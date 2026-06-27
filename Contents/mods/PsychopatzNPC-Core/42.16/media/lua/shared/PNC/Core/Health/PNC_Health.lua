@@ -6,6 +6,14 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Registry = PNC.Registry
 
+local function resolvePathService()
+    return PNC.PathService
+end
+
+local function resolveAnimation()
+    return PNC.Animation
+end
+
 function Health.Ensure(record)
     if not record.health then
         record.health = {
@@ -17,6 +25,95 @@ function Health.Ensure(record)
         }
     end
     return record.health
+end
+
+local function applyIncapacitatedLiveState(record, zombie)
+    local PathService = resolvePathService()
+    local Animation = resolveAnimation()
+    if not zombie then
+        return
+    end
+    if PathService and PathService.Reset then
+        PathService.Reset(zombie, record)
+    end
+    if zombie.setTarget then
+        zombie:setTarget(nil)
+    end
+    if zombie.clearAggroList then
+        zombie:clearAggroList()
+    end
+    if zombie.setRunning then
+        zombie:setRunning(false)
+    end
+    if zombie.setUseless then
+        zombie:setUseless(true)
+    end
+    if zombie.setHealth then
+        zombie:setHealth(Const.INCAPACITATED_ENGINE_BUFFER)
+    end
+    if Animation and Animation.Apply then
+        Animation.Apply(zombie, record, "Idle")
+    end
+end
+
+local function applyNormalLiveState(record, zombie)
+    local Animation = resolveAnimation()
+    if not zombie then
+        return
+    end
+    if zombie.setUseless then
+        zombie:setUseless(false)
+    end
+    if zombie.setHealth then
+        zombie:setHealth(Const.DEFAULT_ENGINE_BUFFER)
+    end
+    if Animation and Animation.Apply then
+        Animation.Apply(zombie, record, "Idle")
+    end
+end
+
+local function refreshNormalLiveBuffer(zombie)
+    if not zombie then
+        return
+    end
+    if zombie.setUseless then
+        zombie:setUseless(false)
+    end
+    if zombie.setHealth then
+        zombie:setHealth(Const.DEFAULT_ENGINE_BUFFER)
+    end
+end
+
+function Health.EnterIncapacitated(record, zombie, reason)
+    local health = Health.Ensure(record)
+    if not record or record.alive == false then
+        return false
+    end
+    health.current = math.max(Const.INCAPACITATED_HP, 1)
+    health.state = "incapacitated"
+    health.downedAt = Core.Now()
+    health.incapacitatedReason = reason or "unknown"
+    record.runtime.target = nil
+    record.runtime.lastPathX = nil
+    record.runtime.lastPathY = nil
+    record.runtime.inCombatUntil = 0
+    record.activeJob = "Incapacitated"
+    record.activeBehavior = "Incapacitated"
+    applyIncapacitatedLiveState(record, zombie)
+    return true
+end
+
+function Health.Recover(record, zombie)
+    local health = Health.Ensure(record)
+    health.current = health.max
+    health.state = "normal"
+    health.downedAt = 0
+    health.incapacitatedReason = nil
+    record.alive = true
+    record.runtime.target = nil
+    record.runtime.inCombatUntil = 0
+    applyNormalLiveState(record, zombie)
+    return true
 end
 
 function Health.ApplyDamageToPlayer(player, amount)
@@ -62,19 +159,18 @@ function Health.ApplyDamage(record, zombie, damageEvent)
 
     health.lastDamageAt = now
 
-    if health.state == "downed" then
-        Health.Kill(record, zombie, damageEvent and damageEvent.type or "downed_finish")
+    if health.state == "incapacitated" then
+        if (now - (tonumber(health.downedAt) or 0)) < Const.INCAPACITATED_GRACE_MS then
+            return false
+        end
+        Health.Kill(record, zombie, damageEvent and damageEvent.type or "incapacitated_finish")
         return true
     end
 
     health.current = health.current - amount
 
     if health.current <= 0 then
-        health.current = 1
-        health.state = "downed"
-        health.downedAt = now
-        record.runtime.target = nil
-        return true
+        return Health.EnterIncapacitated(record, zombie, damageEvent and damageEvent.type or "damage")
     end
 
     return true
@@ -85,9 +181,14 @@ function Health.Update(record, zombie, now)
     if record.alive == false then
         return
     end
-    if health.state == "downed" and (now - (tonumber(health.downedAt) or 0)) >= Const.DOWNED_TIMEOUT_MS then
-        Health.Kill(record, zombie, "downed_timeout")
-    elseif zombie and zombie.setHealth then
-        zombie:setHealth(Const.DEFAULT_ENGINE_BUFFER)
+    if health.state == "incapacitated" then
+        applyIncapacitatedLiveState(record, zombie)
+        if (now - (tonumber(health.downedAt) or 0)) >= Const.INCAPACITATED_TIMEOUT_MS then
+            Health.Kill(record, zombie, "incapacitated_timeout")
+        end
+        return
+    end
+    if zombie then
+        refreshNormalLiveBuffer(zombie)
     end
 end

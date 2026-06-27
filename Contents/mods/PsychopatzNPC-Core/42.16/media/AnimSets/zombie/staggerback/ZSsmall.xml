@@ -4,7 +4,7 @@
 	<m_AnimName>Bob_HitReact2H_01</m_AnimName>
 	<m_BlendOutTime>0.40</m_BlendOutTime>
 	<m_Conditions>
-		<m_Name>Bandit</m_Name>
+		<m_Name>PNCActor</m_Name>
 		<m_Type>BOOL</m_Type>
 		<m_BoolValue>true</m_BoolValue>
 	</m_Conditions>

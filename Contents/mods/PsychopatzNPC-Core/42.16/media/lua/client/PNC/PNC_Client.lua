@@ -175,12 +175,23 @@ local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, te
     local player
     local heldItem
     local actionSquare
+    local debugMenu
+    local snapshot
+    local snapshotText
     if test then
         return
     end
 
     square = getWorldSquare(worldobjects)
     if square then
+        debugMenu = ISContextMenu:getNew(context)
+        context:addSubMenu(context:addOption("PNC Debug"), debugMenu)
+        debugMenu:addOption("Toggle AI Overlay", nil, function()
+            if PNC.Nameplates and PNC.Nameplates.ToggleDebug then
+                PNC.Nameplates.ToggleDebug()
+            end
+        end)
+
         subMenu = ISContextMenu:getNew(context)
         context:addSubMenu(context:addOption("PNC Spawn"), subMenu)
         subMenu:addOption("Spawn Companion", nil, function()
@@ -218,6 +229,16 @@ local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, te
         end)
         subMenu:addOption("Damage 25", nil, function()
             sendDebug("damage", { id = record.id, amount = 25 })
+        end)
+        subMenu:addOption("Dump Snapshot", nil, function()
+            snapshot = ClientState.snapshots and ClientState.snapshots[record.id] or nil
+            snapshotText = PNC.Nameplates and PNC.Nameplates.DebugDescribeSnapshot
+                and PNC.Nameplates.DebugDescribeSnapshot(snapshot)
+                or tostring(snapshot and snapshot.aiState or "No snapshot")
+            print("[PNC] " .. snapshotText)
+            if player and HaloTextHelper and HaloTextHelper.addText then
+                HaloTextHelper.addText(player, "PNC snapshot printed to console")
+            end
         end)
 
         orderMenu = ISContextMenu:getNew(context)

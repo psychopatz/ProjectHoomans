@@ -6,7 +6,35 @@ local Network = PNC.Network
 local Core = PNC.Core
 local Const = PNC.Const
 
+local function resolveAIState(record)
+    local healthState = record.health and tostring(record.health.state or "normal") or "normal"
+    local hasTarget = record.runtime and record.runtime.target ~= nil
+    local inCombat = hasTarget
+        or ((tonumber(record.runtime and record.runtime.inCombatUntil or 0) or 0) > Core.Now())
+
+    if record.alive == false then
+        return "Dead", false
+    end
+    if healthState == "incapacitated" then
+        return "Incapacitated", false
+    end
+    if record.presenceState == Const.PRESENCE_ABSTRACT then
+        return "Abstract", false
+    end
+    if inCombat then
+        return "Combat", true
+    end
+    if record.activeBehavior and record.activeBehavior ~= "" then
+        return tostring(record.activeBehavior), false
+    end
+    return "Idle", false
+end
+
 function Network.BuildSnapshot(record)
+    local aiState
+    local inCombat
+    local target = record.runtime and record.runtime.target or nil
+    aiState, inCombat = resolveAIState(record)
     return {
         id = record.id,
         name = record.name,
@@ -27,6 +55,18 @@ function Network.BuildSnapshot(record)
         weaponMode = record.weaponMode,
         weaponFullType = record.equipment and record.equipment.primaryFullType or nil,
         presenceRevision = record.presenceRevision,
+        aiState = aiState,
+        inCombat = inCombat,
+        debugState = {
+            aiState = aiState,
+            activeJob = record.activeJob,
+            activeBehavior = record.activeBehavior,
+            orderKind = record.orderSpec and record.orderSpec.kind or nil,
+            targetKind = target and target.kind or nil,
+            healthState = record.health and record.health.state or nil,
+            weaponMode = record.weaponMode,
+            presenceState = record.presenceState,
+        },
     }
 end
 

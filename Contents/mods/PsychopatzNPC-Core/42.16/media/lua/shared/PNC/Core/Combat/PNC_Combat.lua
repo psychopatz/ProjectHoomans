@@ -52,6 +52,7 @@ function Combat.TryMelee(record, zombie, target)
     end
 
     record.runtime.lastAttackAt = now
+    record.runtime.inCombatUntil = now + Const.DEBUG_COMBAT_HOLD_MS
     faceTarget(zombie, target)
     if zombie then
         Animation.Apply(zombie, record, "Attack")
@@ -92,6 +93,7 @@ function Combat.TryRanged(record, zombie, target)
     end
 
     record.runtime.lastAttackAt = now
+    record.runtime.inCombatUntil = now + Const.DEBUG_COMBAT_HOLD_MS
     faceTarget(zombie, target)
     if zombie then
         Animation.Apply(zombie, record, "Attack")

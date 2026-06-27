@@ -31,7 +31,7 @@ end
 local function setWalkAnim(zombie, record, mode)
     local walkType = mode == "run" and "Run" or "Walk"
     if zombie.setVariable then
-        zombie:setVariable("BanditWalkType", walkType)
+        zombie:setVariable("PNCWalkType", walkType)
     end
     if zombie.setWalkType then
         zombie:setWalkType(walkType)
@@ -70,7 +70,7 @@ local function resetPathController(zombie)
     end
 end
 
-local function openDoorLikeBandits(zombie, object)
+local function openDoorForNPC(zombie, object)
     local square
     local properties
     local doorSound
@@ -102,7 +102,7 @@ local function openDoorLikeBandits(zombie, object)
         square:RecalcProperties()
         object:syncIsoObject(false, 1, nil, nil)
         LuaEventManager.triggerEvent("OnContainerUpdate")
-        if BanditCompatibility and BanditCompatibility.GetGameVersion and BanditCompatibility.GetGameVersion() >= 42 and object.invalidateRenderChunkLevel then
+        if FBORenderChunk and object.invalidateRenderChunkLevel then
             object:invalidateRenderChunkLevel(FBORenderChunk.DIRTY_OBJECT_MODIFY)
         end
     end
@@ -186,7 +186,7 @@ local function tryDoorOrWindowInteraction(zombie, record, goalX, goalY, goalZ)
                         end
                     end
                     if (instanceof(object, "IsoDoor") or (instanceof(object, "IsoThumpable") and object.isDoor and object:isDoor() == true)) and facingSatisfied then
-                        if openDoorLikeBandits(zombie, object) then
+                        if openDoorForNPC(zombie, object) then
                             return true
                         end
                     end
@@ -207,11 +207,6 @@ local function tryDoorOrWindowInteraction(zombie, record, goalX, goalY, goalZ)
                             zombie:setBumpType("ClimbWindow")
                             return true
                         end
-                    end
-                    if object.isHoppable and object:isHoppable() and zombie.isFacingObject and zombie:isFacingObject(object, 0.5) then
-                        zombie:changeState(ClimbOverFenceState.instance())
-                        zombie:setBumpType("ClimbFenceEnd")
-                        return true
                     end
                 end
             end

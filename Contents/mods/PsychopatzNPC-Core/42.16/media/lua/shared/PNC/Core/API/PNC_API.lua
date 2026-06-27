@@ -117,9 +117,8 @@ function API.DebugCommand(npcId, command, args)
         return true
     end
     if command == "heal" then
-        record.health.current = record.health.max
-        record.health.state = "normal"
-        record.alive = true
+        zombie = Registry.GetLiveZombie(npcId)
+        Health.Recover(record, zombie)
         Network.BroadcastRecord(record, "heal")
         return true
     end

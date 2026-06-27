@@ -72,9 +72,9 @@ function Equipment.Apply(zombie, record)
 
     if not fullType or not InventoryItemFactory or not InventoryItemFactory.CreateItem then
         if zombie.setVariable then
-            zombie:setVariable("BanditPrimary", "")
-            zombie:setVariable("BanditSecondary", "")
-            zombie:setVariable("BanditPrimaryType", "barehand")
+            zombie:setVariable("PNCPrimary", "")
+            zombie:setVariable("PNCSecondary", "")
+            zombie:setVariable("PNCPrimaryType", "barehand")
         end
         return
     end
@@ -82,9 +82,9 @@ function Equipment.Apply(zombie, record)
     item = InventoryItemFactory.CreateItem(fullType)
     if not item then
         if zombie.setVariable then
-            zombie:setVariable("BanditPrimary", "")
-            zombie:setVariable("BanditSecondary", "")
-            zombie:setVariable("BanditPrimaryType", "barehand")
+            zombie:setVariable("PNCPrimary", "")
+            zombie:setVariable("PNCSecondary", "")
+            zombie:setVariable("PNCPrimaryType", "barehand")
         end
         return
     end
@@ -98,9 +98,9 @@ function Equipment.Apply(zombie, record)
         zombie:setSecondaryHandItem(item)
     end
     if zombie.setVariable then
-        zombie:setVariable("BanditPrimary", fullType)
-        zombie:setVariable("BanditSecondary", "")
-        zombie:setVariable("BanditPrimaryType", primaryType)
+        zombie:setVariable("PNCPrimary", fullType)
+        zombie:setVariable("PNCSecondary", "")
+        zombie:setVariable("PNCPrimaryType", primaryType)
     end
     if zombie.resetEquippedHandsModels then
         zombie:resetEquippedHandsModels()

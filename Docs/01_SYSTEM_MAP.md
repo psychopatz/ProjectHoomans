@@ -6,7 +6,7 @@
 - `PNC_SpatialIndex`: indexed nearby player and NPC queries
 - `PNC_Perception`: target selection rules
 - `PNC_Animation`: single animation state writer
-- `PNC_Health`: custom HP, downed, death ownership
+- `PNC_Health`: custom HP, incapacitation, death ownership
 - `PNC_Combat`: shared melee and ranged combat services
 - `PNC_PathService`: live stepping and abstract travel
 - `PNC_OrderSystem`: order normalization and ownership
@@ -22,3 +22,4 @@
 
 ## Client
 - `PNC_Client`: snapshot cache, sync requests, context menu debug tools
+- `PNC_Nameplates`: overhead HP bars, incapacitated pulse, and AI debug overlay

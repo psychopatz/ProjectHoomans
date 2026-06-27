@@ -89,6 +89,27 @@ function Behavior.Tick(record, zombie, now)
     local patrolPoints
     local ownerDist
 
+    if record.alive == false then
+        record.activeJob = "Dead"
+        record.activeBehavior = "Dead"
+        record.runtime.target = nil
+        if zombie then
+            PNC.Animation.Apply(zombie, record, "Idle")
+        end
+        return
+    end
+
+    if record.health and record.health.state == "incapacitated" then
+        record.activeJob = "Incapacitated"
+        record.activeBehavior = "Incapacitated"
+        record.runtime.target = nil
+        if zombie then
+            PathService.Reset(zombie, record)
+            PNC.Animation.Apply(zombie, record, "Idle")
+        end
+        return
+    end
+
     record.activeJob = job
     record.activeBehavior = job
 

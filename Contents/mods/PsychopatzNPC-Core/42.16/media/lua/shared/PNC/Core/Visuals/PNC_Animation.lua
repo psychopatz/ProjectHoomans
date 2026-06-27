@@ -4,6 +4,7 @@ PNC.Animation = PNC.Animation or {}
 local Animation = PNC.Animation
 
 function Animation.ApplyLiveSetup(zombie, record)
+    local descriptor
     if not zombie or not record then
         return
     end
@@ -14,16 +15,17 @@ function Animation.ApplyLiveSetup(zombie, record)
         zombie:setFemaleEtc(record.isFemale == true)
     end
     if zombie.setVariable then
-        zombie:setVariable("Bandit", true)
-        zombie:setVariable("BanditWalkType", "Walk")
-        zombie:setVariable("BanditPrimary", "")
-        zombie:setVariable("BanditSecondary", "")
-        zombie:setVariable("BanditPrimaryType", "barehand")
         zombie:setVariable("LimpSpeed", 0.80)
         zombie:setVariable("RunSpeed", 0.72)
         zombie:setVariable("WalkSpeed", 1.04)
         zombie:setVariable("ZombieHitReaction", "Chainsaw")
         zombie:setVariable("NoLungeTarget", true)
+        zombie:setVariable("PNCActor", true)
+        zombie:setVariable("PNCWalkType", "Walk")
+        zombie:setVariable("PNCPrimary", "")
+        zombie:setVariable("PNCSecondary", "")
+        zombie:setVariable("PNCPrimaryType", "barehand")
+        zombie:setVariable("PNCImmediateAnim", false)
         zombie:setVariable("PNCLive", true)
     end
     if zombie.setWalkType then
@@ -81,9 +83,9 @@ function Animation.ApplyLiveSetup(zombie, record)
         zombie:getEmitter():stopAll()
     end
     if zombie.getDescriptor then
-        local descriptor = zombie:getDescriptor()
+        descriptor = zombie:getDescriptor()
         if descriptor and descriptor.setVoicePrefix then
-            descriptor:setVoicePrefix("Bandit")
+            descriptor:setVoicePrefix("NotAZombie")
         end
     end
 end
@@ -93,7 +95,7 @@ function Animation.Apply(zombie, record, animState)
     if not zombie or not record then
         return
     end
-    previousWalkType = zombie.getVariableString and zombie:getVariableString("BanditWalkType") or ""
+    previousWalkType = zombie.getVariableString and zombie:getVariableString("PNCWalkType") or ""
     zombie:setVariable("PNC", true)
     zombie:setVariable("PNCState", tostring(record.activeBehavior or record.activeJob or "Idle"))
     zombie:setVariable("PNCOrder", tostring(record.orderSpec and record.orderSpec.kind or "none"))
@@ -101,7 +103,7 @@ function Animation.Apply(zombie, record, animState)
     zombie:setVariable("PNCAnim", tostring(animState or "Idle"))
     zombie:setVariable("PNCWeaponMode", tostring(record.weaponMode or "melee"))
     if animState == "Run" or animState == "Walk" then
-        zombie:setVariable("BanditWalkType", animState)
+        zombie:setVariable("PNCWalkType", animState)
         if zombie.setWalkType then
             zombie:setWalkType(animState)
         end
@@ -111,7 +113,7 @@ function Animation.Apply(zombie, record, animState)
         elseif previousWalkType == "Walk" and zombie.setBumpType then
             zombie:setBumpType("WalkToIdle")
         end
-        zombie:setVariable("BanditWalkType", "")
+        zombie:setVariable("PNCWalkType", "")
         if zombie.setWalkType then
             zombie:setWalkType("Walk")
         end
