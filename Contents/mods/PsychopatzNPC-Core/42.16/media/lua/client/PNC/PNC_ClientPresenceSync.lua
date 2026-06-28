@@ -82,6 +82,21 @@ local function buildVisualKey(snapshot)
     }, "|")
 end
 
+local function buildMotionKey(snapshot)
+    local visualState = snapshot and snapshot.visualState or {}
+    return table.concat({
+        tostring(snapshot and snapshot.presenceRevision or 0),
+        tostring(snapshot and snapshot.healthState or "normal"),
+        tostring(visualState.anim or "Idle"),
+        tostring(visualState.walkType or ""),
+        tostring(visualState.mode or ""),
+        tostring(visualState.moving == true),
+        tostring(visualState.attackActive == true),
+        tostring(visualState.attackAnim or ""),
+        tostring(visualState.attackFinishAt or 0),
+    }, "|")
+end
+
 local function applyIdentityVars(zombie, snapshot)
     if not zombie or not zombie.setVariable then
         return
@@ -127,6 +142,7 @@ local function applySnapshotToBody(snapshot, zombie)
     local desiredAnim
     local recordView
     local visualKey
+    local motionKey
     if not snapshot or not zombie or (zombie.isDead and zombie:isDead()) then
         return
     end
@@ -148,8 +164,10 @@ local function applySnapshotToBody(snapshot, zombie)
         modData.PNC_ClientVisualKey = visualKey
     end
 
+    motionKey = buildMotionKey(snapshot)
+
     if snapshot.healthState == "incapacitated" then
-        if Animation and Animation.ApplyDowned then
+        if Animation and Animation.ApplyDowned and (not modData or modData.PNC_ClientMotionKey ~= motionKey) then
             Animation.ApplyDowned(zombie, recordView, visualState.anim == "Crawl")
         end
     elseif Animation and Animation.ClearDowned then
@@ -162,6 +180,7 @@ local function applySnapshotToBody(snapshot, zombie)
     if attackKey and modData and modData.PNC_ClientAttackKey ~= attackKey then
         Animation.PlayBump(zombie, recordView, visualState.attackAnim)
         modData.PNC_ClientAttackKey = attackKey
+        modData.PNC_ClientMotionKey = motionKey
         return
     end
     if modData and not attackKey then
@@ -172,11 +191,14 @@ local function applySnapshotToBody(snapshot, zombie)
     end
 
     desiredAnim = visualState.anim or "Idle"
-    if Animation and Animation.Apply then
+    if Animation and Animation.Apply and (not modData or modData.PNC_ClientMotionKey ~= motionKey) then
         Animation.Apply(zombie, recordView, desiredAnim)
-    end
-    if Animation and Animation.SyncLocomotion then
-        Animation.SyncLocomotion(zombie)
+        if Animation and Animation.SyncLocomotion then
+            Animation.SyncLocomotion(zombie)
+        end
+        if modData then
+            modData.PNC_ClientMotionKey = motionKey
+        end
     end
 end
 

@@ -28,6 +28,23 @@ local Stamina = PNC.Stamina
 local Archetypes = PNC.Archetypes
 local Animation = PNC.Animation
 
+local function getSyncInterval(record)
+    local runtime = record and record.runtime or nil
+    if record and record.presenceState ~= Const.PRESENCE_LIVE then
+        return 500
+    end
+    if runtime and runtime.attackAction then
+        return 75
+    end
+    if runtime and runtime.target then
+        return 100
+    end
+    if runtime and runtime.pathing and runtime.pathing.goalX ~= nil and runtime.pathing.finished ~= true then
+        return 150
+    end
+    return 500
+end
+
 local function resolveDebugArchetype(args, faction, fallbackID)
     local explicit = args and args.archetypeID or nil
     local defaults
@@ -84,7 +101,7 @@ local function processRecord(record, now)
     record.lastThinkAt = now
     record.nextThinkAt = now + Scheduler.GetCadence(record)
 
-    if (now - (tonumber(record.lastSyncAt) or 0)) >= 500 then
+    if (now - (tonumber(record.lastSyncAt) or 0)) >= getSyncInterval(record) then
         Network.BroadcastRecord(record, "tick")
         record.lastSyncAt = now
     end
