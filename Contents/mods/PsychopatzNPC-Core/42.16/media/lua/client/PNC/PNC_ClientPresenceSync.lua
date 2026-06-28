@@ -21,6 +21,10 @@ Sync.BodyByID = Sync.BodyByID or {}
 Sync.BodyByInstanceID = Sync.BodyByInstanceID or {}
 Sync.lastBodyScanAt = Sync.lastBodyScanAt or 0
 
+local function isWorldReady()
+    return (not isIngameState) or isIngameState()
+end
+
 local function buildRecordView(snapshot)
     return {
         activeBehavior = snapshot and snapshot.activeBehavior or snapshot and snapshot.aiState or "Idle",
@@ -232,6 +236,9 @@ function Sync.OnTick()
     local id
     local snapshot
     local body
+    if not isWorldReady() then
+        return
+    end
     requestSyncIfStale(now)
     refreshBodyMap(now)
     for id, snapshot in pairs(ClientState and ClientState.snapshots or {}) do
@@ -245,4 +252,11 @@ function Sync.OnTick()
     end
 end
 
+local function onResetLua()
+    Sync.BodyByID = {}
+    Sync.BodyByInstanceID = {}
+    Sync.lastBodyScanAt = 0
+end
+
 Events.OnTick.Add(Sync.OnTick)
+Events.OnResetLua.Add(onResetLua)

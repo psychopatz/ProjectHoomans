@@ -592,6 +592,9 @@ end
 local function onPreUIDraw()
     local _
     local manager
+    if isIngameState and not isIngameState() then
+        return
+    end
     for _, manager in pairs(State.managers) do
         if manager and manager.active then
             manager:update()
@@ -601,6 +604,11 @@ local function onPreUIDraw()
     end
 end
 
+local function onResetLua()
+    State.managers = {}
+end
+
 Events.OnCreatePlayer.Add(onCreatePlayer)
 Events.OnGameStart.Add(onGameStart)
 Events.OnPreUIDraw.Add(onPreUIDraw)
+Events.OnResetLua.Add(onResetLua)

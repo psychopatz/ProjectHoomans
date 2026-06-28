@@ -28,6 +28,12 @@ end
 
 ISPNCCharacterWindow = ISCollapsableWindow:derive("ISPNCCharacterWindow")
 
+function ISPNCCharacterWindow:onTabButton(_, button)
+    local tabId = button and button.internal or "Info"
+    self.activeTab = tostring(tabId)
+    self.scrollY = 0
+end
+
 function ISPNCCharacterWindow:initialise()
     ISCollapsableWindow.initialise(self)
 end
@@ -40,10 +46,8 @@ function ISPNCCharacterWindow:createChildren()
     self.tabButtons = {}
     for i = 1, #TAB_ORDER do
         tab = TAB_ORDER[i]
-        self.tabButtons[tab.id] = ISButton:new(x, 24, 86, 22, tab.label, self, function()
-            self.activeTab = tab.id
-            self.scrollY = 0
-        end)
+        self.tabButtons[tab.id] = ISButton:new(x, 24, 86, 22, tab.label, self, ISPNCCharacterWindow.onTabButton)
+        self.tabButtons[tab.id].internal = tab.id
         self.tabButtons[tab.id]:initialise()
         self.tabButtons[tab.id]:instantiate()
         self.tabButtons[tab.id].borderColor = { r = 0.4, g = 0.4, b = 0.4, a = 1 }
@@ -51,6 +55,23 @@ function ISPNCCharacterWindow:createChildren()
         x = x + 90
     end
 end
+
+function CharacterWindow.Reset()
+    local window = CharacterWindow.instance
+    if not window then
+        return
+    end
+    if window.removeFromUIManager then
+        window:removeFromUIManager()
+    end
+    CharacterWindow.instance = nil
+end
+
+local function onResetLua()
+    CharacterWindow.Reset()
+end
+
+Events.OnResetLua.Add(onResetLua)
 
 function ISPNCCharacterWindow:setNPC(npcId)
     local summary

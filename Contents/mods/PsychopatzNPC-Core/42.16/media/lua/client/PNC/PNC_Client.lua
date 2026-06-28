@@ -14,8 +14,15 @@ local Core = PNC.Core
 local Registry = PNC.Registry
 local ClientState = PNC.Network.ClientState
 
+local function isWorldReady()
+    return (not isIngameState) or isIngameState()
+end
+
 local function requestFullSync()
     local player = getSpecificPlayer(0)
+    if not isWorldReady() then
+        return
+    end
     ClientState.lastFullSyncRequestAt = Core.Now()
     if player and sendClientCommand then
         sendClientCommand(player, Const.MODULE, Const.CMD_FULL_SYNC_REQUEST, {})
@@ -115,6 +122,9 @@ local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, te
     local debugMenu
     local subMenu
     local square
+    if not isWorldReady() then
+        return
+    end
     if test then
         return
     end
@@ -152,7 +162,13 @@ local function onServerCommand(module, command, args)
     end
 end
 
+local function onResetLua()
+    ClientState.snapshots = {}
+    ClientState.characterPayloads = {}
+end
+
 Events.OnServerCommand.Add(onServerCommand)
 Events.OnGameStart.Add(requestFullSync)
 Events.OnCreatePlayer.Add(requestFullSync)
 Events.OnFillWorldObjectContextMenu.Add(onFillWorldObjectContextMenu)
+Events.OnResetLua.Add(onResetLua)
