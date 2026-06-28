@@ -19,6 +19,7 @@ local Equipment = PNC.Equipment
 local Inventory = PNC.Inventory
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
+local Profiles = PNC.VisualProfiles
 
 local function resolveAIState(record)
     local healthState = record.health and tostring(record.health.state or "normal") or "normal"
@@ -155,6 +156,7 @@ function Network.BuildSnapshot(record)
     local inventorySummary
     local combat
     local visualState
+    local appearance
     aiState, inCombat = resolveAIState(record)
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
     equipmentInfo = Equipment and Equipment.Describe and Equipment.Describe(record) or {}
@@ -162,6 +164,7 @@ function Network.BuildSnapshot(record)
     inventorySummary = Inventory and Inventory.BuildSummaryPayload and Inventory.BuildSummaryPayload(record) or nil
     combat = buildCombatSummary(record)
     visualState = buildVisualState(record)
+    appearance = Profiles and Profiles.RollAppearance and Profiles.RollAppearance(record) or nil
     return {
         id = record.id,
         name = identity.displayName,
@@ -174,6 +177,7 @@ function Network.BuildSnapshot(record)
         faction = record.faction,
         visualProfile = record.visualProfile,
         isFemale = identity.isFemale,
+        identity = identity,
         x = record.x,
         y = record.y,
         z = record.z,
@@ -199,9 +203,11 @@ function Network.BuildSnapshot(record)
         combatModeResolved = equipmentInfo.combatModeResolved or record.weaponMode,
         weaponStatus = equipmentInfo.weaponStatus or "unknown",
         presenceRevision = record.presenceRevision,
+        liveBodyInstanceID = record.liveBodyInstanceID,
         aiState = aiState,
         inCombat = inCombat,
         visualState = visualState,
+        appearance = appearance and Core.DeepCopy(appearance) or nil,
         equipmentSummary = {
             primaryFullType = record.equipment and record.equipment.primaryFullType or nil,
             secondaryFullType = record.equipment and record.equipment.secondaryFullType or nil,

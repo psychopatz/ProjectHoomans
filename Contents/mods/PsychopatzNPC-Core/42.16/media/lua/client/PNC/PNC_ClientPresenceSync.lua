@@ -14,8 +14,11 @@ local Const = PNC.Const
 local Animation = PNC.Animation
 local Client = PNC.Client
 local ClientState = PNC.Network.ClientState
+local Visuals = PNC.Visuals
+local Equipment = PNC.Equipment
 
 Sync.BodyByID = Sync.BodyByID or {}
+Sync.BodyByInstanceID = Sync.BodyByInstanceID or {}
 Sync.lastBodyScanAt = Sync.lastBodyScanAt or 0
 
 local function buildRecordView(snapshot)
@@ -27,7 +30,56 @@ local function buildRecordView(snapshot)
         },
         presenceState = snapshot and snapshot.presenceState or Const.PRESENCE_ABSTRACT,
         weaponMode = snapshot and snapshot.weaponMode or "melee",
+        visualProfile = snapshot and snapshot.visualProfile or nil,
+        isFemale = snapshot and snapshot.isFemale == true or false,
+        identitySeed = snapshot and snapshot.identitySeed or 1,
+        archetypeID = snapshot and snapshot.archetypeID or nil,
+        archetypeLabel = snapshot and snapshot.archetypeLabel or nil,
+        outfit = snapshot and snapshot.appearance and snapshot.appearance.outfit or nil,
+        identity = snapshot and snapshot.identity or nil,
+        equipment = {
+            primaryFullType = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.primaryFullType or nil,
+            secondaryFullType = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.secondaryFullType or nil,
+            worn = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.worn or {},
+            attached = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.attached or {},
+        },
     }
+end
+
+local function stableTableSignature(tbl)
+    local keys = {}
+    local i = 0
+    local key
+    if type(tbl) ~= "table" then
+        return ""
+    end
+    for key, _ in pairs(tbl) do
+        i = i + 1
+        keys[i] = tostring(key)
+    end
+    table.sort(keys)
+    for i = 1, #keys do
+        keys[i] = keys[i] .. "=" .. tostring(tbl[keys[i]] or "")
+    end
+    return table.concat(keys, ";")
+end
+
+local function buildVisualKey(snapshot)
+    local appearance = snapshot and snapshot.appearance or {}
+    local equipment = snapshot and snapshot.equipmentSummary or {}
+    return table.concat({
+        tostring(snapshot and snapshot.presenceRevision or 0),
+        tostring(snapshot and snapshot.visualProfile or ""),
+        tostring(snapshot and snapshot.isFemale == true),
+        tostring(appearance.outfit or ""),
+        tostring(appearance.skinTexture or ""),
+        tostring(appearance.hairModel or ""),
+        tostring(appearance.beardModel or ""),
+        tostring(equipment.primaryFullType or ""),
+        tostring(equipment.secondaryFullType or ""),
+        stableTableSignature(equipment.worn),
+        stableTableSignature(equipment.attached),
+    }, "|")
 end
 
 local function applyIdentityVars(zombie, snapshot)
@@ -51,6 +103,7 @@ local function refreshBodyMap(now)
     end
     Sync.lastBodyScanAt = now
     Sync.BodyByID = {}
+    Sync.BodyByInstanceID = {}
     zombieList = getCell():getZombieList()
     if not zombieList then
         return
@@ -61,6 +114,9 @@ local function refreshBodyMap(now)
         if modData and modData.PNC_UUID and modData.PNC_NPC == true then
             Sync.BodyByID[tostring(modData.PNC_UUID)] = body
         end
+        if body and body.getPersistentOutfitID then
+            Sync.BodyByInstanceID[tostring(body:getPersistentOutfitID() or "")] = body
+        end
     end
 end
 
@@ -70,12 +126,27 @@ local function applySnapshotToBody(snapshot, zombie)
     local attackKey
     local desiredAnim
     local recordView
+    local visualKey
     if not snapshot or not zombie or (zombie.isDead and zombie:isDead()) then
         return
     end
 
     recordView = buildRecordView(snapshot)
     applyIdentityVars(zombie, snapshot)
+
+    visualKey = buildVisualKey(snapshot)
+    if modData and modData.PNC_ClientVisualKey ~= visualKey then
+        if Animation and Animation.ApplyLiveSetup then
+            Animation.ApplyLiveSetup(zombie, recordView)
+        end
+        if Visuals and Visuals.ApplyResolvedAppearance then
+            Visuals.ApplyResolvedAppearance(zombie, snapshot.appearance or {}, snapshot.isFemale == true)
+        end
+        if Equipment and Equipment.Apply then
+            Equipment.Apply(zombie, recordView)
+        end
+        modData.PNC_ClientVisualKey = visualKey
+    end
 
     if snapshot.healthState == "incapacitated" then
         if Animation and Animation.ApplyDowned then
@@ -144,6 +215,7 @@ function Sync.OnTick()
     for id, snapshot in pairs(ClientState and ClientState.snapshots or {}) do
         if snapshot and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false then
             body = Sync.BodyByID[id]
+                or Sync.BodyByInstanceID[tostring(snapshot.liveBodyInstanceID or "")]
             if body then
                 applySnapshotToBody(snapshot, body)
             end

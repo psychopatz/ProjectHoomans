@@ -395,7 +395,7 @@ local function updatePathRequest(zombie, record)
         if issuePathRequest(zombie, path.goalX, path.goalY, path.goalZ) then
             return true, "repath"
         end
-        if isSquareWalkable(path.goalX, path.goalY, path.goalZ) then
+        if (not isServer or not isServer()) and isSquareWalkable(path.goalX, path.goalY, path.goalZ) then
             zombie:setX(path.goalX)
             zombie:setY(path.goalY)
             zombie:setZ(path.goalZ)
@@ -403,6 +403,10 @@ local function updatePathRequest(zombie, record)
             path.wasActive = false
             return true, "fallback_snap"
         end
+        path.finished = true
+        path.wasActive = false
+        resetPathController(zombie)
+        return true, "blocked"
     end
 
     return true, "waiting"

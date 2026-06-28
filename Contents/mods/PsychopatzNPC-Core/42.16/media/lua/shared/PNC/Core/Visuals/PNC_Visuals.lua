@@ -143,19 +143,17 @@ local function applyBaseOutfitItems(zombie, appearance)
     end
 end
 
-function Visuals.ApplyHumanVisuals(zombie, record)
-    local appearance
+function Visuals.ApplyResolvedAppearance(zombie, appearance, isFemale)
     local humanVisual
     local itemVisuals
     local wornItems
 
-    if not zombie or not record then
+    if not zombie or not appearance then
         return
     end
 
-    appearance = Profiles.RollAppearance(record)
     if zombie.setFemaleEtc then
-        zombie:setFemaleEtc(record.isFemale == true)
+        zombie:setFemaleEtc(isFemale == true)
     end
 
     humanVisual = zombie.getHumanVisual and zombie:getHumanVisual() or nil
@@ -199,4 +197,13 @@ function Visuals.ApplyHumanVisuals(zombie, record)
     end
 
     refreshModel(zombie)
+end
+
+function Visuals.ApplyHumanVisuals(zombie, record)
+    local appearance
+    if not zombie or not record then
+        return
+    end
+    appearance = Profiles.RollAppearance(record)
+    Visuals.ApplyResolvedAppearance(zombie, appearance, record.isFemale == true)
 end
