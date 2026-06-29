@@ -20,6 +20,10 @@ local function resolveAnimation()
     return PNC.Animation
 end
 
+local function resolveCombatTactics()
+    return PNC.CombatTactics
+end
+
 function Health.Ensure(record)
     if not record.health then
         record.health = {
@@ -230,6 +234,9 @@ function Health.ApplyDamage(record, zombie, damageEvent)
     if damageEvent and damageEvent.attackerKind == "zombie" then
         record.runtime.targetKind = "zombie"
         record.runtime.combatBlockReason = "taking_zombie_damage"
+        if resolveCombatTactics() and resolveCombatTactics().MarkZombieDamage then
+            resolveCombatTactics().MarkZombieDamage(record, damageEvent.x, damageEvent.y, damageEvent.z, now)
+        end
     end
 
     if health.state == "incapacitated" then

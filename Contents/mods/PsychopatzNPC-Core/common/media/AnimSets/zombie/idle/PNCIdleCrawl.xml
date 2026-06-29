@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode>
+    <m_Name>PNCIdleCrawl</m_Name>
+    <m_AnimName>Zombie_CrawlIdle</m_AnimName>
+    <m_Priority>4</m_Priority>
+    <m_BlendTime>0.20</m_BlendTime>
+    <m_SpeedScale>0.40</m_SpeedScale>
+    <m_randomAdvanceFraction>0.20</m_randomAdvanceFraction>
+    <m_Conditions>
+        <m_Name>PNCActor</m_Name>
+        <m_Type>BOOL</m_Type>
+        <m_BoolValue>true</m_BoolValue>
+    </m_Conditions>
+    <m_Conditions>
+        <m_Name>bMoving</m_Name>
+        <m_Type>BOOL</m_Type>
+        <m_BoolValue>false</m_BoolValue>
+    </m_Conditions>
+    <m_Conditions>
+        <m_Name>PNCWalkType</m_Name>
+        <m_Type>STRING</m_Type>
+        <m_StringValue>Crawl</m_StringValue>
+    </m_Conditions>
+</animNode>

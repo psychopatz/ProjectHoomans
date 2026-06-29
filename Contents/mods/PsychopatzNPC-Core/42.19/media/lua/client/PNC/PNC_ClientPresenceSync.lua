@@ -53,6 +53,21 @@ local function buildRecordView(snapshot)
                 animSpeed = tonumber(visualState.animSpeed) or 1.0,
                 mode = visualState.mode or "walk",
                 resolvedMode = visualState.mode or "walk",
+                moveAnim = visualState.moveAnim or visualState.anim or "Idle",
+                walkType = visualState.walkType or "",
+                engineWalkType = visualState.engineWalkType or visualState.walkType or "",
+                profileKey = visualState.profileKey or visualState.mode or "walk",
+                isRunning = visualState.isRunning == true,
+                isCrawling = visualState.isCrawling == true,
+                motionProfile = {
+                    animSpeed = tonumber(visualState.animSpeed) or 1.0,
+                    moveAnim = visualState.moveAnim or visualState.anim or "Idle",
+                    walkType = visualState.walkType or "",
+                    engineWalkType = visualState.engineWalkType or visualState.walkType or "",
+                    isRunning = visualState.isRunning == true,
+                    isCrawling = visualState.isCrawling == true,
+                    profileKey = visualState.profileKey or visualState.mode or "walk",
+                },
             },
         },
     }
@@ -100,13 +115,18 @@ local function buildMotionKey(snapshot)
         tostring(snapshot and snapshot.presenceRevision or 0),
         tostring(snapshot and snapshot.healthState or "normal"),
         tostring(visualState.anim or "Idle"),
+        tostring(visualState.moveAnim or ""),
         tostring(visualState.walkType or ""),
+        tostring(visualState.engineWalkType or ""),
         tostring(visualState.mode or ""),
         tostring(visualState.moving == true),
         tostring(visualState.attackActive == true),
         tostring(visualState.attackAnim or ""),
         tostring(visualState.attackFinishAt or 0),
         tostring(tonumber(visualState.animSpeed) or 1.0),
+        tostring(visualState.isRunning == true),
+        tostring(visualState.isCrawling == true),
+        tostring(visualState.profileKey or ""),
         tostring(visualState.specialActive == true),
         tostring(visualState.specialAnim or ""),
         tostring(visualState.specialFinishAt or 0),
@@ -185,7 +205,7 @@ local function applySnapshotToBody(snapshot, zombie)
 
     if snapshot.healthState == "incapacitated" then
         if Animation and Animation.ApplyDowned and (not modData or modData.PNC_ClientMotionKey ~= motionKey) then
-            Animation.ApplyDowned(zombie, recordView, visualState.anim == "Crawl")
+            Animation.ApplyDowned(zombie, recordView, visualState.moving == true and visualState.isCrawling == true and recordView.runtime.pathing.motionProfile or false)
         end
     elseif Animation and Animation.ClearDowned then
         Animation.ClearDowned(zombie)
@@ -225,9 +245,9 @@ local function applySnapshotToBody(snapshot, zombie)
 
     desiredAnim = visualState.anim or "Idle"
     if Animation and Animation.Apply and (not modData or modData.PNC_ClientMotionKey ~= motionKey) then
-        Animation.Apply(zombie, recordView, desiredAnim)
+        Animation.Apply(zombie, recordView, desiredAnim, recordView.runtime.pathing.motionProfile, visualState.moving == true)
         if Animation and Animation.SyncLocomotion then
-            Animation.SyncLocomotion(zombie)
+            Animation.SyncLocomotion(zombie, recordView)
         end
         if modData then
             modData.PNC_ClientMotionKey = motionKey

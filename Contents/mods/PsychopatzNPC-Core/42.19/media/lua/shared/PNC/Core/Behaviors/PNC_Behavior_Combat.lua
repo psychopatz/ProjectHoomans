@@ -25,6 +25,9 @@ function BehaviorCombat.TickEngage(record, zombie, target)
     local actionActive
     local repositioned
     local repositionReason
+    local shouldApproach
+    local approachStopDistance
+    local approachMode
 
     Common.SetCombatDebug(record, target, "engaging_" .. tostring(target.kind or "unknown"), effectiveMode, equipmentInfo.weaponStatus)
 
@@ -59,15 +62,20 @@ function BehaviorCombat.TickEngage(record, zombie, target)
             Common.SetCombatDebug(record, target, "attacking_melee", effectiveMode, equipmentInfo.weaponStatus)
             return
         end
-        if reason == "target_out_of_range" then
+        if Tactics and Tactics.ResolveMeleeApproach then
+            shouldApproach, approachStopDistance, approachMode = Tactics.ResolveMeleeApproach(record, dist)
+        else
+            shouldApproach, approachStopDistance, approachMode = reason == "target_out_of_range", Const.MELEE_RANGE, "run"
+        end
+        if reason == "target_out_of_range" or (shouldApproach and dist > Const.MELEE_RANGE) then
             Common.MoveRecord(
                 record,
                 zombie,
                 target.x,
                 target.y,
                 target.z,
-                Common.ResolveCombatApproachMode(dist, "run"),
-                Const.MELEE_RANGE,
+                Common.ResolveCombatApproachMode(dist, approachMode or "run"),
+                approachStopDistance or Const.MELEE_RANGE,
                 "closing_to_melee"
             )
             Common.SetCombatDebug(record, target, "closing_to_melee", effectiveMode, equipmentInfo.weaponStatus)

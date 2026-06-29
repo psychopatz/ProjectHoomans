@@ -4,6 +4,8 @@
 
 - `PNC_Combat_ZombieReaction.lua` owns short NPC-on-zombie shove and hit
   reactions.
+- `PNC_LocomotionProfiles.lua` owns shared fake-locomotion profile resolution
+  for walk, run, sneak, crawl, and recovery cadence.
 - `PNC_PathService.lua` owns facing leases and decides whether combat or
   locomotion currently controls body facing.
 - `PNC_FakeLocomotion.lua` owns travel transport and asks pathing to face the
@@ -19,3 +21,6 @@
   close repositioning.
 - Outside those leases, locomotion owns facing and points the NPC along travel
   direction.
+- Snapshot `visualState` mirrors the resolved motion profile fields so nearby
+  clients replay the same walk, run, sneak, and crawl choice instead of
+  inferring posture from reduced hints.

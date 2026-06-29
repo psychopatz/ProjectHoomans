@@ -11,16 +11,10 @@ PNC.FakeLocomotion = PNC.FakeLocomotion or {}
 local FakeLocomotion = PNC.FakeLocomotion
 local Core = PNC.Core
 local LiveBodyControl = PNC.LiveBodyControl
+local LocomotionProfiles = PNC.LocomotionProfiles
 
 local MAX_STEP_DELTA_MS = 120
 local MIN_STEP_INTERVAL_MS = 35
-local WALK_ANIM_SPEED = 1.04
-local MODE_SPEEDS = {
-    crawl = 0.30,
-    run = 2.10,
-    sneak = 0.48,
-    walk = 0.76,
-}
 
 local function getSquare(x, y, z)
     if not getCell then
@@ -46,9 +40,23 @@ local function buildCandidate(label, x, y, z)
     }
 end
 
-local function getSpeedForMode(mode)
-    mode = tostring(mode or "walk")
-    return MODE_SPEEDS[mode] or MODE_SPEEDS.walk
+local function resolveProfile(lane, mode)
+    local profile = lane and lane.motionProfile or nil
+    if profile then
+        return profile
+    end
+    if LocomotionProfiles and LocomotionProfiles.GetBaseProfile then
+        return LocomotionProfiles.GetBaseProfile(mode)
+    end
+    return {
+        speed = 0.76,
+        moveAnim = mode == "run" and "Run" or mode == "sneak" and "SneakWalk" or mode == "crawl" and "Crawl" or "Walk",
+    }
+end
+
+local function getSpeedForMode(mode, lane)
+    local profile = resolveProfile(lane, mode)
+    return tonumber(profile and profile.speed) or 0.76
 end
 
 function FakeLocomotion.GetModeSpeed(mode)
@@ -56,33 +64,25 @@ function FakeLocomotion.GetModeSpeed(mode)
 end
 
 function FakeLocomotion.ComputeAnimSpeed(mode)
-    local speed = getSpeedForMode(mode)
-    local ratio = speed / math.max(0.01, MODE_SPEEDS.walk)
-    local animSpeed = WALK_ANIM_SPEED * math.sqrt(math.max(0.2, ratio))
-    if mode == "run" then
-        return math.max(1.40, math.min(1.72, animSpeed))
+    if LocomotionProfiles and LocomotionProfiles.ComputeAnimSpeed then
+        return LocomotionProfiles.ComputeAnimSpeed(mode)
     end
-    if mode == "sneak" then
-        return math.max(0.80, math.min(0.92, animSpeed))
-    end
-    if mode == "crawl" then
-        return math.max(0.68, math.min(0.78, animSpeed))
-    end
-    return math.max(0.98, math.min(1.12, animSpeed))
+    return 1.0
 end
 
 local function computeStepDistance(lane, mode, now)
     local lastStepAt = tonumber(lane and lane.lastStepAt or 0) or 0
+    local speed = getSpeedForMode(mode, lane)
     local deltaMs
     if lastStepAt <= 0 then
-        return math.max(0.03, getSpeedForMode(mode) * 0.05), 50
+        return math.max(0.03, speed * 0.05), 50
     end
     deltaMs = math.max(0, now - lastStepAt)
     if deltaMs < MIN_STEP_INTERVAL_MS then
         return 0, deltaMs
     end
     deltaMs = math.min(deltaMs, MAX_STEP_DELTA_MS)
-    return math.max(0.02, getSpeedForMode(mode) * (deltaMs / 1000)), deltaMs
+    return math.max(0.02, speed * (deltaMs / 1000)), deltaMs
 end
 
 local function buildStepCandidates(zx, zy, zz, goal, stepDistance)
@@ -113,6 +113,7 @@ end
 
 function FakeLocomotion.PrepareBody(zombie, lane, now)
     local resolvedMode = lane and lane.resolvedMode or lane and lane.mode or "walk"
+    local profile = resolveProfile(lane, resolvedMode)
     if not zombie then
         return
     end
@@ -123,7 +124,7 @@ function FakeLocomotion.PrepareBody(zombie, lane, now)
         LiveBodyControl.TrySilenceEmitter(zombie, lane, now)
     end
     if zombie.setRunning then
-        zombie:setRunning(tostring(resolvedMode) == "run")
+        zombie:setRunning(profile and profile.isRunning == true)
     end
     if zombie.setUseless then
         zombie:setUseless(true)

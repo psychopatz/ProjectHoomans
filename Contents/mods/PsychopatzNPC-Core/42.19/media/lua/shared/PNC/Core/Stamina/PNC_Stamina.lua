@@ -117,6 +117,7 @@ function Stamina.Update(record, zombie, now)
     local elapsed
     local recoverRate
     local runtime
+    local moveDrain
     if not stamina then
         return
     end
@@ -127,6 +128,12 @@ function Stamina.Update(record, zombie, now)
     stamina.lastUpdatedAt = now
     if elapsed <= 0 then
         return
+    end
+
+    if Stamina.ApplyMovementDrain then
+        moveDrain = Stamina.ApplyMovementDrain(record, elapsed)
+    else
+        moveDrain = 0
     end
 
     recoverRate = Const.STAMINA_RECOVERY_IDLE
@@ -144,6 +151,8 @@ function Stamina.Update(record, zombie, now)
     end
     if runtime and runtime.staminaRecoveryMode == "retreat" then
         recoverRate = math.max(recoverRate, Const.STAMINA_RECOVERY_IDLE)
+    elseif runtime and runtime.staminaRecoveryMode == "move_recovery" then
+        recoverRate = math.max(recoverRate, Const.STAMINA_RECOVERY_IDLE)
     end
 
     stamina.current = clamp((tonumber(stamina.current) or 0) + (recoverRate * elapsed), 0, tonumber(stamina.max) or 100)
@@ -159,3 +168,5 @@ function Stamina.BuildSnapshot(record)
         visibleUntil = stamina and stamina.visibleUntil or 0,
     }
 end
+
+require "PNC/Core/Stamina/PNC_Stamina_Movement"

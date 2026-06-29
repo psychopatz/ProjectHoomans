@@ -174,6 +174,9 @@ function ZombieAggro.UpdateBiteState(zombie, now)
             amount = Const.ZOMBIE_ATTACK_DAMAGE,
             type = "zombie_bite",
             attackerKind = "zombie",
+            x = zombie:getX(),
+            y = zombie:getY(),
+            z = zombie:getZ(),
         })
         Core.LogRecordDebug(record, "Zombie " .. tostring(zombieId) .. " applied bite to NPC " .. tostring(record.id))
     end

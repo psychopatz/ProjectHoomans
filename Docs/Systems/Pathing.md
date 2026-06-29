@@ -12,6 +12,8 @@
 - live path refresh now routes through a single move lane, which matches the Bandits-style "one active move action" flow more closely and avoids stacked `path2` state churn
 - close-range combat approach now softens from `run` to `walk` so embodied chase looks less robotic near contact range
 - combat target stickiness now reduces target thrash so embodied NPCs do not keep stop-stepping between nearby zombies every tick
+- `PNC_LocomotionProfiles` now resolves transport speed, anim cadence, walk family, and crawl/sneak selectors once per lane so fake movement and animation stay in lockstep
+- combat only borrows facing through short path-service leases; normal movement keeps body facing aligned to travel direction
 - path debug logs now report recovery, repath, timeout, and blocked states with the active goal so stuck movement is diagnosable without flooding normal runtime
 
 ## Next Expansion

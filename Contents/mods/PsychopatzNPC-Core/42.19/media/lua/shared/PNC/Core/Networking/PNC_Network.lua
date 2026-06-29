@@ -75,35 +75,34 @@ local function buildVisualState(record)
     local healthState = record and record.health and tostring(record.health.state or "normal") or "normal"
     local moving = path and (path.phase == "requested" or path.phase == "active") or false
     local mode = moving and tostring(path.resolvedMode or path.mode or "walk") or nil
-    local walkType = ""
+    local walkType = moving and tostring(path.walkType or "") or ""
+    local moveAnim = moving and tostring(path.moveAnim or "") or ""
+    local engineWalkType = moving and tostring(path.engineWalkType or "") or ""
     local anim = "Idle"
     local attackActive = attack ~= nil and now < (tonumber(attack.finishAt) or 0)
     local specialActive = path ~= nil and now < (tonumber(path.specialMoveUntil) or 0)
     local animSpeed = path and tonumber(path.animSpeed) or 1.0
+    local profileKey = path and tostring(path.profileKey or "") or ""
+    local isRunning = path and path.isRunning == true or false
+    local isCrawling = path and path.isCrawling == true or false
 
     if healthState == "incapacitated" then
-        walkType = moving and "Walk" or ""
-        anim = moving and "Crawl" or "Downed"
+        walkType = moving and tostring(path and path.walkType or "Crawl") or ""
+        moveAnim = moving and tostring(path and path.moveAnim or "Crawl") or ""
+        engineWalkType = moving and tostring(path and path.engineWalkType or "") or ""
+        anim = moving and moveAnim or "Downed"
+        isCrawling = moving
+        profileKey = moving and tostring(path and path.profileKey or "crawl") or "downed"
     elseif moving then
-        if mode == "run" then
-            walkType = "Run"
-            anim = "Run"
-        elseif mode == "sneak" then
-            walkType = "SneakWalk"
-            anim = "SneakWalk"
-        elseif mode == "crawl" then
-            walkType = "Walk"
-            anim = "Crawl"
-        else
-            walkType = "Walk"
-            anim = "Walk"
-        end
+        anim = moveAnim ~= "" and moveAnim or "Walk"
     end
 
     if specialActive and path and path.specialAnim then
         anim = tostring(path.specialAnim)
         moving = false
         walkType = ""
+        moveAnim = ""
+        engineWalkType = ""
     end
 
     if attackActive and attack and attack.anim then
@@ -114,11 +113,16 @@ local function buildVisualState(record)
         moving = moving,
         mode = mode,
         walkType = walkType,
+        moveAnim = moveAnim,
+        engineWalkType = engineWalkType,
         anim = anim,
         attackActive = attackActive,
         attackAnim = attack and attack.anim or nil,
         attackFinishAt = attack and attack.finishAt or 0,
         animSpeed = animSpeed,
+        isRunning = isRunning,
+        isCrawling = isCrawling,
+        profileKey = profileKey,
         specialActive = specialActive,
         specialAnim = specialActive and path and path.specialAnim or nil,
         specialFinishAt = specialActive and path and path.specialMoveUntil or 0,

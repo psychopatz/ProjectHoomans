@@ -134,6 +134,15 @@ function Internal.updateActiveMove(zombie, record, lane)
     end
 
     now = Internal.Core.Now()
+    if (lane.ownerMode == "window_climb" or lane.ownerMode == "window_open" or lane.ownerMode == "door_open")
+        and now < (tonumber(lane.specialMoveUntil) or 0)
+    then
+        lane.lastProgressAt = now
+        lane.lastIssueAt = now
+        Internal.logMoveDebug(record, zombie, lane, "special_cooldown", lane.ownerMode, "")
+        return true, lane.ownerMode
+    end
+
     Internal.refreshResolvedLocomotion(record, lane, zombie, goal)
     lane.lastActionState = Internal.getActionStateName(zombie)
     if Internal.LiveBodyControl and Internal.LiveBodyControl.SuppressZombieState then
@@ -157,13 +166,6 @@ function Internal.updateActiveMove(zombie, record, lane)
         end
         Internal.logMoveWarning(record, zombie, lane, "suppress_state", suppressedState or lane.lastActionState, "action=" .. tostring(suppressedState or lane.lastActionState))
         Internal.logMoveDebug(record, zombie, lane, "suppress_state", suppressedState or lane.lastActionState, "postAction=" .. tostring(lane.lastActionState))
-    end
-    if (lane.ownerMode == "window_climb" or lane.ownerMode == "window_open")
-        and now < (tonumber(lane.specialMoveUntil) or 0)
-    then
-        lane.lastProgressAt = now
-        Internal.logMoveDebug(record, zombie, lane, "special_cooldown", lane.ownerMode, "")
-        return true, lane.ownerMode
     end
 
     if lane.pendingGoal and (now - (tonumber(lane.lastIssueAt) or 0)) >= Internal.GOAL_REFRESH_DELAY_MS then

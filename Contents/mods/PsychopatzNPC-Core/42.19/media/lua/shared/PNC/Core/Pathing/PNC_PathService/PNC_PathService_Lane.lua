@@ -55,6 +55,15 @@ function Internal.ensureMoveLane(record)
     lane.specialAnim = lane.specialAnim or nil
     lane.resolvedMode = lane.resolvedMode or nil
     lane.animSpeed = tonumber(lane.animSpeed) or 1.0
+    lane.speed = tonumber(lane.speed) or 0
+    lane.moveAnim = lane.moveAnim or "Idle"
+    lane.walkType = lane.walkType or ""
+    lane.engineWalkType = lane.engineWalkType or ""
+    lane.profileKey = lane.profileKey or "idle"
+    lane.staminaMode = lane.staminaMode or "travel"
+    lane.isRunning = lane.isRunning == true
+    lane.isCrawling = lane.isCrawling == true
+    lane.motionProfile = lane.motionProfile or nil
     lane.lastSuppressAudioAt = tonumber(lane.lastSuppressAudioAt) or 0
     lane.ownerMode = lane.ownerMode or "idle"
     lane.facingOwner = lane.facingOwner or "idle"
@@ -106,6 +115,15 @@ function Internal.setLaneGoal(record, lane, goal)
     lane.specialAnim = nil
     lane.resolvedMode = nil
     lane.animSpeed = 1.0
+    lane.speed = 0
+    lane.moveAnim = "Idle"
+    lane.walkType = ""
+    lane.engineWalkType = ""
+    lane.profileKey = "idle"
+    lane.staminaMode = "travel"
+    lane.isRunning = false
+    lane.isCrawling = false
+    lane.motionProfile = nil
     lane.ownerMode = "requested"
 end
 

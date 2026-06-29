@@ -14,11 +14,13 @@ local Core = PNC.Core
 local Animation = PNC.Animation
 local LiveBodyControl = PNC.LiveBodyControl
 local FakeLocomotion = PNC.FakeLocomotion
+local LocomotionProfiles = PNC.LocomotionProfiles
 
 Internal.Core = Core
 Internal.Animation = Animation
 Internal.LiveBodyControl = LiveBodyControl
 Internal.FakeLocomotion = FakeLocomotion
+Internal.LocomotionProfiles = LocomotionProfiles
 
 Internal.GOAL_REFRESH_DELAY_MS = 120
 Internal.PROGRESS_TIMEOUT_MS = 2200
@@ -82,25 +84,16 @@ function Internal.hasActiveAttack(record, now)
 end
 
 function Internal.setWalkAnim(zombie, record, mode, force)
-    local previousWalkType
-    local walkTypeChanged
-    local walkType = "Walk"
-    if mode == "run" then
-        walkType = "Run"
-    elseif mode == "sneak" then
-        walkType = "SneakWalk"
-    elseif mode == "crawl" then
-        walkType = "Walk"
-    end
-    previousWalkType = zombie.getVariableString and zombie:getVariableString("PNCWalkType") or ""
-    walkTypeChanged = previousWalkType ~= walkType
-    if (force == true or walkTypeChanged) and previousWalkType == "" and zombie.setBumpType then
+    local lane = record and record.runtime and record.runtime.pathing or nil
+    local profile = lane and lane.motionProfile or nil
+    local moveAnim = profile and profile.moveAnim or "Walk"
+    local previousMoveAnim = zombie.getVariableString and zombie:getVariableString("PNCMoveAnim") or ""
+    local moveAnimChanged = previousMoveAnim ~= moveAnim
+    if (force == true or moveAnimChanged) and previousMoveAnim == "" and zombie.setBumpType then
         zombie:setBumpType(mode == "run" and "PNC_IdleToRun" or "PNC_IdleToWalk")
     end
-    if mode == "crawl" then
-        Animation.Apply(zombie, record, "Crawl")
-    else
-        Animation.Apply(zombie, record, walkType)
+    if Animation and Animation.Apply then
+        Animation.Apply(zombie, record, moveAnim, profile, true)
     end
     if Animation and Animation.SyncLocomotion then
         Animation.SyncLocomotion(zombie, record)
@@ -223,17 +216,28 @@ function Internal.computeResolvedMode(record, lane, zombie, goal)
 end
 
 function Internal.computeAnimSpeedForMode(mode)
-    if FakeLocomotion and FakeLocomotion.ComputeAnimSpeed then
-        return FakeLocomotion.ComputeAnimSpeed(mode)
+    if LocomotionProfiles and LocomotionProfiles.ComputeAnimSpeed then
+        return LocomotionProfiles.ComputeAnimSpeed(mode)
     end
     return 1.0
 end
 
 function Internal.refreshResolvedLocomotion(record, lane, zombie, goal)
     local resolvedMode = Internal.computeResolvedMode(record, lane, zombie, goal)
+    local profile
     if lane then
         lane.resolvedMode = resolvedMode
-        lane.animSpeed = Internal.computeAnimSpeedForMode(resolvedMode)
+        profile = LocomotionProfiles and LocomotionProfiles.Resolve and LocomotionProfiles.Resolve(record, lane, zombie, goal, Core.Now()) or nil
+        lane.motionProfile = profile
+        lane.speed = tonumber(profile and profile.speed) or 0
+        lane.animSpeed = tonumber(profile and profile.animSpeed) or Internal.computeAnimSpeedForMode(resolvedMode)
+        lane.moveAnim = profile and tostring(profile.moveAnim or "Idle") or "Idle"
+        lane.walkType = profile and tostring(profile.walkType or "") or ""
+        lane.engineWalkType = profile and tostring(profile.engineWalkType or "") or ""
+        lane.profileKey = profile and tostring(profile.profileKey or resolvedMode) or tostring(resolvedMode or "walk")
+        lane.staminaMode = profile and tostring(profile.staminaMode or "travel") or "travel"
+        lane.isRunning = profile and profile.isRunning == true or false
+        lane.isCrawling = profile and profile.isCrawling == true or false
     end
     return resolvedMode
 end
@@ -265,6 +269,7 @@ end
 function Internal.applyHoldAnimation(zombie, record, lane)
     local healthState = record and record.health and tostring(record.health.state or "normal") or "normal"
     local attackAction = record and record.runtime and record.runtime.attackAction or nil
+    local profile = lane and lane.motionProfile or nil
     if not zombie or not record then
         return
     end
@@ -275,15 +280,7 @@ function Internal.applyHoldAnimation(zombie, record, lane)
         Animation.ApplyDowned(zombie, record, false)
         return
     end
-    if lane and lane.mode == "crawl" then
-        Animation.Apply(zombie, record, "Crawl")
-        return
-    end
-    if lane and (lane.mode == "sneak" or (record and record.runtime and record.runtime.stealthActive == true)) then
-        Animation.Apply(zombie, record, "SneakWalk")
-        return
-    end
-    Animation.Apply(zombie, record, "Idle")
+    Animation.Apply(zombie, record, "Idle", profile, false)
 end
 
 function Internal.isAtGoal(zombie, goal, stopDistance)
