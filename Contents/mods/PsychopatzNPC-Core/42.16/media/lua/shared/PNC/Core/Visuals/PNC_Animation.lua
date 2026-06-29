@@ -8,6 +8,7 @@ PNC = PNC or {}
 PNC.Animation = PNC.Animation or {}
 
 local Animation = PNC.Animation
+local LiveBodyControl = PNC.LiveBodyControl
 
 local function setPNCStateVars(zombie, record, animState)
     if not zombie or not zombie.setVariable then
@@ -21,12 +22,13 @@ local function setPNCStateVars(zombie, record, animState)
     zombie:setVariable("PNCWeaponMode", tostring(record and record.weaponMode or "melee"))
 end
 
-local function setLocomotionVars(zombie, walkType, moving)
+local function setLocomotionVars(zombie, walkType, moving, animSpeed)
     if not zombie then
         return
     end
     if zombie.setVariable then
         zombie:setVariable("PNCWalkType", tostring(walkType or ""))
+        zombie:setVariable("PNCAnimSpeed", tonumber(animSpeed) or 1.0)
         zombie:setVariable("PNCMoving", moving == true)
         zombie:setVariable("bMoving", moving == true)
         zombie:setVariable("isMoving", moving == true)
@@ -34,14 +36,16 @@ local function setLocomotionVars(zombie, walkType, moving)
 end
 
 local function applyWalkType(zombie, walkType)
+    local animSpeed
     if not zombie then
         return
     end
     if zombie.setWalkType then
         zombie:setWalkType(tostring(walkType or ""))
     end
+    animSpeed = zombie.getVariableFloat and zombie:getVariableFloat("PNCAnimSpeed", 1.0) or nil
     if zombie.setSpeedMod then
-        zombie:setSpeedMod(1)
+        zombie:setSpeedMod(tonumber(animSpeed) or 1)
     end
     if zombie.setAnimatingBackwards then
         zombie:setAnimatingBackwards(false)
@@ -63,14 +67,13 @@ function Animation.ApplyLiveSetup(zombie, record)
         zombie:setVariable("LimpSpeed", 0.80)
         zombie:setVariable("RunSpeed", 0.72)
         zombie:setVariable("WalkSpeed", 1.04)
-        zombie:setVariable("ZombieHitReaction", "Chainsaw")
-        zombie:setVariable("NoLungeTarget", false)
         zombie:setVariable("PNCActor", true)
         zombie:setVariable("PNCWalkType", "")
         zombie:setVariable("PNCPrimary", "")
         zombie:setVariable("PNCSecondary", "")
         zombie:setVariable("PNCPrimaryType", "barehand")
         zombie:setVariable("PNCImmediateAnim", false)
+        zombie:setVariable("PNCAnimSpeed", 1.0)
         zombie:setVariable("PNCLive", true)
         zombie:setVariable("PNCMoving", false)
         zombie:setVariable("bMoving", false)
@@ -98,35 +101,17 @@ function Animation.ApplyLiveSetup(zombie, record)
     if zombie.clearAttachedItems then
         zombie:clearAttachedItems()
     end
-    if zombie.setTurnAlertedValues then
-        zombie:setTurnAlertedValues(-5, 5)
-    end
-    if zombie.setKnockedDown then
-        zombie:setKnockedDown(false)
-    end
-    if zombie.setSitAgainstWall then
-        zombie:setSitAgainstWall(false)
-    end
-    if zombie.setOnFloor then
-        zombie:setOnFloor(false)
-    end
-    if zombie.setFallOnFront then
-        zombie:setFallOnFront(false)
-    end
-    if zombie.setCrawler then
-        zombie:setCrawler(false)
-    end
-    if zombie.setFakeDead then
-        zombie:setFakeDead(false)
-    end
-    if zombie.setCanWalk then
-        zombie:setCanWalk(true)
+    if LiveBodyControl and LiveBodyControl.ApplyHumanizedBodyFlags then
+        LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
     end
     if zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
         zombie:changeState(ZombieIdleState.instance())
     end
-    if zombie.getEmitter then
-        zombie:getEmitter():stopAll()
+    if LiveBodyControl and LiveBodyControl.StopEmitter then
+        LiveBodyControl.StopEmitter(zombie)
+    end
+    if zombie.setUseless then
+        zombie:setUseless(true)
     end
     if zombie.getDescriptor then
         descriptor = zombie:getDescriptor()
@@ -139,6 +124,8 @@ end
 function Animation.Apply(zombie, record, animState)
     local walkType = ""
     local moving = false
+    local animSpeed = 1.0
+    local lane = record and record.runtime and record.runtime.pathing or nil
     if not zombie or not record then
         return
     end
@@ -150,7 +137,18 @@ function Animation.Apply(zombie, record, animState)
         walkType = "Walk"
         moving = true
     end
-    setLocomotionVars(zombie, walkType, moving)
+    if lane and tonumber(lane.animSpeed) then
+        animSpeed = tonumber(lane.animSpeed) or 1.0
+    elseif animState == "Run" then
+        animSpeed = 1.15
+    elseif animState == "SneakWalk" then
+        animSpeed = 0.82
+    elseif animState == "Crawl" then
+        animSpeed = 0.70
+    elseif animState == "Walk" then
+        animSpeed = 1.04
+    end
+    setLocomotionVars(zombie, walkType, moving, animSpeed)
 end
 
 function Animation.ApplyDowned(zombie, record, moving)
@@ -161,6 +159,7 @@ function Animation.ApplyDowned(zombie, record, moving)
     zombie:setVariable("PNCState", tostring(record and (record.activeBehavior or record.activeJob) or "Incapacitated"))
     zombie:setVariable("PNCAnim", moving and "Crawl" or "Downed")
     zombie:setVariable("PNCWalkType", moving and "Walk" or "")
+    zombie:setVariable("PNCAnimSpeed", moving and 0.72 or 1.0)
     zombie:setVariable("bBecomeCrawler", true)
     zombie:setVariable("bCrawling", true)
     zombie:setVariable("FallOnFront", true)
@@ -182,7 +181,7 @@ function Animation.ApplyDowned(zombie, record, moving)
         zombie:setRunning(false)
     end
     if zombie.setUseless then
-        zombie:setUseless(false)
+        zombie:setUseless(true)
     end
     applyWalkType(zombie, moving and "Walk" or "")
 end
@@ -205,7 +204,7 @@ function Animation.ClearDowned(zombie)
     if zombie.setFallOnFront then
         zombie:setFallOnFront(false)
     end
-    setLocomotionVars(zombie, "", false)
+    setLocomotionVars(zombie, "", false, 1.0)
     applyWalkType(zombie, "")
 end
 
@@ -214,13 +213,13 @@ function Animation.PlayBump(zombie, record, bumpType)
         return
     end
     setPNCStateVars(zombie, record, bumpType or "Bump")
-    setLocomotionVars(zombie, "", false)
+    setLocomotionVars(zombie, "", false, 1.0)
     applyWalkType(zombie, "")
     if zombie.setRunning then
         zombie:setRunning(false)
     end
     if zombie.setBumpDone then
-        pcall(zombie.setBumpDone, zombie, false)
+        zombie:setBumpDone(false)
     end
     if zombie.setVariable then
         zombie:setVariable("BumpAnimFinished", false)
@@ -238,6 +237,6 @@ function Animation.SyncLocomotion(zombie)
     walkType = zombie.getVariableString and zombie:getVariableString("PNCWalkType") or ""
     applyWalkType(zombie, walkType)
     if zombie.setUseless then
-        zombie:setUseless(false)
+        zombie:setUseless(true)
     end
 end

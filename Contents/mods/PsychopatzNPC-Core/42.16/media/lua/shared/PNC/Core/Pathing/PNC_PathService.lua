@@ -11,14 +11,18 @@ local PathService = PNC.PathService
 local Core = PNC.Core
 local Const = PNC.Const
 local Animation = PNC.Animation
+local LiveBodyControl = PNC.LiveBodyControl
+local FakeLocomotion = PNC.FakeLocomotion
 local getActionStateName
 local isAtGoal
+local logMoveWarning
+local logMoveDebug
 
 local GOAL_REFRESH_DELAY_MS = 120
-local NO_PROGRESS_STEP_MS = 700
-local PROGRESS_TIMEOUT_MS = 1200
-local DIRECT_STEP_COOLDOWN_MS = 250
-local CONFLICT_RECOVERIES_BEFORE_STEP = 2
+local PROGRESS_TIMEOUT_MS = 2200
+local SPECIAL_ACTION_COOLDOWN_MS = 1500
+local RUN_START_DISTANCE = 4.50
+local RUN_STOP_DISTANCE = 2.90
 
 local function roundHalf(value)
     if value >= 0 then
@@ -53,12 +57,12 @@ end
 
 local function getDirectStepSize(mode)
     if mode == "run" then
-        return 0.55
+        return 0.28
     end
     if mode == "sneak" or mode == "crawl" then
-        return 0.2
+        return 0.14
     end
-    return 0.35
+    return 0.22
 end
 
 local function isMovementDebugEnabled(record)
@@ -74,7 +78,7 @@ local function isMovementDebugEnabled(record)
     return PNC.Runtime and PNC.Runtime.debugEnabled == true
 end
 
-local function setWalkAnim(zombie, record, mode)
+local function setWalkAnim(zombie, record, mode, force)
     local previousWalkType
     local walkType = "Walk"
     if mode == "run" then
@@ -85,8 +89,8 @@ local function setWalkAnim(zombie, record, mode)
         walkType = "Walk"
     end
     previousWalkType = zombie.getVariableString and zombie:getVariableString("PNCWalkType") or ""
-    if zombie.setUseless then
-        zombie:setUseless(false)
+    if force ~= true and previousWalkType == walkType then
+        return
     end
     if previousWalkType == "" and zombie.setBumpType then
         zombie:setBumpType(mode == "run" and "PNC_IdleToRun" or "PNC_IdleToWalk")
@@ -133,39 +137,21 @@ local function hardResetMoveOwner(zombie)
     if zombie.clearAggroList then
         zombie:clearAggroList()
     end
+    if zombie.setTarget then
+        zombie:setTarget(nil)
+    end
     if zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
         zombie:changeState(ZombieIdleState.instance())
     end
-end
-
-local function issuePathRequest(zombie, targetX, targetY, targetZ)
-    local behavior
-    if not zombie then
-        return false
+    if zombie.setRunning then
+        zombie:setRunning(false)
     end
-    if getActionStateName(zombie) == "walktoward" and zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
-        zombie:changeState(ZombieIdleState.instance())
-    end
-    if zombie.getPathFindBehavior2 then
-        behavior = zombie:getPathFindBehavior2()
-        if behavior and behavior.pathToLocation and behavior.update then
-            behavior:pathToLocation(targetX, targetY, targetZ)
-            behavior:update()
-            return true
-        end
-    end
-    if zombie.pathToLocationF then
-        zombie:pathToLocationF(targetX, targetY, targetZ)
-        return true
-    end
-    if zombie.pathToLocation then
-        zombie:pathToLocation(targetX, targetY, targetZ)
-        return true
-    end
-    return false
 end
 
 getActionStateName = function(zombie)
+    if LiveBodyControl and LiveBodyControl.GetActionStateName then
+        return LiveBodyControl.GetActionStateName(zombie)
+    end
     if not zombie or not zombie.getActionStateName then
         return ""
     end
@@ -184,6 +170,17 @@ local function describeGoal(goal)
         return "nil"
     end
     return tostring(goal.x) .. "," .. tostring(goal.y) .. "," .. tostring(goal.z)
+end
+
+local function describePoint(x, y, z)
+    return tostring(x) .. "," .. tostring(y) .. "," .. tostring(z)
+end
+
+local function describeSquare(square)
+    if not square then
+        return "nil"
+    end
+    return describePoint(square:getX(), square:getY(), square:getZ())
 end
 
 local function describeRecord(record)
@@ -295,161 +292,21 @@ local function logMoveDebug(record, zombie, lane, event, reason, extra)
     Core.Log("DEBUG", buildMoveLogMessage(record, zombie, lane, event, reason, extra))
 end
 
-local function isRecoverableConflictState(actionState)
-    if actionState == nil or actionState == "" or actionState == "walktoward" then
-        return false
-    end
-    if actionState == "lunge" then
-        return true
-    end
-    if string.find(actionState, "attack", 1, true) then
-        return true
-    end
-    if string.find(actionState, "thump", 1, true) then
-        return true
-    end
-    return false
-end
-
-local function incrementRecovery(lane, actionState, reason)
+local function rememberSpecialAction(lane, key, now)
     if not lane then
         return
     end
-    lane.recoveryCount = (tonumber(lane.recoveryCount) or 0) + 1
-    lane.lastRecoveryReason = reason
-    lane.lastActionState = actionState or ""
+    lane.lastSpecialActionKey = key
+    lane.lastSpecialActionAt = now
 end
 
-local function shouldUseHybridStep(lane, now)
-    if not lane then
+local function shouldSuppressSpecialAction(lane, key, now)
+    if not lane or not key then
         return false
     end
-    if (now - (tonumber(lane.lastDirectStepAt) or 0)) < DIRECT_STEP_COOLDOWN_MS then
-        return false
-    end
-    if (tonumber(lane.recoveryCount) or 0) >= CONFLICT_RECOVERIES_BEFORE_STEP then
-        return true
-    end
-    return (now - (tonumber(lane.lastProgressAt) or 0)) >= NO_PROGRESS_STEP_MS
+    return lane.lastSpecialActionKey == key and (now - (tonumber(lane.lastSpecialActionAt) or 0)) < SPECIAL_ACTION_COOLDOWN_MS
 end
 
-local function applyHybridDirectStep(zombie, record, lane, reason)
-    local goal
-    local zx
-    local zy
-    local step
-    local dx
-    local dy
-    local len
-    local nx
-    local ny
-    local candidates
-    local i
-    local candidate
-    local arrived
-    local now = Core.Now()
-
-    if not zombie or not record or not lane or not lane.goal then
-        return false, nil
-    end
-
-    goal = lane.goal
-    zx = zombie:getX()
-    zy = zombie:getY()
-    step = getDirectStepSize(lane.mode or goal.mode)
-    dx = goal.x - zx
-    dy = goal.y - zy
-    len = math.sqrt((dx * dx) + (dy * dy))
-    if len <= 0.001 then
-        return true, "arrived"
-    end
-
-    nx = zx + (dx / len) * math.min(step, len)
-    ny = zy + (dy / len) * math.min(step, len)
-    candidates = {
-        { x = nx, y = ny, z = goal.z },
-        { x = nx, y = zy, z = goal.z },
-        { x = zx, y = ny, z = goal.z },
-    }
-
-    for i = 1, #candidates do
-        candidate = candidates[i]
-        if isSquareWalkable(candidate.x, candidate.y, candidate.z) then
-            hardResetMoveOwner(zombie)
-            if zombie.faceLocationF then
-                zombie:faceLocationF(goal.x, goal.y)
-            end
-            zombie:setX(candidate.x)
-            zombie:setY(candidate.y)
-            zombie:setZ(candidate.z)
-            syncRecordPosition(record, zombie)
-            lane.ownerMode = "hybrid_step"
-            lane.fallbackCount = (tonumber(lane.fallbackCount) or 0) + 1
-            lane.lastDirectStepAt = now
-            lane.lastProgressAt = now
-            lane.lastIssueAt = now
-            lane.lastX = zombie:getX()
-            lane.lastY = zombie:getY()
-            lane.lastActionState = getActionStateName(zombie)
-            logMoveWarning(record, zombie, lane, "hybrid_step", reason or "hybrid_step", "step=" .. tostring(i))
-            logMoveDebug(record, zombie, lane, "hybrid_step", reason or "hybrid_step", "step=" .. tostring(i))
-            arrived = isAtGoal(zombie, goal, lane.stopDistance)
-            if not arrived then
-                setWalkAnim(zombie, record, lane.mode or goal.mode)
-                issuePathRequest(zombie, goal.x, goal.y, goal.z)
-                lane.ownerMode = "engine_path"
-            end
-            return true, arrived and "arrived" or "hybrid_step"
-        end
-    end
-
-    return false, nil
-end
-
-local function recoverConflictingState(zombie, record, lane, now)
-    local actionState = getActionStateName(zombie)
-    local goal = lane and lane.goal or nil
-    local walkTowardPathConflict
-    local recoveryReason
-    local stepped
-    local stepResult
-
-    if not zombie or not record or not lane then
-        return false, nil
-    end
-
-    walkTowardPathConflict = actionState == "walktoward" and hasPath2(zombie)
-    if not walkTowardPathConflict and not isRecoverableConflictState(actionState) then
-        return false, nil
-    end
-
-    recoveryReason = walkTowardPathConflict and "walktoward_path2_conflict" or actionState
-    incrementRecovery(lane, actionState, recoveryReason)
-    logMoveWarning(
-        record,
-        zombie,
-        lane,
-        "recover_conflict",
-        recoveryReason,
-        "recovering goal=" .. describeGoal(goal) .. " mode=" .. tostring(lane.mode or "walk")
-    )
-    logMoveDebug(record, zombie, lane, "recover_conflict", recoveryReason, "")
-
-    if shouldUseHybridStep(lane, now or Core.Now()) then
-        stepped, stepResult = applyHybridDirectStep(zombie, record, lane, recoveryReason)
-        if stepped then
-            return true, stepResult
-        end
-    end
-
-    hardResetMoveOwner(zombie)
-    lane.phase = "requested"
-    lane.ownerMode = "engine_path"
-    lane.startedAt = 0
-    setWalkAnim(zombie, record, lane.mode or "walk")
-    issuePathRequest(zombie, goal and goal.x or zombie:getX(), goal and goal.y or zombie:getY(), goal and goal.z or zombie:getZ())
-    return true, "state_recovered"
-end
 
 local function openDoorForNPC(zombie, object)
     local square
@@ -496,8 +353,9 @@ local function openDoorForNPC(zombie, object)
     return true
 end
 
-local function tryDoorOrWindowInteraction(zombie, record, goalX, goalY, goalZ)
+local function tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY, goalZ)
     local cell
+    local now
     local zx
     local zy
     local zz
@@ -510,19 +368,25 @@ local function tryDoorOrWindowInteraction(zombie, record, goalX, goalY, goalZ)
     local objects
     local j
     local object
+    local objectSquare
     local facingSatisfied
     local targetDx
     local targetDy
     local candidatesByGoal
+    local actionKey
+    local fromPoint
+    local destSquare
 
     if not zombie or not getCell then
-        return false
+        return false, nil
     end
 
+    now = Core.Now()
     cell = getCell()
     zx = math.floor(zombie:getX())
     zy = math.floor(zombie:getY())
     zz = zombie:getZ()
+    fromPoint = describePoint(string.format("%.2f", zombie:getX()), string.format("%.2f", zombie:getY()), zz)
     fd = zombie:getForwardDirection()
     fdx = roundHalf(fd:getX())
     fdy = roundHalf(fd:getY())
@@ -567,8 +431,15 @@ local function tryDoorOrWindowInteraction(zombie, record, goalX, goalY, goalZ)
                         end
                     end
                     if (instanceof(object, "IsoDoor") or (instanceof(object, "IsoThumpable") and object.isDoor and object:isDoor() == true)) and facingSatisfied then
+                        objectSquare = object:getSquare()
+                        actionKey = "door:" .. describeSquare(objectSquare)
+                        if shouldSuppressSpecialAction(lane, actionKey, now) then
+                            return false, nil
+                        end
                         if openDoorForNPC(zombie, object) then
-                            return true
+                            rememberSpecialAction(lane, actionKey, now)
+                            logMoveWarning(record, zombie, lane, "door_open", "door_open", "from=" .. fromPoint .. " object=" .. describeSquare(objectSquare) .. " goal=" .. describePoint(goalX, goalY, goalZ))
+                            return true, "door_open"
                         end
                     end
                     if instanceof(object, "IsoWindow") then
@@ -578,15 +449,51 @@ local function tryDoorOrWindowInteraction(zombie, record, goalX, goalY, goalZ)
                         end
                     end
                     if instanceof(object, "IsoWindow") and facingSatisfied then
+                        objectSquare = object:getSquare()
                         if (not object:IsOpen()) and (not object:isSmashed()) and (not object:isPermaLocked()) then
+                            actionKey = "window_open:" .. describeSquare(objectSquare)
+                            if shouldSuppressSpecialAction(lane, actionKey, now) then
+                                return false, nil
+                            end
                             object:ToggleWindow(zombie)
-                            return true
+                            rememberSpecialAction(lane, actionKey, now)
+                            logMoveWarning(record, zombie, lane, "window_open", "window_open", "from=" .. fromPoint .. " object=" .. describeSquare(objectSquare) .. " goal=" .. describePoint(goalX, goalY, goalZ))
+                            return true, "window_open"
                         end
                         if object:canClimbThrough(zombie) then
-                            ClimbThroughWindowState.instance():setParams(zombie, object)
-                            zombie:changeState(ClimbThroughWindowState.instance())
-                            zombie:setBumpType("ClimbWindow")
-                            return true
+                            actionKey = "window_climb:" .. describeSquare(objectSquare)
+                            if shouldSuppressSpecialAction(lane, actionKey, now) then
+                                return false, nil
+                            end
+                            if object.getOppositeSquare then
+                                destSquare = object:getOppositeSquare()
+                            else
+                                destSquare = nil
+                            end
+                            if not destSquare or not isSquareWalkable(destSquare:getX() + 0.5, destSquare:getY() + 0.5, destSquare:getZ()) then
+                                return false, nil
+                            end
+                            if Animation and Animation.PlayBump then
+                                Animation.PlayBump(zombie, record, "ClimbWindow")
+                            elseif zombie.setBumpType then
+                                zombie:setBumpType("ClimbWindow")
+                            end
+                            zombie:setX(destSquare:getX() + 0.5)
+                            zombie:setY(destSquare:getY() + 0.5)
+                            zombie:setZ(destSquare:getZ())
+                            syncRecordPosition(record, zombie)
+                            rememberSpecialAction(lane, actionKey, now)
+                            lane.specialMoveUntil = now + 450
+                            lane.specialAnim = "ClimbWindow"
+                            logMoveWarning(
+                                record,
+                                zombie,
+                                lane,
+                                "window_climb",
+                                "window_climb",
+                                "from=" .. fromPoint .. " object=" .. describeSquare(objectSquare) .. " to=" .. describeSquare(destSquare) .. " goal=" .. describePoint(goalX, goalY, goalZ)
+                            )
+                            return true, "window_climb"
                         end
                     end
                 end
@@ -594,7 +501,7 @@ local function tryDoorOrWindowInteraction(zombie, record, goalX, goalY, goalZ)
         end
     end
 
-    return false
+    return false, nil
 end
 
 local function ensureMoveLane(record)
@@ -630,6 +537,18 @@ local function ensureMoveLane(record)
     lane.lastRecoveryReason = lane.lastRecoveryReason or nil
     lane.lastActionState = lane.lastActionState or nil
     lane.lastDirectStepAt = tonumber(lane.lastDirectStepAt) or 0
+    lane.lastStepAt = tonumber(lane.lastStepAt) or 0
+    lane.lastStepDistance = tonumber(lane.lastStepDistance) or 0
+    lane.lastStepLabel = lane.lastStepLabel or nil
+    lane.lastRecoverAt = tonumber(lane.lastRecoverAt) or 0
+    lane.noProgressCount = tonumber(lane.noProgressCount) or 0
+    lane.lastSpecialActionKey = lane.lastSpecialActionKey or nil
+    lane.lastSpecialActionAt = tonumber(lane.lastSpecialActionAt) or 0
+    lane.specialMoveUntil = tonumber(lane.specialMoveUntil) or 0
+    lane.specialAnim = lane.specialAnim or nil
+    lane.resolvedMode = lane.resolvedMode or nil
+    lane.animSpeed = tonumber(lane.animSpeed) or 1.0
+    lane.lastSuppressAudioAt = tonumber(lane.lastSuppressAudioAt) or 0
     lane.ownerMode = lane.ownerMode or "idle"
     return lane
 end
@@ -653,6 +572,60 @@ local function getGoalTolerance(mode, stopDistance)
         tolerance = math.min(tonumber(stopDistance) * 1.25, tolerance + 0.75)
     end
     return tolerance
+end
+
+local function computeResolvedMode(record, lane, zombie, goal)
+    local dist
+    local previousMode
+    if not lane or not goal then
+        return "walk"
+    end
+    if lane.mode == "crawl" then
+        return "crawl"
+    end
+    if lane.mode == "sneak" or (record and record.runtime and record.runtime.stealthActive == true) then
+        return "sneak"
+    end
+    if lane.mode ~= "walk" and lane.mode ~= "run" then
+        return tostring(lane.mode or "walk")
+    end
+    if not zombie then
+        return tostring(lane.mode or "walk")
+    end
+    dist = Core.Distance(zombie:getX(), zombie:getY(), goal.x, goal.y)
+    previousMode = tostring(lane.resolvedMode or lane.mode or "walk")
+    if previousMode == "run" then
+        if dist <= math.max(tonumber(lane.stopDistance) or 0.7, RUN_STOP_DISTANCE) then
+            return "walk"
+        end
+        return "run"
+    end
+    if dist >= math.max((tonumber(lane.stopDistance) or 0.7) + 2.75, RUN_START_DISTANCE) then
+        return "run"
+    end
+    return "walk"
+end
+
+local function computeAnimSpeedForMode(mode)
+    if mode == "run" then
+        return 1.22
+    end
+    if mode == "sneak" then
+        return 0.86
+    end
+    if mode == "crawl" then
+        return 0.70
+    end
+    return 1.10
+end
+
+local function refreshResolvedLocomotion(record, lane, zombie, goal)
+    local resolvedMode = computeResolvedMode(record, lane, zombie, goal)
+    if lane then
+        lane.resolvedMode = resolvedMode
+        lane.animSpeed = computeAnimSpeedForMode(resolvedMode)
+    end
+    return resolvedMode
 end
 
 local function getStopDistanceClass(stopDistance)
@@ -708,6 +681,16 @@ local function setLaneGoal(record, lane, goal)
     lane.recoveryCount = 0
     lane.fallbackCount = 0
     lane.lastRecoveryReason = nil
+    lane.lastRecoverAt = 0
+    lane.noProgressCount = 0
+    lane.lastStepAt = 0
+    lane.lastStepDistance = 0
+    lane.lastStepLabel = nil
+    lane.lastSuppressAudioAt = 0
+    lane.specialMoveUntil = 0
+    lane.specialAnim = nil
+    lane.resolvedMode = nil
+    lane.animSpeed = 1.0
     lane.ownerMode = "requested"
 end
 
@@ -736,6 +719,10 @@ local function applyHoldAnimation(zombie, record, lane)
     end
     if lane and lane.mode == "crawl" then
         Animation.Apply(zombie, record, "Crawl")
+        return
+    end
+    if lane and (lane.mode == "sneak" or (record and record.runtime and record.runtime.stealthActive == true)) then
+        Animation.Apply(zombie, record, "SneakWalk")
         return
     end
     Animation.Apply(zombie, record, "Idle")
@@ -816,6 +803,16 @@ local function finalizeCancel(zombie, record, lane)
     lane.startedAt = 0
     lane.recoveryCount = 0
     lane.lastRecoveryReason = nil
+    lane.lastRecoverAt = 0
+    lane.noProgressCount = 0
+    lane.lastStepAt = 0
+    lane.lastStepDistance = 0
+    lane.lastStepLabel = nil
+    lane.lastSuppressAudioAt = 0
+    lane.specialMoveUntil = 0
+    lane.specialAnim = nil
+    lane.resolvedMode = nil
+    lane.animSpeed = 1.0
     lane.ownerMode = "idle"
     setLanePhase(record, lane, "idle", lane.cancelReason or "cancelled")
     applyHoldAnimation(zombie, record, lane)
@@ -830,22 +827,26 @@ local function startRequestedMove(zombie, record, lane)
     end
     now = Core.Now()
     hardResetMoveOwner(zombie)
-    setWalkAnim(zombie, record, lane.mode or goal.mode)
-    if not issuePathRequest(zombie, goal.x, goal.y, goal.z) then
-        lane.blockReason = "path_request_failed"
-        lane.ownerMode = "blocked"
-        setLanePhase(record, lane, "blocked", lane.blockReason)
-        logMoveWarning(record, zombie, lane, "blocked", lane.blockReason, "goal=" .. describeGoal(goal))
-        applyHoldAnimation(zombie, record, lane)
-        return false, "path_request_failed"
+    lane.resolvedMode = refreshResolvedLocomotion(record, lane, zombie, goal)
+    if FakeLocomotion and FakeLocomotion.PrepareBody then
+        FakeLocomotion.PrepareBody(zombie, lane, now)
     end
+    setWalkAnim(zombie, record, lane.resolvedMode or lane.mode or goal.mode, true)
     lane.startedAt = now
     lane.lastIssueAt = now
     lane.lastProgressAt = now
     lane.lastX = zombie:getX()
     lane.lastY = zombie:getY()
     lane.lastActionState = getActionStateName(zombie)
-    lane.ownerMode = "engine_path"
+    lane.lastRecoverAt = 0
+    lane.noProgressCount = 0
+    lane.lastStepAt = 0
+    lane.lastStepDistance = 0
+    lane.lastStepLabel = nil
+    lane.lastSuppressAudioAt = 0
+    lane.specialMoveUntil = 0
+    lane.specialAnim = nil
+    lane.ownerMode = "fake_locomotion"
     setLanePhase(record, lane, "active", "started")
     logMoveTransition(record, zombie, lane, "request_issued", "started")
     return true, "started"
@@ -863,6 +864,16 @@ local function completeMove(zombie, record, lane, phase, reason)
     lane.blockReason = phase == "blocked" and reason or nil
     lane.recoveryCount = 0
     lane.lastRecoveryReason = nil
+    lane.lastRecoverAt = 0
+    lane.noProgressCount = 0
+    lane.lastStepAt = 0
+    lane.lastStepDistance = 0
+    lane.lastStepLabel = nil
+    lane.lastSuppressAudioAt = 0
+    lane.specialMoveUntil = 0
+    lane.specialAnim = nil
+    lane.resolvedMode = nil
+    lane.animSpeed = 1.0
     lane.ownerMode = phase == "blocked" and "blocked" or "idle"
     setLanePhase(record, lane, phase, reason)
     logMoveTransition(record, zombie, lane, "complete", reason)
@@ -890,41 +901,51 @@ local function restartCurrentGoal(zombie, record, lane, reason)
 end
 
 local function updateActiveMove(zombie, record, lane)
-    local behavior
-    local behaviorResult
     local goal = lane and lane.goal or nil
     local now
-    local zx
-    local zy
-    local moved
-    local recovered
-    local recoverResult
     local stepped
     local stepResult
+    local interacted
+    local interactType
+    local suppressed
+    local suppressedState
+    local stepDistance
 
     if not zombie or not lane or not goal then
         return false, "no_goal"
     end
 
     now = Core.Now()
+    refreshResolvedLocomotion(record, lane, zombie, goal)
     lane.lastActionState = getActionStateName(zombie)
-    recovered, recoverResult = recoverConflictingState(zombie, record, lane, now)
-    if recovered then
-        lane.lastIssueAt = now
-        lane.lastProgressAt = now
-        lane.lastX = zombie:getX()
-        lane.lastY = zombie:getY()
-        if recoverResult == "arrived" then
-            return completeMove(zombie, record, lane, "arrived", "hybrid_step")
-        end
-        return true, recoverResult or "state_recovered"
+    if LiveBodyControl and LiveBodyControl.SuppressZombieState then
+        suppressed, suppressedState = LiveBodyControl.SuppressZombieState(zombie, lane, now)
+    else
+        suppressed = false
+        suppressedState = nil
     end
-
-    if zombie.getPathFindBehavior2 then
-        behavior = zombie:getPathFindBehavior2()
-        if behavior and behavior.update then
-            behaviorResult = behavior:update()
+    if suppressed then
+        lane.lastProgressAt = now
+        lane.lastIssueAt = now
+        lane.lastActionState = getActionStateName(zombie)
+        lane.recoveryCount = (tonumber(lane.recoveryCount) or 0) + 1
+        lane.lastRecoveryReason = suppressedState or lane.lastActionState
+        lane.lastRecoverAt = now
+        if FakeLocomotion and FakeLocomotion.PrepareBody then
+            FakeLocomotion.PrepareBody(zombie, lane, now)
         end
+        if lane.ownerMode ~= "window_climb" and lane.ownerMode ~= "window_open" then
+            setWalkAnim(zombie, record, lane.resolvedMode or lane.mode or "walk", false)
+        end
+        logMoveWarning(record, zombie, lane, "suppress_state", suppressedState or lane.lastActionState, "action=" .. tostring(suppressedState or lane.lastActionState))
+        logMoveDebug(record, zombie, lane, "suppress_state", suppressedState or lane.lastActionState, "postAction=" .. tostring(lane.lastActionState))
+    end
+    if (lane.ownerMode == "window_climb" or lane.ownerMode == "window_open")
+        and now < (tonumber(lane.specialMoveUntil) or 0)
+    then
+        lane.lastProgressAt = now
+        logMoveDebug(record, zombie, lane, "special_cooldown", lane.ownerMode, "")
+        return true, lane.ownerMode
     end
 
     if lane.pendingGoal and (now - (tonumber(lane.lastIssueAt) or 0)) >= GOAL_REFRESH_DELAY_MS then
@@ -935,74 +956,68 @@ local function updateActiveMove(zombie, record, lane)
         return completeMove(zombie, record, lane, "arrived", "arrived")
     end
 
-    if BehaviorResult and behaviorResult == BehaviorResult.Succeeded then
-        return completeMove(zombie, record, lane, "arrived", "behavior_succeeded")
-    end
-
-    zx = zombie:getX()
-    zy = zombie:getY()
-    if lane.lastX ~= nil and lane.lastY ~= nil then
-        moved = Core.Distance(lane.lastX, lane.lastY, zx, zy)
-        if moved > 0.05 then
-            lane.lastX = zx
-            lane.lastY = zy
-            lane.lastProgressAt = now
-            lane.recoveryCount = 0
-            lane.ownerMode = "engine_path"
-            syncRecordPosition(record, zombie)
-            logMoveDebug(record, zombie, lane, "progress", "engine_progress", string.format("moved=%.2f", moved))
-            return true, "moving"
-        end
-    end
-
-    if tryDoorOrWindowInteraction(zombie, record, goal.x, goal.y, goal.z) then
+    interacted, interactType = tryDoorOrWindowInteraction(zombie, record, lane, goal.x, goal.y, goal.z)
+    if interacted then
         lane.lastIssueAt = now
         lane.lastProgressAt = now
-        lane.ownerMode = "engine_path"
-        issuePathRequest(zombie, goal.x, goal.y, goal.z)
-        logMoveDebug(record, zombie, lane, "interact", "door_or_window", "")
-        return true, "interact"
+        lane.noProgressCount = 0
+        lane.lastStepAt = now
+        lane.lastX = zombie:getX()
+        lane.lastY = zombie:getY()
+        if interactType == "door_open" then
+            lane.ownerMode = "door_open"
+            lane.specialMoveUntil = now + 180
+            lane.specialAnim = nil
+        elseif interactType == "window_open" then
+            lane.ownerMode = "window_open"
+            lane.specialMoveUntil = now + 250
+            lane.specialAnim = nil
+        else
+            lane.ownerMode = "window_climb"
+        end
+        logMoveDebug(record, zombie, lane, "interact", interactType or "door_or_window", "")
+        return true, interactType or "interact"
     end
 
-    if BehaviorResult and behaviorResult == BehaviorResult.Failed then
-        if lane.pendingGoal then
-            logMoveWarning(record, zombie, lane, "repath", "behavior_failed_pending", "")
-            return refreshPendingGoal(zombie, record, lane, "behavior_failed")
-        end
-        logMoveWarning(record, zombie, lane, "repath", "behavior_failed_restart", "")
-        return restartCurrentGoal(zombie, record, lane, "behavior_failed")
+    if FakeLocomotion and FakeLocomotion.PrepareBody then
+        FakeLocomotion.PrepareBody(zombie, lane, now)
+    end
+    setWalkAnim(zombie, record, lane.resolvedMode or lane.mode or goal.mode, false)
+    if FakeLocomotion and FakeLocomotion.StepTowardGoal then
+        stepped, stepResult, stepDistance = FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
+    else
+        stepped = false
+        stepResult = "missing_locomotion"
+        stepDistance = 0
     end
 
-    if shouldUseHybridStep(lane, now) then
-        stepped, stepResult = applyHybridDirectStep(zombie, record, lane, "no_progress")
-        if stepped then
-            if stepResult == "arrived" then
-                return completeMove(zombie, record, lane, "arrived", "hybrid_step")
-            end
-            return true, stepResult
+    if stepped then
+        lane.ownerMode = "fake_locomotion"
+        lane.recoveryCount = 0
+        lane.lastRecoveryReason = nil
+        lane.lastRecoverAt = 0
+        lane.noProgressCount = 0
+        lane.lastIssueAt = now
+        lane.lastActionState = getActionStateName(zombie)
+        lane.specialAnim = nil
+        syncRecordPosition(record, zombie)
+        if isAtGoal(zombie, goal, lane.stopDistance) then
+            return completeMove(zombie, record, lane, "arrived", "arrived")
         end
+        logMoveDebug(record, zombie, lane, "progress", "fake_step", "step=" .. tostring(stepResult or "direct") .. " dist=" .. string.format("%.3f", tonumber(stepDistance) or 0))
+        return true, "moving"
     end
 
     if (now - (tonumber(lane.lastProgressAt) or 0)) >= PROGRESS_TIMEOUT_MS then
+        lane.noProgressCount = (tonumber(lane.noProgressCount) or 0) + 1
+        lane.blockReason = "fake_locomotion_blocked"
         logMoveWarning(record, zombie, lane, "progress_timeout", lane.blockReason or "progress_timeout", "")
-        if issuePathRequest(zombie, goal.x, goal.y, goal.z) then
-            lane.lastIssueAt = now
-            lane.lastProgressAt = now
-            lane.lastX = zombie:getX()
-            lane.lastY = zombie:getY()
-            lane.ownerMode = "engine_path"
-            logMoveTransition(record, zombie, lane, "refreshed", "progress_timeout")
-            return true, "repath"
+        if lane.noProgressCount >= 2 then
+            logMoveWarning(record, zombie, lane, "blocked", "progress_timeout", "goal=" .. describeGoal(goal))
+            return completeMove(zombie, record, lane, "blocked", "progress_timeout")
         end
-        if (not isServer or not isServer()) and isSquareWalkable(goal.x, goal.y, goal.z) then
-            zombie:setX(goal.x)
-            zombie:setY(goal.y)
-            zombie:setZ(goal.z)
-            syncRecordPosition(record, zombie)
-            return completeMove(zombie, record, lane, "arrived", "fallback_snap")
-        end
-        logMoveWarning(record, zombie, lane, "blocked", "progress_timeout", "goal=" .. describeGoal(goal))
-        return completeMove(zombie, record, lane, "blocked", "progress_timeout")
+        lane.lastProgressAt = now
+        return true, "retry"
     end
 
     return true, "waiting"

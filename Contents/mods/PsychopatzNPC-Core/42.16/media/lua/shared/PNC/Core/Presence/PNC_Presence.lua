@@ -114,15 +114,15 @@ function Presence.Materialize(record, reason)
     end
 
     zombie = zombieList:get(0)
-    if zombie.setUseless then
-        zombie:setUseless(false)
-    end
     if zombie.DoZombieStats then
         zombie:DoZombieStats()
     end
     Animation.ApplyLiveSetup(zombie, record)
     Visuals.ApplyHumanVisuals(zombie, record)
     Equipment.Apply(zombie, record)
+    if zombie.setUseless then
+        zombie:setUseless(true)
+    end
 
     record.x = spawnX
     record.y = spawnY

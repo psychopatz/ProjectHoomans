@@ -64,7 +64,7 @@ local function applyIncapacitatedLiveState(record, zombie)
         zombie:setRunning(false)
     end
     if zombie.setUseless then
-        zombie:setUseless(false)
+        zombie:setUseless(true)
     end
     if zombie.setHealth then
         zombie:setHealth(Const.INCAPACITATED_ENGINE_BUFFER)
@@ -80,7 +80,7 @@ local function applyNormalLiveState(record, zombie)
         return
     end
     if zombie.setUseless then
-        zombie:setUseless(false)
+        zombie:setUseless(true)
     end
     if zombie.setHealth then
         zombie:setHealth(Const.DEFAULT_ENGINE_BUFFER)
@@ -98,7 +98,7 @@ local function refreshNormalLiveBuffer(zombie)
         return
     end
     if zombie.setUseless then
-        zombie:setUseless(false)
+        zombie:setUseless(true)
     end
     if zombie.setHealth then
         zombie:setHealth(Const.DEFAULT_ENGINE_BUFFER)

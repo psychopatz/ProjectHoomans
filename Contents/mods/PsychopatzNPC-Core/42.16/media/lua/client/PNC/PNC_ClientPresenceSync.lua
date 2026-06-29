@@ -26,6 +26,7 @@ local function isWorldReady()
 end
 
 local function buildRecordView(snapshot)
+    local visualState = snapshot and snapshot.visualState or {}
     return {
         activeBehavior = snapshot and snapshot.activeBehavior or snapshot and snapshot.aiState or "Idle",
         activeJob = snapshot and snapshot.activeJob or snapshot and snapshot.aiState or "Idle",
@@ -46,6 +47,13 @@ local function buildRecordView(snapshot)
             secondaryFullType = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.secondaryFullType or nil,
             worn = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.worn or {},
             attached = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.attached or {},
+        },
+        runtime = {
+            pathing = {
+                animSpeed = tonumber(visualState.animSpeed) or 1.0,
+                mode = visualState.mode or "walk",
+                resolvedMode = visualState.mode or "walk",
+            },
         },
     }
 end
@@ -98,6 +106,10 @@ local function buildMotionKey(snapshot)
         tostring(visualState.attackActive == true),
         tostring(visualState.attackAnim or ""),
         tostring(visualState.attackFinishAt or 0),
+        tostring(tonumber(visualState.animSpeed) or 1.0),
+        tostring(visualState.specialActive == true),
+        tostring(visualState.specialAnim or ""),
+        tostring(visualState.specialFinishAt or 0),
     }, "|")
 end
 
@@ -143,6 +155,7 @@ local function applySnapshotToBody(snapshot, zombie)
     local visualState = snapshot and snapshot.visualState or {}
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
     local attackKey
+    local specialKey
     local desiredAnim
     local recordView
     local visualKey
@@ -191,6 +204,22 @@ local function applySnapshotToBody(snapshot, zombie)
         modData.PNC_ClientAttackKey = nil
     end
     if attackKey then
+        return
+    end
+
+    specialKey = visualState.specialActive and visualState.specialAnim
+        and (tostring(visualState.specialAnim) .. ":" .. tostring(visualState.specialFinishAt or 0))
+        or nil
+    if specialKey and modData and modData.PNC_ClientSpecialKey ~= specialKey then
+        Animation.PlayBump(zombie, recordView, visualState.specialAnim)
+        modData.PNC_ClientSpecialKey = specialKey
+        modData.PNC_ClientMotionKey = motionKey
+        return
+    end
+    if modData and not specialKey then
+        modData.PNC_ClientSpecialKey = nil
+    end
+    if specialKey then
         return
     end
 

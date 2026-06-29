@@ -74,10 +74,12 @@ local function buildVisualState(record)
     local now = Core.Now()
     local healthState = record and record.health and tostring(record.health.state or "normal") or "normal"
     local moving = path and (path.phase == "requested" or path.phase == "active") or false
-    local mode = moving and tostring(path.mode or "walk") or nil
+    local mode = moving and tostring(path.resolvedMode or path.mode or "walk") or nil
     local walkType = ""
     local anim = "Idle"
     local attackActive = attack ~= nil and now < (tonumber(attack.finishAt) or 0)
+    local specialActive = path ~= nil and now < (tonumber(path.specialMoveUntil) or 0)
+    local animSpeed = path and tonumber(path.animSpeed) or 1.0
 
     if healthState == "incapacitated" then
         walkType = moving and "Walk" or ""
@@ -98,6 +100,12 @@ local function buildVisualState(record)
         end
     end
 
+    if specialActive and path and path.specialAnim then
+        anim = tostring(path.specialAnim)
+        moving = false
+        walkType = ""
+    end
+
     if attackActive and attack and attack.anim then
         anim = tostring(attack.anim)
     end
@@ -110,6 +118,10 @@ local function buildVisualState(record)
         attackActive = attackActive,
         attackAnim = attack and attack.anim or nil,
         attackFinishAt = attack and attack.finishAt or 0,
+        animSpeed = animSpeed,
+        specialActive = specialActive,
+        specialAnim = specialActive and path and path.specialAnim or nil,
+        specialFinishAt = specialActive and path and path.specialMoveUntil or 0,
     }
 end
 
@@ -244,7 +256,7 @@ function Network.BuildSnapshot(record)
             debugEnabled = record.runtime and record.runtime.debug == true or false,
             presenceState = record.presenceState,
             movePhase = record.runtime and record.runtime.pathing and record.runtime.pathing.phase or "idle",
-            moveMode = record.runtime and record.runtime.pathing and record.runtime.pathing.mode or nil,
+            moveMode = record.runtime and record.runtime.pathing and (record.runtime.pathing.resolvedMode or record.runtime.pathing.mode) or nil,
             moveGoal = record.runtime and record.runtime.pathing and record.runtime.pathing.goal or nil,
             moveCancelReason = record.runtime and record.runtime.pathing and record.runtime.pathing.cancelReason or nil,
             moveBlockReason = record.runtime and record.runtime.pathing and record.runtime.pathing.blockReason or nil,

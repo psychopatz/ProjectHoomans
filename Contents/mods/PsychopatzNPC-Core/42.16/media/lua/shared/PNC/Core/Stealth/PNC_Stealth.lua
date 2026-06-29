@@ -86,7 +86,7 @@ function Stealth.IsOwnerDiscovered(owner)
     local target
     local distSq
     local canSee
-    local ok
+    local canSeeFn
 
     if not owner or owner:isDead() then
         return false, "owner_missing"
@@ -111,8 +111,9 @@ function Stealth.IsOwnerDiscovered(owner)
             end
 
             if distSq <= (Const.STEALTH_DISCOVERY_RADIUS * Const.STEALTH_DISCOVERY_RADIUS) and zombie.CanSee then
-                ok, canSee = pcall(zombie.CanSee, zombie, owner)
-                if ok and canSee == true then
+                canSeeFn = zombie.CanSee
+                canSee = canSeeFn and zombie:CanSee(owner) or false
+                if canSee == true then
                     return true, "owner_seen"
                 end
             end
@@ -140,7 +141,7 @@ local function isOwnerActuallySneaking(owner, ownerDist)
     if owner.getVehicle and owner:getVehicle() then
         return false
     end
-    if tonumber(ownerDist) and tonumber(ownerDist) > 12 then
+    if tonumber(ownerDist) and tonumber(ownerDist) > 24 then
         return false
     end
     return true
