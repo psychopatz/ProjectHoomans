@@ -51,14 +51,23 @@ function Companion.Tick(record, zombie, job)
             moveMode = Stealth and Stealth.ResolveFollowMoveMode and Stealth.ResolveFollowMoveMode(record, owner, ownerDist)
                 or (ownerDist >= Const.FOLLOW_RUN_DISTANCE and "run" or "walk")
             Common.ClearCombatTarget(record, moveMode == "sneak" and "following_owner_sneak" or ("following_owner_" .. tostring(moveMode)))
-            Common.MoveRecord(record, zombie, owner:getX(), owner:getY(), owner:getZ(), moveMode, Const.FOLLOW_DISTANCE)
+            Common.MoveRecord(
+                record,
+                zombie,
+                owner:getX(),
+                owner:getY(),
+                owner:getZ(),
+                moveMode,
+                Const.FOLLOW_DISTANCE,
+                moveMode == "sneak" and "follow_owner_sneak" or ("follow_owner_" .. tostring(moveMode))
+            )
             return true
         end
         if Stealth and Stealth.Clear then
             Stealth.Clear(record, "owner_missing")
         end
         Common.ClearCombatTarget(record, "owner_missing_return_anchor")
-        Common.MoveRecord(record, zombie, record.anchorX, record.anchorY, record.anchorZ, "walk", 0.8)
+        Common.MoveRecord(record, zombie, record.anchorX, record.anchorY, record.anchorZ, "walk", 0.8, "owner_missing_return_anchor")
         return true
     end
 
@@ -77,7 +86,8 @@ function Companion.Tick(record, zombie, job)
             tonumber(order.y) or record.anchorY,
             tonumber(order.z) or record.anchorZ,
             "walk",
-            Const.GUARD_RADIUS
+            Const.GUARD_RADIUS,
+            "guard_anchor"
         )
         return true
     end
@@ -92,7 +102,7 @@ function Companion.Tick(record, zombie, job)
         patrolPoints = order.points or record.patrolPoints or {}
         if #patrolPoints <= 0 then
             Common.ClearCombatTarget(record, "patrol_missing_points")
-            Common.MoveRecord(record, zombie, record.anchorX, record.anchorY, record.anchorZ, "walk", 0.8)
+            Common.MoveRecord(record, zombie, record.anchorX, record.anchorY, record.anchorZ, "walk", 0.8, "patrol_missing_points")
             return true
         end
         record.patrolIndex = record.patrolIndex or 1
@@ -107,7 +117,7 @@ function Companion.Tick(record, zombie, job)
             end
             if point then
                 Common.ClearCombatTarget(record, "patrolling")
-                Common.MoveRecord(record, zombie, point.x, point.y, point.z, "walk", Const.PATROL_REACHED_DISTANCE)
+                Common.MoveRecord(record, zombie, point.x, point.y, point.z, "walk", Const.PATROL_REACHED_DISTANCE, "patrol_route")
             end
         end
         return true

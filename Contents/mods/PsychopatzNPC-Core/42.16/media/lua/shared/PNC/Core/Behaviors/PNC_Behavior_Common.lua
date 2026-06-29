@@ -43,13 +43,18 @@ function Common.GetOwner(record)
     return Core.ResolvePlayerByOnlineID(record.ownerOnlineID) or Core.ResolvePlayerByUsername(record.ownerUsername)
 end
 
-function Common.MoveRecord(record, zombie, tx, ty, tz, mode, stopDistance)
+function Common.MoveRecord(record, zombie, tx, ty, tz, mode, stopDistance, reason)
+    local moveReason = reason
+        or (record and record.runtime and record.runtime.combatBlockReason)
+        or (record and record.activeBehavior and ("move_" .. tostring(record.activeBehavior)))
+        or (record and record.activeJob and ("move_" .. tostring(record.activeJob)))
+        or "behavior_move"
     if record.presenceState == Const.PRESENCE_LIVE then
         if resolveMoveIntent() and resolveMoveIntent().RequestMove then
-            resolveMoveIntent().RequestMove(record, tx, ty, tz, mode, stopDistance, "behavior_move")
+            resolveMoveIntent().RequestMove(record, tx, ty, tz, mode, stopDistance, moveReason)
             return true, "move_intent"
         end
-        return PathService.MoveToward(record, zombie, tx, ty, tz, mode, stopDistance)
+        return PathService.MoveToward(record, zombie, tx, ty, tz, mode, stopDistance, moveReason)
     end
     PathService.AdvanceAbstract(record, tx, ty, tz, stopDistance)
     return true, "abstract_move"

@@ -32,7 +32,8 @@ function Hostile.Tick(record, zombie, job)
             tonumber(order.y) or record.anchorY,
             tonumber(order.z) or record.anchorZ,
             "walk",
-            2.0
+            2.0,
+            "hunt_return_anchor"
         )
         return true
     end
@@ -50,7 +51,7 @@ function Hostile.Tick(record, zombie, job)
             record.runtime.roamGoalZ = tonumber(order.z) or record.anchorZ
         end
         Common.ClearCombatTarget(record, "roaming")
-        Common.MoveRecord(record, zombie, record.runtime.roamGoalX, record.runtime.roamGoalY, record.runtime.roamGoalZ, "walk", 1.0)
+        Common.MoveRecord(record, zombie, record.runtime.roamGoalX, record.runtime.roamGoalY, record.runtime.roamGoalZ, "walk", 1.0, "roam_area")
         return true
     end
 

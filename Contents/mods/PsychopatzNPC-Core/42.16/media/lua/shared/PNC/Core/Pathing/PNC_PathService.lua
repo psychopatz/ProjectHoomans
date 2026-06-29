@@ -12,6 +12,13 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Animation = PNC.Animation
 local getActionStateName
+local isAtGoal
+
+local GOAL_REFRESH_DELAY_MS = 120
+local NO_PROGRESS_STEP_MS = 700
+local PROGRESS_TIMEOUT_MS = 1200
+local DIRECT_STEP_COOLDOWN_MS = 250
+local CONFLICT_RECOVERIES_BEFORE_STEP = 2
 
 local function roundHalf(value)
     if value >= 0 then
@@ -33,6 +40,38 @@ local function isSquareWalkable(x, y, z)
         return false
     end
     return square:isFree(false) and (not square:isSolid()) and (not square:isSolidTrans())
+end
+
+local function syncRecordPosition(record, zombie)
+    if not record or not zombie then
+        return
+    end
+    record.x = zombie:getX()
+    record.y = zombie:getY()
+    record.z = zombie:getZ()
+end
+
+local function getDirectStepSize(mode)
+    if mode == "run" then
+        return 0.55
+    end
+    if mode == "sneak" or mode == "crawl" then
+        return 0.2
+    end
+    return 0.35
+end
+
+local function isMovementDebugEnabled(record)
+    if record and record.runtime and record.runtime.debugMovement == true then
+        return true
+    end
+    if PNC.Runtime and PNC.Runtime.debugMovement == true then
+        return true
+    end
+    if Core and Core.IsRecordDebugEnabled then
+        return Core.IsRecordDebugEnabled(record)
+    end
+    return PNC.Runtime and PNC.Runtime.debugEnabled == true
 end
 
 local function setWalkAnim(zombie, record, mode)
@@ -86,6 +125,19 @@ local function resetPathController(zombie)
     end
 end
 
+local function hardResetMoveOwner(zombie)
+    if not zombie then
+        return
+    end
+    resetPathController(zombie)
+    if zombie.clearAggroList then
+        zombie:clearAggroList()
+    end
+    if zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
+        zombie:changeState(ZombieIdleState.instance())
+    end
+end
+
 local function issuePathRequest(zombie, targetX, targetY, targetZ)
     local behavior
     if not zombie then
@@ -127,6 +179,122 @@ local function hasPath2(zombie)
     return zombie:getPath2() ~= nil
 end
 
+local function describeGoal(goal)
+    if not goal then
+        return "nil"
+    end
+    return tostring(goal.x) .. "," .. tostring(goal.y) .. "," .. tostring(goal.z)
+end
+
+local function describeRecord(record)
+    if not record then
+        return "npc[nil]"
+    end
+    return tostring(record.name or "Unknown NPC")
+        .. "["
+        .. tostring(record.id or "nil")
+        .. "]"
+        .. " faction="
+        .. tostring(record.faction or "unknown")
+        .. " job="
+        .. tostring(record.activeJob or "nil")
+        .. " behavior="
+        .. tostring(record.activeBehavior or "nil")
+        .. " order="
+        .. tostring(record.orderSpec and record.orderSpec.kind or "none")
+end
+
+local function describeZombieTarget(zombie)
+    local target
+    local name
+    if not zombie or not zombie.getTarget then
+        return "nil"
+    end
+    target = zombie:getTarget()
+    if not target then
+        return "nil"
+    end
+    if target.getUsername then
+        name = target:getUsername()
+    elseif target.getDescriptor and target:getDescriptor() and target:getDescriptor().getForename then
+        name = target:getDescriptor():getForename()
+    end
+    return tostring(name or tostring(target))
+end
+
+local function buildMoveLogMessage(record, zombie, lane, event, reason, extra)
+    local goal = lane and lane.goal or nil
+    local intentReason = lane and lane.intentReason or record and record.runtime and record.runtime.moveIntent and record.runtime.moveIntent.reason or nil
+    local requestedBy = lane and lane.requestedByBehavior or record and record.activeBehavior or record and record.activeJob or "nil"
+    local actionState = getActionStateName(zombie)
+    return describeRecord(record)
+        .. " move="
+        .. tostring(event or "unknown")
+        .. " phase="
+        .. tostring(lane and lane.phase or "nil")
+        .. " mode="
+        .. tostring(lane and lane.mode or "nil")
+        .. " reason="
+        .. tostring(reason or "none")
+        .. " intentReason="
+        .. tostring(intentReason or "none")
+        .. " requestedBy="
+        .. tostring(requestedBy)
+        .. " goal="
+        .. describeGoal(goal)
+        .. " revision="
+        .. tostring(lane and lane.goalRevision or 0)
+        .. " action="
+        .. tostring(actionState ~= "" and actionState or "idle")
+        .. " lastAction="
+        .. tostring(lane and lane.lastActionState or (actionState ~= "" and actionState or "idle"))
+        .. " path2="
+        .. tostring(hasPath2(zombie))
+        .. " owner="
+        .. tostring(lane and lane.ownerMode or "none")
+        .. " recoveries="
+        .. tostring(lane and lane.recoveryCount or 0)
+        .. " fallbacks="
+        .. tostring(lane and lane.fallbackCount or 0)
+        .. " target="
+        .. describeZombieTarget(zombie)
+        .. " pos="
+        .. tostring(zombie and zombie.getX and string.format("%.2f", zombie:getX()) or "nil")
+        .. ","
+        .. tostring(zombie and zombie.getY and string.format("%.2f", zombie:getY()) or "nil")
+        .. ","
+        .. tostring(zombie and zombie.getZ and zombie:getZ() or "nil")
+        .. (extra and extra ~= "" and (" " .. tostring(extra)) or "")
+end
+
+local function logMoveWarning(record, zombie, lane, event, reason, extra)
+    local now = Core.Now()
+    local key = tostring(event or "unknown")
+        .. "|"
+        .. tostring(reason or "none")
+        .. "|"
+        .. tostring(lane and lane.phase or "nil")
+        .. "|"
+        .. tostring(getActionStateName(zombie))
+        .. "|"
+        .. tostring(hasPath2(zombie))
+    if lane and lane.lastWarnKey == key and (now - (tonumber(lane.lastWarnAt) or 0)) < 1500 then
+        return
+    end
+    if lane then
+        lane.lastWarnKey = key
+        lane.lastWarnAt = now
+    end
+    Core.LogWarn(buildMoveLogMessage(record, zombie, lane, event, reason, extra))
+end
+
+local function logMoveDebug(record, zombie, lane, event, reason, extra)
+    if not isMovementDebugEnabled(record) then
+        return
+    end
+    Core.Log("DEBUG", buildMoveLogMessage(record, zombie, lane, event, reason, extra))
+end
+
 local function isRecoverableConflictState(actionState)
     if actionState == nil or actionState == "" or actionState == "walktoward" then
         return false
@@ -143,42 +311,144 @@ local function isRecoverableConflictState(actionState)
     return false
 end
 
-local function recoverConflictingState(zombie, record, path)
+local function incrementRecovery(lane, actionState, reason)
+    if not lane then
+        return
+    end
+    lane.recoveryCount = (tonumber(lane.recoveryCount) or 0) + 1
+    lane.lastRecoveryReason = reason
+    lane.lastActionState = actionState or ""
+end
+
+local function shouldUseHybridStep(lane, now)
+    if not lane then
+        return false
+    end
+    if (now - (tonumber(lane.lastDirectStepAt) or 0)) < DIRECT_STEP_COOLDOWN_MS then
+        return false
+    end
+    if (tonumber(lane.recoveryCount) or 0) >= CONFLICT_RECOVERIES_BEFORE_STEP then
+        return true
+    end
+    return (now - (tonumber(lane.lastProgressAt) or 0)) >= NO_PROGRESS_STEP_MS
+end
+
+local function applyHybridDirectStep(zombie, record, lane, reason)
+    local goal
+    local zx
+    local zy
+    local step
+    local dx
+    local dy
+    local len
+    local nx
+    local ny
+    local candidates
+    local i
+    local candidate
+    local arrived
+    local now = Core.Now()
+
+    if not zombie or not record or not lane or not lane.goal then
+        return false, nil
+    end
+
+    goal = lane.goal
+    zx = zombie:getX()
+    zy = zombie:getY()
+    step = getDirectStepSize(lane.mode or goal.mode)
+    dx = goal.x - zx
+    dy = goal.y - zy
+    len = math.sqrt((dx * dx) + (dy * dy))
+    if len <= 0.001 then
+        return true, "arrived"
+    end
+
+    nx = zx + (dx / len) * math.min(step, len)
+    ny = zy + (dy / len) * math.min(step, len)
+    candidates = {
+        { x = nx, y = ny, z = goal.z },
+        { x = nx, y = zy, z = goal.z },
+        { x = zx, y = ny, z = goal.z },
+    }
+
+    for i = 1, #candidates do
+        candidate = candidates[i]
+        if isSquareWalkable(candidate.x, candidate.y, candidate.z) then
+            hardResetMoveOwner(zombie)
+            if zombie.faceLocationF then
+                zombie:faceLocationF(goal.x, goal.y)
+            end
+            zombie:setX(candidate.x)
+            zombie:setY(candidate.y)
+            zombie:setZ(candidate.z)
+            syncRecordPosition(record, zombie)
+            lane.ownerMode = "hybrid_step"
+            lane.fallbackCount = (tonumber(lane.fallbackCount) or 0) + 1
+            lane.lastDirectStepAt = now
+            lane.lastProgressAt = now
+            lane.lastIssueAt = now
+            lane.lastX = zombie:getX()
+            lane.lastY = zombie:getY()
+            lane.lastActionState = getActionStateName(zombie)
+            logMoveWarning(record, zombie, lane, "hybrid_step", reason or "hybrid_step", "step=" .. tostring(i))
+            logMoveDebug(record, zombie, lane, "hybrid_step", reason or "hybrid_step", "step=" .. tostring(i))
+            arrived = isAtGoal(zombie, goal, lane.stopDistance)
+            if not arrived then
+                setWalkAnim(zombie, record, lane.mode or goal.mode)
+                issuePathRequest(zombie, goal.x, goal.y, goal.z)
+                lane.ownerMode = "engine_path"
+            end
+            return true, arrived and "arrived" or "hybrid_step"
+        end
+    end
+
+    return false, nil
+end
+
+local function recoverConflictingState(zombie, record, lane, now)
     local actionState = getActionStateName(zombie)
-    local goal = path and path.goal or nil
-    if not zombie or not record or not path then
-        return false
+    local goal = lane and lane.goal or nil
+    local walkTowardPathConflict
+    local recoveryReason
+    local stepped
+    local stepResult
+
+    if not zombie or not record or not lane then
+        return false, nil
     end
-    if not isRecoverableConflictState(actionState) then
-        return false
+
+    walkTowardPathConflict = actionState == "walktoward" and hasPath2(zombie)
+    if not walkTowardPathConflict and not isRecoverableConflictState(actionState) then
+        return false, nil
     end
-    Core.LogRecordDebug(
+
+    recoveryReason = walkTowardPathConflict and "walktoward_path2_conflict" or actionState
+    incrementRecovery(lane, actionState, recoveryReason)
+    logMoveWarning(
         record,
-        "NPC "
-            .. tostring(record.id)
-            .. " recovering path state from "
-            .. tostring(actionState)
-            .. " goal="
-            .. tostring(goal and goal.x or nil)
-            .. ","
-            .. tostring(goal and goal.y or nil)
-            .. ","
-            .. tostring(goal and goal.z or nil)
-            .. " mode="
-            .. tostring(path.mode or "walk")
+        zombie,
+        lane,
+        "recover_conflict",
+        recoveryReason,
+        "recovering goal=" .. describeGoal(goal) .. " mode=" .. tostring(lane.mode or "walk")
     )
-    resetPathController(zombie)
-    if zombie.clearAggroList then
-        zombie:clearAggroList()
+    logMoveDebug(record, zombie, lane, "recover_conflict", recoveryReason, "")
+
+    if shouldUseHybridStep(lane, now or Core.Now()) then
+        stepped, stepResult = applyHybridDirectStep(zombie, record, lane, recoveryReason)
+        if stepped then
+            return true, stepResult
+        end
     end
-    if zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
-        zombie:changeState(ZombieIdleState.instance())
-    end
-    path.phase = "requested"
-    path.startedAt = 0
-    setWalkAnim(zombie, record, path.mode or "walk")
+
+    hardResetMoveOwner(zombie)
+    lane.phase = "requested"
+    lane.ownerMode = "engine_path"
+    lane.startedAt = 0
+    setWalkAnim(zombie, record, lane.mode or "walk")
     issuePathRequest(zombie, goal and goal.x or zombie:getX(), goal and goal.y or zombie:getY(), goal and goal.z or zombie:getZ())
-    return true
+    return true, "state_recovered"
 end
 
 local function openDoorForNPC(zombie, object)
@@ -348,6 +618,19 @@ local function ensureMoveLane(record)
     lane.lastProgressAt = tonumber(lane.lastProgressAt) or 0
     lane.cancelReason = lane.cancelReason or nil
     lane.blockReason = lane.blockReason or nil
+    lane.intentReason = lane.intentReason or nil
+    lane.requestedByJob = lane.requestedByJob or nil
+    lane.requestedByBehavior = lane.requestedByBehavior or nil
+    lane.requestedOrder = lane.requestedOrder or nil
+    lane.lastWarnKey = lane.lastWarnKey or nil
+    lane.lastWarnAt = tonumber(lane.lastWarnAt) or 0
+    lane.goalRevision = tonumber(lane.goalRevision) or 0
+    lane.recoveryCount = tonumber(lane.recoveryCount) or 0
+    lane.fallbackCount = tonumber(lane.fallbackCount) or 0
+    lane.lastRecoveryReason = lane.lastRecoveryReason or nil
+    lane.lastActionState = lane.lastActionState or nil
+    lane.lastDirectStepAt = tonumber(lane.lastDirectStepAt) or 0
+    lane.ownerMode = lane.ownerMode or "idle"
     return lane
 end
 
@@ -361,8 +644,26 @@ local function buildGoal(x, y, z, mode, stopDistance)
     }
 end
 
-local function getGoalTolerance(mode)
-    return tostring(mode or "walk") == "run" and 2.0 or 1.25
+local function getGoalTolerance(mode, stopDistance)
+    local tolerance = tostring(mode or "walk") == "run" and 1.75 or 1.0
+    if mode == "sneak" or mode == "crawl" then
+        tolerance = 0.6
+    end
+    if tonumber(stopDistance) and tonumber(stopDistance) > tolerance then
+        tolerance = math.min(tonumber(stopDistance) * 1.25, tolerance + 0.75)
+    end
+    return tolerance
+end
+
+local function getStopDistanceClass(stopDistance)
+    local value = tonumber(stopDistance) or 0.7
+    if value <= 0.35 then
+        return "tight"
+    end
+    if value <= 0.9 then
+        return "near"
+    end
+    return "wide"
 end
 
 local function goalsDiffer(currentGoal, nextGoal, currentMode)
@@ -370,38 +671,16 @@ local function goalsDiffer(currentGoal, nextGoal, currentMode)
     if not currentGoal or not nextGoal then
         return true
     end
-    tolerance = getGoalTolerance(currentMode or nextGoal.mode)
+    tolerance = getGoalTolerance(currentMode or nextGoal.mode, nextGoal.stopDistance)
     return math.abs((currentGoal.x or 0) - (nextGoal.x or 0)) > tolerance
         or math.abs((currentGoal.y or 0) - (nextGoal.y or 0)) > tolerance
         or (currentGoal.z or 0) ~= (nextGoal.z or 0)
         or tostring(currentMode or "") ~= tostring(nextGoal.mode or "")
+        or getStopDistanceClass(currentGoal.stopDistance) ~= getStopDistanceClass(nextGoal.stopDistance)
 end
 
-local function isMovePhaseActive(phase)
-    return phase == "requested" or phase == "active"
-end
-
-local function logMoveTransition(record, lane, verb, reason)
-    local goal = lane and lane.goal or nil
-    Core.LogRecordDebug(
-        record,
-        "NPC "
-            .. tostring(record.id)
-            .. " move "
-            .. tostring(verb)
-            .. " phase="
-            .. tostring(lane and lane.phase or "nil")
-            .. " mode="
-            .. tostring(lane and lane.mode or "nil")
-            .. " goal="
-            .. tostring(goal and goal.x or nil)
-            .. ","
-            .. tostring(goal and goal.y or nil)
-            .. ","
-            .. tostring(goal and goal.z or nil)
-            .. " reason="
-            .. tostring(reason or "none")
-    )
+local function logMoveTransition(record, zombie, lane, verb, reason, extra)
+    logMoveDebug(record, zombie, lane, verb, reason, extra)
 end
 
 local function setLanePhase(record, lane, phase, reason)
@@ -409,20 +688,37 @@ local function setLanePhase(record, lane, phase, reason)
         return
     end
     lane.phase = phase
-    logMoveTransition(record, lane, phase, reason)
+    logMoveTransition(record, nil, lane, phase, reason)
 end
 
 local function setLaneGoal(record, lane, goal)
     lane.id = (tonumber(lane.id) or 0) + 1
+    lane.goalRevision = (tonumber(lane.goalRevision) or 0) + 1
     lane.goal = {
         x = goal.x,
         y = goal.y,
         z = goal.z,
+        mode = goal.mode,
+        stopDistance = goal.stopDistance,
     }
     lane.mode = goal.mode
     lane.stopDistance = goal.stopDistance
     lane.blockReason = nil
     lane.cancelReason = nil
+    lane.recoveryCount = 0
+    lane.fallbackCount = 0
+    lane.lastRecoveryReason = nil
+    lane.ownerMode = "requested"
+end
+
+local function captureIntentContext(record, lane, intent)
+    if not lane then
+        return
+    end
+    lane.intentReason = intent and intent.reason or nil
+    lane.requestedByJob = intent and intent.requestedByJob or tostring(record and record.activeJob or "none")
+    lane.requestedByBehavior = intent and intent.requestedByBehavior or tostring(record and record.activeBehavior or record and record.activeJob or "none")
+    lane.requestedOrder = intent and intent.requestedOrder or tostring(record and record.orderSpec and record.orderSpec.kind or "none")
 end
 
 local function applyHoldAnimation(zombie, record, lane)
@@ -445,7 +741,7 @@ local function applyHoldAnimation(zombie, record, lane)
     Animation.Apply(zombie, record, "Idle")
 end
 
-local function isAtGoal(zombie, goal, stopDistance)
+isAtGoal = function(zombie, goal, stopDistance)
     local dist
     if not zombie or not goal then
         return false
@@ -462,6 +758,7 @@ local function consumeMoveIntent(record, lane, zombie)
         return "hold"
     end
     if not intent or intent.kind == "hold" then
+        captureIntentContext(record, lane, intent)
         lane.pendingGoal = nil
         if lane.phase == "active" or lane.phase == "requested" then
             lane.cancelReason = intent and intent.reason or "hold"
@@ -473,6 +770,7 @@ local function consumeMoveIntent(record, lane, zombie)
     end
 
     goal = buildGoal(intent.x, intent.y, intent.z, intent.mode, intent.stopDistance)
+    captureIntentContext(record, lane, intent)
     if zombie and isAtGoal(zombie, goal, goal.stopDistance) then
         lane.pendingGoal = nil
         lane.goal = goal
@@ -510,12 +808,15 @@ end
 
 local function finalizeCancel(zombie, record, lane)
     if zombie then
-        resetPathController(zombie)
+        hardResetMoveOwner(zombie)
     end
     lane.pendingGoal = nil
     lane.lastIssueAt = 0
     lane.lastProgressAt = 0
     lane.startedAt = 0
+    lane.recoveryCount = 0
+    lane.lastRecoveryReason = nil
+    lane.ownerMode = "idle"
     setLanePhase(record, lane, "idle", lane.cancelReason or "cancelled")
     applyHoldAnimation(zombie, record, lane)
     return true, "cancelled"
@@ -528,11 +829,13 @@ local function startRequestedMove(zombie, record, lane)
         return false, "no_goal"
     end
     now = Core.Now()
-    resetPathController(zombie)
+    hardResetMoveOwner(zombie)
     setWalkAnim(zombie, record, lane.mode or goal.mode)
     if not issuePathRequest(zombie, goal.x, goal.y, goal.z) then
         lane.blockReason = "path_request_failed"
+        lane.ownerMode = "blocked"
         setLanePhase(record, lane, "blocked", lane.blockReason)
+        logMoveWarning(record, zombie, lane, "blocked", lane.blockReason, "goal=" .. describeGoal(goal))
         applyHoldAnimation(zombie, record, lane)
         return false, "path_request_failed"
     end
@@ -541,13 +844,16 @@ local function startRequestedMove(zombie, record, lane)
     lane.lastProgressAt = now
     lane.lastX = zombie:getX()
     lane.lastY = zombie:getY()
+    lane.lastActionState = getActionStateName(zombie)
+    lane.ownerMode = "engine_path"
     setLanePhase(record, lane, "active", "started")
+    logMoveTransition(record, zombie, lane, "request_issued", "started")
     return true, "started"
 end
 
 local function completeMove(zombie, record, lane, phase, reason)
     if zombie then
-        resetPathController(zombie)
+        hardResetMoveOwner(zombie)
     end
     lane.pendingGoal = nil
     lane.startedAt = 0
@@ -555,7 +861,11 @@ local function completeMove(zombie, record, lane, phase, reason)
     lane.lastProgressAt = 0
     lane.cancelReason = phase == "arrived" and reason or lane.cancelReason
     lane.blockReason = phase == "blocked" and reason or nil
+    lane.recoveryCount = 0
+    lane.lastRecoveryReason = nil
+    lane.ownerMode = phase == "blocked" and "blocked" or "idle"
     setLanePhase(record, lane, phase, reason)
+    logMoveTransition(record, zombie, lane, "complete", reason)
     applyHoldAnimation(zombie, record, lane)
     return true, reason
 end
@@ -574,6 +884,7 @@ local function restartCurrentGoal(zombie, record, lane, reason)
     if not lane or not lane.goal then
         return false, "no_goal"
     end
+    lane.ownerMode = "requested"
     setLanePhase(record, lane, "requested", reason or "restart")
     return startRequestedMove(zombie, record, lane)
 end
@@ -586,18 +897,27 @@ local function updateActiveMove(zombie, record, lane)
     local zx
     local zy
     local moved
+    local recovered
+    local recoverResult
+    local stepped
+    local stepResult
 
     if not zombie or not lane or not goal then
         return false, "no_goal"
     end
 
     now = Core.Now()
-    if recoverConflictingState(zombie, record, lane) then
+    lane.lastActionState = getActionStateName(zombie)
+    recovered, recoverResult = recoverConflictingState(zombie, record, lane, now)
+    if recovered then
         lane.lastIssueAt = now
         lane.lastProgressAt = now
         lane.lastX = zombie:getX()
         lane.lastY = zombie:getY()
-        return true, "state_recovered"
+        if recoverResult == "arrived" then
+            return completeMove(zombie, record, lane, "arrived", "hybrid_step")
+        end
+        return true, recoverResult or "state_recovered"
     end
 
     if zombie.getPathFindBehavior2 then
@@ -607,7 +927,7 @@ local function updateActiveMove(zombie, record, lane)
         end
     end
 
-    if lane.pendingGoal and (now - (tonumber(lane.lastIssueAt) or 0)) >= 120 then
+    if lane.pendingGoal and (now - (tonumber(lane.lastIssueAt) or 0)) >= GOAL_REFRESH_DELAY_MS then
         return refreshPendingGoal(zombie, record, lane, "goal_refresh")
     end
 
@@ -627,6 +947,10 @@ local function updateActiveMove(zombie, record, lane)
             lane.lastX = zx
             lane.lastY = zy
             lane.lastProgressAt = now
+            lane.recoveryCount = 0
+            lane.ownerMode = "engine_path"
+            syncRecordPosition(record, zombie)
+            logMoveDebug(record, zombie, lane, "progress", "engine_progress", string.format("moved=%.2f", moved))
             return true, "moving"
         end
     end
@@ -634,32 +958,50 @@ local function updateActiveMove(zombie, record, lane)
     if tryDoorOrWindowInteraction(zombie, record, goal.x, goal.y, goal.z) then
         lane.lastIssueAt = now
         lane.lastProgressAt = now
+        lane.ownerMode = "engine_path"
         issuePathRequest(zombie, goal.x, goal.y, goal.z)
+        logMoveDebug(record, zombie, lane, "interact", "door_or_window", "")
         return true, "interact"
     end
 
     if BehaviorResult and behaviorResult == BehaviorResult.Failed then
         if lane.pendingGoal then
+            logMoveWarning(record, zombie, lane, "repath", "behavior_failed_pending", "")
             return refreshPendingGoal(zombie, record, lane, "behavior_failed")
         end
+        logMoveWarning(record, zombie, lane, "repath", "behavior_failed_restart", "")
         return restartCurrentGoal(zombie, record, lane, "behavior_failed")
     end
 
-    if (now - (tonumber(lane.lastProgressAt) or 0)) >= 1200 then
+    if shouldUseHybridStep(lane, now) then
+        stepped, stepResult = applyHybridDirectStep(zombie, record, lane, "no_progress")
+        if stepped then
+            if stepResult == "arrived" then
+                return completeMove(zombie, record, lane, "arrived", "hybrid_step")
+            end
+            return true, stepResult
+        end
+    end
+
+    if (now - (tonumber(lane.lastProgressAt) or 0)) >= PROGRESS_TIMEOUT_MS then
+        logMoveWarning(record, zombie, lane, "progress_timeout", lane.blockReason or "progress_timeout", "")
         if issuePathRequest(zombie, goal.x, goal.y, goal.z) then
             lane.lastIssueAt = now
             lane.lastProgressAt = now
             lane.lastX = zombie:getX()
             lane.lastY = zombie:getY()
-            logMoveTransition(record, lane, "refreshed", "progress_timeout")
+            lane.ownerMode = "engine_path"
+            logMoveTransition(record, zombie, lane, "refreshed", "progress_timeout")
             return true, "repath"
         end
         if (not isServer or not isServer()) and isSquareWalkable(goal.x, goal.y, goal.z) then
             zombie:setX(goal.x)
             zombie:setY(goal.y)
             zombie:setZ(goal.z)
+            syncRecordPosition(record, zombie)
             return completeMove(zombie, record, lane, "arrived", "fallback_snap")
         end
+        logMoveWarning(record, zombie, lane, "blocked", "progress_timeout", "goal=" .. describeGoal(goal))
         return completeMove(zombie, record, lane, "blocked", "progress_timeout")
     end
 
@@ -671,10 +1013,10 @@ function PathService.Reset(zombie, record)
         record.runtime.pathing = nil
         record.runtime.moveIntent = nil
     end
-    resetPathController(zombie)
+    hardResetMoveOwner(zombie)
 end
 
-function PathService.MoveToward(record, zombie, targetX, targetY, targetZ, mode, stopDistance)
+function PathService.MoveToward(record, zombie, targetX, targetY, targetZ, mode, stopDistance, reason)
     record.runtime = record.runtime or {}
     record.runtime.moveIntent = {
         kind = "move",
@@ -683,7 +1025,11 @@ function PathService.MoveToward(record, zombie, targetX, targetY, targetZ, mode,
         z = tonumber(targetZ) or record.z or 0,
         mode = tostring(mode or "walk"),
         stopDistance = tonumber(stopDistance) or 0.7,
-        reason = "path_service_move",
+        reason = reason or "path_service_move",
+        requestedByJob = tostring(record.activeJob or "none"),
+        requestedByBehavior = tostring(record.activeBehavior or record.activeJob or "none"),
+        requestedOrder = tostring(record.orderSpec and record.orderSpec.kind or "none"),
+        combatReason = tostring(record.runtime.combatBlockReason or "none"),
         updatedAt = Core.Now(),
     }
     if zombie and isAtGoal(zombie, buildGoal(targetX, targetY, targetZ, mode, stopDistance), stopDistance) then

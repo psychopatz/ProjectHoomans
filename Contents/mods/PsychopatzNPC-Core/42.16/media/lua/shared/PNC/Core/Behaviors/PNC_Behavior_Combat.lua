@@ -62,7 +62,16 @@ function BehaviorCombat.TickEngage(record, zombie, target)
             return
         end
         if reason == "target_out_of_range" then
-            Common.MoveRecord(record, zombie, target.x, target.y, target.z, Common.ResolveCombatApproachMode(dist, "run"), Const.MELEE_RANGE)
+            Common.MoveRecord(
+                record,
+                zombie,
+                target.x,
+                target.y,
+                target.z,
+                Common.ResolveCombatApproachMode(dist, "run"),
+                Const.MELEE_RANGE,
+                "closing_to_melee"
+            )
             Common.SetCombatDebug(record, target, "closing_to_melee", effectiveMode, equipmentInfo.weaponStatus)
             return
         end
@@ -91,7 +100,16 @@ function BehaviorCombat.TickEngage(record, zombie, target)
             return
         end
         if reason == "target_out_of_range" then
-            Common.MoveRecord(record, zombie, target.x, target.y, target.z, Common.ResolveCombatApproachMode(dist, "run"), Const.RANGED_RANGE * 0.8)
+            Common.MoveRecord(
+                record,
+                zombie,
+                target.x,
+                target.y,
+                target.z,
+                Common.ResolveCombatApproachMode(dist, "run"),
+                Const.RANGED_RANGE * 0.8,
+                "closing_to_range"
+            )
             Common.SetCombatDebug(record, target, "closing_to_range", effectiveMode, equipmentInfo.weaponStatus)
             return
         end
@@ -143,7 +161,16 @@ function BehaviorCombat.TickEngage(record, zombie, target)
         return
     end
     if reason == "target_out_of_range" then
-        Common.MoveRecord(record, zombie, target.x, target.y, target.z, Common.ResolveCombatApproachMode(dist, "run"), Const.RANGED_RANGE * 0.85)
+        Common.MoveRecord(
+            record,
+            zombie,
+            target.x,
+            target.y,
+            target.z,
+            Common.ResolveCombatApproachMode(dist, "run"),
+            Const.RANGED_RANGE * 0.85,
+            "closing_to_range"
+        )
         Common.SetCombatDebug(record, target, "closing_to_range", "mixed", equipmentInfo.weaponStatus)
         return
     end

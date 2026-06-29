@@ -30,6 +30,10 @@ function MoveIntent.RequestMove(record, x, y, z, mode, stopDistance, reason)
         mode = tostring(mode or "walk"),
         stopDistance = tonumber(stopDistance) or 0.7,
         reason = reason or "move_request",
+        requestedByJob = tostring(record.activeJob or "none"),
+        requestedByBehavior = tostring(record.activeBehavior or record.activeJob or "none"),
+        requestedOrder = tostring(record.orderSpec and record.orderSpec.kind or "none"),
+        combatReason = tostring(runtime.combatBlockReason or "none"),
         updatedAt = Core.Now(),
     }
     return true
@@ -44,6 +48,9 @@ function MoveIntent.Hold(record, reason)
     runtime.moveIntent = {
         kind = "hold",
         reason = reason or "hold",
+        requestedByJob = tostring(record.activeJob or "none"),
+        requestedByBehavior = tostring(record.activeBehavior or record.activeJob or "none"),
+        requestedOrder = tostring(record.orderSpec and record.orderSpec.kind or "none"),
         updatedAt = Core.Now(),
     }
     return true
@@ -52,4 +59,3 @@ end
 function MoveIntent.Get(record)
     return record and record.runtime and record.runtime.moveIntent or nil
 end
-

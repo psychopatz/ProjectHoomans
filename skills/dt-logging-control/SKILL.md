@@ -1,6 +1,6 @@
 ---
 name: dt-logging-control
-description: Use when working on DynamicTrading logging noise, subsystem log toggles, or `console.txt` analysis. Applies runtime logging presets and overrides through the same options config used by the in-game Logs tab, lists discovered subsystems, and summarizes DynamicTrading console output into token-efficient reports while preserving warn/error lines.
+description: Use when working on project zomboid logging noise, subsystem log toggles, or `console.txt` analysis. Applies runtime logging presets and overrides through the same options config used by the in-game Logs tab, lists discovered subsystems, and summarizes DynamicTrading console output into token-efficient reports while preserving warn/error lines.
 ---
 
 # DynamicTrading Logging Control

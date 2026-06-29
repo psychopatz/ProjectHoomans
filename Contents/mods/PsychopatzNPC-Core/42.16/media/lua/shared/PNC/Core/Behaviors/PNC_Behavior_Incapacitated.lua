@@ -38,7 +38,7 @@ function Incapacitated.Tick(record, zombie)
     if zombie and owner and record.orderSpec and record.orderSpec.kind == Const.ORDER_FOLLOW then
         ownerDist = Core.Distance(record.x, record.y, owner:getX(), owner:getY())
         if ownerDist > (Const.FOLLOW_DISTANCE + 0.5) then
-            Common.MoveRecord(record, zombie, owner:getX(), owner:getY(), owner:getZ(), "crawl", 1.2)
+            Common.MoveRecord(record, zombie, owner:getX(), owner:getY(), owner:getZ(), "crawl", 1.2, "crawl_to_owner")
         else
             Common.HaltMovement(record, zombie, "incap_hold")
             if Animation and Animation.ApplyDowned then

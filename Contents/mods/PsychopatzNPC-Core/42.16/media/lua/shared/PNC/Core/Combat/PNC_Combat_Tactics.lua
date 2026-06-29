@@ -23,7 +23,7 @@ local function requestMove(record, zombie, x, y, z, mode, stopDistance, reason)
         return true
     end
     if PathService and PathService.MoveToward then
-        return PathService.MoveToward(record, zombie, x, y, z, mode, stopDistance)
+        return PathService.MoveToward(record, zombie, x, y, z, mode, stopDistance, reason)
     end
     return false
 end
