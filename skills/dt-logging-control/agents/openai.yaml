@@ -1,0 +1,3 @@
+display_name: DT Logging Control
+short_description: Toggle DynamicTrading log subsystems and summarize console output.
+default_prompt: Control DynamicTrading logging presets, per-subsystem overrides, and token-efficient console tracing.
