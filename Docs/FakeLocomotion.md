@@ -64,6 +64,10 @@ underlying zombie AI disabled with `setUseless(true)`.
 - Windows: opened in-place and logged.
 - Window climb: fake bump plus controlled reposition to the opposite square,
   with origin and destination logging.
+- Special movement is only considered after a blocked fake step or a short
+  no-progress stall, so nearby windows no longer steal normal movement ticks.
+- Traversal attempts remember the obstacle, source side, destination, and goal
+  revision long enough to reject immediate same-side re-cross loops.
 
 ## Multiplayer Notes
 
@@ -74,3 +78,6 @@ underlying zombie AI disabled with `setUseless(true)`.
   sync does not overwrite climb bumps immediately.
 - Snapshot visual state also carries the resolved locomotion animation speed so
   server fake-step transport and client leg cadence stay aligned.
+- Client interpolation now starts new segments from the currently rendered body
+  position for the same motion stream, which prevents backward rewinds between
+  authoritative snapshots while keeping server-authored targets and durations.

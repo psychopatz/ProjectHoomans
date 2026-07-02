@@ -29,8 +29,13 @@ function Internal.finalizeCancel(zombie, record, lane)
     lane.lastSuppressAudioAt = 0
     lane.specialMoveUntil = 0
     lane.specialAnim = nil
+    lane.lastNonLocomotionState = nil
+    lane.lastNonLocomotionAt = 0
     if Internal.MotionHints and Internal.MotionHints.Clear then
         Internal.MotionHints.Clear(lane)
+    end
+    if Internal.clearTraversalMemory then
+        Internal.clearTraversalMemory(lane)
     end
     lane.resolvedMode = nil
     lane.animSpeed = 1.0
@@ -67,6 +72,8 @@ function Internal.startRequestedMove(zombie, record, lane)
     lane.lastSuppressAudioAt = 0
     lane.specialMoveUntil = 0
     lane.specialAnim = nil
+    lane.lastNonLocomotionState = nil
+    lane.lastNonLocomotionAt = 0
     if Internal.MotionHints and Internal.MotionHints.Clear then
         Internal.MotionHints.Clear(lane)
     end
@@ -96,8 +103,13 @@ function Internal.completeMove(zombie, record, lane, phase, reason)
     lane.lastSuppressAudioAt = 0
     lane.specialMoveUntil = 0
     lane.specialAnim = nil
+    lane.lastNonLocomotionState = nil
+    lane.lastNonLocomotionAt = 0
     if Internal.MotionHints and Internal.MotionHints.Clear then
         Internal.MotionHints.Clear(lane)
+    end
+    if Internal.clearTraversalMemory then
+        Internal.clearTraversalMemory(lane)
     end
     lane.resolvedMode = nil
     lane.animSpeed = 1.0
@@ -143,6 +155,9 @@ function Internal.updateActiveMove(zombie, record, lane)
     end
 
     now = Internal.Core.Now()
+    if Internal.refreshTraversalMemory then
+        Internal.refreshTraversalMemory(lane, zombie)
+    end
     if (lane.ownerMode == "window_climb" or lane.ownerMode == "window_open" or lane.ownerMode == "door_open")
         and now < (tonumber(lane.specialMoveUntil) or 0)
     then
@@ -177,35 +192,31 @@ function Internal.updateActiveMove(zombie, record, lane)
         Internal.logMoveDebug(record, zombie, lane, "suppress_state", suppressedState or lane.lastActionState, "postAction=" .. tostring(lane.lastActionState))
     end
 
+    if not suppressed and Internal.tryRecoverNonLocomotionState then
+        local recovered
+        local recoveredState
+        recovered, recoveredState = Internal.tryRecoverNonLocomotionState(record, zombie, lane, now)
+        if recovered then
+            lane.lastProgressAt = now
+            lane.lastIssueAt = now
+            lane.recoveryCount = (tonumber(lane.recoveryCount) or 0) + 1
+            lane.lastRecoveryReason = recoveredState or lane.lastActionState
+            lane.lastRecoverAt = now
+            if Internal.FakeLocomotion and Internal.FakeLocomotion.PrepareBody then
+                Internal.FakeLocomotion.PrepareBody(zombie, lane, now)
+            end
+            Internal.logMoveWarning(record, zombie, lane, "recover_nonlocomotion", recoveredState or "unknown", "action=" .. tostring(recoveredState or "unknown"))
+            Internal.logMoveDebug(record, zombie, lane, "recover_nonlocomotion", recoveredState or "unknown", "")
+            return true, "recovering"
+        end
+    end
+
     if lane.pendingGoal and (now - (tonumber(lane.lastIssueAt) or 0)) >= Internal.GOAL_REFRESH_DELAY_MS then
         return Internal.refreshPendingGoal(zombie, record, lane, "goal_refresh")
     end
 
     if Internal.isAtGoal(zombie, goal, lane.stopDistance) then
         return Internal.completeMove(zombie, record, lane, "arrived", "arrived")
-    end
-
-    interacted, interactType = Internal.tryDoorOrWindowInteraction(zombie, record, lane, goal.x, goal.y, goal.z)
-    if interacted then
-        lane.lastIssueAt = now
-        lane.lastProgressAt = now
-        lane.noProgressCount = 0
-        lane.lastStepAt = now
-        lane.lastX = zombie:getX()
-        lane.lastY = zombie:getY()
-        if interactType == "door_open" then
-            lane.ownerMode = "door_open"
-            lane.specialMoveUntil = now + 180
-            lane.specialAnim = nil
-        elseif interactType == "window_open" then
-            lane.ownerMode = "window_open"
-            lane.specialMoveUntil = now + 250
-            lane.specialAnim = nil
-        else
-            lane.ownerMode = "window_climb"
-        end
-        Internal.logMoveDebug(record, zombie, lane, "interact", interactType or "door_or_window", "")
-        return true, interactType or "interact"
     end
 
     if Internal.FakeLocomotion and Internal.FakeLocomotion.PrepareBody then
@@ -235,6 +246,41 @@ function Internal.updateActiveMove(zombie, record, lane)
         end
         Internal.logMoveDebug(record, zombie, lane, "progress", "fake_step", "step=" .. tostring(stepResult or "direct") .. " dist=" .. string.format("%.3f", tonumber(stepDistance) or 0))
         return true, "moving"
+    end
+
+    if stepResult == "blocked" then
+        lane.blockReason = "fake_step_blocked"
+        Internal.logMoveDebug(record, zombie, lane, "step_blocked", stepResult, "dist=" .. string.format("%.3f", tonumber(stepDistance) or 0))
+    end
+
+    if stepResult ~= "throttle"
+        and (stepResult == "blocked" or (now - (tonumber(lane.lastProgressAt) or 0)) >= Internal.INTERACTION_STALL_MS)
+    then
+        interacted, interactType = Internal.tryDoorOrWindowInteraction(zombie, record, lane, goal.x, goal.y, goal.z)
+        if interacted then
+            lane.lastIssueAt = now
+            lane.lastProgressAt = now
+            lane.noProgressCount = 0
+            lane.lastStepAt = now
+            lane.lastX = zombie:getX()
+            lane.lastY = zombie:getY()
+            if interactType == "door_open" then
+                lane.ownerMode = "door_open"
+                lane.specialMoveUntil = now + 180
+                lane.specialAnim = nil
+            elseif interactType == "window_open" then
+                lane.ownerMode = "window_open"
+                lane.specialMoveUntil = now + 250
+                lane.specialAnim = nil
+            else
+                lane.ownerMode = "window_climb"
+            end
+            Internal.logMoveDebug(record, zombie, lane, "interact", interactType or "door_or_window", "")
+            return true, interactType or "interact"
+        end
+        if stepResult == "blocked" then
+            Internal.logMoveDebug(record, zombie, lane, "interact_rejected", stepResult, "goal=" .. Internal.describeGoal(goal))
+        end
     end
 
     if (now - (tonumber(lane.lastProgressAt) or 0)) >= Internal.PROGRESS_TIMEOUT_MS then

@@ -16,6 +16,10 @@
 - combat only borrows facing through short path-service leases; normal movement keeps body facing aligned to travel direction
 - the server now emits optional `visualState.motionHint` segments so clients interpolate within a server-authored move/traversal window instead of inferring transport locally
 - door opens, window opens, and window climbs stay server-owned and publish short traversal leases so client smoothing does not fight passage interactions
+- door/window handling is obstacle-driven, not opportunistic: the lane only evaluates traversal after a blocked fake step or a short no-progress stall
+- traversal candidates must be ahead of the goal-facing lane, improve distance toward the live goal, and avoid immediate re-cross of the same obstacle from the same side
+- active move lanes keep short traversal memory so repeated same-side window climbs are rejected and logged instead of re-executed every tick
+- long-lived non-locomotion action states during active fake locomotion are force-recovered back to idle before the next travel tick so walking stance does not freeze in `turnalerted`
 - path debug logs now report recovery, repath, timeout, and blocked states with the active goal so stuck movement is diagnosable without flooding normal runtime
 
 ## Next Expansion

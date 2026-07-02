@@ -1,8 +1,8 @@
 --[[
     PNC Client Presence Sync
-    Owns multiplayer-side live NPC body reconciliation for nearby replicated
-    zombie actors. It applies compact server snapshots to client visuals
-    without creating client authority or re-running server gameplay logic.
+    Owns client-side live NPC visual reconciliation for nearby bodies. Remote
+    clients use it for interpolation plus visual sync, while local-authority
+    worlds use the same snapshot stream for animation, facing, and UI only.
 ]]
 
 PNC = PNC or {}
@@ -13,6 +13,8 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Animation = PNC.Animation
 local Client = PNC.Client
+local Network = PNC.Network
+local Registry = PNC.Registry
 local ClientState = PNC.Network.ClientState
 local Visuals = PNC.Visuals
 local Equipment = PNC.Equipment
@@ -21,9 +23,82 @@ local Interpolation = PNC.ClientInterpolation
 Sync.BodyByID = Sync.BodyByID or {}
 Sync.BodyByInstanceID = Sync.BodyByInstanceID or {}
 Sync.lastBodyScanAt = Sync.lastBodyScanAt or 0
+Sync.lastLocalSnapshotBuildAt = Sync.lastLocalSnapshotBuildAt or 0
 
 local function isWorldReady()
     return (not isIngameState) or isIngameState()
+end
+
+local function isClientVisualReplicaMode()
+    return Core and Core.IsClientOnly and Core.IsClientOnly()
+end
+
+local function canRequestRemoteSync()
+    return isClientVisualReplicaMode()
+end
+
+local function isSnapshotDebugEnabled(snapshot)
+    if snapshot and snapshot.debugState and snapshot.debugState.debugEnabled == true then
+        return true
+    end
+    return PNC.Runtime and PNC.Runtime.debugEnabled == true
+end
+
+local function logClientMotionDebug(snapshot, id, event, extra)
+    if not isSnapshotDebugEnabled(snapshot) or not Core or not Core.Log then
+        return
+    end
+    Core.Log("DEBUG", "client_presence npc=" .. tostring(id or "nil") .. " event=" .. tostring(event or "unknown") .. (extra and extra ~= "" and (" " .. tostring(extra)) or ""))
+end
+
+local function applySnapshotFacing(zombie, snapshot)
+    local visualState
+    local hint
+    local interpState
+    local targetX
+    local targetY
+    local dirX
+    local dirY
+    local len
+    if not zombie or not snapshot then
+        return false
+    end
+    visualState = snapshot.visualState or {}
+    if visualState.moving ~= true or visualState.attackActive == true or visualState.specialActive == true then
+        return false
+    end
+    hint = type(visualState.motionHint) == "table" and visualState.motionHint or nil
+    interpState = snapshot and snapshot.id ~= nil and Interpolation and Interpolation.StateByID
+        and Interpolation.StateByID[tostring(snapshot.id)] or nil
+    targetX = tonumber(snapshot and snapshot.x) or zombie:getX()
+    targetY = tonumber(snapshot and snapshot.y) or zombie:getY()
+    if not hint and not interpState and math.abs(targetX - zombie:getX()) <= 0.001 and math.abs(targetY - zombie:getY()) <= 0.001 then
+        return false
+    end
+    dirX = tonumber(interpState and interpState.renderDirX)
+        or tonumber(hint and hint.dirX)
+        or tonumber(interpState and interpState.dirX)
+        or ((tonumber(hint and hint.toX) or targetX) - (tonumber(hint and hint.fromX) or zombie:getX()))
+    dirY = tonumber(interpState and interpState.renderDirY)
+        or tonumber(hint and hint.dirY)
+        or tonumber(interpState and interpState.dirY)
+        or ((tonumber(hint and hint.toY) or targetY) - (tonumber(hint and hint.fromY) or zombie:getY()))
+    len = math.sqrt((dirX * dirX) + (dirY * dirY))
+    if len <= 0.0001 then
+        dirX = targetX - zombie:getX()
+        dirY = targetY - zombie:getY()
+        len = math.sqrt((dirX * dirX) + (dirY * dirY))
+    end
+    if len <= 0.0001 then
+        return false
+    end
+    dirX = dirX / len
+    dirY = dirY / len
+    if zombie.faceLocationF then
+        zombie:faceLocationF(zombie:getX() + dirX, zombie:getY() + dirY)
+        return true
+    end
+    return false
 end
 
 local function buildRecordView(snapshot)
@@ -50,6 +125,7 @@ local function buildRecordView(snapshot)
             attached = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.attached or {},
         },
         runtime = {
+            debug = snapshot and snapshot.debugState and snapshot.debugState.debugEnabled == true or false,
             pathing = {
                 animSpeed = tonumber(visualState.animSpeed) or 1.0,
                 mode = visualState.mode or "walk",
@@ -172,6 +248,29 @@ local function refreshBodyMap(now)
     end
 end
 
+local function refreshLocalAuthoritySnapshots(now)
+    local snapshots
+    if canRequestRemoteSync() then
+        return
+    end
+    if not Registry or not Registry.ForEach or not Network or not Network.BuildSnapshot then
+        return
+    end
+    if now < ((tonumber(Sync.lastLocalSnapshotBuildAt) or 0) + 75) then
+        return
+    end
+    Sync.lastLocalSnapshotBuildAt = now
+    snapshots = {}
+    Registry.ForEach(function(record)
+        local snapshot = Network.BuildSnapshot(record)
+        if snapshot and snapshot.id then
+            snapshots[snapshot.id] = snapshot
+        end
+    end)
+    ClientState.snapshots = snapshots
+    ClientState.lastSyncReceiveAt = now
+end
+
 local function applySnapshotToBody(snapshot, zombie)
     local visualState = snapshot and snapshot.visualState or {}
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
@@ -187,6 +286,11 @@ local function applySnapshotToBody(snapshot, zombie)
 
     recordView = buildRecordView(snapshot)
     applyIdentityVars(zombie, snapshot)
+    if modData and snapshot and snapshot.id ~= nil then
+        modData.PNC_UUID = tostring(snapshot.id)
+        modData.PNC_NPC = true
+        modData.PNC_LiveBodyInstanceID = snapshot.liveBodyInstanceID
+    end
 
     visualKey = buildVisualKey(snapshot)
     if modData and modData.PNC_ClientVisualKey ~= visualKey then
@@ -247,12 +351,13 @@ local function applySnapshotToBody(snapshot, zombie)
     desiredAnim = visualState.anim or "Idle"
     if Animation and Animation.Apply and (not modData or modData.PNC_ClientMotionKey ~= motionKey) then
         Animation.Apply(zombie, recordView, desiredAnim, recordView.runtime.pathing.motionProfile, visualState.moving == true)
-        if Animation and Animation.SyncLocomotion then
-            Animation.SyncLocomotion(zombie, recordView)
-        end
         if modData then
             modData.PNC_ClientMotionKey = motionKey
         end
+    end
+    if visualState.moving == true and Animation and Animation.SyncLocomotion then
+        Animation.SyncLocomotion(zombie, recordView)
+        logClientMotionDebug(snapshot, snapshot and snapshot.id or nil, "locomotion_resync", "mode=" .. tostring(visualState.mode or "walk") .. " walkType=" .. tostring(visualState.walkType or ""))
     end
 end
 
@@ -289,19 +394,23 @@ function Sync.OnTick()
     if not isWorldReady() then
         return
     end
-    requestSyncIfStale(now)
+    if canRequestRemoteSync() then
+        requestSyncIfStale(now)
+    end
+    refreshLocalAuthoritySnapshots(now)
     refreshBodyMap(now)
     for id, snapshot in pairs(ClientState and ClientState.snapshots or {}) do
         if snapshot and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false then
             body = Sync.BodyByID[id]
                 or Sync.BodyByInstanceID[tostring(snapshot.liveBodyInstanceID or "")]
             if body then
-                if Interpolation and Interpolation.RecordSnapshot then
+                if canRequestRemoteSync() and Interpolation and Interpolation.RecordSnapshot then
                     Interpolation.RecordSnapshot(snapshot, body, now)
                 end
-                if Interpolation and Interpolation.ApplyToZombie then
+                if canRequestRemoteSync() and Interpolation and Interpolation.ApplyToZombie then
                     Interpolation.ApplyToZombie(snapshot, body, now)
                 end
+                applySnapshotFacing(body, snapshot)
                 applySnapshotToBody(snapshot, body)
             end
         end

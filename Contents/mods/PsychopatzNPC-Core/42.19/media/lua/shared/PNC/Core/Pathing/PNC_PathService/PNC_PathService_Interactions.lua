@@ -12,6 +12,52 @@ PathService.Internal = PathService.Internal or {}
 local Internal = PathService.Internal
 local Animation = PNC.Animation
 
+local function normalize2D(dx, dy)
+    local len = math.sqrt((dx * dx) + (dy * dy))
+    if len <= 0.0001 then
+        return nil, nil
+    end
+    return dx / len, dy / len
+end
+
+local function improvesGoalDistance(fromX, fromY, toX, toY, goalX, goalY)
+    return Internal.Core.Distance(toX, toY, goalX, goalY) + 0.05 < Internal.Core.Distance(fromX, fromY, goalX, goalY)
+end
+
+local function buildObstacleSquareKey(square)
+    return square and ("sq:" .. Internal.describeSquare(square)) or nil
+end
+
+local function logTraversalReject(record, zombie, lane, event, reason, extra)
+    Internal.logMoveDebug(record, zombie, lane, event or "traversal_rejected", reason or "rejected", extra or "")
+end
+
+local function isObstacleAhead(zombie, square, goalX, goalY, fallbackX, fallbackY)
+    local goalDirX
+    local goalDirY
+    local objectX
+    local objectY
+    local obstacleDirX
+    local obstacleDirY
+    if not zombie then
+        return false
+    end
+    goalDirX, goalDirY = normalize2D((tonumber(goalX) or zombie:getX()) - zombie:getX(), (tonumber(goalY) or zombie:getY()) - zombie:getY())
+    if not goalDirX then
+        return true
+    end
+    objectX = square and (square:getX() + 0.5) or fallbackX
+    objectY = square and (square:getY() + 0.5) or fallbackY
+    obstacleDirX, obstacleDirY = normalize2D((tonumber(objectX) or zombie:getX()) - zombie:getX(), (tonumber(objectY) or zombie:getY()) - zombie:getY())
+    if not obstacleDirX and fallbackX and fallbackY then
+        obstacleDirX, obstacleDirY = normalize2D(fallbackX - zombie:getX(), fallbackY - zombie:getY())
+    end
+    if not obstacleDirX then
+        return true
+    end
+    return ((goalDirX * obstacleDirX) + (goalDirY * obstacleDirY)) >= 0.25
+end
+
 function Internal.rememberSpecialAction(lane, key, now)
     if not lane then
         return
@@ -95,6 +141,15 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     local actionKey
     local fromPoint
     local destSquare
+    local fromX
+    local fromY
+    local fromZ
+    local destX
+    local destY
+    local destZ
+    local objectKey
+    local candidateCenterX
+    local candidateCenterY
 
     if not zombie or not getCell then
         return false, nil
@@ -105,7 +160,10 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     zx = math.floor(zombie:getX())
     zy = math.floor(zombie:getY())
     zz = zombie:getZ()
-    fromPoint = Internal.describePoint(string.format("%.2f", zombie:getX()), string.format("%.2f", zombie:getY()), zz)
+    fromX = zombie:getX()
+    fromY = zombie:getY()
+    fromZ = zz
+    fromPoint = Internal.describePoint(string.format("%.2f", fromX), string.format("%.2f", fromY), zz)
     fd = zombie:getForwardDirection()
     fdx = Internal.roundHalf(fd:getX())
     fdy = Internal.roundHalf(fd:getY())
@@ -142,6 +200,8 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
             for j = 0, objects:size() - 1 do
                 object = objects:get(j)
                 if object then
+                    candidateCenterX = candidates[i].x + 0.5
+                    candidateCenterY = candidates[i].y + 0.5
                     facingSatisfied = zombie.isFacingObject and zombie:isFacingObject(object, 0.5)
                     if (instanceof(object, "IsoDoor") or (instanceof(object, "IsoThumpable") and object.isDoor and object:isDoor() == true)) then
                         if (not facingSatisfied) and zombie.faceThisObject then
@@ -151,20 +211,32 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                     end
                     if (instanceof(object, "IsoDoor") or (instanceof(object, "IsoThumpable") and object.isDoor and object:isDoor() == true)) and facingSatisfied then
                         objectSquare = object:getSquare()
-                        actionKey = "door:" .. Internal.describeSquare(objectSquare)
-                        if Internal.shouldSuppressSpecialAction(lane, actionKey, now) then
-                            return false, nil
+                        objectKey = buildObstacleSquareKey(objectSquare)
+                        if not isObstacleAhead(zombie, objectSquare, goalX, goalY, candidateCenterX, candidateCenterY) then
+                            logTraversalReject(record, zombie, lane, "traversal_rejected", "door_not_ahead", "object=" .. tostring(objectKey or "nil"))
+                            objectSquare = nil
                         end
-                        if Internal.openDoorForNPC(zombie, object) then
-                            Internal.rememberSpecialAction(lane, actionKey, now)
-                            if Internal.MotionHints and Internal.MotionHints.RememberHold then
-                                Internal.MotionHints.RememberHold(lane, zombie:getX(), zombie:getY(), zombie:getZ(), now, 180, {
-                                    kind = "door_open",
-                                    profile = lane.motionProfile,
-                                })
+                        if objectSquare and not improvesGoalDistance(fromX, fromY, objectSquare:getX() + 0.5, objectSquare:getY() + 0.5, goalX, goalY) then
+                            logTraversalReject(record, zombie, lane, "traversal_rejected", "door_not_progressive", "object=" .. tostring(objectKey or "nil"))
+                            objectSquare = nil
+                        end
+                        if objectSquare then
+                            actionKey = "door:" .. Internal.describeSquare(objectSquare)
+                            if Internal.shouldSuppressSpecialAction(lane, actionKey, now) then
+                                logTraversalReject(record, zombie, lane, "traversal_rejected", "door_special_cooldown", "object=" .. tostring(objectKey or "nil"))
+                                return false, nil
                             end
-                            Internal.logMoveWarning(record, zombie, lane, "door_open", "door_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
-                            return true, "door_open"
+                            if Internal.openDoorForNPC(zombie, object) then
+                                Internal.rememberSpecialAction(lane, actionKey, now)
+                                if Internal.MotionHints and Internal.MotionHints.RememberHold then
+                                    Internal.MotionHints.RememberHold(lane, zombie:getX(), zombie:getY(), zombie:getZ(), now, 180, {
+                                        kind = "door_open",
+                                        profile = lane.motionProfile,
+                                    })
+                                end
+                                Internal.logMoveWarning(record, zombie, lane, "door_open", "door_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
+                                return true, "door_open"
+                            end
                         end
                     end
                     if instanceof(object, "IsoWindow") then
@@ -175,73 +247,100 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                     end
                     if instanceof(object, "IsoWindow") and facingSatisfied then
                         objectSquare = object:getSquare()
-                        if (not object:IsOpen()) and (not object:isSmashed()) and (not object:isPermaLocked()) then
-                            actionKey = "window_open:" .. Internal.describeSquare(objectSquare)
-                            if Internal.shouldSuppressSpecialAction(lane, actionKey, now) then
-                                return false, nil
-                            end
-                            object:ToggleWindow(zombie)
-                            Internal.rememberSpecialAction(lane, actionKey, now)
-                            if Internal.MotionHints and Internal.MotionHints.RememberHold then
-                                Internal.MotionHints.RememberHold(lane, zombie:getX(), zombie:getY(), zombie:getZ(), now, 250, {
-                                    kind = "window_open",
-                                    profile = lane.motionProfile,
-                                })
-                            end
-                            Internal.logMoveWarning(record, zombie, lane, "window_open", "window_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
-                            return true, "window_open"
-                        end
-                        if object:canClimbThrough(zombie) then
-                            actionKey = "window_climb:" .. Internal.describeSquare(objectSquare)
-                            if Internal.shouldSuppressSpecialAction(lane, actionKey, now) then
-                                return false, nil
-                            end
-                            if object.getOppositeSquare then
-                                destSquare = object:getOppositeSquare()
-                            else
-                                destSquare = nil
-                            end
-                            if not destSquare or not Internal.isSquareWalkable(destSquare:getX() + 0.5, destSquare:getY() + 0.5, destSquare:getZ()) then
-                                return false, nil
-                            end
-                            if Animation and Animation.PlayBump then
-                                Animation.PlayBump(zombie, record, "ClimbWindow")
-                            elseif zombie.setBumpType then
-                                zombie:setBumpType("ClimbWindow")
-                            end
-                            zombie:setX(destSquare:getX() + 0.5)
-                            zombie:setY(destSquare:getY() + 0.5)
-                            zombie:setZ(destSquare:getZ())
-                            if Internal.MotionHints and Internal.MotionHints.Remember then
-                                Internal.MotionHints.Remember(
-                                    lane,
-                                    tonumber(zx) + 0.5,
-                                    tonumber(zy) + 0.5,
-                                    zz,
-                                    destSquare:getX() + 0.5,
-                                    destSquare:getY() + 0.5,
-                                    destSquare:getZ(),
-                                    now,
-                                    {
-                                        durationMs = 450,
-                                        kind = "window_climb",
+                        objectKey = buildObstacleSquareKey(objectSquare)
+                        if not isObstacleAhead(zombie, objectSquare, goalX, goalY, candidateCenterX, candidateCenterY) then
+                            logTraversalReject(record, zombie, lane, "traversal_rejected", "window_not_ahead", "object=" .. tostring(objectKey or "nil"))
+                        elseif objectSquare then
+                            if (not object:IsOpen()) and (not object:isSmashed()) and (not object:isPermaLocked()) then
+                                actionKey = "window_open:" .. Internal.describeSquare(objectSquare)
+                                if Internal.shouldSuppressSpecialAction(lane, actionKey, now) then
+                                    logTraversalReject(record, zombie, lane, "traversal_rejected", "window_special_cooldown", "object=" .. tostring(objectKey or "nil"))
+                                    return false, nil
+                                end
+                                object:ToggleWindow(zombie)
+                                Internal.rememberSpecialAction(lane, actionKey, now)
+                                if Internal.MotionHints and Internal.MotionHints.RememberHold then
+                                    Internal.MotionHints.RememberHold(lane, zombie:getX(), zombie:getY(), zombie:getZ(), now, 250, {
+                                        kind = "window_open",
                                         profile = lane.motionProfile,
-                                    }
-                                )
+                                    })
+                                end
+                                Internal.logMoveWarning(record, zombie, lane, "window_open", "window_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
+                                return true, "window_open"
                             end
-                            Internal.syncRecordPosition(record, zombie)
-                            Internal.rememberSpecialAction(lane, actionKey, now)
-                            lane.specialMoveUntil = now + 450
-                            lane.specialAnim = "ClimbWindow"
-                            Internal.logMoveWarning(
-                                record,
-                                zombie,
-                                lane,
-                                "window_climb",
-                                "window_climb",
-                                "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " to=" .. Internal.describeSquare(destSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ)
-                            )
-                            return true, "window_climb"
+                            if object:canClimbThrough(zombie) then
+                                actionKey = "window_climb:" .. Internal.describeSquare(objectSquare)
+                                if Internal.isRepeatedTraversalAttempt
+                                    and Internal.isRepeatedTraversalAttempt(lane, actionKey, fromX, fromY, fromZ, lane and lane.goalRevision or 0, now)
+                                then
+                                    logTraversalReject(record, zombie, lane, "traversal_rejected", "window_repeat_same_side", "object=" .. tostring(objectKey or "nil"))
+                                    return false, nil
+                                end
+                                if Internal.shouldSuppressSpecialAction(lane, actionKey, now) then
+                                    logTraversalReject(record, zombie, lane, "traversal_rejected", "window_climb_special_cooldown", "object=" .. tostring(objectKey or "nil"))
+                                    return false, nil
+                                end
+                                if object.getOppositeSquare then
+                                    destSquare = object:getOppositeSquare()
+                                else
+                                    destSquare = nil
+                                end
+                                if not destSquare or not Internal.isSquareWalkable(destSquare:getX() + 0.5, destSquare:getY() + 0.5, destSquare:getZ()) then
+                                    logTraversalReject(record, zombie, lane, "traversal_rejected", "window_dest_blocked", "object=" .. tostring(objectKey or "nil"))
+                                    return false, nil
+                                end
+                                destX = destSquare:getX() + 0.5
+                                destY = destSquare:getY() + 0.5
+                                destZ = destSquare:getZ()
+                                if not improvesGoalDistance(fromX, fromY, destX, destY, goalX, goalY) then
+                                    if Internal.noteTraversalAttempt then
+                                        Internal.noteTraversalAttempt(lane, "window_climb", actionKey, fromX, fromY, fromZ, destX, destY, destZ, now, lane and lane.goalRevision or 0)
+                                    end
+                                    logTraversalReject(record, zombie, lane, "traversal_rejected", "window_dest_not_progressive", "object=" .. tostring(objectKey or "nil") .. " to=" .. Internal.describeSquare(destSquare))
+                                    return false, nil
+                                end
+                                if Animation and Animation.PlayBump then
+                                    Animation.PlayBump(zombie, record, "ClimbWindow")
+                                elseif zombie.setBumpType then
+                                    zombie:setBumpType("ClimbWindow")
+                                end
+                                zombie:setX(destX)
+                                zombie:setY(destY)
+                                zombie:setZ(destZ)
+                                if Internal.MotionHints and Internal.MotionHints.Remember then
+                                    Internal.MotionHints.Remember(
+                                        lane,
+                                        fromX,
+                                        fromY,
+                                        fromZ,
+                                        destX,
+                                        destY,
+                                        destZ,
+                                        now,
+                                        {
+                                            durationMs = 450,
+                                            kind = "window_climb",
+                                            profile = lane.motionProfile,
+                                        }
+                                    )
+                                end
+                                Internal.syncRecordPosition(record, zombie)
+                                Internal.rememberSpecialAction(lane, actionKey, now)
+                                if Internal.noteTraversalAttempt then
+                                    Internal.noteTraversalAttempt(lane, "window_climb", actionKey, fromX, fromY, fromZ, destX, destY, destZ, now, lane and lane.goalRevision or 0)
+                                end
+                                lane.specialMoveUntil = now + 450
+                                lane.specialAnim = "ClimbWindow"
+                                Internal.logMoveWarning(
+                                    record,
+                                    zombie,
+                                    lane,
+                                    "window_climb",
+                                    "window_climb",
+                                    "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " to=" .. Internal.describeSquare(destSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ)
+                                )
+                                return true, "window_climb"
+                            end
                         end
                     end
                 end

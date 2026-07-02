@@ -240,13 +240,16 @@ end
 
 function ISPNCNameplateManager:update()
     local zombieList
+    local bodyByID = {}
+    local bodyByInstanceID = {}
     local currentTime
     local player
+    local uuid
+    local snapshot
     local i
     local zombie
     local modData
-    local uuid
-    local snapshot
+    local instanceID
     local alive
     local entry
     local visible = {}
@@ -284,28 +287,44 @@ function ISPNCNameplateManager:update()
             modData = zombie:getModData()
             uuid = modData and modData.PNC_UUID or nil
             if uuid then
-                snapshot = ClientState.snapshots and ClientState.snapshots[uuid] or nil
-                alive = snapshot and snapshot.alive ~= false and snapshot.presenceState == Const.PRESENCE_LIVE
-                if alive
-                    and math.abs(player:getZ() - zombie:getZ()) <= FLOOR_TOLERANCE
-                    and calculateDistance(player, zombie) <= MAX_DRAW_DISTANCE
-                then
-                    entry = self.entries[uuid] or { uuid = uuid }
-                    entry.snapshot = snapshot
-                    entry.zombie = zombie
-                    entry.healthRatio = getHealthRatio(snapshot.hpCurrent, snapshot.hpMax)
-                    entry.nameColor = getNameColor(snapshot)
-                    entry.healthVisible = shouldShowHealth(snapshot, currentTime)
-                    entry.staminaVisible = shouldShowStamina(snapshot, currentTime)
-                    entry.staminaRatio = getStaminaRatio(snapshot.staminaCurrent, snapshot.staminaMax)
-                    entry.staminaColor = getStaminaColor(entry.staminaRatio)
-                    entry.barColor = snapshot.healthState == "incapacitated"
-                        and getIncapacitatedBarColor(currentTime)
-                        or getColorForRatio(entry.healthRatio)
-                    cacheEntryMetrics(entry, snapshot)
-                    self.entries[uuid] = entry
-                    visible[uuid] = true
-                end
+                bodyByID[tostring(uuid)] = zombie
+            end
+            instanceID = zombie.getPersistentOutfitID and zombie:getPersistentOutfitID() or nil
+            if instanceID ~= nil then
+                bodyByInstanceID[tostring(instanceID)] = zombie
+            end
+        end
+    end
+
+    for uuid, snapshot in pairs(ClientState.snapshots or {}) do
+        zombie = bodyByID[tostring(uuid)]
+            or bodyByInstanceID[tostring(snapshot and snapshot.liveBodyInstanceID or "")]
+        alive = snapshot and snapshot.alive ~= false and snapshot.presenceState == Const.PRESENCE_LIVE
+        if zombie and alive then
+            modData = zombie.getModData and zombie:getModData() or nil
+            if modData then
+                modData.PNC_UUID = tostring(uuid)
+                modData.PNC_NPC = true
+                modData.PNC_LiveBodyInstanceID = snapshot.liveBodyInstanceID
+            end
+            if math.abs(player:getZ() - zombie:getZ()) <= FLOOR_TOLERANCE
+                and calculateDistance(player, zombie) <= MAX_DRAW_DISTANCE
+            then
+                entry = self.entries[uuid] or { uuid = uuid }
+                entry.snapshot = snapshot
+                entry.zombie = zombie
+                entry.healthRatio = getHealthRatio(snapshot.hpCurrent, snapshot.hpMax)
+                entry.nameColor = getNameColor(snapshot)
+                entry.healthVisible = shouldShowHealth(snapshot, currentTime)
+                entry.staminaVisible = shouldShowStamina(snapshot, currentTime)
+                entry.staminaRatio = getStaminaRatio(snapshot.staminaCurrent, snapshot.staminaMax)
+                entry.staminaColor = getStaminaColor(entry.staminaRatio)
+                entry.barColor = snapshot.healthState == "incapacitated"
+                    and getIncapacitatedBarColor(currentTime)
+                    or getColorForRatio(entry.healthRatio)
+                cacheEntryMetrics(entry, snapshot)
+                self.entries[uuid] = entry
+                visible[uuid] = true
             end
         end
     end

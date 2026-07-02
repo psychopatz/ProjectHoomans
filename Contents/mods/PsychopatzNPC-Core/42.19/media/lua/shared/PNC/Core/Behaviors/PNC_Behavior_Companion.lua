@@ -15,10 +15,114 @@ local Animation = PNC.Animation
 local Common = PNC.BehaviorCommon
 local Targeting = PNC.BehaviorTargeting
 local BehaviorCombat = PNC.BehaviorCombat
+local Registry = PNC.Registry
+
+local function normalizeDirection(dx, dy)
+    local len = math.sqrt((dx * dx) + (dy * dy))
+    if len <= 0.0001 then
+        return nil, nil
+    end
+    return dx / len, dy / len
+end
+
+local function resolveOwnerForward(owner)
+    local forward
+    local fx
+    local fy
+    if not owner or not owner.getForwardDirection then
+        return 0, 1
+    end
+    forward = owner:getForwardDirection()
+    fx = forward and tonumber(forward:getX()) or 0
+    fy = forward and tonumber(forward:getY()) or 0
+    fx, fy = normalizeDirection(fx, fy)
+    if fx and fy then
+        return fx, fy
+    end
+    return 0, 1
+end
+
+local function isSameFollowGroup(record, other)
+    local otherOrder
+    local otherOwnerID
+    local recordOwnerID
+    if not record or not other or other.alive == false then
+        return false
+    end
+    otherOrder = other.orderSpec or {}
+    if tostring(otherOrder.kind or "") ~= Const.ORDER_FOLLOW then
+        return false
+    end
+    otherOwnerID = tonumber(other.ownerOnlineID)
+    recordOwnerID = tonumber(record.ownerOnlineID)
+    if otherOwnerID ~= nil and recordOwnerID ~= nil then
+        return otherOwnerID == recordOwnerID
+    end
+    return tostring(other.ownerUsername or "") == tostring(record.ownerUsername or "")
+end
+
+local function sortFollowerRecords(a, b)
+    return tostring(a and a.id or "") < tostring(b and b.id or "")
+end
+
+local function resolveFollowSlot(record, owner)
+    local followers = {}
+    local i
+    local slotIndex = 0
+    local fx
+    local fy
+    local rightX
+    local rightY
+    local backX
+    local backY
+    local pairIndex
+    local side
+    local lateral
+    local trailing
+    if not owner then
+        return nil
+    end
+    if Registry and Registry.ForEach then
+        Registry.ForEach(function(other)
+            if isSameFollowGroup(record, other) then
+                followers[#followers + 1] = other
+            end
+        end)
+    end
+    table.sort(followers, sortFollowerRecords)
+    for i = 1, #followers do
+        if followers[i].id == record.id then
+            slotIndex = i - 1
+            break
+        end
+    end
+    fx, fy = resolveOwnerForward(owner)
+    rightX = -fy
+    rightY = fx
+    backX = -fx
+    backY = -fy
+    if #followers <= 1 then
+        lateral = 0
+        trailing = tonumber(Const.FOLLOW_SLOT_DISTANCE) or 1.5
+    else
+        pairIndex = math.floor(slotIndex / 2)
+        side = (slotIndex % 2 == 0) and -1 or 1
+        lateral = side * ((tonumber(Const.FOLLOW_SLOT_LATERAL) or 0.95) + (pairIndex * (tonumber(Const.FOLLOW_SLOT_ROW_LATERAL) or 0.2)))
+        trailing = (tonumber(Const.FOLLOW_SLOT_DISTANCE) or 1.5) + (pairIndex * (tonumber(Const.FOLLOW_SLOT_ROW_DISTANCE) or 0.75))
+    end
+    return {
+        x = owner:getX() + (backX * trailing) + (rightX * lateral),
+        y = owner:getY() + (backY * trailing) + (rightY * lateral),
+        z = owner:getZ(),
+        stopDistance = tonumber(Const.FOLLOW_SLOT_STOP_DISTANCE) or 0.65,
+    }
+end
 
 function Companion.Tick(record, zombie, job)
     local owner
     local ownerDist
+    local slotTarget
+    local slotDist
     local target
     local patrolPoints
     local point
@@ -39,8 +143,12 @@ function Companion.Tick(record, zombie, job)
         if owner then
             record.ownerUsername = owner:getUsername()
             record.ownerOnlineID = owner:getOnlineID()
+            slotTarget = resolveFollowSlot(record, owner)
             ownerDist = Core.Distance(record.x, record.y, owner:getX(), owner:getY())
-            if ownerDist <= Const.FOLLOW_DISTANCE and math.abs(owner:getZ() - record.z) < 1 then
+            slotDist = slotTarget and Core.Distance(record.x, record.y, slotTarget.x, slotTarget.y) or ownerDist
+            if slotDist <= (slotTarget and slotTarget.stopDistance or Const.FOLLOW_DISTANCE)
+                and math.abs((slotTarget and slotTarget.z or owner:getZ()) - record.z) < 1
+            then
                 Common.ClearCombatTarget(record, record.runtime.stealthActive and "holding_follow_stealth" or "holding_follow_position")
                 if zombie then
                     Common.HaltMovement(record, zombie, "follow_hold")
@@ -54,11 +162,11 @@ function Companion.Tick(record, zombie, job)
             Common.MoveRecord(
                 record,
                 zombie,
-                owner:getX(),
-                owner:getY(),
-                owner:getZ(),
+                slotTarget and slotTarget.x or owner:getX(),
+                slotTarget and slotTarget.y or owner:getY(),
+                slotTarget and slotTarget.z or owner:getZ(),
                 moveMode,
-                Const.FOLLOW_DISTANCE,
+                slotTarget and slotTarget.stopDistance or Const.FOLLOW_DISTANCE,
                 moveMode == "sneak" and "follow_owner_sneak" or ("follow_owner_" .. tostring(moveMode))
             )
             return true

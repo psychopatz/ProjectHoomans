@@ -298,6 +298,10 @@ function Animation.PlayBump(zombie, record, bumpType)
 end
 
 function Animation.SyncLocomotion(zombie, record)
+    local profile
+    local moving
+    local moveAnim
+    local walkType
     local engineWalkType
     local animSpeed
     local runtime
@@ -323,8 +327,19 @@ function Animation.SyncLocomotion(zombie, record)
         end
         return
     end
+    profile = path and path.motionProfile or nil
+    moving = path and (path.phase == "requested" or path.phase == "active" or path.ownerMode == "fake_locomotion") or false
+    moveAnim = path and path.moveAnim or zombie.getVariableString and zombie:getVariableString("PNCMoveAnim") or ""
+    walkType = path and path.walkType or zombie.getVariableString and zombie:getVariableString("PNCWalkType") or ""
     engineWalkType = path and path.engineWalkType or zombie.getVariableString and zombie:getVariableString("WalkType") or ""
     animSpeed = path and path.animSpeed or zombie.getVariableFloat and zombie:getVariableFloat("PNCAnimSpeed", 1.0) or 1.0
+    setLocomotionVars(zombie, profile or {
+        moveAnim = moveAnim ~= "" and moveAnim or "Walk",
+        walkType = walkType or "",
+        engineWalkType = engineWalkType or "",
+        isRunning = path and path.isRunning == true or false,
+        isCrawling = path and path.isCrawling == true or false,
+    }, moving, animSpeed)
     applyWalkType(zombie, engineWalkType, animSpeed)
     if zombie.setRunning then
         zombie:setRunning(path and path.isRunning == true)

@@ -26,13 +26,23 @@ Internal.MotionHints = MotionHints
 
 Internal.GOAL_REFRESH_DELAY_MS = 120
 Internal.PROGRESS_TIMEOUT_MS = 2200
+Internal.INTERACTION_STALL_MS = 260
 Internal.SPECIAL_ACTION_COOLDOWN_MS = 1500
+Internal.TRAVERSAL_REPEAT_COOLDOWN_MS = 2400
+Internal.TRAVERSAL_PROGRESS_CLEAR_DISTANCE = 1.35
 Internal.RUN_START_DISTANCE = 4.50
 Internal.RUN_STOP_DISTANCE = 2.90
 Internal.FACE_REAPPLY_INTERVAL_MS = 90
 Internal.FACE_SIMILAR_DOT = 0.985
 Internal.FACE_MIN_DISTANCE_SQ = 0.0036
 Internal.COMBAT_FACING_DEFAULT_MS = 180
+Internal.NON_LOCOMOTION_RECOVERY_MS = 240
+
+local ALLOWED_MOVE_ACTION_STATES = {
+    [""] = true,
+    ["idle"] = true,
+    ["walktoward"] = true,
+}
 
 function Internal.roundHalf(value)
     if value >= 0 then
@@ -83,6 +93,136 @@ function Internal.hasActiveAttack(record, now)
     local attackAction = runtime and runtime.attackAction or nil
     now = tonumber(now) or Core.Now()
     return attackAction ~= nil and now < (tonumber(attackAction.finishAt) or 0)
+end
+
+local function buildTraversalPointKey(x, y, z)
+    return tostring(math.floor(tonumber(x) or 0))
+        .. ":"
+        .. tostring(math.floor(tonumber(y) or 0))
+        .. ":"
+        .. tostring(math.floor(tonumber(z) or 0))
+end
+
+function Internal.clearTraversalMemory(lane)
+    if not lane then
+        return
+    end
+    lane.lastTraversalObstacleKey = nil
+    lane.lastTraversalKind = nil
+    lane.lastTraversalFromKey = nil
+    lane.lastTraversalToKey = nil
+    lane.lastTraversalFromX = nil
+    lane.lastTraversalFromY = nil
+    lane.lastTraversalFromZ = nil
+    lane.lastTraversalToX = nil
+    lane.lastTraversalToY = nil
+    lane.lastTraversalToZ = nil
+    lane.lastTraversalAttemptAt = 0
+    lane.lastTraversalGoalRevision = 0
+end
+
+function Internal.noteTraversalAttempt(lane, kind, obstacleKey, fromX, fromY, fromZ, toX, toY, toZ, now, goalRevision)
+    if not lane then
+        return
+    end
+    lane.lastTraversalKind = kind and tostring(kind) or lane.lastTraversalKind
+    lane.lastTraversalObstacleKey = obstacleKey and tostring(obstacleKey) or lane.lastTraversalObstacleKey
+    lane.lastTraversalFromKey = buildTraversalPointKey(fromX, fromY, fromZ)
+    lane.lastTraversalToKey = toX ~= nil and buildTraversalPointKey(toX, toY, toZ) or nil
+    lane.lastTraversalFromX = tonumber(fromX)
+    lane.lastTraversalFromY = tonumber(fromY)
+    lane.lastTraversalFromZ = tonumber(fromZ)
+    lane.lastTraversalToX = tonumber(toX)
+    lane.lastTraversalToY = tonumber(toY)
+    lane.lastTraversalToZ = tonumber(toZ)
+    lane.lastTraversalAttemptAt = tonumber(now) or Core.Now()
+    if goalRevision ~= nil then
+        lane.lastTraversalGoalRevision = tonumber(goalRevision) or lane.lastTraversalGoalRevision
+    end
+end
+
+function Internal.isRepeatedTraversalAttempt(lane, obstacleKey, fromX, fromY, fromZ, goalRevision, now)
+    local fromKey
+    if not lane or not obstacleKey or not lane.lastTraversalObstacleKey or not lane.lastTraversalFromKey then
+        return false
+    end
+    fromKey = buildTraversalPointKey(fromX, fromY, fromZ)
+    if tostring(lane.lastTraversalObstacleKey) ~= tostring(obstacleKey) then
+        return false
+    end
+    if tostring(lane.lastTraversalFromKey) ~= tostring(fromKey) then
+        return false
+    end
+    if (tonumber(now) or Core.Now()) - (tonumber(lane.lastTraversalAttemptAt) or 0) > Internal.TRAVERSAL_REPEAT_COOLDOWN_MS then
+        return false
+    end
+    if goalRevision ~= nil and (tonumber(goalRevision) or 0) > (tonumber(lane.lastTraversalGoalRevision) or 0) then
+        return false
+    end
+    return true
+end
+
+function Internal.refreshTraversalMemory(lane, zombie)
+    local dx
+    local dy
+    if not lane or not zombie or lane.lastTraversalToX == nil or lane.lastTraversalToY == nil then
+        return
+    end
+    dx = zombie:getX() - (tonumber(lane.lastTraversalToX) or zombie:getX())
+    dy = zombie:getY() - (tonumber(lane.lastTraversalToY) or zombie:getY())
+    if math.sqrt((dx * dx) + (dy * dy)) >= Internal.TRAVERSAL_PROGRESS_CLEAR_DISTANCE then
+        Internal.clearTraversalMemory(lane)
+    end
+end
+
+local function resetNonLocomotionTracking(lane)
+    if not lane then
+        return
+    end
+    lane.lastNonLocomotionState = nil
+    lane.lastNonLocomotionAt = 0
+end
+
+function Internal.tryRecoverNonLocomotionState(record, zombie, lane, now)
+    local actionState
+    if not zombie or not lane then
+        return false, nil
+    end
+    now = tonumber(now) or Core.Now()
+    actionState = Internal.getActionStateName(zombie)
+    if ALLOWED_MOVE_ACTION_STATES[actionState or ""] then
+        resetNonLocomotionTracking(lane)
+        return false, actionState
+    end
+    if Internal.hasActiveAttack(record, now)
+        or (tonumber(lane.specialMoveUntil) or 0) > now
+        or (tonumber(lane.combatFacingUntil) or 0) > now
+        or (LiveBodyControl and LiveBodyControl.IsSuppressedActionState and LiveBodyControl.IsSuppressedActionState(actionState))
+    then
+        resetNonLocomotionTracking(lane)
+        return false, actionState
+    end
+    if tostring(lane.ownerMode or "") ~= "fake_locomotion" then
+        resetNonLocomotionTracking(lane)
+        return false, actionState
+    end
+    if lane.lastNonLocomotionState ~= actionState then
+        lane.lastNonLocomotionState = actionState
+        lane.lastNonLocomotionAt = now
+        return false, actionState
+    end
+    if (now - (tonumber(lane.lastNonLocomotionAt) or 0)) < Internal.NON_LOCOMOTION_RECOVERY_MS then
+        return false, actionState
+    end
+    Internal.hardResetMoveOwner(zombie)
+    if zombie.setUseless then
+        zombie:setUseless(true)
+    end
+    if zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
+        zombie:changeState(ZombieIdleState.instance())
+    end
+    resetNonLocomotionTracking(lane)
+    return true, actionState
 end
 
 function Internal.setWalkAnim(zombie, record, mode, force)

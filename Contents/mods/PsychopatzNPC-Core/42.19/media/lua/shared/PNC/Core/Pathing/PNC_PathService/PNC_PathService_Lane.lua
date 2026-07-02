@@ -70,6 +70,20 @@ function Internal.ensureMoveLane(record)
     lane.lastNetworkY = lane.lastNetworkY ~= nil and tonumber(lane.lastNetworkY) or nil
     lane.lastNetworkZ = lane.lastNetworkZ ~= nil and tonumber(lane.lastNetworkZ) or nil
     lane.lastNetworkAt = tonumber(lane.lastNetworkAt) or 0
+    lane.lastTraversalObstacleKey = lane.lastTraversalObstacleKey or nil
+    lane.lastTraversalKind = lane.lastTraversalKind or nil
+    lane.lastTraversalFromKey = lane.lastTraversalFromKey or nil
+    lane.lastTraversalToKey = lane.lastTraversalToKey or nil
+    lane.lastTraversalFromX = lane.lastTraversalFromX ~= nil and tonumber(lane.lastTraversalFromX) or nil
+    lane.lastTraversalFromY = lane.lastTraversalFromY ~= nil and tonumber(lane.lastTraversalFromY) or nil
+    lane.lastTraversalFromZ = lane.lastTraversalFromZ ~= nil and tonumber(lane.lastTraversalFromZ) or nil
+    lane.lastTraversalToX = lane.lastTraversalToX ~= nil and tonumber(lane.lastTraversalToX) or nil
+    lane.lastTraversalToY = lane.lastTraversalToY ~= nil and tonumber(lane.lastTraversalToY) or nil
+    lane.lastTraversalToZ = lane.lastTraversalToZ ~= nil and tonumber(lane.lastTraversalToZ) or nil
+    lane.lastTraversalAttemptAt = tonumber(lane.lastTraversalAttemptAt) or 0
+    lane.lastTraversalGoalRevision = tonumber(lane.lastTraversalGoalRevision) or 0
+    lane.lastNonLocomotionState = lane.lastNonLocomotionState or nil
+    lane.lastNonLocomotionAt = tonumber(lane.lastNonLocomotionAt) or 0
     lane.ownerMode = lane.ownerMode or "idle"
     lane.facingOwner = lane.facingOwner or "idle"
     lane.combatFacingUntil = tonumber(lane.combatFacingUntil) or 0
@@ -130,6 +144,20 @@ function Internal.setLaneGoal(record, lane, goal)
     lane.isCrawling = false
     lane.motionProfile = nil
     lane.motionHint = nil
+    lane.lastTraversalObstacleKey = nil
+    lane.lastTraversalKind = nil
+    lane.lastTraversalFromKey = nil
+    lane.lastTraversalToKey = nil
+    lane.lastTraversalFromX = nil
+    lane.lastTraversalFromY = nil
+    lane.lastTraversalFromZ = nil
+    lane.lastTraversalToX = nil
+    lane.lastTraversalToY = nil
+    lane.lastTraversalToZ = nil
+    lane.lastTraversalAttemptAt = 0
+    lane.lastTraversalGoalRevision = 0
+    lane.lastNonLocomotionState = nil
+    lane.lastNonLocomotionAt = 0
     lane.ownerMode = "requested"
 end
 
