@@ -64,7 +64,12 @@ function Internal.ensureMoveLane(record)
     lane.isRunning = lane.isRunning == true
     lane.isCrawling = lane.isCrawling == true
     lane.motionProfile = lane.motionProfile or nil
+    lane.motionHint = type(lane.motionHint) == "table" and lane.motionHint or nil
     lane.lastSuppressAudioAt = tonumber(lane.lastSuppressAudioAt) or 0
+    lane.lastNetworkX = lane.lastNetworkX ~= nil and tonumber(lane.lastNetworkX) or nil
+    lane.lastNetworkY = lane.lastNetworkY ~= nil and tonumber(lane.lastNetworkY) or nil
+    lane.lastNetworkZ = lane.lastNetworkZ ~= nil and tonumber(lane.lastNetworkZ) or nil
+    lane.lastNetworkAt = tonumber(lane.lastNetworkAt) or 0
     lane.ownerMode = lane.ownerMode or "idle"
     lane.facingOwner = lane.facingOwner or "idle"
     lane.combatFacingUntil = tonumber(lane.combatFacingUntil) or 0
@@ -124,6 +129,7 @@ function Internal.setLaneGoal(record, lane, goal)
     lane.isRunning = false
     lane.isCrawling = false
     lane.motionProfile = nil
+    lane.motionHint = nil
     lane.ownerMode = "requested"
 end
 

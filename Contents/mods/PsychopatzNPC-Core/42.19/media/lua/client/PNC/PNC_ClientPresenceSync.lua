@@ -16,6 +16,7 @@ local Client = PNC.Client
 local ClientState = PNC.Network.ClientState
 local Visuals = PNC.Visuals
 local Equipment = PNC.Equipment
+local Interpolation = PNC.ClientInterpolation
 
 Sync.BodyByID = Sync.BodyByID or {}
 Sync.BodyByInstanceID = Sync.BodyByInstanceID or {}
@@ -295,6 +296,12 @@ function Sync.OnTick()
             body = Sync.BodyByID[id]
                 or Sync.BodyByInstanceID[tostring(snapshot.liveBodyInstanceID or "")]
             if body then
+                if Interpolation and Interpolation.RecordSnapshot then
+                    Interpolation.RecordSnapshot(snapshot, body, now)
+                end
+                if Interpolation and Interpolation.ApplyToZombie then
+                    Interpolation.ApplyToZombie(snapshot, body, now)
+                end
                 applySnapshotToBody(snapshot, body)
             end
         end
@@ -305,6 +312,9 @@ local function onResetLua()
     Sync.BodyByID = {}
     Sync.BodyByInstanceID = {}
     Sync.lastBodyScanAt = 0
+    if Interpolation and Interpolation.ClearAll then
+        Interpolation.ClearAll()
+    end
 end
 
 if Events and Events.OnTick then

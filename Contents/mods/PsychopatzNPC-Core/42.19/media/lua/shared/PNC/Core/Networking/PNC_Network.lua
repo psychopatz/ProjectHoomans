@@ -20,6 +20,7 @@ local Inventory = PNC.Inventory
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local Profiles = PNC.VisualProfiles
+local MotionHints = PNC.MotionHints
 
 local function resolveAIState(record)
     local healthState = record.health and tostring(record.health.state or "normal") or "normal"
@@ -85,6 +86,7 @@ local function buildVisualState(record)
     local profileKey = path and tostring(path.profileKey or "") or ""
     local isRunning = path and path.isRunning == true or false
     local isCrawling = path and path.isCrawling == true or false
+    local motionHint = path and MotionHints and MotionHints.BuildNetworkHint and MotionHints.BuildNetworkHint(record, path, now) or nil
 
     if healthState == "incapacitated" then
         walkType = moving and tostring(path and path.walkType or "Crawl") or ""
@@ -123,6 +125,7 @@ local function buildVisualState(record)
         isRunning = isRunning,
         isCrawling = isCrawling,
         profileKey = profileKey,
+        motionHint = motionHint,
         specialActive = specialActive,
         specialAnim = specialActive and path and path.specialAnim or nil,
         specialFinishAt = specialActive and path and path.specialMoveUntil or 0,
@@ -291,6 +294,7 @@ end
 
 function Network.BroadcastRecord(record, eventName)
     local payload
+    local path
     if not Core.IsAuthority() then
         return
     end
@@ -298,6 +302,10 @@ function Network.BroadcastRecord(record, eventName)
         event = eventName or "update",
         snapshot = Network.BuildSnapshot(record),
     }
+    path = record and record.runtime and record.runtime.pathing or nil
+    if path and MotionHints and MotionHints.MarkBroadcast then
+        MotionHints.MarkBroadcast(record, path, Core.Now())
+    end
     if isServer and isServer() then
         sendServerCommand(Const.MODULE, Const.CMD_SYNC_RECORD, payload)
     else

@@ -14,6 +14,8 @@
 - combat target stickiness now reduces target thrash so embodied NPCs do not keep stop-stepping between nearby zombies every tick
 - `PNC_LocomotionProfiles` now resolves transport speed, anim cadence, walk family, and crawl/sneak selectors once per lane so fake movement and animation stay in lockstep
 - combat only borrows facing through short path-service leases; normal movement keeps body facing aligned to travel direction
+- the server now emits optional `visualState.motionHint` segments so clients interpolate within a server-authored move/traversal window instead of inferring transport locally
+- door opens, window opens, and window climbs stay server-owned and publish short traversal leases so client smoothing does not fight passage interactions
 - path debug logs now report recovery, repath, timeout, and blocked states with the active goal so stuck movement is diagnosable without flooding normal runtime
 
 ## Next Expansion

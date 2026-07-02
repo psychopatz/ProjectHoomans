@@ -15,12 +15,14 @@ local Animation = PNC.Animation
 local LiveBodyControl = PNC.LiveBodyControl
 local FakeLocomotion = PNC.FakeLocomotion
 local LocomotionProfiles = PNC.LocomotionProfiles
+local MotionHints = PNC.MotionHints
 
 Internal.Core = Core
 Internal.Animation = Animation
 Internal.LiveBodyControl = LiveBodyControl
 Internal.FakeLocomotion = FakeLocomotion
 Internal.LocomotionProfiles = LocomotionProfiles
+Internal.MotionHints = MotionHints
 
 Internal.GOAL_REFRESH_DELAY_MS = 120
 Internal.PROGRESS_TIMEOUT_MS = 2200

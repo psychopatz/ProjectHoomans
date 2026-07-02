@@ -13,6 +13,7 @@ local Const = PNC.Const
 local Core = PNC.Core
 local Registry = PNC.Registry
 local ClientState = PNC.Network.ClientState
+local Interpolation = PNC.ClientInterpolation
 
 local function isWorldReady()
     return (not isIngameState) or isIngameState()
@@ -30,6 +31,9 @@ local function requestFullSync()
     end
     if PNC.Registry and PNC.Network and PNC.Network.BuildSnapshot then
         ClientState.snapshots = {}
+        if Interpolation and Interpolation.ClearAll then
+            Interpolation.ClearAll()
+        end
         PNC.Registry.ForEach(function(record)
             local snapshot = PNC.Network.BuildSnapshot(record)
             ClientState.snapshots[snapshot.id] = snapshot
@@ -72,6 +76,9 @@ function Client.HandleServerCommand(command, args)
     if command == Const.CMD_FULL_SYNC then
         ClientState.snapshots = {}
         ClientState.characterPayloads = {}
+        if Interpolation and Interpolation.ClearAll then
+            Interpolation.ClearAll()
+        end
         if args and args.snapshots then
             for i = 1, #args.snapshots do
                 snapshot = args.snapshots[i]
@@ -105,6 +112,9 @@ function Client.HandleServerCommand(command, args)
         ClientState.snapshots[args.id] = nil
         if ClientState.characterPayloads then
             ClientState.characterPayloads[args.id] = nil
+        end
+        if Interpolation and Interpolation.ClearNPC then
+            Interpolation.ClearNPC(args.id)
         end
     end
 end
@@ -165,6 +175,9 @@ end
 local function onResetLua()
     ClientState.snapshots = {}
     ClientState.characterPayloads = {}
+    if Interpolation and Interpolation.ClearAll then
+        Interpolation.ClearAll()
+    end
 end
 
 if Events and Events.OnServerCommand then

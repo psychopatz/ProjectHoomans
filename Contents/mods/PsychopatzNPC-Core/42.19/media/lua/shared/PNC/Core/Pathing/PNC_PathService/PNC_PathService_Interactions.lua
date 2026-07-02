@@ -157,6 +157,12 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                         end
                         if Internal.openDoorForNPC(zombie, object) then
                             Internal.rememberSpecialAction(lane, actionKey, now)
+                            if Internal.MotionHints and Internal.MotionHints.RememberHold then
+                                Internal.MotionHints.RememberHold(lane, zombie:getX(), zombie:getY(), zombie:getZ(), now, 180, {
+                                    kind = "door_open",
+                                    profile = lane.motionProfile,
+                                })
+                            end
                             Internal.logMoveWarning(record, zombie, lane, "door_open", "door_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
                             return true, "door_open"
                         end
@@ -176,6 +182,12 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                             end
                             object:ToggleWindow(zombie)
                             Internal.rememberSpecialAction(lane, actionKey, now)
+                            if Internal.MotionHints and Internal.MotionHints.RememberHold then
+                                Internal.MotionHints.RememberHold(lane, zombie:getX(), zombie:getY(), zombie:getZ(), now, 250, {
+                                    kind = "window_open",
+                                    profile = lane.motionProfile,
+                                })
+                            end
                             Internal.logMoveWarning(record, zombie, lane, "window_open", "window_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
                             return true, "window_open"
                         end
@@ -200,6 +212,23 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                             zombie:setX(destSquare:getX() + 0.5)
                             zombie:setY(destSquare:getY() + 0.5)
                             zombie:setZ(destSquare:getZ())
+                            if Internal.MotionHints and Internal.MotionHints.Remember then
+                                Internal.MotionHints.Remember(
+                                    lane,
+                                    tonumber(zx) + 0.5,
+                                    tonumber(zy) + 0.5,
+                                    zz,
+                                    destSquare:getX() + 0.5,
+                                    destSquare:getY() + 0.5,
+                                    destSquare:getZ(),
+                                    now,
+                                    {
+                                        durationMs = 450,
+                                        kind = "window_climb",
+                                        profile = lane.motionProfile,
+                                    }
+                                )
+                            end
                             Internal.syncRecordPosition(record, zombie)
                             Internal.rememberSpecialAction(lane, actionKey, now)
                             lane.specialMoveUntil = now + 450

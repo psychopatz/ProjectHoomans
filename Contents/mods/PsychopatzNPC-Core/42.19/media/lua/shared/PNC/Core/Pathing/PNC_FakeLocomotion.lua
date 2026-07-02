@@ -135,6 +135,7 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
     local stepDistance
     local zx
     local zy
+    local zz
     local candidates
     local i
     local candidate
@@ -147,6 +148,7 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
     end
     zx = zombie:getX()
     zy = zombie:getY()
+    zz = zombie:getZ()
     candidates = buildStepCandidates(zx, zy, goal.z, goal, stepDistance)
     for i = 1, #candidates do
         candidate = candidates[i]
@@ -169,6 +171,13 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
             lane.lastX = candidate.x
             lane.lastY = candidate.y
             lane.lastZ = candidate.z
+            if PNC.MotionHints and PNC.MotionHints.Remember then
+                PNC.MotionHints.Remember(lane, zx, zy, zz, candidate.x, candidate.y, candidate.z, now, {
+                    kind = "move",
+                    speed = lane.speed,
+                    profile = lane.motionProfile,
+                })
+            end
             return true, candidate.label, stepDistance
         end
     end

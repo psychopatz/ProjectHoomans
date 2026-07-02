@@ -29,6 +29,9 @@ function Internal.finalizeCancel(zombie, record, lane)
     lane.lastSuppressAudioAt = 0
     lane.specialMoveUntil = 0
     lane.specialAnim = nil
+    if Internal.MotionHints and Internal.MotionHints.Clear then
+        Internal.MotionHints.Clear(lane)
+    end
     lane.resolvedMode = nil
     lane.animSpeed = 1.0
     lane.ownerMode = "idle"
@@ -64,6 +67,9 @@ function Internal.startRequestedMove(zombie, record, lane)
     lane.lastSuppressAudioAt = 0
     lane.specialMoveUntil = 0
     lane.specialAnim = nil
+    if Internal.MotionHints and Internal.MotionHints.Clear then
+        Internal.MotionHints.Clear(lane)
+    end
     lane.ownerMode = "fake_locomotion"
     Internal.setLanePhase(record, lane, "active", "started")
     Internal.logMoveTransition(record, zombie, lane, "request_issued", "started")
@@ -90,6 +96,9 @@ function Internal.completeMove(zombie, record, lane, phase, reason)
     lane.lastSuppressAudioAt = 0
     lane.specialMoveUntil = 0
     lane.specialAnim = nil
+    if Internal.MotionHints and Internal.MotionHints.Clear then
+        Internal.MotionHints.Clear(lane)
+    end
     lane.resolvedMode = nil
     lane.animSpeed = 1.0
     lane.ownerMode = phase == "blocked" and "blocked" or "idle"
