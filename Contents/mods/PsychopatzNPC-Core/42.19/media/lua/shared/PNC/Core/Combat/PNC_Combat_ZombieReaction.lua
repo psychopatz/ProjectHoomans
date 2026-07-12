@@ -39,11 +39,18 @@ local function getReactionState(zombie)
 end
 
 local function clearReactionState(zombie, modData)
+    local state = modData and modData.PNC_CombatReaction or nil
     if modData then
         modData.PNC_CombatReaction = nil
     end
     if zombie and zombie.setVariable then
         zombie:setVariable("NoLungeAttack", false)
+    end
+    if zombie and state and state.staggered == true and zombie.setStaggerBack then
+        zombie:setStaggerBack(false)
+    end
+    if zombie and state and state.hitReaction and zombie.setHitReaction then
+        zombie:setHitReaction("")
     end
 end
 
@@ -130,7 +137,7 @@ local function beginReaction(attackerZombie, targetZombie, options)
     applyHitContext(attackerZombie, targetZombie, options)
     if options == nil or options.stagger ~= false then
         if targetZombie.setStaggerBack then
-            pcall(targetZombie.setStaggerBack, targetZombie, true)
+            targetZombie:setStaggerBack(true)
         end
         if targetZombie.setVariable then
             targetZombie:setVariable("NoLungeAttack", true)
@@ -143,6 +150,7 @@ local function beginReaction(attackerZombie, targetZombie, options)
     state = state or {}
     state.kind = options and tostring(options.kind or "melee") or "melee"
     state.hitReaction = options and options.hitReaction or state.hitReaction or "HitReaction"
+    state.staggered = options == nil or options.stagger ~= false
     state.expiresAt = math.max(tonumber(state.expiresAt) or 0, now + durationMs)
     state.pushExpiresAt = math.max(tonumber(state.pushExpiresAt) or 0, now + pushDurationMs)
     state.remainingPush = math.max(tonumber(state.remainingPush) or 0, pushDistance)
@@ -206,13 +214,6 @@ function ZombieReaction.Pump(targetZombie, now)
     if now >= (tonumber(state.expiresAt) or 0) then
         clearReactionState(targetZombie, modData)
         return false
-    end
-
-    if targetZombie.setVariable then
-        targetZombie:setVariable("NoLungeAttack", true)
-    end
-    if state.hitReaction and targetZombie.setHitReaction then
-        targetZombie:setHitReaction(state.hitReaction)
     end
 
     remainingPush = math.max(0, tonumber(state.remainingPush) or 0)

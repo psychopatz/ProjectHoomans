@@ -15,6 +15,7 @@ local Perception = PNC.Perception
 local Spatial = PNC.SpatialIndex
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
+local TraversalQuery = PNC.TraversalQuery
 
 local function ensureRetreatState(record)
     local runtime
@@ -98,6 +99,16 @@ local function buildRetreatFromSource(record, target, distance, sourceX, sourceY
     local dx
     local dy
     local len
+    local baseX
+    local baseY
+    local angles
+    local angle
+    local cosAngle
+    local sinAngle
+    local candidateX
+    local candidateY
+    local retreatZ
+    local i
     if not record then
         return nil
     end
@@ -120,14 +131,36 @@ local function buildRetreatFromSource(record, target, distance, sourceX, sourceY
         dy = 0
         len = 1
     end
+    baseX = dx / len
+    baseY = dy / len
+    retreatZ = tonumber(sourceZ) or target and target.z or record.z
+    angles = { 0, 0.55, -0.55, 1.05, -1.05 }
+    if TraversalQuery and TraversalQuery.CanStep and TraversalQuery.CanOccupy then
+        for i = 1, #angles do
+            angle = angles[i]
+            cosAngle = math.cos(angle)
+            sinAngle = math.sin(angle)
+            dx = (baseX * cosAngle) - (baseY * sinAngle)
+            dy = (baseX * sinAngle) + (baseY * cosAngle)
+            candidateX = record.x + (dx * distance)
+            candidateY = record.y + (dy * distance)
+            if TraversalQuery.CanStep(record.x, record.y, record.z, record.x + (dx * 0.8), record.y + (dy * 0.8), retreatZ)
+                and TraversalQuery.CanOccupy(candidateX, candidateY, retreatZ)
+            then
+                baseX = dx
+                baseY = dy
+                break
+            end
+        end
+    end
     if state then
-        state.vectorX = dx / len
-        state.vectorY = dy / len
+        state.vectorX = baseX
+        state.vectorY = baseY
     end
     return {
-        x = record.x + ((dx / len) * distance),
-        y = record.y + ((dy / len) * distance),
-        z = tonumber(sourceZ) or target and target.z or record.z,
+        x = record.x + (baseX * distance),
+        y = record.y + (baseY * distance),
+        z = retreatZ,
     }
 end
 
@@ -264,7 +297,6 @@ local function continueLockedRetreat(record, zombie, target, state, now)
         return false, nil
     end
     setRetreatState(record, true, "retreat")
-    requestCombatFacing(record, zombie, target, 120, state.reason or "retreat_lock")
     requestMove(
         record,
         zombie,
@@ -298,7 +330,6 @@ local function startRetreat(record, zombie, target, distance, mode, stopDistance
     state.goalMode = mode
     state.goalStopDistance = tonumber(stopDistance) or 0.8
     setRetreatState(record, true, recoveryMode)
-    requestCombatFacing(record, zombie, target, 180, reason or "combat_retreat")
     requestMove(record, zombie, retreat.x, retreat.y, retreat.z, mode, stopDistance, reason)
     return true, reason
 end

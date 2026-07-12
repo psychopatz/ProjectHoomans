@@ -74,7 +74,11 @@ local function buildVisualState(record)
     local attack = runtime and runtime.attackAction or nil
     local now = Core.Now()
     local healthState = record and record.health and tostring(record.health.state or "normal") or "normal"
-    local moving = path and (path.phase == "requested" or path.phase == "active") or false
+    local moving = path and (
+        path.phase == "requested"
+        or path.phase == "active"
+        or now < (tonumber(path.visualMovingUntil) or 0)
+    ) or false
     local mode = moving and tostring(path.resolvedMode or path.mode or "walk") or nil
     local walkType = moving and tostring(path.walkType or "") or ""
     local moveAnim = moving and tostring(path.moveAnim or "") or ""

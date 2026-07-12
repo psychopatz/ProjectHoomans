@@ -85,7 +85,9 @@ function Internal.applyFacingLocation(zombie, lane, faceX, faceY, now, owner, fo
     if not dirX or not Internal.shouldApplyFacing(lane, dirX, dirY, now, force) then
         return false
     end
-    if zombie.faceLocationF then
+    if zombie.faceLocation then
+        zombie:faceLocation(zombie:getX() + dirX, zombie:getY() + dirY)
+    elseif zombie.faceLocationF then
         zombie:faceLocationF(zombie:getX() + dirX, zombie:getY() + dirY)
     end
     if lane then
@@ -143,7 +145,12 @@ function PathService.RequestCombatFacing(record, zombie, target, leaseMs, reason
         now + math.max(60, tonumber(leaseMs) or Internal.COMBAT_FACING_DEFAULT_MS)
     )
     lane.facingOwner = "combat"
-    Internal.applyFacingLocation(zombie, lane, faceX, faceY, now, "combat", true)
+    -- Combat publishes this lease every behavior update.  Forcing the facing
+    -- call here bypassed the direction throttle and continuously put the
+    -- embodied zombie into turnalerted while locomotion forced it back to
+    -- idle.  A newly acquired/opposite target already passes the normal
+    -- direction test, so the forced call is both unnecessary and harmful.
+    Internal.applyFacingLocation(zombie, lane, faceX, faceY, now, "combat", false)
     return true
 end
 

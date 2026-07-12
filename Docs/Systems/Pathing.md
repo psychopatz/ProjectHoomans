@@ -4,7 +4,8 @@
 - live NPCs use server-owned path requests and embodied path behaviors
 - abstract NPCs use coarse world travel
 - live NPCs can open doors and use windows when the path stalls near an obstacle
-- fence hopping is intentionally disabled in the baseline until a non-sticky traversal flow replaces it
+- fence hopping uses the same server-owned traversal lease, repeat suppression,
+  landing validation, and client motion hints as window traversal
 - all path ownership lives in `PNC_PathService`
 - behavior writes `move intent`; only `PNC_PathService.Pump` may start, refresh, cancel, or complete live movement
 - the live move lane uses explicit phases: `idle`, `requested`, `active`, `arrived`, `blocked`, `cancel_pending`
@@ -23,6 +24,5 @@
 - path debug logs now report recovery, repath, timeout, and blocked states with the active goal so stuck movement is diagnosable without flooding normal runtime
 
 ## Next Expansion
-- fence traversal
 - smarter repath and stuck recovery lanes
 - path cache reuse for larger live crowds

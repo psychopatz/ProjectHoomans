@@ -12,6 +12,7 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Spatial = PNC.SpatialIndex
 local Stealth = PNC.Stealth
+local Registry = PNC.Registry
 
 local function pickNearest(firstTarget, secondTarget)
     if not firstTarget then
@@ -45,7 +46,61 @@ local function isManagedNPCBody(zombie)
     return modData and modData.PNC_NPC == true
 end
 
-local function buildZombieTarget(zombie, distSq)
+function Perception.CanSeeWorldObject(record, targetObject)
+    local observer
+    local cell
+    local result
+    local resultName
+    local runtime
+    local cache
+    local bucket
+    local cached
+    local visible
+    if not record or not targetObject then
+        return false
+    end
+    record.runtime = record.runtime or {}
+    runtime = record.runtime
+    bucket = math.floor(Core.Now() / 100)
+    cache = runtime.perceptionVisibilityCache
+    if not cache or cache.bucket ~= bucket then
+        cache = { bucket = bucket, values = {} }
+        runtime.perceptionVisibilityCache = cache
+    end
+    cached = cache.values[targetObject]
+    if cached ~= nil then
+        return cached == "clear" or cached == "clearthroughopendoor" or cached == "clearthroughwindow", cached
+    end
+    observer = Registry and Registry.GetLiveZombie and Registry.GetLiveZombie(record.id) or nil
+    if not observer or (observer.isDead and observer:isDead()) then
+        return false
+    end
+    if math.abs(observer:getZ() - targetObject:getZ()) >= 1 then
+        return false
+    end
+    cell = getCell and getCell() or nil
+    if not cell or not LosUtil or not LosUtil.lineClear then
+        return false
+    end
+    result = LosUtil.lineClear(
+        cell,
+        math.floor(observer:getX()),
+        math.floor(observer:getY()),
+        math.floor(observer:getZ()),
+        math.floor(targetObject:getX()),
+        math.floor(targetObject:getY()),
+        math.floor(targetObject:getZ()),
+        false
+    )
+    resultName = string.lower(tostring(result or ""))
+    visible = resultName == "clear"
+        or resultName == "clearthroughopendoor"
+        or resultName == "clearthroughwindow"
+    cache.values[targetObject] = resultName
+    return visible == true, resultName
+end
+
+local function buildZombieTarget(zombie, distSq, visibilityKind)
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
     local zombieId = modData and modData.PNC_ZombieID or nil
     if not zombieId and Spatial and Spatial.Rebuild then
@@ -63,6 +118,9 @@ local function buildZombieTarget(zombie, distSq)
         y = zombie:getY(),
         z = zombie:getZ(),
         distSq = distSq,
+        visible = true,
+        visibilityKind = visibilityKind or "clear",
+        lastSeenAt = Core.Now(),
     }
 end
 
@@ -72,6 +130,8 @@ local function collectEnemyZombies(record, radius)
     local i
     local zombie
     local distSq
+    local visible
+    local visibilityKind
     if not record or not Spatial or not Spatial.QueryZombies then
         return results
     end
@@ -81,10 +141,12 @@ local function collectEnemyZombies(record, radius)
         zombie = zombies[i]
         if zombie and (not zombie:isDead()) and (not isManagedNPCBody(zombie)) and math.abs(zombie:getZ() - record.z) < 1 then
             distSq = Core.DistanceSq(record.x, record.y, zombie:getX(), zombie:getY())
-            if distSq <= (radius * radius) then
+            visible, visibilityKind = Perception.CanSeeWorldObject(record, zombie)
+            if distSq <= (radius * radius) and visible then
                 results[#results + 1] = {
                     zombie = zombie,
                     distSq = distSq,
+                    visibilityKind = visibilityKind,
                 }
             end
         end
@@ -99,10 +161,17 @@ function Perception.FindNearestEnemyPlayer(record, radius)
     local i
     local player
     local distSq
+    local visible
+    local visibilityKind
 
     for i = 1, #players do
         player = players[i]
-        if player and player:isAlive() and math.abs(player:getZ() - record.z) < 1 then
+        visible = false
+        visibilityKind = nil
+        if player then
+            visible, visibilityKind = Perception.CanSeeWorldObject(record, player)
+        end
+        if player and player:isAlive() and math.abs(player:getZ() - record.z) < 1 and visible then
             distSq = Core.DistanceSq(record.x, record.y, player:getX(), player:getY())
             if distSq < bestDistSq then
                 bestDistSq = distSq
@@ -115,6 +184,9 @@ function Perception.FindNearestEnemyPlayer(record, radius)
                     y = player:getY(),
                     z = player:getZ(),
                     distSq = distSq,
+                    visible = true,
+                    visibilityKind = visibilityKind,
+                    lastSeenAt = Core.Now(),
                 }
             end
         end
@@ -128,11 +200,22 @@ function Perception.FindNearestEnemyNPC(record, radius)
     local bestDistSq = math.huge
     local i
     local target
+    local targetZombie
     local distSq
+    local visible
+    local visibilityKind
 
     for i = 1, #npcs do
         target = npcs[i]
-        if target and target.alive ~= false and isRecordEnemy(record, target) and math.abs(target.z - record.z) < 1 then
+        targetZombie = target and Registry and Registry.GetLiveZombie and Registry.GetLiveZombie(target.id) or nil
+        visible = false
+        visibilityKind = nil
+        if targetZombie then
+            visible, visibilityKind = Perception.CanSeeWorldObject(record, targetZombie)
+        end
+        if target and target.alive ~= false and targetZombie and isRecordEnemy(record, target) and math.abs(target.z - record.z) < 1
+            and visible
+        then
             distSq = Core.DistanceSq(record.x, record.y, target.x, target.y)
             if distSq < bestDistSq then
                 bestDistSq = distSq
@@ -143,6 +226,9 @@ function Perception.FindNearestEnemyNPC(record, radius)
                     y = target.y,
                     z = target.z,
                     distSq = distSq,
+                    visible = true,
+                    visibilityKind = visibilityKind,
+                    lastSeenAt = Core.Now(),
                 }
             end
         end
@@ -167,7 +253,7 @@ function Perception.FindNearestEnemyZombie(record, radius)
     for i = 1, #zombies do
         entry = zombies[i]
         if entry and entry.distSq < bestDistSq then
-            best = buildZombieTarget(entry.zombie, entry.distSq)
+            best = buildZombieTarget(entry.zombie, entry.distSq, entry.visibilityKind)
             bestDistSq = entry.distSq
         end
     end
@@ -209,7 +295,7 @@ function Perception.FindBestEnemyZombie(record, radius)
             end
             score = entry.distSq + (crowdCount * crowdCount * crowdPenalty)
             if score < bestScore then
-                best = buildZombieTarget(entry.zombie, entry.distSq)
+                best = buildZombieTarget(entry.zombie, entry.distSq, entry.visibilityKind)
                 bestScore = score
             end
         end

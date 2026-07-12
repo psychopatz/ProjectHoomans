@@ -11,6 +11,7 @@ PathService.Internal = PathService.Internal or {}
 
 local Internal = PathService.Internal
 local Animation = PNC.Animation
+local TraversalQuery = PNC.TraversalQuery
 
 local function normalize2D(dx, dy)
     local len = math.sqrt((dx * dx) + (dy * dy))
@@ -30,6 +31,13 @@ end
 
 local function logTraversalReject(record, zombie, lane, event, reason, extra)
     Internal.logMoveDebug(record, zombie, lane, event or "traversal_rejected", reason or "rejected", extra or "")
+end
+
+local function findFenceAhead(cell, zombie, goalX, goalY)
+    if TraversalQuery and TraversalQuery.FindFenceAhead then
+        return TraversalQuery.FindFenceAhead(zombie, goalX, goalY, cell)
+    end
+    return nil
 end
 
 local function isObstacleAhead(zombie, square, goalX, goalY, fallbackX, fallbackY)
@@ -150,6 +158,14 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     local objectKey
     local candidateCenterX
     local candidateCenterY
+    local fence
+    local landingSquare
+    local landingX
+    local landingY
+    local landingZ
+    local travelDuration
+    local fenceKey
+    local fenceSquare
 
     if not zombie or not getCell then
         return false, nil
@@ -346,6 +362,72 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                 end
             end
         end
+    end
+
+    fence = findFenceAhead(cell, zombie, goalX, goalY)
+    if fence and fence.landingSquare then
+        landingSquare = fence.landingSquare
+        landingX = landingSquare:getX() + 0.5
+        landingY = landingSquare:getY() + 0.5
+        landingZ = landingSquare:getZ()
+        fenceSquare = fence.square
+        fenceKey = "fence:" .. Internal.describeSquare(fenceSquare)
+        if not improvesGoalDistance(fromX, fromY, landingX, landingY, goalX, goalY) then
+            logTraversalReject(record, zombie, lane, "traversal_rejected", "fence_not_progressive", "object=" .. tostring(fenceKey))
+            return false, nil
+        end
+        if Internal.isRepeatedTraversalAttempt
+            and Internal.isRepeatedTraversalAttempt(lane, fenceKey, fromX, fromY, fromZ, lane and lane.goalRevision or 0, now)
+        then
+            logTraversalReject(record, zombie, lane, "traversal_rejected", "fence_repeat_same_side", "object=" .. tostring(fenceKey))
+            return false, nil
+        end
+        if Internal.shouldSuppressSpecialAction(lane, fenceKey, now) then
+            logTraversalReject(record, zombie, lane, "traversal_rejected", "fence_special_cooldown", "object=" .. tostring(fenceKey))
+            return false, nil
+        end
+        travelDuration = fence.tall == true and 900 or 600
+        if Animation and Animation.PlayBump then
+            Animation.PlayBump(zombie, record, fence.tall == true and "ClimbFenceTall" or "ClimbFence")
+        elseif zombie.setBumpType then
+            zombie:setBumpType(fence.tall == true and "ClimbFenceTall" or "ClimbFence")
+        end
+        zombie:setX(landingX)
+        zombie:setY(landingY)
+        zombie:setZ(landingZ)
+        if Internal.MotionHints and Internal.MotionHints.Remember then
+            Internal.MotionHints.Remember(
+                lane,
+                fromX,
+                fromY,
+                fromZ,
+                landingX,
+                landingY,
+                landingZ,
+                now,
+                {
+                    durationMs = travelDuration,
+                    kind = "fence_climb",
+                    profile = lane.motionProfile,
+                }
+            )
+        end
+        Internal.syncRecordPosition(record, zombie)
+        Internal.rememberSpecialAction(lane, fenceKey, now)
+        if Internal.noteTraversalAttempt then
+            Internal.noteTraversalAttempt(lane, "fence_climb", fenceKey, fromX, fromY, fromZ, landingX, landingY, landingZ, now, lane and lane.goalRevision or 0)
+        end
+        lane.specialMoveUntil = now + travelDuration
+        lane.specialAnim = fence.tall == true and "ClimbFenceTall" or "ClimbFence"
+        Internal.logMoveWarning(
+            record,
+            zombie,
+            lane,
+            "fence_climb",
+            "fence_climb",
+            "from=" .. fromPoint .. " object=" .. Internal.describeSquare(fenceSquare) .. " to=" .. Internal.describeSquare(landingSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ)
+        )
+        return true, "fence_climb"
     end
 
     return false, nil

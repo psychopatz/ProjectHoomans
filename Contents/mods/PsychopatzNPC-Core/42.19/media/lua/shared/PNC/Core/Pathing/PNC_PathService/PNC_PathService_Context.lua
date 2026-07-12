@@ -16,6 +16,7 @@ local LiveBodyControl = PNC.LiveBodyControl
 local FakeLocomotion = PNC.FakeLocomotion
 local LocomotionProfiles = PNC.LocomotionProfiles
 local MotionHints = PNC.MotionHints
+local TraversalQuery = PNC.TraversalQuery
 
 Internal.Core = Core
 Internal.Animation = Animation
@@ -23,6 +24,7 @@ Internal.LiveBodyControl = LiveBodyControl
 Internal.FakeLocomotion = FakeLocomotion
 Internal.LocomotionProfiles = LocomotionProfiles
 Internal.MotionHints = MotionHints
+Internal.TraversalQuery = TraversalQuery
 
 Internal.GOAL_REFRESH_DELAY_MS = 120
 Internal.PROGRESS_TIMEOUT_MS = 2200
@@ -37,6 +39,7 @@ Internal.FACE_SIMILAR_DOT = 0.985
 Internal.FACE_MIN_DISTANCE_SQ = 0.0036
 Internal.COMBAT_FACING_DEFAULT_MS = 180
 Internal.NON_LOCOMOTION_RECOVERY_MS = 240
+Internal.LOCOMOTION_VISUAL_LEASE_MS = 420
 
 local ALLOWED_MOVE_ACTION_STATES = {
     [""] = true,
@@ -59,11 +62,10 @@ function Internal.getSquare(x, y, z)
 end
 
 function Internal.isSquareWalkable(x, y, z)
-    local square = Internal.getSquare(x, y, z)
-    if not square then
-        return false
+    if TraversalQuery and TraversalQuery.CanOccupy then
+        return TraversalQuery.CanOccupy(x, y, z)
     end
-    return square:isFree(false) and (not square:isSolid()) and (not square:isSolidTrans())
+    return false
 end
 
 function Internal.syncRecordPosition(record, zombie)
@@ -229,11 +231,10 @@ function Internal.setWalkAnim(zombie, record, mode, force)
     local lane = record and record.runtime and record.runtime.pathing or nil
     local profile = lane and lane.motionProfile or nil
     local moveAnim = profile and profile.moveAnim or "Walk"
-    local previousMoveAnim = zombie.getVariableString and zombie:getVariableString("PNCMoveAnim") or ""
-    local moveAnimChanged = previousMoveAnim ~= moveAnim
-    if (force == true or moveAnimChanged) and previousMoveAnim == "" and zombie.setBumpType then
-        zombie:setBumpType(mode == "run" and "PNC_IdleToRun" or "PNC_IdleToWalk")
-    end
+    -- BumpType is an exclusive special-action channel, not a locomotion
+    -- transition channel.  Starting a bump for every short movement request
+    -- masked the walk cycle and made frequently refreshed follow goals glide.
+    -- Explicit combat/traversal bumps remain owned by PNC.Animation.PlayBump.
     if Animation and Animation.Apply then
         Animation.Apply(zombie, record, moveAnim, profile, true)
     end
@@ -268,7 +269,7 @@ function Internal.resetPathController(zombie)
     end
 end
 
-function Internal.hardResetMoveOwner(zombie)
+function Internal.hardResetMoveOwner(zombie, preserveVisualMotion)
     if not zombie then
         return
     end
@@ -279,10 +280,14 @@ function Internal.hardResetMoveOwner(zombie)
     if zombie.setTarget then
         zombie:setTarget(nil)
     end
-    if zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
+    if preserveVisualMotion ~= true
+        and zombie.changeState
+        and ZombieIdleState
+        and ZombieIdleState.instance
+    then
         zombie:changeState(ZombieIdleState.instance())
     end
-    if zombie.setRunning then
+    if preserveVisualMotion ~= true and zombie.setRunning then
         zombie:setRunning(false)
     end
 end
@@ -417,6 +422,20 @@ function Internal.applyHoldAnimation(zombie, record, lane)
     end
     if attackAction and Core.Now() < (tonumber(attackAction.finishAt) or 0) then
         return
+    end
+    if lane and Core.Now() < (tonumber(lane.visualMovingUntil) or 0) then
+        if Animation and Animation.Apply then
+            Animation.Apply(zombie, record, lane.moveAnim or "Walk", lane.motionProfile, true)
+        end
+        if Animation and Animation.SyncLocomotion then
+            Animation.SyncLocomotion(zombie, record)
+        end
+        return
+    end
+    if lane then
+        if MotionHints and MotionHints.Clear then
+            MotionHints.Clear(lane)
+        end
     end
     if healthState == "incapacitated" and Animation and Animation.ApplyDowned then
         Animation.ApplyDowned(zombie, record, false)

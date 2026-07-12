@@ -12,23 +12,16 @@ local FakeLocomotion = PNC.FakeLocomotion
 local Core = PNC.Core
 local LiveBodyControl = PNC.LiveBodyControl
 local LocomotionProfiles = PNC.LocomotionProfiles
+local TraversalQuery = PNC.TraversalQuery
 
 local MAX_STEP_DELTA_MS = 120
 local MIN_STEP_INTERVAL_MS = 35
 
-local function getSquare(x, y, z)
-    if not getCell then
-        return nil
+local function isSquareWalkable(x, y, z, fromX, fromY, fromZ)
+    if TraversalQuery and TraversalQuery.CanStep and fromX ~= nil and fromY ~= nil and fromZ ~= nil then
+        return TraversalQuery.CanStep(fromX, fromY, fromZ, x, y, z)
     end
-    return getCell():getGridSquare(math.floor(x), math.floor(y), z)
-end
-
-local function isSquareWalkable(x, y, z)
-    local square = getSquare(x, y, z)
-    if not square then
-        return false
-    end
-    return square:isFree(false) and (not square:isSolid()) and (not square:isSolidTrans())
+    return TraversalQuery and TraversalQuery.CanOccupy and TraversalQuery.CanOccupy(x, y, z) or false, "occupied"
 end
 
 local function buildCandidate(label, x, y, z)
@@ -85,7 +78,7 @@ local function computeStepDistance(lane, mode, now)
     return math.max(0.02, speed * (deltaMs / 1000)), deltaMs
 end
 
-local function buildStepCandidates(zx, zy, zz, goal, stepDistance)
+local function buildStepCandidates(zx, zy, zz, goal, stepDistance, steeringSide)
     local dx = goal.x - zx
     local dy = goal.y - zy
     local len = math.sqrt((dx * dx) + (dy * dy))
@@ -100,14 +93,18 @@ local function buildStepCandidates(zx, zy, zz, goal, stepDistance)
     uy = dy / len
     px = -uy
     py = ux
+    if tonumber(steeringSide) == -1 then
+        px = -px
+        py = -py
+    end
     return {
         buildCandidate("direct", zx + (ux * stepDistance), zy + (uy * stepDistance), goal.z),
-        buildCandidate("x_only", zx + (ux * stepDistance), zy, goal.z),
-        buildCandidate("y_only", zx, zy + (uy * stepDistance), goal.z),
-        buildCandidate("slide_left", zx + ((ux + (px * 0.55)) * stepDistance), zy + ((uy + (py * 0.55)) * stepDistance), goal.z),
-        buildCandidate("slide_right", zx + ((ux - (px * 0.55)) * stepDistance), zy + ((uy - (py * 0.55)) * stepDistance), goal.z),
-        buildCandidate("hard_left", zx + (px * stepDistance), zy + (py * stepDistance), goal.z),
-        buildCandidate("hard_right", zx - (px * stepDistance), zy - (py * stepDistance), goal.z),
+        buildCandidate("slide_preferred", zx + ((ux + (px * 0.55)) * stepDistance), zy + ((uy + (py * 0.55)) * stepDistance), goal.z),
+        buildCandidate("axis_x", zx + (ux * stepDistance), zy, goal.z),
+        buildCandidate("axis_y", zx, zy + (uy * stepDistance), goal.z),
+        buildCandidate("hard_preferred", zx + (px * stepDistance), zy + (py * stepDistance), goal.z),
+        buildCandidate("slide_other", zx + ((ux - (px * 0.55)) * stepDistance), zy + ((uy - (py * 0.55)) * stepDistance), goal.z),
+        buildCandidate("hard_other", zx - (px * stepDistance), zy - (py * stepDistance), goal.z),
     }
 end
 
@@ -139,6 +136,8 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
     local candidates
     local i
     local candidate
+    local walkable
+    local blockReason
     if not zombie or not record or not lane or not goal then
         return false, "invalid", 0
     end
@@ -149,12 +148,21 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
     zx = zombie:getX()
     zy = zombie:getY()
     zz = zombie:getZ()
-    candidates = buildStepCandidates(zx, zy, goal.z, goal, stepDistance)
+    candidates = buildStepCandidates(zx, zy, goal.z, goal, stepDistance, lane.steeringSide)
     for i = 1, #candidates do
         candidate = candidates[i]
-        if isSquareWalkable(candidate.x, candidate.y, candidate.z) then
+        walkable, blockReason = isSquareWalkable(candidate.x, candidate.y, candidate.z, zx, zy, zz)
+        if i == 1 and not walkable and (blockReason == "door" or blockReason == "window" or blockReason == "fence") then
+            lane.lastStepAt = now
+            lane.lastStepDistance = 0
+            lane.lastStepLabel = blockReason
+            return false, "interaction_blocked", stepDistance
+        end
+        if walkable then
             if PNC.PathService and PNC.PathService.ApplyTravelFacing then
                 PNC.PathService.ApplyTravelFacing(zombie, lane, candidate.x, candidate.y, now)
+            elseif zombie.faceLocation then
+                zombie:faceLocation(candidate.x, candidate.y)
             elseif zombie.faceLocationF then
                 zombie:faceLocationF(candidate.x, candidate.y)
             end
@@ -171,6 +179,21 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
             lane.lastX = candidate.x
             lane.lastY = candidate.y
             lane.lastZ = candidate.z
+            if candidate.label == "direct" then
+                lane.directStepCount = (tonumber(lane.directStepCount) or 0) + 1
+                if lane.directStepCount >= 6 then
+                    lane.steeringSide = nil
+                end
+            else
+                lane.directStepCount = 0
+                if lane.steeringSide == nil then
+                    if candidate.label == "slide_other" or candidate.label == "hard_other" then
+                        lane.steeringSide = -1
+                    else
+                        lane.steeringSide = 1
+                    end
+                end
+            end
             if PNC.MotionHints and PNC.MotionHints.Remember then
                 PNC.MotionHints.Remember(lane, zx, zy, zz, candidate.x, candidate.y, candidate.z, now, {
                     kind = "move",
@@ -184,5 +207,7 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
     lane.lastStepAt = now
     lane.lastStepDistance = 0
     lane.lastStepLabel = "blocked"
+    lane.directStepCount = 0
+    lane.steeringSide = tonumber(lane.steeringSide) == 1 and -1 or 1
     return false, "blocked", stepDistance
 end

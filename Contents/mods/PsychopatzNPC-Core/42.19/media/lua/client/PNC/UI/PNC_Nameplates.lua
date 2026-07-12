@@ -35,6 +35,20 @@ local FONT_NAME = UIFont.Small
 local FONT_HP = UIFont.Medium
 local FONT_DEBUG = UIFont.Small
 local UPDATE_RATE = 6
+local SYNTH_FRAMES = {
+    Walk = 24,
+    Run = 20,
+    SneakWalk = 24,
+    Crawl = 20,
+    Idle = 16,
+}
+local SYNTH_CYCLE_MS = {
+    Walk = 900,
+    Run = 720,
+    SneakWalk = 1100,
+    Crawl = 1300,
+    Idle = 1500,
+}
 
 local function clamp(value, minValue, maxValue)
     if value < minValue then
@@ -155,6 +169,84 @@ local function buildDebugText(snapshot)
     }, " | ")
 end
 
+local function getSyntheticAnimFrame(zombie, animName, moving, animSpeed)
+    local modData
+    local now
+    local cycleMs
+    local frameCount
+    local key
+    local elapsed
+    local phase
+    if not zombie then
+        return nil, nil, nil
+    end
+    animName = tostring(animName or "Idle")
+    frameCount = SYNTH_FRAMES[animName] or nil
+    cycleMs = SYNTH_CYCLE_MS[animName] or nil
+    if not frameCount or not cycleMs then
+        return nil, nil, nil
+    end
+    modData = zombie.getModData and zombie:getModData() or nil
+    now = PNC and PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    key = table.concat({
+        animName,
+        tostring(moving == true),
+        string.format("%.3f", tonumber(animSpeed) or 0),
+    }, "|")
+    if modData then
+        if modData.PNC_DebugAnimCycleKey ~= key then
+            modData.PNC_DebugAnimCycleKey = key
+            modData.PNC_DebugAnimCycleStartAt = now
+        end
+        now = tonumber(now) or 0
+        elapsed = math.max(0, now - (tonumber(modData.PNC_DebugAnimCycleStartAt) or now))
+    else
+        elapsed = 0
+    end
+    phase = frameCount <= 1 and 0 or ((elapsed * math.max(0.05, tonumber(animSpeed) or 0)) % cycleMs) / cycleMs
+    return math.max(0, math.min(frameCount - 1, math.floor((phase * frameCount) + 0.0001))), frameCount, phase
+end
+
+local function getAnimationDebug(zombie, snapshot)
+    local parts = {}
+    local animName
+    local moveAnim
+    local moving
+    local actionState
+    local walkTypeVar
+    local engineWalkType
+    local animSpeed
+    local frameIndex
+    local frameCount
+    local phase
+    if not zombie then
+        return "Anim: n/a"
+    end
+    animName = tostring(snapshot and snapshot.visualState and snapshot.visualState.anim or zombie.getVariableString and zombie:getVariableString("PNCAnim") or "-")
+    moveAnim = tostring(zombie.getVariableString and zombie:getVariableString("PNCMoveAnim") or "-")
+    moving = zombie.isMoving and zombie:isMoving() or zombie.getVariableBoolean and zombie:getVariableBoolean("bMoving") or false
+    actionState = tostring(zombie.getActionStateName and zombie:getActionStateName() or zombie.getCurrentStateName and zombie:getCurrentStateName() or "-")
+    walkTypeVar = tostring(zombie.getVariableString and zombie:getVariableString("WalkType") or "")
+    engineWalkType = tostring(zombie.getVariableString and zombie:getVariableString("PNCEngineWalkType") or "")
+    animSpeed = tonumber(zombie.getVariableFloat and zombie:getVariableFloat("PNCAnimSpeed", 0.0) or 0.0) or 0.0
+    parts[#parts + 1] = "Anim: " .. animName
+    parts[#parts + 1] = "MoveAnim: " .. moveAnim
+    parts[#parts + 1] = "Moving: " .. tostring(moving)
+    parts[#parts + 1] = "Action: " .. actionState
+    parts[#parts + 1] = "WalkVar: " .. walkTypeVar
+    parts[#parts + 1] = "EngineWalk: " .. engineWalkType
+    parts[#parts + 1] = string.format("AnimSpd: %.2f", animSpeed)
+    frameIndex, frameCount, phase = getSyntheticAnimFrame(zombie, moveAnim ~= "" and moveAnim or animName, moving == true, animSpeed)
+    if frameIndex ~= nil and frameCount ~= nil then
+        parts[#parts + 1] = "Frame~: " .. tostring(frameIndex) .. "/" .. tostring(frameCount)
+    elseif phase ~= nil then
+        parts[#parts + 1] = string.format("Cycle: %.2f", tonumber(phase) or 0)
+    else
+        parts[#parts + 1] = "Frame~: n/a"
+    end
+    return table.concat(parts, " | ")
+end
+
 local function getNameColor(snapshot)
     if snapshot and snapshot.faction == "hostile" then
         return { r = 1.0, g = 0.28, b = 0.28, a = 1.0 }
@@ -162,7 +254,7 @@ local function getNameColor(snapshot)
     return { r = 1.0, g = 1.0, b = 1.0, a = 1.0 }
 end
 
-local function cacheEntryMetrics(entry, snapshot)
+local function cacheEntryMetrics(entry, snapshot, zombie)
     local textManager = getTextManager()
     local name = snapshot and snapshot.name or "PNC NPC"
     local hpText
@@ -185,6 +277,9 @@ local function cacheEntryMetrics(entry, snapshot)
     end
 
     debugText = buildDebugText(snapshot)
+    if Settings.showAIDebug then
+        debugText = debugText .. " | " .. getAnimationDebug(zombie, snapshot)
+    end
     if entry.debugText ~= debugText then
         entry.debugText = debugText
         entry.debugTextWidth = textManager:MeasureStringX(FONT_DEBUG, debugText)
@@ -322,7 +417,7 @@ function ISPNCNameplateManager:update()
                 entry.barColor = snapshot.healthState == "incapacitated"
                     and getIncapacitatedBarColor(currentTime)
                     or getColorForRatio(entry.healthRatio)
-                cacheEntryMetrics(entry, snapshot)
+                cacheEntryMetrics(entry, snapshot, zombie)
                 self.entries[uuid] = entry
                 visible[uuid] = true
             end

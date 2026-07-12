@@ -44,6 +44,27 @@ function BehaviorCombat.TickEngage(record, zombie, target)
         end
     end
 
+    if target.visible == false or target.visibilityKind == "clearthroughwindow" then
+        Common.MoveRecord(
+            record,
+            zombie,
+            target.x,
+            target.y,
+            target.z,
+            Common.ResolveCombatApproachMode(dist, "walk"),
+            0.75,
+            target.visible == false and "investigating_last_seen" or "approaching_visible_window"
+        )
+        Common.SetCombatDebug(
+            record,
+            target,
+            target.visible == false and "investigating_last_seen" or "approaching_visible_window",
+            effectiveMode,
+            equipmentInfo.weaponStatus
+        )
+        return
+    end
+
     if effectiveMode == "ranged" and Tactics and Tactics.TryReposition and target.kind == "zombie" and dist < 4.2 then
         repositioned, repositionReason = Tactics.TryReposition(record, zombie, target, effectiveMode, "target_too_close", equipmentInfo)
         if repositioned then

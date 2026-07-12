@@ -47,6 +47,9 @@ function Internal.ensureMoveLane(record)
     lane.lastStepAt = tonumber(lane.lastStepAt) or 0
     lane.lastStepDistance = tonumber(lane.lastStepDistance) or 0
     lane.lastStepLabel = lane.lastStepLabel or nil
+    lane.steeringSide = lane.steeringSide ~= nil and tonumber(lane.steeringSide) or nil
+    lane.directStepCount = tonumber(lane.directStepCount) or 0
+    lane.visualMovingUntil = tonumber(lane.visualMovingUntil) or 0
     lane.lastRecoverAt = tonumber(lane.lastRecoverAt) or 0
     lane.noProgressCount = tonumber(lane.noProgressCount) or 0
     lane.lastSpecialActionKey = lane.lastSpecialActionKey or nil
@@ -129,6 +132,9 @@ function Internal.setLaneGoal(record, lane, goal)
     lane.lastStepAt = 0
     lane.lastStepDistance = 0
     lane.lastStepLabel = nil
+    lane.steeringSide = nil
+    lane.directStepCount = 0
+    lane.visualMovingUntil = 0
     lane.lastSuppressAudioAt = 0
     lane.specialMoveUntil = 0
     lane.specialAnim = nil

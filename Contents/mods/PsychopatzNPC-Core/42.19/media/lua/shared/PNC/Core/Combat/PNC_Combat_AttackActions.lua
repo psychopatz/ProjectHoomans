@@ -89,6 +89,27 @@ local function resolveActionTarget(targetRef)
     return nil
 end
 
+local function isActionTargetVisible(record, target)
+    local worldObject
+    local visible
+    local visibilityKind
+    if not target or not Perception or not Perception.CanSeeWorldObject then
+        return false
+    end
+    if target.kind == "player" then
+        worldObject = target.player
+    elseif target.kind == "npc" then
+        worldObject = Registry.GetLiveZombie(target.id)
+    elseif target.kind == "zombie" then
+        worldObject = Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
+    end
+    if not worldObject then
+        return false
+    end
+    visible, visibilityKind = Perception.CanSeeWorldObject(record, worldObject)
+    return visible == true and visibilityKind ~= "clearthroughwindow"
+end
+
 function Internal.clearAttackAction(record)
     if record and record.runtime then
         record.runtime.attackAction = nil
@@ -128,6 +149,7 @@ function Internal.applyDamageToZombie(record, attackerZombie, target, damage, at
     local scaledDamage
     local applied = false
     local reactionOptions
+    local reactionManaged
 
     if not victim or victim:isDead() then
         return false, "invalid_zombie_target"
@@ -152,7 +174,8 @@ function Internal.applyDamageToZombie(record, attackerZombie, target, damage, at
         stagger = attackType ~= "ranged",
     }
 
-    if ZombieReaction and ZombieReaction.ApplyWeaponHit then
+    reactionManaged = ZombieReaction and ZombieReaction.ApplyWeaponHit ~= nil
+    if reactionManaged then
         applied = ZombieReaction.ApplyWeaponHit(attackerZombie or fakeZombie, victim, weaponItem, scaledDamage, reactionOptions)
     elseif weaponItem and victim.Hit then
         applied = pcall(function()
@@ -171,11 +194,11 @@ function Internal.applyDamageToZombie(record, attackerZombie, target, damage, at
             end
         end
     end
-    if ZombieReaction and ZombieReaction.Start then
+    if not reactionManaged and ZombieReaction and ZombieReaction.Start then
         ZombieReaction.Start(attackerZombie or fakeZombie, victim, reactionOptions)
-    elseif attackType == "ranged" and victim.setHitReaction then
+    elseif not reactionManaged and attackType == "ranged" and victim.setHitReaction then
         victim:setHitReaction("ShotBelly")
-    elseif victim.setHitReaction then
+    elseif not reactionManaged and victim.setHitReaction then
         victim:setHitReaction("HitReaction")
     end
     if ZombieAggro and ZombieAggro.OnZombieProvoked and (attackerZombie or fakeZombie) then
@@ -343,6 +366,10 @@ function Combat.PumpAttackAction(record, zombie)
     end
 
     target = resolveActionTarget(action.target)
+    if target and not isActionTargetVisible(record, target) then
+        Internal.clearAttackAction(record)
+        return false, "target_not_visible"
+    end
     if target then
         Internal.faceTarget(zombie, target, record, 120, "attack_followthrough")
     end

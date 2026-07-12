@@ -12,6 +12,7 @@ underlying zombie AI disabled with `setUseless(true)`.
 - `PNC_PathService`: owns the shared move lane, resolved movement mode,
   movement logs, and special movement orchestration.
 - `PNC_FakeLocomotion`: owns fake walking/running/crawling step execution.
+- `PNC_TraversalQuery`: owns shared occupancy and passage-edge queries.
 - `PNC_LiveBodyControl`: owns zombie-body suppression and live-body cleanup.
 - `PNC_Animation`: owns animation variables, walk types, speed multipliers, and
   bump playback.
@@ -48,9 +49,19 @@ underlying zombie AI disabled with `setUseless(true)`.
   instead of over-speed walk.
 - The server resolves `animSpeed` and replicates it to clients so nearby
   multiplayer observers do not guess a different walk cadence.
-- Live locomotion now reapplies walk state every tick instead of only on
-  walk-type transitions, so `setMoving`, sneaking state, and walk type stay in
-  sync with the fake step stream.
+- Every real fake-locomotion displacement refreshes a short visual lease. The
+  lease survives an immediate arrival long enough for short moves to render a
+  gait locally and to be included in at least one moving and one stopping
+  multiplayer snapshot; it never extends server transport.
+- A follow-goal refresh inside that lease preserves the current body state and
+  walk cycle instead of hard-resetting to idle between micro-movements.
+- `BumpType` is reserved for explicit combat, reaction, and traversal actions.
+  Locomotion startup does not occupy the bump channel, because short repeated
+  goals would otherwise mask the normal leg cycle.
+- Live locomotion reapplies `setMoving`, sneaking state, and animation variables
+  every tick. Because the engine rejects `walktoward` for a useless zombie, PNC
+  locomotion nodes also exist in the stable `idle` animation tree. This keeps
+  leg playback independent from vanilla zombie transport ownership.
 
 ## Combat Override Notes
 
@@ -64,8 +75,13 @@ underlying zombie AI disabled with `setUseless(true)`.
 - Windows: opened in-place and logged.
 - Window climb: fake bump plus controlled reposition to the opposite square,
   with origin and destination logging.
+- Fences: shared edge detection, validated landing, controlled reposition, and
+  a replicated climb lease.
 - Special movement is only considered after a blocked fake step or a short
   no-progress stall, so nearby windows no longer steal normal movement ticks.
+- Collision checks include the edge between squares, not only destination
+  occupancy. Walls are hard barriers; a door, window, or fence directly ahead
+  is handed to traversal before lateral steering is attempted.
 - Traversal attempts remember the obstacle, source side, destination, and goal
   revision long enough to reject immediate same-side re-cross loops.
 

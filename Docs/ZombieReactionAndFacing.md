@@ -19,8 +19,18 @@
   explicit heavy reactions.
 - Combat may lease facing briefly for attack windup, attack follow-through, or
   close repositioning.
+- Re-publishing a combat lease does not force another engine facing request.
+  Direction/interval throttling remains authoritative so `turnalerted` cannot
+  race locomotion on every update.
 - Outside those leases, locomotion owns facing and points the NPC along travel
   direction.
+- Retreat movement does not renew combat-facing leases; NPCs face their travel
+  direction instead of fighting the movement controller or fake-backpedaling.
+- Zombie hit reaction selectors are written once at impact and stagger flags
+  are cleared when the short reaction lease expires.
 - Snapshot `visualState` mirrors the resolved motion profile fields so nearby
   clients replay the same walk, run, sneak, and crawl choice instead of
   inferring posture from reduced hints.
+- SP and listen-server bodies are faced only by `PNC_PathService`; the client
+  snapshot loop faces only remote visual replicas and throttles repeated
+  directions.

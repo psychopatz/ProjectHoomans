@@ -42,6 +42,9 @@ local function getSyncInterval(record)
     if runtime and runtime.pathing and (runtime.pathing.phase == "requested" or runtime.pathing.phase == "active") then
         return 150
     end
+    if runtime and runtime.pathing and Core.Now() < ((tonumber(runtime.pathing.visualMovingUntil) or 0) + 250) then
+        return 150
+    end
     return 500
 end
 

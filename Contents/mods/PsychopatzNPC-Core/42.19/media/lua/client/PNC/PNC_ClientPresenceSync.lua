@@ -22,6 +22,7 @@ local Interpolation = PNC.ClientInterpolation
 
 Sync.BodyByID = Sync.BodyByID or {}
 Sync.BodyByInstanceID = Sync.BodyByInstanceID or {}
+Sync.FacingByID = Sync.FacingByID or {}
 Sync.lastBodyScanAt = Sync.lastBodyScanAt or 0
 Sync.lastLocalSnapshotBuildAt = Sync.lastLocalSnapshotBuildAt or 0
 
@@ -60,6 +61,10 @@ local function applySnapshotFacing(zombie, snapshot)
     local dirX
     local dirY
     local len
+    local now
+    local facingState
+    local facingKey
+    local dot
     if not zombie or not snapshot then
         return false
     end
@@ -94,15 +99,38 @@ local function applySnapshotFacing(zombie, snapshot)
     end
     dirX = dirX / len
     dirY = dirY / len
-    if zombie.faceLocationF then
-        zombie:faceLocationF(zombie:getX() + dirX, zombie:getY() + dirY)
-        return true
+    now = Core.Now()
+    facingKey = tostring(snapshot.id or zombie)
+    facingState = Sync.FacingByID[facingKey]
+    if facingState and facingState.body == zombie then
+        dot = (tonumber(facingState.dirX) or 0) * dirX
+            + (tonumber(facingState.dirY) or 0) * dirY
+        if dot >= 0.998
+            or (dot >= 0.985 and (now - (tonumber(facingState.appliedAt) or 0)) < 120)
+        then
+            return false
+        end
     end
-    return false
+    if zombie.faceLocation then
+        zombie:faceLocation(zombie:getX() + dirX, zombie:getY() + dirY)
+    elseif zombie.faceLocationF then
+        zombie:faceLocationF(zombie:getX() + dirX, zombie:getY() + dirY)
+    else
+        return false
+    end
+    Sync.FacingByID[facingKey] = {
+        body = zombie,
+        dirX = dirX,
+        dirY = dirY,
+        appliedAt = now,
+    }
+    return true
 end
 
 local function buildRecordView(snapshot)
     local visualState = snapshot and snapshot.visualState or {}
+    local moving = visualState.moving == true
+    local specialActive = visualState.specialActive == true
     return {
         activeBehavior = snapshot and snapshot.activeBehavior or snapshot and snapshot.aiState or "Idle",
         activeJob = snapshot and snapshot.activeJob or snapshot and snapshot.aiState or "Idle",
@@ -127,6 +155,8 @@ local function buildRecordView(snapshot)
         runtime = {
             debug = snapshot and snapshot.debugState and snapshot.debugState.debugEnabled == true or false,
             pathing = {
+                phase = moving and "active" or "idle",
+                ownerMode = moving and "fake_locomotion" or "idle",
                 animSpeed = tonumber(visualState.animSpeed) or 1.0,
                 mode = visualState.mode or "walk",
                 resolvedMode = visualState.mode or "walk",
@@ -136,6 +166,9 @@ local function buildRecordView(snapshot)
                 profileKey = visualState.profileKey or visualState.mode or "walk",
                 isRunning = visualState.isRunning == true,
                 isCrawling = visualState.isCrawling == true,
+                speed = tonumber(visualState.animSpeed) or 1.0,
+                specialAnim = specialActive and visualState.specialAnim or nil,
+                specialMoveUntil = specialActive and (tonumber(visualState.specialFinishAt) or 0) or 0,
                 motionProfile = {
                     animSpeed = tonumber(visualState.animSpeed) or 1.0,
                     moveAnim = visualState.moveAnim or visualState.anim or "Idle",
@@ -410,7 +443,13 @@ function Sync.OnTick()
                 if canRequestRemoteSync() and Interpolation and Interpolation.ApplyToZombie then
                     Interpolation.ApplyToZombie(snapshot, body, now)
                 end
-                applySnapshotFacing(body, snapshot)
+                -- The authoritative SP/listen-server body was already faced
+                -- by PathService.  Re-facing it from the client snapshot loop
+                -- created a second movement owner.  Dedicated clients alone
+                -- apply replicated facing, with throttling above.
+                if canRequestRemoteSync() then
+                    applySnapshotFacing(body, snapshot)
+                end
                 applySnapshotToBody(snapshot, body)
             end
         end
@@ -420,6 +459,7 @@ end
 local function onResetLua()
     Sync.BodyByID = {}
     Sync.BodyByInstanceID = {}
+    Sync.FacingByID = {}
     Sync.lastBodyScanAt = 0
     if Interpolation and Interpolation.ClearAll then
         Interpolation.ClearAll()

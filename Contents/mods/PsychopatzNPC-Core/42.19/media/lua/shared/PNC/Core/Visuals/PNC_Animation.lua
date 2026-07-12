@@ -17,6 +17,7 @@ local function setPNCStateVars(zombie, record, animState)
         return
     end
     zombie:setVariable("PNC", true)
+    zombie:setVariable("PNCActor", true)
     zombie:setVariable("PNCState", tostring(record and (record.activeBehavior or record.activeJob) or "Idle"))
     zombie:setVariable("PNCOrder", tostring(record and record.orderSpec and record.orderSpec.kind or "none"))
     zombie:setVariable("PNCPresence", tostring(record and record.presenceState or "unknown"))
@@ -59,17 +60,22 @@ local function setLocomotionVars(zombie, profile, moving, animSpeed)
     local engineWalkType = profile and tostring(profile.engineWalkType or "") or ""
     local moveAnim = profile and tostring(profile.moveAnim or "Walk") or "Walk"
     local sneakingNow = walkType == "SneakWalk"
+    local crawlingNow = profile and profile.isCrawling == true or false
     local resolvedAnimSpeed = movingNow and (tonumber(animSpeed) or 1.0) or 0.0
+    local genericWalkType = movingNow and not crawlingNow and "1" or ""
     if not zombie then
         return
     end
     if zombie.setVariable then
+        zombie:setVariable("PNC", true)
+        zombie:setVariable("PNCActor", true)
         zombie:setVariable("PNCMoveAnim", moveAnim)
         zombie:setVariable("PNCWalkType", tostring(walkType or ""))
-        zombie:setVariable("WalkType", tostring(engineWalkType or ""))
-        zombie:setVariable("PNCAnimSpeed", movingNow and resolvedAnimSpeed or 1.0)
+        zombie:setVariable("PNCEngineWalkType", tostring(engineWalkType or ""))
+        zombie:setVariable("WalkType", genericWalkType)
+        zombie:setVariable("PNCAnimSpeed", resolvedAnimSpeed)
         zombie:setVariable("PNCIsRunning", profile and profile.isRunning == true or false)
-        zombie:setVariable("PNCIsCrawling", profile and profile.isCrawling == true or false)
+        zombie:setVariable("PNCIsCrawling", crawlingNow)
         zombie:setVariable("PNCMoving", movingNow)
         zombie:setVariable("bMoving", movingNow)
         zombie:setVariable("isMoving", movingNow)
@@ -78,6 +84,11 @@ local function setLocomotionVars(zombie, profile, moving, animSpeed)
         zombie:setVariable("MovementSpeed", resolvedAnimSpeed)
         zombie:setVariable("WalkSpeed", movingNow and math.max(0.1, resolvedAnimSpeed) or 0.0)
         zombie:setVariable("RunSpeed", movingNow and math.max(0.1, resolvedAnimSpeed) or 0.0)
+        if crawlingNow ~= true or movingNow ~= true then
+            zombie:setVariable("bBecomeCrawler", false)
+            zombie:setVariable("bCrawling", false)
+            zombie:setVariable("FallOnFront", false)
+        end
     end
     if zombie.setMoving then
         zombie:setMoving(movingNow)
@@ -88,19 +99,15 @@ local function setLocomotionVars(zombie, profile, moving, animSpeed)
 end
 
 local function applyWalkType(zombie, engineWalkType, animSpeedValue)
-    local resolvedAnimSpeed
     if not zombie then
         return
     end
     engineWalkType = tostring(engineWalkType or "")
     if zombie.setWalkType then
         zombie:setWalkType(engineWalkType)
-    elseif zombie.setVariable then
-        zombie:setVariable("WalkType", engineWalkType)
     end
-    resolvedAnimSpeed = tonumber(animSpeedValue) or zombie.getVariableFloat and zombie:getVariableFloat("PNCAnimSpeed", 1.0) or nil
     if zombie.setSpeedMod then
-        zombie:setSpeedMod(tonumber(resolvedAnimSpeed) or 1)
+        zombie:setSpeedMod(1)
     end
     if zombie.setAnimatingBackwards then
         zombie:setAnimatingBackwards(false)
@@ -130,12 +137,14 @@ function Animation.ApplyLiveSetup(zombie, record)
         zombie:setVariable("PNCImmediateAnim", false)
         zombie:setVariable("PNCAnimSpeed", 1.0)
         zombie:setVariable("PNCMoveAnim", "")
+        zombie:setVariable("PNCEngineWalkType", "")
         zombie:setVariable("PNCLive", true)
         zombie:setVariable("PNCMoving", false)
         zombie:setVariable("bMoving", false)
         zombie:setVariable("isMoving", false)
         zombie:setVariable("PNCIsRunning", false)
         zombie:setVariable("PNCIsCrawling", false)
+        zombie:setVariable("WalkType", "")
     end
     applyWalkType(zombie, "", 1.0)
     if zombie.setTarget then
@@ -198,6 +207,9 @@ function Animation.Apply(zombie, record, animState, profileOverride, movingOverr
     applyWalkType(zombie, profile and profile.engineWalkType or "", animSpeed)
     if zombie.setRunning then
         zombie:setRunning(profile and profile.isRunning == true)
+    end
+    if LiveBodyControl and LiveBodyControl.SyncLocomotionState then
+        LiveBodyControl.SyncLocomotionState(zombie, moving)
     end
 end
 
@@ -328,10 +340,18 @@ function Animation.SyncLocomotion(zombie, record)
         return
     end
     profile = path and path.motionProfile or nil
-    moving = path and (path.phase == "requested" or path.phase == "active" or path.ownerMode == "fake_locomotion") or false
+    moving = path and (
+        path.phase == "requested"
+        or path.phase == "active"
+        or path.ownerMode == "fake_locomotion"
+        or now < (tonumber(path.visualMovingUntil) or 0)
+    ) or false
     moveAnim = path and path.moveAnim or zombie.getVariableString and zombie:getVariableString("PNCMoveAnim") or ""
     walkType = path and path.walkType or zombie.getVariableString and zombie:getVariableString("PNCWalkType") or ""
-    engineWalkType = path and path.engineWalkType or zombie.getVariableString and zombie:getVariableString("WalkType") or ""
+    engineWalkType = path and path.engineWalkType
+        or zombie.getVariableString and zombie:getVariableString("PNCEngineWalkType")
+        or zombie.getVariableString and zombie:getVariableString("WalkType")
+        or ""
     animSpeed = path and path.animSpeed or zombie.getVariableFloat and zombie:getVariableFloat("PNCAnimSpeed", 1.0) or 1.0
     setLocomotionVars(zombie, profile or {
         moveAnim = moveAnim ~= "" and moveAnim or "Walk",
@@ -343,6 +363,9 @@ function Animation.SyncLocomotion(zombie, record)
     applyWalkType(zombie, engineWalkType, animSpeed)
     if zombie.setRunning then
         zombie:setRunning(path and path.isRunning == true)
+    end
+    if LiveBodyControl and LiveBodyControl.SyncLocomotionState then
+        LiveBodyControl.SyncLocomotionState(zombie, moving)
     end
     if zombie.setUseless then
         zombie:setUseless(true)

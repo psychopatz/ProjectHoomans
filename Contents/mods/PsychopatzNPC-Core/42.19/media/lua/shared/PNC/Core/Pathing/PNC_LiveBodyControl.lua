@@ -20,9 +20,23 @@ local SUPPRESSED_STATES = {
     ["lunge"] = true,
     ["onground"] = true,
     ["onground-ragdoll"] = true,
+    ["pathfind"] = true,
     ["sitonground"] = true,
     ["staggerback"] = true,
     ["staggerback-knockeddown"] = true,
+    ["turnalerted"] = true,
+}
+
+local IDLE_RESET_STATES = {
+    ["getup"] = true,
+    ["getup-fromonback"] = true,
+    ["getup-fromonfront"] = true,
+    ["getup-fromsitting"] = true,
+    ["lunge"] = true,
+    ["pathfind"] = true,
+    ["staggerback"] = true,
+    ["staggerback-knockeddown"] = true,
+    ["turnalerted"] = true,
 }
 
 function LiveBodyControl.IsSuppressedActionState(actionState)
@@ -37,6 +51,27 @@ function LiveBodyControl.GetActionStateName(zombie)
         return ""
     end
     return string.lower(tostring(zombie:getActionStateName() or ""))
+end
+
+function LiveBodyControl.SyncLocomotionState(zombie, moving)
+    local actionState
+    if not zombie then
+        return false
+    end
+    moving = moving == true
+    actionState = LiveBodyControl.GetActionStateName(zombie)
+    if moving then
+        return actionState == "walktoward" or actionState == "idle" or actionState == ""
+    end
+    if actionState == "walktoward"
+        and zombie.changeState
+        and ZombieIdleState
+        and ZombieIdleState.instance
+    then
+        zombie:changeState(ZombieIdleState.instance())
+        return true
+    end
+    return actionState == "idle" or actionState == ""
 end
 
 function LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
@@ -82,8 +117,8 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
     if zombie.setAttackedBy then
         zombie:setAttackedBy(nil)
     end
-    if zombie.setTurnAlertedValues then
-        zombie:setTurnAlertedValues(-5, 5)
+    if zombie.setAnimatingBackwards then
+        zombie:setAnimatingBackwards(false)
     end
 end
 
@@ -117,6 +152,7 @@ end
 
 function LiveBodyControl.SuppressZombieState(zombie, lane, now)
     local actionState = LiveBodyControl.GetActionStateName(zombie)
+    local needsIdleReset
     if not zombie then
         return false, actionState
     end
@@ -125,10 +161,17 @@ function LiveBodyControl.SuppressZombieState(zombie, lane, now)
     if not LiveBodyControl.IsSuppressedActionState(actionState) then
         return false, actionState
     end
+    needsIdleReset = IDLE_RESET_STATES[actionState or ""] == true
+    -- Reset the alert-turn payload only while recovering that actual engine
+    -- state.  Applying it from the generic body-flags path meant it ran more
+    -- than once per movement tick and could race the facing owner.
+    if actionState == "turnalerted" and zombie.setTurnAlertedValues then
+        zombie:setTurnAlertedValues(0, 0)
+    end
     if zombie.setUseless then
         zombie:setUseless(true)
     end
-    if zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
+    if needsIdleReset and zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
         zombie:changeState(ZombieIdleState.instance())
     end
     LiveBodyControl.TrySilenceEmitter(zombie, lane, now)

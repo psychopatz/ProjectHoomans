@@ -9,6 +9,11 @@
 ## Current Rules
 - melee and ranged attacks are server-authoritative delayed-hit actions, not immediate damage writes
 - companions and hostiles can both acquire zombie targets
+- initial player, NPC, and zombie acquisition requires an unobstructed visual
+  trace; closed doors and walls do not count as visible
+- a lost target is investigated at its last seen position for a short memory
+  window, but its live position is not tracked and attacks are cancelled while
+  line-of-sight is blocked
 - unarmed combat uses shove and ground-finisher behavior instead of weapon swings
 - combat can trigger conservative kiting and repositioning through `PNC_Combat_Tactics`
 - horde-aware combat now prefers lower-density zombie picks over blindly taking the nearest body
