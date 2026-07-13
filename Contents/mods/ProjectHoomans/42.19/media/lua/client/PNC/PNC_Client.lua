@@ -422,6 +422,21 @@ function Client.SendDebug(action, payload)
     return false
 end
 
+function Client.SendRevive(npcId)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not player or not npcId then
+        return false
+    end
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not sendClientCommand then
+            return false
+        end
+        sendClientCommand(player, Const.MODULE, Const.CMD_REVIVE, { id = npcId })
+        return true
+    end
+    return PNC.Revive and PNC.Revive.Try and PNC.Revive.Try(player, npcId) or false
+end
+
 local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, test)
     local debugMenu
     local subMenu

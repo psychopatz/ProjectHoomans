@@ -153,6 +153,7 @@ local function sanitizeHealth(rawHealth, fallbackMax)
         downedAt = normalizeNumber(rawHealth and rawHealth.downedAt, 0),
         recentDamageUntil = normalizeNumber(rawHealth and rawHealth.recentDamageUntil, 0),
         reviveUntil = normalizeNumber(rawHealth and rawHealth.reviveUntil, 0),
+        reviveProtectionUntil = normalizeNumber(rawHealth and rawHealth.reviveProtectionUntil, 0),
     }
 end
 

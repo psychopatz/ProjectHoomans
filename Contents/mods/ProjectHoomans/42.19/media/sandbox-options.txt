@@ -1,5 +1,13 @@
 VERSION = 1,
 
+option ProjectHoomans.ZombiesTargetDownedNPC
+{
+    type = boolean,
+    default = false,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.ZombiesTargetDownedNPC,
+}
+
 option ProjectHoomans.EnableWeaponDamage
 {
     type = boolean,
@@ -41,4 +49,3 @@ option ProjectHoomans.NPCWeaponConditionLoss
     page = ProjectHoomans,
     translation = ProjectHoomans.NPCWeaponConditionLoss,
 }
-

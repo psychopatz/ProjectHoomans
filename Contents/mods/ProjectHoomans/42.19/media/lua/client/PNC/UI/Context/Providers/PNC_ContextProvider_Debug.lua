@@ -57,7 +57,7 @@ function Provider.addOptions(menu, entry, player, contextData)
 
     snapshot = ClientState.snapshots and ClientState.snapshots[entry.id] or nil
     if snapshot and snapshot.healthState == "incapacitated" and snapshot.canRevive == true then
-        menu:addOption("Revive", nil, function()
+        menu:addOption(getText("UI_PNC_DebugRevive"), nil, function()
             sendDebug("revive", { id = entry.id })
         end)
     end

@@ -1,0 +1,10 @@
+Sandbox_EN = {
+    Sandbox_ProjectHoomans = "Project Hoomans",
+    Sandbox_ProjectHoomans_ZombiesTargetDownedNPC = "Zombies Target Downed NPC",
+    Sandbox_ProjectHoomans_ZombiesTargetDownedNPC_tooltip = "When enabled, zombies may continue targeting and deliver a final blow to incapacitated NPCs. When disabled, zombies release downed NPCs, who remain revivable until a player helps them.",
+    Sandbox_ProjectHoomans_EnableWeaponDamage = "Enable NPC Weapon Damage",
+    Sandbox_ProjectHoomans_NPCDamageDealtMultiplier = "NPC Damage Dealt Multiplier",
+    Sandbox_ProjectHoomans_NPCPlayerWounds = "NPC Attacks Cause Player Wounds",
+    Sandbox_ProjectHoomans_NPCAmmoConsumption = "NPC Ammo Consumption",
+    Sandbox_ProjectHoomans_NPCWeaponConditionLoss = "NPC Weapon Condition Loss",
+}

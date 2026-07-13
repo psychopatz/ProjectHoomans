@@ -1,6 +1,6 @@
 --[[
     PNC Health
-    Single writer for NPC HP, incapacitation, revive windows, and death state.
+    Single writer for NPC HP, incapacitation, revive recovery, and death state.
     It also owns recent-damage timers that drive overhead combat visibility.
 ]]
 
@@ -11,6 +11,7 @@ local Health = PNC.Health
 local Core = PNC.Core
 local Const = PNC.Const
 local Registry = PNC.Registry
+local Settings = PNC.Sandbox
 
 local function resolvePathService()
     return PNC.PathService
@@ -24,6 +25,10 @@ local function resolveCombatTactics()
     return PNC.CombatTactics
 end
 
+local function resolveLiveBodyControl()
+    return PNC.LiveBodyControl
+end
+
 function Health.Ensure(record)
     if not record.health then
         record.health = {
@@ -34,6 +39,7 @@ function Health.Ensure(record)
             downedAt = 0,
             recentDamageUntil = 0,
             reviveUntil = 0,
+            reviveProtectionUntil = 0,
         }
     end
     if record.health.recentDamageUntil == nil then
@@ -41,6 +47,9 @@ function Health.Ensure(record)
     end
     if record.health.reviveUntil == nil then
         record.health.reviveUntil = 0
+    end
+    if record.health.reviveProtectionUntil == nil then
+        record.health.reviveProtectionUntil = 0
     end
     return record.health
 end
@@ -70,6 +79,9 @@ local function applyIncapacitatedLiveState(record, zombie)
     if zombie.setUseless then
         zombie:setUseless(true)
     end
+    if zombie.setZombiesDontAttack then
+        zombie:setZombiesDontAttack(not Settings.CanZombieTargetRecord(record))
+    end
     if zombie.setHealth then
         zombie:setHealth(Const.INCAPACITATED_ENGINE_BUFFER)
     end
@@ -80,14 +92,21 @@ end
 
 local function applyNormalLiveState(record, zombie)
     local Animation = resolveAnimation()
+    local LiveBodyControl = resolveLiveBodyControl()
     if not zombie then
         return
     end
     if zombie.setUseless then
         zombie:setUseless(true)
     end
+    if zombie.setZombiesDontAttack then
+        zombie:setZombiesDontAttack(not Settings.CanZombieTargetRecord(record))
+    end
     if zombie.setHealth then
         zombie:setHealth(Const.DEFAULT_ENGINE_BUFFER)
+    end
+    if LiveBodyControl and LiveBodyControl.ApplyHumanizedBodyFlags then
+        LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
     end
     if Animation and Animation.ClearDowned then
         Animation.ClearDowned(zombie)
@@ -97,12 +116,15 @@ local function applyNormalLiveState(record, zombie)
     end
 end
 
-local function refreshNormalLiveBuffer(zombie)
+local function refreshNormalLiveBuffer(record, zombie)
     if not zombie then
         return
     end
     if zombie.setUseless then
         zombie:setUseless(true)
+    end
+    if zombie.setZombiesDontAttack then
+        zombie:setZombiesDontAttack(not Settings.CanZombieTargetRecord(record))
     end
     if zombie.setHealth then
         zombie:setHealth(Const.DEFAULT_ENGINE_BUFFER)
@@ -121,7 +143,8 @@ function Health.EnterIncapacitated(record, zombie, reason)
     health.downedAt = now
     health.incapacitatedReason = reason or "unknown"
     health.recentDamageUntil = now + Const.RECENT_DAMAGE_SHOW_MS
-    health.reviveUntil = now + Const.INCAPACITATED_TIMEOUT_MS
+    health.reviveUntil = 0
+    health.reviveProtectionUntil = 0
     record.runtime.forceLive = true
     record.runtime.target = nil
     record.runtime.lastPathX = nil
@@ -134,23 +157,35 @@ function Health.EnterIncapacitated(record, zombie, reason)
         PathService.Reset(zombie, record)
     end
     applyIncapacitatedLiveState(record, zombie)
+    if zombie
+        and not Settings.CanZombieTargetRecord(record)
+        and PNC.ZombieAggro
+        and PNC.ZombieAggro.ClearForNPCBody
+    then
+        PNC.ZombieAggro.ClearForNPCBody(zombie)
+    end
     return true
 end
 
 function Health.Revive(record, zombie)
     local health = Health.Ensure(record)
     local revivedHP = math.min(health.max, math.max(Const.INCAPACITATED_HP, Const.REVIVE_HP))
+    local now = Core.Now()
     health.current = revivedHP
     health.state = "normal"
     health.downedAt = 0
     health.incapacitatedReason = nil
     health.reviveUntil = 0
-    health.recentDamageUntil = Core.Now() + Const.RECENT_DAMAGE_SHOW_MS
+    health.reviveProtectionUntil = now + Const.REVIVE_PROTECTION_MS
+    health.recentDamageUntil = now + Const.RECENT_DAMAGE_SHOW_MS
     record.alive = true
     record.runtime.forceLive = false
     record.runtime.target = nil
     record.runtime.attackAction = nil
     record.runtime.inCombatUntil = 0
+    if zombie and PNC.ZombieAggro and PNC.ZombieAggro.ClearForNPCBody then
+        PNC.ZombieAggro.ClearForNPCBody(zombie)
+    end
     applyNormalLiveState(record, zombie)
     return true
 end
@@ -162,6 +197,7 @@ function Health.Recover(record, zombie)
     health.downedAt = 0
     health.incapacitatedReason = nil
     health.reviveUntil = 0
+    health.reviveProtectionUntil = 0
     health.recentDamageUntil = 0
     record.alive = true
     record.runtime.forceLive = false
@@ -172,17 +208,15 @@ function Health.Recover(record, zombie)
     return true
 end
 
-function Health.CanRevive(record, now)
+function Health.CanRevive(record)
     local health
     if not record then
         return false
     end
     health = Health.Ensure(record)
-    now = tonumber(now) or Core.Now()
     return record
         and record.alive ~= false
         and health.state == "incapacitated"
-        and (tonumber(health.reviveUntil) or 0) > now
 end
 
 function Health.ApplyDamageToPlayer(player, amount)
@@ -200,6 +234,7 @@ function Health.Kill(record, zombie, reason)
     health.current = 0
     health.state = "dead"
     health.reviveUntil = 0
+    health.reviveProtectionUntil = 0
     health.recentDamageUntil = Core.Now() + Const.RECENT_DAMAGE_SHOW_MS
     record.alive = false
     record.presenceState = Const.PRESENCE_CORPSE
@@ -232,6 +267,13 @@ function Health.ApplyDamage(record, zombie, damageEvent)
     local now = Core.Now()
 
     if record.alive == false or amount <= 0 then
+        return false
+    end
+
+    if damageEvent
+        and damageEvent.attackerKind == "zombie"
+        and not Settings.CanZombieTargetRecord(record, now)
+    then
         return false
     end
 
@@ -269,12 +311,14 @@ function Health.Update(record, zombie, now)
     if health.state == "incapacitated" then
         applyIncapacitatedLiveState(record, zombie)
         health.current = Const.INCAPACITATED_HP
-        if now >= (tonumber(health.reviveUntil) or 0) then
-            Health.Kill(record, zombie, "incapacitated_timeout")
-        end
         return
     end
+    if (tonumber(health.reviveProtectionUntil) or 0) > 0
+        and now >= (tonumber(health.reviveProtectionUntil) or 0)
+    then
+        health.reviveProtectionUntil = 0
+    end
     if zombie then
-        refreshNormalLiveBuffer(zombie)
+        refreshNormalLiveBuffer(record, zombie)
     end
 end

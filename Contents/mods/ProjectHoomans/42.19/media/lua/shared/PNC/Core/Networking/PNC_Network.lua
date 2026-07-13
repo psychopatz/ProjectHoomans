@@ -195,6 +195,7 @@ end
 
 function Network.BuildSnapshot(record)
     local aiState
+    local canRevive
     local inCombat
     local staminaInfo
     local equipmentInfo
@@ -204,6 +205,7 @@ function Network.BuildSnapshot(record)
     local visualState
     local appearance
     aiState, inCombat = resolveAIState(record)
+    canRevive = PNC.Health and PNC.Health.CanRevive and PNC.Health.CanRevive(record) or false
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
     equipmentInfo = Equipment and Equipment.Describe and Equipment.Describe(record) or {}
     identity = buildIdentitySummary(record)
@@ -235,7 +237,7 @@ function Network.BuildSnapshot(record)
         hpCurrent = record.health and record.health.current or nil,
         hpMax = record.health and record.health.max or nil,
         healthState = record.health and record.health.state or nil,
-        canRevive = record.health and record.health.state == "incapacitated" and (tonumber(record.health.reviveUntil) or 0) > Core.Now() or false,
+        canRevive = canRevive,
         reviveUntil = record.health and record.health.reviveUntil or 0,
         recentDamageUntil = record.health and record.health.recentDamageUntil or 0,
         staminaCurrent = staminaInfo.current,
@@ -270,7 +272,7 @@ function Network.BuildSnapshot(record)
             identitySeed = identity.identitySeed,
             ownerUsername = record.ownerUsername,
             recruited = record.recruited == true,
-            canRevive = record.health and record.health.state == "incapacitated" and (tonumber(record.health.reviveUntil) or 0) > Core.Now() or false,
+            canRevive = canRevive,
             carry = inventorySummary,
         },
         debugState = {
@@ -280,7 +282,7 @@ function Network.BuildSnapshot(record)
             orderKind = record.orderSpec and record.orderSpec.kind or nil,
             targetKind = combat.targetKind,
             healthState = record.health and record.health.state or nil,
-            canRevive = record.health and record.health.state == "incapacitated" and (tonumber(record.health.reviveUntil) or 0) > Core.Now() or false,
+            canRevive = canRevive,
             weaponMode = record.weaponMode,
             combatModeResolved = combat.combatModeResolved,
             weaponStatus = combat.weaponStatus,

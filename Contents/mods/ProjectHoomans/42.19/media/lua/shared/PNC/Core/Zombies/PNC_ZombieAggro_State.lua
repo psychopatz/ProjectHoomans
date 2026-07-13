@@ -6,6 +6,7 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Registry = PNC.Registry
 local Stealth = PNC.Stealth
+local Settings = PNC.Sandbox
 
 ZombieAggro.State = ZombieAggro.State or {
     bites = {},
@@ -88,7 +89,10 @@ function Internal.getForcedNPCBodyTarget(zombie, now)
     end
     record = Registry.Get(npcId)
     npcBody = Registry.GetLiveZombie(npcId)
-    if not record or not npcBody or record.alive == false or record.presenceState ~= Const.PRESENCE_LIVE then
+    if not record or not npcBody or record.alive == false
+        or record.presenceState ~= Const.PRESENCE_LIVE
+        or not Settings.CanZombieTargetRecord(record)
+    then
         clearForcedNPC(modData)
         return nil, nil
     end
@@ -135,6 +139,7 @@ function Internal.findNearestLiveNPC(zombie, radius)
             and record
             and record.alive ~= false
             and record.presenceState == Const.PRESENCE_LIVE
+            and Settings.CanZombieTargetRecord(record)
             and not (Stealth and Stealth.ShouldSuppressZombieAggro and Stealth.ShouldSuppressZombieAggro(record))
             and math.abs(npcBody:getZ() - zz) < 1
         then
@@ -174,6 +179,10 @@ function Internal.forceAggro(zombie, npcBody)
     modData = Internal.getZombieModData(zombie)
     record = Registry.FindRecordByZombie(npcBody)
     npcId = record and record.id or nil
+    if record and not Settings.CanZombieTargetRecord(record) then
+        Internal.clearZombieTarget(zombie)
+        return false
+    end
     if modData then
         modData.PNC_AggroNPCId = npcId
         modData.PNC_AggroNPCUntil = npcId and (Core.Now() + Const.ZOMBIE_NPC_AGGRO_LEASE_MS) or nil
@@ -193,4 +202,5 @@ function Internal.forceAggro(zombie, npcBody)
     if zombie.setAttackedBy then
         zombie:setAttackedBy(nil)
     end
+    return npcId ~= nil
 end

@@ -7,6 +7,7 @@ local Const = PNC.Const
 local Registry = PNC.Registry
 local Stealth = PNC.Stealth
 local ZombieReaction = PNC.CombatZombieReaction
+local Settings = PNC.Sandbox
 
 local Internal = ZombieAggro.Internal
 
@@ -139,6 +140,11 @@ end
 
 local function pursueNPCRecord(zombie, record, npcBody, now)
     if not record or not npcBody then
+        return false
+    end
+    if not Settings.CanZombieTargetRecord(record) then
+        Internal.clearZombieTarget(zombie)
+        ZombieAggro.ClearBiteEntryForZombie(zombie, "target_protected")
         return false
     end
     if Stealth and Stealth.ShouldSuppressZombieAggro and Stealth.ShouldSuppressZombieAggro(record) then

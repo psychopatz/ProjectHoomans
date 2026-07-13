@@ -7,6 +7,7 @@ local Const = PNC.Const
 local Registry = PNC.Registry
 local Health = PNC.Health
 local Equipment = PNC.Equipment
+local Settings = PNC.Sandbox
 
 local State = ZombieAggro.State
 local Internal = ZombieAggro.Internal
@@ -55,7 +56,7 @@ local function finalizeRelease(zombieId, entry, now, reason)
     local npcBody = entry and entry.npcBody or nil
     local record = entry and Registry.Get(entry.npcId) or nil
     if npcBody and npcBody.setZombiesDontAttack then
-        npcBody:setZombiesDontAttack(false)
+        npcBody:setZombiesDontAttack(record and not Settings.CanZombieTargetRecord(record) or false)
     end
     signalBumpFinish(zombie)
     if zombie and zombie.setBumpType then
@@ -130,7 +131,7 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
     local now
     local entry
 
-    if not zombie or not npcBody or not record then
+    if not zombie or not npcBody or not record or not Settings.CanZombieTargetRecord(record) then
         return false
     end
     zombieId = Internal.ensureZombieID(zombie)
@@ -281,8 +282,14 @@ function ZombieAggro.UpdateBiteState(zombie, now)
     if not record or not npcBody or record.alive == false
         or record.presenceState ~= Const.PRESENCE_LIVE
         or (npcBody.isDead and npcBody:isDead())
+        or not Settings.CanZombieTargetRecord(record)
     then
-        beginRelease(zombieId, npcBody, "target_invalid", now)
+        beginRelease(
+            zombieId,
+            npcBody,
+            record and not Settings.CanZombieTargetRecord(record) and "target_protected" or "target_invalid",
+            now
+        )
         return true
     end
     dist = Core.Distance(zombie:getX(), zombie:getY(), npcBody:getX(), npcBody:getY())

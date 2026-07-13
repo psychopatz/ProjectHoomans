@@ -245,6 +245,13 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_REVIVE and args and args.id then
+        if PNC.Revive and PNC.Revive.Try then
+            PNC.Revive.Try(player, args.id)
+        end
+        return
+    end
+
     if command == Const.CMD_DEBUG_ROSTER_REQUEST then
         if not canUseDebug(player) then
             Network.SendDebugRoster(player, {}, false, BodyLifecycle and BodyLifecycle.LastAudit or {})

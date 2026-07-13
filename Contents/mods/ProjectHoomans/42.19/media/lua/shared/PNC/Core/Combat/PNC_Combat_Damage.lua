@@ -5,12 +5,16 @@ PNC.CombatDamage = PNC.CombatDamage or {}
 
 local Damage = PNC.CombatDamage
 local Inventory = PNC.Inventory
+local Settings = PNC.Sandbox
 
 local function sandbox()
     return SandboxVars and SandboxVars.ProjectHoomans or nil
 end
 
 local function enabled(key, fallback)
+    if Settings and Settings.GetBoolean then
+        return Settings.GetBoolean(key, fallback)
+    end
     local vars = sandbox()
     if vars and vars[key] ~= nil then
         return vars[key] == true
@@ -199,4 +203,3 @@ function Damage.ApplyPlayerDamage(player, amount, attackType, weaponItem)
     end
     return true
 end
-
