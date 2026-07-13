@@ -42,14 +42,14 @@ local function resolveProfile(lane, mode)
         return LocomotionProfiles.GetBaseProfile(mode)
     end
     return {
-        speed = 0.76,
+        speed = 0.68,
         moveAnim = mode == "run" and "Run" or mode == "sneak" and "SneakWalk" or mode == "crawl" and "Crawl" or "Walk",
     }
 end
 
 local function getSpeedForMode(mode, lane)
     local profile = resolveProfile(lane, mode)
-    return tonumber(profile and profile.speed) or 0.76
+    return tonumber(profile and profile.speed) or 0.68
 end
 
 function FakeLocomotion.GetModeSpeed(mode)
@@ -68,14 +68,14 @@ local function computeStepDistance(lane, mode, now)
     local speed = getSpeedForMode(mode, lane)
     local deltaMs
     if lastStepAt <= 0 then
-        return math.max(0.03, speed * 0.05), 50
+        return speed * 0.05, 50
     end
     deltaMs = math.max(0, now - lastStepAt)
     if deltaMs < MIN_STEP_INTERVAL_MS then
         return 0, deltaMs
     end
     deltaMs = math.min(deltaMs, MAX_STEP_DELTA_MS)
-    return math.max(0.02, speed * (deltaMs / 1000)), deltaMs
+    return speed * (deltaMs / 1000), deltaMs
 end
 
 local function buildStepCandidates(zx, zy, zz, goal, stepDistance, steeringSide)

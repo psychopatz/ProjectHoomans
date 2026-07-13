@@ -17,6 +17,48 @@ local Targeting = PNC.BehaviorTargeting
 local BehaviorCombat = PNC.BehaviorCombat
 local Registry = PNC.Registry
 
+local function getFollowState(record)
+    record.runtime = record.runtime or {}
+    record.runtime.followState = record.runtime.followState or { mode = "moving" }
+    return record.runtime.followState
+end
+
+local function setFollowMode(record, mode)
+    local state = getFollowState(record)
+    local changed = state.mode ~= mode
+    state.mode = mode
+    return state, changed
+end
+
+local function shouldIdleNearOwner(record, ownerDist, sameLevel)
+    local state = getFollowState(record)
+    if not sameLevel then return false end
+    if state.mode == "idle_near_owner" then
+        return ownerDist <= (tonumber(Const.FOLLOW_IDLE_EXIT_DISTANCE) or 3.2)
+    end
+    return ownerDist <= (tonumber(Const.FOLLOW_IDLE_ENTER_DISTANCE) or 2.4)
+end
+
+local function holdAndFaceOwner(record, zombie, owner, mode, reason)
+    local _, changed = setFollowMode(record, mode)
+    record.activeBehavior = mode == "idle_near_owner" and "FollowOwner:idle" or "FollowOwner:formation_hold"
+    Common.ClearCombatTarget(record, reason)
+    if not zombie then return true end
+
+    if changed then
+        Common.HaltMovement(record, zombie, "follow_hold")
+        Animation.Apply(zombie, record, "Idle")
+    end
+    if PNC.PathService and PNC.PathService.RequestIdleFacing then
+        PNC.PathService.RequestIdleFacing(record, zombie, owner:getX(), owner:getY(), "follow_owner")
+    elseif zombie.faceThisObject then
+        zombie:faceThisObject(owner)
+    elseif zombie.faceLocationF then
+        zombie:faceLocationF(owner:getX(), owner:getY())
+    end
+    return true
+end
+
 local function normalizeDirection(dx, dy)
     local len = math.sqrt((dx * dx) + (dy * dy))
     if len <= 0.0001 then
@@ -138,9 +180,11 @@ local function tickFollowOwner(record, zombie)
         Stealth.UpdateFollowState(record, owner)
     end
     if tryEngageTarget(record, zombie) then
+        setFollowMode(record, "combat")
         return true
     end
     if not owner then
+        setFollowMode(record, "returning_to_anchor")
         if Stealth and Stealth.Clear then
             Stealth.Clear(record, "owner_missing")
         end
@@ -151,19 +195,32 @@ local function tickFollowOwner(record, zombie)
 
     record.ownerUsername = owner:getUsername()
     record.ownerOnlineID = owner:getOnlineID()
-    slotTarget = resolveFollowSlot(record, owner)
     ownerDist = Core.Distance(record.x, record.y, owner:getX(), owner:getY())
+    if shouldIdleNearOwner(record, ownerDist, math.abs(owner:getZ() - record.z) < 1) then
+        return holdAndFaceOwner(
+            record,
+            zombie,
+            owner,
+            "idle_near_owner",
+            record.runtime.stealthActive and "idle_follow_stealth" or "idle_near_owner"
+        )
+    end
+
+    slotTarget = resolveFollowSlot(record, owner)
     slotDist = slotTarget and Core.Distance(record.x, record.y, slotTarget.x, slotTarget.y) or ownerDist
     if slotDist <= (slotTarget and slotTarget.stopDistance or Const.FOLLOW_DISTANCE)
         and math.abs((slotTarget and slotTarget.z or owner:getZ()) - record.z) < 1
     then
-        Common.ClearCombatTarget(record, record.runtime.stealthActive and "holding_follow_stealth" or "holding_follow_position")
-        if zombie then
-            Common.HaltMovement(record, zombie, "follow_hold")
-            Animation.Apply(zombie, record, "Idle")
-        end
-        return true
+        return holdAndFaceOwner(
+            record,
+            zombie,
+            owner,
+            "formation_hold",
+            record.runtime.stealthActive and "holding_follow_stealth" or "holding_follow_position"
+        )
     end
+    setFollowMode(record, "moving")
+    record.activeBehavior = "FollowOwner:moving"
     moveMode = Stealth and Stealth.ResolveFollowMoveMode and Stealth.ResolveFollowMoveMode(record, owner, ownerDist)
         or (ownerDist >= Const.FOLLOW_RUN_DISTANCE and "run" or "walk")
     Common.ClearCombatTarget(record, moveMode == "sneak" and "following_owner_sneak" or ("following_owner_" .. tostring(moveMode)))

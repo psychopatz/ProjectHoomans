@@ -75,7 +75,9 @@ local function applySnapshotFacing(zombie, snapshot)
     end
     visualState = snapshot.visualState or {}
     if visualState.specialActive == true
-        or (visualState.moving ~= true and visualState.attackActive ~= true)
+        or (visualState.moving ~= true
+            and visualState.attackActive ~= true
+            and visualState.stationaryFacing ~= true)
     then
         return false
     end
@@ -84,9 +86,11 @@ local function applySnapshotFacing(zombie, snapshot)
         and Interpolation.StateByID[tostring(snapshot.id)] or nil
     targetX = tonumber(snapshot and snapshot.x) or zombie:getX()
     targetY = tonumber(snapshot and snapshot.y) or zombie:getY()
-    authoritativeDirX = visualState.attackActive == true and tonumber(visualState.facingDirX)
+    authoritativeDirX = (visualState.attackActive == true or visualState.stationaryFacing == true)
+        and tonumber(visualState.facingDirX)
         or tonumber(visualState.travelDirX)
-    authoritativeDirY = visualState.attackActive == true and tonumber(visualState.facingDirY)
+    authoritativeDirY = (visualState.attackActive == true or visualState.stationaryFacing == true)
+        and tonumber(visualState.facingDirY)
         or tonumber(visualState.travelDirY)
     if authoritativeDirX == nil
         and authoritativeDirY == nil

@@ -10,8 +10,8 @@ PNC.LocomotionProfiles = PNC.LocomotionProfiles or {}
 local LocomotionProfiles = PNC.LocomotionProfiles
 local Stamina = PNC.Stamina
 
-local WALK_SPEED = 0.76
-local WALK_ANIM_SPEED = 1.04
+local WALK_SPEED = 0.68
+local WALK_ANIM_SPEED = 0.96
 
 local BASE_PROFILES = {
     walk = {
@@ -24,7 +24,7 @@ local BASE_PROFILES = {
         profileKey = "walk",
     },
     run = {
-        speed = 2.10,
+        speed = 1.80,
         moveAnim = "Run",
         walkType = "Run",
         engineWalkType = "Run",
@@ -33,7 +33,7 @@ local BASE_PROFILES = {
         profileKey = "run",
     },
     sneak = {
-        speed = 0.48,
+        speed = 0.43,
         moveAnim = "SneakWalk",
         walkType = "SneakWalk",
         engineWalkType = "SneakWalk",
@@ -42,7 +42,7 @@ local BASE_PROFILES = {
         profileKey = "sneak",
     },
     crawl = {
-        speed = 0.30,
+        speed = 0.27,
         moveAnim = "Crawl",
         walkType = "Crawl",
         engineWalkType = "",
@@ -51,7 +51,7 @@ local BASE_PROFILES = {
         profileKey = "crawl",
     },
     recovery_walk = {
-        speed = 0.58,
+        speed = 0.52,
         moveAnim = "Walk",
         walkType = "Walk",
         engineWalkType = "Walk",
@@ -60,7 +60,7 @@ local BASE_PROFILES = {
         profileKey = "recovery_walk",
     },
     recovery_sneak = {
-        speed = 0.42,
+        speed = 0.38,
         moveAnim = "SneakWalk",
         walkType = "SneakWalk",
         engineWalkType = "SneakWalk",

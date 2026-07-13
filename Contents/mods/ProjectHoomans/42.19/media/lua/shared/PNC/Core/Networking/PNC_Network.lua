@@ -152,6 +152,7 @@ local function buildVisualState(record)
         facingDirX = facingDirX,
         facingDirY = facingDirY,
         facingOwner = path and path.facingOwner or nil,
+        stationaryFacing = not moving and path and path.facingOwner == "behavior_idle" or false,
         specialActive = specialActive,
         specialAnim = specialActive and path and path.specialAnim or nil,
         specialFinishAt = specialActive and path and path.specialMoveUntil or 0,

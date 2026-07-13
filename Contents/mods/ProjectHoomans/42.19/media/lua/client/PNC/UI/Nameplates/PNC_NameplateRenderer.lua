@@ -9,7 +9,7 @@ local Fonts = Presentation.Fonts
 local DEBUG_COLOR = { r = 0.8, g = 0.9, b = 1.0, a = 1.0 }
 local PATH_COLOR = { r = 0.15, g = 0.82, b = 1.0, a = 0.82 }
 local PATH_BLOCKED_COLOR = { r = 1.0, g = 0.3, b = 0.2, a = 0.9 }
-local PATH_MARKER_HALF_SIZE = 4
+local PATH_MARKER_HALF_SIZE = 15
 
 local function drawStatusBar(manager, left, top, width, height, ratio, color, alpha, backgroundAlpha)
     manager:drawRect(

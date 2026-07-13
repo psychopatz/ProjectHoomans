@@ -86,6 +86,7 @@ function OrderSystem.SetOrder(record, orderSpec)
     record.runtime.target = nil
     record.runtime.lastPathX = nil
     record.runtime.lastPathY = nil
+    record.runtime.followState = nil
     record.runtime.roaming = nil
     record.runtime.roamGoalX = nil
     record.runtime.roamGoalY = nil

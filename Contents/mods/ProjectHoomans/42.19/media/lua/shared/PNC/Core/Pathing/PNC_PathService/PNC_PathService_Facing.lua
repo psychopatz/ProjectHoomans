@@ -153,6 +153,35 @@ function PathService.RequestCombatFacing(record, zombie, target, leaseMs, reason
     return true
 end
 
+function PathService.RequestIdleFacing(record, zombie, faceX, faceY, reason)
+    local lane
+    local now
+    local previousOwner
+    if not record or not zombie or faceX == nil or faceY == nil then
+        return false
+    end
+
+    lane = Internal.ensureMoveLane(record)
+    if not lane then return false end
+    now = Core.Now()
+    previousOwner = lane.facingOwner
+    Internal.clearExpiredCombatFacing(lane, now)
+    if Internal.applyCombatFacing(zombie, lane, now, false) then
+        return true
+    end
+
+    lane.facingReason = tostring(reason or "idle")
+    return Internal.applyFacingLocation(
+        zombie,
+        lane,
+        faceX,
+        faceY,
+        now,
+        "behavior_idle",
+        previousOwner ~= "behavior_idle"
+    )
+end
+
 function PathService.ApplyTravelFacing(zombie, lane, faceX, faceY, now)
     now = tonumber(now) or Core.Now()
     if Internal.applyCombatFacing(zombie, lane, now, false) then
