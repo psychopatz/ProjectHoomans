@@ -37,15 +37,6 @@ local function isRecordEnemy(source, target)
     return target.faction == "hostile"
 end
 
-local function isManagedNPCBody(zombie)
-    local modData
-    if not zombie or not zombie.getModData then
-        return false
-    end
-    modData = zombie:getModData()
-    return modData and modData.PNC_NPC == true
-end
-
 function Perception.CanSeeWorldObject(record, targetObject)
     local observer
     local cell
@@ -139,7 +130,7 @@ local function collectEnemyZombies(record, radius)
     zombies = Spatial.QueryZombies(record.x, record.y, radius)
     for i = 1, #zombies do
         zombie = zombies[i]
-        if zombie and (not zombie:isDead()) and (not isManagedNPCBody(zombie)) and math.abs(zombie:getZ() - record.z) < 1 then
+        if zombie and (not zombie:isDead()) and (not Core.IsManagedNPCBody(zombie)) and math.abs(zombie:getZ() - record.z) < 1 then
             distSq = Core.DistanceSq(record.x, record.y, zombie:getX(), zombie:getY())
             visible, visibilityKind = Perception.CanSeeWorldObject(record, zombie)
             if distSq <= (radius * radius) and visible then

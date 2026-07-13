@@ -64,15 +64,6 @@ local function requestCombatFacing(record, zombie, target, leaseMs, reason)
     end
 end
 
-local function isManagedNPCBody(zombie)
-    local modData
-    if not zombie or not zombie.getModData then
-        return false
-    end
-    modData = zombie:getModData()
-    return modData and modData.PNC_NPC == true
-end
-
 local function buildRetreatPoint(record, target, distance)
     local dx
     local dy
@@ -177,7 +168,7 @@ local function countZombiesNearPoint(x, y, z, radius)
     zombies = Spatial.QueryZombies(x, y, tonumber(radius) or 0)
     for i = 1, #zombies do
         zombie = zombies[i]
-        if zombie and (not zombie:isDead()) and (not isManagedNPCBody(zombie)) and math.abs(zombie:getZ() - z) < 1 then
+        if zombie and (not zombie:isDead()) and (not Core.IsManagedNPCBody(zombie)) and math.abs(zombie:getZ() - z) < 1 then
             distSq = Core.DistanceSq(x, y, zombie:getX(), zombie:getY())
             if distSq <= radiusSq then
                 count = count + 1

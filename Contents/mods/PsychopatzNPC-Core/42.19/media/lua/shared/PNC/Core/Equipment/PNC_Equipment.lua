@@ -3,6 +3,7 @@ PNC.Equipment = PNC.Equipment or {}
 
 local Equipment = PNC.Equipment
 local Core = PNC.Core
+local Visuals = PNC.Visuals
 local resolvePrimaryType
 local resolveModeFromPrimaryType
 
@@ -117,18 +118,6 @@ local function refreshHands(zombie)
     end
 end
 
-local function refreshModel(zombie)
-    if not zombie then
-        return
-    end
-    if zombie.resetModelNextFrame then
-        zombie:resetModelNextFrame()
-    end
-    if zombie.resetModel then
-        zombie:resetModel()
-    end
-end
-
 local function clearHands(zombie)
     if not zombie then
         return
@@ -146,29 +135,6 @@ local function clearHands(zombie)
     refreshHands(zombie)
 end
 
-local function clearAttachedItems(zombie)
-    local attachedItems
-    local i
-    local attachedItem
-    local item
-    if not zombie or not zombie.getAttachedItems then
-        return
-    end
-    attachedItems = zombie:getAttachedItems()
-    if not attachedItems or not attachedItems.size then
-        return
-    end
-    for i = attachedItems:size() - 1, 0, -1 do
-        attachedItem = attachedItems:get(i)
-        item = attachedItem and attachedItem.getItem and attachedItem:getItem() or nil
-        if item and zombie.removeAttachedItem then
-            pcall(function()
-                zombie:removeAttachedItem(item)
-            end)
-        end
-    end
-end
-
 local function clearExplicitWornItems(zombie)
     local wornItems
     local itemVisuals
@@ -183,27 +149,6 @@ local function clearExplicitWornItems(zombie)
     if itemVisuals and itemVisuals.clear then
         itemVisuals:clear()
     end
-end
-
-local function addClothingVisual(zombie, fullType)
-    local itemVisuals
-    local itemVisual
-    if not zombie or not fullType or not ItemVisual then
-        return false, "visual_api_unavailable"
-    end
-    itemVisuals = zombie.getItemVisuals and zombie:getItemVisuals() or nil
-    if not itemVisuals or not itemVisuals.add then
-        return false, "missing_item_visuals"
-    end
-    itemVisual = ItemVisual.new()
-    if itemVisual.setItemType then
-        itemVisual:setItemType(fullType)
-    end
-    if itemVisual.setClothingItemName then
-        itemVisual:setClothingItemName(fullType)
-    end
-    itemVisuals:add(itemVisual)
-    return true, "visual_added"
 end
 
 local function applyWornItems(zombie, equipment)
@@ -226,7 +171,7 @@ local function applyWornItems(zombie, equipment)
 
     for i = 1, #entries do
         entry = entries[i]
-        ok, errorMessage = addClothingVisual(zombie, entry.fullType)
+        ok, errorMessage = Visuals.AddClothingVisual(zombie, entry.fullType)
         if ok then
             appliedCount = appliedCount + 1
         else
@@ -263,7 +208,7 @@ local function applyAttachedItems(zombie, equipment)
     local ok
     local errorMessage
 
-    clearAttachedItems(zombie)
+    Visuals.ClearAttachedItems(zombie)
 
     if #entries <= 0 then
         return true, "attached:none"
@@ -419,7 +364,7 @@ function Equipment.Apply(zombie, record)
         ok = false
     end
 
-    refreshModel(zombie)
+    Visuals.RefreshModel(zombie)
     return ok, table.concat(reasons, "|")
 end
 

@@ -41,15 +41,6 @@ local function ensureZombieID(zombie)
     return tostring(modData.PNC_ZombieID)
 end
 
-local function isManagedNPCBody(zombie)
-    local modData
-    if not zombie or not zombie.getModData then
-        return false
-    end
-    modData = zombie:getModData()
-    return modData and modData.PNC_NPC == true
-end
-
 function Spatial.Rebuild()
     local zombieList
     local zombie
@@ -81,7 +72,7 @@ function Spatial.Rebuild()
 
     for i = 0, zombieList:size() - 1 do
         zombie = zombieList:get(i)
-        if zombie and (not zombie:isDead()) and (not isManagedNPCBody(zombie)) then
+        if zombie and (not zombie:isDead()) and (not Core.IsManagedNPCBody(zombie)) then
             insertCell(Spatial.ZombieCells, zombie:getX(), zombie:getY(), zombie)
             zombieID = ensureZombieID(zombie)
             if zombieID then

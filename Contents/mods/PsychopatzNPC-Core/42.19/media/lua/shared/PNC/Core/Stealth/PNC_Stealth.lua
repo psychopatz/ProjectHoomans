@@ -35,15 +35,6 @@ local function logStealthState(record, runtime, reason)
     )
 end
 
-local function isManagedNPCBody(zombie)
-    local modData
-    if not zombie or not zombie.getModData then
-        return false
-    end
-    modData = zombie:getModData()
-    return modData and modData.PNC_NPC == true
-end
-
 local function getZombieList()
     local cell
     if not getCell then
@@ -99,7 +90,7 @@ function Stealth.IsOwnerDiscovered(owner)
 
     for i = zombieList:size() - 1, 0, -1 do
         zombie = zombieList:get(i)
-        if zombie and (not zombie:isDead()) and (not isManagedNPCBody(zombie)) and math.abs(zombie:getZ() - owner:getZ()) < 1 then
+        if zombie and (not zombie:isDead()) and (not Core.IsManagedNPCBody(zombie)) and math.abs(zombie:getZ() - owner:getZ()) < 1 then
             target = zombie.getTarget and zombie:getTarget() or nil
             if target == owner then
                 return true, "owner_targeted"

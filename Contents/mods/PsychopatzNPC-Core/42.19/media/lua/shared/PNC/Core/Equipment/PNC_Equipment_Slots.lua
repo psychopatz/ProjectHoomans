@@ -229,36 +229,28 @@ function Equipment.SetSecondary(record, fullType)
     return true
 end
 
-function Equipment.SetAttached(record, location, fullType)
+local function setSlotValue(record, collectionName, location, fullType, normalizeLocation)
     local equipment
-    location = normalizeString(location)
+    location = normalizeLocation(location)
     if not record or not location then
         return false
     end
     equipment = Equipment.EnsureRecordEquipment(record)
     fullType = normalizeString(fullType)
     if fullType then
-        equipment.attached[location] = fullType
+        equipment[collectionName][location] = fullType
     else
-        equipment.attached[location] = nil
+        equipment[collectionName][location] = nil
     end
     return true
 end
 
+function Equipment.SetAttached(record, location, fullType)
+    return setSlotValue(record, "attached", location, fullType, normalizeString)
+end
+
 function Equipment.SetWorn(record, bodyLocation, fullType)
-    local equipment
-    bodyLocation = normalizeBodyLocation(bodyLocation)
-    if not record or not bodyLocation then
-        return false
-    end
-    equipment = Equipment.EnsureRecordEquipment(record)
-    fullType = normalizeString(fullType)
-    if fullType then
-        equipment.worn[bodyLocation] = fullType
-    else
-        equipment.worn[bodyLocation] = nil
-    end
-    return true
+    return setSlotValue(record, "worn", bodyLocation, fullType, normalizeBodyLocation)
 end
 
 function Equipment.ResolveAttachedSlotType(location)

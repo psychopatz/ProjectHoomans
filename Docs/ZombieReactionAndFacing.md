@@ -1,5 +1,7 @@
 # Zombie Reaction And Facing
 
+Zombie aggro pumping is organized as a thin world-list loop plus one-zombie handlers for reaction settling, bite ownership, stealth suppression, target acquisition, and pursuit. Keep those phases separate so engine hit recovery cannot accidentally fall through into retargeting or bite startup.
+
 ## Ownership
 
 - `PNC_Combat_ZombieReaction.lua` owns short NPC-on-zombie shove and hit

@@ -3,7 +3,6 @@ PNC.Visuals = PNC.Visuals or {}
 
 local Visuals = PNC.Visuals
 local Profiles = PNC.VisualProfiles
-local Equipment = PNC.Equipment
 
 local function normalizeBodyLocation(value)
     local lowered
@@ -73,7 +72,7 @@ local function clearBodySoiledState(humanVisual)
     end
 end
 
-local function clearAttachedItems(zombie)
+function Visuals.ClearAttachedItems(zombie)
     local attachedItems
     local i
     local entry
@@ -82,19 +81,21 @@ local function clearAttachedItems(zombie)
         return
     end
     attachedItems = zombie:getAttachedItems()
-    if not attachedItems then
+    if not attachedItems or not attachedItems.size then
         return
     end
     for i = attachedItems:size() - 1, 0, -1 do
         entry = attachedItems:get(i)
         item = entry and entry.getItem and entry:getItem() or nil
         if item and zombie.removeAttachedItem then
-            zombie:removeAttachedItem(item)
+            pcall(function()
+                zombie:removeAttachedItem(item)
+            end)
         end
     end
 end
 
-local function refreshModel(zombie)
+function Visuals.RefreshModel(zombie)
     if not zombie then
         return
     end
@@ -121,15 +122,15 @@ local function safeSetWornItem(zombie, item)
     end)
 end
 
-local function addClothingVisual(zombie, fullType)
+function Visuals.AddClothingVisual(zombie, fullType)
     local itemVisuals
     local itemVisual
     if not zombie or not fullType or not ItemVisual then
-        return false
+        return false, "visual_api_unavailable"
     end
     itemVisuals = zombie.getItemVisuals and zombie:getItemVisuals() or nil
     if not itemVisuals or not itemVisuals.add then
-        return false
+        return false, "missing_item_visuals"
     end
     itemVisual = ItemVisual.new()
     if itemVisual.setItemType then
@@ -139,10 +140,11 @@ local function addClothingVisual(zombie, fullType)
         itemVisual:setClothingItemName(fullType)
     end
     itemVisuals:add(itemVisual)
-    return true
+    return true, "visual_added"
 end
 
 local function applyBaseOutfitItems(zombie, appearance)
+    local equipment = PNC.Equipment
     local items
     local i
     local item
@@ -151,12 +153,12 @@ local function applyBaseOutfitItems(zombie, appearance)
         return
     end
     items = appearance.outfitItems
-    if type(items) ~= "table" or not Equipment or not Equipment.CreateItem then
+    if type(items) ~= "table" or not equipment or not equipment.CreateItem then
         return
     end
     for i = 1, #items do
-        if not addClothingVisual(zombie, items[i]) then
-            item, reason = Equipment.CreateItem(items[i])
+        if not Visuals.AddClothingVisual(zombie, items[i]) then
+            item, reason = equipment.CreateItem(items[i])
             if item then
                 safeSetWornItem(zombie, item)
             elseif reason and reason ~= "invalid_full_type" then
@@ -190,7 +192,7 @@ function Visuals.ApplyResolvedAppearance(zombie, appearance, isFemale)
         wornItems:clear()
     end
 
-    clearAttachedItems(zombie)
+    Visuals.ClearAttachedItems(zombie)
     clearBodySoiledState(humanVisual)
 
     if zombie.dressInNamedOutfit then
@@ -219,7 +221,7 @@ function Visuals.ApplyResolvedAppearance(zombie, appearance, isFemale)
         end
     end
 
-    refreshModel(zombie)
+    Visuals.RefreshModel(zombie)
 end
 
 function Visuals.ApplyHumanVisuals(zombie, record)

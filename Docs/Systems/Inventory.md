@@ -30,3 +30,7 @@
 - does not broadcast packets directly
 - does not decide AI jobs
 - does not materialize world items on its own
+
+## Load-Order Contract
+- skill-derived carry capacity resolves `PNC.Skills` when inventory creation runs, because inventory is loaded before the skills subsystem during shared bootstrap
+- do not capture later-loaded collaborators in file-local variables at module load time

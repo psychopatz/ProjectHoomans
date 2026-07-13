@@ -34,8 +34,7 @@ function Internal.getZombieModData(zombie)
 end
 
 function Internal.isManagedNPCBody(zombie)
-    local modData = Internal.getZombieModData(zombie)
-    return modData and modData.PNC_NPC == true
+    return Core.IsManagedNPCBody(zombie)
 end
 
 function Internal.clearZombieTarget(zombie)

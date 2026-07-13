@@ -5,7 +5,6 @@ local Inventory = PNC.Inventory
 local Core = PNC.Core
 local Archetypes = PNC.Archetypes
 local Identity = PNC.Identity
-local Skills = PNC.Skills
 
 local ITEM_WEIGHT_CACHE = {}
 local ITEM_CAPACITY_CACHE = {}
@@ -277,8 +276,9 @@ local function buildIdentityTemplate(record)
 end
 
 local function buildBaseCarryWeight(record)
-    local strength = Skills and Skills.GetLevel and Skills.GetLevel(record, "Strength") or 2
-    local fitness = Skills and Skills.GetLevel and Skills.GetLevel(record, "Fitness") or 2
+    local skills = PNC.Skills
+    local strength = skills and skills.GetLevel and skills.GetLevel(record, "Strength") or 2
+    local fitness = skills and skills.GetLevel and skills.GetLevel(record, "Fitness") or 2
     return math.max(6, 6 + (tonumber(strength) or 0) + ((tonumber(fitness) or 0) * 0.5))
 end
 
@@ -834,61 +834,100 @@ function Inventory.SyncFromEquipment(record, reason)
     return record.inventory
 end
 
+local function applyAddOperation(record, inv, op)
+    local item
+    if type(op.item) ~= "table" then
+        return nil
+    end
+    item = createItem(record, inv, op.item)
+    if not item then
+        return nil
+    end
+    return buildOperation("add", {
+        item = itemToPayload(item),
+        container = item.container,
+    })
+end
+
+local function applyMoveOperation(inv, op)
+    local itemID = normalizeString(op.itemID)
+    local destination = normalizeString(op.to)
+    local item
+    if not itemID or not destination then
+        return nil
+    end
+    item = inv.items[op.itemID]
+    if not item or not setItemContainer(inv, item, op.to) then
+        return nil
+    end
+    return buildOperation("move", {
+        itemID = item.id,
+        to = item.container,
+    })
+end
+
+local function applyRemoveOperation(inv, op)
+    local itemID = normalizeString(op.itemID)
+    if not itemID or not inv.items[op.itemID] or not removeItemByID(inv, op.itemID) then
+        return nil
+    end
+    return buildOperation("remove", { itemID = op.itemID })
+end
+
+local function applyUpdateOperation(inv, op)
+    local itemID = normalizeString(op.itemID)
+    local item = itemID and inv.items[op.itemID] or nil
+    if not item then
+        return nil
+    end
+    if op.stack ~= nil then
+        item.stack = math.max(1, math.floor(tonumber(op.stack) or item.stack or 1))
+    end
+    if op.uses ~= nil then
+        item.uses = tonumber(op.uses)
+    end
+    if op.cond ~= nil then
+        item.cond = tonumber(op.cond)
+    end
+    return buildOperation("update", {
+        itemID = item.id,
+        stack = item.stack,
+        uses = item.uses,
+        cond = item.cond,
+    })
+end
+
+local function applyInventoryOperation(record, inv, op)
+    if type(op) ~= "table" then
+        return nil
+    end
+    if op.op == "add" then
+        return applyAddOperation(record, inv, op)
+    end
+    if op.op == "move" then
+        return applyMoveOperation(inv, op)
+    end
+    if op.op == "remove" then
+        return applyRemoveOperation(inv, op)
+    end
+    if op.op == "update" then
+        return applyUpdateOperation(inv, op)
+    end
+    return nil
+end
+
 function Inventory.ApplyDelta(record, ops, reason)
     local inv = Inventory.EnsureRecordInventory(record)
     local appliedOps = {}
     local i
-    local op
-    local item
+    local applied
     if type(ops) ~= "table" then
         return false
     end
     for i = 1, #ops do
-        op = ops[i]
-        if type(op) == "table" then
-            if op.op == "add" and type(op.item) == "table" then
-                item = createItem(record, inv, op.item)
-                if item then
-                    appliedOps[#appliedOps + 1] = buildOperation("add", {
-                        item = itemToPayload(item),
-                        container = item.container,
-                    })
-                end
-            elseif op.op == "move" and normalizeString(op.itemID) and normalizeString(op.to) then
-                item = inv.items[op.itemID]
-                if item and setItemContainer(inv, item, op.to) then
-                    appliedOps[#appliedOps + 1] = buildOperation("move", {
-                        itemID = item.id,
-                        to = item.container,
-                    })
-                end
-            elseif op.op == "remove" and normalizeString(op.itemID) then
-                item = inv.items[op.itemID]
-                if item and removeItemByID(inv, op.itemID) then
-                    appliedOps[#appliedOps + 1] = buildOperation("remove", {
-                        itemID = op.itemID,
-                    })
-                end
-            elseif op.op == "update" and normalizeString(op.itemID) then
-                item = inv.items[op.itemID]
-                if item then
-                    if op.stack ~= nil then
-                        item.stack = math.max(1, math.floor(tonumber(op.stack) or item.stack or 1))
-                    end
-                    if op.uses ~= nil then
-                        item.uses = tonumber(op.uses)
-                    end
-                    if op.cond ~= nil then
-                        item.cond = tonumber(op.cond)
-                    end
-                    appliedOps[#appliedOps + 1] = buildOperation("update", {
-                        itemID = item.id,
-                        stack = item.stack,
-                        uses = item.uses,
-                        cond = item.cond,
-                    })
-                end
-            end
+        applied = applyInventoryOperation(record, inv, ops[i])
+        if applied then
+            appliedOps[#appliedOps + 1] = applied
         end
     end
     if #appliedOps <= 0 then

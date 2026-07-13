@@ -25,6 +25,15 @@ function Core.IsAuthority()
     return not Core.IsClientOnly()
 end
 
+function Core.IsManagedNPCBody(zombie)
+    local modData
+    if not zombie or not zombie.getModData then
+        return false
+    end
+    modData = zombie:getModData()
+    return modData and modData.PNC_NPC == true
+end
+
 function Core.Now()
     return nowMillis()
 end

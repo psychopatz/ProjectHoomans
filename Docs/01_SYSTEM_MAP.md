@@ -1,7 +1,7 @@
 # System Map
 
 ## Shared Core
-- `PNC_Core`: environment helpers, time, players, logging
+- `PNC_Core`: environment helpers, time, players, logging, and the canonical managed-NPC-body predicate
 - `PNC_Archetypes`: self-registering archetype registry plus preload-safe archetype bundle application
 - `PNC_ArchetypeLoader`: imports registered archetype modules, applies pending bundles, and logs bootstrap health
 - `PNC_Identity_Factory`: `SurvivorFactory`-first identity resolution
@@ -13,6 +13,7 @@
 - `PNC_Stealth`: follow-stealth state and stealth-based combat suppression
 - `PNC_Perception`: target selection, zombie lookup, and nearby threat counting
 - `PNC_Stamina`: stamina authority, recovery, attack costs, and visibility timers
+- `PNC_Visuals`: owns appearance application and reusable body-visual operations such as clothing visuals, attached-item cleanup, and model refresh
 - `PNC_Animation`: single animation state writer
 - `PNC_Health`: custom HP, incapacitation, death ownership
 - `PNC_Combat`: combat entry
@@ -42,6 +43,12 @@
 - reusable archetype definitions, translation files, clothing XML, and other version-agnostic content belong in `common/media/...`
 - `42.16/media/...` should hold only build-specific runtime Lua and assets that genuinely differ by Project Zomboid version
 - common archetype definition files must store declarative bundles only; runtime registry ownership stays in the versioned core loader/registry
+
+## Ownership and Load-Order Rules
+- use `PNC.Core.IsManagedNPCBody` instead of defining subsystem-local checks for the `PNC_NPC` body marker
+- equipment describes and applies loadout state, but reusable model and clothing-visual mutations belong to `PNC_Visuals`
+- modules required before one of their collaborators must resolve that collaborator from `PNC` at call time; do not capture a not-yet-loaded table in a file-local variable
+- multi-job behavior entry points dispatch to one handler per job so follow, guard, and patrol control flow remains independently testable
 
 ## Server
 - `PNC_Server`: authority tick, full sync, debug commands
