@@ -25,6 +25,8 @@ local function randomFraction()
 end
 
 local function normalizeOrder(record, spec)
+    local pauseMinMs = math.max(0, tonumber(spec.pauseMinMs) or Const.ROAM_PAUSE_MIN_MS)
+    local pauseMaxMs = math.max(pauseMinMs, tonumber(spec.pauseMaxMs) or Const.ROAM_PAUSE_MAX_MS)
     return {
         kind = Const.ORDER_ROAM,
         roamMode = tostring(spec.roamMode or Const.ROAM_MODE_AREA),
@@ -35,6 +37,8 @@ local function normalizeOrder(record, spec)
         targetRadius = math.max(1, tonumber(spec.targetRadius) or Const.ROAM_TARGET_RADIUS),
         reachedDistance = math.max(0.1, tonumber(spec.reachedDistance) or Const.ROAM_REACHED_DISTANCE),
         moveMode = tostring(spec.moveMode or "walk"),
+        pauseMinMs = pauseMinMs,
+        pauseMaxMs = pauseMaxMs,
     }
 end
 
@@ -55,6 +59,25 @@ local function chooseAreaGoal(record, order, state)
     state.goalZ = centerZ
 end
 
+local function areaStateChanged(record, order, state)
+    return state.centerX ~= (tonumber(order.x) or record.anchorX or record.x)
+        or state.centerY ~= (tonumber(order.y) or record.anchorY or record.y)
+        or state.centerZ ~= (tonumber(order.z) or record.anchorZ or record.z)
+        or state.radius ~= math.max(0.5, tonumber(order.radius) or Const.ROAM_DEFAULT_RADIUS)
+end
+
+local function beginAreaPause(record, zombie, order, state, now)
+    local pauseMinMs = math.max(0, tonumber(order.pauseMinMs) or Const.ROAM_PAUSE_MIN_MS)
+    local pauseMaxMs = math.max(pauseMinMs, tonumber(order.pauseMaxMs) or Const.ROAM_PAUSE_MAX_MS)
+    if pauseMaxMs <= 0 then return false end
+
+    state.waitUntil = now + pauseMinMs + (randomFraction() * (pauseMaxMs - pauseMinMs))
+    Common.ClearCombatTarget(record, "roam_pausing")
+    Common.HaltMovement(record, zombie, "roam_pause")
+    record.activeBehavior = "Roam:area:idle"
+    return true
+end
+
 local function areaMode(record, zombie, order)
     record.runtime = record.runtime or {}
     local targetRadius = math.max(1, tonumber(order.targetRadius) or Const.ROAM_TARGET_RADIUS)
@@ -68,13 +91,22 @@ local function areaMode(record, zombie, order)
     local state = record.runtime.roaming or {}
     record.runtime.roaming = state
     local reachedDistance = math.max(0.1, tonumber(order.reachedDistance) or Const.ROAM_REACHED_DISTANCE)
-    if not state.goalX
-        or state.centerX ~= (tonumber(order.x) or record.anchorX or record.x)
-        or state.centerY ~= (tonumber(order.y) or record.anchorY or record.y)
-        or state.centerZ ~= (tonumber(order.z) or record.anchorZ or record.z)
-        or state.radius ~= math.max(0.5, tonumber(order.radius) or Const.ROAM_DEFAULT_RADIUS)
-        or Core.Distance(record.x, record.y, state.goalX, state.goalY) <= reachedDistance
-    then
+    local now = Core.Now()
+
+    if areaStateChanged(record, order, state) then
+        state.waitUntil = nil
+        chooseAreaGoal(record, order, state)
+    elseif state.waitUntil then
+        if now < state.waitUntil then
+            record.activeBehavior = "Roam:area:idle"
+            return true
+        end
+        state.waitUntil = nil
+        chooseAreaGoal(record, order, state)
+    elseif not state.goalX then
+        chooseAreaGoal(record, order, state)
+    elseif Core.Distance(record.x, record.y, state.goalX, state.goalY) <= reachedDistance then
+        if beginAreaPause(record, zombie, order, state, now) then return true end
         chooseAreaGoal(record, order, state)
     end
 

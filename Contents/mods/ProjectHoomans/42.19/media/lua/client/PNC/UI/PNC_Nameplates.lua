@@ -8,7 +8,9 @@ local Nameplates = PNC.Nameplates
 Nameplates.Settings = Nameplates.Settings or {
     enabled = true,
     showAIDebug = false,
+    showPathDebug = false,
 }
+if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDebug = false end
 Nameplates.State = Nameplates.State or {
     managers = {},
 }
@@ -76,6 +78,20 @@ function Nameplates.ToggleDebug()
         HaloTextHelper.addText(player, getText(messageKey))
     end
     return Settings.showAIDebug
+end
+
+function Nameplates.IsPathDebugEnabled()
+    return Settings.showPathDebug == true
+end
+
+function Nameplates.TogglePathDebug()
+    local player = getSpecificPlayer(0)
+    Settings.showPathDebug = not Settings.showPathDebug
+    if player and HaloTextHelper and HaloTextHelper.addText then
+        local messageKey = Settings.showPathDebug and "UI_PNC_PathOverlayEnabled" or "UI_PNC_PathOverlayDisabled"
+        HaloTextHelper.addText(player, getText(messageKey))
+    end
+    return Settings.showPathDebug
 end
 
 function Nameplates.DebugDescribeSnapshot(snapshot)

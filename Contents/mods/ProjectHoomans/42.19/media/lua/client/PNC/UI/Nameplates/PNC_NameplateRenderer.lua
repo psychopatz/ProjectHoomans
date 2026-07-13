@@ -7,6 +7,9 @@ local Layout = Presentation.Layout
 local Fonts = Presentation.Fonts
 
 local DEBUG_COLOR = { r = 0.8, g = 0.9, b = 1.0, a = 1.0 }
+local PATH_COLOR = { r = 0.15, g = 0.82, b = 1.0, a = 0.82 }
+local PATH_BLOCKED_COLOR = { r = 1.0, g = 0.3, b = 0.2, a = 0.9 }
+local PATH_MARKER_HALF_SIZE = 4
 
 local function drawStatusBar(manager, left, top, width, height, ratio, color, alpha, backgroundAlpha)
     manager:drawRect(
@@ -169,6 +172,49 @@ local function drawLive(manager, entry, metrics, currentTime, heartIcon, showDeb
     end
 end
 
+local function drawPathGoal(manager, entry)
+    local zombie = entry.zombie
+    local debugState = entry.snapshot and entry.snapshot.debugState
+    local goal = debugState and debugState.moveGoal
+    if not zombie or zombie:isDead() or type(goal) ~= "table" then return end
+
+    local goalX = tonumber(goal.x)
+    local goalY = tonumber(goal.y)
+    local goalZ = tonumber(goal.z)
+    if not goalX or not goalY or not goalZ then return end
+
+    local worldX = zombie:getX()
+    local worldY = zombie:getY()
+    local worldZ = zombie:getZ()
+    local startX = isoToScreenX(manager.playerIndex, worldX, worldY, worldZ) - manager.x
+    local startY = isoToScreenY(manager.playerIndex, worldX, worldY, worldZ) - manager.y
+    local endX = isoToScreenX(manager.playerIndex, goalX, goalY, goalZ) - manager.x
+    local endY = isoToScreenY(manager.playerIndex, goalX, goalY, goalZ) - manager.y
+    local color = debugState.moveBlockReason and PATH_BLOCKED_COLOR or PATH_COLOR
+
+    manager:drawLine2(startX, startY, endX, endY, color.a, color.r, color.g, color.b)
+    manager:drawLine2(
+        endX - PATH_MARKER_HALF_SIZE,
+        endY,
+        endX + PATH_MARKER_HALF_SIZE,
+        endY,
+        color.a,
+        color.r,
+        color.g,
+        color.b
+    )
+    manager:drawLine2(
+        endX,
+        endY - PATH_MARKER_HALF_SIZE,
+        endX,
+        endY + PATH_MARKER_HALF_SIZE,
+        color.a,
+        color.r,
+        color.g,
+        color.b
+    )
+end
+
 function Renderer.Render(manager, settings)
     if not settings.enabled or not manager.player then
         manager:clearStencilRect()
@@ -178,6 +224,11 @@ function Renderer.Render(manager, settings)
     local metrics = Presentation.ScaleFor(manager.playerIndex)
     local heartIcon = Presentation.GetHeartTexture()
     local currentTime = getTimeInMillis()
+    if settings.showPathDebug then
+        for _, entry in pairs(manager.entries) do
+            if not entry.debugOnly then drawPathGoal(manager, entry) end
+        end
+    end
     for _, entry in pairs(manager.entries) do
         if entry.debugOnly then
             drawDebugOnly(manager, entry, metrics)

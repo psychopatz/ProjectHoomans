@@ -80,14 +80,24 @@ function View.CreateChildren(window)
         { "audit", "UI_PNC_MonitorAuditBodies", "Audit Bodies", ISPNCNPCMonitor.onAudit, "warning" },
         { "refresh", "UI_PNC_MonitorRefresh", "Refresh", ISPNCNPCMonitor.onRefresh, "quiet" },
         { "overlay", "UI_PNC_MonitorToggleOverlay", "Toggle Overlay", ISPNCNPCMonitor.onOverlay, "quiet" },
+        { "paths", "UI_PNC_MonitorTogglePaths", "Toggle Paths", ISPNCNPCMonitor.onPathOverlay, "quiet" },
     }
     window.selectionControls = {}
     for _, action in ipairs(actions) do
+        local variant = action[5]
+        if action[1] == "paths"
+            and PNC.Nameplates
+            and PNC.Nameplates.IsPathDebugEnabled
+            and PNC.Nameplates.IsPathDebugEnabled()
+        then
+            variant = "selected"
+        end
         local button = createToolbarButton(window, {
             id = action[1], title = Support.Tr(action[2], action[3]), target = window,
-            onclick = action[4], variant = action[5],
+            onclick = action[4], variant = variant,
         }, window.footerControls)
-        if action[1] ~= "audit" and action[1] ~= "refresh" and action[1] ~= "overlay" then
+        if action[1] == "paths" then window.pathOverlayButton = button end
+        if action[1] ~= "audit" and action[1] ~= "refresh" and action[1] ~= "overlay" and action[1] ~= "paths" then
             window.selectionControls[#window.selectionControls + 1] = button
         end
     end

@@ -4,6 +4,8 @@ UI_EN = {
     UI_PNC_ToggleAIOverlay = "Toggle AI Overlay",
     UI_PNC_AIOverlayEnabled = "PNC AI Overlay: ON",
     UI_PNC_AIOverlayDisabled = "PNC AI Overlay: OFF",
+    UI_PNC_PathOverlayEnabled = "PNC Path Overlay: ON",
+    UI_PNC_PathOverlayDisabled = "PNC Path Overlay: OFF",
     UI_PNC_OrderRoamNearby = "Roam Nearby",
     UI_PNC_Spawn = "PNC Spawn",
     UI_PNC_SpawnCompanion = "Spawn Companion",
@@ -22,6 +24,7 @@ UI_EN = {
     UI_PNC_MonitorAuditBodies = "Audit Bodies",
     UI_PNC_MonitorRefresh = "Refresh",
     UI_PNC_MonitorToggleOverlay = "Toggle Overlay",
+    UI_PNC_MonitorTogglePaths = "Toggle Paths",
     UI_PNC_MonitorUnauthorized = "Debug roster unavailable or not authorized.",
     UI_PNC_MonitorSelectNPC = "Select an NPC to inspect its lifecycle.",
 }

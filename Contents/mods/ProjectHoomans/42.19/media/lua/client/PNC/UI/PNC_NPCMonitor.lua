@@ -64,6 +64,14 @@ function ISPNCNPCMonitor:onOverlay()
     if PNC.Nameplates and PNC.Nameplates.ToggleDebug then PNC.Nameplates.ToggleDebug() end
 end
 
+function ISPNCNPCMonitor:onPathOverlay()
+    if not PNC.Nameplates or not PNC.Nameplates.TogglePathDebug then return end
+    local enabled = PNC.Nameplates.TogglePathDebug()
+    if self.pathOverlayButton then
+        UI.SetButtonVariant(self.pathOverlayButton, enabled and "selected" or "quiet")
+    end
+end
+
 function ISPNCNPCMonitor:onFocus()
     local item = self:getSelectedDiagnostic()
     local body = Support.FindBody(item)

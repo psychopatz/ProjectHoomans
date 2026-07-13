@@ -128,6 +128,13 @@ local function sanitizeOrderSpec(orderSpec, record)
     if spec.reachedDistance ~= nil then
         spec.reachedDistance = math.max(0.1, normalizeNumber(spec.reachedDistance, Const.ROAM_REACHED_DISTANCE))
     end
+    if spec.pauseMinMs ~= nil then
+        spec.pauseMinMs = math.max(0, normalizeNumber(spec.pauseMinMs, Const.ROAM_PAUSE_MIN_MS))
+    end
+    if spec.pauseMaxMs ~= nil then
+        local minimum = tonumber(spec.pauseMinMs) or Const.ROAM_PAUSE_MIN_MS
+        spec.pauseMaxMs = math.max(minimum, normalizeNumber(spec.pauseMaxMs, Const.ROAM_PAUSE_MAX_MS))
+    end
     spec.roamMode = normalizeString(spec.roamMode)
     spec.moveMode = normalizeString(spec.moveMode)
     spec.ownerUsername = normalizeString(spec.ownerUsername)
