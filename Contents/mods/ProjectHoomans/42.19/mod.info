@@ -1,0 +1,8 @@
+name=ProjectHoomans
+id=ProjectHoomans
+description=Standalone server-authoritative NPC framework for Build 42.<LINE><LINE>Companion and hostile NPC foundation with live and abstract presence states.
+author=Psychopatz
+category=framework
+version=0.1.0
+versionMin=42.19
+require=PsychopatzCore

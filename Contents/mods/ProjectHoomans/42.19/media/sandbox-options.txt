@@ -1,0 +1,44 @@
+VERSION = 1,
+
+option ProjectHoomans.EnableWeaponDamage
+{
+    type = boolean,
+    default = true,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.EnableWeaponDamage,
+}
+
+option ProjectHoomans.NPCDamageDealtMultiplier
+{
+    type = double,
+    default = 1.0,
+    min = 0.0,
+    max = 10.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCDamageDealtMultiplier,
+}
+
+option ProjectHoomans.NPCPlayerWounds
+{
+    type = boolean,
+    default = true,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCPlayerWounds,
+}
+
+option ProjectHoomans.NPCAmmoConsumption
+{
+    type = boolean,
+    default = false,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCAmmoConsumption,
+}
+
+option ProjectHoomans.NPCWeaponConditionLoss
+{
+    type = boolean,
+    default = false,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCWeaponConditionLoss,
+}
+

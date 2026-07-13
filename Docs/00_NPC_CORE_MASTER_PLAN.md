@@ -1,4 +1,4 @@
-# PsychopatzNPC-Core Master Plan
+# ProjectHoomans Master Plan
 
 ## Current V1 Slice
 - server-authoritative NPC registry and persistence

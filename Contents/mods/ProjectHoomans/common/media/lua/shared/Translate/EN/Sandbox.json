@@ -1,0 +1,18 @@
+{
+    "Sandbox_ProjectHoomans": "ProjectHoomans",
+
+    "Sandbox_ProjectHoomans.EnableWeaponDamage": "Weapon-Based NPC Damage",
+    "Sandbox_ProjectHoomans.EnableWeaponDamage_tooltip": "Uses each NPC's equipped weapon damage and combat skill. Disable to use legacy combat-profile damage values.",
+
+    "Sandbox_ProjectHoomans.NPCDamageDealtMultiplier": "NPC Damage Dealt Multiplier",
+    "Sandbox_ProjectHoomans.NPCDamageDealtMultiplier_tooltip": "Scales weapon-based damage dealt by PNC NPCs. 1.0 is normal and 0 prevents weapon-based damage.",
+
+    "Sandbox_ProjectHoomans.NPCPlayerWounds": "NPC Player Wounds",
+    "Sandbox_ProjectHoomans.NPCPlayerWounds_tooltip": "Allows PNC NPC attacks to cause pain, scratches, and bleeding on players in addition to overall health loss.",
+
+    "Sandbox_ProjectHoomans.NPCAmmoConsumption": "NPC Ammo Consumption",
+    "Sandbox_ProjectHoomans.NPCAmmoConsumption_tooltip": "Requires ranged PNC NPCs to carry the firearm's ammunition in their virtual inventory and consumes one round per resolved shot.",
+
+    "Sandbox_ProjectHoomans.NPCWeaponConditionLoss": "NPC Weapon Condition Loss",
+    "Sandbox_ProjectHoomans.NPCWeaponConditionLoss_tooltip": "Allows equipped PNC NPC weapons to lose virtual condition when attacks hit."
+}

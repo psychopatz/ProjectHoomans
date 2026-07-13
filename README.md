@@ -1,4 +1,4 @@
-# PsychopatzNPC-Core
+# ProjectHoomans
 
 Standalone NPC framework for Project Zomboid Build 42.
 
