@@ -60,6 +60,7 @@ function ZombieAggro.Pump(now)
     local nearestRecord
     local nearestBody
     local nearestDistSq
+    local hitSettling
 
     if not Core.IsAuthority() or not getCell then
         return
@@ -77,7 +78,14 @@ function ZombieAggro.Pump(now)
             if ZombieReaction and ZombieReaction.Pump then
                 ZombieReaction.Pump(zombie, now)
             end
-            if ZombieAggro.UpdateBiteState(zombie, now) then
+            hitSettling = ZombieReaction
+                and ZombieReaction.IsEngineHitSettling
+                and ZombieReaction.IsEngineHitSettling(zombie, now)
+                or false
+            if hitSettling then
+                -- The engine owns hit/stagger recovery. Do not clear attackedBy,
+                -- retarget, path, or start a bite during this short window.
+            elseif ZombieAggro.UpdateBiteState(zombie, now) then
                 -- Bite flow owns the zombie while the bite is active.
             else
                 target = zombie.getTarget and zombie:getTarget() or nil

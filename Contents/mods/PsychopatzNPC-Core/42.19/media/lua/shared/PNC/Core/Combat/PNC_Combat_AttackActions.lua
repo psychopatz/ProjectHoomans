@@ -224,6 +224,7 @@ function Internal.applyDamageToZombie(record, attackerZombie, target, damage, at
         durationMs = attackType == "ranged" and 140 or 220,
         stepDistance = attackType == "ranged" and 0.02 or 0.06,
         stagger = attackType ~= "ranged",
+        settleMs = attackType == "ranged" and 420 or 650,
     }
 
     reactionManaged = ZombieReaction and ZombieReaction.ApplyWeaponHit ~= nil

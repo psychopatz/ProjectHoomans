@@ -2,6 +2,9 @@
 
 ## Shared Services
 - `PNC_Combat` is the entry layer only
+- the bootstrap explicitly loads pathing, reaction, tactics, zombie aggro, and
+  attack-action modules in dependency order; combat correctness must not rely
+  on incidental automatic Lua file ordering
 - `PNC_Combat_Melee`, `PNC_Combat_Ranged`, `PNC_Combat_AttackActions`, `PNC_Combat_Tactics`, and `PNC_Combat_Unarmed` own focused combat responsibilities
 - custom damage routes through `PNC_Health`
 - players, NPCs, and zombies use the same target format
@@ -11,8 +14,9 @@
 - attack actions explicitly release the engine bump channel when the animation
   finishes, the target is lost, or the bounded action timeout expires; release
   remains pending until the ActionContext acknowledges that it left `bumped`
-- NPC melee reactions use short server-owned, collision-aware displacement so
-  zombies visibly yield to a hit without being left permanently staggered
+- weapon hits use a short passive settlement lease: vanilla hit/stagger owns
+  animation, while PNC aggro temporarily refrains from clearing the attacker or
+  issuing path/bite commands that would freeze the reaction state
 - committed point-blank melee swings tolerate transient LOS changes during the
   windup, revalidate range at the hit frame, and verify that the engine hit
   actually changed zombie health before using authoritative fallback damage

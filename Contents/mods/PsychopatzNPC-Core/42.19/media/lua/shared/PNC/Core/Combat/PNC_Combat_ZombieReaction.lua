@@ -10,7 +10,6 @@ PNC.CombatZombieReaction = PNC.CombatZombieReaction or {}
 
 local ZombieReaction = PNC.CombatZombieReaction
 local Core = PNC.Core
-local ZombieAggro = PNC.ZombieAggro
 local TraversalQuery = PNC.TraversalQuery
 
 local PUSH_INTERVAL_MS = 45
@@ -18,6 +17,7 @@ local DEFAULT_DURATION_MS = 220
 local DEFAULT_PUSH_DURATION_MS = 150
 local DEFAULT_PUSH_DISTANCE = 0.18
 local DEFAULT_STEP_DISTANCE = 0.06
+local ENGINE_HIT_SETTLE_MS = 650
 
 local function getSquare(x, y, z)
     if not getCell then
@@ -145,9 +145,33 @@ local function beginReaction(attackerZombie, targetZombie, options)
     state.dirY = dirY
     modData.PNC_CombatReaction = state
 
-    if ZombieAggro and ZombieAggro.OnZombieProvoked and attackerZombie then
-        ZombieAggro.OnZombieProvoked(targetZombie, attackerZombie)
+    if PNC.ZombieAggro and PNC.ZombieAggro.OnZombieProvoked and attackerZombie then
+        PNC.ZombieAggro.OnZombieProvoked(targetZombie, attackerZombie)
     end
+    return true
+end
+
+local function beginEngineHitSettle(targetZombie, options)
+    local modData
+    local state
+    local now
+    if not targetZombie or targetZombie:isDead() then
+        return false
+    end
+    modData, state = getReactionState(targetZombie)
+    if not modData then
+        return false
+    end
+    now = Core.Now()
+    state = state or {}
+    state.kind = options and tostring(options.kind or "weapon_hit") or "weapon_hit"
+    state.engineOwned = true
+    state.expiresAt = math.max(
+        tonumber(state.expiresAt) or 0,
+        now + math.max(160, tonumber(options and options.settleMs) or ENGINE_HIT_SETTLE_MS)
+    )
+    state.remainingPush = 0
+    modData.PNC_CombatReaction = state
     return true
 end
 
@@ -173,12 +197,35 @@ function ZombieReaction.ApplyWeaponHit(attackerZombie, targetZombie, weaponItem,
         afterHealth = tonumber(targetZombie:getHealth()) or beforeHealth
         applied = applied == true and afterHealth < (beforeHealth - 0.0001)
     end
+    if not targetZombie:isDead() then
+        if targetZombie.setAttackedBy and attackerZombie then
+            targetZombie:setAttackedBy(attackerZombie)
+        end
+        if options and options.hitReaction and targetZombie.setHitReaction then
+            targetZombie:setHitReaction(tostring(options.hitReaction))
+        end
+        if (not options or options.stagger ~= false) and targetZombie.setStaggerBack then
+            pcall(targetZombie.setStaggerBack, targetZombie, true)
+        end
+        beginEngineHitSettle(targetZombie, options)
+    end
     -- IsoZombie:Hit owns the visible reaction. Manual movement is reserved for
     -- explicit shoves so normal hits cannot fight the engine state machine.
     if options and options.manualPush == true then
         beginReaction(attackerZombie, targetZombie, options)
     end
     return applied == true
+end
+
+function ZombieReaction.IsEngineHitSettling(targetZombie, now)
+    local _
+    local state
+    _, state = getReactionState(targetZombie)
+    if not state or state.engineOwned ~= true then
+        return false
+    end
+    now = tonumber(now) or Core.Now()
+    return now < (tonumber(state.expiresAt) or 0)
 end
 
 function ZombieReaction.Clear(targetZombie)

@@ -169,6 +169,15 @@ function Internal.forceAggro(zombie, npcBody)
     if modData then
         modData.PNC_AggroNPCId = npcId
     end
+    -- Preserve the attacker and action-state context installed by
+    -- IsoZombie:Hit(). Clearing either during the hit frame prevents vanilla
+    -- stagger from entering or exiting correctly.
+    if PNC.CombatZombieReaction
+        and PNC.CombatZombieReaction.IsEngineHitSettling
+        and PNC.CombatZombieReaction.IsEngineHitSettling(zombie)
+    then
+        return
+    end
     if zombie.setTarget then
         zombie:setTarget(nil)
     end

@@ -26,8 +26,11 @@
   direction.
 - Retreat movement does not renew combat-facing leases; NPCs face their travel
   direction instead of fighting the movement controller or fake-backpedaling.
-- Zombie hit reaction selectors are written once at impact and stagger flags
-  are cleared when the short reaction lease expires.
+- Weapon hits let `IsoZombie:Hit()` own the victim's reaction state. PNC keeps
+  only a passive settlement window and does not clear `attackedBy`, retarget,
+  repath, or start a bite until the engine has consumed the hit context.
+- Hit reaction selectors and melee stagger intent are applied after the engine
+  hit call. PNC never clears the engine-owned stagger flag on lease expiry.
 - Snapshot `visualState` mirrors the resolved motion profile fields so nearby
   clients replay the same walk, run, sneak, and crawl choice instead of
   inferring posture from reduced hints.

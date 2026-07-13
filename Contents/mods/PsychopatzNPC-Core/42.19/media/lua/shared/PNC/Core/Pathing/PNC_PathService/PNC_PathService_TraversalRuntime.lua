@@ -17,6 +17,19 @@ local LiveBodyControl = PNC.LiveBodyControl
 local TRAVERSAL_FINISHED_VARIABLE = "PNCTraversalFinished"
 local TRAVERSAL_KIND_VARIABLE = "PNCTraversalKind"
 
+local function clamp01(value)
+    return math.max(0, math.min(1, tonumber(value) or 0))
+end
+
+local function easeInOut(progress)
+    progress = clamp01(progress)
+    if progress < 0.5 then
+        return 2 * progress * progress
+    end
+    local inverse = (-2 * progress) + 2
+    return 1 - ((inverse * inverse) * 0.5)
+end
+
 local function isBumpFinished(zombie)
     local value
     if not zombie then
@@ -65,6 +78,20 @@ local function resetTraversalVariables(zombie)
     zombie:setVariable(TRAVERSAL_KIND_VARIABLE, "")
 end
 
+local function resetEngineTraversalVariables(zombie, kind)
+    if not zombie or not zombie.setVariable then
+        return
+    end
+    if kind == "fence_climb" then
+        zombie:setVariable("ClimbFenceStarted", false)
+        zombie:setVariable("ClimbFenceFinished", true)
+        zombie:setVariable("ClimbFenceOutcome", "")
+    elseif kind == "window_climb" then
+        zombie:setVariable("ClimbWindowStarted", false)
+        zombie:setVariable("ClimbWindowOutcome", "")
+    end
+end
+
 function Internal.clearTraversalAction(zombie, lane, reason)
     if not lane then
         return
@@ -78,6 +105,9 @@ function Internal.clearTraversalAction(zombie, lane, reason)
     lane.specialAnim = nil
     lane.ownerMode = "fake_locomotion"
     lane.lastTraversalFinishReason = reason or "completed"
+    if lane.lastSpecialActionKey then
+        lane.lastSpecialActionAt = Internal.Core.Now()
+    end
 end
 
 function Internal.beginTraversalAction(zombie, record, lane, spec)
@@ -91,10 +121,9 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
     now = Internal.Core.Now()
     travelDurationMs = math.max(250, tonumber(spec.travelDurationMs) or 600)
     finishHoldMs = math.max(120, tonumber(spec.finishHoldMs) or 320)
-    -- Animation events own normal completion. This deadline is deliberately
-    -- generous and exists only to release a body if the engine drops the XML
-    -- End event entirely.
-    hardTimeoutMs = math.max(4000, travelDurationMs + finishHoldMs + 2000)
+    -- Completion events are preferred, but a missing event must never pin an
+    -- NPC on the obstacle for several seconds.
+    hardTimeoutMs = travelDurationMs + math.min(finishHoldMs, 320)
     lane.traversalAction = {
         kind = tostring(spec.kind or "traversal"),
         anim = tostring(spec.anim or "PNC_ClimbFence"),
@@ -106,7 +135,6 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
         endZ = tonumber(spec.toZ) or zombie:getZ(),
         startedAt = now,
         travelDurationMs = travelDurationMs,
-        earliestFinishAt = now + travelDurationMs,
         hardFinishAt = now + hardTimeoutMs,
         sawBumpState = false,
     }
@@ -137,6 +165,7 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
     if LiveBodyControl and LiveBodyControl.SuppressZombieState then
         LiveBodyControl.SuppressZombieState(zombie, lane, now)
     end
+    resetEngineTraversalVariables(zombie, lane.traversalAction.kind)
     if Internal.applyFacingLocation then
         Internal.applyFacingLocation(zombie, lane, lane.traversalAction.endX, lane.traversalAction.endY, now, "traversal", true)
     end
@@ -145,11 +174,22 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
     elseif zombie.setBumpType then
         zombie:setBumpType(lane.traversalAction.anim)
     end
-    if Internal.MotionHints and Internal.MotionHints.RememberHold then
-        Internal.MotionHints.RememberHold(lane, lane.traversalAction.startX, lane.traversalAction.startY, lane.traversalAction.startZ, now, hardTimeoutMs, {
-            kind = lane.traversalAction.kind .. "_hold",
-            profile = lane.motionProfile,
-        })
+    if Internal.MotionHints and Internal.MotionHints.Remember then
+        Internal.MotionHints.Remember(
+            lane,
+            lane.traversalAction.startX,
+            lane.traversalAction.startY,
+            lane.traversalAction.startZ,
+            lane.traversalAction.endX,
+            lane.traversalAction.endY,
+            lane.traversalAction.endZ,
+            now,
+            {
+                durationMs = travelDurationMs,
+                kind = lane.traversalAction.kind,
+                profile = lane.motionProfile,
+            }
+        )
     end
     return true
 end
@@ -160,6 +200,11 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     local timedOut
     local finishReason
     local actionState
+    local progress
+    local eased
+    local nextX
+    local nextY
+    local nextZ
     if not action then
         return false, nil
     end
@@ -177,12 +222,14 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     if zombie.setTarget then
         zombie:setTarget(nil)
     end
-    -- The animation owns the visible hop while the authoritative transform is
-    -- pinned to takeoff.  Committing early makes fake locomotion visibly slide
-    -- through the obstacle before the body finishes vaulting it.
-    zombie:setX(tonumber(action.startX) or zombie:getX())
-    zombie:setY(tonumber(action.startY) or zombie:getY())
-    zombie:setZ(tonumber(action.startZ) or zombie:getZ())
+    progress = clamp01((now - (tonumber(action.startedAt) or now)) / math.max(1, tonumber(action.travelDurationMs) or 1))
+    eased = easeInOut(progress)
+    nextX = (tonumber(action.startX) or zombie:getX()) + (((tonumber(action.endX) or zombie:getX()) - (tonumber(action.startX) or zombie:getX())) * eased)
+    nextY = (tonumber(action.startY) or zombie:getY()) + (((tonumber(action.endY) or zombie:getY()) - (tonumber(action.startY) or zombie:getY())) * eased)
+    nextZ = (tonumber(action.startZ) or zombie:getZ()) + (((tonumber(action.endZ) or zombie:getZ()) - (tonumber(action.startZ) or zombie:getZ())) * eased)
+    zombie:setX(nextX)
+    zombie:setY(nextY)
+    zombie:setZ(nextZ)
     Internal.syncRecordPosition(record, zombie)
     lane.lastProgressAt = now
     lane.lastIssueAt = now
@@ -193,25 +240,21 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     finished = isTraversalFinished(zombie, action)
     if not finished
         and action.sawBumpState == true
-        and now >= (tonumber(action.earliestFinishAt) or now)
+        and progress >= 1
         and actionState ~= "bumped"
     then
         finished = true
     end
     timedOut = now >= (tonumber(action.hardFinishAt) or now)
-    if not finished and not timedOut then
+    if progress < 1 then
         return true, action.kind
     end
     zombie:setX(tonumber(action.endX) or zombie:getX())
     zombie:setY(tonumber(action.endY) or zombie:getY())
     zombie:setZ(tonumber(action.endZ) or zombie:getZ())
     Internal.syncRecordPosition(record, zombie)
-    if Internal.MotionHints and Internal.MotionHints.Remember then
-        Internal.MotionHints.Remember(lane, action.startX, action.startY, action.startZ, action.endX, action.endY, action.endZ, now, {
-            durationMs = 140,
-            kind = action.kind .. "_commit",
-            profile = lane.motionProfile,
-        })
+    if not finished and not timedOut then
+        return true, action.kind .. "_finish"
     end
     finishReason = finished and "anim_finished" or "hard_timeout"
     if finishReason == "hard_timeout" and Internal.logMoveWarning then

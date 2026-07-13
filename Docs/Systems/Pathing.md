@@ -6,14 +6,14 @@
 - live NPCs can open doors and use windows when the path stalls near an obstacle
 - fence hopping uses the same server-owned traversal lease, repeat suppression,
   landing validation, and client motion hints as window traversal
-- fence and window climbs use a two-phase server-owned hold/commit action: the
-  logical position remains at takeoff while the XML hop plays, then moves to
-  the exact landing square only after the PNC-only `PNCTraversalFinished`
-  signal; all traversal XML publishes completion at the true animation `End`,
-  with a long recovery-only timeout for dropped engine events
-- traversal bump types and variables are PNC-only; vanilla climb-start/outcome
-  variables are never written because they enter Java states that assume body
-  systems unavailable on embodied zombie NPCs
+- fence and window climbs use one eased server-owned transport segment aligned
+  with the hop animation; ordinary locomotion remains blocked until the XML
+  `PNCTraversalFinished` signal or a short bounded missing-event fallback
+- traversal completion refreshes the obstacle cooldown so a newly refreshed
+  follow/combat goal cannot immediately hop back across the same fence
+- traversal bump types and completion variables are PNC-only; stale vanilla
+  climb-start/outcome variables are reset only when adopting an accidental
+  engine climb state, before the PNC bump takes ownership
 - fresh follow/combat goals remain pending while traversal owns the body; they
   cannot cancel the bump or restart fake locomotion midway across a passage
 - doors and windows are considered opened only after their engine state reports
@@ -27,7 +27,9 @@
 - combat target stickiness now reduces target thrash so embodied NPCs do not keep stop-stepping between nearby zombies every tick
 - `PNC_LocomotionProfiles` now resolves transport speed, anim cadence, walk family, and crawl/sneak selectors once per lane so fake movement and animation stay in lockstep
 - combat only borrows facing through short path-service leases; normal movement keeps body facing aligned to travel direction
-- the server now emits optional `visualState.motionHint` segments so clients interpolate within a server-authored move/traversal window instead of inferring transport locally
+- the server emits incremental `visualState.motionHint` segments for traversal
+  so remote clients follow the same eased authoritative hop without stretching
+  every small network delta over the entire animation duration
 - door opens, window opens, and window climbs stay server-owned and publish short traversal leases so client smoothing does not fight passage interactions
 - door/window handling is obstacle-driven, not opportunistic: the lane only evaluates traversal after a blocked fake step or a short no-progress stall
 - traversal candidates must be ahead of the goal-facing lane, improve distance toward the live goal, and avoid immediate re-cross of the same obstacle from the same side

@@ -137,9 +137,6 @@ function MotionHints.BuildNetworkHint(record, lane, now)
     if currentX == nil or currentY == nil or currentZ == nil then
         return nil
     end
-    if hint and hint.kind == "window_climb" then
-        return copyHint(hint)
-    end
     lastX = lane.lastNetworkX ~= nil and tonumber(lane.lastNetworkX) or nil
     lastY = lane.lastNetworkY ~= nil and tonumber(lane.lastNetworkY) or nil
     lastZ = lane.lastNetworkZ ~= nil and tonumber(lane.lastNetworkZ) or nil
@@ -155,7 +152,9 @@ function MotionHints.BuildNetworkHint(record, lane, now)
             currentZ,
             tonumber(lane.lastNetworkAt) or ((tonumber(now) or Core.Now()) - durationMs),
             {
-                durationMs = math.max(tonumber(hint and hint.durationMs) or 0, durationMs),
+                durationMs = (hint and (hint.kind == "fence_climb" or hint.kind == "window_climb"))
+                    and durationMs
+                    or math.max(tonumber(hint and hint.durationMs) or 0, durationMs),
                 kind = hint and hint.kind or (lane.specialAnim and "special" or "move"),
                 profile = lane.motionProfile,
             }
