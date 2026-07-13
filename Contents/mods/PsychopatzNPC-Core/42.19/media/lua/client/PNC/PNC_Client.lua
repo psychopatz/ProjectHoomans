@@ -19,6 +19,69 @@ local function isWorldReady()
     return (not isIngameState) or isIngameState()
 end
 
+local function applyZombieReaction(args)
+    local targetZombie
+    local attackerZombie
+    local reaction
+    if not args then
+        return false
+    end
+    targetZombie = PNC.Network and PNC.Network.FindZombieByOnlineID
+        and PNC.Network.FindZombieByOnlineID(args.targetOnlineID) or nil
+    if not targetZombie then
+        return false
+    end
+    attackerZombie = PNC.Network and PNC.Network.FindZombieByOnlineID
+        and PNC.Network.FindZombieByOnlineID(args.attackerOnlineID) or nil
+    reaction = PNC.CombatZombieReaction
+    if not reaction or not reaction.ApplyReplicatedHit then
+        return false
+    end
+    return reaction.ApplyReplicatedHit(attackerZombie, targetZombie, args)
+end
+
+local function applyZombieBite(args)
+    local attackerZombie
+    local targetNPCBody
+    local currentBumpType
+    if not args or not PNC.Network or not PNC.Network.FindZombieByOnlineID then
+        return false
+    end
+    attackerZombie = PNC.Network.FindZombieByOnlineID(args.attackerOnlineID)
+    if not attackerZombie then
+        return false
+    end
+    currentBumpType = attackerZombie.getBumpType and attackerZombie:getBumpType() or ""
+    if args.phase == "clear" then
+        if currentBumpType == "Bite" or currentBumpType == "BiteLow" then
+            if attackerZombie.setBumpDone then
+                attackerZombie:setBumpDone(true)
+            end
+            if attackerZombie.setBumpType then
+                attackerZombie:setBumpType("")
+            end
+        end
+        return true
+    end
+    targetNPCBody = PNC.Network.FindZombieByOnlineID(args.targetOnlineID)
+    if not targetNPCBody and PNC.ClientPresenceSync and PNC.ClientPresenceSync.BodyByID then
+        targetNPCBody = PNC.ClientPresenceSync.BodyByID[tostring(args.npcId or "")]
+    end
+    if targetNPCBody and attackerZombie.faceThisObject then
+        attackerZombie:faceThisObject(targetNPCBody)
+    end
+    if targetNPCBody and attackerZombie.setBumpedChr then
+        attackerZombie:setBumpedChr(targetNPCBody)
+    end
+    if attackerZombie.setBumpDone then
+        attackerZombie:setBumpDone(false)
+    end
+    if attackerZombie.setBumpType then
+        attackerZombie:setBumpType(tostring(args.bumpType or "Bite"))
+    end
+    return true
+end
+
 local function requestFullSync()
     local player = getSpecificPlayer(0)
     if not isWorldReady() then
@@ -73,6 +136,14 @@ function Client.HandleServerCommand(command, args)
     local snapshot
     local i
     ClientState.lastSyncReceiveAt = Core.Now()
+    if command == Const.CMD_ZOMBIE_REACTION then
+        applyZombieReaction(args)
+        return
+    end
+    if command == Const.CMD_ZOMBIE_BITE then
+        applyZombieBite(args)
+        return
+    end
     if command == Const.CMD_FULL_SYNC then
         ClientState.snapshots = {}
         ClientState.characterPayloads = {}

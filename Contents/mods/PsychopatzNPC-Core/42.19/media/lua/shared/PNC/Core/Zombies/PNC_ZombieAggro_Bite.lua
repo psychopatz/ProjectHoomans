@@ -17,14 +17,28 @@ end
 
 local function clearBiteEntry(zombieId, npcBody)
     local entry
+    local attackerZombie
+    local currentBumpType
     if not zombieId or not State.bites then
         return
     end
     entry = State.bites[zombieId]
-    if entry and entry.npcBody and entry.npcBody.setZombiesDontAttack then
-        entry.npcBody:setZombiesDontAttack(false)
-    elseif npcBody and npcBody.setZombiesDontAttack then
+    attackerZombie = entry and entry.zombie or nil
+    npcBody = entry and entry.npcBody or npcBody
+    if npcBody and npcBody.setZombiesDontAttack then
         npcBody:setZombiesDontAttack(false)
+    end
+    currentBumpType = attackerZombie and attackerZombie.getBumpType and attackerZombie:getBumpType() or ""
+    if attackerZombie and (currentBumpType == "Bite" or currentBumpType == "BiteLow") then
+        if attackerZombie.setBumpDone then
+            attackerZombie:setBumpDone(true)
+        end
+        if attackerZombie.setBumpType then
+            attackerZombie:setBumpType("")
+        end
+    end
+    if entry and PNC.Network and PNC.Network.BroadcastZombieBite then
+        PNC.Network.BroadcastZombieBite(attackerZombie, npcBody, entry.npcId, "clear", entry.bumpType)
     end
     State.bites[zombieId] = nil
 end
@@ -51,6 +65,7 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
     local zombieId
     local asn
     local bumpType
+    local now
 
     if not zombie or not npcBody or not record then
         return false
@@ -66,35 +81,55 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
 
     asn = zombie.getActionStateName and zombie:getActionStateName() or ""
     bumpType = zombie.getBumpType and zombie:getBumpType() or ""
-    if asn == "staggerback" or bumpType == "Bite" or bumpType == "BiteLow" then
+    if asn == "staggerback" then
         return false
     end
-
+    -- Repair stale bite flags left by an interrupted/older bite before starting
+    -- a fresh bounded state.
+    if bumpType == "Bite" or bumpType == "BiteLow" then
+        if zombie.setBumpDone then
+            zombie:setBumpDone(true)
+        end
+        if zombie.setBumpType then
+            zombie:setBumpType("")
+        end
+    end
+    now = Core.Now()
+    if Internal.canZombieAttack and not Internal.canZombieAttack(zombie, now) then
+        return false
+    end
+    bumpType = ((npcBody.isProne and npcBody:isProne())
+        or (npcBody.isCrawling and npcBody:isCrawling()))
+        and "BiteLow" or "Bite"
     if npcBody.setZombiesDontAttack then
-        npcBody:setZombiesDontAttack(true)
+        npcBody:setZombiesDontAttack(false)
     end
     if zombie.setTarget then
-        zombie:setTarget(nil)
+        zombie:setTarget(npcBody)
     end
-    if zombie.setAttackedBy then
-        zombie:setAttackedBy(nil)
+    if zombie.setBumpedChr then
+        zombie:setBumpedChr(npcBody)
+    end
+    if zombie.setBumpDone then
+        zombie:setBumpDone(false)
     end
     if zombie.setBumpType then
-        if npcBody.isProne and npcBody:isProne() or npcBody.isCrawling and npcBody:isCrawling() then
-            zombie:setBumpType("BiteLow")
-        else
-            zombie:setBumpType("Bite")
-        end
+        zombie:setBumpType(bumpType)
     end
 
     State.bites[zombieId] = {
         npcId = record.id,
+        zombie = zombie,
         npcBody = npcBody,
-        startedAt = Core.Now(),
-        applyAt = Core.Now() + Const.ZOMBIE_BITE_APPLY_DELAY_MS,
-        clearAt = Core.Now() + Const.ZOMBIE_BITE_CLEAR_DELAY_MS,
+        bumpType = bumpType,
+        startedAt = now,
+        applyAt = now + Const.ZOMBIE_BITE_APPLY_DELAY_MS,
+        clearAt = now + Const.ZOMBIE_BITE_CLEAR_DELAY_MS,
         appliedDamage = false,
     }
+    if PNC.Network and PNC.Network.BroadcastZombieBite then
+        PNC.Network.BroadcastZombieBite(zombie, npcBody, record.id, "start", bumpType)
+    end
     Core.LogRecordDebug(record, "Zombie " .. tostring(zombieId) .. " started bite on NPC " .. tostring(record.id))
     return true
 end
@@ -178,6 +213,9 @@ function ZombieAggro.UpdateBiteState(zombie, now)
             y = zombie:getY(),
             z = zombie:getZ(),
         })
+        if isServer and isServer() then
+            record.runtime.forceSyncEvent = "zombie_bite"
+        end
         Core.LogRecordDebug(record, "Zombie " .. tostring(zombieId) .. " applied bite to NPC " .. tostring(record.id))
     end
 

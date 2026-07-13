@@ -74,6 +74,7 @@ end
 
 local function processRecord(record, now)
     local zombie = Registry.GetLiveZombie(record.id)
+    local forceSyncEvent
 
     Presence.Reconcile(record)
     zombie = Registry.GetLiveZombie(record.id)
@@ -100,7 +101,12 @@ local function processRecord(record, now)
         PathService.Pump(record, zombie)
     end
 
-    if (now - (tonumber(record.lastSyncAt) or 0)) >= getSyncInterval(record) then
+    forceSyncEvent = record.runtime and record.runtime.forceSyncEvent or nil
+    if forceSyncEvent then
+        record.runtime.forceSyncEvent = nil
+        Network.BroadcastRecord(record, forceSyncEvent)
+        record.lastSyncAt = now
+    elseif (now - (tonumber(record.lastSyncAt) or 0)) >= getSyncInterval(record) then
         Network.BroadcastRecord(record, "tick")
         record.lastSyncAt = now
     end

@@ -30,7 +30,7 @@ Internal.RANGED_BUMP_TYPES = {
 }
 
 Internal.ATTACK_TIMINGS = {
-    melee = { hitDelay = 260, duration = 720 },
+    melee = { hitDelay = 320, duration = 760 },
     ranged = { hitDelay = 180, duration = 620 },
     shove = { hitDelay = 130, duration = 480 },
     ground = { hitDelay = 240, duration = 760 },

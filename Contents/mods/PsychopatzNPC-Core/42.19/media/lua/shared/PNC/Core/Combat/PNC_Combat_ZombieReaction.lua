@@ -217,6 +217,28 @@ function ZombieReaction.ApplyWeaponHit(attackerZombie, targetZombie, weaponItem,
     return applied == true
 end
 
+function ZombieReaction.ApplyReplicatedHit(attackerZombie, targetZombie, options)
+    local health
+    if not targetZombie or (targetZombie.isDead and targetZombie:isDead()) then
+        return false
+    end
+    options = options or {}
+    health = tonumber(options.health)
+    -- This is a server-authored result, not client-side damage simulation.
+    -- Lethal state remains on the engine's normal zombie-death replication lane.
+    if health and health > 0 and targetZombie.setHealth then
+        targetZombie:setHealth(health)
+    end
+    applyHitContext(attackerZombie, targetZombie, options)
+    if options.hitReaction and targetZombie.setHitReaction then
+        targetZombie:setHitReaction(tostring(options.hitReaction))
+    end
+    if options.stagger ~= false and targetZombie.setStaggerBack then
+        pcall(targetZombie.setStaggerBack, targetZombie, true)
+    end
+    return true
+end
+
 function ZombieReaction.IsEngineHitSettling(targetZombie, now)
     local _
     local state

@@ -113,6 +113,10 @@ function Registry.RegisterLiveZombie(record, zombie)
     modData.PNC_UUID = record.id
     modData.PNC_NPC = true
     record.liveBodyInstanceID = zombie.getPersistentOutfitID and zombie:getPersistentOutfitID() or nil
+    record.liveBodyOnlineID = zombie.getOnlineID and tonumber(zombie:getOnlineID()) or nil
+    if record.liveBodyOnlineID and record.liveBodyOnlineID < 0 then
+        record.liveBodyOnlineID = nil
+    end
     record.presenceRevision = (tonumber(record.presenceRevision) or 0) + 1
 end
 
@@ -121,6 +125,7 @@ function Registry.UnregisterLiveZombie(id)
     Registry.LiveByID[id] = nil
     if record then
         record.liveBodyInstanceID = nil
+        record.liveBodyOnlineID = nil
         record.presenceRevision = (tonumber(record.presenceRevision) or 0) + 1
     end
 end
@@ -152,6 +157,16 @@ function Registry.RefreshLivePositions()
                 record.x = zombie:getX()
                 record.y = zombie:getY()
                 record.z = zombie:getZ()
+                if zombie.getOnlineID then
+                    local onlineID = tonumber(zombie:getOnlineID())
+                    if onlineID and onlineID >= 0 and record.liveBodyOnlineID ~= onlineID then
+                        record.liveBodyOnlineID = onlineID
+                        if isServer and isServer() then
+                            record.runtime = record.runtime or {}
+                            record.runtime.forceSyncEvent = "body_online_id"
+                        end
+                    end
+                end
             end
         end
     end

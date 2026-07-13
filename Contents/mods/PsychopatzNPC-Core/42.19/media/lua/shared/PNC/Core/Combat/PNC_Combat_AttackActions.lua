@@ -148,7 +148,7 @@ local function isCommittedMeleeTargetInRange(zombie, target)
     dx = (tonumber(target.x) or zombie:getX()) - zombie:getX()
     dy = (tonumber(target.y) or zombie:getY()) - zombie:getY()
     dz = math.abs((tonumber(target.z) or zombie:getZ()) - zombie:getZ())
-    range = (tonumber(Const.MELEE_RANGE) or 1.45) + 0.35
+    range = (tonumber(Const.MELEE_RANGE) or 1.3) + (tonumber(Const.MELEE_HIT_TOLERANCE) or 0.12)
     return dz <= 0.25 and ((dx * dx) + (dy * dy)) <= (range * range)
 end
 
@@ -187,6 +187,12 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
         end
     end
     record.runtime.attackAction = action
+    -- Server.OnTick consumes this after movement pumping and sends exactly one
+    -- transition snapshot, avoiding both a delayed attack start and a duplicate
+    -- periodic snapshot in the same tick.
+    if isServer and isServer() then
+        record.runtime.forceSyncEvent = "attack_start"
+    end
     return action
 end
 
@@ -256,6 +262,11 @@ function Internal.applyDamageToZombie(record, attackerZombie, target, damage, at
     end
     if ZombieAggro and ZombieAggro.OnZombieProvoked and (attackerZombie or fakeZombie) then
         ZombieAggro.OnZombieProvoked(victim, attackerZombie or fakeZombie)
+    end
+    -- IsoZombie:Hit has no native zombie-on-zombie hit packet. Replicate only
+    -- the server-approved visual result; damage and death stay authoritative.
+    if PNC.Network and PNC.Network.BroadcastZombieReaction then
+        PNC.Network.BroadcastZombieReaction(victim, attackerZombie, reactionOptions)
     end
     applyWeaponWear(record)
     return true, applied and "hit_zombie" or "hit_zombie_fallback"

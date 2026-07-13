@@ -33,6 +33,16 @@ function Internal.getZombieModData(zombie)
     return zombie and zombie.getModData and zombie:getModData() or nil
 end
 
+local function clearForcedNPC(modData)
+    if modData then
+        modData.PNC_AggroNPCId = nil
+        modData.PNC_AggroNPCUntil = nil
+        modData.PNC_AggroPathAt = nil
+        modData.PNC_AggroPathX = nil
+        modData.PNC_AggroPathY = nil
+    end
+end
+
 function Internal.isManagedNPCBody(zombie)
     return Core.IsManagedNPCBody(zombie)
 end
@@ -43,9 +53,7 @@ function Internal.clearZombieTarget(zombie)
         return
     end
     modData = Internal.getZombieModData(zombie)
-    if modData then
-        modData.PNC_AggroNPCId = nil
-    end
+    clearForcedNPC(modData)
     if zombie.clearAggroList then
         zombie:clearAggroList()
     end
@@ -60,7 +68,7 @@ function Internal.clearZombieTarget(zombie)
     end
 end
 
-function Internal.getForcedNPCBodyTarget(zombie)
+function Internal.getForcedNPCBodyTarget(zombie, now)
     local modData
     local npcId
     local record
@@ -73,18 +81,19 @@ function Internal.getForcedNPCBodyTarget(zombie)
     if not npcId then
         return nil, nil
     end
+    now = tonumber(now) or Core.Now()
+    if now >= (tonumber(modData.PNC_AggroNPCUntil) or 0) then
+        clearForcedNPC(modData)
+        return nil, nil
+    end
     record = Registry.Get(npcId)
     npcBody = Registry.GetLiveZombie(npcId)
     if not record or not npcBody or record.alive == false or record.presenceState ~= Const.PRESENCE_LIVE then
-        if modData then
-            modData.PNC_AggroNPCId = nil
-        end
+        clearForcedNPC(modData)
         return nil, nil
     end
     if npcBody.isDead and npcBody:isDead() then
-        if modData then
-            modData.PNC_AggroNPCId = nil
-        end
+        clearForcedNPC(modData)
         return nil, nil
     end
     return record, npcBody
@@ -167,6 +176,7 @@ function Internal.forceAggro(zombie, npcBody)
     npcId = record and record.id or nil
     if modData then
         modData.PNC_AggroNPCId = npcId
+        modData.PNC_AggroNPCUntil = npcId and (Core.Now() + Const.ZOMBIE_NPC_AGGRO_LEASE_MS) or nil
     end
     -- Preserve the attacker and action-state context installed by
     -- IsoZombie:Hit(). Clearing either during the hit frame prevents vanilla

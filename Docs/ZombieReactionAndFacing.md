@@ -16,7 +16,9 @@ Zombie aggro pumping is organized as a thin world-list loop plus one-zombie hand
 ## Rules
 
 - Zombie shove reactions are server-owned short windows, not one-frame flag
-  flips.
+  flips. In multiplayer, the server sends a cosmetic reaction event keyed by
+  the victim zombie's engine online ID because zombie-on-zombie `Hit()` has no
+  native player hit packet. Clients never calculate damage from this event.
 - Default shove behavior is stagger plus pushback; knockdown is reserved for
   explicit heavy reactions.
 - Combat may lease facing briefly for attack windup, attack follow-through, or
@@ -26,6 +28,10 @@ Zombie aggro pumping is organized as a thin world-list loop plus one-zombie hand
   race locomotion on every update.
 - Outside those leases, locomotion owns facing and points the NPC along travel
   direction.
+- Each movement snapshot carries the normalized direction of the server's last
+  accepted fake-locomotion step. Dedicated clients periodically reassert that
+  direction because native zombie rotation packets may overwrite a one-shot
+  client facing call.
 - Retreat movement does not renew combat-facing leases; NPCs face their travel
   direction instead of fighting the movement controller or fake-backpedaling.
 - Weapon hits let `IsoZombie:Hit()` own the victim's reaction state. PNC keeps
@@ -33,6 +39,9 @@ Zombie aggro pumping is organized as a thin world-list loop plus one-zombie hand
   repath, or start a bite until the engine has consumed the hit context.
 - Hit reaction selectors and melee stagger intent are applied after the engine
   hit call. PNC never clears the engine-owned stagger flag on lease expiry.
+- A zombie recently attacked by an NPC commits to that NPC for a bounded aggro
+  lease before reconsidering a nearby player. Without a lease, a closer visible
+  NPC may win over the zombie's current nearby player target.
 - Snapshot `visualState` mirrors the resolved motion profile fields so nearby
   clients replay the same walk, run, sneak, and crawl choice instead of
   inferring posture from reduced hints.

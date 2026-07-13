@@ -118,6 +118,7 @@ function PathService.RequestCombatFacing(record, zombie, target, leaseMs, reason
     local faceX
     local faceY
     local faceZ
+    local previousOwner
 
     if not record or not zombie or not target then
         return false
@@ -127,6 +128,7 @@ function PathService.RequestCombatFacing(record, zombie, target, leaseMs, reason
     if not lane then
         return false
     end
+    previousOwner = lane.facingOwner
 
     faceX = target.x ~= nil and tonumber(target.x) or nil
     faceY = target.y ~= nil and tonumber(target.y) or nil
@@ -145,12 +147,9 @@ function PathService.RequestCombatFacing(record, zombie, target, leaseMs, reason
         now + math.max(60, tonumber(leaseMs) or Internal.COMBAT_FACING_DEFAULT_MS)
     )
     lane.facingOwner = "combat"
-    -- Combat publishes this lease every behavior update.  Forcing the facing
-    -- call here bypassed the direction throttle and continuously put the
-    -- embodied zombie into turnalerted while locomotion forced it back to
-    -- idle.  A newly acquired/opposite target already passes the normal
-    -- direction test, so the forced call is both unnecessary and harmful.
-    Internal.applyFacingLocation(zombie, lane, faceX, faceY, now, "combat", false)
+    -- Force only the ownership transition so an attack cannot inherit a stale
+    -- travel direction. Re-published combat leases remain throttled.
+    Internal.applyFacingLocation(zombie, lane, faceX, faceY, now, "combat", previousOwner ~= "combat")
     return true
 end
 

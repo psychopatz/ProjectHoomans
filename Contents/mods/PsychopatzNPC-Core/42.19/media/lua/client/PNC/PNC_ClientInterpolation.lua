@@ -62,6 +62,9 @@ local function buildStreamKind(snapshot)
     if visualState.specialActive == true and visualState.specialAnim then
         return "special:" .. tostring(visualState.specialAnim)
     end
+    if visualState.attackActive == true then
+        return "attack:" .. tostring(visualState.attackAnim or "unknown")
+    end
     if hint and hint.kind then
         return tostring(hint.kind)
     end
@@ -83,6 +86,10 @@ local function buildHintKey(snapshot)
         tostring(hint and hint.toZ or ""),
         tostring(hint and hint.durationMs or ""),
         tostring(hint and hint.kind or ""),
+        tostring(visualState.attackActive == true),
+        tostring(visualState.attackAnim or ""),
+        tostring(visualState.attackStartedAt or 0),
+        tostring(visualState.attackFinishAt or 0),
         tostring(visualState.specialActive == true),
         tostring(visualState.specialAnim or ""),
     }, "|")
@@ -161,6 +168,7 @@ function Interpolation.RecordSnapshot(snapshot, zombie, now)
     hardBoundary = state.key == nil
         or tostring(state.presenceRevision or "") ~= tostring(snapshot.presenceRevision or "")
         or tostring(state.liveBodyInstanceID or "") ~= tostring(snapshot.liveBodyInstanceID or "")
+        or tostring(state.liveBodyOnlineID or "") ~= tostring(snapshot.liveBodyOnlineID or "")
         or tostring(state.streamKind or "") ~= tostring(streamKind)
         or math.abs((tonumber(state.targetZ) or currentZ) - targetZ) > 0.01
         or distance > snapDistance
@@ -199,9 +207,10 @@ function Interpolation.RecordSnapshot(snapshot, zombie, now)
     state.targetX = targetX
     state.targetY = targetY
     state.targetZ = targetZ
-    state.snapToTarget = hardBoundary and distance > snapDistance
+    state.snapToTarget = hardBoundary and (distance > snapDistance or string.sub(streamKind, 1, 7) == "attack:")
     state.presenceRevision = snapshot.presenceRevision
     state.liveBodyInstanceID = snapshot.liveBodyInstanceID
+    state.liveBodyOnlineID = snapshot.liveBodyOnlineID
     state.streamKind = streamKind
     state.dirX = targetX - fromX
     state.dirY = targetY - fromY

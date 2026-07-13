@@ -91,6 +91,19 @@ local function buildVisualState(record)
     local isRunning = path and path.isRunning == true or false
     local isCrawling = path and path.isCrawling == true or false
     local motionHint = path and MotionHints and MotionHints.BuildNetworkHint and MotionHints.BuildNetworkHint(record, path, now) or nil
+    local travelDirX = tonumber(motionHint and motionHint.dirX) or tonumber(path and path.lastFacingDirX)
+    local travelDirY = tonumber(motionHint and motionHint.dirY) or tonumber(path and path.lastFacingDirY)
+    local travelLen = travelDirX and travelDirY and math.sqrt((travelDirX * travelDirX) + (travelDirY * travelDirY)) or 0
+    local facingDirX = tonumber(path and path.lastFacingDirX)
+    local facingDirY = tonumber(path and path.lastFacingDirY)
+
+    if travelLen > 0.0001 then
+        travelDirX = travelDirX / travelLen
+        travelDirY = travelDirY / travelLen
+    else
+        travelDirX = nil
+        travelDirY = nil
+    end
 
     if healthState == "incapacitated" then
         walkType = moving and tostring(path and path.walkType or "Crawl") or ""
@@ -124,12 +137,19 @@ local function buildVisualState(record)
         anim = anim,
         attackActive = attackActive,
         attackAnim = attack and attack.anim or nil,
+        attackStartedAt = attack and attack.startedAt or 0,
+        attackHitAt = attack and attack.hitAt or 0,
         attackFinishAt = attack and attack.finishAt or 0,
         animSpeed = animSpeed,
         isRunning = isRunning,
         isCrawling = isCrawling,
         profileKey = profileKey,
         motionHint = motionHint,
+        travelDirX = travelDirX,
+        travelDirY = travelDirY,
+        facingDirX = facingDirX,
+        facingDirY = facingDirY,
+        facingOwner = path and path.facingOwner or nil,
         specialActive = specialActive,
         specialAnim = specialActive and path and path.specialAnim or nil,
         specialFinishAt = specialActive and path and path.specialMoveUntil or 0,
@@ -227,6 +247,7 @@ function Network.BuildSnapshot(record)
         weaponStatus = equipmentInfo.weaponStatus or "unknown",
         presenceRevision = record.presenceRevision,
         liveBodyInstanceID = record.liveBodyInstanceID,
+        liveBodyOnlineID = record.liveBodyOnlineID,
         aiState = aiState,
         inCombat = inCombat,
         visualState = visualState,
@@ -327,6 +348,103 @@ function Network.BroadcastRemoval(id, reason)
     else
         triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_REMOVE_RECORD, payload)
     end
+end
+
+function Network.GetZombieOnlineID(zombie)
+    local onlineID
+    if not zombie or not zombie.getOnlineID then
+        return nil
+    end
+    onlineID = tonumber(zombie:getOnlineID())
+    if not onlineID or onlineID < 0 then
+        return nil
+    end
+    return onlineID
+end
+
+function Network.FindZombieByOnlineID(onlineID)
+    local cell
+    local zombieList
+    local zombie
+    local i
+    onlineID = tonumber(onlineID)
+    if onlineID == nil or not getCell then
+        return nil
+    end
+    cell = getCell()
+    if not cell or not cell.getZombieList then
+        return nil
+    end
+    zombieList = cell:getZombieList()
+    if not zombieList then
+        return nil
+    end
+    for i = zombieList:size() - 1, 0, -1 do
+        zombie = zombieList:get(i)
+        if Network.GetZombieOnlineID(zombie) == onlineID then
+            return zombie
+        end
+    end
+    return nil
+end
+
+function Network.BroadcastZombieReaction(targetZombie, attackerZombie, options)
+    local targetOnlineID
+    local attackerOnlineID
+    local health
+    local payload
+    if not Core.IsAuthority()
+        or not isServer
+        or not isServer()
+        or not sendServerCommand
+        or not targetZombie
+        or (targetZombie.isDead and targetZombie:isDead())
+    then
+        return false
+    end
+    targetOnlineID = Network.GetZombieOnlineID(targetZombie)
+    if not targetOnlineID then
+        return false
+    end
+    attackerOnlineID = Network.GetZombieOnlineID(attackerZombie)
+    health = targetZombie.getHealth and tonumber(targetZombie:getHealth()) or nil
+    options = options or {}
+    payload = {
+        targetOnlineID = targetOnlineID,
+        attackerOnlineID = attackerOnlineID,
+        kind = tostring(options.kind or "weapon_hit"),
+        hitReaction = options.hitReaction and tostring(options.hitReaction) or nil,
+        hitForce = tonumber(options.hitForce) or 0.92,
+        stagger = options.stagger ~= false,
+        health = health and health > 0 and health or nil,
+    }
+    sendServerCommand(Const.MODULE, Const.CMD_ZOMBIE_REACTION, payload)
+    return true
+end
+
+function Network.BroadcastZombieBite(attackerZombie, targetNPCBody, npcId, phase, bumpType)
+    local attackerOnlineID
+    local targetOnlineID
+    if not Core.IsAuthority()
+        or not isServer
+        or not isServer()
+        or not sendServerCommand
+    then
+        return false
+    end
+    attackerOnlineID = Network.GetZombieOnlineID(attackerZombie)
+    if not attackerOnlineID then
+        return false
+    end
+    targetOnlineID = Network.GetZombieOnlineID(targetNPCBody)
+    sendServerCommand(Const.MODULE, Const.CMD_ZOMBIE_BITE, {
+        attackerOnlineID = attackerOnlineID,
+        targetOnlineID = targetOnlineID,
+        npcId = npcId and tostring(npcId) or nil,
+        phase = phase == "clear" and "clear" or "start",
+        bumpType = bumpType and tostring(bumpType) or "Bite",
+    })
+    return true
 end
 
 function Network.BroadcastFullSync(targetPlayer, records)

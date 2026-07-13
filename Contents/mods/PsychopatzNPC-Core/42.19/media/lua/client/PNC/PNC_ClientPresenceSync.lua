@@ -21,8 +21,10 @@ local Equipment = PNC.Equipment
 local Interpolation = PNC.ClientInterpolation
 
 Sync.BodyByID = Sync.BodyByID or {}
+Sync.BodyByOnlineID = Sync.BodyByOnlineID or {}
 Sync.BodyByInstanceID = Sync.BodyByInstanceID or {}
 Sync.FacingByID = Sync.FacingByID or {}
+Sync.UnresolvedLogAtByID = Sync.UnresolvedLogAtByID or {}
 Sync.lastBodyScanAt = Sync.lastBodyScanAt or 0
 Sync.lastLocalSnapshotBuildAt = Sync.lastLocalSnapshotBuildAt or 0
 
@@ -65,11 +67,15 @@ local function applySnapshotFacing(zombie, snapshot)
     local facingState
     local facingKey
     local dot
+    local authoritativeDirX
+    local authoritativeDirY
     if not zombie or not snapshot then
         return false
     end
     visualState = snapshot.visualState or {}
-    if visualState.moving ~= true or visualState.attackActive == true or visualState.specialActive == true then
+    if visualState.specialActive == true
+        or (visualState.moving ~= true and visualState.attackActive ~= true)
+    then
         return false
     end
     hint = type(visualState.motionHint) == "table" and visualState.motionHint or nil
@@ -77,14 +83,26 @@ local function applySnapshotFacing(zombie, snapshot)
         and Interpolation.StateByID[tostring(snapshot.id)] or nil
     targetX = tonumber(snapshot and snapshot.x) or zombie:getX()
     targetY = tonumber(snapshot and snapshot.y) or zombie:getY()
-    if not hint and not interpState and math.abs(targetX - zombie:getX()) <= 0.001 and math.abs(targetY - zombie:getY()) <= 0.001 then
+    authoritativeDirX = visualState.attackActive == true and tonumber(visualState.facingDirX)
+        or tonumber(visualState.travelDirX)
+    authoritativeDirY = visualState.attackActive == true and tonumber(visualState.facingDirY)
+        or tonumber(visualState.travelDirY)
+    if authoritativeDirX == nil
+        and authoritativeDirY == nil
+        and not hint
+        and not interpState
+        and math.abs(targetX - zombie:getX()) <= 0.001
+        and math.abs(targetY - zombie:getY()) <= 0.001
+    then
         return false
     end
-    dirX = tonumber(interpState and interpState.renderDirX)
+    dirX = authoritativeDirX
+        or tonumber(interpState and interpState.renderDirX)
         or tonumber(hint and hint.dirX)
         or tonumber(interpState and interpState.dirX)
         or ((tonumber(hint and hint.toX) or targetX) - (tonumber(hint and hint.fromX) or zombie:getX()))
-    dirY = tonumber(interpState and interpState.renderDirY)
+    dirY = authoritativeDirY
+        or tonumber(interpState and interpState.renderDirY)
         or tonumber(hint and hint.dirY)
         or tonumber(interpState and interpState.dirY)
         or ((tonumber(hint and hint.toY) or targetY) - (tonumber(hint and hint.fromY) or zombie:getY()))
@@ -105,7 +123,7 @@ local function applySnapshotFacing(zombie, snapshot)
     if facingState and facingState.body == zombie then
         dot = (tonumber(facingState.dirX) or 0) * dirX
             + (tonumber(facingState.dirY) or 0) * dirY
-        if dot >= 0.998
+        if (dot >= 0.998 and (now - (tonumber(facingState.appliedAt) or 0)) < (tonumber(Const.CLIENT_FACING_REASSERT_MS) or 220))
             or (dot >= 0.985 and (now - (tonumber(facingState.appliedAt) or 0)) < 120)
         then
             return false
@@ -258,12 +276,36 @@ local function refreshBodyMap(now)
     local zombieList
     local body
     local modData
+    local onlineID
+    local instanceKey
+    local scanInterval = tonumber(Const.CLIENT_BODY_SCAN_MS) or 750
     local i
-    if not getCell or now < ((tonumber(Sync.lastBodyScanAt) or 0) + 750) then
+    local id
+    local snapshot
+    if not getCell
+        or now < ((tonumber(Sync.lastBodyScanAt) or 0) + (tonumber(Const.CLIENT_BODY_SCAN_UNRESOLVED_MS) or 200))
+    then
+        return
+    end
+    for id, snapshot in pairs(ClientState and ClientState.snapshots or {}) do
+        if snapshot and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false then
+            onlineID = snapshot.liveBodyOnlineID ~= nil and tostring(snapshot.liveBodyOnlineID) or nil
+            instanceKey = snapshot.liveBodyInstanceID ~= nil and tostring(snapshot.liveBodyInstanceID) or nil
+            if not Sync.BodyByID[tostring(id)]
+                and not (onlineID and Sync.BodyByOnlineID[onlineID])
+                and not (instanceKey and Sync.BodyByInstanceID[instanceKey])
+            then
+                scanInterval = tonumber(Const.CLIENT_BODY_SCAN_UNRESOLVED_MS) or 200
+                break
+            end
+        end
+    end
+    if now < ((tonumber(Sync.lastBodyScanAt) or 0) + scanInterval) then
         return
     end
     Sync.lastBodyScanAt = now
     Sync.BodyByID = {}
+    Sync.BodyByOnlineID = {}
     Sync.BodyByInstanceID = {}
     zombieList = getCell():getZombieList()
     if not zombieList then
@@ -275,8 +317,19 @@ local function refreshBodyMap(now)
         if modData and modData.PNC_UUID and modData.PNC_NPC == true then
             Sync.BodyByID[tostring(modData.PNC_UUID)] = body
         end
+        onlineID = Network and Network.GetZombieOnlineID and Network.GetZombieOnlineID(body) or nil
+        if onlineID ~= nil then
+            Sync.BodyByOnlineID[tostring(onlineID)] = body
+        end
         if body and body.getPersistentOutfitID then
-            Sync.BodyByInstanceID[tostring(body:getPersistentOutfitID() or "")] = body
+            instanceKey = tostring(body:getPersistentOutfitID() or "")
+            if instanceKey ~= "" and instanceKey ~= "0" and instanceKey ~= "-1" then
+                if Sync.BodyByInstanceID[instanceKey] ~= nil and Sync.BodyByInstanceID[instanceKey] ~= body then
+                    Sync.BodyByInstanceID[instanceKey] = false
+                elseif Sync.BodyByInstanceID[instanceKey] == nil then
+                    Sync.BodyByInstanceID[instanceKey] = body
+                end
+            end
         end
     end
 end
@@ -327,6 +380,7 @@ local function applySnapshotToBody(snapshot, zombie)
         modData.PNC_UUID = tostring(snapshot.id)
         modData.PNC_NPC = true
         modData.PNC_LiveBodyInstanceID = snapshot.liveBodyInstanceID
+        modData.PNC_LiveBodyOnlineID = snapshot.liveBodyOnlineID
     end
 
     visualKey = buildVisualKey(snapshot)
@@ -446,7 +500,8 @@ function Sync.OnTick()
     refreshBodyMap(now)
     for id, snapshot in pairs(ClientState and ClientState.snapshots or {}) do
         if snapshot and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false then
-            body = Sync.BodyByID[id]
+            body = Sync.BodyByID[tostring(id)]
+                or Sync.BodyByOnlineID[tostring(snapshot.liveBodyOnlineID or "")]
                 or Sync.BodyByInstanceID[tostring(snapshot.liveBodyInstanceID or "")]
             if body then
                 if canRequestRemoteSync() and Interpolation and Interpolation.RecordSnapshot then
@@ -463,6 +518,17 @@ function Sync.OnTick()
                     applySnapshotFacing(body, snapshot)
                 end
                 applySnapshotToBody(snapshot, body)
+            elseif isSnapshotDebugEnabled(snapshot)
+                and (now - (tonumber(Sync.UnresolvedLogAtByID[tostring(id)]) or 0)) >= 3000
+            then
+                Sync.UnresolvedLogAtByID[tostring(id)] = now
+                logClientMotionDebug(
+                    snapshot,
+                    id,
+                    "body_unresolved",
+                    "onlineID=" .. tostring(snapshot.liveBodyOnlineID or "nil")
+                        .. " instanceID=" .. tostring(snapshot.liveBodyInstanceID or "nil")
+                )
             end
         end
     end
@@ -470,8 +536,10 @@ end
 
 local function onResetLua()
     Sync.BodyByID = {}
+    Sync.BodyByOnlineID = {}
     Sync.BodyByInstanceID = {}
     Sync.FacingByID = {}
+    Sync.UnresolvedLogAtByID = {}
     Sync.lastBodyScanAt = 0
     if Interpolation and Interpolation.ClearAll then
         Interpolation.ClearAll()

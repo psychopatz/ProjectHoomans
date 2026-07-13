@@ -61,15 +61,54 @@ local function suppressForStealth(zombie, record)
     record.runtime.combatBlockReason = "follow_stealth_hidden"
 end
 
-local function pursueForcedTarget(zombie, npcBody, record)
+local function refreshPursuitPath(zombie, npcBody, now)
+    local modData = Internal.getZombieModData(zombie)
+    local targetX = npcBody:getX()
+    local targetY = npcBody:getY()
+    local lastX = modData and tonumber(modData.PNC_AggroPathX) or nil
+    local lastY = modData and tonumber(modData.PNC_AggroPathY) or nil
+    local movedSq = lastX and lastY and Core.DistanceSq(lastX, lastY, targetX, targetY) or math.huge
+    local refreshDistance = tonumber(Const.ZOMBIE_NPC_PATH_REFRESH_DISTANCE) or 0.6
+    now = tonumber(now) or Core.Now()
+    if modData
+        and (now - (tonumber(modData.PNC_AggroPathAt) or 0)) < (tonumber(Const.ZOMBIE_NPC_PATH_REFRESH_MS) or 350)
+        and movedSq < (refreshDistance * refreshDistance)
+    then
+        return false
+    end
+    if modData then
+        modData.PNC_AggroPathAt = now
+        modData.PNC_AggroPathX = targetX
+        modData.PNC_AggroPathY = targetY
+    end
+    -- Coordinate pursuit works for an embodied NPC even though its engine type
+    -- is IsoZombie. pathToCharacter may reject zombie-shaped targets.
+    if zombie.pathToLocationF then
+        zombie:pathToLocationF(targetX, targetY, npcBody:getZ())
+    elseif zombie.pathToCharacter then
+        zombie:pathToCharacter(npcBody)
+    end
+    if zombie.getTarget and zombie.setTarget and zombie:getTarget() ~= npcBody then
+        zombie:setTarget(npcBody)
+    end
+    return true
+end
+
+local function pursueForcedTarget(zombie, npcBody, record, now)
     local distSq
     local dist
     local zombieSquare
     local npcSquare
+    if npcBody.setZombiesDontAttack then
+        npcBody:setZombiesDontAttack(false)
+    end
     distSq = Core.DistanceSq(zombie:getX(), zombie:getY(), npcBody:getX(), npcBody:getY())
     dist = math.sqrt(distSq)
-    setNoLungeAttack(zombie, dist <= Const.ZOMBIE_AGGRO_KEEP_RADIUS)
+    setNoLungeAttack(zombie, false)
     if dist < Const.ZOMBIE_BITE_DISTANCE and math.abs(zombie:getZ() - npcBody:getZ()) < 0.3 then
+        if zombie.getTarget and zombie.setTarget and zombie:getTarget() ~= npcBody then
+            zombie:setTarget(npcBody)
+        end
         zombieSquare = zombie.getSquare and zombie:getSquare() or nil
         npcSquare = npcBody.getSquare and npcBody:getSquare() or nil
         if zombieSquare and npcSquare and not zombieSquare:isSomethingTo(npcSquare) then
@@ -79,24 +118,35 @@ local function pursueForcedTarget(zombie, npcBody, record)
                 zombie:faceThisObject(npcBody)
             end
         end
-    elseif zombie.pathToCharacter then
-        zombie:pathToCharacter(npcBody)
-    elseif zombie.pathToLocation then
-        zombie:pathToLocation(npcBody:getX(), npcBody:getY(), npcBody:getZ())
+    else
+        refreshPursuitPath(zombie, npcBody, now)
     end
 end
 
-local function acquireNearestTarget(zombie)
+local function acquireNearestTarget(zombie, closerThanDistSq)
     local nearestRecord
     local nearestBody
     local nearestDistSq
     nearestRecord, nearestBody, nearestDistSq = Internal.findNearestLiveNPC(zombie, Const.ZOMBIE_AGGRO_RADIUS)
-    if nearestRecord and nearestBody then
+    if nearestRecord and nearestBody and (not closerThanDistSq or nearestDistSq < closerThanDistSq) then
         Internal.forceAggro(zombie, nearestBody)
         setNoLungeAttack(zombie, math.sqrt(nearestDistSq) <= Const.ZOMBIE_AGGRO_KEEP_RADIUS)
-        return
+        return nearestRecord, nearestBody
     end
     setNoLungeAttack(zombie, false)
+    return nil, nil
+end
+
+local function pursueNPCRecord(zombie, record, npcBody, now)
+    if not record or not npcBody then
+        return false
+    end
+    if Stealth and Stealth.ShouldSuppressZombieAggro and Stealth.ShouldSuppressZombieAggro(record) then
+        suppressForStealth(zombie, record)
+    else
+        pursueForcedTarget(zombie, npcBody, record, now)
+    end
+    return true
 end
 
 local function processZombie(zombie, now)
@@ -104,6 +154,7 @@ local function processZombie(zombie, now)
     local record
     local npcBody
     local hitSettling
+    local playerDistSq
     if ZombieReaction and ZombieReaction.Pump then
         ZombieReaction.Pump(zombie, now)
     end
@@ -120,25 +171,29 @@ local function processZombie(zombie, now)
         return
     end
 
-    target = zombie.getTarget and zombie:getTarget() or nil
-    if Internal.isCloseLivePlayerTarget(zombie, target) then
-        setNoLungeAttack(zombie, false)
+    -- A recent NPC provocation wins for a bounded lease. This must be checked
+    -- before vanilla's nearby-player target or NPC hits are immediately lost.
+    record, npcBody = Internal.getForcedNPCBodyTarget(zombie, now)
+    if pursueNPCRecord(zombie, record, npcBody, now) then
         return
-    end
-    if Core.IsManagedNPCBody(target) then
-        Internal.forceAggro(zombie, target)
     end
 
-    record, npcBody = Internal.getForcedNPCBodyTarget(zombie)
-    if not record or not npcBody then
-        acquireNearestTarget(zombie)
+    target = zombie.getTarget and zombie:getTarget() or nil
+    if Core.IsManagedNPCBody(target) then
+        Internal.forceAggro(zombie, target)
+        record, npcBody = Internal.getForcedNPCBodyTarget(zombie, now)
+        pursueNPCRecord(zombie, record, npcBody, now)
         return
     end
-    if Stealth and Stealth.ShouldSuppressZombieAggro and Stealth.ShouldSuppressZombieAggro(record) then
-        suppressForStealth(zombie, record)
+    if Internal.isCloseLivePlayerTarget(zombie, target) then
+        playerDistSq = Core.DistanceSq(zombie:getX(), zombie:getY(), target:getX(), target:getY())
+        record, npcBody = acquireNearestTarget(zombie, playerDistSq)
+        if not pursueNPCRecord(zombie, record, npcBody, now) then
+            setNoLungeAttack(zombie, false)
+        end
         return
     end
-    pursueForcedTarget(zombie, npcBody, record)
+    acquireNearestTarget(zombie)
 end
 
 function ZombieAggro.Pump(now)
