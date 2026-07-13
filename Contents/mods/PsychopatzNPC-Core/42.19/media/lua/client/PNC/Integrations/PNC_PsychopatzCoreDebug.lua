@@ -1,9 +1,9 @@
-local ok = pcall(require, "PsychopatzLib/UI/PsychopatzDebugHubWindow")
-if not ok or not (PsychopatzLib and PsychopatzLib.DebugHub) then
+local ok = pcall(require, "PsychopatzCore/UI/PsychopatzDebugHubWindow")
+if not ok or not (PsychopatzCore and PsychopatzCore.DebugHub) then
     return
 end
 
-PsychopatzLib.DebugHub.RegisterTool({
+PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.npcMonitor",
     source = "PsychopatzNPC-Core",
     order = 200,
