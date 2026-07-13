@@ -405,7 +405,12 @@ function Client.SendDebug(action, payload)
             } or hostile and {
                 kind = Const.ORDER_HOSTILE_HUNT,
                 x = x, y = y, z = z,
-            } or { kind = Const.ORDER_GUARD, x = x, y = y, z = z },
+            } or {
+                kind = Const.ORDER_ROAM,
+                roamMode = Const.ROAM_MODE_AREA,
+                x = x, y = y, z = z,
+                radius = Const.ROAM_DEFAULT_RADIUS,
+            },
             weaponMode = variant == "hostile_ranged" and "ranged" or "melee",
             forceLive = true,
             debug = true,

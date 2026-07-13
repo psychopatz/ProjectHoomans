@@ -148,3 +148,11 @@ function Targeting.ResolveHostileEngageTarget(record)
     end
     return Perception.ResolveHostileTarget(record)
 end
+
+function Targeting.ResolveRoamingEngageTarget(record, radius)
+    local target = Targeting.UpdateTargetFromWorld(record, record.runtime and record.runtime.target or nil)
+    if target then
+        return target
+    end
+    return Perception.ResolveRoamingTarget(record, radius)
+end

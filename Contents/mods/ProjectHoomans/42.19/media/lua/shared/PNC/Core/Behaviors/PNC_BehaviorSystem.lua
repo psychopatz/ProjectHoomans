@@ -9,9 +9,11 @@ require "PNC/Core/Behaviors/PNC_Behavior_MoveIntent"
 require "PNC/Core/Behaviors/PNC_Behavior_Common"
 require "PNC/Core/Behaviors/PNC_Behavior_Targeting"
 require "PNC/Core/Behaviors/PNC_Behavior_Combat"
+require "PNC/Core/Behaviors/PNC_BehaviorRegistry"
 require "PNC/Core/Behaviors/PNC_Behavior_Incapacitated"
 require "PNC/Core/Behaviors/PNC_Behavior_Companion"
 require "PNC/Core/Behaviors/PNC_Behavior_Hostile"
+require "PNC/Core/Behaviors/PNC_Behavior_Roaming"
 
 PNC = PNC or {}
 PNC.BehaviorSystem = PNC.BehaviorSystem or {}
@@ -20,6 +22,7 @@ local Behavior = PNC.BehaviorSystem
 local JobSystem = PNC.JobSystem
 local Animation = PNC.Animation
 local Common = PNC.BehaviorCommon
+local Registry = PNC.BehaviorRegistry
 local Incapacitated = PNC.BehaviorIncapacitated
 local Companion = PNC.BehaviorCompanion
 local Hostile = PNC.BehaviorHostile
@@ -45,6 +48,10 @@ function Behavior.Tick(record, zombie, now)
     job = JobSystem.Select(record)
     record.activeJob = job
     record.activeBehavior = job
+
+    if Registry.Tick(record, zombie, job, now) then
+        return
+    end
 
     if Companion.Tick(record, zombie, job) then
         return

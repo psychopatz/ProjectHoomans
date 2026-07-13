@@ -98,6 +98,23 @@ function Provider.addOptions(menu, entry, player, contextData)
             },
         })
     end)
+    orderMenu:addOption(getText("UI_PNC_OrderRoamNearby"), nil, function()
+        if not actionSquare then
+            return
+        end
+        sendDebug("set_order", {
+            id = entry.id,
+            orderSpec = {
+                kind = Const.ORDER_ROAM,
+                roamMode = Const.ROAM_MODE_AREA,
+                x = actionSquare:getX(),
+                y = actionSquare:getY(),
+                z = actionSquare:getZ(),
+                radius = Const.ROAM_DEFAULT_RADIUS,
+                targetRadius = Const.ROAM_TARGET_RADIUS,
+            },
+        })
+    end)
     orderMenu:addOption("Hostile Hunt", nil, function()
         if not actionSquare then
             return

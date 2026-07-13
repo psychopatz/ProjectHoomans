@@ -164,7 +164,14 @@ local function handleDebugSpawn(player, args)
     local orderSpec = hostile
         and { kind = Const.ORDER_HOSTILE_HUNT, x = x, y = y, z = z }
         or companion and { kind = Const.ORDER_FOLLOW, ownerUsername = ownerUsername, ownerOnlineID = ownerOnlineID }
-        or { kind = Const.ORDER_GUARD, x = x, y = y, z = z }
+        or {
+            kind = Const.ORDER_ROAM,
+            roamMode = Const.ROAM_MODE_AREA,
+            x = x,
+            y = y,
+            z = z,
+            radius = Const.ROAM_DEFAULT_RADIUS,
+        }
     local record = API.Spawn({
         faction = faction,
         archetypeID = resolveDebugArchetype(args, faction, hostile and "Scavenger" or "General"),

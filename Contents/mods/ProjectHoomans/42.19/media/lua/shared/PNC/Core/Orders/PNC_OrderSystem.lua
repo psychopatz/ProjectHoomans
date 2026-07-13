@@ -6,6 +6,15 @@ local Const = PNC.Const
 local Core = PNC.Core
 local Skills = PNC.Skills
 
+OrderSystem.Normalizers = OrderSystem.Normalizers or {}
+
+function OrderSystem.RegisterNormalizer(kind, normalizer)
+    kind = tostring(kind or "")
+    if kind == "" or type(normalizer) ~= "function" then return false end
+    OrderSystem.Normalizers[kind] = normalizer
+    return true
+end
+
 local function fallbackOrder(record)
     if record.faction == "hostile" then
         return { kind = Const.ORDER_HOSTILE_HUNT }
@@ -16,8 +25,17 @@ end
 function OrderSystem.Normalize(record, orderSpec)
     local spec = orderSpec or fallbackOrder(record)
     local kind = tostring(spec.kind or spec.mode or "")
+    local normalizer
+    local normalized
 
     if kind == "" then
+        return fallbackOrder(record)
+    end
+
+    normalizer = OrderSystem.Normalizers[kind]
+    if normalizer then
+        normalized = normalizer(record, spec)
+        if type(normalized) == "table" then return normalized end
         return fallbackOrder(record)
     end
 
@@ -47,7 +65,7 @@ function OrderSystem.Normalize(record, orderSpec)
         }
     end
 
-    if kind == Const.ORDER_HOSTILE_ROAM or kind == Const.ORDER_HOSTILE_HUNT then
+    if kind == Const.ORDER_HOSTILE_HUNT then
         return {
             kind = kind,
             x = tonumber(spec.x) or record.anchorX,
@@ -68,6 +86,10 @@ function OrderSystem.SetOrder(record, orderSpec)
     record.runtime.target = nil
     record.runtime.lastPathX = nil
     record.runtime.lastPathY = nil
+    record.runtime.roaming = nil
+    record.runtime.roamGoalX = nil
+    record.runtime.roamGoalY = nil
+    record.runtime.roamGoalZ = nil
     if record.orderSpec.kind == Const.ORDER_PATROL and record.patrolIndex == nil then
         record.patrolIndex = 1
     end

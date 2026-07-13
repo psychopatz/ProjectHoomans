@@ -24,14 +24,16 @@
 - `PNC_Combat_Unarmed`: shove and stomp helpers
 - `PNC_PathService`: live stepping and abstract travel
 - `PNC_OrderSystem`: order normalization and ownership
-- `PNC_JobSystem`: selects active job from order and state
+- `PNC_JobSystem`: selects active job from order and state and accepts registered order-to-job mappings
 - `PNC_BehaviorSystem`: thin coordinator that executes the active job
+- `PNC_BehaviorRegistry`: extensible job-to-handler dispatch used by self-contained behavior modules
 - `PNC_Behavior_MoveIntent`: single behavior-side move intent writer consumed by pathing
 - `PNC_Behavior_Common`: shared owner, movement, and combat-debug helpers
 - `PNC_Behavior_Targeting`: target refresh and facing helpers
 - `PNC_Behavior_Combat`: combat engage sequencing
 - `PNC_Behavior_Companion`: follow, guard, and patrol job handlers
-- `PNC_Behavior_Hostile`: roam, hunt, and direct engage job handlers
+- `PNC_Behavior_Roaming`: faction-neutral, enemy-aware roaming with registered roam modes
+- `PNC_Behavior_Hostile`: hunt and direct engage job handlers
 - `PNC_Behavior_Incapacitated`: crawl and downed shove handling
 - `PNC_Presence`: live and abstract transitions, body cleanup
 - `PNC_Scheduler`: cadence rules

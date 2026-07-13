@@ -160,8 +160,10 @@ function Presence.Abstract(record, reason)
     record.runtime.target = nil
     record.runtime.lastPathX = nil
     record.runtime.lastPathY = nil
+    record.runtime.roaming = nil
     record.runtime.roamGoalX = nil
     record.runtime.roamGoalY = nil
+    record.runtime.roamGoalZ = nil
 
     if zombie then
         record.x = zombie:getX()

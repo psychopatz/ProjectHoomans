@@ -36,12 +36,6 @@ local HEALTH_COLORS = {
     critical = { r = 0.8, g = 0.15, b = 0.15, a = 1.0 },
 }
 
-local STAMINA_COLORS = {
-    rested = { r = 0.24, g = 0.55, b = 0.98, a = 1.0 },
-    tired = { r = 0.92, g = 0.72, b = 0.14, a = 1.0 },
-    exhausted = { r = 0.88, g = 0.26, b = 0.18, a = 1.0 },
-}
-
 local heartTexture
 
 local function clamp(value, minValue, maxValue)
@@ -97,9 +91,8 @@ function Presentation.IncapacitatedColor(currentTime)
 end
 
 function Presentation.StaminaColor(staminaRatio)
-    if staminaRatio >= 0.7 then return STAMINA_COLORS.rested end
-    if staminaRatio >= 0.35 then return STAMINA_COLORS.tired end
-    return STAMINA_COLORS.exhausted
+    local value = 0.28 + (0.72 * clamp(tonumber(staminaRatio) or 0, 0, 1))
+    return { r = value, g = value, b = value, a = 1.0 }
 end
 
 function Presentation.ShouldShowHealth(snapshot, currentTime)

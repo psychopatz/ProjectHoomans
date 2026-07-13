@@ -4,6 +4,7 @@ UI_EN = {
     UI_PNC_ToggleAIOverlay = "Toggle AI Overlay",
     UI_PNC_AIOverlayEnabled = "PNC AI Overlay: ON",
     UI_PNC_AIOverlayDisabled = "PNC AI Overlay: OFF",
+    UI_PNC_OrderRoamNearby = "Roam Nearby",
     UI_PNC_Spawn = "PNC Spawn",
     UI_PNC_SpawnCompanion = "Spawn Companion",
     UI_PNC_SpawnFriendly = "Spawn Friendly",

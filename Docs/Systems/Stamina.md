@@ -11,6 +11,7 @@
 - movement stamina now tracks fake-locomotion exhaustion separately from attack spend and can downgrade run into recovery walk or recovery sneak instead of hard-stalling movement
 - movement exhaustion uses hysteresis and a short sprint breather so run can resume only after both stamina recovery and the breather lock clear
 - nameplates decide draw visibility from stamina summary data, not direct runtime internals
+- the overhead stamina bar uses a smooth dark-gray-to-white gradient so it remains visually distinct from HP's green/yellow/red states
 
 ## Integration Points
 - `PNC_Combat_*` checks and spends attack stamina

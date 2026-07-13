@@ -405,3 +405,23 @@ function Perception.ResolveHostileTarget(record)
 
     return pickNearest(pickNearest(npcTarget, playerTarget), zombieTarget)
 end
+
+function Perception.ResolveRoamingTarget(record, radius)
+    local hostility = record and record.hostility or {}
+    local searchRadius = math.max(1, tonumber(radius) or Const.ROAM_TARGET_RADIUS or 12)
+    local npcTarget = nil
+    local playerTarget = nil
+    local zombieTarget = nil
+
+    if hostility.attackNPCs ~= false then
+        npcTarget = Perception.FindNearestEnemyNPC(record, searchRadius)
+    end
+    if hostility.attackPlayers == true then
+        playerTarget = Perception.FindNearestEnemyPlayer(record, searchRadius)
+    end
+    if hostility.attackZombies ~= false then
+        zombieTarget = Perception.FindBestEnemyZombie(record, searchRadius)
+    end
+
+    return pickNearest(pickNearest(npcTarget, playerTarget), zombieTarget)
+end

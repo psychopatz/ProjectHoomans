@@ -119,6 +119,17 @@ local function sanitizeOrderSpec(orderSpec, record)
     if spec.z ~= nil then
         spec.z = normalizeNumber(spec.z, record.anchorZ)
     end
+    if spec.radius ~= nil then
+        spec.radius = math.max(0.5, normalizeNumber(spec.radius, Const.ROAM_DEFAULT_RADIUS))
+    end
+    if spec.targetRadius ~= nil then
+        spec.targetRadius = math.max(1, normalizeNumber(spec.targetRadius, Const.ROAM_TARGET_RADIUS))
+    end
+    if spec.reachedDistance ~= nil then
+        spec.reachedDistance = math.max(0.1, normalizeNumber(spec.reachedDistance, Const.ROAM_REACHED_DISTANCE))
+    end
+    spec.roamMode = normalizeString(spec.roamMode)
+    spec.moveMode = normalizeString(spec.moveMode)
     spec.ownerUsername = normalizeString(spec.ownerUsername)
     spec.ownerOnlineID = nil
     return spec
@@ -249,6 +260,7 @@ function Persistence.RebuildRuntime(record)
         target = nil,
         pathing = nil,
         abstractTravel = nil,
+        roaming = nil,
         roamGoalX = nil,
         roamGoalY = nil,
         roamGoalZ = nil,
@@ -420,6 +432,9 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     record.patrolPoints = copyPoints(raw.patrolPoints or record.patrolPoints, record.anchorX, record.anchorY, record.anchorZ)
     record.patrolIndex = math.max(1, math.floor(normalizeNumber(raw.patrolIndex, 1)))
     record.orderSpec = sanitizeOrderSpec(raw.orderSpec, record)
+    if record.orderSpec and PNC.OrderSystem and PNC.OrderSystem.Normalize then
+        record.orderSpec = PNC.OrderSystem.Normalize(record, record.orderSpec)
+    end
     record.hostility = sanitizeHostility(raw.hostility, record.faction)
     record.health = sanitizeHealth(raw.health or raw, record.health and record.health.max or Const.DEFAULT_HP_MAX)
     record.alive = tostring(record.health.state or "") ~= "dead"
