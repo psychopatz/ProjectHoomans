@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animNode x_extends="PNC_ShotBellyStep.xml">
+	<m_Name>PNC_ShotBellyStepFromBehind</m_Name>
+	<m_AnimName>Zombie_ShotBellyStepBehind</m_AnimName>
+	<m_BlendTime>0.10</m_BlendTime>
+	<m_BlendOutTime>0.20</m_BlendOutTime>
+	<m_SpeedScale>1.00</m_SpeedScale>
+	<m_Conditions>
+		<m_Name>PNCActor</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_BoolValue>true</m_BoolValue>
+	</m_Conditions>
+	<m_Conditions x_name="749cdede-ee49-4de6-946d-c9b04931e9be">
+		<m_Name>FromBehind</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_Value>true</m_Value>
+	</m_Conditions>
+</animNode>

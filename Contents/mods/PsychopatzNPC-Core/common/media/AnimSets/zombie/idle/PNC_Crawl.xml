@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode x_extends="PNC_LocomotionBase.xml">
+    <m_Name>PNC_Crawl</m_Name>
+    <m_AnimName>Zombie_Crawl</m_AnimName>
+    <m_Conditions>
+        <m_Name>PNCActor</m_Name>
+        <m_Type>BOOL</m_Type>
+        <m_BoolValue>true</m_BoolValue>
+    </m_Conditions>
+    <m_Conditions>
+        <m_Name>bMoving</m_Name>
+        <m_Type>BOOL</m_Type>
+        <m_BoolValue>true</m_BoolValue>
+    </m_Conditions>
+    <m_Conditions>
+        <m_Name>PNCMoveAnim</m_Name>
+        <m_Type>STRING</m_Type>
+        <m_StringValue>Crawl</m_StringValue>
+    </m_Conditions>
+</animNode>

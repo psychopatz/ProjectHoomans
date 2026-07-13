@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode>
+	<m_Name>PNC_LocomotionBase</m_Name>
+    <m_deferredBoneAxis>Y</m_deferredBoneAxis>
+    <m_SpeedScale>PNCAnimSpeed</m_SpeedScale>
+    <m_Looped>true</m_Looped>
+    <m_BlendTime>0.20</m_BlendTime>
+    <m_Priority>5</m_Priority>
+	<m_Conditions>
+		<m_Name>PNCActor</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_BoolValue>true</m_BoolValue>
+	</m_Conditions>
+</animNode>

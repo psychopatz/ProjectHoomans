@@ -178,8 +178,32 @@ function Internal.updateActiveMove(zombie, record, lane)
     end
 
     now = Internal.Core.Now()
+    if Internal.Animation
+        and Internal.Animation.PumpBumpRelease
+        and Internal.Animation.PumpBumpRelease(zombie, now)
+    then
+        lane.lastProgressAt = now
+        lane.lastIssueAt = now
+        lane.ownerMode = "bump_release"
+        return true, "bump_release"
+    elseif lane.ownerMode == "bump_release" then
+        lane.ownerMode = "fake_locomotion"
+    end
     if Internal.refreshTraversalMemory then
         Internal.refreshTraversalMemory(lane, zombie)
+    end
+    if lane.traversalAction and Internal.updateTraversalAction then
+        local traversalActive
+        local traversalState
+        traversalActive, traversalState = Internal.updateTraversalAction(zombie, record, lane, now)
+        if traversalActive then
+            Internal.logMoveDebug(record, zombie, lane, "special_progress", traversalState or lane.ownerMode, "")
+            return true, traversalState or lane.ownerMode
+        end
+        if traversalState == "completed" then
+            Internal.logMoveDebug(record, zombie, lane, "special_complete", lane.lastTraversalFinishReason or "completed", "")
+            return true, "traversal_completed"
+        end
     end
     if (lane.ownerMode == "window_climb" or lane.ownerMode == "window_open" or lane.ownerMode == "door_open" or lane.ownerMode == "fence_climb")
         and now < (tonumber(lane.specialMoveUntil) or 0)
@@ -325,6 +349,10 @@ function Internal.updateActiveMove(zombie, record, lane)
 end
 
 function PathService.Reset(zombie, record)
+    local lane = record and record.runtime and record.runtime.pathing or nil
+    if lane and lane.traversalAction and Internal.clearTraversalAction then
+        Internal.clearTraversalAction(zombie, lane, "reset")
+    end
     if record and record.runtime then
         record.runtime.pathing = nil
         record.runtime.moveIntent = nil
@@ -365,7 +393,9 @@ function PathService.Pump(record, zombie)
 
     lane = Internal.ensureMoveLane(record)
     now = Internal.Core.Now()
-    Internal.applyCombatFacing(zombie, lane, now, false)
+    if not lane.traversalAction then
+        Internal.applyCombatFacing(zombie, lane, now, false)
+    end
     intentState = Internal.consumeMoveIntent(record, lane, zombie)
 
     if lane.phase == "cancel_pending" then

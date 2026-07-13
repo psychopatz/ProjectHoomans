@@ -317,6 +317,10 @@ local function applySnapshotToBody(snapshot, zombie)
         return
     end
 
+    if Animation and Animation.PumpBumpRelease then
+        Animation.PumpBumpRelease(zombie, Core and Core.Now and Core.Now() or 0)
+    end
+
     recordView = buildRecordView(snapshot)
     applyIdentityVars(zombie, snapshot)
     if modData and snapshot and snapshot.id ~= nil then
@@ -358,8 +362,12 @@ local function applySnapshotToBody(snapshot, zombie)
         modData.PNC_ClientMotionKey = motionKey
         return
     end
-    if modData and not attackKey then
+    if modData and not attackKey and modData.PNC_ClientAttackKey ~= nil then
+        if Animation and Animation.FinishBump then
+            Animation.FinishBump(zombie, true)
+        end
         modData.PNC_ClientAttackKey = nil
+        return
     end
     if attackKey then
         return
@@ -374,8 +382,12 @@ local function applySnapshotToBody(snapshot, zombie)
         modData.PNC_ClientMotionKey = motionKey
         return
     end
-    if modData and not specialKey then
+    if modData and not specialKey and modData.PNC_ClientSpecialKey ~= nil then
+        if Animation and Animation.FinishBump then
+            Animation.FinishBump(zombie, true)
+        end
         modData.PNC_ClientSpecialKey = nil
+        return
     end
     if specialKey then
         return

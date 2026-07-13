@@ -12,6 +12,11 @@
 	<m_Scalar>AttackVariationX</m_Scalar>
 	<m_Scalar2>AttackVariationY</m_Scalar2>
 	<m_Conditions>
+		<m_Name>PNCActor</m_Name>
+		<m_Type>BOOL</m_Type>
+		<m_BoolValue>true</m_BoolValue>
+	</m_Conditions>
+	<m_Conditions>
 		<m_Name>BumpType</m_Name>
 		<m_Type>STRING</m_Type>
 		<m_StringValue>PNC_Shove</m_StringValue>

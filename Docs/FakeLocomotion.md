@@ -58,6 +58,9 @@ underlying zombie AI disabled with `setUseless(true)`.
 - `BumpType` is reserved for explicit combat, reaction, and traversal actions.
   Locomotion startup does not occupy the bump channel, because short repeated
   goals would otherwise mask the normal leg cycle.
+- Bump release is a two-tick handshake: completion remains true until the
+  engine ActionContext leaves `bumped`; only the next bump start clears it.
+  Locomotion cannot resume while that release acknowledgement is pending.
 - Live locomotion reapplies `setMoving`, sneaking state, and animation variables
   every tick. Because the engine rejects `walktoward` for a useless zombie, PNC
   locomotion nodes also exist in the stable `idle` animation tree. This keeps
@@ -77,6 +80,16 @@ underlying zombie AI disabled with `setUseless(true)`.
   with origin and destination logging.
 - Fences: shared edge detection, validated landing, controlled reposition, and
   a replicated climb lease.
+- `PNC_PathService_TraversalRuntime` owns the timed transform and bump lifetime
+  for fence/window climbs. Normal fake locomotion and combat facing remain
+  suspended until that runtime releases the body.
+- Traversal does not interpolate the authoritative transform during takeoff.
+  The hop animation plays against a pinned origin, and the server commits the
+  landing position only when `PNCTraversalFinished` becomes true at the
+  animation's actual `End` event.
+- Fake traversal uses only `PNC_ClimbFence`, `PNC_ClimbFenceTall`, and
+  `PNC_ClimbWindow`. It never writes the vanilla `ClimbFenceStarted` or
+  `ClimbWindowStarted` variables that enter unsafe Java traversal states.
 - Special movement is only considered after a blocked fake step or a short
   no-progress stall, so nearby windows no longer steal normal movement ticks.
 - Collision checks include the edge between squares, not only destination
@@ -90,6 +103,9 @@ underlying zombie AI disabled with `setUseless(true)`.
 - The server is authoritative for live-body movement.
 - Clients consume replicated snapshots and live zombie replication only; they do
   not run NPC movement logic.
+- Passage objects and traversal transforms are changed on the server. Clients
+  receive door/window object synchronization and interpolate authoritative NPC
+  positions; they never open a local-only passage or choose a landing square.
 - Snapshot visual state carries short special-move bump windows so client visual
   sync does not overwrite climb bumps immediately.
 - Snapshot visual state also carries the resolved locomotion animation speed so
@@ -97,3 +113,9 @@ underlying zombie AI disabled with `setUseless(true)`.
 - Client interpolation now starts new segments from the currently rendered body
   position for the same motion stream, which prevents backward rewinds between
   authoritative snapshots while keeping server-authored targets and durations.
+- Normal MP move segments last at least 200 ms so a client remains in motion
+  across the server's 150 ms active-snapshot cadence rather than running in
+  place between short 35–50 ms interpolation segments.
+- Every shared animation XML filename and root node name is `PNC_` namespaced
+  and guarded by `PNCActor=true`, preventing Bandits or ordinary zombies from
+  selecting PNC nodes when both mods are enabled.

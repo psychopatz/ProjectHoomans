@@ -17,6 +17,8 @@ local SUPPRESSED_STATES = {
     ["getup-fromonback"] = true,
     ["getup-fromonfront"] = true,
     ["getup-fromsitting"] = true,
+    ["climbfence"] = true,
+    ["climbwindow"] = true,
     ["lunge"] = true,
     ["onground"] = true,
     ["onground-ragdoll"] = true,
@@ -32,6 +34,8 @@ local IDLE_RESET_STATES = {
     ["getup-fromonback"] = true,
     ["getup-fromonfront"] = true,
     ["getup-fromsitting"] = true,
+    ["climbfence"] = true,
+    ["climbwindow"] = true,
     ["lunge"] = true,
     ["pathfind"] = true,
     ["staggerback"] = true,
@@ -85,10 +89,15 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
         zombie:setVariable("bBecomeCrawler", false)
         zombie:setVariable("bCrawling", false)
         zombie:setVariable("FallOnFront", false)
+        zombie:setVariable("BumpFall", false)
+        zombie:setVariable("BumpFallType", "")
         zombie:setVariable("PNCLive", true)
     end
     if zombie.setKnockedDown then
         zombie:setKnockedDown(false)
+    end
+    if zombie.setBumpFall then
+        zombie:setBumpFall(false)
     end
     if zombie.setSitAgainstWall then
         zombie:setSitAgainstWall(false)

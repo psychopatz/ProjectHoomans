@@ -11,6 +11,7 @@ PNC.Combat.Internal = PNC.Combat.Internal or {}
 local Combat = PNC.Combat
 local Internal = Combat.Internal
 local Core = PNC.Core
+local Const = PNC.Const or {}
 local Registry = PNC.Registry
 local Health = PNC.Health
 local Perception = PNC.Perception
@@ -20,10 +21,17 @@ local ZombieReaction = PNC.CombatZombieReaction
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local Tactics = PNC.CombatTactics
+local Animation = PNC.Animation
 
 local function captureTargetRef(target)
+    local worldObject
     if not target then
         return nil
+    end
+    if target.kind == "zombie" and target.zombieId and Perception and Perception.FindZombieByID then
+        worldObject = Perception.FindZombieByID(target.zombieId)
+    elseif target.kind == "player" then
+        worldObject = target.player
     end
     return {
         kind = target.kind,
@@ -34,6 +42,10 @@ local function captureTargetRef(target)
         x = target.x,
         y = target.y,
         z = target.z,
+        -- Runtime-only identity anchor. The stable ID remains authoritative
+        -- across index rebuilds; this direct reference closes the short gap
+        -- between attack commit and the delayed hit frame.
+        worldObject = worldObject,
     }
 end
 
@@ -73,13 +85,20 @@ local function resolveActionTarget(targetRef)
         }
     end
     if targetRef.kind == "zombie" then
-        zombieTarget = Perception.FindZombieByID and Perception.FindZombieByID(targetRef.zombieId) or nil
+        zombieTarget = targetRef.worldObject
+        if zombieTarget and zombieTarget.isDead and zombieTarget:isDead() then
+            zombieTarget = nil
+        end
+        if not zombieTarget then
+            zombieTarget = Perception.FindZombieByID and Perception.FindZombieByID(targetRef.zombieId) or nil
+        end
         if not zombieTarget or zombieTarget:isDead() then
             return nil
         end
         return {
             kind = "zombie",
             zombieId = targetRef.zombieId,
+            worldObject = zombieTarget,
             x = zombieTarget:getX(),
             y = zombieTarget:getY(),
             z = zombieTarget:getZ(),
@@ -101,7 +120,7 @@ local function isActionTargetVisible(record, target)
     elseif target.kind == "npc" then
         worldObject = Registry.GetLiveZombie(target.id)
     elseif target.kind == "zombie" then
-        worldObject = Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
+        worldObject = target.worldObject or Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
     end
     if not worldObject then
         return false
@@ -110,10 +129,32 @@ local function isActionTargetVisible(record, target)
     return visible == true and visibilityKind ~= "clearthroughwindow"
 end
 
+local function isCommittedMeleeTargetInRange(zombie, target)
+    local dx
+    local dy
+    local dz
+    local range
+    if not zombie or not target or target.x == nil or target.y == nil then
+        return false
+    end
+    dx = (tonumber(target.x) or zombie:getX()) - zombie:getX()
+    dy = (tonumber(target.y) or zombie:getY()) - zombie:getY()
+    dz = math.abs((tonumber(target.z) or zombie:getZ()) - zombie:getZ())
+    range = (tonumber(Const.MELEE_RANGE) or 1.45) + 0.35
+    return dz <= 0.25 and ((dx * dx) + (dy * dy)) <= (range * range)
+end
+
 function Internal.clearAttackAction(record)
     if record and record.runtime then
         record.runtime.attackAction = nil
     end
+end
+
+function Internal.finishAttackAction(record, zombie)
+    if Animation and Animation.FinishBump then
+        Animation.FinishBump(zombie, true)
+    end
+    Internal.clearAttackAction(record)
 end
 
 function Internal.buildAttackAction(record, target, attackKind, attackType, anim, damage, skillID, extra)
@@ -142,7 +183,7 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
 end
 
 function Internal.applyDamageToZombie(record, attackerZombie, target, damage, attackType)
-    local victim = target and target.zombieId and Perception.FindZombieByID(target.zombieId) or nil
+    local victim = target and target.worldObject or nil
     local fakeZombie
     local weaponItem
     local health
@@ -151,6 +192,9 @@ function Internal.applyDamageToZombie(record, attackerZombie, target, damage, at
     local reactionOptions
     local reactionManaged
 
+    if (not victim) and target and target.zombieId and Perception.FindZombieByID then
+        victim = Perception.FindZombieByID(target.zombieId)
+    end
     if not victim or victim:isDead() then
         return false, "invalid_zombie_target"
     end
@@ -167,10 +211,10 @@ function Internal.applyDamageToZombie(record, attackerZombie, target, damage, at
         kind = attackType == "ranged" and "ranged" or "melee",
         hitReaction = attackType == "ranged" and "ShotBelly" or "HitReaction",
         hitForce = attackType == "ranged" and 0.78 or 0.92,
-        pushDistance = attackType == "ranged" and 0 or 0.10,
-        pushDurationMs = attackType == "ranged" and 0 or 100,
-        durationMs = attackType == "ranged" and 140 or 190,
-        stepDistance = attackType == "ranged" and 0.02 or 0.05,
+        pushDistance = attackType == "ranged" and 0 or 0.18,
+        pushDurationMs = attackType == "ranged" and 0 or 150,
+        durationMs = attackType == "ranged" and 140 or 220,
+        stepDistance = attackType == "ranged" and 0.02 or 0.06,
         stagger = attackType ~= "ranged",
     }
 
@@ -284,10 +328,10 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     Unarmed.ApplyZombieShove(zombie, zombieTarget, {
                         kind = "pressure_shove",
                         hitForce = 1.02,
-                        pushDistance = 0.15,
-                        pushDurationMs = 110,
-                        durationMs = 160,
-                        stepDistance = 0.05,
+                        pushDistance = 0.22,
+                        pushDurationMs = 170,
+                        durationMs = 220,
+                        stepDistance = 0.06,
                     })
                 end
             end
@@ -361,13 +405,20 @@ function Combat.PumpAttackAction(record, zombie)
         return false, "no_attack"
     end
     if not zombie or record.alive == false then
-        Internal.clearAttackAction(record)
+        Internal.finishAttackAction(record, zombie)
         return false, "attack_cleared"
     end
 
     target = resolveActionTarget(action.target)
-    if target and not isActionTargetVisible(record, target) then
-        Internal.clearAttackAction(record)
+    if not target then
+        Internal.finishAttackAction(record, zombie)
+        return false, "target_lost_or_dead"
+    end
+    if target
+        and not isActionTargetVisible(record, target)
+        and not (action.attackType == "melee" and isCommittedMeleeTargetInRange(zombie, target))
+    then
+        Internal.finishAttackAction(record, zombie)
         return false, "target_not_visible"
     end
     if target then
@@ -376,16 +427,29 @@ function Combat.PumpAttackAction(record, zombie)
 
     if (not action.hitDone) and now >= (tonumber(action.hitAt) or 0) then
         action.hitDone = true
-        action.lastResult, action.lastReason = Internal.applyAttackActionHit(record, zombie, action, target)
+        if action.attackType == "melee" and not isCommittedMeleeTargetInRange(zombie, target) then
+            action.lastResult = false
+            action.lastReason = "target_out_of_range_at_hit"
+        else
+            action.lastResult, action.lastReason = Internal.applyAttackActionHit(record, zombie, action, target)
+        end
+        if action.lastResult ~= true and Core and Core.Log then
+            Core.Log("WARN", "attack_hit_failed npc=" .. tostring(record and record.id or "nil") .. " reason=" .. tostring(action.lastReason or "unknown") .. " target=" .. tostring(target and target.kind or "nil"))
+        end
     end
 
     bumpFinished = zombie.getVariableBoolean and zombie:getVariableBoolean("BumpAnimFinished") or false
     if bumpFinished == true and action.hitDone ~= true then
         action.hitDone = true
-        action.lastResult, action.lastReason = Internal.applyAttackActionHit(record, zombie, action, target)
+        if action.attackType == "melee" and not isCommittedMeleeTargetInRange(zombie, target) then
+            action.lastResult = false
+            action.lastReason = "target_out_of_range_at_anim_end"
+        else
+            action.lastResult, action.lastReason = Internal.applyAttackActionHit(record, zombie, action, target)
+        end
     end
     if target == nil or bumpFinished == true or now >= (tonumber(action.finishAt) or 0) then
-        Internal.clearAttackAction(record)
+        Internal.finishAttackAction(record, zombie)
         return false, action.lastReason or (target and "attack_finished" or "target_lost")
     end
 

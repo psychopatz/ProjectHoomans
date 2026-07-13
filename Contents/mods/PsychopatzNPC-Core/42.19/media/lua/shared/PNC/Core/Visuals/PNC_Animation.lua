@@ -12,6 +12,15 @@ local Core = PNC.Core
 local LiveBodyControl = PNC.LiveBodyControl
 local LocomotionProfiles = PNC.LocomotionProfiles
 
+local BUMP_RELEASE_SETTLE_MS = 50
+
+local function getActionStateName(zombie)
+    if zombie and zombie.getActionStateName then
+        return string.lower(tostring(zombie:getActionStateName() or ""))
+    end
+    return ""
+end
+
 local function setPNCStateVars(zombie, record, animState)
     if not zombie or not zombie.setVariable then
         return
@@ -283,8 +292,14 @@ function Animation.ClearDowned(zombie)
 end
 
 function Animation.PlayBump(zombie, record, bumpType)
+    local modData
     if not zombie then
         return
+    end
+    modData = zombie.getModData and zombie:getModData() or nil
+    if modData then
+        modData.PNC_BumpReleasePending = nil
+        modData.PNC_BumpReleaseAt = nil
     end
     setPNCStateVars(zombie, record, bumpType or "Bump")
     setLocomotionVars(zombie, {
@@ -301,12 +316,74 @@ function Animation.PlayBump(zombie, record, bumpType)
     if zombie.setBumpDone then
         zombie:setBumpDone(false)
     end
+    if zombie.setBumpFall then
+        zombie:setBumpFall(false)
+    end
     if zombie.setVariable then
+        zombie:setVariable("BumpDone", false)
         zombie:setVariable("BumpAnimFinished", false)
+        zombie:setVariable("BumpFall", false)
+        zombie:setVariable("BumpFallType", "")
     end
     if zombie.setBumpType then
         zombie:setBumpType(tostring(bumpType or "Bump"))
     end
+end
+
+function Animation.FinishBump(zombie, forceIdle)
+    local modData
+    if not zombie then
+        return
+    end
+    modData = zombie.getModData and zombie:getModData() or nil
+    if zombie.setBumpDone then
+        zombie:setBumpDone(true)
+    end
+    if zombie.setVariable then
+        -- BumpedState must observe both completion flags during its next
+        -- ActionContext update. Clearing BumpAnimFinished in this same tick
+        -- leaves the body permanently in the bumped action state.
+        zombie:setVariable("BumpDone", true)
+        zombie:setVariable("BumpAnimFinished", true)
+    end
+    if modData then
+        modData.PNC_BumpReleasePending = true
+        modData.PNC_BumpReleaseAt = Core and Core.Now and Core.Now() or 0
+    end
+end
+
+function Animation.PumpBumpRelease(zombie, now)
+    local modData
+    local releaseAt
+    local actionState
+    if not zombie then
+        return false
+    end
+    modData = zombie.getModData and zombie:getModData() or nil
+    if not modData or modData.PNC_BumpReleasePending ~= true then
+        return false
+    end
+    now = tonumber(now) or Core and Core.Now and Core.Now() or 0
+    releaseAt = tonumber(modData.PNC_BumpReleaseAt) or now
+    if zombie.setBumpDone then
+        zombie:setBumpDone(true)
+    end
+    if zombie.setVariable then
+        zombie:setVariable("BumpDone", true)
+        zombie:setVariable("BumpAnimFinished", true)
+    end
+    actionState = getActionStateName(zombie)
+    if (now - releaseAt) < BUMP_RELEASE_SETTLE_MS or actionState == "bumped" then
+        return true
+    end
+    -- BumpedState.exit owns clearing BumpAnimFinished and BumpType. This
+    -- fallback only normalizes a body that has already left that state.
+    if zombie.setBumpType then
+        zombie:setBumpType("")
+    end
+    modData.PNC_BumpReleasePending = nil
+    modData.PNC_BumpReleaseAt = nil
+    return false
 end
 
 function Animation.SyncLocomotion(zombie, record)
@@ -327,6 +404,12 @@ function Animation.SyncLocomotion(zombie, record)
     attackAction = runtime and runtime.attackAction or nil
     path = runtime and runtime.pathing or nil
     now = Core and Core.Now and Core.Now() or 0
+    if Animation.PumpBumpRelease(zombie, now) then
+        if zombie.setUseless then
+            zombie:setUseless(true)
+        end
+        return
+    end
     if attackAction and now < (tonumber(attackAction.finishAt) or 0) then
         if zombie.setUseless then
             zombie:setUseless(true)

@@ -138,6 +138,7 @@ function Internal.setLaneGoal(record, lane, goal)
     lane.lastSuppressAudioAt = 0
     lane.specialMoveUntil = 0
     lane.specialAnim = nil
+    lane.traversalAction = nil
     lane.resolvedMode = nil
     lane.animSpeed = 1.0
     lane.speed = 0
@@ -164,6 +165,13 @@ function Internal.setLaneGoal(record, lane, goal)
     lane.lastTraversalGoalRevision = 0
     lane.lastNonLocomotionState = nil
     lane.lastNonLocomotionAt = 0
+    lane.blockedStepFromX = nil
+    lane.blockedStepFromY = nil
+    lane.blockedStepFromZ = nil
+    lane.blockedStepToX = nil
+    lane.blockedStepToY = nil
+    lane.blockedStepToZ = nil
+    lane.blockedStepReason = nil
     lane.ownerMode = "requested"
 end
 
@@ -183,6 +191,13 @@ function Internal.consumeMoveIntent(record, lane, zombie)
     local goal
     if not runtime then
         return "hold"
+    end
+    if lane and lane.traversalAction then
+        Internal.captureIntentContext(record, lane, intent)
+        if intent and intent.kind ~= "hold" then
+            lane.pendingGoal = Internal.buildGoal(intent.x, intent.y, intent.z, intent.mode, intent.stopDistance)
+        end
+        return "special_active"
     end
     if not intent or intent.kind == "hold" then
         Internal.captureIntentContext(record, lane, intent)

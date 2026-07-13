@@ -108,9 +108,6 @@ function Interpolation.RecordSnapshot(snapshot, zombie, now)
     local targetX
     local targetY
     local targetZ
-    local fromX
-    local fromY
-    local fromZ
     local dx
     local dy
     local distance
@@ -193,6 +190,9 @@ function Interpolation.RecordSnapshot(snapshot, zombie, now)
     state.key = key
     state.startedAt = now
     state.durationMs = clamp(hint and hint.durationMs or Const.CLIENT_INTERP_BASE_MS or 150, 40, 1200)
+    if visualState.moving == true and streamKind == "move" then
+        state.durationMs = math.max(state.durationMs, tonumber(Const.CLIENT_INTERP_MOVE_MIN_MS) or 200)
+    end
     state.lastX = fromX
     state.lastY = fromY
     state.lastZ = fromZ

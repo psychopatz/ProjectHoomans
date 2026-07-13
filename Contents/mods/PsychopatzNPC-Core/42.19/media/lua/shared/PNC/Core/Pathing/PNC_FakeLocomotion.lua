@@ -153,12 +153,26 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
         candidate = candidates[i]
         walkable, blockReason = isSquareWalkable(candidate.x, candidate.y, candidate.z, zx, zy, zz)
         if i == 1 and not walkable and (blockReason == "door" or blockReason == "window" or blockReason == "fence") then
+            lane.blockedStepFromX = zx
+            lane.blockedStepFromY = zy
+            lane.blockedStepFromZ = zz
+            lane.blockedStepToX = candidate.x
+            lane.blockedStepToY = candidate.y
+            lane.blockedStepToZ = candidate.z
+            lane.blockedStepReason = blockReason
             lane.lastStepAt = now
             lane.lastStepDistance = 0
             lane.lastStepLabel = blockReason
             return false, "interaction_blocked", stepDistance
         end
         if walkable then
+            lane.blockedStepFromX = nil
+            lane.blockedStepFromY = nil
+            lane.blockedStepFromZ = nil
+            lane.blockedStepToX = nil
+            lane.blockedStepToY = nil
+            lane.blockedStepToZ = nil
+            lane.blockedStepReason = nil
             if PNC.PathService and PNC.PathService.ApplyTravelFacing then
                 PNC.PathService.ApplyTravelFacing(zombie, lane, candidate.x, candidate.y, now)
             elseif zombie.faceLocation then

@@ -6,6 +6,18 @@
 - live NPCs can open doors and use windows when the path stalls near an obstacle
 - fence hopping uses the same server-owned traversal lease, repeat suppression,
   landing validation, and client motion hints as window traversal
+- fence and window climbs use a two-phase server-owned hold/commit action: the
+  logical position remains at takeoff while the XML hop plays, then moves to
+  the exact landing square only after the PNC-only `PNCTraversalFinished`
+  signal; all traversal XML publishes completion at the true animation `End`,
+  with a long recovery-only timeout for dropped engine events
+- traversal bump types and variables are PNC-only; vanilla climb-start/outcome
+  variables are never written because they enter Java states that assume body
+  systems unavailable on embodied zombie NPCs
+- fresh follow/combat goals remain pending while traversal owns the body; they
+  cannot cancel the bump or restart fake locomotion midway across a passage
+- doors and windows are considered opened only after their engine state reports
+  open, then their object/path state is synchronized by the authoritative side
 - all path ownership lives in `PNC_PathService`
 - behavior writes `move intent`; only `PNC_PathService.Pump` may start, refresh, cancel, or complete live movement
 - the live move lane uses explicit phases: `idle`, `requested`, `active`, `arrived`, `blocked`, `cancel_pending`

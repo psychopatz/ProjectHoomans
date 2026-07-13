@@ -8,6 +8,17 @@
 
 ## Current Rules
 - melee and ranged attacks are server-authoritative delayed-hit actions, not immediate damage writes
+- attack actions explicitly release the engine bump channel when the animation
+  finishes, the target is lost, or the bounded action timeout expires; release
+  remains pending until the ActionContext acknowledges that it left `bumped`
+- NPC melee reactions use short server-owned, collision-aware displacement so
+  zombies visibly yield to a hit without being left permanently staggered
+- committed point-blank melee swings tolerate transient LOS changes during the
+  windup, revalidate range at the hit frame, and verify that the engine hit
+  actually changed zombie health before using authoritative fallback damage
+- delayed attacks retain a runtime-only direct zombie reference plus the stable
+  spatial ID, and cancel immediately with `target_lost_or_dead` if neither
+  resolves before the hit frame
 - companions and hostiles can both acquire zombie targets
 - initial player, NPC, and zombie acquisition requires an unobstructed visual
   trace; closed doors and walls do not count as visible

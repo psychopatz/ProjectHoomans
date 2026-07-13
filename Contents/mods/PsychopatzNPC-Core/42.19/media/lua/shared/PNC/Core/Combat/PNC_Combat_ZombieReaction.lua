@@ -11,6 +11,7 @@ PNC.CombatZombieReaction = PNC.CombatZombieReaction or {}
 local ZombieReaction = PNC.CombatZombieReaction
 local Core = PNC.Core
 local ZombieAggro = PNC.ZombieAggro
+local TraversalQuery = PNC.TraversalQuery
 
 local PUSH_INTERVAL_MS = 45
 local DEFAULT_DURATION_MS = 220
@@ -25,7 +26,10 @@ local function getSquare(x, y, z)
     return getCell():getGridSquare(math.floor(x), math.floor(y), z)
 end
 
-local function isSquareWalkable(x, y, z)
+local function isSquareWalkable(x, y, z, fromX, fromY, fromZ)
+    if TraversalQuery and TraversalQuery.CanStep then
+        return TraversalQuery.CanStep(fromX, fromY, fromZ, x, y, z)
+    end
     local square = getSquare(x, y, z)
     if not square then
         return false
@@ -51,6 +55,9 @@ local function clearReactionState(zombie, modData)
     end
     if zombie and state and state.hitReaction and zombie.setHitReaction then
         zombie:setHitReaction("")
+    end
+    if zombie and state and state.knockedDown == true and zombie.setKnockedDown then
+        zombie:setKnockedDown(false)
     end
 end
 
@@ -151,6 +158,7 @@ local function beginReaction(attackerZombie, targetZombie, options)
     state.kind = options and tostring(options.kind or "melee") or "melee"
     state.hitReaction = options and options.hitReaction or state.hitReaction or "HitReaction"
     state.staggered = options == nil or options.stagger ~= false
+    state.knockedDown = options and options.heavy == true and options.knockdown == true or false
     state.expiresAt = math.max(tonumber(state.expiresAt) or 0, now + durationMs)
     state.pushExpiresAt = math.max(tonumber(state.pushExpiresAt) or 0, now + pushDurationMs)
     state.remainingPush = math.max(tonumber(state.remainingPush) or 0, pushDistance)
@@ -173,14 +181,19 @@ end
 function ZombieReaction.ApplyWeaponHit(attackerZombie, targetZombie, weaponItem, scaledDamage, options)
     local fakeZombie
     local applied = false
+    local beforeHealth
+    local afterHealth
     if not targetZombie or targetZombie:isDead() then
         return false
     end
     if weaponItem and targetZombie.Hit then
+        beforeHealth = tonumber(targetZombie:getHealth()) or 0
         fakeZombie = getCell and getCell():getFakeZombieForHit() or nil
         applied = pcall(function()
             targetZombie:Hit(weaponItem, fakeZombie or attackerZombie, tonumber(scaledDamage) or 0, false, 1, false)
         end)
+        afterHealth = tonumber(targetZombie:getHealth()) or beforeHealth
+        applied = applied == true and afterHealth < (beforeHealth - 0.0001)
     end
     beginReaction(attackerZombie, targetZombie, options or {})
     return applied == true
@@ -225,7 +238,7 @@ function ZombieReaction.Pump(targetZombie, now)
         nz = targetZombie:getZ()
         nx = targetZombie:getX() + ((tonumber(state.dirX) or 0) * stepDistance)
         ny = targetZombie:getY() + ((tonumber(state.dirY) or 0) * stepDistance)
-        if isSquareWalkable(nx, ny, nz) then
+        if isSquareWalkable(nx, ny, nz, targetZombie:getX(), targetZombie:getY(), targetZombie:getZ()) then
             targetZombie:setX(nx)
             targetZombie:setY(ny)
             state.remainingPush = math.max(0, remainingPush - stepDistance)
