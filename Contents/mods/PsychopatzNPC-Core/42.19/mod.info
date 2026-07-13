@@ -5,3 +5,4 @@ author=Psychopatz
 category=framework
 version=0.1.0
 versionMin=42.19
+require=PsychopatzLib
