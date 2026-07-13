@@ -200,6 +200,10 @@ function TraversalQuery.FindFenceAhead(zombie, goalX, goalY, cell)
     local landingSquare
     local fence
     local tall
+    local candidates
+    local i
+    local stepX
+    local stepY
     if not zombie then
         return nil
     end
@@ -216,14 +220,35 @@ function TraversalQuery.FindFenceAhead(zombie, goalX, goalY, cell)
     if len <= 0.001 then
         return nil
     end
-    dirX = dirX / len
-    dirY = dirY / len
     fromSquare = TraversalQuery.GetSquare(originX, originY, originZ, cell)
-    nextSquare = TraversalQuery.GetSquare(originX + (dirX * 1.05), originY + (dirY * 1.05), originZ, cell)
-    if not fromSquare or not nextSquare or fromSquare == nextSquare then
-        nextSquare = TraversalQuery.GetSquare(originX + (dirX * 1.55), originY + (dirY * 1.55), originZ, cell)
+    if not fromSquare then
+        return nil
     end
-    fence, tall = TraversalQuery.GetFenceBetween(fromSquare, nextSquare)
+    stepX = dirX >= 0 and 1 or -1
+    stepY = dirY >= 0 and 1 or -1
+    -- Fence APIs are cardinal-edge based. A normalized diagonal probe can
+    -- cross both tile axes and ask getHoppableThumpable() for the wrong edge.
+    -- Probe the dominant goal axis first, then the secondary axis.
+    if math.abs(dirX) >= math.abs(dirY) then
+        candidates = {
+            { x = fromSquare:getX() + stepX, y = fromSquare:getY() },
+            { x = fromSquare:getX(), y = fromSquare:getY() + stepY, enabled = math.abs(dirY) > 0.15 },
+        }
+    else
+        candidates = {
+            { x = fromSquare:getX(), y = fromSquare:getY() + stepY },
+            { x = fromSquare:getX() + stepX, y = fromSquare:getY(), enabled = math.abs(dirX) > 0.15 },
+        }
+    end
+    for i = 1, #candidates do
+        if candidates[i].enabled ~= false then
+            nextSquare = cell:getGridSquare(candidates[i].x, candidates[i].y, originZ)
+            fence, tall = TraversalQuery.GetFenceBetween(fromSquare, nextSquare)
+            if fence then
+                break
+            end
+        end
+    end
     if not fence then
         return nil
     end

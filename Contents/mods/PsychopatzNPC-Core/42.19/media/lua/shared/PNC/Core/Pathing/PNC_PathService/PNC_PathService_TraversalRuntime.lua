@@ -13,6 +13,7 @@ PathService.Internal = PathService.Internal or {}
 
 local Internal = PathService.Internal
 local Animation = PNC.Animation
+local LiveBodyControl = PNC.LiveBodyControl
 local TRAVERSAL_FINISHED_VARIABLE = "PNCTraversalFinished"
 local TRAVERSAL_KIND_VARIABLE = "PNCTraversalKind"
 
@@ -47,6 +48,13 @@ local function isTraversalFinished(zombie, action)
         return value == "true" or value == "1"
     end
     return false
+end
+
+local function getActionStateName(zombie)
+    if zombie and zombie.getActionStateName then
+        return string.lower(tostring(zombie:getActionStateName() or ""))
+    end
+    return ""
 end
 
 local function resetTraversalVariables(zombie)
@@ -98,7 +106,9 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
         endZ = tonumber(spec.toZ) or zombie:getZ(),
         startedAt = now,
         travelDurationMs = travelDurationMs,
+        earliestFinishAt = now + travelDurationMs,
         hardFinishAt = now + hardTimeoutMs,
+        sawBumpState = false,
     }
     lane.specialMoveUntil = now + hardTimeoutMs
     lane.specialAnim = lane.traversalAction.anim
@@ -120,6 +130,12 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
     end
     if zombie.setRunning then
         zombie:setRunning(false)
+    end
+    -- Engine pathing may have entered its own climb state on the collision
+    -- frame. Exit that state before selecting PNC's bump node; otherwise the
+    -- bump End event is never evaluated and traversal can only hard-timeout.
+    if LiveBodyControl and LiveBodyControl.SuppressZombieState then
+        LiveBodyControl.SuppressZombieState(zombie, lane, now)
     end
     if Internal.applyFacingLocation then
         Internal.applyFacingLocation(zombie, lane, lane.traversalAction.endX, lane.traversalAction.endY, now, "traversal", true)
@@ -143,6 +159,7 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     local finished
     local timedOut
     local finishReason
+    local actionState
     if not action then
         return false, nil
     end
@@ -169,7 +186,18 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     Internal.syncRecordPosition(record, zombie)
     lane.lastProgressAt = now
     lane.lastIssueAt = now
+    actionState = getActionStateName(zombie)
+    if actionState == "bumped" then
+        action.sawBumpState = true
+    end
     finished = isTraversalFinished(zombie, action)
+    if not finished
+        and action.sawBumpState == true
+        and now >= (tonumber(action.earliestFinishAt) or now)
+        and actionState ~= "bumped"
+    then
+        finished = true
+    end
     timedOut = now >= (tonumber(action.hardFinishAt) or now)
     if not finished and not timedOut then
         return true, action.kind

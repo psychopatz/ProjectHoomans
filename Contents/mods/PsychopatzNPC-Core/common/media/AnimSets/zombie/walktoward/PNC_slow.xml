@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <animNode>
-	<m_Name>PNC_ZSslow</m_Name>
+	<m_Name>PNC_Anim_slow</m_Name>
 	<m_deferredBoneAxis>Y</m_deferredBoneAxis>
 	<m_SpeedScale>0.9</m_SpeedScale>
 	<m_BlendTime>0.20</m_BlendTime>

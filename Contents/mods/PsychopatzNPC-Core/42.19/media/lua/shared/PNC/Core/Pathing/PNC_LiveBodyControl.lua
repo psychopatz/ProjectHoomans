@@ -177,6 +177,14 @@ function LiveBodyControl.SuppressZombieState(zombie, lane, now)
     if actionState == "turnalerted" and zombie.setTurnAlertedValues then
         zombie:setTurnAlertedValues(0, 0)
     end
+    if zombie.setVariable and actionState == "climbfence" then
+        zombie:setVariable("ClimbFenceStarted", false)
+        zombie:setVariable("ClimbFenceFinished", true)
+        zombie:setVariable("ClimbFenceOutcome", "")
+    elseif zombie.setVariable and actionState == "climbwindow" then
+        zombie:setVariable("ClimbWindowStarted", false)
+        zombie:setVariable("ClimbWindowOutcome", "")
+    end
     if zombie.setUseless then
         zombie:setUseless(true)
     end

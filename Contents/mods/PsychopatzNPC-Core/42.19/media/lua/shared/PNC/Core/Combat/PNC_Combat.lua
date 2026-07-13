@@ -16,7 +16,6 @@ local Registry = PNC.Registry
 local Animation = PNC.Animation
 local Equipment = PNC.Equipment
 local Perception = PNC.Perception
-local PathService = PNC.PathService
 
 Internal.MELEE_BUMP_TYPES = {
     onehanded = { "PNC_Attack1H1" },
@@ -38,6 +37,7 @@ Internal.ATTACK_TIMINGS = {
 }
 
 function Internal.faceTarget(zombie, target, record, leaseMs, reason)
+    local pathService = PNC.PathService
     local liveTarget
     local zombieTarget
     local faceX
@@ -45,11 +45,14 @@ function Internal.faceTarget(zombie, target, record, leaseMs, reason)
     if not zombie or not target then
         return
     end
+    if pathService and pathService.IsTraversalActive and pathService.IsTraversalActive(record, zombie) then
+        return
+    end
     if target.kind == "player" and target.player then
         faceX = target.player:getX()
         faceY = target.player:getY()
-        if PathService and PathService.RequestCombatFacing and record then
-            PathService.RequestCombatFacing(record, zombie, {
+        if pathService and pathService.RequestCombatFacing and record then
+            pathService.RequestCombatFacing(record, zombie, {
                 x = faceX,
                 y = faceY,
                 z = target.player:getZ(),
@@ -63,8 +66,8 @@ function Internal.faceTarget(zombie, target, record, leaseMs, reason)
     end
     if target.kind == "npc" then
         liveTarget = Registry.GetLiveZombie(target.id)
-        if liveTarget and PathService and PathService.RequestCombatFacing and record then
-            PathService.RequestCombatFacing(record, zombie, {
+        if liveTarget and pathService and pathService.RequestCombatFacing and record then
+            pathService.RequestCombatFacing(record, zombie, {
                 x = liveTarget:getX(),
                 y = liveTarget:getY(),
                 z = liveTarget:getZ(),
@@ -78,8 +81,8 @@ function Internal.faceTarget(zombie, target, record, leaseMs, reason)
     end
     if target.kind == "zombie" then
         zombieTarget = Perception and Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
-        if zombieTarget and PathService and PathService.RequestCombatFacing and record then
-            PathService.RequestCombatFacing(record, zombie, {
+        if zombieTarget and pathService and pathService.RequestCombatFacing and record then
+            pathService.RequestCombatFacing(record, zombie, {
                 x = zombieTarget:getX(),
                 y = zombieTarget:getY(),
                 z = zombieTarget:getZ(),

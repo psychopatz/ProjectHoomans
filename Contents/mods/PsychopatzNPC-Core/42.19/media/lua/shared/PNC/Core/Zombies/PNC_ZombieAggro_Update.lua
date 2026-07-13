@@ -74,9 +74,10 @@ function ZombieAggro.Pump(now)
     for i = zombieList:size() - 1, 0, -1 do
         zombie = zombieList:get(i)
         if zombie and (not zombie:isDead()) and (not Internal.isManagedNPCBody(zombie)) then
-            if ZombieReaction and ZombieReaction.Pump and ZombieReaction.Pump(zombie, now) then
-                -- Combat reaction windows temporarily own the zombie body.
-            elseif ZombieAggro.UpdateBiteState(zombie, now) then
+            if ZombieReaction and ZombieReaction.Pump then
+                ZombieReaction.Pump(zombie, now)
+            end
+            if ZombieAggro.UpdateBiteState(zombie, now) then
                 -- Bite flow owns the zombie while the bite is active.
             else
                 target = zombie.getTarget and zombie:getTarget() or nil

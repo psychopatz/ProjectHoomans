@@ -22,6 +22,14 @@ local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local Tactics = PNC.CombatTactics
 local Animation = PNC.Animation
+local Damage = PNC.CombatDamage
+
+local function applyWeaponWear(record)
+    local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record) or nil
+    if Damage and Damage.ApplyWeaponConditionLoss then
+        Damage.ApplyWeaponConditionLoss(record, weaponItem)
+    end
+end
 
 local function captureTargetRef(target)
     local worldObject
@@ -248,6 +256,7 @@ function Internal.applyDamageToZombie(record, attackerZombie, target, damage, at
     if ZombieAggro and ZombieAggro.OnZombieProvoked and (attackerZombie or fakeZombie) then
         ZombieAggro.OnZombieProvoked(victim, attackerZombie or fakeZombie)
     end
+    applyWeaponWear(record)
     return true, applied and "hit_zombie" or "hit_zombie_fallback"
 end
 
@@ -258,6 +267,19 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
     local attackReason
     if not action or not target then
         return false, "target_lost"
+    end
+
+    if action.attackType == "ranged" and action.ammoConsumed ~= true then
+        local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record) or nil
+        local consumed
+        local ammoReason
+        if Damage and Damage.ConsumeAmmo then
+            consumed, ammoReason = Damage.ConsumeAmmo(record, weaponItem)
+            if not consumed then
+                return false, ammoReason or "out_of_ammo"
+            end
+        end
+        action.ammoConsumed = true
     end
 
     if action.attackKind == "shove" then
@@ -279,7 +301,10 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
 
     if action.attackKind == "ground" or action.attackType == "melee" then
         if target.kind == "player" then
-            if Health.ApplyDamageToPlayer(target.player, action.damage) then
+            if Damage and Damage.ApplyPlayerDamage and Damage.ApplyPlayerDamage(target.player, action.damage, "melee", Internal.resolveWeaponItem(record))
+                or (not Damage and Health.ApplyDamageToPlayer(target.player, action.damage))
+            then
+                applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
                 end
@@ -302,6 +327,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 attackerID = record.id,
                 attackerKind = "npc",
             }) then
+                applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
                 end
@@ -341,7 +367,10 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
 
     if action.attackType == "ranged" then
         if target.kind == "player" then
-            if Health.ApplyDamageToPlayer(target.player, action.damage) then
+            if Damage and Damage.ApplyPlayerDamage and Damage.ApplyPlayerDamage(target.player, action.damage, "ranged", Internal.resolveWeaponItem(record))
+                or (not Damage and Health.ApplyDamageToPlayer(target.player, action.damage))
+            then
+                applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "ranged", action.skillID or "Aiming")
                 end
@@ -364,6 +393,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 attackerID = record.id,
                 attackerKind = "npc",
             }) then
+                applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "ranged", action.skillID or "Aiming")
                 end
@@ -403,6 +433,12 @@ function Combat.PumpAttackAction(record, zombie)
     local bumpFinished
     if not action then
         return false, "no_attack"
+    end
+    if PNC.PathService and PNC.PathService.IsTraversalActive and PNC.PathService.IsTraversalActive(record, zombie) then
+        -- Traversal owns the bump animation. Do not call finishAttackAction:
+        -- that would mark the traversal bump complete and teleport the body.
+        Internal.clearAttackAction(record)
+        return false, "attack_cancelled_for_traversal"
     end
     if not zombie or record.alive == false then
         Internal.finishAttackAction(record, zombie)

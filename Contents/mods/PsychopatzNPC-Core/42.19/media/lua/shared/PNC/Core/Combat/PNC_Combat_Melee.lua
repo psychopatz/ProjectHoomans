@@ -17,6 +17,7 @@ local Perception = PNC.Perception
 local Unarmed = PNC.CombatUnarmed
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
+local Damage = PNC.CombatDamage
 
 function Combat.TryMelee(record, zombie, target)
     local now = Core.Now()
@@ -31,9 +32,13 @@ function Combat.TryMelee(record, zombie, target)
     local skillID = Skills and Skills.ResolveWeaponSkill and Skills.ResolveWeaponSkill(record, record.equipment and record.equipment.primaryFullType, "melee") or "Strength"
     local skillLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, skillID) or 0
     local strengthLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, "Strength") or 0
+    local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record) or nil
 
     if not target then
         return false, "no_target"
+    end
+    if PNC.PathService and PNC.PathService.IsTraversalActive and PNC.PathService.IsTraversalActive(record, zombie) then
+        return false, "traversal_active"
     end
     if Combat.HasActiveAttack and Combat.HasActiveAttack(record, now) then
         return false, "attack_in_progress"
@@ -50,7 +55,11 @@ function Combat.TryMelee(record, zombie, target)
         return false, "stamina_exhausted"
     end
 
-    damage = damage * (0.9 + math.min(skillLevel, 8) * 0.04 + math.min(strengthLevel, 6) * 0.02)
+    if not isBarehand and Damage and Damage.GetAttackDamage and Damage.IsWeaponDamageEnabled and Damage.IsWeaponDamageEnabled() then
+        damage = Damage.GetAttackDamage(record, "melee", weaponItem, damage, skillLevel)
+    else
+        damage = damage * (0.9 + math.min(skillLevel, 8) * 0.04 + math.min(strengthLevel, 6) * 0.02)
+    end
     record.runtime.lastAttackAt = now
     record.runtime.inCombatUntil = now + Const.DEBUG_COMBAT_HOLD_MS
     Internal.faceTarget(zombie, target, record, Internal.ATTACK_TIMINGS.melee.duration, "melee_windup")
@@ -91,6 +100,9 @@ function Combat.TryDownedShove(record, zombie, target)
     local zombieTarget
     if not target or not zombie then
         return false, "no_target"
+    end
+    if PNC.PathService and PNC.PathService.IsTraversalActive and PNC.PathService.IsTraversalActive(record, zombie) then
+        return false, "traversal_active"
     end
     if Combat.HasActiveAttack and Combat.HasActiveAttack(record, now) then
         return false, "attack_in_progress"

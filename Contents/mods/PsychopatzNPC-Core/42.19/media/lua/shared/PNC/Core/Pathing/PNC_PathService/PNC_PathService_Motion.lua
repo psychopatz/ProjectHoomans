@@ -216,6 +216,29 @@ function Internal.updateActiveMove(zombie, record, lane)
 
     Internal.refreshResolvedLocomotion(record, lane, zombie, goal)
     lane.lastActionState = Internal.getActionStateName(zombie)
+    -- A collision can put the embodied zombie into a vanilla traversal state
+    -- before a tiny fake-locomotion step crosses the tile boundary. Adopt the
+    -- obstacle immediately instead of suppressing the state forever.
+    if (lane.lastActionState == "climbfence" or lane.lastActionState == "climbwindow")
+        and Internal.tryDoorOrWindowInteraction
+    then
+        interacted, interactType = Internal.tryDoorOrWindowInteraction(zombie, record, lane, goal.x, goal.y, goal.z)
+        if interacted then
+            lane.lastIssueAt = now
+            lane.noProgressCount = 0
+            if interactType == "fence_climb" then
+                lane.ownerMode = "fence_climb"
+            elseif interactType == "window_climb" then
+                lane.ownerMode = "window_climb"
+            elseif interactType == "door_open" then
+                lane.ownerMode = "door_open"
+            elseif interactType == "window_open" then
+                lane.ownerMode = "window_open"
+            end
+            Internal.logMoveDebug(record, zombie, lane, "adopt_traversal", interactType or lane.lastActionState, "")
+            return true, interactType or "traversal"
+        end
+    end
     if Internal.LiveBodyControl and Internal.LiveBodyControl.SuppressZombieState then
         suppressed, suppressedState = Internal.LiveBodyControl.SuppressZombieState(zombie, lane, now)
     else
@@ -223,8 +246,6 @@ function Internal.updateActiveMove(zombie, record, lane)
         suppressedState = nil
     end
     if suppressed then
-        lane.lastProgressAt = now
-        lane.lastIssueAt = now
         lane.lastActionState = Internal.getActionStateName(zombie)
         lane.recoveryCount = (tonumber(lane.recoveryCount) or 0) + 1
         lane.lastRecoveryReason = suppressedState or lane.lastActionState
@@ -235,8 +256,17 @@ function Internal.updateActiveMove(zombie, record, lane)
         if lane.ownerMode ~= "window_climb" and lane.ownerMode ~= "window_open" and lane.ownerMode ~= "fence_climb" then
             Internal.setWalkAnim(zombie, record, lane.resolvedMode or lane.mode or "walk", false)
         end
-        Internal.logMoveWarning(record, zombie, lane, "suppress_state", suppressedState or lane.lastActionState, "action=" .. tostring(suppressedState or lane.lastActionState))
+        if lane.lastSuppressedWarnState ~= suppressedState
+            or (now - (tonumber(lane.lastSuppressedWarnAt) or 0)) >= 15000
+        then
+            lane.lastSuppressedWarnState = suppressedState
+            lane.lastSuppressedWarnAt = now
+            Internal.logMoveWarning(record, zombie, lane, "suppress_state", suppressedState or lane.lastActionState, "action=" .. tostring(suppressedState or lane.lastActionState))
+        end
         Internal.logMoveDebug(record, zombie, lane, "suppress_state", suppressedState or lane.lastActionState, "postAction=" .. tostring(lane.lastActionState))
+    else
+        lane.lastSuppressedWarnState = nil
+        lane.lastSuppressedWarnAt = nil
     end
 
     if not suppressed and Internal.tryRecoverNonLocomotionState then

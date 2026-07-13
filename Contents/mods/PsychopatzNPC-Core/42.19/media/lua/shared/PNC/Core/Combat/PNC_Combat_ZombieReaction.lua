@@ -1,8 +1,8 @@
 --[[
     PNC Combat Zombie Reaction
-    Owns short server-authoritative zombie hit and shove reactions triggered by
-    NPC combat so reactions read clearly without relying on one-frame engine
-    state flips alone.
+    Adds short collision-safe shove displacement after NPC combat. The engine
+    remains the sole owner of hit/stagger/knockdown state; taking ownership here
+    can freeze vanilla zombies when IsoZombie:Hit() transitions concurrently.
 ]]
 
 PNC = PNC or {}
@@ -43,21 +43,8 @@ local function getReactionState(zombie)
 end
 
 local function clearReactionState(zombie, modData)
-    local state = modData and modData.PNC_CombatReaction or nil
     if modData then
         modData.PNC_CombatReaction = nil
-    end
-    if zombie and zombie.setVariable then
-        zombie:setVariable("NoLungeAttack", false)
-    end
-    if zombie and state and state.staggered == true and zombie.setStaggerBack then
-        zombie:setStaggerBack(false)
-    end
-    if zombie and state and state.hitReaction and zombie.setHitReaction then
-        zombie:setHitReaction("")
-    end
-    if zombie and state and state.knockedDown == true and zombie.setKnockedDown then
-        zombie:setKnockedDown(false)
     end
 end
 
@@ -109,9 +96,6 @@ local function applyHitContext(attackerZombie, targetZombie, options)
     if targetZombie.setHitForce then
         targetZombie:setHitForce(tonumber(options and options.hitForce) or 0.92)
     end
-    if options and options.hitReaction and targetZombie.setHitReaction then
-        targetZombie:setHitReaction(tostring(options.hitReaction))
-    end
 end
 
 local function beginReaction(attackerZombie, targetZombie, options)
@@ -142,23 +126,16 @@ local function beginReaction(attackerZombie, targetZombie, options)
     dirX, dirY = resolvePushDirection(attackerZombie, targetZombie)
 
     applyHitContext(attackerZombie, targetZombie, options)
-    if options == nil or options.stagger ~= false then
-        if targetZombie.setStaggerBack then
-            targetZombie:setStaggerBack(true)
-        end
-        if targetZombie.setVariable then
-            targetZombie:setVariable("NoLungeAttack", true)
-        end
+    -- Explicit shoves may request vanilla stagger/knockdown entry. PNC never
+    -- clears these flags; the engine state that consumes them owns their exit.
+    if (options == nil or options.stagger ~= false) and targetZombie.setStaggerBack then
+        pcall(targetZombie.setStaggerBack, targetZombie, true)
     end
     if options and options.heavy == true and options.knockdown == true and targetZombie.setKnockedDown then
         targetZombie:setKnockedDown(true)
     end
-
     state = state or {}
     state.kind = options and tostring(options.kind or "melee") or "melee"
-    state.hitReaction = options and options.hitReaction or state.hitReaction or "HitReaction"
-    state.staggered = options == nil or options.stagger ~= false
-    state.knockedDown = options and options.heavy == true and options.knockdown == true or false
     state.expiresAt = math.max(tonumber(state.expiresAt) or 0, now + durationMs)
     state.pushExpiresAt = math.max(tonumber(state.pushExpiresAt) or 0, now + pushDurationMs)
     state.remainingPush = math.max(tonumber(state.remainingPush) or 0, pushDistance)
@@ -186,6 +163,7 @@ function ZombieReaction.ApplyWeaponHit(attackerZombie, targetZombie, weaponItem,
     if not targetZombie or targetZombie:isDead() then
         return false
     end
+    applyHitContext(attackerZombie, targetZombie, options)
     if weaponItem and targetZombie.Hit then
         beforeHealth = tonumber(targetZombie:getHealth()) or 0
         fakeZombie = getCell and getCell():getFakeZombieForHit() or nil
@@ -195,7 +173,11 @@ function ZombieReaction.ApplyWeaponHit(attackerZombie, targetZombie, weaponItem,
         afterHealth = tonumber(targetZombie:getHealth()) or beforeHealth
         applied = applied == true and afterHealth < (beforeHealth - 0.0001)
     end
-    beginReaction(attackerZombie, targetZombie, options or {})
+    -- IsoZombie:Hit owns the visible reaction. Manual movement is reserved for
+    -- explicit shoves so normal hits cannot fight the engine state machine.
+    if options and options.manualPush == true then
+        beginReaction(attackerZombie, targetZombie, options)
+    end
     return applied == true
 end
 
@@ -248,5 +230,6 @@ function ZombieReaction.Pump(targetZombie, now)
         state.lastPushAt = now
     end
 
-    return true
+    -- This overlay never owns zombie AI. Vanilla aggro/state updates continue.
+    return false
 end

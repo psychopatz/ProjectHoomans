@@ -14,6 +14,7 @@ local Combat = PNC.Combat
 local Equipment = PNC.Equipment
 local Tactics = PNC.CombatTactics
 local Common = PNC.BehaviorCommon
+local PathService = PNC.PathService
 
 function BehaviorCombat.TickEngage(record, zombie, target)
     local dist = math.sqrt(tonumber(target and target.distSq or 0) or 0)
@@ -30,6 +31,11 @@ function BehaviorCombat.TickEngage(record, zombie, target)
     local approachMode
 
     Common.SetCombatDebug(record, target, "engaging_" .. tostring(target.kind or "unknown"), effectiveMode, equipmentInfo.weaponStatus)
+
+    if PathService and PathService.IsTraversalActive and PathService.IsTraversalActive(record, zombie) then
+        Common.SetCombatDebug(record, target, "traversal_active", effectiveMode, equipmentInfo.weaponStatus)
+        return
+    end
 
     if equipmentInfo.weaponStatus ~= previousWeaponStatus then
         Core.LogRecordDebug(record, "NPC " .. tostring(record.id) .. " weapon state=" .. tostring(equipmentInfo.weaponStatus))

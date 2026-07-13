@@ -14,6 +14,7 @@ local Const = PNC.Const
 local Equipment = PNC.Equipment
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
+local Damage = PNC.CombatDamage
 
 function Combat.TryRanged(record, zombie, target)
     local now = Core.Now()
@@ -25,9 +26,13 @@ function Combat.TryRanged(record, zombie, target)
     local skillID = "Aiming"
     local aimingLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, "Aiming") or 0
     local anim
+    local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record) or nil
 
     if not target then
         return false, "no_target"
+    end
+    if PNC.PathService and PNC.PathService.IsTraversalActive and PNC.PathService.IsTraversalActive(record, zombie) then
+        return false, "traversal_active"
     end
     if equipmentInfo.combatModeResolved ~= "ranged" and equipmentInfo.combatModeResolved ~= "mixed" then
         return false, equipmentInfo.weaponStatus or "ranged_weapon_unavailable"
@@ -47,7 +52,11 @@ function Combat.TryRanged(record, zombie, target)
         return false, "stamina_exhausted"
     end
 
-    damage = damage * (0.9 + math.min(aimingLevel, 8) * 0.05)
+    if Damage and Damage.GetAttackDamage and Damage.IsWeaponDamageEnabled and Damage.IsWeaponDamageEnabled() then
+        damage = Damage.GetAttackDamage(record, "ranged", weaponItem, damage, aimingLevel)
+    else
+        damage = damage * (0.9 + math.min(aimingLevel, 8) * 0.05)
+    end
     record.runtime.lastAttackAt = now
     record.runtime.inCombatUntil = now + Const.DEBUG_COMBAT_HOLD_MS
     Internal.faceTarget(zombie, target, record, Internal.ATTACK_TIMINGS.ranged.duration, "ranged_windup")
