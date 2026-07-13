@@ -23,6 +23,7 @@ local Interpolation = PNC.ClientInterpolation
 Sync.BodyByID = Sync.BodyByID or {}
 Sync.BodyByOnlineID = Sync.BodyByOnlineID or {}
 Sync.BodyByInstanceID = Sync.BodyByInstanceID or {}
+Sync.BodyByLease = Sync.BodyByLease or {}
 Sync.FacingByID = Sync.FacingByID or {}
 Sync.UnresolvedLogAtByID = Sync.UnresolvedLogAtByID or {}
 Sync.lastBodyScanAt = Sync.lastBodyScanAt or 0
@@ -291,7 +292,10 @@ local function refreshBodyMap(now)
         if snapshot and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false then
             onlineID = snapshot.liveBodyOnlineID ~= nil and tostring(snapshot.liveBodyOnlineID) or nil
             instanceKey = snapshot.liveBodyInstanceID ~= nil and tostring(snapshot.liveBodyInstanceID) or nil
-            if not Sync.BodyByID[tostring(id)]
+            local leaseKey = snapshot.liveBodyLease
+                and (tostring(id) .. ":" .. tostring(snapshot.liveBodyLease)) or nil
+            if not (leaseKey and Sync.BodyByLease[leaseKey])
+                and not Sync.BodyByID[tostring(id)]
                 and not (onlineID and Sync.BodyByOnlineID[onlineID])
                 and not (instanceKey and Sync.BodyByInstanceID[instanceKey])
             then
@@ -307,6 +311,7 @@ local function refreshBodyMap(now)
     Sync.BodyByID = {}
     Sync.BodyByOnlineID = {}
     Sync.BodyByInstanceID = {}
+    Sync.BodyByLease = {}
     zombieList = getCell():getZombieList()
     if not zombieList then
         return
@@ -315,7 +320,20 @@ local function refreshBodyMap(now)
         body = zombieList:get(i)
         modData = body and body.getModData and body:getModData() or nil
         if modData and modData.PNC_UUID and modData.PNC_NPC == true then
-            Sync.BodyByID[tostring(modData.PNC_UUID)] = body
+            id = tostring(modData.PNC_UUID)
+            if Sync.BodyByID[id] ~= nil and Sync.BodyByID[id] ~= body then
+                Sync.BodyByID[id] = false
+            elseif Sync.BodyByID[id] == nil then
+                Sync.BodyByID[id] = body
+            end
+            if modData.PNC_BodyLease then
+                instanceKey = id .. ":" .. tostring(modData.PNC_BodyLease)
+                if Sync.BodyByLease[instanceKey] ~= nil and Sync.BodyByLease[instanceKey] ~= body then
+                    Sync.BodyByLease[instanceKey] = false
+                elseif Sync.BodyByLease[instanceKey] == nil then
+                    Sync.BodyByLease[instanceKey] = body
+                end
+            end
         end
         onlineID = Network and Network.GetZombieOnlineID and Network.GetZombieOnlineID(body) or nil
         if onlineID ~= nil then
@@ -381,6 +399,9 @@ local function applySnapshotToBody(snapshot, zombie)
         modData.PNC_NPC = true
         modData.PNC_LiveBodyInstanceID = snapshot.liveBodyInstanceID
         modData.PNC_LiveBodyOnlineID = snapshot.liveBodyOnlineID
+        modData.PNC_BodyKind = "live"
+        modData.PNC_BodyLease = snapshot.liveBodyLease
+        modData.PNC_TagVersion = Const.BODY_TAG_VERSION
     end
 
     visualKey = buildVisualKey(snapshot)
@@ -500,9 +521,14 @@ function Sync.OnTick()
     refreshBodyMap(now)
     for id, snapshot in pairs(ClientState and ClientState.snapshots or {}) do
         if snapshot and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false then
-            body = Sync.BodyByID[tostring(id)]
-                or Sync.BodyByOnlineID[tostring(snapshot.liveBodyOnlineID or "")]
-                or Sync.BodyByInstanceID[tostring(snapshot.liveBodyInstanceID or "")]
+            body = Sync.BodyByOnlineID[tostring(snapshot.liveBodyOnlineID or "")]
+            if not body and snapshot.liveBodyLease then
+                body = Sync.BodyByLease[tostring(id) .. ":" .. tostring(snapshot.liveBodyLease)]
+            end
+            if not body and not snapshot.liveBodyLease then
+                body = Sync.BodyByID[tostring(id)]
+            end
+            body = body or Sync.BodyByInstanceID[tostring(snapshot.liveBodyInstanceID or "")]
             if body then
                 if canRequestRemoteSync() and Interpolation and Interpolation.RecordSnapshot then
                     Interpolation.RecordSnapshot(snapshot, body, now)
@@ -538,6 +564,7 @@ local function onResetLua()
     Sync.BodyByID = {}
     Sync.BodyByOnlineID = {}
     Sync.BodyByInstanceID = {}
+    Sync.BodyByLease = {}
     Sync.FacingByID = {}
     Sync.UnresolvedLogAtByID = {}
     Sync.lastBodyScanAt = 0

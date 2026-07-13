@@ -10,7 +10,7 @@
 	<m_Scalar></m_Scalar>
 	<m_Scalar2></m_Scalar2>
 	<m_Conditions>
-		<m_Name>PNCActor</m_Name>
+		<m_Name>PNCZombieBitingNPC</m_Name>
 		<m_Type>BOOL</m_Type>
 		<m_BoolValue>true</m_BoolValue>
 	</m_Conditions>

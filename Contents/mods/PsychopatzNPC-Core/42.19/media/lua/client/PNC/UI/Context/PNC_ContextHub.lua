@@ -32,6 +32,18 @@ function ContextHub.RegisterProvider(provider)
     return true
 end
 
+local function hasEnabledProvider(entry, player, contextData)
+    local i
+    local provider
+    for i = 1, #ContextHub.ProviderOrder do
+        provider = ContextHub.Providers[ContextHub.ProviderOrder[i]]
+        if provider and (provider.isEnabled == nil or provider.isEnabled(entry, player, contextData) ~= false) then
+            return true
+        end
+    end
+    return false
+end
+
 local function formatEntryLabel(entry)
     local distance = math.sqrt(tonumber(entry and entry.distSq) or 0)
     return tostring(entry and entry.name or "PNC NPC")
@@ -75,6 +87,16 @@ function ContextHub.BuildWorldContext(playerNum, context, worldObjects, test)
         square = square,
     }
     if #entries <= 0 then
+        return
+    end
+    local anyEnabled = false
+    for i = 1, #entries do
+        if hasEnabledProvider(entries[i], player, contextData) then
+            anyEnabled = true
+            break
+        end
+    end
+    if not anyEnabled then
         return
     end
     if #entries == 1 then

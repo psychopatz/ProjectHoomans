@@ -188,6 +188,7 @@ function Types.NewRecord(definition)
         nextThinkAt = now,
         lastSyncAt = 0,
         liveBodyInstanceID = nil,
+        corpse = nil,
         recruited = def.ownerOnlineID ~= nil or def.ownerUsername ~= nil or def.recruited == true,
         persist = def.persist ~= false,
         runtime = {
@@ -205,6 +206,16 @@ function Types.NewRecord(definition)
             stealthBroken = false,
             stealthReason = "spawned",
             debug = def.debug == true,
+            bodyLease = nil,
+            lifecycle = {
+                phase = "abstract",
+                bodyState = "missing",
+                lastReason = "spawned",
+                lastTransitionAt = now,
+                lastAuditAt = 0,
+                lastError = nil,
+                corpseState = "none",
+            },
         },
     }
 

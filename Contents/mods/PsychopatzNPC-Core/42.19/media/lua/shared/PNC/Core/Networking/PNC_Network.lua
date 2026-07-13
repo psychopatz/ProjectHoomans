@@ -10,6 +10,8 @@ PNC.Network = PNC.Network or {}
 PNC.Network.ClientState = PNC.Network.ClientState or {
     snapshots = {},
     characterPayloads = {},
+    debugRoster = {},
+    debugAuthorized = false,
 }
 
 local Network = PNC.Network
@@ -248,6 +250,7 @@ function Network.BuildSnapshot(record)
         presenceRevision = record.presenceRevision,
         liveBodyInstanceID = record.liveBodyInstanceID,
         liveBodyOnlineID = record.liveBodyOnlineID,
+        liveBodyLease = record.runtime and record.runtime.bodyLease or nil,
         aiState = aiState,
         inCombat = inCombat,
         visualState = visualState,
@@ -469,5 +472,19 @@ function Network.SendCharacterPayload(targetPlayer, record)
         sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_CHARACTER_PAYLOAD, payload)
     elseif not isServer or not isServer() then
         triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_CHARACTER_PAYLOAD, payload)
+    end
+end
+
+function Network.SendDebugRoster(targetPlayer, diagnostics, authorized, audit)
+    local payload = {
+        authorized = authorized == true,
+        diagnostics = diagnostics or {},
+        audit = audit or {},
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_DEBUG_ROSTER, payload)
+    elseif not isServer or not isServer() then
+        triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_DEBUG_ROSTER, payload)
     end
 end

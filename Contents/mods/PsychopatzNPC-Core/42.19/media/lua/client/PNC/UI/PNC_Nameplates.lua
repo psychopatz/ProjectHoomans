@@ -4,6 +4,7 @@ PNC = PNC or {}
 PNC.Nameplates = PNC.Nameplates or {}
 
 local Nameplates = PNC.Nameplates
+local Core = PNC.Core
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
 
@@ -152,12 +153,18 @@ local function getStaminaColor(ratio)
     return { r = 0.88, g = 0.26, b = 0.18, a = 1.0 }
 end
 
-local function buildDebugText(snapshot)
+local function buildDebugText(snapshot, hasBoundBody)
     local debugState = snapshot and snapshot.debugState or nil
+    local presence
     if not debugState then
         return "AI: Unknown"
     end
+    presence = string.upper(tostring(snapshot.presenceState or "unknown"))
+    if snapshot.presenceState == Const.PRESENCE_LIVE then
+        presence = presence .. "/" .. (hasBoundBody and "BOUND" or "MISSING")
+    end
     return table.concat({
+        "Presence: " .. presence,
         "AI: " .. tostring(debugState.aiState or snapshot.aiState or "Unknown"),
         "Job: " .. tostring(debugState.activeJob or "-"),
         "Order: " .. tostring(debugState.orderKind or "-"),
@@ -276,7 +283,7 @@ local function cacheEntryMetrics(entry, snapshot, zombie)
         entry.hpTextWidth = textManager:MeasureStringX(FONT_HP, hpText)
     end
 
-    debugText = buildDebugText(snapshot)
+    debugText = buildDebugText(snapshot, zombie ~= nil)
     if Settings.showAIDebug then
         debugText = debugText .. " | " .. getAnimationDebug(zombie, snapshot)
     end
@@ -336,6 +343,8 @@ end
 function ISPNCNameplateManager:update()
     local zombieList
     local bodyByID = {}
+    local bodyByLease = {}
+    local bodyByOnlineID = {}
     local bodyByInstanceID = {}
     local currentTime
     local player
@@ -382,18 +391,47 @@ function ISPNCNameplateManager:update()
             modData = zombie:getModData()
             uuid = modData and modData.PNC_UUID or nil
             if uuid then
-                bodyByID[tostring(uuid)] = zombie
+                uuid = tostring(uuid)
+                if bodyByID[uuid] ~= nil and bodyByID[uuid] ~= zombie then
+                    bodyByID[uuid] = false
+                elseif bodyByID[uuid] == nil then
+                    bodyByID[uuid] = zombie
+                end
+                if modData.PNC_BodyLease then
+                    local leaseKey = uuid .. ":" .. tostring(modData.PNC_BodyLease)
+                    if bodyByLease[leaseKey] ~= nil and bodyByLease[leaseKey] ~= zombie then
+                        bodyByLease[leaseKey] = false
+                    elseif bodyByLease[leaseKey] == nil then
+                        bodyByLease[leaseKey] = zombie
+                    end
+                end
+            end
+            local onlineID = PNC.Network and PNC.Network.GetZombieOnlineID
+                and PNC.Network.GetZombieOnlineID(zombie) or nil
+            if onlineID ~= nil then
+                bodyByOnlineID[tostring(onlineID)] = zombie
             end
             instanceID = zombie.getPersistentOutfitID and zombie:getPersistentOutfitID() or nil
             if instanceID ~= nil then
-                bodyByInstanceID[tostring(instanceID)] = zombie
+                instanceID = tostring(instanceID)
+                if bodyByInstanceID[instanceID] ~= nil and bodyByInstanceID[instanceID] ~= zombie then
+                    bodyByInstanceID[instanceID] = false
+                elseif bodyByInstanceID[instanceID] == nil then
+                    bodyByInstanceID[instanceID] = zombie
+                end
             end
         end
     end
 
     for uuid, snapshot in pairs(ClientState.snapshots or {}) do
-        zombie = bodyByID[tostring(uuid)]
-            or bodyByInstanceID[tostring(snapshot and snapshot.liveBodyInstanceID or "")]
+        zombie = bodyByOnlineID[tostring(snapshot and snapshot.liveBodyOnlineID or "")]
+        if not zombie and snapshot and snapshot.liveBodyLease then
+            zombie = bodyByLease[tostring(uuid) .. ":" .. tostring(snapshot.liveBodyLease)]
+        end
+        if not zombie and snapshot and not snapshot.liveBodyLease then
+            zombie = bodyByID[tostring(uuid)]
+        end
+        zombie = zombie or bodyByInstanceID[tostring(snapshot and snapshot.liveBodyInstanceID or "")]
         alive = snapshot and snapshot.alive ~= false and snapshot.presenceState == Const.PRESENCE_LIVE
         if zombie and alive then
             modData = zombie.getModData and zombie:getModData() or nil
@@ -401,6 +439,10 @@ function ISPNCNameplateManager:update()
                 modData.PNC_UUID = tostring(uuid)
                 modData.PNC_NPC = true
                 modData.PNC_LiveBodyInstanceID = snapshot.liveBodyInstanceID
+                modData.PNC_LiveBodyOnlineID = snapshot.liveBodyOnlineID
+                modData.PNC_BodyKind = "live"
+                modData.PNC_BodyLease = snapshot.liveBodyLease
+                modData.PNC_TagVersion = Const.BODY_TAG_VERSION
             end
             if math.abs(player:getZ() - zombie:getZ()) <= FLOOR_TOLERANCE
                 and calculateDistance(player, zombie) <= MAX_DRAW_DISTANCE
@@ -408,6 +450,7 @@ function ISPNCNameplateManager:update()
                 entry = self.entries[uuid] or { uuid = uuid }
                 entry.snapshot = snapshot
                 entry.zombie = zombie
+                entry.debugOnly = false
                 entry.healthRatio = getHealthRatio(snapshot.hpCurrent, snapshot.hpMax)
                 entry.nameColor = getNameColor(snapshot)
                 entry.healthVisible = shouldShowHealth(snapshot, currentTime)
@@ -421,6 +464,21 @@ function ISPNCNameplateManager:update()
                 self.entries[uuid] = entry
                 visible[uuid] = true
             end
+        elseif Settings.showAIDebug and snapshot
+            and math.abs(player:getZ() - (tonumber(snapshot.z) or 0)) <= FLOOR_TOLERANCE
+            and Core.Distance(player:getX(), player:getY(), tonumber(snapshot.x) or 0, tonumber(snapshot.y) or 0) <= MAX_DRAW_DISTANCE
+        then
+            entry = self.entries[uuid] or { uuid = uuid }
+            entry.snapshot = snapshot
+            entry.zombie = nil
+            entry.debugOnly = true
+            entry.worldX = tonumber(snapshot.x) or 0
+            entry.worldY = tonumber(snapshot.y) or 0
+            entry.worldZ = tonumber(snapshot.z) or 0
+            entry.nameColor = getNameColor(snapshot)
+            cacheEntryMetrics(entry, snapshot, nil)
+            self.entries[uuid] = entry
+            visible[uuid] = true
         end
     end
 
@@ -480,7 +538,32 @@ function ISPNCNameplateManager:render()
 
     for uuid, entry in pairs(self.entries) do
         zombie = entry.zombie
-        if zombie and not zombie:isDead() then
+        if entry.debugOnly then
+            screenX = isoToScreenX(self.playerIndex, entry.worldX, entry.worldY, entry.worldZ) - self.x
+            screenY = isoToScreenY(self.playerIndex, entry.worldX, entry.worldY, entry.worldZ) - self.y
+            drawOutlinedText(
+                self,
+                entry.name,
+                screenX - ((entry.nameWidth or 0) / 2),
+                screenY - nameYOffset,
+                entry.nameColor.r,
+                entry.nameColor.g,
+                entry.nameColor.b,
+                0.9,
+                FONT_NAME
+            )
+            drawOutlinedText(
+                self,
+                entry.debugText,
+                screenX - ((entry.debugTextWidth or 0) / 2),
+                (screenY - nameYOffset) + NAME_DEBUG_GAP,
+                0.8,
+                0.9,
+                1.0,
+                0.9,
+                FONT_DEBUG
+            )
+        elseif zombie and not zombie:isDead() then
             alpha = zombie.getAlpha and zombie:getAlpha(self.playerIndex) or 1
             if alpha > 0 then
                 screenX = isoToScreenX(self.playerIndex, zombie:getX(), zombie:getY(), zombie:getZ()) - self.x

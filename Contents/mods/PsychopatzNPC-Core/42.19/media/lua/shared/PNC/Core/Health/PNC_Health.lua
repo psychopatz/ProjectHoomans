@@ -214,10 +214,15 @@ function Health.Kill(record, zombie, reason)
         if zombie.setHealth then
             zombie:setHealth(0)
         end
-        if zombie.becomeCorpseSilently then
-            zombie:becomeCorpseSilently()
-        end
-        Registry.UnregisterLiveZombie(record.id)
+        PNC.BodyLifecycle.CreateInertCorpse(record, zombie, reason or "death")
+    elseif not record.corpse then
+        record.corpse = {
+            token = nil,
+            x = record.x,
+            y = record.y,
+            z = record.z,
+            createdWorldHour = 0,
+        }
     end
 end
 

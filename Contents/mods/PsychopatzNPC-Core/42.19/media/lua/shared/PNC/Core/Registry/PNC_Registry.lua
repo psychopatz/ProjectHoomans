@@ -104,14 +104,15 @@ function Registry.GetLiveZombie(id)
 end
 
 function Registry.RegisterLiveZombie(record, zombie)
-    local modData
     if not record or not zombie then
         return
     end
+    if not PNC.BodyLifecycle or not PNC.BodyLifecycle.StampLiveBody then
+        Core.LogWarn("Cannot register NPC body without PNC.BodyLifecycle id=" .. tostring(record.id))
+        return
+    end
     Registry.LiveByID[record.id] = zombie
-    modData = zombie:getModData()
-    modData.PNC_UUID = record.id
-    modData.PNC_NPC = true
+    PNC.BodyLifecycle.StampLiveBody(record, zombie)
     record.liveBodyInstanceID = zombie.getPersistentOutfitID and zombie:getPersistentOutfitID() or nil
     record.liveBodyOnlineID = zombie.getOnlineID and tonumber(zombie:getOnlineID()) or nil
     if record.liveBodyOnlineID and record.liveBodyOnlineID < 0 then
@@ -124,6 +125,9 @@ function Registry.UnregisterLiveZombie(id)
     local record = Registry.Get(id)
     Registry.LiveByID[id] = nil
     if record then
+        if record.runtime then
+            record.runtime.bodyLease = nil
+        end
         record.liveBodyInstanceID = nil
         record.liveBodyOnlineID = nil
         record.presenceRevision = (tonumber(record.presenceRevision) or 0) + 1

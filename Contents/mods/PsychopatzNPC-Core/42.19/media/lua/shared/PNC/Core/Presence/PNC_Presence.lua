@@ -91,6 +91,12 @@ function Presence.Materialize(record, reason)
         return Registry.GetLiveZombie(record.id)
     end
 
+    record.runtime = record.runtime or {}
+    record.runtime.bodyLease = nil
+    record.runtime.lifecycle = record.runtime.lifecycle or {}
+    record.runtime.lifecycle.phase = "materializing"
+    record.runtime.lifecycle.lastReason = reason or "materialize"
+    record.runtime.lifecycle.lastTransitionAt = Core.Now()
     spawnX, spawnY, spawnZ = findMaterializeSquare(record)
     zombieList = addZombiesInOutfit(
         spawnX,
@@ -109,6 +115,10 @@ function Presence.Materialize(record, reason)
     )
 
     if not zombieList or zombieList:size() <= 0 then
+        record.runtime.lifecycle.phase = Const.PRESENCE_ABSTRACT
+        record.runtime.lifecycle.bodyState = "missing"
+        record.runtime.lifecycle.lastReason = "materialize_failed"
+        record.runtime.lifecycle.lastError = "spawn_returned_no_body"
         Core.LogWarn("Failed to materialize NPC " .. tostring(record.id) .. " reason=" .. tostring(reason))
         return nil
     end
@@ -161,13 +171,9 @@ function Presence.Abstract(record, reason)
         if ZombieAggro and ZombieAggro.ClearForNPCBody then
             ZombieAggro.ClearForNPCBody(zombie)
         end
-        if zombie.removeFromWorld then
-            zombie:removeFromWorld()
-        end
-        if zombie.removeFromSquare then
-            zombie:removeFromSquare()
-        end
-        Registry.UnregisterLiveZombie(record.id)
+        PNC.BodyLifecycle.RemoveLiveBody(record, zombie, reason or "abstract")
+    else
+        PNC.BodyLifecycle.RemoveLiveBody(record, nil, reason or "abstract_missing")
     end
 
     record.presenceState = Const.PRESENCE_ABSTRACT

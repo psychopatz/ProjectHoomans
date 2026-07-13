@@ -27,6 +27,20 @@ local ZombieAggro = PNC.ZombieAggro
 local Stamina = PNC.Stamina
 local Archetypes = PNC.Archetypes
 local Animation = PNC.Animation
+local BodyLifecycle = PNC.BodyLifecycle
+local buildDebugRoster
+
+local function canUseDebug(player)
+    local access
+    if not isServer or not isServer() then
+        if isDebugEnabled then
+            return isDebugEnabled() == true
+        end
+        return getCore and getCore() and getCore():getDebug() == true or false
+    end
+    access = player and player.getAccessLevel and tostring(player:getAccessLevel() or "") or ""
+    return string.lower(access) == "admin"
+end
 
 local function getSyncInterval(record)
     local runtime = record and record.runtime or nil
@@ -119,6 +133,9 @@ end
 function Server.OnTick()
     local now = Core.Now()
     Registry.EnsureLoaded()
+    if BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
+        BodyLifecycle.AuditLoadedBodies(now, false)
+    end
     Registry.RefreshLivePositions()
     Spatial.Rebuild()
     Registry.ForEach(function(record)
@@ -200,7 +217,24 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_DEBUG_ROSTER_REQUEST then
+        if not canUseDebug(player) then
+            Network.SendDebugRoster(player, {}, false, BodyLifecycle and BodyLifecycle.LastAudit or {})
+            return
+        end
+        if args and args.audit == true and BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
+            BodyLifecycle.AuditLoadedBodies(Core.Now(), true)
+        end
+        Network.SendDebugRoster(player, buildDebugRoster(), true, BodyLifecycle and BodyLifecycle.LastAudit or {})
+        return
+    end
+
     if command ~= Const.CMD_DEBUG then
+        return
+    end
+
+    if not canUseDebug(player) then
+        Core.LogWarn("Rejected unauthorized PNC debug command action=" .. tostring(args and args.action or "unknown"))
         return
     end
 
@@ -271,11 +305,36 @@ local function onClientCommand(module, command, player, args)
         API.SetHostility(args.id, args.modeSpec)
         return
     end
+
+    if args and args.action == "audit_bodies" then
+        if BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
+            BodyLifecycle.AuditLoadedBodies(Core.Now(), true)
+        end
+        Network.SendDebugRoster(player, buildDebugRoster(), true, BodyLifecycle and BodyLifecycle.LastAudit or {})
+        return
+    end
 end
 
 local function onServerStarted()
     Registry.Load()
+    if BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
+        BodyLifecycle.AuditLoadedBodies(Core.Now(), true)
+    end
     Core.LogInfo("PNC server started.")
+end
+
+function buildDebugRoster()
+    local list = {}
+    if not BodyLifecycle or not BodyLifecycle.BuildDiagnostics then
+        return list
+    end
+    Registry.ForEach(function(record)
+        list[#list + 1] = BodyLifecycle.BuildDiagnostics(record)
+    end)
+    table.sort(list, function(a, b)
+        return tostring(a and a.name or a and a.id or "") < tostring(b and b.name or b and b.id or "")
+    end)
+    return list
 end
 
 Events.OnTick.Add(Server.OnTick)

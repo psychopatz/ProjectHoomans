@@ -206,6 +206,10 @@ function ZombieAggro.Pump(now)
         return
     end
 
+    if ZombieAggro.PumpBiteRecovery then
+        ZombieAggro.PumpBiteRecovery(now)
+    end
+
     cell = getCell()
     zombieList = cell and cell.getZombieList and cell:getZombieList() or nil
     if not zombieList then

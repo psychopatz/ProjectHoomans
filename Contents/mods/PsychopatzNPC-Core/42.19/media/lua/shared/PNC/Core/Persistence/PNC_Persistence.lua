@@ -138,6 +138,19 @@ local function sanitizeHealth(rawHealth, fallbackMax)
     }
 end
 
+local function sanitizeCorpse(rawCorpse, record)
+    if type(rawCorpse) ~= "table" then
+        return nil
+    end
+    return {
+        token = normalizeString(rawCorpse.token),
+        x = normalizeNumber(rawCorpse.x, record and record.x or 0),
+        y = normalizeNumber(rawCorpse.y, record and record.y or 0),
+        z = normalizeNumber(rawCorpse.z, record and record.z or 0),
+        createdWorldHour = normalizeNumber(rawCorpse.createdWorldHour, 0),
+    }
+end
+
 local function sanitizeStamina(rawStamina, record)
     local output
     if type(rawStamina) ~= "table" then
@@ -254,10 +267,21 @@ function Persistence.RebuildRuntime(record)
         forceLive = false,
         forceAbstract = false,
         debug = false,
+        bodyLease = nil,
+        lifecycle = {
+            phase = "rehydrated",
+            bodyState = "missing",
+            lastReason = "rehydrated",
+            lastTransitionAt = now,
+            lastAuditAt = 0,
+            lastError = nil,
+            corpseState = record and record.alive == false and "unresolved" or "none",
+        },
     }
     record.activeJob = nil
     record.activeBehavior = nil
     record.liveBodyInstanceID = nil
+    record.liveBodyOnlineID = nil
     record.lastThinkAt = now
     record.nextThinkAt = now
     record.lastSyncAt = 0
@@ -326,6 +350,7 @@ function Persistence.SerializeRecord(record)
         },
         inventory = Inventory and Inventory.Serialize and Inventory.Serialize(record) or nil,
         progression = progression,
+        corpse = sanitizeCorpse(record.corpse, record),
     }
     return payload
 end
@@ -406,6 +431,16 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     }
     record.recruited = progression.recruited == true or record.recruited == true
     record.persist = raw.persist ~= false
+    record.corpse = sanitizeCorpse(raw.corpse, record)
+    if record.alive == false and not record.corpse then
+        record.corpse = {
+            token = nil,
+            x = record.x,
+            y = record.y,
+            z = record.z,
+            createdWorldHour = 0,
+        }
+    end
     Identity.ApplyRecordIdentity(record, {
         archetypeID = raw.archetypeID or record.archetypeID,
         identitySeed = identity and identity.seed or record.identitySeed,

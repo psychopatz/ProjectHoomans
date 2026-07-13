@@ -9,6 +9,10 @@ local Provider = {
     id = "debug",
 }
 
+function Provider.isEnabled()
+    return PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() == true
+end
+
 local function sendDebug(action, payload)
     if PNC.Client and PNC.Client.SendDebug then
         PNC.Client.SendDebug(action, payload)
