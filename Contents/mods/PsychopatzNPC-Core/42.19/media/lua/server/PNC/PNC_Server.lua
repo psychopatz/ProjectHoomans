@@ -150,54 +150,75 @@ local function handleDebugSpawn(player, args)
     local x = tonumber(args and args.x) or (player and player:getX()) or 0
     local y = tonumber(args and args.y) or (player and player:getY()) or 0
     local z = tonumber(args and args.z) or (player and player:getZ()) or 0
-
-    if args and args.variant == "companion" then
-        API.Spawn({
-            faction = "companion",
-            archetypeID = resolveDebugArchetype(args, "companion", "General"),
-            x = x,
-            y = y,
-            z = z,
-            ownerUsername = player and player:getUsername() or nil,
-            ownerOnlineID = player and player:getOnlineID() or nil,
-            orderSpec = {
-                kind = Const.ORDER_FOLLOW,
-                ownerUsername = player and player:getUsername() or nil,
-                ownerOnlineID = player and player:getOnlineID() or nil,
-            },
-            forceLive = true,
-            weaponMode = "melee",
-        })
-        return
+    local variant = tostring(args and args.variant or "companion")
+    local faction = (variant == "hostile_melee" or variant == "hostile_ranged") and "hostile" or variant
+    local companion = faction == "companion"
+    local hostile = faction == "hostile"
+    if faction ~= "companion" and faction ~= "friendly" and faction ~= "neutral" and faction ~= "hostile" then
+        faction = "companion"
+        companion = true
+        hostile = false
     end
+    local ownerUsername = companion and player and player:getUsername() or nil
+    local ownerOnlineID = companion and player and player:getOnlineID() or nil
+    local orderSpec = hostile
+        and { kind = Const.ORDER_HOSTILE_HUNT, x = x, y = y, z = z }
+        or companion and { kind = Const.ORDER_FOLLOW, ownerUsername = ownerUsername, ownerOnlineID = ownerOnlineID }
+        or { kind = Const.ORDER_GUARD, x = x, y = y, z = z }
+    local record = API.Spawn({
+        faction = faction,
+        archetypeID = resolveDebugArchetype(args, faction, hostile and "Scavenger" or "General"),
+        x = x,
+        y = y,
+        z = z,
+        ownerUsername = ownerUsername,
+        ownerOnlineID = ownerOnlineID,
+        orderSpec = orderSpec,
+        forceLive = true,
+        weaponMode = variant == "hostile_ranged" and "ranged" or "melee",
+        debug = true,
+    })
+    Core.LogInfo("PNC debug spawn variant=" .. variant .. " faction=" .. faction
+        .. " id=" .. tostring(record and record.id or "failed"))
+    return record
+end
 
-    if args and args.variant == "hostile_melee" then
-        API.Spawn({
-            faction = "hostile",
-            archetypeID = resolveDebugArchetype(args, "hostile", "Scavenger"),
-            x = x,
-            y = y,
-            z = z,
-            orderSpec = { kind = Const.ORDER_HOSTILE_HUNT, x = x, y = y, z = z },
-            weaponMode = "melee",
-            forceLive = true,
-        })
-        return
+local function findTeleportPosition(record)
+    local body = record and Registry.GetLiveZombie(record.id) or nil
+    local x = body and body:getX() or tonumber(record and record.x) or 0
+    local y = body and body:getY() or tonumber(record and record.y) or 0
+    local z = body and body:getZ() or tonumber(record and record.z) or 0
+    local cell = getCell and getCell() or nil
+    local offsets = { { 2, 0 }, { -2, 0 }, { 0, 2 }, { 0, -2 }, { 1, 1 }, { -1, 1 }, { 1, -1 }, { -1, -1 } }
+    local i
+    if cell then
+        for i = 1, #offsets do
+            local square = cell:getGridSquare(math.floor(x) + offsets[i][1], math.floor(y) + offsets[i][2], math.floor(z))
+            if square and (not square.isFree or square:isFree(false)) then
+                return square:getX() + 0.5, square:getY() + 0.5, square:getZ()
+            end
+        end
     end
+    return x + 1.5, y + 1.5, z
+end
 
-    if args and args.variant == "hostile_ranged" then
-        API.Spawn({
-            faction = "hostile",
-            archetypeID = resolveDebugArchetype(args, "hostile", "Scavenger"),
-            x = x,
-            y = y,
-            z = z,
-            orderSpec = { kind = Const.ORDER_HOSTILE_HUNT, x = x, y = y, z = z },
-            weaponMode = "ranged",
-            forceLive = true,
-        })
-        return
+local function teleportPlayerToRecord(player, npcId)
+    local record = npcId and Registry.Get(npcId) or nil
+    local x
+    local y
+    local z
+    if not player or not record then
+        return false
     end
+    x, y, z = findTeleportPosition(record)
+    if player.setX then player:setX(x) end
+    if player.setY then player:setY(y) end
+    if player.setZ then player:setZ(z) end
+    if player.setLx then player:setLx(x) end
+    if player.setLy then player:setLy(y) end
+    if player.setLz then player:setLz(z) end
+    Core.LogInfo("PNC debug teleported " .. tostring(player:getUsername()) .. " near NPC " .. tostring(record.id))
+    return true
 end
 
 local function onClientCommand(module, command, player, args)
@@ -240,6 +261,11 @@ local function onClientCommand(module, command, player, args)
 
     if args and args.action == "spawn" then
         handleDebugSpawn(player, args)
+        return
+    end
+
+    if args and args.action == "teleport_to_npc" then
+        teleportPlayerToRecord(player, args.id)
         return
     end
 

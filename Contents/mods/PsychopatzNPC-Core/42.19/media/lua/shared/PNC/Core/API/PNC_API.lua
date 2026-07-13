@@ -67,17 +67,20 @@ local function finalizeNewRecord(record, definition)
         end
     end
     OrderSystem.SetOrder(record, definition.orderSpec)
-    if definition.faction == "hostile" then
-        OrderSystem.SetHostility(record, {
-            mode = "hostile_any_player",
-            attackPlayers = true,
-            attackNPCs = true,
-        })
-    end
+    OrderSystem.SetHostility(record, definition.hostility or Types.DefaultHostility(definition.faction))
     Registry.AddRecord(record)
     if definition.forceLive == true then
         record.runtime.forceLive = true
-        Presence.Materialize(record, "force_live_spawn")
+        local materialized, materializeReason = Presence.Materialize(record, "force_live_spawn")
+        if not materialized then
+            record.runtime.lifecycle = record.runtime.lifecycle or {}
+            record.runtime.lifecycle.lastError = tostring(materializeReason or "materialize_failed")
+            Core.LogWarn("PNC spawn materialization failed id=" .. tostring(record.id)
+                .. " faction=" .. tostring(record.faction) .. " reason=" .. tostring(materializeReason))
+        else
+            Core.LogInfo("PNC spawned id=" .. tostring(record.id) .. " faction=" .. tostring(record.faction)
+                .. " presence=" .. tostring(record.presenceState))
+        end
     end
     Network.BroadcastRecord(record, "spawn")
     return record

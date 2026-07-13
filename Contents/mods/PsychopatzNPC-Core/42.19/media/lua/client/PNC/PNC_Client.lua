@@ -17,6 +17,33 @@ local Interpolation = PNC.ClientInterpolation
 
 Client.BiteReplicas = Client.BiteReplicas or {}
 
+local function tr(key, fallback)
+    local value = getText and getText(key) or nil
+    if not value or value == "" or value == key then
+        return fallback
+    end
+    return value
+end
+
+local function teleportLocalPlayerNear(record, player)
+    local body = record and Registry.GetLiveZombie and Registry.GetLiveZombie(record.id) or nil
+    local x = body and body:getX() or tonumber(record and record.x) or 0
+    local y = body and body:getY() or tonumber(record and record.y) or 0
+    local z = body and body:getZ() or tonumber(record and record.z) or 0
+    if not record or not player then
+        return false
+    end
+    x = x + 1.5
+    y = y + 1.5
+    if player.setX then player:setX(x) end
+    if player.setY then player:setY(y) end
+    if player.setZ then player:setZ(z) end
+    if player.setLx then player:setLx(x) end
+    if player.setLy then player:setLy(y) end
+    if player.setLz then player:setLz(z) end
+    return true
+end
+
 local function isWorldReady()
     return (not isIngameState) or isIngameState()
 end
@@ -350,30 +377,38 @@ function Client.SendDebug(action, payload)
         Client.RequestDebugRoster(false)
         return true
     end
+    if action == "teleport_to_npc" and args.id then
+        return teleportLocalPlayerNear(Registry.Get(args.id), player)
+    end
     if action == "spawn" and PNC.API and PNC.API.Spawn then
-        local companion = args.variant == "companion"
-        local ranged = args.variant == "hostile_ranged"
+        local variant = tostring(args.variant or "companion")
+        local faction = (variant == "hostile_melee" or variant == "hostile_ranged") and "hostile" or variant
+        if faction ~= "companion" and faction ~= "friendly" and faction ~= "neutral" and faction ~= "hostile" then
+            faction = "companion"
+        end
+        local companion = faction == "companion"
+        local hostile = faction == "hostile"
         local ownerUsername = companion and player and player.getUsername and player:getUsername() or nil
         local ownerOnlineID = companion and player and player.getOnlineID and player:getOnlineID() or nil
+        local x = tonumber(args.x) or (player and player:getX()) or 0
+        local y = tonumber(args.y) or (player and player:getY()) or 0
+        local z = tonumber(args.z) or (player and player:getZ()) or 0
         return PNC.API.Spawn({
-            faction = companion and "companion" or "hostile",
-            x = tonumber(args.x) or (player and player:getX()) or 0,
-            y = tonumber(args.y) or (player and player:getY()) or 0,
-            z = tonumber(args.z) or (player and player:getZ()) or 0,
+            faction = faction,
+            x = x, y = y, z = z,
             ownerUsername = ownerUsername,
             ownerOnlineID = ownerOnlineID,
             orderSpec = companion and {
                 kind = Const.ORDER_FOLLOW,
                 ownerUsername = ownerUsername,
                 ownerOnlineID = ownerOnlineID,
-            } or {
+            } or hostile and {
                 kind = Const.ORDER_HOSTILE_HUNT,
-                x = tonumber(args.x) or (player and player:getX()) or 0,
-                y = tonumber(args.y) or (player and player:getY()) or 0,
-                z = tonumber(args.z) or (player and player:getZ()) or 0,
-            },
-            weaponMode = ranged and "ranged" or "melee",
+                x = x, y = y, z = z,
+            } or { kind = Const.ORDER_GUARD, x = x, y = y, z = z },
+            weaponMode = variant == "hostile_ranged" and "ranged" or "melee",
             forceLive = true,
+            debug = true,
         }) ~= nil
     end
     if PNC.API and args.id then
@@ -396,27 +431,33 @@ local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, te
     square = PNC.NPCSelection and PNC.NPCSelection.GetWorldSquare and PNC.NPCSelection.GetWorldSquare(worldobjects) or nil
     if square and Client.CanUseDebug() then
         debugMenu = ISContextMenu:getNew(context)
-        context:addSubMenu(context:addOption(getText("UI_PNC_Debug")), debugMenu)
+        context:addSubMenu(context:addOption(tr("UI_PNC_Debug", "PNC Debug")), debugMenu)
         if PNC.NPCMonitor and PNC.NPCMonitor.Toggle then
-            debugMenu:addOption(getText("UI_PNC_NPCMonitor"), nil, function()
+            debugMenu:addOption(tr("UI_PNC_NPCMonitor", "NPC Monitor"), nil, function()
                 PNC.NPCMonitor.Toggle()
             end)
         end
-        debugMenu:addOption(getText("UI_PNC_ToggleAIOverlay"), nil, function()
+        debugMenu:addOption(tr("UI_PNC_ToggleAIOverlay", "Toggle AI Overlay"), nil, function()
             if PNC.Nameplates and PNC.Nameplates.ToggleDebug then
                 PNC.Nameplates.ToggleDebug()
             end
         end)
 
         subMenu = ISContextMenu:getNew(context)
-        context:addSubMenu(context:addOption(getText("UI_PNC_Spawn")), subMenu)
-        subMenu:addOption(getText("UI_PNC_SpawnCompanion"), nil, function()
+        context:addSubMenu(context:addOption(tr("UI_PNC_Spawn", "PNC Spawn")), subMenu)
+        subMenu:addOption(tr("UI_PNC_SpawnCompanion", "Spawn Companion"), nil, function()
             Client.SendDebug("spawn", { variant = "companion", x = square:getX(), y = square:getY(), z = square:getZ() })
         end)
-        subMenu:addOption(getText("UI_PNC_SpawnHostileMelee"), nil, function()
+        subMenu:addOption(tr("UI_PNC_SpawnFriendly", "Spawn Friendly"), nil, function()
+            Client.SendDebug("spawn", { variant = "friendly", x = square:getX(), y = square:getY(), z = square:getZ() })
+        end)
+        subMenu:addOption(tr("UI_PNC_SpawnNeutral", "Spawn Neutral"), nil, function()
+            Client.SendDebug("spawn", { variant = "neutral", x = square:getX(), y = square:getY(), z = square:getZ() })
+        end)
+        subMenu:addOption(tr("UI_PNC_SpawnHostileMelee", "Spawn Hostile Melee"), nil, function()
             Client.SendDebug("spawn", { variant = "hostile_melee", x = square:getX(), y = square:getY(), z = square:getZ() })
         end)
-        subMenu:addOption(getText("UI_PNC_SpawnHostileRanged"), nil, function()
+        subMenu:addOption(tr("UI_PNC_SpawnHostileRanged", "Spawn Hostile Ranged"), nil, function()
             Client.SendDebug("spawn", { variant = "hostile_ranged", x = square:getX(), y = square:getY(), z = square:getZ() })
         end)
     end

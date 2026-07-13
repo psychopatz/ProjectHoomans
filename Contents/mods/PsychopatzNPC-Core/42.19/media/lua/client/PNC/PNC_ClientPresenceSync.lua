@@ -384,12 +384,14 @@ local function applySnapshotToBody(snapshot, zombie)
     local recordView
     local visualKey
     local motionKey
+    local now
     if not snapshot or not zombie or (zombie.isDead and zombie:isDead()) then
         return
     end
 
+    now = Core and Core.Now and Core.Now() or 0
     if Animation and Animation.PumpBumpRelease then
-        Animation.PumpBumpRelease(zombie, Core and Core.Now and Core.Now() or 0)
+        Animation.PumpBumpRelease(zombie, now)
     end
 
     recordView = buildRecordView(snapshot)
@@ -416,6 +418,18 @@ local function applySnapshotToBody(snapshot, zombie)
             Equipment.Apply(zombie, recordView)
         end
         modData.PNC_ClientVisualKey = visualKey
+    end
+
+    -- The multiplayer zombie packet may reapply rot, blood, dirt, or a zombie
+    -- skin after the one-time visual snapshot. Reassert only the inexpensive
+    -- human visual fields on a bounded cadence; clothes and inventory stay put.
+    if Visuals and Visuals.MaintainHumanAppearance
+        and (not modData or now >= (tonumber(modData.PNC_ClientHumanVisualAt) or 0))
+    then
+        Visuals.MaintainHumanAppearance(zombie, snapshot.appearance or {}, snapshot.isFemale == true, true)
+        if modData then
+            modData.PNC_ClientHumanVisualAt = now + 1000
+        end
     end
 
     motionKey = buildMotionKey(snapshot)

@@ -72,6 +72,49 @@ local function clearBodySoiledState(humanVisual)
     end
 end
 
+function Visuals.ClearBodySoiledState(zombie)
+    local humanVisual = zombie and zombie.getHumanVisual and zombie:getHumanVisual() or nil
+    clearBodySoiledState(humanVisual)
+end
+
+function Visuals.MaintainHumanAppearance(zombie, appearance, isFemale, refreshModel)
+    local humanVisual
+    local immutableColor
+    if not zombie or not appearance then
+        return false
+    end
+    if zombie.setFemaleEtc then
+        pcall(zombie.setFemaleEtc, zombie, isFemale == true)
+    end
+    if zombie.setNoTeeth then
+        pcall(zombie.setNoTeeth, zombie, true)
+    end
+    humanVisual = zombie.getHumanVisual and zombie:getHumanVisual() or nil
+    clearBodySoiledState(humanVisual)
+    if humanVisual then
+        if appearance.skinTexture and humanVisual.setSkinTextureName then
+            pcall(humanVisual.setSkinTextureName, humanVisual, appearance.skinTexture)
+        end
+        if appearance.hairModel and humanVisual.setHairModel then
+            pcall(humanVisual.setHairModel, humanVisual, appearance.hairModel)
+        end
+        if appearance.beardModel and humanVisual.setBeardModel then
+            pcall(humanVisual.setBeardModel, humanVisual, appearance.beardModel)
+        end
+        immutableColor = makeImmutableColor(appearance.hairColor)
+        if immutableColor and humanVisual.setHairColor then
+            pcall(humanVisual.setHairColor, humanVisual, immutableColor)
+        end
+        if immutableColor and humanVisual.setBeardColor then
+            pcall(humanVisual.setBeardColor, humanVisual, immutableColor)
+        end
+    end
+    if refreshModel == true then
+        Visuals.RefreshModel(zombie)
+    end
+    return true
+end
+
 function Visuals.ClearAttachedItems(zombie)
     local attachedItems
     local i
@@ -200,28 +243,7 @@ function Visuals.ApplyResolvedAppearance(zombie, appearance, isFemale)
     end
     applyBaseOutfitItems(zombie, appearance)
 
-    if humanVisual then
-        if appearance.skinTexture and humanVisual.setSkinTextureName then
-            humanVisual:setSkinTextureName(appearance.skinTexture)
-        end
-        if appearance.hairModel and humanVisual.setHairModel then
-            humanVisual:setHairModel(appearance.hairModel)
-        end
-        if appearance.beardModel and humanVisual.setBeardModel then
-            humanVisual:setBeardModel(appearance.beardModel)
-        end
-        if appearance.hairColor then
-            local immutableColor = makeImmutableColor(appearance.hairColor)
-            if immutableColor and humanVisual.setHairColor then
-                humanVisual:setHairColor(immutableColor)
-            end
-            if immutableColor and humanVisual.setBeardColor then
-                humanVisual:setBeardColor(immutableColor)
-            end
-        end
-    end
-
-    Visuals.RefreshModel(zombie)
+    Visuals.MaintainHumanAppearance(zombie, appearance, isFemale, true)
 end
 
 function Visuals.ApplyHumanVisuals(zombie, record)

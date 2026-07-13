@@ -31,6 +31,9 @@ local function isRecordEnemy(source, target)
     if not source or not target or source.id == target.id then
         return false
     end
+    if source.hostility and source.hostility.attackNPCs == false then
+        return false
+    end
     if source.faction == "hostile" then
         return target.faction ~= "hostile"
     end
@@ -351,14 +354,18 @@ function Perception.ResolveCompanionTarget(record)
     end
 
     owner = Core.ResolvePlayerByOnlineID(record.ownerOnlineID) or Core.ResolvePlayerByUsername(record.ownerUsername)
-    npcTarget = Perception.FindNearestEnemyNPC(record, defenseRadius)
-    zombieTarget = Perception.FindBestEnemyZombie(record, defenseRadius)
+    if not record.hostility or record.hostility.attackNPCs ~= false then
+        npcTarget = Perception.FindNearestEnemyNPC(record, defenseRadius)
+    end
+    if not record.hostility or record.hostility.attackZombies ~= false then
+        zombieTarget = Perception.FindBestEnemyZombie(record, defenseRadius)
+    end
     if npcTarget or zombieTarget then
         return pickNearest(npcTarget, zombieTarget)
     end
 
     if owner then
-        hostileToOwnerNPC = Perception.FindNearestEnemyNPC({
+        hostileToOwnerNPC = (not record.hostility or record.hostility.attackNPCs ~= false) and Perception.FindNearestEnemyNPC({
             id = record.id,
             faction = record.faction,
             x = owner:getX(),
@@ -366,7 +373,7 @@ function Perception.ResolveCompanionTarget(record)
             z = owner:getZ(),
             hostility = record.hostility,
         }, defenseRadius)
-        hostileToOwnerZombie = Perception.FindBestEnemyZombie({
+        hostileToOwnerZombie = (not record.hostility or record.hostility.attackZombies ~= false) and Perception.FindBestEnemyZombie({
             id = record.id,
             faction = record.faction,
             x = owner:getX(),

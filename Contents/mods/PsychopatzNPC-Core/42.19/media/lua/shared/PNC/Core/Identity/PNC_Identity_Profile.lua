@@ -4,6 +4,15 @@ PNC.Identity = PNC.Identity or {}
 local Identity = PNC.Identity
 local Archetypes = PNC.Archetypes
 
+local function resolveHumanSkinTexture(value, isFemale)
+    local texture = value and tostring(value) or ""
+    local expected = isFemale and "FemaleBody" or "MaleBody"
+    if texture ~= "" and string.find(texture, expected, 1, true) then
+        return texture
+    end
+    return isFemale and "FemaleBody01" or "MaleBody01"
+end
+
 local function normalizeString(value)
     if value == nil or value == "" then
         return nil
@@ -135,7 +144,7 @@ function Identity.RollAppearance(record)
     runtime.appearanceCache = {
         outfit = record.outfit or (record.isFemale and spawnOutfit.female or spawnOutfit.male),
         outfitItems = type(look) == "table" and PNC.Core.DeepCopy(look) or {},
-        skinTexture = survivor.skinTexture,
+        skinTexture = resolveHumanSkinTexture(survivor.skinTexture, record.isFemale == true),
         hairModel = survivor.hairModel,
         beardModel = record.isFemale and nil or survivor.beardModel,
         hairColor = survivor.hairColor,

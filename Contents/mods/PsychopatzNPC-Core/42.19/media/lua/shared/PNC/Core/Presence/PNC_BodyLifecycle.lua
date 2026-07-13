@@ -78,6 +78,171 @@ local function normalizeOnlineID(zombie)
     return value and value >= 0 and value or nil
 end
 
+local function itemFullType(item)
+    return item and item.getFullType and tostring(item:getFullType() or "") or ""
+end
+
+local function addItemToContainer(container, item)
+    if not container or not item then
+        return false
+    end
+    if item.getContainer and item:getContainer() == container then
+        return true
+    end
+    return container.AddItem and pcall(container.AddItem, container, item) or false
+end
+
+local function prepareCorpseItems(record, zombie)
+    local equipment = PNC.Equipment
+    local profiles = PNC.VisualProfiles
+    local container = zombie and zombie.getInventory and zombie:getInventory() or nil
+    local pool = {}
+    local allItems = {}
+    local seen = {}
+    local claimed = {}
+    local appearanceUsed = {}
+    local wornItems = zombie and zombie.getWornItems and zombie:getWornItems() or nil
+    local inventoryItems = container and container.getItems and container:getItems() or nil
+    local appearance = profiles and profiles.RollAppearance and profiles.RollAppearance(record) or nil
+    local abstractInventory = PNC.Inventory and PNC.Inventory.EnsureRecordInventory
+        and PNC.Inventory.EnsureRecordInventory(record) or record.inventory
+    local i
+    local descriptor
+    local item
+    local fullType
+
+    if not container or not equipment or not equipment.CreateItem then
+        return false
+    end
+
+    local function remember(candidate)
+        local kind
+        if not candidate or seen[candidate] then
+            return candidate
+        end
+        seen[candidate] = true
+        kind = itemFullType(candidate)
+        if kind ~= "" then
+            pool[kind] = pool[kind] or {}
+            pool[kind][#pool[kind] + 1] = candidate
+            allItems[#allItems + 1] = candidate
+        end
+        return candidate
+    end
+
+    local function create(kind)
+        local created = equipment.CreateItem(kind)
+        if created then
+            remember(created)
+        end
+        return created
+    end
+
+    local function takeForInventory(kind)
+        local candidates = pool[kind] or {}
+        local index
+        for index = 1, #candidates do
+            if not claimed[candidates[index]] then
+                claimed[candidates[index]] = true
+                return candidates[index]
+            end
+        end
+        local created = create(kind)
+        if created then
+            claimed[created] = true
+        end
+        return created
+    end
+
+    local function takeForAppearance(kind)
+        local candidates = pool[kind] or {}
+        local index
+        for index = 1, #candidates do
+            if not appearanceUsed[candidates[index]] then
+                appearanceUsed[candidates[index]] = true
+                return candidates[index]
+            end
+        end
+        local created = create(kind)
+        if created then
+            appearanceUsed[created] = true
+        end
+        return created
+    end
+
+    if inventoryItems then
+        for i = 0, inventoryItems:size() - 1 do
+            remember(inventoryItems:get(i))
+        end
+    end
+    if wornItems then
+        for i = 0, wornItems:size() - 1 do
+            local entry = wornItems:get(i)
+            remember(entry and entry.getItem and entry:getItem() or nil)
+        end
+    end
+    remember(zombie.getPrimaryHandItem and zombie:getPrimaryHandItem() or nil)
+    remember(zombie.getSecondaryHandItem and zombie:getSecondaryHandItem() or nil)
+
+    -- Materialize the canonical logical inventory first. Live NPC rendering can
+    -- use ItemVisuals, but IsoDeadBody only retains real InventoryItem objects.
+    if abstractInventory and type(abstractInventory.items) == "table" then
+        for _, descriptor in pairs(abstractInventory.items) do
+            fullType = descriptor and descriptor.type and tostring(descriptor.type) or ""
+            if fullType ~= "" then
+                item = takeForInventory(fullType)
+                if item and descriptor.cond ~= nil and item.setCondition then
+                    pcall(item.setCondition, item, math.max(0, math.floor(tonumber(descriptor.cond) or 0)))
+                end
+                if item and descriptor.wornSlot and zombie.setWornItem then
+                    pcall(zombie.setWornItem, zombie, tostring(descriptor.wornSlot), item)
+                elseif item and descriptor.equipSlot == "primary" and zombie.setPrimaryHandItem then
+                    pcall(zombie.setPrimaryHandItem, zombie, item)
+                elseif item and descriptor.equipSlot == "secondary" and zombie.setSecondaryHandItem then
+                    pcall(zombie.setSecondaryHandItem, zombie, item)
+                end
+            end
+        end
+    end
+
+    -- Named outfits are often visual-only. Add their real clothing counterparts
+    -- and wear them so the corpse preserves both appearance and loot.
+    if appearance and type(appearance.outfitItems) == "table" then
+        for i = 1, #appearance.outfitItems do
+            fullType = tostring(appearance.outfitItems[i] or "")
+            if fullType ~= "" then
+                item = takeForAppearance(fullType)
+                if item and item.getBodyLocation and zombie.setWornItem then
+                    local bodyLocation = item:getBodyLocation()
+                    if bodyLocation and tostring(bodyLocation) ~= "" then
+                        pcall(zombie.setWornItem, zombie, tostring(bodyLocation), item)
+                    end
+                end
+            end
+        end
+    end
+
+    -- Explicit worn slots take precedence over generated outfit locations.
+    if record.equipment and type(record.equipment.worn) == "table" then
+        for bodyLocation, kind in pairs(record.equipment.worn) do
+            local candidates = pool[tostring(kind)] or {}
+            item = candidates[1] or create(tostring(kind))
+            if item and zombie.setWornItem then
+                pcall(zombie.setWornItem, zombie, tostring(bodyLocation), item)
+            end
+        end
+    end
+    for i = 1, #allItems do
+        addItemToContainer(container, allItems[i])
+    end
+    if PNC.Visuals and PNC.Visuals.RefreshModel then
+        PNC.Visuals.RefreshModel(zombie)
+    end
+    return true
+end
+
+Lifecycle.PrepareCorpseItems = prepareCorpseItems
+
 local function clearBodyCombat(zombie)
     if not zombie then
         return
@@ -184,8 +349,8 @@ local function forEachCorpse(square, callback)
     end
 end
 
-local function makeCorpseInert(corpse)
-    local reanimateAt = worldHour() + 100000000
+local function makeCorpseInert(corpse, createdWorldHour)
+    local reanimateAt = (tonumber(createdWorldHour) or worldHour()) + 100000000
     if not corpse then
         return
     end
@@ -209,7 +374,7 @@ local function stampCorpse(record, corpse, token)
     modData.PNC_BodyKind = "corpse"
     modData.PNC_CorpseToken = token
     modData.PNC_TagVersion = Const.BODY_TAG_VERSION
-    makeCorpseInert(corpse)
+    makeCorpseInert(corpse, record.corpse and record.corpse.createdWorldHour)
     record.corpse = record.corpse or {}
     record.corpse.token = token
     record.corpse.x = corpse.getX and corpse:getX() or record.x
@@ -240,11 +405,8 @@ function Lifecycle.StampLiveBody(record, zombie)
     return record.runtime.bodyLease
 end
 
-function Lifecycle.RemoveLiveBody(record, zombie, reason)
+local function detachLiveBody(record, reason)
     local reg = registry()
-    if zombie then
-        removeZombie(zombie)
-    end
     if record then
         record.runtime = record.runtime or {}
         record.runtime.bodyLease = nil
@@ -262,6 +424,13 @@ function Lifecycle.RemoveLiveBody(record, zombie, reason)
         end
     end
     return true
+end
+
+function Lifecycle.RemoveLiveBody(record, zombie, reason)
+    if zombie then
+        removeZombie(zombie)
+    end
+    return detachLiveBody(record, reason)
 end
 
 local function scheduleCorpseFinalize(record, x, y, z, token, reason)
@@ -284,6 +453,7 @@ function Lifecycle.CreateInertCorpse(record, zombie, reason)
     local createdWorldHour
     local ok
     local corpse
+    local converted = false
     if not record or not zombie then
         return false, nil
     end
@@ -308,28 +478,36 @@ function Lifecycle.CreateInertCorpse(record, zombie, reason)
     if zombie.setReanim then
         pcall(zombie.setReanim, zombie, false)
     end
+    clearBodyCombat(zombie)
+    prepareCorpseItems(record, zombie)
     if IsoDeadBody and IsoDeadBody.new then
         ok, corpse = pcall(IsoDeadBody.new, zombie, false, true)
         if not ok or not corpse then
             ok, corpse = pcall(IsoDeadBody.new, zombie, false)
         end
     end
+    converted = corpse ~= nil
+    if not corpse then
+        if zombie.becomeCorpseSilently then
+            ok = pcall(zombie.becomeCorpseSilently, zombie)
+            converted = ok == true
+        end
+        if converted then
+            scheduleCorpseFinalize(record, x, y, z, token, reason or "death")
+            ensureRuntime(record).corpseState = "finalizing"
+        else
+            removeZombie(zombie)
+            ensureRuntime(record).corpseState = "missing"
+        end
+    end
+    record.presenceState = Const.PRESENCE_CORPSE
+    detachLiveBody(record, reason or "death")
+    mark(record, "corpse", "missing", reason or "death")
     if corpse then
         stampCorpse(record, corpse, token)
         if isServer and isServer() and corpse.transmitCompleteItemToClients then
             pcall(corpse.transmitCompleteItemToClients, corpse)
         end
-    else
-        if zombie.becomeCorpseSilently then
-            pcall(zombie.becomeCorpseSilently, zombie)
-        end
-        scheduleCorpseFinalize(record, x, y, z, token, reason or "death")
-        ensureRuntime(record).corpseState = "finalizing"
-    end
-    Lifecycle.RemoveLiveBody(record, zombie, reason or "death")
-    record.presenceState = Const.PRESENCE_CORPSE
-    mark(record, "corpse", "missing", reason or "death")
-    if corpse then
         ensureRuntime(record).corpseState = "inert_loaded"
     end
     return corpse ~= nil, corpse

@@ -9,6 +9,14 @@ local Monitor = PNC.NPCMonitor
 local ClientState = PNC.Network.ClientState
 local FILTERS = { "All", "Live", "Abstract", "Corpse", "Problems" }
 
+local function tr(key, fallback)
+    local value = getText and getText(key) or nil
+    if not value or value == "" or value == key then
+        return fallback
+    end
+    return value
+end
+
 local function diagnosticProblem(item)
     if not item then
         return false
@@ -75,6 +83,10 @@ end
 
 function ISPNCNPCMonitor:createChildren()
     local x = 10
+    local listWidth = math.max(430, math.floor(self.width * 0.57))
+    local listHeight = math.max(300, self.height - 105)
+    local topButtonWidth = 92
+    local topButtonX = self.width - 10 - topButtonWidth
     local i
     local filter
     ISCollapsableWindow.createChildren(self)
@@ -87,30 +99,35 @@ function ISPNCNPCMonitor:createChildren()
         self:addChild(self.filterButtons[filter])
         x = x + 84
     end
-    self.focus = ISButton:new(700, 26, 80, 23, getText("UI_PNC_MonitorFocus"), self, ISPNCNPCMonitor.onFocus)
+    self.teleport = ISButton:new(topButtonX, 26, topButtonWidth, 23, tr("UI_PNC_MonitorTeleport", "Teleport"), self, ISPNCNPCMonitor.onTeleport)
+    self.teleport:initialise()
+    self:addChild(self.teleport)
+    topButtonX = topButtonX - topButtonWidth - 5
+    self.focus = ISButton:new(topButtonX, 26, topButtonWidth, 23, tr("UI_PNC_MonitorFocus", "Focus"), self, ISPNCNPCMonitor.onFocus)
     self.focus:initialise()
     self:addChild(self.focus)
 
-    self.list = ISScrollingListBox:new(10, 56, 455, 465)
+    self.list = ISScrollingListBox:new(10, 56, listWidth, listHeight)
     self.list:initialise()
     self.list:instantiate()
     self.list.itemheight = 24
     self.list.drawBorder = true
     self:addChild(self.list)
 
-    self.forceLive = ISButton:new(10, 530, 92, 24, getText("UI_PNC_MonitorForceLive"), self, ISPNCNPCMonitor.onAction)
+    local bottomY = self.height - 34
+    self.forceLive = ISButton:new(10, bottomY, 92, 24, tr("UI_PNC_MonitorForceLive", "Force Live"), self, ISPNCNPCMonitor.onAction)
     self.forceLive.internal = "force_live"
-    self.forceAbstract = ISButton:new(106, 530, 108, 24, getText("UI_PNC_MonitorForceAbstract"), self, ISPNCNPCMonitor.onAction)
+    self.forceAbstract = ISButton:new(106, bottomY, 108, 24, tr("UI_PNC_MonitorForceAbstract", "Force Abstract"), self, ISPNCNPCMonitor.onAction)
     self.forceAbstract.internal = "force_abstract"
-    self.heal = ISButton:new(218, 530, 70, 24, getText("UI_PNC_MonitorHeal"), self, ISPNCNPCMonitor.onAction)
+    self.heal = ISButton:new(218, bottomY, 62, 24, tr("UI_PNC_MonitorHeal", "Heal"), self, ISPNCNPCMonitor.onAction)
     self.heal.internal = "heal"
-    self.damage = ISButton:new(292, 530, 82, 24, getText("UI_PNC_MonitorDamage"), self, ISPNCNPCMonitor.onAction)
+    self.damage = ISButton:new(284, bottomY, 72, 24, tr("UI_PNC_MonitorDamage", "Damage"), self, ISPNCNPCMonitor.onAction)
     self.damage.internal = "damage"
-    self.toggleDebug = ISButton:new(378, 530, 104, 24, getText("UI_PNC_MonitorRecordDebug"), self, ISPNCNPCMonitor.onAction)
+    self.toggleDebug = ISButton:new(360, bottomY, 104, 24, tr("UI_PNC_MonitorRecordDebug", "Record Debug"), self, ISPNCNPCMonitor.onAction)
     self.toggleDebug.internal = "toggle_debug"
-    self.audit = ISButton:new(486, 530, 96, 24, getText("UI_PNC_MonitorAuditBodies"), self, ISPNCNPCMonitor.onAudit)
-    self.refresh = ISButton:new(586, 530, 82, 24, getText("UI_PNC_MonitorRefresh"), self, ISPNCNPCMonitor.onRefresh)
-    self.overlay = ISButton:new(672, 530, 108, 24, getText("UI_PNC_MonitorToggleOverlay"), self, ISPNCNPCMonitor.onOverlay)
+    self.audit = ISButton:new(468, bottomY, 96, 24, tr("UI_PNC_MonitorAuditBodies", "Audit Bodies"), self, ISPNCNPCMonitor.onAudit)
+    self.refresh = ISButton:new(568, bottomY, 76, 24, tr("UI_PNC_MonitorRefresh", "Refresh"), self, ISPNCNPCMonitor.onRefresh)
+    self.overlay = ISButton:new(648, bottomY, 108, 24, tr("UI_PNC_MonitorToggleOverlay", "Toggle Overlay"), self, ISPNCNPCMonitor.onOverlay)
     local buttons = { self.forceLive, self.forceAbstract, self.heal, self.damage, self.toggleDebug, self.audit, self.refresh, self.overlay }
     for i = 1, #buttons do
         buttons[i]:initialise()
@@ -170,6 +187,14 @@ function ISPNCNPCMonitor:onFocus()
     end
 end
 
+function ISPNCNPCMonitor:onTeleport()
+    local item = self:getSelectedDiagnostic()
+    if not item or not PNC.Client then
+        return
+    end
+    PNC.Client.SendDebug("teleport_to_npc", { id = item.id })
+end
+
 function ISPNCNPCMonitor:requestRoster(forceAudit)
     if PNC.Client and PNC.Client.RequestDebugRoster then
         PNC.Client.RequestDebugRoster(forceAudit == true)
@@ -190,11 +215,11 @@ function ISPNCNPCMonitor:refreshList()
         item = roster[i]
         if matchesFilter(item, self.filter) then
             label = string.format(
-                "%s | %s/%s | %s | HP %s/%s",
+                "%s | %s | %s/%s | HP %s/%s",
                 tostring(item.name or item.id),
+                string.upper(tostring(item.faction or "?")),
                 string.upper(tostring(item.presenceState or "?")),
                 string.upper(tostring(item.bodyState or "?")),
-                tostring(item.activeBehavior or item.activeJob or "Idle"),
                 tostring(math.floor(tonumber(item.hpCurrent) or 0)),
                 tostring(math.floor(tonumber(item.hpMax) or 0))
             )
@@ -245,7 +270,7 @@ end
 
 function ISPNCNPCMonitor:render()
     local item = self:getSelectedDiagnostic()
-    local x = 480
+    local x = self.list:getX() + self.list:getWidth() + 15
     local y = 62
     local lines
     local i
@@ -256,11 +281,11 @@ function ISPNCNPCMonitor:render()
         self.filterButtons[filter]:setTitle(self.filter == filter and ("[" .. filter .. "]") or filter)
     end
     if not ClientState.debugAuthorized then
-        self:drawText(getText("UI_PNC_MonitorUnauthorized"), x, y, 1, 0.35, 0.25, 1, UIFont.Small)
+        self:drawText(tr("UI_PNC_MonitorUnauthorized", "Debug roster unavailable or not authorized."), x, y, 1, 0.35, 0.25, 1, UIFont.Small)
         return
     end
     if not item then
-        self:drawText(getText("UI_PNC_MonitorSelectNPC"), x, y, 0.85, 0.85, 0.85, 1, UIFont.Small)
+        self:drawText(tr("UI_PNC_MonitorSelectNPC", "Select an NPC to inspect its lifecycle."), x, y, 0.85, 0.85, 0.85, 1, UIFont.Small)
         return
     end
     lines = {
@@ -311,7 +336,7 @@ function ISPNCNPCMonitor:new(x, y, width, height)
     local o = ISCollapsableWindow:new(x, y, width, height)
     setmetatable(o, self)
     self.__index = self
-    o.title = getText("UI_PNC_MonitorTitle")
+    o.title = tr("UI_PNC_MonitorTitle", "PNC NPC Monitor")
     o.filter = "All"
     o.resizable = false
     return o
@@ -323,7 +348,11 @@ function Monitor.Toggle()
         return nil
     end
     if not window then
-        window = ISPNCNPCMonitor:new(120, 80, 800, 570)
+        local screenWidth = getCore and getCore():getScreenWidth() or 1280
+        local screenHeight = getCore and getCore():getScreenHeight() or 720
+        local width = math.max(760, math.min(960, screenWidth - 40))
+        local height = math.max(520, math.min(640, screenHeight - 60))
+        window = ISPNCNPCMonitor:new(math.max(20, math.floor((screenWidth - width) / 2)), math.max(30, math.floor((screenHeight - height) / 2)), width, height)
         window:initialise()
         window:instantiate()
         Monitor.instance = window

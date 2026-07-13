@@ -54,6 +54,45 @@ local function normalizeInventory(inventory)
     return Core.DeepCopy(inventory)
 end
 
+function Types.NormalizeFaction(value)
+    local faction = string.lower(tostring(value or "companion"))
+    if faction == "hostile" or faction == "neutral" or faction == "friendly" or faction == "companion" then
+        return faction
+    end
+    if faction == "enemy" or faction == "bandit" then
+        return "hostile"
+    end
+    if faction == "ally" or faction == "survivor" then
+        return "friendly"
+    end
+    return "companion"
+end
+
+function Types.DefaultHostility(faction)
+    faction = Types.NormalizeFaction(faction)
+    if faction == "hostile" then
+        return { mode = "hostile_any_player", attackPlayers = true, attackNPCs = true, attackZombies = true }
+    end
+    if faction == "neutral" then
+        return { mode = "neutral", attackPlayers = false, attackNPCs = false, attackZombies = false }
+    end
+    if faction == "friendly" then
+        return { mode = "defend_allies", attackPlayers = false, attackNPCs = true, attackZombies = true }
+    end
+    return { mode = "defend_owner", attackPlayers = false, attackNPCs = true, attackZombies = true }
+end
+
+function Types.NormalizeHostility(faction, value)
+    local source = type(value) == "table" and value or {}
+    local defaults = Types.DefaultHostility(faction)
+    return {
+        mode = tostring(source.mode or defaults.mode),
+        attackPlayers = source.attackPlayers == nil and defaults.attackPlayers or source.attackPlayers == true,
+        attackNPCs = source.attackNPCs == nil and defaults.attackNPCs or source.attackNPCs == true,
+        attackZombies = source.attackZombies == nil and defaults.attackZombies or source.attackZombies == true,
+    }
+end
+
 local function normalizePatrolPoints(points, fallbackX, fallbackY, fallbackZ)
     local output = {}
     local i
@@ -78,7 +117,7 @@ end
 
 function Types.NormalizeDefinition(definition)
     local def = definition or {}
-    local faction = tostring(def.faction or def.role or "companion")
+    local faction = Types.NormalizeFaction(def.faction or def.role)
     local x = tonumber(def.x) or 0
     local y = tonumber(def.y) or 0
     local z = tonumber(def.z) or 0
@@ -109,6 +148,7 @@ function Types.NormalizeDefinition(definition)
         patrolPoints = normalizePatrolPoints(def.patrolPoints, x, y, z),
         weaponMode = tostring(def.weaponMode or (isHostile and "mixed" or "melee")),
         combatProfile = Core.DeepCopy(def.combatProfile or {}),
+        hostility = Types.NormalizeHostility(faction, def.hostility),
         equipment = normalizeEquipment(def.equipment),
         inventory = normalizeInventory(def.inventory),
         allowedJobs = Core.DeepCopy(def.allowedJobs or {}),
@@ -164,12 +204,7 @@ function Types.NewRecord(definition)
             unarmedGroundDamage = tonumber(def.combatProfile.unarmedGroundDamage) or Const.UNARMED_GROUND_DAMAGE,
             unarmedCooldownMs = tonumber(def.combatProfile.unarmedCooldownMs) or Const.UNARMED_COOLDOWN_MS,
         },
-        hostility = {
-            mode = hostile and "hostile_any_player" or "defend_owner",
-            attackPlayers = hostile,
-            attackNPCs = true,
-            attackZombies = true,
-        },
+        hostility = Core.DeepCopy(def.hostility),
         health = {
             current = def.hpMax,
             max = def.hpMax,
@@ -222,7 +257,7 @@ function Types.NewRecord(definition)
     if Identity and Identity.ApplyRecordIdentity then
         Identity.ApplyRecordIdentity(record, def)
     else
-        record.name = record.name or (hostile and "Hostile NPC" or "Companion NPC")
+        record.name = record.name or ((hostile and "Hostile NPC") or (def.faction == "neutral" and "Neutral NPC") or "Friendly NPC")
     end
 
     return record

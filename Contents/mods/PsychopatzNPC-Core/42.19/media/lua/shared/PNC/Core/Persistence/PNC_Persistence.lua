@@ -196,14 +196,15 @@ local function sanitizeProgression(rawProgression)
 end
 
 local function sanitizeHostility(rawHostility, faction)
-    local hostile = tostring(faction or "") == "hostile"
+    if PNC.Types and PNC.Types.NormalizeHostility then
+        return PNC.Types.NormalizeHostility(faction, rawHostility)
+    end
     local source = type(rawHostility) == "table" and rawHostility or {}
-    return {
-        mode = tostring(source.mode or (hostile and "hostile_any_player" or "defend_owner")),
-        attackPlayers = source.attackPlayers == true or hostile,
-        attackNPCs = source.attackNPCs ~= false,
-        attackZombies = source.attackZombies ~= false,
-    }
+    local hostile = tostring(faction or "") == "hostile"
+    return { mode = tostring(source.mode or (hostile and "hostile_any_player" or "defend_owner")),
+        attackPlayers = source.attackPlayers == nil and hostile or source.attackPlayers == true,
+        attackNPCs = source.attackNPCs == nil and true or source.attackNPCs == true,
+        attackZombies = source.attackZombies == nil and true or source.attackZombies == true }
 end
 
 local function migrateLegacyIdentity(raw, definition)
