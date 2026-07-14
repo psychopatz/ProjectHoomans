@@ -8,6 +8,8 @@ if isClient() and not isServer() then
     return
 end
 
+local Teleport = require "PsychopatzCore/World/PsychopatzTeleport"
+
 PNC = PNC or {}
 PNC.Server = PNC.Server or {}
 
@@ -247,14 +249,13 @@ local function teleportPlayerToRecord(player, npcId)
         return false
     end
     x, y, z = findTeleportPosition(record)
-    if player.setX then player:setX(x) end
-    if player.setY then player:setY(y) end
-    if player.setZ then player:setZ(z) end
-    if player.setLx then player:setLx(x) end
-    if player.setLy then player:setLy(y) end
-    if player.setLz then player:setLz(z) end
-    Core.LogInfo("PNC debug teleported " .. tostring(player:getUsername()) .. " near NPC " .. tostring(record.id))
-    return true
+    if Teleport.ToCoordinates(player, x, y, z) then
+        Core.LogInfo("PNC debug queued teleport for " .. tostring(player:getUsername())
+            .. " near NPC " .. tostring(record.id))
+        return true
+    end
+    Core.LogWarn("PNC debug teleport unavailable for NPC " .. tostring(record.id))
+    return false
 end
 
 local function onClientCommand(module, command, player, args)

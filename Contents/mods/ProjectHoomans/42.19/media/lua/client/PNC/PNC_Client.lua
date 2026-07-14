@@ -8,6 +8,8 @@
 PNC = PNC or {}
 PNC.Client = PNC.Client or {}
 
+local Teleport = require "PsychopatzCore/World/PsychopatzTeleport"
+
 local Client = PNC.Client
 local Const = PNC.Const
 local Core = PNC.Core
@@ -26,22 +28,14 @@ local function tr(key, fallback)
 end
 
 local function teleportLocalPlayerNear(record, player)
-    local body = record and Registry.GetLiveZombie and Registry.GetLiveZombie(record.id) or nil
-    local x = body and body:getX() or tonumber(record and record.x) or 0
-    local y = body and body:getY() or tonumber(record and record.y) or 0
-    local z = body and body:getZ() or tonumber(record and record.z) or 0
     if not record or not player then
         return false
     end
-    x = x + 1.5
-    y = y + 1.5
-    if player.setX then player:setX(x) end
-    if player.setY then player:setY(y) end
-    if player.setZ then player:setZ(z) end
-    if player.setLx then player:setLx(x) end
-    if player.setLy then player:setLy(y) end
-    if player.setLz then player:setLz(z) end
-    return true
+    local body = Registry.GetLiveZombie and Registry.GetLiveZombie(record.id) or nil
+    local x = body and body:getX() or tonumber(record.x) or 0
+    local y = body and body:getY() or tonumber(record.y) or 0
+    local z = body and body:getZ() or tonumber(record.z) or 0
+    return Teleport.ToCoordinates(player, x + 1.5, y + 1.5, z)
 end
 
 local function isWorldReady()
