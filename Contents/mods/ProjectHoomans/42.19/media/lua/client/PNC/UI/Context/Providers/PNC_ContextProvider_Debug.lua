@@ -9,6 +9,14 @@ local Provider = {
     id = "debug",
 }
 
+local function tr(key, fallback)
+    local value = getText and getText(key) or nil
+    if not value or value == "" or value == key then
+        return fallback
+    end
+    return value
+end
+
 function Provider.isEnabled()
     return PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() == true
 end
@@ -29,11 +37,15 @@ local function isRecording(entry)
 end
 
 function Provider.addOptions(menu, entry, player, contextData)
+    local debugMenu = ISContextMenu:getNew(menu)
     local snapshot
     local actionSquare = entry.zombie and entry.zombie.getSquare and entry.zombie:getSquare() or contextData and contextData.square or nil
     local heldItem = player and player.getPrimaryHandItem and player:getPrimaryHandItem() or nil
     local orderMenu
     local weaponMenu
+
+    menu:addSubMenu(menu:addOption(tr("UI_PNC_Debug", "Debug")), debugMenu)
+    menu = debugMenu
 
     menu:addOption("Force Live", nil, function()
         sendDebug("force_live", { id = entry.id })
@@ -66,7 +78,7 @@ function Provider.addOptions(menu, entry, player, contextData)
 
     snapshot = ClientState.snapshots and ClientState.snapshots[entry.id] or nil
     if snapshot and snapshot.healthState == "incapacitated" and snapshot.canRevive == true then
-        menu:addOption(getText("UI_PNC_DebugRevive"), nil, function()
+        menu:addOption(tr("UI_PNC_DebugRevive", "Debug Revive (Free)"), nil, function()
             sendDebug("revive", { id = entry.id })
         end)
     end
@@ -107,7 +119,7 @@ function Provider.addOptions(menu, entry, player, contextData)
             },
         })
     end)
-    orderMenu:addOption(getText("UI_PNC_OrderRoamNearby"), nil, function()
+    orderMenu:addOption(tr("UI_PNC_OrderRoamNearby", "Roam Nearby"), nil, function()
         if not actionSquare then
             return
         end

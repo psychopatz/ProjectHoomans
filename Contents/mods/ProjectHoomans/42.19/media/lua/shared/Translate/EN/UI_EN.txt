@@ -3,6 +3,7 @@ UI_EN = {
     UI_PNC_AIOverlayDisabled = "PNC AI Overlay: OFF",
     UI_PNC_PathOverlayEnabled = "PNC Path Overlay: ON",
     UI_PNC_PathOverlayDisabled = "PNC Path Overlay: OFF",
+    UI_PNC_Debug = "Debug",
     UI_PNC_OrderRoamNearby = "Roam Nearby",
     UI_PNC_Revive = "Revive",
     UI_PNC_DebugRevive = "Debug Revive (Free)",
