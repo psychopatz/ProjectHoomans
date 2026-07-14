@@ -1,7 +1,4 @@
 UI_EN = {
-    UI_PNC_Debug = "PNC Debug",
-    UI_PNC_NPCMonitor = "NPC Monitor",
-    UI_PNC_ToggleAIOverlay = "Toggle AI Overlay",
     UI_PNC_AIOverlayEnabled = "PNC AI Overlay: ON",
     UI_PNC_AIOverlayDisabled = "PNC AI Overlay: OFF",
     UI_PNC_PathOverlayEnabled = "PNC Path Overlay: ON",
@@ -17,6 +14,7 @@ UI_EN = {
     UI_PNC_SpawnHostileRanged = "Spawn Hostile Ranged",
     UI_PNC_MonitorTitle = "PNC NPC Monitor",
     UI_PNC_MonitorFocus = "Focus",
+    UI_PNC_MonitorTrack = "Track",
     UI_PNC_MonitorTeleport = "Teleport",
     UI_PNC_MonitorForceLive = "Force Live",
     UI_PNC_MonitorForceAbstract = "Force Abstract",

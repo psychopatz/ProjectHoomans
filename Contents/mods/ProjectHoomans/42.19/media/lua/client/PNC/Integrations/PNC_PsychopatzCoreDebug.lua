@@ -21,3 +21,17 @@ PsychopatzCore.DebugHub.RegisterTool({
         PNC.NPCMonitor.Toggle()
     end,
 })
+
+PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.settings",
+    source = "ProjectHoomans",
+    order = 210,
+    title = "Project Hoomans Settings",
+    description = "Configure persistent NPC overlays and client presentation settings.",
+    available = function()
+        return PNC and PNC.Settings and PNC.Settings.Toggle
+    end,
+    action = function()
+        PNC.Settings.Toggle()
+    end,
+})

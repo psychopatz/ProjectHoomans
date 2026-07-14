@@ -72,6 +72,10 @@ function View.CreateChildren(window)
         id = "focus", title = Support.Tr("UI_PNC_MonitorFocus", "Focus"), target = window,
         onclick = ISPNCNPCMonitor.onFocus,
     }, window.topControls)
+    window.track = createToolbarButton(window, {
+        id = "track", title = Support.Tr("UI_PNC_MonitorTrack", "Track"), target = window,
+        onclick = ISPNCNPCMonitor.onTrack, variant = "quiet",
+    }, window.topControls)
     window.teleport = createToolbarButton(window, {
         id = "teleport", title = Support.Tr("UI_PNC_MonitorTeleport", "Teleport"), target = window,
         onclick = ISPNCNPCMonitor.onTeleport,

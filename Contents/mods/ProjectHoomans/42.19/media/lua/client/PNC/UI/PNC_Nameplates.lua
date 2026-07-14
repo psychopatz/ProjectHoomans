@@ -1,15 +1,22 @@
 require "ISUI/ISUIElement"
+require "PsychopatzCore/Settings/PsychopatzSettings"
 
 PNC = PNC or {}
 PNC.Nameplates = PNC.Nameplates or {}
 
 local Nameplates = PNC.Nameplates
 
-Nameplates.Settings = Nameplates.Settings or {
-    enabled = true,
-    showAIDebug = false,
-    showPathDebug = false,
-}
+PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHoomans", {
+    fileName = "ProjectHoomans_Config.txt",
+    defaults = {
+        enabled = true,
+        showAIDebug = false,
+        showPathDebug = false,
+    },
+})
+Nameplates.Settings = PNC.SettingsStore.values
+if Nameplates.Settings.enabled == nil then Nameplates.Settings.enabled = true end
+if Nameplates.Settings.showAIDebug == nil then Nameplates.Settings.showAIDebug = false end
 if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDebug = false end
 Nameplates.State = Nameplates.State or {
     managers = {},
@@ -71,6 +78,7 @@ end
 function Nameplates.ToggleDebug()
     local player = getSpecificPlayer(0)
     Settings.showAIDebug = not Settings.showAIDebug
+    PNC.SettingsStore:Set("showAIDebug", Settings.showAIDebug, true)
     PNC.Runtime = PNC.Runtime or {}
     PNC.Runtime.debugEnabled = Settings.showAIDebug == true
     if player and HaloTextHelper and HaloTextHelper.addText then
@@ -87,6 +95,7 @@ end
 function Nameplates.TogglePathDebug()
     local player = getSpecificPlayer(0)
     Settings.showPathDebug = not Settings.showPathDebug
+    PNC.SettingsStore:Set("showPathDebug", Settings.showPathDebug, true)
     if player and HaloTextHelper and HaloTextHelper.addText then
         local messageKey = Settings.showPathDebug and "UI_PNC_PathOverlayEnabled" or "UI_PNC_PathOverlayDisabled"
         HaloTextHelper.addText(player, getText(messageKey))
@@ -111,6 +120,8 @@ local function onCreatePlayer(playerIndex)
 end
 
 local function onGameStart()
+    PNC.Runtime = PNC.Runtime or {}
+    PNC.Runtime.debugEnabled = Settings.showAIDebug == true
     for i = 0, getNumActivePlayers() - 1 do
         initForPlayer(i)
     end

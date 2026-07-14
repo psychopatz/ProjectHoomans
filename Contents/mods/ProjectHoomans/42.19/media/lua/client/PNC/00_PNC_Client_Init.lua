@@ -1,6 +1,9 @@
 require "PNC/00_PNC_Init"
 require "PNC/Patches/PNC_FishingPatch"
 require "PNC/UI/PNC_Nameplates"
+require "PsychopatzCore/EventMarkers/PsychopatzEventMarkerHandler"
+PNC.EventMarkers = PsychopatzCore.EventMarkers
+require "PNC/UI/PNC_Settings"
 require "PNC/UI/Context/PNC_NPCSelection"
 require "PNC/UI/Context/PNC_ContextHub"
 require "PNC/UI/Context/Providers/PNC_ContextProvider_Revive"

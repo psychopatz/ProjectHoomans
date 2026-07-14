@@ -10,7 +10,7 @@
 ## Client Visuals
 - live NPCs render overhead nameplates with name, HP text, and HP bar
 - incapacitated NPCs use a pulsing red bar variant
-- AI debug overlay can be toggled from the right-click `PNC Debug` menu
+- AI debug overlay can be toggled from the NPC monitor, Project Hoomans settings, or the PsychopatzCore debug hub
 - debug overlay shows `aiState`, active job, order, and current target type
 
 ## Corpse Appearance

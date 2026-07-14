@@ -589,7 +589,6 @@ function Client.SendRevive(npcId)
 end
 
 local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, test)
-    local debugMenu
     local subMenu
     local square
     if not isWorldReady() then
@@ -601,19 +600,6 @@ local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, te
 
     square = PNC.NPCSelection and PNC.NPCSelection.GetWorldSquare and PNC.NPCSelection.GetWorldSquare(worldobjects) or nil
     if square and Client.CanUseDebug() then
-        debugMenu = ISContextMenu:getNew(context)
-        context:addSubMenu(context:addOption(tr("UI_PNC_Debug", "PNC Debug")), debugMenu)
-        if PNC.NPCMonitor and PNC.NPCMonitor.Toggle then
-            debugMenu:addOption(tr("UI_PNC_NPCMonitor", "NPC Monitor"), nil, function()
-                PNC.NPCMonitor.Toggle()
-            end)
-        end
-        debugMenu:addOption(tr("UI_PNC_ToggleAIOverlay", "Toggle AI Overlay"), nil, function()
-            if PNC.Nameplates and PNC.Nameplates.ToggleDebug then
-                PNC.Nameplates.ToggleDebug()
-            end
-        end)
-
         subMenu = ISContextMenu:getNew(context)
         context:addSubMenu(context:addOption(tr("UI_PNC_Spawn", "PNC Spawn")), subMenu)
         subMenu:addOption(tr("UI_PNC_SpawnColonist", "Spawn Colonist"), nil, function()
