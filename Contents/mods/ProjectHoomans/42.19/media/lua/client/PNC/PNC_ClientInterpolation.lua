@@ -46,7 +46,7 @@ local function isDebugEnabled(snapshot, state)
     if state and state.debugEnabled == true then
         return true
     end
-    return PNC.Runtime and PNC.Runtime.debugEnabled == true
+    return false
 end
 
 local function logDebug(snapshot, state, id, event, extra)
@@ -214,7 +214,11 @@ function Interpolation.RecordSnapshot(snapshot, zombie, now)
     state.streamKind = streamKind
     state.dirX = targetX - fromX
     state.dirY = targetY - fromY
-    state.debugEnabled = snapshot and snapshot.debugState and snapshot.debugState.debugEnabled == true or false
+    if snapshot and snapshot.debugState then
+        state.debugEnabled = snapshot.debugState.debugEnabled == true
+    elseif state.debugEnabled == nil then
+        state.debugEnabled = false
+    end
     Interpolation.StateByID[id] = state
     logDebug(snapshot, state, id, "segment_start", string.format("kind=%s hard=%s from=%.2f,%.2f to=%.2f,%.2f dur=%d", tostring(streamKind), tostring(hardBoundary), fromX, fromY, targetX, targetY, tonumber(state.durationMs) or 0))
     if state.snapToTarget then

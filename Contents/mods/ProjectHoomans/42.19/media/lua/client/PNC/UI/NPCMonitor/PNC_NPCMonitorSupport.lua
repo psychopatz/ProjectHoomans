@@ -57,6 +57,10 @@ function Support.PresenceColor(item)
     return "accent"
 end
 
+function Support.IsRecording(item)
+    return item and item.debugRecording == true or false
+end
+
 local function addDetail(list, label, value, tone)
     list:addItem(tostring(label), {
         label = tostring(label),
@@ -88,6 +92,8 @@ function Support.PopulateDetails(list, item, authorized, audit)
     addDetail(list, "Online / outfit", tostring(item.liveBodyOnlineID or "-") .. " / " .. tostring(item.liveBodyInstanceID or "-"))
     addDetail(list, "Position", string.format("%.2f, %.2f, %.0f", tonumber(item.x) or 0, tonumber(item.y) or 0, tonumber(item.z) or 0))
     addDetail(list, "AI", item.activeBehavior or item.activeJob or "Idle")
+    addDetail(list, "Debug recording", Support.IsRecording(item) and "REC" or "Off",
+        Support.IsRecording(item) and "danger" or "textMuted")
     addDetail(list, "Health", tostring(item.healthState or "-") .. "  " .. tostring(item.hpCurrent or 0) .. "/" .. tostring(item.hpMax or 0))
     addDetail(list, "Target", item.targetKind or "none")
     addDetail(list, "Combat block", item.combatBlockReason)

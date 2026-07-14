@@ -45,19 +45,39 @@ local function hasEnabledProvider(entry, player, contextData)
 end
 
 local function formatEntryLabel(entry)
+    local label = tostring(entry and entry.name or "PNC NPC")
     local distance = math.sqrt(tonumber(entry and entry.distSq) or 0)
-    return tostring(entry and entry.name or "PNC NPC")
-        .. " ["
-        .. tostring(entry and entry.archetypeLabel or "NPC")
-        .. "] "
-        .. string.format("(%.1f)", distance)
+    local debugPresentation = PNC.Runtime and PNC.Runtime.debugEnabled == true
+        or entry and entry.debugRecording == true
+    if debugPresentation then
+        label = label
+            .. " ["
+            .. tostring(entry and entry.archetypeLabel or "NPC")
+            .. "] "
+            .. string.format("(%.1f)", distance)
+    end
+    if entry and entry.debugRecording == true then
+        label = label .. "  [REC]"
+    end
+    return label
+end
+
+local function resolveEntryIcon()
+    -- Match Dynamic Trading's production Talk provider exactly. This is a
+    -- base-game texture, so no mod-local copy is required.
+    return getTexture and getTexture("media/ui/emotes/insult.png") or nil
 end
 
 function ContextHub.AddEntryOptions(menu, player, entry, contextData)
     local subMenu = ISContextMenu:getNew(menu)
+    local option
     local i
     local provider
-    menu:addSubMenu(menu:addOption(formatEntryLabel(entry)), subMenu)
+    option = menu:addOption(formatEntryLabel(entry))
+    if option then
+        option.iconTexture = resolveEntryIcon()
+    end
+    menu:addSubMenu(option, subMenu)
     for i = 1, #ContextHub.ProviderOrder do
         provider = ContextHub.Providers[ContextHub.ProviderOrder[i]]
         if provider and (provider.isEnabled == nil or provider.isEnabled(entry, player, contextData) ~= false) then
@@ -70,7 +90,6 @@ function ContextHub.BuildWorldContext(playerNum, context, worldObjects, test)
     local player
     local entries
     local square
-    local rootMenu
     local contextData
     local i
     if test then
@@ -99,20 +118,9 @@ function ContextHub.BuildWorldContext(playerNum, context, worldObjects, test)
     if not anyEnabled then
         return
     end
-    if #entries == 1 then
-        rootMenu = ISContextMenu:getNew(context)
-        context:addSubMenu(context:addOption("PNC NPC"), rootMenu)
-        for i = 1, #ContextHub.ProviderOrder do
-            local provider = ContextHub.Providers[ContextHub.ProviderOrder[i]]
-            if provider and (provider.isEnabled == nil or provider.isEnabled(entries[1], player, contextData) ~= false) then
-                provider.addOptions(rootMenu, entries[1], player, contextData)
-            end
-        end
-        return
-    end
-    rootMenu = ISContextMenu:getNew(context)
-    context:addSubMenu(context:addOption("PNC NPCs"), rootMenu)
     for i = 1, #entries do
-        ContextHub.AddEntryOptions(rootMenu, player, entries[i], contextData)
+        if hasEnabledProvider(entries[i], player, contextData) then
+            ContextHub.AddEntryOptions(context, player, entries[i], contextData)
+        end
     end
 end

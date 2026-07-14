@@ -45,7 +45,7 @@ local function isSnapshotDebugEnabled(snapshot)
     if snapshot and snapshot.debugState and snapshot.debugState.debugEnabled == true then
         return true
     end
-    return PNC.Runtime and PNC.Runtime.debugEnabled == true
+    return false
 end
 
 local function logClientMotionDebug(snapshot, id, event, extra)

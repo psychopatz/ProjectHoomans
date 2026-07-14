@@ -109,6 +109,10 @@ local diagnostics = PNC.BodyLifecycle.BuildDiagnostics(record)
 assertEqual(diagnostics.bodyState, "bound", "diagnostic body state")
 assertEqual(diagnostics.liveBodyOnlineID, 22, "diagnostic online ID")
 assertEqual(diagnostics.bodyActionState, "idle", "diagnostic action state")
+assertEqual(diagnostics.debugRecording, false, "diagnostic recording defaults off")
+record.runtime.debug = true
+diagnostics = PNC.BodyLifecycle.BuildDiagnostics(record)
+assertEqual(diagnostics.debugRecording, true, "diagnostic recording state")
 
 PNC.BodyLifecycle.RemoveLiveBody(record, second, "test_abstract")
 assertEqual(record.presenceState, "abstract", "detached presence state")

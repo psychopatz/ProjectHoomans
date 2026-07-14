@@ -238,10 +238,10 @@ function Core.LogDebug(message)
 end
 
 function Core.IsRecordDebugEnabled(record)
-    if record and record.runtime and record.runtime.debug == true then
-        return true
-    end
-    return PNC.Runtime and PNC.Runtime.debugEnabled == true
+    -- Global debug controls global diagnostics and overlays. Record logs are
+    -- intentionally opt-in so enabling the developer UI does not make every
+    -- active NPC flood the same console stream.
+    return record and record.runtime and record.runtime.debug == true or false
 end
 
 function Core.LogRecordDebug(record, message)

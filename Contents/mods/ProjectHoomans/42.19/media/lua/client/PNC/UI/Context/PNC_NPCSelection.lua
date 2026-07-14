@@ -32,6 +32,7 @@ local function buildEntry(zombie, record, snapshot, referenceX, referenceY)
     local y = zombie and zombie.getY and zombie:getY() or snapshot and tonumber(snapshot.y) or record and tonumber(record.y) or 0
     local refX = tonumber(referenceX) or x
     local refY = tonumber(referenceY) or y
+    local debugState = snapshot and snapshot.debugState or nil
     return {
         zombie = zombie,
         record = record,
@@ -39,6 +40,9 @@ local function buildEntry(zombie, record, snapshot, referenceX, referenceY)
         id = record and record.id or snapshot and snapshot.id or zombie and zombie.getModData and zombie:getModData().PNC_UUID or nil,
         name = record and record.name or snapshot and (snapshot.displayName or snapshot.name) or "PNC NPC",
         archetypeLabel = record and record.archetypeLabel or snapshot and snapshot.archetypeLabel or "NPC",
+        debugRecording = record and record.runtime and record.runtime.debug == true
+            or debugState and debugState.debugEnabled == true
+            or false,
         x = x,
         y = y,
         z = zombie and zombie.getZ and zombie:getZ() or snapshot and tonumber(snapshot.z) or record and tonumber(record.z) or 0,

@@ -23,6 +23,7 @@ UI_EN = {
     UI_PNC_MonitorHeal = "Heal",
     UI_PNC_MonitorDamage = "Damage",
     UI_PNC_MonitorRecordDebug = "Record Debug",
+    UI_PNC_MonitorStopRecordDebug = "Stop Recording",
     UI_PNC_MonitorAuditBodies = "Audit Bodies",
     UI_PNC_MonitorRefresh = "Refresh",
     UI_PNC_MonitorToggleOverlay = "Toggle Overlay",

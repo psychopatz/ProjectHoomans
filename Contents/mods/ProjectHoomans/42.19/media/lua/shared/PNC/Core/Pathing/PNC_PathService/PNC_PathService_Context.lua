@@ -78,16 +78,10 @@ function Internal.syncRecordPosition(record, zombie)
 end
 
 function Internal.isMovementDebugEnabled(record)
-    if record and record.runtime and record.runtime.debugMovement == true then
-        return true
-    end
-    if PNC.Runtime and PNC.Runtime.debugMovement == true then
-        return true
-    end
     if Core and Core.IsRecordDebugEnabled then
         return Core.IsRecordDebugEnabled(record)
     end
-    return PNC.Runtime and PNC.Runtime.debugEnabled == true
+    return false
 end
 
 function Internal.hasActiveAttack(record, now)

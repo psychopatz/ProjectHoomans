@@ -271,7 +271,11 @@ function API.DebugCommand(npcId, command, args)
         return applied ~= false
     end
     if command == "toggle_debug" then
-        record.runtime.debug = not (record.runtime and record.runtime.debug == true)
+        record.runtime = record.runtime or {}
+        record.runtime.debug = record.runtime.debug ~= true
+        Core.LogInfo("record_debug npc=" .. tostring(record.id)
+            .. " name=" .. tostring(record.name or "Unknown NPC")
+            .. " enabled=" .. tostring(record.runtime.debug == true))
         Network.BroadcastRecord(record, "debug_toggle")
         return true
     end

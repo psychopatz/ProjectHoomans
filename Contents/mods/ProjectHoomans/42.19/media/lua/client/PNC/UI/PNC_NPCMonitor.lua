@@ -146,6 +146,13 @@ end
 function ISPNCNPCMonitor:updateControlState()
     local item = self:getSelectedDiagnostic()
     for _, button in ipairs(self.selectionControls or {}) do button:setEnable(item ~= nil) end
+    if self.recordDebugButton then
+        local recording = Support.IsRecording(item)
+        self.recordDebugButton:setTitle(recording
+            and Support.Tr("UI_PNC_MonitorStopRecordDebug", "Stop Recording")
+            or Support.Tr("UI_PNC_MonitorRecordDebug", "Record Debug"))
+        UI.SetButtonVariant(self.recordDebugButton, recording and "danger" or "default")
+    end
     self.focus:setEnable(item ~= nil and Support.FindBody(item) ~= nil)
     self.teleport:setEnable(item ~= nil)
 end

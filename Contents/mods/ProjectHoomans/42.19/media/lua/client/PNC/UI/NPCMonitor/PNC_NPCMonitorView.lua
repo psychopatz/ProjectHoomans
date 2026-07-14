@@ -16,8 +16,7 @@ function View.DrawRosterItem(list, y, entry, alternate)
     UI.DrawListSelection(list, y, height, list.selected == entry.index, alternate)
     local text = Theme.colors.text
     local muted = Theme.colors.textMuted
-    UI.DrawBadge(list, item.presenceState or "unknown", list:getWidth() - 10, y + 5, Support.PresenceColor(item))
-    local name = Layout.Ellipsize(item.name or item.id or "Unknown NPC", UIFont.Medium, math.max(40, list:getWidth() - 126))
+    local name = Layout.Ellipsize(item.name or item.id or "Unknown NPC", UIFont.Medium, math.max(40, list:getWidth() - 190))
     list:drawText(name, 11, y + 5, text.r, text.g, text.b, text.a, UIFont.Medium)
     local summary = string.format("%s  •  %s  •  HP %d/%d",
         string.upper(tostring(item.faction or "?")),
@@ -27,6 +26,15 @@ function View.DrawRosterItem(list, y, entry, alternate)
     summary = Layout.Ellipsize(summary, UIFont.Small, list:getWidth() - 22)
     list:drawText(summary, 11, y + 28, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
     return y + height
+end
+
+function View.DrawRosterContent(list, y, entry)
+    local item = entry.item
+    local right = list:getWidth() - 10
+    local presenceWidth = UI.DrawBadge(list, item.presenceState or "unknown", right, y + 5, Support.PresenceColor(item))
+    if Support.IsRecording(item) then
+        UI.DrawBadge(list, "REC", right - presenceWidth - 6, y + 5, "danger")
+    end
 end
 
 function View.DrawDetailItem(list, y, entry, alternate)
@@ -68,7 +76,11 @@ function View.CreateChildren(window)
         id = "teleport", title = Support.Tr("UI_PNC_MonitorTeleport", "Teleport"), target = window,
         onclick = ISPNCNPCMonitor.onTeleport,
     }, window.topControls)
-    window.list = UI.CreateList(window, { itemHeight = Layout.Pixels(50, window.uiScale), doDrawItem = View.DrawRosterItem })
+    window.list = UI.CreateList(window, {
+        itemHeight = Layout.Pixels(50, window.uiScale),
+        doDrawItem = View.DrawRosterItem,
+        drawItemContent = View.DrawRosterContent,
+    })
     window.details = UI.CreateList(window, { itemHeight = Layout.Pixels(28, window.uiScale), doDrawItem = View.DrawDetailItem })
 
     local actions = {
@@ -97,6 +109,7 @@ function View.CreateChildren(window)
             onclick = action[4], variant = variant,
         }, window.footerControls)
         if action[1] == "paths" then window.pathOverlayButton = button end
+        if action[1] == "toggle_debug" then window.recordDebugButton = button end
         if action[1] ~= "audit" and action[1] ~= "refresh" and action[1] ~= "overlay" and action[1] ~= "paths" then
             window.selectionControls[#window.selectionControls + 1] = button
         end

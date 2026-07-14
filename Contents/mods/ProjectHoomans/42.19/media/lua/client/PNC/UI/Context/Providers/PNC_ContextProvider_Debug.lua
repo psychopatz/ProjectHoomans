@@ -19,6 +19,15 @@ local function sendDebug(action, payload)
     end
 end
 
+local function isRecording(entry)
+    local snapshot = entry and (entry.snapshot
+        or (ClientState.snapshots and ClientState.snapshots[entry.id])) or nil
+    return entry and entry.debugRecording == true
+        or entry and entry.record and entry.record.runtime and entry.record.runtime.debug == true
+        or snapshot and snapshot.debugState and snapshot.debugState.debugEnabled == true
+        or false
+end
+
 function Provider.addOptions(menu, entry, player, contextData)
     local snapshot
     local actionSquare = entry.zombie and entry.zombie.getSquare and entry.zombie:getSquare() or contextData and contextData.square or nil
@@ -38,7 +47,7 @@ function Provider.addOptions(menu, entry, player, contextData)
     menu:addOption("Damage 25", nil, function()
         sendDebug("damage", { id = entry.id, amount = 25 })
     end)
-    menu:addOption("Toggle Combat Debug", nil, function()
+    menu:addOption(isRecording(entry) and "Stop Recording Debug" or "Record Debug", nil, function()
         sendDebug("toggle_debug", { id = entry.id })
     end)
     menu:addOption("View Character", nil, function()

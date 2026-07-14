@@ -51,6 +51,7 @@ function Lifecycle.BuildDiagnostics(record)
         bodyActionState = body and body.getActionStateName and body:getActionStateName() or nil,
         activeJob = record.activeJob,
         activeBehavior = record.activeBehavior,
+        debugRecording = record.runtime and record.runtime.debug == true or false,
         healthState = record.health and record.health.state or nil,
         hpCurrent = record.health and record.health.current or nil,
         hpMax = record.health and record.health.max or nil,
