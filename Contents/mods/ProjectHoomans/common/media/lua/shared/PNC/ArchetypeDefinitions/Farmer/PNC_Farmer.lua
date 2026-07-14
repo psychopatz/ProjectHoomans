@@ -1,6 +1,6 @@
 --[[
     PNC Farmer Archetype Definition
-    Declares a preload-safe archetype bundle for farmer-flavored companion NPCs.
+    Declares a preload-safe archetype bundle for farmer-flavored colonist NPCs.
 ]]
 
 PNC = PNC or {}
@@ -11,8 +11,8 @@ local bundle = {
         label = "Farmer",
         type = "survivor",
         tags = { "civilian", "agriculture" },
-        visualProfile = "companion",
-        defaultForFaction = "companion",
+        visualProfile = "colonist",
+        defaultForFaction = "colonist",
         allowedJobs = {
             FollowOwner = true,
             GuardAnchor = true,

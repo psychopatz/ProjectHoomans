@@ -4,7 +4,7 @@ Standalone NPC framework for Project Zomboid Build 42.
 
 This repository starts with a server-authoritative V1 slice:
 
-- companion NPCs with `Follow`, `Guard`, and `Patrol`
+- colonist NPCs with `Follow`, `Guard`, and `Patrol`
 - hostile NPCs with shared `Melee` and `Ranged` combat
 - live/abstract presence switching with runtime body leases and automatic stale-body cleanup
 - inert, lootable NPC corpses with persistent corpse identity and reanimation supervision

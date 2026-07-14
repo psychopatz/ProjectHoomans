@@ -1,7 +1,7 @@
 --[[
     PNC Behavior Hostile
     Owns hostile hunt and direct engage job handlers so aggression logic stays
-    separate from faction-neutral roaming and companion-follow rules.
+    separate from faction-neutral roaming and colonist-follow rules.
 ]]
 
 PNC = PNC or {}

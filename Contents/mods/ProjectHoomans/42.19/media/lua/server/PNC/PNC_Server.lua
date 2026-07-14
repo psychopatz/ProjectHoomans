@@ -26,8 +26,10 @@ local API = PNC.API
 local ZombieAggro = PNC.ZombieAggro
 local Stamina = PNC.Stamina
 local Archetypes = PNC.Archetypes
+local Types = PNC.Types
 local Animation = PNC.Animation
 local BodyLifecycle = PNC.BodyLifecycle
+local PlayerDamage = PNC.PlayerDamage
 local buildDebugRoster
 
 local function canUseDebug(player)
@@ -70,7 +72,7 @@ local function resolveDebugArchetype(args, faction, fallbackID)
     end
     if Archetypes then
         defaults = faction == "hostile" and Archetypes.GetHostileDefaults and Archetypes.GetHostileDefaults()
-            or Archetypes.GetCompanionDefaults and Archetypes.GetCompanionDefaults()
+            or Archetypes.GetColonistDefaults and Archetypes.GetColonistDefaults()
         if type(defaults) == "table" and defaults[1] then
             return tostring(defaults[1])
         end
@@ -177,20 +179,20 @@ local function handleDebugSpawn(player, args)
     local x = tonumber(args and args.x) or (player and player:getX()) or 0
     local y = tonumber(args and args.y) or (player and player:getY()) or 0
     local z = tonumber(args and args.z) or (player and player:getZ()) or 0
-    local variant = tostring(args and args.variant or "companion")
-    local faction = (variant == "hostile_melee" or variant == "hostile_ranged") and "hostile" or variant
-    local companion = faction == "companion"
+    local variant = tostring(args and args.variant or "colonist")
+    local faction = (variant == "hostile_melee" or variant == "hostile_ranged") and "hostile" or Types.NormalizeFaction(variant)
+    local colonist = faction == "colonist"
     local hostile = faction == "hostile"
-    if faction ~= "companion" and faction ~= "friendly" and faction ~= "neutral" and faction ~= "hostile" then
-        faction = "companion"
-        companion = true
+    if faction ~= "colonist" and faction ~= "neutral" and faction ~= "hostile" then
+        faction = "colonist"
+        colonist = true
         hostile = false
     end
-    local ownerUsername = companion and player and player:getUsername() or nil
-    local ownerOnlineID = companion and player and player:getOnlineID() or nil
+    local ownerUsername = colonist and player and player:getUsername() or nil
+    local ownerOnlineID = colonist and player and player:getOnlineID() or nil
     local orderSpec = hostile
         and { kind = Const.ORDER_HOSTILE_HUNT, x = x, y = y, z = z }
-        or companion and { kind = Const.ORDER_FOLLOW, ownerUsername = ownerUsername, ownerOnlineID = ownerOnlineID }
+        or colonist and { kind = Const.ORDER_FOLLOW, ownerUsername = ownerUsername, ownerOnlineID = ownerOnlineID }
         or {
             kind = Const.ORDER_ROAM,
             roamMode = Const.ROAM_MODE_AREA,
@@ -286,6 +288,13 @@ local function onClientCommand(module, command, player, args)
     if command == Const.CMD_REVIVE and args and args.id then
         if PNC.Revive and PNC.Revive.Try then
             PNC.Revive.Try(player, args.id)
+        end
+        return
+    end
+
+    if command == Const.CMD_PLAYER_WEAPON_HIT then
+        if PlayerDamage and PlayerDamage.HandleClientReport then
+            PlayerDamage.HandleClientReport(player, args or {})
         end
         return
     end

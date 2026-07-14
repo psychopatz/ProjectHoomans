@@ -38,15 +38,19 @@ local function refreshEquipmentRuntime(record)
     return equipmentInfo
 end
 
-local function applyLiveEquipment(record, reason)
+local function applyLiveEquipment(record, reason, scope)
     local zombie = Registry.GetLiveZombie(record.id)
     local applied = true
     local applyReason = "no_live_body"
     if zombie then
-        if PNC.Visuals and PNC.Visuals.ApplyHumanVisuals then
+        if scope ~= "hands" and PNC.Visuals and PNC.Visuals.ApplyHumanVisuals then
             PNC.Visuals.ApplyHumanVisuals(zombie, record)
         end
-        applied, applyReason = Equipment.Apply(zombie, record)
+        if scope == "hands" and Equipment.ApplyHands then
+            applied, applyReason = Equipment.ApplyHands(zombie, record)
+        else
+            applied, applyReason = Equipment.Apply(zombie, record)
+        end
         Core.LogRecordDebug(record, "NPC " .. tostring(record.id) .. " equipment apply live=" .. tostring(applied) .. " reason=" .. tostring(applyReason))
     else
         Core.LogRecordDebug(record, "NPC " .. tostring(record.id) .. " has no live body during equipment update; stored for later materialize")
@@ -246,7 +250,7 @@ function API.DebugCommand(npcId, command, args)
         else
             record.weaponMode = "melee"
         end
-        applied, applyReason = applyLiveEquipment(record, "equipment")
+        applied, applyReason = applyLiveEquipment(record, "equipment", "hands")
         return true
     end
     if command == "copy_player_loadout" then

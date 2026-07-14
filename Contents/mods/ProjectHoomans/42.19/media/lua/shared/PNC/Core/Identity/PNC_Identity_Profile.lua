@@ -35,9 +35,9 @@ function Identity.ResolveArchetypeID(source)
     if explicit and Archetypes.Get(explicit) then
         return Archetypes.Get(explicit).id
     end
-    seed = Identity.NormalizeSeed(source and source.identitySeed or nil, tostring(source and source.faction or "companion"))
-    faction = tostring(source and source.faction or "companion")
-    options = faction == "hostile" and Archetypes.GetHostileDefaults() or Archetypes.GetCompanionDefaults()
+    seed = Identity.NormalizeSeed(source and source.identitySeed or nil, tostring(source and source.faction or "colonist"))
+    faction = PNC.Types and PNC.Types.NormalizeFaction and PNC.Types.NormalizeFaction(source and source.faction) or tostring(source and source.faction or "colonist")
+    options = faction == "hostile" and Archetypes.GetHostileDefaults() or Archetypes.GetColonistDefaults()
     return tostring(choose(options, seed, "archetype:" .. faction) or "General")
 end
 
@@ -164,7 +164,7 @@ function Identity.GetCharacterSummary(record)
         identitySeed = identity.seed or record and record.identitySeed or 1,
         isFemale = identity.isFemale == true or record and record.isFemale == true or false,
         recruited = record and record.recruited == true or false,
-        faction = record and record.faction or "companion",
+        faction = record and record.faction or "colonist",
         survivor = PNC.Core.DeepCopy(identity.survivor or {}),
     }
 end

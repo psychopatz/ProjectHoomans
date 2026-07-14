@@ -7,6 +7,8 @@
   on incidental automatic Lua file ordering
 - `PNC_Combat_Melee`, `PNC_Combat_Ranged`, `PNC_Combat_AttackActions`, `PNC_Combat_Tactics`, and `PNC_Combat_Unarmed` own focused combat responsibilities
 - custom damage routes through `PNC_Health`
+- player weapon hits damage neutral and hostile NPCs through a server-authoritative hit bridge; colonists are protected from player damage
+- live NPC bodies use a high engine-health safety buffer so vanilla zombie-body damage cannot bypass custom HP, incapacitation, or multiplayer validation
 - players, NPCs, and zombies use the same target format
 
 ## Current Rules
@@ -33,7 +35,7 @@
 - delayed attacks retain a runtime-only direct zombie reference plus the stable
   spatial ID, and cancel immediately with `target_lost_or_dead` if neither
   resolves before the hit frame
-- companions and hostiles can both acquire zombie targets
+- colonists and hostiles can both acquire zombie targets
 - initial player, NPC, and zombie acquisition requires an unobstructed visual
   trace; closed doors and walls do not count as visible
 - a lost target is investigated at its last seen position for a short memory

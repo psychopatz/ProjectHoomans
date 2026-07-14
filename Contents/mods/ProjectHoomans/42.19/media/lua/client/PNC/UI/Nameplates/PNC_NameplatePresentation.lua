@@ -27,7 +27,7 @@ Presentation.Fonts = {
 local NAME_COLORS = {
     hostile = { r = 1.0, g = 0.28, b = 0.28, a = 1.0 },
     controlled = { r = 0.3, g = 1.0, b = 0.3, a = 1.0 },
-    friendly = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+    neutral = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
 }
 
 local HEALTH_COLORS = {
@@ -68,10 +68,10 @@ function Presentation.NameColor(snapshot)
     if snapshot and snapshot.faction == "hostile" then
         return NAME_COLORS.hostile
     end
-    if snapshot and (snapshot.recruited == true or snapshot.faction == "companion") then
+    if snapshot and (snapshot.recruited == true or snapshot.faction == "colonist" or snapshot.faction == "companion") then
         return NAME_COLORS.controlled
     end
-    return NAME_COLORS.friendly
+    return NAME_COLORS.neutral
 end
 
 function Presentation.HealthColor(healthRatio)

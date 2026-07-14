@@ -1,13 +1,13 @@
 # Orders
 
-## Companion Orders
+## Colonist Orders
 - `follow`
 - `guard`
 - `patrol`
 
 ## Shared Orders
 - `roam`: faction-neutral area roaming with configurable center, radius, target radius, and movement mode
-- friendly roamers engage hostile NPCs and zombies according to their hostility configuration
+- colonist roamers engage hostile NPCs and zombies according to their hostility configuration
 - hostile roamers engage players, non-hostile NPCs, and zombies according to their hostility configuration
 
 ## Hostile Orders

@@ -18,7 +18,7 @@
 
 ## Ownership Rules
 - only the `PNC_Nameplates` subsystem draws overhead bars and text
-- name colors communicate disposition: recruited/companion NPCs are green, hostile NPCs are red, and other friendly or unrecruited NPCs are white
+- name colors communicate disposition: colonists are green, hostile NPCs are red, and neutral NPCs are white
 - only `PNC_CharacterWindow` opens and renders the profile window
 - only the context hub stack decides which NPCs are selectable from a right-click
 - snapshot payloads come from `PNC_Network`, not UI code

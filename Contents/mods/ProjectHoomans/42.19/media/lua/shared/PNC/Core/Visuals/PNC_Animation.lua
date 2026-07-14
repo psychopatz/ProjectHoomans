@@ -397,6 +397,7 @@ function Animation.SyncLocomotion(zombie, record)
     local attackAction
     local path
     local now
+    local downedMoving
     if not zombie then
         return
     end
@@ -404,6 +405,20 @@ function Animation.SyncLocomotion(zombie, record)
     attackAction = runtime and runtime.attackAction or nil
     path = runtime and runtime.pathing or nil
     now = Core and Core.Now and Core.Now() or 0
+    if record and record.health and record.health.state == "incapacitated" then
+        downedMoving = path and (
+            path.phase == "requested"
+            or path.phase == "active"
+            or path.ownerMode == "fake_locomotion"
+            or now < (tonumber(path.visualMovingUntil) or 0)
+        ) and tostring(path.resolvedMode or path.mode or "") == "crawl"
+        Animation.ApplyDowned(
+            zombie,
+            record,
+            downedMoving and (path.motionProfile or true) or false
+        )
+        return
+    end
     if Animation.PumpBumpRelease(zombie, now) then
         if zombie.setUseless then
             zombie:setUseless(true)

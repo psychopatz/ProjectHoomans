@@ -82,7 +82,7 @@ local record = {
     identitySeed = 42,
     identity = { seed = 42, displayName = "Kahlua Test", survivor = {} },
     name = "Kahlua Test",
-    faction = "companion",
+    faction = "colonist",
     x = 1,
     y = 2,
     z = 0,

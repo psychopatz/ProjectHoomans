@@ -1,6 +1,6 @@
 --[[
     PNC Behavior Targeting
-    Shared target refresh and live-body facing helpers used by companion and
+    Shared target refresh and live-body facing helpers used by colonist and
     hostile behavior branches.
 ]]
 

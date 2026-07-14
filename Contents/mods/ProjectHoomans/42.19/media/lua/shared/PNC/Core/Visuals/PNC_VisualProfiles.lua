@@ -5,7 +5,7 @@ local Profiles = PNC.VisualProfiles
 local Identity = PNC.Identity
 
 Profiles.Named = Profiles.Named or {
-    companion = {
+    colonist = {
         male = {
             outfit = "PNCCompanionMale",
             skinTextures = { "MaleBody01", "MaleBody02", "MaleBody03", "MaleBody04" },
@@ -33,6 +33,11 @@ Profiles.Named = Profiles.Named or {
     },
 }
 
+-- Old saves and third-party archetypes may still request the former profile.
+Profiles.Named.colonist = Profiles.Named.colonist or Profiles.Named.companion
+Profiles.Named.companion = Profiles.Named.colonist
+Profiles.Named.friendly = Profiles.Named.colonist
+
 local function chooseFromList(record, key, list)
     if type(list) ~= "table" or #list <= 0 then
         return nil
@@ -46,7 +51,7 @@ function Profiles.Resolve(record)
     if not record then
         return nil
     end
-    bucket = Profiles.Named[tostring(record.visualProfile or record.faction or "companion")] or Profiles.Named.companion
+    bucket = Profiles.Named[tostring(record.visualProfile or record.faction or "colonist")] or Profiles.Named.colonist
     genderKey = record.isFemale and "female" or "male"
     return bucket[genderKey] or bucket.male or bucket.female
 end

@@ -102,6 +102,7 @@ local function prepareCorpseItems(record, zombie)
     local claimed = {}
     local appearanceUsed = {}
     local wornItems = zombie and zombie.getWornItems and zombie:getWornItems() or nil
+    local itemVisuals = zombie and zombie.getItemVisuals and zombie:getItemVisuals() or nil
     local inventoryItems = container and container.getItems and container:getItems() or nil
     local appearance = profiles and profiles.RollAppearance and profiles.RollAppearance(record) or nil
     local abstractInventory = PNC.Inventory and PNC.Inventory.EnsureRecordInventory
@@ -110,8 +111,37 @@ local function prepareCorpseItems(record, zombie)
     local descriptor
     local item
     local fullType
+    local visualsByType = {}
+    local usedVisuals = {}
 
     if not container or not equipment or not equipment.CreateItem then
+        return false
+    end
+
+    if itemVisuals and itemVisuals.size then
+        for i = 0, itemVisuals:size() - 1 do
+            local visual = itemVisuals:get(i)
+            local visualType = visual and visual.getItemType and tostring(visual:getItemType() or "") or ""
+            if visualType ~= "" then
+                visualsByType[visualType] = visualsByType[visualType] or {}
+                visualsByType[visualType][#visualsByType[visualType] + 1] = visual
+            end
+        end
+    end
+
+    local function copyLiveVisual(candidate, kind)
+        local candidates = visualsByType[tostring(kind or "")] or {}
+        local targetVisual = candidate and candidate.getVisual and candidate:getVisual() or nil
+        local index
+        if not targetVisual or not targetVisual.copyFrom then
+            return false
+        end
+        for index = 1, #candidates do
+            if not usedVisuals[candidates[index]] then
+                usedVisuals[candidates[index]] = true
+                return pcall(targetVisual.copyFrom, targetVisual, candidates[index])
+            end
+        end
         return false
     end
 
@@ -126,6 +156,7 @@ local function prepareCorpseItems(record, zombie)
             pool[kind] = pool[kind] or {}
             pool[kind][#pool[kind] + 1] = candidate
             allItems[#allItems + 1] = candidate
+            addItemToContainer(container, candidate)
         end
         return candidate
     end
@@ -195,6 +226,7 @@ local function prepareCorpseItems(record, zombie)
                     pcall(item.setCondition, item, math.max(0, math.floor(tonumber(descriptor.cond) or 0)))
                 end
                 if item and descriptor.wornSlot and zombie.setWornItem then
+                    copyLiveVisual(item, fullType)
                     pcall(zombie.setWornItem, zombie, tostring(descriptor.wornSlot), item)
                 elseif item and descriptor.equipSlot == "primary" and zombie.setPrimaryHandItem then
                     pcall(zombie.setPrimaryHandItem, zombie, item)
@@ -215,6 +247,7 @@ local function prepareCorpseItems(record, zombie)
                 if item and item.getBodyLocation and zombie.setWornItem then
                     local bodyLocation = item:getBodyLocation()
                     if bodyLocation and tostring(bodyLocation) ~= "" then
+                        copyLiveVisual(item, fullType)
                         pcall(zombie.setWornItem, zombie, tostring(bodyLocation), item)
                     end
                 end
@@ -228,9 +261,13 @@ local function prepareCorpseItems(record, zombie)
             local candidates = pool[tostring(kind)] or {}
             item = candidates[1] or create(tostring(kind))
             if item and zombie.setWornItem then
+                copyLiveVisual(item, tostring(kind))
                 pcall(zombie.setWornItem, zombie, tostring(bodyLocation), item)
             end
         end
+    end
+    if wornItems and wornItems.addItemsToItemContainer then
+        pcall(wornItems.addItemsToItemContainer, wornItems, container)
     end
     for i = 1, #allItems do
         addItemToContainer(container, allItems[i])
@@ -436,7 +473,100 @@ function Lifecycle.RemoveLiveBody(record, zombie, reason)
     return detachLiveBody(record, reason)
 end
 
-local function scheduleCorpseFinalize(record, x, y, z, token, reason)
+local function captureWornEntries(wornItems)
+    local entries = {}
+    local entry
+    local item
+    local i
+    if not wornItems or not wornItems.size then
+        return entries
+    end
+    for i = 0, wornItems:size() - 1 do
+        entry = wornItems:get(i)
+        item = entry and entry.getItem and entry:getItem() or nil
+        if item then
+            entries[#entries + 1] = {
+                location = entry.getLocation and tostring(entry:getLocation() or "") or "",
+                item = item,
+                fullType = itemFullType(item),
+            }
+        end
+    end
+    return entries
+end
+
+local function applyCorpseWornItems(corpse, wornEntries)
+    local targetWornItems
+    local container
+    local inventoryItems
+    local pool = {}
+    local claimed = {}
+    local applied = 0
+    local entry
+    local item
+    local kind
+    local candidates
+    local i
+    local j
+    if not corpse or type(wornEntries) ~= "table" then
+        return false
+    end
+    targetWornItems = corpse.getWornItems and corpse:getWornItems() or nil
+    container = corpse.getContainer and corpse:getContainer() or nil
+    if not targetWornItems or not targetWornItems.setItem then
+        return false
+    end
+    inventoryItems = container and container.getItems and container:getItems() or nil
+    if inventoryItems then
+        for i = 0, inventoryItems:size() - 1 do
+            item = inventoryItems:get(i)
+            kind = itemFullType(item)
+            if kind ~= "" then
+                pool[kind] = pool[kind] or {}
+                pool[kind][#pool[kind] + 1] = item
+            end
+        end
+    end
+    if targetWornItems.clear then
+        pcall(targetWornItems.clear, targetWornItems)
+    end
+    for i = 1, #wornEntries do
+        entry = wornEntries[i]
+        item = nil
+        if entry.item and entry.item.getContainer and entry.item:getContainer() == container then
+            item = entry.item
+        end
+        candidates = pool[tostring(entry.fullType or "")] or {}
+        if not item then
+            for j = 1, #candidates do
+                if not claimed[candidates[j]] then
+                    item = candidates[j]
+                    break
+                end
+            end
+        end
+        item = item or entry.item
+        if item and entry.location and entry.location ~= "" then
+            addItemToContainer(container, item)
+            claimed[item] = true
+            if pcall(targetWornItems.setItem, targetWornItems, entry.location, item) then
+                applied = applied + 1
+            end
+        end
+    end
+    if targetWornItems and container and targetWornItems.addItemsToItemContainer then
+        pcall(targetWornItems.addItemsToItemContainer, targetWornItems, container)
+    end
+    return applied > 0 or #wornEntries == 0
+end
+
+local function transmitCorpseState(corpse)
+    if corpse and isServer and isServer() and corpse.transmitCompleteItemToClients then
+        pcall(corpse.transmitCompleteItemToClients, corpse)
+    end
+end
+
+local function scheduleCorpseFinalize(record, x, y, z, token, reason, wornEntries)
     Lifecycle.PendingCorpses[#Lifecycle.PendingCorpses + 1] = {
         npcId = tostring(record.id),
         x = math.floor(tonumber(x) or 0),
@@ -445,6 +575,7 @@ local function scheduleCorpseFinalize(record, x, y, z, token, reason)
         token = token,
         reason = reason,
         attempts = 0,
+        wornEntries = wornEntries,
     }
 end
 
@@ -457,6 +588,8 @@ function Lifecycle.CreateInertCorpse(record, zombie, reason)
     local ok
     local corpse
     local converted = false
+    local sourceWornItems
+    local wornEntries
     if not record or not zombie then
         return false, nil
     end
@@ -483,6 +616,8 @@ function Lifecycle.CreateInertCorpse(record, zombie, reason)
     end
     clearBodyCombat(zombie)
     prepareCorpseItems(record, zombie)
+    sourceWornItems = zombie.getWornItems and zombie:getWornItems() or nil
+    wornEntries = captureWornEntries(sourceWornItems)
     if IsoDeadBody and IsoDeadBody.new then
         ok, corpse = pcall(IsoDeadBody.new, zombie, false, true)
         if not ok or not corpse then
@@ -496,7 +631,7 @@ function Lifecycle.CreateInertCorpse(record, zombie, reason)
             converted = ok == true
         end
         if converted then
-            scheduleCorpseFinalize(record, x, y, z, token, reason or "death")
+            scheduleCorpseFinalize(record, x, y, z, token, reason or "death", wornEntries)
             ensureRuntime(record).corpseState = "finalizing"
         else
             removeZombie(zombie)
@@ -507,10 +642,9 @@ function Lifecycle.CreateInertCorpse(record, zombie, reason)
     detachLiveBody(record, reason or "death")
     mark(record, "corpse", "missing", reason or "death")
     if corpse then
+        applyCorpseWornItems(corpse, wornEntries)
         stampCorpse(record, corpse, token)
-        if isServer and isServer() and corpse.transmitCompleteItemToClients then
-            pcall(corpse.transmitCompleteItemToClients, corpse)
-        end
+        transmitCorpseState(corpse)
         ensureRuntime(record).corpseState = "inert_loaded"
     end
     return corpse ~= nil, corpse
@@ -539,7 +673,9 @@ local function pumpPendingCorpses()
             end
         end)
         if found and record then
+            applyCorpseWornItems(found, pending.wornEntries)
             stampCorpse(record, found, pending.token)
+            transmitCorpseState(found)
             table.remove(Lifecycle.PendingCorpses, i)
         elseif pending.attempts >= 8 then
             if record then

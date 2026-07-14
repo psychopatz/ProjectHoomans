@@ -4,7 +4,7 @@
 - server-authoritative NPC registry and persistence
 - live and abstract presence states
 - body removal on abstraction to prevent zombie husks
-- companion `Follow`, `Guard`, `Patrol`
+- colonist `Follow`, `Guard`, `Patrol`
 - hostile `Hunt` and `Roam`
 - shared melee and ranged combat with atomic combat files
 - zombie aggro bridge so zombies can acquire embodied NPCs

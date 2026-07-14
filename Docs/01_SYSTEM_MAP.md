@@ -31,7 +31,7 @@
 - `PNC_Behavior_Common`: shared owner, movement, and combat-debug helpers
 - `PNC_Behavior_Targeting`: target refresh and facing helpers
 - `PNC_Behavior_Combat`: combat engage sequencing
-- `PNC_Behavior_Companion`: follow, guard, and patrol job handlers
+- `PNC_Behavior_Companion`: colonist follow, guard, and patrol job handlers (legacy module filename)
 - `PNC_Behavior_Roaming`: faction-neutral, enemy-aware roaming with registered roam modes
 - `PNC_Behavior_Hostile`: hunt and direct engage job handlers
 - `PNC_Behavior_Incapacitated`: crawl and downed shove handling
@@ -49,6 +49,7 @@
 ## Ownership and Load-Order Rules
 - use `PNC.Core.IsManagedNPCBody` instead of defining subsystem-local checks for the `PNC_NPC` body marker
 - equipment describes and applies loadout state, but reusable model and clothing-visual mutations belong to `PNC_Visuals`
+- weapon-only changes use `PNC.Equipment.ApplyHands`; full equipment application is reserved for worn or attached-item changes so existing clothing tints are preserved
 - modules required before one of their collaborators must resolve that collaborator from `PNC` at call time; do not capture a not-yet-loaded table in a file-local variable
 - multi-job behavior entry points dispatch to one handler per job so follow, guard, and patrol control flow remains independently testable
 

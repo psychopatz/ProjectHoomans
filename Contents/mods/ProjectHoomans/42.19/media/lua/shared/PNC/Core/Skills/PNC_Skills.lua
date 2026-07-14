@@ -5,6 +5,7 @@ local Skills = PNC.Skills
 local Identity = PNC.Identity
 local Catalog = PNC.SkillCatalog
 local Archetypes = PNC.Archetypes
+local Types = PNC.Types
 
 local function ensureProgress(record)
     if not record then
@@ -58,7 +59,7 @@ local function resolveBaseLevel(record, skillID)
     lowered = string.lower(tostring(skillID))
     level = Identity.Range(record.identitySeed, "skill:" .. tostring(skillID), 0, 3)
 
-    if record.faction == "companion" then
+    if (Types and Types.IsColonist and Types.IsColonist(record)) or record.faction == "colonist" then
         if lowered == "fitness" or lowered == "strength" or lowered == "nimble" or lowered == "sneaking" then
             level = Identity.Range(record.identitySeed, "skill:" .. tostring(skillID), 1, 4)
         elseif skillID == specialty.melee then

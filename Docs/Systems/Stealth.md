@@ -1,7 +1,7 @@
 # Stealth
 
 ## Purpose
-- `PNC_Stealth` owns follow-stealth state for companions and the suppression rules that affect combat and zombie aggro.
+- `PNC_Stealth` owns follow-stealth state for colonists and the suppression rules that affect combat and zombie aggro.
 
 ## Current Rules
 - stealth follow is only active for `follow` orders
@@ -12,10 +12,10 @@
 
 ## Integration Points
 - `PNC_BehaviorSystem` asks stealth for follow move mode
-- `PNC_Perception` suppresses companion target acquisition while valid follow-stealth is active
-- `PNC_ZombieAggro` suppresses zombie targeting on concealed companions
+- `PNC_Perception` suppresses colonist target acquisition while valid follow-stealth is active
+- `PNC_ZombieAggro` suppresses zombie targeting on concealed colonists
 
 ## Forbidden Responsibilities
 - does not path bodies
 - does not directly damage or aggro targets
-- does not own player stealth mechanics outside companion-follow rules
+- does not own player stealth mechanics outside colonist-follow rules

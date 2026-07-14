@@ -18,11 +18,13 @@ Archetypes.Registry = Archetypes.Registry or {
     modules = {},
     moduleOrder = {},
     loadedModules = {},
-    companionDefaults = {},
+    colonistDefaults = {},
     hostileDefaults = {},
 }
 
 local Registry = Archetypes.Registry
+Registry.colonistDefaults = Registry.colonistDefaults or Registry.companionDefaults or {}
+Registry.companionDefaults = Registry.colonistDefaults
 PNC.PendingArchetypeBundles = PNC.PendingArchetypeBundles or {}
 
 local function appendUnique(list, value)
@@ -70,11 +72,12 @@ function PNC.RegisterArchetype(id, data)
     entry.label = normalizeString(entry.label or entry.name) or id
     entry.tags = type(entry.tags) == "table" and Core.DeepCopy(entry.tags) or {}
     entry.type = normalizeString(entry.type) or "survivor"
-    entry.visualProfile = normalizeString(entry.visualProfile) or "companion"
+    entry.visualProfile = normalizeString(entry.visualProfile) or "colonist"
     entry.allowedJobs = type(entry.allowedJobs) == "table" and Core.DeepCopy(entry.allowedJobs) or {}
     Registry.definitions[id] = entry
-    if entry.defaultForFaction == "companion" then
-        appendUnique(Registry.companionDefaults, id)
+    if entry.defaultForFaction == "colonist" or entry.defaultForFaction == "companion" or entry.defaultForFaction == "friendly" then
+        entry.defaultForFaction = "colonist"
+        appendUnique(Registry.colonistDefaults, id)
     elseif entry.defaultForFaction == "hostile" then
         appendUnique(Registry.hostileDefaults, id)
     end
@@ -238,7 +241,7 @@ function Archetypes.Get(id)
     local definition = Registry.definitions[key] or Registry.definitions.General or {
         id = key,
         label = key,
-        visualProfile = "companion",
+        visualProfile = "colonist",
         tags = {},
         allowedJobs = {},
     }
@@ -256,12 +259,17 @@ function Archetypes.Get(id)
     }
 end
 
-function Archetypes.GetCompanionDefaults()
-    local defaults = normalizeDefaults(Registry.companionDefaults)
+function Archetypes.GetColonistDefaults()
+    local defaults = normalizeDefaults(Registry.colonistDefaults)
     if #defaults <= 0 then
         defaults[1] = "General"
     end
     return defaults
+end
+
+-- Compatibility for add-ons built against the former faction name.
+function Archetypes.GetCompanionDefaults()
+    return Archetypes.GetColonistDefaults()
 end
 
 function Archetypes.GetHostileDefaults()

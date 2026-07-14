@@ -368,6 +368,22 @@ function Equipment.Apply(zombie, record)
     return ok, table.concat(reasons, "|")
 end
 
+function Equipment.ApplyHands(zombie, record)
+    local equipment
+    local descriptor
+    local ok
+    local reason
+
+    if not zombie or not record then
+        return false, "missing_body_or_record"
+    end
+
+    equipment = Equipment.EnsureRecordEquipment(record)
+    descriptor = buildWeaponDescriptor(equipment.primaryFullType, true)
+    ok, reason = applyHands(zombie, equipment, descriptor)
+    return ok, reason
+end
+
 function Equipment.ResolveWeaponMode(fullType)
     return buildWeaponDescriptor(fullType, false).resolvedMode
 end

@@ -55,17 +55,22 @@ local function normalizeInventory(inventory)
 end
 
 function Types.NormalizeFaction(value)
-    local faction = string.lower(tostring(value or "companion"))
-    if faction == "hostile" or faction == "neutral" or faction == "friendly" or faction == "companion" then
+    local faction = string.lower(tostring(value or "colonist"))
+    if faction == "hostile" or faction == "neutral" or faction == "colonist" then
         return faction
     end
     if faction == "enemy" or faction == "bandit" then
         return "hostile"
     end
-    if faction == "ally" or faction == "survivor" then
-        return "friendly"
+    if faction == "companion" or faction == "friendly" or faction == "ally" or faction == "survivor" then
+        return "colonist"
     end
-    return "companion"
+    return "colonist"
+end
+
+function Types.IsColonist(value)
+    local faction = type(value) == "table" and value.faction or value
+    return Types.NormalizeFaction(faction) == "colonist"
 end
 
 function Types.DefaultHostility(faction)
@@ -75,9 +80,6 @@ function Types.DefaultHostility(faction)
     end
     if faction == "neutral" then
         return { mode = "neutral", attackPlayers = false, attackNPCs = false, attackZombies = false }
-    end
-    if faction == "friendly" then
-        return { mode = "defend_allies", attackPlayers = false, attackNPCs = true, attackZombies = true }
     end
     return { mode = "defend_owner", attackPlayers = false, attackNPCs = true, attackZombies = true }
 end
@@ -258,7 +260,7 @@ function Types.NewRecord(definition)
     if Identity and Identity.ApplyRecordIdentity then
         Identity.ApplyRecordIdentity(record, def)
     else
-        record.name = record.name or ((hostile and "Hostile NPC") or (def.faction == "neutral" and "Neutral NPC") or "Friendly NPC")
+        record.name = record.name or ((hostile and "Hostile NPC") or (def.faction == "neutral" and "Neutral NPC") or "Colonist NPC")
     end
 
     return record

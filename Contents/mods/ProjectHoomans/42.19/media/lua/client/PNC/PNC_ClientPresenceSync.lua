@@ -167,6 +167,9 @@ local function buildRecordView(snapshot)
         identitySeed = snapshot and snapshot.identitySeed or 1,
         archetypeID = snapshot and snapshot.archetypeID or nil,
         archetypeLabel = snapshot and snapshot.archetypeLabel or nil,
+        health = {
+            state = snapshot and snapshot.healthState or "normal",
+        },
         outfit = snapshot and snapshot.appearance and snapshot.appearance.outfit or nil,
         identity = snapshot and snapshot.identity or nil,
         equipment = {
@@ -235,10 +238,17 @@ local function buildVisualKey(snapshot)
         tostring(appearance.skinTexture or ""),
         tostring(appearance.hairModel or ""),
         tostring(appearance.beardModel or ""),
-        tostring(equipment.primaryFullType or ""),
-        tostring(equipment.secondaryFullType or ""),
         stableTableSignature(equipment.worn),
         stableTableSignature(equipment.attached),
+    }, "|")
+end
+
+local function buildHandsKey(snapshot)
+    local equipment = snapshot and snapshot.equipmentSummary or {}
+    return table.concat({
+        tostring(snapshot and snapshot.presenceRevision or 0),
+        tostring(equipment.primaryFullType or ""),
+        tostring(equipment.secondaryFullType or ""),
     }, "|")
 end
 
@@ -389,6 +399,7 @@ local function applySnapshotToBody(snapshot, zombie)
     local desiredAnim
     local recordView
     local visualKey
+    local handsKey
     local motionKey
     local now
     if not snapshot or not zombie or (zombie.isDead and zombie:isDead()) then
@@ -413,6 +424,7 @@ local function applySnapshotToBody(snapshot, zombie)
     end
 
     visualKey = buildVisualKey(snapshot)
+    handsKey = buildHandsKey(snapshot)
     if modData and modData.PNC_ClientVisualKey ~= visualKey then
         if Animation and Animation.ApplyLiveSetup then
             Animation.ApplyLiveSetup(zombie, recordView)
@@ -424,6 +436,14 @@ local function applySnapshotToBody(snapshot, zombie)
             Equipment.Apply(zombie, recordView)
         end
         modData.PNC_ClientVisualKey = visualKey
+        modData.PNC_ClientHandsKey = handsKey
+    elseif modData and modData.PNC_ClientHandsKey ~= handsKey then
+        if Equipment and Equipment.ApplyHands then
+            Equipment.ApplyHands(zombie, recordView)
+        elseif Equipment and Equipment.Apply then
+            Equipment.Apply(zombie, recordView)
+        end
+        modData.PNC_ClientHandsKey = handsKey
     end
 
     -- The multiplayer zombie packet may reapply rot, blood, dirt, or a zombie
@@ -441,9 +461,13 @@ local function applySnapshotToBody(snapshot, zombie)
     motionKey = buildMotionKey(snapshot)
 
     if snapshot.healthState == "incapacitated" then
-        if Animation and Animation.ApplyDowned and (not modData or modData.PNC_ClientMotionKey ~= motionKey) then
+        if Animation and Animation.ApplyDowned then
             Animation.ApplyDowned(zombie, recordView, visualState.moving == true and visualState.isCrawling == true and recordView.runtime.pathing.motionProfile or false)
         end
+        if modData then
+            modData.PNC_ClientMotionKey = motionKey
+        end
+        return
     elseif Animation and Animation.ClearDowned then
         Animation.ClearDowned(zombie)
     end

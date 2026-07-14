@@ -1,6 +1,6 @@
 --[[
-    PNC Behavior Companion
-    Owns companion job handlers such as follow, guard, and patrol so those
+    PNC Behavior Colonist
+    Owns colonist job handlers such as follow, guard, and patrol so those
     rules stay isolated from hostile roaming and combat internals.
 ]]
 
