@@ -13,6 +13,13 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     debugRoster = {},
     debugAuthorized = false,
 }
+PNC.Network.ServerState = PNC.Network.ServerState or {
+    interests = {},
+    rosterDeltas = {},
+    rosterRevision = 0,
+    lastInterestRefreshAt = 0,
+    lastRosterFlushAt = 0,
+}
 
 local Network = PNC.Network
 local Core = PNC.Core
@@ -23,6 +30,53 @@ local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local Profiles = PNC.VisualProfiles
 local MotionHints = PNC.MotionHints
+local ServerState = PNC.Network.ServerState
+
+function PNC.Network.ResetServerState()
+    ServerState.interests = {}
+    ServerState.rosterDeltas = {}
+    ServerState.rosterRevision = 0
+    ServerState.lastInterestRefreshAt = 0
+    ServerState.lastRosterFlushAt = 0
+end
+
+local function playerKey(player)
+    if player and player.getUsername then
+        return tostring(player:getUsername())
+    end
+    if player and player.getOnlineID then
+        return tostring(player:getOnlineID())
+    end
+    return tostring(player)
+end
+
+local function sendToPlayer(player, command, payload)
+    if isServer and isServer() and player and sendServerCommand then
+        sendServerCommand(player, Const.MODULE, command, payload)
+        return true
+    end
+    if not isServer or not isServer() then
+        triggerEvent("OnServerCommand", Const.MODULE, command, payload)
+        return true
+    end
+    return false
+end
+
+local function sendToInterestedNPC(npcId, command, payload)
+    local state
+    local count = 0
+    npcId = npcId and tostring(npcId) or nil
+    if not npcId then
+        return 0
+    end
+    for _, state in pairs(ServerState.interests) do
+        if state.player and state.ids and state.ids[npcId] then
+            sendToPlayer(state.player, command, payload)
+            count = count + 1
+        end
+    end
+    return count
+end
 
 local function resolveAIState(record)
     local healthState = record.health and tostring(record.health.state or "normal") or "normal"
@@ -168,6 +222,7 @@ function Network.BuildRosterSnapshot(record)
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
     identity = buildIdentitySummary(record)
     return {
+        interestDetailed = false,
         id = record.id,
         displayName = identity.displayName,
         name = identity.displayName,
@@ -214,6 +269,7 @@ function Network.BuildSnapshot(record)
     visualState = buildVisualState(record)
     appearance = Profiles and Profiles.RollAppearance and Profiles.RollAppearance(record) or nil
     return {
+        interestDetailed = true,
         id = record.id,
         name = identity.displayName,
         displayName = identity.displayName,
@@ -302,6 +358,37 @@ function Network.BuildSnapshot(record)
     }
 end
 
+function Network.BuildPresenceDelta(record)
+    local aiState
+    local inCombat
+    local staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
+    aiState, inCombat = resolveAIState(record)
+    return {
+        interestDetailed = true,
+        id = record.id,
+        x = record.x,
+        y = record.y,
+        z = record.z,
+        presenceState = record.presenceState,
+        alive = record.alive,
+        hpCurrent = record.health and record.health.current or nil,
+        hpMax = record.health and record.health.max or nil,
+        healthState = record.health and record.health.state or nil,
+        recentDamageUntil = record.health and record.health.recentDamageUntil or 0,
+        staminaCurrent = staminaInfo.current,
+        staminaMax = staminaInfo.max,
+        staminaState = staminaInfo.state,
+        staminaVisibleUntil = staminaInfo.visibleUntil,
+        presenceRevision = record.presenceRevision,
+        liveBodyInstanceID = record.liveBodyInstanceID,
+        liveBodyOnlineID = record.liveBodyOnlineID,
+        liveBodyLease = record.runtime and record.runtime.bodyLease or nil,
+        aiState = aiState,
+        inCombat = inCombat,
+        visualState = buildVisualState(record),
+    }
+end
+
 function Network.BuildCharacterPayload(record)
     local snapshot = Network.BuildSnapshot(record)
     local inventoryPayload = Inventory and Inventory.BuildFullPayload and Inventory.BuildFullPayload(record) or nil
@@ -323,34 +410,207 @@ function Network.BuildCharacterPayload(record)
     }
 end
 
+function Network.QueueRosterDelta(record, removed, reason)
+    local id = type(record) == "table" and record.id or record
+    if id == nil then
+        return
+    end
+    id = tostring(id)
+    ServerState.rosterRevision = (tonumber(ServerState.rosterRevision) or 0) + 1
+    ServerState.rosterDeltas[id] = {
+        id = id,
+        removed = removed == true,
+        reason = reason,
+        revision = ServerState.rosterRevision,
+        snapshot = removed == true and nil or Network.BuildRosterSnapshot(record),
+    }
+end
+
+function Network.QueuePeriodicRoster(record, now)
+    local runtime
+    local signature
+    if not record or not record.id then
+        return false
+    end
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    now = tonumber(now) or Core.Now()
+    signature = table.concat({
+        tostring(math.floor(tonumber(record.x) or 0)),
+        tostring(math.floor(tonumber(record.y) or 0)),
+        tostring(math.floor(tonumber(record.z) or 0)),
+        tostring(record.presenceState or ""),
+        tostring(record.health and record.health.state or ""),
+        tostring(record.orderSpec and record.orderSpec.kind or ""),
+    }, ":")
+    if runtime.rosterSignature == signature then
+        return false
+    end
+    if now - (tonumber(runtime.lastRosterQueuedAt) or 0) < Const.ROSTER_DELTA_INTERVAL_MS then
+        return false
+    end
+    runtime.rosterSignature = signature
+    runtime.lastRosterQueuedAt = now
+    Network.QueueRosterDelta(record, false, "periodic")
+    return true
+end
+
+function Network.RefreshInterestSets(now)
+    local Spatial = PNC.SpatialIndex
+    local seenPlayers = {}
+    now = tonumber(now) or Core.Now()
+    if not isServer or not isServer() or now - (tonumber(ServerState.lastInterestRefreshAt) or 0) < Const.INTEREST_REFRESH_MS then
+        return
+    end
+    ServerState.lastInterestRefreshAt = now
+    Core.ForEachPlayer(function(player)
+        local key = playerKey(player)
+        local state = ServerState.interests[key] or { ids = {} }
+        local candidates = Spatial and Spatial.QueryNPCs and Spatial.QueryNPCs(
+            player:getX(), player:getY(), Const.INTEREST_LEAVE_DISTANCE
+        ) or {}
+        local nextIDs = {}
+        local i
+        local record
+        local distance
+        state.player = player
+        seenPlayers[key] = true
+        for i = 1, #candidates do
+            record = candidates[i]
+            if record and record.id and record.alive ~= false then
+                distance = Core.Distance(player:getX(), player:getY(), record.x, record.y)
+                if (state.ids[record.id] and distance <= Const.INTEREST_LEAVE_DISTANCE)
+                    or distance <= Const.INTEREST_ENTER_DISTANCE
+                then
+                    nextIDs[record.id] = true
+                    if not state.ids[record.id] then
+                        sendToPlayer(player, Const.CMD_SYNC_RECORD, {
+                            event = "interest_enter",
+                            snapshot = Network.BuildSnapshot(record),
+                        })
+                    end
+                end
+            end
+        end
+        for id, _ in pairs(state.ids) do
+            if not nextIDs[id] then
+                record = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(id) or nil
+                if record then
+                    sendToPlayer(player, Const.CMD_SYNC_RECORD, {
+                        event = "interest_exit",
+                        snapshot = Network.BuildRosterSnapshot(record),
+                    })
+                end
+            end
+        end
+        state.ids = nextIDs
+        ServerState.interests[key] = state
+    end)
+    for key, _ in pairs(ServerState.interests) do
+        if not seenPlayers[key] then
+            ServerState.interests[key] = nil
+        end
+    end
+end
+
+function Network.FlushRosterDeltas(now, force)
+    local entries = {}
+    local id
+    now = tonumber(now) or Core.Now()
+    if not force and now - (tonumber(ServerState.lastRosterFlushAt) or 0) < Const.ROSTER_DELTA_INTERVAL_MS then
+        return 0
+    end
+    for id, _ in pairs(ServerState.rosterDeltas) do
+        entries[#entries + 1] = ServerState.rosterDeltas[id]
+    end
+    if #entries <= 0 then
+        ServerState.lastRosterFlushAt = now
+        return 0
+    end
+    Core.ForEachPlayer(function(player)
+        sendToPlayer(player, Const.CMD_ROSTER_DELTA, {
+            directoryRevision = ServerState.rosterRevision,
+            entries = entries,
+        })
+    end)
+    ServerState.rosterDeltas = {}
+    ServerState.lastRosterFlushAt = now
+    return #entries
+end
+
 function Network.BroadcastRecord(record, eventName)
     local payload
     local path
+    local recipients = {}
+    local state
     if not Core.IsAuthority() then
         return
     end
+    if eventName ~= "tick" and eventName ~= "materialize" and eventName ~= "interest_enter" then
+        Network.QueueRosterDelta(record, false, eventName)
+    end
+    if isServer and isServer() then
+        for _, state in pairs(ServerState.interests) do
+            if state.player and state.ids and state.ids[record.id] then
+                recipients[#recipients + 1] = state.player
+            end
+        end
+        if #recipients <= 0 then
+            return
+        end
+    end
     payload = {
         event = eventName or "update",
-        snapshot = Network.BuildSnapshot(record),
+        snapshot = eventName == "tick" and Network.BuildPresenceDelta(record) or Network.BuildSnapshot(record),
     }
     path = record and record.runtime and record.runtime.pathing or nil
     if path and MotionHints and MotionHints.MarkBroadcast then
         MotionHints.MarkBroadcast(record, path, Core.Now())
     end
     if isServer and isServer() then
-        sendServerCommand(Const.MODULE, Const.CMD_SYNC_RECORD, payload)
-    else
-        triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_SYNC_RECORD, payload)
+        local i
+        for i = 1, #recipients do
+            sendToPlayer(recipients[i], Const.CMD_SYNC_RECORD, payload)
+        end
+        return
     end
+    triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_SYNC_RECORD, payload)
 end
 
 function Network.BroadcastRemoval(id, reason)
     local payload = { id = id, reason = reason }
+    local record
     if not Core.IsAuthority() then
         return
     end
+    if tostring(reason or "") == "death" then
+        record = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(id) or nil
+        if record then
+            Network.QueueRosterDelta(record, false, reason)
+            payload = { event = "death", snapshot = Network.BuildSnapshot(record) }
+            if isServer and isServer() then
+                local state
+                for _, state in pairs(ServerState.interests) do
+                    if state.player and state.ids and state.ids[id] then
+                        sendToPlayer(state.player, Const.CMD_SYNC_RECORD, payload)
+                        state.ids[id] = nil
+                    end
+                end
+            else
+                triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_SYNC_RECORD, payload)
+            end
+            return
+        end
+    end
+    Network.QueueRosterDelta(id, true, reason)
     if isServer and isServer() then
-        sendServerCommand(Const.MODULE, Const.CMD_REMOVE_RECORD, payload)
+        local state
+        for _, state in pairs(ServerState.interests) do
+            if state.player and state.ids and state.ids[id] then
+                sendToPlayer(state.player, Const.CMD_REMOVE_RECORD, payload)
+                state.ids[id] = nil
+            end
+        end
     else
         triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_REMOVE_RECORD, payload)
     end
@@ -399,6 +659,8 @@ function Network.BroadcastZombieReaction(targetZombie, attackerZombie, options)
     local attackerOnlineID
     local health
     local payload
+    local attackerModData
+    local npcId
     if not Core.IsAuthority()
         or not isServer
         or not isServer()
@@ -424,8 +686,9 @@ function Network.BroadcastZombieReaction(targetZombie, attackerZombie, options)
         stagger = options.stagger ~= false,
         health = health and health > 0 and health or nil,
     }
-    sendServerCommand(Const.MODULE, Const.CMD_ZOMBIE_REACTION, payload)
-    return true
+    attackerModData = attackerZombie and attackerZombie.getModData and attackerZombie:getModData() or nil
+    npcId = attackerModData and attackerModData.PNC_UUID or nil
+    return sendToInterestedNPC(npcId, Const.CMD_ZOMBIE_REACTION, payload) > 0
 end
 
 function Network.BroadcastZombieBite(attackerZombie, targetNPCBody, npcId, phase, bumpType)
@@ -443,22 +706,53 @@ function Network.BroadcastZombieBite(attackerZombie, targetNPCBody, npcId, phase
         return false
     end
     targetOnlineID = Network.GetZombieOnlineID(targetNPCBody)
-    sendServerCommand(Const.MODULE, Const.CMD_ZOMBIE_BITE, {
+    local payload = {
         attackerOnlineID = attackerOnlineID,
         targetOnlineID = targetOnlineID,
         npcId = npcId and tostring(npcId) or nil,
         phase = phase == "clear" and "clear" or "start",
         bumpType = bumpType and tostring(bumpType) or "Bite",
-    })
-    return true
+    }
+    return sendToInterestedNPC(npcId, Const.CMD_ZOMBIE_BITE, payload) > 0
 end
 
 function Network.BroadcastFullSync(targetPlayer, records)
-    local payload = { snapshots = records }
+    local chunkSize = math.max(1, tonumber(Const.ROSTER_CHUNK_SIZE) or 50)
+    local total = #(records or {})
+    local chunkCount = math.ceil(total / chunkSize)
+    local chunkIndex
+    local startIndex
+    local finishIndex
+    local chunk
+    local i
+    sendToPlayer(targetPlayer, Const.CMD_ROSTER_SYNC_BEGIN, {
+        directoryRevision = ServerState.rosterRevision,
+        total = total,
+        chunkCount = chunkCount,
+    })
+    for chunkIndex = 1, chunkCount do
+        chunk = {}
+        startIndex = ((chunkIndex - 1) * chunkSize) + 1
+        finishIndex = math.min(total, startIndex + chunkSize - 1)
+        for i = startIndex, finishIndex do
+            chunk[#chunk + 1] = records[i]
+        end
+        sendToPlayer(targetPlayer, Const.CMD_ROSTER_SYNC_CHUNK, {
+            directoryRevision = ServerState.rosterRevision,
+            chunkIndex = chunkIndex,
+            snapshots = chunk,
+        })
+    end
+    sendToPlayer(targetPlayer, Const.CMD_ROSTER_SYNC_END, {
+        directoryRevision = ServerState.rosterRevision,
+        total = total,
+    })
     if isServer and isServer() and targetPlayer then
-        sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_FULL_SYNC, payload)
-    elseif not isServer or not isServer() then
-        triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_FULL_SYNC, payload)
+        local state = ServerState.interests[playerKey(targetPlayer)]
+        if state then
+            state.ids = {}
+        end
+        ServerState.lastInterestRefreshAt = 0
     end
 end
 
@@ -476,6 +770,36 @@ function Network.SendCharacterPayload(targetPlayer, record)
     elseif not isServer or not isServer() then
         triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_CHARACTER_PAYLOAD, payload)
     end
+end
+
+function Network.CanViewCharacter(player, record)
+    local access
+    local distance
+    if not player or not record then
+        return false
+    end
+    access = player.getAccessLevel and string.lower(tostring(player:getAccessLevel() or "")) or ""
+    if access == "admin" then
+        return true
+    end
+    if record.ownerUsername and player.getUsername and tostring(record.ownerUsername) == tostring(player:getUsername()) then
+        return true
+    end
+    if math.floor(tonumber(player:getZ()) or 0) ~= math.floor(tonumber(record.z) or 0) then
+        return false
+    end
+    distance = Core.Distance(player:getX(), player:getY(), record.x, record.y)
+    return distance <= Const.CHARACTER_DETAIL_DISTANCE
+end
+
+function Network.SendInventoryDelta(targetPlayer, record, sinceRevision)
+    local delta = Inventory and Inventory.BuildDeltaPayload and Inventory.BuildDeltaPayload(record, sinceRevision) or nil
+    if not delta or delta.fullRequired == true then
+        Network.SendCharacterPayload(targetPlayer, record)
+        return false
+    end
+    sendToPlayer(targetPlayer, Const.CMD_INVENTORY_DELTA, delta)
+    return true
 end
 
 function Network.SendDebugRoster(targetPlayer, diagnostics, authorized, audit)

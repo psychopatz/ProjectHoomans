@@ -97,6 +97,9 @@ function OrderSystem.SetOrder(record, orderSpec)
     if Skills and Skills.SyncRecruitment then
         Skills.SyncRecruitment(record)
     end
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "order")
+    end
 end
 
 function OrderSystem.SetHostility(record, modeSpec)
@@ -120,5 +123,8 @@ function OrderSystem.SetHostility(record, modeSpec)
         record.hostility.attackZombies = modeSpec.attackZombies == true
     else
         record.hostility.attackZombies = record.hostility.attackZombies == true
+    end
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "hostility")
     end
 end

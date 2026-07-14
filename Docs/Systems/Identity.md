@@ -16,6 +16,9 @@
 - `identity.survivor.*`
 - archetype skill-bias metadata
 - archetype look and loadout metadata
+- persisted resolved SurvivorFactory name and appearance fields
+
+Seed-derived skills are resolved by `PNC_Skills`; progression stores signed deltas over that base.
 
 ## Public Functions
 - `PNC.RegisterArchetypeModule(id, spec)`

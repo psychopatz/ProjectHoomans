@@ -293,7 +293,9 @@ local function refreshBodyMap(now)
         return
     end
     for id, snapshot in pairs(ClientState and ClientState.snapshots or {}) do
-        if snapshot and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false then
+        if snapshot and snapshot.interestDetailed ~= false
+            and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false
+        then
             onlineID = snapshot.liveBodyOnlineID ~= nil and tostring(snapshot.liveBodyOnlineID) or nil
             instanceKey = snapshot.liveBodyInstanceID ~= nil and tostring(snapshot.liveBodyInstanceID) or nil
             local leaseKey = snapshot.liveBodyLease
@@ -538,7 +540,9 @@ function Sync.OnTick()
     refreshLocalAuthoritySnapshots(now)
     refreshBodyMap(now)
     for id, snapshot in pairs(ClientState and ClientState.snapshots or {}) do
-        if snapshot and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false then
+        if snapshot and snapshot.interestDetailed ~= false
+            and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false
+        then
             body = Sync.BodyByOnlineID[tostring(snapshot.liveBodyOnlineID or "")]
             if not body and snapshot.liveBodyLease then
                 body = Sync.BodyByLease[tostring(id) .. ":" .. tostring(snapshot.liveBodyLease)]

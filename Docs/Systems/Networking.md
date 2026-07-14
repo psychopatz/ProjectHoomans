@@ -5,7 +5,7 @@
 - the server registry remains authoritative; clients never create canonical NPC records.
 
 ## Current Payload Lanes
-- `BuildRosterSnapshot`: compact list data for joins and broad roster views
+- `BuildRosterSnapshot`: compact list data sent in 50-record join chunks and batched roster deltas
 - `BuildSnapshot`: live-presence and nearby view state
 - `BuildCharacterPayload`: on-demand detailed payload for `View Character`
 - `BroadcastRecord` and `BroadcastFullSync`: server dispatch only
@@ -18,6 +18,10 @@
 ## Current Rules
 - snapshot building reuses cached equipment and appearance data where possible
 - full inventory payloads are on-demand, not sent every tick
+- live snapshots and combat events are sent only to players inside the NPC interest set
+- interest enters at 48 tiles and leaves at 56 tiles
+- full character payloads require owner, admin, or same-level five-tile access
+- inventory revisions use deltas while the operation log covers the client revision; gaps receive a full refresh
 - live-body client reconciliation is handled by `PNC_ClientPresenceSync`, not by networking itself
 - movement stays on periodic compact snapshots, while attack starts, newly
   assigned body online IDs, and bite damage request one immediate transition

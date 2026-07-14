@@ -382,6 +382,9 @@ local function stampCorpse(record, corpse, token)
     record.corpse.z = corpse.getZ and corpse:getZ() or record.z
     record.corpse.createdWorldHour = tonumber(record.corpse.createdWorldHour) or worldHour()
     ensureRuntime(record).corpseState = "inert_loaded"
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "corpse")
+    end
     return true
 end
 

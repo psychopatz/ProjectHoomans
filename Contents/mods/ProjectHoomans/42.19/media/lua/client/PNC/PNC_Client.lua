@@ -274,6 +274,8 @@ end
 function Client.RequestCharacterPayload(npcId)
     local player = getSpecificPlayer(0)
     local payload
+    local cached
+    local inventoryRevision
     if not npcId then
         return false
     end
@@ -292,8 +294,80 @@ function Client.RequestCharacterPayload(npcId)
     if not player or not sendClientCommand then
         return false
     end
-    sendClientCommand(player, Const.MODULE, Const.CMD_REQUEST_CHARACTER, { id = npcId })
+    cached = ClientState.characterPayloads and ClientState.characterPayloads[npcId] or nil
+    inventoryRevision = cached and cached.inventory and cached.inventory.summary
+        and tonumber(cached.inventory.summary.revision) or nil
+    sendClientCommand(player, Const.MODULE, Const.CMD_REQUEST_CHARACTER, {
+        id = npcId,
+        inventoryRevision = inventoryRevision,
+    })
     return true
+end
+
+local function removeFromContainer(inventory, itemID)
+    local container
+    local i
+    for _, container in pairs(inventory and inventory.containers or {}) do
+        for i = #(container.items or {}), 1, -1 do
+            if container.items[i] == itemID then
+                table.remove(container.items, i)
+            end
+        end
+    end
+end
+
+local function applyInventoryDelta(args)
+    local cached = args and ClientState.characterPayloads and ClientState.characterPayloads[args.npcId] or nil
+    local inventory = cached and cached.inventory or nil
+    local i
+    local op
+    local item
+    local container
+    if not inventory or type(inventory.items) ~= "table" or type(args.ops) ~= "table" then
+        Client.RequestCharacterPayload(args and args.npcId)
+        return false
+    end
+    for i = 1, #args.ops do
+        op = args.ops[i]
+        if op.op == "add" and type(op.item) == "table" and op.item.id then
+            item = Core.DeepCopy(op.item)
+            inventory.items[item.id] = item
+            container = inventory.containers[item.container or op.container or "root"]
+            if container then
+                container.items[#container.items + 1] = item.id
+            end
+        elseif op.op == "remove" and op.itemID then
+            removeFromContainer(inventory, op.itemID)
+            inventory.items[op.itemID] = nil
+        elseif op.op == "move" and op.itemID and inventory.items[op.itemID] then
+            removeFromContainer(inventory, op.itemID)
+            inventory.items[op.itemID].container = op.to
+            container = inventory.containers[op.to]
+            if container then
+                container.items[#container.items + 1] = op.itemID
+            end
+        elseif op.op == "update" and op.itemID and inventory.items[op.itemID] then
+            item = inventory.items[op.itemID]
+            if op.stack ~= nil then item.stack = op.stack end
+            if op.uses ~= nil then item.uses = op.uses end
+            if op.cond ~= nil then item.cond = op.cond end
+        end
+    end
+    inventory.summary = Core.DeepCopy(args.summary or inventory.summary or {})
+    inventory.summary.revision = tonumber(args.inventoryRevision) or inventory.summary.revision
+    inventory.revision = inventory.summary.revision
+    return true
+end
+
+local function mergeSnapshot(current, incoming)
+    local key
+    if type(current) ~= "table" then
+        return incoming
+    end
+    for key, _ in pairs(incoming or {}) do
+        current[key] = incoming[key]
+    end
+    return current
 end
 
 function Client.HandleServerCommand(command, args)
@@ -330,12 +404,84 @@ function Client.HandleServerCommand(command, args)
         return
     end
 
+    if command == Const.CMD_ROSTER_SYNC_BEGIN then
+        ClientState.pendingRoster = {}
+        ClientState.pendingRosterRevision = args and args.directoryRevision or 0
+        ClientState.pendingRosterExpectedChunks = args and args.chunkCount or 0
+        ClientState.pendingRosterChunks = {}
+        return
+    end
+
+    if command == Const.CMD_ROSTER_SYNC_CHUNK then
+        ClientState.pendingRoster = ClientState.pendingRoster or {}
+        for i = 1, #(args and args.snapshots or {}) do
+            snapshot = args.snapshots[i]
+            if snapshot and snapshot.id then
+                ClientState.pendingRoster[snapshot.id] = snapshot
+            end
+        end
+        if args and args.chunkIndex then
+            ClientState.pendingRosterChunks[args.chunkIndex] = true
+        end
+        return
+    end
+
+    if command == Const.CMD_ROSTER_SYNC_END then
+        local receivedChunks = 0
+        for _, _ in pairs(ClientState.pendingRosterChunks or {}) do
+            receivedChunks = receivedChunks + 1
+        end
+        if receivedChunks < (tonumber(ClientState.pendingRosterExpectedChunks) or 0) then
+            ClientState.pendingRoster = nil
+            ClientState.pendingRosterChunks = nil
+            Client.RequestFullSync()
+            return
+        end
+        ClientState.snapshots = ClientState.pendingRoster or {}
+        ClientState.characterPayloads = {}
+        ClientState.rosterRevision = args and args.directoryRevision or ClientState.pendingRosterRevision or 0
+        ClientState.pendingRoster = nil
+        ClientState.pendingRosterChunks = nil
+        if Interpolation and Interpolation.ClearAll then
+            Interpolation.ClearAll()
+        end
+        return
+    end
+
+    if command == Const.CMD_ROSTER_DELTA then
+        for i = 1, #(args and args.entries or {}) do
+            local entry = args.entries[i]
+            if entry.removed == true then
+                ClientState.snapshots[entry.id] = nil
+                if ClientState.characterPayloads then
+                    ClientState.characterPayloads[entry.id] = nil
+                end
+            elseif entry.snapshot and entry.snapshot.id then
+                local current = ClientState.snapshots[entry.snapshot.id]
+                if not current or not current.visualState then
+                    ClientState.snapshots[entry.snapshot.id] = entry.snapshot
+                else
+                    current.displayName = entry.snapshot.displayName
+                    current.name = entry.snapshot.name
+                    current.faction = entry.snapshot.faction
+                    current.recruited = entry.snapshot.recruited
+                end
+            end
+        end
+        ClientState.rosterRevision = args and args.directoryRevision or ClientState.rosterRevision
+        return
+    end
+
     if command == Const.CMD_SYNC_RECORD then
         snapshot = args and args.snapshot or nil
         if snapshot and snapshot.id then
-            ClientState.snapshots[snapshot.id] = snapshot
+            if args.event == "interest_exit" or args.event == "interest_enter" then
+                ClientState.snapshots[snapshot.id] = snapshot
+            else
+                ClientState.snapshots[snapshot.id] = mergeSnapshot(ClientState.snapshots[snapshot.id], snapshot)
+            end
             if ClientState.characterPayloads and ClientState.characterPayloads[snapshot.id] then
-                ClientState.characterPayloads[snapshot.id].snapshot = snapshot
+                ClientState.characterPayloads[snapshot.id].snapshot = ClientState.snapshots[snapshot.id]
             end
         end
         return
@@ -347,6 +493,11 @@ function Client.HandleServerCommand(command, args)
         if args.snapshot and args.snapshot.id then
             ClientState.snapshots[args.snapshot.id] = args.snapshot
         end
+        return
+    end
+
+    if command == Const.CMD_INVENTORY_DELTA and args and args.npcId then
+        applyInventoryDelta(args)
         return
     end
 

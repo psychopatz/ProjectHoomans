@@ -108,6 +108,9 @@ function Stamina.SpendAttack(record, attackType, skillID)
     stamina.current = clamp((tonumber(stamina.current) or 0) - drain, 0, tonumber(stamina.max) or 100)
     stamina.visibleUntil = Core.Now() + Const.STAMINA_VISIBLE_MS
     updateState(record)
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "stamina")
+    end
     return true
 end
 
@@ -155,8 +158,12 @@ function Stamina.Update(record, zombie, now)
         recoverRate = math.max(recoverRate, Const.STAMINA_RECOVERY_IDLE)
     end
 
-    stamina.current = clamp((tonumber(stamina.current) or 0) + (recoverRate * elapsed), 0, tonumber(stamina.max) or 100)
+    local previous = tonumber(stamina.current) or 0
+    stamina.current = clamp(previous + (recoverRate * elapsed), 0, tonumber(stamina.max) or 100)
     updateState(record)
+    if math.abs(stamina.current - previous) >= 0.01 and PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "stamina")
+    end
 end
 
 function Stamina.BuildSnapshot(record)

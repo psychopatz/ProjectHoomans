@@ -26,6 +26,17 @@ local function normalizeNumber(value, fallback)
     return numeric
 end
 
+local function hasTableEntries(source)
+    local _
+    if type(source) ~= "table" then
+        return false
+    end
+    for _, _ in pairs(source) do
+        return true
+    end
+    return false
+end
+
 local function copyStringMap(source)
     local output = {}
     local key
@@ -194,16 +205,22 @@ end
 local function sanitizeProgression(rawProgression)
     local output = {
         recruited = false,
-        skillLevels = {},
+        skillLevelDeltas = {},
+        legacySkillLevels = {},
         skillXP = {},
     }
     local key
     local value
     local source = type(rawProgression) == "table" and rawProgression or {}
     output.recruited = source.recruited == true
+    if type(source.skillLevelDeltas) == "table" then
+        for key, value in pairs(source.skillLevelDeltas) do
+            output.skillLevelDeltas[tostring(key)] = math.max(-10, math.min(10, math.floor(normalizeNumber(value, 0))))
+        end
+    end
     if type(source.skillLevels) == "table" then
         for key, value in pairs(source.skillLevels) do
-            output.skillLevels[tostring(key)] = math.max(0, math.min(10, math.floor(normalizeNumber(value, 0))))
+            output.legacySkillLevels[tostring(key)] = math.max(0, math.min(10, math.floor(normalizeNumber(value, 0))))
         end
     end
     if type(source.skillXP) == "table" then
@@ -327,14 +344,21 @@ function Persistence.SerializeRecord(record)
     if not record or record.persist == false then
         return nil
     end
-    if Inventory and Inventory.EnsureRecordInventory then
-        Inventory.EnsureRecordInventory(record)
-    end
     identity = sanitizeIdentity(record.identity, record)
     progression = sanitizeProgression(record.progression)
+    if hasTableEntries(progression.legacySkillLevels) then
+        local skillID
+        local level
+        for skillID, level in pairs(progression.legacySkillLevels) do
+            local base = PNC.Skills and PNC.Skills.GetBaseLevel and PNC.Skills.GetBaseLevel(record, skillID) or 0
+            progression.skillLevelDeltas[skillID] = math.max(-10, math.min(10, level - base))
+        end
+    end
+    progression.legacySkillLevels = nil
     progression.recruited = record.recruited == true
     payload = {
         schemaVersion = Const.PERSISTENCE_VERSION,
+        recordRevision = math.max(0, math.floor(normalizeNumber(record.recordRevision, 0))),
         id = record.id,
         persist = record.persist ~= false,
         faction = record.faction,
@@ -369,7 +393,9 @@ function Persistence.SerializeRecord(record)
             worn = copyStringMap(record.equipment and record.equipment.worn),
             attached = copyStringMap(record.equipment and record.equipment.attached),
         },
-        inventory = Inventory and Inventory.Serialize and Inventory.Serialize(record) or nil,
+        inventory = record.inventory and Inventory and Inventory.Serialize and Inventory.Serialize(record)
+            or type(record.persistedInventory) == "table" and Core.DeepCopy(record.persistedInventory)
+            or nil,
         progression = progression,
         corpse = sanitizeCorpse(record.corpse, record),
     }
@@ -426,6 +452,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         return nil
     end
     record.id = tostring(raw.id or record.id)
+    record.recordRevision = math.max(0, math.floor(normalizeNumber(raw.recordRevision, 0)))
     record.x = normalizeNumber(position.x, record.x)
     record.y = normalizeNumber(position.y, record.y)
     record.z = normalizeNumber(position.z, record.z)
@@ -450,7 +477,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         and tostring(raw.presenceState or "") ~= Const.PRESENCE_CORPSE
     progression = sanitizeProgression(raw.progression)
     record.progression = {
-        skillLevels = progression.skillLevels,
+        skillLevelDeltas = progression.skillLevelDeltas,
         skillXP = progression.skillXP,
     }
     record.recruited = progression.recruited == true or record.recruited == true
@@ -475,13 +502,18 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         outfit = raw.outfit,
         isFemale = raw.isFemale == true or (identity and identity.isFemale == true),
     })
-    sanitizeStamina(raw.stamina, record)
-    if Inventory and Inventory.Deserialize then
-        Inventory.Deserialize(record, raw.inventory)
-        if not raw.inventory and type(raw.equipment) == "table" and Inventory.SyncFromEquipment then
-            Inventory.SyncFromEquipment(record, "legacy_equipment_load")
+    if hasTableEntries(progression.legacySkillLevels) then
+        local skillID
+        local level
+        for skillID, level in pairs(progression.legacySkillLevels) do
+            local base = PNC.Skills and PNC.Skills.GetBaseLevel and PNC.Skills.GetBaseLevel(record, skillID) or 0
+            record.progression.skillLevelDeltas[skillID] = math.max(-10, math.min(10, level - base))
         end
     end
+    sanitizeStamina(raw.stamina, record)
+    record.inventory = nil
+    record.persistedInventory = type(raw.inventory) == "table" and Core.DeepCopy(raw.inventory) or nil
+    record.legacyEquipmentInventory = not raw.inventory and type(raw.equipment) == "table"
     return Persistence.RebuildRuntime(record)
 end
 

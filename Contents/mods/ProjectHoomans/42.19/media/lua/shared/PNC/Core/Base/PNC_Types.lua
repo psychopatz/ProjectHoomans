@@ -218,6 +218,7 @@ function Types.NewRecord(definition)
         orderSpec = nil,
         activeJob = nil,
         activeBehavior = nil,
+        recordRevision = 0,
         presenceRevision = 0,
         lastThinkAt = now,
         nextThinkAt = now,

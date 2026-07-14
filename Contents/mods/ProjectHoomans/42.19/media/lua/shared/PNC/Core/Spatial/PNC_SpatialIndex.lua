@@ -10,6 +10,8 @@ Spatial.PlayerCells = Spatial.PlayerCells or {}
 Spatial.NPCCells = Spatial.NPCCells or {}
 Spatial.ZombieCells = Spatial.ZombieCells or {}
 Spatial.ZombieByID = Spatial.ZombieByID or {}
+Spatial.NPCMembership = Spatial.NPCMembership or {}
+Spatial.NPCInitialized = Spatial.NPCInitialized or false
 
 local function getCellKey(x, y)
     local size = Const.SPATIAL_CELL_SIZE
@@ -24,6 +26,57 @@ local function insertCell(grid, x, y, value)
         grid[key] = bucket
     end
     bucket[#bucket + 1] = value
+end
+
+local function removeFromCell(grid, key, value)
+    local bucket = grid[key]
+    local i
+    if not bucket then
+        return
+    end
+    for i = #bucket, 1, -1 do
+        if bucket[i] == value then
+            table.remove(bucket, i)
+        end
+    end
+    if #bucket <= 0 then
+        grid[key] = nil
+    end
+end
+
+function Spatial.UpdateNPC(record)
+    local id
+    local key
+    local previous
+    if not record or not record.id then
+        return
+    end
+    id = tostring(record.id)
+    previous = Spatial.NPCMembership[id]
+    if record.alive == false or record.presenceState == Const.PRESENCE_CORPSE then
+        if previous then
+            removeFromCell(Spatial.NPCCells, previous.key, previous.record)
+            Spatial.NPCMembership[id] = nil
+        end
+        return
+    end
+    key = getCellKey(record.x, record.y)
+    if previous and previous.key == key and previous.record == record then
+        return
+    end
+    if previous then
+        removeFromCell(Spatial.NPCCells, previous.key, previous.record)
+    end
+    insertCell(Spatial.NPCCells, record.x, record.y, record)
+    Spatial.NPCMembership[id] = { key = key, record = record }
+end
+
+function Spatial.RemoveNPC(id)
+    local previous = id ~= nil and Spatial.NPCMembership[tostring(id)] or nil
+    if previous then
+        removeFromCell(Spatial.NPCCells, previous.key, previous.record)
+        Spatial.NPCMembership[tostring(id)] = nil
+    end
 end
 
 local function ensureZombieID(zombie)
@@ -47,7 +100,6 @@ function Spatial.Rebuild()
     local zombieID
     local i
     Spatial.PlayerCells = {}
-    Spatial.NPCCells = {}
     Spatial.ZombieCells = {}
     Spatial.ZombieByID = {}
 
@@ -55,11 +107,14 @@ function Spatial.Rebuild()
         insertCell(Spatial.PlayerCells, player:getX(), player:getY(), player)
     end)
 
-    Registry.ForEach(function(record)
-        if record.alive ~= false and record.presenceState ~= Const.PRESENCE_CORPSE then
-            insertCell(Spatial.NPCCells, record.x, record.y, record)
-        end
-    end)
+    if not Spatial.NPCInitialized then
+        Spatial.NPCCells = {}
+        Spatial.NPCMembership = {}
+        Registry.ForEach(function(record)
+            Spatial.UpdateNPC(record)
+        end)
+        Spatial.NPCInitialized = true
+    end
 
     if not getCell then
         return

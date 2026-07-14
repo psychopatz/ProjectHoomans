@@ -230,6 +230,7 @@ function API.DebugCommand(npcId, command, args)
     if command == "set_weapon_mode" then
         record.weaponMode = tostring(args and args.weaponMode or record.weaponMode or "melee")
         refreshEquipmentRuntime(record)
+        Registry.MarkDirty(record, "equipment")
         Network.BroadcastRecord(record, "weapon_mode")
         return true
     end

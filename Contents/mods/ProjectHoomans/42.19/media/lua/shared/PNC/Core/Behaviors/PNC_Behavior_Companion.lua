@@ -193,7 +193,12 @@ local function tickFollowOwner(record, zombie)
         return true
     end
 
-    record.ownerUsername = owner:getUsername()
+    if record.ownerUsername ~= owner:getUsername() then
+        record.ownerUsername = owner:getUsername()
+        if PNC.Registry and PNC.Registry.MarkDirty then
+            PNC.Registry.MarkDirty(record, "owner")
+        end
+    end
     record.ownerOnlineID = owner:getOnlineID()
     ownerDist = Core.Distance(record.x, record.y, owner:getX(), owner:getY())
     if shouldIdleNearOwner(record, ownerDist, math.abs(owner:getZ() - record.z) < 1) then
@@ -275,6 +280,9 @@ local function tickPatrolRoute(record, zombie)
         record.patrolIndex = record.patrolIndex + 1
         if record.patrolIndex > #patrolPoints then
             record.patrolIndex = 1
+        end
+        if PNC.Registry and PNC.Registry.MarkDirty then
+            PNC.Registry.MarkDirty(record, "patrol")
         end
         point = patrolPoints[record.patrolIndex]
     end

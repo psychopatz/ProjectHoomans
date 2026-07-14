@@ -81,7 +81,7 @@ end
 local function buildSnapshotList()
     local list = {}
     Registry.ForEach(function(record)
-        list[#list + 1] = Network.BuildSnapshot(record)
+        list[#list + 1] = Network.BuildRosterSnapshot(record)
     end)
     return list
 end
@@ -89,6 +89,9 @@ end
 local function processRecord(record, now)
     local zombie = Registry.GetLiveZombie(record.id)
     local forceSyncEvent
+    local previousX = record.x
+    local previousY = record.y
+    local previousZ = record.z
 
     Presence.Reconcile(record)
     zombie = Registry.GetLiveZombie(record.id)
@@ -101,6 +104,9 @@ local function processRecord(record, now)
         if record.lastSyncAt ~= record.presenceRevision then
             Network.BroadcastRemoval(record.id, "death")
             record.lastSyncAt = record.presenceRevision
+        end
+        if Spatial and Spatial.RemoveNPC then
+            Spatial.RemoveNPC(record.id)
         end
         return
     end
@@ -128,19 +134,40 @@ local function processRecord(record, now)
     if zombie and Animation and Animation.SyncLocomotion then
         Animation.SyncLocomotion(zombie, record)
     end
+    if Spatial and Spatial.UpdateNPC then
+        Spatial.UpdateNPC(record)
+    end
+    if record.x ~= previousX or record.y ~= previousY or record.z ~= previousZ then
+        Registry.MarkDirty(record, "position")
+    end
+    if Network and Network.QueuePeriodicRoster then
+        Network.QueuePeriodicRoster(record, now)
+    end
+    if Scheduler and Scheduler.Schedule then
+        Scheduler.Schedule(record, now + Scheduler.GetCadence(record))
+    end
 end
 
 function Server.OnTick()
     local now = Core.Now()
+    local due
+    local i
     Registry.EnsureLoaded()
     if BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
         BodyLifecycle.AuditLoadedBodies(now, false)
     end
     Registry.RefreshLivePositions()
     Spatial.Rebuild()
-    Registry.ForEach(function(record)
-        processRecord(record, now)
-    end)
+    if Network.RefreshInterestSets then
+        Network.RefreshInterestSets(now)
+    end
+    due = Scheduler.PopDue(Registry.Data, now)
+    for i = 1, #due do
+        processRecord(due[i], now)
+    end
+    if Network.FlushRosterDeltas then
+        Network.FlushRosterDeltas(now, false)
+    end
     if ZombieAggro and ZombieAggro.Pump then
         ZombieAggro.Pump(now)
     end
@@ -241,7 +268,18 @@ local function onClientCommand(module, command, player, args)
     end
 
     if command == Const.CMD_REQUEST_CHARACTER and args and args.id then
-        Network.SendCharacterPayload(player, Registry.Get(args.id))
+        local record = Registry.Get(args.id)
+        if record and Network.CanViewCharacter(player, record) then
+            if tonumber(args.inventoryRevision) and tonumber(args.inventoryRevision) > 0 then
+                Network.SendInventoryDelta(player, record, args.inventoryRevision)
+            else
+                Network.SendCharacterPayload(player, record)
+            end
+        else
+            Core.LogWarn("Rejected unauthorized NPC character request player="
+                .. tostring(player and player.getUsername and player:getUsername() or "unknown")
+                .. " npc=" .. tostring(args.id))
+        end
         return
     end
 

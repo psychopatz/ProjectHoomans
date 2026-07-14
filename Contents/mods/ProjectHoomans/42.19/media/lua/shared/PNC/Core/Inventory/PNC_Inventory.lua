@@ -286,7 +286,7 @@ local function createBaseInventory(record)
     local maxWeight = buildBaseCarryWeight(record)
     return {
         revision = 0,
-        deltaMode = record and record.recruited == true and "full" or "template_plus_delta",
+        deltaMode = "template_plus_delta",
         cachedWeight = 0,
         maxWeight = maxWeight,
         rootMaxWeight = maxWeight,
@@ -307,6 +307,7 @@ local function createBaseInventory(record)
         template = {
             archetypeID = record and record.archetypeID or "General",
             seed = record and record.identitySeed or 1,
+            generatorVersion = PNC.Const and PNC.Const.GENERATOR_VERSION or 1,
         },
     }
 end
@@ -324,6 +325,7 @@ local function createItem(record, inv, spec)
         bagContainer = normalizeString(spec.bagContainer),
         maxWeight = tonumber(spec.maxWeight),
         templateKey = normalizeString(spec.templateKey),
+        legacyTemplateKey = normalizeString(spec.legacyTemplateKey),
         preferredContainer = normalizeString(spec.preferredContainer),
         wornSlot = normalizeString(spec.wornSlot),
         attachedSlot = normalizeString(spec.attachedSlot),
@@ -427,12 +429,18 @@ local function buildTemplateSnapshot(record)
     local bagItem
     local supply
     local bagContainerID
+    local lookCounts = {}
+    local supplyCounts = {}
+    local templateKey
     for i = 1, #appearanceItems do
+        lookCounts[tostring(appearanceItems[i])] = (lookCounts[tostring(appearanceItems[i])] or 0) + 1
+        templateKey = "tmpl:look:" .. tostring(appearanceItems[i]) .. ":" .. tostring(lookCounts[tostring(appearanceItems[i])])
         item = createItem(record, base, {
             type = appearanceItems[i],
             container = "root",
             wornSlot = PNC.Equipment and PNC.Equipment.CreateItem and nil or nil,
-            templateKey = "tmpl:look:" .. tostring(i),
+            templateKey = templateKey,
+            legacyTemplateKey = "tmpl:look:" .. tostring(i),
         })
         if item and PNC.Equipment and PNC.Equipment.CreateItem then
             local created = PNC.Equipment.CreateItem(appearanceItems[i])
@@ -470,12 +478,22 @@ local function buildTemplateSnapshot(record)
 
     for i = 1, #(template.supplies or {}) do
         supply = template.supplies[i]
+        templateKey = normalizeString(supply.key)
+        if not templateKey then
+            supplyCounts[tostring(supply.type)] = (supplyCounts[tostring(supply.type)] or 0) + 1
+            templateKey = tostring(supply.type) .. ":" .. tostring(supplyCounts[tostring(supply.type)])
+            if Core.LogWarn then
+                Core.LogWarn("PNC archetype supply missing stable key archetype=" .. tostring(template.archetypeID)
+                    .. " type=" .. tostring(supply.type))
+            end
+        end
         createItem(record, base, {
             type = supply.type,
             stack = supply.stack,
             container = (supply.preferredContainer == "bag" and bagContainerID) and bagContainerID or "root",
             preferredContainer = supply.preferredContainer,
-            templateKey = "tmpl:supply:" .. tostring(i),
+            templateKey = "tmpl:supply:" .. tostring(templateKey),
+            legacyTemplateKey = "tmpl:supply:" .. tostring(i),
         })
     end
 
@@ -490,7 +508,7 @@ local function findItemByTemplateKey(inv, templateKey)
         return nil
     end
     for itemID, item in pairs(inv.items or {}) do
-        if item and item.templateKey == templateKey then
+        if item and (item.templateKey == templateKey or item.legacyTemplateKey == templateKey) then
             return item
         end
     end
@@ -506,10 +524,49 @@ local function setItemContainer(inv, item, containerID)
     return true
 end
 
+local function resolveSavedContainer(inv, containerID)
+    local resolved = normalizeString(containerID) or "root"
+    local bag
+    if inv.containers and inv.containers[resolved] then
+        return resolved
+    end
+    if string.sub(resolved, 1, 4) == "bag_" and inv.equipped and inv.equipped.bag then
+        bag = inv.items and inv.items[inv.equipped.bag] or nil
+        if bag and bag.bagContainer then
+            return bag.bagContainer
+        end
+    end
+    return "root"
+end
+
+local function applySavedSlots(inv, item, changed)
+    if changed.wornSlot == nil and changed.attachedSlot == nil and changed.equipSlot == nil then
+        return
+    end
+    clearItemRefs(inv, item.id)
+    item.wornSlot = normalizeString(changed.wornSlot)
+    item.attachedSlot = normalizeString(changed.attachedSlot)
+    item.equipSlot = normalizeString(changed.equipSlot)
+    if item.wornSlot then
+        inv.worn[item.wornSlot] = item.id
+    end
+    if item.attachedSlot then
+        inv.attached[item.attachedSlot] = item.id
+    end
+    if item.equipSlot == "primary" then
+        inv.equipped.primary = item.id
+    elseif item.equipSlot == "secondary" then
+        inv.equipped.secondary = item.id
+    elseif item.equipSlot == "bag" then
+        inv.equipped.bag = item.id
+    end
+end
+
 local function applySavedDelta(record, inv, delta)
     local i
     local item
     local changed
+    local unresolved = 0
     if type(delta) ~= "table" then
         return
     end
@@ -517,13 +574,17 @@ local function applySavedDelta(record, inv, delta)
         item = findItemByTemplateKey(inv, delta.removedTemplateKeys[i])
         if item then
             removeItemByID(inv, item.id)
+        else
+            unresolved = unresolved + 1
         end
     end
     for i = 1, #(delta.moved or {}) do
         changed = delta.moved[i]
         item = changed and changed.templateKey and findItemByTemplateKey(inv, changed.templateKey) or nil
         if item then
-            setItemContainer(inv, item, normalizeString(changed.to) or "root")
+            setItemContainer(inv, item, resolveSavedContainer(inv, changed.to))
+        else
+            unresolved = unresolved + 1
         end
     end
     if type(delta.changed) == "table" then
@@ -541,16 +602,25 @@ local function applySavedDelta(record, inv, delta)
                     item.cond = tonumber(changed.cond)
                 end
                 if changed.container ~= nil then
-                    setItemContainer(inv, item, changed.container)
+                    setItemContainer(inv, item, resolveSavedContainer(inv, changed.container))
                 end
+                applySavedSlots(inv, item, changed)
+            elseif type(changed) == "table" then
+                unresolved = unresolved + 1
             end
         end
     end
     for i = 1, #(delta.added or {}) do
         changed = delta.added[i]
         if type(changed) == "table" then
+            changed = Core.DeepCopy(changed)
+            changed.container = resolveSavedContainer(inv, changed.container)
             createItem(record, inv, changed)
         end
+    end
+    if unresolved > 0 and Core.LogWarn then
+        Core.LogWarn("PNC inventory discarded unresolved template deltas npc=" .. tostring(record and record.id)
+            .. " count=" .. tostring(unresolved))
     end
 end
 
@@ -578,12 +648,18 @@ local function buildCompactDelta(record, inv)
                 if (tonumber(item.stack) or 1) ~= (tonumber(templateItem.stack) or 1)
                     or (tonumber(item.uses) or 0) ~= (tonumber(templateItem.uses) or 0)
                     or (tonumber(item.cond) or 0) ~= (tonumber(templateItem.cond) or 0)
+                    or item.wornSlot ~= templateItem.wornSlot
+                    or item.attachedSlot ~= templateItem.attachedSlot
+                    or item.equipSlot ~= templateItem.equipSlot
                 then
                     changed[item.templateKey] = {
                         stack = item.stack,
                         uses = item.uses,
                         cond = item.cond,
                         container = item.container,
+                        wornSlot = item.wornSlot,
+                        attachedSlot = item.attachedSlot,
+                        equipSlot = item.equipSlot,
                     }
                 end
             end
@@ -611,10 +687,11 @@ function Inventory.CreateFromTemplate(record, options)
         return nil
     end
     inv = buildTemplateSnapshot(record)
-    inv.deltaMode = record.recruited == true and "full" or "template_plus_delta"
+    inv.deltaMode = "template_plus_delta"
     inv.template = {
         archetypeID = record.archetypeID,
         seed = record.identitySeed,
+        generatorVersion = PNC.Const and PNC.Const.GENERATOR_VERSION or 1,
     }
     record.inventory = inv
     runtime = getRuntimeState(record)
@@ -658,12 +735,27 @@ function Inventory.EnsureRecordInventory(record)
     if not record then
         return nil
     end
+    if type(record.inventory) ~= "table" and type(record.persistedInventory) == "table" then
+        local persisted = record.persistedInventory
+        local persistedGenerator = persisted.template and tonumber(persisted.template.generatorVersion) or nil
+        local currentGenerator = PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1
+        record.persistedInventory = nil
+        local hydrated = Inventory.Deserialize(record, persisted)
+        if persistedGenerator ~= currentGenerator and PNC.Registry and PNC.Registry.MarkDirty then
+            PNC.Registry.MarkDirty(record, "inventory_rebase")
+        end
+        return hydrated
+    end
+    if type(record.inventory) ~= "table" and record.legacyEquipmentInventory == true then
+        record.legacyEquipmentInventory = nil
+        return Inventory.SyncFromEquipment(record, "legacy_equipment_load")
+    end
     if type(record.inventory) ~= "table" or not record.inventory.items or not record.inventory.containers then
         return Inventory.CreateFromTemplate(record)
     end
     inv = record.inventory
     inv.revision = math.max(0, math.floor(tonumber(inv.revision) or 0))
-    inv.deltaMode = normalizeString(inv.deltaMode) or (record.recruited == true and "full" or "template_plus_delta")
+    inv.deltaMode = "template_plus_delta"
     inv.cachedWeight = tonumber(inv.cachedWeight) or 0
     inv.rootMaxWeight = tonumber(inv.rootMaxWeight) or tonumber(inv.maxWeight) or buildBaseCarryWeight(record)
     inv.maxWeight = tonumber(inv.maxWeight) or inv.rootMaxWeight
@@ -825,12 +917,15 @@ function Inventory.SyncFromEquipment(record, reason)
             createItem(record, inv, item)
         end
     end
-    inv.deltaMode = record.recruited == true and "full" or "template_plus_delta"
+    inv.deltaMode = "template_plus_delta"
     if hadInventory then
         inv.revision = math.max(1, tonumber(inv.revision) or 0)
     end
     refreshNextItemSerial(record, inv)
     Inventory.RebuildCaches(record)
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "inventory")
+    end
     return record.inventory
 end
 
@@ -936,11 +1031,25 @@ function Inventory.ApplyDelta(record, ops, reason)
     bumpRevision(record, appliedOps, reason)
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "inventory")
+    end
     return true
 end
 
 function Inventory.BuildSummaryPayload(record)
-    local inv = Inventory.EnsureRecordInventory(record)
+    local raw = record and record.persistedInventory or nil
+    local persistedSummary = raw and (raw.summary or raw.inventorySummary) or nil
+    local persistedGenerator = raw and raw.template and tonumber(raw.template.generatorVersion) or nil
+    local currentGenerator = PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1
+    local inv
+    if type(record and record.inventory) ~= "table"
+        and type(persistedSummary) == "table"
+        and persistedGenerator == currentGenerator
+    then
+        return Core.DeepCopy(persistedSummary)
+    end
+    inv = Inventory.EnsureRecordInventory(record)
     if not inv then
         return nil
     end
@@ -996,6 +1105,30 @@ function Inventory.BuildDeltaPayload(record, sinceRevision)
     if not inv or not runtime or type(runtime.opLog) ~= "table" then
         return nil
     end
+    if sinceRevision > (tonumber(inv.revision) or 0) then
+        return {
+            npcId = record.id,
+            inventoryRevision = inv.revision,
+            fullRequired = true,
+        }
+    end
+    if sinceRevision == (tonumber(inv.revision) or 0) then
+        return {
+            npcId = record.id,
+            inventoryRevision = inv.revision,
+            ops = {},
+            summary = Inventory.BuildSummaryPayload(record),
+        }
+    end
+    if #runtime.opLog <= 0
+        or (tonumber(runtime.opLog[1] and runtime.opLog[1].revision) or 0) > (sinceRevision + 1)
+    then
+        return {
+            npcId = record.id,
+            inventoryRevision = inv.revision,
+            fullRequired = true,
+        }
+    end
     for i = 1, #runtime.opLog do
         entry = runtime.opLog[i]
         if entry and (tonumber(entry.revision) or 0) > sinceRevision then
@@ -1019,7 +1152,7 @@ function Inventory.Serialize(record)
     if not inv then
         return nil
     end
-    if record.recruited ~= true and inv.deltaMode == "template_plus_delta" then
+    if inv.deltaMode == "template_plus_delta" then
         payload = {
             revision = inv.revision,
             deltaMode = inv.deltaMode,
@@ -1028,8 +1161,10 @@ function Inventory.Serialize(record)
             template = {
                 archetypeID = record.archetypeID,
                 seed = record.identitySeed,
+                generatorVersion = PNC.Const and PNC.Const.GENERATOR_VERSION or 1,
             },
             delta = buildCompactDelta(record, inv),
+            summary = Inventory.BuildSummaryPayload(record),
         }
         return payload
     end
@@ -1059,10 +1194,10 @@ function Inventory.Deserialize(record, rawInventory)
     end
     record.inventory = {
         revision = tonumber(rawInventory.revision) or 0,
-        deltaMode = normalizeString(rawInventory.deltaMode) or (record.recruited == true and "full" or "template_plus_delta"),
+        deltaMode = "template_plus_delta",
         cachedWeight = tonumber(rawInventory.cachedWeight) or 0,
-        maxWeight = tonumber(rawInventory.maxWeight) or buildBaseCarryWeight(record),
-        rootMaxWeight = tonumber(rawInventory.rootMaxWeight) or tonumber(rawInventory.maxWeight) or buildBaseCarryWeight(record),
+        maxWeight = buildBaseCarryWeight(record),
+        rootMaxWeight = buildBaseCarryWeight(record),
         template = type(rawInventory.template) == "table" and Core.DeepCopy(rawInventory.template) or {
             archetypeID = record.archetypeID,
             seed = record.identitySeed,

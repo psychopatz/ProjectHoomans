@@ -12,7 +12,7 @@ local function ensureProgress(record)
     end
     record.progression = record.progression or {}
     record.progression.skillXP = record.progression.skillXP or {}
-    record.progression.skillLevels = record.progression.skillLevels or {}
+    record.progression.skillLevelDeltas = record.progression.skillLevelDeltas or {}
     return record.progression
 end
 
@@ -92,6 +92,10 @@ local function resolveBaseLevel(record, skillID)
     return clampLevel(level)
 end
 
+function Skills.GetBaseLevel(record, skillID)
+    return resolveBaseLevel(record, skillID)
+end
+
 local function resolveXPThreshold(level)
     return 75 + (clampLevel(level) * 30)
 end
@@ -113,18 +117,15 @@ end
 
 function Skills.GetLevel(record, skillID)
     local progression
-    local overrides
-    local override
+    local deltas
+    local delta
     if not record or not skillID then
         return 0
     end
     progression = ensureProgress(record)
-    overrides = progression and progression.skillLevels or nil
-    override = overrides and overrides[skillID] or nil
-    if override ~= nil then
-        return clampLevel(override)
-    end
-    return resolveBaseLevel(record, skillID)
+    deltas = progression and progression.skillLevelDeltas or nil
+    delta = deltas and tonumber(deltas[skillID]) or 0
+    return clampLevel(resolveBaseLevel(record, skillID) + delta)
 end
 
 function Skills.GetAverage(record, skillIDs)
@@ -161,10 +162,13 @@ function Skills.AddXP(record, skillID, amount)
     while xpValue >= threshold and currentLevel < 10 do
         xpValue = xpValue - threshold
         currentLevel = currentLevel + 1
-        progression.skillLevels[skillID] = currentLevel
+        progression.skillLevelDeltas[skillID] = currentLevel - resolveBaseLevel(record, skillID)
         threshold = resolveXPThreshold(currentLevel)
     end
     xpMap[skillID] = xpValue
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "skills")
+    end
     return true
 end
 

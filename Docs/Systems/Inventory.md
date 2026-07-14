@@ -11,8 +11,10 @@
 - `inventory.attached`
 - `inventory.items`
 - `inventory.containers`
-- template-plus-delta persistence state
+- template-plus-delta persistence state for recruited and unrecruited NPCs
+- stable semantic template keys and generator revision
 - derived carry caches such as used and remaining weight
+- revision-bound summaries that do not require full inventory hydration
 
 ## Public Functions
 - `PNC.Inventory.CreateFromTemplate(record)`
@@ -34,3 +36,4 @@
 ## Load-Order Contract
 - skill-derived carry capacity resolves `PNC.Skills` when inventory creation runs, because inventory is loaded before the skills subsystem during shared bootstrap
 - do not capture later-loaded collaborators in file-local variables at module load time
+- generator updates rebase the current template and replay valid semantic deltas

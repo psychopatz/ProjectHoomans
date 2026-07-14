@@ -64,6 +64,9 @@ function Health.MarkRecentDamage(record, now)
         tonumber(record.runtime.inCombatUntil or 0) or 0,
         damageAt + Const.DEBUG_COMBAT_HOLD_MS
     )
+    if Registry and Registry.MarkDirty then
+        Registry.MarkDirty(record, "health")
+    end
 end
 
 local function applyIncapacitatedLiveState(record, zombie)
@@ -164,6 +167,9 @@ function Health.EnterIncapacitated(record, zombie, reason)
     then
         PNC.ZombieAggro.ClearForNPCBody(zombie)
     end
+    if Registry and Registry.MarkDirty then
+        Registry.MarkDirty(record, "health")
+    end
     return true
 end
 
@@ -187,6 +193,9 @@ function Health.Revive(record, zombie)
         PNC.ZombieAggro.ClearForNPCBody(zombie)
     end
     applyNormalLiveState(record, zombie)
+    if Registry and Registry.MarkDirty then
+        Registry.MarkDirty(record, "health")
+    end
     return true
 end
 
@@ -205,6 +214,9 @@ function Health.Recover(record, zombie)
     record.runtime.attackAction = nil
     record.runtime.inCombatUntil = 0
     applyNormalLiveState(record, zombie)
+    if Registry and Registry.MarkDirty then
+        Registry.MarkDirty(record, "health")
+    end
     return true
 end
 
@@ -259,6 +271,9 @@ function Health.Kill(record, zombie, reason)
             createdWorldHour = 0,
         }
     end
+    if Registry and Registry.MarkDirty then
+        Registry.MarkDirty(record, "health")
+    end
 end
 
 function Health.ApplyDamage(record, zombie, damageEvent)
@@ -295,6 +310,9 @@ function Health.ApplyDamage(record, zombie, damageEvent)
     end
 
     health.current = health.current - amount
+    if Registry and Registry.MarkDirty then
+        Registry.MarkDirty(record, "health")
+    end
 
     if health.current <= 0 then
         return Health.EnterIncapacitated(record, zombie, damageEvent and damageEvent.type or "damage")
@@ -317,6 +335,9 @@ function Health.Update(record, zombie, now)
         and now >= (tonumber(health.reviveProtectionUntil) or 0)
     then
         health.reviveProtectionUntil = 0
+        if Registry and Registry.MarkDirty then
+            Registry.MarkDirty(record, "health")
+        end
     end
     if zombie then
         refreshNormalLiveBuffer(record, zombie)
