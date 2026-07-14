@@ -34,6 +34,11 @@ local function setBiteDiagnostic(record, entry, reason)
         releaseAt = entry.releaseAt,
         finishedAt = entry.finishedAt,
         actionState = actionState(entry.zombie),
+        outcome = entry.outcome,
+        partId = entry.partId,
+        woundType = entry.woundType,
+        protection = entry.protection,
+        woundChance = entry.woundChance,
         reason = reason or entry.releaseReason,
     }
 end
@@ -200,14 +205,13 @@ end
 
 local function applyBiteDamage(entry, record, zombie, npcBody, now)
     local teeth
+    local applied
+    local result
+    local wounds = PNC.NPCWounds
+    local reaction = PNC.CombatZombieReaction
     entry.phase = "impact"
     entry.appliedDamage = true
     entry.impactAt = now
-    if ZombRand(4) == 1 and zombie.playSound then
-        zombie:playSound("ZombieBite")
-    elseif zombie.playSound then
-        zombie:playSound("ZombieScratch")
-    end
     if Equipment and Equipment.CreateItem then
         teeth = Equipment.CreateItem("Base.RollingPin")
     end
@@ -227,24 +231,49 @@ local function applyBiteDamage(entry, record, zombie, npcBody, now)
     }
     record.runtime.targetKind = "zombie"
     record.runtime.combatBlockReason = "under_zombie_bite"
-    if teeth and npcBody.Hit then
-        pcall(function()
-            npcBody:Hit(teeth, zombie, 1.01, false, 1, false)
-        end)
+    if wounds and wounds.ResolveZombieAttack then
+        applied, result = wounds.ResolveZombieAttack(record, npcBody, zombie)
+    else
+        applied = Health.ApplyDamage(record, npcBody, {
+            amount = Const.ZOMBIE_ATTACK_DAMAGE,
+            type = "zombie_bite",
+            attackerKind = "zombie",
+            x = zombie:getX(), y = zombie:getY(), z = zombie:getZ(),
+        })
+        result = { outcome = applied and "wounded" or "blocked", woundType = "bite" }
     end
-    Health.ApplyDamage(record, npcBody, {
-        amount = Const.ZOMBIE_ATTACK_DAMAGE,
-        type = "zombie_bite",
-        attackerKind = "zombie",
-        x = zombie:getX(),
-        y = zombie:getY(),
-        z = zombie:getZ(),
-    })
+    entry.outcome = result and result.outcome or "blocked"
+    entry.partId = result and result.partId or nil
+    entry.woundType = result and result.woundType or nil
+    entry.protection = result and result.protection or 0
+    entry.woundChance = result and result.chance or 0
+    if applied then
+        if zombie.playSound then
+            zombie:playSound(result and result.woundType == "bite" and "ZombieBite" or "ZombieScratch")
+        end
+        if teeth and npcBody.Hit then
+            pcall(function()
+                npcBody:Hit(teeth, zombie, 1.01, false, 1, false)
+            end)
+        end
+    elseif reaction and reaction.Start then
+        reaction.Start(npcBody, zombie, {
+            kind = "npc_parry", stagger = true, hitForce = 0.78,
+            pushDistance = 0.12, durationMs = 220,
+        })
+        if PNC.Network and PNC.Network.BroadcastZombieReaction then
+            PNC.Network.BroadcastZombieReaction(zombie, npcBody, {
+                kind = "npc_parry", stagger = true, hitForce = 0.78,
+            })
+        end
+    end
     if isServer and isServer() then
         record.runtime.forceSyncEvent = "zombie_bite"
     end
     setBiteDiagnostic(record, entry, "impact")
-    Core.LogRecordDebug(record, "Zombie " .. tostring(entry.zombieId) .. " applied bite to NPC " .. tostring(record.id))
+    Core.LogRecordDebug(record, "Zombie " .. tostring(entry.zombieId) .. " resolved lunge on NPC "
+        .. tostring(record.id) .. " outcome=" .. tostring(entry.outcome)
+        .. " part=" .. tostring(entry.partId or "none"))
 end
 
 function ZombieAggro.UpdateBiteState(zombie, now)

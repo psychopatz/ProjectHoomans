@@ -89,7 +89,35 @@ local record = {
     anchorX = 1,
     anchorY = 2,
     anchorZ = 0,
-    health = { current = 90, max = 100, state = "normal" },
+    health = {
+        current = 90,
+        max = 100,
+        state = "normal",
+        body = {
+            wounds = {
+                ForeArm_L = {
+                    partId = "ForeArm_L",
+                    type = "bite",
+                    severity = 12,
+                    bleedingRate = 0.085,
+                    bandaged = true,
+                    bandagedAt = 900,
+                    healAtWorldHour = 20,
+                },
+            },
+            infection = {
+                active = true,
+                fatal = false,
+                sourcePart = "ForeArm_L",
+                infectedAtWorldHour = 10,
+                fatalAtWorldHour = 58,
+            },
+            bleedingRate = 0,
+            openWoundCount = 0,
+            bandagedWoundCount = 1,
+            lastBleedAt = 900,
+        },
+    },
     weaponMode = "melee",
     equipment = { worn = {}, attached = {} },
     progression = { skillLevels = { Strength = 5 }, skillXP = {} },
@@ -99,10 +127,15 @@ local record = {
 local payload = PNC.Persistence.SerializeRecord(record)
 assert(payload, "serialization failed without next()")
 assert(payload.progression.skillLevelDeltas.Strength == 3, "legacy skill delta conversion failed")
+assert(payload.health.body.wounds.ForeArm_L, "body wound was not serialized")
+assert(payload.health.body.infection.active == true, "infection was not serialized")
 
 local restored = PNC.Persistence.DeserializeRecord(payload, record.id)
 assert(restored, "deserialization failed without next()")
 assert(restored.progression.skillLevelDeltas.Strength == 3, "deserialized skill delta changed")
+assert(restored.health.body.wounds.ForeArm_L.type == "bite", "body wound did not round trip")
+assert(restored.health.body.infection.sourcePart == "ForeArm_L", "infection did not round trip")
+assert(restored.health.body.lastBleedAt == 0, "wall clock bleed timestamp was persisted")
 
 next = originalNext
 print("pnc_kahlua_persistence_smoke: ok")

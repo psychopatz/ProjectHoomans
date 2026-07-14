@@ -3,7 +3,6 @@ PNC.CharacterWindowTabs = PNC.CharacterWindowTabs or {}
 
 local Tabs = PNC.CharacterWindowTabs
 local Shared = PNC.CharacterWindowShared
-
 local bodyTextures = {}
 
 local function bodyTexture(isFemale)
@@ -14,56 +13,137 @@ local function bodyTexture(isFemale)
     return bodyTextures[key]
 end
 
+local function drawBody(view, texture, x, y, width, height)
+    if not texture then return { x = x, y = y, width = width, height = height } end
+    local textureWidth = texture.getWidthOrig and texture:getWidthOrig() or texture:getWidth()
+    local textureHeight = texture.getHeightOrig and texture:getHeightOrig() or texture:getHeight()
+    local scale = math.min(width / math.max(1, textureWidth), height / math.max(1, textureHeight))
+    local drawWidth = textureWidth * scale
+    local drawHeight = textureHeight * scale
+    local bounds = {
+        x = x + (width - drawWidth) / 2,
+        y = y,
+        width = drawWidth,
+        height = drawHeight,
+    }
+    view:drawTextureScaled(texture, bounds.x, bounds.y, drawWidth, drawHeight, 1, 0.88, 0.88, 0.88)
+    return bounds
+end
+
+local function markerColor(wound)
+    if wound.bandaged == true then return 0.26, 0.72, 0.34 end
+    if wound.type == "bite" then return 0.88, 0.12, 0.12 end
+    if wound.type == "laceration" then return 0.95, 0.43, 0.12 end
+    return 0.92, 0.78, 0.18
+end
+
+local function drawWoundMarkers(view, bodyBounds, wounds)
+    local parts = PNC.NPCWounds and PNC.NPCWounds.Parts or {}
+    local partId
+    local wound
+    local part
+    for partId, wound in pairs(wounds or {}) do
+        part = parts[partId]
+        if part then
+            local r, g, b = markerColor(wound)
+            local size = wound.type == "bite" and 10 or 8
+            local x = bodyBounds.x + bodyBounds.width * part.x - size / 2
+            local y = bodyBounds.y + bodyBounds.height * part.y - size / 2
+            view:drawRect(x, y, size, size, 0.95, r, g, b)
+            view:drawRectBorder(x, y, size, size, 1, 0.1, 0.1, 0.1)
+        end
+    end
+end
+
+local function sortedWounds(wounds)
+    local rows = {}
+    local parts = PNC.NPCWounds and PNC.NPCWounds.Parts or {}
+    local partId
+    local wound
+    for partId, wound in pairs(wounds or {}) do
+        rows[#rows + 1] = {
+            partId = partId,
+            label = parts[partId] and parts[partId].label or tostring(partId),
+            wound = wound,
+        }
+    end
+    table.sort(rows, function(left, right) return left.label < right.label end)
+    return rows
+end
+
 function Tabs.RenderHealth(view, snapshot, payload, topY)
     local resolved = Shared.GetSnapshot(snapshot, payload)
-    local health = payload and payload.health or {}
+    local payloadHealth = payload and payload.health or {}
+    local health = {
+        current = resolved.hpCurrent or payloadHealth.current,
+        max = resolved.hpMax or payloadHealth.max,
+        state = resolved.healthState or payloadHealth.state,
+        incapacitatedReason = payloadHealth.incapacitatedReason,
+    }
     local stamina = payload and payload.stamina or {}
+    local body = resolved.bodyHealth or payloadHealth.body or {}
+    local wounds = body.wounds or {}
+    local rows = sortedWounds(wounds)
     local texture = bodyTexture(resolved.isFemale == true)
     local padding = 12
-    local silhouetteWidth = Shared.Clamp(math.floor(view.width * 0.3), 105, 165)
-    local silhouetteHeight = math.min(view.height - padding * 2, 302)
+    local silhouetteWidth = Shared.Clamp(math.floor(view.width * 0.31), 112, 170)
+    local silhouetteHeight = math.min(315, math.max(220, view.height - padding * 2))
+    local bodyBounds = drawBody(view, texture, padding, padding, silhouetteWidth, silhouetteHeight)
     local x = padding + silhouetteWidth + 18
-    local width = math.max(130, view.width - x - padding)
+    local width = math.max(150, view.width - x - padding)
     local y = topY
-    local hpCurrent = tonumber(health.current or resolved.hpCurrent) or 0
-    local hpMax = math.max(1, tonumber(health.max or resolved.hpMax) or 100)
-    local staminaCurrent = tonumber(stamina.current or resolved.staminaCurrent) or 0
-    local staminaMax = math.max(1, tonumber(stamina.max or resolved.staminaMax) or 100)
-    local state = tostring(health.state or resolved.healthState or "normal")
+    local hpCurrent = tonumber(health.current) or 0
+    local hpMax = math.max(1, tonumber(health.max) or 100)
+    local state = tostring(health.state or "normal")
+    local fontHeight = getTextManager():getFontHeight(UIFont.Small)
+    local i
 
-    if texture then
-        local tw = texture.getWidthOrig and texture:getWidthOrig() or texture:getWidth()
-        local th = texture.getHeightOrig and texture:getHeightOrig() or texture:getHeight()
-        local scale = math.min(silhouetteWidth / math.max(1, tw), silhouetteHeight / math.max(1, th))
-        local drawWidth = tw * scale
-        local drawHeight = th * scale
-        view:drawTextureScaled(texture, padding + (silhouetteWidth - drawWidth) / 2, padding, drawWidth, drawHeight, 1, 0.88, 0.88, 0.88)
-    end
+    drawWoundMarkers(view, bodyBounds, wounds)
 
     y = Shared.DrawSection(view, "Overall Body Status", x, y, width)
     y = Shared.DrawBar(view, "Health", hpCurrent, hpMax, x, y, width, { r = 0.72, g = 0.16, b = 0.16 })
-    y = Shared.DrawBar(view, "Stamina", staminaCurrent, staminaMax, x, y, width, { r = 0.24, g = 0.62, b = 0.3 })
-    y = y + 4
-    y = Shared.DrawLabelValue(view, "Condition", state, x, y, 92)
-    y = Shared.DrawLabelValue(view, "Stamina State", stamina.state or resolved.staminaState or "fresh", x, y, 92)
-    y = Shared.DrawLabelValue(view, "Can Revive", resolved.canRevive == true and "Yes" or "No", x, y, 92)
-    y = Shared.DrawLabelValue(view, "Recent Damage", (tonumber(health.recentDamageUntil or resolved.recentDamageUntil) or 0) > 0 and "Recorded" or "None", x, y, 92)
+    if stamina.current ~= nil then
+        y = Shared.DrawBar(view, "Stamina", stamina.current, math.max(1, tonumber(stamina.max) or 100), x, y, width, { r = 0.24, g = 0.62, b = 0.3 })
+    end
+    y = Shared.DrawLabelValue(view, "Condition", state, x, y + 2, 92)
+    y = Shared.DrawLabelValue(view, "Open Wounds", body.openWoundCount or 0, x, y, 92)
+    y = Shared.DrawLabelValue(view, "Bandaged", body.bandagedWoundCount or 0, x, y, 92)
+    y = Shared.DrawLabelValue(view, "Bleeding", (tonumber(body.bleedingRate) or 0) > 0 and "Active" or "Controlled", x, y, 92)
 
-    y = y + 8
-    y = Shared.DrawSection(view, "Medical Summary", x, y, width)
-    if state == "incapacitated" then
-        view:drawText("Incapacitated", x, y, 0.95, 0.36, 0.31, 1, UIFont.Medium)
+    if body.infection and (body.infection.active == true or body.infection.fatal == true) then
+        y = y + 4
+        view:drawText("Knox Infection", x, y, 0.92, 0.24, 0.2, 1, UIFont.Medium)
         y = y + getTextManager():getFontHeight(UIFont.Medium) + 5
-        view:drawText("Reason: " .. tostring(health.incapacitatedReason or "critical injury"), x, y, 0.82, 0.82, 0.82, 1, UIFont.Small)
-        y = y + getTextManager():getFontHeight(UIFont.Small) + 6
-        view:drawText("Use the Revive interaction while in range.", x, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
-        y = y + getTextManager():getFontHeight(UIFont.Small) + 6
-    elseif state == "dead" then
-        view:drawText("No vital signs", x, y, 0.95, 0.36, 0.31, 1, UIFont.Medium)
-        y = y + getTextManager():getFontHeight(UIFont.Medium) + 8
+        local source = PNC.NPCWounds and PNC.NPCWounds.Parts and body.infection.sourcePart
+            and PNC.NPCWounds.Parts[body.infection.sourcePart] or nil
+        y = Shared.DrawLabelValue(view, "Bite Location", source and source.label or body.infection.sourcePart or "Unknown", x, y, 92)
+        y = Shared.DrawLabelValue(view, "Outcome", body.infection.fatal == true and "Reanimating" or "Terminal", x, y, 92)
+    end
+
+    y = y + 7
+    y = Shared.DrawSection(view, "Injuries", x, y, width)
+    if #rows == 0 then
+        view:drawText("No body-part injuries.", x, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        y = y + fontHeight + 8
     else
-        view:drawText("No active incapacitation or critical wound state.", x, y, 0.75, 0.75, 0.75, 1, UIFont.Small)
-        y = y + getTextManager():getFontHeight(UIFont.Small) + 8
+        for i = 1, #rows do
+            local row = rows[i]
+            local wound = row.wound
+            local status = wound.bandaged == true and "Bandaged" or "Bleeding"
+            local label = row.label .. " - " .. string.upper(string.sub(tostring(wound.type or "wound"), 1, 1))
+                .. string.sub(tostring(wound.type or "wound"), 2)
+            view:drawText(PsychopatzCore.UI.Layout.Ellipsize(label, UIFont.Small, width - 78), x, y, 0.9, 0.9, 0.9, 1, UIFont.Small)
+            view:drawTextRight(status, x + width, y, wound.bandaged and 0.35 or 0.92, wound.bandaged and 0.76 or 0.38, 0.35, 1, UIFont.Small)
+            y = y + fontHeight + 5
+        end
+    end
+
+    if state == "incapacitated" then
+        y = y + 6
+        view:drawText("Incapacitated - " .. tostring(health.incapacitatedReason or "critical injury"), x, y, 0.95, 0.36, 0.31, 1, UIFont.Small)
+        y = y + fontHeight + 6
+        view:drawText("Revival bandages all current bleeding wounds.", x, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        y = y + fontHeight + 6
     end
 
     return math.max(y, padding + silhouetteHeight) + 12

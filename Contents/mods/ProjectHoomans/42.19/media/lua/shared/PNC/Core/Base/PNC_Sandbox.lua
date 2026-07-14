@@ -18,6 +18,38 @@ function Settings.GetBoolean(key, fallback)
     return fallback == true
 end
 
+function Settings.GetNumber(key, fallback, minimum, maximum)
+    local vars = projectVars()
+    local value = tonumber(vars and vars[key]) or tonumber(fallback) or 0
+    if minimum ~= nil then value = math.max(tonumber(minimum) or value, value) end
+    if maximum ~= nil then value = math.min(tonumber(maximum) or value, value) end
+    return value
+end
+
+function Settings.NPCZombieWoundChance()
+    return Settings.GetNumber("NPCZombieWoundChance", 45, 0, 100)
+end
+
+function Settings.NPCZombieBiteChance()
+    return Settings.GetNumber("NPCZombieBiteChance", 20, 0, 100)
+end
+
+function Settings.NPCZombieLacerationChance()
+    return Settings.GetNumber("NPCZombieLacerationChance", 30, 0, 100)
+end
+
+function Settings.NPCZombieInfectionEnabled()
+    return Settings.GetBoolean("NPCZombieInfection", false)
+end
+
+function Settings.NPCInfectionMortalityHours()
+    return Settings.GetNumber("NPCInfectionMortalityHours", 48, 1, 168)
+end
+
+function Settings.NPCReanimationHours()
+    return Settings.GetNumber("NPCReanimationHours", 1, 0.05, 24)
+end
+
 function Settings.ZombiesTargetDownedNPC()
     return Settings.GetBoolean("ZombiesTargetDownedNPC", false)
 end

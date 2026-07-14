@@ -51,6 +51,12 @@ function Health.Ensure(record)
     if record.health.reviveProtectionUntil == nil then
         record.health.reviveProtectionUntil = 0
     end
+    if type(record.health.body) ~= "table" then
+        record.health.body = {
+            wounds = {}, bleedingRate = 0, openWoundCount = 0,
+            bandagedWoundCount = 0, lastBleedAt = 0,
+        }
+    end
     return record.health
 end
 
@@ -190,6 +196,9 @@ function Health.Revive(record, zombie)
     health.reviveUntil = 0
     health.reviveProtectionUntil = now + Const.REVIVE_PROTECTION_MS
     health.recentDamageUntil = now + Const.RECENT_DAMAGE_SHOW_MS
+    if PNC.NPCWounds and PNC.NPCWounds.BandageAll then
+        PNC.NPCWounds.BandageAll(record, now)
+    end
     record.alive = true
     record.runtime.forceLive = false
     record.runtime.target = nil
@@ -214,6 +223,9 @@ function Health.Recover(record, zombie)
     health.reviveUntil = 0
     health.reviveProtectionUntil = 0
     health.recentDamageUntil = 0
+    if PNC.NPCWounds and PNC.NPCWounds.Clear then
+        PNC.NPCWounds.Clear(record)
+    end
     record.alive = true
     record.runtime.forceLive = false
     record.runtime.target = nil
@@ -235,6 +247,8 @@ function Health.CanRevive(record)
     return record
         and record.alive ~= false
         and health.state == "incapacitated"
+        and not (PNC.NPCWounds and PNC.NPCWounds.HasActiveInfection
+            and PNC.NPCWounds.HasActiveInfection(record))
 end
 
 function Health.ApplyDamageToPlayer(player, amount)
@@ -308,6 +322,16 @@ function Health.ApplyDamage(record, zombie, damageEvent)
     end
 
     if health.state == "incapacitated" then
+        if PNC.NPCWounds and PNC.NPCWounds.HasActiveInfection
+            and PNC.NPCWounds.HasActiveInfection(record)
+        then
+            PNC.NPCWounds.TriggerInfectionDeath(
+                record,
+                zombie,
+                damageEvent and damageEvent.type or "zombie_infection"
+            )
+            return true
+        end
         if (now - (tonumber(health.downedAt) or 0)) < Const.INCAPACITATED_GRACE_MS then
             return false
         end
@@ -321,6 +345,12 @@ function Health.ApplyDamage(record, zombie, damageEvent)
     end
 
     if health.current <= 0 then
+        if PNC.NPCWounds and PNC.NPCWounds.HasActiveInfection
+            and PNC.NPCWounds.HasActiveInfection(record)
+        then
+            PNC.NPCWounds.TriggerInfectionDeath(record, zombie, "zombie_infection")
+            return true
+        end
         return Health.EnterIncapacitated(record, zombie, damageEvent and damageEvent.type or "damage")
     end
 
@@ -331,6 +361,10 @@ function Health.Update(record, zombie, now)
     local health = Health.Ensure(record)
     if record.alive == false then
         return
+    end
+    if PNC.NPCWounds and PNC.NPCWounds.Update then
+        PNC.NPCWounds.Update(record, zombie, now)
+        if record.alive == false then return end
     end
     if health.state == "incapacitated" then
         applyIncapacitatedLiveState(record, zombie)

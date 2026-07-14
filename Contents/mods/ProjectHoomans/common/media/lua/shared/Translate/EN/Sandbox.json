@@ -1,6 +1,24 @@
 {
     "Sandbox_ProjectHoomans": "ProjectHoomans",
 
+    "Sandbox_ProjectHoomans.NPCZombieWoundChance": "NPC Zombie Wound Chance (%)",
+    "Sandbox_ProjectHoomans.NPCZombieWoundChance_tooltip": "Base chance that a zombie lunge creates a wound. Armor on the struck body part reduces the final chance; failed rolls are parried.",
+
+    "Sandbox_ProjectHoomans.NPCZombieBiteChance": "NPC Bite Chance per Wound (%)",
+    "Sandbox_ProjectHoomans.NPCZombieBiteChance_tooltip": "Chance that a successful zombie wound is a bite.",
+
+    "Sandbox_ProjectHoomans.NPCZombieLacerationChance": "NPC Laceration Chance per Wound (%)",
+    "Sandbox_ProjectHoomans.NPCZombieLacerationChance_tooltip": "Chance that a successful non-bite result becomes a laceration; remaining wounds are scratches.",
+
+    "Sandbox_ProjectHoomans.NPCZombieInfection": "NPC Knox Infection and Reanimation",
+    "Sandbox_ProjectHoomans.NPCZombieInfection_tooltip": "Allows bites to infect NPCs, cause terminal infection, and reanimate the corpse as an ordinary zombie.",
+
+    "Sandbox_ProjectHoomans.NPCInfectionMortalityHours": "NPC Infection Mortality (Game Hours)",
+    "Sandbox_ProjectHoomans.NPCInfectionMortalityHours_tooltip": "In-game hours between an infected bite and death.",
+
+    "Sandbox_ProjectHoomans.NPCReanimationHours": "NPC Reanimation Delay (Game Hours)",
+    "Sandbox_ProjectHoomans.NPCReanimationHours_tooltip": "In-game hours between infection death and corpse reanimation.",
+
     "Sandbox_ProjectHoomans.EnableWeaponDamage": "Weapon-Based NPC Damage",
     "Sandbox_ProjectHoomans.EnableWeaponDamage_tooltip": "Uses each NPC's equipped weapon damage and combat skill. Disable to use legacy combat-profile damage values.",
 

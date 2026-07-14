@@ -582,6 +582,21 @@ function Client.SendRevive(npcId)
     return PNC.Revive and PNC.Revive.Try and PNC.Revive.Try(player, npcId) or false
 end
 
+function Client.SendBandage(npcId, partId)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not player or not npcId or not partId then return false end
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not sendClientCommand then return false end
+        sendClientCommand(player, Const.MODULE, Const.CMD_BANDAGE, {
+            id = npcId,
+            partId = tostring(partId),
+        })
+        return true
+    end
+    return PNC.Treatment and PNC.Treatment.TryBandage
+        and PNC.Treatment.TryBandage(player, npcId, partId) or false
+end
+
 local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, test)
     local subMenu
     local square

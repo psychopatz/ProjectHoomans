@@ -49,14 +49,19 @@ function Lifecycle.AuditLoadedBodies(now, force)
                 record = npcId and reg.Get(npcId) or nil
                 if kind == "corpse" and record and record.alive == false then
                     stats.corpses = stats.corpses + 1
-                    record.runtime = record.runtime or {}
-                    record.runtime.corpseRecoveryAttempts = (tonumber(record.runtime.corpseRecoveryAttempts) or 0) + 1
-                    if record.runtime.corpseRecoveryAttempts <= (tonumber(Const.CORPSE_REANIMATE_RETRY_MAX) or 3) then
-                        Lifecycle.CreateInertCorpse(record, zombie, "corpse_reanimated")
+                    local infection = record.health and record.health.body and record.health.body.infection or nil
+                    if infection and infection.fatal == true and Lifecycle.ReleaseReanimatedNPC then
+                        Lifecycle.ReleaseReanimatedNPC(record, zombie)
                     else
-                        Internal.removeZombie(zombie)
-                        Internal.ensureRuntime(record).corpseState = "missing"
-                        Internal.mark(record, "corpse", "stale_cleaned", "corpse_recovery_capped", "reanimation_retry_limit")
+                        record.runtime = record.runtime or {}
+                        record.runtime.corpseRecoveryAttempts = (tonumber(record.runtime.corpseRecoveryAttempts) or 0) + 1
+                        if record.runtime.corpseRecoveryAttempts <= (tonumber(Const.CORPSE_REANIMATE_RETRY_MAX) or 3) then
+                            Lifecycle.CreateInertCorpse(record, zombie, "corpse_reanimated")
+                        else
+                            Internal.removeZombie(zombie)
+                            Internal.ensureRuntime(record).corpseState = "missing"
+                            Internal.mark(record, "corpse", "stale_cleaned", "corpse_recovery_capped", "reanimation_retry_limit")
+                        end
                     end
                 elseif kind == "live"
                     and record

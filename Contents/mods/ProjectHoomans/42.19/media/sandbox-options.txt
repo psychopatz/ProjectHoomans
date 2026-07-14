@@ -8,6 +8,64 @@ option ProjectHoomans.ZombiesTargetDownedNPC
     translation = ProjectHoomans.ZombiesTargetDownedNPC,
 }
 
+option ProjectHoomans.NPCZombieWoundChance
+{
+    type = double,
+    default = 45.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieWoundChance,
+}
+
+option ProjectHoomans.NPCZombieBiteChance
+{
+    type = double,
+    default = 20.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieBiteChance,
+}
+
+option ProjectHoomans.NPCZombieLacerationChance
+{
+    type = double,
+    default = 30.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieLacerationChance,
+}
+
+option ProjectHoomans.NPCZombieInfection
+{
+    type = boolean,
+    default = false,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieInfection,
+}
+
+option ProjectHoomans.NPCInfectionMortalityHours
+{
+    type = double,
+    default = 48.0,
+    min = 1.0,
+    max = 168.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCInfectionMortalityHours,
+}
+
+option ProjectHoomans.NPCReanimationHours
+{
+    type = double,
+    default = 1.0,
+    min = 0.05,
+    max = 24.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCReanimationHours,
+}
+
 option ProjectHoomans.EnableWeaponDamage
 {
     type = boolean,

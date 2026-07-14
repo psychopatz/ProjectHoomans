@@ -214,6 +214,13 @@ function Types.NewRecord(definition)
             lastDamageAt = 0,
             downedAt = 0,
             recentDamageUntil = 0,
+            body = {
+                wounds = {},
+                bleedingRate = 0,
+                openWoundCount = 0,
+                bandagedWoundCount = 0,
+                lastBleedAt = 0,
+            },
         },
         presenceState = Const.PRESENCE_ABSTRACT,
         alive = true,

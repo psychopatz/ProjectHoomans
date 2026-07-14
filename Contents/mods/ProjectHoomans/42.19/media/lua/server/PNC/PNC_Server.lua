@@ -32,6 +32,7 @@ local Types = PNC.Types
 local Animation = PNC.Animation
 local BodyLifecycle = PNC.BodyLifecycle
 local PlayerDamage = PNC.PlayerDamage
+local Treatment = PNC.Treatment
 local buildDebugRoster
 
 local function canUseDebug(player)
@@ -289,6 +290,13 @@ local function onClientCommand(module, command, player, args)
     if command == Const.CMD_REVIVE and args and args.id then
         if PNC.Revive and PNC.Revive.Try then
             PNC.Revive.Try(player, args.id)
+        end
+        return
+    end
+
+    if command == Const.CMD_BANDAGE and args and args.id and args.partId then
+        if Treatment and Treatment.TryBandage then
+            Treatment.TryBandage(player, args.id, args.partId)
         end
         return
     end

@@ -7,7 +7,7 @@ Const.MOD_ID = "ProjectHoomans"
 Const.MODULE = "PNC"
 Const.MODDATA_KEY = "PNC_Core_Global"
 Const.MODDATA_NPC_PREFIX = "PNC_NPC_"
-Const.PERSISTENCE_VERSION = 5
+Const.PERSISTENCE_VERSION = 6
 Const.STORAGE_LAYOUT_VERSION = 2
 Const.GENERATOR_VERSION = 1
 
@@ -26,6 +26,7 @@ Const.CMD_ZOMBIE_REACTION = "ZombieReaction"
 Const.CMD_ZOMBIE_BITE = "ZombieBite"
 Const.CMD_PLAYER_WEAPON_HIT = "PlayerWeaponHit"
 Const.CMD_REVIVE = "ReviveNPC"
+Const.CMD_BANDAGE = "BandageNPC"
 Const.CMD_DEBUG = "DebugCommand"
 Const.CMD_DEBUG_ROSTER_REQUEST = "RequestDebugRoster"
 Const.CMD_DEBUG_ROSTER = "DebugRoster"
@@ -89,6 +90,14 @@ Const.REVIVE_PROTECTION_MS = 3000
 Const.REVIVE_BANDAGE_TYPE = "Base.Bandage"
 Const.REVIVE_BANDAGE_COUNT = 5
 Const.REVIVE_RANGE = 3.0
+Const.BANDAGE_TYPE = "Base.Bandage"
+Const.BANDAGE_TYPES = {
+    "Base.AlcoholBandage", "Base.Bandage",
+    "Base.AlcoholRippedSheets", "Base.RippedSheets",
+}
+Const.BANDAGE_RANGE = 3.0
+Const.WOUND_BLEED_UPDATE_MS = 1000
+Const.WOUND_DIRTY_FLUSH_MS = 5000
 Const.INCAP_SHOVE_RANGE = 1.15
 Const.INCAP_SHOVE_COOLDOWN_MS = 1200
 

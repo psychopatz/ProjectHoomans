@@ -30,6 +30,7 @@ local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local Profiles = PNC.VisualProfiles
 local MotionHints = PNC.MotionHints
+local Wounds = PNC.NPCWounds
 local ServerState = PNC.Network.ServerState
 
 function PNC.Network.ResetServerState()
@@ -262,6 +263,7 @@ function Network.BuildSnapshot(record)
     local combat
     local visualState
     local appearance
+    local bodyHealth
     aiState, inCombat = resolveAIState(record)
     canRevive = PNC.Health and PNC.Health.CanRevive and PNC.Health.CanRevive(record) or false
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
@@ -271,6 +273,7 @@ function Network.BuildSnapshot(record)
     combat = buildCombatSummary(record, equipmentInfo)
     visualState = buildVisualState(record)
     appearance = Profiles and Profiles.RollAppearance and Profiles.RollAppearance(record) or nil
+    bodyHealth = Wounds and Wounds.BuildSnapshot and Wounds.BuildSnapshot(record) or nil
     return {
         interestDetailed = true,
         id = record.id,
@@ -299,6 +302,7 @@ function Network.BuildSnapshot(record)
         canRevive = canRevive,
         reviveUntil = record.health and record.health.reviveUntil or 0,
         recentDamageUntil = record.health and record.health.recentDamageUntil or 0,
+        bodyHealth = bodyHealth,
         staminaCurrent = staminaInfo.current,
         staminaMax = staminaInfo.max,
         staminaState = staminaInfo.state,

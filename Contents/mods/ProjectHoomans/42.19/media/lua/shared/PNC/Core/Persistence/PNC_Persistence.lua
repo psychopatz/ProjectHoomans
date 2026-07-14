@@ -153,6 +153,48 @@ local function sanitizeOrderSpec(orderSpec, record)
     return spec
 end
 
+local function sanitizeHealthBody(rawBody)
+    local source = type(rawBody) == "table" and rawBody or {}
+    local wounds = {}
+    local partId
+    local wound
+    for partId, wound in pairs(type(source.wounds) == "table" and source.wounds or {}) do
+        if type(wound) == "table" then
+            partId = tostring(wound.partId or partId)
+            wounds[partId] = {
+                partId = partId,
+                type = tostring(wound.type or "scratch"),
+                severity = math.max(0, normalizeNumber(wound.severity, 0)),
+                bleedingRate = math.max(0, normalizeNumber(wound.bleedingRate, 0)),
+                bandaged = wound.bandaged == true,
+                createdAt = normalizeNumber(wound.createdAt, 0),
+                bandagedAt = normalizeNumber(wound.bandagedAt, 0),
+                healAtWorldHour = normalizeNumber(wound.healAtWorldHour, 0),
+            }
+        end
+    end
+    local infectionSource = type(source.infection) == "table" and source.infection or nil
+    local infection = infectionSource and {
+        active = infectionSource.active == true,
+        fatal = infectionSource.fatal == true,
+        pendingFatal = infectionSource.pendingFatal == true,
+        sourcePart = normalizeString(infectionSource.sourcePart),
+        infectedAtWorldHour = normalizeNumber(infectionSource.infectedAtWorldHour, 0),
+        fatalAtWorldHour = normalizeNumber(infectionSource.fatalAtWorldHour, 0),
+        reanimateAtWorldHour = normalizeNumber(infectionSource.reanimateAtWorldHour, 0),
+    } or nil
+    return {
+        wounds = wounds,
+        infection = infection,
+        bleedingRate = math.max(0, normalizeNumber(source.bleedingRate, 0)),
+        openWoundCount = math.max(0, math.floor(normalizeNumber(source.openWoundCount, 0))),
+        bandagedWoundCount = math.max(0, math.floor(normalizeNumber(source.bandagedWoundCount, 0))),
+        -- Wall-clock values do not survive a process restart. Bleeding resumes
+        -- from the next health tick instead of charging an offline time jump.
+        lastBleedAt = 0,
+    }
+end
+
 local function sanitizeHealth(rawHealth, fallbackMax)
     local maxValue = math.max(1, normalizeNumber(rawHealth and rawHealth.max, fallbackMax or Const.DEFAULT_HP_MAX))
     local currentValue = Core.Clamp(normalizeNumber(rawHealth and rawHealth.current, maxValue), 0, maxValue)
@@ -165,6 +207,8 @@ local function sanitizeHealth(rawHealth, fallbackMax)
         recentDamageUntil = normalizeNumber(rawHealth and rawHealth.recentDamageUntil, 0),
         reviveUntil = normalizeNumber(rawHealth and rawHealth.reviveUntil, 0),
         reviveProtectionUntil = normalizeNumber(rawHealth and rawHealth.reviveProtectionUntil, 0),
+        incapacitatedReason = normalizeString(rawHealth and rawHealth.incapacitatedReason),
+        body = sanitizeHealthBody(rawHealth and rawHealth.body),
     }
 end
 

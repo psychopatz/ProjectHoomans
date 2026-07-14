@@ -141,6 +141,9 @@ function Presence.Materialize(record, reason)
     record.presenceState = Const.PRESENCE_LIVE
     Registry.RegisterLiveZombie(record, zombie)
     Health.Update(record, zombie, Core.Now())
+    if record.alive == false then
+        return nil
+    end
     Animation.Apply(zombie, record, "Idle")
 
     if net and net.BroadcastRecord then
