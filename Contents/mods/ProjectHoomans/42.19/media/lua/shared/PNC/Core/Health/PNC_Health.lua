@@ -160,6 +160,12 @@ function Health.EnterIncapacitated(record, zombie, reason)
         PathService.Reset(zombie, record)
     end
     applyIncapacitatedLiveState(record, zombie)
+    -- Bite impact is pumped after the normal NPC scheduler pass. Queue a near
+    -- follow-up so a hit reaction that settles later in this frame is repaired
+    -- immediately by the idempotent downed-state maintenance path.
+    if PNC.Scheduler and PNC.Scheduler.Schedule then
+        PNC.Scheduler.Schedule(record, now + 50)
+    end
     if zombie
         and not Settings.CanZombieTargetRecord(record)
         and PNC.ZombieAggro

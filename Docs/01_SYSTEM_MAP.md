@@ -35,6 +35,7 @@
 - `PNC_Behavior_Roaming`: faction-neutral, enemy-aware roaming with registered roam modes
 - `PNC_Behavior_Hostile`: hunt and direct engage job handlers
 - `PNC_Behavior_Incapacitated`: crawl and downed shove handling
+- `PNC_BodyLifecycle`: stable facade for live-body leases, corpse conversion, loaded-world audits, and diagnostics; implementation ownership is split under `Presence/PNC_BodyLifecycle/`
 - `PNC_Presence`: live and abstract transitions, body cleanup
 - `PNC_Scheduler`: cadence rules
 - `PNC_Network`: roster snapshots, live presence snapshots, and on-demand character payloads
@@ -52,6 +53,7 @@
 - weapon-only changes use `PNC.Equipment.ApplyHands`; full equipment application is reserved for worn or attached-item changes so existing clothing tints are preserved
 - modules required before one of their collaborators must resolve that collaborator from `PNC` at call time; do not capture a not-yet-loaded table in a file-local variable
 - multi-job behavior entry points dispatch to one handler per job so follow, guard, and patrol control flow remains independently testable
+- body-lifecycle callers use the public `PNC.BodyLifecycle` methods; new engine operations, corpse policies, and audit rules belong in their focused internal module instead of the facade
 
 ## Server
 - `PNC_Server`: authority tick, full sync, debug commands

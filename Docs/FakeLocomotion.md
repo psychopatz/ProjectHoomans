@@ -65,6 +65,17 @@ underlying zombie AI disabled with `setUseless(true)`.
   every tick. Because the engine rejects `walktoward` for a useless zombie, PNC
   locomotion nodes also exist in the stable `idle` animation tree. This keeps
   leg playback independent from vanilla zombie transport ownership.
+- Incapacitated crawling is a visual PNC locomotion profile. It keeps vanilla
+  crawler, on-floor, and fall-on-front flags disabled so the body remains in
+  the animation tree containing `PNC_Crawl` while fake steps move it.
+- Downed animation maintenance also releases stale bump, stagger, and hit
+  reaction ownership. This is repeated safely on server and clients because a
+  damage callback can finish changing action state after custom HP reaches the
+  incapacitated state.
+- Stagger recovery clears the Java `bStaggerBack` latch and expires the action
+  timer directly. A legacy `changeState(ZombieIdleState)` call does not change
+  animation ActionContext and actually installs a fresh delay, which previously
+  made a repeatedly attacked crawler glide until the delay could finally expire.
 
 ## Combat Override Notes
 

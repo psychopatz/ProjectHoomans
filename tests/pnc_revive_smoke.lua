@@ -4,6 +4,7 @@ local records = {}
 local bodies = {}
 local broadcasts = 0
 local clearedAggro = 0
+local scheduledAt
 
 PNC = {
     Core = {
@@ -44,6 +45,9 @@ PNC = {
     },
     ZombieAggro = {
         ClearForNPCBody = function() clearedAggro = clearedAggro + 1 end,
+    },
+    Scheduler = {
+        Schedule = function(_, dueAt) scheduledAt = dueAt end,
     },
 }
 
@@ -176,6 +180,37 @@ assertEqual(reviveRecord.health.current, 10, "protected revive health")
 now = now + PNC.Const.REVIVE_PROTECTION_MS + 1
 PNC.Health.Update(reviveRecord, bodies[reviveRecord.id], now)
 assertEqual(PNC.Sandbox.CanZombieTargetRecord(reviveRecord), true, "recovery protection expires")
+
+local transitionAnimations = 0
+local transitionResets = 0
+local transitionRecord = {
+    id = "transition",
+    alive = true,
+    presenceState = "live",
+    runtime = {},
+    health = {
+        current = 5,
+        max = 100,
+        state = "normal",
+        recentDamageUntil = 0,
+        reviveProtectionUntil = 0,
+    },
+}
+PNC.PathService = {
+    Reset = function() transitionResets = transitionResets + 1 end,
+}
+PNC.Animation = {
+    ApplyDowned = function() transitionAnimations = transitionAnimations + 1 end,
+}
+assertEqual(PNC.Health.ApplyDamage(transitionRecord, makeBody(0, 0, 0), {
+    amount = 10,
+    attackerKind = "player",
+    type = "transition_test",
+}), true, "damage enters incapacitation")
+assertEqual(transitionRecord.health.state, "incapacitated", "transition health state")
+assertEqual(transitionResets, 1, "transition resets path ownership")
+assertEqual(transitionAnimations, 1, "transition applies downed state immediately")
+assertEqual(scheduledAt, now + 50, "transition schedules downed reassertion")
 
 local halted = 0
 local downedAnimations = 0

@@ -14,6 +14,9 @@ function Scheduler.GetCadence(record)
     if record.presenceState == Const.PRESENCE_ABSTRACT then
         return Const.TICK_ABSTRACT_MS
     end
+    if record.health and record.health.state == "incapacitated" then
+        return math.min(Const.TICK_LIVE_WARM_MS, 100)
+    end
     if record.runtime and record.runtime.attackAction then
         return 50
     end

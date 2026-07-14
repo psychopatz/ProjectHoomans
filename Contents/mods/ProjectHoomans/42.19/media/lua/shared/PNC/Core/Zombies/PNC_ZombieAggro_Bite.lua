@@ -151,7 +151,8 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
     if Internal.canZombieAttack and not Internal.canZombieAttack(zombie, now) then
         return false
     end
-    bumpType = ((npcBody.isProne and npcBody:isProne())
+    bumpType = ((record.health and record.health.state == "incapacitated")
+        or (npcBody.isProne and npcBody:isProne())
         or (npcBody.isCrawling and npcBody:isCrawling()))
         and "BiteLow" or "Bite"
     if npcBody.setZombiesDontAttack then

@@ -93,11 +93,12 @@ local function setLocomotionVars(zombie, profile, moving, animSpeed)
         zombie:setVariable("MovementSpeed", resolvedAnimSpeed)
         zombie:setVariable("WalkSpeed", movingNow and math.max(0.1, resolvedAnimSpeed) or 0.0)
         zombie:setVariable("RunSpeed", movingNow and math.max(0.1, resolvedAnimSpeed) or 0.0)
-        if crawlingNow ~= true or movingNow ~= true then
-            zombie:setVariable("bBecomeCrawler", false)
-            zombie:setVariable("bCrawling", false)
-            zombie:setVariable("FallOnFront", false)
-        end
+        -- PNC crawl is a visual locomotion profile, never the vanilla zombie
+        -- crawler state. The latter changes the engine action-state tree and
+        -- prevents the PNC idle/walktoward crawl nodes from being selected.
+        zombie:setVariable("bBecomeCrawler", false)
+        zombie:setVariable("bCrawling", false)
+        zombie:setVariable("FallOnFront", false)
     end
     if zombie.setMoving then
         zombie:setMoving(movingNow)
@@ -125,6 +126,7 @@ end
 
 function Animation.ApplyLiveSetup(zombie, record)
     local descriptor
+    local releasedDamageReaction = false
     if not zombie or not record then
         return
     end
@@ -180,7 +182,14 @@ function Animation.ApplyLiveSetup(zombie, record)
     if LiveBodyControl and LiveBodyControl.ApplyHumanizedBodyFlags then
         LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
     end
-    if zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
+    if LiveBodyControl and LiveBodyControl.ReleaseDamageReaction then
+        releasedDamageReaction = LiveBodyControl.ReleaseDamageReaction(zombie)
+    end
+    if not releasedDamageReaction
+        and zombie.changeState
+        and ZombieIdleState
+        and ZombieIdleState.instance
+    then
         zombie:changeState(ZombieIdleState.instance())
     end
     if LiveBodyControl and LiveBodyControl.StopEmitter then
@@ -229,29 +238,46 @@ function Animation.ApplyDowned(zombie, record, movingOrProfile)
     if not zombie then
         return
     end
-    zombie:setVariable("PNC", true)
-    zombie:setVariable("PNCState", tostring(record and (record.activeBehavior or record.activeJob) or "Incapacitated"))
-    zombie:setVariable("PNCAnim", moving and "Crawl" or "Downed")
+    if LiveBodyControl and LiveBodyControl.ReleaseDamageReaction then
+        LiveBodyControl.ReleaseDamageReaction(zombie)
+    end
+    setPNCStateVars(zombie, record, moving and "Crawl" or "Downed")
+    zombie:setVariable("PNCActor", true)
     zombie:setVariable("PNCMoveAnim", moving and "Crawl" or "")
-    zombie:setVariable("PNCWalkType", moving and "Crawl" or "")
+    -- Fake crawling must stay in the PNC idle locomotion tree. Enabling the
+    -- vanilla crawler/floor flags moves the zombie into its on-ground action
+    -- state, where controlled position steps continue but PNC_Crawl cannot be
+    -- selected, producing a static prone body that glides across the floor.
+    zombie:setVariable("PNCWalkType", "Crawl")
+    zombie:setVariable("PNCEngineWalkType", "")
+    zombie:setVariable("PNCIsCrawling", true)
+    zombie:setVariable("PNCMoving", moving == true)
     zombie:setVariable("WalkType", "")
     zombie:setVariable("PNCAnimSpeed", animSpeed)
-    zombie:setVariable("bBecomeCrawler", true)
-    zombie:setVariable("bCrawling", true)
-    zombie:setVariable("FallOnFront", true)
+    zombie:setVariable("bBecomeCrawler", false)
+    zombie:setVariable("bCrawling", false)
+    zombie:setVariable("FallOnFront", false)
     zombie:setVariable("bMoving", moving == true)
     zombie:setVariable("isMoving", moving == true)
+    zombie:setVariable("Speed", moving and animSpeed or 0.0)
+    zombie:setVariable("MovementSpeed", moving and animSpeed or 0.0)
     if zombie.setCrawler then
-        zombie:setCrawler(true)
+        zombie:setCrawler(false)
     end
     if zombie.setOnFloor then
-        zombie:setOnFloor(true)
+        zombie:setOnFloor(false)
     end
     if zombie.setFallOnFront then
-        zombie:setFallOnFront(true)
+        zombie:setFallOnFront(false)
     end
     if zombie.setCanWalk then
         zombie:setCanWalk(true)
+    end
+    if zombie.setMoving then
+        zombie:setMoving(moving == true)
+    end
+    if zombie.setSneaking then
+        zombie:setSneaking(false)
     end
     if zombie.setRunning then
         zombie:setRunning(false)

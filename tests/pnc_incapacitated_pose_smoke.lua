@@ -10,14 +10,18 @@ local variables = {}
 local crawler = false
 local onFloor = false
 local fallOnFront = false
+local actionState = "staggerback"
+local staggerBack = true
+local stateEventDelay = 700
+local legacyIdleResets = 0
+local finishingEvents = 0
+
+ZombieIdleState = {
+    instance = function() return "idle_state" end,
+}
 
 PNC = {
     Core = { Now = function() return 1000 end },
-    LiveBodyControl = {
-        SyncLocomotionState = function()
-            error("generic locomotion sync ran for an incapacitated body")
-        end,
-    },
     LocomotionProfiles = {
         GetBaseProfile = function(mode)
             return {
@@ -32,10 +36,48 @@ PNC = {
     },
 }
 
+dofile(ROOT .. "Pathing/PNC_LiveBodyControl.lua")
+PNC.LiveBodyControl.SyncLocomotionState = function()
+    error("generic locomotion sync ran for an incapacitated body")
+end
 dofile(ROOT .. "Visuals/PNC_Animation.lua")
 
+local function advanceActionContext()
+    if string.find(actionState, "staggerback", 1, true) == 1
+        and staggerBack == false
+        and stateEventDelay <= 0
+    then
+        actionState = "idle"
+    end
+end
+
 local zombie = {
+    getActionStateName = function() return actionState end,
+    getModData = function() return {} end,
+    changeState = function(_, state)
+        assertEqual(state, "idle_state", "downed idle transition state")
+        -- This is the legacy AI state machine, not animation ActionContext.
+        -- ZombieIdleState.enter() installs a new random state-event delay.
+        stateEventDelay = 600
+        legacyIdleResets = legacyIdleResets + 1
+    end,
     setVariable = function(_, key, value) variables[key] = value end,
+    setBumpDone = function() end,
+    setBumpStaggered = function() end,
+    setBumpFall = function() end,
+    setBumpType = function() end,
+    setHitReaction = function() end,
+    setStaggerBack = function(_, value) staggerBack = value == true end,
+    setStateEventDelayTimer = function(_, value) stateEventDelay = value end,
+    reportEvent = function(_, event)
+        if event == "ActiveAnimFinishing" then
+            finishingEvents = finishingEvents + 1
+            actionState = "idle"
+        end
+    end,
+    setTarget = function() end,
+    clearAggroList = function() end,
+    setAttackedBy = function() end,
     setCrawler = function(_, value) crawler = value == true end,
     setOnFloor = function(_, value) onFloor = value == true end,
     setFallOnFront = function(_, value) fallOnFront = value == true end,
@@ -54,10 +96,17 @@ local stationary = {
 }
 
 PNC.Animation.SyncLocomotion(zombie, stationary)
-assertEqual(crawler, true, "stationary incapacitated crawler flag")
-assertEqual(onFloor, true, "stationary incapacitated floor flag")
-assertEqual(fallOnFront, true, "stationary incapacitated front flag")
-assertEqual(variables.bCrawling, true, "stationary incapacitated animation crawler variable")
+assertEqual(staggerBack, false, "incapacitation clears stagger latch")
+assertEqual(stateEventDelay, 0, "incapacitation expires stagger action timer")
+assertEqual(legacyIdleResets, 0, "incapacitation avoids legacy idle timer reset")
+advanceActionContext()
+assertEqual(actionState, "idle", "stale stagger exits on next ActionContext update")
+assertEqual(crawler, false, "stationary incapacitated avoids vanilla crawler state")
+assertEqual(onFloor, false, "stationary incapacitated avoids vanilla floor state")
+assertEqual(fallOnFront, false, "stationary incapacitated avoids vanilla front state")
+assertEqual(variables.bCrawling, false, "stationary incapacitated vanilla crawler variable")
+assertEqual(variables.PNCActor, true, "stationary incapacitated custom animation actor")
+assertEqual(variables.PNCWalkType, "Crawl", "stationary incapacitated idle crawl selector")
 assertEqual(variables.PNCAnim, "Downed", "stationary incapacitated animation")
 assertEqual(variables.bMoving, false, "stationary incapacitated movement variable")
 
@@ -65,6 +114,9 @@ variables = {}
 crawler = false
 onFloor = false
 fallOnFront = false
+actionState = "hitreaction"
+staggerBack = true
+stateEventDelay = 700
 local moving = {
     health = { state = "incapacitated" },
     runtime = {
@@ -83,9 +135,17 @@ local moving = {
 }
 
 PNC.Animation.SyncLocomotion(zombie, moving)
-assertEqual(crawler, true, "moving incapacitated crawler flag")
-assertEqual(onFloor, true, "moving incapacitated floor flag")
+assertEqual(actionState, "idle", "moving crawl releases repeated hit reaction")
+assertEqual(finishingEvents, 1, "moving crawl reports hit-reaction completion")
+assertEqual(staggerBack, false, "moving crawl clears pending stagger latch")
+assertEqual(legacyIdleResets, 0, "moving crawl avoids legacy idle timer reset")
+assertEqual(crawler, false, "moving incapacitated avoids vanilla crawler state")
+assertEqual(onFloor, false, "moving incapacitated avoids vanilla floor state")
+assertEqual(fallOnFront, false, "moving incapacitated avoids vanilla front state")
+assertEqual(variables.PNCActor, true, "moving incapacitated custom animation actor")
 assertEqual(variables.PNCAnim, "Crawl", "moving incapacitated animation")
+assertEqual(variables.PNCMoveAnim, "Crawl", "moving incapacitated crawl-cycle selector")
+assertEqual(variables.PNCWalkType, "Crawl", "moving incapacitated crawl family selector")
 assertEqual(variables.bMoving, true, "moving incapacitated movement variable")
 
 -- Remote clients receive the same snapshot many times while the engine may
@@ -128,19 +188,44 @@ dofile("Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/PNC_ClientPresen
 PNC.ClientPresenceSync.BodyByOnlineID["77"] = zombie
 
 PNC.ClientPresenceSync.OnTick()
-assertEqual(crawler, true, "remote client initial crawler flag")
-assertEqual(onFloor, true, "remote client initial floor flag")
+assertEqual(crawler, false, "remote client avoids vanilla crawler state")
+assertEqual(onFloor, false, "remote client avoids vanilla floor state")
 
 crawler = false
 onFloor = false
 fallOnFront = false
-variables.bCrawling = false
-variables.FallOnFront = false
+actionState = "staggerback"
+staggerBack = true
+stateEventDelay = 700
+variables.PNCActor = false
+variables.PNCWalkType = ""
+local legacyResetsBeforeRemoteRepair = legacyIdleResets
 
 PNC.ClientPresenceSync.OnTick()
-assertEqual(crawler, true, "remote client repeated crawler flag")
-assertEqual(onFloor, true, "remote client repeated floor flag")
-assertEqual(fallOnFront, true, "remote client repeated front flag")
-assertEqual(variables.bCrawling, true, "remote client repeated animation crawler variable")
+assertEqual(staggerBack, false, "remote client clears repeated stagger latch")
+assertEqual(stateEventDelay, 0, "remote client expires repeated stagger timer")
+assertEqual(legacyIdleResets, legacyResetsBeforeRemoteRepair, "remote client avoids legacy idle timer reset")
+advanceActionContext()
+assertEqual(actionState, "idle", "remote client releases stale hit reaction")
+assertEqual(crawler, false, "remote client repeated vanilla crawler state")
+assertEqual(onFloor, false, "remote client repeated vanilla floor state")
+assertEqual(fallOnFront, false, "remote client repeated vanilla front state")
+assertEqual(variables.bCrawling, false, "remote client repeated vanilla crawler variable")
+assertEqual(variables.PNCActor, true, "remote client restores custom animation actor")
+assertEqual(variables.PNCWalkType, "Crawl", "remote client restores idle crawl selector")
+
+-- The authoritative path tick sees the same state after late damage callbacks.
+-- Its suppression path must use the ActionContext exit condition as well.
+actionState = "staggerback"
+staggerBack = true
+stateEventDelay = 900
+local suppressed, suppressedState = PNC.LiveBodyControl.SuppressZombieState(zombie, {}, 2000)
+assertEqual(suppressed, true, "path suppression recognizes staggerback")
+assertEqual(suppressedState, "staggerback", "path suppression reports staggerback")
+assertEqual(staggerBack, false, "path suppression clears stagger latch")
+assertEqual(stateEventDelay, 0, "path suppression expires stagger timer")
+assertEqual(legacyIdleResets, legacyResetsBeforeRemoteRepair, "path suppression avoids legacy idle timer reset")
+advanceActionContext()
+assertEqual(actionState, "idle", "path-suppressed stagger exits next ActionContext update")
 
 print("pnc_incapacitated_pose_smoke: ok")

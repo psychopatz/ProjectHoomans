@@ -39,4 +39,11 @@ local found = false
 for i = 1, #due do found = found or due[i] == hot end
 assert(found, "hot record did not retain 50ms cadence")
 
+local downed = {
+    presenceState = "live",
+    health = { state = "incapacitated" },
+    runtime = {},
+}
+assert(PNC.Scheduler.GetCadence(downed) <= 100, "incapacitated maintenance cadence is too slow")
+
 print("pnc_scheduler_smoke: ok")

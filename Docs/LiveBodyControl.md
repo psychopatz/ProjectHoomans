@@ -39,5 +39,10 @@ may read and update only lane fields needed for suppression throttles, such as
 - Clear target, aggro, crawler, fake-dead, floor, and alert state drift.
 - Silence moans and other emitter output on a throttle.
 - Force lunge/get-up/stagger style states back to idle when encountered.
+- Release damage reactions through their real ActionContext exit signals:
+  clear `bStaggerBack`, zero `stateEventDelayTimer` for stagger states, and
+  report `ActiveAnimFinishing` for hit-reaction states. The legacy AI
+  `changeState(ZombieIdleState)` API must not be used for these states because
+  entering that AI state resets the same delay timer used by ActionContext.
 - Support the fake-locomotion owner by keeping the embodied body in a stable
   non-zombie state before each server-authoritative movement step.

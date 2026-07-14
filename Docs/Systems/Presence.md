@@ -21,3 +21,22 @@
 - `Abstract` snapshots current position and calls:
   - `removeFromWorld()`
   - `removeFromSquare()`
+
+## Body Lifecycle Ownership
+
+`PNC_BodyLifecycle.lua` is a stable facade. Implementation modules under
+`Presence/PNC_BodyLifecycle/` own one lifecycle concern each:
+
+- `State`: record lifecycle state, cleanup notes, audit counters, and ID normalization
+- `World`: low-level zombie/corpse removal, combat cleanup, and corpse iteration
+- `CorpseItems`: canonical inventory and visual-item materialization
+- `CorpseWornItems`: worn-item capture, corpse transfer, and network transmission
+- `LiveBodies`: live-body stamping, leases, detachment, and removal transitions
+- `Corpses`: live-to-corpse conversion and corpse identity stamping
+- `CorpseAudit`: delayed corpse finalization and bounded corpse-record supervision
+- `Audit`: loaded-world live-body reconciliation and orphan/duplicate cleanup
+- `Diagnostics`: read-only lifecycle data for debug surfaces
+
+Callers should depend on the facade methods. New lifecycle behavior belongs in
+the narrowest internal module so corpse policy, engine operations, and audit
+rules can evolve without growing a central coordinator again.

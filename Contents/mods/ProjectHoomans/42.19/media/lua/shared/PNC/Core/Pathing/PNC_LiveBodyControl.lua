@@ -38,16 +38,21 @@ local IDLE_RESET_STATES = {
     ["climbwindow"] = true,
     ["lunge"] = true,
     ["pathfind"] = true,
-    ["staggerback"] = true,
-    ["staggerback-knockeddown"] = true,
     ["turnalerted"] = true,
 }
+
+local function isDamageReactionState(actionState)
+    actionState = string.lower(tostring(actionState or ""))
+    return string.find(actionState, "staggerback", 1, true) == 1
+        or string.find(actionState, "hitreaction", 1, true) == 1
+end
 
 function LiveBodyControl.IsSuppressedActionState(actionState)
     if not actionState or actionState == "" then
         return false
     end
-    return SUPPRESSED_STATES[string.lower(tostring(actionState))] == true
+    actionState = string.lower(tostring(actionState))
+    return SUPPRESSED_STATES[actionState] == true or isDamageReactionState(actionState)
 end
 
 function LiveBodyControl.GetActionStateName(zombie)
@@ -55,6 +60,78 @@ function LiveBodyControl.GetActionStateName(zombie)
         return ""
     end
     return string.lower(tostring(zombie:getActionStateName() or ""))
+end
+
+function LiveBodyControl.ReleaseDamageReaction(zombie, actionState)
+    local modData
+    local isDamageReaction
+    if not zombie then
+        return false
+    end
+    actionState = string.lower(tostring(actionState or LiveBodyControl.GetActionStateName(zombie) or ""))
+    isDamageReaction = isDamageReactionState(actionState)
+
+    -- IsoZombie:Hit raises this Java-side latch before ActionContext enters
+    -- staggerback. Clear it even if the transition has not become visible yet.
+    if zombie.setStaggerBack then
+        zombie:setStaggerBack(false)
+    end
+    if zombie.setHitReaction then
+        zombie:setHitReaction("")
+    end
+    if zombie.setBumpDone then
+        zombie:setBumpDone(true)
+    end
+    if zombie.setBumpStaggered then
+        zombie:setBumpStaggered(false)
+    end
+    if zombie.setBumpFall then
+        zombie:setBumpFall(false)
+    end
+    if zombie.setBumpType then
+        zombie:setBumpType("")
+    end
+    if zombie.setVariable then
+        zombie:setVariable("BumpDone", true)
+        zombie:setVariable("BumpAnimFinished", true)
+        zombie:setVariable("BumpFall", false)
+        zombie:setVariable("BumpFallType", "")
+    end
+
+    if isDamageReaction then
+        -- The staggerback ActionContext exits only when this timer reaches zero.
+        -- Calling changeState(ZombieIdleState) is not an ActionContext reset: its
+        -- enter() installs a new 400-1000 tick delay and can keep staggerback
+        -- alive indefinitely while maintenance repeats.
+        if string.find(actionState, "staggerback", 1, true) == 1
+            and zombie.setStateEventDelayTimer
+        then
+            zombie:setStateEventDelayTimer(0)
+        end
+        -- Hit-reaction states use this event, rather than the stagger timer, as
+        -- their normal transition back to idle.
+        if string.find(actionState, "hitreaction", 1, true) == 1
+            and zombie.reportEvent
+        then
+            zombie:reportEvent("ActiveAnimFinishing")
+        end
+    end
+
+    if zombie.setTarget then
+        zombie:setTarget(nil)
+    end
+    if zombie.clearAggroList then
+        zombie:clearAggroList()
+    end
+    if zombie.setAttackedBy then
+        zombie:setAttackedBy(nil)
+    end
+    modData = zombie.getModData and zombie:getModData() or nil
+    if modData then
+        modData.PNC_BumpReleasePending = nil
+        modData.PNC_BumpReleaseAt = nil
+    end
+    return isDamageReaction
 end
 
 function LiveBodyControl.SyncLocomotionState(zombie, moving)
@@ -171,6 +248,9 @@ function LiveBodyControl.SuppressZombieState(zombie, lane, now)
         return false, actionState
     end
     needsIdleReset = IDLE_RESET_STATES[actionState or ""] == true
+    if isDamageReactionState(actionState) then
+        LiveBodyControl.ReleaseDamageReaction(zombie, actionState)
+    end
     -- Reset the alert-turn payload only while recovering that actual engine
     -- state.  Applying it from the generic body-flags path meant it ran more
     -- than once per movement tick and could race the facing owner.
