@@ -218,6 +218,9 @@ function Network.BuildRosterSnapshot(record)
     local inCombat
     local staminaInfo
     local identity
+    if type(record) ~= "table" then
+        return nil
+    end
     aiState, inCombat = resolveAIState(record)
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
     identity = buildIdentitySummary(record)
@@ -412,18 +415,30 @@ end
 
 function Network.QueueRosterDelta(record, removed, reason)
     local id = type(record) == "table" and record.id or record
+    local snapshot
     if id == nil then
-        return
+        return false
+    end
+    if removed ~= true and type(record) ~= "table" then
+        return false
     end
     id = tostring(id)
+    -- Lua's `condition and nil or value` idiom can never produce nil: the `or`
+    -- branch runs because nil is falsey. Build removal entries explicitly so an
+    -- NPC id string is never passed to BuildRosterSnapshot as though it were a
+    -- record table.
+    if removed ~= true then
+        snapshot = Network.BuildRosterSnapshot(record)
+    end
     ServerState.rosterRevision = (tonumber(ServerState.rosterRevision) or 0) + 1
     ServerState.rosterDeltas[id] = {
         id = id,
         removed = removed == true,
         reason = reason,
         revision = ServerState.rosterRevision,
-        snapshot = removed == true and nil or Network.BuildRosterSnapshot(record),
+        snapshot = snapshot,
     }
+    return true
 end
 
 function Network.QueuePeriodicRoster(record, now)

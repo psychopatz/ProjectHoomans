@@ -78,6 +78,23 @@ local record = {
 
 local oldBase = PNC.Skills.GetBaseLevel(record, "Strength")
 assertEqual(PNC.Skills.GetLevel(record, "Strength"), math.min(10, oldBase + 2), "skill delta")
+assertEqual(PNC.Skills.GetLevel(record.id, "Strength"), 0, "skill lookup accepted record id")
+
+local malformedProgress = {
+    identitySeed = 42,
+    archetypeID = "Test",
+    faction = "colonist",
+    weaponMode = "melee",
+    progression = "legacy-invalid",
+}
+PNC.Skills.GetLevel(malformedProgress, "Strength")
+assertEqual(type(malformedProgress.progression), "table", "invalid progression was not normalized")
+malformedProgress.progression.skillXP = 12
+malformedProgress.progression.skillLevelDeltas = "invalid"
+PNC.Skills.GetLevel(malformedProgress, "Strength")
+assertEqual(type(malformedProgress.progression.skillXP), "table", "invalid skill XP map was not normalized")
+assertEqual(type(malformedProgress.progression.skillLevelDeltas), "table", "invalid skill delta map was not normalized")
+
 skillBias.Strength = { min = 5, max = 5 }
 local newBase = PNC.Skills.GetBaseLevel(record, "Strength")
 assertEqual(PNC.Skills.GetLevel(record, "Strength"), math.min(10, newBase + 2), "skill automatic rebase")

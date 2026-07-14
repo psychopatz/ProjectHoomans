@@ -23,14 +23,16 @@ local function ensureState(record)
     local strength
     local resolvedMax
     local current
-    if not record then
+    if type(record) ~= "table" then
         return nil
     end
     averageCombat = Skills.GetAverage(record, { "Axe", "LongBlade", "LongBlunt", "ShortBlade", "ShortBlunt", "Spear", "Aiming" })
     endurance = Skills.GetLevel(record, "Fitness")
     strength = Skills.GetLevel(record, "Strength")
     resolvedMax = math.floor(100 + ((averageCombat + endurance + strength) * 2.5))
-    record.stamina = record.stamina or {}
+    if type(record.stamina) ~= "table" then
+        record.stamina = {}
+    end
     current = tonumber(record.stamina.current)
     if current == nil then
         current = resolvedMax

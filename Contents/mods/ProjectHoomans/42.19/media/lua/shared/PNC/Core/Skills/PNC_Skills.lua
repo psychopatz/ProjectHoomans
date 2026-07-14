@@ -8,12 +8,18 @@ local Archetypes = PNC.Archetypes
 local Types = PNC.Types
 
 local function ensureProgress(record)
-    if not record then
+    if type(record) ~= "table" then
         return nil
     end
-    record.progression = record.progression or {}
-    record.progression.skillXP = record.progression.skillXP or {}
-    record.progression.skillLevelDeltas = record.progression.skillLevelDeltas or {}
+    if type(record.progression) ~= "table" then
+        record.progression = {}
+    end
+    if type(record.progression.skillXP) ~= "table" then
+        record.progression.skillXP = {}
+    end
+    if type(record.progression.skillLevelDeltas) ~= "table" then
+        record.progression.skillLevelDeltas = {}
+    end
     return record.progression
 end
 
@@ -25,7 +31,7 @@ local function getSpecialtyMap(record)
     local weaponMode
     local meleeFocus
     local rangedFocus
-    if not record then
+    if type(record) ~= "table" then
         return {}
     end
     weaponMode = tostring(record.weaponMode or "melee")
@@ -51,7 +57,7 @@ local function resolveBaseLevel(record, skillID)
     local specialty
     local level
     local lowered
-    if not record or not skillID then
+    if type(record) ~= "table" or not skillID then
         return 0
     end
 
@@ -102,7 +108,7 @@ local function resolveXPThreshold(level)
 end
 
 function Skills.SyncRecruitment(record)
-    if not record then
+    if type(record) ~= "table" then
         return false
     end
     if record.recruited == true then
@@ -120,7 +126,7 @@ function Skills.GetLevel(record, skillID)
     local progression
     local deltas
     local delta
-    if not record or not skillID then
+    if type(record) ~= "table" or not skillID then
         return 0
     end
     progression = ensureProgress(record)
@@ -205,8 +211,12 @@ end
 
 function Skills.BuildSnapshot(record)
     local levels = {}
-    local skillIDs = Catalog.GetAllSkillIDs()
+    local skillIDs
     local i
+    if type(record) ~= "table" then
+        return levels
+    end
+    skillIDs = Catalog.GetAllSkillIDs()
     for i = 1, #skillIDs do
         levels[skillIDs[i]] = Skills.GetLevel(record, skillIDs[i])
     end

@@ -22,6 +22,9 @@
 - interest enters at 48 tiles and leaves at 56 tiles
 - full character payloads require owner, admin, or same-level five-tile access
 - inventory revisions use deltas while the operation log covers the client revision; gaps receive a full refresh
+- roster removals are id-only tombstones and never build a character snapshot;
+  optional nil payloads must use an explicit branch rather than Lua's
+  `condition and nil or value` idiom, which always evaluates the fallback
 - live-body client reconciliation is handled by `PNC_ClientPresenceSync`, not by networking itself
 - movement stays on periodic compact snapshots, while attack starts, newly
   assigned body online IDs, and bite damage request one immediate transition

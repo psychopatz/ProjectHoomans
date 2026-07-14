@@ -81,8 +81,18 @@ PNC = {
         BuildFullPayload = function() return { summary = { revision = 0 }, items = {}, containers = {} } end,
         BuildDeltaPayload = function() return nil end,
     },
-    Skills = { BuildSnapshot = function() return {} end },
-    Stamina = { BuildSnapshot = function() return { current = 100, max = 100, state = "fresh" } end },
+    Skills = {
+        BuildSnapshot = function(record)
+            assertEqual(type(record), "table", "skills snapshot received non-record")
+            return {}
+        end,
+    },
+    Stamina = {
+        BuildSnapshot = function(record)
+            assertEqual(type(record), "table", "stamina snapshot received non-record")
+            return { current = 100, max = 100, state = "fresh" }
+        end,
+    },
     VisualProfiles = { RollAppearance = function() return {} end },
     MotionHints = {},
     Health = { CanRevive = function() return false end },
@@ -148,5 +158,17 @@ assertEqual(PNC.Network.CanViewCharacter(players[1], nearbyRecord), true, "nearb
 assertEqual(PNC.Network.CanViewCharacter(players[16], nearbyRecord), true, "owner detail access")
 nearbyRecord.ownerUsername = nil
 assertEqual(PNC.Network.CanViewCharacter(players[16], nearbyRecord), false, "remote detail rejection")
+
+-- Removal deltas carry only an id. The old `true and nil or snapshot()` idiom
+-- evaluated snapshot() anyway and sent that id string through stamina/skills.
+sent = {}
+PNC.Network.BroadcastRemoval("npc_removed", "range_exit")
+assertEqual(PNC.Network.FlushRosterDeltas(6000, true), 1, "removal roster delta count")
+assertEqual(#sent, 16, "removal roster delta recipients")
+assertEqual(sent[1].command, "RosterDelta", "removal roster delta command")
+assertEqual(sent[1].payload.entries[1].id, "npc_removed", "removal roster id")
+assertEqual(sent[1].payload.entries[1].removed, true, "removal roster marker")
+assertEqual(sent[1].payload.entries[1].snapshot, nil, "removal roster leaked snapshot")
+assertEqual(PNC.Network.QueueRosterDelta("npc_invalid", false, "invalid"), false, "non-removal accepted id-only record")
 
 print("pnc_network_scale_smoke: ok")
