@@ -27,6 +27,20 @@
 - `PNC.Inventory.Serialize(record)`
 - `PNC.Inventory.Deserialize(record, rawInventory)`
 
+## Module Layout
+- `PNC_Inventory.lua` is the stable subsystem facade and load-order entry point.
+- `PNC_Inventory_Model.lua` loads focused model modules for runtime/revision state,
+  container membership, and item/carry-cache mechanics.
+- `PNC_Inventory_Templates.lua` owns deterministic template generation.
+- `PNC_Inventory_Equipment.lua` loads record hydration and legacy equipment-sync modules.
+- `PNC_Inventory_Mutations.lua` validates and records inventory operations.
+- `PNC_Inventory_Payloads.lua` builds summary, full, and incremental network payloads.
+- `PNC_Inventory_Persistence.lua` owns the public serializer/hydrator and delegates
+  template-delta encoding and replay to its delta codec.
+
+Implementation modules communicate through `PNC.Inventory.Internal`; consumers should
+continue to call only the public `PNC.Inventory` functions.
+
 ## Forbidden Responsibilities
 - does not own persistence schema migration
 - does not broadcast packets directly

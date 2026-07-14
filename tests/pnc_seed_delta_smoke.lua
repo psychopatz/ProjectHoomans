@@ -1,4 +1,7 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/"
+
+package.path = SHARED_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -91,6 +94,25 @@ assert(PNC.Inventory.ApplyDelta(record, {
     { op = "add", item = { id = "loot_1", type = "Base.CustomLoot", container = "root" } },
 }, "test"), "inventory delta failed")
 
+local firstDelta = PNC.Inventory.BuildDeltaPayload(record, 0)
+assertEqual(firstDelta.inventoryRevision, 1, "first delta revision")
+assertEqual(#firstDelta.ops, 2, "first delta operation count")
+assertEqual(firstDelta.summary.itemCount, 1, "first delta summary item count")
+
+assert(PNC.Inventory.ApplyDelta(record, {
+    { op = "update", itemID = "loot_1", stack = 3, cond = 0.75 },
+}, "test_update"), "inventory update failed")
+
+local secondDelta = PNC.Inventory.BuildDeltaPayload(record, 1)
+assertEqual(secondDelta.inventoryRevision, 2, "second delta revision")
+assertEqual(#secondDelta.ops, 1, "second delta operation count")
+local fullPayload = PNC.Inventory.BuildFullPayload(record)
+assertEqual(fullPayload.items.loot_1.stack, 3, "full payload stack")
+assertEqual(fullPayload.items.loot_1.cond, 0.75, "full payload condition")
+local weightState = PNC.Inventory.GetWeightState(record)
+assert(weightState.usedWeight > 0, "weight cache was not rebuilt")
+assert(weightState.remainingWeight >= 0, "remaining weight is invalid")
+
 local saved = PNC.Inventory.Serialize(record)
 assertEqual(saved.deltaMode, "template_plus_delta", "serialized delta mode")
 assertEqual(saved.template.generatorVersion, 1, "generator version")
@@ -124,5 +146,6 @@ end
 assertEqual(hasBandage, false, "removed template item returned")
 assertEqual(hasLoot, true, "added item lost on rebase")
 assertEqual(hasNewTemplate, true, "new template item did not appear")
+assertEqual(reloaded.inventory.items.loot_1.stack, 3, "updated stack lost on rebase")
 
 print("pnc_seed_delta_smoke: ok")
