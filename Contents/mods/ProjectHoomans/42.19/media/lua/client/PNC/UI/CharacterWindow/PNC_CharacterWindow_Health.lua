@@ -2,28 +2,71 @@ PNC = PNC or {}
 PNC.CharacterWindowTabs = PNC.CharacterWindowTabs or {}
 
 local Tabs = PNC.CharacterWindowTabs
+local Shared = PNC.CharacterWindowShared
 
-local function line(window, label, value, y)
-    window:drawText(tostring(label) .. ": " .. tostring(value), 18, y, 0.93, 0.93, 0.93, 1, UIFont.Small)
-    return y + 18
+local bodyTextures = {}
+
+local function bodyTexture(isFemale)
+    local key = isFemale and "female" or "male"
+    if bodyTextures[key] == nil then
+        bodyTextures[key] = getTexture("media/ui/defense/" .. key .. "_base.png")
+    end
+    return bodyTextures[key]
 end
 
-function Tabs.RenderHealth(window, snapshot, payload, topY)
-    local data = payload and payload.snapshot and payload.snapshot.characterWindow or snapshot and snapshot.characterWindow or {}
+function Tabs.RenderHealth(view, snapshot, payload, topY)
+    local resolved = Shared.GetSnapshot(snapshot, payload)
+    local health = payload and payload.health or {}
     local stamina = payload and payload.stamina or {}
+    local texture = bodyTexture(resolved.isFemale == true)
+    local padding = 12
+    local silhouetteWidth = Shared.Clamp(math.floor(view.width * 0.3), 105, 165)
+    local silhouetteHeight = math.min(view.height - padding * 2, 302)
+    local x = padding + silhouetteWidth + 18
+    local width = math.max(130, view.width - x - padding)
     local y = topY
-    y = line(window, "Health", tostring(snapshot.hpCurrent or 0) .. "/" .. tostring(snapshot.hpMax or 0), y)
-    y = line(window, "Health State", snapshot.healthState or "normal", y)
-    y = line(window, "Stamina", tostring(math.floor((tonumber(stamina.current or snapshot.staminaCurrent) or 0) + 0.5))
-        .. "/" .. tostring(math.floor((tonumber(stamina.max or snapshot.staminaMax) or 0) + 0.5)), y)
-    y = line(window, "Stamina State", stamina.state or snapshot.staminaState or "fresh", y)
-    y = line(window, "Can Revive", data.canRevive == true and "Yes" or "No", y)
-    y = line(window, "Incapacitated", snapshot.healthState == "incapacitated" and "Yes" or "No", y)
+    local hpCurrent = tonumber(health.current or resolved.hpCurrent) or 0
+    local hpMax = math.max(1, tonumber(health.max or resolved.hpMax) or 100)
+    local staminaCurrent = tonumber(stamina.current or resolved.staminaCurrent) or 0
+    local staminaMax = math.max(1, tonumber(stamina.max or resolved.staminaMax) or 100)
+    local state = tostring(health.state or resolved.healthState or "normal")
+
+    if texture then
+        local tw = texture.getWidthOrig and texture:getWidthOrig() or texture:getWidth()
+        local th = texture.getHeightOrig and texture:getHeightOrig() or texture:getHeight()
+        local scale = math.min(silhouetteWidth / math.max(1, tw), silhouetteHeight / math.max(1, th))
+        local drawWidth = tw * scale
+        local drawHeight = th * scale
+        view:drawTextureScaled(texture, padding + (silhouetteWidth - drawWidth) / 2, padding, drawWidth, drawHeight, 1, 0.88, 0.88, 0.88)
+    end
+
+    y = Shared.DrawSection(view, "Overall Body Status", x, y, width)
+    y = Shared.DrawBar(view, "Health", hpCurrent, hpMax, x, y, width, { r = 0.72, g = 0.16, b = 0.16 })
+    y = Shared.DrawBar(view, "Stamina", staminaCurrent, staminaMax, x, y, width, { r = 0.24, g = 0.62, b = 0.3 })
+    y = y + 4
+    y = Shared.DrawLabelValue(view, "Condition", state, x, y, 92)
+    y = Shared.DrawLabelValue(view, "Stamina State", stamina.state or resolved.staminaState or "fresh", x, y, 92)
+    y = Shared.DrawLabelValue(view, "Can Revive", resolved.canRevive == true and "Yes" or "No", x, y, 92)
+    y = Shared.DrawLabelValue(view, "Recent Damage", (tonumber(health.recentDamageUntil or resolved.recentDamageUntil) or 0) > 0 and "Recorded" or "None", x, y, 92)
+
     y = y + 8
-    window:drawText("Medical adapter shell", 18, y, 0.86, 0.86, 0.86, 1, UIFont.Medium)
-    y = y + 20
-    window:drawText("This tab is owned by PNC and stays player-independent.", 18, y, 0.7, 0.7, 0.7, 1, UIFont.Small)
-    y = y + 18
-    window:drawText("Future bandage, wounds, and revive actions plug into this host.", 18, y, 0.7, 0.7, 0.7, 1, UIFont.Small)
-    return y + 18
+    y = Shared.DrawSection(view, "Medical Summary", x, y, width)
+    if state == "incapacitated" then
+        view:drawText("Incapacitated", x, y, 0.95, 0.36, 0.31, 1, UIFont.Medium)
+        y = y + getTextManager():getFontHeight(UIFont.Medium) + 5
+        view:drawText("Reason: " .. tostring(health.incapacitatedReason or "critical injury"), x, y, 0.82, 0.82, 0.82, 1, UIFont.Small)
+        y = y + getTextManager():getFontHeight(UIFont.Small) + 6
+        view:drawText("Use the Revive interaction while in range.", x, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        y = y + getTextManager():getFontHeight(UIFont.Small) + 6
+    elseif state == "dead" then
+        view:drawText("No vital signs", x, y, 0.95, 0.36, 0.31, 1, UIFont.Medium)
+        y = y + getTextManager():getFontHeight(UIFont.Medium) + 8
+    else
+        view:drawText("No active incapacitation or critical wound state.", x, y, 0.75, 0.75, 0.75, 1, UIFont.Small)
+        y = y + getTextManager():getFontHeight(UIFont.Small) + 8
+    end
+
+    return math.max(y, padding + silhouetteHeight) + 12
 end
+
+return Tabs
