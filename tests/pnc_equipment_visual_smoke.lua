@@ -10,6 +10,9 @@ local refreshCount = 0
 PNC = {
     Core = { LogWarn = function() end },
     Visuals = {
+        ClearAttachedItems = function(zombie)
+            zombie.attached = {}
+        end,
         RefreshModel = function()
             refreshCount = refreshCount + 1
         end,
@@ -28,6 +31,13 @@ WeaponType.getWeaponType = function()
     return WeaponType.ONE_HANDED
 end
 
+ISHotbarAttachDefinition = {
+    Back = {
+        type = "Back",
+        attachments = { BigWeapon = "Back" },
+    },
+}
+
 dofile(ROOT .. "Equipment/PNC_Equipment_Items.lua")
 dofile(ROOT .. "Equipment/PNC_Equipment_Slots.lua")
 dofile(ROOT .. "Equipment/PNC_Equipment.lua")
@@ -35,6 +45,7 @@ dofile(ROOT .. "Equipment/PNC_Equipment.lua")
 local weapon = {
     IsWeapon = function() return true end,
     isRequiresEquippedBothHands = function() return false end,
+    getAttachmentType = function() return "BigWeapon" end,
 }
 PNC.Equipment.CreateItem = function()
     return weapon, "test_item"
@@ -43,12 +54,18 @@ end
 local primarySet = 0
 local handModelsReset = 0
 local zombie = {
+    attached = {},
     setVariable = function() end,
-    setPrimaryHandItem = function(_, item)
-        assertEqual(item, weapon, "primary hand item")
+    setPrimaryHandItem = function(self, item)
+        self.primary = item
         primarySet = primarySet + 1
     end,
-    setSecondaryHandItem = function() end,
+    setSecondaryHandItem = function(self, item)
+        self.secondary = item
+    end,
+    setAttachedItem = function(self, location, item)
+        self.attached[location] = item
+    end,
     resetEquippedHandsModels = function()
         handModelsReset = handModelsReset + 1
     end,
@@ -57,9 +74,6 @@ local zombie = {
     end,
     getItemVisuals = function()
         error("hands-only refresh touched clothing visuals")
-    end,
-    getAttachedItems = function()
-        error("hands-only refresh touched attached items")
     end,
 }
 local record = {
@@ -71,10 +85,24 @@ local record = {
 }
 
 local applied = PNC.Equipment.ApplyHands(zombie, record)
-assertEqual(applied, true, "hands-only apply")
-assertEqual(primarySet, 1, "primary hand apply count")
+assertEqual(applied, true, "idle equipment apply")
+assertEqual(zombie.primary, nil, "idle primary hand")
+assertEqual(zombie.attached.Back, weapon, "idle holstered weapon")
+
+record.runtime = { target = { kind = "zombie" } }
+applied = PNC.Equipment.ApplyCombatState(zombie, record, true)
+assertEqual(applied, true, "combat equipment apply")
+assertEqual(zombie.primary, weapon, "combat primary hand")
+assertEqual(zombie.attached.Back, nil, "combat holster cleared")
+
+record.runtime.target = nil
+applied = PNC.Equipment.ApplyCombatState(zombie, record, false)
+assertEqual(applied, true, "holster equipment apply")
+assertEqual(zombie.primary, nil, "holstered primary hand")
+assertEqual(zombie.attached.Back, weapon, "weapon returned to holster")
+assert(primarySet >= 3, "primary hand state was not refreshed")
 assert(handModelsReset > 0, "hand models were not refreshed")
-assertEqual(refreshCount, 0, "hands-only path performed a full model refresh")
+assert(refreshCount > 0, "equipment presentation did not refresh the model")
 
 local calls = {
     appearance = 0,

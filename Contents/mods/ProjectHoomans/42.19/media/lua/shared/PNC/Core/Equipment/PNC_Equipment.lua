@@ -243,6 +243,62 @@ local function applyAttachedItems(zombie, equipment)
     return true, "attached:" .. tostring(appliedCount)
 end
 
+local function isAttackMode(record)
+    local runtime = record and record.runtime or nil
+    if runtime and runtime.target ~= nil then
+        return true
+    end
+    return runtime and runtime.attackMode == true or false
+end
+
+local function buildPresentationEquipment(equipment, attackMode)
+    local presentation = Equipment.NormalizeLoadoutSpec(equipment)
+    local occupied = {}
+    local fullTypes
+    local location
+    local fullType
+    local item
+    local createReason
+    local i
+    local holsteredCount = 0
+    local holsterReasons = {}
+
+    if attackMode then
+        return presentation, 0, {}
+    end
+
+    for location, _ in pairs(presentation.attached) do
+        occupied[location] = true
+    end
+
+    fullTypes = {}
+    if presentation.primaryFullType then
+        fullTypes[#fullTypes + 1] = presentation.primaryFullType
+    end
+    if presentation.secondaryFullType then
+        fullTypes[#fullTypes + 1] = presentation.secondaryFullType
+    end
+    for i = 1, #fullTypes do
+        fullType = fullTypes[i]
+        if fullType then
+            item, createReason = Equipment.CreateItem(fullType)
+            if item then
+                location = Equipment.ResolveAttachedLocation(item, nil, occupied)
+                if location then
+                    presentation.attached[location] = fullType
+                    occupied[location] = true
+                    holsteredCount = holsteredCount + 1
+                else
+                    holsterReasons[#holsterReasons + 1] = tostring(fullType) .. ":no_attachment_location"
+                end
+            else
+                holsterReasons[#holsterReasons + 1] = tostring(fullType) .. ":" .. tostring(createReason or "invalid_full_type")
+            end
+        end
+    end
+    return presentation, holsteredCount, holsterReasons
+end
+
 local function applyHands(zombie, equipment, descriptor)
     local item
     local primaryType
@@ -301,6 +357,36 @@ local function applyHands(zombie, equipment, descriptor)
     return true, descriptor.weaponStatus .. ":" .. tostring(descriptor.createReason or "unknown")
 end
 
+local function applyCombatPresentation(zombie, record, equipment, descriptor, attackMode)
+    local presentation
+    local holsteredCount
+    local holsterReasons
+    local attachedOk
+    local attachedReason
+    local handsOk
+    local handsReason
+
+    presentation, holsteredCount, holsterReasons = buildPresentationEquipment(equipment, attackMode)
+    attachedOk, attachedReason = applyAttachedItems(zombie, presentation)
+
+    if attackMode then
+        handsOk, handsReason = applyHands(zombie, equipment, descriptor)
+    else
+        clearHands(zombie)
+        setEquipmentVariables(zombie, "barehand", nil, nil)
+        handsOk = true
+        handsReason = "holstered:" .. tostring(holsteredCount)
+        if #holsterReasons > 0 then
+            handsOk = false
+            handsReason = handsReason .. ",unavailable=" .. table.concat(holsterReasons, ",")
+        end
+    end
+
+    record.runtime = record.runtime or {}
+    record.runtime.equipmentAttackModeApplied = attackMode == true
+    return attachedOk and handsOk, attachedReason, handsReason
+end
+
 resolvePrimaryType = function(item)
     local weaponType
     if not item or not item.IsWeapon or not item:IsWeapon() or not WeaponType or not WeaponType.getWeaponType then
@@ -340,6 +426,7 @@ function Equipment.Apply(zombie, record)
     local descriptor
     local ok = true
     local laneOk
+    local handsReason
     local reasons = {}
 
     if not zombie or not record then
@@ -354,12 +441,14 @@ function Equipment.Apply(zombie, record)
         ok = false
     end
 
-    laneOk, reasons[#reasons + 1] = applyAttachedItems(zombie, equipment)
-    if not laneOk then
-        ok = false
-    end
-
-    laneOk, reasons[#reasons + 1] = applyHands(zombie, equipment, descriptor)
+    laneOk, reasons[#reasons + 1], handsReason = applyCombatPresentation(
+        zombie,
+        record,
+        equipment,
+        descriptor,
+        isAttackMode(record)
+    )
+    reasons[#reasons + 1] = handsReason
     if not laneOk then
         ok = false
     end
@@ -378,10 +467,41 @@ function Equipment.ApplyHands(zombie, record)
         return false, "missing_body_or_record"
     end
 
+    if not isAttackMode(record) then
+        return Equipment.ApplyCombatState(zombie, record, false, true)
+    end
+
     equipment = Equipment.EnsureRecordEquipment(record)
     descriptor = buildWeaponDescriptor(equipment.primaryFullType, true)
     ok, reason = applyHands(zombie, equipment, descriptor)
     return ok, reason
+end
+
+function Equipment.IsAttackMode(record)
+    return isAttackMode(record)
+end
+
+function Equipment.ApplyCombatState(zombie, record, attackMode, force)
+    local equipment
+    local descriptor
+    local ok
+    local attachedReason
+    local handsReason
+
+    if not zombie or not record then
+        return false, "missing_body_or_record"
+    end
+    record.runtime = record.runtime or {}
+    attackMode = attackMode == true
+    if force ~= true and record.runtime.equipmentAttackModeApplied == attackMode then
+        return true, "unchanged"
+    end
+
+    equipment = Equipment.EnsureRecordEquipment(record)
+    descriptor = buildWeaponDescriptor(equipment.primaryFullType, true)
+    ok, attachedReason, handsReason = applyCombatPresentation(zombie, record, equipment, descriptor, attackMode)
+    Visuals.RefreshModel(zombie)
+    return ok, tostring(attachedReason) .. "|" .. tostring(handsReason)
 end
 
 function Equipment.ResolveWeaponMode(fullType)

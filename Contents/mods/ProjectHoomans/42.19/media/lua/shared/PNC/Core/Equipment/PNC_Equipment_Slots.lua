@@ -260,7 +260,7 @@ function Equipment.ResolveAttachedSlotType(location)
     return getAttachmentLocationToType()[tostring(location)]
 end
 
-function Equipment.ResolveAttachedLocation(item, preferredSlotType)
+function Equipment.ResolveAttachedLocation(item, preferredSlotType, occupiedLocations)
     local attachmentType
     local preferredLookup = {}
     local entries = {}
@@ -290,7 +290,7 @@ function Equipment.ResolveAttachedLocation(item, preferredSlotType)
     for _, def in pairs(ISHotbarAttachDefinition) do
         if type(def) == "table" and MANAGED_ATTACHMENT_TYPES[def.type] and def.attachments then
             location = def.attachments[attachmentType]
-            if location and location ~= "" then
+            if location and location ~= "" and not (occupiedLocations and occupiedLocations[location]) then
                 entries[#entries + 1] = {
                     location = location,
                     slotType = def.type,

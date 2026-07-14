@@ -26,10 +26,16 @@ function Common.SetCombatDebug(record, target, reason, modeResolved, weaponStatu
     record.runtime.combatBlockReason = reason or "idle"
 end
 
-function Common.ClearCombatTarget(record, reason)
+function Common.ClearCombatTarget(record, reason, zombie)
     local equipmentInfo = Equipment.Describe(record)
     record.runtime = record.runtime or {}
     record.runtime.target = nil
+    if not zombie and PNC.Registry and PNC.Registry.GetLiveZombie then
+        zombie = PNC.Registry.GetLiveZombie(record.id)
+    end
+    if Equipment.ApplyCombatState and zombie then
+        Equipment.ApplyCombatState(zombie, record, false)
+    end
     Common.SetCombatDebug(
         record,
         nil,

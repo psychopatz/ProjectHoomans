@@ -127,6 +127,7 @@ function Presence.Materialize(record, reason)
     if zombie.DoZombieStats then
         zombie:DoZombieStats()
     end
+    record.runtime.target = nil
     Animation.ApplyLiveSetup(zombie, record)
     Visuals.ApplyHumanVisuals(zombie, record)
     Equipment.Apply(zombie, record)
@@ -138,7 +139,6 @@ function Presence.Materialize(record, reason)
     record.y = spawnY
     record.z = spawnZ
     record.presenceState = Const.PRESENCE_LIVE
-    record.runtime.target = nil
     Registry.RegisterLiveZombie(record, zombie)
     Health.Update(record, zombie, Core.Now())
     Animation.Apply(zombie, record, "Idle")

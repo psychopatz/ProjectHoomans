@@ -123,6 +123,12 @@ PNC.Registry = { Get = function() return nearbyRecord end }
 
 dofile(FILE)
 
+assertEqual(PNC.Network.BuildSnapshot(nearbyRecord).attackMode, false, "idle snapshot attack mode")
+nearbyRecord.runtime.target = { kind = "zombie" }
+assertEqual(PNC.Network.BuildSnapshot(nearbyRecord).attackMode, true, "combat snapshot attack mode")
+assertEqual(PNC.Network.BuildPresenceDelta(nearbyRecord).attackMode, true, "combat delta attack mode")
+nearbyRecord.runtime.target = nil
+
 local roster = {}
 for i = 1, 500 do
     roster[i] = { id = "npc_" .. tostring(i), displayName = "NPC " .. tostring(i) }

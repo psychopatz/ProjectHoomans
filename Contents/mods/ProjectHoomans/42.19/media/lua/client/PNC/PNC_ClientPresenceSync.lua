@@ -179,6 +179,7 @@ local function buildRecordView(snapshot)
             attached = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.attached or {},
         },
         runtime = {
+            attackMode = snapshot and snapshot.attackMode == true or false,
             debug = snapshot and snapshot.debugState and snapshot.debugState.debugEnabled == true or false,
             pathing = {
                 phase = moving and "active" or "idle",
@@ -234,6 +235,7 @@ local function buildVisualKey(snapshot)
         tostring(snapshot and snapshot.presenceRevision or 0),
         tostring(snapshot and snapshot.visualProfile or ""),
         tostring(snapshot and snapshot.isFemale == true),
+        tostring(snapshot and snapshot.attackMode == true),
         tostring(appearance.outfit or ""),
         tostring(appearance.skinTexture or ""),
         tostring(appearance.hairModel or ""),
@@ -247,6 +249,7 @@ local function buildHandsKey(snapshot)
     local equipment = snapshot and snapshot.equipmentSummary or {}
     return table.concat({
         tostring(snapshot and snapshot.presenceRevision or 0),
+        tostring(snapshot and snapshot.attackMode == true),
         tostring(equipment.primaryFullType or ""),
         tostring(equipment.secondaryFullType or ""),
     }, "|")

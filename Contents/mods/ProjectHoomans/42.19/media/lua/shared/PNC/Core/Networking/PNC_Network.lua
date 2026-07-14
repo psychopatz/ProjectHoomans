@@ -315,6 +315,7 @@ function Network.BuildSnapshot(record)
         liveBodyLease = record.runtime and record.runtime.bodyLease or nil,
         aiState = aiState,
         inCombat = inCombat,
+        attackMode = record.runtime and record.runtime.target ~= nil or false,
         visualState = visualState,
         appearance = appearance and Core.DeepCopy(appearance) or nil,
         equipmentSummary = {
@@ -388,6 +389,7 @@ function Network.BuildPresenceDelta(record)
         liveBodyLease = record.runtime and record.runtime.bodyLease or nil,
         aiState = aiState,
         inCombat = inCombat,
+        attackMode = record.runtime and record.runtime.target ~= nil or false,
         visualState = buildVisualState(record),
     }
 end

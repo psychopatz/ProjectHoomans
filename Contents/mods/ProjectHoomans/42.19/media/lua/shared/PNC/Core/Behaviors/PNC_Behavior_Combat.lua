@@ -30,6 +30,9 @@ function BehaviorCombat.TickEngage(record, zombie, target)
     local approachStopDistance
     local approachMode
 
+    if Equipment.ApplyCombatState and zombie then
+        Equipment.ApplyCombatState(zombie, record, true)
+    end
     Common.SetCombatDebug(record, target, "engaging_" .. tostring(target.kind or "unknown"), effectiveMode, equipmentInfo.weaponStatus)
 
     if PathService and PathService.IsTraversalActive and PathService.IsTraversalActive(record, zombie) then
