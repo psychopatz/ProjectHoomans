@@ -1,4 +1,6 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/CharacterWindow/"
+local BANDAGE_MENU_FILE =
+    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/Context/PNC_BandageMenu.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -71,6 +73,7 @@ getGameTime = function()
     return { getWorldAgeHours = function() return 100 end }
 end
 
+dofile(BANDAGE_MENU_FILE)
 dofile(ROOT .. "PNC_CharacterWindow_Health.lua")
 
 local view = {
@@ -86,6 +89,8 @@ assertEqual(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 20, 15), true, "h
 assertEqual(rootMenu.x, 120, "context absolute x")
 assertEqual(rootMenu.y, 215, "context absolute y")
 assertEqual(rootMenu.options[1].name, "Bandage", "vanilla bandage option")
+assertEqual(rootMenu.options[1].subMenu.options[1].name, "Bandage (2)",
+    "character menu groups bandages by type and count")
 assertEqual(rootMenu.options[1].subMenu.options[1].itemForTexture, bandageItem, "actual item icon")
 
 rootMenu.options[1].subMenu.options[1].callback()

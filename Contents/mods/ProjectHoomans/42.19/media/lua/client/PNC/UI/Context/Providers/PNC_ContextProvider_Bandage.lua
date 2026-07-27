@@ -48,8 +48,8 @@ end
 
 function Provider.addOptions(menu, entry, player)
     local wounds = openWounds(entry)
-    local bandageCount = PNC.Treatment and PNC.Treatment.CountBandages
-        and PNC.Treatment.CountBandages(player) or 0
+    local bandages = PNC.Treatment and PNC.Treatment.ListBandages
+        and PNC.Treatment.ListBandages(player) or {}
     local dx = (tonumber(entry and entry.x) or 0) - (tonumber(player and player:getX()) or 0)
     local dy = (tonumber(entry and entry.y) or 0) - (tonumber(player and player:getY()) or 0)
     local sameLevel = math.abs((tonumber(entry and entry.z) or 0) - (tonumber(player and player:getZ()) or 0)) < 1
@@ -64,14 +64,29 @@ function Provider.addOptions(menu, entry, player)
             or tr("UI_PNC_Bandage", "Bandage")
         local option = menu:addOption(
             actionLabel .. " " .. row.label .. " (" .. typeLabel .. ")",
-            nil,
-            function()
-                if PNC.Client and PNC.Client.SendBandage then
-                    PNC.Client.SendBandage(entry.id, row.partId)
-                end
-            end
+            nil
         )
-        if bandageCount <= 0 or not inRange then option.notAvailable = true end
+        if PNC.BandageMenu and PNC.BandageMenu.AddMaterialOptions then
+            PNC.BandageMenu.AddMaterialOptions(
+                menu,
+                option,
+                player,
+                function(bandageType)
+                    if PNC.Client and PNC.Client.SendBandage then
+                        PNC.Client.SendBandage(
+                            entry.id,
+                            row.partId,
+                            false,
+                            bandageType
+                        )
+                    end
+                end,
+                inRange,
+                bandages
+            )
+        else
+            option.notAvailable = true
+        end
     end
     if PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() and #wounds > 0 then
         local debugMenu = ISContextMenu:getNew(menu)

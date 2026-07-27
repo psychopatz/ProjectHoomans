@@ -253,25 +253,14 @@ function Treatment.IsPlayerInBandageRange(player, npcId)
     return isPlayerInRange(player, record)
 end
 
-function Treatment.CountBandages(player)
-    local inventory = player and player.getInventory and player:getInventory() or nil
-    if not inventory or not inventory.getItemCount then return 0 end
-    local types = bandageTypes()
-    local count = 0
-    local i
-    for i = 1, #types do
-        count = count + (tonumber(inventory:getItemCount(types[i], true)) or 0)
-    end
-    return count
-end
-
-function Treatment.ListBandages(player)
+local function listBandages(player)
     local inventory = player and player.getInventory and player:getInventory() or nil
     local output = {}
     local types = bandageTypes()
     local i
     for i = 1, #types do
-        local found = inventory and inventory.getAllTypeRecurse and inventory:getAllTypeRecurse(types[i]) or nil
+        local found = inventory and inventory.getAllTypeRecurse
+            and inventory:getAllTypeRecurse(types[i]) or nil
         local count = found and found.size and tonumber(found:size()) or 0
         local item = count > 0 and found:get(0) or nil
         if count > 0 then
@@ -279,12 +268,25 @@ function Treatment.ListBandages(player)
                 fullType = types[i],
                 count = count,
                 item = item,
-                name = item and item.getDisplayName and item:getDisplayName()
-                    or item and item.getName and item:getName() or tostring(types[i]),
+                name = bandageDisplayName(types[i], item),
             }
         end
     end
     return output
+end
+
+function Treatment.CountBandages(player)
+    local count = 0
+    local entries = listBandages(player)
+    local i
+    for i = 1, #entries do
+        count = count + math.max(0, tonumber(entries[i].count) or 0)
+    end
+    return count
+end
+
+function Treatment.ListBandages(player)
+    return listBandages(player)
 end
 
 function Treatment.TryBandage(player, npcId, partId, options)

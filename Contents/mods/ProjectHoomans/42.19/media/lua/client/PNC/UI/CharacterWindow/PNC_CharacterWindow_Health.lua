@@ -489,9 +489,7 @@ local function showHealthMenu(view, partId, x, y)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local canDebug = PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() == true
     local context
-    local bandages
     local option
-    local subMenu
     if (not wound
         or (wound.bandaged == true and wound.bandageDirty ~= true)
         or not player) and not canDebug
@@ -500,22 +498,22 @@ local function showHealthMenu(view, partId, x, y)
     end
     context = ISContextMenu.get(0, x + view:getAbsoluteX(), y + view:getAbsoluteY())
     if wound and (wound.bandaged ~= true or wound.bandageDirty == true) and player then
-        bandages = PNC.Treatment and PNC.Treatment.ListBandages and PNC.Treatment.ListBandages(player) or {}
         option = context:addOption(Shared.Text("ContextMenu_Bandage", "Bandage"), nil)
-        if #bandages > 0 then
-            subMenu = context:getNew(context)
-            context:addSubMenu(option, subMenu)
-            for _, entry in ipairs(bandages) do
-                local bandageType = entry.fullType
-                local itemOption = subMenu:addOption(
-                    tostring(entry.name) .. " (" .. tostring(entry.count) .. ")",
-                    nil,
-                    function()
-                        PNC.Client.SendBandage(view.npcId, partId, false, bandageType)
-                    end
-                )
-                itemOption.itemForTexture = entry.item
-            end
+        if PNC.BandageMenu and PNC.BandageMenu.AddMaterialOptions then
+            PNC.BandageMenu.AddMaterialOptions(
+                context,
+                option,
+                player,
+                function(bandageType)
+                    PNC.Client.SendBandage(
+                        view.npcId,
+                        partId,
+                        false,
+                        bandageType
+                    )
+                end,
+                true
+            )
         else
             option.notAvailable = true
         end
