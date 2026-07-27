@@ -20,6 +20,7 @@ local Stamina = PNC.Stamina
 local Animation = PNC.Animation
 local Damage = PNC.CombatDamage
 local Firearms = PNC.Firearms
+local FirearmEffects = PNC.FirearmEffects
 
 local function applyWeaponWear(record)
     local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record) or nil
@@ -226,6 +227,18 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
             end
         end
         action.ammoConsumed = true
+    end
+
+    if action.attackType == "ranged" and action.shotEffectDone ~= true then
+        action.shotEffectDone = true
+        if FirearmEffects and FirearmEffects.Emit then
+            FirearmEffects.Emit(
+                record,
+                zombie,
+                target,
+                Internal.resolveWeaponItem and Internal.resolveWeaponItem(record, zombie) or nil
+            )
+        end
     end
 
     if action.attackKind == "shove" then

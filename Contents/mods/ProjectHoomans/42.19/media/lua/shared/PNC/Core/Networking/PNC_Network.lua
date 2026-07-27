@@ -754,6 +754,43 @@ function Network.BroadcastZombieBite(attackerZombie, targetNPCBody, npcId, phase
     return sendToInterestedNPC(npcId, Const.CMD_ZOMBIE_BITE, payload) > 0
 end
 
+function Network.BroadcastFirearmShot(payload)
+    local deliveryRadius
+    local sent = 0
+    if not Core.IsAuthority() or type(payload) ~= "table" then
+        return false
+    end
+    if isServer and isServer() then
+        if not sendServerCommand then return false end
+        -- A gunshot can be heard beyond an NPC's normal detailed-interest
+        -- bubble. Deliver this transient event by the weapon's own noise
+        -- radius, with the interest distance as the minimum visual range.
+        deliveryRadius = math.max(
+            tonumber(payload.soundRadius) or 0,
+            tonumber(Const.INTEREST_LEAVE_DISTANCE) or 56
+        )
+        Core.ForEachPlayer(function(player)
+            local dx
+            local dy
+            local dz
+            if not player then return end
+            dx = (tonumber(player:getX()) or 0) - (tonumber(payload.sx) or 0)
+            dy = (tonumber(player:getY()) or 0) - (tonumber(payload.sy) or 0)
+            dz = math.abs((tonumber(player:getZ()) or 0) - (tonumber(payload.sz) or 0))
+            if dz <= 2 and ((dx * dx) + (dy * dy)) <= (deliveryRadius * deliveryRadius) then
+                sendToPlayer(player, Const.CMD_FIREARM_SHOT, payload)
+                sent = sent + 1
+            end
+        end)
+        return sent > 0
+    end
+    if triggerEvent then
+        triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_FIREARM_SHOT, payload)
+        return true
+    end
+    return false
+end
+
 function Network.BroadcastFullSync(targetPlayer, records)
     local chunkSize = math.max(1, tonumber(Const.ROSTER_CHUNK_SIZE) or 50)
     local total = #(records or {})

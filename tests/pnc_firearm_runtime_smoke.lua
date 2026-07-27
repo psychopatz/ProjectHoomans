@@ -21,6 +21,12 @@ local weapon = {
     getFullType = function() return "Base.TestPistol" end,
     getAmmoType = function() return "Base.Bullets9mm" end,
     getMaxAmmo = function() return 3 end,
+    getAmmoPerShoot = function() return 1 end,
+    getSwingSound = function() return "TestPistolShot" end,
+    getSoundRadius = function() return 72 end,
+    getSoundVolume = function() return 40 end,
+    getProjectileCount = function() return 1 end,
+    getProjectileSpread = function() return 0.25 end,
     setCurrentAmmoCount = function(_, value) mirroredAmmo = value end,
 }
 local scriptItem = {
@@ -118,6 +124,13 @@ local record = {
 local fired
 local reason
 local magazine
+local descriptor = PNC.Firearms.Describe(record, weapon)
+assertEqual(descriptor.ammoType, "Base.Bullets9mm", "weapon ammo type")
+assertEqual(descriptor.ammoPerShot, 1, "weapon ammo per shot")
+assertEqual(descriptor.shotSound, "TestPistolShot", "weapon shot sound")
+assertEqual(descriptor.soundRadius, 72, "weapon noise radius")
+assertEqual(descriptor.projectileCount, 1, "weapon projectile count")
+assertEqual(descriptor.projectileSpread, 0.25, "weapon projectile spread")
 fired, reason, magazine = PNC.Firearms.PrepareShot(record, weapon)
 assertEqual(fired, true, "first companion shot")
 assertEqual(reason, "round_consumed", "first companion shot reason")

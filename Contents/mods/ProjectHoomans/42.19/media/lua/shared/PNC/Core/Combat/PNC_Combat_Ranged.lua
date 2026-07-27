@@ -111,7 +111,6 @@ function Combat.TryRanged(record, zombie, target)
     record.runtime.inCombatUntil = now + Const.DEBUG_COMBAT_HOLD_MS
     Internal.faceTarget(zombie, target, record, Internal.ATTACK_TIMINGS.ranged.duration, "ranged_windup")
     if zombie then
-        Internal.playAttackSound(zombie, record)
         anim = Internal.triggerRangedWeaponAnim(zombie, record, equipmentInfo)
     end
     Internal.buildAttackAction(

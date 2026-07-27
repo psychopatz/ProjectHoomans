@@ -58,6 +58,17 @@ local function safeMethod(target, methodName)
     return ok and value or nil
 end
 
+local function itemKeyString(value)
+    local key
+    if value == nil then return nil end
+    key = safeMethod(value, "getItemKey")
+    if key ~= nil and tostring(key) ~= "" then
+        return tostring(key)
+    end
+    value = tostring(value)
+    return value ~= "" and value or nil
+end
+
 local function fullTypeOf(record, weaponItem)
     local fullType = safeMethod(weaponItem, "getFullType")
     if fullType and tostring(fullType) ~= "" then
@@ -108,6 +119,12 @@ local function positiveInteger(value)
     value = tonumber(value)
     if not value or value <= 0 then return nil end
     return math.max(1, math.floor(value))
+end
+
+local function nonNegativeInteger(value)
+    value = tonumber(value)
+    if value == nil or value < 0 then return nil end
+    return math.floor(value)
 end
 
 local function resolveCapacity(weaponItem, scriptItem, reloadFamily)
@@ -310,18 +327,57 @@ function Firearms.Describe(record, weaponItem)
     local weaponFamily
     local reloadFamily
     local ammoType
+    local manuallyRemoveSpentRounds
     if not fullType then return nil end
     weaponFamily, reloadFamily = resolveFamily(fullType, scriptItem)
     ammoType = safeMethod(weaponItem, "getAmmoType")
         or safeMethod(scriptItem, "getAmmoType")
+    manuallyRemoveSpentRounds = safeMethod(weaponItem, "isManuallyRemoveSpentRounds")
+    if manuallyRemoveSpentRounds == nil then
+        manuallyRemoveSpentRounds = safeMethod(scriptItem, "isManuallyRemoveSpentRounds")
+    end
     return {
         fullType = fullType,
-        ammoType = ammoType and tostring(ammoType) or nil,
+        -- Build 42 returns an ItemKey here, while older/modded weapons may
+        -- return a full-type string. Canonicalizing through getItemKey keeps
+        -- inventory matching and replicated shot metadata compatible with both.
+        ammoType = itemKeyString(ammoType),
         capacity = resolveCapacity(weaponItem, scriptItem, reloadFamily),
+        ammoPerShot = positiveInteger(safeMethod(weaponItem, "getAmmoPerShoot"))
+            or positiveInteger(safeMethod(scriptItem, "getAmmoPerShoot"))
+            or 1,
         weaponFamily = weaponFamily,
         reloadFamily = reloadFamily,
         reloadAnim = RELOAD_ANIMS[reloadFamily] or RELOAD_ANIMS.pistol,
         reloadDurationMs = resolveReloadDuration(record, scriptItem, reloadFamily),
+        shotSound = safeMethod(weaponItem, "getSwingSound")
+            or safeMethod(scriptItem, "getSwingSound"),
+        soundRadius = nonNegativeInteger(safeMethod(weaponItem, "getSoundRadius"))
+            or nonNegativeInteger(safeMethod(scriptItem, "getSoundRadius"))
+            or 30,
+        soundVolume = nonNegativeInteger(safeMethod(weaponItem, "getSoundVolume"))
+            or nonNegativeInteger(safeMethod(scriptItem, "getSoundVolume"))
+            or 10,
+        soundGain = tonumber(safeMethod(weaponItem, "getSoundGain"))
+            or tonumber(safeMethod(scriptItem, "getSoundGain"))
+            or 1,
+        projectileCount = positiveInteger(safeMethod(weaponItem, "getProjectileCount"))
+            or positiveInteger(safeMethod(scriptItem, "getProjectileCount"))
+            or 1,
+        projectileSpread = tonumber(safeMethod(weaponItem, "getProjectileSpread"))
+            or tonumber(safeMethod(scriptItem, "getProjectileSpread"))
+            or 0,
+        maxRange = tonumber(safeMethod(weaponItem, "getMaxRange"))
+            or tonumber(safeMethod(scriptItem, "getMaxRange")),
+        piercing = safeMethod(weaponItem, "isPiercingBullets") == true
+            or safeMethod(scriptItem, "isPiercingBullets") == true,
+        impactSound = safeMethod(weaponItem, "getImpactSound")
+            or safeMethod(scriptItem, "getImpactSound"),
+        shellFallSound = safeMethod(weaponItem, "getShellFallSound")
+            or safeMethod(scriptItem, "getShellFallSound"),
+        ejectsShell = manuallyRemoveSpentRounds ~= true,
+        rackAfterShoot = safeMethod(weaponItem, "isRackAfterShoot") == true
+            or safeMethod(scriptItem, "isRackAfterShoot") == true,
     }
 end
 
@@ -355,12 +411,17 @@ end
 function Firearms.PrepareShot(record, weaponItem)
     local magazine
     local reason
+    local roundsRequired
     magazine, reason = Firearms.GetMagazineState(record, weaponItem)
     if not magazine then return false, reason end
     if magazine.ammoNotRequired == true then
         return true, reason, magazine
     end
-    if (tonumber(magazine.count) or 0) <= 0 then
+    roundsRequired = math.max(
+        1,
+        math.floor(tonumber(magazine.descriptor and magazine.descriptor.ammoPerShot) or 1)
+    )
+    if (tonumber(magazine.count) or 0) < roundsRequired then
         if magazine.unlimitedReserve == true
             or (tonumber(magazine.looseAmmo) or 0) > 0
         then
@@ -371,13 +432,13 @@ function Firearms.PrepareShot(record, weaponItem)
     if not updateMagazine(
         record,
         magazine.itemID,
-        magazine.count - 1,
+        magazine.count - roundsRequired,
         "combat_round_fired",
         weaponItem
     ) then
         return false, "ammo_update_failed", magazine
     end
-    magazine.count = magazine.count - 1
+    magazine.count = magazine.count - roundsRequired
     return true, "round_consumed", magazine
 end
 

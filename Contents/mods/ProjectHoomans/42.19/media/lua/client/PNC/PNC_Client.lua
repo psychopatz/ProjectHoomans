@@ -379,6 +379,12 @@ function Client.HandleServerCommand(command, args)
         applyZombieBite(args)
         return
     end
+    if command == Const.CMD_FIREARM_SHOT then
+        if PNC.ClientFirearmEffects and PNC.ClientFirearmEffects.Play then
+            PNC.ClientFirearmEffects.Play(args)
+        end
+        return
+    end
     if command == Const.CMD_DEBUG_ROSTER then
         ClientState.debugAuthorized = args and args.authorized == true or false
         ClientState.debugRoster = args and args.diagnostics or {}
@@ -651,6 +657,9 @@ local function onResetLua()
     ClientState.debugRoster = {}
     ClientState.debugAuthorized = false
     Client.BiteReplicas = {}
+    if PNC.ClientFirearmEffects and PNC.ClientFirearmEffects.Reset then
+        PNC.ClientFirearmEffects.Reset()
+    end
     if Interpolation and Interpolation.ClearAll then
         Interpolation.ClearAll()
     end

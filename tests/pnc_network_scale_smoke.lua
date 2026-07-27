@@ -36,6 +36,7 @@ PNC = {
         CMD_REMOVE_RECORD = "RemoveRecord",
         CMD_CHARACTER_PAYLOAD = "CharacterPayload",
         CMD_INVENTORY_DELTA = "InventoryDelta",
+        CMD_FIREARM_SHOT = "FirearmShot",
         ROSTER_CHUNK_SIZE = 50,
         ROSTER_DELTA_INTERVAL_MS = 10000,
         INTEREST_REFRESH_MS = 1000,
@@ -176,5 +177,18 @@ assertEqual(sent[1].payload.entries[1].id, "npc_removed", "removal roster id")
 assertEqual(sent[1].payload.entries[1].removed, true, "removal roster marker")
 assertEqual(sent[1].payload.entries[1].snapshot, nil, "removal roster leaked snapshot")
 assertEqual(PNC.Network.QueueRosterDelta("npc_invalid", false, "invalid"), false, "non-removal accepted id-only record")
+
+sent = {}
+assertEqual(PNC.Network.BroadcastFirearmShot({
+    shotId = "npc_near:1",
+    npcId = "npc_near",
+    sx = 0,
+    sy = 0,
+    sz = 0,
+    soundRadius = 60,
+}), true, "firearm shot event broadcast")
+assertEqual(#sent, 8, "firearm shot distance recipient count")
+assertEqual(sent[1].command, "FirearmShot", "firearm shot command")
+assertEqual(sent[1].payload.shotId, "npc_near:1", "firearm shot id")
 
 print("pnc_network_scale_smoke: ok")

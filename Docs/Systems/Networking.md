@@ -14,6 +14,9 @@
   and replay reaction flags without running damage logic
 - `BroadcastZombieBite`: two transition packets (`start` and `clear`) for the
   normal-zombie bite animation; canonical NPC damage remains server-only
+- `BroadcastFirearmShot`: one transient, deduplicated visual/audio packet built
+  from the equipped gun at its hit frame. It carries weapon/ammunition and
+  projectile metadata but no permission to apply damage or consume ammo
 - NPC bandaging is presented as a local timed action, but only its completion
   sends `CMD_BANDAGE`; the server revalidates the item, range, wound, and debug
   authorization before mutating or broadcasting the record
@@ -21,7 +24,10 @@
 ## Current Rules
 - snapshot building reuses cached equipment and appearance data where possible
 - full inventory payloads are on-demand, not sent every tick
-- live snapshots and combat events are sent only to players inside the NPC interest set
+- live snapshots and body-bound combat events are sent only to players inside
+  the NPC interest set. Firearm shots use the larger of that visual radius and
+  the equipped gun's sound radius so players who can hear a loud gun are not
+  omitted merely because they do not subscribe to the shooter's live snapshot
 - interest enters at 48 tiles and leaves at 56 tiles
 - full character payloads require owner, admin, or same-level five-tile access
 - inventory revisions use deltas while the operation log covers the client revision; gaps receive a full refresh

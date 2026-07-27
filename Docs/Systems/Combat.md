@@ -83,6 +83,16 @@
   start/finish transitions use the normal presence snapshot stream so remote
   clients see the same pistol, rifle, shotgun, revolver, or double-barrel
   animation without applying ammunition locally
+- a firearm produces its shot at the authoritative delayed-hit frame, not at
+  animation start. `PNC_Combat_FirearmEffects` derives the ammo ItemKey,
+  ammo-per-shot, shot/shell/impact sounds, noise radius and volume, projectile
+  count/spread, range, and piercing flag from the equipped `HandWeapon`; this
+  keeps modded guns data-driven instead of adding PNC weapon-name tables
+- the server consumes the weapon-defined rounds and publishes the vanilla-style
+  world sound that attracts zombies. A transient shot event lets clients play
+  that firearm's positional audio and render its native muzzle hook, a bounded
+  two-tick orange light, and short projectile-count-aware tracers; clients
+  never apply firearm damage or ammunition changes
 - the debug overlay exposes loaded rounds, magazine capacity, reload state, and
   either the companion's loose reserve count or `infinite`; this row has its
   own in-game overlay toggle
