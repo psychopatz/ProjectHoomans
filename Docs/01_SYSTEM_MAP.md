@@ -87,7 +87,7 @@
 - `PNC_ClientHumanNPCSafeguards`: client-local correction for vanilla
   `IsoPlayer.updateLOS` treating managed human bodies as visible zombies,
   including panic, sleep, and single-player fast-forward side effects;
-  preserves all ordinary-zombie threat counters
+  preserves all ordinary-zombie threat behavior
 - `PNC_LiveBodyControl`: pre-AI `OnZombieUpdate` safety plus world-ready scans
   ensure persisted and legacy NPC bodies cannot target or bite during relog
 - `PNC_HumanNPCSleepPatch`: refreshes corrected threat counters immediately

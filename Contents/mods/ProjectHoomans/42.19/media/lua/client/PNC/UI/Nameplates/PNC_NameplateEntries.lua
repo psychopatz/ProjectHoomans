@@ -14,8 +14,6 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
     local fonts = Presentation.Fonts
     local showDebug = settings and settings.showAIDebug == true
     local name = snapshot and snapshot.name or "PNC NPC"
-    local hpText = "[" .. tostring(math.floor((tonumber(snapshot.hpCurrent) or 0) + 0.5))
-        .. "/" .. tostring(math.floor((tonumber(snapshot.hpMax) or 0) + 0.5)) .. "]"
     local debugText = showDebug
         and Debug.BuildText(snapshot, zombie ~= nil, settings) or ""
     if showDebug and settings.debugShowAnimation ~= false then
@@ -24,13 +22,22 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
     end
     local infectionDebugText = showDebug
         and Debug.InfectionText(snapshot, settings) or ""
+    local treatmentText, treatmentColor =
+        Presentation.TreatmentStatus(snapshot)
+    entry.treatmentColor = treatmentColor
+    entry.treatmentVisible = treatmentText ~= ""
     Presentation.CacheTextMetric(entry, "name", name, fonts.name)
-    Presentation.CacheTextMetric(entry, "hpText", hpText, fonts.hp)
     Presentation.CacheTextMetric(entry, "debugText", debugText, fonts.debug)
     Presentation.CacheTextMetric(
         entry,
         "infectionDebugText",
         infectionDebugText,
+        fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "treatmentText",
+        treatmentText,
         fonts.debug
     )
 end

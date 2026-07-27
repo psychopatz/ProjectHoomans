@@ -23,10 +23,10 @@ local function snapshotFor(entry)
 end
 
 function Provider.isEnabled(entry)
-    local snapshot = snapshotFor(entry)
-    local record = entry and entry.record or nil
-    return snapshot and snapshot.healthState == "incapacitated" and snapshot.canRevive == true
-        or record and record.health and PNC.Health and PNC.Health.CanRevive and PNC.Health.CanRevive(record)
+    -- Recovery is now driven entirely by ordinary body-part bandaging and
+    -- gradual healing. Keep the provider registered for save/UI compatibility,
+    -- but do not expose a second instant-revive interaction.
+    return false
 end
 
 function Provider.addOptions(menu, entry, player)

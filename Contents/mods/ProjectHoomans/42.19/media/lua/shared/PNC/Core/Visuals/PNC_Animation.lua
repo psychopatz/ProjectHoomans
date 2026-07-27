@@ -431,13 +431,23 @@ function Animation.SyncLocomotion(zombie, record)
     local path
     local now
     local downedMoving
+    local treatment
     if not zombie then
         return
     end
     runtime = record and record.runtime or nil
+    treatment = runtime and runtime.selfTreatment or nil
     attackAction = runtime and runtime.attackAction or nil
     path = runtime and runtime.pathing or nil
     now = Core and Core.Now and Core.Now() or 0
+    if treatment and treatment.phase == "bandaging"
+        and now < (tonumber(treatment.finishAt) or 0)
+    then
+        if zombie.setUseless then
+            zombie:setUseless(true)
+        end
+        return
+    end
     if record and record.health and record.health.state == "incapacitated" then
         downedMoving = path and (
             path.phase == "requested"

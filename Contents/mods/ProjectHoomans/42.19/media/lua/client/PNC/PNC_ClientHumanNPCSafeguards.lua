@@ -162,7 +162,7 @@ end
 -- Build 42 exposes no setter for Stats.lastVeryCloseZombies. Re-running the
 -- vanilla LOS pass while managed human bodies carry its built-in grapple-only
 -- exclusion is the only supported way to obtain exact counters. The flag is
--- restored synchronously; it is never persisted or replicated.
+-- restored synchronously so it cannot leak into NPC posture or reanimation.
 function Safeguards.RefreshVanillaThreatCounters(player)
     local bodies
     local previous = {}
@@ -203,8 +203,8 @@ local function getSpeedControls()
         and UIManager.getSpeedControls() or nil
 end
 
-local function getCurrentSpeed()
-    local controls = getSpeedControls()
+local function getCurrentSpeed(controls)
+    controls = controls or getSpeedControls()
     if controls and controls.getCurrentGameSpeed then
         return tonumber(controls:getCurrentGameSpeed())
     end
@@ -218,14 +218,21 @@ local function applyFastForwardSpeed(controls, speed)
         [4] = "Wait",
     }
     local buttonName = buttonNames[tonumber(speed)]
-    if controls and controls.ButtonClicked and buttonName then
-        -- Vanilla's ButtonClicked changes both the selected speed and the
-        -- GameTime multiplier. SetCurrentGameSpeed alone always resets the
-        -- multiplier to 1 and therefore only changes the icon.
-        controls:ButtonClicked(buttonName)
-        return true
+    if not controls or not controls.ButtonClicked or not buttonName then
+        return false
     end
-    return false
+    -- This invokes the public Java method normally. Never assign or wrap it:
+    -- Kahlua cannot replace methods owned by zombie.ui.SpeedControls.
+    controls:ButtonClicked(buttonName)
+    return true
+end
+
+local function hasThreatCounters(stats)
+    return stats and (
+        (stats.getNumVisibleZombies and stats:getNumVisibleZombies() > 0)
+        or (stats.getNumChasingZombies and stats:getNumChasingZombies() > 0)
+        or (stats.getNumVeryCloseZombies and stats:getNumVeryCloseZombies() > 0)
+    ) or false
 end
 
 local function logDebugThrottled(player, key, message)
@@ -263,33 +270,6 @@ local function capturePanicBaseline(player, overwrite)
     Safeguards.PlayerState[playerKey(player)] = state
 end
 
-function Safeguards.CaptureFastForwardIntent()
-    local controls
-    local speed
-    local count
-    local i
-    local player
-    local state
-    if isClient and isClient() then return end
-    controls = getSpeedControls()
-    speed = controls and controls.getCurrentGameSpeed
-        and tonumber(controls:getCurrentGameSpeed()) or nil
-    if speed == nil then return end
-    count = getNumActivePlayers and getNumActivePlayers() or 1
-    for i = 0, math.max(0, count - 1) do
-        player = getSpecificPlayer and getSpecificPlayer(i) or nil
-        if player then
-            state = Safeguards.PlayerState[playerKey(player)] or {}
-            if speed > 1 then
-                state.fastForwardSpeed = speed
-            elseif speed == 1 then
-                state.fastForwardSpeed = nil
-            end
-            Safeguards.PlayerState[playerKey(player)] = state
-        end
-    end
-end
-
 function Safeguards.OnPlayerUpdate(player)
     local stats = player and player.getStats and player:getStats() or nil
     local spotted = player and player.getSpottedList and player:getSpottedList() or nil
@@ -303,12 +283,28 @@ function Safeguards.OnPlayerUpdate(player)
     local rawVisible
     local rawChasing
     local rawVeryClose
+    local rawThreatCounters
     local currentSpeed
     local refreshed = false
     local panicCorrected = false
     if not player or not stats then return end
 
-    seedKnownHumanBodies(player, lastSpotted)
+    if not (isClient and isClient()) then
+        currentSpeed = getCurrentSpeed()
+        if currentSpeed and currentSpeed > 1 then
+            -- OnPlayerUpdate is raised immediately before IsoPlayer.updateLOS.
+            -- Arm one post-world-update check without intercepting UI input.
+            state.fastForwardSpeed = currentSpeed
+            state.awaitingLOS = true
+        elseif currentSpeed == 1 then
+            -- Normal speed at this pre-LOS point is an explicit vanilla/user
+            -- interruption, not the nearby-zombie reset that has yet to run.
+            state.fastForwardSpeed = nil
+            state.awaitingLOS = false
+        end
+    end
+
+    managedVisible = seedKnownHumanBodies(player, lastSpotted)
     for i = 0, listSize(spotted) - 1 do
         body = listGet(spotted, i)
         if isAlive(body) and isZombie(body) then
@@ -328,14 +324,10 @@ function Safeguards.OnPlayerUpdate(player)
     rawVisible = stats.getNumVisibleZombies and stats:getNumVisibleZombies() or nil
     rawChasing = stats.getNumChasingZombies and stats:getNumChasingZombies() or nil
     rawVeryClose = stats.getNumVeryCloseZombies and stats:getNumVeryCloseZombies() or nil
-    currentSpeed = getCurrentSpeed()
-    if currentSpeed and currentSpeed > 1 then
-        state.fastForwardSpeed = currentSpeed
-    end
-    if managedVisible and ((rawVeryClose and rawVeryClose > 0)
-        or (state.fastForwardSpeed and state.fastForwardSpeed > 1
-            and currentSpeed == 1))
-    then
+    rawThreatCounters = (rawVisible and rawVisible > 0)
+        or (rawChasing and rawChasing > 0)
+        or (rawVeryClose and rawVeryClose > 0)
+    if managedVisible and rawThreatCounters then
         refreshed = Safeguards.RefreshVanillaThreatCounters(player)
     end
     if managedVisible and not realZombieVisible then
@@ -344,9 +336,7 @@ function Safeguards.OnPlayerUpdate(player)
             stats:setLastNumberChasingZombies(0)
         end
         if panic ~= nil and state.safePanic ~= nil and panic > state.safePanic
-            and ((rawVisible and rawVisible > 0)
-                or (rawChasing and rawChasing > 0)
-                or (rawVeryClose and rawVeryClose > 0))
+            and rawThreatCounters
             and stats.set and CharacterStat and CharacterStat.PANIC
         then
             stats:set(CharacterStat.PANIC, state.safePanic)
@@ -356,28 +346,7 @@ function Safeguards.OnPlayerUpdate(player)
     elseif panic ~= nil then
         state.safePanic = panic
     end
-    if realZombieVisible or playerInterruptsFastForward(player) then
-        state.fastForwardSpeed = nil
-    elseif refreshed and state.fastForwardSpeed and state.fastForwardSpeed > 1
-        and currentSpeed == 1
-        and (not stats.getNumVisibleZombies or stats:getNumVisibleZombies() <= 0)
-        and (not stats.getNumChasingZombies or stats:getNumChasingZombies() <= 0)
-        and (not stats.getNumVeryCloseZombies or stats:getNumVeryCloseZombies() <= 0)
-    then
-        local controls = getSpeedControls()
-        if applyFastForwardSpeed(controls, state.fastForwardSpeed) then
-            logDebugThrottled(player, "fast_forward_restored",
-                "event=fast_forward_restored speed="
-                .. tostring(state.fastForwardSpeed)
-                .. " rawVisible=" .. tostring(rawVisible)
-                .. " rawChasing=" .. tostring(rawChasing)
-                .. " rawVeryClose=" .. tostring(rawVeryClose))
-        end
-    end
-    if (rawVisible and rawVisible > 0)
-        or (rawChasing and rawChasing > 0)
-        or (rawVeryClose and rawVeryClose > 0)
-    then
+    if rawThreatCounters then
         logDebugThrottled(player,
             "counter_scan:" .. tostring(managedVisible)
                 .. ":" .. tostring(realZombieVisible),
@@ -387,8 +356,6 @@ function Safeguards.OnPlayerUpdate(player)
                 .. " counters=" .. tostring(rawVisible)
                 .. "/" .. tostring(rawChasing)
                 .. "/" .. tostring(rawVeryClose)
-                .. " speed=" .. tostring(currentSpeed)
-                .. " intent=" .. tostring(state.fastForwardSpeed)
                 .. " panic=" .. tostring(panic))
     end
     if panicCorrected and player.getMoodles then
@@ -397,6 +364,64 @@ function Safeguards.OnPlayerUpdate(player)
     end
     if panic ~= nil then state.lastPanic = panic end
     Safeguards.PlayerState[playerKey(player)] = state
+end
+
+-- IngameState raises OnTick after IsoWorld.update(), so vanilla updateLOS has
+-- finished and any close-zombie speed reset is now observable. Recount with
+-- only managed bodies temporarily excluded, then restore the captured speed
+-- only when no ordinary zombie or player interruption remains.
+function Safeguards.OnTick()
+    local controls
+    local currentSpeed
+    local count
+    local restoreSpeed
+    local blocked = false
+    local i
+    local player
+    local stats
+    local state
+    local rawThreat
+    local refreshed
+    if isClient and isClient() then return end
+    controls = getSpeedControls()
+    currentSpeed = getCurrentSpeed(controls)
+    if currentSpeed == nil then return end
+    count = getNumActivePlayers and getNumActivePlayers() or 1
+    for i = 0, math.max(0, count - 1) do
+        player = getSpecificPlayer and getSpecificPlayer(i) or nil
+        state = player and Safeguards.PlayerState[playerKey(player)] or nil
+        if state and state.awaitingLOS == true then
+            state.awaitingLOS = false
+            if currentSpeed == 1 and state.fastForwardSpeed
+                and state.fastForwardSpeed > 1
+            then
+                stats = player.getStats and player:getStats() or nil
+                rawThreat = hasThreatCounters(stats)
+                refreshed = rawThreat
+                    and Safeguards.RefreshVanillaThreatCounters(player) or false
+                if playerInterruptsFastForward(player)
+                    or not refreshed
+                    or hasThreatCounters(stats)
+                then
+                    state.fastForwardSpeed = nil
+                    blocked = true
+                else
+                    restoreSpeed = math.max(
+                        tonumber(restoreSpeed) or 1,
+                        tonumber(state.fastForwardSpeed) or 1
+                    )
+                    logDebugThrottled(player, "fast_forward_restore",
+                        "event=fast_forward_restore speed="
+                        .. tostring(state.fastForwardSpeed)
+                        .. " rawThreat=" .. tostring(rawThreat))
+                end
+            end
+            Safeguards.PlayerState[playerKey(player)] = state
+        end
+    end
+    if not blocked and restoreSpeed and currentSpeed == 1 then
+        applyFastForwardSpeed(controls, restoreSpeed)
+    end
 end
 
 function Safeguards.RegisterHumanBody(body)
@@ -425,8 +450,8 @@ end
 if Events and Events.OnPlayerUpdate then
     Events.OnPlayerUpdate.Add(Safeguards.OnPlayerUpdate)
 end
-if Events and Events.OnPreUIDraw then
-    Events.OnPreUIDraw.Add(Safeguards.CaptureFastForwardIntent)
+if Events and Events.OnTick then
+    Events.OnTick.Add(Safeguards.OnTick)
 end
 if Events and Events.OnCreatePlayer then
     Events.OnCreatePlayer.Add(Safeguards.OnCreatePlayer)

@@ -11,6 +11,7 @@ require "PNC/Core/Behaviors/PNC_Behavior_Targeting"
 require "PNC/Core/Behaviors/PNC_Behavior_Combat"
 require "PNC/Core/Behaviors/PNC_BehaviorRegistry"
 require "PNC/Core/Behaviors/PNC_Behavior_Incapacitated"
+require "PNC/Core/Behaviors/PNC_Behavior_Treatment"
 require "PNC/Core/Behaviors/PNC_Behavior_Companion"
 require "PNC/Core/Behaviors/PNC_Behavior_Hostile"
 require "PNC/Core/Behaviors/PNC_Behavior_Roaming"
@@ -24,6 +25,7 @@ local Animation = PNC.Animation
 local Common = PNC.BehaviorCommon
 local Registry = PNC.BehaviorRegistry
 local Incapacitated = PNC.BehaviorIncapacitated
+local Treatment = PNC.BehaviorTreatment
 local Companion = PNC.BehaviorCompanion
 local Hostile = PNC.BehaviorHostile
 
@@ -37,6 +39,10 @@ function Behavior.Tick(record, zombie, now)
         if zombie then
             Animation.Apply(zombie, record, "Idle")
         end
+        return
+    end
+
+    if Treatment and Treatment.Tick and Treatment.Tick(record, zombie, now) then
         return
     end
 

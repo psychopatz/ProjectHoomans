@@ -105,10 +105,12 @@ assertEqual(#stopped, 18, "voice suppression repeats after cooldown")
 
 useless = false
 noTeeth = false
+grappleOnly = true
 vanillaTarget = {}
 zombieUpdateHandler(managedBody)
 assertEqual(useless, true, "zombie update repairs persisted useless flag")
 assertEqual(noTeeth, true, "zombie update repairs persisted teeth flag")
+assertEqual(grappleOnly, false, "zombie update repairs leaked grapple-only flag")
 assertEqual(vanillaTarget, nil, "zombie update clears persisted target")
 
 local panic = 2
@@ -133,11 +135,16 @@ local spottedValues = {}
 local lastSpottedValues = {}
 local speed = 1
 local multiplier = 1
+local speedButtonCalls = 0
 local controls = {
     getCurrentGameSpeed = function() return speed end,
     SetCurrentGameSpeed = function(_, value) speed = value end,
     ButtonClicked = function(_, name)
-        if name == "Fast Forward x 1" then
+        speedButtonCalls = speedButtonCalls + 1
+        if name == "Play" then
+            speed = 1
+            multiplier = 1
+        elseif name == "Fast Forward x 1" then
             speed = 2
             multiplier = 5
         elseif name == "Fast Forward x 2" then
@@ -149,6 +156,7 @@ local controls = {
         end
     end,
 }
+local originalButtonClicked = controls.ButtonClicked
 local player = {
     getPlayerNum = function() return 0 end,
     getStats = function() return stats end,
@@ -180,6 +188,8 @@ local player = {
             if body.isZombie and body:isZombie() and not excluded then
                 visibleZombies = visibleZombies + 1
                 veryCloseZombies = veryCloseZombies + 1
+                speed = 1
+                multiplier = 1
             end
         end
     end,
@@ -191,7 +201,7 @@ instanceof = function(body, className)
 end
 Events = {
     OnPlayerUpdate = { Add = function() end },
-    OnPreUIDraw = { Add = function() end },
+    OnTick = { Add = function() end },
     OnCreatePlayer = { Add = function() end },
     OnResetLua = { Add = function() end },
 }
@@ -209,6 +219,7 @@ panic = 5
 visibleZombies = 3
 chasingZombies = 2
 veryCloseZombies = 1
+grappleOnly = false
 spottedValues[1] = managedBody
 PNC.ClientPresenceSync.BodyByID.npc_1 = managedBody
 
@@ -237,21 +248,35 @@ assertEqual(visibleZombies, 1, "real zombie visible count survives exact recount
 assertEqual(veryCloseZombies, 1, "real zombie close count survives exact recount")
 
 spottedValues[2] = nil
-speed = 3
-PNC.ClientHumanNPCSafeguards.CaptureFastForwardIntent()
-speed = 1
-visibleZombies = 1
-veryCloseZombies = 1
+controls:ButtonClicked("Fast Forward x 2")
+local playerSpeedButtonCalls = speedButtonCalls
 PNC.ClientHumanNPCSafeguards.OnPlayerUpdate(player)
-assertEqual(speed, 3, "managed body does not cancel requested fast-forward")
-assertEqual(multiplier, 20, "fast-forward restores vanilla time multiplier")
+player:updateLOS()
+assertEqual(speed, 1, "vanilla LOS attempted managed-body speed reset")
+PNC.ClientHumanNPCSafeguards.OnTick()
+assertEqual(speed, 3, "post-LOS safeguard restores requested fast-forward")
+assertEqual(multiplier, 20, "post-LOS safeguard restores vanilla multiplier")
+assertEqual(speedButtonCalls, playerSpeedButtonCalls + 1,
+    "safeguard delegates restoration through vanilla speed controls")
+assertEqual(controls.ButtonClicked, originalButtonClicked,
+    "safeguard leaves Java-owned method untouched")
 
-speed = 1
-PNC.ClientHumanNPCSafeguards.CaptureFastForwardIntent()
-visibleZombies = 1
-veryCloseZombies = 1
+controls:ButtonClicked("Play")
 PNC.ClientHumanNPCSafeguards.OnPlayerUpdate(player)
+player:updateLOS()
+PNC.ClientHumanNPCSafeguards.OnTick()
 assertEqual(speed, 1, "explicit normal speed remains selected")
+
+spottedValues[2] = normalZombie
+controls:ButtonClicked("Fast Forward x 2")
+PNC.ClientHumanNPCSafeguards.OnPlayerUpdate(player)
+player:updateLOS()
+PNC.ClientHumanNPCSafeguards.OnTick()
+assertEqual(speed, 1, "ordinary zombie still cancels fast-forward")
+spottedValues[2] = nil
+PNC.ClientHumanNPCSafeguards.OnResetLua()
+assertEqual(controls.ButtonClicked, originalButtonClicked,
+    "Lua reset leaves Java-owned method untouched")
 
 local sleepAllowed
 ISWorldObjectContextMenu = {

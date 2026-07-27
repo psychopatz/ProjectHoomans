@@ -51,6 +51,7 @@ local body = {
     getZ = function() return 0 end,
 }
 local emitter = { isPlaying = function() return true end }
+local playedSound
 local player = {
     getInventory = function() return inventory end,
     getPerkLevel = function() return 4 end,
@@ -62,7 +63,10 @@ local player = {
     shouldBeTurning = function() return false end,
     reportEvent = function(self, event) self.reportedEvent = event end,
     SetVariable = function(self, key, value) self.animationVariable = key .. "=" .. value end,
-    playSound = function() return 7 end,
+    playSound = function(_, sound)
+        playedSound = sound
+        return 7
+    end,
     getEmitter = function() return emitter end,
     stopOrTriggerSound = function() end,
 }
@@ -102,9 +106,10 @@ assertEqual(queued.maxTime, 104, "First Aid duration")
 assertEqual(queued:isValid(), true, "queued action validity")
 
 queued:start()
-assertEqual(queued.startedAnimation, "Loot", "vanilla other-patient animation")
-assertEqual(player.animationVariable, "LootPosition=Mid", "vanilla loot position")
-assertEqual(player.reportedEvent, "EventLootItem", "vanilla animation event")
+assertEqual(queued.startedAnimation, "Bandage", "vanilla bandage animation")
+assertEqual(player.reportedEvent, "EventBandage", "vanilla animation event")
+assertEqual(playedSound, "FirstAidApplyBandage", "vanilla bandage SFX")
+assertEqual(queued.useProgressBar, true, "vanilla loading bar enabled")
 assertEqual(item.jobType, "Bandage", "item progress label")
 
 queued:update()

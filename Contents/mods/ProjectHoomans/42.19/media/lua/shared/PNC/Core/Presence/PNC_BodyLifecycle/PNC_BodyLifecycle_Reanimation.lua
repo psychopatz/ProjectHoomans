@@ -20,7 +20,8 @@ local CONTROL_MODDATA_KEYS = {
     "PNC_BumpReleaseAt", "PNC_BumpReleasePending", "PNC_CombatReaction",
     "PNC_LastAttackAt", "PNC_ZombieID", "PNC_ClientAttackKey",
     "PNC_ClientHandsKey", "PNC_ClientHumanVisualAt", "PNC_ClientMotionKey",
-    "PNC_ClientSpecialKey", "PNC_ClientVisualKey", "PNC_DebugAnimCycleKey",
+    "PNC_ClientSpecialKey", "PNC_ClientTreatmentSoundKey",
+    "PNC_ClientVisualKey", "PNC_DebugAnimCycleKey",
     "PNC_DebugAnimCycleStartAt", "PNC_DeathMarkerID", "PNC_DeathName",
 }
 
@@ -84,7 +85,6 @@ function Lifecycle.ReleaseReanimatedNPC(record, zombie)
     setBoolean(zombie, "setNoTeeth", false)
     setBoolean(zombie, "setZombiesDontAttack", false)
     setBoolean(zombie, "setInvincible", false)
-
     if PNC.Registry and PNC.Registry.GetDeathMarker
         and PNC.Registry.GetDeathMarker(record.id)
         and PNC.Registry.RemoveDeathMarker

@@ -56,12 +56,15 @@
   zombie. A dedicated client patch refreshes those counters immediately before
   the vanilla sleep handler; any ordinary zombie remains counted and still
   blocks sleep
-- single-player fast-forward intent is retained when `updateLOS` alone reset
-  speed because of a managed body. Restoration delegates through vanilla
-  `SpeedControls:ButtonClicked`, which restores both its selected icon and the
-  corresponding `GameTime` multiplier. Movement, aiming, attacking, fire,
-  death, or any remaining real-zombie counter cancels that intent normally.
-  Multiplayer time control is not overridden
+- single-player fast-forward intent is sampled by `OnPlayerUpdate` immediately
+  before vanilla LOS and checked by `OnTick` after the world update. If a
+  temporary filtered recount proves that only managed bodies caused the reset,
+  PNC invokes the unmodified vanilla speed-control method; it never replaces a
+  Java-owned UI method. Player interruptions and ordinary zombies still cancel
+  time acceleration normally
+- human-body maintenance clears any leaked grapple-only flag from older saves,
+  recovering the NPC's standing posture; the flag exists only during the
+  synchronous filtered LOS recount and cannot reach NPC update or replication
 - while the AI debug overlay is enabled, the safeguard emits cadence-bounded
   `human_safeguard` counter decisions and one `sleep_gate` line per sleep
   attempt with visible/chasing/very-close counters before and after correction

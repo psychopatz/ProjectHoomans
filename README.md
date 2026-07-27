@@ -9,7 +9,8 @@ This repository starts with a server-authoritative V1 slice:
 - live/abstract presence switching with runtime body leases and automatic stale-body cleanup
 - vanilla-owned, lootable NPC corpses with lightweight death-location markers and authority-owned infected reanimation
 - phased zombie-bite recovery that releases the engine bump state on interruption or timeout
-- body-part wounds with vanilla-style timed bandaging and server-side item consumption
+- body-part wounds with vanilla-style timed bandaging, gradual First Aid-based
+  healing, threat-aware NPC self-treatment, and server-side item consumption
 - configurable bite infection, staged fever and health decline, infection death, and corpse reanimation
 - multiplayer-safe authority flow with the same codepath used by singleplayer host
 - an admin/debug-only NPC Monitor with lifecycle audits, filters, recovery controls, and overlay states

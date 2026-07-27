@@ -214,6 +214,39 @@ function API.ApplyDebugInfection(npcId, args)
     return true, result
 end
 
+function API.ClearKnoxInfection(npcId, source)
+    local record = Registry.Get(npcId)
+    local cleared
+    local reason
+    if not record or not Core.IsAuthority()
+        or not PNC.NPCWounds or not PNC.NPCWounds.ClearInfection
+    then
+        return false, "not_authority_or_missing"
+    end
+    cleared, reason = PNC.NPCWounds.ClearInfection(
+        record,
+        source or "knox_cured"
+    )
+    if not cleared then return false, reason end
+    Network.BroadcastRecord(record, source or "knox_cured")
+    return true, reason
+end
+
+function API.DebugBandageAlmostDirty(npcId, partId)
+    local record = Registry.Get(npcId)
+    local applied
+    local reason
+    if not record or not Core.IsAuthority()
+        or not PNC.NPCWounds or not PNC.NPCWounds.DebugAlmostDirty
+    then
+        return false, "not_authority_or_missing"
+    end
+    applied, reason = PNC.NPCWounds.DebugAlmostDirty(record, partId)
+    if not applied then return false, reason end
+    Network.BroadcastRecord(record, "debug_bandage_almost_dirty")
+    return true, reason
+end
+
 function API.GetSnapshot(npcId)
     local record = Registry.Get(npcId)
     if record then
@@ -271,7 +304,7 @@ function API.DebugCommand(npcId, command, args)
             return false
         end
         Health.Revive(record, zombie)
-        Network.BroadcastRecord(record, "revive")
+        Network.BroadcastRecord(record, "bandaged_all")
         return true
     end
     if command == "damage" then
@@ -285,6 +318,12 @@ function API.DebugCommand(npcId, command, args)
     end
     if command == "infection" then
         return API.ApplyDebugInfection(npcId, args or {})
+    end
+    if command == "clear_infection" then
+        return API.ClearKnoxInfection(npcId, "debug_infection_cleared")
+    end
+    if command == "bandage_almost_dirty" then
+        return API.DebugBandageAlmostDirty(npcId, args and args.partId)
     end
     if command == "set_weapon_mode" then
         record.weaponMode = tostring(args and args.weaponMode or record.weaponMode or "melee")

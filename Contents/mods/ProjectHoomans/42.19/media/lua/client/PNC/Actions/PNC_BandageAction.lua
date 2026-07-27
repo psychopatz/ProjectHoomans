@@ -24,17 +24,13 @@ end
 
 local function itemStillPresent(character, item)
     local inventory = character and character.getInventory and character:getInventory() or nil
-    local ok
-    local present
     if not item then return true end
     if not inventory then return false end
     if inventory.containsRecursive then
-        ok, present = pcall(inventory.containsRecursive, inventory, item)
-        if ok then return present == true end
+        return inventory:containsRecursive(item) == true
     end
     if inventory.contains then
-        ok, present = pcall(inventory.contains, inventory, item)
-        if ok then return present == true end
+        return inventory:contains(item) == true
     end
     return item.getContainer and item:getContainer() ~= nil
 end
@@ -84,12 +80,9 @@ function PNCBandageAction:update()
 end
 
 function PNCBandageAction:start()
-    -- Vanilla uses its Loot/Mid first-aid pose when one character bandages
-    -- another character. The bandage item job delta supplies the standard
-    -- timed-action loading indicator.
-    self:setActionAnim("Loot")
-    self.character:SetVariable("LootPosition", "Mid")
-    self.character:reportEvent("EventLootItem")
+    self:setActionAnim(CharacterActionAnims and CharacterActionAnims.Bandage
+        or "Bandage")
+    self.character:reportEvent("EventBandage")
     self:setOverrideHandModels(nil, nil)
     if self.item then
         self.item:setJobType(getText("ContextMenu_Apply_Bandage"))
@@ -140,6 +133,8 @@ function PNCBandageAction:new(character, npcId, partId, item, debugFree, bandage
     action.bandageType = bandageType
     action.stopOnWalk = true
     action.stopOnRun = true
+    action.stopOnAim = true
+    action.useProgressBar = true
     action.maxTime = math.max(80, 120 - doctorLevel * 4)
     return action
 end

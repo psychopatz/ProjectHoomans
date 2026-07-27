@@ -9,18 +9,14 @@ Presentation.Layout = {
     padding = 2,
     maxDrawDistance = 22,
     floorTolerance = 1,
-    heartIconSize = 16,
-    heartIconGap = 2,
     nameYOffset = 152,
     barYOffset = 130,
-    hpTextTopGap = 12,
     debugTextGap = 14,
     nameDebugGap = 16,
 }
 
 Presentation.Fonts = {
     name = UIFont.Small,
-    hp = UIFont.Medium,
     debug = UIFont.Small,
 }
 
@@ -36,7 +32,12 @@ local HEALTH_COLORS = {
     critical = { r = 0.8, g = 0.15, b = 0.15, a = 1.0 },
 }
 
-local heartTexture
+local TREATMENT_COLORS = {
+    applying = { r = 0.35, g = 0.95, b = 1.0, a = 1.0 },
+    retreat = { r = 1.0, g = 0.72, b = 0.15, a = 1.0 },
+    dirty = { r = 1.0, g = 0.55, b = 0.12, a = 1.0 },
+    clean = { r = 0.35, g = 0.95, b = 0.35, a = 1.0 },
+}
 
 local function clamp(value, minValue, maxValue)
     if value < minValue then return minValue end
@@ -95,6 +96,48 @@ function Presentation.StaminaColor(staminaRatio)
     return { r = value, g = value, b = value, a = 1.0 }
 end
 
+local function treatmentPartLabel(partId)
+    local part = PNC.NPCWounds and PNC.NPCWounds.Parts
+        and PNC.NPCWounds.Parts[partId] or nil
+    return tostring(part and part.label or partId or "Wound")
+end
+
+function Presentation.TreatmentStatus(snapshot)
+    local state = snapshot and snapshot.treatmentState or nil
+    local phase = tostring(state and state.phase or "idle")
+    local body = snapshot and snapshot.bodyHealth or nil
+    local partId
+    local wound
+    if phase == "bandaging" then
+        return "Bandaging " .. treatmentPartLabel(state.partId)
+            .. " - " .. tostring(state.bandageName or state.bandageType or "Ripped Sheets"),
+            TREATMENT_COLORS.applying,
+            true
+    end
+    if phase == "retreat" then
+        return "Seeking safety to bandage", TREATMENT_COLORS.retreat, true
+    end
+    for candidateId, candidate in pairs(body and body.wounds or {}) do
+        if candidate and candidate.bandaged == true and candidate.bandageDirty == true then
+            return "Dirty bandage: " .. treatmentPartLabel(candidateId)
+                .. " (" .. tostring(candidate.bandageName or candidate.bandageType or "Ripped Sheets") .. ")",
+                TREATMENT_COLORS.dirty,
+                false
+        end
+        if not wound and candidate and candidate.bandaged == true then
+            partId = candidateId
+            wound = candidate
+        end
+    end
+    if wound then
+        return "Bandaged: " .. treatmentPartLabel(partId)
+            .. " (" .. tostring(wound.bandageName or wound.bandageType or "Ripped Sheets") .. ")",
+            TREATMENT_COLORS.clean,
+            false
+    end
+    return "", TREATMENT_COLORS.clean, false
+end
+
 function Presentation.ShouldShowHealth(snapshot, currentTime)
     if not snapshot then return false end
     if tostring(snapshot.healthState or "") == "incapacitated" then return true end
@@ -110,12 +153,6 @@ function Presentation.ShouldShowStamina(snapshot, currentTime)
     return Presentation.StaminaRatio(snapshot) < 0.999
 end
 
-function Presentation.GetHeartTexture()
-    if heartTexture ~= nil then return heartTexture or nil end
-    heartTexture = getTexture("media/ui/Moodle_internal_plus_red.png") or getTexture("heart_on") or false
-    return heartTexture or nil
-end
-
 function Presentation.ScaleFor(playerIndex)
     local zoom = getCore():getZoom(playerIndex)
     if zoom <= 0 then zoom = 1 end
@@ -124,8 +161,6 @@ function Presentation.ScaleFor(playerIndex)
         zoom = zoom,
         barWidth = Presentation.Layout.barWidth / divisor,
         barHeight = Presentation.Layout.barHeight / divisor,
-        heartIconSize = Presentation.Layout.heartIconSize / divisor,
-        heartIconGap = Presentation.Layout.heartIconGap / divisor,
         nameYOffset = Presentation.Layout.nameYOffset / zoom,
         barYOffset = Presentation.Layout.barYOffset / zoom,
     }

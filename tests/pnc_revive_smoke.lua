@@ -5,11 +5,27 @@ local bodies = {}
 local broadcasts = 0
 local clearedAggro = 0
 local scheduledAt
+local currentWorldHour = 10
+
+getGameTime = function()
+    return { getWorldAgeHours = function() return currentWorldHour end }
+end
 
 PNC = {
     Core = {
         Now = function() return now end,
         IsAuthority = function() return true end,
+        Clamp = function(value, minimum, maximum)
+            return math.max(minimum, math.min(maximum, value))
+        end,
+        DeepCopy = function(value)
+            if type(value) ~= "table" then return value end
+            local output = {}
+            for key, entry in pairs(value) do
+                output[key] = PNC.Core.DeepCopy(entry)
+            end
+            return output
+        end,
         DistanceSq = function(x1, y1, x2, y2)
             local dx = x2 - x1
             local dy = y2 - y1
@@ -30,12 +46,22 @@ PNC = {
         REVIVE_BANDAGE_TYPE = "Base.Bandage",
         REVIVE_BANDAGE_COUNT = 5,
         REVIVE_RANGE = 3,
+        BANDAGE_RANGE = 3,
+        BANDAGE_TYPE = "Base.Bandage",
+        BANDAGE_TYPES = { "Base.Bandage", "Base.RippedSheets" },
+        BANDAGE_HEAL_PER_WORLD_HOUR = 1.5,
+        BANDAGE_FIRST_AID_HEAL_BONUS = 0.25,
+        BANDAGE_DIRTY_AFTER_WORLD_HOURS = 8,
+        INCAPACITATED_RECOVERY_HP = 5,
+        WOUND_BLEED_UPDATE_MS = 1000,
+        WOUND_DIRTY_FLUSH_MS = 5000,
         PRESENCE_LIVE = "live",
         PRESENCE_CORPSE = "corpse",
     },
     Registry = {
         Get = function(id) return records[id] end,
         GetLiveZombie = function(id) return bodies[id] end,
+        MarkDirty = function() end,
     },
     Network = {
         BroadcastRecord = function() broadcasts = broadcasts + 1 end,
@@ -53,6 +79,8 @@ PNC = {
 
 dofile(root .. "Base/PNC_Sandbox.lua")
 dofile(root .. "Health/PNC_Health.lua")
+dofile(root .. "Health/PNC_NPCWounds.lua")
+dofile(root .. "Health/PNC_Treatment.lua")
 dofile(root .. "Health/PNC_Revive.lua")
 
 local function assertEqual(actual, expected, message)
@@ -73,7 +101,7 @@ local function makeBody(x, y, z)
 end
 
 local function makeRecord(id)
-    return {
+    local record = {
         id = id,
         x = 0,
         y = 0,
@@ -89,6 +117,17 @@ local function makeRecord(id)
             reviveUntil = now + 10000,
         },
     }
+    local bodyHealth = PNC.NPCWounds.Ensure(record)
+    bodyHealth.wounds.Head = {
+        partId = "Head",
+        type = "laceration",
+        bleedingRate = 0.05,
+        severity = 10,
+        damage = 10,
+        bandaged = false,
+    }
+    PNC.NPCWounds.Recalculate(record)
+    return record
 end
 
 local function makePlayer(bandageCount, x)
@@ -149,33 +188,42 @@ assertEqual(downed.health.state, "dead", "enabled final blow")
 local reviveRecord = makeRecord("revive")
 records[reviveRecord.id] = reviveRecord
 bodies[reviveRecord.id] = makeBody(0, 0, 0)
-local shortPlayer = makePlayer(4, 0)
+local shortPlayer = makePlayer(0, 0)
 local success, reason = PNC.Revive.Try(shortPlayer, reviveRecord.id)
-assertEqual(success, false, "four bandages rejected")
+assertEqual(success, false, "missing bandage rejected")
 assertEqual(reason, "missing_bandages", "missing bandage reason")
 assertEqual(shortPlayer.removedCount(), 0, "failed revive consumes nothing")
 
-local farPlayer = makePlayer(5, 4)
+local farPlayer = makePlayer(1, 4)
 success, reason = PNC.Revive.Try(farPlayer, reviveRecord.id)
 assertEqual(success, false, "distant revive rejected")
 assertEqual(reason, "too_far", "distance reason")
 assertEqual(farPlayer.removedCount(), 0, "distant revive consumes nothing")
 
-local player = makePlayer(5, 0)
+local player = makePlayer(1, 0)
 success, reason = PNC.Revive.Try(player, reviveRecord.id)
-assertEqual(success, true, "valid revive")
-assertEqual(reason, "revived", "revive reason")
-assertEqual(player.removedCount(), 5, "revive bandage cost")
-assertEqual(reviveRecord.health.state, "normal", "incapacitation cured")
-assertEqual(reviveRecord.health.current, 10, "revive health")
+assertEqual(success, true, "valid bulk bandage compatibility")
+assertEqual(reason, "wounds_bandaged", "bulk bandage reason")
+assertEqual(player.removedCount(), 1, "one material per wound")
+assertEqual(reviveRecord.health.state, "incapacitated", "bandage does not instantly revive")
+assertEqual(reviveRecord.health.current, 1, "bandage grants no instant health")
+assertEqual(reviveRecord.health.body.bandagedWoundCount, 1, "wound was bandaged")
 assertEqual(broadcasts, 1, "revive broadcast")
-assertEqual(clearedAggro, 1, "revive clears zombie pressure")
-assertEqual(PNC.Sandbox.CanZombieTargetRecord(reviveRecord), false, "revive recovery protection")
+assertEqual(clearedAggro, 0, "bandaging does not fake recovery")
+
+currentWorldHour = currentWorldHour + 3
+now = now + 1000
+PNC.Health.Update(reviveRecord, bodies[reviveRecord.id], now)
+assertEqual(reviveRecord.health.state, "normal", "healing threshold resumes walking")
+assert(reviveRecord.health.current >= 5, "gradual healing did not reach recovery threshold")
+assertEqual(clearedAggro, 1, "actual recovery clears zombie pressure")
+assertEqual(PNC.Sandbox.CanZombieTargetRecord(reviveRecord), false, "recovery protection")
+local protectedHealth = reviveRecord.health.current
 assertEqual(PNC.Health.ApplyDamage(reviveRecord, bodies[reviveRecord.id], {
     amount = 12,
     attackerKind = "zombie",
 }), false, "recovery protection blocks zombie damage")
-assertEqual(reviveRecord.health.current, 10, "protected revive health")
+assertEqual(reviveRecord.health.current, protectedHealth, "protected recovery health")
 
 now = now + PNC.Const.REVIVE_PROTECTION_MS + 1
 PNC.Health.Update(reviveRecord, bodies[reviveRecord.id], now)

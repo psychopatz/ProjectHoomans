@@ -295,6 +295,26 @@ local function buildMotionKey(snapshot)
     }, "|")
 end
 
+local function syncTreatmentSound(zombie, snapshot, modData)
+    local treatment = snapshot and snapshot.treatmentState or nil
+    local phase = tostring(treatment and treatment.phase or "idle")
+    local soundKey
+    local emitter
+    if not modData then return end
+    if phase ~= "bandaging" then
+        modData.PNC_ClientTreatmentSoundKey = nil
+        return
+    end
+    soundKey = tostring(treatment.partId or "")
+        .. ":" .. tostring(treatment.startedAt or 0)
+    if modData.PNC_ClientTreatmentSoundKey == soundKey then return end
+    emitter = zombie and zombie.getEmitter and zombie:getEmitter() or nil
+    if emitter and emitter.playSound then
+        emitter:playSound("FirstAidApplyBandage")
+        modData.PNC_ClientTreatmentSoundKey = soundKey
+    end
+end
+
 local function applyIdentityVars(zombie, snapshot)
     if not zombie or not zombie.setVariable then
         return
@@ -610,6 +630,7 @@ local function applySnapshotToBody(snapshot, zombie)
     then
         PNC.ClientHumanNPCSafeguards.RegisterHumanBody(zombie)
     end
+    syncTreatmentSound(zombie, snapshot, modData)
 
     visualKey = buildVisualKey(snapshot)
     handsKey = buildHandsKey(snapshot)

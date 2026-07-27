@@ -7,6 +7,12 @@ local Tabs = PNC.CharacterWindowTabs
 local Shared = PNC.CharacterWindowShared
 local healthTextures = {}
 
+local function currentWorldHour()
+    local gameTime = getGameTime and getGameTime() or nil
+    return gameTime and gameTime.getWorldAgeHours
+        and (tonumber(gameTime:getWorldAgeHours()) or 0) or 0
+end
+
 -- These are the exact suffixes passed to zombie.ui.UI_BodyPart by vanilla's
 -- NewHealthPanel. Every damage texture is aligned to the 123x302 base body.
 local VANILLA_PART_TEXTURE = {
@@ -212,6 +218,8 @@ function Tabs.RenderHealth(view, snapshot, payload, topY)
     local state = tostring(health.state or "normal")
     local fontHeight = getTextManager():getFontHeight(UIFont.Small)
     local injuryTint = math.max(0.2, 1 - Shared.Clamp(hpCurrent / hpMax, 0, 1))
+    local debugAllowed = PNC.Client and PNC.Client.CanUseDebug
+        and PNC.Client.CanUseDebug() == true
     local i
 
     -- Keep the same hierarchy and color treatment as vanilla ISHealthPanel:
@@ -222,11 +230,7 @@ function Tabs.RenderHealth(view, snapshot, payload, topY)
     view:drawText(overallStatus(hpCurrent, hpMax, state == "incapacitated"), x, y,
         1, 1 - injuryTint, 1 - injuryTint, 1, UIFont.Small)
     y = y + fontHeight
-    view:drawText(string.format("HP %.1f / %.1f  (%d%%)", hpCurrent, hpMax,
-        math.floor(Shared.Clamp(hpCurrent / hpMax, 0, 1) * 100 + 0.5)),
-        x, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
-    y = y + fontHeight
-    if PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() == true then
+    if debugAllowed then
         local infection = body.infection
         local infected = infection
             and (infection.active == true or infection.fatal == true)
@@ -252,8 +256,47 @@ function Tabs.RenderHealth(view, snapshot, payload, topY)
                 x, y, 1, 1, 1, 1, UIFont.Small)
             y = y + fontHeight
             if wound.bandaged == true then
-                view:drawText("- " .. Shared.Text("IGUI_health_Bandaged", "Bandaged"), x + 15, y,
-                    0.28, 0.89, 0.28, 1, UIFont.Small)
+                local bandageLabel = tostring(
+                    wound.bandageName or wound.bandageType
+                        or Shared.Text("IGUI_health_Bandaged", "Bandaged")
+                )
+                local prefix = wound.bandageDirty == true
+                    and Shared.Text("IGUI_health_DirtyBandage", "Dirty Bandage")
+                    or Shared.Text("IGUI_health_Bandaged", "Bandaged")
+                view:drawText("- " .. prefix .. " (" .. bandageLabel .. ")", x + 15, y,
+                    wound.bandageDirty == true and 0.95 or 0.28,
+                    wound.bandageDirty == true and 0.55 or 0.89,
+                    0.28, 1, UIFont.Small)
+                if debugAllowed then
+                    local nowHour = currentWorldHour()
+                    local dirtyAt = tonumber(wound.dirtyAtWorldHour) or nowHour
+                    local dirtyRemaining = math.max(0, dirtyAt - nowHour)
+                    local healed = math.max(0, tonumber(wound.bandageHealedPoints) or 0)
+                    local remaining = math.max(
+                        0,
+                        tonumber(wound.damage) or tonumber(wound.severity) or 0
+                    )
+                    local initial = math.max(
+                        remaining + healed,
+                        tonumber(wound.bandageInitialDamage) or 0
+                    )
+                    local rate = math.max(0, tonumber(wound.healRatePerWorldHour) or 0)
+                    y = y + fontHeight
+                    view:drawText(
+                        wound.bandageDirty == true
+                            and "- DEBUG Dirty timer: READY"
+                            or string.format(
+                                "- DEBUG Dirty in: %.3f world h",
+                                dirtyRemaining
+                            ),
+                        x + 15, y, 0.55, 0.82, 1, 1, UIFont.Small
+                    )
+                    y = y + fontHeight
+                    view:drawText(string.format(
+                        "- DEBUG Healed: %.2f / %.2f pts | Remaining: %.2f | Rate: %.2f/h",
+                        healed, initial, remaining, rate
+                    ), x + 15, y, 0.55, 0.82, 1, 1, UIFont.Small)
+                end
             else
                 view:drawText("- " .. woundLabel(wound), x + 15, y,
                     0.89, 0.28, 0.28, 1, UIFont.Small)
@@ -280,7 +323,8 @@ function Tabs.RenderHealth(view, snapshot, payload, topY)
         y = y + 6
         view:drawText("Incapacitated - " .. tostring(health.incapacitatedReason or "critical injury"), x, y, 0.95, 0.36, 0.31, 1, UIFont.Small)
         y = y + fontHeight + 6
-        view:drawText("Revival bandages all current bleeding wounds.", x, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        view:drawText("Bandage the wounds; they will stand once sufficiently recovered.",
+            x, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
         y = y + fontHeight + 6
     end
 
@@ -390,6 +434,52 @@ local function addDebugInfectionMenu(context, view, selectedPartId, body)
             })
         end
     )
+    local clearOption = infectionMenu:addOption(
+        Shared.Text("UI_PNC_DebugInfectionClear", "Clear Knox Infection"),
+        nil,
+        function()
+            PNC.Client.SendDebug("clear_infection", { id = view.npcId })
+        end
+    )
+    clearOption.notAvailable = not infected
+end
+
+local function addDebugBandageMenu(context, view, partId, wound)
+    local menu
+    local statusOption
+    local dirtyAt
+    local remaining
+    if not wound or wound.bandaged ~= true or not partId then return end
+    menu = context:getNew(context)
+    context:addSubMenu(
+        context:addOption(
+            Shared.Text("UI_PNC_DebugBandageState", "Debug Bandage State"),
+            nil
+        ),
+        menu
+    )
+    dirtyAt = tonumber(wound.dirtyAtWorldHour) or currentWorldHour()
+    remaining = math.max(0, dirtyAt - currentWorldHour())
+    statusOption = menu:addOption(
+        wound.bandageDirty == true and "Status: DIRTY"
+            or string.format("Status: clean, %.3f world h remaining", remaining),
+        nil
+    )
+    statusOption.notAvailable = true
+    local almostDirty = menu:addOption(
+        Shared.Text(
+            "UI_PNC_DebugBandageAlmostDirty",
+            "Make Bandage Almost Dirty"
+        ),
+        nil,
+        function()
+            PNC.Client.SendDebug("bandage_almost_dirty", {
+                id = view.npcId,
+                partId = partId,
+            })
+        end
+    )
+    almostDirty.notAvailable = wound.bandageDirty == true
 end
 
 local function showHealthMenu(view, partId, x, y)
@@ -402,9 +492,14 @@ local function showHealthMenu(view, partId, x, y)
     local bandages
     local option
     local subMenu
-    if (not wound or wound.bandaged == true or not player) and not canDebug then return false end
+    if (not wound
+        or (wound.bandaged == true and wound.bandageDirty ~= true)
+        or not player) and not canDebug
+    then
+        return false
+    end
     context = ISContextMenu.get(0, x + view:getAbsoluteX(), y + view:getAbsoluteY())
-    if wound and wound.bandaged ~= true and player then
+    if wound and (wound.bandaged ~= true or wound.bandageDirty == true) and player then
         bandages = PNC.Treatment and PNC.Treatment.ListBandages and PNC.Treatment.ListBandages(player) or {}
         option = context:addOption(Shared.Text("ContextMenu_Bandage", "Bandage"), nil)
         if #bandages > 0 then
@@ -431,6 +526,7 @@ local function showHealthMenu(view, partId, x, y)
         end
     end
     if canDebug then
+        addDebugBandageMenu(context, view, partId, wound)
         addDebugDamageMenu(context, view, partId)
         addDebugInfectionMenu(context, view, partId, body)
     end

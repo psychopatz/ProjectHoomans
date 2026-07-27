@@ -42,6 +42,13 @@ local WOUND_STATS = {
     bite = { priority = 3, damage = 12, bleedingRate = 0.085 },
     bullet = { priority = 4, damage = 14, bleedingRate = 0.095 },
 }
+local BANDAGE_QUALITY = {
+    ["Base.AlcoholBandage"] = 1.35,
+    ["Base.Bandage"] = 1.20,
+    ["Base.Bandaid"] = 0.65,
+    ["Base.AlcoholRippedSheets"] = 1.10,
+    ["Base.RippedSheets"] = 0.90,
+}
 local DEBUG_WOUND_TYPES = { "scratch", "laceration", "bite" }
 
 local function worldHour()
@@ -378,6 +385,30 @@ function Wounds.ForceInfection(record, partId)
     return applied, reason
 end
 
+-- Public cure seam: remove only the Knox infection lifecycle. Physical bite
+-- damage and the wound itself remain for the normal treatment system.
+function Wounds.ClearInfection(record, source)
+    local body
+    local infection
+    if not record or record.alive == false then return false, "invalid_target" end
+    body = Wounds.Ensure(record)
+    infection = body.infection
+    if not infection
+        or (infection.active ~= true
+            and infection.fatal ~= true
+            and infection.pendingFatal ~= true)
+    then
+        return false, "not_infected"
+    end
+    body.infection = nil
+    record.runtime = record.runtime or {}
+    record.runtime.forceSyncEvent = tostring(source or "infection_cleared")
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "infection")
+    end
+    return true, "infection_cleared"
+end
+
 local function chooseWoundType()
     local roll = randomPercent()
     local biteChance = Settings.NPCZombieBiteChance()
@@ -407,6 +438,13 @@ local function addWound(record, part, woundType, now, woundDamage)
     wound.bandaged = false
     wound.bandagedAt = 0
     wound.healAtWorldHour = 0
+    wound.bandageType = nil
+    wound.bandageName = nil
+    wound.bandageDirty = false
+    wound.bandageAppliedWorldHour = 0
+    wound.lastHealWorldHour = 0
+    wound.dirtyAtWorldHour = 0
+    wound.firstAidLevel = 0
     body.wounds[part.id] = wound
     if woundType == "bite" then infect(record, part.id, worldHour()) end
     Wounds.Recalculate(record)
@@ -634,31 +672,123 @@ function Wounds.TriggerInfectionDeath(record, zombie, reason)
     return true, "killed"
 end
 
-function Wounds.Bandage(record, partId, now)
+local function bandageQuality(fullType)
+    return BANDAGE_QUALITY[tostring(fullType or "")]
+        or BANDAGE_QUALITY["Base.RippedSheets"]
+end
+
+function Wounds.GetTreatableWounds(record)
+    local body = Wounds.Ensure(record)
+    local output = {}
+    local i
+    local partId
+    local wound
+    for i = 1, #Wounds.PartOrder do
+        partId = Wounds.PartOrder[i]
+        wound = body.wounds[partId]
+        if wound and (wound.bandaged ~= true or wound.bandageDirty == true) then
+            output[#output + 1] = {
+                partId = partId,
+                wound = wound,
+            }
+        end
+    end
+    return output
+end
+
+function Wounds.FindTreatableWound(record)
+    local wounds = Wounds.GetTreatableWounds(record)
+    return wounds[1] and wounds[1].partId or nil,
+        wounds[1] and wounds[1].wound or nil
+end
+
+function Wounds.Bandage(record, partId, now, options)
     local body = Wounds.Ensure(record)
     local wound = body.wounds[tostring(partId or "")]
-    if not wound or wound.bandaged == true then return false, "wound_missing" end
+    local currentHour
+    if type(now) == "table" and options == nil then
+        options = now
+        now = nil
+    end
+    options = type(options) == "table" and options or {}
+    if not wound then return false, "wound_missing" end
+    if wound.bandaged == true and wound.bandageDirty ~= true then
+        return false, "already_bandaged"
+    end
     now = tonumber(now) or Core.Now()
+    currentHour = worldHour()
     wound.bandaged = true
     wound.bandagedAt = now
-    wound.healAtWorldHour = worldHour() + 6
+    wound.bandageType = tostring(options.bandageType or "Base.RippedSheets")
+    wound.bandageName = tostring(options.bandageName or wound.bandageType)
+    wound.bandageDirty = false
+    wound.bandageAppliedWorldHour = currentHour
+    wound.lastHealWorldHour = currentHour
+    wound.dirtyAtWorldHour = currentHour
+        + math.max(0.25, tonumber(options.dirtyAfterWorldHours)
+            or tonumber(Const.BANDAGE_DIRTY_AFTER_WORLD_HOURS) or 8)
+    wound.firstAidLevel = Core.Clamp(
+        math.floor(tonumber(options.firstAidLevel) or 0),
+        0,
+        10
+    )
+    wound.healRatePerWorldHour = (
+        (tonumber(Const.BANDAGE_HEAL_PER_WORLD_HOUR) or 1.5)
+        + wound.firstAidLevel
+            * (tonumber(Const.BANDAGE_FIRST_AID_HEAL_BONUS) or 0.25)
+    ) * bandageQuality(wound.bandageType)
+    wound.bandageInitialDamage = math.max(
+        0,
+        tonumber(wound.damage) or tonumber(wound.severity) or 0
+    )
+    wound.bandageHealedPoints = 0
+    -- Retained as a migration sentinel for older saves, but no longer used as
+    -- an instant-heal deadline.
+    wound.healAtWorldHour = 0
     Wounds.Recalculate(record)
     if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
     return true, "bandaged"
 end
 
-function Wounds.BandageAll(record, now)
+function Wounds.DebugAlmostDirty(record, partId)
+    local body
+    local wound
+    local currentHour
+    if not record or record.alive == false then return false, "invalid_target" end
+    body = Wounds.Ensure(record)
+    wound = body.wounds[tostring(partId or "")]
+    if not wound then return false, "wound_missing" end
+    if wound.bandaged ~= true then return false, "not_bandaged" end
+    if wound.bandageDirty == true then return false, "already_dirty" end
+    currentHour = worldHour()
+    wound.dirtyAtWorldHour = currentHour
+        + math.max(
+            0.001,
+            tonumber(Const.DEBUG_BANDAGE_ALMOST_DIRTY_WORLD_HOURS) or 0.02
+        )
+    wound.lastHealWorldHour = math.min(
+        tonumber(wound.lastHealWorldHour) or currentHour,
+        currentHour
+    )
+    record.runtime = record.runtime or {}
+    record.runtime.forceSyncEvent = "debug_bandage_almost_dirty"
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "wounds")
+    end
+    return true, "bandage_almost_dirty"
+end
+
+function Wounds.BandageAll(record, now, options)
     local body = Wounds.Ensure(record)
     local changed = false
     local partId
     local wound
     now = tonumber(now) or Core.Now()
     for partId, wound in pairs(body.wounds) do
-        if wound.bandaged ~= true then
-            wound.bandaged = true
-            wound.bandagedAt = now
-            wound.healAtWorldHour = worldHour() + 6
-            changed = true
+        if wound.bandaged ~= true or wound.bandageDirty == true then
+            if Wounds.Bandage(record, partId, now, options) then
+                changed = true
+            end
         end
     end
     Wounds.Recalculate(record)
@@ -685,6 +815,13 @@ function Wounds.Update(record, zombie, now)
     local changed = false
     local partId
     local wound
+    local lastHealHour
+    local healElapsed
+    local healRate
+    local healAmount
+    local remainingDamage
+    local healUntilHour
+    local dirtyAtHour
     if not body or record.alive == false then return false end
 
     if infection and infection.active == true then
@@ -698,13 +835,68 @@ function Wounds.Update(record, zombie, now)
     end
 
     for partId, wound in pairs(body.wounds) do
-        if wound.bandaged == true
-            and (tonumber(wound.healAtWorldHour) or 0) > 0
-            and currentHour >= tonumber(wound.healAtWorldHour)
-        then
-            Wounds.ApplyBodyHealing(record, tonumber(wound.damage) or tonumber(wound.severity) or 0, partId)
-            body.wounds[partId] = nil
-            changed = true
+        if wound.bandaged == true then
+            if wound.bandageHealedPoints == nil then
+                wound.bandageHealedPoints = 0
+                changed = true
+            end
+            if wound.bandageInitialDamage == nil then
+                wound.bandageInitialDamage = math.max(
+                    0,
+                    (tonumber(wound.damage) or tonumber(wound.severity) or 0)
+                        + (tonumber(wound.bandageHealedPoints) or 0)
+                )
+                changed = true
+            end
+            -- Migrate deadline-based bandages without granting a reconnect
+            -- burst. Healing resumes from the current world hour.
+            if (tonumber(wound.lastHealWorldHour) or 0) <= 0 then
+                wound.lastHealWorldHour = currentHour
+                wound.bandageAppliedWorldHour = currentHour
+                wound.dirtyAtWorldHour = currentHour
+                    + (tonumber(Const.BANDAGE_DIRTY_AFTER_WORLD_HOURS) or 8)
+                wound.healAtWorldHour = 0
+                changed = true
+            end
+            if wound.bandageDirty ~= true then
+                lastHealHour = tonumber(wound.lastHealWorldHour) or currentHour
+                dirtyAtHour = tonumber(wound.dirtyAtWorldHour) or math.huge
+                healUntilHour = math.min(currentHour, dirtyAtHour)
+                healElapsed = math.max(0, healUntilHour - lastHealHour)
+                if healElapsed > 0 then
+                    healRate = math.max(0.01,
+                        tonumber(wound.healRatePerWorldHour)
+                        or ((tonumber(Const.BANDAGE_HEAL_PER_WORLD_HOUR) or 1.5)
+                            + (tonumber(wound.firstAidLevel) or 0)
+                                * (tonumber(Const.BANDAGE_FIRST_AID_HEAL_BONUS) or 0.25))
+                            * bandageQuality(wound.bandageType))
+                    remainingDamage = math.max(0,
+                        tonumber(wound.damage) or tonumber(wound.severity) or 0)
+                    healAmount = math.min(remainingDamage, healElapsed * healRate)
+                    wound.lastHealWorldHour = healUntilHour
+                    if healAmount > 0 then
+                        Wounds.ApplyBodyHealing(record, healAmount, partId)
+                        wound.damage = math.max(0, remainingDamage - healAmount)
+                        wound.severity = math.max(0,
+                            (tonumber(wound.severity) or remainingDamage) - healAmount)
+                        wound.bandageHealedPoints = math.max(
+                            0,
+                            tonumber(wound.bandageHealedPoints) or 0
+                        ) + healAmount
+                        changed = true
+                    end
+                    if (tonumber(wound.damage) or 0) <= 0.001 then
+                        body.wounds[partId] = nil
+                    end
+                end
+                if body.wounds[partId]
+                    and currentHour >= dirtyAtHour
+                then
+                    wound.bandageDirty = true
+                    wound.lastHealWorldHour = currentHour
+                    changed = true
+                end
+            end
         end
     end
 

@@ -7,6 +7,16 @@ local Treatment = PNC.Treatment
 local Core = PNC.Core
 local Const = PNC.Const
 local Registry = PNC.Registry
+local Inventory = PNC.Inventory
+local Skills = PNC.Skills
+
+local BANDAGE_NAMES = {
+    ["Base.AlcoholBandage"] = "Sterilized Bandage",
+    ["Base.Bandage"] = "Bandage",
+    ["Base.Bandaid"] = "Adhesive Bandage",
+    ["Base.AlcoholRippedSheets"] = "Sterilized Ripped Sheets",
+    ["Base.RippedSheets"] = "Ripped Sheets",
+}
 
 local function targetPosition(record)
     local body = record and Registry.GetLiveZombie(record.id) or nil
@@ -41,6 +51,88 @@ local function isBandageType(fullType)
     return false
 end
 
+local function bandageDisplayName(fullType, item)
+    if item and item.getDisplayName then
+        return tostring(item:getDisplayName())
+    end
+    if item and item.getName then
+        return tostring(item:getName())
+    end
+    return BANDAGE_NAMES[tostring(fullType or "")]
+        or tostring(fullType or "Ripped Sheets")
+end
+
+local function playerFirstAidLevel(player)
+    if player and player.getPerkLevel and Perks and Perks.Doctor then
+        return math.max(0, math.min(10,
+            math.floor(tonumber(player:getPerkLevel(Perks.Doctor)) or 0)))
+    end
+    return 0
+end
+
+local function isPlayerOwned(record)
+    return record and (record.recruited == true
+        or record.ownerOnlineID ~= nil
+        or (record.ownerUsername ~= nil and tostring(record.ownerUsername) ~= ""))
+        or false
+end
+
+local function findNPCBandage(record)
+    local inv
+    local types
+    local i
+    local item
+    if not record then return nil end
+    if not isPlayerOwned(record) then
+        return {
+            virtual = true,
+            fullType = "Base.RippedSheets",
+            displayName = BANDAGE_NAMES["Base.RippedSheets"],
+        }
+    end
+    inv = Inventory and Inventory.EnsureRecordInventory
+        and Inventory.EnsureRecordInventory(record) or record.inventory
+    types = bandageTypes()
+    for i = 1, #types do
+        for _, item in pairs(inv and inv.items or {}) do
+            if item and tostring(item.type or "") == tostring(types[i])
+                and math.max(1, tonumber(item.stack) or 1) > 0
+            then
+                return {
+                    virtual = false,
+                    itemID = item.id,
+                    fullType = item.type,
+                    displayName = BANDAGE_NAMES[tostring(item.type)]
+                        or tostring(item.type),
+                }
+            end
+        end
+    end
+    return nil
+end
+
+local function consumeNPCBandage(record, supply)
+    local inv
+    local item
+    local stack
+    local operation
+    if supply and supply.virtual == true then return true end
+    if not record or not supply or not Inventory or not Inventory.ApplyDelta then
+        return false
+    end
+    inv = Inventory.EnsureRecordInventory
+        and Inventory.EnsureRecordInventory(record) or record.inventory
+    item = inv and inv.items and inv.items[supply.itemID] or nil
+    if not item then return false end
+    stack = math.max(1, math.floor(tonumber(item.stack) or 1))
+    if stack > 1 then
+        operation = { op = "update", itemID = item.id, stack = stack - 1 }
+    else
+        operation = { op = "remove", itemID = item.id }
+    end
+    return Inventory.ApplyDelta(record, { operation }, "self_bandage") == true
+end
+
 local function findBandage(player, requestedType)
     local inventory = player and player.getInventory and player:getInventory() or nil
     local types = requestedType and { requestedType } or bandageTypes()
@@ -60,6 +152,96 @@ end
 
 function Treatment.FindBandage(player, requestedType)
     return findBandage(player, requestedType)
+end
+
+function Treatment.GetPlayerFirstAidLevel(player)
+    return playerFirstAidLevel(player)
+end
+
+function Treatment.GetNPCFirstAidLevel(record)
+    return Skills and Skills.GetLevel and Skills.GetLevel(record, "FirstAid") or 0
+end
+
+function Treatment.GetBandageDisplayName(fullType, item)
+    return bandageDisplayName(fullType, item)
+end
+
+function Treatment.IsPlayerOwnedNPC(record)
+    return isPlayerOwned(record)
+end
+
+function Treatment.FindNPCBandage(record)
+    return findNPCBandage(record)
+end
+
+function Treatment.HasNPCBandage(record)
+    return findNPCBandage(record) ~= nil
+end
+
+function Treatment.GetNPCBandageDuration(record)
+    local skill = Treatment.GetNPCFirstAidLevel(record)
+    return math.max(
+        tonumber(Const.SELF_BANDAGE_MIN_DURATION_MS) or 3000,
+        (tonumber(Const.SELF_BANDAGE_BASE_DURATION_MS) or 6500)
+            - skill * (tonumber(Const.SELF_BANDAGE_FIRST_AID_REDUCTION_MS) or 350)
+    )
+end
+
+function Treatment.ApplyBandage(record, partId, options)
+    local applied
+    local reason
+    options = type(options) == "table" and options or {}
+    if not record or record.alive == false then return false, "npc_missing" end
+    if not PNC.NPCWounds or not PNC.NPCWounds.Bandage then
+        return false, "wounds_unavailable"
+    end
+    applied, reason = PNC.NPCWounds.Bandage(record, partId, Core.Now(), {
+        bandageType = options.bandageType,
+        bandageName = options.bandageName,
+        firstAidLevel = options.firstAidLevel,
+    })
+    if not applied then return false, reason end
+    record.runtime = record.runtime or {}
+    record.runtime.forceSyncEvent = options.syncEvent or "bandaged"
+    if Registry and Registry.MarkDirty then
+        Registry.MarkDirty(record, "wounds")
+    end
+    if options.broadcast ~= false
+        and PNC.Network and PNC.Network.BroadcastRecord
+    then
+        PNC.Network.BroadcastRecord(record, options.syncEvent or "bandaged")
+    end
+    return true, "bandaged"
+end
+
+function Treatment.TryNPCBandage(record, partId)
+    local supply
+    local applied
+    local reason
+    if not Core.IsAuthority() then return false, "not_authority" end
+    supply = findNPCBandage(record)
+    if not supply then return false, "missing_bandage" end
+    applied, reason = Treatment.ApplyBandage(record, partId, {
+        bandageType = supply.fullType,
+        bandageName = supply.displayName,
+        firstAidLevel = Treatment.GetNPCFirstAidLevel(record),
+        syncEvent = "self_bandaged",
+        broadcast = false,
+    })
+    if not applied then return false, reason end
+    if not consumeNPCBandage(record, supply) then
+        return false, "bandage_consumption_failed"
+    end
+    if Skills and Skills.AddXP then
+        Skills.AddXP(record, "FirstAid", 1)
+    end
+    if Core and Core.LogRecordDebug then
+        Core.LogRecordDebug(record, "NPC " .. tostring(record.id)
+            .. " self-bandaged part=" .. tostring(partId)
+            .. " item=" .. tostring(supply.fullType)
+            .. " firstAid=" .. tostring(Treatment.GetNPCFirstAidLevel(record)))
+    end
+    return true, supply.displayName
 end
 
 function Treatment.IsPlayerInBandageRange(player, npcId)
@@ -117,14 +299,21 @@ function Treatment.TryBandage(player, npcId, partId, options)
         item, container = findBandage(player, options.bandageType)
         if not item then return false, "missing_bandage" end
     end
-    applied, reason = PNC.NPCWounds.Bandage(record, partId, Core.Now())
+    local resolvedType = options.bandageType
+        or item and item.getFullType and item:getFullType()
+        or Const.BANDAGE_TYPE
+    applied, reason = Treatment.ApplyBandage(record, partId, {
+        bandageType = resolvedType,
+        bandageName = bandageDisplayName(resolvedType, item),
+        firstAidLevel = playerFirstAidLevel(player),
+        syncEvent = "bandaged",
+        broadcast = false,
+    })
     if not applied then return false, reason end
     if options.consumeItem ~= false then
         container:Remove(item)
         if sendRemoveItemFromContainer then sendRemoveItemFromContainer(container, item) end
     end
-    record.runtime = record.runtime or {}
-    record.runtime.forceSyncEvent = "bandaged"
     if PNC.Network and PNC.Network.BroadcastRecord then
         PNC.Network.BroadcastRecord(record, "bandaged")
     end

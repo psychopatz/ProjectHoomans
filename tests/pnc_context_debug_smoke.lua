@@ -31,6 +31,7 @@ end
 local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
 local debugAuthorized = false
 local registeredProvider
+local sent = {}
 
 PNC = {
     Const = {
@@ -45,7 +46,9 @@ PNC = {
     },
     Client = {
         CanUseDebug = function() return debugAuthorized end,
-        SendDebug = function() end,
+        SendDebug = function(action, payload)
+            sent[#sent + 1] = { action = action, payload = payload }
+        end,
     },
     ContextHub = {
         RegisterProvider = function(provider)
@@ -55,8 +58,25 @@ PNC = {
     Network = {
         ClientState = {
             snapshots = {
-                npc_one = { healthState = "incapacitated", canRevive = true },
+                npc_one = {
+                    healthState = "incapacitated",
+                    canRevive = true,
+                    bodyHealth = {
+                        infection = { active = true, stage = "fever" },
+                        wounds = {
+                            Hand_L = {
+                                bandaged = true,
+                                bandageDirty = false,
+                            },
+                        },
+                    },
+                },
             },
+        },
+    },
+    NPCWounds = {
+        Parts = {
+            Hand_L = { label = "Left Hand" },
         },
     },
 }
@@ -80,8 +100,28 @@ assertEqual(menu.options[1].name, "Debug", "debug submenu uses a readable fallba
 local debugMenu = menu.options[1].submenu
 assertEqual(debugMenu ~= nil, true, "debug submenu attached")
 assertEqual(findOption(debugMenu, "Force Live") ~= nil, true, "debug action moved into debug submenu")
-assertEqual(findOption(debugMenu, "Debug Revive (Free)") ~= nil, true, "missing translation falls back to readable revive label")
+assertEqual(findOption(debugMenu, "Debug Bandage All (Free)") ~= nil, true,
+    "missing translation falls back to readable bandage-all label")
 assertEqual(findOption(debugMenu, "Orders") ~= nil, true, "debug orders remain available")
 assertEqual(findOption(debugMenu, "Combat") ~= nil, true, "debug combat controls remain available")
+local infectionOption = findOption(debugMenu, "Infection")
+assertEqual(infectionOption ~= nil, true, "infection debug submenu missing")
+local clearOption = findOption(infectionOption.submenu, "Clear Knox Infection")
+assertEqual(clearOption ~= nil, true, "infection clear action missing")
+assertEqual(clearOption.notAvailable, false, "infection clear disabled for infected NPC")
+clearOption.callback()
+assertEqual(sent[1].action, "clear_infection", "world menu infection clear action")
+assertEqual(sent[1].payload.id, "npc_one", "world menu infection clear NPC")
+
+local bandageOption = findOption(debugMenu, "Bandage State")
+assertEqual(bandageOption ~= nil, true, "bandage debug submenu missing")
+local almostDirty = findOption(
+    bandageOption.submenu,
+    "Make Almost Dirty: Left Hand"
+)
+assertEqual(almostDirty ~= nil, true, "almost-dirty bandage action missing")
+almostDirty.callback()
+assertEqual(sent[2].action, "bandage_almost_dirty", "world menu almost-dirty action")
+assertEqual(sent[2].payload.partId, "Hand_L", "world menu almost-dirty part")
 
 print("pnc_context_debug_smoke: ok")

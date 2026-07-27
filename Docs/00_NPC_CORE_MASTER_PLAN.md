@@ -8,7 +8,7 @@
 - hostile `Hunt` and `Roam`
 - shared melee and ranged combat with atomic combat files
 - zombie aggro bridge so zombies can acquire embodied NPCs
-- custom HP, incapacitation, revive window, and stamina
+- custom HP, body-part wounds, bandage-driven incapacitation recovery, and stamina
 - seeded identity, archetype registry, and compact inventory persistence
 - right-click debug spawning, NPC selection hub, and character window
 

@@ -245,6 +245,13 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
     if zombie.setNoTeeth then
         zombie:setNoTeeth(true)
     end
+    -- Repair bodies saved while an older client safeguard leaked this flag.
+    -- The LOS correction may set it only around one synchronous updateLOS()
+    -- call; normal body maintenance must always leave the NPC out of vanilla's
+    -- prone/reanimation-only posture.
+    if zombie.setReanimatedForGrappleOnly then
+        zombie:setReanimatedForGrappleOnly(false)
+    end
     if zombie.getDescriptor then
         descriptor = zombie:getDescriptor()
         if descriptor and descriptor.setVoicePrefix then
@@ -305,6 +312,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local hadTarget
     local wasUseless
     local hadTeeth
+    local wasGrappleOnly
     local modData
     local npcId
     if not zombie or not Core or not Core.IsManagedNPCBody
@@ -315,11 +323,13 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     hadTarget = zombie.getTarget and zombie:getTarget() ~= nil or false
     wasUseless = zombie.isUseless and zombie:isUseless() or false
     hadTeeth = zombie.isNoTeeth and not zombie:isNoTeeth() or false
+    wasGrappleOnly = zombie.isReanimatedForGrappleOnly
+        and zombie:isReanimatedForGrappleOnly() or false
     LiveBodyControl.MaintainHumanizedBody(
         zombie,
         Core.Now and Core.Now() or 0
     )
-    if (hadTarget or not wasUseless or hadTeeth)
+    if (hadTarget or not wasUseless or hadTeeth or wasGrappleOnly)
         and not SAFETY_REPAIR_LOGGED[zombie]
         and Core.LogWarn
     then
@@ -330,7 +340,8 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
             .. " source=" .. tostring(source or "unknown")
             .. " target=" .. tostring(hadTarget)
             .. " useless=" .. tostring(wasUseless)
-            .. " hadTeeth=" .. tostring(hadTeeth))
+            .. " hadTeeth=" .. tostring(hadTeeth)
+            .. " grappleOnly=" .. tostring(wasGrappleOnly))
     end
     return true
 end

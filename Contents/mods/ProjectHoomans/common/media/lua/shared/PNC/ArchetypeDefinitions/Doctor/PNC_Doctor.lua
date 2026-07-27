@@ -38,6 +38,7 @@ local bundle = {
         },
     },
     skills = {
+        FirstAid = { min = 5, max = 8 },
         Nimble = { min = 2, max = 4 },
         Sneaking = { min = 1, max = 3 },
         Fitness = { min = 1, max = 3 },

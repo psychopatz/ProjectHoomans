@@ -43,6 +43,10 @@ PNC = {
         WOUND_DIRTY_FLUSH_MS = 5000,
         BANDAGE_TYPE = "Base.Bandage",
         BANDAGE_RANGE = 3,
+        BANDAGE_HEAL_PER_WORLD_HOUR = 1.5,
+        BANDAGE_FIRST_AID_HEAL_BONUS = 0.25,
+        BANDAGE_DIRTY_AFTER_WORLD_HOURS = 8,
+        DEBUG_BANDAGE_ALMOST_DIRTY_WORLD_HOURS = 0.02,
         PRESENCE_CORPSE = "corpse",
     },
     Core = {
@@ -74,6 +78,26 @@ PNC = {
     Network = {
         BroadcastRecord = function() broadcasts = broadcasts + 1 end,
         BroadcastRemoval = function() end,
+    },
+    Inventory = {
+        EnsureRecordInventory = function(record) return record.inventory end,
+        ApplyDelta = function(record, ops)
+            local op = ops and ops[1] or nil
+            local item = op and record.inventory and record.inventory.items[op.itemID] or nil
+            if not item then return false end
+            if op.op == "update" then
+                item.stack = op.stack
+            elseif op.op == "remove" then
+                record.inventory.items[op.itemID] = nil
+            else
+                return false
+            end
+            return true
+        end,
+    },
+    Skills = {
+        GetLevel = function() return 3 end,
+        AddXP = function() return true end,
     },
 }
 
@@ -171,6 +195,116 @@ assertEqual(record.health.body.bandagedWoundCount, 1, "bandaged count")
 assertEqual(broadcasts, 1, "bandage broadcast")
 assertEqual(PNC.NPCWounds.HasActiveInfection(record), true, "bandage does not cure Knox infection")
 
+local healingRecord = makeRecord("gradual_healing")
+records[healingRecord.id] = healingRecord
+bodies[healingRecord.id] = body
+applied, result = PNC.NPCWounds.ApplyDebugWound(
+    healingRecord,
+    body,
+    "ForeArm_L",
+    "laceration",
+    30
+)
+assertEqual(applied, true, "gradual healing wound")
+success, reason = PNC.Treatment.TryBandage(
+    player,
+    healingRecord.id,
+    "ForeArm_L",
+    { consumeItem = false, bandageType = "Base.Bandage" }
+)
+assertEqual(success, true, "gradual healing bandage")
+local healingWound = healingRecord.health.body.wounds.ForeArm_L
+assertEqual(healingWound.bandageType, "Base.Bandage", "bandage type metadata")
+assertEqual(healingWound.bandageName, "Bandage", "bandage name metadata")
+assertNear(healingWound.bandageInitialDamage, 30, "bandage initial healing points")
+assertNear(healingWound.bandageHealedPoints, 0, "bandage starts with zero healed points")
+local healthBeforeBandageRegen = healingRecord.health.current
+currentWorldHour = currentWorldHour + 1
+PNC.Health.Update(healingRecord, body, now + 250)
+assert(healingRecord.health.current > healthBeforeBandageRegen,
+    "bandage did not heal gradually")
+assert(healingRecord.health.body.wounds.ForeArm_L.bandageHealedPoints > 0,
+    "bandage did not track healed points")
+assert(healingRecord.health.body.wounds.ForeArm_L,
+    "wound healed instantly instead of gradually")
+currentWorldHour = currentWorldHour + 7
+PNC.Health.Update(healingRecord, body, now + 500)
+healingWound = healingRecord.health.body.wounds.ForeArm_L
+assert(healingWound and healingWound.bandageDirty == true,
+    "old bandage did not become dirty")
+success = PNC.Treatment.TryBandage(
+    player,
+    healingRecord.id,
+    "ForeArm_L",
+    { consumeItem = false, bandageType = "Base.RippedSheets" }
+)
+assertEqual(success, true, "dirty bandage replacement")
+assertEqual(healingRecord.health.body.wounds.ForeArm_L.bandageDirty, false,
+    "replacement bandage remained dirty")
+local almostDirtyAt = currentWorldHour
+success, reason = PNC.API.DebugCommand(
+    healingRecord.id,
+    "bandage_almost_dirty",
+    { partId = "ForeArm_L" }
+)
+assertEqual(success, true, "debug almost-dirty bandage")
+assertEqual(reason, "bandage_almost_dirty", "debug almost-dirty reason")
+assertNear(
+    healingRecord.health.body.wounds.ForeArm_L.dirtyAtWorldHour,
+    almostDirtyAt + 0.02,
+    "debug almost-dirty deadline"
+)
+currentWorldHour = almostDirtyAt + 0.02
+PNC.Health.Update(healingRecord, body, now + 750)
+assertEqual(
+    healingRecord.health.body.wounds.ForeArm_L.bandageDirty,
+    true,
+    "debug bandage did not become dirty"
+)
+currentWorldHour = 100
+
+local ownedTreatment = makeRecord("owned_treatment")
+ownedTreatment.recruited = true
+ownedTreatment.inventory = {
+    items = {
+        med_1 = {
+            id = "med_1",
+            type = "Base.Bandage",
+            stack = 2,
+        },
+    },
+}
+records[ownedTreatment.id] = ownedTreatment
+bodies[ownedTreatment.id] = body
+PNC.NPCWounds.ApplyDebugWound(
+    ownedTreatment,
+    body,
+    "Hand_L",
+    "scratch",
+    4
+)
+success, reason = PNC.Treatment.TryNPCBandage(ownedTreatment, "Hand_L")
+assertEqual(success, true, "owned NPC self-bandage")
+assertEqual(ownedTreatment.inventory.items.med_1.stack, 1,
+    "owned NPC consumes canonical inventory")
+assertEqual(ownedTreatment.health.body.wounds.Hand_L.firstAidLevel, 3,
+    "NPC First Aid skill stored on wound")
+
+local unownedTreatment = makeRecord("unowned_treatment")
+records[unownedTreatment.id] = unownedTreatment
+bodies[unownedTreatment.id] = body
+PNC.NPCWounds.ApplyDebugWound(
+    unownedTreatment,
+    body,
+    "Hand_R",
+    "scratch",
+    4
+)
+success, reason = PNC.Treatment.TryNPCBandage(unownedTreatment, "Hand_R")
+assertEqual(success, true, "unowned NPC virtual rag")
+assertEqual(unownedTreatment.health.body.wounds.Hand_R.bandageType,
+    "Base.RippedSheets", "unowned NPC uses unlimited ripped sheets")
+
 local debugRecord = makeRecord("debug_bandage")
 records[debugRecord.id] = debugRecord
 bodies[debugRecord.id] = body
@@ -243,6 +377,17 @@ assertEqual(forcedInfection.health.body.infection.sourcePart, "Neck", "debug inf
 assertEqual(forcedInfection.health.body.infection.stage, "fever", "debug fever stage")
 assert(forcedInfection.health.body.infection.temperatureC > 38, "debug fever temperature missing")
 assert(forcedInfection.health.current < 88, "fever did not progressively lower health")
+local infectedWound = forcedInfection.health.body.wounds.Neck
+assert(infectedWound and infectedWound.type == "bite",
+    "debug infection did not retain a physical bite")
+applied, result = PNC.API.DebugCommand(forcedInfection.id, "clear_infection", {})
+assertEqual(applied, true, "debug infection clear")
+assertEqual(result, "infection_cleared", "debug infection clear reason")
+assertEqual(forcedInfection.health.body.infection, nil, "infection lifecycle was not cleared")
+assertEqual(forcedInfection.health.body.wounds.Neck, infectedWound,
+    "infection clear removed the physical bite")
+assertEqual(forcedInfection.health.body.wounds.Neck.type, "bite",
+    "infection clear changed the physical wound")
 
 local fatalDebug = makeRecord("fatal_debug_infection")
 records[fatalDebug.id] = fatalDebug

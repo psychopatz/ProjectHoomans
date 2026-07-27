@@ -24,9 +24,16 @@ end
 PNC = {
     Const = { PRESENCE_LIVE = "LIVE" },
     Core = { Now = function() return 1000 end },
+    NPCWounds = {
+        Parts = {
+            Hand_L = { label = "Left Hand" },
+        },
+    },
 }
+UIFont = { Small = "Small", Medium = "Medium" }
 
 dofile(ROOT .. "PNC/UI/Nameplates/PNC_NameplateDebug.lua")
+dofile(ROOT .. "PNC/UI/Nameplates/PNC_NameplatePresentation.lua")
 
 local snapshot = {
     id = "npc_debug",
@@ -85,5 +92,38 @@ snapshot.bodyHealth.infection.pendingFatal = false
 assertEqual(PNC.NameplateDebug.InfectionText(snapshot, {
     debugShowInfection = true,
 }), "", "healthy NPC has no infection warning")
+
+snapshot.treatmentState = {
+    phase = "bandaging",
+    partId = "Hand_L",
+    bandageType = "Base.RippedSheets",
+    bandageName = "Ripped Sheets",
+}
+local treatmentText = PNC.NameplatePresentation.TreatmentStatus(snapshot)
+assertContains(treatmentText, "Bandaging Left Hand", "active treatment body part")
+assertContains(treatmentText, "Ripped Sheets", "active treatment material")
+snapshot.treatmentState.phase = "idle"
+snapshot.bodyHealth.wounds = {
+    Hand_L = {
+        bandaged = true,
+        bandageDirty = true,
+        bandageName = "Bandage",
+    },
+}
+treatmentText = PNC.NameplatePresentation.TreatmentStatus(snapshot)
+assertContains(treatmentText, "Dirty bandage", "dirty treatment marker")
+assertContains(treatmentText, "Bandage", "dirty treatment material")
+
+local entriesPath = ROOT .. "PNC/UI/Nameplates/PNC_NameplateEntries.lua"
+local entriesFile = assert(io.open(entriesPath, "r"))
+local entriesSource = entriesFile:read("*a")
+entriesFile:close()
+assertNotContains(entriesSource, "hpText", "numeric HP cache returned")
+
+local rendererPath = ROOT .. "PNC/UI/Nameplates/PNC_NameplateRenderer.lua"
+local rendererFile = assert(io.open(rendererPath, "r"))
+local rendererSource = rendererFile:read("*a")
+rendererFile:close()
+assertNotContains(rendererSource, "entry.hpText", "numeric HP rendering returned")
 
 print("pnc_nameplate_debug_smoke: ok")

@@ -64,6 +64,13 @@ Catalog.Groups = Catalog.Groups or {
             { id = "Butchering", display = "Butchering" },
         },
     },
+    {
+        id = "Medical",
+        display = "Medical",
+        skills = {
+            { id = "FirstAid", display = "First Aid" },
+        },
+    },
 }
 
 local function ensureLookup()

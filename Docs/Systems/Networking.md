@@ -28,6 +28,10 @@
 - NPC bandaging is presented as a local timed action, but only its completion
   sends `CMD_BANDAGE`; the server revalidates the item, range, wound, and debug
   authorization before mutating or broadcasting the record
+- NPC self-treatment runs only on the authority. Compact treatment phase,
+  body-part, material, and timing fields replicate for nameplates; clients
+  never choose a wound, consume companion inventory, finish an action, or
+  advance gradual healing
 
 ## Current Rules
 - snapshot building reuses cached equipment and appearance data where possible

@@ -404,6 +404,16 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if args and args.action == "clear_infection" then
+        API.DebugCommand(args.id, "clear_infection", args)
+        return
+    end
+
+    if args and args.action == "bandage_almost_dirty" then
+        API.DebugCommand(args.id, "bandage_almost_dirty", args)
+        return
+    end
+
     if args and args.action == "set_weapon_mode" then
         API.DebugCommand(args.id, "set_weapon_mode", args)
         return

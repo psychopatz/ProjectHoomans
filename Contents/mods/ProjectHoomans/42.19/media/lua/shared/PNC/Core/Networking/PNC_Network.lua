@@ -272,6 +272,7 @@ function Network.BuildSnapshot(record)
     local bodyHealth
     local firearmState
     local vehiclePassenger
+    local treatmentState
     aiState, inCombat = resolveAIState(record)
     canRevive = PNC.Health and PNC.Health.CanRevive and PNC.Health.CanRevive(record) or false
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
@@ -286,6 +287,9 @@ function Network.BuildSnapshot(record)
         and Firearms.BuildDebugState(record)
         or nil
     vehiclePassenger = record.runtime and record.runtime.vehiclePassenger or nil
+    treatmentState = PNC.BehaviorTreatment
+        and PNC.BehaviorTreatment.BuildSnapshot
+        and PNC.BehaviorTreatment.BuildSnapshot(record) or nil
     return {
         interestDetailed = true,
         id = record.id,
@@ -315,6 +319,7 @@ function Network.BuildSnapshot(record)
         reviveUntil = record.health and record.health.reviveUntil or 0,
         recentDamageUntil = record.health and record.health.recentDamageUntil or 0,
         bodyHealth = bodyHealth,
+        treatmentState = treatmentState,
         staminaCurrent = staminaInfo.current,
         staminaMax = staminaInfo.max,
         staminaState = staminaInfo.state,
@@ -415,6 +420,9 @@ function Network.BuildPresenceDelta(record)
         hpCurrent = record.health and record.health.current or nil,
         hpMax = record.health and record.health.max or nil,
         healthState = record.health and record.health.state or nil,
+        treatmentState = PNC.BehaviorTreatment
+            and PNC.BehaviorTreatment.BuildSnapshot
+            and PNC.BehaviorTreatment.BuildSnapshot(record) or nil,
         recentDamageUntil = record.health and record.health.recentDamageUntil or 0,
         staminaCurrent = staminaInfo.current,
         staminaMax = staminaInfo.max,

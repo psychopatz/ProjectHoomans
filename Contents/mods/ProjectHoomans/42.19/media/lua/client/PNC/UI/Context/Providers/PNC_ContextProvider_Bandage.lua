@@ -30,7 +30,7 @@ local function openWounds(entry)
     local wound
     local parts = PNC.NPCWounds and PNC.NPCWounds.Parts or {}
     for partId, wound in pairs(woundsFor(entry)) do
-        if wound and wound.bandaged ~= true then
+        if wound and (wound.bandaged ~= true or wound.bandageDirty == true) then
             output[#output + 1] = {
                 partId = tostring(partId),
                 wound = wound,
@@ -59,8 +59,11 @@ function Provider.addOptions(menu, entry, player)
     for i = 1, #wounds do
         local row = wounds[i]
         local typeLabel = tr("UI_PNC_Wound_" .. tostring(row.wound.type), tostring(row.wound.type or "Wound"))
+        local actionLabel = row.wound.bandageDirty == true
+            and tr("UI_PNC_ChangeBandage", "Change bandage")
+            or tr("UI_PNC_Bandage", "Bandage")
         local option = menu:addOption(
-            tr("UI_PNC_Bandage", "Bandage") .. " " .. row.label .. " (" .. typeLabel .. ")",
+            actionLabel .. " " .. row.label .. " (" .. typeLabel .. ")",
             nil,
             function()
                 if PNC.Client and PNC.Client.SendBandage then

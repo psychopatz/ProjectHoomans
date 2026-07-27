@@ -36,17 +36,7 @@ local function drawStatusBar(manager, left, top, width, height, ratio, color, al
     )
 end
 
-local function healthTextColor(healthRatio)
-    if healthRatio < 0.25 then
-        return { r = 0.8, g = 0.1, b = 0.1, a = 1.0 }
-    end
-    if healthRatio < 0.6 then
-        return { r = 0.8, g = 0.8, b = 0.1, a = 1.0 }
-    end
-    return { r = 0.1, g = 0.8, b = 0.1, a = 1.0 }
-end
-
-local function drawHealth(manager, entry, metrics, screenX, barLeft, barTop, alpha, heartIcon)
+local function drawHealth(manager, entry, metrics, barLeft, barTop, alpha)
     if not entry.healthVisible then return end
     drawStatusBar(
         manager,
@@ -58,32 +48,6 @@ local function drawHealth(manager, entry, metrics, screenX, barLeft, barTop, alp
         entry.barColor,
         alpha,
         0.55
-    )
-
-    local totalWidth = metrics.heartIconSize + metrics.heartIconGap + (entry.hpTextWidth or 0)
-    local counterX = screenX - (totalWidth / 2)
-    local counterY = barTop - (Layout.hpTextTopGap / metrics.zoom)
-    if heartIcon then
-        manager:drawTextureScaled(
-            heartIcon,
-            counterX,
-            counterY + (2 / metrics.zoom),
-            metrics.heartIconSize,
-            metrics.heartIconSize,
-            alpha,
-            1,
-            1,
-            1
-        )
-    end
-    Presentation.DrawOutlinedText(
-        manager,
-        entry.hpText,
-        counterX + metrics.heartIconSize + metrics.heartIconGap,
-        counterY,
-        healthTextColor(entry.healthRatio),
-        alpha,
-        Fonts.hp
     )
 end
 
@@ -150,7 +114,7 @@ local function drawDebugOnly(manager, entry, metrics)
     drawDebugText(manager, entry, screenX, nameY + Layout.nameDebugGap, 0.9)
 end
 
-local function drawLive(manager, entry, metrics, currentTime, heartIcon, showDebug)
+local function drawLive(manager, entry, metrics, currentTime, showDebug)
     local zombie = entry.zombie
     if not zombie or zombie:isDead() then return end
     local alpha = zombie.getAlpha and zombie:getAlpha(manager.playerIndex) or 1
@@ -165,6 +129,19 @@ local function drawLive(manager, entry, metrics, currentTime, heartIcon, showDeb
         entry.barColor = Presentation.IncapacitatedColor(currentTime)
     end
 
+    if entry.treatmentVisible and entry.treatmentText ~= "" then
+        local treatmentHeight = getTextManager():getFontHeight(Fonts.debug) + 2
+        Presentation.DrawOutlinedText(
+            manager,
+            entry.treatmentText,
+            screenX - ((entry.treatmentTextWidth or 0) / 2),
+            nameY - treatmentHeight,
+            entry.treatmentColor,
+            0.95 * alpha,
+            Fonts.debug
+        )
+    end
+
     Presentation.DrawOutlinedText(
         manager,
         entry.name,
@@ -174,7 +151,7 @@ local function drawLive(manager, entry, metrics, currentTime, heartIcon, showDeb
         entry.nameColor.a * alpha,
         Fonts.name
     )
-    drawHealth(manager, entry, metrics, screenX, barLeft, barTop, alpha, heartIcon)
+    drawHealth(manager, entry, metrics, barLeft, barTop, alpha)
     local staminaTop = drawStamina(manager, entry, metrics, barLeft, barTop, alpha)
 
     if showDebug then
@@ -240,7 +217,6 @@ function Renderer.Render(manager, settings)
     end
 
     local metrics = Presentation.ScaleFor(manager.playerIndex)
-    local heartIcon = Presentation.GetHeartTexture()
     local currentTime = getTimeInMillis()
     if settings.showPathDebug then
         for _, entry in pairs(manager.entries) do
@@ -251,7 +227,7 @@ function Renderer.Render(manager, settings)
         if entry.debugOnly then
             drawDebugOnly(manager, entry, metrics)
         else
-            drawLive(manager, entry, metrics, currentTime, heartIcon, settings.showAIDebug)
+            drawLive(manager, entry, metrics, currentTime, settings.showAIDebug)
         end
     end
     manager:clearStencilRect()

@@ -44,6 +44,7 @@ function Provider.addOptions(menu, entry, player, contextData)
     local orderMenu
     local weaponMenu
     local infectionMenu
+    local treatmentMenu
 
     menu:addSubMenu(menu:addOption(tr("UI_PNC_Debug", "Debug")), debugMenu)
     menu = debugMenu
@@ -79,7 +80,7 @@ function Provider.addOptions(menu, entry, player, contextData)
 
     snapshot = ClientState.snapshots and ClientState.snapshots[entry.id] or nil
     if snapshot and snapshot.healthState == "incapacitated" and snapshot.canRevive == true then
-        menu:addOption(tr("UI_PNC_DebugRevive", "Debug Revive (Free)"), nil, function()
+        menu:addOption(tr("UI_PNC_DebugBandageAll", "Debug Bandage All (Free)"), nil, function()
             sendDebug("revive", { id = entry.id })
         end)
     end
@@ -98,6 +99,53 @@ function Provider.addOptions(menu, entry, player, contextData)
     infectionMenu:addOption(tr("UI_PNC_DebugInfectionFatal", "Trigger Infection Death"), nil, function()
         sendDebug("infection", { id = entry.id, stage = "fatal" })
     end)
+    local infection = snapshot and snapshot.bodyHealth
+        and snapshot.bodyHealth.infection or nil
+    local infected = infection
+        and (infection.active == true
+            or infection.fatal == true
+            or infection.pendingFatal == true)
+    local clearInfection = infectionMenu:addOption(
+        tr("UI_PNC_DebugInfectionClear", "Clear Knox Infection"),
+        nil,
+        function()
+            sendDebug("clear_infection", { id = entry.id })
+        end
+    )
+    clearInfection.notAvailable = not infected
+
+    treatmentMenu = ISContextMenu:getNew(menu)
+    menu:addSubMenu(
+        menu:addOption(tr("UI_PNC_DebugBandageState", "Bandage State")),
+        treatmentMenu
+    )
+    local hasBandage = false
+    for partId, wound in pairs(
+        snapshot and snapshot.bodyHealth and snapshot.bodyHealth.wounds or {}
+    ) do
+        if wound and wound.bandaged == true then
+            local selectedPartId = partId
+            hasBandage = true
+            local part = PNC.NPCWounds and PNC.NPCWounds.Parts
+                and PNC.NPCWounds.Parts[partId] or nil
+            local option = treatmentMenu:addOption(
+                tr("UI_PNC_DebugBandageAlmostDirty", "Make Almost Dirty")
+                    .. ": " .. tostring(part and part.label or partId),
+                nil,
+                function()
+                    sendDebug("bandage_almost_dirty", {
+                        id = entry.id,
+                        partId = selectedPartId,
+                    })
+                end
+            )
+            option.notAvailable = wound.bandageDirty == true
+        end
+    end
+    if not hasBandage then
+        local status = treatmentMenu:addOption("No bandaged wounds", nil)
+        status.notAvailable = true
+    end
 
     orderMenu = ISContextMenu:getNew(menu)
     menu:addSubMenu(menu:addOption("Orders"), orderMenu)

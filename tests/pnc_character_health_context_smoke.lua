@@ -67,6 +67,9 @@ PNC = {
 }
 
 getSpecificPlayer = function() return {} end
+getGameTime = function()
+    return { getWorldAgeHours = function() return 100 end }
+end
 
 dofile(ROOT .. "PNC_CharacterWindow_Health.lua")
 
@@ -116,6 +119,36 @@ assertEqual(debugSent[4].payload.partId, "Head", "force infection selected part"
 assertEqual(debugSent[4].payload.stage, "incubating", "force infection initial stage")
 infectionMenu.options[3].callback()
 assertEqual(debugSent[5].payload.stage, "fever", "advance infection fever")
+assertEqual(infectionMenu.options[6].name, "Clear Knox Infection", "infection clear option")
+assertEqual(infectionMenu.options[6].notAvailable, true, "healthy infection clear disabled")
+
+view.snapshot.bodyHealth.infection = { active = true, stage = "incubating" }
+assertEqual(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 20, 15), true,
+    "infected health debug menu")
+infectionMenu = rootMenu.options[4].subMenu
+assertEqual(infectionMenu.options[6].notAvailable, false, "infected clear enabled")
+infectionMenu.options[6].callback()
+assertEqual(debugSent[6].action, "clear_infection", "clear infection action")
+assertEqual(debugSent[6].payload.id, "npc_health_menu", "clear infection npc")
+
+view.snapshot.bodyHealth.wounds.Head = {
+    type = "bite",
+    bandaged = true,
+    bandageDirty = false,
+    dirtyAtWorldHour = 100.02,
+    damage = 8,
+    bandageInitialDamage = 12,
+    bandageHealedPoints = 4,
+    healRatePerWorldHour = 2,
+}
+assertEqual(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 20, 15), true,
+    "bandaged health debug menu")
+assertEqual(rootMenu.options[1].name, "Debug Bandage State", "bandage debug submenu")
+assertEqual(rootMenu.options[1].subMenu.options[1].name,
+    "Status: clean, 0.020 world h remaining", "bandage dirty timer status")
+rootMenu.options[1].subMenu.options[2].callback()
+assertEqual(debugSent[7].action, "bandage_almost_dirty", "almost-dirty action")
+assertEqual(debugSent[7].payload.partId, "Head", "almost-dirty selected part")
 
 view.snapshot.bodyHealth.wounds = {}
 view.healthHitRegions = {}
@@ -131,5 +164,11 @@ assert(string.find(healthUISource, "media/ui/BodyDamage/", 1, true), "vanilla bo
 assert(string.find(healthUISource, '"_bandage_"', 1, true), "vanilla bandage overlays are not used")
 assert(string.find(healthUISource, '"_bite_"', 1, true), "vanilla bite overlays are not used")
 assert(not string.find(healthUISource, "bps_node_diamond", 1, true), "generic wound diamonds returned")
+assert(not string.find(healthUISource, "HP %.1f / %.1f", 1, true),
+    "numeric HP returned to the health panel")
+assert(string.find(healthUISource, "DEBUG Dirty in:", 1, true),
+    "bandage dirty timer diagnostics missing")
+assert(string.find(healthUISource, "DEBUG Healed:", 1, true),
+    "bandage healing-point diagnostics missing")
 
 print("pnc_character_health_context_smoke: ok")

@@ -94,7 +94,10 @@ local function applyIncapacitatedLiveState(record, zombie)
     if zombie.setHealth then
         zombie:setHealth(Const.INCAPACITATED_ENGINE_BUFFER)
     end
-    if Animation and Animation.ApplyDowned then
+    if Animation and Animation.ApplyDowned
+        and not (record.runtime and record.runtime.selfTreatment
+            and record.runtime.selfTreatment.phase == "bandaging")
+    then
         Animation.ApplyDowned(zombie, record, moving == true)
     end
 end
@@ -188,23 +191,21 @@ function Health.EnterIncapacitated(record, zombie, reason)
     return true
 end
 
-function Health.Revive(record, zombie)
+function Health.ResumeFromIncapacitated(record, zombie, reason)
     local health = Health.Ensure(record)
-    local revivedHP = math.min(health.max, math.max(Const.INCAPACITATED_HP, Const.REVIVE_HP))
     local now = Core.Now()
-    if PNC.NPCWounds and PNC.NPCWounds.SetOverallHealth then
-        PNC.NPCWounds.SetOverallHealth(record, revivedHP)
+    if health.state ~= "incapacitated"
+        or (tonumber(health.current) or 0)
+            < (tonumber(Const.INCAPACITATED_RECOVERY_HP) or 5)
+    then
+        return false
     end
-    health.current = revivedHP
     health.state = "normal"
     health.downedAt = 0
     health.incapacitatedReason = nil
     health.reviveUntil = 0
     health.reviveProtectionUntil = now + Const.REVIVE_PROTECTION_MS
     health.recentDamageUntil = now + Const.RECENT_DAMAGE_SHOW_MS
-    if PNC.NPCWounds and PNC.NPCWounds.BandageAll then
-        PNC.NPCWounds.BandageAll(record, now)
-    end
     record.alive = true
     record.runtime.forceLive = false
     record.runtime.target = nil
@@ -217,7 +218,23 @@ function Health.Revive(record, zombie)
     if Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "health")
     end
+    if Core and Core.LogRecordDebug then
+        Core.LogRecordDebug(record, "NPC " .. tostring(record.id)
+            .. " recovered from incapacitation hp="
+            .. string.format("%.2f", tonumber(health.current) or 0)
+            .. " reason=" .. tostring(reason or "bandage_healing"))
+    end
     return true
+end
+
+-- Compatibility entry point for older UI/debug callers. "Revive" no longer
+-- grants HP or stands the NPC up; it only controls bleeding. Normal wound
+-- healing owns the transition back to walking at the recovery threshold.
+function Health.Revive(record, zombie, options)
+    if not record or not PNC.NPCWounds or not PNC.NPCWounds.BandageAll then
+        return false
+    end
+    return PNC.NPCWounds.BandageAll(record, Core.Now(), options)
 end
 
 function Health.Recover(record, zombie)
@@ -249,13 +266,17 @@ end
 
 function Health.CanRevive(record)
     local health
+    local treatable
     if not record then
         return false
     end
     health = Health.Ensure(record)
+    treatable = PNC.NPCWounds and PNC.NPCWounds.GetTreatableWounds
+        and PNC.NPCWounds.GetTreatableWounds(record) or {}
     return record
         and record.alive ~= false
         and health.state == "incapacitated"
+        and #treatable > 0
         and not (PNC.NPCWounds and PNC.NPCWounds.HasActiveInfection
             and PNC.NPCWounds.HasActiveInfection(record))
 end
@@ -425,11 +446,13 @@ function Health.Update(record, zombie, now)
         if record.alive == false then return end
     end
     if health.state == "incapacitated" then
-        applyIncapacitatedLiveState(record, zombie)
-        if PNC.NPCWounds and PNC.NPCWounds.SetOverallHealth then
-            PNC.NPCWounds.SetOverallHealth(record, Const.INCAPACITATED_HP)
+        if (tonumber(health.current) or 0)
+            >= (tonumber(Const.INCAPACITATED_RECOVERY_HP) or 5)
+        then
+            Health.ResumeFromIncapacitated(record, zombie, "bandage_healing")
+            return
         end
-        health.current = Const.INCAPACITATED_HP
+        applyIncapacitatedLiveState(record, zombie)
         return
     end
     if (tonumber(health.reviveProtectionUntil) or 0) > 0
