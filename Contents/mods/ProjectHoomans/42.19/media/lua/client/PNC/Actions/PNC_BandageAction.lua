@@ -3,6 +3,21 @@ require "TimedActions/ISTimedActionQueue"
 
 PNCBandageAction = ISBaseTimedAction:derive("PNCBandageAction")
 
+local LOW_TREATMENT_PARTS = {
+    Groin = true,
+    UpperLeg_L = true,
+    UpperLeg_R = true,
+    LowerLeg_L = true,
+    LowerLeg_R = true,
+    Foot_L = true,
+    Foot_R = true,
+}
+
+local HIGH_TREATMENT_PARTS = {
+    Head = true,
+    Neck = true,
+}
+
 local function targetRecord(npcId)
     local record = PNC and PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(npcId) or nil
     if record then return record end
@@ -55,6 +70,23 @@ local function inRange(character, npcId)
     return dx * dx + dy * dy <= range * range
 end
 
+function PNCBandageAction.ResolveLootPosition(npcId, partId)
+    local record = targetRecord(npcId)
+    local body = targetBody(npcId)
+    local healthState = tostring(
+        record and (
+            record.healthState
+            or record.health and record.health.state
+        ) or ""
+    )
+    local downed = healthState == "incapacitated"
+        or body and body.isOnFloor and body:isOnFloor() == true
+    partId = tostring(partId or "")
+    if downed or LOW_TREATMENT_PARTS[partId] then return "Low" end
+    if HIGH_TREATMENT_PARTS[partId] then return "High" end
+    return "Mid"
+end
+
 function PNCBandageAction:isValid()
     local record = targetRecord(self.npcId)
     if not self.character or self.character:isDead() then return false end
@@ -80,9 +112,15 @@ function PNCBandageAction:update()
 end
 
 function PNCBandageAction:start()
-    self:setActionAnim(CharacterActionAnims and CharacterActionAnims.Bandage
-        or "Bandage")
-    self.character:reportEvent("EventBandage")
+    -- Treating another character uses the mid-height interaction pose. The
+    -- self-bandage action anim raises the player's arm because it expects the
+    -- patient's BodyDamage to belong to the acting character.
+    self:setActionAnim("Loot")
+    self.character:SetVariable(
+        "LootPosition",
+        PNCBandageAction.ResolveLootPosition(self.npcId, self.partId)
+    )
+    self.character:reportEvent("EventLootItem")
     self:setOverrideHandModels(nil, nil)
     if self.item then
         self.item:setJobType(getText("ContextMenu_Apply_Bandage"))
@@ -111,7 +149,9 @@ end
 function PNCBandageAction:perform()
     self:stopSound()
     if self.item then self.item:setJobDelta(0) end
-    if PNC and PNC.Client and PNC.Client.CompleteBandage then
+    if self:isValid()
+        and PNC and PNC.Client and PNC.Client.CompleteBandage
+    then
         PNC.Client.CompleteBandage(
             self.npcId,
             self.partId,
@@ -141,6 +181,9 @@ end
 
 function PNCBandageAction.Queue(character, npcId, partId, debugFree, bandageType)
     local item
+    if not inRange(character, npcId) then
+        return false, "out_of_range"
+    end
     if debugFree ~= true then
         item = PNC and PNC.Treatment and PNC.Treatment.FindBandage
             and PNC.Treatment.FindBandage(character, bandageType) or nil

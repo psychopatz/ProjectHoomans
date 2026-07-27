@@ -49,9 +49,11 @@ local body = {
     getX = function() return 0 end,
     getY = function() return 0 end,
     getZ = function() return 0 end,
+    isOnFloor = function() return false end,
 }
 local emitter = { isPlaying = function() return true end }
 local playedSound
+local rangeAllowed = true
 local player = {
     getInventory = function() return inventory end,
     getPerkLevel = function() return 4 end,
@@ -62,7 +64,9 @@ local player = {
     faceThisObject = function() end,
     shouldBeTurning = function() return false end,
     reportEvent = function(self, event) self.reportedEvent = event end,
-    SetVariable = function(self, key, value) self.animationVariable = key .. "=" .. value end,
+    SetVariable = function(self, key, value)
+        self.animationVariable = key .. "=" .. value
+    end,
     playSound = function(_, sound)
         playedSound = sound
         return 7
@@ -78,13 +82,22 @@ getText = function() return "Bandage" end
 PNC = {
     Const = { BANDAGE_RANGE = 3 },
     Registry = {
-        Get = function() return { id = "npc_timed", alive = true, x = 0, y = 0, z = 0 } end,
+        Get = function()
+            return {
+                id = "npc_timed",
+                alive = true,
+                healthState = "normal",
+                x = 0,
+                y = 0,
+                z = 0,
+            }
+        end,
         GetLiveZombie = function() return body end,
     },
     Network = { ClientState = { snapshots = {} } },
     Treatment = {
         FindBandage = function() return item end,
-        IsPlayerInBandageRange = function() return true end,
+        IsPlayerInBandageRange = function() return rangeAllowed end,
     },
     Client = {
         CompleteBandage = function(npcId, partId, debugFree, bandageType)
@@ -106,8 +119,9 @@ assertEqual(queued.maxTime, 104, "First Aid duration")
 assertEqual(queued:isValid(), true, "queued action validity")
 
 queued:start()
-assertEqual(queued.startedAnimation, "Bandage", "vanilla bandage animation")
-assertEqual(player.reportedEvent, "EventBandage", "vanilla animation event")
+assertEqual(queued.startedAnimation, "Loot", "other-character treatment animation")
+assertEqual(player.animationVariable, "LootPosition=Mid", "mid treatment pose")
+assertEqual(player.reportedEvent, "EventLootItem", "treatment interaction event")
 assertEqual(playedSound, "FirstAidApplyBandage", "vanilla bandage SFX")
 assertEqual(queued.useProgressBar, true, "vanilla loading bar enabled")
 assertEqual(item.jobType, "Bandage", "item progress label")
@@ -120,5 +134,59 @@ assertEqual(completed[2], "Hand_R", "authoritative completion body part")
 assertEqual(completed[4], "Base.Bandage", "authoritative completion item type")
 assertEqual(item.jobDelta, 0, "item progress reset")
 assertEqual(queued.basePerformed, true, "timed action completion")
+
+rangeAllowed = false
+ok, reason = PNCBandageAction.Queue(
+    player, "npc_timed", "Hand_R", false, "Base.Bandage"
+)
+assertEqual(ok, false, "out-of-range action rejected before queue")
+assertEqual(reason, "out_of_range", "out-of-range queue reason")
+
+local completionBeforeBlocked = completed
+local blockedAction = PNCBandageAction:new(
+    player,
+    "npc_timed",
+    "Hand_R",
+    item,
+    false,
+    "Base.Bandage"
+)
+blockedAction:perform()
+assertEqual(completed, completionBeforeBlocked,
+    "out-of-range completion reached authority")
+assertEqual(blockedAction.basePerformed, true,
+    "blocked timed action did not leave the queue")
+
+assertEqual(
+    PNCBandageAction.ResolveLootPosition("npc_timed", "Head"),
+    "High",
+    "head treatment pose"
+)
+assertEqual(
+    PNCBandageAction.ResolveLootPosition("npc_timed", "LowerLeg_R"),
+    "Low",
+    "lower-leg treatment pose"
+)
+assertEqual(
+    PNCBandageAction.ResolveLootPosition("npc_timed", "Torso_Upper"),
+    "Mid",
+    "torso treatment pose"
+)
+
+PNC.Registry.Get = function()
+    return {
+        id = "npc_timed",
+        alive = true,
+        healthState = "incapacitated",
+        x = 0,
+        y = 0,
+        z = 0,
+    }
+end
+assertEqual(
+    PNCBandageAction.ResolveLootPosition("npc_timed", "Head"),
+    "Low",
+    "downed patient overrides wound height"
+)
 
 print("pnc_bandage_timed_action_smoke: ok")

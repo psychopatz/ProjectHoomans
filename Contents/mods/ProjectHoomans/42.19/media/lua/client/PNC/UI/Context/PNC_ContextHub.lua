@@ -32,6 +32,32 @@ function ContextHub.RegisterProvider(provider)
     return true
 end
 
+-- Reusable option presentation for all context providers. Vanilla renders a
+-- notAvailable option in red and prevents selection; ordinary disabled options
+-- remain grey. good/bad color variants stay available when not disabled.
+function ContextHub.ApplyOptionPresentation(option, presentation)
+    local color
+    if not option or type(presentation) ~= "table" then return option end
+    color = presentation.color
+    if presentation.disabled == true then
+        if color == "bad" or color == "red" then
+            option.notAvailable = true
+        else
+            option.isDisabled = true
+        end
+    elseif presentation.unavailable == true then
+        option.notAvailable = true
+    end
+    if color == "bad" or color == "red" then
+        option.badColor = true
+    elseif color == "good" or color == "green" then
+        option.goodColor = true
+    elseif type(color) == "table" then
+        option.color = color
+    end
+    return option
+end
+
 local function hasEnabledProvider(entry, player, contextData)
     local i
     local provider

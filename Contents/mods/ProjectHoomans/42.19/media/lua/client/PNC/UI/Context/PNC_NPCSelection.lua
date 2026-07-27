@@ -79,6 +79,7 @@ function Selection.CollectNearbyNPCs(player, worldObjects, radius)
         local zombie
         local record
         local modData
+        local snapshot
         if not scanTarget then
             return
         end
@@ -91,8 +92,16 @@ function Selection.CollectNearbyNPCs(player, worldObjects, radius)
             if zombie and instanceof and instanceof(zombie, "IsoZombie") then
                 record = Registry.FindRecordByZombie(zombie)
                 modData = zombie.getModData and zombie:getModData() or nil
-                if record or (modData and modData.PNC_UUID) then
-                    pushEntry(zombie, record or { id = modData.PNC_UUID, name = "PNC NPC", archetypeLabel = "NPC" }, nil)
+                snapshot = modData and modData.PNC_UUID
+                    and ClientState.snapshots
+                    and ClientState.snapshots[tostring(modData.PNC_UUID)]
+                    or nil
+                if record or snapshot or (modData and modData.PNC_UUID) then
+                    pushEntry(zombie, record, snapshot or {
+                        id = modData.PNC_UUID,
+                        name = "PNC NPC",
+                        archetypeLabel = "NPC",
+                    })
                 end
             end
         end

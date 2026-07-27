@@ -15,6 +15,8 @@ local Animation = PNC.Animation
 local Common = PNC.BehaviorCommon
 local Targeting = PNC.BehaviorTargeting
 local BehaviorCombat = PNC.BehaviorCombat
+local Perception = PNC.Perception
+local CombatTactics = PNC.CombatTactics
 local Registry = PNC.Registry
 local CompanionVehicle = PNC.CompanionVehicle
 
@@ -162,6 +164,11 @@ local function resolveFollowSlot(record, owner)
 end
 
 local function tryEngageTarget(record, zombie)
+    if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
+        == tostring(Const.ATTACK_TYPE_NONE or "none")
+    then
+        return false
+    end
     local target = Targeting.ResolveCompanionEngageTarget(record)
     if not target then
         return false
@@ -169,6 +176,41 @@ local function tryEngageTarget(record, zombie)
     record.runtime.target = target
     BehaviorCombat.TickEngage(record, zombie, target)
     return true
+end
+
+local function tryAvoidThreat(record, zombie)
+    local threat
+    local moved
+    local reason
+    if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
+        ~= tostring(Const.ATTACK_TYPE_NONE or "none")
+    then
+        return false
+    end
+    Common.ClearCombatTarget(record, "attack_disabled", zombie)
+    threat = Perception and Perception.ResolveCompanionTarget
+        and Perception.ResolveCompanionTarget(record) or nil
+    if not threat or not CombatTactics or not CombatTactics.AvoidThreat then
+        return false
+    end
+    moved, reason = CombatTactics.AvoidThreat(record, zombie, threat)
+    if moved then
+        record.activeBehavior = "AvoidThreat:no_attack"
+        Common.SetCombatDebug(
+            record,
+            nil,
+            reason or "companion_avoiding_threat",
+            "none",
+            "holstered"
+        )
+        return true
+    end
+    return false
+end
+
+local function tryRespondToThreat(record, zombie)
+    if tryAvoidThreat(record, zombie) then return true end
+    return tryEngageTarget(record, zombie)
 end
 
 local function tickFollowOwner(record, zombie)
@@ -229,7 +271,7 @@ local function tickFollowOwner(record, zombie)
         Common.HaltMovement(record, zombie, "vehicle_full")
         return true
     end
-    if not ownerVehicle and tryEngageTarget(record, zombie) then
+    if not ownerVehicle and tryRespondToThreat(record, zombie) then
         setFollowMode(record, "combat")
         return true
     end
@@ -277,7 +319,7 @@ end
 
 local function tickGuardAnchor(record, zombie)
     local order = record.orderSpec or {}
-    if tryEngageTarget(record, zombie) then
+    if tryRespondToThreat(record, zombie) then
         return true
     end
     Common.ClearCombatTarget(record, "guarding_anchor")
@@ -298,7 +340,7 @@ local function tickPatrolRoute(record, zombie)
     local order = record.orderSpec or {}
     local patrolPoints
     local point
-    if tryEngageTarget(record, zombie) then
+    if tryRespondToThreat(record, zombie) then
         return true
     end
     patrolPoints = order.points or record.patrolPoints or {}

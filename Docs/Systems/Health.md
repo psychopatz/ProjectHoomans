@@ -13,7 +13,21 @@
 - `PNC_NPCWounds` owns authoritative wounds, body-part health, bleeding, bandage state, and Knox infection state.
 - NPC bandaging queues a vanilla `Bandage` timed action on the treating client, including `EventBandage`, the first-aid sound, and the item progress indicator.
 - Live NPC self-treatment uses the same `FirstAidApplyBandage` sound. Its treatment snapshot lets each remote client play that sound once, while a per-body transient key prevents duplicate playback on the authority client.
+- Every successful authoritative bandage publishes a short-lived completion
+  revision. Interested clients play the framework-owned
+  `PNC_BandageComplete` 3D cue once from the treated NPC and deduplicate it by
+  revision, timestamp, and body part. The audio is a vendored, renamed copy of
+  Dynamic Trading's healing-completion cue, so Dynamic Trading is not a
+  runtime dependency.
 - No state changes when the action is queued. On completion, the host/server revalidates player range, NPC/wound state, debug permission, and the selected item before applying the bandage and consuming it.
+- Player-to-NPC treatment uses the mid-height interaction pose (`Loot` /
+  `LootPosition=Mid`) instead of the self-bandage animation. Range is checked
+  before queueing, throughout the timed action, immediately before completion,
+  and again by the authority.
+- Treatment height follows the vanilla `LootPosition` action variable:
+  incapacitated/on-floor patients and leg/groin/foot wounds use `Low`,
+  head/neck wounds use `High`, and remaining standing-patient wounds use
+  `Mid`.
 - Cancelling, walking, running, losing the item, or leaving range prevents completion.
 - Every wound stores its applied item type/name, healer First Aid level, gradual heal rate, dirty-bandage deadline, initial damage, and healed-point total. Better First Aid and better materials heal faster; dirty bandages pause healing until replaced.
 - Authorized Health/debug menus show the remaining world-hour dirty timer, healed/initial/remaining points, and current heal rate. `Make Bandage Almost Dirty` moves the authoritative deadline to 0.02 world hours in the future so the normal transition can be tested without bypassing it.

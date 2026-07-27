@@ -131,6 +131,45 @@ local function buildCombatSummary(record, equipmentInfo)
     }
 end
 
+local function buildCommandFeedback(record)
+    local runtime = record and record.runtime or nil
+    local revision = tonumber(runtime and runtime.lastCompanionCommandRevision)
+    if not runtime or not runtime.lastCompanionCommand or revision == nil then
+        return false
+    end
+    if Core.Now() - (tonumber(runtime.lastCompanionCommandAt) or 0)
+        > (tonumber(Const.COMPANION_COMMAND_FEEDBACK_MS) or 5000)
+    then
+        return false
+    end
+    return {
+        id = tostring(runtime.lastCompanionCommand),
+        revision = revision,
+        issuedAt = tonumber(runtime.lastCompanionCommandAt) or 0,
+        ownerUsername = runtime.lastCompanionCommandOwner,
+    }
+end
+
+local function buildBandageFeedback(record)
+    local runtime = record and record.runtime or nil
+    local revision = tonumber(runtime and runtime.bandageCompletionRevision)
+    local completedAt = tonumber(runtime and runtime.bandageCompletionAt) or 0
+    if not runtime or revision == nil then return false end
+    if Core.Now() - completedAt
+        > (tonumber(Const.BANDAGE_COMPLETION_FEEDBACK_MS) or 5000)
+    then
+        return false
+    end
+    return {
+        revision = revision,
+        completedAt = completedAt,
+        partId = runtime.bandageCompletionPartId,
+        sound = tostring(
+            Const.BANDAGE_COMPLETION_SOUND or "PNC_BandageComplete"
+        ),
+    }
+end
+
 local function buildVisualState(record)
     local runtime = record and record.runtime or nil
     local path = runtime and runtime.pathing or nil
@@ -245,6 +284,13 @@ function Network.BuildRosterSnapshot(record)
         y = record.y,
         z = record.z,
         orderKind = record.orderSpec and record.orderSpec.kind or nil,
+        attackType = record.attackType or "auto",
+        ownerUsername = record.ownerUsername
+            or record.characterWindow
+                and record.characterWindow.ownerUsername,
+        ownerOnlineID = record.ownerOnlineID
+            or record.characterWindow
+                and record.characterWindow.ownerOnlineID,
         hpCurrent = record.health and record.health.current or nil,
         hpMax = record.health and record.health.max or nil,
         healthState = record.health and record.health.state or nil,
@@ -308,6 +354,15 @@ function Network.BuildSnapshot(record)
         y = record.y,
         z = record.z,
         orderKind = record.orderSpec and record.orderSpec.kind or nil,
+        attackType = record.attackType or "auto",
+        ownerUsername = record.ownerUsername
+            or record.characterWindow
+                and record.characterWindow.ownerUsername,
+        ownerOnlineID = record.ownerOnlineID
+            or record.characterWindow
+                and record.characterWindow.ownerOnlineID,
+        commandFeedback = buildCommandFeedback(record),
+        bandageFeedback = buildBandageFeedback(record),
         activeJob = record.activeJob,
         activeBehavior = record.activeBehavior,
         presenceState = record.presenceState,
@@ -369,6 +424,7 @@ function Network.BuildSnapshot(record)
             activeJob = record.activeJob,
             activeBehavior = record.activeBehavior,
             orderKind = record.orderSpec and record.orderSpec.kind or nil,
+            attackType = record.attackType or "auto",
             targetKind = combat.targetKind,
             healthState = record.health and record.health.state or nil,
             canRevive = canRevive,
@@ -420,6 +476,9 @@ function Network.BuildPresenceDelta(record)
         hpCurrent = record.health and record.health.current or nil,
         hpMax = record.health and record.health.max or nil,
         healthState = record.health and record.health.state or nil,
+        attackType = record.attackType or "auto",
+        commandFeedback = buildCommandFeedback(record),
+        bandageFeedback = buildBandageFeedback(record),
         treatmentState = PNC.BehaviorTreatment
             and PNC.BehaviorTreatment.BuildSnapshot
             and PNC.BehaviorTreatment.BuildSnapshot(record) or nil,

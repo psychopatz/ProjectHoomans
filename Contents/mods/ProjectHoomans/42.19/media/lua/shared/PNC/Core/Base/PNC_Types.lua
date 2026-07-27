@@ -62,6 +62,24 @@ local function normalizeEquipmentSpawnMode(value)
     return nil
 end
 
+function Types.NormalizeAttackType(value, weaponMode)
+    local auto = Const.ATTACK_TYPE_AUTO or "auto"
+    local melee = Const.ATTACK_TYPE_MELEE or "melee"
+    local ranged = Const.ATTACK_TYPE_RANGED or "ranged"
+    local none = Const.ATTACK_TYPE_NONE or "none"
+    value = string.lower(tostring(value or ""))
+    if value == auto
+        or value == melee
+        or value == ranged
+        or value == none
+    then
+        return value
+    end
+    -- Legacy records had no independent attack response. Treat their existing
+    -- weapon selection as automatic instead of silently locking it to one mode.
+    return auto
+end
+
 function Types.NormalizeFaction(value)
     local faction = string.lower(tostring(value or "colonist"))
     if faction == "hostile" or faction == "neutral" or faction == "colonist" then
@@ -165,6 +183,10 @@ function Types.NormalizeDefinition(definition)
         orderSpec = def.orderSpec,
         patrolPoints = normalizePatrolPoints(def.patrolPoints, x, y, z),
         weaponMode = tostring(def.weaponMode or (isHostile and "mixed" or "melee")),
+        attackType = Types.NormalizeAttackType(
+            def.attackType,
+            def.weaponMode or (isHostile and "mixed" or "melee")
+        ),
         equipmentSpawnMode = normalizeEquipmentSpawnMode(def.equipmentSpawnMode),
         equipmentPoolID = normalizeString(def.equipmentPoolID) or "Default",
         combatProfile = Core.DeepCopy(def.combatProfile or {}),
@@ -213,6 +235,7 @@ function Types.NewRecord(definition)
         patrolPoints = def.patrolPoints,
         patrolIndex = 1,
         weaponMode = def.weaponMode,
+        attackType = def.attackType,
         equipmentSpawnMode = def.equipmentSpawnMode,
         equipmentPoolID = def.equipmentPoolID,
         equipment = normalizeEquipment(def.equipment),

@@ -203,6 +203,10 @@ function Treatment.ApplyBandage(record, partId, options)
     if not applied then return false, reason end
     record.runtime = record.runtime or {}
     record.runtime.forceSyncEvent = options.syncEvent or "bandaged"
+    record.runtime.bandageCompletionRevision =
+        (tonumber(record.runtime.bandageCompletionRevision) or 0) + 1
+    record.runtime.bandageCompletionAt = Core.Now()
+    record.runtime.bandageCompletionPartId = tostring(partId)
     if Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "wounds")
     end

@@ -79,9 +79,10 @@ function Provider.addOptions(menu, entry, player)
         for i = 1, #wounds do
             local row = wounds[i]
             local partId = row.partId
-            debugMenu:addOption(row.label, nil, function()
+            local debugOption = debugMenu:addOption(row.label, nil, function()
                 PNC.Client.SendBandage(entry.id, partId, true)
             end)
+            if not inRange then debugOption.notAvailable = true end
         end
     end
 end

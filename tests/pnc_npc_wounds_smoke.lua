@@ -194,6 +194,12 @@ assertEqual(record.health.body.openWoundCount, 0, "bleeding controlled")
 assertEqual(record.health.body.bandagedWoundCount, 1, "bandaged count")
 assertEqual(broadcasts, 1, "bandage broadcast")
 assertEqual(PNC.NPCWounds.HasActiveInfection(record), true, "bandage does not cure Knox infection")
+assertEqual(record.runtime.bandageCompletionRevision, 1,
+    "bandage completion revision")
+assertEqual(record.runtime.bandageCompletionAt, now,
+    "bandage completion timestamp")
+assertEqual(record.runtime.bandageCompletionPartId, result.partId,
+    "bandage completion body part")
 
 local healingRecord = makeRecord("gradual_healing")
 records[healingRecord.id] = healingRecord

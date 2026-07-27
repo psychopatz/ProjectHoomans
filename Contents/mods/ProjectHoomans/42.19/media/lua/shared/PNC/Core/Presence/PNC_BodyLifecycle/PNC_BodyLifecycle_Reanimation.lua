@@ -21,6 +21,8 @@ local CONTROL_MODDATA_KEYS = {
     "PNC_LastAttackAt", "PNC_ZombieID", "PNC_ClientAttackKey",
     "PNC_ClientHandsKey", "PNC_ClientHumanVisualAt", "PNC_ClientMotionKey",
     "PNC_ClientSpecialKey", "PNC_ClientTreatmentSoundKey",
+    "PNC_ClientBandageCompletionKey",
+    "PNC_CommandAckRevision", "PNC_CommandAckToken",
     "PNC_ClientVisualKey", "PNC_DebugAnimCycleKey",
     "PNC_DebugAnimCycleStartAt", "PNC_DeathMarkerID", "PNC_DeathName",
 }

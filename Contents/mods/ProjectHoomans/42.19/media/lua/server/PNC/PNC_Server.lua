@@ -33,6 +33,7 @@ local Animation = PNC.Animation
 local BodyLifecycle = PNC.BodyLifecycle
 local PlayerDamage = PNC.PlayerDamage
 local Treatment = PNC.Treatment
+local CompanionCommands = PNC.CompanionCommands
 local buildDebugRoster
 
 local function canUseDebug(player)
@@ -321,6 +322,13 @@ local function onClientCommand(module, command, player, args)
                 consumeItem = not debugFree,
                 bandageType = args.bandageType,
             })
+        end
+        return
+    end
+
+    if command == Const.CMD_COMPANION_COMMAND and args and args.commandID then
+        if CompanionCommands and CompanionCommands.Execute then
+            CompanionCommands.Execute(player, args)
         end
         return
     end

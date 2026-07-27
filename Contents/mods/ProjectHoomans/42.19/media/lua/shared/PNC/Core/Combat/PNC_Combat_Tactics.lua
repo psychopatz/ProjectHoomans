@@ -418,6 +418,46 @@ function Tactics.MaintainRangedSpacing(record, zombie, target)
     )
 end
 
+function Tactics.AvoidThreat(record, zombie, target)
+    local state
+    local now
+    local staminaRatio
+    local distance
+    local mode
+    if not record or not target then return false, "avoid_target_missing" end
+    now = Core.Now()
+    state = ensureRetreatState(record)
+    if continueLockedRetreat(record, zombie, target, state, now) then
+        return true, state.reason or "companion_avoiding_threat"
+    end
+    staminaRatio = Stamina and Stamina.GetRatio
+        and Stamina.GetRatio(record) or 1
+    distance = math.sqrt(tonumber(target.distSq) or Core.DistanceSq(
+        record.x,
+        record.y,
+        target.x,
+        target.y
+    ))
+    if distance > (tonumber(Const.COMPANION_AVOID_THREAT_RADIUS) or 10) then
+        clearActiveRetreat(record, state)
+        return false, "threat_outside_avoid_radius"
+    end
+    mode = staminaRatio > (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
+        and "run" or "walk"
+    return startRetreat(
+        record,
+        zombie,
+        target,
+        tonumber(Const.COMPANION_AVOID_THREAT_DISTANCE) or 5,
+        mode,
+        0.8,
+        tonumber(Const.COMPANION_AVOID_THREAT_LOCK_MS) or 750,
+        "companion_avoiding_threat",
+        staminaRatio <= (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
+            and "retreat" or nil
+    )
+end
+
 function Tactics.TryReposition(record, zombie, target, effectiveMode, reason, equipmentInfo)
     local nearbyCount
     local aiming

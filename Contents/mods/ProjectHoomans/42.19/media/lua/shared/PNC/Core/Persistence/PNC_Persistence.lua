@@ -453,6 +453,9 @@ function Persistence.SerializeRecord(record)
         health = sanitizeHealth(record.health, record.health and record.health.max or Const.DEFAULT_HP_MAX),
         stamina = sanitizeStamina(record.stamina, record),
         weaponMode = tostring(record.weaponMode or "melee"),
+        attackType = PNC.Types and PNC.Types.NormalizeAttackType
+            and PNC.Types.NormalizeAttackType(record.attackType, record.weaponMode)
+            or tostring(record.attackType or record.weaponMode or "melee"),
         equipmentSpawnMode = normalizeString(record.equipmentSpawnMode),
         equipmentPoolID = normalizeString(record.equipmentPoolID) or "Default",
         equipment = {
@@ -522,6 +525,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         orderSpec = raw.orderSpec,
         patrolPoints = raw.patrolPoints,
         weaponMode = raw.weaponMode,
+        attackType = raw.attackType,
         equipmentSpawnMode = raw.equipmentSpawnMode,
         equipmentPoolID = raw.equipmentPoolID,
         combatProfile = raw.combatProfile,
@@ -549,6 +553,9 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     record.anchorZ = normalizeNumber(anchor.z, record.anchorZ)
     record.ownerUsername = normalizeString(raw.ownerUsername) or record.ownerUsername
     record.weaponMode = tostring(raw.weaponMode or record.weaponMode or "melee")
+    record.attackType = PNC.Types and PNC.Types.NormalizeAttackType
+        and PNC.Types.NormalizeAttackType(raw.attackType, record.weaponMode)
+        or tostring(raw.attackType or record.weaponMode or "melee")
     record.patrolPoints = copyPoints(raw.patrolPoints or record.patrolPoints, record.anchorX, record.anchorY, record.anchorZ)
     record.patrolIndex = math.max(1, math.floor(normalizeNumber(raw.patrolIndex, 1)))
     record.orderSpec = sanitizeOrderSpec(raw.orderSpec, record)

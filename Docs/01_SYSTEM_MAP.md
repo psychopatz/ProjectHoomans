@@ -35,6 +35,14 @@
 - `PNC_CompanionVehicle`: authority-owned companion boarding, abstract vehicle
   travel, engine-visible seat reservations, disembarkation, and stale-token
   repair
+- `PNC_CompanionCommandRegistry`: companion-only movement/attack-type command
+  registration, ownership validation, authority execution, and replicated
+  feedback revisions.
+- `PNC_CompanionCommandFlavor`: expandable translated player/NPC command
+  flavor registry; client presentation consumes each acknowledgement once.
+- `PNC_CompanionCommandEmotes` and `PNC_ContextProvider_Commands`: registry-
+  driven radial/context adapters with private nested command groups, separate
+  closest/group radial scopes, and target-aware command presentation.
 - `PNC_OrderSystem`: order normalization and ownership
 - `PNC_JobSystem`: selects active job from order and state and accepts registered order-to-job mappings
 - `PNC_BehaviorSystem`: thin coordinator that executes the active job

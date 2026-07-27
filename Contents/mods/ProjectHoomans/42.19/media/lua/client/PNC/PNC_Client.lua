@@ -634,6 +634,34 @@ function Client.SendBandage(npcId, partId, debugFree, bandageType)
     return PNCBandageAction.Queue(player, npcId, partId, debugFree, bandageType)
 end
 
+function Client.SendCompanionCommand(commandID, npcId, scope)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local args
+    if not player or not PNC.CompanionCommands
+        or not PNC.CompanionCommands.Get(commandID)
+    then
+        return false
+    end
+    args = {
+        commandID = tostring(commandID),
+        id = npcId and tostring(npcId) or nil,
+        scope = scope and tostring(scope) or nil,
+        radius = tonumber(Const.COMPANION_COMMAND_RADIUS) or 20,
+    }
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not sendClientCommand then return false end
+        sendClientCommand(
+            player,
+            Const.MODULE,
+            Const.CMD_COMPANION_COMMAND,
+            args
+        )
+        return true
+    end
+    local affected = PNC.CompanionCommands.Execute(player, args)
+    return (tonumber(affected) or 0) > 0
+end
+
 local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, test)
     local square
     if not isWorldReady() then

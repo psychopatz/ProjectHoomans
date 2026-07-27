@@ -125,11 +125,43 @@ PNC.Registry = { Get = function() return nearbyRecord end }
 
 dofile(FILE)
 
+nearbyRecord.ownerUsername = "player_1"
+assertEqual(
+    PNC.Network.BuildRosterSnapshot(nearbyRecord).ownerUsername,
+    "player_1",
+    "roster snapshot owner identity"
+)
+assertEqual(
+    PNC.Network.BuildSnapshot(nearbyRecord).ownerUsername,
+    "player_1",
+    "detailed snapshot owner identity"
+)
+nearbyRecord.ownerUsername = nil
+
 assertEqual(PNC.Network.BuildSnapshot(nearbyRecord).attackMode, false, "idle snapshot attack mode")
 nearbyRecord.runtime.target = { kind = "zombie" }
 assertEqual(PNC.Network.BuildSnapshot(nearbyRecord).attackMode, true, "combat snapshot attack mode")
 assertEqual(PNC.Network.BuildPresenceDelta(nearbyRecord).attackMode, true, "combat delta attack mode")
 nearbyRecord.runtime.target = nil
+
+nearbyRecord.runtime.bandageCompletionRevision = 3
+nearbyRecord.runtime.bandageCompletionAt = 1999
+nearbyRecord.runtime.bandageCompletionPartId = "ForeArm_L"
+local bandageSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
+assertEqual(bandageSnapshot.bandageFeedback.revision, 3,
+    "bandage completion revision snapshot")
+assertEqual(bandageSnapshot.bandageFeedback.partId, "ForeArm_L",
+    "bandage completion part snapshot")
+assertEqual(bandageSnapshot.bandageFeedback.sound, "PNC_BandageComplete",
+    "bandage completion sound snapshot")
+assertEqual(
+    PNC.Network.BuildPresenceDelta(nearbyRecord).bandageFeedback.revision,
+    3,
+    "bandage completion presence delta"
+)
+nearbyRecord.runtime.bandageCompletionRevision = nil
+nearbyRecord.runtime.bandageCompletionAt = nil
+nearbyRecord.runtime.bandageCompletionPartId = nil
 
 nearbyRecord.runtime.vehiclePassenger = {
     active = true,
