@@ -3,6 +3,7 @@ require "PsychopatzCore/UI/PsychopatzUI"
 require "PNC/UI/Inventory/PNC_InventoryUI_Model"
 require "PNC/UI/Inventory/PNC_InventoryUI_List"
 require "PNC/UI/Inventory/PNC_InventoryUI_ContainerList"
+require "PNC/UI/Inventory/PNC_InventoryQuantityModal"
 
 PNC = PNC or {}
 PNC.InventoryWindow = PNC.InventoryWindow or {}
@@ -11,6 +12,7 @@ local InventoryWindow = PNC.InventoryWindow
 local Model = PNC.InventoryUIModel
 local ClientState = PNC.Network.ClientState
 local Actions = PNC.InventoryActions
+local QuantityModal = PNC.InventoryQuantityModal
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
 
@@ -126,10 +128,20 @@ end
 
 function InventoryWindow.CollectBulkTransferIDs(list)
     local ids = {}
+    local seen = {}
     for _, entry in ipairs(list and list.items or {}) do
         local row = entry and entry.item or nil
-        if row and row.id and row.favorite ~= true and row.equipped ~= true then
-            ids[#ids + 1] = row.id
+        if row and row.favorite ~= true and row.equipped ~= true
+            and row.restricted ~= true
+        then
+            local rowIDs = row.itemIDs or { row.id }
+            for index = 1, #rowIDs do
+                local itemID = rowIDs[index]
+                if itemID and not seen[itemID] then
+                    seen[itemID] = true
+                    ids[#ids + 1] = itemID
+                end
+            end
         end
     end
     return ids
@@ -167,6 +179,8 @@ function ISPNCInventoryWindow:setNPC(npcId)
     self.npcId = npcId and tostring(npcId) or nil
     self.selectedNPCContainer = "root"
     self.selectedPlayerContainer = "root"
+    self.expandedPlayerGroups = {}
+    self.expandedNPCGroups = {}
     self.contextSignature = nil
     if PNC.Client and PNC.Client.RequestCharacterPayload and self.npcId then
         PNC.Client.RequestCharacterPayload(self.npcId)
@@ -205,6 +219,32 @@ function ISPNCInventoryWindow:refreshInventory(force)
     local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
     local inventory = self:inventory()
     local revision = inventory and tonumber(inventory.revision) or -1
+    local currentPlayerContainer = Model.FindContainer(
+        self.playerContainers,
+        self.selectedPlayerContainer
+    )
+    if not currentPlayerContainer then
+        currentPlayerContainer = {
+            id = "root",
+            container = player and player.getInventory and player:getInventory() or nil,
+        }
+    end
+    local currentPlayerRows = Model.BuildPlayerRows(
+        currentPlayerContainer,
+        player,
+        self.expandedPlayerGroups
+    )
+    local protectedState = {}
+    for index = 1, #currentPlayerRows do
+        local row = currentPlayerRows[index]
+        protectedState[index] = table.concat({
+            tostring(row.id or ""),
+            row.favorite == true and "f" or "-",
+            row.equipped == true and "e" or "-",
+            tostring(row.stack or 1),
+            table.concat(row.itemIDs or { row.id or "" }, ","),
+        }, "")
+    end
     local playerCount = player and player.getInventory and player:getInventory()
         and player:getInventory():getItems()
         and player:getInventory():getItems():size()
@@ -213,6 +253,7 @@ function ISPNCInventoryWindow:refreshInventory(force)
         tostring(self.npcId or ""),
         tostring(revision),
         tostring(playerCount),
+        table.concat(protectedState, ","),
         tostring(self.selectedNPCContainer),
         tostring(self.selectedPlayerContainer),
     }, "|")
@@ -230,10 +271,16 @@ function ISPNCInventoryWindow:refreshInventory(force)
     resetList(
         self.playerList,
         Model.BuildPlayerRows(
-            Model.FindContainer(self.playerContainers, self.selectedPlayerContainer)
+            Model.FindContainer(self.playerContainers, self.selectedPlayerContainer),
+            player,
+            self.expandedPlayerGroups
         )
     )
-    resetList(self.npcList, Model.BuildNPCRows(inventory, self.selectedNPCContainer))
+    resetList(self.npcList, Model.BuildNPCRows(
+        inventory,
+        self.selectedNPCContainer,
+        self.expandedNPCGroups
+    ))
     if self.giveAllButton and self.giveAllButton.setEnable then
         self.giveAllButton:setEnable(
             #InventoryWindow.CollectBulkTransferIDs(self.playerList) > 0
@@ -266,18 +313,29 @@ function ISPNCInventoryWindow:refreshInventory(force)
 end
 
 function ISPNCInventoryWindow:beginInventoryDrag(role, row)
+    if not row or row.restricted == true then return false end
     self.dragState = { source = role, row = row }
+    return true
 end
 
-function ISPNCInventoryWindow:sendTransfer(direction, row, destinationOverride)
+function ISPNCInventoryWindow:sendTransfer(
+    direction,
+    row,
+    destinationOverride,
+    quantity
+)
     local inventory = self:inventory()
-    if not inventory or not row then return false end
+    local selection
+    if not inventory or not row or row.restricted == true then return false end
+    selection = Model.BuildTransferSelection(row, quantity)
+    if not selection then return false end
     self.statusText = tr("UI_PNC_Inventory_Transferring", "Transferring...")
     if direction == "player_to_npc" then
         return PNC.Client.SendInventoryTransfer({
             id = self.npcId,
             direction = direction,
-            itemIDs = { row.id },
+            itemIDs = selection.itemIDs,
+            quantity = selection.quantity,
             npcContainer = destinationOverride or self.selectedNPCContainer,
             inventoryRevision = inventory.revision,
         })
@@ -285,34 +343,68 @@ function ISPNCInventoryWindow:sendTransfer(direction, row, destinationOverride)
     return PNC.Client.SendInventoryTransfer({
         id = self.npcId,
         direction = direction,
-        itemIDs = { row.id },
+        itemIDs = selection.itemIDs,
+        quantity = selection.quantity,
         playerContainer = destinationOverride or self.selectedPlayerContainer,
         inventoryRevision = inventory.revision,
     })
 end
 
-function ISPNCInventoryWindow:acceptVanillaItems(items)
-    local inventory = self:inventory()
-    local ids = {}
-    for _, item in ipairs(items or {}) do
-        if item and item.getID then ids[#ids + 1] = tostring(item:getID()) end
+function ISPNCInventoryWindow:requestTransfer(
+    direction,
+    row,
+    destinationOverride
+)
+    local maximum = Model.GetRowQuantity(row)
+    if not row or row.restricted == true then return false end
+    if maximum <= 1 then
+        return self:sendTransfer(direction, row, destinationOverride, 1)
     end
-    if #ids < 1 or not inventory then return false end
-    self.statusText = tr("UI_PNC_Inventory_Transferring", "Transferring...")
-    return PNC.Client.SendInventoryTransfer({
-        id = self.npcId,
-        direction = "player_to_npc",
-        itemIDs = ids,
-        npcContainer = self.selectedNPCContainer,
-        inventoryRevision = inventory.revision,
-    })
+    QuantityModal.Open(
+        maximum,
+        tostring(row.name or tr("UI_PNC_Inventory_Item", "Item")),
+        self,
+        function(target, quantity)
+            target:sendTransfer(
+                direction,
+                row,
+                destinationOverride,
+                quantity
+            )
+        end
+    )
+    return true
+end
+
+function ISPNCInventoryWindow:acceptVanillaItems(items)
+    local members = {}
+    for _, item in ipairs(items or {}) do
+        if item and item.getID then
+            members[#members + 1] = {
+                id = tostring(item:getID()),
+                stack = 1,
+                nativeItem = item,
+            }
+        end
+    end
+    if #members < 1 then return false end
+    local first = members[1]
+    local name = first.nativeItem and first.nativeItem.getDisplayName
+        and first.nativeItem:getDisplayName() or "Items"
+    return self:requestTransfer("player_to_npc", {
+        source = "player",
+        id = first.id,
+        name = tostring(name),
+        stack = #members,
+        members = members,
+    }, self.selectedNPCContainer)
 end
 
 function ISPNCInventoryWindow:completeInventoryDrop(targetRole)
     local drag = self.dragState
     self.dragState = nil
     if drag and drag.source ~= targetRole then
-        return self:sendTransfer(
+        return self:requestTransfer(
             drag.source == "player" and "player_to_npc" or "npc_to_player",
             drag.row
         )
@@ -328,14 +420,9 @@ function ISPNCInventoryWindow:completeInventoryDrop(targetRole)
             if item and item.getID then ids[#ids + 1] = tostring(item:getID()) end
         end
         if #ids > 0 and inventory then
+            local dragged = ISInventoryPane.draggedItems
             ISInventoryPane.draggedItems = {}
-            return PNC.Client.SendInventoryTransfer({
-                id = self.npcId,
-                direction = "player_to_npc",
-                itemIDs = ids,
-                npcContainer = self.selectedNPCContainer,
-                inventoryRevision = inventory.revision,
-            })
+            return self:acceptVanillaItems(dragged)
         end
     end
     return false
@@ -358,7 +445,7 @@ function ISPNCInventoryWindow:completeInventoryDropAtMouse()
         if destination then
             local row = self.dragState.row
             self.dragState = nil
-            return self:sendTransfer("npc_to_player", row, destination)
+            return self:requestTransfer("npc_to_player", row, destination)
         end
     end
     self.dragState = nil
@@ -367,40 +454,57 @@ end
 
 function ISPNCInventoryWindow:showItemContext(role, row)
     local context = ISContextMenu.get(0, getMouseX(), getMouseY())
+    if row.restricted == true then
+        local option = context:addOption(
+            tr("UI_PNC_Inventory_OffLimits", "Off Limits"),
+            nil,
+            nil
+        )
+        if option then option.notAvailable = true end
+        return
+    end
     if role == "player" then
         context:addOption(
             tr("UI_PNC_Inventory_Give", "Transfer to Companion"),
             self,
-            function(target) target:sendTransfer("player_to_npc", row) end
+            function(target)
+                target:requestTransfer("player_to_npc", row)
+            end
         )
         return
     end
     local inventory = self:inventory()
     local compact = inventory and inventory.items and inventory.items[row.id] or nil
-    for _, definition in ipairs(Actions.List()) do
-        if Actions.IsAvailable(definition, nil, compact) then
-            local option = context:addOption(
-                tr(definition.labelKey, definition.label),
-                self,
-                function(target)
-                    target:sendItemAction(definition.id, row.id)
+    if row.groupHeader ~= true then
+        for _, definition in ipairs(Actions.List()) do
+            if Actions.IsAvailable(definition, nil, compact) then
+                local option = context:addOption(
+                    tr(definition.labelKey, definition.label),
+                    self,
+                    function(target)
+                        target:sendItemAction(definition.id, row.id)
+                    end
+                )
+                if option and definition.iconTexture and getTexture then
+                    option.iconTexture = getTexture(definition.iconTexture)
                 end
-            )
-            if option and definition.iconTexture and getTexture then
-                option.iconTexture = getTexture(definition.iconTexture)
             end
         end
     end
     context:addOption(
         tr("UI_PNC_Inventory_Take", "Transfer to Player"),
         self,
-        function(target) target:sendTransfer("npc_to_player", row) end
+        function(target)
+            target:requestTransfer("npc_to_player", row)
+        end
     )
 end
 
 function ISPNCInventoryWindow:sendItemAction(actionID, itemID)
     local inventory = self:inventory()
     if not inventory then return false end
+    local item = inventory.items and inventory.items[tostring(itemID)] or nil
+    if item and item.interactionLocked == true then return false end
     self.statusText = tr("UI_PNC_Inventory_Working", "Applying command...")
     return PNC.Client.SendInventoryAction({
         id = self.npcId,
@@ -408,6 +512,16 @@ function ISPNCInventoryWindow:sendItemAction(actionID, itemID)
         itemID = itemID,
         inventoryRevision = inventory.revision,
     })
+end
+
+function ISPNCInventoryWindow:toggleInventoryGroup(role, groupKey)
+    if not groupKey then return false end
+    local groups = role == "player"
+        and self.expandedPlayerGroups or self.expandedNPCGroups
+    groups[groupKey] = groups[groupKey] ~= true
+    self.contextSignature = nil
+    self:refreshInventory(true)
+    return true
 end
 
 function ISPNCInventoryWindow:getSelectedContainer(role)
@@ -555,6 +669,9 @@ function ISPNCInventoryWindow:onMouseDown(x, y)
 end
 
 function ISPNCInventoryWindow:close()
+    if QuantityModal and QuantityModal.instance then
+        QuantityModal.instance:close()
+    end
     InventoryWindow.instance = nil
     UI.Window.close(self)
 end

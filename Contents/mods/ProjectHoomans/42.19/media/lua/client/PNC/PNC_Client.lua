@@ -303,6 +303,46 @@ local function removeFromContainer(inventory, itemID)
     end
 end
 
+local function rebuildCachedEquipment(cached, authoritativeEquipment)
+    local inventory = cached and cached.inventory or nil
+    local equipment = Core.DeepCopy(authoritativeEquipment or {})
+    local itemID
+    local item
+    if not inventory then return end
+
+    inventory.equipped = {}
+    inventory.worn = {}
+    inventory.attached = {}
+    for itemID, item in pairs(inventory.items or {}) do
+        if item.equipSlot then inventory.equipped[item.equipSlot] = itemID end
+        if item.wornSlot then inventory.worn[item.wornSlot] = itemID end
+        if item.attachedSlot then inventory.attached[item.attachedSlot] = itemID end
+    end
+
+    equipment.worn = equipment.worn or {}
+    equipment.attached = equipment.attached or {}
+    if authoritativeEquipment == nil then
+        equipment.primaryFullType = inventory.equipped.primary
+            and inventory.items[inventory.equipped.primary]
+            and inventory.items[inventory.equipped.primary].type or nil
+        equipment.secondaryFullType = inventory.equipped.secondary
+            and inventory.items[inventory.equipped.secondary]
+            and inventory.items[inventory.equipped.secondary].type or nil
+        equipment.worn = {}
+        equipment.attached = {}
+        for itemID, item in pairs(inventory.items or {}) do
+            if item.wornSlot then equipment.worn[item.wornSlot] = item.type end
+            if item.attachedSlot then equipment.attached[item.attachedSlot] = item.type end
+        end
+    end
+    cached.equipment = equipment
+    cached.snapshot = cached.snapshot or {}
+    cached.snapshot.equipmentSummary = Core.DeepCopy(equipment)
+    if cached.snapshot.id and ClientState.snapshots then
+        ClientState.snapshots[cached.snapshot.id] = cached.snapshot
+    end
+end
+
 local function applyInventoryDelta(args)
     local cached = args and ClientState.characterPayloads and ClientState.characterPayloads[args.npcId] or nil
     local inventory = cached and cached.inventory or nil
@@ -340,6 +380,11 @@ local function applyInventoryDelta(args)
             if op.cond ~= nil then item.cond = op.cond end
             if op.ammoCount ~= nil then item.ammoCount = op.ammoCount end
             if op.fav ~= nil then item.fav = op.fav == true end
+            if op.interactionLocked ~= nil then
+                item.interactionLocked = op.interactionLocked == true
+                item.interactionLockReason = item.interactionLocked
+                    and op.interactionLockReason or nil
+            end
         elseif op.op == "equip" and op.slot then
             inventory.equipped = inventory.equipped or {}
             if op.oldSlot and inventory.equipped[op.oldSlot] == op.itemID then
@@ -369,6 +414,7 @@ local function applyInventoryDelta(args)
     inventory.summary = Core.DeepCopy(args.summary or inventory.summary or {})
     inventory.summary.revision = tonumber(args.inventoryRevision) or inventory.summary.revision
     inventory.revision = inventory.summary.revision
+    rebuildCachedEquipment(cached, args.equipment)
     return true
 end
 

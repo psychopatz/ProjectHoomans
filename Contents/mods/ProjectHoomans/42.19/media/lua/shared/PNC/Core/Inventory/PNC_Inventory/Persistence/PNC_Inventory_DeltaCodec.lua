@@ -64,6 +64,14 @@ function Internal.applySavedDelta(record, inv, delta)
                     item.ammoCount = math.max(0, math.floor(tonumber(changed.ammoCount) or 0))
                 end
                 if changed.fav ~= nil then item.fav = changed.fav == true end
+                if changed.interactionLocked ~= nil then
+                    item.interactionLocked = changed.interactionLocked == true
+                    item.interactionLockReason = item.interactionLocked
+                        and Internal.normalizeString(
+                            changed.interactionLockReason
+                        )
+                        or nil
+                end
                 if changed.container ~= nil then
                     Internal.setItemContainer(inv, item,
                         Internal.resolveSavedContainer(inv, changed.container))
@@ -115,6 +123,10 @@ function Internal.buildCompactDelta(record, inv)
                     or (tonumber(item.cond) or 0) ~= (tonumber(templateItem.cond) or 0)
                     or item.ammoCount ~= templateItem.ammoCount
                     or (item.fav == true) ~= (templateItem.fav == true)
+                    or (item.interactionLocked == true)
+                        ~= (templateItem.interactionLocked == true)
+                    or item.interactionLockReason
+                        ~= templateItem.interactionLockReason
                     or item.wornSlot ~= templateItem.wornSlot
                     or item.attachedSlot ~= templateItem.attachedSlot
                     or item.equipSlot ~= templateItem.equipSlot
@@ -125,6 +137,8 @@ function Internal.buildCompactDelta(record, inv)
                         cond = item.cond,
                         ammoCount = item.ammoCount,
                         fav = item.fav == true,
+                        interactionLocked = item.interactionLocked == true,
+                        interactionLockReason = item.interactionLockReason,
                         container = item.container,
                         wornSlot = item.wornSlot,
                         attachedSlot = item.attachedSlot,

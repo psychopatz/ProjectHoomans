@@ -196,6 +196,10 @@ assert(identityCard, "NPC identity card was not generated")
 assertEqual(identityCard.type, "Base.IDcard", "NPC identity card type")
 assertEqual(identityCard.customName, "ID Card: Unknown NPC", "NPC identity card name")
 assertEqual(identityCard.identityNPCId, bothRecord.id, "NPC identity card UUID")
+assertEqual(identityCard.interactionLocked, true,
+    "NPC identity card is interaction locked")
+assertEqual(identityCard.interactionLockReason, "identity_card",
+    "NPC identity card lock reason")
 assertEqual(rangedTypes[primary.type], true, "ranged weapon is active when both spawn")
 assertEqual(rangedTypes[reserve.type] == true, false, "melee weapon is reserve when both spawn")
 assertEqual(bothRecord.weaponMode, "mixed", "both-weapon combat mode")

@@ -149,6 +149,24 @@ assertEqual(equipDelta.ops[1].op, "equip", "equipment delta operation")
 assertEqual(equipDelta.ops[1].itemID, "fallback_1", "equipment delta item")
 assertEqual(equipDelta.ops[2].op, "update", "favorite delta operation")
 assertEqual(equipDelta.ops[2].fav, true, "favorite delta value")
+assertEqual(equipDelta.equipment.primaryFullType, "Base.HuntingKnife",
+    "delta carries authoritative equipment summary")
+local locked, lockReason = PNC.Inventory.SetInteractionLocked(
+    record,
+    "loot_1",
+    true,
+    "quest_item",
+    "test_interaction_lock"
+)
+assertEqual(locked, true, "interaction lock mutation")
+assertEqual(lockReason, "interaction_locked", "interaction lock reason")
+local lockDelta = PNC.Inventory.BuildDeltaPayload(record, 5)
+assertEqual(lockDelta.inventoryRevision, 6, "interaction lock delta revision")
+assertEqual(lockDelta.ops[1].op, "update", "interaction lock delta operation")
+assertEqual(lockDelta.ops[1].interactionLocked, true,
+    "interaction lock delta state")
+assertEqual(lockDelta.ops[1].interactionLockReason, "quest_item",
+    "interaction lock delta reason")
 local weightState = PNC.Inventory.GetWeightState(record)
 assert(weightState.usedWeight > 0, "weight cache was not rebuilt")
 assert(weightState.remainingWeight >= 0, "remaining weight is invalid")
@@ -191,5 +209,9 @@ assertEqual(reloaded.inventory.items.loot_1.ammoCount, 0, "magazine state lost o
 assertEqual(reloaded.inventory.equipped.primary, "fallback_1", "equipped primary lost on rebase")
 assertEqual(reloaded.inventory.items.fallback_1.equipSlot, "primary", "equipped item slot lost on rebase")
 assertEqual(reloaded.inventory.items.fallback_1.fav, true, "favorite item lost on rebase")
+assertEqual(reloaded.inventory.items.loot_1.interactionLocked, true,
+    "interaction lock lost on rebase")
+assertEqual(reloaded.inventory.items.loot_1.interactionLockReason, "quest_item",
+    "interaction lock reason lost on rebase")
 
 print("pnc_seed_delta_smoke: ok")

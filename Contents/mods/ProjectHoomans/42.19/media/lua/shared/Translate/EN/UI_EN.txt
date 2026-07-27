@@ -1,6 +1,10 @@
 UI_EN = {
     UI_PNC_Inventory_Title = "Inventory",
     UI_PNC_Inventory_Open = "Inventory",
+    UI_PNC_Character_View = "View Character",
+    UI_PNC_Inventory_Transfer = "Transfer",
+    UI_PNC_Inventory_SelectQuantity = "Select transfer quantity",
+    UI_PNC_Inventory_OffLimits = "Off Limits",
     UI_PNC_Inventory_Equip = "Equip Primary",
     UI_PNC_Inventory_Favorite = "Favorite",
     UI_PNC_Inventory_Unfavorite = "Unfavorite",

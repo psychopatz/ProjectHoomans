@@ -94,6 +94,7 @@ function Inventory.BuildDeltaPayload(record, sinceRevision)
             inventoryRevision = inv.revision,
             ops = {},
             summary = Inventory.BuildSummaryPayload(record),
+            equipment = Core.DeepCopy(record.equipment or {}),
         }
     end
     if #runtime.opLog <= 0
@@ -119,5 +120,6 @@ function Inventory.BuildDeltaPayload(record, sinceRevision)
         inventoryRevision = inv.revision,
         ops = payload,
         summary = Inventory.BuildSummaryPayload(record),
+        equipment = Core.DeepCopy(record.equipment or {}),
     }
 end

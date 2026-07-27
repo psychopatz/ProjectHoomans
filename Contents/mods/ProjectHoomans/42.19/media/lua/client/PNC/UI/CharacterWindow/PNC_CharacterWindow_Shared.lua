@@ -261,11 +261,21 @@ end
 
 function Shared.BuildClothingRows(snapshot, payload, npcId)
     local equipment = Shared.GetEquipment(snapshot, payload)
+    local inventory = payload and payload.inventory or nil
     local character = Shared.GetLiveCharacter(npcId or Shared.GetSnapshot(snapshot, payload).id)
     local rows = {}
     local location
     local fullType
     local stats
+    if inventory and type(inventory.worn) == "table"
+        and type(inventory.items) == "table"
+    then
+        equipment = { worn = {} }
+        for location, itemId in pairs(inventory.worn) do
+            local state = inventory.items[itemId]
+            if state and state.type then equipment.worn[location] = state.type end
+        end
+    end
     for location, fullType in pairs(type(equipment.worn) == "table" and equipment.worn or {}) do
         stats = itemStats(fullType)
         local state = virtualWornItem(payload, location)
@@ -312,12 +322,18 @@ end
 function Shared.BuildBodyProtection(npcId, snapshot, payload, rows)
     rows = rows or Shared.BuildClothingRows(snapshot, payload, npcId)
     local character = Shared.GetLiveCharacter(npcId)
+    local hasAuthoritativeInventory = payload
+        and payload.inventory
+        and type(payload.inventory.worn) == "table"
+        and type(payload.inventory.items) == "table"
     local output = {}
     local biteTotal = 0
     local scratchTotal = 0
     for _, definition in ipairs(Shared.BodyParts) do
-        local bite = bodyDefense(character, definition.index, true)
-        local scratch = bodyDefense(character, definition.index, false)
+        local bite = not hasAuthoritativeInventory
+            and bodyDefense(character, definition.index, true) or nil
+        local scratch = not hasAuthoritativeInventory
+            and bodyDefense(character, definition.index, false) or nil
         if bite == nil or scratch == nil then
             bite = 0
             scratch = 0

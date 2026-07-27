@@ -42,7 +42,42 @@ local function probe(fullType)
     return result
 end
 
-local function playerItemRow(item, containerKey)
+local function listContainsItem(list, item)
+    local entry
+    local candidate
+    if not list or not list.size or not list.get then return false end
+    for index = 0, list:size() - 1 do
+        entry = list:get(index)
+        candidate = entry and entry.getItem and safeCall(entry, "getItem", nil)
+            or entry
+        if candidate == item then return true end
+    end
+    return false
+end
+
+local function isPlayerItemEquipped(player, item)
+    local method = player and player.isEquipped or nil
+    local ok
+    local value
+    if safeCall(item, "isEquipped", false) == true then return true end
+    if type(method) == "function" then
+        ok, value = pcall(method, player, item)
+        if ok and value == true then return true end
+    end
+    if safeCall(player, "getPrimaryHandItem", nil) == item
+        or safeCall(player, "getSecondaryHandItem", nil) == item
+    then
+        return true
+    end
+    if listContainsItem(safeCall(player, "getWornItems", nil), item)
+        or listContainsItem(safeCall(player, "getAttachedItems", nil), item)
+    then
+        return true
+    end
+    return false
+end
+
+local function playerItemRow(item, containerKey, player)
     local fullType = tostring(safeCall(item, "getFullType", ""))
     local metadata = probe(fullType)
     local customName = safeCall(item, "getName", nil)
@@ -58,8 +93,117 @@ local function playerItemRow(item, containerKey)
         weight = metadata.weight,
         container = containerKey,
         stack = 1,
-        equipped = safeCall(item, "isEquipped", false) == true,
+        equipped = isPlayerItemEquipped(player, item),
         favorite = safeCall(item, "isFavorite", false) == true,
+        restricted = false,
+    }
+end
+
+local function groupKey(row)
+    return table.concat({
+        tostring(row.source or ""),
+        tostring(row.fullType or ""),
+        tostring(row.name or ""),
+        tostring(row.category or ""),
+        row.favorite == true and "favorite" or "ordinary",
+        row.equipped == true and "equipped" or "carried",
+        row.restricted == true and "restricted" or "interactive",
+    }, "\031")
+end
+
+local function copyRow(source)
+    local output = {}
+    for key, value in pairs(source or {}) do output[key] = value end
+    return output
+end
+
+function Model.GroupRows(rows, expandedGroups)
+    local buckets = {}
+    local order = {}
+    local output = {}
+    local key
+    local bucket
+    local row
+    expandedGroups = type(expandedGroups) == "table" and expandedGroups or {}
+    for index = 1, #(rows or {}) do
+        row = rows[index]
+        key = groupKey(row)
+        bucket = buckets[key]
+        if not bucket then
+            bucket = { key = key, members = {} }
+            buckets[key] = bucket
+            order[#order + 1] = bucket
+        end
+        row.groupKey = key
+        bucket.members[#bucket.members + 1] = row
+    end
+    for index = 1, #order do
+        bucket = order[index]
+        if #bucket.members <= 1 then
+            output[#output + 1] = bucket.members[1]
+        else
+            local header = copyRow(bucket.members[1])
+            local quantity = 0
+            local weight = 0
+            local itemIDs = {}
+            for memberIndex = 1, #bucket.members do
+                local member = bucket.members[memberIndex]
+                quantity = quantity + math.max(
+                    1,
+                    math.floor(tonumber(member.stack) or 1)
+                )
+                weight = weight + (tonumber(member.weight) or 0)
+                itemIDs[#itemIDs + 1] = member.id
+            end
+            header.grouped = true
+            header.groupHeader = true
+            header.groupKey = bucket.key
+            header.members = bucket.members
+            header.itemIDs = itemIDs
+            header.stack = quantity
+            header.weight = weight
+            header.expanded = expandedGroups[bucket.key] == true
+            output[#output + 1] = header
+            if header.expanded then
+                for memberIndex = 1, #bucket.members do
+                    local member = bucket.members[memberIndex]
+                    member.groupChild = true
+                    output[#output + 1] = member
+                end
+            end
+        end
+    end
+    return output
+end
+
+function Model.GetRowQuantity(row)
+    return row and math.max(1, math.floor(tonumber(row.stack) or 1)) or 0
+end
+
+function Model.BuildTransferSelection(row, requestedQuantity)
+    local available = Model.GetRowQuantity(row)
+    local quantity = math.floor(tonumber(requestedQuantity) or available)
+    local members = row and row.members or row and { row } or {}
+    local itemIDs = {}
+    local selected = 0
+    if not row or row.restricted == true or quantity < 1 or quantity > available then
+        return nil, "invalid_quantity"
+    end
+    for index = 1, #members do
+        local member = members[index]
+        local memberQuantity = math.max(
+            1,
+            math.floor(tonumber(member.stack) or 1)
+        )
+        if selected < quantity then
+            itemIDs[#itemIDs + 1] = member.id
+            selected = selected + math.min(memberQuantity, quantity - selected)
+        end
+    end
+    if selected < quantity then return nil, "quantity_unavailable" end
+    return {
+        itemIDs = itemIDs,
+        quantity = quantity,
     }
 end
 
@@ -108,19 +252,19 @@ function Model.BuildPlayerContainers(player)
     return output
 end
 
-function Model.BuildPlayerRows(containerEntry)
+function Model.BuildPlayerRows(containerEntry, player, expandedGroups)
     local rows = {}
     local container = containerEntry and containerEntry.container or nil
     local items = container and container.getItems and container:getItems() or nil
     if items and items.size and items.get then
         for index = 0, items:size() - 1 do
-            rows[#rows + 1] = playerItemRow(items:get(index), containerEntry.id)
+            rows[#rows + 1] = playerItemRow(items:get(index), containerEntry.id, player)
         end
     end
     table.sort(rows, function(a, b)
         return string.lower(a.name) < string.lower(b.name)
     end)
-    return rows
+    return Model.GroupRows(rows, expandedGroups)
 end
 
 function Model.BuildNPCContainers(inventory)
@@ -148,7 +292,7 @@ function Model.BuildNPCContainers(inventory)
     return output
 end
 
-function Model.BuildNPCRows(inventory, containerID)
+function Model.BuildNPCRows(inventory, containerID, expandedGroups)
     local rows = {}
     local container = inventory and inventory.containers
         and inventory.containers[containerID or "root"]
@@ -172,6 +316,8 @@ function Model.BuildNPCRows(inventory, containerID)
                     or item.wornSlot ~= nil
                     or item.attachedSlot ~= nil,
                 favorite = item.fav == true,
+                restricted = item.interactionLocked == true,
+                restrictionReason = item.interactionLockReason,
             }
         end
     end
@@ -179,7 +325,7 @@ function Model.BuildNPCRows(inventory, containerID)
         if a.equipped ~= b.equipped then return a.equipped == true end
         return string.lower(a.name) < string.lower(b.name)
     end)
-    return rows
+    return Model.GroupRows(rows, expandedGroups)
 end
 
 function Model.FindContainer(containers, containerID)

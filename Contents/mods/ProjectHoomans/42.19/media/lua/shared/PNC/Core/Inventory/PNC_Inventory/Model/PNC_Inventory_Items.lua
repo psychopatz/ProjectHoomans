@@ -119,6 +119,8 @@ function Internal.itemToPayload(item)
         cond = tonumber(item.cond) or nil,
         ammoCount = tonumber(item.ammoCount),
         fav = item.fav == true or nil,
+        interactionLocked = item.interactionLocked == true or nil,
+        interactionLockReason = item.interactionLockReason,
         container = item.container,
         bagContainer = item.bagContainer,
         maxWeight = tonumber(item.maxWeight) or nil,
@@ -152,6 +154,10 @@ function Internal.createItem(record, inv, spec)
             and math.max(0, math.floor(tonumber(spec.ammoCount) or 0))
             or nil,
         fav = spec.fav == true,
+        interactionLocked = spec.interactionLocked == true,
+        interactionLockReason = Internal.normalizeString(
+            spec.interactionLockReason
+        ),
         container = Internal.normalizeString(spec.container) or "root",
         bagContainer = Internal.normalizeString(spec.bagContainer),
         maxWeight = tonumber(spec.maxWeight)
@@ -233,6 +239,8 @@ function Internal.ensureIdentityCard(record, inv)
         item.customName = "ID Card: " .. displayName
         item.identityNPCId = tostring(record.id)
         item.identityNPCName = displayName
+        item.interactionLocked = true
+        item.interactionLockReason = "identity_card"
     end
     return item
 end

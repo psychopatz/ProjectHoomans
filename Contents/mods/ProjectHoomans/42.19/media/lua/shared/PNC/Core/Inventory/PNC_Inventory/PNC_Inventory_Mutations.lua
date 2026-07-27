@@ -70,6 +70,16 @@ local function applyUpdateOperation(inv, op)
     if op.fav ~= nil then
         item.fav = op.fav == true
     end
+    if op.interactionLocked ~= nil then
+        item.interactionLocked = op.interactionLocked == true
+        item.interactionLockReason = item.interactionLocked
+            and Internal.normalizeString(op.interactionLockReason)
+            or nil
+    elseif op.interactionLockReason ~= nil then
+        item.interactionLockReason = Internal.normalizeString(
+            op.interactionLockReason
+        )
+    end
     return Internal.buildOperation("update", {
         itemID = item.id,
         stack = item.stack,
@@ -77,6 +87,8 @@ local function applyUpdateOperation(inv, op)
         cond = item.cond,
         ammoCount = item.ammoCount,
         fav = item.fav == true,
+        interactionLocked = item.interactionLocked == true,
+        interactionLockReason = item.interactionLockReason,
     })
 end
 
@@ -265,6 +277,40 @@ function Inventory.SetFavorite(record, itemID, favorite, reason)
     }, reason or (favorite and "inventory_favorite" or "inventory_unfavorite"))
     if not applied then return false, "favorite_failed" end
     return true, favorite and "favorited" or "unfavorited"
+end
+
+function Inventory.SetInteractionLocked(
+    record,
+    itemID,
+    locked,
+    lockReason,
+    mutationReason
+)
+    local inv = Inventory.EnsureRecordInventory(record)
+    local item
+    local applied
+    itemID = Internal.normalizeString(itemID)
+    item = itemID and inv and inv.items and inv.items[itemID] or nil
+    if not item then return false, "item_not_found" end
+    locked = locked == true
+    lockReason = locked and Internal.normalizeString(lockReason) or nil
+    if item.interactionLocked == locked
+        and item.interactionLockReason == lockReason
+    then
+        return true, "unchanged"
+    end
+    applied = Inventory.ApplyDelta(record, {
+        {
+            op = "update",
+            itemID = item.id,
+            interactionLocked = locked,
+            interactionLockReason = lockReason,
+        },
+    }, mutationReason or (locked
+        and "inventory_interaction_lock"
+        or "inventory_interaction_unlock"))
+    if not applied then return false, "interaction_lock_failed" end
+    return true, locked and "interaction_locked" or "interaction_unlocked"
 end
 
 function Inventory.SetEquipped(record, slot, itemID, reason)

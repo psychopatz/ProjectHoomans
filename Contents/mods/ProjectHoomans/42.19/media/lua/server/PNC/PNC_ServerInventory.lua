@@ -11,6 +11,17 @@ local Inventory = PNC.Inventory
 local Actions = PNC.InventoryActions
 local Network = PNC.Network
 
+local function canUseDebug(player)
+    local access
+    if not isServer or not isServer() then
+        if isDebugEnabled then return isDebugEnabled() == true end
+        return getCore and getCore() and getCore():getDebug() == true or false
+    end
+    access = player and player.getAccessLevel
+        and tostring(player:getAccessLevel() or "") or ""
+    return string.lower(access) == "admin"
+end
+
 local function notify(player, success, reason, args)
     local payload = {
         success = success == true,
@@ -26,6 +37,7 @@ end
 
 local function canManage(player, record)
     if not record then return false, "npc_not_found" end
+    if canUseDebug(player) then return true, "debug_authorized" end
     if not PNC.CompanionCommands or not PNC.CompanionCommands.CanPlayerCommand then
         return false, "command_service_unavailable"
     end
@@ -86,13 +98,55 @@ local function nativeFlag(item, methodName)
     return ok and value == true
 end
 
-local function isNativeBulkProtected(item)
-    return nativeFlag(item, "isFavorite") or nativeFlag(item, "isEquipped")
+local function nativeListContainsItem(list, item)
+    local entry
+    local candidate
+    if not list or not list.size or not list.get then return false end
+    for index = 0, list:size() - 1 do
+        entry = list:get(index)
+        candidate = entry and entry.getItem and entry:getItem() or entry
+        if candidate == item then return true end
+    end
+    return false
+end
+
+local function playerEquipsItem(player, item)
+    local ok
+    local equipped
+    if nativeFlag(item, "isEquipped") then return true end
+    if player and player.isEquipped then
+        ok, equipped = pcall(player.isEquipped, player, item)
+        if ok and equipped == true then return true end
+    end
+    if player and player.getPrimaryHandItem and player:getPrimaryHandItem() == item then
+        return true
+    end
+    if player and player.getSecondaryHandItem and player:getSecondaryHandItem() == item then
+        return true
+    end
+    if nativeListContainsItem(
+        player and player.getWornItems and player:getWornItems() or nil,
+        item
+    ) then
+        return true
+    end
+    if nativeListContainsItem(
+        player and player.getAttachedItems and player:getAttachedItems() or nil,
+        item
+    ) then
+        return true
+    end
+    return false
+end
+
+local function isNativeBulkProtected(player, item)
+    return nativeFlag(item, "isFavorite") or playerEquipsItem(player, item)
 end
 
 local function isCompactBulkProtected(item)
     return item and (
         item.fav == true
+        or item.interactionLocked == true
         or item.equipSlot ~= nil
         or item.wornSlot ~= nil
         or item.attachedSlot ~= nil
@@ -153,7 +207,7 @@ local function transferPlayerToNPC(player, record, args, sinceRevision)
         local eligibleIDs = {}
         local eligibleItems = {}
         for index = 1, #resolved do
-            if not isNativeBulkProtected(resolved[index])
+            if not isNativeBulkProtected(player, resolved[index])
                 and not isNonEmptyContainer(resolved[index])
             then
                 eligibleIDs[#eligibleIDs + 1] = itemIDs[index]
@@ -163,6 +217,15 @@ local function transferPlayerToNPC(player, record, args, sinceRevision)
         itemIDs = eligibleIDs
         resolved = eligibleItems
         if #itemIDs < 1 then return false, "no_transferable_items" end
+    elseif args.quantity ~= nil then
+        local quantity = math.floor(tonumber(args.quantity) or 0)
+        if quantity < 1 or quantity > #resolved then
+            return false, "invalid_quantity"
+        end
+        while #resolved > quantity do
+            resolved[#resolved] = nil
+            itemIDs[#itemIDs] = nil
+        end
     end
     local specs = {}
     for index = 1, #resolved do
@@ -188,21 +251,34 @@ end
 
 local function transferNPCToPlayer(player, record, args, sinceRevision)
     local requestedIDs = type(args.itemIDs) == "table" and args.itemIDs or {}
-    local itemIDs = {}
     local inv = Inventory.EnsureRecordInventory(record)
     local maxItems = tonumber(Const.INVENTORY_TRANSFER_MAX_ITEMS) or 64
+    local maxQuantity = tonumber(Const.INVENTORY_TRANSFER_MAX_QUANTITY) or 1024
+    local requestedQuantity = args.bulk ~= true and args.quantity ~= nil
+        and math.floor(tonumber(args.quantity) or 0) or nil
     if #requestedIDs < 1 or #requestedIDs > maxItems then
         return false, "invalid_item_count"
+    end
+    if requestedQuantity ~= nil
+        and (requestedQuantity < 1 or requestedQuantity > maxQuantity)
+    then
+        return false, "invalid_quantity"
     end
 
     local seen = {}
     local nativeItems = {}
+    local plans = {}
+    local remaining = requestedQuantity
     for index = 1, #requestedIDs do
         local itemID = tostring(requestedIDs[index] or "")
         local item = inv.items[itemID]
         if itemID == "" or seen[itemID] or not item then
             rollbackNativeItems(nativeItems)
             return false, "item_not_found"
+        end
+        if args.bulk ~= true and item.interactionLocked == true then
+            rollbackNativeItems(nativeItems)
+            return false, "item_off_limits"
         end
         if args.bulk ~= true and compactContainerHasItems(inv, item) then
             rollbackNativeItems(nativeItems)
@@ -216,36 +292,90 @@ local function transferNPCToPlayer(player, record, args, sinceRevision)
             -- Vanilla bulk transfer leaves favorites, equipped items, and
             -- non-empty carried containers in place.
         else
-            itemIDs[#itemIDs + 1] = itemID
-            local state = {}
-            for key, value in pairs(item.itemState or {}) do state[key] = value end
-            state.condition = item.cond or state.condition
-            state.usedDelta = item.uses or state.usedDelta
-            state.ammoCount = item.ammoCount or state.ammoCount
-            state.favorite = item.fav == true
-            state.customName = item.customName or state.customName
-            local created, reason = ItemTransfer.GiveToPlayerContainer(
-                player,
-                args.playerContainer,
-                item.type,
-                math.max(1, math.floor(tonumber(item.stack) or 1)),
-                state
+            local available = math.max(
+                1,
+                math.floor(tonumber(item.stack) or 1)
             )
-            if not created then
-                rollbackNativeItems(nativeItems)
-                return false, reason
-            end
-            local createdArray = nativeListToArray(created)
-            for _, nativeItem in ipairs(createdArray) do
-                nativeItems[#nativeItems + 1] = nativeItem
+            local transferCount = remaining ~= nil
+                and math.min(available, math.max(0, remaining))
+                or available
+            if transferCount > 0 then
+                local state = {}
+                for key, value in pairs(item.itemState or {}) do
+                    state[key] = value
+                end
+                state.condition = item.cond or state.condition
+                state.usedDelta = item.uses or state.usedDelta
+                state.ammoCount = item.ammoCount or state.ammoCount
+                state.favorite = item.fav == true
+                state.customName = item.customName or state.customName
+                local created, reason = ItemTransfer.GiveToPlayerContainer(
+                    player,
+                    args.playerContainer,
+                    item.type,
+                    transferCount,
+                    state
+                )
+                if not created then
+                    rollbackNativeItems(nativeItems)
+                    return false, reason
+                end
+                plans[#plans + 1] = {
+                    itemID = itemID,
+                    previousStack = available,
+                    quantity = transferCount,
+                }
+                local createdArray = nativeListToArray(created)
+                for _, nativeItem in ipairs(createdArray) do
+                    nativeItems[#nativeItems + 1] = nativeItem
+                end
+                if remaining ~= nil then
+                    remaining = remaining - transferCount
+                end
             end
         end
     end
 
-    if #itemIDs < 1 then return false, "no_transferable_items" end
+    if #plans < 1 then return false, "no_transferable_items" end
+    if remaining ~= nil and remaining > 0 then
+        rollbackNativeItems(nativeItems)
+        return false, "quantity_unavailable"
+    end
 
-    local removed, reason = Inventory.RemoveItems(record, itemIDs, "npc_to_player")
-    if not removed then
+    local removeIDs = {}
+    local ops = {}
+    local partial = false
+    for index = 1, #plans do
+        local plan = plans[index]
+        if plan.quantity >= plan.previousStack then
+            removeIDs[#removeIDs + 1] = plan.itemID
+            ops[#ops + 1] = { op = "remove", itemID = plan.itemID }
+        else
+            partial = true
+            ops[#ops + 1] = {
+                op = "update",
+                itemID = plan.itemID,
+                stack = plan.previousStack - plan.quantity,
+            }
+        end
+    end
+    local mutated
+    local reason
+    if partial then
+        mutated = Inventory.ApplyDelta(
+            record,
+            ops,
+            "npc_to_player_partial"
+        )
+        reason = "remove_failed"
+    else
+        mutated, reason = Inventory.RemoveItems(
+            record,
+            removeIDs,
+            "npc_to_player"
+        )
+    end
+    if not mutated then
         rollbackNativeItems(nativeItems)
         return false, reason
     end
@@ -331,6 +461,9 @@ function Service.Action(player, args)
     local inv = Inventory.EnsureRecordInventory(record)
     local item = inv.items[tostring(args.itemID or "")]
     if not item then return notify(player, false, "item_not_found", args) end
+    if item.interactionLocked == true then
+        return notify(player, false, "item_off_limits", args)
+    end
 
     local success
     if tostring(args.actionID or "") == "drop" then

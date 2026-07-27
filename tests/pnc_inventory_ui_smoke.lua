@@ -68,6 +68,21 @@ package.preload["PNC/UI/Inventory/PNC_InventoryUI_ContainerList"] = function()
     ISPNCInventoryContainerList = {}
     return ISPNCInventoryContainerList
 end
+local quantityRequest
+package.preload["PNC/UI/Inventory/PNC_InventoryQuantityModal"] = function()
+    PNC.InventoryQuantityModal = {
+        Open = function(maximum, itemLabel, callbackTarget, callback)
+            quantityRequest = {
+                maximum = maximum,
+                itemLabel = itemLabel,
+                callbackTarget = callbackTarget,
+                callback = callback,
+            }
+            return quantityRequest
+        end,
+    }
+    return PNC.InventoryQuantityModal
+end
 
 local contextPlayerID
 local context = { options = {} }
@@ -108,13 +123,41 @@ local playerBag = {
     isFavorite = function() return true end,
     isEquipped = function() return true end,
 }
+local wornShirt = {
+    getID = function() return 43 end,
+    getFullType = function() return "Base.Shirt_Denim" end,
+    getDisplayName = function() return "Denim Shirt" end,
+    isFavorite = function() return false end,
+    isEquipped = function() return false end,
+}
+local ammoOne = {
+    getID = function() return 44 end,
+    getFullType = function() return "Base.Bullets9mm" end,
+    getDisplayName = function() return "9mm Round" end,
+    isFavorite = function() return false end,
+    isEquipped = function() return false end,
+}
+local ammoTwo = {
+    getID = function() return 45 end,
+    getFullType = function() return "Base.Bullets9mm" end,
+    getDisplayName = function() return "9mm Round" end,
+    isFavorite = function() return false end,
+    isEquipped = function() return false end,
+}
 local rootContainer = {
-    getItems = function() return javaList({ playerBag }) end,
+    getItems = function()
+        return javaList({ playerBag, wornShirt, ammoOne, ammoTwo })
+    end,
     getCapacityWeight = function() return 4.5 end,
 }
 local player = {
     getInventory = function() return rootContainer end,
     getMaxWeight = function() return 12 end,
+    getWornItems = function()
+        return javaList({
+            { getItem = function() return wornShirt end },
+        })
+    end,
 }
 local playerContainers = PNC.InventoryUIModel.BuildPlayerContainers(player)
 assertEqual(#playerContainers, 2, "player root and backpack selectors")
@@ -122,9 +165,36 @@ assertEqual(playerContainers[1].id, "root", "player root selector first")
 assertEqual(playerContainers[2].label, "Duffel Bag", "player backpack selector")
 assertEqual(PNC.InventoryUIModel.FindContainer(playerContainers, "missing"), nil,
     "missing container does not masquerade as root")
-local playerRows = PNC.InventoryUIModel.BuildPlayerRows(playerContainers[1])
-assertEqual(playerRows[1].favorite, true, "player favorite row state")
-assertEqual(playerRows[1].equipped, true, "player equipped row state")
+local playerRows = PNC.InventoryUIModel.BuildPlayerRows(playerContainers[1], player)
+local playerRowsByID = {}
+for _, row in ipairs(playerRows) do playerRowsByID[row.id] = row end
+assertEqual(playerRowsByID["42"].favorite, true, "player favorite row state")
+assertEqual(playerRowsByID["42"].equipped, true, "player equipped row state")
+assertEqual(playerRowsByID["43"].equipped, true,
+    "player worn item protected even when InventoryItem:isEquipped is false")
+local playerAmmoGroup
+for _, row in ipairs(playerRows) do
+    if row.fullType == "Base.Bullets9mm" then playerAmmoGroup = row end
+end
+assertEqual(playerAmmoGroup.groupHeader, true, "matching player items collapse")
+assertEqual(playerAmmoGroup.stack, 2, "collapsed player quantity")
+local playerAmmoSelection = PNC.InventoryUIModel.BuildTransferSelection(
+    playerAmmoGroup,
+    1
+)
+assertEqual(#playerAmmoSelection.itemIDs, 1, "partial player selection")
+local expandedPlayerRows = PNC.InventoryUIModel.BuildPlayerRows(
+    playerContainers[1],
+    player,
+    { [playerAmmoGroup.groupKey] = true }
+)
+local expandedAmmoCount = 0
+for _, row in ipairs(expandedPlayerRows) do
+    if row.fullType == "Base.Bullets9mm" then
+        expandedAmmoCount = expandedAmmoCount + 1
+    end
+end
+assertEqual(expandedAmmoCount, 3, "expanded group has header and members")
 
 local npcContainers = PNC.InventoryUIModel.BuildNPCContainers({
     items = {
@@ -153,11 +223,48 @@ local npcRows = PNC.InventoryUIModel.BuildNPCRows({
             fav = true,
             wornSlot = "base:back",
         },
+        nails_a = {
+            id = "nails_a",
+            type = "Base.Nails",
+            container = "root",
+            stack = 2,
+        },
+        nails_b = {
+            id = "nails_b",
+            type = "Base.Nails",
+            container = "root",
+            stack = 3,
+        },
+        identity_card = {
+            id = "identity_card",
+            type = "Base.IDcard",
+            container = "root",
+            interactionLocked = true,
+            interactionLockReason = "identity_card",
+        },
     },
-    containers = { root = { items = { "npc_bag" } } },
+    containers = {
+        root = {
+            items = { "npc_bag", "nails_a", "nails_b", "identity_card" },
+        },
+    },
 }, "root")
-assertEqual(npcRows[1].favorite, true, "NPC favorite row state")
-assertEqual(npcRows[1].equipped, true, "NPC equipped row state")
+local npcRowsByID = {}
+local npcNailsGroup
+for _, row in ipairs(npcRows) do
+    npcRowsByID[row.id] = row
+    if row.fullType == "Base.Nails" then npcNailsGroup = row end
+end
+assertEqual(npcRowsByID["npc_bag"].favorite, true, "NPC favorite row state")
+assertEqual(npcRowsByID["npc_bag"].equipped, true, "NPC equipped row state")
+assertEqual(npcNailsGroup.stack, 5, "compact NPC stacks combine")
+local npcNailsSelection = PNC.InventoryUIModel.BuildTransferSelection(
+    npcNailsGroup,
+    4
+)
+assertEqual(#npcNailsSelection.itemIDs, 2, "quantity spans compact stacks")
+assertEqual(npcRowsByID["identity_card"].restricted, true,
+    "off-limits item model state")
 
 dofile(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryWindow.lua")
 
@@ -167,6 +274,8 @@ local eligibleIDs = PNC.InventoryWindow.CollectBulkTransferIDs({
         { item = { id = "ordinary" } },
         { item = { id = "favorite", favorite = true } },
         { item = { id = "equipped", equipped = true } },
+        { item = { id = "locked", restricted = true } },
+        { item = playerRowsByID["43"] },
     },
 })
 assertEqual(#eligibleIDs, 1, "bulk transfer protected-item filtering")
@@ -174,6 +283,23 @@ assertEqual(eligibleIDs[1], "ordinary", "bulk transfer eligible item")
 window:showItemContext("player", { id = "player_item_1" })
 assertEqual(contextPlayerID, 0, "context menu receives numeric player ID")
 assertEqual(#context.options, 1, "player transfer context option")
+
+window.npcID = "npc_1"
+window.selectedNPCContainer = "root"
+window.sendTransfer = function(self, direction, row, destination, quantity)
+    self.lastTransfer = {
+        direction = direction,
+        row = row,
+        destination = destination,
+        quantity = quantity,
+    }
+end
+window:requestTransfer("player_to_npc", playerAmmoGroup, nil)
+assertEqual(quantityRequest.maximum, 2, "group transfer opens quantity modal")
+quantityRequest.callback(quantityRequest.callbackTarget, 1)
+assertEqual(window.lastTransfer.quantity, 1, "modal quantity reaches transfer")
+assertEqual(window.lastTransfer.direction, "player_to_npc",
+    "modal preserves transfer direction")
 
 window.playerContainers = {
     { id = "root" },
@@ -199,5 +325,24 @@ assert(string.find(listSource, "media/ui/icon.png", 1, true),
     "vanilla equipped circle texture missing")
 assert(string.find(listSource, "media/ui/FavoriteStar.png", 1, true),
     "vanilla favorite star texture missing")
+assert(string.find(
+    listSource,
+    "media/ui/inventoryPanes/Button_TreeCollapsed.png",
+    1,
+    true
+), "vanilla collapsed-group texture missing")
+assert(string.find(listSource, "row.restricted", 1, true),
+    "off-limits row dimming missing")
+
+local modalSource = assert(io.open(
+    CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryQuantityModal.lua",
+    "r"
+)):read("*a")
+assert(string.find(
+    modalSource,
+    'require "RadioCom/ISUIRadio/ISSliderPanel"',
+    1,
+    true
+), "quantity modal slider missing")
 
 print("pnc_inventory_ui_smoke: ok")

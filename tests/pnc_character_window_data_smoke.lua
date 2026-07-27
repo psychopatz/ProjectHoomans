@@ -82,7 +82,12 @@ assertNear(summary.windAverage, 0.5, "average wind resistance")
 
 local payload = {
     snapshot = snapshot,
-    equipment = snapshot.equipmentSummary,
+    equipment = {
+        worn = {
+            Jacket = "Base.Trousers",
+            Pants = "Base.Jacket",
+        },
+    },
     inventory = {
         worn = { Jacket = "jacket_1", Pants = "pants_1" },
         items = {
@@ -94,6 +99,8 @@ local payload = {
 local stateRows = PNC.CharacterWindowShared.BuildClothingRows(snapshot, payload, "npc_ui")
 assertEqual(stateRows[1].condition, 4, "virtual clothing condition")
 assertNear(stateRows[1].conditionRatio, 0.4, "virtual condition ratio")
+assertEqual(stateRows[1].fullType, "Base.Jacket",
+    "inventory worn map overrides stale equipment summary")
 local protection = PNC.CharacterWindowShared.BuildBodyProtection("npc_ui", snapshot, payload, stateRows)
 assertNear(protection.Torso_Upper.bite, 12, "condition-adjusted covered bite defense")
 assertNear(protection.Torso_Upper.scratch, 20, "condition-adjusted covered scratch defense")
@@ -109,7 +116,7 @@ PNC.ClientPresenceSync = {
         },
     },
 }
-protection = PNC.CharacterWindowShared.BuildBodyProtection("npc_ui", snapshot, payload, stateRows)
+protection = PNC.CharacterWindowShared.BuildBodyProtection("npc_ui", snapshot, nil, stateRows)
 assertEqual(protection.Head.bite, 28, "live per-part bite defense")
 assertEqual(protection.Head.scratch, 18, "live per-part scratch defense")
 

@@ -10,6 +10,7 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     if not row then return y + self.itemheight end
     local selected = self.selected == listItem.index
     local stripe = (listItem.index or 0) % 2 == 0
+    local dimmed = row.restricted == true
     if selected then
         self:drawRect(0, y, self.width, self.itemheight, 0.32, 0.32, 0.36, 0.40)
     elseif stripe then
@@ -17,19 +18,52 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     else
         self:drawRect(0, y, self.width, self.itemheight, 0.07, 0.07, 0.07, 0.46)
     end
+    local indent = row.groupHeader and 12 or row.groupChild and 12 or 0
+    if row.groupHeader then
+        local treeTexture = row.expanded and self.treeExpanded or self.treeCollapsed
+        if treeTexture then
+            self:drawTextureScaledAspect(
+                treeTexture, 1, y + 9, 12, 12, 1, 1, 1, 1
+            )
+        end
+    end
     if row.texture then
-        self:drawTextureScaledAspect(row.texture, 5, y + 3, 26, 26, 1, 1, 1, 1)
+        local tint = dimmed and 0.42 or 1
+        self:drawTextureScaledAspect(
+            row.texture, 5 + indent, y + 3, 26, 26, 1, tint, tint, tint
+        )
     end
     if row.favorite and self.favoriteStar then
-        self:drawTexture(self.favoriteStar, 5, y + 19, 1, 1, 1, 1)
+        self:drawTexture(
+            self.favoriteStar, 5 + indent, y + 19,
+            1, dimmed and 0.42 or 1, dimmed and 0.42 or 1,
+            dimmed and 0.42 or 1
+        )
     end
     if row.equipped and self.equippedItemIcon then
-        self:drawTexture(self.equippedItemIcon, 21, y + 19, 1, 1, 1, 1)
+        self:drawTexture(
+            self.equippedItemIcon, 21 + indent, y + 19,
+            1, dimmed and 0.42 or 1, dimmed and 0.42 or 1,
+            dimmed and 0.42 or 1
+        )
     end
-    local countText = row.stack and row.stack > 1 and (" x" .. tostring(row.stack)) or ""
-    self:drawText(tostring(row.name) .. countText, 39, y + 7, 0.86, 0.86, 0.86, 1, UIFont.Small)
+    local countText = row.stack and row.stack > 1
+        and (" (" .. tostring(row.stack) .. ")") or ""
+    local textColor = dimmed and 0.40 or 0.86
+    self:drawText(
+        tostring(row.name) .. countText,
+        39 + indent, y + 7,
+        textColor, textColor, textColor, 1, UIFont.Small
+    )
     local categoryX = math.floor(self.width * 0.64)
-    self:drawText(tostring(row.category or "Item"), categoryX, y + 7, 0.64, 0.64, 0.82, 1, UIFont.Small)
+    self:drawText(
+        tostring(row.category or "Item"),
+        categoryX, y + 7,
+        dimmed and 0.38 or 0.64,
+        dimmed and 0.38 or 0.64,
+        dimmed and 0.42 or 0.82,
+        1, UIFont.Small
+    )
     return y + self.itemheight
 end
 
@@ -44,7 +78,11 @@ function ISPNCInventoryList:onMouseDown(x, y)
     end
     local row = self:selectedRow()
     if row and self.ownerWindow then
-        self.ownerWindow:beginInventoryDrag(self.role, row)
+        if row.groupHeader and x <= 16 then
+            self.ownerWindow:toggleInventoryGroup(self.role, row.groupKey)
+        elseif row.restricted ~= true then
+            self.ownerWindow:beginInventoryDrag(self.role, row)
+        end
     end
     return true
 end
@@ -94,6 +132,10 @@ function ISPNCInventoryList:new(x, y, width, height, ownerWindow, role)
     o.borderColor = { r = 0.45, g = 0.45, b = 0.45, a = 0.9 }
     o.equippedItemIcon = getTexture and getTexture("media/ui/icon.png") or nil
     o.favoriteStar = getTexture and getTexture("media/ui/FavoriteStar.png") or nil
+    o.treeExpanded = getTexture
+        and getTexture("media/ui/inventoryPanes/Button_TreeExpanded.png") or nil
+    o.treeCollapsed = getTexture
+        and getTexture("media/ui/inventoryPanes/Button_TreeCollapsed.png") or nil
     return o
 end
 

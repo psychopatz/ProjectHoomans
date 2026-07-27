@@ -64,6 +64,10 @@ function Inventory.EnsureRecordInventory(record)
                 and math.max(0, math.floor(tonumber(item.ammoCount) or 0))
                 or nil
             item.fav = item.fav == true
+            item.interactionLocked = item.interactionLocked == true
+            item.interactionLockReason = Internal.normalizeString(
+                item.interactionLockReason
+            )
             item.templateKey = Internal.normalizeString(item.templateKey)
             item.wornSlot = Internal.normalizeString(item.wornSlot)
             item.attachedSlot = Internal.normalizeString(item.attachedSlot)
@@ -71,6 +75,12 @@ function Inventory.EnsureRecordInventory(record)
             item.customName = Internal.normalizeString(item.customName)
             item.identityNPCId = Internal.normalizeString(item.identityNPCId)
             item.identityNPCName = Internal.normalizeString(item.identityNPCName)
+            if item.templateKey == "tmpl:identity_card:0"
+                or item.identityNPCId ~= nil
+            then
+                item.interactionLocked = true
+                item.interactionLockReason = "identity_card"
+            end
             item.bagContainer = Internal.normalizeString(item.bagContainer)
             item.maxWeight = tonumber(item.maxWeight)
             local profile = Internal.getContainerProfile(item.type)

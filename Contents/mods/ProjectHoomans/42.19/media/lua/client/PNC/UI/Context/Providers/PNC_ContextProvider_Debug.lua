@@ -64,11 +64,6 @@ function Provider.addOptions(menu, entry, player, contextData)
     menu:addOption(isRecording(entry) and "Stop Recording Debug" or "Record Debug", nil, function()
         sendDebug("toggle_debug", { id = entry.id })
     end)
-    menu:addOption("View Character", nil, function()
-        if PNC.CharacterWindow and PNC.CharacterWindow.Toggle then
-            PNC.CharacterWindow.Toggle(entry.id)
-        end
-    end)
     menu:addOption("Dump Snapshot", nil, function()
         local snapshotText
         snapshot = ClientState.snapshots and ClientState.snapshots[entry.id] or nil

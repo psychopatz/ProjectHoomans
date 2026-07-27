@@ -89,6 +89,19 @@ PNC = {
             record.inventory.revision = record.inventory.revision + 1
             return true, "removed"
         end,
+        ApplyDelta = function(_, ops)
+            for _, op in ipairs(ops or {}) do
+                if op.op == "update" and record.inventory.items[op.itemID] then
+                    if op.stack ~= nil then
+                        record.inventory.items[op.itemID].stack = op.stack
+                    end
+                elseif op.op == "remove" then
+                    record.inventory.items[op.itemID] = nil
+                end
+            end
+            record.inventory.revision = record.inventory.revision + 1
+            return true, "applied"
+        end,
     },
     InventoryActions = {
         Execute = function(actionID)
@@ -183,6 +196,58 @@ assertEqual(granted.state.customName, "Trusted Axe", "native recreation custom n
 assertEqual(granted.state.favorite, true, "explicit favorite transfer allowed")
 assertEqual(removedIDs[1], "npc-item", "compact source removed")
 
+record.inventory.revision = 10
+record.inventory.items["npc-item"].stack = 5
+record.inventory.items["npc-item"].fav = false
+ok, reason = Service.Transfer(player, {
+    id = record.id,
+    direction = "npc_to_player",
+    itemIDs = { "npc-item" },
+    playerContainer = "root",
+    quantity = 2,
+    inventoryRevision = 10,
+    requestId = "partial",
+})
+assertEqual(ok, true, "partial NPC stack transfer success")
+assertEqual(reason, "transferred_to_player", "partial NPC stack reason")
+assertEqual(granted.count, 2, "partial native quantity")
+assertEqual(record.inventory.items["npc-item"].stack, 3,
+    "partial compact stack remainder")
+
+record.inventory.revision = 11
+record.inventory.items["npc-item"].interactionLocked = true
+record.inventory.items["npc-item"].interactionLockReason = "quest_item"
+ok, reason = Service.Transfer(player, {
+    id = record.id,
+    direction = "npc_to_player",
+    itemIDs = { "npc-item" },
+    playerContainer = "root",
+    quantity = 1,
+    inventoryRevision = 11,
+})
+assertEqual(ok, false, "off-limits NPC transfer rejected")
+assertEqual(reason, "item_off_limits", "off-limits transfer reason")
+ok, reason = Service.Action(player, {
+    id = record.id,
+    actionID = "drop",
+    itemID = "npc-item",
+    inventoryRevision = 11,
+})
+assertEqual(ok, false, "off-limits NPC action rejected")
+assertEqual(reason, "item_off_limits", "off-limits action reason")
+ok, reason = Service.Transfer(player, {
+    id = record.id,
+    direction = "npc_to_player",
+    itemIDs = { "npc-item" },
+    playerContainer = "root",
+    inventoryRevision = 11,
+    bulk = true,
+})
+assertEqual(ok, false, "off-limits NPC bulk transfer skipped")
+assertEqual(reason, "no_transferable_items", "off-limits NPC bulk reason")
+record.inventory.items["npc-item"].interactionLocked = false
+record.inventory.items["npc-item"].interactionLockReason = nil
+
 record.inventory.revision = 12
 ok, reason = Service.Action(player, {
     id = record.id,
@@ -221,6 +286,26 @@ ok, reason = Service.Transfer(player, {
 assertEqual(ok, false, "favorite player bulk transfer skipped")
 assertEqual(reason, "no_transferable_items", "favorite player bulk reason")
 
+nativeFavorite = false
+nativeEquipped = false
+player.getWornItems = function()
+    return javaList({
+        { getItem = function() return nativeItem end },
+    })
+end
+record.inventory.revision = 30
+ok, reason = Service.Transfer(player, {
+    id = record.id,
+    direction = "player_to_npc",
+    itemIDs = { "55" },
+    npcContainer = "root",
+    inventoryRevision = 30,
+    bulk = true,
+})
+assertEqual(ok, false, "worn player bulk transfer skipped")
+assertEqual(reason, "no_transferable_items", "worn player bulk reason")
+player.getWornItems = nil
+
 record.inventory.revision = 31
 record.inventory.items["npc-item"].fav = false
 record.inventory.items["npc-item"].equipSlot = "primary"
@@ -236,11 +321,24 @@ assertEqual(ok, false, "equipped NPC bulk transfer skipped")
 assertEqual(reason, "no_transferable_items", "equipped NPC bulk reason")
 
 canManage = false
+isServer = function() return true end
+player.getAccessLevel = function() return "admin" end
+record.inventory.revision = 40
 ok, reason = Service.Action(player, {
     id = record.id,
     actionID = "equip_primary",
     itemID = "npc-item",
-    inventoryRevision = 20,
+    inventoryRevision = 40,
+})
+assertEqual(ok, true, "admin debug inventory edit rejected")
+assertEqual(reason, "equipped_primary", "admin debug inventory action reason")
+
+player.getAccessLevel = function() return "" end
+ok, reason = Service.Action(player, {
+    id = record.id,
+    actionID = "equip_primary",
+    itemID = "npc-item",
+    inventoryRevision = record.inventory.revision,
 })
 assertEqual(ok, false, "non-owner rejected")
 assertEqual(reason, "not_owner", "non-owner reason")
