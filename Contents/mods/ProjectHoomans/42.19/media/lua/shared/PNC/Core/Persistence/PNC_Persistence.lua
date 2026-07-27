@@ -406,6 +406,7 @@ function Persistence.SerializeRecord(record)
     local identity
     local progression
     local payload
+    local startupBodyHint
     if not record or record.persist == false then
         return nil
     end
@@ -466,6 +467,20 @@ function Persistence.SerializeRecord(record)
         progression = progression,
         corpse = sanitizeCorpse(record.corpse, record),
     }
+    startupBodyHint = record.runtime and record.runtime.startupBodyHint or nil
+    if record.liveBodyInstanceID ~= nil or startupBodyHint then
+        payload.bodyHint = {
+            instanceID = record.liveBodyInstanceID
+                or startupBodyHint and startupBodyHint.instanceID or nil,
+            onlineID = record.liveBodyOnlineID
+                or startupBodyHint and startupBodyHint.onlineID or nil,
+            lease = record.runtime and record.runtime.bodyLease
+                or startupBodyHint and startupBodyHint.lease or nil,
+            x = normalizeNumber(record.x, 0),
+            y = normalizeNumber(record.y, 0),
+            z = normalizeNumber(record.z, 0),
+        }
+    end
     return payload
 end
 
@@ -478,6 +493,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     local identity
     local progression
     local inventoryData
+    local bodyHint
     if type(raw) ~= "table" then
         return nil
     end
@@ -583,7 +599,19 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     record.inventory = nil
     record.persistedInventory = type(raw.inventory) == "table" and Core.DeepCopy(raw.inventory) or nil
     record.legacyEquipmentInventory = not raw.inventory and type(raw.equipment) == "table"
-    return Persistence.RebuildRuntime(record)
+    record = Persistence.RebuildRuntime(record)
+    bodyHint = type(raw.bodyHint) == "table" and raw.bodyHint or nil
+    if bodyHint and bodyHint.instanceID ~= nil then
+        record.runtime.startupBodyHint = {
+            instanceID = tostring(bodyHint.instanceID),
+            onlineID = tonumber(bodyHint.onlineID),
+            lease = normalizeString(bodyHint.lease),
+            x = normalizeNumber(bodyHint.x, record.x),
+            y = normalizeNumber(bodyHint.y, record.y),
+            z = normalizeNumber(bodyHint.z, record.z),
+        }
+    end
+    return record
 end
 
 function Persistence.LoadAll(serializedRecords)

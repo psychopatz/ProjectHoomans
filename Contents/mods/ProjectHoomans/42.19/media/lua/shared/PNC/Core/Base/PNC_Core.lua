@@ -31,7 +31,19 @@ function Core.IsManagedNPCBody(zombie)
         return false
     end
     modData = zombie:getModData()
-    return modData and modData.PNC_NPC == true
+    if modData and (modData.PNC_NPC == true
+        or modData.PNC_PersistedShell == true
+        or (modData.PNC_UUID ~= nil and modData.PNC_BodyKind == "live"))
+    then
+        return true
+    end
+    -- PNCLive is persisted by some older body versions even when their Lua
+    -- modData tag was only partially written. Reanimation explicitly clears
+    -- this variable before releasing a corpse-created zombie to vanilla.
+    return zombie.getVariableBoolean
+        and (zombie:getVariableBoolean("PNCLive") == true
+            or zombie:getVariableBoolean("PNCActor") == true)
+        or false
 end
 
 function Core.Now()

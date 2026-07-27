@@ -20,50 +20,42 @@ function Internal.clearBodyCombat(zombie)
         return
     end
     if PNC.ZombieAggro and PNC.ZombieAggro.ClearForNPCBody then
-        pcall(PNC.ZombieAggro.ClearForNPCBody, zombie)
+        PNC.ZombieAggro.ClearForNPCBody(zombie)
     end
     if zombie.clearAggroList then
-        pcall(zombie.clearAggroList, zombie)
+        zombie:clearAggroList()
     end
     if zombie.setTarget then
-        pcall(zombie.setTarget, zombie, nil)
+        zombie:setTarget(nil)
     end
     if zombie.setAttackedBy then
-        pcall(zombie.setAttackedBy, zombie, nil)
+        zombie:setAttackedBy(nil)
     end
     if zombie.setUseless then
-        pcall(zombie.setUseless, zombie, true)
+        zombie:setUseless(true)
     end
     if zombie.setRunning then
-        pcall(zombie.setRunning, zombie, false)
+        zombie:setRunning(false)
     end
     if zombie.setReanimate then
-        pcall(zombie.setReanimate, zombie, false)
+        zombie:setReanimate(false)
     end
 end
 
 function Internal.removeZombie(zombie)
-    local ok
-    local removed = false
     if not zombie then
         return false
     end
     Internal.clearBodyCombat(zombie)
-    if VirtualZombieManager and VirtualZombieManager.instance
-        and VirtualZombieManager.instance.removeZombieFromWorld
-    then
-        ok, removed = pcall(
-            VirtualZombieManager.instance.removeZombieFromWorld,
-            VirtualZombieManager.instance,
-            zombie
-        )
-        removed = ok and removed == true
+    -- Match the proven Dynamic Trading V2 removal path. The zombie manager may
+    -- keep a persisted shell eligible for reload; removing the concrete world
+    -- object and square membership directly makes the transition deterministic
+    -- and keeps errors visible instead of hiding them behind pcall.
+    if zombie.removeFromWorld then
+        zombie:removeFromWorld()
     end
-    if not removed and zombie.removeFromWorld then
-        pcall(zombie.removeFromWorld, zombie)
-    end
-    if not removed and zombie.removeFromSquare then
-        pcall(zombie.removeFromSquare, zombie)
+    if zombie.removeFromSquare then
+        zombie:removeFromSquare()
     end
     return true
 end

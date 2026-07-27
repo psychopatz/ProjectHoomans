@@ -13,7 +13,8 @@ local Const = PNC.Const
 
 local CONTROL_MODDATA_KEYS = {
     "PNC_NPC", "PNC_UUID", "PNC_BodyKind", "PNC_BodyLease",
-    "PNC_CorpseToken", "PNC_TagVersion", "PNC_LiveBodyInstanceID",
+    "PNC_CorpseToken", "PNC_TagVersion", "PNC_PersistedShell",
+    "PNC_ShellVersion", "PNC_BaseOutfit", "PNC_LiveBodyInstanceID",
     "PNC_LiveBodyOnlineID", "PNC_AggroNPCId", "PNC_AggroNPCUntil",
     "PNC_AggroPathAt", "PNC_AggroPathX", "PNC_AggroPathY",
     "PNC_BumpReleaseAt", "PNC_BumpReleasePending", "PNC_CombatReaction",

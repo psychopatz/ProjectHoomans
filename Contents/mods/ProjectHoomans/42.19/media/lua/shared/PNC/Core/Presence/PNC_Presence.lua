@@ -83,6 +83,12 @@ function Presence.ShouldMaterialize(record)
     if record.runtime and record.runtime.forceAbstract then
         return false
     end
+    if PNC.BodyLifecycle
+        and PNC.BodyLifecycle.IsStartupBodyCleanupComplete
+        and not PNC.BodyLifecycle.IsStartupBodyCleanupComplete()
+    then
+        return false
+    end
     -- Vehicle companions intentionally have no IsoZombie body. The companion
     -- vehicle coordinator updates their abstract position and explicitly
     -- materializes them after the owner exits.
@@ -133,6 +139,18 @@ function Presence.Materialize(record, reason)
     if not Core.IsAuthority() or record.alive == false or record.presenceState == Const.PRESENCE_LIVE then
         return Registry.GetLiveZombie(record.id)
     end
+    if PNC.BodyLifecycle
+        and PNC.BodyLifecycle.IsStartupBodyCleanupComplete
+        and not PNC.BodyLifecycle.IsStartupBodyCleanupComplete()
+    then
+        return nil
+    end
+
+    if PNC.BodyLifecycle and PNC.BodyLifecycle.CleanupRecordShells
+        and PNC.BodyLifecycle.CleanupRecordShells(record, Core.Now()) > 0
+    then
+        return nil
+    end
 
     record.runtime = record.runtime or {}
     record.runtime.bodyLease = nil
@@ -166,7 +184,7 @@ function Presence.Materialize(record, reason)
         spawnY,
         spawnZ,
         1,
-        PNC.VisualProfiles.ResolveSpawnOutfit(record),
+        "Naked",
         record.isFemale and 100 or 0,
         false,
         false,

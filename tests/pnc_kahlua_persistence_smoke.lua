@@ -135,6 +135,11 @@ local record = {
     equipment = { worn = {}, attached = {} },
     progression = { skillLevels = { Strength = 5 }, skillXP = {} },
     persistedInventory = { revision = 0 },
+    liveBodyInstanceID = 9191,
+    liveBodyOnlineID = 91,
+    runtime = {
+        bodyLease = "lease-persisted",
+    },
 }
 
 local payload = PNC.Persistence.SerializeRecord(record)
@@ -146,6 +151,8 @@ assert(payload.health.body.infection.stage == "nauseous", "infection stage was n
 assert(payload.health.body.parts.ForeArm_L.current == 76, "body-part health was not serialized")
 assert(payload.equipmentSpawnMode == "ranged", "equipment spawn override was not serialized")
 assert(payload.equipmentPoolID == "Default", "equipment pool was not serialized")
+assert(payload.bodyHint.instanceID == 9191, "live body instance hint was not serialized")
+assert(payload.bodyHint.lease == "lease-persisted", "live body lease hint was not serialized")
 
 local restored = PNC.Persistence.DeserializeRecord(payload, record.id)
 assert(restored, "deserialization failed without next()")
@@ -159,6 +166,10 @@ assert(restored.health.body.parts.ForeArm_L.current == 76, "body-part health did
 assert(restored.health.body.lastBleedAt == 0, "wall clock bleed timestamp was persisted")
 assert(restored.equipmentSpawnMode == "ranged", "equipment spawn override did not round trip")
 assert(restored.equipmentPoolID == "Default", "equipment pool did not round trip")
+assert(restored.runtime.startupBodyHint.instanceID == "9191",
+    "startup body instance hint did not round trip")
+assert(restored.runtime.startupBodyHint.lease == "lease-persisted",
+    "startup body lease hint did not round trip")
 
 next = originalNext
 print("pnc_kahlua_persistence_smoke: ok")

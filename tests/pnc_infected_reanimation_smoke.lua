@@ -96,7 +96,13 @@ assertEqual(broadcastId, "infected_npc", "client removal broadcast")
 assertEqual(removedId, "infected_npc", "registry removal")
 
 local spawnedFlags = {}
-local spawnedModData = { PNC_NPC = true, PNC_UUID = "stale" }
+local spawnedModData = {
+    PNC_NPC = true,
+    PNC_UUID = "stale",
+    PNC_PersistedShell = true,
+    PNC_ShellVersion = 1,
+    PNC_BaseOutfit = "Naked",
+}
 local spawnedZombie = {
     getModData = function() return spawnedModData end,
     clearVariable = function(_, name) spawnedFlags["cleared_" .. name] = true end,
@@ -212,6 +218,12 @@ assertEqual(spawnedFlags.onFloor, nil, "vanilla reanimation pose was overwritten
 assertEqual(spawnedFlags.health, nil, "vanilla toughness health was overwritten")
 assertEqual(spawnedModData.PNC_NPC, nil, "spawned zombie managed tag cleared")
 assertEqual(spawnedModData.PNC_UUID, nil, "spawned zombie managed UUID cleared")
+assertEqual(spawnedModData.PNC_PersistedShell, nil,
+    "spawned zombie persisted-shell marker cleared")
+assertEqual(spawnedModData.PNC_ShellVersion, nil,
+    "spawned zombie shell version cleared")
+assertEqual(spawnedModData.PNC_BaseOutfit, nil,
+    "spawned zombie shell outfit marker cleared")
 assertEqual(spawnedModData.PNC_ReanimatedFrom, "spawn_infected_npc",
     "spawned zombie provenance")
 assertEqual(broadcastId, "spawn_infected_npc", "spawned NPC client removal")

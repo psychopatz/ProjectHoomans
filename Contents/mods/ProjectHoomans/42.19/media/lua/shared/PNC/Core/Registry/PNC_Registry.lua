@@ -434,6 +434,7 @@ function Registry.RegisterLiveZombie(record, zombie)
         record.liveBodyOnlineID = nil
     end
     record.presenceRevision = (tonumber(record.presenceRevision) or 0) + 1
+    Registry.MarkDirty(record, "live_body_hint")
 end
 
 function Registry.UnregisterLiveZombie(id)

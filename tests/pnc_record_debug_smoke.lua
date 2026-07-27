@@ -22,6 +22,23 @@ end
 PNC = { Runtime = { debugEnabled = true } }
 dofile(SHARED_ROOT .. "PNC/Core/Base/PNC_Core.lua")
 
+local legacyManagedBody = {
+    getModData = function()
+        return { PNC_UUID = "npc_legacy", PNC_BodyKind = "live" }
+    end,
+    getVariableBoolean = function(_, name)
+        return name == "PNCActor"
+    end,
+}
+local releasedZombie = {
+    getModData = function() return {} end,
+    getVariableBoolean = function() return false end,
+}
+assertEqual(PNC.Core.IsManagedNPCBody(legacyManagedBody), true,
+    "legacy live body remains recognizable during relog")
+assertEqual(PNC.Core.IsManagedNPCBody(releasedZombie), false,
+    "released reanimation remains an ordinary zombie")
+
 local quietRecord = { id = "npc_quiet", runtime = {} }
 local recordedRecord = { id = "npc_recorded", runtime = { debug = true } }
 PNC.Core.LogRecordDebug(quietRecord, "quiet record")

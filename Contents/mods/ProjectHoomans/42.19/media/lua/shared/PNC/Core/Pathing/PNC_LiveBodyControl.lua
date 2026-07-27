@@ -13,6 +13,7 @@ local Core = PNC.Core
 
 local SUPPRESSION_AUDIO_COOLDOWN_MS = 250
 local NEXT_AUDIO_SUPPRESSION_AT = setmetatable({}, { __mode = "k" })
+local SAFETY_REPAIR_LOGGED = setmetatable({}, { __mode = "k" })
 local ZOMBIE_VOICE_SOUNDS = {
     "FemaleZombieVoiceA",
     "FemaleZombieVoiceB",
@@ -238,6 +239,12 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
     if zombie.setUseless then
         zombie:setUseless(true)
     end
+    -- This is a second, engine-level fail-safe for the short load/rebind window
+    -- where a persisted IsoZombie may update before its record is reconciled.
+    -- Released infected reanimations explicitly restore teeth to vanilla.
+    if zombie.setNoTeeth then
+        zombie:setNoTeeth(true)
+    end
     if zombie.getDescriptor then
         descriptor = zombie:getDescriptor()
         if descriptor and descriptor.setVoicePrefix then
@@ -294,6 +301,69 @@ function LiveBodyControl.MaintainHumanizedBody(zombie, now)
     return true
 end
 
+function LiveBodyControl.EnforceManagedSafety(zombie, source)
+    local hadTarget
+    local wasUseless
+    local hadTeeth
+    local modData
+    local npcId
+    if not zombie or not Core or not Core.IsManagedNPCBody
+        or not Core.IsManagedNPCBody(zombie)
+    then
+        return false
+    end
+    hadTarget = zombie.getTarget and zombie:getTarget() ~= nil or false
+    wasUseless = zombie.isUseless and zombie:isUseless() or false
+    hadTeeth = zombie.isNoTeeth and not zombie:isNoTeeth() or false
+    LiveBodyControl.MaintainHumanizedBody(
+        zombie,
+        Core.Now and Core.Now() or 0
+    )
+    if (hadTarget or not wasUseless or hadTeeth)
+        and not SAFETY_REPAIR_LOGGED[zombie]
+        and Core.LogWarn
+    then
+        SAFETY_REPAIR_LOGGED[zombie] = true
+        modData = zombie.getModData and zombie:getModData() or nil
+        npcId = modData and modData.PNC_UUID or "unknown"
+        Core.LogWarn("human_safety_repaired npc=" .. tostring(npcId)
+            .. " source=" .. tostring(source or "unknown")
+            .. " target=" .. tostring(hadTarget)
+            .. " useless=" .. tostring(wasUseless)
+            .. " hadTeeth=" .. tostring(hadTeeth))
+    end
+    return true
+end
+
+function LiveBodyControl.ScanLoadedManagedBodies(source)
+    local cell = getCell and getCell() or nil
+    local zombies = cell and cell.getZombieList and cell:getZombieList() or nil
+    local repaired = 0
+    local i
+    if not zombies then return 0 end
+    for i = 0, zombies:size() - 1 do
+        if LiveBodyControl.EnforceManagedSafety(
+            zombies:get(i),
+            source or "loaded_scan"
+        ) then
+            repaired = repaired + 1
+        end
+    end
+    if repaired > 0 and Core and Core.LogDebug then
+        Core.LogDebug("human_safety_scan source=" .. tostring(source)
+            .. " managed=" .. tostring(repaired))
+    end
+    return repaired
+end
+
+function LiveBodyControl.OnZombieUpdate(zombie)
+    LiveBodyControl.EnforceManagedSafety(zombie, "zombie_update")
+end
+
+function LiveBodyControl.OnWorldReady()
+    LiveBodyControl.ScanLoadedManagedBodies("world_ready")
+end
+
 function LiveBodyControl.TrySilenceEmitter(zombie, lane, now)
     if not lane then
         return false
@@ -346,4 +416,23 @@ function LiveBodyControl.SuppressZombieState(zombie, lane, now)
     end
     LiveBodyControl.TrySilenceEmitter(zombie, lane, now)
     return true, actionState
+end
+
+if Events and Events.OnZombieUpdate then
+    if Events.OnZombieUpdate.Remove then
+        Events.OnZombieUpdate.Remove(LiveBodyControl.OnZombieUpdate)
+    end
+    Events.OnZombieUpdate.Add(LiveBodyControl.OnZombieUpdate)
+end
+if Events and Events.OnGameStart then
+    if Events.OnGameStart.Remove then
+        Events.OnGameStart.Remove(LiveBodyControl.OnWorldReady)
+    end
+    Events.OnGameStart.Add(LiveBodyControl.OnWorldReady)
+end
+if Events and Events.OnServerStarted then
+    if Events.OnServerStarted.Remove then
+        Events.OnServerStarted.Remove(LiveBodyControl.OnWorldReady)
+    end
+    Events.OnServerStarted.Add(LiveBodyControl.OnWorldReady)
 end

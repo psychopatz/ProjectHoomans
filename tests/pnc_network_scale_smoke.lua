@@ -34,6 +34,7 @@ PNC = {
         CMD_ROSTER_DELTA = "RosterDelta",
         CMD_SYNC_RECORD = "SyncRecord",
         CMD_REMOVE_RECORD = "RemoveRecord",
+        CMD_REMOVE_BODY = "RemoveBody",
         CMD_CHARACTER_PAYLOAD = "CharacterPayload",
         CMD_INVENTORY_DELTA = "InventoryDelta",
         CMD_FIREARM_SHOT = "FirearmShot",
@@ -194,6 +195,18 @@ assertEqual(sent[1].payload.entries[1].id, "npc_removed", "removal roster id")
 assertEqual(sent[1].payload.entries[1].removed, true, "removal roster marker")
 assertEqual(sent[1].payload.entries[1].snapshot, nil, "removal roster leaked snapshot")
 assertEqual(PNC.Network.QueueRosterDelta("npc_invalid", false, "invalid"), false, "non-removal accepted id-only record")
+
+sent = {}
+assertEqual(
+    PNC.Network.BroadcastBodyRemoval("npc_near", 707, 77, "startup_uuid"),
+    true,
+    "body-instance removal broadcast"
+)
+assertEqual(#sent, 16, "body-instance removal reaches all players")
+assertEqual(sent[1].command, "RemoveBody", "body-instance removal command")
+assertEqual(sent[1].payload.id, "npc_near", "body-instance removal NPC id")
+assertEqual(sent[1].payload.bodyInstanceID, "707", "body-instance removal outfit id")
+assertEqual(sent[1].payload.bodyOnlineID, 77, "body-instance removal online id")
 
 sent = {}
 assertEqual(PNC.Network.BroadcastFirearmShot({

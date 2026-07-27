@@ -40,6 +40,9 @@ function Internal.stampCorpse(record, corpse, token)
     modData.PNC_UUID = nil
     modData.PNC_BodyKind = nil
     modData.PNC_BodyLease = nil
+    modData.PNC_PersistedShell = nil
+    modData.PNC_ShellVersion = nil
+    modData.PNC_BaseOutfit = nil
     modData.PNC_DeathMarkerID = tostring(record.id)
     modData.PNC_DeathName = tostring(record.name or record.displayName or "Unknown NPC")
     modData.PNC_CorpseToken = token

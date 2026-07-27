@@ -36,8 +36,8 @@ local cell = {
 }
 
 getCell = function() return cell end
-addZombiesInOutfit = function(x, y, z)
-    spawn = { x = x, y = y, z = z }
+addZombiesInOutfit = function(x, y, z, _, outfit)
+    spawn = { x = x, y = y, z = z, outfit = outfit }
     return zombieList
 end
 
@@ -122,6 +122,7 @@ assertEqual(materialized, body, "saved NPC materialized")
 assertEqual(registeredBody, body, "repaired body registered")
 assertEqual(spawn.x, 0.5, "vehicle-stuck spawn repaired x")
 assertEqual(spawn.y, 0.5, "vehicle-stuck spawn repaired y")
+assertEqual(spawn.outfit, "Naked", "PNC engine shell uses naked base outfit")
 assertEqual(record.x, spawn.x, "repaired record x")
 assertEqual(record.presenceState, "live", "repaired record live")
 assertEqual(record.runtime.positionRecovery.lastEvent, "materialize_relocate",

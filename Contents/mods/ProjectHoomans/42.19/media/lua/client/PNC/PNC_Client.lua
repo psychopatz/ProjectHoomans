@@ -512,6 +512,15 @@ function Client.HandleServerCommand(command, args)
         if Interpolation and Interpolation.ClearNPC then
             Interpolation.ClearNPC(args.id)
         end
+        return
+    end
+
+    if command == Const.CMD_REMOVE_BODY and args then
+        if PNC.ClientPresenceSync
+            and PNC.ClientPresenceSync.RemoveBodyInstance
+        then
+            PNC.ClientPresenceSync.RemoveBodyInstance(args)
+        end
     end
 end
 

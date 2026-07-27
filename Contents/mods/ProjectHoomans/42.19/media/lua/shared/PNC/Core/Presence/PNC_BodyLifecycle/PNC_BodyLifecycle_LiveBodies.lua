@@ -25,6 +25,10 @@ function Lifecycle.StampLiveBody(record, zombie)
     modData.PNC_BodyLease = tostring(record.runtime.bodyLease)
     modData.PNC_CorpseToken = nil
     modData.PNC_TagVersion = Const.BODY_TAG_VERSION
+    modData.PNC_PersistedShell = true
+    modData.PNC_ShellVersion = Const.BODY_SHELL_VERSION
+    modData.PNC_BaseOutfit = "Naked"
+    record.runtime.startupBodyHint = nil
     Internal.mark(record, "live", "bound", "body_stamped")
     return record.runtime.bodyLease
 end
@@ -45,6 +49,9 @@ function Internal.detachLiveBody(record, reason)
             Internal.mark(record, "abstract", "missing", reason or "body_removed")
         else
             Internal.mark(record, "corpse", "missing", reason or "source_body_removed")
+        end
+        if reg and reg.MarkDirty then
+            reg.MarkDirty(record, "live_body_hint")
         end
     end
     return true

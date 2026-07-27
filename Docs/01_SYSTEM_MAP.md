@@ -10,7 +10,8 @@
 - `PNC_Inventory_EquipmentGeneration`: generic categorized equipment pools and deterministic starting-equipment policy
 - `PNC_DeathMarkers`: compact post-death identity/location persistence after full NPC retirement
 - `PNC/EquipmentDefinitions/PNC_EquipmentPools`: version-independent built-in equipment catalog
-- `PNC_Persistence`: versioned canonical save schema, migration, and runtime rehydrate
+- `PNC_Persistence`: versioned canonical save schema, migration, runtime
+  rehydrate, and compact prior-body instance hints used only for relog cleanup
 - `PNC_Registry`: authoritative NPC records and live body lookup
 - `PNC_Relationships`: faction-enemy matrix and authoritative disposition transitions
 - `PNC_SpatialIndex`: indexed nearby player, NPC, and zombie queries
@@ -48,12 +49,14 @@
 - `PNC_Behavior_Incapacitated`: crawl and downed shove handling
 - `PNC_BodyLifecycle`: stable facade for live-body leases, corpse conversion,
   keyed identity-card injection through `PsychopatzCore.CorpseItems`,
-  authority-owned infected-corpse reanimation, loaded-world audits, and
-  diagnostics; implementation ownership is split under
+  authority-owned infected-corpse reanimation, persisted naked-shell startup
+  cleanup, loaded-world audits, and diagnostics; implementation ownership is split under
   `Presence/PNC_BodyLifecycle/`
-- `PNC_Presence`: live and abstract transitions, body cleanup
+- `PNC_Presence`: live and abstract transitions, naked engine-shell
+  materialization, and pre-spawn stale-shell cleanup
 - `PNC_Scheduler`: cadence rules
-- `PNC_Network`: roster snapshots, live presence snapshots, and on-demand character payloads
+- `PNC_Network`: roster snapshots, live presence snapshots, instance-specific
+  stale-body removals, and on-demand character payloads
 - `PNC_ZombieAggro`: zombie-to-NPC aggro bridge and bite flow
 - `PNC_API`: external entry points
 
@@ -78,10 +81,17 @@
 ## Client
 - `PNC_Client`: roster cache, character-payload cache, sync requests, context menu debug tools
 - `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
-- `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby embodied NPCs
+- `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby
+  embodied NPCs, including canonical-instance selection and duplicate shell
+  pruning
 - `PNC_ClientHumanNPCSafeguards`: client-local correction for vanilla
-  `IsoPlayer.updateLOS` treating managed human bodies as visible zombies;
-  preserves normal panic whenever a real zombie is visible
+  `IsoPlayer.updateLOS` treating managed human bodies as visible zombies,
+  including panic, sleep, and single-player fast-forward side effects;
+  preserves all ordinary-zombie threat counters
+- `PNC_LiveBodyControl`: pre-AI `OnZombieUpdate` safety plus world-ready scans
+  ensure persisted and legacy NPC bodies cannot target or bite during relog
+- `PNC_HumanNPCSleepPatch`: refreshes corrected threat counters immediately
+  before delegating to the unmodified vanilla sleep decision
 - `PNC_VehicleSeatPatch`: prevents vanilla seat-item movement from extracting
   an abstract NPC reservation token and reports the named occupant
 - `PNC_ContextHub`: central reusable NPC selection and right-click hub

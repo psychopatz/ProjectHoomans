@@ -64,12 +64,25 @@ function Lifecycle.AuditLoadedBodies(now, force)
                     end
                     stats.removed = stats.removed + 1
                 end
-            elseif modData and modData.PNC_NPC == true then
+            elseif (Core.IsManagedNPCBody
+                and Core.IsManagedNPCBody(zombie))
+                or (modData and modData.PNC_NPC == true)
+            then
                 stats.scanned = stats.scanned + 1
-                npcId = modData.PNC_UUID and tostring(modData.PNC_UUID) or nil
-                kind = tostring(modData.PNC_BodyKind or "live")
-                lease = modData.PNC_BodyLease and tostring(modData.PNC_BodyLease) or nil
-                tagVersion = tonumber(modData.PNC_TagVersion)
+                -- Neutralize persisted/legacy bodies before validating their
+                -- lease. Invalid bodies are removed below, but they must not
+                -- receive even one vanilla attack update during that decision.
+                if PNC.LiveBodyControl
+                    and PNC.LiveBodyControl.EnforceManagedSafety
+                then
+                    PNC.LiveBodyControl.EnforceManagedSafety(zombie, "body_audit")
+                end
+                npcId = modData and modData.PNC_UUID
+                    and tostring(modData.PNC_UUID) or nil
+                kind = tostring(modData and modData.PNC_BodyKind or "live")
+                lease = modData and modData.PNC_BodyLease
+                    and tostring(modData.PNC_BodyLease) or nil
+                tagVersion = tonumber(modData and modData.PNC_TagVersion)
                 record = npcId and reg.Get(npcId) or nil
                 if kind == "corpse" and record and record.alive == false then
                     stats.corpses = stats.corpses + 1

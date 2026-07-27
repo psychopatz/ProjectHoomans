@@ -36,7 +36,10 @@ may read and update only lane fields needed for suppression throttles, such as
 
 - Apply live-body anti-zombie flags such as `NoLungeTarget` and
   `NoLungeAttack`.
-- Clear target, aggro, crawler, fake-dead, floor, and alert state drift.
+- Enforce `isUseless`, no teeth, and cleared target/aggro from
+  `OnZombieUpdate` before the remainder of vanilla AI; world-ready scans cover
+  loaded bodies before normal reconciliation.
+- Clear crawler, fake-dead, floor, and alert state drift.
 - Silence moans and other emitter output on a throttle.
 - Force lunge/get-up/stagger style states back to idle when encountered.
 - Release damage reactions through their real ActionContext exit signals:

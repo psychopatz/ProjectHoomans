@@ -28,6 +28,7 @@ local record = {
     runtime = {},
 }
 local records = { [record.id] = record }
+local safetyRepairs = 0
 
 PNC = {
     Core = {
@@ -45,6 +46,12 @@ PNC = {
         CORPSE_AUDIT_INTERVAL_MS = 1000,
         CORPSE_AUDIT_BATCH_SIZE = 12,
         CORPSE_REANIMATE_RETRY_MAX = 3,
+    },
+    LiveBodyControl = {
+        EnforceManagedSafety = function()
+            safetyRepairs = safetyRepairs + 1
+            return true
+        end,
     },
 }
 
@@ -104,6 +111,7 @@ assertEqual(audit.scanned, 2, "audited body count")
 assertEqual(audit.duplicates, 1, "duplicate body count")
 assertEqual(audit.removed, 1, "removed duplicate count")
 assertEqual(audit.rebound, 1, "rebound body count")
+assertEqual(safetyRepairs, 2, "audit neutralizes bodies before lease decision")
 assertEqual(PNC.Registry.LiveByID[record.id], second, "accepted live body")
 assertEqual(first.removedFromWorld, true, "duplicate removed from world")
 

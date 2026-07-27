@@ -165,6 +165,9 @@ function Server.OnTick()
     local due
     local i
     Registry.EnsureLoaded()
+    if BodyLifecycle and BodyLifecycle.PumpStartupBodyCleanup then
+        BodyLifecycle.PumpStartupBodyCleanup(now, false)
+    end
     if BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
         BodyLifecycle.AuditLoadedBodies(now, false)
     end
@@ -456,6 +459,13 @@ end
 
 local function onServerStarted()
     Registry.Load()
+    if BodyLifecycle and BodyLifecycle.RunStartupBodyCleanupNow then
+        BodyLifecycle.RunStartupBodyCleanupNow(
+            Core.Now(),
+            "server_started",
+            true
+        )
+    end
     if PNC.CompanionVehicle and PNC.CompanionVehicle.AuditLoadedReservations then
         PNC.CompanionVehicle.AuditLoadedReservations(Core.Now(), true)
     end

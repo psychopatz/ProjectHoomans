@@ -678,6 +678,30 @@ function Network.BroadcastRemoval(id, reason)
     end
 end
 
+function Network.BroadcastBodyRemoval(id, bodyInstanceID, bodyOnlineID, reason)
+    local payload
+    if not Core.IsAuthority() then
+        return false
+    end
+    payload = {
+        id = id and tostring(id) or nil,
+        bodyInstanceID = bodyInstanceID ~= nil and tostring(bodyInstanceID) or nil,
+        bodyOnlineID = tonumber(bodyOnlineID),
+        reason = tostring(reason or "stale_body"),
+    }
+    if isServer and isServer() then
+        -- A stale engine zombie can be present on a client before that client
+        -- has entered the NPC interest set. Send instance removals to every
+        -- connected player instead of relying on roster interest membership.
+        Core.ForEachPlayer(function(player)
+            sendToPlayer(player, Const.CMD_REMOVE_BODY, payload)
+        end)
+    else
+        triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_REMOVE_BODY, payload)
+    end
+    return true
+end
+
 function Network.GetZombieOnlineID(zombie)
     local onlineID
     if not zombie or not zombie.getOnlineID then

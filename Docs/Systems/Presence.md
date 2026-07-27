@@ -9,17 +9,66 @@
 - abstracting a living NPC removes the live zombie body immediately
 - no hidden or parked zombie is kept around for abstract travel
 - materialization always spawns a fresh body from authoritative record state
-- every live-body maintenance lane reapplies `isUseless`, the `NotAZombie`
-  descriptor voice prefix, and Bandits-compatible suppression of all six Build
-  42 male/female zombie voice channels. The recurring pass stops only zombie
-  vocals, so intentional firearm, melee, door, and treatment sounds remain
-  audible
-- client replicas correct vanilla `IsoPlayer.updateLOS` only when its visible
-  zombie set contains managed human NPC bodies and no real zombie. In that
-  narrow case PNC uses the supported `Stats` API to remove the false visible
-  zombie/panic contribution, pre-seeds the human as already spotted, and stops
-  the false surprise sting; any visible ordinary zombie leaves vanilla fear
-  behavior untouched
+- every fresh live body starts from the engine's `Naked` outfit, then PNC
+  reapplies the identity-seeded human appearance and record-owned equipment.
+  `Naked` is a disposable shell baseline, not the NPC's final visible outfit
+- persistence stores only a compact previous body-instance hint. On launch the
+  authority runs all required shell-cleanup passes synchronously from both
+  `OnServerStarted` and `OnGameStart` before materialization is allowed;
+  it removes old UUID/lease-tagged bodies and naked legacy shells that match an
+  abstract record's saved position or body hint, then spawns one fresh body
+- an early `OnZombieUpdate` interceptor handles any shell exposed between world
+  loading callbacks. A matched shell receives no-teeth, no-target, useless, and
+  no-lunge flags directly before it is removed, including legacy naked shells
+  that lost all PNC modData
+- replacement materialization waits only 50 ms after a repaired shell. The
+  previous multi-tick startup delay is no longer part of the normal path
+- naked cleanup is deliberately identity/position constrained. PNC does not
+  delete unrelated naked vanilla zombies elsewhere in the world
+- materialization performs the same record-local cleanup immediately before
+  spawning. This covers distant cells that stream in after the startup passes
+- stale removals replicate through an instance-specific `RemoveBody` command
+  sent to every connected player. Remote clients also retain exactly one
+  canonical online-ID/lease/instance body per NPC snapshot and prune older
+  local duplicates; record removal remains a separate command
+- every live-body maintenance lane reapplies `isUseless`, clears vanilla
+  target/aggro, removes teeth, applies the `NotAZombie` descriptor voice prefix,
+  and performs Bandits-compatible suppression of all six Build 42 male/female
+  zombie voice channels. The recurring pass stops only zombie vocals, so
+  intentional firearm, melee, door, and treatment sounds remain audible
+- human safety is enforced from `OnZombieUpdate`, before the remainder of
+  vanilla zombie AI, as well as from client/server world-ready scans. This
+  closes the relog window where a persisted body could update before registry
+  reconciliation. The authority audit also neutralizes each recognized body
+  before accepting, rebinding, or removing its lease
+- legacy bodies remain recognizable through current modData plus the older
+  `PNCLive`/`PNCActor` variables. Infected corpse reanimation clears those
+  variables and explicitly restores `isUseless=false` and teeth before vanilla
+  takes ownership, so released zombies are not caught by the human safeguard
+- client replicas correct vanilla `IsoPlayer.updateLOS` when its zombie set
+  contains managed human NPC bodies. PNC uses the supported `Stats` API for
+  visible/chasing counters and, because Build 42 has no very-close-counter
+  setter, performs a synchronous second LOS pass with only managed bodies
+  temporarily excluded through the engine's grapple-only LOS flag. The flag is
+  restored before the callback returns and is never persisted or replicated
+- the corrected counters feed vanilla sleep unchanged, so a nearby PNC human
+  no longer produces `IGUI_Sleep_NotSafe` or wakes a sleeping player as a
+  zombie. A dedicated client patch refreshes those counters immediately before
+  the vanilla sleep handler; any ordinary zombie remains counted and still
+  blocks sleep
+- single-player fast-forward intent is retained when `updateLOS` alone reset
+  speed because of a managed body. Restoration delegates through vanilla
+  `SpeedControls:ButtonClicked`, which restores both its selected icon and the
+  corresponding `GameTime` multiplier. Movement, aiming, attacking, fire,
+  death, or any remaining real-zombie counter cancels that intent normally.
+  Multiplayer time control is not overridden
+- while the AI debug overlay is enabled, the safeguard emits cadence-bounded
+  `human_safeguard` counter decisions and one `sleep_gate` line per sleep
+  attempt with visible/chasing/very-close counters before and after correction
+  plus the remaining panic value
+- managed humans are pre-seeded as already spotted so the false surprise sting
+  is never started. PNC does not hard-stop player audio; any visible ordinary
+  zombie leaves vanilla fear behavior untouched
 - companions following an owner transactionally reserve an installed,
   currently free vehicle seat when they reach the owner's car. The authority
   first adds a private weighted reservation item to that seat container, which
@@ -68,6 +117,8 @@
 ## Current Implementation
 - server checks player distance with hysteresis
 - `Materialize` uses `addZombiesInOutfit(...)`
+- `Materialize` always requests `Naked`, then applies human visuals and
+  equipment from the canonical record
 - unresolved live snapshots temporarily use a faster client body scan, then
   return to the normal low-frequency scan after binding
 - `Abstract` snapshots current position and calls:
@@ -85,6 +136,9 @@
   reusable keyed corpse-item injection service
 - `CorpseWornItems`: worn-item capture, corpse transfer, and network transmission
 - `LiveBodies`: live-body stamping, leases, detachment, and removal transitions
+- `Startup`: persisted-shell detection, startup materialization gate,
+  record-local preflight cleanup, naked legacy-shell matching, and body-instance
+  removal replication
 - `Corpses`: live-to-corpse conversion and corpse identity stamping
 - `Reanimation`: infection timing, single-spawn guards, vanilla corpse handoff,
   fallback creation, safeguard cleanup, and permanent release from PNC ownership
