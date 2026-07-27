@@ -194,6 +194,11 @@ local function sanitizeHealthBody(rawBody)
         infectedAtWorldHour = normalizeNumber(infectionSource.infectedAtWorldHour, 0),
         fatalAtWorldHour = normalizeNumber(infectionSource.fatalAtWorldHour, 0),
         reanimateAtWorldHour = normalizeNumber(infectionSource.reanimateAtWorldHour, 0),
+        progress = Core.Clamp(normalizeNumber(infectionSource.progress, 0), 0, 1),
+        stage = tostring(infectionSource.stage or "incubating"),
+        fever = Core.Clamp(normalizeNumber(infectionSource.fever, 0), 0, 100),
+        temperatureC = Core.Clamp(normalizeNumber(infectionSource.temperatureC, 37), 30, 45),
+        lastUpdatedWorldHour = normalizeNumber(infectionSource.lastUpdatedWorldHour, 0),
     } or nil
     return {
         wounds = wounds,

@@ -37,7 +37,7 @@
 - `PNC_Behavior_Roaming`: faction-neutral, enemy-aware roaming with registered roam modes
 - `PNC_Behavior_Hostile`: hunt and direct engage job handlers
 - `PNC_Behavior_Incapacitated`: crawl and downed shove handling
-- `PNC_BodyLifecycle`: stable facade for live-body leases, corpse conversion, loaded-world audits, and diagnostics; implementation ownership is split under `Presence/PNC_BodyLifecycle/`
+- `PNC_BodyLifecycle`: stable facade for live-body leases, corpse conversion, authority-owned infected-corpse reanimation, loaded-world audits, and diagnostics; implementation ownership is split under `Presence/PNC_BodyLifecycle/`
 - `PNC_Presence`: live and abstract transitions, body cleanup
 - `PNC_Scheduler`: cadence rules
 - `PNC_Network`: roster snapshots, live presence snapshots, and on-demand character payloads

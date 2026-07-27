@@ -11,6 +11,7 @@
 - canonical persisted fields only
 - nested `identity` payload
 - compact `inventory` payload
+- body-part wounds and infection timing, stage, progress, fever, and temperature
 - runtime rebuild defaults after load
 - dirty-record tracking and v4 monolithic-store migration
 

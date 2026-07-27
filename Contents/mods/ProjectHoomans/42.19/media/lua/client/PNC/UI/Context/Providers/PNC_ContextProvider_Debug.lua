@@ -43,6 +43,7 @@ function Provider.addOptions(menu, entry, player, contextData)
     local heldItem = player and player.getPrimaryHandItem and player:getPrimaryHandItem() or nil
     local orderMenu
     local weaponMenu
+    local infectionMenu
 
     menu:addSubMenu(menu:addOption(tr("UI_PNC_Debug", "Debug")), debugMenu)
     menu = debugMenu
@@ -82,6 +83,21 @@ function Provider.addOptions(menu, entry, player, contextData)
             sendDebug("revive", { id = entry.id })
         end)
     end
+
+    infectionMenu = ISContextMenu:getNew(menu)
+    menu:addSubMenu(menu:addOption(tr("UI_PNC_DebugInfection", "Infection")), infectionMenu)
+    infectionMenu:addOption(tr("UI_PNC_DebugInfectionForce", "Force Infected Bite"), nil, function()
+        sendDebug("infection", { id = entry.id, stage = "incubating" })
+    end)
+    infectionMenu:addOption(tr("UI_PNC_DebugInfectionFever", "Advance to Fever"), nil, function()
+        sendDebug("infection", { id = entry.id, stage = "fever" })
+    end)
+    infectionMenu:addOption(tr("UI_PNC_DebugInfectionTerminal", "Advance to Terminal"), nil, function()
+        sendDebug("infection", { id = entry.id, stage = "terminal" })
+    end)
+    infectionMenu:addOption(tr("UI_PNC_DebugInfectionFatal", "Trigger Infection Death"), nil, function()
+        sendDebug("infection", { id = entry.id, stage = "fatal" })
+    end)
 
     orderMenu = ISContextMenu:getNew(menu)
     menu:addSubMenu(menu:addOption("Orders"), orderMenu)

@@ -58,6 +58,15 @@ local function findBandage(player, requestedType)
     return nil, nil
 end
 
+function Treatment.FindBandage(player, requestedType)
+    return findBandage(player, requestedType)
+end
+
+function Treatment.IsPlayerInBandageRange(player, npcId)
+    local record = npcId and Registry.Get(npcId) or nil
+    return isPlayerInRange(player, record)
+end
+
 function Treatment.CountBandages(player)
     local inventory = player and player.getInventory and player:getInventory() or nil
     if not inventory or not inventory.getItemCount then return 0 end

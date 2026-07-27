@@ -58,12 +58,14 @@ option ProjectHoomans.NPCZombieLacerationChance
     translation = ProjectHoomans.NPCZombieLacerationChance,
 }
 
-option ProjectHoomans.NPCZombieInfection
+option ProjectHoomans.NPCZombieInfectionChance
 {
-    type = boolean,
-    default = false,
+    type = double,
+    default = 100.0,
+    min = 0.0,
+    max = 100.0,
     page = ProjectHoomans,
-    translation = ProjectHoomans.NPCZombieInfection,
+    translation = ProjectHoomans.NPCZombieInfectionChance,
 }
 
 option ProjectHoomans.NPCInfectionMortalityHours

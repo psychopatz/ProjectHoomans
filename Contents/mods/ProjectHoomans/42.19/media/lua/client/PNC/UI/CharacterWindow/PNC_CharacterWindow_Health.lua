@@ -225,7 +225,22 @@ function Tabs.RenderHealth(view, snapshot, payload, topY)
     view:drawText(string.format("HP %.1f / %.1f  (%d%%)", hpCurrent, hpMax,
         math.floor(Shared.Clamp(hpCurrent / hpMax, 0, 1) * 100 + 0.5)),
         x, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
-    y = y + fontHeight * 2
+    y = y + fontHeight
+    if PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() == true then
+        local infection = body.infection
+        local infected = infection
+            and (infection.active == true or infection.fatal == true)
+        local infectionText = infected and string.format(
+            "DEBUG Knox infection: YES | %s | %.0f%% | %.1f C",
+            tostring(infection.stage or "incubating"),
+            (tonumber(infection.progress) or 0) * 100,
+            tonumber(infection.temperatureC) or 37
+        ) or "DEBUG Knox infection: NO"
+        view:drawText(infectionText, x, y,
+            infected and 1 or 0.45, infected and 0.35 or 0.9, 0.2, 1, UIFont.Small)
+        y = y + fontHeight
+    end
+    y = y + fontHeight
 
     if #rows > 0 then
         for i = 1, #rows do
@@ -314,6 +329,69 @@ local function addDebugDamageMenu(context, view, selectedPartId)
     end
 end
 
+local function addDebugInfectionMenu(context, view, selectedPartId, body)
+    local infectionMenu = context:getNew(context)
+    local infection = body and body.infection or nil
+    local infected = infection and (infection.active == true or infection.fatal == true)
+    local status = infected and string.format(
+        "Status: INFECTED - %s (%.0f%%, %.1f C)",
+        tostring(infection.stage or "incubating"),
+        (tonumber(infection.progress) or 0) * 100,
+        tonumber(infection.temperatureC) or 37
+    ) or "Status: NOT INFECTED"
+    local statusOption
+    context:addSubMenu(
+        context:addOption(Shared.Text("UI_PNC_DebugInfection", "Debug Infection"), nil),
+        infectionMenu
+    )
+    statusOption = infectionMenu:addOption(status, nil)
+    statusOption.notAvailable = true
+    infectionMenu:addOption(
+        Shared.Text("UI_PNC_DebugInfectionForce", "Force Infected Bite"),
+        nil,
+        function()
+            PNC.Client.SendDebug("infection", {
+                id = view.npcId,
+                partId = selectedPartId,
+                stage = "incubating",
+            })
+        end
+    )
+    infectionMenu:addOption(
+        Shared.Text("UI_PNC_DebugInfectionFever", "Advance to Fever"),
+        nil,
+        function()
+            PNC.Client.SendDebug("infection", {
+                id = view.npcId,
+                partId = selectedPartId,
+                stage = "fever",
+            })
+        end
+    )
+    infectionMenu:addOption(
+        Shared.Text("UI_PNC_DebugInfectionTerminal", "Advance to Terminal"),
+        nil,
+        function()
+            PNC.Client.SendDebug("infection", {
+                id = view.npcId,
+                partId = selectedPartId,
+                stage = "terminal",
+            })
+        end
+    )
+    infectionMenu:addOption(
+        Shared.Text("UI_PNC_DebugInfectionFatal", "Trigger Infection Death"),
+        nil,
+        function()
+            PNC.Client.SendDebug("infection", {
+                id = view.npcId,
+                partId = selectedPartId,
+                stage = "fatal",
+            })
+        end
+    )
+end
+
 local function showHealthMenu(view, partId, x, y)
     local body = Shared.GetSnapshot(view.snapshot, view.payload).bodyHealth
         or view.payload and view.payload.health and view.payload.health.body or {}
@@ -354,6 +432,7 @@ local function showHealthMenu(view, partId, x, y)
     end
     if canDebug then
         addDebugDamageMenu(context, view, partId)
+        addDebugInfectionMenu(context, view, partId, body)
     end
     return true
 end

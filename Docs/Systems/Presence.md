@@ -12,6 +12,10 @@
 - multiplayer snapshots identify that body primarily by the engine zombie
   online ID; persistent outfit IDs are only a collision-checked fallback and
   must never be treated as unique actor identity
+- infected corpse reanimation is authority-only: the server invokes the vanilla
+  corpse handoff once, clears every PNC identity/control flag and human-NPC
+  safeguard, and removes the NPC record; clients receive the resulting zombie
+  through vanilla replication and never run their own conversion
 
 ## Current Implementation
 - server checks player distance with hysteresis
@@ -33,6 +37,8 @@
 - `CorpseWornItems`: worn-item capture, corpse transfer, and network transmission
 - `LiveBodies`: live-body stamping, leases, detachment, and removal transitions
 - `Corpses`: live-to-corpse conversion and corpse identity stamping
+- `Reanimation`: infection timing, single-spawn guards, vanilla corpse handoff,
+  fallback creation, safeguard cleanup, and permanent release from PNC ownership
 - `CorpseAudit`: delayed corpse finalization and bounded corpse-record supervision
 - `Audit`: loaded-world live-body reconciliation and orphan/duplicate cleanup
 - `Diagnostics`: read-only lifecycle data for debug surfaces

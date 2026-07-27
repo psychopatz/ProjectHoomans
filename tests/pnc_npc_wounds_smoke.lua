@@ -73,6 +73,7 @@ PNC = {
     },
     Network = {
         BroadcastRecord = function() broadcasts = broadcasts + 1 end,
+        BroadcastRemoval = function() end,
     },
 }
 
@@ -87,7 +88,7 @@ SandboxVars = {
         NPCZombieWoundChance = 100,
         NPCZombieBiteChance = 100,
         NPCZombieLacerationChance = 0,
-        NPCZombieInfection = true,
+        NPCZombieInfectionChance = 100,
         NPCInfectionMortalityHours = 48,
         NPCReanimationHours = 1,
     },
@@ -212,13 +213,49 @@ assertEqual(result.outcome, "parried", "parry outcome")
 assertEqual(protected.health.current, 100, "parry health")
 
 protection = 0
-SandboxVars.ProjectHoomans.NPCZombieInfection = false
+SandboxVars.ProjectHoomans.NPCZombieInfectionChance = 0
 local safeBite = makeRecord("safe_bite")
 randomValues = { 0, 0, 0 }
 applied, result = PNC.NPCWounds.ResolveZombieAttack(safeBite, body, attacker)
 assertEqual(applied, true, "bite with infection disabled")
 assertEqual(result.woundType, "bite", "disabled infection still permits bites")
-assertEqual(PNC.NPCWounds.HasActiveInfection(safeBite), false, "sandbox infection toggle")
+assertEqual(PNC.NPCWounds.HasActiveInfection(safeBite), false, "zero infection chance")
+
+SandboxVars.ProjectHoomans.NPCZombieInfectionChance = 50
+local failedInfectionRoll = makeRecord("failed_infection_roll")
+randomValues = { 0, 0, 0, 6000 }
+applied, result = PNC.NPCWounds.ResolveZombieAttack(failedInfectionRoll, body, attacker)
+assertEqual(applied, true, "infection roll leaves bite wound intact")
+assertEqual(result.woundType, "bite", "infection roll changed bite outcome")
+assertEqual(PNC.NPCWounds.HasActiveInfection(failedInfectionRoll), false,
+    "infection chance roll was not independent")
+
+SandboxVars.ProjectHoomans.NPCZombieInfectionChance = 0
+local forcedInfection = makeRecord("forced_infection")
+records[forcedInfection.id] = forcedInfection
+bodies[forcedInfection.id] = body
+applied, result = PNC.API.DebugCommand(forcedInfection.id, "infection", {
+    partId = "Neck",
+    stage = "fever",
+})
+assertEqual(applied, true, "debug infection bypasses sandbox roll")
+assertEqual(forcedInfection.health.body.infection.sourcePart, "Neck", "debug infection part")
+assertEqual(forcedInfection.health.body.infection.stage, "fever", "debug fever stage")
+assert(forcedInfection.health.body.infection.temperatureC > 38, "debug fever temperature missing")
+assert(forcedInfection.health.current < 88, "fever did not progressively lower health")
+
+local fatalDebug = makeRecord("fatal_debug_infection")
+records[fatalDebug.id] = fatalDebug
+bodies[fatalDebug.id] = body
+applied, result = PNC.API.DebugCommand(fatalDebug.id, "infection", {
+    partId = "Torso_Upper",
+    stage = "fatal",
+})
+assertEqual(applied, true, "debug fatal infection")
+assertEqual(fatalDebug.alive, false, "debug infection death")
+assertEqual(fatalDebug.health.body.infection.stage, "fatal", "debug fatal stage")
+assertEqual(fatalDebug.health.body.infection.reanimateAtWorldHour, 101,
+    "debug fatal reanimation schedule")
 
 SandboxVars.ProjectHoomans.NPCZombieBiteChance = 0
 SandboxVars.ProjectHoomans.NPCZombieLacerationChance = 100
@@ -234,7 +271,13 @@ assertEqual(bleeding.alive, true, "ordinary blood loss remains revivable")
 assertEqual(bleeding.health.state, "incapacitated", "blood loss enters incapacitation")
 assertEqual(bleeding.health.incapacitatedReason, "blood_loss", "blood loss reason")
 
-SandboxVars.ProjectHoomans.NPCZombieInfection = true
+SandboxVars.ProjectHoomans.NPCZombieInfectionChance = 100
+currentWorldHour = 140
+local healthBeforeFever = record.health.current
+PNC.Health.Update(record, body, now + 500)
+assertEqual(record.health.body.infection.stage, "fever", "infection fever progression")
+assert(record.health.body.infection.temperatureC > 38, "infection fever temperature")
+assert(record.health.current < healthBeforeFever, "infection health decline")
 currentWorldHour = 148
 PNC.Health.Update(record, body, now + 1000)
 assertEqual(record.alive, false, "terminal infection kills")

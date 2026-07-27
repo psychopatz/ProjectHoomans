@@ -92,6 +92,14 @@ function Internal.auditCorpseRecord(record)
             end
         end
     end)
+    if accepted and Lifecycle.IsReanimationDue
+        and Lifecycle.IsReanimationDue(record)
+        and Lifecycle.SpawnReanimatedZombie
+    then
+        local spawned = Lifecycle.SpawnReanimatedZombie(record, accepted)
+        if spawned then return end
+        if state.corpseState == "reanimation_retry" then return end
+    end
     state.corpseState = accepted and "inert_loaded" or "missing"
 end
 

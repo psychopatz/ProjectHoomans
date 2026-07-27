@@ -117,6 +117,11 @@ local record = {
                 sourcePart = "ForeArm_L",
                 infectedAtWorldHour = 10,
                 fatalAtWorldHour = 58,
+                progress = 0.5,
+                stage = "nauseous",
+                fever = 11.1,
+                temperatureC = 37.4,
+                lastUpdatedWorldHour = 34,
             },
             bleedingRate = 0,
             openWoundCount = 0,
@@ -137,6 +142,7 @@ assert(payload, "serialization failed without next()")
 assert(payload.progression.skillLevelDeltas.Strength == 3, "legacy skill delta conversion failed")
 assert(payload.health.body.wounds.ForeArm_L, "body wound was not serialized")
 assert(payload.health.body.infection.active == true, "infection was not serialized")
+assert(payload.health.body.infection.stage == "nauseous", "infection stage was not serialized")
 assert(payload.health.body.parts.ForeArm_L.current == 76, "body-part health was not serialized")
 assert(payload.equipmentSpawnMode == "ranged", "equipment spawn override was not serialized")
 assert(payload.equipmentPoolID == "Default", "equipment pool was not serialized")
@@ -146,6 +152,9 @@ assert(restored, "deserialization failed without next()")
 assert(restored.progression.skillLevelDeltas.Strength == 3, "deserialized skill delta changed")
 assert(restored.health.body.wounds.ForeArm_L.type == "bite", "body wound did not round trip")
 assert(restored.health.body.infection.sourcePart == "ForeArm_L", "infection did not round trip")
+assert(restored.health.body.infection.progress == 0.5, "infection progress did not round trip")
+assert(restored.health.body.infection.stage == "nauseous", "infection stage did not round trip")
+assert(restored.health.body.infection.temperatureC == 37.4, "infection fever did not round trip")
 assert(restored.health.body.parts.ForeArm_L.current == 76, "body-part health did not round trip")
 assert(restored.health.body.lastBleedAt == 0, "wall clock bleed timestamp was persisted")
 assert(restored.equipmentSpawnMode == "ranged", "equipment spawn override did not round trip")

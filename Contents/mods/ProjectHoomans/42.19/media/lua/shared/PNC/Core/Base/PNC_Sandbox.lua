@@ -46,8 +46,20 @@ function Settings.NPCZombieLacerationChance()
     return Settings.GetNumber("NPCZombieLacerationChance", 30, 0, 100)
 end
 
+function Settings.NPCZombieInfectionChance()
+    local vars = projectVars()
+    if vars and vars.NPCZombieInfectionChance ~= nil then
+        return Settings.GetNumber("NPCZombieInfectionChance", 100, 0, 100)
+    end
+    -- Compatibility for saves created while infection was a boolean rule.
+    if vars and vars.NPCZombieInfection ~= nil then
+        return vars.NPCZombieInfection == true and 100 or 0
+    end
+    return 100
+end
+
 function Settings.NPCZombieInfectionEnabled()
-    return Settings.GetBoolean("NPCZombieInfection", false)
+    return Settings.NPCZombieInfectionChance() > 0
 end
 
 function Settings.NPCInfectionMortalityHours()

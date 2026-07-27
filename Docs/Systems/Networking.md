@@ -14,6 +14,9 @@
   and replay reaction flags without running damage logic
 - `BroadcastZombieBite`: two transition packets (`start` and `clear`) for the
   normal-zombie bite animation; canonical NPC damage remains server-only
+- NPC bandaging is presented as a local timed action, but only its completion
+  sends `CMD_BANDAGE`; the server revalidates the item, range, wound, and debug
+  authorization before mutating or broadcasting the record
 
 ## Current Rules
 - snapshot building reuses cached equipment and appearance data where possible
@@ -29,6 +32,12 @@
 - movement stays on periodic compact snapshots, while attack starts, newly
   assigned body online IDs, and bite damage request one immediate transition
   snapshot instead of increasing the global movement frequency
+- detailed health payloads carry the persisted infection stage, progress,
+  fever, and temperature; clients never advance infection or subtract health
+- corpse-to-zombie conversion runs only on the authority. The vanilla corpse
+  reanimation routine allocates the server zombie ID, inserts the zombie,
+  transfers corpse equipment, and removes the corpse; vanilla synchronization
+  owns the resulting zombie while PNC sends only the NPC-record removal tombstone
 
 ## Forbidden Responsibilities
 - does not tick AI

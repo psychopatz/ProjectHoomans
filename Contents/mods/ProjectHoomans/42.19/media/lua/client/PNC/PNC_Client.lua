@@ -582,7 +582,7 @@ function Client.SendRevive(npcId)
     return PNC.Revive and PNC.Revive.Try and PNC.Revive.Try(player, npcId) or false
 end
 
-function Client.SendBandage(npcId, partId, debugFree, bandageType)
+function Client.CompleteBandage(npcId, partId, debugFree, bandageType)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     if not player or not npcId or not partId then return false end
     debugFree = debugFree == true and Client.CanUseDebug()
@@ -601,6 +601,14 @@ function Client.SendBandage(npcId, partId, debugFree, bandageType)
             consumeItem = not debugFree,
             bandageType = bandageType,
         }) or false
+end
+
+function Client.SendBandage(npcId, partId, debugFree, bandageType)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not player or not npcId or not partId then return false end
+    debugFree = debugFree == true and Client.CanUseDebug()
+    if not PNCBandageAction or not PNCBandageAction.Queue then return false end
+    return PNCBandageAction.Queue(player, npcId, partId, debugFree, bandageType)
 end
 
 local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, test)

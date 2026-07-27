@@ -191,6 +191,29 @@ function API.ApplyDebugWound(npcId, args)
     return true, result
 end
 
+function API.ApplyDebugInfection(npcId, args)
+    local record = Registry.Get(npcId)
+    local zombie
+    local applied
+    local result
+    if not record or not PNC.NPCWounds or not PNC.NPCWounds.ApplyDebugInfection then
+        return false
+    end
+    zombie = Registry.GetLiveZombie(npcId)
+    applied, result = PNC.NPCWounds.ApplyDebugInfection(
+        record,
+        zombie,
+        args and args.partId,
+        args and args.stage
+    )
+    if not applied then return false, result end
+    Network.BroadcastRecord(record, "debug_infection")
+    if record.alive == false then
+        Network.BroadcastRemoval(record.id, "death")
+    end
+    return true, result
+end
+
 function API.GetSnapshot(npcId)
     local record = Registry.Get(npcId)
     if record then
@@ -259,6 +282,9 @@ function API.DebugCommand(npcId, command, args)
     end
     if command == "damage_part" then
         return API.ApplyDebugWound(npcId, args or {})
+    end
+    if command == "infection" then
+        return API.ApplyDebugInfection(npcId, args or {})
     end
     if command == "set_weapon_mode" then
         record.weaponMode = tostring(args and args.weaponMode or record.weaponMode or "melee")

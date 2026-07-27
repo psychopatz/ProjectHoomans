@@ -92,7 +92,7 @@ Const.REVIVE_BANDAGE_COUNT = 5
 Const.REVIVE_RANGE = 3.0
 Const.BANDAGE_TYPE = "Base.Bandage"
 Const.BANDAGE_TYPES = {
-    "Base.AlcoholBandage", "Base.Bandage",
+    "Base.AlcoholBandage", "Base.Bandage", "Base.Bandaid",
     "Base.AlcoholRippedSheets", "Base.RippedSheets",
 }
 Const.BANDAGE_RANGE = 3.0
@@ -170,6 +170,7 @@ Const.BODY_AUDIT_INTERVAL_MS = 250
 Const.CORPSE_AUDIT_INTERVAL_MS = 1000
 Const.CORPSE_AUDIT_BATCH_SIZE = 12
 Const.CORPSE_REANIMATE_RETRY_MAX = 3
+Const.CORPSE_REANIMATE_RETRY_MS = 2000
 Const.BODY_TAG_VERSION = 1
 Const.BITE_RELEASE_TIMEOUT_MS = 650
 Const.INVENTORY_OPLOG_MAX = 32

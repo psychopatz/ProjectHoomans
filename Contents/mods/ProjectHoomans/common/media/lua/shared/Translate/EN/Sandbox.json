@@ -16,11 +16,11 @@
     "Sandbox_ProjectHoomans.NPCZombieLacerationChance": "NPC Laceration Chance per Wound (%)",
     "Sandbox_ProjectHoomans.NPCZombieLacerationChance_tooltip": "Chance that a successful non-bite result becomes a laceration; remaining wounds are scratches.",
 
-    "Sandbox_ProjectHoomans.NPCZombieInfection": "NPC Knox Infection and Reanimation",
-    "Sandbox_ProjectHoomans.NPCZombieInfection_tooltip": "Allows bites to infect NPCs, cause terminal infection, and reanimate the corpse as an ordinary zombie.",
+    "Sandbox_ProjectHoomans.NPCZombieInfectionChance": "NPC Bite Infection Chance (%)",
+    "Sandbox_ProjectHoomans.NPCZombieInfectionChance_tooltip": "Chance that an NPC bite becomes Knox infected. Set to 0 to disable infection without changing zombie attacks or bite wounds. Infected NPCs develop fever, lose health, die, and reanimate.",
 
     "Sandbox_ProjectHoomans.NPCInfectionMortalityHours": "NPC Infection Mortality (Game Hours)",
-    "Sandbox_ProjectHoomans.NPCInfectionMortalityHours_tooltip": "In-game hours between an infected bite and death.",
+    "Sandbox_ProjectHoomans.NPCInfectionMortalityHours_tooltip": "In-game hours from infection to terminal fever and death. Health declines during the later stages.",
 
     "Sandbox_ProjectHoomans.NPCReanimationHours": "NPC Reanimation Delay (Game Hours)",
     "Sandbox_ProjectHoomans.NPCReanimationHours_tooltip": "In-game hours between infection death and corpse reanimation.",

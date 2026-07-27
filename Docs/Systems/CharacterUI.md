@@ -15,6 +15,11 @@
 - the generic `PNC Debug` world-context submenu is intentionally omitted; NPC-specific context providers, the NPC monitor, and the PsychopatzCore debug hub own those tools
 - tab helper files own their own content areas so medical, bandage, and body-part systems can be added without replacing the window.
 - full character and inventory payloads are requested on demand instead of being replicated every tick.
+- right-clicking an open wound queues a vanilla-style timed bandage action;
+  the item icon receives job progress and the server applies treatment only
+  after the action completes
+- authorized debug users see explicit Knox infection state in the Health tab
+  and can force infection stages from either the character or NPC debug menu
 - descriptor portraits used for dead or abstract NPCs convert persisted string
   clothing slots to Build 42 `ItemBodyLocation` values before calling
   `WornItems:setItem`; the shared PsychopatzCore portrait component owns this

@@ -9,9 +9,12 @@ local Internal = Lifecycle.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
-function Internal.makeCorpseInert(corpse, createdWorldHour, requestedReanimateAt)
-    local reanimateAt = tonumber(requestedReanimateAt)
-        or ((tonumber(createdWorldHour) or Internal.worldHour()) + 100000000)
+function Internal.makeCorpseInert(corpse, createdWorldHour, _requestedReanimateAt)
+    -- Managed corpses never ask each client/corpse instance to reanimate
+    -- independently. The authority watches requestedReanimateAt on the record,
+    -- spawns exactly one ordinary zombie, and replicates the corpse removal.
+    local reanimateAt =
+        (tonumber(createdWorldHour) or Internal.worldHour()) + 100000000
     if not corpse then
         return
     end
@@ -51,58 +54,6 @@ function Internal.stampCorpse(record, corpse, token)
     Internal.ensureRuntime(record).corpseState = "inert_loaded"
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "corpse")
-    end
-    return true
-end
-
-function Lifecycle.ReleaseReanimatedNPC(record, zombie)
-    local modData
-    local variables = {
-        "PNCLive", "PNCActor", "PNCAnim", "PNCMoveAnim", "PNCWalkType",
-        "NoLungeTarget", "NoLungeAttack", "ZombieHitReaction", "bMoving",
-        "isMoving", "Speed", "MovementSpeed", "bCrawling",
-    }
-    local i
-    if not record or not zombie then return false end
-    modData = zombie.getModData and zombie:getModData() or nil
-    if modData then
-        modData.PNC_ReanimatedFrom = tostring(record.id)
-        modData.PNC_NPC = nil
-        modData.PNC_UUID = nil
-        modData.PNC_BodyKind = nil
-        modData.PNC_BodyLease = nil
-        modData.PNC_CorpseToken = nil
-        modData.PNC_TagVersion = nil
-        modData.PNC_AggroNPCId = nil
-        modData.PNC_AggroNPCUntil = nil
-        modData.PNC_AggroPathAt = nil
-        modData.PNC_AggroPathX = nil
-        modData.PNC_AggroPathY = nil
-        modData.PNC_BumpReleaseAt = nil
-        modData.PNC_BumpReleasePending = nil
-        modData.PNC_CombatReaction = nil
-    end
-    for i = 1, #variables do
-        if zombie.clearVariable then
-            pcall(zombie.clearVariable, zombie, variables[i])
-        elseif zombie.setVariable then
-            pcall(zombie.setVariable, zombie, variables[i], false)
-        end
-    end
-    if zombie.setUseless then pcall(zombie.setUseless, zombie, false) end
-    if zombie.setNoTeeth then pcall(zombie.setNoTeeth, zombie, false) end
-    if zombie.setZombiesDontAttack then pcall(zombie.setZombiesDontAttack, zombie, false) end
-    if zombie.setReanimate then pcall(zombie.setReanimate, zombie, false) end
-    if zombie.setCanWalk then pcall(zombie.setCanWalk, zombie, true) end
-    if zombie.setHealth then
-        local health = zombie.getHealth and tonumber(zombie:getHealth()) or 0
-        if health <= 0 then pcall(zombie.setHealth, zombie, 1) end
-    end
-    if PNC.Network and PNC.Network.BroadcastRemoval then
-        PNC.Network.BroadcastRemoval(record.id, "zombified")
-    end
-    if PNC.Registry and PNC.Registry.RemoveRecord then
-        PNC.Registry.RemoveRecord(record.id)
     end
     return true
 end

@@ -9,6 +9,11 @@ function Tabs.RenderTemperature(view, snapshot, payload, topY)
     local rows = Shared.BuildClothingRows(snapshot, payload, view.npcId)
     local insulation = Shared.BuildBodyInsulation(view.npcId, snapshot, payload, rows)
     local thermal = Shared.GetThermalState(view.npcId)
+    local bodyHealth = resolved.bodyHealth
+        or payload and payload.health and payload.health.body or {}
+    local infection = bodyHealth and bodyHealth.infection or nil
+    local infectionTemperature = infection and infection.active == true
+        and tonumber(infection.temperatureC) or nil
     local padding = 12
     local bodyWidth = Shared.Clamp(math.floor(view.width * 0.27), 96, 145)
     local bodyHeight = math.min(280, math.max(180, view.height - padding * 2))
@@ -21,10 +26,18 @@ function Tabs.RenderTemperature(view, snapshot, payload, topY)
     Shared.DrawBodyMap(view, resolved.isFemale == true, padding, padding, bodyWidth, bodyHeight, insulation, Shared.TemperatureColor)
 
     y = Shared.DrawSection(view, "Body Temperature", contentX, y, contentWidth)
-    if thermal and thermal.coreTemperature then
-        y = Shared.DrawBar(view, "Core Temperature", thermal.coreTemperature, 42, contentX, y, contentWidth, { r = 0.82, g = 0.34, b = 0.18 })
-        y = Shared.DrawLabelValue(view, "Reading", tostring(Shared.Round(thermal.coreTemperature, 1)) .. " C", contentX, y + 2, 92)
-        y = Shared.DrawLabelValue(view, "Heat Output", tostring(Shared.Round((thermal.heatGenerationUI or 0) * 100, 0)) .. "%", contentX, y, 92)
+    if infectionTemperature or thermal and thermal.coreTemperature then
+        local coreTemperature = infectionTemperature or thermal.coreTemperature
+        y = Shared.DrawBar(view, "Core Temperature", coreTemperature, 42, contentX, y, contentWidth, { r = 0.82, g = 0.34, b = 0.18 })
+        y = Shared.DrawLabelValue(view, "Reading", tostring(Shared.Round(coreTemperature, 1)) .. " C", contentX, y + 2, 92)
+        y = Shared.DrawLabelValue(view, "Heat Output",
+            infectionTemperature and tostring(Shared.Round(tonumber(infection.fever) or 0, 0)) .. "% fever"
+                or tostring(Shared.Round((thermal.heatGenerationUI or 0) * 100, 0)) .. "%",
+            contentX, y, 92)
+        if infectionTemperature then
+            y = Shared.DrawLabelValue(view, "Infection",
+                tostring(infection.stage or "incubating"), contentX, y, 92)
+        end
     else
         view:drawText("Live temperature telemetry is available while this NPC is loaded.", contentX, y, 0.7, 0.7, 0.7, 1, UIFont.Small)
         y = y + fontHeight + 10

@@ -107,10 +107,21 @@ assertEqual(debugSent[2].payload.partId, "Head", "clicked injury part")
 damageMenu.options[3].subMenu.options[2].callback()
 assertEqual(debugSent[3].payload.partId, "Hand_R", "chosen injury part")
 
+assertEqual(rootMenu.options[4].name, "Debug Infection", "debug infection option")
+local infectionMenu = rootMenu.options[4].subMenu
+assertEqual(infectionMenu.options[1].name, "Status: NOT INFECTED", "infection status")
+infectionMenu.options[2].callback()
+assertEqual(debugSent[4].action, "infection", "force infection action")
+assertEqual(debugSent[4].payload.partId, "Head", "force infection selected part")
+assertEqual(debugSent[4].payload.stage, "incubating", "force infection initial stage")
+infectionMenu.options[3].callback()
+assertEqual(debugSent[5].payload.stage, "fever", "advance infection fever")
+
 view.snapshot.bodyHealth.wounds = {}
 view.healthHitRegions = {}
 assertEqual(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 70, 70), true, "blank health debug menu")
 assertEqual(rootMenu.options[1].name, "Debug Injury", "blank health menu only offers debug injury")
+assertEqual(rootMenu.options[2].name, "Debug Infection", "blank health menu offers infection debug")
 
 local healthUIPath = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Health.lua"
 local healthUIFile = assert(io.open(healthUIPath, "r"))

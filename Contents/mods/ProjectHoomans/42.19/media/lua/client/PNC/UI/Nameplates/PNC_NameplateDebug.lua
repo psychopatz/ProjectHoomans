@@ -108,6 +108,7 @@ end
 
 function Debug.DescribeSnapshot(snapshot)
     if not snapshot then return "No snapshot" end
+    local infection = snapshot.bodyHealth and snapshot.bodyHealth.infection or nil
     return table.concat({
         "id=" .. tostring(snapshot.id),
         "name=" .. tostring(snapshot.name),
@@ -122,6 +123,10 @@ function Debug.DescribeSnapshot(snapshot)
         "hp=" .. tostring(snapshot.hpCurrent) .. "/" .. tostring(snapshot.hpMax),
         "stamina=" .. tostring(snapshot.staminaCurrent) .. "/" .. tostring(snapshot.staminaMax),
         "healthState=" .. tostring(snapshot.healthState),
+        "infected=" .. tostring(infection
+            and (infection.active == true or infection.fatal == true) or false),
+        "infectionStage=" .. tostring(infection and infection.stage or "-"),
+        "fever=" .. tostring(infection and math.floor((tonumber(infection.fever) or 0) + 0.5) or 0),
         "presence=" .. tostring(snapshot.presenceState),
     }, " | ")
 end

@@ -249,6 +249,68 @@ function Wounds.ApplyBodyHealing(record, amount, partId)
     return changeBodyHealth(record, amount, partId and tostring(partId) or nil, true)
 end
 
+local function infectionStage(progress)
+    if progress < 0.20 then return "incubating" end
+    if progress < 0.45 then return "queasy" end
+    if progress < 0.65 then return "nauseous" end
+    if progress < 0.85 then return "fever" end
+    return "terminal"
+end
+
+local function refreshInfectionState(record, currentHour, applyDecline)
+    local body = Wounds.Ensure(record)
+    local infection = body.infection
+    local health = record and record.health or nil
+    local infectedAt
+    local fatalAt
+    local duration
+    local progress
+    local fever
+    local stage
+    local priorStage
+    local targetHealth
+    local decline
+    local changed = false
+    if not infection or infection.active ~= true then return false end
+    infectedAt = tonumber(infection.infectedAtWorldHour) or currentHour
+    fatalAt = tonumber(infection.fatalAtWorldHour)
+        or (infectedAt + Settings.NPCInfectionMortalityHours())
+    duration = math.max(0.01, fatalAt - infectedAt)
+    progress = Core.Clamp((currentHour - infectedAt) / duration, 0, 1)
+    fever = Core.Clamp((progress - 0.45) / 0.45, 0, 1) * 100
+    stage = infectionStage(progress)
+    priorStage = infection.stage
+    if math.abs((tonumber(infection.progress) or -1) - progress) >= 0.001
+        or math.abs((tonumber(infection.fever) or -1) - fever) >= 0.1
+        or priorStage ~= stage
+    then
+        changed = true
+    end
+    infection.progress = progress
+    infection.stage = stage
+    infection.fever = fever
+    infection.temperatureC = 37 + fever / 100 * 3.5
+    infection.lastUpdatedWorldHour = currentHour
+
+    -- Once the fever is established, progressively lower the authoritative
+    -- body-part aggregate. This is derived from world time, so reconnects and
+    -- abstract NPC simulation cannot apply the same interval twice.
+    if applyDecline ~= false and health and progress > 0.65 then
+        decline = Core.Clamp((progress - 0.65) / 0.35, 0, 1)
+        targetHealth = math.max((tonumber(health.max) or 100) * 0.05,
+            (tonumber(health.max) or 100) * (1 - decline * 0.95))
+        if (tonumber(health.current) or 0) > targetHealth + 0.01 then
+            Wounds.ApplyBodyDamage(record, health.current - targetHealth)
+            changed = true
+        end
+    end
+    if priorStage ~= stage then
+        record.runtime = record.runtime or {}
+        record.runtime.forceSyncEvent = "infection_" .. stage
+    end
+    return changed
+end
+
 function Wounds.Recalculate(record)
     local body = Wounds.Ensure(record)
     local bleedingRate = 0
@@ -276,20 +338,44 @@ function Wounds.HasActiveInfection(record)
     return infection and infection.active == true and infection.fatal ~= true or false
 end
 
-local function infect(record, partId, nowHour)
+local function infect(record, partId, nowHour, force)
     local body = Wounds.Ensure(record)
-    if not Settings.NPCZombieInfectionEnabled() or body.infection and body.infection.active then
-        return false
+    local chance = Settings.NPCZombieInfectionChance()
+    if body.infection and (body.infection.active == true or body.infection.fatal == true) then
+        return false, "already_infected"
+    end
+    if force ~= true then
+        if chance <= 0 then return false, "disabled" end
+        if randomPercent() >= chance then return false, "roll_failed" end
     end
     body.infection = {
         active = true,
         fatal = false,
+        pendingFatal = false,
         sourcePart = partId,
         infectedAtWorldHour = nowHour,
         fatalAtWorldHour = nowHour + Settings.NPCInfectionMortalityHours(),
         reanimateAtWorldHour = 0,
+        progress = 0,
+        stage = "incubating",
+        fever = 0,
+        temperatureC = 37,
+        lastUpdatedWorldHour = nowHour,
     }
-    return true
+    return true, "infected"
+end
+
+function Wounds.ForceInfection(record, partId)
+    local applied, reason = infect(
+        record,
+        tostring(partId or Wounds.ChoosePartId()),
+        worldHour(),
+        true
+    )
+    if applied and PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "infection")
+    end
+    return applied, reason
 end
 
 local function chooseWoundType()
@@ -409,6 +495,64 @@ function Wounds.ApplyDebugWound(record, npcBody, partId, woundType, amount)
     }
 end
 
+function Wounds.ApplyDebugInfection(record, npcBody, partId, stage)
+    local selectedPartId = partId and tostring(partId) or Wounds.ChoosePartId()
+    local body
+    local infection
+    local mortality
+    local currentHour
+    local progressByStage = {
+        incubating = 0.05,
+        queasy = 0.30,
+        nauseous = 0.55,
+        fever = 0.72,
+        terminal = 0.92,
+    }
+    local requestedStage = tostring(stage or "incubating")
+    local progress = progressByStage[requestedStage]
+        or progressByStage.incubating
+    if not record or record.alive == false or not Wounds.Parts[selectedPartId] then
+        return false, "invalid_target"
+    end
+    body = Wounds.Ensure(record)
+    if not body.wounds[selectedPartId] then
+        local woundApplied, woundResult =
+            Wounds.ApplyDebugWound(record, npcBody, selectedPartId, "bite")
+        if not woundApplied then return false, woundResult end
+        if record.alive == false then
+            infection = body.infection
+            return infection and infection.fatal == true,
+                infection and infection.stage or "target_died"
+        end
+    end
+    if not Wounds.HasActiveInfection(record) then
+        Wounds.ForceInfection(record, selectedPartId)
+    end
+    infection = body.infection
+    if not infection or infection.active ~= true then return false, "infection_unavailable" end
+    currentHour = worldHour()
+    mortality = Settings.NPCInfectionMortalityHours()
+    infection.sourcePart = selectedPartId
+    infection.infectedAtWorldHour = currentHour - mortality * progress
+    infection.fatalAtWorldHour = currentHour + mortality * (1 - progress)
+    infection.pendingFatal = false
+    refreshInfectionState(record, currentHour, true)
+    if requestedStage == "fatal" then
+        local killed, reason = Wounds.TriggerInfectionDeath(
+            record,
+            npcBody,
+            "debug_zombie_infection"
+        )
+        if not killed and reason ~= "awaiting_live_body" then return false, reason end
+    end
+    record.runtime = record.runtime or {}
+    record.runtime.forceSyncEvent = "debug_infection_" .. tostring(infection.stage)
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "infection")
+    end
+    return true, infection.stage
+end
+
 function Wounds.ResolveZombieAttack(record, npcBody, attacker, attackerZombieId)
     local part = choosePart()
     local protection = Wounds.GetProtection(npcBody, part)
@@ -459,6 +603,10 @@ function Wounds.PrepareInfectionDeath(record)
     if not infection or infection.active ~= true then return false end
     infection.active = false
     infection.fatal = true
+    infection.progress = 1
+    infection.stage = "fatal"
+    infection.fever = 100
+    infection.temperatureC = 40.5
     infection.fatalAtWorldHour = tonumber(infection.fatalAtWorldHour) or worldHour()
     infection.reanimateAtWorldHour = worldHour() + Settings.NPCReanimationHours()
     return true
@@ -536,12 +684,14 @@ function Wounds.Update(record, zombie, now)
     local wound
     if not body or record.alive == false then return false end
 
-    if infection and infection.active == true
-        and (infection.pendingFatal == true
-            or currentHour >= (tonumber(infection.fatalAtWorldHour) or math.huge))
-    then
-        Wounds.TriggerInfectionDeath(record, zombie, "zombie_infection")
-        return true
+    if infection and infection.active == true then
+        if refreshInfectionState(record, currentHour, false) then changed = true end
+        if infection.pendingFatal == true
+            or currentHour >= (tonumber(infection.fatalAtWorldHour) or math.huge)
+        then
+            Wounds.TriggerInfectionDeath(record, zombie, "zombie_infection")
+            return true
+        end
     end
 
     for partId, wound in pairs(body.wounds) do
@@ -554,10 +704,17 @@ function Wounds.Update(record, zombie, now)
             changed = true
         end
     end
+
+    if infection and infection.active == true
+        and refreshInfectionState(record, currentHour, true)
+    then
+        changed = true
+    end
+
     if changed then
         Wounds.Recalculate(record)
         record.runtime = record.runtime or {}
-        record.runtime.forceSyncEvent = "wound_healed"
+        record.runtime.forceSyncEvent = record.runtime.forceSyncEvent or "wound_healed"
         if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
     end
 
