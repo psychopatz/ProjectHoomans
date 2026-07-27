@@ -36,12 +36,50 @@ Internal.ATTACK_TIMINGS = {
     ground = { hitDelay = 240, duration = 760 },
 }
 
+local function applyImmediateFacing(zombie, liveTarget, faceX, faceY)
+    local applied = false
+    local dx
+    local dy
+    local len
+    local forward
+    if not zombie then return false end
+    if faceX ~= nil and faceY ~= nil and zombie.getX and zombie.getY then
+        dx = tonumber(faceX) - zombie:getX()
+        dy = tonumber(faceY) - zombie:getY()
+        len = math.sqrt((dx * dx) + (dy * dy))
+        if len > 0.0001 then
+            dx = dx / len
+            dy = dy / len
+            if zombie.getForwardDirection then
+                forward = zombie:getForwardDirection()
+                if forward and forward.set then
+                    pcall(forward.set, forward, dx, dy)
+                end
+            end
+            if zombie.faceLocation then
+                zombie:faceLocation(zombie:getX() + dx, zombie:getY() + dy)
+                applied = true
+            elseif zombie.faceLocationF then
+                zombie:faceLocationF(zombie:getX() + dx, zombie:getY() + dy)
+                applied = true
+            end
+        end
+    end
+    if liveTarget and zombie.faceThisObject then
+        zombie:faceThisObject(liveTarget)
+        applied = true
+    end
+    return applied
+end
+
 function Internal.faceTarget(zombie, target, record, leaseMs, reason)
     local pathService = PNC.PathService
     local liveTarget
-    local zombieTarget
     local faceX
     local faceY
+    local faceZ
+    local immediate
+    local leased
     if not zombie or not target then
         return false
     end
@@ -49,55 +87,51 @@ function Internal.faceTarget(zombie, target, record, leaseMs, reason)
         return false
     end
     if target.kind == "player" and target.player then
+        liveTarget = target.player
         faceX = target.player:getX()
         faceY = target.player:getY()
-        -- faceThisObject gives the engine an immediate live-object heading,
-        -- while the PathService lease publishes the same direction to remote
-        -- clients and prevents locomotion from taking facing back mid-shot.
-        if zombie.faceThisObject then
-            zombie:faceThisObject(target.player)
-        end
-        if pathService and pathService.RequestCombatFacing and record then
-            pathService.RequestCombatFacing(record, zombie, {
-                x = faceX,
-                y = faceY,
-                z = target.player:getZ(),
-            }, leaseMs, reason or "combat_player")
-            return true
-        end
-        return zombie.faceThisObject ~= nil
-    end
-    if target.kind == "npc" then
+        faceZ = target.player:getZ()
+    elseif target.kind == "npc" then
         liveTarget = Registry.GetLiveZombie(target.id)
-        if liveTarget and zombie.faceThisObject then
-            zombie:faceThisObject(liveTarget)
+        if liveTarget then
+            faceX = liveTarget:getX()
+            faceY = liveTarget:getY()
+            faceZ = liveTarget:getZ()
+        else
+            faceX = target.x
+            faceY = target.y
+            faceZ = target.z
         end
-        if liveTarget and pathService and pathService.RequestCombatFacing and record then
-            pathService.RequestCombatFacing(record, zombie, {
-                x = liveTarget:getX(),
-                y = liveTarget:getY(),
-                z = liveTarget:getZ(),
-            }, leaseMs, reason or "combat_npc")
-            return true
+    elseif target.kind == "zombie" then
+        liveTarget = target.worldObject
+            or (Perception and Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil)
+        if liveTarget then
+            faceX = liveTarget:getX()
+            faceY = liveTarget:getY()
+            faceZ = liveTarget:getZ()
+        else
+            faceX = target.x
+            faceY = target.y
+            faceZ = target.z
         end
-        return liveTarget ~= nil and zombie.faceThisObject ~= nil
+    else
+        return false
     end
-    if target.kind == "zombie" then
-        zombieTarget = Perception and Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
-        if zombieTarget and zombie.faceThisObject then
-            zombie:faceThisObject(zombieTarget)
-        end
-        if zombieTarget and pathService and pathService.RequestCombatFacing and record then
-            pathService.RequestCombatFacing(record, zombie, {
-                x = zombieTarget:getX(),
-                y = zombieTarget:getY(),
-                z = zombieTarget:getZ(),
-            }, leaseMs, reason or "combat_zombie")
-            return true
-        end
-        return zombieTarget ~= nil and zombie.faceThisObject ~= nil
+
+    -- The object call drives the local ActionContext, the direct vector repairs
+    -- IsoZombie bodies whose object target is temporarily unresolved, and the
+    -- lease publishes the same heading to multiplayer replicas.
+    immediate = applyImmediateFacing(zombie, liveTarget, faceX, faceY)
+    if faceX ~= nil and faceY ~= nil
+        and pathService and pathService.RequestCombatFacing and record
+    then
+        leased = pathService.RequestCombatFacing(record, zombie, {
+            x = faceX,
+            y = faceY,
+            z = faceZ,
+        }, leaseMs, reason or ("combat_" .. tostring(target.kind)))
     end
-    return false
+    return immediate == true or leased == true
 end
 
 function Combat.FaceTarget(record, zombie, target, leaseMs, reason)

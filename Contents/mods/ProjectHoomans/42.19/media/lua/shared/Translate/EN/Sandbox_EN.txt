@@ -21,6 +21,7 @@ Sandbox_EN = {
     Sandbox_ProjectHoomans_EnableWeaponDamage = "Enable NPC Weapon Damage",
     Sandbox_ProjectHoomans_NPCDamageDealtMultiplier = "NPC Damage Dealt Multiplier",
     Sandbox_ProjectHoomans_NPCPlayerWounds = "NPC Attacks Cause Player Wounds",
-    Sandbox_ProjectHoomans_NPCAmmoConsumption = "NPC Ammo Consumption",
+    Sandbox_ProjectHoomans_NPCAmmoConsumption = "Companion Ammo Realism",
+    Sandbox_ProjectHoomans_NPCAmmoConsumption_tooltip = "Every NPC firearm empties and reloads its real magazine. When enabled, recruited companions consume matching inventory ammunition as their reserve and stop when it is gone. Neutral and hostile NPCs use an infinite reserve. When disabled, companions also use an infinite reserve but still reload normally.",
     Sandbox_ProjectHoomans_NPCWeaponConditionLoss = "NPC Weapon Condition Loss",
 }

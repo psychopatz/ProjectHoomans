@@ -52,6 +52,15 @@ local function logBlocked(record, lane, reason)
     )
 end
 
+local function holdRangedAction(record, zombie, target, reason, mode, weaponStatus)
+    if reason ~= "reload_started" and reason ~= "reloading" then
+        return false
+    end
+    holdRangedAim(record, zombie, target)
+    Common.SetCombatDebug(record, target, "reloading", mode, weaponStatus)
+    return true
+end
+
 function BehaviorCombat.TickEngage(record, zombie, target)
     local dist = math.sqrt(tonumber(target and target.distSq or 0) or 0)
     local equipmentInfo = Equipment.Describe(record)
@@ -179,6 +188,9 @@ function BehaviorCombat.TickEngage(record, zombie, target)
             Common.SetCombatDebug(record, target, "attacking_ranged", effectiveMode, equipmentInfo.weaponStatus)
             return
         end
+        if holdRangedAction(record, zombie, target, reason, effectiveMode, equipmentInfo.weaponStatus) then
+            return
+        end
         if reason == "target_out_of_range" then
             Common.MoveRecord(
                 record,
@@ -241,6 +253,9 @@ function BehaviorCombat.TickEngage(record, zombie, target)
         end
         Common.HaltMovement(record, zombie)
         Common.SetCombatDebug(record, target, "attacking_ranged", "mixed", equipmentInfo.weaponStatus)
+        return
+    end
+    if holdRangedAction(record, zombie, target, reason, "mixed", equipmentInfo.weaponStatus) then
         return
     end
     if reason == "target_out_of_range" then

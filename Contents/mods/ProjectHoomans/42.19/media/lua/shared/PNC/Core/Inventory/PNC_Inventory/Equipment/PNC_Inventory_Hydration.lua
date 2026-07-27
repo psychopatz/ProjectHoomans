@@ -62,6 +62,9 @@ function Inventory.EnsureRecordInventory(record)
             item.stack = math.max(1, math.floor(tonumber(item.stack) or tonumber(item.uses) or 1))
             item.uses = tonumber(item.uses)
             item.cond = tonumber(item.cond)
+            item.ammoCount = item.ammoCount ~= nil
+                and math.max(0, math.floor(tonumber(item.ammoCount) or 0))
+                or nil
             item.templateKey = Internal.normalizeString(item.templateKey)
             item.wornSlot = Internal.normalizeString(item.wornSlot)
             item.attachedSlot = Internal.normalizeString(item.attachedSlot)

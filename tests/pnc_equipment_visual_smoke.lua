@@ -91,8 +91,8 @@ local record = {
 
 local applied = PNC.Equipment.ApplyHands(zombie, record)
 assertEqual(applied, true, "idle equipment apply")
-assertEqual(zombie.primary, weapon, "spawn primary hand")
-assertEqual(zombie.attached.Back, nil, "no implicit spawn holster")
+assertEqual(zombie.primary, nil, "idle primary hand cleared")
+assertEqual(zombie.attached.Back, weapon, "idle primary implicitly holstered")
 
 record.runtime = { target = { kind = "zombie" } }
 applied = PNC.Equipment.ApplyCombatState(zombie, record, true)
@@ -103,8 +103,8 @@ assertEqual(zombie.attached.Back, nil, "combat holster cleared")
 record.runtime.target = nil
 applied = PNC.Equipment.ApplyCombatState(zombie, record, false)
 assertEqual(applied, true, "idle combat-state equipment apply")
-assertEqual(zombie.primary, weapon, "idle primary remains equipped")
-assertEqual(zombie.attached.Back, nil, "idle primary is not implicitly holstered")
+assertEqual(zombie.primary, nil, "idle primary leaves hand")
+assertEqual(zombie.attached.Back, weapon, "idle primary returns to holster")
 assert(primarySet >= 3, "primary hand state was not refreshed")
 assert(handModelsReset > 0, "hand models were not refreshed")
 assert(refreshCount > 0, "equipment presentation did not refresh the model")

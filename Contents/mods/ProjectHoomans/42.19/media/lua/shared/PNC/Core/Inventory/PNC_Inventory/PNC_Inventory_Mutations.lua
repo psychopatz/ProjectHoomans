@@ -64,11 +64,15 @@ local function applyUpdateOperation(inv, op)
     if op.cond ~= nil then
         item.cond = tonumber(op.cond)
     end
+    if op.ammoCount ~= nil then
+        item.ammoCount = math.max(0, math.floor(tonumber(op.ammoCount) or item.ammoCount or 0))
+    end
     return Internal.buildOperation("update", {
         itemID = item.id,
         stack = item.stack,
         uses = item.uses,
         cond = item.cond,
+        ammoCount = item.ammoCount,
     })
 end
 

@@ -23,6 +23,8 @@
 - `PNC_Combat`: combat entry
 - `PNC_Combat_Melee`: melee attack start rules
 - `PNC_Combat_Ranged`: ranged attack start rules
+- `PNC_Combat_Firearms`: weapon-derived magazine capacity, companion ammunition
+  policy, and timed reload actions
 - `PNC_Combat_AttackActions`: delayed hit windows and attack pumping
 - `PNC_Combat_Tactics`: conservative kiting and repositioning
 - `PNC_Combat_Unarmed`: shove and stomp helpers

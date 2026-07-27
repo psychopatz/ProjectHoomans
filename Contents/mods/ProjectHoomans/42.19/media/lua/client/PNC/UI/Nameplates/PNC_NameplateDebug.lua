@@ -66,6 +66,7 @@ end
 
 function Debug.BuildText(snapshot, hasBoundBody, settings)
     local debugState = snapshot and snapshot.debugState or nil
+    local firearmState = snapshot and snapshot.firearmState or nil
     local parts = {}
     if not debugState then
         return settingEnabled(settings, "debugShowAI") and "AI: Unknown" or ""
@@ -97,6 +98,18 @@ function Debug.BuildText(snapshot, hasBoundBody, settings)
         )
         parts[#parts + 1] =
             "Weapon: " .. tostring(debugState.weaponStatus or "-")
+    end
+    if settingEnabled(settings, "debugShowMagazine") and firearmState then
+        parts[#parts + 1] = "Mag: "
+            .. tostring(firearmState.count or 0)
+            .. "/"
+            .. tostring(firearmState.capacity or 0)
+            .. (firearmState.reloadActive == true and " (reloading)" or "")
+        parts[#parts + 1] = "Reserve: " .. (
+            firearmState.unlimitedReserve == true
+                and "infinite"
+                or tostring(firearmState.reserveCount or 0)
+        )
     end
     if settingEnabled(settings, "debugShowStamina") then
         parts[#parts + 1] = "Stamina: " .. tostring(
@@ -173,6 +186,7 @@ end
 function Debug.DescribeSnapshot(snapshot)
     if not snapshot then return "No snapshot" end
     local infection = snapshot.bodyHealth and snapshot.bodyHealth.infection or nil
+    local firearm = snapshot.firearmState or nil
     return table.concat({
         "id=" .. tostring(snapshot.id),
         "name=" .. tostring(snapshot.name),
@@ -183,6 +197,11 @@ function Debug.DescribeSnapshot(snapshot)
         "target=" .. tostring(snapshot.debugState and snapshot.debugState.targetKind or "none"),
         "mode=" .. tostring(snapshot.debugState and snapshot.debugState.combatModeResolved or snapshot.weaponMode or "-"),
         "weapon=" .. tostring(snapshot.debugState and snapshot.debugState.weaponStatus or "-"),
+        "magazine=" .. tostring(firearm and firearm.count or "-")
+            .. "/" .. tostring(firearm and firearm.capacity or "-"),
+        "reserve=" .. tostring(firearm and (
+            firearm.unlimitedReserve == true and "infinite" or firearm.reserveCount
+        ) or "-"),
         "block=" .. tostring(snapshot.debugState and snapshot.debugState.combatBlockReason or "-"),
         "hp=" .. tostring(snapshot.hpCurrent) .. "/" .. tostring(snapshot.hpMax),
         "stamina=" .. tostring(snapshot.staminaCurrent) .. "/" .. tostring(snapshot.staminaMax),

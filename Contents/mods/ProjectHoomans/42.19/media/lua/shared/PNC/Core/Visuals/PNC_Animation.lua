@@ -346,6 +346,13 @@ function Animation.PlayBump(zombie, record, bumpType)
         zombie:setBumpFall(false)
     end
     if zombie.setVariable then
+        -- The custom firearm and reload nodes scale their timelines through
+        -- these variables. An unset scalar may evaluate to zero on IsoZombie
+        -- bodies, visually freezing the shot before its recoil frame.
+        zombie:setVariable("CombatSpeed", "1.0")
+        zombie:setVariable("ReloadSpeed", "1.0")
+        zombie:setVariable("AttackVariationX", "0.0")
+        zombie:setVariable("AttackVariationY", "0.0")
         zombie:setVariable("BumpDone", false)
         zombie:setVariable("BumpAnimFinished", false)
         zombie:setVariable("BumpFall", false)

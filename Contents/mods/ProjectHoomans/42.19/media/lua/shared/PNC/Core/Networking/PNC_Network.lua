@@ -31,6 +31,7 @@ local Stamina = PNC.Stamina
 local Profiles = PNC.VisualProfiles
 local MotionHints = PNC.MotionHints
 local Wounds = PNC.NPCWounds
+local Firearms = PNC.Firearms
 local ServerState = PNC.Network.ServerState
 
 function PNC.Network.ResetServerState()
@@ -264,6 +265,7 @@ function Network.BuildSnapshot(record)
     local visualState
     local appearance
     local bodyHealth
+    local firearmState
     aiState, inCombat = resolveAIState(record)
     canRevive = PNC.Health and PNC.Health.CanRevive and PNC.Health.CanRevive(record) or false
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
@@ -274,6 +276,9 @@ function Network.BuildSnapshot(record)
     visualState = buildVisualState(record)
     appearance = Profiles and Profiles.RollAppearance and Profiles.RollAppearance(record) or nil
     bodyHealth = Wounds and Wounds.BuildSnapshot and Wounds.BuildSnapshot(record) or nil
+    firearmState = Firearms and Firearms.BuildDebugState
+        and Firearms.BuildDebugState(record)
+        or nil
     return {
         interestDetailed = true,
         id = record.id,
@@ -313,6 +318,7 @@ function Network.BuildSnapshot(record)
         weaponFullType = record.equipment and record.equipment.primaryFullType or nil,
         combatModeResolved = equipmentInfo.combatModeResolved or record.weaponMode,
         weaponStatus = equipmentInfo.weaponStatus or "unknown",
+        firearmState = firearmState,
         presenceRevision = record.presenceRevision,
         liveBodyInstanceID = record.liveBodyInstanceID,
         liveBodyOnlineID = record.liveBodyOnlineID,
@@ -350,6 +356,11 @@ function Network.BuildSnapshot(record)
             weaponMode = record.weaponMode,
             combatModeResolved = combat.combatModeResolved,
             weaponStatus = combat.weaponStatus,
+            magazineCount = firearmState and firearmState.count or nil,
+            magazineCapacity = firearmState and firearmState.capacity or nil,
+            ammoReserveUnlimited = firearmState and firearmState.unlimitedReserve == true or false,
+            ammoReserveCount = firearmState and firearmState.reserveCount or nil,
+            firearmReloadActive = firearmState and firearmState.reloadActive == true or false,
             combatBlockReason = combat.combatBlockReason,
             staminaState = staminaInfo.state,
             staminaCurrent = staminaInfo.current,
@@ -370,6 +381,9 @@ function Network.BuildPresenceDelta(record)
     local aiState
     local inCombat
     local staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
+    local firearmState = Firearms and Firearms.BuildDebugState
+        and Firearms.BuildDebugState(record)
+        or nil
     aiState, inCombat = resolveAIState(record)
     return {
         interestDetailed = true,
@@ -394,6 +408,7 @@ function Network.BuildPresenceDelta(record)
         aiState = aiState,
         inCombat = inCombat,
         attackMode = record.runtime and record.runtime.target ~= nil or false,
+        firearmState = firearmState,
         visualState = buildVisualState(record),
     }
 end

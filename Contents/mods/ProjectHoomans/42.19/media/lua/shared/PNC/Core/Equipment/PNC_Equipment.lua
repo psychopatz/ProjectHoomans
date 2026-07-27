@@ -168,6 +168,25 @@ local function applyInventoryState(item, record, bodyLocation)
     return item
 end
 
+local function applyPrimaryInventoryState(item, record)
+    local inventory = record and record.inventory or nil
+    local itemID = inventory and inventory.equipped and inventory.equipped.primary or nil
+    local state = itemID and inventory.items and inventory.items[itemID] or nil
+    local maximum
+    if not item or not state then return item end
+    maximum = item.getConditionMax and tonumber(item:getConditionMax()) or 0
+    if state.cond ~= nil and item.setCondition then
+        item:setCondition(math.max(0, math.min(
+            maximum > 0 and maximum or tonumber(state.cond),
+            tonumber(state.cond) or 0
+        )))
+    end
+    if state.ammoCount ~= nil and item.setCurrentAmmoCount then
+        pcall(item.setCurrentAmmoCount, item, math.max(0, math.floor(tonumber(state.ammoCount) or 0)))
+    end
+    return item
+end
+
 local function applyWornItems(zombie, equipment, record)
     local entries = Equipment.GetOrderedWornEntries(equipment)
     local appliedCount = 0
@@ -225,10 +244,12 @@ local function applyWornItems(zombie, equipment, record)
     return true, "worn:" .. tostring(appliedCount)
 end
 
-local function applyAttachedItems(zombie, equipment)
+local function applyAttachedItems(zombie, equipment, implicitHolsterFullType)
     local entries = Equipment.GetOrderedAttachedEntries(equipment)
     local appliedCount = 0
     local failureCount = 0
+    local occupiedLocations = {}
+    local alreadyAttached = false
     local i
     local entry
     local item
@@ -238,12 +259,16 @@ local function applyAttachedItems(zombie, equipment)
 
     Visuals.ClearAttachedItems(zombie)
 
-    if #entries <= 0 then
+    if #entries <= 0 and not implicitHolsterFullType then
         return true, "attached:none"
     end
 
     for i = 1, #entries do
         entry = entries[i]
+        occupiedLocations[entry.location] = true
+        if implicitHolsterFullType and entry.fullType == implicitHolsterFullType then
+            alreadyAttached = true
+        end
         item, createReason = Equipment.CreateItem(entry.fullType)
         if item then
             ok, errorMessage = safeInvoke(zombie, "setAttachedItem", entry.location, item)
@@ -265,6 +290,36 @@ local function applyAttachedItems(zombie, equipment)
         end
     end
 
+    if implicitHolsterFullType and not alreadyAttached then
+        local holsterLocation
+        local holsterSlotType
+        item, createReason = Equipment.CreateItem(implicitHolsterFullType)
+        if item then
+            holsterLocation, holsterSlotType = Equipment.ResolveAttachedLocation(
+                item,
+                nil,
+                occupiedLocations
+            )
+            if holsterLocation then
+                ok, errorMessage = safeInvoke(zombie, "setAttachedItem", holsterLocation, item)
+                if ok then
+                    if item.setAttachedToModel then
+                        item:setAttachedToModel(holsterLocation)
+                    end
+                    if item.setAttachedSlotType and holsterSlotType then
+                        item:setAttachedSlotType(holsterSlotType)
+                    end
+                    appliedCount = appliedCount + 1
+                else
+                    failureCount = failureCount + 1
+                    Core.LogWarn("PNC equipment failed to holster "
+                        .. tostring(implicitHolsterFullType) .. " at "
+                        .. tostring(holsterLocation) .. ": " .. tostring(errorMessage))
+                end
+            end
+        end
+    end
+
     if failureCount > 0 then
         return false, "attached:applied=" .. tostring(appliedCount) .. ",failed=" .. tostring(failureCount)
     end
@@ -279,7 +334,7 @@ local function isAttackMode(record)
     return runtime and runtime.attackMode == true or false
 end
 
-local function applyHands(zombie, equipment, descriptor)
+local function applyHands(zombie, record, equipment, descriptor, attackMode)
     local item
     local primaryType
     local secondaryItem
@@ -301,6 +356,17 @@ local function applyHands(zombie, equipment, descriptor)
         return false, descriptor.weaponStatus
     end
 
+    if attackMode ~= true then
+        setEquipmentVariables(
+            zombie,
+            descriptor.primaryType,
+            descriptor.fullType,
+            equipment.secondaryFullType
+        )
+        return true, descriptor.weaponStatus .. ":holstered"
+    end
+
+    applyPrimaryInventoryState(item, record)
     primaryType = descriptor.primaryType
     ok, errorMessage = safeInvoke(zombie, "setPrimaryHandItem", item)
     if not ok then
@@ -342,9 +408,17 @@ local function applyCombatPresentation(zombie, record, equipment, descriptor, at
     local attachedReason
     local handsOk
     local handsReason
+    local holsterFullType
 
-    attachedOk, attachedReason = applyAttachedItems(zombie, equipment)
-    handsOk, handsReason = applyHands(zombie, equipment, descriptor)
+    if attackMode ~= true then
+        holsterFullType = descriptor.fullType
+    end
+    attachedOk, attachedReason = applyAttachedItems(
+        zombie,
+        equipment,
+        holsterFullType
+    )
+    handsOk, handsReason = applyHands(zombie, record, equipment, descriptor, attackMode)
 
     record.runtime = record.runtime or {}
     record.runtime.equipmentAttackModeApplied = attackMode == true
@@ -434,7 +508,14 @@ function Equipment.ApplyHands(zombie, record)
 
     equipment = Equipment.EnsureRecordEquipment(record)
     descriptor = buildWeaponDescriptor(equipment.primaryFullType, true)
-    ok, reason = applyHands(zombie, equipment, descriptor)
+    ok, _, reason = applyCombatPresentation(
+        zombie,
+        record,
+        equipment,
+        descriptor,
+        isAttackMode(record)
+    )
+    Visuals.RefreshModel(zombie)
     return ok, reason
 end
 

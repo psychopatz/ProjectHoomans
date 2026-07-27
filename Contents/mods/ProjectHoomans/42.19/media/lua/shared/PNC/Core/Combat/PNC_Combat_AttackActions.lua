@@ -19,6 +19,7 @@ local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local Animation = PNC.Animation
 local Damage = PNC.CombatDamage
+local Firearms = PNC.Firearms
 
 local function applyWeaponWear(record)
     local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record) or nil
@@ -164,6 +165,8 @@ end
 function Internal.buildAttackAction(record, target, attackKind, attackType, anim, damage, skillID, extra)
     local now = Core.Now()
     local timings = Internal.ATTACK_TIMINGS[attackKind] or Internal.ATTACK_TIMINGS.melee
+    local hitDelay = type(extra) == "table" and tonumber(extra.hitDelayMs) or nil
+    local duration = type(extra) == "table" and tonumber(extra.durationMs) or nil
     local action = {
         attackKind = attackKind,
         attackType = attackType,
@@ -171,8 +174,8 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
         damage = damage,
         skillID = skillID,
         startedAt = now,
-        hitAt = now + timings.hitDelay,
-        finishAt = now + timings.duration,
+        hitAt = now + (hitDelay or timings.hitDelay),
+        finishAt = now + (duration or timings.duration),
         hitDone = false,
         target = captureTargetRef(target),
     }
@@ -187,7 +190,7 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
     -- transition snapshot, avoiding both a delayed attack start and a duplicate
     -- periodic snapshot in the same tick.
     if isServer and isServer() then
-        record.runtime.forceSyncEvent = "attack_start"
+        record.runtime.forceSyncEvent = action.syncEvent or "attack_start"
     end
     return action
 end
@@ -386,6 +389,23 @@ function Combat.PumpAttackAction(record, zombie)
     if not zombie or record.alive == false then
         Internal.finishAttackAction(record, zombie)
         return false, "attack_cleared"
+    end
+
+    if action.attackType == "reload" then
+        target = resolveActionTarget(action.target)
+        if target then
+            Internal.faceTarget(zombie, target, record, 120, "reload_followthrough")
+        end
+        if now >= (tonumber(action.finishAt) or 0) then
+            if Firearms and Firearms.CompleteReload then
+                action.lastResult, action.lastReason = Firearms.CompleteReload(record, zombie, action)
+            else
+                action.lastResult, action.lastReason = false, "firearm_service_unavailable"
+            end
+            Internal.finishAttackAction(record, zombie)
+            return false, action.lastReason or "reload_finished"
+        end
+        return true, "reloading"
     end
 
     target = resolveActionTarget(action.target)

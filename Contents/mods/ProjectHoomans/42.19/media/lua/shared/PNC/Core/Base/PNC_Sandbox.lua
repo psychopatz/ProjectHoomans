@@ -70,6 +70,12 @@ function Settings.NPCReanimationSeconds()
     return Settings.GetNumber("NPCReanimationSeconds", 3, 1, 60)
 end
 
+function Settings.CompanionAmmoRealismEnabled()
+    -- Preserve the original key so existing sandbox presets and saves keep
+    -- their configured value.
+    return Settings.GetBoolean("NPCAmmoConsumption", false)
+end
+
 function Settings.ZombiesTargetDownedNPC()
     return Settings.GetBoolean("ZombiesTargetDownedNPC", false)
 end

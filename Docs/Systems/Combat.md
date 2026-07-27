@@ -5,7 +5,9 @@
 - the bootstrap explicitly loads pathing, reaction, tactics, zombie aggro, and
   attack-action modules in dependency order; combat correctness must not rely
   on incidental automatic Lua file ordering
-- `PNC_Combat_Melee`, `PNC_Combat_Ranged`, `PNC_Combat_AttackActions`, `PNC_Combat_Tactics`, and `PNC_Combat_Unarmed` own focused combat responsibilities
+- `PNC_Combat_Melee`, `PNC_Combat_Ranged`, `PNC_Combat_Firearms`,
+  `PNC_Combat_AttackActions`, `PNC_Combat_Tactics`, and
+  `PNC_Combat_Unarmed` own focused combat responsibilities
 - custom damage routes through `PNC_Health`
 - player weapon hits damage neutral and hostile NPCs through a server-authoritative hit bridge; colonists are protected from player damage
 - hostile NPCs treat companions and neutral survivors as enemies; companions
@@ -63,6 +65,32 @@
 - in-range ranged NPCs explicitly replace any previous travel intent with an
   aim hold, face the live target through both the engine object-facing API and
   the replicated combat-facing lease, and keep that aim through cooldowns
+- ranged facing falls back to the target's last authoritative coordinates when
+  its live engine object is temporarily unresolved, and the direct normalized
+  heading is replicated for remote attack animations
+- firearm attack nodes initialize their animation speed/scalar variables before
+  entering the bump channel, allowing the vanilla handgun/rifle shot animation
+  to reach its visible recoil frames on both the server body and client replicas
+- `Companion Ammo Realism` retains the legacy `NPCAmmoConsumption` sandbox key
+  for save compatibility. Every ranged NPC uses the equipped firearm's script
+  clip size, persists the loaded round count on that inventory weapon, and
+  performs a timed weapon-family reload when the magazine is empty. When
+  realism is enabled, recruited/player-owned companions consume matching loose
+  rounds and stop when their reserve is empty. Autonomous NPCs—and companions
+  with realism disabled—reload from an infinite reserve instead of bypassing
+  magazine limits
+- reload and magazine changes are server-authoritative inventory deltas. Reload
+  start/finish transitions use the normal presence snapshot stream so remote
+  clients see the same pistol, rifle, shotgun, revolver, or double-barrel
+  animation without applying ammunition locally
+- the debug overlay exposes loaded rounds, magazine capacity, reload state, and
+  either the companion's loose reserve count or `infinite`; this row has its
+  own in-game overlay toggle
+- idle NPCs keep both melee weapons and firearms out of their hands. The active
+  primary weapon is attached to the best compatible holster/belt/back slot and
+  transitions to the hands only while the combat target is active; the same
+  attack-mode transition is replicated to multiplayer clients
+- ranged attacks use half the base stamina of melee attacks (10 versus 20)
 - ranged kiting starts only inside the short safety standoff (2.2 tiles);
   ordinary cooldowns against a single nearby enemy no longer trigger a retreat
   that starves follow-up shots

@@ -338,6 +338,7 @@ local function applyInventoryDelta(args)
             if op.stack ~= nil then item.stack = op.stack end
             if op.uses ~= nil then item.uses = op.uses end
             if op.cond ~= nil then item.cond = op.cond end
+            if op.ammoCount ~= nil then item.ammoCount = op.ammoCount end
         end
     end
     inventory.summary = Core.DeepCopy(args.summary or inventory.summary or {})

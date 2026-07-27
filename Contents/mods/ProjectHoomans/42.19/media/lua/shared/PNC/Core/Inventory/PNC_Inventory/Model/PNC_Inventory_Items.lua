@@ -62,6 +62,7 @@ function Internal.itemToPayload(item)
         stack = tonumber(item.stack) or nil,
         uses = tonumber(item.uses) or nil,
         cond = tonumber(item.cond) or nil,
+        ammoCount = tonumber(item.ammoCount),
         fav = item.fav == true or nil,
         container = item.container,
         bagContainer = item.bagContainer,
@@ -85,6 +86,9 @@ function Internal.createItem(record, inv, spec)
         stack = math.max(1, math.floor(tonumber(spec.stack) or tonumber(spec.uses) or 1)),
         uses = tonumber(spec.uses),
         cond = tonumber(spec.cond),
+        ammoCount = spec.ammoCount ~= nil
+            and math.max(0, math.floor(tonumber(spec.ammoCount) or 0))
+            or nil,
         fav = spec.fav == true,
         container = Internal.normalizeString(spec.container) or "root",
         bagContainer = Internal.normalizeString(spec.bagContainer),

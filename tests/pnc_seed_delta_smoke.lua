@@ -121,7 +121,7 @@ assertEqual(#firstDelta.ops, 2, "first delta operation count")
 assertEqual(firstDelta.summary.itemCount, 2, "first delta summary item count")
 
 assert(PNC.Inventory.ApplyDelta(record, {
-    { op = "update", itemID = "loot_1", stack = 3, cond = 0.75 },
+    { op = "update", itemID = "loot_1", stack = 3, cond = 0.75, ammoCount = 0 },
 }, "test_update"), "inventory update failed")
 
 local secondDelta = PNC.Inventory.BuildDeltaPayload(record, 1)
@@ -130,6 +130,7 @@ assertEqual(#secondDelta.ops, 1, "second delta operation count")
 local fullPayload = PNC.Inventory.BuildFullPayload(record)
 assertEqual(fullPayload.items.loot_1.stack, 3, "full payload stack")
 assertEqual(fullPayload.items.loot_1.cond, 0.75, "full payload condition")
+assertEqual(fullPayload.items.loot_1.ammoCount, 0, "full payload magazine state")
 local weightState = PNC.Inventory.GetWeightState(record)
 assert(weightState.usedWeight > 0, "weight cache was not rebuilt")
 assert(weightState.remainingWeight >= 0, "remaining weight is invalid")
@@ -168,5 +169,6 @@ assertEqual(hasBandage, false, "removed template item returned")
 assertEqual(hasLoot, true, "added item lost on rebase")
 assertEqual(hasNewTemplate, true, "new template item did not appear")
 assertEqual(reloaded.inventory.items.loot_1.stack, 3, "updated stack lost on rebase")
+assertEqual(reloaded.inventory.items.loot_1.ammoCount, 0, "magazine state lost on rebase")
 
 print("pnc_seed_delta_smoke: ok")

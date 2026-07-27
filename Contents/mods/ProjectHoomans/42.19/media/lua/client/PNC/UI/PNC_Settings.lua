@@ -58,6 +58,7 @@ Registry.Register({
         debugPartControl("debugShowOrder", "Overlay: current order"),
         debugPartControl("debugShowTarget", "Overlay: current target"),
         debugPartControl("debugShowCombat", "Overlay: combat mode and weapon"),
+        debugPartControl("debugShowMagazine", "Overlay: firearm magazine and reserve"),
         debugPartControl("debugShowStamina", "Overlay: stamina"),
         debugPartControl("debugShowBlock", "Overlay: block reason"),
         debugPartControl("debugShowInfection", "Overlay: infection status"),

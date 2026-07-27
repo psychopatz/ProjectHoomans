@@ -10,6 +10,7 @@
 - `inventory.worn`
 - `inventory.attached`
 - `inventory.items`
+- per-firearm `ammoCount`, persisted and replicated as part of the inventory item
 - `inventory.containers`
 - template-plus-delta persistence state for recruited and unrecruited NPCs
 - stable semantic template keys and generator revision
@@ -85,6 +86,14 @@ PNC.Inventory.AddEquipmentSpawnEntry("Default", "rangedWeapon", {
     },
 })
 ```
+
+`PNC_Combat_Firearms` derives magazine capacity and ammunition type from the
+equipped weapon/script item for every ranged NPC. It writes the loaded count to
+that weapon's compact inventory item. With `Companion Ammo Realism` enabled,
+recruited companions consume matching grant/loot stacks when a reload finishes;
+other NPCs refill the same finite magazine from an infinite reserve. The
+original `NPCAmmoConsumption` sandbox key is intentionally retained for
+existing saves and presets.
 
 The melee and ranged weapon chances are independent. Consequently an NPC can
 spawn unarmed, melee-only, ranged-only, or with both weapons. The ranged weapon

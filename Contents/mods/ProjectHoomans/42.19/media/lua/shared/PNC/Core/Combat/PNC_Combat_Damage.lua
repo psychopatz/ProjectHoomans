@@ -112,11 +112,22 @@ local function equippedInventoryItem(record)
 end
 
 function Damage.ConsumeAmmo(record, weaponItem)
+    local firearms = PNC.Firearms
     local inv
     local ammoType
     local itemID
     local item
-    if not Damage.IsAmmoConsumptionEnabled() then
+    if firearms and firearms.PrepareShot then
+        return firearms.PrepareShot(record, weaponItem)
+    end
+    if not Damage.IsAmmoConsumptionEnabled()
+        or not record
+        or not (
+            record.recruited == true
+            or record.ownerOnlineID ~= nil
+            or (record.ownerUsername ~= nil and tostring(record.ownerUsername) ~= "")
+        )
+    then
         return true, "ammo_disabled"
     end
     ammoType = weaponItem and weaponItem.getAmmoType and weaponItem:getAmmoType() or nil
