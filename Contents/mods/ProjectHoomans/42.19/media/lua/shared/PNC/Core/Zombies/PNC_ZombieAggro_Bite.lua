@@ -231,12 +231,13 @@ local function applyBiteDamage(entry, record, zombie, npcBody, now)
     record.runtime.targetKind = "zombie"
     record.runtime.combatBlockReason = "under_zombie_bite"
     if wounds and wounds.ResolveZombieAttack then
-        applied, result = wounds.ResolveZombieAttack(record, npcBody, zombie)
+        applied, result = wounds.ResolveZombieAttack(record, npcBody, zombie, entry.zombieId)
     else
         applied = Health.ApplyDamage(record, npcBody, {
             amount = Const.ZOMBIE_ATTACK_DAMAGE,
             type = "zombie_bite",
             attackerKind = "zombie",
+            attackerZombieId = entry.zombieId,
             x = zombie:getX(), y = zombie:getY(), z = zombie:getZ(),
         })
         result = { outcome = applied and "wounded" or "blocked", woundType = "bite" }

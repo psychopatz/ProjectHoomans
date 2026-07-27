@@ -36,6 +36,13 @@
   spatial ID, and cancel immediately with `target_lost_or_dead` if neither
   resolves before the hit frame
 - colonists and hostiles can both acquire zombie targets
+- companion, roaming, and hostile behaviors share periodic target
+  reassessment. A nearby enemy actively attacking the NPC takes priority over
+  a passive target; otherwise a substantially closer candidate may replace the
+  current target, with a short reassessment interval and distance hysteresis
+  preventing target flicker
+- recent validated damage identifies NPC and player attackers as immediate
+  threats for a bounded memory window
 - initial player, NPC, and zombie acquisition requires an unobstructed visual
   trace; closed doors and walls do not count as visible
 - a lost target is investigated at its last seen position for a short memory

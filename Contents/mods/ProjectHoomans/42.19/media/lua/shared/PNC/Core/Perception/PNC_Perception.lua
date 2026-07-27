@@ -14,17 +14,132 @@ local Spatial = PNC.SpatialIndex
 local Stealth = PNC.Stealth
 local Registry = PNC.Registry
 
+local function isImmediateThreat(target)
+    local radius = tonumber(Const.TARGET_IMMEDIATE_THREAT_RADIUS) or 6
+    return target and target.threatening == true
+        and (tonumber(target.distSq) or math.huge) <= (radius * radius)
+end
+
 local function pickNearest(firstTarget, secondTarget)
+    local firstThreat
+    local secondThreat
     if not firstTarget then
         return secondTarget
     end
     if not secondTarget then
         return firstTarget
     end
+    firstThreat = isImmediateThreat(firstTarget)
+    secondThreat = isImmediateThreat(secondTarget)
+    if firstThreat ~= secondThreat then
+        return firstThreat and firstTarget or secondTarget
+    end
     if (tonumber(firstTarget.distSq) or math.huge) <= (tonumber(secondTarget.distSq) or math.huge) then
         return firstTarget
     end
     return secondTarget
+end
+
+local function sameTarget(target, kind, id, onlineID, username)
+    if not target or tostring(target.kind or "") ~= tostring(kind or "") then
+        return false
+    end
+    if kind == "npc" then
+        return tostring(target.id or "") == tostring(id or "")
+    end
+    if kind == "zombie" then
+        return tostring(target.zombieId or "") == tostring(id or "")
+    end
+    if kind == "player" then
+        if onlineID ~= nil and target.onlineID ~= nil then
+            return tonumber(target.onlineID) == tonumber(onlineID)
+        end
+        return username ~= nil and tostring(target.username or "") == tostring(username)
+    end
+    return false
+end
+
+local function targetPointsAtRecord(target, record)
+    if not target or not record then return false end
+    return tostring(target.kind or "") == "npc"
+        and tostring(target.id or "") == tostring(record.id or "")
+end
+
+function Perception.RememberAttacker(record, damageEvent, now)
+    local kind
+    local id
+    if not record or type(damageEvent) ~= "table" then return false end
+    kind = tostring(damageEvent.attackerKind or "")
+    if kind ~= "npc" and kind ~= "player" and kind ~= "zombie" then
+        return false
+    end
+    if kind == "npc" then
+        id = damageEvent.attackerID
+    elseif kind == "zombie" then
+        id = damageEvent.attackerZombieId or damageEvent.zombieId
+    end
+    if (kind == "npc" or kind == "zombie") and (id == nil or id == "") then
+        return false
+    end
+    if kind == "player"
+        and damageEvent.attackerOnlineID == nil
+        and (damageEvent.attackerUsername == nil or damageEvent.attackerUsername == "")
+    then
+        return false
+    end
+    record.runtime = record.runtime or {}
+    record.runtime.recentThreat = {
+        kind = kind,
+        id = id,
+        onlineID = damageEvent.attackerOnlineID,
+        username = damageEvent.attackerUsername,
+        expiresAt = (tonumber(now) or Core.Now())
+            + (tonumber(Const.TARGET_RECENT_ATTACKER_MS) or 5000),
+    }
+    return true
+end
+
+function Perception.IsTargetThreatening(record, target)
+    local recent
+    local targetRecord
+    local targetBody
+    local observerBody
+    local engineTarget
+    if not record or not target then return false end
+    recent = record.runtime and record.runtime.recentThreat or nil
+    if recent and Core.Now() <= (tonumber(recent.expiresAt) or 0)
+        and sameTarget(
+            target,
+            recent.kind,
+            recent.id,
+            recent.onlineID,
+            recent.username
+        )
+    then
+        return true
+    end
+    if target.kind == "npc" then
+        targetRecord = Registry and Registry.Get and Registry.Get(target.id) or nil
+        return targetRecord ~= nil
+            and targetPointsAtRecord(targetRecord.runtime and targetRecord.runtime.target, record)
+    end
+    if target.kind == "zombie" then
+        targetBody = target.zombie
+            or (Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId))
+        observerBody = Registry and Registry.GetLiveZombie
+            and Registry.GetLiveZombie(record.id)
+            or nil
+        if targetBody and observerBody and targetBody.getTarget then
+            local ok
+            ok, engineTarget = pcall(targetBody.getTarget, targetBody)
+            return ok and engineTarget == observerBody
+        end
+    end
+    return false
+end
+
+function Perception.SelectPreferredTarget(firstTarget, secondTarget)
+    return pickNearest(firstTarget, secondTarget)
 end
 
 local function isRecordEnemy(source, target)
@@ -94,7 +209,7 @@ function Perception.CanSeeWorldObject(record, targetObject)
     return visible == true, resultName
 end
 
-local function buildZombieTarget(zombie, distSq, visibilityKind)
+local function buildZombieTarget(record, zombie, distSq, visibilityKind)
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
     local zombieId = modData and modData.PNC_ZombieID or nil
     if not zombieId and Spatial and Spatial.Rebuild then
@@ -105,8 +220,9 @@ local function buildZombieTarget(zombie, distSq, visibilityKind)
     if not zombieId then
         return nil
     end
-    return {
+    local target = {
         kind = "zombie",
+        zombie = zombie,
         zombieId = zombieId,
         x = zombie:getX(),
         y = zombie:getY(),
@@ -116,6 +232,9 @@ local function buildZombieTarget(zombie, distSq, visibilityKind)
         visibilityKind = visibilityKind or "clear",
         lastSeenAt = Core.Now(),
     }
+    target.threatening = Perception.IsTargetThreatening(record, target)
+    target.zombie = nil
+    return target
 end
 
 local function collectEnemyZombies(record, radius)
@@ -149,14 +268,15 @@ local function collectEnemyZombies(record, radius)
 end
 
 function Perception.FindNearestEnemyPlayer(record, radius)
+    radius = tonumber(radius) or Const.ZOMBIE_TARGET_RADIUS
     local players = Spatial.QueryPlayers(record.x, record.y, radius)
     local best = nil
-    local bestDistSq = math.huge
     local i
     local player
     local distSq
     local visible
     local visibilityKind
+    local candidate
 
     for i = 1, #players do
         player = players[i]
@@ -167,9 +287,8 @@ function Perception.FindNearestEnemyPlayer(record, radius)
         end
         if player and player:isAlive() and math.abs(player:getZ() - record.z) < 1 and visible then
             distSq = Core.DistanceSq(record.x, record.y, player:getX(), player:getY())
-            if distSq < bestDistSq then
-                bestDistSq = distSq
-                best = {
+            if distSq <= (radius * radius) then
+                candidate = {
                     kind = "player",
                     player = player,
                     onlineID = player:getOnlineID(),
@@ -182,6 +301,8 @@ function Perception.FindNearestEnemyPlayer(record, radius)
                     visibilityKind = visibilityKind,
                     lastSeenAt = Core.Now(),
                 }
+                candidate.threatening = Perception.IsTargetThreatening(record, candidate)
+                best = pickNearest(best, candidate)
             end
         end
     end
@@ -189,15 +310,16 @@ function Perception.FindNearestEnemyPlayer(record, radius)
 end
 
 function Perception.FindNearestEnemyNPC(record, radius)
+    radius = tonumber(radius) or Const.ZOMBIE_TARGET_RADIUS
     local npcs = Spatial.QueryNPCs(record.x, record.y, radius)
     local best = nil
-    local bestDistSq = math.huge
     local i
     local target
     local targetZombie
     local distSq
     local visible
     local visibilityKind
+    local candidate
 
     for i = 1, #npcs do
         target = npcs[i]
@@ -211,9 +333,8 @@ function Perception.FindNearestEnemyNPC(record, radius)
             and visible
         then
             distSq = Core.DistanceSq(record.x, record.y, target.x, target.y)
-            if distSq < bestDistSq then
-                bestDistSq = distSq
-                best = {
+            if distSq <= (radius * radius) then
+                candidate = {
                     kind = "npc",
                     id = target.id,
                     x = target.x,
@@ -224,6 +345,8 @@ function Perception.FindNearestEnemyNPC(record, radius)
                     visibilityKind = visibilityKind,
                     lastSeenAt = Core.Now(),
                 }
+                candidate.threatening = Perception.IsTargetThreatening(record, candidate)
+                best = pickNearest(best, candidate)
             end
         end
     end
@@ -233,22 +356,21 @@ end
 function Perception.FindNearestEnemyZombie(record, radius)
     local zombies
     local best
-    local bestDistSq
     local i
     local entry
+    local candidate
 
     if not record or record.hostility and record.hostility.attackZombies == false then
         return nil
     end
 
     best = nil
-    bestDistSq = math.huge
     zombies = collectEnemyZombies(record, radius)
     for i = 1, #zombies do
         entry = zombies[i]
-        if entry and entry.distSq < bestDistSq then
-            best = buildZombieTarget(entry.zombie, entry.distSq, entry.visibilityKind)
-            bestDistSq = entry.distSq
+        if entry then
+            candidate = buildZombieTarget(record, entry.zombie, entry.distSq, entry.visibilityKind)
+            best = pickNearest(best, candidate)
         end
     end
 
@@ -265,6 +387,9 @@ function Perception.FindBestEnemyZombie(record, radius)
     local other
     local crowdCount
     local score
+    local target
+    local targetIsThreat
+    local bestIsThreat
     local crowdRadiusSq = (tonumber(Const.COMBAT_TARGET_CROWD_RADIUS) or 2.2) ^ 2
     local crowdPenalty = 1.6
 
@@ -288,8 +413,13 @@ function Perception.FindBestEnemyZombie(record, radius)
                 end
             end
             score = entry.distSq + (crowdCount * crowdCount * crowdPenalty)
-            if score < bestScore then
-                best = buildZombieTarget(entry.zombie, entry.distSq, entry.visibilityKind)
+            target = buildZombieTarget(record, entry.zombie, entry.distSq, entry.visibilityKind)
+            targetIsThreat = isImmediateThreat(target)
+            bestIsThreat = isImmediateThreat(best)
+            if (targetIsThreat and not bestIsThreat)
+                or (targetIsThreat == bestIsThreat and score < bestScore)
+            then
+                best = target
                 bestScore = score
             end
         end

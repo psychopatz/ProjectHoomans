@@ -409,7 +409,7 @@ function Wounds.ApplyDebugWound(record, npcBody, partId, woundType, amount)
     }
 end
 
-function Wounds.ResolveZombieAttack(record, npcBody, attacker)
+function Wounds.ResolveZombieAttack(record, npcBody, attacker, attackerZombieId)
     local part = choosePart()
     local protection = Wounds.GetProtection(npcBody, part)
     local baseChance = Settings.NPCZombieWoundChance()
@@ -434,6 +434,7 @@ function Wounds.ResolveZombieAttack(record, npcBody, attacker)
         partId = part.id,
         type = "zombie_" .. woundType,
         attackerKind = "zombie",
+        attackerZombieId = attackerZombieId,
         x = attacker and attacker.getX and attacker:getX() or record.x,
         y = attacker and attacker.getY and attacker:getY() or record.y,
         z = attacker and attacker.getZ and attacker:getZ() or record.z,

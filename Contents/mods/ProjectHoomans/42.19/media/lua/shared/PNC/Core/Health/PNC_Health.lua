@@ -343,6 +343,9 @@ function Health.ApplyDamage(record, zombie, damageEvent)
     end
 
     Health.MarkRecentDamage(record, now)
+    if PNC.Perception and PNC.Perception.RememberAttacker then
+        PNC.Perception.RememberAttacker(record, damageEvent, now)
+    end
     if damageEvent and damageEvent.attackerKind == "zombie" then
         record.runtime.targetKind = "zombie"
         record.runtime.combatBlockReason = "taking_zombie_damage"

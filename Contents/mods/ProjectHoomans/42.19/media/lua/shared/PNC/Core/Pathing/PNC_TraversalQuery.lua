@@ -104,6 +104,66 @@ function TraversalQuery.GetPassageBetween(fromSquare, toSquare)
     return nil
 end
 
+function TraversalQuery.FindPassageToward(zombie, goalX, goalY, goalZ, cell)
+    local fromSquare
+    local nextSquare
+    local passage
+    local originX
+    local originY
+    local originZ
+    local dirX
+    local dirY
+    local stepX
+    local stepY
+    local candidates
+    local candidate
+    local i
+    if not zombie then return nil end
+    cell = cell or (getCell and getCell() or nil)
+    if not cell then return nil end
+    originX = zombie:getX()
+    originY = zombie:getY()
+    originZ = zombie:getZ()
+    if goalZ ~= nil and math.abs((tonumber(goalZ) or originZ) - originZ) >= 1 then
+        return nil
+    end
+    dirX = (tonumber(goalX) or originX) - originX
+    dirY = (tonumber(goalY) or originY) - originY
+    if math.abs(dirX) <= 0.001 and math.abs(dirY) <= 0.001 then
+        return nil
+    end
+    fromSquare = TraversalQuery.GetSquare(originX, originY, originZ, cell)
+    if not fromSquare then return nil end
+    stepX = dirX >= 0 and 1 or -1
+    stepY = dirY >= 0 and 1 or -1
+    if math.abs(dirX) >= math.abs(dirY) then
+        candidates = {
+            { x = fromSquare:getX() + stepX, y = fromSquare:getY(), enabled = math.abs(dirX) > 0.001 },
+            { x = fromSquare:getX(), y = fromSquare:getY() + stepY, enabled = math.abs(dirY) > 0.001 },
+        }
+    else
+        candidates = {
+            { x = fromSquare:getX(), y = fromSquare:getY() + stepY, enabled = math.abs(dirY) > 0.001 },
+            { x = fromSquare:getX() + stepX, y = fromSquare:getY(), enabled = math.abs(dirX) > 0.001 },
+        }
+    end
+    for i = 1, #candidates do
+        candidate = candidates[i]
+        if candidate.enabled then
+            nextSquare = cell:getGridSquare(candidate.x, candidate.y, originZ)
+            passage = TraversalQuery.GetPassageBetween(fromSquare, nextSquare)
+            if passage then
+                return {
+                    object = passage,
+                    fromSquare = fromSquare,
+                    toSquare = nextSquare,
+                }
+            end
+        end
+    end
+    return nil
+end
+
 function TraversalQuery.GetFenceBetween(fromSquare, toSquare)
     local fromX
     local fromY

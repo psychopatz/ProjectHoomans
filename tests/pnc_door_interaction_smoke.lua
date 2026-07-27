@@ -139,6 +139,15 @@ assertEqual(opened, true, "blocked door state")
 assertEqual(synced, 1, "blocked door synchronized")
 
 opened = false
+lane = {}
+interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
+    zombie, { id = "proactive_door_test" }, lane, 2.5, 0.5, 0
+)
+assertEqual(interacted, true, "goal-directed passage probe opens nearby door")
+assertEqual(interaction, "door_open", "proactive door interaction")
+assertEqual(opened, true, "proactive door state")
+
+opened = false
 zombie.isCollidedWithDoor = function() return true end
 lane = {}
 interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
@@ -152,5 +161,33 @@ opened = false
 door.getLockedByKey = function() return 7 end
 assertEqual(PNC.PathService.Internal.openDoorForNPC(zombie, door), false, "key-locked door stays closed")
 assertEqual(opened, false, "key-locked door state")
+
+door.getLockedByKey = nil
+zombie.isCollidedWithDoor = function() return false end
+local windowOpened = false
+local window = {
+    __class = "IsoWindow",
+    getSquare = function() return fromSquare end,
+    IsOpen = function() return windowOpened end,
+    isSmashed = function() return false end,
+    isPermaLocked = function() return false end,
+    ToggleWindow = function() windowOpened = true end,
+    syncIsoObject = function() synced = synced + 1 end,
+    canClimbThrough = function() return windowOpened end,
+    getOppositeSquare = function() return toSquare end,
+}
+fromSquare.getObjects = function() return newList({ window }) end
+toSquare.getDoorTo = function() return nil end
+toSquare.getWindowTo = function(_, other)
+    if other == fromSquare then return window end
+    return nil
+end
+lane = {}
+interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
+    zombie, { id = "proactive_window_test" }, lane, 2.5, 0.5, 0
+)
+assertEqual(interacted, true, "goal-directed passage probe opens nearby window")
+assertEqual(interaction, "window_open", "proactive window interaction")
+assertEqual(windowOpened, true, "proactive window state")
 
 print("pnc_door_interaction_smoke: ok")

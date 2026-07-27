@@ -3,7 +3,9 @@
 ## V1
 - live NPCs use server-owned path requests and embodied path behaviors
 - abstract NPCs use coarse world travel
-- live NPCs can open doors and use windows when the path stalls near an obstacle
+- live NPCs proactively probe the cardinal passage edges toward their current
+  goal, opening doors or windows before repeated collision, while blocked-step
+  and stall detection remain recovery fallbacks
 - fence hopping uses the same server-owned traversal lease, repeat suppression,
   landing validation, and client motion hints as window traversal
 - fence and window climbs use one eased server-owned transport segment aligned
@@ -24,14 +26,18 @@
 - `walktoward` is a normal locomotion state, not a path-conflict state; recovery is reserved for real combat/thump conflicts so valid movement is not reset every tick
 - live path refresh now routes through a single move lane, which matches the Bandits-style "one active move action" flow more closely and avoids stacked `path2` state churn
 - close-range combat approach now softens from `run` to `walk` so embodied chase looks less robotic near contact range
-- combat target stickiness now reduces target thrash so embodied NPCs do not keep stop-stepping between nearby zombies every tick
+- combat target reassessment uses a short interval and distance hysteresis so
+  NPCs can respond to a nearby attacker without stop-stepping between nearly
+  equivalent targets every tick
 - `PNC_LocomotionProfiles` now resolves transport speed, anim cadence, walk family, and crawl/sneak selectors once per lane so fake movement and animation stay in lockstep
 - combat only borrows facing through short path-service leases; normal movement keeps body facing aligned to travel direction
 - the server emits incremental `visualState.motionHint` segments for traversal
   so remote clients follow the same eased authoritative hop without stretching
   every small network delta over the entire animation duration
 - door opens, window opens, and window climbs stay server-owned and publish short traversal leases so client smoothing does not fight passage interactions
-- door/window handling is obstacle-driven, not opportunistic: the lane only evaluates traversal after a blocked fake step or a short no-progress stall
+- door/window handling is goal-directed rather than opportunistic: the lane
+  probes only the adjacent cardinal passage edges that advance the active goal,
+  then falls back to blocked-step, collision, and no-progress recovery
 - traversal candidates must be ahead of the goal-facing lane, improve distance toward the live goal, and avoid immediate re-cross of the same obstacle from the same side
 - active move lanes keep short traversal memory so repeated same-side window climbs are rejected and logged instead of re-executed every tick
 - long-lived non-locomotion action states during active fake locomotion are force-recovered back to idle before the next travel tick so walking stance does not freeze in `turnalerted`

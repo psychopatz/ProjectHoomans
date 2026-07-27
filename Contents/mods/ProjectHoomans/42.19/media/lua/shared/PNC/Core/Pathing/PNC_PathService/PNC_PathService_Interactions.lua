@@ -241,6 +241,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     local blockedFence
     local blockedFenceTall
     local blockedPassage
+    local passageAhead
     local collided
 
     if not zombie or not getCell then
@@ -273,6 +274,14 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     blockedPassage = blockedFromSquare and blockedSquare and TraversalQuery and TraversalQuery.GetPassageBetween
         and TraversalQuery.GetPassageBetween(blockedFromSquare, blockedSquare)
         or nil
+    if not blockedPassage and TraversalQuery and TraversalQuery.FindPassageToward then
+        passageAhead = TraversalQuery.FindPassageToward(zombie, goalX, goalY, goalZ, cell)
+        if passageAhead then
+            blockedPassage = passageAhead.object
+            blockedFromSquare = passageAhead.fromSquare
+            blockedSquare = passageAhead.toSquare
+        end
+    end
 
     -- A blocked fake-locomotion step identifies the exact edge object. Open it
     -- directly: a door can belong to the origin square, which makes its square
@@ -556,4 +565,15 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     end
 
     return false, nil
+end
+
+function Internal.hasClosedPassageToward(zombie, goalX, goalY, goalZ)
+    local query = Internal.TraversalQuery or TraversalQuery
+    local passage
+    if not query or not query.FindPassageToward or not query.IsClosedPassage then
+        return false
+    end
+    passage = query.FindPassageToward(zombie, goalX, goalY, goalZ)
+    return passage ~= nil and passage.object ~= nil
+        and query.IsClosedPassage(passage.object)
 end

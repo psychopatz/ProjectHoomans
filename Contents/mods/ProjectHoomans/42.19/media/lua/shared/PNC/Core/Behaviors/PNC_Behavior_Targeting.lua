@@ -72,6 +72,9 @@ function Targeting.UpdateTargetFromWorld(record, target)
             target.visible = true
             target.visibilityKind = visibilityKind
             target.lastSeenAt = now
+            target.threatening = Perception.IsTargetThreatening
+                and Perception.IsTargetThreatening(record, target)
+                or false
             return target
         end
         if targetRecord and targetRecord.alive ~= false and now < memoryUntil then
@@ -97,6 +100,9 @@ function Targeting.UpdateTargetFromWorld(record, target)
             target.visible = true
             target.visibilityKind = visibilityKind
             target.lastSeenAt = now
+            target.threatening = Perception.IsTargetThreatening
+                and Perception.IsTargetThreatening(record, target)
+                or false
             return target
         end
         if player and now < memoryUntil then
@@ -121,6 +127,9 @@ function Targeting.UpdateTargetFromWorld(record, target)
             target.visible = true
             target.visibilityKind = visibilityKind
             target.lastSeenAt = now
+            target.threatening = Perception.IsTargetThreatening
+                and Perception.IsTargetThreatening(record, target)
+                or false
             return target
         end
         if zombie and now < memoryUntil then
@@ -133,26 +142,80 @@ function Targeting.UpdateTargetFromWorld(record, target)
     return nil
 end
 
-function Targeting.ResolveCompanionEngageTarget(record)
-    local target = Targeting.UpdateTargetFromWorld(record, record.runtime and record.runtime.target or nil)
-    if target then
-        return target
+local function sameTarget(left, right)
+    if not left or not right or left.kind ~= right.kind then return false end
+    if left.kind == "npc" then return tostring(left.id or "") == tostring(right.id or "") end
+    if left.kind == "zombie" then return tostring(left.zombieId or "") == tostring(right.zombieId or "") end
+    if left.kind == "player" then
+        if left.onlineID ~= nil and right.onlineID ~= nil then
+            return tonumber(left.onlineID) == tonumber(right.onlineID)
+        end
+        return tostring(left.username or "") == tostring(right.username or "")
     end
-    return Perception.ResolveCompanionTarget(record)
+    return false
+end
+
+function Targeting.SelectReassessedTarget(record, current, candidate)
+    local currentDist
+    local candidateDist
+    local threatRadius = tonumber(Const.TARGET_IMMEDIATE_THREAT_RADIUS) or 6
+    local threatRadiusSq = threatRadius * threatRadius
+    local currentThreat
+    local candidateThreat
+    local switchRatio = tonumber(Const.TARGET_SWITCH_DISTANCE_RATIO) or 0.72
+    if not candidate then return current end
+    if candidate.x ~= nil and candidate.y ~= nil then
+        candidate.distSq = Core.DistanceSq(record.x, record.y, candidate.x, candidate.y)
+    end
+    if not current then return candidate end
+    if sameTarget(current, candidate) then return candidate end
+    currentDist = tonumber(current.distSq) or math.huge
+    candidateDist = tonumber(candidate.distSq) or math.huge
+    currentThreat = current.threatening == true and currentDist <= threatRadiusSq
+    candidateThreat = candidate.threatening == true and candidateDist <= threatRadiusSq
+    if candidateThreat and not currentThreat then
+        return candidate
+    end
+    if currentThreat and not candidateThreat then
+        return current
+    end
+    if current.visible == false and candidate.visible ~= false then
+        return candidate
+    end
+    if candidateDist < currentDist * switchRatio then
+        return candidate
+    end
+    return current
+end
+
+function Targeting.ResolveEngageTarget(record, resolver)
+    local runtime
+    local now
+    local current
+    local candidate
+    if not record or type(resolver) ~= "function" then return nil end
+    record.runtime = record.runtime or {}
+    runtime = record.runtime
+    now = Core.Now()
+    current = Targeting.UpdateTargetFromWorld(record, runtime.target)
+    if current and now < (tonumber(runtime.nextTargetReassessAt) or 0) then
+        return current
+    end
+    runtime.nextTargetReassessAt = now + (tonumber(Const.TARGET_REASSESS_MS) or 350)
+    candidate = resolver(record)
+    return Targeting.SelectReassessedTarget(record, current, candidate)
+end
+
+function Targeting.ResolveCompanionEngageTarget(record)
+    return Targeting.ResolveEngageTarget(record, Perception.ResolveCompanionTarget)
 end
 
 function Targeting.ResolveHostileEngageTarget(record)
-    local target = Targeting.UpdateTargetFromWorld(record, record.runtime and record.runtime.target or nil)
-    if target then
-        return target
-    end
-    return Perception.ResolveHostileTarget(record)
+    return Targeting.ResolveEngageTarget(record, Perception.ResolveHostileTarget)
 end
 
 function Targeting.ResolveRoamingEngageTarget(record, radius)
-    local target = Targeting.UpdateTargetFromWorld(record, record.runtime and record.runtime.target or nil)
-    if target then
-        return target
-    end
-    return Perception.ResolveRoamingTarget(record, radius)
+    return Targeting.ResolveEngageTarget(record, function(source)
+        return Perception.ResolveRoamingTarget(source, radius)
+    end)
 end

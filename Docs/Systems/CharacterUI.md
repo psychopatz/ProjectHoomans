@@ -15,6 +15,10 @@
 - the generic `PNC Debug` world-context submenu is intentionally omitted; NPC-specific context providers, the NPC monitor, and the PsychopatzCore debug hub own those tools
 - tab helper files own their own content areas so medical, bandage, and body-part systems can be added without replacing the window.
 - full character and inventory payloads are requested on demand instead of being replicated every tick.
+- descriptor portraits used for dead or abstract NPCs convert persisted string
+  clothing slots to Build 42 `ItemBodyLocation` values before calling
+  `WornItems:setItem`; the shared PsychopatzCore portrait component owns this
+  engine-version compatibility boundary.
 
 ## Current Tabs
 - `Info`
