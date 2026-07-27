@@ -127,7 +127,71 @@ function Internal.ensureMoveLane(record)
     lane.lastFacingDirY = lane.lastFacingDirY ~= nil and tonumber(lane.lastFacingDirY) or nil
     lane.lastFacingX = lane.lastFacingX ~= nil and tonumber(lane.lastFacingX) or nil
     lane.lastFacingY = lane.lastFacingY ~= nil and tonumber(lane.lastFacingY) or nil
+    lane.vehicleBlockedGoalX = lane.vehicleBlockedGoalX ~= nil
+        and tonumber(lane.vehicleBlockedGoalX) or nil
+    lane.vehicleBlockedGoalY = lane.vehicleBlockedGoalY ~= nil
+        and tonumber(lane.vehicleBlockedGoalY) or nil
+    lane.vehicleBlockedGoalZ = lane.vehicleBlockedGoalZ ~= nil
+        and tonumber(lane.vehicleBlockedGoalZ) or nil
+    lane.vehicleBlockedFromX = lane.vehicleBlockedFromX ~= nil
+        and tonumber(lane.vehicleBlockedFromX) or nil
+    lane.vehicleBlockedFromY = lane.vehicleBlockedFromY ~= nil
+        and tonumber(lane.vehicleBlockedFromY) or nil
+    lane.vehicleBlockedFromZ = lane.vehicleBlockedFromZ ~= nil
+        and tonumber(lane.vehicleBlockedFromZ) or nil
+    lane.vehicleBlockedAt = tonumber(lane.vehicleBlockedAt) or 0
+    lane.vehicleBlockedReason = lane.vehicleBlockedReason or nil
     return lane
+end
+
+function Internal.clearVehicleBlockedGoal(lane)
+    if not lane then return end
+    lane.vehicleBlockedGoalX = nil
+    lane.vehicleBlockedGoalY = nil
+    lane.vehicleBlockedGoalZ = nil
+    lane.vehicleBlockedFromX = nil
+    lane.vehicleBlockedFromY = nil
+    lane.vehicleBlockedFromZ = nil
+    lane.vehicleBlockedAt = 0
+    lane.vehicleBlockedReason = nil
+end
+
+function Internal.isVehicleBlockedGoal(lane, intent)
+    local dx
+    local dy
+    local dz
+    local distance
+    local query
+    local occupancyReason
+    if not lane or not intent or intent.kind ~= "move"
+        or lane.vehicleBlockedGoalX == nil
+        or lane.vehicleBlockedFromX == nil
+    then
+        return false
+    end
+    dx = (tonumber(intent.x) or 0) - lane.vehicleBlockedGoalX
+    dy = (tonumber(intent.y) or 0) - lane.vehicleBlockedGoalY
+    dz = (tonumber(intent.z) or 0) - (tonumber(lane.vehicleBlockedGoalZ) or 0)
+    distance = math.sqrt((dx * dx) + (dy * dy))
+    if distance >= Internal.VEHICLE_BLOCKED_GOAL_CHANGE_DISTANCE
+        or math.abs(dz) >= 1
+    then
+        Internal.clearVehicleBlockedGoal(lane)
+        return false
+    end
+    query = Internal.TraversalQuery or PNC.TraversalQuery
+    occupancyReason = query and query.GetOccupancyReason
+        and query.GetOccupancyReason(
+            lane.vehicleBlockedFromX,
+            lane.vehicleBlockedFromY,
+            lane.vehicleBlockedFromZ
+        )
+        or nil
+    if occupancyReason ~= "vehicle" then
+        Internal.clearVehicleBlockedGoal(lane)
+        return false
+    end
+    return true
 end
 
 function Internal.setLanePhase(record, lane, phase, reason)
@@ -219,6 +283,27 @@ function Internal.consumeMoveIntent(record, lane, zombie)
     local goal
     if not runtime then
         return "hold"
+    end
+    if Internal.isVehicleBlockedGoal(lane, intent) then
+        Internal.captureIntentContext(record, lane, intent)
+        lane.pendingGoal = nil
+        lane.cancelReason = "vehicle_path_blocked"
+        if lane.phase == "active" or lane.phase == "requested" then
+            Internal.setLanePhase(
+                record,
+                lane,
+                "cancel_pending",
+                "vehicle_path_blocked"
+            )
+        elseif lane.phase ~= "idle" and lane.phase ~= "cancel_pending" then
+            Internal.setLanePhase(
+                record,
+                lane,
+                "idle",
+                "vehicle_path_blocked"
+            )
+        end
+        return "vehicle_blocked"
     end
     if lane and lane.traversalAction then
         Internal.captureIntentContext(record, lane, intent)

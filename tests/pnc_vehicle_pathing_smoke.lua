@@ -17,6 +17,7 @@ PNC = {
         end,
         LogWarn = function(message)
             PNC._lastWarning = message
+            PNC._warningCount = (PNC._warningCount or 0) + 1
         end,
         LogRecordDebug = function() end,
     },
@@ -58,7 +59,11 @@ local function makeSquare(vehicleIntersecting)
 end
 
 local clearSquare = makeSquare(false)
+local vehicleBlocking = true
 local vehicleSquare = makeSquare(true)
+vehicleSquare.isVehicleIntersecting = function()
+    return vehicleBlocking
+end
 local cell = {
     getGridSquare = function(_, x)
         return x == 1 and vehicleSquare or clearSquare
@@ -141,9 +146,28 @@ record = {
     x = position.x,
     y = position.y,
     z = position.z,
-    runtime = {},
+    runtime = {
+        moveIntent = {
+            kind = "move",
+            x = 8.5,
+            y = 0.5,
+            z = 0,
+            mode = "walk",
+            stopDistance = 0.7,
+            reason = "test_vehicle_goal",
+        },
+    },
 }
-lane = {}
+lane = {
+    phase = "active",
+    goal = {
+        x = 8.5,
+        y = 0.5,
+        z = 0,
+        mode = "walk",
+        stopDistance = 0.7,
+    },
+}
 local repaired, repairedReason =
     PNC.PathService.Internal.repairInvalidBodyPosition(record, body, lane, 2000)
 assertEqual(repaired, true, "live vehicle position repaired")
@@ -153,9 +177,46 @@ assertEqual(record.x, position.x, "live repair record x")
 assertEqual(record.runtime.forceSyncEvent, "position_recovery", "live repair multiplayer sync")
 assertEqual(record.runtime.positionRecovery.lastEvent, "live_unstuck", "live repair metadata")
 assertEqual(PNC._dirtyDomain, "position_recovery", "live repair persisted")
+assertEqual(lane.phase, "cancel_pending", "vehicle path lane invalidated")
+assertEqual(lane.vehicleBlockedGoalX, 8.5, "vehicle-blocked goal quarantined")
 assert(
     string.find(PNC._lastWarning or "", "event=live_unstuck", 1, true),
     "live repair warning was not logged"
 )
+
+position.x = 1.5
+position.y = 0.5
+repaired = PNC.PathService.Internal.repairInvalidBodyPosition(
+    record,
+    body,
+    lane,
+    2500
+)
+assertEqual(repaired, true, "repeated vehicle position repaired")
+assertEqual(PNC._warningCount, 1, "repeated recovery warning throttled")
+assertEqual(record.runtime.positionRecovery.suppressedLogs, 1,
+    "suppressed recovery warning counted")
+
+PNC.PathService.Internal.logMoveTransition = function() end
+dofile(ROOT .. "PNC_PathService/PNC_PathService_Lane.lua")
+lane.phase = "idle"
+local intentState = PNC.PathService.Internal.consumeMoveIntent(
+    record,
+    lane,
+    body
+)
+assertEqual(intentState, "vehicle_blocked",
+    "same vehicle-blocked goal remains quarantined")
+assertEqual(lane.phase, "idle", "quarantined goal does not restart lane")
+
+vehicleBlocking = false
+intentState = PNC.PathService.Internal.consumeMoveIntent(
+    record,
+    lane,
+    body
+)
+assertEqual(intentState, "requested", "goal released after vehicle moved")
+assertEqual(lane.phase, "requested", "released goal restarts lane")
+assertEqual(lane.vehicleBlockedGoalX, nil, "vehicle quarantine cleared")
 
 print("pnc_vehicle_pathing_smoke: ok")

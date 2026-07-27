@@ -40,6 +40,8 @@ Internal.FACE_MIN_DISTANCE_SQ = 0.0036
 Internal.COMBAT_FACING_DEFAULT_MS = 180
 Internal.NON_LOCOMOTION_RECOVERY_MS = 240
 Internal.LOCOMOTION_VISUAL_LEASE_MS = 420
+Internal.VEHICLE_BLOCKED_GOAL_CHANGE_DISTANCE = 1.75
+Internal.POSITION_RECOVERY_LOG_INTERVAL_MS = 15000
 
 local ALLOWED_MOVE_ACTION_STATES = {
     [""] = true,
@@ -77,6 +79,41 @@ function Internal.syncRecordPosition(record, zombie)
     record.z = zombie:getZ()
 end
 
+local function activeMovementGoal(record, lane)
+    local intent = record and record.runtime and record.runtime.moveIntent or nil
+    if intent and intent.kind == "move" then
+        return intent
+    end
+    return lane and (lane.pendingGoal or lane.goal) or nil
+end
+
+local function quarantineVehicleBlockedGoal(record, lane, fromX, fromY, fromZ, now)
+    local goal = activeMovementGoal(record, lane)
+    if not lane or not goal then
+        return
+    end
+    lane.vehicleBlockedGoalX = tonumber(goal.x)
+    lane.vehicleBlockedGoalY = tonumber(goal.y)
+    lane.vehicleBlockedGoalZ = tonumber(goal.z)
+    lane.vehicleBlockedFromX = tonumber(fromX)
+    lane.vehicleBlockedFromY = tonumber(fromY)
+    lane.vehicleBlockedFromZ = tonumber(fromZ)
+    lane.vehicleBlockedAt = tonumber(now) or Core.Now()
+    lane.vehicleBlockedReason = tostring(
+        goal.reason or lane.intentReason or "vehicle_path_blocked"
+    )
+    lane.pendingGoal = nil
+    lane.cancelReason = "vehicle_path_blocked"
+    if lane.phase == "active" or lane.phase == "requested"
+        or lane.phase == "cancel_pending"
+    then
+        lane.phase = "cancel_pending"
+    else
+        lane.phase = "idle"
+        lane.ownerMode = "idle"
+    end
+end
+
 function Internal.repairInvalidBodyPosition(record, zombie, lane, now)
     local query = Internal.TraversalQuery or PNC.TraversalQuery
     local reason
@@ -88,6 +125,8 @@ function Internal.repairInvalidBodyPosition(record, zombie, lane, now)
     local safeZ
     local recovery
     local message
+    local logKey
+    local shouldLog
     if not record or not zombie or not lane
         or not query
         or not query.GetOccupancyReason
@@ -145,6 +184,23 @@ function Internal.repairInvalidBodyPosition(record, zombie, lane, now)
     lane.blockedStepReason = nil
     lane.steeringSide = nil
     lane.directStepCount = 0
+    if reason == "vehicle" then
+        if lane.traversalAction and Internal.clearTraversalAction then
+            Internal.clearTraversalAction(
+                zombie,
+                lane,
+                "vehicle_position_recovery"
+            )
+        end
+        quarantineVehicleBlockedGoal(
+            record,
+            lane,
+            fromX,
+            fromY,
+            fromZ,
+            now
+        )
+    end
     record.runtime = record.runtime or {}
     recovery = record.runtime.positionRecovery or {}
     record.runtime.positionRecovery = recovery
@@ -169,9 +225,26 @@ function Internal.repairInvalidBodyPosition(record, zombie, lane, now)
         .. " from=" .. tostring(fromX) .. "," .. tostring(fromY) .. "," .. tostring(fromZ)
         .. " to=" .. tostring(safeX) .. "," .. tostring(safeY) .. "," .. tostring(safeZ)
         .. " count=" .. tostring(recovery.count)
-    Core.LogWarn(message)
-    if Core.LogRecordDebug then
-        Core.LogRecordDebug(record, message)
+    logKey = tostring(reason)
+        .. ":"
+        .. tostring(math.floor(tonumber(fromX) or 0))
+        .. ":"
+        .. tostring(math.floor(tonumber(fromY) or 0))
+        .. ":"
+        .. tostring(math.floor(tonumber(fromZ) or 0))
+    shouldLog = recovery.lastLogKey ~= logKey
+        or now - (tonumber(recovery.lastLogAt) or 0)
+            >= Internal.POSITION_RECOVERY_LOG_INTERVAL_MS
+    if shouldLog then
+        recovery.lastLogKey = logKey
+        recovery.lastLogAt = now
+        recovery.suppressedLogs = 0
+        Core.LogWarn(message)
+        if Core.LogRecordDebug then
+            Core.LogRecordDebug(record, message)
+        end
+    else
+        recovery.suppressedLogs = (tonumber(recovery.suppressedLogs) or 0) + 1
     end
     return true, reason
 end
