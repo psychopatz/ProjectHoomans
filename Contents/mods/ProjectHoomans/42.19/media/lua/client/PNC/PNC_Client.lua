@@ -19,14 +19,6 @@ local Interpolation = PNC.ClientInterpolation
 
 Client.BiteReplicas = Client.BiteReplicas or {}
 
-local function tr(key, fallback)
-    local value = getText and getText(key) or nil
-    if not value or value == "" or value == key then
-        return fallback
-    end
-    return value
-end
-
 local function teleportLocalPlayerNear(record, player)
     if not record or not player then
         return false
@@ -527,7 +519,9 @@ function Client.SendDebug(action, payload)
     end
     if action == "spawn" and PNC.API and PNC.API.Spawn then
         local variant = tostring(args.variant or "colonist")
-        local faction = (variant == "hostile_melee" or variant == "hostile_ranged") and "hostile" or PNC.Types.NormalizeFaction(variant)
+        local legacyFaction = (variant == "hostile_melee" or variant == "hostile_ranged")
+            and "hostile" or variant
+        local faction = PNC.Types.NormalizeFaction(args.faction or legacyFaction)
         if faction ~= "colonist" and faction ~= "neutral" and faction ~= "hostile" then
             faction = "colonist"
         end
@@ -556,7 +550,10 @@ function Client.SendDebug(action, payload)
                 x = x, y = y, z = z,
                 radius = Const.ROAM_DEFAULT_RADIUS,
             },
-            equipmentSpawnMode = PNC.Inventory.GetDebugEquipmentSpawnMode(variant),
+            equipmentSpawnMode = PNC.Inventory.GetDebugEquipmentSpawnMode(
+                variant,
+                args.equipmentSpawnMode
+            ),
             forceLive = true,
             debug = true,
         }) ~= nil
@@ -612,7 +609,6 @@ function Client.SendBandage(npcId, partId, debugFree, bandageType)
 end
 
 local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, test)
-    local subMenu
     local square
     if not isWorldReady() then
         return
@@ -623,23 +619,9 @@ local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, te
 
     square = PNC.NPCSelection and PNC.NPCSelection.GetWorldSquare and PNC.NPCSelection.GetWorldSquare(worldobjects) or nil
     if square and Client.CanUseDebug() then
-        subMenu = ISContextMenu:getNew(context)
-        context:addSubMenu(context:addOption(tr("UI_PNC_Spawn", "PNC Spawn")), subMenu)
-        subMenu:addOption(tr("UI_PNC_SpawnColonist", "Spawn Colonist"), nil, function()
-            Client.SendDebug("spawn", { variant = "colonist", x = square:getX(), y = square:getY(), z = square:getZ() })
-        end)
-        subMenu:addOption(tr("UI_PNC_SpawnNeutral", "Spawn Neutral"), nil, function()
-            Client.SendDebug("spawn", { variant = "neutral", x = square:getX(), y = square:getY(), z = square:getZ() })
-        end)
-        subMenu:addOption(tr("UI_PNC_SpawnHostile", "Spawn Hostile (Equipment Chances)"), nil, function()
-            Client.SendDebug("spawn", { variant = "hostile", x = square:getX(), y = square:getY(), z = square:getZ() })
-        end)
-        subMenu:addOption(tr("UI_PNC_SpawnHostileMelee", "Spawn Hostile Melee"), nil, function()
-            Client.SendDebug("spawn", { variant = "hostile_melee", x = square:getX(), y = square:getY(), z = square:getZ() })
-        end)
-        subMenu:addOption(tr("UI_PNC_SpawnHostileRanged", "Spawn Hostile Ranged"), nil, function()
-            Client.SendDebug("spawn", { variant = "hostile_ranged", x = square:getX(), y = square:getY(), z = square:getZ() })
-        end)
+        if PNC.DebugSpawnMenu and PNC.DebugSpawnMenu.Add then
+            PNC.DebugSpawnMenu.Add(context, square)
+        end
     end
     if PNC.ContextHub and PNC.ContextHub.BuildWorldContext then
         PNC.ContextHub.BuildWorldContext(playerNum, context, worldobjects, test)

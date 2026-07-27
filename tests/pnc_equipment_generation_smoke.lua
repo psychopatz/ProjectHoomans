@@ -102,6 +102,12 @@ assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("hostile_melee"), "melee",
     "debug melee override")
 assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("hostile_ranged"), "ranged",
     "debug ranged override")
+assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("neutral", "melee"), "melee",
+    "neutral debug melee override")
+assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("colonist", "ranged"), "ranged",
+    "companion debug ranged override")
+assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("neutral", "both"), "both",
+    "neutral debug both override")
 assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("hostile"), nil,
     "generic debug hostile uses chances")
 assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("colonist"), nil,

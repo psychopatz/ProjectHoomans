@@ -341,6 +341,7 @@ end
 function Damage.ApplyNPCDamage(targetRecord, targetBody, hit)
     local wounds = PNC.NPCWounds
     local network = PNC.Network
+    local relationships = PNC.Relationships
     local applied
     local result
     if not targetRecord or not wounds or not wounds.ApplyCombatDamage then
@@ -348,6 +349,11 @@ function Damage.ApplyNPCDamage(targetRecord, targetBody, hit)
     end
     applied, result = wounds.ApplyCombatDamage(targetRecord, targetBody, hit)
     if not applied then return false, "npc_damage_rejected", result end
+    if hit and hit.attackerKind == "player"
+        and relationships and relationships.ProvokeNeutralByPlayer
+    then
+        relationships.ProvokeNeutralByPlayer(targetRecord)
+    end
     targetRecord.runtime = targetRecord.runtime or {}
     targetRecord.runtime.forceSyncEvent = nil
     if network then

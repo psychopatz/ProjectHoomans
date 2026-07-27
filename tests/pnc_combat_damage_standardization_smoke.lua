@@ -20,6 +20,7 @@ local recordBroadcasts = 0
 local removals = 0
 local corpseCreates = 0
 local zombieReactionOptions
+local playerProvocations = 0
 
 ZombRand = function() return 0 end
 BodyPartType = {
@@ -97,6 +98,13 @@ PNC = {
     ZombieAggro = {
         OnZombieProvoked = function() end,
     },
+    Relationships = {
+        ProvokeNeutralByPlayer = function(record)
+            playerProvocations = playerProvocations + 1
+            record.faction = "hostile"
+            return true
+        end,
+    },
 }
 
 dofile(ROOT .. "Health/PNC_Health.lua")
@@ -156,6 +164,18 @@ assertNear(targetRecord.health.current, 90, "NPC target overall health")
 assertNear(targetRecord.health.body.parts.Head.current, 80, "NPC target part health")
 assertEqual(targetRecord.health.body.wounds.Head.type, "laceration", "NPC target wound record")
 assertEqual(recordBroadcasts, 1, "NPC damage immediately synchronized")
+applied, reason = PNC.CombatDamage.ApplyTargetDamage(nil, nil, {
+    kind = "npc",
+    id = targetRecord.id,
+}, {
+    damage = 1,
+    attackType = "melee",
+    attackerKind = "player",
+})
+assertEqual(applied, true, "player damage reaches NPC")
+assertEqual(reason, "hit_npc", "player NPC target reason")
+assertEqual(playerProvocations, 1, "accepted player hit invokes relationship transition")
+assertEqual(targetRecord.faction, "hostile", "relationship transition precedes broadcast")
 
 local playerPartDamage = 0
 local playerPain = 0

@@ -24,7 +24,7 @@
 - `PNC.Inventory.RegisterEquipmentSpawnPool(poolID, specification)`
 - `PNC.Inventory.AddEquipmentSpawnEntry(poolID, category, entry)`
 - `PNC.Inventory.GetEquipmentSpawnPool(poolID)`
-- `PNC.Inventory.GetDebugEquipmentSpawnMode(variant)`
+- `PNC.Inventory.GetDebugEquipmentSpawnMode(variant, requestedMode)`
 - `PNC.Inventory.ChooseEquipmentSpawnEntry(poolID, category, seed, salt, validator)`
 - `PNC.Inventory.ResolveStartingEquipment(record)`
 - `PNC.Inventory.EnsureRecordInventory(record)`
@@ -98,6 +98,12 @@ receives the same equipment regardless of NPC archetype and across multiplayer,
 save/load, and template rebases. Explicit debug melee/ranged variants set a
 persistent generation override and bypass the chances; ordinary debug spawns
 use the normal chance policy.
+
+The world debug menu nests equipment choices under Companion, Neutral, and
+Hostile. Each faction can use sandbox chances or explicitly force melee,
+ranged, or both weapon categories. Forced choices bypass chance rolls but still
+select concrete items deterministically from the identity-seeded equipment
+pool.
 
 For built-in content, edit `PNC/EquipmentDefinitions/PNC_EquipmentPools.lua`;
 the generation service should remain free of item lists.

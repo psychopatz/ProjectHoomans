@@ -185,7 +185,13 @@ local function handleDebugSpawn(player, args)
     local y = tonumber(args and args.y) or (player and player:getY()) or 0
     local z = tonumber(args and args.z) or (player and player:getZ()) or 0
     local variant = tostring(args and args.variant or "colonist")
-    local faction = (variant == "hostile_melee" or variant == "hostile_ranged") and "hostile" or Types.NormalizeFaction(variant)
+    local legacyFaction = (variant == "hostile_melee" or variant == "hostile_ranged")
+        and "hostile" or variant
+    local faction = Types.NormalizeFaction(args and args.faction or legacyFaction)
+    local equipmentSpawnMode = PNC.Inventory.GetDebugEquipmentSpawnMode(
+        variant,
+        args and args.equipmentSpawnMode
+    )
     local colonist = faction == "colonist"
     local hostile = faction == "hostile"
     if faction ~= "colonist" and faction ~= "neutral" and faction ~= "hostile" then
@@ -216,10 +222,11 @@ local function handleDebugSpawn(player, args)
         ownerOnlineID = ownerOnlineID,
         orderSpec = orderSpec,
         forceLive = true,
-        equipmentSpawnMode = PNC.Inventory.GetDebugEquipmentSpawnMode(variant),
+        equipmentSpawnMode = equipmentSpawnMode,
         debug = true,
     })
     Core.LogInfo("PNC debug spawn variant=" .. variant .. " faction=" .. faction
+        .. " equipment=" .. tostring(equipmentSpawnMode or "sandbox_chances")
         .. " id=" .. tostring(record and record.id or "failed"))
     return record
 end

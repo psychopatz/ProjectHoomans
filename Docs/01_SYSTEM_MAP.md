@@ -12,6 +12,7 @@
 - `PNC/EquipmentDefinitions/PNC_EquipmentPools`: version-independent built-in equipment catalog
 - `PNC_Persistence`: versioned canonical save schema, migration, and runtime rehydrate
 - `PNC_Registry`: authoritative NPC records and live body lookup
+- `PNC_Relationships`: faction-enemy matrix and authoritative disposition transitions
 - `PNC_SpatialIndex`: indexed nearby player, NPC, and zombie queries
 - `PNC_Stealth`: follow-stealth state and stealth-based combat suppression
 - `PNC_Perception`: target selection, zombie lookup, and nearby threat counting
@@ -69,6 +70,7 @@
 
 ## Client
 - `PNC_Client`: roster cache, character-payload cache, sync requests, context menu debug tools
+- `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
 - `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby embodied NPCs
 - `PNC_ContextHub`: central reusable NPC selection and right-click hub
 - `PNC_NPCSelection`: cursor-space NPC selection helper used by context providers

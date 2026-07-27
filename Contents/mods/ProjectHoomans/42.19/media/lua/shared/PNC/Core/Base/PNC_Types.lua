@@ -87,7 +87,9 @@ function Types.DefaultHostility(faction)
         return { mode = "hostile_any_player", attackPlayers = true, attackNPCs = true, attackZombies = true }
     end
     if faction == "neutral" then
-        return { mode = "neutral", attackPlayers = false, attackNPCs = false, attackZombies = false }
+        -- Neutral survivors do not initiate violence against players or
+        -- zombies, but hostile looters are enemies of every survivor faction.
+        return { mode = "neutral", attackPlayers = false, attackNPCs = true, attackZombies = false }
     end
     return { mode = "defend_owner", attackPlayers = false, attackNPCs = true, attackZombies = true }
 end
@@ -95,12 +97,18 @@ end
 function Types.NormalizeHostility(faction, value)
     local source = type(value) == "table" and value or {}
     local defaults = Types.DefaultHostility(faction)
-    return {
+    local normalized = {
         mode = tostring(source.mode or defaults.mode),
         attackPlayers = source.attackPlayers == nil and defaults.attackPlayers or source.attackPlayers == true,
         attackNPCs = source.attackNPCs == nil and defaults.attackNPCs or source.attackNPCs == true,
         attackZombies = source.attackZombies == nil and defaults.attackZombies or source.attackZombies == true,
     }
+    -- Migrate neutral records written before the base relationship rule was
+    -- introduced. Hostile NPCs must be valid threats to neutral survivors.
+    if Types.NormalizeFaction(faction) == "neutral" then
+        normalized.attackNPCs = true
+    end
+    return normalized
 end
 
 local function normalizePatrolPoints(points, fallbackX, fallbackY, fallbackZ)

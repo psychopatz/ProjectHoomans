@@ -6,6 +6,7 @@ PNC.EventMarkers = PsychopatzCore.EventMarkers
 require "PNC/UI/PNC_Settings"
 require "PNC/UI/Context/PNC_NPCSelection"
 require "PNC/UI/Context/PNC_ContextHub"
+require "PNC/UI/Context/PNC_DebugSpawnMenu"
 require "PNC/UI/Context/Providers/PNC_ContextProvider_Revive"
 require "PNC/UI/Context/Providers/PNC_ContextProvider_Bandage"
 require "PNC/UI/Context/Providers/PNC_ContextProvider_Debug"

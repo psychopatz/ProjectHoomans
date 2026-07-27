@@ -8,6 +8,11 @@
 - `PNC_Combat_Melee`, `PNC_Combat_Ranged`, `PNC_Combat_AttackActions`, `PNC_Combat_Tactics`, and `PNC_Combat_Unarmed` own focused combat responsibilities
 - custom damage routes through `PNC_Health`
 - player weapon hits damage neutral and hostile NPCs through a server-authoritative hit bridge; colonists are protected from player damage
+- hostile NPCs treat companions and neutral survivors as enemies; companions
+  and neutrals reciprocally recognize hostile NPCs while remaining peaceful
+  with each other
+- an accepted player weapon hit converts a neutral NPC to hostile, immediately
+  assigns hostile hunting behavior, and makes it a valid companion target
 - live NPC bodies use a high engine-health safety buffer so vanilla zombie-body damage cannot bypass custom HP, incapacitation, or multiplayer validation
 - players, NPCs, and zombies use the same target format
 
@@ -35,7 +40,8 @@
 - delayed attacks retain a runtime-only direct zombie reference plus the stable
   spatial ID, and cancel immediately with `target_lost_or_dead` if neither
   resolves before the hit frame
-- colonists and hostiles can both acquire zombie targets
+- companions and hostiles can acquire zombie targets; neutrals reserve combat
+  for hostile NPCs until their disposition changes
 - companion, roaming, and hostile behaviors share periodic target
   reassessment. A nearby enemy actively attacking the NPC takes priority over
   a passive target; otherwise a substantially closer candidate may replace the

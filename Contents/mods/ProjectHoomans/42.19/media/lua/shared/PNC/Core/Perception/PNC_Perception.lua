@@ -13,6 +13,7 @@ local Const = PNC.Const
 local Spatial = PNC.SpatialIndex
 local Stealth = PNC.Stealth
 local Registry = PNC.Registry
+local Relationships = PNC.Relationships
 
 local function isImmediateThreat(target)
     local radius = tonumber(Const.TARGET_IMMEDIATE_THREAT_RADIUS) or 6
@@ -143,16 +144,9 @@ function Perception.SelectPreferredTarget(firstTarget, secondTarget)
 end
 
 local function isRecordEnemy(source, target)
-    if not source or not target or source.id == target.id then
-        return false
-    end
-    if source.hostility and source.hostility.attackNPCs == false then
-        return false
-    end
-    if source.faction == "hostile" then
-        return target.faction ~= "hostile"
-    end
-    return target.faction == "hostile"
+    return Relationships and Relationships.AreNPCsEnemies
+        and Relationships.AreNPCsEnemies(source, target)
+        or false
 end
 
 function Perception.CanSeeWorldObject(record, targetObject)

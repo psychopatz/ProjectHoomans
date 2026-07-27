@@ -103,8 +103,14 @@ function Inventory.GetEquipmentSpawnPool(poolID)
     return Inventory.EquipmentSpawnPools[normalizeString(poolID) or "Default"]
 end
 
-function Inventory.GetDebugEquipmentSpawnMode(variant)
+function Inventory.GetDebugEquipmentSpawnMode(variant, requestedMode)
     variant = tostring(variant or "")
+    requestedMode = tostring(requestedMode or "")
+    if requestedMode == "melee" or requestedMode == "ranged"
+        or requestedMode == "both"
+    then
+        return requestedMode
+    end
     if variant == "hostile_melee" then return "melee" end
     if variant == "hostile_ranged" then return "ranged" end
     return nil
