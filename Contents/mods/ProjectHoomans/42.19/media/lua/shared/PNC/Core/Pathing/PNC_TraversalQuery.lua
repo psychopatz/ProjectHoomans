@@ -89,7 +89,15 @@ function TraversalQuery.GetPassageBetween(fromSquare, toSquare)
     if object then
         return object
     end
+    object = callFirst(toSquare, { "getDoorTo", "getIsoDoorTo" }, fromSquare)
+    if object then
+        return object
+    end
     object = callFirst(fromSquare, { "getWindowTo", "getWindowOrWindowThumpableTo", "getWindowThumpableTo" }, toSquare)
+    if object then
+        return object
+    end
+    object = callFirst(toSquare, { "getWindowTo", "getWindowOrWindowThumpableTo", "getWindowThumpableTo" }, fromSquare)
     if object then
         return object
     end

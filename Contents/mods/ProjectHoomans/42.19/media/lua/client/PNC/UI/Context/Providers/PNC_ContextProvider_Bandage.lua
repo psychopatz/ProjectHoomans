@@ -70,6 +70,17 @@ function Provider.addOptions(menu, entry, player)
         )
         if bandageCount <= 0 or not inRange then option.notAvailable = true end
     end
+    if PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() and #wounds > 0 then
+        local debugMenu = ISContextMenu:getNew(menu)
+        menu:addSubMenu(menu:addOption(tr("UI_PNC_DebugBandage", "Debug Bandage (No Item)")), debugMenu)
+        for i = 1, #wounds do
+            local row = wounds[i]
+            local partId = row.partId
+            debugMenu:addOption(row.label, nil, function()
+                PNC.Client.SendBandage(entry.id, partId, true)
+            end)
+        end
+    end
 end
 
 ContextHub.RegisterProvider(Provider)

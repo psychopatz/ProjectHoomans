@@ -216,6 +216,35 @@ function Internal.updateActiveMove(zombie, record, lane)
 
     Internal.refreshResolvedLocomotion(record, lane, zombie, goal)
     lane.lastActionState = Internal.getActionStateName(zombie)
+    if Internal.isDoorCollision
+        and Internal.isDoorCollision(zombie)
+        and Internal.tryDoorOrWindowInteraction
+    then
+        interacted, interactType = Internal.tryDoorOrWindowInteraction(zombie, record, lane, goal.x, goal.y, goal.z)
+        if interacted then
+            lane.lastIssueAt = now
+            lane.lastProgressAt = now
+            lane.noProgressCount = 0
+            lane.lastStepAt = now
+            lane.lastX = zombie:getX()
+            lane.lastY = zombie:getY()
+            if interactType == "door_open" then
+                lane.ownerMode = "door_open"
+                lane.specialMoveUntil = now + 180
+                lane.specialAnim = nil
+            elseif interactType == "window_open" then
+                lane.ownerMode = "window_open"
+                lane.specialMoveUntil = now + 250
+                lane.specialAnim = nil
+            elseif interactType == "fence_climb" then
+                lane.ownerMode = "fence_climb"
+            else
+                lane.ownerMode = "window_climb"
+            end
+            Internal.logMoveDebug(record, zombie, lane, "collision_interact", interactType or "door_or_window", "")
+            return true, interactType or "interact"
+        end
+    end
     -- A collision can put the embodied zombie into a vanilla traversal state
     -- before a tiny fake-locomotion step crosses the tile boundary. Adopt the
     -- obstacle immediately instead of suppressing the state forever.

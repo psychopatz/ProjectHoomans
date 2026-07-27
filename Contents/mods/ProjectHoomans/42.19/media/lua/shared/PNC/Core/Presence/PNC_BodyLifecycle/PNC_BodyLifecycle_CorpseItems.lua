@@ -182,9 +182,9 @@ function Internal.prepareCorpseItems(record, zombie)
             end
         end
     end
-    if wornItems and wornItems.addItemsToItemContainer then
-        pcall(wornItems.addItemsToItemContainer, wornItems, container)
-    end
+    -- Every remembered or created item is already inserted through
+    -- addItemToContainer(). Calling addItemsToItemContainer() again produces
+    -- duplicate inventory IDs during IsoDeadBody conversion in multiplayer.
     for i = 1, #allItems do
         Internal.addItemToContainer(container, allItems[i])
     end

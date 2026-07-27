@@ -7,6 +7,7 @@ local function assertEqual(actual, expected, label)
 end
 
 local refreshCount = 0
+local clothingVisuals = {}
 PNC = {
     Core = { LogWarn = function() end },
     Visuals = {
@@ -15,6 +16,10 @@ PNC = {
         end,
         RefreshModel = function()
             refreshCount = refreshCount + 1
+        end,
+        AddClothingVisual = function(_, fullType)
+            clothingVisuals[#clothingVisuals + 1] = fullType
+            return true, "visual_added"
         end,
     },
 }
@@ -86,8 +91,8 @@ local record = {
 
 local applied = PNC.Equipment.ApplyHands(zombie, record)
 assertEqual(applied, true, "idle equipment apply")
-assertEqual(zombie.primary, nil, "idle primary hand")
-assertEqual(zombie.attached.Back, weapon, "idle holstered weapon")
+assertEqual(zombie.primary, weapon, "spawn primary hand")
+assertEqual(zombie.attached.Back, nil, "no implicit spawn holster")
 
 record.runtime = { target = { kind = "zombie" } }
 applied = PNC.Equipment.ApplyCombatState(zombie, record, true)
@@ -97,12 +102,53 @@ assertEqual(zombie.attached.Back, nil, "combat holster cleared")
 
 record.runtime.target = nil
 applied = PNC.Equipment.ApplyCombatState(zombie, record, false)
-assertEqual(applied, true, "holster equipment apply")
-assertEqual(zombie.primary, nil, "holstered primary hand")
-assertEqual(zombie.attached.Back, weapon, "weapon returned to holster")
+assertEqual(applied, true, "idle combat-state equipment apply")
+assertEqual(zombie.primary, weapon, "idle primary remains equipped")
+assertEqual(zombie.attached.Back, nil, "idle primary is not implicitly holstered")
 assert(primarySet >= 3, "primary hand state was not refreshed")
 assert(handModelsReset > 0, "hand models were not refreshed")
 assert(refreshCount > 0, "equipment presentation did not refresh the model")
+
+local appliedCondition
+local shirtBodyLocation = {}
+local clothing = {
+    setCondition = function(_, value) appliedCondition = value end,
+    getConditionMax = function() return 10 end,
+    getBodyLocation = function() return shirtBodyLocation end,
+}
+PNC.Equipment.CreateItem = function()
+    return clothing, "test_clothing"
+end
+local worn = { clear = function() end }
+local visuals = { clear = function() end }
+local dressedZombie = {
+    attached = {},
+    getWornItems = function() return worn end,
+    getItemVisuals = function() return visuals end,
+    setWornItem = function(_, location, item)
+        assertEqual(location, shirtBodyLocation, "typed worn item location")
+        assertEqual(item, clothing, "worn item instance")
+    end,
+    getAttachedItems = function()
+        return { size = function() return 0 end }
+    end,
+    setVariable = function() end,
+    setPrimaryHandItem = function() end,
+    setSecondaryHandItem = function() end,
+    resetEquippedHandsModels = function() end,
+}
+local dressedRecord = {
+    equipment = { worn = { Shirt = "Base.Shirt_FormalWhite" }, attached = {} },
+    inventory = {
+        worn = { Shirt = "shirt_1" },
+        items = { shirt_1 = { id = "shirt_1", type = "Base.Shirt_FormalWhite", cond = 3 } },
+    },
+    runtime = {},
+}
+applied = PNC.Equipment.Apply(dressedZombie, dressedRecord)
+assertEqual(applied, true, "full clothing apply")
+assertEqual(appliedCondition, 3, "virtual condition copied to live worn item")
+assertEqual(clothingVisuals[#clothingVisuals], "Base.Shirt_FormalWhite", "explicit clothing visual applied")
 
 local calls = {
     appearance = 0,

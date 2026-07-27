@@ -40,7 +40,9 @@ local WOUND_STATS = {
     scratch = { priority = 1, damage = 4, bleedingRate = 0.018 },
     laceration = { priority = 2, damage = 8, bleedingRate = 0.055 },
     bite = { priority = 3, damage = 12, bleedingRate = 0.085 },
+    bullet = { priority = 4, damage = 14, bleedingRate = 0.095 },
 }
+local DEBUG_WOUND_TYPES = { "scratch", "laceration", "bite" }
 
 local function worldHour()
     local gameTime = getGameTime and getGameTime() or nil
@@ -71,6 +73,11 @@ local function choosePart()
         if roll < 0 then return part end
     end
     return Wounds.Parts.Torso_Upper
+end
+
+function Wounds.ChoosePartId()
+    local part = choosePart()
+    return part and part.id or "Torso_Upper"
 end
 
 local function resolvePartIndex(part)
@@ -133,13 +140,113 @@ end
 
 function Wounds.Ensure(record)
     local health = PNC.Health and PNC.Health.Ensure and PNC.Health.Ensure(record) or record.health
+    local initialRatio = Core.Clamp(
+        (tonumber(health.current) or tonumber(health.max) or 100)
+            / math.max(1, tonumber(health.max) or 100),
+        0,
+        1
+    )
+    local i
+    local partId
+    local partHealth
     health.body = type(health.body) == "table" and health.body or {}
     health.body.wounds = type(health.body.wounds) == "table" and health.body.wounds or {}
+    health.body.parts = type(health.body.parts) == "table" and health.body.parts or {}
+    for i = 1, #Wounds.PartOrder do
+        partId = Wounds.PartOrder[i]
+        partHealth = health.body.parts[partId]
+        if type(partHealth) ~= "table" then
+            partHealth = { current = initialRatio * 100, max = 100 }
+            health.body.parts[partId] = partHealth
+        else
+            partHealth.max = math.max(1, tonumber(partHealth.max) or 100)
+            partHealth.current = Core.Clamp(
+                tonumber(partHealth.current) or partHealth.max,
+                0,
+                partHealth.max
+            )
+        end
+    end
     health.body.bleedingRate = tonumber(health.body.bleedingRate) or 0
     health.body.openWoundCount = tonumber(health.body.openWoundCount) or 0
     health.body.bandagedWoundCount = tonumber(health.body.bandagedWoundCount) or 0
     health.body.lastBleedAt = tonumber(health.body.lastBleedAt) or 0
     return health.body
+end
+
+-- The public NPC HP value is derived from the mean percentage of all body
+-- parts. This keeps the character window, network snapshot, monitor and
+-- overhead nameplate on one authoritative value.
+function Wounds.SyncOverallHealth(record)
+    local health = record and record.health or nil
+    local body = health and Wounds.Ensure(record) or nil
+    local totalPercent = 0
+    local i
+    local partHealth
+    if not body then return nil end
+    for i = 1, #Wounds.PartOrder do
+        partHealth = body.parts[Wounds.PartOrder[i]]
+        totalPercent = totalPercent + Core.Clamp(
+            (tonumber(partHealth.current) or 0) / math.max(1, tonumber(partHealth.max) or 100),
+            0,
+            1
+        )
+    end
+    body.totalPartHealth = totalPercent * 100
+    body.totalPartMax = #Wounds.PartOrder * 100
+    body.overallPercent = totalPercent / #Wounds.PartOrder * 100
+    health.current = Core.Clamp(
+        (tonumber(health.max) or 100) * body.overallPercent / 100,
+        0,
+        tonumber(health.max) or 100
+    )
+    return health.current
+end
+
+function Wounds.SetOverallHealth(record, value)
+    local health = record and record.health or nil
+    local body = health and Wounds.Ensure(record) or nil
+    local ratio
+    local i
+    local partHealth
+    if not body then return nil end
+    ratio = Core.Clamp((tonumber(value) or 0) / math.max(1, tonumber(health.max) or 100), 0, 1)
+    for i = 1, #Wounds.PartOrder do
+        partHealth = body.parts[Wounds.PartOrder[i]]
+        partHealth.current = partHealth.max * ratio
+    end
+    return Wounds.SyncOverallHealth(record)
+end
+
+local function changeBodyHealth(record, amount, partId, healing)
+    local body = Wounds.Ensure(record)
+    local count = #Wounds.PartOrder
+    local selectedScale = partId and 2 or 1
+    local otherScale = partId and ((count - selectedScale) / math.max(1, count - 1)) or 1
+    local i
+    local id
+    local partHealth
+    local scale
+    amount = math.max(0, tonumber(amount) or 0)
+    for i = 1, count do
+        id = Wounds.PartOrder[i]
+        partHealth = body.parts[id]
+        scale = id == partId and selectedScale or otherScale
+        if healing then
+            partHealth.current = math.min(partHealth.max, partHealth.current + amount * scale)
+        else
+            partHealth.current = math.max(0, partHealth.current - amount * scale)
+        end
+    end
+    return Wounds.SyncOverallHealth(record)
+end
+
+function Wounds.ApplyBodyDamage(record, amount, partId)
+    return changeBodyHealth(record, amount, partId and tostring(partId) or nil, false)
+end
+
+function Wounds.ApplyBodyHealing(record, amount, partId)
+    return changeBodyHealth(record, amount, partId and tostring(partId) or nil, true)
 end
 
 function Wounds.Recalculate(record)
@@ -159,6 +266,7 @@ function Wounds.Recalculate(record)
     body.bleedingRate = bleedingRate
     body.openWoundCount = openCount
     body.bandagedWoundCount = bandagedCount
+    Wounds.SyncOverallHealth(record)
     return body
 end
 
@@ -193,9 +301,10 @@ local function chooseWoundType()
     return "scratch"
 end
 
-local function addWound(record, part, woundType, now)
+local function addWound(record, part, woundType, now, woundDamage)
     local body = Wounds.Ensure(record)
     local stats = WOUND_STATS[woundType] or WOUND_STATS.scratch
+    local severityDamage = math.max(0.1, tonumber(woundDamage) or tonumber(stats.damage) or 4)
     local existing = body.wounds[part.id]
     local existingStats = existing and WOUND_STATS[existing.type] or nil
     local wound = existing or {
@@ -207,7 +316,8 @@ local function addWound(record, part, woundType, now)
     end
     wound.bleedingRate = math.min(0.18, math.max(tonumber(wound.bleedingRate) or 0, stats.bleedingRate)
         + (existing and stats.bleedingRate * 0.35 or 0))
-    wound.severity = math.min(100, (tonumber(wound.severity) or 0) + stats.damage)
+    wound.severity = math.min(100, (tonumber(wound.severity) or 0) + severityDamage)
+    wound.damage = math.min(100, (tonumber(wound.damage) or 0) + severityDamage)
     wound.bandaged = false
     wound.bandagedAt = 0
     wound.healAtWorldHour = 0
@@ -215,6 +325,88 @@ local function addWound(record, part, woundType, now)
     if woundType == "bite" then infect(record, part.id, worldHour()) end
     Wounds.Recalculate(record)
     return wound, stats.damage
+end
+
+function Wounds.ApplyCombatDamage(record, npcBody, damageEvent)
+    local partId = damageEvent and damageEvent.partId and tostring(damageEvent.partId) or Wounds.ChoosePartId()
+    local part = Wounds.Parts[partId]
+    local woundType = tostring(damageEvent and damageEvent.woundType or "scratch")
+    local amount = math.max(0, tonumber(damageEvent and damageEvent.amount) or 0)
+    local applied
+    local wound
+    if not record or record.alive == false or not part or amount <= 0 then
+        return false, { outcome = "invalid_target", partId = partId }
+    end
+    if not WOUND_STATS[woundType] then
+        woundType = "scratch"
+    end
+    applied = PNC.Health.ApplyDamage(record, npcBody, {
+        amount = amount,
+        partId = part.id,
+        type = tostring(damageEvent and damageEvent.type or "combat_" .. woundType),
+        attackerID = damageEvent and damageEvent.attackerID,
+        attackerKind = damageEvent and damageEvent.attackerKind or "npc",
+        attackerOnlineID = damageEvent and damageEvent.attackerOnlineID,
+        attackerUsername = damageEvent and damageEvent.attackerUsername,
+        weaponFullType = damageEvent and damageEvent.weaponFullType,
+        x = damageEvent and damageEvent.x,
+        y = damageEvent and damageEvent.y,
+        z = damageEvent and damageEvent.z,
+    })
+    if not applied then
+        return false, { outcome = "damage_rejected", partId = part.id }
+    end
+    if record.alive ~= false then
+        wound = addWound(record, part, woundType, Core.Now(), amount)
+    end
+    record.runtime = record.runtime or {}
+    record.runtime.forceSyncEvent = record.alive == false and "death" or "combat_damage"
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "wounds")
+    end
+    return true, {
+        outcome = record.alive == false and "killed" or "wounded",
+        partId = part.id,
+        woundType = wound and wound.type or woundType,
+        damage = amount,
+        infected = Wounds.HasActiveInfection(record),
+    }
+end
+
+function Wounds.ApplyDebugWound(record, npcBody, partId, woundType, amount)
+    local part = partId and Wounds.Parts[tostring(partId)] or choosePart()
+    local selectedType = tostring(woundType or "")
+    local wound
+    local defaultDamage
+    local appliedDamage
+    if not record or record.alive == false or not part then
+        return false, { outcome = "invalid_target" }
+    end
+    if not WOUND_STATS[selectedType] then
+        local roll = ZombRand and ZombRand(#DEBUG_WOUND_TYPES)
+            or math.floor(math.random() * #DEBUG_WOUND_TYPES)
+        selectedType = DEBUG_WOUND_TYPES[(tonumber(roll) or 0) + 1] or "scratch"
+    end
+    wound, defaultDamage = addWound(record, part, selectedType, Core.Now(), amount)
+    appliedDamage = math.max(0.1, tonumber(amount) or tonumber(defaultDamage) or 4)
+    PNC.Health.ApplyDamage(record, npcBody, {
+        amount = appliedDamage,
+        partId = part.id,
+        type = "debug_" .. selectedType,
+        attackerKind = "debug",
+    })
+    record.runtime = record.runtime or {}
+    record.runtime.forceSyncEvent = "debug_wound"
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "wounds")
+    end
+    return true, {
+        outcome = "wounded",
+        partId = part.id,
+        woundType = wound.type,
+        damage = appliedDamage,
+        infected = Wounds.HasActiveInfection(record),
+    }
 end
 
 function Wounds.ResolveZombieAttack(record, npcBody, attacker)
@@ -239,6 +431,7 @@ function Wounds.ResolveZombieAttack(record, npcBody, attacker)
     wound, damage = addWound(record, part, woundType, Core.Now())
     PNC.Health.ApplyDamage(record, npcBody, {
         amount = damage,
+        partId = part.id,
         type = "zombie_" .. woundType,
         attackerKind = "zombie",
         x = attacker and attacker.getX and attacker:getX() or record.x,
@@ -277,6 +470,7 @@ function Wounds.TriggerInfectionDeath(record, zombie, reason)
     if not zombie then
         local newlyPending = infection.pendingFatal ~= true
         infection.pendingFatal = true
+        Wounds.SetOverallHealth(record, math.max(1, tonumber(record.health.current) or 1))
         record.health.current = math.max(1, tonumber(record.health.current) or 1)
         if newlyPending and PNC.Registry and PNC.Registry.MarkDirty then
             PNC.Registry.MarkDirty(record, "infection")
@@ -354,6 +548,7 @@ function Wounds.Update(record, zombie, now)
             and (tonumber(wound.healAtWorldHour) or 0) > 0
             and currentHour >= tonumber(wound.healAtWorldHour)
         then
+            Wounds.ApplyBodyHealing(record, tonumber(wound.damage) or tonumber(wound.severity) or 0, partId)
             body.wounds[partId] = nil
             changed = true
         end
@@ -375,16 +570,17 @@ function Wounds.Update(record, zombie, now)
     body.lastBleedAt = now
     if health.state == "normal" and (tonumber(body.bleedingRate) or 0) > 0 then
         bleedDamage = body.bleedingRate * math.min(10, elapsed / 1000)
-        health.current = math.max(0, (tonumber(health.current) or 0) - bleedDamage)
-        health.recentDamageUntil = now + (tonumber(Const.RECENT_DAMAGE_SHOW_MS) or 4000)
-        if health.current <= 0 then
-            if Wounds.HasActiveInfection(record) then
-                Wounds.TriggerInfectionDeath(record, zombie, "infected_blood_loss")
-            else
-                PNC.Health.EnterIncapacitated(record, zombie, "blood_loss")
-            end
-            return true
+        partId = nil
+        for _, wound in pairs(body.wounds) do
+            if wound.bandaged ~= true then partId = wound.partId break end
         end
+        PNC.Health.ApplyDamage(record, zombie, {
+            amount = bleedDamage,
+            partId = partId,
+            type = "blood_loss",
+            attackerKind = "wound",
+        })
+        if health.state ~= "normal" or record.alive == false then return true end
         record.runtime = record.runtime or {}
         if now - (tonumber(record.runtime.lastWoundDirtyAt) or 0)
             >= (tonumber(Const.WOUND_DIRTY_FLUSH_MS) or 5000)
@@ -406,6 +602,10 @@ function Wounds.BuildSnapshot(record)
         infected = Wounds.HasActiveInfection(record),
         infection = body.infection and Core.DeepCopy(body.infection) or nil,
         wounds = {},
+        parts = Core.DeepCopy(body.parts),
+        totalPartHealth = body.totalPartHealth,
+        totalPartMax = body.totalPartMax,
+        overallPercent = body.overallPercent,
     }
     local i
     local partId

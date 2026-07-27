@@ -127,6 +127,7 @@ end
 function PlayerDamage.Apply(record, zombie, attacker, weapon, reportedDamage, source)
     local amount
     local applied
+    local usedCombatService = false
     if not record or not zombie then
         return false, "missing_target"
     end
@@ -139,16 +140,36 @@ function PlayerDamage.Apply(record, zombie, attacker, weapon, reportedDamage, so
         restoreEngineBuffer(zombie, record)
         return false, "invalid_damage"
     end
-    applied = Health.ApplyDamage(record, zombie, {
-        amount = amount,
-        type = tostring(source or "player_weapon"),
-        attackerKind = "player",
-        attackerOnlineID = attacker and attacker.getOnlineID and attacker:getOnlineID() or nil,
-        attackerUsername = attacker and attacker.getUsername and attacker:getUsername() or nil,
-        weaponFullType = getFullType(weapon),
-    }) == true
+    if PNC.CombatDamage and PNC.CombatDamage.ApplyTargetDamage then
+        usedCombatService = true
+        applied = PNC.CombatDamage.ApplyTargetDamage(nil, attacker, {
+            kind = "npc",
+            id = record.id,
+        }, {
+            damage = amount,
+            attackType = isRangedWeapon(weapon) and "ranged" or "melee",
+            attackKind = tostring(source or "player_weapon"),
+            attackerKind = "player",
+            attackerOnlineID = attacker and attacker.getOnlineID and attacker:getOnlineID() or nil,
+            attackerUsername = attacker and attacker.getUsername and attacker:getUsername() or nil,
+            weaponItem = weapon,
+            weaponFullType = getFullType(weapon),
+            x = attacker and attacker.getX and attacker:getX() or nil,
+            y = attacker and attacker.getY and attacker:getY() or nil,
+            z = attacker and attacker.getZ and attacker:getZ() or nil,
+        })
+    else
+        applied = Health.ApplyDamage(record, zombie, {
+            amount = amount,
+            type = tostring(source or "player_weapon"),
+            attackerKind = "player",
+            attackerOnlineID = attacker and attacker.getOnlineID and attacker:getOnlineID() or nil,
+            attackerUsername = attacker and attacker.getUsername and attacker:getUsername() or nil,
+            weaponFullType = getFullType(weapon),
+        }) == true
+    end
     restoreEngineBuffer(zombie, record)
-    if applied and Network and Network.BroadcastRecord then
+    if applied and not usedCombatService and Network and Network.BroadcastRecord then
         Network.BroadcastRecord(record, "player_damage")
     end
     return applied, applied and "damaged" or "damage_rejected"
@@ -268,4 +289,3 @@ if Events and Events.OnWeaponHitCharacter and not PlayerDamage.WeaponHitHookRegi
     Events.OnWeaponHitCharacter.Add(onWeaponHitCharacter)
     PlayerDamage.WeaponHitHookRegistered = true
 end
-

@@ -94,6 +94,10 @@ local record = {
         max = 100,
         state = "normal",
         body = {
+            parts = {
+                ForeArm_L = { current = 76, max = 100 },
+                Head = { current = 88.75, max = 100 },
+            },
             wounds = {
                 ForeArm_L = {
                     partId = "ForeArm_L",
@@ -129,12 +133,14 @@ assert(payload, "serialization failed without next()")
 assert(payload.progression.skillLevelDeltas.Strength == 3, "legacy skill delta conversion failed")
 assert(payload.health.body.wounds.ForeArm_L, "body wound was not serialized")
 assert(payload.health.body.infection.active == true, "infection was not serialized")
+assert(payload.health.body.parts.ForeArm_L.current == 76, "body-part health was not serialized")
 
 local restored = PNC.Persistence.DeserializeRecord(payload, record.id)
 assert(restored, "deserialization failed without next()")
 assert(restored.progression.skillLevelDeltas.Strength == 3, "deserialized skill delta changed")
 assert(restored.health.body.wounds.ForeArm_L.type == "bite", "body wound did not round trip")
 assert(restored.health.body.infection.sourcePart == "ForeArm_L", "infection did not round trip")
+assert(restored.health.body.parts.ForeArm_L.current == 76, "body-part health did not round trip")
 assert(restored.health.body.lastBleedAt == 0, "wall clock bleed timestamp was persisted")
 
 next = originalNext

@@ -42,6 +42,7 @@ local function makeWornItems()
     function worn:clear() entries = {} end
     function worn:setItem(location, item)
         local i
+        assert(type(location) ~= "string", "Build 42 requires typed ItemBodyLocation")
         assertEqual(item:getContainer(), container, "worn item container ordering")
         for i = #entries, 1, -1 do
             if entries[i]:getLocation() == location then
@@ -54,10 +55,7 @@ local function makeWornItems()
         }
     end
     function worn:addItemsToItemContainer(target)
-        local i
-        for i = 1, #entries do
-            target:AddItem(entries[i]:getItem())
-        end
+        error("worn items were redundantly re-added to their existing container")
     end
     function worn:getItem(location)
         local i
@@ -72,6 +70,9 @@ local function makeWornItems()
 end
 
 local visualCopies = 0
+local shirtBodyLocation = setmetatable({}, {
+    __tostring = function() return "Shirt" end,
+})
 local itemVisual = {
     copyFrom = function(_, source)
         assert(source, "missing source clothing visual")
@@ -80,7 +81,7 @@ local itemVisual = {
 }
 local shirt = {
     getFullType = function() return "Base.Shirt_FormalWhite" end,
-    getBodyLocation = function() return "Shirt" end,
+    getBodyLocation = function() return shirtBodyLocation end,
     getContainer = function(self) return self.container end,
     getVisual = function() return itemVisual end,
 }
@@ -101,7 +102,7 @@ local corpse = {
     setFakeDead = function() end,
     setReanimateTime = function() end,
     transmitCompleteItemToClients = function()
-        assertEqual(corpseWorn:getItem("Shirt"), shirt, "transmitted corpse worn shirt")
+        assertEqual(corpseWorn:getItem(shirtBodyLocation), shirt, "transmitted corpse worn shirt")
         assertEqual(corpseModData.PNC_BodyKind, "corpse", "transmitted corpse body kind")
         transmitCount = transmitCount + 1
     end,
@@ -113,6 +114,7 @@ local zombie = {
     getPrimaryHandItem = function() return nil end,
     getSecondaryHandItem = function() return nil end,
     setWornItem = function(_, location, item)
+        if tostring(location or "") == "Shirt" then location = shirtBodyLocation end
         sourceWorn:setItem(location, item)
     end,
     getX = function() return 10 end,
@@ -183,8 +185,8 @@ local created, result = PNC.BodyLifecycle.CreateInertCorpse(record, zombie, "tes
 assertEqual(created, true, "corpse creation")
 assertEqual(result, corpse, "created corpse instance")
 assertEqual(#inventoryValues, 1, "corpse clothing inventory count")
-assertEqual(sourceWorn:getItem("Shirt"), shirt, "source worn shirt")
-assertEqual(corpseWorn:getItem("Shirt"), shirt, "corpse worn shirt")
+assertEqual(sourceWorn:getItem(shirtBodyLocation), shirt, "source worn shirt")
+assertEqual(corpseWorn:getItem(shirtBodyLocation), shirt, "corpse worn shirt")
 assertEqual(visualCopies, 1, "live clothing visual copy count")
 assertEqual(transmitCount, 1, "multiplayer corpse transmission count")
 assertEqual(corpseModData.PNC_UUID, record.id, "corpse network NPC id")

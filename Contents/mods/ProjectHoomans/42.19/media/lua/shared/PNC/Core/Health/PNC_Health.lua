@@ -53,7 +53,7 @@ function Health.Ensure(record)
     end
     if type(record.health.body) ~= "table" then
         record.health.body = {
-            wounds = {}, bleedingRate = 0, openWoundCount = 0,
+            wounds = {}, parts = {}, bleedingRate = 0, openWoundCount = 0,
             bandagedWoundCount = 0, lastBleedAt = 0,
         }
     end
@@ -147,6 +147,9 @@ function Health.EnterIncapacitated(record, zombie, reason)
     if not record or record.alive == false then
         return false
     end
+    if PNC.NPCWounds and PNC.NPCWounds.SetOverallHealth then
+        PNC.NPCWounds.SetOverallHealth(record, math.max(Const.INCAPACITATED_HP, 1))
+    end
     health.current = math.max(Const.INCAPACITATED_HP, 1)
     health.state = "incapacitated"
     health.downedAt = now
@@ -189,6 +192,9 @@ function Health.Revive(record, zombie)
     local health = Health.Ensure(record)
     local revivedHP = math.min(health.max, math.max(Const.INCAPACITATED_HP, Const.REVIVE_HP))
     local now = Core.Now()
+    if PNC.NPCWounds and PNC.NPCWounds.SetOverallHealth then
+        PNC.NPCWounds.SetOverallHealth(record, revivedHP)
+    end
     health.current = revivedHP
     health.state = "normal"
     health.downedAt = 0
@@ -225,6 +231,9 @@ function Health.Recover(record, zombie)
     health.recentDamageUntil = 0
     if PNC.NPCWounds and PNC.NPCWounds.Clear then
         PNC.NPCWounds.Clear(record)
+    end
+    if PNC.NPCWounds and PNC.NPCWounds.SetOverallHealth then
+        PNC.NPCWounds.SetOverallHealth(record, health.max)
     end
     record.alive = true
     record.runtime.forceLive = false
@@ -263,6 +272,11 @@ end
 
 function Health.Kill(record, zombie, reason)
     local health = Health.Ensure(record)
+    local corpseOK
+    local corpseCreated
+    if PNC.NPCWounds and PNC.NPCWounds.SetOverallHealth then
+        PNC.NPCWounds.SetOverallHealth(record, 0)
+    end
     health.current = 0
     health.state = "dead"
     health.reviveUntil = 0
@@ -281,7 +295,20 @@ function Health.Kill(record, zombie, reason)
         if zombie.setHealth then
             zombie:setHealth(0)
         end
-        PNC.BodyLifecycle.CreateInertCorpse(record, zombie, reason or "death")
+        if PNC.BodyLifecycle and PNC.BodyLifecycle.CreateInertCorpse then
+            corpseOK, corpseCreated = pcall(
+                PNC.BodyLifecycle.CreateInertCorpse,
+                record,
+                zombie,
+                reason or "death"
+            )
+        else
+            corpseOK, corpseCreated = false, "corpse_service_unavailable"
+        end
+        if (not corpseOK or corpseCreated ~= true) and Core and Core.Log then
+            Core.Log("ERROR", "NPC corpse creation failed npc=" .. tostring(record.id)
+                .. " reason=" .. tostring(corpseCreated or "unknown"))
+        end
     elseif not record.corpse then
         record.corpse = {
             token = nil,
@@ -301,6 +328,9 @@ function Health.ApplyDamage(record, zombie, damageEvent)
     local amount = tonumber(damageEvent and damageEvent.amount or 0) or 0
     local now = Core.Now()
 
+    if Core and Core.IsAuthority and not Core.IsAuthority() then
+        return false
+    end
     if record.alive == false or amount <= 0 then
         return false
     end
@@ -339,7 +369,11 @@ function Health.ApplyDamage(record, zombie, damageEvent)
         return true
     end
 
-    health.current = health.current - amount
+    if PNC.NPCWounds and PNC.NPCWounds.ApplyBodyDamage then
+        PNC.NPCWounds.ApplyBodyDamage(record, amount, damageEvent and damageEvent.partId)
+    else
+        health.current = health.current - amount
+    end
     if Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "health")
     end
@@ -368,6 +402,9 @@ function Health.Update(record, zombie, now)
     end
     if health.state == "incapacitated" then
         applyIncapacitatedLiveState(record, zombie)
+        if PNC.NPCWounds and PNC.NPCWounds.SetOverallHealth then
+            PNC.NPCWounds.SetOverallHealth(record, Const.INCAPACITATED_HP)
+        end
         health.current = Const.INCAPACITATED_HP
         return
     end

@@ -8,6 +8,7 @@ local resolvePrimaryType
 local resolveModeFromPrimaryType
 
 Equipment.DescriptorCache = Equipment.DescriptorCache or {}
+Equipment.PRESENTATION_REVISION = 2
 
 local function copyDescriptor(source, item, createReason)
     return {
@@ -151,7 +152,23 @@ local function clearExplicitWornItems(zombie)
     end
 end
 
-local function applyWornItems(zombie, equipment)
+local function applyInventoryState(item, record, bodyLocation)
+    local inventory = record and record.inventory or nil
+    local itemID = inventory and inventory.worn and inventory.worn[bodyLocation] or nil
+    local state = itemID and inventory.items and inventory.items[itemID] or nil
+    local maximum
+    if not item or not state then return item end
+    maximum = item.getConditionMax and tonumber(item:getConditionMax()) or 0
+    if state.cond ~= nil and item.setCondition then
+        item:setCondition(math.max(0, math.min(maximum > 0 and maximum or tonumber(state.cond), tonumber(state.cond) or 0)))
+    end
+    if state.uses ~= nil and item.setUses then
+        item:setUses(math.max(0, tonumber(state.uses) or 0))
+    end
+    return item
+end
+
+local function applyWornItems(zombie, equipment, record)
     local entries = Equipment.GetOrderedWornEntries(equipment)
     local appliedCount = 0
     local failureCount = 0
@@ -159,8 +176,11 @@ local function applyWornItems(zombie, equipment)
     local entry
     local item
     local createReason
-    local ok
-    local errorMessage
+    local typedBodyLocation
+    local visualOk
+    local visualReason
+    local wornOk
+    local wornReason
 
     if #entries <= 0 then
         clearExplicitWornItems(zombie)
@@ -171,23 +191,31 @@ local function applyWornItems(zombie, equipment)
 
     for i = 1, #entries do
         entry = entries[i]
-        ok, errorMessage = Visuals.AddClothingVisual(zombie, entry.fullType)
-        if ok then
-            appliedCount = appliedCount + 1
-        else
-            item, createReason = Equipment.CreateItem(entry.fullType)
-            if item then
-                ok, errorMessage = safeInvoke(zombie, "setWornItem", entry.bodyLocation, item)
-                if not ok then
-                    failureCount = failureCount + 1
-                    Core.LogWarn("PNC equipment failed to wear " .. tostring(entry.fullType) .. " on " .. tostring(entry.bodyLocation) .. ": " .. tostring(errorMessage))
-                else
-                    appliedCount = appliedCount + 1
-                end
+        visualOk, visualReason = Visuals.AddClothingVisual(zombie, entry.fullType)
+        item, createReason = Equipment.CreateItem(entry.fullType)
+        if item then
+            applyInventoryState(item, record, entry.bodyLocation)
+            typedBodyLocation = item.getBodyLocation and item:getBodyLocation() or nil
+            if typedBodyLocation then
+                wornOk, wornReason = safeInvoke(zombie, "setWornItem", typedBodyLocation, item)
+            else
+                wornOk, wornReason = false, "missing_typed_body_location"
+            end
+            if visualOk or wornOk then
+                appliedCount = appliedCount + 1
             else
                 failureCount = failureCount + 1
-                Core.LogWarn("PNC equipment could not create worn item " .. tostring(entry.fullType) .. ": " .. tostring(createReason))
+                Core.LogWarn("PNC equipment failed to wear " .. tostring(entry.fullType) .. " on " .. tostring(entry.bodyLocation) .. ": visual=" .. tostring(visualReason) .. ", worn=" .. tostring(wornReason))
             end
+            if visualOk and not wornOk then
+                Core.LogWarn("PNC equipment displayed but could not mechanically wear " .. tostring(entry.fullType) .. ": " .. tostring(wornReason))
+            end
+        elseif visualOk then
+            appliedCount = appliedCount + 1
+            Core.LogWarn("PNC equipment displayed visual-only worn item " .. tostring(entry.fullType) .. ": " .. tostring(createReason))
+        else
+            failureCount = failureCount + 1
+            Core.LogWarn("PNC equipment could not create or display worn item " .. tostring(entry.fullType) .. ": create=" .. tostring(createReason) .. ", visual=" .. tostring(visualReason))
         end
     end
 
@@ -251,54 +279,6 @@ local function isAttackMode(record)
     return runtime and runtime.attackMode == true or false
 end
 
-local function buildPresentationEquipment(equipment, attackMode)
-    local presentation = Equipment.NormalizeLoadoutSpec(equipment)
-    local occupied = {}
-    local fullTypes
-    local location
-    local fullType
-    local item
-    local createReason
-    local i
-    local holsteredCount = 0
-    local holsterReasons = {}
-
-    if attackMode then
-        return presentation, 0, {}
-    end
-
-    for location, _ in pairs(presentation.attached) do
-        occupied[location] = true
-    end
-
-    fullTypes = {}
-    if presentation.primaryFullType then
-        fullTypes[#fullTypes + 1] = presentation.primaryFullType
-    end
-    if presentation.secondaryFullType then
-        fullTypes[#fullTypes + 1] = presentation.secondaryFullType
-    end
-    for i = 1, #fullTypes do
-        fullType = fullTypes[i]
-        if fullType then
-            item, createReason = Equipment.CreateItem(fullType)
-            if item then
-                location = Equipment.ResolveAttachedLocation(item, nil, occupied)
-                if location then
-                    presentation.attached[location] = fullType
-                    occupied[location] = true
-                    holsteredCount = holsteredCount + 1
-                else
-                    holsterReasons[#holsterReasons + 1] = tostring(fullType) .. ":no_attachment_location"
-                end
-            else
-                holsterReasons[#holsterReasons + 1] = tostring(fullType) .. ":" .. tostring(createReason or "invalid_full_type")
-            end
-        end
-    end
-    return presentation, holsteredCount, holsterReasons
-end
-
 local function applyHands(zombie, equipment, descriptor)
     local item
     local primaryType
@@ -358,32 +338,17 @@ local function applyHands(zombie, equipment, descriptor)
 end
 
 local function applyCombatPresentation(zombie, record, equipment, descriptor, attackMode)
-    local presentation
-    local holsteredCount
-    local holsterReasons
     local attachedOk
     local attachedReason
     local handsOk
     local handsReason
 
-    presentation, holsteredCount, holsterReasons = buildPresentationEquipment(equipment, attackMode)
-    attachedOk, attachedReason = applyAttachedItems(zombie, presentation)
-
-    if attackMode then
-        handsOk, handsReason = applyHands(zombie, equipment, descriptor)
-    else
-        clearHands(zombie)
-        setEquipmentVariables(zombie, "barehand", nil, nil)
-        handsOk = true
-        handsReason = "holstered:" .. tostring(holsteredCount)
-        if #holsterReasons > 0 then
-            handsOk = false
-            handsReason = handsReason .. ",unavailable=" .. table.concat(holsterReasons, ",")
-        end
-    end
+    attachedOk, attachedReason = applyAttachedItems(zombie, equipment)
+    handsOk, handsReason = applyHands(zombie, equipment, descriptor)
 
     record.runtime = record.runtime or {}
     record.runtime.equipmentAttackModeApplied = attackMode == true
+    record.runtime.equipmentPresentationRevision = Equipment.PRESENTATION_REVISION
     return attachedOk and handsOk, attachedReason, handsReason
 end
 
@@ -436,7 +401,7 @@ function Equipment.Apply(zombie, record)
     equipment = Equipment.EnsureRecordEquipment(record)
     descriptor = buildWeaponDescriptor(equipment.primaryFullType, true)
 
-    laneOk, reasons[#reasons + 1] = applyWornItems(zombie, equipment)
+    laneOk, reasons[#reasons + 1] = applyWornItems(zombie, equipment, record)
     if not laneOk then
         ok = false
     end
@@ -467,10 +432,6 @@ function Equipment.ApplyHands(zombie, record)
         return false, "missing_body_or_record"
     end
 
-    if not isAttackMode(record) then
-        return Equipment.ApplyCombatState(zombie, record, false, true)
-    end
-
     equipment = Equipment.EnsureRecordEquipment(record)
     descriptor = buildWeaponDescriptor(equipment.primaryFullType, true)
     ok, reason = applyHands(zombie, equipment, descriptor)
@@ -493,7 +454,9 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
     end
     record.runtime = record.runtime or {}
     attackMode = attackMode == true
-    if force ~= true and record.runtime.equipmentAttackModeApplied == attackMode then
+    if force ~= true
+        and record.runtime.equipmentAttackModeApplied == attackMode
+        and record.runtime.equipmentPresentationRevision == Equipment.PRESENTATION_REVISION then
         return true, "unchanged"
     end
 

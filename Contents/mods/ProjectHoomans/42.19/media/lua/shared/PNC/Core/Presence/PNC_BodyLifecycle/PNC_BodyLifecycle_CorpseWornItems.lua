@@ -10,6 +10,7 @@ function Internal.captureWornEntries(wornItems)
     local entries = {}
     local entry
     local item
+    local location
     local i
     if not wornItems or not wornItems.size then
         return entries
@@ -18,8 +19,15 @@ function Internal.captureWornEntries(wornItems)
         entry = wornItems:get(i)
         item = entry and entry.getItem and entry:getItem() or nil
         if item then
+            location = entry.getLocation and entry:getLocation()
+                or entry.getBodyLocation and entry:getBodyLocation()
+                or nil
             entries[#entries + 1] = {
-                location = entry.getLocation and tostring(entry:getLocation() or "") or "",
+                -- Build 42 WornItems:setItem requires ItemBodyLocation. Keep the
+                -- typed object from the live WornItems entry; tostring() here
+                -- selects an invalid Java overload and opens the Lua debugger.
+                location = location,
+                locationId = tostring(location or ""),
                 item = item,
                 fullType = Internal.itemFullType(item),
             }
@@ -79,16 +87,17 @@ function Internal.applyCorpseWornItems(corpse, wornEntries)
             end
         end
         item = item or entry.item
-        if item and entry.location and entry.location ~= "" then
+        -- Never feed a legacy string slot into Build 42's Java overload. The
+        -- item remains in the corpse inventory even when it cannot be reworn.
+        if item and type(entry.location) ~= "string"
+            and entry.location ~= nil and tostring(entry.location) ~= ""
+        then
             Internal.addItemToContainer(container, item)
             claimed[item] = true
             if pcall(targetWornItems.setItem, targetWornItems, entry.location, item) then
                 applied = applied + 1
             end
         end
-    end
-    if targetWornItems and container and targetWornItems.addItemsToItemContainer then
-        pcall(targetWornItems.addItemsToItemContainer, targetWornItems, container)
     end
     return applied > 0 or #wornEntries == 0
 end

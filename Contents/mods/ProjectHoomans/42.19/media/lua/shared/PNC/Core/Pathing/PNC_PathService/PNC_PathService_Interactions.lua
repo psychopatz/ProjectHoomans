@@ -32,6 +32,40 @@ local function logTraversalReject(record, zombie, lane, event, reason, extra)
     Internal.logMoveDebug(record, zombie, lane, event or "traversal_rejected", reason or "rejected", extra or "")
 end
 
+local function methodReturnsTrue(object, names)
+    local i
+    local method
+    local ok
+    local result
+    if not object then return false end
+    for i = 1, #names do
+        method = object[names[i]]
+        if type(method) == "function" then
+            ok, result = pcall(method, object)
+            if ok and result == true then return true end
+        end
+    end
+    return false
+end
+
+local function methodReturnsValue(object, names)
+    local i
+    local method
+    local ok
+    local result
+    if not object then return false end
+    for i = 1, #names do
+        method = object[names[i]]
+        if type(method) == "function" then
+            ok, result = pcall(method, object)
+            if ok and result ~= nil and result ~= false and result ~= 0 and result ~= "" then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 local function findFenceAhead(cell, zombie, goalX, goalY)
     if TraversalQuery and TraversalQuery.FindFenceAhead then
         return TraversalQuery.FindFenceAhead(zombie, goalX, goalY, cell)
@@ -80,6 +114,19 @@ function Internal.shouldSuppressSpecialAction(lane, key, now)
     return lane.lastSpecialActionKey == key and (now - (tonumber(lane.lastSpecialActionAt) or 0)) < Internal.SPECIAL_ACTION_COOLDOWN_MS
 end
 
+function Internal.isDoorCollision(zombie)
+    local method
+    local ok
+    local result
+    if not zombie then return false end
+    method = zombie.isCollidedWithDoor
+    if type(method) == "function" then
+        ok, result = pcall(method, zombie)
+        return ok and result == true
+    end
+    return methodReturnsTrue(zombie, { "isCollidedThisFrame", "isCollided" })
+end
+
 function Internal.openDoorForNPC(zombie, object)
     local square
     local properties
@@ -88,12 +135,14 @@ function Internal.openDoorForNPC(zombie, object)
     if not object then
         return false
     end
-    if object.IsOpen and object:IsOpen() then
+    if methodReturnsTrue(object, { "IsOpen", "isOpen" }) then
         return true
     end
-    if (object.isLocked and object:isLocked())
-        or (object.isLockedByKey and object:isLockedByKey())
-        or (object.isObstructed and object:isObstructed())
+    if methodReturnsTrue(object, { "isLocked", "IsLocked" })
+        or methodReturnsTrue(object, { "isLockedByKey" })
+        or methodReturnsValue(object, { "getLockedByKey" })
+        or methodReturnsTrue(object, { "isBarricaded", "IsBarricaded" })
+        or methodReturnsTrue(object, { "isObstructed" })
     then
         return false
     end
@@ -107,21 +156,28 @@ function Internal.openDoorForNPC(zombie, object)
     elseif IsoDoor and IsoDoor.getGarageDoorIndex and IsoDoor.getGarageDoorIndex(object) > -1 then
         IsoDoor.toggleGarageDoor(object, true)
     else
-        object:DirtySlice()
-        square:InvalidateSpecialObjectPaths()
-        object:ToggleDoorSilent()
+        if object.DirtySlice then object:DirtySlice() end
+        if square.InvalidateSpecialObjectPaths then square:InvalidateSpecialObjectPaths() end
+        if object.ToggleDoorSilent then
+            object:ToggleDoorSilent()
+        elseif object.toggleDoorSilent then
+            object:toggleDoorSilent()
+        end
     end
 
-    opened = object.IsOpen and object:IsOpen() == true
+    opened = methodReturnsTrue(object, { "IsOpen", "isOpen" })
     if not opened and object.setOpen then
         object:setOpen(true)
-        opened = object.IsOpen and object:IsOpen() == true
+        opened = methodReturnsTrue(object, { "IsOpen", "isOpen" })
+    elseif not opened and object.SetOpen then
+        object:SetOpen(true)
+        opened = methodReturnsTrue(object, { "IsOpen", "isOpen" })
     end
     if not opened then
         return false
     end
-    square:InvalidateSpecialObjectPaths()
-    square:RecalcProperties()
+    if square.InvalidateSpecialObjectPaths then square:InvalidateSpecialObjectPaths() end
+    if square.RecalcProperties then square:RecalcProperties() end
     if object.syncIsoObject then
         object:syncIsoObject(false, 1, nil, nil)
     end
@@ -132,7 +188,7 @@ function Internal.openDoorForNPC(zombie, object)
         object:invalidateRenderChunkLevel(FBORenderChunk.DIRTY_OBJECT_MODIFY)
     end
 
-    properties = object:getProperties()
+    properties = object.getProperties and object:getProperties() or nil
     doorSound = properties and properties:has("DoorSound") and properties:get("DoorSound") or "WoodDoor"
     if zombie.playSound then
         zombie:playSound(doorSound .. "Open")
@@ -185,6 +241,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     local blockedFence
     local blockedFenceTall
     local blockedPassage
+    local collided
 
     if not zombie or not getCell then
         return false, nil
@@ -199,6 +256,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     fromY = zombie:getY()
     fromZ = zz
     fromPoint = Internal.describePoint(string.format("%.2f", fromX), string.format("%.2f", fromY), zz)
+    collided = Internal.isDoorCollision(zombie)
     fd = zombie:getForwardDirection()
     fdx = Internal.roundHalf(fd:getX())
     fdy = Internal.roundHalf(fd:getY())
@@ -215,6 +273,31 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     blockedPassage = blockedFromSquare and blockedSquare and TraversalQuery and TraversalQuery.GetPassageBetween
         and TraversalQuery.GetPassageBetween(blockedFromSquare, blockedSquare)
         or nil
+
+    -- A blocked fake-locomotion step identifies the exact edge object. Open it
+    -- directly: a door can belong to the origin square, which makes its square
+    -- center look non-progressive even though the passage itself is ahead.
+    if blockedPassage and TraversalQuery and TraversalQuery.IsDoor
+        and TraversalQuery.IsDoor(blockedPassage)
+    then
+        objectSquare = blockedPassage.getSquare and blockedPassage:getSquare() or blockedSquare
+        actionKey = "door:" .. Internal.describeSquare(objectSquare)
+        if not Internal.shouldSuppressSpecialAction(lane, actionKey, now)
+            and Internal.openDoorForNPC(zombie, blockedPassage)
+        then
+            Internal.rememberSpecialAction(lane, actionKey, now)
+            if Internal.MotionHints and Internal.MotionHints.RememberHold then
+                Internal.MotionHints.RememberHold(lane, zombie:getX(), zombie:getY(), zombie:getZ(), now, 180, {
+                    kind = "door_open",
+                    profile = lane.motionProfile,
+                })
+            end
+            Internal.logMoveWarning(record, zombie, lane, "door_open", "blocked_passage",
+                "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare)
+                    .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
+            return true, "door_open"
+        end
+    end
 
     candidates = {
         { x = zx, y = zy, z = zz },
@@ -259,11 +342,17 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                     if (instanceof(object, "IsoDoor") or (instanceof(object, "IsoThumpable") and object.isDoor and object:isDoor() == true)) and facingSatisfied then
                         objectSquare = object:getSquare()
                         objectKey = buildObstacleSquareKey(objectSquare)
-                        if object ~= blockedPassage and not isObstacleAhead(zombie, objectSquare, goalX, goalY, candidateCenterX, candidateCenterY) then
+                        if object ~= blockedPassage
+                            and not (collided and i <= 4)
+                            and not isObstacleAhead(zombie, objectSquare, goalX, goalY, candidateCenterX, candidateCenterY)
+                        then
                             logTraversalReject(record, zombie, lane, "traversal_rejected", "door_not_ahead", "object=" .. tostring(objectKey or "nil"))
                             objectSquare = nil
                         end
-                        if objectSquare and object ~= blockedPassage and not improvesGoalDistance(fromX, fromY, objectSquare:getX() + 0.5, objectSquare:getY() + 0.5, goalX, goalY) then
+                        if objectSquare and object ~= blockedPassage
+                            and not (collided and i <= 4)
+                            and not improvesGoalDistance(fromX, fromY, objectSquare:getX() + 0.5, objectSquare:getY() + 0.5, goalX, goalY)
+                        then
                             logTraversalReject(record, zombie, lane, "traversal_rejected", "door_not_progressive", "object=" .. tostring(objectKey or "nil"))
                             objectSquare = nil
                         end

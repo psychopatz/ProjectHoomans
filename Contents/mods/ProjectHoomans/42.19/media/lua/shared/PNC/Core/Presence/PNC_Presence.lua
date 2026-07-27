@@ -97,6 +97,9 @@ function Presence.Materialize(record, reason)
     record.runtime.lifecycle.phase = "materializing"
     record.runtime.lifecycle.lastReason = reason or "materialize"
     record.runtime.lifecycle.lastTransitionAt = Core.Now()
+    if PNC.Inventory and PNC.Inventory.EnsureRecordInventory then
+        PNC.Inventory.EnsureRecordInventory(record)
+    end
     spawnX, spawnY, spawnZ = findMaterializeSquare(record)
     zombieList = addZombiesInOutfit(
         spawnX,

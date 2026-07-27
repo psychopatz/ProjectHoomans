@@ -296,7 +296,11 @@ local function onClientCommand(module, command, player, args)
 
     if command == Const.CMD_BANDAGE and args and args.id and args.partId then
         if Treatment and Treatment.TryBandage then
-            Treatment.TryBandage(player, args.id, args.partId)
+            local debugFree = args.debugFree == true and canUseDebug(player)
+            Treatment.TryBandage(player, args.id, args.partId, {
+                consumeItem = not debugFree,
+                bandageType = args.bandageType,
+            })
         end
         return
     end
@@ -361,6 +365,11 @@ local function onClientCommand(module, command, player, args)
 
     if args and args.action == "damage" then
         API.DebugCommand(args.id, "damage", args)
+        return
+    end
+
+    if args and args.action == "damage_part" then
+        API.DebugCommand(args.id, "damage_part", args)
         return
     end
 

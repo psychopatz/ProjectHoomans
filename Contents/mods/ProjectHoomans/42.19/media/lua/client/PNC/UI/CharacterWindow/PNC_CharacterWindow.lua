@@ -69,6 +69,12 @@ function ISPNCCharacterTab:onMouseWheel(del)
     return true
 end
 
+function ISPNCCharacterTab:onRightMouseUp(x, y)
+    local hook = Tabs["On" .. tostring(self.tabId) .. "RightMouseUp"]
+    if hook then return hook(self, x, y) == true end
+    return false
+end
+
 function ISPNCCharacterTab:new(x, y, width, height, tabId)
     local o = ISPanel:new(x, y, width, height)
     setmetatable(o, self)

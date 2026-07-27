@@ -4,31 +4,10 @@ PNC.CharacterWindowTabs = PNC.CharacterWindowTabs or {}
 local Tabs = PNC.CharacterWindowTabs
 local Shared = PNC.CharacterWindowShared
 
-local bodyTextures = {}
-
-local function bodyTexture(isFemale)
-    local key = isFemale and "female" or "male"
-    if bodyTextures[key] == nil then
-        bodyTextures[key] = getTexture("media/ui/defense/" .. key .. "_base.png")
-    end
-    return bodyTextures[key]
-end
-
-local function drawBody(view, texture, x, y, width, height)
-    if not texture then return end
-    local textureWidth = texture.getWidthOrig and texture:getWidthOrig() or texture:getWidth()
-    local textureHeight = texture.getHeightOrig and texture:getHeightOrig() or texture:getHeight()
-    local scale = math.min(width / math.max(1, textureWidth), height / math.max(1, textureHeight))
-    local drawWidth = textureWidth * scale
-    local drawHeight = textureHeight * scale
-    view:drawTextureScaled(texture, x + (width - drawWidth) / 2, y, drawWidth, drawHeight, 1, 0.88, 0.88, 0.88)
-end
-
 function Tabs.RenderProtection(view, snapshot, payload, topY)
     local resolved = Shared.GetSnapshot(snapshot, payload)
-    local equipment = Shared.GetEquipment(snapshot, payload)
-    local rows = Shared.BuildClothingRows(snapshot, payload)
-    local summary = Shared.SummarizeClothing(rows)
+    local rows = Shared.BuildClothingRows(snapshot, payload, view.npcId)
+    local protection = Shared.BuildBodyProtection(view.npcId, snapshot, payload, rows)
     local padding = 12
     local bodyWidth = Shared.Clamp(math.floor(view.width * 0.27), 96, 145)
     local bodyHeight = math.min(280, math.max(180, view.height - padding * 2))
@@ -38,13 +17,28 @@ function Tabs.RenderProtection(view, snapshot, payload, topY)
     local y = topY
     local i
 
-    drawBody(view, bodyTexture(resolved.isFemale == true), padding, padding, bodyWidth, bodyHeight)
+    Shared.DrawBodyMap(view, resolved.isFemale == true, padding, padding, bodyWidth, bodyHeight, protection, Shared.ProtectionColor)
 
     y = Shared.DrawSection(view, "Clothing Protection", contentX, y, contentWidth)
-    y = Shared.DrawBar(view, "Average Bite Defense", summary.biteAverage, 100, contentX, y, contentWidth, { r = 0.68, g = 0.3, b = 0.2 })
-    y = Shared.DrawBar(view, "Average Scratch Defense", summary.scratchAverage, 100, contentX, y, contentWidth, { r = 0.72, g = 0.58, b = 0.22 })
-    y = Shared.DrawLabelValue(view, "Primary", equipment.primaryFullType or "Bare hands", contentX, y + 2, 72)
-    y = Shared.DrawLabelValue(view, "Secondary", equipment.secondaryFullType or "-", contentX, y, 72)
+    y = Shared.DrawBar(view, "Average Bite Defense", protection.biteAverage, 100, contentX, y, contentWidth, { r = 0.68, g = 0.3, b = 0.2 })
+    y = Shared.DrawBar(view, "Average Scratch Defense", protection.scratchAverage, 100, contentX, y, contentWidth, { r = 0.72, g = 0.58, b = 0.22 })
+
+    local biteWidth = math.min(56, math.floor(contentWidth * 0.2))
+    local scratchWidth = math.min(64, math.floor(contentWidth * 0.22))
+    local partWidth = math.max(72, contentWidth - biteWidth - scratchWidth)
+    view:drawText("Part", contentX, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
+    view:drawTextRight("Bite", contentX + partWidth + biteWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
+    view:drawTextRight("Scratch", contentX + contentWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
+    y = y + fontHeight + 3
+    for _, definition in ipairs(Shared.BodyParts) do
+        local entry = protection[definition.id]
+        local br, bg, bb = Shared.ProtectionColor(entry.bite)
+        local sr, sg, sb = Shared.ProtectionColor(entry.scratch)
+        view:drawText(definition.label, contentX, y, 0.9, 0.9, 0.9, 1, UIFont.Small)
+        view:drawTextRight(tostring(Shared.Round(entry.bite, 0)) .. "%", contentX + partWidth + biteWidth, y, br, bg, bb, 1, UIFont.Small)
+        view:drawTextRight(tostring(Shared.Round(entry.scratch, 0)) .. "%", contentX + contentWidth, y, sr, sg, sb, 1, UIFont.Small)
+        y = y + fontHeight + 2
+    end
 
     y = y + 7
     y = Shared.DrawSection(view, "Worn Items", contentX, y, contentWidth)
@@ -52,11 +46,11 @@ function Tabs.RenderProtection(view, snapshot, payload, topY)
         view:drawText("No protective clothing equipped.", contentX, y, 0.7, 0.7, 0.7, 1, UIFont.Small)
         y = y + fontHeight + 8
     else
-        local valueWidth = math.min(54, math.floor(contentWidth * 0.18))
+        local valueWidth = math.min(66, math.floor(contentWidth * 0.22))
         local itemWidth = math.max(70, contentWidth - valueWidth * 2 - 12)
         view:drawText("Item", contentX, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
-        view:drawTextRight("Bite", contentX + itemWidth + valueWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
-        view:drawTextRight("Scratch", contentX + contentWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        view:drawTextRight("Condition", contentX + itemWidth + valueWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        view:drawTextRight("Holes", contentX + contentWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
         y = y + fontHeight + 3
         view:drawRect(contentX, y, contentWidth, 1, 0.55, 0.4, 0.4, 0.4)
         y = y + 5
@@ -64,8 +58,9 @@ function Tabs.RenderProtection(view, snapshot, payload, topY)
             local row = rows[i]
             local label = PsychopatzCore.UI.Layout.Ellipsize(row.name .. " (" .. row.location .. ")", UIFont.Small, itemWidth - 8)
             view:drawText(label, contentX, y, 0.88, 0.88, 0.88, 1, UIFont.Small)
-            view:drawTextRight(tostring(Shared.Round(row.bite, 1)) .. "%", contentX + itemWidth + valueWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
-            view:drawTextRight(tostring(Shared.Round(row.scratch, 1)) .. "%", contentX + contentWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
+            local condition = row.conditionMax > 0 and tostring(Shared.Round(row.condition, 0)) .. "/" .. tostring(Shared.Round(row.conditionMax, 0)) or "-"
+            view:drawTextRight(condition, contentX + itemWidth + valueWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
+            view:drawTextRight(tostring(row.holes or 0), contentX + contentWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
             y = y + fontHeight + 5
         end
     end

@@ -208,7 +208,6 @@ local function applyBiteDamage(entry, record, zombie, npcBody, now)
     local applied
     local result
     local wounds = PNC.NPCWounds
-    local reaction = PNC.CombatZombieReaction
     entry.phase = "impact"
     entry.appliedDamage = true
     entry.impactAt = now
@@ -255,16 +254,6 @@ local function applyBiteDamage(entry, record, zombie, npcBody, now)
             pcall(function()
                 npcBody:Hit(teeth, zombie, 1.01, false, 1, false)
             end)
-        end
-    elseif reaction and reaction.Start then
-        reaction.Start(npcBody, zombie, {
-            kind = "npc_parry", stagger = true, hitForce = 0.78,
-            pushDistance = 0.12, durationMs = 220,
-        })
-        if PNC.Network and PNC.Network.BroadcastZombieReaction then
-            PNC.Network.BroadcastZombieReaction(zombie, npcBody, {
-                kind = "npc_parry", stagger = true, hitForce = 0.78,
-            })
         end
     end
     if isServer and isServer() then

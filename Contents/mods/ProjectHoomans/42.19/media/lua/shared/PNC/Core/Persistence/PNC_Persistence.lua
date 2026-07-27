@@ -156,6 +156,7 @@ end
 local function sanitizeHealthBody(rawBody)
     local source = type(rawBody) == "table" and rawBody or {}
     local wounds = {}
+    local parts = {}
     local partId
     local wound
     for partId, wound in pairs(type(source.wounds) == "table" and source.wounds or {}) do
@@ -165,11 +166,22 @@ local function sanitizeHealthBody(rawBody)
                 partId = partId,
                 type = tostring(wound.type or "scratch"),
                 severity = math.max(0, normalizeNumber(wound.severity, 0)),
+                damage = math.max(0, normalizeNumber(wound.damage, wound.severity or 0)),
                 bleedingRate = math.max(0, normalizeNumber(wound.bleedingRate, 0)),
                 bandaged = wound.bandaged == true,
                 createdAt = normalizeNumber(wound.createdAt, 0),
                 bandagedAt = normalizeNumber(wound.bandagedAt, 0),
                 healAtWorldHour = normalizeNumber(wound.healAtWorldHour, 0),
+            }
+        end
+    end
+    for partId, partHealth in pairs(type(source.parts) == "table" and source.parts or {}) do
+        if type(partHealth) == "table" then
+            local maximum = math.max(1, normalizeNumber(partHealth.max, 100))
+            partId = tostring(partId)
+            parts[partId] = {
+                current = Core.Clamp(normalizeNumber(partHealth.current, maximum), 0, maximum),
+                max = maximum,
             }
         end
     end
@@ -185,7 +197,11 @@ local function sanitizeHealthBody(rawBody)
     } or nil
     return {
         wounds = wounds,
+        parts = parts,
         infection = infection,
+        totalPartHealth = math.max(0, normalizeNumber(source.totalPartHealth, 0)),
+        totalPartMax = math.max(0, normalizeNumber(source.totalPartMax, 0)),
+        overallPercent = Core.Clamp(normalizeNumber(source.overallPercent, 100), 0, 100),
         bleedingRate = math.max(0, normalizeNumber(source.bleedingRate, 0)),
         openWoundCount = math.max(0, math.floor(normalizeNumber(source.openWoundCount, 0))),
         bandagedWoundCount = math.max(0, math.floor(normalizeNumber(source.bandagedWoundCount, 0))),

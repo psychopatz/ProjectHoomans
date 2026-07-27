@@ -11,6 +11,8 @@ local records = {}
 local bodies = {}
 local broadcasts = 0
 
+ZombRand = function() return 0 end
+
 PNC = {
     Const = {
         FACTION_COLONIST = "colonist",
@@ -32,6 +34,10 @@ PNC = {
     },
     Core = {
         Now = function() return now end,
+        IsAuthority = function() return true end,
+        Clamp = function(value, minimum, maximum)
+            return math.max(minimum, math.min(maximum, value))
+        end,
         Distance = function(x1, y1, x2, y2)
             local dx = x2 - x1
             local dy = y2 - y1
@@ -66,6 +72,8 @@ PNC = {
 
 dofile(ROOT .. "Base/PNC_Types.lua")
 dofile(ROOT .. "Health/PNC_Health.lua")
+dofile(ROOT .. "Health/PNC_NPCWounds.lua")
+dofile(ROOT .. "Combat/PNC_Combat_Damage.lua")
 dofile(ROOT .. "Health/PNC_PlayerDamage.lua")
 
 assertEqual(PNC.Types.NormalizeFaction("colonist"), "colonist", "colonist faction")
@@ -136,12 +144,16 @@ local applied, reason = PNC.PlayerDamage.HandleClientReport(player, {
 assertEqual(applied, true, "neutral damage applied")
 assertEqual(reason, "damaged", "neutral damage reason")
 assertEqual(records.neutral_1.health.current, 85, "scaled neutral custom HP")
+assertEqual(records.neutral_1.health.body.openWoundCount, 1, "player hit creates NPC body-part wound")
+assertEqual(records.neutral_1.health.body.wounds.Head.type, "laceration", "player melee wound type")
 assertEqual(engineHealth, 1000, "engine buffer restored")
 assertEqual(broadcasts, 1, "damage broadcast")
 
 local colonist = makeRecord("colonist_1", "colonist")
 local legacyCompanion = makeRecord("legacy_1", "companion")
 local hostile = makeRecord("hostile_1", "hostile")
+records.hostile_1 = hostile
+bodies.hostile_1 = body
 assertEqual(PNC.PlayerDamage.CanDamageRecord(colonist), false, "colonist protection")
 assertEqual(PNC.PlayerDamage.CanDamageRecord(legacyCompanion), false, "legacy colonist protection")
 assertEqual(PNC.PlayerDamage.CanDamageRecord(hostile), true, "hostile damage enabled")

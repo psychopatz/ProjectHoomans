@@ -706,6 +706,8 @@ function Network.BroadcastZombieReaction(targetZombie, attackerZombie, options)
         hitForce = tonumber(options.hitForce) or 0.92,
         stagger = options.stagger ~= false,
         health = health and health > 0 and health or nil,
+        partId = options.partId and tostring(options.partId) or nil,
+        woundType = options.woundType and tostring(options.woundType) or nil,
     }
     attackerModData = attackerZombie and attackerZombie.getModData and attackerZombie:getModData() or nil
     npcId = attackerModData and attackerModData.PNC_UUID or nil

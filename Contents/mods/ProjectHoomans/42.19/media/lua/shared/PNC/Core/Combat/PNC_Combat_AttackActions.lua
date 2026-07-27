@@ -13,14 +13,10 @@ local Internal = Combat.Internal
 local Core = PNC.Core
 local Const = PNC.Const or {}
 local Registry = PNC.Registry
-local Health = PNC.Health
 local Perception = PNC.Perception
-local ZombieAggro = PNC.ZombieAggro
 local Unarmed = PNC.CombatUnarmed
-local ZombieReaction = PNC.CombatZombieReaction
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
-local Tactics = PNC.CombatTactics
 local Animation = PNC.Animation
 local Damage = PNC.CombatDamage
 
@@ -197,83 +193,18 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
 end
 
 function Internal.applyDamageToZombie(record, attackerZombie, target, damage, attackType)
-    local victim = target and target.worldObject or nil
-    local fakeZombie
-    local weaponItem
-    local health
-    local scaledDamage
-    local applied = false
-    local reactionOptions
-    local reactionManaged
-
-    if (not victim) and target and target.zombieId and Perception.FindZombieByID then
-        victim = Perception.FindZombieByID(target.zombieId)
+    if not Damage or not Damage.ApplyTargetDamage then
+        return false, "damage_service_unavailable"
     end
-    if not victim or victim:isDead() then
-        return false, "invalid_zombie_target"
-    end
-
-    weaponItem = Internal.resolveWeaponItem(record)
-    fakeZombie = getCell and getCell():getFakeZombieForHit() or nil
-    if attackType == "ranged" then
-        scaledDamage = math.max(0.12, (tonumber(damage) or 0) * 0.06)
-    else
-        scaledDamage = math.max(0.18, (tonumber(damage) or 0) * 0.08)
-    end
-
-    reactionOptions = {
-        kind = attackType == "ranged" and "ranged" or "melee",
-        hitReaction = attackType == "ranged" and "ShotBelly" or "HitReaction",
-        hitForce = attackType == "ranged" and 0.78 or 0.92,
-        pushDistance = attackType == "ranged" and 0 or 0.18,
-        pushDurationMs = attackType == "ranged" and 0 or 150,
-        durationMs = attackType == "ranged" and 140 or 220,
-        stepDistance = attackType == "ranged" and 0.02 or 0.06,
-        stagger = attackType ~= "ranged",
-        settleMs = attackType == "ranged" and 420 or 650,
-    }
-
-    reactionManaged = ZombieReaction and ZombieReaction.ApplyWeaponHit ~= nil
-    if reactionManaged then
-        applied = ZombieReaction.ApplyWeaponHit(attackerZombie or fakeZombie, victim, weaponItem, scaledDamage, reactionOptions)
-    elseif weaponItem and victim.Hit then
-        applied = pcall(function()
-            victim:Hit(weaponItem, fakeZombie or attackerZombie, scaledDamage, false, 1, false)
-        end)
-    end
-
-    if not applied then
-        health = tonumber(victim:getHealth()) or 1
-        victim:setHealth(health - scaledDamage)
-        if victim:getHealth() <= 0 then
-            if victim.Kill then
-                victim:Kill(attackerZombie or fakeZombie)
-            elseif victim.setHealth then
-                victim:setHealth(0)
-            end
-        end
-    end
-    if not reactionManaged and ZombieReaction and ZombieReaction.Start then
-        ZombieReaction.Start(attackerZombie or fakeZombie, victim, reactionOptions)
-    elseif not reactionManaged and attackType == "ranged" and victim.setHitReaction then
-        victim:setHitReaction("ShotBelly")
-    elseif not reactionManaged and victim.setHitReaction then
-        victim:setHitReaction("HitReaction")
-    end
-    if ZombieAggro and ZombieAggro.OnZombieProvoked and (attackerZombie or fakeZombie) then
-        ZombieAggro.OnZombieProvoked(victim, attackerZombie or fakeZombie)
-    end
-    -- IsoZombie:Hit has no native zombie-on-zombie hit packet. Replicate only
-    -- the server-approved visual result; damage and death stay authoritative.
-    if PNC.Network and PNC.Network.BroadcastZombieReaction then
-        PNC.Network.BroadcastZombieReaction(victim, attackerZombie, reactionOptions)
-    end
-    applyWeaponWear(record)
-    return true, applied and "hit_zombie" or "hit_zombie_fallback"
+    return Damage.ApplyTargetDamage(record, attackerZombie, target, {
+        damage = damage,
+        attackType = attackType,
+        attackKind = attackType,
+        weaponItem = Internal.resolveWeaponItem(record),
+    })
 end
 
 function Internal.applyAttackActionHit(record, zombie, action, target)
-    local targetRecord
     local zombieTarget
     local attackApplied
     local attackReason
@@ -313,9 +244,14 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
 
     if action.attackKind == "ground" or action.attackType == "melee" then
         if target.kind == "player" then
-            if Damage and Damage.ApplyPlayerDamage and Damage.ApplyPlayerDamage(target.player, action.damage, "melee", Internal.resolveWeaponItem(record))
-                or (not Damage and Health.ApplyDamageToPlayer(target.player, action.damage))
-            then
+            attackApplied, attackReason = Damage and Damage.ApplyTargetDamage
+                and Damage.ApplyTargetDamage(record, zombie, target, {
+                    damage = action.damage,
+                    attackType = "melee",
+                    attackKind = action.attackKind,
+                    weaponItem = Internal.resolveWeaponItem(record),
+                })
+            if attackApplied then
                 applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
@@ -324,21 +260,19 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     Skills.AddXP(record, action.skillID or "Strength", action.attackKind == "ground" and 4 or 5)
                     Skills.AddXP(record, "Maintenance", 1)
                 end
-                return true, "hit_player"
+                return true, attackReason or "hit_player"
             end
-            return false, "invalid_player_target"
+            return false, attackReason or "invalid_player_target"
         end
         if target.kind == "npc" then
-            targetRecord = Registry.Get(target.id)
-            if not targetRecord then
-                return false, "invalid_npc_target"
-            end
-            if Health.ApplyDamage(targetRecord, Registry.GetLiveZombie(target.id), {
-                amount = action.damage,
-                type = "melee",
-                attackerID = record.id,
-                attackerKind = "npc",
-            }) then
+            attackApplied, attackReason = Damage and Damage.ApplyTargetDamage
+                and Damage.ApplyTargetDamage(record, zombie, target, {
+                    damage = action.damage,
+                    attackType = "melee",
+                    attackKind = action.attackKind,
+                    weaponItem = Internal.resolveWeaponItem(record),
+                })
+            if attackApplied then
                 applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
@@ -347,30 +281,20 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     Skills.AddXP(record, action.skillID or "Strength", 5)
                     Skills.AddXP(record, "Maintenance", 1)
                 end
-                return true, "hit_npc"
+                return true, attackReason or "hit_npc"
             end
-            return false, "npc_damage_rejected"
+            return false, attackReason or "npc_damage_rejected"
         end
         if target.kind == "zombie" then
-            if Stamina and Stamina.SpendAttack then
-                Stamina.SpendAttack(record, "melee", action.skillID)
-            end
-            if Skills and Skills.AddXP then
-                Skills.AddXP(record, action.skillID or "Strength", action.attackKind == "ground" and 4 or 5)
-                Skills.AddXP(record, "Maintenance", 1)
-            end
             attackApplied, attackReason = Internal.applyDamageToZombie(record, zombie, target, action.damage, "melee")
-            if attackApplied and action.attackKind == "melee" and Tactics and Tactics.ShouldPressureShove and Tactics.ShouldPressureShove(record) then
-                zombieTarget = Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
-                if zombieTarget and Unarmed and Unarmed.ApplyZombieShove then
-                    Unarmed.ApplyZombieShove(zombie, zombieTarget, {
-                        kind = "pressure_shove",
-                        hitForce = 1.02,
-                        pushDistance = 0.22,
-                        pushDurationMs = 170,
-                        durationMs = 220,
-                        stepDistance = 0.06,
-                    })
+            if attackApplied then
+                applyWeaponWear(record)
+                if Stamina and Stamina.SpendAttack then
+                    Stamina.SpendAttack(record, "melee", action.skillID)
+                end
+                if Skills and Skills.AddXP then
+                    Skills.AddXP(record, action.skillID or "Strength", action.attackKind == "ground" and 4 or 5)
+                    Skills.AddXP(record, "Maintenance", 1)
                 end
             end
             return attackApplied, attackReason
@@ -379,9 +303,14 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
 
     if action.attackType == "ranged" then
         if target.kind == "player" then
-            if Damage and Damage.ApplyPlayerDamage and Damage.ApplyPlayerDamage(target.player, action.damage, "ranged", Internal.resolveWeaponItem(record))
-                or (not Damage and Health.ApplyDamageToPlayer(target.player, action.damage))
-            then
+            attackApplied, attackReason = Damage and Damage.ApplyTargetDamage
+                and Damage.ApplyTargetDamage(record, zombie, target, {
+                    damage = action.damage,
+                    attackType = "ranged",
+                    attackKind = action.attackKind,
+                    weaponItem = Internal.resolveWeaponItem(record),
+                })
+            if attackApplied then
                 applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "ranged", action.skillID or "Aiming")
@@ -390,21 +319,19 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     Skills.AddXP(record, "Aiming", 5)
                     Skills.AddXP(record, "Reloading", 2)
                 end
-                return true, "hit_player"
+                return true, attackReason or "hit_player"
             end
-            return false, "invalid_player_target"
+            return false, attackReason or "invalid_player_target"
         end
         if target.kind == "npc" then
-            targetRecord = Registry.Get(target.id)
-            if not targetRecord then
-                return false, "invalid_npc_target"
-            end
-            if Health.ApplyDamage(targetRecord, Registry.GetLiveZombie(target.id), {
-                amount = action.damage,
-                type = "ranged",
-                attackerID = record.id,
-                attackerKind = "npc",
-            }) then
+            attackApplied, attackReason = Damage and Damage.ApplyTargetDamage
+                and Damage.ApplyTargetDamage(record, zombie, target, {
+                    damage = action.damage,
+                    attackType = "ranged",
+                    attackKind = action.attackKind,
+                    weaponItem = Internal.resolveWeaponItem(record),
+                })
+            if attackApplied then
                 applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "ranged", action.skillID or "Aiming")
@@ -413,19 +340,23 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     Skills.AddXP(record, "Aiming", 5)
                     Skills.AddXP(record, "Reloading", 2)
                 end
-                return true, "hit_npc"
+                return true, attackReason or "hit_npc"
             end
-            return false, "npc_damage_rejected"
+            return false, attackReason or "npc_damage_rejected"
         end
         if target.kind == "zombie" then
-            if Stamina and Stamina.SpendAttack then
-                Stamina.SpendAttack(record, "ranged", action.skillID or "Aiming")
+            attackApplied, attackReason = Internal.applyDamageToZombie(record, zombie, target, action.damage, "ranged")
+            if attackApplied then
+                applyWeaponWear(record)
+                if Stamina and Stamina.SpendAttack then
+                    Stamina.SpendAttack(record, "ranged", action.skillID or "Aiming")
+                end
+                if Skills and Skills.AddXP then
+                    Skills.AddXP(record, "Aiming", 5)
+                    Skills.AddXP(record, "Reloading", 2)
+                end
             end
-            if Skills and Skills.AddXP then
-                Skills.AddXP(record, "Aiming", 5)
-                Skills.AddXP(record, "Reloading", 2)
-            end
-            return Internal.applyDamageToZombie(record, zombie, target, action.damage, "ranged")
+            return attackApplied, attackReason
         end
     end
 

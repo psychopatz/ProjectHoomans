@@ -216,6 +216,7 @@ function Types.NewRecord(definition)
             recentDamageUntil = 0,
             body = {
                 wounds = {},
+                parts = {},
                 bleedingRate = 0,
                 openWoundCount = 0,
                 bandagedWoundCount = 0,

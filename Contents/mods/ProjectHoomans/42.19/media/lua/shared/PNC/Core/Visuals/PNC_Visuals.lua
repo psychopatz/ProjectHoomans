@@ -4,39 +4,6 @@ PNC.Visuals = PNC.Visuals or {}
 local Visuals = PNC.Visuals
 local Profiles = PNC.VisualProfiles
 
-local function normalizeBodyLocation(value)
-    local lowered
-    local stripped
-    local canonical
-    local ordered = {
-        "UnderwearBottom", "UnderwearTop", "UnderwearExtra1", "UnderwearExtra2", "Underwear", "Codpiece", "Torso1Legs1", "Legs1",
-        "Ears", "EarTop", "Nose", "Hat", "FullHat", "SCBA", "Mask", "MaskEyes", "Eyes", "RightEye", "LeftEye",
-        "Neck", "Necklace", "Necklace_Long", "Gorget", "Scarf", "Pants", "Pants_Skinny", "PantsExtra", "ShortPants", "ShortsShort",
-        "LongSkirt", "Skirt", "Dress", "LongDress", "TankTop", "Tshirt", "ShortSleeveShirt", "Shirt", "Jersey", "VestTexture",
-        "Sweater", "SweaterHat", "TorsoExtraVest", "Cuirass", "TorsoExtra", "Jacket", "JacketHat", "Jacket_Down", "JacketHat_Bulky",
-        "Jacket_Bulky", "JacketSuit", "FullTop", "RightWrist", "Right_MiddleFinger", "Right_RingFinger", "LeftWrist",
-        "Left_MiddleFinger", "Left_RingFinger", "Hands", "HandsRight", "HandsLeft", "BathRobe", "FullSuit", "FullSuitHead",
-        "Boilersuit", "Tail", "TorsoExtraVestBullet", "ShoulderpadRight", "ShoulderpadLeft", "Elbow_Right", "Elbow_Left",
-        "ForeArm_Right", "ForeArm_Left", "Thigh_Right", "Thigh_Left", "Knee_Right", "Knee_Left", "Calf_Right", "Calf_Left",
-        "FannyPackFront", "FannyPackBack", "Webbing", "Back", "AmmoStrap", "AnkleHolster", "BeltExtra", "ShoulderHolster",
-        "Socks", "Shoes"
-    }
-    local i
-    value = value and tostring(value) or nil
-    if not value then
-        return nil
-    end
-    lowered = string.lower(value)
-    stripped = string.match(lowered, "([^:%.]+)$") or lowered
-    for i = 1, #ordered do
-        canonical = ordered[i]
-        if string.lower(canonical) == stripped then
-            return canonical
-        end
-    end
-    return value
-end
-
 local function makeImmutableColor(color)
     if not color or not ImmutableColor then
         return nil
@@ -156,8 +123,7 @@ local function safeSetWornItem(zombie, item)
         return false
     end
     bodyLocation = item.getBodyLocation and item:getBodyLocation() or nil
-    bodyLocation = normalizeBodyLocation(bodyLocation)
-    if not bodyLocation or bodyLocation == "" then
+    if not bodyLocation then
         return false
     end
     return pcall(function()

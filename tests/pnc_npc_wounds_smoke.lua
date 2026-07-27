@@ -6,6 +6,12 @@ local function assertEqual(actual, expected, label)
     end
 end
 
+local function assertNear(actual, expected, label)
+    if math.abs((tonumber(actual) or 0) - expected) > 0.000001 then
+        error((label or "assertNear") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
+    end
+end
+
 local now = 10000
 local currentWorldHour = 100
 local randomValues = {}
@@ -74,6 +80,7 @@ dofile(ROOT .. "Base/PNC_Sandbox.lua")
 dofile(ROOT .. "Health/PNC_Health.lua")
 dofile(ROOT .. "Health/PNC_NPCWounds.lua")
 dofile(ROOT .. "Health/PNC_Treatment.lua")
+dofile(ROOT .. "API/PNC_API.lua")
 
 SandboxVars = {
     ProjectHoomans = {
@@ -128,12 +135,17 @@ randomValues = { 0, 0, 0 }
 local applied, result = PNC.NPCWounds.ResolveZombieAttack(record, body, attacker)
 assertEqual(applied, true, "unarmored wound")
 assertEqual(result.woundType, "bite", "bite roll")
-assertEqual(record.health.current, 88, "bite initial damage")
+assertNear(record.health.current, 88, "bite initial damage")
 assertEqual(PNC.NPCWounds.HasActiveInfection(record), true, "bite infection")
 assertEqual(record.health.body.openWoundCount, 1, "open wound count")
 
 local wound = record.health.body.wounds[result.partId]
 assert(wound and wound.bandaged == false, "wound was not recorded")
+assertNear(record.health.body.overallPercent, 88, "body-part aggregate health")
+assertNear(record.health.body.parts[result.partId].current, 76, "wounded part takes focused damage")
+local woundSnapshot = PNC.NPCWounds.BuildSnapshot(record)
+assertNear(woundSnapshot.overallPercent, 88, "snapshot aggregate health")
+assertEqual(woundSnapshot.totalPartMax, 1700, "snapshot total body-part maximum")
 
 local removed = 0
 local item = {}
@@ -158,6 +170,39 @@ assertEqual(record.health.body.bandagedWoundCount, 1, "bandaged count")
 assertEqual(broadcasts, 1, "bandage broadcast")
 assertEqual(PNC.NPCWounds.HasActiveInfection(record), true, "bandage does not cure Knox infection")
 
+local debugRecord = makeRecord("debug_bandage")
+records[debugRecord.id] = debugRecord
+bodies[debugRecord.id] = body
+protection = 0
+randomValues = { 0, 0, 0 }
+applied, result = PNC.NPCWounds.ResolveZombieAttack(debugRecord, body, attacker)
+assertEqual(applied, true, "debug bandage wound")
+local removedBeforeDebug = removed
+success, reason = PNC.Treatment.TryBandage(player, debugRecord.id, result.partId, { consumeItem = false })
+assertEqual(success, true, "debug bandage action")
+assertEqual(reason, "bandaged_debug", "debug bandage reason")
+assertEqual(removed, removedBeforeDebug, "debug bandage consumes no item")
+
+local specificDebug = makeRecord("debug_specific_wound")
+records[specificDebug.id] = specificDebug
+bodies[specificDebug.id] = body
+applied, result = PNC.API.DebugCommand(specificDebug.id, "damage_part", {
+    partId = "Hand_R",
+    woundType = "laceration",
+})
+assertEqual(applied, true, "specific debug wound applied")
+assertEqual(result.partId, "Hand_R", "specific debug wound part")
+assertEqual(result.woundType, "laceration", "specific debug wound type")
+assertNear(specificDebug.health.current, 92, "specific debug wound damage")
+assertEqual(specificDebug.health.body.wounds.Hand_R.bandaged, false, "specific debug wound can be bandaged")
+
+local randomDebug = makeRecord("debug_random_wound")
+randomValues = { 0, 2 }
+applied, result = PNC.NPCWounds.ApplyDebugWound(randomDebug, body)
+assertEqual(applied, true, "random debug wound applied")
+assertEqual(result.partId, "Head", "random debug wound part")
+assertEqual(result.woundType, "bite", "random debug wound type")
+
 local protected = makeRecord("protected")
 protection = 100
 randomValues = { 0, 0 }
@@ -181,7 +226,7 @@ local bleeding = makeRecord("bleeding")
 randomValues = { 0, 0, 0 }
 applied = PNC.NPCWounds.ResolveZombieAttack(bleeding, body, attacker)
 assertEqual(applied, true, "bleeding wound")
-bleeding.health.current = 0.01
+PNC.NPCWounds.SetOverallHealth(bleeding, 0.01)
 bleeding.health.body.lastBleedAt = now
 now = now + 1000
 PNC.Health.Update(bleeding, body, now)
