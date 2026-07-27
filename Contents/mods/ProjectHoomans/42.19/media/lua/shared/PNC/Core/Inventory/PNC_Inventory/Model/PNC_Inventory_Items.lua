@@ -5,6 +5,7 @@ PNC.Inventory = PNC.Inventory or {}
 
 local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
+local Core = PNC.Core
 local ITEM_WEIGHT_CACHE = {}
 local ITEM_CAPACITY_CACHE = {}
 
@@ -75,6 +76,7 @@ function Internal.itemToPayload(item)
         customName = item.customName,
         identityNPCId = item.identityNPCId,
         identityNPCName = item.identityNPCName,
+        itemState = Core.DeepCopy(item.itemState or {}),
     }
 end
 
@@ -102,6 +104,7 @@ function Internal.createItem(record, inv, spec)
         customName = Internal.normalizeString(spec.customName),
         identityNPCId = Internal.normalizeString(spec.identityNPCId),
         identityNPCName = Internal.normalizeString(spec.identityNPCName),
+        itemState = Core.DeepCopy(spec.itemState or {}),
     }
     if not item.type then return nil end
     inv.items[itemID] = item

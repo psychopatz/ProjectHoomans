@@ -333,6 +333,20 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_INVENTORY_TRANSFER then
+        if PNC.ServerInventory and PNC.ServerInventory.Transfer then
+            PNC.ServerInventory.Transfer(player, args or {})
+        end
+        return
+    end
+
+    if command == Const.CMD_INVENTORY_ACTION then
+        if PNC.ServerInventory and PNC.ServerInventory.Action then
+            PNC.ServerInventory.Action(player, args or {})
+        end
+        return
+    end
+
     if command == Const.CMD_PLAYER_WEAPON_HIT then
         if PlayerDamage and PlayerDamage.HandleClientReport then
             PlayerDamage.HandleClientReport(player, args or {})

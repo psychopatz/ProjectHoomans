@@ -80,6 +80,10 @@ PNC = {
             return {
                 IsWeapon = function() return true end,
                 getActualWeight = function() return 1 end,
+                getBodyLocation = function()
+                    return fullType == "Base.Tshirt_DefaultTEXTURE_TINT"
+                        and "Torso1" or nil
+                end,
                 fullType = fullType,
             }
         end,
@@ -217,5 +221,63 @@ assert(medical and (
     medical.type == "Base.Bandage"
     or medical.type == "Base.AlcoholBandage"
 ), "generic equipment category selection")
+
+dofile(ROOT .. "Inventory/PNC_Inventory_Actions.lua")
+local interactionRecord = makeRecord("inventory_interaction", 5150)
+interactionRecord.faction = "colonist"
+local interactionInventory = PNC.Inventory.CreateFromTemplate(interactionRecord)
+local added, addReason, addedIDs = PNC.Inventory.AddItems(interactionRecord, {
+    {
+        type = "Base.Tshirt_DefaultTEXTURE_TINT",
+        stack = 1,
+        itemState = { condition = 8, customName = "Travel Shirt" },
+    },
+}, "root", "smoke_add")
+assertEqual(added, true, "public inventory add")
+assertEqual(addReason, "added", "public inventory add reason")
+assertEqual(#addedIDs, 1, "public inventory add ID")
+local addedItem = interactionInventory.items[addedIDs[1]]
+assertEqual(addedItem.itemState.condition, 8, "portable state retained")
+
+local worn, wornReason = PNC.InventoryActions.Execute(
+    "wear", nil, interactionRecord, addedItem.id, {}
+)
+assertEqual(worn, true, "modular wear action")
+assertEqual(wornReason, "worn", "modular wear reason")
+assertEqual(addedItem.wornSlot, "Torso1", "worn slot applied")
+
+local removedWorn = PNC.InventoryActions.Execute(
+    "remove_worn", nil, interactionRecord, addedItem.id, {}
+)
+assertEqual(removedWorn, true, "modular remove-worn action")
+assertEqual(addedItem.wornSlot, nil, "worn slot cleared")
+
+local equipped = PNC.InventoryActions.Execute(
+    "equip_primary", nil, interactionRecord, addedItem.id, {}
+)
+assertEqual(equipped, true, "modular equip action")
+assertEqual(interactionInventory.equipped.primary, addedItem.id, "primary equipped")
+assertEqual(PNC.Inventory.SetEquipped(
+    interactionRecord, "secondary", addedItem.id, "smoke_secondary"
+), true, "move item to secondary")
+assertEqual(interactionInventory.equipped.primary, nil, "old equip slot cleared")
+assertEqual(interactionInventory.equipped.secondary, addedItem.id, "secondary equipped")
+assertEqual(PNC.Inventory.SetEquipped(
+    interactionRecord, "primary", addedItem.id, "smoke_primary"
+), true, "move item back to primary")
+assertEqual(interactionInventory.equipped.secondary, nil, "secondary slot cleared")
+assertEqual(interactionInventory.equipped.primary, addedItem.id, "primary restored")
+assertEqual(PNC.InventoryActions.Execute(
+    "unequip", nil, interactionRecord, addedItem.id, {}
+), true, "modular unequip action")
+assertEqual(interactionInventory.equipped.primary, nil, "primary cleared")
+
+local payload = PNC.Inventory.BuildFullPayload(interactionRecord)
+assertEqual(payload.items[addedItem.id].itemState.customName, "Travel Shirt",
+    "portable state replicated")
+assertEqual(PNC.Inventory.RemoveItems(
+    interactionRecord, { addedItem.id }, "smoke_remove"
+), true, "public inventory remove")
+assertEqual(interactionInventory.items[addedItem.id], nil, "item removed")
 
 print("pnc_equipment_generation_smoke: ok")

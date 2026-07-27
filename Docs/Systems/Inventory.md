@@ -30,6 +30,12 @@
 - `PNC.Inventory.ResolveStartingEquipment(record)`
 - `PNC.Inventory.EnsureRecordInventory(record)`
 - `PNC.Inventory.ApplyDelta(record, ops, reason)`
+- `PNC.Inventory.CanAccept(record, itemSpecs)`
+- `PNC.Inventory.AddItems(record, itemSpecs, containerID, reason)`
+- `PNC.Inventory.RemoveItems(record, itemIDs, reason)`
+- `PNC.Inventory.SetEquipped(record, slot, itemID, reason)`
+- `PNC.Inventory.SetWorn(record, itemID, wornSlot, reason)`
+- `PNC.Inventory.ClearWorn(record, itemID, reason)`
 - `PNC.Inventory.EquipPrimary(record, itemID, reason)`
 - `PNC.Inventory.GetWeightState(record)`
 - `PNC.Inventory.BuildSummaryPayload(record)`
@@ -49,12 +55,36 @@
 - `PNC_Inventory_Templates.lua` owns deterministic template generation.
 - `PNC_Inventory_Equipment.lua` loads record hydration and legacy equipment-sync modules.
 - `PNC_Inventory_Mutations.lua` validates and records inventory operations.
+- `PNC_Inventory_Actions.lua` is the data-driven item command registry. Built-in
+  actions are equip, unequip, wear, remove worn clothing, and drop; additional
+  mods can register actions without changing the inventory window.
 - `PNC_Inventory_Payloads.lua` builds summary, full, and incremental network payloads.
 - `PNC_Inventory_Persistence.lua` owns the public serializer/hydrator and delegates
   template-delta encoding and replay to its delta codec.
 
 Implementation modules communicate through `PNC.Inventory.Internal`; consumers should
 continue to call only the public `PNC.Inventory` functions.
+
+## Player Interaction and Multiplayer
+
+- `PNC_InventoryWindow` presents the player and companion containers with
+  clearly labeled ownership panes, vanilla-style striped rows, item/category
+  columns, selected-container weight, equipped dots, contextual item actions,
+  and drag transfer in both directions. Each pane has a vanilla-style icon rail
+  on its right edge: the inventory icon selects the root and bag icons select
+  accessible backpacks or other item containers.
+- The vanilla player inventory pane is bridged to the companion pane, so native
+  inventory items can be dropped directly onto the companion window and compact
+  NPC items can be dropped into the player's selected inventory or backpack.
+- Clients submit only item IDs, destination IDs, and their last inventory
+  revision. `PNC_ServerInventory` resolves every ID again against authoritative
+  state, enforces companion ownership/range, rejects stale revisions, caps batch
+  size, checks NPC carry capacity, and rolls back native items if the compact
+  mutation fails.
+- Native player/world item creation and removal is delegated to
+  `PsychopatzCore.ItemTransfer`, keeping packet synchronization and portable
+  item-state conversion standardized across ProjectHoomans, DynamicTrading, and
+  future Psychopatz mods.
 
 ## Equipment Generation
 

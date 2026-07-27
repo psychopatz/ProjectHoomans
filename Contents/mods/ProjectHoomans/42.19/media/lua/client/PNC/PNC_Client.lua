@@ -339,14 +339,29 @@ local function applyInventoryDelta(args)
             if op.uses ~= nil then item.uses = op.uses end
             if op.cond ~= nil then item.cond = op.cond end
             if op.ammoCount ~= nil then item.ammoCount = op.ammoCount end
-        elseif op.op == "equip" and op.slot == "primary" then
+        elseif op.op == "equip" and op.slot then
             inventory.equipped = inventory.equipped or {}
+            if op.oldSlot and inventory.equipped[op.oldSlot] == op.itemID then
+                inventory.equipped[op.oldSlot] = nil
+            end
             if op.previousItemID and inventory.items[op.previousItemID] then
                 inventory.items[op.previousItemID].equipSlot = nil
             end
-            inventory.equipped.primary = op.itemID
+            inventory.equipped[op.slot] = op.itemID
             if op.itemID and inventory.items[op.itemID] then
-                inventory.items[op.itemID].equipSlot = "primary"
+                inventory.items[op.itemID].equipSlot = op.slot
+            end
+        elseif op.op == "wear" and op.slot then
+            inventory.worn = inventory.worn or {}
+            if op.oldSlot and inventory.worn[op.oldSlot] == op.itemID then
+                inventory.worn[op.oldSlot] = nil
+            end
+            if op.previousItemID and inventory.items[op.previousItemID] then
+                inventory.items[op.previousItemID].wornSlot = nil
+            end
+            inventory.worn[op.slot] = op.itemID
+            if op.itemID and inventory.items[op.itemID] then
+                inventory.items[op.itemID].wornSlot = op.slot
             end
         end
     end
@@ -501,6 +516,14 @@ function Client.HandleServerCommand(command, args)
 
     if command == Const.CMD_INVENTORY_DELTA and args and args.npcId then
         applyInventoryDelta(args)
+        return
+    end
+
+    if command == Const.CMD_INVENTORY_RESULT then
+        ClientState.inventoryResult = Core.DeepCopy(args or {})
+        if PNC.InventoryWindow and PNC.InventoryWindow.OnResult then
+            PNC.InventoryWindow.OnResult(ClientState.inventoryResult)
+        end
         return
     end
 
@@ -662,6 +685,68 @@ function Client.SendCompanionCommand(commandID, npcId, scope)
     return (tonumber(affected) or 0) > 0
 end
 
+local function nextInventoryRequestID()
+    ClientState.inventoryRequestSerial = (tonumber(ClientState.inventoryRequestSerial) or 0) + 1
+    return table.concat({
+        tostring(getTimeInMillis and getTimeInMillis() or Core.Now()),
+        tostring(ClientState.inventoryRequestSerial),
+    }, ":")
+end
+
+function Client.SendInventoryTransfer(args)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not player or type(args) ~= "table" or not args.id then return false end
+    args.requestId = args.requestId or nextInventoryRequestID()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not sendClientCommand then return false end
+        sendClientCommand(player, Const.MODULE, Const.CMD_INVENTORY_TRANSFER, args)
+        return true
+    end
+    if PNC.ServerInventory and PNC.ServerInventory.Transfer then
+        local success, reason = PNC.ServerInventory.Transfer(player, args)
+        Client.RequestCharacterPayload(args.id)
+        if PNC.InventoryWindow and PNC.InventoryWindow.OnResult then
+            PNC.InventoryWindow.OnResult({
+                success = success == true,
+                reason = reason,
+                npcId = args.id,
+                requestId = args.requestId,
+            })
+        end
+        return success == true
+    end
+    return false
+end
+
+function Client.SendInventoryAction(args)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not player or type(args) ~= "table" or not args.id
+        or not args.itemID or not args.actionID
+    then
+        return false
+    end
+    args.requestId = args.requestId or nextInventoryRequestID()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not sendClientCommand then return false end
+        sendClientCommand(player, Const.MODULE, Const.CMD_INVENTORY_ACTION, args)
+        return true
+    end
+    if PNC.ServerInventory and PNC.ServerInventory.Action then
+        local success, reason = PNC.ServerInventory.Action(player, args)
+        Client.RequestCharacterPayload(args.id)
+        if PNC.InventoryWindow and PNC.InventoryWindow.OnResult then
+            PNC.InventoryWindow.OnResult({
+                success = success == true,
+                reason = reason,
+                npcId = args.id,
+                requestId = args.requestId,
+            })
+        end
+        return success == true
+    end
+    return false
+end
+
 local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, test)
     local square
     if not isWorldReady() then
@@ -693,6 +778,8 @@ local function onResetLua()
     ClientState.characterPayloads = {}
     ClientState.debugRoster = {}
     ClientState.debugAuthorized = false
+    ClientState.inventoryResult = nil
+    ClientState.inventoryRequestSerial = 0
     Client.BiteReplicas = {}
     if PNC.ClientFirearmEffects and PNC.ClientFirearmEffects.Reset then
         PNC.ClientFirearmEffects.Reset()
