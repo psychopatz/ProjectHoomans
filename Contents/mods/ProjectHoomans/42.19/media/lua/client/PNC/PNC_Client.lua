@@ -243,13 +243,14 @@ function Client.RequestDebugRoster(forceAudit)
         end
         return false
     end
-    if forceAudit and PNC.BodyLifecycle and PNC.BodyLifecycle.AuditLoadedBodies then
-        PNC.BodyLifecycle.AuditLoadedBodies(Core.Now(), true)
+    if PNC.BodyLifecycle and PNC.BodyLifecycle.AuditLoadedBodies then
+        -- The monitor is also available in single-player, where there may be
+        -- no remote server request to drive corpse cleanup. The audit owns its
+        -- own throttling, so ordinary refreshes safely keep markers current.
+        PNC.BodyLifecycle.AuditLoadedBodies(Core.Now(), forceAudit == true)
     end
-    if PNC.Registry and PNC.BodyLifecycle and PNC.BodyLifecycle.BuildDiagnostics then
-        PNC.Registry.ForEach(function(record)
-            diagnostics[#diagnostics + 1] = PNC.BodyLifecycle.BuildDiagnostics(record)
-        end)
+    if PNC.BodyLifecycle and PNC.BodyLifecycle.BuildDebugRoster then
+        diagnostics = PNC.BodyLifecycle.BuildDebugRoster()
     end
     ClientState.debugRoster = diagnostics
     ClientState.debugAuthorized = true

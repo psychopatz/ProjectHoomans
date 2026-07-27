@@ -138,7 +138,10 @@ function Monitor.UpdateTrackedMarker(force)
     end
 
     local item = findDiagnostic(trackedID)
-    if not item then return false end
+    if not item then
+        Monitor.ClearTrack()
+        return false
+    end
     local body = Support.FindBody(item)
     local x = body and body.getX and body:getX() or tonumber(item.x)
     local y = body and body.getY and body:getY() or tonumber(item.y)
@@ -252,7 +255,10 @@ end
 
 function ISPNCNPCMonitor:updateControlState()
     local item = self:getSelectedDiagnostic()
-    for _, button in ipairs(self.selectionControls or {}) do button:setEnable(item ~= nil) end
+    local mutableRecord = item ~= nil and item.deathMarker ~= true
+    for _, button in ipairs(self.selectionControls or {}) do
+        button:setEnable(mutableRecord)
+    end
     if self.recordDebugButton then
         local recording = Support.IsRecording(item)
         self.recordDebugButton:setTitle(recording

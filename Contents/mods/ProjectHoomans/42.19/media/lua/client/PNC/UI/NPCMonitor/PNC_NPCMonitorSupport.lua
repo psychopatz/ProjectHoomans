@@ -87,6 +87,15 @@ function Support.PopulateDetails(list, item, authorized, audit)
     addDetail(list, "Faction", item.faction)
     addDetail(list, "Presence", tostring(item.presenceState or "-") .. " / " .. tostring(item.phase or "-"), Support.PresenceColor(item))
     addDetail(list, "Body", tostring(item.bodyState or "-") .. " / corpse " .. tostring(item.corpseState or "-"))
+    if item.deathMarker == true then
+        addDetail(list, "Metadata", "Lightweight death marker", "warning")
+        addDetail(list, "Corpse token", item.corpseToken)
+        addDetail(list, "Infected", item.infected == true and "Yes" or "No",
+            item.infected == true and "danger" or "textMuted")
+        addDetail(list, "Created world hour", item.createdWorldHour)
+        addDetail(list, "Missing since", item.missingSinceAt)
+        addDetail(list, "Reanimate at", item.reanimateAt)
+    end
     addDetail(list, "Last cleanup", tostring(item.lastCleanupState or "-") .. " / " .. tostring(item.lastCleanupReason or "-"))
     addDetail(list, "Lease", item.bodyLease)
     addDetail(list, "Online / outfit", tostring(item.liveBodyOnlineID or "-") .. " / " .. tostring(item.liveBodyInstanceID or "-"))

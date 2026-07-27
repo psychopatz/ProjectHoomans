@@ -20,6 +20,10 @@
   UUID, name, death position, corpse token, infection flag, and reanimation
   delay; when the recorded square is loaded and the matching corpse remains
   absent beyond the short finalization grace, the marker is automatically deleted
+- `PNC_BodyLifecycle.BuildDebugRoster` merges live/abstract records and compact
+  death markers for both local and remote NPC-monitor requests
+- local monitor refreshes run the normal throttled body/corpse audit, so
+  single-player marker cleanup does not depend on a remote server response
 - uninfected corpses remain ordinary engine corpses. PNC does not tick their
   health, inventory, appearance, decomposition, or removal
 - every immediate and delayed corpse-finalization path idempotently ensures the

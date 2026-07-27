@@ -405,7 +405,10 @@ function Tactics.TryReposition(record, zombie, target, effectiveMode, reason, eq
 
     if effectiveMode == "ranged" or effectiveMode == "mixed" then
         aiming = Skills and Skills.GetLevel and Skills.GetLevel(record, "Aiming") or 0
-        if target.kind == "zombie" and (dist < 4.2 or (reason == "cooldown_active" and nearbyCount >= 1)) then
+        -- A single nearby target is not enough reason to run during every
+        -- cooldown. That behavior continually replaced the aim hold with a
+        -- retreat intent and starved ranged NPCs of reliable follow-up shots.
+        if target.kind == "zombie" and dist < (tonumber(Const.RANGED_MIN_STANDOFF) or 2.2) then
             return startRetreat(
                 record,
                 zombie,

@@ -70,6 +70,7 @@ function Lifecycle.BuildDeathMarkerDiagnostics(marker)
         id = tostring(marker.id),
         name = marker.name,
         faction = "dead",
+        deathMarker = true,
         presenceState = Const.PRESENCE_CORPSE,
         alive = false,
         phase = marker.infected == true and "awaiting-reanimation"
@@ -78,6 +79,10 @@ function Lifecycle.BuildDeathMarkerDiagnostics(marker)
             and "corpse-loaded" or "corpse-missing",
         corpseState = state.corpseState or "unresolved",
         corpseToken = marker.corpseToken,
+        infected = marker.infected == true,
+        createdWorldHour = marker.createdWorldHour,
+        reanimateAt = state.reanimateAt,
+        missingSinceAt = state.missingSinceAt,
         x = marker.x,
         y = marker.y,
         z = marker.z,
@@ -88,4 +93,27 @@ function Lifecycle.BuildDeathMarkerDiagnostics(marker)
         lastReason = marker.infected == true and "infection-death"
             or "death",
     }
+end
+
+function Lifecycle.BuildDebugRoster()
+    local list = {}
+    local registry = Internal.registry()
+    if not registry then return list end
+    if registry.ForEach then
+        registry.ForEach(function(record)
+            local diagnostic = Lifecycle.BuildDiagnostics(record)
+            if diagnostic then list[#list + 1] = diagnostic end
+        end)
+    end
+    if registry.ForEachDeathMarker then
+        registry.ForEachDeathMarker(function(marker)
+            local diagnostic = Lifecycle.BuildDeathMarkerDiagnostics(marker)
+            if diagnostic then list[#list + 1] = diagnostic end
+        end)
+    end
+    table.sort(list, function(left, right)
+        return tostring(left and (left.name or left.id) or "")
+            < tostring(right and (right.name or right.id) or "")
+    end)
+    return list
 end

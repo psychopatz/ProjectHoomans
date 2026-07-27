@@ -9,6 +9,12 @@
 - nearby NPCs are listed directly on the root world context menu; each entry uses Dynamic Trading's production Talk icon and owns a submenu for its actions
 - normal context labels contain only the NPC name. Archetype and distance are developer metadata and appear only while global debug presentation is enabled or that NPC is being recorded.
 - the NPC monitor uses the shared list-content hook to layer presence and `REC` badges over its roster renderer without coupling those indicators to the base row layout
+- the monitor merges active diagnostics with compact death markers in
+  multiplayer and local/single-player modes. Corpse entries expose the retained
+  UUID, name, position, corpse token, infection state, creation hour, and
+  runtime corpse state without restoring the retired full NPC record
+- tracking is removed automatically when its NPC or death-marker diagnostic
+  disappears, preventing a stale direction marker
 - client presentation settings use the shared `PsychopatzCore.Settings` store and `PsychopatzCore.InGameSettings` window instead of a PNC-specific persistence format
 - reusable world-direction markers are exposed through `PNC.EventMarkers`, backed by the marker runtime and assets owned by PsychopatzCore
 - the NPC monitor's `Focus` action outlines and faces a loaded body, while `Track` maintains a shared direction marker from authoritative diagnostic coordinates even after the monitor closes

@@ -329,7 +329,13 @@ local function onClientCommand(module, command, player, args)
         if args and args.audit == true and BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
             BodyLifecycle.AuditLoadedBodies(Core.Now(), true)
         end
-        Network.SendDebugRoster(player, buildDebugRoster(), true, BodyLifecycle and BodyLifecycle.LastAudit or {})
+        Network.SendDebugRoster(
+            player,
+            BodyLifecycle and BodyLifecycle.BuildDebugRoster
+                and BodyLifecycle.BuildDebugRoster() or {},
+            true,
+            BodyLifecycle and BodyLifecycle.LastAudit or {}
+        )
         return
     end
 
@@ -429,7 +435,13 @@ local function onClientCommand(module, command, player, args)
         if BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
             BodyLifecycle.AuditLoadedBodies(Core.Now(), true)
         end
-        Network.SendDebugRoster(player, buildDebugRoster(), true, BodyLifecycle and BodyLifecycle.LastAudit or {})
+        Network.SendDebugRoster(
+            player,
+            BodyLifecycle and BodyLifecycle.BuildDebugRoster
+                and BodyLifecycle.BuildDebugRoster() or {},
+            true,
+            BodyLifecycle and BodyLifecycle.LastAudit or {}
+        )
         return
     end
 end
@@ -440,28 +452,6 @@ local function onServerStarted()
         BodyLifecycle.AuditLoadedBodies(Core.Now(), true)
     end
     Core.LogInfo("PNC server started.")
-end
-
-function buildDebugRoster()
-    local list = {}
-    if not BodyLifecycle or not BodyLifecycle.BuildDiagnostics then
-        return list
-    end
-    Registry.ForEach(function(record)
-        list[#list + 1] = BodyLifecycle.BuildDiagnostics(record)
-    end)
-    if Registry.ForEachDeathMarker
-        and BodyLifecycle.BuildDeathMarkerDiagnostics
-    then
-        Registry.ForEachDeathMarker(function(marker)
-            list[#list + 1] =
-                BodyLifecycle.BuildDeathMarkerDiagnostics(marker)
-        end)
-    end
-    table.sort(list, function(a, b)
-        return tostring(a and a.name or a and a.id or "") < tostring(b and b.name or b and b.id or "")
-    end)
-    return list
 end
 
 Events.OnTick.Add(Server.OnTick)

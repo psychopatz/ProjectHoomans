@@ -60,6 +60,12 @@
   silently become a barehand shove
 - ranged NPCs require a validated firearm instance. Spawn templates satisfy
   that contract through inventory equipment generation
+- in-range ranged NPCs explicitly replace any previous travel intent with an
+  aim hold, face the live target through both the engine object-facing API and
+  the replicated combat-facing lease, and keep that aim through cooldowns
+- ranged kiting starts only inside the short safety standoff (2.2 tiles);
+  ordinary cooldowns against a single nearby enemy no longer trigger a retreat
+  that starves follow-up shots
 - natural equipment generation can produce melee-only, ranged-only, both, or
   unarmed NPCs; combat mode follows the generated equipment rather than the
   NPC archetype
@@ -68,3 +74,5 @@
 - low-stamina combat below the retreat threshold enters a recovery retreat instead of standing in place
 - surrounded melee pressure can add a shove-back stagger to create breathing room after a hit
 - combat debug state exposes target kind, resolved mode, weapon status, and block reason
+- repeated identical combat-block diagnostics are rate-limited per NPC and
+  combat lane so the 75 ms combat cadence cannot flood the Lua log

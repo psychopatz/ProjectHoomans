@@ -43,56 +43,65 @@ function Internal.faceTarget(zombie, target, record, leaseMs, reason)
     local faceX
     local faceY
     if not zombie or not target then
-        return
+        return false
     end
     if pathService and pathService.IsTraversalActive and pathService.IsTraversalActive(record, zombie) then
-        return
+        return false
     end
     if target.kind == "player" and target.player then
         faceX = target.player:getX()
         faceY = target.player:getY()
+        -- faceThisObject gives the engine an immediate live-object heading,
+        -- while the PathService lease publishes the same direction to remote
+        -- clients and prevents locomotion from taking facing back mid-shot.
+        if zombie.faceThisObject then
+            zombie:faceThisObject(target.player)
+        end
         if pathService and pathService.RequestCombatFacing and record then
             pathService.RequestCombatFacing(record, zombie, {
                 x = faceX,
                 y = faceY,
                 z = target.player:getZ(),
             }, leaseMs, reason or "combat_player")
-            return
+            return true
         end
-        if zombie.faceThisObject then
-            zombie:faceThisObject(target.player)
-        end
-        return
+        return zombie.faceThisObject ~= nil
     end
     if target.kind == "npc" then
         liveTarget = Registry.GetLiveZombie(target.id)
+        if liveTarget and zombie.faceThisObject then
+            zombie:faceThisObject(liveTarget)
+        end
         if liveTarget and pathService and pathService.RequestCombatFacing and record then
             pathService.RequestCombatFacing(record, zombie, {
                 x = liveTarget:getX(),
                 y = liveTarget:getY(),
                 z = liveTarget:getZ(),
             }, leaseMs, reason or "combat_npc")
-            return
+            return true
         end
-        if liveTarget and zombie.faceThisObject then
-            zombie:faceThisObject(liveTarget)
-        end
-        return
+        return liveTarget ~= nil and zombie.faceThisObject ~= nil
     end
     if target.kind == "zombie" then
         zombieTarget = Perception and Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
+        if zombieTarget and zombie.faceThisObject then
+            zombie:faceThisObject(zombieTarget)
+        end
         if zombieTarget and pathService and pathService.RequestCombatFacing and record then
             pathService.RequestCombatFacing(record, zombie, {
                 x = zombieTarget:getX(),
                 y = zombieTarget:getY(),
                 z = zombieTarget:getZ(),
             }, leaseMs, reason or "combat_zombie")
-            return
+            return true
         end
-        if zombieTarget and zombie.faceThisObject then
-            zombie:faceThisObject(zombieTarget)
-        end
+        return zombieTarget ~= nil and zombie.faceThisObject ~= nil
     end
+    return false
+end
+
+function Combat.FaceTarget(record, zombie, target, leaseMs, reason)
+    return Internal.faceTarget(zombie, target, record, leaseMs, reason)
 end
 
 function Internal.canAttack(record, now, cooldownMs)

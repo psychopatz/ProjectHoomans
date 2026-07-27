@@ -117,4 +117,14 @@ window:onTrack()
 assertEqual(PNC.NPCMonitor.trackedId, nil, "second click clears tracking")
 assertEqual(removals[1], "pnc_npc_track:npc_anton", "tracked marker removed")
 
+window:onTrack()
+assertEqual(PNC.NPCMonitor.trackedId, "npc_anton", "NPC can be tracked again")
+PNC.Network.ClientState.debugRoster = {}
+now = 3400
+onTick()
+assertEqual(PNC.NPCMonitor.trackedId, nil,
+    "tracking clears when authoritative metadata disappears")
+assertEqual(removals[2], "pnc_npc_track:npc_anton",
+    "stale direction marker removed with metadata")
+
 print("pnc_npc_monitor_track_smoke: ok")

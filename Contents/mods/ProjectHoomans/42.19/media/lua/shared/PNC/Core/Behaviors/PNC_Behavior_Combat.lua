@@ -16,6 +16,42 @@ local Tactics = PNC.CombatTactics
 local Common = PNC.BehaviorCommon
 local PathService = PNC.PathService
 
+local function holdRangedAim(record, zombie, target)
+    local timings = Combat and Combat.Internal and Combat.Internal.ATTACK_TIMINGS or nil
+    local leaseMs = timings and timings.ranged and timings.ranged.duration or 620
+    Common.HaltMovement(record, zombie, "ranged_aim")
+    if Combat and Combat.FaceTarget then
+        Combat.FaceTarget(record, zombie, target, leaseMs, "ranged_aim")
+    end
+end
+
+local function logBlocked(record, lane, reason)
+    local runtime
+    local state
+    local key
+    local now
+    local repeatMs
+    if not record then
+        return
+    end
+    record.runtime = record.runtime or {}
+    runtime = record.runtime
+    state = runtime.combatBlockedLog or {}
+    runtime.combatBlockedLog = state
+    key = tostring(lane or "combat") .. "|" .. tostring(reason or "unknown")
+    now = Core.Now()
+    repeatMs = tonumber(Const.COMBAT_BLOCK_LOG_REPEAT_MS) or 5000
+    if state.key == key and (now - (tonumber(state.at) or 0)) < repeatMs then
+        return
+    end
+    state.key = key
+    state.at = now
+    Core.LogRecordDebug(
+        record,
+        "NPC " .. tostring(record.id) .. " " .. tostring(lane or "combat") .. " blocked=" .. tostring(reason)
+    )
+end
+
 function BehaviorCombat.TickEngage(record, zombie, target)
     local dist = math.sqrt(tonumber(target and target.distSq or 0) or 0)
     local equipmentInfo = Equipment.Describe(record)
@@ -74,7 +110,12 @@ function BehaviorCombat.TickEngage(record, zombie, target)
         return
     end
 
-    if effectiveMode == "ranged" and Tactics and Tactics.TryReposition and target.kind == "zombie" and dist < 4.2 then
+    if effectiveMode == "ranged"
+        and Tactics
+        and Tactics.TryReposition
+        and target.kind == "zombie"
+        and dist < (tonumber(Const.RANGED_MIN_STANDOFF) or 2.2)
+    then
         repositioned, repositionReason = Tactics.TryReposition(record, zombie, target, effectiveMode, "target_too_close", equipmentInfo)
         if repositioned then
             Common.SetCombatDebug(record, target, repositionReason or "maintaining_range", effectiveMode, equipmentInfo.weaponStatus)
@@ -121,11 +162,14 @@ function BehaviorCombat.TickEngage(record, zombie, target)
             return
         end
         Common.SetCombatDebug(record, target, reason, effectiveMode, equipmentInfo.weaponStatus)
-        Core.LogRecordDebug(record, "NPC " .. tostring(record.id) .. " melee blocked=" .. tostring(reason))
+        logBlocked(record, "melee", reason)
         return
     end
 
     if effectiveMode == "ranged" then
+        if dist <= Const.RANGED_RANGE then
+            holdRangedAim(record, zombie, target)
+        end
         attacked, reason = Combat.TryRanged(record, zombie, target)
         if attacked then
             if Tactics and Tactics.ClearRetreatState then
@@ -159,7 +203,7 @@ function BehaviorCombat.TickEngage(record, zombie, target)
             return
         end
         Common.SetCombatDebug(record, target, reason, effectiveMode, equipmentInfo.weaponStatus)
-        Core.LogRecordDebug(record, "NPC " .. tostring(record.id) .. " ranged blocked=" .. tostring(reason))
+        logBlocked(record, "ranged", reason)
         return
     end
 
@@ -183,10 +227,13 @@ function BehaviorCombat.TickEngage(record, zombie, target)
             return
         end
         Common.SetCombatDebug(record, target, reason, "mixed", equipmentInfo.weaponStatus)
-        Core.LogRecordDebug(record, "NPC " .. tostring(record.id) .. " mixed melee blocked=" .. tostring(reason))
+        logBlocked(record, "mixed melee", reason)
         return
     end
 
+    if dist <= Const.RANGED_RANGE then
+        holdRangedAim(record, zombie, target)
+    end
     attacked, reason = Combat.TryRanged(record, zombie, target)
     if attacked then
         if Tactics and Tactics.ClearRetreatState then
@@ -220,5 +267,5 @@ function BehaviorCombat.TickEngage(record, zombie, target)
         return
     end
     Common.SetCombatDebug(record, target, reason, "mixed", equipmentInfo.weaponStatus)
-    Core.LogRecordDebug(record, "NPC " .. tostring(record.id) .. " mixed ranged blocked=" .. tostring(reason))
+    logBlocked(record, "mixed ranged", reason)
 end
