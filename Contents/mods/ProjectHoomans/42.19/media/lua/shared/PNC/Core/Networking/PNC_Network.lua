@@ -322,6 +322,7 @@ function Network.BuildSnapshot(record)
     local firearmState
     local vehiclePassenger
     local treatmentState
+    local attackMode
     aiState, inCombat = resolveAIState(record)
     canRevive = PNC.Health and PNC.Health.CanRevive and PNC.Health.CanRevive(record) or false
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
@@ -339,6 +340,15 @@ function Network.BuildSnapshot(record)
     treatmentState = PNC.BehaviorTreatment
         and PNC.BehaviorTreatment.BuildSnapshot
         and PNC.BehaviorTreatment.BuildSnapshot(record) or nil
+    attackMode = record.runtime and (
+        record.runtime.target ~= nil
+        or (
+            record.runtime.attackAction ~= nil
+            and Core.Now() < (
+                tonumber(record.runtime.attackAction.finishAt) or 0
+            )
+        )
+    ) or false
     return {
         interestDetailed = true,
         id = record.id,
@@ -405,7 +415,7 @@ function Network.BuildSnapshot(record)
         liveBodyLease = record.runtime and record.runtime.bodyLease or nil,
         aiState = aiState,
         inCombat = inCombat,
-        attackMode = record.runtime and record.runtime.target ~= nil or false,
+        attackMode = attackMode,
         visualState = visualState,
         appearance = appearance and Core.DeepCopy(appearance) or nil,
         equipmentSummary = {

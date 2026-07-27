@@ -14,6 +14,7 @@ local Spatial = PNC.SpatialIndex
 local Stealth = PNC.Stealth
 local Registry = PNC.Registry
 local Relationships = PNC.Relationships
+Perception.OwnerThreatCache = Perception.OwnerThreatCache or {}
 
 local function isImmediateThreat(target)
     local radius = tonumber(Const.TARGET_IMMEDIATE_THREAT_RADIUS) or 6
@@ -472,13 +473,146 @@ local function getCompanionDefenseRadius()
     return math.max(8, tonumber(Const.ZOMBIE_TARGET_RADIUS) or 12)
 end
 
+local function ownerThreatCacheKey(owner)
+    local onlineID = owner and owner.getOnlineID
+        and owner:getOnlineID() or nil
+    local username = owner and owner.getUsername
+        and owner:getUsername() or nil
+    if onlineID ~= nil and (tonumber(onlineID) or -1) >= 0 then
+        return "id:" .. tostring(onlineID)
+    end
+    if username and tostring(username) ~= "" then
+        return "user:" .. tostring(username)
+    end
+    return tostring(owner)
+end
+
+local function buildOwnerThreatTarget(record, owner, zombie)
+    local ok
+    local engineTarget
+    local candidate
+    if not zombie or zombie:isDead()
+        or Core.IsManagedNPCBody(zombie)
+        or math.abs(zombie:getZ() - owner:getZ()) >= 1
+        or not zombie.getTarget
+    then
+        return nil
+    end
+    ok, engineTarget = pcall(zombie.getTarget, zombie)
+    if not ok or engineTarget ~= owner then
+        return nil
+    end
+    candidate = buildZombieTarget(
+        record,
+        zombie,
+        Core.DistanceSq(
+            record.x,
+            record.y,
+            zombie:getX(),
+            zombie:getY()
+        ),
+        "owner_under_attack"
+    )
+    if candidate then
+        candidate.threatening = true
+        candidate.defendingOwner = true
+    end
+    return candidate
+end
+
+local function findZombieTargetingOwner(record, owner, radius)
+    local zombies
+    local bestZombie
+    local bestOwnerDistSq
+    local radiusSq
+    local i
+    local zombie
+    local ok
+    local engineTarget
+    local ownerDistSq
+    local now
+    local cacheKey
+    local cached
+    if not record or not owner or not Spatial or not Spatial.QueryZombies then
+        return nil
+    end
+    now = Core.Now()
+    cacheKey = ownerThreatCacheKey(owner)
+    cached = Perception.OwnerThreatCache[cacheKey]
+    if cached and now < (tonumber(cached.expiresAt) or 0) then
+        if cached.zombie == false then
+            return nil
+        end
+        local cachedTarget = buildOwnerThreatTarget(
+            record,
+            owner,
+            cached.zombie
+        )
+        if cachedTarget then
+            return cachedTarget
+        end
+    end
+    radius = math.max(1, tonumber(radius) or getCompanionDefenseRadius())
+    radiusSq = radius * radius
+    zombies = Spatial.QueryZombies(owner:getX(), owner:getY(), radius)
+    bestOwnerDistSq = math.huge
+    for i = 1, #zombies do
+        zombie = zombies[i]
+        if zombie and not zombie:isDead()
+            and not Core.IsManagedNPCBody(zombie)
+            and math.abs(zombie:getZ() - owner:getZ()) < 1
+            and zombie.getTarget
+        then
+            ok, engineTarget = pcall(zombie.getTarget, zombie)
+            if ok and engineTarget == owner then
+                ownerDistSq = Core.DistanceSq(
+                    owner:getX(),
+                    owner:getY(),
+                    zombie:getX(),
+                    zombie:getY()
+                )
+                if ownerDistSq <= radiusSq
+                    and ownerDistSq < bestOwnerDistSq
+                then
+                    bestZombie = zombie
+                    bestOwnerDistSq = ownerDistSq
+                end
+            end
+        end
+    end
+    Perception.OwnerThreatCache[cacheKey] = {
+        zombie = bestZombie or false,
+        expiresAt = now + (
+            tonumber(Const.COMPANION_OWNER_THREAT_CACHE_MS) or 100
+        ),
+    }
+    return buildOwnerThreatTarget(record, owner, bestZombie)
+end
+
+function Perception.FindOwnerThreateningZombie(record, owner, radius)
+    return findZombieTargetingOwner(record, owner, radius)
+end
+
 function Perception.ResolveCompanionTarget(record)
     local owner
+    local ownerThreatZombie
     local npcTarget
     local zombieTarget
     local hostileToOwnerNPC
     local hostileToOwnerZombie
     local defenseRadius = getCompanionDefenseRadius()
+
+    owner = Core.ResolvePlayerByOnlineID(record.ownerOnlineID) or Core.ResolvePlayerByUsername(record.ownerUsername)
+    if owner and (not record.hostility or record.hostility.attackZombies ~= false) then
+        ownerThreatZombie = findZombieTargetingOwner(
+            record,
+            owner,
+            defenseRadius
+        )
+        if ownerThreatZombie then
+            return ownerThreatZombie
+        end
+    end
 
     if Stealth and Stealth.ShouldSuppressCompanionCombat and Stealth.ShouldSuppressCompanionCombat(record) then
         record.runtime = record.runtime or {}
@@ -487,7 +621,6 @@ function Perception.ResolveCompanionTarget(record)
         return nil
     end
 
-    owner = Core.ResolvePlayerByOnlineID(record.ownerOnlineID) or Core.ResolvePlayerByUsername(record.ownerUsername)
     if not record.hostility or record.hostility.attackNPCs ~= false then
         npcTarget = Perception.FindNearestEnemyNPC(record, defenseRadius)
     end

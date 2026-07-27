@@ -16,6 +16,38 @@ local Tactics = PNC.CombatTactics
 local Common = PNC.BehaviorCommon
 local PathService = PNC.PathService
 
+function BehaviorCombat.TickCommittedAction(record, zombie)
+    local equipmentInfo
+    local actionActive
+    local reason
+    local target
+    if not Combat or not Combat.PumpAttackAction
+        or not record
+        or not record.runtime
+        or not record.runtime.attackAction
+    then
+        return false
+    end
+    target = record and record.runtime and record.runtime.target or nil
+    equipmentInfo = Equipment.Describe(record)
+    if Equipment.ApplyCombatState and zombie then
+        Equipment.ApplyCombatState(zombie, record, true)
+    end
+    actionActive, reason = Combat.PumpAttackAction(record, zombie)
+    if not actionActive then
+        return false
+    end
+    Common.HaltMovement(record, zombie, "committed_attack")
+    Common.SetCombatDebug(
+        record,
+        target,
+        reason or "attack_in_progress",
+        equipmentInfo.combatModeResolved,
+        equipmentInfo.weaponStatus
+    )
+    return true
+end
+
 local function holdRangedAim(record, zombie, target)
     local timings = Combat and Combat.Internal and Combat.Internal.ATTACK_TIMINGS or nil
     local leaseMs = timings and timings.ranged and timings.ranged.duration or 620

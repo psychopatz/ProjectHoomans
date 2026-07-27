@@ -27,6 +27,10 @@
 - attack actions explicitly release the engine bump channel when the animation
   finishes, the target is lost, or the bounded action timeout expires; release
   remains pending until the ActionContext acknowledges that it left `bumped`
+- once an attack windup is committed, its action pump temporarily owns the
+  behavior tick independently of fresh perception. A short LOS/index miss
+  therefore cannot cancel the swing, holster its weapon, or skip its delayed
+  hit/finish frame
 - weapon hits use a short passive settlement lease: vanilla hit/stagger owns
   animation, while PNC aggro temporarily refrains from clearing the attacker or
   issuing path/bite commands that would freeze the reaction state
@@ -50,6 +54,9 @@
   resolves before the hit frame
 - companions and hostiles can acquire zombie targets; neutrals reserve combat
   for hostile NPCs until their disposition changes
+- companions prioritize an ordinary zombie whose live engine target is their
+  owner. This urgent defense lane bypasses follow-stealth suppression and the
+  rotating LOS budget because the owner is already under active attack
 - companion, roaming, and hostile behaviors share periodic target
   reassessment. A nearby enemy actively attacking the NPC takes priority over
   a passive target; otherwise a substantially closer candidate may replace the
@@ -117,6 +124,9 @@
   primary weapon is attached to the best compatible holster/belt/back slot and
   transitions to the hands only while the combat target is active; the same
   attack-mode transition is replicated to multiplayer clients
+- combat-hand state is verified against the live body before the presentation
+  cache returns `unchanged`. If an engine action transition discards the hand
+  item, only the hand model is repaired; worn clothing is never rebuilt
 - ranged attacks use half the base stamina of melee attacks (10 versus 20)
 - ranged combat owns locomotion before the aim/fire branch. Shooters maintain a
   preferred minimum distance of 5 tiles and, under zombie pressure, retreat

@@ -54,6 +54,12 @@ reaction packets in one frame do not each traverse the full engine zombie list.
 - movement stays on periodic compact snapshots, while attack starts, newly
   assigned body online IDs, and bite damage request one immediate transition
   snapshot instead of increasing the global movement frequency
+- client appearance identity is keyed by the live body lease/instance and
+  actual appearance or worn-equipment fields. Combat draw/holster state has a
+  separate hand key, so entering combat cannot recreate clothing, reroll its
+  tint, or reset a committed attack animation
+- attack mode remains replicated while a delayed attack action is active, even
+  if target reassessment temporarily yields no target
 - detailed health payloads carry the persisted infection stage, progress,
   fever, and temperature; clients never advance infection or subtract health
 - client locomotion/resync diagnostics are deduplicated per NPC and state for

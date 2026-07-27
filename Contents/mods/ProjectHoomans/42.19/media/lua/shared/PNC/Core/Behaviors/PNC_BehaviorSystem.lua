@@ -28,6 +28,7 @@ local Incapacitated = PNC.BehaviorIncapacitated
 local Treatment = PNC.BehaviorTreatment
 local Companion = PNC.BehaviorCompanion
 local Hostile = PNC.BehaviorHostile
+local Combat = PNC.BehaviorCombat
 
 function Behavior.Tick(record, zombie, now)
     local job
@@ -48,6 +49,15 @@ function Behavior.Tick(record, zombie, now)
 
     if record.health and record.health.state == "incapacitated" then
         Incapacitated.Tick(record, zombie)
+        return
+    end
+
+    -- A committed windup owns the actor until its delayed hit/finish frame.
+    -- Perception may legitimately return no fresh target for one frame, but
+    -- that must not holster the weapon or abandon the animation in progress.
+    if Combat and Combat.TickCommittedAction
+        and Combat.TickCommittedAction(record, zombie)
+    then
         return
     end
 

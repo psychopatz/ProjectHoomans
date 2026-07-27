@@ -13,6 +13,7 @@ local Core = PNC.Core
 local Const = PNC.Const
 local PathService = PNC.PathService
 local Equipment = PNC.Equipment
+local Combat = PNC.Combat
 
 local function resolveMoveIntent()
     return PNC.BehaviorMoveIntent
@@ -28,13 +29,17 @@ end
 
 function Common.ClearCombatTarget(record, reason, zombie)
     local equipmentInfo = Equipment.Describe(record)
+    local committedAttack
     record.runtime = record.runtime or {}
     record.runtime.target = nil
+    committedAttack = Combat and Combat.HasActiveAttack
+        and Combat.HasActiveAttack(record, Core.Now())
+        or false
     if not zombie and PNC.Registry and PNC.Registry.GetLiveZombie then
         zombie = PNC.Registry.GetLiveZombie(record.id)
     end
     if Equipment.ApplyCombatState and zombie then
-        Equipment.ApplyCombatState(zombie, record, false)
+        Equipment.ApplyCombatState(zombie, record, committedAttack)
     end
     Common.SetCombatDebug(
         record,

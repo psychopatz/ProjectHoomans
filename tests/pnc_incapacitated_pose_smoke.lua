@@ -187,6 +187,40 @@ PNC.Network = {
 dofile("Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/PNC_ClientPresenceSync.lua")
 PNC.ClientPresenceSync.BodyByOnlineID["77"] = zombie
 
+local visualKeySnapshot = {
+    liveBodyInstanceID = "body_1",
+    liveBodyLease = "lease_1",
+    liveBodyOnlineID = 77,
+    presenceRevision = 4,
+    attackMode = false,
+    visualProfile = "profile",
+    isFemale = false,
+    appearance = { outfit = "Naked" },
+    equipmentSummary = {
+        primaryFullType = "Base.Axe",
+        worn = { Shirt = "Base.Shirt_FormalWhite" },
+        attached = {},
+    },
+}
+local visualKey = PNC.ClientPresenceSync.Internal.BuildVisualKey(
+    visualKeySnapshot
+)
+local handsKey = PNC.ClientPresenceSync.Internal.BuildHandsKey(
+    visualKeySnapshot
+)
+visualKeySnapshot.presenceRevision = 5
+visualKeySnapshot.attackMode = true
+assertEqual(
+    PNC.ClientPresenceSync.Internal.BuildVisualKey(visualKeySnapshot),
+    visualKey,
+    "combat transition rebuilt immutable clothing presentation"
+)
+if PNC.ClientPresenceSync.Internal.BuildHandsKey(visualKeySnapshot)
+    == handsKey
+then
+    error("combat transition did not invalidate hand presentation")
+end
+
 PNC.ClientPresenceSync.OnTick()
 assertEqual(crawler, false, "remote client avoids vanilla crawler state")
 assertEqual(onFloor, false, "remote client avoids vanilla floor state")

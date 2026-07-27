@@ -29,6 +29,7 @@ Sync.FacingByID = Sync.FacingByID or {}
 Sync.UnresolvedLogAtByID = Sync.UnresolvedLogAtByID or {}
 Sync.MotionLogByID = Sync.MotionLogByID or {}
 Sync.PrunedRevisionByID = Sync.PrunedRevisionByID or {}
+Sync.Internal = Sync.Internal or {}
 Sync.lastBodyScanAt = Sync.lastBodyScanAt or 0
 Sync.lastLocalSnapshotBuildAt = Sync.lastLocalSnapshotBuildAt or 0
 
@@ -248,10 +249,11 @@ local function buildVisualKey(snapshot)
     local appearance = snapshot and snapshot.appearance or {}
     local equipment = snapshot and snapshot.equipmentSummary or {}
     return table.concat({
-        tostring(snapshot and snapshot.presenceRevision or 0),
+        tostring(snapshot and snapshot.liveBodyInstanceID or ""),
+        tostring(snapshot and snapshot.liveBodyLease or ""),
+        tostring(snapshot and snapshot.liveBodyOnlineID or ""),
         tostring(snapshot and snapshot.visualProfile or ""),
         tostring(snapshot and snapshot.isFemale == true),
-        tostring(snapshot and snapshot.attackMode == true),
         tostring(appearance.outfit or ""),
         tostring(appearance.skinTexture or ""),
         tostring(appearance.hairModel or ""),
@@ -264,12 +266,17 @@ end
 local function buildHandsKey(snapshot)
     local equipment = snapshot and snapshot.equipmentSummary or {}
     return table.concat({
-        tostring(snapshot and snapshot.presenceRevision or 0),
+        tostring(snapshot and snapshot.liveBodyInstanceID or ""),
+        tostring(snapshot and snapshot.liveBodyLease or ""),
+        tostring(snapshot and snapshot.liveBodyOnlineID or ""),
         tostring(snapshot and snapshot.attackMode == true),
         tostring(equipment.primaryFullType or ""),
         tostring(equipment.secondaryFullType or ""),
     }, "|")
 end
+
+Sync.Internal.BuildVisualKey = buildVisualKey
+Sync.Internal.BuildHandsKey = buildHandsKey
 
 local function buildMotionKey(snapshot)
     local visualState = snapshot and snapshot.visualState or {}
@@ -699,6 +706,14 @@ local function applySnapshotToBody(snapshot, zombie)
             Equipment.Apply(zombie, recordView)
         end
         modData.PNC_ClientHandsKey = handsKey
+    end
+    if snapshot.attackMode == true
+        and Equipment
+        and Equipment.EnsureCombatHands
+    then
+        -- Engine action-state transitions may discard IsoZombie hand models.
+        -- This is a read-mostly repair and never rebuilds worn clothing.
+        Equipment.EnsureCombatHands(zombie, recordView)
     end
 
     -- The multiplayer zombie packet may reapply rot, blood, dirt, or a zombie

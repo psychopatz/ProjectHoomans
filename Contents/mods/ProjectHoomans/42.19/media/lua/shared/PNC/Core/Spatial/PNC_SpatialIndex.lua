@@ -170,8 +170,6 @@ function Spatial.Rebuild(now, force)
     Spatial.PlayerCells = {}
     Spatial.PlayerByOnlineID = {}
     Spatial.PlayerByUsername = {}
-    Spatial.ZombieCells = {}
-    Spatial.ZombieByID = {}
 
     Core.ForEachPlayer(function(player)
         local onlineID

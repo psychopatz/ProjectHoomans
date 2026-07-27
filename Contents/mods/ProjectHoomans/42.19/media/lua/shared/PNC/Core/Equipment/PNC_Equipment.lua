@@ -137,6 +137,48 @@ local function clearHands(zombie)
     refreshHands(zombie)
 end
 
+local function getPrimaryHandItem(zombie)
+    local ok
+    local item
+    if not zombie or type(zombie.getPrimaryHandItem) ~= "function" then
+        return nil, false
+    end
+    ok, item = pcall(zombie.getPrimaryHandItem, zombie)
+    if not ok then
+        return nil, false
+    end
+    return item, true
+end
+
+local function isPrimaryHandStateCurrent(zombie, descriptor, attackMode)
+    local item
+    local readable
+    local ok
+    local fullType
+    item, readable = getPrimaryHandItem(zombie)
+    if not readable then
+        return nil
+    end
+    if attackMode ~= true or not descriptor or not descriptor.fullType
+        or descriptor.hasWeapon ~= true
+    then
+        return item == nil
+    end
+    if not item then
+        return false
+    end
+    if type(item.getFullType) ~= "function" then
+        -- A present hand item is the strongest comparison available for
+        -- lightweight test doubles and unusual modded InventoryItems.
+        return true
+    end
+    ok, fullType = pcall(item.getFullType, item)
+    if not ok or fullType == nil then
+        return true
+    end
+    return tostring(fullType) == tostring(descriptor.fullType)
+end
+
 local function clearExplicitWornItems(zombie)
     local wornItems
     local itemVisuals
@@ -538,23 +580,63 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
     local ok
     local attachedReason
     local handsReason
+    local handStateCurrent
 
     if not zombie or not record then
         return false, "missing_body_or_record"
     end
     record.runtime = record.runtime or {}
     attackMode = attackMode == true
+    equipment = Equipment.EnsureRecordEquipment(record)
+    descriptor = buildWeaponDescriptor(equipment.primaryFullType, false)
+    handStateCurrent = isPrimaryHandStateCurrent(
+        zombie,
+        descriptor,
+        attackMode
+    )
     if force ~= true
         and record.runtime.equipmentAttackModeApplied == attackMode
-        and record.runtime.equipmentPresentationRevision == Equipment.PRESENTATION_REVISION then
+        and record.runtime.equipmentPresentationRevision == Equipment.PRESENTATION_REVISION
+        and handStateCurrent ~= false
+    then
         return true, "unchanged"
     end
 
-    equipment = Equipment.EnsureRecordEquipment(record)
     descriptor = buildWeaponDescriptor(equipment.primaryFullType, true)
     ok, attachedReason, handsReason = applyCombatPresentation(zombie, record, equipment, descriptor, attackMode)
     Visuals.RefreshModel(zombie)
     return ok, tostring(attachedReason) .. "|" .. tostring(handsReason)
+end
+
+function Equipment.EnsureCombatHands(zombie, record)
+    local equipment
+    local descriptor
+    local current
+    local ok
+    local reason
+    if not zombie or not record then
+        return false, "missing_body_or_record"
+    end
+    equipment = Equipment.EnsureRecordEquipment(record)
+    descriptor = buildWeaponDescriptor(equipment.primaryFullType, false)
+    current = isPrimaryHandStateCurrent(zombie, descriptor, true)
+    if current == true then
+        return true, "unchanged"
+    end
+    descriptor = buildWeaponDescriptor(equipment.primaryFullType, true)
+    ok, reason = applyHands(
+        zombie,
+        record,
+        equipment,
+        descriptor,
+        true
+    )
+    record.runtime = record.runtime or {}
+    record.runtime.equipmentAttackModeApplied = true
+    record.runtime.equipmentPresentationRevision =
+        Equipment.PRESENTATION_REVISION
+    Visuals.RefreshModel(zombie)
+    return ok, reason
 end
 
 function Equipment.ResolveWeaponMode(fullType)

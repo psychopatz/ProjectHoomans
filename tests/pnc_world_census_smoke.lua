@@ -81,4 +81,15 @@ assert(PNC.SpatialIndex.Rebuild(now, false) == true,
 assert(scans == 2,
     "spatial consumer rescanned an already-fresh census")
 
+-- Spatial refreshes may run after another census consumer in the same census
+-- generation. Rebuilding player cells must not erase the retained zombie
+-- grid merely because there is no newer zombie snapshot to consume.
+now = 1600
+assert(PNC.SpatialIndex.Rebuild(now, false) == true,
+    "spatial refresh with unchanged census generation failed")
+assert(scans == 2,
+    "unchanged census generation triggered another engine scan")
+assert(#PNC.SpatialIndex.QueryZombies(8, 0, 16) == 25,
+    "unchanged census generation erased the zombie index")
+
 print("pnc_world_census_smoke: ok")

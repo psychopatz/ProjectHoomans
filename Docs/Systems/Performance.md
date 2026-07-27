@@ -20,6 +20,11 @@ Ordinary zombies receive their stable PNC spatial ID during census collection.
 A stale target lookup respects the normal census throttle and never forces a
 new full scan for each NPC.
 
+The spatial layer retains the last valid zombie grid when another consumer has
+already refreshed the census but its generation has not changed. Player-cell
+refreshes never clear zombie cells unless a replacement census generation is
+actually indexed.
+
 ## Zombie Aggro Budget
 
 `PNC_ZombieAggro_ActiveSet` admits zombies that are near a live NPC, were
@@ -50,6 +55,11 @@ LOS is limited to a rotating window of six candidates plus a remembered zombie
 attacker. A window with no visible result advances on the next frame. Frames
 invalidate on expiry, meaningful observer movement, floor changes, or new
 attacker memory.
+
+An owner-targeting zombie is an urgent companion-defense exception. It is
+selected from the owner's nearby spatial cells before the normal LOS window;
+this does not perform a global zombie-list scan. Companions belonging to the
+same player share that result for 100 ms.
 
 ## Simulation LOD
 
@@ -108,6 +118,8 @@ after the workload to read the accumulated snapshot.
 - `pnc_world_census_smoke.lua`
 - `pnc_zombie_aggro_budget_smoke.lua`
 - `pnc_perception_frame_smoke.lua`
+- `pnc_companion_owner_defense_smoke.lua`
+- `pnc_combat_commitment_smoke.lua`
 - `pnc_simulation_lod_smoke.lua`
 - `pnc_scheduler_smoke.lua`
 - `pnc_spatial_throttle_smoke.lua`

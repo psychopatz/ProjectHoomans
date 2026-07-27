@@ -65,6 +65,9 @@ local zombie = {
         self.primary = item
         primarySet = primarySet + 1
     end,
+    getPrimaryHandItem = function(self)
+        return self.primary
+    end,
     setSecondaryHandItem = function(self, item)
         self.secondary = item
     end,
@@ -99,6 +102,12 @@ applied = PNC.Equipment.ApplyCombatState(zombie, record, true)
 assertEqual(applied, true, "combat equipment apply")
 assertEqual(zombie.primary, weapon, "combat primary hand")
 assertEqual(zombie.attached.Back, nil, "combat holster cleared")
+
+zombie.primary = nil
+applied = PNC.Equipment.ApplyCombatState(zombie, record, true)
+assertEqual(applied, true, "combat hand repair")
+assertEqual(zombie.primary, weapon,
+    "cached combat presentation did not restore a discarded weapon")
 
 record.runtime.target = nil
 applied = PNC.Equipment.ApplyCombatState(zombie, record, false)
