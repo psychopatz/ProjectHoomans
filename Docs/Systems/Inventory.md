@@ -30,6 +30,7 @@
 - `PNC.Inventory.ResolveStartingEquipment(record)`
 - `PNC.Inventory.EnsureRecordInventory(record)`
 - `PNC.Inventory.ApplyDelta(record, ops, reason)`
+- `PNC.Inventory.EquipPrimary(record, itemID, reason)`
 - `PNC.Inventory.GetWeightState(record)`
 - `PNC.Inventory.BuildSummaryPayload(record)`
 - `PNC.Inventory.BuildFullPayload(record)`
@@ -98,9 +99,13 @@ existing saves and presets.
 The melee and ranged weapon chances are independent. Consequently an NPC can
 spawn unarmed, melee-only, ranged-only, or with both weapons. The ranged weapon
 becomes active when both are generated; the melee weapon remains in inventory
-as a reserve. `NPCMeleeWeaponSpawnChance` and `NPCRangedWeaponSpawnChance`
-control the rolls from 0–100 in sandbox settings; their defaults are 70% and
-20%, respectively.
+as a reserve. If a finite-reserve ranged NPC exhausts all ammunition, combat
+uses `EquipPrimary` to atomically switch to that reserve; the operation updates
+the legacy equipment view, compact persistence state, inventory revision, and
+incremental client delta together. With no usable melee item it clears primary
+equipment so the unarmed shove lane becomes the last resort.
+`NPCMeleeWeaponSpawnChance` and `NPCRangedWeaponSpawnChance` control the rolls
+from 0–100 in sandbox settings; their defaults are 70% and 20%, respectively.
 
 Selection uses `identitySeed` and stable category salts, so the same identity
 receives the same equipment regardless of NPC archetype and across multiplayer,

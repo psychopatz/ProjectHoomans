@@ -325,6 +325,99 @@ local function startRetreat(record, zombie, target, distance, mode, stopDistance
     return true, reason
 end
 
+local function buildZombieThreatCentroid(record, radius)
+    local zombies
+    local zombie
+    local count = 0
+    local sumX = 0
+    local sumY = 0
+    local i
+    if not record or not Spatial or not Spatial.QueryZombies then
+        return nil, nil, 0
+    end
+    zombies = Spatial.QueryZombies(record.x, record.y, tonumber(radius) or 0)
+    for i = 1, #zombies do
+        zombie = zombies[i]
+        if zombie
+            and (not zombie:isDead())
+            and (not Core.IsManagedNPCBody(zombie))
+            and math.abs(zombie:getZ() - record.z) < 1
+        then
+            count = count + 1
+            sumX = sumX + zombie:getX()
+            sumY = sumY + zombie:getY()
+        end
+    end
+    if count <= 0 then return nil, nil, 0 end
+    return sumX / count, sumY / count, count
+end
+
+function Tactics.MaintainRangedSpacing(record, zombie, target)
+    local state
+    local now
+    local dist
+    local preferredMin
+    local report
+    local pressure
+    local sourceX
+    local sourceY
+    local centroidCount
+    local retreatDistance
+    local mode
+    local reason
+    if not record or not zombie or not target then return false, nil end
+    now = Core.Now()
+    state = ensureRetreatState(record)
+    if continueLockedRetreat(record, zombie, target, state, now) then
+        return true, state.reason or "ranged_disengage"
+    end
+
+    dist = math.sqrt(tonumber(target.distSq or 0) or 0)
+    preferredMin = tonumber(Const.RANGED_PREFERRED_MIN_DISTANCE) or 5.0
+    report = assessThreat(record, target)
+    pressure = target.kind == "zombie" and (
+        report.pressureCount >= (tonumber(Const.RANGED_PRESSURE_COUNT) or 2)
+        or report.hordeCount >= Const.COMBAT_HORDE_COUNT
+        or (
+            dist < preferredMin
+            and report.targetCrowdCount >= Const.COMBAT_TARGET_CROWD_COUNT
+        )
+    )
+
+    if dist >= preferredMin and not pressure then
+        clearActiveRetreat(record, state)
+        return false, nil
+    end
+
+    if pressure then
+        sourceX, sourceY, centroidCount = buildZombieThreatCentroid(
+            record,
+            Const.COMBAT_HORDE_RADIUS
+        )
+    end
+    retreatDistance = (tonumber(Const.RANGED_RETREAT_STEP) or 3.2)
+        + math.max(0, preferredMin - dist)
+        + math.min(tonumber(centroidCount) or 0, 5) * 0.2
+    mode = report.staminaRatio > Const.COMBAT_RETREAT_STAMINA_RATIO and "run" or "walk"
+    reason = pressure and "ranged_avoiding_horde" or "ranged_disengage"
+    return startRetreat(
+        record,
+        zombie,
+        target,
+        math.min(5.5, retreatDistance),
+        mode,
+        0.45,
+        math.max(Const.COMBAT_KITE_RETREAT_LOCK_MS, 650),
+        reason,
+        report.staminaRatio <= Const.COMBAT_RETREAT_STAMINA_RATIO
+            and "retreat"
+            or nil,
+        sourceX,
+        sourceY,
+        record.z
+    )
+end
+
 function Tactics.TryReposition(record, zombie, target, effectiveMode, reason, equipmentInfo)
     local nearbyCount
     local aiming

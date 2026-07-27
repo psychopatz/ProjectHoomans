@@ -120,3 +120,33 @@ function Inventory.ApplyDelta(record, ops, reason)
     end
     return true
 end
+
+function Inventory.EquipPrimary(record, itemID, reason)
+    local inv = Inventory.EnsureRecordInventory(record)
+    local previousID
+    local previous
+    local item
+    local op
+    if not inv then return false, "inventory_unavailable" end
+    itemID = Internal.normalizeString(itemID)
+    item = itemID and inv.items[itemID] or nil
+    if itemID and not item then return false, "item_not_found" end
+    previousID = inv.equipped and inv.equipped.primary or nil
+    if previousID == itemID then return true, "unchanged" end
+    previous = previousID and inv.items[previousID] or nil
+    if previous then previous.equipSlot = nil end
+    if item then item.equipSlot = "primary" end
+    inv.equipped.primary = itemID
+    op = Internal.buildOperation("equip", {
+        slot = "primary",
+        itemID = itemID,
+        previousItemID = previousID,
+    })
+    Internal.bumpRevision(record, { op }, reason or "equip_primary")
+    Inventory.SyncEquipmentFromInventory(record)
+    Inventory.RebuildCaches(record)
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "inventory")
+    end
+    return true, item and "equipped_primary" or "primary_cleared"
+end

@@ -91,9 +91,18 @@
   transitions to the hands only while the combat target is active; the same
   attack-mode transition is replicated to multiplayer clients
 - ranged attacks use half the base stamina of melee attacks (10 versus 20)
-- ranged kiting starts only inside the short safety standoff (2.2 tiles);
-  ordinary cooldowns against a single nearby enemy no longer trigger a retreat
-  that starves follow-up shots
+- ranged combat owns locomotion before the aim/fire branch. Shooters maintain a
+  preferred minimum distance of 5 tiles and, under zombie pressure, retreat
+  away from the local horde centroid instead of allowing roam/follow movement
+  to pull them into the target
+- retreat locks preserve the chosen escape vector between AI ticks. A ranged
+  NPC runs while stamina permits and degrades to walking when exhausted;
+  reload and committed attack actions still halt movement for their timed
+  animation, leaving the intended windows in which enemies can catch it
+- when a finite-reserve shooter reaches `out_of_ammo`, the authoritative
+  equipment service deterministically equips a usable carried melee weapon,
+  preferring the generated reserve slot. If none exists it clears the firearm
+  from the primary hand and enters the existing barehand shove lane
 - natural equipment generation can produce melee-only, ranged-only, both, or
   unarmed NPCs; combat mode follows the generated equipment rather than the
   NPC archetype

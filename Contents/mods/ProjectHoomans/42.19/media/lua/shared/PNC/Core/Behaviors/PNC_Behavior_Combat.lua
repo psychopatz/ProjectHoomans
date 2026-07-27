@@ -61,6 +61,32 @@ local function holdRangedAction(record, zombie, target, reason, mode, weaponStat
     return true
 end
 
+local function activateRangedFallback(record, zombie, target, reason, weaponStatus)
+    local switched
+    local fallbackReason
+    if reason ~= "out_of_ammo" then return false end
+    if Equipment and Equipment.ActivateMeleeFallback then
+        switched, fallbackReason = Equipment.ActivateMeleeFallback(record, zombie)
+    end
+    if switched then
+        if Tactics and Tactics.ClearRetreatState then
+            Tactics.ClearRetreatState(record)
+        end
+        Common.SetCombatDebug(
+            record,
+            target,
+            fallbackReason or "switched_to_shove",
+            "melee",
+            fallbackReason == "switched_to_melee"
+                and "melee_fallback"
+                or "barehand_fallback"
+        )
+        return true
+    end
+    Common.SetCombatDebug(record, target, fallbackReason or reason, "ranged", weaponStatus)
+    return false
+end
+
 function BehaviorCombat.TickEngage(record, zombie, target)
     local dist = math.sqrt(tonumber(target and target.distSq or 0) or 0)
     local equipmentInfo = Equipment.Describe(record)
@@ -117,6 +143,27 @@ function BehaviorCombat.TickEngage(record, zombie, target)
             equipmentInfo.weaponStatus
         )
         return
+    end
+
+    if (effectiveMode == "ranged" or effectiveMode == "mixed")
+        and Tactics
+        and Tactics.MaintainRangedSpacing
+    then
+        repositioned, repositionReason = Tactics.MaintainRangedSpacing(
+            record,
+            zombie,
+            target
+        )
+        if repositioned then
+            Common.SetCombatDebug(
+                record,
+                target,
+                repositionReason or "ranged_disengage",
+                effectiveMode,
+                equipmentInfo.weaponStatus
+            )
+            return
+        end
     end
 
     if effectiveMode == "ranged"
@@ -191,6 +238,15 @@ function BehaviorCombat.TickEngage(record, zombie, target)
         if holdRangedAction(record, zombie, target, reason, effectiveMode, equipmentInfo.weaponStatus) then
             return
         end
+        if activateRangedFallback(
+            record,
+            zombie,
+            target,
+            reason,
+            equipmentInfo.weaponStatus
+        ) then
+            return
+        end
         if reason == "target_out_of_range" then
             Common.MoveRecord(
                 record,
@@ -256,6 +312,15 @@ function BehaviorCombat.TickEngage(record, zombie, target)
         return
     end
     if holdRangedAction(record, zombie, target, reason, "mixed", equipmentInfo.weaponStatus) then
+        return
+    end
+    if activateRangedFallback(
+        record,
+        zombie,
+        target,
+        reason,
+        equipmentInfo.weaponStatus
+    ) then
         return
     end
     if reason == "target_out_of_range" then

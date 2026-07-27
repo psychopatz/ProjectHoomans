@@ -339,6 +339,15 @@ local function applyInventoryDelta(args)
             if op.uses ~= nil then item.uses = op.uses end
             if op.cond ~= nil then item.cond = op.cond end
             if op.ammoCount ~= nil then item.ammoCount = op.ammoCount end
+        elseif op.op == "equip" and op.slot == "primary" then
+            inventory.equipped = inventory.equipped or {}
+            if op.previousItemID and inventory.items[op.previousItemID] then
+                inventory.items[op.previousItemID].equipSlot = nil
+            end
+            inventory.equipped.primary = op.itemID
+            if op.itemID and inventory.items[op.itemID] then
+                inventory.items[op.itemID].equipSlot = "primary"
+            end
         end
     end
     inventory.summary = Core.DeepCopy(args.summary or inventory.summary or {})

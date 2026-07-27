@@ -77,6 +77,10 @@ PNC = {
         ApplyCombatState = function() end,
     },
     CombatTactics = {
+        MaintainRangedSpacing = function()
+            calls[#calls + 1] = "spacing"
+            return false, nil
+        end,
         TryReposition = function(_, _, _, _, reason)
             calls[#calls + 1] = "reposition:" .. tostring(reason)
             if repositionClose and reason == "target_too_close" then
@@ -125,9 +129,10 @@ local target = {
 }
 
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assertEqual(calls[1], "hold", "ranged aim stops stale movement first")
-assertEqual(calls[2], "face", "ranged aim faces after stopping")
-assertEqual(calls[3], "try_ranged", "ranged attack evaluates after facing")
+assertEqual(calls[1], "spacing", "ranged spacing owns movement before aiming")
+assertEqual(calls[2], "hold", "ranged aim stops stale movement first")
+assertEqual(calls[3], "face", "ranged aim faces after stopping")
+assertEqual(calls[4], "try_ranged", "ranged attack evaluates after facing")
 
 for _ = 1, 39 do
     now = now + 75
@@ -153,11 +158,13 @@ repositionClose = true
 local attemptsBeforeClose = rangedAttempts
 PNC.BehaviorCombat.TickEngage(record, {}, target)
 assertEqual(rangedAttempts, attemptsBeforeClose, "unsafe point-blank range repositions before firing")
-assertEqual(calls[1], "reposition:target_too_close", "short standoff owns point-blank response")
+assertEqual(calls[1], "spacing", "preferred-distance controller evaluates point-blank response first")
+assertEqual(calls[2], "reposition:target_too_close", "short standoff remains the fallback point-blank response")
 
 -- Tactics: a normal cooldown with only one enemy in safe firing range must not
 -- generate a retreat intent.
 local retreatMoves = 0
+local spatialZombies = {}
 now = 20000
 PNC = {
     Const = {
@@ -204,7 +211,7 @@ PNC = {
         end,
     },
     SpatialIndex = {
-        QueryZombies = function() return {} end,
+        QueryZombies = function() return spatialZombies end,
     },
     Skills = {
         GetLevel = function() return 0 end,
@@ -242,6 +249,37 @@ local repositioned = PNC.CombatTactics.TryReposition(
 assertEqual(repositioned, false, "safe cooldown does not trigger ranged retreat")
 assertEqual(retreatMoves, 0, "safe cooldown does not author movement")
 
+repositioned = PNC.CombatTactics.MaintainRangedSpacing(record, {}, target)
+assertEqual(repositioned, true, "ranged spacing retreats from a nearby enemy")
+assertEqual(retreatMoves, 1, "ranged spacing authors retreat movement")
+PNC.CombatTactics.ClearRetreatState(record)
+target.x = 6
+target.distSq = 36
+spatialZombies = {
+    {
+        isDead = function() return false end,
+        getX = function() return 6 end,
+        getY = function() return 0 end,
+        getZ = function() return 0 end,
+    },
+    {
+        isDead = function() return false end,
+        getX = function() return 6.5 end,
+        getY = function() return 0 end,
+        getZ = function() return 0 end,
+    },
+    {
+        isDead = function() return false end,
+        getX = function() return 6 end,
+        getY = function() return 0.5 end,
+        getZ = function() return 0 end,
+    },
+}
+repositioned = PNC.CombatTactics.MaintainRangedSpacing(record, {}, target)
+assertEqual(repositioned, false, "safe ranged distance holds even when the target has a crowd")
+assertEqual(retreatMoves, 1, "safe ranged distance authors no movement")
+
+spatialZombies = {}
 target.x = 1
 target.distSq = 1
 repositioned = PNC.CombatTactics.TryReposition(
@@ -253,7 +291,7 @@ repositioned = PNC.CombatTactics.TryReposition(
     {}
 )
 assertEqual(repositioned, true, "point-blank target still triggers ranged retreat")
-assertEqual(retreatMoves, 1, "point-blank retreat authors one movement intent")
+assertEqual(retreatMoves, 2, "point-blank retreat authors one movement intent")
 
 -- Facing: the server immediately faces the live object and also records the
 -- PathService lease used by multiplayer snapshots.
