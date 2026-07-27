@@ -100,10 +100,16 @@ function Internal.canAttack(record, now, cooldownMs)
     return (now - (tonumber(record.runtime.lastAttackAt) or 0)) >= cooldownMs
 end
 
-function Internal.resolveWeaponItem(record)
+function Internal.resolveWeaponItem(record, zombie)
     local fullType = record and record.equipment and record.equipment.primaryFullType or nil
     local item
     local _
+    if zombie and zombie.getPrimaryHandItem then
+        item = zombie:getPrimaryHandItem()
+        if item and item.IsWeapon and item:IsWeapon() then
+            return item
+        end
+    end
     if not fullType then
         return nil
     end

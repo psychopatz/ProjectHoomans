@@ -27,12 +27,15 @@ function Combat.TryMelee(record, zombie, target)
     local equipmentInfo = Equipment.Describe(record)
     local zombieTarget
     local anim
-    local isBarehand = equipmentInfo.primaryType == "barehand"
+    local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record, zombie) or nil
+    -- WeaponType is primarily an animation-family resolver and may classify a
+    -- valid modded weapon as barehand. Combat capability follows the actual
+    -- equipped InventoryItem instead.
+    local isBarehand = not (weaponItem and weaponItem.IsWeapon and weaponItem:IsWeapon())
     local cooldownMs = isBarehand and (tonumber(profile.unarmedCooldownMs) or Const.UNARMED_COOLDOWN_MS) or (tonumber(profile.meleeCooldownMs) or 900)
     local skillID = Skills and Skills.ResolveWeaponSkill and Skills.ResolveWeaponSkill(record, record.equipment and record.equipment.primaryFullType, "melee") or "Strength"
     local skillLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, skillID) or 0
     local strengthLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, "Strength") or 0
-    local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record) or nil
 
     if not target then
         return false, "no_target"

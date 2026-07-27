@@ -1,7 +1,8 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
 local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/"
+local COMMON_ROOT = "Contents/mods/ProjectHoomans/common/media/lua/shared/"
 
-package.path = SHARED_ROOT .. "?.lua;" .. package.path
+package.path = SHARED_ROOT .. "?.lua;" .. COMMON_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -12,7 +13,6 @@ end
 local skillBias = { Strength = { min = 2, max = 2 } }
 local loadout = {
     bagChoices = {},
-    primaryChoices = {},
     supplies = {
         { key = "medical_bandage", type = "Base.Bandage", stack = 2, preferredContainer = "root" },
     },
@@ -28,6 +28,10 @@ PNC = {
             return output
         end,
         LogWarn = function() end,
+    },
+    Sandbox = {
+        NPCMeleeWeaponSpawnChance = function() return 0 end,
+        NPCRangedWeaponSpawnChance = function() return 0 end,
     },
     Identity = {
         NormalizeSeed = function(seed) return tonumber(seed) or 1 end,

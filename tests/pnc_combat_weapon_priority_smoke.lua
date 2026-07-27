@@ -12,6 +12,9 @@ local shoveCount = 0
 local weaponAnimationCount = 0
 local action
 local targetZombie = { isDead = function() return false end }
+local equippedWeapon = {
+    IsWeapon = function() return true end,
+}
 
 PNC = {
     Core = { Now = function() return now end },
@@ -27,7 +30,7 @@ PNC = {
             ATTACK_TIMINGS = { melee = { duration = 500 } },
             canAttack = function() return true end,
             faceTarget = function() end,
-            resolveWeaponItem = function() return mode == "armed" and {} or nil end,
+            resolveWeaponItem = function() return mode == "armed" and equippedWeapon or nil end,
             playAttackSound = function() end,
             triggerMeleeWeaponAnim = function()
                 weaponAnimationCount = weaponAnimationCount + 1
@@ -40,7 +43,12 @@ PNC = {
     },
     Equipment = {
         Describe = function()
-            return { primaryType = mode == "armed" and "onehanded" or "barehand" }
+            -- A valid weapon can lack a specialized WeaponType animation
+            -- classification. It must still attack instead of shoving.
+            return {
+                primaryType = "barehand",
+                hasWeapon = mode == "armed",
+            }
         end,
     },
     Perception = { FindZombieByID = function() return targetZombie end },

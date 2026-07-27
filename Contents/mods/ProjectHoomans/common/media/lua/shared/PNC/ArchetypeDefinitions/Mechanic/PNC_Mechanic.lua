@@ -45,7 +45,6 @@ local bundle = {
     },
     loadout = {
         bagChoices = { "Base.Toolbox_Mechanic", "Base.Bag_DuffelBag" },
-        primaryChoices = { "Base.PipeWrench", "Base.Wrench", "Base.Hammer" },
         supplies = {
             { type = "Base.Bandage", stack = 1, preferredContainer = "bag" },
             { type = "Base.Screwdriver", stack = 1, preferredContainer = "bag" },

@@ -60,6 +60,8 @@ PNC = {
                 anchorZ = definition.anchorZ or definition.z or 0,
                 ownerUsername = definition.ownerUsername,
                 weaponMode = definition.weaponMode or "melee",
+                equipmentSpawnMode = definition.equipmentSpawnMode,
+                equipmentPoolID = definition.equipmentPoolID,
                 patrolPoints = {},
                 equipment = definition.equipment or { worn = {}, attached = {} },
                 health = { current = 100, max = 100, state = "normal" },
@@ -123,6 +125,8 @@ local record = {
         },
     },
     weaponMode = "melee",
+    equipmentSpawnMode = "ranged",
+    equipmentPoolID = "Default",
     equipment = { worn = {}, attached = {} },
     progression = { skillLevels = { Strength = 5 }, skillXP = {} },
     persistedInventory = { revision = 0 },
@@ -134,6 +138,8 @@ assert(payload.progression.skillLevelDeltas.Strength == 3, "legacy skill delta c
 assert(payload.health.body.wounds.ForeArm_L, "body wound was not serialized")
 assert(payload.health.body.infection.active == true, "infection was not serialized")
 assert(payload.health.body.parts.ForeArm_L.current == 76, "body-part health was not serialized")
+assert(payload.equipmentSpawnMode == "ranged", "equipment spawn override was not serialized")
+assert(payload.equipmentPoolID == "Default", "equipment pool was not serialized")
 
 local restored = PNC.Persistence.DeserializeRecord(payload, record.id)
 assert(restored, "deserialization failed without next()")
@@ -142,6 +148,8 @@ assert(restored.health.body.wounds.ForeArm_L.type == "bite", "body wound did not
 assert(restored.health.body.infection.sourcePart == "ForeArm_L", "infection did not round trip")
 assert(restored.health.body.parts.ForeArm_L.current == 76, "body-part health did not round trip")
 assert(restored.health.body.lastBleedAt == 0, "wall clock bleed timestamp was persisted")
+assert(restored.equipmentSpawnMode == "ranged", "equipment spawn override did not round trip")
+assert(restored.equipmentPoolID == "Default", "equipment pool did not round trip")
 
 next = originalNext
 print("pnc_kahlua_persistence_smoke: ok")

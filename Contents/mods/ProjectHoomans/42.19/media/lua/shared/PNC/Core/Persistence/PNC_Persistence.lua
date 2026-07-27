@@ -447,6 +447,8 @@ function Persistence.SerializeRecord(record)
         health = sanitizeHealth(record.health, record.health and record.health.max or Const.DEFAULT_HP_MAX),
         stamina = sanitizeStamina(record.stamina, record),
         weaponMode = tostring(record.weaponMode or "melee"),
+        equipmentSpawnMode = normalizeString(record.equipmentSpawnMode),
+        equipmentPoolID = normalizeString(record.equipmentPoolID) or "Default",
         equipment = {
             primaryFullType = normalizeString(record.equipment and record.equipment.primaryFullType),
             secondaryFullType = normalizeString(record.equipment and record.equipment.secondaryFullType),
@@ -499,6 +501,8 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         orderSpec = raw.orderSpec,
         patrolPoints = raw.patrolPoints,
         weaponMode = raw.weaponMode,
+        equipmentSpawnMode = raw.equipmentSpawnMode,
+        equipmentPoolID = raw.equipmentPoolID,
         combatProfile = raw.combatProfile,
         equipment = raw.equipment,
         inventory = inventoryData,

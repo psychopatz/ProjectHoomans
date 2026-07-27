@@ -54,6 +54,14 @@ local function normalizeInventory(inventory)
     return Core.DeepCopy(inventory)
 end
 
+local function normalizeEquipmentSpawnMode(value)
+    value = normalizeString(value)
+    if value == "melee" or value == "ranged" or value == "both" then
+        return value
+    end
+    return nil
+end
+
 function Types.NormalizeFaction(value)
     local faction = string.lower(tostring(value or "colonist"))
     if faction == "hostile" or faction == "neutral" or faction == "colonist" then
@@ -149,6 +157,8 @@ function Types.NormalizeDefinition(definition)
         orderSpec = def.orderSpec,
         patrolPoints = normalizePatrolPoints(def.patrolPoints, x, y, z),
         weaponMode = tostring(def.weaponMode or (isHostile and "mixed" or "melee")),
+        equipmentSpawnMode = normalizeEquipmentSpawnMode(def.equipmentSpawnMode),
+        equipmentPoolID = normalizeString(def.equipmentPoolID) or "Default",
         combatProfile = Core.DeepCopy(def.combatProfile or {}),
         hostility = Types.NormalizeHostility(faction, def.hostility),
         equipment = normalizeEquipment(def.equipment),
@@ -195,6 +205,8 @@ function Types.NewRecord(definition)
         patrolPoints = def.patrolPoints,
         patrolIndex = 1,
         weaponMode = def.weaponMode,
+        equipmentSpawnMode = def.equipmentSpawnMode,
+        equipmentPoolID = def.equipmentPoolID,
         equipment = normalizeEquipment(def.equipment),
         inventory = normalizeInventory(def.inventory),
         combatProfile = {

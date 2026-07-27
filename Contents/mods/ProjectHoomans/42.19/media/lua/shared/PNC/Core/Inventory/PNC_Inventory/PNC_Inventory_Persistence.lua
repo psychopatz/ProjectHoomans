@@ -23,6 +23,8 @@ function Inventory.Serialize(record)
                 archetypeID = record.archetypeID,
                 seed = record.identitySeed,
                 generatorVersion = PNC.Const and PNC.Const.GENERATOR_VERSION or 1,
+                equipmentPoolID = inv.template and inv.template.equipmentPoolID or nil,
+                weaponMode = inv.template and inv.template.weaponMode or nil,
             },
             delta = Internal.buildCompactDelta(record, inv),
             summary = Inventory.BuildSummaryPayload(record),

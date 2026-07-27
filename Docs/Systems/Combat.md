@@ -42,6 +42,14 @@
   window, but its live position is not tracked and attacks are cancelled while
   line-of-sight is blocked
 - unarmed combat uses shove and ground-finisher behavior instead of weapon swings
+- armed melee detection follows the actual equipped weapon item, not its optional
+  animation-family classification; a valid modded weapon therefore cannot
+  silently become a barehand shove
+- ranged NPCs require a validated firearm instance. Spawn templates satisfy
+  that contract through inventory equipment generation
+- natural equipment generation can produce melee-only, ranged-only, both, or
+  unarmed NPCs; combat mode follows the generated equipment rather than the
+  NPC archetype
 - combat can trigger conservative kiting and repositioning through `PNC_Combat_Tactics`
 - horde-aware combat now prefers lower-density zombie picks over blindly taking the nearest body
 - low-stamina combat below the retreat threshold enters a recovery retreat instead of standing in place

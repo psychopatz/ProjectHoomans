@@ -26,6 +26,14 @@ function Settings.GetNumber(key, fallback, minimum, maximum)
     return value
 end
 
+function Settings.NPCMeleeWeaponSpawnChance()
+    return Settings.GetNumber("NPCMeleeWeaponSpawnChance", 70, 0, 100)
+end
+
+function Settings.NPCRangedWeaponSpawnChance()
+    return Settings.GetNumber("NPCRangedWeaponSpawnChance", 20, 0, 100)
+end
+
 function Settings.NPCZombieWoundChance()
     return Settings.GetNumber("NPCZombieWoundChance", 45, 0, 100)
 end

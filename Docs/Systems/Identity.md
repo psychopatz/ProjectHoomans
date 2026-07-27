@@ -19,6 +19,10 @@
 - persisted resolved SurvivorFactory name and appearance fields
 
 Seed-derived skills are resolved by `PNC_Skills`; progression stores signed deltas over that base.
+Starting equipment is owned by `PNC.Inventory`, not archetypes. It uses the
+persisted `identitySeed` with category-specific salts, making selections stable
+across multiplayer peers, save/load, and inventory template rebases without
+restricting an NPC type to a particular weapon family.
 
 ## Public Functions
 - `PNC.RegisterArchetypeModule(id, spec)`

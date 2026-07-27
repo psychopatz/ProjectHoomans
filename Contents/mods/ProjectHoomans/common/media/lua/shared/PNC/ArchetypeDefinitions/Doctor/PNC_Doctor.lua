@@ -44,7 +44,6 @@ local bundle = {
     },
     loadout = {
         bagChoices = { "Base.Bag_DoctorBag", "Base.Bag_Satchel" },
-        primaryChoices = { "Base.Scalpel", "Base.KitchenKnife", "Base.Hammer" },
         supplies = {
             { key = "medical_bandage", type = "Base.Bandage", stack = 4, preferredContainer = "bag" },
             { key = "medical_disinfectant", type = "Base.Disinfectant", stack = 1, preferredContainer = "bag" },

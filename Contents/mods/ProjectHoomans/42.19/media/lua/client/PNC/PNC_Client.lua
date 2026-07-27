@@ -556,7 +556,7 @@ function Client.SendDebug(action, payload)
                 x = x, y = y, z = z,
                 radius = Const.ROAM_DEFAULT_RADIUS,
             },
-            weaponMode = variant == "hostile_ranged" and "ranged" or "melee",
+            equipmentSpawnMode = PNC.Inventory.GetDebugEquipmentSpawnMode(variant),
             forceLive = true,
             debug = true,
         }) ~= nil
@@ -622,6 +622,9 @@ local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, te
         end)
         subMenu:addOption(tr("UI_PNC_SpawnNeutral", "Spawn Neutral"), nil, function()
             Client.SendDebug("spawn", { variant = "neutral", x = square:getX(), y = square:getY(), z = square:getZ() })
+        end)
+        subMenu:addOption(tr("UI_PNC_SpawnHostile", "Spawn Hostile (Equipment Chances)"), nil, function()
+            Client.SendDebug("spawn", { variant = "hostile", x = square:getX(), y = square:getY(), z = square:getZ() })
         end)
         subMenu:addOption(tr("UI_PNC_SpawnHostileMelee", "Spawn Hostile Melee"), nil, function()
             Client.SendDebug("spawn", { variant = "hostile_melee", x = square:getX(), y = square:getY(), z = square:getZ() })

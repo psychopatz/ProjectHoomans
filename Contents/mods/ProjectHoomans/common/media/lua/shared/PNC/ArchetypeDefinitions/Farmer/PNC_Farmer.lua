@@ -45,7 +45,6 @@ local bundle = {
     },
     loadout = {
         bagChoices = { "Base.Bag_Satchel", "Base.Bag_DuffelBag" },
-        primaryChoices = { "Base.HandAxe", "Base.Shovel", "Base.GardenFork" },
         supplies = {
             { type = "Base.Bandage", stack = 2, preferredContainer = "bag" },
             { type = "Base.WaterBottleFull", stack = 1, preferredContainer = "bag" },

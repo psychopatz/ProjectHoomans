@@ -26,7 +26,7 @@ function Combat.TryRanged(record, zombie, target)
     local skillID = "Aiming"
     local aimingLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, "Aiming") or 0
     local anim
-    local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record) or nil
+    local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record, zombie) or nil
 
     if not target then
         return false, "no_target"
@@ -36,6 +36,9 @@ function Combat.TryRanged(record, zombie, target)
     end
     if equipmentInfo.combatModeResolved ~= "ranged" and equipmentInfo.combatModeResolved ~= "mixed" then
         return false, equipmentInfo.weaponStatus or "ranged_weapon_unavailable"
+    end
+    if not weaponItem or not weaponItem.IsWeapon or not weaponItem:IsWeapon() then
+        return false, "ranged_weapon_instance_unavailable"
     end
     if Combat.HasActiveAttack and Combat.HasActiveAttack(record, now) then
         return false, "attack_in_progress"

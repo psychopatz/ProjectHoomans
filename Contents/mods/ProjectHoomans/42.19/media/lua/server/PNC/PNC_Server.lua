@@ -214,7 +214,7 @@ local function handleDebugSpawn(player, args)
         ownerOnlineID = ownerOnlineID,
         orderSpec = orderSpec,
         forceLive = true,
-        weaponMode = variant == "hostile_ranged" and "ranged" or "melee",
+        equipmentSpawnMode = PNC.Inventory.GetDebugEquipmentSpawnMode(variant),
         debug = true,
     })
     Core.LogInfo("PNC debug spawn variant=" .. variant .. " faction=" .. faction

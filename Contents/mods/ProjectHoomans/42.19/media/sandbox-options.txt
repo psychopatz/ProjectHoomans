@@ -1,5 +1,25 @@
 VERSION = 1,
 
+option ProjectHoomans.NPCMeleeWeaponSpawnChance
+{
+    type = double,
+    default = 70.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCMeleeWeaponSpawnChance,
+}
+
+option ProjectHoomans.NPCRangedWeaponSpawnChance
+{
+    type = double,
+    default = 20.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCRangedWeaponSpawnChance,
+}
+
 option ProjectHoomans.ZombiesTargetDownedNPC
 {
     type = boolean,

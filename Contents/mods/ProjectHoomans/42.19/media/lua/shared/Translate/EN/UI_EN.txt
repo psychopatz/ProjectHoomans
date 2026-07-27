@@ -20,6 +20,7 @@ UI_EN = {
     UI_PNC_Spawn = "PNC Spawn",
     UI_PNC_SpawnColonist = "Spawn Colonist",
     UI_PNC_SpawnNeutral = "Spawn Neutral",
+    UI_PNC_SpawnHostile = "Spawn Hostile (Equipment Chances)",
     UI_PNC_SpawnHostileMelee = "Spawn Hostile Melee",
     UI_PNC_SpawnHostileRanged = "Spawn Hostile Ranged",
     UI_PNC_MonitorTitle = "PNC NPC Monitor",

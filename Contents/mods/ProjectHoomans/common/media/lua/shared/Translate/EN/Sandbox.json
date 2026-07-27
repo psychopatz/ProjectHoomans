@@ -1,6 +1,12 @@
 {
     "Sandbox_ProjectHoomans": "ProjectHoomans",
 
+    "Sandbox_ProjectHoomans.NPCMeleeWeaponSpawnChance": "NPC Melee Weapon Spawn Chance (%)",
+    "Sandbox_ProjectHoomans.NPCMeleeWeaponSpawnChance_tooltip": "Independent identity-seeded chance that a generated NPC receives a melee weapon. Melee and ranged rolls can both succeed.",
+
+    "Sandbox_ProjectHoomans.NPCRangedWeaponSpawnChance": "NPC Ranged Weapon Spawn Chance (%)",
+    "Sandbox_ProjectHoomans.NPCRangedWeaponSpawnChance_tooltip": "Independent identity-seeded chance that a generated NPC receives a firearm and matching ammunition. Melee and ranged rolls can both succeed.",
+
     "Sandbox_ProjectHoomans.NPCZombieWoundChance": "NPC Zombie Wound Chance (%)",
     "Sandbox_ProjectHoomans.NPCZombieWoundChance_tooltip": "Base chance that a zombie lunge creates a wound. Armor on the struck body part reduces the final chance; failed rolls are parried.",
 

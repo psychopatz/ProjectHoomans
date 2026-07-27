@@ -24,14 +24,50 @@ local function buildIdentityTemplate(record)
     local archetype = Archetypes.Get(record and record.archetypeID or nil)
     local loadout = archetype.loadout or {}
     local seed = Identity.NormalizeSeed(record and record.identitySeed or nil, record and record.id or "npc")
+    local startingEquipment = Inventory.ResolveStartingEquipment
+        and Inventory.ResolveStartingEquipment(record)
+        or {}
     return {
         archetypeID = archetype.id,
         appearance = appearance,
         bagType = choose(loadout.bagChoices, seed, "inv:bag:" .. tostring(archetype.id)),
-        primaryType = choose(loadout.primaryChoices, seed, "inv:primary:" .. tostring(archetype.id)),
+        startingEquipment = startingEquipment,
         attached = Core.DeepCopy(loadout.attached or {}),
         supplies = Internal.shallowArrayCopy(loadout.supplies),
     }
+end
+
+local function createSupplyItems(record, base, supplies, prefix, bagContainerID, archetypeID)
+    local counts = {}
+    local supply
+    local templateKey
+    local i
+    for i = 1, #(supplies or {}) do
+        supply = supplies[i]
+        templateKey = Internal.normalizeString(supply.key)
+        if not templateKey then
+            counts[tostring(supply.type)] = (counts[tostring(supply.type)] or 0) + 1
+            templateKey = tostring(supply.type) .. ":" .. tostring(counts[tostring(supply.type)])
+            if Core.LogWarn then
+                Core.LogWarn("PNC spawn supply missing stable key archetype="
+                    .. tostring(archetypeID) .. " type=" .. tostring(supply.type))
+            end
+        end
+        Internal.createItem(record, base, {
+            type = supply.type,
+            stack = supply.stack,
+            uses = supply.uses,
+            cond = supply.cond,
+            container = (supply.preferredContainer == "bag" and bagContainerID)
+                and bagContainerID
+                or "root",
+            preferredContainer = supply.preferredContainer,
+            templateKey = tostring(prefix) .. tostring(templateKey),
+            legacyTemplateKey = prefix == "tmpl:supply:"
+                and "tmpl:supply:" .. tostring(i)
+                or nil,
+        })
+    end
 end
 
 function Internal.buildTemplateSnapshot(record)
@@ -39,11 +75,9 @@ function Internal.buildTemplateSnapshot(record)
     local template = buildIdentityTemplate(record)
     local appearanceItems = template.appearance and template.appearance.outfitItems or {}
     local lookCounts = {}
-    local supplyCounts = {}
     local bagContainerID
     local bagItem
     local templateKey
-    local supply
     local item
     local i
 
@@ -82,36 +116,60 @@ function Internal.buildTemplateSnapshot(record)
         end
     end
 
-    if template.primaryType then
+    if template.startingEquipment.primaryWeapon
+        and template.startingEquipment.primaryWeapon.type
+    then
         Internal.createItem(record, base, {
-            type = template.primaryType,
+            type = template.startingEquipment.primaryWeapon.type,
+            cond = template.startingEquipment.primaryWeapon.cond,
             container = "root",
             equipSlot = "primary",
             templateKey = "tmpl:weapon:0",
         })
     end
 
-    for i = 1, #(template.supplies or {}) do
-        supply = template.supplies[i]
-        templateKey = Internal.normalizeString(supply.key)
-        if not templateKey then
-            supplyCounts[tostring(supply.type)] = (supplyCounts[tostring(supply.type)] or 0) + 1
-            templateKey = tostring(supply.type) .. ":" .. tostring(supplyCounts[tostring(supply.type)])
-            if Core.LogWarn then
-                Core.LogWarn("PNC archetype supply missing stable key archetype=" .. tostring(template.archetypeID)
-                    .. " type=" .. tostring(supply.type))
-            end
-        end
+    if template.startingEquipment.reserveWeapon
+        and template.startingEquipment.reserveWeapon.type
+    then
         Internal.createItem(record, base, {
-            type = supply.type,
-            stack = supply.stack,
-            container = (supply.preferredContainer == "bag" and bagContainerID) and bagContainerID or "root",
-            preferredContainer = supply.preferredContainer,
-            templateKey = "tmpl:supply:" .. tostring(templateKey),
-            legacyTemplateKey = "tmpl:supply:" .. tostring(i),
+            type = template.startingEquipment.reserveWeapon.type,
+            cond = template.startingEquipment.reserveWeapon.cond,
+            container = "root",
+            templateKey = "tmpl:weapon:reserve",
         })
     end
 
+    createSupplyItems(
+        record,
+        base,
+        template.startingEquipment.primaryWeapon
+            and template.startingEquipment.primaryWeapon.grants
+            or {},
+        "tmpl:equipment_grant:primary:",
+        bagContainerID,
+        template.archetypeID
+    )
+    createSupplyItems(
+        record,
+        base,
+        template.startingEquipment.reserveWeapon
+            and template.startingEquipment.reserveWeapon.grants
+            or {},
+        "tmpl:equipment_grant:reserve:",
+        bagContainerID,
+        template.archetypeID
+    )
+    createSupplyItems(
+        record,
+        base,
+        template.supplies,
+        "tmpl:supply:",
+        bagContainerID,
+        template.archetypeID
+    )
+
+    base.template.equipmentPoolID = template.startingEquipment.poolID
+    base.template.weaponMode = template.startingEquipment.weaponMode
     Internal.calculateWeights(base)
     return base
 end
@@ -119,18 +177,25 @@ end
 function Inventory.CreateFromTemplate(record, options)
     local inv
     local runtime
+    local generatedTemplate
     if not record then
         return nil
     end
     inv = Internal.buildTemplateSnapshot(record)
     inv.deltaMode = "template_plus_delta"
+    generatedTemplate = inv.template or {}
     inv.template = {
         archetypeID = record.archetypeID,
         seed = record.identitySeed,
         generatorVersion = PNC.Const and PNC.Const.GENERATOR_VERSION or 1,
+        equipmentPoolID = generatedTemplate.equipmentPoolID,
+        weaponMode = generatedTemplate.weaponMode,
     }
     record.inventory = inv
     runtime = Internal.getRuntimeState(record)
+    record.weaponMode = inv.template.weaponMode or record.weaponMode or "melee"
+    record.runtime.spawnEquipmentPool = inv.template.equipmentPoolID
+    record.runtime.spawnWeaponMode = inv.template.weaponMode
     if options and options.keepRevision then
         inv.revision = tonumber(options.keepRevision) or inv.revision
     else
