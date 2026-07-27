@@ -97,6 +97,9 @@ function Perception.RememberAttacker(record, damageEvent, now)
         expiresAt = (tonumber(now) or Core.Now())
             + (tonumber(Const.TARGET_RECENT_ATTACKER_MS) or 5000),
     }
+    if Perception.InvalidateFrame then
+        Perception.InvalidateFrame(record)
+    end
     return true
 end
 
@@ -206,10 +209,8 @@ end
 local function buildZombieTarget(record, zombie, distSq, visibilityKind)
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
     local zombieId = modData and modData.PNC_ZombieID or nil
-    if not zombieId and Spatial and Spatial.Rebuild then
-        Spatial.Rebuild(Core.Now(), true)
-        modData = zombie and zombie.getModData and zombie:getModData() or nil
-        zombieId = modData and modData.PNC_ZombieID or nil
+    if not zombieId and Spatial and Spatial.GetZombieID then
+        zombieId = Spatial.GetZombieID(zombie)
     end
     if not zombieId then
         return nil
@@ -243,6 +244,9 @@ local function collectEnemyZombies(record, radius)
         return results
     end
     radius = tonumber(radius) or Const.ZOMBIE_TARGET_RADIUS
+    if Perception.GetVisibleZombieEntries then
+        return Perception.GetVisibleZombieEntries(record, radius)
+    end
     zombies = Spatial.QueryZombies(record.x, record.y, radius)
     for i = 1, #zombies do
         zombie = zombies[i]
@@ -431,6 +435,12 @@ function Perception.CountEnemyZombies(record, radius)
         return 0
     end
 
+    if Perception.CountZombiesInFrame then
+        return Perception.CountZombiesInFrame(
+            record,
+            tonumber(radius) or Const.ZOMBIE_TARGET_RADIUS
+        )
+    end
     zombies = collectEnemyZombies(record, radius)
     for i = 1, #zombies do
         entry = zombies[i]
@@ -452,7 +462,7 @@ function Perception.FindZombieByID(zombieId)
         return zombie
     end
     if Spatial.Rebuild then
-        Spatial.Rebuild(Core.Now(), true)
+        Spatial.Rebuild(Core.Now(), false)
         return Spatial.FindZombieByID(zombieId)
     end
     return nil

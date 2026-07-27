@@ -78,6 +78,16 @@ function Relationships.SetFaction(record, faction, reason)
         end
     end
 
+    if PNC.SimulationClock and PNC.SimulationClock.Wake then
+        PNC.SimulationClock.Wake(record, nil, Core.Now())
+    end
+    if PNC.Scheduler and PNC.Scheduler.Schedule then
+        PNC.Scheduler.Schedule(
+            record,
+            Core.Now() + (tonumber(PNC.Scheduler.SLOT_MS) or 50)
+        )
+    end
+
     Registry = PNC.Registry
     if Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "faction")

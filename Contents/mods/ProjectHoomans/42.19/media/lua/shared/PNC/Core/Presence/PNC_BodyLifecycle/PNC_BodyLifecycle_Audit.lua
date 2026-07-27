@@ -8,11 +8,14 @@ local Lifecycle = PNC.BodyLifecycle
 local Internal = Lifecycle.Internal
 local Core = PNC.Core
 local Const = PNC.Const
+local Census = PNC.WorldCensus
 
 function Lifecycle.AuditLoadedBodies(now, force)
     local reg = Internal.registry()
     local cell
     local zombieList
+    local zombieArray
+    local zombieCount
     local accepted = {}
     local stats = { scanned = 0, removed = 0, rebound = 0, duplicates = 0, corpses = 0 }
     local i
@@ -35,11 +38,17 @@ function Lifecycle.AuditLoadedBodies(now, force)
     end
     Lifecycle.NextAuditAt = now + (tonumber(Const.BODY_AUDIT_INTERVAL_MS) or 250)
     reg.EnsureLoaded()
-    cell = getCell and getCell() or nil
-    zombieList = cell and cell.getZombieList and cell:getZombieList() or nil
-    if zombieList then
-        for i = zombieList:size() - 1, 0, -1 do
-            zombie = zombieList:get(i)
+    if Census and Census.GetLifecycleCandidates then
+        zombieArray = Census.GetLifecycleCandidates(now, force)
+        zombieCount = #zombieArray
+    else
+        cell = getCell and getCell() or nil
+        zombieList = cell and cell.getZombieList and cell:getZombieList() or nil
+        zombieCount = zombieList and zombieList:size() or nil
+    end
+    if zombieCount then
+        for i = zombieCount - 1, 0, -1 do
+            zombie = zombieArray and zombieArray[i + 1] or zombieList:get(i)
             modData = zombie and zombie.getModData and zombie:getModData() or nil
             local deathMarkerId = modData and (
                 modData.PNC_DeathMarkerID
@@ -137,7 +146,7 @@ function Lifecycle.AuditLoadedBodies(now, force)
             end
         end
     end
-    if zombieList then
+    if zombieCount then
         reg.ForEach(function(candidate)
             local id = tostring(candidate.id)
             local registered = reg.LiveByID and reg.LiveByID[id] or nil

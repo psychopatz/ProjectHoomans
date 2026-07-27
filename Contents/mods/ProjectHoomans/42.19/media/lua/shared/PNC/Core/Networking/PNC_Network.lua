@@ -802,6 +802,9 @@ function Network.FindZombieByOnlineID(onlineID)
     if onlineID == nil or not getCell then
         return nil
     end
+    if PNC.WorldCensus and PNC.WorldCensus.FindByOnlineID then
+        return PNC.WorldCensus.FindByOnlineID(onlineID, Core.Now())
+    end
     cell = getCell()
     if not cell or not cell.getZombieList then
         return nil
@@ -1011,6 +1014,11 @@ function Network.SendDebugRoster(targetPlayer, diagnostics, authorized, audit)
         authorized = authorized == true,
         diagnostics = diagnostics or {},
         audit = audit or {},
+        performance = authorized == true
+            and PNC.Performance
+            and PNC.Performance.Snapshot
+            and PNC.Performance.Snapshot(false)
+            or nil,
         serverTime = Core.Now(),
     }
     if isServer and isServer() and targetPlayer then

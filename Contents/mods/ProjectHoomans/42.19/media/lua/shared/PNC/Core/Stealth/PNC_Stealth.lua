@@ -4,6 +4,26 @@ PNC.Stealth = PNC.Stealth or {}
 local Stealth = PNC.Stealth
 local Core = PNC.Core
 local Const = PNC.Const
+Stealth.OwnerDiscoveryCache = Stealth.OwnerDiscoveryCache or {}
+
+local function ownerCacheKey(owner)
+    local onlineID = owner and owner.getOnlineID and owner:getOnlineID() or nil
+    local username = owner and owner.getUsername and owner:getUsername() or nil
+    if onlineID ~= nil then return "id:" .. tostring(onlineID) end
+    if username and tostring(username) ~= "" then
+        return "user:" .. tostring(username)
+    end
+    return tostring(owner)
+end
+
+local function cacheDiscovery(owner, discovered, reason, now)
+    Stealth.OwnerDiscoveryCache[ownerCacheKey(owner)] = {
+        discovered = discovered == true,
+        reason = reason,
+        expiresAt = now + (tonumber(Const.STEALTH_DISCOVERY_CACHE_MS) or 200),
+    }
+    return discovered == true, reason
+end
 
 local function logStealthState(record, runtime, reason)
     local stateKey
@@ -35,13 +55,31 @@ local function logStealthState(record, runtime, reason)
     )
 end
 
-local function getZombieList()
+local function getZombieCandidates(owner)
     local cell
+    local zombieList
+    local values
+    local i
+    local radius = tonumber(Const.STEALTH_DISCOVERY_RADIUS) or 12
+    if owner and PNC.SpatialIndex and PNC.SpatialIndex.QueryZombies then
+        return PNC.SpatialIndex.QueryZombies(
+            owner:getX(),
+            owner:getY(),
+            radius
+        )
+    end
     if not getCell then
-        return nil
+        return {}
     end
     cell = getCell()
-    return cell and cell.getZombieList and cell:getZombieList() or nil
+    zombieList = cell and cell.getZombieList and cell:getZombieList() or nil
+    values = {}
+    if zombieList then
+        for i = 0, zombieList:size() - 1 do
+            values[#values + 1] = zombieList:get(i)
+        end
+    end
+    return values
 end
 
 local function resolveOwner(record)
@@ -78,40 +116,51 @@ function Stealth.IsOwnerDiscovered(owner)
     local distSq
     local canSee
     local canSeeFn
+    local now = Core.Now()
+    local cached = owner
+        and Stealth.OwnerDiscoveryCache[ownerCacheKey(owner)] or nil
 
     if not owner or owner:isDead() then
         return false, "owner_missing"
     end
-
-    zombieList = getZombieList()
-    if not zombieList then
-        return false, "no_zombies"
+    if cached and now < (tonumber(cached.expiresAt) or 0) then
+        return cached.discovered == true, cached.reason
     end
 
-    for i = zombieList:size() - 1, 0, -1 do
-        zombie = zombieList:get(i)
+    zombieList = getZombieCandidates(owner)
+    if #zombieList <= 0 then
+        return cacheDiscovery(owner, false, "no_zombies", now)
+    end
+
+    for i = #zombieList, 1, -1 do
+        zombie = zombieList[i]
         if zombie and (not zombie:isDead()) and (not Core.IsManagedNPCBody(zombie)) and math.abs(zombie:getZ() - owner:getZ()) < 1 then
             target = zombie.getTarget and zombie:getTarget() or nil
             if target == owner then
-                return true, "owner_targeted"
+                return cacheDiscovery(owner, true, "owner_targeted", now)
             end
 
             distSq = Core.DistanceSq(zombie:getX(), zombie:getY(), owner:getX(), owner:getY())
             if distSq <= (Const.STEALTH_BREAK_CONTACT_DISTANCE * Const.STEALTH_BREAK_CONTACT_DISTANCE) then
-                return true, "owner_close_contact"
+                return cacheDiscovery(
+                    owner,
+                    true,
+                    "owner_close_contact",
+                    now
+                )
             end
 
             if distSq <= (Const.STEALTH_DISCOVERY_RADIUS * Const.STEALTH_DISCOVERY_RADIUS) and zombie.CanSee then
                 canSeeFn = zombie.CanSee
                 canSee = canSeeFn and zombie:CanSee(owner) or false
                 if canSee == true then
-                    return true, "owner_seen"
+                    return cacheDiscovery(owner, true, "owner_seen", now)
                 end
             end
         end
     end
 
-    return false, "owner_hidden"
+    return cacheDiscovery(owner, false, "owner_hidden", now)
 end
 
 local function isOwnerActuallySneaking(owner, ownerDist)

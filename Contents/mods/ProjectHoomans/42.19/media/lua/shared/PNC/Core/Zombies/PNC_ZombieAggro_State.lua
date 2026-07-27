@@ -122,6 +122,10 @@ function Internal.findNearestLiveNPC(zombie, radius)
     local zy
     local zz
     local limitSq
+    local candidates
+    local i
+    local record
+    local npcBody
 
     if not zombie then
         return nil, nil, math.huge
@@ -133,24 +137,58 @@ function Internal.findNearestLiveNPC(zombie, radius)
     limitSq = radius * radius
     bestDistSq = math.huge
 
-    Registry.ForEachLive(function(record, npcBody)
-        local distSq
-        if npcBody
-            and record
-            and record.alive ~= false
-            and record.presenceState == Const.PRESENCE_LIVE
-            and Settings.CanZombieTargetRecord(record)
-            and not (Stealth and Stealth.ShouldSuppressZombieAggro and Stealth.ShouldSuppressZombieAggro(record))
-            and math.abs(npcBody:getZ() - zz) < 1
-        then
-            distSq = Core.DistanceSq(zx, zy, npcBody:getX(), npcBody:getY())
-            if distSq <= limitSq and distSq < bestDistSq then
-                bestRecord = record
-                bestBody = npcBody
-                bestDistSq = distSq
+    if PNC.SpatialIndex and PNC.SpatialIndex.QueryNPCs then
+        candidates = PNC.SpatialIndex.QueryNPCs(zx, zy, radius)
+        for i = 1, #candidates do
+            record = candidates[i]
+            npcBody = record and Registry.GetLiveZombie(record.id) or nil
+            if npcBody
+                and record.alive ~= false
+                and record.presenceState == Const.PRESENCE_LIVE
+                and Settings.CanZombieTargetRecord(record)
+                and not (Stealth and Stealth.ShouldSuppressZombieAggro
+                    and Stealth.ShouldSuppressZombieAggro(record))
+                and math.abs(npcBody:getZ() - zz) < 1
+            then
+                local distSq = Core.DistanceSq(
+                    zx,
+                    zy,
+                    npcBody:getX(),
+                    npcBody:getY()
+                )
+                if distSq <= limitSq and distSq < bestDistSq then
+                    bestRecord = record
+                    bestBody = npcBody
+                    bestDistSq = distSq
+                end
             end
         end
-    end)
+    else
+        Registry.ForEachLive(function(candidateRecord, candidateBody)
+            local distSq
+            if candidateBody
+                and candidateRecord
+                and candidateRecord.alive ~= false
+                and candidateRecord.presenceState == Const.PRESENCE_LIVE
+                and Settings.CanZombieTargetRecord(candidateRecord)
+                and not (Stealth and Stealth.ShouldSuppressZombieAggro
+                    and Stealth.ShouldSuppressZombieAggro(candidateRecord))
+                and math.abs(candidateBody:getZ() - zz) < 1
+            then
+                distSq = Core.DistanceSq(
+                    zx,
+                    zy,
+                    candidateBody:getX(),
+                    candidateBody:getY()
+                )
+                if distSq <= limitSq and distSq < bestDistSq then
+                    bestRecord = candidateRecord
+                    bestBody = candidateBody
+                    bestDistSq = distSq
+                end
+            end
+        end)
+    end
 
     return bestRecord, bestBody, bestDistSq
 end
@@ -186,6 +224,14 @@ function Internal.forceAggro(zombie, npcBody)
     if modData then
         modData.PNC_AggroNPCId = npcId
         modData.PNC_AggroNPCUntil = npcId and (Core.Now() + Const.ZOMBIE_NPC_AGGRO_LEASE_MS) or nil
+    end
+    if npcId and ZombieAggro.Activate then
+        ZombieAggro.Activate(
+            zombie,
+            Core.Now(),
+            "forced_aggro",
+            Const.ZOMBIE_NPC_AGGRO_LEASE_MS
+        )
     end
     -- Preserve the attacker and action-state context installed by
     -- IsoZombie:Hit(). Clearing either during the hit frame prevents vanilla

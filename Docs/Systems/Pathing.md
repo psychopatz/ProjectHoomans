@@ -21,7 +21,11 @@
 - doors and windows are considered opened only after their engine state reports
   open, then their object/path state is synchronized by the authoritative side
 - all path ownership lives in `PNC_PathService`
+- abstract travel is elapsed-time based (`speed × elapsed`) so reducing a far
+  NPC's AI cadence does not change its simulated travel speed
 - behavior writes `move intent`; only `PNC_PathService.Pump` may start, refresh, cancel, or complete live movement
+- repeated move/hold requests reuse their runtime intent table, reducing
+  short-lived Kahlua allocations during follow and combat
 - the live move lane uses explicit phases: `idle`, `requested`, `active`, `arrived`, `blocked`, `cancel_pending`
 - `walktoward` is a normal locomotion state, not a path-conflict state; recovery is reserved for real combat/thump conflicts so valid movement is not reset every tick
 - live path refresh now routes through a single move lane, which matches the Bandits-style "one active move action" flow more closely and avoids stacked `path2` state churn

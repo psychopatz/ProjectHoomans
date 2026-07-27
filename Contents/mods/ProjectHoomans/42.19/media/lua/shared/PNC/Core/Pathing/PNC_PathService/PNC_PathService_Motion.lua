@@ -448,21 +448,31 @@ function PathService.Reset(zombie, record)
 end
 
 function PathService.MoveToward(record, zombie, targetX, targetY, targetZ, mode, stopDistance, reason)
+    local intent
     record.runtime = record.runtime or {}
-    record.runtime.moveIntent = {
-        kind = "move",
-        x = tonumber(targetX) or record.x,
-        y = tonumber(targetY) or record.y,
-        z = tonumber(targetZ) or record.z or 0,
-        mode = tostring(mode or "walk"),
-        stopDistance = tonumber(stopDistance) or 0.7,
-        reason = reason or "path_service_move",
-        requestedByJob = tostring(record.activeJob or "none"),
-        requestedByBehavior = tostring(record.activeBehavior or record.activeJob or "none"),
-        requestedOrder = tostring(record.orderSpec and record.orderSpec.kind or "none"),
-        combatReason = tostring(record.runtime.combatBlockReason or "none"),
-        updatedAt = Internal.Core.Now(),
-    }
+    intent = record.runtime.moveIntent
+    if not intent or intent.kind ~= "move" then
+        intent = {}
+        record.runtime.moveIntent = intent
+    end
+    intent.kind = "move"
+    intent.x = tonumber(targetX) or record.x
+    intent.y = tonumber(targetY) or record.y
+    intent.z = tonumber(targetZ) or record.z or 0
+    intent.mode = tostring(mode or "walk")
+    intent.stopDistance = tonumber(stopDistance) or 0.7
+    intent.reason = reason or "path_service_move"
+    intent.requestedByJob = tostring(record.activeJob or "none")
+    intent.requestedByBehavior = tostring(
+        record.activeBehavior or record.activeJob or "none"
+    )
+    intent.requestedOrder = tostring(
+        record.orderSpec and record.orderSpec.kind or "none"
+    )
+    intent.combatReason = tostring(
+        record.runtime.combatBlockReason or "none"
+    )
+    intent.updatedAt = Internal.Core.Now()
     if zombie and Internal.isAtGoal(zombie, Internal.buildGoal(targetX, targetY, targetZ, mode, stopDistance), stopDistance) then
         return true, "arrived"
     end
@@ -526,7 +536,13 @@ function PathService.AdvanceAbstract(record, targetX, targetY, targetZ, stopDist
     local dx
     local dy
     local len
-    local step = PNC.Const.ABSTRACT_TRAVEL_STEP
+    local elapsedMs = record and record.runtime
+        and tonumber(record.runtime.abstractStepElapsedMs)
+        or tonumber(PNC.Const.TICK_ABSTRACT_MS)
+        or 3000
+    local speed = tonumber(PNC.Const.ABSTRACT_TRAVEL_SPEED)
+        or ((tonumber(PNC.Const.ABSTRACT_TRAVEL_STEP) or 5) / 3)
+    local step = math.max(0, speed * math.max(0, elapsedMs) / 1000)
     stopDistance = tonumber(stopDistance) or 1.0
     dist = Internal.Core.Distance(record.x, record.y, targetX, targetY)
     if dist <= stopDistance and record.z == targetZ then

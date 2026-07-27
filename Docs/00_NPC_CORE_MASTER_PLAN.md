@@ -12,7 +12,8 @@
 - seeded identity, archetype registry, and compact inventory persistence
 - v8 compact health/inventory/stamina persistence with save-time dirty
   snapshots and a 100-NPC/4,000-acquired-item scale gate
-- cadence-bounded spatial rebuilding plus staggered NPC scheduling
+- shared world census, numeric spatial cells, budgeted active-zombie aggro,
+  cached perception frames, and staggered LOD scheduling
 - right-click debug spawning, NPC selection hub, and character window
 
 ## Immediate Next Steps
@@ -23,3 +24,5 @@
 - more complete obstacle handling for windows, doors, and future fence traversal
 - migration adapter layer for DynamicTrading
 - deeper medical/body-part gameplay plugged into the NPC character window shell
+- profile real 25-live and 100-NPC multiplayer sessions using the new
+  debug-only counters before tuning the conservative default budgets

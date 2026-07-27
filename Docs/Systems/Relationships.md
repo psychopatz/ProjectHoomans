@@ -28,6 +28,8 @@ the hostile faction. The transition:
 - assigns `hostile_hunt`
 - clears the previous target and attack action
 - schedules immediate target reassessment
+- wakes all runtime simulation clocks and replaces a far/dormant scheduler slot
+  with a 50 ms slot
 - dirties faction and hostility persistence before the combat snapshot is sent
 
 Companions therefore recognize and attack the newly hostile NPC using the same

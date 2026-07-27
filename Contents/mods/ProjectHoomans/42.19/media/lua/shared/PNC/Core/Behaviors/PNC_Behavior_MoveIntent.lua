@@ -18,41 +18,57 @@ end
 
 function MoveIntent.RequestMove(record, x, y, z, mode, stopDistance, reason)
     local runtime
+    local intent
     if not record then
         return false
     end
     runtime = ensureRuntime(record)
-    runtime.moveIntent = {
-        kind = "move",
-        x = tonumber(x) or record.x,
-        y = tonumber(y) or record.y,
-        z = tonumber(z) or record.z or 0,
-        mode = tostring(mode or "walk"),
-        stopDistance = tonumber(stopDistance) or 0.7,
-        reason = reason or "move_request",
-        requestedByJob = tostring(record.activeJob or "none"),
-        requestedByBehavior = tostring(record.activeBehavior or record.activeJob or "none"),
-        requestedOrder = tostring(record.orderSpec and record.orderSpec.kind or "none"),
-        combatReason = tostring(runtime.combatBlockReason or "none"),
-        updatedAt = Core.Now(),
-    }
+    intent = runtime.moveIntent
+    if not intent or intent.kind ~= "move" then
+        intent = {}
+        runtime.moveIntent = intent
+    end
+    intent.kind = "move"
+    intent.x = tonumber(x) or record.x
+    intent.y = tonumber(y) or record.y
+    intent.z = tonumber(z) or record.z or 0
+    intent.mode = tostring(mode or "walk")
+    intent.stopDistance = tonumber(stopDistance) or 0.7
+    intent.reason = reason or "move_request"
+    intent.requestedByJob = tostring(record.activeJob or "none")
+    intent.requestedByBehavior = tostring(
+        record.activeBehavior or record.activeJob or "none"
+    )
+    intent.requestedOrder = tostring(
+        record.orderSpec and record.orderSpec.kind or "none"
+    )
+    intent.combatReason = tostring(runtime.combatBlockReason or "none")
+    intent.updatedAt = Core.Now()
     return true
 end
 
 function MoveIntent.Hold(record, reason)
     local runtime
+    local intent
     if not record then
         return false
     end
     runtime = ensureRuntime(record)
-    runtime.moveIntent = {
-        kind = "hold",
-        reason = reason or "hold",
-        requestedByJob = tostring(record.activeJob or "none"),
-        requestedByBehavior = tostring(record.activeBehavior or record.activeJob or "none"),
-        requestedOrder = tostring(record.orderSpec and record.orderSpec.kind or "none"),
-        updatedAt = Core.Now(),
-    }
+    intent = runtime.moveIntent
+    if not intent or intent.kind ~= "hold" then
+        intent = {}
+        runtime.moveIntent = intent
+    end
+    intent.kind = "hold"
+    intent.reason = reason or "hold"
+    intent.requestedByJob = tostring(record.activeJob or "none")
+    intent.requestedByBehavior = tostring(
+        record.activeBehavior or record.activeJob or "none"
+    )
+    intent.requestedOrder = tostring(
+        record.orderSpec and record.orderSpec.kind or "none"
+    )
+    intent.updatedAt = Core.Now()
     return true
 end
 

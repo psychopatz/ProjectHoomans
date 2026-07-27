@@ -1,5 +1,9 @@
 # Orders
 
+Order and hostility mutations wake the record's runtime clocks and schedule a
+50 ms update. Commands therefore take effect immediately even when the NPC was
+in the 15-second abstract-far or 60-second dormant tier.
+
 ## Colonist Orders
 - `follow`
 - `guard`

@@ -36,6 +36,12 @@
 - zombie-on-NPC pursuit uses throttled coordinate repaths because the NPC's
   embodied engine type is also `IsoZombie`; bite bump state is explicitly
   entered and cleared so a completed bite cannot strand the attacker
+- PNC zombie-side work is limited to an expiring active set populated by
+  spatial proximity, provocation, aggro leases, and bite leases. The server
+  processes at most 64 active zombies and issues at most 16 pursuit path
+  requests per tick; unrelated zombies remain entirely vanilla-owned
+- nearest NPC acquisition queries nearby numeric spatial cells instead of
+  scanning every live NPC for every zombie
 - committed point-blank melee swings tolerate transient LOS changes during the
   windup, revalidate range at the hit frame, and verify that the engine hit
   actually changed zombie health before using authoritative fallback damage
@@ -53,6 +59,12 @@
   threats for a bounded memory window
 - initial player, NPC, and zombie acquisition requires an unobstructed visual
   trace; closed doors and walls do not count as visible
+- zombie acquisition reuses a 200 ms per-NPC perception frame. It performs one
+  spatial query, derives all combat-pressure radii from the same sorted
+  candidate list, and limits LOS work to a rotating window of six candidates
+  plus a remembered attacker. A fully blocked window advances on the next
+  frame so farther visible threats are not permanently hidden. Pressure counts
+  are intentionally geometric while attack selection remains LOS-gated
 - a lost target is investigated at its last seen position for a short memory
   window, but its live position is not tracked and attacks are cancelled while
   line-of-sight is blocked

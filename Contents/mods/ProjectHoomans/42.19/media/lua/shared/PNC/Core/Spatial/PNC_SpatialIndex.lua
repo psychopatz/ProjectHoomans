@@ -5,31 +5,58 @@ local Spatial = PNC.SpatialIndex
 local Core = PNC.Core
 local Const = PNC.Const
 local Registry = PNC.Registry
+local Census = PNC.WorldCensus
+local Performance = PNC.Performance
 
 Spatial.PlayerCells = Spatial.PlayerCells or {}
+Spatial.PlayerByOnlineID = Spatial.PlayerByOnlineID or {}
+Spatial.PlayerByUsername = Spatial.PlayerByUsername or {}
 Spatial.NPCCells = Spatial.NPCCells or {}
 Spatial.ZombieCells = Spatial.ZombieCells or {}
 Spatial.ZombieByID = Spatial.ZombieByID or {}
 Spatial.NPCMembership = Spatial.NPCMembership or {}
 Spatial.NPCInitialized = Spatial.NPCInitialized or false
+if tonumber(Spatial.IndexSchemaVersion) ~= 3 then
+    Spatial.PlayerCells = {}
+    Spatial.PlayerByOnlineID = {}
+    Spatial.PlayerByUsername = {}
+    Spatial.NPCCells = {}
+    Spatial.ZombieCells = {}
+    Spatial.ZombieByID = {}
+    Spatial.NPCMembership = {}
+    Spatial.NPCInitialized = false
+    Spatial.LastCensusGeneration = nil
+    Spatial.IndexSchemaVersion = 3
+end
 
-local function getCellKey(x, y)
+local function getCellCoordinates(x, y)
     local size = Const.SPATIAL_CELL_SIZE
-    return tostring(math.floor(x / size)) .. ":" .. tostring(math.floor(y / size))
+    return math.floor(x / size), math.floor(y / size)
 end
 
 local function insertCell(grid, x, y, value)
-    local key = getCellKey(x, y)
-    local bucket = grid[key]
+    local cellX
+    local cellY
+    local column
+    local bucket
+    cellX, cellY = getCellCoordinates(x, y)
+    column = grid[cellX]
+    if not column then
+        column = { _count = 0 }
+        grid[cellX] = column
+    end
+    bucket = column[cellY]
     if not bucket then
         bucket = {}
-        grid[key] = bucket
+        column[cellY] = bucket
+        column._count = (tonumber(column._count) or 0) + 1
     end
     bucket[#bucket + 1] = value
 end
 
-local function removeFromCell(grid, key, value)
-    local bucket = grid[key]
+local function removeFromCell(grid, cellX, cellY, value)
+    local column = grid[cellX]
+    local bucket = column and column[cellY] or nil
     local i
     if not bucket then
         return
@@ -40,13 +67,18 @@ local function removeFromCell(grid, key, value)
         end
     end
     if #bucket <= 0 then
-        grid[key] = nil
+        column[cellY] = nil
+        column._count = math.max(0, (tonumber(column._count) or 1) - 1)
+        if column._count <= 0 then
+            grid[cellX] = nil
+        end
     end
 end
 
 function Spatial.UpdateNPC(record)
     local id
-    local key
+    local cellX
+    local cellY
     local previous
     if not record or not record.id then
         return
@@ -55,26 +87,49 @@ function Spatial.UpdateNPC(record)
     previous = Spatial.NPCMembership[id]
     if record.alive == false or record.presenceState == Const.PRESENCE_CORPSE then
         if previous then
-            removeFromCell(Spatial.NPCCells, previous.key, previous.record)
+            removeFromCell(
+                Spatial.NPCCells,
+                previous.cellX,
+                previous.cellY,
+                previous.record
+            )
             Spatial.NPCMembership[id] = nil
         end
         return
     end
-    key = getCellKey(record.x, record.y)
-    if previous and previous.key == key and previous.record == record then
+    cellX, cellY = getCellCoordinates(record.x, record.y)
+    if previous
+        and previous.cellX == cellX
+        and previous.cellY == cellY
+        and previous.record == record
+    then
         return
     end
     if previous then
-        removeFromCell(Spatial.NPCCells, previous.key, previous.record)
+        removeFromCell(
+            Spatial.NPCCells,
+            previous.cellX,
+            previous.cellY,
+            previous.record
+        )
     end
     insertCell(Spatial.NPCCells, record.x, record.y, record)
-    Spatial.NPCMembership[id] = { key = key, record = record }
+    Spatial.NPCMembership[id] = {
+        cellX = cellX,
+        cellY = cellY,
+        record = record,
+    }
 end
 
 function Spatial.RemoveNPC(id)
     local previous = id ~= nil and Spatial.NPCMembership[tostring(id)] or nil
     if previous then
-        removeFromCell(Spatial.NPCCells, previous.key, previous.record)
+        removeFromCell(
+            Spatial.NPCCells,
+            previous.cellX,
+            previous.cellY,
+            previous.record
+        )
         Spatial.NPCMembership[tostring(id)] = nil
     end
 end
@@ -95,7 +150,9 @@ local function ensureZombieID(zombie)
 end
 
 function Spatial.Rebuild(now, force)
+    local startedAt
     local zombieList
+    local censusZombies
     local zombie
     local zombieID
     local i
@@ -108,13 +165,26 @@ function Spatial.Rebuild(now, force)
     then
         return false
     end
+    startedAt = Performance and Performance.Begin and Performance.Begin() or nil
     Spatial.LastRebuildAt = now
     Spatial.PlayerCells = {}
+    Spatial.PlayerByOnlineID = {}
+    Spatial.PlayerByUsername = {}
     Spatial.ZombieCells = {}
     Spatial.ZombieByID = {}
 
     Core.ForEachPlayer(function(player)
+        local onlineID
+        local username
         insertCell(Spatial.PlayerCells, player:getX(), player:getY(), player)
+        onlineID = player.getOnlineID and player:getOnlineID() or nil
+        username = player.getUsername and player:getUsername() or nil
+        if onlineID ~= nil then
+            Spatial.PlayerByOnlineID[tostring(onlineID)] = player
+        end
+        if username and tostring(username) ~= "" then
+            Spatial.PlayerByUsername[tostring(username)] = player
+        end
     end)
 
     if not Spatial.NPCInitialized then
@@ -126,24 +196,54 @@ function Spatial.Rebuild(now, force)
         Spatial.NPCInitialized = true
     end
 
-    if not getCell then
-        return true
-    end
-
-    zombieList = getCell():getZombieList()
-    if not zombieList then
-        return true
-    end
-
-    for i = 0, zombieList:size() - 1 do
-        zombie = zombieList:get(i)
-        if zombie and (not zombie:isDead()) and (not Core.IsManagedNPCBody(zombie)) then
-            insertCell(Spatial.ZombieCells, zombie:getX(), zombie:getY(), zombie)
-            zombieID = ensureZombieID(zombie)
-            if zombieID then
-                Spatial.ZombieByID[zombieID] = zombie
+    if Census and Census.GetOrdinary then
+        censusZombies = Census.GetOrdinary(now, force)
+        local generation = Census.GetGeneration
+            and Census.GetGeneration() or nil
+        if force == true
+            or generation == nil
+            or generation ~= Spatial.LastCensusGeneration
+        then
+            Spatial.ZombieCells = {}
+            Spatial.ZombieByID = {}
+            for i = 1, #censusZombies do
+                zombie = censusZombies[i]
+                insertCell(
+                    Spatial.ZombieCells,
+                    zombie:getX(),
+                    zombie:getY(),
+                    zombie
+                )
+                zombieID = ensureZombieID(zombie)
+                if zombieID then
+                    Spatial.ZombieByID[zombieID] = zombie
+                end
+            end
+            Spatial.LastCensusGeneration = generation
+            if Performance then
+                Performance.Count("spatial.zombieIndexRebuilds", 1)
             end
         end
+    elseif getCell then
+        Spatial.ZombieCells = {}
+        Spatial.ZombieByID = {}
+        zombieList = getCell():getZombieList()
+        if zombieList then
+            for i = 0, zombieList:size() - 1 do
+                zombie = zombieList:get(i)
+                if zombie and (not zombie:isDead()) and (not Core.IsManagedNPCBody(zombie)) then
+                    insertCell(Spatial.ZombieCells, zombie:getX(), zombie:getY(), zombie)
+                    zombieID = ensureZombieID(zombie)
+                    if zombieID then
+                        Spatial.ZombieByID[zombieID] = zombie
+                    end
+                end
+            end
+        end
+    end
+    if Performance then
+        Performance.Count("spatial.rebuilds", 1)
+        Performance.Finish("spatial.rebuild", startedAt)
     end
     return true
 end
@@ -158,13 +258,13 @@ local function queryGrid(grid, x, y, radius)
     local cellX
     local cellY
     local bucket
-    local key
+    local column
     local i
 
     for cellX = minCellX, maxCellX do
         for cellY = minCellY, maxCellY do
-            key = tostring(cellX) .. ":" .. tostring(cellY)
-            bucket = grid[key]
+            column = grid[cellX]
+            bucket = column and column[cellY] or nil
             if bucket then
                 for i = 1, #bucket do
                     results[#results + 1] = bucket[i]
@@ -192,4 +292,18 @@ function Spatial.FindZombieByID(zombieID)
         return nil
     end
     return Spatial.ZombieByID[tostring(zombieID)]
+end
+
+function Spatial.GetZombieID(zombie)
+    return ensureZombieID(zombie)
+end
+
+function Spatial.FindPlayerByOnlineID(onlineID)
+    if onlineID == nil then return nil end
+    return Spatial.PlayerByOnlineID[tostring(onlineID)]
+end
+
+function Spatial.FindPlayerByUsername(username)
+    if username == nil then return nil end
+    return Spatial.PlayerByUsername[tostring(username)]
 end

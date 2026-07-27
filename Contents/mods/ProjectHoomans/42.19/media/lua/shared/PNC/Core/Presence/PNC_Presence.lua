@@ -11,13 +11,49 @@ local Visuals = PNC.Visuals
 local Equipment = PNC.Equipment
 local PathService = PNC.PathService
 local ZombieAggro = PNC.ZombieAggro
+local Spatial = PNC.SpatialIndex
 local Network = nil
+local lastInterestRefreshAt = 0
+local materializationBudget = {
+    tickAt = nil,
+    count = 0,
+}
 
 local function resolveNetwork()
     if not Network then
         Network = PNC.Network
     end
     return Network
+end
+
+function Presence.BeginServerTick(now)
+    materializationBudget.tickAt = tonumber(now) or Core.Now()
+    materializationBudget.count = 0
+end
+
+local function consumeMaterializationBudget(record, reason)
+    local now
+    local maximum
+    if tostring(reason or "") ~= "range_enter" then return true end
+    now = Core.Now()
+    if materializationBudget.tickAt ~= now then
+        materializationBudget.tickAt = now
+        materializationBudget.count = 0
+    end
+    maximum = math.max(
+        1,
+        math.floor(tonumber(Const.MATERIALIZE_MAX_PER_TICK) or 2)
+    )
+    if materializationBudget.count < maximum then
+        materializationBudget.count = materializationBudget.count + 1
+        return true
+    end
+    record.runtime = record.runtime or {}
+    record.runtime.forcePresenceCheck = true
+    if PNC.SimulationClock and PNC.SimulationClock.Wake then
+        PNC.SimulationClock.Wake(record, "presence", now)
+    end
+    return false
 end
 
 local function findMaterializeSquare(record)
@@ -75,8 +111,47 @@ local function logPositionRecovery(record, eventName, recoveryReason, fromX, fro
     Core.LogRecordDebug(record, message)
 end
 
-function Presence.ShouldMaterialize(record)
-    local nearest = Core.GetNearestPlayerPosition(record.x, record.y)
+local function findNearestPlayer(record)
+    local radius = math.max(
+        tonumber(Const.ABSTRACT_NEAR_DISTANCE) or 80,
+        tonumber(Const.ABSTRACT_DISTANCE) or 40
+    )
+    local players = Spatial and Spatial.QueryPlayers
+        and Spatial.QueryPlayers(record.x, record.y, radius) or nil
+    local nearest
+    local bestDistSq = math.huge
+    local i
+    local player
+    local distSq
+    if not players then
+        return Core.GetNearestPlayerPosition(record.x, record.y)
+    end
+    for i = 1, #players do
+        player = players[i]
+        if player then
+            distSq = Core.DistanceSq(
+                record.x,
+                record.y,
+                player:getX(),
+                player:getY()
+            )
+            if distSq < bestDistSq then
+                bestDistSq = distSq
+                nearest = {
+                    player = player,
+                    x = player:getX(),
+                    y = player:getY(),
+                    z = player:getZ(),
+                    distSq = distSq,
+                }
+            end
+        end
+    end
+    return nearest
+end
+
+function Presence.ShouldMaterialize(record, nearest)
+    nearest = nearest or findNearestPlayer(record)
     if record.alive == false or record.presenceState == Const.PRESENCE_CORPSE then
         return false
     end
@@ -108,8 +183,8 @@ function Presence.ShouldMaterialize(record)
     return nearest and nearest.distSq <= (Const.MATERIALIZE_DISTANCE * Const.MATERIALIZE_DISTANCE) or false
 end
 
-function Presence.ShouldAbstract(record)
-    local nearest = Core.GetNearestPlayerPosition(record.x, record.y)
+function Presence.ShouldAbstract(record, nearest)
+    nearest = nearest or findNearestPlayer(record)
     if record.presenceState ~= Const.PRESENCE_LIVE then
         return false
     end
@@ -138,6 +213,9 @@ function Presence.Materialize(record, reason)
     local net = resolveNetwork()
     if not Core.IsAuthority() or record.alive == false or record.presenceState == Const.PRESENCE_LIVE then
         return Registry.GetLiveZombie(record.id)
+    end
+    if not consumeMaterializationBudget(record, reason) then
+        return nil
     end
     if PNC.BodyLifecycle
         and PNC.BodyLifecycle.IsStartupBodyCleanupComplete
@@ -286,12 +364,76 @@ function Presence.Abstract(record, reason)
 end
 
 function Presence.Reconcile(record)
+    local nearest
     if record.alive == false then
         return
     end
-    if Presence.ShouldMaterialize(record) then
+    nearest = findNearestPlayer(record)
+    record.runtime = record.runtime or {}
+    record.runtime.nearestPlayerDistSq = nearest and nearest.distSq or nil
+    record.runtime.lastPresenceCheckAt = Core.Now()
+    record.runtime.forcePresenceCheck = nil
+    if Presence.ShouldMaterialize(record, nearest) then
         Presence.Materialize(record, "range_enter")
-    elseif Presence.ShouldAbstract(record) then
+    elseif Presence.ShouldAbstract(record, nearest) then
         Presence.Abstract(record, "range_exit")
     end
+end
+
+function Presence.RefreshMaterializationCandidates(now, force)
+    local seen = {}
+    local candidates
+    local i
+    local record
+    local distSq
+    local count = 0
+    local radius = tonumber(Const.MATERIALIZE_DISTANCE) or 28
+    now = tonumber(now) or Core.Now()
+    if force ~= true and now - lastInterestRefreshAt
+        < (tonumber(Const.PRESENCE_INTEREST_REFRESH_MS) or 250)
+    then
+        return 0
+    end
+    lastInterestRefreshAt = now
+    if not Spatial or not Spatial.QueryNPCs then return 0 end
+    Core.ForEachPlayer(function(player)
+        candidates = Spatial.QueryNPCs(player:getX(), player:getY(), radius)
+        for i = 1, #candidates do
+            record = candidates[i]
+            if record and record.id and record.alive ~= false
+                and record.presenceState == Const.PRESENCE_ABSTRACT
+                and not seen[record.id]
+            then
+                distSq = Core.DistanceSq(
+                    record.x,
+                    record.y,
+                    player:getX(),
+                    player:getY()
+                )
+                if distSq <= radius * radius then
+                    seen[record.id] = true
+                    count = count + 1
+                    record.runtime = record.runtime or {}
+                    record.runtime.nearestPlayerDistSq = distSq
+                    record.runtime.forcePresenceCheck = true
+                    if PNC.SimulationClock and PNC.SimulationClock.Wake then
+                        PNC.SimulationClock.Wake(record, "presence", now)
+                    end
+                    if PNC.Scheduler and PNC.Scheduler.Schedule then
+                        PNC.Scheduler.Schedule(
+                            record,
+                            now + (tonumber(PNC.Scheduler.SLOT_MS) or 50)
+                        )
+                    end
+                end
+            end
+        end
+    end)
+    if count > 0 and Spatial.Rebuild then
+        -- One fresh census/index for the whole entering batch keeps
+        -- pre-materialization shell cleanup and first-frame perception safe
+        -- without returning to one global scan per NPC.
+        Spatial.Rebuild(now, true)
+    end
+    return count
 end

@@ -27,6 +27,9 @@
   delete unrelated naked vanilla zombies elsewhere in the world
 - materialization performs the same record-local cleanup immediately before
   spawning. This covers distant cells that stream in after the startup passes
+- steady-state materialization preflight combines the small lifecycle-candidate
+  census with a local 3.5-tile spatial zombie query; materializing several NPCs
+  no longer multiplies a full loaded-zombie scan per NPC
 - stale removals replicate through an instance-specific `RemoveBody` command
   sent to every connected player. Remote clients also retain exactly one
   canonical online-ID/lease/instance body per NPC snapshot and prune older
@@ -118,7 +121,15 @@
   identity, worn items, and death-marker metadata are final
 
 ## Current Implementation
-- server checks player distance with hysteresis
+- server checks player distance with hysteresis through the player spatial
+  index, computing the nearest result once per reconciliation
+- a 250 ms player-interest wake pass schedules nearby abstract records even
+  when their far/dormant AI cadence is sleeping; materialization responsiveness
+  therefore does not depend on a distant NPC's next AI decision
+- range-entry body creation is limited to two NPCs per server tick. Deferred
+  records keep a 50 ms presence-wake cadence until their body is created
+- live position reads occur with each budgeted record update, with a slower
+  one-second whole-live-set pass retained only as an integrity safety net
 - `Materialize` uses `addZombiesInOutfit(...)`
 - `Materialize` always requests `Naked`, then applies human visuals and
   equipment from the canonical record
@@ -127,6 +138,8 @@
 - `Abstract` snapshots current position and calls:
   - `removeFromWorld()`
   - `removeFromSquare()`
+- the loaded-body audit consumes `PNC_WorldCensus`, sharing the same engine
+  enumeration used by spatial indexing instead of scanning all zombies again
 
 ## Body Lifecycle Ownership
 

@@ -132,6 +132,10 @@ function Core.ResolvePlayerByOnlineID(onlineID)
     if onlineID == nil then
         return nil
     end
+    if PNC.SpatialIndex and PNC.SpatialIndex.FindPlayerByOnlineID then
+        player = PNC.SpatialIndex.FindPlayerByOnlineID(onlineID)
+        if player then return player end
+    end
     if isServer and isServer() and getOnlinePlayers then
         players = getOnlinePlayers()
         if players then
@@ -160,6 +164,10 @@ function Core.ResolvePlayerByUsername(username)
     local player
     if not username then
         return nil
+    end
+    if PNC.SpatialIndex and PNC.SpatialIndex.FindPlayerByUsername then
+        player = PNC.SpatialIndex.FindPlayerByUsername(username)
+        if player then return player end
     end
     if isServer and isServer() and getOnlinePlayers then
         players = getOnlinePlayers()

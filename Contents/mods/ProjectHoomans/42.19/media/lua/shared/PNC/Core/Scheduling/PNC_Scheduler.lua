@@ -3,6 +3,8 @@ PNC.Scheduler = PNC.Scheduler or {}
 
 local Scheduler = PNC.Scheduler
 local Const = PNC.Const
+local LOD = PNC.SimulationLOD
+local Performance = PNC.Performance
 
 Scheduler.SLOT_MS = 50
 Scheduler.Buckets = Scheduler.Buckets or {}
@@ -11,6 +13,9 @@ Scheduler.Initialized = Scheduler.Initialized or false
 Scheduler.LastSlot = Scheduler.LastSlot or nil
 
 function Scheduler.GetCadence(record)
+    if LOD and LOD.GetCadence then
+        return LOD.GetCadence(record)
+    end
     if record.runtime and record.runtime.vehiclePassenger
         and record.runtime.vehiclePassenger.active == true
     then
@@ -68,7 +73,14 @@ function Scheduler.Initialize(records, now)
     Scheduler.LastSlot = math.floor((tonumber(now) or 0) / Scheduler.SLOT_MS) - 1
     for id, record in pairs(records or {}) do
         cadence = Scheduler.GetCadence(record)
-        Scheduler.Schedule(record, (tonumber(now) or 0) + (PNC.Identity.MixSeed(record.identitySeed, "schedule") % math.max(1, cadence)))
+        if record.runtime and record.runtime.forcePresenceCheck then
+            Scheduler.Schedule(
+                record,
+                (tonumber(now) or 0) + Scheduler.SLOT_MS
+            )
+        else
+            Scheduler.Schedule(record, (tonumber(now) or 0) + (PNC.Identity.MixSeed(record.identitySeed, "schedule") % math.max(1, cadence)))
+        end
     end
     Scheduler.Initialized = true
 end
@@ -112,6 +124,12 @@ function Scheduler.PopDue(records, now)
             deferred[i],
             (tonumber(now) or 0) + Scheduler.SLOT_MS
         )
+    end
+    if Performance then
+        Performance.Count("scheduler.processed", #output)
+        Performance.Count("scheduler.deferred", #deferred)
+        Performance.SetGauge("scheduler.lastDue", #output)
+        Performance.SetGauge("scheduler.lastDeferred", #deferred)
     end
     return output
 end

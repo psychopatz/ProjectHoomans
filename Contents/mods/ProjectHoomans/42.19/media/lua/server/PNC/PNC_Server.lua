@@ -23,6 +23,9 @@ local Health = PNC.Health
 local Behavior = PNC.BehaviorSystem
 local PathService = PNC.PathService
 local Scheduler = PNC.Scheduler
+local SimulationClock = PNC.SimulationClock
+local SimulationLOD = PNC.SimulationLOD
+local Performance = PNC.Performance
 local Network = PNC.Network
 local API = PNC.API
 local ZombieAggro = PNC.ZombieAggro
@@ -35,6 +38,7 @@ local PlayerDamage = PNC.PlayerDamage
 local Treatment = PNC.Treatment
 local CompanionCommands = PNC.CompanionCommands
 local buildDebugRoster
+local lastLivePositionSafetyRefreshAt = 0
 
 local function canUseDebug(player)
     local access
@@ -95,11 +99,38 @@ end
 local function processRecord(record, now)
     local zombie = Registry.GetLiveZombie(record.id)
     local forceSyncEvent
-    Presence.Reconcile(record)
+    local decisionInterval
+    local pathDue = false
+    local forcePresence = record.runtime
+        and record.runtime.forcePresenceCheck == true
+    if zombie and Registry.RefreshLivePosition then
+        Registry.RefreshLivePosition(record, zombie, false)
+    end
+    if not SimulationClock
+        or SimulationClock.IsDue(
+            record,
+            "presence",
+            now,
+            SimulationLOD and SimulationLOD.GetPresenceInterval(record) or 500,
+            forcePresence
+        )
+    then
+        Presence.Reconcile(record)
+    end
     zombie = Registry.GetLiveZombie(record.id)
-    Health.Update(record, zombie, now)
-    if Stamina and Stamina.Update then
-        Stamina.Update(record, zombie, now)
+    if not SimulationClock
+        or SimulationClock.IsDue(
+            record,
+            "vitals",
+            now,
+            SimulationLOD and SimulationLOD.GetVitalsInterval(record) or 250,
+            false
+        )
+    then
+        Health.Update(record, zombie, now)
+        if Stamina and Stamina.Update then
+            Stamina.Update(record, zombie, now)
+        end
     end
 
     if record.alive == false then
@@ -116,6 +147,11 @@ local function processRecord(record, now)
     end
 
     if now >= (tonumber(record.nextThinkAt) or 0) then
+        record.runtime = record.runtime or {}
+        record.runtime.abstractStepElapsedMs = math.max(
+            0,
+            now - (tonumber(record.lastThinkAt) or now)
+        )
         Behavior.Tick(record, zombie, now)
         -- A behavior may abstract a boarding companion or materialize a
         -- disembarking one. Refresh the lease-bound body before any pathing or
@@ -123,11 +159,27 @@ local function processRecord(record, now)
         -- newly materialized passenger is immediately eligible for setup).
         zombie = Registry.GetLiveZombie(record.id)
         record.lastThinkAt = now
-        record.nextThinkAt = now + Scheduler.GetCadence(record)
+        decisionInterval = SimulationLOD
+            and SimulationLOD.GetDecisionInterval(record)
+            or Scheduler.GetCadence(record)
+        record.nextThinkAt = now + decisionInterval
     end
 
-    if zombie and record.alive ~= false then
+    pathDue = zombie and record.alive ~= false and (
+        not SimulationClock
+        or SimulationClock.IsDue(
+            record,
+            "path",
+            now,
+            SimulationLOD and SimulationLOD.GetPathInterval(record) or 100,
+            false
+        )
+    )
+    if pathDue then
         PathService.Pump(record, zombie)
+        if Registry.RefreshLivePosition then
+            Registry.RefreshLivePosition(record, zombie, false)
+        end
     end
 
     forceSyncEvent = record.runtime and record.runtime.forceSyncEvent or nil
@@ -140,7 +192,7 @@ local function processRecord(record, now)
         record.lastSyncAt = now
     end
 
-    if zombie and Animation and Animation.SyncLocomotion then
+    if zombie and pathDue and Animation and Animation.SyncLocomotion then
         Animation.SyncLocomotion(zombie, record)
     end
     if Spatial and Spatial.UpdateNPC then
@@ -156,8 +208,12 @@ end
 
 function Server.OnTick()
     local now = Core.Now()
+    local startedAt = Performance and Performance.Begin and Performance.Begin() or nil
     local due
     local i
+    if Presence.BeginServerTick then
+        Presence.BeginServerTick(now)
+    end
     Registry.EnsureLoaded()
     if BodyLifecycle and BodyLifecycle.PumpStartupBodyCleanup then
         BodyLifecycle.PumpStartupBodyCleanup(now, false)
@@ -168,8 +224,16 @@ function Server.OnTick()
     if PNC.CompanionVehicle and PNC.CompanionVehicle.AuditLoadedReservations then
         PNC.CompanionVehicle.AuditLoadedReservations(now, false)
     end
-    Registry.RefreshLivePositions(false)
+    if now - lastLivePositionSafetyRefreshAt
+        >= (tonumber(Const.LIVE_POSITION_SAFETY_REFRESH_MS) or 1000)
+    then
+        Registry.RefreshLivePositions(false)
+        lastLivePositionSafetyRefreshAt = now
+    end
     Spatial.Rebuild(now, false)
+    if Presence.RefreshMaterializationCandidates then
+        Presence.RefreshMaterializationCandidates(now, false)
+    end
     if Network.RefreshInterestSets then
         Network.RefreshInterestSets(now)
     end
@@ -182,6 +246,9 @@ function Server.OnTick()
     end
     if ZombieAggro and ZombieAggro.Pump then
         ZombieAggro.Pump(now)
+    end
+    if Performance then
+        Performance.Finish("server.tick", startedAt)
     end
 end
 
@@ -354,6 +421,12 @@ local function onClientCommand(module, command, player, args)
         end
         if args and args.audit == true and BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
             BodyLifecycle.AuditLoadedBodies(Core.Now(), true)
+        end
+        if args and args.performance == true
+            and Performance
+            and Performance.Enable
+        then
+            Performance.Enable(60000)
         end
         Network.SendDebugRoster(
             player,

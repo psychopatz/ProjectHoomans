@@ -8,6 +8,22 @@ local Skills = PNC.Skills
 
 OrderSystem.Normalizers = OrderSystem.Normalizers or {}
 
+local function wakeRecord(record)
+    local now
+    if not record then return end
+    now = Core.Now()
+    record.nextThinkAt = now
+    if PNC.SimulationClock and PNC.SimulationClock.Wake then
+        PNC.SimulationClock.Wake(record, nil, now)
+    end
+    if PNC.Scheduler and PNC.Scheduler.Schedule then
+        PNC.Scheduler.Schedule(
+            record,
+            now + (tonumber(PNC.Scheduler.SLOT_MS) or 50)
+        )
+    end
+end
+
 function OrderSystem.RegisterNormalizer(kind, normalizer)
     kind = tostring(kind or "")
     if kind == "" or type(normalizer) ~= "function" then return false end
@@ -100,6 +116,7 @@ function OrderSystem.SetOrder(record, orderSpec)
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "order")
     end
+    wakeRecord(record)
 end
 
 function OrderSystem.SetHostility(record, modeSpec)
@@ -127,4 +144,5 @@ function OrderSystem.SetHostility(record, modeSpec)
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "hostility")
     end
+    wakeRecord(record)
 end

@@ -153,6 +153,9 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
         return false
     end
     now = Core.Now()
+    if ZombieAggro.Activate then
+        ZombieAggro.Activate(zombie, now, "bite")
+    end
     if Internal.canZombieAttack and not Internal.canZombieAttack(zombie, now) then
         return false
     end

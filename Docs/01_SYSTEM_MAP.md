@@ -13,12 +13,18 @@
 - `PNC_Persistence`: versioned canonical save schema, migration, runtime
   rehydrate, and compact prior-body instance hints used only for relog cleanup
 - `PNC_Registry`: authoritative NPC records and live body lookup
+- `PNC_Performance`: debug-only runtime counters, gauges, and timings; no
+  performance telemetry is persisted
+- `PNC_WorldCensus`: one cadence-bounded loaded-zombie snapshot shared by
+  spatial indexing, lifecycle auditing, and aggro discovery
 - `PNC_Relationships`: faction-enemy matrix and authoritative disposition transitions
-- `PNC_SpatialIndex`: indexed nearby player, NPC, and zombie queries; global
-  player/zombie scans are cadence-bounded while explicit stale-ID recovery may
-  force a rebuild
+- `PNC_SpatialIndex`: nested numeric-cell player, NPC, and zombie queries built
+  from the shared world census; player identity maps also provide constant-time
+  owner lookup
 - `PNC_Stealth`: follow-stealth state and stealth-based combat suppression
 - `PNC_Perception`: target selection, zombie lookup, and nearby threat counting
+- `PNC_Perception_Frame`: short-lived per-NPC zombie candidate, LOS, and
+  multi-radius threat-count cache
 - `PNC_Stamina`: stamina authority, recovery, attack costs, and visibility timers
 - `PNC_Visuals`: owns appearance application and reusable body-visual operations such as clothing visuals, attached-item cleanup, and model refresh
 - `PNC_Animation`: single animation state writer
@@ -64,11 +70,17 @@
   `Presence/PNC_BodyLifecycle/`
 - `PNC_Presence`: live and abstract transitions, naked engine-shell
   materialization, and pre-spawn stale-shell cleanup
-- `PNC_Scheduler`: cadence rules, identity-seeded update distribution, and a
-  hard 24-record server-tick budget with overflow deferred to later slots
+- `PNC_SimulationClock`: independent runtime deadlines for presence, vitals,
+  pathing, and other simulation domains
+- `PNC_SimulationLOD`: combat, moving, live-idle, abstract-near,
+  abstract-far, and dormant cadence policy
+- `PNC_Scheduler`: identity-seeded LOD scheduling and a hard 24-record
+  server-tick budget with overflow deferred to later slots
 - `PNC_Network`: roster snapshots, live presence snapshots, instance-specific
   stale-body removals, and on-demand character payloads
 - `PNC_ZombieAggro`: zombie-to-NPC aggro bridge and bite flow
+- `PNC_ZombieAggro_ActiveSet`: expiring spatially discovered zombie work set
+  with separate per-tick update and pursuit-path budgets
 - `PNC_API`: external entry points
 
 ## Layout Rule
@@ -83,6 +95,10 @@
 - starting equipment is independent of archetypes; combat consumes generated
   capability and does not choose or spawn inventory items
 - modules required before one of their collaborators must resolve that collaborator from `PNC` at call time; do not capture a not-yet-loaded table in a file-local variable
+- population-wide engine enumeration belongs in `PNC_WorldCensus`; consumers
+  must not add an independent per-tick `getZombieList()` scan
+- cadence decisions belong in `PNC_SimulationLOD`, while independent subsystem
+  deadlines belong in `PNC_SimulationClock`
 - multi-job behavior entry points dispatch to one handler per job so follow, guard, and patrol control flow remains independently testable
 - body-lifecycle callers use the public `PNC.BodyLifecycle` methods; new engine operations, corpse policies, and audit rules belong in their focused internal module instead of the facade
 

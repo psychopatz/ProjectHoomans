@@ -1,5 +1,9 @@
 # Networking
 
+Online player ownership lookup is backed by the refreshed spatial player maps.
+Replicated zombie online-ID lookup consumes `PNC_WorldCensus`, so several
+reaction packets in one frame do not each traverse the full engine zombie list.
+
 ## Purpose
 - `PNC_Network` owns client-facing payload construction and replication only.
 - the server registry remains authoritative; clients never create canonical NPC records.

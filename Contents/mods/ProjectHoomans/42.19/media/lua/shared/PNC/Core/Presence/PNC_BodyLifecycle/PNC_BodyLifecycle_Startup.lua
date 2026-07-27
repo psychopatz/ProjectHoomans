@@ -239,6 +239,11 @@ end
 function Lifecycle.CleanupRecordShells(record, now)
     local cell
     local zombieList
+    local candidates = {}
+    local seen = {}
+    local lifecycleCandidates
+    local nearby
+    local censusAll
     local removed = 0
     local i
     local zombie
@@ -252,13 +257,63 @@ function Lifecycle.CleanupRecordShells(record, now)
     if not Core.IsAuthority() or not record or record.alive == false then
         return 0
     end
-    cell = getCell and getCell() or nil
-    zombieList = cell and cell.getZombieList and cell:getZombieList() or nil
-    if not zombieList then
-        return 0
+    if PNC.WorldCensus and PNC.WorldCensus.GetLifecycleCandidates then
+        lifecycleCandidates = PNC.WorldCensus.GetLifecycleCandidates(
+            now,
+            false
+        )
+        for i = 1, #lifecycleCandidates do
+            zombie = lifecycleCandidates[i]
+            if zombie and not seen[zombie] then
+                seen[zombie] = true
+                candidates[#candidates + 1] = zombie
+            end
+        end
     end
-    for i = zombieList:size() - 1, 0, -1 do
-        zombie = zombieList:get(i)
+    if PNC.SpatialIndex and PNC.SpatialIndex.QueryZombies then
+        nearby = PNC.SpatialIndex.QueryZombies(
+            record.x,
+            record.y,
+            3.5
+        )
+        for i = 1, #nearby do
+            zombie = nearby[i]
+            if zombie and not seen[zombie] then
+                seen[zombie] = true
+                candidates[#candidates + 1] = zombie
+            end
+        end
+    end
+    if PNC.WorldCensus and PNC.WorldCensus.GetAll
+        and (not PNC.SpatialIndex
+            or tonumber(PNC.SpatialIndex.LastRebuildAt) == nil)
+    then
+        censusAll = PNC.WorldCensus.GetAll(now, false)
+        for i = 1, #censusAll do
+            zombie = censusAll[i]
+            closeEnough = distanceSqToRecord(zombie, record)
+            if zombie and not seen[zombie]
+                and closeEnough ~= nil
+                and closeEnough <= (3.5 * 3.5)
+            then
+                seen[zombie] = true
+                candidates[#candidates + 1] = zombie
+            end
+        end
+    end
+    if #candidates <= 0
+        and (not PNC.WorldCensus or not PNC.WorldCensus.GetLifecycleCandidates)
+    then
+        cell = getCell and getCell() or nil
+        zombieList = cell and cell.getZombieList and cell:getZombieList() or nil
+        if zombieList then
+            for i = 0, zombieList:size() - 1 do
+                candidates[#candidates + 1] = zombieList:get(i)
+            end
+        end
+    end
+    for i = #candidates, 1, -1 do
+        zombie = candidates[i]
         npcId, strong, weak = getLiveShellIdentity(zombie)
         naked = isNakedShell(zombie)
         exactID = npcId ~= nil and tostring(npcId) == tostring(record.id)

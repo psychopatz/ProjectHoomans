@@ -13,6 +13,8 @@ This repository starts with a server-authoritative V1 slice:
   healing, threat-aware NPC self-treatment, and server-side item consumption
 - configurable bite infection, staged fever and health decline, infection death, and corpse reanimation
 - multiplayer-safe authority flow with the same codepath used by singleplayer host
+- population-scaled simulation with a shared zombie census, bounded aggro and
+  NPC scheduler work, cached perception, and elapsed-time abstract travel
 - an admin/debug-only NPC Monitor with lifecycle audits, filters, recovery controls, and overlay states
 
 The framework is split into small subsystem files under `PNC/Core` so future work can extend jobs, behaviors, pathing, combat, and migration adapters without rebuilding the base.

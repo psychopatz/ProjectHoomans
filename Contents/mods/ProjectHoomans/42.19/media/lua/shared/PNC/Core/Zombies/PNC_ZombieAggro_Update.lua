@@ -12,10 +12,6 @@ local Settings = PNC.Sandbox
 local Internal = ZombieAggro.Internal
 
 function ZombieAggro.ClearForNPCBody(npcBody)
-    local cell
-    local zombieList
-    local i
-    local zombie
     local target
     local forcedRecord
     local forcedBody
@@ -23,13 +19,8 @@ function ZombieAggro.ClearForNPCBody(npcBody)
         return
     end
     ZombieAggro.ClearBiteEntriesForNPCBody(npcBody)
-    cell = getCell()
-    zombieList = cell and cell.getZombieList and cell:getZombieList() or nil
-    if not zombieList then
-        return
-    end
-    for i = zombieList:size() - 1, 0, -1 do
-        zombie = zombieList:get(i)
+    if ZombieAggro.ForEachActive then
+        ZombieAggro.ForEachActive(function(zombie)
         if zombie and (not zombie:isDead()) and (not Internal.isManagedNPCBody(zombie)) then
             target = zombie.getTarget and zombie:getTarget() or nil
             forcedRecord, forcedBody = Internal.getForcedNPCBodyTarget(zombie)
@@ -38,12 +29,16 @@ function ZombieAggro.ClearForNPCBody(npcBody)
                 ZombieAggro.ClearBiteEntryForZombie(zombie)
             end
         end
+        end)
     end
 end
 
 function ZombieAggro.OnZombieProvoked(zombie, npcBody)
     if not zombie or not npcBody or zombie:isDead() or Internal.isManagedNPCBody(zombie) then
         return
+    end
+    if ZombieAggro.Activate then
+        ZombieAggro.Activate(zombie, Core.Now(), "provoked")
     end
     Internal.forceAggro(zombie, npcBody)
 end
@@ -74,6 +69,11 @@ local function refreshPursuitPath(zombie, npcBody, now)
     if modData
         and (now - (tonumber(modData.PNC_AggroPathAt) or 0)) < (tonumber(Const.ZOMBIE_NPC_PATH_REFRESH_MS) or 350)
         and movedSq < (refreshDistance * refreshDistance)
+    then
+        return false
+    end
+    if ZombieAggro.ConsumePathRequestBudget
+        and not ZombieAggro.ConsumePathRequestBudget()
     then
         return false
     end
@@ -203,12 +203,7 @@ local function processZombie(zombie, now)
 end
 
 function ZombieAggro.Pump(now)
-    local cell
-    local zombieList
-    local i
-    local zombie
-
-    if not Core.IsAuthority() or not getCell then
+    if not Core.IsAuthority() then
         return
     end
 
@@ -216,16 +211,11 @@ function ZombieAggro.Pump(now)
         ZombieAggro.PumpBiteRecovery(now)
     end
 
-    cell = getCell()
-    zombieList = cell and cell.getZombieList and cell:getZombieList() or nil
-    if not zombieList then
-        return
+    if ZombieAggro.RefreshActiveSet then
+        ZombieAggro.RefreshActiveSet(now, false)
     end
-
-    for i = zombieList:size() - 1, 0, -1 do
-        zombie = zombieList:get(i)
-        if zombie and (not zombie:isDead()) and (not Internal.isManagedNPCBody(zombie)) then
-            processZombie(zombie, now)
-        end
+    if ZombieAggro.PumpActiveSet then
+        return ZombieAggro.PumpActiveSet(now, processZombie)
     end
+    return 0
 end
