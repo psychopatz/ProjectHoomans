@@ -168,6 +168,9 @@ function Server.OnTick()
     if BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
         BodyLifecycle.AuditLoadedBodies(now, false)
     end
+    if PNC.CompanionVehicle and PNC.CompanionVehicle.AuditLoadedReservations then
+        PNC.CompanionVehicle.AuditLoadedReservations(now, false)
+    end
     Registry.RefreshLivePositions()
     Spatial.Rebuild()
     if Network.RefreshInterestSets then
@@ -453,6 +456,9 @@ end
 
 local function onServerStarted()
     Registry.Load()
+    if PNC.CompanionVehicle and PNC.CompanionVehicle.AuditLoadedReservations then
+        PNC.CompanionVehicle.AuditLoadedReservations(Core.Now(), true)
+    end
     if BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
         BodyLifecycle.AuditLoadedBodies(Core.Now(), true)
     end

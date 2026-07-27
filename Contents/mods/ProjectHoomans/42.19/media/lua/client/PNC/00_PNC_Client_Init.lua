@@ -1,5 +1,6 @@
 require "PNC/00_PNC_Init"
 require "PNC/Patches/PNC_FishingPatch"
+require "PNC/Patches/PNC_VehicleSeatPatch"
 require "PNC/UI/PNC_Nameplates"
 require "PsychopatzCore/EventMarkers/PsychopatzEventMarkerHandler"
 PNC.EventMarkers = PsychopatzCore.EventMarkers

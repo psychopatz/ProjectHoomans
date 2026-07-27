@@ -29,6 +29,9 @@
 - `PNC_Combat_Tactics`: conservative kiting and repositioning
 - `PNC_Combat_Unarmed`: shove and stomp helpers
 - `PNC_PathService`: live stepping and abstract travel
+- `PNC_CompanionVehicle`: authority-owned companion boarding, abstract vehicle
+  travel, engine-visible seat reservations, disembarkation, and stale-token
+  repair
 - `PNC_OrderSystem`: order normalization and ownership
 - `PNC_JobSystem`: selects active job from order and state and accepts registered order-to-job mappings
 - `PNC_BehaviorSystem`: thin coordinator that executes the active job
@@ -74,6 +77,8 @@
 - `PNC_Client`: roster cache, character-payload cache, sync requests, context menu debug tools
 - `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
 - `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby embodied NPCs
+- `PNC_VehicleSeatPatch`: prevents vanilla seat-item movement from extracting
+  an abstract NPC reservation token and reports the named occupant
 - `PNC_ContextHub`: central reusable NPC selection and right-click hub
 - `PNC_NPCSelection`: cursor-space NPC selection helper used by context providers
 - `PNC_Nameplates`: overhead name, HP, stamina, and AI debug overlay

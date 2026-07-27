@@ -1,0 +1,11 @@
+module PNC
+{
+    item VehicleSeatReservation
+    {
+        DisplayCategory = Hidden,
+        ItemType = base:normal,
+        Weight = 0.1,
+        Icon = IDCard,
+        Tooltip = Internal NPC vehicle-seat reservation. Do not spawn.,
+    }
+}

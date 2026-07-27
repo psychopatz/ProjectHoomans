@@ -9,14 +9,21 @@
 - abstracting a living NPC removes the live zombie body immediately
 - no hidden or parked zombie is kept around for abstract travel
 - materialization always spawns a fresh body from authoritative record state
-- companions following an owner reserve an installed, currently free vehicle
-  seat when they reach the owner's car. PNC then removes their live body and
-  tracks them as an `abstract` vehicle passenger at a 100 ms cadence; no
-  `IsoZombie` is attached to the vehicle
-- abstract seat reservations are coordinated across companions and yield to
-  real engine occupants. If a player claims a reserved seat while travelling,
-  the NPC stays safely abstract until another seat opens instead of spawning
-  beside a moving car
+- companions following an owner transactionally reserve an installed,
+  currently free vehicle seat when they reach the owner's car. The authority
+  first adds a private weighted reservation item to that seat container, which
+  makes vanilla `BaseVehicle:isSeatOccupied()` enforce the capacity, and only
+  then removes the live body. PNC tracks the companion as an `abstract`
+  passenger at a 100 ms cadence; no `IsoZombie` is attached to the vehicle
+- each reservation is one NPC to one real seat. Vanilla entry/switch checks,
+  other PNC companions, and the vehicle seat UI all see that consumed capacity.
+  The client blocks vanilla's "move items from seat" and inventory-transfer
+  paths from treating the reservation as movable luggage
+- reservations are authority-created and synchronized through the vehicle
+  container item lane. They are released on disembark, vehicle transfer,
+  abstraction rollback, seat loss, and NPC death. A bounded server audit
+  removes duplicates, tokens moved outside their seat, and stale save/crash
+  remnants whose NPC no longer has the matching runtime passenger state
 - when the owner exits, normal safe-square materialization handles
   disembarkation. Changing vehicles transfers the abstract reservation without
   creating an intermediate body. A disconnect clears the reservation and,

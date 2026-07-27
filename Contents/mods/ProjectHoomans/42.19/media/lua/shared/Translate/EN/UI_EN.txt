@@ -30,6 +30,7 @@ UI_EN = {
     UI_PNC_SpawnEquipmentMelee = "Melee Weapon",
     UI_PNC_SpawnEquipmentRanged = "Ranged Weapon",
     UI_PNC_SpawnEquipmentBoth = "Melee + Ranged Weapons",
+    UI_PNC_VehicleSeatOccupied = "Seat occupied by %1",
     UI_PNC_MonitorTitle = "PNC NPC Monitor",
     UI_PNC_MonitorFocus = "Focus",
     UI_PNC_MonitorTrack = "Track",

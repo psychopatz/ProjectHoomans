@@ -275,6 +275,9 @@ function Health.Kill(record, zombie, reason)
     local corpseOK
     local corpseCreated
     local deathMarker
+    if PNC.CompanionVehicle and PNC.CompanionVehicle.Release then
+        PNC.CompanionVehicle.Release(record, "npc_death")
+    end
     if PNC.NPCWounds and PNC.NPCWounds.SetOverallHealth then
         PNC.NPCWounds.SetOverallHealth(record, 0)
     end

@@ -20,7 +20,11 @@
 - companion vehicle travel remains authority-owned. Clients receive at most
   the compact abstract passenger metadata (`vehicleId`, reserved seat, owner,
   and board time); they never attach an NPC zombie to a vehicle or decide when
-  it should disembark
+  it should disembark. The authority mirrors each active reservation into the
+  matching vanilla seat container with one private weighted token, using the
+  normal container add/remove replication lane so every client sees the same
+  occupied capacity. Clients may reject interaction with that token but never
+  create, transfer, or remove authoritative reservations
 - NPC bandaging is presented as a local timed action, but only its completion
   sends `CMD_BANDAGE`; the server revalidates the item, range, wound, and debug
   authorization before mutating or broadcasting the record
