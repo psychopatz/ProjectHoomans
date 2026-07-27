@@ -474,12 +474,26 @@ function PathService.Pump(record, zombie)
     local lane
     local intentState
     local now
+    local positionRepaired
     if not zombie or not runtime then
         return false, "no_live_body"
     end
 
     lane = Internal.ensureMoveLane(record)
     now = Internal.Core.Now()
+    if Internal.repairInvalidBodyPosition then
+        positionRepaired = Internal.repairInvalidBodyPosition(
+            record,
+            zombie,
+            lane,
+            now
+        )
+        if positionRepaired and Internal.FakeLocomotion
+            and Internal.FakeLocomotion.PrepareBody
+        then
+            Internal.FakeLocomotion.PrepareBody(zombie, lane, now)
+        end
+    end
     if not lane.traversalAction then
         Internal.applyCombatFacing(zombie, lane, now, false)
     end

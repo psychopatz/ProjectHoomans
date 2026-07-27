@@ -41,6 +41,22 @@ local IDLE_RESET_STATES = {
     ["turnalerted"] = true,
 }
 
+function LiveBodyControl.SetAuthoritativePosition(zombie, x, y, z)
+    if not zombie then
+        return false
+    end
+    zombie:setX(x)
+    zombie:setY(y)
+    zombie:setZ(z)
+    -- PNC has already validated and authored this movement. Keep the engine's
+    -- previous-position fields aligned so its collision pass does not
+    -- reinterpret a Lua-controlled step as a fence/window/vehicle collision.
+    if zombie.setLastX then zombie:setLastX(x) end
+    if zombie.setLastY then zombie:setLastY(y) end
+    if zombie.setLastZ then zombie:setLastZ(z) end
+    return true
+end
+
 local function isDamageReactionState(actionState)
     actionState = string.lower(tostring(actionState or ""))
     return string.find(actionState, "staggerback", 1, true) == 1

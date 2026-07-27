@@ -212,12 +212,83 @@ function TraversalQuery.IsClosedPassage(object)
     return false
 end
 
-function TraversalQuery.CanOccupy(x, y, z, cell)
+function TraversalQuery.GetOccupancyReason(x, y, z, cell)
     local square = TraversalQuery.GetSquare(x, y, z, cell)
-    return square ~= nil
-        and square:isFree(false)
-        and not square:isSolid()
-        and not square:isSolidTrans()
+    if not square then return "unloaded" end
+    if objectBool(square, { "isVehicleIntersecting" }, false) then
+        return "vehicle"
+    end
+    if square:isSolid() then return "solid" end
+    if square:isSolidTrans() then return "solid_trans" end
+    if not square:isFree(false) then return "occupied" end
+    return nil
+end
+
+function TraversalQuery.CanOccupy(x, y, z, cell)
+    return TraversalQuery.GetOccupancyReason(x, y, z, cell) == nil
+end
+
+function TraversalQuery.FindNearestOccupable(x, y, z, maxRadius, cell)
+    local originX = math.floor(tonumber(x) or 0)
+    local originY = math.floor(tonumber(y) or 0)
+    local originZ = math.floor(tonumber(z) or 0)
+    local originalReason
+    local radius
+    local dx
+    local dy
+    local candidateX
+    local candidateY
+    local candidateDistSq
+    local best
+    maxRadius = math.max(0, math.floor(tonumber(maxRadius) or 3))
+    originalReason = TraversalQuery.GetOccupancyReason(
+        originX + 0.5,
+        originY + 0.5,
+        originZ,
+        cell
+    )
+    if not originalReason then
+        return tonumber(x) or originX + 0.5,
+            tonumber(y) or originY + 0.5,
+            originZ,
+            nil
+    end
+    for radius = 1, maxRadius do
+        best = nil
+        for dx = -radius, radius do
+            for dy = -radius, radius do
+                if math.max(math.abs(dx), math.abs(dy)) == radius then
+                    candidateX = originX + dx + 0.5
+                    candidateY = originY + dy + 0.5
+                    if TraversalQuery.CanOccupy(candidateX, candidateY, originZ, cell) then
+                        candidateDistSq = (candidateX - (tonumber(x) or originX + 0.5)) ^ 2
+                            + (candidateY - (tonumber(y) or originY + 0.5)) ^ 2
+                        if not best
+                            or candidateDistSq < best.distSq
+                            or (
+                                candidateDistSq == best.distSq
+                                and (
+                                    candidateX < best.x
+                                    or (candidateX == best.x and candidateY < best.y)
+                                )
+                            )
+                        then
+                            best = {
+                                x = candidateX,
+                                y = candidateY,
+                                z = originZ,
+                                distSq = candidateDistSq,
+                            }
+                        end
+                    end
+                end
+            end
+        end
+        if best then
+            return best.x, best.y, best.z, originalReason
+        end
+    end
+    return nil, nil, nil, originalReason
 end
 
 function TraversalQuery.CanStep(fromX, fromY, fromZ, toX, toY, toZ, cell)

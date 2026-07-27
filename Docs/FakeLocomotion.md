@@ -101,11 +101,16 @@ underlying zombie AI disabled with `setUseless(true)`.
 - Fake traversal uses only `PNC_ClimbFence`, `PNC_ClimbFenceTall`, and
   `PNC_ClimbWindow`. It never writes the vanilla `ClimbFenceStarted` or
   `ClimbWindowStarted` variables that enter unsafe Java traversal states.
+- PNC-authored transforms synchronize the body’s previous-position fields.
+  This keeps Java collision handling from reinterpreting controlled movement
+  as a traversal collision on an `IsoZombie` without player `BodyDamage`.
 - Special movement is only considered after a blocked fake step or a short
   no-progress stall, so nearby windows no longer steal normal movement ticks.
 - Collision checks include the edge between squares, not only destination
   occupancy. Walls are hard barriers; a door, window, or fence directly ahead
   is handed to traversal before lateral steering is attempted.
+- Vehicle-intersecting squares are treated as occupied, so the existing
+  side-preference steering walks around the vehicle footprint.
 - Traversal attempts remember the obstacle, source side, destination, and goal
   revision long enough to reject immediate same-side re-cross loops.
 

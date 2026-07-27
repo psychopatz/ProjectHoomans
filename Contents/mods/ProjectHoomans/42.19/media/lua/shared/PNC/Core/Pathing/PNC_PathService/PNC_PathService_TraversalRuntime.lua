@@ -227,9 +227,13 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     nextX = (tonumber(action.startX) or zombie:getX()) + (((tonumber(action.endX) or zombie:getX()) - (tonumber(action.startX) or zombie:getX())) * eased)
     nextY = (tonumber(action.startY) or zombie:getY()) + (((tonumber(action.endY) or zombie:getY()) - (tonumber(action.startY) or zombie:getY())) * eased)
     nextZ = (tonumber(action.startZ) or zombie:getZ()) + (((tonumber(action.endZ) or zombie:getZ()) - (tonumber(action.startZ) or zombie:getZ())) * eased)
-    zombie:setX(nextX)
-    zombie:setY(nextY)
-    zombie:setZ(nextZ)
+    if LiveBodyControl and LiveBodyControl.SetAuthoritativePosition then
+        LiveBodyControl.SetAuthoritativePosition(zombie, nextX, nextY, nextZ)
+    else
+        zombie:setX(nextX)
+        zombie:setY(nextY)
+        zombie:setZ(nextZ)
+    end
     Internal.syncRecordPosition(record, zombie)
     lane.lastProgressAt = now
     lane.lastIssueAt = now
@@ -249,9 +253,16 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     if progress < 1 then
         return true, action.kind
     end
-    zombie:setX(tonumber(action.endX) or zombie:getX())
-    zombie:setY(tonumber(action.endY) or zombie:getY())
-    zombie:setZ(tonumber(action.endZ) or zombie:getZ())
+    nextX = tonumber(action.endX) or zombie:getX()
+    nextY = tonumber(action.endY) or zombie:getY()
+    nextZ = tonumber(action.endZ) or zombie:getZ()
+    if LiveBodyControl and LiveBodyControl.SetAuthoritativePosition then
+        LiveBodyControl.SetAuthoritativePosition(zombie, nextX, nextY, nextZ)
+    else
+        zombie:setX(nextX)
+        zombie:setY(nextY)
+        zombie:setZ(nextZ)
+    end
     Internal.syncRecordPosition(record, zombie)
     if not finished and not timedOut then
         return true, action.kind .. "_finish"

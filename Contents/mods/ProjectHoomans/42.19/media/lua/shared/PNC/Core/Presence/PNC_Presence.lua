@@ -22,31 +22,57 @@ end
 
 local function findMaterializeSquare(record)
     local cell
-    local x
-    local y
-    local z
-    local dx
-    local dy
-    local square
+    local query
+    local safeX
+    local safeY
+    local safeZ
+    local recoveryReason
 
     if not getCell then
-        return record.x, record.y, record.z
+        return record.x, record.y, record.z, nil
     end
 
     cell = getCell()
-    x = math.floor(record.x)
-    y = math.floor(record.y)
-    z = math.floor(record.z)
-
-    for dx = -2, 2 do
-        for dy = -2, 2 do
-            square = cell:getGridSquare(x + dx, y + dy, z)
-            if square and square:isFree(false) and (not square:isSolid()) and (not square:isSolidTrans()) then
-                return x + dx, y + dy, z
-            end
-        end
+    query = PNC.TraversalQuery
+    if query and query.FindNearestOccupable then
+        safeX, safeY, safeZ, recoveryReason = query.FindNearestOccupable(
+            record.x,
+            record.y,
+            record.z,
+            4,
+            cell
+        )
+        return safeX, safeY, safeZ, recoveryReason
     end
-    return x, y, z
+    return record.x, record.y, record.z, nil
+end
+
+local function logPositionRecovery(record, eventName, recoveryReason, fromX, fromY, fromZ, toX, toY, toZ)
+    local recovery
+    local message
+    if not record then return end
+    record.runtime = record.runtime or {}
+    recovery = record.runtime.positionRecovery or {}
+    record.runtime.positionRecovery = recovery
+    recovery.count = (tonumber(recovery.count) or 0) + 1
+    recovery.lastAt = Core.Now()
+    recovery.lastEvent = eventName
+    recovery.lastReason = recoveryReason
+    recovery.fromX = fromX
+    recovery.fromY = fromY
+    recovery.fromZ = fromZ
+    recovery.toX = toX
+    recovery.toY = toY
+    recovery.toZ = toZ
+    message = "NPC position recovery npc=" .. tostring(record.id)
+        .. " name=" .. tostring(record.name or "Unknown NPC")
+        .. " event=" .. tostring(eventName)
+        .. " reason=" .. tostring(recoveryReason or "blocked")
+        .. " from=" .. tostring(fromX) .. "," .. tostring(fromY) .. "," .. tostring(fromZ)
+        .. " to=" .. tostring(toX) .. "," .. tostring(toY) .. "," .. tostring(toZ)
+        .. " count=" .. tostring(recovery.count)
+    Core.LogWarn(message)
+    Core.LogRecordDebug(record, message)
 end
 
 function Presence.ShouldMaterialize(record)
@@ -55,6 +81,11 @@ function Presence.ShouldMaterialize(record)
         return false
     end
     if record.runtime and record.runtime.forceAbstract then
+        return false
+    end
+    if record.runtime
+        and Core.Now() < (tonumber(record.runtime.materializeRetryAt) or 0)
+    then
         return false
     end
     if record.runtime and record.runtime.forceLive then
@@ -86,6 +117,10 @@ function Presence.Materialize(record, reason)
     local spawnX
     local spawnY
     local spawnZ
+    local recoveryReason
+    local originalX
+    local originalY
+    local originalZ
     local net = resolveNetwork()
     if not Core.IsAuthority() or record.alive == false or record.presenceState == Const.PRESENCE_LIVE then
         return Registry.GetLiveZombie(record.id)
@@ -100,7 +135,24 @@ function Presence.Materialize(record, reason)
     if PNC.Inventory and PNC.Inventory.EnsureRecordInventory then
         PNC.Inventory.EnsureRecordInventory(record)
     end
-    spawnX, spawnY, spawnZ = findMaterializeSquare(record)
+    originalX = record.x
+    originalY = record.y
+    originalZ = record.z
+    spawnX, spawnY, spawnZ, recoveryReason = findMaterializeSquare(record)
+    if spawnX == nil or spawnY == nil or spawnZ == nil then
+        record.runtime.lifecycle.phase = Const.PRESENCE_ABSTRACT
+        record.runtime.lifecycle.bodyState = "missing"
+        record.runtime.lifecycle.lastReason = "materialize_position_blocked"
+        record.runtime.lifecycle.lastError = "no_safe_square:" .. tostring(recoveryReason or "unknown")
+        record.runtime.materializeRetryAt = Core.Now() + 5000
+        Core.LogWarn("NPC position recovery deferred npc=" .. tostring(record.id)
+            .. " name=" .. tostring(record.name or "Unknown NPC")
+            .. " event=materialize_no_safe_square"
+            .. " reason=" .. tostring(recoveryReason or "unknown")
+            .. " at=" .. tostring(originalX) .. "," .. tostring(originalY) .. "," .. tostring(originalZ))
+        return nil
+    end
+    record.runtime.materializeRetryAt = nil
     zombieList = addZombiesInOutfit(
         spawnX,
         spawnY,
@@ -141,6 +193,22 @@ function Presence.Materialize(record, reason)
     record.x = spawnX
     record.y = spawnY
     record.z = spawnZ
+    if recoveryReason and Registry and Registry.MarkDirty then
+        Registry.MarkDirty(record, "position_recovery")
+    end
+    if recoveryReason then
+        logPositionRecovery(
+            record,
+            "materialize_relocate",
+            recoveryReason,
+            originalX,
+            originalY,
+            originalZ,
+            spawnX,
+            spawnY,
+            spawnZ
+        )
+    end
     record.presenceState = Const.PRESENCE_LIVE
     Registry.RegisterLiveZombie(record, zombie)
     Health.Update(record, zombie, Core.Now())

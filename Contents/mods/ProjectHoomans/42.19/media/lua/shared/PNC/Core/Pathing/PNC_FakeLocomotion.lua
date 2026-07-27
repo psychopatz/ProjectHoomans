@@ -180,9 +180,18 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
             elseif zombie.faceLocationF then
                 zombie:faceLocationF(candidate.x, candidate.y)
             end
-            zombie:setX(candidate.x)
-            zombie:setY(candidate.y)
-            zombie:setZ(candidate.z)
+            if LiveBodyControl and LiveBodyControl.SetAuthoritativePosition then
+                LiveBodyControl.SetAuthoritativePosition(
+                    zombie,
+                    candidate.x,
+                    candidate.y,
+                    candidate.z
+                )
+            else
+                zombie:setX(candidate.x)
+                zombie:setY(candidate.y)
+                zombie:setZ(candidate.z)
+            end
             record.x = candidate.x
             record.y = candidate.y
             record.z = candidate.z

@@ -40,6 +40,23 @@
   then falls back to blocked-step, collision, and no-progress recovery
 - traversal candidates must be ahead of the goal-facing lane, improve distance toward the live goal, and avoid immediate re-cross of the same obstacle from the same side
 - active move lanes keep short traversal memory so repeated same-side window climbs are rejected and logged instead of re-executed every tick
+- vehicle-intersecting squares are hard occupancy failures for fake
+  locomotion, steering NPCs around vehicle collision geometry instead of
+  allowing a Lua-authored step into the chassis
+- authoritative NPC position writes synchronize the engine previous-position
+  fields. This prevents Java collision handling from reinterpreting controlled
+  motion as a player-style traversal on an embodied `IsoZombie` without
+  `BodyDamage`
+- materialization validates saved coordinates against the same occupancy
+  service and relocates a blocked legacy NPC to the nearest safe square. This
+  repairs existing saves in place; it does not require NPC or world regeneration
+- live bodies receive a throttled position-safety audit. If a moving vehicle or
+  changed world geometry traps a body, the server relocates it, resets local
+  path-recovery state, and forces a multiplayer position snapshot
+- successful repairs store `runtime.positionRecovery` diagnostics and emit an
+  `NPC position recovery` warning containing NPC id/name, recovery event,
+  obstacle reason, source, destination, and recovery count. These rare
+  operational warnings are emitted even when per-record debug logging is off
 - long-lived non-locomotion action states during active fake locomotion are force-recovered back to idle before the next travel tick so walking stance does not freeze in `turnalerted`
 - path debug logs report recovery, repath, timeout, and blocked states with the active goal only for NPCs explicitly marked `Record Debug`; global debug presentation does not opt the whole roster into movement logging
 

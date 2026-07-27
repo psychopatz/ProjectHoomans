@@ -46,3 +46,6 @@ may read and update only lane fields needed for suppression throttles, such as
   entering that AI state resets the same delay timer used by ActionContext.
 - Support the fake-locomotion owner by keeping the embodied body in a stable
   non-zombie state before each server-authoritative movement step.
+- Apply PNC-authored transforms through `SetAuthoritativePosition`, keeping the
+  engine previous-position fields aligned so controlled movement is not
+  reprocessed as a Java collision or vanilla traversal.
