@@ -9,6 +9,17 @@
 - abstracting a living NPC removes the live zombie body immediately
 - no hidden or parked zombie is kept around for abstract travel
 - materialization always spawns a fresh body from authoritative record state
+- every live-body maintenance lane reapplies `isUseless`, the `NotAZombie`
+  descriptor voice prefix, and Bandits-compatible suppression of all six Build
+  42 male/female zombie voice channels. The recurring pass stops only zombie
+  vocals, so intentional firearm, melee, door, and treatment sounds remain
+  audible
+- client replicas correct vanilla `IsoPlayer.updateLOS` only when its visible
+  zombie set contains managed human NPC bodies and no real zombie. In that
+  narrow case PNC uses the supported `Stats` API to remove the false visible
+  zombie/panic contribution, pre-seeds the human as already spotted, and stops
+  the false surprise sting; any visible ordinary zombie leaves vanilla fear
+  behavior untouched
 - companions following an owner transactionally reserve an installed,
   currently free vehicle seat when they reach the owner's car. The authority
   first adds a private weighted reservation item to that seat container, which

@@ -19,6 +19,7 @@ local ClientState = PNC.Network.ClientState
 local Visuals = PNC.Visuals
 local Equipment = PNC.Equipment
 local Interpolation = PNC.ClientInterpolation
+local LiveBodyControl = PNC.LiveBodyControl
 
 Sync.BodyByID = Sync.BodyByID or {}
 Sync.BodyByOnlineID = Sync.BodyByOnlineID or {}
@@ -424,6 +425,9 @@ local function applySnapshotToBody(snapshot, zombie)
     end
 
     now = Core and Core.Now and Core.Now() or 0
+    if LiveBodyControl and LiveBodyControl.MaintainHumanizedBody then
+        LiveBodyControl.MaintainHumanizedBody(zombie, now)
+    end
     if Animation and Animation.PumpBumpRelease then
         Animation.PumpBumpRelease(zombie, now)
     end
@@ -438,6 +442,11 @@ local function applySnapshotToBody(snapshot, zombie)
         modData.PNC_BodyKind = "live"
         modData.PNC_BodyLease = snapshot.liveBodyLease
         modData.PNC_TagVersion = Const.BODY_TAG_VERSION
+    end
+    if PNC.ClientHumanNPCSafeguards
+        and PNC.ClientHumanNPCSafeguards.RegisterHumanBody
+    then
+        PNC.ClientHumanNPCSafeguards.RegisterHumanBody(zombie)
     end
 
     visualKey = buildVisualKey(snapshot)

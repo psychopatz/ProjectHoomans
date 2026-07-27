@@ -11,7 +11,16 @@ PNC.LiveBodyControl = PNC.LiveBodyControl or {}
 local LiveBodyControl = PNC.LiveBodyControl
 local Core = PNC.Core
 
-local SUPPRESSION_AUDIO_COOLDOWN_MS = 1000
+local SUPPRESSION_AUDIO_COOLDOWN_MS = 250
+local NEXT_AUDIO_SUPPRESSION_AT = setmetatable({}, { __mode = "k" })
+local ZOMBIE_VOICE_SOUNDS = {
+    "FemaleZombieVoiceA",
+    "FemaleZombieVoiceB",
+    "FemaleZombieVoiceC",
+    "MaleZombieVoiceA",
+    "MaleZombieVoiceB",
+    "MaleZombieVoiceC",
+}
 local SUPPRESSED_STATES = {
     ["getup"] = true,
     ["getup-fromonback"] = true,
@@ -172,6 +181,7 @@ function LiveBodyControl.SyncLocomotionState(zombie, moving)
 end
 
 function LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
+    local descriptor
     if not zombie then
         return
     end
@@ -222,6 +232,18 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
     if zombie.setAnimatingBackwards then
         zombie:setAnimatingBackwards(false)
     end
+    -- Replicated zombie packets can restore this flag after the initial body
+    -- setup. Reassert it from every maintenance lane so vanilla AI/audio does
+    -- not briefly treat a human NPC as an ordinary zombie.
+    if zombie.setUseless then
+        zombie:setUseless(true)
+    end
+    if zombie.getDescriptor then
+        descriptor = zombie:getDescriptor()
+        if descriptor and descriptor.setVoicePrefix then
+            descriptor:setVoicePrefix("NotAZombie")
+        end
+    end
 end
 
 function LiveBodyControl.StopEmitter(zombie)
@@ -237,6 +259,41 @@ function LiveBodyControl.StopEmitter(zombie)
     return true
 end
 
+function LiveBodyControl.SuppressZombieSounds(zombie)
+    local descriptor
+    local emitter
+    local i
+    if not zombie then return false end
+    if zombie.getDescriptor then
+        descriptor = zombie:getDescriptor()
+        if descriptor and descriptor.setVoicePrefix then
+            descriptor:setVoicePrefix("NotAZombie")
+        end
+    end
+    emitter = zombie.getEmitter and zombie:getEmitter() or nil
+    if not emitter or not emitter.stopSoundByName then return descriptor ~= nil end
+    -- Bandits uses these six Build 42 channels in addition to NotAZombie.
+    -- Stop only zombie voices here: stopAll() would also cut gun, melee, door,
+    -- and treatment sounds emitted intentionally by the NPC.
+    for i = 1, #ZOMBIE_VOICE_SOUNDS do
+        emitter:stopSoundByName(ZOMBIE_VOICE_SOUNDS[i])
+    end
+    return true
+end
+
+function LiveBodyControl.MaintainHumanizedBody(zombie, now)
+    local nextAudioAt
+    if not zombie then return false end
+    LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
+    now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
+    nextAudioAt = tonumber(NEXT_AUDIO_SUPPRESSION_AT[zombie]) or 0
+    if now >= nextAudioAt then
+        LiveBodyControl.SuppressZombieSounds(zombie)
+        NEXT_AUDIO_SUPPRESSION_AT[zombie] = now + SUPPRESSION_AUDIO_COOLDOWN_MS
+    end
+    return true
+end
+
 function LiveBodyControl.TrySilenceEmitter(zombie, lane, now)
     if not lane then
         return false
@@ -245,7 +302,7 @@ function LiveBodyControl.TrySilenceEmitter(zombie, lane, now)
     if (now - (tonumber(lane.lastSuppressAudioAt) or 0)) < SUPPRESSION_AUDIO_COOLDOWN_MS then
         return false
     end
-    if not LiveBodyControl.StopEmitter(zombie) then
+    if not LiveBodyControl.SuppressZombieSounds(zombie) then
         return false
     end
     lane.lastSuppressAudioAt = now
