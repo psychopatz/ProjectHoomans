@@ -11,6 +11,14 @@ Scheduler.Initialized = Scheduler.Initialized or false
 Scheduler.LastSlot = Scheduler.LastSlot or nil
 
 function Scheduler.GetCadence(record)
+    if record.runtime and record.runtime.vehiclePassenger
+        and record.runtime.vehiclePassenger.active == true
+    then
+        return math.min(
+            tonumber(Const.FOLLOW_VEHICLE_TICK_MS) or 100,
+            tonumber(Const.TICK_LIVE_WARM_MS) or 250
+        )
+    end
     if record.presenceState == Const.PRESENCE_ABSTRACT then
         return Const.TICK_ABSTRACT_MS
     end

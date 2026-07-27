@@ -9,6 +9,19 @@
 - abstracting a living NPC removes the live zombie body immediately
 - no hidden or parked zombie is kept around for abstract travel
 - materialization always spawns a fresh body from authoritative record state
+- companions following an owner reserve an installed, currently free vehicle
+  seat when they reach the owner's car. PNC then removes their live body and
+  tracks them as an `abstract` vehicle passenger at a 100 ms cadence; no
+  `IsoZombie` is attached to the vehicle
+- abstract seat reservations are coordinated across companions and yield to
+  real engine occupants. If a player claims a reserved seat while travelling,
+  the NPC stays safely abstract until another seat opens instead of spawning
+  beside a moving car
+- when the owner exits, normal safe-square materialization handles
+  disembarkation. Changing vehicles transfers the abstract reservation without
+  creating an intermediate body. A disconnect clears the reservation and,
+  unless another player is nearby, resumes normal abstract owner-missing
+  behavior from the last vehicle position
 - multiplayer snapshots identify that body primarily by the engine zombie
   online ID; persistent outfit IDs are only a collision-checked fallback and
   must never be treated as unique actor identity

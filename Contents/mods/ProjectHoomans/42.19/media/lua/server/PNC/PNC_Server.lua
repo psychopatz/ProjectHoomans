@@ -120,6 +120,11 @@ local function processRecord(record, now)
 
     if now >= (tonumber(record.nextThinkAt) or 0) then
         Behavior.Tick(record, zombie, now)
+        -- A behavior may abstract a boarding companion or materialize a
+        -- disembarking one. Refresh the lease-bound body before any pathing or
+        -- animation work so this tick never pumps a removed IsoZombie (and a
+        -- newly materialized passenger is immediately eligible for setup).
+        zombie = Registry.GetLiveZombie(record.id)
         record.lastThinkAt = now
         record.nextThinkAt = now + Scheduler.GetCadence(record)
     end

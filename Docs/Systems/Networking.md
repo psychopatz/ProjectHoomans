@@ -17,6 +17,10 @@
 - `BroadcastFirearmShot`: one transient, deduplicated visual/audio packet built
   from the equipped gun at its hit frame. It carries weapon/ammunition and
   projectile metadata but no permission to apply damage or consume ammo
+- companion vehicle travel remains authority-owned. Clients receive at most
+  the compact abstract passenger metadata (`vehicleId`, reserved seat, owner,
+  and board time); they never attach an NPC zombie to a vehicle or decide when
+  it should disembark
 - NPC bandaging is presented as a local timed action, but only its completion
   sends `CMD_BANDAGE`; the server revalidates the item, range, wound, and debug
   authorization before mutating or broadcasting the record

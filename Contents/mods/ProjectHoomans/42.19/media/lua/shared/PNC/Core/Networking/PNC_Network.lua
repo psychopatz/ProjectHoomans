@@ -91,6 +91,11 @@ local function resolveAIState(record)
     if healthState == "incapacitated" then
         return "Downed", true
     end
+    if record.runtime and record.runtime.vehiclePassenger
+        and record.runtime.vehiclePassenger.active == true
+    then
+        return "VehiclePassenger", false
+    end
     if record.presenceState == Const.PRESENCE_ABSTRACT then
         return "Abstract", false
     end
@@ -266,6 +271,7 @@ function Network.BuildSnapshot(record)
     local appearance
     local bodyHealth
     local firearmState
+    local vehiclePassenger
     aiState, inCombat = resolveAIState(record)
     canRevive = PNC.Health and PNC.Health.CanRevive and PNC.Health.CanRevive(record) or false
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
@@ -279,6 +285,7 @@ function Network.BuildSnapshot(record)
     firearmState = Firearms and Firearms.BuildDebugState
         and Firearms.BuildDebugState(record)
         or nil
+    vehiclePassenger = record.runtime and record.runtime.vehiclePassenger or nil
     return {
         interestDetailed = true,
         id = record.id,
@@ -319,6 +326,13 @@ function Network.BuildSnapshot(record)
         combatModeResolved = equipmentInfo.combatModeResolved or record.weaponMode,
         weaponStatus = equipmentInfo.weaponStatus or "unknown",
         firearmState = firearmState,
+        vehiclePassenger = vehiclePassenger and {
+            active = vehiclePassenger.active == true,
+            vehicleId = vehiclePassenger.vehicleId,
+            seat = vehiclePassenger.seat,
+            ownerOnlineID = vehiclePassenger.ownerOnlineID,
+            boardedAt = vehiclePassenger.boardedAt,
+        } or nil,
         presenceRevision = record.presenceRevision,
         liveBodyInstanceID = record.liveBodyInstanceID,
         liveBodyOnlineID = record.liveBodyOnlineID,
@@ -361,6 +375,10 @@ function Network.BuildSnapshot(record)
             ammoReserveUnlimited = firearmState and firearmState.unlimitedReserve == true or false,
             ammoReserveCount = firearmState and firearmState.reserveCount or nil,
             firearmReloadActive = firearmState and firearmState.reloadActive == true or false,
+            vehiclePassenger = vehiclePassenger and vehiclePassenger.active == true or false,
+            vehicleId = vehiclePassenger and vehiclePassenger.vehicleId or nil,
+            vehicleSeat = vehiclePassenger and vehiclePassenger.seat or nil,
+            vehicleBlockReason = record.runtime and record.runtime.vehicleBlockReason or nil,
             combatBlockReason = combat.combatBlockReason,
             staminaState = staminaInfo.state,
             staminaCurrent = staminaInfo.current,
@@ -384,6 +402,7 @@ function Network.BuildPresenceDelta(record)
     local firearmState = Firearms and Firearms.BuildDebugState
         and Firearms.BuildDebugState(record)
         or nil
+    local vehiclePassenger = record.runtime and record.runtime.vehiclePassenger or nil
     aiState, inCombat = resolveAIState(record)
     return {
         interestDetailed = true,
@@ -409,6 +428,13 @@ function Network.BuildPresenceDelta(record)
         inCombat = inCombat,
         attackMode = record.runtime and record.runtime.target ~= nil or false,
         firearmState = firearmState,
+        vehiclePassenger = vehiclePassenger and {
+            active = vehiclePassenger.active == true,
+            vehicleId = vehiclePassenger.vehicleId,
+            seat = vehiclePassenger.seat,
+            ownerOnlineID = vehiclePassenger.ownerOnlineID,
+            boardedAt = vehiclePassenger.boardedAt,
+        } or nil,
         visualState = buildVisualState(record),
     }
 end

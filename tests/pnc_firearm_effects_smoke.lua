@@ -101,6 +101,7 @@ assertEqual(worldNoise.volume, 48, "weapon-driven world noise volume")
 
 local played = {}
 local rendered = 0
+local renderLines = {}
 local muzzleFlash = 0
 local removedLights = 0
 local impactSound
@@ -147,7 +148,15 @@ getCore = function()
 end
 getRenderer = function()
     return {
-        renderline = function() rendered = rendered + 1 end,
+        renderline = function(_, _, x1, y1, x2, y2)
+            rendered = rendered + 1
+            renderLines[#renderLines + 1] = {
+                x1 = x1,
+                y1 = y1,
+                x2 = x2,
+                y2 = y2,
+            }
+        end,
     }
 end
 getWorld = function()
@@ -189,6 +198,20 @@ assertEqual(impactSound, "ModdedBulletImpact", "weapon impact sound")
 assertEqual(PNC.ClientFirearmEffects.Play(payload), false, "duplicate shot ignored")
 PNC.ClientFirearmEffects.OnPreUIDraw()
 assertEqual(rendered, 3, "each projectile tracer drawn")
+assert(
+    renderLines[1].x1 ~= renderLines[1].x2 or renderLines[1].y1 ~= renderLines[1].y2,
+    "tracer line has no visible length"
+)
+local firstTracerX = renderLines[1].x1
+PNC.ClientFirearmEffects.OnPreUIDraw()
+assert(
+    renderLines[4].x1 ~= firstTracerX,
+    "tracer did not advance between draw frames"
+)
+for _ = 1, 10 do
+    PNC.ClientFirearmEffects.OnPreUIDraw()
+end
+assertEqual(#PNC.ClientFirearmEffects.ActiveTracers, 0, "tracers expire after flight")
 PNC.ClientFirearmEffects.OnTick()
 PNC.ClientFirearmEffects.OnTick()
 assertEqual(#PNC.ClientFirearmEffects.ActiveLights, 0, "muzzle light cleaned")

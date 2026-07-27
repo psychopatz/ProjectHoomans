@@ -90,6 +90,22 @@ PNC = {
 dofile(ROOT .. "Pathing/PNC_TraversalQuery.lua")
 dofile(ROOT .. "Presence/PNC_Presence.lua")
 
+local passengerRecord = {
+    alive = true,
+    presenceState = "abstract",
+    x = 0,
+    y = 0,
+    z = 0,
+    runtime = {
+        vehiclePassenger = { active = true, vehicleId = "vehicle:7", seat = 1 },
+    },
+}
+assertEqual(
+    PNC.Presence.ShouldMaterialize(passengerRecord),
+    false,
+    "abstract vehicle passenger stays bodyless"
+)
+
 local record = {
     id = "saved_vehicle_stuck",
     name = "Saved Vehicle Stuck",

@@ -130,6 +130,23 @@ assertEqual(PNC.Network.BuildSnapshot(nearbyRecord).attackMode, true, "combat sn
 assertEqual(PNC.Network.BuildPresenceDelta(nearbyRecord).attackMode, true, "combat delta attack mode")
 nearbyRecord.runtime.target = nil
 
+nearbyRecord.runtime.vehiclePassenger = {
+    active = true,
+    vehicleId = "vehicle:7",
+    seat = 1,
+    ownerOnlineID = 42,
+    boardedAt = 1500,
+}
+local passengerSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
+assertEqual(passengerSnapshot.aiState, "VehiclePassenger", "vehicle passenger AI state")
+assertEqual(passengerSnapshot.vehiclePassenger.seat, 1, "vehicle seat snapshot")
+assertEqual(
+    PNC.Network.BuildPresenceDelta(nearbyRecord).vehiclePassenger.vehicleId,
+    "vehicle:7",
+    "vehicle passenger delta"
+)
+nearbyRecord.runtime.vehiclePassenger = nil
+
 local roster = {}
 for i = 1, 500 do
     roster[i] = { id = "npc_" .. tostring(i), displayName = "NPC " .. tostring(i) }

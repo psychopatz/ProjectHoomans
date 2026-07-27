@@ -83,6 +83,14 @@ function Presence.ShouldMaterialize(record)
     if record.runtime and record.runtime.forceAbstract then
         return false
     end
+    -- Vehicle companions intentionally have no IsoZombie body. The companion
+    -- vehicle coordinator updates their abstract position and explicitly
+    -- materializes them after the owner exits.
+    if record.runtime and record.runtime.vehiclePassenger
+        and record.runtime.vehiclePassenger.active == true
+    then
+        return false
+    end
     if record.runtime
         and Core.Now() < (tonumber(record.runtime.materializeRetryAt) or 0)
     then

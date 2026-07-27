@@ -91,8 +91,13 @@
 - the server consumes the weapon-defined rounds and publishes the vanilla-style
   world sound that attracts zombies. A transient shot event lets clients play
   that firearm's positional audio and render its native muzzle hook, a bounded
-  two-tick orange light, and short projectile-count-aware tracers; clients
+  two-tick orange light, and projectile-count-aware tracers; clients
   never apply firearm damage or ammunition changes
+- tracer rendering follows the proven Bandits-style screen-space flight model:
+  a floor-level isometric origin, direction-corrected 600-pixel streak, and
+  12 draw-frame lifetime. Weapon projectile count and spread still come from
+  the current `HandWeapon`, so shotguns and modded multi-projectile guns fan out
+  without hardcoded weapon names
 - the debug overlay exposes loaded rounds, magazine capacity, reload state, and
   either the companion's loose reserve count or `infinite`; this row has its
   own in-game overlay toggle

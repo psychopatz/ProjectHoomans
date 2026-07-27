@@ -46,4 +46,12 @@ local downed = {
 }
 assert(PNC.Scheduler.GetCadence(downed) <= 100, "incapacitated maintenance cadence is too slow")
 
+local passenger = {
+    presenceState = "abstract",
+    runtime = {
+        vehiclePassenger = { active = true },
+    },
+}
+assert(PNC.Scheduler.GetCadence(passenger) <= 100, "vehicle passenger tracking cadence is too slow")
+
 print("pnc_scheduler_smoke: ok")

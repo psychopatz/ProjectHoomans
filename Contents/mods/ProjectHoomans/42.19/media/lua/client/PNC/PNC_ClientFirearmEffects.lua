@@ -173,32 +173,58 @@ local function spawnLight(x, y, squareZ)
     return true
 end
 
-local function addTracer(payload, x, y, z)
+local function directionDegrees(sx, sy, tx, ty)
+    local dx = tx - sx
+    local dy = ty - sy
+    local radians
+    if math.abs(dx) < 0.0001 and math.abs(dy) < 0.0001 then
+        return 0
+    end
+    if math.atan2 then
+        radians = math.atan2(dy, dx)
+    elseif dx > 0 then
+        radians = math.atan(dy / dx)
+    elseif dx < 0 and dy >= 0 then
+        radians = math.atan(dy / dx) + math.pi
+    elseif dx < 0 then
+        radians = math.atan(dy / dx) - math.pi
+    elseif dy > 0 then
+        radians = math.pi * 0.5
+    else
+        radians = -math.pi * 0.5
+    end
+    return radians * 57.29577951308232
+end
+
+local function addTracer(payload)
     local toScreen = ISCoordConversion and ISCoordConversion.ToScreen
-    local startX
-    local startY
-    local endX
-    local endY
+    local screenX
+    local screenY
+    local sx = tonumber(payload.sx)
+    local sy = tonumber(payload.sy)
+    local sz = tonumber(payload.sz) or 0
     local tx = tonumber(payload.tx)
     local ty = tonumber(payload.ty)
-    local tz = tonumber(payload.tz) or tonumber(payload.sz) or 0
     local count = math.max(1, math.min(16, math.floor(tonumber(payload.projectileCount) or 1)))
     local spread = math.max(0, tonumber(payload.projectileSpread) or 0)
+    local direction
     local i
-    if not toScreen or not tx or not ty then return false end
-    startX, startY = toScreen(x, y, z)
-    endX, endY = toScreen(tx, ty, tz + 0.8)
-    if not startX or not startY or not endX or not endY then return false end
+    if not toScreen or not sx or not sy or not tx or not ty then return false end
+    screenX, screenY = toScreen(sx, sy, sz)
+    if not screenX or not screenY then return false end
+    direction = directionDegrees(sx, sy, tx, ty)
     for i = 1, count do
         local centered = i - ((count + 1) * 0.5)
-        local visualSpread = centered * math.max(2, spread * 0.8)
+        local jitter = ZombRandFloat and ZombRandFloat(-0.15, 0.15) or 0
         Effects.ActiveTracers[#Effects.ActiveTracers + 1] = {
-            sx = startX,
-            sy = startY,
-            tx = endX + visualSpread,
-            ty = endY - (math.abs(centered) * 1.5),
-            tick = 0,
-            ttl = 4,
+            x = screenX,
+            y = screenY,
+            direction = direction + (centered * math.max(0.7, spread)) + jitter,
+            tick = 1,
+            ttl = 12,
+            length = 600,
+            altitude = 85,
+            altitudeVariation = ZombRandFloat and ZombRandFloat(-10, 10) or 0,
             color = payload.ammoType and string.find(string.lower(payload.ammoType), "shell", 1, true)
                 and { r = 1.0, g = 0.62, b = 0.12 }
                 or { r = 1.0, g = 0.78, b = 0.28 },
@@ -249,7 +275,7 @@ function Effects.Play(payload)
     end
     playShotAudio(body, weapon, payload)
     spawnLight(x, y, squareZ)
-    addTracer(payload, x, y, z)
+    addTracer(payload)
     playImpact(payload)
     return true
 end
@@ -284,29 +310,31 @@ function Effects.OnPreUIDraw()
     zoom = math.max(0.1, zoom or 1)
     for i = #Effects.ActiveTracers, 1, -1 do
         local tracer = Effects.ActiveTracers[i]
-        local progress = math.min(1, (tracer.tick + 1) / tracer.ttl)
-        local dx = tracer.tx - tracer.sx
-        local dy = tracer.ty - tracer.sy
-        local distance = math.sqrt((dx * dx) + (dy * dy))
-        local headX = tracer.sx + (dx * progress)
-        local headY = tracer.sy + (dy * progress)
-        local tailProgress = math.max(0, progress - (math.min(90 / zoom, distance) / math.max(1, distance)))
-        local tailX = tracer.sx + (dx * tailProgress)
-        local tailY = tracer.sy + (dy * tailProgress)
-        local alpha = 1.0 - (tracer.tick / tracer.ttl)
+        local theta = tracer.direction * math.pi / 180
+        local stepLength = tracer.length / zoom
+        local dx = math.cos(theta) - math.sin(theta)
+        local dy = (math.cos(theta) + math.sin(theta)) * 0.5
+        local baseAltitude = tracer.altitude / zoom
+        local x1 = tracer.x / zoom
+        local y1 = tracer.y / zoom
+        local x2 = x1 + math.floor(stepLength * dx)
+        local y2 = y1 + math.floor(stepLength * dy)
+        local alpha = math.max(0.14, 1.0 - ((tracer.tick - 1) / tracer.ttl))
         renderer:renderline(
             texture,
-            tailX / zoom,
-            tailY / zoom,
-            headX / zoom,
-            headY / zoom,
+            x1,
+            y1 - baseAltitude,
+            x2,
+            y2 - (baseAltitude + (tracer.altitudeVariation / zoom)),
             tracer.color.r,
             tracer.color.g,
             tracer.color.b,
             alpha
         )
+        tracer.x = tracer.x + math.floor(stepLength * dx)
+        tracer.y = tracer.y + math.floor(stepLength * dy)
         tracer.tick = tracer.tick + 1
-        if tracer.tick >= tracer.ttl then
+        if tracer.tick > tracer.ttl then
             table.remove(Effects.ActiveTracers, i)
         end
     end

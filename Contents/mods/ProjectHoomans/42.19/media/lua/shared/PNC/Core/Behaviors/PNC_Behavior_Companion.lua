@@ -16,6 +16,7 @@ local Common = PNC.BehaviorCommon
 local Targeting = PNC.BehaviorTargeting
 local BehaviorCombat = PNC.BehaviorCombat
 local Registry = PNC.Registry
+local CompanionVehicle = PNC.CompanionVehicle
 
 local function getFollowState(record)
     record.runtime = record.runtime or {}
@@ -172,6 +173,9 @@ end
 
 local function tickFollowOwner(record, zombie)
     local owner = Common.GetOwner(record)
+    local ownerVehicle
+    local vehicleHandled
+    local vehicleReason
     local ownerDist
     local slotTarget
     local slotDist
@@ -179,11 +183,13 @@ local function tickFollowOwner(record, zombie)
     if Stealth and Stealth.UpdateFollowState then
         Stealth.UpdateFollowState(record, owner)
     end
-    if tryEngageTarget(record, zombie) then
-        setFollowMode(record, "combat")
-        return true
-    end
     if not owner then
+        if CompanionVehicle and CompanionVehicle.IsPassenger
+            and CompanionVehicle.IsPassenger(record)
+            and CompanionVehicle.Tick
+        then
+            CompanionVehicle.Tick(record, zombie, nil)
+        end
         setFollowMode(record, "returning_to_anchor")
         if Stealth and Stealth.Clear then
             Stealth.Clear(record, "owner_missing")
@@ -200,6 +206,33 @@ local function tickFollowOwner(record, zombie)
         end
     end
     record.ownerOnlineID = owner:getOnlineID()
+    ownerVehicle = owner.getVehicle and owner:getVehicle() or nil
+    if CompanionVehicle and CompanionVehicle.Tick then
+        vehicleHandled, vehicleReason = CompanionVehicle.Tick(record, zombie, owner)
+        if vehicleHandled then
+            setFollowMode(
+                record,
+                CompanionVehicle.IsPassenger and CompanionVehicle.IsPassenger(record)
+                    and "vehicle_passenger"
+                    or "vehicle_disembark"
+            )
+            return true
+        end
+    end
+    -- A companion trying to catch its owner's car should not abandon that
+    -- task for opportunistic combat. When no seat exists, it waits instead of
+    -- repeatedly pathing into the occupied vehicle.
+    if ownerVehicle and vehicleReason == "vehicle_full" then
+        setFollowMode(record, "vehicle_full")
+        record.activeBehavior = "FollowOwner:vehicle_full"
+        Common.ClearCombatTarget(record, "vehicle_full", zombie)
+        Common.HaltMovement(record, zombie, "vehicle_full")
+        return true
+    end
+    if not ownerVehicle and tryEngageTarget(record, zombie) then
+        setFollowMode(record, "combat")
+        return true
+    end
     ownerDist = Core.Distance(record.x, record.y, owner:getX(), owner:getY())
     if shouldIdleNearOwner(record, ownerDist, math.abs(owner:getZ() - record.z) < 1) then
         return holdAndFaceOwner(
