@@ -8,6 +8,7 @@
 - `PNC_Identity_Profile`: persisted identity and appearance resolution
 - `PNC_Inventory`: compact player-like inventory tree with template-plus-delta persistence
 - `PNC_Inventory_EquipmentGeneration`: generic categorized equipment pools and deterministic starting-equipment policy
+- `PNC_DeathMarkers`: compact post-death identity/location persistence after full NPC retirement
 - `PNC/EquipmentDefinitions/PNC_EquipmentPools`: version-independent built-in equipment catalog
 - `PNC_Persistence`: versioned canonical save schema, migration, and runtime rehydrate
 - `PNC_Registry`: authoritative NPC records and live body lookup
@@ -37,7 +38,11 @@
 - `PNC_Behavior_Roaming`: faction-neutral, enemy-aware roaming with registered roam modes
 - `PNC_Behavior_Hostile`: hunt and direct engage job handlers
 - `PNC_Behavior_Incapacitated`: crawl and downed shove handling
-- `PNC_BodyLifecycle`: stable facade for live-body leases, corpse conversion, authority-owned infected-corpse reanimation, loaded-world audits, and diagnostics; implementation ownership is split under `Presence/PNC_BodyLifecycle/`
+- `PNC_BodyLifecycle`: stable facade for live-body leases, corpse conversion,
+  keyed identity-card injection through `PsychopatzCore.CorpseItems`,
+  authority-owned infected-corpse reanimation, loaded-world audits, and
+  diagnostics; implementation ownership is split under
+  `Presence/PNC_BodyLifecycle/`
 - `PNC_Presence`: live and abstract transitions, body cleanup
 - `PNC_Scheduler`: cadence rules
 - `PNC_Network`: roster snapshots, live presence snapshots, and on-demand character payloads

@@ -1,4 +1,4 @@
--- Corpse conversion, delayed finalization, and corpse-record supervision.
+-- Vanilla corpse conversion, delayed finalization, and marker stamping.
 
 PNC = PNC or {}
 PNC.BodyLifecycle = PNC.BodyLifecycle or {}
@@ -9,10 +9,11 @@ local Internal = Lifecycle.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
-function Internal.makeCorpseInert(corpse, createdWorldHour, _requestedReanimateAt)
-    -- Managed corpses never ask each client/corpse instance to reanimate
-    -- independently. The authority watches requestedReanimateAt on the record,
-    -- spawns exactly one ordinary zombie, and replicates the corpse removal.
+function Internal.makeCorpseInert(corpse, createdWorldHour)
+    -- The engine owns this corpse, but an NPC body starts as an IsoZombie.
+    -- Prevent that backing actor from scheduling a second local/client
+    -- reanimation. The authority invokes corpse:reanimate() explicitly for
+    -- infected death markers.
     local reanimateAt =
         (tonumber(createdWorldHour) or Internal.worldHour()) + 100000000
     if not corpse then
@@ -28,32 +29,49 @@ end
 
 function Internal.stampCorpse(record, corpse, token)
     local modData
-    local infection
     if not record or not corpse or not corpse.getModData then
         return false
     end
-    token = tostring(token or Core.GenerateID("corpse"))
+    token = tostring(token or record.corpseToken
+        or record.corpse and record.corpse.token
+        or Core.GenerateID("corpse"))
     modData = corpse:getModData()
-    modData.PNC_NPC = true
-    modData.PNC_UUID = tostring(record.id)
-    modData.PNC_BodyKind = "corpse"
+    modData.PNC_NPC = nil
+    modData.PNC_UUID = nil
+    modData.PNC_BodyKind = nil
+    modData.PNC_BodyLease = nil
+    modData.PNC_DeathMarkerID = tostring(record.id)
+    modData.PNC_DeathName = tostring(record.name or record.displayName or "Unknown NPC")
     modData.PNC_CorpseToken = token
     modData.PNC_TagVersion = Const.BODY_TAG_VERSION
-    infection = record.health and record.health.body and record.health.body.infection or nil
     Internal.makeCorpseInert(
         corpse,
-        record.corpse and record.corpse.createdWorldHour,
-        infection and infection.fatal == true and infection.reanimateAtWorldHour or nil
+        record.createdWorldHour
+            or record.corpse and record.corpse.createdWorldHour
     )
-    record.corpse = record.corpse or {}
-    record.corpse.token = token
-    record.corpse.x = corpse.getX and corpse:getX() or record.x
-    record.corpse.y = corpse.getY and corpse:getY() or record.y
-    record.corpse.z = corpse.getZ and corpse:getZ() or record.z
-    record.corpse.createdWorldHour = tonumber(record.corpse.createdWorldHour) or Internal.worldHour()
-    Internal.ensureRuntime(record).corpseState = "inert_loaded"
-    if PNC.Registry and PNC.Registry.MarkDirty then
+    if record.corpse then
+        record.corpse.token = token
+        record.corpse.x = corpse.getX and corpse:getX() or record.x
+        record.corpse.y = corpse.getY and corpse:getY() or record.y
+        record.corpse.z = corpse.getZ and corpse:getZ() or record.z
+        record.corpse.createdWorldHour =
+            tonumber(record.corpse.createdWorldHour) or Internal.worldHour()
+    else
+        record.corpseToken = token
+        record.x = corpse.getX and corpse:getX() or record.x
+        record.y = corpse.getY and corpse:getY() or record.y
+        record.z = corpse.getZ and corpse:getZ() or record.z
+    end
+    if record.runtime then
+        Internal.ensureRuntime(record).corpseState = "inert_loaded"
+    end
+    if PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(record.id) == record
+        and PNC.Registry.MarkDirty
+    then
         PNC.Registry.MarkDirty(record, "corpse")
+    elseif PNC.Registry then
+        PNC.Registry.DirectoryDirty = true
     end
     return true
 end
@@ -71,7 +89,7 @@ function Internal.scheduleCorpseFinalize(record, x, y, z, token, reason, wornEnt
     }
 end
 
-function Lifecycle.CreateInertCorpse(record, zombie, reason)
+function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
     local x
     local y
     local z
@@ -134,6 +152,10 @@ function Lifecycle.CreateInertCorpse(record, zombie, reason)
     Internal.detachLiveBody(record, reason or "death")
     Internal.mark(record, "corpse", "missing", reason or "death")
     if corpse then
+        -- IsoDeadBody conversion can discard a source-body item on fallback
+        -- engine paths. Guarantee the stable quest identity on the final
+        -- vanilla-owned container before the one complete-corpse MP sync.
+        Internal.ensureCorpseIdentityCard(record, corpse)
         Internal.applyCorpseWornItems(corpse, wornEntries)
         Internal.stampCorpse(record, corpse, token)
         Internal.transmitCorpseState(corpse)
@@ -141,3 +163,6 @@ function Lifecycle.CreateInertCorpse(record, zombie, reason)
     end
     return corpse ~= nil, corpse
 end
+
+-- Compatibility for integrations written before engine-owned corpse handoff.
+Lifecycle.CreateInertCorpse = Lifecycle.CreateVanillaCorpse

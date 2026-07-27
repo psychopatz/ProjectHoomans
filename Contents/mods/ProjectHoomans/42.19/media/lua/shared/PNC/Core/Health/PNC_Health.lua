@@ -274,6 +274,7 @@ function Health.Kill(record, zombie, reason)
     local health = Health.Ensure(record)
     local corpseOK
     local corpseCreated
+    local deathMarker
     if PNC.NPCWounds and PNC.NPCWounds.SetOverallHealth then
         PNC.NPCWounds.SetOverallHealth(record, 0)
     end
@@ -295,9 +296,13 @@ function Health.Kill(record, zombie, reason)
         if zombie.setHealth then
             zombie:setHealth(0)
         end
-        if PNC.BodyLifecycle and PNC.BodyLifecycle.CreateInertCorpse then
+        local createCorpse = PNC.BodyLifecycle and (
+            PNC.BodyLifecycle.CreateVanillaCorpse
+            or PNC.BodyLifecycle.CreateInertCorpse
+        ) or nil
+        if createCorpse then
             corpseOK, corpseCreated = pcall(
-                PNC.BodyLifecycle.CreateInertCorpse,
+                createCorpse,
                 record,
                 zombie,
                 reason or "death"
@@ -318,9 +323,22 @@ function Health.Kill(record, zombie, reason)
             createdWorldHour = 0,
         }
     end
-    if Registry and Registry.MarkDirty then
+    -- Retire the heavyweight NPC immediately. From this point the vanilla
+    -- corpse owns appearance/items and PNC retains only a compact location
+    -- marker until that corpse disappears (or reanimates).
+    if Registry and Registry.AddDeathMarker then
+        deathMarker = Registry.AddDeathMarker(record)
+    end
+    if deathMarker and Registry and Registry.RemoveRecord then
+        record.runtime.deathRetired = true
+        Registry.RemoveRecord(record.id)
+        if PNC.Network and PNC.Network.BroadcastRemoval then
+            PNC.Network.BroadcastRemoval(record.id, "death")
+        end
+    elseif Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "health")
     end
+    return deathMarker ~= nil, deathMarker
 end
 
 function Health.ApplyDamage(record, zombie, damageEvent)

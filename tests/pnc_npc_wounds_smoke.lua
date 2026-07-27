@@ -90,7 +90,7 @@ SandboxVars = {
         NPCZombieLacerationChance = 0,
         NPCZombieInfectionChance = 100,
         NPCInfectionMortalityHours = 48,
-        NPCReanimationHours = 1,
+        NPCReanimationSeconds = 3,
     },
 }
 
@@ -254,8 +254,8 @@ applied, result = PNC.API.DebugCommand(fatalDebug.id, "infection", {
 assertEqual(applied, true, "debug fatal infection")
 assertEqual(fatalDebug.alive, false, "debug infection death")
 assertEqual(fatalDebug.health.body.infection.stage, "fatal", "debug fatal stage")
-assertEqual(fatalDebug.health.body.infection.reanimateAtWorldHour, 101,
-    "debug fatal reanimation schedule")
+assertEqual(fatalDebug.health.body.infection.reanimateAtWorldHour, 100,
+    "debug fatal death world hour")
 
 SandboxVars.ProjectHoomans.NPCZombieBiteChance = 0
 SandboxVars.ProjectHoomans.NPCZombieLacerationChance = 100
@@ -283,7 +283,8 @@ PNC.Health.Update(record, body, now + 1000)
 assertEqual(record.alive, false, "terminal infection kills")
 assertEqual(record.health.state, "dead", "terminal infection state")
 assertEqual(record.health.body.infection.fatal, true, "fatal infection marker")
-assertEqual(record.health.body.infection.reanimateAtWorldHour, 149, "reanimation schedule")
+assertEqual(record.health.body.infection.reanimateAtWorldHour, 148,
+    "infection death world hour")
 assertEqual(corpseReason, "zombie_infection", "infection corpse reason")
 
 currentWorldHour = 200

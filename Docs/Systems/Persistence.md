@@ -27,6 +27,12 @@
 ## Storage Rules
 - the global directory never contains full NPC record bodies
 - inventory payloads remain unhydrated after load until gameplay or UI needs them
+- full NPC records never persist after death. The registry directory instead
+  keeps a minimal `deathMarkers` map with identity, name, position, corpse token,
+  infection state, and delay metadata
+- a death marker is removed once its recorded square is loaded and the matching
+  vanilla corpse is absent; legacy persisted dead records migrate into this
+  compact form during registry load
 - persistence ModData is server-only and is never broadcast with `ModData.transmit`
 - Project Zomboid still writes all named ModData tables to its single global save file
 - v4 migration keeps `NPCs` as the fallback until every expected v5 table is written and verified

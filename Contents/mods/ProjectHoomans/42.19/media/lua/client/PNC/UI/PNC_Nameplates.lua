@@ -12,12 +12,37 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
         enabled = true,
         showAIDebug = false,
         showPathDebug = false,
+        debugShowPresence = true,
+        debugShowAI = true,
+        debugShowJob = true,
+        debugShowOrder = true,
+        debugShowTarget = true,
+        debugShowCombat = true,
+        debugShowStamina = true,
+        debugShowBlock = true,
+        debugShowInfection = true,
+        debugShowAnimation = true,
     },
 })
 Nameplates.Settings = PNC.SettingsStore.values
 if Nameplates.Settings.enabled == nil then Nameplates.Settings.enabled = true end
 if Nameplates.Settings.showAIDebug == nil then Nameplates.Settings.showAIDebug = false end
 if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDebug = false end
+local debugSettingDefaults = {
+    debugShowPresence = true,
+    debugShowAI = true,
+    debugShowJob = true,
+    debugShowOrder = true,
+    debugShowTarget = true,
+    debugShowCombat = true,
+    debugShowStamina = true,
+    debugShowBlock = true,
+    debugShowInfection = true,
+    debugShowAnimation = true,
+}
+for key, value in pairs(debugSettingDefaults) do
+    if Nameplates.Settings[key] == nil then Nameplates.Settings[key] = value end
+end
 Nameplates.State = Nameplates.State or {
     managers = {},
 }

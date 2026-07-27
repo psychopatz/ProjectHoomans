@@ -6,6 +6,57 @@ PNC.BodyLifecycle.Internal = PNC.BodyLifecycle.Internal or {}
 
 local Lifecycle = PNC.BodyLifecycle
 local Internal = Lifecycle.Internal
+local CorpseItems =
+    require "PsychopatzCore/Inventory/PsychopatzCorpseItems"
+
+local function identityCardKey(npcId)
+    return "ProjectHoomans:identity-card:" .. tostring(npcId or "")
+end
+
+local function identityCardSpec(record)
+    local npcId = tostring(record and record.id or "")
+    local npcName = tostring(
+        record and (record.name or record.displayName) or "Unknown NPC"
+    )
+    return {
+        fullType = "Base.IDcard",
+        key = identityCardKey(npcId),
+        customName = "ID Card: " .. npcName,
+        modData = {
+            PNC_IDCard = true,
+            PNC_IDCardNPCId = npcId,
+            PNC_IDCardNPCName = npcName,
+        },
+        match = function(item)
+            local modData = item and item.getModData and item:getModData() or nil
+            return Internal.itemFullType(item) == "Base.IDcard"
+                and modData
+                and tostring(modData.PNC_IDCardNPCId or "") == npcId
+        end,
+        create = function()
+            return PNC.Equipment and PNC.Equipment.CreateItem
+                and PNC.Equipment.CreateItem("Base.IDcard") or nil
+        end,
+    }
+end
+
+function Internal.ensureCorpseIdentityCard(record, target)
+    local container
+    local item
+    local created
+    local reason
+    if not record or not target then
+        return nil, false, "invalid_identity_card_target"
+    end
+    container = target.getContainer and target:getContainer()
+        or target.getInventory and target:getInventory()
+        or nil
+    item, created, reason = CorpseItems.Inject(
+        container,
+        identityCardSpec(record)
+    )
+    return item, created == true, reason
+end
 
 function Internal.prepareCorpseItems(record, zombie)
     local equipment = PNC.Equipment
@@ -29,7 +80,29 @@ function Internal.prepareCorpseItems(record, zombie)
     local visualsByType = {}
     local usedVisuals = {}
 
-    if not container or not equipment or not equipment.CreateItem then
+    local function applyDescriptorMetadata(candidate, value)
+        local state
+        if not candidate or not value then return end
+        state = {
+            customName = value.customName,
+            condition = value.cond,
+        }
+        if value.identityNPCId then
+            state.key = identityCardKey(value.identityNPCId)
+            state.modData = {
+                PNC_IDCard = true,
+                PNC_IDCardNPCId = tostring(value.identityNPCId),
+                PNC_IDCardNPCName = tostring(
+                    value.identityNPCName or record.name or "Unknown NPC"
+                ),
+            }
+        end
+        CorpseItems.ApplyState(candidate, state)
+    end
+
+    if not CorpseItems.IsAuthority()
+        or not container or not equipment or not equipment.CreateItem
+    then
         return false
     end
 
@@ -71,7 +144,7 @@ function Internal.prepareCorpseItems(record, zombie)
             pool[kind] = pool[kind] or {}
             pool[kind][#pool[kind] + 1] = candidate
             allItems[#allItems + 1] = candidate
-            Internal.addItemToContainer(container, candidate)
+            CorpseItems.AddExisting(container, candidate)
         end
         return candidate
     end
@@ -138,6 +211,7 @@ function Internal.prepareCorpseItems(record, zombie)
             fullType = descriptor and descriptor.type and tostring(descriptor.type) or ""
             if fullType ~= "" then
                 item = takeForInventory(fullType)
+                applyDescriptorMetadata(item, descriptor)
                 if item and descriptor.cond ~= nil and item.setCondition then
                     pcall(item.setCondition, item, math.max(0, math.floor(tonumber(descriptor.cond) or 0)))
                 end
@@ -182,11 +256,11 @@ function Internal.prepareCorpseItems(record, zombie)
             end
         end
     end
-    -- Every remembered or created item is already inserted through
-    -- addItemToContainer(). Calling addItemsToItemContainer() again produces
+    -- Every remembered or created item is already inserted through the shared
+    -- corpse-item service. Calling addItemsToItemContainer() again produces
     -- duplicate inventory IDs during IsoDeadBody conversion in multiplayer.
     for i = 1, #allItems do
-        Internal.addItemToContainer(container, allItems[i])
+        CorpseItems.AddExisting(container, allItems[i])
     end
     if PNC.Visuals and PNC.Visuals.RefreshModel then
         PNC.Visuals.RefreshModel(zombie)

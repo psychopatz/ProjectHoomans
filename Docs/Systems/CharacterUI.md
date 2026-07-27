@@ -24,6 +24,11 @@
   clothing slots to Build 42 `ItemBodyLocation` values before calling
   `WornItems:setItem`; the shared PsychopatzCore portrait component owns this
   engine-version compatibility boundary.
+- the Info tab deliberately renders a descriptor-backed human preview with the
+  same full-body framing as vanilla player information. It never binds the
+  live IsoZombie carrier to the portrait, so an NPC stands upright instead of
+  inheriting the carrier's slouched animation set. Dynamic Trading keeps using
+  its independent portrait path.
 
 ## Current Tabs
 - `Info`

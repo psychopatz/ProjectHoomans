@@ -66,8 +66,8 @@ function Settings.NPCInfectionMortalityHours()
     return Settings.GetNumber("NPCInfectionMortalityHours", 48, 1, 168)
 end
 
-function Settings.NPCReanimationHours()
-    return Settings.GetNumber("NPCReanimationHours", 1, 0.05, 24)
+function Settings.NPCReanimationSeconds()
+    return Settings.GetNumber("NPCReanimationSeconds", 3, 1, 60)
 end
 
 function Settings.ZombiesTargetDownedNPC()

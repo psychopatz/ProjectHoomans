@@ -26,6 +26,7 @@ Sync.BodyByInstanceID = Sync.BodyByInstanceID or {}
 Sync.BodyByLease = Sync.BodyByLease or {}
 Sync.FacingByID = Sync.FacingByID or {}
 Sync.UnresolvedLogAtByID = Sync.UnresolvedLogAtByID or {}
+Sync.MotionLogByID = Sync.MotionLogByID or {}
 Sync.lastBodyScanAt = Sync.lastBodyScanAt or 0
 Sync.lastLocalSnapshotBuildAt = Sync.lastLocalSnapshotBuildAt or 0
 
@@ -49,9 +50,22 @@ local function isSnapshotDebugEnabled(snapshot)
 end
 
 local function logClientMotionDebug(snapshot, id, event, extra)
+    local now
+    local key
+    local state
     if not isSnapshotDebugEnabled(snapshot) or not Core or not Core.Log then
         return
     end
+    id = tostring(id or "nil")
+    now = Core.Now and Core.Now() or 0
+    key = tostring(event or "unknown") .. "|" .. tostring(extra or "")
+    state = Sync.MotionLogByID[id]
+    if state and state.key == key
+        and (now - (tonumber(state.at) or 0)) < 5000
+    then
+        return
+    end
+    Sync.MotionLogByID[id] = { key = key, at = now }
     Core.Log("DEBUG", "client_presence npc=" .. tostring(id or "nil") .. " event=" .. tostring(event or "unknown") .. (extra and extra ~= "" and (" " .. tostring(extra)) or ""))
 end
 
@@ -616,6 +630,7 @@ local function onResetLua()
     Sync.BodyByLease = {}
     Sync.FacingByID = {}
     Sync.UnresolvedLogAtByID = {}
+    Sync.MotionLogByID = {}
     Sync.lastBodyScanAt = 0
     if Interpolation and Interpolation.ClearAll then
         Interpolation.ClearAll()

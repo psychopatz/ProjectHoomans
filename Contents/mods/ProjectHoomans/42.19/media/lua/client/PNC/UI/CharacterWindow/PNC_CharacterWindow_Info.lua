@@ -9,10 +9,12 @@ local Layout = PsychopatzCore.UI.Layout
 
 function Tabs.CreateInfoChildren(view)
     view.portraitPanel = PsychopatzCore.UI.PortraitPanel:new(12, 12, 132, 264, {
-        zoom = 14,
-        yOffset = -0.85,
+        -- Match the vanilla player-info full-body preview. The NPC's live
+        -- backing object is an IsoZombie, so use the descriptor's human pose.
+        zoom = -3,
+        yOffset = 0,
         direction = IsoDirections and IsoDirections.S,
-        animSetName = "zombie",
+        animSetName = false,
         stateName = "idle",
         animate = true,
     })

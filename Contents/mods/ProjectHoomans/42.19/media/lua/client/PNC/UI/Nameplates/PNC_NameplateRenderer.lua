@@ -7,6 +7,7 @@ local Layout = Presentation.Layout
 local Fonts = Presentation.Fonts
 
 local DEBUG_COLOR = { r = 0.8, g = 0.9, b = 1.0, a = 1.0 }
+local INFECTION_COLOR = { r = 1.0, g = 0.12, b = 0.08, a = 1.0 }
 local PATH_COLOR = { r = 0.15, g = 0.82, b = 1.0, a = 0.82 }
 local PATH_BLOCKED_COLOR = { r = 1.0, g = 0.3, b = 0.2, a = 0.9 }
 local PATH_MARKER_HALF_SIZE = 15
@@ -105,15 +106,32 @@ local function drawStamina(manager, entry, metrics, barLeft, barTop, alpha)
 end
 
 local function drawDebugText(manager, entry, screenX, y, alpha)
-    Presentation.DrawOutlinedText(
-        manager,
-        entry.debugText,
-        screenX - ((entry.debugTextWidth or 0) / 2),
-        y,
-        DEBUG_COLOR,
-        alpha,
-        Fonts.debug
-    )
+    local lineHeight = getTextManager():getFontHeight(Fonts.debug) + 2
+    if entry.debugText and entry.debugText ~= "" then
+        Presentation.DrawOutlinedText(
+            manager,
+            entry.debugText,
+            screenX - ((entry.debugTextWidth or 0) / 2),
+            y,
+            DEBUG_COLOR,
+            alpha,
+            Fonts.debug
+        )
+        y = y + lineHeight
+    end
+    if entry.infectionDebugText and entry.infectionDebugText ~= "" then
+        Presentation.DrawOutlinedText(
+            manager,
+            entry.infectionDebugText,
+            screenX - ((entry.infectionDebugTextWidth or 0) / 2),
+            y,
+            INFECTION_COLOR,
+            alpha,
+            Fonts.debug
+        )
+        y = y + lineHeight
+    end
+    return y
 end
 
 local function drawDebugOnly(manager, entry, metrics)

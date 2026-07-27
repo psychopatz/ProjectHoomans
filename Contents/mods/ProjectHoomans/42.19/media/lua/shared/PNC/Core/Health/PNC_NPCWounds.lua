@@ -608,7 +608,10 @@ function Wounds.PrepareInfectionDeath(record)
     infection.fever = 100
     infection.temperatureC = 40.5
     infection.fatalAtWorldHour = tonumber(infection.fatalAtWorldHour) or worldHour()
-    infection.reanimateAtWorldHour = worldHour() + Settings.NPCReanimationHours()
+    -- The actual three-second-style delay is wall-clock based and owned by the
+    -- lightweight death marker. Keep the world-hour value as death provenance,
+    -- not as the live reanimation scheduler.
+    infection.reanimateAtWorldHour = worldHour()
     return true
 end
 

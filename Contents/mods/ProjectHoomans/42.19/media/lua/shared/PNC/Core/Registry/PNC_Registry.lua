@@ -26,8 +26,12 @@ local function getDirectory()
     directory.schemaVersion = tonumber(directory.schemaVersion or directory.Version) or 0
     directory.directoryRevision = math.max(0, math.floor(tonumber(directory.directoryRevision) or 0))
     directory.records = type(directory.records) == "table" and directory.records or {}
+    directory.deathMarkers = type(directory.deathMarkers) == "table"
+        and directory.deathMarkers or {}
     return directory
 end
+
+Registry.GetStorageDirectory = getDirectory
 
 local function assignModData(key, payload)
     local target = ModData.getOrCreate(key)
@@ -237,6 +241,9 @@ function Registry.Load()
         PNC.Network.ResetServerState()
     end
     directory = getDirectory()
+    if Registry.LoadDeathMarkers then
+        Registry.LoadDeathMarkers(directory)
+    end
     migrateLegacy(directory)
     for id, entry in pairs(directory.records) do
         key = type(entry) == "table" and entry.storageKey or nil
@@ -249,6 +256,9 @@ function Registry.Load()
     end
     recoverOrphans(directory)
     Registry.Loaded = true
+    if Registry.MigrateDeadRecords then
+        Registry.MigrateDeadRecords()
+    end
     Core.LogInfo("Registry loaded with " .. tostring(Core.TableSize(Registry.Data)) .. " NPC records.")
 end
 

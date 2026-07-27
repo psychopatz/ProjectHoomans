@@ -20,7 +20,7 @@ local CONTROL_MODDATA_KEYS = {
     "PNC_LastAttackAt", "PNC_ZombieID", "PNC_ClientAttackKey",
     "PNC_ClientHandsKey", "PNC_ClientHumanVisualAt", "PNC_ClientMotionKey",
     "PNC_ClientSpecialKey", "PNC_ClientVisualKey", "PNC_DebugAnimCycleKey",
-    "PNC_DebugAnimCycleStartAt",
+    "PNC_DebugAnimCycleStartAt", "PNC_DeathMarkerID", "PNC_DeathName",
 }
 
 local CONTROL_VARIABLES = {
@@ -54,6 +54,15 @@ local function clearManagedState(record, zombie)
 end
 
 function Lifecycle.IsReanimationDue(record)
+    local markerRuntime
+    if record and record.infected ~= nil then
+        markerRuntime = PNC.Registry and PNC.Registry.GetDeathMarkerRuntime
+            and PNC.Registry.GetDeathMarkerRuntime(record.id) or nil
+        return record.infected == true
+            and markerRuntime
+            and Core.Now() >= (tonumber(markerRuntime.reanimateAt) or 0)
+            or false
+    end
     local infection = record and record.health and record.health.body
         and record.health.body.infection or nil
     local reanimateAt = tonumber(infection and infection.reanimateAtWorldHour)
@@ -75,11 +84,16 @@ function Lifecycle.ReleaseReanimatedNPC(record, zombie)
     setBoolean(zombie, "setZombiesDontAttack", false)
     setBoolean(zombie, "setInvincible", false)
 
-    if PNC.Network and PNC.Network.BroadcastRemoval then
-        PNC.Network.BroadcastRemoval(record.id, "zombified")
-    end
-    if PNC.Registry and PNC.Registry.RemoveRecord then
-        PNC.Registry.RemoveRecord(record.id)
+    if PNC.Registry and PNC.Registry.GetDeathMarker
+        and PNC.Registry.GetDeathMarker(record.id)
+        and PNC.Registry.RemoveDeathMarker
+    then
+        PNC.Registry.RemoveDeathMarker(record.id)
+    elseif record.health and PNC.Registry then
+        if PNC.Network and PNC.Network.BroadcastRemoval then
+            PNC.Network.BroadcastRemoval(record.id, "zombified")
+        end
+        if PNC.Registry.RemoveRecord then PNC.Registry.RemoveRecord(record.id) end
     end
     return true
 end
@@ -102,7 +116,9 @@ function Lifecycle.SpawnReanimatedZombie(record, corpse)
     end
     if not Lifecycle.IsReanimationDue(record) then return false, "not_due" end
 
-    state = Internal.ensureRuntime(record)
+    state = PNC.Registry and PNC.Registry.GetDeathMarkerRuntime
+        and PNC.Registry.GetDeathMarkerRuntime(record.id)
+        or Internal.ensureRuntime(record)
     now = Core.Now()
     retryAt = tonumber(state.nextReanimationSpawnAt) or 0
     if state.reanimationSpawned == true then return false, "already_spawned" end
@@ -147,14 +163,17 @@ function Lifecycle.SpawnReanimatedZombie(record, corpse)
             (tonumber(state.reanimationSpawnAttempts) or 0) + 1
         state.nextReanimationSpawnAt =
             now + (tonumber(Const.CORPSE_REANIMATE_RETRY_MS) or 2000)
-        Internal.mark(
-            record,
-            "corpse",
-            "reanimation_retry",
-            "reanimation_spawn_failed",
-            ok and "reanimation_returned_no_zombie"
-                or tostring(zombieList or "engine_reanimation_failed")
-        )
+        state.corpseState = "reanimation_retry"
+        if record.runtime then
+            Internal.mark(
+                record,
+                "corpse",
+                "reanimation_retry",
+                "reanimation_spawn_failed",
+                ok and "reanimation_returned_no_zombie"
+                    or tostring(zombieList or "engine_reanimation_failed")
+            )
+        end
         if state.reanimationSpawnAttempts == 1
             or state.reanimationSpawnAttempts % 10 == 0
         then

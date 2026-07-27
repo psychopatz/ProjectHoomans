@@ -1,10 +1,12 @@
--- Worn-item capture and transfer from live bodies to inert corpses.
+-- Worn-item capture and transfer from live bodies to vanilla corpses.
 
 PNC = PNC or {}
 PNC.BodyLifecycle = PNC.BodyLifecycle or {}
 PNC.BodyLifecycle.Internal = PNC.BodyLifecycle.Internal or {}
 
 local Internal = PNC.BodyLifecycle.Internal
+local CorpseItems =
+    require "PsychopatzCore/Inventory/PsychopatzCorpseItems"
 
 function Internal.captureWornEntries(wornItems)
     local entries = {}
@@ -92,7 +94,7 @@ function Internal.applyCorpseWornItems(corpse, wornEntries)
         if item and type(entry.location) ~= "string"
             and entry.location ~= nil and tostring(entry.location) ~= ""
         then
-            Internal.addItemToContainer(container, item)
+            CorpseItems.AddExisting(container, item)
             claimed[item] = true
             if pcall(targetWornItems.setItem, targetWornItems, entry.location, item) then
                 applied = applied + 1
@@ -103,7 +105,5 @@ function Internal.applyCorpseWornItems(corpse, wornEntries)
 end
 
 function Internal.transmitCorpseState(corpse)
-    if corpse and isServer and isServer() and corpse.transmitCompleteItemToClients then
-        pcall(corpse.transmitCompleteItemToClients, corpse)
-    end
+    return CorpseItems.Transmit(corpse)
 end

@@ -106,7 +106,9 @@ local function processRecord(record, now)
     end
 
     if record.alive == false then
-        if record.lastSyncAt ~= record.presenceRevision then
+        if not (record.runtime and record.runtime.deathRetired)
+            and record.lastSyncAt ~= record.presenceRevision
+        then
             Network.BroadcastRemoval(record.id, "death")
             record.lastSyncAt = record.presenceRevision
         end
@@ -441,6 +443,14 @@ function buildDebugRoster()
     Registry.ForEach(function(record)
         list[#list + 1] = BodyLifecycle.BuildDiagnostics(record)
     end)
+    if Registry.ForEachDeathMarker
+        and BodyLifecycle.BuildDeathMarkerDiagnostics
+    then
+        Registry.ForEachDeathMarker(function(marker)
+            list[#list + 1] =
+                BodyLifecycle.BuildDeathMarkerDiagnostics(marker)
+        end)
+    end
     table.sort(list, function(a, b)
         return tostring(a and a.name or a and a.id or "") < tostring(b and b.name or b and b.id or "")
     end)

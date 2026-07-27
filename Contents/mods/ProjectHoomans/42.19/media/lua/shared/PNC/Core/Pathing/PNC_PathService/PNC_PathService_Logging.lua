@@ -133,8 +133,32 @@ function Internal.logMoveWarning(record, zombie, lane, event, reason, extra)
 end
 
 function Internal.logMoveDebug(record, zombie, lane, event, reason, extra)
+    local now
+    local key
+    local interval
     if not Internal.isMovementDebugEnabled(record) then
         return
+    end
+    now = Core.Now()
+    key = table.concat({
+        tostring(event or "unknown"),
+        tostring(reason or "none"),
+        tostring(lane and lane.phase or "nil"),
+        tostring(lane and lane.ownerMode or "none"),
+        tostring(Internal.getActionStateName(zombie)),
+        tostring(lane and lane.blockReason or ""),
+    }, "|")
+    interval = (event == "progress"
+        or event == "special_progress"
+        or event == "special_cooldown") and 5000 or 1500
+    if lane and lane.lastDebugLogKey == key
+        and (now - (tonumber(lane.lastDebugLogAt) or 0)) < interval
+    then
+        return
+    end
+    if lane then
+        lane.lastDebugLogKey = key
+        lane.lastDebugLogAt = now
     end
     Core.Log("DEBUG", Internal.buildMoveLogMessage(record, zombie, lane, event, reason, extra))
 end

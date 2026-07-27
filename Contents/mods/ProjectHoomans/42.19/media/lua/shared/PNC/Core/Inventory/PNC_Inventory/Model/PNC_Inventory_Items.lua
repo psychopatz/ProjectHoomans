@@ -71,6 +71,9 @@ function Internal.itemToPayload(item)
         wornSlot = item.wornSlot,
         attachedSlot = item.attachedSlot,
         equipSlot = item.equipSlot,
+        customName = item.customName,
+        identityNPCId = item.identityNPCId,
+        identityNPCName = item.identityNPCName,
     }
 end
 
@@ -92,6 +95,9 @@ function Internal.createItem(record, inv, spec)
         wornSlot = Internal.normalizeString(spec.wornSlot),
         attachedSlot = Internal.normalizeString(spec.attachedSlot),
         equipSlot = Internal.normalizeString(spec.equipSlot),
+        customName = Internal.normalizeString(spec.customName),
+        identityNPCId = Internal.normalizeString(spec.identityNPCId),
+        identityNPCName = Internal.normalizeString(spec.identityNPCName),
     }
     if not item.type then return nil end
     inv.items[itemID] = item
@@ -110,6 +116,30 @@ function Internal.createItem(record, inv, spec)
         inv.equipped.secondary = itemID
     elseif item.equipSlot == "bag" then
         inv.equipped.bag = itemID
+    end
+    return item
+end
+
+function Internal.ensureIdentityCard(record, inv)
+    local item
+    local displayName
+    if not record or not inv or type(inv.items) ~= "table" then return nil end
+    item = Internal.findItemByTemplateKey(inv, "tmpl:identity_card:0")
+    displayName = tostring(record.name or record.displayName or "Unknown NPC")
+    if not item then
+        item = Internal.createItem(record, inv, {
+            type = "Base.IDcard",
+            container = "root",
+            templateKey = "tmpl:identity_card:0",
+        })
+    end
+    if item then
+        -- Repair the incorrectly-cased type written by generator revision 3.
+        -- Script item IDs are case-sensitive in Build 42.
+        item.type = "Base.IDcard"
+        item.customName = "ID Card: " .. displayName
+        item.identityNPCId = tostring(record.id)
+        item.identityNPCName = displayName
     end
     return item
 end

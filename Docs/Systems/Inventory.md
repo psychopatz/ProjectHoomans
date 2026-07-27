@@ -14,6 +14,8 @@
 - template-plus-delta persistence state for recruited and unrecruited NPCs
 - stable semantic template keys and generator revision
 - identity-seeded starting equipment selection and entry-provided grants
+- one canonical `Base.IDcard` per generated NPC, named from the identity and
+  carrying the NPC UUID/name as item modData for future kill/identification quests
 - derived carry caches such as used and remaining weight
 - revision-bound summaries that do not require full inventory hydration
 
@@ -111,3 +113,8 @@ the generation service should remain free of item lists.
 - do not capture later-loaded collaborators in file-local variables at module load time
 - generator updates rebase the current template and replay valid semantic deltas
 - generator version 2 moves built-in starting items into generic equipment pools
+- generator version 3 adds the stable named identity-card template and rebases
+  older inventories without duplicating cards
+- death conversion re-validates the identity card against the final
+  `IsoDeadBody` container, so legacy records and engine fallback conversions
+  still receive exactly one card

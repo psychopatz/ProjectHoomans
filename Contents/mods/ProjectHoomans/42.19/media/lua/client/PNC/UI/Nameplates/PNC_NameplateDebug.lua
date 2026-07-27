@@ -49,23 +49,87 @@ local function syntheticAnimFrame(zombie, animName, moving, animSpeed)
     return frame, frameCount, phase
 end
 
-function Debug.BuildText(snapshot, hasBoundBody)
+local function settingEnabled(settings, key)
+    return not settings or settings[key] ~= false
+end
+
+local function infectionState(snapshot)
+    local infection = snapshot and snapshot.bodyHealth
+        and snapshot.bodyHealth.infection or nil
+    local infected = infection
+        and (infection.active == true
+            or infection.fatal == true
+            or infection.pendingFatal == true)
+        or false
+    return infected, infection
+end
+
+function Debug.BuildText(snapshot, hasBoundBody, settings)
     local debugState = snapshot and snapshot.debugState or nil
-    if not debugState then return "AI: Unknown" end
+    local parts = {}
+    if not debugState then
+        return settingEnabled(settings, "debugShowAI") and "AI: Unknown" or ""
+    end
     local presence = string.upper(tostring(snapshot.presenceState or "unknown"))
     if snapshot.presenceState == Const.PRESENCE_LIVE then
         presence = presence .. "/" .. (hasBoundBody and "BOUND" or "MISSING")
     end
+    if settingEnabled(settings, "debugShowPresence") then
+        parts[#parts + 1] = "Presence: " .. presence
+    end
+    if settingEnabled(settings, "debugShowAI") then
+        parts[#parts + 1] =
+            "AI: " .. tostring(debugState.aiState or snapshot.aiState or "Unknown")
+    end
+    if settingEnabled(settings, "debugShowJob") then
+        parts[#parts + 1] = "Job: " .. tostring(debugState.activeJob or "-")
+    end
+    if settingEnabled(settings, "debugShowOrder") then
+        parts[#parts + 1] = "Order: " .. tostring(debugState.orderKind or "-")
+    end
+    if settingEnabled(settings, "debugShowTarget") then
+        parts[#parts + 1] =
+            "Target: " .. tostring(debugState.targetKind or "none")
+    end
+    if settingEnabled(settings, "debugShowCombat") then
+        parts[#parts + 1] = "Mode: " .. tostring(
+            debugState.combatModeResolved or debugState.weaponMode or "-"
+        )
+        parts[#parts + 1] =
+            "Weapon: " .. tostring(debugState.weaponStatus or "-")
+    end
+    if settingEnabled(settings, "debugShowStamina") then
+        parts[#parts + 1] = "Stamina: " .. tostring(
+            debugState.staminaState or snapshot.staminaState or "-"
+        )
+    end
+    if settingEnabled(settings, "debugShowBlock") then
+        parts[#parts + 1] =
+            "Block: " .. tostring(debugState.combatBlockReason or "-")
+    end
+    return table.concat(parts, " | ")
+end
+
+function Debug.InfectionText(snapshot, settings)
+    local infected
+    local infection
+    if not settingEnabled(settings, "debugShowInfection") then
+        return ""
+    end
+    infected, infection = infectionState(snapshot)
+    if not infected then
+        return ""
+    end
     return table.concat({
-        "Presence: " .. presence,
-        "AI: " .. tostring(debugState.aiState or snapshot.aiState or "Unknown"),
-        "Job: " .. tostring(debugState.activeJob or "-"),
-        "Order: " .. tostring(debugState.orderKind or "-"),
-        "Target: " .. tostring(debugState.targetKind or "none"),
-        "Mode: " .. tostring(debugState.combatModeResolved or debugState.weaponMode or "-"),
-        "Weapon: " .. tostring(debugState.weaponStatus or "-"),
-        "Stamina: " .. tostring(debugState.staminaState or snapshot.staminaState or "-"),
-        "Block: " .. tostring(debugState.combatBlockReason or "-"),
+        "INFECTED: YES",
+        "Stage: " .. tostring(infection.stage or "incubating"),
+        "Fever: " .. tostring(
+            math.floor((tonumber(infection.fever) or 0) + 0.5)
+        ) .. "%",
+        string.format(
+            "Temp: %.1f C",
+            tonumber(infection.temperatureC) or 37
+        ),
     }, " | ")
 end
 

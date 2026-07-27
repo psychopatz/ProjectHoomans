@@ -11,6 +11,7 @@ local Const = PNC.Const
 local Core = PNC.Core
 
 Interpolation.StateByID = Interpolation.StateByID or {}
+Interpolation.DebugLogByID = Interpolation.DebugLogByID or {}
 
 local function clamp(value, minValue, maxValue)
     value = tonumber(value) or minValue
@@ -50,9 +51,22 @@ local function isDebugEnabled(snapshot, state)
 end
 
 local function logDebug(snapshot, state, id, event, extra)
+    local now
+    local key
+    local previous
     if not isDebugEnabled(snapshot, state) or not Core or not Core.Log then
         return
     end
+    id = tostring(id or "nil")
+    now = getNowMs()
+    key = tostring(event or "unknown") .. "|" .. tostring(extra or "")
+    previous = Interpolation.DebugLogByID[id]
+    if previous and previous.key == key
+        and (now - (tonumber(previous.at) or 0)) < 5000
+    then
+        return
+    end
+    Interpolation.DebugLogByID[id] = { key = key, at = now }
     Core.Log("DEBUG", "client_interp npc=" .. tostring(id or "nil") .. " event=" .. tostring(event or "unknown") .. (extra and extra ~= "" and (" " .. tostring(extra)) or ""))
 end
 
@@ -100,10 +114,12 @@ function Interpolation.ClearNPC(id)
         return
     end
     Interpolation.StateByID[tostring(id)] = nil
+    Interpolation.DebugLogByID[tostring(id)] = nil
 end
 
 function Interpolation.ClearAll()
     Interpolation.StateByID = {}
+    Interpolation.DebugLogByID = {}
 end
 
 function Interpolation.RecordSnapshot(snapshot, zombie, now)

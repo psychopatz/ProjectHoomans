@@ -11,6 +11,8 @@ function Inventory.EnsureRecordInventory(record)
     local raw
     local itemID
     local item
+    local generatorVersion
+    local currentGenerator
     if not record then return nil end
     if type(record.inventory) ~= "table" and type(record.persistedInventory) == "table" then
         local persisted = record.persistedInventory
@@ -32,6 +34,8 @@ function Inventory.EnsureRecordInventory(record)
     end
 
     inv = record.inventory
+    generatorVersion = inv.template and tonumber(inv.template.generatorVersion) or 0
+    currentGenerator = PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1
     inv.revision = math.max(0, math.floor(tonumber(inv.revision) or 0))
     inv.deltaMode = "template_plus_delta"
     inv.cachedWeight = tonumber(inv.cachedWeight) or 0
@@ -62,6 +66,9 @@ function Inventory.EnsureRecordInventory(record)
             item.wornSlot = Internal.normalizeString(item.wornSlot)
             item.attachedSlot = Internal.normalizeString(item.attachedSlot)
             item.equipSlot = Internal.normalizeString(item.equipSlot)
+            item.customName = Internal.normalizeString(item.customName)
+            item.identityNPCId = Internal.normalizeString(item.identityNPCId)
+            item.identityNPCName = Internal.normalizeString(item.identityNPCName)
             item.bagContainer = Internal.normalizeString(item.bagContainer)
             item.maxWeight = tonumber(item.maxWeight)
             inv.items[item.id] = item
@@ -75,6 +82,11 @@ function Inventory.EnsureRecordInventory(record)
     end
     Internal.getRuntimeState(record)
     Internal.refreshNextItemSerial(record, inv)
+    if generatorVersion < 3 then
+        Internal.ensureIdentityCard(record, inv)
+        inv.template = inv.template or {}
+        inv.template.generatorVersion = currentGenerator
+    end
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)
     return record.inventory

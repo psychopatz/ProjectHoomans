@@ -24,6 +24,7 @@ function Lifecycle.AuditLoadedBodies(now, force)
     local tagVersion
     local record
     local expected
+    local deathMarker
     now = tonumber(now) or Core.Now()
     if not Core.IsAuthority() or not reg or not reg.EnsureLoaded then
         return stats
@@ -40,7 +41,30 @@ function Lifecycle.AuditLoadedBodies(now, force)
         for i = zombieList:size() - 1, 0, -1 do
             zombie = zombieList:get(i)
             modData = zombie and zombie.getModData and zombie:getModData() or nil
-            if modData and modData.PNC_NPC == true then
+            local deathMarkerId = modData and (
+                modData.PNC_DeathMarkerID
+                or tostring(modData.PNC_BodyKind or "") == "corpse"
+                    and modData.PNC_UUID
+            ) or nil
+            deathMarker = deathMarkerId
+                and reg.GetDeathMarker
+                and reg.GetDeathMarker(deathMarkerId) or nil
+            if deathMarker then
+                stats.scanned = stats.scanned + 1
+                stats.corpses = stats.corpses + 1
+                if deathMarker.infected == true
+                    and Lifecycle.ReleaseReanimatedNPC
+                then
+                    Lifecycle.ReleaseReanimatedNPC(deathMarker, zombie)
+                else
+                    -- An uninfected death marker must never produce a zombie.
+                    Internal.removeZombie(zombie)
+                    if reg.RemoveDeathMarker then
+                        reg.RemoveDeathMarker(deathMarker.id)
+                    end
+                    stats.removed = stats.removed + 1
+                end
+            elseif modData and modData.PNC_NPC == true then
                 stats.scanned = stats.scanned + 1
                 npcId = modData.PNC_UUID and tostring(modData.PNC_UUID) or nil
                 kind = tostring(modData.PNC_BodyKind or "live")

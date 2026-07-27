@@ -10,21 +10,32 @@ local ClientState = PNC.Network.ClientState
 
 local UPDATE_RATE = 6
 
-local function cacheMetrics(entry, snapshot, zombie, showDebug)
+local function cacheMetrics(entry, snapshot, zombie, settings)
     local fonts = Presentation.Fonts
+    local showDebug = settings and settings.showAIDebug == true
     local name = snapshot and snapshot.name or "PNC NPC"
     local hpText = "[" .. tostring(math.floor((tonumber(snapshot.hpCurrent) or 0) + 0.5))
         .. "/" .. tostring(math.floor((tonumber(snapshot.hpMax) or 0) + 0.5)) .. "]"
-    local debugText = Debug.BuildText(snapshot, zombie ~= nil)
-    if showDebug then
-        debugText = debugText .. " | " .. Debug.AnimationText(zombie, snapshot)
+    local debugText = showDebug
+        and Debug.BuildText(snapshot, zombie ~= nil, settings) or ""
+    if showDebug and settings.debugShowAnimation ~= false then
+        local animationText = Debug.AnimationText(zombie, snapshot)
+        debugText = debugText ~= "" and (debugText .. " | " .. animationText) or animationText
     end
+    local infectionDebugText = showDebug
+        and Debug.InfectionText(snapshot, settings) or ""
     Presentation.CacheTextMetric(entry, "name", name, fonts.name)
     Presentation.CacheTextMetric(entry, "hpText", hpText, fonts.hp)
     Presentation.CacheTextMetric(entry, "debugText", debugText, fonts.debug)
+    Presentation.CacheTextMetric(
+        entry,
+        "infectionDebugText",
+        infectionDebugText,
+        fonts.debug
+    )
 end
 
-local function populateLiveEntry(entry, snapshot, zombie, currentTime, showDebug)
+local function populateLiveEntry(entry, snapshot, zombie, currentTime, settings)
     entry.snapshot = snapshot
     entry.zombie = zombie
     entry.debugOnly = false
@@ -37,10 +48,10 @@ local function populateLiveEntry(entry, snapshot, zombie, currentTime, showDebug
     entry.barColor = snapshot.healthState == "incapacitated"
         and Presentation.IncapacitatedColor(currentTime)
         or Presentation.HealthColor(entry.healthRatio)
-    cacheMetrics(entry, snapshot, zombie, showDebug)
+    cacheMetrics(entry, snapshot, zombie, settings)
 end
 
-local function populateDebugEntry(entry, snapshot, showDebug)
+local function populateDebugEntry(entry, snapshot, settings)
     entry.snapshot = snapshot
     entry.zombie = nil
     entry.debugOnly = true
@@ -48,7 +59,7 @@ local function populateDebugEntry(entry, snapshot, showDebug)
     entry.worldY = tonumber(snapshot.y) or 0
     entry.worldZ = tonumber(snapshot.z) or 0
     entry.nameColor = Presentation.NameColor(snapshot)
-    cacheMetrics(entry, snapshot, nil, showDebug)
+    cacheMetrics(entry, snapshot, nil, settings)
 end
 
 local function isLiveVisible(player, zombie)
@@ -104,13 +115,13 @@ function Entries.Refresh(manager, settings)
             Bodies.Tag(zombie, uuid, snapshot)
             if isLiveVisible(player, zombie) then
                 local entry = manager.entries[uuid] or { uuid = uuid }
-                populateLiveEntry(entry, snapshot, zombie, currentTime, settings.showAIDebug)
+                populateLiveEntry(entry, snapshot, zombie, currentTime, settings)
                 manager.entries[uuid] = entry
                 visible[uuid] = true
             end
         elseif settings.showAIDebug and snapshot and isDebugVisible(player, snapshot) then
             local entry = manager.entries[uuid] or { uuid = uuid }
-            populateDebugEntry(entry, snapshot, settings.showAIDebug)
+            populateDebugEntry(entry, snapshot, settings)
             manager.entries[uuid] = entry
             visible[uuid] = true
         end

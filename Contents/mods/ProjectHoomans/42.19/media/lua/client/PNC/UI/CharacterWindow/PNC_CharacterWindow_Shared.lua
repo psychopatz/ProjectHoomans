@@ -234,6 +234,7 @@ function Shared.BuildPortraitSpec(npcId, snapshot, payload)
             tostring(resolved.presenceRevision or 0),
         }, "|"),
         identitySeed = resolved.identitySeed or 1,
+        preferDescriptor = true,
         isFemale = resolved.isFemale == true,
         outfit = resolved.appearance and resolved.appearance.outfit or nil,
         appearance = resolved.appearance or {},

@@ -15,16 +15,6 @@ function Internal.itemFullType(item)
     return item and item.getFullType and tostring(item:getFullType() or "") or ""
 end
 
-function Internal.addItemToContainer(container, item)
-    if not container or not item then
-        return false
-    end
-    if item.getContainer and item:getContainer() == container then
-        return true
-    end
-    return container.AddItem and pcall(container.AddItem, container, item) or false
-end
-
 function Internal.clearBodyCombat(zombie)
     if not zombie then
         return

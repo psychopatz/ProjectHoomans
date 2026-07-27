@@ -22,8 +22,8 @@
     "Sandbox_ProjectHoomans.NPCInfectionMortalityHours": "NPC Infection Mortality (Game Hours)",
     "Sandbox_ProjectHoomans.NPCInfectionMortalityHours_tooltip": "In-game hours from infection to terminal fever and death. Health declines during the later stages.",
 
-    "Sandbox_ProjectHoomans.NPCReanimationHours": "NPC Reanimation Delay (Game Hours)",
-    "Sandbox_ProjectHoomans.NPCReanimationHours_tooltip": "In-game hours between infection death and corpse reanimation.",
+    "Sandbox_ProjectHoomans.NPCReanimationSeconds": "NPC Reanimation Delay (Real Seconds)",
+    "Sandbox_ProjectHoomans.NPCReanimationSeconds_tooltip": "Real-time seconds between infection death and vanilla corpse reanimation.",
 
     "Sandbox_ProjectHoomans.EnableWeaponDamage": "Weapon-Based NPC Damage",
     "Sandbox_ProjectHoomans.EnableWeaponDamage_tooltip": "Uses each NPC's equipped weapon damage and combat skill. Disable to use legacy combat-profile damage values.",

@@ -118,7 +118,7 @@ assert(PNC.Inventory.ApplyDelta(record, {
 local firstDelta = PNC.Inventory.BuildDeltaPayload(record, 0)
 assertEqual(firstDelta.inventoryRevision, 1, "first delta revision")
 assertEqual(#firstDelta.ops, 2, "first delta operation count")
-assertEqual(firstDelta.summary.itemCount, 1, "first delta summary item count")
+assertEqual(firstDelta.summary.itemCount, 2, "first delta summary item count")
 
 assert(PNC.Inventory.ApplyDelta(record, {
     { op = "update", itemID = "loot_1", stack = 3, cond = 0.75 },

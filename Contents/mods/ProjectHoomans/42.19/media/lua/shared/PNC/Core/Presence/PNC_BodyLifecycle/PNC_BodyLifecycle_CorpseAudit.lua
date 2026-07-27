@@ -1,4 +1,4 @@
--- Pending corpse finalization and bounded corpse-record audits.
+-- Pending corpse finalization and bounded lightweight death-marker audits.
 
 PNC = PNC or {}
 PNC.BodyLifecycle = PNC.BodyLifecycle or {}
@@ -22,24 +22,41 @@ function Internal.pumpPendingCorpses()
     for i = #Lifecycle.PendingCorpses, 1, -1 do
         pending = Lifecycle.PendingCorpses[i]
         pending.attempts = (tonumber(pending.attempts) or 0) + 1
-        record = Internal.registry() and Internal.registry().Get and Internal.registry().Get(pending.npcId) or nil
+        record = Internal.registry() and Internal.registry().GetDeathMarker
+            and Internal.registry().GetDeathMarker(pending.npcId)
+            or Internal.registry() and Internal.registry().Get
+                and Internal.registry().Get(pending.npcId) or nil
         square = cell:getGridSquare(pending.x, pending.y, pending.z)
         found = nil
         Internal.forEachCorpse(square, function(corpse)
             local modData = corpse.getModData and corpse:getModData() or nil
-            if not found and (not modData or not modData.PNC_UUID or tostring(modData.PNC_UUID) == pending.npcId) then
+            local markerId = modData and (
+                modData.PNC_DeathMarkerID or modData.PNC_UUID
+            ) or nil
+            if not found and markerId
+                and tostring(markerId) == tostring(pending.npcId)
+            then
                 found = corpse
             end
         end)
         if found and record then
+            if Internal.ensureCorpseIdentityCard then
+                Internal.ensureCorpseIdentityCard(record, found)
+            end
             Internal.applyCorpseWornItems(found, pending.wornEntries)
             Internal.stampCorpse(record, found, pending.token)
             Internal.transmitCorpseState(found)
             table.remove(Lifecycle.PendingCorpses, i)
         elseif pending.attempts >= 8 then
             if record then
-                Internal.ensureRuntime(record).corpseState = "missing"
-                Internal.mark(record, "corpse", "missing", "corpse_finalize_timeout", "corpse_not_found")
+                local state = Internal.registry().GetDeathMarkerRuntime
+                    and Internal.registry().GetDeathMarkerRuntime(record.id)
+                    or Internal.ensureRuntime(record)
+                state.corpseState = "missing"
+                if record.runtime then
+                    Internal.mark(record, "corpse", "missing",
+                        "corpse_finalize_timeout", "corpse_not_found")
+                end
             end
             table.remove(Lifecycle.PendingCorpses, i)
         end
@@ -48,59 +65,87 @@ end
 
 function Internal.auditCorpseRecord(record)
     local cell = getCell and getCell() or nil
-    local descriptor = record and record.corpse or nil
     local square
     local accepted
     local token
     local state
-    if not cell or not record or record.alive ~= false then
+    local now
+    local markerId
+    local identityCardCreated = false
+    if not cell or not record then
         return
     end
-    state = Internal.ensureRuntime(record)
-    if not descriptor then
-        state.corpseState = "missing"
-        return
-    end
+    state = Internal.registry() and Internal.registry().GetDeathMarkerRuntime
+        and Internal.registry().GetDeathMarkerRuntime(record.id)
+        or Internal.ensureRuntime(record)
+    now = Core.Now()
     square = cell:getGridSquare(
-        math.floor(tonumber(descriptor.x) or tonumber(record.x) or 0),
-        math.floor(tonumber(descriptor.y) or tonumber(record.y) or 0),
-        math.floor(tonumber(descriptor.z) or tonumber(record.z) or 0)
+        math.floor(tonumber(record.x) or 0),
+        math.floor(tonumber(record.y) or 0),
+        math.floor(tonumber(record.z) or 0)
     )
     if not square then
         state.corpseState = "unloaded"
         return
     end
-    token = descriptor.token and tostring(descriptor.token) or nil
+    token = record.corpseToken
+        or record.corpse and record.corpse.token
+    token = token and tostring(token) or nil
     Internal.forEachCorpse(square, function(corpse)
         local modData = corpse.getModData and corpse:getModData() or nil
-        local corpseId = modData and modData.PNC_UUID and tostring(modData.PNC_UUID) or nil
+        local corpseId = modData
+            and (modData.PNC_DeathMarkerID or modData.PNC_UUID) or nil
         local corpseToken = modData and modData.PNC_CorpseToken and tostring(modData.PNC_CorpseToken) or nil
-        if corpseId == tostring(record.id) then
+        corpseId = corpseId and tostring(corpseId) or nil
+        if corpseId == tostring(record.id)
+            and (not token or not corpseToken or corpseToken == token)
+        then
             if not token then
                 token = corpseToken or Core.GenerateID("corpse")
-                descriptor.token = token
+                record.corpseToken = token
             end
-            if corpseToken == token or corpseToken == nil then
-                if not accepted then
-                    accepted = corpse
+            if not accepted then
+                accepted = corpse
+                markerId = modData and modData.PNC_DeathMarkerID or nil
+                if tostring(markerId or "") ~= tostring(record.id) then
                     Internal.stampCorpse(record, corpse, token)
-                else
-                    Internal.removeCorpse(corpse)
                 end
-            else
-                Internal.removeCorpse(corpse)
             end
         end
     end)
+    if accepted and Internal.ensureCorpseIdentityCard then
+        local _, created = Internal.ensureCorpseIdentityCard(record, accepted)
+        identityCardCreated = created == true
+    end
     if accepted and Lifecycle.IsReanimationDue
         and Lifecycle.IsReanimationDue(record)
         and Lifecycle.SpawnReanimatedZombie
     then
         local spawned = Lifecycle.SpawnReanimatedZombie(record, accepted)
         if spawned then return end
+        if identityCardCreated then
+            Internal.transmitCorpseState(accepted)
+            identityCardCreated = false
+        end
         if state.corpseState == "reanimation_retry" then return end
     end
-    state.corpseState = accepted and "inert_loaded" or "missing"
+    if accepted then
+        if identityCardCreated then
+            Internal.transmitCorpseState(accepted)
+        end
+        state.corpseState = "inert_loaded"
+        state.missingSinceAt = 0
+        return
+    end
+    state.corpseState = "missing"
+    state.missingSinceAt = (tonumber(state.missingSinceAt) or 0) > 0
+        and state.missingSinceAt or now
+    if now - state.missingSinceAt
+        >= (tonumber(Const.DEATH_MARKER_MISSING_GRACE_MS) or 5000)
+        and Internal.registry() and Internal.registry().RemoveDeathMarker
+    then
+        Internal.registry().RemoveDeathMarker(record.id)
+    end
 end
 
 function Internal.auditCorpseBatch(reg)
@@ -109,11 +154,15 @@ function Internal.auditCorpseBatch(reg)
     local startAt
     local count
     local i
-    reg.ForEach(function(candidate)
-        if candidate.alive == false then
+    if reg.ForEachDeathMarker then
+        reg.ForEachDeathMarker(function(candidate)
             dead[#dead + 1] = candidate
-        end
-    end)
+        end)
+    else
+        reg.ForEach(function(candidate)
+            if candidate.alive == false then dead[#dead + 1] = candidate end
+        end)
+    end
     if #dead <= 0 then
         Lifecycle.CorpseAuditCursor = 1
         return

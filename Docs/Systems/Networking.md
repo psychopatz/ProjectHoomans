@@ -34,10 +34,16 @@
   snapshot instead of increasing the global movement frequency
 - detailed health payloads carry the persisted infection stage, progress,
   fever, and temperature; clients never advance infection or subtract health
+- client locomotion/resync diagnostics are deduplicated per NPC and state for
+  five seconds, so enabling record diagnostics remains useful without
+  producing a line every render/update frame
 - corpse-to-zombie conversion runs only on the authority. The vanilla corpse
   reanimation routine allocates the server zombie ID, inserts the zombie,
   transfers corpse equipment, and removes the corpse; vanilla synchronization
   owns the resulting zombie while PNC sends only the NPC-record removal tombstone
+- death immediately sends that removal tombstone and retires the full roster
+  record. Lightweight death markers stay server-owned and are exposed only
+  through authorized lifecycle diagnostics
 
 ## Forbidden Responsibilities
 - does not tick AI

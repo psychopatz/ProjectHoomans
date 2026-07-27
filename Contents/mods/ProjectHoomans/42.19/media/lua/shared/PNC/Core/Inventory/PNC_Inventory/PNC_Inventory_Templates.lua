@@ -81,6 +81,8 @@ function Internal.buildTemplateSnapshot(record)
     local item
     local i
 
+    Internal.ensureIdentityCard(record, base)
+
     for i = 1, #appearanceItems do
         lookCounts[tostring(appearanceItems[i])] = (lookCounts[tostring(appearanceItems[i])] or 0) + 1
         templateKey = "tmpl:look:" .. tostring(appearanceItems[i]) .. ":"

@@ -19,6 +19,20 @@ local function setPathDebug(value)
     PNC.SettingsStore:Set("showPathDebug", value, true)
 end
 
+local function debugPartControl(id, label)
+    return {
+        id = id,
+        type = "boolean",
+        label = label,
+        get = function() return PNC.Nameplates.Settings[id] ~= false end,
+        set = function(value)
+            value = value == true
+            PNC.Nameplates.Settings[id] = value
+            PNC.SettingsStore:Set(id, value, true)
+        end,
+    }
+end
+
 Registry.Register({
     id = "ProjectHoomans",
     title = "Project Hoomans Settings",
@@ -38,14 +52,24 @@ Registry.Register({
             get = function() return PNC.Nameplates.Settings.showPathDebug == true end,
             set = setPathDebug,
         },
+        debugPartControl("debugShowPresence", "Overlay: presence/body binding"),
+        debugPartControl("debugShowAI", "Overlay: AI state"),
+        debugPartControl("debugShowJob", "Overlay: active job"),
+        debugPartControl("debugShowOrder", "Overlay: current order"),
+        debugPartControl("debugShowTarget", "Overlay: current target"),
+        debugPartControl("debugShowCombat", "Overlay: combat mode and weapon"),
+        debugPartControl("debugShowStamina", "Overlay: stamina"),
+        debugPartControl("debugShowBlock", "Overlay: block reason"),
+        debugPartControl("debugShowInfection", "Overlay: infection status"),
+        debugPartControl("debugShowAnimation", "Overlay: animation diagnostics"),
     },
     window = {
         anchor = "center",
         responsiveSpec = {
             width = 560,
-            height = 360,
+            height = 620,
             minWidth = 420,
-            minHeight = 280,
+            minHeight = 420,
             maxWidth = 760,
             maxHeight = 620,
         },

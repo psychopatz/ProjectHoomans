@@ -70,7 +70,9 @@ local record = {
 
 assert(PNC.BodyLifecycle.Internal.stampCorpse(record, corpse, "corpse_token"), "corpse stamp failed")
 assert(reanimateAt > 25, "managed corpse was not kept inert for authority handoff")
-assertEqual(corpseModData.PNC_BodyKind, "corpse", "managed corpse tag")
+assertEqual(corpseModData.PNC_NPC, nil, "corpse released from managed NPC tag")
+assertEqual(corpseModData.PNC_UUID, nil, "corpse released from managed UUID")
+assertEqual(corpseModData.PNC_DeathMarkerID, "infected_npc", "death marker corpse tag")
 
 local clearedVariables = {}
 local released = {}
@@ -182,7 +184,21 @@ local spawnRecord = {
 
 removedId = nil
 broadcastId = nil
+local identityEnsureCount = 0
+PNC.BodyLifecycle.Internal.ensureCorpseIdentityCard = function(_, target)
+    assertEqual(target, spawnCorpse, "identity card target before reanimation")
+    identityEnsureCount = identityEnsureCount + 1
+    spawnCorpseModData.IdentityCardReady = true
+    return {}, true
+end
+local originalReanimate = spawnCorpse.reanimate
+spawnCorpse.reanimate = function(self)
+    assertEqual(spawnCorpseModData.IdentityCardReady, true,
+        "identity card ensured before reanimation")
+    return originalReanimate(self)
+end
 PNC.BodyLifecycle.Internal.auditCorpseRecord(spawnRecord)
+assertEqual(identityEnsureCount, 1, "infected corpse identity ensure count")
 assertEqual(spawnCalls, 0, "fallback used despite vanilla corpse reanimation")
 assertEqual(corpseReanimateCalls, 1, "vanilla corpse reanimation count")
 assertEqual(corpseRemoved, true, "vanilla reanimation consumed corpse")

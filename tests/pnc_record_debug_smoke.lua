@@ -72,6 +72,15 @@ PNC.ClientInterpolation.RecordSnapshot({
 }, zombie, 1000)
 assertEqual(#output, 3, "recorded client NPC emits interpolation log")
 assertContains(output[3], "npc=npc_client_recorded", "recorded client NPC identity")
+PNC.ClientInterpolation.RecordSnapshot({
+    id = "npc_client_recorded",
+    x = 1,
+    y = 0,
+    z = 0,
+    visualState = { moving = true },
+    debugState = { debugEnabled = true },
+}, zombie, 1000)
+assertEqual(#output, 3, "duplicate interpolation diagnostic is throttled")
 
 print = originalPrint
 

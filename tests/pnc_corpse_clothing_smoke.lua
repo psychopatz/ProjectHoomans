@@ -1,7 +1,9 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
 local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/"
+local CORE_SHARED_ROOT =
+    "../psychopatzCore/Contents/mods/PsychopatzCore/42.16/media/lua/shared/"
 
-package.path = SHARED_ROOT .. "?.lua;" .. package.path
+package.path = CORE_SHARED_ROOT .. "?.lua;" .. SHARED_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -85,6 +87,14 @@ local shirt = {
     getContainer = function(self) return self.container end,
     getVisual = function() return itemVisual end,
 }
+local cardModData = {}
+local identityCardCreateCount = 0
+local identityCard = {
+    getFullType = function() return "Base.IDcard" end,
+    getContainer = function(self) return self.container end,
+    setName = function(self, value) self.customName = value end,
+    getModData = function() return cardModData end,
+}
 local liveVisual = {
     getItemType = function() return "Base.Shirt_FormalWhite" end,
 }
@@ -103,7 +113,8 @@ local corpse = {
     setReanimateTime = function() end,
     transmitCompleteItemToClients = function()
         assertEqual(corpseWorn:getItem(shirtBodyLocation), shirt, "transmitted corpse worn shirt")
-        assertEqual(corpseModData.PNC_BodyKind, "corpse", "transmitted corpse body kind")
+        assertEqual(corpseModData.PNC_DeathMarkerID, "npc_corpse_clothes",
+            "transmitted death marker identity")
         transmitCount = transmitCount + 1
     end,
 }
@@ -126,6 +137,7 @@ local zombie = {
 }
 local record = {
     id = "npc_corpse_clothes",
+    name = "Corpse Clothes",
     x = 10,
     y = 20,
     z = 0,
@@ -148,8 +160,12 @@ PNC = {
     },
     Equipment = {
         CreateItem = function(fullType)
-            assertEqual(fullType, "Base.Shirt_FormalWhite", "created corpse clothing type")
-            return shirt
+            if fullType == "Base.Shirt_FormalWhite" then return shirt end
+            if fullType == "Base.IDcard" then
+                identityCardCreateCount = identityCardCreateCount + 1
+                return identityCard
+            end
+            error("unexpected corpse item type " .. tostring(fullType))
         end,
     },
     VisualProfiles = {
@@ -159,18 +175,39 @@ PNC = {
     },
     Inventory = {
         EnsureRecordInventory = function()
-            return { items = {} }
+            return {
+                items = {
+                    identity = {
+                        type = "Base.IDcard",
+                        customName = "ID Card: Corpse Clothes",
+                        identityNPCId = record.id,
+                        identityNPCName = "Corpse Clothes",
+                    },
+                },
+            }
         end,
     },
     Visuals = { RefreshModel = function() end },
     Registry = {
         LiveByID = { [record.id] = zombie },
+        GetDeathMarker = function(id)
+            return tostring(id) == record.id and record or nil
+        end,
         MarkDirty = function() end,
     },
 }
 
 IsoDeadBody = {
     new = function()
+        -- Reproduce the engine/fallback conversion that occasionally omits a
+        -- source-body item. The final corpse ensure must restore the card.
+        local i
+        for i = #inventoryValues, 1, -1 do
+            if inventoryValues[i] == identityCard then
+                table.remove(inventoryValues, i)
+            end
+        end
+        identityCard.container = nil
         return corpse
     end,
 }
@@ -184,13 +221,52 @@ dofile(ROOT .. "Presence/PNC_BodyLifecycle.lua")
 local created, result = PNC.BodyLifecycle.CreateInertCorpse(record, zombie, "test_death")
 assertEqual(created, true, "corpse creation")
 assertEqual(result, corpse, "created corpse instance")
-assertEqual(#inventoryValues, 1, "corpse clothing inventory count")
+assertEqual(#inventoryValues, 2, "corpse inventory count")
+assertEqual(identityCard.customName, "ID Card: Corpse Clothes", "physical ID card name")
+assertEqual(cardModData.PNC_IDCard, true, "physical ID card marker")
+assertEqual(cardModData.PNC_IDCardNPCId, record.id, "physical ID card NPC UUID")
+assertEqual(identityCardCreateCount, 2, "lost ID card recreated after corpse conversion")
 assertEqual(sourceWorn:getItem(shirtBodyLocation), shirt, "source worn shirt")
 assertEqual(corpseWorn:getItem(shirtBodyLocation), shirt, "corpse worn shirt")
 assertEqual(visualCopies, 1, "live clothing visual copy count")
 assertEqual(transmitCount, 1, "multiplayer corpse transmission count")
-assertEqual(corpseModData.PNC_UUID, record.id, "corpse network NPC id")
-assertEqual(corpseModData.PNC_BodyKind, "corpse", "corpse network body kind")
+assertEqual(corpseModData.PNC_NPC, nil, "corpse released from NPC ownership")
+assertEqual(corpseModData.PNC_UUID, nil, "corpse released from NPC UUID")
+assertEqual(corpseModData.PNC_DeathMarkerID, record.id, "corpse death marker id")
 assertEqual(record.runtime.lifecycle.corpseState, "inert_loaded", "corpse lifecycle state")
+
+-- Delayed becomeCorpseSilently finalization must apply the same guarantee using
+-- only the compact death marker after the full live record is retired.
+for index = #inventoryValues, 1, -1 do
+    if inventoryValues[index] == identityCard then
+        table.remove(inventoryValues, index)
+    end
+end
+identityCard.container = nil
+local corpseSquare = {
+    getDeadBodys = function() return makeList({ corpse }) end,
+    getStaticMovingObjects = function() return makeList({}) end,
+}
+getCell = function()
+    return {
+        getGridSquare = function() return corpseSquare end,
+    }
+end
+PNC.BodyLifecycle.PendingCorpses = {
+    {
+        npcId = record.id,
+        x = 10,
+        y = 20,
+        z = 0,
+        token = corpseModData.PNC_CorpseToken,
+        attempts = 0,
+        wornEntries = PNC.BodyLifecycle.Internal.captureWornEntries(sourceWorn),
+    },
+}
+PNC.BodyLifecycle.Internal.pumpPendingCorpses()
+assertEqual(#PNC.BodyLifecycle.PendingCorpses, 0, "delayed corpse finalized")
+assertEqual(#inventoryValues, 2, "delayed corpse restored identity card")
+assertEqual(identityCardCreateCount, 3, "delayed corpse recreated identity card")
+assertEqual(transmitCount, 2, "delayed corpse single completed-state transmission")
 
 print("pnc_corpse_clothing_smoke: ok")

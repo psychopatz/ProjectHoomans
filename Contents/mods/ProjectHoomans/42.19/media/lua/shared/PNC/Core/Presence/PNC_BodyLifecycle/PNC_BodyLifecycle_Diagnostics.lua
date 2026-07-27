@@ -60,3 +60,32 @@ function Lifecycle.BuildDiagnostics(record)
         bite = bite and Core.DeepCopy(bite) or nil,
     }
 end
+
+function Lifecycle.BuildDeathMarkerDiagnostics(marker)
+    local state = marker and Internal.registry()
+        and Internal.registry().GetDeathMarkerRuntime
+        and Internal.registry().GetDeathMarkerRuntime(marker.id) or {}
+    if not marker then return nil end
+    return {
+        id = tostring(marker.id),
+        name = marker.name,
+        faction = "dead",
+        presenceState = Const.PRESENCE_CORPSE,
+        alive = false,
+        phase = marker.infected == true and "awaiting-reanimation"
+            or "engine-corpse",
+        bodyState = state.corpseState == "inert_loaded"
+            and "corpse-loaded" or "corpse-missing",
+        corpseState = state.corpseState or "unresolved",
+        corpseToken = marker.corpseToken,
+        x = marker.x,
+        y = marker.y,
+        z = marker.z,
+        healthState = "dead",
+        hpCurrent = 0,
+        hpMax = 0,
+        targetKind = "none",
+        lastReason = marker.infected == true and "infection-death"
+            or "death",
+    }
+end
