@@ -150,6 +150,41 @@ assertEqual(applied, true, "full clothing apply")
 assertEqual(appliedCondition, 3, "virtual condition copied to live worn item")
 assertEqual(clothingVisuals[#clothingVisuals], "Base.Shirt_FormalWhite", "explicit clothing visual applied")
 
+local bagLocation = {}
+local bag = {
+    getBodyLocation = function() return nil end,
+    canBeEquipped = function() return bagLocation end,
+}
+PNC.Equipment.CreateItem = function()
+    return bag, "test_bag"
+end
+local bagZombie = {
+    attached = {},
+    getWornItems = function() return worn end,
+    getItemVisuals = function() return visuals end,
+    setWornItem = function(_, location, item)
+        assertEqual(location, bagLocation, "container canBeEquipped location")
+        assertEqual(item, bag, "worn container instance")
+    end,
+    getAttachedItems = function()
+        return { size = function() return 0 end }
+    end,
+    setVariable = function() end,
+    setPrimaryHandItem = function() end,
+    setSecondaryHandItem = function() end,
+    resetEquippedHandsModels = function() end,
+}
+local bagRecord = {
+    equipment = { worn = { Back = "Base.Bag_Test" }, attached = {} },
+    inventory = {
+        worn = { ["base:back"] = "bag_1" },
+        items = { bag_1 = { id = "bag_1", type = "Base.Bag_Test" } },
+    },
+    runtime = {},
+}
+assertEqual(PNC.Equipment.Apply(bagZombie, bagRecord), true,
+    "container equipment apply")
+
 local calls = {
     appearance = 0,
     fullEquipment = 0,

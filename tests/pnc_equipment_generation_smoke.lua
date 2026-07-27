@@ -11,6 +11,15 @@ local function assertEqual(actual, expected, label)
     end
 end
 
+local function assertNear(actual, expected, tolerance, label)
+    if math.abs((tonumber(actual) or 0) - (tonumber(expected) or 0))
+        > (tonumber(tolerance) or 0.0001)
+    then
+        error((label or "assertNear") .. ": expected=" .. tostring(expected)
+            .. " actual=" .. tostring(actual))
+    end
+end
+
 local function deepCopy(value)
     local output
     local key
@@ -37,10 +46,38 @@ PNC = {
     Const = {
         INVENTORY_OPLOG_MAX = 32,
         GENERATOR_VERSION = 2,
+        INVENTORY_HARD_CAPACITY_MULTIPLIER = 3,
+        STAMINA_MELEE_COST = 20,
+        STAMINA_RANGED_COST = 10,
+        STAMINA_DOWNED_SHOVE_COST = 8,
+        STAMINA_ATTACK_MIN_RESERVE = 10,
+        STAMINA_RECOVERY_IDLE = 7,
+        STAMINA_RECOVERY_MOVING = 4.5,
+        STAMINA_RECOVERY_COMBAT = 3,
+        STAMINA_RECOVERY_DOWNED = 2.5,
+        STAMINA_VISIBLE_MS = 4000,
+        STAMINA_MOVE_DRAIN_WALK = 3,
+        STAMINA_MOVE_DRAIN_RUN = 10,
+        STAMINA_MOVE_DRAIN_SNEAK = 4,
+        STAMINA_MOVE_DRAIN_CRAWL = 2.2,
+        STAMINA_MOVE_DRAIN_RECOVERY_WALK = 1.4,
+        STAMINA_MOVE_DRAIN_RECOVERY_SNEAK = 1.8,
+        STAMINA_MOVE_EXHAUST_PAUSE = 0.25,
+        STAMINA_MOVE_EXHAUST_RESUME = 0.4,
+        STAMINA_MOVE_RECOVERY_PAUSE = 0.35,
+        STAMINA_MOVE_RECOVERY_RESUME = 0.5,
+        STAMINA_MOVE_CRAWL_PAUSE = 0.6,
+        STAMINA_MOVE_CRAWL_RESUME = 0.75,
+        STAMINA_SPRINT_BREATHER_MS = 900,
+        ENCUMBRANCE_SEVERE_RATIO = 1.75,
+        ENCUMBRANCE_DAMAGE_INTERVAL_MS = 5000,
+        ENCUMBRANCE_DAMAGE_AMOUNT = 1,
+        ENCUMBRANCE_DAMAGE_FLOOR_RATIO = 0.75,
     },
     Core = {
         DeepCopy = deepCopy,
         LogWarn = function() end,
+        Now = function() return 0 end,
     },
     Sandbox = {},
     Identity = {
@@ -77,9 +114,17 @@ PNC = {
     },
     Equipment = {
         CreateItem = function(fullType)
+            local isBag = fullType == "Base.Bag_Test"
             return {
-                IsWeapon = function() return true end,
-                getActualWeight = function() return 1 end,
+                IsWeapon = function() return not isBag end,
+                getActualWeight = function()
+                    return fullType == "Base.HeavyLoad" and 1
+                        or isBag and 2
+                        or 1
+                end,
+                getMaxCapacity = isBag and function() return 10 end or nil,
+                getWeightReduction = isBag and function() return 80 end or nil,
+                canBeEquipped = isBag and function() return "base:back" end or nil,
                 getBodyLocation = function()
                     return fullType == "Base.Tshirt_DefaultTEXTURE_TINT"
                         and "Torso1" or nil
@@ -272,12 +317,93 @@ assertEqual(PNC.InventoryActions.Execute(
 ), true, "modular unequip action")
 assertEqual(interactionInventory.equipped.primary, nil, "primary cleared")
 
+local favorited, favoriteReason = PNC.InventoryActions.Execute(
+    "favorite", nil, interactionRecord, addedItem.id, {}
+)
+assertEqual(favorited, true, "modular favorite action")
+assertEqual(favoriteReason, "favorited", "modular favorite reason")
+assertEqual(addedItem.fav, true, "favorite state applied")
 local payload = PNC.Inventory.BuildFullPayload(interactionRecord)
 assertEqual(payload.items[addedItem.id].itemState.customName, "Travel Shirt",
     "portable state replicated")
+assertEqual(payload.items[addedItem.id].fav, true, "favorite state replicated")
+assertEqual(PNC.InventoryActions.Execute(
+    "unfavorite", nil, interactionRecord, addedItem.id, {}
+), true, "modular unfavorite action")
+assertEqual(addedItem.fav, false, "favorite state cleared")
 assertEqual(PNC.Inventory.RemoveItems(
     interactionRecord, { addedItem.id }, "smoke_remove"
 ), true, "public inventory remove")
 assertEqual(interactionInventory.items[addedItem.id], nil, "item removed")
+
+local bagAdded, _, bagIDs = PNC.Inventory.AddItems(interactionRecord, {
+    { type = "Base.Bag_Test", stack = 1 },
+}, "root", "smoke_bag_add")
+assertEqual(bagAdded, true, "wearable container add")
+local bagItem = interactionInventory.items[bagIDs[1]]
+assertEqual(bagItem.wearableSlot, "base:back", "container equipment slot")
+assertEqual(bagItem.weightReduction, 0.8, "container weight reduction")
+assertEqual(bagItem.maxWeight, 10, "container capacity")
+
+assertEqual(PNC.Inventory.AddItems(interactionRecord, {
+    { type = "Base.Bandage", stack = 5 },
+}, bagItem.bagContainer, "smoke_bag_contents"), true, "bag contents add")
+local weightBeforeBagEquip = interactionInventory.cachedWeight
+assertEqual(PNC.InventoryActions.Execute(
+    "equip_container", nil, interactionRecord, bagItem.id, {}
+), true, "modular bag equip action")
+assertEqual(bagItem.wornSlot, "base:back", "bag worn slot")
+assertEqual(interactionInventory.worn["base:back"], bagItem.id, "bag worn reference")
+local reducedContentsWeight =
+    PNC.Inventory.Internal.getItemWeight("Base.Bandage") * 5 * 0.8
+assertNear(interactionInventory.cachedWeight,
+    weightBeforeBagEquip - reducedContentsWeight, 0.0001,
+    "equipped bag reduces contents weight")
+local bagPayload = PNC.Inventory.BuildFullPayload(interactionRecord)
+assertEqual(bagPayload.items[bagItem.id].weightReduction, 0.8,
+    "bag reduction replicated")
+assertEqual(bagPayload.items[bagItem.id].wearableSlot, "base:back",
+    "bag equipment slot replicated")
+
+local baseCarry = interactionInventory.maxWeight
+local heavyUnitWeight = PNC.Inventory.Internal.getItemWeight("Base.HeavyLoad")
+local severeStack = math.ceil(
+    ((baseCarry * 1.8) - interactionInventory.cachedWeight) / heavyUnitWeight
+)
+assertEqual(PNC.Inventory.AddItems(interactionRecord, {
+    { type = "Base.HeavyLoad", stack = severeStack },
+}, "root", "smoke_severe_load"), true, "severe load accepted below hard cap")
+local encumbrance = PNC.Inventory.GetEncumbranceState(interactionRecord)
+assertEqual(encumbrance.level, "severe", "severe encumbrance threshold")
+
+local strainDamageCalls = 0
+PNC.Health = {
+    ApplyStrainDamage = function(_, _, amount, floorRatio, reason)
+        strainDamageCalls = strainDamageCalls + 1
+        assertEqual(amount, 1, "strain damage amount")
+        assertEqual(floorRatio, 0.75, "strain damage floor")
+        assertEqual(reason, "severe_encumbrance", "strain damage reason")
+        return true
+    end,
+}
+PNC.Registry = { MarkDirty = function() end }
+PNC.Skills = {
+    GetAverage = function() return 2 end,
+    GetLevel = function() return 2 end,
+}
+dofile(ROOT .. "Stamina/PNC_Stamina.lua")
+local staminaSnapshot = PNC.Stamina.BuildSnapshot(interactionRecord)
+assert(staminaSnapshot.max < staminaSnapshot.baseMax,
+    "encumbrance lowers maximum stamina")
+assertEqual(staminaSnapshot.encumbranceLevel, "severe",
+    "stamina snapshot carries encumbrance")
+PNC.Stamina.Update(interactionRecord, nil, 10000)
+PNC.Stamina.Update(interactionRecord, nil, 16000)
+assertEqual(strainDamageCalls, 1, "severe load periodic strain damage")
+
+assertEqual(PNC.InventoryActions.Execute(
+    "unequip_container", nil, interactionRecord, bagItem.id, {}
+), true, "modular bag unequip action")
+assertEqual(bagItem.wornSlot, nil, "bag worn slot cleared")
 
 print("pnc_equipment_generation_smoke: ok")

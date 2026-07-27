@@ -216,6 +216,14 @@ local function applyWornItems(zombie, equipment, record)
         if item then
             applyInventoryState(item, record, entry.bodyLocation)
             typedBodyLocation = item.getBodyLocation and item:getBodyLocation() or nil
+            if (not typedBodyLocation or tostring(typedBodyLocation) == "")
+                and item.canBeEquipped
+            then
+                typedBodyLocation = item:canBeEquipped()
+            end
+            if not typedBodyLocation or tostring(typedBodyLocation) == "" then
+                typedBodyLocation = entry.bodyLocation
+            end
             if typedBodyLocation then
                 wornOk, wornReason = safeInvoke(zombie, "setWornItem", typedBodyLocation, item)
             else

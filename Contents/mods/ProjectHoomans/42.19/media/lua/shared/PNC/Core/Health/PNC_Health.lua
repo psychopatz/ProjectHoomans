@@ -436,6 +436,40 @@ function Health.ApplyDamage(record, zombie, damageEvent)
     return true
 end
 
+function Health.ApplyStrainDamage(record, zombie, amount, floorRatio, reason)
+    local health
+    local floorHealth
+    local applied
+    if not record then return false end
+    health = Health.Ensure(record)
+    if Core and Core.IsAuthority and not Core.IsAuthority() then
+        return false
+    end
+    if not record or record.alive == false or not health
+        or health.state == "incapacitated"
+    then
+        return false
+    end
+    amount = math.max(0, tonumber(amount) or 0)
+    floorRatio = Core.Clamp(tonumber(floorRatio) or 0.75, 0, 1)
+    floorHealth = (tonumber(health.max) or 100) * floorRatio
+    applied = math.min(amount,
+        math.max(0, (tonumber(health.current) or 0) - floorHealth))
+    if applied <= 0 then return false end
+
+    if PNC.NPCWounds and PNC.NPCWounds.ApplyBodyDamage then
+        PNC.NPCWounds.ApplyBodyDamage(record, applied)
+    else
+        health.current = math.max(floorHealth,
+            (tonumber(health.current) or 0) - applied)
+    end
+    health.lastStrainReason = tostring(reason or "strain")
+    if Registry and Registry.MarkDirty then
+        Registry.MarkDirty(record, "health")
+    end
+    return true
+end
+
 function Health.Update(record, zombie, now)
     local health = Health.Ensure(record)
     if record.alive == false then

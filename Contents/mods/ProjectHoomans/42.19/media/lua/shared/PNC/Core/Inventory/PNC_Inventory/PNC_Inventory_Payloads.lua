@@ -26,11 +26,14 @@ function Inventory.BuildSummaryPayload(record)
     if not inv then
         return nil
     end
+    local encumbrance = Inventory.GetEncumbranceState(record)
     return {
         revision = inv.revision,
         usedWeight = tonumber(inv.cachedWeight) or 0,
         maxWeight = tonumber(inv.maxWeight) or 0,
         remainingWeight = tonumber(inv.remainingWeight) or 0,
+        encumbranceRatio = encumbrance and encumbrance.ratio or 0,
+        encumbranceLevel = encumbrance and encumbrance.level or "normal",
         itemCount = tonumber(inv.itemCount) or Internal.countMapEntries(inv.items),
         containerCount = tonumber(inv.containerCount) or Internal.countMapEntries(inv.containers),
         signature = inv.signature,

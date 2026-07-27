@@ -339,6 +339,7 @@ local function applyInventoryDelta(args)
             if op.uses ~= nil then item.uses = op.uses end
             if op.cond ~= nil then item.cond = op.cond end
             if op.ammoCount ~= nil then item.ammoCount = op.ammoCount end
+            if op.fav ~= nil then item.fav = op.fav == true end
         elseif op.op == "equip" and op.slot then
             inventory.equipped = inventory.equipped or {}
             if op.oldSlot and inventory.equipped[op.oldSlot] == op.itemID then

@@ -106,12 +106,15 @@ function Internal.buildTemplateSnapshot(record)
     end
 
     if template.bagType then
+        local bagProfile = Internal.getContainerProfile(template.bagType)
         bagItem = Internal.createItem(record, base, {
             type = template.bagType,
             container = "root",
-            equipSlot = "bag",
+            wornSlot = bagProfile.wearableSlot,
+            wearableSlot = bagProfile.wearableSlot,
+            weightReduction = bagProfile.weightReduction,
             templateKey = "tmpl:bag:0",
-            maxWeight = Internal.getItemCapacity(template.bagType),
+            maxWeight = bagProfile.capacity,
         })
         if bagItem then
             bagContainerID = bagItem.bagContainer

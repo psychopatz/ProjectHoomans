@@ -124,18 +124,20 @@ function ISPNCInventoryWindow:onResponsiveLayout()
     self.statusY = buttonY + 27
 end
 
-local function rowIDs(list)
+function InventoryWindow.CollectBulkTransferIDs(list)
     local ids = {}
     for _, entry in ipairs(list and list.items or {}) do
         local row = entry and entry.item or nil
-        if row and row.id then ids[#ids + 1] = row.id end
+        if row and row.id and row.favorite ~= true and row.equipped ~= true then
+            ids[#ids + 1] = row.id
+        end
     end
     return ids
 end
 
 function ISPNCInventoryWindow:onGiveAll()
     local inventory = self:inventory()
-    local ids = rowIDs(self.playerList)
+    local ids = InventoryWindow.CollectBulkTransferIDs(self.playerList)
     if not inventory or #ids < 1 then return false end
     return PNC.Client.SendInventoryTransfer({
         id = self.npcId,
@@ -143,12 +145,13 @@ function ISPNCInventoryWindow:onGiveAll()
         itemIDs = ids,
         npcContainer = self.selectedNPCContainer,
         inventoryRevision = inventory.revision,
+        bulk = true,
     })
 end
 
 function ISPNCInventoryWindow:onTakeAll()
     local inventory = self:inventory()
-    local ids = rowIDs(self.npcList)
+    local ids = InventoryWindow.CollectBulkTransferIDs(self.npcList)
     if not inventory or #ids < 1 then return false end
     return PNC.Client.SendInventoryTransfer({
         id = self.npcId,
@@ -156,6 +159,7 @@ function ISPNCInventoryWindow:onTakeAll()
         itemIDs = ids,
         playerContainer = self.selectedPlayerContainer,
         inventoryRevision = inventory.revision,
+        bulk = true,
     })
 end
 
@@ -230,6 +234,16 @@ function ISPNCInventoryWindow:refreshInventory(force)
         )
     )
     resetList(self.npcList, Model.BuildNPCRows(inventory, self.selectedNPCContainer))
+    if self.giveAllButton and self.giveAllButton.setEnable then
+        self.giveAllButton:setEnable(
+            #InventoryWindow.CollectBulkTransferIDs(self.playerList) > 0
+        )
+    end
+    if self.takeAllButton and self.takeAllButton.setEnable then
+        self.takeAllButton:setEnable(
+            #InventoryWindow.CollectBulkTransferIDs(self.npcList) > 0
+        )
+    end
     resetContainerList(
         self.playerContainerList,
         self.playerContainers,
@@ -365,13 +379,16 @@ function ISPNCInventoryWindow:showItemContext(role, row)
     local compact = inventory and inventory.items and inventory.items[row.id] or nil
     for _, definition in ipairs(Actions.List()) do
         if Actions.IsAvailable(definition, nil, compact) then
-            context:addOption(
+            local option = context:addOption(
                 tr(definition.labelKey, definition.label),
                 self,
                 function(target)
                     target:sendItemAction(definition.id, row.id)
                 end
             )
+            if option and definition.iconTexture and getTexture then
+                option.iconTexture = getTexture(definition.iconTexture)
+            end
         end
     end
     context:addOption(

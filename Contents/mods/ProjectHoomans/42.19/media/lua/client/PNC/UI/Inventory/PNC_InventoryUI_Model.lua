@@ -59,6 +59,7 @@ local function playerItemRow(item, containerKey)
         container = containerKey,
         stack = 1,
         equipped = safeCall(item, "isEquipped", false) == true,
+        favorite = safeCall(item, "isFavorite", false) == true,
     }
 end
 
@@ -170,6 +171,7 @@ function Model.BuildNPCRows(inventory, containerID)
                 equipped = item.equipSlot ~= nil
                     or item.wornSlot ~= nil
                     or item.attachedSlot ~= nil,
+                favorite = item.fav == true,
             }
         end
     end
@@ -212,6 +214,10 @@ function Model.GetNPCContainerWeight(inventory, containerID)
         and inventory.containers[containerID or "root"]
         or nil
     if not container then return 0, 0 end
+    if (containerID or "root") == "root" and inventory.summary then
+        return tonumber(inventory.summary.usedWeight) or 0,
+            tonumber(inventory.summary.maxWeight) or tonumber(container.maxWeight) or 0
+    end
     local usedWeight = 0
     for _, itemID in ipairs(container.items or {}) do
         local item = inventory.items and inventory.items[itemID] or nil

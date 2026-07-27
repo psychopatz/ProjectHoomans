@@ -22,6 +22,9 @@ local function ensureState(record)
     local endurance
     local strength
     local resolvedMax
+    local effectiveMax
+    local encumbrance
+    local previousBaseMax
     local current
     if type(record) ~= "table" then
         return nil
@@ -30,21 +33,71 @@ local function ensureState(record)
     endurance = Skills.GetLevel(record, "Fitness")
     strength = Skills.GetLevel(record, "Strength")
     resolvedMax = math.floor(100 + ((averageCombat + endurance + strength) * 2.5))
+    encumbrance = PNC.Inventory
+        and PNC.Inventory.GetEncumbranceState
+        and PNC.Inventory.GetEncumbranceState(record)
+        or nil
+    effectiveMax = math.max(1, math.floor(resolvedMax
+        * (tonumber(encumbrance and encumbrance.staminaMultiplier) or 1)))
     if type(record.stamina) ~= "table" then
         record.stamina = {}
     end
+    previousBaseMax = tonumber(record.stamina.baseMax)
     current = tonumber(record.stamina.current)
     if current == nil then
-        current = resolvedMax
-    elseif tonumber(record.stamina.max) and tonumber(record.stamina.max) > 0 and tonumber(record.stamina.max) ~= resolvedMax then
-        current = (current / tonumber(record.stamina.max)) * resolvedMax
+        current = effectiveMax
+    elseif previousBaseMax and previousBaseMax > 0 and previousBaseMax ~= resolvedMax then
+        current = current * (resolvedMax / previousBaseMax)
     end
-    record.stamina.max = resolvedMax
-    record.stamina.current = clamp(current, 0, resolvedMax)
+    record.stamina.baseMax = resolvedMax
+    record.stamina.max = effectiveMax
+    record.stamina.current = clamp(current, 0, effectiveMax)
+    record.stamina.encumbranceLevel = encumbrance and encumbrance.level or "normal"
+    record.stamina.encumbranceRatio = encumbrance and encumbrance.ratio or 0
+    record.stamina.encumbranceDrainMultiplier =
+        encumbrance and encumbrance.drainMultiplier or 1
+    record.stamina.encumbranceRecoveryMultiplier =
+        encumbrance and encumbrance.recoveryMultiplier or 1
     record.stamina.state = record.stamina.state or "fresh"
     record.stamina.visibleUntil = tonumber(record.stamina.visibleUntil) or 0
     record.stamina.lastUpdatedAt = tonumber(record.stamina.lastUpdatedAt) or Core.Now()
     return record.stamina
+end
+
+local function applySevereEncumbranceDamage(record, zombie, now)
+    local stamina = record and record.stamina or nil
+    local runtime
+    local lastDamageAt
+    local interval
+    if not stamina
+        or (tonumber(stamina.encumbranceRatio) or 0)
+            < (tonumber(Const.ENCUMBRANCE_SEVERE_RATIO) or 1.75)
+    then
+        if record and record.runtime then
+            record.runtime.lastEncumbranceDamageAt = nil
+        end
+        return false
+    end
+    record.runtime = record.runtime or {}
+    runtime = record.runtime
+    lastDamageAt = tonumber(runtime.lastEncumbranceDamageAt)
+    interval = tonumber(Const.ENCUMBRANCE_DAMAGE_INTERVAL_MS) or 5000
+    if not lastDamageAt then
+        runtime.lastEncumbranceDamageAt = now
+        return false
+    end
+    if now - lastDamageAt < interval then return false end
+    runtime.lastEncumbranceDamageAt = now
+    if PNC.Health and PNC.Health.ApplyStrainDamage then
+        return PNC.Health.ApplyStrainDamage(
+            record,
+            zombie,
+            tonumber(Const.ENCUMBRANCE_DAMAGE_AMOUNT) or 1,
+            tonumber(Const.ENCUMBRANCE_DAMAGE_FLOOR_RATIO) or 0.75,
+            "severe_encumbrance"
+        )
+    end
+    return false
 end
 
 local function updateState(record)
@@ -135,6 +188,8 @@ function Stamina.Update(record, zombie, now)
         return
     end
 
+    applySevereEncumbranceDamage(record, zombie, now)
+
     if Stamina.ApplyMovementDrain then
         moveDrain = Stamina.ApplyMovementDrain(record, elapsed)
     else
@@ -159,6 +214,8 @@ function Stamina.Update(record, zombie, now)
     elseif runtime and runtime.staminaRecoveryMode == "move_recovery" then
         recoverRate = math.max(recoverRate, Const.STAMINA_RECOVERY_IDLE)
     end
+    recoverRate = recoverRate
+        * (tonumber(stamina.encumbranceRecoveryMultiplier) or 1)
 
     local previous = tonumber(stamina.current) or 0
     stamina.current = clamp(previous + (recoverRate * elapsed), 0, tonumber(stamina.max) or 100)
@@ -173,7 +230,10 @@ function Stamina.BuildSnapshot(record)
     return {
         current = stamina and stamina.current or 0,
         max = stamina and stamina.max or 100,
+        baseMax = stamina and stamina.baseMax or 100,
         state = stamina and stamina.state or "fresh",
+        encumbranceLevel = stamina and stamina.encumbranceLevel or "normal",
+        encumbranceRatio = stamina and stamina.encumbranceRatio or 0,
         visibleUntil = stamina and stamina.visibleUntil or 0,
     }
 end

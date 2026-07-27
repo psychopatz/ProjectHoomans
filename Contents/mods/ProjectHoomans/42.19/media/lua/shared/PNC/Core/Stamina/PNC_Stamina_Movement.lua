@@ -180,6 +180,8 @@ function Stamina.ApplyMovementDrain(record, elapsedSeconds)
     else
         runtime.staminaRecoveryMode = staminaMode
     end
+    drainPerSecond = drainPerSecond
+        * (tonumber(stamina.encumbranceDrainMultiplier) or 1)
 
     drain = math.max(0, drainPerSecond * math.max(0, tonumber(elapsedSeconds) or 0))
     stamina.current = clamp((tonumber(stamina.current) or 0) - drain, 0, tonumber(stamina.max) or 100)

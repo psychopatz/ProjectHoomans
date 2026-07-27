@@ -16,6 +16,7 @@ function Inventory.SyncEquipmentFromInventory(record)
     if not record then return nil end
     inv = record.inventory
     if not inv then return nil end
+    Internal.normalizeLegacyBagSlot(inv)
     record.equipment = PNC.Equipment
         and PNC.Equipment.NormalizeLoadoutSpec
         and PNC.Equipment.NormalizeLoadoutSpec(record.equipment)
@@ -44,15 +45,19 @@ function Inventory.SyncFromEquipment(record, reason)
     local hadInventory
     local preserved = {}
     local previousInv
+    local promotedBackItem
     local function assignItem(slotType, slotValue, fullType)
         local item
         if not fullType then return end
         if slotType == "equip" and slotValue == "bag" then
+            local profile = Internal.getContainerProfile(fullType)
             item = Internal.createItem(record, inv, {
                 type = fullType,
                 container = "root",
-                equipSlot = "bag",
-                maxWeight = Internal.getItemCapacity(fullType),
+                wornSlot = profile.wearableSlot,
+                wearableSlot = profile.wearableSlot,
+                weightReduction = profile.weightReduction,
+                maxWeight = profile.capacity,
             })
             return item and item.id or nil
         end
@@ -87,10 +92,9 @@ function Inventory.SyncFromEquipment(record, reason)
         or record.equipment
     if equipment.attached
         and equipment.attached.Back
-        and not equipment.primaryFullType
         and Internal.getItemCapacity(equipment.attached.Back) > 0
     then
-        assignItem("equip", "bag", equipment.attached.Back)
+        promotedBackItem = assignItem("equip", "bag", equipment.attached.Back)
     end
     if equipment.primaryFullType then assignItem("equip", "primary", equipment.primaryFullType) end
     if equipment.secondaryFullType then assignItem("equip", "secondary", equipment.secondaryFullType) end
@@ -98,14 +102,24 @@ function Inventory.SyncFromEquipment(record, reason)
         assignItem("worn", key, equipment.worn[key])
     end
     for key, _ in pairs(equipment.attached or {}) do
-        assignItem("attached", key, equipment.attached[key])
+        if not (key == "Back" and promotedBackItem) then
+            assignItem("attached", key, equipment.attached[key])
+        end
     end
     for key = 1, #preserved do
         local item = preserved[key]
         if item then
             if item.container ~= "root" and not inv.containers[item.container] then
-                if item.preferredContainer == "bag" and inv.equipped.bag and inv.items[inv.equipped.bag] then
-                    item.container = inv.items[inv.equipped.bag].bagContainer or "root"
+                local equippedBag
+                for wornSlot, wornID in pairs(inv.worn or {}) do
+                    local wornItem = inv.items[wornID]
+                    if wornItem and wornItem.bagContainer then
+                        equippedBag = wornItem
+                        break
+                    end
+                end
+                if item.preferredContainer == "bag" and equippedBag then
+                    item.container = equippedBag.bagContainer or "root"
                 else
                     item.container = "root"
                 end

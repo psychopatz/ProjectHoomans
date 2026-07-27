@@ -67,12 +67,16 @@ local function applyUpdateOperation(inv, op)
     if op.ammoCount ~= nil then
         item.ammoCount = math.max(0, math.floor(tonumber(op.ammoCount) or item.ammoCount or 0))
     end
+    if op.fav ~= nil then
+        item.fav = op.fav == true
+    end
     return Internal.buildOperation("update", {
         itemID = item.id,
         stack = item.stack,
         uses = item.uses,
         cond = item.cond,
         ammoCount = item.ammoCount,
+        fav = item.fav == true,
     })
 end
 
@@ -129,27 +133,55 @@ local function addedWeight(spec)
         * math.max(1, math.floor(tonumber(spec.stack) or tonumber(spec.uses) or 1))
 end
 
-function Inventory.CanAccept(record, specs)
+function Inventory.CanAccept(record, specs, containerID)
     local inv = Inventory.EnsureRecordInventory(record)
     local weightState = Inventory.GetWeightState(record)
     local incomingWeight = 0
-    local incomingCapacity = 0
+    local destination
+    local destinationWeight
+    local destinationMax
+    local owner
+    local destinationReduction = 0
+    local hardMultiplier = tonumber(PNC.Const and PNC.Const.INVENTORY_HARD_CAPACITY_MULTIPLIER) or 3
+    local hardCapacity = tonumber(PNC.Const and PNC.Const.INVENTORY_HARD_CAPACITY)
     local weight
     local index
     if not inv or type(specs) ~= "table" or #specs < 1 then
         return false, "items_missing"
     end
+    containerID = Internal.normalizeString(containerID) or "root"
+    destination = inv.containers[containerID]
+    if not destination then return false, "container_not_found" end
     for index = 1, #specs do
         weight = addedWeight(specs[index])
         if not weight then
             return false, "invalid_item_spec"
         end
         incomingWeight = incomingWeight + weight
-        incomingCapacity = incomingCapacity
-            + math.max(0, tonumber(specs[index].maxWeight) or 0)
     end
-    if (tonumber(weightState.usedWeight) or 0) + incomingWeight
-        > (tonumber(weightState.maxWeight) or 0) + incomingCapacity
+
+    if containerID ~= "root" then
+        destinationWeight = Internal.getContainerRawWeight(inv, containerID) or 0
+        destinationMax = math.max(0, tonumber(destination.maxWeight) or 0)
+        if destinationMax <= 0 or destinationWeight + incomingWeight > destinationMax then
+            return false, "container_full"
+        end
+        for _, candidate in pairs(inv.items or {}) do
+            if candidate.bagContainer == containerID then
+                owner = candidate
+                break
+            end
+        end
+        if owner and owner.wornSlot and inv.worn[owner.wornSlot] == owner.id then
+            destinationReduction = math.max(0,
+                math.min(1, tonumber(owner.weightReduction) or 0))
+        end
+    end
+
+    if (tonumber(weightState.usedWeight) or 0)
+        + (incomingWeight * (1 - destinationReduction))
+        > (hardCapacity
+            or ((tonumber(weightState.maxWeight) or 0) * hardMultiplier))
     then
         return false, "no_capacity"
     end
@@ -157,14 +189,14 @@ function Inventory.CanAccept(record, specs)
 end
 
 function Inventory.AddItems(record, specs, containerID, reason)
-    local canAccept, acceptReason = Inventory.CanAccept(record, specs)
+    containerID = Internal.normalizeString(containerID) or "root"
+    local canAccept, acceptReason = Inventory.CanAccept(record, specs, containerID)
     local ops = {}
     local index
     local spec
     if not canAccept then
         return false, acceptReason, {}
     end
-    containerID = Internal.normalizeString(containerID) or "root"
     local inv = Inventory.EnsureRecordInventory(record)
     if not inv.containers[containerID] then
         return false, "container_not_found", {}
@@ -213,6 +245,26 @@ function Inventory.RemoveItems(record, itemIDs, reason)
         return false, "remove_failed"
     end
     return true, "removed"
+end
+
+function Inventory.SetFavorite(record, itemID, favorite, reason)
+    local inv = Inventory.EnsureRecordInventory(record)
+    local item
+    local applied
+    itemID = Internal.normalizeString(itemID)
+    item = itemID and inv and inv.items and inv.items[itemID] or nil
+    if not item then return false, "item_not_found" end
+    favorite = favorite == true
+    if item.fav == favorite then return true, "unchanged" end
+    applied = Inventory.ApplyDelta(record, {
+        {
+            op = "update",
+            itemID = item.id,
+            fav = favorite,
+        },
+    }, reason or (favorite and "inventory_favorite" or "inventory_unfavorite"))
+    if not applied then return false, "favorite_failed" end
+    return true, favorite and "favorited" or "unfavorited"
 end
 
 function Inventory.SetEquipped(record, slot, itemID, reason)
@@ -266,6 +318,7 @@ function Inventory.SetWorn(record, itemID, wornSlot, reason)
     local previous
     local oldSlot
     local op
+    local ops = {}
     if not inv then return false, "inventory_unavailable" end
     itemID = Internal.normalizeString(itemID)
     wornSlot = Internal.normalizeString(wornSlot)
@@ -274,6 +327,13 @@ function Inventory.SetWorn(record, itemID, wornSlot, reason)
     if itemID and not wornSlot then return false, "worn_slot_missing" end
 
     if item then
+        if item.container ~= "root" then
+            Internal.setItemContainer(inv, item, "root")
+            ops[#ops + 1] = Internal.buildOperation("move", {
+                itemID = item.id,
+                to = "root",
+            })
+        end
         oldSlot = item.wornSlot
         if oldSlot and inv.worn[oldSlot] == itemID then
             inv.worn[oldSlot] = nil
@@ -296,7 +356,8 @@ function Inventory.SetWorn(record, itemID, wornSlot, reason)
         previousItemID = previousItemID,
         oldSlot = oldSlot,
     })
-    Internal.bumpRevision(record, { op }, reason or "inventory_wear")
+    ops[#ops + 1] = op
+    Internal.bumpRevision(record, ops, reason or "inventory_wear")
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)
     if PNC.Registry and PNC.Registry.MarkDirty then

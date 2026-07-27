@@ -63,6 +63,7 @@ function Internal.applySavedDelta(record, inv, delta)
                 if changed.ammoCount ~= nil then
                     item.ammoCount = math.max(0, math.floor(tonumber(changed.ammoCount) or 0))
                 end
+                if changed.fav ~= nil then item.fav = changed.fav == true end
                 if changed.container ~= nil then
                     Internal.setItemContainer(inv, item,
                         Internal.resolveSavedContainer(inv, changed.container))
@@ -113,6 +114,7 @@ function Internal.buildCompactDelta(record, inv)
                     or (tonumber(item.uses) or 0) ~= (tonumber(templateItem.uses) or 0)
                     or (tonumber(item.cond) or 0) ~= (tonumber(templateItem.cond) or 0)
                     or item.ammoCount ~= templateItem.ammoCount
+                    or (item.fav == true) ~= (templateItem.fav == true)
                     or item.wornSlot ~= templateItem.wornSlot
                     or item.attachedSlot ~= templateItem.attachedSlot
                     or item.equipSlot ~= templateItem.equipSlot
@@ -122,6 +124,7 @@ function Internal.buildCompactDelta(record, inv)
                         uses = item.uses,
                         cond = item.cond,
                         ammoCount = item.ammoCount,
+                        fav = item.fav == true,
                         container = item.container,
                         wornSlot = item.wornSlot,
                         attachedSlot = item.attachedSlot,

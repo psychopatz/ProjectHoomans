@@ -69,23 +69,113 @@ function Actions.Execute(actionID, player, record, itemID, context)
 end
 
 local function resolveWornSlot(item)
+    local stored = item and item.wearableSlot
+    if stored and tostring(stored) ~= "" then return tostring(stored) end
+    local profile = Inventory and Inventory.GetContainerProfile
+        and Inventory.GetContainerProfile(item and item.type)
+        or nil
+    if profile and profile.wearableSlot then
+        return tostring(profile.wearableSlot)
+    end
     local probe = PNC.Equipment and PNC.Equipment.CreateItem
         and PNC.Equipment.CreateItem(item and item.type)
         or nil
     if type(probe) == "table" and not probe.getBodyLocation and probe[1] then
         probe = probe[1]
     end
-    local slot = probe and probe.getBodyLocation and probe:getBodyLocation() or nil
+    local slot = probe and probe.canBeEquipped and probe:canBeEquipped() or nil
+    if not slot or tostring(slot) == "" then
+        slot = probe and probe.getBodyLocation and probe:getBodyLocation() or nil
+    end
     slot = slot and tostring(slot) or nil
     return slot ~= "" and slot or nil
 end
+
+local function isWearableContainer(item)
+    return item and item.bagContainer ~= nil and resolveWornSlot(item) ~= nil
+end
+
+Actions.Register({
+    id = "favorite",
+    labelKey = "UI_PNC_Inventory_Favorite",
+    label = "Favorite",
+    iconTexture = "media/ui/FavoriteStarChecked.png",
+    refreshEquipment = false,
+    isAvailable = function(_, item)
+        return item.fav ~= true
+    end,
+    execute = function(_, record, item)
+        return Inventory.SetFavorite(
+            record,
+            item.id,
+            true,
+            "inventory_action_favorite"
+        )
+    end,
+})
+
+Actions.Register({
+    id = "unfavorite",
+    labelKey = "UI_PNC_Inventory_Unfavorite",
+    label = "Unfavorite",
+    iconTexture = "media/ui/FavoriteStarUnchecked.png",
+    refreshEquipment = false,
+    isAvailable = function(_, item)
+        return item.fav == true
+    end,
+    execute = function(_, record, item)
+        return Inventory.SetFavorite(
+            record,
+            item.id,
+            false,
+            "inventory_action_unfavorite"
+        )
+    end,
+})
+
+Actions.Register({
+    id = "equip_container",
+    labelKey = "UI_PNC_Inventory_EquipContainer",
+    label = "Equip Bag",
+    isAvailable = function(_, item)
+        return item.wornSlot == nil and isWearableContainer(item)
+    end,
+    execute = function(_, record, item)
+        local slot = resolveWornSlot(item)
+        if not slot then return false, "not_equippable_container" end
+        return Inventory.SetWorn(
+            record,
+            item.id,
+            slot,
+            "inventory_action_equip_container"
+        )
+    end,
+})
+
+Actions.Register({
+    id = "unequip_container",
+    labelKey = "UI_PNC_Inventory_UnequipContainer",
+    label = "Unequip Bag",
+    isAvailable = function(_, item)
+        return item.wornSlot ~= nil and item.bagContainer ~= nil
+    end,
+    execute = function(_, record, item)
+        return Inventory.ClearWorn(
+            record,
+            item.id,
+            "inventory_action_unequip_container"
+        )
+    end,
+})
 
 Actions.Register({
     id = "equip_primary",
     labelKey = "UI_PNC_Inventory_Equip",
     label = "Equip Primary",
     isAvailable = function(_, item)
-        return item.equipSlot ~= "primary" and item.wornSlot == nil
+        return item.equipSlot ~= "primary"
+            and item.wornSlot == nil
+            and item.bagContainer == nil
     end,
     execute = function(_, record, item)
         return Inventory.SetEquipped(record, "primary", item.id, "inventory_action_equip")
@@ -114,7 +204,9 @@ Actions.Register({
     labelKey = "UI_PNC_Inventory_Wear",
     label = "Wear",
     isAvailable = function(_, item)
-        return item.wornSlot == nil and resolveWornSlot(item) ~= nil
+        return item.wornSlot == nil
+            and item.bagContainer == nil
+            and resolveWornSlot(item) ~= nil
     end,
     execute = function(_, record, item)
         local slot = resolveWornSlot(item)
@@ -136,7 +228,7 @@ Actions.Register({
     labelKey = "UI_PNC_Inventory_Remove",
     label = "Remove",
     isAvailable = function(_, item)
-        return item.wornSlot ~= nil
+        return item.wornSlot ~= nil and item.bagContainer == nil
     end,
     execute = function(_, record, item)
         return Inventory.ClearWorn(record, item.id, "inventory_action_remove_worn")

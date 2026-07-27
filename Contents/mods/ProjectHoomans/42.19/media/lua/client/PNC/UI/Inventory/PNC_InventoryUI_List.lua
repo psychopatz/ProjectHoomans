@@ -20,8 +20,11 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     if row.texture then
         self:drawTextureScaledAspect(row.texture, 5, y + 3, 26, 26, 1, 1, 1, 1)
     end
-    if row.equipped then
-        self:drawRect(30, y + self.itemheight - 8, 5, 5, 1, 0.95, 0.35, 0.10)
+    if row.favorite and self.favoriteStar then
+        self:drawTexture(self.favoriteStar, 5, y + 19, 1, 1, 1, 1)
+    end
+    if row.equipped and self.equippedItemIcon then
+        self:drawTexture(self.equippedItemIcon, 21, y + 19, 1, 1, 1, 1)
     end
     local countText = row.stack and row.stack > 1 and (" x" .. tostring(row.stack)) or ""
     self:drawText(tostring(row.name) .. countText, 39, y + 7, 0.86, 0.86, 0.86, 1, UIFont.Small)
@@ -89,6 +92,8 @@ function ISPNCInventoryList:new(x, y, width, height, ownerWindow, role)
     o.drawBorder = true
     o.backgroundColor = { r = 0, g = 0, b = 0, a = 0.62 }
     o.borderColor = { r = 0.45, g = 0.45, b = 0.45, a = 0.9 }
+    o.equippedItemIcon = getTexture and getTexture("media/ui/icon.png") or nil
+    o.favoriteStar = getTexture and getTexture("media/ui/FavoriteStar.png") or nil
     return o
 end
 

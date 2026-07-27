@@ -77,6 +77,28 @@ local function isNonEmptyContainer(item)
     return items and items.size and items:size() > 0 or false
 end
 
+local function nativeFlag(item, methodName)
+    local method = item and item[methodName] or nil
+    local ok
+    local value
+    if not method then return false end
+    ok, value = pcall(method, item)
+    return ok and value == true
+end
+
+local function isNativeBulkProtected(item)
+    return nativeFlag(item, "isFavorite") or nativeFlag(item, "isEquipped")
+end
+
+local function isCompactBulkProtected(item)
+    return item and (
+        item.fav == true
+        or item.equipSlot ~= nil
+        or item.wornSlot ~= nil
+        or item.attachedSlot ~= nil
+    ) or false
+end
+
 local function compactSpec(item)
     local description, reason = ItemTransfer.DescribeItem(item)
     if not description then return nil, reason end
@@ -85,6 +107,14 @@ local function compactSpec(item)
         or item.getInventory and item:getInventory()
         or nil
     local state = description.state or {}
+    local reduction = item.getWeightReduction
+        and tonumber(item:getWeightReduction())
+        or nil
+    if reduction and reduction > 1 then reduction = reduction / 100 end
+    local wearableSlot = item.canBeEquipped
+        and tostring(item:canBeEquipped() or "")
+        or nil
+    if wearableSlot == "" then wearableSlot = nil end
     return {
         type = description.fullType,
         stack = 1,
@@ -94,6 +124,8 @@ local function compactSpec(item)
         fav = state.favorite == true,
         customName = state.customName,
         maxWeight = nested and nested.getCapacity and tonumber(nested:getCapacity()) or nil,
+        weightReduction = reduction,
+        wearableSlot = wearableSlot,
         itemState = state,
     }
 end
@@ -117,6 +149,21 @@ local function transferPlayerToNPC(player, record, args, sinceRevision)
     if #itemIDs < 1 or #itemIDs > maxItems then return false, "invalid_item_count" end
     local resolved, reason = ItemTransfer.ResolvePlayerItems(player, itemIDs)
     if not resolved then return false, reason end
+    if args.bulk == true then
+        local eligibleIDs = {}
+        local eligibleItems = {}
+        for index = 1, #resolved do
+            if not isNativeBulkProtected(resolved[index])
+                and not isNonEmptyContainer(resolved[index])
+            then
+                eligibleIDs[#eligibleIDs + 1] = itemIDs[index]
+                eligibleItems[#eligibleItems + 1] = resolved[index]
+            end
+        end
+        itemIDs = eligibleIDs
+        resolved = eligibleItems
+        if #itemIDs < 1 then return false, "no_transferable_items" end
+    end
     local specs = {}
     for index = 1, #resolved do
         specs[index], reason = compactSpec(resolved[index])
@@ -140,48 +187,62 @@ local function transferPlayerToNPC(player, record, args, sinceRevision)
 end
 
 local function transferNPCToPlayer(player, record, args, sinceRevision)
-    local itemIDs = type(args.itemIDs) == "table" and args.itemIDs or {}
+    local requestedIDs = type(args.itemIDs) == "table" and args.itemIDs or {}
+    local itemIDs = {}
     local inv = Inventory.EnsureRecordInventory(record)
     local maxItems = tonumber(Const.INVENTORY_TRANSFER_MAX_ITEMS) or 64
-    if #itemIDs < 1 or #itemIDs > maxItems then return false, "invalid_item_count" end
+    if #requestedIDs < 1 or #requestedIDs > maxItems then
+        return false, "invalid_item_count"
+    end
 
     local seen = {}
     local nativeItems = {}
-    for index = 1, #itemIDs do
-        local itemID = tostring(itemIDs[index] or "")
+    for index = 1, #requestedIDs do
+        local itemID = tostring(requestedIDs[index] or "")
         local item = inv.items[itemID]
         if itemID == "" or seen[itemID] or not item then
             rollbackNativeItems(nativeItems)
             return false, "item_not_found"
         end
-        if compactContainerHasItems(inv, item) then
+        if args.bulk ~= true and compactContainerHasItems(inv, item) then
             rollbackNativeItems(nativeItems)
             return false, "container_not_empty"
         end
         seen[itemID] = true
-        local state = {}
-        for key, value in pairs(item.itemState or {}) do state[key] = value end
-        state.condition = item.cond or state.condition
-        state.usedDelta = item.uses or state.usedDelta
-        state.ammoCount = item.ammoCount or state.ammoCount
-        state.favorite = item.fav == true
-        state.customName = item.customName or state.customName
-        local created, reason = ItemTransfer.GiveToPlayerContainer(
-            player,
-            args.playerContainer,
-            item.type,
-            math.max(1, math.floor(tonumber(item.stack) or 1)),
-            state
-        )
-        if not created then
-            rollbackNativeItems(nativeItems)
-            return false, reason
-        end
-        local createdArray = nativeListToArray(created)
-        for _, nativeItem in ipairs(createdArray) do
-            nativeItems[#nativeItems + 1] = nativeItem
+        if args.bulk == true
+            and (isCompactBulkProtected(item)
+                or compactContainerHasItems(inv, item))
+        then
+            -- Vanilla bulk transfer leaves favorites, equipped items, and
+            -- non-empty carried containers in place.
+        else
+            itemIDs[#itemIDs + 1] = itemID
+            local state = {}
+            for key, value in pairs(item.itemState or {}) do state[key] = value end
+            state.condition = item.cond or state.condition
+            state.usedDelta = item.uses or state.usedDelta
+            state.ammoCount = item.ammoCount or state.ammoCount
+            state.favorite = item.fav == true
+            state.customName = item.customName or state.customName
+            local created, reason = ItemTransfer.GiveToPlayerContainer(
+                player,
+                args.playerContainer,
+                item.type,
+                math.max(1, math.floor(tonumber(item.stack) or 1)),
+                state
+            )
+            if not created then
+                rollbackNativeItems(nativeItems)
+                return false, reason
+            end
+            local createdArray = nativeListToArray(created)
+            for _, nativeItem in ipairs(createdArray) do
+                nativeItems[#nativeItems + 1] = nativeItem
+            end
         end
     end
+
+    if #itemIDs < 1 then return false, "no_transferable_items" end
 
     local removed, reason = Inventory.RemoveItems(record, itemIDs, "npc_to_player")
     if not removed then
@@ -275,6 +336,7 @@ function Service.Action(player, args)
     if tostring(args.actionID or "") == "drop" then
         success, reason = dropItem(player, record, item, sinceRevision)
     else
+        local definition = Actions.Get and Actions.Get(args.actionID) or nil
         success, reason = Actions.Execute(
             args.actionID,
             player,
@@ -283,7 +345,9 @@ function Service.Action(player, args)
             args
         )
         if success then
-            refreshLiveEquipment(record)
+            if not definition or definition.refreshEquipment ~= false then
+                refreshLiveEquipment(record)
+            end
             syncResult(player, record, sinceRevision)
         end
     end

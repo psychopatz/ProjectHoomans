@@ -39,9 +39,7 @@ function Inventory.EnsureRecordInventory(record)
     inv.revision = math.max(0, math.floor(tonumber(inv.revision) or 0))
     inv.deltaMode = "template_plus_delta"
     inv.cachedWeight = tonumber(inv.cachedWeight) or 0
-    inv.rootMaxWeight = tonumber(inv.rootMaxWeight)
-        or tonumber(inv.maxWeight)
-        or Internal.buildBaseCarryWeight(record)
+    inv.rootMaxWeight = Internal.buildBaseCarryWeight(record)
     inv.maxWeight = tonumber(inv.maxWeight) or inv.rootMaxWeight
     inv.equipped = type(inv.equipped) == "table"
         and inv.equipped
@@ -65,6 +63,7 @@ function Inventory.EnsureRecordInventory(record)
             item.ammoCount = item.ammoCount ~= nil
                 and math.max(0, math.floor(tonumber(item.ammoCount) or 0))
                 or nil
+            item.fav = item.fav == true
             item.templateKey = Internal.normalizeString(item.templateKey)
             item.wornSlot = Internal.normalizeString(item.wornSlot)
             item.attachedSlot = Internal.normalizeString(item.attachedSlot)
@@ -74,6 +73,19 @@ function Inventory.EnsureRecordInventory(record)
             item.identityNPCName = Internal.normalizeString(item.identityNPCName)
             item.bagContainer = Internal.normalizeString(item.bagContainer)
             item.maxWeight = tonumber(item.maxWeight)
+            local profile = Internal.getContainerProfile(item.type)
+            item.weightReduction = item.weightReduction ~= nil
+                and math.max(0, math.min(1,
+                    (tonumber(item.weightReduction) or 0) > 1
+                        and (tonumber(item.weightReduction) or 0) / 100
+                        or (tonumber(item.weightReduction) or 0)))
+                or profile.weightReduction
+            item.wearableSlot = Internal.normalizeString(item.wearableSlot)
+                or profile.wearableSlot
+            if (not item.maxWeight or item.maxWeight <= 0) and profile.capacity > 0 then
+                item.maxWeight = profile.capacity
+                item.bagContainer = item.bagContainer or ("bag_" .. tostring(item.id))
+            end
             inv.items[item.id] = item
             Internal.ensureContainer(inv, item.container,
                 item.container == "root" and inv.rootMaxWeight or 0)
@@ -83,6 +95,7 @@ function Inventory.EnsureRecordInventory(record)
             end
         end
     end
+    Internal.normalizeLegacyBagSlot(inv)
     Internal.getRuntimeState(record)
     Internal.refreshNextItemSerial(record, inv)
     if generatorVersion < 3 then
@@ -97,10 +110,13 @@ end
 
 function Inventory.GetWeightState(record)
     local inv = Inventory.EnsureRecordInventory(record)
+    local encumbrance = inv and Inventory.GetEncumbranceState(record) or nil
     return inv and {
         usedWeight = tonumber(inv.cachedWeight) or 0,
         maxWeight = tonumber(inv.maxWeight) or 0,
         remainingWeight = tonumber(inv.remainingWeight)
             or math.max(0, (tonumber(inv.maxWeight) or 0) - (tonumber(inv.cachedWeight) or 0)),
+        ratio = encumbrance and encumbrance.ratio or 0,
+        level = encumbrance and encumbrance.level or "normal",
     } or nil
 end

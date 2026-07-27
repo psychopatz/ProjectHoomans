@@ -31,9 +31,13 @@ local record = {
         },
     },
 }
+local nativeFavorite = false
+local nativeEquipped = false
 local nativeItem = {
     getID = function() return 55 end,
     getFullType = function() return "Base.Bandage" end,
+    isFavorite = function() return nativeFavorite end,
+    isEquipped = function() return nativeEquipped end,
 }
 local nativeCreated = {
     getContainer = function() return {} end,
@@ -156,10 +160,12 @@ assertEqual(ok, true, "player-to-NPC success")
 assertEqual(reason, "transferred_to_npc", "player-to-NPC reason")
 assertEqual(addedSpecs[1].type, "Base.Bandage", "compact item type")
 assertEqual(addedSpecs[1].cond, 4, "compact condition")
+assertEqual(addedSpecs[1].fav, true, "compact favorite state")
 assertEqual(takenIDs[1], "55", "native source removed")
 assertEqual(deltaSince, 3, "delta starts at client revision")
 
 record.inventory.revision = 8
+record.inventory.items["npc-item"].fav = true
 ok, reason = Service.Transfer(player, {
     id = record.id,
     direction = "npc_to_player",
@@ -174,6 +180,7 @@ assertEqual(granted.destination, "bag-9", "player bag destination")
 assertEqual(granted.fullType, "Base.Axe", "native recreation type")
 assertEqual(granted.state.condition, 7, "native recreation condition")
 assertEqual(granted.state.customName, "Trusted Axe", "native recreation custom name")
+assertEqual(granted.state.favorite, true, "explicit favorite transfer allowed")
 assertEqual(removedIDs[1], "npc-item", "compact source removed")
 
 record.inventory.revision = 12
@@ -199,6 +206,34 @@ ok, reason = Service.Transfer(player, {
 assertEqual(ok, false, "revision conflict rejected")
 assertEqual(reason, "revision_conflict", "revision conflict reason")
 assertEqual(fullSyncs, 1, "conflict sends full payload")
+
+canManage = true
+nativeFavorite = true
+record.inventory.revision = 30
+ok, reason = Service.Transfer(player, {
+    id = record.id,
+    direction = "player_to_npc",
+    itemIDs = { "55" },
+    npcContainer = "root",
+    inventoryRevision = 30,
+    bulk = true,
+})
+assertEqual(ok, false, "favorite player bulk transfer skipped")
+assertEqual(reason, "no_transferable_items", "favorite player bulk reason")
+
+record.inventory.revision = 31
+record.inventory.items["npc-item"].fav = false
+record.inventory.items["npc-item"].equipSlot = "primary"
+ok, reason = Service.Transfer(player, {
+    id = record.id,
+    direction = "npc_to_player",
+    itemIDs = { "npc-item" },
+    playerContainer = "root",
+    inventoryRevision = 31,
+    bulk = true,
+})
+assertEqual(ok, false, "equipped NPC bulk transfer skipped")
+assertEqual(reason, "no_transferable_items", "equipped NPC bulk reason")
 
 canManage = false
 ok, reason = Service.Action(player, {

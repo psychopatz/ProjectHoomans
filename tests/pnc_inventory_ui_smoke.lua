@@ -105,6 +105,8 @@ local playerBag = {
     getFullType = function() return "Base.Bag_DuffelBag" end,
     getDisplayName = function() return "Duffel Bag" end,
     getItemContainer = function() return nestedContainer end,
+    isFavorite = function() return true end,
+    isEquipped = function() return true end,
 }
 local rootContainer = {
     getItems = function() return javaList({ playerBag }) end,
@@ -120,6 +122,9 @@ assertEqual(playerContainers[1].id, "root", "player root selector first")
 assertEqual(playerContainers[2].label, "Duffel Bag", "player backpack selector")
 assertEqual(PNC.InventoryUIModel.FindContainer(playerContainers, "missing"), nil,
     "missing container does not masquerade as root")
+local playerRows = PNC.InventoryUIModel.BuildPlayerRows(playerContainers[1])
+assertEqual(playerRows[1].favorite, true, "player favorite row state")
+assertEqual(playerRows[1].equipped, true, "player equipped row state")
 
 local npcContainers = PNC.InventoryUIModel.BuildNPCContainers({
     items = {
@@ -128,6 +133,8 @@ local npcContainers = PNC.InventoryUIModel.BuildNPCContainers({
             type = "Base.Bag_DuffelBag",
             customName = "Work Bag",
             bagContainer = "bag_npc_bag",
+            fav = true,
+            wornSlot = "base:back",
         },
     },
     containers = {
@@ -137,10 +144,33 @@ local npcContainers = PNC.InventoryUIModel.BuildNPCContainers({
 })
 assertEqual(#npcContainers, 2, "NPC root and backpack selectors")
 assertEqual(npcContainers[2].label, "Work Bag", "NPC backpack selector")
+local npcRows = PNC.InventoryUIModel.BuildNPCRows({
+    items = {
+        npc_bag = {
+            id = "npc_bag",
+            type = "Base.Bag_DuffelBag",
+            container = "root",
+            fav = true,
+            wornSlot = "base:back",
+        },
+    },
+    containers = { root = { items = { "npc_bag" } } },
+}, "root")
+assertEqual(npcRows[1].favorite, true, "NPC favorite row state")
+assertEqual(npcRows[1].equipped, true, "NPC equipped row state")
 
 dofile(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryWindow.lua")
 
 local window = setmetatable({}, { __index = ISPNCInventoryWindow })
+local eligibleIDs = PNC.InventoryWindow.CollectBulkTransferIDs({
+    items = {
+        { item = { id = "ordinary" } },
+        { item = { id = "favorite", favorite = true } },
+        { item = { id = "equipped", equipped = true } },
+    },
+})
+assertEqual(#eligibleIDs, 1, "bulk transfer protected-item filtering")
+assertEqual(eligibleIDs[1], "ordinary", "bulk transfer eligible item")
 window:showItemContext("player", { id = "player_item_1" })
 assertEqual(contextPlayerID, 0, "context menu receives numeric player ID")
 assertEqual(#context.options, 1, "player transfer context option")
@@ -160,5 +190,14 @@ window:cycleContainer("player", 1)
 assertEqual(window.selectedPlayerContainer, "root", "container wheel cycles forward")
 window:cycleContainer("player", -1)
 assertEqual(window.selectedPlayerContainer, "bag_1", "container wheel cycles backward")
+
+local listSource = assert(io.open(
+    CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryUI_List.lua",
+    "r"
+)):read("*a")
+assert(string.find(listSource, "media/ui/icon.png", 1, true),
+    "vanilla equipped circle texture missing")
+assert(string.find(listSource, "media/ui/FavoriteStar.png", 1, true),
+    "vanilla favorite star texture missing")
 
 print("pnc_inventory_ui_smoke: ok")
