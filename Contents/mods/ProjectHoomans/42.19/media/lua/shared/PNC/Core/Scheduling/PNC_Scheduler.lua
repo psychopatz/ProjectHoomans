@@ -75,6 +75,10 @@ end
 
 function Scheduler.PopDue(records, now)
     local output = {}
+    local deferred = {}
+    local maxRecords = math.max(1, math.floor(
+        tonumber(Const.SCHEDULER_MAX_RECORDS_PER_TICK) or 24
+    ))
     local currentSlot = math.floor((tonumber(now) or 0) / Scheduler.SLOT_MS)
     local slot = Scheduler.LastSlot or (currentSlot - 1)
     local bucket
@@ -92,13 +96,23 @@ function Scheduler.PopDue(records, now)
                 id = bucket[i]
                 if Scheduler.SlotByID[id] == slot and records[id] then
                     Scheduler.SlotByID[id] = nil
-                    output[#output + 1] = records[id]
+                    if #output < maxRecords then
+                        output[#output + 1] = records[id]
+                    else
+                        deferred[#deferred + 1] = records[id]
+                    end
                 end
             end
             Scheduler.Buckets[slot] = nil
         end
     end
     Scheduler.LastSlot = currentSlot
+    for i = 1, #deferred do
+        Scheduler.Schedule(
+            deferred[i],
+            (tonumber(now) or 0) + Scheduler.SLOT_MS
+        )
+    end
     return output
 end
 

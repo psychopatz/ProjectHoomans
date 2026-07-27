@@ -7,6 +7,12 @@ local Const = PNC.Const
 local Identity = PNC.Identity
 local Types = PNC.Types
 local Inventory = PNC.Inventory
+local HEALTH_PART_IDS = {
+    "Head", "Neck", "Torso_Upper", "Torso_Lower", "Groin",
+    "UpperArm_L", "UpperArm_R", "ForeArm_L", "ForeArm_R",
+    "Hand_L", "Hand_R", "UpperLeg_L", "UpperLeg_R",
+    "LowerLeg_L", "LowerLeg_R", "Foot_L", "Foot_R",
+}
 
 local function normalizeString(value)
     if value == nil or value == "" then
@@ -153,12 +159,30 @@ local function sanitizeOrderSpec(orderSpec, record)
     return spec
 end
 
+local function serializePatrolPoints(record)
+    local points = record and record.patrolPoints or nil
+    local orderKind = record and record.orderSpec
+        and tostring(record.orderSpec.kind or "") or ""
+    if orderKind ~= tostring(Const.ORDER_PATROL or "patrol")
+        and (type(points) ~= "table" or #points <= 1)
+    then
+        return nil
+    end
+    return copyPoints(points, record.anchorX, record.anchorY, record.anchorZ)
+end
+
 local function sanitizeHealthBody(rawBody)
     local source = type(rawBody) == "table" and rawBody or {}
     local wounds = {}
     local parts = {}
+    local basePart = source.partBase
     local partId
     local wound
+    local bleedingRate = 0
+    local openWoundCount = 0
+    local bandagedWoundCount = 0
+    local totalPercent = 0
+    local partCount = 0
     for partId, wound in pairs(type(source.wounds) == "table" and source.wounds or {}) do
         if type(wound) == "table" then
             partId = tostring(wound.partId or partId)
@@ -173,17 +197,61 @@ local function sanitizeHealthBody(rawBody)
                 bandagedAt = normalizeNumber(wound.bandagedAt, 0),
                 healAtWorldHour = normalizeNumber(wound.healAtWorldHour, 0),
             }
+            if wounds[partId].bandaged then
+                bandagedWoundCount = bandagedWoundCount + 1
+            else
+                openWoundCount = openWoundCount + 1
+                bleedingRate = bleedingRate + wounds[partId].bleedingRate
+            end
         end
     end
-    for partId, partHealth in pairs(type(source.parts) == "table" and source.parts or {}) do
-        if type(partHealth) == "table" then
-            local maximum = math.max(1, normalizeNumber(partHealth.max, 100))
-            partId = tostring(partId)
-            parts[partId] = {
-                current = Core.Clamp(normalizeNumber(partHealth.current, maximum), 0, maximum),
+    local function normalizePart(partHealth)
+        local maximum
+        if type(partHealth) == "number" then
+            maximum = 100
+            return {
+                current = Core.Clamp(normalizeNumber(partHealth, maximum), 0, maximum),
                 max = maximum,
             }
         end
+        if type(partHealth) ~= "table" then return nil end
+        maximum = math.max(1, normalizeNumber(
+            partHealth.max or partHealth.m,
+            100
+        ))
+        return {
+            current = Core.Clamp(normalizeNumber(
+                partHealth.current or partHealth.c,
+                maximum
+            ), 0, maximum),
+            max = maximum,
+        }
+    end
+    if basePart ~= nil then
+        local normalizedBase = normalizePart(basePart)
+        if normalizedBase then
+            for i = 1, #HEALTH_PART_IDS do
+                parts[HEALTH_PART_IDS[i]] = {
+                    current = normalizedBase.current,
+                    max = normalizedBase.max,
+                }
+            end
+        end
+    end
+    for partId, partHealth in pairs(type(source.parts) == "table"
+        and source.parts or {})
+    do
+        partHealth = normalizePart(partHealth)
+        if partHealth then
+            parts[tostring(partId)] = partHealth
+        end
+    end
+    for _, partHealth in pairs(parts) do
+        totalPercent = totalPercent + (
+            (tonumber(partHealth.current) or 0)
+            / math.max(1, tonumber(partHealth.max) or 100)
+        )
+        partCount = partCount + 1
     end
     local infectionSource = type(source.infection) == "table" and source.infection or nil
     local infection = infectionSource and {
@@ -204,16 +272,126 @@ local function sanitizeHealthBody(rawBody)
         wounds = wounds,
         parts = parts,
         infection = infection,
-        totalPartHealth = math.max(0, normalizeNumber(source.totalPartHealth, 0)),
-        totalPartMax = math.max(0, normalizeNumber(source.totalPartMax, 0)),
-        overallPercent = Core.Clamp(normalizeNumber(source.overallPercent, 100), 0, 100),
-        bleedingRate = math.max(0, normalizeNumber(source.bleedingRate, 0)),
-        openWoundCount = math.max(0, math.floor(normalizeNumber(source.openWoundCount, 0))),
-        bandagedWoundCount = math.max(0, math.floor(normalizeNumber(source.bandagedWoundCount, 0))),
+        totalPartHealth = partCount > 0 and totalPercent * 100
+            or math.max(0, normalizeNumber(source.totalPartHealth, 0)),
+        totalPartMax = partCount > 0 and partCount * 100
+            or math.max(0, normalizeNumber(source.totalPartMax, 0)),
+        overallPercent = partCount > 0
+            and Core.Clamp(totalPercent / partCount * 100, 0, 100)
+            or Core.Clamp(normalizeNumber(source.overallPercent, 100), 0, 100),
+        bleedingRate = bleedingRate,
+        openWoundCount = openWoundCount,
+        bandagedWoundCount = bandagedWoundCount,
         -- Wall-clock values do not survive a process restart. Bleeding resumes
         -- from the next health tick instead of charging an offline time jump.
         lastBleedAt = 0,
     }
+end
+
+local function compactPartValue(partHealth)
+    local maximum = math.max(1, normalizeNumber(partHealth and partHealth.max, 100))
+    local current = Core.Clamp(normalizeNumber(
+        partHealth and partHealth.current,
+        maximum
+    ), 0, maximum)
+    if maximum == 100 then return current end
+    return { current = current, max = maximum }
+end
+
+local function partSignature(partHealth)
+    local maximum = math.max(1, normalizeNumber(partHealth and partHealth.max, 100))
+    local current = Core.Clamp(normalizeNumber(
+        partHealth and partHealth.current,
+        maximum
+    ), 0, maximum)
+    return tostring(current) .. ":" .. tostring(maximum)
+end
+
+local function buildCompactHealthBody(rawBody)
+    local normalized = sanitizeHealthBody(rawBody)
+    local output = {}
+    local counts = {}
+    local values = {}
+    local bestSignature
+    local bestCount = 0
+    local signature
+    local partId
+    local partHealth
+    local baseline = { current = 100, max = 100 }
+    local wound
+    local compactWound
+    local infection
+    local allStandardParts = true
+    local useBaseline = false
+    for partId, partHealth in pairs(normalized.parts or {}) do
+        signature = partSignature(partHealth)
+        counts[signature] = (tonumber(counts[signature]) or 0) + 1
+        values[signature] = partHealth
+        if counts[signature] > bestCount then
+            bestSignature = signature
+            bestCount = counts[signature]
+        end
+    end
+    for i = 1, #HEALTH_PART_IDS do
+        if normalized.parts[HEALTH_PART_IDS[i]] == nil then
+            allStandardParts = false
+            break
+        end
+    end
+    if allStandardParts and bestSignature and bestCount >= 2 then
+        useBaseline = true
+        baseline = values[bestSignature]
+        if partSignature(baseline) ~= "100:100" then
+            output.partBase = compactPartValue(baseline)
+        end
+    end
+    for partId, partHealth in pairs(normalized.parts or {}) do
+        if not useBaseline
+            or partSignature(partHealth) ~= partSignature(baseline)
+        then
+            output.parts = output.parts or {}
+            output.parts[tostring(partId)] = compactPartValue(partHealth)
+        end
+    end
+    for partId, wound in pairs(normalized.wounds or {}) do
+        compactWound = {
+            type = wound.type ~= "scratch" and wound.type or nil,
+            severity = wound.severity > 0 and wound.severity or nil,
+            damage = wound.damage ~= wound.severity and wound.damage or nil,
+            bleedingRate = wound.bleedingRate > 0 and wound.bleedingRate or nil,
+            bandaged = wound.bandaged == true or nil,
+            createdAt = wound.createdAt > 0 and wound.createdAt or nil,
+            bandagedAt = wound.bandagedAt > 0 and wound.bandagedAt or nil,
+            healAtWorldHour = wound.healAtWorldHour > 0
+                and wound.healAtWorldHour or nil,
+        }
+        output.wounds = output.wounds or {}
+        output.wounds[tostring(partId)] = compactWound
+    end
+    infection = normalized.infection
+    if infection then
+        output.infection = {
+            active = infection.active == true or nil,
+            fatal = infection.fatal == true or nil,
+            pendingFatal = infection.pendingFatal == true or nil,
+            sourcePart = infection.sourcePart,
+            infectedAtWorldHour = infection.infectedAtWorldHour ~= 0
+                and infection.infectedAtWorldHour or nil,
+            fatalAtWorldHour = infection.fatalAtWorldHour ~= 0
+                and infection.fatalAtWorldHour or nil,
+            reanimateAtWorldHour = infection.reanimateAtWorldHour ~= 0
+                and infection.reanimateAtWorldHour or nil,
+            progress = infection.progress ~= 0 and infection.progress or nil,
+            stage = infection.stage ~= "incubating" and infection.stage or nil,
+            fever = infection.fever ~= 0 and infection.fever or nil,
+            temperatureC = infection.temperatureC ~= 37
+                and infection.temperatureC or nil,
+            lastUpdatedWorldHour = infection.lastUpdatedWorldHour ~= 0
+                and infection.lastUpdatedWorldHour or nil,
+        }
+    end
+    if not hasTableEntries(output) then return nil end
+    return output
 end
 
 local function sanitizeHealth(rawHealth, fallbackMax)
@@ -231,6 +409,22 @@ local function sanitizeHealth(rawHealth, fallbackMax)
         incapacitatedReason = normalizeString(rawHealth and rawHealth.incapacitatedReason),
         body = sanitizeHealthBody(rawHealth and rawHealth.body),
     }
+end
+
+local function serializeHealth(rawHealth, fallbackMax)
+    local normalized = sanitizeHealth(rawHealth, fallbackMax)
+    local body = buildCompactHealthBody(normalized.body)
+    local output = {
+        current = normalized.current ~= normalized.max
+            and normalized.current or nil,
+        max = normalized.max ~= Const.DEFAULT_HP_MAX
+            and normalized.max or nil,
+        state = normalized.state ~= "normal" and normalized.state or nil,
+        incapacitatedReason = normalized.state == "incapacitated"
+            and normalized.incapacitatedReason or nil,
+        body = body,
+    }
+    return output
 end
 
 local function sanitizeCorpse(rawCorpse, record)
@@ -253,18 +447,24 @@ local function sanitizeStamina(rawStamina, record)
     end
     output = {
         current = normalizeNumber(rawStamina.current, 0),
-        max = normalizeNumber(rawStamina.max, 0),
-        state = tostring(rawStamina.state or "fresh"),
-        visibleUntil = normalizeNumber(rawStamina.visibleUntil, 0),
+        max = rawStamina.max ~= nil
+            and math.max(1, normalizeNumber(rawStamina.max, 1)) or nil,
     }
     if record then
         record.stamina = output
-        if PNC.Stamina and PNC.Stamina.BuildSnapshot then
-            output = Core.DeepCopy(PNC.Stamina.BuildSnapshot(record))
-            record.stamina = output
-        end
     end
     return output
+end
+
+local function serializeStamina(rawStamina)
+    local current
+    local maximum
+    if type(rawStamina) ~= "table" then return nil end
+    current = tonumber(rawStamina.current)
+    maximum = tonumber(rawStamina.max)
+    if current == nil then return nil end
+    if maximum and math.abs(current - maximum) < 0.01 then return nil end
+    return { current = current }
 end
 
 local function sanitizeProgression(rawProgression)
@@ -280,7 +480,11 @@ local function sanitizeProgression(rawProgression)
     output.recruited = source.recruited == true
     if type(source.skillLevelDeltas) == "table" then
         for key, value in pairs(source.skillLevelDeltas) do
-            output.skillLevelDeltas[tostring(key)] = math.max(-10, math.min(10, math.floor(normalizeNumber(value, 0))))
+            value = math.max(-10, math.min(10,
+                math.floor(normalizeNumber(value, 0))))
+            if value ~= 0 then
+                output.skillLevelDeltas[tostring(key)] = value
+            end
         end
     end
     if type(source.skillLevels) == "table" then
@@ -290,7 +494,8 @@ local function sanitizeProgression(rawProgression)
     end
     if type(source.skillXP) == "table" then
         for key, value in pairs(source.skillXP) do
-            output.skillXP[tostring(key)] = math.max(0, normalizeNumber(value, 0))
+            value = math.max(0, normalizeNumber(value, 0))
+            if value ~= 0 then output.skillXP[tostring(key)] = value end
         end
     end
     return output
@@ -391,6 +596,13 @@ function Persistence.RebuildRuntime(record)
     record.presenceRevision = normalizeNumber(record.presenceRevision, 0)
     record.ownerOnlineID = nil
     healthState = record.health and tostring(record.health.state or "normal") or "normal"
+    if record.health then
+        record.health.lastDamageAt = 0
+        record.health.recentDamageUntil = 0
+        record.health.reviveUntil = 0
+        record.health.reviveProtectionUntil = 0
+        record.health.downedAt = healthState == "incapacitated" and now or 0
+    end
     if record.alive == false or healthState == "corpse" then
         record.presenceState = Const.PRESENCE_CORPSE
     else
@@ -407,6 +619,7 @@ function Persistence.SerializeRecord(record)
     local progression
     local payload
     local startupBodyHint
+    local inventoryPayload
     if not record or record.persist == false then
         return nil
     end
@@ -422,6 +635,34 @@ function Persistence.SerializeRecord(record)
     end
     progression.legacySkillLevels = nil
     progression.recruited = record.recruited == true
+    if not hasTableEntries(progression.skillLevelDeltas) then
+        progression.skillLevelDeltas = nil
+    end
+    if not hasTableEntries(progression.skillXP) then
+        progression.skillXP = nil
+    end
+    if progression.recruited ~= true
+        and progression.skillLevelDeltas == nil
+        and progression.skillXP == nil
+    then
+        progression = nil
+    end
+    if record.inventory and Inventory and Inventory.Serialize then
+        inventoryPayload = Inventory.Serialize(record)
+    elseif type(record.persistedInventory) == "table" then
+        if tonumber(record.persistenceSourceVersion)
+                and tonumber(record.persistenceSourceVersion)
+                    < tonumber(Const.PERSISTENCE_VERSION)
+            and Inventory
+            and Inventory.EnsureRecordInventory
+            and Inventory.Serialize
+        then
+            Inventory.EnsureRecordInventory(record)
+            inventoryPayload = Inventory.Serialize(record)
+        else
+            inventoryPayload = Core.DeepCopy(record.persistedInventory)
+        end
+    end
     payload = {
         schemaVersion = Const.PERSISTENCE_VERSION,
         recordRevision = math.max(0, math.floor(normalizeNumber(record.recordRevision, 0))),
@@ -447,11 +688,15 @@ function Persistence.SerializeRecord(record)
         },
         presenceState = record.alive == false and Const.PRESENCE_CORPSE or Const.PRESENCE_ABSTRACT,
         orderSpec = sanitizeOrderSpec(record.orderSpec, record),
-        patrolPoints = copyPoints(record.patrolPoints, record.anchorX, record.anchorY, record.anchorZ),
-        patrolIndex = math.max(1, math.floor(normalizeNumber(record.patrolIndex, 1))),
+        patrolPoints = serializePatrolPoints(record),
+        patrolIndex = record.orderSpec
+                and tostring(record.orderSpec.kind or "")
+                    == tostring(Const.ORDER_PATROL or "patrol")
+            and math.max(1, math.floor(normalizeNumber(record.patrolIndex, 1)))
+            or nil,
         hostility = sanitizeHostility(record.hostility, record.faction),
-        health = sanitizeHealth(record.health, record.health and record.health.max or Const.DEFAULT_HP_MAX),
-        stamina = sanitizeStamina(record.stamina, record),
+        health = serializeHealth(record.health, record.health and record.health.max or Const.DEFAULT_HP_MAX),
+        stamina = serializeStamina(record.stamina),
         weaponMode = tostring(record.weaponMode or "melee"),
         attackType = PNC.Types and PNC.Types.NormalizeAttackType
             and PNC.Types.NormalizeAttackType(record.attackType, record.weaponMode)
@@ -464,9 +709,7 @@ function Persistence.SerializeRecord(record)
             worn = copyStringMap(record.equipment and record.equipment.worn),
             attached = copyStringMap(record.equipment and record.equipment.attached),
         },
-        inventory = record.inventory and Inventory and Inventory.Serialize and Inventory.Serialize(record)
-            or type(record.persistedInventory) == "table" and Core.DeepCopy(record.persistedInventory)
-            or nil,
+        inventory = inventoryPayload,
         progression = progression,
         corpse = sanitizeCorpse(record.corpse, record),
     }
@@ -607,6 +850,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     record.persistedInventory = type(raw.inventory) == "table" and Core.DeepCopy(raw.inventory) or nil
     record.legacyEquipmentInventory = not raw.inventory and type(raw.equipment) == "table"
     record = Persistence.RebuildRuntime(record)
+    record.persistenceSourceVersion = tonumber(raw.schemaVersion) or 0
     bodyHint = type(raw.bodyHint) == "table" and raw.bodyHint or nil
     if bodyHint and bodyHint.instanceID ~= nil then
         record.runtime.startupBodyHint = {

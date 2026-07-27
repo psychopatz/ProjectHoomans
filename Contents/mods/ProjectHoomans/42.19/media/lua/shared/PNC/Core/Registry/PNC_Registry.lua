@@ -10,12 +10,63 @@ Registry.Data = Registry.Data or {}
 Registry.LiveByID = Registry.LiveByID or {}
 Registry.DirtyByID = Registry.DirtyByID or {}
 Registry.DirtyDomains = Registry.DirtyDomains or {}
+Registry.SavedSnapshots = Registry.SavedSnapshots or {}
 Registry.Loaded = Registry.Loaded or false
 Registry.DirectoryDirty = Registry.DirectoryDirty or false
 Registry.LastFlushCount = Registry.LastFlushCount or 0
 
 local function storageKeyForID(id)
     return tostring(Const.MODDATA_NPC_PREFIX or "PNC_NPC_") .. tostring(id)
+end
+
+local function captureSnapshot(record)
+    local stamina = record and record.stamina or nil
+    local staminaCurrent = stamina and tonumber(stamina.current) or nil
+    local staminaMax = stamina and tonumber(stamina.max) or nil
+    if type(record) ~= "table" then return nil end
+    if staminaCurrent ~= nil and staminaMax ~= nil
+        and math.abs(staminaCurrent - staminaMax) < 0.01
+    then
+        staminaCurrent = nil
+    end
+    return {
+        x = tonumber(record.x) or 0,
+        y = tonumber(record.y) or 0,
+        z = tonumber(record.z) or 0,
+        staminaCurrent = staminaCurrent,
+    }
+end
+
+local function numberChanged(left, right, epsilon)
+    if left == nil or right == nil then return left ~= right end
+    return math.abs((tonumber(left) or 0) - (tonumber(right) or 0))
+        > (tonumber(epsilon) or 0)
+end
+
+local function snapshotChanged(previous, current)
+    if not previous or not current then return previous ~= current end
+    return numberChanged(previous.x, current.x, 0.001)
+        or numberChanged(previous.y, current.y, 0.001)
+        or numberChanged(previous.z, current.z, 0.001)
+        or numberChanged(
+            previous.staminaCurrent,
+            current.staminaCurrent,
+            0.01
+        )
+end
+
+local function markSnapshotChanges()
+    local id
+    local record
+    local current
+    for id, record in pairs(Registry.Data) do
+        if record and record.persist ~= false then
+            current = captureSnapshot(record)
+            if snapshotChanged(Registry.SavedSnapshots[id], current) then
+                Registry.MarkDirty(record, "save_snapshot")
+            end
+        end
+    end
 end
 
 Registry.StorageKeyForID = storageKeyForID
@@ -92,6 +143,7 @@ local function migrateLegacy(directory)
                 PNC.Inventory.EnsureRecordInventory(record)
             end
             Registry.Data[record.id] = record
+            Registry.SavedSnapshots[record.id] = captureSnapshot(record)
             Registry.DirtyByID[record.id] = true
             Registry.DirtyDomains[record.id] = { migration = true }
             putPointer(directory, record, storageKeyForID(record.id))
@@ -178,11 +230,18 @@ local function recoverOrphans(directory)
         if string.sub(key, 1, #(Const.MODDATA_NPC_PREFIX or "PNC_NPC_")) == (Const.MODDATA_NPC_PREFIX or "PNC_NPC_")
             and not referenced[key]
         then
-            local record = deserializeSafely(ModData.get(key), nil, key)
+            local raw = ModData.get(key)
+            local record = deserializeSafely(raw, nil, key)
             if record and not Registry.Data[record.id] and not directory.records[record.id] then
                 Registry.Data[record.id] = record
+                Registry.SavedSnapshots[record.id] = captureSnapshot(record)
                 putPointer(directory, record, key)
                 Registry.DirectoryDirty = true
+                if tonumber(raw and raw.schemaVersion)
+                    ~= tonumber(Const.PERSISTENCE_VERSION)
+                then
+                    Registry.MarkDirty(record, "schema_migration")
+                end
                 recovered = recovered + 1
             end
         end
@@ -226,6 +285,7 @@ function Registry.Load()
     Registry.LiveByID = {}
     Registry.DirtyByID = {}
     Registry.DirtyDomains = {}
+    Registry.SavedSnapshots = {}
     Registry.DirectoryDirty = false
     if PNC.Scheduler then
         PNC.Scheduler.Initialized = false
@@ -236,6 +296,7 @@ function Registry.Load()
         PNC.SpatialIndex.NPCInitialized = false
         PNC.SpatialIndex.NPCCells = {}
         PNC.SpatialIndex.NPCMembership = {}
+        PNC.SpatialIndex.LastRebuildAt = nil
     end
     if PNC.Network and PNC.Network.ResetServerState then
         PNC.Network.ResetServerState()
@@ -248,9 +309,16 @@ function Registry.Load()
     for id, entry in pairs(directory.records) do
         key = type(entry) == "table" and entry.storageKey or nil
         if key and not Registry.Data[tostring(id)] then
-            record = deserializeSafely(ModData.get(tostring(key)), id, key)
+            local raw = ModData.get(tostring(key))
+            record = deserializeSafely(raw, id, key)
             if record then
                 Registry.Data[record.id] = record
+                Registry.SavedSnapshots[record.id] = captureSnapshot(record)
+                if tonumber(raw and raw.schemaVersion)
+                    ~= tonumber(Const.PERSISTENCE_VERSION)
+                then
+                    Registry.MarkDirty(record, "schema_migration")
+                end
             end
         end
     end
@@ -282,7 +350,8 @@ function Registry.FlushDirty()
         return 0
     end
     Registry.EnsureLoaded()
-    Registry.RefreshLivePositions()
+    Registry.RefreshLivePositions(false)
+    markSnapshotChanges()
     directory = getDirectory()
     for id, _ in pairs(Registry.DirtyByID) do
         record = Registry.Data[id]
@@ -294,6 +363,9 @@ function Registry.FlushDirty()
                 ok, err = pcall(assignModData, key, payload)
                 if ok then
                     putPointer(directory, record, key)
+                    record.persistenceSourceVersion =
+                        tonumber(Const.PERSISTENCE_VERSION)
+                    Registry.SavedSnapshots[id] = captureSnapshot(record)
                     count = count + 1
                     finished = true
                 else
@@ -396,6 +468,7 @@ function Registry.RemoveRecord(id)
     Registry.Data[id] = nil
     Registry.DirtyByID[id] = nil
     Registry.DirtyDomains[id] = nil
+    Registry.SavedSnapshots[id] = nil
     directory.records[id] = nil
     if ModData.remove then
         ModData.remove(entry and entry.storageKey or storageKeyForID(id))
@@ -461,7 +534,7 @@ function Registry.FindRecordByZombie(zombie)
     return uuid and Registry.Get(uuid) or nil
 end
 
-function Registry.RefreshLivePositions()
+function Registry.RefreshLivePositions(markDirty)
     local id
     local zombie
     local record
@@ -481,7 +554,9 @@ function Registry.RefreshLivePositions()
                     record.x = x
                     record.y = y
                     record.z = z
-                    Registry.MarkDirty(record, "position")
+                    if markDirty == true then
+                        Registry.MarkDirty(record, "position")
+                    end
                     if PNC.SpatialIndex and PNC.SpatialIndex.UpdateNPC then
                         PNC.SpatialIndex.UpdateNPC(record)
                     end

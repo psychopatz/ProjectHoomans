@@ -95,10 +95,6 @@ end
 local function processRecord(record, now)
     local zombie = Registry.GetLiveZombie(record.id)
     local forceSyncEvent
-    local previousX = record.x
-    local previousY = record.y
-    local previousZ = record.z
-
     Presence.Reconcile(record)
     zombie = Registry.GetLiveZombie(record.id)
     Health.Update(record, zombie, now)
@@ -150,9 +146,6 @@ local function processRecord(record, now)
     if Spatial and Spatial.UpdateNPC then
         Spatial.UpdateNPC(record)
     end
-    if record.x ~= previousX or record.y ~= previousY or record.z ~= previousZ then
-        Registry.MarkDirty(record, "position")
-    end
     if Network and Network.QueuePeriodicRoster then
         Network.QueuePeriodicRoster(record, now)
     end
@@ -175,8 +168,8 @@ function Server.OnTick()
     if PNC.CompanionVehicle and PNC.CompanionVehicle.AuditLoadedReservations then
         PNC.CompanionVehicle.AuditLoadedReservations(now, false)
     end
-    Registry.RefreshLivePositions()
-    Spatial.Rebuild()
+    Registry.RefreshLivePositions(false)
+    Spatial.Rebuild(now, false)
     if Network.RefreshInterestSets then
         Network.RefreshInterestSets(now)
     end

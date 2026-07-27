@@ -17,8 +17,6 @@ function Inventory.Serialize(record)
         return {
             revision = inv.revision,
             deltaMode = inv.deltaMode,
-            maxWeight = inv.maxWeight,
-            cachedWeight = inv.cachedWeight,
             template = {
                 archetypeID = record.archetypeID,
                 seed = record.identitySeed,
@@ -31,8 +29,6 @@ function Inventory.Serialize(record)
         }
     end
     payload = Inventory.BuildFullPayload(record)
-    payload.maxWeight = inv.maxWeight
-    payload.cachedWeight = inv.cachedWeight
     return payload
 end
 

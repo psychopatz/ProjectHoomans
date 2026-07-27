@@ -84,6 +84,10 @@ for i = 1, 500 do
         id = "npc_" .. tostring(i),
         recordRevision = 0,
         persist = true,
+        x = 0,
+        y = 0,
+        z = 0,
+        stamina = { current = 100 },
         persistedInventory = { revision = 0, summary = { revision = 0 } },
         runtime = {},
     })
@@ -93,6 +97,31 @@ assertEqual(PNC.Registry.FlushDirty(), 500, "initial dirty flush")
 assertEqual(PNC.Core.TableSize(tables.PNC_Core_Global.records), 500, "directory pointer count")
 assertEqual(tables.PNC_Core_Global.NPCs, nil, "directory contains no record bodies")
 assert(tables.PNC_NPC_npc_1 and tables.PNC_NPC_npc_500, "per-NPC tables missing")
+
+PNC.Registry.LiveByID.npc_1 = {
+    isDead = function() return false end,
+    getX = function() return 4 end,
+    getY = function() return 2 end,
+    getZ = function() return 0 end,
+}
+PNC.Registry.RefreshLivePositions(false)
+assertEqual(PNC.Registry.DirtyByID.npc_1, nil,
+    "continuous movement dirtied the record")
+assertEqual(PNC.Registry.FlushDirty(), 1,
+    "save-time position snapshot was not persisted")
+assertEqual(PNC.Registry.DirtyByID.npc_1, nil,
+    "position snapshot remained dirty after save")
+PNC.Registry.LiveByID.npc_1 = nil
+
+tables.PNC_NPC_npc_2.schemaVersion = 4
+PNC.Registry.Loaded = false
+PNC.Registry.Load()
+assert(PNC.Registry.DirtyByID.npc_2,
+    "older per-NPC schema was not scheduled for migration")
+assertEqual(PNC.Registry.FlushDirty(), 1,
+    "per-NPC schema migration flush count")
+assertEqual(tables.PNC_NPC_npc_2.schemaVersion, 5,
+    "per-NPC schema migration version")
 
 PNC.Registry.MarkDirty("npc_10", "health")
 PNC.Registry.MarkDirty("npc_20", "inventory")

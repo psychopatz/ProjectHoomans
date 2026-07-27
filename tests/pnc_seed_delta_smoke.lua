@@ -68,6 +68,25 @@ PNC = {
 dofile(ROOT .. "Skills/PNC_Skills.lua")
 dofile(ROOT .. "Inventory/PNC_Inventory.lua")
 
+local oversizedState = {
+    customName = string.rep("x", 1100),
+    unsupported = { nested = true },
+    modData = {},
+}
+for stateIndex = 1, 70 do
+    oversizedState.modData["key_" .. tostring(stateIndex)] = stateIndex
+end
+oversizedState.modData.nested = { rejected = true }
+local sanitizedState = PNC.Inventory.SanitizeItemState(oversizedState)
+local sanitizedKeyCount = 0
+for _, _ in pairs(sanitizedState.modData or {}) do
+    sanitizedKeyCount = sanitizedKeyCount + 1
+end
+assertEqual(sanitizedKeyCount, 64, "portable modData key bound")
+assertEqual(#sanitizedState.customName, 1024, "portable string bound")
+assertEqual(sanitizedState.unsupported, nil, "unsupported item state survived")
+assertEqual(sanitizedState.modData.nested, nil, "nested modData survived")
+
 local record = {
     id = "npc_delta",
     identitySeed = 42,
@@ -171,9 +190,32 @@ local weightState = PNC.Inventory.GetWeightState(record)
 assert(weightState.usedWeight > 0, "weight cache was not rebuilt")
 assert(weightState.remainingWeight >= 0, "remaining weight is invalid")
 
+local identityCardID
+for itemID, item in pairs(record.inventory.items) do
+    if item.templateKey == "tmpl:identity_card:0" then
+        identityCardID = itemID
+        break
+    end
+end
+assert(identityCardID, "identity-card template item missing")
+assert(PNC.Inventory.ApplyDelta(record, {
+    {
+        op = "update",
+        itemID = identityCardID,
+        cond = 0,
+        ammoCount = 0,
+    },
+}, "test_zero_state"), "zero-valued template state update failed")
+
 local saved = PNC.Inventory.Serialize(record)
 assertEqual(saved.deltaMode, "template_plus_delta", "serialized delta mode")
 assertEqual(saved.template.generatorVersion, 1, "generator version")
+assertEqual(saved.maxWeight, nil, "derived max weight was persisted")
+assertEqual(saved.cachedWeight, nil, "derived used weight was persisted")
+assertEqual(saved.delta.changed["tmpl:identity_card:0"].cond, 0,
+    "zero condition delta was lost")
+assertEqual(saved.delta.changed["tmpl:identity_card:0"].ammoCount, 0,
+    "zero ammo delta was lost")
 
 loadout.supplies[#loadout.supplies + 1] = {
     key = "new_template_item",
@@ -213,5 +255,11 @@ assertEqual(reloaded.inventory.items.loot_1.interactionLocked, true,
     "interaction lock lost on rebase")
 assertEqual(reloaded.inventory.items.loot_1.interactionLockReason, "quest_item",
     "interaction lock reason lost on rebase")
+local reloadedCard = PNC.Inventory.Internal.findItemByTemplateKey(
+    reloaded.inventory,
+    "tmpl:identity_card:0"
+)
+assertEqual(reloadedCard.cond, 0, "zero condition lost on rebase")
+assertEqual(reloadedCard.ammoCount, 0, "zero ammo state lost on rebase")
 
 print("pnc_seed_delta_smoke: ok")

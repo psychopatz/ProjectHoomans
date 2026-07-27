@@ -207,7 +207,7 @@ local function buildZombieTarget(record, zombie, distSq, visibilityKind)
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
     local zombieId = modData and modData.PNC_ZombieID or nil
     if not zombieId and Spatial and Spatial.Rebuild then
-        Spatial.Rebuild()
+        Spatial.Rebuild(Core.Now(), true)
         modData = zombie and zombie.getModData and zombie:getModData() or nil
         zombieId = modData and modData.PNC_ZombieID or nil
     end
@@ -452,7 +452,7 @@ function Perception.FindZombieByID(zombieId)
         return zombie
     end
     if Spatial.Rebuild then
-        Spatial.Rebuild()
+        Spatial.Rebuild(Core.Now(), true)
         return Spatial.FindZombieByID(zombieId)
     end
     return nil

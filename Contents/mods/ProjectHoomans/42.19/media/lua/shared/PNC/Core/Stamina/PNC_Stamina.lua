@@ -220,9 +220,6 @@ function Stamina.Update(record, zombie, now)
     local previous = tonumber(stamina.current) or 0
     stamina.current = clamp(previous + (recoverRate * elapsed), 0, tonumber(stamina.max) or 100)
     updateState(record)
-    if math.abs(stamina.current - previous) >= 0.01 and PNC.Registry and PNC.Registry.MarkDirty then
-        PNC.Registry.MarkDirty(record, "stamina")
-    end
 end
 
 function Stamina.BuildSnapshot(record)

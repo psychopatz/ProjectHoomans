@@ -12,6 +12,10 @@
 - movement exhaustion uses hysteresis and a short sprint breather so run can resume only after both stamina recovery and the breather lock clear
 - nameplates decide draw visibility from stamina summary data, not direct runtime internals
 - the overhead stamina bar uses a smooth dark-gray-to-white gradient so it remains visually distinct from HP's green/yellow/red states
+- passive recovery and movement drain do not dirty persistence every update;
+  the registry captures a changed current value during the next save
+- maximum stamina, encumbrance multipliers, display state, and visibility
+  timers are derived/runtime values; v8 persists only a non-full current value
 
 ## Integration Points
 - `PNC_Combat_*` checks and spends attack stamina

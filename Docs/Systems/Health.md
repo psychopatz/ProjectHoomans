@@ -54,6 +54,18 @@
 - `PNC.API.ClearKnoxInfection(npcId, source)` is the authority-only cure integration seam. It removes the infection lifecycle but deliberately preserves the bite and all physical wound damage for normal treatment.
 - debug menus can force an infected bite, jump to fever/terminal, trigger infection death, or clear Knox infection; the Health screen and snapshot dump expose infection status, progress, stage, fever, and temperature to authorized debug users
 
+## Persistence
+
+- schema v8 stores the most common value shared by all standard body parts as
+  `partBase` and saves only exceptional parts; standard 100-point part maxima
+  use a number instead of a nested table
+- aggregate health percentages, wound counts, and bleeding rate are rebuilt
+  from parts/wounds on load
+- recent-damage display time, revive protection, and other process-clock
+  values are runtime-only and do not dirty the record when they expire
+- an incapacitated NPC receives a fresh short damage grace period after load;
+  stale process-clock timestamps are never applied across a restart
+
 ## Client Visuals
 - live NPCs render overhead nameplates with their name and HP bar; exact HP numbers are intentionally hidden from both the nameplate and Health panel
 - incapacitated NPCs use a pulsing red bar variant

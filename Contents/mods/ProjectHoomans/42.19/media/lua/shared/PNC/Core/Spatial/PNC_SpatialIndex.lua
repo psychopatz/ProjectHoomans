@@ -94,11 +94,21 @@ local function ensureZombieID(zombie)
     return tostring(modData.PNC_ZombieID)
 end
 
-function Spatial.Rebuild()
+function Spatial.Rebuild(now, force)
     local zombieList
     local zombie
     local zombieID
     local i
+    local lastRebuildAt = tonumber(Spatial.LastRebuildAt)
+    now = tonumber(now) or Core.Now()
+    if force ~= true
+        and lastRebuildAt ~= nil
+        and now - lastRebuildAt
+            < (tonumber(Const.SPATIAL_REBUILD_MS) or 100)
+    then
+        return false
+    end
+    Spatial.LastRebuildAt = now
     Spatial.PlayerCells = {}
     Spatial.ZombieCells = {}
     Spatial.ZombieByID = {}
@@ -117,12 +127,12 @@ function Spatial.Rebuild()
     end
 
     if not getCell then
-        return
+        return true
     end
 
     zombieList = getCell():getZombieList()
     if not zombieList then
-        return
+        return true
     end
 
     for i = 0, zombieList:size() - 1 do
@@ -135,6 +145,7 @@ function Spatial.Rebuild()
             end
         end
     end
+    return true
 end
 
 local function queryGrid(grid, x, y, radius)

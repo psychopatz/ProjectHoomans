@@ -36,3 +36,10 @@ matrix. Clients never author this transition.
 Future reputation, faction diplomacy, and individual grudges should extend
 `PNC_Relationships`; perception and damage routing should continue to consume
 the service rather than maintaining parallel rules.
+
+Before that layer is added, persistence schema v8 establishes its scale
+contract: future individual reputation entries must be sparse and created only
+after a real player-character/NPC interaction. Derived recruitment chance and
+historical daily attempts must not be copied into every NPC record. Shared
+leader/faction diplomacy belongs in one world-level map rather than an
+NPC-by-NPC cross product.

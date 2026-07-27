@@ -5,6 +5,7 @@ PNC = {
         TICK_LIVE_HOT_MS = 100,
         TICK_LIVE_WARM_MS = 250,
         TICK_LIVE_COLD_MS = 1000,
+        SCHEDULER_MAX_RECORDS_PER_TICK = 24,
     },
     Identity = {
         MixSeed = function(seed) return (tonumber(seed) or 1) * 97 end,
@@ -38,6 +39,27 @@ local due = PNC.Scheduler.PopDue(records, 1050)
 local found = false
 for i = 1, #due do found = found or due[i] == hot end
 assert(found, "hot record did not retain 50ms cadence")
+
+PNC.Scheduler.Buckets = {}
+PNC.Scheduler.SlotByID = {}
+PNC.Scheduler.Initialized = true
+PNC.Scheduler.LastSlot = 20
+local crowded = {}
+for i = 1, 100 do
+    local crowdedRecord = {
+        id = "crowded_" .. tostring(i),
+        identitySeed = i,
+        presenceState = "live",
+        runtime = { attackAction = {} },
+    }
+    crowded[crowdedRecord.id] = crowdedRecord
+    PNC.Scheduler.Schedule(crowdedRecord, 1050)
+end
+local bounded = PNC.Scheduler.PopDue(crowded, 1050)
+assert(#bounded <= 24, "scheduler exceeded the per-tick record budget")
+local deferred = PNC.Scheduler.PopDue(crowded, 1100)
+assert(#deferred > 0 and #deferred <= 24,
+    "scheduler did not defer crowded records")
 
 local downed = {
     presenceState = "live",

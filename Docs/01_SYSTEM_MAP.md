@@ -14,7 +14,9 @@
   rehydrate, and compact prior-body instance hints used only for relog cleanup
 - `PNC_Registry`: authoritative NPC records and live body lookup
 - `PNC_Relationships`: faction-enemy matrix and authoritative disposition transitions
-- `PNC_SpatialIndex`: indexed nearby player, NPC, and zombie queries
+- `PNC_SpatialIndex`: indexed nearby player, NPC, and zombie queries; global
+  player/zombie scans are cadence-bounded while explicit stale-ID recovery may
+  force a rebuild
 - `PNC_Stealth`: follow-stealth state and stealth-based combat suppression
 - `PNC_Perception`: target selection, zombie lookup, and nearby threat counting
 - `PNC_Stamina`: stamina authority, recovery, attack costs, and visibility timers
@@ -62,7 +64,8 @@
   `Presence/PNC_BodyLifecycle/`
 - `PNC_Presence`: live and abstract transitions, naked engine-shell
   materialization, and pre-spawn stale-shell cleanup
-- `PNC_Scheduler`: cadence rules
+- `PNC_Scheduler`: cadence rules, identity-seeded update distribution, and a
+  hard 24-record server-tick budget with overflow deferred to later slots
 - `PNC_Network`: roster snapshots, live presence snapshots, instance-specific
   stale-body removals, and on-demand character payloads
 - `PNC_ZombieAggro`: zombie-to-NPC aggro bridge and bite flow

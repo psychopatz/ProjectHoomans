@@ -148,7 +148,10 @@ assert(payload.progression.skillLevelDeltas.Strength == 3, "legacy skill delta c
 assert(payload.health.body.wounds.ForeArm_L, "body wound was not serialized")
 assert(payload.health.body.infection.active == true, "infection was not serialized")
 assert(payload.health.body.infection.stage == "nauseous", "infection stage was not serialized")
-assert(payload.health.body.parts.ForeArm_L.current == 76, "body-part health was not serialized")
+assert(payload.health.body.parts.ForeArm_L == 76,
+    "body-part health was not compacted")
+assert(payload.health.lastDamageAt == nil,
+    "transient damage timestamp was persisted")
 assert(payload.equipmentSpawnMode == "ranged", "equipment spawn override was not serialized")
 assert(payload.equipmentPoolID == "Default", "equipment pool was not serialized")
 assert(payload.bodyHint.instanceID == 9191, "live body instance hint was not serialized")

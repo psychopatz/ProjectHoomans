@@ -5,10 +5,93 @@ PNC.Inventory = PNC.Inventory or {}
 
 local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
-local Core = PNC.Core
 local ITEM_WEIGHT_CACHE = {}
 local ITEM_CAPACITY_CACHE = {}
 local ITEM_CONTAINER_PROFILE_CACHE = {}
+local ITEM_STATE_SCALAR_FIELDS = {
+    "condition",
+    "headCondition",
+    "quality",
+    "haveBeenRepaired",
+    "usedDelta",
+    "favorite",
+    "customName",
+    "ammoCount",
+    "fluidAmount",
+    "fluidType",
+}
+
+local function boundedString(value)
+    local limit
+    local output
+    if value == nil then return nil end
+    output = tostring(value)
+    limit = tonumber(PNC.Const
+        and PNC.Const.INVENTORY_ITEM_STATE_MAX_STRING_LENGTH) or 1024
+    if #output > limit then
+        output = string.sub(output, 1, limit)
+    end
+    return output
+end
+
+local function sanitizeScalar(value)
+    local kind = type(value)
+    if kind == "string" then return boundedString(value) end
+    if kind == "number" then
+        if value ~= value or value == math.huge or value == -math.huge then
+            return nil
+        end
+        return value
+    end
+    if kind == "boolean" then return value end
+    return nil
+end
+
+function Internal.sanitizeItemState(raw)
+    local output = {}
+    local field
+    local value
+    local entries = {}
+    local entry
+    local key
+    local copied = 0
+    local maxKeys = tonumber(PNC.Const
+        and PNC.Const.INVENTORY_ITEM_STATE_MAX_MODDATA_KEYS) or 64
+    if type(raw) ~= "table" then return output end
+    for i = 1, #ITEM_STATE_SCALAR_FIELDS do
+        field = ITEM_STATE_SCALAR_FIELDS[i]
+        value = sanitizeScalar(raw[field])
+        if value ~= nil then output[field] = value end
+    end
+    if type(raw.modData) == "table" then
+        for key, value in pairs(raw.modData) do
+            entries[#entries + 1] = {
+                key = tostring(key),
+                value = value,
+            }
+        end
+        table.sort(entries, function(left, right)
+            return left.key < right.key
+        end)
+        output.modData = {}
+        for i = 1, #entries do
+            if copied >= maxKeys then break end
+            entry = entries[i]
+            key = entry.key
+            value = sanitizeScalar(entry.value)
+            if value ~= nil then
+                output.modData[boundedString(key)] = value
+                copied = copied + 1
+            end
+        end
+        if copied <= 0 then output.modData = nil end
+    end
+    return output
+end
+
+function Inventory.SanitizeItemState(raw)
+    return Internal.sanitizeItemState(raw)
+end
 
 local function normalizeReduction(value)
     value = tonumber(value) or 0
@@ -134,8 +217,57 @@ function Internal.itemToPayload(item)
         customName = item.customName,
         identityNPCId = item.identityNPCId,
         identityNPCName = item.identityNPCName,
-        itemState = Core.DeepCopy(item.itemState or {}),
+        itemState = Internal.sanitizeItemState(item.itemState),
     }
+end
+
+-- Persistence omits values that can be reconstructed from the script item.
+-- Network payloads keep using itemToPayload because clients need a complete
+-- standalone description.
+function Internal.itemToPersistencePayload(item)
+    local profile
+    local output
+    local itemState
+    if not item or not item.id or not item.type then return nil end
+    profile = Internal.getContainerProfile(item.type)
+    itemState = Internal.sanitizeItemState(item.itemState)
+    if item.cond ~= nil then itemState.condition = nil end
+    if item.uses ~= nil then itemState.usedDelta = nil end
+    if item.ammoCount ~= nil then itemState.ammoCount = nil end
+    if item.fav ~= nil then itemState.favorite = nil end
+    if item.customName ~= nil then itemState.customName = nil end
+    if Internal.countMapEntries(itemState) <= 0 then itemState = nil end
+    output = {
+        id = item.id,
+        type = item.type,
+        stack = (tonumber(item.stack) or 1) ~= 1
+            and math.max(1, math.floor(tonumber(item.stack) or 1)) or nil,
+        uses = tonumber(item.uses),
+        cond = tonumber(item.cond),
+        ammoCount = tonumber(item.ammoCount),
+        fav = item.fav == true or nil,
+        interactionLocked = item.interactionLocked == true or nil,
+        interactionLockReason = item.interactionLocked == true
+            and item.interactionLockReason or nil,
+        container = item.container ~= "root" and item.container or nil,
+        maxWeight = tonumber(item.maxWeight) ~= tonumber(profile.capacity)
+            and tonumber(item.maxWeight) or nil,
+        weightReduction = tonumber(item.weightReduction)
+                ~= tonumber(profile.weightReduction)
+            and tonumber(item.weightReduction) or nil,
+        wearableSlot = item.wearableSlot ~= profile.wearableSlot
+            and item.wearableSlot or nil,
+        templateKey = item.templateKey,
+        preferredContainer = item.preferredContainer,
+        wornSlot = item.wornSlot,
+        attachedSlot = item.attachedSlot,
+        equipSlot = item.equipSlot,
+        customName = item.customName,
+        identityNPCId = item.identityNPCId,
+        identityNPCName = item.identityNPCName,
+        itemState = itemState,
+    }
+    return output
 end
 
 function Internal.createItem(record, inv, spec)
@@ -176,7 +308,7 @@ function Internal.createItem(record, inv, spec)
         customName = Internal.normalizeString(spec.customName),
         identityNPCId = Internal.normalizeString(spec.identityNPCId),
         identityNPCName = Internal.normalizeString(spec.identityNPCName),
-        itemState = Core.DeepCopy(spec.itemState or {}),
+        itemState = Internal.sanitizeItemState(spec.itemState),
     }
     inv.items[itemID] = item
     Internal.addItemToContainer(inv, itemID, item.container)

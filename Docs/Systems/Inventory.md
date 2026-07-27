@@ -19,6 +19,7 @@
   carrying the NPC UUID/name as item modData for future kill/identification quests
 - derived carry caches such as used and remaining weight
 - revision-bound summaries that do not require full inventory hydration
+- bounded portable item state with deterministic primitive-only modData
 
 ## Public Functions
 - `PNC.Inventory.CreateFromTemplate(record)`
@@ -85,6 +86,16 @@ continue to call only the public `PNC.Inventory` functions.
   `PsychopatzCore.ItemTransfer`, keeping packet synchronization and portable
   item-state conversion standardized across ProjectHoomans, DynamicTrading, and
   future Psychopatz mods.
+- compact persistence does not repeat script-derived bag capacity, weight
+  reduction, wearable slot, root carry capacity, or cached used weight.
+  Acquired items persist only overrides plus their sanitized portable state.
+- portable item state accepts the standardized condition, repair, drainable,
+  favorite, custom-name, ammunition, fluid, and primitive modData fields.
+  Nested tables/userdata/functions are rejected; modData is sorted
+  deterministically and bounded to 64 keys with 1,024-character string values.
+- runtime inventory operation logs remain capped and are never serialized.
+  Save deltas are rebuilt from the current canonical inventory, so mutation
+  history cannot grow the save indefinitely.
 
 ## Equipment Generation
 
@@ -165,6 +176,8 @@ the generation service should remain free of item lists.
 - generator version 2 moves built-in starting items into generic equipment pools
 - generator version 3 adds the stable named identity-card template and rebases
   older inventories without duplicating cards
+- persistence schema version 8 removes duplicated derived weights and writes
+  minimal per-field template changes and minimal acquired-item payloads
 - death conversion re-validates the identity card against the final
   `IsoDeadBody` container, so legacy records and engine fallback conversions
   still receive exactly one card

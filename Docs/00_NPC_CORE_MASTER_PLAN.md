@@ -10,9 +10,13 @@
 - zombie aggro bridge so zombies can acquire embodied NPCs
 - custom HP, body-part wounds, bandage-driven incapacitation recovery, and stamina
 - seeded identity, archetype registry, and compact inventory persistence
+- v8 compact health/inventory/stamina persistence with save-time dirty
+  snapshots and a 100-NPC/4,000-acquired-item scale gate
+- cadence-bounded spatial rebuilding plus staggered NPC scheduling
 - right-click debug spawning, NPC selection hub, and character window
 
 ## Immediate Next Steps
+- character-specific companion ownership and sparse per-NPC player reputation
 - smoother live motion and tighter SP/MP parity for chase and follow
 - richer animation bindings and better weapon-specific timing
 - better ranged aim, muzzle/projectile treatment, and combat diagnostics

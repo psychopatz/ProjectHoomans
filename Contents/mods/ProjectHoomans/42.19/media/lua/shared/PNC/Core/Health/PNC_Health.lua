@@ -70,9 +70,6 @@ function Health.MarkRecentDamage(record, now)
         tonumber(record.runtime.inCombatUntil or 0) or 0,
         damageAt + Const.DEBUG_COMBAT_HOLD_MS
     )
-    if Registry and Registry.MarkDirty then
-        Registry.MarkDirty(record, "health")
-    end
 end
 
 local function applyIncapacitatedLiveState(record, zombie)
@@ -493,9 +490,6 @@ function Health.Update(record, zombie, now)
         and now >= (tonumber(health.reviveProtectionUntil) or 0)
     then
         health.reviveProtectionUntil = 0
-        if Registry and Registry.MarkDirty then
-            Registry.MarkDirty(record, "health")
-        end
     end
     if zombie then
         refreshNormalLiveBuffer(record, zombie)

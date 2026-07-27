@@ -11,9 +11,21 @@ local function applySavedSlots(inv, item, changed)
         return
     end
     Internal.clearItemRefs(inv, item.id)
-    item.wornSlot = Internal.normalizeString(changed.wornSlot)
-    item.attachedSlot = Internal.normalizeString(changed.attachedSlot)
-    item.equipSlot = Internal.normalizeString(changed.equipSlot)
+    if changed.wornSlot == false then
+        item.wornSlot = nil
+    else
+        item.wornSlot = Internal.normalizeString(changed.wornSlot)
+    end
+    if changed.attachedSlot == false then
+        item.attachedSlot = nil
+    else
+        item.attachedSlot = Internal.normalizeString(changed.attachedSlot)
+    end
+    if changed.equipSlot == false then
+        item.equipSlot = nil
+    else
+        item.equipSlot = Internal.normalizeString(changed.equipSlot)
+    end
     if item.wornSlot then inv.worn[item.wornSlot] = item.id end
     if item.attachedSlot then inv.attached[item.attachedSlot] = item.id end
     if item.equipSlot == "primary" then
@@ -58,10 +70,23 @@ function Internal.applySavedDelta(record, inv, delta)
                 if changed.stack ~= nil then
                     item.stack = math.max(1, math.floor(tonumber(changed.stack) or item.stack or 1))
                 end
-                if changed.uses ~= nil then item.uses = tonumber(changed.uses) end
-                if changed.cond ~= nil then item.cond = tonumber(changed.cond) end
+                if changed.uses == false then
+                    item.uses = nil
+                elseif changed.uses ~= nil then
+                    item.uses = tonumber(changed.uses)
+                end
+                if changed.cond == false then
+                    item.cond = nil
+                elseif changed.cond ~= nil then
+                    item.cond = tonumber(changed.cond)
+                end
                 if changed.ammoCount ~= nil then
-                    item.ammoCount = math.max(0, math.floor(tonumber(changed.ammoCount) or 0))
+                    if changed.ammoCount == false then
+                        item.ammoCount = nil
+                    else
+                        item.ammoCount = math.max(0,
+                            math.floor(tonumber(changed.ammoCount) or 0))
+                    end
                 end
                 if changed.fav ~= nil then item.fav = changed.fav == true end
                 if changed.interactionLocked ~= nil then
@@ -71,6 +96,13 @@ function Internal.applySavedDelta(record, inv, delta)
                             changed.interactionLockReason
                         )
                         or nil
+                end
+                if changed.interactionLockReason == false then
+                    item.interactionLockReason = nil
+                elseif changed.interactionLockReason ~= nil then
+                    item.interactionLockReason = Internal.normalizeString(
+                        changed.interactionLockReason
+                    )
                 end
                 if changed.container ~= nil then
                     Internal.setItemContainer(inv, item,
@@ -106,11 +138,12 @@ function Internal.buildCompactDelta(record, inv)
     local templateItem
     local item
     local itemID
+    local itemChanges
     for itemID, item in pairs(inv.items or {}) do
         if item.templateKey then
             templateItem = Internal.findItemByTemplateKey(template, item.templateKey)
             if not templateItem then
-                added[#added + 1] = Internal.itemToPayload(item)
+                added[#added + 1] = Internal.itemToPersistencePayload(item)
             else
                 if item.container ~= templateItem.container then
                     moved[#moved + 1] = {
@@ -118,36 +151,54 @@ function Internal.buildCompactDelta(record, inv)
                         to = item.container,
                     }
                 end
-                if (tonumber(item.stack) or 1) ~= (tonumber(templateItem.stack) or 1)
-                    or (tonumber(item.uses) or 0) ~= (tonumber(templateItem.uses) or 0)
-                    or (tonumber(item.cond) or 0) ~= (tonumber(templateItem.cond) or 0)
-                    or item.ammoCount ~= templateItem.ammoCount
-                    or (item.fav == true) ~= (templateItem.fav == true)
-                    or (item.interactionLocked == true)
-                        ~= (templateItem.interactionLocked == true)
-                    or item.interactionLockReason
-                        ~= templateItem.interactionLockReason
-                    or item.wornSlot ~= templateItem.wornSlot
-                    or item.attachedSlot ~= templateItem.attachedSlot
-                    or item.equipSlot ~= templateItem.equipSlot
+                itemChanges = {}
+                if (tonumber(item.stack) or 1)
+                    ~= (tonumber(templateItem.stack) or 1)
+                then itemChanges.stack = item.stack end
+                if tonumber(item.uses) ~= tonumber(templateItem.uses)
                 then
-                    changed[item.templateKey] = {
-                        stack = item.stack,
-                        uses = item.uses,
-                        cond = item.cond,
-                        ammoCount = item.ammoCount,
-                        fav = item.fav == true,
-                        interactionLocked = item.interactionLocked == true,
-                        interactionLockReason = item.interactionLockReason,
-                        container = item.container,
-                        wornSlot = item.wornSlot,
-                        attachedSlot = item.attachedSlot,
-                        equipSlot = item.equipSlot,
-                    }
+                    itemChanges.uses = item.uses ~= nil
+                        and item.uses or false
+                end
+                if tonumber(item.cond) ~= tonumber(templateItem.cond)
+                then
+                    itemChanges.cond = item.cond ~= nil
+                        and item.cond or false
+                end
+                if item.ammoCount ~= templateItem.ammoCount then
+                    itemChanges.ammoCount = item.ammoCount ~= nil
+                        and item.ammoCount or false
+                end
+                if (item.fav == true) ~= (templateItem.fav == true) then
+                    itemChanges.fav = item.fav == true
+                end
+                if (item.interactionLocked == true)
+                    ~= (templateItem.interactionLocked == true)
+                then
+                    itemChanges.interactionLocked =
+                        item.interactionLocked == true
+                end
+                if item.interactionLockReason
+                    ~= templateItem.interactionLockReason
+                then
+                    itemChanges.interactionLockReason =
+                        item.interactionLockReason or false
+                end
+                if item.wornSlot ~= templateItem.wornSlot then
+                    itemChanges.wornSlot = item.wornSlot or false
+                end
+                if item.attachedSlot ~= templateItem.attachedSlot then
+                    itemChanges.attachedSlot = item.attachedSlot or false
+                end
+                if item.equipSlot ~= templateItem.equipSlot then
+                    itemChanges.equipSlot = item.equipSlot or false
+                end
+                if Internal.countMapEntries(itemChanges) > 0 then
+                    changed[item.templateKey] = itemChanges
                 end
             end
         else
-            added[#added + 1] = Internal.itemToPayload(item)
+            added[#added + 1] = Internal.itemToPersistencePayload(item)
         end
     end
     for itemID, item in pairs(template.items or {}) do
