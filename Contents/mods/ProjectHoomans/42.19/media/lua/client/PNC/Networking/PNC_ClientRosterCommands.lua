@@ -32,6 +32,36 @@ local function mergeSnapshot(current, incoming)
     return current
 end
 
+local function storeSnapshot(incoming, replace)
+    local id
+    if type(incoming) ~= "table" or incoming.id == nil then
+        return nil
+    end
+    id = tostring(incoming.id)
+    if replace == true or incoming.deathMarker == true then
+        ClientState.snapshots[id] = incoming
+    else
+        ClientState.snapshots[id] = mergeSnapshot(
+            ClientState.snapshots[id],
+            incoming
+        )
+    end
+    if incoming.deathMarker == true then
+        if ClientState.characterPayloads then
+            ClientState.characterPayloads[id] = nil
+        end
+        if Interpolation and Interpolation.ClearNPC then
+            Interpolation.ClearNPC(id)
+        end
+    elseif ClientState.characterPayloads
+        and ClientState.characterPayloads[id]
+    then
+        ClientState.characterPayloads[id].snapshot =
+            ClientState.snapshots[id]
+    end
+    return ClientState.snapshots[id]
+end
+
 Internal.RegisterServerCommand(Const.CMD_FULL_SYNC, function(args)
     local snapshot
     local i
@@ -93,7 +123,6 @@ end)
 
 Internal.RegisterServerCommand(Const.CMD_ROSTER_DELTA, function(args)
     local entry
-    local current
     local i
     for i = 1, #(args.entries or {}) do
         entry = args.entries[i]
@@ -103,11 +132,7 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_DELTA, function(args)
                 ClientState.characterPayloads[entry.id] = nil
             end
         elseif entry.snapshot and entry.snapshot.id then
-            current = ClientState.snapshots[entry.snapshot.id]
-            ClientState.snapshots[entry.snapshot.id] = mergeSnapshot(
-                current,
-                entry.snapshot
-            )
+            storeSnapshot(entry.snapshot, false)
         end
     end
     ClientState.rosterRevision = args.directoryRevision
@@ -120,18 +145,9 @@ Internal.RegisterServerCommand(Const.CMD_SYNC_RECORD, function(args)
         return
     end
     if args.event == "interest_exit" or args.event == "interest_enter" then
-        ClientState.snapshots[snapshot.id] = snapshot
+        storeSnapshot(snapshot, true)
     else
-        ClientState.snapshots[snapshot.id] = mergeSnapshot(
-            ClientState.snapshots[snapshot.id],
-            snapshot
-        )
-    end
-    if ClientState.characterPayloads
-        and ClientState.characterPayloads[snapshot.id]
-    then
-        ClientState.characterPayloads[snapshot.id].snapshot =
-            ClientState.snapshots[snapshot.id]
+        storeSnapshot(snapshot, false)
     end
 end)
 

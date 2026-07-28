@@ -36,7 +36,7 @@ local CONTROL_VARIABLES = {
 
 local function setBoolean(zombie, methodName, value)
     local method = zombie and zombie[methodName] or nil
-    if method then pcall(method, zombie, value) end
+    if method then method(zombie, value) end
 end
 
 local function clearManagedState(record, zombie)
@@ -50,9 +50,9 @@ local function clearManagedState(record, zombie)
     end
     for i = 1, #CONTROL_VARIABLES do
         if zombie.clearVariable then
-            pcall(zombie.clearVariable, zombie, CONTROL_VARIABLES[i])
+            zombie:clearVariable(CONTROL_VARIABLES[i])
         elseif zombie.setVariable then
-            pcall(zombie.setVariable, zombie, CONTROL_VARIABLES[i], false)
+            zombie:setVariable(CONTROL_VARIABLES[i], false)
         end
     end
 end
@@ -110,7 +110,6 @@ function Lifecycle.SpawnReanimatedZombie(record, corpse)
     local z
     local outfit
     local femaleChance
-    local ok
     local zombieList
     local zombie
     local usedCorpseReanimation = false
@@ -133,8 +132,8 @@ function Lifecycle.SpawnReanimatedZombie(record, corpse)
     -- inventory, worn items, and modData, allocates the server zombie ID,
     -- inserts it into the cell, and removes the corpse.
     if corpse.reanimate then
-        ok, zombie = pcall(corpse.reanimate, corpse)
-        usedCorpseReanimation = ok and zombie ~= nil
+        zombie = corpse:reanimate()
+        usedCorpseReanimation = zombie ~= nil
     end
 
     -- Keep a narrow fallback for unusual corpses/builds where the engine
@@ -146,8 +145,7 @@ function Lifecycle.SpawnReanimatedZombie(record, corpse)
         outfit = PNC.VisualProfiles and PNC.VisualProfiles.ResolveSpawnOutfit
             and PNC.VisualProfiles.ResolveSpawnOutfit(record) or nil
         femaleChance = record.isFemale == true and 100 or 0
-        ok, zombieList = pcall(
-            addZombiesInOutfit,
+        zombieList = addZombiesInOutfit(
             x, y, z, 1, outfit, femaleChance,
             false, -- crawler
             false, -- fall on front
@@ -157,7 +155,7 @@ function Lifecycle.SpawnReanimatedZombie(record, corpse)
             false, -- sitting
             1      -- health
         )
-        zombie = ok and zombieList and zombieList.size
+        zombie = zombieList and zombieList.size
             and zombieList:size() > 0 and zombieList:get(0) or nil
     end
     state.reanimationSpawnInProgress = false
@@ -173,8 +171,7 @@ function Lifecycle.SpawnReanimatedZombie(record, corpse)
                 "corpse",
                 "reanimation_retry",
                 "reanimation_spawn_failed",
-                ok and "reanimation_returned_no_zombie"
-                    or tostring(zombieList or "engine_reanimation_failed")
+                tostring(zombieList or "engine_reanimation_failed")
             )
         end
         if state.reanimationSpawnAttempts == 1
@@ -190,7 +187,7 @@ function Lifecycle.SpawnReanimatedZombie(record, corpse)
     state.reanimationSpawned = true
     state.corpseState = "reanimated"
     if not usedCorpseReanimation then
-        if zombie.DoZombieStats then pcall(zombie.DoZombieStats, zombie) end
+        if zombie.DoZombieStats then zombie:DoZombieStats() end
         Internal.removeCorpse(corpse)
     end
     if not Lifecycle.ReleaseReanimatedNPC(record, zombie) then

@@ -39,7 +39,12 @@ PNC = {}
 dofile(FILE)
 
 local map = {
-    addChild = function(self, child) self.child = child end,
+    width = 500,
+    height = 500,
+    children = {},
+    addChild = function(self, child)
+        self.children[#self.children + 1] = child
+    end,
 }
 setmetatable(map, { __index = ISWorldMap })
 map:createChildren()

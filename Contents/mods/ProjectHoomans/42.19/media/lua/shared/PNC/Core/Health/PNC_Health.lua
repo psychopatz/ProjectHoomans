@@ -299,7 +299,7 @@ end
 
 function Health.Kill(record, zombie, reason)
     local health = Health.Ensure(record)
-    local corpseOK
+    local corpseConverted
     local corpseCreated
     local deathMarker
     if PNC.CompanionVehicle and PNC.CompanionVehicle.Release then
@@ -331,16 +331,13 @@ function Health.Kill(record, zombie, reason)
             or PNC.BodyLifecycle.CreateInertCorpse
         ) or nil
         if createCorpse then
-            corpseOK, corpseCreated = pcall(
-                createCorpse,
-                record,
-                zombie,
-                reason or "death"
-            )
+            corpseConverted, corpseCreated =
+                createCorpse(record, zombie, reason or "death")
         else
-            corpseOK, corpseCreated = false, "corpse_service_unavailable"
+            corpseConverted, corpseCreated =
+                false, "corpse_service_unavailable"
         end
-        if (not corpseOK or corpseCreated ~= true) and Core and Core.Log then
+        if corpseConverted ~= true and Core and Core.Log then
             Core.Log("ERROR", "NPC corpse creation failed npc=" .. tostring(record.id)
                 .. " reason=" .. tostring(corpseCreated or "unknown"))
         end
@@ -361,10 +358,13 @@ function Health.Kill(record, zombie, reason)
     end
     if deathMarker and Registry and Registry.RemoveRecord then
         record.runtime.deathRetired = true
-        Registry.RemoveRecord(record.id)
+        -- Broadcast while both the compact marker and retiring live record are
+        -- addressable. The networking path prefers the thin corpse snapshot;
+        -- removing first would degrade this into a generic roster removal.
         if PNC.Network and PNC.Network.BroadcastRemoval then
             PNC.Network.BroadcastRemoval(record.id, "death")
         end
+        Registry.RemoveRecord(record.id)
     elseif Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "health")
     end

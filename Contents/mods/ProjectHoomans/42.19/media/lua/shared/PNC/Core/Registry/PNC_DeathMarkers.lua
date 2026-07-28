@@ -29,6 +29,13 @@ local function normalizeMarker(source, fallbackID)
         corpseToken = normalizeString(source.corpseToken or source.token),
         createdWorldHour = tonumber(source.createdWorldHour) or 0,
         infected = source.infected == true,
+        colonist = source.colonist == true
+            or source.recruited == true
+            or tostring(source.faction or "") == "colonist",
+        portrait = PNC.Identity
+            and PNC.Identity.NormalizePortraitSummary
+            and PNC.Identity.NormalizePortraitSummary(source.portrait)
+            or nil,
         reanimationDelaySeconds = math.max(
             1,
             tonumber(source.reanimationDelaySeconds) or 3
@@ -101,6 +108,12 @@ function Registry.AddDeathMarker(record)
         corpseToken = corpse and corpse.token,
         createdWorldHour = corpse and corpse.createdWorldHour,
         infected = infection and infection.fatal == true or false,
+        colonist = record.recruited == true
+            or tostring(record.faction or "") == "colonist",
+        portrait = PNC.Identity
+            and PNC.Identity.BuildPortraitSummary
+            and PNC.Identity.BuildPortraitSummary(record)
+            or nil,
         reanimationDelaySeconds = Settings and Settings.NPCReanimationSeconds
             and Settings.NPCReanimationSeconds() or 3,
     })
@@ -131,7 +144,7 @@ function Registry.ForEachDeathMarker(callback)
     end
 end
 
-function Registry.RemoveDeathMarker(id)
+function Registry.RemoveDeathMarker(id, reason)
     local directory
     if Core.IsAuthority and not Core.IsAuthority() then return false end
     if id == nil or not Registry.GetStorageDirectory then return false end
@@ -141,6 +154,14 @@ function Registry.RemoveDeathMarker(id)
     Registry.DeathMarkerRuntime[id] = nil
     directory.deathMarkers[id] = nil
     Registry.DirectoryDirty = true
+    if PNC.Network and PNC.Network.BroadcastDeathMarkerRemoval then
+        PNC.Network.BroadcastDeathMarkerRemoval(
+            id,
+            reason or "corpse_removed"
+        )
+    elseif PNC.Network and PNC.Network.BroadcastRemoval then
+        PNC.Network.BroadcastRemoval(id, reason or "corpse_removed")
+    end
     return true
 end
 

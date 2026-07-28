@@ -49,6 +49,7 @@ PNC = {
         CHARACTER_DETAIL_DISTANCE = 5,
         PRESENCE_LIVE = "live",
         PRESENCE_ABSTRACT = "abstract",
+        PRESENCE_CORPSE = "corpse",
         MELEE_RANGE = 1.3,
         RANGED_MIN_STANDOFF = 2.2,
         RANGED_PREFERRED_MIN_DISTANCE = 5,
@@ -85,6 +86,15 @@ PNC = {
                 identitySeed = record.identitySeed,
                 isFemale = false,
                 survivor = {},
+            }
+        end,
+        BuildPortraitSummary = function(record)
+            return {
+                identitySeed = record.identitySeed,
+                isFemale = false,
+                faceOnly = true,
+                appearance = { hairModel = "Short" },
+                equipment = { worn = { Hat = "Base.Hat_HardHat" } },
             }
         end,
     },
@@ -174,7 +184,18 @@ local nearbyRecord = {
 PNC.SpatialIndex = {
     QueryNPCs = function() return { nearbyRecord } end,
 }
-PNC.Registry = { Get = function() return nearbyRecord end }
+local activeDeathMarker
+PNC.Registry = {
+    Get = function() return nearbyRecord end,
+    GetDeathMarker = function(id)
+        if activeDeathMarker
+            and tostring(activeDeathMarker.id) == tostring(id)
+        then
+            return activeDeathMarker
+        end
+        return nil
+    end,
+}
 
 dofile(FILE)
 
@@ -205,11 +226,42 @@ assertEqual(
     "roster omitted map presentation"
 )
 assertEqual(
+    PNC.Network.BuildRosterSnapshot(nearbyRecord)
+        .portrait.equipment.worn.Hat,
+    "Base.Hat_HardHat",
+    "roster omitted compact portrait metadata"
+)
+assertEqual(
     PNC.Network.BuildPresenceDelta(nearbyRecord).mapPresentation,
     nil,
     "high-frequency presence delta repeated map presentation"
 )
 nearbyRecord.ownerUsername = nil
+
+local deathSnapshot = PNC.Network.BuildDeathMarkerSnapshot({
+    id = "dead_colonist",
+    name = "Dead Colonist",
+    x = 12,
+    y = 34,
+    z = 0,
+    corpseToken = "corpse:12",
+    colonist = true,
+    infected = false,
+    portrait = {
+        identitySeed = 88,
+        faceOnly = true,
+        appearance = { hairModel = "Short" },
+        equipment = { worn = {} },
+    },
+})
+assertEqual(deathSnapshot.deathMarker, true, "death marker roster flag")
+assertEqual(deathSnapshot.colonist, true, "death marker colonist flag")
+assertEqual(deathSnapshot.presenceState, "corpse",
+    "death marker roster presence")
+assertEqual(deathSnapshot.inventory, nil,
+    "death marker snapshot leaked heavyweight inventory")
+assertEqual(deathSnapshot.portrait.identitySeed, 88,
+    "death marker snapshot omitted compact portrait")
 
 assertEqual(PNC.Network.BuildSnapshot(nearbyRecord).attackMode, false, "idle snapshot attack mode")
 nearbyRecord.runtime.target = {
@@ -376,6 +428,55 @@ assertEqual(sent[1].payload.entries[1].id, "npc_removed", "removal roster id")
 assertEqual(sent[1].payload.entries[1].removed, true, "removal roster marker")
 assertEqual(sent[1].payload.entries[1].snapshot, nil, "removal roster leaked snapshot")
 assertEqual(PNC.Network.QueueRosterDelta("npc_invalid", false, "invalid"), false, "non-removal accepted id-only record")
+
+activeDeathMarker = {
+    id = nearbyRecord.id,
+    name = "Nearby Corpse",
+    x = nearbyRecord.x,
+    y = nearbyRecord.y,
+    z = nearbyRecord.z,
+    corpseToken = "corpse:nearby",
+    colonist = true,
+    infected = false,
+}
+sent = {}
+PNC.Network.BroadcastRemoval(nearbyRecord.id, "death")
+assertEqual(#sent, 8, "death snapshot interest recipient count")
+assertEqual(sent[1].command, "SyncRecord", "death snapshot command")
+assertEqual(sent[1].payload.snapshot.deathMarker, true,
+    "death event did not use compact marker snapshot")
+assertEqual(sent[1].payload.snapshot.inventory, nil,
+    "death event leaked heavyweight record data")
+sent = {}
+assertEqual(PNC.Network.FlushRosterDeltas(7000, true), 1,
+    "death marker roster delta count")
+assertEqual(#sent, 16, "death marker roster delta recipients")
+assertEqual(sent[1].payload.entries[1].removed, false,
+    "death marker was sent as a removal")
+assertEqual(sent[1].payload.entries[1].snapshot.deathMarker, true,
+    "death marker roster delta lost marker metadata")
+activeDeathMarker = nil
+
+sent = {}
+assertEqual(
+    PNC.Network.BroadcastDeathMarkerRemoval(
+        nearbyRecord.id,
+        "corpse_collected"
+    ),
+    true,
+    "death marker removal broadcast"
+)
+assertEqual(#sent, 16, "death marker removal was not immediate for all players")
+assertEqual(sent[1].command, "RemoveRecord",
+    "death marker removal command")
+assertEqual(sent[1].payload.reason, "corpse_collected",
+    "death marker removal reason")
+sent = {}
+assertEqual(PNC.Network.FlushRosterDeltas(8000, true), 1,
+    "death marker removal roster delta count")
+assertEqual(#sent, 16, "death marker removal delta recipients")
+assertEqual(sent[1].payload.entries[1].removed, true,
+    "death marker removal delta was not terminal")
 
 sent = {}
 assertEqual(

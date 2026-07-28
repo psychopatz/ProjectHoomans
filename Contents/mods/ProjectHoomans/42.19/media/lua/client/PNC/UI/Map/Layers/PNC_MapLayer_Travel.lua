@@ -8,20 +8,61 @@ local Directory = PNC.TravelDirectory
 local Layers = PNC.MapLayers
 local Display = PNC.MapDisplay
 local Icons = PNC.MapMarkerIcons
+local HoverPortrait = PNC.MapHoverPortrait
 
 TravelLayer.Enabled = TravelLayer.Enabled ~= false
 TravelLayer.DotTexture = TravelLayer.DotTexture
     or getTexture("media/ui/circle.png")
+TravelLayer.RefreshMs = 100
+
+local function listProjectedEntries()
+    local now = getTimestampMs and tonumber(getTimestampMs()) or 0
+    local cached = TravelLayer.EntryCache
+    local cachedAt = tonumber(TravelLayer.EntryCacheAt) or 0
+    local refreshMs = math.max(
+        0,
+        tonumber(TravelLayer.RefreshMs) or 100
+    )
+    if now > 0
+        and cached
+        and now >= cachedAt
+        and now - cachedAt < refreshMs
+    then
+        return cached
+    end
+    cached = Directory.ListProjected()
+    if now > 0 then
+        TravelLayer.EntryCache = cached
+        TravelLayer.EntryCacheAt = now
+    end
+    return cached
+end
 
 local COLORS = {
-    colonist = { r = 0.15, g = 0.90, b = 0.25 },
-    companion = { r = 0.15, g = 0.90, b = 0.25 },
+    colonist = { r = 0.08, g = 0.42, b = 0.16 },
+    follower = { r = 0.15, g = 0.90, b = 0.25 },
+    dead = { r = 0.55, g = 0.55, b = 0.55 },
+    deadColonist = { r = 0.95, g = 0.45, b = 0.10 },
     neutral = { r = 0.95, g = 0.75, b = 0.20 },
     hostile = { r = 1.00, g = 0.25, b = 0.20 },
 }
 
 local function colorFor(entry)
-    if entry and entry.recruited == true then return COLORS.companion end
+    if entry and entry.deathMarker == true then
+        return entry.colonist == true and COLORS.deadColonist or COLORS.dead
+    end
+    local colonist = entry and (
+        entry.colonist == true
+        or entry.recruited == true
+        or tostring(entry.faction or "") == "colonist"
+    )
+    if colonist
+        and tostring(entry.orderKind or "")
+            == tostring(PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
+    then
+        return COLORS.follower
+    end
+    if colonist then return COLORS.colonist end
     return COLORS[tostring(entry and entry.faction or "neutral")]
         or COLORS.neutral
 end
@@ -102,6 +143,7 @@ local function isOverControls(map, x, y)
         or isInsideVisibleChild(map.keyUI, x, y)
         or isInsideVisibleChild(map.buttonPanel, x, y)
         or isInsideVisibleChild(map.pncNamesButton, x, y)
+        or isInsideVisibleChild(map.pncHoverPortrait, x, y)
 end
 
 local function drawSelectedRoute(map, entry)
@@ -145,23 +187,36 @@ function TravelLayer.SetEnabled(enabled)
     TravelLayer.Enabled = enabled == true
 end
 
+function TravelLayer.InvalidateEntryCache()
+    TravelLayer.EntryCache = nil
+    TravelLayer.EntryCacheAt = nil
+end
+
 function TravelLayer.Render(map)
-    if not TravelLayer.Enabled or not map or not map.mapAPI then return end
+    if not TravelLayer.Enabled or not map or not map.mapAPI then
+        if HoverPortrait and HoverPortrait.Hide then
+            HoverPortrait.Hide(map)
+        end
+        return
+    end
     if Display and Display.EnsureButton then Display.EnsureButton(map) end
-    local entries = Directory.ListProjected()
+    local entries = listProjectedEntries()
     local zoom = tonumber(map.mapAPI:getZoomF()) or 0
     local showLabels = Display and Display.AreNamesVisible
         and Display.AreNamesVisible() or false
     local dotSize = math.max(7, math.min(13, 7 + (zoom - 10) * 0.8))
     local mouseX = map:getMouseX()
     local mouseY = map:getMouseY()
-    local hovered
+    local hoveredEntry
+    local hoveredX
+    local hoveredY
     local i
     local entry
     local sx
     local sy
     local color
     local selected
+    local markerHovered
     local half = dotSize / 2
     for i = 1, #entries do
         entry = entries[i]
@@ -178,6 +233,13 @@ function TravelLayer.Render(map)
                     and PNC.MapCommands.IsSelected
                     and PNC.MapCommands.IsSelected(entry.id)
                     or false
+                markerHovered = math.abs(mouseX - sx) <= half + 3
+                    and math.abs(mouseY - sy) <= half + 3
+                if markerHovered then
+                    hoveredEntry = entry
+                    hoveredX = sx
+                    hoveredY = sy
+                end
                 if selected then
                     drawSelectedRoute(map, entry)
                 end
@@ -216,7 +278,7 @@ function TravelLayer.Render(map)
                     selected and 0.2 or 0.05
                 )
                 drawMarkerIcon(map, entry, sx, sy, dotSize)
-                if showLabels or selected then
+                if (showLabels or selected) and not markerHovered then
                     map:drawTextCentre(
                         displayLabel(entry),
                         sx,
@@ -228,42 +290,46 @@ function TravelLayer.Render(map)
                         UIFont.Small
                     )
                 end
-                if math.abs(mouseX - sx) <= half + 3
-                    and math.abs(mouseY - sy) <= half + 3
-                then
-                    hovered = {
-                        entry = entry,
-                        x = sx,
-                        y = sy,
-                    }
-                end
             end
         end
     end
 
-    if hovered then
-        local label = displayLabel(hovered.entry)
-        local eta = etaText(hovered.entry)
-        if eta then label = label .. " — " .. eta end
-        local width = getTextManager():MeasureStringX(UIFont.Small, label) + 12
-        local height = getTextManager():getFontHeight(UIFont.Small) + 8
-        local x = math.max(
-            4,
-            math.min(map.width - width - 4, hovered.x - width / 2)
-        )
-        local y = math.max(4, hovered.y - height - 10)
-        map:drawRect(x, y, width, height, 0.88, 0.05, 0.05, 0.05)
-        map:drawRectBorder(x, y, width, height, 1, 0.5, 0.5, 0.5)
-        map:drawTextCentre(
-            label,
-            x + width / 2,
-            y + 4,
-            1,
-            1,
-            1,
-            1,
-            UIFont.Small
-        )
+    if hoveredEntry then
+        local portraitVisible = HoverPortrait
+            and HoverPortrait.Update
+            and HoverPortrait.Update(
+                map,
+                hoveredEntry,
+                hoveredX,
+                hoveredY
+            )
+            or false
+        if not portraitVisible then
+            local label = displayLabel(hoveredEntry)
+            local eta = etaText(hoveredEntry)
+            if eta then label = label .. " — " .. eta end
+            local width = getTextManager():MeasureStringX(UIFont.Small, label) + 12
+            local height = getTextManager():getFontHeight(UIFont.Small) + 8
+            local x = math.max(
+                4,
+                math.min(map.width - width - 4, hoveredX - width / 2)
+            )
+            local y = math.max(4, hoveredY - height - 10)
+            map:drawRect(x, y, width, height, 0.88, 0.05, 0.05, 0.05)
+            map:drawRectBorder(x, y, width, height, 1, 0.5, 0.5, 0.5)
+            map:drawTextCentre(
+                label,
+                x + width / 2,
+                y + 4,
+                1,
+                1,
+                1,
+                1,
+                UIFont.Small
+            )
+        end
+    elseif HoverPortrait and HoverPortrait.Hide then
+        HoverPortrait.Hide(map)
     end
 end
 

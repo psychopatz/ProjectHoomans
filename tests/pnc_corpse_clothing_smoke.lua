@@ -101,6 +101,8 @@ local liveVisual = {
 local sourceWorn = makeWornItems()
 local corpseWorn = makeWornItems()
 local transmitCount = 0
+local engineDeathCount = 0
+local directCorpseCount = 0
 local corpseModData = {}
 local corpse = {
     getContainer = function() return container end,
@@ -134,6 +136,19 @@ local zombie = {
     setReanimate = function() end,
     setReanim = function() end,
     setUseless = function() end,
+    becomeCorpseSilently = function()
+        engineDeathCount = engineDeathCount + 1
+        -- Reproduce an engine conversion that occasionally omits a source-body
+        -- item. Finalization must restore the card on the returned corpse.
+        local i
+        for i = #inventoryValues, 1, -1 do
+            if inventoryValues[i] == identityCard then
+                table.remove(inventoryValues, i)
+            end
+        end
+        identityCard.container = nil
+        return corpse
+    end,
 }
 local record = {
     id = "npc_corpse_clothes",
@@ -199,15 +214,7 @@ PNC = {
 
 IsoDeadBody = {
     new = function()
-        -- Reproduce the engine/fallback conversion that occasionally omits a
-        -- source-body item. The final corpse ensure must restore the card.
-        local i
-        for i = #inventoryValues, 1, -1 do
-            if inventoryValues[i] == identityCard then
-                table.remove(inventoryValues, i)
-            end
-        end
-        identityCard.container = nil
+        directCorpseCount = directCorpseCount + 1
         return corpse
     end,
 }
@@ -221,6 +228,8 @@ dofile(ROOT .. "Presence/PNC_BodyLifecycle.lua")
 local created, result = PNC.BodyLifecycle.CreateInertCorpse(record, zombie, "test_death")
 assertEqual(created, true, "corpse creation")
 assertEqual(result, corpse, "created corpse instance")
+assertEqual(engineDeathCount, 1, "engine-networked death conversion count")
+assertEqual(directCorpseCount, 0, "direct corpse fallback bypassed engine death")
 assertEqual(#inventoryValues, 2, "corpse inventory count")
 assertEqual(identityCard.customName, "ID Card: Corpse Clothes", "physical ID card name")
 assertEqual(cardModData.PNC_IDCard, true, "physical ID card marker")

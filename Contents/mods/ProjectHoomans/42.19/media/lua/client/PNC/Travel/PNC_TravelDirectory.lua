@@ -38,6 +38,11 @@ local function resolveSnapshot(npcId)
     then
         local authoritative = PNC.Registry.Get(npcId)
         if authoritative then return authoritative end
+        local marker = PNC.Registry.GetDeathMarker
+            and PNC.Registry.GetDeathMarker(npcId) or nil
+        if marker and PNC.Network.BuildDeathMarkerSnapshot then
+            return PNC.Network.BuildDeathMarkerSnapshot(marker)
+        end
     end
     local snapshot = ClientState.snapshots
         and ClientState.snapshots[npcId] or nil
@@ -46,11 +51,22 @@ local function resolveSnapshot(npcId)
     if snapshot then return snapshot end
     for i = 1, #(ClientState.debugRoster or {}) do
         candidate = ClientState.debugRoster[i]
-        if tostring(candidate and candidate.id or "") == npcId
-            and candidate.deathMarker ~= true
-        then
+        if tostring(candidate and candidate.id or "") == npcId then
             return candidate
         end
+    end
+    return nil
+end
+
+local function resolvePortrait(snapshot)
+    if snapshot and snapshot.portrait then
+        return snapshot.portrait
+    end
+    if snapshot and snapshot.runtime
+        and PNC.Identity
+        and PNC.Identity.BuildPortraitSummary
+    then
+        return PNC.Identity.BuildPortraitSummary(snapshot)
     end
     return nil
 end
@@ -81,8 +97,10 @@ function Directory.IsVisible(snapshot)
     local selected = isSelected(snapshot)
     local id
     local filter
+    if snapshot and snapshot.deathMarker == true then
+        return tonumber(snapshot.x) ~= nil and tonumber(snapshot.y) ~= nil
+    end
     if not snapshot or snapshot.alive == false
-        or snapshot.deathMarker == true
         or snapshot.presenceState == PNC.Const.PRESENCE_CORPSE
         or travel and tostring(travel.visibility or "all") == "hidden"
     then
@@ -125,6 +143,13 @@ function Directory.GetProjected(npcId, atWorldHour)
             ),
             faction = tostring(snapshot.faction or "neutral"),
             recruited = snapshot.recruited == true,
+            colonist = snapshot.colonist == true
+                or snapshot.recruited == true
+                or tostring(snapshot.faction or "") == "colonist",
+            deathMarker = snapshot.deathMarker == true,
+            infected = snapshot.infected == true,
+            orderKind = snapshot.orderKind,
+            portrait = resolvePortrait(snapshot),
             roleTag = snapshot.mapPresentation
                 and snapshot.mapPresentation.roleTag or nil,
             iconID = snapshot.mapPresentation
@@ -179,6 +204,13 @@ function Directory.GetProjected(npcId, atWorldHour)
         ),
         faction = tostring(snapshot.faction or "neutral"),
         recruited = snapshot.recruited == true,
+        colonist = snapshot.colonist == true
+            or snapshot.recruited == true
+            or tostring(snapshot.faction or "") == "colonist",
+        deathMarker = snapshot.deathMarker == true,
+        infected = snapshot.infected == true,
+        orderKind = snapshot.orderKind,
+        portrait = resolvePortrait(snapshot),
         roleTag = snapshot.mapPresentation
             and snapshot.mapPresentation.roleTag or nil,
         iconID = snapshot.mapPresentation
@@ -222,7 +254,7 @@ function Directory.ListProjected(atWorldHour)
     end
     for _, item in ipairs(ClientState.debugRoster or {}) do
         id = item and tostring(item.id or "") or ""
-        if id ~= "" and not seen[id] and item.deathMarker ~= true then
+        if id ~= "" and not seen[id] then
             projected = Directory.GetProjected(id, atWorldHour)
             if projected then
                 output[#output + 1] = projected
@@ -244,6 +276,18 @@ function Directory.ListProjected(atWorldHour)
                 end
             end
         end)
+        if PNC.Registry.ForEachDeathMarker then
+            PNC.Registry.ForEachDeathMarker(function(marker)
+                id = marker and tostring(marker.id or "") or ""
+                if id ~= "" and not seen[id] then
+                    projected = Directory.GetProjected(id, atWorldHour)
+                    if projected then
+                        output[#output + 1] = projected
+                        seen[id] = true
+                    end
+                end
+            end)
+        end
     end
     table.sort(output, function(left, right)
         return tostring(left.name) < tostring(right.name)

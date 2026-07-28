@@ -94,6 +94,11 @@ local function buildSnapshotList()
     Registry.ForEach(function(record)
         list[#list + 1] = Network.BuildRosterSnapshot(record)
     end)
+    if Registry.ForEachDeathMarker and Network.BuildDeathMarkerSnapshot then
+        Registry.ForEachDeathMarker(function(marker)
+            list[#list + 1] = Network.BuildDeathMarkerSnapshot(marker)
+        end)
+    end
     return list
 end
 

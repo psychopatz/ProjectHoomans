@@ -179,6 +179,30 @@ assertEqual(
     "inventory revision applied"
 )
 
+State.snapshots.npc_roster.inventory = { heavyweight = true }
+Client.HandleServerCommand("SyncRecord", {
+    event = "death",
+    snapshot = {
+        id = "npc_roster",
+        name = "Dead NPC",
+        presenceState = "corpse",
+        alive = false,
+        deathMarker = true,
+        colonist = false,
+        x = 11,
+        y = 12,
+        z = 0,
+    },
+})
+assertEqual(State.snapshots.npc_roster.deathMarker, true,
+    "death marker snapshot was not applied")
+assertEqual(State.snapshots.npc_roster.inventory, nil,
+    "thin death marker retained heavyweight live snapshot fields")
+assertEqual(State.characterPayloads.npc_roster, nil,
+    "death marker retained stale character payload")
+assertEqual(clearedNPC, "npc_roster",
+    "death marker retained live interpolation state")
+
 Client.HandleServerCommand("InventoryResult", { success = true })
 assertEqual(inventoryResult.success, true, "inventory result dispatched")
 Client.HandleServerCommand("MapCommandResult", { ok = true })

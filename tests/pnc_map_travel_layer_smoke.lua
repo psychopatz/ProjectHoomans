@@ -8,8 +8,13 @@ local colors = {}
 local namesVisible = false
 local mouseX = -100
 local mouseY = -100
+local hoveredPortrait
+local portraitHidden = 0
+local clock = 1000
+local listProjectedCount = 0
 
 getTexture = function() return nil end
+getTimestampMs = function() return clock end
 UIFont = { Small = "small" }
 getTextManager = function()
     return {
@@ -21,9 +26,11 @@ end
 PNC = {
     Const = {
         TRAVEL_MAP_LABEL_MIN_ZOOM = 10,
+        ORDER_FOLLOW = "follow",
     },
     TravelDirectory = {
         ListProjected = function()
+            listProjectedCount = listProjectedCount + 1
             return {
                 {
                     id = "idle",
@@ -32,17 +39,49 @@ PNC = {
                     state = "live",
                     x = 10,
                     y = 20,
+                    portrait = {
+                        identitySeed = 1,
+                        appearance = { hairModel = "Short" },
+                    },
+                },
+                {
+                    id = "colonist",
+                    name = "Working Colonist",
+                    faction = "colonist",
+                    recruited = true,
+                    state = "live",
+                    x = 30,
+                    y = 40,
                 },
                 {
                     id = "moving",
-                    name = "Moving NPC",
+                    name = "Moving Follower",
                     faction = "colonist",
                     recruited = true,
+                    orderKind = "follow",
                     state = "en_route",
-                    x = 30,
-                    y = 40,
+                    x = 50,
+                    y = 60,
                     remainingWorldHours = 0.5,
                     roleTag = "trader",
+                },
+                {
+                    id = "dead",
+                    name = "Dead NPC",
+                    deathMarker = true,
+                    colonist = false,
+                    state = "corpse",
+                    x = 70,
+                    y = 80,
+                },
+                {
+                    id = "dead_colonist",
+                    name = "Dead Colonist",
+                    deathMarker = true,
+                    colonist = true,
+                    state = "corpse",
+                    x = 90,
+                    y = 100,
                 },
             }
         end,
@@ -59,6 +98,15 @@ PNC = {
     MapDisplay = {
         AreNamesVisible = function() return namesVisible end,
         EnsureButton = function() end,
+    },
+    MapHoverPortrait = {
+        Update = function(_, entry)
+            hoveredPortrait = entry
+            return entry and entry.portrait ~= nil
+        end,
+        Hide = function()
+            portraitHidden = portraitHidden + 1
+        end,
     },
     MapMarkerIcons = {
         Resolve = function() return nil end,
@@ -89,28 +137,49 @@ local map = {
 
 assert(layer and layer.render, "travel map layer did not register")
 layer.render(map)
-assert(dots == 2, "idle and travelling NPC dots were not both rendered")
+assert(listProjectedCount == 1,
+    "travel map entries were not loaded for the first frame")
+assert(dots == 5, "live and deceased NPC dots were not all rendered")
 assert(colors[1].r == 0.95 and colors[1].g == 0.75,
     "neutral NPC marker was not yellow")
-assert(colors[2].r == 0.15 and colors[2].g == 0.90,
-    "companion NPC marker was not green")
-assert(labels[1] == "Moving NPC [trader]",
+assert(colors[2].r == 0.08 and colors[2].g == 0.42,
+    "working colonist marker was not dark green")
+assert(colors[3].r == 0.15 and colors[3].g == 0.90,
+    "following colonist marker was not green")
+assert(colors[4].r == 0.55 and colors[4].g == 0.55,
+    "dead NPC marker was not grey")
+assert(colors[5].r == 0.95 and colors[5].g == 0.45,
+    "dead colonist marker was not orange")
+assert(labels[1] == "Moving Follower [trader]",
     "selected NPC label or role postfix was not preserved")
 
 labels = {}
 mouseX = 10
 mouseY = 20
 layer.render(map)
-assert(labels[#labels] == "Idle NPC",
-    "hover tooltip still appended the live presence state")
+assert(listProjectedCount == 1,
+    "travel map rebuilt all projected NPC entries inside the refresh window")
+assert(labels[1] == "Moving Follower [trader]" and labels[2] == nil,
+    "map layer duplicated the name owned by the visible portrait card")
+assert(hoveredPortrait and hoveredPortrait.id == "idle",
+    "hovered map marker was not sent to the portrait presenter")
 
 labels = {}
 mouseX = -100
 mouseY = -100
 namesVisible = true
 layer.render(map)
+assert(portraitHidden > 0,
+    "map hover portrait was not hidden after leaving NPC dots")
 assert(labels[1] == "Idle NPC"
-    and labels[2] == "Moving NPC [trader]",
+    and labels[2] == "Working Colonist"
+    and labels[3] == "Moving Follower [trader]"
+    and labels[4] == "Dead NPC"
+    and labels[5] == "Dead Colonist",
     "NPC name toggle did not reveal ordinary labels")
+clock = 1100
+layer.render(map)
+assert(listProjectedCount == 2,
+    "travel map did not refresh projected NPC entries after its throttle")
 
 print("pnc_map_travel_layer_smoke: ok")

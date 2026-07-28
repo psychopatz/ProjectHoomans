@@ -17,6 +17,8 @@ PNC = {
     Const = {
         PRESENCE_LIVE = "live",
         PRESENCE_ABSTRACT = "abstract",
+        PRESENCE_CORPSE = "corpse",
+        ORDER_FOLLOW = "follow",
         TRAVEL_SCHEMA_VERSION = 1,
         TRAVEL_ROUTE_MAX_POINTS = 128,
         TRAVEL_METADATA_MAX_DEPTH = 3,
@@ -114,10 +116,66 @@ PNC.Network.ClientState.snapshots["idle:1"] = {
     x = 25,
     y = 35,
     z = 0,
+    portrait = {
+        identitySeed = 3,
+        faceOnly = true,
+        appearance = { hairModel = "Short" },
+        equipment = { worn = {} },
+    },
 }
 local idle = assert(PNC.TravelDirectory.GetProjected("idle:1"))
 assert(idle.name == "Idle NPC" and idle.x == 25 and idle.state == "idle",
     "non-travelling NPC was missing from the map directory")
+assert(idle.portrait and idle.portrait.appearance.hairModel == "Short",
+    "map projection dropped compact portrait metadata")
+
+PNC.Network.ClientState.snapshots["dead:neutral"] = {
+    id = "dead:neutral",
+    name = "Dead NPC",
+    faction = "dead",
+    presenceState = "corpse",
+    alive = false,
+    deathMarker = true,
+    colonist = false,
+    x = 45,
+    y = 55,
+    z = 0,
+}
+local deadNeutral =
+    assert(PNC.TravelDirectory.GetProjected("dead:neutral"))
+assert(deadNeutral.deathMarker == true
+    and deadNeutral.colonist == false
+    and deadNeutral.x == 45,
+    "compact dead NPC marker was hidden or misclassified")
+
+PNC.Network.ClientState.snapshots["dead:colonist"] = {
+    id = "dead:colonist",
+    name = "Dead Colonist",
+    faction = "dead",
+    presenceState = "corpse",
+    alive = false,
+    deathMarker = true,
+    colonist = true,
+    x = 65,
+    y = 75,
+    z = 0,
+}
+local deadColonist =
+    assert(PNC.TravelDirectory.GetProjected("dead:colonist"))
+assert(deadColonist.deathMarker == true and deadColonist.colonist == true,
+    "compact dead colonist marker lost its classification")
+
+PNC.Network.ClientState.snapshots["dead:legacy"] = {
+    id = "dead:legacy",
+    name = "Legacy Dead Record",
+    presenceState = "corpse",
+    alive = false,
+    x = 85,
+    y = 95,
+    z = 0,
+}
+assert(PNC.TravelDirectory.GetProjected("dead:legacy") == nil,
+    "non-marker dead record leaked onto the map")
 
 PNC.Network.ClientState.snapshots["known:alice"] = {
     id = "known:alice",

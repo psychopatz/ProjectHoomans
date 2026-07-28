@@ -12,6 +12,15 @@ local authority = true
 local directory = { records = {}, deathMarkers = {} }
 local removedRecords = {}
 local removalBroadcasts = {}
+local deathRetirementOrder = {}
+
+local function recordRemovalBroadcast(id, reason)
+    deathRetirementOrder[#deathRetirementOrder + 1] = "broadcast"
+    removalBroadcasts[#removalBroadcasts + 1] = {
+        id = tostring(id),
+        reason = tostring(reason),
+    }
+end
 
 PNC = {
     Core = {
@@ -32,24 +41,29 @@ PNC = {
     Sandbox = {
         NPCReanimationSeconds = function() return 3 end,
     },
+    Identity = {
+        BuildPortraitSummary = function(record)
+            return record and record.portrait or nil
+        end,
+        NormalizePortraitSummary = function(source)
+            return source
+        end,
+    },
     Registry = {
         Data = {},
         LiveByID = {},
         GetStorageDirectory = function() return directory end,
         RemoveRecord = function(id)
             id = tostring(id)
+            deathRetirementOrder[#deathRetirementOrder + 1] = "remove"
             removedRecords[id] = true
             PNC.Registry.Data[id] = nil
         end,
         MarkDirty = function() end,
     },
     Network = {
-        BroadcastRemoval = function(id, reason)
-            removalBroadcasts[#removalBroadcasts + 1] = {
-                id = tostring(id),
-                reason = tostring(reason),
-            }
-        end,
+        BroadcastRemoval = recordRemovalBroadcast,
+        BroadcastDeathMarkerRemoval = recordRemovalBroadcast,
     },
     BodyLifecycle = { Internal = {} },
 }
@@ -63,6 +77,14 @@ local record = {
     y = 20,
     z = 0,
     alive = false,
+    recruited = true,
+    faction = "colonist",
+    portrait = {
+        identitySeed = 12,
+        faceOnly = true,
+        appearance = { hairModel = "Short" },
+        equipment = { worn = { Hat = "Base.Hat_HardHat" } },
+    },
     runtime = {},
     inventory = { deliberately = "large" },
     equipment = { deliberately = "large" },
@@ -86,6 +108,9 @@ assertEqual(marker.name, "Morgan Reed", "death marker name")
 assertEqual(marker.x, 11, "death marker corpse x")
 assertEqual(marker.corpseToken, "corpse_dead_npc", "death marker token")
 assertEqual(marker.infected, true, "death marker infection")
+assertEqual(marker.colonist, true, "death marker colonist classification")
+assertEqual(marker.portrait.appearance.hairModel, "Short",
+    "death marker compact portrait")
 assertEqual(marker.inventory, nil, "death marker retained inventory")
 assertEqual(marker.equipment, nil, "death marker retained equipment")
 assertEqual(marker.health, nil, "death marker retained health")
@@ -111,6 +136,8 @@ local normalRecord = {
     y = 5,
     z = 0,
     alive = true,
+    recruited = false,
+    faction = "neutral",
     presenceState = "live",
     presenceRevision = 1,
     runtime = {},
@@ -123,10 +150,15 @@ local retired, normalMarker =
 assertEqual(retired, true, "ordinary dead NPC was not retired")
 assert(normalMarker, "ordinary death marker missing")
 assertEqual(normalMarker.infected, false, "ordinary death marked infected")
+assertEqual(normalMarker.colonist, false, "ordinary death marked colonist")
 assertEqual(removedRecords[normalRecord.id], true, "full NPC record was retained")
 assertEqual(PNC.Registry.Data[normalRecord.id], nil, "retired NPC still registered")
 assertEqual(removalBroadcasts[#removalBroadcasts].id, normalRecord.id,
     "retired NPC removal was not broadcast")
+assertEqual(deathRetirementOrder[#deathRetirementOrder - 1], "broadcast",
+    "death snapshot was broadcast after registry retirement")
+assertEqual(deathRetirementOrder[#deathRetirementOrder], "remove",
+    "death record was not retired after its final snapshot")
 
 getGameTime = function()
     return { getWorldAgeHours = function() return 50 end }
@@ -240,5 +272,34 @@ now = 10001
 PNC.BodyLifecycle.Internal.auditCorpseRecord(missingMarker)
 assertEqual(PNC.Registry.GetDeathMarker(missingMarker.id), nil,
     "missing loaded corpse marker was not cleared")
+assertEqual(removalBroadcasts[#removalBroadcasts].reason, "corpse_collected",
+    "garbage-collected corpse did not broadcast marker removal")
+
+local collectedRecord = {
+    id = "collected_corpse",
+    name = "Collected Body",
+    x = 50,
+    y = 60,
+    z = 0,
+    corpse = {
+        token = "collected_token",
+        x = 50,
+        y = 60,
+        z = 0,
+        createdWorldHour = 50,
+    },
+    health = { body = { infection = { fatal = false } } },
+}
+local collectedMarker = PNC.Registry.AddDeathMarker(collectedRecord)
+PNC.Registry.GetDeathMarkerRuntime(collectedMarker.id).corpseState =
+    "inert_loaded"
+now = 11000
+PNC.BodyLifecycle.Internal.auditCorpseRecord(collectedMarker)
+assertEqual(PNC.Registry.GetDeathMarker(collectedMarker.id), nil,
+    "known loaded corpse marker survived corpse garbage collection")
+assertEqual(removalBroadcasts[#removalBroadcasts].id, collectedMarker.id,
+    "garbage-collected corpse broadcast the wrong marker removal")
+assertEqual(removalBroadcasts[#removalBroadcasts].reason, "corpse_collected",
+    "garbage-collected corpse removal reason")
 
 print("pnc_death_marker_smoke: ok")

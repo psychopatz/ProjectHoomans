@@ -20,10 +20,10 @@ function Internal.makeCorpseInert(corpse, createdWorldHour)
         return
     end
     if corpse.setFakeDead then
-        pcall(corpse.setFakeDead, corpse, false)
+        corpse:setFakeDead(false)
     end
     if corpse.setReanimateTime then
-        pcall(corpse.setReanimateTime, corpse, reanimateAt)
+        corpse:setReanimateTime(reanimateAt)
     end
 end
 
@@ -98,7 +98,6 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
     local z
     local token
     local createdWorldHour
-    local ok
     local corpse
     local converted = false
     local sourceWornItems
@@ -122,27 +121,31 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
         createdWorldHour = createdWorldHour,
     }
     if zombie.setReanimate then
-        pcall(zombie.setReanimate, zombie, false)
+        zombie:setReanimate(false)
     end
     if zombie.setReanim then
-        pcall(zombie.setReanim, zombie, false)
+        zombie:setReanim(false)
     end
     Internal.clearBodyCombat(zombie)
     Internal.prepareCorpseItems(record, zombie)
     sourceWornItems = zombie.getWornItems and zombie:getWornItems() or nil
     wornEntries = Internal.captureWornEntries(sourceWornItems)
-    if IsoDeadBody and IsoDeadBody.new then
-        ok, corpse = pcall(IsoDeadBody.new, zombie, false, true)
-        if not ok or not corpse then
-            ok, corpse = pcall(IsoDeadBody.new, zombie, false)
-        end
+    -- Use the character death path first. On a multiplayer server this invokes
+    -- the engine's zombie-death networking and gives every client the same
+    -- corpse object ID. Constructing IsoDeadBody directly removes the source
+    -- zombie locally but does not emit that death packet, leaving clients with
+    -- either no corpse or an orphan corpse that reanimation cannot consume.
+    if zombie.becomeCorpseSilently then
+        corpse = zombie:becomeCorpseSilently()
+        converted = true
     end
-    converted = corpse ~= nil
+    -- Retain direct construction only as a compatibility fallback for engine
+    -- objects that do not expose the normal conversion method or reject it.
+    if not converted and IsoDeadBody and IsoDeadBody.new then
+        corpse = IsoDeadBody.new(zombie, false, true)
+        converted = corpse ~= nil
+    end
     if not corpse then
-        if zombie.becomeCorpseSilently then
-            ok = pcall(zombie.becomeCorpseSilently, zombie)
-            converted = ok == true
-        end
         if converted then
             Internal.scheduleCorpseFinalize(record, x, y, z, token, reason or "death", wornEntries)
             Internal.ensureRuntime(record).corpseState = "finalizing"
@@ -164,7 +167,7 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
         Internal.transmitCorpseState(corpse)
         Internal.ensureRuntime(record).corpseState = "inert_loaded"
     end
-    return corpse ~= nil, corpse
+    return converted, corpse
 end
 
 -- Compatibility for integrations written before engine-owned corpse handoff.

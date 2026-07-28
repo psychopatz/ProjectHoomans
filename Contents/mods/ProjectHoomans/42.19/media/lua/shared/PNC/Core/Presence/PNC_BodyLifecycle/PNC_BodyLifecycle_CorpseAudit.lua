@@ -71,6 +71,7 @@ function Internal.auditCorpseRecord(record)
     local state
     local now
     local markerId
+    local previousCorpseState
     local identityCardCreated = false
     if not cell or not record then
         return
@@ -79,6 +80,7 @@ function Internal.auditCorpseRecord(record)
         and Internal.registry().GetDeathMarkerRuntime(record.id)
         or Internal.ensureRuntime(record)
     now = Core.Now()
+    previousCorpseState = state.corpseState
     square = cell:getGridSquare(
         math.floor(tonumber(record.x) or 0),
         math.floor(tonumber(record.y) or 0),
@@ -140,11 +142,12 @@ function Internal.auditCorpseRecord(record)
     state.corpseState = "missing"
     state.missingSinceAt = (tonumber(state.missingSinceAt) or 0) > 0
         and state.missingSinceAt or now
-    if now - state.missingSinceAt
-        >= (tonumber(Const.DEATH_MARKER_MISSING_GRACE_MS) or 5000)
+    if (previousCorpseState == "inert_loaded"
+        or now - state.missingSinceAt
+            >= (tonumber(Const.DEATH_MARKER_MISSING_GRACE_MS) or 5000))
         and Internal.registry() and Internal.registry().RemoveDeathMarker
     then
-        Internal.registry().RemoveDeathMarker(record.id)
+        Internal.registry().RemoveDeathMarker(record.id, "corpse_collected")
     end
 end
 

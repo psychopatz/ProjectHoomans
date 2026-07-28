@@ -14,6 +14,7 @@ local Const = PNC.Const
 local Equipment = PNC.Equipment
 local Stamina = PNC.Stamina
 local MotionHints = PNC.MotionHints
+local Identity = PNC.Identity
 
 local function buildTravelSummary(record, includeRoute)
     return PNC.Travel
@@ -243,6 +244,10 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
         archetypeID = identity.archetypeID,
         archetypeLabel = identity.archetypeLabel,
         identitySeed = identity.identitySeed,
+        portrait = Identity
+            and Identity.BuildPortraitSummary
+            and Identity.BuildPortraitSummary(record)
+            or nil,
         faction = record.faction,
         presenceState = record.presenceState,
         x = record.x,
@@ -271,6 +276,37 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
         persist = record.persist ~= false,
         travel = buildTravelSummary(record, includeTravelRoute ~= false),
         mapPresentation = buildMapPresentationSummary(record),
+    }
+end
+
+function Network.BuildDeathMarkerSnapshot(marker)
+    if type(marker) ~= "table" or marker.id == nil then
+        return nil
+    end
+    return {
+        interestDetailed = false,
+        id = tostring(marker.id),
+        displayName = tostring(marker.name or marker.id),
+        name = tostring(marker.name or marker.id),
+        faction = "dead",
+        presenceState = Const.PRESENCE_CORPSE,
+        alive = false,
+        deathMarker = true,
+        colonist = marker.colonist == true,
+        infected = marker.infected == true,
+        portrait = marker.portrait and Core.DeepCopy(marker.portrait) or nil,
+        corpseToken = marker.corpseToken,
+        createdWorldHour = marker.createdWorldHour,
+        x = tonumber(marker.x) or 0,
+        y = tonumber(marker.y) or 0,
+        z = tonumber(marker.z) or 0,
+        hpCurrent = 0,
+        hpMax = 0,
+        healthState = "dead",
+        aiState = "Dead",
+        inCombat = false,
+        recruited = false,
+        persist = true,
     }
 end
 

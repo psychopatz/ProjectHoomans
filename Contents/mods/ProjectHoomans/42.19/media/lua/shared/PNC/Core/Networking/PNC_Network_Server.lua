@@ -77,6 +77,13 @@ function Network.QueueRosterDelta(record, removed, reason, includeTravelRoute)
             includeTravelRoute ~= false
         )
     end
+    return Network.QueueRosterSnapshot(id, snapshot, removed, reason)
+end
+
+function Network.QueueRosterSnapshot(id, snapshot, removed, reason)
+    if id == nil then return false end
+    if removed ~= true and type(snapshot) ~= "table" then return false end
+    id = tostring(id)
     ServerState.rosterRevision = (tonumber(ServerState.rosterRevision) or 0) + 1
     ServerState.rosterDeltas[id] = {
         id = id,
@@ -243,15 +250,23 @@ end
 
 function Network.BroadcastRemoval(id, reason)
     local payload = { id = id, reason = reason }
+    local marker
     local record
+    local snapshot
     if not Core.IsAuthority() then
         return
     end
     if tostring(reason or "") == "death" then
+        marker = PNC.Registry and PNC.Registry.GetDeathMarker
+            and PNC.Registry.GetDeathMarker(id) or nil
         record = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(id) or nil
-        if record then
-            Network.QueueRosterDelta(record, false, reason)
-            payload = { event = "death", snapshot = Network.BuildSnapshot(record) }
+        snapshot = marker and Network.BuildDeathMarkerSnapshot
+            and Network.BuildDeathMarkerSnapshot(marker)
+            or record and Network.BuildSnapshot(record)
+            or nil
+        if snapshot then
+            Network.QueueRosterSnapshot(id, snapshot, false, reason)
+            payload = { event = "death", snapshot = snapshot }
             if isServer and isServer() then
                 local state
                 for _, state in pairs(ServerState.interests) do
@@ -278,6 +293,37 @@ function Network.BroadcastRemoval(id, reason)
     else
         triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_REMOVE_RECORD, payload)
     end
+end
+
+function Network.BroadcastDeathMarkerRemoval(id, reason)
+    local payload
+    if not Core.IsAuthority() or id == nil then
+        return false
+    end
+    id = tostring(id)
+    payload = {
+        id = id,
+        reason = tostring(reason or "corpse_removed"),
+    }
+    Network.QueueRosterDelta(id, true, payload.reason)
+    if isServer and isServer() then
+        Core.ForEachPlayer(function(player)
+            sendToPlayer(player, Const.CMD_REMOVE_RECORD, payload)
+        end)
+        for _, state in pairs(ServerState.interests) do
+            if state.ids then
+                state.ids[id] = nil
+            end
+        end
+    else
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_REMOVE_RECORD,
+            payload
+        )
+    end
+    return true
 end
 
 function Network.BroadcastBodyRemoval(id, bodyInstanceID, bodyOnlineID, reason)

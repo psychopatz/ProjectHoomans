@@ -84,6 +84,10 @@ function Network.BuildSnapshot(record)
         name = identity.displayName,
         displayName = identity.displayName,
         identitySeed = identity.identitySeed,
+        portrait = PNC.Identity
+            and PNC.Identity.BuildPortraitSummary
+            and PNC.Identity.BuildPortraitSummary(record)
+            or nil,
         archetypeID = identity.archetypeID,
         archetypeLabel = identity.archetypeLabel,
         recruited = record.recruited == true,
