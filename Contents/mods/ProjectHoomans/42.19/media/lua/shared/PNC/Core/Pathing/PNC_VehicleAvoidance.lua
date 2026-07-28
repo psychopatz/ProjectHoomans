@@ -33,7 +33,10 @@ local function call(object, methodName, ...)
     local ok
     local result
     if not object then return nil end
-    method = object[methodName]
+    ok, method = pcall(function()
+        return object[methodName]
+    end)
+    if not ok then return nil end
     if type(method) ~= "function" then return nil end
     ok, result = pcall(method, object, ...)
     if not ok then return nil end
@@ -72,6 +75,96 @@ local function visitVehicles(vehicles, visitor)
     end
 end
 
+local function getTablePolyBounds(poly)
+    local x1
+    local x2
+    local x3
+    local x4
+    local y1
+    local y2
+    local y3
+    local y4
+    if type(poly) ~= "table" then
+        return nil
+    end
+    x1 = tonumber(poly.x1)
+    x2 = tonumber(poly.x2)
+    x3 = tonumber(poly.x3)
+    x4 = tonumber(poly.x4)
+    y1 = tonumber(poly.y1)
+    y2 = tonumber(poly.y2)
+    y3 = tonumber(poly.y3)
+    y4 = tonumber(poly.y4)
+    if not x1 or not x2 or not x3 or not x4
+        or not y1 or not y2 or not y3 or not y4
+    then
+        return nil
+    end
+    return math.floor(math.min(x1, x2, x3, x4)) - 1,
+        math.floor(math.max(x1, x2, x3, x4)) + 1,
+        math.floor(math.min(y1, y2, y3, y4)) - 1,
+        math.floor(math.max(y1, y2, y3, y4)) + 1
+end
+
+local function getVehicleScanBounds(vehicle, poly)
+    local minX
+    local maxX
+    local minY
+    local maxY
+    local centerX
+    local centerY
+    local script
+    local extents
+    local extentX
+    local extentZ
+    local scanRadius
+    minX, maxX, minY, maxY = getTablePolyBounds(poly)
+    if minX then
+        return minX, maxX, minY, maxY
+    end
+    centerX = tonumber(call(vehicle, "getX"))
+    centerY = tonumber(call(vehicle, "getY"))
+    if not centerX or not centerY then
+        return nil
+    end
+    script = call(vehicle, "getScript")
+    extents = call(script, "getExtents")
+    extentX = math.abs(tonumber(call(extents, "x")) or 0)
+    -- VehicleScript extents use X for half-width and Z for half-length.
+    extentZ = math.abs(tonumber(call(extents, "z")) or 0)
+    if extentX > 0 or extentZ > 0 then
+        scanRadius = math.ceil(
+            math.sqrt(
+                (extentX * extentX) + (extentZ * extentZ)
+            )
+        ) + 1
+    else
+        scanRadius = math.max(
+            2,
+            math.floor(
+                tonumber(
+                    Const.VEHICLE_AVOIDANCE_FALLBACK_SCAN_RADIUS
+                ) or 6
+            )
+        )
+    end
+    scanRadius = math.min(
+        math.max(2, scanRadius),
+        math.max(
+            2,
+            math.floor(
+                tonumber(
+                    Const.VEHICLE_AVOIDANCE_MAX_SCAN_RADIUS
+                ) or 24
+            )
+        )
+    )
+    return math.floor(centerX - scanRadius),
+        math.floor(centerX + scanRadius),
+        math.floor(centerY - scanRadius),
+        math.floor(centerY + scanRadius)
+end
+
 local function markVehicle(vehicle, exact, clearance)
     local poly
     local z
@@ -89,32 +182,17 @@ local function markVehicle(vehicle, exact, clearance)
     )
     if call(vehicle, "isRemovedFromWorld") == true then return end
     poly = call(vehicle, "getPolyPlusRadius") or call(vehicle, "getPoly")
-    if not poly then return end
-    z = math.floor(tonumber(poly.z) or 0)
-    minX = math.floor(math.min(
-        tonumber(poly.x1) or 0,
-        tonumber(poly.x2) or 0,
-        tonumber(poly.x3) or 0,
-        tonumber(poly.x4) or 0
-    )) - 1
-    maxX = math.floor(math.max(
-        tonumber(poly.x1) or 0,
-        tonumber(poly.x2) or 0,
-        tonumber(poly.x3) or 0,
-        tonumber(poly.x4) or 0
-    )) + 1
-    minY = math.floor(math.min(
-        tonumber(poly.y1) or 0,
-        tonumber(poly.y2) or 0,
-        tonumber(poly.y3) or 0,
-        tonumber(poly.y4) or 0
-    )) - 1
-    maxY = math.floor(math.max(
-        tonumber(poly.y1) or 0,
-        tonumber(poly.y2) or 0,
-        tonumber(poly.y3) or 0,
-        tonumber(poly.y4) or 0
-    )) + 1
+    z = math.floor(
+        tonumber(call(vehicle, "getZ"))
+            or (
+                type(poly) == "table"
+                and tonumber(poly.z)
+            )
+            or 0
+    )
+    minX, maxX, minY, maxY =
+        getVehicleScanBounds(vehicle, poly)
+    if not minX then return end
     for x = minX, maxX do
         for y = minY, maxY do
             if call(vehicle, "isIntersectingSquare", x, y, z) == true then

@@ -183,6 +183,58 @@ canStep, stepReason = PNC.TraversalQuery.CanStep(
 assertEqual(canStep, false, "vehicle landing blocks window traversal")
 assertEqual(stepReason, "vehicle", "vehicle wins over window interaction")
 
+local nonTablePoly = coroutine.create(function() end)
+local javaLikeVehicle = {
+    getPolyPlusRadius = function()
+        return nonTablePoly
+    end,
+    getX = function() return 7.5 end,
+    getY = function() return 8.5 end,
+    getZ = function() return 0 end,
+    getScript = function()
+        return {
+            getExtents = function()
+                return {
+                    x = function() return 0.9 end,
+                    z = function() return 2.4 end,
+                }
+            end,
+        }
+    end,
+    isRemovedFromWorld = function() return false end,
+    isIntersectingSquare = function(_, x, y, z)
+        return x == 7 and y == 8 and z == 0
+    end,
+}
+local javaLikeVehicles = {
+    iterator = function()
+        local consumed = false
+        return {
+            hasNext = function() return not consumed end,
+            next = function()
+                consumed = true
+                return javaLikeVehicle
+            end,
+        }
+    end,
+}
+local javaLikeCell = {
+    getGridSquare = function() return clearSquare end,
+    getVehicles = function() return javaLikeVehicles end,
+}
+PNC.VehicleAvoidance.Invalidate()
+assertEqual(
+    PNC.VehicleAvoidance.GetReason(
+        7.5,
+        8.5,
+        0,
+        javaLikeCell,
+        false
+    ),
+    "vehicle",
+    "non-table Build 42 VehiclePoly footprint"
+)
+
 PNC.LocomotionProfiles = {
     GetBaseProfile = function()
         return { speed = 1, moveAnim = "Walk" }

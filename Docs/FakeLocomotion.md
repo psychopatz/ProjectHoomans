@@ -192,6 +192,11 @@ away/back oscillations from hiding a blocked NPC indefinitely.
   is handed to traversal before lateral steering is attempted.
 - Vehicle-intersecting squares are treated as occupied, so the existing
   side-preference steering walks around the vehicle footprint.
+- Build 42 returns vehicle polygons as Java `VehiclePoly` userdata rather than
+  Lua tables. Vehicle avoidance derives a conservative scan bound from the
+  vehicle position and script extents, then uses the engine's
+  `isIntersectingSquare` method for exact occupancy without indexing Java
+  polygon fields.
 - Traversal attempts remember the obstacle, source side, destination, and goal
   revision long enough to reject immediate same-side re-cross loops.
 
