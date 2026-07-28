@@ -39,6 +39,113 @@ local function objectBool(object, names, defaultValue)
     return result == true
 end
 
+local function listSize(list)
+    if not list or not list.size then
+        return 0
+    end
+    return list:size()
+end
+
+local function listItem(list, index)
+    if not list or not list.get then
+        return nil
+    end
+    return list:get(index)
+end
+
+local function getMaterializationObstacle(square)
+    local objects
+    local object
+    local sprite
+    local i
+    if not square or not square.getObjects then
+        return nil
+    end
+    objects = square:getObjects()
+    for i = 0, listSize(objects) - 1 do
+        object = listItem(objects, i)
+        if object and not (object.isFloor and object:isFloor()) then
+            if instanceof and instanceof(object, "IsoFeedingTrough") then
+                return "feeding_trough"
+            end
+            if object.isTableSurface and object:isTableSurface() then
+                return "table_surface"
+            end
+            if object.getContainer and object:getContainer() then
+                return "container_object"
+            end
+            sprite = object.getSprite and object:getSprite() or nil
+            if sprite and sprite.getSpriteGrid and sprite:getSpriteGrid() then
+                return "multi_tile_object"
+            end
+        end
+    end
+    return nil
+end
+
+local function findNearestByReason(x, y, z, maxRadius, cell, reasonResolver)
+    local originX = math.floor(tonumber(x) or 0)
+    local originY = math.floor(tonumber(y) or 0)
+    local originZ = math.floor(tonumber(z) or 0)
+    local originalReason
+    local radius
+    local dx
+    local dy
+    local candidateX
+    local candidateY
+    local candidateDistSq
+    local best
+    maxRadius = math.max(0, math.floor(tonumber(maxRadius) or 3))
+    originalReason = reasonResolver(
+        originX + 0.5,
+        originY + 0.5,
+        originZ,
+        cell
+    )
+    if not originalReason then
+        return tonumber(x) or originX + 0.5,
+            tonumber(y) or originY + 0.5,
+            originZ,
+            nil
+    end
+    for radius = 1, maxRadius do
+        best = nil
+        for dx = -radius, radius do
+            for dy = -radius, radius do
+                if math.max(math.abs(dx), math.abs(dy)) == radius then
+                    candidateX = originX + dx + 0.5
+                    candidateY = originY + dy + 0.5
+                    if not reasonResolver(candidateX, candidateY, originZ, cell) then
+                        candidateDistSq = (candidateX - (tonumber(x) or originX + 0.5)) ^ 2
+                            + (candidateY - (tonumber(y) or originY + 0.5)) ^ 2
+                        if not best
+                            or candidateDistSq < best.distSq
+                            or (
+                                candidateDistSq == best.distSq
+                                and (
+                                    candidateX < best.x
+                                    or (candidateX == best.x and candidateY < best.y)
+                                )
+                            )
+                        then
+                            best = {
+                                x = candidateX,
+                                y = candidateY,
+                                z = originZ,
+                                distSq = candidateDistSq,
+                            }
+                        end
+                    end
+                end
+            end
+        end
+        if best then
+            return best.x, best.y, best.z, originalReason
+        end
+    end
+    return nil, nil, nil, originalReason
+end
+
 function TraversalQuery.GetSquare(x, y, z, cell)
     cell = cell or (getCell and getCell() or nil)
     if not cell then
@@ -229,66 +336,41 @@ function TraversalQuery.CanOccupy(x, y, z, cell)
 end
 
 function TraversalQuery.FindNearestOccupable(x, y, z, maxRadius, cell)
-    local originX = math.floor(tonumber(x) or 0)
-    local originY = math.floor(tonumber(y) or 0)
-    local originZ = math.floor(tonumber(z) or 0)
-    local originalReason
-    local radius
-    local dx
-    local dy
-    local candidateX
-    local candidateY
-    local candidateDistSq
-    local best
-    maxRadius = math.max(0, math.floor(tonumber(maxRadius) or 3))
-    originalReason = TraversalQuery.GetOccupancyReason(
-        originX + 0.5,
-        originY + 0.5,
-        originZ,
-        cell
+    return findNearestByReason(
+        x,
+        y,
+        z,
+        maxRadius,
+        cell,
+        TraversalQuery.GetOccupancyReason
     )
-    if not originalReason then
-        return tonumber(x) or originX + 0.5,
-            tonumber(y) or originY + 0.5,
-            originZ,
-            nil
+end
+
+function TraversalQuery.GetMaterializationOccupancyReason(x, y, z, cell)
+    local square = TraversalQuery.GetSquare(x, y, z, cell)
+    local reason = TraversalQuery.GetOccupancyReason(x, y, z, cell)
+    if reason then
+        return reason
     end
-    for radius = 1, maxRadius do
-        best = nil
-        for dx = -radius, radius do
-            for dy = -radius, radius do
-                if math.max(math.abs(dx), math.abs(dy)) == radius then
-                    candidateX = originX + dx + 0.5
-                    candidateY = originY + dy + 0.5
-                    if TraversalQuery.CanOccupy(candidateX, candidateY, originZ, cell) then
-                        candidateDistSq = (candidateX - (tonumber(x) or originX + 0.5)) ^ 2
-                            + (candidateY - (tonumber(y) or originY + 0.5)) ^ 2
-                        if not best
-                            or candidateDistSq < best.distSq
-                            or (
-                                candidateDistSq == best.distSq
-                                and (
-                                    candidateX < best.x
-                                    or (candidateX == best.x and candidateY < best.y)
-                                )
-                            )
-                        then
-                            best = {
-                                x = candidateX,
-                                y = candidateY,
-                                z = originZ,
-                                distSq = candidateDistSq,
-                            }
-                        end
-                    end
-                end
-            end
-        end
-        if best then
-            return best.x, best.y, best.z, originalReason
-        end
+    if square.hasFloor and not square:hasFloor() then
+        return "no_floor"
     end
-    return nil, nil, nil, originalReason
+    return getMaterializationObstacle(square)
+end
+
+function TraversalQuery.CanMaterializeAt(x, y, z, cell)
+    return TraversalQuery.GetMaterializationOccupancyReason(x, y, z, cell) == nil
+end
+
+function TraversalQuery.FindNearestMaterializationSquare(x, y, z, maxRadius, cell)
+    return findNearestByReason(
+        x,
+        y,
+        z,
+        maxRadius,
+        cell,
+        TraversalQuery.GetMaterializationOccupancyReason
+    )
 end
 
 function TraversalQuery.CanStep(fromX, fromY, fromZ, toX, toY, toZ, cell)

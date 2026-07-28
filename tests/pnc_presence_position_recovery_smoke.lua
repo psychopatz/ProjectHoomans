@@ -11,6 +11,10 @@ local warnings = {}
 local registeredBody
 local dirtyDomain
 local spawn
+local spawnCount = 0
+local now = 1000
+local presenceWakeAt
+local scheduledAt
 local body = {
     DoZombieStats = function() end,
     setUseless = function() end,
@@ -19,24 +23,47 @@ local zombieList = {
     size = function() return 1 end,
     get = function() return body end,
 }
-local function makeSquare(vehicleIntersecting)
+local chunk = { loaded = true }
+local function makeList(values)
+    return {
+        size = function() return #values end,
+        get = function(_, index) return values[index + 1] end,
+    }
+end
+local function makeSquare(vehicleIntersecting, objects, hasFloor)
     return {
         isFree = function() return true end,
         isSolid = function() return false end,
         isSolidTrans = function() return false end,
         isVehicleIntersecting = function() return vehicleIntersecting == true end,
+        hasFloor = function() return hasFloor ~= false end,
+        getObjects = function() return makeList(objects or {}) end,
+        -- Return a fresh wrapper-shaped value on every call. The runtime can
+        -- do the same for Java userdata, so settle identity must be coordinate
+        -- based rather than Lua object based.
+        getChunk = function() return { loaded = chunk.loaded } end,
     }
 end
 local clearSquare = makeSquare(false)
 local vehicleSquare = makeSquare(true)
+local barnSquare = makeSquare(false, {
+    {
+        isFloor = function() return false end,
+        isTableSurface = function() return false end,
+        getContainer = function() return {} end,
+    },
+})
 local cell = {
     getGridSquare = function(_, x)
-        return x == 1 and vehicleSquare or clearSquare
+        if x == 1 then return vehicleSquare end
+        if x == 2 then return barnSquare end
+        return clearSquare
     end,
 }
 
 getCell = function() return cell end
 addZombiesInOutfit = function(x, y, z, _, outfit)
+    spawnCount = spawnCount + 1
     spawn = { x = x, y = y, z = z, outfit = outfit }
     return zombieList
 end
@@ -48,9 +75,14 @@ PNC = {
         PRESENCE_CORPSE = "corpse",
         MATERIALIZE_DISTANCE = 40,
         ABSTRACT_DISTANCE = 50,
+        MATERIALIZE_CHUNK_SETTLE_MS = 0,
+        MATERIALIZE_CHUNK_RETRY_MS = 250,
+        MATERIALIZE_NEIGHBOR_RADIUS = 1,
+        MATERIALIZE_SAFE_RADIUS = 8,
+        MATERIALIZE_MAX_PER_TICK = 10,
     },
     Core = {
-        Now = function() return 1000 end,
+        Now = function() return now end,
         IsAuthority = function() return true end,
         GetNearestPlayerPosition = function() return { distSq = 0 } end,
         LogWarn = function(message) warnings[#warnings + 1] = message end,
@@ -85,9 +117,22 @@ PNC = {
     VisualProfiles = {
         ResolveSpawnOutfit = function() return "PNCCompanionMale" end,
     },
+    SimulationClock = {
+        Wake = function(_, key, dueAt)
+            if key == "presence" then
+                presenceWakeAt = dueAt
+            end
+        end,
+    },
+    Scheduler = {
+        Schedule = function(_, dueAt)
+            scheduledAt = dueAt
+        end,
+    },
 }
 
 dofile(ROOT .. "Pathing/PNC_TraversalQuery.lua")
+dofile(ROOT .. "Presence/PNC_MaterializationSafety.lua")
 dofile(ROOT .. "Presence/PNC_Presence.lua")
 
 local passengerRecord = {
@@ -152,5 +197,135 @@ assertEqual(spawn.x, 0.75, "clear saved x preserved")
 assertEqual(spawn.y, 0.75, "clear saved y preserved")
 assertEqual(clearRecord.runtime.positionRecovery, nil, "clear saved NPC not repaired")
 assertEqual(#warnings, 1, "clear materialization emitted no recovery log")
+
+local barnRecord = {
+    id = "saved_barn_fixture",
+    name = "Saved Barn Fixture",
+    alive = true,
+    presenceState = "abstract",
+    x = 2.5,
+    y = 0.5,
+    z = 0,
+    runtime = {},
+}
+materialized = PNC.Presence.Materialize(barnRecord, "range_enter")
+assertEqual(materialized, body, "barn-fixture NPC materialized")
+assertEqual(spawn.x, 3.5, "barn-fixture spawn relocated x")
+assertEqual(spawn.y, 0.5, "barn-fixture spawn relocated y")
+assertEqual(
+    barnRecord.runtime.positionRecovery.lastReason,
+    "container_object",
+    "barn-fixture recovery reason"
+)
+assertEqual(#warnings, 2, "barn-fixture recovery logged once")
+
+PNC.Const.MATERIALIZE_CHUNK_SETTLE_MS = 1000
+now = 2000
+chunk.loaded = false
+local streamingRecord = {
+    id = "streaming_chunk",
+    name = "Streaming Chunk",
+    alive = true,
+    presenceState = "abstract",
+    x = 0.5,
+    y = 0.5,
+    z = 0,
+    runtime = {},
+}
+local previousSpawnCount = spawnCount
+materialized = PNC.Presence.Materialize(streamingRecord, "range_enter")
+assertEqual(materialized, nil, "first streaming attempt deferred")
+assertEqual(spawnCount, previousSpawnCount, "deferred attempt created no body")
+assertEqual(
+    streamingRecord.runtime.materializationDeferredReason,
+    "target_chunk_loading",
+    "streaming defer reason"
+)
+assertEqual(streamingRecord.runtime.materializeRetryAt, 2250, "streaming retry scheduled")
+assertEqual(presenceWakeAt, 2250, "streaming presence lane wake scheduled")
+assertEqual(scheduledAt, 2250, "streaming record retry scheduled")
+
+chunk.loaded = true
+now = 2250
+materialized = PNC.Presence.Materialize(streamingRecord, "range_enter")
+assertEqual(materialized, nil, "newly loaded chunk begins settling")
+assertEqual(
+    streamingRecord.runtime.materializationDeferredReason,
+    "target_chunk_settling",
+    "newly loaded chunk settle reason"
+)
+
+now = 2750
+materialized = PNC.Presence.Materialize(streamingRecord, "range_enter")
+assertEqual(materialized, nil, "partially settled chunk remains abstract")
+assertEqual(spawnCount, previousSpawnCount, "settling attempts created no body")
+
+now = 3251
+materialized = PNC.Presence.Materialize(streamingRecord, "range_enter")
+assertEqual(materialized, body, "settled chunk materialized")
+assertEqual(spawnCount, previousSpawnCount + 1, "settled chunk created one body")
+assertEqual(
+    streamingRecord.runtime.materializationSafety,
+    nil,
+    "settled materialization state cleared"
+)
+assertEqual(
+    streamingRecord.runtime.materializationDeferredReason,
+    nil,
+    "settled defer reason cleared"
+)
+
+now = 4000
+local explicitRecord = {
+    id = "explicit_live_spawn",
+    name = "Explicit Live Spawn",
+    alive = true,
+    presenceState = "abstract",
+    x = 0.5,
+    y = 0.5,
+    z = 0,
+    runtime = {},
+}
+previousSpawnCount = spawnCount
+materialized = PNC.Presence.Materialize(explicitRecord, "force_live_spawn")
+assertEqual(materialized, body, "explicit live spawn bypasses range settle delay")
+assertEqual(spawnCount, previousSpawnCount + 1, "explicit live spawn created one body")
+
+now = 5000
+local movingRecord = {
+    id = "moving_in_settling_chunk",
+    name = "Moving In Settling Chunk",
+    alive = true,
+    presenceState = "abstract",
+    x = 0.5,
+    y = 0.5,
+    z = 0,
+    runtime = {},
+}
+previousSpawnCount = spawnCount
+materialized = PNC.Presence.Materialize(movingRecord, "range_enter")
+assertEqual(materialized, nil, "moving NPC begins chunk settle")
+assertEqual(
+    movingRecord.runtime.materializationSafety.readySince,
+    5000,
+    "moving NPC settle start recorded"
+)
+
+now = 5500
+movingRecord.x = 3.5
+materialized = PNC.Presence.Materialize(movingRecord, "range_enter")
+assertEqual(materialized, nil, "same-chunk movement remains settling")
+assertEqual(
+    movingRecord.runtime.materializationSafety.readySince,
+    5000,
+    "same-chunk movement preserves settle start"
+)
+
+now = 6001
+movingRecord.x = 8.5
+materialized = PNC.Presence.Materialize(movingRecord, "range_enter")
+assertEqual(materialized, body, "moving abstract NPC materialized after settle")
+assertEqual(spawnCount, previousSpawnCount + 1, "moving NPC created one body")
+assertEqual(spawn.x, 8.5, "moving NPC uses latest abstract position")
 
 print("pnc_presence_position_recovery_smoke: ok")

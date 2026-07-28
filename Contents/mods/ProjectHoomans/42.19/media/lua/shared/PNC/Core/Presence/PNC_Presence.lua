@@ -13,6 +13,7 @@ local PathService = PNC.PathService
 local ZombieAggro = PNC.ZombieAggro
 local Spatial = PNC.SpatialIndex
 local Admission = PNC.PresenceAdmission
+local MaterializationSafety = PNC.MaterializationSafety
 local Network = nil
 local lastInterestRefreshAt = 0
 local materializationBudget = {
@@ -71,7 +72,7 @@ local function consumeMaterializationBudget(record, reason, nearest)
     return false
 end
 
-local function findMaterializeSquare(record)
+local function findMaterializeSquare(record, now, reason)
     local cell
     local query
     local safeX
@@ -84,13 +85,19 @@ local function findMaterializeSquare(record)
     end
 
     cell = getCell()
+    if MaterializationSafety and MaterializationSafety.Resolve then
+        return MaterializationSafety.Resolve(record, now, cell, {
+            requireSettle = tostring(reason or "") == "range_enter",
+        })
+    end
     query = PNC.TraversalQuery
-    if query and query.FindNearestOccupable then
-        safeX, safeY, safeZ, recoveryReason = query.FindNearestOccupable(
+    if query and query.FindNearestMaterializationSquare then
+        safeX, safeY, safeZ, recoveryReason =
+            query.FindNearestMaterializationSquare(
             record.x,
             record.y,
             record.z,
-            4,
+            tonumber(Const.MATERIALIZE_SAFE_RADIUS) or 8,
             cell
         )
         return safeX, safeY, safeZ, recoveryReason
@@ -222,15 +229,14 @@ function Presence.Materialize(record, reason, nearest)
     local spawnY
     local spawnZ
     local recoveryReason
+    local deferredReason
     local originalX
     local originalY
     local originalZ
+    local now
     local net = resolveNetwork()
     if not Core.IsAuthority() or record.alive == false or record.presenceState == Const.PRESENCE_LIVE then
         return Registry.GetLiveZombie(record.id)
-    end
-    if not consumeMaterializationBudget(record, reason, nearest) then
-        return nil
     end
     if PNC.BodyLifecycle
         and PNC.BodyLifecycle.IsStartupBodyCleanupComplete
@@ -239,18 +245,7 @@ function Presence.Materialize(record, reason, nearest)
         return nil
     end
 
-    if PNC.BodyLifecycle and PNC.BodyLifecycle.CleanupRecordShells
-        and PNC.BodyLifecycle.CleanupRecordShells(record, Core.Now()) > 0
-    then
-        return nil
-    end
-
     record.runtime = record.runtime or {}
-    record.runtime.bodyLease = nil
-    record.runtime.lifecycle = record.runtime.lifecycle or {}
-    record.runtime.lifecycle.phase = "materializing"
-    record.runtime.lifecycle.lastReason = reason or "materialize"
-    record.runtime.lifecycle.lastTransitionAt = Core.Now()
     if PNC.Inventory and PNC.Inventory.EnsureRecordInventory then
         PNC.Inventory.EnsureRecordInventory(record)
     end
@@ -262,8 +257,25 @@ function Presence.Materialize(record, reason, nearest)
     originalX = record.x
     originalY = record.y
     originalZ = record.z
-    spawnX, spawnY, spawnZ, recoveryReason = findMaterializeSquare(record)
+    now = Core.Now()
+    spawnX, spawnY, spawnZ, recoveryReason, deferredReason =
+        findMaterializeSquare(record, now, reason)
+    if deferredReason and deferredReason ~= "no_safe_square" then
+        if MaterializationSafety and MaterializationSafety.Defer then
+            MaterializationSafety.Defer(record, deferredReason, now)
+        else
+            record.runtime.materializeRetryAt = now
+                + (tonumber(Const.MATERIALIZE_CHUNK_RETRY_MS) or 250)
+        end
+        record.runtime.lifecycle = record.runtime.lifecycle or {}
+        record.runtime.lifecycle.phase = Const.PRESENCE_ABSTRACT
+        record.runtime.lifecycle.bodyState = "missing"
+        record.runtime.lifecycle.lastReason = "materialize_deferred"
+        record.runtime.lifecycle.lastError = tostring(deferredReason)
+        return nil
+    end
     if spawnX == nil or spawnY == nil or spawnZ == nil then
+        record.runtime.lifecycle = record.runtime.lifecycle or {}
         record.runtime.lifecycle.phase = Const.PRESENCE_ABSTRACT
         record.runtime.lifecycle.bodyState = "missing"
         record.runtime.lifecycle.lastReason = "materialize_position_blocked"
@@ -275,6 +287,24 @@ function Presence.Materialize(record, reason, nearest)
             .. " reason=" .. tostring(recoveryReason or "unknown")
             .. " at=" .. tostring(originalX) .. "," .. tostring(originalY) .. "," .. tostring(originalZ))
         return nil
+    end
+    if not consumeMaterializationBudget(record, reason, nearest) then
+        return nil
+    end
+    if PNC.BodyLifecycle and PNC.BodyLifecycle.CleanupRecordShells
+        and PNC.BodyLifecycle.CleanupRecordShells(record, now) > 0
+    then
+        return nil
+    end
+
+    record.runtime.bodyLease = nil
+    record.runtime.lifecycle = record.runtime.lifecycle or {}
+    record.runtime.lifecycle.phase = "materializing"
+    record.runtime.lifecycle.lastReason = reason or "materialize"
+    record.runtime.lifecycle.lastError = nil
+    record.runtime.lifecycle.lastTransitionAt = now
+    if MaterializationSafety and MaterializationSafety.Reset then
+        MaterializationSafety.Reset(record)
     end
     record.runtime.materializeRetryAt = nil
     zombieList = addZombiesInOutfit(

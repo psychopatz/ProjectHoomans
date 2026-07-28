@@ -27,6 +27,21 @@
   delete unrelated naked vanilla zombies elsewhere in the world
 - materialization performs the same record-local cleanup immediately before
   spawning. This covers distant cells that stream in after the startup passes
+- range-entry materialization keeps the NPC abstract until the destination
+  chunk and its immediate square neighborhood are loaded and have remained
+  stable for the configured settle interval. Streaming retries do not consume
+  the per-tick live-body admission budget and never create a partial body
+- the settle identity uses stable 10x10 world-chunk coordinates rather than
+  exact NPC tiles or transient Java wrappers. Abstract travel may continue
+  inside a loaded chunk without indefinitely restarting the handoff
+- each streaming deferral schedules its own presence-lane retry, so conversion
+  does not depend on a later global interest scan
+- the materialization-only occupancy query is deliberately stricter than
+  ordinary locomotion: it rejects missing floors, vehicles, solid/occupied
+  squares, feeding troughs, container furniture, table surfaces, and
+  multi-tile fixtures. Invalid persisted coordinates are relocated to the
+  nearest qualifying square within the bounded safety radius; if none exists,
+  the authoritative record remains abstract and retries later
 - steady-state materialization preflight combines the small lifecycle-candidate
   census with a local 3.5-tile spatial zombie query; materializing several NPCs
   no longer multiplies a full loaded-zombie scan per NPC
@@ -133,6 +148,10 @@
 - `Materialize` uses `addZombiesInOutfit(...)`
 - `Materialize` always requests `Naked`, then applies human visuals and
   equipment from the canonical record
+- `PNC_MaterializationSafety` owns chunk-readiness and settling state;
+  `PNC_TraversalQuery.FindNearestMaterializationSquare` owns conservative
+  destination validation. The default settle interval is 1000 ms, retry
+  interval is 250 ms, and relocation radius is eight tiles
 - unresolved live snapshots temporarily use a faster client body scan, then
   return to the normal low-frequency scan after binding
 - `Abstract` snapshots current position and calls:
