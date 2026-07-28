@@ -47,6 +47,13 @@
 - vehicle-intersecting squares are hard occupancy failures for fake
   locomotion, steering NPCs around vehicle collision geometry instead of
   allowing a Lua-authored step into the chassis
+- `PNC_VehicleAvoidance` supplements the square flag with a shared 250 ms
+  footprint cache built from loaded `BaseVehicle` polygons. This covers the
+  multiplayer window where a vehicle is synchronized before the grid-square
+  intersection cache catches up, without scanning every vehicle per NPC step
+- planned travel treats the one-tile ring around a chassis as clearance:
+  routes cannot enter that ring from outside, while an NPC already inside it
+  may move outward. Exact chassis tiles remain hard-blocked in both directions
 - authoritative NPC position writes synchronize the engine previous-position
   fields. This prevents Java collision handling from reinterpreting controlled
   motion as a player-style traversal on an embodied `IsoZombie` without

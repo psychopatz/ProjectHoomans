@@ -8,6 +8,7 @@ PNC = PNC or {}
 PNC.TraversalQuery = PNC.TraversalQuery or {}
 
 local TraversalQuery = PNC.TraversalQuery
+local VehicleAvoidance = PNC.VehicleAvoidance
 
 local function callFirst(object, names, ...)
     local i
@@ -321,10 +322,14 @@ end
 
 function TraversalQuery.GetOccupancyReason(x, y, z, cell)
     local square = TraversalQuery.GetSquare(x, y, z, cell)
+    local vehicleReason
     if not square then return "unloaded" end
-    if objectBool(square, { "isVehicleIntersecting" }, false) then
-        return "vehicle"
+    if VehicleAvoidance and VehicleAvoidance.GetReason then
+        vehicleReason = VehicleAvoidance.GetReason(x, y, z, cell, false)
+    elseif objectBool(square, { "isVehicleIntersecting" }, false) then
+        vehicleReason = "vehicle"
     end
+    if vehicleReason then return vehicleReason end
     if square:isSolid() then return "solid" end
     if square:isSolidTrans() then return "solid_trans" end
     if not square:isFree(false) then return "occupied" end
@@ -333,6 +338,19 @@ end
 
 function TraversalQuery.CanOccupy(x, y, z, cell)
     return TraversalQuery.GetOccupancyReason(x, y, z, cell) == nil
+end
+
+function TraversalQuery.GetTraversalOccupancyReason(x, y, z, cell)
+    local reason = TraversalQuery.GetOccupancyReason(x, y, z, cell)
+    if reason then return reason end
+    if VehicleAvoidance and VehicleAvoidance.GetReason then
+        return VehicleAvoidance.GetReason(x, y, z, cell, true)
+    end
+    return nil
+end
+
+function TraversalQuery.CanTraverseAt(x, y, z, cell)
+    return TraversalQuery.GetTraversalOccupancyReason(x, y, z, cell) == nil
 end
 
 function TraversalQuery.FindNearestOccupable(x, y, z, maxRadius, cell)
@@ -351,6 +369,10 @@ function TraversalQuery.GetMaterializationOccupancyReason(x, y, z, cell)
     local reason = TraversalQuery.GetOccupancyReason(x, y, z, cell)
     if reason then
         return reason
+    end
+    if VehicleAvoidance and VehicleAvoidance.GetReason then
+        reason = VehicleAvoidance.GetReason(x, y, z, cell, true)
+        if reason then return reason end
     end
     if square.hasFloor and not square:hasFloor() then
         return "no_floor"
@@ -378,13 +400,44 @@ function TraversalQuery.CanStep(fromX, fromY, fromZ, toX, toY, toZ, cell)
     local toSquare
     local passage
     local fence
+    local fromReason
+    local toReason
     fromSquare = TraversalQuery.GetSquare(fromX, fromY, fromZ, cell)
     toSquare = TraversalQuery.GetSquare(toX, toY, toZ, cell)
     if not fromSquare or not toSquare then
         return false, "unloaded"
     end
+    toReason = TraversalQuery.GetTraversalOccupancyReason(
+        toX,
+        toY,
+        toZ,
+        cell
+    )
+    -- Vehicle safety must win over passage handling. Otherwise a window or
+    -- fence on the same edge can start a traversal whose landing tile is a
+    -- synchronized vehicle footprint.
+    if toReason == "vehicle" then
+        return false, toReason
+    end
+    if toReason == "vehicle_clearance" then
+        fromReason = TraversalQuery.GetTraversalOccupancyReason(
+            fromX,
+            fromY,
+            fromZ,
+            cell
+        )
+        if fromReason ~= "vehicle_clearance" then
+            return false, toReason
+        end
+    end
     if fromSquare == toSquare then
-        return TraversalQuery.CanOccupy(toX, toY, toZ, cell), "clear"
+        if not toReason then return true, "clear" end
+        if toReason == "vehicle_clearance"
+            and fromReason == "vehicle_clearance"
+        then
+            return true, "clear"
+        end
+        return false, toReason
     end
     passage = TraversalQuery.GetPassageBetween(fromSquare, toSquare)
     if passage and TraversalQuery.IsWindow(passage) then
@@ -403,8 +456,13 @@ function TraversalQuery.CanStep(fromX, fromY, fromZ, toX, toY, toZ, cell)
     if fromSquare.isBlockedTo and fromSquare:isBlockedTo(toSquare) then
         return false, "blocked_edge"
     end
-    if not TraversalQuery.CanOccupy(toX, toY, toZ, cell) then
-        return false, "occupied"
+    if toReason then
+        if toReason == "vehicle_clearance"
+            and fromReason == "vehicle_clearance"
+        then
+            return true, "clear"
+        end
+        return false, toReason
     end
     return true, "clear"
 end
@@ -474,7 +532,12 @@ function TraversalQuery.FindFenceAhead(zombie, goalX, goalY, cell)
         return nil
     end
     landingSquare = nextSquare
-    if not landingSquare or not TraversalQuery.CanOccupy(landingSquare:getX() + 0.5, landingSquare:getY() + 0.5, landingSquare:getZ(), cell) then
+    if not landingSquare or not TraversalQuery.CanTraverseAt(
+        landingSquare:getX() + 0.5,
+        landingSquare:getY() + 0.5,
+        landingSquare:getZ(),
+        cell
+    ) then
         return nil
     end
     return {

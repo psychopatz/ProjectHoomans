@@ -36,6 +36,14 @@ local function isInterior(square)
     return square.getRoom and square:getRoom() ~= nil or false
 end
 
+local function canTraverseAt(x, y, z, cell)
+    if Query and Query.CanTraverseAt then
+        return Query.CanTraverseAt(x, y, z, cell)
+    end
+    return Query and Query.CanOccupy
+        and Query.CanOccupy(x, y, z, cell) or false
+end
+
 local function heapPush(heap, node)
     local index = #heap + 1
     heap[index] = node
@@ -330,7 +338,7 @@ function Planner.TryLastResortRecovery(
                     y = math.floor(fromY) + dy + 0.5
                     candidateDistance = distance(x, y, goalX, goalY)
                     if candidateDistance <= currentDistance - 1
-                        and Query.CanOccupy(x, y, fromZ, cell)
+                        and canTraverseAt(x, y, fromZ, cell)
                     then
                         square = cell:getGridSquare(
                             math.floor(x),

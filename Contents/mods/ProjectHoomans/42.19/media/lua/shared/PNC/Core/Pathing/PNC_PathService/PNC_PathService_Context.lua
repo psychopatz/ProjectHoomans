@@ -64,6 +64,9 @@ function Internal.getSquare(x, y, z)
 end
 
 function Internal.isSquareWalkable(x, y, z)
+    if TraversalQuery and TraversalQuery.CanTraverseAt then
+        return TraversalQuery.CanTraverseAt(x, y, z)
+    end
     if TraversalQuery and TraversalQuery.CanOccupy then
         return TraversalQuery.CanOccupy(x, y, z)
     end

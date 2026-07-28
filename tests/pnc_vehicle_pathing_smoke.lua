@@ -8,6 +8,10 @@ local function assertEqual(actual, expected, label)
 end
 
 PNC = {
+    Const = {
+        VEHICLE_AVOIDANCE_CACHE_MS = 250,
+        VEHICLE_AVOIDANCE_CLEARANCE_TILES = 1,
+    },
     Core = {
         Now = function() return 1000 end,
         Distance = function(x1, y1, x2, y2)
@@ -24,6 +28,7 @@ PNC = {
 }
 
 dofile(ROOT .. "PNC_LiveBodyControl.lua")
+dofile(ROOT .. "PNC_VehicleAvoidance.lua")
 dofile(ROOT .. "PNC_TraversalQuery.lua")
 
 local position = {}
@@ -64,10 +69,43 @@ local vehicleSquare = makeSquare(true)
 vehicleSquare.isVehicleIntersecting = function()
     return vehicleBlocking
 end
+local cachedVehicleBlocking = true
+local cachedVehicle = {
+    getPolyPlusRadius = function()
+        return {
+            x1 = 4,
+            y1 = 0,
+            x2 = 5,
+            y2 = 0,
+            x3 = 5,
+            y3 = 1,
+            x4 = 4,
+            y4 = 1,
+            z = 0,
+        }
+    end,
+    isIntersectingSquare = function(_, x, y, z)
+        return cachedVehicleBlocking and x == 4 and y == 0 and z == 0
+    end,
+    isRemovedFromWorld = function() return false end,
+}
+local vehicles = {
+    iterator = function()
+        local consumed = false
+        return {
+            hasNext = function() return not consumed end,
+            next = function()
+                consumed = true
+                return cachedVehicle
+            end,
+        }
+    end,
+}
 local cell = {
     getGridSquare = function(_, x)
         return x == 1 and vehicleSquare or clearSquare
     end,
+    getVehicles = function() return vehicles end,
 }
 getCell = function() return cell end
 
@@ -92,6 +130,58 @@ assertEqual(safeX, 0.5, "nearest safe recovery x")
 assertEqual(safeY, 0.5, "nearest safe recovery y")
 assertEqual(safeZ, 0, "nearest safe recovery z")
 assertEqual(recoveryReason, "vehicle", "nearest safe recovery reason")
+assertEqual(
+    PNC.TraversalQuery.GetOccupancyReason(4.5, 0.5, 0, cell),
+    "vehicle",
+    "vehicle registry supplements stale square cache"
+)
+local canStep, stepReason = PNC.TraversalQuery.CanStep(
+    2.5,
+    0.5,
+    0,
+    3.5,
+    0.5,
+    0,
+    cell
+)
+assertEqual(canStep, false, "route does not enter vehicle clearance")
+assertEqual(stepReason, "vehicle_clearance", "vehicle clearance reason")
+canStep = PNC.TraversalQuery.CanStep(
+    3.5,
+    0.5,
+    0,
+    2.5,
+    0.5,
+    0,
+    cell
+)
+assertEqual(canStep, true, "route may escape vehicle clearance")
+
+local windowObject = {
+    isDestroyed = function() return false end,
+    IsOpen = function() return false end,
+}
+local windowFromSquare = makeSquare(false)
+local windowVehicleSquare = makeSquare(false)
+windowFromSquare.getWindowTo = function() return windowObject end
+local windowCell = {
+    getGridSquare = function(_, x)
+        return x == 4 and windowVehicleSquare or windowFromSquare
+    end,
+    getVehicles = function() return vehicles end,
+}
+PNC.VehicleAvoidance.Invalidate()
+canStep, stepReason = PNC.TraversalQuery.CanStep(
+    3.5,
+    0.5,
+    0,
+    4.5,
+    0.5,
+    0,
+    windowCell
+)
+assertEqual(canStep, false, "vehicle landing blocks window traversal")
+assertEqual(stepReason, "vehicle", "vehicle wins over window interaction")
 
 PNC.LocomotionProfiles = {
     GetBaseProfile = function()
