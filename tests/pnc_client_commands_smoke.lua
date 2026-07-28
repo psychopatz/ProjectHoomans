@@ -14,7 +14,6 @@ local function assertEqual(actual, expected, label)
     end
 end
 
-local clearedNPC
 local firearmShot
 local inventoryResult
 local mapResult
@@ -66,10 +65,6 @@ PNC = {
     Registry = {
         Get = function() return nil end,
         GetLiveZombie = function() return nil end,
-    },
-    ClientInterpolation = {
-        ClearAll = function() end,
-        ClearNPC = function(id) clearedNPC = id end,
     },
     ClientFirearmEffects = {
         Play = function(args) firearmShot = args end,
@@ -200,8 +195,6 @@ assertEqual(State.snapshots.npc_roster.inventory, nil,
     "thin death marker retained heavyweight live snapshot fields")
 assertEqual(State.characterPayloads.npc_roster, nil,
     "death marker retained stale character payload")
-assertEqual(clearedNPC, "npc_roster",
-    "death marker retained live interpolation state")
 
 Client.HandleServerCommand("InventoryResult", { success = true })
 assertEqual(inventoryResult.success, true, "inventory result dispatched")
@@ -219,7 +212,6 @@ assertEqual(
     nil,
     "character payload removal applied"
 )
-assertEqual(clearedNPC, "npc_roster", "interpolation record cleared")
 assertEqual(State.lastSyncReceiveAt, 5000, "command receive timestamp")
 
 print("pnc_client_commands_smoke: ok")

@@ -20,20 +20,20 @@
 
 ## Current Rules
 - melee and ranged attacks are server-authoritative delayed-hit actions, not immediate damage writes
-- attack start is an immediate state-transition snapshot. Remote clients snap
-  the visual body to the authoritative attack origin before playing the attack,
-  while the hit frame uses a small range tolerance rather than movement-sized
-  reach padding
+- attack start is an immediate state-transition snapshot. Native zombie
+  networking owns the remote body's position, while the hit frame uses a small
+  range tolerance rather than movement-sized reach padding
 - attack actions explicitly release the engine bump channel when the animation
   finishes, the target is lost, or the bounded action timeout expires; release
   remains pending until the ActionContext acknowledges that it left `bumped`
 - the authority selects the combat animation and owns hit timing/damage but
   does not enter the visual bump state. The rendering client plays and
   finishes attack snapshots in single-player, listen-server, and dedicated
-  multiplayer alike; remote-only interpolation still owns replicated movement
-- one- and two-handed melee families each rotate between two PNC-only attack
-  nodes, using the proven Dynamic Trading animation clips without sharing its
-  bump identifiers
+  multiplayer alike; native zombie networking owns replicated movement
+- one- and two-handed melee families each rotate between two PNC human attack
+  nodes using the engine/Bandits bump identifiers (`Attack1H1`, `Attack2H1`,
+  and variants). A short bounded client retry repairs packet-interrupted action
+  entry without looping completed swings
 - melee swing audio reuses the already resolved live hand weapon instead of
   constructing another inventory item for the same attack
 - once an attack windup is committed, its action pump temporarily owns the

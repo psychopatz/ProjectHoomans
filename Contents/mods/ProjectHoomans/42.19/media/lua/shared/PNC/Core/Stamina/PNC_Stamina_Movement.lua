@@ -163,6 +163,26 @@ function Stamina.ApplyMovementDrain(record, elapsedSeconds)
         end
         return 0
     end
+    -- A movement intent is not physical movement. In MP the server may keep a
+    -- delegated lane active while the visible client body is blocked or has
+    -- not yet acquired zombie ownership. Drain only after PathService observes
+    -- actual coordinate progress.
+    local now = Core and Core.Now and Core.Now() or 0
+    local lastPhysicalMoveAt =
+        tonumber(lane.lastPhysicalMoveAt) or 0
+    local progressLeaseMs = math.max(
+        100,
+        tonumber(Const.STAMINA_MOVE_PROGRESS_LEASE_MS) or 750
+    )
+    if lastPhysicalMoveAt <= 0
+        or now - lastPhysicalMoveAt > progressLeaseMs
+    then
+        if runtime then
+            runtime.staminaRecoveryMode =
+                runtime.target and "combat_close" or nil
+        end
+        return 0
+    end
 
     profileKey = lane.profileKey or lane.resolvedMode or lane.mode or "walk"
     staminaMode = tostring(lane.staminaMode or "travel")

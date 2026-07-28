@@ -1,6 +1,6 @@
 --[[
     PNC Client Presence Tick
-    Orchestrates snapshot refresh, body resolution, interpolation, and visuals.
+    Orchestrates snapshot refresh, body resolution, native control, and visuals.
 ]]
 
 PNC = PNC or {}
@@ -16,7 +16,6 @@ local Client = PNC.Client
 local Network = PNC.Network
 local Registry = PNC.Registry
 local ClientState = PNC.Network.ClientState
-local Interpolation = PNC.ClientInterpolation
 local isWorldReady = Internal.IsWorldReady
 local canRequestRemoteSync = Internal.CanRequestRemoteSync
 local isSnapshotDebugEnabled = Internal.IsSnapshotDebugEnabled
@@ -25,6 +24,8 @@ local applySnapshotFacing = Internal.ApplySnapshotFacing
 local applySnapshotToBody = Internal.ApplySnapshotToBody
 local pruneSnapshotDuplicates = Internal.PruneSnapshotDuplicates
 local refreshBodyMap = Internal.RefreshBodyMap
+local bindNativePathSnapshot =
+    Internal.BindNativePathSnapshot
 
 local function localSnapshotInterval(record, previous, now)
     local runtime = record and record.runtime or nil
@@ -201,17 +202,32 @@ function Sync.OnTick()
                     or snapshot.healthState == "incapacitated"
                 then
                     pruneSnapshotDuplicates(snapshot, body)
-                    if remoteReplica and Interpolation and Interpolation.RecordSnapshot then
-                        Interpolation.RecordSnapshot(snapshot, body, now)
-                    end
-                    if remoteReplica and Interpolation and Interpolation.ApplyToZombie then
-                        Interpolation.ApplyToZombie(snapshot, body, now)
-                    end
+                    -- The embodied NPC is already an engine-replicated
+                    -- IsoZombie.  Project Zomboid smooths its authoritative
+                    -- server position just as it does for Bandits.  Applying
+                    -- roster-snapshot X/Y interpolation here creates a second
+                    -- transport owner that continually rewinds the native
+                    -- network mover.
                     -- The authoritative SP/listen-server body was already
                     -- faced by PathService. Dedicated clients alone apply
                     -- replicated facing.
                     if remoteReplica then
-                        applySnapshotFacing(body, snapshot)
+                        if bindNativePathSnapshot then
+                            bindNativePathSnapshot(
+                                snapshot,
+                                body,
+                                now
+                            )
+                        end
+                        -- Native PathFindBehavior2 and zombie replication own
+                        -- facing while delegated movement is active.
+                        if not (
+                            snapshot.visualState
+                            and snapshot.visualState.nativeMoveActive
+                                == true
+                        ) then
+                            applySnapshotFacing(body, snapshot)
+                        end
                     end
                     applySnapshotToBody(snapshot, body, remoteReplica)
                 end
@@ -228,5 +244,10 @@ function Sync.OnTick()
                 )
             end
         end
+    end
+    if remoteReplica
+        and Internal.PruneNativePathControllers
+    then
+        Internal.PruneNativePathControllers(now)
     end
 end

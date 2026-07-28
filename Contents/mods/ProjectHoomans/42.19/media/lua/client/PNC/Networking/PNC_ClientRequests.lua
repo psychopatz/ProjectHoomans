@@ -12,7 +12,6 @@ local Internal = Client.Internal
 local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
-local Interpolation = PNC.ClientInterpolation
 local isWorldReady = Internal.IsWorldReady
 
 local function requestFullSync()
@@ -27,9 +26,6 @@ local function requestFullSync()
     end
     if PNC.Registry and PNC.Network and PNC.Network.BuildSnapshot then
         ClientState.snapshots = {}
-        if Interpolation and Interpolation.ClearAll then
-            Interpolation.ClearAll()
-        end
         PNC.Registry.ForEach(function(record)
             local snapshot = PNC.Network.BuildSnapshot(record)
             ClientState.snapshots[snapshot.id] = snapshot

@@ -1,8 +1,8 @@
 --[[
     PNC Fake Locomotion
-    Server-authoritative embodied movement for live NPC bodies. It keeps zombie
-    AI disabled and advances bodies by small controlled steps so behaviors can
-    share one locomotion authority in both singleplayer and multiplayer.
+    Single-player and exceptional fallback embodied movement. Multiplayer uses
+    delegated native zombie pathing and never treats these setX/setY steps as
+    its transport.
 ]]
 
 PNC = PNC or {}
@@ -256,8 +256,8 @@ function FakeLocomotion.PrepareBody(zombie, lane, now)
     if zombie.setRunning then
         zombie:setRunning(profile and profile.isRunning == true)
     end
-    if zombie.setUseless then
-        zombie:setUseless(true)
+    if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
+        LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
 end
 
@@ -285,6 +285,15 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
     local sawNonProgressCandidate = false
     if not zombie or not record or not lane or not goal then
         return false, "invalid", 0
+    end
+    -- Build 42 multiplayer IsoZombie movement is client-controlled. Never
+    -- allow incremental setX/setY movement to become a second transport owner
+    -- if native planning is temporarily unavailable or misconfigured.
+    if LiveBodyControl
+        and LiveBodyControl.IsMultiplayer
+        and LiveBodyControl.IsMultiplayer()
+    then
+        return false, "native_mp_required", 0
     end
     stepDistance, deltaMs = computeStepDistance(
         lane,
@@ -447,6 +456,7 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
                     record.z = candidate.z
                     lane.lastStepAt = now
                     lane.lastStepDistance = actualStepDistance
+                    lane.lastPhysicalMoveAt = now
                     lane.lastStepLabel = candidate.label
                     lane.steeringDirX = moveDirX
                     lane.steeringDirY = moveDirY

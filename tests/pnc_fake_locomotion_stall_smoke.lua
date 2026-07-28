@@ -125,4 +125,22 @@ assert(
     "locomotion facing still used the sub-threshold tiny step"
 )
 
+PNC.LiveBodyControl.IsMultiplayer = function()
+    return true
+end
+local beforeX = body.x
+local beforeY = body.y
+local mpMoved
+mpMoved, result = PNC.FakeLocomotion.StepTowardGoal(
+    body,
+    record,
+    lane,
+    { x = 5, y = 5, z = 0, mode = "run" },
+    1100
+)
+assert(not mpMoved and result == "native_mp_required",
+    "legacy fake locomotion remained reachable in multiplayer")
+assert(body.x == beforeX and body.y == beforeY,
+    "multiplayer fake-locomotion gate changed body position")
+
 print("pnc_fake_locomotion_stall_smoke: ok")

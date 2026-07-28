@@ -6,9 +6,9 @@ local PATH_MOTION =
     "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Pathing/"
     .. "PNC_PathService/PNC_PathService_Motion.lua"
 local ATTACK_XML =
-    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Attack1H1.xml"
+    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Anim_Attack1H1.xml"
 local ATTACK_VARIANT_XML =
-    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Attack1H2.xml"
+    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Anim_Attack1H2.xml"
 
 local function readAll(path)
     local file = assert(io.open(path, "rb"))
@@ -97,12 +97,12 @@ assertContains(
 )
 assertContains(
     clientSync,
-    "Animation.PlayBump(zombie, recordView, visualState.attackAnim)",
+    "Animation.PlayBump(zombie, recordView, anim)",
     "client attack presentation uses shared trigger"
 )
 assertContains(
     attackXML,
-    "<m_StringValue>PNC_Attack1H1</m_StringValue>",
+    "<m_StringValue>Attack1H1</m_StringValue>",
     "attack node bump type"
 )
 assertContains(
@@ -112,17 +112,13 @@ assertContains(
 )
 assertContains(
     attackVariantXML,
-    "<m_AnimName>Bob_Attack1Hand01_HitC</m_AnimName>",
+    "<m_AnimName>Bob_Attack1Hand01_HitB</m_AnimName>",
     "second one-handed melee animation"
 )
-assert(
-    not string.find(
-        clientAttackPresentation,
-        "remoteReplica",
-        1,
-        true
-    ),
-    "single-player client attack presentation is disabled"
+assertContains(
+    combat,
+    'onehanded = { "Attack1H1", "Attack1H2" }',
+    "engine-native Bandits melee bump vocabulary"
 )
 assert(
     not string.find(combat, "Animation.PlayBump", 1, true),

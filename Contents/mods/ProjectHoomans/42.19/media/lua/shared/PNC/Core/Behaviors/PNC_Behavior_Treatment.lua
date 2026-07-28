@@ -18,7 +18,7 @@ local MoveIntent = PNC.BehaviorMoveIntent
 local TraversalQuery = PNC.TraversalQuery
 local COMBAT_NAVIGATION = {
     navigationPolicy = "combat",
-    navigationProvider = "direct",
+    navigationProvider = "engine_path",
 }
 
 local BANDAGE_ANIM_BY_PART = {

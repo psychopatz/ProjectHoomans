@@ -46,39 +46,14 @@ squares["0:0"].getDoorTo = function(_, other)
     return other == squares["1:0"] and door or nil
 end
 
-PNC = {
-    Const = {
-        LOCAL_PATH_LOOKAHEAD_TILES = 14,
-        LOCAL_PATH_SEARCH_RADIUS = 5,
-        LOCAL_PATH_MAX_NODES = 100,
-        LOCAL_PATH_INTERIOR_PENALTY = 0,
-    },
-    Core = {
-        Now = function() return 0 end,
-    },
-}
+PNC = { Const = {} }
 
 dofile(ROOT .. "PNC_TraversalQuery.lua")
-dofile(ROOT .. "PNC_LocalPathPlanner.lua")
 
 local canPlan, kind = PNC.TraversalQuery.CanPlanStep(
     0.5, 0.5, 0, 1.5, 0.5, 0, cell, {}, {}
 )
 assert(canPlan and kind == "door_open", "usable door was not routable")
-
-local path = assert(PNC.LocalPathPlanner.Plan(
-    0.5,
-    0.5,
-    0,
-    2.5,
-    0.5,
-    0,
-    { cell = cell, body = {} }
-))
-assert(
-    path[1] and path[1].traversalKind == "door_open",
-    "planned route did not preserve door edge metadata"
-)
 
 door.isLocked = function() return true end
 canPlan, kind = PNC.TraversalQuery.CanPlanStep(

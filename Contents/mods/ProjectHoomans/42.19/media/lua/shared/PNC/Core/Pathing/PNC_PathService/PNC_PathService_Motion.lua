@@ -28,6 +28,7 @@ function Internal.finalizeCancel(zombie, record, lane)
     lane.noProgressCount = 0
     lane.lastStepAt = 0
     lane.lastStepDistance = 0
+    lane.lastPhysicalMoveAt = 0
     lane.lastStepLabel = nil
     lane.lastProgressDelta = 0
     lane.goalDistance = nil
@@ -68,7 +69,10 @@ function Internal.startRequestedMove(zombie, record, lane)
     preserveVisualMotion = now < (tonumber(lane.visualMovingUntil) or 0)
     Internal.hardResetMoveOwner(zombie, preserveVisualMotion)
     lane.resolvedMode = Internal.refreshResolvedLocomotion(record, lane, zombie, goal)
-    if Internal.FakeLocomotion and Internal.FakeLocomotion.PrepareBody then
+    if lane.navigationProvider ~= "engine_path"
+        and Internal.FakeLocomotion
+        and Internal.FakeLocomotion.PrepareBody
+    then
         Internal.FakeLocomotion.PrepareBody(zombie, lane, now)
     end
     Internal.setWalkAnim(zombie, record, lane.resolvedMode or lane.mode or goal.mode, true)
@@ -82,6 +86,7 @@ function Internal.startRequestedMove(zombie, record, lane)
     lane.noProgressCount = 0
     lane.lastStepAt = 0
     lane.lastStepDistance = 0
+    lane.lastPhysicalMoveAt = 0
     lane.lastStepLabel = nil
     lane.lastProgressDelta = 0
     lane.goalDistance = Internal.Core.Distance(
@@ -131,6 +136,7 @@ function Internal.completeMove(zombie, record, lane, phase, reason)
     lane.noProgressCount = 0
     lane.lastStepAt = 0
     lane.lastStepDistance = 0
+    lane.lastPhysicalMoveAt = 0
     lane.lastStepLabel = nil
     lane.steeringSide = nil
     lane.directStepCount = 0
@@ -325,7 +331,10 @@ function Internal.updateActiveMove(zombie, record, lane)
         lane.recoveryCount = (tonumber(lane.recoveryCount) or 0) + 1
         lane.lastRecoveryReason = suppressedState or lane.lastActionState
         lane.lastRecoverAt = now
-        if Internal.FakeLocomotion and Internal.FakeLocomotion.PrepareBody then
+        if lane.navigationProvider ~= "engine_path"
+            and Internal.FakeLocomotion
+            and Internal.FakeLocomotion.PrepareBody
+        then
             Internal.FakeLocomotion.PrepareBody(zombie, lane, now)
         end
         if lane.ownerMode ~= "window_climb" and lane.ownerMode ~= "window_open" and lane.ownerMode ~= "fence_climb" then
@@ -354,7 +363,10 @@ function Internal.updateActiveMove(zombie, record, lane)
             lane.recoveryCount = (tonumber(lane.recoveryCount) or 0) + 1
             lane.lastRecoveryReason = recoveredState or lane.lastActionState
             lane.lastRecoverAt = now
-            if Internal.FakeLocomotion and Internal.FakeLocomotion.PrepareBody then
+            if lane.navigationProvider ~= "engine_path"
+                and Internal.FakeLocomotion
+                and Internal.FakeLocomotion.PrepareBody
+            then
                 Internal.FakeLocomotion.PrepareBody(zombie, lane, now)
             end
             Internal.logMoveWarning(record, zombie, lane, "recover_nonlocomotion", recoveredState or "unknown", "action=" .. tostring(recoveredState or "unknown"))
@@ -375,7 +387,10 @@ function Internal.updateActiveMove(zombie, record, lane)
         return Internal.completeMove(zombie, record, lane, "arrived", "arrived")
     end
 
-    if Internal.FakeLocomotion and Internal.FakeLocomotion.PrepareBody then
+    if lane.navigationProvider ~= "engine_path"
+        and Internal.FakeLocomotion
+        and Internal.FakeLocomotion.PrepareBody
+    then
         Internal.FakeLocomotion.PrepareBody(zombie, lane, now)
     end
     Internal.setWalkAnim(zombie, record, lane.resolvedMode or lane.mode or goal.mode, false)
@@ -570,7 +585,9 @@ function PathService.Pump(record, zombie)
             lane,
             now
         )
-        if positionRepaired and Internal.FakeLocomotion
+        if positionRepaired
+            and lane.navigationProvider ~= "engine_path"
+            and Internal.FakeLocomotion
             and Internal.FakeLocomotion.PrepareBody
         then
             Internal.FakeLocomotion.PrepareBody(zombie, lane, now)
@@ -591,6 +608,20 @@ function PathService.Pump(record, zombie)
     -- prevents any stale/third-party move intent from restoring locomotion
     -- variables over a melee or ranged bump animation.
     if Internal.hasActiveAttack(record, now) then
+        local nativeNavigation = record.runtime
+            and record.runtime.localNavigation or nil
+        local enginePlanner = PNC.EnginePathPlanner
+        if nativeNavigation
+            and nativeNavigation.nativeActive == true
+            and enginePlanner
+            and enginePlanner.Invalidate
+        then
+            enginePlanner.Invalidate(
+                record,
+                "combat_attack_lease",
+                zombie
+            )
+        end
         lane.lastProgressAt = now
         lane.lastIssueAt = now
         lane.ownerMode = "attack_lease"
@@ -598,10 +629,150 @@ function PathService.Pump(record, zombie)
     end
 
     if lane.phase == "requested" then
-        return Internal.startRequestedMove(zombie, record, lane)
+        local started
+        local startState
+        started, startState = Internal.startRequestedMove(
+            zombie,
+            record,
+            lane
+        )
+        if started
+            and lane.navigationProvider == "engine_path"
+            and PNC.EnginePathPlanner
+            and PNC.EnginePathPlanner.GetSteeringTarget
+        then
+            PNC.EnginePathPlanner.GetSteeringTarget(
+                record,
+                zombie,
+                lane.goal
+            )
+        end
+        return started, startState
     end
 
     if lane.phase == "active" then
+        local enginePlanner = PNC.EnginePathPlanner
+        local nativeNavigation = record.runtime
+            and record.runtime.localNavigation or nil
+        if lane.navigationProvider == "engine_path"
+            and enginePlanner
+            and enginePlanner.GetSteeringTarget
+            and (
+                not nativeNavigation
+                or nativeNavigation.nativeActive ~= true
+            )
+        then
+            enginePlanner.GetSteeringTarget(
+                record,
+                zombie,
+                lane.goal
+            )
+        end
+        nativeNavigation = record.runtime
+            and record.runtime.localNavigation or nil
+        if enginePlanner and enginePlanner.Pump
+            and nativeNavigation
+            and nativeNavigation.provider == "engine_path"
+            and nativeNavigation.nativeActive == true
+        then
+            local handled
+            local nativeState
+            local nativeTraversalState
+            local fromX = zombie:getX()
+            local fromY = zombie:getY()
+            local fromZ = zombie:getZ()
+            nativeTraversalState = enginePlanner.Internal
+                and enginePlanner.Internal.GetNativeTraversalState
+                and enginePlanner.Internal.GetNativeTraversalState(
+                    zombie
+                )
+                or nil
+            if lane.goal then
+                lane.resolvedMode = Internal.refreshResolvedLocomotion(
+                    record,
+                    lane,
+                    zombie,
+                    lane.goal
+                )
+                if nativeTraversalState == nil then
+                    Internal.setWalkAnim(
+                        zombie,
+                        record,
+                        lane.resolvedMode or lane.mode
+                            or lane.goal.mode,
+                        false
+                    )
+                end
+            end
+            handled, nativeState = enginePlanner.Pump(
+                record,
+                zombie,
+                lane
+            )
+            if handled then
+                local toX = zombie:getX()
+                local toY = zombie:getY()
+                local toZ = zombie:getZ()
+                local dx = toX - fromX
+                local dy = toY - fromY
+                local stepDistance = math.sqrt(
+                    (dx * dx) + (dy * dy)
+                )
+                nativeTraversalState = nativeNavigation
+                    and nativeNavigation.nativeTraversalState
+                    or nil
+                lane.ownerMode = nativeTraversalState
+                    and "engine_traversal"
+                    or "engine_path"
+                lane.lastProgressAt = now
+                lane.lastIssueAt = now
+                lane.lastStepAt = now
+                lane.lastStepDistance = stepDistance
+                lane.lastStepLabel = nativeState
+                if stepDistance > 0.0001 then
+                    lane.lastPhysicalMoveAt = now
+                    lane.lastX = toX
+                    lane.lastY = toY
+                    lane.visualMovingUntil = now
+                        + Internal.LOCOMOTION_VISUAL_LEASE_MS
+                    if Internal.MotionHints
+                        and Internal.MotionHints.Remember
+                    then
+                        Internal.MotionHints.Remember(
+                            lane,
+                            fromX,
+                            fromY,
+                            fromZ,
+                            toX,
+                            toY,
+                            toZ,
+                            now,
+                            {
+                                kind = "engine_path",
+                                profile = lane.motionProfile,
+                            }
+                        )
+                    end
+                end
+                if Internal.syncRecordPosition then
+                    Internal.syncRecordPosition(record, zombie)
+                end
+                if Internal.isAtGoal(
+                        zombie,
+                        lane.goal,
+                        lane.stopDistance
+                    ) then
+                    return Internal.completeMove(
+                        zombie,
+                        record,
+                        lane,
+                        "arrived",
+                        nativeState
+                    )
+                end
+                return true, nativeState
+            end
+        end
         return Internal.updateActiveMove(zombie, record, lane)
     end
 

@@ -58,46 +58,30 @@ assertEqual(PNC.PathService.Internal.isMovementDebugEnabled(recordedRecord), tru
 
 PNC.Core.IsClientOnly = function() return true end
 PNC.Core.Now = function() return 1000 end
-PNC.Const = {
-    CLIENT_INTERP_BASE_MS = 150,
-    CLIENT_INTERP_MOVE_MIN_MS = 200,
-    CLIENT_INTERP_SNAP_DISTANCE = 5,
+PNC.ClientPresenceSync = {
+    MotionLogByID = {},
+    Internal = {},
 }
-dofile(CLIENT_ROOT .. "PNC/PNC_ClientInterpolation.lua")
-
-local zombie = {
-    getX = function() return 0 end,
-    getY = function() return 0 end,
-    getZ = function() return 0 end,
-}
-PNC.ClientInterpolation.RecordSnapshot({
+dofile(
+    CLIENT_ROOT
+        .. "PNC/PresenceSync/PNC_ClientPresenceRuntime.lua"
+)
+PNC.ClientPresenceSync.Internal.LogClientMotionDebug({
     id = "npc_client_quiet",
-    x = 1,
-    y = 0,
-    z = 0,
-    visualState = { moving = true },
     debugState = { debugEnabled = false },
-}, zombie, 1000)
+}, "npc_client_quiet", "native_controller_start", "goal=1,0,0")
 assertEqual(#output, 2, "global debug does not enable client NPC logs")
-PNC.ClientInterpolation.RecordSnapshot({
+PNC.ClientPresenceSync.Internal.LogClientMotionDebug({
     id = "npc_client_recorded",
-    x = 1,
-    y = 0,
-    z = 0,
-    visualState = { moving = true },
     debugState = { debugEnabled = true },
-}, zombie, 1000)
-assertEqual(#output, 3, "recorded client NPC emits interpolation log")
+}, "npc_client_recorded", "native_controller_start", "goal=1,0,0")
+assertEqual(#output, 3, "recorded client NPC emits native-controller log")
 assertContains(output[3], "npc=npc_client_recorded", "recorded client NPC identity")
-PNC.ClientInterpolation.RecordSnapshot({
+PNC.ClientPresenceSync.Internal.LogClientMotionDebug({
     id = "npc_client_recorded",
-    x = 1,
-    y = 0,
-    z = 0,
-    visualState = { moving = true },
     debugState = { debugEnabled = true },
-}, zombie, 1000)
-assertEqual(#output, 3, "duplicate interpolation diagnostic is throttled")
+}, "npc_client_recorded", "native_controller_start", "goal=1,0,0")
+assertEqual(#output, 3, "duplicate native-controller diagnostic is throttled")
 
 print = originalPrint
 

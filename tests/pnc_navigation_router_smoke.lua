@@ -6,7 +6,7 @@ local plannerClears = 0
 local plannerInvalidations = 0
 
 PNC = {
-    LocalPathPlanner = {
+    EnginePathPlanner = {
         GetSteeringTarget = function(_, _, target)
             plannerCalls = plannerCalls + 1
             return {
@@ -42,8 +42,9 @@ local policy, provider = PNC.NavigationRouter.Resolve(
     "investigating_last_seen"
 )
 assert(policy == "combat", "active combat did not select combat policy")
-assert(provider == "direct", "combat policy did not bypass planning")
-assert(plannerCalls == 0, "combat resolution invoked local A*")
+assert(provider == "engine_path",
+    "combat policy did not select native engine pathing")
+assert(plannerCalls == 0, "policy resolution invoked native planning")
 
 local travelRecord = {
     activeBehavior = "Travel:en_route",
@@ -58,8 +59,8 @@ travelPolicy, travelProvider, travelSpec = PNC.NavigationRouter.Resolve(
 )
 assert(travelPolicy == "travel", "journey did not select travel policy")
 assert(
-    travelProvider == "local_path",
-    "travel policy did not select local planner"
+    travelProvider == "engine_path",
+    "travel policy did not select native engine planner"
 )
 local target = { x = 10, y = 4, z = 0, mode = "walk" }
 local steering = PNC.NavigationRouter.GetSteeringTarget(
@@ -70,7 +71,7 @@ local steering = PNC.NavigationRouter.GetSteeringTarget(
     travelProvider,
     travelSpec
 )
-assert(plannerCalls == 1, "travel did not invoke local planner")
+assert(plannerCalls == 1, "travel did not invoke native engine planner")
 assert(steering.x == 9, "travel provider result was not returned")
 assert(
     PNC.NavigationRouter.Invalidate(travelRecord, "test_stall"),
@@ -83,8 +84,9 @@ policy, provider = PNC.NavigationRouter.Resolve(
     "melee_kiting",
     { navigationPolicy = "combat" }
 )
-assert(policy == "combat" and provider == "direct")
-assert(plannerClears == 1, "switching to direct did not clear route cache")
+assert(policy == "combat" and provider == "engine_path")
+assert(plannerClears == 1,
+    "switching navigation policy did not clear the previous route")
 
 local tacticalCalls = 0
 assert(PNC.NavigationRouter.RegisterProvider("kite_test", {

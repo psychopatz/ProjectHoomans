@@ -45,8 +45,12 @@ Client presence-reconciliation modules:
   audio, and animation application
 - `PNC_ClientPresenceBodies`: body indexing, directed removal, and duplicate
   shell cleanup
-- `PNC_ClientPresenceTick`: snapshot refresh, interpolation, body resolution,
-  and per-frame orchestration
+- `PNC_ClientNativePathController`: nearest-client `PathFindBehavior2`
+  ownership for MP live bodies. Presence ticks bind goals; actual native
+  requests and updates run from that body's `OnZombieUpdate`, matching Bandits.
+- `PNC_ClientPresenceTick`: snapshot refresh, body resolution, visual
+  reconciliation, and per-frame orchestration. It does not write replicated
+  NPC positions; native zombie networking owns MP transport.
 
 New inbound commands should register a handler from their domain module through
 `PNC.Client.Internal.RegisterServerCommand`. Existing callers should continue

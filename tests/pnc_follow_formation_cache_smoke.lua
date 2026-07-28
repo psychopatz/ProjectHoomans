@@ -103,4 +103,30 @@ now = 1300
 PNC.BehaviorCompanion.Tick(records[1], {}, "FollowOwner")
 assert(scans == 2, "formation cache did not refresh after its window")
 
+local building = {}
+local room = {}
+owner.getSquare = function()
+    return {
+        getBuilding = function() return building end,
+        getRoom = function() return room end,
+    }
+end
+getCell = function()
+    return {
+        getGridSquare = function()
+            return {
+                getBuilding = function() return nil end,
+                getRoom = function() return nil end,
+            }
+        end,
+    }
+end
+now = 1600
+PNC.BehaviorCompanion.Tick(records[1], {}, "FollowOwner")
+assert(
+    records[1].runtime.followSlotTarget.x == owner:getX()
+        and records[1].runtime.followSlotTarget.y == owner:getY(),
+    "indoor formation slot remained across a building wall"
+)
+
 print("pnc_follow_formation_cache_smoke: ok")

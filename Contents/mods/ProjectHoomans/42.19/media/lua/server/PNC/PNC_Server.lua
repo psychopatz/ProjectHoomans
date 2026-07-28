@@ -221,6 +221,11 @@ function Server.OnTick()
         Presence.BeginServerTick(now)
     end
     Registry.EnsureLoaded()
+    if PNC.EnginePathPlanner
+        and PNC.EnginePathPlanner.PumpServerFrame
+    then
+        PNC.EnginePathPlanner.PumpServerFrame()
+    end
     if PNC.Travel and PNC.Travel.Service
         and PNC.Travel.Service.RefreshAbstractPositions
     then

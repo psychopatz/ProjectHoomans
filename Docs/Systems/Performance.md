@@ -99,8 +99,10 @@ frame spike.
 - local-authority appearance maintenance runs at 250 ms and never replays
   server-owned locomotion; attack snapshots remain client-rendered in every
   topology, including single-player
-- bounded local A* admits at most two searches per 50 ms window; excess NPCs
-  keep their current waypoint and retry on a later scheduler pass
+- meaningful movement uses the native engine controller, including combat
+  approach; request starts remain capped at one per 100 ms, moving targets must
+  drift 1.5 tiles before a one-second replan, and sub-tile corrections avoid
+  path search; excess NPCs are deferred to later scheduler passes
 - performance collection is disabled unless runtime debug or an explicit
   capture window is active
 
@@ -131,7 +133,7 @@ after the workload to read the accumulated snapshot.
 - `pnc_companion_owner_defense_smoke.lua`
 - `pnc_follow_formation_cache_smoke.lua`
 - `pnc_client_animation_authority_smoke.lua`
-- `pnc_local_path_planner_smoke.lua`
+- `pnc_engine_path_planner_smoke.lua`
 - `pnc_combat_commitment_smoke.lua`
 - `pnc_simulation_lod_smoke.lua`
 - `pnc_scheduler_smoke.lua`

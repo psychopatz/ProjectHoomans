@@ -2,9 +2,9 @@
 
 ## Purpose
 
-`PNC_FakeLocomotion.lua` is the movement authority for embodied PNC live bodies.
-It advances NPCs by small server-authoritative position steps while keeping the
-underlying zombie AI disabled with `setUseless(true)`.
+`PNC_FakeLocomotion.lua` is the single-player and exceptional fallback mover.
+Multiplayer embodied movement is owned by the engine's native zombie controller;
+fake position steps are never used as MP transport.
 
 ## Ownership
 
@@ -13,7 +13,8 @@ underlying zombie AI disabled with `setUseless(true)`.
   movement logs, and special movement orchestration.
 - `PNC_FakeLocomotion`: owns fake walking/running/crawling step execution.
 - `PNC_TraversalQuery`: owns shared occupancy and passage-edge queries.
-- `PNC_NavigationRouter`: selects a waypoint provider for each movement policy.
+- `PNC_NavigationRouter`: selects a provider for each movement policy.
+- `PNC_EnginePathPlanner`: owns bounded native local/travel movement handoffs.
 - `PNC_TraversalProfiles`: owns traversal animation names and timing profiles.
 - `PNC_LiveBodyControl`: owns zombie-body suppression and live-body cleanup.
 - `PNC_Animation`: owns animation variables, walk types, speed multipliers, and
@@ -23,25 +24,26 @@ underlying zombie AI disabled with `setUseless(true)`.
 
 ## Rules
 
-- Live bodies stay `setUseless(true)` by default.
-- Do not reintroduce vanilla `pathToLocation`, `walktoward`, or `path2` as the
-  primary locomotion authority.
-- If pathfinding is reintroduced later, it may only provide waypoints. It must
-  not own the body transform.
+- Single-player fallback bodies stay `setUseless(true)` outside a synchronous
+  native update. Multiplayer live bodies always stay `setUseless(false)`.
+- Vanilla `PathFindBehavior2` owns meaningful router-approved local/travel
+  and combat movement. `PNC_PathService` pumps and releases that lease;
+  committed attacks, sub-tile corrections, and native failures return to fake
+  locomotion.
 - Keep special movement inside the same shared lane so follow, combat, patrol,
   guard, and retreat all use one locomotion path.
 - Prefer time-scaled small steps over large snaps for multiplayer stability.
 
 ## Navigation Router
 
-The router changes steering, not locomotion ownership:
+The router selects both steering and the movement implementation:
 
-- `combat` uses the allocation-free `direct` provider. Closing, retreating, and
-  kiting therefore do not run A* while their goals change rapidly.
-- `local` uses bounded, cached local A* for follow, guard, patrol, roaming, and
-  other non-combat live movement.
-- `travel` uses the same local provider and additionally permits the existing
-  delayed last-resort recovery.
+- `local`, `travel`, and `combat` use the `engine_path` provider.
+- Meaningful movement uses native routing on both open ground and indoors.
+  Sub-tile corrections remain direct and allocation-light.
+- Native path requests are asynchronous, globally budgeted, and staggered.
+  PathService pumps the active engine behavior directly and cancels/resets it
+  on success, failure, timeout, policy switch, or invalidation.
 - Unknown policy names fall back to `local`; missing providers fall back to the
   final target without interrupting movement.
 
@@ -63,20 +65,14 @@ PNC.NavigationRouter.RegisterPolicy("kite", {
 ```
 
 Pass `{ navigationPolicy = "kite" }` as the final `Common.MoveRecord` or
-`MoveIntent.RequestMove` argument. Providers should cache expensive work on the
-record and return only steering targets; they must never write the body
-transform.
+`MoveIntent.RequestMove` argument. Providers cache expensive state on the
+record; any movement handoff remains mediated by PathService.
 
-The local planner treats usable doors, windows, and fences as weighted action
-edges. Locked/barricaded doors and unsafe landing squares remain blocked. The
-selected action edge points at the opposite tile, allowing the existing
-collision-driven PathService interaction to execute the passage precisely.
+The engine controller supplies its own doorway/window-aware movement for the
+bounded lease. The collision-driven fake lane resumes when that lease ends.
 
-The path overlay reports the selected `policy/provider`, local plan result,
-waypoint position, traversal edge, steering step, goal/final distances, and
-non-progress/replan diagnostics. The bright segment ends at the current
-steering waypoint; the dim segment continues from there to the behavior's real
-final goal.
+The path overlay reports the selected `policy/provider`, native controller
+state, traversal state, goal/final distances, and non-progress diagnostics.
 
 Fake locomotion only refreshes its progress lease when it beats the best
 distance reached for the current lane goal. Zero-length axis candidates are
@@ -84,27 +80,24 @@ discarded, and bounded lateral movement that fails to improve that best
 distance invalidates the cached route. This prevents walk-in-place and
 away/back oscillations from hiding a blocked NPC indefinitely.
 
-## Continuous Route Steering
+## Native Engine Routing
 
-- Local route waypoints use a tight coordinate comparison. Adjacent one-tile
-  waypoints are no longer mistaken for the same movement-lane goal.
-- An active local route hot-swaps its steering goal without restarting fake
-  locomotion, its walk cycle, or its interpolation cadence.
-- On clear ground the planner selects a visible point up to three route nodes
-  ahead. Reached and passed nodes advance continuously, producing rounded
-  turns instead of point-to-point stops at every tile center.
-- Door, window, fence, wall-corner, and other traversal-entry nodes remain
-  precision boundaries. Look-ahead may aim at one but never skip through it.
-- Fake locomotion blends the previous travel vector toward the new steering
-  vector. Sharp turns use a stronger correction so smoothing cannot create an
-  orbit around a waypoint.
-- Facing is projected one tile along the accepted movement vector rather than
-  aimed at the tiny per-tick displacement. Server and client locomotion facing
-  can refresh every 40 ms, while combat and stationary facing keep their
-  separate throttling rules.
-- The overlay reports the base route node as `wp`, the forward steering node
-  as `aim`, continuous lane retargets as `rt`, and the requested heading change
-  in degrees as `turn`.
+- PNC never indexes `zombie.pathfind.Path` from Lua; Build 42 does not expose
+  that Java object as a Kahlua table.
+- The engine behavior is pumped directly, matching the robust movement pattern
+  used by Bandits, and is never wrapped in `pcall`.
+- Only one request may start per global budget window, so a following group
+  cannot launch all path searches in one scheduler pass.
+- Moving targets replan only after drifting 1.5 tiles and after a one-second
+  cooldown, preventing follow targets from restarting A* every behavior tick.
+- Combat approach, retreat, and kiting use bounded native routes. Beginning a
+  committed attack immediately invalidates the native lease before its bump
+  animation is applied.
+- Facing and animation return to normal fake-locomotion ownership as soon as
+  the native lease succeeds, fails, times out, or is invalidated.
+- Every accepted native displacement publishes motion hints for diagnostics
+  and visual-state context; embodied MP position transport remains owned by
+  Project Zomboid's zombie network controller.
 
 ## Resolved Locomotion Mode
 
@@ -202,22 +195,16 @@ away/back oscillations from hiding a blocked NPC indefinitely.
 
 ## Multiplayer Notes
 
-- The server is authoritative for live-body movement.
-- Clients consume replicated snapshots and live zombie replication only; they do
-  not run NPC movement logic.
-- Passage objects and traversal transforms are changed on the server. Clients
-  receive door/window object synchronization and interpolate authoritative NPC
-  positions; they never open a local-only passage or choose a landing square.
-- Snapshot visual state carries short special-move bump windows so client visual
-  sync does not overwrite climb bumps immediately.
-- Snapshot visual state also carries the resolved locomotion animation speed so
-  server fake-step transport and client leg cadence stay aligned.
-- Client interpolation now starts new segments from the currently rendered body
-  position for the same motion stream, which prevents backward rewinds between
-  authoritative snapshots while keeping server-authored targets and durations.
-- Normal MP move segments last at least 200 ms so a client remains in motion
-  across the server's 150 ms active-snapshot cadence rather than running in
-  place between short 35–50 ms interpolation segments.
+- The server owns NPC decisions and publishes native path goals.
+- Mirroring Bandits, the nearest client advances `PathFindBehavior2` inside
+  that body's `OnZombieUpdate`; other clients observe normal IsoZombie
+  replication.
+- Every MP live body remains useful for its full lifetime. Health, animation,
+  materialization, and safety maintenance all route through one flag writer.
+- Native movement owns doors, windows, fences, stairs, facing, and position.
+  Fake steps and scripted traversal transforms do not run as MP transport.
+- Roster snapshots never write client NPC X/Y. The legacy interpolation module
+  was removed, so there is no second position owner.
 - Every shared animation XML filename and root node name is `PNC_` namespaced
   and guarded by `PNCActor=true`, preventing Bandits or ordinary zombies from
   selecting PNC nodes when both mods are enabled.

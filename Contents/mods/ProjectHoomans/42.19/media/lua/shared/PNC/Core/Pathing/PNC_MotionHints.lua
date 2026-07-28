@@ -1,7 +1,7 @@
 --[[
     PNC Motion Hints
-    Shared helpers for compact, server-authored movement segments that clients
-    can interpolate visually without taking locomotion authority.
+    Shared helpers for compact, server-authored movement direction and timing.
+    Clients may use these for facing/presentation but never for position writes.
 ]]
 
 PNC = PNC or {}

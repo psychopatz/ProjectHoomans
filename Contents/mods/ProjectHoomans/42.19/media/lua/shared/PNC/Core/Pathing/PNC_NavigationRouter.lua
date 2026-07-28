@@ -1,12 +1,14 @@
 --[[
     PNC Navigation Router
 
-    Selects a steering provider without taking ownership of movement. Providers
-    may return a waypoint, but PathService remains the only live-body movement
-    owner and therefore keeps fake locomotion/interpolation authoritative.
+    Selects a navigation provider while PathService remains the single movement
+    coordinator. A provider may adjust a steering target or ask PathService for
+    a bounded native-engine movement handoff.
 
-    The direct provider is intentionally a no-op. Combat and kiting use it by
-    default, so their high-frequency target updates never invoke local A*.
+    The direct provider is intentionally a no-op fallback. Meaningful movement
+    uses the native engine controller across local, travel, and combat
+    policies. SP may retain allocation-free sub-tile corrections; MP always
+    keeps a single client-native movement owner.
 ]]
 
 PNC = PNC or {}
@@ -183,9 +185,9 @@ function Router.Invalidate(record, reason)
     return invalidated
 end
 
-Router.RegisterProvider("local_path", {
+Router.RegisterProvider("engine_path", {
     GetSteeringTarget = function(record, body, finalTarget, policy)
-        local planner = PNC.LocalPathPlanner
+        local planner = PNC.EnginePathPlanner
         if not planner or not planner.GetSteeringTarget then
             return finalTarget
         end
@@ -197,13 +199,13 @@ Router.RegisterProvider("local_path", {
         )
     end,
     Clear = function(record)
-        local planner = PNC.LocalPathPlanner
+        local planner = PNC.EnginePathPlanner
         if planner and planner.Clear then
             planner.Clear(record)
         end
     end,
     Invalidate = function(record, reason)
-        local planner = PNC.LocalPathPlanner
+        local planner = PNC.EnginePathPlanner
         return planner and planner.Invalidate
             and planner.Invalidate(record, reason) or false
     end,
@@ -213,15 +215,13 @@ Router.RegisterPolicy("direct", {
     provider = Router.DIRECT_PROVIDER,
 })
 Router.RegisterPolicy("combat", {
-    provider = Router.DIRECT_PROVIDER,
+    provider = "engine_path",
 })
 Router.RegisterPolicy("local", {
-    provider = "local_path",
-    allowRecovery = false,
+    provider = "engine_path",
 })
 Router.RegisterPolicy("travel", {
-    provider = "local_path",
-    allowRecovery = true,
+    provider = "engine_path",
 })
 
 return Router

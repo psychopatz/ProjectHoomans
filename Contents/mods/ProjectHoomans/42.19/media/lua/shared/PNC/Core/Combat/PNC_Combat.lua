@@ -17,15 +17,19 @@ local Equipment = PNC.Equipment
 local Perception = PNC.Perception
 
 Internal.MELEE_BUMP_TYPES = {
-    onehanded = { "PNC_Attack1H1", "PNC_Attack1H2" },
-    twohanded = { "PNC_Attack2H1", "PNC_Attack2H2" },
-    spear = { "PNC_AttackS1" },
-    knife = { "PNC_AttackKnife" },
+    -- Use the engine/Bandits BumpType vocabulary.  PNC's PNCActor-conditioned
+    -- animation nodes already map these identifiers to the human clips, while
+    -- the standard names survive IsoZombie multiplayer packet updates more
+    -- reliably than a parallel PNC-only BumpType namespace.
+    onehanded = { "Attack1H1", "Attack1H2" },
+    twohanded = { "Attack2H1", "Attack2H2" },
+    spear = { "AttackS1" },
+    knife = { "AttackKnife" },
 }
 
 Internal.RANGED_BUMP_TYPES = {
-    handgun = { "PNC_AttackPistol" },
-    rifle = { "PNC_AttackRifle" },
+    handgun = { "AttackPistol" },
+    rifle = { "AttackRifle" },
 }
 
 Internal.ATTACK_TIMINGS = {

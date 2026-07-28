@@ -17,6 +17,108 @@ local Visuals = PNC.Visuals
 local Equipment = PNC.Equipment
 local LiveBodyControl = PNC.LiveBodyControl
 local logClientMotionDebug = Internal.LogClientMotionDebug
+local ATTACK_BUMP_RETRY_DELAY_MS = 90
+local ATTACK_BUMP_RETRY_WINDOW_MS = 420
+local ATTACK_BUMP_MAX_RETRIES = 3
+local LOCOMOTION_MAINTAIN_MS = 500
+
+local function getActionStateName(zombie)
+    if zombie and zombie.getActionStateName then
+        return string.lower(tostring(
+            zombie:getActionStateName() or ""
+        ))
+    end
+    return ""
+end
+
+local function getBumpType(zombie)
+    if zombie and zombie.getBumpType then
+        return tostring(zombie:getBumpType() or "")
+    end
+    return ""
+end
+
+local function beginClientAttackBump(
+    snapshot,
+    zombie,
+    recordView,
+    modData,
+    attackKey,
+    anim,
+    now
+)
+    if Animation and Animation.PlayBump then
+        Animation.PlayBump(zombie, recordView, anim)
+    end
+    if modData then
+        modData.PNC_ClientAttackKey = attackKey
+        modData.PNC_ClientAttackLocalStartedAt = now
+        modData.PNC_ClientAttackRetryAt =
+            now + ATTACK_BUMP_RETRY_DELAY_MS
+        modData.PNC_ClientAttackRetries = 0
+    end
+    logClientMotionDebug(
+        snapshot,
+        snapshot and snapshot.id or nil,
+        "attack_anim_start",
+        "anim=" .. tostring(anim)
+            .. " bump=" .. getBumpType(zombie)
+            .. " action=" .. getActionStateName(zombie)
+    )
+end
+
+local function maintainClientAttackBump(
+    snapshot,
+    zombie,
+    recordView,
+    modData,
+    anim,
+    now
+)
+    local localStartedAt
+    local retryAt
+    local retries
+    local actionState
+    local bumpType
+    if not modData or not Animation or not Animation.PlayBump then
+        return false
+    end
+    localStartedAt = tonumber(
+        modData.PNC_ClientAttackLocalStartedAt
+    ) or now
+    retryAt = tonumber(modData.PNC_ClientAttackRetryAt) or now
+    retries = tonumber(modData.PNC_ClientAttackRetries) or 0
+    if now < retryAt
+        or now - localStartedAt > ATTACK_BUMP_RETRY_WINDOW_MS
+        or retries >= ATTACK_BUMP_MAX_RETRIES
+    then
+        return false
+    end
+    actionState = getActionStateName(zombie)
+    bumpType = getBumpType(zombie)
+    if actionState == "bumped" then
+        return false
+    end
+    -- A zombie packet can restore the same BumpType without entering the
+    -- client action state.  Force a real variable edge before retrying.
+    if bumpType == tostring(anim) and zombie.setBumpType then
+        zombie:setBumpType("")
+    end
+    Animation.PlayBump(zombie, recordView, anim)
+    modData.PNC_ClientAttackRetries = retries + 1
+    modData.PNC_ClientAttackRetryAt =
+        now + ATTACK_BUMP_RETRY_DELAY_MS
+    logClientMotionDebug(
+        snapshot,
+        snapshot and snapshot.id or nil,
+        "attack_anim_retry",
+        "anim=" .. tostring(anim)
+            .. " retry=" .. tostring(retries + 1)
+            .. " previousBump=" .. tostring(bumpType)
+            .. " action=" .. tostring(actionState)
+    )
+    return true
+end
 
 local function buildRecordView(snapshot)
     local visualState = snapshot and snapshot.visualState or {}
@@ -49,6 +151,12 @@ local function buildRecordView(snapshot)
         runtime = {
             attackMode = snapshot and snapshot.attackMode == true or false,
             debug = snapshot and snapshot.debugState and snapshot.debugState.debugEnabled == true or false,
+            localNavigation = {
+                provider = visualState.nativeMoveActive == true
+                    and "engine_path" or nil,
+                nativeActive = visualState.nativeMoveActive == true,
+                clientDelegated = visualState.nativeMoveActive == true,
+            },
             pathing = {
                 phase = moving and "active" or "idle",
                 ownerMode = moving and "fake_locomotion" or "idle",
@@ -150,6 +258,8 @@ local function buildMotionKey(snapshot)
         tostring(visualState.specialActive == true),
         tostring(visualState.specialAnim or ""),
         tostring(visualState.specialFinishAt or 0),
+        tostring(visualState.nativeMoveActive == true),
+        tostring(visualState.nativeMoveRevision or 0),
     }, "|")
 end
 
@@ -231,6 +341,7 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     local visualKey
     local handsKey
     local motionKey
+    local motionChanged
     local now
     if not snapshot or not zombie or (zombie.isDead and zombie:isDead()) then
         return
@@ -243,7 +354,14 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
 
     now = Core and Core.Now and Core.Now() or 0
     if LiveBodyControl and LiveBodyControl.MaintainHumanizedBody then
-        LiveBodyControl.MaintainHumanizedBody(zombie, now)
+        -- Remote IsoZombies are transported by the engine's normal MP
+        -- network controller.  They must remain useful for that controller
+        -- to advance walking and native fence/window traversal.
+        LiveBodyControl.MaintainHumanizedBody(
+            zombie,
+            now,
+            remoteReplica
+        )
     end
     if (
         remoteReplica
@@ -293,7 +411,13 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     visualKey = buildVisualKey(snapshot)
     handsKey = buildHandsKey(snapshot)
     if modData and modData.PNC_ClientVisualKey ~= visualKey then
-        if Animation and Animation.ApplyLiveSetup then
+        if not (
+                remoteReplica
+                and visualState.nativeMoveActive == true
+            )
+            and Animation
+            and Animation.ApplyLiveSetup
+        then
             Animation.ApplyLiveSetup(zombie, recordView)
         end
         if Visuals and Visuals.ApplyResolvedAppearance then
@@ -343,10 +467,19 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
         end
         if modData then
             modData.PNC_ClientMotionKey = motionKey
+            modData.PNC_ClientWasDowned = true
         end
         return
-    elseif Animation and Animation.ClearDowned then
+    elseif modData
+        and modData.PNC_ClientWasDowned == true
+        and Animation
+        and Animation.ClearDowned
+    then
+        -- ClearDowned writes the generic movement variables, so it is only a
+        -- transition repair. Running it for every healthy snapshot competes
+        -- with PathFindBehavior2 and forces WalkTowardState over path2.
         Animation.ClearDowned(zombie)
+        modData.PNC_ClientWasDowned = nil
     end
 
     -- Combat presentation is client-owned in every topology. The server
@@ -357,10 +490,15 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
         and (tostring(visualState.attackAnim) .. ":" .. tostring(visualState.attackFinishAt or 0))
         or nil
     if attackKey and modData and modData.PNC_ClientAttackKey ~= attackKey then
-        if Animation and Animation.PlayBump then
-            Animation.PlayBump(zombie, recordView, visualState.attackAnim)
-        end
-        modData.PNC_ClientAttackKey = attackKey
+        beginClientAttackBump(
+            snapshot,
+            zombie,
+            recordView,
+            modData,
+            attackKey,
+            visualState.attackAnim,
+            now
+        )
         modData.PNC_ClientMotionKey = motionKey
         return
     end
@@ -369,9 +507,33 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
             Animation.FinishBump(zombie, true)
         end
         modData.PNC_ClientAttackKey = nil
+        modData.PNC_ClientAttackLocalStartedAt = nil
+        modData.PNC_ClientAttackRetryAt = nil
+        modData.PNC_ClientAttackRetries = nil
         return
     end
     if attackKey then
+        maintainClientAttackBump(
+            snapshot,
+            zombie,
+            recordView,
+            modData,
+            visualState.attackAnim,
+            now
+        )
+        return
+    end
+
+    if remoteReplica
+        and visualState.nativeTraversalActive == true
+    then
+        -- Fence/window traversal is already carried by the engine zombie
+        -- packet and its native action state.  Replaying a PNC locomotion or
+        -- scripted bump here would create a second animation owner.
+        if modData then
+            modData.PNC_ClientMotionKey = motionKey
+            modData.PNC_ClientLocomotionMaintainAt = nil
+        end
         return
     end
 
@@ -397,9 +559,27 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
         return
     end
 
+    if remoteReplica
+        and visualState.nativeMoveActive == true
+    then
+        -- The nearest client advances PathFindBehavior2 from OnZombieUpdate.
+        -- Only its walk/run presentation style is ours; generic movement and
+        -- action-state variables remain exclusively engine-owned.
+        if Animation and Animation.SyncNativeLocomotionStyle then
+            Animation.SyncNativeLocomotionStyle(zombie, recordView)
+        end
+        if modData then
+            modData.PNC_ClientMotionKey = motionKey
+            modData.PNC_ClientLocomotionMaintainAt = nil
+        end
+        return
+    end
+
     desiredAnim = visualState.anim or "Idle"
+    motionChanged = not modData
+        or modData.PNC_ClientMotionKey ~= motionKey
     if remoteReplica and Animation and Animation.Apply
-        and (not modData or modData.PNC_ClientMotionKey ~= motionKey)
+        and motionChanged
     then
         Animation.Apply(zombie, recordView, desiredAnim, recordView.runtime.pathing.motionProfile, visualState.moving == true)
         if modData then
@@ -408,9 +588,23 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     end
     if remoteReplica and visualState.moving == true
         and Animation and Animation.SyncLocomotion
+        and (
+            motionChanged
+            or not modData
+            or now >= (
+                tonumber(modData.PNC_ClientLocomotionMaintainAt)
+                    or 0
+            )
+        )
     then
         Animation.SyncLocomotion(zombie, recordView)
+        if modData then
+            modData.PNC_ClientLocomotionMaintainAt =
+                now + LOCOMOTION_MAINTAIN_MS
+        end
         logClientMotionDebug(snapshot, snapshot and snapshot.id or nil, "locomotion_resync", "mode=" .. tostring(visualState.mode or "walk") .. " walkType=" .. tostring(visualState.walkType or ""))
+    elseif modData and visualState.moving ~= true then
+        modData.PNC_ClientLocomotionMaintainAt = nil
     end
 end
 

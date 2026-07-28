@@ -4,11 +4,14 @@ local FILE =
 
 local calls = {
     apply = 0,
+    clear = 0,
     finish = 0,
+    nativeStyle = 0,
     play = 0,
     pump = 0,
     sync = 0,
 }
+local now = 1000
 
 PNC = {
     Const = {
@@ -18,17 +21,25 @@ PNC = {
         PRESENCE_LIVE = "live",
     },
     Core = {
-        Now = function() return 1000 end,
+        Now = function() return now end,
     },
     Animation = {
         Apply = function() calls.apply = calls.apply + 1 end,
-        ClearDowned = function() end,
+        ClearDowned = function() calls.clear = calls.clear + 1 end,
         FinishBump = function(zombie)
             calls.finish = calls.finish + 1
             zombie:getModData().PNC_BumpReleasePending = true
         end,
-        PlayBump = function() calls.play = calls.play + 1 end,
+        PlayBump = function(zombie, _, anim)
+            calls.play = calls.play + 1
+            if zombie and zombie.setBumpType then
+                zombie:setBumpType(anim)
+            end
+        end,
         PumpBumpRelease = function() calls.pump = calls.pump + 1 end,
+        SyncNativeLocomotionStyle = function()
+            calls.nativeStyle = calls.nativeStyle + 1
+        end,
         SyncLocomotion = function() calls.sync = calls.sync + 1 end,
     },
     ClientPresenceSync = {
@@ -96,6 +107,39 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
 assert(calls.play == 3, "remote replica did not replay the attack snapshot")
 assert(calls.pump == 2, "remote replica did not maintain bump release")
 
+local retryModData = {}
+local retryBumpType = ""
+local clearedBeforeRetry = false
+local retryBody = {
+    getModData = function() return retryModData end,
+    isDead = function() return false end,
+    setFemaleEtc = function() end,
+    setVariable = function() end,
+    getActionStateName = function() return "idle" end,
+    getBumpType = function() return retryBumpType end,
+    setBumpType = function(_, value)
+        if value == "" then
+            clearedBeforeRetry = true
+        end
+        retryBumpType = value
+    end,
+}
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    attackSnapshot,
+    retryBody,
+    true
+)
+now = now + 100
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    attackSnapshot,
+    retryBody,
+    true
+)
+assert(calls.play == 5,
+    "MP attack bump was not retried after packet/state loss")
+assert(clearedBeforeRetry,
+    "same-value MP bump retry did not create a variable edge")
+
 local finishedLocalSnapshot = {
     id = attackSnapshot.id,
     alive = true,
@@ -109,6 +153,7 @@ local finishedLocalSnapshot = {
         moving = false,
     },
 }
+local pumpsBeforeFinish = calls.pump
 PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     finishedLocalSnapshot,
     sustainedLocalBody,
@@ -120,7 +165,8 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     sustainedLocalBody,
     false
 )
-assert(calls.pump == 4, "single-player client did not pump pending bump release")
+assert(calls.pump == pumpsBeforeFinish + 2,
+    "single-player client did not pump pending bump release")
 
 local movingSnapshot = {
     id = "moving_authority",
@@ -143,6 +189,38 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
 )
 assert(calls.apply == 0, "local authority gained a second locomotion owner")
 assert(calls.sync == 0, "local authority resynchronized locomotion twice")
+
+local nativeReplica = body()
+local nativeSnapshot = {
+    id = "native_replica",
+    alive = true,
+    attackMode = false,
+    healthState = "normal",
+    presenceRevision = 1,
+    presenceState = "live",
+    visualState = {
+        anim = "Run",
+        moveAnim = "Run",
+        moving = true,
+        mode = "run",
+        nativeMoveActive = true,
+        nativeMoveRevision = 3,
+    },
+}
+local appliesBeforeNative = calls.apply
+local syncsBeforeNative = calls.sync
+local clearsBeforeNative = calls.clear
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    nativeSnapshot,
+    nativeReplica,
+    true
+)
+assert(calls.nativeStyle == 1,
+    "native MP route did not receive presentation-only locomotion style")
+assert(calls.apply == appliesBeforeNative and calls.sync == syncsBeforeNative,
+    "native MP route invoked fake locomotion")
+assert(calls.clear == clearsBeforeNative,
+    "healthy native MP route was reset through ClearDowned")
 
 local specialBody = body()
 local finishesBeforeSpecial = calls.finish

@@ -205,6 +205,34 @@ local function resolveFollowSlot(record, owner)
     target.y = owner:getY() + (backY * trailing) + (rightY * lateral)
     target.z = owner:getZ()
     target.stopDistance = tonumber(Const.FOLLOW_SLOT_STOP_DISTANCE) or 0.65
+    -- Formation offsets are useful outdoors but can place the synthetic goal
+    -- through an exterior/interior wall in a small room. Keep the slot only
+    -- when it resolves to the owner's loaded building and room; otherwise
+    -- route to the owner square so the native path exposes the real doorway.
+    local cell = getCell and getCell() or nil
+    local ownerSquare = owner.getSquare and owner:getSquare() or nil
+    local slotSquare = cell and cell.getGridSquare and cell:getGridSquare(
+        math.floor(target.x),
+        math.floor(target.y),
+        math.floor(target.z)
+    ) or nil
+    if ownerSquare and slotSquare then
+        local ownerBuilding = ownerSquare.getBuilding
+            and ownerSquare:getBuilding() or nil
+        local slotBuilding = slotSquare.getBuilding
+            and slotSquare:getBuilding() or nil
+        local ownerRoom = ownerSquare.getRoom and ownerSquare:getRoom() or nil
+        local slotRoom = slotSquare.getRoom and slotSquare:getRoom() or nil
+        if ownerBuilding ~= slotBuilding
+            or (ownerBuilding ~= nil and ownerRoom ~= slotRoom)
+        then
+            target.x = owner:getX()
+            target.y = owner:getY()
+            target.stopDistance = tonumber(
+                Const.FOLLOW_SLOT_STOP_DISTANCE
+            ) or 0.65
+        end
+    end
     return target
 end
 

@@ -14,6 +14,31 @@ local LocomotionProfiles = PNC.LocomotionProfiles
 
 local BUMP_RELEASE_SETTLE_MS = 50
 
+local function setManagedUseless(
+    zombie,
+    requestedUseless,
+    keepEngineMovementActive
+)
+    if LiveBodyControl
+        and LiveBodyControl.SetManagedBodyUseless
+    then
+        return LiveBodyControl.SetManagedBodyUseless(
+            zombie,
+            requestedUseless,
+            keepEngineMovementActive
+        )
+    end
+    if zombie and zombie.setUseless then
+        local multiplayer = (isClient and isClient() == true)
+            or (isServer and isServer() == true)
+        zombie:setUseless(
+            multiplayer and false
+                or requestedUseless == true
+        )
+    end
+    return requestedUseless == true
+end
+
 local function getActionStateName(zombie)
     if zombie and zombie.getActionStateName then
         return string.lower(tostring(zombie:getActionStateName() or ""))
@@ -158,6 +183,70 @@ local function applyWalkType(zombie, engineWalkType, animSpeedValue)
     end
 end
 
+-- PathFindBehavior2 owns the action state, bMoving/isMoving, and deferred
+-- movement while an engine path is active.  This helper deliberately applies
+-- only PNC-specific presentation variables and the same walk-type setter used
+-- by Bandits.  Calling setLocomotionVars/SyncLocomotionState here would force
+-- WalkTowardState on top of a non-null path2 and make doDeferredMovement reject
+-- the path every frame.
+function Animation.SyncNativeLocomotionStyle(zombie, record)
+    local runtime
+    local path
+    local profile
+    local moveAnim
+    local walkType
+    local engineWalkType
+    local animSpeed
+    if not zombie then
+        return
+    end
+    runtime = record and record.runtime or nil
+    path = runtime and runtime.pathing or nil
+    profile = path and path.motionProfile or nil
+    moveAnim = profile and profile.moveAnim
+        or path and path.moveAnim
+        or "Walk"
+    walkType = profile and profile.walkType
+        or path and path.walkType
+        or ""
+    engineWalkType = profile and profile.engineWalkType
+        or path and path.engineWalkType
+        or walkType
+    animSpeed = tonumber(
+        profile and profile.animSpeed
+            or path and path.animSpeed
+    ) or 1.0
+    setPNCStateVars(
+        zombie,
+        record,
+        profile and profile.moveAnim or moveAnim
+    )
+    if zombie.setVariable then
+        zombie:setVariable("PNCMoveAnim", tostring(moveAnim or "Walk"))
+        zombie:setVariable("PNCWalkType", tostring(walkType or ""))
+        zombie:setVariable(
+            "PNCEngineWalkType",
+            tostring(engineWalkType or "")
+        )
+        zombie:setVariable("PNCAnimSpeed", animSpeed)
+        zombie:setVariable(
+            "PNCIsRunning",
+            profile and profile.isRunning == true
+                or path and path.isRunning == true
+                or false
+        )
+        zombie:setVariable(
+            "PNCIsCrawling",
+            profile and profile.isCrawling == true
+                or path and path.isCrawling == true
+                or false
+        )
+        zombie:setVariable("PNCMoving", true)
+    end
+    applyWalkType(zombie, engineWalkType, animSpeed)
+    setManagedUseless(zombie, false, true)
+end
+
 function Animation.ApplyLiveSetup(zombie, record)
     local descriptor
     local releasedDamageReaction = false
@@ -229,9 +318,7 @@ function Animation.ApplyLiveSetup(zombie, record)
     if LiveBodyControl and LiveBodyControl.StopEmitter then
         LiveBodyControl.StopEmitter(zombie)
     end
-    if zombie.setUseless then
-        zombie:setUseless(true)
-    end
+    setManagedUseless(zombie, true)
     if zombie.getDescriptor then
         descriptor = zombie:getDescriptor()
         if descriptor and descriptor.setVoicePrefix then
@@ -316,9 +403,7 @@ function Animation.ApplyDowned(zombie, record, movingOrProfile)
     if zombie.setRunning then
         zombie:setRunning(false)
     end
-    if zombie.setUseless then
-        zombie:setUseless(true)
-    end
+    setManagedUseless(zombie, true)
     applyWalkType(zombie, "", animSpeed)
 end
 
@@ -491,6 +576,7 @@ function Animation.SyncLocomotion(zombie, record)
     local now
     local downedMoving
     local treatment
+    local navigation
     if not zombie then
         return
     end
@@ -498,13 +584,12 @@ function Animation.SyncLocomotion(zombie, record)
     treatment = runtime and runtime.selfTreatment or nil
     attackAction = runtime and runtime.attackAction or nil
     path = runtime and runtime.pathing or nil
+    navigation = runtime and runtime.localNavigation or nil
     now = Core and Core.Now and Core.Now() or 0
     if treatment and treatment.phase == "bandaging"
         and now < (tonumber(treatment.finishAt) or 0)
     then
-        if zombie.setUseless then
-            zombie:setUseless(true)
-        end
+        setManagedUseless(zombie, true)
         return
     end
     if record and record.health and record.health.state == "incapacitated" then
@@ -522,21 +607,22 @@ function Animation.SyncLocomotion(zombie, record)
         return
     end
     if Animation.PumpBumpRelease(zombie, now) then
-        if zombie.setUseless then
-            zombie:setUseless(true)
-        end
+        setManagedUseless(zombie, true)
         return
     end
     if attackAction and now < (tonumber(attackAction.finishAt) or 0) then
-        if zombie.setUseless then
-            zombie:setUseless(true)
-        end
+        setManagedUseless(zombie, true)
         return
     end
     if path and now < (tonumber(path.specialMoveUntil) or 0) and path.specialAnim then
-        if zombie.setUseless then
-            zombie:setUseless(true)
-        end
+        setManagedUseless(zombie, true)
+        return
+    end
+    if navigation
+        and navigation.provider == "engine_path"
+        and navigation.nativeActive == true
+    then
+        Animation.SyncNativeLocomotionStyle(zombie, record)
         return
     end
     profile = path and path.motionProfile or nil
@@ -567,7 +653,14 @@ function Animation.SyncLocomotion(zombie, record)
     if LiveBodyControl and LiveBodyControl.SyncLocomotionState then
         LiveBodyControl.SyncLocomotionState(zombie, moving)
     end
-    if zombie.setUseless then
-        zombie:setUseless(true)
-    end
+    local keepEngineMovementActive =
+        LiveBodyControl
+        and LiveBodyControl.ShouldKeepEngineMovementActive
+        and LiveBodyControl.ShouldKeepEngineMovementActive(record)
+        or false
+    setManagedUseless(
+        zombie,
+        not keepEngineMovementActive,
+        keepEngineMovementActive
+    )
 end

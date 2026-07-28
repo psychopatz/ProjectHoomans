@@ -7,7 +7,6 @@ PNC = PNC or {}
 PNC.ClientPresenceSync = PNC.ClientPresenceSync or {}
 
 local Sync = PNC.ClientPresenceSync
-local Interpolation = PNC.ClientInterpolation
 
 Sync.BodyByID = Sync.BodyByID or {}
 Sync.BodyByOnlineID = Sync.BodyByOnlineID or {}
@@ -27,6 +26,7 @@ require "PNC/PresenceSync/PNC_ClientPresenceRuntime"
 require "PNC/PresenceSync/PNC_ClientPresenceFacing"
 require "PNC/PresenceSync/PNC_ClientPresenceVisuals"
 require "PNC/PresenceSync/PNC_ClientPresenceBodies"
+require "PNC/PresenceSync/PNC_ClientNativePathController"
 require "PNC/PresenceSync/PNC_ClientPresenceTick"
 
 local function onResetLua()
@@ -43,8 +43,8 @@ local function onResetLua()
     Sync.lastBodyScanAt = 0
     Sync.lastLocalSnapshotBuildAt = 0
     Sync.lastLocalVisualMaintainAt = 0
-    if Interpolation and Interpolation.ClearAll then
-        Interpolation.ClearAll()
+    if Sync.Internal.ClearNativePathControllers then
+        Sync.Internal.ClearNativePathControllers()
     end
 end
 

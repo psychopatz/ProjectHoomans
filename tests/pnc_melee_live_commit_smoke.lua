@@ -189,6 +189,6 @@ assertEqual(
     "setter-driven bump does not bind BumpedChr"
 )
 assertEqual(action.attackKind, "melee", "melee action committed")
-assertEqual(action.anim, "PNC_Attack1H1", "selected animation was not snapshotted")
+assertEqual(action.anim, "Attack1H1", "selected animation was not snapshotted")
 
 print("pnc_melee_live_commit_smoke: ok")

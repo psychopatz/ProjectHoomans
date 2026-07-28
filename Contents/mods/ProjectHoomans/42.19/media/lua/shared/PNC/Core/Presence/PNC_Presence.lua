@@ -10,6 +10,7 @@ local Animation = PNC.Animation
 local Visuals = PNC.Visuals
 local Equipment = PNC.Equipment
 local PathService = PNC.PathService
+local LiveBodyControl = PNC.LiveBodyControl
 local ZombieAggro = PNC.ZombieAggro
 local Spatial = PNC.SpatialIndex
 local Admission = PNC.PresenceAdmission
@@ -340,8 +341,8 @@ function Presence.Materialize(record, reason, nearest)
     Animation.ApplyLiveSetup(zombie, record)
     Visuals.ApplyHumanVisuals(zombie, record)
     Equipment.Apply(zombie, record)
-    if zombie.setUseless then
-        zombie:setUseless(true)
+    if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
+        LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
 
     record.x = spawnX

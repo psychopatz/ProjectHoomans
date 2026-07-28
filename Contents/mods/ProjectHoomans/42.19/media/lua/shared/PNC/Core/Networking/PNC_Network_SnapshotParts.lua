@@ -139,6 +139,8 @@ end
 local function buildVisualState(record)
     local runtime = record and record.runtime or nil
     local path = runtime and runtime.pathing or nil
+    local navigation = runtime
+        and runtime.localNavigation or nil
     local attack = runtime and runtime.attackAction or nil
     local now = Core.Now()
     local healthState = record and record.health and tostring(record.health.state or "normal") or "normal"
@@ -154,6 +156,15 @@ local function buildVisualState(record)
     local anim = "Idle"
     local attackActive = attack ~= nil and now < (tonumber(attack.finishAt) or 0)
     local specialActive = path ~= nil and now < (tonumber(path.specialMoveUntil) or 0)
+    local nativeTraversalState = navigation
+        and navigation.nativeTraversalState or nil
+    local nativeTraversalActive =
+        nativeTraversalState ~= nil
+    local nativeMoveActive = moving
+        and navigation
+        and navigation.nativeActive == true
+        and navigation.clientDelegated == true
+        or false
     local animSpeed = path and tonumber(path.animSpeed) or 1.0
     local profileKey = path and tostring(path.profileKey or "") or ""
     local isRunning = path and path.isRunning == true or false
@@ -222,6 +233,17 @@ local function buildVisualState(record)
         specialActive = specialActive,
         specialAnim = specialActive and path and path.specialAnim or nil,
         specialFinishAt = specialActive and path and path.specialMoveUntil or 0,
+        nativeTraversalActive = nativeTraversalActive,
+        nativeTraversalState = nativeTraversalState,
+        nativeMoveActive = nativeMoveActive,
+        nativeMoveX = nativeMoveActive
+            and navigation.requestX or nil,
+        nativeMoveY = nativeMoveActive
+            and navigation.requestY or nil,
+        nativeMoveZ = nativeMoveActive
+            and navigation.requestZ or nil,
+        nativeMoveRevision = nativeMoveActive
+            and navigation.requestRevision or 0,
     }
 end
 

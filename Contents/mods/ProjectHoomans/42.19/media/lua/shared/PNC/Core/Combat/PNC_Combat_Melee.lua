@@ -127,7 +127,7 @@ function Combat.TryMelee(record, zombie, target)
             equipmentInfo
         )
     end
-    Internal.buildAttackAction(record, target, "melee", "melee", anim or "PNC_Attack1H1", damage, skillID)
+    Internal.buildAttackAction(record, target, "melee", "melee", anim or "Attack1H1", damage, skillID)
     return true, "melee_attack_started"
 end
 

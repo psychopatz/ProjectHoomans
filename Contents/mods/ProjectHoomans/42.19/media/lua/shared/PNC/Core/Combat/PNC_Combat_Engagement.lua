@@ -18,7 +18,7 @@ local Common = PNC.BehaviorCommon
 local PathService = PNC.PathService
 local COMBAT_NAVIGATION = {
     navigationPolicy = "combat",
-    navigationProvider = "direct",
+    navigationProvider = "engine_path",
 }
 
 local function setDebug(context, reason, mode, weaponStatus)

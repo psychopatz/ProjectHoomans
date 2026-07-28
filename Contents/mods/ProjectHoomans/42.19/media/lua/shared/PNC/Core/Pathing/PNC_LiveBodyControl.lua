@@ -181,7 +181,45 @@ function LiveBodyControl.SyncLocomotionState(zombie, moving)
     return actionState == "idle" or actionState == ""
 end
 
-function LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
+function LiveBodyControl.IsMultiplayer()
+    local world = getWorld and getWorld() or nil
+    local gameMode = world and world.getGameMode
+        and tostring(world:getGameMode() or "") or ""
+    if gameMode == "Multiplayer" then
+        return true
+    end
+    return (isClient and isClient() == true)
+        or (isServer and isServer() == true)
+        or false
+end
+
+function LiveBodyControl.SetManagedBodyUseless(
+    zombie,
+    requestedUseless,
+    keepEngineMovementActive
+)
+    if not zombie or not zombie.setUseless then
+        return false
+    end
+    -- Build 42 multiplayer zombie simulation and replication require the
+    -- IsoZombie to remain useful for the complete lifetime of the live body.
+    -- Bandits applies the same invariant in Multiplayer.  Individual health,
+    -- animation, and safety systems must not temporarily disable the body.
+    if LiveBodyControl.IsMultiplayer()
+        or keepEngineMovementActive == true
+    then
+        zombie:setUseless(false)
+        return false
+    end
+    requestedUseless = requestedUseless == true
+    zombie:setUseless(requestedUseless)
+    return requestedUseless
+end
+
+function LiveBodyControl.ApplyHumanizedBodyFlags(
+    zombie,
+    keepEngineMovementActive
+)
     local descriptor
     if not zombie then
         return
@@ -234,11 +272,14 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
         zombie:setAnimatingBackwards(false)
     end
     -- Replicated zombie packets can restore this flag after the initial body
-    -- setup. Reassert it from every maintenance lane so vanilla AI/audio does
-    -- not briefly treat a human NPC as an ordinary zombie.
-    if zombie.setUseless then
-        zombie:setUseless(true)
-    end
+    -- setup. The MP authority may temporarily clear it for an active native
+    -- movement lease; all target, teeth, lunge, and voice safeguards above
+    -- remain enforced during that lease.
+    LiveBodyControl.SetManagedBodyUseless(
+        zombie,
+        true,
+        keepEngineMovementActive
+    )
     -- This is a second, engine-level fail-safe for the short load/rebind window
     -- where a persisted IsoZombie may update before its record is reconciled.
     -- Released infected reanimations explicitly restore teeth to vanilla.
@@ -295,10 +336,17 @@ function LiveBodyControl.SuppressZombieSounds(zombie)
     return true
 end
 
-function LiveBodyControl.MaintainHumanizedBody(zombie, now)
+function LiveBodyControl.MaintainHumanizedBody(
+    zombie,
+    now,
+    keepEngineMovementActive
+)
     local nextAudioAt
     if not zombie then return false end
-    LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
+    LiveBodyControl.ApplyHumanizedBodyFlags(
+        zombie,
+        keepEngineMovementActive
+    )
     now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
     nextAudioAt = tonumber(NEXT_AUDIO_SUPPRESSION_AT[zombie]) or 0
     if now >= nextAudioAt then
@@ -308,6 +356,22 @@ function LiveBodyControl.MaintainHumanizedBody(zombie, now)
     return true
 end
 
+function LiveBodyControl.ShouldKeepEngineMovementActive(record)
+    if LiveBodyControl.IsMultiplayer() then
+        return true
+    end
+    if Core and Core.IsAuthority and not Core.IsAuthority() then
+        return false
+    end
+    local navigation = record and record.runtime
+        and record.runtime.localNavigation or nil
+    return navigation
+        and navigation.provider == "engine_path"
+        and navigation.nativeActive == true
+        and navigation.serverMovementLease == true
+        or false
+end
+
 function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local hadTarget
     local wasUseless
@@ -315,11 +379,21 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local wasGrappleOnly
     local modData
     local npcId
+    local record
+    local keepEngineMovementActive
     if not zombie or not Core or not Core.IsManagedNPCBody
         or not Core.IsManagedNPCBody(zombie)
     then
         return false
     end
+    if PNC.Registry and PNC.Registry.FindRecordByZombie then
+        record = PNC.Registry.FindRecordByZombie(zombie)
+    end
+    -- Multiplayer live bodies stay useful for their entire lifetime. The
+    -- closest client may own native movement while every other peer observes
+    -- the engine's zombie replication, matching Bandits' controller model.
+    keepEngineMovementActive =
+        LiveBodyControl.ShouldKeepEngineMovementActive(record)
     hadTarget = zombie.getTarget and zombie:getTarget() ~= nil or false
     wasUseless = zombie.isUseless and zombie:isUseless() or false
     hadTeeth = zombie.isNoTeeth and not zombie:isNoTeeth() or false
@@ -327,9 +401,15 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         and zombie:isReanimatedForGrappleOnly() or false
     LiveBodyControl.MaintainHumanizedBody(
         zombie,
-        Core.Now and Core.Now() or 0
+        Core.Now and Core.Now() or 0,
+        keepEngineMovementActive
     )
-    if (hadTarget or not wasUseless or hadTeeth or wasGrappleOnly)
+    if (
+            hadTarget
+            or (not wasUseless and not keepEngineMovementActive)
+            or hadTeeth
+            or wasGrappleOnly
+        )
         and not SAFETY_REPAIR_LOGGED[zombie]
         and Core.LogWarn
     then
@@ -369,6 +449,20 @@ end
 
 function LiveBodyControl.OnZombieUpdate(zombie)
     LiveBodyControl.EnforceManagedSafety(zombie, "zombie_update")
+    if Core
+        and Core.IsAuthority
+        and Core.IsAuthority()
+        and not LiveBodyControl.IsMultiplayer()
+        and PNC.Registry
+        and PNC.Registry.FindRecordByZombie
+        and PNC.EnginePathPlanner
+        and PNC.EnginePathPlanner.PumpFrame
+    then
+        local record = PNC.Registry.FindRecordByZombie(zombie)
+        if record then
+            PNC.EnginePathPlanner.PumpFrame(record, zombie)
+        end
+    end
 end
 
 function LiveBodyControl.OnWorldReady()
@@ -419,9 +513,7 @@ function LiveBodyControl.SuppressZombieState(zombie, lane, now)
         zombie:setVariable("ClimbWindowStarted", false)
         zombie:setVariable("ClimbWindowOutcome", "")
     end
-    if zombie.setUseless then
-        zombie:setUseless(true)
-    end
+    LiveBodyControl.SetManagedBodyUseless(zombie, true)
     if needsIdleReset and zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
         zombie:changeState(ZombieIdleState.instance())
     end

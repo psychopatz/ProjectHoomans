@@ -34,20 +34,31 @@ end
 local function logClientMotionDebug(snapshot, id, event, extra)
     local now
     local key
+    local eventKey
     local state
+    local states
     if not isSnapshotDebugEnabled(snapshot) or not Core or not Core.Log then
         return
     end
     id = tostring(id or "nil")
     now = Core.Now and Core.Now() or 0
-    key = tostring(event or "unknown") .. "|" .. tostring(extra or "")
-    state = Sync.MotionLogByID[id]
-    if state and state.key == key
-        and (now - (tonumber(state.at) or 0)) < 5000
-    then
-        return
+    eventKey = tostring(event or "unknown")
+    key = eventKey .. "|" .. tostring(extra or "")
+    states = Sync.MotionLogByID[id]
+    if type(states) ~= "table" or states.key ~= nil then
+        states = {}
+        Sync.MotionLogByID[id] = states
     end
-    Sync.MotionLogByID[id] = { key = key, at = now }
+    state = states[eventKey]
+    if state then
+        local elapsed = now - (tonumber(state.at) or 0)
+        if elapsed < 1500
+            or (state.key == key and elapsed < 5000)
+        then
+            return
+        end
+    end
+    states[eventKey] = { key = key, at = now }
     Core.Log("DEBUG", "client_presence npc=" .. tostring(id or "nil") .. " event=" .. tostring(event or "unknown") .. (extra and extra ~= "" and (" " .. tostring(extra)) or ""))
 end
 

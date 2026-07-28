@@ -83,6 +83,7 @@ end
 
 local function applyIncapacitatedLiveState(record, zombie)
     local Animation = resolveAnimation()
+    local LiveBodyControl = resolveLiveBodyControl()
     local path = record and record.runtime and record.runtime.pathing or nil
     local moving = path and (path.phase == "requested" or path.phase == "active") and path.mode == "crawl"
     if not zombie then
@@ -91,8 +92,8 @@ local function applyIncapacitatedLiveState(record, zombie)
     if zombie.setRunning then
         zombie:setRunning(false)
     end
-    if zombie.setUseless then
-        zombie:setUseless(true)
+    if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
+        LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
     if zombie.setZombiesDontAttack then
         zombie:setZombiesDontAttack(shouldPreventZombieAttack(record))
@@ -114,8 +115,8 @@ local function applyNormalLiveState(record, zombie)
     if not zombie then
         return
     end
-    if zombie.setUseless then
-        zombie:setUseless(true)
+    if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
+        LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
     if zombie.setZombiesDontAttack then
         zombie:setZombiesDontAttack(shouldPreventZombieAttack(record))
@@ -135,11 +136,12 @@ local function applyNormalLiveState(record, zombie)
 end
 
 local function refreshNormalLiveBuffer(record, zombie)
+    local LiveBodyControl = resolveLiveBodyControl()
     if not zombie then
         return
     end
-    if zombie.setUseless then
-        zombie:setUseless(true)
+    if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
+        LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
     if zombie.setZombiesDontAttack then
         zombie:setZombiesDontAttack(shouldPreventZombieAttack(record))

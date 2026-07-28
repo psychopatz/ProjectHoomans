@@ -12,12 +12,10 @@ local Sync = PNC.ClientPresenceSync
 local Internal = Sync.Internal
 local Core = PNC.Core
 local Const = PNC.Const
-local Interpolation = PNC.ClientInterpolation
 
 local function applySnapshotFacing(zombie, snapshot)
     local visualState
     local hint
-    local interpState
     local targetX
     local targetY
     local dirX
@@ -43,8 +41,6 @@ local function applySnapshotFacing(zombie, snapshot)
         return false
     end
     hint = type(visualState.motionHint) == "table" and visualState.motionHint or nil
-    interpState = snapshot and snapshot.id ~= nil and Interpolation and Interpolation.StateByID
-        and Interpolation.StateByID[tostring(snapshot.id)] or nil
     targetX = tonumber(snapshot and snapshot.x) or zombie:getX()
     targetY = tonumber(snapshot and snapshot.y) or zombie:getY()
     authoritativeDirX = (visualState.attackActive == true or visualState.stationaryFacing == true)
@@ -56,21 +52,16 @@ local function applySnapshotFacing(zombie, snapshot)
     if authoritativeDirX == nil
         and authoritativeDirY == nil
         and not hint
-        and not interpState
         and math.abs(targetX - zombie:getX()) <= 0.001
         and math.abs(targetY - zombie:getY()) <= 0.001
     then
         return false
     end
     dirX = authoritativeDirX
-        or tonumber(interpState and interpState.renderDirX)
         or tonumber(hint and hint.dirX)
-        or tonumber(interpState and interpState.dirX)
         or ((tonumber(hint and hint.toX) or targetX) - (tonumber(hint and hint.fromX) or zombie:getX()))
     dirY = authoritativeDirY
-        or tonumber(interpState and interpState.renderDirY)
         or tonumber(hint and hint.dirY)
-        or tonumber(interpState and interpState.dirY)
         or ((tonumber(hint and hint.toY) or targetY) - (tonumber(hint and hint.fromY) or zombie:getY()))
     len = math.sqrt((dirX * dirX) + (dirY * dirY))
     if len <= 0.0001 then

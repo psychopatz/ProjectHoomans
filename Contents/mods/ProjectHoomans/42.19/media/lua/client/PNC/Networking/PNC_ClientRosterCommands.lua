@@ -11,7 +11,6 @@ local Client = PNC.Client
 local Internal = Client.Internal
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
-local Interpolation = PNC.ClientInterpolation
 
 local function mergeSnapshot(current, incoming)
     local key
@@ -50,9 +49,6 @@ local function storeSnapshot(incoming, replace)
         if ClientState.characterPayloads then
             ClientState.characterPayloads[id] = nil
         end
-        if Interpolation and Interpolation.ClearNPC then
-            Interpolation.ClearNPC(id)
-        end
     elseif ClientState.characterPayloads
         and ClientState.characterPayloads[id]
     then
@@ -67,9 +63,6 @@ Internal.RegisterServerCommand(Const.CMD_FULL_SYNC, function(args)
     local i
     ClientState.snapshots = {}
     ClientState.characterPayloads = {}
-    if Interpolation and Interpolation.ClearAll then
-        Interpolation.ClearAll()
-    end
     for i = 1, #(args.snapshots or {}) do
         snapshot = args.snapshots[i]
         ClientState.snapshots[snapshot.id] = snapshot
@@ -116,9 +109,6 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_END, function(args)
         or 0
     ClientState.pendingRoster = nil
     ClientState.pendingRosterChunks = nil
-    if Interpolation and Interpolation.ClearAll then
-        Interpolation.ClearAll()
-    end
 end)
 
 Internal.RegisterServerCommand(Const.CMD_ROSTER_DELTA, function(args)
@@ -158,9 +148,6 @@ Internal.RegisterServerCommand(Const.CMD_REMOVE_RECORD, function(args)
     ClientState.snapshots[args.id] = nil
     if ClientState.characterPayloads then
         ClientState.characterPayloads[args.id] = nil
-    end
-    if Interpolation and Interpolation.ClearNPC then
-        Interpolation.ClearNPC(args.id)
     end
 end)
 

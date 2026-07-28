@@ -1,8 +1,7 @@
 --[[
     PNC Traversal Runtime
-    Owns the server-authoritative lifetime and transform progression of fence
-    and window climbs.  Intent updates remain pending while this action owns
-    the body; clients only interpolate the resulting authoritative snapshots.
+    Owns single-player/fallback transform progression for fence and window
+    climbs. Multiplayer uses the delegated native zombie path controller.
 ]]
 
 PNC = PNC or {}
@@ -115,6 +114,14 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
     local travelDurationMs
     local finishHoldMs
     local hardTimeoutMs
+    -- Native PathFindBehavior2 owns doors, windows, fences, and stairs in MP.
+    -- This scripted interpolated traversal remains SP-only.
+    if LiveBodyControl
+        and LiveBodyControl.IsMultiplayer
+        and LiveBodyControl.IsMultiplayer()
+    then
+        return false
+    end
     if not zombie or not record or not lane or type(spec) ~= "table" then
         return false
     end
@@ -153,8 +160,8 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
     if zombie.setPath2 then
         zombie:setPath2(nil)
     end
-    if zombie.setUseless then
-        zombie:setUseless(true)
+    if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
+        LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
     if zombie.setRunning then
         zombie:setRunning(false)
@@ -208,13 +215,24 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     if not action then
         return false, nil
     end
+    if LiveBodyControl
+        and LiveBodyControl.IsMultiplayer
+        and LiveBodyControl.IsMultiplayer()
+    then
+        Internal.clearTraversalAction(
+            zombie,
+            lane,
+            "native_mp_owner"
+        )
+        return false, "native_mp_owner"
+    end
     if not zombie or not record then
         Internal.clearTraversalAction(zombie, lane, "body_missing")
         return false, "body_missing"
     end
     now = tonumber(now) or Internal.Core.Now()
-    if zombie.setUseless then
-        zombie:setUseless(true)
+    if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
+        LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
     if zombie.setPath2 then
         zombie:setPath2(nil)
@@ -235,6 +253,7 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
         zombie:setZ(nextZ)
     end
     Internal.syncRecordPosition(record, zombie)
+    lane.lastPhysicalMoveAt = now
     lane.lastProgressAt = now
     lane.lastIssueAt = now
     actionState = getActionStateName(zombie)
@@ -264,6 +283,7 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
         zombie:setZ(nextZ)
     end
     Internal.syncRecordPosition(record, zombie)
+    lane.lastPhysicalMoveAt = now
     if not finished and not timedOut then
         return true, action.kind .. "_finish"
     end

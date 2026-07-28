@@ -33,6 +33,8 @@ local grappleOnly = false
 local noTeeth = false
 local vanillaTarget = {}
 local modData = { PNC_NPC = true }
+local managedRecord
+local nativeFramePumps = 0
 local emitter = {
     stopSoundByName = function(_, name)
         stopped[#stopped + 1] = name
@@ -69,9 +71,20 @@ local managedBody = {
 PNC = {
     Core = {
         Now = function() return 1000 end,
+        IsAuthority = function() return true end,
         IsManagedNPCBody = function(body)
             local data = body and body.getModData and body:getModData() or nil
             return data and data.PNC_NPC == true or false
+        end,
+    },
+    Registry = {
+        FindRecordByZombie = function()
+            return managedRecord
+        end,
+    },
+    EnginePathPlanner = {
+        PumpFrame = function()
+            nativeFramePumps = nativeFramePumps + 1
         end,
     },
 }
@@ -112,6 +125,29 @@ assertEqual(useless, true, "zombie update repairs persisted useless flag")
 assertEqual(noTeeth, true, "zombie update repairs persisted teeth flag")
 assertEqual(grappleOnly, false, "zombie update repairs leaked grapple-only flag")
 assertEqual(vanillaTarget, nil, "zombie update clears persisted target")
+
+managedRecord = {
+    runtime = {
+        localNavigation = {
+            provider = "engine_path",
+            nativeActive = true,
+            serverMovementLease = true,
+        },
+    },
+}
+useless = true
+zombieUpdateHandler(managedBody)
+assertEqual(useless, false,
+    "multiplayer native movement lease was stomped by body safety")
+assertEqual(nativeFramePumps, 1,
+    "multiplayer native route was not advanced from zombie update")
+PNC.Core.IsAuthority = function() return false end
+useless = false
+PNC.LiveBodyControl.EnforceManagedSafety(managedBody, "client_replica")
+assertEqual(useless, true,
+    "client replica inherited the server's native movement lease")
+PNC.Core.IsAuthority = function() return true end
+managedRecord = nil
 
 local panic = 2
 local visibleZombies = 0

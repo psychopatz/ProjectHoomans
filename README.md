@@ -19,8 +19,9 @@ This repository starts with a server-authoritative V1 slice:
   live/abstract handoff, and an extensible vanilla-world-map overlay
 - relationship-ready map visibility, role postfixes, pluggable marker icons,
   and per-client name controls
-- bounded live-body route look-ahead that avoids walls and strongly prefers
-  outdoor paths, with delayed safe-square recovery as a last resort
+- budgeted native-engine routing for meaningful local/travel movement,
+  combat approach, doors, and level transitions, while sub-tile corrections
+  and committed attacks stay on the lightweight fake-locomotion lane
 - pluggable route and speed providers plus configurable live-body admission
   caps, allowing large populations to travel abstractly while nearby NPCs
   materialize in distance-priority order

@@ -11,7 +11,6 @@ local Client = PNC.Client
 local Internal = Client.Internal
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
-local Interpolation = PNC.ClientInterpolation
 
 local function isWorldReady()
     return (not isIngameState) or isIngameState()
@@ -62,9 +61,6 @@ local function onResetLua()
     Client.BiteReplicas = {}
     if PNC.ClientFirearmEffects and PNC.ClientFirearmEffects.Reset then
         PNC.ClientFirearmEffects.Reset()
-    end
-    if Interpolation and Interpolation.ClearAll then
-        Interpolation.ClearAll()
     end
 end
 

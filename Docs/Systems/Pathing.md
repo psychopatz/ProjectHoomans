@@ -17,7 +17,7 @@
   climb-start/outcome variables are reset only when adopting an accidental
   engine climb state, before the PNC bump takes ownership
 - fresh follow/combat goals remain pending while traversal owns the body; they
-  cannot cancel the bump or restart fake locomotion midway across a passage
+  cannot cancel the bump or restart locomotion midway across a passage
 - doors and windows are considered opened only after their engine state reports
   open, then their object/path state is synchronized by the authoritative side
 - all path ownership lives in `PNC_PathService`
@@ -28,8 +28,8 @@
   short-lived Kahlua allocations during follow and combat
 - continuously moving follow/steering goals use a 0.22-tile retarget
   threshold, avoiding lane-state resets for sub-step owner jitter
-- bounded local route searches are spread across scheduler windows rather than
-  allowing a newly obstructed group to run every A* search in one frame
+- native engine requests are spread across scheduler windows rather than
+  allowing a newly moving group to start every A* search in one frame
 - follower slot membership and owner heading are shared per owner for 250 ms;
   each follower still updates the cached slot against the owner's live position
 - the live move lane uses explicit phases: `idle`, `requested`, `active`, `arrived`, `blocked`, `cancel_pending`
@@ -39,12 +39,25 @@
 - combat target reassessment uses a short interval and distance hysteresis so
   NPCs can respond to a nearby attacker without stop-stepping between nearly
   equivalent targets every tick
-- `PNC_LocomotionProfiles` now resolves transport speed, anim cadence, walk family, and crawl/sneak selectors once per lane so fake movement and animation stay in lockstep
-- combat only borrows facing through short path-service leases; normal movement keeps body facing aligned to travel direction
+- `PNC_LocomotionProfiles` resolves transport mode, animation cadence, walk
+  family, and crawl/sneak selectors once per lane so native and fallback
+  movement share the same presentation
+- combat approach and repositioning use native routes; a committed attack
+  invalidates that route before the attack action graph takes ownership
 - the server emits incremental `visualState.motionHint` segments for traversal
   so remote clients follow the same eased authoritative hop without stretching
   every small network delta over the entire animation duration
-- door opens, window opens, and window climbs stay server-owned and publish short traversal leases so client smoothing does not fight passage interactions
+- SP native routes are advanced from the authoritative `OnZombieUpdate` frame.
+- In multiplayer the server publishes path goals but never calls the native
+  behavior update. Mirroring Bandits, the nearest client owns
+  `PathFindBehavior2:update()` from the replicated body's `OnZombieUpdate`
+  callback; generic client ticks only bind the latest goal. Normal zombie
+  networking transports movement and native door/window/fence/stair states.
+- All multiplayer live bodies remain `setUseless(false)` throughout their
+  lifetime. There is one centralized writer so health and animation refreshes
+  cannot silently disable the active controller.
+- MP sub-tile corrections also use the delegated native controller; fake
+  setX/setY steps are not an alternate multiplayer transport.
 - door/window handling is goal-directed rather than opportunistic: the lane
   probes only the adjacent cardinal passage edges that advance the active goal,
   then falls back to blocked-step, collision, and no-progress recovery
@@ -74,11 +87,12 @@
   `NPC position recovery` warning containing NPC id/name, recovery event,
   obstacle reason, source, destination, and recovery count. These rare
   operational warnings are emitted even when per-record debug logging is off
-- long-lived non-locomotion action states during active fake locomotion are force-recovered back to idle before the next travel tick so walking stance does not freeze in `turnalerted`
-- a committed attack lease stops the path pump before requested or active fake
-  locomotion can overwrite the attack action graph
+- long-lived non-locomotion action states during fallback fake locomotion are
+  force-recovered before the next travel tick
+- a committed attack lease cancels native routing and stops the path pump
+  before locomotion can overwrite the attack action graph
 - path debug logs report recovery, repath, timeout, and blocked states with the active goal only for NPCs explicitly marked `Record Debug`; global debug presentation does not opt the whole roster into movement logging
 
 ## Next Expansion
 - smarter repath and stuck recovery lanes
-- path cache reuse for larger live crowds
+- native-route admission tuning for larger live crowds

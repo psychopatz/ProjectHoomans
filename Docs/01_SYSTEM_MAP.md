@@ -39,6 +39,9 @@
 - `PNC_Combat_Unarmed`: shove and stomp helpers
 - `PNC_LiveBodyControl`: reusable suppression of vanilla zombie-only body
   states, replicated `isUseless` drift, and Build 42 zombie voice channels
+- `PNC_EnginePathPlanner`: budgeted SP native `PathFindBehavior2` ownership and
+  unbudgeted MP goal publication for meaningful local/travel routes,
+  coordinated by `PNC_PathService`
 - `PNC_PathService`: live stepping and abstract travel
 - `PNC_CompanionVehicle`: authority-owned companion boarding, abstract vehicle
   travel, engine-visible seat reservations, disembarkation, and stale-token

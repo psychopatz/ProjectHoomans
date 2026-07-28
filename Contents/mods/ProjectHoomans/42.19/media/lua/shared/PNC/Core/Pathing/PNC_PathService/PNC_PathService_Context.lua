@@ -388,8 +388,8 @@ function Internal.tryRecoverNonLocomotionState(record, zombie, lane, now)
         return false, actionState
     end
     Internal.hardResetMoveOwner(zombie)
-    if zombie.setUseless then
-        zombie:setUseless(true)
+    if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
+        LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
     if zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
         zombie:changeState(ZombieIdleState.instance())
@@ -402,6 +402,18 @@ function Internal.setWalkAnim(zombie, record, mode, force)
     local lane = record and record.runtime and record.runtime.pathing or nil
     local profile = lane and lane.motionProfile or nil
     local moveAnim = profile and profile.moveAnim or "Walk"
+    -- Engine paths must never pass through the fake-locomotion animator.
+    -- Animation.Apply writes bMoving/setMoving and creates WalkTowardState;
+    -- PathFindBehavior2 then owns path2 at the same time, which the engine
+    -- rejects in IsoGameCharacter.doDeferredMovement.
+    if lane
+        and lane.navigationProvider == "engine_path"
+        and Animation
+        and Animation.SyncNativeLocomotionStyle
+    then
+        Animation.SyncNativeLocomotionStyle(zombie, record)
+        return
+    end
     -- BumpType is an exclusive special-action channel, not a locomotion
     -- transition channel.  Starting a bump for every short movement request
     -- masked the walk cycle and made frequently refreshed follow goals glide.
@@ -427,7 +439,6 @@ function Internal.resetPathController(zombie)
     if zombie.getPathFindBehavior2 then
         behavior = zombie:getPathFindBehavior2()
         if behavior then
-            behavior:update()
             behavior:cancel()
             behavior:reset()
         end
