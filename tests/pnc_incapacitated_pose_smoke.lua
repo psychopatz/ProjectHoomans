@@ -1,3 +1,6 @@
+local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
+package.path = CLIENT_ROOT .. "?.lua;" .. package.path
+
 local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
 
 local function assertEqual(actual, expected, label)

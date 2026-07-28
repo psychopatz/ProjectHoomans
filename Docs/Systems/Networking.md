@@ -35,6 +35,19 @@ Client networking modules:
 - `PNC_ClientActions`: outbound debug, map, health, companion, and inventory
   commands
 
+Client presence-reconciliation modules:
+
+- `PNC_ClientPresenceSync`: public facade, shared body maps, reset handling, and
+  event wiring
+- `PNC_ClientPresenceRuntime`: replica-mode policy and deduplicated diagnostics
+- `PNC_ClientPresenceFacing`: throttled replicated facing
+- `PNC_ClientPresenceVisuals`: identity, appearance, equipment, treatment
+  audio, and animation application
+- `PNC_ClientPresenceBodies`: body indexing, directed removal, and duplicate
+  shell cleanup
+- `PNC_ClientPresenceTick`: snapshot refresh, interpolation, body resolution,
+  and per-frame orchestration
+
 New inbound commands should register a handler from their domain module through
 `PNC.Client.Internal.RegisterServerCommand`. Existing callers should continue
 using the public `PNC.Network.*` and `PNC.Client.*` APIs rather than requiring

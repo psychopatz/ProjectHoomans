@@ -1,7 +1,7 @@
 local ANIMATION =
     "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Visuals/PNC_Animation.lua"
 local CLIENT_SYNC =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/PNC_ClientPresenceSync.lua"
+    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/PresenceSync/PNC_ClientPresenceVisuals.lua"
 local ATTACK_XML =
     "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Attack1H1.xml"
 
