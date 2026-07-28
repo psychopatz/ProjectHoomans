@@ -13,13 +13,12 @@ local Combat = PNC.Combat
 local Internal = Combat.Internal
 local Core = PNC.Core
 local Registry = PNC.Registry
-local Animation = PNC.Animation
 local Equipment = PNC.Equipment
 local Perception = PNC.Perception
 
 Internal.MELEE_BUMP_TYPES = {
-    onehanded = { "PNC_Attack1H1" },
-    twohanded = { "PNC_Attack2H1" },
+    onehanded = { "PNC_Attack1H1", "PNC_Attack1H2" },
+    twohanded = { "PNC_Attack2H1", "PNC_Attack2H2" },
     spear = { "PNC_AttackS1" },
     knife = { "PNC_AttackKnife" },
 }
@@ -222,13 +221,12 @@ function Internal.triggerMeleeWeaponAnim(
     equipmentInfo
 )
     local options = Internal.MELEE_BUMP_TYPES[Internal.resolveMeleeAnimFamily(record, equipmentInfo)] or Internal.MELEE_BUMP_TYPES.onehanded
-    local anim
-    if not zombie or not Animation or not Animation.PlayBump or not options or #options <= 0 then
+    if not options or #options <= 0 then
         return nil
     end
-    anim = options[ZombRand(#options) + 1]
-    Animation.PlayBump(zombie, record, anim)
-    return anim
+    -- The authority selects and snapshots the animation. Presentation is
+    -- client-owned in SP, listen-server, and dedicated multiplayer alike.
+    return options[ZombRand(#options) + 1]
 end
 
 function Internal.triggerRangedWeaponAnim(
@@ -238,25 +236,22 @@ function Internal.triggerRangedWeaponAnim(
 )
     local family = equipmentInfo and equipmentInfo.primaryType == "rifle" and "rifle" or "handgun"
     local options = Internal.RANGED_BUMP_TYPES[family] or Internal.RANGED_BUMP_TYPES.handgun
-    local anim
-    if not zombie or not Animation or not Animation.PlayBump or not options or #options <= 0 then
+    if not options or #options <= 0 then
         return nil
     end
-    anim = options[ZombRand(#options) + 1]
-    Animation.PlayBump(zombie, record, anim)
-    return anim
+    return options[ZombRand(#options) + 1]
 end
 
-function Internal.playAttackSound(zombie, record)
-    local item
+function Internal.playAttackSound(zombie, record, weaponItem)
     local emitter
     local swingSound
     if not zombie or not zombie.getEmitter then
         return
     end
-    item = Internal.resolveWeaponItem(record)
     emitter = zombie:getEmitter()
-    swingSound = item and item.getSwingSound and item:getSwingSound() or nil
+    weaponItem = weaponItem or Internal.resolveWeaponItem(record, zombie)
+    swingSound = weaponItem and weaponItem.getSwingSound
+        and weaponItem:getSwingSound() or nil
     if swingSound and swingSound ~= "" and emitter and emitter.playSound then
         emitter:playSound(swingSound)
     end

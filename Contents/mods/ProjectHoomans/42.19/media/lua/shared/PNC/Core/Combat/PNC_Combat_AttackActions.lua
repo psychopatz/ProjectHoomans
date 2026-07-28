@@ -17,7 +17,6 @@ local Perception = PNC.Perception
 local Unarmed = PNC.CombatUnarmed
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
-local Animation = PNC.Animation
 local Damage = PNC.CombatDamage
 local Firearms = PNC.Firearms
 local FirearmEffects = PNC.FirearmEffects
@@ -150,23 +149,6 @@ local function isCommittedMeleeTargetInRange(zombie, target)
     return dz <= 0.25 and ((dx * dx) + (dy * dy)) <= (range * range)
 end
 
-local function observeAttackAnimation(zombie, action)
-    local actionState
-    if not zombie
-        or not zombie.getActionStateName
-        or not action
-    then
-        return
-    end
-    actionState = string.lower(
-        tostring(zombie:getActionStateName() or "")
-    )
-    action.animationActionState = actionState
-    if actionState == "bumped" then
-        action.animationStateEntered = true
-    end
-end
-
 function Internal.clearAttackAction(record)
     if record and record.runtime then
         record.runtime.attackAction = nil
@@ -174,10 +156,14 @@ function Internal.clearAttackAction(record)
 end
 
 function Internal.finishAttackAction(record, zombie)
-    if Animation and Animation.FinishBump then
-        Animation.FinishBump(zombie, true)
-    end
+    -- Clearing the authoritative action publishes an inactive snapshot. The
+    -- rendering client owns FinishBump so SP and MP follow the same path.
     Internal.clearAttackAction(record)
+    if record and record.runtime
+        and record.runtime.forceSyncEvent == nil
+    then
+        record.runtime.forceSyncEvent = "attack_finish"
+    end
 end
 
 function Internal.buildAttackAction(record, target, attackKind, attackType, anim, damage, skillID, extra)
@@ -185,10 +171,6 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
     local timings = Internal.ATTACK_TIMINGS[attackKind] or Internal.ATTACK_TIMINGS.melee
     local hitDelay = type(extra) == "table" and tonumber(extra.hitDelayMs) or nil
     local duration = type(extra) == "table" and tonumber(extra.durationMs) or nil
-    local animationTrigger = record
-        and record.runtime
-        and record.runtime.lastAnimationTrigger
-        or nil
     local action = {
         attackKind = attackKind,
         attackType = attackType,
@@ -200,18 +182,9 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
         finishAt = now + (duration or timings.duration),
         hitDone = false,
         animationRetries = 0,
-        animationTriggerMode = animationTrigger
-            and animationTrigger.anim == tostring(anim or "")
-            and animationTrigger.mode
-            or nil,
-        animationStateEntered = animationTrigger
-            and animationTrigger.anim == tostring(anim or "")
-            and animationTrigger.entered == true
-            or false,
-        animationActionState = animationTrigger
-            and animationTrigger.anim == tostring(anim or "")
-            and animationTrigger.stateAfter
-            or nil,
+        animationTriggerMode = "client_snapshot",
+        animationStateEntered = false,
+        animationActionState = nil,
         target = captureTargetRef(target),
     }
     local key
@@ -442,14 +415,13 @@ function Combat.PumpAttackAction(record, zombie)
     local now = Core.Now()
     local action = record and record.runtime and record.runtime.attackAction or nil
     local target
-    local bumpFinished
     if not action then
         return false, "no_attack"
     end
     if PNC.PathService and PNC.PathService.IsTraversalActive and PNC.PathService.IsTraversalActive(record, zombie) then
-        -- Traversal owns the bump animation. Do not call finishAttackAction:
-        -- that would mark the traversal bump complete and teleport the body.
-        Internal.clearAttackAction(record)
+        -- Traversal owns its separate special-animation lane. Ending the
+        -- combat action only publishes an inactive attack snapshot.
+        Internal.finishAttackAction(record, zombie)
         return false, "attack_cancelled_for_traversal"
     end
     if not zombie or record.alive == false then
@@ -489,8 +461,6 @@ function Combat.PumpAttackAction(record, zombie)
     if target then
         Internal.faceTarget(zombie, target, record, 120, "attack_followthrough")
     end
-    observeAttackAnimation(zombie, action)
-
     if (not action.hitDone) and now >= (tonumber(action.hitAt) or 0) then
         action.hitDone = true
         if action.attackType == "melee" and not isCommittedMeleeTargetInRange(zombie, target) then
@@ -504,17 +474,7 @@ function Combat.PumpAttackAction(record, zombie)
         end
     end
 
-    bumpFinished = zombie.getVariableBoolean and zombie:getVariableBoolean("BumpAnimFinished") or false
-    if bumpFinished == true and action.hitDone ~= true then
-        action.hitDone = true
-        if action.attackType == "melee" and not isCommittedMeleeTargetInRange(zombie, target) then
-            action.lastResult = false
-            action.lastReason = "target_out_of_range_at_anim_end"
-        else
-            action.lastResult, action.lastReason = Internal.applyAttackActionHit(record, zombie, action, target)
-        end
-    end
-    if target == nil or bumpFinished == true or now >= (tonumber(action.finishAt) or 0) then
+    if target == nil or now >= (tonumber(action.finishAt) or 0) then
         Internal.finishAttackAction(record, zombie)
         return false, action.lastReason or (target and "attack_finished" or "target_lost")
     end

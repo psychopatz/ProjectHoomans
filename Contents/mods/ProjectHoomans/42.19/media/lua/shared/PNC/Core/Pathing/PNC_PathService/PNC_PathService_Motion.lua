@@ -586,6 +586,17 @@ function PathService.Pump(record, zombie)
         intentState = Internal.consumeMoveIntent(record, lane, zombie)
     end
 
+    -- Combat owns the action graph for the full committed attack lease.
+    -- Normal engagement code also requests a hold, but this boundary guard
+    -- prevents any stale/third-party move intent from restoring locomotion
+    -- variables over a melee or ranged bump animation.
+    if Internal.hasActiveAttack(record, now) then
+        lane.lastProgressAt = now
+        lane.lastIssueAt = now
+        lane.ownerMode = "attack_lease"
+        return true, "attack_active"
+    end
+
     if lane.phase == "requested" then
         return Internal.startRequestedMove(zombie, record, lane)
     end

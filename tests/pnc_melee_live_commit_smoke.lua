@@ -165,19 +165,23 @@ assert(
     "stale target distance was not refreshed from live body"
 )
 assertEqual(heldReason, "melee_windup", "movement held before attack")
-assertEqual(animation, "PNC_Attack1H1", "melee bump selected")
+assertEqual(animation, nil, "server directly rendered the melee bump")
 assertEqual(
     variables.BumpDone,
-    false,
-    "known-good BumpDone variable mirrored"
+    nil,
+    "server wrote client-owned BumpDone variable"
 )
-assertEqual(variables.BumpFall, false, "known-good BumpFall mirrored")
-assertEqual(variables.BumpFallType, "", "known-good BumpFallType mirrored")
+assertEqual(variables.BumpFall, nil, "server wrote client-owned BumpFall")
+assertEqual(
+    variables.BumpFallType,
+    nil,
+    "server wrote client-owned BumpFallType"
+)
 assertEqual(actionState, "pathfind", "state is not forced from Lua")
 assertEqual(
-    record.runtime.lastAnimationTrigger.mode,
-    "bump_type_setter",
-    "singleplayer animation trigger mode"
+    record.runtime.lastAnimationTrigger,
+    nil,
+    "server recorded a client-owned animation trigger"
 )
 assertEqual(
     animationTarget,
@@ -185,5 +189,6 @@ assertEqual(
     "setter-driven bump does not bind BumpedChr"
 )
 assertEqual(action.attackKind, "melee", "melee action committed")
+assertEqual(action.anim, "PNC_Attack1H1", "selected animation was not snapshotted")
 
 print("pnc_melee_live_commit_smoke: ok")

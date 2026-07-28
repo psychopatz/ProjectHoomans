@@ -56,17 +56,11 @@ function Unarmed.IsGroundTarget(target)
 end
 
 function Unarmed.PlayShove(zombie, record, target)
-    local Animation = PNC.Animation
     if not zombie then
         return
     end
     if target and zombie.faceThisObject then
         zombie:faceThisObject(target)
-    end
-    if Animation and Animation.PlayBump then
-        Animation.PlayBump(zombie, record, "PNC_Shove")
-    elseif zombie.setBumpType then
-        zombie:setBumpType("PNC_Shove")
     end
     if zombie.playSound then
         zombie:playSound("AttackShove")
@@ -105,18 +99,12 @@ function Unarmed.ApplyZombieShove(attackerZombie, targetZombie, options)
 end
 
 function Unarmed.PlayGroundAttack(zombie, record, target)
-    local Animation = PNC.Animation
     local anim = "PNC_Attack2HStamp"
     if not zombie then
         return anim
     end
     if target and (target.isCrawling and target:isCrawling() or target.isProne and target:isProne()) then
         anim = "PNC_Attack2HFloor"
-    end
-    if Animation and Animation.PlayBump then
-        Animation.PlayBump(zombie, record, anim)
-    elseif zombie.setBumpType then
-        zombie:setBumpType(anim)
     end
     if zombie.playSound then
         if anim == "PNC_Attack2HStamp" then

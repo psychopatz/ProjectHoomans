@@ -17,7 +17,6 @@ local Internal = PNC.Combat.Internal
 local Inventory = PNC.Inventory
 local Settings = PNC.Sandbox
 local Skills = PNC.Skills
-local Animation = PNC.Animation
 
 local RELOAD_ANIMS = {
     pistol = "LoadPistol",
@@ -461,9 +460,6 @@ function Firearms.StartReload(record, zombie, target, weaponItem)
     anim = descriptor.reloadAnim
     if not Internal.buildAttackAction then
         return false, "action_service_unavailable"
-    end
-    if zombie and Animation and Animation.PlayBump then
-        Animation.PlayBump(zombie, record, anim)
     end
     Internal.buildAttackAction(record, target, "reload", "reload", anim, 0, "Reloading", {
         durationMs = descriptor.reloadDurationMs,

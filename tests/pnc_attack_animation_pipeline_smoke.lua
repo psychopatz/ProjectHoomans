@@ -2,8 +2,13 @@ local ANIMATION =
     "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Visuals/PNC_Animation.lua"
 local CLIENT_SYNC =
     "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/PresenceSync/PNC_ClientPresenceVisuals.lua"
+local PATH_MOTION =
+    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Pathing/"
+    .. "PNC_PathService/PNC_PathService_Motion.lua"
 local ATTACK_XML =
     "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Attack1H1.xml"
+local ATTACK_VARIANT_XML =
+    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Attack1H2.xml"
 
 local function readAll(path)
     local file = assert(io.open(path, "rb"))
@@ -20,7 +25,33 @@ end
 
 local animation = readAll(ANIMATION)
 local clientSync = readAll(CLIENT_SYNC)
+local pathMotion = readAll(PATH_MOTION)
 local attackXML = readAll(ATTACK_XML)
+local attackVariantXML = readAll(ATTACK_VARIANT_XML)
+local clientAttackPresentation = assert(string.match(
+    clientSync,
+    "    attackKey =.-\n    specialKey ="
+))
+local combat = readAll(
+    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/"
+        .. "PNC_Combat.lua"
+)
+local melee = readAll(
+    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/"
+        .. "PNC_Combat_Melee.lua"
+)
+local attackActions = readAll(
+    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/"
+        .. "PNC_Combat_AttackActions.lua"
+)
+local unarmed = readAll(
+    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/"
+        .. "PNC_Combat_Unarmed.lua"
+)
+local firearms = readAll(
+    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/"
+        .. "PNC_Combat_Firearms.lua"
+)
 local playBump = assert(string.match(
     animation,
     "function Animation%.PlayBump.-\nend\n\nfunction Animation%.FinishBump"
@@ -67,7 +98,7 @@ assertContains(
 assertContains(
     clientSync,
     "Animation.PlayBump(zombie, recordView, visualState.attackAnim)",
-    "multiplayer attack replay uses shared trigger"
+    "client attack presentation uses shared trigger"
 )
 assertContains(
     attackXML,
@@ -78,6 +109,45 @@ assertContains(
     attackXML,
     "<m_ParameterValue>BumpAnimFinished=true</m_ParameterValue>",
     "attack node completion"
+)
+assertContains(
+    attackVariantXML,
+    "<m_AnimName>Bob_Attack1Hand01_HitC</m_AnimName>",
+    "second one-handed melee animation"
+)
+assert(
+    not string.find(
+        clientAttackPresentation,
+        "remoteReplica",
+        1,
+        true
+    ),
+    "single-player client attack presentation is disabled"
+)
+assert(
+    not string.find(combat, "Animation.PlayBump", 1, true),
+    "server animation selector still renders attack bumps"
+)
+assert(
+    not string.find(melee, "Animation.PlayBump", 1, true),
+    "server melee commit still renders attack bumps"
+)
+assert(
+    not string.find(attackActions, "Animation.FinishBump", 1, true),
+    "server attack completion still owns the client bump"
+)
+assert(
+    not string.find(unarmed, "Animation.PlayBump", 1, true),
+    "server unarmed combat still renders attack bumps"
+)
+assert(
+    not string.find(firearms, "Animation.PlayBump", 1, true),
+    "server reload action still renders attack bumps"
+)
+assertContains(
+    pathMotion,
+    "if Internal.hasActiveAttack(record, now) then",
+    "path service attack animation lease"
 )
 
 print("pnc_attack_animation_pipeline_smoke: ok")

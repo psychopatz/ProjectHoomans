@@ -221,7 +221,7 @@ local function applyIdentityVars(zombie, snapshot)
     end
 end
 
-local function applySnapshotToBody(snapshot, zombie)
+local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     local visualState = snapshot and snapshot.visualState or {}
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
     local attackKey
@@ -235,12 +235,28 @@ local function applySnapshotToBody(snapshot, zombie)
     if not snapshot or not zombie or (zombie.isDead and zombie:isDead()) then
         return
     end
+    -- Preserve the legacy exported-helper contract for tests/extensions.
+    -- Production callers always pass the authority decision explicitly.
+    if remoteReplica == nil then
+        remoteReplica = true
+    end
 
     now = Core and Core.Now and Core.Now() or 0
     if LiveBodyControl and LiveBodyControl.MaintainHumanizedBody then
         LiveBodyControl.MaintainHumanizedBody(zombie, now)
     end
-    if Animation and Animation.PumpBumpRelease then
+    if (
+        remoteReplica
+        or (
+            modData
+            and (
+                modData.PNC_ClientAttackKey ~= nil
+                or modData.PNC_BumpReleasePending == true
+            )
+        )
+    )
+        and Animation and Animation.PumpBumpRelease
+    then
         Animation.PumpBumpRelease(zombie, now)
     end
 
@@ -320,6 +336,8 @@ local function applySnapshotToBody(snapshot, zombie)
     motionKey = buildMotionKey(snapshot)
 
     if snapshot.healthState == "incapacitated" then
+        -- Downed-state repair is idempotent and also clears late vanilla
+        -- stagger/hit-reaction latches on the authoritative body.
         if Animation and Animation.ApplyDowned then
             Animation.ApplyDowned(zombie, recordView, visualState.moving == true and visualState.isCrawling == true and recordView.runtime.pathing.motionProfile or false)
         end
@@ -331,11 +349,17 @@ local function applySnapshotToBody(snapshot, zombie)
         Animation.ClearDowned(zombie)
     end
 
+    -- Combat presentation is client-owned in every topology. The server
+    -- chooses the clip and hit timing; SP and MP clients both render the
+    -- resulting attack snapshot. remoteReplica only gates replicated
+    -- locomotion, facing, and traversal presentation.
     attackKey = visualState.attackActive and visualState.attackAnim
         and (tostring(visualState.attackAnim) .. ":" .. tostring(visualState.attackFinishAt or 0))
         or nil
     if attackKey and modData and modData.PNC_ClientAttackKey ~= attackKey then
-        Animation.PlayBump(zombie, recordView, visualState.attackAnim)
+        if Animation and Animation.PlayBump then
+            Animation.PlayBump(zombie, recordView, visualState.attackAnim)
+        end
         modData.PNC_ClientAttackKey = attackKey
         modData.PNC_ClientMotionKey = motionKey
         return
@@ -355,13 +379,15 @@ local function applySnapshotToBody(snapshot, zombie)
         and (tostring(visualState.specialAnim) .. ":" .. tostring(visualState.specialFinishAt or 0))
         or nil
     if specialKey and modData and modData.PNC_ClientSpecialKey ~= specialKey then
-        Animation.PlayBump(zombie, recordView, visualState.specialAnim)
+        if remoteReplica and Animation and Animation.PlayBump then
+            Animation.PlayBump(zombie, recordView, visualState.specialAnim)
+        end
         modData.PNC_ClientSpecialKey = specialKey
         modData.PNC_ClientMotionKey = motionKey
         return
     end
     if modData and not specialKey and modData.PNC_ClientSpecialKey ~= nil then
-        if Animation and Animation.FinishBump then
+        if remoteReplica and Animation and Animation.FinishBump then
             Animation.FinishBump(zombie, true)
         end
         modData.PNC_ClientSpecialKey = nil
@@ -372,13 +398,17 @@ local function applySnapshotToBody(snapshot, zombie)
     end
 
     desiredAnim = visualState.anim or "Idle"
-    if Animation and Animation.Apply and (not modData or modData.PNC_ClientMotionKey ~= motionKey) then
+    if remoteReplica and Animation and Animation.Apply
+        and (not modData or modData.PNC_ClientMotionKey ~= motionKey)
+    then
         Animation.Apply(zombie, recordView, desiredAnim, recordView.runtime.pathing.motionProfile, visualState.moving == true)
         if modData then
             modData.PNC_ClientMotionKey = motionKey
         end
     end
-    if visualState.moving == true and Animation and Animation.SyncLocomotion then
+    if remoteReplica and visualState.moving == true
+        and Animation and Animation.SyncLocomotion
+    then
         Animation.SyncLocomotion(zombie, recordView)
         logClientMotionDebug(snapshot, snapshot and snapshot.id or nil, "locomotion_resync", "mode=" .. tostring(visualState.mode or "walk") .. " walkType=" .. tostring(visualState.walkType or ""))
     end

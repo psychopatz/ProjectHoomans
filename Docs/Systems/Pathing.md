@@ -26,6 +26,12 @@
 - behavior writes `move intent`; only `PNC_PathService.Pump` may start, refresh, cancel, or complete live movement
 - repeated move/hold requests reuse their runtime intent table, reducing
   short-lived Kahlua allocations during follow and combat
+- continuously moving follow/steering goals use a 0.22-tile retarget
+  threshold, avoiding lane-state resets for sub-step owner jitter
+- bounded local route searches are spread across scheduler windows rather than
+  allowing a newly obstructed group to run every A* search in one frame
+- follower slot membership and owner heading are shared per owner for 250 ms;
+  each follower still updates the cached slot against the owner's live position
 - the live move lane uses explicit phases: `idle`, `requested`, `active`, `arrived`, `blocked`, `cancel_pending`
 - `walktoward` is a normal locomotion state, not a path-conflict state; recovery is reserved for real combat/thump conflicts so valid movement is not reset every tick
 - live path refresh now routes through a single move lane, which matches the Bandits-style "one active move action" flow more closely and avoids stacked `path2` state churn
@@ -69,6 +75,8 @@
   obstacle reason, source, destination, and recovery count. These rare
   operational warnings are emitted even when per-record debug logging is off
 - long-lived non-locomotion action states during active fake locomotion are force-recovered back to idle before the next travel tick so walking stance does not freeze in `turnalerted`
+- a committed attack lease stops the path pump before requested or active fake
+  locomotion can overwrite the attack action graph
 - path debug logs report recovery, repath, timeout, and blocked states with the active goal only for NPCs explicitly marked `Record Debug`; global debug presentation does not opt the whole roster into movement logging
 
 ## Next Expansion

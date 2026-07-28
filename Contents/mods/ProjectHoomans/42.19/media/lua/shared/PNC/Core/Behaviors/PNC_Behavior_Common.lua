@@ -79,6 +79,7 @@ function Common.MoveRecord(
     local policy
     local steeringTarget
     local intentNavigation = navigationOptions
+    local moveIntent
     if record.presenceState == Const.PRESENCE_LIVE then
         if NavigationRouter and NavigationRouter.Resolve then
             policyName, providerName, policy = NavigationRouter.Resolve(
@@ -130,8 +131,9 @@ function Common.MoveRecord(
                 }
             end
         end
-        if resolveMoveIntent() and resolveMoveIntent().RequestMove then
-            resolveMoveIntent().RequestMove(
+        moveIntent = resolveMoveIntent()
+        if moveIntent and moveIntent.RequestMove then
+            moveIntent.RequestMove(
                 record,
                 tx,
                 ty,
@@ -167,8 +169,11 @@ function Common.ResolveCombatApproachMode(dist, preferredMode)
 end
 
 function Common.HaltMovement(record, zombie, reason)
-    if record and record.presenceState == Const.PRESENCE_LIVE and resolveMoveIntent() and resolveMoveIntent().Hold then
-        resolveMoveIntent().Hold(record, reason or "hold")
+    local moveIntent = resolveMoveIntent()
+    if record and record.presenceState == Const.PRESENCE_LIVE
+        and moveIntent and moveIntent.Hold
+    then
+        moveIntent.Hold(record, reason or "hold")
         return
     end
     if zombie and PathService and PathService.Reset then

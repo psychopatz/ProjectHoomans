@@ -19,6 +19,7 @@ local Perception = PNC.Perception
 local CombatTactics = PNC.CombatTactics
 local Registry = PNC.Registry
 local CompanionVehicle = PNC.CompanionVehicle
+local FollowFormationCache = {}
 
 local function getFollowState(record)
     record.runtime = record.runtime or {}
@@ -110,10 +111,52 @@ local function sortFollowerRecords(a, b)
     return tostring(a and a.id or "") < tostring(b and b.id or "")
 end
 
-local function resolveFollowSlot(record, owner)
+local function resolveFollowOwnerKey(record, owner)
+    local onlineID = owner and owner.getOnlineID
+        and tonumber(owner:getOnlineID()) or tonumber(record and record.ownerOnlineID)
+    if onlineID ~= nil then
+        return "id:" .. tostring(onlineID)
+    end
+    return "user:" .. tostring(
+        owner and owner.getUsername and owner:getUsername()
+            or record and record.ownerUsername
+            or ""
+    )
+end
+
+local function buildFollowFormation(record, owner, now)
     local followers = {}
+    local slots = {}
+    local fx
+    local fy
     local i
-    local slotIndex = 0
+    if Registry and Registry.ForEach then
+        Registry.ForEach(function(other)
+            if isSameFollowGroup(record, other) then
+                followers[#followers + 1] = other
+            end
+        end)
+    end
+    table.sort(followers, sortFollowerRecords)
+    for i = 1, #followers do
+        slots[tostring(followers[i].id)] = i - 1
+    end
+    fx, fy = resolveOwnerForward(owner)
+    return {
+        expiresAt = now + (tonumber(Const.FOLLOW_FORMATION_CACHE_MS) or 250),
+        count = #followers,
+        slots = slots,
+        forwardX = fx,
+        forwardY = fy,
+    }
+end
+
+local function resolveFollowSlot(record, owner)
+    local ownerKey
+    local cache
+    local now
+    local slotIndex
+    local followerCount
     local fx
     local fy
     local rightX
@@ -124,29 +167,29 @@ local function resolveFollowSlot(record, owner)
     local side
     local lateral
     local trailing
+    local target
     if not owner then
         return nil
     end
-    if Registry and Registry.ForEach then
-        Registry.ForEach(function(other)
-            if isSameFollowGroup(record, other) then
-                followers[#followers + 1] = other
-            end
-        end)
+    now = Core.Now()
+    ownerKey = resolveFollowOwnerKey(record, owner)
+    cache = FollowFormationCache[ownerKey]
+    if not cache
+        or now >= (tonumber(cache.expiresAt) or 0)
+        or cache.slots[tostring(record.id)] == nil
+    then
+        cache = buildFollowFormation(record, owner, now)
+        FollowFormationCache[ownerKey] = cache
     end
-    table.sort(followers, sortFollowerRecords)
-    for i = 1, #followers do
-        if followers[i].id == record.id then
-            slotIndex = i - 1
-            break
-        end
-    end
-    fx, fy = resolveOwnerForward(owner)
+    slotIndex = tonumber(cache.slots[tostring(record.id)]) or 0
+    followerCount = tonumber(cache.count) or 1
+    fx = tonumber(cache.forwardX) or 0
+    fy = tonumber(cache.forwardY) or 1
     rightX = -fy
     rightY = fx
     backX = -fx
     backY = -fy
-    if #followers <= 1 then
+    if followerCount <= 1 then
         lateral = 0
         trailing = tonumber(Const.FOLLOW_SLOT_DISTANCE) or 1.5
     else
@@ -155,12 +198,14 @@ local function resolveFollowSlot(record, owner)
         lateral = side * ((tonumber(Const.FOLLOW_SLOT_LATERAL) or 0.95) + (pairIndex * (tonumber(Const.FOLLOW_SLOT_ROW_LATERAL) or 0.2)))
         trailing = (tonumber(Const.FOLLOW_SLOT_DISTANCE) or 1.5) + (pairIndex * (tonumber(Const.FOLLOW_SLOT_ROW_DISTANCE) or 0.75))
     end
-    return {
-        x = owner:getX() + (backX * trailing) + (rightX * lateral),
-        y = owner:getY() + (backY * trailing) + (rightY * lateral),
-        z = owner:getZ(),
-        stopDistance = tonumber(Const.FOLLOW_SLOT_STOP_DISTANCE) or 0.65,
-    }
+    record.runtime = record.runtime or {}
+    target = record.runtime.followSlotTarget or {}
+    record.runtime.followSlotTarget = target
+    target.x = owner:getX() + (backX * trailing) + (rightX * lateral)
+    target.y = owner:getY() + (backY * trailing) + (rightY * lateral)
+    target.z = owner:getZ()
+    target.stopDistance = tonumber(Const.FOLLOW_SLOT_STOP_DISTANCE) or 0.65
+    return target
 end
 
 local function tryEngageTarget(record, zombie)

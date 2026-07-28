@@ -11,7 +11,6 @@ local Combat = PNC.Combat
 local Internal = PNC.Combat.Internal or {}
 local Core = PNC.Core
 local Const = PNC.Const
-local Animation = PNC.Animation
 local Equipment = PNC.Equipment
 local Perception = PNC.Perception
 local Unarmed = PNC.CombatUnarmed
@@ -119,16 +118,9 @@ function Combat.TryMelee(record, zombie, target)
 
     if isBarehand then
         damage = tonumber(profile.unarmedDamage) or Const.UNARMED_DAMAGE
-        if Animation and Animation.PlayBump then
-            Animation.PlayBump(
-                zombie,
-                record,
-                "PNC_Shove"
-            )
-            anim = "PNC_Shove"
-        end
+        anim = "PNC_Shove"
     else
-        Internal.playAttackSound(zombie, record)
+        Internal.playAttackSound(zombie, record, weaponItem)
         anim = Internal.triggerMeleeWeaponAnim(
             zombie,
             record,

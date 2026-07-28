@@ -18,6 +18,14 @@ local TRAVERSAL_OWNER_MODES = {
     window_open = true,
 }
 
+local function continuousGoalTolerance(intent)
+    if not intent or intent.navigationProvider == nil then
+        return nil
+    end
+    return tonumber(PNC.Const and PNC.Const.PATH_CONTINUOUS_RETARGET_DISTANCE)
+        or 0.22
+end
+
 function PathService.IsTraversalActive(record, zombie)
     local lane = record and record.runtime and record.runtime.pathing or nil
     local modData
@@ -358,10 +366,12 @@ function Internal.consumeMoveIntent(record, lane, zombie)
     local intent = runtime and runtime.moveIntent or nil
     local goal
     local continuousSteering
+    local goalTolerance
     local goalsDiffer
     if not runtime then
         return "hold"
     end
+    goalTolerance = continuousGoalTolerance(intent)
     if Internal.isVehicleBlockedGoal(lane, intent) then
         Internal.captureIntentContext(record, lane, intent)
         lane.pendingGoal = nil
@@ -399,7 +409,7 @@ function Internal.consumeMoveIntent(record, lane, zombie)
                     lane.pendingGoal,
                     goal,
                     lane.mode,
-                    intent.navigationProvider ~= nil and 0.08 or nil
+                    goalTolerance
                 )
             then
                 lane.pendingGoalAt = Internal.Core.Now()
@@ -450,7 +460,7 @@ function Internal.consumeMoveIntent(record, lane, zombie)
         lane.goal,
         goal,
         lane.mode,
-        continuousSteering and 0.08 or nil
+        goalTolerance
     )
     if goalsDiffer then
         if continuousSteering and lane.phase == "active" then
@@ -462,7 +472,7 @@ function Internal.consumeMoveIntent(record, lane, zombie)
                 lane.pendingGoal,
                 goal,
                 lane.mode,
-                continuousSteering and 0.08 or nil
+                goalTolerance
             )
         then
             lane.pendingGoalAt = Internal.Core.Now()

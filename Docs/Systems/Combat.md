@@ -27,6 +27,15 @@
 - attack actions explicitly release the engine bump channel when the animation
   finishes, the target is lost, or the bounded action timeout expires; release
   remains pending until the ActionContext acknowledges that it left `bumped`
+- the authority selects the combat animation and owns hit timing/damage but
+  does not enter the visual bump state. The rendering client plays and
+  finishes attack snapshots in single-player, listen-server, and dedicated
+  multiplayer alike; remote-only interpolation still owns replicated movement
+- one- and two-handed melee families each rotate between two PNC-only attack
+  nodes, using the proven Dynamic Trading animation clips without sharing its
+  bump identifiers
+- melee swing audio reuses the already resolved live hand weapon instead of
+  constructing another inventory item for the same attack
 - once an attack windup is committed, its action pump temporarily owns the
   behavior tick independently of fresh perception. A short LOS/index miss
   therefore cannot cancel the swing, holster its weapon, or skip its delayed

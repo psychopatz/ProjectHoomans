@@ -91,6 +91,16 @@ frame spike.
 - spatial grids use nested numeric cells instead of concatenated string keys
 - world-census arrays are cleared and reused
 - behavior movement intent tables are mutated and reused
+- companions following one owner share a 250 ms sorted formation cache; the
+  group is no longer rescanned and resorted once per follower tick
+- local-authority presence snapshots are rebuilt per record by activity tier
+  (50 ms attacks, 150 ms movement, 500 ms idle, 2,000 ms abstract) instead of
+  rebuilding every record every 75 ms
+- local-authority appearance maintenance runs at 250 ms and never replays
+  server-owned locomotion; attack snapshots remain client-rendered in every
+  topology, including single-player
+- bounded local A* admits at most two searches per 50 ms window; excess NPCs
+  keep their current waypoint and retry on a later scheduler pass
 - performance collection is disabled unless runtime debug or an explicit
   capture window is active
 
@@ -119,6 +129,9 @@ after the workload to read the accumulated snapshot.
 - `pnc_zombie_aggro_budget_smoke.lua`
 - `pnc_perception_frame_smoke.lua`
 - `pnc_companion_owner_defense_smoke.lua`
+- `pnc_follow_formation_cache_smoke.lua`
+- `pnc_client_animation_authority_smoke.lua`
+- `pnc_local_path_planner_smoke.lua`
 - `pnc_combat_commitment_smoke.lua`
 - `pnc_simulation_lod_smoke.lua`
 - `pnc_scheduler_smoke.lua`

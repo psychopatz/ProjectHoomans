@@ -135,6 +135,49 @@ assert(
     planCalls == 2,
     "nearby blocked goal bypassed local route planning"
 )
+
+local budgetPlanCalls = 0
+PNC.LocalPathPlanner.Plan = function()
+    budgetPlanCalls = budgetPlanCalls + 1
+    return nil, "blocked"
+end
+now = 2000
+local budgetRecords = {}
+for index = 1, 3 do
+    budgetRecords[index] = {
+        id = "budget_" .. tostring(index),
+        runtime = {},
+        x = body.x,
+        y = body.y,
+        z = body.z,
+    }
+    PNC.LocalPathPlanner.GetSteeringTarget(
+        budgetRecords[index],
+        body,
+        { x = 10.5, y = 4.5, z = 0 },
+        { allowRecovery = false }
+    )
+end
+assert(
+    budgetPlanCalls == 2,
+    "local planner exceeded its per-window route budget"
+)
+assert(
+    budgetRecords[3].runtime.localNavigation.lastPlanReason
+        == "budget_deferred",
+    "excess route plan was not deferred"
+)
+now = 2050
+PNC.LocalPathPlanner.GetSteeringTarget(
+    budgetRecords[3],
+    body,
+    { x = 10.5, y = 4.5, z = 0 },
+    { allowRecovery = false }
+)
+assert(
+    budgetPlanCalls == 3,
+    "deferred route plan did not resume in the next budget window"
+)
 PNC.LocalPathPlanner.Plan = originalPlan
 PNC.TraversalQuery.CanStep = originalCanStep
 

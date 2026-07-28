@@ -24,6 +24,29 @@ local WAYPOINT_REACHED_RADIUS = 0.55
 local TRAVERSAL_WAYPOINT_RADIUS = 0.38
 local ROUTE_LOOKAHEAD_WAYPOINTS = 3
 local ROUTE_LOOKAHEAD_DISTANCE = 2.75
+local planBudgetSlot
+local planBudgetUsed = 0
+
+local function consumePlanBudget(now)
+    local windowMs = math.max(
+        1,
+        tonumber(Const.LOCAL_PATH_PLAN_BUDGET_WINDOW_MS) or 50
+    )
+    local budget = math.max(
+        1,
+        tonumber(Const.LOCAL_PATH_PLAN_BUDGET_PER_WINDOW) or 2
+    )
+    local slot = math.floor((tonumber(now) or 0) / windowMs)
+    if planBudgetSlot ~= slot then
+        planBudgetSlot = slot
+        planBudgetUsed = 0
+    end
+    if planBudgetUsed >= budget then
+        return false
+    end
+    planBudgetUsed = planBudgetUsed + 1
+    return true
+end
 
 local function key(x, y)
     return tostring(x) .. ":" .. tostring(y)
@@ -744,37 +767,49 @@ function Planner.GetSteeringTarget(record, body, finalTarget, options)
             navigation.currentTraversalKind = nil
             return finalTarget
         end
-        path, reason = Planner.Plan(
-            x,
-            y,
-            z,
-            finalTarget.x,
-            finalTarget.y,
-            finalTarget.z,
-            {
-                body = body,
-                radius = options and options.radius,
-                maxNodes = options and options.maxNodes,
-                interiorPenalty = options
-                    and options.interiorPenalty,
-                allowDoors = not options
-                    or options.allowDoors ~= false,
-                allowWindows = not options
-                    or options.allowWindows ~= false,
-                allowFences = not options
-                    or options.allowFences ~= false,
-            }
-        )
-        navigation.path = path
-        navigation.index = path and 1 or nil
-        navigation.steeringIndex = navigation.index
-        navigation.planStartX = x
-        navigation.planStartY = y
-        navigation.plannedAt = now
-        navigation.lastPlanReason = reason
-        navigation.planFailures = path
-            and 0 or (tonumber(navigation.planFailures) or 0) + 1
-        waypoint = path and path[1] or nil
+        if not consumePlanBudget(now) then
+            navigation.lastPlanReason = "budget_deferred"
+            navigation.deferredPlans =
+                (tonumber(navigation.deferredPlans) or 0) + 1
+            if not waypoint then
+                navigation.steeringKind = "final_budget_deferred"
+                navigation.steeringIndex = nil
+                navigation.currentTraversalKind = nil
+                return finalTarget
+            end
+        else
+            path, reason = Planner.Plan(
+                x,
+                y,
+                z,
+                finalTarget.x,
+                finalTarget.y,
+                finalTarget.z,
+                {
+                    body = body,
+                    radius = options and options.radius,
+                    maxNodes = options and options.maxNodes,
+                    interiorPenalty = options
+                        and options.interiorPenalty,
+                    allowDoors = not options
+                        or options.allowDoors ~= false,
+                    allowWindows = not options
+                        or options.allowWindows ~= false,
+                    allowFences = not options
+                        or options.allowFences ~= false,
+                }
+            )
+            navigation.path = path
+            navigation.index = path and 1 or nil
+            navigation.steeringIndex = navigation.index
+            navigation.planStartX = x
+            navigation.planStartY = y
+            navigation.plannedAt = now
+            navigation.lastPlanReason = reason
+            navigation.planFailures = path
+                and 0 or (tonumber(navigation.planFailures) or 0) + 1
+            waypoint = path and path[1] or nil
+        end
     end
     if not waypoint then
         navigation.steeringKind = "final_fallback"
