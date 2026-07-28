@@ -57,6 +57,9 @@ function Lifecycle.BuildDiagnostics(record)
         hpMax = record.health and record.health.max or nil,
         targetKind = record.runtime and record.runtime.targetKind or "none",
         combatBlockReason = record.runtime and record.runtime.combatBlockReason or nil,
+        mapPresentation = PNC.MapPresentation
+            and PNC.MapPresentation.BuildSummary(record.mapPresentation)
+            or nil,
         bite = bite and Core.DeepCopy(bite) or nil,
     }
 end

@@ -11,6 +11,25 @@ local Route = PNC.Travel and PNC.Travel.Route
 
 Directory.VisibilityFilters = Directory.VisibilityFilters or {}
 
+local function currentPlayerKey()
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if player and player.getUsername then
+        return tostring(player:getUsername())
+    end
+    if player and player.getOnlineID then
+        return tostring(player:getOnlineID())
+    end
+    return nil
+end
+
+local function isSelected(snapshot)
+    return snapshot
+        and PNC.MapCommands
+        and PNC.MapCommands.IsSelected
+        and PNC.MapCommands.IsSelected(snapshot.id)
+        or false
+end
+
 local function resolveSnapshot(npcId)
     npcId = tostring(npcId or "")
     if not (Core and Core.IsClientOnly and Core.IsClientOnly())
@@ -59,12 +78,23 @@ end
 
 function Directory.IsVisible(snapshot)
     local travel = snapshot and snapshot.travel or nil
+    local selected = isSelected(snapshot)
     local id
     local filter
     if not snapshot or snapshot.alive == false
         or snapshot.deathMarker == true
         or snapshot.presenceState == PNC.Const.PRESENCE_CORPSE
         or travel and tostring(travel.visibility or "all") == "hidden"
+    then
+        return false
+    end
+    if PNC.MapPresentation
+        and PNC.MapPresentation.IsVisibleFor
+        and not PNC.MapPresentation.IsVisibleFor(
+            snapshot.mapPresentation,
+            currentPlayerKey(),
+            selected
+        )
     then
         return false
     end
@@ -94,6 +124,13 @@ function Directory.GetProjected(npcId, atWorldHour)
                 snapshot.displayName or snapshot.name or snapshot.id
             ),
             faction = tostring(snapshot.faction or "neutral"),
+            recruited = snapshot.recruited == true,
+            roleTag = snapshot.mapPresentation
+                and snapshot.mapPresentation.roleTag or nil,
+            iconID = snapshot.mapPresentation
+                and snapshot.mapPresentation.iconID or nil,
+            mapVisibility = snapshot.mapPresentation
+                and snapshot.mapPresentation.visibility or "all",
             presenceState = snapshot.presenceState,
             state = snapshot.presenceState == PNC.Const.PRESENCE_LIVE
                 and "live" or "idle",
@@ -141,6 +178,13 @@ function Directory.GetProjected(npcId, atWorldHour)
             snapshot.displayName or snapshot.name or snapshot.id
         ),
         faction = tostring(snapshot.faction or "neutral"),
+        recruited = snapshot.recruited == true,
+        roleTag = snapshot.mapPresentation
+            and snapshot.mapPresentation.roleTag or nil,
+        iconID = snapshot.mapPresentation
+            and snapshot.mapPresentation.iconID or nil,
+        mapVisibility = snapshot.mapPresentation
+            and snapshot.mapPresentation.visibility or "all",
         presenceState = snapshot.presenceState,
         journeyId = projected.journeyId,
         state = projected.state,

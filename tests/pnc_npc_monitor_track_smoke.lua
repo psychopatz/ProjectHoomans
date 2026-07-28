@@ -10,6 +10,10 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function() return true end
 package.preload["PsychopatzCore/EventMarkers/PsychopatzEventMarkerHandler"] = function() return true end
 package.preload["PNC/UI/NPCMonitor/PNC_NPCMonitorSupport"] = function() return true end
 package.preload["PNC/UI/NPCMonitor/PNC_NPCMonitorView"] = function() return true end
+package.preload["ISUI/ISContextMenu"] = function()
+    ISContextMenu = ISContextMenu or {}
+    return ISContextMenu
+end
 
 local markerCalls = {}
 local removals = {}

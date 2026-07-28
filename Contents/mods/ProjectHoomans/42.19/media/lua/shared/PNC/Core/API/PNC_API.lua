@@ -269,6 +269,78 @@ function API.GetCharacterPayload(npcId)
     return nil
 end
 
+-- Stable cross-mod map marker API. Relationship systems decide when to call
+-- SetKnown; the map renderer only consumes this neutral presentation record.
+API.MapPresentation = API.MapPresentation or {}
+
+function API.MapPresentation.Get(npcId)
+    local record = Registry.Get(npcId)
+    if record and PNC.MapPresentation then
+        return PNC.MapPresentation.BuildSummary(record.mapPresentation)
+    end
+    local snapshot = PNC.Network
+        and PNC.Network.ClientState
+        and PNC.Network.ClientState.snapshots
+        and PNC.Network.ClientState.snapshots[tostring(npcId)] or nil
+    return snapshot and Core.DeepCopy(snapshot.mapPresentation) or nil
+end
+
+function API.MapPresentation.Set(npcId, spec)
+    local record = Registry.Get(npcId)
+    local presentation
+    local reason
+    if not Core.IsAuthority() or not record or not PNC.MapPresentation then
+        return nil, "not_authority_or_missing"
+    end
+    presentation, reason = PNC.MapPresentation.Apply(record, spec or {})
+    if not presentation then return nil, reason end
+    if Registry.MarkDirty then
+        Registry.MarkDirty(record, "map_presentation")
+    end
+    Network.BroadcastRecord(record, "map_presentation")
+    return PNC.MapPresentation.BuildSummary(presentation)
+end
+
+function API.MapPresentation.SetVisibility(npcId, visibility)
+    return API.MapPresentation.Set(npcId, {
+        visibility = visibility,
+    })
+end
+
+function API.MapPresentation.SetKnown(npcId, playerKey, known)
+    local record = Registry.Get(npcId)
+    local presentation
+    local reason
+    if not Core.IsAuthority() or not record or not PNC.MapPresentation then
+        return nil, "not_authority_or_missing"
+    end
+    presentation, reason = PNC.MapPresentation.SetKnown(
+        record,
+        playerKey,
+        known
+    )
+    if not presentation then return nil, reason end
+    if Registry.MarkDirty then
+        Registry.MarkDirty(record, "map_presentation")
+    end
+    Network.BroadcastRecord(record, "map_presentation")
+    return PNC.MapPresentation.BuildSummary(presentation)
+end
+
+function API.MapPresentation.RegisterIcon(iconID, definition)
+    return PNC.MapMarkerIcons
+        and PNC.MapMarkerIcons.Register
+        and PNC.MapMarkerIcons.Register(iconID, definition)
+        or false
+end
+
+function API.MapPresentation.UnregisterIcon(iconID)
+    return PNC.MapMarkerIcons
+        and PNC.MapMarkerIcons.Unregister
+        and PNC.MapMarkerIcons.Unregister(iconID)
+        or false
+end
+
 function API.DebugCommand(npcId, command, args)
     local record = Registry.Get(npcId)
     local zombie
@@ -324,6 +396,16 @@ function API.DebugCommand(npcId, command, args)
     end
     if command == "bandage_almost_dirty" then
         return API.DebugBandageAlmostDirty(npcId, args and args.partId)
+    end
+    if command == "set_map_presentation" then
+        return API.MapPresentation.Set(npcId, args or {}) ~= nil
+    end
+    if command == "set_map_known" then
+        return API.MapPresentation.SetKnown(
+            npcId,
+            args and args.playerKey,
+            args and args.known == true
+        ) ~= nil
     end
     if command == "set_weapon_mode" then
         record.weaponMode = tostring(args and args.weaponMode or record.weaponMode or "melee")

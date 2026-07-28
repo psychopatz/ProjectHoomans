@@ -8,6 +8,7 @@ local Const = PNC.Const
 local Service = PNC.Travel and PNC.Travel.Service
 local Common = PNC.BehaviorCommon
 local Animation = PNC.Animation
+local LocalPathPlanner = PNC.LocalPathPlanner
 
 local function normalizeTravelOrder(record, spec)
     local journey = record and record.travel or nil
@@ -40,17 +41,24 @@ function Travel.Tick(record, zombie, _, _)
     )
     record.activeBehavior = "Travel:" .. tostring(state or journey.state)
     if state == "en_route" and target then
+        local steeringTarget = LocalPathPlanner
+            and LocalPathPlanner.GetSteeringTarget
+            and LocalPathPlanner.GetSteeringTarget(record, zombie, target)
+            or target
         Common.MoveRecord(
             record,
             zombie,
-            target.x,
-            target.y,
-            target.z,
-            target.mode,
-            target.stopDistance,
+            steeringTarget.x,
+            steeringTarget.y,
+            steeringTarget.z,
+            steeringTarget.mode or target.mode,
+            steeringTarget.stopDistance or target.stopDistance,
             "journey:" .. tostring(journey.journeyId)
         )
     else
+        if LocalPathPlanner and LocalPathPlanner.Clear then
+            LocalPathPlanner.Clear(record)
+        end
         Common.HaltMovement(record, zombie, "journey_" .. tostring(state))
         if Animation and Animation.Apply then
             Animation.Apply(zombie, record, "Idle")

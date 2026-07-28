@@ -113,6 +113,15 @@ PNC = {
             end,
         },
     },
+    MapPresentation = {
+        BuildSummary = function(value)
+            return PNC.Core.DeepCopy(value or {
+                visibility = "all",
+                knownBy = {},
+                revision = 0,
+            })
+        end,
+    },
 }
 
 local nearbyRecord = {
@@ -141,6 +150,13 @@ local nearbyRecord = {
                 { x = 101, y = 0, z = 0 },
             },
         },
+    },
+    mapPresentation = {
+        visibility = "known",
+        knownBy = { player_1 = true },
+        roleTag = "trader",
+        iconID = "trader",
+        revision = 2,
     },
 }
 
@@ -171,6 +187,16 @@ assertEqual(
     PNC.Network.BuildPresenceDelta(nearbyRecord).travel.route,
     nil,
     "high-frequency presence delta repeated travel route"
+)
+assertEqual(
+    PNC.Network.BuildRosterSnapshot(nearbyRecord).mapPresentation.roleTag,
+    "trader",
+    "roster omitted map presentation"
+)
+assertEqual(
+    PNC.Network.BuildPresenceDelta(nearbyRecord).mapPresentation,
+    nil,
+    "high-frequency presence delta repeated map presentation"
 )
 nearbyRecord.ownerUsername = nil
 

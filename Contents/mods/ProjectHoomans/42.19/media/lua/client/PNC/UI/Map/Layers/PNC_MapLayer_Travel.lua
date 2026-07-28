@@ -6,33 +6,78 @@ PNC.MapTravelLayer = PNC.MapTravelLayer or {}
 local TravelLayer = PNC.MapTravelLayer
 local Directory = PNC.TravelDirectory
 local Layers = PNC.MapLayers
-local Const = PNC.Const
+local Display = PNC.MapDisplay
+local Icons = PNC.MapMarkerIcons
 
 TravelLayer.Enabled = TravelLayer.Enabled ~= false
 TravelLayer.DotTexture = TravelLayer.DotTexture
     or getTexture("media/ui/circle.png")
 
 local COLORS = {
-    colonist = { r = 0.15, g = 0.85, b = 1.00 },
+    colonist = { r = 0.15, g = 0.90, b = 0.25 },
+    companion = { r = 0.15, g = 0.90, b = 0.25 },
     neutral = { r = 0.95, g = 0.75, b = 0.20 },
     hostile = { r = 1.00, g = 0.25, b = 0.20 },
 }
 
 local function colorFor(entry)
+    if entry and entry.recruited == true then return COLORS.companion end
     return COLORS[tostring(entry and entry.faction or "neutral")]
         or COLORS.neutral
 end
 
 local function etaText(entry)
     local remaining = tonumber(entry and entry.remainingWorldHours)
-    if not remaining then return tostring(entry and entry.state or "") end
+    if not remaining then return nil end
     local hours = math.floor(remaining)
     local minutes = math.floor((remaining - hours) * 60 + 0.5)
     if hours > 0 then
-        return tostring(entry.state) .. " · ETA "
-            .. tostring(hours) .. "h " .. tostring(minutes) .. "m"
+        return "ETA " .. tostring(hours) .. "h " .. tostring(minutes) .. "m"
     end
-    return tostring(entry.state) .. " · ETA " .. tostring(minutes) .. "m"
+    return "ETA " .. tostring(minutes) .. "m"
+end
+
+local function displayLabel(entry)
+    local name = tostring(entry and entry.name or entry and entry.id or "NPC")
+    local roleTag = entry and entry.roleTag
+    if roleTag ~= nil and tostring(roleTag) ~= "" then
+        return name .. " [" .. tostring(roleTag) .. "]"
+    end
+    return name
+end
+
+local function drawMarkerIcon(map, entry, sx, sy, dotSize)
+    local definition = Icons and Icons.Resolve
+        and Icons.Resolve(entry and entry.iconID) or nil
+    local color
+    local size
+    if not definition then return end
+    color = definition.color or { r = 0.05, g = 0.05, b = 0.05, a = 1 }
+    size = math.max(dotSize, tonumber(definition.size) or dotSize)
+    if definition.texture and map.drawTextureScaledAspect then
+        map:drawTextureScaledAspect(
+            definition.texture,
+            sx - size / 2,
+            sy - size / 2,
+            size,
+            size,
+            color.a or 1,
+            color.r or 1,
+            color.g or 1,
+            color.b or 1
+        )
+    elseif definition.glyph then
+        map:drawTextCentre(
+            definition.glyph,
+            sx,
+            sy - 6,
+            color.r or 0.05,
+            color.g or 0.05,
+            color.b or 0.05,
+            color.a or 1,
+            UIFont.Small
+        )
+    end
 end
 
 local function isInsideVisibleChild(child, x, y)
@@ -56,6 +101,7 @@ local function isOverControls(map, x, y)
     return isInsideVisibleChild(map.symbolsUI, x, y)
         or isInsideVisibleChild(map.keyUI, x, y)
         or isInsideVisibleChild(map.buttonPanel, x, y)
+        or isInsideVisibleChild(map.pncNamesButton, x, y)
 end
 
 local function drawSelectedRoute(map, entry)
@@ -101,10 +147,11 @@ end
 
 function TravelLayer.Render(map)
     if not TravelLayer.Enabled or not map or not map.mapAPI then return end
+    if Display and Display.EnsureButton then Display.EnsureButton(map) end
     local entries = Directory.ListProjected()
     local zoom = tonumber(map.mapAPI:getZoomF()) or 0
-    local showLabels = zoom
-        >= (tonumber(Const.TRAVEL_MAP_LABEL_MIN_ZOOM) or 13)
+    local showLabels = Display and Display.AreNamesVisible
+        and Display.AreNamesVisible() or false
     local dotSize = math.max(7, math.min(13, 7 + (zoom - 10) * 0.8))
     local mouseX = map:getMouseX()
     local mouseY = map:getMouseY()
@@ -168,9 +215,10 @@ function TravelLayer.Render(map)
                     selected and 1.0 or 0.05,
                     selected and 0.2 or 0.05
                 )
+                drawMarkerIcon(map, entry, sx, sy, dotSize)
                 if showLabels or selected then
                     map:drawTextCentre(
-                        entry.name,
+                        displayLabel(entry),
                         sx,
                         sy + half + 2,
                         1,
@@ -194,7 +242,9 @@ function TravelLayer.Render(map)
     end
 
     if hovered then
-        local label = hovered.entry.name .. " — " .. etaText(hovered.entry)
+        local label = displayLabel(hovered.entry)
+        local eta = etaText(hovered.entry)
+        if eta then label = label .. " — " .. eta end
         local width = getTextManager():MeasureStringX(UIFont.Small, label) + 12
         local height = getTextManager():getFontHeight(UIFont.Small) + 8
         local x = math.max(

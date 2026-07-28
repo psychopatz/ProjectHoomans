@@ -528,6 +528,18 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if args and args.action == "set_map_presentation" then
+        API.DebugCommand(args.id, "set_map_presentation", args)
+        return
+    end
+
+    if args and args.action == "set_map_known" then
+        args.playerKey = player and player.getUsername
+            and player:getUsername() or nil
+        API.DebugCommand(args.id, "set_map_known", args)
+        return
+    end
+
     if args and args.action == "set_weapon_mode" then
         API.DebugCommand(args.id, "set_weapon_mode", args)
         return

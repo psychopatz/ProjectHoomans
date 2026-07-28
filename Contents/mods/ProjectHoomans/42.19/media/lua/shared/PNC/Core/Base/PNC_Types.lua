@@ -198,6 +198,9 @@ function Types.NormalizeDefinition(definition)
         debug = def.debug == true,
         persist = def.persist ~= false,
         recruited = def.recruited == true,
+        mapPresentation = PNC.MapPresentation
+            and PNC.MapPresentation.Normalize(def.mapPresentation)
+            or nil,
     }
 end
 
@@ -279,6 +282,9 @@ function Types.NewRecord(definition)
         liveBodyInstanceID = nil,
         corpse = nil,
         recruited = def.ownerOnlineID ~= nil or def.ownerUsername ~= nil or def.recruited == true,
+        mapPresentation = PNC.MapPresentation
+            and PNC.MapPresentation.Normalize(def.mapPresentation)
+            or nil,
         persist = def.persist ~= false,
         runtime = {
             target = nil,

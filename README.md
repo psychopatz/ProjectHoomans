@@ -17,6 +17,10 @@ This repository starts with a server-authoritative V1 slice:
   NPC scheduler work, cached perception, and elapsed-time abstract travel
 - persistent named journeys with waypoint waits, ETA/progress queries,
   live/abstract handoff, and an extensible vanilla-world-map overlay
+- relationship-ready map visibility, role postfixes, pluggable marker icons,
+  and per-client name controls
+- bounded live-body route look-ahead that avoids walls and strongly prefers
+  outdoor paths, with delayed safe-square recovery as a last resort
 - pluggable route and speed providers plus configurable live-body admission
   caps, allowing large populations to travel abstractly while nearby NPCs
   materialize in distance-priority order
@@ -56,6 +60,11 @@ continues. Right-click a valid destination and choose
 `NPC Commands → Move <name> here`. Idle and travelling NPCs are both displayed;
 the selected NPC stays highlighted and its name remains visible.
 
+The `NPC NAMES` button immediately left of the vanilla bottom map controls
+toggles ordinary name labels. Selected and hovered NPCs remain identifiable
+when labels are off. Marker colors are green for companions, yellow for
+neutral NPCs, and red for hostile NPCs.
+
 Map actions have separate client presentation and authority-side handlers:
 
 ```lua
@@ -87,6 +96,34 @@ PNC.API.MapCommands.RegisterHandler("scavenge", {
 This split keeps world-map UI concerns independent from server-owned gameplay.
 Future building, guard, investigate, trade, and scavenging commands can register
 their own providers and handlers without adding branches to the map hook.
+
+## Map presentation API
+
+Map visibility and marker styling are independent of travel, so relationship,
+trading, quest, and job mods can use the same contract for idle or moving NPCs:
+
+```lua
+PNC.API.MapPresentation.Set(npcId, {
+    visibility = "known", -- all | known | selected | hidden
+    roleTag = "trader",   -- rendered as [trader]
+    iconID = "my_trader",
+})
+
+PNC.API.MapPresentation.SetKnown(npcId, playerUsername, true)
+
+-- Client-side icon registration; texturePath or glyph may be used.
+PNC.API.MapPresentation.RegisterIcon("my_trader", {
+    texturePath = "media/ui/MyTraderMarker.png",
+    size = 12,
+})
+```
+
+`known` is a bounded persisted set keyed by player username. `selected` is
+resolved locally per player, while `hidden` suppresses the marker unless that
+player explicitly selects the NPC. The built-in placeholder icon IDs are
+`trader`, `quest_giver`, `guard`, and `worker`. The debug NPC Monitor exposes
+visibility, known/forgotten state, role tags, icon IDs, and trader/quest-giver
+presets through its `Map Marker` menu.
 
 Live NPC engine bodies are identified only by protected mod-data tags (`PNC_UUID`, body kind, and a runtime lease). Appearance, clothing, nakedness, and persistent outfit IDs are never authoritative identity. At death the full NPC record is retired; every immediate or delayed conversion path ensures exactly one named ID card on the final vanilla corpse, while the save keeps only a compact location marker until the corpse is confirmed missing. Corpse injection and replication are server-authoritative through PsychopatzCore. Live-body leases deliberately reset every session so bodies left behind by a prior session are quarantined before presence reconciliation.
 

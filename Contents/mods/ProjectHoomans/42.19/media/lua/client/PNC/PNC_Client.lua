@@ -609,6 +609,11 @@ function Client.SendDebug(action, payload)
     local player = getSpecificPlayer(0)
     local args = payload or {}
     args.action = action
+    if action == "set_map_known" and player then
+        args.playerKey = player.getUsername and player:getUsername()
+            or player.getOnlineID and tostring(player:getOnlineID())
+            or nil
+    end
     if not Client.CanUseDebug() then
         return false
     end

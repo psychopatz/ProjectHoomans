@@ -1,6 +1,7 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PsychopatzCore/EventMarkers/PsychopatzEventMarkerHandler"
 require "PNC/UI/NPCMonitor/PNC_NPCMonitorSupport"
+require "ISUI/ISContextMenu"
 
 PNC.NPCMonitor = PNC.NPCMonitor or {}
 
@@ -111,6 +112,117 @@ function ISPNCNPCMonitor:onPathOverlay()
     if self.pathOverlayButton then
         UI.SetButtonVariant(self.pathOverlayButton, enabled and "selected" or "quiet")
     end
+end
+
+local function newSubMenu(context, title)
+    local option = context:addOption(title)
+    local submenu = ISContextMenu:getNew(context)
+    context:addSubMenu(option, submenu)
+    return submenu
+end
+
+local function sendMapDebug(window, item, action, payload)
+    payload = payload or {}
+    payload.id = item.id
+    if PNC.Client and PNC.Client.SendDebug then
+        PNC.Client.SendDebug(action, payload)
+    end
+    window:requestRoster(false)
+end
+
+function ISPNCNPCMonitor:onMapMarker(button)
+    local item = self:getSelectedDiagnostic()
+    local presentation
+    local context
+    local visibility
+    local roles
+    local icons
+    local x
+    local y
+    if not item or not button then return end
+    presentation = item.mapPresentation or {}
+    x = button.getAbsoluteX and button:getAbsoluteX() or getMouseX()
+    y = button.getAbsoluteY and (
+        button:getAbsoluteY()
+            + (button.getHeight and button:getHeight() or button.height or 0)
+    ) or getMouseY()
+    context = ISContextMenu.get(0, x, y)
+
+    visibility = newSubMenu(context, "Visibility: "
+        .. tostring(presentation.visibility or "all"))
+    for _, mode in ipairs({
+        { "all", "All Players" },
+        { "known", "Known Players Only" },
+        { "selected", "Selected NPC Only" },
+        { "hidden", "Hidden" },
+    }) do
+        local modeID = mode[1]
+        visibility:addOption(mode[2], nil, function()
+            sendMapDebug(self, item, "set_map_presentation", {
+                visibility = modeID,
+            })
+        end)
+    end
+
+    context:addOption("Known to Me", nil, function()
+        sendMapDebug(self, item, "set_map_known", { known = true })
+    end)
+    context:addOption("Forget Me", nil, function()
+        sendMapDebug(self, item, "set_map_known", { known = false })
+    end)
+
+    roles = newSubMenu(context, "Role Postfix")
+    roles:addOption("None", nil, function()
+        sendMapDebug(self, item, "set_map_presentation", {
+            clearRole = true,
+        })
+    end)
+    for _, role in ipairs({
+        { "trader", "Trader" },
+        { "quest giver", "Quest Giver" },
+        { "guard", "Guard" },
+        { "worker", "Worker" },
+    }) do
+        local roleTag = role[1]
+        roles:addOption(role[2], nil, function()
+            sendMapDebug(self, item, "set_map_presentation", {
+                roleTag = roleTag,
+            })
+        end)
+    end
+
+    icons = newSubMenu(context, "Marker Icon")
+    icons:addOption("None", nil, function()
+        sendMapDebug(self, item, "set_map_presentation", {
+            clearIcon = true,
+        })
+    end)
+    for _, icon in ipairs({
+        { "trader", "Trader (T)" },
+        { "quest_giver", "Quest Giver (!)" },
+        { "guard", "Guard (G)" },
+        { "worker", "Worker (W)" },
+    }) do
+        local iconID = icon[1]
+        icons:addOption(icon[2], nil, function()
+            sendMapDebug(self, item, "set_map_presentation", {
+                iconID = iconID,
+            })
+        end)
+    end
+
+    context:addOption("Preset: Trader", nil, function()
+        sendMapDebug(self, item, "set_map_presentation", {
+            roleTag = "trader",
+            iconID = "trader",
+        })
+    end)
+    context:addOption("Preset: Quest Giver", nil, function()
+        sendMapDebug(self, item, "set_map_presentation", {
+            roleTag = "quest giver",
+            iconID = "quest_giver",
+        })
+    end)
 end
 
 function ISPNCNPCMonitor:onFocus()

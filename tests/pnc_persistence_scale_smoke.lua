@@ -29,7 +29,7 @@ local function approximateBytes(value, seen)
     return total
 end
 
-PNC.Const.PERSISTENCE_VERSION = 9
+PNC.Const.PERSISTENCE_VERSION = 10
 PNC.Const.DEFAULT_HP_MAX = 100
 PNC.Const.ROAM_DEFAULT_RADIUS = 6
 PNC.Const.ROAM_TARGET_RADIUS = 12
@@ -48,6 +48,9 @@ PNC.Const.TRAVEL_SPEED_WALK_TILES_PER_HOUR = 300
 PNC.Const.TRAVEL_SPEED_RUN_TILES_PER_HOUR = 480
 PNC.Const.TRAVEL_SPEED_VEHICLE_TILES_PER_HOUR = 1500
 PNC.Const.TRAVEL_ARRIVAL_RADIUS = 1
+PNC.Const.MAP_PRESENTATION_MAX_KNOWN_PLAYERS = 64
+PNC.Const.MAP_PRESENTATION_ROLE_MAX_LENGTH = 32
+PNC.Const.MAP_PRESENTATION_ICON_MAX_LENGTH = 64
 
 PNC.Core.Clamp = function(value, minimum, maximum)
     return math.max(minimum, math.min(maximum, value))
@@ -91,10 +94,14 @@ PNC.Types = {
             persist = definition.persist ~= false,
             alive = true,
             runtime = {},
+            mapPresentation = PNC.MapPresentation
+                and PNC.MapPresentation.Normalize(definition.mapPresentation)
+                or nil,
         }
     end,
 }
 
+dofile(ROOT .. "Map/PNC_MapPresentation.lua")
 dofile(ROOT .. "Travel/PNC_Travel_Route.lua")
 dofile(ROOT .. "Travel/PNC_Travel_Providers.lua")
 dofile(ROOT .. "Travel/PNC_Travel_Model.lua")
@@ -159,6 +166,12 @@ for npcIndex = 1, 100 do
         alive = true,
         recruited = false,
         runtime = {},
+        mapPresentation = {
+            visibility = "known",
+            knownBy = { scale_player = true },
+            roleTag = "trader",
+            iconID = "trader",
+        },
     }
     for partIndex = 1, #partIDs do
         record.health.body.parts[partIDs[partIndex]] = {
@@ -208,7 +221,7 @@ end
 assertEqual(PNC.Core.TableSize and PNC.Core.TableSize(payloads) or 100, 100,
     "scale payload count")
 local sample = payloads.scale_npc_1
-assertEqual(sample.schemaVersion, 9, "scale schema version")
+assertEqual(sample.schemaVersion, 10, "scale schema version")
 assertEqual(sample.inventory.maxWeight, nil, "derived max weight persisted")
 assertEqual(sample.inventory.cachedWeight, nil, "derived used weight persisted")
 assertEqual(#sample.inventory.delta.added, 40, "acquired item delta count")
@@ -230,9 +243,13 @@ assertEqual(restored.travel.journeyId, "journey:scale:1",
     "journey id round trip")
 assertEqual(restored.orderSpec.kind, "travel",
     "active journey order round trip")
+assertEqual(restored.mapPresentation.roleTag, "trader",
+    "map role round trip")
+assertEqual(restored.mapPresentation.knownBy.scale_player, true,
+    "map knowledge round trip")
 
 local legacyPayload = PNC.Core.DeepCopy(sample)
-legacyPayload.schemaVersion = 8
+legacyPayload.schemaVersion = 9
 legacyPayload.inventory.maxWeight = 999
 legacyPayload.inventory.cachedWeight = 888
 local legacyRecord = PNC.Persistence.DeserializeRecord(
@@ -241,7 +258,7 @@ local legacyRecord = PNC.Persistence.DeserializeRecord(
 )
 assertEqual(legacyRecord.inventory, nil, "legacy inventory hydrated during load")
 local migratedPayload = PNC.Persistence.SerializeRecord(legacyRecord)
-assertEqual(migratedPayload.schemaVersion, 9, "lazy migration schema")
+assertEqual(migratedPayload.schemaVersion, 10, "lazy migration schema")
 assertEqual(migratedPayload.inventory.maxWeight, nil,
     "legacy derived max weight survived migration")
 assertEqual(migratedPayload.inventory.cachedWeight, nil,

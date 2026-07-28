@@ -42,6 +42,15 @@ local function buildTravelSummary(record, includeRoute)
         or nil
 end
 
+local function buildMapPresentationSummary(record)
+    return PNC.MapPresentation
+        and PNC.MapPresentation.BuildSummary
+        and PNC.MapPresentation.BuildSummary(
+            record and record.mapPresentation
+        )
+        or nil
+end
+
 function PNC.Network.ResetServerState()
     ServerState.interests = {}
     ServerState.rosterDeltas = {}
@@ -313,6 +322,7 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
         recruited = record.recruited == true,
         persist = record.persist ~= false,
         travel = buildTravelSummary(record, includeTravelRoute ~= false),
+        mapPresentation = buildMapPresentationSummary(record),
     }
 end
 
@@ -428,6 +438,7 @@ function Network.BuildSnapshot(record)
         visualState = visualState,
         appearance = appearance and Core.DeepCopy(appearance) or nil,
         travel = buildTravelSummary(record, true),
+        mapPresentation = buildMapPresentationSummary(record),
         equipmentSummary = {
             primaryFullType = record.equipment and record.equipment.primaryFullType or nil,
             secondaryFullType = record.equipment and record.equipment.secondaryFullType or nil,

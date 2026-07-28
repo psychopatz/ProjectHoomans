@@ -718,6 +718,9 @@ function Persistence.SerializeRecord(record)
             and PNC.Travel.Model.BuildSummary
             and PNC.Travel.Model.BuildSummary(record.travel, true)
             or nil,
+        mapPresentation = PNC.MapPresentation
+            and PNC.MapPresentation.BuildSummary(record.mapPresentation)
+            or nil,
     }
     startupBodyHint = record.runtime and record.runtime.startupBodyHint or nil
     if record.liveBodyInstanceID ~= nil or startupBodyHint then
@@ -784,6 +787,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         archetypeID = raw.archetypeID or (identity and identity.archetypeID) or nil,
         persist = raw.persist ~= false,
         recruited = raw.recruited == true or (raw.progression and raw.progression.recruited == true) or false,
+        mapPresentation = raw.mapPresentation,
     }
     record = Types.NewRecord(definition)
     if not record then

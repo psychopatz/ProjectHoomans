@@ -103,6 +103,7 @@ function View.CreateChildren(window)
         { "heal", "UI_PNC_MonitorHeal", "Heal", ISPNCNPCMonitor.onAction, "success" },
         { "damage", "UI_PNC_MonitorDamage", "Damage", ISPNCNPCMonitor.onAction, "danger" },
         { "toggle_debug", "UI_PNC_MonitorRecordDebug", "Record Debug", ISPNCNPCMonitor.onAction, "default" },
+        { "map_marker", "UI_PNC_MonitorMapMarker", "Map Marker", ISPNCNPCMonitor.onMapMarker, "default" },
         { "audit", "UI_PNC_MonitorAuditBodies", "Audit Bodies", ISPNCNPCMonitor.onAudit, "warning" },
         { "refresh", "UI_PNC_MonitorRefresh", "Refresh", ISPNCNPCMonitor.onRefresh, "quiet" },
         { "overlay", "UI_PNC_MonitorToggleOverlay", "Toggle Overlay", ISPNCNPCMonitor.onOverlay, "quiet" },

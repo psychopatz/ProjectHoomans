@@ -7,6 +7,8 @@ PNC.EventMarkers = PsychopatzCore.EventMarkers
 require "PNC/UI/PNC_Settings"
 require "PNC/Travel/PNC_TravelDirectory"
 require "PNC/UI/Map/PNC_MapLayerRegistry"
+require "PNC/UI/Map/PNC_MapDisplaySettings"
+require "PNC/UI/Map/PNC_MapMarkerIconRegistry"
 require "PNC/UI/Map/PNC_MapCommandRegistry"
 require "PNC/UI/Map/Commands/PNC_MapCommand_Travel"
 require "PNC/UI/Map/Layers/PNC_MapLayer_Travel"
