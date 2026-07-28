@@ -8,9 +8,21 @@ local Registry = PNC.Registry
 local Health = PNC.Health
 local Equipment = PNC.Equipment
 local Settings = PNC.Sandbox
+local Stealth = PNC.Stealth
 
 local State = ZombieAggro.State
 local Internal = ZombieAggro.Internal
+
+local function shouldPreventZombieAttack(record)
+    return record ~= nil and (
+        not Settings.CanZombieTargetRecord(record)
+        or (
+            Stealth
+            and Stealth.ShouldSuppressZombieAggro
+            and Stealth.ShouldSuppressZombieAggro(record)
+        )
+    )
+end
 
 local function getBiteEntry(zombieId)
     return zombieId and State.bites and State.bites[zombieId] or nil
@@ -61,7 +73,7 @@ local function finalizeRelease(zombieId, entry, now, reason)
     local npcBody = entry and entry.npcBody or nil
     local record = entry and Registry.Get(entry.npcId) or nil
     if npcBody and npcBody.setZombiesDontAttack then
-        npcBody:setZombiesDontAttack(record and not Settings.CanZombieTargetRecord(record) or false)
+        npcBody:setZombiesDontAttack(shouldPreventZombieAttack(record))
     end
     signalBumpFinish(zombie)
     if zombie and zombie.setBumpType then
@@ -136,7 +148,9 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
     local now
     local entry
 
-    if not zombie or not npcBody or not record or not Settings.CanZombieTargetRecord(record) then
+    if not zombie or not npcBody or not record
+        or shouldPreventZombieAttack(record)
+    then
         return false
     end
     zombieId = Internal.ensureZombieID(zombie)

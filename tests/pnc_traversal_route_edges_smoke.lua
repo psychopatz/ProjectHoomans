@@ -121,4 +121,24 @@ canPlan, kind = PNC.TraversalQuery.CanPlanStep(
 )
 assert(canPlan and kind == "fence_climb", "hoppable fence was not routable")
 
+local tallFenceProperties = {
+    get = function(_, name)
+        return name == "FenceTypeHigh" and "Metal" or nil
+    end,
+}
+local tallFence = {
+    getProperties = function() return tallFenceProperties end,
+    isTallHoppable = function() return true end,
+}
+squares["0:0"].getHoppableTo = function(_, other)
+    return other == squares["1:0"] and tallFence or nil
+end
+canPlan, kind = PNC.TraversalQuery.CanPlanStep(
+    0.5, 0.5, 0, 1.5, 0.5, 0, cell, {}, {}
+)
+assert(
+    canPlan and kind == "fence_climb_tall",
+    "pair-based tall hoppable fence was not routable"
+)
+
 print("pnc_traversal_route_edges_smoke: ok")

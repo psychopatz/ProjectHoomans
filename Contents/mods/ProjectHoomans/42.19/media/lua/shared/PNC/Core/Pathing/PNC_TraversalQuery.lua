@@ -287,6 +287,32 @@ function TraversalQuery.GetFenceBetween(fromSquare, toSquare)
     if not fromSquare or not toSquare or fromSquare == toSquare then
         return nil, false
     end
+    object = callFirst(
+        fromSquare,
+        {
+            "getHoppableTo",
+            "getWallHoppableTo",
+            "getHoppableThumpableTo",
+        },
+        toSquare
+    )
+    isFence, isTall = TraversalQuery.IsFence(object)
+    if object and isFence then
+        return object, isTall
+    end
+    object = callFirst(
+        toSquare,
+        {
+            "getHoppableTo",
+            "getWallHoppableTo",
+            "getHoppableThumpableTo",
+        },
+        fromSquare
+    )
+    isFence, isTall = TraversalQuery.IsFence(object)
+    if object and isFence then
+        return object, isTall
+    end
     fromX = fromSquare:getX()
     fromY = fromSquare:getY()
     toX = toSquare:getX()
@@ -295,7 +321,17 @@ function TraversalQuery.GetFenceBetween(fromSquare, toSquare)
     squares = { fromSquare, toSquare }
     for i = 1, #squares do
         square = squares[i]
-        object = callFirst(square, { "getHoppableThumpable" }, northEdge)
+        object = callFirst(
+            square,
+            {
+                "getHoppable",
+                "getWallHoppable",
+                "getHoppableWall",
+                "getThumpableWallOrHoppable",
+                "getHoppableThumpable",
+            },
+            northEdge
+        )
         isFence, isTall = TraversalQuery.IsFence(object)
         if object and isFence then
             return object, isTall

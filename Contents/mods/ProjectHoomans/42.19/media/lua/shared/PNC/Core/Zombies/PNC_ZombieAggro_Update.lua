@@ -54,7 +54,11 @@ local function suppressForStealth(zombie, record)
     ZombieAggro.ClearBiteEntryForZombie(zombie)
     setNoLungeAttack(zombie, false)
     record.runtime = record.runtime or {}
-    record.runtime.combatBlockReason = "follow_stealth_hidden"
+    record.runtime.combatBlockReason = Stealth
+        and Stealth.IsTravelStealthActive
+        and Stealth.IsTravelStealthActive(record)
+        and "travel_stealth_hidden"
+        or "follow_stealth_hidden"
 end
 
 local function refreshPursuitPath(zombie, npcBody, now)

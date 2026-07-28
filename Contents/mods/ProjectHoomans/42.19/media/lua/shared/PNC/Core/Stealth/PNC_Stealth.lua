@@ -4,6 +4,7 @@ PNC.Stealth = PNC.Stealth or {}
 local Stealth = PNC.Stealth
 local Core = PNC.Core
 local Const = PNC.Const
+local Settings = PNC.Sandbox
 Stealth.OwnerDiscoveryCache = Stealth.OwnerDiscoveryCache or {}
 
 local function ownerCacheKey(owner)
@@ -229,12 +230,156 @@ function Stealth.IsFollowStealthActive(record)
     return runtime and runtime.stealthActive == true and runtime.ownerSneaking == true
 end
 
+local function applyTravelBodyProtection(record, zombie, active)
+    local protectedBySettings = Settings
+        and Settings.CanZombieTargetRecord
+        and not Settings.CanZombieTargetRecord(record, Core.Now())
+        or false
+    if zombie and zombie.setZombiesDontAttack then
+        zombie:setZombiesDontAttack(active == true or protectedBySettings)
+    end
+end
+
+local function travelState(record)
+    if not record then
+        return nil
+    end
+    record.runtime = record.runtime or {}
+    record.runtime.travelStealth = record.runtime.travelStealth or {
+        active = false,
+        combatActive = false,
+        nextScanAt = 0,
+        quietUntil = 0,
+        reason = "inactive",
+    }
+    return record.runtime.travelStealth
+end
+
+function Stealth.IsTravelStealthActive(record)
+    local state = record
+        and record.runtime
+        and record.runtime.travelStealth
+        or nil
+    return state ~= nil
+        and state.active == true
+        and state.combatActive ~= true
+end
+
+function Stealth.IsTravelCombatActive(record)
+    local state = record
+        and record.runtime
+        and record.runtime.travelStealth
+        or nil
+    return state ~= nil and state.combatActive == true
+end
+
+function Stealth.ClearTravel(record, reason, zombie)
+    local state = travelState(record)
+    if not state then
+        return false
+    end
+    state.active = false
+    state.combatActive = false
+    state.nextScanAt = 0
+    state.quietUntil = 0
+    state.reason = reason or "inactive"
+    applyTravelBodyProtection(record, zombie, false)
+    return false
+end
+
+function Stealth.SetTravelCombatActive(record, zombie, active)
+    local state = travelState(record)
+    if not state then
+        return false
+    end
+    state.combatActive = active == true
+    state.active = false
+    state.nextScanAt = 0
+    state.quietUntil = 0
+    state.reason = active == true and "travel_combat" or "combat_clear"
+    applyTravelBodyProtection(record, zombie, false)
+    return state.combatActive
+end
+
+function Stealth.UpdateTravelState(record, zombie, now)
+    local state = travelState(record)
+    local perception
+    local nearCount
+    local hordeCount
+    local danger
+    local wasActive
+    if not state or not zombie or state.combatActive == true then
+        return false
+    end
+    now = tonumber(now) or Core.Now()
+    if now < (tonumber(state.nextScanAt) or 0) then
+        return state.active == true
+    end
+    state.nextScanAt = now
+        + (tonumber(Const.LIVE_TRAVEL_STEALTH_SCAN_MS) or 350)
+    perception = PNC.Perception
+    nearCount = perception
+        and perception.CountZombiesInFrame
+        and perception.CountZombiesInFrame(
+            record,
+            tonumber(Const.LIVE_TRAVEL_STEALTH_NEAR_RADIUS) or 7
+        )
+        or 0
+    hordeCount = nearCount > 0 and nearCount
+        or (
+            perception
+            and perception.CountZombiesInFrame
+            and perception.CountZombiesInFrame(
+                record,
+                tonumber(Const.LIVE_TRAVEL_STEALTH_HORDE_RADIUS) or 12
+            )
+            or 0
+        )
+    danger = nearCount > 0
+        or hordeCount >= (
+            tonumber(Const.LIVE_TRAVEL_STEALTH_HORDE_COUNT) or 3
+        )
+    wasActive = state.active == true
+    if danger then
+        state.active = true
+        state.quietUntil = now
+            + (
+                tonumber(Const.LIVE_TRAVEL_STEALTH_CLEAR_DELAY_MS)
+                or 2500
+            )
+        state.reason = nearCount > 0
+            and "nearby_zombie"
+            or "nearby_horde"
+    elseif wasActive and now < (tonumber(state.quietUntil) or 0) then
+        state.active = true
+        state.reason = "quiet_hysteresis"
+    else
+        state.active = false
+        state.quietUntil = 0
+        state.reason = "area_clear"
+    end
+    if state.active then
+        if not wasActive
+            and PNC.ZombieAggro
+            and PNC.ZombieAggro.ClearForNPCBody
+        then
+            PNC.ZombieAggro.ClearForNPCBody(zombie)
+        end
+        applyTravelBodyProtection(record, zombie, true)
+        record.runtime.combatBlockReason = "travel_stealth_hidden"
+    elseif wasActive then
+        applyTravelBodyProtection(record, zombie, false)
+    end
+    return state.active == true
+end
+
 function Stealth.ShouldSuppressCompanionCombat(record)
     return Stealth.IsFollowStealthActive(record)
 end
 
 function Stealth.ShouldSuppressZombieAggro(record)
     return Stealth.IsFollowStealthActive(record)
+        or Stealth.IsTravelStealthActive(record)
 end
 
 function Stealth.ResolveFollowMoveMode(record, owner, ownerDist)

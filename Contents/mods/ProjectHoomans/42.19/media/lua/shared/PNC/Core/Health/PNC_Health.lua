@@ -29,6 +29,15 @@ local function resolveLiveBodyControl()
     return PNC.LiveBodyControl
 end
 
+local function shouldPreventZombieAttack(record)
+    return not Settings.CanZombieTargetRecord(record)
+        or (
+            PNC.Stealth
+            and PNC.Stealth.ShouldSuppressZombieAggro
+            and PNC.Stealth.ShouldSuppressZombieAggro(record)
+        )
+end
+
 function Health.Ensure(record)
     if not record.health then
         record.health = {
@@ -86,7 +95,7 @@ local function applyIncapacitatedLiveState(record, zombie)
         zombie:setUseless(true)
     end
     if zombie.setZombiesDontAttack then
-        zombie:setZombiesDontAttack(not Settings.CanZombieTargetRecord(record))
+        zombie:setZombiesDontAttack(shouldPreventZombieAttack(record))
     end
     if zombie.setHealth then
         zombie:setHealth(Const.INCAPACITATED_ENGINE_BUFFER)
@@ -109,7 +118,7 @@ local function applyNormalLiveState(record, zombie)
         zombie:setUseless(true)
     end
     if zombie.setZombiesDontAttack then
-        zombie:setZombiesDontAttack(not Settings.CanZombieTargetRecord(record))
+        zombie:setZombiesDontAttack(shouldPreventZombieAttack(record))
     end
     if zombie.setHealth then
         zombie:setHealth(Const.DEFAULT_ENGINE_BUFFER)
@@ -133,7 +142,7 @@ local function refreshNormalLiveBuffer(record, zombie)
         zombie:setUseless(true)
     end
     if zombie.setZombiesDontAttack then
-        zombie:setZombiesDontAttack(not Settings.CanZombieTargetRecord(record))
+        zombie:setZombiesDontAttack(shouldPreventZombieAttack(record))
     end
     if zombie.setHealth then
         zombie:setHealth(Const.DEFAULT_ENGINE_BUFFER)

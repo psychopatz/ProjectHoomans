@@ -104,6 +104,100 @@ function Perception.RememberAttacker(record, damageEvent, now)
     return true
 end
 
+function Perception.ResolveRecentAttacker(record, now)
+    local recent
+    local kind
+    local targetRecord
+    local worldObject
+    local x
+    local y
+    local z
+    local target
+    if not record or not record.runtime then
+        return nil
+    end
+    recent = record.runtime.recentThreat
+    now = tonumber(now) or Core.Now()
+    if not recent or now > (tonumber(recent.expiresAt) or 0) then
+        record.runtime.recentThreat = nil
+        return nil
+    end
+    kind = tostring(recent.kind or "")
+    if kind == "npc" then
+        targetRecord = Registry
+            and Registry.Get
+            and Registry.Get(recent.id)
+            or nil
+        if not targetRecord or targetRecord.alive == false then
+            return nil
+        end
+        if Relationships
+            and Relationships.AreNPCsEnemies
+            and not Relationships.AreNPCsEnemies(record, targetRecord)
+        then
+            return nil
+        end
+        worldObject = Registry
+            and Registry.GetLiveZombie
+            and Registry.GetLiveZombie(recent.id)
+            or nil
+        if not worldObject or (worldObject.isDead and worldObject:isDead()) then
+            return nil
+        end
+        x = worldObject:getX()
+        y = worldObject:getY()
+        z = worldObject:getZ()
+        target = {
+            kind = "npc",
+            id = recent.id,
+        }
+    elseif kind == "player" then
+        worldObject = Core.ResolvePlayerByOnlineID(recent.onlineID)
+            or Core.ResolvePlayerByUsername(recent.username)
+        if not worldObject
+            or (worldObject.isDead and worldObject:isDead())
+            or (worldObject.isAlive and not worldObject:isAlive())
+        then
+            return nil
+        end
+        x = worldObject:getX()
+        y = worldObject:getY()
+        z = worldObject:getZ()
+        target = {
+            kind = "player",
+            player = worldObject,
+            onlineID = recent.onlineID,
+            username = recent.username,
+        }
+    elseif kind == "zombie" then
+        worldObject = Perception.FindZombieByID
+            and Perception.FindZombieByID(recent.id)
+            or nil
+        if not worldObject or (worldObject.isDead and worldObject:isDead()) then
+            return nil
+        end
+        x = worldObject:getX()
+        y = worldObject:getY()
+        z = worldObject:getZ()
+        target = {
+            kind = "zombie",
+            zombieId = recent.id,
+            worldObject = worldObject,
+        }
+    else
+        return nil
+    end
+    target.x = x
+    target.y = y
+    target.z = z
+    target.distSq = Core.DistanceSq(record.x, record.y, x, y)
+    target.visible = true
+    target.visibilityKind = "recent_attacker"
+    target.lastSeenAt = now
+    target.threatening = true
+    return target
+end
+
 function Perception.IsTargetThreatening(record, target)
     local recent
     local targetRecord
