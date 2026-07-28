@@ -326,6 +326,54 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
     }
 end
 
+local function buildPathDebugState(record)
+    local lane = record.runtime and record.runtime.pathing or nil
+    local navigation = record.runtime
+        and record.runtime.localNavigation or nil
+    local router = record.runtime
+        and record.runtime.navigationRouter or nil
+    return {
+        movePhase = lane and lane.phase or "idle",
+        moveMode = lane and (lane.resolvedMode or lane.mode) or nil,
+        moveGoal = lane and lane.goal or nil,
+        moveFinalGoal = lane
+            and lane.finalGoalX ~= nil and {
+                x = lane.finalGoalX,
+                y = lane.finalGoalY,
+                z = lane.finalGoalZ,
+            } or nil,
+        moveBlockReason = lane and lane.blockReason or nil,
+        moveLastStep = lane and lane.lastStepLabel or nil,
+        moveGoalDistance = lane and lane.goalDistance or nil,
+        moveNonProgressSteps = lane
+            and lane.nonProgressStepCount or 0,
+        moveRetargetCount = lane and lane.retargetCount or 0,
+        moveSteeringTurnDot = lane
+            and lane.steeringTurnDot or nil,
+        moveBlockedStepReason = lane and lane.blockedStepReason or nil,
+        navigationPolicy = lane
+            and lane.navigationPolicy or router and router.policy or nil,
+        navigationProvider = lane
+            and lane.navigationProvider or router and router.provider or nil,
+        navigationPlanReason = navigation
+            and navigation.lastPlanReason or nil,
+        navigationSteeringKind = navigation
+            and navigation.steeringKind or nil,
+        navigationTraversalKind = navigation
+            and navigation.currentTraversalKind or nil,
+        navigationPathIndex = navigation and navigation.index or nil,
+        navigationSteeringIndex = navigation
+            and navigation.steeringIndex
+            or lane and lane.steeringIndex or nil,
+        navigationPathLength = navigation
+            and navigation.path and #navigation.path or 0,
+        navigationPlanFailures = navigation
+            and navigation.planFailures or 0,
+        navigationInvalidationReason = router
+            and router.lastInvalidationReason or nil,
+    }
+end
+
 function Network.BuildSnapshot(record)
     local aiState
     local canRevive
@@ -342,6 +390,9 @@ function Network.BuildSnapshot(record)
     local vehiclePassenger
     local treatmentState
     local attackMode
+    local pathing
+    local navigation
+    local navigationRouter
     aiState, inCombat = resolveAIState(record)
     canRevive = PNC.Health and PNC.Health.CanRevive and PNC.Health.CanRevive(record) or false
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
@@ -356,6 +407,10 @@ function Network.BuildSnapshot(record)
         and Firearms.BuildDebugState(record)
         or nil
     vehiclePassenger = record.runtime and record.runtime.vehiclePassenger or nil
+    pathing = record.runtime and record.runtime.pathing or nil
+    navigation = record.runtime and record.runtime.localNavigation or nil
+    navigationRouter = record.runtime
+        and record.runtime.navigationRouter or nil
     treatmentState = PNC.BehaviorTreatment
         and PNC.BehaviorTreatment.BuildSnapshot
         and PNC.BehaviorTreatment.BuildSnapshot(record) or nil
@@ -436,6 +491,7 @@ function Network.BuildSnapshot(record)
         inCombat = inCombat,
         attackMode = attackMode,
         visualState = visualState,
+        pathDebugState = buildPathDebugState(record),
         appearance = appearance and Core.DeepCopy(appearance) or nil,
         travel = buildTravelSummary(record, true),
         mapPresentation = buildMapPresentationSummary(record),
@@ -487,11 +543,56 @@ function Network.BuildSnapshot(record)
             stealthActive = record.runtime and record.runtime.stealthActive == true or false,
             debugEnabled = record.runtime and record.runtime.debug == true or false,
             presenceState = record.presenceState,
-            movePhase = record.runtime and record.runtime.pathing and record.runtime.pathing.phase or "idle",
-            moveMode = record.runtime and record.runtime.pathing and (record.runtime.pathing.resolvedMode or record.runtime.pathing.mode) or nil,
-            moveGoal = record.runtime and record.runtime.pathing and record.runtime.pathing.goal or nil,
-            moveCancelReason = record.runtime and record.runtime.pathing and record.runtime.pathing.cancelReason or nil,
-            moveBlockReason = record.runtime and record.runtime.pathing and record.runtime.pathing.blockReason or nil,
+            movePhase = pathing and pathing.phase or "idle",
+            moveMode = pathing
+                and (pathing.resolvedMode or pathing.mode) or nil,
+            moveGoal = pathing and pathing.goal or nil,
+            moveFinalGoal = pathing
+                and pathing.finalGoalX ~= nil and {
+                    x = pathing.finalGoalX,
+                    y = pathing.finalGoalY,
+                    z = pathing.finalGoalZ,
+                } or nil,
+            moveCancelReason = pathing and pathing.cancelReason or nil,
+            moveBlockReason = pathing and pathing.blockReason or nil,
+            moveIntentReason = pathing and pathing.intentReason or nil,
+            moveOwnerMode = pathing and pathing.ownerMode or nil,
+            moveLastStep = pathing and pathing.lastStepLabel or nil,
+            moveLastStepDistance = pathing
+                and pathing.lastStepDistance or nil,
+            moveLastProgressDelta = pathing
+                and pathing.lastProgressDelta or nil,
+            moveGoalDistance = pathing and pathing.goalDistance or nil,
+            moveBestGoalDistance = pathing
+                and pathing.bestGoalDistance or nil,
+            moveNonProgressSteps = pathing
+                and pathing.nonProgressStepCount or 0,
+            moveBlockedStepReason = pathing
+                and pathing.blockedStepReason or nil,
+            navigationPolicy = pathing
+                and pathing.navigationPolicy
+                or navigationRouter and navigationRouter.policy
+                or nil,
+            navigationProvider = pathing
+                and pathing.navigationProvider
+                or navigationRouter and navigationRouter.provider
+                or nil,
+            navigationPlanReason = navigation
+                and navigation.lastPlanReason or nil,
+            navigationSteeringKind = navigation
+                and navigation.steeringKind or nil,
+            navigationTraversalKind = navigation
+                and navigation.currentTraversalKind or nil,
+            navigationPathIndex = navigation
+                and navigation.index or nil,
+            navigationPathLength = navigation
+                and navigation.path and #navigation.path or 0,
+            navigationPlanFailures = navigation
+                and navigation.planFailures or 0,
+            navigationInvalidations = navigationRouter
+                and navigationRouter.invalidations or 0,
+            navigationInvalidationReason = navigationRouter
+                and navigationRouter.lastInvalidationReason or nil,
         },
     }
 end
@@ -499,11 +600,21 @@ end
 function Network.BuildPresenceDelta(record)
     local aiState
     local inCombat
+    local now = Core.Now()
     local staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
     local firearmState = Firearms and Firearms.BuildDebugState
         and Firearms.BuildDebugState(record)
         or nil
     local vehiclePassenger = record.runtime and record.runtime.vehiclePassenger or nil
+    local pathDebugState
+    local lastPathDebugAt = record.runtime
+        and tonumber(record.runtime.pathDebugReplicatedAt) or 0
+    if lastPathDebugAt <= 0 or now - lastPathDebugAt >= 350 then
+        pathDebugState = buildPathDebugState(record)
+        if record.runtime then
+            record.runtime.pathDebugReplicatedAt = now
+        end
+    end
     aiState, inCombat = resolveAIState(record)
     return {
         interestDetailed = true,
@@ -546,6 +657,7 @@ function Network.BuildPresenceDelta(record)
             boardedAt = vehiclePassenger.boardedAt,
         } or nil,
         visualState = buildVisualState(record),
+        pathDebugState = pathDebugState,
         travel = buildTravelSummary(record, false),
     }
 end

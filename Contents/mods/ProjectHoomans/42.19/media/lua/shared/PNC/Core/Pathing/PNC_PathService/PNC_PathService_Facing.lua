@@ -43,25 +43,42 @@ function Internal.clearExpiredCombatFacing(lane, now)
     end
 end
 
-function Internal.shouldApplyFacing(lane, dirX, dirY, now, force)
+function Internal.shouldApplyFacing(
+    lane,
+    dirX,
+    dirY,
+    now,
+    force,
+    owner
+)
     local previousX
     local previousY
     local dot
+    local interval
+    local similarDot
     if force == true or not lane then
         return true
     end
+    interval = owner == "locomotion"
+        and Internal.LOCOMOTION_FACE_REAPPLY_INTERVAL_MS
+        or Internal.FACE_REAPPLY_INTERVAL_MS
+    similarDot = owner == "locomotion"
+        and Internal.LOCOMOTION_FACE_SIMILAR_DOT
+        or Internal.FACE_SIMILAR_DOT
     previousX = tonumber(lane.lastFacingDirX)
     previousY = tonumber(lane.lastFacingDirY)
     if previousX and previousY then
         dot = (previousX * dirX) + (previousY * dirY)
-        if dot >= 0.998 then
+        if dot >= 0.99998 then
             return false
         end
-        if dot >= Internal.FACE_SIMILAR_DOT and (now - (tonumber(lane.lastFacingAt) or 0)) < Internal.FACE_REAPPLY_INTERVAL_MS then
+        if dot >= similarDot
+            and (now - (tonumber(lane.lastFacingAt) or 0)) < interval
+        then
             return false
         end
     end
-    return (now - (tonumber(lane.lastFacingAt) or 0)) >= Internal.FACE_REAPPLY_INTERVAL_MS
+    return (now - (tonumber(lane.lastFacingAt) or 0)) >= interval
         or previousX == nil
         or previousY == nil
 end
@@ -82,7 +99,16 @@ function Internal.applyFacingLocation(zombie, lane, faceX, faceY, now, owner, fo
         return false
     end
     dirX, dirY = Internal.normalizeDirection(dx, dy)
-    if not dirX or not Internal.shouldApplyFacing(lane, dirX, dirY, now, force) then
+    if not dirX
+        or not Internal.shouldApplyFacing(
+            lane,
+            dirX,
+            dirY,
+            now,
+            force,
+            owner
+        )
+    then
         return false
     end
     if zombie.faceLocation then

@@ -16,6 +16,10 @@ local Perception = PNC.Perception
 local Animation = PNC.Animation
 local MoveIntent = PNC.BehaviorMoveIntent
 local TraversalQuery = PNC.TraversalQuery
+local COMBAT_NAVIGATION = {
+    navigationPolicy = "combat",
+    navigationProvider = "direct",
+}
 
 local BANDAGE_ANIM_BY_PART = {
     Head = "BandageHead",
@@ -138,7 +142,8 @@ local function requestRetreat(record, threat)
             record.z,
             "run",
             tonumber(Const.SELF_BANDAGE_RETREAT_STOP_DISTANCE) or 1,
-            "self_treatment_retreat"
+            "self_treatment_retreat",
+            COMBAT_NAVIGATION
         )
     end
     record.activeBehavior = "SelfTreatmentRetreat"

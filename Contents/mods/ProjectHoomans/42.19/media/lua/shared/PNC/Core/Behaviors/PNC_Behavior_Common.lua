@@ -14,6 +14,7 @@ local Const = PNC.Const
 local PathService = PNC.PathService
 local Equipment = PNC.Equipment
 local Combat = PNC.Combat
+local NavigationRouter = PNC.NavigationRouter
 
 local function resolveMoveIntent()
     return PNC.BehaviorMoveIntent
@@ -54,18 +55,105 @@ function Common.GetOwner(record)
     return Core.ResolvePlayerByOnlineID(record.ownerOnlineID) or Core.ResolvePlayerByUsername(record.ownerUsername)
 end
 
-function Common.MoveRecord(record, zombie, tx, ty, tz, mode, stopDistance, reason)
+function Common.MoveRecord(
+    record,
+    zombie,
+    tx,
+    ty,
+    tz,
+    mode,
+    stopDistance,
+    reason,
+    navigationOptions
+)
     local moveReason = reason
         or (record and record.runtime and record.runtime.combatBlockReason)
         or (record and record.activeBehavior and ("move_" .. tostring(record.activeBehavior)))
         or (record and record.activeJob and ("move_" .. tostring(record.activeJob)))
         or "behavior_move"
+    local finalX = tx
+    local finalY = ty
+    local finalZ = tz
+    local policyName
+    local providerName
+    local policy
+    local steeringTarget
+    local intentNavigation = navigationOptions
     if record.presenceState == Const.PRESENCE_LIVE then
+        if NavigationRouter and NavigationRouter.Resolve then
+            policyName, providerName, policy = NavigationRouter.Resolve(
+                record,
+                moveReason,
+                navigationOptions
+            )
+            -- The direct route is allocation-free. This is the normal combat
+            -- and kiting path, where goals can change on every behavior tick.
+            if providerName ~= NavigationRouter.DIRECT_PROVIDER
+                and NavigationRouter.GetSteeringTarget
+            then
+                steeringTarget = NavigationRouter.GetSteeringTarget(
+                    record,
+                    zombie,
+                    {
+                        x = finalX,
+                        y = finalY,
+                        z = finalZ,
+                        mode = mode,
+                        stopDistance = stopDistance,
+                    },
+                    policyName,
+                    providerName,
+                    policy
+                )
+                if steeringTarget then
+                    tx = steeringTarget.x
+                    ty = steeringTarget.y
+                    tz = steeringTarget.z
+                    mode = steeringTarget.mode or mode
+                    stopDistance = steeringTarget.stopDistance
+                        or stopDistance
+                end
+            end
+            if providerName ~= NavigationRouter.DIRECT_PROVIDER then
+                intentNavigation = {
+                    navigationPolicy = policyName,
+                    navigationProvider = providerName,
+                    finalX = finalX,
+                    finalY = finalY,
+                    finalZ = finalZ,
+                    waypointIndex = steeringTarget
+                        and steeringTarget.waypointIndex or nil,
+                    steeringIndex = steeringTarget
+                        and steeringTarget.steeringIndex or nil,
+                    steeringKind = steeringTarget
+                        and steeringTarget.steeringKind or nil,
+                }
+            end
+        end
         if resolveMoveIntent() and resolveMoveIntent().RequestMove then
-            resolveMoveIntent().RequestMove(record, tx, ty, tz, mode, stopDistance, moveReason)
+            resolveMoveIntent().RequestMove(
+                record,
+                tx,
+                ty,
+                tz,
+                mode,
+                stopDistance,
+                moveReason,
+                intentNavigation
+            )
             return true, "move_intent"
         end
-        return PathService.MoveToward(record, zombie, tx, ty, tz, mode, stopDistance, moveReason)
+        return PathService.MoveToward(
+            record,
+            zombie,
+            tx,
+            ty,
+            tz,
+            mode,
+            stopDistance,
+            moveReason,
+            intentNavigation
+        )
     end
     PathService.AdvanceAbstract(record, tx, ty, tz, stopDistance)
     return true, "abstract_move"

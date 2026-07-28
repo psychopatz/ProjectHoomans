@@ -11,6 +11,7 @@ PathService.Internal = PathService.Internal or {}
 
 local Internal = PathService.Internal
 local TraversalQuery = PNC.TraversalQuery
+local TraversalProfiles = PNC.TraversalProfiles
 
 local function normalize2D(dx, dy)
     local len = math.sqrt((dx * dx) + (dy * dy))
@@ -243,6 +244,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     local blockedPassage
     local passageAhead
     local collided
+    local traversalProfile
 
     if not zombie or not getCell then
         return false, nil
@@ -463,17 +465,34 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                                     logTraversalReject(record, zombie, lane, "traversal_rejected", "window_dest_not_progressive", "object=" .. tostring(objectKey or "nil") .. " to=" .. Internal.describeSquare(destSquare))
                                     return false, nil
                                 end
+                                traversalProfile = TraversalProfiles
+                                    and TraversalProfiles.Resolve
+                                    and TraversalProfiles.Resolve(
+                                        "window_climb",
+                                        {
+                                            record = record,
+                                            body = zombie,
+                                            lane = lane,
+                                            obstacle = object,
+                                        },
+                                        "default"
+                                    ) or {}
                                 if not Internal.beginTraversalAction or not Internal.beginTraversalAction(zombie, record, lane, {
                                     kind = "window_climb",
-                                    anim = "PNC_ClimbWindow",
+                                    anim = traversalProfile.anim
+                                        or "PNC_ClimbWindow",
                                     fromX = fromX,
                                     fromY = fromY,
                                     fromZ = fromZ,
                                     toX = destX,
                                     toY = destY,
                                     toZ = destZ,
-                                    travelDurationMs = 700,
-                                    finishHoldMs = 320,
+                                    travelDurationMs = tonumber(
+                                        traversalProfile.travelDurationMs
+                                    ) or 700,
+                                    finishHoldMs = tonumber(
+                                        traversalProfile.finishHoldMs
+                                    ) or 320,
                                 }) then
                                     logTraversalReject(record, zombie, lane, "traversal_rejected", "window_runtime_unavailable", "object=" .. tostring(objectKey or "nil"))
                                     return false, nil
@@ -533,10 +552,29 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
             logTraversalReject(record, zombie, lane, "traversal_rejected", "fence_special_cooldown", "object=" .. tostring(fenceKey))
             return false, nil
         end
-        travelDuration = fence.tall == true and 900 or 600
+        traversalProfile = TraversalProfiles
+            and TraversalProfiles.Resolve
+            and TraversalProfiles.Resolve(
+                "fence_climb",
+                {
+                    record = record,
+                    body = zombie,
+                    lane = lane,
+                    obstacle = fence.object,
+                    tall = fence.tall == true,
+                },
+                fence.tall == true and "tall" or "low"
+            ) or {}
+        travelDuration = tonumber(traversalProfile.travelDurationMs)
+            or (fence.tall == true and 900 or 600)
         if not Internal.beginTraversalAction or not Internal.beginTraversalAction(zombie, record, lane, {
             kind = "fence_climb",
-            anim = fence.tall == true and "PNC_ClimbFenceTall" or "PNC_ClimbFence",
+            anim = traversalProfile.anim
+                or (
+                    fence.tall == true
+                    and "PNC_ClimbFenceTall"
+                    or "PNC_ClimbFence"
+                ),
             fromX = fromX,
             fromY = fromY,
             fromZ = fromZ,
@@ -544,7 +582,8 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
             toY = landingY,
             toZ = landingZ,
             travelDurationMs = travelDuration,
-            finishHoldMs = fence.tall == true and 420 or 320,
+            finishHoldMs = tonumber(traversalProfile.finishHoldMs)
+                or (fence.tall == true and 420 or 320),
         }) then
             logTraversalReject(record, zombie, lane, "traversal_rejected", "fence_runtime_unavailable", "object=" .. tostring(fenceKey))
             return false, nil

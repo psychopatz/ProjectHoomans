@@ -55,6 +55,7 @@ function Internal.ensureMoveLane(record)
     lane.stopDistance = tonumber(lane.stopDistance) or 0.7
     lane.goal = lane.goal or nil
     lane.pendingGoal = lane.pendingGoal or nil
+    lane.pendingGoalAt = tonumber(lane.pendingGoalAt) or 0
     lane.startedAt = tonumber(lane.startedAt) or 0
     lane.lastIssueAt = tonumber(lane.lastIssueAt) or 0
     lane.lastProgressAt = tonumber(lane.lastProgressAt) or 0
@@ -64,6 +65,14 @@ function Internal.ensureMoveLane(record)
     lane.requestedByJob = lane.requestedByJob or nil
     lane.requestedByBehavior = lane.requestedByBehavior or nil
     lane.requestedOrder = lane.requestedOrder or nil
+    lane.navigationPolicy = lane.navigationPolicy or nil
+    lane.navigationProvider = lane.navigationProvider or nil
+    lane.finalGoalX = lane.finalGoalX ~= nil
+        and tonumber(lane.finalGoalX) or nil
+    lane.finalGoalY = lane.finalGoalY ~= nil
+        and tonumber(lane.finalGoalY) or nil
+    lane.finalGoalZ = lane.finalGoalZ ~= nil
+        and tonumber(lane.finalGoalZ) or nil
     lane.lastWarnKey = lane.lastWarnKey or nil
     lane.lastWarnAt = tonumber(lane.lastWarnAt) or 0
     lane.goalRevision = tonumber(lane.goalRevision) or 0
@@ -75,6 +84,15 @@ function Internal.ensureMoveLane(record)
     lane.lastStepAt = tonumber(lane.lastStepAt) or 0
     lane.lastStepDistance = tonumber(lane.lastStepDistance) or 0
     lane.lastStepLabel = lane.lastStepLabel or nil
+    lane.lastProgressDelta = tonumber(lane.lastProgressDelta) or 0
+    lane.goalDistance = lane.goalDistance ~= nil
+        and tonumber(lane.goalDistance) or nil
+    lane.bestGoalDistance = lane.bestGoalDistance ~= nil
+        and tonumber(lane.bestGoalDistance) or nil
+    lane.lastGoalProgressAt = tonumber(lane.lastGoalProgressAt) or 0
+    lane.nonProgressStepCount = tonumber(lane.nonProgressStepCount) or 0
+    lane.lastNavigationInvalidatedAt =
+        tonumber(lane.lastNavigationInvalidatedAt) or 0
     lane.steeringSide = lane.steeringSide ~= nil and tonumber(lane.steeringSide) or nil
     lane.directStepCount = tonumber(lane.directStepCount) or 0
     lane.visualMovingUntil = tonumber(lane.visualMovingUntil) or 0
@@ -212,6 +230,7 @@ function Internal.setLaneGoal(record, lane, goal)
         mode = goal.mode,
         stopDistance = goal.stopDistance,
     }
+    lane.pendingGoalAt = 0
     lane.mode = goal.mode
     lane.stopDistance = goal.stopDistance
     lane.blockReason = nil
@@ -224,6 +243,12 @@ function Internal.setLaneGoal(record, lane, goal)
     lane.lastStepAt = 0
     lane.lastStepDistance = 0
     lane.lastStepLabel = nil
+    lane.lastProgressDelta = 0
+    lane.goalDistance = nil
+    lane.bestGoalDistance = nil
+    lane.lastGoalProgressAt = 0
+    lane.nonProgressStepCount = 0
+    lane.lastNavigationInvalidatedAt = 0
     lane.steeringSide = nil
     lane.directStepCount = 0
     lane.visualMovingUntil = 0
@@ -267,6 +292,47 @@ function Internal.setLaneGoal(record, lane, goal)
     lane.ownerMode = "requested"
 end
 
+function Internal.retargetLaneGoal(record, lane, goal)
+    local now
+    if not lane or not goal then
+        return false
+    end
+    now = Internal.Core.Now()
+    lane.goalRevision = (tonumber(lane.goalRevision) or 0) + 1
+    lane.goal = {
+        x = goal.x,
+        y = goal.y,
+        z = goal.z,
+        mode = goal.mode,
+        stopDistance = goal.stopDistance,
+    }
+    lane.mode = goal.mode
+    lane.stopDistance = goal.stopDistance
+    lane.pendingGoal = nil
+    lane.pendingGoalAt = 0
+    lane.blockReason = nil
+    lane.cancelReason = nil
+    lane.blockedStepFromX = nil
+    lane.blockedStepFromY = nil
+    lane.blockedStepFromZ = nil
+    lane.blockedStepToX = nil
+    lane.blockedStepToY = nil
+    lane.blockedStepToZ = nil
+    lane.blockedStepReason = nil
+    lane.goalDistance = nil
+    lane.bestGoalDistance = nil
+    lane.lastProgressDelta = 0
+    lane.lastProgressAt = now
+    lane.lastGoalProgressAt = now
+    lane.nonProgressStepCount = 0
+    lane.noProgressCount = 0
+    lane.steeringSide = nil
+    lane.directStepCount = 0
+    lane.retargetCount = (tonumber(lane.retargetCount) or 0) + 1
+    lane.lastRetargetAt = now
+    return true
+end
+
 function Internal.captureIntentContext(record, lane, intent)
     if not lane then
         return
@@ -275,18 +341,31 @@ function Internal.captureIntentContext(record, lane, intent)
     lane.requestedByJob = intent and intent.requestedByJob or tostring(record and record.activeJob or "none")
     lane.requestedByBehavior = intent and intent.requestedByBehavior or tostring(record and record.activeBehavior or record and record.activeJob or "none")
     lane.requestedOrder = intent and intent.requestedOrder or tostring(record and record.orderSpec and record.orderSpec.kind or "none")
+    lane.navigationPolicy = intent and intent.navigationPolicy or nil
+    lane.navigationProvider = intent and intent.navigationProvider or nil
+    lane.finalGoalX = intent and tonumber(intent.finalX) or nil
+    lane.finalGoalY = intent and tonumber(intent.finalY) or nil
+    lane.finalGoalZ = intent and tonumber(intent.finalZ) or nil
+    lane.waypointIndex = intent
+        and tonumber(intent.waypointIndex) or nil
+    lane.steeringIndex = intent
+        and tonumber(intent.steeringIndex) or nil
+    lane.steeringKind = intent and intent.steeringKind or nil
 end
 
 function Internal.consumeMoveIntent(record, lane, zombie)
     local runtime = record and record.runtime or nil
     local intent = runtime and runtime.moveIntent or nil
     local goal
+    local continuousSteering
+    local goalsDiffer
     if not runtime then
         return "hold"
     end
     if Internal.isVehicleBlockedGoal(lane, intent) then
         Internal.captureIntentContext(record, lane, intent)
         lane.pendingGoal = nil
+        lane.pendingGoalAt = 0
         lane.cancelReason = "vehicle_path_blocked"
         if lane.phase == "active" or lane.phase == "requested" then
             Internal.setLanePhase(
@@ -308,13 +387,31 @@ function Internal.consumeMoveIntent(record, lane, zombie)
     if lane and lane.traversalAction then
         Internal.captureIntentContext(record, lane, intent)
         if intent and intent.kind ~= "hold" then
-            lane.pendingGoal = Internal.buildGoal(intent.x, intent.y, intent.z, intent.mode, intent.stopDistance)
+            goal = Internal.buildGoal(
+                intent.x,
+                intent.y,
+                intent.z,
+                intent.mode,
+                intent.stopDistance
+            )
+            if not lane.pendingGoal
+                or Internal.goalsDiffer(
+                    lane.pendingGoal,
+                    goal,
+                    lane.mode,
+                    intent.navigationProvider ~= nil and 0.08 or nil
+                )
+            then
+                lane.pendingGoalAt = Internal.Core.Now()
+            end
+            lane.pendingGoal = goal
         end
         return "special_active"
     end
     if not intent or intent.kind == "hold" then
         Internal.captureIntentContext(record, lane, intent)
         lane.pendingGoal = nil
+        lane.pendingGoalAt = 0
         if lane.phase == "active" or lane.phase == "requested" then
             lane.cancelReason = intent and intent.reason or "hold"
             Internal.setLanePhase(record, lane, "cancel_pending", lane.cancelReason)
@@ -328,6 +425,7 @@ function Internal.consumeMoveIntent(record, lane, zombie)
     Internal.captureIntentContext(record, lane, intent)
     if zombie and Internal.isAtGoal(zombie, goal, goal.stopDistance) then
         lane.pendingGoal = nil
+        lane.pendingGoalAt = 0
         lane.goal = goal
         lane.mode = goal.mode
         lane.stopDistance = goal.stopDistance
@@ -347,7 +445,28 @@ function Internal.consumeMoveIntent(record, lane, zombie)
         return "requested"
     end
 
-    if Internal.goalsDiffer(lane.goal, goal, lane.mode) then
+    continuousSteering = intent.navigationProvider ~= nil
+    goalsDiffer = Internal.goalsDiffer(
+        lane.goal,
+        goal,
+        lane.mode,
+        continuousSteering and 0.08 or nil
+    )
+    if goalsDiffer then
+        if continuousSteering and lane.phase == "active" then
+            Internal.retargetLaneGoal(record, lane, goal)
+            return "retargeted"
+        end
+        if not lane.pendingGoal
+            or Internal.goalsDiffer(
+                lane.pendingGoal,
+                goal,
+                lane.mode,
+                continuousSteering and 0.08 or nil
+            )
+        then
+            lane.pendingGoalAt = Internal.Core.Now()
+        end
         lane.pendingGoal = goal
         if lane.phase == "requested" then
             Internal.setLaneGoal(record, lane, goal)

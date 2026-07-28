@@ -467,6 +467,145 @@ function TraversalQuery.CanStep(fromX, fromY, fromZ, toX, toY, toZ, cell)
     return true, "clear"
 end
 
+function TraversalQuery.CanOpenDoor(object)
+    local lockedByKey
+    if not TraversalQuery.IsDoor(object) then
+        return false
+    end
+    if not TraversalQuery.IsClosedPassage(object) then
+        return true
+    end
+    lockedByKey = callFirst(object, { "getLockedByKey" })
+    return not objectBool(object, { "isLocked", "IsLocked" }, false)
+        and not objectBool(object, { "isLockedByKey" }, false)
+        and (
+            lockedByKey == nil
+            or lockedByKey == false
+            or lockedByKey == 0
+            or lockedByKey == ""
+        )
+        and not objectBool(
+            object,
+            { "isBarricaded", "IsBarricaded" },
+            false
+        )
+        and not objectBool(object, { "isObstructed" }, false)
+end
+
+function TraversalQuery.CanUseWindow(object, body)
+    local open
+    local smashed
+    if not TraversalQuery.IsWindow(object) then
+        return false
+    end
+    open = objectBool(object, { "IsOpen", "isOpen" }, false)
+    smashed = objectBool(
+        object,
+        { "isDestroyed", "IsDestroyed", "isSmashed" },
+        false
+    )
+    if not open and not smashed then
+        if objectBool(
+            object,
+            { "isPermaLocked", "IsPermaLocked" },
+            false
+        ) or objectBool(
+            object,
+            { "isBarricaded", "IsBarricaded" },
+            false
+        ) then
+            return false
+        end
+        -- Runtime opens the window before testing the climb. A closed but
+        -- usable window is therefore a valid (and more expensive) route edge.
+        return true
+    end
+    if body and type(object.canClimbThrough) == "function" then
+        local ok
+        local canClimb
+        ok, canClimb = pcall(object.canClimbThrough, object, body)
+        return ok and canClimb == true
+    end
+    return true
+end
+
+-- Planner-only edge classification. This does not start interactions and does
+-- not move the body; it merely exposes the same doors/windows/fences that the
+-- PathService traversal runtime knows how to execute.
+function TraversalQuery.CanPlanStep(
+    fromX,
+    fromY,
+    fromZ,
+    toX,
+    toY,
+    toZ,
+    cell,
+    body,
+    options
+)
+    local canStep
+    local reason
+    local fromSquare
+    local toSquare
+    local passage
+    local fence
+    local tall
+    canStep, reason = TraversalQuery.CanStep(
+        fromX,
+        fromY,
+        fromZ,
+        toX,
+        toY,
+        toZ,
+        cell
+    )
+    if canStep then
+        return true, "walk", 0
+    end
+    if reason ~= "door" and reason ~= "window" and reason ~= "fence" then
+        return false, reason, 0
+    end
+    fromSquare = TraversalQuery.GetSquare(fromX, fromY, fromZ, cell)
+    toSquare = TraversalQuery.GetSquare(toX, toY, toZ, cell)
+    if not fromSquare or not toSquare then
+        return false, "unloaded", 0
+    end
+    if reason == "door" then
+        if options and options.allowDoors == false then
+            return false, reason, 0
+        end
+        passage = TraversalQuery.GetPassageBetween(fromSquare, toSquare)
+        if TraversalQuery.CanOpenDoor(passage) then
+            return true, "door_open", 2
+        end
+        return false, "door_unusable", 0
+    end
+    if reason == "window" then
+        if options and options.allowWindows == false then
+            return false, reason, 0
+        end
+        passage = TraversalQuery.GetPassageBetween(fromSquare, toSquare)
+        if TraversalQuery.CanUseWindow(passage, body) then
+            return true, "window_climb", 5
+        end
+        return false, "window_unusable", 0
+    end
+    if options and options.allowFences == false then
+        return false, reason, 0
+    end
+    fence, tall = TraversalQuery.GetFenceBetween(fromSquare, toSquare)
+    if fence and TraversalQuery.CanTraverseAt(
+        toX,
+        toY,
+        toZ,
+        cell
+    ) then
+        return true, tall and "fence_climb_tall" or "fence_climb",
+            tall and 6 or 3
+    end
+    return false, "fence_unusable", 0
+end
+
 function TraversalQuery.FindFenceAhead(zombie, goalX, goalY, cell)
     local originX
     local originY

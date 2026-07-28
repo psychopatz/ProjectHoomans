@@ -87,6 +87,8 @@ local function applySnapshotFacing(zombie, snapshot)
     local dot
     local authoritativeDirX
     local authoritativeDirY
+    local locomotionFacing
+    local facingElapsed
     if not zombie or not snapshot then
         return false
     end
@@ -140,13 +142,44 @@ local function applySnapshotFacing(zombie, snapshot)
     dirX = dirX / len
     dirY = dirY / len
     now = Core.Now()
+    locomotionFacing = visualState.moving == true
+        and visualState.attackActive ~= true
+        and visualState.stationaryFacing ~= true
     facingKey = tostring(snapshot.id or zombie)
     facingState = Sync.FacingByID[facingKey]
     if facingState and facingState.body == zombie then
         dot = (tonumber(facingState.dirX) or 0) * dirX
             + (tonumber(facingState.dirY) or 0) * dirY
-        if (dot >= 0.998 and (now - (tonumber(facingState.appliedAt) or 0)) < (tonumber(Const.CLIENT_FACING_REASSERT_MS) or 220))
-            or (dot >= 0.985 and (now - (tonumber(facingState.appliedAt) or 0)) < 120)
+        facingElapsed = now
+            - (tonumber(facingState.appliedAt) or 0)
+        if locomotionFacing and (
+            dot >= 0.99998
+            or facingElapsed
+                < (
+                    tonumber(
+                        Const.CLIENT_LOCOMOTION_FACING_MS
+                    ) or 40
+                )
+        )
+        then
+            return false
+        end
+        if not locomotionFacing
+            and (
+                (
+                    dot >= 0.998
+                    and facingElapsed
+                        < (
+                            tonumber(
+                                Const.CLIENT_FACING_REASSERT_MS
+                            ) or 220
+                        )
+                )
+                or (
+                    dot >= 0.985
+                    and facingElapsed < 120
+                )
+            )
         then
             return false
         end

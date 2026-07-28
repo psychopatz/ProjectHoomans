@@ -18,6 +18,7 @@ function Internal.finalizeCancel(zombie, record, lane)
         Internal.hardResetMoveOwner(zombie, preserveVisualMotion)
     end
     lane.pendingGoal = nil
+    lane.pendingGoalAt = 0
     lane.lastIssueAt = 0
     lane.lastProgressAt = 0
     lane.startedAt = 0
@@ -28,6 +29,11 @@ function Internal.finalizeCancel(zombie, record, lane)
     lane.lastStepAt = 0
     lane.lastStepDistance = 0
     lane.lastStepLabel = nil
+    lane.lastProgressDelta = 0
+    lane.goalDistance = nil
+    lane.bestGoalDistance = nil
+    lane.lastGoalProgressAt = now
+    lane.nonProgressStepCount = 0
     lane.steeringSide = nil
     lane.directStepCount = 0
     lane.lastSuppressAudioAt = 0
@@ -77,6 +83,16 @@ function Internal.startRequestedMove(zombie, record, lane)
     lane.lastStepAt = 0
     lane.lastStepDistance = 0
     lane.lastStepLabel = nil
+    lane.lastProgressDelta = 0
+    lane.goalDistance = Internal.Core.Distance(
+        zombie:getX(),
+        zombie:getY(),
+        goal.x,
+        goal.y
+    )
+    lane.bestGoalDistance = lane.goalDistance
+    lane.lastGoalProgressAt = now
+    lane.nonProgressStepCount = 0
     lane.steeringSide = nil
     lane.directStepCount = 0
     if not preserveVisualMotion then
@@ -103,6 +119,7 @@ function Internal.completeMove(zombie, record, lane, phase, reason)
         Internal.hardResetMoveOwner(zombie, preserveVisualMotion)
     end
     lane.pendingGoal = nil
+    lane.pendingGoalAt = 0
     lane.startedAt = 0
     lane.lastIssueAt = 0
     lane.lastProgressAt = 0
@@ -149,6 +166,7 @@ function Internal.refreshPendingGoal(zombie, record, lane, reason)
     end
     Internal.setLaneGoal(record, lane, lane.pendingGoal)
     lane.pendingGoal = nil
+    lane.pendingGoalAt = 0
     Internal.setLanePhase(record, lane, "requested", reason or "refresh")
     return Internal.startRequestedMove(zombie, record, lane)
 end
@@ -345,7 +363,11 @@ function Internal.updateActiveMove(zombie, record, lane)
         end
     end
 
-    if lane.pendingGoal and (now - (tonumber(lane.lastIssueAt) or 0)) >= Internal.GOAL_REFRESH_DELAY_MS then
+    if lane.pendingGoal
+        and (
+            now - (tonumber(lane.pendingGoalAt) or now)
+        ) >= Internal.GOAL_REFRESH_DELAY_MS
+    then
         return Internal.refreshPendingGoal(zombie, record, lane, "goal_refresh")
     end
 
@@ -383,13 +405,37 @@ function Internal.updateActiveMove(zombie, record, lane)
         return true, "moving"
     end
 
-    if stepResult == "blocked" or stepResult == "interaction_blocked" then
-        lane.blockReason = "fake_step_blocked"
+    if stepResult == "blocked"
+        or stepResult == "interaction_blocked"
+        or stepResult == "stalled"
+    then
+        lane.blockReason = stepResult == "stalled"
+            and "no_goal_progress" or "fake_step_blocked"
+        if stepResult == "stalled"
+            and now - (tonumber(lane.lastNavigationInvalidatedAt) or 0)
+                >= 500
+            and PNC.NavigationRouter
+            and PNC.NavigationRouter.Invalidate
+        then
+            PNC.NavigationRouter.Invalidate(
+                record,
+                "fake_locomotion_stalled"
+            )
+            lane.lastNavigationInvalidatedAt = now
+        end
         Internal.logMoveDebug(record, zombie, lane, "step_blocked", stepResult, "dist=" .. string.format("%.3f", tonumber(stepDistance) or 0))
     end
 
     if stepResult ~= "throttle"
-        and ((stepResult == "blocked" or stepResult == "interaction_blocked") or (now - (tonumber(lane.lastProgressAt) or 0)) >= Internal.INTERACTION_STALL_MS)
+        and (
+            (
+                stepResult == "blocked"
+                or stepResult == "interaction_blocked"
+                or stepResult == "stalled"
+            )
+            or (now - (tonumber(lane.lastProgressAt) or 0))
+                >= Internal.INTERACTION_STALL_MS
+        )
     then
         interacted, interactType = Internal.tryDoorOrWindowInteraction(zombie, record, lane, goal.x, goal.y, goal.z)
         if interacted then
@@ -415,7 +461,10 @@ function Internal.updateActiveMove(zombie, record, lane)
             Internal.logMoveDebug(record, zombie, lane, "interact", interactType or "door_or_window", "")
             return true, interactType or "interact"
         end
-        if stepResult == "blocked" or stepResult == "interaction_blocked" then
+        if stepResult == "blocked"
+            or stepResult == "interaction_blocked"
+            or stepResult == "stalled"
+        then
             Internal.logMoveDebug(record, zombie, lane, "interact_rejected", stepResult, "goal=" .. Internal.describeGoal(goal))
         end
     end
@@ -447,7 +496,17 @@ function PathService.Reset(zombie, record)
     Internal.hardResetMoveOwner(zombie)
 end
 
-function PathService.MoveToward(record, zombie, targetX, targetY, targetZ, mode, stopDistance, reason)
+function PathService.MoveToward(
+    record,
+    zombie,
+    targetX,
+    targetY,
+    targetZ,
+    mode,
+    stopDistance,
+    reason,
+    navigation
+)
     local intent
     record.runtime = record.runtime or {}
     intent = record.runtime.moveIntent
@@ -472,6 +531,19 @@ function PathService.MoveToward(record, zombie, targetX, targetY, targetZ, mode,
     intent.combatReason = tostring(
         record.runtime.combatBlockReason or "none"
     )
+    intent.navigationPolicy = navigation
+        and navigation.navigationPolicy or nil
+    intent.navigationProvider = navigation
+        and navigation.navigationProvider or nil
+    intent.finalX = navigation and tonumber(navigation.finalX) or intent.x
+    intent.finalY = navigation and tonumber(navigation.finalY) or intent.y
+    intent.finalZ = navigation and tonumber(navigation.finalZ) or intent.z
+    intent.waypointIndex = navigation
+        and tonumber(navigation.waypointIndex) or nil
+    intent.steeringIndex = navigation
+        and tonumber(navigation.steeringIndex) or nil
+    intent.steeringKind = navigation
+        and tostring(navigation.steeringKind or "") or nil
     intent.updatedAt = Internal.Core.Now()
     if zombie and Internal.isAtGoal(zombie, Internal.buildGoal(targetX, targetY, targetZ, mode, stopDistance), stopDistance) then
         return true, "arrived"

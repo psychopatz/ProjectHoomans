@@ -15,6 +15,10 @@ local Equipment = PNC.Equipment
 local Tactics = PNC.CombatTactics
 local Common = PNC.BehaviorCommon
 local PathService = PNC.PathService
+local COMBAT_NAVIGATION = {
+    navigationPolicy = "combat",
+    navigationProvider = "direct",
+}
 
 function BehaviorCombat.TickCommittedAction(record, zombie)
     local equipmentInfo
@@ -165,7 +169,8 @@ function BehaviorCombat.TickEngage(record, zombie, target)
             target.z,
             Common.ResolveCombatApproachMode(dist, "walk"),
             0.75,
-            target.visible == false and "investigating_last_seen" or "approaching_visible_window"
+            target.visible == false and "investigating_last_seen" or "approaching_visible_window",
+            COMBAT_NAVIGATION
         )
         Common.SetCombatDebug(
             record,
@@ -235,7 +240,8 @@ function BehaviorCombat.TickEngage(record, zombie, target)
                 target.z,
                 Common.ResolveCombatApproachMode(dist, approachMode or "run"),
                 approachStopDistance or Const.MELEE_RANGE,
-                "closing_to_melee"
+                "closing_to_melee",
+                COMBAT_NAVIGATION
             )
             Common.SetCombatDebug(record, target, "closing_to_melee", effectiveMode, equipmentInfo.weaponStatus)
             return
@@ -288,7 +294,8 @@ function BehaviorCombat.TickEngage(record, zombie, target)
                 target.z,
                 Common.ResolveCombatApproachMode(dist, "run"),
                 Const.RANGED_RANGE * 0.8,
-                "closing_to_range"
+                "closing_to_range",
+                COMBAT_NAVIGATION
             )
             Common.SetCombatDebug(record, target, "closing_to_range", effectiveMode, equipmentInfo.weaponStatus)
             return
@@ -364,7 +371,8 @@ function BehaviorCombat.TickEngage(record, zombie, target)
             target.z,
             Common.ResolveCombatApproachMode(dist, "run"),
             Const.RANGED_RANGE * 0.85,
-            "closing_to_range"
+            "closing_to_range",
+            COMBAT_NAVIGATION
         )
         Common.SetCombatDebug(record, target, "closing_to_range", "mixed", equipmentInfo.weaponStatus)
         return

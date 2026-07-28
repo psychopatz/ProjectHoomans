@@ -16,6 +16,10 @@ local Spatial = PNC.SpatialIndex
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local TraversalQuery = PNC.TraversalQuery
+local COMBAT_NAVIGATION = {
+    navigationPolicy = "combat",
+    navigationProvider = "direct",
+}
 
 local function ensureRetreatState(record)
     local runtime
@@ -49,11 +53,30 @@ end
 local function requestMove(record, zombie, x, y, z, mode, stopDistance, reason)
     local MoveIntent = PNC.BehaviorMoveIntent
     if MoveIntent and MoveIntent.RequestMove and record and record.presenceState == Const.PRESENCE_LIVE then
-        MoveIntent.RequestMove(record, x, y, z, mode, stopDistance, reason)
+        MoveIntent.RequestMove(
+            record,
+            x,
+            y,
+            z,
+            mode,
+            stopDistance,
+            reason,
+            COMBAT_NAVIGATION
+        )
         return true
     end
     if PathService and PathService.MoveToward then
-        return PathService.MoveToward(record, zombie, x, y, z, mode, stopDistance, reason)
+        return PathService.MoveToward(
+            record,
+            zombie,
+            x,
+            y,
+            z,
+            mode,
+            stopDistance,
+            reason,
+            COMBAT_NAVIGATION
+        )
     end
     return false
 end

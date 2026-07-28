@@ -126,4 +126,38 @@ local rendererSource = rendererFile:read("*a")
 rendererFile:close()
 assertNotContains(rendererSource, "entry.hpText", "numeric HP rendering returned")
 
+dofile(rendererPath)
+local pathLines = PNC.NameplateRenderer.BuildPathDebugLines({
+    navigationPolicy = "local",
+    navigationProvider = "local_path",
+    navigationPlanReason = "planned",
+    navigationSteeringKind = "waypoint",
+    navigationPathIndex = 2,
+    navigationSteeringIndex = 4,
+    navigationPathLength = 7,
+    navigationTraversalKind = "window_climb",
+    movePhase = "active",
+    moveMode = "walk",
+    moveLastStep = "slide_preferred",
+    moveGoalDistance = 0.82,
+    moveNonProgressSteps = 4,
+    moveRetargetCount = 3,
+    moveSteeringTurnDot = 0,
+    moveBlockReason = "no_goal_progress",
+    navigationInvalidationReason = "fake_locomotion_stalled",
+})
+assertContains(pathLines[1], "NAV local/local_path", "path algorithm")
+assertContains(pathLines[1], "wp=2/7", "path waypoint")
+assertContains(pathLines[1], "aim=4", "path look-ahead waypoint")
+assertContains(pathLines[1], "window_climb", "path action edge")
+assertContains(pathLines[2], "np=4", "path non-progress counter")
+assertContains(pathLines[2], "rt=3", "path retarget counter")
+assertContains(pathLines[2], "turn=90", "path turn angle")
+assertContains(pathLines[3], "no_goal_progress", "path block reason")
+assertContains(
+    pathLines[3],
+    "fake_locomotion_stalled",
+    "path replan reason"
+)
+
 print("pnc_nameplate_debug_smoke: ok")

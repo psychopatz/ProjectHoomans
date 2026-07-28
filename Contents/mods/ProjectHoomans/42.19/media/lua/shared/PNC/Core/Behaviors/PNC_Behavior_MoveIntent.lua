@@ -16,7 +16,16 @@ local function ensureRuntime(record)
     return record.runtime
 end
 
-function MoveIntent.RequestMove(record, x, y, z, mode, stopDistance, reason)
+function MoveIntent.RequestMove(
+    record,
+    x,
+    y,
+    z,
+    mode,
+    stopDistance,
+    reason,
+    navigation
+)
     local runtime
     local intent
     if not record then
@@ -43,6 +52,19 @@ function MoveIntent.RequestMove(record, x, y, z, mode, stopDistance, reason)
         record.orderSpec and record.orderSpec.kind or "none"
     )
     intent.combatReason = tostring(runtime.combatBlockReason or "none")
+    intent.navigationPolicy = navigation
+        and navigation.navigationPolicy or nil
+    intent.navigationProvider = navigation
+        and navigation.navigationProvider or nil
+    intent.finalX = navigation and tonumber(navigation.finalX) or intent.x
+    intent.finalY = navigation and tonumber(navigation.finalY) or intent.y
+    intent.finalZ = navigation and tonumber(navigation.finalZ) or intent.z
+    intent.waypointIndex = navigation
+        and tonumber(navigation.waypointIndex) or nil
+    intent.steeringIndex = navigation
+        and tonumber(navigation.steeringIndex) or nil
+    intent.steeringKind = navigation
+        and tostring(navigation.steeringKind or "") or nil
     intent.updatedAt = Core.Now()
     return true
 end

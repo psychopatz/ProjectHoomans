@@ -309,4 +309,29 @@ assertEqual(intentState, "requested", "goal released after vehicle moved")
 assertEqual(lane.phase, "requested", "released goal restarts lane")
 assertEqual(lane.vehicleBlockedGoalX, nil, "vehicle quarantine cleared")
 
+lane.phase = "active"
+lane.lastStepAt = 777
+record.runtime.moveIntent.x = 9.5
+record.runtime.moveIntent.navigationPolicy = "travel"
+record.runtime.moveIntent.navigationProvider = "local_path"
+record.runtime.moveIntent.waypointIndex = 2
+record.runtime.moveIntent.steeringIndex = 3
+intentState = PNC.PathService.Internal.consumeMoveIntent(
+    record,
+    lane,
+    body
+)
+assertEqual(
+    intentState,
+    "retargeted",
+    "adjacent local waypoint retarget"
+)
+assertEqual(lane.goal.x, 9.5, "active lane adopted new waypoint")
+assertEqual(
+    lane.lastStepAt,
+    777,
+    "continuous retarget reset movement cadence"
+)
+assertEqual(lane.steeringIndex, 3, "look-ahead index captured")
+
 print("pnc_vehicle_pathing_smoke: ok")

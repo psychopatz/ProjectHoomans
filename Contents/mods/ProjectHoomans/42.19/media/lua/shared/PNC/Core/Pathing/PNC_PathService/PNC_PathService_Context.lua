@@ -35,7 +35,9 @@ Internal.TRAVERSAL_PROGRESS_CLEAR_DISTANCE = 1.35
 Internal.RUN_START_DISTANCE = 4.50
 Internal.RUN_STOP_DISTANCE = 2.90
 Internal.FACE_REAPPLY_INTERVAL_MS = 90
+Internal.LOCOMOTION_FACE_REAPPLY_INTERVAL_MS = 40
 Internal.FACE_SIMILAR_DOT = 0.985
+Internal.LOCOMOTION_FACE_SIMILAR_DOT = 0.99985
 Internal.FACE_MIN_DISTANCE_SQ = 0.0036
 Internal.COMBAT_FACING_DEFAULT_MS = 180
 Internal.NON_LOCOMOTION_RECOVERY_MS = 240
@@ -569,12 +571,21 @@ function Internal.getStopDistanceClass(stopDistance)
     return "wide"
 end
 
-function Internal.goalsDiffer(currentGoal, nextGoal, currentMode)
+function Internal.goalsDiffer(
+    currentGoal,
+    nextGoal,
+    currentMode,
+    coordinateTolerance
+)
     local tolerance
     if not currentGoal or not nextGoal then
         return true
     end
-    tolerance = Internal.getGoalTolerance(currentMode or nextGoal.mode, nextGoal.stopDistance)
+    tolerance = tonumber(coordinateTolerance)
+        or Internal.getGoalTolerance(
+            currentMode or nextGoal.mode,
+            nextGoal.stopDistance
+        )
     return math.abs((currentGoal.x or 0) - (nextGoal.x or 0)) > tolerance
         or math.abs((currentGoal.y or 0) - (nextGoal.y or 0)) > tolerance
         or (currentGoal.z or 0) ~= (nextGoal.z or 0)
