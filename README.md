@@ -40,6 +40,9 @@ local journey, reason = PNC.API.Travel.Start(npcId, {
     ownerMod = "MyMod",
     ownerRef = "delivery:42",
     metadata = { purpose = "delivery" },
+    -- Optional. When omitted, arrival becomes an area-roam order centered on
+    -- the destination using the framework's default roam radius.
+    arrivalAction = { type = "roam", radius = 8 },
 })
 ```
 
@@ -47,10 +50,36 @@ local journey, reason = PNC.API.Travel.Start(npcId, {
 remaining distance, ETA in world hours, owner fields, and copied metadata.
 Journeys can be paused, resumed, cancelled, or retargeted while retaining their
 stable journey ID. Extensions can register route providers, speed profiles,
-travel listeners, client visibility filters, and independent ordered map
-layers; each registration type has a matching unregister operation for safe
-mod reloads. Canonical journey state remains server-owned and persists
+arrival handlers, travel listeners, client visibility filters, and independent
+ordered map layers; each registration type has a matching unregister operation
+for safe mod reloads. Canonical journey state remains server-owned and persists
 independently of whether the NPC currently has a live engine body.
+
+Arrival actions are serializable handler IDs plus configuration, so they work
+across saves and multiplayer without persisting Lua functions. For example, a
+trading integration can register its behavior once:
+
+```lua
+PNC.API.Travel.RegisterArrivalHandler("trading",
+    function(record, journey, action)
+        -- Install the trading mod's own order/job here.
+        DynamicTrading.StartAtMarket(record.id, action.marketID)
+        return true, "trading_started"
+    end
+)
+
+PNC.API.Travel.Start(npcId, {
+    destination = marketLocation,
+    arrivalAction = {
+        type = "trading",
+        marketID = "west_point_hardware",
+    },
+})
+```
+
+An omitted action defaults to roaming, `{ type = "roam", radius = 12 }`
+overrides its radius, and `{ type = "none" }` deliberately leaves the arrived
+journey without a follow-up order.
 
 ## Map command framework
 

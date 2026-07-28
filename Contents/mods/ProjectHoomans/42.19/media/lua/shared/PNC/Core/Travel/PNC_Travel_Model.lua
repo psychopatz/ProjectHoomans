@@ -9,6 +9,7 @@ local Const = PNC.Const
 local Core = PNC.Core
 local Route = PNC.Travel.Route
 local Providers = PNC.Travel.Providers
+local Arrivals = PNC.Travel.Arrivals
 
 Model.ActiveStates = {
     planned = true,
@@ -86,6 +87,10 @@ function Model.New(record, request, worldHour)
         request,
         route.totalDistance
     )
+    local arrivalAction = request.arrivalAction
+    if arrivalAction == nil then
+        arrivalAction = request.onArrival
+    end
     local id = request.journeyId
         or Core.GenerateID("journey")
     local journey = {
@@ -121,6 +126,10 @@ function Model.New(record, request, worldHour)
         controller = record.presenceState == Const.PRESENCE_LIVE
             and "live" or "abstract",
         metadata = Model.CopyMetadata(request.metadata),
+        arrivalAction = Arrivals and Arrivals.Normalize
+            and Arrivals.Normalize(arrivalAction)
+            or { type = "roam" },
+        arrivalHandled = false,
         revision = 1,
         lastStateReason = "started",
     }
@@ -148,6 +157,7 @@ function Model.Normalize(raw, record, worldHour)
         arrivalRadius = raw.arrivalRadius,
         visibility = raw.visibility,
         metadata = raw.metadata,
+        arrivalAction = raw.arrivalAction,
     }
     local journey = Model.New(
         record,
@@ -188,6 +198,13 @@ function Model.Normalize(raw, record, worldHour)
         or journey.lastAdvancedWorldHour
     journey.arrivedWorldHour = tonumber(raw.arrivedWorldHour)
     journey.pausedWorldHour = tonumber(raw.pausedWorldHour)
+    journey.arrivalHandled = raw.arrivalHandled == true
+    journey.arrivalHandledBy = raw.arrivalHandledBy
+        and tostring(raw.arrivalHandledBy)
+        or nil
+    journey.arrivalHandledReason = raw.arrivalHandledReason
+        and tostring(raw.arrivalHandledReason)
+        or nil
     journey.controller = tostring(raw.controller or "abstract")
     journey.revision = math.max(1, math.floor(tonumber(raw.revision) or 1))
     journey.routeVersion = math.max(
@@ -232,6 +249,12 @@ function Model.BuildSummary(journey, includeRoute)
         revision = journey.revision,
         lastStateReason = journey.lastStateReason,
         metadata = Model.CopyMetadata(journey.metadata),
+        arrivalAction = Arrivals and Arrivals.Normalize
+            and Arrivals.Normalize(journey.arrivalAction)
+            or Model.CopyMetadata(journey.arrivalAction),
+        arrivalHandled = journey.arrivalHandled == true,
+        arrivalHandledBy = journey.arrivalHandledBy,
+        arrivalHandledReason = journey.arrivalHandledReason,
     }
     if includeRoute ~= false then
         summary.route = {

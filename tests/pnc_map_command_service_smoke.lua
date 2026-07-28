@@ -51,7 +51,13 @@ local result = PNC.MapCommandService.Execute(nil, {
     commandID = "travel",
     npcIds = { "one", "two", "missing" },
     target = { x = 100, y = 200, z = 0 },
-    options = { speedProfile = "walk" },
+    options = {
+        speedProfile = "walk",
+        arrivalAction = {
+            type = "trading",
+            marketID = "fixture-market",
+        },
+    },
 }, {
     debugAuthorized = true,
 })
@@ -61,6 +67,9 @@ assert(#starts == 2, "travel map command did not start both journeys")
 assert(starts[1].request.destination.x == 100
     and starts[1].request.ownerRef == "debug_map_command",
     "travel map command lost its destination or ownership metadata")
+assert(starts[1].request.arrivalAction.type == "trading"
+    and starts[1].request.arrivalAction.marketID == "fixture-market",
+    "travel map command lost its arrival action")
 
 local invalid = PNC.MapCommandService.Execute(nil, {
     commandID = "travel",

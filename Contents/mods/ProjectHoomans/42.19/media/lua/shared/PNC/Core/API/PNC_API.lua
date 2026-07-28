@@ -475,6 +475,7 @@ function API.Travel.GetCapabilities()
         clientProjection = true,
         routeProviders = true,
         speedProfiles = true,
+        arrivalActions = true,
         mapDirectory = true,
     }
 end
@@ -543,6 +544,14 @@ end
 
 function API.Travel.UnregisterSpeedProfile(id)
     return PNC.Travel.Providers.UnregisterSpeedProfile(id)
+end
+
+function API.Travel.RegisterArrivalHandler(id, handler)
+    return PNC.Travel.Arrivals.RegisterHandler(id, handler)
+end
+
+function API.Travel.UnregisterArrivalHandler(id)
+    return PNC.Travel.Arrivals.UnregisterHandler(id)
 end
 
 function API.Travel.RegisterListener(eventName, listener)

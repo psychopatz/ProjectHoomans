@@ -16,6 +16,7 @@ local Const = PNC.Const
 local Model = PNC.Travel.Model
 local Projection = PNC.Travel.Projection
 local Route = PNC.Travel.Route
+local Arrivals = PNC.Travel.Arrivals
 
 Service.Listeners = Service.Listeners or {}
 Service.LastPositionRefreshAt = Service.LastPositionRefreshAt or 0
@@ -120,6 +121,35 @@ function Service.Emit(eventName, record, journey, reason)
     end
 end
 
+function Service.EnsureArrivalHandled(recordOrID, reason, replicate)
+    local record = resolveRecord(recordOrID)
+    local journey = record and record.travel or nil
+    local wasHandled
+    local handled
+    local handledReason
+    if not journey or journey.state ~= "arrived" then
+        return false, "not_arrived"
+    end
+    if not Arrivals or not Arrivals.Dispatch then
+        return false, "arrival_dispatch_unavailable"
+    end
+    wasHandled = journey.arrivalHandled == true
+    handled, handledReason = Arrivals.Dispatch(
+        record,
+        journey,
+        reason or "arrived"
+    )
+    if handled and not wasHandled and replicate ~= false then
+        markChanged(
+            record,
+            "order",
+            "travel_arrival",
+            false
+        )
+    end
+    return handled, handledReason
+end
+
 function Service.Get(recordOrID)
     local record = resolveRecord(recordOrID)
     return record and record.travel or nil
@@ -157,6 +187,13 @@ function Service.Start(recordOrID, request)
     record.x = journey.x or record.x
     record.y = journey.y or record.y
     record.z = journey.z or record.z
+    if journey.state == "arrived" then
+        Service.EnsureArrivalHandled(
+            record,
+            "already_at_destination",
+            false
+        )
+    end
     markChanged(record, "travel", "travel_started", true)
     if PNC.SimulationClock and PNC.SimulationClock.Wake then
         PNC.SimulationClock.Wake(record, nil, Core.Now())
@@ -169,7 +206,12 @@ function Service.Start(recordOrID, request)
     end
     Service.Emit("started", record, journey, "started")
     if journey.state == "arrived" then
-        Service.Emit("arrived", record, journey, "already_at_destination")
+        Service.Emit(
+            "arrived",
+            record,
+            journey,
+            "already_at_destination"
+        )
     end
     return journey
 end
@@ -185,13 +227,23 @@ function Service.SetState(record, state, reason)
     journey.revision = (tonumber(journey.revision) or 0) + 1
     if state == "arrived" then
         journey.arrivedWorldHour = worldHour()
+        Service.EnsureArrivalHandled(
+            record,
+            reason or "arrived",
+            false
+        )
     elseif state == "paused" then
         journey.pausedWorldHour = worldHour()
     end
     markChanged(record, "travel", "travel_state", false)
     Service.Emit("state_changed", record, journey, previous .. ":" .. state)
     if state == "arrived" then
-        Service.Emit("arrived", record, journey, reason or "arrived")
+        Service.Emit(
+            "arrived",
+            record,
+            journey,
+            reason or "arrived"
+        )
     elseif state == "cancelled" then
         Service.Emit("cancelled", record, journey, reason or "cancelled")
     end
@@ -253,6 +305,9 @@ function Service.Retarget(recordOrID, request)
     request.ownerRef = request.ownerRef or previous.ownerRef
     request.visibility = request.visibility or previous.visibility
     request.metadata = request.metadata or previous.metadata
+    if request.arrivalAction == nil and request.onArrival == nil then
+        request.arrivalAction = previous.arrivalAction
+    end
     local replacement = Model.New(record, request, worldHour())
     replacement.routeVersion = (tonumber(previous.routeVersion) or 0) + 1
     replacement.revision = (tonumber(previous.revision) or 0) + 1
@@ -293,6 +348,13 @@ function Service.Advance(recordOrID, atWorldHour)
     if previousState ~= journey.state then
         journey.revision = (tonumber(journey.revision) or 0) + 1
         journey.lastStateReason = journey.state
+        if journey.state == "arrived" then
+            Service.EnsureArrivalHandled(
+                record,
+                "route_complete",
+                false
+            )
+        end
         markChanged(record, "travel", "travel_state", false)
         Service.Emit(
             "state_changed",
@@ -301,8 +363,15 @@ function Service.Advance(recordOrID, atWorldHour)
             previousState .. ":" .. tostring(journey.state)
         )
         if journey.state == "arrived" then
-            Service.Emit("arrived", record, journey, "route_complete")
+            Service.Emit(
+                "arrived",
+                record,
+                journey,
+                "route_complete"
+            )
         end
+    elseif journey.state == "arrived" then
+        Service.EnsureArrivalHandled(record, "arrival_recovery")
     end
     return projected, changed
 end
@@ -381,6 +450,13 @@ function Service.ReachCurrentWaypoint(recordOrID, atWorldHour)
     journey.segmentProgress = projected.segmentProgress
     journey.revision = (tonumber(journey.revision) or 0) + 1
     Projection.UpdateETA(journey, journey.lastAdvancedWorldHour)
+    if journey.state == "arrived" then
+        Service.EnsureArrivalHandled(
+            record,
+            "route_complete",
+            false
+        )
+    end
     markChanged(record, "travel", "travel_waypoint", false)
     if previous ~= journey.state then
         Service.Emit(
@@ -391,7 +467,12 @@ function Service.ReachCurrentWaypoint(recordOrID, atWorldHour)
         )
     end
     if journey.state == "arrived" then
-        Service.Emit("arrived", record, journey, "route_complete")
+        Service.Emit(
+            "arrived",
+            record,
+            journey,
+            "route_complete"
+        )
     end
     return true, journey.state
 end
@@ -452,6 +533,9 @@ function Service.TickLive(recordOrID, body, atWorldHour)
             journey,
             previousState .. ":" .. journey.state
         )
+    end
+    if journey.state == "arrived" then
+        Service.EnsureArrivalHandled(record, "live_arrival")
     end
     Projection.UpdateETA(journey, atWorldHour)
     return Service.GetCurrentTarget(record), journey.state

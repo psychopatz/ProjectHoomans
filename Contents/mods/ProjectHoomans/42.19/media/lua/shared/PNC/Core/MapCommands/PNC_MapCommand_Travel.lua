@@ -32,6 +32,8 @@ Service.RegisterHandler("travel", {
                     ownerMod = "ProjectHoomans",
                     ownerRef = options.ownerRef or "debug_map_command",
                     visibility = options.visibility or "all",
+                    arrivalAction = options.arrivalAction
+                        or options.onArrival,
                     metadata = {
                         source = "map_command",
                         commandID = "travel",
