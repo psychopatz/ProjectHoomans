@@ -76,6 +76,16 @@ function View.CreateChildren(window)
         id = "track", title = Support.Tr("UI_PNC_MonitorTrack", "Track"), target = window,
         onclick = ISPNCNPCMonitor.onTrack, variant = "quiet",
     }, window.topControls)
+    window.commandMap = createToolbarButton(window, {
+        id = "command_map",
+        title = Support.Tr(
+            "UI_PNC_MonitorCommandMap",
+            "Command Map"
+        ),
+        target = window,
+        onclick = ISPNCNPCMonitor.onCommandMap,
+        variant = "selected",
+    }, window.topControls)
     window.teleport = createToolbarButton(window, {
         id = "teleport", title = Support.Tr("UI_PNC_MonitorTeleport", "Teleport"), target = window,
         onclick = ISPNCNPCMonitor.onTeleport,

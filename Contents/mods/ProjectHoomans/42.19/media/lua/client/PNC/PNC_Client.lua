@@ -423,6 +423,14 @@ local function mergeSnapshot(current, incoming)
     if type(current) ~= "table" then
         return incoming
     end
+    if type(incoming) == "table"
+        and type(incoming.travel) == "table"
+        and incoming.travel.route == nil
+        and type(current.travel) == "table"
+        and current.travel.route ~= nil
+    then
+        incoming.travel.route = current.travel.route
+    end
     for key, _ in pairs(incoming or {}) do
         current[key] = incoming[key]
     end
@@ -523,14 +531,10 @@ function Client.HandleServerCommand(command, args)
                 end
             elseif entry.snapshot and entry.snapshot.id then
                 local current = ClientState.snapshots[entry.snapshot.id]
-                if not current or not current.visualState then
-                    ClientState.snapshots[entry.snapshot.id] = entry.snapshot
-                else
-                    current.displayName = entry.snapshot.displayName
-                    current.name = entry.snapshot.name
-                    current.faction = entry.snapshot.faction
-                    current.recruited = entry.snapshot.recruited
-                end
+                ClientState.snapshots[entry.snapshot.id] = mergeSnapshot(
+                    current,
+                    entry.snapshot
+                )
             end
         end
         ClientState.rosterRevision = args and args.directoryRevision or ClientState.rosterRevision
@@ -570,6 +574,13 @@ function Client.HandleServerCommand(command, args)
         ClientState.inventoryResult = Core.DeepCopy(args or {})
         if PNC.InventoryWindow and PNC.InventoryWindow.OnResult then
             PNC.InventoryWindow.OnResult(ClientState.inventoryResult)
+        end
+        return
+    end
+
+    if command == Const.CMD_MAP_COMMAND_RESULT then
+        if PNC.MapCommands and PNC.MapCommands.HandleResult then
+            PNC.MapCommands.HandleResult(args or {})
         end
         return
     end
@@ -658,6 +669,44 @@ function Client.SendDebug(action, payload)
         return PNC.API.DebugCommand(args.id, action, args)
     end
     return false
+end
+
+function Client.SendMapCommand(commandID, npcIds, target, options)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local args = {
+        requestId = Core.GenerateID
+            and Core.GenerateID("map_command") or tostring(Core.Now()),
+        commandID = tostring(commandID or ""),
+        npcIds = Core.DeepCopy(npcIds or {}),
+        target = Core.DeepCopy(target or {}),
+        options = Core.DeepCopy(options or {}),
+    }
+    if args.commandID == "" or #args.npcIds <= 0 then return false end
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not player or not sendClientCommand then return false end
+        sendClientCommand(
+            player,
+            Const.MODULE,
+            Const.CMD_MAP_COMMAND,
+            args
+        )
+        return true
+    end
+    local result = PNC.MapCommandService
+        and PNC.MapCommandService.Execute
+        and PNC.MapCommandService.Execute(player, args, {
+            debugAuthorized = Client.CanUseDebug(),
+            source = "local",
+        }) or {
+            requestId = args.requestId,
+            commandID = args.commandID,
+            ok = false,
+            reason = "map_commands_unavailable",
+        }
+    if PNC.MapCommands and PNC.MapCommands.HandleResult then
+        PNC.MapCommands.HandleResult(result)
+    end
+    return result.ok == true, result
 end
 
 function Client.SendRevive(npcId)

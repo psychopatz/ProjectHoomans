@@ -34,6 +34,14 @@ local Wounds = PNC.NPCWounds
 local Firearms = PNC.Firearms
 local ServerState = PNC.Network.ServerState
 
+local function buildTravelSummary(record, includeRoute)
+    return PNC.Travel
+        and PNC.Travel.Model
+        and PNC.Travel.Model.BuildSummary
+        and PNC.Travel.Model.BuildSummary(record and record.travel, includeRoute)
+        or nil
+end
+
 function PNC.Network.ResetServerState()
     ServerState.interests = {}
     ServerState.rosterDeltas = {}
@@ -259,7 +267,7 @@ local function buildVisualState(record)
     }
 end
 
-function Network.BuildRosterSnapshot(record)
+function Network.BuildRosterSnapshot(record, includeTravelRoute)
     local aiState
     local inCombat
     local staminaInfo
@@ -304,6 +312,7 @@ function Network.BuildRosterSnapshot(record)
         inCombat = inCombat,
         recruited = record.recruited == true,
         persist = record.persist ~= false,
+        travel = buildTravelSummary(record, includeTravelRoute ~= false),
     }
 end
 
@@ -418,6 +427,7 @@ function Network.BuildSnapshot(record)
         attackMode = attackMode,
         visualState = visualState,
         appearance = appearance and Core.DeepCopy(appearance) or nil,
+        travel = buildTravelSummary(record, true),
         equipmentSummary = {
             primaryFullType = record.equipment and record.equipment.primaryFullType or nil,
             secondaryFullType = record.equipment and record.equipment.secondaryFullType or nil,
@@ -525,6 +535,7 @@ function Network.BuildPresenceDelta(record)
             boardedAt = vehiclePassenger.boardedAt,
         } or nil,
         visualState = buildVisualState(record),
+        travel = buildTravelSummary(record, false),
     }
 end
 
@@ -549,7 +560,7 @@ function Network.BuildCharacterPayload(record)
     }
 end
 
-function Network.QueueRosterDelta(record, removed, reason)
+function Network.QueueRosterDelta(record, removed, reason, includeTravelRoute)
     local id = type(record) == "table" and record.id or record
     local snapshot
     if id == nil then
@@ -564,7 +575,10 @@ function Network.QueueRosterDelta(record, removed, reason)
     -- NPC id string is never passed to BuildRosterSnapshot as though it were a
     -- record table.
     if removed ~= true then
-        snapshot = Network.BuildRosterSnapshot(record)
+        snapshot = Network.BuildRosterSnapshot(
+            record,
+            includeTravelRoute ~= false
+        )
     end
     ServerState.rosterRevision = (tonumber(ServerState.rosterRevision) or 0) + 1
     ServerState.rosterDeltas[id] = {
@@ -593,6 +607,8 @@ function Network.QueuePeriodicRoster(record, now)
         tostring(record.presenceState or ""),
         tostring(record.health and record.health.state or ""),
         tostring(record.orderSpec and record.orderSpec.kind or ""),
+        tostring(record.travel and record.travel.state or ""),
+        tostring(record.travel and record.travel.revision or 0),
     }, ":")
     if runtime.rosterSignature == signature then
         return false
@@ -602,7 +618,7 @@ function Network.QueuePeriodicRoster(record, now)
     end
     runtime.rosterSignature = signature
     runtime.lastRosterQueuedAt = now
-    Network.QueueRosterDelta(record, false, "periodic")
+    Network.QueueRosterDelta(record, false, "periodic", false)
     return true
 end
 

@@ -1,0 +1,110 @@
+local SHARED = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+local CLIENT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/"
+
+local worldHour = 0.5
+getGameTime = function()
+    return {
+        getWorldAgeHours = function() return worldHour end,
+    }
+end
+
+PNC = {
+    Const = {
+        PRESENCE_LIVE = "live",
+        PRESENCE_ABSTRACT = "abstract",
+        TRAVEL_SCHEMA_VERSION = 1,
+        TRAVEL_ROUTE_MAX_POINTS = 128,
+        TRAVEL_METADATA_MAX_DEPTH = 3,
+        TRAVEL_METADATA_MAX_ENTRIES = 64,
+        TRAVEL_SPEED_WALK_TILES_PER_HOUR = 100,
+        TRAVEL_SPEED_RUN_TILES_PER_HOUR = 200,
+        TRAVEL_SPEED_VEHICLE_TILES_PER_HOUR = 500,
+        TRAVEL_ARRIVAL_RADIUS = 1,
+    },
+    Core = {
+        IsClientOnly = function() return true end,
+        GenerateID = function() return "journey:directory" end,
+        DeepCopy = function(value)
+            if type(value) ~= "table" then return value end
+            local output = {}
+            for key, item in pairs(value) do
+                output[key] = PNC.Core.DeepCopy(item)
+            end
+            return output
+        end,
+    },
+    Network = {
+        ClientState = {
+            snapshots = {},
+        },
+    },
+}
+
+dofile(SHARED .. "Travel/PNC_Travel_Route.lua")
+dofile(SHARED .. "Travel/PNC_Travel_Providers.lua")
+dofile(SHARED .. "Travel/PNC_Travel_Model.lua")
+dofile(SHARED .. "Travel/PNC_Travel_Projection.lua")
+dofile(CLIENT .. "Travel/PNC_TravelDirectory.lua")
+
+local record = {
+    id = "directory:1",
+    x = 0,
+    y = 0,
+    z = 0,
+    presenceState = "abstract",
+}
+local journey = PNC.Travel.Model.New(record, {
+    journeyId = "journey:directory",
+    destination = { x = 100, y = 0, z = 0 },
+    speedTilesPerWorldHour = 100,
+}, 0)
+local summary = PNC.Travel.Model.BuildSummary(journey, true)
+assert(summary.route.segments == nil,
+    "network summary leaked derived route segments")
+
+PNC.Network.ClientState.snapshots[record.id] = {
+    id = record.id,
+    name = "Directory Walker",
+    faction = "colonist",
+    presenceState = "abstract",
+    x = 0,
+    y = 0,
+    z = 0,
+    travel = summary,
+}
+
+local projected = assert(PNC.TravelDirectory.GetProjected(record.id))
+assert(math.abs(projected.x - 50) < 0.001,
+    "client directory did not extrapolate abstract movement")
+assert(math.abs(projected.percent - 0.5) < 0.001,
+    "client directory progress is incorrect")
+assert(type(summary.route.segments) == "table",
+    "client route geometry was not compiled into the cache")
+local cachedRoute = summary.route
+PNC.TravelDirectory.GetProjected(record.id)
+assert(summary.route == cachedRoute,
+    "client route geometry was rebuilt on a subsequent frame")
+
+summary.state = "cancelled"
+assert(PNC.TravelDirectory.GetProjected(record.id) ~= nil,
+    "cancelled journey hid the NPC's current location")
+summary.state = "en_route"
+summary.visibility = "hidden"
+assert(PNC.TravelDirectory.GetProjected(record.id) == nil,
+    "hidden journey remained visible")
+summary.visibility = "all"
+
+PNC.Network.ClientState.snapshots["idle:1"] = {
+    id = "idle:1",
+    name = "Idle NPC",
+    faction = "neutral",
+    presenceState = "abstract",
+    x = 25,
+    y = 35,
+    z = 0,
+}
+local idle = assert(PNC.TravelDirectory.GetProjected("idle:1"))
+assert(idle.name == "Idle NPC" and idle.x == 25 and idle.state == "idle",
+    "non-travelling NPC was missing from the map directory")
+
+print("pnc_travel_directory_smoke: ok")

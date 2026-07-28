@@ -156,6 +156,7 @@ local function sanitizeOrderSpec(orderSpec, record)
     spec.moveMode = normalizeString(spec.moveMode)
     spec.ownerUsername = normalizeString(spec.ownerUsername)
     spec.ownerOnlineID = nil
+    spec.journeyId = normalizeString(spec.journeyId)
     return spec
 end
 
@@ -712,6 +713,11 @@ function Persistence.SerializeRecord(record)
         inventory = inventoryPayload,
         progression = progression,
         corpse = sanitizeCorpse(record.corpse, record),
+        travel = PNC.Travel
+            and PNC.Travel.Model
+            and PNC.Travel.Model.BuildSummary
+            and PNC.Travel.Model.BuildSummary(record.travel, true)
+            or nil,
     }
     startupBodyHint = record.runtime and record.runtime.startupBodyHint or nil
     if record.liveBodyInstanceID ~= nil or startupBodyHint then
@@ -850,6 +856,26 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     record.persistedInventory = type(raw.inventory) == "table" and Core.DeepCopy(raw.inventory) or nil
     record.legacyEquipmentInventory = not raw.inventory and type(raw.equipment) == "table"
     record = Persistence.RebuildRuntime(record)
+    if type(raw.travel) == "table"
+        and PNC.Travel
+        and PNC.Travel.Model
+        and PNC.Travel.Model.Normalize
+    then
+        record.travel = PNC.Travel.Model.Normalize(
+            raw.travel,
+            record,
+            PNC.Travel.Service and PNC.Travel.Service.WorldHour
+                and PNC.Travel.Service.WorldHour()
+                or tonumber(raw.travel.lastAdvancedWorldHour)
+                or 0
+        )
+        if record.travel and PNC.Travel.Model.IsActive(record.travel) then
+            record.orderSpec = {
+                kind = Const.ORDER_TRAVEL or "travel",
+                journeyId = record.travel.journeyId,
+            }
+        end
+    end
     record.persistenceSourceVersion = tonumber(raw.schemaVersion) or 0
     bodyHint = type(raw.bodyHint) == "table" and raw.bodyHint or nil
     if bodyHint and bodyHint.instanceID ~= nil then

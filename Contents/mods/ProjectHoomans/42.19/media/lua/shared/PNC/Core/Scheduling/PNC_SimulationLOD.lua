@@ -20,6 +20,14 @@ local function isMoving(record)
         or false
 end
 
+local function isTraveling(record)
+    return PNC.Travel
+        and PNC.Travel.Model
+        and PNC.Travel.Model.IsActive
+        and PNC.Travel.Model.IsActive(record and record.travel)
+        or false
+end
+
 local function isAbstractDormant(record)
     local order = record.orderSpec or {}
     local health = record.health or {}
@@ -60,6 +68,9 @@ function LOD.Resolve(record)
         if record.runtime and record.runtime.target then
             return "abstract_active"
         end
+        if isTraveling(record) then
+            return "abstract_travel"
+        end
         if isAbstractDormant(record) then
             return "abstract_dormant"
         end
@@ -90,7 +101,9 @@ function LOD.GetCadence(record)
     if tier == "moving" or tier == "incapacitated" then
         return math.min(tonumber(Const.TICK_LIVE_WARM_MS) or 250, 100)
     end
-    if tier == "abstract_near" or tier == "abstract_active" then
+    if tier == "abstract_near" or tier == "abstract_active"
+        or tier == "abstract_travel"
+    then
         return tonumber(Const.TICK_ABSTRACT_MS) or 3000
     end
     if tier == "abstract_far" then
@@ -111,7 +124,9 @@ function LOD.GetDecisionInterval(record)
     if tier == "combat" then return 100 end
     if tier == "moving" or tier == "vehicle" then return 250 end
     if tier == "incapacitated" then return 250 end
-    if tier == "abstract_near" or tier == "abstract_active" then
+    if tier == "abstract_near" or tier == "abstract_active"
+        or tier == "abstract_travel"
+    then
         return tonumber(Const.TICK_ABSTRACT_MS) or 3000
     end
     if tier == "abstract_far" then
@@ -130,7 +145,9 @@ function LOD.GetVitalsInterval(record)
     then
         return tonumber(Const.SIMULATION_VITALS_HOT_MS) or 250
     end
-    if tier == "abstract_near" or tier == "abstract_active" then
+    if tier == "abstract_near" or tier == "abstract_active"
+        or tier == "abstract_travel"
+    then
         return tonumber(Const.SIMULATION_VITALS_ABSTRACT_MS) or 5000
     end
     if tier == "abstract_far" then

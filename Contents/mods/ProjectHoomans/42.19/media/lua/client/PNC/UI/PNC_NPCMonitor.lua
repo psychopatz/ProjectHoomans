@@ -198,6 +198,16 @@ function ISPNCNPCMonitor:onTeleport()
     if item and PNC.Client then PNC.Client.SendDebug("teleport_to_npc", { id = item.id }) end
 end
 
+function ISPNCNPCMonitor:onCommandMap()
+    local item = self:getSelectedDiagnostic()
+    if not item or not PNC.MapCommands
+        or not PNC.MapCommands.OpenForNPC
+    then
+        return
+    end
+    PNC.MapCommands.OpenForNPC(item)
+end
+
 function ISPNCNPCMonitor:requestRoster(forceAudit)
     if PNC.Client and PNC.Client.RequestDebugRoster then
         PNC.Client.RequestDebugRoster(forceAudit == true)
@@ -271,6 +281,9 @@ function ISPNCNPCMonitor:updateControlState()
     UI.SetButtonVariant(self.track,
         item and Monitor.trackedId == tostring(item.id) and "selected" or "quiet")
     self.teleport:setEnable(item ~= nil)
+    if self.commandMap then
+        self.commandMap:setEnable(mutableRecord)
+    end
 end
 
 function ISPNCNPCMonitor:prerender()

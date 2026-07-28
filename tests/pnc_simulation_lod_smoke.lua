@@ -24,6 +24,13 @@ PNC = {
         TICK_ABSTRACT_MS = 3000,
     },
 }
+PNC.Travel = {
+    Model = {
+        IsActive = function(journey)
+            return journey and journey.state == "en_route" or false
+        end,
+    },
+}
 
 dofile(ROOT .. "Scheduling/PNC_SimulationClock.lua")
 dofile(ROOT .. "Scheduling/PNC_SimulationLOD.lua")
@@ -40,6 +47,20 @@ assert(PNC.SimulationLOD.Resolve(far) == "abstract_far",
     "far active NPC received the wrong LOD")
 assert(PNC.SimulationLOD.GetCadence(far) == 15000,
     "far abstract cadence was not reduced")
+
+local travelling = {
+    x = 0,
+    y = 0,
+    presenceState = "abstract",
+    orderSpec = { kind = "travel" },
+    travel = { state = "en_route" },
+    health = { current = 100, max = 100 },
+    runtime = {},
+}
+assert(PNC.SimulationLOD.Resolve(travelling) == "abstract_travel",
+    "abstract journey did not receive the travel LOD")
+assert(PNC.SimulationLOD.GetCadence(travelling) == 3000,
+    "abstract journey cadence is incorrect")
 
 local dormant = {
     x = 0,

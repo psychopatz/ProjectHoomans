@@ -12,6 +12,7 @@ local Equipment = PNC.Equipment
 local PathService = PNC.PathService
 local ZombieAggro = PNC.ZombieAggro
 local Spatial = PNC.SpatialIndex
+local Admission = PNC.PresenceAdmission
 local Network = nil
 local lastInterestRefreshAt = 0
 local materializationBudget = {
@@ -31,9 +32,11 @@ function Presence.BeginServerTick(now)
     materializationBudget.count = 0
 end
 
-local function consumeMaterializationBudget(record, reason)
+local function consumeMaterializationBudget(record, reason, nearest)
     local now
     local maximum
+    local allowed
+    local admissionReason
     if tostring(reason or "") ~= "range_enter" then return true end
     now = Core.Now()
     if materializationBudget.tickAt ~= now then
@@ -44,8 +47,20 @@ local function consumeMaterializationBudget(record, reason)
         1,
         math.floor(tonumber(Const.MATERIALIZE_MAX_PER_TICK) or 2)
     )
+    if Admission and Admission.Evaluate then
+        allowed, admissionReason = Admission.Evaluate(record, nearest)
+        if allowed == false then
+            record.runtime = record.runtime or {}
+            record.runtime.materializeAdmissionReason = admissionReason
+            record.runtime.materializeRetryAt = now
+                + (tonumber(Const.LIVE_BODY_ADMISSION_RETRY_MS) or 1000)
+            return false
+        end
+    end
     if materializationBudget.count < maximum then
         materializationBudget.count = materializationBudget.count + 1
+        record.runtime = record.runtime or {}
+        record.runtime.materializeAdmissionReason = nil
         return true
     end
     record.runtime = record.runtime or {}
@@ -200,7 +215,7 @@ function Presence.ShouldAbstract(record, nearest)
     return (not nearest) or nearest.distSq >= (Const.ABSTRACT_DISTANCE * Const.ABSTRACT_DISTANCE)
 end
 
-function Presence.Materialize(record, reason)
+function Presence.Materialize(record, reason, nearest)
     local zombieList
     local zombie
     local spawnX
@@ -214,7 +229,7 @@ function Presence.Materialize(record, reason)
     if not Core.IsAuthority() or record.alive == false or record.presenceState == Const.PRESENCE_LIVE then
         return Registry.GetLiveZombie(record.id)
     end
-    if not consumeMaterializationBudget(record, reason) then
+    if not consumeMaterializationBudget(record, reason, nearest) then
         return nil
     end
     if PNC.BodyLifecycle
@@ -238,6 +253,11 @@ function Presence.Materialize(record, reason)
     record.runtime.lifecycle.lastTransitionAt = Core.Now()
     if PNC.Inventory and PNC.Inventory.EnsureRecordInventory then
         PNC.Inventory.EnsureRecordInventory(record)
+    end
+    if PNC.Travel and PNC.Travel.Service
+        and PNC.Travel.Service.Get(record)
+    then
+        PNC.Travel.Service.Advance(record, PNC.Travel.Service.WorldHour())
     end
     originalX = record.x
     originalY = record.y
@@ -315,6 +335,9 @@ function Presence.Materialize(record, reason)
     end
     record.presenceState = Const.PRESENCE_LIVE
     Registry.RegisterLiveZombie(record, zombie)
+    if PNC.Travel and PNC.Travel.Service then
+        PNC.Travel.Service.OnMaterialized(record)
+    end
     Health.Update(record, zombie, Core.Now())
     if record.alive == false then
         return nil
@@ -344,6 +367,9 @@ function Presence.Abstract(record, reason)
     record.runtime.roamGoalZ = nil
 
     if zombie then
+        if PNC.Travel and PNC.Travel.Service then
+            PNC.Travel.Service.OnAbstracted(record, zombie)
+        end
         record.x = zombie:getX()
         record.y = zombie:getY()
         record.z = zombie:getZ()
@@ -353,6 +379,9 @@ function Presence.Abstract(record, reason)
         end
         PNC.BodyLifecycle.RemoveLiveBody(record, zombie, reason or "abstract")
     else
+        if PNC.Travel and PNC.Travel.Service then
+            PNC.Travel.Service.OnAbstracted(record, nil)
+        end
         PNC.BodyLifecycle.RemoveLiveBody(record, nil, reason or "abstract_missing")
     end
 
@@ -374,7 +403,7 @@ function Presence.Reconcile(record)
     record.runtime.lastPresenceCheckAt = Core.Now()
     record.runtime.forcePresenceCheck = nil
     if Presence.ShouldMaterialize(record, nearest) then
-        Presence.Materialize(record, "range_enter")
+        Presence.Materialize(record, "range_enter", nearest)
     elseif Presence.ShouldAbstract(record, nearest) then
         Presence.Abstract(record, "range_exit")
     end
@@ -382,11 +411,14 @@ end
 
 function Presence.RefreshMaterializationCandidates(now, force)
     local seen = {}
+    local ordered = {}
     local candidates
     local i
     local record
     local distSq
     local count = 0
+    local entry
+    local slotMs
     local radius = tonumber(Const.MATERIALIZE_DISTANCE) or 28
     now = tonumber(now) or Core.Now()
     if force ~= true and now - lastInterestRefreshAt
@@ -402,7 +434,6 @@ function Presence.RefreshMaterializationCandidates(now, force)
             record = candidates[i]
             if record and record.id and record.alive ~= false
                 and record.presenceState == Const.PRESENCE_ABSTRACT
-                and not seen[record.id]
             then
                 distSq = Core.DistanceSq(
                     record.x,
@@ -411,24 +442,42 @@ function Presence.RefreshMaterializationCandidates(now, force)
                     player:getY()
                 )
                 if distSq <= radius * radius then
-                    seen[record.id] = true
-                    count = count + 1
-                    record.runtime = record.runtime or {}
-                    record.runtime.nearestPlayerDistSq = distSq
-                    record.runtime.forcePresenceCheck = true
-                    if PNC.SimulationClock and PNC.SimulationClock.Wake then
-                        PNC.SimulationClock.Wake(record, "presence", now)
-                    end
-                    if PNC.Scheduler and PNC.Scheduler.Schedule then
-                        PNC.Scheduler.Schedule(
-                            record,
-                            now + (tonumber(PNC.Scheduler.SLOT_MS) or 50)
-                        )
+                    entry = seen[record.id]
+                    if not entry then
+                        entry = {
+                            record = record,
+                            distSq = distSq,
+                        }
+                        seen[record.id] = entry
+                        ordered[#ordered + 1] = entry
+                    elseif distSq < entry.distSq then
+                        entry.distSq = distSq
                     end
                 end
             end
         end
     end)
+    table.sort(ordered, function(left, right)
+        if left.distSq == right.distSq then
+            return tostring(left.record.id) < tostring(right.record.id)
+        end
+        return left.distSq < right.distSq
+    end)
+    slotMs = tonumber(PNC.Scheduler and PNC.Scheduler.SLOT_MS) or 50
+    for i = 1, #ordered do
+        entry = ordered[i]
+        record = entry.record
+        count = count + 1
+        record.runtime = record.runtime or {}
+        record.runtime.nearestPlayerDistSq = entry.distSq
+        record.runtime.forcePresenceCheck = true
+        if PNC.SimulationClock and PNC.SimulationClock.Wake then
+            PNC.SimulationClock.Wake(record, "presence", now)
+        end
+        if PNC.Scheduler and PNC.Scheduler.Schedule then
+            PNC.Scheduler.Schedule(record, now + i * slotMs)
+        end
+    end
     if count > 0 and Spatial.Rebuild then
         -- One fresh census/index for the whole entering batch keeps
         -- pre-materialization shell cleanup and first-frame perception safe

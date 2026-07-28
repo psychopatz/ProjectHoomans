@@ -29,7 +29,7 @@ local function approximateBytes(value, seen)
     return total
 end
 
-PNC.Const.PERSISTENCE_VERSION = 8
+PNC.Const.PERSISTENCE_VERSION = 9
 PNC.Const.DEFAULT_HP_MAX = 100
 PNC.Const.ROAM_DEFAULT_RADIUS = 6
 PNC.Const.ROAM_TARGET_RADIUS = 12
@@ -39,6 +39,15 @@ PNC.Const.ROAM_PAUSE_MAX_MS = 7000
 PNC.Const.PRESENCE_ABSTRACT = "abstract"
 PNC.Const.PRESENCE_CORPSE = "corpse"
 PNC.Const.ORDER_PATROL = "patrol"
+PNC.Const.ORDER_TRAVEL = "travel"
+PNC.Const.TRAVEL_SCHEMA_VERSION = 1
+PNC.Const.TRAVEL_ROUTE_MAX_POINTS = 128
+PNC.Const.TRAVEL_METADATA_MAX_DEPTH = 3
+PNC.Const.TRAVEL_METADATA_MAX_ENTRIES = 64
+PNC.Const.TRAVEL_SPEED_WALK_TILES_PER_HOUR = 300
+PNC.Const.TRAVEL_SPEED_RUN_TILES_PER_HOUR = 480
+PNC.Const.TRAVEL_SPEED_VEHICLE_TILES_PER_HOUR = 1500
+PNC.Const.TRAVEL_ARRIVAL_RADIUS = 1
 
 PNC.Core.Clamp = function(value, minimum, maximum)
     return math.max(minimum, math.min(maximum, value))
@@ -85,6 +94,10 @@ PNC.Types = {
         }
     end,
 }
+
+dofile(ROOT .. "Travel/PNC_Travel_Route.lua")
+dofile(ROOT .. "Travel/PNC_Travel_Providers.lua")
+dofile(ROOT .. "Travel/PNC_Travel_Model.lua")
 
 dofile(ROOT .. "Persistence/PNC_Persistence.lua")
 
@@ -154,6 +167,18 @@ for npcIndex = 1, 100 do
         }
     end
     PNC.Inventory.CreateFromTemplate(record)
+    record.travel = PNC.Travel.Model.New(record, {
+        journeyId = "journey:scale:" .. tostring(npcIndex),
+        ownerMod = "ScaleFixture",
+        ownerRef = "mission:" .. tostring(npcIndex),
+        destination = {
+            x = npcIndex + 300,
+            y = npcIndex * 2,
+            z = 0,
+        },
+        durationWorldHours = 1,
+        metadata = { purpose = "scale_test" },
+    }, 10)
     local acquired = {}
     for itemIndex = 1, 40 do
         acquired[itemIndex] = {
@@ -183,13 +208,15 @@ end
 assertEqual(PNC.Core.TableSize and PNC.Core.TableSize(payloads) or 100, 100,
     "scale payload count")
 local sample = payloads.scale_npc_1
-assertEqual(sample.schemaVersion, 8, "scale schema version")
+assertEqual(sample.schemaVersion, 9, "scale schema version")
 assertEqual(sample.inventory.maxWeight, nil, "derived max weight persisted")
 assertEqual(sample.inventory.cachedWeight, nil, "derived used weight persisted")
 assertEqual(#sample.inventory.delta.added, 40, "acquired item delta count")
 assertEqual(sample.health.body.partBase, 92, "body-part baseline")
 assertEqual(sample.health.body.parts.Head, 70, "body-part override")
 assertEqual(sample.runtime, nil, "runtime state leaked into save")
+assertEqual(sample.travel.ownerMod, "ScaleFixture", "travel owner persisted")
+assertEqual(sample.travel.route.points[2].x, 301, "travel route persisted")
 assert(totalBytes < 5 * 1024 * 1024,
     "100-NPC fixture exceeded the 5 MiB compact-save budget: "
         .. tostring(totalBytes))
@@ -199,9 +226,13 @@ assertEqual(restored.health.body.parts.Head.current, 70,
     "compact health override round trip")
 assertEqual(restored.health.body.parts.Neck.current, 92,
     "compact health baseline round trip")
+assertEqual(restored.travel.journeyId, "journey:scale:1",
+    "journey id round trip")
+assertEqual(restored.orderSpec.kind, "travel",
+    "active journey order round trip")
 
 local legacyPayload = PNC.Core.DeepCopy(sample)
-legacyPayload.schemaVersion = 7
+legacyPayload.schemaVersion = 8
 legacyPayload.inventory.maxWeight = 999
 legacyPayload.inventory.cachedWeight = 888
 local legacyRecord = PNC.Persistence.DeserializeRecord(
@@ -210,7 +241,7 @@ local legacyRecord = PNC.Persistence.DeserializeRecord(
 )
 assertEqual(legacyRecord.inventory, nil, "legacy inventory hydrated during load")
 local migratedPayload = PNC.Persistence.SerializeRecord(legacyRecord)
-assertEqual(migratedPayload.schemaVersion, 8, "lazy migration schema")
+assertEqual(migratedPayload.schemaVersion, 9, "lazy migration schema")
 assertEqual(migratedPayload.inventory.maxWeight, nil,
     "legacy derived max weight survived migration")
 assertEqual(migratedPayload.inventory.cachedWeight, nil,

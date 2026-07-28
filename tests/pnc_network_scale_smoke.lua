@@ -98,6 +98,21 @@ PNC = {
     VisualProfiles = { RollAppearance = function() return {} end },
     MotionHints = {},
     Health = { CanRevive = function() return false end },
+    Travel = {
+        Model = {
+            BuildSummary = function(journey, includeRoute)
+                if not journey then return nil end
+                return {
+                    journeyId = journey.journeyId,
+                    state = journey.state,
+                    revision = journey.revision,
+                    route = includeRoute ~= false and {
+                        points = PNC.Core.DeepCopy(journey.route.points),
+                    } or nil,
+                }
+            end,
+        },
+    },
 }
 
 local nearbyRecord = {
@@ -116,6 +131,17 @@ local nearbyRecord = {
     equipment = { worn = {}, attached = {} },
     runtime = {},
     presenceRevision = 1,
+    travel = {
+        journeyId = "journey:network",
+        state = "en_route",
+        revision = 1,
+        route = {
+            points = {
+                { x = 1, y = 0, z = 0 },
+                { x = 101, y = 0, z = 0 },
+            },
+        },
+    },
 }
 
 PNC.SpatialIndex = {
@@ -135,6 +161,16 @@ assertEqual(
     PNC.Network.BuildSnapshot(nearbyRecord).ownerUsername,
     "player_1",
     "detailed snapshot owner identity"
+)
+assertEqual(
+    #PNC.Network.BuildRosterSnapshot(nearbyRecord).travel.route.points,
+    2,
+    "initial roster omitted travel route"
+)
+assertEqual(
+    PNC.Network.BuildPresenceDelta(nearbyRecord).travel.route,
+    nil,
+    "high-frequency presence delta repeated travel route"
 )
 nearbyRecord.ownerUsername = nil
 

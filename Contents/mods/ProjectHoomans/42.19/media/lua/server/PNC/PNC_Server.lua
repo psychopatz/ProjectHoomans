@@ -37,6 +37,7 @@ local BodyLifecycle = PNC.BodyLifecycle
 local PlayerDamage = PNC.PlayerDamage
 local Treatment = PNC.Treatment
 local CompanionCommands = PNC.CompanionCommands
+local MapCommandService = PNC.MapCommandService
 local buildDebugRoster
 local lastLivePositionSafetyRefreshAt = 0
 
@@ -215,6 +216,11 @@ function Server.OnTick()
         Presence.BeginServerTick(now)
     end
     Registry.EnsureLoaded()
+    if PNC.Travel and PNC.Travel.Service
+        and PNC.Travel.Service.RefreshAbstractPositions
+    then
+        PNC.Travel.Service.RefreshAbstractPositions(now, false)
+    end
     if BodyLifecycle and BodyLifecycle.PumpStartupBodyCleanup then
         BodyLifecycle.PumpStartupBodyCleanup(now, false)
     end
@@ -389,6 +395,26 @@ local function onClientCommand(module, command, player, args)
     if command == Const.CMD_COMPANION_COMMAND and args and args.commandID then
         if CompanionCommands and CompanionCommands.Execute then
             CompanionCommands.Execute(player, args)
+        end
+        return
+    end
+
+    if command == Const.CMD_MAP_COMMAND then
+        local result = MapCommandService and MapCommandService.Execute
+            and MapCommandService.Execute(player, args or {}, {
+                debugAuthorized = canUseDebug(player),
+                source = "network",
+            }) or {
+                ok = false,
+                reason = "map_commands_unavailable",
+            }
+        if sendServerCommand then
+            sendServerCommand(
+                player,
+                Const.MODULE,
+                Const.CMD_MAP_COMMAND_RESULT,
+                result
+            )
         end
         return
     end
