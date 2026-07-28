@@ -21,6 +21,40 @@ local function getActionStateName(zombie)
     return ""
 end
 
+local function recordBumpTrigger(
+    zombie,
+    record,
+    bumpType,
+    entered,
+    mode,
+    before,
+    after
+)
+    local now = Core and Core.Now and Core.Now() or 0
+    local modData = zombie
+        and zombie.getModData
+        and zombie:getModData()
+        or nil
+    local trigger = {
+        anim = tostring(bumpType or "Bump"),
+        entered = entered == true,
+        mode = tostring(mode or "unknown"),
+        stateBefore = tostring(before or ""),
+        stateAfter = tostring(after or ""),
+        at = now,
+    }
+    if modData then
+        modData.PNC_BumpTriggerMode = trigger.mode
+        modData.PNC_BumpTriggerStateBefore = trigger.stateBefore
+        modData.PNC_BumpTriggerStateAfter = trigger.stateAfter
+        modData.PNC_BumpTriggerAt = now
+    end
+    if record then
+        record.runtime = record.runtime or {}
+        record.runtime.lastAnimationTrigger = trigger
+    end
+end
+
 local function setPNCStateVars(zombie, record, animState)
     if not zombie or not zombie.setVariable then
         return
@@ -319,9 +353,14 @@ end
 
 function Animation.PlayBump(zombie, record, bumpType)
     local modData
+    local entered
+    local stateBefore
+    local stateAfter
+    local resolvedBumpType
     if not zombie then
-        return
+        return false, "no_body"
     end
+    resolvedBumpType = tostring(bumpType or "Bump")
     modData = zombie.getModData and zombie:getModData() or nil
     if modData then
         modData.PNC_BumpReleasePending = nil
@@ -353,14 +392,34 @@ function Animation.PlayBump(zombie, record, bumpType)
         zombie:setVariable("ReloadSpeed", "1.0")
         zombie:setVariable("AttackVariationX", "0.0")
         zombie:setVariable("AttackVariationY", "0.0")
+        -- Fake IsoZombie bodies used by PNC relied on this complete variable
+        -- set in the known-good f738e10 pipeline. Keep the native setters and
+        -- their ActionContext mirrors in sync before selecting BumpType.
         zombie:setVariable("BumpDone", false)
         zombie:setVariable("BumpAnimFinished", false)
         zombie:setVariable("BumpFall", false)
         zombie:setVariable("BumpFallType", "")
     end
+    stateBefore = getActionStateName(zombie)
     if zombie.setBumpType then
-        zombie:setBumpType(tostring(bumpType or "Bump"))
+        -- Preserve the known-good setter-driven handoff. Calling reportEvent,
+        -- changeState, clearing path state, or binding BumpedChr here bypasses
+        -- or disturbs the zombie action-group transition used by these fake
+        -- bodies.
+        zombie:setBumpType(resolvedBumpType)
     end
+    stateAfter = getActionStateName(zombie)
+    entered = stateBefore == "bumped" or stateAfter == "bumped"
+    recordBumpTrigger(
+        zombie,
+        record,
+        resolvedBumpType,
+        entered,
+        "bump_type_setter",
+        stateBefore,
+        stateAfter
+    )
+    return true, "bump_type_setter"
 end
 
 function Animation.FinishBump(zombie, forceIdle)

@@ -72,6 +72,62 @@ local function applyImmediateFacing(zombie, liveTarget, faceX, faceY)
     return applied
 end
 
+function Internal.resolveTargetObject(target)
+    if not target then return nil end
+    if target.kind == "player" then
+        return target.player
+    end
+    if target.kind == "npc" then
+        return Registry and Registry.GetLiveZombie
+            and Registry.GetLiveZombie(target.id) or nil
+    end
+    if target.kind == "zombie" then
+        return target.worldObject
+            or (
+                Perception
+                and Perception.FindZombieByID
+                and Perception.FindZombieByID(target.zombieId)
+            )
+            or nil
+    end
+    return nil
+end
+
+function Internal.refreshTargetDistance(record, zombie, target)
+    local liveTarget
+    local originX
+    local originY
+    local originZ
+    local dx
+    local dy
+    if not target then return math.huge, nil end
+    liveTarget = Internal.resolveTargetObject(target)
+    if liveTarget and liveTarget.getX and liveTarget.getY then
+        target.x = liveTarget:getX()
+        target.y = liveTarget:getY()
+        target.z = liveTarget.getZ and liveTarget:getZ()
+            or target.z
+        target.worldObject = target.kind == "zombie"
+            and liveTarget or target.worldObject
+    end
+    originX = zombie and zombie.getX and zombie:getX()
+        or record and tonumber(record.x) or 0
+    originY = zombie and zombie.getY and zombie:getY()
+        or record and tonumber(record.y) or 0
+    originZ = zombie and zombie.getZ and zombie:getZ()
+        or record and tonumber(record.z) or 0
+    if target.x == nil or target.y == nil
+        or math.abs((tonumber(target.z) or originZ) - originZ) > 0.5
+    then
+        target.distSq = math.huge
+        return math.huge, liveTarget
+    end
+    dx = tonumber(target.x) - originX
+    dy = tonumber(target.y) - originY
+    target.distSq = (dx * dx) + (dy * dy)
+    return math.sqrt(target.distSq), liveTarget
+end
+
 function Internal.faceTarget(zombie, target, record, leaseMs, reason)
     local pathService = PNC.PathService
     local liveTarget
@@ -86,37 +142,19 @@ function Internal.faceTarget(zombie, target, record, leaseMs, reason)
     if pathService and pathService.IsTraversalActive and pathService.IsTraversalActive(record, zombie) then
         return false
     end
-    if target.kind == "player" and target.player then
-        liveTarget = target.player
-        faceX = target.player:getX()
-        faceY = target.player:getY()
-        faceZ = target.player:getZ()
-    elseif target.kind == "npc" then
-        liveTarget = Registry.GetLiveZombie(target.id)
-        if liveTarget then
-            faceX = liveTarget:getX()
-            faceY = liveTarget:getY()
-            faceZ = liveTarget:getZ()
-        else
-            faceX = target.x
-            faceY = target.y
-            faceZ = target.z
-        end
-    elseif target.kind == "zombie" then
-        liveTarget = target.worldObject
-            or (Perception and Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil)
-        if liveTarget then
-            faceX = liveTarget:getX()
-            faceY = liveTarget:getY()
-            faceZ = liveTarget:getZ()
-        else
-            faceX = target.x
-            faceY = target.y
-            faceZ = target.z
-        end
-    else
+    liveTarget = Internal.resolveTargetObject(target)
+    if target.kind ~= "player"
+        and target.kind ~= "npc"
+        and target.kind ~= "zombie"
+    then
         return false
     end
+    faceX = liveTarget and liveTarget.getX
+        and liveTarget:getX() or target.x
+    faceY = liveTarget and liveTarget.getY
+        and liveTarget:getY() or target.y
+    faceZ = liveTarget and liveTarget.getZ
+        and liveTarget:getZ() or target.z
 
     -- The object call drives the local ActionContext, the direct vector repairs
     -- IsoZombie bodies whose object target is temporarily unresolved, and the
@@ -178,7 +216,11 @@ function Internal.resolveMeleeAnimFamily(record, equipmentInfo)
     return "onehanded"
 end
 
-function Internal.triggerMeleeWeaponAnim(zombie, record, equipmentInfo)
+function Internal.triggerMeleeWeaponAnim(
+    zombie,
+    record,
+    equipmentInfo
+)
     local options = Internal.MELEE_BUMP_TYPES[Internal.resolveMeleeAnimFamily(record, equipmentInfo)] or Internal.MELEE_BUMP_TYPES.onehanded
     local anim
     if not zombie or not Animation or not Animation.PlayBump or not options or #options <= 0 then
@@ -189,7 +231,11 @@ function Internal.triggerMeleeWeaponAnim(zombie, record, equipmentInfo)
     return anim
 end
 
-function Internal.triggerRangedWeaponAnim(zombie, record, equipmentInfo)
+function Internal.triggerRangedWeaponAnim(
+    zombie,
+    record,
+    equipmentInfo
+)
     local family = equipmentInfo and equipmentInfo.primaryType == "rifle" and "rifle" or "handgun"
     local options = Internal.RANGED_BUMP_TYPES[family] or Internal.RANGED_BUMP_TYPES.handgun
     local anim

@@ -46,6 +46,14 @@ PNC = {
         CHARACTER_DETAIL_DISTANCE = 5,
         PRESENCE_LIVE = "live",
         PRESENCE_ABSTRACT = "abstract",
+        MELEE_RANGE = 1.3,
+        RANGED_MIN_STANDOFF = 2.2,
+        RANGED_PREFERRED_MIN_DISTANCE = 5,
+        RANGED_RANGE = 8.5,
+        COMBAT_PRESSURE_RADIUS = 3,
+        COMBAT_HORDE_RADIUS = 5.5,
+        COMBAT_DEBUG_CONE_RADIUS = 8.5,
+        COMBAT_DEBUG_CONE_HALF_ANGLE_DEGREES = 55,
     },
     Core = {
         Now = function() return 2000 end,
@@ -201,10 +209,86 @@ assertEqual(
 nearbyRecord.ownerUsername = nil
 
 assertEqual(PNC.Network.BuildSnapshot(nearbyRecord).attackMode, false, "idle snapshot attack mode")
-nearbyRecord.runtime.target = { kind = "zombie" }
-assertEqual(PNC.Network.BuildSnapshot(nearbyRecord).attackMode, true, "combat snapshot attack mode")
-assertEqual(PNC.Network.BuildPresenceDelta(nearbyRecord).attackMode, true, "combat delta attack mode")
+nearbyRecord.runtime.target = {
+    kind = "zombie",
+    zombieId = "z1",
+    x = 4,
+    y = 0,
+    z = 0,
+    distSq = 9,
+    visible = true,
+}
+nearbyRecord.runtime.combatTactical = {
+    decision = "melee_pressure_retreat",
+    pressure = 4,
+    visiblePressure = 3,
+    horde = 7,
+    visibleHorde = 5,
+    pressureTolerance = 2,
+}
+nearbyRecord.runtime.combatRetreat = {
+    phase = "retreat",
+    reason = "melee_pressure_retreat",
+    goalX = -2,
+    goalY = 0,
+    goalZ = 0,
+    goalMode = "run",
+    lockUntil = 2300,
+}
+local combatSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
+assertEqual(combatSnapshot.attackMode, true, "combat snapshot attack mode")
+assertEqual(
+    combatSnapshot.combatDebugState.decision,
+    "melee_pressure_retreat",
+    "combat tactical decision snapshot"
+)
+assertEqual(
+    combatSnapshot.combatDebugState.visiblePressureCount,
+    3,
+    "combat visible pressure snapshot"
+)
+assertEqual(
+    combatSnapshot.combatDebugState.target.x,
+    4,
+    "combat target position snapshot"
+)
+assertEqual(
+    combatSnapshot.combatDebugState.tacticalMove.x,
+    -2,
+    "combat movement goal snapshot"
+)
+assertEqual(
+    combatSnapshot.combatDebugState.coneHalfAngleDegrees,
+    55,
+    "combat cone snapshot"
+)
+nearbyRecord.runtime.combatDebugReplicatedAt = nil
+local combatDelta = PNC.Network.BuildPresenceDelta(nearbyRecord)
+assertEqual(combatDelta.attackMode, true, "combat delta attack mode")
+assertEqual(
+    combatDelta.combatDebugState.decision,
+    "melee_pressure_retreat",
+    "combat decision presence delta"
+)
+assertEqual(
+    PNC.Network.BuildPresenceDelta(nearbyRecord).combatDebugState,
+    nil,
+    "combat debug presence delta throttle"
+)
 nearbyRecord.runtime.target = nil
+nearbyRecord.runtime.combatTactical = nil
+nearbyRecord.runtime.combatRetreat = nil
+local idleCombatDelta = PNC.Network.BuildPresenceDelta(nearbyRecord)
+assertEqual(
+    idleCombatDelta.combatDebugState.target,
+    nil,
+    "combat debug sends terminal idle transition"
+)
+assertEqual(
+    PNC.Network.BuildPresenceDelta(nearbyRecord).combatDebugState,
+    nil,
+    "idle combat debug does not repeat"
+)
 
 nearbyRecord.runtime.bandageCompletionRevision = 3
 nearbyRecord.runtime.bandageCompletionAt = 1999

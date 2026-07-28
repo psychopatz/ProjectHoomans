@@ -16,6 +16,7 @@ local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local Damage = PNC.CombatDamage
 local Firearms = PNC.Firearms
+local Tactics = PNC.CombatTactics
 
 function Combat.TryRanged(record, zombie, target)
     local now = Core.Now()
@@ -33,6 +34,8 @@ function Combat.TryRanged(record, zombie, target)
     local magazine
     local reloadStarted
     local reloadReason
+    local shotReady
+    local shotReason
 
     if not target then
         return false, "no_target"
@@ -87,6 +90,12 @@ function Combat.TryRanged(record, zombie, target)
     if Stamina and Stamina.CanSpendAttack and not Stamina.CanSpendAttack(record, "ranged", skillID) then
         return false, "stamina_exhausted"
     end
+    if Tactics and Tactics.CanTakeRangedShot then
+        shotReady, shotReason = Tactics.CanTakeRangedShot(record, target)
+        if not shotReady then
+            return false, shotReason or "aiming"
+        end
+    end
 
     if Firearms and Firearms.PrepareShot then
         ammoReady, ammoReason, magazine = Firearms.PrepareShot(record, weaponItem)
@@ -126,5 +135,8 @@ function Combat.TryRanged(record, zombie, target)
             weaponFullType = magazine and magazine.descriptor and magazine.descriptor.fullType or nil,
         }
     )
+    if Tactics and Tactics.MarkRangedShot then
+        Tactics.MarkRangedShot(record)
+    end
     return true, "ranged_attack_started"
 end

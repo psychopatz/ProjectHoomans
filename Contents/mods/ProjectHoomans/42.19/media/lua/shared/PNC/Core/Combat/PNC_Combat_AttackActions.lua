@@ -150,6 +150,23 @@ local function isCommittedMeleeTargetInRange(zombie, target)
     return dz <= 0.25 and ((dx * dx) + (dy * dy)) <= (range * range)
 end
 
+local function observeAttackAnimation(zombie, action)
+    local actionState
+    if not zombie
+        or not zombie.getActionStateName
+        or not action
+    then
+        return
+    end
+    actionState = string.lower(
+        tostring(zombie:getActionStateName() or "")
+    )
+    action.animationActionState = actionState
+    if actionState == "bumped" then
+        action.animationStateEntered = true
+    end
+end
+
 function Internal.clearAttackAction(record)
     if record and record.runtime then
         record.runtime.attackAction = nil
@@ -168,6 +185,10 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
     local timings = Internal.ATTACK_TIMINGS[attackKind] or Internal.ATTACK_TIMINGS.melee
     local hitDelay = type(extra) == "table" and tonumber(extra.hitDelayMs) or nil
     local duration = type(extra) == "table" and tonumber(extra.durationMs) or nil
+    local animationTrigger = record
+        and record.runtime
+        and record.runtime.lastAnimationTrigger
+        or nil
     local action = {
         attackKind = attackKind,
         attackType = attackType,
@@ -178,6 +199,19 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
         hitAt = now + (hitDelay or timings.hitDelay),
         finishAt = now + (duration or timings.duration),
         hitDone = false,
+        animationRetries = 0,
+        animationTriggerMode = animationTrigger
+            and animationTrigger.anim == tostring(anim or "")
+            and animationTrigger.mode
+            or nil,
+        animationStateEntered = animationTrigger
+            and animationTrigger.anim == tostring(anim or "")
+            and animationTrigger.entered == true
+            or false,
+        animationActionState = animationTrigger
+            and animationTrigger.anim == tostring(anim or "")
+            and animationTrigger.stateAfter
+            or nil,
         target = captureTargetRef(target),
     }
     local key
@@ -385,6 +419,25 @@ function Combat.HasActiveAttack(record, now)
     return action ~= nil and now < (tonumber(action.finishAt) or 0)
 end
 
+function Combat.CancelAttackAction(record, zombie, expectedType, reason)
+    local action = record and record.runtime and record.runtime.attackAction or nil
+    if not action then return false, "no_attack" end
+    if expectedType ~= nil
+        and tostring(action.attackType or "") ~= tostring(expectedType)
+    then
+        return false, "attack_type_mismatch"
+    end
+    Internal.finishAttackAction(record, zombie)
+    if record and record.runtime then
+        record.runtime.lastAttackCancellation = {
+            attackType = action.attackType,
+            reason = tostring(reason or "cancelled"),
+            at = Core.Now(),
+        }
+    end
+    return true, reason or "attack_cancelled"
+end
+
 function Combat.PumpAttackAction(record, zombie)
     local now = Core.Now()
     local action = record and record.runtime and record.runtime.attackAction or nil
@@ -436,6 +489,7 @@ function Combat.PumpAttackAction(record, zombie)
     if target then
         Internal.faceTarget(zombie, target, record, 120, "attack_followthrough")
     end
+    observeAttackAnimation(zombie, action)
 
     if (not action.hitDone) and now >= (tonumber(action.hitAt) or 0) then
         action.hitDone = true

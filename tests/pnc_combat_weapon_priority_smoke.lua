@@ -10,6 +10,8 @@ local now = 1000
 local mode = "armed"
 local shoveCount = 0
 local weaponAnimationCount = 0
+local groundAnimationCount = 0
+local grounded = false
 local action
 local targetZombie = { isDead = function() return false end }
 local equippedWeapon = {
@@ -23,11 +25,16 @@ PNC = {
         UNARMED_COOLDOWN_MS = 900,
         UNARMED_DAMAGE = 5,
         UNARMED_GROUND_DAMAGE = 8,
+        COMBAT_SHOVE_RANGE = 1.35,
+        INCAP_SHOVE_COOLDOWN_MS = 1200,
         DEBUG_COMBAT_HOLD_MS = 2500,
     },
     Combat = {
         Internal = {
-            ATTACK_TIMINGS = { melee = { duration = 500 } },
+            ATTACK_TIMINGS = {
+                melee = { duration = 500 },
+                shove = { duration = 420 },
+            },
             canAttack = function() return true end,
             faceTarget = function() end,
             resolveWeaponItem = function() return mode == "armed" and equippedWeapon or nil end,
@@ -53,8 +60,15 @@ PNC = {
     },
     Perception = { FindZombieByID = function() return targetZombie end },
     CombatUnarmed = {
-        IsGroundTarget = function() return false end,
+        IsGroundTarget = function() return grounded end,
         PlayShove = function() shoveCount = shoveCount + 1 end,
+        PlayGroundAttack = function()
+            groundAnimationCount = groundAnimationCount + 1
+            return "PNC_Attack2HStamp"
+        end,
+    },
+    CombatTactics = {
+        ShouldUseGroundFinisher = function() return true end,
     },
 }
 
@@ -84,6 +98,32 @@ assertEqual(started, true, "barehand attack starts")
 assertEqual(reason, "shove_started", "barehand shove reason")
 assertEqual(action.attackKind, "shove", "barehand attack kind")
 assertEqual(shoveCount, 1, "barehand shove retained")
+
+now = now + 1000
+mode = "armed"
+grounded = true
+action = nil
+started, reason = PNC.Combat.TryMelee(record(), {}, target)
+assertEqual(started, true, "armed ground finisher starts")
+assertEqual(reason, "ground_attack_started", "armed ground finisher reason")
+assertEqual(action.attackKind, "ground", "armed crawler uses ground attack")
+assertEqual(action.anim, "PNC_Attack2HStamp", "ground finisher animation retained")
+assertEqual(groundAnimationCount, 1, "ground finisher animation count")
+
+now = now + 1000
+grounded = false
+action = nil
+local shoveRecord = record()
+started, reason = PNC.Combat.TryShove(
+    shoveRecord,
+    {},
+    target,
+    "pressure_shove"
+)
+assertEqual(started, true, "armed tactical shove starts")
+assertEqual(reason, "pressure_shove", "tactical shove reason")
+assertEqual(action.attackKind, "shove", "tactical shove action kind")
+assertEqual(shoveCount, 2, "tactical shove animation count")
 
 local biteFile = assert(io.open(ROOT .. "Zombies/PNC_ZombieAggro_Bite.lua", "r"))
 local biteSource = biteFile:read("*a")

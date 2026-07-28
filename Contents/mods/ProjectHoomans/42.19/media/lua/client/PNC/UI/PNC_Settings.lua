@@ -19,6 +19,12 @@ local function setPathDebug(value)
     PNC.SettingsStore:Set("showPathDebug", value, true)
 end
 
+local function setCombatDebug(value)
+    value = value == true
+    PNC.Nameplates.Settings.showCombatDebug = value
+    PNC.SettingsStore:Set("showCombatDebug", value, true)
+end
+
 local function debugPartControl(id, label)
     return {
         id = id,
@@ -51,6 +57,15 @@ Registry.Register({
             label = "Show NPC path overlay",
             get = function() return PNC.Nameplates.Settings.showPathDebug == true end,
             set = setPathDebug,
+        },
+        {
+            id = "showCombatDebug",
+            type = "boolean",
+            label = "Show NPC combat overlay",
+            get = function()
+                return PNC.Nameplates.Settings.showCombatDebug == true
+            end,
+            set = setCombatDebug,
         },
         debugPartControl("debugShowPresence", "Overlay: presence/body binding"),
         debugPartControl("debugShowAI", "Overlay: AI state"),

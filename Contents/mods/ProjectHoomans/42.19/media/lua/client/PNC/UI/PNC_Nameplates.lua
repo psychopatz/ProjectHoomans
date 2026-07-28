@@ -12,6 +12,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
         enabled = true,
         showAIDebug = false,
         showPathDebug = false,
+        showCombatDebug = false,
         debugShowPresence = true,
         debugShowAI = true,
         debugShowJob = true,
@@ -29,6 +30,7 @@ Nameplates.Settings = PNC.SettingsStore.values
 if Nameplates.Settings.enabled == nil then Nameplates.Settings.enabled = true end
 if Nameplates.Settings.showAIDebug == nil then Nameplates.Settings.showAIDebug = false end
 if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDebug = false end
+if Nameplates.Settings.showCombatDebug == nil then Nameplates.Settings.showCombatDebug = false end
 local debugSettingDefaults = {
     debugShowPresence = true,
     debugShowAI = true,
@@ -128,6 +130,27 @@ function Nameplates.TogglePathDebug()
         HaloTextHelper.addText(player, getText(messageKey))
     end
     return Settings.showPathDebug
+end
+
+function Nameplates.IsCombatDebugEnabled()
+    return Settings.showCombatDebug == true
+end
+
+function Nameplates.ToggleCombatDebug()
+    local player = getSpecificPlayer(0)
+    Settings.showCombatDebug = not Settings.showCombatDebug
+    PNC.SettingsStore:Set(
+        "showCombatDebug",
+        Settings.showCombatDebug,
+        true
+    )
+    if player and HaloTextHelper and HaloTextHelper.addText then
+        local messageKey = Settings.showCombatDebug
+            and "UI_PNC_CombatOverlayEnabled"
+            or "UI_PNC_CombatOverlayDisabled"
+        HaloTextHelper.addText(player, getText(messageKey))
+    end
+    return Settings.showCombatDebug
 end
 
 function Nameplates.DebugDescribeSnapshot(snapshot)

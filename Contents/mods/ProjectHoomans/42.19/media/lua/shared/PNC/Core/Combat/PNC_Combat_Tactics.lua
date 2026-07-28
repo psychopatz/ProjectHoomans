@@ -16,10 +16,12 @@ local Spatial = PNC.SpatialIndex
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local TraversalQuery = PNC.TraversalQuery
+local Relationships = PNC.Relationships
 local COMBAT_NAVIGATION = {
     navigationPolicy = "combat",
     navigationProvider = "direct",
 }
+local buildZombieThreatCentroid
 
 local function ensureRetreatState(record)
     local runtime
@@ -47,6 +49,9 @@ local function ensureRetreatState(record)
     state.lastZombieDamageY = state.lastZombieDamageY ~= nil and tonumber(state.lastZombieDamageY) or nil
     state.lastZombieDamageZ = state.lastZombieDamageZ ~= nil and tonumber(state.lastZombieDamageZ) or nil
     state.approachActive = state.approachActive == true
+    state.recoveryMode = state.recoveryMode or nil
+    state.retreatDistance = tonumber(state.retreatDistance) or nil
+    state.refreshAt = tonumber(state.refreshAt) or 0
     return state
 end
 
@@ -79,34 +84,6 @@ local function requestMove(record, zombie, x, y, z, mode, stopDistance, reason)
         )
     end
     return false
-end
-
-local function requestCombatFacing(record, zombie, target, leaseMs, reason)
-    if PathService and PathService.RequestCombatFacing then
-        PathService.RequestCombatFacing(record, zombie, target, leaseMs, reason)
-    end
-end
-
-local function buildRetreatPoint(record, target, distance)
-    local dx
-    local dy
-    local len
-    if not record or not target then
-        return nil
-    end
-    dx = record.x - target.x
-    dy = record.y - target.y
-    len = math.sqrt((dx * dx) + (dy * dy))
-    if len <= 0.001 then
-        dx = 1
-        dy = 0
-        len = 1
-    end
-    return {
-        x = record.x + (dx / len) * distance,
-        y = record.y + (dy / len) * distance,
-        z = target.z or record.z,
-    }
 end
 
 local function buildRetreatFromSource(record, target, distance, sourceX, sourceY, sourceZ, state)
@@ -201,21 +178,82 @@ local function countZombiesNearPoint(x, y, z, radius)
     return count
 end
 
+local function countVisibleZombies(record, radius)
+    local entries
+    if Perception and Perception.GetVisibleZombieEntries then
+        entries = Perception.GetVisibleZombieEntries(record, radius)
+        return #entries
+    end
+    return Perception and Perception.CountEnemyZombies
+        and Perception.CountEnemyZombies(record, radius) or 0
+end
+
 local function assessThreat(record, target)
+    local now = Core.Now()
     local staminaRatio = Stamina and Stamina.GetRatio and Stamina.GetRatio(record) or 1
     local runtime = record and record.runtime or {}
+    local cached = runtime.combatThreatAssessment
+    local targetKey = target and (
+        tostring(target.kind or "") .. ":"
+        .. tostring(target.id or target.zombieId or target.onlineID or "")
+    ) or "none"
     local targetCrowdCount = 0
+    local report
+    if cached
+        and cached.targetKey == targetKey
+        and cached.x ~= nil
+        and cached.y ~= nil
+        and now < (tonumber(cached.expiresAt) or 0)
+        and Core.DistanceSq(
+            tonumber(cached.x) or record.x,
+            tonumber(cached.y) or record.y,
+            record.x,
+            record.y
+        ) <= 0.16
+        and (
+            not target
+            or cached.targetX == nil
+            or Core.DistanceSq(
+                tonumber(cached.targetX) or target.x,
+                tonumber(cached.targetY) or target.y,
+                target.x,
+                target.y
+            ) <= 0.16
+        )
+    then
+        return cached
+    end
     if target and target.kind == "zombie" then
         targetCrowdCount = countZombiesNearPoint(target.x, target.y, target.z or record.z, Const.COMBAT_TARGET_CROWD_RADIUS)
     end
-    return {
+    report = {
+        targetKey = targetKey,
+        x = record.x,
+        y = record.y,
+        targetX = target and target.x or nil,
+        targetY = target and target.y or nil,
         staminaRatio = staminaRatio,
         retreating = runtime.retreatMode == true,
         surroundedCount = Perception and Perception.CountEnemyZombies and Perception.CountEnemyZombies(record, Const.COMBAT_SURROUND_RADIUS) or 0,
         pressureCount = Perception and Perception.CountEnemyZombies and Perception.CountEnemyZombies(record, Const.COMBAT_PRESSURE_RADIUS) or 0,
         hordeCount = Perception and Perception.CountEnemyZombies and Perception.CountEnemyZombies(record, Const.COMBAT_HORDE_RADIUS) or 0,
+        visiblePressureCount = countVisibleZombies(record, Const.COMBAT_PRESSURE_RADIUS),
+        visibleHordeCount = countVisibleZombies(record, Const.COMBAT_HORDE_RADIUS),
         targetCrowdCount = targetCrowdCount,
+        expiresAt = now + (tonumber(Const.COMBAT_TACTICAL_DIAGNOSTIC_MS) or 200),
     }
+    runtime.combatThreatAssessment = report
+    runtime.combatTactical = {
+        surrounded = report.surroundedCount,
+        pressure = report.pressureCount,
+        visiblePressure = report.visiblePressureCount,
+        horde = report.hordeCount,
+        visibleHorde = report.visibleHordeCount,
+        targetCrowd = report.targetCrowdCount,
+        stamina = report.staminaRatio,
+        assessedAt = now,
+    }
+    return report
 end
 
 local function clearActiveRetreat(record, state)
@@ -230,6 +268,9 @@ local function clearActiveRetreat(record, state)
         state.goalStopDistance = 0.8
         state.vectorX = nil
         state.vectorY = nil
+        state.recoveryMode = nil
+        state.retreatDistance = nil
+        state.refreshAt = 0
     end
     if record then
         record.runtime = record.runtime or {}
@@ -257,15 +298,6 @@ function Tactics.ClearRetreatState(record)
     clearActiveRetreat(record, ensureRetreatState(record))
 end
 
-function Tactics.ShouldPressureShove(record)
-    local surroundedCount
-    if not record then
-        return false
-    end
-    surroundedCount = Perception and Perception.CountEnemyZombies and Perception.CountEnemyZombies(record, Const.COMBAT_SURROUND_RADIUS) or 0
-    return surroundedCount >= Const.COMBAT_SURROUND_COUNT
-end
-
 function Tactics.MarkZombieDamage(record, sourceX, sourceY, sourceZ, now)
     local state = ensureRetreatState(record)
     now = tonumber(now) or Core.Now()
@@ -279,8 +311,39 @@ function Tactics.MarkZombieDamage(record, sourceX, sourceY, sourceZ, now)
     state.damagePressureUntil = now + Const.COMBAT_KITE_DAMAGE_PRESSURE_MS
 end
 
-function Tactics.GetRetreatState(record)
-    return ensureRetreatState(record)
+local function targetObject(target)
+    if not target then return nil end
+    if target.kind == "zombie" then
+        return Perception and Perception.FindZombieByID
+            and Perception.FindZombieByID(target.zombieId) or nil
+    end
+    if target.kind == "player" then
+        return target.player
+    end
+    return nil
+end
+
+function Tactics.IsGroundTarget(target)
+    local object = targetObject(target)
+    local Unarmed = PNC.CombatUnarmed
+    return object ~= nil
+        and Unarmed
+        and Unarmed.IsGroundTarget
+        and Unarmed.IsGroundTarget(object) == true
+end
+
+function Tactics.ShouldUseGroundFinisher(record, target)
+    local report
+    if not Tactics.IsGroundTarget(target) then
+        return false, "target_not_grounded"
+    end
+    report = assessThreat(record, target)
+    if report.pressureCount
+        > (tonumber(Const.COMBAT_GROUND_FINISHER_MAX_PRESSURE) or 1)
+    then
+        return false, "ground_finisher_unsafe"
+    end
+    return true, "ground_finisher_safe"
 end
 
 function Tactics.ResolveMeleeApproach(record, dist)
@@ -300,17 +363,44 @@ function Tactics.ResolveMeleeApproach(record, dist)
     end
     shouldApproach = state.approachActive == true
     preferredMode = dist > (Const.MELEE_RANGE + Const.COMBAT_KITE_MELEE_HOLD_BUFFER) and "run" or "walk"
-    return shouldApproach, Const.MELEE_RANGE, preferredMode
+    return shouldApproach,
+        tonumber(Const.MELEE_APPROACH_STOP_DISTANCE)
+            or math.max(0.75, (tonumber(Const.MELEE_RANGE) or 1.3) - 0.35),
+        preferredMode
 end
 
 local function continueLockedRetreat(record, zombie, target, state, now)
+    local retreat
+    local sourceX
+    local sourceY
     if not state or now >= (tonumber(state.lockUntil) or 0) then
         return false, nil
     end
     if state.goalX == nil or state.goalY == nil then
         return false, nil
     end
-    setRetreatState(record, true, "retreat")
+    if now >= (tonumber(state.refreshAt) or 0) then
+        sourceX, sourceY = buildZombieThreatCentroid(
+            record,
+            Const.COMBAT_HORDE_RADIUS
+        )
+        retreat = buildRetreatFromSource(
+            record,
+            target,
+            tonumber(state.retreatDistance) or 2.4,
+            sourceX,
+            sourceY,
+            record.z,
+            state
+        )
+        if retreat then
+            state.goalX = retreat.x
+            state.goalY = retreat.y
+            state.goalZ = retreat.z
+        end
+        state.refreshAt = now + 220
+    end
+    setRetreatState(record, true, state.recoveryMode or "retreat")
     requestMove(
         record,
         zombie,
@@ -343,12 +433,15 @@ local function startRetreat(record, zombie, target, distance, mode, stopDistance
     state.goalZ = retreat.z
     state.goalMode = mode
     state.goalStopDistance = tonumber(stopDistance) or 0.8
+    state.recoveryMode = recoveryMode
+    state.retreatDistance = distance
+    state.refreshAt = now + 220
     setRetreatState(record, true, recoveryMode)
     requestMove(record, zombie, retreat.x, retreat.y, retreat.z, mode, stopDistance, reason)
     return true, reason
 end
 
-local function buildZombieThreatCentroid(record, radius)
+buildZombieThreatCentroid = function(record, radius)
     local zombies
     local zombie
     local count = 0
@@ -373,6 +466,491 @@ local function buildZombieThreatCentroid(record, radius)
     end
     if count <= 0 then return nil, nil, 0 end
     return sumX / count, sumY / count, count
+end
+
+local function stableDirection(id)
+    local value = tostring(id or "")
+    local hash = 0
+    local i
+    for i = 1, #value do
+        hash = (hash * 33 + string.byte(value, i)) % 360
+    end
+    return (hash / 360) * math.pi * 2
+end
+
+local function pointNearSegment(px, py, ax, ay, bx, by, corridor)
+    local vx = bx - ax
+    local vy = by - ay
+    local lengthSq = (vx * vx) + (vy * vy)
+    local projection
+    local closestX
+    local closestY
+    if lengthSq <= 0.001 then return false end
+    projection = (((px - ax) * vx) + ((py - ay) * vy)) / lengthSq
+    if projection <= 0.06 or projection >= 0.98 then return false end
+    closestX = ax + (vx * projection)
+    closestY = ay + (vy * projection)
+    return Core.DistanceSq(px, py, closestX, closestY)
+        <= corridor * corridor
+end
+
+local function isProtectedNPC(record, other, target)
+    if not other
+        or other == record
+        or other.alive == false
+        or tostring(other.id or "") == tostring(target and target.id or "")
+    then
+        return false
+    end
+    if Relationships and Relationships.AreNPCsEnemies then
+        return not Relationships.AreNPCsEnemies(record, other)
+    end
+    return tostring(other.faction or "") == tostring(record.faction or "")
+end
+
+function Tactics.IsFriendlyFireSafe(record, target)
+    local now
+    local targetKey
+    local cached
+    local distance
+    local midpointX
+    local midpointY
+    local corridor = tonumber(Const.RANGED_FRIENDLY_FIRE_CORRIDOR) or 0.62
+    local candidates
+    local other
+    local players
+    local player
+    local i
+    local unsafeKind
+    local unsafeID
+    local unsafeX
+    local unsafeY
+    local unsafeZ
+    if not record or not target or target.x == nil or target.y == nil then
+        return false, "invalid_fire_lane"
+    end
+    record.runtime = record.runtime or {}
+    now = Core.Now()
+    targetKey = tostring(target.kind or "") .. ":"
+        .. tostring(target.id or target.zombieId or target.onlineID or "")
+    cached = record.runtime.combatFireLane
+    if cached
+        and cached.targetKey == targetKey
+        and now < (tonumber(cached.expiresAt) or 0)
+        and Core.DistanceSq(cached.shooterX, cached.shooterY, record.x, record.y)
+            <= 0.04
+        and Core.DistanceSq(cached.targetX, cached.targetY, target.x, target.y)
+            <= 0.04
+    then
+        return cached.safe == true,
+            cached.safe == true and "fire_lane_clear" or "friendly_fire_risk"
+    end
+    distance = math.sqrt(Core.DistanceSq(record.x, record.y, target.x, target.y))
+    midpointX = (record.x + target.x) * 0.5
+    midpointY = (record.y + target.y) * 0.5
+
+    candidates = Spatial and Spatial.QueryNPCs
+        and Spatial.QueryNPCs(midpointX, midpointY, distance * 0.5 + corridor)
+        or {}
+    for i = 1, #candidates do
+        other = candidates[i]
+        if isProtectedNPC(record, other, target)
+            and math.abs((tonumber(other.z) or record.z) - record.z) < 1
+            and pointNearSegment(
+                tonumber(other.x) or 0,
+                tonumber(other.y) or 0,
+                record.x,
+                record.y,
+                target.x,
+                target.y,
+                corridor
+            )
+        then
+            unsafeKind = "npc"
+            unsafeID = other.id
+            unsafeX = other.x
+            unsafeY = other.y
+            unsafeZ = other.z
+            break
+        end
+    end
+
+    if not unsafeKind then
+        players = Spatial and Spatial.QueryPlayers
+            and Spatial.QueryPlayers(
+                midpointX,
+                midpointY,
+                distance * 0.5 + corridor
+            ) or {}
+        for i = 1, #players do
+            player = players[i]
+            if player
+                and player ~= target.player
+                and not (
+                    target.kind == "player"
+                    and target.onlineID ~= nil
+                    and player.getOnlineID
+                    and tonumber(player:getOnlineID()) == tonumber(target.onlineID)
+                )
+                and math.abs(player:getZ() - record.z) < 1
+                and pointNearSegment(
+                    player:getX(),
+                    player:getY(),
+                    record.x,
+                    record.y,
+                    target.x,
+                    target.y,
+                    corridor
+                )
+            then
+                unsafeKind = "player"
+                unsafeID = player.getOnlineID and player:getOnlineID() or nil
+                unsafeX = player:getX()
+                unsafeY = player:getY()
+                unsafeZ = player:getZ()
+                break
+            end
+        end
+    end
+
+    record.runtime.combatFireLane = {
+        targetKey = targetKey,
+        safe = unsafeKind == nil,
+        blockerKind = unsafeKind,
+        blockerID = unsafeID,
+        blockerX = unsafeX,
+        blockerY = unsafeY,
+        blockerZ = unsafeZ,
+        shooterX = record.x,
+        shooterY = record.y,
+        targetX = target.x,
+        targetY = target.y,
+        checkedAt = now,
+        expiresAt = now + (tonumber(Const.RANGED_FIRE_LANE_CACHE_MS) or 120),
+    }
+    if unsafeKind then
+        return false, "friendly_fire_risk"
+    end
+    return true, "fire_lane_clear"
+end
+
+function Tactics.CanTakeRangedShot(record, target)
+    local now
+    local state
+    local targetKey
+    local aiming
+    local dist
+    local report
+    local settleMs
+    local moveTolerance
+    local progress
+    local confidence
+    local safe
+    local reason
+    if not record or not target then return false, "no_target" end
+    safe, reason = Tactics.IsFriendlyFireSafe(record, target)
+    if not safe then return false, reason end
+
+    record.runtime = record.runtime or {}
+    now = Core.Now()
+    state = record.runtime.combatAim or {}
+    record.runtime.combatAim = state
+    targetKey = tostring(target.kind or "") .. ":"
+        .. tostring(target.id or target.zombieId or target.onlineID or "")
+    moveTolerance = tonumber(Const.RANGED_AIM_MOVE_TOLERANCE) or 0.35
+    if state.targetKey ~= targetKey
+        or state.shooterX == nil
+        or Core.DistanceSq(state.shooterX, state.shooterY, record.x, record.y)
+            > moveTolerance * moveTolerance
+        or state.targetX == nil
+        or Core.DistanceSq(state.targetX, state.targetY, target.x, target.y)
+            > (moveTolerance * 1.5) ^ 2
+    then
+        state.targetKey = targetKey
+        state.startedAt = now
+        state.shooterX = record.x
+        state.shooterY = record.y
+        state.targetX = target.x
+        state.targetY = target.y
+    end
+
+    aiming = Skills and Skills.GetLevel and Skills.GetLevel(record, "Aiming") or 0
+    dist = math.sqrt(tonumber(target.distSq)
+        or Core.DistanceSq(record.x, record.y, target.x, target.y))
+    report = assessThreat(record, target)
+    settleMs = (tonumber(Const.RANGED_AIM_BASE_MS) or 460)
+        - math.min(aiming, 10)
+            * (tonumber(Const.RANGED_AIM_SKILL_REDUCTION_MS) or 32)
+        + dist * (tonumber(Const.RANGED_AIM_DISTANCE_PENALTY_MS) or 22)
+        + math.min(report.visiblePressureCount, 4)
+            * (tonumber(Const.RANGED_AIM_PRESSURE_PENALTY_MS) or 65)
+    settleMs = math.max(
+        tonumber(Const.RANGED_AIM_MIN_MS) or 140,
+        math.min(900, settleMs)
+    )
+    state.readyAt = (tonumber(state.startedAt) or now) + settleMs
+    progress = math.max(0, math.min(
+        1,
+        (now - (tonumber(state.startedAt) or now)) / math.max(1, settleMs)
+    ))
+    confidence = 0.42
+        + math.min(aiming, 10) * 0.045
+        + progress * 0.42
+        - math.min(0.18, dist / math.max(1, Const.RANGED_RANGE) * 0.18)
+        - math.min(report.visiblePressureCount, 4) * 0.035
+    state.confidence = math.max(0, math.min(1, confidence))
+    state.settleMs = settleMs
+    if now < state.readyAt or state.confidence < 0.54 then
+        return false, "aiming"
+    end
+    return true, "aim_confident"
+end
+
+function Tactics.MarkRangedShot(record)
+    local state = record and record.runtime and record.runtime.combatAim or nil
+    if not state then return end
+    state.startedAt = Core.Now()
+    state.shooterX = record.x
+    state.shooterY = record.y
+    state.confidence = 0
+end
+
+function Tactics.ShouldInterruptReload(record, target)
+    local action = record and record.runtime and record.runtime.attackAction or nil
+    local report
+    local dist
+    if not action or action.attackType ~= "reload" then
+        return false, nil
+    end
+    report = assessThreat(record, target)
+    dist = target and math.sqrt(tonumber(target.distSq)
+        or Core.DistanceSq(record.x, record.y, target.x, target.y))
+        or math.huge
+    if dist <= (tonumber(Const.RANGED_RELOAD_BREAK_DISTANCE) or 2.35)
+        or report.surroundedCount >= 1
+        or report.visiblePressureCount
+            >= (tonumber(Const.RANGED_RELOAD_BREAK_PRESSURE_COUNT) or 2)
+    then
+        return true, "reload_interrupted_by_pressure"
+    end
+    return false, nil
+end
+
+function Tactics.GetMeleeApproachPoint(record, target)
+    local candidates
+    local other
+    local allyCount = 0
+    local angle
+    local radius
+    local x
+    local y
+    local i
+    if not record or not target or not Spatial or not Spatial.QueryNPCs then
+        return target and target.x, target and target.y, false
+    end
+    candidates = Spatial.QueryNPCs(
+        target.x,
+        target.y,
+        tonumber(Const.COMBAT_FORMATION_QUERY_RADIUS) or 2.4
+    )
+    for i = 1, #candidates do
+        other = candidates[i]
+        if isProtectedNPC(record, other, target)
+            and math.abs((tonumber(other.z) or record.z) - record.z) < 1
+        then
+            allyCount = allyCount + 1
+        end
+    end
+    if allyCount <= 0 then return target.x, target.y, false end
+    angle = stableDirection(record.id)
+    radius = tonumber(Const.COMBAT_FORMATION_SLOT_RADIUS) or 1.05
+    x = target.x + math.cos(angle) * radius
+    y = target.y + math.sin(angle) * radius
+    if TraversalQuery and TraversalQuery.CanOccupy
+        and not TraversalQuery.CanOccupy(x, y, target.z or record.z)
+    then
+        angle = angle + math.pi
+        x = target.x + math.cos(angle) * radius
+        y = target.y + math.sin(angle) * radius
+    end
+    return x, y, true
+end
+
+function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipmentInfo)
+    local report
+    local state
+    local now
+    local dist
+    local meleeLane
+    local grounded
+    local dangerousCrowd
+    local sourceX
+    local sourceY
+    local centroidCount
+    local skillID
+    local meleeSkill
+    local pressureTolerance
+    local shouldShove
+    if not record or not zombie or not target or target.kind ~= "zombie" then
+        return false, nil, nil
+    end
+    now = Core.Now()
+    state = ensureRetreatState(record)
+    if continueLockedRetreat(record, zombie, target, state, now) then
+        return true, state.reason or "combat_retreat", nil
+    end
+
+    dist = math.sqrt(tonumber(target.distSq)
+        or Core.DistanceSq(record.x, record.y, target.x, target.y))
+    meleeLane = effectiveMode == "melee"
+        or (
+            effectiveMode == "mixed"
+            and dist <= (tonumber(Const.MELEE_RANGE) or 1.3) * 1.1
+        )
+    if not meleeLane then return false, nil, nil end
+
+    report = assessThreat(record, target)
+    grounded = Tactics.IsGroundTarget(target)
+    skillID = Skills and Skills.ResolveWeaponSkill
+        and Skills.ResolveWeaponSkill(
+            record,
+            record.equipment and record.equipment.primaryFullType,
+            "melee"
+        ) or "Strength"
+    meleeSkill = Skills and Skills.GetLevel
+        and Skills.GetLevel(record, skillID) or 0
+    pressureTolerance = 2
+        + math.floor(math.min(meleeSkill, 9) / 3)
+        + (equipmentInfo and equipmentInfo.hasWeapon and 1 or 0)
+    pressureTolerance = math.min(
+        tonumber(Const.COMBAT_PRESSURE_COUNT) or 4,
+        pressureTolerance
+    )
+    dangerousCrowd = report.surroundedCount
+            >= (tonumber(Const.COMBAT_SURROUND_COUNT) or 3)
+        or report.pressureCount >= pressureTolerance
+        or report.visiblePressureCount >= pressureTolerance
+        or report.visibleHordeCount
+            >= (tonumber(Const.COMBAT_HORDE_COUNT) or 6)
+        or report.targetCrowdCount
+            >= (tonumber(Const.COMBAT_TARGET_CROWD_COUNT) or 3)
+    shouldShove = not grounded
+        and dist <= (tonumber(Const.COMBAT_SHOVE_RANGE) or 1.35)
+        and report.surroundedCount
+            < (tonumber(Const.COMBAT_SURROUND_COUNT) or 3)
+        and report.pressureCount
+            >= (tonumber(Const.COMBAT_SHOVE_PRESSURE_COUNT) or 2)
+        and (
+            equipmentInfo == nil
+            or equipmentInfo.hasWeapon ~= true
+            or report.pressureCount > pressureTolerance
+        )
+        and report.staminaRatio
+            > (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
+
+    if shouldShove then
+        record.runtime.combatTactical.decision = "pressure_shove"
+        record.runtime.combatTactical.meleeSkill = meleeSkill
+        record.runtime.combatTactical.pressureTolerance = pressureTolerance
+        return false, "pressure_shove", "shove"
+    end
+
+    if report.staminaRatio
+            <= (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
+        or dangerousCrowd
+        or (
+            grounded
+            and report.pressureCount
+                > (tonumber(Const.COMBAT_GROUND_FINISHER_MAX_PRESSURE) or 1)
+        )
+    then
+        sourceX, sourceY, centroidCount = buildZombieThreatCentroid(
+            record,
+            Const.COMBAT_HORDE_RADIUS
+        )
+        record.runtime.combatTactical.decision = grounded
+            and "crawler_pressure_retreat" or "melee_pressure_retreat"
+        return startRetreat(
+            record,
+            zombie,
+            target,
+            2.8 + math.min(tonumber(centroidCount) or 0, 5) * 0.35,
+            report.staminaRatio > (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
+                and "run" or "walk",
+            0.6,
+            math.max(650, tonumber(Const.COMBAT_KITE_RETREAT_LOCK_MS) or 450),
+            grounded and "crawler_pressure_retreat" or "melee_pressure_retreat",
+            report.staminaRatio <= (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
+                and "retreat" or "avoid_horde",
+            sourceX,
+            sourceY,
+            record.z
+        )
+    end
+    record.runtime.combatTactical.decision = grounded
+        and "ground_finisher_window" or "melee_commit_window"
+    record.runtime.combatTactical.meleeSkill = meleeSkill
+    record.runtime.combatTactical.pressureTolerance = pressureTolerance
+    return false, nil, grounded and "ground" or nil
+end
+
+function Tactics.RepositionForClearShot(record, zombie, target)
+    local state
+    local now
+    local dx
+    local dy
+    local length
+    local direction
+    local distance
+    local candidateX
+    local candidateY
+    local alternateX
+    local alternateY
+    local z
+    if not record or not zombie or not target then return false, nil end
+    now = Core.Now()
+    state = ensureRetreatState(record)
+    if continueLockedRetreat(record, zombie, target, state, now) then
+        return true, state.reason or "clearing_fire_lane"
+    end
+    dx = target.x - record.x
+    dy = target.y - record.y
+    length = math.sqrt((dx * dx) + (dy * dy))
+    if length <= 0.001 then return false, "invalid_fire_lane" end
+    direction = stableDirection(record.id) < math.pi and 1 or -1
+    distance = tonumber(Const.RANGED_FIRE_LANE_STRAFE_DISTANCE) or 1.6
+    candidateX = record.x + (-dy / length) * distance * direction
+    candidateY = record.y + (dx / length) * distance * direction
+    alternateX = record.x - (-dy / length) * distance * direction
+    alternateY = record.y - (dx / length) * distance * direction
+    z = target.z or record.z
+    if TraversalQuery and TraversalQuery.CanOccupy
+        and not TraversalQuery.CanOccupy(candidateX, candidateY, z)
+    then
+        candidateX = alternateX
+        candidateY = alternateY
+    end
+    state.phase = "strafe"
+    state.reason = "clearing_fire_lane"
+    state.lockUntil = now
+        + (tonumber(Const.RANGED_FIRE_LANE_LOCK_MS) or 500)
+    state.goalX = candidateX
+    state.goalY = candidateY
+    state.goalZ = z
+    state.goalMode = "walk"
+    state.goalStopDistance = 0.25
+    setRetreatState(record, true, nil)
+    requestMove(
+        record,
+        zombie,
+        candidateX,
+        candidateY,
+        z,
+        "walk",
+        0.25,
+        "clearing_fire_lane"
+    )
+    return true, "clearing_fire_lane"
 end
 
 function Tactics.MaintainRangedSpacing(record, zombie, target)
@@ -492,8 +1070,11 @@ function Tactics.TryReposition(record, zombie, target, effectiveMode, reason, eq
     local state
     local forcedDamageRetreat
 
-    if not record or not zombie or not target or not PathService or not PathService.MoveToward then
+    if not record or not zombie or not target then
         return false, nil
+    end
+    if reason == "friendly_fire_risk" then
+        return Tactics.RepositionForClearShot(record, zombie, target)
     end
 
     now = Core.Now()
@@ -543,7 +1124,12 @@ function Tactics.TryReposition(record, zombie, target, effectiveMode, reason, eq
         )
     end
 
-    if target.kind == "zombie" and (report.hordeCount >= Const.COMBAT_HORDE_COUNT or report.targetCrowdCount >= Const.COMBAT_TARGET_CROWD_COUNT) then
+    if target.kind == "zombie"
+        and (
+            report.visibleHordeCount >= Const.COMBAT_HORDE_COUNT
+            or report.targetCrowdCount >= Const.COMBAT_TARGET_CROWD_COUNT
+        )
+    then
         return startRetreat(
             record,
             zombie,

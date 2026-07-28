@@ -160,4 +160,142 @@ assertContains(
     "path replan reason"
 )
 
+local combatLines = PNC.NameplateRenderer.BuildCombatDebugLines({
+    mode = "ranged",
+    decision = "clearing_fire_lane",
+    surroundedCount = 1,
+    pressureCount = 4,
+    visiblePressureCount = 3,
+    pressureTolerance = 2,
+    hordeCount = 7,
+    visibleHordeCount = 5,
+    targetCrowdCount = 3,
+    target = {
+        kind = "zombie",
+        distSq = 16,
+        visible = true,
+        visibilityKind = "clear",
+        threatening = true,
+    },
+    aimConfidence = 0.72,
+    aimReadyInMs = 180,
+    fireLaneSafe = false,
+    fireLaneBlocker = { kind = "npc" },
+    magazineCount = 5,
+    magazineCapacity = 15,
+    action = {
+        attackType = "ranged",
+        attackKind = "ranged",
+        anim = "PNC_AttackRifle",
+        animationRetries = 1,
+        animationTriggerMode = "wasBumped+bumped_state",
+        animationActionState = "bumped",
+        hitRemainingMs = 120,
+        finishRemainingMs = 420,
+    },
+    tacticalMove = {
+        phase = "strafe",
+        mode = "walk",
+        reason = "clearing_fire_lane",
+        lockRemainingMs = 300,
+    },
+}, 3.5)
+assertContains(combatLines[1], "COMBAT ranged", "combat mode")
+assertContains(combatLines[1], "clearing_fire_lane", "combat decision")
+assertContains(combatLines[2], "pressure=3/4", "visible pressure")
+assertContains(combatLines[2], "tol=2", "pressure tolerance")
+assertContains(combatLines[2], "horde=5/7", "visible horde")
+assertContains(combatLines[3], "d=3.5", "live target distance")
+assertContains(combatLines[3], "ACTIVE", "active threat")
+assertContains(combatLines[4], "aim=72%", "aim confidence")
+assertContains(combatLines[4], "lane=BLOCKED:npc", "friendly fire blocker")
+assertContains(combatLines[4], "ammo=5/15", "combat ammo")
+assertContains(combatLines[5], "ACTION ranged/ranged", "attack timing")
+assertContains(
+    combatLines[5],
+    "via=wasBumped+bumped_state",
+    "attack animation trigger"
+)
+assertContains(combatLines[5], "state=bumped", "attack action state")
+assertContains(combatLines[6], "MOVE strafe/walk", "tactical movement")
+
+local renderedLines = 0
+local renderedText = {}
+isoToScreenX = function(_, x, y) return (x - y) * 32 end
+isoToScreenY = function(_, x, y, z)
+    return (x + y) * 16 - z * 96
+end
+getTextManager = function()
+    return {
+        getFontHeight = function() return 12 end,
+        MeasureStringX = function(_, _, text) return #text * 6 end,
+    }
+end
+PNC.NameplatePresentation.DrawOutlinedText =
+    function(_, text)
+        renderedText[#renderedText + 1] = text
+    end
+local manager = {
+    playerIndex = 0,
+    x = 0,
+    y = 0,
+    drawLine2 = function()
+        renderedLines = renderedLines + 1
+    end,
+}
+local forward = {
+    getX = function() return 1 end,
+    getY = function() return 0 end,
+}
+local zombie = {
+    isDead = function() return false end,
+    getX = function() return 0 end,
+    getY = function() return 0 end,
+    getZ = function() return 0 end,
+    getForwardDirection = function() return forward end,
+}
+PNC.NameplateRenderer.RenderCombatDebug(manager, {
+    zombie = zombie,
+    snapshot = {
+        attackMode = true,
+        combatDebugState = {
+            mode = "ranged",
+            decision = "clearing_fire_lane",
+            target = {
+                kind = "zombie",
+                id = "z1",
+                x = 4,
+                y = 0,
+                z = 0,
+                visible = true,
+            },
+            fireLaneSafe = false,
+            fireLaneBlocker = {
+                kind = "npc",
+                id = "ally",
+                x = 2,
+                y = 0,
+                z = 0,
+            },
+            tacticalMove = {
+                phase = "strafe",
+                reason = "clearing_fire_lane",
+                x = 0,
+                y = 2,
+                z = 0,
+                mode = "walk",
+            },
+            meleeRange = 1.3,
+            rangedPreferredDistance = 5,
+            rangedRange = 8.5,
+            pressureRadius = 3,
+            hordeRadius = 5.5,
+            coneRadius = 8.5,
+            coneHalfAngleDegrees = 55,
+        },
+    },
+})
+assert(renderedLines > 80, "combat geometry was not rendered")
+assertContains(renderedText[1], "COMBAT ranged", "combat label rendered")
+
 print("pnc_nameplate_debug_smoke: ok")

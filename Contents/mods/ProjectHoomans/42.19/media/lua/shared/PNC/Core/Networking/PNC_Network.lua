@@ -139,12 +139,25 @@ end
 
 local function buildCombatSummary(record, equipmentInfo)
     local target = record.runtime and record.runtime.target or nil
+    local tactical = record.runtime and record.runtime.combatTactical or {}
+    local aim = record.runtime and record.runtime.combatAim or {}
+    local fireLane = record.runtime and record.runtime.combatFireLane or {}
     equipmentInfo = equipmentInfo or Equipment and Equipment.Describe and Equipment.Describe(record) or {}
     return {
         targetKind = target and target.kind or "none",
         combatModeResolved = equipmentInfo.combatModeResolved or record.weaponMode,
         weaponStatus = equipmentInfo.weaponStatus or "unknown",
         combatBlockReason = record.runtime and record.runtime.combatBlockReason or nil,
+        tacticalDecision = tactical.decision,
+        pressureCount = tactical.pressure,
+        visiblePressureCount = tactical.visiblePressure,
+        hordeCount = tactical.horde,
+        visibleHordeCount = tactical.visibleHorde,
+        pressureTolerance = tactical.pressureTolerance,
+        aimConfidence = aim.confidence,
+        aimReadyAt = aim.readyAt,
+        fireLaneSafe = fireLane.safe,
+        fireLaneBlockerKind = fireLane.blockerKind,
     }
 end
 
@@ -374,6 +387,109 @@ local function buildPathDebugState(record)
     }
 end
 
+local function buildCombatDebugState(record, combat, firearmState)
+    local runtime = record.runtime or {}
+    local target = runtime.target
+    local tactical = runtime.combatTactical or {}
+    local aim = runtime.combatAim or {}
+    local fireLane = runtime.combatFireLane or {}
+    local retreat = runtime.combatRetreat or {}
+    local action = runtime.attackAction
+    local now = Core.Now()
+    return {
+        target = target and {
+            kind = target.kind,
+            id = target.id or target.zombieId
+                or target.onlineID or target.username,
+            x = target.x,
+            y = target.y,
+            z = target.z,
+            distSq = target.distSq,
+            visible = target.visible ~= false,
+            visibilityKind = target.visibilityKind,
+            threatening = target.threatening == true,
+        } or nil,
+        mode = combat.combatModeResolved,
+        weaponStatus = combat.weaponStatus,
+        blockReason = combat.combatBlockReason,
+        decision = tactical.decision,
+        surroundedCount = tactical.surrounded,
+        pressureCount = tactical.pressure,
+        visiblePressureCount = tactical.visiblePressure,
+        hordeCount = tactical.horde,
+        visibleHordeCount = tactical.visibleHorde,
+        targetCrowdCount = tactical.targetCrowd,
+        pressureTolerance = tactical.pressureTolerance,
+        meleeSkill = tactical.meleeSkill,
+        assessedAt = tactical.assessedAt,
+        assessmentAgeMs = tactical.assessedAt
+            and math.max(
+                0,
+                now - (tonumber(tactical.assessedAt) or now)
+            ) or nil,
+        staminaRatio = tactical.stamina,
+        aimConfidence = aim.confidence,
+        aimReadyInMs = aim.readyAt
+            and math.max(0, (tonumber(aim.readyAt) or now) - now)
+            or nil,
+        aimSettleMs = aim.settleMs,
+        fireLaneSafe = fireLane.safe,
+        fireLaneBlocker = fireLane.blockerKind and {
+            kind = fireLane.blockerKind,
+            id = fireLane.blockerID,
+            x = fireLane.blockerX,
+            y = fireLane.blockerY,
+            z = fireLane.blockerZ,
+        } or nil,
+        tacticalMove = retreat.goalX ~= nil and {
+            phase = retreat.phase,
+            reason = retreat.reason,
+            x = retreat.goalX,
+            y = retreat.goalY,
+            z = retreat.goalZ,
+            mode = retreat.goalMode,
+            lockRemainingMs = math.max(
+                0,
+                (tonumber(retreat.lockUntil) or now) - now
+            ),
+        } or nil,
+        action = action and {
+            attackType = action.attackType,
+            attackKind = action.attackKind,
+            anim = action.anim,
+            animationRetries = action.animationRetries,
+            animationTriggerMode = action.animationTriggerMode,
+            animationStateEntered = action.animationStateEntered == true,
+            animationActionState = action.animationActionState,
+            phase = action.phase,
+            hitRemainingMs = math.max(
+                0,
+                (tonumber(action.hitAt) or now) - now
+            ),
+            finishRemainingMs = math.max(
+                0,
+                (tonumber(action.finishAt) or now) - now
+            ),
+        } or nil,
+        magazineCount = firearmState and firearmState.count or nil,
+        magazineCapacity = firearmState and firearmState.capacity or nil,
+        ammoReserveCount = firearmState and firearmState.reserveCount or nil,
+        ammoReserveUnlimited = firearmState
+            and firearmState.unlimitedReserve == true or false,
+        reloadActive = firearmState
+            and firearmState.reloadActive == true or false,
+        meleeRange = Const.MELEE_RANGE,
+        rangedMinStandoff = Const.RANGED_MIN_STANDOFF,
+        rangedPreferredDistance = Const.RANGED_PREFERRED_MIN_DISTANCE,
+        rangedRange = Const.RANGED_RANGE,
+        pressureRadius = Const.COMBAT_PRESSURE_RADIUS,
+        hordeRadius = Const.COMBAT_HORDE_RADIUS,
+        coneRadius = Const.COMBAT_DEBUG_CONE_RADIUS,
+        coneHalfAngleDegrees =
+            Const.COMBAT_DEBUG_CONE_HALF_ANGLE_DEGREES,
+    }
+end
+
 function Network.BuildSnapshot(record)
     local aiState
     local canRevive
@@ -492,6 +608,11 @@ function Network.BuildSnapshot(record)
         attackMode = attackMode,
         visualState = visualState,
         pathDebugState = buildPathDebugState(record),
+        combatDebugState = buildCombatDebugState(
+            record,
+            combat,
+            firearmState
+        ),
         appearance = appearance and Core.DeepCopy(appearance) or nil,
         travel = buildTravelSummary(record, true),
         mapPresentation = buildMapPresentationSummary(record),
@@ -534,6 +655,16 @@ function Network.BuildSnapshot(record)
             vehicleSeat = vehiclePassenger and vehiclePassenger.seat or nil,
             vehicleBlockReason = record.runtime and record.runtime.vehicleBlockReason or nil,
             combatBlockReason = combat.combatBlockReason,
+            tacticalDecision = combat.tacticalDecision,
+            pressureCount = combat.pressureCount,
+            visiblePressureCount = combat.visiblePressureCount,
+            hordeCount = combat.hordeCount,
+            visibleHordeCount = combat.visibleHordeCount,
+            pressureTolerance = combat.pressureTolerance,
+            aimConfidence = combat.aimConfidence,
+            aimReadyAt = combat.aimReadyAt,
+            fireLaneSafe = combat.fireLaneSafe,
+            fireLaneBlockerKind = combat.fireLaneBlockerKind,
             staminaState = staminaInfo.state,
             staminaCurrent = staminaInfo.current,
             staminaMax = staminaInfo.max,
@@ -606,6 +737,7 @@ function Network.BuildPresenceDelta(record)
         and Firearms.BuildDebugState(record)
         or nil
     local vehiclePassenger = record.runtime and record.runtime.vehiclePassenger or nil
+    aiState, inCombat = resolveAIState(record)
     local pathDebugState
     local lastPathDebugAt = record.runtime
         and tonumber(record.runtime.pathDebugReplicatedAt) or 0
@@ -615,7 +747,33 @@ function Network.BuildPresenceDelta(record)
             record.runtime.pathDebugReplicatedAt = now
         end
     end
-    aiState, inCombat = resolveAIState(record)
+    local combatDebugState
+    local lastCombatDebugAt = record.runtime
+        and tonumber(record.runtime.combatDebugReplicatedAt) or 0
+    local combatDebugTransitioned = record.runtime
+        and record.runtime.combatDebugWasActive ~= inCombat
+        or false
+    if lastCombatDebugAt <= 0
+        or combatDebugTransitioned
+        or (inCombat and now - lastCombatDebugAt >= 150)
+    then
+        local equipmentInfo = Equipment
+            and Equipment.Describe
+            and Equipment.Describe(record)
+            or {}
+        local combat = buildCombatSummary(record, equipmentInfo)
+        combatDebugState = buildCombatDebugState(
+            record,
+            combat,
+            firearmState
+        )
+        if record.runtime then
+            record.runtime.combatDebugReplicatedAt = now
+        end
+    end
+    if record.runtime then
+        record.runtime.combatDebugWasActive = inCombat
+    end
     return {
         interestDetailed = true,
         id = record.id,
@@ -658,6 +816,7 @@ function Network.BuildPresenceDelta(record)
         } or nil,
         visualState = buildVisualState(record),
         pathDebugState = pathDebugState,
+        combatDebugState = combatDebugState,
         travel = buildTravelSummary(record, false),
     }
 end

@@ -18,6 +18,7 @@ local Unarmed = PNC.CombatUnarmed
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local Damage = PNC.CombatDamage
+local Tactics = PNC.CombatTactics
 
 function Combat.TryMelee(record, zombie, target)
     local now = Core.Now()
@@ -36,6 +37,8 @@ function Combat.TryMelee(record, zombie, target)
     local skillID = Skills and Skills.ResolveWeaponSkill and Skills.ResolveWeaponSkill(record, record.equipment and record.equipment.primaryFullType, "melee") or "Strength"
     local skillLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, skillID) or 0
     local strengthLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, "Strength") or 0
+    local groundSafe
+    local liveTarget
 
     if not target then
         return false, "no_target"
@@ -50,8 +53,19 @@ function Combat.TryMelee(record, zombie, target)
         return false, "cooldown_active"
     end
 
-    dist = math.sqrt(tonumber(target.distSq) or 0)
-    if dist > Const.MELEE_RANGE then
+    if Internal.refreshTargetDistance then
+        dist, liveTarget = Internal.refreshTargetDistance(
+            record,
+            zombie,
+            target
+        )
+    else
+        dist = math.sqrt(tonumber(target.distSq) or 0)
+    end
+    if dist > (
+        (tonumber(Const.MELEE_RANGE) or 1.3)
+        + (tonumber(Const.MELEE_HIT_TOLERANCE) or 0.12)
+    ) then
         return false, "target_out_of_range"
     end
     if Stamina and Stamina.CanSpendAttack and not Stamina.CanSpendAttack(record, "melee", skillID) then
@@ -65,17 +79,36 @@ function Combat.TryMelee(record, zombie, target)
     end
     record.runtime.lastAttackAt = now
     record.runtime.inCombatUntil = now + Const.DEBUG_COMBAT_HOLD_MS
+    if PNC.BehaviorMoveIntent and PNC.BehaviorMoveIntent.Hold then
+        PNC.BehaviorMoveIntent.Hold(record, "melee_windup")
+    end
     Internal.faceTarget(zombie, target, record, Internal.ATTACK_TIMINGS.melee.duration, "melee_windup")
 
     if target.kind == "zombie" then
-        zombieTarget = Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
-        if isBarehand and zombieTarget then
-            if Unarmed and Unarmed.IsGroundTarget and Unarmed.IsGroundTarget(zombieTarget) then
-                damage = tonumber(profile.unarmedGroundDamage) or Const.UNARMED_GROUND_DAMAGE
+        zombieTarget = liveTarget
+            or Perception.FindZombieByID
+                and Perception.FindZombieByID(target.zombieId)
+            or nil
+        if zombieTarget then
+            groundSafe = Unarmed
+                and Unarmed.IsGroundTarget
+                and Unarmed.IsGroundTarget(zombieTarget)
+                and (
+                    not Tactics
+                    or not Tactics.ShouldUseGroundFinisher
+                    or Tactics.ShouldUseGroundFinisher(record, target) == true
+                )
+            if groundSafe then
+                damage = isBarehand
+                    and (tonumber(profile.unarmedGroundDamage)
+                        or Const.UNARMED_GROUND_DAMAGE)
+                    or damage * 1.15
                 anim = Unarmed and Unarmed.PlayGroundAttack and Unarmed.PlayGroundAttack(zombie, record, zombieTarget) or "PNC_Attack2HStamp"
                 Internal.buildAttackAction(record, target, "ground", "melee", anim, damage, skillID)
                 return true, "ground_attack_started"
             end
+        end
+        if isBarehand and zombieTarget then
             if Unarmed and Unarmed.PlayShove then
                 Unarmed.PlayShove(zombie, record, zombieTarget)
             end
@@ -87,48 +120,83 @@ function Combat.TryMelee(record, zombie, target)
     if isBarehand then
         damage = tonumber(profile.unarmedDamage) or Const.UNARMED_DAMAGE
         if Animation and Animation.PlayBump then
-            Animation.PlayBump(zombie, record, "PNC_Shove")
+            Animation.PlayBump(
+                zombie,
+                record,
+                "PNC_Shove"
+            )
             anim = "PNC_Shove"
         end
     else
         Internal.playAttackSound(zombie, record)
-        anim = Internal.triggerMeleeWeaponAnim(zombie, record, equipmentInfo)
+        anim = Internal.triggerMeleeWeaponAnim(
+            zombie,
+            record,
+            equipmentInfo
+        )
     end
     Internal.buildAttackAction(record, target, "melee", "melee", anim or "PNC_Attack1H1", damage, skillID)
     return true, "melee_attack_started"
 end
 
-function Combat.TryDownedShove(record, zombie, target)
+function Combat.TryShove(record, zombie, target, reason)
     local now = Core.Now()
     local zombieTarget
-    if not target or not zombie then
+    local profile = record and record.combatProfile or {}
+    if not record or not zombie or not target then
         return false, "no_target"
     end
-    if PNC.PathService and PNC.PathService.IsTraversalActive and PNC.PathService.IsTraversalActive(record, zombie) then
+    if target.kind ~= "zombie" then
+        return false, "shove_requires_zombie"
+    end
+    if PNC.PathService and PNC.PathService.IsTraversalActive
+        and PNC.PathService.IsTraversalActive(record, zombie)
+    then
         return false, "traversal_active"
     end
     if Combat.HasActiveAttack and Combat.HasActiveAttack(record, now) then
         return false, "attack_in_progress"
     end
-    if not Internal.canAttack(record, now, Const.INCAP_SHOVE_COOLDOWN_MS) then
+    if not Internal.canAttack(
+        record,
+        now,
+        tonumber(profile.shoveCooldownMs) or Const.INCAP_SHOVE_COOLDOWN_MS
+    ) then
         return false, "cooldown_active"
     end
-    if math.sqrt(tonumber(target.distSq) or 0) > Const.INCAP_SHOVE_RANGE then
+    if math.sqrt(tonumber(target.distSq) or 0)
+        > (tonumber(Const.COMBAT_SHOVE_RANGE) or 1.35)
+    then
         return false, "target_out_of_range"
     end
-    if Stamina and Stamina.CanSpendAttack and not Stamina.CanSpendAttack(record, "downed_shove", "Strength") then
+    if Stamina and Stamina.CanSpendAttack
+        and not Stamina.CanSpendAttack(record, "melee", "Strength")
+    then
         return false, "stamina_exhausted"
     end
-    zombieTarget = Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
-    if not zombieTarget then
-        return false, "invalid_zombie_target"
-    end
+    zombieTarget = Perception.FindZombieByID
+        and Perception.FindZombieByID(target.zombieId) or nil
+    if not zombieTarget then return false, "invalid_zombie_target" end
     record.runtime.lastAttackAt = now
     record.runtime.inCombatUntil = now + Const.DEBUG_COMBAT_HOLD_MS
-    Internal.faceTarget(zombie, target, record, Internal.ATTACK_TIMINGS.shove.duration, "downed_shove")
+    Internal.faceTarget(
+        zombie,
+        target,
+        record,
+        Internal.ATTACK_TIMINGS.shove.duration,
+        reason or "tactical_shove"
+    )
     if Unarmed and Unarmed.PlayShove then
         Unarmed.PlayShove(zombie, record, zombieTarget)
     end
-    Internal.buildAttackAction(record, target, "shove", "melee", "PNC_Shove", Const.UNARMED_DAMAGE, "Strength")
-    return true, "downed_shove_started"
+    Internal.buildAttackAction(
+        record,
+        target,
+        "shove",
+        "melee",
+        "PNC_Shove",
+        tonumber(profile.shoveDamage) or Const.UNARMED_DAMAGE,
+        "Strength"
+    )
+    return true, reason or "shove_started"
 end

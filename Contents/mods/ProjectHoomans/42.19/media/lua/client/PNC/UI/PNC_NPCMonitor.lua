@@ -114,6 +114,21 @@ function ISPNCNPCMonitor:onPathOverlay()
     end
 end
 
+function ISPNCNPCMonitor:onCombatOverlay()
+    if not PNC.Nameplates
+        or not PNC.Nameplates.ToggleCombatDebug
+    then
+        return
+    end
+    local enabled = PNC.Nameplates.ToggleCombatDebug()
+    if self.combatOverlayButton then
+        UI.SetButtonVariant(
+            self.combatOverlayButton,
+            enabled and "selected" or "quiet"
+        )
+    end
+end
+
 local function newSubMenu(context, title)
     local option = context:addOption(title)
     local submenu = ISContextMenu:getNew(context)

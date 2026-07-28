@@ -8,6 +8,7 @@
 require "PNC/Core/Behaviors/PNC_Behavior_MoveIntent"
 require "PNC/Core/Behaviors/PNC_Behavior_Common"
 require "PNC/Core/Behaviors/PNC_Behavior_Targeting"
+require "PNC/Core/Combat/PNC_Combat_Engagement"
 require "PNC/Core/Behaviors/PNC_Behavior_Combat"
 require "PNC/Core/Behaviors/PNC_BehaviorRegistry"
 require "PNC/Core/Behaviors/PNC_Behavior_Travel"

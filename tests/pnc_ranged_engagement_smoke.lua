@@ -109,6 +109,7 @@ PNC = {
     },
 }
 
+dofile(ROOT .. "Combat/PNC_Combat_Engagement.lua")
 dofile(ROOT .. "Behaviors/PNC_Behavior_Combat.lua")
 
 local record = {
