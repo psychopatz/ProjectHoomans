@@ -5,8 +5,40 @@ Replicated zombie online-ID lookup consumes `PNC_WorldCensus`, so several
 reaction packets in one frame do not each traverse the full engine zombie list.
 
 ## Purpose
-- `PNC_Network` owns client-facing payload construction and replication only.
+- `PNC_Network` exposes the stable shared networking facade.
 - the server registry remains authoritative; clients never create canonical NPC records.
+
+## Module Layout
+
+Shared networking modules:
+
+- `PNC_Network`: public `PNC.Network` facade and shared state
+- `PNC_Network_SnapshotParts`: reusable identity, movement, combat, roster,
+  and debug-state payload sections
+- `PNC_Network_Snapshots`: detailed snapshots, presence deltas, and character
+  payloads
+- `PNC_Network_Server`: transport fan-out, interest sets, roster deltas,
+  removals, and server response payloads
+- `PNC_Network_CombatEvents`: transient zombie reaction, bite, and firearm
+  replication
+
+Client networking modules:
+
+- `PNC_Client`: bootstrap and top-level event wiring
+- `PNC_ClientCommandRouter`: inbound command registry and dispatcher
+- `PNC_ClientCombatCommands`: transient combat-event application and bite
+  replica lifecycle
+- `PNC_ClientRequests`: full-sync, debug-roster, and character-detail requests
+- `PNC_ClientRosterCommands`: roster chunks, record deltas, and removal handlers
+- `PNC_ClientInventoryCommands`: character payload, inventory delta, and result
+  handlers
+- `PNC_ClientActions`: outbound debug, map, health, companion, and inventory
+  commands
+
+New inbound commands should register a handler from their domain module through
+`PNC.Client.Internal.RegisterServerCommand`. Existing callers should continue
+using the public `PNC.Network.*` and `PNC.Client.*` APIs rather than requiring
+feature modules directly.
 
 ## Current Payload Lanes
 - `BuildRosterSnapshot`: compact list data sent in 50-record join chunks and batched roster deltas

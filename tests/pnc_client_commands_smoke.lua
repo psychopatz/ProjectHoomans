@@ -1,0 +1,201 @@
+local CLIENT_ROOT =
+    "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
+package.path = CLIENT_ROOT .. "?.lua;" .. package.path
+
+local FILE = CLIENT_ROOT .. "PNC/PNC_Client.lua"
+
+local function assertEqual(actual, expected, label)
+    if actual ~= expected then
+        error(
+            (label or "assertEqual")
+                .. ": expected=" .. tostring(expected)
+                .. " actual=" .. tostring(actual)
+        )
+    end
+end
+
+local clearedNPC
+local firearmShot
+local inventoryResult
+local mapResult
+local removedBody
+
+package.preload["PsychopatzCore/World/PsychopatzTeleport"] = function()
+    return { ToCoordinates = function() return true end }
+end
+
+PNC = {
+    Const = {
+        MODULE = "PNC",
+        CMD_DEBUG_ROSTER = "DebugRoster",
+        CMD_MAP_COMMAND_RESULT = "MapCommandResult",
+        CMD_ZOMBIE_REACTION = "ZombieReaction",
+        CMD_ZOMBIE_BITE = "ZombieBite",
+        CMD_FIREARM_SHOT = "FirearmShot",
+        CMD_FULL_SYNC = "FullSync",
+        CMD_ROSTER_SYNC_BEGIN = "RosterSyncBegin",
+        CMD_ROSTER_SYNC_CHUNK = "RosterSyncChunk",
+        CMD_ROSTER_SYNC_END = "RosterSyncEnd",
+        CMD_ROSTER_DELTA = "RosterDelta",
+        CMD_SYNC_RECORD = "SyncRecord",
+        CMD_REMOVE_RECORD = "RemoveRecord",
+        CMD_REMOVE_BODY = "RemoveBody",
+        CMD_CHARACTER_PAYLOAD = "CharacterPayload",
+        CMD_INVENTORY_DELTA = "InventoryDelta",
+        CMD_INVENTORY_RESULT = "InventoryResult",
+    },
+    Core = {
+        Now = function() return 5000 end,
+        DeepCopy = function(value)
+            if type(value) ~= "table" then return value end
+            local output = {}
+            for key, item in pairs(value) do
+                output[key] = PNC.Core.DeepCopy(item)
+            end
+            return output
+        end,
+        IsClientOnly = function() return false end,
+    },
+    Network = {
+        ClientState = {
+            snapshots = {},
+            characterPayloads = {},
+        },
+        FindZombieByOnlineID = function() return nil end,
+    },
+    Registry = {
+        Get = function() return nil end,
+        GetLiveZombie = function() return nil end,
+    },
+    ClientInterpolation = {
+        ClearAll = function() end,
+        ClearNPC = function(id) clearedNPC = id end,
+    },
+    ClientFirearmEffects = {
+        Play = function(args) firearmShot = args end,
+    },
+    ClientPresenceSync = {
+        RemoveBodyInstance = function(args) removedBody = args end,
+    },
+    InventoryWindow = {
+        OnResult = function(args) inventoryResult = args end,
+    },
+    MapCommands = {
+        HandleResult = function(args) mapResult = args end,
+    },
+}
+
+dofile(FILE)
+
+local Client = PNC.Client
+local State = PNC.Network.ClientState
+
+local customPayload
+Client.Internal.RegisterServerCommand(
+    "CustomCommand",
+    function(args) customPayload = args end
+)
+Client.HandleServerCommand("CustomCommand", { value = 7 })
+assertEqual(customPayload.value, 7, "extensible command registry")
+
+Client.HandleServerCommand("FullSync", {
+    snapshots = {
+        { id = "npc_full", x = 1 },
+    },
+})
+assertEqual(State.snapshots.npc_full.x, 1, "legacy full sync")
+
+Client.HandleServerCommand("RosterSyncBegin", {
+    directoryRevision = 4,
+    chunkCount = 1,
+})
+Client.HandleServerCommand("RosterSyncChunk", {
+    chunkIndex = 1,
+    snapshots = {
+        {
+            id = "npc_roster",
+            travel = {
+                route = { points = { { x = 1, y = 2 } } },
+            },
+        },
+    },
+})
+Client.HandleServerCommand("RosterSyncEnd", {
+    directoryRevision = 4,
+})
+assertEqual(State.rosterRevision, 4, "roster revision")
+assertEqual(
+    State.snapshots.npc_roster.travel.route.points[1].y,
+    2,
+    "roster chunk applied"
+)
+
+Client.HandleServerCommand("SyncRecord", {
+    event = "tick",
+    snapshot = {
+        id = "npc_roster",
+        x = 9,
+        travel = { state = "en_route" },
+    },
+})
+assertEqual(State.snapshots.npc_roster.x, 9, "record delta merged")
+assertEqual(
+    State.snapshots.npc_roster.travel.route.points[1].x,
+    1,
+    "record delta retained route"
+)
+
+Client.HandleServerCommand("CharacterPayload", {
+    npcId = "npc_roster",
+    snapshot = { id = "npc_roster", x = 10 },
+    inventory = {
+        items = {
+            item_1 = { id = "item_1", stack = 1 },
+        },
+        containers = {},
+        summary = { revision = 1 },
+    },
+})
+Client.HandleServerCommand("InventoryDelta", {
+    npcId = "npc_roster",
+    inventoryRevision = 2,
+    ops = {
+        {
+            op = "update",
+            itemID = "item_1",
+            stack = 3,
+        },
+    },
+    summary = { revision = 2 },
+})
+assertEqual(
+    State.characterPayloads.npc_roster.inventory.items.item_1.stack,
+    3,
+    "inventory delta applied"
+)
+assertEqual(
+    State.characterPayloads.npc_roster.inventory.revision,
+    2,
+    "inventory revision applied"
+)
+
+Client.HandleServerCommand("InventoryResult", { success = true })
+assertEqual(inventoryResult.success, true, "inventory result dispatched")
+Client.HandleServerCommand("MapCommandResult", { ok = true })
+assertEqual(mapResult.ok, true, "map result dispatched")
+Client.HandleServerCommand("FirearmShot", { shotId = "shot:1" })
+assertEqual(firearmShot.shotId, "shot:1", "firearm event dispatched")
+Client.HandleServerCommand("RemoveBody", { bodyInstanceID = "17" })
+assertEqual(removedBody.bodyInstanceID, "17", "body removal dispatched")
+
+Client.HandleServerCommand("RemoveRecord", { id = "npc_roster" })
+assertEqual(State.snapshots.npc_roster, nil, "record removal applied")
+assertEqual(
+    State.characterPayloads.npc_roster,
+    nil,
+    "character payload removal applied"
+)
+assertEqual(clearedNPC, "npc_roster", "interpolation record cleared")
+assertEqual(State.lastSyncReceiveAt, 5000, "command receive timestamp")
+
+print("pnc_client_commands_smoke: ok")
