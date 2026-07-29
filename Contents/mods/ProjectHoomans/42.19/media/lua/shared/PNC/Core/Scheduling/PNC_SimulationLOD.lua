@@ -28,6 +28,13 @@ local function isTraveling(record)
         or false
 end
 
+local function isFollowingOwner(record)
+    local order = record and record.orderSpec or {}
+    return tostring(order.kind or "") == tostring(
+        Const.ORDER_FOLLOW or "follow"
+    )
+end
+
 local function isAbstractDormant(record)
     local order = record.orderSpec or {}
     local health = record.health or {}
@@ -78,10 +85,14 @@ function LOD.Resolve(record)
     end
     if record.runtime and record.runtime.attackAction then return "combat_action" end
     if record.runtime and record.runtime.target then return "combat" end
-    if isMoving(record) then return "moving" end
     if record.health and record.health.state == "incapacitated" then
         return "incapacitated"
     end
+    -- A live follower is never truly idle: its goal is another moving actor.
+    -- Keeping this tier hot removes the one-second wake-up delay without
+    -- increasing cadence for unrelated stationary NPCs.
+    if isFollowingOwner(record) then return "follow_owner" end
+    if isMoving(record) then return "moving" end
     return "live_idle"
 end
 
@@ -97,6 +108,9 @@ function LOD.GetCadence(record)
     if tier == "combat_action" then return 50 end
     if tier == "combat" then
         return math.min(tonumber(Const.TICK_LIVE_HOT_MS) or 100, 75)
+    end
+    if tier == "follow_owner" then
+        return tonumber(Const.FOLLOW_TICK_INTERVAL_MS) or 100
     end
     if tier == "moving" or tier == "incapacitated" then
         return math.min(tonumber(Const.TICK_LIVE_WARM_MS) or 250, 100)
@@ -122,6 +136,9 @@ function LOD.GetDecisionInterval(record)
     if tier == "presence_wake" then return 50 end
     if tier == "combat_action" then return 50 end
     if tier == "combat" then return 100 end
+    if tier == "follow_owner" then
+        return tonumber(Const.FOLLOW_DECISION_INTERVAL_MS) or 100
+    end
     if tier == "moving" or tier == "vehicle" then return 250 end
     if tier == "incapacitated" then return 250 end
     if tier == "abstract_near" or tier == "abstract_active"
@@ -171,7 +188,8 @@ function LOD.GetPathInterval(record)
     if tier == "combat_action" then
         return tonumber(Const.SIMULATION_PATH_HOT_MS) or 50
     end
-    if tier == "combat" or tier == "moving" or tier == "vehicle"
+    if tier == "combat" or tier == "follow_owner"
+        or tier == "moving" or tier == "vehicle"
         or tier == "incapacitated"
     then
         return tonumber(Const.SIMULATION_PATH_MOVING_MS) or 100

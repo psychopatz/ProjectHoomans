@@ -18,6 +18,7 @@ local DEFAULT_PUSH_DURATION_MS = 150
 local DEFAULT_PUSH_DISTANCE = 0.18
 local DEFAULT_STEP_DISTANCE = 0.06
 local ENGINE_HIT_SETTLE_MS = 650
+local MIN_ENGINE_REACTION_MS = 110
 
 local function getSquare(x, y, z)
     if not getCell then
@@ -45,6 +46,52 @@ end
 local function clearReactionState(zombie, modData)
     if modData then
         modData.PNC_CombatReaction = nil
+    end
+end
+
+local function isDamageReactionState(zombie)
+    local name = zombie
+        and zombie.getActionStateName
+        and tostring(zombie:getActionStateName() or ""):lower()
+        or ""
+    return name:find("stagger", 1, true) ~= nil
+        or name:find("bump", 1, true) ~= nil
+        or name:find("hitreaction", 1, true) ~= nil
+        or name:find("knockdown", 1, true) ~= nil
+        or name:find("fall", 1, true) ~= nil
+        or name:find("onground", 1, true) ~= nil
+end
+
+local function releaseReactionState(zombie, state, force)
+    local shouldReleaseStagger = force == true
+        or state and state.pncForcedStagger == true
+        or isDamageReactionState(zombie)
+    if not zombie then
+        return
+    end
+    if shouldReleaseStagger and zombie.setStaggerBack then
+        zombie:setStaggerBack(false)
+    end
+    if shouldReleaseStagger and zombie.setBumpDone then
+        zombie:setBumpDone(true)
+    end
+    if shouldReleaseStagger and zombie.setVariable then
+        zombie:setVariable("BumpDone", true)
+        zombie:setVariable("BumpAnimFinished", true)
+    end
+    if shouldReleaseStagger and zombie.setBumpType then
+        local bumpType = zombie.getBumpType
+            and tostring(zombie:getBumpType() or "")
+            or "stagger"
+        if bumpType == "" or bumpType:lower() == "stagger" then
+            zombie:setBumpType("")
+        end
+    end
+    if state and state.pncHitReaction == true and zombie.setHitReaction then
+        zombie:setHitReaction("")
+    end
+    if shouldReleaseStagger and zombie.setStateEventDelayTimer then
+        zombie:setStateEventDelayTimer(0)
     end
 end
 
@@ -121,8 +168,8 @@ local function beginReaction(attackerZombie, targetZombie, options)
     dirX, dirY = resolvePushDirection(attackerZombie, targetZombie)
 
     applyHitContext(attackerZombie, targetZombie, options)
-    -- Explicit shoves may request vanilla stagger/knockdown entry. PNC never
-    -- clears these flags; the engine state that consumes them owns their exit.
+    -- Explicit shoves request vanilla stagger entry, but retain a bounded PNC
+    -- lease so a missing animation event cannot leave the zombie frozen.
     if (options == nil or options.stagger ~= false) and targetZombie.setStaggerBack then
         targetZombie:setStaggerBack(true)
         if targetZombie.setBumpType then
@@ -134,6 +181,12 @@ local function beginReaction(attackerZombie, targetZombie, options)
     end
     state = state or {}
     state.kind = options and tostring(options.kind or "melee") or "melee"
+    state.startedAt = tonumber(state.startedAt) or now
+    state.engineOwned = false
+    state.pncForcedStagger = options == nil or options.stagger ~= false
+    state.pncHitReaction = options
+        and options.hitReaction ~= nil
+        or state.pncHitReaction == true
     state.expiresAt = math.max(tonumber(state.expiresAt) or 0, now + durationMs)
     state.pushExpiresAt = math.max(tonumber(state.pushExpiresAt) or 0, now + pushDurationMs)
     state.remainingPush = math.max(tonumber(state.remainingPush) or 0, pushDistance)
@@ -149,7 +202,11 @@ local function beginReaction(attackerZombie, targetZombie, options)
     return true
 end
 
-local function beginEngineHitSettle(targetZombie, options)
+local function beginEngineHitSettle(
+    targetZombie,
+    options,
+    ownsHitReaction
+)
     local modData
     local state
     local now
@@ -164,6 +221,9 @@ local function beginEngineHitSettle(targetZombie, options)
     state = state or {}
     state.kind = options and tostring(options.kind or "weapon_hit") or "weapon_hit"
     state.engineOwned = true
+    state.startedAt = now
+    state.pncForcedStagger = false
+    state.pncHitReaction = ownsHitReaction == true
     state.expiresAt = math.max(
         tonumber(state.expiresAt) or 0,
         now + math.max(160, tonumber(options and options.settleMs) or ENGINE_HIT_SETTLE_MS)
@@ -202,13 +262,20 @@ function ZombieReaction.ApplyWeaponHit(attackerZombie, targetZombie, weaponItem,
         if targetZombie.setAttackedBy and attackerZombie then
             targetZombie:setAttackedBy(attackerZombie)
         end
-        if options and options.hitReaction and targetZombie.setHitReaction then
+        if not applied
+            and options
+            and options.hitReaction
+            and targetZombie.setHitReaction
+        then
             targetZombie:setHitReaction(tostring(options.hitReaction))
         end
-        if (not options or options.stagger ~= false) and targetZombie.setStaggerBack then
-            targetZombie:setStaggerBack(true)
-        end
-        beginEngineHitSettle(targetZombie, options)
+        -- IsoZombie:Hit owns stagger entry. Reasserting StaggerBack here could
+        -- leave WalkToward/attack AI suspended after the engine clip ended.
+        beginEngineHitSettle(
+            targetZombie,
+            options,
+            not applied and options and options.hitReaction ~= nil
+        )
     end
     -- IsoZombie:Hit owns the visible reaction. Manual movement is reserved for
     -- explicit shoves so normal hits cannot fight the engine state machine.
@@ -220,6 +287,8 @@ end
 
 function ZombieReaction.ApplyReplicatedHit(attackerZombie, targetZombie, options)
     local health
+    local modData
+    local state
     if not targetZombie or (targetZombie.isDead and targetZombie:isDead()) then
         return false
     end
@@ -236,9 +305,28 @@ function ZombieReaction.ApplyReplicatedHit(attackerZombie, targetZombie, options
     end
     if options.stagger ~= false and targetZombie.setStaggerBack then
         targetZombie:setStaggerBack(true)
+        if targetZombie.setBumpDone then
+            targetZombie:setBumpDone(false)
+        end
+        if targetZombie.setVariable then
+            targetZombie:setVariable("BumpDone", false)
+            targetZombie:setVariable("BumpAnimFinished", false)
+        end
         if targetZombie.setBumpType then
             targetZombie:setBumpType("stagger")
         end
+    end
+    options.settleMs = tonumber(options.settleMs)
+        or (tostring(options.kind or "") == "ranged" and 420 or 520)
+    beginEngineHitSettle(
+        targetZombie,
+        options,
+        options.hitReaction ~= nil
+    )
+    modData, state = getReactionState(targetZombie)
+    if modData and state then
+        state.pncForcedStagger = options.stagger ~= false
+        state.pncHitReaction = options.hitReaction ~= nil
     end
     return true
 end
@@ -251,7 +339,16 @@ function ZombieReaction.IsEngineHitSettling(targetZombie, now)
         return false
     end
     now = tonumber(now) or Core.Now()
-    return now < (tonumber(state.expiresAt) or 0)
+    if now >= (tonumber(state.expiresAt) or 0) then
+        return false
+    end
+    if now < (
+        (tonumber(state.startedAt) or now)
+        + MIN_ENGINE_REACTION_MS
+    ) then
+        return true
+    end
+    return isDamageReactionState(targetZombie)
 end
 
 function ZombieReaction.Clear(targetZombie)
@@ -280,6 +377,21 @@ function ZombieReaction.Pump(targetZombie, now)
     end
 
     if now >= (tonumber(state.expiresAt) or 0) then
+        releaseReactionState(targetZombie, state, true)
+        clearReactionState(targetZombie, modData)
+        return false
+    end
+
+    -- Once the engine has left its damage state, return AI ownership
+    -- immediately instead of suppressing pursuit for the whole settle timeout.
+    if state.engineOwned == true
+        and now >= (
+            (tonumber(state.startedAt) or now)
+            + MIN_ENGINE_REACTION_MS
+        )
+        and not isDamageReactionState(targetZombie)
+    then
+        releaseReactionState(targetZombie, state, false)
         clearReactionState(targetZombie, modData)
         return false
     end
@@ -303,6 +415,5 @@ function ZombieReaction.Pump(targetZombie, now)
         state.lastPushAt = now
     end
 
-    -- This overlay never owns zombie AI. Vanilla aggro/state updates continue.
-    return false
+    return true
 end

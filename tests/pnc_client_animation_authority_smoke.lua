@@ -6,6 +6,7 @@ local calls = {
     apply = 0,
     clear = 0,
     finish = 0,
+    maintain = 0,
     nativeStyle = 0,
     play = 0,
     pump = 0,
@@ -43,6 +44,12 @@ PNC = {
                 zombie:setBumpType(anim)
             end
         end,
+        MaintainBump = function(zombie, _, anim)
+            calls.maintain = calls.maintain + 1
+            if zombie and zombie.setBumpType then
+                zombie:setBumpType(anim)
+            end
+        end,
         PumpBumpRelease = function()
             calls.pump = calls.pump + 1
             return pumpReturnsActive
@@ -56,6 +63,13 @@ PNC = {
         Internal = {
             LogClientMotionDebug = function() end,
         },
+    },
+    BehaviorTreatment = {
+        ResolveBandageAnimation = function(partId)
+            return partId == "Hand_L"
+                and "BandageLeftArm"
+                or "BandageUpperBody"
+        end,
     },
 }
 
@@ -285,5 +299,60 @@ assert(
     calls.finish == finishesBeforeSpecial,
     "local authority finished its server-owned special bump"
 )
+
+local treatmentBody = body()
+local treatmentSnapshot = {
+    id = "treatment_replica",
+    alive = true,
+    attackMode = false,
+    healthState = "normal",
+    presenceRevision = 1,
+    presenceState = "live",
+    treatmentState = {
+        phase = "bandaging",
+        partId = "Hand_L",
+        startedAt = 2000,
+        finishAt = 7000,
+    },
+    visualState = {
+        anim = "Idle",
+        moving = false,
+    },
+}
+local playsBeforeTreatment = calls.play
+local finishesBeforeTreatment = calls.finish
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    treatmentSnapshot,
+    treatmentBody,
+    true
+)
+assert(calls.play == playsBeforeTreatment + 1,
+    "MP treatment snapshot did not start its bandage animation")
+assert(treatmentBody:getModData().PNC_ClientTreatmentAnimKey
+        == "Hand_L:2000",
+    "MP treatment animation key was not retained")
+assert(engineMovementActive == true,
+    "MP treatment animation did not retain engine action updates")
+
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    treatmentSnapshot,
+    treatmentBody,
+    true
+)
+assert(calls.play == playsBeforeTreatment + 1,
+    "MP treatment animation was restarted on an unchanged snapshot")
+assert(calls.maintain == 1,
+    "MP treatment animation lease was not maintained")
+
+treatmentSnapshot.treatmentState = {
+    phase = "idle",
+}
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    treatmentSnapshot,
+    treatmentBody,
+    true
+)
+assert(calls.finish == finishesBeforeTreatment + 1,
+    "MP treatment completion did not release its bandage animation")
 
 print("pnc_client_animation_authority_smoke: ok")

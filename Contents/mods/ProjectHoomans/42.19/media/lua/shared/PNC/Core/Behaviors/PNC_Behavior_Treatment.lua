@@ -37,6 +37,11 @@ local BANDAGE_ANIM_BY_PART = {
     Foot_R = "BandageRightLeg",
 }
 
+function Behavior.ResolveBandageAnimation(partId)
+    return BANDAGE_ANIM_BY_PART[tostring(partId or "")]
+        or "BandageUpperBody"
+end
+
 local function ensureState(record)
     record.runtime = record.runtime or {}
     record.runtime.selfTreatment = record.runtime.selfTreatment or {
@@ -138,6 +143,7 @@ local function startBandage(record, zombie, partId, now)
     local emitter
     local modData
     local soundKey
+    local bandageAnim
     if not supply then return false end
     state.phase = "bandaging"
     state.partId = partId
@@ -153,18 +159,29 @@ local function startBandage(record, zombie, partId, now)
     if MoveIntent and MoveIntent.Hold then
         MoveIntent.Hold(record, "self_bandage")
     end
+    bandageAnim = Behavior.ResolveBandageAnimation(partId)
     if zombie and Animation and Animation.PlayBump then
         Animation.PlayBump(
             zombie,
             record,
-            BANDAGE_ANIM_BY_PART[partId] or "BandageUpperBody"
+            bandageAnim,
+            {
+                leaseUntil = state.finishAt,
+            }
         )
+    end
+    modData = zombie and zombie.getModData
+        and zombie:getModData() or nil
+    soundKey = tostring(partId) .. ":" .. tostring(state.startedAt)
+    if modData then
+        -- The local client sees the same body in SP/listen-host worlds. Mark
+        -- the authority-started action so snapshot presentation maintains it
+        -- instead of selecting the same node a second time.
+        modData.PNC_ClientTreatmentAnimKey = soundKey
     end
     emitter = zombie and zombie.getEmitter and zombie:getEmitter() or nil
     if emitter and emitter.playSound then
         emitter:playSound("FirstAidApplyBandage")
-        modData = zombie.getModData and zombie:getModData() or nil
-        soundKey = tostring(partId) .. ":" .. tostring(state.startedAt)
         if modData then
             -- Local-authority worlds use the same snapshot presentation path.
             -- Seed its dedupe key so the replicated SFX is not played twice.
@@ -250,6 +267,14 @@ function Behavior.Tick(record, zombie, now)
         record.activeBehavior = "SelfBandage"
         if MoveIntent and MoveIntent.Hold then
             MoveIntent.Hold(record, "self_bandage")
+        end
+        if Animation and Animation.MaintainBump then
+            Animation.MaintainBump(
+                zombie,
+                record,
+                Behavior.ResolveBandageAnimation(state.partId),
+                state.finishAt
+            )
         end
         if now < (tonumber(state.finishAt) or 0) then return true end
         applied, label = Treatment.TryNPCBandage(record, state.partId)

@@ -536,10 +536,9 @@ function Internal.computeResolvedMode(record, lane, zombie, goal)
         end
         return "walk"
     end
-    if lane.mode == "sneak"
-        or (record and record.runtime
-            and record.runtime.stealthActive == true)
-    then
+    -- Behavior owns the requested locomotion mode. Stealth visibility is a
+    -- combat/aggro policy and must not silently rewrite an existing path lane.
+    if lane.mode == "sneak" then
         return "sneak"
     end
     if lane.mode ~= "walk" and lane.mode ~= "run" then

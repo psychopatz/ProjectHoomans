@@ -4,6 +4,7 @@ PNC = {
     Const = {
         PRESENCE_ABSTRACT = "abstract",
         ORDER_GUARD = "guard",
+        ORDER_FOLLOW = "follow",
         ABSTRACT_NEAR_DISTANCE = 80,
         TICK_ABSTRACT_MS = 3000,
         TICK_ABSTRACT_FAR_MS = 15000,
@@ -20,6 +21,8 @@ PNC = {
         SIMULATION_PATH_HOT_MS = 50,
         SIMULATION_PATH_MOVING_MS = 100,
         SIMULATION_PATH_IDLE_MS = 500,
+        FOLLOW_TICK_INTERVAL_MS = 100,
+        FOLLOW_DECISION_INTERVAL_MS = 100,
         ABSTRACT_TRAVEL_SPEED = 1.6666667,
         TICK_ABSTRACT_MS = 3000,
     },
@@ -88,6 +91,23 @@ assert(PNC.SimulationLOD.Resolve(far) == "presence_wake"
     and PNC.SimulationLOD.GetCadence(far) == 50,
     "deferred materialization did not retain its fast wake cadence")
 far.runtime.forcePresenceCheck = nil
+
+local follower = {
+    x = 0,
+    y = 0,
+    presenceState = "live",
+    orderSpec = { kind = "follow" },
+    health = { current = 100, max = 100 },
+    runtime = {},
+}
+assert(PNC.SimulationLOD.Resolve(follower) == "follow_owner",
+    "stationary follower was incorrectly classified as idle")
+assert(PNC.SimulationLOD.GetCadence(follower) == 100,
+    "stationary follower retained the one-second wake delay")
+assert(PNC.SimulationLOD.GetDecisionInterval(follower) == 100,
+    "moving-owner decisions were not refreshed responsively")
+assert(PNC.SimulationLOD.GetPathInterval(follower) == 100,
+    "follow path pumping remained on the idle cadence")
 
 assert(PNC.SimulationClock.IsDue(far, "vitals", 1000, 5000, false),
     "new subsystem clock was not due")

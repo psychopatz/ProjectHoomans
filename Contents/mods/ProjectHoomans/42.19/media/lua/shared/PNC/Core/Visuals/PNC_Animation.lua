@@ -582,6 +582,7 @@ function Animation.PlayBump(zombie, record, bumpType, options)
     local resolvedBumpType
     local keepManagedUseless
     local combatBump
+    local leaseUntil
     if not zombie then
         return false, "no_body"
     end
@@ -618,12 +619,17 @@ function Animation.PlayBump(zombie, record, bumpType, options)
         keepManagedUseless = false
     end
     modData = zombie.getModData and zombie:getModData() or nil
+    leaseUntil = tonumber(options and options.leaseUntil)
+        or (now + BUMP_ACTION_LEASE_TIMEOUT_MS)
+    leaseUntil = math.max(
+        now + BUMP_ACTION_ENTRY_GRACE_MS,
+        leaseUntil
+    )
     if modData then
         modData.PNC_BumpReleasePending = nil
         modData.PNC_BumpReleaseAt = nil
         modData.PNC_BumpActionLease = true
-        modData.PNC_BumpActionLeaseUntil =
-            now + BUMP_ACTION_LEASE_TIMEOUT_MS
+        modData.PNC_BumpActionLeaseUntil = leaseUntil
         modData.PNC_BumpActionLeaseStartedAt = now
         modData.PNC_BumpRequestedType = resolvedBumpType
         modData.PNC_BumpKeepUseless = keepManagedUseless
@@ -719,6 +725,48 @@ function Animation.PlayBump(zombie, record, bumpType, options)
         stateAfter
     )
     return true, "bump_type_setter"
+end
+
+-- Long actions such as self-treatment own the selector for their whole
+-- authority window. Extend a healthy selector without replaying it; if the
+-- engine dropped the bumped state early, restart the same PNC-owned node.
+function Animation.MaintainBump(
+    zombie,
+    record,
+    bumpType,
+    leaseUntil
+)
+    local modData
+    local resolvedBumpType
+    local now
+    if not zombie then
+        return false, "no_body"
+    end
+    now = Core and Core.Now and Core.Now() or 0
+    resolvedBumpType = Animation.ResolveBumpType(bumpType)
+    modData = zombie.getModData and zombie:getModData() or nil
+    if modData
+        and tostring(modData.PNC_BumpRequestedType or "")
+            == tostring(resolvedBumpType)
+        and Animation.IsBumpActionActive(zombie, now)
+    then
+        modData.PNC_BumpActionLeaseUntil = math.max(
+            tonumber(modData.PNC_BumpActionLeaseUntil) or 0,
+            tonumber(leaseUntil) or (
+                now + BUMP_ACTION_LEASE_TIMEOUT_MS
+            )
+        )
+        applyBumpLeaseBodyMode(zombie)
+        return true, "bump_maintained"
+    end
+    return Animation.PlayBump(
+        zombie,
+        record,
+        bumpType,
+        {
+            leaseUntil = leaseUntil,
+        }
+    )
 end
 
 function Animation.FinishBump(zombie, forceIdle)

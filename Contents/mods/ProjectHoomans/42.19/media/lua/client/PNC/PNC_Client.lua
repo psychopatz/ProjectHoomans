@@ -59,6 +59,7 @@ local function onResetLua()
     ClientState.inventoryResult = nil
     ClientState.inventoryRequestSerial = 0
     Client.BiteReplicas = {}
+    Client.ZombieReactionReplicas = {}
     if PNC.ClientFirearmEffects and PNC.ClientFirearmEffects.Reset then
         PNC.ClientFirearmEffects.Reset()
     end
@@ -80,5 +81,5 @@ if Events and Events.OnResetLua then
     Events.OnResetLua.Add(onResetLua)
 end
 if Events and Events.OnTick then
-    Events.OnTick.Add(Internal.PumpBiteReplicas)
+    Events.OnTick.Add(Internal.PumpCombatReplicas)
 end

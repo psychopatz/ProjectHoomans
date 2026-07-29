@@ -14,6 +14,7 @@ local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 
 Client.BiteReplicas = Client.BiteReplicas or {}
+Client.ZombieReactionReplicas = Client.ZombieReactionReplicas or {}
 
 local function applyZombieReaction(args)
     local targetZombie
@@ -33,7 +34,20 @@ local function applyZombieReaction(args)
     if not reaction or not reaction.ApplyReplicatedHit then
         return false
     end
-    return reaction.ApplyReplicatedHit(attackerZombie, targetZombie, args)
+    local applied = reaction.ApplyReplicatedHit(
+        attackerZombie,
+        targetZombie,
+        args
+    )
+    if applied then
+        Client.ZombieReactionReplicas[
+            tostring(args.targetOnlineID)
+        ] = {
+            targetOnlineID = args.targetOnlineID,
+            deadline = Core.Now() + 1500,
+        }
+    end
+    return applied
 end
 
 local function signalBiteRelease(attackerZombie)
@@ -132,12 +146,13 @@ local function applyZombieBite(args)
     return true
 end
 
-local function pumpBiteReplicas()
+local function pumpCombatReplicas()
     local now = Core.Now()
     local key
     local state
     local zombie
     local asn
+    local reaction
     for key, state in pairs(Client.BiteReplicas) do
         zombie = PNC.Network and PNC.Network.FindZombieByOnlineID
             and PNC.Network.FindZombieByOnlineID(state.attackerOnlineID) or nil
@@ -165,9 +180,26 @@ local function pumpBiteReplicas()
             })
         end
     end
+    reaction = PNC.CombatZombieReaction
+    for key, state in pairs(Client.ZombieReactionReplicas) do
+        zombie = PNC.Network and PNC.Network.FindZombieByOnlineID
+            and PNC.Network.FindZombieByOnlineID(
+                state.targetOnlineID
+            )
+            or nil
+        if zombie and reaction and reaction.Pump then
+            if not reaction.Pump(zombie, now) then
+                Client.ZombieReactionReplicas[key] = nil
+            end
+        elseif now >= (tonumber(state.deadline) or 0) then
+            Client.ZombieReactionReplicas[key] = nil
+        end
+    end
 end
 
-Internal.PumpBiteReplicas = pumpBiteReplicas
+Internal.PumpCombatReplicas = pumpCombatReplicas
+-- Compatibility alias for older client bootstrap code and external tooling.
+Internal.PumpBiteReplicas = pumpCombatReplicas
 
 Internal.RegisterServerCommand(Const.CMD_ZOMBIE_REACTION, function(args)
     applyZombieReaction(args)

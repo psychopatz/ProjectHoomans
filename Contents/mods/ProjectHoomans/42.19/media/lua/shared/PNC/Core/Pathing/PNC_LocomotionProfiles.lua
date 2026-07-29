@@ -134,9 +134,7 @@ local function resolveStaminaMode(record, lane, requestedMode)
     if runtime and runtime.target then
         return "combat_close"
     end
-    if requestedMode == "sneak"
-        or (runtime and runtime.stealthActive == true)
-    then
+    if requestedMode == "sneak" then
         return "sneak"
     end
     return "travel"

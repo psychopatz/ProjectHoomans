@@ -396,17 +396,57 @@ function Stealth.ShouldSuppressZombieAggro(record)
         or Stealth.IsTravelStealthActive(record)
 end
 
-function Stealth.ResolveFollowMoveMode(record, owner, ownerDist)
-    if Stealth.IsFollowStealthActive(record) and isOwnerActuallySneaking(owner, ownerDist) then
+function Stealth.ResolveFollowMoveMode(
+    record,
+    owner,
+    ownerDist,
+    slotDist,
+    hazardCount
+)
+    local runtime = record and record.runtime or {}
+    local state = runtime.followState or {}
+    local enterDistance = tonumber(Const.FOLLOW_WALK_DISTANCE) or 4
+    local exitDistance = tonumber(
+        Const.FOLLOW_CATCHUP_EXIT_DISTANCE
+    ) or 3
+    local ownerRunning = owner and (
+        (owner.isRunning and owner:isRunning())
+        or (owner.isSprinting and owner:isSprinting())
+    ) or false
+    if record then
+        record.runtime = runtime
+        runtime.followState = state
+    end
+
+    -- Posture follows the owner, while stealth discovery independently
+    -- controls aggro/combat suppression. Coupling those two decisions made a
+    -- discovered sneaking owner force followers into the wrong walk state.
+    if isOwnerActuallySneaking(owner, ownerDist) then
+        state.catchingUp = false
         return "sneak"
     end
-    if owner and owner.isRunning and owner:isRunning() then
-        return "run"
+
+    if ownerRunning
+        or (tonumber(ownerDist) or 0) >= enterDistance
+        or (tonumber(slotDist) or 0) >= enterDistance
+        or (
+            state.ownerMoving == true
+            and (tonumber(hazardCount) or 0)
+                >= (tonumber(Const.FOLLOW_HORDE_AVOID_COUNT) or 3)
+        )
+    then
+        state.catchingUp = true
+    elseif state.catchingUp == true
+        and math.max(
+            tonumber(ownerDist) or 0,
+            tonumber(slotDist) or 0
+        ) > exitDistance
+    then
+        state.catchingUp = true
+    else
+        state.catchingUp = false
     end
-    if owner and owner.isSprinting and owner:isSprinting() then
-        return "run"
-    end
-    if ownerDist >= Const.FOLLOW_RUN_DISTANCE then
+    if state.catchingUp == true then
         return "run"
     end
     return "walk"

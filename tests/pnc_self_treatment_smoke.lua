@@ -18,6 +18,8 @@ local moveRequest
 local treatmentSounds = 0
 local zombieModData = {}
 local retreatAvailable = true
+local maintainedBumps = 0
+local bumpLeaseUntil
 
 PNC = {
     Const = {
@@ -60,8 +62,14 @@ PNC = {
         end,
     },
     Animation = {
-        PlayBump = function(_, _, selected)
+        PlayBump = function(_, _, selected, options)
             bumpType = selected
+            bumpLeaseUntil = options and options.leaseUntil or nil
+        end,
+        MaintainBump = function(_, _, selected, leaseUntil)
+            bumpType = selected
+            bumpLeaseUntil = leaseUntil
+            maintainedBumps = maintainedBumps + 1
         end,
         FinishBump = function()
             bumpFinished = bumpFinished + 1
@@ -139,8 +147,17 @@ assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
 assertEqual(bumpType, "BandageLeftArm", "body-part-specific animation")
 assertEqual(record.runtime.selfTreatment.phase, "bandaging", "bandage phase")
 assertEqual(treatmentSounds, 1, "self-bandage SFX")
+assertEqual(bumpLeaseUntil, 2100, "bandage action lease covers treatment")
 assertEqual(zombieModData.PNC_ClientTreatmentSoundKey, "Hand_L:1100",
     "local replicated SFX dedupe key")
+assertEqual(zombieModData.PNC_ClientTreatmentAnimKey, "Hand_L:1100",
+    "local replicated animation dedupe key")
+
+now = now + 100
+assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
+    "safe treatment remains active")
+assertEqual(maintainedBumps, 1,
+    "authority did not maintain the bandage selector")
 
 threat = { kind = "zombie", x = 2, y = 0, z = 0, distSq = 4 }
 now = now + 100
