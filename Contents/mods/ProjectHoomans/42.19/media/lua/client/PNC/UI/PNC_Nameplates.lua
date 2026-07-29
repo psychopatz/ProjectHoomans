@@ -14,6 +14,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
         showPathDebug = false,
         showCombatDebug = false,
         showAnimationDebug = false,
+        showAnimationSceneDebug = false,
         debugShowPresence = true,
         debugShowAI = true,
         debugShowJob = true,
@@ -33,6 +34,9 @@ if Nameplates.Settings.showAIDebug == nil then Nameplates.Settings.showAIDebug =
 if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDebug = false end
 if Nameplates.Settings.showCombatDebug == nil then Nameplates.Settings.showCombatDebug = false end
 if Nameplates.Settings.showAnimationDebug == nil then Nameplates.Settings.showAnimationDebug = false end
+if Nameplates.Settings.showAnimationSceneDebug == nil then
+    Nameplates.Settings.showAnimationSceneDebug = false
+end
 local debugSettingDefaults = {
     debugShowPresence = true,
     debugShowAI = true,
@@ -176,6 +180,30 @@ function Nameplates.ToggleAnimationDebug()
         )
     end
     return Settings.showAnimationDebug
+end
+
+function Nameplates.IsAnimationSceneDebugEnabled()
+    return Settings.showAnimationSceneDebug == true
+end
+
+function Nameplates.ToggleAnimationSceneDebug()
+    local player = getSpecificPlayer(0)
+    Settings.showAnimationSceneDebug =
+        not Settings.showAnimationSceneDebug
+    PNC.SettingsStore:Set(
+        "showAnimationSceneDebug",
+        Settings.showAnimationSceneDebug,
+        true
+    )
+    if player and HaloTextHelper and HaloTextHelper.addText then
+        HaloTextHelper.addText(
+            player,
+            Settings.showAnimationSceneDebug
+                and "PNC scene overlay enabled"
+                or "PNC scene overlay disabled"
+        )
+    end
+    return Settings.showAnimationSceneDebug
 end
 
 function Nameplates.DebugDescribeSnapshot(snapshot)

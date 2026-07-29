@@ -231,8 +231,11 @@ local function buildMotionKey(snapshot)
         tostring(visualState.sceneId or ""),
         tostring(visualState.sceneBump or ""),
         tostring(visualState.sceneRevision or 0),
+        tostring(visualState.scenePlaybackRevision or 0),
         tostring(visualState.sceneFinishAt or 0),
+        tostring(visualState.sceneNextStepAt or 0),
         tostring(visualState.sceneLoop == true),
+        tostring(visualState.sceneRepeatMode or "once"),
     }, "|")
 end
 
@@ -376,6 +379,9 @@ local function getScenePresentation(snapshot, now)
         key = tostring(visualState.sceneId)
             .. ":" .. tostring(
                 visualState.sceneRevision or 0
+            )
+            .. ":" .. tostring(
+                visualState.scenePlaybackRevision or 0
             ),
         id = tostring(visualState.sceneId),
         bump = tostring(visualState.sceneBump),

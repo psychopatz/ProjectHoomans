@@ -8,6 +8,8 @@ local Layout = Presentation.Layout
 local Fonts = Presentation.Fonts
 
 local DEBUG_COLOR = { r = 0.8, g = 0.9, b = 1.0, a = 1.0 }
+local SCENE_COLOR = { r = 0.68, g = 0.48, b = 1.0, a = 1.0 }
+local SCENE_TRACK_COLOR = { r = 0.52, g = 0.82, b = 1.0, a = 1.0 }
 local INFECTION_COLOR = { r = 1.0, g = 0.12, b = 0.08, a = 1.0 }
 local PATH_COLOR = { r = 0.15, g = 0.82, b = 1.0, a = 0.82 }
 local PATH_BLOCKED_COLOR = { r = 1.0, g = 0.3, b = 0.2, a = 0.9 }
@@ -86,7 +88,15 @@ local function drawStamina(manager, entry, metrics, barLeft, barTop, alpha)
     return top
 end
 
-local function drawDebugText(manager, entry, screenX, y, alpha, showAnimation)
+local function drawDebugText(
+    manager,
+    entry,
+    screenX,
+    y,
+    alpha,
+    showAnimation,
+    showScene
+)
     local lineHeight = getTextManager():getFontHeight(Fonts.debug) + 2
     if entry.debugText and entry.debugText ~= "" then
         Presentation.DrawOutlinedText(
@@ -122,6 +132,37 @@ local function drawDebugText(manager, entry, screenX, y, alpha, showAnimation)
             screenX - ((entry.animationDebugTextWidth or 0) / 2),
             y,
             COMBAT_CONE_COLOR,
+            alpha,
+            Fonts.debug
+        )
+        y = y + lineHeight
+    end
+    if showScene
+        and entry.sceneDebugText
+        and entry.sceneDebugText ~= ""
+    then
+        Presentation.DrawOutlinedText(
+            manager,
+            entry.sceneDebugText,
+            screenX - ((entry.sceneDebugTextWidth or 0) / 2),
+            y,
+            SCENE_COLOR,
+            alpha,
+            Fonts.debug
+        )
+        y = y + lineHeight
+    end
+    if showScene
+        and entry.sceneTrackDebugText
+        and entry.sceneTrackDebugText ~= ""
+    then
+        Presentation.DrawOutlinedText(
+            manager,
+            entry.sceneTrackDebugText,
+            screenX
+                - ((entry.sceneTrackDebugTextWidth or 0) / 2),
+            y,
+            SCENE_TRACK_COLOR,
             alpha,
             Fonts.debug
         )
@@ -188,7 +229,9 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
 
     local showDebug = settings.showAIDebug == true
     local showAnimation = settings.showAnimationDebug == true
-    if showDebug or showAnimation then
+    local showScene =
+        settings.showAnimationSceneDebug == true
+    if showDebug or showAnimation or showScene then
         local debugY
         if entry.staminaVisible then
             debugY = (entry.healthVisible and staminaTop or barTop) + metrics.barHeight + Layout.debugTextGap
@@ -203,7 +246,8 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
             screenX,
             debugY,
             0.95 * alpha,
-            showAnimation
+            showAnimation,
+            showScene
         )
     end
 end

@@ -159,11 +159,9 @@ local function buildVisualState(record)
     local engineWalkType = moving and tostring(path.engineWalkType or "") or ""
     local anim = "Idle"
     local attackActive = attack ~= nil and now < (tonumber(attack.finishAt) or 0)
+    -- A composite scene remains authoritative during its short inter-step
+    -- gap even though no bump selector is active in that interval.
     local sceneActive = scene ~= nil
-        and (
-            (tonumber(scene.finishAt) or 0) <= 0
-            or now < (tonumber(scene.finishAt) or 0)
-        )
     local specialActive = path ~= nil and now < (tonumber(path.specialMoveUntil) or 0)
     local nativeTraversalState = navigation
         and navigation.nativeTraversalState or nil
@@ -255,10 +253,28 @@ local function buildVisualState(record)
         sceneBump = sceneActive and scene and scene.bump or nil,
         sceneRevision = sceneActive
             and scene and scene.revision or 0,
+        scenePlaybackRevision = sceneActive
+            and scene and scene.playbackRevision or 0,
         sceneStartedAt = sceneActive
             and scene and scene.startedAt or 0,
+        sceneStepStartedAt = sceneActive
+            and scene and scene.stepStartedAt or 0,
         sceneFinishAt = sceneActive
             and scene and scene.finishAt or 0,
+        sceneNextStepAt = sceneActive
+            and scene and scene.nextStepAt or 0,
+        sceneStepId = sceneActive
+            and scene and scene.stepId or nil,
+        sceneStepPosition = sceneActive
+            and scene and scene.stepPosition or 0,
+        sceneStepCount = sceneActive
+            and scene and scene.sequenceLength or 0,
+        sceneSequenceIteration = sceneActive
+            and scene and scene.sequenceIteration or 0,
+        sceneRepeatMode = sceneActive
+            and scene and scene.repeatMode or "once",
+        sceneSequenceLoop = sceneActive
+            and scene and scene.repeatMode == "loop" or false,
         sceneLoop = sceneActive
             and scene and scene.loop == true or false,
         sceneBlocking = sceneActive

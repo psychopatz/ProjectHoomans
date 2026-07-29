@@ -31,6 +31,16 @@ local function setAnimationDebug(value)
     PNC.SettingsStore:Set("showAnimationDebug", value, true)
 end
 
+local function setAnimationSceneDebug(value)
+    value = value == true
+    PNC.Nameplates.Settings.showAnimationSceneDebug = value
+    PNC.SettingsStore:Set(
+        "showAnimationSceneDebug",
+        value,
+        true
+    )
+end
+
 local function debugPartControl(id, label)
     return {
         id = id,
@@ -81,6 +91,17 @@ Registry.Register({
                 return PNC.Nameplates.Settings.showAnimationDebug == true
             end,
             set = setAnimationDebug,
+        },
+        {
+            id = "showAnimationSceneDebug",
+            type = "boolean",
+            label = "Show NPC animation scene overlay",
+            get = function()
+                return PNC.Nameplates.Settings[
+                    "showAnimationSceneDebug"
+                ] == true
+            end,
+            set = setAnimationSceneDebug,
         },
         debugPartControl("debugShowPresence", "Overlay: presence/body binding"),
         debugPartControl("debugShowAI", "Overlay: AI state"),

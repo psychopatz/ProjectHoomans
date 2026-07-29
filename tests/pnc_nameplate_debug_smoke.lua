@@ -93,6 +93,60 @@ assertEqual(PNC.NameplateDebug.InfectionText(snapshot, {
     debugShowInfection = true,
 }), "", "healthy NPC has no infection warning")
 
+snapshot.visualState = {
+    sceneActive = true,
+    sceneId = "idle.ambient",
+    sceneBump = "SmellGag",
+    sceneRevision = 4,
+    scenePlaybackRevision = 2,
+    sceneStepId = "smell_gag",
+    sceneStepPosition = 2,
+    sceneStepCount = 4,
+    sceneSequenceIteration = 3,
+    sceneRepeatMode = "loop",
+}
+local sceneBody = {
+    getCurrentActionContextStateName = function()
+        return "bumped"
+    end,
+    getAnimationStateName = function()
+        return "bumped"
+    end,
+    getBumpType = function()
+        return "PNC_SmellGag"
+    end,
+    isAnimationUpdatingThisFrame = function()
+        return true
+    end,
+    dbgGetAnimTrackName = function(_, layer, track)
+        if layer == 0 and track == 0 then
+            return "Bob_EmoteSmellGag"
+        end
+        return ""
+    end,
+    dbgGetAnimTrackTime = function()
+        return 0.5
+    end,
+    dbgGetAnimTrackWeight = function()
+        return 1
+    end,
+}
+local sceneLine
+local sceneTrackLine
+sceneLine, sceneTrackLine =
+    PNC.NameplateDebug.AnimationSceneText(
+        sceneBody,
+        snapshot
+    )
+assertContains(sceneLine, "SCENE idle.ambient", "scene overlay ID")
+assertContains(sceneLine, "policy=loop", "scene overlay repeat policy")
+assertContains(sceneLine, "step=2/4:smell_gag", "scene overlay queue")
+assertContains(sceneLine, "rev=4:2", "scene overlay playback revision")
+assertContains(sceneTrackLine, "req=SmellGag", "scene requested bump")
+assertContains(sceneTrackLine, "actual=PNC_SmellGag", "scene actual bump")
+assertContains(sceneTrackLine, "clip=Bob_EmoteSmellGag", "scene clip")
+assertContains(sceneTrackLine, "frame@30=15", "scene frame")
+
 snapshot.treatmentState = {
     phase = "bandaging",
     partId = "Hand_L",

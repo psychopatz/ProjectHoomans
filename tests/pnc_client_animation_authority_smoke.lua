@@ -370,6 +370,7 @@ local sceneSnapshot = {
         sceneId = "social.surrender",
         sceneBump = "Surrender",
         sceneRevision = 4,
+        scenePlaybackRevision = 1,
         sceneStartedAt = 3000,
         sceneFinishAt = 0,
         sceneLoop = true,
@@ -387,7 +388,7 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
 assert(calls.play == playsBeforeScene + 1,
     "MP animation scene did not start its registered bump")
 assert(sceneBody:getModData().PNC_ClientAnimationSceneKey
-        == "social.surrender:4",
+        == "social.surrender:4:1",
     "MP animation scene key was not retained")
 assert(engineMovementActive == true,
     "MP animation scene did not retain engine action updates")
@@ -401,6 +402,21 @@ assert(calls.play == playsBeforeScene + 1,
     "unchanged MP animation scene restarted")
 assert(calls.maintain == maintainsBeforeScene + 1,
     "looping MP animation scene was not maintained")
+
+sceneSnapshot.visualState.sceneBump = "Sneeze"
+sceneSnapshot.visualState.scenePlaybackRevision = 2
+sceneSnapshot.visualState.sceneLoop = false
+sceneSnapshot.visualState.sceneFinishAt = 5000
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    sceneSnapshot,
+    sceneBody,
+    true
+)
+assert(calls.play == playsBeforeScene + 2,
+    "next primitive in an unchanged scene did not replay")
+assert(sceneBody:getModData().PNC_ClientAnimationSceneKey
+        == "social.surrender:4:2",
+    "primitive playback revision was not retained")
 
 sceneSnapshot.visualState = {
     anim = "Idle",

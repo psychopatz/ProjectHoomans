@@ -82,34 +82,25 @@ assert(started == true, "idle debug cycle did not start")
 assert(state.pool == "idle", "debug cycle lost pool")
 assert(record.runtime.animationScene
         and record.runtime.animationScene.id
-            == "idle.shift_weight",
-    "debug cycle did not immediately play a weighted scene")
-
-now = 3700
+            == "idle.ambient",
+    "debug cycle did not immediately play the composite idle scene")
+local idleSequence = record.runtime.animationScene
+local firstPlaybackRevision = idleSequence.playbackRevision
+now = idleSequence.finishAt
 PNC.AnimationScenes.Tick(record, body, now)
-assert(record.runtime.animationScene == nil,
-    "completed debug scene was not released")
-
-now = 3701
+assert(record.runtime.animationScene == idleSequence
+        and idleSequence.bump == nil,
+    "scene lab cycle did not preserve the sequence during its gap")
+now = idleSequence.nextStepAt
 PNC.AnimationScenes.Tick(record, body, now)
-assert(state.completedCount == 1,
-    "debug cycle did not count completed scene")
-assert(state.nextAt == 4201,
-    "debug cycle did not apply configured inter-scene gap")
-assert(record.runtime.animationScene == nil,
-    "natural idle injection bypassed debug cycle gap")
-
-now = 4201
-PNC.AnimationScenes.Tick(record, body, now)
-assert(record.runtime.animationScene
-        and record.runtime.animationScene.id
-            == "idle.smell_bad",
-    "debug cycle repeated the prior scene despite alternatives")
+assert(idleSequence.playbackRevision
+        == firstPlaybackRevision + 1,
+    "scene lab cycle did not advance the primitive queue")
 
 local snapshot =
     PNC.AnimationSceneDebug.BuildSnapshot(record)
 assert(snapshot.active == true
-        and snapshot.completedCount == 1,
+        and snapshot.completedCount == 0,
     "debug controller snapshot omitted live cycle state")
 
 local stopped = PNC.AnimationSceneDebug.Stop(
@@ -175,6 +166,7 @@ PNC.Network.ClientState.snapshots.scene_debug_npc = {
         sceneId = "social.surrender",
         sceneBump = "Surrender",
         sceneRevision = 7,
+        sceneRepeatMode = "loop",
         sceneDebug = {
             active = true,
             pool = "idle",
@@ -189,6 +181,8 @@ local clientRuntime =
 assert(clientRuntime.sceneId == "social.surrender"
         and clientRuntime.sceneRevision == 7,
     "scene lab did not prefer replicated authority state")
+assert(clientRuntime.sceneRepeatMode == "loop",
+    "scene lab omitted replicated repeat policy")
 assert(clientRuntime.cycleActive == true
         and clientRuntime.cycleCompletedCount == 3,
     "scene lab omitted replicated cycle diagnostics")

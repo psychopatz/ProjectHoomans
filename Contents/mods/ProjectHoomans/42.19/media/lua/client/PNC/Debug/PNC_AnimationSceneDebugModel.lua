@@ -9,14 +9,24 @@ local function lower(value)
 end
 
 local function sceneSearchText(scene)
-    return lower(table.concat({
-        scene.id,
-        scene.label,
-        scene.description,
-        scene.category,
-        scene.pool,
-        scene.bump,
-    }, " "))
+    local values = {}
+    local step
+    local function append(value)
+        if value ~= nil and tostring(value) ~= "" then
+            values[#values + 1] = tostring(value)
+        end
+    end
+    append(scene.id)
+    append(scene.label)
+    append(scene.description)
+    append(scene.category)
+    append(scene.pool)
+    append(scene.bump)
+    for _, step in ipairs(scene.steps or {}) do
+        append(step.id)
+        append(step.bump)
+    end
+    return lower(table.concat(values, " "))
 end
 
 function Model.GetGroups()
@@ -126,12 +136,35 @@ function Model.GetRuntime(npcId, fallback)
         sceneRevision = visual.sceneRevision
             or scene and scene.revision
             or 0,
+        scenePlaybackRevision = visual.scenePlaybackRevision
+            or scene and scene.playbackRevision
+            or 0,
         sceneStartedAt = visual.sceneStartedAt
             or scene and scene.startedAt
+            or 0,
+        sceneStepStartedAt = visual.sceneStepStartedAt
+            or scene and scene.stepStartedAt
             or 0,
         sceneFinishAt = visual.sceneFinishAt
             or scene and scene.finishAt
             or 0,
+        sceneNextStepAt = visual.sceneNextStepAt
+            or scene and scene.nextStepAt
+            or 0,
+        sceneStepId = visual.sceneStepId
+            or scene and scene.stepId,
+        sceneStepPosition = visual.sceneStepPosition
+            or scene and scene.stepPosition
+            or 0,
+        sceneStepCount = visual.sceneStepCount
+            or scene and scene.sequenceLength
+            or 0,
+        sceneSequenceIteration = visual.sceneSequenceIteration
+            or scene and scene.sequenceIteration
+            or 0,
+        sceneRepeatMode = visual.sceneRepeatMode
+            or scene and scene.repeatMode
+            or "once",
         sceneLoop = visual.sceneLoop == true
             or scene and scene.loop == true
             or false,

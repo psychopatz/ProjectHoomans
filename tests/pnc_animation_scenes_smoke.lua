@@ -73,6 +73,8 @@ assert(PNC.AnimationScenes.Get("idle.shift_weight").bump
     "default idle scene missing")
 assert(PNC.AnimationScenes.Get("social.surrender").blocking == true,
     "surrender scene is not blocking")
+assert(PNC.AnimationScenes.Get("idle.ambient").repeatMode == "loop",
+    "idle scene repeat policy is not explicit")
 
 local registered, custom = PNC.AnimationScenes.Register(
     "example.wave",
@@ -86,6 +88,8 @@ local registered, custom = PNC.AnimationScenes.Register(
 )
 assert(registered and custom.bump == "WaveHi",
     "custom scene registration failed")
+assert(custom.repeatMode == "once",
+    "one-off scene did not default to once")
 
 local started, active = PNC.AnimationScenes.Request(
     record,
@@ -100,7 +104,7 @@ assert(played[#played].bump == "ShiftWeight",
 assert(played[#played].options.sceneId == "idle.shift_weight",
     "scene playback did not carry an ownership token")
 assert(bodyModData.PNC_ClientAnimationSceneKey
-        == "idle.shift_weight:1",
+        == "idle.shift_weight:1:1",
     "local scene snapshot dedupe key missing")
 assert(PNC.AnimationScenes.Tick(record, body, now + 100) == false,
     "nonblocking idle scene consumed behavior")
@@ -160,7 +164,81 @@ assert(PNC.AnimationScenes.Tick(record, body, now) == false,
     "injected idle scene blocked behavior")
 assert(record.runtime.animationScene
         and record.runtime.animationScene.id
-            == "idle.shift_weight",
-    "weighted idle pool did not inject a scene")
+            == "idle.ambient",
+    "idle pool did not inject the composite scene")
+local idleSequence = record.runtime.animationScene
+assert(idleSequence.sequenceLength == 4
+        and idleSequence.playbackRevision == 1,
+    "composite idle did not expose its primitive queue")
+local firstBump = idleSequence.bump
+local firstFinish = idleSequence.finishAt
+now = firstFinish
+PNC.AnimationScenes.Tick(record, body, now)
+assert(record.runtime.animationScene == idleSequence
+        and idleSequence.bump == nil
+        and idleSequence.nextStepAt > now,
+    "composite idle did not enter its inter-step gap")
+now = idleSequence.nextStepAt
+PNC.AnimationScenes.Tick(record, body, now)
+assert(idleSequence.bump ~= nil
+        and idleSequence.bump ~= firstBump
+        and idleSequence.playbackRevision == 2,
+    "composite idle did not advance to another primitive")
+assert(PNC.AnimationScenes.Interrupt(
+    record,
+    body,
+    "combat"
+), "combat did not short-circuit the idle queue")
+
+started = PNC.AnimationScenes.Request(
+    record,
+    body,
+    "idle.ambient",
+    { now = now }
+)
+record.runtime.followState = { ownerMoving = true }
+assert(started
+        and PNC.AnimationScenes.InterruptForSafety(
+            record,
+            body,
+            now
+        )
+        and record.runtime.animationScene == nil,
+    "moving owner did not snap a follower out of its idle queue")
+record.runtime.followState = nil
+
+started = PNC.AnimationScenes.Request(
+    record,
+    body,
+    "idle.ambient",
+    { now = now }
+)
+record.runtime.moveIntent = {
+    kind = "move",
+    updatedAt = now - 5000,
+}
+assert(started
+        and PNC.AnimationScenes.InterruptForSafety(
+            record,
+            body,
+            now
+        ) == false
+        and record.runtime.animationScene ~= nil,
+    "stale movement intent cancelled an otherwise idle scene")
+record.runtime.pathing = { phase = "active" }
+assert(PNC.AnimationScenes.InterruptForSafety(
+    record,
+    body,
+    now
+), "active movement path did not cancel an idle scene")
+record.runtime.pathing = nil
+record.runtime.moveIntent = nil
+
+record.runtime.nextIdleAnimationSceneAt = now
+record.runtime.target = { id = "zombie" }
+assert(PNC.AnimationScenes.Tick(record, body, now) == false
+        and record.runtime.animationScene == nil,
+    "combat state allowed a fresh idle queue")
+record.runtime.target = nil
 
 print("pnc_animation_scenes_smoke: ok")

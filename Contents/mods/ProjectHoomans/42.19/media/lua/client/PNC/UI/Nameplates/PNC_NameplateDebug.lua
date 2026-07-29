@@ -277,6 +277,69 @@ function Debug.AnimationTrackText(zombie)
         )
 end
 
+-- Dedicated scene diagnostics keep authority state and the actual local
+-- animator on the same overlay. This makes a missing selector, a stuck
+-- ActionContext, or an MP primitive-revision problem visible immediately.
+function Debug.AnimationSceneText(zombie, snapshot)
+    local visual = snapshot and snapshot.visualState or {}
+    local active = visual.sceneActive == true
+    local runtime = Debug.CaptureAnimationRuntime(zombie)
+    local actualBump = zombie
+        and zombie.getBumpType
+        and tostring(zombie:getBumpType() or "")
+        or ""
+    local phase = active and (
+        tostring(visual.sceneBump or "") ~= ""
+            and "playing" or "gap"
+    ) or "inactive"
+    local sceneLine = "SCENE " .. tostring(
+        active and visual.sceneId or "inactive"
+    )
+        .. " policy=" .. tostring(
+            visual.sceneRepeatMode or "once"
+        )
+        .. " phase=" .. phase
+        .. " step=" .. tostring(
+            visual.sceneStepPosition or 0
+        )
+        .. "/" .. tostring(visual.sceneStepCount or 0)
+        .. ":" .. tostring(visual.sceneStepId or "-")
+        .. " pass=" .. tostring(
+            visual.sceneSequenceIteration or 0
+        )
+        .. " rev=" .. tostring(visual.sceneRevision or 0)
+        .. ":" .. tostring(
+            visual.scenePlaybackRevision or 0
+        )
+    local trackLine = "SCENE ANIM req="
+        .. tostring(visual.sceneBump or "-")
+        .. " actual="
+        .. tostring(actualBump ~= "" and actualBump or "-")
+        .. " state=" .. tostring(runtime.actionState)
+        .. "/" .. tostring(runtime.animationState)
+        .. " clip="
+        .. tostring(runtime.clip ~= "" and runtime.clip or "-")
+        .. " t=" .. (
+            runtime.time ~= nil
+                and string.format(
+                    "%.3fs",
+                    tonumber(runtime.time) or 0
+                )
+                or "-"
+        )
+        .. " frame@30=" .. tostring(runtime.frame or "-")
+        .. " weight=" .. (
+            runtime.weight ~= nil
+                and string.format(
+                    "%.3f",
+                    tonumber(runtime.weight) or 0
+                )
+                or "-"
+        )
+        .. " updating=" .. tostring(runtime.updating)
+    return sceneLine, trackLine
+end
+
 function Debug.AnimationText(zombie, snapshot)
     if not zombie then return "Anim: n/a" end
     local animName = tostring(snapshot and snapshot.visualState and snapshot.visualState.anim

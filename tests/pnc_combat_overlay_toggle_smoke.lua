@@ -135,5 +135,32 @@ assertEqual(
     "animation overlay toggles off"
 )
 assertEqual(writes[4].value, false, "animation disabled persisted")
+assertEqual(
+    PNC.Nameplates.IsAnimationSceneDebugEnabled(),
+    false,
+    "scene overlay defaults off"
+)
+assertEqual(
+    PNC.Nameplates.ToggleAnimationSceneDebug(),
+    true,
+    "scene overlay toggles on"
+)
+assertEqual(
+    writes[5].key,
+    "showAnimationSceneDebug",
+    "scene overlay setting persisted"
+)
+assertEqual(
+    halos[5],
+    "PNC scene overlay enabled",
+    "scene overlay enabled feedback"
+)
+assertEqual(
+    PNC.Nameplates.ToggleAnimationSceneDebug(),
+    false,
+    "scene overlay toggles off"
+)
+assertEqual(writes[6].value, false,
+    "scene overlay disabled persisted")
 
 print("pnc_combat_overlay_toggle_smoke: ok")

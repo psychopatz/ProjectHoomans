@@ -24,6 +24,15 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
         and settings.showAnimationDebug == true
         and Debug.AnimationTrackText(zombie)
         or ""
+    local sceneDebugText = ""
+    local sceneTrackDebugText = ""
+    if settings
+        and settings.showAnimationSceneDebug == true
+        and Debug.AnimationSceneText
+    then
+        sceneDebugText, sceneTrackDebugText =
+            Debug.AnimationSceneText(zombie, snapshot)
+    end
     local infectionDebugText = showDebug
         and Debug.InfectionText(snapshot, settings) or ""
     local treatmentText, treatmentColor =
@@ -36,6 +45,18 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
         entry,
         "animationDebugText",
         animationDebugText,
+        fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "sceneDebugText",
+        sceneDebugText,
+        fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "sceneTrackDebugText",
+        sceneTrackDebugText,
         fonts.debug
     )
     Presentation.CacheTextMetric(

@@ -145,6 +145,7 @@ function ISPNCAnimationSceneDebugWindow:createChildren()
         { "step", "Roll Pool Once", "onStep", "warning" },
         { "cycle", "Auto Cycle Pool", "onCycle", "warning" },
         { "stop", "Stop Scene / Cycle", "onStop", "danger" },
+        { "overlay", "Scene Overlay", "onOverlay", "quiet" },
         { "refresh", "Refresh Registry", "onRefresh", "quiet" },
         { "xml", "Open XML Player", "onOpenXML", "quiet" },
     }
@@ -336,6 +337,7 @@ function ISPNCAnimationSceneDebugWindow:refreshDetails(force)
         and PNC.Core.Now() or 0
     local key = tostring(scene and scene.id or "")
         .. ":" .. tostring(runtime.sceneRevision)
+        .. ":" .. tostring(runtime.scenePlaybackRevision)
         .. ":" .. tostring(runtime.cycleCompletedCount)
         .. ":" .. tostring(runtime.cycleActive)
     if not force
@@ -365,10 +367,23 @@ function ISPNCAnimationSceneDebugWindow:refreshDetails(force)
         )
         addDetail(
             self.details,
+            "Composition",
+            tostring(#(scene.steps or {}))
+                .. " step(s) / "
+                .. tostring(scene.sequenceMode or "ordered")
+                .. " / "
+                .. tostring(scene.repeatMode or "once")
+        )
+        addDetail(
+            self.details,
             "Playback",
-            scene.loop and "loop" or (
-                tostring(scene.durationMs) .. " ms"
-            )
+            tostring(scene.repeatMode or "once")
+                .. " scene / "
+                .. (
+                    scene.loop
+                        and "looped primitive"
+                        or "one-shot primitives"
+                )
         )
         addDetail(self.details, "Priority", scene.priority)
         addDetail(
@@ -398,13 +413,31 @@ function ISPNCAnimationSceneDebugWindow:refreshDetails(force)
     addDetail(
         self.details,
         "Scene revision",
-        runtime.sceneRevision
+        tostring(runtime.sceneRevision)
+            .. " / playback "
+            .. tostring(runtime.scenePlaybackRevision)
+    )
+    addDetail(
+        self.details,
+        "Sequence step",
+        tostring(runtime.sceneStepPosition)
+            .. "/" .. tostring(runtime.sceneStepCount)
+            .. " " .. tostring(runtime.sceneStepId or "-")
+            .. " / pass "
+            .. tostring(runtime.sceneSequenceIteration)
+            .. " / " .. tostring(runtime.sceneRepeatMode)
     )
     addDetail(
         self.details,
         "Scene timing",
         tostring(runtime.sceneStartedAt)
             .. " → " .. tostring(runtime.sceneFinishAt)
+    )
+    addDetail(
+        self.details,
+        "Next primitive",
+        runtime.sceneNextStepAt ~= 0
+            and runtime.sceneNextStepAt or "-"
     )
     addDetail(
         self.details,
@@ -543,6 +576,21 @@ function ISPNCAnimationSceneDebugWindow:onStop()
     self:send("animation_scene_stop", {})
 end
 
+function ISPNCAnimationSceneDebugWindow:onOverlay()
+    if PNC.Nameplates
+        and PNC.Nameplates.ToggleAnimationSceneDebug
+    then
+        local enabled =
+            PNC.Nameplates.ToggleAnimationSceneDebug()
+        if self.overlayButton then
+            UI.SetButtonVariant(
+                self.overlayButton,
+                enabled and "selected" or "quiet"
+            )
+        end
+    end
+end
+
 function ISPNCAnimationSceneDebugWindow:onRefresh()
     self:refreshGroups()
     self:refreshCatalog()
@@ -571,6 +619,16 @@ function ISPNCAnimationSceneDebugWindow:prerender()
     self.stepButton:setEnable(hasPool == true)
     self.cycleButton:setEnable(hasPool == true)
     self.stopButton:setEnable(self.npcId ~= "")
+    if self.overlayButton
+        and PNC.Nameplates
+        and PNC.Nameplates.IsAnimationSceneDebugEnabled
+    then
+        UI.SetButtonVariant(
+            self.overlayButton,
+            PNC.Nameplates.IsAnimationSceneDebugEnabled()
+                and "selected" or "quiet"
+        )
+    end
     PsychopatzWindow.prerender(self)
 end
 

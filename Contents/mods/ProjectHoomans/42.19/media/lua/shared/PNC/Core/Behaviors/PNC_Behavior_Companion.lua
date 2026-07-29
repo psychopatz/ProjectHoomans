@@ -695,6 +695,19 @@ local function tickFollowOwner(record, zombie)
     end
     record.ownerOnlineID = owner:getOnlineID()
     followState = updateOwnerMotionState(record, owner, now)
+    -- A follower may still be inside its formation tolerance when the owner
+    -- first moves. End ambient presentation immediately instead of waiting
+    -- for MoveRecord to be requested several ticks later.
+    if followState.ownerMoving == true
+        and PNC.AnimationScenes
+        and PNC.AnimationScenes.Interrupt
+    then
+        PNC.AnimationScenes.Interrupt(
+            record,
+            zombie,
+            "movement"
+        )
+    end
     ownerVehicle = owner.getVehicle and owner:getVehicle() or nil
     if CompanionVehicle and CompanionVehicle.Tick then
         vehicleHandled, vehicleReason = CompanionVehicle.Tick(record, zombie, owner)

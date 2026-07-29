@@ -65,6 +65,17 @@ function Behavior.Tick(record, zombie, now)
         return
     end
 
+    -- Scenes are presentation leases, never tactical locks. Cancel an
+    -- interruptible sequence before committed combat, treatment, or movement
+    -- gets its turn so an ambient pose cannot delay a survival response.
+    if AnimationScenes and AnimationScenes.InterruptForSafety then
+        AnimationScenes.InterruptForSafety(
+            record,
+            zombie,
+            now
+        )
+    end
+
     -- A committed windup owns the actor until its delayed hit/finish frame.
     -- Perception may legitimately return no fresh target for one frame, but
     -- that must not holster the weapon or abandon the animation in progress.

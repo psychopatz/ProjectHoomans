@@ -288,6 +288,13 @@ nearbyRecord.runtime.animationScene = {
     id = "social.surrender",
     bump = "Surrender",
     revision = 4,
+    playbackRevision = 2,
+    stepId = "surrender",
+    stepPosition = 1,
+    sequenceLength = 1,
+    sequenceIteration = 1,
+    repeatMode = "loop",
+    stepStartedAt = 1900,
     startedAt = 1900,
     finishAt = 0,
     loop = true,
@@ -301,6 +308,12 @@ assertEqual(sceneSnapshot.visualState.sceneId, "social.surrender",
     "animation scene ID snapshot")
 assertEqual(sceneSnapshot.visualState.sceneBump, "Surrender",
     "animation scene selector snapshot")
+assertEqual(sceneSnapshot.visualState.scenePlaybackRevision, 2,
+    "animation primitive revision snapshot")
+assertEqual(sceneSnapshot.visualState.sceneStepPosition, 1,
+    "animation scene step position snapshot")
+assertEqual(sceneSnapshot.visualState.sceneRepeatMode, "loop",
+    "animation scene repeat policy snapshot")
 assertEqual(sceneSnapshot.visualState.sceneLoop, true,
     "animation scene loop policy snapshot")
 nearbyRecord.runtime.animationScene = nil
