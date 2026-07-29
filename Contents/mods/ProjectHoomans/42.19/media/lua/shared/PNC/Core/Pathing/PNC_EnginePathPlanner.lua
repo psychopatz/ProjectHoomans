@@ -31,9 +31,9 @@ end
 local function beginRequest(body, finalTarget, navigation, now, reason)
     local multiplayerAuthority =
         Internal.IsMultiplayerAuthority()
-    local behavior = not multiplayerAuthority
-        and Internal.GetPathBehavior(body) or nil
-    if not multiplayerAuthority and not behavior then
+    if not multiplayerAuthority
+        and (not body or not body.pathToLocationF)
+    then
         navigation.lastPlanReason = "native_path_unavailable"
         navigation.plannedAt = now
         navigation.planFailures =
@@ -45,28 +45,13 @@ local function beginRequest(body, finalTarget, navigation, now, reason)
     local x = tonumber(finalTarget.x) or body:getX()
     local y = tonumber(finalTarget.y) or body:getY()
     local z = tonumber(finalTarget.z) or body:getZ()
-    if not multiplayerAuthority and (
-        not behavior.update
-        or (not behavior.pathToLocationF and not behavior.pathToLocation)
-    ) then
-        navigation.lastPlanReason = "native_path_api_unavailable"
-        navigation.plannedAt = now
-        navigation.planFailures =
-            (tonumber(navigation.planFailures) or 0) + 1
-        return false
-    end
-    -- Build 42 assigns multiplayer zombie simulation to a client. Bandits
-    -- follows that ownership and updates PathFindBehavior2 only on the nearest
-    -- client. The dedicated server publishes the goal and observes the
-    -- replicated body; it must not create a second native path controller.
-    if not multiplayerAuthority and behavior.pathToLocationF then
-        behavior:pathToLocationF(x, y, z)
-    elseif not multiplayerAuthority then
-        behavior:pathToLocation(
-            math.floor(x),
-            math.floor(y),
-            math.floor(z)
-        )
+    -- Build 42 assigns multiplayer zombie simulation to a client. The
+    -- dedicated server publishes the goal and observes the replicated body;
+    -- it must not create a second native path controller. In SP and on the
+    -- owning MP client, pathToLocationF enters PathFindState and the engine
+    -- exclusively advances PathFindBehavior2.
+    if not multiplayerAuthority then
+        body:pathToLocationF(x, y, z)
     end
     navigation.requestPending = true
     navigation.nativeActive = true
@@ -80,6 +65,14 @@ local function beginRequest(body, finalTarget, navigation, now, reason)
     navigation.requestX = x
     navigation.requestY = y
     navigation.requestZ = z
+    navigation.requestStopDistance = math.max(
+        0.1,
+        tonumber(finalTarget.stopDistance) or 0.7
+    )
+    navigation.lastObservedX = body:getX()
+    navigation.lastObservedY = body:getY()
+    navigation.lastObservedZ = body:getZ()
+    navigation.lastPhysicalProgressAt = now
     navigation.lastPlanReason = reason or "native_request"
     navigation.steeringKind = "engine_native"
     Internal.SetServerMovementLease(body, navigation, true)
@@ -202,17 +195,6 @@ function Planner.GetSteeringTarget(record, body, finalTarget)
     return finalTarget
 end
 
-local function setNativeUpdateWindow(body, enabled, previousUseless)
-    if not body or not body.setUseless then
-        return
-    end
-    if enabled then
-        body:setUseless(false)
-    else
-        body:setUseless(previousUseless == true)
-    end
-end
-
 function Planner.Pump(record, body, source)
     local navigation = record and record.runtime
         and record.runtime.localNavigation or nil
@@ -245,8 +227,7 @@ function Planner.Pump(record, body, source)
         return true, navigation.lastPlanReason
     end
 
-    local behavior = Internal.GetPathBehavior(body)
-    if not behavior or not behavior.update then
+    if not body or not body.pathToLocationF then
         Internal.ClearEngineRequest(body, navigation)
         navigation.lastPlanReason = "native_path_api_unavailable"
         navigation.planFailures =
@@ -254,12 +235,15 @@ function Planner.Pump(record, body, source)
         return true, "engine_path_failed"
     end
 
-    local lastPumpAt = tonumber(navigation.lastPumpAt) or 0
-    if lastPumpAt > 0 and now - lastPumpAt < 15
-    then
-        return true, navigation.lastPlanReason
-            or "native_frame_owned"
+    navigation.lastPumpAt = now
+    if Internal.IsAtRequestGoal(body, navigation) then
+        Internal.ClearEngineRequest(body, navigation)
+        navigation.lastPlanReason = "native_path_succeeded"
+        navigation.planFailures = 0
+        navigation.completedAt = now
+        return true, "engine_path_succeeded"
     end
+
     local traversalState =
         Internal.GetNativeTraversalState(body)
     if navigation.nativeTraversalState ~= nil then
@@ -294,36 +278,30 @@ function Planner.Pump(record, body, source)
                 (tonumber(navigation.planFailures) or 0) + 1
             return true, "engine_path_failed"
         end
-        -- The engine traversal action has finished.  If update() had already
-        -- reported a terminal result, consume it now; otherwise resume the
-        -- same native route after the climb/window state releases.
-        local traversalResult =
-            navigation.nativeTraversalResult
         navigation.nativeTraversalState = nil
         navigation.nativeTraversalStartedAt = 0
-        navigation.nativeTraversalResult = nil
-        if traversalResult == "Succeeded" then
-            Internal.ClearEngineRequest(body, navigation)
-            navigation.lastPlanReason =
-                "native_path_succeeded"
-            navigation.planFailures = 0
-            navigation.completedAt = now
-            return true, "engine_path_succeeded"
-        elseif traversalResult == "Failed" then
-            Internal.ClearEngineRequest(body, navigation)
-            navigation.lastPlanReason =
-                "native_path_failed"
-            navigation.planFailures =
-                (tonumber(navigation.planFailures) or 0) + 1
-            return true, "engine_path_failed"
-        end
     end
+
+    local x = body:getX()
+    local y = body:getY()
+    local z = body:getZ()
+    local dx = x - (tonumber(navigation.lastObservedX) or x)
+    local dy = y - (tonumber(navigation.lastObservedY) or y)
+    local dz = z - (tonumber(navigation.lastObservedZ) or z)
+    if (dx * dx) + (dy * dy) + (dz * dz) >= 0.0025 then
+        navigation.lastPhysicalProgressAt = now
+    end
+    navigation.lastObservedX = x
+    navigation.lastObservedY = y
+    navigation.lastObservedZ = z
+
     local requestTimeoutMs = math.max(
         500,
         tonumber(Const.ENGINE_PATH_REQUEST_TIMEOUT_MS) or 2500
     )
     local hasPath = body and body.getPath2 and body:getPath2() ~= nil
-    if not hasPath
+    local movementState = Internal.GetNativeMovementState(body)
+    if not hasPath and movementState == nil
         and now - (tonumber(navigation.requestStartedAt) or now)
             >= requestTimeoutMs
     then
@@ -333,15 +311,20 @@ function Planner.Pump(record, body, source)
             (tonumber(navigation.planFailures) or 0) + 1
         return true, "engine_path_timeout"
     end
-    if hasPath and (tonumber(navigation.movingStartedAt) or 0) <= 0 then
+    if (hasPath or movementState ~= nil)
+        and (tonumber(navigation.movingStartedAt) or 0) <= 0
+    then
         navigation.movingStartedAt = now
     end
     local routeTimeoutMs = math.max(
         requestTimeoutMs,
         tonumber(Const.ENGINE_PATH_ROUTE_TIMEOUT_MS) or 15000
     )
-    if hasPath
-        and now - (tonumber(navigation.movingStartedAt) or now)
+    if now - (
+            tonumber(navigation.lastPhysicalProgressAt)
+                or navigation.requestStartedAt
+                or now
+        )
             >= routeTimeoutMs
     then
         Internal.ClearEngineRequest(body, navigation)
@@ -351,14 +334,6 @@ function Planner.Pump(record, body, source)
         return true, "engine_path_timeout"
     end
 
-    local previousUseless = true
-    if body.isUseless then
-        previousUseless = body:isUseless() == true
-    end
-    setNativeUpdateWindow(body, true, previousUseless)
-    local result = behavior:update()
-    setNativeUpdateWindow(body, false, previousUseless)
-    navigation.lastPumpAt = now
     traversalState = Internal.GetNativeTraversalState(body)
     if traversalState ~= nil then
         navigation.nativeTraversalState = traversalState
@@ -368,11 +343,6 @@ function Planner.Pump(record, body, source)
             ) or 0) > 0
                 and navigation.nativeTraversalStartedAt
                 or now
-        if Internal.ResultMatches(result, "Succeeded") then
-            navigation.nativeTraversalResult = "Succeeded"
-        elseif Internal.ResultMatches(result, "Failed") then
-            navigation.nativeTraversalResult = "Failed"
-        end
         navigation.requestPending = false
         navigation.lastPlanReason =
             "native_traversal_" .. traversalState
@@ -384,22 +354,8 @@ function Planner.Pump(record, body, source)
         )
         return true, navigation.lastPlanReason
     end
-    if Internal.ResultMatches(result, "Failed") then
-        Internal.ClearEngineRequest(body, navigation)
-        navigation.lastPlanReason = "native_path_failed"
-        navigation.planFailures =
-            (tonumber(navigation.planFailures) or 0) + 1
-        return true, "engine_path_failed"
-    end
-    if Internal.ResultMatches(result, "Succeeded") then
-        Internal.ClearEngineRequest(body, navigation)
-        navigation.lastPlanReason = "native_path_succeeded"
-        navigation.planFailures = 0
-        navigation.completedAt = now
-        return true, "engine_path_succeeded"
-    end
-
-    navigation.requestPending = not hasPath
+    navigation.requestPending =
+        not hasPath and movementState == "pathfind"
     navigation.lastPlanReason = navigation.requestPending
         and "native_path_pending" or "native_path_moving"
     navigation.steeringKind = "engine_native"

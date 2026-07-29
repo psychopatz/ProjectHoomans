@@ -45,10 +45,6 @@ function Behavior.Tick(record, zombie, now)
         return
     end
 
-    if Treatment and Treatment.Tick and Treatment.Tick(record, zombie, now) then
-        return
-    end
-
     if record.health and record.health.state == "incapacitated" then
         Incapacitated.Tick(record, zombie)
         return
@@ -60,6 +56,10 @@ function Behavior.Tick(record, zombie, now)
     if Combat and Combat.TickCommittedAction
         and Combat.TickCommittedAction(record, zombie)
     then
+        return
+    end
+
+    if Treatment and Treatment.Tick and Treatment.Tick(record, zombie, now) then
         return
     end
 

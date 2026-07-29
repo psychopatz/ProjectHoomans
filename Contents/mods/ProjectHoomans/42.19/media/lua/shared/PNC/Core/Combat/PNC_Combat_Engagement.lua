@@ -355,6 +355,14 @@ local function handleRanged(context, debugMode, stopFactor)
     if activateRangedFallback(context, reason) then
         return true
     end
+    if debugMode == "mixed"
+        and reason == "friendly_fire_risk"
+        and context.distance
+            <= (tonumber(Const.MIXED_MELEE_FALLBACK_RANGE) or 4.0)
+    then
+        clearRetreatFor(context)
+        return handleMelee(context, "mixed", true)
+    end
     if reason == "target_out_of_range" then
         moveToRangedRange(context, debugMode, stopFactor)
         return true
@@ -497,6 +505,16 @@ function Engagement.Tick(record, zombie, target)
         investigateHiddenTarget(context)
         return true
     end
+    -- Mixed loadouts commit to melee before ranged spacing arbitrates. The
+    -- previous order always backed away from a close zombie and could never
+    -- reach the later MELEE_COMMIT_RANGE branch.
+    if context.mode == "mixed"
+        and context.distance
+            <= (tonumber(Const.MIXED_MELEE_SWITCH_RANGE) or 2.4)
+    then
+        clearRetreatFor(context)
+        return handleMelee(context, "mixed", true)
+    end
     if maintainRangedSpacing(context) then
         return true
     end
@@ -510,11 +528,10 @@ function Engagement.Tick(record, zombie, target)
         return handleRanged(context, "ranged", 0.8)
     end
 
-    meleeCommitRange = (
-        tonumber(Const.MELEE_RANGE) or 1.3
-    ) + (
-        tonumber(Const.MELEE_HIT_TOLERANCE) or 0.12
-    )
+    meleeCommitRange =
+        tonumber(Const.MELEE_COMMIT_RANGE)
+        or tonumber(Const.MELEE_APPROACH_STOP_DISTANCE)
+        or 1.0
     if context.distance <= meleeCommitRange then
         return handleMelee(context, "mixed", false)
     end

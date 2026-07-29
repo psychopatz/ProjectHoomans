@@ -14,7 +14,7 @@ local Internal = PathService.Internal
 function Internal.finalizeCancel(zombie, record, lane)
     local now = Internal.Core.Now()
     local preserveVisualMotion = now < (tonumber(lane and lane.visualMovingUntil) or 0)
-    if zombie and not Internal.hasActiveAttack(record) then
+    if zombie and not Internal.hasActiveAttack(record, now, zombie) then
         Internal.hardResetMoveOwner(zombie, preserveVisualMotion)
     end
     lane.pendingGoal = nil
@@ -596,18 +596,12 @@ function PathService.Pump(record, zombie)
     if not lane.traversalAction then
         Internal.applyCombatFacing(zombie, lane, now, false)
     end
-    intentState = Internal.consumeMoveIntent(record, lane, zombie)
 
-    if lane.phase == "cancel_pending" then
-        Internal.finalizeCancel(zombie, record, lane)
-        intentState = Internal.consumeMoveIntent(record, lane, zombie)
-    end
-
-    -- Combat owns the action graph for the full committed attack lease.
-    -- Normal engagement code also requests a hold, but this boundary guard
-    -- prevents any stale/third-party move intent from restoring locomotion
-    -- variables over a melee or ranged bump animation.
-    if Internal.hasActiveAttack(record, now) then
+    -- This guard intentionally runs before consuming or finalizing movement
+    -- intents. Both startRequestedMove and finalizeCancel write locomotion/
+    -- idle variables, so allowing either during the body-local bump tail can
+    -- replace the weapon clip even after the combat action itself is done.
+    if Internal.hasActiveAttack(record, now, zombie) then
         local nativeNavigation = record.runtime
             and record.runtime.localNavigation or nil
         local enginePlanner = PNC.EnginePathPlanner
@@ -626,6 +620,13 @@ function PathService.Pump(record, zombie)
         lane.lastIssueAt = now
         lane.ownerMode = "attack_lease"
         return true, "attack_active"
+    end
+
+    intentState = Internal.consumeMoveIntent(record, lane, zombie)
+
+    if lane.phase == "cancel_pending" then
+        Internal.finalizeCancel(zombie, record, lane)
+        intentState = Internal.consumeMoveIntent(record, lane, zombie)
     end
 
     if lane.phase == "requested" then

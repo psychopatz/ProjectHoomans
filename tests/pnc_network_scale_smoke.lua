@@ -116,6 +116,11 @@ PNC = {
             return { current = 100, max = 100, state = "fresh" }
         end,
     },
+    Sandbox = {
+        CanZombieTargetRecord = function(record)
+            return record.zombieTargetable ~= false
+        end,
+    },
     VisualProfiles = { RollAppearance = function() return {} end },
     MotionHints = {},
     Health = { CanRevive = function() return false end },
@@ -200,6 +205,21 @@ PNC.Registry = {
 dofile(FILE)
 
 nearbyRecord.ownerUsername = "player_1"
+assertEqual(
+    PNC.Network.BuildRosterSnapshot(nearbyRecord).zombieTargetable,
+    true,
+    "roster omitted zombie targetability"
+)
+assertEqual(
+    PNC.Network.BuildSnapshot(nearbyRecord).zombieTargetable,
+    true,
+    "detailed snapshot omitted zombie targetability"
+)
+assertEqual(
+    PNC.Network.BuildPresenceDelta(nearbyRecord).zombieTargetable,
+    true,
+    "presence delta omitted zombie targetability"
+)
 assertEqual(
     PNC.Network.BuildRosterSnapshot(nearbyRecord).ownerUsername,
     "player_1",

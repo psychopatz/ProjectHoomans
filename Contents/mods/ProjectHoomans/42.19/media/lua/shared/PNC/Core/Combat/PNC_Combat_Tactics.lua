@@ -52,6 +52,11 @@ local function ensureRetreatState(record)
     state.recoveryMode = state.recoveryMode or nil
     state.retreatDistance = tonumber(state.retreatDistance) or nil
     state.refreshAt = tonumber(state.refreshAt) or 0
+    state.startedAt = tonumber(state.startedAt) or 0
+    state.lastProgressAt = tonumber(state.lastProgressAt) or 0
+    state.lastX = state.lastX ~= nil and tonumber(state.lastX) or nil
+    state.lastY = state.lastY ~= nil and tonumber(state.lastY) or nil
+    state.retryAt = tonumber(state.retryAt) or 0
     return state
 end
 
@@ -271,6 +276,10 @@ local function clearActiveRetreat(record, state)
         state.recoveryMode = nil
         state.retreatDistance = nil
         state.refreshAt = 0
+        state.startedAt = 0
+        state.lastProgressAt = 0
+        state.lastX = nil
+        state.lastY = nil
     end
     if record then
         record.runtime = record.runtime or {}
@@ -295,7 +304,11 @@ local function setRetreatState(record, enabled, recoveryMode)
 end
 
 function Tactics.ClearRetreatState(record)
-    clearActiveRetreat(record, ensureRetreatState(record))
+    local state = ensureRetreatState(record)
+    clearActiveRetreat(record, state)
+    if state then
+        state.retryAt = 0
+    end
 end
 
 function Tactics.MarkZombieDamage(record, sourceX, sourceY, sourceZ, now)
@@ -373,11 +386,56 @@ local function continueLockedRetreat(record, zombie, target, state, now)
     local retreat
     local sourceX
     local sourceY
-    if not state or now >= (tonumber(state.lockUntil) or 0) then
+    local currentX
+    local currentY
+    local movedX
+    local movedY
+    local goalX
+    local goalY
+    local stopDistance
+    local stallMs
+    local retryMs
+    if not state or state.phase ~= "retreat" then
         return false, nil
     end
     if state.goalX == nil or state.goalY == nil then
         return false, nil
+    end
+    currentX = zombie and zombie.getX and zombie:getX()
+        or tonumber(record and record.x) or 0
+    currentY = zombie and zombie.getY and zombie:getY()
+        or tonumber(record and record.y) or 0
+    goalX = tonumber(state.goalX) or currentX
+    goalY = tonumber(state.goalY) or currentY
+    stopDistance = tonumber(state.goalStopDistance) or 0.8
+    if Core.DistanceSq(currentX, currentY, goalX, goalY)
+        <= stopDistance * stopDistance
+    then
+        clearActiveRetreat(record, state)
+        state.retryAt = 0
+        return false, "retreat_complete"
+    end
+    if state.lastX == nil or state.lastY == nil then
+        state.lastX = currentX
+        state.lastY = currentY
+        state.lastProgressAt = now
+    else
+        movedX = currentX - state.lastX
+        movedY = currentY - state.lastY
+        if (movedX * movedX) + (movedY * movedY)
+            >= (tonumber(Const.COMBAT_RETREAT_PROGRESS_DISTANCE) or 0.18) ^ 2
+        then
+            state.lastX = currentX
+            state.lastY = currentY
+            state.lastProgressAt = now
+        end
+    end
+    stallMs = tonumber(Const.COMBAT_RETREAT_STALL_MS) or 900
+    retryMs = tonumber(Const.COMBAT_RETREAT_RETRY_MS) or 800
+    if now - (tonumber(state.lastProgressAt) or now) >= stallMs then
+        clearActiveRetreat(record, state)
+        state.retryAt = now + retryMs
+        return false, "retreat_stalled"
     end
     if now >= (tonumber(state.refreshAt) or 0) then
         sourceX, sourceY = buildZombieThreatCentroid(
@@ -401,7 +459,7 @@ local function continueLockedRetreat(record, zombie, target, state, now)
         state.refreshAt = now + 220
     end
     setRetreatState(record, true, state.recoveryMode or "retreat")
-    requestMove(
+    if not requestMove(
         record,
         zombie,
         state.goalX,
@@ -410,7 +468,11 @@ local function continueLockedRetreat(record, zombie, target, state, now)
         state.goalMode or "walk",
         state.goalStopDistance or 0.8,
         state.reason or "combat_retreat"
-    )
+    ) then
+        clearActiveRetreat(record, state)
+        state.retryAt = now + retryMs
+        return false, "retreat_rejected"
+    end
     return true, state.reason or "combat_retreat"
 end
 
@@ -420,6 +482,9 @@ local function startRetreat(record, zombie, target, distance, mode, stopDistance
     local now = Core.Now()
     if not state then
         return false, nil
+    end
+    if now < (tonumber(state.retryAt) or 0) then
+        return false, "retreat_stalled"
     end
     retreat = buildRetreatFromSource(record, target, distance, sourceX, sourceY, sourceZ, state)
     if not retreat then
@@ -436,8 +501,28 @@ local function startRetreat(record, zombie, target, distance, mode, stopDistance
     state.recoveryMode = recoveryMode
     state.retreatDistance = distance
     state.refreshAt = now + 220
+    state.startedAt = now
+    state.lastProgressAt = now
+    state.lastX = zombie and zombie.getX and zombie:getX()
+        or tonumber(record.x) or 0
+    state.lastY = zombie and zombie.getY and zombie:getY()
+        or tonumber(record.y) or 0
     setRetreatState(record, true, recoveryMode)
-    requestMove(record, zombie, retreat.x, retreat.y, retreat.z, mode, stopDistance, reason)
+    if not requestMove(
+        record,
+        zombie,
+        retreat.x,
+        retreat.y,
+        retreat.z,
+        mode,
+        stopDistance,
+        reason
+    ) then
+        clearActiveRetreat(record, state)
+        state.retryAt = now
+            + (tonumber(Const.COMBAT_RETREAT_RETRY_MS) or 800)
+        return false, "retreat_rejected"
+    end
     return true, reason
 end
 
@@ -1019,17 +1104,28 @@ function Tactics.MaintainRangedSpacing(record, zombie, target)
     )
 end
 
-function Tactics.AvoidThreat(record, zombie, target)
+function Tactics.AvoidThreat(record, zombie, target, options)
     local state
     local now
     local staminaRatio
     local distance
     local mode
+    local continued
+    local continueReason
+    local radius
     if not record or not target then return false, "avoid_target_missing" end
+    options = type(options) == "table" and options or {}
     now = Core.Now()
     state = ensureRetreatState(record)
-    if continueLockedRetreat(record, zombie, target, state, now) then
+    continued, continueReason =
+        continueLockedRetreat(record, zombie, target, state, now)
+    if continued then
         return true, state.reason or "companion_avoiding_threat"
+    end
+    if continueReason == "retreat_stalled"
+        or now < (tonumber(state and state.retryAt) or 0)
+    then
+        return false, "retreat_stalled"
     end
     staminaRatio = Stamina and Stamina.GetRatio
         and Stamina.GetRatio(record) or 1
@@ -1039,8 +1135,12 @@ function Tactics.AvoidThreat(record, zombie, target)
         target.x,
         target.y
     ))
-    if distance > (tonumber(Const.COMPANION_AVOID_THREAT_RADIUS) or 10) then
+    radius = tonumber(options.radius)
+        or tonumber(Const.COMPANION_AVOID_THREAT_RADIUS)
+        or 10
+    if distance > radius then
         clearActiveRetreat(record, state)
+        state.retryAt = 0
         return false, "threat_outside_avoid_radius"
     end
     mode = staminaRatio > (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
@@ -1049,13 +1149,22 @@ function Tactics.AvoidThreat(record, zombie, target)
         record,
         zombie,
         target,
-        tonumber(Const.COMPANION_AVOID_THREAT_DISTANCE) or 5,
-        mode,
-        0.8,
-        tonumber(Const.COMPANION_AVOID_THREAT_LOCK_MS) or 750,
-        "companion_avoiding_threat",
-        staminaRatio <= (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
-            and "retreat" or nil
+        tonumber(options.distance)
+            or tonumber(Const.COMPANION_AVOID_THREAT_DISTANCE)
+            or 5,
+        tostring(options.mode or mode),
+        tonumber(options.stopDistance) or 0.8,
+        tonumber(options.lockMs)
+            or tonumber(Const.COMPANION_AVOID_THREAT_LOCK_MS)
+            or 750,
+        tostring(options.reason or "companion_avoiding_threat"),
+        options.recoveryMode
+            or (
+                staminaRatio
+                    <= (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
+                and "retreat"
+                or nil
+            )
     )
 end
 

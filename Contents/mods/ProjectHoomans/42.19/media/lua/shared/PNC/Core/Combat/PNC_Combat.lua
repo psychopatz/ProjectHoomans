@@ -17,19 +17,19 @@ local Equipment = PNC.Equipment
 local Perception = PNC.Perception
 
 Internal.MELEE_BUMP_TYPES = {
-    -- Use the engine/Bandits BumpType vocabulary.  PNC's PNCActor-conditioned
-    -- animation nodes already map these identifiers to the human clips, while
-    -- the standard names survive IsoZombie multiplayer packet updates more
-    -- reliably than a parallel PNC-only BumpType namespace.
-    onehanded = { "Attack1H1", "Attack1H2" },
-    twohanded = { "Attack2H1", "Attack2H2" },
-    spear = { "AttackS1" },
-    knife = { "AttackKnife" },
+    -- Keep attack selectors out of vanilla IsoZombie's BumpType namespace.
+    -- Dynamic Trading uses the same namespaced-node pattern; generic
+    -- Attack1H/Attack2H values can select a vanilla bump node before PNC's
+    -- human arm animation on multiplayer replicas.
+    onehanded = { "PNC_Attack1H1", "PNC_Attack1H2" },
+    twohanded = { "PNC_Attack2H1", "PNC_Attack2H2" },
+    spear = { "PNC_AttackS1" },
+    knife = { "PNC_AttackKnife" },
 }
 
 Internal.RANGED_BUMP_TYPES = {
-    handgun = { "AttackPistol" },
-    rifle = { "AttackRifle" },
+    handgun = { "PNC_AttackPistol" },
+    rifle = { "PNC_AttackRifle" },
 }
 
 Internal.ATTACK_TIMINGS = {
@@ -56,7 +56,7 @@ local function applyImmediateFacing(zombie, liveTarget, faceX, faceY)
             if zombie.getForwardDirection then
                 forward = zombie:getForwardDirection()
                 if forward and forward.set then
-                    pcall(forward.set, forward, dx, dy)
+                    forward:set(dx, dy)
                 end
             end
             if zombie.faceLocation then

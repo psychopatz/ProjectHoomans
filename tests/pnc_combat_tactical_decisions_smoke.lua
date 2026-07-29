@@ -244,6 +244,31 @@ assert(
     "locked retreat refresh must continue away from danger"
 )
 
+-- A native route that makes no physical progress releases combat ownership
+-- instead of rebuilding the same retreat forever while the NPC is mauled.
+now = now + 250
+record = makeRecord("stalled_retreat")
+moved, reason = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, true, "stalled-retreat fixture starts movement")
+now = now + 1000
+moved, reason = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, false, "stalled retreat did not release combat")
+assertEqual(reason, "retreat_stalled", "stalled retreat reason")
+assertEqual(record.runtime.retreatMode, false,
+    "stalled retreat retained movement ownership")
+
 -- A crawler is only finished when the immediate area is safe.
 now = now + 250
 grounded = true

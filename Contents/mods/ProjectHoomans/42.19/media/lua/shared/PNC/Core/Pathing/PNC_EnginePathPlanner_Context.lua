@@ -87,6 +87,36 @@ function Internal.GetNativeTraversalState(body)
     return nil
 end
 
+function Internal.GetNativeMovementState(body)
+    local state = body and body.getActionStateName
+        and string.lower(tostring(
+            body:getActionStateName() or ""
+        ))
+        or ""
+    if state == "pathfind" then
+        return state
+    end
+    return Internal.GetNativeTraversalState(body)
+end
+
+function Internal.IsAtRequestGoal(body, navigation)
+    if not body or not navigation then return false end
+    local requestZ = tonumber(navigation.requestZ) or body:getZ()
+    if math.abs(body:getZ() - requestZ) >= 0.5 then
+        return false
+    end
+    local dx = (tonumber(navigation.requestX) or body:getX())
+        - body:getX()
+    local dy = (tonumber(navigation.requestY) or body:getY())
+        - body:getY()
+    local stopDistance = math.max(
+        0.1,
+        tonumber(navigation.requestStopDistance) or 0.7
+    )
+    return (dx * dx) + (dy * dy)
+        <= stopDistance * stopDistance
+end
+
 function Internal.IsMultiplayerAuthority()
     return Core
         and Core.IsAuthority
@@ -99,30 +129,33 @@ function Internal.SetServerMovementLease(body, navigation, active)
     if not navigation then
         return false
     end
-    active = active == true
+    local movementActive = active == true
+    local serverLease = movementActive
         and Internal.IsMultiplayerAuthority()
-    navigation.serverMovementLease = active
+    navigation.serverMovementLease = serverLease
     local record = navigation.record
     if record then
         Planner.ActiveServerRoutes[record] =
-            active and navigation or nil
+            serverLease and navigation or nil
     end
     if LiveBodyControl
         and LiveBodyControl.SetManagedBodyUseless
     then
         LiveBodyControl.SetManagedBodyUseless(
             body,
-            not active,
-            active
+            not movementActive,
+            movementActive
         )
     elseif body and body.setUseless then
         -- Defensive load-order fallback: MP bodies must remain useful even if
         -- the shared body-control module failed to initialize.
         local multiplayer = (isClient and isClient() == true)
             or (isServer and isServer() == true)
-        body:setUseless(multiplayer and false or not active)
+        body:setUseless(
+            multiplayer and false or not movementActive
+        )
     end
-    return active
+    return serverLease
 end
 
 function Internal.ClearEngineRequest(body, navigation)
@@ -139,6 +172,18 @@ function Internal.ClearEngineRequest(body, navigation)
     if body and body.setPath2 then
         body:setPath2(nil)
     end
+    local actionState = body and body.getActionStateName
+        and string.lower(tostring(
+            body:getActionStateName() or ""
+        ))
+        or ""
+    if actionState == "pathfind"
+        and body.changeState
+        and ZombieIdleState
+        and ZombieIdleState.instance
+    then
+        body:changeState(ZombieIdleState.instance())
+    end
     if navigation then
         Internal.SetServerMovementLease(body, navigation, false)
     end
@@ -153,6 +198,10 @@ function Internal.ClearEngineRequest(body, navigation)
         navigation.nativeTraversalState = nil
         navigation.nativeTraversalStartedAt = 0
         navigation.nativeTraversalResult = nil
+        navigation.lastObservedX = nil
+        navigation.lastObservedY = nil
+        navigation.lastObservedZ = nil
+        navigation.lastPhysicalProgressAt = 0
     end
 end
 

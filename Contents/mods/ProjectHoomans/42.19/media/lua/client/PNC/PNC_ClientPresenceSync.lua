@@ -27,6 +27,7 @@ require "PNC/PresenceSync/PNC_ClientPresenceFacing"
 require "PNC/PresenceSync/PNC_ClientPresenceVisuals"
 require "PNC/PresenceSync/PNC_ClientPresenceBodies"
 require "PNC/PresenceSync/PNC_ClientNativePathController"
+require "PNC/PresenceSync/PNC_ClientZombieAggroController"
 require "PNC/PresenceSync/PNC_ClientPresenceTick"
 
 local function onResetLua()

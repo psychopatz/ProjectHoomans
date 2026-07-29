@@ -58,10 +58,12 @@ local function resolveExhaustedProfile(requestedMode, staminaMode, now, runtime)
     end
     if requestedMode == "run" then
         runtime.sprintSlowUntil = math.max(tonumber(runtime.sprintSlowUntil) or 0, now + Const.STAMINA_SPRINT_BREATHER_MS)
-        if staminaMode == "combat_close" or staminaMode == "combat_retreat" then
-            return "recovery_walk"
-        end
-        return "recovery_sneak"
+        -- Exhaustion may slow a run, but it must not invent stealth posture.
+        -- Sneak remains reserved for an explicit owner-follow or journey
+        -- avoidance request.
+        return staminaMode == "sneak"
+            and "recovery_sneak"
+            or "recovery_walk"
     end
     return "recovery_walk"
 end

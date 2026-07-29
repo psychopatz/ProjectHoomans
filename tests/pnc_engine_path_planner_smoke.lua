@@ -78,7 +78,6 @@ local cancelCount = 0
 local resetCount = 0
 local updateCount = 0
 local nextResult = BehaviorResult.Working
-local updateSawUsefulBody = false
 local body
 local serverMode = false
 isServer = function() return serverMode end
@@ -89,7 +88,6 @@ local behavior = {
     end,
     update = function()
         updateCount = updateCount + 1
-        updateSawUsefulBody = body and body.useless == false
         return nextResult
     end,
     cancel = function() cancelCount = cancelCount + 1 end,
@@ -109,6 +107,10 @@ body = {
     getPathFindBehavior2 = function() return behavior end,
     getPath2 = function(self) return self.path2 end,
     setPath2 = function(self, path) self.path2 = path end,
+    pathToLocationF = function(self, x, y, z)
+        behavior:pathToLocationF(x, y, z)
+        self.actionState = "pathfind"
+    end,
     getActionStateName = function(self)
         return self.actionState or "idle"
     end,
@@ -152,11 +154,10 @@ local resetsAfterStart = resetCount
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
 assert(handled and state == "native_path_pending",
     "native path did not remain active while working")
-assert(updateSawUsefulBody,
-    "native path update ran while the managed body was useless")
-assert(updateCount == 1, "native path request was not started")
-assert(body.useless == true,
-    "native path update did not restore the managed-body safety flag")
+assert(updateCount == 0,
+    "Lua manually advanced engine-owned PathFindBehavior2")
+assert(body.useless == false,
+    "native route did not keep the managed body useful")
 assert(cancelCount == cancelsAfterStart
     and resetCount == resetsAfterStart,
     "working native path was cancelled or reset")
@@ -178,7 +179,8 @@ PNC.EnginePathPlanner.GetSteeringTarget(
 assert(requestCount == requestsBeforeMovingReplan + 1,
     "moving target did not trigger a bounded native replan")
 
-nextResult = BehaviorResult.Succeeded
+body.x = movedTarget.x
+body.y = movedTarget.y
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
 assert(handled and state == "engine_path_succeeded",
     "native path success was not consumed")
@@ -186,23 +188,27 @@ assert(cancelCount >= 2 and resetCount >= 2,
     "native behavior was not released after success")
 assert(not record.runtime.localNavigation.nativeActive,
     "native movement ownership was not released")
+body.x = 0.5
+body.y = 0.5
+body.actionState = "idle"
 
 now = now + 2000
 nextResult = BehaviorResult.Working
 PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
-nextResult = BehaviorResult.Failed
+body.actionState = "idle"
+now = now + 2500
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
-assert(handled and state == "engine_path_failed",
-    "native path failure did not release movement ownership")
+assert(handled and state == "engine_path_timeout",
+    "engine path-state exit did not release movement ownership")
 
 now = now + 2000
 nextResult = BehaviorResult.Working
 PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 local updatesBeforeTimeout = updateCount
-now = now + 2500
+now = now + 15000
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
 assert(handled and state == "engine_path_timeout",
-    "native path timeout did not release movement ownership")
+    "non-progressing native route did not time out")
 assert(updateCount == updatesBeforeTimeout,
     "timed-out native path was updated again")
 
@@ -217,6 +223,7 @@ local directBody = {
     getZ = body.getZ,
     getSquare = body.getSquare,
     getPathFindBehavior2 = body.getPathFindBehavior2,
+    pathToLocationF = body.pathToLocationF,
     getPath2 = function() return nil end,
     setPath2 = function() end,
 }
@@ -269,6 +276,8 @@ assert(not string.find(plannerSource, "pcall", 1, true),
     "native planner must not hide path errors with pcall")
 assert(not string.find(plannerSource, "getClassField", 1, true),
     "native planner depends on debug-only Java reflection")
+assert(not string.find(plannerSource, "behavior:update(", 1, true),
+    "planner manually pumps PathFindBehavior2 instead of PathFindState")
 local motionSource = readAll(MOTION_FILE)
 assert(string.find(motionSource, "combat_attack_lease", 1, true),
     "combat attack lease does not cancel native movement")
@@ -318,13 +327,13 @@ nextResult = BehaviorResult.Working
 PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 handled, state = PNC.EnginePathPlanner.PumpFrame(record, body)
 assert(handled and state == "native_path_pending",
-    "authoritative zombie-frame pump did not advance native movement")
+    "authoritative observer lost engine-owned native movement")
 local updatesAfterFrame = updateCount
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
 assert(handled and state == "native_path_pending",
     "scheduled fallback lost native ownership after frame pump")
 assert(updateCount == updatesAfterFrame,
-    "scheduled fallback double-pumped a zombie-frame native route")
+    "observer pump manually advanced PathFindBehavior2")
 
 serverMode = true
 now = now + 2000

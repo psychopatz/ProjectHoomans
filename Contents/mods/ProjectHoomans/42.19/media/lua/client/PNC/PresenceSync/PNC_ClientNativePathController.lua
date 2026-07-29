@@ -1,10 +1,10 @@
 --[[
     Multiplayer native path controller.
 
-    Build 42 gives a nearby client ownership of zombie simulation. Mirroring
-    Bandits, only the client closest to a PNC body advances PathFindBehavior2.
-    The server remains authoritative for goals, combat, and NPC records while
-    normal IsoZombie networking transports the resulting movement.
+    Build 42 gives a nearby client ownership of zombie simulation. Only the
+    client closest to a PNC body submits the engine path request; PathFindState
+    advances it. The server remains authoritative for goals, combat, and NPC
+    records while normal IsoZombie networking transports the movement.
 ]]
 
 PNC = PNC or {}
@@ -21,6 +21,8 @@ local Network = PNC.Network
 local RETRY_DELAY_MS = 500
 local MAX_RETRIES = 3
 local CONTROLLER_CHECK_MS = 250
+local ROUTE_TIMEOUT_MS = 15000
+local PROGRESS_EPSILON_SQ = 0.0025
 
 Sync.NativePathStateByBody =
     Sync.NativePathStateByBody or {}
@@ -45,7 +47,7 @@ local function playerID(player)
     return nil
 end
 
-local function isLocalController(body)
+function Internal.IsLocalZombieController(body)
     local localPlayer = getSpecificPlayer
         and getSpecificPlayer(0) or nil
     local players = getOnlinePlayers
@@ -83,15 +85,6 @@ local function isLocalController(body)
         and playerID(nearest) == playerID(localPlayer)
 end
 
-local function resultMatches(result, name)
-    if BehaviorResult and BehaviorResult[name] ~= nil then
-        return result == BehaviorResult[name]
-    end
-    local value = tostring(result or "")
-    return value == name
-        or value == ("BehaviorResult." .. name)
-end
-
 local function clearOwnedPath(body, state)
     local behavior
     if not body or not state or state.owned ~= true then
@@ -110,18 +103,43 @@ local function clearOwnedPath(body, state)
     if body.setPath2 then
         body:setPath2(nil)
     end
+    local actionState = body.getActionStateName
+        and string.lower(tostring(
+            body:getActionStateName() or ""
+        ))
+        or ""
+    if actionState == "pathfind"
+        and body.changeState
+        and ZombieIdleState
+        and ZombieIdleState.instance
+    then
+        body:changeState(ZombieIdleState.instance())
+    end
     state.owned = false
     state.requestKey = nil
     state.completed = false
     state.failed = false
 end
 
-local function buildGoal(snapshot)
+local function hasBodyActionLock(body)
+    local modData = body
+        and body.getModData
+        and body:getModData()
+        or nil
+    return modData ~= nil
+        and (
+            modData.PNC_BumpActionLease == true
+            or modData.PNC_BumpReleasePending == true
+        )
+end
+
+local function buildGoal(snapshot, body)
     local visualState = snapshot
         and snapshot.visualState or nil
     if not visualState
         or visualState.nativeMoveActive ~= true
         or visualState.attackActive == true
+        or hasBodyActionLock(body)
     then
         return nil
     end
@@ -135,10 +153,42 @@ local function buildGoal(snapshot)
         x = x,
         y = y,
         z = z,
+        stopDistance = math.max(
+            0.1,
+            tonumber(visualState.nativeMoveStopDistance)
+                or 0.7
+        ),
         revision = tonumber(
             visualState.nativeMoveRevision
         ) or 0,
     }
+end
+
+local function distanceToGoalSquared(body, goal)
+    local dx = goal.x - body:getX()
+    local dy = goal.y - body:getY()
+    local dz = math.abs(goal.z - body:getZ())
+    if dz >= 0.5 then
+        return math.huge
+    end
+    return (dx * dx) + (dy * dy)
+end
+
+local function rememberProgress(body, state, now)
+    local x = body:getX()
+    local y = body:getY()
+    local z = body:getZ()
+    local dx = x - (tonumber(state.lastX) or x)
+    local dy = y - (tonumber(state.lastY) or y)
+    local dz = z - (tonumber(state.lastZ) or z)
+    if (dx * dx) + (dy * dy) + (dz * dz)
+        >= PROGRESS_EPSILON_SQ
+    then
+        state.lastProgressAt = now
+    end
+    state.lastX = x
+    state.lastY = y
+    state.lastZ = z
 end
 
 local function requestKey(snapshot, goal)
@@ -199,10 +249,12 @@ function Internal.BindNativePathSnapshot(snapshot, body, now)
     now = tonumber(now)
         or (Core.Now and Core.Now() or 0)
     local state = ensureState(body)
+    local goal = buildGoal(snapshot, body)
     state.snapshot = snapshot
     state.lastSeenAt = now
     state.releasePending = false
-    if LiveBodyControl
+    if (goal or hasBodyActionLock(body))
+        and LiveBodyControl
         and LiveBodyControl.SetManagedBodyUseless
     then
         LiveBodyControl.SetManagedBodyUseless(
@@ -210,10 +262,12 @@ function Internal.BindNativePathSnapshot(snapshot, body, now)
             false,
             true
         )
-    elseif body.setUseless then
+    elseif (goal or hasBodyActionLock(body))
+        and body.setUseless
+    then
         body:setUseless(false)
     end
-    return buildGoal(snapshot) ~= nil
+    return goal ~= nil
 end
 
 function Internal.UpdateNativePathController(
@@ -230,6 +284,14 @@ function Internal.UpdateNativePathController(
     end
     now = tonumber(now)
         or (Core.Now and Core.Now() or 0)
+    local state = ensureState(body)
+    state.snapshot = snapshot
+    state.lastSeenAt = now
+    local goal = buildGoal(snapshot, body)
+    if not goal then
+        clearOwnedPath(body, state)
+        return false, "native_goal_inactive"
+    end
     if LiveBodyControl
         and LiveBodyControl.SetManagedBodyUseless
     then
@@ -241,21 +303,13 @@ function Internal.UpdateNativePathController(
     elseif body.setUseless then
         body:setUseless(false)
     end
-
-    local state = ensureState(body)
-    state.snapshot = snapshot
-    state.lastSeenAt = now
-    local goal = buildGoal(snapshot)
-    if not goal then
-        clearOwnedPath(body, state)
-        return false, "native_goal_inactive"
-    end
     if state.localController == nil
         or now >= (
             tonumber(state.nextControllerCheckAt) or 0
         )
     then
-        state.localController = isLocalController(body)
+        state.localController =
+            Internal.IsLocalZombieController(body)
         state.nextControllerCheckAt =
             now + CONTROLLER_CHECK_MS
     end
@@ -273,11 +327,7 @@ function Internal.UpdateNativePathController(
 
     local behavior = body.getPathFindBehavior2
         and body:getPathFindBehavior2() or nil
-    if not behavior
-        or not behavior.update
-        or (not behavior.pathToLocation
-            and not behavior.pathToLocationF)
-    then
+    if not behavior or not body.pathToLocationF then
         return false, "native_path_api_unavailable"
     end
 
@@ -298,19 +348,11 @@ function Internal.UpdateNativePathController(
                 behavior:reset()
             end
         end
-        if behavior.pathToLocation then
-            behavior:pathToLocation(
-                goal.x,
-                goal.y,
-                goal.z
-            )
-        else
-            behavior:pathToLocationF(
-                goal.x,
-                goal.y,
-                goal.z
-            )
-        end
+        -- Build 42.19 requires the character wrapper here. It enters
+        -- PathFindState, which is the sole owner of PathFindBehavior2.update()
+        -- and of native door/window/fence traversal. Calling update() from Lua
+        -- leaves WalkTowardState and path2 active together and floods warnings.
+        body:pathToLocationF(goal.x, goal.y, goal.z)
         if state.requestKey ~= key then
             state.retries = 0
         else
@@ -321,6 +363,11 @@ function Internal.UpdateNativePathController(
         state.owned = true
         state.completed = false
         state.failed = false
+        state.startedAt = now
+        state.lastProgressAt = now
+        state.lastX = body:getX()
+        state.lastY = body:getY()
+        state.lastZ = body:getZ()
         logState(
             snapshot,
             "native_controller_start",
@@ -338,8 +385,10 @@ function Internal.UpdateNativePathController(
             or "native_path_retry_wait"
     end
 
-    local result = behavior:update()
-    if resultMatches(result, "Succeeded") then
+    rememberProgress(body, state, now)
+    if distanceToGoalSquared(body, goal)
+        <= goal.stopDistance * goal.stopDistance
+    then
         state.completed = true
         logState(
             snapshot,
@@ -348,8 +397,14 @@ function Internal.UpdateNativePathController(
         )
         return true, "native_path_succeeded"
     end
-    if resultMatches(result, "Failed") then
+    if now - (tonumber(state.lastProgressAt) or now)
+        >= ROUTE_TIMEOUT_MS
+    then
+        if behavior.cancel then behavior:cancel() end
+        if behavior.reset then behavior:reset() end
+        if body.setPath2 then body:setPath2(nil) end
         state.failed = true
+        state.owned = false
         state.retryAt = now + RETRY_DELAY_MS
         logState(
             snapshot,
@@ -375,10 +430,16 @@ function Internal.OnNativePathZombieUpdate(body)
     if not snapshot then
         return
     end
-    -- Match Bandits' ZAMove execution context. Build 42 assigns zombie
-    -- simulation ownership while the zombie itself is being updated; pumping
-    -- PathFindBehavior2 from generic OnTick can leave a replica animating
-    -- without advancing its networked position.
+    -- Match Bandits' ManageActionState boundary on every zombie frame. The
+    -- engine owns locomotion/traversal, but never target selection or zombie
+    -- feeding behavior for a managed human body.
+    if LiveBodyControl and LiveBodyControl.SuppressVanillaIntent then
+        LiveBodyControl.SuppressVanillaIntent(
+            body,
+            buildGoal(snapshot, body) ~= nil
+                or hasBodyActionLock(body)
+        )
+    end
     Internal.UpdateNativePathController(
         snapshot,
         body,

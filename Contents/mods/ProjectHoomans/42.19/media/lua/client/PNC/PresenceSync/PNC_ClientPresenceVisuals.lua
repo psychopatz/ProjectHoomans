@@ -80,6 +80,7 @@ local function maintainClientAttackBump(
     local retries
     local actionState
     local bumpType
+    local resolvedBumpType
     if not modData or not Animation or not Animation.PlayBump then
         return false
     end
@@ -96,12 +97,15 @@ local function maintainClientAttackBump(
     end
     actionState = getActionStateName(zombie)
     bumpType = getBumpType(zombie)
+    resolvedBumpType = Animation.ResolveBumpType
+        and Animation.ResolveBumpType(anim)
+        or tostring(anim)
     if actionState == "bumped" then
         return false
     end
     -- A zombie packet can restore the same BumpType without entering the
     -- client action state.  Force a real variable edge before retrying.
-    if bumpType == tostring(anim) and zombie.setBumpType then
+    if bumpType == resolvedBumpType and zombie.setBumpType then
         zombie:setBumpType("")
     end
     Animation.PlayBump(zombie, recordView, anim)
@@ -342,6 +346,8 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     local handsKey
     local motionKey
     local motionChanged
+    local engineMovementActive
+    local bumpReleaseActive
     local now
     if not snapshot or not zombie or (zombie.isDead and zombie:isDead()) then
         return
@@ -353,14 +359,22 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     end
 
     now = Core and Core.Now and Core.Now() or 0
+    engineMovementActive = remoteReplica
+        and (
+            visualState.nativeMoveActive == true
+            or visualState.nativeTraversalActive == true
+            or visualState.attackActive == true
+            or modData and modData.PNC_BumpActionLease == true
+            or modData and modData.PNC_BumpReleasePending == true
+        )
     if LiveBodyControl and LiveBodyControl.MaintainHumanizedBody then
-        -- Remote IsoZombies are transported by the engine's normal MP
-        -- network controller.  They must remain useful for that controller
-        -- to advance walking and native fence/window traversal.
+        -- Native path/traversal and bumped action leases need Java-side action
+        -- updates. The attack remains gameplay-scripted; this lease only lets
+        -- the selected arm/weapon clip advance on the local client body.
         LiveBodyControl.MaintainHumanizedBody(
             zombie,
             now,
-            remoteReplica
+            engineMovementActive
         )
     end
     if (
@@ -375,7 +389,8 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     )
         and Animation and Animation.PumpBumpRelease
     then
-        Animation.PumpBumpRelease(zombie, now)
+        bumpReleaseActive =
+            Animation.PumpBumpRelease(zombie, now)
     end
 
     recordView = buildRecordView(snapshot)
@@ -523,6 +538,15 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
         )
         return
     end
+    if bumpReleaseActive then
+        -- A newer movement snapshot can arrive before BumpedState consumes
+        -- BumpAnimFinished. Do not let traversal, native locomotion, or fake
+        -- locomotion presentation overwrite that final action-graph frame.
+        if modData then
+            modData.PNC_ClientMotionKey = motionKey
+        end
+        return
+    end
 
     if remoteReplica
         and visualState.nativeTraversalActive == true
@@ -562,9 +586,9 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     if remoteReplica
         and visualState.nativeMoveActive == true
     then
-        -- The nearest client advances PathFindBehavior2 from OnZombieUpdate.
-        -- Only its walk/run presentation style is ours; generic movement and
-        -- action-state variables remain exclusively engine-owned.
+        -- The nearest client submits the PathFindState request. Only its
+        -- walk/run presentation style is ours; movement and action-state
+        -- variables remain exclusively engine-owned.
         if Animation and Animation.SyncNativeLocomotionStyle then
             Animation.SyncNativeLocomotionStyle(zombie, recordView)
         end

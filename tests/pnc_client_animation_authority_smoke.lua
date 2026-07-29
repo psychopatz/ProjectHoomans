@@ -12,6 +12,8 @@ local calls = {
     sync = 0,
 }
 local now = 1000
+local engineMovementActive
+local pumpReturnsActive = false
 
 PNC = {
     Const = {
@@ -22,6 +24,11 @@ PNC = {
     },
     Core = {
         Now = function() return now end,
+    },
+    LiveBodyControl = {
+        MaintainHumanizedBody = function(_, _, active)
+            engineMovementActive = active
+        end,
     },
     Animation = {
         Apply = function() calls.apply = calls.apply + 1 end,
@@ -36,7 +43,10 @@ PNC = {
                 zombie:setBumpType(anim)
             end
         end,
-        PumpBumpRelease = function() calls.pump = calls.pump + 1 end,
+        PumpBumpRelease = function()
+            calls.pump = calls.pump + 1
+            return pumpReturnsActive
+        end,
         SyncNativeLocomotionStyle = function()
             calls.nativeStyle = calls.nativeStyle + 1
         end,
@@ -106,6 +116,8 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
 )
 assert(calls.play == 3, "remote replica did not replay the attack snapshot")
 assert(calls.pump == 2, "remote replica did not maintain bump release")
+assert(engineMovementActive == true,
+    "remote attack did not retain its action-context update lease")
 
 local retryModData = {}
 local retryBumpType = ""
@@ -215,12 +227,27 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     nativeReplica,
     true
 )
+assert(engineMovementActive == true,
+    "native MP movement did not retain engine body mode")
 assert(calls.nativeStyle == 1,
     "native MP route did not receive presentation-only locomotion style")
 assert(calls.apply == appliesBeforeNative and calls.sync == syncsBeforeNative,
     "native MP route invoked fake locomotion")
 assert(calls.clear == clearsBeforeNative,
     "healthy native MP route was reset through ClearDowned")
+
+local releaseBody = body()
+releaseBody:getModData().PNC_BumpReleasePending = true
+local nativeStylesBeforeRelease = calls.nativeStyle
+pumpReturnsActive = true
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    nativeSnapshot,
+    releaseBody,
+    true
+)
+pumpReturnsActive = false
+assert(calls.nativeStyle == nativeStylesBeforeRelease,
+    "new MP locomotion snapshot overwrote the pending bump exit")
 
 local specialBody = body()
 local finishesBeforeSpecial = calls.finish

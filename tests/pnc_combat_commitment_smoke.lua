@@ -88,4 +88,26 @@ assert(record.runtime.attackAction == nil,
 assert(attackPumps == 2,
     "expired committed attack skipped its finish pump")
 
+local behaviorFile = assert(io.open(
+    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+        .. "Behaviors/PNC_BehaviorSystem.lua",
+    "rb"
+))
+local behaviorSource = behaviorFile:read("*a")
+behaviorFile:close()
+local committedAt = assert(string.find(
+    behaviorSource,
+    "Combat.TickCommittedAction(record, zombie)",
+    1,
+    true
+))
+local treatmentAt = assert(string.find(
+    behaviorSource,
+    "Treatment.Tick(record, zombie, now)",
+    1,
+    true
+))
+assert(committedAt < treatmentAt,
+    "self-treatment can preempt a committed attack")
+
 print("pnc_combat_commitment_smoke: ok")

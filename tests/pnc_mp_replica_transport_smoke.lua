@@ -36,12 +36,11 @@ local requestCount = 0
 local updateCount = 0
 local cancelCount = 0
 local resetCount = 0
+local bodyModData = {
+    PNC_NPC = true,
+    PNC_UUID = "remote_replica",
+}
 local behavior = {
-    pathToLocation = function(_, x, y, z)
-        requestCount = requestCount + 1
-        assert(x == 8 and y == 4 and z == 0,
-            "delegated goal was altered")
-    end,
     update = function()
         updateCount = updateCount + 1
         return "Working"
@@ -57,11 +56,9 @@ local body = {
     x = 1,
     y = 1,
     z = 0,
+    actionState = "idle",
     getModData = function()
-        return {
-            PNC_NPC = true,
-            PNC_UUID = "remote_replica",
-        }
+        return bodyModData
     end,
     isUseless = function() return useless end,
     setUseless = function(_, value)
@@ -73,7 +70,28 @@ local body = {
     getPathFindBehavior2 = function()
         return behavior
     end,
+    pathToLocationF = function(self, x, y, z)
+        requestCount = requestCount + 1
+        assert(x == 8 and y == 4 and z == 0,
+            "delegated goal was altered")
+        self.actionState = "pathfind"
+    end,
+    getActionStateName = function(self)
+        return self.actionState
+    end,
     setPath2 = function() end,
+    setTarget = function(self, value)
+        self.target = value
+    end,
+    setTargetSeenTime = function(self, value)
+        self.targetSeenTime = value
+    end,
+    setEatBodyTarget = function(self, value)
+        self.eatBodyTarget = value
+    end,
+    clearAggroList = function(self)
+        self.aggroCleared = true
+    end,
 }
 
 PNC = {
@@ -125,8 +143,8 @@ assert(
     "managed MP replica was not maintained"
 )
 assert(
-    useless == false,
-    "MP replica was disabled instead of leaving native network movement active"
+    useless == true,
+    "idle MP replica did not retain scripted/manual body mode"
 )
 
 PNC.ClientPresenceSync = {
@@ -195,8 +213,12 @@ assert(
 )
 assert(nativeZombieUpdateHandler,
     "native path controller was not registered on OnZombieUpdate")
+body.target = localPlayer
+body.targetSeenTime = 12
+body.eatBodyTarget = localPlayer
+body.aggroCleared = false
 nativeZombieUpdateHandler(body)
-assert(requestCount == 1 and updateCount == 1,
+assert(requestCount == 1 and updateCount == 0,
     "nearest MP client did not start movement in zombie update context")
 PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
     snapshot,
@@ -206,10 +228,18 @@ PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
 nativeZombieUpdateHandler(body)
 assert(requestCount == 1,
     "unchanged delegated goal was submitted more than once")
-assert(updateCount == 2,
-    "client controller did not advance PathFindBehavior2 each frame")
+assert(updateCount == 0,
+    "client manually advanced engine-owned PathFindBehavior2")
 assert(useless == false,
     "client controller disabled the body during movement")
+assert(body.target == nil,
+    "zombie target was not suppressed in the movement-owner frame")
+assert(body.targetSeenTime == 0,
+    "zombie target memory was not reset in the movement-owner frame")
+assert(body.eatBodyTarget == nil,
+    "zombie eating target was not suppressed in the movement-owner frame")
+assert(body.aggroCleared == true,
+    "zombie aggro was not suppressed in the movement-owner frame")
 
 localPlayer.x = 200
 localPlayer.y = 200
@@ -219,6 +249,62 @@ clientNow = 1300
 nativeZombieUpdateHandler(body)
 assert(cancelCount == 1 and resetCount == 1,
     "controller handoff did not release the previous local path")
+
+useless = true
+bodyModData.PNC_BumpActionLease = true
+bodyModData.PNC_BumpActionLeaseUntil = clientNow + 1000
+local attackSnapshot = {
+    id = snapshot.id,
+    liveBodyLease = snapshot.liveBodyLease,
+    visualState = {
+        nativeMoveActive = true,
+        attackActive = true,
+        nativeMoveX = 8,
+        nativeMoveY = 4,
+        nativeMoveZ = 0,
+        nativeMoveRevision = 3,
+    },
+}
+assert(
+    not PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
+        attackSnapshot,
+        body,
+        clientNow + 16
+    ),
+    "attack snapshot retained a native path goal"
+)
+assert(useless == false,
+    "attack action lease did not keep the MP action context active")
+local requestsBeforeAttackUpdate = requestCount
+nativeZombieUpdateHandler(body)
+assert(requestCount == requestsBeforeAttackUpdate,
+    "MP zombie update started movement during the attack action lease")
+assert(useless == false,
+    "MP zombie update disabled the body during the attack action lease")
+
+local postAttackMoveSnapshot = {
+    id = snapshot.id,
+    liveBodyLease = snapshot.liveBodyLease,
+    visualState = {
+        nativeMoveActive = true,
+        attackActive = false,
+        nativeMoveX = 8,
+        nativeMoveY = 4,
+        nativeMoveZ = 0,
+        nativeMoveRevision = 4,
+    },
+}
+assert(
+    not PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
+        postAttackMoveSnapshot,
+        body,
+        clientNow + 32
+    ),
+    "post-attack movement bypassed the body-local bump tail"
+)
+nativeZombieUpdateHandler(body)
+assert(requestCount == requestsBeforeAttackUpdate,
+    "native path started before the local bump lifecycle exited")
 
 local tickSource = readAll(CLIENT_TICK)
 assert(not string.find(
@@ -278,6 +364,14 @@ assert(not string.find(controllerSource, "setX(", 1, true)
     "client native controller contains teleport movement")
 assert(not string.find(controllerSource, "pcall", 1, true),
     "client native controller hides failures with pcall")
+assert(not string.find(controllerSource, "behavior:update(", 1, true),
+    "client manually pumps PathFindBehavior2 instead of PathFindState")
+assert(string.find(
+    controllerSource,
+    "body:pathToLocationF",
+    1,
+    true
+), "client does not enter the engine PathFindState wrapper")
 
 local visualSource = readAll(CLIENT_VISUALS)
 assert(string.find(

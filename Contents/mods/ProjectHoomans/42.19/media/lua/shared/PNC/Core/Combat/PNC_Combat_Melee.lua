@@ -62,8 +62,9 @@ function Combat.TryMelee(record, zombie, target)
         dist = math.sqrt(tonumber(target.distSq) or 0)
     end
     if dist > (
-        (tonumber(Const.MELEE_RANGE) or 1.3)
-        + (tonumber(Const.MELEE_HIT_TOLERANCE) or 0.12)
+        tonumber(Const.MELEE_COMMIT_RANGE)
+            or tonumber(Const.MELEE_APPROACH_STOP_DISTANCE)
+            or 1.0
     ) then
         return false, "target_out_of_range"
     end
@@ -127,7 +128,15 @@ function Combat.TryMelee(record, zombie, target)
             equipmentInfo
         )
     end
-    Internal.buildAttackAction(record, target, "melee", "melee", anim or "Attack1H1", damage, skillID)
+    Internal.buildAttackAction(
+        record,
+        target,
+        "melee",
+        "melee",
+        anim or "PNC_Attack1H1",
+        damage,
+        skillID
+    )
     return true, "melee_attack_started"
 end
 

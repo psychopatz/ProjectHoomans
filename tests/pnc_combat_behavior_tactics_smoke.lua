@@ -143,6 +143,32 @@ assertEqual(
 )
 
 calls = {}
+mode = "mixed"
+target.distSq = 2.25
+PNC.BehaviorCombat.TickEngage(record, {}, target)
+assertEqual(calls[1], "pre", "mixed close-range precheck runs")
+assertEqual(calls[2], "melee",
+    "mixed close-range combat commits melee before ranged spacing")
+for i = 1, #calls do
+    assert(calls[i] ~= "spacing",
+        "mixed melee switch backed away through ranged spacing")
+end
+
+calls = {}
+target.distSq = 9
+PNC.BehaviorCombat.TickEngage(record, {}, target)
+assert(calls[#calls] == "hold",
+    "blocked mixed firearm lane did not commit melee fallback")
+local sawMeleeFallback = false
+for i = 1, #calls do
+    if calls[i] == "melee" then sawMeleeFallback = true end
+    assert(calls[i] ~= "reposition:friendly_fire_risk",
+        "mixed friendly-fire block strafed instead of melee fallback")
+end
+assert(sawMeleeFallback,
+    "mixed friendly-fire block never attempted melee fallback")
+
+calls = {}
 reloadPressure = true
 record.runtime.attackAction = { attackType = "reload" }
 assertEqual(

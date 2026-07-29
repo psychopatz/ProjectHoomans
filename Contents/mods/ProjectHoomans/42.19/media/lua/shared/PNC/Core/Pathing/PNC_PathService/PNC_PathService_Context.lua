@@ -261,11 +261,20 @@ function Internal.isMovementDebugEnabled(record)
     return false
 end
 
-function Internal.hasActiveAttack(record, now)
+function Internal.hasActiveAttack(record, now, zombie)
     local runtime = record and record.runtime or nil
     local attackAction = runtime and runtime.attackAction or nil
     now = tonumber(now) or Core.Now()
-    return attackAction ~= nil and now < (tonumber(attackAction.finishAt) or 0)
+    if attackAction ~= nil
+        and now < (tonumber(attackAction.finishAt) or 0)
+    then
+        return true
+    end
+    return zombie ~= nil
+        and Animation
+        and Animation.IsBumpActionActive
+        and Animation.IsBumpActionActive(zombie, now)
+        or false
 end
 
 local function buildTraversalPointKey(x, y, z)
@@ -367,7 +376,7 @@ function Internal.tryRecoverNonLocomotionState(record, zombie, lane, now)
         resetNonLocomotionTracking(lane)
         return false, actionState
     end
-    if Internal.hasActiveAttack(record, now)
+    if Internal.hasActiveAttack(record, now, zombie)
         or (tonumber(lane.specialMoveUntil) or 0) > now
         or (tonumber(lane.combatFacingUntil) or 0) > now
         or (LiveBodyControl and LiveBodyControl.IsSuppressedActionState and LiveBodyControl.IsSuppressedActionState(actionState))

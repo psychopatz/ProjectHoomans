@@ -15,11 +15,7 @@ local Const = PNC.Const
 local Perception = PNC.Perception
 local Animation = PNC.Animation
 local MoveIntent = PNC.BehaviorMoveIntent
-local TraversalQuery = PNC.TraversalQuery
-local COMBAT_NAVIGATION = {
-    navigationPolicy = "combat",
-    navigationProvider = "engine_path",
-}
+local CombatTactics = PNC.CombatTactics
 
 local BANDAGE_ANIM_BY_PART = {
     Head = "BandageHead",
@@ -90,68 +86,42 @@ local function clearAction(record, zombie, reason)
     record.runtime.tacticalState = nil
 end
 
-local function requestRetreat(record, threat)
+local function requestRetreat(record, zombie, threat)
     local state = ensureState(record)
-    local dx = record.x - (tonumber(threat and threat.x) or record.x - 1)
-    local dy = record.y - (tonumber(threat and threat.y) or record.y)
-    local length = math.sqrt(dx * dx + dy * dy)
-    local distance = tonumber(Const.SELF_BANDAGE_RETREAT_DISTANCE) or 5
-    local baseX
-    local baseY
-    local angles = { 0, 0.55, -0.55, 1.05, -1.05, 1.55, -1.55 }
-    local angle
-    local candidateX
-    local candidateY
-    local rotatedX
-    local rotatedY
-    local i
-    if length <= 0.001 then
-        dx = 1
-        dy = 0
-        length = 1
-    end
-    baseX = dx / length
-    baseY = dy / length
-    if TraversalQuery and TraversalQuery.CanStep
-        and TraversalQuery.CanOccupy
-    then
-        for i = 1, #angles do
-            angle = angles[i]
-            rotatedX = baseX * math.cos(angle) - baseY * math.sin(angle)
-            rotatedY = baseX * math.sin(angle) + baseY * math.cos(angle)
-            candidateX = record.x + rotatedX * distance
-            candidateY = record.y + rotatedY * distance
-            if TraversalQuery.CanStep(
-                record.x, record.y, record.z,
-                record.x + rotatedX * 0.8,
-                record.y + rotatedY * 0.8,
-                record.z
-            ) and TraversalQuery.CanOccupy(candidateX, candidateY, record.z)
-            then
-                baseX = rotatedX
-                baseY = rotatedY
-                break
-            end
-        end
-    end
-    if MoveIntent and MoveIntent.RequestMove then
-        MoveIntent.RequestMove(
+    local moved
+    local reason
+    if CombatTactics and CombatTactics.AvoidThreat then
+        moved, reason = CombatTactics.AvoidThreat(
             record,
-            record.x + baseX * distance,
-            record.y + baseY * distance,
-            record.z,
-            "run",
-            tonumber(Const.SELF_BANDAGE_RETREAT_STOP_DISTANCE) or 1,
-            "self_treatment_retreat",
-            COMBAT_NAVIGATION
+            zombie,
+            threat,
+            {
+                radius = tonumber(Const.SELF_BANDAGE_THREAT_RADIUS) or 10,
+                distance = tonumber(Const.SELF_BANDAGE_RETREAT_DISTANCE) or 5,
+                stopDistance =
+                    tonumber(Const.SELF_BANDAGE_RETREAT_STOP_DISTANCE) or 1,
+                lockMs = tonumber(Const.COMPANION_AVOID_THREAT_LOCK_MS) or 750,
+                mode = "run",
+                reason = "self_treatment_retreat",
+                recoveryMode = "retreat_to_treat",
+            }
         )
+    end
+    if not moved then
+        state.phase = "idle"
+        state.interruptedReason = reason or "retreat_unavailable"
+        record.runtime.tacticalState = nil
+        return false, state.interruptedReason
     end
     record.activeBehavior = "SelfTreatmentRetreat"
     state.phase = "retreat"
     state.interruptedReason = "threat_nearby"
     record.runtime.tacticalState = "retreat_to_treat"
-    record.runtime.target = nil
-    record.runtime.attackAction = nil
+    -- Keep the threat visible to the combat layer. If native movement stalls,
+    -- Treatment.Tick returns false and the same tick can defend instead of
+    -- standing unarmed while repeatedly rebuilding a retreat.
+    record.runtime.target = threat
+    return true, reason or "self_treatment_retreat"
 end
 
 local function startBandage(record, zombie, partId, now)
@@ -266,8 +236,7 @@ function Behavior.Tick(record, zombie, now)
             if record.health and record.health.state == "incapacitated" then
                 return false
             end
-            requestRetreat(record, threat)
-            return true
+            return requestRetreat(record, zombie, threat)
         end
         record.activeBehavior = "SelfBandage"
         if MoveIntent and MoveIntent.Hold then
@@ -297,8 +266,15 @@ function Behavior.Tick(record, zombie, now)
         if record.health and record.health.state == "incapacitated" then
             return false
         end
-        requestRetreat(record, threat)
-        return true
+        return requestRetreat(record, zombie, threat)
+    end
+    if state.phase == "retreat"
+        and CombatTactics
+        and CombatTactics.ClearRetreatState
+    then
+        CombatTactics.ClearRetreatState(record)
+        state.phase = "idle"
+        record.runtime.tacticalState = nil
     end
     if now < (tonumber(state.retryAt) or 0) then return false end
     return startBandage(record, zombie, partId, now)

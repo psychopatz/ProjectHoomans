@@ -15,6 +15,7 @@ local Equipment = PNC.Equipment
 local Stamina = PNC.Stamina
 local MotionHints = PNC.MotionHints
 local Identity = PNC.Identity
+local Settings = PNC.Sandbox
 
 local function buildTravelSummary(record, includeRoute)
     return PNC.Travel
@@ -242,6 +243,8 @@ local function buildVisualState(record)
             and navigation.requestY or nil,
         nativeMoveZ = nativeMoveActive
             and navigation.requestZ or nil,
+        nativeMoveStopDistance = nativeMoveActive
+            and navigation.requestStopDistance or nil,
         nativeMoveRevision = nativeMoveActive
             and navigation.requestRevision or 0,
     }
@@ -272,6 +275,10 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
             or nil,
         faction = record.faction,
         presenceState = record.presenceState,
+        zombieTargetable = Settings
+            and Settings.CanZombieTargetRecord
+            and Settings.CanZombieTargetRecord(record)
+            or false,
         x = record.x,
         y = record.y,
         z = record.z,

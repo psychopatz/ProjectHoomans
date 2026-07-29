@@ -127,7 +127,7 @@ function Combat.TryRanged(record, zombie, target)
         target,
         "ranged",
         "ranged",
-        anim or "AttackPistol",
+        anim or "PNC_AttackPistol",
         damage,
         skillID,
         {

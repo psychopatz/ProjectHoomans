@@ -17,6 +17,7 @@ local bumpFinished = 0
 local moveRequest
 local treatmentSounds = 0
 local zombieModData = {}
+local retreatAvailable = true
 
 PNC = {
     Const = {
@@ -74,6 +75,21 @@ PNC = {
                 stopDistance = stopDistance, reason = reason,
             }
         end,
+    },
+    CombatTactics = {
+        AvoidThreat = function(_, _, _, options)
+            if not retreatAvailable then
+                return false, "retreat_stalled"
+            end
+            moveRequest = {
+                x = 5, y = 0, z = 0,
+                mode = options.mode,
+                stopDistance = options.stopDistance,
+                reason = options.reason,
+            }
+            return true, options.reason
+        end,
+        ClearRetreatState = function() end,
     },
 }
 
@@ -151,5 +167,14 @@ assertEqual(PNC.BehaviorTreatment.Tick(abstractRecord, nil, now), true,
 assertEqual(consumed, beforeAbstract + 1, "abstract treatment consumes once")
 assertEqual(PNC.BehaviorTreatment.Tick(abstractRecord, nil, now + 1000), false,
     "abstract treatment cadence bounded")
+
+treatable = true
+threat = { kind = "zombie", x = 1, y = 0, z = 0, distSq = 1 }
+retreatAvailable = false
+record.runtime.selfTreatment.phase = "idle"
+assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now + 2000), false,
+    "stalled treatment retreat did not yield to defensive combat")
+assertEqual(record.runtime.selfTreatment.interruptedReason, "retreat_stalled",
+    "stalled treatment retreat reason")
 
 print("pnc_self_treatment_smoke: ok")

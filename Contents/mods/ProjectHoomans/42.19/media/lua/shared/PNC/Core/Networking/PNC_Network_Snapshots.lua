@@ -17,6 +17,7 @@ local Stamina = PNC.Stamina
 local Profiles = PNC.VisualProfiles
 local Wounds = PNC.NPCWounds
 local Firearms = PNC.Firearms
+local Settings = PNC.Sandbox
 local Parts = Network.Internal.SnapshotParts
 local buildTravelSummary = Parts.BuildTravelSummary
 local buildMapPresentationSummary = Parts.BuildMapPresentationSummary
@@ -112,6 +113,10 @@ function Network.BuildSnapshot(record)
         activeJob = record.activeJob,
         activeBehavior = record.activeBehavior,
         presenceState = record.presenceState,
+        zombieTargetable = Settings
+            and Settings.CanZombieTargetRecord
+            and Settings.CanZombieTargetRecord(record)
+            or false,
         alive = record.alive,
         hpCurrent = record.health and record.health.current or nil,
         hpMax = record.health and record.health.max or nil,
@@ -324,6 +329,10 @@ function Network.BuildPresenceDelta(record)
         y = record.y,
         z = record.z,
         presenceState = record.presenceState,
+        zombieTargetable = Settings
+            and Settings.CanZombieTargetRecord
+            and Settings.CanZombieTargetRecord(record)
+            or false,
         alive = record.alive,
         hpCurrent = record.health and record.health.current or nil,
         hpMax = record.health and record.health.max or nil,

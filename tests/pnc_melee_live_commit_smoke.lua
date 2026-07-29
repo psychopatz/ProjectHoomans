@@ -15,6 +15,7 @@ local animationTarget
 local heldReason
 local action
 local actionState = "pathfind"
+local liveTargetX = 1.35
 local modData = {}
 local variables = {}
 local weapon = {
@@ -23,7 +24,7 @@ local weapon = {
 }
 local liveTarget = {
     isDead = function() return false end,
-    getX = function() return 1.35 end,
+    getX = function() return liveTargetX end,
     getY = function() return 0 end,
     getZ = function() return 0 end,
 }
@@ -68,6 +69,7 @@ PNC = {
         PRESENCE_LIVE = "LIVE",
         MELEE_RANGE = 1.3,
         MELEE_HIT_TOLERANCE = 0.12,
+        MELEE_COMMIT_RANGE = 1.0,
         UNARMED_COOLDOWN_MS = 900,
         UNARMED_DAMAGE = 5,
         UNARMED_GROUND_DAMAGE = 8,
@@ -158,10 +160,21 @@ local started, reason = PNC.Combat.TryMelee(
     body,
     target
 )
+assertEqual(started, false, "outer hit radius started melee windup")
+assertEqual(reason, "target_out_of_range", "outer hit radius reason")
+assertEqual(action, nil, "outer hit radius committed an attack")
+
+liveTargetX = 0.95
+target.distSq = 100
+started, reason = PNC.Combat.TryMelee(
+    record,
+    body,
+    target
+)
 assertEqual(started, true, "live distance opens melee commit")
 assertEqual(reason, "melee_attack_started", "melee commit reason")
 assert(
-    math.abs(target.distSq - (1.35 * 1.35)) < 0.0001,
+    math.abs(target.distSq - (0.95 * 0.95)) < 0.0001,
     "stale target distance was not refreshed from live body"
 )
 assertEqual(heldReason, "melee_windup", "movement held before attack")
@@ -189,6 +202,10 @@ assertEqual(
     "setter-driven bump does not bind BumpedChr"
 )
 assertEqual(action.attackKind, "melee", "melee action committed")
-assertEqual(action.anim, "Attack1H1", "selected animation was not snapshotted")
+assertEqual(
+    action.anim,
+    "PNC_Attack1H1",
+    "selected animation was not snapshotted"
+)
 
 print("pnc_melee_live_commit_smoke: ok")

@@ -180,9 +180,9 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
     if npcBody.setZombiesDontAttack then
         npcBody:setZombiesDontAttack(false)
     end
-    if zombie.setTarget then
-        zombie:setTarget(npcBody)
-    end
+    -- BumpedChr and the PNC bite entry own this scripted attack. Binding the
+    -- IsoZombie NPC shell as setTarget() creates an unsupported MP character
+    -- goal and makes NetworkZombieMind reject the packet.
     if zombie.setBumpedChr then
         zombie:setBumpedChr(npcBody)
     end

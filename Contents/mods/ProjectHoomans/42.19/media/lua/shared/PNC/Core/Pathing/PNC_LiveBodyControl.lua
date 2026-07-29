@@ -51,6 +51,26 @@ local IDLE_RESET_STATES = {
     ["turnalerted"] = true,
 }
 
+local function clearVanillaIntent(zombie)
+    if not zombie then return false end
+    if zombie.setTarget then
+        zombie:setTarget(nil)
+    end
+    if zombie.setTargetSeenTime then
+        zombie:setTargetSeenTime(0)
+    end
+    if zombie.setEatBodyTarget then
+        zombie:setEatBodyTarget(nil, false)
+    end
+    if zombie.clearAggroList then
+        zombie:clearAggroList()
+    end
+    if zombie.setAttackedBy then
+        zombie:setAttackedBy(nil)
+    end
+    return true
+end
+
 function LiveBodyControl.SetAuthoritativePosition(zombie, x, y, z)
     if not zombie then
         return false
@@ -143,19 +163,13 @@ function LiveBodyControl.ReleaseDamageReaction(zombie, actionState)
         end
     end
 
-    if zombie.setTarget then
-        zombie:setTarget(nil)
-    end
-    if zombie.clearAggroList then
-        zombie:clearAggroList()
-    end
-    if zombie.setAttackedBy then
-        zombie:setAttackedBy(nil)
-    end
+    clearVanillaIntent(zombie)
     modData = zombie.getModData and zombie:getModData() or nil
     if modData then
         modData.PNC_BumpReleasePending = nil
         modData.PNC_BumpReleaseAt = nil
+        modData.PNC_BumpActionLease = nil
+        modData.PNC_BumpActionLeaseUntil = nil
     end
     return isDamageReaction
 end
@@ -201,19 +215,31 @@ function LiveBodyControl.SetManagedBodyUseless(
     if not zombie or not zombie.setUseless then
         return false
     end
-    -- Build 42 multiplayer zombie simulation and replication require the
-    -- IsoZombie to remain useful for the complete lifetime of the live body.
-    -- Bandits applies the same invariant in Multiplayer.  Individual health,
-    -- animation, and safety systems must not temporarily disable the body.
-    if LiveBodyControl.IsMultiplayer()
-        or keepEngineMovementActive == true
-    then
+    -- Native PathFindState and the bumped ActionContext both need a useful
+    -- IsoZombie. Multiplayer is not itself a lease: callers explicitly keep
+    -- the engine active only while it owns pathing or a scripted bump clip.
+    if keepEngineMovementActive == true then
         zombie:setUseless(false)
         return false
     end
     requestedUseless = requestedUseless == true
     zombie:setUseless(requestedUseless)
     return requestedUseless
+end
+
+function LiveBodyControl.SuppressVanillaIntent(
+    zombie,
+    keepEngineMovementActive
+)
+    if not clearVanillaIntent(zombie) then
+        return false
+    end
+    LiveBodyControl.SetManagedBodyUseless(
+        zombie,
+        true,
+        keepEngineMovementActive
+    )
+    return true
 end
 
 function LiveBodyControl.ApplyHumanizedBodyFlags(
@@ -259,15 +285,7 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(
     if zombie.setCanWalk then
         zombie:setCanWalk(true)
     end
-    if zombie.setTarget then
-        zombie:setTarget(nil)
-    end
-    if zombie.clearAggroList then
-        zombie:clearAggroList()
-    end
-    if zombie.setAttackedBy then
-        zombie:setAttackedBy(nil)
-    end
+    clearVanillaIntent(zombie)
     if zombie.setAnimatingBackwards then
         zombie:setAnimatingBackwards(false)
     end
@@ -356,19 +374,43 @@ function LiveBodyControl.MaintainHumanizedBody(
     return true
 end
 
-function LiveBodyControl.ShouldKeepEngineMovementActive(record)
-    if LiveBodyControl.IsMultiplayer() then
-        return true
+function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
+    local runtime = record and record.runtime or nil
+    local navigation = runtime and runtime.localNavigation or nil
+    local attackAction = runtime and runtime.attackAction or nil
+    local treatment = runtime and runtime.selfTreatment or nil
+    local modData = zombie
+        and zombie.getModData
+        and zombie:getModData()
+        or nil
+    local now = Core and Core.Now and Core.Now() or 0
+    -- MP replicas own their local animation ActionContext even though they do
+    -- not own combat decisions. Honor that body-local lease before applying
+    -- the authority-only restriction used by navigation records.
+    if modData and modData.PNC_BumpActionLease == true then
+        if now <= (
+            tonumber(modData.PNC_BumpActionLeaseUntil)
+                or now
+        ) then
+            return true
+        end
+        modData.PNC_BumpActionLease = nil
+        modData.PNC_BumpActionLeaseUntil = nil
     end
     if Core and Core.IsAuthority and not Core.IsAuthority() then
         return false
     end
-    local navigation = record and record.runtime
-        and record.runtime.localNavigation or nil
+    if attackAction
+        and now < (tonumber(attackAction.finishAt) or 0)
+    then
+        return true
+    end
+    if treatment and treatment.phase == "bandaging" then
+        return true
+    end
     return navigation
         and navigation.provider == "engine_path"
         and navigation.nativeActive == true
-        and navigation.serverMovementLease == true
         or false
 end
 
@@ -389,11 +431,10 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     if PNC.Registry and PNC.Registry.FindRecordByZombie then
         record = PNC.Registry.FindRecordByZombie(zombie)
     end
-    -- Multiplayer live bodies stay useful for their entire lifetime. The
-    -- closest client may own native movement while every other peer observes
-    -- the engine's zombie replication, matching Bandits' controller model.
+    -- Native movement and bumped action leases temporarily keep the body
+    -- useful so Java can advance their action states.
     keepEngineMovementActive =
-        LiveBodyControl.ShouldKeepEngineMovementActive(record)
+        LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
     hadTarget = zombie.getTarget and zombie:getTarget() ~= nil or false
     wasUseless = zombie.isUseless and zombie:isUseless() or false
     hadTeeth = zombie.isNoTeeth and not zombie:isNoTeeth() or false

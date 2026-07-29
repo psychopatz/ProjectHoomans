@@ -11,6 +11,10 @@ local Settings = PNC.Sandbox
 
 local Internal = ZombieAggro.Internal
 
+local function isMultiplayerServer()
+    return isServer and isServer() == true or false
+end
+
 function ZombieAggro.ClearForNPCBody(npcBody)
     local target
     local forcedRecord
@@ -90,11 +94,6 @@ local function refreshPursuitPath(zombie, npcBody, now)
     -- is IsoZombie. pathToCharacter may reject zombie-shaped targets.
     if zombie.pathToLocationF then
         zombie:pathToLocationF(targetX, targetY, npcBody:getZ())
-    elseif zombie.pathToCharacter then
-        zombie:pathToCharacter(npcBody)
-    end
-    if zombie.getTarget and zombie.setTarget and zombie:getTarget() ~= npcBody then
-        zombie:setTarget(npcBody)
     end
     return true
 end
@@ -111,9 +110,6 @@ local function pursueForcedTarget(zombie, npcBody, record, now)
     dist = math.sqrt(distSq)
     setNoLungeAttack(zombie, false)
     if dist < Const.ZOMBIE_BITE_DISTANCE and math.abs(zombie:getZ() - npcBody:getZ()) < 0.3 then
-        if zombie.getTarget and zombie.setTarget and zombie:getTarget() ~= npcBody then
-            zombie:setTarget(npcBody)
-        end
         zombieSquare = zombie.getSquare and zombie:getSquare() or nil
         npcSquare = npcBody.getSquare and npcBody:getSquare() or nil
         if zombieSquare and npcSquare and not zombieSquare:isSomethingTo(npcSquare) then
@@ -123,7 +119,10 @@ local function pursueForcedTarget(zombie, npcBody, record, now)
                 zombie:faceThisObject(npcBody)
             end
         end
-    else
+    elseif not isMultiplayerServer() then
+        -- SP/local authority owns the native zombie path. In MP the owning
+        -- client performs coordinate-only pursuit while this server code owns
+        -- only the forced-target lease, bite validation, and damage.
         refreshPursuitPath(zombie, npcBody, now)
     end
 end

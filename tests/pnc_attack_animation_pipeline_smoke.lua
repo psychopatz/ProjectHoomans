@@ -96,6 +96,11 @@ assertContains(
     "setter-driven action-group handoff"
 )
 assertContains(
+    playBump,
+    "setManagedUseless(zombie, false, true)",
+    "bumped action-context lease"
+)
+assertContains(
     clientSync,
     "Animation.PlayBump(zombie, recordView, anim)",
     "client attack presentation uses shared trigger"
@@ -103,7 +108,7 @@ assertContains(
 assertContains(
     attackXML,
     "<m_StringValue>Attack1H1</m_StringValue>",
-    "attack node bump type"
+    "Bandits-compatible attack node bump type"
 )
 assertContains(
     attackXML,
@@ -113,12 +118,17 @@ assertContains(
 assertContains(
     attackVariantXML,
     "<m_AnimName>Bob_Attack1Hand01_HitB</m_AnimName>",
-    "second one-handed melee animation"
+    "Bandits-compatible second one-handed melee animation"
 )
 assertContains(
     combat,
-    'onehanded = { "Attack1H1", "Attack1H2" }',
-    "engine-native Bandits melee bump vocabulary"
+    'onehanded = { "PNC_Attack1H1", "PNC_Attack1H2" }',
+    "namespaced network melee vocabulary"
+)
+assertContains(
+    animation,
+    'PNC_Attack1H1 = "Attack1H1"',
+    "network-to-engine attack bump translation"
 )
 assert(
     not string.find(combat, "Animation.PlayBump", 1, true),
@@ -142,8 +152,28 @@ assert(
 )
 assertContains(
     pathMotion,
-    "if Internal.hasActiveAttack(record, now) then",
+    "if Internal.hasActiveAttack(record, now, zombie) then",
     "path service attack animation lease"
+)
+local pathPump = assert(string.match(
+    pathMotion,
+    "function PathService%.Pump.-\nend\n\nfunction PathService%.AdvanceAbstract"
+))
+local actionLockAt = assert(string.find(
+    pathPump,
+    "Internal.hasActiveAttack(record, now, zombie)",
+    1,
+    true
+))
+local consumeIntentAt = assert(string.find(
+    pathPump,
+    "Internal.consumeMoveIntent(record, lane, zombie)",
+    1,
+    true
+))
+assert(
+    actionLockAt < consumeIntentAt,
+    "movement intent mutates locomotion before the body action lease"
 )
 
 print("pnc_attack_animation_pipeline_smoke: ok")
