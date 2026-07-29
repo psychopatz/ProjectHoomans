@@ -552,6 +552,15 @@ function Renderer.BuildBodyAnimationDebugLine(zombie, action)
         )
 end
 
+function Renderer.BuildAnimationTraceDebugLine(zombie)
+    if not PNC.AnimationTrace
+        or not PNC.AnimationTrace.GetOverlayLine
+    then
+        return nil
+    end
+    return PNC.AnimationTrace.GetOverlayLine(zombie)
+end
+
 local function screenPoint(manager, x, y, z)
     return isoToScreenX(manager.playerIndex, x, y, z) - manager.x,
         isoToScreenY(manager.playerIndex, x, y, z) - manager.y
@@ -1130,6 +1139,11 @@ local function drawCombatDebug(manager, entry)
                 zombie,
                 debugState.action
             )
+        local traceLine =
+            Renderer.BuildAnimationTraceDebugLine(zombie)
+        if traceLine then
+            lines[#lines + 1] = traceLine
+        end
     end
     if #lines <= 0 then return end
     if debugState.fireLaneSafe == false then

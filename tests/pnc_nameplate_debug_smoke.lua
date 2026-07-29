@@ -254,6 +254,16 @@ assertContains(
     "useless=true",
     "live body mode"
 )
+PNC.AnimationTrace = {
+    GetOverlayLine = function()
+        return "TRACE #7 fail=action_handoff_missing"
+    end,
+}
+assertContains(
+    PNC.NameplateRenderer.BuildAnimationTraceDebugLine({}),
+    "fail=action_handoff_missing",
+    "retained animation trace overlay"
+)
 
 local renderedLines = 0
 local renderedText = {}

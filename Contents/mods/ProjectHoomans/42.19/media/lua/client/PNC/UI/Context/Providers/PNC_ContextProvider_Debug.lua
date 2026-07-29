@@ -72,6 +72,18 @@ function Provider.addOptions(menu, entry, player, contextData)
             or tostring(snapshot and snapshot.aiState or "No snapshot")
         print("[PNC] " .. snapshotText)
     end)
+    menu:addOption("Animation Debug Player", nil, function()
+        -- Keep the 511-node generated catalog and its UI out of the normal
+        -- client startup path. Debuggers pay this load cost only on first use.
+        if not PNC.AnimationDebugWindow then
+            require "PNC/UI/PNC_AnimationDebugWindow"
+        end
+        if PNC.AnimationDebugWindow
+            and PNC.AnimationDebugWindow.Open
+        then
+            PNC.AnimationDebugWindow.Open(entry)
+        end
+    end)
 
     snapshot = ClientState.snapshots and ClientState.snapshots[entry.id] or nil
     if snapshot and snapshot.healthState == "incapacitated" and snapshot.canRevive == true then

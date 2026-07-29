@@ -11,6 +11,7 @@ local Animation = PNC.Animation
 local Core = PNC.Core
 local LiveBodyControl = PNC.LiveBodyControl
 local LocomotionProfiles = PNC.LocomotionProfiles
+local AnimationTrace = PNC.AnimationTrace
 
 local BUMP_RELEASE_SETTLE_MS = 50
 local BUMP_ACTION_LEASE_TIMEOUT_MS = 10000
@@ -537,6 +538,17 @@ function Animation.PlayBump(zombie, record, bumpType, options)
     end
     now = Core and Core.Now and Core.Now() or 0
     resolvedBumpType = Animation.ResolveBumpType(bumpType)
+    if AnimationTrace and AnimationTrace.Ensure then
+        AnimationTrace.Ensure(zombie, {
+            npcId = record and record.id or nil,
+            requested = bumpType,
+            resolved = resolvedBumpType,
+            debugEnabled = record
+                and record.runtime
+                and record.runtime.debug == true
+                or false,
+        }, now)
+    end
     combatBump = isCombatBumpType(
         bumpType,
         resolvedBumpType
@@ -606,6 +618,14 @@ function Animation.PlayBump(zombie, record, bumpType, options)
     -- Non-combat traversal retains PNC's explicit presentation setup.
     applyBumpLeaseBodyMode(zombie)
     stateBefore = getActionStateName(zombie)
+    if AnimationTrace and AnimationTrace.Sample then
+        AnimationTrace.Sample(
+            zombie,
+            "setter_before",
+            now,
+            true
+        )
+    end
     if zombie.setBumpType then
         -- Preserve the known-good setter-driven handoff. Calling reportEvent,
         -- changeState, clearing path state, or binding BumpedChr here bypasses
@@ -614,6 +634,14 @@ function Animation.PlayBump(zombie, record, bumpType, options)
         zombie:setBumpType(resolvedBumpType)
     end
     stateAfter = getActionStateName(zombie)
+    if AnimationTrace and AnimationTrace.Sample then
+        AnimationTrace.Sample(
+            zombie,
+            "setter_after",
+            now,
+            true
+        )
+    end
     entered = stateBefore ~= stateAfter
         or stateBefore == "bumped"
         or stateAfter == "bumped"
@@ -634,6 +662,12 @@ function Animation.FinishBump(zombie, forceIdle)
     if not zombie then
         return
     end
+    if AnimationTrace and AnimationTrace.MarkFinishing then
+        AnimationTrace.MarkFinishing(
+            zombie,
+            "finish_before"
+        )
+    end
     modData = zombie.getModData and zombie:getModData() or nil
     if zombie.setBumpDone then
         zombie:setBumpDone(true)
@@ -649,6 +683,14 @@ function Animation.FinishBump(zombie, forceIdle)
         modData.PNC_BumpReleasePending = true
         modData.PNC_BumpReleaseAt = Core and Core.Now and Core.Now() or 0
         modData.PNC_BumpActionLease = true
+    end
+    if AnimationTrace and AnimationTrace.Sample then
+        AnimationTrace.Sample(
+            zombie,
+            "finish_after",
+            nil,
+            true
+        )
     end
 end
 
@@ -677,6 +719,13 @@ function Animation.PumpBumpRelease(zombie, now)
     end
     actionState = getActionStateName(zombie)
     if (now - releaseAt) < BUMP_RELEASE_SETTLE_MS or actionState == "bumped" then
+        if AnimationTrace and AnimationTrace.Sample then
+            AnimationTrace.Sample(
+                zombie,
+                "release_wait",
+                now
+            )
+        end
         return true
     end
     -- BumpedState.exit owns clearing BumpAnimFinished and BumpType. This
@@ -689,6 +738,13 @@ function Animation.PumpBumpRelease(zombie, now)
     modData.PNC_BumpActionLease = nil
     modData.PNC_BumpActionLeaseUntil = nil
     modData.PNC_BumpKeepUseless = nil
+    if AnimationTrace and AnimationTrace.End then
+        AnimationTrace.End(
+            zombie,
+            "release_complete",
+            now
+        )
+    end
     return false
 end
 

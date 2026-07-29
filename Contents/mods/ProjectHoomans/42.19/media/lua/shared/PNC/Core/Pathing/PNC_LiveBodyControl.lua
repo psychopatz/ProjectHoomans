@@ -114,6 +114,12 @@ function LiveBodyControl.ReleaseDamageReaction(zombie, actionState)
     if not zombie then
         return false
     end
+    if PNC.AnimationTrace and PNC.AnimationTrace.Sample then
+        PNC.AnimationTrace.Sample(
+            zombie,
+            "damage_release_before"
+        )
+    end
     actionState = string.lower(tostring(actionState or LiveBodyControl.GetActionStateName(zombie) or ""))
     isDamageReaction = isDamageReactionState(actionState)
 
@@ -171,6 +177,12 @@ function LiveBodyControl.ReleaseDamageReaction(zombie, actionState)
         modData.PNC_BumpActionLease = nil
         modData.PNC_BumpActionLeaseUntil = nil
         modData.PNC_BumpKeepUseless = nil
+    end
+    if PNC.AnimationTrace and PNC.AnimationTrace.Sample then
+        PNC.AnimationTrace.Sample(
+            zombie,
+            "damage_release_after"
+        )
     end
     return isDamageReaction
 end
@@ -251,6 +263,12 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(
     if not zombie then
         return
     end
+    if PNC.AnimationTrace and PNC.AnimationTrace.Sample then
+        PNC.AnimationTrace.Sample(
+            zombie,
+            "humanize_before"
+        )
+    end
     if zombie.setVariable then
         zombie:setVariable("ZombieHitReaction", "Chainsaw")
         zombie:setVariable("NoLungeTarget", true)
@@ -317,6 +335,12 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(
         if descriptor and descriptor.setVoicePrefix then
             descriptor:setVoicePrefix("NotAZombie")
         end
+    end
+    if PNC.AnimationTrace and PNC.AnimationTrace.Sample then
+        PNC.AnimationTrace.Sample(
+            zombie,
+            "humanize_after"
+        )
     end
 end
 

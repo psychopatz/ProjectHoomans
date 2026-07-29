@@ -16,6 +16,7 @@ local Animation = PNC.Animation
 local Visuals = PNC.Visuals
 local Equipment = PNC.Equipment
 local LiveBodyControl = PNC.LiveBodyControl
+local AnimationTrace = PNC.AnimationTrace
 local logClientMotionDebug = Internal.LogClientMotionDebug
 local LOCOMOTION_MAINTAIN_MS = 500
 
@@ -85,6 +86,7 @@ local function buildRecordView(snapshot)
     local moving = visualState.moving == true
     local specialActive = visualState.specialActive == true
     return {
+        id = snapshot and snapshot.id or nil,
         activeBehavior = snapshot and snapshot.activeBehavior or snapshot and snapshot.aiState or "Idle",
         activeJob = snapshot and snapshot.activeJob or snapshot and snapshot.aiState or "Idle",
         orderSpec = {
@@ -315,6 +317,61 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     end
 
     now = Core and Core.Now and Core.Now() or 0
+    -- The animation player is an explicitly selected, client-local debug
+    -- owner. While it is active, snapshots may keep identity current but must
+    -- not rewrite animation variables or replay locomotion over the requested
+    -- XML node. Stop/close restores normal snapshot ownership immediately.
+    if PNC.AnimationDebugPlayer
+        and PNC.AnimationDebugPlayer.IsPreviewing
+        and PNC.AnimationDebugPlayer.IsPreviewing(zombie)
+    then
+        applyIdentityVars(zombie, snapshot)
+        if modData and snapshot.id ~= nil then
+            modData.PNC_UUID = tostring(snapshot.id)
+            modData.PNC_NPC = true
+        end
+        PNC.AnimationDebugPlayer.Maintain(zombie, now)
+        return
+    end
+    attackKey = visualState.attackActive
+        and visualState.attackAnim
+        and (
+            tostring(visualState.attackAnim)
+                .. ":"
+                .. tostring(
+                    visualState.attackFinishAt or 0
+                )
+        )
+        or nil
+    if attackKey
+        and modData
+        and modData.PNC_ClientAttackKey ~= attackKey
+        and AnimationTrace
+        and AnimationTrace.Begin
+    then
+        AnimationTrace.Begin(zombie, {
+            npcId = snapshot.id,
+            attackKey = attackKey,
+            requested = visualState.attackAnim,
+            resolved = Animation
+                and Animation.ResolveBumpType
+                and Animation.ResolveBumpType(
+                    visualState.attackAnim
+                )
+                or visualState.attackAnim,
+            debugEnabled = snapshot.debugState
+                and snapshot.debugState.debugEnabled == true
+                or snapshot.combatDebugState ~= nil
+                or false,
+        }, now)
+    end
+    if AnimationTrace and AnimationTrace.Sample then
+        AnimationTrace.Sample(
+            zombie,
+            "client_pre_maintain",
+            now
+        )
+    end
     engineMovementActive = remoteReplica
         and (
             visualState.nativeMoveActive == true
@@ -333,6 +390,13 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
             engineMovementActive
         )
     end
+    if AnimationTrace and AnimationTrace.Sample then
+        AnimationTrace.Sample(
+            zombie,
+            "client_post_maintain",
+            now
+        )
+    end
     if (
         remoteReplica
         or (
@@ -347,6 +411,13 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     then
         bumpReleaseActive =
             Animation.PumpBumpRelease(zombie, now)
+    end
+    if AnimationTrace and AnimationTrace.Sample then
+        AnimationTrace.Sample(
+            zombie,
+            "client_post_release_pump",
+            now
+        )
     end
 
     recordView = buildRecordView(snapshot)
@@ -415,6 +486,13 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
         -- This is a read-mostly repair and never rebuilds worn clothing.
         Equipment.EnsureCombatHands(zombie, recordView)
     end
+    if AnimationTrace and AnimationTrace.Sample then
+        AnimationTrace.Sample(
+            zombie,
+            "client_post_equipment",
+            now
+        )
+    end
 
     -- The multiplayer zombie packet may reapply rot, blood, dirt, or a zombie
     -- skin after the one-time visual snapshot. Reassert only the inexpensive
@@ -457,9 +535,6 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     -- chooses the clip and hit timing; SP and MP clients both render the
     -- resulting attack snapshot. remoteReplica only gates replicated
     -- locomotion, facing, and traversal presentation.
-    attackKey = visualState.attackActive and visualState.attackAnim
-        and (tostring(visualState.attackAnim) .. ":" .. tostring(visualState.attackFinishAt or 0))
-        or nil
     if attackKey and modData and modData.PNC_ClientAttackKey ~= attackKey then
         beginClientAttackBump(
             snapshot,
@@ -489,6 +564,13 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
         -- because one expected action-state label was not observed restarts
         -- valid clips before their weapon-swing keyframe.
         observeClientAttackBump(zombie, modData)
+        if AnimationTrace and AnimationTrace.Sample then
+            AnimationTrace.Sample(
+                zombie,
+                "client_attack_observe",
+                now
+            )
+        end
         return
     end
     if bumpReleaseActive then
