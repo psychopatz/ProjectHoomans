@@ -6,6 +6,7 @@ local Time = Conversation.Time
 local Content = Conversation.Content
 local Relationship = Conversation.Relationship
 local Lifecycle = Conversation.Lifecycle
+local Palette = PNC.NPCTypePalette
 
 local function portraitSpec(entry)
     local snapshot = entry and entry.snapshot or {}
@@ -44,12 +45,14 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         character = entry and entry.zombie or nil,
         portrait = portraitSpec(entry),
         backgroundID = Content.GetBackground(timeID),
+        theme = Palette.BuildConversationTheme(entry),
         context = {
             entry = entry,
             player = player,
             npcName = name,
             timeID = timeID,
             relationshipID = relationshipID,
+            npcType = Palette.ResolveType(entry),
         },
         lifecycle = Lifecycle.Create(),
         start = "greeting",

@@ -53,6 +53,7 @@ dofile(CORE_TEXT)
 dofile(ROOT .. "PNC/Conversation/PNC_ConversationTime.lua")
 dofile(ROOT .. "PNC/Conversation/Content/PNC_ConversationRegistry.lua")
 dofile(ROOT .. "PNC/Conversation/PNC_ConversationRelationship.lua")
+dofile(ROOT .. "PNC/UI/PNC_NPCTypePalette.lua")
 PNC.Conversation.Lifecycle = {
     Create = function()
         return { kind = "conversation_lifecycle" }
@@ -107,6 +108,7 @@ local entry = {
     snapshot = {
         identitySeed = 42,
         isFemale = true,
+        faction = "hostile",
         appearance = { hairModel = "Long" },
         equipmentSummary = { worn = { Hat = "Base.Hat" } },
         relationshipCategory = "Lover",
@@ -118,6 +120,9 @@ assertEqual(definition.npcID, "npc-12", "history NPC id")
 assertEqual(definition.character, entry.zombie, "live portrait target")
 assertEqual(definition.backgroundID, "twilight", "portrait background")
 assertEqual(definition.context.relationshipID, "Lover", "relationship category")
+assertEqual(definition.context.npcType, "hostile", "conversation NPC type")
+assertEqual(definition.theme.accent.r, 1, "hostile conversation red")
+assertEqual(definition.theme.accent.g, 0.25, "hostile palette matches map")
 assertEqual(definition.lifecycle.kind, "conversation_lifecycle",
     "conversation safety lifecycle attached")
 assertEqual(#definition.nodes.greeting.choices, 3, "code-block choices")

@@ -1,5 +1,7 @@
 -- Named, locally extrapolated NPC journey dots for the vanilla world map.
 
+require "PNC/UI/PNC_NPCTypePalette"
+
 PNC = PNC or {}
 PNC.MapTravelLayer = PNC.MapTravelLayer or {}
 
@@ -9,6 +11,7 @@ local Layers = PNC.MapLayers
 local Display = PNC.MapDisplay
 local Icons = PNC.MapMarkerIcons
 local HoverPortrait = PNC.MapHoverPortrait
+local Palette = PNC.NPCTypePalette
 
 TravelLayer.Enabled = TravelLayer.Enabled ~= false
 TravelLayer.DotTexture = TravelLayer.DotTexture
@@ -38,33 +41,8 @@ local function listProjectedEntries()
     return cached
 end
 
-local COLORS = {
-    colonist = { r = 0.08, g = 0.42, b = 0.16 },
-    follower = { r = 0.15, g = 0.90, b = 0.25 },
-    dead = { r = 0.55, g = 0.55, b = 0.55 },
-    deadColonist = { r = 0.95, g = 0.45, b = 0.10 },
-    neutral = { r = 0.95, g = 0.75, b = 0.20 },
-    hostile = { r = 1.00, g = 0.25, b = 0.20 },
-}
-
 local function colorFor(entry)
-    if entry and entry.deathMarker == true then
-        return entry.colonist == true and COLORS.deadColonist or COLORS.dead
-    end
-    local colonist = entry and (
-        entry.colonist == true
-        or entry.recruited == true
-        or tostring(entry.faction or "") == "colonist"
-    )
-    if colonist
-        and tostring(entry.orderKind or "")
-            == tostring(PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
-    then
-        return COLORS.follower
-    end
-    if colonist then return COLORS.colonist end
-    return COLORS[tostring(entry and entry.faction or "neutral")]
-        or COLORS.neutral
+    return Palette.Resolve(entry)
 end
 
 local function etaText(entry)
