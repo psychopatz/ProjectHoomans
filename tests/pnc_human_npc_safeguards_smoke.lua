@@ -29,9 +29,11 @@ end
 local stopped = {}
 local voicePrefix
 local useless = false
+local uselessWrites = 0
 local grappleOnly = false
 local noTeeth = false
 local vanillaTarget = {}
+local actionState = "idle"
 local modData = { PNC_NPC = true }
 local managedRecord
 local nativeFramePumps = 0
@@ -50,7 +52,10 @@ local managedBody = {
     getModData = function() return modData end,
     getDescriptor = function() return descriptor end,
     getEmitter = function() return emitter end,
-    setUseless = function(_, value) useless = value end,
+    setUseless = function(_, value)
+        uselessWrites = uselessWrites + 1
+        useless = value
+    end,
     isUseless = function() return useless end,
     setNoTeeth = function(_, value) noTeeth = value end,
     isNoTeeth = function() return noTeeth end,
@@ -66,6 +71,14 @@ local managedBody = {
     isZombie = function() return true end,
     isAlive = function() return true end,
     isDead = function() return false end,
+    getActionStateName = function() return actionState end,
+    changeState = function()
+        actionState = "idle"
+    end,
+}
+
+ZombieIdleState = {
+    instance = function() return "idle_state" end,
 }
 
 PNC = {
@@ -115,6 +128,28 @@ PNC.LiveBodyControl.MaintainHumanizedBody(managedBody, 1100)
 assertEqual(#stopped, 12, "voice suppression is cadence bounded")
 PNC.LiveBodyControl.MaintainHumanizedBody(managedBody, 1300)
 assertEqual(#stopped, 18, "voice suppression repeats after cooldown")
+
+modData.PNC_BumpActionLease = true
+modData.PNC_BumpActionLeaseUntil = 2000
+modData.PNC_BumpKeepUseless = true
+local writesBeforeActionMaintenance = uselessWrites
+PNC.LiveBodyControl.MaintainHumanizedBody(managedBody, 1400)
+assertEqual(
+    uselessWrites,
+    writesBeforeActionMaintenance,
+    "active animation lease repeated setUseless and reset ActionContext"
+)
+modData.PNC_BumpActionLease = nil
+modData.PNC_BumpActionLeaseUntil = nil
+modData.PNC_BumpKeepUseless = nil
+
+actionState = "attack"
+zombieUpdateHandler(managedBody)
+assertEqual(
+    actionState,
+    "idle",
+    "vanilla zombie attack graph retained locomotion ownership"
+)
 
 useless = false
 noTeeth = false

@@ -15,43 +15,61 @@ local AnimationTrace = PNC.AnimationTrace
 
 local BUMP_RELEASE_SETTLE_MS = 50
 local BUMP_ACTION_LEASE_TIMEOUT_MS = 10000
+local BUMP_ACTION_ENTRY_GRACE_MS = 350
 
--- Combat snapshots keep PNC's namespaced vocabulary on the network, while
--- the live IsoZombie receives the exact BumpType contract used by Bandits'
--- bumped action graph.  Keeping this translation at the body adapter avoids
--- leaking engine animation identifiers into combat authority/state code.
-local ENGINE_COMBAT_BUMP_TYPES = {
-    PNC_Attack1H1 = "Attack1H1",
-    PNC_Attack1H2 = "Attack1H2",
-    PNC_Attack2H1 = "Attack2H1",
-    PNC_Attack2H2 = "Attack2H2",
-    PNC_AttackS1 = "AttackS1",
-    PNC_AttackKnife = "AttackKnife",
-    PNC_AttackPistol = "AttackPistol",
-    PNC_AttackRifle = "AttackRifle",
-    PNC_Attack2HFloor = "Attack2HFloor",
-    PNC_Attack2HStamp = "Attack2HStamp",
-    PNC_Shove = "Shove",
+-- PNC owns a namespaced copy of Bandits' complete combat bump graph. Never
+-- translate these requests back to Bandits' global BumpType values: doing so
+-- lets whichever mod node loads last win and made melee playback dependent on
+-- load order. Legacy unprefixed values remain recognizable only for cleanup.
+local PNC_COMBAT_BUMP_TYPES = {
+    PNC_Attack1H1 = true,
+    PNC_Attack1H2 = true,
+    PNC_Attack2H1 = true,
+    PNC_Attack2H2 = true,
+    PNC_AttackS1 = true,
+    PNC_AttackKnife = true,
+    PNC_AttackPistol = true,
+    PNC_AttackRifle = true,
+    PNC_Attack2HFloor = true,
+    PNC_Attack2HStamp = true,
+    PNC_Shove = true,
 }
 
-local ENGINE_COMBAT_BUMP_TYPE_SET = {}
-for _, engineBumpType in pairs(ENGINE_COMBAT_BUMP_TYPES) do
-    ENGINE_COMBAT_BUMP_TYPE_SET[engineBumpType] = true
-end
-
 function Animation.ResolveBumpType(bumpType)
-    local requested = tostring(bumpType or "Bump")
-    return ENGINE_COMBAT_BUMP_TYPES[requested] or requested
+    local resolved = tostring(bumpType or "Bump")
+    if string.sub(resolved, 1, 4) == "PNC_" then
+        return resolved
+    end
+    return "PNC_" .. resolved
 end
 
 local function isCombatBumpType(requested, resolved)
-    return ENGINE_COMBAT_BUMP_TYPES[tostring(requested or "")]
-            ~= nil
-        or ENGINE_COMBAT_BUMP_TYPE_SET[tostring(resolved or "")]
-            == true
+    local requestName = tostring(requested or "")
+    local resolvedName = tostring(resolved or "")
+    local function hasCombatPrefix(value)
+        return string.sub(value, 1, 10) == "PNC_Attack"
+            or string.sub(value, 1, 9) == "PNC_Shove"
+            or string.sub(value, 1, 17) == "PNC_Legacy_Attack"
+            or string.sub(value, 1, 16) == "PNC_Legacy_Shove"
+            or string.sub(value, 1, 16) == "PNC_Legacy_Knife"
+            or value == "PNC_FrontKick"
+            or value == "PNC_HighKick"
+            or value == "PNC_Legacy_FrontKick"
+            or value == "PNC_Legacy_HighKick"
+    end
+    return PNC_COMBAT_BUMP_TYPES[requestName] == true
+        or PNC_COMBAT_BUMP_TYPES[resolvedName] == true
+        or PNC_COMBAT_BUMP_TYPES["PNC_" .. requestName] == true
+        or PNC_COMBAT_BUMP_TYPES["PNC_" .. resolvedName] == true
+        or hasCombatPrefix(requestName)
+        or hasCombatPrefix(resolvedName)
+        or hasCombatPrefix("PNC_" .. requestName)
+        or hasCombatPrefix("PNC_" .. resolvedName)
 end
 
 function Animation.IsBumpActionActive(zombie, now)
+    local actionState
+    local bumpType
     local modData = zombie
         and zombie.getModData
         and zombie:getModData()
@@ -60,6 +78,35 @@ function Animation.IsBumpActionActive(zombie, now)
         return false
     end
     now = tonumber(now) or Core and Core.Now and Core.Now() or 0
+    actionState = zombie.getActionStateName
+        and string.lower(tostring(zombie:getActionStateName() or ""))
+        or ""
+    if zombie.getBumpType then
+        bumpType = tostring(zombie:getBumpType() or "")
+    elseif zombie.getVariableString then
+        bumpType = tostring(zombie:getVariableString("BumpType") or "")
+    else
+        bumpType = ""
+    end
+    -- A failed/externally-cancelled bump used to retain its ten-second lease.
+    -- Fake locomotion correctly respected that lease, so the body translated
+    -- while Bob_Idle remained selected. Recover as soon as the engine has
+    -- demonstrably cleared both the selector and bumped action state.
+    if modData.PNC_BumpReleasePending ~= true
+        and now - (
+            tonumber(modData.PNC_BumpActionLeaseStartedAt)
+                or now
+        ) >= BUMP_ACTION_ENTRY_GRACE_MS
+        and bumpType == ""
+        and actionState ~= "bumped"
+    then
+        modData.PNC_BumpActionLease = nil
+        modData.PNC_BumpActionLeaseUntil = nil
+        modData.PNC_BumpActionLeaseStartedAt = nil
+        modData.PNC_BumpRequestedType = nil
+        modData.PNC_BumpKeepUseless = nil
+        return false
+    end
     if now <= (
         tonumber(modData.PNC_BumpActionLeaseUntil)
             or now
@@ -68,6 +115,8 @@ function Animation.IsBumpActionActive(zombie, now)
     end
     modData.PNC_BumpActionLease = nil
     modData.PNC_BumpActionLeaseUntil = nil
+    modData.PNC_BumpActionLeaseStartedAt = nil
+    modData.PNC_BumpRequestedType = nil
     modData.PNC_BumpKeepUseless = nil
     return false
 end
@@ -575,6 +624,8 @@ function Animation.PlayBump(zombie, record, bumpType, options)
         modData.PNC_BumpActionLease = true
         modData.PNC_BumpActionLeaseUntil =
             now + BUMP_ACTION_LEASE_TIMEOUT_MS
+        modData.PNC_BumpActionLeaseStartedAt = now
+        modData.PNC_BumpRequestedType = resolvedBumpType
         modData.PNC_BumpKeepUseless = keepManagedUseless
     end
     setPNCStateVars(zombie, record, bumpType or "Bump")
@@ -590,12 +641,16 @@ function Animation.PlayBump(zombie, record, bumpType, options)
         if zombie.setRunning then
             zombie:setRunning(false)
         end
-        if zombie.setBumpDone then
-            zombie:setBumpDone(false)
-        end
-        if zombie.setBumpFall then
-            zombie:setBumpFall(false)
-        end
+    end
+    -- BumpAnimFinished is an engine exit latch, not just an XML event mirror.
+    -- It can remain true after the previous attack until BumpedState performs
+    -- its exit. A new selector that enters while it is still true survives for
+    -- only one update and never gives its attack clip a visible blend weight.
+    if zombie.setBumpDone then
+        zombie:setBumpDone(false)
+    end
+    if zombie.setBumpFall then
+        zombie:setBumpFall(false)
     end
     if zombie.setVariable then
         -- The custom firearm and reload nodes scale their timelines through
@@ -603,19 +658,28 @@ function Animation.PlayBump(zombie, record, bumpType, options)
         -- bodies, visually freezing the shot before its recoil frame.
         zombie:setVariable("CombatSpeed", "1.0")
         zombie:setVariable("ReloadSpeed", "1.0")
-        zombie:setVariable("AttackVariationX", "0.0")
-        zombie:setVariable("AttackVariationY", "0.0")
-        if not combatBump then
-            zombie:setVariable("BumpDone", false)
-            zombie:setVariable("BumpAnimFinished", false)
+        zombie:setVariable("BumpDone", false)
+        zombie:setVariable("BumpAnimFinished", false)
+        zombie:setVariable("BumpFall", false)
+        zombie:setVariable("BumpFallType", "")
+        if combatBump then
+            -- PNC's copied combat graph uses private blend coordinates. A
+            -- non-zero vector is required on IsoZombie shells, which do not
+            -- receive the IsoPlayer attack-direction callback.
+            zombie:setVariable("PNCAttackVariationX", "1.0")
+            zombie:setVariable("PNCAttackVariationY", "0.0")
+            if zombie.clearVariable then
+                zombie:clearVariable("AttackVariationX")
+                zombie:clearVariable("AttackVariationY")
+            end
+        else
             zombie:setVariable("BumpFall", false)
             zombie:setVariable("BumpFallType", "")
         end
     end
-    -- Bandits does not reset movement variables, BumpDone, or the legacy
-    -- state machine before a smack. Those writes race the action graph and
-    -- can select attack/walktoward/climbfence instead of the bumped clip.
-    -- Non-combat traversal retains PNC's explicit presentation setup.
+    -- Do not force a legacy state change or rewrite combat locomotion here.
+    -- The completion latches above are the only required preflight writes;
+    -- setBumpType remains the sole owner of the ActionContext handoff.
     applyBumpLeaseBodyMode(zombie)
     stateBefore = getActionStateName(zombie)
     if AnimationTrace and AnimationTrace.Sample then
@@ -737,6 +801,8 @@ function Animation.PumpBumpRelease(zombie, now)
     modData.PNC_BumpReleaseAt = nil
     modData.PNC_BumpActionLease = nil
     modData.PNC_BumpActionLeaseUntil = nil
+    modData.PNC_BumpActionLeaseStartedAt = nil
+    modData.PNC_BumpRequestedType = nil
     modData.PNC_BumpKeepUseless = nil
     if AnimationTrace and AnimationTrace.End then
         AnimationTrace.End(

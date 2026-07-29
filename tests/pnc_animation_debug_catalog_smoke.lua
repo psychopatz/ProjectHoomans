@@ -6,10 +6,10 @@ PNC = {}
 dofile(CATALOG_FILE)
 
 local catalog = PNC.AnimationDebugCatalog
-assert(catalog.generatedCount == 511, "catalog must include every zombie XML node")
-assert(#catalog.entries == 511, "catalog entry count mismatch")
+assert(catalog.generatedCount == 544, "catalog must include every zombie XML node")
+assert(#catalog.entries == 544, "catalog entry count mismatch")
 assert(catalog.stateCounts.hitreaction == 41, "nested hitreaction nodes missing")
-assert(catalog.stateCounts.bumped == 203, "bumped node inventory mismatch")
+assert(catalog.stateCounts.bumped == 236, "bumped node inventory mismatch")
 
 local attack
 local inheritedStagger
@@ -34,7 +34,10 @@ assert(attack.node == "PNC_Anim_Attack2H2", "Attack2H2 node name mismatch")
 assert(attack.anim == "Bob_AttackBat01_HitB", "Attack2H2 clip mismatch")
 assert(attack.playable == true, "Attack2H2 must be playable")
 assert(attack.conditions[2].name == "BumpType", "Attack2H2 selector missing")
-assert(attack.conditions[2].value == "Attack2H2", "Attack2H2 selector mismatch")
+assert(
+    attack.conditions[2].value == "PNC_Legacy_Attack2H2",
+    "Attack2H2 selector is not isolated from the canonical PNC graph"
+)
 
 assert(inheritedStagger, "derived stagger node missing")
 assert(

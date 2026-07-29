@@ -104,11 +104,13 @@ function View.CreateChildren(window)
         { "damage", "UI_PNC_MonitorDamage", "Damage", ISPNCNPCMonitor.onAction, "danger" },
         { "toggle_debug", "UI_PNC_MonitorRecordDebug", "Record Debug", ISPNCNPCMonitor.onAction, "default" },
         { "map_marker", "UI_PNC_MonitorMapMarker", "Map Marker", ISPNCNPCMonitor.onMapMarker, "default" },
+        { "equipment", "UI_PNC_MonitorEquipment", "Equipment", ISPNCNPCMonitor.onEquipment, "default" },
         { "audit", "UI_PNC_MonitorAuditBodies", "Audit Bodies", ISPNCNPCMonitor.onAudit, "warning" },
         { "refresh", "UI_PNC_MonitorRefresh", "Refresh", ISPNCNPCMonitor.onRefresh, "quiet" },
         { "overlay", "UI_PNC_MonitorToggleOverlay", "Toggle Overlay", ISPNCNPCMonitor.onOverlay, "quiet" },
         { "paths", "UI_PNC_MonitorTogglePaths", "Toggle Paths", ISPNCNPCMonitor.onPathOverlay, "quiet" },
         { "combat", "UI_PNC_MonitorToggleCombat", "Toggle Combat", ISPNCNPCMonitor.onCombatOverlay, "quiet" },
+        { "animation", "UI_PNC_MonitorToggleAnimation", "Toggle Animation", ISPNCNPCMonitor.onAnimationOverlay, "quiet" },
     }
     window.selectionControls = {}
     for _, action in ipairs(actions) do
@@ -127,6 +129,13 @@ function View.CreateChildren(window)
         then
             variant = "selected"
         end
+        if action[1] == "animation"
+            and PNC.Nameplates
+            and PNC.Nameplates.IsAnimationDebugEnabled
+            and PNC.Nameplates.IsAnimationDebugEnabled()
+        then
+            variant = "selected"
+        end
         local button = createToolbarButton(window, {
             id = action[1], title = Support.Tr(action[2], action[3]), target = window,
             onclick = action[4], variant = variant,
@@ -135,12 +144,16 @@ function View.CreateChildren(window)
         if action[1] == "combat" then
             window.combatOverlayButton = button
         end
+        if action[1] == "animation" then
+            window.animationOverlayButton = button
+        end
         if action[1] == "toggle_debug" then window.recordDebugButton = button end
         if action[1] ~= "audit"
             and action[1] ~= "refresh"
             and action[1] ~= "overlay"
             and action[1] ~= "paths"
             and action[1] ~= "combat"
+            and action[1] ~= "animation"
         then
             window.selectionControls[#window.selectionControls + 1] = button
         end

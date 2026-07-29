@@ -16,7 +16,7 @@
 	<m_Conditions>
 		<m_Name>BumpType</m_Name>
 		<m_Type>STRING</m_Type>
-		<m_StringValue>Surrender</m_StringValue>
+		<m_StringValue>PNC_Surrender</m_StringValue>
 	</m_Conditions>
 	<m_Events>
 		<m_EventName>SetVariable</m_EventName>

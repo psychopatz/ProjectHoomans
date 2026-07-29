@@ -393,7 +393,6 @@ local function begin(
     if applySelectors ~= false then
         saveAndApplyConditions(active)
     end
-    if body.setUseless then body:setUseless(false) end
     markPreview(active)
     return active
 end
@@ -446,8 +445,7 @@ function Player.PlayXML(entry, npcId, body, record)
         local ok, playReason = Animation.PlayBump(
             body,
             active.record,
-            bumpType,
-            { keepManagedUseless = false }
+            bumpType
         )
         return completeStart(
             active,
@@ -459,6 +457,7 @@ function Player.PlayXML(entry, npcId, body, record)
     if not entry.playable or not entry.anim or entry.anim == "" then
         return completeStart(active, false, "node_has_no_clip")
     end
+    if body.setUseless then body:setUseless(false) end
     if entry.looped and body.PlayAnimWithSpeed then
         body:PlayAnimWithSpeed(
             tostring(entry.anim),
@@ -495,8 +494,7 @@ function Player.PlayPipeline(entry, npcId, body, record)
     local ok, playReason = Animation.PlayBump(
         body,
         active.record,
-        bumpType,
-        { keepManagedUseless = false }
+        bumpType
     )
     return completeStart(active, ok, playReason)
 end
@@ -514,6 +512,7 @@ function Player.PlayRaw(entry, npcId, body, record)
     if not entry.playable or not entry.anim or entry.anim == "" then
         return completeStart(active, false, "node_has_no_clip")
     end
+    if body.setUseless then body:setUseless(false) end
     if entry.looped and body.PlayAnimWithSpeed then
         body:PlayAnimWithSpeed(
             tostring(entry.anim),
@@ -597,7 +596,12 @@ function Player.Maintain(body, now)
         Player.Stop("body_dead")
         return false
     end
-    if body.setUseless then body:setUseless(false) end
+    -- Pipeline previews use the same topology contract as Bandits: useless in
+    -- SP, useful in MP while ActionContext advances. Direct/raw clip playback
+    -- has no bump lease and therefore keeps the body useful explicitly.
+    if not isPipelineMode(active.mode) and body.setUseless then
+        body:setUseless(false)
+    end
     markPreview(active)
     if isPipelineMode(active.mode)
         and Animation
@@ -687,6 +691,19 @@ function Player.Runtime()
         trackWeight = body
             and body.dbgGetAnimTrackWeight
             and tonumber(body:dbgGetAnimTrackWeight(0, 0))
+            or nil,
+        trackFrame = body
+            and body.dbgGetAnimTrackTime
+            and math.max(
+                0,
+                math.floor(
+                    (
+                        tonumber(
+                            body:dbgGetAnimTrackTime(0, 0)
+                        ) or 0
+                    ) * 30 + 0.0001
+                )
+            )
             or nil,
         useless = body
             and body.isUseless

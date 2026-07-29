@@ -13,6 +13,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
         showAIDebug = false,
         showPathDebug = false,
         showCombatDebug = false,
+        showAnimationDebug = false,
         debugShowPresence = true,
         debugShowAI = true,
         debugShowJob = true,
@@ -31,6 +32,7 @@ if Nameplates.Settings.enabled == nil then Nameplates.Settings.enabled = true en
 if Nameplates.Settings.showAIDebug == nil then Nameplates.Settings.showAIDebug = false end
 if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDebug = false end
 if Nameplates.Settings.showCombatDebug == nil then Nameplates.Settings.showCombatDebug = false end
+if Nameplates.Settings.showAnimationDebug == nil then Nameplates.Settings.showAnimationDebug = false end
 local debugSettingDefaults = {
     debugShowPresence = true,
     debugShowAI = true,
@@ -151,6 +153,29 @@ function Nameplates.ToggleCombatDebug()
         HaloTextHelper.addText(player, getText(messageKey))
     end
     return Settings.showCombatDebug
+end
+
+function Nameplates.IsAnimationDebugEnabled()
+    return Settings.showAnimationDebug == true
+end
+
+function Nameplates.ToggleAnimationDebug()
+    local player = getSpecificPlayer(0)
+    Settings.showAnimationDebug = not Settings.showAnimationDebug
+    PNC.SettingsStore:Set(
+        "showAnimationDebug",
+        Settings.showAnimationDebug,
+        true
+    )
+    if player and HaloTextHelper and HaloTextHelper.addText then
+        HaloTextHelper.addText(
+            player,
+            Settings.showAnimationDebug
+                and "PNC animation tracks enabled"
+                or "PNC animation tracks disabled"
+        )
+    end
+    return Settings.showAnimationDebug
 end
 
 function Nameplates.DebugDescribeSnapshot(snapshot)

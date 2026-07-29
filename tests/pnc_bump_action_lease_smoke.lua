@@ -35,7 +35,10 @@ dofile(ANIMATION)
 
 local modData = {}
 local variables = {}
+variables.AttackVariationX = "0.0"
+variables.AttackVariationY = "0.0"
 local bumpType = ""
+local bumpDone = true
 local useless = true
 local actionState = "idle"
 local body = {
@@ -45,13 +48,21 @@ local body = {
     getActionStateName = function()
         return actionState
     end,
+    getBumpType = function()
+        return bumpType
+    end,
     setVariable = function(_, key, value)
         variables[key] = value
+    end,
+    clearVariable = function(_, key)
+        variables[key] = nil
     end,
     setBumpType = function(_, value)
         bumpType = value
     end,
-    setBumpDone = function() end,
+    setBumpDone = function(_, value)
+        bumpDone = value == true
+    end,
     setBumpFall = function() end,
     setRunning = function() end,
     setMoving = function() end,
@@ -61,6 +72,9 @@ local body = {
     setAnimatingBackwards = function() end,
     setUseless = function(_, value)
         useless = value
+    end,
+    isUseless = function()
+        return useless
     end,
 }
 local record = {
@@ -73,17 +87,17 @@ local record = {
 
 assertEqual(
     PNC.Animation.ResolveBumpType("PNC_Attack1H1"),
-    "Attack1H1",
+    "PNC_Attack1H1",
     "one-handed engine contract"
 )
 assertEqual(
     PNC.Animation.ResolveBumpType("PNC_Attack2HStamp"),
-    "Attack2HStamp",
+    "PNC_Attack2HStamp",
     "ground-stomp engine contract"
 )
 assertEqual(
     PNC.Animation.ResolveBumpType("PNC_AttackRifle"),
-    "AttackRifle",
+    "PNC_AttackRifle",
     "firearm engine contract"
 )
 assertEqual(
@@ -91,12 +105,43 @@ assertEqual(
     "PNC_ClimbWindow",
     "non-combat bump remains namespaced"
 )
+assertEqual(
+    PNC.Animation.ResolveBumpType("BandageUpperBody"),
+    "PNC_BandageUpperBody",
+    "unnamespaced action is isolated for PNC"
+)
 
 local started, reason =
     PNC.Animation.PlayBump(body, record, "PNC_Attack1H1")
 assertEqual(started, true, "bump started")
 assertEqual(reason, "bump_type_setter", "bump start mode")
-assertEqual(bumpType, "Attack1H1", "engine bump type written")
+assertEqual(bumpType, "PNC_Attack1H1", "engine bump type written")
+assertEqual(bumpDone, false, "stale Java bump completion latch reset")
+assertEqual(
+    variables.BumpAnimFinished,
+    false,
+    "stale XML completion latch reset"
+)
+assertEqual(
+    variables.PNCAttackVariationX,
+    "1.0",
+    "private melee blend scalar initialized"
+)
+assertEqual(
+    variables.PNCAttackVariationY,
+    "0.0",
+    "private melee blend scalar direction initialized"
+)
+assertEqual(
+    variables.AttackVariationX,
+    nil,
+    "stale melee X blend scalar cleared"
+)
+assertEqual(
+    variables.AttackVariationY,
+    nil,
+    "stale melee Y blend scalar cleared"
+)
 assertEqual(
     useless,
     true,
@@ -200,5 +245,32 @@ assertEqual(
     nil,
     "scripted traversal body-mode lease cleared"
 )
+
+now = 1300
+started = PNC.Animation.PlayBump(
+    body,
+    record,
+    "PNC_Attack1H1"
+)
+assertEqual(started, true, "stale-lease scenario started")
+bumpType = ""
+actionState = "idle"
+now = 1651
+assertEqual(
+    PNC.Animation.IsBumpActionActive(body, now),
+    false,
+    "cleared engine action retained a sliding idle lease"
+)
+assertEqual(
+    modData.PNC_BumpActionLease,
+    nil,
+    "stale action lease was not removed"
+)
+assertEqual(
+    PNC.Animation.Apply(body, record, "Walk"),
+    true,
+    "locomotion did not recover after a cancelled bump"
+)
+assertEqual(variables.bMoving, true, "recovered body did not animate its legs")
 
 print("pnc_bump_action_lease_smoke: ok")

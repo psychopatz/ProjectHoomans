@@ -106,6 +106,15 @@ function Support.PopulateDetails(list, item, authorized, audit)
     addDetail(list, "Health", tostring(item.healthState or "-") .. "  " .. tostring(item.hpCurrent or 0) .. "/" .. tostring(item.hpMax or 0))
     addDetail(list, "Target", item.targetKind or "none")
     addDetail(list, "Combat block", item.combatBlockReason)
+    addDetail(list, "Attack policy", tostring(item.attackType or "auto")
+        .. " / zombies="
+        .. tostring(not item.hostility
+            or item.hostility.attackZombies ~= false))
+    local equipment = item.equipment or {}
+    addDetail(list, "Primary", equipment.primaryFullType or "-")
+    addDetail(list, "Secondary", equipment.secondaryFullType or "-")
+    addDetail(list, "Back", equipment.attached
+        and equipment.attached.Back or "-")
     addDetail(list, "Body action", item.bodyActionState)
     addDetail(list, "Last transition", item.lastReason)
     addDetail(list, "Error", item.lastError, item.lastError and "danger" or nil)

@@ -13,7 +13,7 @@
 	<m_Conditions>
 		<m_Name>BumpType</m_Name>
 		<m_Type>STRING</m_Type>
-		<m_StringValue>right</m_StringValue>
+		<m_StringValue>PNC_right</m_StringValue>
 	</m_Conditions>
 	<m_Conditions>
 		<m_Name>FromBehind</m_Name>

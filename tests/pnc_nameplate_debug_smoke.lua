@@ -254,6 +254,53 @@ assertContains(
     "useless=true",
     "live body mode"
 )
+local animationTrackLine =
+    PNC.NameplateRenderer.BuildAnimationTrackDebugLine({
+        getCurrentActionContextStateName = function()
+            return "bumped"
+        end,
+        getAnimationStateName = function()
+            return "bumped"
+        end,
+        isAnimationUpdatingThisFrame = function()
+            return true
+        end,
+        dbgGetAnimTrackName = function(_, layer, track)
+            if layer == 0 and track == 0 then
+                return "Bob_IdleBat"
+            end
+            if layer == 0 and track == 1 then
+                return "Bob_Attack1Hand01_Hit"
+            end
+            return ""
+        end,
+        dbgGetAnimTrackTime = function(_, layer, track)
+            return track == 1 and 0.42 or 0.75
+        end,
+        dbgGetAnimTrackWeight = function(_, layer, track)
+            return track == 1 and 1.0 or 0.0
+        end,
+    })
+assertContains(
+    animationTrackLine,
+    "clip=Bob_Attack1Hand01_Hit",
+    "visible animation track"
+)
+assertContains(
+    animationTrackLine,
+    "slot=0:1",
+    "visible animation slot"
+)
+assertContains(
+    animationTrackLine,
+    "frame@30=12",
+    "live animation frame"
+)
+assertContains(
+    animationTrackLine,
+    "weight=1.000",
+    "visible animation blend weight"
+)
 PNC.AnimationTrace = {
     GetOverlayLine = function()
         return "TRACE #7 fail=action_handoff_missing"

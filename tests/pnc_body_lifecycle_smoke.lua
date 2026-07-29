@@ -1,7 +1,7 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
 local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/"
 local CORE_SHARED_ROOT =
-    "../psychopatzCore/Contents/mods/PsychopatzCore/42.16/media/lua/shared/"
+    "../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/"
 
 package.path = CORE_SHARED_ROOT .. "?.lua;" .. SHARED_ROOT .. "?.lua;" .. package.path
 

@@ -31,7 +31,9 @@ PNC = {
         PlayBump = function(_, _, bumpType, options)
             pipelineCalls[#pipelineCalls + 1] = {
                 bumpType = bumpType,
-                keepManagedUseless = options.keepManagedUseless,
+                keepManagedUseless = options
+                    and options.keepManagedUseless
+                    or nil,
             }
             return true, "bump_type_setter"
         end,
@@ -135,7 +137,11 @@ local entry = {
     playable = true,
     conditions = {
         { name = "PNCActor", kind = "BOOL", value = "true" },
-        { name = "BumpType", kind = "STRING", value = "Attack2H2" },
+        {
+            name = "BumpType",
+            kind = "STRING",
+            value = "PNC_Legacy_Attack2H2",
+        },
         { name = "hitforce", kind = "GTR", value = "1.0" },
     },
 }
@@ -174,10 +180,13 @@ assert(not player.IsPreviewing(body), "preview ownership survived stop")
 ok, reason = player.PlayPipeline(entry, "npc-1", body)
 assert(ok and reason == "bump_type_setter", "pipeline preview failed")
 assert(#pipelineCalls == 1, "PNC bump pipeline was not called")
-assert(pipelineCalls[1].bumpType == "Attack2H2", "wrong pipeline BumpType")
 assert(
-    pipelineCalls[1].keepManagedUseless == false,
-    "debug pipeline must permit client ActionContext updates"
+    pipelineCalls[1].bumpType == "PNC_Legacy_Attack2H2",
+    "wrong pipeline BumpType"
+)
+assert(
+    pipelineCalls[1].keepManagedUseless == nil,
+    "debug pipeline must preserve the SP/MP body-mode contract"
 )
 player.Finish()
 assert(finishCalls == 1, "pipeline finish was not signalled")

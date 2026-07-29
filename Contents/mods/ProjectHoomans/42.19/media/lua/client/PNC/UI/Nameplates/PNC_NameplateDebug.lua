@@ -20,6 +20,10 @@ local SYNTH_CYCLE_MS = {
     Idle = 1500,
 }
 
+local ANIMATION_FRAME_RATE = 30
+local DEBUG_TRACK_LAYER_COUNT = 4
+local DEBUG_TRACKS_PER_LAYER = 4
+
 local function syntheticAnimFrame(zombie, animName, moving, animSpeed)
     if not zombie then return nil, nil, nil end
     animName = tostring(animName or "Idle")
@@ -146,6 +150,133 @@ function Debug.InfectionText(snapshot, settings)
     }, " | ")
 end
 
+-- IsoGameCharacter exposes these debug accessors directly to Lua. They are
+-- safe for empty layer/track slots and avoid indexing AnimationTrack or
+-- AdvancedAnimator Java userdata, whose methods are not Lua-exposed.
+function Debug.CaptureAnimationRuntime(zombie)
+    local runtime = {
+        actionState = "-",
+        animationState = "-",
+        clip = "",
+        layer = nil,
+        trackIndex = nil,
+        time = nil,
+        weight = nil,
+        frame = nil,
+        frameRate = ANIMATION_FRAME_RATE,
+        trackCount = 0,
+        updating = nil,
+    }
+    local best
+    local layer
+    local trackIndex
+    if not zombie then return runtime end
+    runtime.actionState = tostring(
+        zombie.getCurrentActionContextStateName
+            and zombie:getCurrentActionContextStateName()
+            or zombie.getActionStateName
+                and zombie:getActionStateName()
+            or "-"
+    )
+    runtime.animationState = tostring(
+        zombie.getAnimationStateName
+            and zombie:getAnimationStateName()
+            or "-"
+    )
+    if zombie.isAnimationUpdatingThisFrame then
+        runtime.updating =
+            zombie:isAnimationUpdatingThisFrame() == true
+    end
+    if not zombie.dbgGetAnimTrackName then return runtime end
+    for layer = 0, DEBUG_TRACK_LAYER_COUNT - 1 do
+        for trackIndex = 0, DEBUG_TRACKS_PER_LAYER - 1 do
+            local name = tostring(
+                zombie:dbgGetAnimTrackName(
+                    layer,
+                    trackIndex
+                ) or ""
+            )
+            if name ~= "" then
+                local time = zombie.dbgGetAnimTrackTime
+                    and tonumber(
+                        zombie:dbgGetAnimTrackTime(
+                            layer,
+                            trackIndex
+                        )
+                    )
+                    or 0
+                local weight = zombie.dbgGetAnimTrackWeight
+                    and tonumber(
+                        zombie:dbgGetAnimTrackWeight(
+                            layer,
+                            trackIndex
+                        )
+                    )
+                    or 0
+                local candidate = {
+                    clip = name,
+                    layer = layer,
+                    trackIndex = trackIndex,
+                    time = time,
+                    weight = weight,
+                }
+                runtime.trackCount = runtime.trackCount + 1
+                if not best
+                    or weight > best.weight
+                then
+                    best = candidate
+                end
+            end
+        end
+    end
+    if best then
+        runtime.clip = best.clip
+        runtime.layer = best.layer
+        runtime.trackIndex = best.trackIndex
+        runtime.time = best.time
+        runtime.weight = best.weight
+        runtime.frame = math.max(
+            0,
+            math.floor(
+                math.max(0, tonumber(best.time) or 0)
+                    * ANIMATION_FRAME_RATE
+                    + 0.0001
+            )
+        )
+    end
+    return runtime
+end
+
+function Debug.AnimationTrackText(zombie)
+    local runtime = Debug.CaptureAnimationRuntime(zombie)
+    if runtime.clip == "" then
+        return "TRACK clip=- state="
+            .. tostring(runtime.actionState)
+            .. "/" .. tostring(runtime.animationState)
+            .. " frame@30=- weight=-"
+    end
+    return "TRACK clip=" .. tostring(runtime.clip)
+        .. " slot=" .. tostring(runtime.layer)
+        .. ":" .. tostring(runtime.trackIndex)
+        .. " state=" .. tostring(runtime.actionState)
+        .. "/" .. tostring(runtime.animationState)
+        .. " time=" .. string.format(
+            "%.3fs",
+            tonumber(runtime.time) or 0
+        )
+        .. " frame@30=" .. tostring(runtime.frame)
+        .. " weight=" .. string.format(
+            "%.3f",
+            tonumber(runtime.weight) or 0
+        )
+        .. " tracks=" .. tostring(runtime.trackCount)
+        .. (
+            runtime.updating ~= nil
+                and " updating=" .. tostring(runtime.updating)
+                or ""
+        )
+end
+
 function Debug.AnimationText(zombie, snapshot)
     if not zombie then return "Anim: n/a" end
     local animName = tostring(snapshot and snapshot.visualState and snapshot.visualState.anim
@@ -167,18 +298,41 @@ function Debug.AnimationText(zombie, snapshot)
         "EngineWalk: " .. engineWalkType,
         string.format("AnimSpd: %.2f", animSpeed),
     }
-    local frame, frameCount, phase = syntheticAnimFrame(
-        zombie,
-        moveAnim ~= "" and moveAnim or animName,
-        moving == true,
-        animSpeed
-    )
-    if frame ~= nil and frameCount ~= nil then
-        parts[#parts + 1] = "Frame~: " .. tostring(frame) .. "/" .. tostring(frameCount)
-    elseif phase ~= nil then
-        parts[#parts + 1] = string.format("Cycle: %.2f", tonumber(phase) or 0)
+    local runtime = Debug.CaptureAnimationRuntime(zombie)
+    if runtime.clip ~= "" then
+        parts[#parts + 1] = "Clip: " .. tostring(runtime.clip)
+        parts[#parts + 1] = "Track: "
+            .. tostring(runtime.layer)
+            .. ":" .. tostring(runtime.trackIndex)
+        parts[#parts + 1] = string.format(
+            "Time: %.3fs",
+            tonumber(runtime.time) or 0
+        )
+        parts[#parts + 1] = "Frame@30: "
+            .. tostring(runtime.frame)
+        parts[#parts + 1] = string.format(
+            "Weight: %.3f",
+            tonumber(runtime.weight) or 0
+        )
     else
-        parts[#parts + 1] = "Frame~: n/a"
+        local frame, frameCount, phase = syntheticAnimFrame(
+            zombie,
+            moveAnim ~= "" and moveAnim or animName,
+            moving == true,
+            animSpeed
+        )
+        if frame ~= nil and frameCount ~= nil then
+            parts[#parts + 1] = "Frame~: "
+                .. tostring(frame)
+                .. "/" .. tostring(frameCount)
+        elseif phase ~= nil then
+            parts[#parts + 1] = string.format(
+                "Cycle: %.2f",
+                tonumber(phase) or 0
+            )
+        else
+            parts[#parts + 1] = "Frame~: n/a"
+        end
     end
     return table.concat(parts, " | ")
 end

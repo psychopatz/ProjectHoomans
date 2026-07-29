@@ -108,5 +108,32 @@ assertEqual(
     "UI_PNC_CombatOverlayDisabled",
     "combat disabled feedback"
 )
+assertEqual(
+    PNC.Nameplates.IsAnimationDebugEnabled(),
+    false,
+    "animation overlay defaults off"
+)
+assertEqual(
+    PNC.Nameplates.ToggleAnimationDebug(),
+    true,
+    "animation overlay toggles on"
+)
+assertEqual(
+    writes[3].key,
+    "showAnimationDebug",
+    "animation setting persisted"
+)
+assertEqual(writes[3].value, true, "animation enabled persisted")
+assertEqual(
+    halos[3],
+    "PNC animation tracks enabled",
+    "animation enabled feedback"
+)
+assertEqual(
+    PNC.Nameplates.ToggleAnimationDebug(),
+    false,
+    "animation overlay toggles off"
+)
+assertEqual(writes[4].value, false, "animation disabled persisted")
 
 print("pnc_combat_overlay_toggle_smoke: ok")

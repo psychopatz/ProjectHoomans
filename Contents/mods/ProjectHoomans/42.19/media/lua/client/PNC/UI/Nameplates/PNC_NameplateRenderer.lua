@@ -3,6 +3,7 @@ PNC.NameplateRenderer = PNC.NameplateRenderer or {}
 
 local Renderer = PNC.NameplateRenderer
 local Presentation = PNC.NameplatePresentation
+local NameplateDebug = PNC.NameplateDebug
 local Layout = Presentation.Layout
 local Fonts = Presentation.Fonts
 
@@ -85,7 +86,7 @@ local function drawStamina(manager, entry, metrics, barLeft, barTop, alpha)
     return top
 end
 
-local function drawDebugText(manager, entry, screenX, y, alpha)
+local function drawDebugText(manager, entry, screenX, y, alpha, showAnimation)
     local lineHeight = getTextManager():getFontHeight(Fonts.debug) + 2
     if entry.debugText and entry.debugText ~= "" then
         Presentation.DrawOutlinedText(
@@ -111,6 +112,21 @@ local function drawDebugText(manager, entry, screenX, y, alpha)
         )
         y = y + lineHeight
     end
+    if showAnimation
+        and entry.animationDebugText
+        and entry.animationDebugText ~= ""
+    then
+        Presentation.DrawOutlinedText(
+            manager,
+            entry.animationDebugText,
+            screenX - ((entry.animationDebugTextWidth or 0) / 2),
+            y,
+            COMBAT_CONE_COLOR,
+            alpha,
+            Fonts.debug
+        )
+        y = y + lineHeight
+    end
     return y
 end
 
@@ -130,7 +146,7 @@ local function drawDebugOnly(manager, entry, metrics)
     drawDebugText(manager, entry, screenX, nameY + Layout.nameDebugGap, 0.9)
 end
 
-local function drawLive(manager, entry, metrics, currentTime, showDebug)
+local function drawLive(manager, entry, metrics, currentTime, settings)
     local zombie = entry.zombie
     if not zombie or zombie:isDead() then return end
     local alpha = zombie.getAlpha and zombie:getAlpha(manager.playerIndex) or 1
@@ -170,7 +186,9 @@ local function drawLive(manager, entry, metrics, currentTime, showDebug)
     drawHealth(manager, entry, metrics, barLeft, barTop, alpha)
     local staminaTop = drawStamina(manager, entry, metrics, barLeft, barTop, alpha)
 
-    if showDebug then
+    local showDebug = settings.showAIDebug == true
+    local showAnimation = settings.showAnimationDebug == true
+    if showDebug or showAnimation then
         local debugY
         if entry.staminaVisible then
             debugY = (entry.healthVisible and staminaTop or barTop) + metrics.barHeight + Layout.debugTextGap
@@ -179,7 +197,14 @@ local function drawLive(manager, entry, metrics, currentTime, showDebug)
         else
             debugY = nameY + Layout.nameDebugGap
         end
-        drawDebugText(manager, entry, screenX, debugY, 0.95 * alpha)
+        drawDebugText(
+            manager,
+            entry,
+            screenX,
+            debugY,
+            0.95 * alpha,
+            showAnimation
+        )
     end
 end
 
@@ -559,6 +584,15 @@ function Renderer.BuildAnimationTraceDebugLine(zombie)
         return nil
     end
     return PNC.AnimationTrace.GetOverlayLine(zombie)
+end
+
+function Renderer.BuildAnimationTrackDebugLine(zombie)
+    if not NameplateDebug
+        or not NameplateDebug.AnimationTrackText
+    then
+        return nil
+    end
+    return NameplateDebug.AnimationTrackText(zombie)
 end
 
 local function screenPoint(manager, x, y, z)
@@ -1139,6 +1173,11 @@ local function drawCombatDebug(manager, entry)
                 zombie,
                 debugState.action
             )
+        local trackLine =
+            Renderer.BuildAnimationTrackDebugLine(zombie)
+        if trackLine then
+            lines[#lines + 1] = trackLine
+        end
         local traceLine =
             Renderer.BuildAnimationTraceDebugLine(zombie)
         if traceLine then
@@ -1172,7 +1211,9 @@ local function drawCombatDebug(manager, entry)
         labelX = screenX + 18
         if string.sub(lines[i], 1, 8) == "DEFENSE " then
             textColor = COMBAT_DEFENSE_COLOR
-        elseif string.sub(lines[i], 1, 5) == "ANIM " then
+        elseif string.sub(lines[i], 1, 5) == "ANIM "
+            or string.sub(lines[i], 1, 6) == "TRACK "
+        then
             textColor = DEBUG_COLOR
         elseif debugState.fireLaneSafe == false then
             textColor = COMBAT_UNSAFE_COLOR
@@ -1370,7 +1411,7 @@ function Renderer.Render(manager, settings)
         if entry.debugOnly then
             drawDebugOnly(manager, entry, metrics)
         else
-            drawLive(manager, entry, metrics, currentTime, settings.showAIDebug)
+            drawLive(manager, entry, metrics, currentTime, settings)
         end
     end
     manager:clearStencilRect()

@@ -1,14 +1,14 @@
 -- GENERATED FILE. Do not edit by hand.
--- Source: common/media/AnimSets/zombie (511 XML nodes)
+-- Source: common/media/AnimSets/zombie (544 XML nodes)
 PNC = PNC or {}
 PNC.AnimationDebugCatalog = {
-    generatedCount = 511,
+    generatedCount = 544,
     stateCounts = {
         ["attack"] = 18,
         ["attack-network"] = 18,
         ["attackvehicle"] = 3,
         ["attackvehicle-network"] = 3,
-        ["bumped"] = 203,
+        ["bumped"] = 236,
         ["climbdownrope"] = 1,
         ["climbfence"] = 4,
         ["climbrope"] = 1,
@@ -940,7 +940,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AimPistol" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AimPistol" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -960,7 +960,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AimPistolLow" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AimPistolLow" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -980,7 +980,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 1,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AimPistolTorch" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AimPistolTorch" },
             },
             events = {
             },
@@ -999,7 +999,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AimRifle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AimRifle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1019,7 +1019,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AimRifleLow" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AimRifleLow" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1039,7 +1039,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AimRifleTurn180L" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AimRifleTurn180L" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1059,7 +1059,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AimRifleTurn180R" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AimRifleTurn180R" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1079,7 +1079,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AimRifleTurn45L" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AimRifleTurn45L" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1099,7 +1099,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AimRifleTurn45R" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AimRifleTurn45R" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1119,7 +1119,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AimRifleTurn90L" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AimRifleTurn90L" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1139,7 +1139,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AimRifleTurn90R" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AimRifleTurn90R" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1159,7 +1159,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttachBack" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttachBack" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1179,7 +1179,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttachBackOut" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttachBackOut" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1199,7 +1199,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttachHolsterLeft" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttachHolsterLeft" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1219,7 +1219,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttachHolsterLeftOut" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttachHolsterLeftOut" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1239,7 +1239,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttachHolsterRight" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttachHolsterRight" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1259,7 +1259,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttachHolsterRightOut" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttachHolsterRightOut" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1279,7 +1279,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack1H1" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack1H1" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1299,7 +1299,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack1H1Bwd" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack1H1Bwd" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1319,7 +1319,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack1H2" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack1H2" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1339,7 +1339,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack1H2Bwd" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack1H2Bwd" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1359,7 +1359,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack1H3" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack1H3" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1379,7 +1379,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack1H3Bwd" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack1H3Bwd" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1399,7 +1399,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack1H4" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack1H4" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1419,7 +1419,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack1H5" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack1H5" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1439,7 +1439,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack2H1" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack2H1" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1459,7 +1459,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack2H1Bwd" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack2H1Bwd" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1479,7 +1479,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack2H2" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack2H2" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1499,7 +1499,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack2H2Bwd" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack2H2Bwd" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1519,7 +1519,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack2H3" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack2H3" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1539,7 +1539,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack2H3Bwd" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack2H3Bwd" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1559,7 +1559,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack2H4" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack2H4" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1579,7 +1579,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack2HFloor" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack2HFloor" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1599,7 +1599,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack2HHeavy1" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack2HHeavy1" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1619,7 +1619,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack2HHeavy2" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack2HHeavy2" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1639,7 +1639,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Attack2HStamp" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Attack2HStamp" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1659,7 +1659,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackBareHands1" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackBareHands1" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1679,7 +1679,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackBareHands2" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackBareHands2" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1699,7 +1699,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackBareHands2Bwd" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackBareHands2Bwd" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1719,7 +1719,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackBareHands3" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackBareHands3" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1739,7 +1739,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackBareHands4" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackBareHands4" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1759,7 +1759,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackBareHands4Bwd" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackBareHands4Bwd" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1779,7 +1779,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackBareHands5" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackBareHands5" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1799,7 +1799,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackBareHands6" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackBareHands6" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1819,7 +1819,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackChainsaw1" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackChainsaw1" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1839,7 +1839,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackChainsaw2" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackChainsaw2" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1859,7 +1859,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackPistol" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackPistol" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1879,7 +1879,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackRifle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackRifle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1899,7 +1899,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackS1" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackS1" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1919,7 +1919,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackS1Bwd" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackS1Bwd" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1939,7 +1939,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackS2" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackS2" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1959,7 +1959,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackS2Bwd" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackS2Bwd" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1979,7 +1979,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AwakeBed" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AwakeBed" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -1999,7 +1999,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "BandageHead" },
+                { name = "BumpType", kind = "STRING", value = "PNC_BandageHead" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2019,7 +2019,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "BandageLeftArm" },
+                { name = "BumpType", kind = "STRING", value = "PNC_BandageLeftArm" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2039,7 +2039,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "BandageLeftLeg" },
+                { name = "BumpType", kind = "STRING", value = "PNC_BandageLeftLeg" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2059,7 +2059,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "BandageLowerBody" },
+                { name = "BumpType", kind = "STRING", value = "PNC_BandageLowerBody" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2079,7 +2079,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "BandageRightArm" },
+                { name = "BumpType", kind = "STRING", value = "PNC_BandageRightArm" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2099,7 +2099,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "BandageRightLeg" },
+                { name = "BumpType", kind = "STRING", value = "PNC_BandageRightLeg" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2119,7 +2119,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "BandageUpperBody" },
+                { name = "BumpType", kind = "STRING", value = "PNC_BandageUpperBody" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2139,7 +2139,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "BlowtorchHigh" },
+                { name = "BumpType", kind = "STRING", value = "PNC_BlowtorchHigh" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2159,7 +2159,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "left" },
+                { name = "BumpType", kind = "STRING", value = "PNC_left" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2179,7 +2179,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "left" },
+                { name = "BumpType", kind = "STRING", value = "PNC_left" },
                 { name = "FromBehind", kind = "BOOL", value = "true" },
             },
             events = {
@@ -2200,7 +2200,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "right" },
+                { name = "BumpType", kind = "STRING", value = "PNC_right" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2220,7 +2220,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "right" },
+                { name = "BumpType", kind = "STRING", value = "PNC_right" },
                 { name = "FromBehind", kind = "BOOL", value = "true" },
             },
             events = {
@@ -2241,7 +2241,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "ChewNails" },
+                { name = "BumpType", kind = "STRING", value = "PNC_ChewNails" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2261,7 +2261,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "ChopTree" },
+                { name = "BumpType", kind = "STRING", value = "PNC_ChopTree" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2392,7 +2392,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Cough" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Cough" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2412,7 +2412,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Defecate" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Defecate" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2432,7 +2432,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Die" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Die" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2452,7 +2452,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "DigShovel" },
+                { name = "BumpType", kind = "STRING", value = "PNC_DigShovel" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2472,7 +2472,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Drink" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Drink" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2492,7 +2492,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Eat" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Eat" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2512,7 +2512,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Exhausted" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Exhausted" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2532,7 +2532,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Faint" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Faint" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2552,7 +2552,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "FeelFeint" },
+                { name = "BumpType", kind = "STRING", value = "PNC_FeelFeint" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2572,7 +2572,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "FillBucket" },
+                { name = "BumpType", kind = "STRING", value = "PNC_FillBucket" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2592,7 +2592,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "FishingSpearIdle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_FishingSpearIdle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2612,7 +2612,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "FishingSpearInOut" },
+                { name = "BumpType", kind = "STRING", value = "PNC_FishingSpearInOut" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2632,7 +2632,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "FishingSpearStrike" },
+                { name = "BumpType", kind = "STRING", value = "PNC_FishingSpearStrike" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2652,7 +2652,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Forage" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Forage" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2672,7 +2672,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "FrontKick" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_FrontKick" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2692,7 +2692,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "GetUp" },
+                { name = "BumpType", kind = "STRING", value = "PNC_GetUp" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2712,7 +2712,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Hammer" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Hammer" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2732,7 +2732,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "HammerLow" },
+                { name = "BumpType", kind = "STRING", value = "PNC_HammerLow" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2752,7 +2752,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "HighKick" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_HighKick" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2772,7 +2772,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "IdleToAimPistol" },
+                { name = "BumpType", kind = "STRING", value = "PNC_IdleToAimPistol" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2792,7 +2792,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "IdleToAimRifle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_IdleToAimRifle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2812,7 +2812,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "IdleToRun" },
+                { name = "BumpType", kind = "STRING", value = "PNC_IdleToRun" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2832,7 +2832,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "IdleToRun" },
+                { name = "BumpType", kind = "STRING", value = "PNC_IdleToRun" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "twohanded" },
             },
             events = {
@@ -2853,7 +2853,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "IdleToRun" },
+                { name = "BumpType", kind = "STRING", value = "PNC_IdleToRun" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "handgun" },
             },
             events = {
@@ -2874,7 +2874,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "IdleToRun" },
+                { name = "BumpType", kind = "STRING", value = "PNC_IdleToRun" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "rifle" },
             },
             events = {
@@ -2895,7 +2895,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "IdleToWalk" },
+                { name = "BumpType", kind = "STRING", value = "PNC_IdleToWalk" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2915,7 +2915,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "IdleToWalk" },
+                { name = "BumpType", kind = "STRING", value = "PNC_IdleToWalk" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "twohanded" },
             },
             events = {
@@ -2936,7 +2936,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "IdleToWalk" },
+                { name = "BumpType", kind = "STRING", value = "PNC_IdleToWalk" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "handgun" },
             },
             events = {
@@ -2957,7 +2957,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "IdleToWalk" },
+                { name = "BumpType", kind = "STRING", value = "PNC_IdleToWalk" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "rifle" },
             },
             events = {
@@ -2978,7 +2978,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackKnife" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackKnife" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -2998,7 +2998,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackKnifeBwd" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackKnifeBwd" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3018,7 +3018,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "AttackKnifeMiss" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_AttackKnifeMiss" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3038,7 +3038,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "LoadDBShotgun" },
+                { name = "BumpType", kind = "STRING", value = "PNC_LoadDBShotgun" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3058,7 +3058,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "LoadPistol" },
+                { name = "BumpType", kind = "STRING", value = "PNC_LoadPistol" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3078,7 +3078,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "LoadRevolver" },
+                { name = "BumpType", kind = "STRING", value = "PNC_LoadRevolver" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3098,7 +3098,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "LoadRifle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_LoadRifle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3118,7 +3118,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "LoadShotgun" },
+                { name = "BumpType", kind = "STRING", value = "PNC_LoadShotgun" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3138,7 +3138,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Loot" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Loot" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3158,7 +3158,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "LootHigh" },
+                { name = "BumpType", kind = "STRING", value = "PNC_LootHigh" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3178,7 +3178,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "LootLow" },
+                { name = "BumpType", kind = "STRING", value = "PNC_LootLow" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3199,7 +3199,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "No" },
+                { name = "BumpType", kind = "STRING", value = "PNC_No" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3219,7 +3219,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "PainHead" },
+                { name = "BumpType", kind = "STRING", value = "PNC_PainHead" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3239,7 +3239,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "PainStomach1" },
+                { name = "BumpType", kind = "STRING", value = "PNC_PainStomach1" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3259,7 +3259,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "PainStomach2" },
+                { name = "BumpType", kind = "STRING", value = "PNC_PainStomach2" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3279,7 +3279,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "PainTorso" },
+                { name = "BumpType", kind = "STRING", value = "PNC_PainTorso" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3299,7 +3299,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "pourBottle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_pourBottle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3319,7 +3319,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "PourBucket" },
+                { name = "BumpType", kind = "STRING", value = "PNC_PourBucket" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3339,7 +3339,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "PourWateringCan" },
+                { name = "BumpType", kind = "STRING", value = "PNC_PourWateringCan" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3359,7 +3359,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "PullAtCollar" },
+                { name = "BumpType", kind = "STRING", value = "PNC_PullAtCollar" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3379,7 +3379,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "PushUpIn" },
+                { name = "BumpType", kind = "STRING", value = "PNC_PushUpIn" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3399,7 +3399,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "PushUpLoop1" },
+                { name = "BumpType", kind = "STRING", value = "PNC_PushUpLoop1" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3419,7 +3419,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "PushUpLoop2" },
+                { name = "BumpType", kind = "STRING", value = "PNC_PushUpLoop2" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3439,7 +3439,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "PushUpOut" },
+                { name = "BumpType", kind = "STRING", value = "PNC_PushUpOut" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3459,7 +3459,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RackDBShotgun" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RackDBShotgun" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3479,7 +3479,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RackPistol" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RackPistol" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3499,7 +3499,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RackRevolver" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RackRevolver" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3519,7 +3519,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RackRifle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RackRifle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3539,7 +3539,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RackRifleAim" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RackRifleAim" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3559,7 +3559,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RackShotgun" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RackShotgun" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3579,7 +3579,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RackShotgunAim" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RackShotgunAim" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3599,7 +3599,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Rake" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Rake" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3619,7 +3619,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "ReadBook" },
+                { name = "BumpType", kind = "STRING", value = "PNC_ReadBook" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3639,7 +3639,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Refuel" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Refuel" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3659,7 +3659,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "ReloadPistol" },
+                { name = "BumpType", kind = "STRING", value = "PNC_ReloadPistol" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3679,7 +3679,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "ReloadRifle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_ReloadRifle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3699,7 +3699,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RemoveBarricadeCrowbarHigh" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RemoveBarricadeCrowbarHigh" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3719,7 +3719,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RemoveBarricadeCrowbarLow" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RemoveBarricadeCrowbarLow" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3739,7 +3739,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RemoveBarricadeCrowbarMid" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RemoveBarricadeCrowbarMid" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3759,7 +3759,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RunToIdle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RunToIdle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3779,7 +3779,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RunToIdle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RunToIdle" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "twohanded" },
             },
             events = {
@@ -3800,7 +3800,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RunToIdle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RunToIdle" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "handgun" },
             },
             events = {
@@ -3821,7 +3821,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RunToIdle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RunToIdle" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "rifle" },
             },
             events = {
@@ -3842,7 +3842,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RunToTurn180L" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RunToTurn180L" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3862,7 +3862,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "RunToTurn180R" },
+                { name = "BumpType", kind = "STRING", value = "PNC_RunToTurn180R" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3882,7 +3882,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "SaluteCasual" },
+                { name = "BumpType", kind = "STRING", value = "PNC_SaluteCasual" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3902,7 +3902,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "SaluteFormal" },
+                { name = "BumpType", kind = "STRING", value = "PNC_SaluteFormal" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3922,7 +3922,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Scramble" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Scramble" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3942,7 +3942,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "ShiftWeight" },
+                { name = "BumpType", kind = "STRING", value = "PNC_ShiftWeight" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3962,7 +3962,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Shove" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Shove" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -3982,7 +3982,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Shove" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Shove" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "twohanded" },
             },
             events = {
@@ -4003,7 +4003,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Shove" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Shove" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "handgun" },
             },
             events = {
@@ -4024,7 +4024,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Shove" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Legacy_Shove" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "rifle" },
             },
             events = {
@@ -4045,7 +4045,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Shrug" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Shrug" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4065,7 +4065,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Sit" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Sit" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4085,7 +4085,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "SitAction" },
+                { name = "BumpType", kind = "STRING", value = "PNC_SitAction" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4105,7 +4105,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "SitMaking" },
+                { name = "BumpType", kind = "STRING", value = "PNC_SitMaking" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4125,7 +4125,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "SitRubHands" },
+                { name = "BumpType", kind = "STRING", value = "PNC_SitRubHands" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4145,7 +4145,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Sleep" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Sleep" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4165,7 +4165,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "SleepBed" },
+                { name = "BumpType", kind = "STRING", value = "PNC_SleepBed" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4185,7 +4185,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "SmellBad" },
+                { name = "BumpType", kind = "STRING", value = "PNC_SmellBad" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4205,7 +4205,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "SmellGag" },
+                { name = "BumpType", kind = "STRING", value = "PNC_SmellGag" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4225,7 +4225,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Smoke" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Smoke" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4246,7 +4246,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Sneeze" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Sneeze" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4266,7 +4266,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Spooked1" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Spooked1" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4286,7 +4286,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Spooked2" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Spooked2" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4306,7 +4306,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Surrender" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Surrender" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4326,7 +4326,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "UnoadDBShotgun" },
+                { name = "BumpType", kind = "STRING", value = "PNC_UnoadDBShotgun" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4346,7 +4346,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "UnloadPistol" },
+                { name = "BumpType", kind = "STRING", value = "PNC_UnloadPistol" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4366,7 +4366,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "UnloadRevolver" },
+                { name = "BumpType", kind = "STRING", value = "PNC_UnloadRevolver" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4386,7 +4386,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "UnloadRifle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_UnloadRifle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4406,7 +4406,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "UnoadShotgun" },
+                { name = "BumpType", kind = "STRING", value = "PNC_UnoadShotgun" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4426,7 +4426,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Vomit" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Vomit" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4446,7 +4446,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "WalkToIdle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_WalkToIdle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4466,7 +4466,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "WalkToIdle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_WalkToIdle" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "twohanded" },
             },
             events = {
@@ -4487,7 +4487,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "WalkToIdle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_WalkToIdle" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "handgun" },
             },
             events = {
@@ -4508,7 +4508,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "WalkToIdle" },
+                { name = "BumpType", kind = "STRING", value = "PNC_WalkToIdle" },
                 { name = "PNCPrimaryType", kind = "STRING", value = "rifle" },
             },
             events = {
@@ -4529,7 +4529,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "washFace" },
+                { name = "BumpType", kind = "STRING", value = "PNC_washFace" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4549,7 +4549,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "WaveHi" },
+                { name = "BumpType", kind = "STRING", value = "PNC_WaveHi" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4569,7 +4569,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "WindowOpen" },
+                { name = "BumpType", kind = "STRING", value = "PNC_WindowOpen" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4589,7 +4589,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "WindowSmash" },
+                { name = "BumpType", kind = "STRING", value = "PNC_WindowSmash" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4609,7 +4609,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "WipeBrow" },
+                { name = "BumpType", kind = "STRING", value = "PNC_WipeBrow" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4629,7 +4629,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "WipeHead" },
+                { name = "BumpType", kind = "STRING", value = "PNC_WipeHead" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4649,7 +4649,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Yes" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Yes" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4669,7 +4669,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCZombieBitingNPC", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "Bite" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Bite" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4689,7 +4689,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCZombieBitingNPC", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "BiteLow" },
+                { name = "BumpType", kind = "STRING", value = "PNC_BiteLow" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4709,7 +4709,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "ZombiePushedBack" },
+                { name = "BumpType", kind = "STRING", value = "PNC_ZombiePushedBack" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "SprinterTripped=TRUE" },
@@ -4731,7 +4731,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "ZombiePushedFront" },
+                { name = "BumpType", kind = "STRING", value = "PNC_ZombiePushedFront" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "SprinterTripped=TRUE" },
@@ -4753,7 +4753,7 @@ PNC.AnimationDebugCatalog = {
             transitionCount = 0,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
-                { name = "BumpType", kind = "STRING", value = "trippingFromSprint" },
+                { name = "BumpType", kind = "STRING", value = "PNC_trippingFromSprint" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "SprinterTripped=TRUE" },
@@ -4784,11 +4784,31 @@ PNC.AnimationDebugCatalog = {
         {
             state = "bumped",
             folder = "bumped",
+            file = "PNC_Attack1H1Bwd.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack1H1Bwd.xml",
+            extends = nil,
+            node = "PNC_Attack1H1Bwd",
+            anim = "Bob_WalkBwd_Attack1Hand01_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack1H1Bwd" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
             file = "PNC_Attack1H2.xml",
             path = "media/AnimSets/zombie/bumped/PNC_Attack1H2.xml",
             extends = nil,
             node = "PNC_Attack1H2",
-            anim = "Bob_Attack1Hand01_HitC",
+            anim = "Bob_Attack1Hand01_HitB",
             looped = false,
             speed = 0.9,
             playable = true,
@@ -4796,6 +4816,106 @@ PNC.AnimationDebugCatalog = {
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
                 { name = "BumpType", kind = "STRING", value = "PNC_Attack1H2" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_Attack1H2Bwd.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack1H2Bwd.xml",
+            extends = nil,
+            node = "PNC_Attack1H2Bwd",
+            anim = "Bob_WalkBwd_Attack1Hand02_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack1H2Bwd" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_Attack1H3.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack1H3.xml",
+            extends = nil,
+            node = "PNC_Attack1H3",
+            anim = "Bob_Attack1Hand01_HitC",
+            looped = false,
+            speed = 0.89,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack1H3" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_Attack1H3Bwd.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack1H3Bwd.xml",
+            extends = nil,
+            node = "PNC_Attack1H3Bwd",
+            anim = "Bob_WalkBwd_Attack1Hand03_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack1H3Bwd" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_Attack1H4.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack1H4.xml",
+            extends = nil,
+            node = "PNC_Attack1H4",
+            anim = "Bob_Attack1Hand02_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack1H4" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_Attack1H5.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack1H5.xml",
+            extends = nil,
+            node = "PNC_Attack1H5",
+            anim = "Bob_Attack1Hand03_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack1H5" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4824,6 +4944,26 @@ PNC.AnimationDebugCatalog = {
         {
             state = "bumped",
             folder = "bumped",
+            file = "PNC_Attack2H1Bwd.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack2H1Bwd.xml",
+            extends = nil,
+            node = "PNC_Attack2H1Bwd",
+            anim = "Bob_WalkBwd_AttackBat01_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack2H1Bwd" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
             file = "PNC_Attack2H2.xml",
             path = "media/AnimSets/zombie/bumped/PNC_Attack2H2.xml",
             extends = nil,
@@ -4836,6 +4976,86 @@ PNC.AnimationDebugCatalog = {
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
                 { name = "BumpType", kind = "STRING", value = "PNC_Attack2H2" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_Attack2H2Bwd.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack2H2Bwd.xml",
+            extends = nil,
+            node = "PNC_Attack2H2Bwd",
+            anim = "Bob_WalkBwd_AttackBat02_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack2H2Bwd" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_Attack2H3.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack2H3.xml",
+            extends = nil,
+            node = "PNC_Attack2H3",
+            anim = "Bob_AttackBat02_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack2H3" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_Attack2H3Bwd.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack2H3Bwd.xml",
+            extends = nil,
+            node = "PNC_Attack2H3Bwd",
+            anim = "Bob_WalkBwd_AttackBat03_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack2H3Bwd" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_Attack2H4.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack2H4.xml",
+            extends = nil,
+            node = "PNC_Attack2H4",
+            anim = "Bob_AttackBat03_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack2H4" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4864,6 +5084,46 @@ PNC.AnimationDebugCatalog = {
         {
             state = "bumped",
             folder = "bumped",
+            file = "PNC_Attack2HHeavy1.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack2HHeavy1.xml",
+            extends = nil,
+            node = "PNC_Attack2HHeavy1",
+            anim = "Bob_Attack2H_Heavy01_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack2HHeavy1" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_Attack2HHeavy2.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Attack2HHeavy2.xml",
+            extends = nil,
+            node = "PNC_Attack2HHeavy2",
+            anim = "Bob_Attack2H_Heavy02_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Attack2HHeavy2" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
             file = "PNC_Attack2HStamp.xml",
             path = "media/AnimSets/zombie/bumped/PNC_Attack2HStamp.xml",
             extends = nil,
@@ -4884,6 +5144,206 @@ PNC.AnimationDebugCatalog = {
         {
             state = "bumped",
             folder = "bumped",
+            file = "PNC_AttackBareHands1.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackBareHands1.xml",
+            extends = nil,
+            node = "PNC_AttackBareHands1",
+            anim = "Bob_AttackPunch01_CritHit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackBareHands1" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackBareHands2.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackBareHands2.xml",
+            extends = nil,
+            node = "PNC_AttackBareHands2",
+            anim = "Bob_AttackPunch01_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackBareHands2" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackBareHands2Bwd.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackBareHands2Bwd.xml",
+            extends = nil,
+            node = "PNC_AttackBareHands2Bwd",
+            anim = "Bob_WalkBwd_AttackPunch01_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackBareHands2Bwd" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackBareHands3.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackBareHands3.xml",
+            extends = nil,
+            node = "PNC_AttackBareHands3",
+            anim = "Bob_AttackPunch02_CritHit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackBareHands3" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackBareHands4.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackBareHands4.xml",
+            extends = nil,
+            node = "PNC_AttackBareHands4",
+            anim = "Bob_AttackPunch02_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackBareHands4" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackBareHands4Bwd.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackBareHands4Bwd.xml",
+            extends = nil,
+            node = "PNC_AttackBareHands4Bwd",
+            anim = "Bob_WalkBwd_AttackPunch02_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackBareHands4Bwd" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackBareHands5.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackBareHands5.xml",
+            extends = nil,
+            node = "PNC_AttackBareHands5",
+            anim = "Bob_AttackPunch03_CritHit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackBareHands5" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackBareHands6.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackBareHands6.xml",
+            extends = nil,
+            node = "PNC_AttackBareHands6",
+            anim = "Bob_AttackPunch03_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackBareHands6" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackChainsaw1.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackChainsaw1.xml",
+            extends = nil,
+            node = "PNC_AttackChainsaw1",
+            anim = "Bob_AttackChainsaw01_CritHit",
+            looped = false,
+            speed = 1.0,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackChainsaw1" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackChainsaw2.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackChainsaw2.xml",
+            extends = nil,
+            node = "PNC_AttackChainsaw2",
+            anim = "Bob_AttackChainsaw_Miss",
+            looped = false,
+            speed = 1.0,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackChainsaw2" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
             file = "PNC_AttackKnife.xml",
             path = "media/AnimSets/zombie/bumped/PNC_AttackKnife.xml",
             extends = nil,
@@ -4896,6 +5356,46 @@ PNC.AnimationDebugCatalog = {
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
                 { name = "BumpType", kind = "STRING", value = "PNC_AttackKnife" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackKnifeBwd.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackKnifeBwd.xml",
+            extends = nil,
+            node = "PNC_AttackKnifeBwd",
+            anim = "Bob_WalkBwd_AttackKnife01_Hit",
+            looped = false,
+            speed = 1.0,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackKnifeBwd" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackKnifeMiss.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackKnifeMiss.xml",
+            extends = nil,
+            node = "PNC_AttackKnifeMiss",
+            anim = "Bob_AttackKnife01_Miss",
+            looped = false,
+            speed = 1.0,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackKnifeMiss" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
@@ -4964,6 +5464,106 @@ PNC.AnimationDebugCatalog = {
         {
             state = "bumped",
             folder = "bumped",
+            file = "PNC_AttackS1Bwd.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackS1Bwd.xml",
+            extends = nil,
+            node = "PNC_AttackS1Bwd",
+            anim = "Bob_WalkBwd_AttackSpear01_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackS1Bwd" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackS2.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackS2.xml",
+            extends = nil,
+            node = "PNC_AttackS2",
+            anim = "Bob_AttackSpear02_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackS2" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_AttackS2Bwd.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_AttackS2Bwd.xml",
+            extends = nil,
+            node = "PNC_AttackS2Bwd",
+            anim = "Bob_WalkBwd_AttackSpear02_Hit",
+            looped = false,
+            speed = 0.9,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_AttackS2Bwd" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_FrontKick.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_FrontKick.xml",
+            extends = nil,
+            node = "PNC_FrontKick",
+            anim = "Bob_FrontKick",
+            looped = false,
+            speed = 1.6,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_FrontKick" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_HighKick.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_HighKick.xml",
+            extends = nil,
+            node = "PNC_HighKick",
+            anim = "Bob_HighKick",
+            looped = false,
+            speed = 0.85,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_HighKick" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
             file = "PNC_IdleToRun.xml",
             path = "media/AnimSets/zombie/bumped/PNC_IdleToRun.xml",
             extends = nil,
@@ -5016,6 +5616,69 @@ PNC.AnimationDebugCatalog = {
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
                 { name = "BumpType", kind = "STRING", value = "PNC_Shove" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_ShoveBat.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_ShoveBat.xml",
+            extends = nil,
+            node = "PNC_ShoveBat",
+            anim = "Bob_Shove_Bat",
+            looped = false,
+            speed = 0.8,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Shove" },
+                { name = "PNCPrimaryType", kind = "STRING", value = "twohanded" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_ShoveHandgun.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_ShoveHandgun.xml",
+            extends = nil,
+            node = "PNC_ShoveHandgun",
+            anim = "Bob_Shove_Handgun",
+            looped = false,
+            speed = 0.8,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Shove" },
+                { name = "PNCPrimaryType", kind = "STRING", value = "handgun" },
+            },
+            events = {
+                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_ShoveRifle.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_ShoveRifle.xml",
+            extends = nil,
+            node = "PNC_ShoveRifle",
+            anim = "Bob_Shove_Rifle",
+            looped = false,
+            speed = 0.8,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_Shove" },
+                { name = "PNCPrimaryType", kind = "STRING", value = "rifle" },
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },

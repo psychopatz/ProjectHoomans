@@ -25,6 +25,12 @@ local function setCombatDebug(value)
     PNC.SettingsStore:Set("showCombatDebug", value, true)
 end
 
+local function setAnimationDebug(value)
+    value = value == true
+    PNC.Nameplates.Settings.showAnimationDebug = value
+    PNC.SettingsStore:Set("showAnimationDebug", value, true)
+end
+
 local function debugPartControl(id, label)
     return {
         id = id,
@@ -66,6 +72,15 @@ Registry.Register({
                 return PNC.Nameplates.Settings.showCombatDebug == true
             end,
             set = setCombatDebug,
+        },
+        {
+            id = "showAnimationDebug",
+            type = "boolean",
+            label = "Show live NPC animation tracks",
+            get = function()
+                return PNC.Nameplates.Settings.showAnimationDebug == true
+            end,
+            set = setAnimationDebug,
         },
         debugPartControl("debugShowPresence", "Overlay: presence/body binding"),
         debugPartControl("debugShowAI", "Overlay: AI state"),

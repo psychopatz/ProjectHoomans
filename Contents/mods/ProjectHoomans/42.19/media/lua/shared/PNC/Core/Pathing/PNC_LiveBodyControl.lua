@@ -23,6 +23,8 @@ local ZOMBIE_VOICE_SOUNDS = {
     "MaleZombieVoiceC",
 }
 local SUPPRESSED_STATES = {
+    ["attack"] = true,
+    ["attack-network"] = true,
     ["getup"] = true,
     ["getup-fromonback"] = true,
     ["getup-fromonfront"] = true,
@@ -40,6 +42,8 @@ local SUPPRESSED_STATES = {
 }
 
 local IDLE_RESET_STATES = {
+    ["attack"] = true,
+    ["attack-network"] = true,
     ["getup"] = true,
     ["getup-fromonback"] = true,
     ["getup-fromonfront"] = true,
@@ -176,6 +180,8 @@ function LiveBodyControl.ReleaseDamageReaction(zombie, actionState)
         modData.PNC_BumpReleaseAt = nil
         modData.PNC_BumpActionLease = nil
         modData.PNC_BumpActionLeaseUntil = nil
+        modData.PNC_BumpActionLeaseStartedAt = nil
+        modData.PNC_BumpRequestedType = nil
         modData.PNC_BumpKeepUseless = nil
     end
     if PNC.AnimationTrace and PNC.AnimationTrace.Sample then
@@ -225,19 +231,27 @@ function LiveBodyControl.SetManagedBodyUseless(
     requestedUseless,
     keepEngineMovementActive
 )
+    local desiredUseless
     if not zombie or not zombie.setUseless then
         return false
     end
     -- Native PathFindState and the bumped ActionContext both need a useful
     -- IsoZombie. Multiplayer is not itself a lease: callers explicitly keep
     -- the engine active only while it owns pathing or a scripted bump clip.
-    if keepEngineMovementActive == true then
-        zombie:setUseless(false)
-        return false
+    desiredUseless = keepEngineMovementActive ~= true
+        and requestedUseless == true
+        or false
+    -- setUseless() is not a harmless flag assignment on IsoZombie. Repeating
+    -- it while BumpedState is entering can rebuild the action context and
+    -- discard the selected PNC clip. The safety pass runs every zombie update,
+    -- so make this body-mode write strictly edge-triggered.
+    if zombie.isUseless
+        and zombie:isUseless() == desiredUseless
+    then
+        return desiredUseless
     end
-    requestedUseless = requestedUseless == true
-    zombie:setUseless(requestedUseless)
-    return requestedUseless
+    zombie:setUseless(desiredUseless)
+    return desiredUseless
 end
 
 function LiveBodyControl.SuppressVanillaIntent(
@@ -384,13 +398,55 @@ function LiveBodyControl.MaintainHumanizedBody(
     now,
     keepEngineMovementActive
 )
+    local descriptor
+    local modData
     local nextAudioAt
+    local actionLeaseActive
     if not zombie then return false end
-    LiveBodyControl.ApplyHumanizedBodyFlags(
-        zombie,
-        keepEngineMovementActive
-    )
     now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
+    modData = zombie.getModData and zombie:getModData() or nil
+    actionLeaseActive = modData
+        and modData.PNC_BumpActionLease == true
+        and now <= (
+            tonumber(modData.PNC_BumpActionLeaseUntil)
+                or now
+        )
+        or false
+    if actionLeaseActive then
+        -- During a PNC special action, do not repeatedly write prone, crawler,
+        -- fall, or usefulness setters. Those setters are appropriate while
+        -- repairing an idle zombie shell, but can make BumpedState exit on the
+        -- very frame its XML node is selected. Keep only safeguards that do
+        -- not own the action graph.
+        clearVanillaIntent(zombie)
+        if zombie.setVariable then
+            zombie:setVariable("NoLungeTarget", true)
+            zombie:setVariable("NoLungeAttack", true)
+            zombie:setVariable("PNCLive", true)
+        end
+        if zombie.setNoTeeth then
+            zombie:setNoTeeth(true)
+        end
+        if zombie.setReanimatedForGrappleOnly then
+            zombie:setReanimatedForGrappleOnly(false)
+        end
+        if zombie.getDescriptor then
+            descriptor = zombie:getDescriptor()
+            if descriptor and descriptor.setVoicePrefix then
+                descriptor:setVoicePrefix("NotAZombie")
+            end
+        end
+        LiveBodyControl.SetManagedBodyUseless(
+            zombie,
+            modData.PNC_BumpKeepUseless == true,
+            modData.PNC_BumpKeepUseless ~= true
+        )
+    else
+        LiveBodyControl.ApplyHumanizedBodyFlags(
+            zombie,
+            keepEngineMovementActive
+        )
+    end
     nextAudioAt = tonumber(NEXT_AUDIO_SUPPRESSION_AT[zombie]) or 0
     if now >= nextAudioAt then
         LiveBodyControl.SuppressZombieSounds(zombie)
@@ -421,6 +477,8 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
         end
         modData.PNC_BumpActionLease = nil
         modData.PNC_BumpActionLeaseUntil = nil
+        modData.PNC_BumpActionLeaseStartedAt = nil
+        modData.PNC_BumpRequestedType = nil
         modData.PNC_BumpKeepUseless = nil
     end
     if Core and Core.IsAuthority and not Core.IsAuthority() then
@@ -441,6 +499,7 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
 end
 
 function LiveBodyControl.EnforceManagedSafety(zombie, source)
+    local actionState
     local hadTarget
     local wasUseless
     local hadTeeth
@@ -471,6 +530,20 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         Core.Now and Core.Now() or 0,
         keepEngineMovementActive
     )
+    actionState = LiveBodyControl.GetActionStateName(zombie)
+    -- PNC weapon actions live in BumpedState. A managed body reaching the
+    -- vanilla zombie attack/lunge graph outside an engine lease has escaped
+    -- presentation ownership; that graph has no PNC walk nodes and produces
+    -- Bob_Idle sliding while fake locomotion continues.
+    if not keepEngineMovementActive
+        and LiveBodyControl.IsSuppressedActionState(actionState)
+    then
+        LiveBodyControl.SuppressZombieState(
+            zombie,
+            nil,
+            Core.Now and Core.Now() or 0
+        )
+    end
     if (
             hadTarget
             or (not wasUseless and not keepEngineMovementActive)

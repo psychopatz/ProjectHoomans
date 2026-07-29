@@ -57,6 +57,9 @@ function Lifecycle.BuildDiagnostics(record)
         hpMax = record.health and record.health.max or nil,
         targetKind = record.runtime and record.runtime.targetKind or "none",
         combatBlockReason = record.runtime and record.runtime.combatBlockReason or nil,
+        attackType = record.attackType or "auto",
+        hostility = Core.DeepCopy(record.hostility or {}),
+        equipment = Core.DeepCopy(record.equipment or {}),
         mapPresentation = PNC.MapPresentation
             and PNC.MapPresentation.BuildSummary(record.mapPresentation)
             or nil,

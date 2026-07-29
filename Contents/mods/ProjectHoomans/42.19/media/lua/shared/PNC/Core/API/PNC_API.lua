@@ -446,6 +446,47 @@ function API.DebugCommand(npcId, command, args)
         applied, applyReason = applyLiveEquipment(record, "equipment")
         return applied ~= false
     end
+    if command == "set_equipment_slot" then
+        local slotKind = tostring(args and args.slotKind or "")
+        local slotName = tostring(args and args.slotName or "")
+        local itemType = args and args.fullType or nil
+        if itemType ~= nil and tostring(itemType) == "" then itemType = nil end
+        if slotKind == "primary" then
+            Equipment.SetPrimary(record, itemType)
+        elseif slotKind == "secondary" then
+            Equipment.SetSecondary(record, itemType)
+        elseif slotKind == "attached" and slotName ~= "" then
+            Equipment.SetAttached(record, slotName, itemType)
+        elseif slotKind == "worn" and slotName ~= "" then
+            Equipment.SetWorn(record, slotName, itemType)
+        else
+            return false
+        end
+        if Inventory and Inventory.SyncFromEquipment then
+            Inventory.SyncFromEquipment(record, "debug_equipment_slot")
+        end
+        record.weaponMode = record.equipment
+            and record.equipment.primaryFullType
+            and Equipment.ResolveWeaponMode(
+                record.equipment.primaryFullType
+            )
+            or "melee"
+        Registry.MarkDirty(record, "equipment")
+        applied, applyReason = applyLiveEquipment(record, "equipment")
+        Network.BroadcastRecord(record, "equipment")
+        return applied ~= false
+    end
+    if command == "clear_equipment" then
+        applied = API.SetLoadout(npcId, {
+            worn = {},
+            attached = {},
+        })
+        if applied then
+            Registry.MarkDirty(record, "equipment")
+            Network.BroadcastRecord(record, "equipment")
+        end
+        return applied
+    end
     if command == "toggle_debug" then
         record.runtime = record.runtime or {}
         record.runtime.debug = record.runtime.debug ~= true

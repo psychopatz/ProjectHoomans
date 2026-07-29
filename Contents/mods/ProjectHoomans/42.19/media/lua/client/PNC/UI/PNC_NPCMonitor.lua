@@ -129,6 +129,21 @@ function ISPNCNPCMonitor:onCombatOverlay()
     end
 end
 
+function ISPNCNPCMonitor:onAnimationOverlay()
+    if not PNC.Nameplates
+        or not PNC.Nameplates.ToggleAnimationDebug
+    then
+        return
+    end
+    local enabled = PNC.Nameplates.ToggleAnimationDebug()
+    if self.animationOverlayButton then
+        UI.SetButtonVariant(
+            self.animationOverlayButton,
+            enabled and "selected" or "quiet"
+        )
+    end
+end
+
 local function newSubMenu(context, title)
     local option = context:addOption(title)
     local submenu = ISContextMenu:getNew(context)
@@ -143,6 +158,160 @@ local function sendMapDebug(window, item, action, payload)
         PNC.Client.SendDebug(action, payload)
     end
     window:requestRoster(false)
+end
+
+local EQUIPMENT_PRESETS = {
+    primary = {
+        { "Hammer", "Base.Hammer" },
+        { "Kitchen Knife", "Base.KitchenKnife" },
+        { "Baseball Bat", "Base.BaseballBat" },
+        { "Crowbar", "Base.Crowbar" },
+        { "Hand Axe", "Base.HandAxe" },
+        { "Pipe Wrench", "Base.PipeWrench" },
+        { "Shovel", "Base.Shovel" },
+        { "Pistol", "Base.Pistol" },
+        { "Revolver", "Base.Revolver" },
+        { "Double Barrel Shotgun", "Base.DoubleBarrelShotgun" },
+    },
+    back = {
+        { "Schoolbag", "Base.Bag_Schoolbag" },
+        { "Duffel Bag", "Base.Bag_DuffelBag" },
+        { "Hiking Bag", "Base.Bag_BigHikingBag" },
+        { "ALICE Pack", "Base.Bag_ALICEpack" },
+        { "Baseball Bat", "Base.BaseballBat" },
+        { "Crowbar", "Base.Crowbar" },
+        { "Shovel", "Base.Shovel" },
+        { "Shotgun", "Base.DoubleBarrelShotgun" },
+    },
+    belt = {
+        { "Hammer", "Base.Hammer" },
+        { "Kitchen Knife", "Base.KitchenKnife" },
+        { "Hand Axe", "Base.HandAxe" },
+        { "Pipe Wrench", "Base.PipeWrench" },
+        { "Pistol", "Base.Pistol" },
+    },
+}
+
+local function sendEquipmentDebug(
+    window,
+    item,
+    slotKind,
+    slotName,
+    fullType
+)
+    sendMapDebug(window, item, "set_equipment_slot", {
+        slotKind = slotKind,
+        slotName = slotName,
+        fullType = fullType,
+    })
+end
+
+local function addEquipmentSlotMenu(
+    window,
+    context,
+    item,
+    title,
+    slotKind,
+    slotName,
+    presets
+)
+    local submenu = newSubMenu(context, title)
+    submenu:addOption("Clear slot", nil, function()
+        sendEquipmentDebug(
+            window,
+            item,
+            slotKind,
+            slotName,
+            nil
+        )
+    end)
+    for _, preset in ipairs(presets or {}) do
+        local label = preset[1]
+        local fullType = preset[2]
+        submenu:addOption(label, nil, function()
+            sendEquipmentDebug(
+                window,
+                item,
+                slotKind,
+                slotName,
+                fullType
+            )
+        end)
+    end
+    return submenu
+end
+
+function ISPNCNPCMonitor:onEquipment(button)
+    local item = self:getSelectedDiagnostic()
+    local context
+    local x
+    local y
+    if not item or not button then return end
+    x = button.getAbsoluteX and button:getAbsoluteX() or getMouseX()
+    y = button.getAbsoluteY and (
+        button:getAbsoluteY()
+            + (button.getHeight and button:getHeight()
+                or button.height or 0)
+    ) or getMouseY()
+    context = ISContextMenu.get(0, x, y)
+    context:addOption("Copy my complete loadout", nil, function()
+        sendMapDebug(self, item, "copy_player_loadout", {})
+    end)
+    context:addOption("Copy my held weapon", nil, function()
+        local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+        local held = player and player.getPrimaryHandItem
+            and player:getPrimaryHandItem() or nil
+        sendMapDebug(self, item, "copy_held_weapon", {
+            weaponFullType = held and held.getFullType
+                and held:getFullType() or nil,
+        })
+    end)
+    context:addOption("Clear complete loadout", nil, function()
+        sendMapDebug(self, item, "clear_equipment", {})
+    end)
+    addEquipmentSlotMenu(
+        self,
+        context,
+        item,
+        "Primary hand",
+        "primary",
+        "",
+        EQUIPMENT_PRESETS.primary
+    )
+    addEquipmentSlotMenu(
+        self,
+        context,
+        item,
+        "Secondary hand",
+        "secondary",
+        "",
+        EQUIPMENT_PRESETS.belt
+    )
+    addEquipmentSlotMenu(
+        self,
+        context,
+        item,
+        "Back / bag",
+        "attached",
+        "Back",
+        EQUIPMENT_PRESETS.back
+    )
+    for _, slot in ipairs({
+        { "Right holster", "HolsterRight" },
+        { "Left holster", "HolsterLeft" },
+        { "Left belt", "SmallBeltLeft" },
+        { "Right belt", "SmallBeltRight" },
+    }) do
+        addEquipmentSlotMenu(
+            self,
+            context,
+            item,
+            slot[1],
+            "attached",
+            slot[2],
+            EQUIPMENT_PRESETS.belt
+        )
+    end
 end
 
 function ISPNCNPCMonitor:onMapMarker(button)

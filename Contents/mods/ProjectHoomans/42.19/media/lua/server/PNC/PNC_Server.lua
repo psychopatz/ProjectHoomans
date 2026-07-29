@@ -573,6 +573,16 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if args and args.action == "set_equipment_slot" then
+        API.DebugCommand(args.id, "set_equipment_slot", args)
+        return
+    end
+
+    if args and args.action == "clear_equipment" then
+        API.DebugCommand(args.id, "clear_equipment", args)
+        return
+    end
+
     if args and args.action == "toggle_debug" then
         API.DebugCommand(args.id, "toggle_debug", args)
         return

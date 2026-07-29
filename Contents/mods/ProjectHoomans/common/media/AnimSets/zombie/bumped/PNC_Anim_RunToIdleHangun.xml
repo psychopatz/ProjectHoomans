@@ -14,7 +14,7 @@
 	<m_Conditions>
 		<m_Name>BumpType</m_Name>
 		<m_Type>STRING</m_Type>
-		<m_StringValue>RunToIdle</m_StringValue>
+		<m_StringValue>PNC_RunToIdle</m_StringValue>
 	</m_Conditions>
 	<m_Conditions>
 		<m_Name>PNCPrimaryType</m_Name>

@@ -6,9 +6,11 @@ local PATH_MOTION =
     "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Pathing/"
     .. "PNC_PathService/PNC_PathService_Motion.lua"
 local ATTACK_XML =
-    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Anim_Attack1H1.xml"
+    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Attack1H1.xml"
 local ATTACK_VARIANT_XML =
-    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Anim_Attack1H2.xml"
+    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Attack1H2.xml"
+local SHOVE_VARIANT_XML =
+    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_ShoveBat.xml"
 
 local function readAll(path)
     local file = assert(io.open(path, "rb"))
@@ -28,6 +30,7 @@ local clientSync = readAll(CLIENT_SYNC)
 local pathMotion = readAll(PATH_MOTION)
 local attackXML = readAll(ATTACK_XML)
 local attackVariantXML = readAll(ATTACK_VARIANT_XML)
+local shoveVariantXML = readAll(SHOVE_VARIANT_XML)
 local clientAttackPresentation = assert(string.match(
     clientSync,
     "    attackKey =.-\n    specialKey ="
@@ -71,6 +74,21 @@ assertContains(
     playBump,
     'zombie:setVariable("BumpFallType", "")',
     "known-good bump fall type"
+)
+assertContains(
+    playBump,
+    'zombie:setVariable("PNCAttackVariationX", "1.0")',
+    "private melee X blend scalar"
+)
+assertContains(
+    playBump,
+    'zombie:setVariable("PNCAttackVariationY", "0.0")',
+    "private melee Y blend scalar"
+)
+assertContains(
+    playBump,
+    'zombie:setVariable("BumpAnimFinished", false)',
+    "stale bump completion latch reset"
 )
 assert(
     not string.find(
@@ -121,8 +139,22 @@ assertContains(
 )
 assertContains(
     attackXML,
-    "<m_StringValue>Attack1H1</m_StringValue>",
-    "Bandits-compatible attack node bump type"
+    "<m_StringValue>PNC_Attack1H1</m_StringValue>",
+    "PNC-namespaced Bandits attack node bump type"
+)
+assertContains(
+    attackXML,
+    "<m_Scalar>PNCAttackVariationX</m_Scalar>",
+    "PNC-private attack blend scalar"
+)
+assertContains(
+    attackXML,
+    "<m_Scalar2>PNCAttackVariationY</m_Scalar2>",
+    "PNC-private secondary attack blend scalar"
+)
+assert(
+    not string.find(attackXML, "Bandit", 1, true),
+    "Bandits identifier leaked into canonical PNC combat XML"
 )
 assertContains(
     attackXML,
@@ -135,14 +167,23 @@ assertContains(
     "Bandits-compatible second one-handed melee animation"
 )
 assertContains(
+    shoveVariantXML,
+    "<m_Name>PNCPrimaryType</m_Name>",
+    "Bandits shove weapon selector renamed for PNC"
+)
+assert(
+    not string.find(shoveVariantXML, "BanditPrimaryType", 1, true),
+    "Bandits-only shove selector leaked into PNC XML"
+)
+assertContains(
     combat,
     'onehanded = { "PNC_Attack1H1", "PNC_Attack1H2" }',
     "namespaced network melee vocabulary"
 )
 assertContains(
     animation,
-    'PNC_Attack1H1 = "Attack1H1"',
-    "network-to-engine attack bump translation"
+    "PNC_Attack1H1 = true",
+    "namespaced combat bump ownership"
 )
 assert(
     not string.find(combat, "Animation.PlayBump", 1, true),

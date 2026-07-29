@@ -229,9 +229,8 @@ function Perception.IsTargetThreatening(record, target)
             and Registry.GetLiveZombie(record.id)
             or nil
         if targetBody and observerBody and targetBody.getTarget then
-            local ok
-            ok, engineTarget = pcall(targetBody.getTarget, targetBody)
-            return ok and engineTarget == observerBody
+            engineTarget = targetBody:getTarget()
+            return engineTarget == observerBody
         end
     end
     return false
@@ -470,6 +469,41 @@ function Perception.FindNearestEnemyZombie(record, radius)
     return best
 end
 
+-- A nearby zombie is actionable even when LosUtil has not produced a usable
+-- result on the authoritative MP server yet. This reads the already-cached
+-- spatial frame and is deliberately short range, so it neither adds another
+-- world scan nor turns distant zombies behind buildings into targets.
+function Perception.FindImmediateEnemyZombie(record, radius)
+    local frame
+    local entries
+    local entry
+    local i
+    local limit = tonumber(radius)
+        or tonumber(Const.TARGET_IMMEDIATE_THREAT_RADIUS)
+        or 4
+    local limitSq = limit * limit
+    if not record
+        or record.hostility and record.hostility.attackZombies == false
+        or not Perception.GetZombieFrame
+    then
+        return nil
+    end
+    frame = Perception.GetZombieFrame(record, limit)
+    entries = frame and frame.entries or nil
+    for i = 1, #(entries or {}) do
+        entry = entries[i]
+        if entry and entry.zombie and entry.distSq <= limitSq then
+            return buildZombieTarget(
+                record,
+                entry.zombie,
+                entry.distSq,
+                "proximity"
+            )
+        end
+    end
+    return nil
+end
+
 function Perception.FindBestEnemyZombie(record, radius)
     local candidates
     local best
@@ -582,7 +616,6 @@ local function ownerThreatCacheKey(owner)
 end
 
 local function buildOwnerThreatTarget(record, owner, zombie)
-    local ok
     local engineTarget
     local candidate
     if not zombie or zombie:isDead()
@@ -592,8 +625,8 @@ local function buildOwnerThreatTarget(record, owner, zombie)
     then
         return nil
     end
-    ok, engineTarget = pcall(zombie.getTarget, zombie)
-    if not ok or engineTarget ~= owner then
+    engineTarget = zombie:getTarget()
+    if engineTarget ~= owner then
         return nil
     end
     candidate = buildZombieTarget(
@@ -621,7 +654,6 @@ local function findZombieTargetingOwner(record, owner, radius)
     local radiusSq
     local i
     local zombie
-    local ok
     local engineTarget
     local ownerDistSq
     local now
@@ -657,8 +689,8 @@ local function findZombieTargetingOwner(record, owner, radius)
             and math.abs(zombie:getZ() - owner:getZ()) < 1
             and zombie.getTarget
         then
-            ok, engineTarget = pcall(zombie.getTarget, zombie)
-            if ok and engineTarget == owner then
+            engineTarget = zombie:getTarget()
+            if engineTarget == owner then
                 ownerDistSq = Core.DistanceSq(
                     owner:getX(),
                     owner:getY(),
@@ -694,9 +726,16 @@ function Perception.ResolveCompanionTarget(record)
     local zombieTarget
     local hostileToOwnerNPC
     local hostileToOwnerZombie
+    local immediateZombie
     local defenseRadius = getCompanionDefenseRadius()
 
     owner = Core.ResolvePlayerByOnlineID(record.ownerOnlineID) or Core.ResolvePlayerByUsername(record.ownerUsername)
+    if not record.hostility or record.hostility.attackZombies ~= false then
+        immediateZombie = Perception.FindImmediateEnemyZombie(record)
+        if immediateZombie then
+            return immediateZombie
+        end
+    end
     if owner and (not record.hostility or record.hostility.attackZombies ~= false) then
         ownerThreatZombie = findZombieTargetingOwner(
             record,

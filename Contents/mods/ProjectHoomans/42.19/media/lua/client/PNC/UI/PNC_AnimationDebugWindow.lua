@@ -487,6 +487,13 @@ function ISPNCAnimationDebugWindow:refreshDetails(force)
     )
     addDetail(
         self.details,
+        "Track frame @ 30 FPS",
+        runtime.trackFrame ~= nil
+            and tostring(runtime.trackFrame)
+            or "-"
+    )
+    addDetail(
+        self.details,
         "Last result",
         runtime.result
             and (
