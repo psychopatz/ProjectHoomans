@@ -538,6 +538,16 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if args and (
+        args.action == "animation_scene_play"
+        or args.action == "animation_scene_pool_step"
+        or args.action == "animation_scene_pool_start"
+        or args.action == "animation_scene_stop"
+    ) then
+        API.DebugCommand(args.id, args.action, args)
+        return
+    end
+
     if args and args.action == "set_map_presentation" then
         API.DebugCommand(args.id, "set_map_presentation", args)
         return

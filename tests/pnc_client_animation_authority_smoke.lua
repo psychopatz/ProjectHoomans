@@ -355,4 +355,64 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
 assert(calls.finish == finishesBeforeTreatment + 1,
     "MP treatment completion did not release its bandage animation")
 
+local sceneBody = body()
+local sceneSnapshot = {
+    id = "scene_replica",
+    alive = true,
+    attackMode = false,
+    healthState = "normal",
+    presenceRevision = 1,
+    presenceState = "live",
+    visualState = {
+        anim = "Surrender",
+        moving = false,
+        sceneActive = true,
+        sceneId = "social.surrender",
+        sceneBump = "Surrender",
+        sceneRevision = 4,
+        sceneStartedAt = 3000,
+        sceneFinishAt = 0,
+        sceneLoop = true,
+        sceneBlocking = true,
+    },
+}
+local playsBeforeScene = calls.play
+local maintainsBeforeScene = calls.maintain
+local finishesBeforeScene = calls.finish
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    sceneSnapshot,
+    sceneBody,
+    true
+)
+assert(calls.play == playsBeforeScene + 1,
+    "MP animation scene did not start its registered bump")
+assert(sceneBody:getModData().PNC_ClientAnimationSceneKey
+        == "social.surrender:4",
+    "MP animation scene key was not retained")
+assert(engineMovementActive == true,
+    "MP animation scene did not retain engine action updates")
+
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    sceneSnapshot,
+    sceneBody,
+    true
+)
+assert(calls.play == playsBeforeScene + 1,
+    "unchanged MP animation scene restarted")
+assert(calls.maintain == maintainsBeforeScene + 1,
+    "looping MP animation scene was not maintained")
+
+sceneSnapshot.visualState = {
+    anim = "Idle",
+    moving = false,
+    sceneActive = false,
+}
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    sceneSnapshot,
+    sceneBody,
+    true
+)
+assert(calls.finish == finishesBeforeScene + 1,
+    "MP animation scene did not release on stop")
+
 print("pnc_client_animation_authority_smoke: ok")

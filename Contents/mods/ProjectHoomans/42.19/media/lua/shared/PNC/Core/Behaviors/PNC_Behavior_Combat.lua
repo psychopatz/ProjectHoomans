@@ -73,6 +73,20 @@ function BehaviorCombat.TickCommittedAction(record, zombie)
 end
 
 function BehaviorCombat.TickEngage(record, zombie, target)
+    local scene = record and record.runtime
+        and record.runtime.animationScene or nil
+    if scene and scene.blocking == true then
+        return true
+    end
+    if PNC.AnimationScenes
+        and PNC.AnimationScenes.Interrupt
+    then
+        PNC.AnimationScenes.Interrupt(
+            record,
+            zombie,
+            "combat"
+        )
+    end
     if not Engagement or not Engagement.Tick then
         return false
     end

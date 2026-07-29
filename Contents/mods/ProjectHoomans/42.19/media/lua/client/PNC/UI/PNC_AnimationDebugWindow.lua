@@ -245,6 +245,7 @@ function ISPNCAnimationDebugWindow:createChildren()
         { "finish", "Finish Event", "onFinish", "quiet" },
         { "stop", "Stop / Restore", "onStop", "danger" },
         { "dump", "Dump Trace", "onDump", "quiet" },
+        { "scenes", "Scene Lab", "onScenes", "selected" },
     }
     for _, definition in ipairs(definitions) do
         local button = UI.CreateButton(self, {
@@ -564,6 +565,22 @@ end
 function ISPNCAnimationDebugWindow:onDump()
     DebugPlayer.Dump()
     self:refreshDetails(true)
+end
+
+function ISPNCAnimationDebugWindow:onScenes()
+    if not PNC.AnimationSceneDebugWindow then
+        require "PNC/UI/PNC_AnimationSceneDebugWindow"
+    end
+    if PNC.AnimationSceneDebugWindow
+        and PNC.AnimationSceneDebugWindow.Open
+    then
+        PNC.AnimationSceneDebugWindow.Open({
+            id = self.npcId,
+            name = self.npcName,
+            zombie = self:resolveBody(),
+            record = self.record,
+        })
+    end
 end
 
 function ISPNCAnimationDebugWindow:prerender()

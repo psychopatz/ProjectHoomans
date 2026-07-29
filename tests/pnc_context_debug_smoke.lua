@@ -104,6 +104,11 @@ assertEqual(findOption(debugMenu, "Debug Bandage All (Free)") ~= nil, true,
     "missing translation falls back to readable bandage-all label")
 assertEqual(findOption(debugMenu, "Orders") ~= nil, true, "debug orders remain available")
 assertEqual(findOption(debugMenu, "Combat") ~= nil, true, "debug combat controls remain available")
+assertEqual(
+    findOption(debugMenu, "Animation Scene Lab") ~= nil,
+    true,
+    "scene lab is available from the NPC debug submenu"
+)
 local infectionOption = findOption(debugMenu, "Infection")
 assertEqual(infectionOption ~= nil, true, "infection debug submenu missing")
 local clearOption = findOption(infectionOption.submenu, "Clear Knox Infection")

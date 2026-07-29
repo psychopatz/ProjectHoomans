@@ -284,6 +284,26 @@ assertEqual(deathSnapshot.portrait.identitySeed, 88,
     "death marker snapshot omitted compact portrait")
 
 assertEqual(PNC.Network.BuildSnapshot(nearbyRecord).attackMode, false, "idle snapshot attack mode")
+nearbyRecord.runtime.animationScene = {
+    id = "social.surrender",
+    bump = "Surrender",
+    revision = 4,
+    startedAt = 1900,
+    finishAt = 0,
+    loop = true,
+    blocking = true,
+    priority = 80,
+}
+local sceneSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
+assertEqual(sceneSnapshot.visualState.sceneActive, true,
+    "animation scene omitted from visual snapshot")
+assertEqual(sceneSnapshot.visualState.sceneId, "social.surrender",
+    "animation scene ID snapshot")
+assertEqual(sceneSnapshot.visualState.sceneBump, "Surrender",
+    "animation scene selector snapshot")
+assertEqual(sceneSnapshot.visualState.sceneLoop, true,
+    "animation scene loop policy snapshot")
+nearbyRecord.runtime.animationScene = nil
 nearbyRecord.runtime.target = {
     kind = "zombie",
     zombieId = "z1",

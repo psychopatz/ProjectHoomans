@@ -227,6 +227,12 @@ local function buildMotionKey(snapshot)
         tostring(treatment.partId or ""),
         tostring(treatment.startedAt or 0),
         tostring(treatment.finishAt or 0),
+        tostring(visualState.sceneActive == true),
+        tostring(visualState.sceneId or ""),
+        tostring(visualState.sceneBump or ""),
+        tostring(visualState.sceneRevision or 0),
+        tostring(visualState.sceneFinishAt or 0),
+        tostring(visualState.sceneLoop == true),
     }, "|")
 end
 
@@ -351,6 +357,86 @@ local function syncTreatmentAnimation(
     return true, false
 end
 
+local function getScenePresentation(snapshot, now)
+    local visualState = snapshot and snapshot.visualState or {}
+    local finishAt
+    local leaseUntil
+    if visualState.sceneActive ~= true
+        or tostring(visualState.sceneId or "") == ""
+        or tostring(visualState.sceneBump or "") == ""
+    then
+        return nil
+    end
+    finishAt = tonumber(visualState.sceneFinishAt) or 0
+    leaseUntil = finishAt
+    if visualState.sceneLoop == true and finishAt <= 0 then
+        leaseUntil = now + 10000
+    end
+    return {
+        key = tostring(visualState.sceneId)
+            .. ":" .. tostring(
+                visualState.sceneRevision or 0
+            ),
+        id = tostring(visualState.sceneId),
+        bump = tostring(visualState.sceneBump),
+        loop = visualState.sceneLoop == true,
+        finishAt = finishAt,
+        leaseUntil = leaseUntil,
+    }
+end
+
+local function syncAnimationScene(
+    zombie,
+    recordView,
+    modData,
+    presentation
+)
+    if not modData then
+        return presentation ~= nil, false
+    end
+    if not presentation then
+        if modData.PNC_ClientAnimationSceneKey == nil then
+            return false, false
+        end
+        if Animation and Animation.FinishBump then
+            Animation.FinishBump(zombie, true)
+        end
+        modData.PNC_ClientAnimationSceneKey = nil
+        return false, true
+    end
+    if modData.PNC_ClientAnimationSceneKey
+        ~= presentation.key
+    then
+        if Animation and Animation.PlayBump then
+            Animation.PlayBump(
+                zombie,
+                recordView,
+                presentation.bump,
+                {
+                    sceneId = presentation.id,
+                    leaseUntil = presentation.leaseUntil,
+                }
+            )
+        end
+        modData.PNC_ClientAnimationSceneKey =
+            presentation.key
+    elseif presentation.loop
+        and Animation
+        and Animation.MaintainBump
+    then
+        Animation.MaintainBump(
+            zombie,
+            recordView,
+            presentation.bump,
+            presentation.leaseUntil,
+            {
+                sceneId = presentation.id,
+            }
+        )
+    end
+    return true, false
+end
+
 local function applyIdentityVars(zombie, snapshot)
     if not zombie or not zombie.setVariable then
         return
@@ -378,6 +464,9 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     local treatmentPresentation
     local treatmentActive
     local treatmentReleased
+    local scenePresentation
+    local sceneActive
+    local sceneReleased
     local now
     if not snapshot or not zombie or (zombie.isDead and zombie:isDead()) then
         return
@@ -391,6 +480,8 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     now = Core and Core.Now and Core.Now() or 0
     treatmentPresentation = getTreatmentPresentation(snapshot)
     treatmentActive = treatmentPresentation ~= nil
+    scenePresentation = getScenePresentation(snapshot, now)
+    sceneActive = scenePresentation ~= nil
     -- The animation player is an explicitly selected, client-local debug
     -- owner. While it is active, snapshots may keep identity current but must
     -- not rewrite animation variables or replay locomotion over the requested
@@ -452,6 +543,7 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
             or visualState.nativeTraversalActive == true
             or visualState.attackActive == true
             or treatmentActive
+            or sceneActive
             or modData and modData.PNC_BumpActionLease == true
             or modData and modData.PNC_BumpReleasePending == true
         )
@@ -612,6 +704,7 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     -- locomotion, facing, and traversal presentation.
     if attackKey and modData and modData.PNC_ClientAttackKey ~= attackKey then
         modData.PNC_ClientTreatmentAnimKey = nil
+        modData.PNC_ClientAnimationSceneKey = nil
         beginClientAttackBump(
             snapshot,
             zombie,
@@ -659,6 +752,9 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
         return
     end
 
+    if treatmentPresentation and modData then
+        modData.PNC_ClientAnimationSceneKey = nil
+    end
     treatmentActive, treatmentReleased =
         syncTreatmentAnimation(
             zombie,
@@ -667,6 +763,21 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
             treatmentPresentation
         )
     if treatmentActive or treatmentReleased then
+        if modData then
+            modData.PNC_ClientMotionKey = motionKey
+            modData.PNC_ClientLocomotionMaintainAt = nil
+        end
+        return
+    end
+
+    sceneActive, sceneReleased =
+        syncAnimationScene(
+            zombie,
+            recordView,
+            modData,
+            scenePresentation
+        )
+    if sceneActive or sceneReleased then
         if modData then
             modData.PNC_ClientMotionKey = motionKey
             modData.PNC_ClientLocomotionMaintainAt = nil

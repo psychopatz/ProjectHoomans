@@ -143,6 +143,9 @@ local function buildVisualState(record)
     local navigation = runtime
         and runtime.localNavigation or nil
     local attack = runtime and runtime.attackAction or nil
+    local scene = runtime and runtime.animationScene or nil
+    local sceneDebug = runtime
+        and runtime.animationSceneDebug or nil
     local now = Core.Now()
     local healthState = record and record.health and tostring(record.health.state or "normal") or "normal"
     local moving = path and (
@@ -156,6 +159,11 @@ local function buildVisualState(record)
     local engineWalkType = moving and tostring(path.engineWalkType or "") or ""
     local anim = "Idle"
     local attackActive = attack ~= nil and now < (tonumber(attack.finishAt) or 0)
+    local sceneActive = scene ~= nil
+        and (
+            (tonumber(scene.finishAt) or 0) <= 0
+            or now < (tonumber(scene.finishAt) or 0)
+        )
     local specialActive = path ~= nil and now < (tonumber(path.specialMoveUntil) or 0)
     local nativeTraversalState = navigation
         and navigation.nativeTraversalState or nil
@@ -204,6 +212,14 @@ local function buildVisualState(record)
         engineWalkType = ""
     end
 
+    if sceneActive and scene and scene.bump then
+        anim = tostring(scene.bump)
+        moving = false
+        walkType = ""
+        moveAnim = ""
+        engineWalkType = ""
+    end
+
     if attackActive and attack and attack.anim then
         anim = tostring(attack.anim)
     end
@@ -234,6 +250,32 @@ local function buildVisualState(record)
         specialActive = specialActive,
         specialAnim = specialActive and path and path.specialAnim or nil,
         specialFinishAt = specialActive and path and path.specialMoveUntil or 0,
+        sceneActive = sceneActive,
+        sceneId = sceneActive and scene and scene.id or nil,
+        sceneBump = sceneActive and scene and scene.bump or nil,
+        sceneRevision = sceneActive
+            and scene and scene.revision or 0,
+        sceneStartedAt = sceneActive
+            and scene and scene.startedAt or 0,
+        sceneFinishAt = sceneActive
+            and scene and scene.finishAt or 0,
+        sceneLoop = sceneActive
+            and scene and scene.loop == true or false,
+        sceneBlocking = sceneActive
+            and scene and scene.blocking == true or false,
+        scenePriority = sceneActive
+            and scene and scene.priority or 0,
+        sceneDebug = sceneDebug and {
+            active = sceneDebug.active == true,
+            mode = sceneDebug.mode,
+            pool = sceneDebug.pool,
+            gapMs = sceneDebug.gapMs,
+            nextAt = sceneDebug.nextAt,
+            lastSceneId = sceneDebug.lastSceneId,
+            completedCount =
+                sceneDebug.completedCount,
+            lastError = sceneDebug.lastError,
+        } or nil,
         nativeTraversalActive = nativeTraversalActive,
         nativeTraversalState = nativeTraversalState,
         nativeMoveActive = nativeMoveActive,

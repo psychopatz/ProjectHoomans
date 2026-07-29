@@ -84,6 +84,16 @@ function Provider.addOptions(menu, entry, player, contextData)
             PNC.AnimationDebugWindow.Open(entry)
         end
     end)
+    menu:addOption("Animation Scene Lab", nil, function()
+        if not PNC.AnimationSceneDebugWindow then
+            require "PNC/UI/PNC_AnimationSceneDebugWindow"
+        end
+        if PNC.AnimationSceneDebugWindow
+            and PNC.AnimationSceneDebugWindow.Open
+        then
+            PNC.AnimationSceneDebugWindow.Open(entry)
+        end
+    end)
 
     snapshot = ClientState.snapshots and ClientState.snapshots[entry.id] or nil
     if snapshot and snapshot.healthState == "incapacitated" and snapshot.canRevive == true then

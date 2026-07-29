@@ -81,6 +81,15 @@ function Common.MoveRecord(
     local intentNavigation = navigationOptions
     local moveIntent
     if record.presenceState == Const.PRESENCE_LIVE then
+        if PNC.AnimationScenes
+            and PNC.AnimationScenes.Interrupt
+        then
+            PNC.AnimationScenes.Interrupt(
+                record,
+                zombie,
+                "movement"
+            )
+        end
         if NavigationRouter and NavigationRouter.Resolve then
             policyName, providerName, policy = NavigationRouter.Resolve(
                 record,

@@ -31,11 +31,19 @@ local Treatment = PNC.BehaviorTreatment
 local Companion = PNC.BehaviorCompanion
 local Hostile = PNC.BehaviorHostile
 local Combat = PNC.BehaviorCombat
+local AnimationScenes = PNC.AnimationScenes
 
 function Behavior.Tick(record, zombie, now)
     local job
 
     if record.alive == false then
+        if AnimationScenes and AnimationScenes.Stop then
+            AnimationScenes.Stop(
+                record,
+                zombie,
+                "npc_dead"
+            )
+        end
         record.activeJob = "Dead"
         record.activeBehavior = "Dead"
         Common.ClearCombatTarget(record, "dead")
@@ -46,6 +54,13 @@ function Behavior.Tick(record, zombie, now)
     end
 
     if record.health and record.health.state == "incapacitated" then
+        if AnimationScenes and AnimationScenes.Stop then
+            AnimationScenes.Stop(
+                record,
+                zombie,
+                "npc_incapacitated"
+            )
+        end
         Incapacitated.Tick(record, zombie)
         return
     end
@@ -55,6 +70,12 @@ function Behavior.Tick(record, zombie, now)
     -- that must not holster the weapon or abandon the animation in progress.
     if Combat and Combat.TickCommittedAction
         and Combat.TickCommittedAction(record, zombie)
+    then
+        return
+    end
+
+    if AnimationScenes and AnimationScenes.Tick
+        and AnimationScenes.Tick(record, zombie, now)
     then
         return
     end

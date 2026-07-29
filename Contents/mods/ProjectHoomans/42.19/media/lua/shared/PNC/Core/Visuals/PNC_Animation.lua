@@ -586,6 +586,16 @@ function Animation.PlayBump(zombie, record, bumpType, options)
     if not zombie then
         return false, "no_body"
     end
+    if (not options or options.sceneId == nil)
+        and PNC.AnimationScenes
+        and PNC.AnimationScenes.OnExternalBump
+    then
+        PNC.AnimationScenes.OnExternalBump(
+            record,
+            zombie,
+            bumpType
+        )
+    end
     now = Core and Core.Now and Core.Now() or 0
     resolvedBumpType = Animation.ResolveBumpType(bumpType)
     if AnimationTrace and AnimationTrace.Ensure then
@@ -734,7 +744,8 @@ function Animation.MaintainBump(
     zombie,
     record,
     bumpType,
-    leaseUntil
+    leaseUntil,
+    options
 )
     local modData
     local resolvedBumpType
@@ -765,6 +776,9 @@ function Animation.MaintainBump(
         bumpType,
         {
             leaseUntil = leaseUntil,
+            sceneId = options and options.sceneId or nil,
+            sceneRevision = options
+                and options.sceneRevision or nil,
         }
     )
 end

@@ -397,6 +397,72 @@ function API.DebugCommand(npcId, command, args)
     if command == "bandage_almost_dirty" then
         return API.DebugBandageAlmostDirty(npcId, args and args.partId)
     end
+    if command == "animation_scene_play" then
+        zombie = Registry.GetLiveZombie(npcId)
+        applied, applyReason =
+            PNC.AnimationSceneDebug.Play(
+                record,
+                zombie,
+                args and args.sceneId,
+                {
+                    durationMs = args and args.durationMs,
+                    reason = "debug_scene_command",
+                }
+            )
+        Network.BroadcastRecord(
+            record,
+            "animation_scene_debug"
+        )
+        return applied, applyReason
+    end
+    if command == "animation_scene_pool_step" then
+        zombie = Registry.GetLiveZombie(npcId)
+        applied, applyReason =
+            PNC.AnimationSceneDebug.PlayPoolOnce(
+                record,
+                zombie,
+                args and args.pool,
+                {
+                    reason = "debug_scene_pool_step",
+                }
+            )
+        Network.BroadcastRecord(
+            record,
+            "animation_scene_debug"
+        )
+        return applied, applyReason
+    end
+    if command == "animation_scene_pool_start" then
+        zombie = Registry.GetLiveZombie(npcId)
+        applied, applyReason =
+            PNC.AnimationSceneDebug.StartPoolCycle(
+                record,
+                zombie,
+                args and args.pool,
+                {
+                    gapMs = args and args.gapMs,
+                }
+            )
+        Network.BroadcastRecord(
+            record,
+            "animation_scene_debug"
+        )
+        return applied, applyReason
+    end
+    if command == "animation_scene_stop" then
+        zombie = Registry.GetLiveZombie(npcId)
+        applied, applyReason =
+            PNC.AnimationSceneDebug.Stop(
+                record,
+                zombie,
+                "debug_scene_command_stop"
+            )
+        Network.BroadcastRecord(
+            record,
+            "animation_scene_debug"
+        )
+        return applied, applyReason
+    end
     if command == "set_map_presentation" then
         return API.MapPresentation.Set(npcId, args or {}) ~= nil
     end
@@ -604,6 +670,57 @@ function API.Travel.UnregisterListener(eventName, listener)
 end
 
 API.MapCommands = API.MapCommands or {}
+
+-- Stable cross-mod animation scene API. Scene definitions contain only
+-- serializable policy fields; behaviors and clients exchange scene IDs.
+API.AnimationScenes = API.AnimationScenes or {}
+
+function API.AnimationScenes.Register(sceneId, definition)
+    local registered
+    local normalized
+    registered, normalized =
+        PNC.AnimationScenes.Register(sceneId, definition)
+    return registered,
+        normalized and Core.DeepCopy(normalized) or nil
+end
+
+function API.AnimationScenes.Unregister(sceneId)
+    return PNC.AnimationScenes.Unregister(sceneId)
+end
+
+function API.AnimationScenes.Get(sceneId)
+    local definition = PNC.AnimationScenes.Get(sceneId)
+    return definition and Core.DeepCopy(definition) or nil
+end
+
+function API.AnimationScenes.Play(npcId, sceneId, options)
+    local record = Registry.Get(npcId)
+    local zombie = record
+        and Registry.GetLiveZombie(record.id) or nil
+    if not Core.IsAuthority() then
+        return false, "authority_required"
+    end
+    return PNC.AnimationScenes.Request(
+        record,
+        zombie,
+        sceneId,
+        options
+    )
+end
+
+function API.AnimationScenes.Stop(npcId, reason)
+    local record = Registry.Get(npcId)
+    local zombie = record
+        and Registry.GetLiveZombie(record.id) or nil
+    if not Core.IsAuthority() then
+        return false, "authority_required"
+    end
+    return PNC.AnimationScenes.Stop(
+        record,
+        zombie,
+        reason
+    )
+end
 
 function API.MapCommands.RegisterHandler(id, definition)
     return PNC.MapCommandService.RegisterHandler(id, definition)
