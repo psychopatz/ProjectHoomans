@@ -147,10 +147,10 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     retryBody,
     true
 )
-assert(calls.play == 5,
-    "MP attack bump was not retried after packet/state loss")
-assert(clearedBeforeRetry,
-    "same-value MP bump retry did not create a variable edge")
+assert(calls.play == 4,
+    "MP attack bump was replayed instead of observed once")
+assert(not clearedBeforeRetry,
+    "MP attack bump was cleared during its active clip")
 
 local finishedLocalSnapshot = {
     id = attackSnapshot.id,

@@ -50,6 +50,8 @@ PNC = {
         RANGED_RELOAD_BREAK_DISTANCE = 2.35,
         RANGED_RELOAD_BREAK_PRESSURE_COUNT = 2,
         COMBAT_RETREAT_STAMINA_RATIO = 0.1,
+        COMBAT_RETREAT_STAMINA_CURRENT = 20,
+        COMBAT_KITE_NEAR_MISS_WINDOW_MS = 1400,
         COMBAT_REENGAGE_STAMINA_RATIO = 0.28,
         COMBAT_SURROUND_RADIUS = 1.8,
         COMBAT_SURROUND_COUNT = 3,
@@ -158,6 +160,7 @@ local function makeRecord(id)
         z = 0,
         runtime = {},
         equipment = {},
+        stamina = { current = 100, max = 100 },
     }
 end
 
@@ -207,15 +210,23 @@ assertEqual(
     "skill and equipment influence pressure tolerance"
 )
 
--- Hitting the tolerance boundary must retreat instead of advancing into the
--- group. The locked goal is refreshed from the NPC's new position so it keeps
--- creating separation rather than walking back toward the original target.
+-- Crowd pressure alone must not make a healthy follower abandon the player.
+-- A real avoided zombie impact arms the short reactive kite.
 now = now + 250
 pressureCount = 4
 visiblePressureCount = 4
 hordeCount = 4
 visibleHordeCount = 4
 record = makeRecord("boundary_retreat")
+moved, reason, action = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, false, "pressure boundary does not trigger proactive retreat")
+PNC.CombatTactics.MarkZombieNearMiss(record, 1, 0, 0, now)
 moved, reason = PNC.CombatTactics.PreAttackDecision(
     record,
     {},
@@ -223,8 +234,8 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, true, "pressure boundary triggers retreat")
-assertEqual(reason, "melee_pressure_retreat", "boundary retreat reason")
+assertEqual(moved, true, "near miss triggers reactive kite")
+assertEqual(reason, "near_miss_kite", "reactive kite reason")
 assert(
     moves[#moves].x < record.x,
     "retreat goal must increase distance from the threat"
@@ -248,6 +259,7 @@ assert(
 -- instead of rebuilding the same retreat forever while the NPC is mauled.
 now = now + 250
 record = makeRecord("stalled_retreat")
+PNC.CombatTactics.MarkZombieNearMiss(record, 1, 0, 0, now)
 moved, reason = PNC.CombatTactics.PreAttackDecision(
     record,
     {},
@@ -291,16 +303,15 @@ visiblePressureCount = 3
 hordeCount = 6
 visibleHordeCount = 6
 record = makeRecord("crawler_pressure")
-moved, reason = PNC.CombatTactics.PreAttackDecision(
+moved, reason, action = PNC.CombatTactics.PreAttackDecision(
     record,
     {},
     target,
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, true, "unsafe crawler triggers movement")
-assertEqual(reason, "crawler_pressure_retreat", "unsafe crawler retreat reason")
-assertEqual(moves[#moves].reason, "crawler_pressure_retreat", "crawler retreat intent")
+assertEqual(moved, false, "crawler pressure alone does not trigger retreat")
+assertEqual(action, "ground", "crawler pressure leaves attack arbitration active")
 
 -- Friendly humans crossing the shot corridor block fire.
 grounded = false

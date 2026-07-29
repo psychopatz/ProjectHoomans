@@ -108,6 +108,16 @@ local function pursueForcedTarget(zombie, npcBody, record, now)
     end
     distSq = Core.DistanceSq(zombie:getX(), zombie:getY(), npcBody:getX(), npcBody:getY())
     dist = math.sqrt(distSq)
+    if Internal.rememberZombieAttacker then
+        Internal.rememberZombieAttacker(
+            record,
+            zombie,
+            dist < Const.ZOMBIE_BITE_DISTANCE
+                and "bite_range" or "pursuit",
+            now,
+            distSq
+        )
+    end
     setNoLungeAttack(zombie, false)
     if dist < Const.ZOMBIE_BITE_DISTANCE and math.abs(zombie:getZ() - npcBody:getZ()) < 0.3 then
         zombieSquare = zombie.getSquare and zombie:getSquare() or nil

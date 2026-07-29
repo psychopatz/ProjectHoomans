@@ -86,6 +86,12 @@ local function clearAction(record, zombie, reason)
     record.runtime.tacticalState = nil
 end
 
+local function needsRecoveryRetreat(record)
+    return CombatTactics
+        and CombatTactics.NeedsRecoveryRetreat
+        and CombatTactics.NeedsRecoveryRetreat(record) == true
+end
+
 local function requestRetreat(record, zombie, threat)
     local state = ensureState(record)
     local moved
@@ -101,7 +107,7 @@ local function requestRetreat(record, zombie, threat)
                 stopDistance =
                     tonumber(Const.SELF_BANDAGE_RETREAT_STOP_DISTANCE) or 1,
                 lockMs = tonumber(Const.COMPANION_AVOID_THREAT_LOCK_MS) or 750,
-                mode = "run",
+                mode = "walk",
                 reason = "self_treatment_retreat",
                 recoveryMode = "retreat_to_treat",
             }
@@ -236,7 +242,10 @@ function Behavior.Tick(record, zombie, now)
             if record.health and record.health.state == "incapacitated" then
                 return false
             end
-            return requestRetreat(record, zombie, threat)
+            if needsRecoveryRetreat(record) then
+                return requestRetreat(record, zombie, threat)
+            end
+            return false
         end
         record.activeBehavior = "SelfBandage"
         if MoveIntent and MoveIntent.Hold then
@@ -266,7 +275,18 @@ function Behavior.Tick(record, zombie, now)
         if record.health and record.health.state == "incapacitated" then
             return false
         end
-        return requestRetreat(record, zombie, threat)
+        if needsRecoveryRetreat(record) then
+            return requestRetreat(record, zombie, threat)
+        end
+        if state.phase == "retreat"
+            and CombatTactics
+            and CombatTactics.ClearRetreatState
+        then
+            CombatTactics.ClearRetreatState(record)
+        end
+        state.phase = "idle"
+        record.runtime.tacticalState = nil
+        return false
     end
     if state.phase == "retreat"
         and CombatTactics

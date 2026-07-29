@@ -253,6 +253,23 @@ function Internal.BindNativePathSnapshot(snapshot, body, now)
     state.snapshot = snapshot
     state.lastSeenAt = now
     state.releasePending = false
+    -- Presence visuals run immediately after this bind. Release a delegated
+    -- PathFindBehavior2 route here, before PlayBump selects the attack clip;
+    -- waiting for the later OnZombieUpdate callback lets pathfind locomotion
+    -- swallow the first (and often only) melee animation edge.
+    if not goal
+        and state.owned == true
+        and (
+            hasBodyActionLock(body)
+            or (
+                snapshot
+                and snapshot.visualState
+                and snapshot.visualState.attackActive == true
+            )
+        )
+    then
+        clearOwnedPath(body, state)
+    end
     if (goal or hasBodyActionLock(body))
         and LiveBodyControl
         and LiveBodyControl.SetManagedBodyUseless

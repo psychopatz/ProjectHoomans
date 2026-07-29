@@ -530,7 +530,16 @@ function Internal.computeResolvedMode(record, lane, zombie, goal)
     if lane.mode == "crawl" then
         return "crawl"
     end
-    if lane.mode == "sneak" or (record and record.runtime and record.runtime.stealthActive == true) then
+    if record and record.runtime and record.runtime.target ~= nil then
+        if lane.mode == "run" then
+            return "run"
+        end
+        return "walk"
+    end
+    if lane.mode == "sneak"
+        or (record and record.runtime
+            and record.runtime.stealthActive == true)
+    then
         return "sneak"
     end
     if lane.mode ~= "walk" and lane.mode ~= "run" then

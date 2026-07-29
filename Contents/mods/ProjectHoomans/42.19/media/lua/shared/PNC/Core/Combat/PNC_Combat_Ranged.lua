@@ -116,6 +116,13 @@ function Combat.TryRanged(record, zombie, target)
     else
         damage = damage * (0.9 + math.min(aimingLevel, 8) * 0.05)
     end
+    if Internal.prepareAttackMovement then
+        Internal.prepareAttackMovement(
+            record,
+            zombie,
+            "ranged_windup"
+        )
+    end
     record.runtime.lastAttackAt = now
     record.runtime.inCombatUntil = now + Const.DEBUG_COMBAT_HOLD_MS
     Internal.faceTarget(zombie, target, record, Internal.ATTACK_TIMINGS.ranged.duration, "ranged_windup")

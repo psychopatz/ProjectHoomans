@@ -216,6 +216,45 @@ assertContains(
 assertContains(combatLines[5], "state=bumped", "attack action state")
 assertContains(combatLines[6], "MOVE strafe/walk", "tactical movement")
 
+local animationLine =
+    PNC.NameplateRenderer.BuildBodyAnimationDebugLine({
+        getModData = function()
+            return {
+                PNC_ClientAttackRequestedAnim =
+                    "PNC_Attack1H1",
+                PNC_BumpActionLease = true,
+            }
+        end,
+        getActionStateName = function() return "bumped" end,
+        getBumpType = function() return "Attack1H1" end,
+        isUseless = function() return true end,
+        isMoving = function() return false end,
+        isSneaking = function() return false end,
+        getVariableBoolean = function() return false end,
+    }, {
+        anim = "PNC_Attack1H1",
+    })
+assertContains(
+    animationLine,
+    "req=PNC_Attack1H1",
+    "live animation request"
+)
+assertContains(
+    animationLine,
+    "bump=Attack1H1",
+    "live engine bump"
+)
+assertContains(
+    animationLine,
+    "state=bumped",
+    "live action state"
+)
+assertContains(
+    animationLine,
+    "useless=true",
+    "live body mode"
+)
+
 local renderedLines = 0
 local renderedText = {}
 isoToScreenX = function(_, x, y) return (x - y) * 32 end
@@ -251,6 +290,23 @@ local zombie = {
     getZ = function() return 0 end,
     getForwardDirection = function() return forward end,
 }
+local attackerZombie = {
+    isDead = function() return false end,
+    getX = function() return 1 end,
+    getY = function() return 0 end,
+    getZ = function() return 0 end,
+    getActionStateName = function() return "bumped" end,
+    getBumpType = function() return "Bite" end,
+    getPath2 = function() return nil end,
+}
+PNC.Perception = {
+    FindZombieByID = function(id)
+        if id == "attacker-zed" then
+            return attackerZombie
+        end
+        return nil
+    end,
+}
 PNC.NameplateRenderer.RenderCombatDebug(manager, {
     zombie = zombie,
     snapshot = {
@@ -258,6 +314,17 @@ PNC.NameplateRenderer.RenderCombatDebug(manager, {
         combatDebugState = {
             mode = "ranged",
             decision = "clearing_fire_lane",
+            zombieAttacker = {
+                zombieId = "attacker-zed",
+                phase = "windup",
+                ageMs = 40,
+                x = 1,
+                y = 0,
+                z = 0,
+                actionState = "bumped",
+                bumpType = "Bite",
+                path2Active = false,
+            },
             target = {
                 kind = "zombie",
                 id = "z1",
@@ -293,6 +360,21 @@ PNC.NameplateRenderer.RenderCombatDebug(manager, {
     },
 })
 assert(renderedLines > 80, "combat geometry was not rendered")
-assertContains(renderedText[1], "COMBAT ranged", "combat label rendered")
+local renderedTextJoined = table.concat(renderedText, "\n")
+assertContains(
+    renderedTextJoined,
+    "COMBAT ranged",
+    "combat label rendered"
+)
+assertContains(
+    renderedTextJoined,
+    "ZED->NPC attacker-zed",
+    "zombie attacker overlay rendered"
+)
+assertContains(
+    renderedTextJoined,
+    "state=bumped bump=Bite",
+    "zombie attacker action graph rendered"
+)
 
 print("pnc_nameplate_debug_smoke: ok")

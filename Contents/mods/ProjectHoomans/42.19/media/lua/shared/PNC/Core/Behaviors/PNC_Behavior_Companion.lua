@@ -19,6 +19,7 @@ local Perception = PNC.Perception
 local CombatTactics = PNC.CombatTactics
 local Registry = PNC.Registry
 local CompanionVehicle = PNC.CompanionVehicle
+local TraversalQuery = PNC.TraversalQuery
 local FollowFormationCache = {}
 
 local function getFollowState(record)
@@ -32,15 +33,6 @@ local function setFollowMode(record, mode)
     local changed = state.mode ~= mode
     state.mode = mode
     return state, changed
-end
-
-local function shouldIdleNearOwner(record, ownerDist, sameLevel)
-    local state = getFollowState(record)
-    if not sameLevel then return false end
-    if state.mode == "idle_near_owner" then
-        return ownerDist <= (tonumber(Const.FOLLOW_IDLE_EXIT_DISTANCE) or 3.2)
-    end
-    return ownerDist <= (tonumber(Const.FOLLOW_IDLE_ENTER_DISTANCE) or 2.4)
 end
 
 local function holdAndFaceOwner(record, zombie, owner, mode, reason)
@@ -191,12 +183,12 @@ local function resolveFollowSlot(record, owner)
     backY = -fy
     if followerCount <= 1 then
         lateral = 0
-        trailing = tonumber(Const.FOLLOW_SLOT_DISTANCE) or 1.5
+        trailing = tonumber(Const.FOLLOW_SLOT_DISTANCE) or 2.25
     else
         pairIndex = math.floor(slotIndex / 2)
         side = (slotIndex % 2 == 0) and -1 or 1
-        lateral = side * ((tonumber(Const.FOLLOW_SLOT_LATERAL) or 0.95) + (pairIndex * (tonumber(Const.FOLLOW_SLOT_ROW_LATERAL) or 0.2)))
-        trailing = (tonumber(Const.FOLLOW_SLOT_DISTANCE) or 1.5) + (pairIndex * (tonumber(Const.FOLLOW_SLOT_ROW_DISTANCE) or 0.75))
+        lateral = side * ((tonumber(Const.FOLLOW_SLOT_LATERAL) or 1.15) + (pairIndex * (tonumber(Const.FOLLOW_SLOT_ROW_LATERAL) or 0.25)))
+        trailing = (tonumber(Const.FOLLOW_SLOT_DISTANCE) or 2.25) + (pairIndex * (tonumber(Const.FOLLOW_SLOT_ROW_DISTANCE) or 0.85))
     end
     record.runtime = record.runtime or {}
     target = record.runtime.followSlotTarget or {}
@@ -204,7 +196,8 @@ local function resolveFollowSlot(record, owner)
     target.x = owner:getX() + (backX * trailing) + (rightX * lateral)
     target.y = owner:getY() + (backY * trailing) + (rightY * lateral)
     target.z = owner:getZ()
-    target.stopDistance = tonumber(Const.FOLLOW_SLOT_STOP_DISTANCE) or 0.65
+    target.stopDistance = tonumber(Const.FOLLOW_SLOT_STOP_DISTANCE) or 0.35
+    target.personalSpaceCorrection = nil
     -- Formation offsets are useful outdoors but can place the synthetic goal
     -- through an exterior/interior wall in a small room. Keep the slot only
     -- when it resolves to the owner's loaded building and room; otherwise
@@ -229,8 +222,111 @@ local function resolveFollowSlot(record, owner)
             target.x = owner:getX()
             target.y = owner:getY()
             target.stopDistance = tonumber(
-                Const.FOLLOW_SLOT_STOP_DISTANCE
-            ) or 0.65
+                Const.FOLLOW_INDOOR_APPROACH_DISTANCE
+            ) or 1.6
+            target.indoorApproach = true
+        else
+            target.indoorApproach = nil
+        end
+    else
+        target.indoorApproach = nil
+    end
+    return target
+end
+
+local function isOwnerSpaceCandidate(owner, x, y, z)
+    local cell
+    local ownerSquare
+    local candidateSquare
+    local ownerBuilding
+    local candidateBuilding
+    local ownerRoom
+    local candidateRoom
+    if TraversalQuery and TraversalQuery.CanOccupy
+        and not TraversalQuery.CanOccupy(x, y, z)
+    then
+        return false
+    end
+    cell = getCell and getCell() or nil
+    ownerSquare = owner and owner.getSquare
+        and owner:getSquare() or nil
+    candidateSquare = cell and cell.getGridSquare
+        and cell:getGridSquare(
+            math.floor(x),
+            math.floor(y),
+            math.floor(z)
+        ) or nil
+    if not ownerSquare or not candidateSquare then
+        return true
+    end
+    ownerBuilding = ownerSquare.getBuilding
+        and ownerSquare:getBuilding() or nil
+    candidateBuilding = candidateSquare.getBuilding
+        and candidateSquare:getBuilding() or nil
+    ownerRoom = ownerSquare.getRoom
+        and ownerSquare:getRoom() or nil
+    candidateRoom = candidateSquare.getRoom
+        and candidateSquare:getRoom() or nil
+    return ownerBuilding == candidateBuilding
+        and (
+            ownerBuilding == nil
+            or ownerRoom == candidateRoom
+        )
+end
+
+local function enforceOwnerPersonalSpace(
+    record,
+    owner,
+    target,
+    ownerDist
+)
+    local minimum = tonumber(
+        Const.FOLLOW_PERSONAL_SPACE_MIN
+    ) or 1.25
+    local radius = tonumber(Const.FOLLOW_SLOT_DISTANCE) or 2.25
+    local dx
+    local dy
+    local fx
+    local fy
+    local directions
+    local direction
+    local x
+    local y
+    local i
+    if not record or not owner or not target
+        or ownerDist >= minimum
+    then
+        return target
+    end
+    dx, dy = normalizeDirection(
+        (tonumber(record.x) or owner:getX()) - owner:getX(),
+        (tonumber(record.y) or owner:getY()) - owner:getY()
+    )
+    fx, fy = resolveOwnerForward(owner)
+    if not dx or not dy then
+        dx = -fx
+        dy = -fy
+    end
+    directions = {
+        { x = dx, y = dy },
+        { x = -fx, y = -fy },
+        { x = -fy, y = fx },
+        { x = fy, y = -fx },
+        { x = fx, y = fy },
+    }
+    for i = 1, #directions do
+        direction = directions[i]
+        x = owner:getX() + direction.x * radius
+        y = owner:getY() + direction.y * radius
+        if isOwnerSpaceCandidate(owner, x, y, owner:getZ()) then
+            target.x = x
+            target.y = y
+            target.z = owner:getZ()
+            target.stopDistance =
+                tonumber(Const.FOLLOW_SLOT_STOP_DISTANCE) or 0.35
+            target.indoorApproach = nil
+            target.personalSpaceCorrection = true
+            return target
         end
     end
     return target
@@ -247,6 +343,11 @@ local function tryEngageTarget(record, zombie)
         return false
     end
     record.runtime.target = target
+    if Stealth and Stealth.SuspendForCombat then
+        Stealth.SuspendForCombat(record, "combat_target")
+    else
+        record.runtime.stealthActive = false
+    end
     BehaviorCombat.TickEngage(record, zombie, target)
     return true
 end
@@ -349,17 +450,13 @@ local function tickFollowOwner(record, zombie)
         return true
     end
     ownerDist = Core.Distance(record.x, record.y, owner:getX(), owner:getY())
-    if shouldIdleNearOwner(record, ownerDist, math.abs(owner:getZ() - record.z) < 1) then
-        return holdAndFaceOwner(
-            record,
-            zombie,
-            owner,
-            "idle_near_owner",
-            record.runtime.stealthActive and "idle_follow_stealth" or "idle_near_owner"
-        )
-    end
-
     slotTarget = resolveFollowSlot(record, owner)
+    slotTarget = enforceOwnerPersonalSpace(
+        record,
+        owner,
+        slotTarget,
+        ownerDist
+    )
     slotDist = slotTarget and Core.Distance(record.x, record.y, slotTarget.x, slotTarget.y) or ownerDist
     if slotDist <= (slotTarget and slotTarget.stopDistance or Const.FOLLOW_DISTANCE)
         and math.abs((slotTarget and slotTarget.z or owner:getZ()) - record.z) < 1

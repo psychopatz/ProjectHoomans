@@ -17,9 +17,6 @@ local Visuals = PNC.Visuals
 local Equipment = PNC.Equipment
 local LiveBodyControl = PNC.LiveBodyControl
 local logClientMotionDebug = Internal.LogClientMotionDebug
-local ATTACK_BUMP_RETRY_DELAY_MS = 90
-local ATTACK_BUMP_RETRY_WINDOW_MS = 420
-local ATTACK_BUMP_MAX_RETRIES = 3
 local LOCOMOTION_MAINTAIN_MS = 500
 
 local function getActionStateName(zombie)
@@ -53,9 +50,17 @@ local function beginClientAttackBump(
     if modData then
         modData.PNC_ClientAttackKey = attackKey
         modData.PNC_ClientAttackLocalStartedAt = now
-        modData.PNC_ClientAttackRetryAt =
-            now + ATTACK_BUMP_RETRY_DELAY_MS
         modData.PNC_ClientAttackRetries = 0
+        modData.PNC_ClientAttackRequestedAnim =
+            tostring(anim or "")
+        modData.PNC_ClientAttackResolvedAnim =
+            Animation and Animation.ResolveBumpType
+                and Animation.ResolveBumpType(anim)
+                or tostring(anim or "")
+        modData.PNC_ClientAttackActionState =
+            getActionStateName(zombie)
+        modData.PNC_ClientAttackBumpType =
+            getBumpType(zombie)
     end
     logClientMotionDebug(
         snapshot,
@@ -67,61 +72,12 @@ local function beginClientAttackBump(
     )
 end
 
-local function maintainClientAttackBump(
-    snapshot,
-    zombie,
-    recordView,
-    modData,
-    anim,
-    now
-)
-    local localStartedAt
-    local retryAt
-    local retries
-    local actionState
-    local bumpType
-    local resolvedBumpType
-    if not modData or not Animation or not Animation.PlayBump then
-        return false
-    end
-    localStartedAt = tonumber(
-        modData.PNC_ClientAttackLocalStartedAt
-    ) or now
-    retryAt = tonumber(modData.PNC_ClientAttackRetryAt) or now
-    retries = tonumber(modData.PNC_ClientAttackRetries) or 0
-    if now < retryAt
-        or now - localStartedAt > ATTACK_BUMP_RETRY_WINDOW_MS
-        or retries >= ATTACK_BUMP_MAX_RETRIES
-    then
-        return false
-    end
-    actionState = getActionStateName(zombie)
-    bumpType = getBumpType(zombie)
-    resolvedBumpType = Animation.ResolveBumpType
-        and Animation.ResolveBumpType(anim)
-        or tostring(anim)
-    if actionState == "bumped" then
-        return false
-    end
-    -- A zombie packet can restore the same BumpType without entering the
-    -- client action state.  Force a real variable edge before retrying.
-    if bumpType == resolvedBumpType and zombie.setBumpType then
-        zombie:setBumpType("")
-    end
-    Animation.PlayBump(zombie, recordView, anim)
-    modData.PNC_ClientAttackRetries = retries + 1
-    modData.PNC_ClientAttackRetryAt =
-        now + ATTACK_BUMP_RETRY_DELAY_MS
-    logClientMotionDebug(
-        snapshot,
-        snapshot and snapshot.id or nil,
-        "attack_anim_retry",
-        "anim=" .. tostring(anim)
-            .. " retry=" .. tostring(retries + 1)
-            .. " previousBump=" .. tostring(bumpType)
-            .. " action=" .. tostring(actionState)
-    )
-    return true
+local function observeClientAttackBump(zombie, modData)
+    if not modData then return end
+    modData.PNC_ClientAttackActionState =
+        getActionStateName(zombie)
+    modData.PNC_ClientAttackBumpType =
+        getBumpType(zombie)
 end
 
 local function buildRecordView(snapshot)
@@ -523,19 +479,16 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
         end
         modData.PNC_ClientAttackKey = nil
         modData.PNC_ClientAttackLocalStartedAt = nil
-        modData.PNC_ClientAttackRetryAt = nil
         modData.PNC_ClientAttackRetries = nil
+        modData.PNC_ClientAttackRequestedAnim = nil
+        modData.PNC_ClientAttackResolvedAnim = nil
         return
     end
     if attackKey then
-        maintainClientAttackBump(
-            snapshot,
-            zombie,
-            recordView,
-            modData,
-            visualState.attackAnim,
-            now
-        )
+        -- Bandits selects BumpType exactly once. Re-clearing and replaying it
+        -- because one expected action-state label was not observed restarts
+        -- valid clips before their weapon-swing keyframe.
+        observeClientAttackBump(zombie, modData)
         return
     end
     if bumpReleaseActive then

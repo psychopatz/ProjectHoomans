@@ -14,6 +14,7 @@ local Const = PNC.Const
 local Combat = PNC.Combat
 local Equipment = PNC.Equipment
 local Tactics = PNC.CombatTactics
+local Defense = PNC.CombatDefense
 local Common = PNC.BehaviorCommon
 local PathService = PNC.PathService
 local COMBAT_NAVIGATION = {
@@ -226,6 +227,7 @@ local function moveToMelee(context, reason)
     local shouldApproach
     local stopDistance
     local approachMode
+    local accepted
     local x = context.target.x
     local y = context.target.y
     local usingFormation = false
@@ -250,7 +252,7 @@ local function moveToMelee(context, reason)
             context.target
         )
     end
-    Common.MoveRecord(
+    accepted = Common.MoveRecord(
         context.record,
         context.zombie,
         x,
@@ -277,12 +279,28 @@ local function moveToMelee(context, reason)
             and "closing_to_melee_slot"
             or "closing_to_melee"
     )
-    return true
+    if context.record.runtime
+        and context.record.runtime.combatTactical
+    then
+        context.record.runtime.combatTactical.decision =
+            usingFormation
+                and "closing_to_melee_slot"
+                or "closing_to_melee"
+        context.record.runtime.combatTactical.approachDistance =
+            context.distance
+        context.record.runtime.combatTactical.approachAccepted =
+            accepted ~= false
+    end
+    return accepted ~= false
 end
 
 local function handleMelee(context, debugMode, allowApproach)
     local attacked
     local reason
+    local commitRange =
+        tonumber(Const.MELEE_COMMIT_RANGE)
+        or tonumber(Const.MELEE_APPROACH_STOP_DISTANCE)
+        or 1.0
     attacked, reason = Combat.TryMelee(
         context.record,
         context.zombie,
@@ -295,7 +313,13 @@ local function handleMelee(context, debugMode, allowApproach)
         return true
     end
     if allowApproach ~= false
-        and reason == "target_out_of_range"
+        -- Distance is authoritative even if another gate (cooldown, stamina,
+        -- or a stale action lease) supplied the reason. Never claim the melee
+        -- lane is handled while the target remains outside strike reach.
+        and (
+            reason == "target_out_of_range"
+            or (tonumber(context.distance) or math.huge) > commitRange
+        )
         and moveToMelee(context, reason)
     then
         return true
@@ -457,6 +481,9 @@ function Engagement.Tick(record, zombie, target)
     }
     context.mode = context.equipment.combatModeResolved
     refreshDistance(context)
+    if Defense and Defense.Refresh then
+        Defense.Refresh(record, zombie)
+    end
 
     if Equipment.ApplyCombatState then
         Equipment.ApplyCombatState(zombie, record, true)

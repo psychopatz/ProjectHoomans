@@ -74,8 +74,6 @@ local function resolvePushDirection(attackerZombie, targetZombie)
 end
 
 local function applyHitContext(attackerZombie, targetZombie, options)
-    local ok
-    local behind
     if not targetZombie then
         return
     end
@@ -86,12 +84,9 @@ local function applyHitContext(attackerZombie, targetZombie, options)
         targetZombie:setPlayerAttackPosition(targetZombie:testDotSide(attackerZombie))
     end
     if attackerZombie and targetZombie.setHitFromBehind and attackerZombie.isBehind then
-        ok, behind = pcall(function()
-            return attackerZombie:isBehind(targetZombie)
-        end)
-        if ok then
-            targetZombie:setHitFromBehind(behind == true)
-        end
+        targetZombie:setHitFromBehind(
+            attackerZombie:isBehind(targetZombie) == true
+        )
     end
     if targetZombie.setHitForce then
         targetZombie:setHitForce(tonumber(options and options.hitForce) or 0.92)
@@ -129,7 +124,10 @@ local function beginReaction(attackerZombie, targetZombie, options)
     -- Explicit shoves may request vanilla stagger/knockdown entry. PNC never
     -- clears these flags; the engine state that consumes them owns their exit.
     if (options == nil or options.stagger ~= false) and targetZombie.setStaggerBack then
-        pcall(targetZombie.setStaggerBack, targetZombie, true)
+        targetZombie:setStaggerBack(true)
+        if targetZombie.setBumpType then
+            targetZombie:setBumpType("stagger")
+        end
     end
     if options and options.heavy == true and options.knockdown == true and targetZombie.setKnockedDown then
         targetZombie:setKnockedDown(true)
@@ -191,6 +189,9 @@ function ZombieReaction.ApplyWeaponHit(attackerZombie, targetZombie, weaponItem,
     if weaponItem and targetZombie.Hit then
         beforeHealth = tonumber(targetZombie:getHealth()) or 0
         fakeZombie = getCell and getCell():getFakeZombieForHit() or nil
+        -- Last-resort Java boundary only: IsoZombie:Hit is an overloaded
+        -- engine call that can reject a valid-looking Kahlua signature.
+        -- The deterministic health fallback below handles that failure.
         applied = pcall(function()
             targetZombie:Hit(weaponItem, fakeZombie or attackerZombie, tonumber(scaledDamage) or 0, false, 1, false)
         end)
@@ -205,7 +206,7 @@ function ZombieReaction.ApplyWeaponHit(attackerZombie, targetZombie, weaponItem,
             targetZombie:setHitReaction(tostring(options.hitReaction))
         end
         if (not options or options.stagger ~= false) and targetZombie.setStaggerBack then
-            pcall(targetZombie.setStaggerBack, targetZombie, true)
+            targetZombie:setStaggerBack(true)
         end
         beginEngineHitSettle(targetZombie, options)
     end
@@ -234,7 +235,10 @@ function ZombieReaction.ApplyReplicatedHit(attackerZombie, targetZombie, options
         targetZombie:setHitReaction(tostring(options.hitReaction))
     end
     if options.stagger ~= false and targetZombie.setStaggerBack then
-        pcall(targetZombie.setStaggerBack, targetZombie, true)
+        targetZombie:setStaggerBack(true)
+        if targetZombie.setBumpType then
+            targetZombie:setBumpType("stagger")
+        end
     end
     return true
 end

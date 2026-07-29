@@ -158,11 +158,29 @@ assertEqual(interaction, "door_open", "collision interaction")
 assertEqual(opened, true, "collision door state")
 
 opened = false
-door.getLockedByKey = function() return 7 end
+door.isLockedByKey = function() return true end
 assertEqual(PNC.PathService.Internal.openDoorForNPC(zombie, door), false, "key-locked door stays closed")
 assertEqual(opened, false, "key-locked door state")
 
-door.getLockedByKey = nil
+door.isLockedByKey = nil
+door.isLocked = function() return true end
+door.isObstructed = function() return true end
+IsoDoor = {
+    getDoubleDoorIndex = function() return -1 end,
+    getGarageDoorIndex = function() return 0 end,
+    toggleGarageDoor = function()
+        opened = true
+    end,
+}
+assertEqual(
+    PNC.PathService.Internal.openDoorForNPC(zombie, door),
+    true,
+    "friendly NPC opens a locked garage like Bandits"
+)
+assertEqual(opened, true, "garage door state")
+door.isLocked = nil
+door.isObstructed = nil
+IsoDoor = nil
 zombie.isCollidedWithDoor = function() return false end
 local windowOpened = false
 local window = {

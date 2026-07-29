@@ -181,7 +181,40 @@ end
 
 function Internal.canAttack(record, now, cooldownMs)
     cooldownMs = cooldownMs or 1000
-    return (now - (tonumber(record.runtime.lastAttackAt) or 0)) >= cooldownMs
+    local lastAttackAt = tonumber(
+        record and record.runtime and record.runtime.lastAttackAt
+    ) or 0
+    -- Core.Now() is session-local. A runtime restored by a hot reload, world
+    -- reload, or an MP authority handoff must not preserve a timestamp from a
+    -- later clock and suppress combat until the new session catches up.
+    if lastAttackAt > now then
+        record.runtime.lastAttackAt = 0
+        lastAttackAt = 0
+    end
+    return (now - lastAttackAt) >= cooldownMs
+end
+
+function Internal.prepareAttackMovement(record, zombie, reason)
+    local pathService = PNC.PathService
+    local moveIntent = PNC.BehaviorMoveIntent
+    local stealth = PNC.Stealth
+    reason = reason or "combat_action"
+    -- Bandits completes its Move task before starting Smack. Mirror that
+    -- ownership boundary: PathFindBehavior2 must release the body before the
+    -- client selects a bumped attack clip, otherwise locomotion wins and only
+    -- the authoritative sound/damage is observed.
+    if pathService and pathService.Reset then
+        pathService.Reset(zombie, record)
+    end
+    if moveIntent and moveIntent.Hold then
+        moveIntent.Hold(record, reason)
+    end
+    if stealth and stealth.SuspendForCombat then
+        stealth.SuspendForCombat(record, reason)
+    elseif record and record.runtime then
+        record.runtime.stealthActive = false
+    end
+    return true
 end
 
 function Internal.resolveWeaponItem(record, zombie)

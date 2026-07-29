@@ -15,6 +15,13 @@ end
 
 local now = 1000
 local authority = true
+local gameMode = "Sandbox"
+
+getWorld = function()
+    return {
+        getGameMode = function() return gameMode end,
+    }
+end
 
 PNC = {
     Core = {
@@ -90,7 +97,11 @@ local started, reason =
 assertEqual(started, true, "bump started")
 assertEqual(reason, "bump_type_setter", "bump start mode")
 assertEqual(bumpType, "Attack1H1", "engine bump type written")
-assertEqual(useless, false, "action context kept active")
+assertEqual(
+    useless,
+    true,
+    "SP combat bump preserves Bandits-style useless shell"
+)
 assertEqual(
     modData.PNC_BumpActionLease,
     true,
@@ -114,14 +125,14 @@ assertEqual(
 )
 assertEqual(
     PNC.LiveBodyControl.ShouldKeepEngineMovementActive(record, body),
-    true,
-    "authority safety preserves active attack lease"
+    false,
+    "SP attack does not reactivate the engine zombie controller"
 )
 authority = false
 assertEqual(
     PNC.LiveBodyControl.ShouldKeepEngineMovementActive(record, body),
-    true,
-    "MP replica safety preserves local action lease"
+    false,
+    "SP local action lease retains useless shell"
 )
 
 PNC.Animation.FinishBump(body, true)
@@ -141,6 +152,53 @@ assertEqual(
     modData.PNC_BumpActionLease,
     nil,
     "completed action lease cleared"
+)
+
+gameMode = "Multiplayer"
+started = PNC.Animation.PlayBump(
+    body,
+    record,
+    "PNC_Attack1H1"
+)
+assertEqual(started, true, "MP combat bump started")
+assertEqual(
+    useless,
+    false,
+    "MP combat bump keeps replicated ActionContext useful"
+)
+PNC.Animation.FinishBump(body, true)
+now = 1150
+PNC.Animation.PumpBumpRelease(body, now)
+
+started = PNC.Animation.PlayBump(
+    body,
+    record,
+    "PNC_ClimbFence",
+    { keepManagedUseless = true }
+)
+assertEqual(started, true, "scripted traversal bump started")
+assertEqual(useless, true, "scripted traversal retained safe fake-body mode")
+assertEqual(
+    modData.PNC_BumpKeepUseless,
+    true,
+    "scripted traversal body-mode lease"
+)
+assertEqual(
+    PNC.LiveBodyControl.ShouldKeepEngineMovementActive(record, body),
+    false,
+    "safety audit does not reactivate unsafe native traversal"
+)
+PNC.Animation.FinishBump(body, true)
+now = 1200
+assertEqual(
+    PNC.Animation.PumpBumpRelease(body, now),
+    false,
+    "scripted traversal bump released"
+)
+assertEqual(
+    modData.PNC_BumpKeepUseless,
+    nil,
+    "scripted traversal body-mode lease cleared"
 )
 
 print("pnc_bump_action_lease_smoke: ok")

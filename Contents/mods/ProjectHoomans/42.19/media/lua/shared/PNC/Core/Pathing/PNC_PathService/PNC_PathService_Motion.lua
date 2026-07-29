@@ -504,6 +504,11 @@ function PathService.Reset(zombie, record)
     if lane and lane.traversalAction and Internal.clearTraversalAction then
         Internal.clearTraversalAction(zombie, lane, "reset")
     end
+    if PNC.EnginePathPlanner
+        and PNC.EnginePathPlanner.Clear
+    then
+        PNC.EnginePathPlanner.Clear(record, zombie)
+    end
     if record and record.runtime then
         record.runtime.pathing = nil
         record.runtime.moveIntent = nil

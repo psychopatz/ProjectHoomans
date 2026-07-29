@@ -48,6 +48,14 @@ local function ensureRetreatState(record)
     state.lastZombieDamageX = state.lastZombieDamageX ~= nil and tonumber(state.lastZombieDamageX) or nil
     state.lastZombieDamageY = state.lastZombieDamageY ~= nil and tonumber(state.lastZombieDamageY) or nil
     state.lastZombieDamageZ = state.lastZombieDamageZ ~= nil and tonumber(state.lastZombieDamageZ) or nil
+    state.nearMissUntil = tonumber(state.nearMissUntil) or 0
+    state.lastNearMissAt = tonumber(state.lastNearMissAt) or 0
+    state.lastNearMissX = state.lastNearMissX ~= nil
+        and tonumber(state.lastNearMissX) or nil
+    state.lastNearMissY = state.lastNearMissY ~= nil
+        and tonumber(state.lastNearMissY) or nil
+    state.lastNearMissZ = state.lastNearMissZ ~= nil
+        and tonumber(state.lastNearMissZ) or nil
     state.approachActive = state.approachActive == true
     state.recoveryMode = state.recoveryMode or nil
     state.retreatDistance = tonumber(state.retreatDistance) or nil
@@ -196,6 +204,9 @@ end
 local function assessThreat(record, target)
     local now = Core.Now()
     local staminaRatio = Stamina and Stamina.GetRatio and Stamina.GetRatio(record) or 1
+    local staminaCurrent = tonumber(
+        record and record.stamina and record.stamina.current
+    ) or 100
     local runtime = record and record.runtime or {}
     local cached = runtime.combatThreatAssessment
     local targetKey = target and (
@@ -238,6 +249,7 @@ local function assessThreat(record, target)
         targetX = target and target.x or nil,
         targetY = target and target.y or nil,
         staminaRatio = staminaRatio,
+        staminaCurrent = staminaCurrent,
         retreating = runtime.retreatMode == true,
         surroundedCount = Perception and Perception.CountEnemyZombies and Perception.CountEnemyZombies(record, Const.COMBAT_SURROUND_RADIUS) or 0,
         pressureCount = Perception and Perception.CountEnemyZombies and Perception.CountEnemyZombies(record, Const.COMBAT_PRESSURE_RADIUS) or 0,
@@ -256,6 +268,7 @@ local function assessThreat(record, target)
         visibleHorde = report.visibleHordeCount,
         targetCrowd = report.targetCrowdCount,
         stamina = report.staminaRatio,
+        staminaCurrent = report.staminaCurrent,
         assessedAt = now,
     }
     return report
@@ -321,7 +334,33 @@ function Tactics.MarkZombieDamage(record, sourceX, sourceY, sourceZ, now)
     state.lastZombieDamageX = sourceX ~= nil and tonumber(sourceX) or nil
     state.lastZombieDamageY = sourceY ~= nil and tonumber(sourceY) or nil
     state.lastZombieDamageZ = sourceZ ~= nil and tonumber(sourceZ) or nil
-    state.damagePressureUntil = now + Const.COMBAT_KITE_DAMAGE_PRESSURE_MS
+    -- Damage remains diagnostic only. Kiting is armed exclusively by a
+    -- resolved near miss, not by every wound/bleed update.
+    state.damagePressureUntil = 0
+end
+
+function Tactics.MarkZombieNearMiss(
+    record,
+    sourceX,
+    sourceY,
+    sourceZ,
+    now
+)
+    local state = ensureRetreatState(record)
+    now = tonumber(now) or Core.Now()
+    if not state then return end
+    state.lastNearMissAt = now
+    state.lastNearMissX = sourceX ~= nil
+        and tonumber(sourceX) or nil
+    state.lastNearMissY = sourceY ~= nil
+        and tonumber(sourceY) or nil
+    state.lastNearMissZ = sourceZ ~= nil
+        and tonumber(sourceZ) or nil
+    state.nearMissUntil = now
+        + (
+            tonumber(Const.COMBAT_KITE_NEAR_MISS_WINDOW_MS)
+                or 1400
+        )
 end
 
 local function targetObject(target)
@@ -458,7 +497,7 @@ local function continueLockedRetreat(record, zombie, target, state, now)
         end
         state.refreshAt = now + 220
     end
-    setRetreatState(record, true, state.recoveryMode or "retreat")
+    setRetreatState(record, true, state.recoveryMode)
     if not requestMove(
         record,
         zombie,
@@ -524,6 +563,46 @@ local function startRetreat(record, zombie, target, distance, mode, stopDistance
         return false, "retreat_rejected"
     end
     return true, reason
+end
+
+local function staminaCurrent(record)
+    if record and record.stamina then
+        return tonumber(record.stamina.current) or math.huge
+    end
+    return math.huge
+end
+
+function Tactics.NeedsRecoveryRetreat(record)
+    return staminaCurrent(record)
+        < (tonumber(Const.COMBAT_RETREAT_STAMINA_CURRENT) or 20)
+end
+
+local function tryNearMissRetreat(record, zombie, target, state, now, report)
+    if not state
+        or not target
+        or target.kind ~= "zombie"
+        or now > (tonumber(state.nearMissUntil) or 0)
+    then
+        return false, nil
+    end
+    state.nearMissUntil = 0
+    if record.runtime and record.runtime.combatTactical then
+        record.runtime.combatTactical.decision = "near_miss_kite"
+    end
+    return startRetreat(
+        record,
+        zombie,
+        target,
+        tonumber(Const.COMBAT_KITE_DAMAGE_DISTANCE) or 2.4,
+        report and report.surroundedCount >= 2 and "run" or "walk",
+        0.7,
+        tonumber(Const.COMBAT_KITE_DAMAGE_LOCK_MS) or 700,
+        "near_miss_kite",
+        nil,
+        state.lastNearMissX,
+        state.lastNearMissY,
+        state.lastNearMissZ
+    )
 end
 
 buildZombieThreatCentroid = function(record, radius)
@@ -868,7 +947,6 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
     local dist
     local meleeLane
     local grounded
-    local dangerousCrowd
     local sourceX
     local sourceY
     local centroidCount
@@ -876,13 +954,25 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
     local meleeSkill
     local pressureTolerance
     local shouldShove
+    local continued
+    local continueReason
     if not record or not zombie or not target or target.kind ~= "zombie" then
         return false, nil, nil
     end
     now = Core.Now()
     state = ensureRetreatState(record)
-    if continueLockedRetreat(record, zombie, target, state, now) then
+    continued, continueReason = continueLockedRetreat(
+        record,
+        zombie,
+        target,
+        state,
+        now
+    )
+    if continued then
         return true, state.reason or "combat_retreat", nil
+    end
+    if continueReason == "retreat_stalled" then
+        return false, continueReason, nil
     end
 
     dist = math.sqrt(tonumber(target.distSq)
@@ -896,6 +986,9 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
 
     report = assessThreat(record, target)
     grounded = Tactics.IsGroundTarget(target)
+    if tryNearMissRetreat(record, zombie, target, state, now, report) then
+        return true, "near_miss_kite", nil
+    end
     skillID = Skills and Skills.ResolveWeaponSkill
         and Skills.ResolveWeaponSkill(
             record,
@@ -911,14 +1004,6 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
         tonumber(Const.COMBAT_PRESSURE_COUNT) or 4,
         pressureTolerance
     )
-    dangerousCrowd = report.surroundedCount
-            >= (tonumber(Const.COMBAT_SURROUND_COUNT) or 3)
-        or report.pressureCount >= pressureTolerance
-        or report.visiblePressureCount >= pressureTolerance
-        or report.visibleHordeCount
-            >= (tonumber(Const.COMBAT_HORDE_COUNT) or 6)
-        or report.targetCrowdCount
-            >= (tonumber(Const.COMBAT_TARGET_CROWD_COUNT) or 3)
     shouldShove = not grounded
         and dist <= (tonumber(Const.COMBAT_SHOVE_RANGE) or 1.35)
         and report.surroundedCount
@@ -930,8 +1015,7 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
             or equipmentInfo.hasWeapon ~= true
             or report.pressureCount > pressureTolerance
         )
-        and report.staminaRatio
-            > (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
+        and not Tactics.NeedsRecoveryRetreat(record)
 
     if shouldShove then
         record.runtime.combatTactical.decision = "pressure_shove"
@@ -940,33 +1024,22 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
         return false, "pressure_shove", "shove"
     end
 
-    if report.staminaRatio
-            <= (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
-        or dangerousCrowd
-        or (
-            grounded
-            and report.pressureCount
-                > (tonumber(Const.COMBAT_GROUND_FINISHER_MAX_PRESSURE) or 1)
-        )
-    then
+    if Tactics.NeedsRecoveryRetreat(record) then
         sourceX, sourceY, centroidCount = buildZombieThreatCentroid(
             record,
             Const.COMBAT_HORDE_RADIUS
         )
-        record.runtime.combatTactical.decision = grounded
-            and "crawler_pressure_retreat" or "melee_pressure_retreat"
+        record.runtime.combatTactical.decision = "recovering_stamina"
         return startRetreat(
             record,
             zombie,
             target,
             2.8 + math.min(tonumber(centroidCount) or 0, 5) * 0.35,
-            report.staminaRatio > (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
-                and "run" or "walk",
+            "walk",
             0.6,
             math.max(650, tonumber(Const.COMBAT_KITE_RETREAT_LOCK_MS) or 450),
-            grounded and "crawler_pressure_retreat" or "melee_pressure_retreat",
-            report.staminaRatio <= (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
-                and "retreat" or "avoid_horde",
+            "recovering_stamina",
+            "retreat",
             sourceX,
             sourceY,
             record.z
@@ -1169,15 +1242,11 @@ function Tactics.AvoidThreat(record, zombie, target, options)
 end
 
 function Tactics.TryReposition(record, zombie, target, effectiveMode, reason, equipmentInfo)
-    local nearbyCount
     local aiming
-    local meleeSkill
     local dist
     local report
-    local keepRetreating
     local now
     local state
-    local forcedDamageRetreat
 
     if not record or not zombie or not target then
         return false, nil
@@ -1190,65 +1259,25 @@ function Tactics.TryReposition(record, zombie, target, effectiveMode, reason, eq
     state = ensureRetreatState(record)
     dist = math.sqrt(tonumber(target.distSq or 0) or 0)
     report = assessThreat(record, target)
-    nearbyCount = Perception and Perception.CountEnemyZombies and Perception.CountEnemyZombies(record, 2.6) or 0
-
     if continueLockedRetreat(record, zombie, target, state, now) then
         return true, state.reason or "combat_retreat"
     end
 
-    keepRetreating = report.retreating and report.staminaRatio < Const.COMBAT_REENGAGE_STAMINA_RATIO
-    forcedDamageRetreat = target.kind == "zombie"
-        and report.pressureCount >= 2
-        and dist <= (Const.MELEE_RANGE + 0.35)
-        and state
-        and now <= (tonumber(state.damagePressureUntil) or 0)
-    if forcedDamageRetreat then
-        return startRetreat(
-            record,
-            zombie,
-            target,
-            Const.COMBAT_KITE_DAMAGE_DISTANCE,
-            report.surroundedCount >= 2 and "run" or "walk",
-            0.7,
-            Const.COMBAT_KITE_DAMAGE_LOCK_MS,
-            "damage_pressure_retreat",
-            "retreat",
-            state.lastZombieDamageX,
-            state.lastZombieDamageY,
-            state.lastZombieDamageZ
-        )
+    if tryNearMissRetreat(record, zombie, target, state, now, report) then
+        return true, "near_miss_kite"
     end
 
-    if report.staminaRatio <= Const.COMBAT_RETREAT_STAMINA_RATIO or keepRetreating then
+    if Tactics.NeedsRecoveryRetreat(record) then
         return startRetreat(
             record,
             zombie,
             target,
             3.8 + math.min(report.pressureCount, 4) * 0.35,
-            report.surroundedCount >= 2 and "run" or "walk",
+            "walk",
             0.8,
             Const.COMBAT_KITE_RETREAT_LOCK_MS,
             "recovering_stamina",
             "retreat"
-        )
-    end
-
-    if target.kind == "zombie"
-        and (
-            report.visibleHordeCount >= Const.COMBAT_HORDE_COUNT
-            or report.targetCrowdCount >= Const.COMBAT_TARGET_CROWD_COUNT
-        )
-    then
-        return startRetreat(
-            record,
-            zombie,
-            target,
-            2.8 + math.min(report.targetCrowdCount, 4) * 0.45,
-            report.surroundedCount >= 2 and "run" or "walk",
-            0.8,
-            Const.COMBAT_KITE_RETREAT_LOCK_MS,
-            "avoiding_horde",
-            report.staminaRatio <= 0.35 and "retreat" or "avoid_horde"
         )
     end
 
@@ -1273,22 +1302,6 @@ function Tactics.TryReposition(record, zombie, target, effectiveMode, reason, eq
             )
         end
         return false, nil
-    end
-
-    meleeSkill = Skills and Skills.GetLevel and Skills.GetLevel(record, equipmentInfo and equipmentInfo.primaryType == "barehand" and "Strength"
-        or (Skills.ResolveWeaponSkill and Skills.ResolveWeaponSkill(record, record.equipment and record.equipment.primaryFullType, "melee") or "Strength")) or 0
-    if target.kind == "zombie" and (reason == "cooldown_active" or reason == "stamina_exhausted") and nearbyCount >= 2 then
-        return startRetreat(
-            record,
-            zombie,
-            target,
-            0.75 + math.min(meleeSkill, 6) * 0.08,
-            report.surroundedCount >= 2 and "run" or "walk",
-            0.2,
-            Const.COMBAT_KITE_RETREAT_LOCK_MS,
-            "melee_kiting",
-            nil
-        )
     end
 
     return false, nil

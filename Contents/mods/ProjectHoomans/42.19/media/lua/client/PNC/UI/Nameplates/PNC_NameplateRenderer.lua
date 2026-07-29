@@ -23,7 +23,9 @@ local COMBAT_HORDE_COLOR = { r = 1.0, g = 0.12, b = 0.08, a = 0.3 }
 local COMBAT_MELEE_COLOR = { r = 1.0, g = 0.42, b = 0.16, a = 0.58 }
 local COMBAT_RANGE_COLOR = { r = 0.3, g = 0.58, b = 1.0, a = 0.36 }
 local COMBAT_MOVE_COLOR = { r = 0.5, g = 1.0, b = 0.3, a = 0.88 }
+local COMBAT_DEFENSE_COLOR = { r = 0.16, g = 1.0, b = 0.30, a = 0.78 }
 local COMBAT_BLOCKER_COLOR = { r = 1.0, g = 0.15, b = 0.8, a = 0.95 }
+local ZOMBIE_ATTACKER_COLOR = { r = 1.0, g = 0.28, b = 0.12, a = 0.96 }
 local COMBAT_MARKER_HALF_SIZE = 9
 
 local function drawStatusBar(manager, left, top, width, height, ratio, color, alpha, backgroundAlpha)
@@ -345,6 +347,13 @@ function Renderer.BuildCombatDebugLines(debugState, currentTargetDistance)
                 ) .. "%"
                 or "-"
         )
+        .. "/" .. tostring(
+            debugState.staminaCurrent ~= nil
+                and math.floor(
+                    tonumber(debugState.staminaCurrent) or 0
+                )
+                or "-"
+        )
 
     target = debugState.target
     if type(target) == "table" then
@@ -468,7 +477,79 @@ function Renderer.BuildCombatDebugLines(debugState, currentTargetDistance)
                 )
             ) .. "ms"
     end
+    lines[#lines + 1] = "DEFENSE r="
+        .. tostring(rounded(debugState.defenseRadius, 1) or "-")
+        .. " nearby=" .. tostring(
+            tonumber(debugState.defenseNearbyCount) or 0
+        )
+        .. " fit=" .. tostring(
+            debugState.defenseFitness ~= nil
+                and math.floor(tonumber(debugState.defenseFitness) or 0)
+                or "-"
+        )
+        .. " dodge=" .. tostring(
+            debugState.defenseAvoidChance ~= nil
+                and math.floor(
+                    (tonumber(debugState.defenseAvoidChance) or 0)
+                        * 100 + 0.5
+                ) .. "%"
+                or "-"
+        )
+        .. " gear=" .. tostring(
+            debugState.defenseProtection ~= nil
+                and math.floor(
+                    (tonumber(debugState.defenseProtection) or 0)
+                        + 0.5
+                ) .. "%"
+                or "-"
+        )
+        .. " type=" .. tostring(debugState.defenseDamageType or "-")
+        .. " last=" .. tostring(debugState.defenseOutcome or "-")
+        .. (debugState.defensePushed == true and "+push" or "")
     return lines
+end
+
+function Renderer.BuildBodyAnimationDebugLine(zombie, action)
+    local modData
+    local actionState
+    local bumpType
+    local requested
+    local useless
+    local moving
+    local sneaking
+    local finished
+    if not zombie then return nil end
+    modData = zombie.getModData and zombie:getModData() or nil
+    actionState = zombie.getActionStateName
+        and tostring(zombie:getActionStateName() or "")
+        or "-"
+    bumpType = zombie.getBumpType
+        and tostring(zombie:getBumpType() or "")
+        or "-"
+    requested = modData
+        and modData.PNC_ClientAttackRequestedAnim
+        or action and action.anim
+        or "-"
+    useless = zombie.isUseless
+        and zombie:isUseless() == true or false
+    moving = zombie.isMoving
+        and zombie:isMoving() == true or false
+    sneaking = zombie.isSneaking
+        and zombie:isSneaking() == true or false
+    finished = zombie.getVariableBoolean
+        and zombie:getVariableBoolean("BumpAnimFinished")
+        == true or false
+    return "ANIM req=" .. tostring(requested)
+        .. " bump=" .. tostring(bumpType ~= "" and bumpType or "-")
+        .. " state=" .. tostring(actionState ~= "" and actionState or "-")
+        .. " useless=" .. tostring(useless)
+        .. " moving=" .. tostring(moving)
+        .. " sneak=" .. tostring(sneaking)
+        .. " done=" .. tostring(finished)
+        .. " lease=" .. tostring(
+            modData and modData.PNC_BumpActionLease == true
+                or false
+        )
 end
 
 local function screenPoint(manager, x, y, z)
@@ -747,6 +828,132 @@ local function drawFireLane(manager, zombie, debugState, target)
     )
 end
 
+local function resolveZombieAttacker(attacker)
+    local onlineID
+    local zombieId
+    local zombie
+    if type(attacker) ~= "table" then return nil end
+    onlineID = tonumber(attacker.onlineID)
+    if onlineID and onlineID >= 0
+        and PNC.Network
+        and PNC.Network.FindZombieByOnlineID
+    then
+        zombie =
+            PNC.Network.FindZombieByOnlineID(onlineID)
+        if zombie then return zombie end
+    end
+    zombieId = attacker.zombieId
+    if zombieId
+        and PNC.Perception
+        and PNC.Perception.FindZombieByID
+    then
+        return PNC.Perception.FindZombieByID(zombieId)
+    end
+    return nil
+end
+
+local function drawZombieAttackerDebug(
+    manager,
+    npcBody,
+    attacker
+)
+    local zombie
+    local x
+    local y
+    local z
+    local npcX
+    local npcY
+    local npcZ
+    local distance
+    local screenX
+    local screenY
+    local lineHeight
+    local firstLine
+    local secondLine
+    if not npcBody or type(attacker) ~= "table" then
+        return
+    end
+    zombie = resolveZombieAttacker(attacker)
+    if zombie and zombie.isDead and zombie:isDead() then
+        zombie = nil
+    end
+    x = zombie and zombie:getX() or tonumber(attacker.x)
+    y = zombie and zombie:getY() or tonumber(attacker.y)
+    z = zombie and zombie:getZ() or tonumber(attacker.z)
+    if not x or not y or z == nil then return end
+    npcX = npcBody:getX()
+    npcY = npcBody:getY()
+    npcZ = npcBody:getZ()
+    distance = math.sqrt(
+        ((x - npcX) * (x - npcX))
+            + ((y - npcY) * (y - npcY))
+    )
+    drawWorldLine(
+        manager,
+        x,
+        y,
+        z,
+        npcX,
+        npcY,
+        npcZ,
+        ZOMBIE_ATTACKER_COLOR
+    )
+    drawWorldMarker(
+        manager,
+        x,
+        y,
+        z,
+        ZOMBIE_ATTACKER_COLOR,
+        COMBAT_MARKER_HALF_SIZE + 4
+    )
+    screenX, screenY = screenPoint(manager, x, y, z)
+    lineHeight =
+        getTextManager():getFontHeight(Fonts.debug) + 2
+    firstLine = "ZED->NPC "
+        .. tostring(attacker.zombieId or attacker.onlineID or "?")
+        .. " phase=" .. tostring(attacker.phase or "-")
+        .. " d=" .. tostring(rounded(distance, 2) or "-")
+        .. " age=" .. tostring(
+            math.floor(tonumber(attacker.ageMs) or 0)
+        ) .. "ms"
+    secondLine = "state="
+        .. tostring(
+            zombie and zombie.getActionStateName
+                and zombie:getActionStateName()
+                or attacker.actionState or "-"
+        )
+        .. " bump="
+        .. tostring(
+            zombie and zombie.getBumpType
+                and zombie:getBumpType()
+                or attacker.bumpType or "-"
+        )
+        .. " path2="
+        .. tostring(
+            zombie and zombie.getPath2
+                and zombie:getPath2() ~= nil
+                or attacker.path2Active == true
+        )
+    Presentation.DrawOutlinedText(
+        manager,
+        firstLine,
+        screenX + 16,
+        screenY - lineHeight,
+        ZOMBIE_ATTACKER_COLOR,
+        1,
+        Fonts.debug
+    )
+    Presentation.DrawOutlinedText(
+        manager,
+        secondLine,
+        screenX + 16,
+        screenY,
+        ZOMBIE_ATTACKER_COLOR,
+        1,
+        Fonts.debug
+    )
+end
+
 local function drawCombatDebug(manager, entry)
     local zombie = entry.zombie
     local debugState = entry.snapshot
@@ -782,9 +989,24 @@ local function drawCombatDebug(manager, entry)
     active = type(target) == "table"
         or type(debugState.action) == "table"
         or type(debugState.tacticalMove) == "table"
+        or type(debugState.zombieAttacker) == "table"
         or entry.snapshot.attackMode == true
         or entry.snapshot.inCombat == true
     if not active then return end
+    drawWorldCircle(
+        manager,
+        worldX,
+        worldY,
+        worldZ,
+        debugState.defenseRadius,
+        COMBAT_DEFENSE_COLOR,
+        false
+    )
+    drawZombieAttackerDebug(
+        manager,
+        zombie,
+        debugState.zombieAttacker
+    )
     drawWorldCircle(
         manager,
         worldX,
@@ -902,6 +1124,13 @@ local function drawCombatDebug(manager, entry)
         debugState,
         targetDistance
     )
+    if type(debugState.action) == "table" then
+        lines[#lines + 1] =
+            Renderer.BuildBodyAnimationDebugLine(
+                zombie,
+                debugState.action
+            )
+    end
     if #lines <= 0 then return end
     if debugState.fireLaneSafe == false then
         textColor = COMBAT_UNSAFE_COLOR
@@ -927,6 +1156,24 @@ local function drawCombatDebug(manager, entry)
     labelY = screenY + 18
     for i = 1, #lines do
         labelX = screenX + 18
+        if string.sub(lines[i], 1, 8) == "DEFENSE " then
+            textColor = COMBAT_DEFENSE_COLOR
+        elseif string.sub(lines[i], 1, 5) == "ANIM " then
+            textColor = DEBUG_COLOR
+        elseif debugState.fireLaneSafe == false then
+            textColor = COMBAT_UNSAFE_COLOR
+        elseif debugState.decision
+            and string.find(
+                tostring(debugState.decision),
+                "retreat",
+                1,
+                true
+            )
+        then
+            textColor = COMBAT_AIM_COLOR
+        else
+            textColor = COMBAT_CONE_COLOR
+        end
         Presentation.DrawOutlinedText(
             manager,
             lines[i],

@@ -230,6 +230,20 @@ function Stealth.IsFollowStealthActive(record)
     return runtime and runtime.stealthActive == true and runtime.ownerSneaking == true
 end
 
+function Stealth.SuspendForCombat(record, reason)
+    local runtime
+    if not record then
+        return false
+    end
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    runtime.stealthActive = false
+    runtime.stealthBroken = true
+    runtime.stealthReason = reason or "combat_active"
+    logStealthState(record, runtime, runtime.stealthReason)
+    return true
+end
+
 local function applyTravelBodyProtection(record, zombie, active)
     local protectedBySettings = Settings
         and Settings.CanZombieTargetRecord

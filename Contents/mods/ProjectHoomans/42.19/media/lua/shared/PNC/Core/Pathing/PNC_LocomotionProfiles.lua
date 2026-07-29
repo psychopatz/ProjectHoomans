@@ -128,14 +128,16 @@ local function resolveStaminaMode(record, lane, requestedMode)
     if requestedMode == "crawl" then
         return "crawl"
     end
-    if requestedMode == "sneak" or (runtime and runtime.stealthActive == true) then
-        return "sneak"
-    end
     if retreatState and (tonumber(retreatState.lockUntil) or 0) > 0 then
         return "combat_retreat"
     end
     if runtime and runtime.target then
         return "combat_close"
+    end
+    if requestedMode == "sneak"
+        or (runtime and runtime.stealthActive == true)
+    then
+        return "sneak"
     end
     return "travel"
 end

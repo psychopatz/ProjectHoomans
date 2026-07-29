@@ -253,6 +253,8 @@ assert(cancelCount == 1 and resetCount == 1,
 useless = true
 bodyModData.PNC_BumpActionLease = true
 bodyModData.PNC_BumpActionLeaseUntil = clientNow + 1000
+PNC.ClientPresenceSync.NativePathStateByBody[body].owned = true
+body.actionState = "pathfind"
 local attackSnapshot = {
     id = snapshot.id,
     liveBodyLease = snapshot.liveBodyLease,
@@ -273,6 +275,8 @@ assert(
     ),
     "attack snapshot retained a native path goal"
 )
+assert(cancelCount == 2 and resetCount == 2,
+    "attack snapshot did not release delegated movement before PlayBump")
 assert(useless == false,
     "attack action lease did not keep the MP action context active")
 local requestsBeforeAttackUpdate = requestCount

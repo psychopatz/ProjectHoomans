@@ -77,6 +77,12 @@ PNC = {
         end,
     },
     CombatTactics = {
+        NeedsRecoveryRetreat = function(targetRecord)
+            return targetRecord
+                and targetRecord.stamina
+                and (tonumber(targetRecord.stamina.current) or 100) < 20
+                or false
+        end,
         AvoidThreat = function(_, _, _, options)
             if not retreatAvailable then
                 return false, "retreat_stalled"
@@ -104,6 +110,7 @@ local record = {
     x = 0, y = 0, z = 0,
     runtime = {},
     health = { state = "normal" },
+    stamina = { current = 10, max = 100 },
 }
 local zombie = {
     getModData = function() return zombieModData end,
@@ -120,12 +127,13 @@ local zombie = {
 threat = { kind = "zombie", x = 1, y = 0, z = 0, distSq = 1 }
 assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
     "injured NPC retreats before treating")
-assertEqual(moveRequest.mode, "run", "treatment retreat runs")
+assertEqual(moveRequest.mode, "walk", "exhausted treatment retreat preserves stamina")
 assertEqual(moveRequest.reason, "self_treatment_retreat", "retreat intent")
 assertEqual(consumed, 0, "retreat consumed no bandage")
 
 threat = nil
 now = now + 100
+record.stamina.current = 100
 assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
     "safe NPC starts treatment")
 assertEqual(bumpType, "BandageLeftArm", "body-part-specific animation")
@@ -136,8 +144,8 @@ assertEqual(zombieModData.PNC_ClientTreatmentSoundKey, "Hand_L:1100",
 
 threat = { kind = "zombie", x = 2, y = 0, z = 0, distSq = 4 }
 now = now + 100
-assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
-    "near threat interrupts treatment")
+assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), false,
+    "fit NPC interrupts treatment and returns to combat")
 assertEqual(consumed, 0, "interrupted treatment consumed no item")
 assertEqual(bumpFinished, 1, "interrupted animation released")
 
@@ -172,6 +180,7 @@ treatable = true
 threat = { kind = "zombie", x = 1, y = 0, z = 0, distSq = 1 }
 retreatAvailable = false
 record.runtime.selfTreatment.phase = "idle"
+record.stamina.current = 10
 assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now + 2000), false,
     "stalled treatment retreat did not yield to defensive combat")
 assertEqual(record.runtime.selfTreatment.interruptedReason, "retreat_stalled",

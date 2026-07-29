@@ -11,6 +11,7 @@ end
 local engaged = 0
 local avoided = 0
 local cleared = 0
+local stealthSuspended = 0
 
 local owner = {
     getUsername = function() return "alice" end,
@@ -92,6 +93,14 @@ PNC = {
             return true, "companion_avoiding_threat"
         end,
     },
+    Stealth = {
+        UpdateFollowState = function() end,
+        SuspendForCombat = function(record)
+            stealthSuspended = stealthSuspended + 1
+            record.runtime.stealthActive = false
+            return true
+        end,
+    },
     Registry = {
         ForEach = function(callback)
             callback(PNC.TestRecord)
@@ -130,10 +139,15 @@ assertEqual(record.runtime.combatModeResolved, "none",
     "avoid debug combat mode")
 
 record.attackType = "auto"
+record.runtime.stealthActive = true
 assertEqual(PNC.BehaviorCompanion.Tick(record, {}, "FollowOwner"),
     true, "auto attack follow tick handled")
 assertEqual(engaged, 1, "auto attack did not engage")
 assertEqual(avoided, 1, "auto attack used avoid-only branch")
 assert(cleared >= 1, "don't attack did not clear combat state")
+assertEqual(stealthSuspended, 1,
+    "combat target did not suspend follow stealth")
+assertEqual(record.runtime.stealthActive, false,
+    "combat engagement retained sneak locomotion")
 
 print("pnc_companion_attack_type_smoke: ok")

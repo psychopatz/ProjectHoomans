@@ -48,10 +48,10 @@ function Combat.TryMelee(record, zombie, target)
     if Combat.HasActiveAttack and Combat.HasActiveAttack(record, now) then
         return false, "attack_in_progress"
     end
-    if not Internal.canAttack(record, now, cooldownMs) then
-        return false, "cooldown_active"
-    end
 
+    -- Range owns approach arbitration. Checking cooldown first made an NPC
+    -- outside strike reach stand still for the cooldown window (or forever
+    -- after a stale timestamp) instead of proactively closing on its target.
     if Internal.refreshTargetDistance then
         dist, liveTarget = Internal.refreshTargetDistance(
             record,
@@ -68,6 +68,9 @@ function Combat.TryMelee(record, zombie, target)
     ) then
         return false, "target_out_of_range"
     end
+    if not Internal.canAttack(record, now, cooldownMs) then
+        return false, "cooldown_active"
+    end
     if Stamina and Stamina.CanSpendAttack and not Stamina.CanSpendAttack(record, "melee", skillID) then
         return false, "stamina_exhausted"
     end
@@ -77,11 +80,15 @@ function Combat.TryMelee(record, zombie, target)
     else
         damage = damage * (0.9 + math.min(skillLevel, 8) * 0.04 + math.min(strengthLevel, 6) * 0.02)
     end
+    if Internal.prepareAttackMovement then
+        Internal.prepareAttackMovement(
+            record,
+            zombie,
+            "melee_windup"
+        )
+    end
     record.runtime.lastAttackAt = now
     record.runtime.inCombatUntil = now + Const.DEBUG_COMBAT_HOLD_MS
-    if PNC.BehaviorMoveIntent and PNC.BehaviorMoveIntent.Hold then
-        PNC.BehaviorMoveIntent.Hold(record, "melee_windup")
-    end
     Internal.faceTarget(zombie, target, record, Internal.ATTACK_TIMINGS.melee.duration, "melee_windup")
 
     if target.kind == "zombie" then
@@ -178,6 +185,13 @@ function Combat.TryShove(record, zombie, target, reason)
     zombieTarget = Perception.FindZombieByID
         and Perception.FindZombieByID(target.zombieId) or nil
     if not zombieTarget then return false, "invalid_zombie_target" end
+    if Internal.prepareAttackMovement then
+        Internal.prepareAttackMovement(
+            record,
+            zombie,
+            reason or "shove_windup"
+        )
+    end
     record.runtime.lastAttackAt = now
     record.runtime.inCombatUntil = now + Const.DEBUG_COMBAT_HOLD_MS
     Internal.faceTarget(

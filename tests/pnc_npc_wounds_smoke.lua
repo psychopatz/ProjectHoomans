@@ -144,9 +144,35 @@ local function makeRecord(id)
 end
 
 local protection = 0
+local coveredPartNames = {
+    "Head", "Neck", "UpperBody", "LowerBody", "Groin",
+    "UpperArm_L", "UpperArm_R", "ForeArm_L", "ForeArm_R",
+    "Hand_L", "Hand_R", "UpperLeg_L", "UpperLeg_R",
+    "LowerLeg_L", "LowerLeg_R", "Foot_L", "Foot_R",
+}
+local coveredParts = {
+    size = function() return #coveredPartNames end,
+    get = function(_, index) return coveredPartNames[index + 1] end,
+}
+local armorItem = {
+    getCoveredParts = function() return coveredParts end,
+    getBiteDefense = function() return protection end,
+    getScratchDefense = function() return protection end,
+    getBulletDefense = function() return protection end,
+    getCondition = function() return 10 end,
+    getConditionMax = function() return 10 end,
+}
+local wornEntry = {
+    getItem = function() return armorItem end,
+    getLocation = function() return "FullSuit" end,
+}
+local wornItems = {
+    size = function() return 1 end,
+    get = function() return wornEntry end,
+}
 local body = {
     getX = function() return 0 end, getY = function() return 0 end, getZ = function() return 0 end,
-    getBodyPartClothingDefense = function() return protection end,
+    getWornItems = function() return wornItems end,
     setUseless = function() end, setHealth = function() end, setZombiesDontAttack = function() end,
 }
 local attacker = {

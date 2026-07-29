@@ -170,6 +170,7 @@ function LiveBodyControl.ReleaseDamageReaction(zombie, actionState)
         modData.PNC_BumpReleaseAt = nil
         modData.PNC_BumpActionLease = nil
         modData.PNC_BumpActionLeaseUntil = nil
+        modData.PNC_BumpKeepUseless = nil
     end
     return isDamageReaction
 end
@@ -392,10 +393,11 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
             tonumber(modData.PNC_BumpActionLeaseUntil)
                 or now
         ) then
-            return true
+            return modData.PNC_BumpKeepUseless ~= true
         end
         modData.PNC_BumpActionLease = nil
         modData.PNC_BumpActionLeaseUntil = nil
+        modData.PNC_BumpKeepUseless = nil
     end
     if Core and Core.IsAuthority and not Core.IsAuthority() then
         return false

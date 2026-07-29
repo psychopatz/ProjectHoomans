@@ -5,6 +5,7 @@ local FILE =
 local now = 1000
 local scans = 0
 local records = {}
+local moves = {}
 local owner = {
     getForwardDirection = function()
         return {
@@ -45,11 +46,13 @@ PNC = {
         FOLLOW_IDLE_ENTER_DISTANCE = 2.4,
         FOLLOW_IDLE_EXIT_DISTANCE = 3.2,
         FOLLOW_RUN_DISTANCE = 8,
-        FOLLOW_SLOT_DISTANCE = 1.5,
-        FOLLOW_SLOT_LATERAL = 0.95,
-        FOLLOW_SLOT_ROW_DISTANCE = 0.75,
-        FOLLOW_SLOT_ROW_LATERAL = 0.2,
-        FOLLOW_SLOT_STOP_DISTANCE = 0.65,
+        FOLLOW_SLOT_DISTANCE = 2.25,
+        FOLLOW_SLOT_LATERAL = 1.15,
+        FOLLOW_SLOT_ROW_DISTANCE = 0.85,
+        FOLLOW_SLOT_ROW_LATERAL = 0.25,
+        FOLLOW_SLOT_STOP_DISTANCE = 0.35,
+        FOLLOW_INDOOR_APPROACH_DISTANCE = 1.6,
+        FOLLOW_PERSONAL_SPACE_MIN = 1.25,
         ORDER_FOLLOW = "follow",
     },
     Core = {
@@ -64,7 +67,17 @@ PNC = {
     BehaviorCommon = {
         ClearCombatTarget = function() end,
         GetOwner = function() return owner end,
-        MoveRecord = function() return true end,
+        HaltMovement = function() end,
+        MoveRecord = function(record, _, x, y, z, mode, stopDistance)
+            moves[tostring(record.id)] = {
+                x = x,
+                y = y,
+                z = z,
+                mode = mode,
+                stopDistance = stopDistance,
+            }
+            return true
+        end,
     },
     BehaviorTargeting = {
         ResolveCompanionEngageTarget = function() return nil end,
@@ -99,6 +112,36 @@ assert(
     "follow steering target was reallocated"
 )
 
+-- Being close to the owner is not itself a valid formation hold. A lone
+-- follower inside personal space must move back to its assigned rear slot.
+now = 1251
+records = {
+    {
+        id = "solo",
+        alive = true,
+        attackType = "auto",
+        orderSpec = { kind = "follow" },
+        ownerOnlineID = 7,
+        ownerUsername = "alice",
+        presenceState = "live",
+        runtime = {},
+        x = 0.25,
+        y = 0,
+        z = 0,
+    },
+}
+PNC.BehaviorCompanion.Tick(records[1], {}, "FollowOwner")
+local soloMove = moves.solo
+assert(soloMove ~= nil,
+    "close follower accepted a player-blocking hold position")
+assert(
+    math.sqrt((soloMove.x * soloMove.x)
+        + (soloMove.y * soloMove.y)) >= 2.2,
+    "solo follow slot remained inside player personal space"
+)
+assert(soloMove.stopDistance <= 0.35,
+    "follow slot tolerance erased the configured spacing")
+
 now = 1300
 PNC.BehaviorCompanion.Tick(records[1], {}, "FollowOwner")
 assert(scans == 2, "formation cache did not refresh after its window")
@@ -121,12 +164,17 @@ getCell = function()
         end,
     }
 end
+records[1].x = 2
 now = 1600
 PNC.BehaviorCompanion.Tick(records[1], {}, "FollowOwner")
 assert(
     records[1].runtime.followSlotTarget.x == owner:getX()
         and records[1].runtime.followSlotTarget.y == owner:getY(),
     "indoor formation slot remained across a building wall"
+)
+assert(
+    records[1].runtime.followSlotTarget.stopDistance == 1.6,
+    "indoor doorway approach collapsed into the player's body"
 )
 
 print("pnc_follow_formation_cache_smoke: ok")

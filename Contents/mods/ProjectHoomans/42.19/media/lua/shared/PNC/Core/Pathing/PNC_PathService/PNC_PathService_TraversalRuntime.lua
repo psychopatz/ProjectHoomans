@@ -177,7 +177,12 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
         Internal.applyFacingLocation(zombie, lane, lane.traversalAction.endX, lane.traversalAction.endY, now, "traversal", true)
     end
     if Animation and Animation.PlayBump then
-        Animation.PlayBump(zombie, record, lane.traversalAction.anim)
+        Animation.PlayBump(
+            zombie,
+            record,
+            lane.traversalAction.anim,
+            { keepManagedUseless = true }
+        )
     elseif zombie.setBumpType then
         zombie:setBumpType(lane.traversalAction.anim)
     end

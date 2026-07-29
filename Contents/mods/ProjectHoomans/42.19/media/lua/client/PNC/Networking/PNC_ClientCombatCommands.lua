@@ -55,7 +55,7 @@ local function finishBiteReplica(attackerZombie)
         attackerZombie:setBumpType("")
     end
     if attackerZombie and attackerZombie.setBumpedChr then
-        pcall(attackerZombie.setBumpedChr, attackerZombie, nil)
+        attackerZombie:setBumpedChr(nil)
     end
     if attackerZombie and attackerZombie.setVariable then
         attackerZombie:setVariable("PNCZombieBitingNPC", false)

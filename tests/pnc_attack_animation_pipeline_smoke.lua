@@ -97,13 +97,27 @@ assertContains(
 )
 assertContains(
     playBump,
-    "setManagedUseless(zombie, false, true)",
+    "applyBumpLeaseBodyMode(zombie)",
     "bumped action-context lease"
 )
 assertContains(
     clientSync,
     "Animation.PlayBump(zombie, recordView, anim)",
     "client attack presentation uses shared trigger"
+)
+assert(
+    not string.find(
+        clientSync,
+        "attack_anim_retry",
+        1,
+        true
+    ),
+    "client attack presentation must not restart Bandits-style bumps"
+)
+assertContains(
+    clientSync,
+    "observeClientAttackBump(zombie, modData)",
+    "client records the live action graph without replaying it"
 )
 assertContains(
     attackXML,

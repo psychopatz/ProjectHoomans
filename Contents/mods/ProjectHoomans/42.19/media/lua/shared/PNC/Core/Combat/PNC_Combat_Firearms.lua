@@ -461,6 +461,13 @@ function Firearms.StartReload(record, zombie, target, weaponItem)
     if not Internal.buildAttackAction then
         return false, "action_service_unavailable"
     end
+    if Internal.prepareAttackMovement then
+        Internal.prepareAttackMovement(
+            record,
+            zombie,
+            "reload_windup"
+        )
+    end
     Internal.buildAttackAction(record, target, "reload", "reload", anim, 0, "Reloading", {
         durationMs = descriptor.reloadDurationMs,
         hitDelayMs = descriptor.reloadDurationMs,

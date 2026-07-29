@@ -394,8 +394,15 @@ local function buildCombatDebugState(record, combat, firearmState)
     local aim = runtime.combatAim or {}
     local fireLane = runtime.combatFireLane or {}
     local retreat = runtime.combatRetreat or {}
+    local defense = runtime.combatDefense or {}
     local action = runtime.attackAction
     local now = Core.Now()
+    local zombieAttacker = runtime.zombieAttacker
+    local zombieAttackerAge = zombieAttacker
+        and math.max(
+            0,
+            now - (tonumber(zombieAttacker.observedAt) or now)
+        ) or nil
     return {
         target = target and {
             kind = target.kind,
@@ -428,6 +435,36 @@ local function buildCombatDebugState(record, combat, firearmState)
                 now - (tonumber(tactical.assessedAt) or now)
             ) or nil,
         staminaRatio = tactical.stamina,
+        staminaCurrent = tactical.staminaCurrent,
+        defenseRadius = tonumber(defense.radius)
+            or tonumber(Const.NPC_ZOMBIE_DEFENSE_RADIUS)
+            or 2.2,
+        defenseNearbyCount = tonumber(defense.nearbyCount) or 0,
+        defenseFitness = tonumber(defense.fitness),
+        defenseDamageType = defense.damageType,
+        defenseProtection = tonumber(defense.protection),
+        defenseAvoidChance = tonumber(defense.avoidChance),
+        defenseRoll = tonumber(defense.roll),
+        defenseOutcome = defense.outcome,
+        defensePushed = defense.pushed == true,
+        defenseAgeMs = defense.updatedAt
+            and math.max(0, now - (tonumber(defense.updatedAt) or now))
+            or nil,
+        zombieAttacker = zombieAttacker
+            and zombieAttackerAge <= 1500 and {
+                zombieId = zombieAttacker.zombieId,
+                onlineID = zombieAttacker.onlineID,
+                phase = zombieAttacker.phase,
+                ageMs = zombieAttackerAge,
+                x = zombieAttacker.x,
+                y = zombieAttacker.y,
+                z = zombieAttacker.z,
+                distSq = zombieAttacker.distSq,
+                actionState = zombieAttacker.actionState,
+                bumpType = zombieAttacker.bumpType,
+                path2Active =
+                    zombieAttacker.path2Active == true,
+            } or nil,
         aimConfidence = aim.confidence,
         aimReadyInMs = aim.readyAt
             and math.max(0, (tonumber(aim.readyAt) or now) - now)

@@ -50,6 +50,10 @@ local BANDAGE_QUALITY = {
     ["Base.RippedSheets"] = 0.90,
 }
 local DEBUG_WOUND_TYPES = { "scratch", "laceration", "bite" }
+local COVERAGE_PART_ALIASES = {
+    UpperBody = "Torso_Upper",
+    LowerBody = "Torso_Lower",
+}
 
 local function worldHour()
     local gameTime = getGameTime and getGameTime() or nil
@@ -87,61 +91,132 @@ function Wounds.ChoosePartId()
     return part and part.id or "Torso_Upper"
 end
 
-local function resolvePartIndex(part)
-    local value = BodyPartType and part and BodyPartType[part.engine] or nil
-    local ok
-    local index
-    if not value then return nil, nil end
-    if BodyPartType.ToIndex then
-        ok, index = pcall(BodyPartType.ToIndex, value)
-        if ok and tonumber(index) then return tonumber(index), value end
+local function itemCoversPart(item, entry, partId)
+    local covered = item
+        and item.getCoveredParts
+        and item:getCoveredParts()
+        or nil
+    local name
+    local i
+    if covered and covered.size and covered.get then
+        for i = 0, covered:size() - 1 do
+            name = tostring(covered:get(i) or "")
+            name = string.match(name, "([%w_]+)$") or name
+            name = COVERAGE_PART_ALIASES[name] or name
+            if name == partId then return true end
+        end
+        return false
     end
-    if value.index then
-        ok, index = pcall(value.index, value)
-        if ok and tonumber(index) then return tonumber(index), value end
+    -- Non-clothing defensive items can omit covered-parts metadata. Fall back
+    -- to the worn slot without invoking ambiguous Java overloads.
+    name = entry
+        and (
+            entry.getLocation and tostring(entry:getLocation())
+            or entry.getBodyLocation
+                and tostring(entry:getBodyLocation())
+        )
+        or ""
+    name = string.lower(name)
+    if partId == "Head" then
+        return string.find(name, "head", 1, true) ~= nil
+            or string.find(name, "hat", 1, true) ~= nil
     end
-    return nil, value
+    if partId == "Neck" then
+        return string.find(name, "neck", 1, true) ~= nil
+            or string.find(name, "scarf", 1, true) ~= nil
+    end
+    if string.find(partId, "Hand", 1, true) then
+        return string.find(name, "hand", 1, true) ~= nil
+            or string.find(name, "glove", 1, true) ~= nil
+    end
+    if string.find(partId, "Foot", 1, true) then
+        return string.find(name, "shoe", 1, true) ~= nil
+            or string.find(name, "sock", 1, true) ~= nil
+            or string.find(name, "foot", 1, true) ~= nil
+    end
+    if string.find(partId, "Leg", 1, true)
+        or partId == "Groin"
+        or partId == "Torso_Lower"
+    then
+        return string.find(name, "pants", 1, true) ~= nil
+            or string.find(name, "trouser", 1, true) ~= nil
+            or string.find(name, "skirt", 1, true) ~= nil
+            or string.find(name, "short", 1, true) ~= nil
+    end
+    return string.find(name, "shirt", 1, true) ~= nil
+        or string.find(name, "jacket", 1, true) ~= nil
+        or string.find(name, "sweater", 1, true) ~= nil
+        or string.find(name, "torso", 1, true) ~= nil
+        or string.find(name, "suit", 1, true) ~= nil
 end
 
-function Wounds.GetProtection(npcBody, part)
-    local index
-    local enum
-    local ok
-    local value
-    if not npcBody then return 0 end
-    if npcBody.getBodyPartClothingDefense then
-        index, enum = resolvePartIndex(part)
-        if index ~= nil then
-            ok, value = pcall(npcBody.getBodyPartClothingDefense, npcBody, index, true, false)
-            if ok and tonumber(value) then return Core.Clamp(tonumber(value), 0, 100) end
-        end
-        if enum ~= nil then
-            ok, value = pcall(npcBody.getBodyPartClothingDefense, npcBody, enum, true, false)
-            if ok and tonumber(value) then return Core.Clamp(tonumber(value), 0, 100) end
-        end
-    end
-    -- Older/alternate IsoZombie bindings may not expose per-part defense. Use
-    -- a conservative worn-item average so armor still matters without an
-    -- expensive inventory or visual scan.
+function Wounds.GetProtection(npcBody, part, damageType)
+    local remainingRisk = 1
+    local partId = part and tostring(part.id or part) or nil
+    if not npcBody or not partId then return 0 end
+    damageType = string.lower(tostring(damageType or "bite"))
+    -- Fake-human IsoZombie bodies do not consistently expose
+    -- getBodyPartClothingDefense (and calling the wrong Java overload can
+    -- fault). Read the already-materialized worn items directly instead.
+    -- Layered protection is combined as independent risk reduction and item
+    -- condition scales the effective value.
     local worn = npcBody.getWornItems and npcBody:getWornItems() or nil
     local count = 0
-    local total = 0
     local i
     local entry
     local item
     local defense
+    local conditionRatio
     if worn and worn.size and worn.get then
         for i = 0, worn:size() - 1 do
             entry = worn:get(i)
             item = entry and entry.getItem and entry:getItem() or entry
-            defense = item and item.getBiteDefense and tonumber(item:getBiteDefense()) or nil
+            if not itemCoversPart(item, entry, partId) then
+                defense = nil
+            elseif damageType == "bullet" then
+                defense = item
+                    and item.getBulletDefense
+                    and tonumber(item:getBulletDefense())
+                    or nil
+            elseif damageType == "scratch"
+                or damageType == "laceration"
+            then
+                defense = item
+                    and item.getScratchDefense
+                    and tonumber(item:getScratchDefense())
+                    or nil
+            else
+                defense = item
+                    and item.getBiteDefense
+                    and tonumber(item:getBiteDefense())
+                    or nil
+            end
             if defense then
-                total = total + Core.Clamp(defense, 0, 100)
+                conditionRatio = 1
+                if item.getCondition and item.getConditionMax then
+                    conditionRatio = Core.Clamp(
+                        (tonumber(item:getCondition()) or 0)
+                            / math.max(
+                                1,
+                                tonumber(item:getConditionMax()) or 1
+                            ),
+                        0,
+                        1
+                    )
+                end
+                defense = Core.Clamp(
+                    defense * conditionRatio,
+                    0,
+                    100
+                )
+                remainingRisk = remainingRisk * (1 - defense / 100)
                 count = count + 1
             end
         end
     end
-    if count > 0 then return Core.Clamp(total / count, 0, 100) end
+    if count > 0 then
+        return Core.Clamp((1 - remainingRisk) * 100, 0, 100)
+    end
     return 0
 end
 
@@ -418,6 +493,14 @@ local function chooseWoundType()
     return "scratch"
 end
 
+function Wounds.ChooseZombieAttackPart()
+    return choosePart()
+end
+
+function Wounds.RollZombieAttackType()
+    return chooseWoundType()
+end
+
 local function addWound(record, part, woundType, now, woundDamage)
     local body = Wounds.Ensure(record)
     local stats = WOUND_STATS[woundType] or WOUND_STATS.scratch
@@ -593,11 +676,15 @@ end
 
 function Wounds.ResolveZombieAttack(record, npcBody, attacker, attackerZombieId)
     local part = choosePart()
-    local protection = Wounds.GetProtection(npcBody, part)
+    local woundType = chooseWoundType()
+    local protection = Wounds.GetProtection(
+        npcBody,
+        part,
+        woundType
+    )
     local baseChance = Settings.NPCZombieWoundChance()
     local finalChance = Core.Clamp(baseChance * (1 - protection / 100), 0, 100)
     local woundRoll = randomPercent()
-    local woundType
     local wound
     local damage
     if woundRoll >= finalChance then
@@ -609,7 +696,6 @@ function Wounds.ResolveZombieAttack(record, npcBody, attacker, attackerZombieId)
             roll = woundRoll,
         }
     end
-    woundType = chooseWoundType()
     wound, damage = addWound(record, part, woundType, Core.Now())
     PNC.Health.ApplyDamage(record, npcBody, {
         amount = damage,
@@ -631,6 +717,66 @@ function Wounds.ResolveZombieAttack(record, npcBody, attacker, attackerZombieId)
         protection = protection,
         chance = finalChance,
         roll = woundRoll,
+        infected = Wounds.HasActiveInfection(record),
+    }
+end
+
+-- Applies a zombie hit after CombatDefense has already performed the single
+-- no-harm roll. Keeping this separate from ResolveZombieAttack prevents a
+-- second legacy parry roll from making the displayed probability dishonest.
+function Wounds.ApplyResolvedZombieAttack(
+    record,
+    npcBody,
+    attacker,
+    attackerZombieId,
+    defenseResult
+)
+    local part = defenseResult and defenseResult.part or nil
+    local woundType = tostring(
+        defenseResult and defenseResult.damageType or "scratch"
+    )
+    local protection = tonumber(
+        defenseResult and defenseResult.protection
+    ) or 0
+    local wound
+    local damage
+    if not part or not WOUND_STATS[woundType] then
+        return false, {
+            outcome = "invalid_resolved_attack",
+            partId = defenseResult and defenseResult.partId or nil,
+        }
+    end
+    wound, damage = addWound(
+        record,
+        part,
+        woundType,
+        Core.Now()
+    )
+    PNC.Health.ApplyDamage(record, npcBody, {
+        amount = damage,
+        partId = part.id,
+        type = "zombie_" .. woundType,
+        attackerKind = "zombie",
+        attackerZombieId = attackerZombieId,
+        x = attacker and attacker.getX
+            and attacker:getX() or record.x,
+        y = attacker and attacker.getY
+            and attacker:getY() or record.y,
+        z = attacker and attacker.getZ
+            and attacker:getZ() or record.z,
+    })
+    record.runtime = record.runtime or {}
+    record.runtime.forceSyncEvent = "npc_wound"
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "wounds")
+    end
+    return true, {
+        outcome = "wounded",
+        partId = part.id,
+        woundType = wound.type,
+        protection = protection,
+        chance = defenseResult and defenseResult.avoidChance or nil,
+        roll = defenseResult and defenseResult.roll or nil,
         infected = Wounds.HasActiveInfection(record),
     }
 end

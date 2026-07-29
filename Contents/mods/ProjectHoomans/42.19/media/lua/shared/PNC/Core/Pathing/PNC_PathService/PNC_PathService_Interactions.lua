@@ -36,32 +36,13 @@ end
 local function methodReturnsTrue(object, names)
     local i
     local method
-    local ok
     local result
     if not object then return false end
     for i = 1, #names do
         method = object[names[i]]
         if type(method) == "function" then
-            ok, result = pcall(method, object)
-            if ok and result == true then return true end
-        end
-    end
-    return false
-end
-
-local function methodReturnsValue(object, names)
-    local i
-    local method
-    local ok
-    local result
-    if not object then return false end
-    for i = 1, #names do
-        method = object[names[i]]
-        if type(method) == "function" then
-            ok, result = pcall(method, object)
-            if ok and result ~= nil and result ~= false and result ~= 0 and result ~= "" then
-                return true
-            end
+            result = method(object)
+            if result == true then return true end
         end
     end
     return false
@@ -117,13 +98,10 @@ end
 
 function Internal.isDoorCollision(zombie)
     local method
-    local ok
-    local result
     if not zombie then return false end
     method = zombie.isCollidedWithDoor
     if type(method) == "function" then
-        ok, result = pcall(method, zombie)
-        return ok and result == true
+        return method(zombie) == true
     end
     return methodReturnsTrue(zombie, { "isCollidedThisFrame", "isCollided" })
 end
@@ -133,17 +111,35 @@ function Internal.openDoorForNPC(zombie, object)
     local properties
     local doorSound
     local opened
+    local doubleDoor
+    local garageDoor
     if not object then
         return false
     end
     if methodReturnsTrue(object, { "IsOpen", "isOpen" }) then
         return true
     end
-    if methodReturnsTrue(object, { "isLocked", "IsLocked" })
-        or methodReturnsTrue(object, { "isLockedByKey" })
-        or methodReturnsValue(object, { "getLockedByKey" })
-        or methodReturnsTrue(object, { "isBarricaded", "IsBarricaded" })
-        or methodReturnsTrue(object, { "isObstructed" })
+    doubleDoor = IsoDoor
+        and IsoDoor.getDoubleDoorIndex
+        and IsoDoor.getDoubleDoorIndex(object) > -1
+        or false
+    garageDoor = IsoDoor
+        and IsoDoor.getGarageDoorIndex
+        and IsoDoor.getGarageDoorIndex(object) > -1
+        or false
+    -- Bandits deliberately lets non-hostile actors operate garage doors from
+    -- either side without applying the ordinary lock/obstruction branch.
+    -- Garages otherwise trap followers spawned inside.
+    if not garageDoor
+        and (
+            methodReturnsTrue(object, { "isLocked", "IsLocked" })
+            or methodReturnsTrue(object, { "isLockedByKey" })
+            or methodReturnsTrue(
+                object,
+                { "isBarricaded", "IsBarricaded" }
+            )
+            or methodReturnsTrue(object, { "isObstructed" })
+        )
     then
         return false
     end
@@ -152,10 +148,12 @@ function Internal.openDoorForNPC(zombie, object)
         return false
     end
 
-    if IsoDoor and IsoDoor.getDoubleDoorIndex and IsoDoor.getDoubleDoorIndex(object) > -1 then
+    if doubleDoor then
         IsoDoor.toggleDoubleDoor(object, true)
-    elseif IsoDoor and IsoDoor.getGarageDoorIndex and IsoDoor.getGarageDoorIndex(object) > -1 then
+        opened = true
+    elseif garageDoor then
         IsoDoor.toggleGarageDoor(object, true)
+        opened = true
     else
         if object.DirtySlice then object:DirtySlice() end
         if square.InvalidateSpecialObjectPaths then square:InvalidateSpecialObjectPaths() end
@@ -166,7 +164,8 @@ function Internal.openDoorForNPC(zombie, object)
         end
     end
 
-    opened = methodReturnsTrue(object, { "IsOpen", "isOpen" })
+    opened = opened
+        or methodReturnsTrue(object, { "IsOpen", "isOpen" })
     if not opened and object.setOpen then
         object:setOpen(true)
         opened = methodReturnsTrue(object, { "IsOpen", "isOpen" })

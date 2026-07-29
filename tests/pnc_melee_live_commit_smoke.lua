@@ -18,6 +18,7 @@ local actionState = "pathfind"
 local liveTargetX = 1.35
 local modData = {}
 local variables = {}
+local handoffEvents = {}
 local weapon = {
     IsWeapon = function() return true end,
     getSwingSound = function() return nil end,
@@ -97,6 +98,20 @@ PNC = {
     Stamina = {
         CanSpendAttack = function() return true end,
     },
+    PathService = {
+        IsTraversalActive = function() return false end,
+        Reset = function()
+            handoffEvents[#handoffEvents + 1] = "path_reset"
+        end,
+    },
+    Stealth = {
+        SuspendForCombat = function(record)
+            handoffEvents[#handoffEvents + 1] =
+                "stealth_suspended"
+            record.runtime.stealthActive = false
+            return true
+        end,
+    },
     CombatDamage = {
         IsWeaponDamageEnabled = function() return false end,
     },
@@ -124,6 +139,7 @@ PNC.Combat.Internal.buildAttackAction = function(
     attackType,
     anim
 )
+    handoffEvents[#handoffEvents + 1] = "action_built"
     action = {
         attackKind = attackKind,
         attackType = attackType,
@@ -155,6 +171,7 @@ local target = {
     distSq = 100,
 }
 
+record.runtime.lastAttackAt = now
 local started, reason = PNC.Combat.TryMelee(
     record,
     body,
@@ -164,6 +181,8 @@ assertEqual(started, false, "outer hit radius started melee windup")
 assertEqual(reason, "target_out_of_range", "outer hit radius reason")
 assertEqual(action, nil, "outer hit radius committed an attack")
 
+record.runtime.lastAttackAt = 0
+record.runtime.stealthActive = true
 liveTargetX = 0.95
 target.distSq = 100
 started, reason = PNC.Combat.TryMelee(
@@ -178,6 +197,14 @@ assert(
     "stale target distance was not refreshed from live body"
 )
 assertEqual(heldReason, "melee_windup", "movement held before attack")
+assertEqual(handoffEvents[1], "path_reset",
+    "native movement was not released before melee")
+assertEqual(handoffEvents[2], "stealth_suspended",
+    "follow stealth was not released before melee")
+assertEqual(handoffEvents[3], "action_built",
+    "attack action was published before movement released")
+assertEqual(record.runtime.stealthActive, false,
+    "melee retained the sneak locomotion branch")
 assertEqual(animation, nil, "server directly rendered the melee bump")
 assertEqual(
     variables.BumpDone,
@@ -206,6 +233,18 @@ assertEqual(
     action.anim,
     "PNC_Attack1H1",
     "selected animation was not snapshotted"
+)
+
+record.runtime.lastAttackAt = now + 60000
+assertEqual(
+    PNC.Combat.Internal.canAttack(record, now, 900),
+    true,
+    "future session timestamp suppressed melee"
+)
+assertEqual(
+    record.runtime.lastAttackAt,
+    0,
+    "future session timestamp was not normalized"
 )
 
 print("pnc_melee_live_commit_smoke: ok")
