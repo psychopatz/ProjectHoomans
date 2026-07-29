@@ -1,0 +1,56 @@
+Project Hoomans Conversation Translation Guide
+==============================================
+
+Build 42.20 format
+- Project Zomboid loads UI translations from
+  `media/lua/shared/Translate/<LANG>/UI.json`.
+- The generated catalog lives in the mod's `common` layer so every compatible
+  Build 42 version uses the same conversation strings.
+- Every entry in that catalog must use a `UI_` key.
+- Legacy `UI_<LANG>.txt` files and arbitrary Lua translation tables are not
+  loaded by the Build 42.20 Translator.
+- `UI.json` is generated output. Do not maintain conversation prose there.
+
+Scalable authoring structure
+- Shared UI entries:
+  `translation-src/<LANG>/UI.base.json`
+- Conversation choices and responses:
+  `translation-src/<LANG>/Conversation/Core.json`
+- Greeting prose:
+  `translation-src/<LANG>/Greetings/<Relationship>/
+  greeting_<Relationship><Time>.json`
+- Greeting selection keys:
+  `PNC/Conversation/Content/Greetings/<Relationship>/
+  greeting_<Relationship><Time>.lua`
+
+Greeting categories
+- FirstMeet
+- Acquaintance
+- Member
+- Lover
+
+Time variants
+- Dawn
+- Sunrise
+- Sunset
+- Dusk
+- Twilight
+
+Adding a greeting
+1. Add a stable `UI_PNC_Greeting_...` key and its prose to the matching
+   modular JSON source.
+2. Add only that key to the matching greeting Lua module.
+3. Run `python3 tools/build_conversation_translations.py`.
+4. Commit both the modular source and the generated
+   `common/media/lua/shared/Translate/<LANG>/UI.json`.
+
+Adding a relationship category
+1. Add the category to `PNC_ConversationRelationship.lua`.
+2. Create the matching translation and greeting Lua folders.
+3. Require the category bootstrap from `PNC_Conversation.lua`.
+
+Adding another language
+1. Mirror `translation-src/EN` under the language code, for example `FR`.
+2. Preserve every key and translate only the values.
+3. Run:
+   `python3 tools/build_conversation_translations.py --language FR`

@@ -1,0 +1,9 @@
+local Registry = PNC.Conversation.Content
+return Registry.RegisterGreeting("Acquaintance", "sunrise",
+    {
+        "UI_PNC_Greeting_Acquaintance_Sunrise_001",
+        "UI_PNC_Greeting_Acquaintance_Sunrise_002",
+        "UI_PNC_Greeting_Acquaintance_Sunrise_003",
+        "UI_PNC_Greeting_Acquaintance_Sunrise_004",
+        "UI_PNC_Greeting_Acquaintance_Sunrise_005",
+    })
