@@ -17,8 +17,12 @@ local BehaviorCombat = PNC.BehaviorCombat
 local Common = PNC.BehaviorCommon
 local Core = PNC.Core
 local Const = PNC.Const
+local Performance = PNC.Performance
 
 Roaming.Modes = Roaming.Modes or {}
+
+local LEGACY_PAUSE_MIN_MS = 2500
+local LEGACY_PAUSE_MAX_MS = 7000
 
 local function randomFraction()
     return ZombRandFloat(0, 10000) / 10000
@@ -57,6 +61,23 @@ local function chooseAreaGoal(record, order, state)
     state.goalX = centerX + (math.cos(angle) * distance)
     state.goalY = centerY + (math.sin(angle) * distance)
     state.goalZ = centerZ
+    state.phase = "moving"
+end
+
+local function syncAreaBounds(record, order, state)
+    state.centerX =
+        tonumber(order.x) or record.anchorX or record.x
+    state.centerY =
+        tonumber(order.y) or record.anchorY or record.y
+    state.centerZ =
+        tonumber(order.z) or record.anchorZ or record.z
+    state.radius = math.max(
+        0.5,
+        tonumber(order.radius) or Const.ROAM_DEFAULT_RADIUS
+    )
+    state.goalX = nil
+    state.goalY = nil
+    state.goalZ = nil
 end
 
 local function areaStateChanged(record, order, state)
@@ -69,35 +90,118 @@ end
 local function beginAreaPause(record, zombie, order, state, now)
     local pauseMinMs = math.max(0, tonumber(order.pauseMinMs) or Const.ROAM_PAUSE_MIN_MS)
     local pauseMaxMs = math.max(pauseMinMs, tonumber(order.pauseMaxMs) or Const.ROAM_PAUSE_MAX_MS)
+    -- Existing saves materialized the old defaults into orderSpec. Treat that
+    -- exact pair as a default profile so the calmer dwell policy applies
+    -- without requiring players to recreate every roaming order.
+    if pauseMinMs == LEGACY_PAUSE_MIN_MS
+        and pauseMaxMs == LEGACY_PAUSE_MAX_MS
+    then
+        pauseMinMs = tonumber(Const.ROAM_PAUSE_MIN_MS)
+            or pauseMinMs
+        pauseMaxMs = math.max(
+            pauseMinMs,
+            tonumber(Const.ROAM_PAUSE_MAX_MS)
+                or pauseMaxMs
+        )
+    end
     if pauseMaxMs <= 0 then return false end
 
     state.waitUntil = now + pauseMinMs + (randomFraction() * (pauseMaxMs - pauseMinMs))
+    state.phase = "idle"
     Common.ClearCombatTarget(record, "roam_pausing")
     Common.HaltMovement(record, zombie, "roam_pause")
     record.activeBehavior = "Roam:area:idle"
     return true
 end
 
+local function resolveRoamingThreat(
+    record,
+    state,
+    targetRadius,
+    now
+)
+    local activePath = record.runtime
+        and record.runtime.pathing
+        and (
+            record.runtime.pathing.phase == "requested"
+            or record.runtime.pathing.phase == "active"
+        )
+    local interval = activePath
+        and (
+            tonumber(Const.ROAM_THREAT_MOVING_SCAN_MS)
+                or 250
+        )
+        or (
+            tonumber(Const.ROAM_THREAT_IDLE_SCAN_MS)
+                or 500
+        )
+    if record.runtime.target == nil
+        and now < (tonumber(state.nextThreatScanAt) or 0)
+    then
+        return nil
+    end
+    state.nextThreatScanAt = now + interval
+    if Performance then
+        Performance.Count("roaming.threatScans", 1)
+    end
+    return Targeting.ResolveRoamingEngageTarget(
+        record,
+        targetRadius
+    )
+end
+
 local function areaMode(record, zombie, order)
     record.runtime = record.runtime or {}
+    local state = record.runtime.roaming or {}
     local targetRadius = math.max(1, tonumber(order.targetRadius) or Const.ROAM_TARGET_RADIUS)
-    local target = Targeting.ResolveRoamingEngageTarget(record, targetRadius)
+    local now = Core.Now()
+    local target
+    record.runtime.roaming = state
+    target = resolveRoamingThreat(
+        record,
+        state,
+        targetRadius,
+        now
+    )
     if target then
+        state.phase = "combat"
         record.runtime.target = target
         BehaviorCombat.TickEngage(record, zombie, target)
         return true
     end
+    if record.runtime.target ~= nil then
+        -- Target reassessment may invalidate the previous world object while
+        -- this roamer still has an active dwell timer. Clear it before the
+        -- early idle return; otherwise LOD sees permanent combat and keeps
+        -- this NPC on the 75 ms tier despite having nothing to fight.
+        Common.ClearCombatTarget(
+            record,
+            "roam_target_lost",
+            zombie
+        )
+    end
 
-    local state = record.runtime.roaming or {}
-    record.runtime.roaming = state
     local reachedDistance = math.max(0.1, tonumber(order.reachedDistance) or Const.ROAM_REACHED_DISTANCE)
-    local now = Core.Now()
 
     if areaStateChanged(record, order, state) then
         state.waitUntil = nil
+        syncAreaBounds(record, order, state)
+        if beginAreaPause(
+            record,
+            zombie,
+            order,
+            state,
+            now
+        ) then
+            return true
+        end
         chooseAreaGoal(record, order, state)
     elseif state.waitUntil then
         if now < state.waitUntil then
+            state.phase = "idle"
+            if Performance then
+                Performance.Count("roaming.idleTicks", 1)
+            end
             record.activeBehavior = "Roam:area:idle"
             return true
         end

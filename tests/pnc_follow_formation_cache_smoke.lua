@@ -4,6 +4,7 @@ local FILE =
 
 local now = 1000
 local scans = 0
+local targetScans = 0
 local records = {}
 local moves = {}
 local owner = {
@@ -43,6 +44,10 @@ PNC = {
         ATTACK_TYPE_NONE = "none",
         FOLLOW_DISTANCE = 1.8,
         FOLLOW_FORMATION_CACHE_MS = 250,
+        FOLLOW_FORMATION_MOVING_CACHE_MS = 200,
+        FOLLOW_FORMATION_IDLE_CACHE_MS = 1000,
+        FOLLOW_THREAT_ACTIVE_SCAN_MS = 150,
+        FOLLOW_THREAT_IDLE_SCAN_MS = 350,
         FOLLOW_IDLE_ENTER_DISTANCE = 2.4,
         FOLLOW_IDLE_EXIT_DISTANCE = 3.2,
         FOLLOW_RUN_DISTANCE = 8,
@@ -80,7 +85,10 @@ PNC = {
         end,
     },
     BehaviorTargeting = {
-        ResolveCompanionEngageTarget = function() return nil end,
+        ResolveCompanionEngageTarget = function()
+            targetScans = targetScans + 1
+            return nil
+        end,
     },
     BehaviorCombat = {},
     Perception = {},
@@ -100,6 +108,8 @@ for index = 1, #records do
     assert(PNC.BehaviorCompanion.Tick(records[index], {}, "FollowOwner"))
 end
 assert(scans == 1, "each follower rebuilt the same formation")
+assert(targetScans == 5,
+    "initial follower safety scans did not run")
 local firstTarget = records[1].runtime.followSlotTarget
 
 now = 1100
@@ -107,6 +117,8 @@ for index = 1, #records do
     PNC.BehaviorCompanion.Tick(records[index], {}, "FollowOwner")
 end
 assert(scans == 1, "formation cache expired too early")
+assert(targetScans == 5,
+    "active follower threat scans ignored their negative cache")
 assert(
     records[1].runtime.followSlotTarget == firstTarget,
     "follow steering target was reallocated"
@@ -131,6 +143,8 @@ records = {
     },
 }
 PNC.BehaviorCompanion.Tick(records[1], {}, "FollowOwner")
+assert(targetScans == 6,
+    "new follower did not perform an initial safety scan")
 local soloMove = moves.solo
 assert(soloMove ~= nil,
     "close follower accepted a player-blocking hold position")
@@ -145,6 +159,8 @@ assert(soloMove.stopDistance <= 0.35,
 now = 1300
 PNC.BehaviorCompanion.Tick(records[1], {}, "FollowOwner")
 assert(scans == 2, "formation cache did not refresh after its window")
+assert(targetScans == 6,
+    "idle follower repeated a cached threat scan")
 
 local building = {}
 local room = {}
@@ -167,6 +183,8 @@ end
 records[1].x = 2
 now = 1600
 PNC.BehaviorCompanion.Tick(records[1], {}, "FollowOwner")
+assert(targetScans == 6,
+    "stationary follower threat cache expired too early")
 assert(
     records[1].runtime.followSlotTarget.x == owner:getX()
         and records[1].runtime.followSlotTarget.y == owner:getY(),
@@ -176,5 +194,10 @@ assert(
     records[1].runtime.followSlotTarget.stopDistance == 1.6,
     "indoor doorway approach collapsed into the player's body"
 )
+
+now = 1601
+PNC.BehaviorCompanion.Tick(records[1], {}, "FollowOwner")
+assert(targetScans == 7,
+    "stationary follower safety scan did not refresh on schedule")
 
 print("pnc_follow_formation_cache_smoke: ok")

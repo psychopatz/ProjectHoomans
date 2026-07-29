@@ -14,9 +14,7 @@ end
 
 local function isMoving(record)
     local path = record.runtime and record.runtime.pathing or nil
-    local intent = record.runtime and record.runtime.moveIntent or nil
     return (path and (path.phase == "requested" or path.phase == "active"))
-        or (intent and intent.kind == "move")
         or false
 end
 
@@ -33,6 +31,26 @@ local function isFollowingOwner(record)
     return tostring(order.kind or "") == tostring(
         Const.ORDER_FOLLOW or "follow"
     )
+end
+
+local function isActiveFollower(record)
+    local runtime = record.runtime or {}
+    local state = runtime.followState
+    local mode = state and tostring(state.mode or "") or ""
+    if not state then return true end
+    return state.ownerMoving == true
+        or isMoving(record)
+        or mode == "moving"
+        or mode == "returning_to_anchor"
+        or mode == "vehicle_disembark"
+end
+
+local function isRoamingIdle(record)
+    local state = record.runtime
+        and record.runtime.roaming or nil
+    return state and state.phase == "idle"
+        and not isMoving(record)
+        or false
 end
 
 local function isAbstractDormant(record)
@@ -88,10 +106,11 @@ function LOD.Resolve(record)
     if record.health and record.health.state == "incapacitated" then
         return "incapacitated"
     end
-    -- A live follower is never truly idle: its goal is another moving actor.
-    -- Keeping this tier hot removes the one-second wake-up delay without
-    -- increasing cadence for unrelated stationary NPCs.
-    if isFollowingOwner(record) then return "follow_owner" end
+    if isFollowingOwner(record) then
+        return isActiveFollower(record)
+            and "follow_owner" or "follow_idle"
+    end
+    if isRoamingIdle(record) then return "roam_idle" end
     if isMoving(record) then return "moving" end
     return "live_idle"
 end
@@ -111,6 +130,14 @@ function LOD.GetCadence(record)
     end
     if tier == "follow_owner" then
         return tonumber(Const.FOLLOW_TICK_INTERVAL_MS) or 100
+    end
+    if tier == "follow_idle" then
+        return tonumber(Const.FOLLOW_IDLE_TICK_INTERVAL_MS)
+            or 350
+    end
+    if tier == "roam_idle" then
+        return tonumber(Const.ROAM_IDLE_TICK_INTERVAL_MS)
+            or 500
     end
     if tier == "moving" or tier == "incapacitated" then
         return math.min(tonumber(Const.TICK_LIVE_WARM_MS) or 250, 100)
@@ -138,6 +165,14 @@ function LOD.GetDecisionInterval(record)
     if tier == "combat" then return 100 end
     if tier == "follow_owner" then
         return tonumber(Const.FOLLOW_DECISION_INTERVAL_MS) or 100
+    end
+    if tier == "follow_idle" then
+        return tonumber(Const.FOLLOW_IDLE_TICK_INTERVAL_MS)
+            or 350
+    end
+    if tier == "roam_idle" then
+        return tonumber(Const.ROAM_IDLE_TICK_INTERVAL_MS)
+            or 500
     end
     if tier == "moving" or tier == "vehicle" then return 250 end
     if tier == "incapacitated" then return 250 end

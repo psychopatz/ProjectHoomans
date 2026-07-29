@@ -21,6 +21,7 @@ local Registry = PNC.Registry
 local CompanionVehicle = PNC.CompanionVehicle
 local TraversalQuery = PNC.TraversalQuery
 local Spatial = PNC.SpatialIndex
+local Performance = PNC.Performance
 local FollowFormationCache = {}
 
 local function getFollowState(record)
@@ -117,7 +118,12 @@ local function resolveFollowOwnerKey(record, owner)
     )
 end
 
-local function buildFollowFormation(record, owner, now)
+local function buildFollowFormation(
+    record,
+    owner,
+    now,
+    ownerMoving
+)
     local followers = {}
     local slots = {}
     local fx
@@ -136,15 +142,32 @@ local function buildFollowFormation(record, owner, now)
     end
     fx, fy = resolveOwnerForward(owner)
     return {
-        expiresAt = now + (tonumber(Const.FOLLOW_FORMATION_CACHE_MS) or 250),
+        expiresAt = now + (
+            ownerMoving
+                and (
+                    tonumber(
+                        Const.FOLLOW_FORMATION_MOVING_CACHE_MS
+                    ) or 200
+                )
+                or (
+                    tonumber(
+                        Const.FOLLOW_FORMATION_IDLE_CACHE_MS
+                    ) or 1000
+                )
+        ),
         count = #followers,
         slots = slots,
         forwardX = fx,
         forwardY = fy,
+        ownerMoving = ownerMoving == true,
     }
 end
 
-local function resolveFollowSlot(record, owner)
+local function resolveFollowSlot(
+    record,
+    owner,
+    ownerMoving
+)
     local ownerKey
     local cache
     local now
@@ -170,8 +193,15 @@ local function resolveFollowSlot(record, owner)
     if not cache
         or now >= (tonumber(cache.expiresAt) or 0)
         or cache.slots[tostring(record.id)] == nil
+        or ownerMoving == true
+            and cache.ownerMoving ~= true
     then
-        cache = buildFollowFormation(record, owner, now)
+        cache = buildFollowFormation(
+            record,
+            owner,
+            now,
+            ownerMoving
+        )
         FollowFormationCache[ownerKey] = cache
     end
     slotIndex = tonumber(cache.slots[tostring(record.id)]) or 0
@@ -653,6 +683,35 @@ local function tryRespondToThreat(record, zombie)
     return tryEngageTarget(record, zombie)
 end
 
+local function shouldScanFollowThreat(
+    record,
+    now,
+    active
+)
+    local runtime = record.runtime or {}
+    local state
+    local interval = active
+        and (
+            tonumber(Const.FOLLOW_THREAT_ACTIVE_SCAN_MS)
+                or 150
+        )
+        or (
+            tonumber(Const.FOLLOW_THREAT_IDLE_SCAN_MS)
+                or 500
+        )
+    record.runtime = runtime
+    state = getFollowState(record)
+    if runtime.target ~= nil then return true end
+    if now < (tonumber(state.nextThreatScanAt) or 0) then
+        return false
+    end
+    state.nextThreatScanAt = now + interval
+    if Performance then
+        Performance.Count("follow.threatScans", 1)
+    end
+    return true
+end
+
 local function tickFollowOwner(record, zombie)
     local owner = Common.GetOwner(record)
     local now = Core.Now and Core.Now() or 0
@@ -758,12 +817,25 @@ local function tickFollowOwner(record, zombie)
         )
     if not ownerVehicle
         and not prioritizeOwner
+        and shouldScanFollowThreat(
+            record,
+            now,
+            followState.ownerMoving == true
+                or ownerDist >= (
+                    tonumber(Const.FOLLOW_WALK_DISTANCE)
+                        or 4
+                )
+        )
         and tryRespondToThreat(record, zombie)
     then
         setFollowMode(record, "combat")
         return true
     end
-    slotTarget = resolveFollowSlot(record, owner)
+    slotTarget = resolveFollowSlot(
+        record,
+        owner,
+        followState.ownerMoving == true
+    )
     slotTarget = enforceOwnerPersonalSpace(
         record,
         owner,

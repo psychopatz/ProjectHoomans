@@ -23,6 +23,8 @@ PNC = {
         SIMULATION_PATH_IDLE_MS = 500,
         FOLLOW_TICK_INTERVAL_MS = 100,
         FOLLOW_DECISION_INTERVAL_MS = 100,
+        FOLLOW_IDLE_TICK_INTERVAL_MS = 350,
+        ROAM_IDLE_TICK_INTERVAL_MS = 500,
         ABSTRACT_TRAVEL_SPEED = 1.6666667,
         TICK_ABSTRACT_MS = 3000,
     },
@@ -108,6 +110,57 @@ assert(PNC.SimulationLOD.GetDecisionInterval(follower) == 100,
     "moving-owner decisions were not refreshed responsively")
 assert(PNC.SimulationLOD.GetPathInterval(follower) == 100,
     "follow path pumping remained on the idle cadence")
+
+-- Once a follower has acquired and is holding formation beside a stationary
+-- owner, it must leave the 100 ms hot tier. This is the common steady-state
+-- case for groups and is where population-scale savings matter most.
+follower.runtime.followState = {
+    mode = "formation_hold",
+    ownerMoving = false,
+}
+assert(PNC.SimulationLOD.Resolve(follower) == "follow_idle",
+    "stationary formation follower remained in the hot tier")
+assert(PNC.SimulationLOD.GetCadence(follower) == 350,
+    "stationary formation follower did not receive the cool cadence")
+assert(PNC.SimulationLOD.GetDecisionInterval(follower) == 350,
+    "stationary follower decisions were not throttled")
+assert(PNC.SimulationLOD.GetPathInterval(follower) == 500,
+    "stationary follower kept pumping an inactive path")
+
+-- Owner movement/path acquisition must wake the follower immediately on its
+-- next scheduled decision and return path servicing to the moving cadence.
+follower.runtime.followState.ownerMoving = true
+assert(PNC.SimulationLOD.Resolve(follower) == "follow_owner",
+    "moving owner did not wake a stationary follower")
+assert(PNC.SimulationLOD.GetCadence(follower) == 100,
+    "moving owner did not restore responsive follow cadence")
+follower.runtime.followState.ownerMoving = false
+follower.runtime.pathing = { phase = "active" }
+assert(PNC.SimulationLOD.Resolve(follower) == "follow_owner",
+    "active follow path was incorrectly cooled")
+assert(PNC.SimulationLOD.GetPathInterval(follower) == 100,
+    "active follow path did not retain its moving pump cadence")
+
+-- A completed moveIntent is historical bookkeeping, not proof that an NPC is
+-- still moving. Treating it as live kept roamers hot forever and prevented
+-- ambient scenes from becoming eligible.
+local idleRoamer = {
+    x = 0,
+    y = 0,
+    presenceState = "live",
+    orderSpec = { kind = "roam" },
+    health = { current = 100, max = 100 },
+    runtime = {
+        moveIntent = { kind = "move" },
+        roaming = { phase = "idle" },
+    },
+}
+assert(PNC.SimulationLOD.Resolve(idleRoamer) == "roam_idle",
+    "stale move intent kept an idle roamer in the moving tier")
+assert(PNC.SimulationLOD.GetCadence(idleRoamer) == 500,
+    "idle roamer did not receive the population-safe cadence")
+assert(PNC.SimulationLOD.GetPathInterval(idleRoamer) == 500,
+    "idle roamer kept pumping an inactive path")
 
 assert(PNC.SimulationClock.IsDue(far, "vitals", 1000, 5000, false),
     "new subsystem clock was not due")
