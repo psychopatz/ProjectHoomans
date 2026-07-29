@@ -38,6 +38,7 @@ local PlayerDamage = PNC.PlayerDamage
 local Treatment = PNC.Treatment
 local CompanionCommands = PNC.CompanionCommands
 local MapCommandService = PNC.MapCommandService
+local ConversationScene = PNC.ConversationScene
 local buildDebugRoster
 local lastLivePositionSafetyRefreshAt = 0
 
@@ -111,6 +112,9 @@ local function processRecord(record, now)
         and record.runtime.forcePresenceCheck == true
     if zombie and Registry.RefreshLivePosition then
         Registry.RefreshLivePosition(record, zombie, false)
+    end
+    if ConversationScene and ConversationScene.Pump then
+        ConversationScene.Pump(record, zombie, now)
     end
     if not SimulationClock
         or SimulationClock.IsDue(
@@ -365,6 +369,20 @@ local function onClientCommand(module, command, player, args)
     if command == Const.CMD_FULL_SYNC_REQUEST then
         snapshots = buildSnapshotList()
         Network.BroadcastFullSync(player, snapshots)
+        return
+    end
+
+    if ConversationScene
+        and (
+            command == ConversationScene.CMD_BEGIN
+            or command == ConversationScene.CMD_END
+        )
+    then
+        ConversationScene.HandleClientCommand(
+            player,
+            command,
+            args or {}
+        )
         return
     end
 

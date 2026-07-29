@@ -53,6 +53,11 @@ dofile(CORE_TEXT)
 dofile(ROOT .. "PNC/Conversation/PNC_ConversationTime.lua")
 dofile(ROOT .. "PNC/Conversation/Content/PNC_ConversationRegistry.lua")
 dofile(ROOT .. "PNC/Conversation/PNC_ConversationRelationship.lua")
+PNC.Conversation.Lifecycle = {
+    Create = function()
+        return { kind = "conversation_lifecycle" }
+    end,
+}
 
 local relationships = { "FirstMeet", "Acquaintance", "Member", "Lover" }
 local variants = { "Dawn", "Sunrise", "Sunset", "Dusk", "Twilight" }
@@ -113,6 +118,8 @@ assertEqual(definition.npcID, "npc-12", "history NPC id")
 assertEqual(definition.character, entry.zombie, "live portrait target")
 assertEqual(definition.backgroundID, "twilight", "portrait background")
 assertEqual(definition.context.relationshipID, "Lover", "relationship category")
+assertEqual(definition.lifecycle.kind, "conversation_lifecycle",
+    "conversation safety lifecycle attached")
 assertEqual(#definition.nodes.greeting.choices, 3, "code-block choices")
 assert(definition.nodes.greeting.npc.key:find("Lover_Twilight", 1, true),
     "time greeting selected")

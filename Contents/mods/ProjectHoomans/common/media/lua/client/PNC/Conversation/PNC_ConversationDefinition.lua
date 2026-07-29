@@ -5,6 +5,7 @@ local Conversation = PNC.Conversation
 local Time = Conversation.Time
 local Content = Conversation.Content
 local Relationship = Conversation.Relationship
+local Lifecycle = Conversation.Lifecycle
 
 local function portraitSpec(entry)
     local snapshot = entry and entry.snapshot or {}
@@ -50,6 +51,7 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             timeID = timeID,
             relationshipID = relationshipID,
         },
+        lifecycle = Lifecycle.Create(),
         start = "greeting",
         nodes = {
             greeting = {
