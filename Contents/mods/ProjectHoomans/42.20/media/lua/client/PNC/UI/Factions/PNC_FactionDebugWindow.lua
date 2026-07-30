@@ -29,7 +29,15 @@ local CONTROLS = {
     { id = "rank", titleKey = "UI_PNC_FactionNextRank", variant = "quiet" },
     { id = "archive", titleKey = "UI_PNC_FactionArchive", variant = "danger" },
     { id = "war", titleKey = "UI_PNC_FactionDeclareWar", variant = "danger" },
+    { id = "truce", titleKey = "UI_PNC_FactionStartTruce", variant = "quiet" },
     { id = "peace", titleKey = "UI_PNC_FactionMakePeace", variant = "success" },
+    { id = "alliance", titleKey = "UI_PNC_FactionFormAlliance", variant = "success" },
+    { id = "break_alliance", titleKey = "UI_PNC_FactionBreakAlliance", variant = "danger" },
+    { id = "incident_minor", titleKey = "UI_PNC_FactionMinorAttack", variant = "quiet" },
+    { id = "incident_severe", titleKey = "UI_PNC_FactionSevereAttack", variant = "danger" },
+    { id = "incident_killed", titleKey = "UI_PNC_FactionMemberKilled", variant = "danger" },
+    { id = "incident_rescue", titleKey = "UI_PNC_FactionMemberRescued", variant = "success" },
+    { id = "recalculate", titleKey = "UI_PNC_FactionRecalculate", variant = "quiet" },
 }
 
 local function drawEntity(list, y, entry, alternate)
@@ -107,6 +115,10 @@ function ISPNCFactionDebugWindow:createChildren()
         itemHeight = Layout.Pixels(44, self.uiScale),
         doDrawItem = drawEntity,
     })
+    self.targets = UI.CreateList(self, {
+        itemHeight = Layout.Pixels(44, self.uiScale),
+        doDrawItem = drawEntity,
+    })
     self.npcs = UI.CreateList(self, {
         itemHeight = Layout.Pixels(44, self.uiScale),
         doDrawItem = drawEntity,
@@ -140,28 +152,33 @@ function ISPNCFactionDebugWindow:onResponsiveLayout()
     local top = controls.bottom + Layout.Pixels(25, self.uiScale)
     local height = math.max(100, rect.y + rect.height - top)
     local gap = Layout.Pixels(8, self.uiScale)
-    local leftWidth = math.max(
-        180,
-        math.floor((rect.width - gap * 2) * 0.25)
+    local listWidth = math.max(
+        150,
+        math.floor((rect.width - gap * 3) * 0.19)
     )
     self.layout = {
         faction = {
             x = rect.x, y = top,
-            width = leftWidth, height = height,
+            width = listWidth, height = height,
+        },
+        target = {
+            x = rect.x + listWidth + gap, y = top,
+            width = listWidth, height = height,
         },
         npc = {
-            x = rect.x + leftWidth + gap, y = top,
-            width = leftWidth, height = height,
+            x = rect.x + listWidth * 2 + gap * 2, y = top,
+            width = listWidth, height = height,
         },
         detail = {
-            x = rect.x + leftWidth * 2 + gap * 2,
+            x = rect.x + listWidth * 3 + gap * 3,
             y = top,
-            width = rect.width - leftWidth * 2 - gap * 2,
+            width = rect.width - listWidth * 3 - gap * 3,
             height = height,
         },
     }
     for widget, bounds in pairs({
         [self.factions] = self.layout.faction,
+        [self.targets] = self.layout.target,
         [self.npcs] = self.layout.npc,
         [self.details] = self.layout.detail,
     }) do
@@ -182,13 +199,20 @@ function ISPNCFactionDebugWindow:getNPC()
     return entry and entry.item or nil
 end
 
+function ISPNCFactionDebugWindow:getTargetFaction()
+    local entry = self.targets and self.targets:getItem()
+    return entry and entry.item or nil
+end
+
 function ISPNCFactionDebugWindow:requestSnapshot()
     local faction = self:getFaction()
     local npc = self:getNPC()
+    local target = self:getTargetFaction()
     if PNC.Client and PNC.Client.RequestFactionDebug then
         PNC.Client.RequestFactionDebug(
             faction and faction.id,
-            npc and npc.id
+            npc and npc.id,
+            target and target.id
         )
     end
     self.lastRequestAt = PNC.Core.Now()
@@ -207,6 +231,7 @@ end
 function ISPNCFactionDebugWindow:refreshSnapshot()
     local oldFaction = self:getFaction()
     local oldNPC = self:getNPC()
+    local oldTarget = self:getTargetFaction()
     local snapshot = ClientState.factionDebug
     self.factions:clear()
     for _, item in ipairs(Model.BuildFactionItems(snapshot)) do
@@ -221,6 +246,28 @@ function ISPNCFactionDebugWindow:refreshSnapshot()
         and (tonumber(self.factions.selected) or 0) < 1
     then
         self.factions.selected = 1
+    end
+    self.targets:clear()
+    for _, item in ipairs(Model.BuildFactionItems(snapshot)) do
+        self.targets:addItem(item.label, item)
+    end
+    restoreSelection(
+        self.targets,
+        snapshot and snapshot.selectedTargetFactionID
+            or oldTarget and oldTarget.id
+    )
+    if #self.targets.items > 0
+        and (tonumber(self.targets.selected) or 0) < 1
+    then
+        local selectedSource = self:getFaction()
+        for index, entry in ipairs(self.targets.items) do
+            if not selectedSource
+                or entry.item.id ~= selectedSource.id
+            then
+                self.targets.selected = index
+                break
+            end
+        end
     end
     self.npcs:clear()
     for _, item in ipairs(Model.BuildNPCItems(snapshot)) do
@@ -268,6 +315,7 @@ function ISPNCFactionDebugWindow:onAction(button)
     local internal = button.internal
     local faction = self:getFaction()
     local npc = self:getNPC()
+    local target = self:getTargetFaction()
     if internal == "refresh" then
         self:requestSnapshot()
         return
@@ -275,6 +323,7 @@ function ISPNCFactionDebugWindow:onAction(button)
     local payload = {
         factionID = faction and faction.id,
         npcID = npc and npc.id,
+        targetFactionID = target and target.id,
     }
     if internal == "create_player_faction" then
         payload.factionAction = internal
@@ -304,7 +353,9 @@ end
 function ISPNCFactionDebugWindow:selectionSignature()
     local faction = self:getFaction()
     local npc = self:getNPC()
+    local target = self:getTargetFaction()
     return tostring(faction and faction.id or "") .. "|"
+        .. tostring(target and target.id or "") .. "|"
         .. tostring(npc and npc.id or "")
 end
 
@@ -326,6 +377,7 @@ function ISPNCFactionDebugWindow:prerender()
     end
     local faction = self:getFaction()
     local npc = self:getNPC()
+    local target = self:getTargetFaction()
     local currentFactionID = npc and npc.npc
         and npc.npc.affiliation
         and npc.npc.affiliation.factionID or nil
@@ -333,19 +385,11 @@ function ISPNCFactionDebugWindow:prerender()
         and currentFactionID == faction.id
     local snapshot = ClientState.factionDebug or {}
     local playerFactionID = snapshot.currentPlayerFactionID
-    local selectedIsPlayerFaction = faction ~= nil
-        and faction.id == playerFactionID
-    local atWar = false
-    for _, relation in ipairs(snapshot.diplomacy or {}) do
-        if relation.state == "war"
-            and (
-                relation.factionAID == playerFactionID
-                or relation.factionBID == playerFactionID
-            )
-        then
-            atWar = true
-        end
-    end
+    local pairSelected = faction ~= nil and target ~= nil
+        and faction.id ~= target.id
+    local relation = snapshot.relationForward or {}
+    local atWar = relation.atWar == true
+    local allied = relation.allied == true
     for index, button in ipairs(self.controls) do
         local internal = CONTROLS[index].id
         local create = string.sub(internal, 1, 7) == "create_"
@@ -354,15 +398,25 @@ function ISPNCFactionDebugWindow:prerender()
         if internal == "create_player_faction" then
             enabled = playerFactionID == nil
         elseif internal == "war" then
-            enabled = playerFactionID ~= nil
-                and faction ~= nil
-                and not selectedIsPlayerFaction
-                and not atWar
+            enabled = pairSelected and not atWar
+        elseif internal == "truce" then
+            enabled = pairSelected
         elseif internal == "peace" then
-            enabled = playerFactionID ~= nil
-                and faction ~= nil
-                and not selectedIsPlayerFaction
-                and atWar
+            enabled = pairSelected and (
+                atWar or allied
+                or (tonumber(relation.truceUntil) or 0) > 0
+            )
+        elseif internal == "alliance" then
+            enabled = pairSelected and not allied
+        elseif internal == "break_alliance" then
+            enabled = pairSelected and allied
+        elseif internal == "incident_minor"
+            or internal == "incident_severe"
+            or internal == "incident_killed"
+            or internal == "incident_rescue"
+            or internal == "recalculate"
+        then
+            enabled = pairSelected
         elseif internal == "archive" then
             enabled = faction ~= nil
         elseif internal == "assign" then
@@ -392,6 +446,12 @@ function ISPNCFactionDebugWindow:render()
         self.layout.faction.x,
         self.layout.faction.y - Layout.Pixels(21, self.uiScale),
         self.layout.faction.width
+    )
+    UI.DrawSectionTitle(
+        self, "Target faction",
+        self.layout.target.x,
+        self.layout.target.y - Layout.Pixels(21, self.uiScale),
+        self.layout.target.width
     )
     UI.DrawSectionTitle(
         self, "NPC affiliation",

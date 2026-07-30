@@ -173,22 +173,86 @@ local function rebuildIndexes()
             changed = true
         end
     end
-    for _, relation in pairs(
-        Factions.Registry.diplomacy or {}
+    local treatyPairs = {}
+    for sourceID, faction in pairs(
+        Factions.Registry.byID
     ) do
-        local first = Factions.Registry.byID[
-            relation.factionAID
-        ]
-        local second = Factions.Registry.byID[
-            relation.factionBID
-        ]
-        if relation.state == Constants.DIPLOMACY_WAR
-            and (not first or first.status ~= "active"
-                or not second or second.status ~= "active")
-        then
-            relation.state = Constants.DIPLOMACY_PEACE
-            relation.reason = "faction_not_active"
-            changed = true
+        for targetID, relation in pairs(
+            faction.relations or {}
+        ) do
+            if relation.atWar == true
+                or relation.allied == true
+                or (tonumber(relation.truceUntil) or 0) > 0
+            then
+                local pairKey = Types.MakeDiplomacyKey(
+                    sourceID,
+                    targetID
+                )
+                if pairKey then treatyPairs[pairKey] = true end
+            end
+        end
+    end
+    for pairKey, _ in pairs(treatyPairs) do
+        local firstID, secondID =
+            string.match(pairKey, "^([^|]+)|([^|]+)$")
+        local first = Factions.Registry.byID[firstID]
+        local second = Factions.Registry.byID[secondID]
+        if first and second then
+            local firstRelation = Types.NormalizeRelation(
+                first.relations[secondID],
+                firstID,
+                secondID
+            )
+            local secondRelation = Types.NormalizeRelation(
+                second.relations[firstID],
+                secondID,
+                firstID
+            )
+            local active = first.status == "active"
+                and second.status == "active"
+            local atWar = active and (
+                firstRelation.atWar == true
+                or secondRelation.atWar == true
+            )
+            local allied = active and not atWar and (
+                firstRelation.allied == true
+                or secondRelation.allied == true
+            )
+            local truceUntil = active and not atWar
+                and not allied and math.max(
+                    tonumber(firstRelation.truceUntil) or 0,
+                    tonumber(secondRelation.truceUntil) or 0
+                ) or 0
+            firstRelation.atWar = atWar
+            secondRelation.atWar = atWar
+            firstRelation.allied = allied
+            secondRelation.allied = allied
+            firstRelation.truceUntil = truceUntil
+            secondRelation.truceUntil = truceUntil
+            firstRelation.state =
+                PNC.FactionDiplomacyMath.ResolveState(
+                    firstRelation,
+                    firstRelation.lastEvaluatedAt
+                )
+            secondRelation.state =
+                PNC.FactionDiplomacyMath.ResolveState(
+                    secondRelation,
+                    secondRelation.lastEvaluatedAt
+                )
+            if not Types.AreEqual(
+                first.relations[secondID],
+                firstRelation
+            ) then
+                first.relations[secondID] = firstRelation
+                changed = true
+            end
+            if not Types.AreEqual(
+                second.relations[firstID],
+                secondRelation
+            ) then
+                second.relations[firstID] = secondRelation
+                changed = true
+            end
         end
     end
     for npcID, record in pairs(
@@ -502,6 +566,7 @@ function Factions.Create(spec)
         tags = Types.NormalizeTags(spec.tags),
         ownerPlayerKey = spec.ownerPlayerKey,
         playerMemberKeys = spec.playerMemberKeys,
+        policy = spec.policy,
         revision = 1,
     })
     if not faction then return false, "invalid_name" end
@@ -1017,44 +1082,99 @@ end
 
 function Factions.IsPlayerFaction(factionID)
     local faction = registryRecord(factionID)
-    return faction ~= nil
-        and next(faction.playerMemberKeys or {}) ~= nil
+    if not faction then return false end
+    for _, _ in pairs(faction.playerMemberKeys or {}) do
+        return true
+    end
+    return false
 end
 
-function Factions.GetDiplomacy(firstFactionID, secondFactionID)
-    Factions.EnsureLoaded()
-    local pairKey = Types.MakeDiplomacyKey(
-        firstFactionID,
-        secondFactionID
-    )
-    if not pairKey then return nil, "invalid_faction_pair" end
-    local relation = Factions.Registry.diplomacy[pairKey]
-    return relation and copy(relation) or nil,
-        relation and nil or "diplomacy_not_found"
+local function relationPair(sourceFactionID, targetFactionID)
+    local source = registryRecord(sourceFactionID)
+    local target = registryRecord(targetFactionID)
+    if not source or not target
+        or sourceFactionID == targetFactionID
+    then
+        return nil, nil, "invalid_faction_pair"
+    end
+    return source, target
 end
+
+local function currentRelation(source, targetFactionID)
+    return Types.NormalizeRelation(
+        source.relations and source.relations[targetFactionID],
+        source.id,
+        targetFactionID
+    )
+end
+
+function Factions.GetRelation(sourceFactionID, targetFactionID)
+    Factions.EnsureLoaded()
+    local source, _, reason = relationPair(
+        sourceFactionID,
+        targetFactionID
+    )
+    if not source then return nil, reason end
+    local relation = source.relations
+        and source.relations[targetFactionID] or nil
+    if not relation then return nil, "relation_not_found" end
+    return copy(Types.NormalizeRelation(
+        relation,
+        sourceFactionID,
+        targetFactionID
+    ))
+end
+
+-- Compatibility alias. V3 is directed, so argument order now matters.
+Factions.GetDiplomacy = Factions.GetRelation
 
 function Factions.AreAtWar(firstFactionID, secondFactionID)
     Factions.EnsureLoaded()
-    local pairKey = Types.MakeDiplomacyKey(
-        firstFactionID,
-        secondFactionID
-    )
-    local relation = pairKey
-        and Factions.Registry.diplomacy[pairKey] or nil
-    return relation ~= nil
-        and relation.state == Constants.DIPLOMACY_WAR
+    local first = registryRecord(firstFactionID)
+    local second = registryRecord(secondFactionID)
+    if not first or not second then return false end
+    local forward = first.relations
+        and first.relations[secondFactionID]
+    local reverse = second.relations
+        and second.relations[firstFactionID]
+    return forward ~= nil and reverse ~= nil
+        and forward.atWar == true and reverse.atWar == true
+end
+
+function Factions.AreAllied(firstFactionID, secondFactionID)
+    Factions.EnsureLoaded()
+    local first = registryRecord(firstFactionID)
+    local second = registryRecord(secondFactionID)
+    if not first or not second then return false end
+    local forward = first.relations
+        and first.relations[secondFactionID]
+    local reverse = second.relations
+        and second.relations[firstFactionID]
+    return forward ~= nil and reverse ~= nil
+        and forward.allied == true and reverse.allied == true
+end
+
+function Factions.GetTruceUntil(firstFactionID, secondFactionID)
+    Factions.EnsureLoaded()
+    local first = registryRecord(firstFactionID)
+    local second = registryRecord(secondFactionID)
+    if not first or not second then return 0 end
+    local forward = first.relations
+        and first.relations[secondFactionID]
+    local reverse = second.relations
+        and second.relations[firstFactionID]
+    if not forward or not reverse then return 0 end
+    local left = tonumber(forward.truceUntil) or 0
+    local right = tonumber(reverse.truceUntil) or 0
+    return left == right and left or 0
 end
 
 function Factions.IsFactionAtWar(factionID)
-    if not Types.IsValidFactionID(factionID) then
-        return false
-    end
-    for _, relation in pairs(
-        Factions.Registry.diplomacy or {}
-    ) do
-        if relation.state == Constants.DIPLOMACY_WAR
-            and (relation.factionAID == factionID
-                or relation.factionBID == factionID)
+    local faction = registryRecord(factionID)
+    if not faction then return false end
+    for targetID, relation in pairs(faction.relations or {}) do
+        if relation.atWar == true
+            and Factions.AreAtWar(factionID, targetID)
         then
             return true
         end
@@ -1062,89 +1182,413 @@ function Factions.IsFactionAtWar(factionID)
     return false
 end
 
-local function setDiplomacy(
+local function rememberIncidentID(relation, incidentID)
+    relation.recentIncidentIDs =
+        relation.recentIncidentIDs or {}
+    for _, existingID in ipairs(relation.recentIncidentIDs) do
+        if existingID == incidentID then return false end
+    end
+    relation.recentIncidentIDs[
+        #relation.recentIncidentIDs + 1
+    ] = incidentID
+    while #relation.recentIncidentIDs
+        > Constants.RECENT_INCIDENT_ID_LIMIT
+    do
+        table.remove(relation.recentIncidentIDs, 1)
+    end
+    return true
+end
+
+local function appendAudit(
+    relation,
+    relationSourceID,
+    relationTargetID,
+    incidentType,
+    at,
+    initiatingFactionID
+)
+    local incidentID = table.concat({
+        "treaty",
+        incidentType,
+        tostring(at),
+        tostring(initiatingFactionID or relationSourceID),
+        relationSourceID,
+        relationTargetID,
+    }, ":")
+    if not rememberIncidentID(relation, incidentID) then
+        return false
+    end
+    local definition =
+        PNC.FactionIncidentDefinitions.Get(incidentType)
+    local incident = Types.NormalizeIncident({
+        id = incidentID,
+        type = incidentType,
+        sourceFactionID = initiatingFactionID
+            or relationSourceID,
+        targetFactionID = initiatingFactionID == relationTargetID
+            and relationSourceID or relationTargetID,
+        occurredAt = at,
+        standingEffect = definition.standing,
+        trustEffect = definition.trust,
+        fearEffect = definition.fear,
+        grievanceEffect = definition.grievance,
+        severity = definition.severity,
+        public = true,
+        witnessed = true,
+        preserve = true,
+        tags = definition.tags,
+    }, relationSourceID, relationTargetID)
+    if incident then
+        relation.incidents[#relation.incidents + 1] = incident
+    end
+    return incident ~= nil
+end
+
+local function reconcilePair(firstFactionID, secondFactionID, reason)
+    if not PNC.FactionBehavior
+        or not PNC.FactionBehavior.ReconcileFaction
+    then
+        return
+    end
+    PNC.FactionBehavior.ReconcileFaction(firstFactionID, reason)
+    PNC.FactionBehavior.ReconcileFaction(secondFactionID, reason)
+end
+
+function Factions.CommitDirectedRelation(
+    sourceFactionID,
+    targetFactionID,
+    relation,
+    reason
+)
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    local source, _, pairReason = relationPair(
+        sourceFactionID,
+        targetFactionID
+    )
+    if not source then return false, pairReason end
+    local existing = currentRelation(source, targetFactionID)
+    local normalized = Types.NormalizeRelation(
+        relation,
+        sourceFactionID,
+        targetFactionID
+    )
+    normalized.revision = existing.revision
+    if Types.AreEqual(existing, normalized) then
+        return false, "unchanged", copy(existing)
+    end
+    normalized.revision = existing.revision + 1
+    source.relations[targetFactionID] = normalized
+    touchFaction(source)
+    touchRegistry()
+    reconcilePair(
+        sourceFactionID,
+        targetFactionID,
+        reason or "directed_relation_changed"
+    )
+    return true, "updated", copy(normalized)
+end
+
+function Factions.RecalculateRelation(
+    sourceFactionID,
+    targetFactionID,
+    worldAgeHours
+)
+    local source, _, reason = relationPair(
+        sourceFactionID,
+        targetFactionID
+    )
+    if not source then return false, reason end
+    local relation = currentRelation(source, targetFactionID)
+    local recalculated, changed =
+        PNC.FactionDiplomacyMath.RecalculateRelation(
+            relation,
+            finiteTimestamp(worldAgeHours, 0)
+        )
+    if not changed then
+        return false, "unchanged", copy(relation)
+    end
+    return Factions.CommitDirectedRelation(
+        sourceFactionID,
+        targetFactionID,
+        recalculated,
+        "diplomacy_recalculated"
+    )
+end
+
+local function mutateTreaty(
     firstFactionID,
     secondFactionID,
-    state,
-    options
+    incidentType,
+    options,
+    mutate
 )
+    if not authority() then return false, "not_authority" end
     Factions.EnsureLoaded()
-    local first = registryRecord(firstFactionID)
-    local second = registryRecord(secondFactionID)
-    local pairKey = Types.MakeDiplomacyKey(
+    local first, second, reason = relationPair(
         firstFactionID,
         secondFactionID
     )
-    local existing
-    local relation
-    if not authority() then return false, "not_authority" end
-    if not first or not second or not pairKey then
-        return false, "invalid_faction_pair"
-    end
-    if first.status ~= "active"
-        or second.status ~= "active"
-    then
+    if not first then return false, reason end
+    if first.status ~= "active" or second.status ~= "active" then
         return false, "faction_not_active"
     end
     options = type(options) == "table" and options or {}
-    existing = Factions.Registry.diplomacy[pairKey]
-    if existing and existing.state == state then
-        return false, "unchanged", copy(existing)
+    local suppliedAt = tonumber(options.worldAgeHours)
+    if suppliedAt == nil or suppliedAt ~= suppliedAt
+        or suppliedAt == math.huge or suppliedAt == -math.huge
+        or suppliedAt < 0
+    then
+        return false, "invalid_world_age"
     end
-    relation = Types.NormalizeDiplomacy({
-        factionAID = firstFactionID,
-        factionBID = secondFactionID,
-        state = state,
-        changedAt = options.worldAgeHours,
-        reason = options.reason,
-        instigatorFactionID = options.instigatorFactionID,
-        revision = math.max(
-            tonumber(existing and existing.revision) or 0,
-            0
-        ) + 1,
-    }, pairKey)
-    Factions.Registry.diplomacy[pairKey] = relation
+    if options.instigatorFactionID ~= nil
+        and options.instigatorFactionID ~= firstFactionID
+        and options.instigatorFactionID ~= secondFactionID
+    then
+        return false, "invalid_instigator_faction"
+    end
+    local at = suppliedAt
+    local forward = currentRelation(first, secondFactionID)
+    local reverse = currentRelation(second, firstFactionID)
+    local oldForward = copy(forward)
+    local oldReverse = copy(reverse)
+    local ok, mutationReason = mutate(
+        forward,
+        reverse,
+        at,
+        options,
+        first,
+        second
+    )
+    if ok == false then
+        return false, mutationReason, copy(forward)
+    end
+    local forwardState = forward.state
+    local reverseState = reverse.state
+    local resolvedForward =
+        PNC.FactionDiplomacyMath.ResolveState(
+        forward,
+        at
+    )
+    local resolvedReverse =
+        PNC.FactionDiplomacyMath.ResolveState(
+        reverse,
+        at
+    )
+    if resolvedForward ~= forwardState then
+        forward.previousState = forwardState
+        forward.state = resolvedForward
+    end
+    if resolvedReverse ~= reverseState then
+        reverse.previousState = reverseState
+        reverse.state = resolvedReverse
+    end
+    appendAudit(
+        forward,
+        firstFactionID,
+        secondFactionID,
+        incidentType,
+        at,
+        options.instigatorFactionID or firstFactionID
+    )
+    appendAudit(
+        reverse,
+        secondFactionID,
+        firstFactionID,
+        incidentType,
+        at,
+        options.instigatorFactionID or firstFactionID
+    )
+    if Types.AreEqual(oldForward, forward)
+        and Types.AreEqual(oldReverse, reverse)
+    then
+        return false, "unchanged", copy(forward)
+    end
+    forward.revision = oldForward.revision + 1
+    reverse.revision = oldReverse.revision + 1
+    first.relations[secondFactionID] = forward
+    second.relations[firstFactionID] = reverse
     touchFaction(first)
     touchFaction(second)
     touchRegistry()
-    if PNC.FactionBehavior
-        and PNC.FactionBehavior.ReconcileFaction
-    then
-        PNC.FactionBehavior.ReconcileFaction(
-            firstFactionID,
-            "diplomacy_" .. state
-        )
-        PNC.FactionBehavior.ReconcileFaction(
-            secondFactionID,
-            "diplomacy_" .. state
-        )
-    end
-    return true, state, copy(relation)
-end
-
-function Factions.DeclareWar(
-    firstFactionID,
-    secondFactionID,
-    options
-)
-    return setDiplomacy(
+    reconcilePair(
         firstFactionID,
         secondFactionID,
-        Constants.DIPLOMACY_WAR,
-        options
+        "diplomacy_" .. incidentType
+    )
+    return true, incidentType, copy(forward)
+end
+
+function Factions.DeclareWar(firstFactionID, secondFactionID, options)
+    options = type(options) == "table" and options or {}
+    local warReason = Constants.WAR_REASONS[options.reason]
+        and options.reason or nil
+    if not warReason then return false, "invalid_war_reason" end
+    return mutateTreaty(
+        firstFactionID,
+        secondFactionID,
+        "war_declared",
+        options,
+        function(forward, reverse, at)
+            if forward.atWar and reverse.atWar then
+                return false, "unchanged"
+            end
+            forward.atWar = true
+            reverse.atWar = true
+            forward.allied = false
+            reverse.allied = false
+            forward.truceUntil = 0
+            reverse.truceUntil = 0
+            forward.warStartedAt = at
+            reverse.warStartedAt = at
+            forward.warReason = warReason
+            reverse.warReason = warReason
+            forward.initiatingFactionID =
+                options.instigatorFactionID or firstFactionID
+            reverse.initiatingFactionID =
+                forward.initiatingFactionID
+            forward.triggeringIncidentID =
+                options.triggeringIncidentID
+            reverse.triggeringIncidentID =
+                options.triggeringIncidentID
+            return true
+        end
     )
 end
 
-function Factions.MakePeace(
-    firstFactionID,
-    secondFactionID,
-    options
-)
-    return setDiplomacy(
+function Factions.EndWar(firstFactionID, secondFactionID, options)
+    return mutateTreaty(
         firstFactionID,
         secondFactionID,
-        Constants.DIPLOMACY_PEACE,
-        options
+        "peace_made",
+        options,
+        function(forward, reverse, at)
+            if not forward.atWar and not reverse.atWar then
+                return false, "not_at_war"
+            end
+            forward.atWar = false
+            reverse.atWar = false
+            forward.warEndedAt = at
+            reverse.warEndedAt = at
+            return true
+        end
+    )
+end
+
+function Factions.StartTruce(firstFactionID, secondFactionID, options)
+    options = type(options) == "table" and options or {}
+    local untilAt = finiteTimestamp(options.truceUntil, 0)
+    return mutateTreaty(
+        firstFactionID,
+        secondFactionID,
+        "truce_started",
+        options,
+        function(forward, reverse, at)
+            if untilAt <= at then
+                return false, "invalid_truce_expiry"
+            end
+            forward.atWar = false
+            reverse.atWar = false
+            forward.allied = false
+            reverse.allied = false
+            forward.truceUntil = untilAt
+            reverse.truceUntil = untilAt
+            forward.warEndedAt = at
+            reverse.warEndedAt = at
+            return true
+        end
+    )
+end
+
+function Factions.MakePeace(firstFactionID, secondFactionID, options)
+    return mutateTreaty(
+        firstFactionID,
+        secondFactionID,
+        "peace_made",
+        options,
+        function(forward, reverse, at)
+            local changed = forward.atWar or reverse.atWar
+                or forward.allied or reverse.allied
+                or forward.truceUntil > 0
+                or reverse.truceUntil > 0
+            if not changed then return false, "unchanged" end
+            for _, relation in ipairs({ forward, reverse }) do
+                relation.atWar = false
+                relation.allied = false
+                relation.truceUntil = 0
+                relation.warEndedAt = at
+                relation.standing =
+                    PNC.FactionDiplomacyMath.ClampStanding(
+                        relation.standing + 15
+                    )
+                relation.trust =
+                    PNC.FactionDiplomacyMath.ClampTrust(
+                        relation.trust + 10
+                    )
+                relation.grievance =
+                    PNC.FactionDiplomacyMath.ClampGrievance(
+                        relation.grievance * 0.5
+                    )
+            end
+            return true
+        end
+    )
+end
+
+function Factions.FormAlliance(firstFactionID, secondFactionID, options)
+    options = type(options) == "table" and options or {}
+    return mutateTreaty(
+        firstFactionID,
+        secondFactionID,
+        "alliance_formed",
+        options,
+        function(forward, reverse)
+            if forward.allied and reverse.allied then
+                return false, "unchanged"
+            end
+            if forward.atWar or reverse.atWar then
+                return false, "cannot_ally_during_war"
+            end
+            if options.override ~= true and (
+                forward.standing < 30 or forward.trust < 10
+                or reverse.standing < 30 or reverse.trust < 10
+            ) then
+                return false, "alliance_threshold_not_met"
+            end
+            forward.atWar = false
+            reverse.atWar = false
+            forward.truceUntil = 0
+            reverse.truceUntil = 0
+            forward.allied = true
+            reverse.allied = true
+            return true
+        end
+    )
+end
+
+function Factions.BreakAlliance(firstFactionID, secondFactionID, options)
+    return mutateTreaty(
+        firstFactionID,
+        secondFactionID,
+        "alliance_broken",
+        options,
+        function(forward, reverse)
+            if not forward.allied and not reverse.allied then
+                return false, "not_allied"
+            end
+            for _, relation in ipairs({ forward, reverse }) do
+                relation.allied = false
+                relation.trust =
+                    PNC.FactionDiplomacyMath.ClampTrust(
+                        relation.trust - 15
+                    )
+                relation.grievance =
+                    PNC.FactionDiplomacyMath.ClampGrievance(
+                        relation.grievance + 10
+                    )
+            end
+            return true
+        end
     )
 end
 
@@ -1163,7 +1607,8 @@ end
 function Factions.OnPlayerAggression(
     player,
     targetRecord,
-    worldAgeHours
+    worldAgeHours,
+    context
 )
     local targetFactionID =
         Factions.GetOrganizationalFactionID(targetRecord)
@@ -1182,13 +1627,21 @@ function Factions.OnPlayerAggression(
     if playerFaction.id == targetFactionID then
         return false, "same_faction"
     end
-    return Factions.DeclareWar(
+    if not PNC.FactionIncidentService then
+        return false, "incident_service_unavailable"
+    end
+    context = type(context) == "table" and context or {}
+    return PNC.FactionIncidentService.RecordAttack(
         playerFaction.id,
         targetFactionID,
         {
             worldAgeHours = worldAgeHours,
-            reason = "player_attacked_member",
-            instigatorFactionID = playerFaction.id,
+            actorKey = playerFaction.ownerPlayerKey,
+            subjectKey = EntityRef.ForNPC(targetRecord.id),
+            callbackID = context.callbackID,
+            severe = context.severe,
+            killed = context.killed,
+            targetRecord = targetRecord,
         }
     )
 end
@@ -1196,7 +1649,8 @@ end
 function Factions.OnNPCAggression(
     attackerRecord,
     targetRecord,
-    worldAgeHours
+    worldAgeHours,
+    context
 )
     local attackerFactionID =
         Factions.GetOrganizationalFactionID(attackerRecord)
@@ -1208,13 +1662,21 @@ function Factions.OnNPCAggression(
     if attackerFactionID == targetFactionID then
         return false, "same_faction"
     end
-    return Factions.DeclareWar(
+    if not PNC.FactionIncidentService then
+        return false, "incident_service_unavailable"
+    end
+    context = type(context) == "table" and context or {}
+    return PNC.FactionIncidentService.RecordAttack(
         attackerFactionID,
         targetFactionID,
         {
             worldAgeHours = worldAgeHours,
-            reason = "npc_attacked_member",
-            instigatorFactionID = attackerFactionID,
+            actorKey = EntityRef.ForNPC(attackerRecord.id),
+            subjectKey = EntityRef.ForNPC(targetRecord.id),
+            targetRecord = targetRecord,
+            callbackID = context.callbackID,
+            severe = context.severe,
+            killed = context.killed,
         }
     )
 end
@@ -1222,7 +1684,8 @@ end
 function Factions.OnNPCAttackPlayer(
     attackerRecord,
     player,
-    worldAgeHours
+    worldAgeHours,
+    context
 )
     local attackerFactionID =
         Factions.GetOrganizationalFactionID(attackerRecord)
@@ -1240,37 +1703,37 @@ function Factions.OnNPCAttackPlayer(
     then
         return false, "same_or_missing_faction"
     end
-    return Factions.DeclareWar(
+    if not PNC.FactionIncidentService then
+        return false, "incident_service_unavailable"
+    end
+    context = type(context) == "table" and context or {}
+    return PNC.FactionIncidentService.RecordAttack(
         attackerFactionID,
         playerFaction.id,
         {
             worldAgeHours = worldAgeHours,
-            reason = "npc_attacked_player",
-            instigatorFactionID = attackerFactionID,
+            actorKey = EntityRef.ForNPC(attackerRecord.id),
+            subjectKey = playerFaction.ownerPlayerKey,
+            callbackID = context.callbackID,
+            severe = context.severe,
+            killed = context.killed,
         }
     )
 end
 
 function Factions.CanNPCTargetPlayer(record, player)
-    local factionID =
-        Factions.GetOrganizationalFactionID(record)
-    local faction = factionID and registryRecord(factionID)
-    local playerFaction
-    if not faction then
-        return record and record.hostility
-            and record.hostility.attackPlayers == true
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ResolveIntent
+    then
+        local result = PNC.FactionBehavior.ResolveIntent(
+            record,
+            player,
+            {}
+        )
+        return result and result.attackAllowed == true
     end
-    playerFaction = Factions.GetPlayerFaction(player)
-    if playerFaction and playerFaction.id == factionID then
-        return false
-    end
-    if Archetypes.IsHostileToOutsiders(
-        faction.archetypeID
-    ) then
-        return true
-    end
-    return playerFaction ~= nil
-        and Factions.AreAtWar(factionID, playerFaction.id)
+    return record and record.hostility
+        and record.hostility.attackPlayers == true
 end
 
 function Factions.OnRelationshipChanged(
@@ -1311,16 +1774,49 @@ function Factions.OnRelationshipChanged(
     then
         return false, "target_faction_unavailable"
     end
-    return Factions.DeclareWar(
-        observerFactionID,
+    local rank = observerRecord.affiliation
+        and observerRecord.affiliation.rank or "member"
+    if rank ~= "leader" and rank ~= "second"
+        and rank ~= "officer"
+    then
+        return false, "insufficient_faction_authority"
+    end
+    if not PNC.FactionIncidentService then
+        return false, "incident_service_unavailable"
+    end
+    local ok, reason = PNC.FactionIncidentService.AddIncident(
         targetFaction.id,
+        observerFactionID,
+        "personal_grievance_report",
         {
-            worldAgeHours =
-                relationship.lastEvaluatedAt,
-            reason = "member_relationship_enemy",
-            instigatorFactionID = observerFactionID,
+            worldAgeHours = relationship.lastEvaluatedAt,
+            actorKey = targetKey,
+            subjectKey = EntityRef.ForNPC(observerRecord.id),
+            relationSourceFactionID = observerFactionID,
+            relationTargetFactionID = targetFaction.id,
+            authorityRank = rank,
+            externalID = "relationship:"
+                .. observerRecord.id .. ":"
+                .. targetKey .. ":"
+                .. tostring(relationship.revision or 0),
         }
     )
+    if ok and PNC.Config and PNC.Config.Factions
+        and PNC.Config.Factions
+            .EnemyRelationshipCanImmediatelyDeclareWar == true
+    then
+        return Factions.DeclareWar(
+            observerFactionID,
+            targetFaction.id,
+            {
+                worldAgeHours =
+                    relationship.lastEvaluatedAt,
+                reason = "scripted",
+                instigatorFactionID = observerFactionID,
+            }
+        )
+    end
+    return ok, reason
 end
 
 function Factions.Archive(factionID, reason, worldAgeHours)
@@ -1383,29 +1879,39 @@ function Factions.Archive(factionID, reason, worldAgeHours)
     end
     faction.playerMemberKeys = {}
     faction.ownerPlayerKey = nil
-    for _, relation in pairs(
-        Factions.Registry.diplomacy or {}
-    ) do
-        if relation.factionAID == factionID
-            or relation.factionBID == factionID
-        then
-            local otherID = relation.factionAID == factionID
-                and relation.factionBID
-                or relation.factionAID
-            if relation.state == Constants.DIPLOMACY_WAR then
-                relation.state = Constants.DIPLOMACY_PEACE
-                relation.changedAt = at
-                relation.reason = "faction_archived"
-                relation.revision = math.max(
-                    0,
-                    math.floor(
-                        tonumber(relation.revision) or 0
-                    )
-                ) + 1
-                local other = registryRecord(otherID)
-                if other then touchFaction(other) end
-                reconcileFactionIDs[otherID] = true
+    for otherID, relation in pairs(faction.relations or {}) do
+        local other = registryRecord(otherID)
+        local reverse = other and other.relations
+            and other.relations[factionID] or nil
+        local changedTreaty = relation.atWar
+            or relation.allied
+            or (tonumber(relation.truceUntil) or 0) > 0
+            or reverse and (
+                reverse.atWar or reverse.allied
+                or (tonumber(reverse.truceUntil) or 0) > 0
+            )
+        if changedTreaty then
+            for _, item in ipairs({ relation, reverse }) do
+                if item then
+                    item.atWar = false
+                    item.allied = false
+                    item.truceUntil = 0
+                    item.warEndedAt = at
+                    item.state =
+                        PNC.FactionDiplomacyMath.ResolveState(
+                            item,
+                            at
+                        )
+                    item.revision = math.max(
+                        0,
+                        math.floor(
+                            tonumber(item.revision) or 0
+                        )
+                    ) + 1
+                end
             end
+            if other then touchFaction(other) end
+            reconcileFactionIDs[otherID] = true
         end
     end
     if type(reason) == "string" and reason ~= "" then

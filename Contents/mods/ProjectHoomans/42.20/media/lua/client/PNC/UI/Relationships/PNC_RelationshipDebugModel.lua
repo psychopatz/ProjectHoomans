@@ -165,6 +165,22 @@ local function appendFaction(rows, title, faction)
     )
 end
 
+local function signedBand(value)
+    value = tonumber(value) or 0
+    if value <= -45 then return "very_negative" end
+    if value <= -15 then return "negative" end
+    if value >= 30 then return "positive" end
+    return "neutral"
+end
+
+local function grievanceBand(value)
+    value = tonumber(value) or 0
+    if value >= 65 then return "severe" end
+    if value >= 30 then return "high" end
+    if value >= 10 then return "moderate" end
+    return "low"
+end
+
 function Model.BuildTargets(roster, observerNPCID)
     local targets = {
         {
@@ -228,6 +244,48 @@ function Model.BuildRows(snapshot, authorized, reason)
     rows[#rows + 1] = row("Target key", target.key)
     appendFaction(rows, "Observer faction", observer.faction)
     appendFaction(rows, "Target faction", target.faction)
+    local factionRelation = snapshot.factionRelation
+    if factionRelation then
+        rows[#rows + 1] = row(
+            "Faction relation",
+            tostring(factionRelation.state)
+                .. " / standing "
+                .. tostring(factionRelation.standing)
+                .. " / trust "
+                .. tostring(factionRelation.trust),
+            factionRelation.atWar and "danger" or "text"
+        )
+        rows[#rows + 1] = row(
+            "Faction fear / grievance",
+            tostring(factionRelation.fear)
+                .. " / " .. tostring(factionRelation.grievance)
+        )
+        rows[#rows + 1] = row(
+            "Faction metric bands",
+            "standing=" .. signedBand(factionRelation.standing)
+                .. " / trust=" .. signedBand(factionRelation.trust)
+                .. " / grievance="
+                .. grievanceBand(factionRelation.grievance)
+        )
+        rows[#rows + 1] = row(
+            "Faction treaty",
+            "war=" .. tostring(factionRelation.atWar)
+                .. " allied=" .. tostring(factionRelation.allied)
+                .. " truceUntil="
+                .. tostring(factionRelation.truceUntil)
+        )
+    end
+    if snapshot.factionIntent then
+        rows[#rows + 1] = row(
+            "Faction intent",
+            tostring(snapshot.factionIntent.intent)
+                .. " / " .. tostring(snapshot.factionIntent.reason)
+                .. " / attack="
+                .. tostring(snapshot.factionIntent.attackAllowed),
+            snapshot.factionIntent.attackAllowed
+                and "danger" or "success"
+        )
+    end
     rows[#rows + 1] = row(
         "Snapshot world age",
         number(snapshot.generatedAt, 3) .. " h"

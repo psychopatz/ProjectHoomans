@@ -29,9 +29,10 @@
 - Phase 5A persistent organizational faction registry, data-only settler,
   looter, trader, and refugee archetypes, NPC affiliation/role/rank,
   leadership, archival, and guarded faction inspection
-- Phase 5B stable player-owned factions, symmetric pairwise war, looter
-  outsider hostility, authoritative aggression escalation, and a centralized
-  bridge to legacy companion/combat behavior
+- Phase 5B stable player-owned factions, directed opinion/incident records,
+  deterministic archetype policy, symmetric official treaties, policy-aware
+  escalation/intent, and a centralized bridge to legacy companion/combat
+  behavior
 - shared world census, numeric spatial cells, budgeted active-zombie aggro,
   cached perception frames, and staggered LOD scheduling
 - right-click debug spawning, NPC selection hub, and character window

@@ -34,31 +34,138 @@ local function ownerIdentity(faction)
 end
 
 local function factionHasPlayerMembers(faction)
-    return faction ~= nil
-        and next(faction.playerMemberKeys or {}) ~= nil
+    if not faction then return false end
+    for _, _ in pairs(faction.playerMemberKeys or {}) do
+        return true
+    end
+    return false
 end
 
 local function factionAtWarWithPlayerFaction(factionID)
-    local relation
-    local otherID
-    local other
-    for _, relation in pairs(
-        Factions.Registry.diplomacy or {}
-    ) do
-        if relation.state == "war"
-            and (relation.factionAID == factionID
-                or relation.factionBID == factionID)
+    local faction = Factions.Registry.byID[factionID]
+    if not faction then return false end
+    for otherID, relation in pairs(faction.relations or {}) do
+        if relation.atWar == true
+            and Factions.AreAtWar(factionID, otherID)
         then
-            otherID = relation.factionAID == factionID
-                and relation.factionBID
-                or relation.factionAID
-            other = Factions.Registry.byID[otherID]
+            local other = Factions.Registry.byID[otherID]
             if factionHasPlayerMembers(other) then
                 return true
             end
         end
     end
     return false
+end
+
+local function playerEntityKey(player)
+    local uuid = PNC.PlayerCharacters
+        and PNC.PlayerCharacters.GetCharacterUUID
+        and PNC.PlayerCharacters.GetCharacterUUID(player)
+        or nil
+    local account = player and player.getUsername
+        and player:getUsername() or nil
+    return uuid and EntityRef.ForPlayerIdentity(account, uuid)
+        or nil
+end
+
+local function targetContext(target)
+    if type(target) ~= "table"
+        and type(target) ~= "userdata"
+    then
+        return nil, nil, nil
+    end
+    if target.id and PNC.FactionTypes.IsValidNPCID
+        and PNC.FactionTypes.IsValidNPCID(target.id)
+    then
+        local factionID =
+            Factions.GetOrganizationalFactionID(target)
+        return factionID, EntityRef.ForNPC(target.id), target
+    end
+    local playerFaction = Factions.GetPlayerFaction(target)
+    return playerFaction and playerFaction.id or nil,
+        playerEntityKey(target),
+        nil
+end
+
+function Behavior.ResolveIntent(observerRecord, target, context)
+    context = type(context) == "table" and context or {}
+    if not observerRecord then
+        return {
+            intent = "observe",
+            attackAllowed = false,
+            pursueAllowed = false,
+            commandable = false,
+            reason = "invalid_observer",
+        }
+    end
+    local observerFactionID =
+        Factions.GetOrganizationalFactionID(observerRecord)
+    local observerFaction = observerFactionID
+        and Factions.Registry.byID[observerFactionID] or nil
+    local targetFactionID, targetKey, targetRecord =
+        targetContext(target)
+    if not observerFaction then
+        local hostile = observerRecord.hostility
+            and (
+                targetRecord
+                    and observerRecord.hostility.attackNPCs
+                or not targetRecord
+                    and observerRecord.hostility.attackPlayers
+            ) == true
+        return {
+            intent = hostile and "attack" or "observe",
+            attackAllowed = hostile,
+            pursueAllowed = hostile,
+            commandable = false,
+            reason = hostile and "legacy_hostility"
+                or "unaffiliated_neutral",
+        }
+    end
+    local sameFaction = targetFactionID ~= nil
+        and targetFactionID == observerFactionID
+    local relation = targetFactionID and not sameFaction
+        and observerFaction.relations[targetFactionID] or nil
+    relation = relation and PNC.FactionTypes.NormalizeRelation(
+        relation,
+        observerFactionID,
+        targetFactionID
+    ) or nil
+    local at = tonumber(context.worldAgeHours)
+        or tonumber(relation and relation.lastEvaluatedAt) or 0
+    local state = relation
+        and PNC.FactionDiplomacyMath.ResolveState(relation, at)
+        or "unknown"
+    local personal = targetKey and observerRecord.social
+        and observerRecord.social.relationships
+        and observerRecord.social.relationships[targetKey] or nil
+    local samePlayerOwnedFaction = sameFaction
+        and factionHasPlayerMembers(observerFaction)
+    local targetIsOwner = targetKey ~= nil
+        and targetKey == observerFaction.ownerPlayerKey
+    local commandable = samePlayerOwnedFaction
+        and (
+            targetIsOwner
+            or observerFaction.playerMemberKeys[targetKey] == true
+        )
+    return PNC.FactionIntent.Resolve({
+        archetypeID = observerFaction.archetypeID,
+        policy = observerFaction.policy,
+        diplomaticState = state,
+        sameFaction = sameFaction,
+        samePlayerOwnedFaction = samePlayerOwnedFaction,
+        targetIsOwner = targetIsOwner,
+        commandable = commandable,
+        atWar = relation and relation.atWar == true,
+        allied = relation and relation.allied == true,
+        activeTruce = relation
+            and relation.truceUntil > at,
+        personalState = personal and personal.state,
+        immediateSelfDefense =
+            context.immediateSelfDefense == true,
+        targetAggression = context.targetAggression == true,
+        observerStrength = context.observerStrength,
+        targetStrength = context.targetStrength,
+    })
 end
 
 local function assign(record, key, value)
@@ -193,18 +300,13 @@ function Behavior.ApplyNPC(record, reason)
         }
         return apply(record, "player_owned", owner, reason)
     end
-    aggressive = Archetypes.IsHostileToOutsiders(
-        faction.archetypeID
-    ) or Factions.IsFactionAtWar(factionID)
+    aggressive = Factions.IsFactionAtWar(factionID)
     return apply(
         record,
         aggressive and "aggressive" or "neutral",
         {
             attackPlayers =
-                Archetypes.IsHostileToOutsiders(
-                    faction.archetypeID
-                )
-                or factionAtWarWithPlayerFaction(factionID),
+                factionAtWarWithPlayerFaction(factionID),
         },
         reason
     )

@@ -11,9 +11,9 @@ while constructing new event memories. These relationship phases do not make
 NPCs talk, join factions, refuse orders, or act autonomously.
 
 Phase 5B keeps the directed relationship data model but adds one explicit
-integration: when an affiliated NPC's relationship toward a stable player
-character reaches `enemy`, their factions enter symmetric war. Other personal
-states do not alter combat.
+integration: an affiliated leader/officer/second whose relationship toward a
+stable player reaches `enemy` may submit a faction grievance report. Personal
+hostility does not immediately force symmetric war by default.
 
 ## Directed Model
 
@@ -134,9 +134,9 @@ Existing states remain until these exit rules are crossed:
 - enemy exits when approval > -45
 
 When a state changes, the old value is copied to `previousState`. Friend and
-rival do not change faction or hostility. Phase 5B may escalate an affiliated
-NPC's player-directed `enemy` state into faction war; it does not rewrite the
-personal relationship or affiliation.
+rival do not change faction or hostility. Phase 5B may turn an authorized
+NPC's player-directed `enemy` state into a faction grievance report; it does
+not rewrite the personal relationship or affiliation.
 
 ## Normalization
 

@@ -17,7 +17,7 @@ PNC = {}
 dofile(FILE)
 
 local snapshot = {
-    registrySchemaVersion = 2,
+    registrySchemaVersion = 3,
     registryRevision = 4,
     selectedFactionID = "faction_test",
     selectedNPCID = "npc_one",
@@ -56,13 +56,36 @@ local snapshot = {
         createdAt = 10,
         archivedAt = 0,
         tags = { debugCreated = true },
+        policy = {
+            outsiderPolicy = "neutral",
+            warThreshold = 70,
+            peaceThreshold = 25,
+        },
+    },
+    selectedTargetFaction = {
+        id = "faction_player",
+        name = "Player Survivors",
+    },
+    relationForward = {
+        targetFactionID = "faction_player",
+        state = "war",
+        previousState = "hostile",
+        standing = -50,
+        trust = -30,
+        fear = 10,
+        grievance = 70,
+        atWar = true,
+        allied = false,
+        truceUntil = 0,
+        revision = 2,
+        incidents = {},
     },
     diplomacy = {
         {
-            factionAID = "faction_player",
-            factionBID = "faction_test",
+            targetFactionID = "faction_player",
             state = "war",
-            reason = "test",
+            atWar = true,
+            standing = -50,
         },
     },
     members = {
@@ -105,7 +128,8 @@ assertContains(rows, "Archetype", "Settlement")
 assertContains(rows, "Leader", "npc_one")
 assertContains(rows, "Member Alice", "npc_one")
 assertContains(rows, "  affiliation", "member / medic / senior")
-assertContains(rows, "Diplomacy faction_player", "war / test")
+assertContains(rows, "Diplomacy faction_player", "war / standing")
+assertContains(rows, "Source -> target", "war / standing")
 assertContains(rows, "Last action", "leader")
 
 local unauthorized =

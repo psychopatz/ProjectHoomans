@@ -46,6 +46,7 @@ local function factionSummary(faction)
         createdAt = faction.createdAt,
         archivedAt = faction.archivedAt,
         tags = copy(faction.tags),
+        policy = copy(faction.policy),
         revision = faction.revision,
     }
 end
@@ -74,7 +75,8 @@ function Debug.BuildSnapshot(
     selectedFactionID,
     selectedNPCID,
     action,
-    player
+    player,
+    selectedTargetFactionID
 )
     local factions = {}
     local roster = {}
@@ -83,6 +85,10 @@ function Debug.BuildSnapshot(
     local playerKey
     local playerFaction
     local diplomacy = {}
+    local selectedTarget
+    local relationForward
+    local relationReverse
+    local intentPreview
     Factions.EnsureLoaded()
     if player and PNC.PlayerCharacters
         and PNC.PlayerCharacters.GetEntityKey
@@ -114,23 +120,50 @@ function Debug.BuildSnapshot(
         if faction then
             selected = factionSummary(faction)
             members = copy(Factions.GetMembers(faction.id))
-            for _, relation in pairs(
-                Factions.Registry.diplomacy or {}
+            for targetID, relation in pairs(
+                faction.relations or {}
             ) do
-                if relation.factionAID == faction.id
-                    or relation.factionBID == faction.id
-                then
-                    diplomacy[#diplomacy + 1] =
-                        copy(relation)
-                end
+                local item = copy(relation)
+                item.sourceFactionID = faction.id
+                item.targetFactionID = targetID
+                diplomacy[#diplomacy + 1] = item
             end
             table.sort(diplomacy, function(left, right)
-                local leftID = left.factionAID == faction.id
-                    and left.factionBID or left.factionAID
-                local rightID = right.factionAID == faction.id
-                    and right.factionBID or right.factionAID
-                return leftID < rightID
+                return left.targetFactionID
+                    < right.targetFactionID
             end)
+            local targetID = Types.IsValidFactionID(
+                selectedTargetFactionID
+            ) and selectedTargetFactionID or nil
+            if not targetID and playerFaction
+                and playerFaction.id ~= faction.id
+            then
+                targetID = playerFaction.id
+            end
+            if targetID and targetID ~= faction.id then
+                local target = Factions.Get(targetID)
+                if target then
+                    selectedTarget = factionSummary(target)
+                    relationForward =
+                        Factions.GetRelation(faction.id, targetID)
+                    relationReverse =
+                        Factions.GetRelation(targetID, faction.id)
+                    local preview = PNC.FactionIntent.Resolve({
+                        archetypeID = faction.archetypeID,
+                        policy = faction.policy,
+                        diplomaticState = relationForward
+                            and relationForward.state or "unknown",
+                        atWar = relationForward
+                            and relationForward.atWar,
+                        allied = relationForward
+                            and relationForward.allied,
+                        activeTruce = relationForward
+                            and relationForward.truceUntil
+                                > worldAgeHours(),
+                    })
+                    intentPreview = preview
+                end
+            end
         end
     end
     return {
@@ -140,6 +173,12 @@ function Debug.BuildSnapshot(
         factions = factions,
         selectedFaction = selected,
         selectedFactionID = selected and selected.id or nil,
+        selectedTargetFaction = selectedTarget,
+        selectedTargetFactionID =
+            selectedTarget and selectedTarget.id or nil,
+        relationForward = relationForward,
+        relationReverse = relationReverse,
+        intentPreview = intentPreview,
         selectedNPCID = Types.IsValidNPCID(selectedNPCID)
             and selectedNPCID or nil,
         members = members,
@@ -156,6 +195,7 @@ end
 function Debug.PerformAction(player, args)
     local action = tostring(args and args.factionAction or "")
     local factionID = args and args.factionID
+    local targetFactionID = args and args.targetFactionID
     local npcID = args and args.npcID
     local at = worldAgeHours()
     local ok
@@ -239,34 +279,100 @@ function Debug.PerformAction(player, args)
             "debug_archive",
             at
         )
-    elseif action == "war" or action == "peace" then
-        local playerFaction = Factions.GetPlayerFaction(player)
-        if not playerFaction then
-            ok, reason = false, "player_faction_required"
-        elseif not factionID
-            or factionID == playerFaction.id
+    elseif action == "war" or action == "peace"
+        or action == "truce" or action == "alliance"
+        or action == "break_alliance"
+    then
+        if not factionID or not targetFactionID
+            or factionID == targetFactionID
         then
-            ok, reason = false, "select_other_faction"
+            ok, reason = false, "select_distinct_factions"
         elseif action == "war" then
             ok, reason, value = Factions.DeclareWar(
-                playerFaction.id,
                 factionID,
+                targetFactionID,
                 {
                     worldAgeHours = at,
-                    reason = "debug_declared_war",
-                    instigatorFactionID = playerFaction.id,
+                    reason = "manual_debug",
+                    instigatorFactionID = factionID,
+                }
+            )
+        elseif action == "peace" then
+            ok, reason, value = Factions.MakePeace(
+                factionID,
+                targetFactionID,
+                {
+                    worldAgeHours = at,
+                    instigatorFactionID = factionID,
+                }
+            )
+        elseif action == "truce" then
+            ok, reason, value = Factions.StartTruce(
+                factionID,
+                targetFactionID,
+                {
+                    worldAgeHours = at,
+                    truceUntil = at + 24,
+                    instigatorFactionID = factionID,
+                }
+            )
+        elseif action == "alliance" then
+            ok, reason, value = Factions.FormAlliance(
+                factionID,
+                targetFactionID,
+                {
+                    worldAgeHours = at,
+                    instigatorFactionID = factionID,
+                    override = true,
                 }
             )
         else
-            ok, reason, value = Factions.MakePeace(
-                playerFaction.id,
+            ok, reason, value = Factions.BreakAlliance(
                 factionID,
+                targetFactionID,
                 {
                     worldAgeHours = at,
-                    reason = "debug_made_peace",
-                    instigatorFactionID = playerFaction.id,
+                    instigatorFactionID = factionID,
                 }
             )
+        end
+    elseif action == "incident_minor"
+        or action == "incident_severe"
+        or action == "incident_killed"
+        or action == "incident_rescue"
+        or action == "recalculate"
+    then
+        if not factionID or not targetFactionID
+            or factionID == targetFactionID
+        then
+            ok, reason = false, "select_distinct_factions"
+        elseif action == "recalculate" then
+            ok, reason, value = Factions.RecalculateRelation(
+                factionID,
+                targetFactionID,
+                at
+            )
+        else
+            local incidentTypes = {
+                incident_minor = "member_attacked_minor",
+                incident_severe = "member_attacked_severe",
+                incident_killed = "member_killed",
+                incident_rescue = "member_rescued",
+            }
+            ok, reason, value =
+                PNC.FactionIncidentService.AddIncident(
+                    factionID,
+                    targetFactionID,
+                    incidentTypes[action],
+                    {
+                        worldAgeHours = at,
+                        externalID = "debug:" .. action .. ":"
+                            .. factionID .. ":" .. targetFactionID
+                            .. ":" .. tostring(at),
+                        public = true,
+                        witnessed = true,
+                    }
+                )
         end
     else
         ok, reason = false, "unsupported_faction_action"
@@ -280,7 +386,8 @@ function Debug.PerformAction(player, args)
             npcID = npcID,
             resultingRevision = value and value.revision,
         }),
-        player
+        player,
+        targetFactionID
     )
 end
 

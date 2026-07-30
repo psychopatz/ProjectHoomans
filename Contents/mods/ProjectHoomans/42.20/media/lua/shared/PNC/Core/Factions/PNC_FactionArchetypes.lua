@@ -21,6 +21,16 @@ local DEFINITIONS = {
             hostileToOutsiders = false,
             defaultLegacyFaction = "neutral",
         },
+        policyDefaults = {
+            aggression = 0.30,
+            retaliation = 0.55,
+            caution = 0.55,
+            hospitality = 0.50,
+            opportunism = 0.30,
+            outsiderPolicy = "neutral",
+            warThreshold = 70,
+            peaceThreshold = 25,
+        },
     },
     looter = {
         id = "looter",
@@ -33,8 +43,18 @@ local DEFINITIONS = {
         },
         defaultRole = "civilian",
         behavior = {
-            hostileToOutsiders = true,
-            defaultLegacyFaction = "hostile",
+            hostileToOutsiders = false,
+            defaultLegacyFaction = "neutral",
+        },
+        policyDefaults = {
+            aggression = 0.75,
+            retaliation = 0.70,
+            caution = 0.35,
+            hospitality = 0.10,
+            opportunism = 0.85,
+            outsiderPolicy = "predatory",
+            warThreshold = 58,
+            peaceThreshold = 20,
         },
     },
     trader = {
@@ -51,6 +71,16 @@ local DEFINITIONS = {
             hostileToOutsiders = false,
             defaultLegacyFaction = "neutral",
         },
+        policyDefaults = {
+            aggression = 0.20,
+            retaliation = 0.40,
+            caution = 0.65,
+            hospitality = 0.60,
+            opportunism = 0.75,
+            outsiderPolicy = "commercial",
+            warThreshold = 76,
+            peaceThreshold = 30,
+        },
     },
     refugee = {
         id = "refugee",
@@ -64,6 +94,16 @@ local DEFINITIONS = {
         behavior = {
             hostileToOutsiders = false,
             defaultLegacyFaction = "neutral",
+        },
+        policyDefaults = {
+            aggression = 0.15,
+            retaliation = 0.35,
+            caution = 0.80,
+            hospitality = 0.45,
+            opportunism = 0.25,
+            outsiderPolicy = "cautious",
+            warThreshold = 80,
+            peaceThreshold = 28,
         },
     },
 }
@@ -105,6 +145,11 @@ end
 function Archetypes.GetDefaultRole(archetypeID)
     local definition = DEFINITIONS[archetypeID]
     return definition and definition.defaultRole or "civilian"
+end
+
+function Archetypes.GetPolicyDefaults(archetypeID)
+    local definition = DEFINITIONS[archetypeID]
+    return definition and copy(definition.policyDefaults) or nil
 end
 
 function Archetypes.IsHostileToOutsiders(archetypeID)

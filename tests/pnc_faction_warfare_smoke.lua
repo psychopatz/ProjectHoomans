@@ -39,6 +39,10 @@ end
 local hour = 50
 local globalData = {}
 
+-- Project Zomboid's Kahlua runtime does not expose Lua's global next().
+-- Keep it absent across the complete faction service/behavior path.
+next = nil
+
 function isClient() return false end
 function isServer() return true end
 function getTimeInMillis() return hour * 3600000 end
@@ -65,6 +69,9 @@ dofile(SHARED .. "Base/PNC_Constants.lua")
 dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
 dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
 dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
+dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
+dofile(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
+dofile(SHARED .. "Factions/PNC_FactionIntent.lua")
 dofile(SHARED .. "Factions/PNC_FactionTypes.lua")
 
 PNC.Types = {
@@ -161,6 +168,7 @@ local playerNPC = npc("npc_player_member")
 local traderNPC = npc("npc_trader")
 
 dofile(SERVER .. "PNC_FactionService.lua")
+dofile(SERVER .. "PNC_FactionIncidentService.lua")
 dofile(SERVER .. "PNC_FactionBehavior.lua")
 dofile(SHARED .. "Relationships/PNC_Relationships.lua")
 dofile(SHARED .. "Commands/PNC_CompanionCommandRegistry.lua")
@@ -201,20 +209,20 @@ local _, _, traderFaction = Factions.Create({
     createdAt = hour,
 })
 
--- Looter assignment immediately strips companion ownership and becomes
--- hostile-hunt behavior.
+-- Looter assignment strips companion ownership, but archetype alone does
+-- not grant lethal intent.
 truthy(Factions.AddNPC(
     looterFaction.id,
     looterNPC.id,
     { joinedAt = hour }
 ), "assign looter")
-equal(looterNPC.faction, "hostile", "looter tactical class")
+equal(looterNPC.faction, "neutral", "looter tactical class")
 equal(looterNPC.recruited, false, "looter not companion")
 equal(looterNPC.ownerUsername, nil, "looter owner cleared")
-equal(looterNPC.hostility.attackPlayers, true,
-    "looter attacks outsiders")
-equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_HUNT,
-    "looter hunt order")
+equal(looterNPC.hostility.attackPlayers, false,
+    "looter does not auto-attack outsiders")
+equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_ROAM,
+    "looter follows nonlethal policy")
 
 -- Player-owned faction membership derives companion ownership.
 truthy(Factions.AddNPC(
@@ -264,7 +272,7 @@ truthy(Factions.DeclareWar(
     traderFaction.id,
     {
         worldAgeHours = hour,
-        reason = "test_war",
+        reason = "manual_debug",
         instigatorFactionID = playerFaction.id,
     }
 ), "declare war")
@@ -294,55 +302,65 @@ equal(Factions.DeclareWar(
 equal(Factions.Registry.revision,
     beforeWarRevision + 1, "duplicate war no revision")
 
--- Peace restores a non-looter faction to neutral. Looters remain hostile by
--- archetype even without a formal war.
+-- Peace restores external factions to nonlethal policy.
 truthy(Factions.MakePeace(
     playerFaction.id,
     traderFaction.id,
     {
         worldAgeHours = hour + 1,
-        reason = "test_peace",
+        reason = "manual_debug",
     }
 ), "make peace")
 equal(traderNPC.faction, "neutral",
     "peace restores neutral behavior")
 equal(Factions.CanNPCTargetPlayer(traderNPC, player),
     false, "peace stops player targeting")
-truthy(PNC.Relationships.AreNPCsEnemies(
+equal(PNC.Relationships.AreNPCsEnemies(
     looterNPC,
     playerNPC
-), "looter remains outsider-hostile")
+), false, "looter policy alone is nonlethal")
 
--- An enemy personal relationship and authoritative damage both escalate to
--- faction-wide war.
+-- Personal enemy state is reported only by faction authority and does not
+-- immediately declare war under the safe default.
+truthy(Factions.SetLeader(
+    traderFaction.id,
+    traderNPC.id,
+    hour + 1
+), "set faction leader")
 truthy(Factions.OnRelationshipChanged(
     traderNPC,
     playerKey,
-    { state = "enemy", lastEvaluatedAt = hour + 1 }
-), "enemy relationship starts war")
-truthy(Factions.AreAtWar(
+    {
+        state = "enemy",
+        lastEvaluatedAt = hour + 1,
+        revision = 1,
+    }
+), "leader reports personal grievance")
+equal(Factions.AreAtWar(
     playerFaction.id,
     traderFaction.id
-), "relationship war persisted")
-truthy(Factions.MakePeace(
-    playerFaction.id,
-    traderFaction.id,
-    {
-        worldAgeHours = hour + 1.5,
-        reason = "reset_for_aggression_test",
-    }
-), "reset relationship war")
+), false, "personal enemy does not force war")
 
 hour = hour + 2
 truthy(Factions.OnPlayerAggression(
     player,
     traderNPC,
     hour
-), "player aggression starts war")
+), "first attack records incident")
+equal(Factions.AreAtWar(
+    playerFaction.id,
+    traderFaction.id
+), false, "minor attack does not force war")
+truthy(Factions.OnPlayerAggression(
+    player,
+    traderNPC,
+    hour + 0.001,
+    { killed = true }
+), "death upgrades attack episode")
 truthy(Factions.AreAtWar(
     playerFaction.id,
     traderFaction.id
-), "aggression war persisted")
+), "member death escalates to war")
 truthy(Factions.Archive(
     traderFaction.id,
     "test_archive",
@@ -363,18 +381,43 @@ equal(playerNPC.presenceRevision, 9,
 equal(traderNPC.presenceRevision, 9,
     "war behavior leaves presence revision")
 
--- V1 faction registries deterministically migrate to V2.
+-- V2 pair diplomacy deterministically migrates to two V3 directions.
 local migrated = PNC.FactionTypes.NormalizeFactionRegistry({
-    schemaVersion = 1,
+    schemaVersion = 2,
     revision = 3,
-    byID = Factions.Registry.byID,
-    byArchetype = Factions.Registry.byArchetype,
+    byID = {
+        faction_old_a = {
+            id = "faction_old_a",
+            name = "Old A",
+            archetypeID = "settler",
+        },
+        faction_old_b = {
+            id = "faction_old_b",
+            name = "Old B",
+            archetypeID = "looter",
+        },
+    },
+    diplomacy = {
+        ["faction_old_a|faction_old_b"] = {
+            factionAID = "faction_old_a",
+            factionBID = "faction_old_b",
+            state = "war",
+            changedAt = 20,
+            revision = 2,
+        },
+    },
 })
-equal(migrated.schemaVersion, 2, "registry migrated to V2")
+equal(migrated.schemaVersion, 3, "registry migrated to V3")
 truthy(type(migrated.byPlayerKey) == "table",
     "player index added")
-truthy(type(migrated.diplomacy) == "table",
-    "diplomacy table added")
+equal(migrated.diplomacy, nil,
+    "legacy pair table removed")
+truthy(migrated.byID.faction_old_a
+    .relations.faction_old_b.atWar,
+    "forward war migrated")
+truthy(migrated.byID.faction_old_b
+    .relations.faction_old_a.atWar,
+    "reverse war migrated")
 saveSafe(Factions.Registry)
 
 print("pnc_faction_warfare_smoke: ok")

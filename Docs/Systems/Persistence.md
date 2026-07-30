@@ -13,7 +13,7 @@
 - compact `inventory` payload
 - sparse, directed `social` relationship and memory payload
 - separate `PNC_PlayerCharacters` player-character registry schema v3
-- separate `PNC_Factions` organizational registry schema v2
+- separate `PNC_Factions` organizational/diplomacy registry schema v3
 - primitive NPC affiliation schema v1
 - body-part wounds and infection timing, stage, progress, fever, and temperature
 - runtime rebuild defaults after load
@@ -69,9 +69,10 @@
   V1. The separate `PNC_Factions` registry starts empty; migration never
   converts legacy `colonist`, `neutral`, or `hostile` classifications into
   organizational membership
-- faction-registry V1 data normalizes to V2 with stable player-character
-  membership indexes and an empty pairwise diplomacy map. This migration does
-  not create factions or infer wars
+- faction-registry V1 data normalizes through V2 membership indexes. V2
+  symmetric pair diplomacy normalizes to V3 directed relation records while
+  preserving official war/peace state, timestamps, initiator, and revision.
+  It invents no opinion metrics, incidents, factions, or memberships
 - full NPC records never persist after death. The registry directory instead
   keeps a minimal `deathMarkers` map with identity, name, position, corpse token,
   infection state, and delay metadata

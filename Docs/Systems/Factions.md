@@ -1,29 +1,31 @@
 # Persistent Factions
 
-## Purpose and Compatibility Boundary
+## Purpose and Boundaries
 
-Phase 5A gave survivor organizations stable server-owned identity and NPC
-membership. Phase 5B adds a narrow server-owned behavior bridge, player
-factions, and pairwise faction war. The system still separates:
+The faction system gives organizations stable server-owned identities,
+directed opinions, deterministic policies, and symmetric official treaties.
+It deliberately separates four concepts:
 
-- a faction archetype classifies what kind of organization it is;
+- a faction archetype describes what kind of organization it is;
 - a faction record identifies one persistent organization;
-- `record.affiliation` identifies an NPC's organization, status, role, and rank;
-- legacy `record.faction` remains a derived tactical compatibility field used
-  by existing combat, targeting, jobs, recruitment, visuals, and commands.
+- `record.affiliation` stores an NPC's organization, role, rank, and status;
+- legacy `record.faction` is derived tactical compatibility state.
 
-`record.affiliation.factionID` is canonical. The centralized behavior bridge
-derives legacy ownership/hostility fields after membership or diplomacy
-changes. Migration still never groups old `colonist`, `neutral`, or `hostile`
-records automatically.
+`record.affiliation.factionID` is canonical membership. Assigning an NPC to a
+looter organization removes player ownership, but the archetype is not itself
+permission to attack. Tactical intent combines faction policy, the directed
+relation, official treaties, relative strength, and immediate self-defense.
 
-## Registry and Records
+This phase does not implement territory, economy, raids, autonomous strategy,
+dialogue, diplomacy UI for ordinary players, or faction simulation.
 
-The authority stores a separate `PNC_Factions` Global ModData registry:
+## Persistence Schema V3
+
+The authority owns the separate `PNC_Factions` Global ModData table:
 
 ```lua
 {
-    schemaVersion = 2,
+    schemaVersion = 3,
     revision = 0,
     byID = {
         faction_123 = {
@@ -39,6 +41,43 @@ The authority stores a separate `PNC_Factions` Global ModData registry:
             playerMemberKeys = {
                 ["player:Patrick:char_f8d31a"] = true,
             },
+            policy = {
+                schemaVersion = 1,
+                aggression = 0.28,
+                retaliation = 0.57,
+                caution = 0.51,
+                hospitality = 0.49,
+                opportunism = 0.27,
+                outsiderPolicy = "neutral",
+                warThreshold = 70,
+                peaceThreshold = 25,
+                generatedFromArchetype = true,
+                generationVersion = 1,
+            },
+            relations = {
+                faction_456 = {
+                    schemaVersion = 1,
+                    targetFactionID = "faction_456",
+                    standing = -18,
+                    trust = -20,
+                    fear = 5,
+                    grievance = 25,
+                    state = "wary",
+                    previousState = "neutral",
+                    atWar = false,
+                    allied = false,
+                    truceUntil = 0,
+                    warStartedAt = 0,
+                    warEndedAt = 0,
+                    warReason = nil,
+                    initiatingFactionID = nil,
+                    triggeringIncidentID = nil,
+                    incidents = {},
+                    recentIncidentIDs = {},
+                    lastEvaluatedAt = 183,
+                    revision = 1,
+                },
+            },
             tags = {},
             revision = 1,
         },
@@ -49,189 +88,255 @@ The authority stores a separate `PNC_Factions` Global ModData registry:
     byPlayerKey = {
         ["player:Patrick:char_f8d31a"] = "faction_123",
     },
-    diplomacy = {
-        ["faction_123|faction_456"] = {
-            factionAID = "faction_123",
-            factionBID = "faction_456",
-            state = "war",
-            changedAt = 183.0,
-            reason = "player_attacked_member",
-            instigatorFactionID = "faction_123",
-            revision = 1,
-        },
-    },
 }
 ```
 
-`byID` is canonical for faction identity. NPC affiliation is canonical for
-NPC membership; `playerMemberKeys` is canonical for stable player-character
-membership. `memberIDs`, `byArchetype`, and `byPlayerKey` are primitive-only
-secondary indexes rebuilt deterministically.
-Complete NPC records and engine objects are never copied into
-the faction registry.
+`byID` is canonical. The other top-level maps are deterministic secondary
+indexes. Persistent data contains only serialization-safe primitives and
+tables—never NPC records, players, zombies, inventory items, Java objects,
+functions, coroutines, or metatables.
 
-Faction statuses are `active`, `inactive`, `archived`, and `destroyed`.
-Ordinary APIs preserve archived/destroyed records and never reuse their IDs.
-Faction names are display data and need not be unique.
+## Archetypes and Policy
 
-## Archetypes
+The four data-only archetypes are:
 
-The shared, copy-returning archetype registry contains exactly:
+- `settler` — balanced, neutral outsiders;
+- `looter` — aggressive, retaliatory, opportunistic, predatory outsiders;
+- `trader` — cautious, hospitable, commercial outsiders;
+- `refugee` — highly cautious, low aggression, cautious outsiders.
 
-- `settler` — Settlement
-- `looter` — Looter Gang
-- `trader` — Trading Company
-- `refugee` — Refugee Group
+Each new faction receives deterministic small variation around its archetype
+defaults. Existing V2 factions receive the same result every normalization,
+using only faction ID, archetype, field name, and generation version. Authored
+policy fields are preserved and clamped.
 
-Definitions contain labels, descriptions, allowed/default roles, and a small
-data-only tactical policy. A looter faction is hostile to outsiders. Settler,
-trader, and refugee factions are neutral until war. Definitions contain no
-engine callbacks, raid schedules, economy, territory, or autonomous strategy.
+Policy dimensions range from `0` through `1`. War and peace thresholds range
+from `0` through `100`. Policy is consulted by escalation and tactical intent;
+it is not autonomous faction AI.
 
-## Player Factions
+## Directed Relations
 
-`CreatePlayerFaction(player, spec)` resolves the existing stable
-`player:<account>:<characterUUID>` identity and stores it as the owner/member.
-One player character may belong to one faction. A new survivor UUID is a
-different person and does not inherit the dead character's faction.
+`factionA.relations[factionB.id]` is A's opinion of B. B's opinion of A is a
+separate record and may have different:
 
-Player-owned NPC members derive companion ownership from the faction owner:
-legacy `colonist`, recruited, follow order, and owner identity. Transferring
-that NPC to an external faction removes those companion fields. If
-authoritative aggression needs a player faction and none exists, the service
-creates a personal settler faction for that specific character.
+- standing, from `-100` through `100`;
+- trust, from `-100` through `100`;
+- fear, from `0` through `100`;
+- grievance, from `0` through `100`;
+- state, history, incident list, and revision.
 
-## Behavior and War
+Official war, alliance, and truce fields are symmetric invariants. Treaty
+operations synchronously update both directed records, both faction
+revisions, and the registry once. Directional opinion metrics remain
+independent.
 
-The server applies this compatibility policy:
+States are `unknown`, `neutral`, `friendly`, `wary`, `hostile`, `war`,
+`truce`, and `allied`. Treaty states take priority.
 
-- player-owned faction member: commandable companion;
-- looter member: hostile-hunt behavior toward outsiders;
-- settler/trader/refugee member at peace: neutral roaming behavior;
-- any faction member at war: aggressive toward members of the opposing
-  faction;
-- unaffiliated NPC after faction removal: neutral and unowned.
+Opinion entry thresholds are:
 
-War is one canonical, symmetric diplomacy record keyed by a sorted faction-ID
-pair. Reads in either direction return the same state. The target resolver
-checks faction IDs and player-character membership, preventing a war with one
-player faction from making neutral organizations attack every player.
+- friendly: standing at least `30`, trust at least `10`, grievance at most
+  `20`;
+- hostile: standing at most `-45` or grievance at least `65`;
+- wary: standing at most `-15`, trust at most `-25`, fear at least `50`, or
+  grievance at least `30`;
+- neutral: meaningful contact that meets none of those;
+- unknown: no meaningful contact.
 
-War begins when authoritative combat records a player or NPC attacking a
-member of another faction, or when a member's directed relationship toward a
-player reaches `enemy`. An attacking unaffiliated player first receives their
-stable personal faction. Making peace restores non-looter factions to neutral;
-looters remain hostile to outsiders by archetype.
+Hysteresis retains friendly until standing falls below `20` or grievance
+exceeds `30`; hostile remains while standing is at most `-30` or grievance is
+at least `50`. Wary remains until standing is above `-5`, trust above `-15`,
+fear below `40`, and grievance below `20`.
 
-## NPC Affiliation
+Explicit recalculation applies deterministic elapsed-world-age decay. Standing
+and trust drift toward zero; fear and non-war grievance decline. Reads do not
+decay or mutate data. Expired truces clear during explicit recalculation.
 
-Every V14 NPC record contains affiliation schema V1:
+## Incidents and Escalation
+
+Faction effects are selected from server-owned definitions. Callers provide a
+named incident and evidence context, never arbitrary scores. Supported
+incidents are minor/severe member attack, member killed, rescued, protected,
+fought together, abandoned, and authoritative personal grievance report.
+Treaty audit records cover war, peace, truce, alliance formed, and alliance
+broken.
+
+For an attack by A against B, B's relation toward A receives the negative
+effect. A's reverse opinion does not change. Rescue/protection similarly
+improves the beneficiary faction's opinion of the actor faction.
+
+Attack callbacks are aggregated by faction pair and stable actor/subject keys:
+
+1. the first credible hit creates one minor incident;
+2. a repeated hit in the short aggregation window upgrades it to severe;
+3. death upgrades that same incident to member killed;
+4. duplicate callback/event IDs are rejected;
+5. attack ticks do not create an unbounded incident stream.
+
+A minor attack does not automatically declare war. Severe assault is evaluated
+against the victim faction's aggression, retaliation, grievance, and war
+threshold. Killing a member commonly escalates; killing a leader adds fear and
+grievance and uses the `leader_killed` reason. Violence during an active truce
+immediately uses `truce_broken`.
+
+Valid persisted war reasons are a bounded enum:
+`member_killed`, `severe_assault`, `repeated_aggression`, `leader_killed`,
+`truce_broken`, `manual_debug`, `scripted`, and `unknown`.
+
+An individual NPC reaching personal `enemy` does not start faction war by
+default. Only leaders/officers/seconds can submit a grievance report.
+`PNC.Config.Factions.EnemyRelationshipCanImmediatelyDeclareWar` defaults to
+`false`; enabling it is an explicit compatibility override.
+
+The incident history is deterministically limited to 64 entries. Ordinary
+weak/old incidents are removed before preserved treaty audits. A separate
+bounded recent-ID list retains dedupe evidence.
+
+## Treaties
+
+Server mutation APIs are:
+
+- `DeclareWar(sourceFactionID, targetFactionID, options)`
+- `EndWar(sourceFactionID, targetFactionID, options)`
+- `StartTruce(sourceFactionID, targetFactionID, options)`
+- `MakePeace(sourceFactionID, targetFactionID, options)`
+- `FormAlliance(sourceFactionID, targetFactionID, options)`
+- `BreakAlliance(sourceFactionID, targetFactionID, options)`
+
+War clears alliance/truce. Truce ends war for a bounded world-age duration.
+Peace clears war/alliance/truce, adds `15` standing and `10` trust on each
+direction, and halves each direction's grievance. Alliance normally requires
+both directions to meet friendly thresholds; guarded debug/script operations
+may explicitly override this check. Breaking alliance applies trust and
+grievance penalties.
+
+Already-current treaty requests are revision-neutral.
+
+## Tactical Intent and Compatibility Behavior
+
+`PNC.FactionBehavior.ResolveIntent(observerRecord, target, context)` returns:
 
 ```lua
 {
-    schemaVersion = 1,
-    factionID = nil,
-    membershipStatus = "unaffiliated",
-    role = "civilian",
-    rank = "member",
-    joinedAt = 0,
-    leftAt = 0,
-    originArchetypeID = nil,
-    formerFactionIDs = {},
-    revision = 0,
+    intent = "observe",
+    attackAllowed = false,
+    pursueAllowed = false,
+    commandable = false,
+    reason = "neutral_outsider_policy",
 }
 ```
 
-Supported membership statuses are `unaffiliated`, `applicant`, `guest`,
-`refugee`, `member`, `probationary_member`, `prisoner`, `mercenary`,
-`deserter`, and `exile`. Phase 5A behavior is limited to unaffiliated, guest,
-refugee, and member.
+Intent priority is immediate self-defense, player-owned membership, same
+faction, war, truce, alliance, directed hostility, directed caution/friendship,
+archetype policy, then personal disposition.
 
-Roles are `leader`, `lieutenant`, `guard`, `enforcer`, `raider`, `trader`,
-`medic`, `farmer`, `builder`, `scavenger`, `cook`, `mechanic`, `laborer`,
-`caregiver`, `civilian`, and `prisoner`. Archetypes validate the roles they
-currently allow. Ranks are `member`, `senior`, `officer`, `second`, and
-`leader`. Role and rank do not modify personality, conduct, or tactical AI.
+- player-owned members remain commandable companions for the exact stable
+  player-character UUID;
+- war allows attack/pursuit against the opposing faction;
+- truce prevents attack;
+- neutral looters threaten or avoid stronger targets but do not automatically
+  attack;
+- a hostile predatory looter attacks only with sufficient policy aggression
+  and a clear strength advantage;
+- traders tolerate, refugees avoid, and settlers observe neutral outsiders.
 
-Former-membership history contains faction ID, joined/left world-age hours,
-and a normalized reason. It is deterministically limited to the newest eight
-entries.
+The legacy tactical bridge sets external peaceful members to neutral roaming.
+It uses hostile-hunt compatibility state only while the faction has an active
+war. Final target filtering still resolves the exact opposing faction, so a
+war with one player faction does not authorize attacks against unrelated
+players or organizations. Social changes never advance `presenceRevision`.
 
-## Membership, Leadership, and Archival
+## Membership, Leadership, and Player Factions
 
-All mutation uses `PNC.Factions`. Add rejects unintended dual membership;
-transfer removes the old index, appends history, and commits the destination
-in one synchronous authority operation. Remove resets affiliation and clears
-leadership when necessary.
+Affiliation remains NPC schema V1 and contains faction ID, membership status,
+role, rank, joined/left world-age hours, origin archetype, bounded former
+factions, and revision.
 
-Leader assignment requires a living member unless `addIfMissing` is explicitly
-requested. A new leader receives leader role/rank; the former leader is
-demoted to member rank and the archetype's safe default role. Removing or
-killing a leader clears `leaderNPCID`; no successor is selected and the faction
-is not archived.
+Player factions store stable
+`player:<accountIdentity>:<characterUUID>` membership. A new survivor UUID on
+the same account is a different social/faction person and cannot inherit
+command authority.
 
-Archival preserves the faction ID and display record, clears leadership,
-converts current memberships into former-membership history, and leaves
-relationships, conduct, personality, and inventory unchanged. Removed NPCs are
-reconciled to unaffiliated neutral behavior. Active wars involving the
-archived faction become peace so surviving factions do not remain aggressive
-toward a faction that can no longer field members.
+Add rejects unintended dual membership. Transfer changes source/destination
+indexes and history atomically. Leadership requires a living member. Removing
+or killing a leader clears leadership without inventing a successor.
+Archiving preserves faction identity, removes current membership, and clears
+all symmetric treaty flags involving the archived faction.
 
-## Authority, Revisions, and API
+## Public API and Revisions
 
-Mutation APIs are server-only:
+Copied reads include:
 
-- `Create`
-- `CreatePlayerFaction`, `EnsurePlayerFaction`
-- `AddNPC`, `RemoveNPC`, `TransferNPC`
-- `SetNPCStatus`, `SetNPCRole`, `SetNPCRank`
-- `SetLeader`
-- `Archive`
-- `DeclareWar`, `MakePeace`
-- authoritative `OnPlayerAggression`, `OnNPCAggression`, and
-  `OnRelationshipChanged` adapters
+- `Get`, `List`, `GetByArchetype`, `GetMembers`, `GetLeader`;
+- `GetNPCFaction`, `GetNPCAffiliation`, `IsMember`;
+- `GetPlayerFaction`, `GetFactionForPlayerKey`;
+- `GetRelation` (`GetDiplomacy` is a directed compatibility alias);
+- `AreAtWar`, `AreAllied`, `GetTruceUntil`, `IsFactionAtWar`;
+- `GetOrganizationalFactionID`, `GetLegacyFactionClass`.
 
-Copied read APIs are:
+Authority mutation also includes membership, leadership, archival,
+`CommitDirectedRelation`, `RecalculateRelation`, and
+`PNC.FactionIncidentService.AddIncident/RecordAttack/RecordPositiveEvent`.
 
-- `Get`, `List`, `GetByArchetype`, `GetMembers`, `GetLeader`
-- `GetNPCFaction`, `GetNPCAffiliation`, `IsMember`
-- `GetArchetype`, `GetAllowedRoles`
-- `GetPlayerFaction`, `GetFactionForPlayerKey`
-- `GetDiplomacy`, `AreAtWar`, `IsFactionAtWar`
-- `GetOrganizationalFactionID`, `GetLegacyFactionClass`
+A directed relation mutation increments that relation, its source faction,
+and the registry. An official treaty increments both relation records, both
+factions, and the registry exactly once. Rejected, duplicate, unchanged, and
+copied read operations increment nothing. NPC affiliation/derived behavior
+uses existing record dirty tracking and never changes `presenceRevision`.
 
-Membership changes advance affiliation and owning NPC record revisions plus
-the affected faction and faction-registry revisions. Derived behavior changes
-use normal NPC dirty-record revision rules and never advance
-`presenceRevision`. War/peace advances both faction revisions and the registry
-once. Pure reads and already-current diplomacy advance nothing.
+## Migration
 
-Faction IDs come from `PNC.Core.GenerateID("faction")`, are collision checked
-with bounded retries, and cannot be supplied by ordinary clients.
+Faction registry V2 stored one symmetric `diplomacy[pairKey]` peace/war record.
+V3 deterministically creates both directed relations and preserves active war,
+timestamps, initiator, and revision. It invents no opinion score or incident.
+V2 peace becomes neutral meaningful contact. V3 normalization is idempotent
+and safely repairs one-sided treaty flags to their strongest symmetric
+invariant.
 
-## Persistence and Debugging
+NPC persistence remains V14, affiliation V1, social V3, conduct V1, and player
+identity registry V3.
 
-Phase 5A advanced NPC persistence from V13 to V14 solely so every existing
-record is rewritten with neutral affiliation. Social remains V3, the
-player-character registry remains V3, and conduct remains V1. Migration does
-not infer membership from legacy faction, proximity, archetype, ownership, or
-recruitment.
+## Debugging and Live Validation
 
-Phase 5B advances only the separate `PNC_Factions` registry from V1 to V2.
-Normalization adds empty player and diplomacy indexes deterministically.
-NPC persistence remains V14 and affiliation remains V1.
+The admin/debug-only **PNC Faction Inspector** is available from the
+PsychopatzCore Debug Hub. It has separate source and target faction lists, an
+NPC affiliation list, and a details panel showing:
 
-The admin/debug-only **PNC Faction Inspector** lists factions and NPCs, displays
-details/members/diplomacy, and routes player-faction creation, war/peace,
-create, assign, transfer, remove, leader, role, rank, and archive actions
-through the real service. The Relationship Inspector
-shows read-only organization summaries for observer/target NPCs and explicitly
-shows no organizational faction for player targets.
+- both directed relation records and revisions;
+- standing, trust, fear, grievance, state, and previous state;
+- symmetric war/alliance/truce fields;
+- policy dimensions;
+- incident history;
+- resolved intent and reason.
 
-## Non-Goals and Extensions
+Its incident/treaty buttons invoke production server APIs. They never send or
+edit score values. Available triggers are minor attack, severe attack, member
+killed, rescue, recalculation, war, 24-hour truce, peace, alliance, and
+alliance break.
 
-Phase 5B still adds no reputation/standing score, communities, settlement
-simulation, territory, mobile parties, trade, economy, raids, tribute, goals,
-role-specific AI, gossip, dialogue, romance, order refusal, or desertion
-simulation. War is a tactical relationship and target filter, not autonomous
-strategic faction simulation.
+For a basic in-game check:
+
+1. Create/select a player faction and a looter faction.
+2. Assign an NPC to the player faction; confirm it is a companion.
+3. Transfer it to the looter faction; confirm command ownership clears and it
+   roams without automatically attacking.
+4. Select looter as source and player faction as target; confirm the intent is
+   `threaten` or `avoid`, with `attack=false`.
+5. Trigger minor attack; inspect the reverse (victim-to-actor) relation and
+   confirm no automatic war.
+6. Trigger member killed; confirm war becomes symmetric and both sides'
+   members become enemies.
+7. Start truce or make peace; confirm attacks stop.
+8. Save/reload and confirm directed metrics, incidents, treaty, policy, and
+   revisions persist.
+
+Run `lua tests/pnc_faction_diplomacy_smoke.lua` for deterministic non-engine
+coverage.
+
+## Future Extension Points
+
+Current data can later support authored policy changes, faction reputation,
+negotiation, tribute, leadership succession, autonomous strategy, incident
+consolidation, communities, settlements, and normal-player diplomacy UI.
+Those systems must consume the existing authority API rather than mutate
+relations or treaty flags directly.

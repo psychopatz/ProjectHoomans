@@ -213,7 +213,11 @@ function PlayerDamage.Apply(record, zombie, attacker, weapon, reportedDamage, so
         PNC.Factions.OnPlayerAggression(
             attacker,
             record,
-            at
+            at,
+            {
+                killed = record.alive == false,
+                severe = (tonumber(amount) or 0) >= 25,
+            }
         )
     end
     if applied and not usedCombatService and Network and Network.BroadcastRecord then

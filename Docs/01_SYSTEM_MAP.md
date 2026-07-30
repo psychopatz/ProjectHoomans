@@ -31,17 +31,20 @@
   `PNC_RelationshipStates`: serialization-safe directed social records,
   deterministic memory decay, cached score calculation, and hysteresis
 - `PNC_Relationships`: server-authoritative personal relationship API plus the
-  faction-aware enemy matrix and disposition transitions; Phase 5B escalates
-  a faction member's `enemy` state toward a player into faction war
+  faction-aware intent matrix and disposition transitions; authorized leaders
+  may report personal grievances, but personal `enemy` does not force war by
+  default
 - `PNC_SocialEventDefinitions`: data-only balance, allowed-source, cooldown,
   saturation, and observer rules for the five Phase 2 events
 - `PNC_ConductConstants`, `PNC_ConductTypes`, `PNC_ConductMath`, and
   `PNC_ConductDefinitions`: actor-owned behavioral schema, objective score
   derivation/decay, evidence limits, and the five accepted-event mappings
-- `PNC_FactionConstants`, `PNC_FactionArchetypes`, and `PNC_FactionTypes`:
-  organizational/diplomacy enums, four data-only archetypes, faction
-  registry/record normalization, player keys, and primitive NPC
-  affiliation/history
+- `PNC_FactionConstants`, `PNC_FactionArchetypes`,
+  `PNC_FactionDiplomacyMath`, `PNC_FactionIncidentDefinitions`,
+  `PNC_FactionIntent`, and `PNC_FactionTypes`: organizational/diplomacy
+  enums, four deterministic policy archetypes, pure directed-state
+  math/intent, server-owned incident balance, V3 registry normalization,
+  player keys, and primitive NPC affiliation/history
 - `PNC_SpatialIndex`: nested numeric-cell player, NPC, and zombie queries built
   from the shared world census; player identity maps also provide constant-time
   owner lookup
@@ -143,9 +146,10 @@
   read-only player/NPC formatters
 - `PNC_ConductService` and `PNC_ConductDebug`: authority-only evidence
   mutation, UUID/NPC ownership, copied reads, and sanitized formatting
-- `PNC_FactionService` and `PNC_FactionDebug`: separate `PNC_Factions`
-  ModData ownership, generated identity, copied queries, atomic membership,
-  player factions, symmetric war/peace, aggression adapters,
+- `PNC_FactionService`, `PNC_FactionIncidentService`, and
+  `PNC_FactionDebug`: separate `PNC_Factions` ModData ownership, generated
+  identity, copied directed queries, atomic membership/treaties, attack
+  aggregation, policy-aware escalation, player factions,
   leadership/archive operations, index repair, and sanitized inspection
 - `PNC_FactionBehavior`: centralized derivation of legacy companion,
   ownership, order, and hostility fields from canonical faction state
@@ -166,8 +170,9 @@
   admin/debug-only directed relationship inspection, reverse-direction
   comparison, memory/revision diagnostics, and guarded named-event triggers
 - `PNC_FactionDebugWindow` and `PNC_FactionDebugModel`: admin/debug-only
-  organization/member inspection and service-backed create, membership,
-  player-faction, war/peace, role/rank, leader, transfer, and archive controls
+  source/target organization inspection with both directed opinions, policy,
+  incident/intent diagnostics, and service-backed incident, treaty,
+  membership, player-faction, role/rank, leader, transfer, and archive controls
 - `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
 - `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby
   embodied NPCs, including canonical-instance selection and duplicate shell

@@ -375,7 +375,13 @@ function Damage.ApplyNPCDamage(targetRecord, targetBody, hit)
             PNC.Factions.OnNPCAggression(
                 attackerRecord,
                 targetRecord,
-                at
+                at,
+                {
+                    killed = targetRecord.alive == false,
+                    severe = hit and (
+                        tonumber(hit.amount) or 0
+                    ) >= 25,
+                }
             )
         end
     end
@@ -551,7 +557,12 @@ function Damage.ApplyTargetDamage(attackerRecord, attackerBody, target, options)
             PNC.Factions.OnNPCAttackPlayer(
                 attackerRecord,
                 target.player,
-                at
+                at,
+                {
+                    severe = hit.amount >= 25,
+                    killed = target.player.isDead
+                        and target.player:isDead() == true,
+                }
             )
         end
         return applied == true, applied == true and "hit_player" or "invalid_player_target", hit

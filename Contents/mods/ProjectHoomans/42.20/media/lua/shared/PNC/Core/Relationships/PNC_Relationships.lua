@@ -38,6 +38,17 @@ function Relationships.AreNPCsEnemies(source, target)
         and factions.GetOrganizationalFactionID
         and factions.GetOrganizationalFactionID(target)
         or target.affiliation and target.affiliation.factionID
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ResolveIntent
+        and sourceOrganization
+    then
+        local intent = PNC.FactionBehavior.ResolveIntent(
+            source,
+            target,
+            {}
+        )
+        return intent and intent.attackAllowed == true
+    end
     if sourceOrganization and targetOrganization then
         if sourceOrganization == targetOrganization then
             return false
@@ -50,44 +61,7 @@ function Relationships.AreNPCsEnemies(source, target)
         then
             return true
         end
-        sourceDefinition = factions
-            and factions.Registry
-            and factions.Registry.byID[sourceOrganization]
-            or nil
-        targetDefinition = factions
-            and factions.Registry
-            and factions.Registry.byID[targetOrganization]
-            or nil
-        return PNC.FactionArchetypes
-            and PNC.FactionArchetypes.IsHostileToOutsiders
-            and (
-                PNC.FactionArchetypes.IsHostileToOutsiders(
-                    sourceDefinition
-                        and sourceDefinition.archetypeID
-                )
-                or PNC.FactionArchetypes.IsHostileToOutsiders(
-                    targetDefinition
-                        and targetDefinition.archetypeID
-                )
-            ) == true
-    end
-    local organization = sourceOrganization
-        and factions
-        and factions.Registry
-        and factions.Registry.byID[sourceOrganization]
-        or targetOrganization
-            and factions
-            and factions.Registry
-            and factions.Registry.byID[targetOrganization]
-            or nil
-    if organization
-        and PNC.FactionArchetypes
-        and PNC.FactionArchetypes.IsHostileToOutsiders
-        and PNC.FactionArchetypes.IsHostileToOutsiders(
-            organization.archetypeID
-        )
-    then
-        return true
+        return false
     end
     if sourceOrganization and not targetOrganization then
         return factionOf(target) == Const.FACTION_HOSTILE

@@ -7,6 +7,8 @@ local Types = PNC.FactionTypes
 local Constants = PNC.FactionConstants
 local Archetypes = PNC.FactionArchetypes
 local EntityRef = PNC.EntityRef
+local DiplomacyMath = PNC.FactionDiplomacyMath
+local IncidentDefinitions = PNC.FactionIncidentDefinitions
 
 local function finite(value, fallback)
     value = tonumber(value)
@@ -109,6 +111,100 @@ local function normalizeIDSet(value, validator)
     return output
 end
 
+local function clamp(value, minimum, maximum)
+    return DiplomacyMath and DiplomacyMath.Clamp
+        and DiplomacyMath.Clamp(value, minimum, maximum)
+        or math.max(minimum, math.min(maximum, finite(value, 0)))
+end
+
+local function deterministicUnit(seedText)
+    local hash = 2166136261
+    local index
+    seedText = tostring(seedText or "")
+    for index = 1, #seedText do
+        hash = (
+            hash * 16777619
+            + string.byte(seedText, index)
+        ) % 2147483647
+    end
+    return (hash % 10001) / 10000
+end
+
+local function policyVariation(factionID, field)
+    return (deterministicUnit(
+        tostring(factionID) .. ":" .. tostring(field)
+    ) * 0.16) - 0.08
+end
+
+function Types.NormalizePolicy(value, archetypeID, factionID)
+    local source = type(value) == "table" and value or {}
+    local defaults = Archetypes.GetPolicyDefaults(archetypeID)
+        or {
+            aggression = 0.5,
+            retaliation = 0.5,
+            caution = 0.5,
+            hospitality = 0.5,
+            opportunism = 0.5,
+            outsiderPolicy = "neutral",
+            warThreshold = 70,
+            peaceThreshold = 25,
+        }
+    local function dimension(field)
+        if source[field] ~= nil then
+            return clamp(source[field], 0, 1)
+        end
+        return clamp(
+            (tonumber(defaults[field]) or 0.5)
+                + policyVariation(factionID, field),
+            0,
+            1
+        )
+    end
+    local outsiderPolicy =
+        Constants.VALID_OUTSIDER_POLICIES[
+            source.outsiderPolicy
+        ] and source.outsiderPolicy
+        or defaults.outsiderPolicy
+    return {
+        schemaVersion = Constants.POLICY_SCHEMA_VERSION,
+        aggression = dimension("aggression"),
+        retaliation = dimension("retaliation"),
+        caution = dimension("caution"),
+        hospitality = dimension("hospitality"),
+        opportunism = dimension("opportunism"),
+        outsiderPolicy =
+            Constants.VALID_OUTSIDER_POLICIES[
+                outsiderPolicy
+            ] and outsiderPolicy or "neutral",
+        warThreshold = clamp(
+            source.warThreshold ~= nil
+                and source.warThreshold
+                or defaults.warThreshold,
+            0,
+            100
+        ),
+        peaceThreshold = clamp(
+            source.peaceThreshold ~= nil
+                and source.peaceThreshold
+                or defaults.peaceThreshold,
+            0,
+            100
+        ),
+        generatedFromArchetype =
+            source.generatedFromArchetype ~= false,
+        generationVersion =
+            Constants.POLICY_GENERATION_VERSION,
+    }
+end
+
+function Types.NewPolicy(archetypeID, factionID, overrides)
+    return Types.NormalizePolicy(
+        overrides,
+        archetypeID,
+        factionID
+    )
+end
+
 local function isValidPlayerKey(value)
     return EntityRef and EntityRef.IsPlayer
         and EntityRef.IsPlayer(value) == true
@@ -157,6 +253,249 @@ function Types.NormalizeDiplomacy(value, pairKey)
             ) and source.instigatorFactionID or nil,
         revision = revision(source.revision),
     }
+end
+
+local function normalizeIncidentTags(value)
+    local output = {}
+    if type(value) ~= "table" then return output end
+    for key, enabled in pairs(value) do
+        key = safeString(key, Constants.TAG_KEY_MAX_LENGTH)
+        if key and enabled == true then output[key] = true end
+    end
+    return output
+end
+
+function Types.NormalizeIncident(
+    value,
+    relationSourceFactionID,
+    relationTargetFactionID
+)
+    local source = type(value) == "table" and value or {}
+    local id = safeString(
+        source.id,
+        Constants.INCIDENT_ID_MAX_LENGTH
+    )
+    local incidentType = safeString(
+        source.type,
+        Constants.INCIDENT_TYPE_MAX_LENGTH
+    )
+    local definition = IncidentDefinitions
+        and IncidentDefinitions.Get(incidentType) or nil
+    local incidentSourceFactionID =
+        Types.IsValidFactionID(source.sourceFactionID)
+        and source.sourceFactionID or nil
+    local incidentTargetFactionID =
+        Types.IsValidFactionID(source.targetFactionID)
+        and source.targetFactionID or nil
+    local pairMatches = (
+        incidentSourceFactionID == relationSourceFactionID
+        and incidentTargetFactionID == relationTargetFactionID
+    ) or (
+        incidentSourceFactionID == relationTargetFactionID
+        and incidentTargetFactionID == relationSourceFactionID
+    )
+    if not id or not definition
+        or not Types.IsValidFactionID(relationSourceFactionID)
+        or not Types.IsValidFactionID(relationTargetFactionID)
+        or relationSourceFactionID == relationTargetFactionID
+        or not pairMatches
+    then
+        return nil
+    end
+    local actorKey = EntityRef.IsValid(source.actorKey)
+        and source.actorKey or nil
+    local subjectKey = EntityRef.IsValid(source.subjectKey)
+        and source.subjectKey or nil
+    return {
+        id = id,
+        type = incidentType,
+        sourceFactionID = incidentSourceFactionID,
+        targetFactionID = incidentTargetFactionID,
+        actorKey = actorKey,
+        subjectKey = subjectKey,
+        occurredAt = timestamp(source.occurredAt, 0),
+        standingEffect = clamp(
+            source.standingEffect,
+            Constants.STANDING_MIN,
+            Constants.STANDING_MAX
+        ),
+        trustEffect = clamp(
+            source.trustEffect,
+            Constants.TRUST_MIN,
+            Constants.TRUST_MAX
+        ),
+        fearEffect = clamp(
+            source.fearEffect,
+            -Constants.FEAR_MAX,
+            Constants.FEAR_MAX
+        ),
+        grievanceEffect = clamp(
+            source.grievanceEffect,
+            -Constants.GRIEVANCE_MAX,
+            Constants.GRIEVANCE_MAX
+        ),
+        severity = clamp(source.severity, 0, 1),
+        public = source.public == true,
+        witnessed = source.witnessed == true,
+        preserve = source.preserve == true
+            or definition.preserve == true,
+        tags = normalizeIncidentTags(source.tags),
+    }
+end
+
+local function normalizeRecentIncidentIDs(value)
+    local output = {}
+    local seen = {}
+    if type(value) ~= "table" then return output end
+    for index = 1, #value do
+        local id = safeString(
+            value[index],
+            Constants.INCIDENT_ID_MAX_LENGTH
+        )
+        if id and not seen[id] then
+            seen[id] = true
+            output[#output + 1] = id
+        end
+    end
+    while #output > Constants.RECENT_INCIDENT_ID_LIMIT do
+        table.remove(output, 1)
+    end
+    return output
+end
+
+local function normalizeIncidents(
+    value,
+    sourceFactionID,
+    targetFactionID
+)
+    local output = {}
+    local seen = {}
+    for _, raw in pairs(type(value) == "table" and value or {}) do
+        local incident = Types.NormalizeIncident(
+            raw,
+            sourceFactionID,
+            targetFactionID
+        )
+        if incident and not seen[incident.id] then
+            seen[incident.id] = true
+            output[#output + 1] = incident
+        end
+    end
+    table.sort(output, function(left, right)
+        if left.occurredAt ~= right.occurredAt then
+            return left.occurredAt < right.occurredAt
+        end
+        return left.id < right.id
+    end)
+    while #output > Constants.INCIDENT_LIMIT do
+        local weakestIndex
+        for index, incident in ipairs(output) do
+            if incident.preserve ~= true
+                and (
+                    not weakestIndex
+                    or incident.severity
+                        < output[weakestIndex].severity
+                    or (
+                        incident.severity
+                            == output[weakestIndex].severity
+                        and incident.occurredAt
+                            < output[weakestIndex].occurredAt
+                    )
+                    or (
+                        incident.severity
+                            == output[weakestIndex].severity
+                        and incident.occurredAt
+                            == output[weakestIndex].occurredAt
+                        and incident.id
+                            < output[weakestIndex].id
+                    )
+                )
+            then
+                weakestIndex = index
+            end
+        end
+        table.remove(output, weakestIndex or 1)
+    end
+    return output
+end
+
+function Types.NormalizeRelation(
+    value,
+    sourceFactionID,
+    targetFactionID
+)
+    if not Types.IsValidFactionID(sourceFactionID)
+        or not Types.IsValidFactionID(targetFactionID)
+        or sourceFactionID == targetFactionID
+    then
+        return nil
+    end
+    local source = type(value) == "table" and value or {}
+    local relation = {
+        schemaVersion = Constants.RELATION_SCHEMA_VERSION,
+        targetFactionID = targetFactionID,
+        standing = DiplomacyMath.ClampStanding(
+            source.standing
+        ),
+        trust = DiplomacyMath.ClampTrust(source.trust),
+        fear = DiplomacyMath.ClampFear(source.fear),
+        grievance = DiplomacyMath.ClampGrievance(
+            source.grievance
+        ),
+        state = Constants.VALID_RELATION_STATES[source.state]
+            and source.state or "unknown",
+        previousState =
+            Constants.VALID_RELATION_STATES[
+                source.previousState
+            ] and source.previousState or "unknown",
+        atWar = source.atWar == true,
+        allied = source.allied == true,
+        truceUntil = timestamp(source.truceUntil, 0),
+        warStartedAt = timestamp(source.warStartedAt, 0),
+        warEndedAt = timestamp(source.warEndedAt, 0),
+        warReason = Constants.WAR_REASONS[source.warReason]
+            and source.warReason or nil,
+        initiatingFactionID =
+            Types.IsValidFactionID(
+                source.initiatingFactionID
+            ) and source.initiatingFactionID or nil,
+        triggeringIncidentID = safeString(
+            source.triggeringIncidentID,
+            Constants.INCIDENT_ID_MAX_LENGTH
+        ),
+        incidents = normalizeIncidents(
+            source.incidents,
+            sourceFactionID,
+            targetFactionID
+        ),
+        recentIncidentIDs = normalizeRecentIncidentIDs(
+            source.recentIncidentIDs
+        ),
+        lastEvaluatedAt = timestamp(
+            source.lastEvaluatedAt,
+            0
+        ),
+        revision = revision(source.revision),
+    }
+    if relation.atWar then
+        relation.allied = false
+        relation.truceUntil = 0
+    elseif relation.allied then
+        relation.truceUntil = 0
+    end
+    relation.state = DiplomacyMath.ResolveState(
+        relation,
+        relation.lastEvaluatedAt
+    )
+    return relation
+end
+
+function Types.NewRelation(sourceFactionID, targetFactionID)
+    return Types.NormalizeRelation(
+        nil,
+        sourceFactionID,
+        targetFactionID
+    )
 end
 
 local function normalizeFormerFaction(value)
@@ -295,7 +634,7 @@ function Types.NormalizeFaction(value, factionID)
     local archetypeID = Archetypes.Exists(source.archetypeID)
         and source.archetypeID or nil
     if not id or not name or not archetypeID then return nil end
-    return {
+    local output = {
         id = id,
         name = name,
         archetypeID = archetypeID,
@@ -315,9 +654,29 @@ function Types.NormalizeFaction(value, factionID)
             source.playerMemberKeys,
             isValidPlayerKey
         ),
+        policy = Types.NormalizePolicy(
+            source.policy,
+            archetypeID,
+            id
+        ),
+        relations = {},
         tags = normalizeTags(source.tags),
         revision = revision(source.revision),
     }
+    for targetFactionID, rawRelation in pairs(
+        type(source.relations) == "table"
+            and source.relations or {}
+    ) do
+        local relation = Types.NormalizeRelation(
+            rawRelation,
+            id,
+            targetFactionID
+        )
+        if relation then
+            output.relations[targetFactionID] = relation
+        end
+    end
+    return output
 end
 
 function Types.NewFaction(spec)
@@ -332,7 +691,6 @@ function Types.NormalizeFactionRegistry(value)
         byID = {},
         byArchetype = {},
         byPlayerKey = {},
-        diplomacy = {},
     }
     local faction
     local factionIDs = {}
@@ -371,6 +729,8 @@ function Types.NormalizeFactionRegistry(value)
             faction.ownerPlayerKey = nil
         end
     end
+    -- V2 stored one symmetric pair record. V3 migrates it into two directed
+    -- relations while preserving the official war/peace state.
     for pairKey, raw in pairs(
         type(source.diplomacy) == "table"
             and source.diplomacy or {}
@@ -380,7 +740,36 @@ function Types.NormalizeFactionRegistry(value)
             and output.byID[diplomacy.factionAID]
             and output.byID[diplomacy.factionBID]
         then
-            output.diplomacy[pairKey] = diplomacy
+            local first = output.byID[diplomacy.factionAID]
+            local second = output.byID[diplomacy.factionBID]
+            local atWar =
+                diplomacy.state == Constants.DIPLOMACY_WAR
+            local function migrateRelation(
+                sourceFaction,
+                targetFaction
+            )
+                if sourceFaction.relations[targetFaction.id] then
+                    return
+                end
+                sourceFaction.relations[targetFaction.id] =
+                    Types.NormalizeRelation({
+                        atWar = atWar,
+                        state = atWar and "war" or "neutral",
+                        previousState = "unknown",
+                        warStartedAt = atWar
+                            and diplomacy.changedAt or 0,
+                        warEndedAt = atWar
+                            and 0 or diplomacy.changedAt,
+                        warReason = atWar and "unknown" or nil,
+                        initiatingFactionID =
+                            diplomacy.instigatorFactionID,
+                        lastEvaluatedAt =
+                            diplomacy.changedAt,
+                        revision = diplomacy.revision,
+                    }, sourceFaction.id, targetFaction.id)
+            end
+            migrateRelation(first, second)
+            migrateRelation(second, first)
         end
     end
     return output

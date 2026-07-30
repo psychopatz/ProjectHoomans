@@ -1,0 +1,123 @@
+-- Pure tactical intent resolution from already-resolved faction context.
+
+PNC = PNC or {}
+PNC.FactionIntent = PNC.FactionIntent or {}
+
+local Intent = PNC.FactionIntent
+
+local function result(intent, attack, pursue, commandable, reason)
+    return {
+        intent = intent,
+        attackAllowed = attack == true,
+        pursueAllowed = pursue == true,
+        commandable = commandable == true,
+        reason = tostring(reason or "unspecified"),
+    }
+end
+
+function Intent.Resolve(spec)
+    spec = type(spec) == "table" and spec or {}
+    local state = tostring(spec.diplomaticState or "unknown")
+    local policy = type(spec.policy) == "table"
+        and spec.policy or {}
+    local archetypeID = tostring(spec.archetypeID or "")
+    local targetStrength = tonumber(spec.targetStrength) or 1
+    local observerStrength = math.max(
+        0.01,
+        tonumber(spec.observerStrength) or 1
+    )
+
+    if spec.immediateSelfDefense == true
+        or spec.targetAggression == true
+    then
+        return result("attack", true, true, false,
+            "immediate_self_defense")
+    end
+    if spec.samePlayerOwnedFaction == true then
+        return result(
+            spec.targetIsOwner and "obey" or "protect",
+            false,
+            false,
+            spec.commandable == true,
+            "same_player_faction"
+        )
+    end
+    if spec.sameFaction == true then
+        return result("cooperate", false, false,
+            spec.commandable == true, "same_faction")
+    end
+    if spec.atWar == true or state == "war" then
+        return result("attack", true, true, false,
+            "faction_war")
+    end
+    if spec.activeTruce == true or state == "truce" then
+        return result("avoid", false, false, false,
+            "active_truce")
+    end
+    if spec.allied == true or state == "allied" then
+        return result("cooperate", false, false, false,
+            "faction_alliance")
+    end
+    if state == "hostile" then
+        if archetypeID == "looter"
+            and (tonumber(policy.aggression) or 0) >= 0.70
+            and targetStrength <= observerStrength * 0.75
+        then
+            return result("attack", true, true, false,
+                "hostile_predatory_advantage")
+        end
+        return result(
+            (tonumber(policy.caution) or 0.5) >= 0.65
+                and "avoid" or "threaten",
+            false,
+            false,
+            false,
+            "hostile_nonwar"
+        )
+    end
+    if state == "wary" then
+        return result(
+            targetStrength > observerStrength
+                and "avoid" or "observe",
+            false,
+            false,
+            false,
+            "wary_relation"
+        )
+    end
+    if state == "friendly" then
+        return result("tolerate", false, false, false,
+            "friendly_relation")
+    end
+
+    if archetypeID == "looter"
+        or policy.outsiderPolicy == "predatory"
+    then
+        if targetStrength > observerStrength * 1.15 then
+            return result("avoid", false, false, false,
+                "predatory_target_stronger")
+        end
+        return result("threaten", false, false, false,
+            "predatory_pressure")
+    end
+    if archetypeID == "refugee"
+        or policy.outsiderPolicy == "cautious"
+    then
+        return result("avoid", false, false, false,
+            "cautious_outsider_policy")
+    end
+    if archetypeID == "trader"
+        or policy.outsiderPolicy == "commercial"
+    then
+        return result("tolerate", false, false, false,
+            "commercial_outsider_policy")
+    end
+    if spec.personalState == "enemy" then
+        return result("threaten", false, false, false,
+            "personal_enemy_nonofficial")
+    end
+    return result("observe", false, false, false,
+        "neutral_outsider_policy")
+end
+
+return Intent

@@ -199,6 +199,26 @@ local function factionSnapshot(record)
     }
 end
 
+local function playerFactionSnapshot(targetKey)
+    local faction = PNC.Factions
+        and PNC.Factions.GetFactionForPlayerKey
+        and PNC.Factions.GetFactionForPlayerKey(targetKey)
+        or nil
+    if not faction then return factionSnapshot(nil) end
+    return {
+        organizationalFaction = true,
+        label = faction.name,
+        factionID = faction.id,
+        archetypeID = faction.archetypeID,
+        membershipStatus = "player_member",
+        role = faction.ownerPlayerKey == targetKey
+            and "owner" or "member",
+        rank = faction.ownerPlayerKey == targetKey
+            and "leader" or "member",
+        affiliationRevision = faction.revision or 0,
+    }
+end
+
 local function actionSnapshot(value)
     if type(value) ~= "table" then return nil end
     local details = {}
@@ -253,6 +273,10 @@ function Debug.BuildSnapshot(
     local reverseExists
     local reverseKey
     local memories = {}
+    local observerFactionSnapshot
+    local targetFactionSnapshot
+    local factionRelation
+    local factionIntent
     local index
     if not observer or observer.alive == false then
         return nil, "observer_not_found"
@@ -292,6 +316,41 @@ function Debug.BuildSnapshot(
         reverse = reverse or Types.NewRelationship(reverseKey)
     end
     local observerKey = EntityRef.ForNPC(observer.id)
+    observerFactionSnapshot = factionSnapshot(observer)
+    if target and target.kind == "npc" then
+        targetFactionSnapshot = factionSnapshot(
+            Registry.Get(target.npcID)
+        )
+    else
+        targetFactionSnapshot = playerFactionSnapshot(targetKey)
+    end
+    if observerFactionSnapshot.organizationalFaction
+        and targetFactionSnapshot.organizationalFaction
+        and observerFactionSnapshot.factionID
+            ~= targetFactionSnapshot.factionID
+    then
+        factionRelation = PNC.Factions.GetRelation(
+            observerFactionSnapshot.factionID,
+            targetFactionSnapshot.factionID
+        )
+        local observerFaction = PNC.Factions.Get(
+            observerFactionSnapshot.factionID
+        )
+        factionIntent = PNC.FactionIntent.Resolve({
+            archetypeID = observerFaction
+                and observerFaction.archetypeID,
+            policy = observerFaction and observerFaction.policy,
+            diplomaticState = factionRelation
+                and factionRelation.state or "unknown",
+            atWar = factionRelation
+                and factionRelation.atWar,
+            allied = factionRelation
+                and factionRelation.allied,
+            activeTruce = factionRelation
+                and factionRelation.truceUntil > at,
+            personalState = relationship.state,
+        })
+    end
     return {
         generatedAt = at,
         observer = {
@@ -307,16 +366,15 @@ function Debug.BuildSnapshot(
             socialRevision = observer.social
                 and observer.social.revision or 0,
             personality = personalitySnapshot(observer),
-            faction = factionSnapshot(observer),
+            faction = observerFactionSnapshot,
         },
         target = (function()
             local output = copy(target)
-            local targetRecord = target
-                and target.kind == "npc"
-                and Registry.Get(target.npcID) or nil
-            output.faction = factionSnapshot(targetRecord)
+            output.faction = targetFactionSnapshot
             return output
         end)(),
+        factionRelation = factionRelation,
+        factionIntent = factionIntent,
         observerConduct = PNC.ConductDebug
             and PNC.ConductDebug.BuildSnapshot(observerKey, at)
             or nil,

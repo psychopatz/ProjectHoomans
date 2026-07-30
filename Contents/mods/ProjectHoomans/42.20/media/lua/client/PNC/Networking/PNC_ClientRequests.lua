@@ -133,12 +133,17 @@ function Client.RequestRelationshipDebug(
     return snapshot ~= nil
 end
 
-function Client.RequestFactionDebug(factionID, npcID)
+function Client.RequestFactionDebug(
+    factionID,
+    npcID,
+    targetFactionID
+)
     local player = getSpecificPlayer
         and getSpecificPlayer(0) or nil
     local args = {
         factionID = factionID,
         npcID = npcID,
+        targetFactionID = targetFactionID,
     }
     local snapshot
     if not Client.CanUseDebug() then
@@ -169,7 +174,8 @@ function Client.RequestFactionDebug(factionID, npcID)
         factionID,
         npcID,
         nil,
-        player
+        player,
+        targetFactionID
     )
     ClientState.factionDebugAuthorized = true
     ClientState.factionDebug = snapshot

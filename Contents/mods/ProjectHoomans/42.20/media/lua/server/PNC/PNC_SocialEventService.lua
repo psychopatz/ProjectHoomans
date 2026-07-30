@@ -19,6 +19,31 @@ local ProfileMath = PNC.SocialProfileMath
 local Conduct = PNC.Conduct
 local ConductDefinitions = PNC.ConductDefinitions
 
+local FACTION_INCIDENT_BY_SOCIAL_EVENT = {
+    saved_from_incapacitation = "member_rescued",
+    protected_from_attacker = "member_protected",
+    survived_combat_together = "members_fought_together",
+    abandoned_in_combat = "member_abandoned",
+}
+
+local function factionIDForEntityKey(key)
+    local parsed = EntityRef.Parse(key)
+    if not parsed or not PNC.Factions then return nil end
+    if parsed.kind == "npc" then
+        local record = Registry and Registry.Get
+            and Registry.Get(parsed.npcID) or nil
+        return record
+            and PNC.Factions.GetOrganizationalFactionID(record)
+            or nil
+    end
+    if parsed.kind == "player" then
+        local faction =
+            PNC.Factions.GetFactionForPlayerKey(key)
+        return faction and faction.id or nil
+    end
+    return nil
+end
+
 local function result(ok, reason, fields)
     local output = fields or {}
     output.ok = ok == true
@@ -524,6 +549,54 @@ function SocialEvents.Process(eventSpec)
         conductEvidenceCreated = #(conductDetails or {}),
         conductDetails = conductDetails or {},
     })
+    local factionIncidentType =
+        FACTION_INCIDENT_BY_SOCIAL_EVENT[event.type]
+    if factionIncidentType and PNC.FactionIncidentService then
+        local actorFactionID =
+            factionIDForEntityKey(event.actorKey)
+        local targetFactionID =
+            factionIDForEntityKey(event.targetKey)
+        if actorFactionID and targetFactionID
+            and actorFactionID ~= targetFactionID
+        then
+            local incidentOK, incidentReason, incidentDetails =
+                PNC.FactionIncidentService.RecordPositiveEvent(
+                    actorFactionID,
+                    targetFactionID,
+                    factionIncidentType,
+                    {
+                        worldAgeHours = event.occurredAt,
+                        actorKey = event.actorKey,
+                        subjectKey = event.targetKey,
+                        externalID = "social-faction:"
+                            .. event.id,
+                        public = true,
+                        witnessed = true,
+                    }
+                )
+            output.factionIncident = {
+                ok = incidentOK,
+                reason = incidentReason,
+                details = incidentDetails,
+            }
+            if event.type == "survived_combat_together" then
+                PNC.FactionIncidentService.RecordPositiveEvent(
+                    targetFactionID,
+                    actorFactionID,
+                    factionIncidentType,
+                    {
+                        worldAgeHours = event.occurredAt,
+                        actorKey = event.targetKey,
+                        subjectKey = event.actorKey,
+                        externalID = "social-faction-reciprocal:"
+                            .. event.id,
+                        public = true,
+                        witnessed = true,
+                    }
+                )
+            end
+        end
+    end
     if PNC.SocialEventDebug and PNC.SocialEventDebug.LogProcessed then
         PNC.SocialEventDebug.LogProcessed(output, definition)
     end

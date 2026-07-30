@@ -553,7 +553,8 @@ local function onClientCommand(module, command, player, args)
                 args and args.factionID,
                 args and args.npcID,
                 nil,
-                player
+                player,
+                args and args.targetFactionID
             ),
             true,
             nil
