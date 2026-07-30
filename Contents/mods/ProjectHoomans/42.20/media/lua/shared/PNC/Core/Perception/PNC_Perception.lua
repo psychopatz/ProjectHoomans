@@ -377,7 +377,17 @@ function Perception.FindNearestEnemyPlayer(record, radius)
         if player then
             visible, visibilityKind = Perception.CanSeeWorldObject(record, player)
         end
-        if player and player:isAlive() and math.abs(player:getZ() - record.z) < 1 and visible then
+        local factionEnemy = not PNC.Factions
+            or not PNC.Factions.CanNPCTargetPlayer
+            or PNC.Factions.CanNPCTargetPlayer(
+                record,
+                player
+            )
+        if player and player:isAlive()
+            and factionEnemy
+            and math.abs(player:getZ() - record.z) < 1
+            and visible
+        then
             distSq = Core.DistanceSq(record.x, record.y, player:getX(), player:getY())
             if distSq <= (radius * radius) then
                 candidate = {

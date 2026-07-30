@@ -40,6 +40,9 @@ local function factionSummary(faction)
         status = faction.status,
         leaderNPCID = faction.leaderNPCID,
         memberCount = Core.TableSize(faction.memberIDs),
+        ownerPlayerKey = faction.ownerPlayerKey,
+        playerMemberCount =
+            Core.TableSize(faction.playerMemberKeys),
         createdAt = faction.createdAt,
         archivedAt = faction.archivedAt,
         tags = copy(faction.tags),
@@ -67,12 +70,31 @@ local function actionResult(ok, reason, fields)
     return result
 end
 
-function Debug.BuildSnapshot(selectedFactionID, selectedNPCID, action)
+function Debug.BuildSnapshot(
+    selectedFactionID,
+    selectedNPCID,
+    action,
+    player
+)
     local factions = {}
     local roster = {}
     local selected
     local members = {}
+    local playerKey
+    local playerFaction
+    local diplomacy = {}
     Factions.EnsureLoaded()
+    if player and PNC.PlayerCharacters
+        and PNC.PlayerCharacters.GetEntityKey
+    then
+        playerKey = PNC.PlayerCharacters.GetEntityKey(player, {
+            callback = "faction_debug_snapshot",
+            worldAgeHours = worldAgeHours(),
+        })
+        playerFaction = playerKey
+            and Factions.GetFactionForPlayerKey(playerKey)
+            or nil
+    end
     for _, faction in ipairs(Factions.List()) do
         factions[#factions + 1] = factionSummary(faction)
     end
@@ -92,6 +114,23 @@ function Debug.BuildSnapshot(selectedFactionID, selectedNPCID, action)
         if faction then
             selected = factionSummary(faction)
             members = copy(Factions.GetMembers(faction.id))
+            for _, relation in pairs(
+                Factions.Registry.diplomacy or {}
+            ) do
+                if relation.factionAID == faction.id
+                    or relation.factionBID == faction.id
+                then
+                    diplomacy[#diplomacy + 1] =
+                        copy(relation)
+                end
+            end
+            table.sort(diplomacy, function(left, right)
+                local leftID = left.factionAID == faction.id
+                    and left.factionBID or left.factionAID
+                local rightID = right.factionAID == faction.id
+                    and right.factionBID or right.factionAID
+                return leftID < rightID
+            end)
         end
     end
     return {
@@ -104,7 +143,11 @@ function Debug.BuildSnapshot(selectedFactionID, selectedNPCID, action)
         selectedNPCID = Types.IsValidNPCID(selectedNPCID)
             and selectedNPCID or nil,
         members = members,
+        diplomacy = diplomacy,
         roster = roster,
+        currentPlayerKey = playerKey,
+        currentPlayerFactionID =
+            playerFaction and playerFaction.id or nil,
         actionResult = copy(action),
         generatedAt = worldAgeHours(),
     }
@@ -127,7 +170,8 @@ function Debug.PerformAction(player, args)
             return Debug.BuildSnapshot(
                 factionID,
                 npcID,
-                actionResult(false, "unknown_archetype")
+                actionResult(false, "unknown_archetype"),
+                player
             )
         end
         ok, reason, value = Factions.Create({
@@ -138,6 +182,16 @@ function Debug.PerformAction(player, args)
             tags = { debugCreated = true },
         })
         if ok then factionID = value.id end
+    elseif action == "create_player_faction" then
+        ok, reason, value = Factions.CreatePlayerFaction(
+            player,
+            {
+                archetypeID = "settler",
+                createdAt = at,
+                tags = { debugCreated = true },
+            }
+        )
+        if ok and value then factionID = value.id end
     elseif action == "assign" then
         ok, reason, value = Factions.AddNPC(
             factionID,
@@ -185,6 +239,35 @@ function Debug.PerformAction(player, args)
             "debug_archive",
             at
         )
+    elseif action == "war" or action == "peace" then
+        local playerFaction = Factions.GetPlayerFaction(player)
+        if not playerFaction then
+            ok, reason = false, "player_faction_required"
+        elseif not factionID
+            or factionID == playerFaction.id
+        then
+            ok, reason = false, "select_other_faction"
+        elseif action == "war" then
+            ok, reason, value = Factions.DeclareWar(
+                playerFaction.id,
+                factionID,
+                {
+                    worldAgeHours = at,
+                    reason = "debug_declared_war",
+                    instigatorFactionID = playerFaction.id,
+                }
+            )
+        else
+            ok, reason, value = Factions.MakePeace(
+                playerFaction.id,
+                factionID,
+                {
+                    worldAgeHours = at,
+                    reason = "debug_made_peace",
+                    instigatorFactionID = playerFaction.id,
+                }
+            )
+        end
     else
         ok, reason = false, "unsupported_faction_action"
     end
@@ -196,7 +279,8 @@ function Debug.PerformAction(player, args)
             factionID = factionID,
             npcID = npcID,
             resultingRevision = value and value.revision,
-        })
+        }),
+        player
     )
 end
 

@@ -1,8 +1,7 @@
 --[[
     PNC Relationships Facade
-    Preserves the existing faction-enemy boundary while the server-side
-    relationship service adds persistent directed personal relationships.
-    Personal states do not alter faction, hostility, combat, or AI in Phase 1.
+    Personal relationships remain directed. Organizational faction war and
+    looter policy now take precedence over the legacy tactical classification.
 ]]
 
 PNC = PNC or {}
@@ -20,11 +19,81 @@ end
 function Relationships.AreNPCsEnemies(source, target)
     local sourceFaction
     local targetFaction
+    local factions = PNC.Factions
+    local sourceOrganization
+    local targetOrganization
+    local sourceDefinition
+    local targetDefinition
     if not source or not target or tostring(source.id or "") == tostring(target.id or "") then
         return false
     end
     if source.hostility and source.hostility.attackNPCs == false then
         return false
+    end
+    sourceOrganization = factions
+        and factions.GetOrganizationalFactionID
+        and factions.GetOrganizationalFactionID(source)
+        or source.affiliation and source.affiliation.factionID
+    targetOrganization = factions
+        and factions.GetOrganizationalFactionID
+        and factions.GetOrganizationalFactionID(target)
+        or target.affiliation and target.affiliation.factionID
+    if sourceOrganization and targetOrganization then
+        if sourceOrganization == targetOrganization then
+            return false
+        end
+        if factions and factions.AreAtWar
+            and factions.AreAtWar(
+                sourceOrganization,
+                targetOrganization
+            )
+        then
+            return true
+        end
+        sourceDefinition = factions
+            and factions.Registry
+            and factions.Registry.byID[sourceOrganization]
+            or nil
+        targetDefinition = factions
+            and factions.Registry
+            and factions.Registry.byID[targetOrganization]
+            or nil
+        return PNC.FactionArchetypes
+            and PNC.FactionArchetypes.IsHostileToOutsiders
+            and (
+                PNC.FactionArchetypes.IsHostileToOutsiders(
+                    sourceDefinition
+                        and sourceDefinition.archetypeID
+                )
+                or PNC.FactionArchetypes.IsHostileToOutsiders(
+                    targetDefinition
+                        and targetDefinition.archetypeID
+                )
+            ) == true
+    end
+    local organization = sourceOrganization
+        and factions
+        and factions.Registry
+        and factions.Registry.byID[sourceOrganization]
+        or targetOrganization
+            and factions
+            and factions.Registry
+            and factions.Registry.byID[targetOrganization]
+            or nil
+    if organization
+        and PNC.FactionArchetypes
+        and PNC.FactionArchetypes.IsHostileToOutsiders
+        and PNC.FactionArchetypes.IsHostileToOutsiders(
+            organization.archetypeID
+        )
+    then
+        return true
+    end
+    if sourceOrganization and not targetOrganization then
+        return factionOf(target) == Const.FACTION_HOSTILE
+    end
+    if targetOrganization and not sourceOrganization then
+        return factionOf(source) == Const.FACTION_HOSTILE
     end
     sourceFaction = factionOf(source)
     targetFaction = factionOf(target)

@@ -127,7 +127,7 @@ end
 
 -- 1-4. Pure defaults and all four data-only archetypes.
 local registryDefault = Types.NewFactionRegistry()
-assertEqual(registryDefault.schemaVersion, 1, "registry schema")
+assertEqual(registryDefault.schemaVersion, 2, "registry schema")
 assertEqual(registryDefault.revision, 0, "registry revision")
 assertEqual(next(registryDefault.byID), nil, "registry starts empty")
 local affiliationDefault = Types.NewAffiliation()

@@ -75,40 +75,56 @@ the PsychopatzCore Debug Hub dependency did not load.
 
 ## Faction Inspector
 
-These Phase 5A scenarios have not been run live. They remain part of the same
+These Phase 5A/5B scenarios have not all been run live. They remain part of the same
 single-player, hosted-server, and dedicated-server release gate.
 
 1. Open **PsychopatzCore Debug Hub → PNC Faction Inspector**.
-2. Use the four creation buttons once each. Confirm Settlement, Looter Gang,
+2. Click **Create My Faction**. Confirm a player-owned Settlement appears and
+   the details show the current stable player-character key.
+3. Use the four organization buttons once each. Confirm Settlement, Looter Gang,
    Trading Company, and Refugee Group records appear after refresh.
-3. Select a faction and NPC, then click **Assign NPC**. Confirm the faction
+4. Select the player faction and a neutral NPC, then click **Assign NPC**.
+   Confirm it becomes a commandable companion owned by the current character.
+5. Transfer that NPC to a Looter Gang. Confirm ownership/recruitment clears,
+   its order becomes hostile hunt, and it attacks the player and outsiders.
+6. Select a peaceful trader/refugee/settler faction and NPC, then click
+   **Assign NPC**. Confirm it becomes neutral and is not a companion.
+7. Select that external faction and click **Declare War**. Confirm the
+   diplomacy row shows `war`, every member becomes aggressive toward every
+   member of the player faction, and the player faction's companions retaliate.
+8. Click **Make Peace**. Confirm non-looter members return to neutral behavior;
+   looters remain hostile by archetype.
+9. While at peace, attack one external-faction member. Confirm the inspector
+   records war and all members of both factions become enemies, not only the
+   attacked NPC.
+10. In multiplayer, keep a third player in an unrelated faction. Confirm the
+    warring NPCs do not target that player solely because another player
+    faction is at war.
+11. Confirm the faction
    detail member list and NPC affiliation update.
-4. Open the Relationship Inspector for that NPC. Confirm faction name, ID,
+12. Open the Relationship Inspector for that NPC. Confirm faction name, ID,
    archetype, membership status, role, and rank match.
-5. Select another faction and click **Assign NPC** for the same NPC. Confirm
+13. Select another faction and click **Assign NPC** for the same NPC. Confirm
    the unintended dual membership is rejected and revisions do not change.
-6. Click **Transfer NPC**. Confirm the destination membership and bounded
+14. Click **Transfer NPC**. Confirm the destination membership and bounded
    former-faction history update together.
-7. Use **Next Role** and **Next Rank**. Confirm only roles allowed by the
+15. Use **Next Role** and **Next Rank**. Confirm only roles allowed by the
    selected archetype are chosen.
-8. Click **Set Leader**. Confirm `leaderNPCID` and the NPC's leader role/rank.
-9. Remove the leader. Confirm leadership clears and no successor is selected.
-10. Archive a faction. Confirm its record remains visible, status becomes
-    archived, membership becomes former history, and its ID is preserved.
-11. Save/reload. Confirm faction identity, membership, history, and revisions
-    persist while relationships, conduct, personality, inventory, and
-    recruitment remain intact.
-12. Confirm `presenceRevision` does not change from faction edits.
-13. Assign legacy hostile, neutral, and colonist NPCs to different
-    organizational archetypes. Confirm `record.faction`, `attackPlayers`,
-    `attackNPCs`, companion commands, and observed combat behavior remain
-    unchanged. In particular, looters must not attack automatically and
-    traders must not become automatically friendly.
+16. Click **Set Leader**. Confirm `leaderNPCID` and leader role/rank.
+17. Remove the leader. Confirm leadership clears and no successor is selected.
+18. Archive a warring faction. Confirm its record/ID remain, membership becomes
+    former history, active war ends, and former members become neutral.
+19. Save/reload. Confirm faction identity, player ownership, diplomacy,
+    membership, history, and revisions persist.
+20. Confirm faction behavior edits change `recordRevision` as needed but never
+    `presenceRevision`.
+21. Kill the player character and create a new survivor on the same account.
+    Confirm the new UUID cannot command the old character's faction members.
 
 The client sends only named guarded actions and selected IDs. The server
 generates faction IDs and validates archetype, membership, role, rank, and
-status; the inspector has no diplomacy, raid, trade, reputation, or hostility
-controls.
+status. War/peace buttons invoke the real authority service; the inspector has
+no score injection, raid, trade, or reputation controls.
 
 ## Trait Screen
 

@@ -16,6 +16,7 @@ end
 
 local CONTROLS = {
     { id = "refresh", titleKey = "UI_PNC_MonitorRefresh", variant = "quiet" },
+    { id = "create_player_faction", titleKey = "UI_PNC_FactionCreatePlayer", variant = "success" },
     { id = "create_settler", titleKey = "UI_PNC_FactionCreateSettler", variant = "success" },
     { id = "create_looter", titleKey = "UI_PNC_FactionCreateLooter", variant = "danger" },
     { id = "create_trader", titleKey = "UI_PNC_FactionCreateTrader", variant = "default" },
@@ -27,6 +28,8 @@ local CONTROLS = {
     { id = "role", titleKey = "UI_PNC_FactionNextRole", variant = "quiet" },
     { id = "rank", titleKey = "UI_PNC_FactionNextRank", variant = "quiet" },
     { id = "archive", titleKey = "UI_PNC_FactionArchive", variant = "danger" },
+    { id = "war", titleKey = "UI_PNC_FactionDeclareWar", variant = "danger" },
+    { id = "peace", titleKey = "UI_PNC_FactionMakePeace", variant = "success" },
 }
 
 local function drawEntity(list, y, entry, alternate)
@@ -273,7 +276,9 @@ function ISPNCFactionDebugWindow:onAction(button)
         factionID = faction and faction.id,
         npcID = npc and npc.id,
     }
-    if string.sub(internal, 1, 7) == "create_" then
+    if internal == "create_player_faction" then
+        payload.factionAction = internal
+    elseif string.sub(internal, 1, 7) == "create_" then
         payload.factionAction = "create"
         payload.archetypeID = string.sub(internal, 8)
     else
@@ -326,11 +331,39 @@ function ISPNCFactionDebugWindow:prerender()
         and npc.npc.affiliation.factionID or nil
     local sameFaction = faction ~= nil
         and currentFactionID == faction.id
+    local snapshot = ClientState.factionDebug or {}
+    local playerFactionID = snapshot.currentPlayerFactionID
+    local selectedIsPlayerFaction = faction ~= nil
+        and faction.id == playerFactionID
+    local atWar = false
+    for _, relation in ipairs(snapshot.diplomacy or {}) do
+        if relation.state == "war"
+            and (
+                relation.factionAID == playerFactionID
+                or relation.factionBID == playerFactionID
+            )
+        then
+            atWar = true
+        end
+    end
     for index, button in ipairs(self.controls) do
         local internal = CONTROLS[index].id
         local create = string.sub(internal, 1, 7) == "create_"
+            and internal ~= "create_player_faction"
         local enabled = internal == "refresh" or create
-        if internal == "archive" then
+        if internal == "create_player_faction" then
+            enabled = playerFactionID == nil
+        elseif internal == "war" then
+            enabled = playerFactionID ~= nil
+                and faction ~= nil
+                and not selectedIsPlayerFaction
+                and not atWar
+        elseif internal == "peace" then
+            enabled = playerFactionID ~= nil
+                and faction ~= nil
+                and not selectedIsPlayerFaction
+                and atWar
+        elseif internal == "archive" then
             enabled = faction ~= nil
         elseif internal == "assign" then
             enabled = faction ~= nil and npc ~= nil

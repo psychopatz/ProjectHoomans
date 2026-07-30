@@ -110,6 +110,15 @@ local function commit(record, social, targetKey, relationship,
     if Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "social")
     end
+    if PNC.Factions
+        and PNC.Factions.OnRelationshipChanged
+    then
+        PNC.Factions.OnRelationshipChanged(
+            record,
+            targetKey,
+            relationship
+        )
+    end
 end
 
 local function findMemory(relationship, memoryID)

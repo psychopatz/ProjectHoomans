@@ -1,5 +1,5 @@
--- Immutable, data-only organizational classifications. These definitions do
--- not imply hostility, diplomacy, trade, settlement, or AI behavior.
+-- Immutable organizational classifications. Phase 5B gives archetypes a
+-- narrow tactical policy; this does not simulate raids, trade, or settlements.
 
 PNC = PNC or {}
 PNC.FactionArchetypes = PNC.FactionArchetypes or {}
@@ -17,6 +17,10 @@ local DEFINITIONS = {
             mechanic = true, civilian = true,
         },
         defaultRole = "civilian",
+        behavior = {
+            hostileToOutsiders = false,
+            defaultLegacyFaction = "neutral",
+        },
     },
     looter = {
         id = "looter",
@@ -28,6 +32,10 @@ local DEFINITIONS = {
             medic = true, civilian = true,
         },
         defaultRole = "civilian",
+        behavior = {
+            hostileToOutsiders = true,
+            defaultLegacyFaction = "hostile",
+        },
     },
     trader = {
         id = "trader",
@@ -39,6 +47,10 @@ local DEFINITIONS = {
             civilian = true,
         },
         defaultRole = "civilian",
+        behavior = {
+            hostileToOutsiders = false,
+            defaultLegacyFaction = "neutral",
+        },
     },
     refugee = {
         id = "refugee",
@@ -49,6 +61,10 @@ local DEFINITIONS = {
             scavenger = true, caregiver = true, civilian = true,
         },
         defaultRole = "civilian",
+        behavior = {
+            hostileToOutsiders = false,
+            defaultLegacyFaction = "neutral",
+        },
     },
 }
 
@@ -89,6 +105,13 @@ end
 function Archetypes.GetDefaultRole(archetypeID)
     local definition = DEFINITIONS[archetypeID]
     return definition and definition.defaultRole or "civilian"
+end
+
+function Archetypes.IsHostileToOutsiders(archetypeID)
+    local definition = DEFINITIONS[archetypeID]
+    return definition ~= nil
+        and definition.behavior ~= nil
+        and definition.behavior.hostileToOutsiders == true
 end
 
 return Archetypes

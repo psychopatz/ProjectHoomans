@@ -7,11 +7,13 @@ and pure relationship logic. Phase 2 adds a centralized event pipeline that
 turns five verified health/combat milestones into memories. Phase 3A supplies
 the player-character UUID lifecycle used by those events. Phase 3B adds
 persistent player/NPC profiles and applies the observer NPC's personality only
-while constructing new event memories. None of these phases makes NPCs talk,
-join factions, become hostile, refuse orders, or act autonomously.
+while constructing new event memories. These relationship phases do not make
+NPCs talk, join factions, refuse orders, or act autonomously.
 
-The existing faction-enemy methods on `PNC.Relationships` remain intact.
-Personal states are data only and do not affect that matrix or combat.
+Phase 5B keeps the directed relationship data model but adds one explicit
+integration: when an affiliated NPC's relationship toward a stable player
+character reaches `enemy`, their factions enter symmetric war. Other personal
+states do not alter combat.
 
 ## Directed Model
 
@@ -131,8 +133,10 @@ Existing states remain until these exit rules are crossed:
 - rival exits when approval > -15 or respect < 15
 - enemy exits when approval > -45
 
-When a state changes, the old value is copied to `previousState`. These states
-do not change faction or hostility.
+When a state changes, the old value is copied to `previousState`. Friend and
+rival do not change faction or hostility. Phase 5B may escalate an affiliated
+NPC's player-directed `enemy` state into faction war; it does not rewrite the
+personal relationship or affiliation.
 
 ## Normalization
 

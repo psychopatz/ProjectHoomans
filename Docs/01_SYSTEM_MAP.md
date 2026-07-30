@@ -31,16 +31,17 @@
   `PNC_RelationshipStates`: serialization-safe directed social records,
   deterministic memory decay, cached score calculation, and hysteresis
 - `PNC_Relationships`: server-authoritative personal relationship API plus the
-  existing faction-enemy matrix and disposition transitions; personal states
-  do not affect combat decisions
+  faction-aware enemy matrix and disposition transitions; Phase 5B escalates
+  a faction member's `enemy` state toward a player into faction war
 - `PNC_SocialEventDefinitions`: data-only balance, allowed-source, cooldown,
   saturation, and observer rules for the five Phase 2 events
 - `PNC_ConductConstants`, `PNC_ConductTypes`, `PNC_ConductMath`, and
   `PNC_ConductDefinitions`: actor-owned behavioral schema, objective score
   derivation/decay, evidence limits, and the five accepted-event mappings
 - `PNC_FactionConstants`, `PNC_FactionArchetypes`, and `PNC_FactionTypes`:
-  organizational enums, four data-only archetypes, faction registry/record
-  normalization, and primitive NPC affiliation/history
+  organizational/diplomacy enums, four data-only archetypes, faction
+  registry/record normalization, player keys, and primitive NPC
+  affiliation/history
 - `PNC_SpatialIndex`: nested numeric-cell player, NPC, and zombie queries built
   from the shared world census; player identity maps also provide constant-time
   owner lookup
@@ -144,7 +145,10 @@
   mutation, UUID/NPC ownership, copied reads, and sanitized formatting
 - `PNC_FactionService` and `PNC_FactionDebug`: separate `PNC_Factions`
   ModData ownership, generated identity, copied queries, atomic membership,
+  player factions, symmetric war/peace, aggression adapters,
   leadership/archive operations, index repair, and sanitized inspection
+- `PNC_FactionBehavior`: centralized derivation of legacy companion,
+  ownership, order, and hostility fields from canonical faction state
 - `PNC_RelationshipService`: authoritative directed relationship mutations
 - `PNC_RelationshipDebug`: read-only selected-pair snapshots/formatting plus
   admin/debug-only named-event test dispatch through the real event service
@@ -163,7 +167,7 @@
   comparison, memory/revision diagnostics, and guarded named-event triggers
 - `PNC_FactionDebugWindow` and `PNC_FactionDebugModel`: admin/debug-only
   organization/member inspection and service-backed create, membership,
-  role/rank, leader, transfer, and archive controls
+  player-faction, war/peace, role/rank, leader, transfer, and archive controls
 - `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
 - `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby
   embodied NPCs, including canonical-instance selection and duplicate shell

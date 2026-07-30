@@ -36,7 +36,9 @@ function Model.BuildFactionItems(snapshot)
             id = faction.id,
             label = faction.name,
             detail = faction.archetypeLabel
-                .. " / " .. faction.status,
+                .. " / " .. faction.status
+                .. (faction.ownerPlayerKey
+                    and " / player-owned" or ""),
             faction = faction,
         }
     end
@@ -81,6 +83,12 @@ function Model.BuildRows(snapshot, authorized, reason)
     rows[#rows + 1] = row(
         "Faction count", #(snapshot.factions or {})
     )
+    rows[#rows + 1] = row(
+        "Your faction",
+        snapshot.currentPlayerFactionID or "(none)",
+        snapshot.currentPlayerFactionID
+            and "success" or "warning"
+    )
     faction = snapshot.selectedFaction
     if not faction then
         rows[#rows + 1] = row(
@@ -101,7 +109,15 @@ function Model.BuildRows(snapshot, authorized, reason)
             "Leader", faction.leaderNPCID or "(none)"
         )
         rows[#rows + 1] = row(
-            "Members", faction.memberCount or 0
+            "Player owner",
+            faction.ownerPlayerKey or "(none)"
+        )
+        rows[#rows + 1] = row(
+            "Members",
+            tostring(faction.memberCount or 0)
+                .. " NPC / "
+                .. tostring(faction.playerMemberCount or 0)
+                .. " player"
         )
         rows[#rows + 1] = row("Revision", faction.revision)
         rows[#rows + 1] = row(
@@ -129,6 +145,18 @@ function Model.BuildRows(snapshot, authorized, reason)
                 "  joined/revision",
                 tostring(affiliation.joinedAt) .. " h / "
                     .. tostring(affiliation.revision)
+            )
+        end
+        for _, relation in ipairs(snapshot.diplomacy or {}) do
+            local otherID = relation.factionAID == faction.id
+                and relation.factionBID
+                or relation.factionAID
+            rows[#rows + 1] = row(
+                "Diplomacy " .. tostring(otherID),
+                tostring(relation.state)
+                    .. " / " .. tostring(relation.reason),
+                relation.state == "war"
+                    and "danger" or "success"
             )
         end
     end

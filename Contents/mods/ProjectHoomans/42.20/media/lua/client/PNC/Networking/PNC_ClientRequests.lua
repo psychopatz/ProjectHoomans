@@ -167,7 +167,9 @@ function Client.RequestFactionDebug(factionID, npcID)
     end
     snapshot = PNC.FactionDebug.BuildSnapshot(
         factionID,
-        npcID
+        npcID,
+        nil,
+        player
     )
     ClientState.factionDebugAuthorized = true
     ClientState.factionDebug = snapshot

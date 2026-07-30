@@ -12,6 +12,7 @@ local Core = PNC.Core
 local Constants = PNC.FactionConstants
 local Types = PNC.FactionTypes
 local Archetypes = PNC.FactionArchetypes
+local EntityRef = PNC.EntityRef
 
 Factions.Registry = Factions.Registry
     or Types.NewFactionRegistry()
@@ -142,6 +143,7 @@ end
 
 local function rebuildIndexes()
     local byArchetype = {}
+    local byPlayerKey = {}
     local membersByFaction = {}
     local changed = false
     for factionID, faction in pairs(Factions.Registry.byID) do
@@ -149,6 +151,45 @@ local function rebuildIndexes()
             byArchetype[faction.archetypeID] or {}
         byArchetype[faction.archetypeID][factionID] = true
         membersByFaction[factionID] = {}
+        for playerKey, _ in pairs(
+            faction.playerMemberKeys or {}
+        ) do
+            if not byPlayerKey[playerKey] then
+                byPlayerKey[playerKey] = factionID
+            else
+                faction.playerMemberKeys[playerKey] = nil
+                if faction.ownerPlayerKey == playerKey then
+                    faction.ownerPlayerKey = nil
+                end
+                changed = true
+            end
+        end
+        if faction.ownerPlayerKey
+            and faction.playerMemberKeys[
+                faction.ownerPlayerKey
+            ] ~= true
+        then
+            faction.ownerPlayerKey = nil
+            changed = true
+        end
+    end
+    for _, relation in pairs(
+        Factions.Registry.diplomacy or {}
+    ) do
+        local first = Factions.Registry.byID[
+            relation.factionAID
+        ]
+        local second = Factions.Registry.byID[
+            relation.factionBID
+        ]
+        if relation.state == Constants.DIPLOMACY_WAR
+            and (not first or first.status ~= "active"
+                or not second or second.status ~= "active")
+        then
+            relation.state = Constants.DIPLOMACY_PEACE
+            relation.reason = "faction_not_active"
+            changed = true
+        end
     end
     for npcID, record in pairs(
         PNC.Registry and PNC.Registry.Data or {}
@@ -229,6 +270,13 @@ local function rebuildIndexes()
         Factions.Registry.byArchetype = byArchetype
         changed = true
     end
+    if not Types.AreEqual(
+        Factions.Registry.byPlayerKey,
+        byPlayerKey
+    ) then
+        Factions.Registry.byPlayerKey = byPlayerKey
+        changed = true
+    end
     if changed then Factions.Dirty = true end
     return changed
 end
@@ -248,6 +296,11 @@ function Factions.Load()
     Factions.Loaded = true
     Factions.Dirty = not Types.AreEqual(raw, normalized)
     rebuildIndexes()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileAll
+    then
+        PNC.FactionBehavior.ReconcileAll("registry_load")
+    end
     return true, Factions.Dirty
 end
 
@@ -419,8 +472,8 @@ function Factions.GetOrganizationalFactionID(record)
 end
 
 function Factions.GetLegacyFactionClass(record)
-    -- Compatibility facade only. Never derive this tactical classification
-    -- from an organizational faction archetype.
+    -- Compatibility facade. Phase 5B derives this tactical classification
+    -- through the centralized faction behavior bridge.
     return type(record) == "table" and record.faction or nil
 end
 
@@ -447,9 +500,25 @@ function Factions.Create(spec)
         createdAt = createdAt,
         archivedAt = 0,
         tags = Types.NormalizeTags(spec.tags),
+        ownerPlayerKey = spec.ownerPlayerKey,
+        playerMemberKeys = spec.playerMemberKeys,
         revision = 1,
     })
     if not faction then return false, "invalid_name" end
+    for playerKey, _ in pairs(
+        faction.playerMemberKeys or {}
+    ) do
+        if Factions.Registry.byPlayerKey[playerKey] then
+            return false, "player_already_affiliated"
+        end
+    end
+    if spec.ownerPlayerKey ~= nil then
+        if not EntityRef.IsPlayer(spec.ownerPlayerKey) then
+            return false, "invalid_player_key"
+        end
+        faction.ownerPlayerKey = spec.ownerPlayerKey
+        faction.playerMemberKeys[spec.ownerPlayerKey] = true
+    end
     if spec.leaderNPCID ~= nil then
         leader = npcRecord(spec.leaderNPCID, false)
         if not leader then return false, "leader_not_found" end
@@ -477,8 +546,21 @@ function Factions.Create(spec)
     Factions.Registry.byArchetype[faction.archetypeID] =
         Factions.Registry.byArchetype[faction.archetypeID] or {}
     Factions.Registry.byArchetype[faction.archetypeID][id] = true
+    for playerKey, _ in pairs(
+        faction.playerMemberKeys or {}
+    ) do
+        Factions.Registry.byPlayerKey[playerKey] = id
+    end
     if leader then commitAffiliation(leader, leaderAffiliation) end
     touchRegistry()
+    if leader and PNC.FactionBehavior
+        and PNC.FactionBehavior.ApplyNPC
+    then
+        PNC.FactionBehavior.ApplyNPC(
+            leader,
+            "faction_created"
+        )
+    end
     return true, "created", copy(faction)
 end
 
@@ -537,6 +619,11 @@ function Factions.AddNPC(factionID, npcID, options)
     commitAffiliation(record, nextAffiliation)
     touchFaction(faction)
     touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ApplyNPC
+    then
+        PNC.FactionBehavior.ApplyNPC(record, "faction_joined")
+    end
     return true, "added", copy(nextAffiliation)
 end
 
@@ -584,6 +671,14 @@ function Factions.RemoveNPC(
     commitAffiliation(record, nextAffiliation)
     touchFaction(faction)
     touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ApplyUnaffiliated
+    then
+        PNC.FactionBehavior.ApplyUnaffiliated(
+            record,
+            "faction_removed"
+        )
+    end
     return true, "removed", copy(nextAffiliation)
 end
 
@@ -652,6 +747,14 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
     commitAffiliation(record, nextAffiliation)
     touchFaction(destination)
     touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ApplyNPC
+    then
+        PNC.FactionBehavior.ApplyNPC(
+            record,
+            "faction_transferred"
+        )
+    end
     return true, "transferred", copy(nextAffiliation)
 end
 
@@ -796,10 +899,435 @@ function Factions.SetLeader(
     return true, "leader_set", copy(faction)
 end
 
+local function playerKeyFor(player, callback, ensure)
+    if not player or not PNC.PlayerCharacters then
+        return nil, "player_identity_unavailable"
+    end
+    if ensure ~= true then
+        local uuid = PNC.PlayerCharacters.GetCharacterUUID
+            and PNC.PlayerCharacters.GetCharacterUUID(player)
+            or nil
+        local accountIdentity = player.getUsername
+            and player:getUsername() or nil
+        local key = uuid and EntityRef.ForPlayerIdentity(
+            accountIdentity,
+            uuid
+        ) or nil
+        return key, key and "resolved"
+            or "player_identity_unavailable"
+    end
+    if not PNC.PlayerCharacters.GetEntityKey then
+        return nil, "player_identity_unavailable"
+    end
+    local at = getGameTime and getGameTime()
+        and getGameTime().getWorldAgeHours
+        and getGameTime():getWorldAgeHours() or 0
+    return PNC.PlayerCharacters.GetEntityKey(player, {
+        callback = callback or "faction",
+        worldAgeHours = finiteTimestamp(at, 0),
+    })
+end
+
+function Factions.GetFactionForPlayerKey(playerKey)
+    Factions.EnsureLoaded()
+    if not EntityRef.IsPlayer(playerKey) then
+        return nil, "invalid_player_key"
+    end
+    local factionID = Factions.Registry.byPlayerKey[playerKey]
+    if not factionID then return nil, "unaffiliated" end
+    return Factions.Get(factionID)
+end
+
+function Factions.GetPlayerFaction(player)
+    local playerKey, reason = playerKeyFor(
+        player,
+        "get_player_faction",
+        false
+    )
+    if not playerKey then return nil, reason end
+    return Factions.GetFactionForPlayerKey(playerKey)
+end
+
+function Factions.CreatePlayerFaction(player, spec)
+    local playerKey
+    local reason
+    local parsed
+    local name
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    playerKey, reason = playerKeyFor(
+        player,
+        "create_player_faction",
+        true
+    )
+    if not playerKey then return false, reason end
+    if Factions.Registry.byPlayerKey[playerKey] then
+        return false, "player_already_affiliated",
+            Factions.Get(
+                Factions.Registry.byPlayerKey[playerKey]
+            )
+    end
+    spec = type(spec) == "table" and spec or {}
+    parsed = EntityRef.Parse(playerKey)
+    name = spec.name
+    if not name then
+        local playerName = tostring(
+            player.getDisplayName
+                and player:getDisplayName()
+                or parsed and parsed.accountIdentity
+                or "Player"
+        )
+        name = string.sub(playerName, 1, 80)
+            .. " Survivors"
+    end
+    return Factions.Create({
+        name = name,
+        archetypeID = spec.archetypeID or "settler",
+        createdAt = spec.createdAt,
+        tags = spec.tags,
+        ownerPlayerKey = playerKey,
+        playerMemberKeys = {
+            [playerKey] = true,
+        },
+    })
+end
+
+function Factions.EnsurePlayerFaction(player, options)
+    local faction
+    local reason
+    local ok
+    faction, reason = Factions.GetPlayerFaction(player)
+    if faction then return true, "existing", faction end
+    options = type(options) == "table" and options or {}
+    ok, reason, faction = Factions.CreatePlayerFaction(player, {
+        name = options.name,
+        archetypeID = options.archetypeID or "settler",
+        createdAt = options.worldAgeHours,
+        tags = options.tags or {
+            automaticallyCreated = true,
+        },
+    })
+    if not ok and reason == "player_already_affiliated"
+        and faction
+    then
+        return true, "existing", faction
+    end
+    return ok, reason, faction
+end
+
+function Factions.IsPlayerFaction(factionID)
+    local faction = registryRecord(factionID)
+    return faction ~= nil
+        and next(faction.playerMemberKeys or {}) ~= nil
+end
+
+function Factions.GetDiplomacy(firstFactionID, secondFactionID)
+    Factions.EnsureLoaded()
+    local pairKey = Types.MakeDiplomacyKey(
+        firstFactionID,
+        secondFactionID
+    )
+    if not pairKey then return nil, "invalid_faction_pair" end
+    local relation = Factions.Registry.diplomacy[pairKey]
+    return relation and copy(relation) or nil,
+        relation and nil or "diplomacy_not_found"
+end
+
+function Factions.AreAtWar(firstFactionID, secondFactionID)
+    Factions.EnsureLoaded()
+    local pairKey = Types.MakeDiplomacyKey(
+        firstFactionID,
+        secondFactionID
+    )
+    local relation = pairKey
+        and Factions.Registry.diplomacy[pairKey] or nil
+    return relation ~= nil
+        and relation.state == Constants.DIPLOMACY_WAR
+end
+
+function Factions.IsFactionAtWar(factionID)
+    if not Types.IsValidFactionID(factionID) then
+        return false
+    end
+    for _, relation in pairs(
+        Factions.Registry.diplomacy or {}
+    ) do
+        if relation.state == Constants.DIPLOMACY_WAR
+            and (relation.factionAID == factionID
+                or relation.factionBID == factionID)
+        then
+            return true
+        end
+    end
+    return false
+end
+
+local function setDiplomacy(
+    firstFactionID,
+    secondFactionID,
+    state,
+    options
+)
+    Factions.EnsureLoaded()
+    local first = registryRecord(firstFactionID)
+    local second = registryRecord(secondFactionID)
+    local pairKey = Types.MakeDiplomacyKey(
+        firstFactionID,
+        secondFactionID
+    )
+    local existing
+    local relation
+    if not authority() then return false, "not_authority" end
+    if not first or not second or not pairKey then
+        return false, "invalid_faction_pair"
+    end
+    if first.status ~= "active"
+        or second.status ~= "active"
+    then
+        return false, "faction_not_active"
+    end
+    options = type(options) == "table" and options or {}
+    existing = Factions.Registry.diplomacy[pairKey]
+    if existing and existing.state == state then
+        return false, "unchanged", copy(existing)
+    end
+    relation = Types.NormalizeDiplomacy({
+        factionAID = firstFactionID,
+        factionBID = secondFactionID,
+        state = state,
+        changedAt = options.worldAgeHours,
+        reason = options.reason,
+        instigatorFactionID = options.instigatorFactionID,
+        revision = math.max(
+            tonumber(existing and existing.revision) or 0,
+            0
+        ) + 1,
+    }, pairKey)
+    Factions.Registry.diplomacy[pairKey] = relation
+    touchFaction(first)
+    touchFaction(second)
+    touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileFaction
+    then
+        PNC.FactionBehavior.ReconcileFaction(
+            firstFactionID,
+            "diplomacy_" .. state
+        )
+        PNC.FactionBehavior.ReconcileFaction(
+            secondFactionID,
+            "diplomacy_" .. state
+        )
+    end
+    return true, state, copy(relation)
+end
+
+function Factions.DeclareWar(
+    firstFactionID,
+    secondFactionID,
+    options
+)
+    return setDiplomacy(
+        firstFactionID,
+        secondFactionID,
+        Constants.DIPLOMACY_WAR,
+        options
+    )
+end
+
+function Factions.MakePeace(
+    firstFactionID,
+    secondFactionID,
+    options
+)
+    return setDiplomacy(
+        firstFactionID,
+        secondFactionID,
+        Constants.DIPLOMACY_PEACE,
+        options
+    )
+end
+
+local function factionForPlayer(player, create, at)
+    local faction
+    if create then
+        local ok
+        ok, _, faction = Factions.EnsurePlayerFaction(player, {
+            worldAgeHours = at,
+        })
+        return ok and faction or nil
+    end
+    return Factions.GetPlayerFaction(player)
+end
+
+function Factions.OnPlayerAggression(
+    player,
+    targetRecord,
+    worldAgeHours
+)
+    local targetFactionID =
+        Factions.GetOrganizationalFactionID(targetRecord)
+    local playerFaction
+    if not targetFactionID then
+        return false, "target_unaffiliated"
+    end
+    playerFaction = factionForPlayer(
+        player,
+        true,
+        worldAgeHours
+    )
+    if not playerFaction then
+        return false, "player_faction_unavailable"
+    end
+    if playerFaction.id == targetFactionID then
+        return false, "same_faction"
+    end
+    return Factions.DeclareWar(
+        playerFaction.id,
+        targetFactionID,
+        {
+            worldAgeHours = worldAgeHours,
+            reason = "player_attacked_member",
+            instigatorFactionID = playerFaction.id,
+        }
+    )
+end
+
+function Factions.OnNPCAggression(
+    attackerRecord,
+    targetRecord,
+    worldAgeHours
+)
+    local attackerFactionID =
+        Factions.GetOrganizationalFactionID(attackerRecord)
+    local targetFactionID =
+        Factions.GetOrganizationalFactionID(targetRecord)
+    if not attackerFactionID or not targetFactionID then
+        return false, "unaffiliated"
+    end
+    if attackerFactionID == targetFactionID then
+        return false, "same_faction"
+    end
+    return Factions.DeclareWar(
+        attackerFactionID,
+        targetFactionID,
+        {
+            worldAgeHours = worldAgeHours,
+            reason = "npc_attacked_member",
+            instigatorFactionID = attackerFactionID,
+        }
+    )
+end
+
+function Factions.OnNPCAttackPlayer(
+    attackerRecord,
+    player,
+    worldAgeHours
+)
+    local attackerFactionID =
+        Factions.GetOrganizationalFactionID(attackerRecord)
+    local playerFaction
+    if not attackerFactionID then
+        return false, "attacker_unaffiliated"
+    end
+    playerFaction = factionForPlayer(
+        player,
+        true,
+        worldAgeHours
+    )
+    if not playerFaction
+        or playerFaction.id == attackerFactionID
+    then
+        return false, "same_or_missing_faction"
+    end
+    return Factions.DeclareWar(
+        attackerFactionID,
+        playerFaction.id,
+        {
+            worldAgeHours = worldAgeHours,
+            reason = "npc_attacked_player",
+            instigatorFactionID = attackerFactionID,
+        }
+    )
+end
+
+function Factions.CanNPCTargetPlayer(record, player)
+    local factionID =
+        Factions.GetOrganizationalFactionID(record)
+    local faction = factionID and registryRecord(factionID)
+    local playerFaction
+    if not faction then
+        return record and record.hostility
+            and record.hostility.attackPlayers == true
+    end
+    playerFaction = Factions.GetPlayerFaction(player)
+    if playerFaction and playerFaction.id == factionID then
+        return false
+    end
+    if Archetypes.IsHostileToOutsiders(
+        faction.archetypeID
+    ) then
+        return true
+    end
+    return playerFaction ~= nil
+        and Factions.AreAtWar(factionID, playerFaction.id)
+end
+
+function Factions.OnRelationshipChanged(
+    observerRecord,
+    targetKey,
+    relationship
+)
+    local observerFactionID =
+        Factions.GetOrganizationalFactionID(observerRecord)
+    local targetFaction
+    local parsed
+    local livePlayer
+    if not observerFactionID
+        or not relationship
+        or relationship.state ~= "enemy"
+        or not EntityRef.IsPlayer(targetKey)
+    then
+        return false, "not_faction_enemy"
+    end
+    targetFaction = Factions.GetFactionForPlayerKey(targetKey)
+    if not targetFaction then
+        parsed = EntityRef.Parse(targetKey)
+        livePlayer = parsed
+            and PNC.PlayerCharacters
+            and PNC.PlayerCharacters.RuntimeByUUID
+            and PNC.PlayerCharacters.RuntimeByUUID[
+                parsed.characterUUID
+            ] or nil
+        targetFaction = livePlayer
+            and factionForPlayer(
+                livePlayer,
+                true,
+                relationship.lastEvaluatedAt
+            ) or nil
+    end
+    if not targetFaction
+        or targetFaction.id == observerFactionID
+    then
+        return false, "target_faction_unavailable"
+    end
+    return Factions.DeclareWar(
+        observerFactionID,
+        targetFaction.id,
+        {
+            worldAgeHours =
+                relationship.lastEvaluatedAt,
+            reason = "member_relationship_enemy",
+            instigatorFactionID = observerFactionID,
+        }
+    )
+end
+
 function Factions.Archive(factionID, reason, worldAgeHours)
     local faction
     local at
     local memberIDs = {}
+    local reconcileFactionIDs = {}
     if not authority() then return false, "not_authority" end
     Factions.EnsureLoaded()
     faction = registryRecord(factionID)
@@ -834,12 +1362,52 @@ function Factions.Archive(factionID, reason, worldAgeHours)
                 formerFactionIDs = former,
                 revision = affiliation.revision,
             }))
+            if PNC.FactionBehavior
+                and PNC.FactionBehavior.ApplyUnaffiliated
+            then
+                PNC.FactionBehavior.ApplyUnaffiliated(
+                    record,
+                    "faction_archived"
+                )
+            end
         end
     end
     faction.status = "archived"
     faction.archivedAt = at
     faction.leaderNPCID = nil
     faction.memberIDs = {}
+    for playerKey, _ in pairs(
+        faction.playerMemberKeys or {}
+    ) do
+        Factions.Registry.byPlayerKey[playerKey] = nil
+    end
+    faction.playerMemberKeys = {}
+    faction.ownerPlayerKey = nil
+    for _, relation in pairs(
+        Factions.Registry.diplomacy or {}
+    ) do
+        if relation.factionAID == factionID
+            or relation.factionBID == factionID
+        then
+            local otherID = relation.factionAID == factionID
+                and relation.factionBID
+                or relation.factionAID
+            if relation.state == Constants.DIPLOMACY_WAR then
+                relation.state = Constants.DIPLOMACY_PEACE
+                relation.changedAt = at
+                relation.reason = "faction_archived"
+                relation.revision = math.max(
+                    0,
+                    math.floor(
+                        tonumber(relation.revision) or 0
+                    )
+                ) + 1
+                local other = registryRecord(otherID)
+                if other then touchFaction(other) end
+                reconcileFactionIDs[otherID] = true
+            end
+        end
+    end
     if type(reason) == "string" and reason ~= "" then
         local tags = Types.NormalizeTags({
             archiveReason = reason,
@@ -848,6 +1416,16 @@ function Factions.Archive(factionID, reason, worldAgeHours)
     end
     touchFaction(faction)
     touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileFaction
+    then
+        for otherID, _ in pairs(reconcileFactionIDs) do
+            PNC.FactionBehavior.ReconcileFaction(
+                otherID,
+                "faction_archived_peace"
+            )
+        end
+    end
     return true, "archived", copy(faction)
 end
 

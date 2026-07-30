@@ -157,7 +157,33 @@ function Commands.IsOwnedByPlayer(record, player)
     local recordOnlineID
     local username
     local onlineID
+    local organizationID
+    local organization
+    local uuid
+    local playerKey
     if not record or not player then return false end
+    organizationID = record.affiliation
+        and record.affiliation.factionID or nil
+    organization = organizationID
+        and PNC.Factions
+        and PNC.Factions.Registry
+        and PNC.Factions.Registry.byID[organizationID]
+        or nil
+    if organization and organization.ownerPlayerKey then
+        uuid = PNC.PlayerCharacters
+            and PNC.PlayerCharacters.GetCharacterUUID
+            and PNC.PlayerCharacters.GetCharacterUUID(player)
+            or nil
+        playerKey = uuid
+            and PNC.EntityRef
+            and PNC.EntityRef.ForPlayerIdentity(
+                player.getUsername
+                    and player:getUsername() or nil,
+                uuid
+            ) or nil
+        return playerKey ~= nil
+            and organization.playerMemberKeys[playerKey] == true
+    end
     recordUsername = ownerUsername(record)
     recordOnlineID = tonumber(ownerOnlineID(record))
     username = player.getUsername and tostring(player:getUsername() or "") or ""

@@ -360,6 +360,25 @@ function Damage.ApplyNPCDamage(targetRecord, targetBody, hit)
     end
     applied, result = wounds.ApplyCombatDamage(targetRecord, targetBody, hit)
     if not applied then return false, "npc_damage_rejected", result end
+    if hit and hit.attackerKind == "npc"
+        and hit.attackerID
+        and PNC.Factions
+        and PNC.Factions.OnNPCAggression
+    then
+        local attackerRecord = PNC.Registry
+            and PNC.Registry.Get
+            and PNC.Registry.Get(hit.attackerID) or nil
+        local at = getGameTime and getGameTime()
+            and getGameTime().getWorldAgeHours
+            and getGameTime():getWorldAgeHours() or 0
+        if attackerRecord then
+            PNC.Factions.OnNPCAggression(
+                attackerRecord,
+                targetRecord,
+                at
+            )
+        end
+    end
     if hit and hit.attackerKind == "player"
         and relationships and relationships.ProvokeNeutralByPlayer
     then
@@ -521,6 +540,20 @@ function Damage.ApplyTargetDamage(attackerRecord, attackerBody, target, options)
     if hit.amount <= 0 then return false, "invalid_damage", hit end
     if target.kind == "player" then
         local applied = Damage.ApplyPlayerDamage(target.player, hit.amount, hit.attackType, hit.weaponItem, hit)
+        if applied == true
+            and attackerRecord
+            and PNC.Factions
+            and PNC.Factions.OnNPCAttackPlayer
+        then
+            local at = getGameTime and getGameTime()
+                and getGameTime().getWorldAgeHours
+                and getGameTime():getWorldAgeHours() or 0
+            PNC.Factions.OnNPCAttackPlayer(
+                attackerRecord,
+                target.player,
+                at
+            )
+        end
         return applied == true, applied == true and "hit_player" or "invalid_player_target", hit
     end
     if target.kind == "npc" then

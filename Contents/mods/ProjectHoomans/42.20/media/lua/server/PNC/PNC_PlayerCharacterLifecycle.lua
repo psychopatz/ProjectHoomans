@@ -46,6 +46,19 @@ local function ensureIdentityAndProfile(player, callback, at)
     then
         PNC.SocialProfiles.EnsurePlayerProfile(player, at)
     end
+    if uuid and PNC.Factions
+        and PNC.Factions.GetPlayerFaction
+        and PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileFaction
+    then
+        local faction = PNC.Factions.GetPlayerFaction(player)
+        if faction then
+            PNC.FactionBehavior.ReconcileFaction(
+                faction.id,
+                "player_identity_bound"
+            )
+        end
+    end
     return uuid, reason
 end
 
@@ -77,11 +90,24 @@ end
 function Lifecycle.OnPlayerDeath(first, second)
     local player = callbackPlayer(first, second)
     if player and service() then
-        return service().MarkDead(
+        local faction = PNC.Factions
+            and PNC.Factions.GetPlayerFaction
+            and PNC.Factions.GetPlayerFaction(player)
+            or nil
+        local changed, reason = service().MarkDead(
             player,
             worldAgeHours(),
             "OnPlayerDeath"
         )
+        if faction and PNC.FactionBehavior
+            and PNC.FactionBehavior.ReconcileFaction
+        then
+            PNC.FactionBehavior.ReconcileFaction(
+                faction.id,
+                "player_character_died"
+            )
+        end
+        return changed, reason
     end
     return false, "player_unavailable"
 end

@@ -17,10 +17,11 @@ PNC = {}
 dofile(FILE)
 
 local snapshot = {
-    registrySchemaVersion = 1,
+    registrySchemaVersion = 2,
     registryRevision = 4,
     selectedFactionID = "faction_test",
     selectedNPCID = "npc_one",
+    currentPlayerFactionID = "faction_player",
     factions = {
         {
             id = "faction_test",
@@ -50,10 +51,19 @@ local snapshot = {
         status = "active",
         leaderNPCID = "npc_one",
         memberCount = 1,
+        playerMemberCount = 0,
         revision = 3,
         createdAt = 10,
         archivedAt = 0,
         tags = { debugCreated = true },
+    },
+    diplomacy = {
+        {
+            factionAID = "faction_player",
+            factionBID = "faction_test",
+            state = "war",
+            reason = "test",
+        },
     },
     members = {
         {
@@ -89,11 +99,13 @@ assert(npcItems[1].detail == "faction_test",
 local rows =
     PNC.FactionDebugModel.BuildRows(snapshot, true)
 assertContains(rows, "Registry", "revision 4")
+assertContains(rows, "Your faction", "faction_player")
 assertContains(rows, "Faction", "Test Cooperative")
 assertContains(rows, "Archetype", "Settlement")
 assertContains(rows, "Leader", "npc_one")
 assertContains(rows, "Member Alice", "npc_one")
 assertContains(rows, "  affiliation", "member / medic / senior")
+assertContains(rows, "Diplomacy faction_player", "war / test")
 assertContains(rows, "Last action", "leader")
 
 local unauthorized =

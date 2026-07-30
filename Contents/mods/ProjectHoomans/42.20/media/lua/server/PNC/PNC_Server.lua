@@ -551,7 +551,9 @@ local function onClientCommand(module, command, player, args)
             player,
             PNC.FactionDebug.BuildSnapshot(
                 args and args.factionID,
-                args and args.npcID
+                args and args.npcID,
+                nil,
+                player
             ),
             true,
             nil

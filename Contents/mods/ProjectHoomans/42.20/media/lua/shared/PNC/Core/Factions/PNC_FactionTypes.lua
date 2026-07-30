@@ -6,6 +6,7 @@ PNC.FactionTypes = PNC.FactionTypes or {}
 local Types = PNC.FactionTypes
 local Constants = PNC.FactionConstants
 local Archetypes = PNC.FactionArchetypes
+local EntityRef = PNC.EntityRef
 
 local function finite(value, fallback)
     value = tonumber(value)
@@ -106,6 +107,56 @@ local function normalizeIDSet(value, validator)
         end
     end
     return output
+end
+
+local function isValidPlayerKey(value)
+    return EntityRef and EntityRef.IsPlayer
+        and EntityRef.IsPlayer(value) == true
+end
+
+function Types.MakeDiplomacyKey(firstFactionID, secondFactionID)
+    if not Types.IsValidFactionID(firstFactionID)
+        or not Types.IsValidFactionID(secondFactionID)
+        or firstFactionID == secondFactionID
+    then
+        return nil
+    end
+    if firstFactionID < secondFactionID then
+        return firstFactionID .. "|" .. secondFactionID
+    end
+    return secondFactionID .. "|" .. firstFactionID
+end
+
+function Types.NormalizeDiplomacy(value, pairKey)
+    local source = type(value) == "table" and value or {}
+    local first = Types.IsValidFactionID(source.factionAID)
+        and source.factionAID or nil
+    local second = Types.IsValidFactionID(source.factionBID)
+        and source.factionBID or nil
+    local expected = Types.MakeDiplomacyKey(first, second)
+    if not expected or (pairKey ~= nil and pairKey ~= expected) then
+        return nil
+    end
+    if second < first then
+        first, second = second, first
+    end
+    return {
+        factionAID = first,
+        factionBID = second,
+        state = Constants.VALID_DIPLOMACY_STATES[source.state]
+            and source.state or Constants.DIPLOMACY_PEACE,
+        changedAt = timestamp(source.changedAt, 0),
+        reason = safeString(
+            source.reason,
+            Constants.DIPLOMACY_REASON_MAX_LENGTH
+        ) or "unspecified",
+        instigatorFactionID =
+            (
+                source.instigatorFactionID == first
+                or source.instigatorFactionID == second
+            ) and source.instigatorFactionID or nil,
+        revision = revision(source.revision),
+    }
 end
 
 local function normalizeFormerFaction(value)
@@ -254,9 +305,15 @@ function Types.NormalizeFaction(value, factionID)
         archivedAt = timestamp(source.archivedAt, 0),
         leaderNPCID = Types.IsValidNPCID(source.leaderNPCID)
             and source.leaderNPCID or nil,
+        ownerPlayerKey = isValidPlayerKey(source.ownerPlayerKey)
+            and source.ownerPlayerKey or nil,
         memberIDs = normalizeIDSet(
             source.memberIDs,
             Types.IsValidNPCID
+        ),
+        playerMemberKeys = normalizeIDSet(
+            source.playerMemberKeys,
+            isValidPlayerKey
         ),
         tags = normalizeTags(source.tags),
         revision = revision(source.revision),
@@ -274,17 +331,56 @@ function Types.NormalizeFactionRegistry(value)
         revision = revision(source.revision),
         byID = {},
         byArchetype = {},
+        byPlayerKey = {},
+        diplomacy = {},
     }
     local faction
+    local factionIDs = {}
     for id, raw in pairs(
         type(source.byID) == "table" and source.byID or {}
     ) do
         faction = Types.NormalizeFaction(raw, id)
         if faction and faction.id == id then
             output.byID[id] = faction
+            factionIDs[#factionIDs + 1] = id
             output.byArchetype[faction.archetypeID] =
                 output.byArchetype[faction.archetypeID] or {}
             output.byArchetype[faction.archetypeID][id] = true
+        end
+    end
+    table.sort(factionIDs)
+    for _, id in ipairs(factionIDs) do
+        faction = output.byID[id]
+        for playerKey, _ in pairs(
+            faction.playerMemberKeys or {}
+        ) do
+            if output.byPlayerKey[playerKey] == nil then
+                output.byPlayerKey[playerKey] = id
+            else
+                faction.playerMemberKeys[playerKey] = nil
+                if faction.ownerPlayerKey == playerKey then
+                    faction.ownerPlayerKey = nil
+                end
+            end
+        end
+        if faction.ownerPlayerKey
+            and faction.playerMemberKeys[
+                faction.ownerPlayerKey
+            ] ~= true
+        then
+            faction.ownerPlayerKey = nil
+        end
+    end
+    for pairKey, raw in pairs(
+        type(source.diplomacy) == "table"
+            and source.diplomacy or {}
+    ) do
+        local diplomacy = Types.NormalizeDiplomacy(raw, pairKey)
+        if diplomacy
+            and output.byID[diplomacy.factionAID]
+            and output.byID[diplomacy.factionBID]
+        then
+            output.diplomacy[pairKey] = diplomacy
         end
     end
     return output

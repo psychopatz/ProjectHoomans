@@ -99,13 +99,47 @@ local function isRangedWeapon(weapon)
     return weapon.getSubCategory and tostring(weapon:getSubCategory() or "") == "Firearm"
 end
 
-function PlayerDamage.CanDamageRecord(record)
+function PlayerDamage.CanDamageRecord(record, attacker)
     local faction
     if not record or record.alive == false then
         return false
     end
     faction = Types and Types.NormalizeFaction and Types.NormalizeFaction(record.faction) or tostring(record.faction or "colonist")
-    return faction ~= (Const.FACTION_COLONIST or "colonist")
+    if faction ~= (Const.FACTION_COLONIST or "colonist") then
+        return true
+    end
+    local organizationID = PNC.Factions
+        and PNC.Factions.GetOrganizationalFactionID
+        and PNC.Factions.GetOrganizationalFactionID(record)
+        or nil
+    local organization = organizationID
+        and PNC.Factions
+        and PNC.Factions.Registry
+        and PNC.Factions.Registry.byID[organizationID]
+        or nil
+    if not attacker or not organization
+        or not organization.ownerPlayerKey
+    then
+        return false
+    end
+    local attackerFaction = PNC.Factions.GetPlayerFaction
+        and PNC.Factions.GetPlayerFaction(attacker)
+        or nil
+    if not attackerFaction
+        and PNC.Factions.EnsurePlayerFaction
+    then
+        local at = getGameTime and getGameTime()
+            and getGameTime().getWorldAgeHours
+            and getGameTime():getWorldAgeHours() or 0
+        local ok
+        ok, _, attackerFaction =
+            PNC.Factions.EnsurePlayerFaction(attacker, {
+                worldAgeHours = at,
+            })
+        if not ok then attackerFaction = nil end
+    end
+    return attackerFaction == nil
+        or attackerFaction.id ~= organizationID
 end
 
 function PlayerDamage.ScaleDamage(reportedDamage, weapon)
@@ -131,7 +165,7 @@ function PlayerDamage.Apply(record, zombie, attacker, weapon, reportedDamage, so
     if not record or not zombie then
         return false, "missing_target"
     end
-    if not PlayerDamage.CanDamageRecord(record) then
+    if not PlayerDamage.CanDamageRecord(record, attacker) then
         restoreEngineBuffer(zombie, record)
         return false, "colonist_protected"
     end
@@ -169,6 +203,19 @@ function PlayerDamage.Apply(record, zombie, attacker, weapon, reportedDamage, so
         }) == true
     end
     restoreEngineBuffer(zombie, record)
+    if applied
+        and PNC.Factions
+        and PNC.Factions.OnPlayerAggression
+    then
+        local at = getGameTime and getGameTime()
+            and getGameTime().getWorldAgeHours
+            and getGameTime():getWorldAgeHours() or 0
+        PNC.Factions.OnPlayerAggression(
+            attacker,
+            record,
+            at
+        )
+    end
     if applied and not usedCombatService and Network and Network.BroadcastRecord then
         Network.BroadcastRecord(record, "player_damage")
     end
