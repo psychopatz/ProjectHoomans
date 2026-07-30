@@ -296,6 +296,8 @@ function Treatment.TryBandage(player, npcId, partId, options)
     local container
     local applied
     local reason
+    local wound
+    local socialContext
     if not Core.IsAuthority() then return false, "not_authority" end
     if not player or (player.isDead and player:isDead()) then return false, "invalid_player" end
     if not record or record.alive == false then return false, "npc_missing" end
@@ -308,6 +310,16 @@ function Treatment.TryBandage(player, npcId, partId, options)
     local resolvedType = options.bandageType
         or item and item.getFullType and item:getFullType()
         or Const.BANDAGE_TYPE
+    wound = record.health
+        and record.health.body
+        and record.health.body.wounds
+        and record.health.body.wounds[tostring(partId)] or nil
+    socialContext = {
+        woundType = wound and wound.type or nil,
+        severity = wound and (
+            tonumber(wound.damage) or tonumber(wound.severity)
+        ) or nil,
+    }
     applied, reason = Treatment.ApplyBandage(record, partId, {
         bandageType = resolvedType,
         bandageName = bandageDisplayName(resolvedType, item),
@@ -322,6 +334,16 @@ function Treatment.TryBandage(player, npcId, partId, options)
     end
     if PNC.Network and PNC.Network.BroadcastRecord then
         PNC.Network.BroadcastRecord(record, "bandaged")
+    end
+    if PNC.SocialEventHooks
+        and PNC.SocialEventHooks.OnTreatmentCompleted
+    then
+        PNC.SocialEventHooks.OnTreatmentCompleted(
+            player,
+            record,
+            partId,
+            socialContext
+        )
     end
     return true, options.consumeItem == false and "bandaged_debug" or "bandaged"
 end

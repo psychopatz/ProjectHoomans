@@ -1,8 +1,8 @@
 --[[
-    PNC Relationship Foundation
-    Central faction-enemy rules and authoritative disposition transitions.
-    Individual/faction reputation can extend this service later without
-    teaching perception or damage code about relationship storage.
+    PNC Relationships Facade
+    Preserves the existing faction-enemy boundary while the server-side
+    relationship service adds persistent directed personal relationships.
+    Personal states do not alter faction, hostility, combat, or AI in Phase 1.
 ]]
 
 PNC = PNC or {}

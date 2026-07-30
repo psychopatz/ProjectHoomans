@@ -5,12 +5,14 @@
 - `PNC_Registry` delegates all long-lived record writes to this subsystem.
 
 ## Owned Data
-- v8 versioned per-NPC persisted schema
+- v12 versioned per-NPC persisted schema
 - `PNC_Core_Global.records` directory pointers
 - isolated `PNC_NPC_<id>` record tables
 - canonical persisted fields only
 - nested `identity` payload
 - compact `inventory` payload
+- sparse, directed `social` relationship and memory payload
+- separate `PNC_PlayerCharacters` player-character registry schema v2
 - body-part wounds and infection timing, stage, progress, fever, and temperature
 - runtime rebuild defaults after load
 - dirty-record tracking and v4 monolithic-store migration
@@ -24,6 +26,9 @@
 - `PNC.Persistence.RebuildRuntime(record)`
 - `PNC.Registry.MarkDirty(record, domain)`
 - `PNC.Registry.FlushDirty()`
+- `PNC.PlayerCharacters.Load()`
+- `PNC.PlayerCharacters.Save()`
+- `PNC.PlayerCharacters.NormalizeRegistry()`
 
 ## Storage Rules
 - the global directory never contains full NPC record bodies
@@ -46,7 +51,18 @@
   snapshots and dirties only records whose position or stamina actually
   differs at save time
 - records loaded from an older per-NPC schema are accepted, marked
-  `schema_migration`, and rewritten as v8 on the next save
+  `schema_migration`, and rewritten as v12 on the next save
+- player-character identity uses its own Global ModData table and schema.
+  Phase 3B adds a UUID-owned primitive social profile to each record
+- the player registry's canonical `byUUID` records contain primitives only;
+  `byAccount` is a deterministically rebuilt secondary index
+- each survivor carries only `PNC_CharacterUUID` and
+  `PNC_CharacterIdentityVersion` in player ModData. Runtime player-object and
+  UUID bindings are module state and never serialized
+- v11 and older records deterministically receive social schema v2 and an NPC
+  personality generated from their stored identity seed. Partially migrated
+  social data is normalized through the same constructor path, so migration
+  is idempotent and never pre-creates relationships or rewrites memories
 - full NPC records never persist after death. The registry directory instead
   keeps a minimal `deathMarkers` map with identity, name, position, corpse token,
   infection state, and delay metadata

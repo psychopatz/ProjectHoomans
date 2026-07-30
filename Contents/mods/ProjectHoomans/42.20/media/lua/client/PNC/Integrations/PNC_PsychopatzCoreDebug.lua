@@ -22,6 +22,25 @@ PsychopatzCore.DebugHub.RegisterTool({
     end,
 })
 
+PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.relationships",
+    source = "ProjectHoomans",
+    order = 210,
+    title = "PNC Relationship Inspector",
+    description = "Inspect directed social data and trigger guarded test events.",
+    available = function()
+        return PNC
+            and PNC.RelationshipDebugUI
+            and PNC.RelationshipDebugUI.Toggle
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        PNC.RelationshipDebugUI.Toggle()
+    end,
+})
+
 -- Project Hoomans settings belong to the standard in-game settings registry.
 -- Remove the old debug-hub launcher as well when this file is hot-reloaded.
 PsychopatzCore.DebugHub.UnregisterTool("pnc.settings")

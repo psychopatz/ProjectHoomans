@@ -7,7 +7,7 @@ Const.MOD_ID = "ProjectHoomans"
 Const.MODULE = "PNC"
 Const.MODDATA_KEY = "PNC_Core_Global"
 Const.MODDATA_NPC_PREFIX = "PNC_NPC_"
-Const.PERSISTENCE_VERSION = 10
+Const.PERSISTENCE_VERSION = 12
 Const.STORAGE_LAYOUT_VERSION = 2
 Const.GENERATOR_VERSION = 3
 
@@ -36,6 +36,8 @@ Const.CMD_COMPANION_COMMAND = "CompanionCommand"
 Const.CMD_DEBUG = "DebugCommand"
 Const.CMD_DEBUG_ROSTER_REQUEST = "RequestDebugRoster"
 Const.CMD_DEBUG_ROSTER = "DebugRoster"
+Const.CMD_RELATIONSHIP_DEBUG_REQUEST = "RequestRelationshipDebug"
+Const.CMD_RELATIONSHIP_DEBUG = "RelationshipDebug"
 Const.CMD_MAP_COMMAND = "MapCommand"
 Const.CMD_MAP_COMMAND_RESULT = "MapCommandResult"
 Const.PRESENCE_LIVE = "live"

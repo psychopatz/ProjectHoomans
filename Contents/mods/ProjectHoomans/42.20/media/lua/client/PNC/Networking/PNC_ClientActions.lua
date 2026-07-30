@@ -49,6 +49,22 @@ function Client.SendDebug(action, payload)
     if action == "teleport_to_npc" and args.id then
         return teleportLocalPlayerNear(Registry.Get(args.id), player)
     end
+    if action == "social_trigger_event" then
+        local snapshot
+        local reason
+        if not PNC.RelationshipDebug
+            or not PNC.RelationshipDebug.TriggerSocialEvent
+        then
+            return false
+        end
+        snapshot, reason =
+            PNC.RelationshipDebug.TriggerSocialEvent(player, args)
+        ClientState.relationshipDebugAuthorized = true
+        ClientState.relationshipDebug = snapshot
+        ClientState.relationshipDebugReason = reason
+        ClientState.lastRelationshipDebugReceiveAt = Core.Now()
+        return snapshot ~= nil, reason
+    end
     if action == "spawn" and PNC.API and PNC.API.Spawn then
         local variant = tostring(args.variant or "colonist")
         local legacyFaction = (variant == "hostile_melee" or variant == "hostile_ranged")

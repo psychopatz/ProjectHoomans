@@ -31,6 +31,17 @@ Internal.RegisterServerCommand(Const.CMD_DEBUG_ROSTER, function(args)
     ClientState.lastDebugRosterReceiveAt = Core.Now()
 end)
 
+Internal.RegisterServerCommand(
+    Const.CMD_RELATIONSHIP_DEBUG,
+    function(args)
+        ClientState.relationshipDebugAuthorized =
+            args.authorized == true
+        ClientState.relationshipDebug = args.snapshot
+        ClientState.relationshipDebugReason = args.reason
+        ClientState.lastRelationshipDebugReceiveAt = Core.Now()
+    end
+)
+
 Internal.RegisterServerCommand(Const.CMD_MAP_COMMAND_RESULT, function(args)
     if PNC.MapCommands and PNC.MapCommands.HandleResult then
         PNC.MapCommands.HandleResult(args)

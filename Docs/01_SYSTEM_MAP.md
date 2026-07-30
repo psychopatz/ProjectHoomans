@@ -6,6 +6,15 @@
 - `PNC_ArchetypeLoader`: imports registered archetype modules, applies pending bundles, and logs bootstrap health
 - `PNC_Identity_Factory`: `SurvivorFactory`-first identity resolution
 - `PNC_Identity_Profile`: persisted identity and appearance resolution
+- `PNC_PlayerCharacterTypes`: pure player-character registry/record
+  constructors, UUID/account validation, and deterministic normalization
+- `PNC_SocialProfileConstants`, `PNC_SocialProfileTypes`, and
+  `PNC_SocialProfileGenerator`: profile schemas, centralized enums, defensive
+  normalization, and identity-seeded NPC personality generation
+- `PNC_SocialTraits`: idempotent Build 42 character-trait registration,
+  engine/server exclusions, canonical trait IDs, and pure profile resolution
+- `PNC_SocialProfileMath`: orientation compatibility and pure observer event
+  interpretation
 - `PNC_Inventory`: compact player-like inventory tree with template-plus-delta persistence
 - `PNC_Inventory_EquipmentGeneration`: generic categorized equipment pools and deterministic starting-equipment policy
 - `PNC_DeathMarkers`: compact post-death identity/location persistence after full NPC retirement
@@ -17,7 +26,15 @@
   performance telemetry is persisted
 - `PNC_WorldCensus`: one cadence-bounded loaded-zombie snapshot shared by
   spatial indexing, lifecycle auditing, and aggro discovery
-- `PNC_Relationships`: faction-enemy matrix and authoritative disposition transitions
+- `PNC_EntityRef`: stable `npc:` and account-plus-character `player:` keys
+- `PNC_RelationshipTypes`, `PNC_RelationshipMath`, and
+  `PNC_RelationshipStates`: serialization-safe directed social records,
+  deterministic memory decay, cached score calculation, and hysteresis
+- `PNC_Relationships`: server-authoritative personal relationship API plus the
+  existing faction-enemy matrix and disposition transitions; personal states
+  do not affect combat decisions
+- `PNC_SocialEventDefinitions`: data-only balance, allowed-source, cooldown,
+  saturation, and observer rules for the five Phase 2 events
 - `PNC_SpatialIndex`: nested numeric-cell player, NPC, and zombie queries built
   from the shared world census; player identity maps also provide constant-time
   owner lookup
@@ -107,9 +124,32 @@
 
 ## Server
 - `PNC_Server`: authority tick, full sync, debug commands
+- `PNC_PlayerCharacterService`: authoritative UUID registry, claim validation,
+  entity-key resolution, death state, and runtime bindings
+- `PNC_PlayerCharacterLifecycle`: guarded Build 42 callbacks plus a throttled
+  authoritative player availability/death/disconnect sweep
+- `PNC_PlayerCharacterDebug`: opt-in identity and combat callback diagnostics
+  plus read-only character-record formatting
+- `PNC_SocialProfileService`: authoritative live-trait resolution, UUID-owned
+  player profile commits, NPC profile access, and pure-helper facade
+- `PNC_SocialProfileDebug`: disabled-by-default profile diagnostics and
+  read-only player/NPC formatters
+- `PNC_RelationshipService`: authoritative directed relationship mutations
+- `PNC_RelationshipDebug`: read-only selected-pair snapshots/formatting plus
+  admin/debug-only named-event test dispatch through the real event service
+- `PNC_SocialEventService`: validation, dedupe, cooldown/saturation, memory
+  construction, and atomic event processing
+- `PNC_SocialEventHooks`: stable-identity milestone adapters and verified
+  incapacitation rescue attribution
+- `PNC_SocialEncounterTracker`: non-persistent, stable-key combat aggregation
+  for protection, shared survival, and conservative abandonment
+- `PNC_SocialEventDebug`: opt-in read-only processed-event diagnostics
 
 ## Client
 - `PNC_Client`: roster cache, character-payload cache, sync requests, context menu debug tools
+- `PNC_RelationshipDebugWindow` and `PNC_RelationshipDebugModel`:
+  admin/debug-only directed relationship inspection, reverse-direction
+  comparison, memory/revision diagnostics, and guarded named-event triggers
 - `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
 - `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby
   embodied NPCs, including canonical-instance selection and duplicate shell

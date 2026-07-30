@@ -202,11 +202,22 @@ end
 function Health.ResumeFromIncapacitated(record, zombie, reason)
     local health = Health.Ensure(record)
     local now = Core.Now()
+    local socialEpisodeID
+    local socialOccurredAt
     if health.state ~= "incapacitated"
         or (tonumber(health.current) or 0)
             < (tonumber(Const.INCAPACITATED_RECOVERY_HP) or 5)
     then
         return false
+    end
+    if PNC.SocialEventHooks then
+        socialEpisodeID =
+            PNC.SocialEventHooks.GetDownedEpisodeID(
+                record,
+                health.downedAt
+            )
+        socialOccurredAt =
+            PNC.SocialEventHooks.WorldAgeHours()
     end
     health.state = "normal"
     health.downedAt = 0
@@ -231,6 +242,16 @@ function Health.ResumeFromIncapacitated(record, zombie, reason)
             .. " recovered from incapacitation hp="
             .. string.format("%.2f", tonumber(health.current) or 0)
             .. " reason=" .. tostring(reason or "bandage_healing"))
+    end
+    if socialEpisodeID
+        and PNC.SocialEventHooks
+        and PNC.SocialEventHooks.OnIncapacitationRecovered
+    then
+        PNC.SocialEventHooks.OnIncapacitationRecovered(
+            record,
+            socialEpisodeID,
+            socialOccurredAt
+        )
     end
     return true
 end
@@ -323,6 +344,20 @@ function Health.Kill(record, zombie, reason)
     record.runtime.lastPathX = nil
     record.runtime.lastPathY = nil
     record.deathReason = reason or "unknown"
+    if PNC.SocialEventHooks then
+        if PNC.SocialEventHooks.DiscardRescueContributions then
+            PNC.SocialEventHooks.DiscardRescueContributions(record)
+        end
+        if PNC.SocialEncounterTracker
+            and PNC.SocialEncounterTracker.OnParticipantLeft
+        then
+            PNC.SocialEncounterTracker.OnParticipantLeft(
+                PNC.EntityRef.ForNPC(record.id),
+                PNC.SocialEventHooks.WorldAgeHours(),
+                "death"
+            )
+        end
+    end
 
     if zombie then
         if zombie.setHealth then

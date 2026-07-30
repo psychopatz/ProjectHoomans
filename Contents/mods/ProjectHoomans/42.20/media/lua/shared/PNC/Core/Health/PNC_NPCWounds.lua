@@ -707,6 +707,24 @@ function Wounds.ResolveZombieAttack(record, npcBody, attacker, attackerZombieId)
         y = attacker and attacker.getY and attacker:getY() or record.y,
         z = attacker and attacker.getZ and attacker:getZ() or record.z,
     })
+    if PNC.SocialEncounterTracker
+        and PNC.SocialEncounterTracker.RecordNPCDamaged
+        and PNC.SocialEventHooks
+    then
+        PNC.SocialEncounterTracker.RecordNPCDamaged(
+            record,
+            attackerZombieId,
+            PNC.SocialEventHooks.WorldAgeHours(),
+            {
+                x = attacker and attacker.getX
+                    and attacker:getX() or record.x,
+                y = attacker and attacker.getY
+                    and attacker:getY() or record.y,
+                z = attacker and attacker.getZ
+                    and attacker:getZ() or record.z,
+            }
+        )
+    end
     record.runtime = record.runtime or {}
     record.runtime.forceSyncEvent = "npc_wound"
     if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
@@ -765,6 +783,24 @@ function Wounds.ApplyResolvedZombieAttack(
         z = attacker and attacker.getZ
             and attacker:getZ() or record.z,
     })
+    if PNC.SocialEncounterTracker
+        and PNC.SocialEncounterTracker.RecordNPCDamaged
+        and PNC.SocialEventHooks
+    then
+        PNC.SocialEncounterTracker.RecordNPCDamaged(
+            record,
+            attackerZombieId,
+            PNC.SocialEventHooks.WorldAgeHours(),
+            {
+                x = attacker and attacker.getX
+                    and attacker:getX() or record.x,
+                y = attacker and attacker.getY
+                    and attacker:getY() or record.y,
+                z = attacker and attacker.getZ
+                    and attacker:getZ() or record.z,
+            }
+        )
+    end
     record.runtime = record.runtime or {}
     record.runtime.forceSyncEvent = "npc_wound"
     if PNC.Registry and PNC.Registry.MarkDirty then

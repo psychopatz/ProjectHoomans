@@ -5,6 +5,7 @@ local Types = PNC.Types
 local Core = PNC.Core
 local Const = PNC.Const
 local Identity = PNC.Identity
+local RelationshipTypes = PNC.RelationshipTypes
 
 local function normalizeString(value)
     if value == nil or value == "" then
@@ -198,6 +199,8 @@ function Types.NormalizeDefinition(definition)
         debug = def.debug == true,
         persist = def.persist ~= false,
         recruited = def.recruited == true,
+        social = type(def.social) == "table"
+            and Core.DeepCopy(def.social) or nil,
         mapPresentation = PNC.MapPresentation
             and PNC.MapPresentation.Normalize(def.mapPresentation)
             or nil,
@@ -253,6 +256,7 @@ function Types.NewRecord(definition)
             unarmedCooldownMs = tonumber(def.combatProfile.unarmedCooldownMs) or Const.UNARMED_COOLDOWN_MS,
         },
         hostility = Core.DeepCopy(def.hostility),
+        social = nil,
         health = {
             current = def.hpMax,
             max = def.hpMax,
@@ -319,6 +323,24 @@ function Types.NewRecord(definition)
     else
         record.name = record.name or ((hostile and "Hostile NPC") or (def.faction == "neutral" and "Neutral NPC") or "Colonist NPC")
     end
+
+    record.social = RelationshipTypes
+        and RelationshipTypes.NewSocialState(
+            def.social,
+            record.identitySeed,
+            record.archetypeID
+        )
+        or {
+            schemaVersion = 2,
+            revision = 0,
+            morale = 0,
+            moraleBaseline = 0,
+            relationships = {},
+            recentEventIDs = {},
+            lastEvaluatedAt = 0,
+            personality = nil,
+            personalityOverrides = {},
+        }
 
     return record
 end

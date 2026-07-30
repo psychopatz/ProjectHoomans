@@ -7,6 +7,8 @@ local Const = PNC.Const
 local Identity = PNC.Identity
 local Types = PNC.Types
 local Inventory = PNC.Inventory
+local RelationshipTypes = PNC.RelationshipTypes
+local RelationshipMath = PNC.RelationshipMath
 local HEALTH_PART_IDS = {
     "Head", "Neck", "Torso_Upper", "Torso_Lower", "Groin",
     "UpperArm_L", "UpperArm_R", "ForeArm_L", "ForeArm_R",
@@ -546,6 +548,45 @@ local function migrateLegacyInventory(raw)
     return nil
 end
 
+local function sanitizeSocial(raw, identitySeed, archetypeID)
+    local social
+    local targetKey
+    local relationship
+    if RelationshipTypes and RelationshipTypes.NormalizeSocialState then
+        social = RelationshipTypes.NormalizeSocialState(
+            raw,
+            identitySeed,
+            archetypeID
+        )
+        if RelationshipMath
+            and RelationshipMath.RecalculateRelationship
+        then
+            for targetKey, relationship in pairs(
+                social.relationships
+            ) do
+                social.relationships[targetKey] =
+                    RelationshipMath.RecalculateRelationship(
+                        relationship,
+                        targetKey,
+                        relationship.lastEvaluatedAt
+                    )
+            end
+        end
+        return social
+    end
+    return {
+        schemaVersion = 2,
+        revision = 0,
+        morale = 0,
+        moraleBaseline = 0,
+        relationships = {},
+        recentEventIDs = {},
+        lastEvaluatedAt = 0,
+        personality = nil,
+        personalityOverrides = {},
+    }
+end
+
 function Persistence.RebuildRuntime(record)
     local now = Core.Now()
     local healthState
@@ -711,6 +752,11 @@ function Persistence.SerializeRecord(record)
             attached = copyStringMap(record.equipment and record.equipment.attached),
         },
         inventory = inventoryPayload,
+        social = sanitizeSocial(
+            record.social,
+            record.identitySeed,
+            record.archetypeID
+        ),
         progression = progression,
         corpse = sanitizeCorpse(record.corpse, record),
         travel = PNC.Travel
@@ -787,6 +833,11 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         archetypeID = raw.archetypeID or (identity and identity.archetypeID) or nil,
         persist = raw.persist ~= false,
         recruited = raw.recruited == true or (raw.progression and raw.progression.recruited == true) or false,
+        social = sanitizeSocial(
+            raw.social,
+            raw.identitySeed or (identity and identity.seed),
+            raw.archetypeID or (identity and identity.archetypeID)
+        ),
         mapPresentation = raw.mapPresentation,
     }
     record = Types.NewRecord(definition)
@@ -826,6 +877,11 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         skillXP = progression.skillXP,
     }
     record.recruited = progression.recruited == true or record.recruited == true
+    record.social = sanitizeSocial(
+        raw.social,
+        record.identitySeed,
+        record.archetypeID
+    )
     record.persist = raw.persist ~= false
     record.corpse = sanitizeCorpse(raw.corpse, record)
     if record.alive == false and not record.corpse then
@@ -847,6 +903,11 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         outfit = raw.outfit,
         isFemale = raw.isFemale == true or (identity and identity.isFemale == true),
     })
+    record.social = sanitizeSocial(
+        raw.social,
+        record.identitySeed,
+        record.archetypeID
+    )
     if hasTableEntries(progression.legacySkillLevels) then
         local skillID
         local level

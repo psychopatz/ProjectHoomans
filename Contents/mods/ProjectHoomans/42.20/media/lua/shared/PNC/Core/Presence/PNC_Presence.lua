@@ -388,6 +388,16 @@ function Presence.Abstract(record, reason)
     if not Core.IsAuthority() or record.presenceState ~= Const.PRESENCE_LIVE then
         return false
     end
+    if PNC.SocialEncounterTracker
+        and PNC.SocialEncounterTracker.OnParticipantLeft
+        and PNC.SocialEventHooks
+    then
+        PNC.SocialEncounterTracker.OnParticipantLeft(
+            PNC.EntityRef.ForNPC(record.id),
+            PNC.SocialEventHooks.WorldAgeHours(),
+            reason or "abstract"
+        )
+    end
 
     record.runtime.target = nil
     record.runtime.lastPathX = nil

@@ -10,14 +10,26 @@
 - zombie aggro bridge so zombies can acquire embodied NPCs
 - custom HP, body-part wounds, bandage-driven incapacitation recovery, and stamina
 - seeded identity, archetype registry, and compact inventory persistence
-- v8 compact health/inventory/stamina persistence with save-time dirty
+- v12 compact health/inventory/stamina/social persistence with save-time dirty
   snapshots and a 100-NPC/4,000-acquired-item scale gate
+- sparse, directed NPC-to-NPC and NPC-to-player-character relationship records
+  with deterministic memories, decay, and hysteresis-aware social states
+- centralized Phase 2 health/combat social events with bounded dedupe,
+  cooldown/saturation controls, verified rescue attribution, and runtime-only
+  encounter aggregation
+- Phase 3A server-authoritative player-character UUID registry with persistent
+  survivor mirrors, reconnect/death/new-survivor separation, claim validation,
+  and centralized social entity-key resolution
+- Phase 3B UUID-owned player social profiles, Build 42 character-creation
+  traits, deterministic NPC personalities, and observer-only modifiers for new
+  instances of the five existing social events
 - shared world census, numeric spatial cells, budgeted active-zombie aggro,
   cached perception frames, and staggered LOD scheduling
 - right-click debug spawning, NPC selection hub, and character window
 
 ## Immediate Next Steps
-- character-specific companion ownership and sparse per-NPC player reputation
+- execute the documented SP, hosted, and dedicated player-identity, trait, and
+  profile validation matrices before expanding social attribution
 - smoother live motion and tighter SP/MP parity for chase and follow
 - richer animation bindings and better weapon-specific timing
 - better ranged aim, muzzle/projectile treatment, and combat diagnostics

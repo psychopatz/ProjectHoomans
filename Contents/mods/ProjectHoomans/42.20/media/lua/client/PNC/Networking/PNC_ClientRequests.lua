@@ -83,6 +83,56 @@ function Client.RequestDebugRoster(forceAudit)
     return true
 end
 
+function Client.RequestRelationshipDebug(
+    observerNPCID,
+    targetKind,
+    targetNPCID
+)
+    local player = getSpecificPlayer
+        and getSpecificPlayer(0) or nil
+    local args = {
+        observerNPCID = observerNPCID,
+        targetKind = targetKind,
+        targetNPCID = targetNPCID,
+    }
+    local snapshot
+    local reason
+    if not Client.CanUseDebug() then
+        ClientState.relationshipDebugAuthorized = false
+        ClientState.relationshipDebug = nil
+        ClientState.relationshipDebugReason = "not_authorized"
+        return false
+    end
+    ClientState.lastRelationshipDebugRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(
+                player,
+                Const.MODULE,
+                Const.CMD_RELATIONSHIP_DEBUG_REQUEST,
+                args
+            )
+            return true
+        end
+        return false
+    end
+    if not PNC.RelationshipDebug
+        or not PNC.RelationshipDebug.BuildSnapshotForRequest
+    then
+        return false
+    end
+    snapshot, reason =
+        PNC.RelationshipDebug.BuildSnapshotForRequest(
+            player,
+            args
+        )
+    ClientState.relationshipDebugAuthorized = true
+    ClientState.relationshipDebug = snapshot
+    ClientState.relationshipDebugReason = reason
+    ClientState.lastRelationshipDebugReceiveAt = Core.Now()
+    return snapshot ~= nil
+end
+
 function Client.RequestCharacterPayload(npcId)
     local player = getSpecificPlayer(0)
     local payload

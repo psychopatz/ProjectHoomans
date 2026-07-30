@@ -1,0 +1,22 @@
+{
+    "UI_PNC_Trait_Gay": "Gay",
+    "UI_PNC_Trait_Gay_Description": "Can be romantically attracted to people of the same gender.",
+    "UI_PNC_Trait_Bisexual": "Bisexual",
+    "UI_PNC_Trait_Bisexual_Description": "Can be romantically attracted to men and women.",
+    "UI_PNC_Trait_BlandPalate": "Bland Palate",
+    "UI_PNC_Trait_BlandPalate_Description": "Prefers simple, mild food.",
+    "UI_PNC_Trait_SpiceLover": "Spice Lover",
+    "UI_PNC_Trait_SpiceLover_Description": "Prefers strongly seasoned and spicy food.",
+    "UI_PNC_Trait_Flirty": "Flirty",
+    "UI_PNC_Trait_Flirty_Description": "Is comfortable expressing romantic interest early.",
+    "UI_PNC_Trait_Reserved": "Reserved",
+    "UI_PNC_Trait_Reserved_Description": "Requires greater familiarity before expressing romantic interest.",
+    "UI_PNC_Trait_Jealous": "Jealous",
+    "UI_PNC_Trait_Jealous_Description": "Reacts more strongly to perceived romantic rivalry.",
+    "UI_PNC_Trait_Unpossessive": "Unpossessive",
+    "UI_PNC_Trait_Unpossessive_Description": "Reacts less strongly to harmless romantic attention involving a partner.",
+    "UI_PNC_Trait_Friendly": "Friendly",
+    "UI_PNC_Trait_Friendly_Description": "Forms positive first impressions more easily but is affected more by prolonged isolation.",
+    "UI_PNC_Trait_Withdrawn": "Withdrawn",
+    "UI_PNC_Trait_Withdrawn_Description": "Builds familiarity more slowly but is less affected by isolation."
+}

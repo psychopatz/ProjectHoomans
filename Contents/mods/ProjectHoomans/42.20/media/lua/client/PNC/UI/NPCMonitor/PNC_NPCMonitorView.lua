@@ -105,6 +105,7 @@ function View.CreateChildren(window)
         { "toggle_debug", "UI_PNC_MonitorRecordDebug", "Record Debug", ISPNCNPCMonitor.onAction, "default" },
         { "map_marker", "UI_PNC_MonitorMapMarker", "Map Marker", ISPNCNPCMonitor.onMapMarker, "default" },
         { "equipment", "UI_PNC_MonitorEquipment", "Equipment", ISPNCNPCMonitor.onEquipment, "default" },
+        { "relationships", "UI_PNC_MonitorRelationships", "Relationships", ISPNCNPCMonitor.onRelationships, "default" },
         { "audit", "UI_PNC_MonitorAuditBodies", "Audit Bodies", ISPNCNPCMonitor.onAudit, "warning" },
         { "refresh", "UI_PNC_MonitorRefresh", "Refresh", ISPNCNPCMonitor.onRefresh, "quiet" },
         { "overlay", "UI_PNC_MonitorToggleOverlay", "Toggle Overlay", ISPNCNPCMonitor.onOverlay, "quiet" },

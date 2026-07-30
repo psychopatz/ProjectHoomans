@@ -56,6 +56,9 @@ local function onResetLua()
     ClientState.characterPayloads = {}
     ClientState.debugRoster = {}
     ClientState.debugAuthorized = false
+    ClientState.relationshipDebug = nil
+    ClientState.relationshipDebugAuthorized = false
+    ClientState.relationshipDebugReason = nil
     ClientState.inventoryResult = nil
     ClientState.inventoryRequestSerial = 0
     Client.BiteReplicas = {}

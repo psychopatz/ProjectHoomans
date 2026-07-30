@@ -1,105 +1,544 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+local SHARED_ROOT =
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local SERVER_ROOT =
+    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
+        error((label or "assertEqual") .. ": expected=" ..
+            tostring(expected) .. " actual=" .. tostring(actual))
     end
 end
 
-local now = 1000
-local dirty = {}
-local assignedOrder
+local function assertNear(actual, expected, epsilon, label)
+    if math.abs(actual - expected) > epsilon then
+        error((label or "assertNear") .. ": expected=" ..
+            tostring(expected) .. " actual=" .. tostring(actual))
+    end
+end
 
-PNC = {
-    Const = {
-        FACTION_COLONIST = "colonist",
-        FACTION_NEUTRAL = "neutral",
-        FACTION_HOSTILE = "hostile",
-        ORDER_HOSTILE_HUNT = "hostile_hunt",
-        DEFAULT_HP_MAX = 100,
-        UNARMED_DAMAGE = 4,
-        UNARMED_GROUND_DAMAGE = 6,
-        UNARMED_COOLDOWN_MS = 900,
-    },
-    Core = {
-        Now = function() return now end,
-        DeepCopy = function(value)
-            if type(value) ~= "table" then return value end
-            local output = {}
-            for key, item in pairs(value) do output[key] = item end
-            return output
-        end,
-        LogInfo = function() end,
-    },
-    Identity = {},
-    Registry = {
-        MarkDirty = function(_, field) dirty[field] = true end,
-    },
-    OrderSystem = {
-        SetOrder = function(record, order)
-            assignedOrder = order
-            record.orderSpec = order
-        end,
-    },
+local function assertContains(value, fragment, label)
+    if not string.find(tostring(value), tostring(fragment), 1, true) then
+        error((label or "assertContains") .. ": missing=" ..
+            tostring(fragment))
+    end
+end
+
+local function containsMemory(relationship, memoryID)
+    local _
+    local memory
+    for _, memory in pairs(relationship.memories or {}) do
+        if memory.id == memoryID then
+            return true
+        end
+    end
+    return false
+end
+
+local function countMemories(relationship)
+    local count = 0
+    local _
+    for _, _ in pairs(relationship.memories or {}) do
+        count = count + 1
+    end
+    return count
+end
+
+local function assertSaveSafe(value, path, seen)
+    local valueType = type(value)
+    local key
+    local item
+    path = path or "root"
+    if valueType == "nil"
+        or valueType == "string"
+        or valueType == "number"
+        or valueType == "boolean"
+    then
+        return
+    end
+    if valueType ~= "table" then
+        error("unsafe persisted value at " .. path .. ": " .. valueType)
+    end
+    if getmetatable(value) ~= nil then
+        error("metatable found at " .. path)
+    end
+    seen = seen or {}
+    if seen[value] then
+        error("cycle found at " .. path)
+    end
+    seen[value] = true
+    for key, item in pairs(value) do
+        if type(key) ~= "string" and type(key) ~= "number" then
+            error("unsafe key at " .. path)
+        end
+        assertSaveSafe(item, path .. "." .. tostring(key), seen)
+    end
+    seen[value] = nil
+end
+
+PNC = {}
+dofile(SHARED_ROOT .. "Base/PNC_Core.lua")
+dofile(SHARED_ROOT .. "Base/PNC_Constants.lua")
+
+dofile(SHARED_ROOT .. "Identity/PNC_Identity.lua")
+PNC.Identity.ApplyRecordIdentity =
+    function(record, definition)
+        record.identitySeed = tonumber(definition.identitySeed)
+            or record.identitySeed or 1
+        record.identity = definition.identity or record.identity or {
+            seed = record.identitySeed,
+            survivor = {},
+        }
+        record.name = definition.displayName or definition.name
+            or record.name or "Relationship Test"
+        record.archetypeID = definition.archetypeID
+            or record.archetypeID or "General"
+        record.isFemale = definition.isFemale == true
+    end
+
+dofile(SHARED_ROOT .. "Relationships/PNC_EntityRef.lua")
+dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileConstants.lua")
+dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
+dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
+dofile(SHARED_ROOT .. "Relationships/PNC_SocialTraits.lua")
+dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileMath.lua")
+dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipConstants.lua")
+dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipStates.lua")
+dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipTypes.lua")
+dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipMath.lua")
+dofile(SHARED_ROOT .. "Base/PNC_Types.lua")
+dofile(SHARED_ROOT .. "Relationships/PNC_Relationships.lua")
+dofile(SHARED_ROOT .. "Persistence/PNC_Persistence.lua")
+
+PNC.Registry = {
+    Data = {},
+    DirtyByID = {},
+    DirtyDomains = {},
 }
 
-dofile(ROOT .. "Base/PNC_Types.lua")
-dofile(ROOT .. "Relationships/PNC_Relationships.lua")
+function PNC.Registry.Get(id)
+    return PNC.Registry.Data[tostring(id)]
+end
 
-local neutralDefaults = PNC.Types.DefaultHostility("neutral")
-assertEqual(neutralDefaults.attackPlayers, false, "neutral does not initiate on players")
-assertEqual(neutralDefaults.attackNPCs, true, "neutral recognizes hostile NPCs")
-assertEqual(neutralDefaults.attackZombies, false, "neutral does not initiate on zombies")
-assertEqual(PNC.Types.NormalizeHostility("neutral", {
-    attackNPCs = false,
-}).attackNPCs, true, "legacy neutral hostility migrated")
+function PNC.Registry.MarkDirty(record, domain)
+    local id = tostring(record.id)
+    if not PNC.Registry.DirtyByID[id] then
+        record.recordRevision =
+            math.max(0, math.floor(tonumber(record.recordRevision) or 0)) + 1
+    end
+    PNC.Registry.DirtyByID[id] = true
+    PNC.Registry.DirtyDomains[id] =
+        PNC.Registry.DirtyDomains[id] or {}
+    PNC.Registry.DirtyDomains[id][domain] = true
+    return true
+end
 
-local companion = { id = "companion", faction = "colonist" }
-local neutral = {
-    id = "neutral",
+dofile(SERVER_ROOT .. "PNC_RelationshipService.lua")
+dofile(SERVER_ROOT .. "PNC_RelationshipDebug.lua")
+
+local function newRecord(id)
+    local record = PNC.Types.NewRecord({
+        id = id,
+        displayName = id,
+        faction = "neutral",
+        x = 0,
+        y = 0,
+        z = 0,
+        identity = { seed = 1, survivor = {} },
+    })
+    PNC.Registry.Data[id] = record
+    return record
+end
+
+local function memory(id, targetKey, overrides)
+    local spec = {
+        id = id,
+        type = "test_memory",
+        aboutKey = targetKey,
+        createdAt = 0,
+        lastEvaluatedAt = 0,
+        approvalEffect = 10,
+        respectEffect = 5,
+        moraleEffect = 0,
+        strength = 1,
+        decayPerDay = 0,
+        permanent = false,
+        shareable = true,
+        knowledgeSource = "experienced",
+        tags = { test = true },
+    }
+    local key
+    local value
+    for key, value in pairs(overrides or {}) do
+        spec[key] = value
+    end
+    return spec
+end
+
+-- 1. New social state defaults.
+local defaults = PNC.RelationshipTypes.NewSocialState()
+assertEqual(defaults.schemaVersion, 2, "social schema default")
+assertEqual(defaults.revision, 0, "social revision default")
+assertEqual(defaults.morale, 0, "social morale default")
+assertEqual(type(defaults.relationships), "table",
+    "social relationships default")
+
+-- 2-5. Directed keys and safe parsing.
+local alice = newRecord("npc_alice")
+local bob = newRecord("npc_bob")
+local aliceKey = PNC.EntityRef.ForNPC(alice.id)
+local bobKey = PNC.EntityRef.ForNPC(bob.id)
+local playerKey = PNC.EntityRef.ForPlayerIdentity(
+    "Patrick",
+    "char_f8d31a"
+)
+assertEqual(PNC.EntityRef.Parse(bobKey).npcID, "npc_bob",
+    "NPC key parsing")
+local parsedPlayer = PNC.EntityRef.Parse(playerKey)
+assertEqual(parsedPlayer.accountIdentity, "Patrick",
+    "player account parsing")
+assertEqual(parsedPlayer.characterUUID, "char_f8d31a",
+    "player character parsing")
+assertEqual(PNC.EntityRef.Parse("player:Patrick"), nil,
+    "malformed player key")
+assertEqual(PNC.EntityRef.Parse("npc:"), nil, "malformed NPC key")
+assertEqual(PNC.EntityRef.ForPlayerIdentity("Patrick", nil), nil,
+    "username-only identity rejected")
+
+assertEqual(PNC.Relationships.AddMemory(
+    alice.id,
+    bobKey,
+    memory("alice_likes_bob", bobKey)
+), true, "Alice memory added")
+assertEqual(PNC.Relationships.AddMemory(
+    bob.id,
+    aliceKey,
+    memory("bob_dislikes_alice", aliceKey, {
+        approvalEffect = -20,
+    })
+), true, "Bob memory added")
+assertEqual(PNC.Relationships.GetApproval(alice.id, bobKey), 10,
+    "Alice directed approval")
+assertEqual(PNC.Relationships.GetApproval(bob.id, aliceKey), -20,
+    "Bob reverse approval")
+assertEqual(PNC.Relationships.AddMemory(
+    alice.id,
+    playerKey,
+    memory("alice_knows_player_character", playerKey, {
+        approvalEffect = 4,
+        respectEffect = 2,
+    })
+), true, "player-character relationship added")
+assertEqual(PNC.Relationships.GetApproval(alice.id, playerKey), 4,
+    "player-character relationship stored")
+
+-- 6-9. Numeric clamping.
+local clampKey = PNC.EntityRef.ForNPC("npc_clamp")
+local high = PNC.RelationshipTypes.NewRelationship(clampKey)
+high.baselineApproval = 100
+high.memories = {
+    memory("high", clampKey, { approvalEffect = 100 }),
+}
+high = PNC.RelationshipMath.RecalculateRelationship(high, clampKey, 0)
+assertEqual(high.approval, 100, "approval upper clamp")
+local low = PNC.RelationshipTypes.NewRelationship(clampKey)
+low.baselineApproval = -100
+low.memories = {
+    memory("low", clampKey, { approvalEffect = -100 }),
+}
+low = PNC.RelationshipMath.RecalculateRelationship(low, clampKey, 0)
+assertEqual(low.approval, -100, "approval lower clamp")
+local respect = PNC.RelationshipTypes.NewRelationship(clampKey)
+respect.baselineRespect = -100
+respect.memories = {
+    memory("respect", clampKey, { respectEffect = -100 }),
+}
+respect = PNC.RelationshipMath.RecalculateRelationship(
+    respect,
+    clampKey,
+    0
+)
+assertEqual(respect.respect, -100, "respect clamp")
+local familiarity = PNC.RelationshipTypes.NormalizeRelationship({
+    familiarity = 1000,
+}, clampKey)
+assertEqual(familiarity.familiarity, 100, "familiarity upper clamp")
+familiarity = PNC.RelationshipTypes.NormalizeRelationship({
+    familiarity = -1000,
+}, clampKey)
+assertEqual(familiarity.familiarity, 0, "familiarity lower clamp")
+
+-- 10-11. Deterministic temporary decay and permanent memory.
+local temporary = memory("temporary", clampKey, {
+    strength = 1,
+    decayPerDay = 0.25,
+})
+assertNear(PNC.RelationshipMath.CalculateMemoryStrengthAtTime(
+    temporary,
+    48
+), 0.5, 0.000001, "temporary decay")
+local permanent = memory("permanent", clampKey, {
+    strength = 0.8,
+    decayPerDay = 1,
+    permanent = true,
+})
+assertNear(PNC.RelationshipMath.CalculateMemoryStrengthAtTime(
+    permanent,
+    2400
+), 0.8, 0.000001, "permanent memory")
+
+-- 12. Duplicate IDs are rejected.
+assertEqual(PNC.Relationships.AddMemory(
+    alice.id,
+    bobKey,
+    memory("alice_likes_bob", bobKey)
+), false, "duplicate memory ID")
+assertEqual(PNC.Relationships.AddMemory(
+    {},
+    bobKey,
+    memory("bad_observer", bobKey)
+), false, "live/table observer rejected")
+assertEqual(PNC.Relationships.AddMemory(
+    alice.id,
+    "player:username-only",
+    memory("bad_target", bobKey)
+), false, "malformed service target rejected")
+assertEqual(PNC.Relationships.AddMemory(
+    alice.id,
+    bobKey,
+    { type = "missing_id", aboutKey = bobKey }
+), false, "invalid memory rejected")
+
+-- 13-14. Limit preserves permanent entries and removes weakest temporary.
+local limited = PNC.RelationshipTypes.NewRelationship(clampKey)
+limited.memories[1] = memory("permanent_keep", clampKey, {
+    permanent = true,
+    strength = 0.1,
+})
+for index = 1, 20 do
+    limited.memories[#limited.memories + 1] = memory(
+        string.format("temporary_%02d", index),
+        clampKey,
+        { strength = index / 20 }
+    )
+end
+limited = PNC.RelationshipMath.PruneMemories(
+    limited,
+    clampKey,
+    0,
+    20
+)
+assertEqual(countMemories(limited), 20, "memory limit")
+assertEqual(containsMemory(limited, "permanent_keep"), true,
+    "permanent preserved")
+assertEqual(containsMemory(limited, "temporary_01"), false,
+    "weakest temporary removed")
+
+-- 15-18. Entry thresholds and hysteresis.
+local stateRel = PNC.RelationshipTypes.NewRelationship(clampKey)
+stateRel.familiarity = 5
+stateRel.baselineApproval = 35
+stateRel.baselineRespect = 15
+stateRel = PNC.RelationshipMath.RecalculateRelationship(
+    stateRel,
+    clampKey,
+    0
+)
+assertEqual(stateRel.state, "friend", "friend entry")
+stateRel.baselineApproval = 25
+stateRel.baselineRespect = 5
+stateRel = PNC.RelationshipMath.RecalculateRelationship(
+    stateRel,
+    clampKey,
+    0
+)
+assertEqual(stateRel.state, "friend", "friend hysteresis")
+
+stateRel = PNC.RelationshipTypes.NewRelationship(clampKey)
+stateRel.familiarity = 5
+stateRel.baselineApproval = -25
+stateRel.baselineRespect = 25
+stateRel = PNC.RelationshipMath.RecalculateRelationship(
+    stateRel,
+    clampKey,
+    0
+)
+assertEqual(stateRel.state, "rival", "rival entry")
+stateRel.baselineApproval = -15
+stateRel.baselineRespect = 15
+stateRel = PNC.RelationshipMath.RecalculateRelationship(
+    stateRel,
+    clampKey,
+    0
+)
+assertEqual(stateRel.state, "rival", "rival hysteresis")
+stateRel.baselineApproval = -14
+stateRel = PNC.RelationshipMath.RecalculateRelationship(
+    stateRel,
+    clampKey,
+    0
+)
+assertEqual(stateRel.state ~= "rival", true, "rival exit")
+
+stateRel = PNC.RelationshipTypes.NewRelationship(clampKey)
+stateRel.familiarity = 5
+stateRel.baselineApproval = -60
+stateRel.baselineRespect = 0
+stateRel = PNC.RelationshipMath.RecalculateRelationship(
+    stateRel,
+    clampKey,
+    0
+)
+assertEqual(stateRel.state, "enemy", "enemy entry")
+stateRel.baselineApproval = -45
+stateRel.baselineRespect = 50
+stateRel = PNC.RelationshipMath.RecalculateRelationship(
+    stateRel,
+    clampKey,
+    0
+)
+assertEqual(stateRel.state, "enemy", "enemy hysteresis")
+stateRel.baselineApproval = -44
+stateRel = PNC.RelationshipMath.RecalculateRelationship(
+    stateRel,
+    clampKey,
+    0
+)
+assertEqual(stateRel.state ~= "enemy", true, "enemy exit")
+
+-- 19. Recalculation never touches the reverse direction.
+local reverseBefore = PNC.Relationships.Get(bob.id, aliceKey)
+PNC.Relationships.Recalculate(alice.id, bobKey, 24)
+local reverseAfter = PNC.Relationships.Get(bob.id, aliceKey)
+assertEqual(PNC.RelationshipTypes.AreEqual(
+    reverseBefore,
+    reverseAfter
+), true, "reverse relationship remains independent")
+
+-- 20-22. No-op revisions, mutation revisions, and presence isolation.
+local revisionRecord = newRecord("npc_revisions")
+local revisionTarget = PNC.EntityRef.ForNPC("npc_revision_target")
+PNC.Registry.DirtyByID[revisionRecord.id] = nil
+local presenceBefore = revisionRecord.presenceRevision
+assertEqual(PNC.Relationships.AddMemory(
+    revisionRecord.id,
+    revisionTarget,
+    memory("revision_memory", revisionTarget)
+), true, "revision mutation")
+local revisionRelationship =
+    revisionRecord.social.relationships[revisionTarget]
+assertEqual(revisionRelationship.revision, 1,
+    "relationship revision increment")
+assertEqual(revisionRecord.social.revision, 1,
+    "social revision increment")
+assertEqual(revisionRecord.recordRevision, 1,
+    "record revision increment")
+assertEqual(revisionRecord.presenceRevision, presenceBefore,
+    "presence revision unchanged")
+local relationRevisionBefore = revisionRelationship.revision
+local socialRevisionBefore = revisionRecord.social.revision
+local recordRevisionBefore = revisionRecord.recordRevision
+assertEqual(PNC.Relationships.Recalculate(
+    revisionRecord.id,
+    revisionTarget,
+    0
+), false, "no-op recalculation")
+assertEqual(revisionRelationship.revision, relationRevisionBefore,
+    "no-op relationship revision")
+assertEqual(revisionRecord.social.revision, socialRevisionBefore,
+    "no-op social revision")
+assertEqual(revisionRecord.recordRevision, recordRevisionBefore,
+    "no-op record revision")
+
+-- 23. Normalization is idempotent and repairs non-finite values.
+local malformed = {
+    schemaVersion = 999,
+    revision = -4,
+    morale = 0 / 0,
+    moraleBaseline = math.huge,
+    relationships = {
+        [clampKey] = {
+            approval = math.huge,
+            respect = -math.huge,
+            familiarity = -5,
+            state = "future_state",
+            memories = {
+                { id = nil, type = "invalid", aboutKey = clampKey },
+                memory("valid", clampKey),
+            },
+        },
+        ["not-a-key"] = {},
+    },
+}
+local normalizedOnce =
+    PNC.RelationshipTypes.NormalizeSocialState(malformed)
+local normalizedTwice =
+    PNC.RelationshipTypes.NormalizeSocialState(normalizedOnce)
+assertEqual(PNC.RelationshipTypes.AreEqual(
+    normalizedOnce,
+    normalizedTwice
+), true, "normalization idempotence")
+assertEqual(normalizedOnce.morale, 0, "NaN repaired")
+assertEqual(normalizedOnce.moraleBaseline, 0, "infinity repaired")
+assertEqual(countMemories(
+    normalizedOnce.relationships[clampKey]
+), 1, "invalid memory discarded")
+
+-- 24-25. Older records migrate deterministically to V12 and can run again.
+assertEqual(PNC.Const.PERSISTENCE_VERSION, 12,
+    "persistence schema advanced to V12")
+local oldRaw = {
+    schemaVersion = 10,
+    recordRevision = 7,
+    id = "npc_migration",
     faction = "neutral",
-    hostility = neutralDefaults,
-    alive = true,
-    x = 2,
-    y = 3,
-    z = 0,
-    runtime = {},
-    ownerUsername = "stale-owner",
-    ownerOnlineID = 42,
+    persist = true,
+    position = { x = 1, y = 2, z = 0 },
+    spawn = { x = 1, y = 2, z = 0 },
+    anchor = { x = 1, y = 2, z = 0 },
+    identity = {
+        seed = 9,
+        displayName = "Migration Test",
+        survivor = {},
+    },
 }
-local hostile = {
-    id = "hostile",
-    faction = "hostile",
-    hostility = PNC.Types.DefaultHostility("hostile"),
-}
-assertEqual(PNC.Relationships.AreNPCsEnemies(hostile, companion), true,
-    "hostile attacks companion")
-assertEqual(PNC.Relationships.AreNPCsEnemies(hostile, neutral), true,
-    "hostile attacks neutral")
-assertEqual(PNC.Relationships.AreNPCsEnemies(companion, hostile), true,
-    "companion attacks hostile")
-assertEqual(PNC.Relationships.AreNPCsEnemies(neutral, hostile), true,
-    "neutral attacks hostile")
-assertEqual(PNC.Relationships.AreNPCsEnemies(companion, neutral), false,
-    "companion and neutral remain peaceful")
-assertEqual(PNC.Relationships.AreNPCsEnemies(hostile, {
-    id = "hostile_two",
-    faction = "hostile",
-}), false, "hostiles do not attack each other")
+local migrated = PNC.Persistence.DeserializeRecord(
+    oldRaw,
+    oldRaw.id
+)
+assertEqual(migrated.social.schemaVersion, 2,
+    "migration adds social data")
+assertEqual(next(migrated.social.relationships), nil,
+    "migration keeps relationships sparse")
+local migratedPayload = PNC.Persistence.SerializeRecord(migrated)
+assertEqual(migratedPayload.schemaVersion, 12,
+    "migration writes V12")
+local migratedAgain = PNC.Persistence.DeserializeRecord(
+    migratedPayload,
+    migrated.id
+)
+assertEqual(PNC.RelationshipTypes.AreEqual(
+    migrated.social,
+    migratedAgain.social
+), true, "migration rerun is safe")
 
-local changed, reason = PNC.Relationships.ProvokeNeutralByPlayer(neutral)
-assertEqual(changed, true, "player provocation transitions neutral")
-assertEqual(reason, "changed", "player provocation result")
-assertEqual(neutral.faction, "hostile", "provoked neutral becomes hostile")
-assertEqual(neutral.hostility.attackPlayers, true, "provoked neutral targets players")
-assertEqual(neutral.hostility.attackNPCs, true, "provoked neutral targets companions")
-assertEqual(neutral.hostility.attackZombies, true, "provoked neutral uses hostile defaults")
-assertEqual(neutral.ownerUsername, nil, "provoked neutral owner cleared")
-assertEqual(neutral.ownerOnlineID, nil, "provoked neutral owner id cleared")
-assertEqual(neutral.nextThinkAt, now, "provoked neutral reassesses immediately")
-assertEqual(assignedOrder.kind, "hostile_hunt", "provoked neutral hostile order")
-assertEqual(dirty.faction, true, "faction persistence dirtied")
-assertEqual(dirty.hostility, true, "hostility persistence dirtied")
+-- 26. Serialized payload is primitive/table-only and has no metatables.
+assertSaveSafe(migratedPayload)
+
+-- Read-only diagnostics and existing faction behavior remain intact.
+local debugText = PNC.RelationshipDebug.Inspect(
+    alice.id,
+    bobKey,
+    24
+)
+assertContains(debugText, "Relationship Debug", "debug heading")
+assertContains(debugText, "test_memory", "debug memory")
+local neutralDefaults = PNC.Types.DefaultHostility("neutral")
+assertEqual(neutralDefaults.attackPlayers, false,
+    "neutral faction behavior unchanged")
+assertEqual(PNC.Relationships.AreNPCsEnemies(
+    { id = "one", faction = "neutral", hostility = neutralDefaults },
+    { id = "two", faction = "hostile" }
+), true, "existing faction enemy API")
 
 print("pnc_relationship_foundation_smoke: ok")

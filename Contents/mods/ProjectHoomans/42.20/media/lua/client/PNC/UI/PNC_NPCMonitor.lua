@@ -102,6 +102,16 @@ function ISPNCNPCMonitor:onRefresh()
     self:requestRoster(false)
 end
 
+function ISPNCNPCMonitor:onRelationships()
+    local item = self:getSelectedDiagnostic()
+    if item and item.deathMarker ~= true
+        and PNC.RelationshipDebugUI
+        and PNC.RelationshipDebugUI.Open
+    then
+        PNC.RelationshipDebugUI.Open(item.id)
+    end
+end
+
 function ISPNCNPCMonitor:onOverlay()
     if PNC.Nameplates and PNC.Nameplates.ToggleDebug then PNC.Nameplates.ToggleDebug() end
 end

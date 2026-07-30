@@ -39,6 +39,7 @@ local Treatment = PNC.Treatment
 local CompanionCommands = PNC.CompanionCommands
 local MapCommandService = PNC.MapCommandService
 local ConversationScene = PNC.ConversationScene
+local PlayerCharacterLifecycle = PNC.PlayerCharacterLifecycle
 local buildDebugRoster
 local lastLivePositionSafetyRefreshAt = 0
 
@@ -225,6 +226,11 @@ function Server.OnTick()
         Presence.BeginServerTick(now)
     end
     Registry.EnsureLoaded()
+    if PlayerCharacterLifecycle
+        and PlayerCharacterLifecycle.Pump
+    then
+        PlayerCharacterLifecycle.Pump(now, false)
+    end
     if PNC.EnginePathPlanner
         and PNC.EnginePathPlanner.PumpServerFrame
     then
@@ -266,6 +272,19 @@ function Server.OnTick()
     end
     if ZombieAggro and ZombieAggro.Pump then
         ZombieAggro.Pump(now)
+    end
+    if PNC.SocialEncounterTracker
+        and PNC.SocialEncounterTracker.Pump
+        and PNC.SocialEventHooks
+    then
+        if PNC.SocialEventHooks.PruneThreatAttributions then
+            PNC.SocialEventHooks.PruneThreatAttributions(
+                PNC.SocialEventHooks.WorldAgeHours()
+            )
+        end
+        PNC.SocialEncounterTracker.Pump(
+            PNC.SocialEventHooks.WorldAgeHours()
+        )
     end
     if Performance then
         Performance.Finish("server.tick", startedAt)
@@ -492,6 +511,32 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_RELATIONSHIP_DEBUG_REQUEST then
+        local snapshot
+        local reason
+        if not canUseDebug(player) then
+            Network.SendRelationshipDebug(
+                player,
+                nil,
+                false,
+                "not_authorized"
+            )
+            return
+        end
+        snapshot, reason =
+            PNC.RelationshipDebug.BuildSnapshotForRequest(
+                player,
+                args or {}
+            )
+        Network.SendRelationshipDebug(
+            player,
+            snapshot,
+            true,
+            reason
+        )
+        return
+    end
+
     if command ~= Const.CMD_DEBUG then
         return
     end
@@ -508,6 +553,23 @@ local function onClientCommand(module, command, player, args)
 
     if args and args.action == "teleport_to_npc" then
         teleportPlayerToRecord(player, args.id)
+        return
+    end
+
+    if args and args.action == "social_trigger_event" then
+        local snapshot
+        local reason
+        snapshot, reason =
+            PNC.RelationshipDebug.TriggerSocialEvent(
+                player,
+                args
+            )
+        Network.SendRelationshipDebug(
+            player,
+            snapshot,
+            true,
+            reason
+        )
         return
     end
 
@@ -643,6 +705,11 @@ end
 
 local function onServerStarted()
     Registry.Load()
+    if PlayerCharacterLifecycle
+        and PlayerCharacterLifecycle.OnServerStarted
+    then
+        PlayerCharacterLifecycle.OnServerStarted(Core.Now())
+    end
     if BodyLifecycle and BodyLifecycle.RunStartupBodyCleanupNow then
         BodyLifecycle.RunStartupBodyCleanupNow(
             Core.Now(),
