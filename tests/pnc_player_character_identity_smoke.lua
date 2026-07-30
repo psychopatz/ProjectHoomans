@@ -134,6 +134,10 @@ dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_SocialTraits.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileMath.lua")
+dofile(SHARED_ROOT .. "Conduct/PNC_ConductConstants.lua")
+dofile(SHARED_ROOT .. "Conduct/PNC_ConductTypes.lua")
+dofile(SHARED_ROOT .. "Conduct/PNC_ConductMath.lua")
+dofile(SHARED_ROOT .. "Conduct/PNC_ConductDefinitions.lua")
 dofile(SHARED_ROOT
     .. "Identity/PNC_PlayerCharacterTypes.lua")
 dofile(SHARED_ROOT
@@ -176,6 +180,8 @@ end
 
 dofile(SERVER_ROOT .. "PNC_PlayerCharacterDebug.lua")
 dofile(SERVER_ROOT .. "PNC_PlayerCharacterService.lua")
+PNC.PlayerCharacters.Load()
+dofile(SERVER_ROOT .. "PNC_ConductService.lua")
 dofile(SERVER_ROOT .. "PNC_RelationshipService.lua")
 dofile(SERVER_ROOT .. "PNC_SocialEventDebug.lua")
 dofile(SERVER_ROOT .. "PNC_SocialEventService.lua")
@@ -188,7 +194,7 @@ local IdentityConstants = PNC.PlayerCharacterConstants
 
 -- 1. New registry defaults.
 local defaults = IdentityTypes.NewRegistry()
-assertEqual(defaults.schemaVersion, 2, "registry schema")
+assertEqual(defaults.schemaVersion, 3, "registry schema")
 assertEqual(defaults.revision, 0, "registry revision")
 assertEqual(type(defaults.byUUID), "table", "registry UUID map")
 assertEqual(type(defaults.byAccount), "table", "registry account map")
@@ -203,6 +209,10 @@ assertEqual(defaultRecord.status, "active", "character status")
 assertEqual(defaultRecord.firstSeenAt, 5, "first seen default")
 assertEqual(defaultRecord.diedAt, 0, "active diedAt")
 assertEqual(defaultRecord.revision, 0, "character revision")
+assertEqual(defaultRecord.conduct.scores.reliability, 0,
+    "new character conduct neutral")
+assertEqual(#defaultRecord.conduct.evidence, 0,
+    "new character has no conduct evidence")
 
 Service.Load()
 local originalGenerator = Service.UUIDGenerator
@@ -283,6 +293,37 @@ assertEqual(Service.EnsureIdentity(reconnect, {
 }), aliceUUID, "reconnect UUID")
 
 -- 9-10. Death is correct and repeat notifications are idempotent.
+local historicalAliceKey = PNC.EntityRef.ForPlayerIdentity(
+    "Alice",
+    aliceUUID
+)
+assertTrue(PNC.Conduct.AddEvidence(
+    historicalAliceKey,
+    {
+        id = "conduct:social:identity:historical:"
+            .. historicalAliceKey,
+        eventID = "social:identity:historical",
+        eventType = "saved_from_incapacitation",
+        actorKey = historicalAliceKey,
+        subjectKey = "npc:npc_identity_history_subject",
+        createdAt = 102,
+        effects = {
+            compassion = 8,
+            courage = 5,
+        },
+        strength = 1,
+        decayPerDay = 0,
+        permanent = true,
+        visibility = "direct",
+        shareable = true,
+        tags = { identity_test = true },
+    }
+), "historical survivor conduct")
+local historicalConduct =
+    PNC.Conduct.GetForPlayerCharacter(aliceUUID)
+assertEqual(historicalConduct.scores.compassion, 8,
+    "historical conduct score")
+
 local beforeDeath = Service.GetRegistrySnapshot().revision
 assertTrue(Service.MarkDead(reconnect, 103, "test_death"),
     "death marked")
@@ -311,6 +352,18 @@ assertTrue(snapshot.byAccount.Alice[aliceUUID],
     "historical UUID indexed")
 assertTrue(snapshot.byAccount.Alice[newAliceUUID],
     "new UUID indexed")
+local newSurvivorConduct =
+    PNC.Conduct.GetForPlayerCharacter(newAliceUUID)
+local retainedHistoricalConduct =
+    PNC.Conduct.GetForPlayerCharacter(aliceUUID)
+assertEqual(newSurvivorConduct.scores.compassion, 0,
+    "new survivor does not inherit conduct")
+assertEqual(#newSurvivorConduct.evidence, 0,
+    "new survivor has no inherited evidence")
+assertEqual(retainedHistoricalConduct.scores.compassion, 8,
+    "dead survivor conduct retained")
+assertEqual(#retainedHistoricalConduct.evidence, 1,
+    "dead survivor evidence retained")
 
 -- 14-15. Another account cannot claim Alice's active UUID.
 local malloryData = {
@@ -525,7 +578,7 @@ assertEqual(normalizedOnce.byUUID.char_missing_account, nil,
 
 -- 32-33. An old save gets an empty registry; repeating migration is safe.
 local migrated = IdentityTypes.NormalizeRegistry({})
-assertEqual(migrated.schemaVersion, 2, "old save migration")
+assertEqual(migrated.schemaVersion, 3, "old save migration")
 assertTrue(simpleEqual(
     migrated,
     IdentityTypes.NormalizeRegistry(migrated)

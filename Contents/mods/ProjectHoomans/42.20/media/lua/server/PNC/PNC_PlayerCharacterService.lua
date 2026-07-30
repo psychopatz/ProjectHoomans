@@ -358,6 +358,31 @@ function PlayerCharacters.ApplyResolvedSocialProfile(
     return true, "updated", copy(normalized)
 end
 
+-- Internal conduct commit boundary. The conduct service performs evidence
+-- validation and revision calculation; this method owns character/registry
+-- revision updates.
+function PlayerCharacters.ApplyConductRecord(characterUUID, value)
+    local record
+    local normalized
+    PlayerCharacters.EnsureLoaded()
+    characterUUID = Types.NormalizeUUID(characterUUID)
+    record = characterUUID
+        and PlayerCharacters.Registry.byUUID[characterUUID] or nil
+    if not record then
+        return false, "character_not_found"
+    end
+    if not PNC.ConductTypes then
+        return false, "conduct_types_unavailable"
+    end
+    normalized = PNC.ConductTypes.NormalizeConductRecord(value)
+    if PNC.ConductTypes.AreEqual(record.conduct, normalized) then
+        return false, "unchanged", copy(normalized)
+    end
+    record.conduct = normalized
+    markRecordChanged(record)
+    return true, "updated", copy(normalized)
+end
+
 function PlayerCharacters.IsCharacterActive(characterUUID)
     local record = PlayerCharacters.GetRegistryRecord(characterUUID)
     return record ~= nil

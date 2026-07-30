@@ -21,7 +21,7 @@ The server owns the separate Global ModData table `PNC_PlayerCharacters`:
 
 ```lua
 {
-    schemaVersion = 2,
+    schemaVersion = 3,
     revision = 0,
     byUUID = {
         ["char_..."] = {
@@ -144,6 +144,10 @@ UUID-owned `socialProfile`. Existing historical records receive neutral
 profiles without guessed traits. Active loaded survivors resolve against
 their authoritative Build 42 traits when their player object becomes
 available. See `SocialProfiles.md`.
+
+Phase 4 advances the registry to V3 and adds UUID-owned behavioral conduct.
+Existing active, dead, and retired identities receive neutral conduct without
+reconstructing history from NPC opinions.
 
 ## Public Server API
 

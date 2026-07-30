@@ -168,6 +168,45 @@ local function personalitySnapshot(record)
     }
 end
 
+local function actionSnapshot(value)
+    if type(value) ~= "table" then return nil end
+    local details = {}
+    local conductDetails = {}
+    for _, item in ipairs(value.details or {}) do
+        details[#details + 1] = {
+            observerNPCID = item.observerNPCID,
+            aboutKey = item.aboutKey,
+            memoryID = item.memoryID,
+            saturationBefore = copy(item.saturationBefore),
+            saturationAfter = copy(item.saturationAfter),
+            modifierBreakdown = copy(item.modifierBreakdown),
+            baseEffects = copy(item.baseEffects),
+            modifiedEffects = copy(item.modifiedEffects),
+        }
+    end
+    for _, item in ipairs(value.conductDetails or {}) do
+        conductDetails[#conductDetails + 1] = {
+            entityKey = item.entityKey,
+            evidenceID = item.evidenceID,
+            evidence = copy(item.evidence),
+            conductRevision = item.conduct
+                and item.conduct.revision or nil,
+        }
+    end
+    return {
+        ok = value.ok == true,
+        reason = value.reason,
+        eventID = value.eventID,
+        eventType = value.eventType,
+        memoriesCreated = value.memoriesCreated or 0,
+        relationshipsChanged = value.relationshipsChanged or 0,
+        conductEvidenceCreated =
+            value.conductEvidenceCreated or 0,
+        details = details,
+        conductDetails = conductDetails,
+    }
+end
+
 function Debug.BuildSnapshot(
     observerNPCID,
     targetKey,
@@ -221,6 +260,7 @@ function Debug.BuildSnapshot(
         reverseExists = reverse ~= nil
         reverse = reverse or Types.NewRelationship(reverseKey)
     end
+    local observerKey = EntityRef.ForNPC(observer.id)
     return {
         generatedAt = at,
         observer = {
@@ -238,6 +278,14 @@ function Debug.BuildSnapshot(
             personality = personalitySnapshot(observer),
         },
         target = copy(target),
+        observerConduct = PNC.ConductDebug
+            and PNC.ConductDebug.BuildSnapshot(observerKey, at)
+            or nil,
+        targetConduct = target
+            and target.key
+            and PNC.ConductDebug
+            and PNC.ConductDebug.BuildSnapshot(target.key, at)
+            or nil,
         relationship = summarizeRelationship(
             relationship,
             exists
@@ -249,7 +297,7 @@ function Debug.BuildSnapshot(
             reverse,
             reverseExists
         ) or nil,
-        actionResult = copy(actionResult),
+        actionResult = actionSnapshot(actionResult),
     }
 end
 

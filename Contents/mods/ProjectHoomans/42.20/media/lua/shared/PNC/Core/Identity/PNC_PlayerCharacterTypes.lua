@@ -7,6 +7,7 @@ PNC.PlayerCharacterTypes = PNC.PlayerCharacterTypes or {}
 local Types = PNC.PlayerCharacterTypes
 local Constants = PNC.PlayerCharacterConstants
 local ProfileTypes = PNC.SocialProfileTypes
+local ConductTypes = PNC.ConductTypes
 
 local function finite(value, fallback)
     value = tonumber(value)
@@ -118,6 +119,9 @@ function Types.NewCharacterRecord(spec)
             and ProfileTypes.NormalizePlayerSocialProfile(
                 spec.socialProfile
             ) or nil,
+        conduct = ConductTypes
+            and ConductTypes.NormalizeConductRecord(spec.conduct)
+            or nil,
         revision = revision(spec.revision),
     }
 end
@@ -150,6 +154,7 @@ function Types.NormalizeCharacterRecord(value, registryUUID)
         lastKnownY = value.lastKnownY,
         lastKnownZ = value.lastKnownZ,
         socialProfile = value.socialProfile,
+        conduct = value.conduct,
         revision = value.revision,
     }
     return Types.NewCharacterRecord(spec)

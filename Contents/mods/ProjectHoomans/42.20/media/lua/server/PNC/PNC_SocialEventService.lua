@@ -16,6 +16,8 @@ local Relationships = PNC.Relationships
 local Definitions = PNC.SocialEventDefinitions
 local ProfileTypes = PNC.SocialProfileTypes
 local ProfileMath = PNC.SocialProfileMath
+local Conduct = PNC.Conduct
+local ConductDefinitions = PNC.ConductDefinitions
 
 local function result(ok, reason, fields)
     local output = fields or {}
@@ -401,6 +403,10 @@ function SocialEvents.Process(eventSpec)
     local applied
     local mutationResult
     local details = {}
+    local conductPrepared
+    local conductDetails
+    local conductDefinition
+    local conductApplied
     if not isAuthority() then
         return result(false, "not_authority")
     end
@@ -443,6 +449,30 @@ function SocialEvents.Process(eventSpec)
             relationshipsChanged = 0,
         })
     end
+    conductDefinition = ConductDefinitions
+        and ConductDefinitions[event.type] or nil
+    if not conductDefinition or not Conduct
+        or not Conduct.PrepareSocialEvent
+    then
+        return result(false, "conduct_definition_unavailable", {
+            eventID = event.id,
+            memoriesCreated = 0,
+            relationshipsChanged = 0,
+            conductEvidenceCreated = 0,
+        })
+    end
+    conductPrepared, reason = Conduct.PrepareSocialEvent(
+        event,
+        conductDefinition
+    )
+    if not conductPrepared then
+        return result(false, reason, {
+            eventID = event.id,
+            memoriesCreated = 0,
+            relationshipsChanged = 0,
+            conductEvidenceCreated = 0,
+        })
+    end
     for index = 1, #work do
         prepared = work[index]
         applied, reason, mutationResult =
@@ -472,6 +502,17 @@ function SocialEvents.Process(eventSpec)
             modifiedEffects = prepared.modifiedEffects,
         }
     end
+    conductApplied, reason, conductDetails =
+        Conduct.CommitPrepared(conductPrepared)
+    if not conductApplied then
+        return result(false, reason, {
+            eventID = event.id,
+            memoriesCreated = #details,
+            relationshipsChanged = #details,
+            conductEvidenceCreated = 0,
+            transactionInvariantFailed = true,
+        })
+    end
     local output = result(true, nil, {
         eventID = event.id,
         eventType = event.type,
@@ -480,6 +521,8 @@ function SocialEvents.Process(eventSpec)
         memoriesCreated = #details,
         relationshipsChanged = #details,
         details = details,
+        conductEvidenceCreated = #(conductDetails or {}),
+        conductDetails = conductDetails or {},
     })
     if PNC.SocialEventDebug and PNC.SocialEventDebug.LogProcessed then
         PNC.SocialEventDebug.LogProcessed(output, definition)

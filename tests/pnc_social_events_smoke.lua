@@ -32,6 +32,16 @@ local function memoryCount(relationship, memoryType)
     return count
 end
 
+local function evidenceCount(conduct, eventType)
+    local count = 0
+    for _, evidence in ipairs(conduct and conduct.evidence or {}) do
+        if not eventType or evidence.eventType == eventType then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 local function assertSaveSafe(value, seen)
     local valueType = type(value)
     local key
@@ -80,6 +90,10 @@ dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_SocialTraits.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileMath.lua")
+dofile(SHARED_ROOT .. "Conduct/PNC_ConductConstants.lua")
+dofile(SHARED_ROOT .. "Conduct/PNC_ConductTypes.lua")
+dofile(SHARED_ROOT .. "Conduct/PNC_ConductMath.lua")
+dofile(SHARED_ROOT .. "Conduct/PNC_ConductDefinitions.lua")
 dofile(SHARED_ROOT
     .. "Identity/PNC_PlayerCharacterTypes.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipConstants.lua")
@@ -141,8 +155,10 @@ end
 dofile(SERVER_ROOT .. "PNC_PlayerCharacterDebug.lua")
 dofile(SERVER_ROOT .. "PNC_PlayerCharacterService.lua")
 PNC.PlayerCharacters.Load()
+dofile(SERVER_ROOT .. "PNC_ConductService.lua")
 dofile(SERVER_ROOT .. "PNC_RelationshipService.lua")
 dofile(SERVER_ROOT .. "PNC_RelationshipDebug.lua")
+dofile(SERVER_ROOT .. "PNC_ConductDebug.lua")
 dofile(SERVER_ROOT .. "PNC_SocialEventDebug.lua")
 dofile(SERVER_ROOT .. "PNC_SocialProfileDebug.lua")
 dofile(SERVER_ROOT .. "PNC_SocialProfileService.lua")
@@ -276,6 +292,13 @@ assertEqual(memoryCount(bobToPlayer, "treated_wound"), 1,
 assertEqual(bobToPlayer.approval, 4, "treatment approval")
 assertEqual(bobToPlayer.familiarity, 2, "treatment familiarity")
 assertEqual(bob.social.morale, 2, "treatment morale")
+local playerConduct = PNC.Conduct.GetForEntity(playerKey)
+assertEqual(playerConduct.scores.compassion, 2,
+    "treatment actor compassion conduct")
+assertEqual(playerConduct.scores.generosity, 1,
+    "treatment actor generosity conduct")
+assertEqual(evidenceCount(playerConduct, "treated_wound"), 1,
+    "treatment actor evidence")
 assertEqual(PNC.SocialEvents.Emit(treated).reason, "duplicate_event",
     "duplicate event rejected")
 assertEqual(memoryCount(PNC.Relationships.Get(bob.id, playerKey)), 1,
@@ -289,6 +312,10 @@ local cooldown = PNC.SocialEvents.Emit(event(
 ))
 assertEqual(cooldown.reason, "cooldown_active",
     "treatment cooldown blocks farming")
+assertEqual(evidenceCount(
+    PNC.Conduct.GetForEntity(playerKey),
+    "treated_wound"
+), 1, "cooldown creates no conduct")
 local afterCooldown = PNC.SocialEvents.Emit(event(
     "social:treated_wound:3",
     "treated_wound",
@@ -321,6 +348,10 @@ assertEqual(PNC.SocialEvents.Emit(event(
     bobKey,
     97
 )).reason, "contribution_saturated", "saturation rejection")
+assertEqual(evidenceCount(
+    PNC.Conduct.GetForEntity(playerKey),
+    "treated_wound"
+), 8, "saturation creates no conduct")
 
 -- 11-12. One rescue per episode and no nearest-player guessing.
 local rescue = event(
@@ -331,6 +362,10 @@ local rescue = event(
     70
 )
 assertTrue(PNC.SocialEvents.Emit(rescue).ok, "rescue accepted")
+assertEqual(evidenceCount(
+    PNC.Conduct.GetForEntity(playerKey),
+    "saved_from_incapacitation"
+), 1, "rescue actor evidence")
 assertEqual(PNC.SocialEvents.Emit(rescue).reason, "duplicate_event",
     "rescue episode idempotent")
 carol.health.state = "normal"
@@ -407,6 +442,10 @@ assertEqual(memoryCount(
     PNC.Relationships.Get(bob.id, aliceKey),
     "protected_from_attacker"
 ), 1, "several kills aggregate to one protection memory")
+assertEqual(evidenceCount(
+    PNC.Conduct.GetForEntity(aliceKey),
+    "protected_from_attacker"
+), 1, "protection aggregated conduct evidence")
 PNC.SocialEncounterTracker.Reset()
 PNC.SocialEncounterTracker.RecordActivity({
     actorKey = aliceKey,
@@ -454,6 +493,14 @@ assertEqual(memoryCount(
     PNC.Relationships.Get(carol.id, aliceKey),
     "survived_combat_together"
 ), 1, "Carol reciprocal shared memory")
+assertEqual(evidenceCount(
+    PNC.Conduct.GetForEntity(aliceKey),
+    "survived_combat_together"
+), 1, "Alice participant conduct")
+assertEqual(evidenceCount(
+    PNC.Conduct.GetForEntity(carolKey),
+    "survived_combat_together"
+), 1, "Carol participant conduct")
 
 PNC.SocialEncounterTracker.Reset()
 local sharedPlayer = PNC.SocialEncounterTracker.RecordActivity({
@@ -468,6 +515,10 @@ assertEqual(memoryCount(
     PNC.Relationships.Get(alice.id, playerKey),
     "survived_combat_together"
 ), 1, "player NPC shared combat has NPC-owned memory")
+assertEqual(evidenceCount(
+    PNC.Conduct.GetForEntity(playerKey),
+    "survived_combat_together"
+), 1, "player shared-combat conduct")
 
 PNC.SocialEncounterTracker.Reset()
 local trivial = PNC.SocialEncounterTracker.RecordActivity({
@@ -517,6 +568,10 @@ assertEqual(memoryCount(
     PNC.Relationships.Get(bob.id, aliceKey),
     "abandoned_in_combat"
 ), negativeBefore, "return during grace cancels abandonment")
+assertEqual(evidenceCount(
+    PNC.Conduct.GetForEntity(aliceKey),
+    "abandoned_in_combat"
+), 0, "canceled abandonment creates no conduct")
 assertTrue(PNC.SocialEncounterTracker.MarkPotentialAbandonment(
     abandonEncounter,
     aliceKey,
@@ -537,6 +592,10 @@ assertEqual(memoryCount(
 ), negativeBefore + 1, "confirmed abandonment creates one memory")
 assertTrue(afterAbandon.familiarity > beforeAbandon.familiarity,
     "negative experience raises familiarity")
+assertEqual(evidenceCount(
+    PNC.Conduct.GetForEntity(aliceKey),
+    "abandoned_in_combat"
+), 1, "confirmed abandonment actor conduct")
 
 -- Ending danger prevents confirmation.
 PNC.SocialEncounterTracker.Reset()
@@ -617,6 +676,54 @@ assertEqual(PNC.SocialEvents.Emit(event(
 assertEqual(revisionTarget.recordRevision, recordRevision,
     "disabled feature has no mutation")
 PNC.Config.Relationships.EnableSocialEvents = true
+
+-- Conduct reads are copies, and a conduct-only mutation updates only the
+-- owning conduct/social/record revisions.
+local conductCopy = PNC.Conduct.GetForEntity(aliceKey)
+conductCopy.scores.reliability = 99
+assertTrue(PNC.Conduct.GetScore(aliceKey, "reliability") ~= 99,
+    "conduct read returns copy")
+local conductOnlyRelationship =
+    PNC.Relationships.Get(alice.id, bobKey)
+local conductOnlyRelationshipRevision =
+    conductOnlyRelationship and conductOnlyRelationship.revision
+local conductOnlySocialRevision = alice.social.revision
+local conductOnlyRecordRevision = alice.recordRevision
+local conductOnlyPresenceRevision = alice.presenceRevision
+clearDirty()
+local conductOnlySpec = {
+    id = "conduct:social:conduct_only:" .. aliceKey,
+    eventID = "social:conduct_only",
+    eventType = "test",
+    actorKey = aliceKey,
+    subjectKey = bobKey,
+    createdAt = 150,
+    effects = { honesty = 3 },
+    strength = 1,
+    decayPerDay = 0,
+    visibility = "private",
+    tags = { test = true },
+}
+assertTrue(PNC.Conduct.AddEvidence(
+    aliceKey, conductOnlySpec
+), "conduct-only evidence accepted")
+assertEqual(PNC.Conduct.AddEvidence(
+    aliceKey, conductOnlySpec
+), false, "duplicate conduct evidence rejected")
+assertTrue(alice.social.revision > conductOnlySocialRevision,
+    "conduct-only social revision")
+assertTrue(alice.recordRevision > conductOnlyRecordRevision,
+    "conduct-only record revision")
+assertEqual(alice.presenceRevision, conductOnlyPresenceRevision,
+    "conduct-only presence unchanged")
+local relationshipAfterConductOnly =
+    PNC.Relationships.Get(alice.id, bobKey)
+assertEqual(
+    relationshipAfterConductOnly
+        and relationshipAfterConductOnly.revision,
+    conductOnlyRelationshipRevision,
+    "conduct-only relationship revision unchanged"
+)
 
 -- The per-NPC dedupe cache is bounded and evicts oldest successful IDs.
 local cacheRecord = newRecord("npc_event_cache")
@@ -723,6 +830,10 @@ assertTrue(debugRead ~= nil, "debug read snapshot")
 assertEqual(debugReadReason, nil, "debug read reason")
 assertEqual(debugRead.relationship.exists, false,
     "debug read previews missing relationship")
+assertTrue(debugRead.observerConduct ~= nil,
+    "debug read includes observer conduct")
+assertTrue(debugRead.targetConduct ~= nil,
+    "debug read includes target conduct")
 assertEqual(debugObserver.recordRevision, debugRecordRevision,
     "debug read record revision unchanged")
 assertEqual(debugObserver.social.revision, debugSocialRevision,
@@ -747,6 +858,19 @@ assertEqual(debugTriggered.relationship.exists, true,
     "debug trigger stores relationship")
 assertEqual(#debugTriggered.memories, 1,
     "debug trigger returns memory detail")
+assertEqual(debugTriggered.actionResult.conductEvidenceCreated, 1,
+    "debug trigger returns conduct result")
+assertTrue(debugTriggered.targetConduct.scores.compassion > 0,
+    "debug trigger refreshes target conduct")
+assertTrue(string.find(
+    PNC.ConductDebug.Format(
+        debugTriggered.targetConduct.entityKey,
+        300
+    ),
+    "Conduct Debug",
+    1,
+    true
+) ~= nil, "conduct debug formatter")
 assertTrue(debugObserver.recordRevision > debugRecordRevision,
     "debug trigger record revision")
 assertTrue(debugObserver.social.revision > debugSocialRevision,

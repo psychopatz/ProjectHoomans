@@ -35,6 +35,9 @@
   do not affect combat decisions
 - `PNC_SocialEventDefinitions`: data-only balance, allowed-source, cooldown,
   saturation, and observer rules for the five Phase 2 events
+- `PNC_ConductConstants`, `PNC_ConductTypes`, `PNC_ConductMath`, and
+  `PNC_ConductDefinitions`: actor-owned behavioral schema, objective score
+  derivation/decay, evidence limits, and the five accepted-event mappings
 - `PNC_SpatialIndex`: nested numeric-cell player, NPC, and zombie queries built
   from the shared world census; player identity maps also provide constant-time
   owner lookup
@@ -134,6 +137,8 @@
   player profile commits, NPC profile access, and pure-helper facade
 - `PNC_SocialProfileDebug`: disabled-by-default profile diagnostics and
   read-only player/NPC formatters
+- `PNC_ConductService` and `PNC_ConductDebug`: authority-only evidence
+  mutation, UUID/NPC ownership, copied reads, and sanitized formatting
 - `PNC_RelationshipService`: authoritative directed relationship mutations
 - `PNC_RelationshipDebug`: read-only selected-pair snapshots/formatting plus
   admin/debug-only named-event test dispatch through the real event service

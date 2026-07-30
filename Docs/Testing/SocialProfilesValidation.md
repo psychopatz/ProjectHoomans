@@ -34,7 +34,7 @@ foundation.
 7. Click **Treat Wound**, **Save**, **Protect**, **Survive Together**, or
    **Abandon**. The panel should refresh with the real event result, memory,
    personality-adjusted effects, scores, state, cooldown/saturation values,
-   and revisions.
+   conduct evidence, and revisions.
 8. Switch observer and target for an NPC pair. Confirm the reverse direction
    is independent. **Survive Together** intentionally creates both directions;
    the other buttons create only the selected observer's direction.
@@ -44,6 +44,26 @@ foundation.
 10. Confirm every accepted mutation advances relationship, social, and record
     revisions while the displayed presence revision stays unchanged.
 11. Close/reload the save and confirm memories and values remain visible.
+
+Conduct-specific checks:
+
+1. With an NPC observer and current-player target, trigger **Treat Wound**.
+   Confirm the relationship memory and player conduct evidence appear;
+   compassion rises by 2 and generosity by 1 before decay.
+2. Trigger it again during cooldown. Confirm neither a memory nor evidence is
+   added and no revisions advance.
+3. Trigger **Save** and confirm player compassion +8, courage +5, group
+   loyalty +4, and reliability +3 evidence.
+4. Select two NPCs and trigger **Survive Together** once. Confirm reciprocal
+   relationship memories and exactly one participant evidence entry on each
+   NPC. If two memories appear, record whether the button was deliberately
+   pressed twice; one trigger must not finalize twice.
+5. Trigger **Abandon** and confirm the selected target/actor receives the
+   documented negative actor evidence.
+6. Save/reload, then verify evidence persists and `presenceRevision` remains
+   unchanged.
+7. Kill the player and create a new survivor. Confirm the new UUID starts
+   neutral while the dead UUID's conduct remains intact.
 
 Selection and **Refresh** are read-only. The window never sends scores or
 memory payloads; the server derives the stable player-character key and routes

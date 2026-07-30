@@ -5,7 +5,7 @@ PNC.RelationshipConstants = PNC.RelationshipConstants or {}
 
 local Constants = PNC.RelationshipConstants
 
-Constants.SOCIAL_SCHEMA_VERSION = 2
+Constants.SOCIAL_SCHEMA_VERSION = 3
 Constants.MEMORY_LIMIT = 20
 Constants.RECENT_EVENT_ID_LIMIT = 64
 

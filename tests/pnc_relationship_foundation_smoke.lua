@@ -102,6 +102,9 @@ dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_SocialTraits.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileMath.lua")
+dofile(SHARED_ROOT .. "Conduct/PNC_ConductConstants.lua")
+dofile(SHARED_ROOT .. "Conduct/PNC_ConductTypes.lua")
+dofile(SHARED_ROOT .. "Conduct/PNC_ConductMath.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipConstants.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipStates.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipTypes.lua")
@@ -177,7 +180,7 @@ end
 
 -- 1. New social state defaults.
 local defaults = PNC.RelationshipTypes.NewSocialState()
-assertEqual(defaults.schemaVersion, 2, "social schema default")
+assertEqual(defaults.schemaVersion, 3, "social schema default")
 assertEqual(defaults.revision, 0, "social revision default")
 assertEqual(defaults.morale, 0, "social morale default")
 assertEqual(type(defaults.relationships), "table",
@@ -484,9 +487,9 @@ assertEqual(countMemories(
     normalizedOnce.relationships[clampKey]
 ), 1, "invalid memory discarded")
 
--- 24-25. Older records migrate deterministically to V12 and can run again.
-assertEqual(PNC.Const.PERSISTENCE_VERSION, 12,
-    "persistence schema advanced to V12")
+-- 24-25. Older records migrate deterministically to V13 and can run again.
+assertEqual(PNC.Const.PERSISTENCE_VERSION, 13,
+    "persistence schema advanced to V13")
 local oldRaw = {
     schemaVersion = 10,
     recordRevision = 7,
@@ -506,13 +509,17 @@ local migrated = PNC.Persistence.DeserializeRecord(
     oldRaw,
     oldRaw.id
 )
-assertEqual(migrated.social.schemaVersion, 2,
+assertEqual(migrated.social.schemaVersion, 3,
     "migration adds social data")
 assertEqual(next(migrated.social.relationships), nil,
     "migration keeps relationships sparse")
+assertEqual(migrated.social.conduct.scores.reliability, 0,
+    "migration adds neutral NPC conduct")
+assertEqual(#migrated.social.conduct.evidence, 0,
+    "migration does not infer conduct evidence")
 local migratedPayload = PNC.Persistence.SerializeRecord(migrated)
-assertEqual(migratedPayload.schemaVersion, 12,
-    "migration writes V12")
+assertEqual(migratedPayload.schemaVersion, 13,
+    "migration writes V13")
 local migratedAgain = PNC.Persistence.DeserializeRecord(
     migratedPayload,
     migrated.id

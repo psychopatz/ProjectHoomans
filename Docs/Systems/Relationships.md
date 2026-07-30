@@ -47,7 +47,7 @@ Every NPC record owns:
 
 ```lua
 record.social = {
-    schemaVersion = 2,
+    schemaVersion = 3,
     revision = 0,
     morale = 0,
     moraleBaseline = 0,
@@ -56,6 +56,7 @@ record.social = {
     lastEvaluatedAt = 0,
     personality = { ... },
     personalityOverrides = {},
+    conduct = { ... },
 }
 ```
 
@@ -151,11 +152,13 @@ supply their own deterministic or event-owned ID.
 
 ## Persistence and Revisions
 
-NPC persistence schema V12 stores social schema V2 personality data. V11 and
+NPC persistence schema V13 stores social schema V3 personality and conduct
+data. V12 and
 older records deserialize through `NormalizeSocialState`, deterministically
 generating a profile from the existing identity seed while preserving
-relationships and event state. The existing registry migration pipeline marks
-old records for rewrite; no separate migration path duplicates this logic.
+relationships and event state and adding neutral conduct without reconstructing
+history. The existing registry migration pipeline marks old records for
+rewrite; no separate migration path duplicates this logic.
 
 A relationship mutation increments that relationship's revision. A committed
 social change increments `record.social.revision` and calls
@@ -313,7 +316,8 @@ in the PNC NPC Monitor. It displays one directed relationship at a time:
 observer and target keys, cached and baseline values, states, morale,
 personality dimensions, relationship/social/record/presence revisions,
 cooldowns, saturation, current memory strengths, and the independently stored
-reverse direction for NPC targets. Merely opening, selecting, or refreshing
+reverse direction for NPC targets. It also shows observer and target conduct
+scores/evidence. Merely opening, selecting, or refreshing
 the inspector does not create a relationship or advance revisions.
 
 The inspector can submit only these named test milestones:

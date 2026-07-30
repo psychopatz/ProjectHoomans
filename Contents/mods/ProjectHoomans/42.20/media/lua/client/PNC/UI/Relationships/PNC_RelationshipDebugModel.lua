@@ -72,6 +72,74 @@ local function enabledKeys(values)
     return #keys > 0 and table.concat(keys, ", ") or "(none)"
 end
 
+local CONDUCT_DIMENSIONS = {
+    "reliability", "generosity", "compassion", "courage",
+    "restraint", "honesty", "groupLoyalty",
+}
+
+local function appendConduct(rows, title, conduct)
+    rows[#rows + 1] = row(title, conduct
+        and ("revision " .. tostring(conduct.revision or 0))
+        or "(unavailable)", conduct and "success" or "warning")
+    if not conduct then return end
+    rows[#rows + 1] = row("  entity", conduct.entityKey)
+    for _, dimension in ipairs(CONDUCT_DIMENSIONS) do
+        rows[#rows + 1] = row(
+            "  " .. dimension,
+            number(conduct.scores and conduct.scores[dimension])
+        )
+    end
+    rows[#rows + 1] = row(
+        "  evidence",
+        tostring(conduct.evidenceCount or #(conduct.evidence or {}))
+    )
+    for index, evidence in ipairs(conduct.evidence or {}) do
+        rows[#rows + 1] = row(
+            "  " .. tostring(index) .. ". "
+                .. tostring(evidence.eventType),
+            tostring(evidence.id)
+        )
+        local effects = {}
+        for _, dimension in ipairs(CONDUCT_DIMENSIONS) do
+            if evidence.effects
+                and evidence.effects[dimension] ~= nil
+            then
+                effects[#effects + 1] = dimension .. " "
+                    .. signed(evidence.effects[dimension])
+            end
+        end
+        rows[#rows + 1] = row(
+            "    effects", table.concat(effects, " / ")
+        )
+        rows[#rows + 1] = row(
+            "    strength",
+            number(evidence.currentStrength, 4)
+                .. " current / decay "
+                .. number(evidence.decayPerDay, 4) .. "/day"
+        )
+        rows[#rows + 1] = row(
+            "    visibility",
+            tostring(evidence.visibility)
+                .. (evidence.shareable and " / shareable" or "")
+        )
+        rows[#rows + 1] = row(
+            "    event", tostring(evidence.eventID)
+        )
+        rows[#rows + 1] = row(
+            "    subject", tostring(evidence.subjectKey)
+        )
+        rows[#rows + 1] = row(
+            "    timestamps",
+            number(evidence.createdAt, 3) .. " h created / "
+                .. number(evidence.lastEvaluatedAt, 3)
+                .. " h evaluated"
+        )
+        rows[#rows + 1] = row(
+            "    tags", enabledKeys(evidence.tags)
+        )
+    end
+end
+
 function Model.BuildTargets(roster, observerNPCID)
     local targets = {
         {
@@ -212,6 +280,8 @@ function Model.BuildRows(snapshot, authorized, reason)
     end
     appendMap(rows, "Cooldown", snapshot.cooldowns)
     appendMap(rows, "Saturation", snapshot.saturation)
+    appendConduct(rows, "Observer conduct", snapshot.observerConduct)
+    appendConduct(rows, "Target conduct", snapshot.targetConduct)
     rows[#rows + 1] = row(
         "Memories",
         tostring(#(snapshot.memories or {}))
@@ -270,7 +340,9 @@ function Model.BuildRows(snapshot, authorized, reason)
             tostring(action.memoriesCreated or 0)
                 .. " memories / "
                 .. tostring(action.relationshipsChanged or 0)
-                .. " relationships"
+                .. " relationships / "
+                .. tostring(action.conductEvidenceCreated or 0)
+                .. " conduct evidence"
         )
         detail = action.details and action.details[1] or nil
         if detail and detail.baseEffects and detail.modifiedEffects then

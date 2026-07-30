@@ -575,7 +575,7 @@ local function sanitizeSocial(raw, identitySeed, archetypeID)
         return social
     end
     return {
-        schemaVersion = 2,
+        schemaVersion = 3,
         revision = 0,
         morale = 0,
         moraleBaseline = 0,
@@ -584,6 +584,8 @@ local function sanitizeSocial(raw, identitySeed, archetypeID)
         lastEvaluatedAt = 0,
         personality = nil,
         personalityOverrides = {},
+        conduct = PNC.ConductTypes
+            and PNC.ConductTypes.NewConductRecord() or nil,
     }
 end
 

@@ -167,6 +167,10 @@ dofile(ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
 dofile(ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
 dofile(ROOT .. "Relationships/PNC_SocialTraits.lua")
 dofile(ROOT .. "Relationships/PNC_SocialProfileMath.lua")
+dofile(ROOT .. "Conduct/PNC_ConductConstants.lua")
+dofile(ROOT .. "Conduct/PNC_ConductTypes.lua")
+dofile(ROOT .. "Conduct/PNC_ConductMath.lua")
+dofile(ROOT .. "Conduct/PNC_ConductDefinitions.lua")
 dofile(ROOT .. "Identity/PNC_PlayerCharacterTypes.lua")
 dofile(ROOT .. "Relationships/PNC_RelationshipConstants.lua")
 dofile(ROOT .. "Relationships/PNC_RelationshipStates.lua")
@@ -235,6 +239,7 @@ dofile(SERVER .. "PNC_PlayerCharacterDebug.lua")
 dofile(SERVER .. "PNC_PlayerCharacterService.lua")
 dofile(SERVER .. "PNC_SocialProfileDebug.lua")
 dofile(SERVER .. "PNC_SocialProfileService.lua")
+dofile(SERVER .. "PNC_ConductService.lua")
 dofile(SERVER .. "PNC_RelationshipService.lua")
 dofile(SERVER .. "PNC_SocialEventDebug.lua")
 dofile(SERVER .. "PNC_SocialEventService.lua")
@@ -374,7 +379,7 @@ local authoredNPC = PNC.Types.NewRecord({
         },
     },
 })
-assertEqual(authoredNPC.social.schemaVersion, 2, "NPC social V2")
+assertEqual(authoredNPC.social.schemaVersion, 3, "NPC social V3")
 assertEqual(authoredNPC.social.personality.orientation, "gay",
     "constructor applies authored enum")
 assertEqual(authoredNPC.social.personality.compassion, 0.88,
@@ -385,7 +390,7 @@ assertTrue(deepEqual(
     authoredNPC.social.personality,
     loaded.social.personality
 ), "save/load does not reroll")
-assertEqual(serialized.schemaVersion, 12, "NPC schema V12")
+assertEqual(serialized.schemaVersion, 13, "NPC schema V13")
 assertSaveSafe(serialized.social)
 
 local oldNPC = PNC.Persistence.DeserializeRecord({
@@ -406,11 +411,15 @@ local oldNPC = PNC.Persistence.DeserializeRecord({
         recentEventIDs = { "social:old" },
     },
 })
-assertEqual(oldNPC.social.schemaVersion, 2, "old NPC social migrated")
+assertEqual(oldNPC.social.schemaVersion, 3, "old NPC social migrated")
 assertEqual(oldNPC.social.revision, 3,
     "social migration preserves revision")
 assertEqual(oldNPC.social.recentEventIDs[1], "social:old",
     "social cache preserved")
+assertEqual(oldNPC.social.conduct.scores.courage, 0,
+    "old NPC receives neutral conduct")
+assertEqual(#oldNPC.social.conduct.evidence, 0,
+    "old relationship history not inferred as conduct")
 local oldProfileFirst = oldNPC.social.personality
 local oldNPCSecond = PNC.Persistence.DeserializeRecord(
     PNC.Persistence.SerializeRecord(oldNPC)
@@ -447,12 +456,16 @@ PNC.PlayerCharacters.Load()
 local historical = PNC.PlayerCharacters.GetRegistryRecord(
     "char_historical"
 )
-assertEqual(PNC.PlayerCharacters.GetRegistrySnapshot().schemaVersion, 2,
+assertEqual(PNC.PlayerCharacters.GetRegistrySnapshot().schemaVersion, 3,
     "player registry V2 migration")
 assertEqual(historical.socialProfile.orientation, "straight",
     "historical profile neutral orientation")
 assertEqual(historical.socialProfile.resolvedAt, 0,
     "historical profile not guessed")
+assertEqual(historical.conduct.scores.reliability, 0,
+    "dead historical character receives neutral conduct")
+assertEqual(#historical.conduct.evidence, 0,
+    "historical conduct not inferred")
 local normalizedRegistry = PNC.PlayerCharacterTypes.NormalizeRegistry(
     PNC.PlayerCharacters.GetRegistrySnapshot()
 )
@@ -730,6 +743,13 @@ local originalMemoryEffect =
     relationship.memories[1].approvalEffect
 assertEqual(originalMemoryEffect, highTreatment.approvalEffect,
     "observer profile modifies new memory")
+local objectiveConduct = PNC.Conduct.GetForEntity(actorKey)
+local objectiveEvidence =
+    objectiveConduct.evidence[#objectiveConduct.evidence]
+assertEqual(objectiveEvidence.effects.compassion, 2,
+    "personality does not modify conduct compassion")
+assertEqual(objectiveEvidence.effects.generosity, 1,
+    "personality does not modify conduct generosity")
 assertEqual(PNC.SocialEvents.Emit(event).reason, "duplicate_event",
     "profile event deduplication")
 local cooldownEvent = PNC.Core.DeepCopy(event)

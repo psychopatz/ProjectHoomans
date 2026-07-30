@@ -50,6 +50,43 @@ local rows = PNC.RelationshipDebugModel.BuildRows({
         label = "Bob",
         key = "npc:bob",
     },
+    observerConduct = {
+        entityKey = "npc:alice",
+        revision = 2,
+        scores = {
+            reliability = 2, generosity = 0, compassion = 0,
+            courage = 2, restraint = 0, honesty = 0,
+            groupLoyalty = 1,
+        },
+        evidenceCount = 1,
+        evidence = {},
+    },
+    targetConduct = {
+        entityKey = "npc:bob",
+        revision = 4,
+        scores = {
+            reliability = 3, generosity = 1, compassion = 8,
+            courage = 5, restraint = 0, honesty = 0,
+            groupLoyalty = 4,
+        },
+        evidenceCount = 1,
+        evidence = {
+            {
+                id = "conduct:social:test:npc:bob:rescuer",
+                eventID = "social:test",
+                eventType = "saved_from_incapacitation",
+                subjectKey = "npc:alice",
+                createdAt = 5,
+                lastEvaluatedAt = 10,
+                effects = { compassion = 8, courage = 5 },
+                currentStrength = 0.99,
+                decayPerDay = 0.0025,
+                visibility = "direct",
+                shareable = true,
+                tags = { rescue = true },
+            },
+        },
+    },
     relationship = {
         exists = true,
         approval = 12,
@@ -117,6 +154,11 @@ assertContains(rows, "Approval", "12.00")
 assertContains(rows, "Revisions", "presence 2")
 assertContains(rows, "Reverse direction", "stored")
 assertContains(rows, "Saturation treated_wound", "approval=4")
+assertContains(rows, "Observer conduct", "revision 2")
+assertContains(rows, "Target conduct", "revision 4")
+assertContains(rows, "  compassion", "8.00")
+assertContains(rows, "    visibility", "direct / shareable")
+assertContains(rows, "    event", "social:test")
 assertContains(rows, "1. treated_wound", "memory:1")
 assertContains(rows, "  strength", "0.9500 current")
 assertContains(rows, "Last trigger", "treated_wound")

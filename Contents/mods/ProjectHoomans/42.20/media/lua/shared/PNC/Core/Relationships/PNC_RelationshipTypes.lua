@@ -7,6 +7,7 @@ local Types = PNC.RelationshipTypes
 local Constants = PNC.RelationshipConstants
 local EntityRef = PNC.EntityRef
 local ProfileTypes = PNC.SocialProfileTypes
+local ConductTypes = PNC.ConductTypes
 
 local function finiteNumber(value)
     local numeric = tonumber(value)
@@ -476,6 +477,9 @@ function Types.NormalizeSocialState(value, identitySeed, archetypeID)
         lastEvaluatedAt = nonNegative(source.lastEvaluatedAt, 0),
         personality = personality,
         personalityOverrides = personalityOverrides,
+        conduct = ConductTypes
+            and ConductTypes.NormalizeConductRecord(source.conduct)
+            or nil,
     }
 end
 

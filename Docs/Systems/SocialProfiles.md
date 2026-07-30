@@ -225,6 +225,10 @@ Phase 3B advances:
 - NPC social schema V1 to V2;
 - player-character registry schema V1 to V2.
 
+Phase 4 later advances these domains to NPC V13, social V3, and player
+registry V3 solely to add behavioral conduct. Profile generation and values
+remain unchanged.
+
 The top-level NPC schema advances because the existing registry marks old
 records for rewrite from that marker. V11 records deterministically generate a
 personality from their persisted seed while preserving relationships,
