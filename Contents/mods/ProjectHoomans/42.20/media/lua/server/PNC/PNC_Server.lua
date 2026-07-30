@@ -231,6 +231,20 @@ function Server.OnTick()
     then
         PlayerCharacterLifecycle.Pump(now, false)
     end
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.PumpReconciliation
+    then
+        PNC.FactionBehavior.PumpReconciliation()
+    end
+    if PNC.FactionIncidentService
+        and PNC.FactionIncidentService.PumpRuntime
+    then
+        PNC.FactionIncidentService.PumpRuntime(
+            getGameTime and getGameTime()
+                and getGameTime().getWorldAgeHours
+                and getGameTime():getWorldAgeHours() or 0
+        )
+    end
     if PNC.EnginePathPlanner
         and PNC.EnginePathPlanner.PumpServerFrame
     then

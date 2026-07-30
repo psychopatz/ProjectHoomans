@@ -61,6 +61,28 @@ PsychopatzCore.DebugHub.RegisterTool({
     end,
 })
 
+PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.factionOverlay",
+    source = "ProjectHoomans",
+    order = 221,
+    title = getText
+        and getText("UI_PNC_FactionWorldOverlayTitle")
+        or "UI_PNC_FactionWorldOverlayTitle",
+    description =
+        "Toggle server-resolved faction diagnostics above visible NPCs.",
+    available = function()
+        return PNC
+            and PNC.FactionDebugOverlay
+            and PNC.FactionDebugOverlay.Toggle
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        PNC.FactionDebugOverlay.Toggle()
+    end,
+})
+
 -- Project Hoomans settings belong to the standard in-game settings registry.
 -- Remove the old debug-hub launcher as well when this file is hot-reloaded.
 PsychopatzCore.DebugHub.UnregisterTool("pnc.settings")

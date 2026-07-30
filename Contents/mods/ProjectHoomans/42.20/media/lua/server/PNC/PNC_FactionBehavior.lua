@@ -16,9 +16,27 @@ local EntityRef = PNC.EntityRef
 local Types = PNC.Types
 local Const = PNC.Const
 local Core = PNC.Core
+local Balance = PNC.FactionBalance
+
+Behavior.ReconciliationQueue =
+    Behavior.ReconciliationQueue or {}
+Behavior.ReconciliationKeys =
+    Behavior.ReconciliationKeys or {}
 
 local function same(left, right)
     return PNC.FactionTypes.AreEqual(left, right)
+end
+
+local function currentWorldAgeHours()
+    if getGameTime and getGameTime()
+        and getGameTime().getWorldAgeHours
+    then
+        return math.max(
+            0,
+            tonumber(getGameTime():getWorldAgeHours()) or 0
+        )
+    end
+    return 0
 end
 
 local function ownerIdentity(faction)
@@ -90,13 +108,23 @@ end
 function Behavior.ResolveIntent(observerRecord, target, context)
     context = type(context) == "table" and context or {}
     if not observerRecord then
-        return {
+        local invalid = {
             intent = "observe",
             attackAllowed = false,
             pursueAllowed = false,
             commandable = false,
             reason = "invalid_observer",
         }
+        if context.returnDebugTrace == true then
+            return {
+                result = invalid,
+                trace = {
+                    selectedRule = "invalid_observer",
+                    fallback = "observe",
+                },
+            }
+        end
+        return invalid
     end
     local observerFactionID =
         Factions.GetOrganizationalFactionID(observerRecord)
@@ -112,7 +140,7 @@ function Behavior.ResolveIntent(observerRecord, target, context)
                 or not targetRecord
                     and observerRecord.hostility.attackPlayers
             ) == true
-        return {
+        local legacy = {
             intent = hostile and "attack" or "observe",
             attackAllowed = hostile,
             pursueAllowed = hostile,
@@ -120,6 +148,17 @@ function Behavior.ResolveIntent(observerRecord, target, context)
             reason = hostile and "legacy_hostility"
                 or "unaffiliated_neutral",
         }
+        if context.returnDebugTrace == true then
+            return {
+                result = legacy,
+                trace = {
+                    selectedRule = legacy.reason,
+                    fallback = "observe",
+                    organizationalFaction = false,
+                },
+            }
+        end
+        return legacy
     end
     local sameFaction = targetFactionID ~= nil
         and targetFactionID == observerFactionID
@@ -147,7 +186,7 @@ function Behavior.ResolveIntent(observerRecord, target, context)
             targetIsOwner
             or observerFaction.playerMemberKeys[targetKey] == true
         )
-    return PNC.FactionIntent.Resolve({
+    local spec = {
         archetypeID = observerFaction.archetypeID,
         policy = observerFaction.policy,
         diplomaticState = state,
@@ -165,7 +204,45 @@ function Behavior.ResolveIntent(observerRecord, target, context)
         targetAggression = context.targetAggression == true,
         observerStrength = context.observerStrength,
         targetStrength = context.targetStrength,
-    })
+    }
+    local resolved = context.returnDebugTrace == true
+        and PNC.FactionIntent.ResolveWithTrace(spec)
+        or PNC.FactionIntent.Resolve(spec)
+    if context.suppressTelemetry ~= true
+        and PNC.FactionTelemetry
+        and PNC.FactionTelemetry.RecordIntent
+    then
+        local result = resolved.result or resolved
+        PNC.FactionTelemetry.RecordIntent({
+            operation = "resolve_intent",
+            worldAgeHours = at,
+            observerNPCID = observerRecord.id,
+            actorKey = EntityRef.ForNPC(observerRecord.id),
+            subjectKey = targetKey,
+            sourceFactionID = observerFactionID,
+            targetFactionID = targetFactionID,
+            result = result.intent,
+            reason = result.reason,
+            attackAllowed = result.attackAllowed,
+            pursueAllowed = result.pursueAllowed,
+        })
+    end
+    return resolved
+end
+
+function Behavior.ResolveIntentWithTrace(
+    observerRecord,
+    target,
+    context
+)
+    local options = {}
+    for name, value in pairs(
+        type(context) == "table" and context or {}
+    ) do
+        options[name] = value
+    end
+    options.returnDebugTrace = true
+    return Behavior.ResolveIntent(observerRecord, target, options)
 end
 
 local function assign(record, key, value)
@@ -265,12 +342,23 @@ local function apply(record, mode, owner, reason)
         changed = true
     end
     if not changed then return false, "unchanged" end
-    clearCombatRuntime(record)
+    local runtimeTarget = record.runtime
+        and record.runtime.target or nil
+    if not runtimeTarget or runtimeTarget.kind ~= "zombie" then
+        clearCombatRuntime(record)
+    end
+    record.runtime = record.runtime or {}
     record.runtime.factionBehaviorReason =
         tostring(reason or "faction_policy")
     record.runtime.factionBehaviorAt = Core.Now()
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "faction_behavior")
+    end
+    if PNC.Network and PNC.Network.BroadcastRecord then
+        PNC.Network.BroadcastRecord(
+            record,
+            tostring(reason or "faction_behavior")
+        )
     end
     if PNC.SimulationClock and PNC.SimulationClock.Wake then
         PNC.SimulationClock.Wake(record, nil, Core.Now())
@@ -336,6 +424,240 @@ function Behavior.ReconcileAll(reason)
             + Behavior.ReconcileFaction(factionID, reason)
     end
     return changed
+end
+
+local function reconciliationKey(firstFactionID, secondFactionID)
+    if tostring(firstFactionID) > tostring(secondFactionID) then
+        firstFactionID, secondFactionID =
+            secondFactionID, firstFactionID
+    end
+    return tostring(firstFactionID) .. "|"
+        .. tostring(secondFactionID)
+end
+
+local function collectMembers(firstFactionID, secondFactionID)
+    local found = {}
+    local output = {}
+    for _, factionID in ipairs({
+        firstFactionID,
+        secondFactionID,
+    }) do
+        local faction = Factions.Registry.byID[factionID]
+        for npcID, _ in pairs(
+            faction and faction.memberIDs or {}
+        ) do
+            if not found[npcID] then
+                found[npcID] = true
+                output[#output + 1] = npcID
+            end
+        end
+    end
+    table.sort(output)
+    return output
+end
+
+function Behavior.QueueTreatyReconciliation(
+    firstFactionID,
+    secondFactionID,
+    operation,
+    worldAgeHours
+)
+    local key = reconciliationKey(
+        firstFactionID, secondFactionID
+    )
+    if Behavior.ReconciliationKeys[key] then
+        for _, job in ipairs(Behavior.ReconciliationQueue) do
+            if job.key == key then
+                job.operation = tostring(
+                    operation or job.operation
+                )
+                job.createdAt = math.max(
+                    0,
+                    tonumber(worldAgeHours)
+                        or currentWorldAgeHours()
+                )
+                break
+            end
+        end
+        if PNC.FactionTelemetry then
+            PNC.FactionTelemetry.RecordTreatyReconciliation({
+                operation = tostring(
+                    operation or "treaty_changed"
+                ),
+                worldAgeHours = tonumber(worldAgeHours)
+                    or currentWorldAgeHours(),
+                sourceFactionID = firstFactionID,
+                targetFactionID = secondFactionID,
+                encounterKey = key,
+                result = "deduplicated",
+                reason = "already_queued",
+            })
+        end
+        return false, "already_queued"
+    end
+    local maximum = math.floor(
+        Balance and Balance.Get("reconciliationQueueLimit")
+            or 64
+    )
+    if #Behavior.ReconciliationQueue >= maximum then
+        return false, "queue_full"
+    end
+    local members = collectMembers(
+        firstFactionID, secondFactionID
+    )
+    local job = {
+        key = key,
+        sourceFactionID = firstFactionID,
+        targetFactionID = secondFactionID,
+        operation = tostring(operation or "treaty_changed"),
+        createdAt = math.max(
+            0, tonumber(worldAgeHours)
+                or currentWorldAgeHours()
+        ),
+        cursor = 1,
+        memberIDs = members,
+        memberCount = #members,
+        processedCount = 0,
+        staleTargetsCleared = 0,
+        intentsChanged = 0,
+    }
+    Behavior.ReconciliationKeys[key] = true
+    Behavior.ReconciliationQueue[
+        #Behavior.ReconciliationQueue + 1
+    ] = job
+    if PNC.FactionTelemetry then
+        PNC.FactionTelemetry.RecordTreatyReconciliation({
+            operation = job.operation,
+            worldAgeHours = job.createdAt,
+            sourceFactionID = firstFactionID,
+            targetFactionID = secondFactionID,
+            encounterKey = key,
+            result = "queued",
+            memberCount = job.memberCount,
+        })
+    end
+    return true, "queued", job
+end
+
+local function runtimeTargetValue(target)
+    if not target then return nil end
+    if target.kind == "npc" then
+        return target.id and PNC.Registry.Get(target.id) or nil
+    end
+    if target.kind == "player" then
+        return target.player
+    end
+    return nil
+end
+
+function Behavior.PumpReconciliation(maximum)
+    maximum = math.max(
+        1,
+        math.floor(tonumber(maximum)
+            or (
+                Balance
+                and Balance.Get("reconciliationBatchSize")
+                or 16
+            ))
+    )
+    local processed = 0
+    while processed < maximum
+        and #Behavior.ReconciliationQueue > 0
+    do
+        local job = Behavior.ReconciliationQueue[1]
+        local npcID = job.memberIDs[job.cursor]
+        if not npcID then
+            Behavior.ReconciliationKeys[job.key] = nil
+            table.remove(Behavior.ReconciliationQueue, 1)
+            if PNC.FactionTelemetry then
+                PNC.FactionTelemetry.RecordTreatyReconciliation({
+                    operation = job.operation,
+                    worldAgeHours = currentWorldAgeHours(),
+                    sourceFactionID = job.sourceFactionID,
+                    targetFactionID = job.targetFactionID,
+                    encounterKey = job.key,
+                    result = "completed",
+                    memberCount = job.memberCount,
+                    processedCount = job.processedCount,
+                    staleTargetsCleared =
+                        job.staleTargetsCleared,
+                    intentsChanged = job.intentsChanged,
+                })
+            end
+        else
+            job.cursor = job.cursor + 1
+            job.processedCount = job.processedCount + 1
+            processed = processed + 1
+            local record = PNC.Registry.Get(npcID)
+            if record then
+                local memberIntentChanged = false
+                local beforeTarget = record.runtime
+                    and record.runtime.target or nil
+                local beforeReason = record.runtime
+                    and record.runtime.factionBehaviorReason
+                Behavior.ApplyNPC(record, job.operation)
+                local target = record.runtime
+                    and record.runtime.target or beforeTarget
+                if target and target.kind ~= "zombie" then
+                    local value = runtimeTargetValue(target)
+                    local selfDefense = target.targetAggression == true
+                        or target.immediateSelfDefense == true
+                        or (
+                            tonumber(record.runtime
+                                .factionSelfDefenseUntil) or 0
+                        ) > Core.Now()
+                    local intent = value and Behavior.ResolveIntent(
+                        record,
+                        value,
+                        {
+                            worldAgeHours =
+                                currentWorldAgeHours(),
+                            immediateSelfDefense = selfDefense,
+                            targetAggression = selfDefense,
+                        }
+                    ) or nil
+                    if intent and intent.attackAllowed ~= true then
+                        clearCombatRuntime(record)
+                        job.staleTargetsCleared =
+                            job.staleTargetsCleared + 1
+                        memberIntentChanged = true
+                    elseif intent and selfDefense
+                        and record.runtime.target == nil
+                    then
+                        record.runtime.target = target
+                    end
+                end
+                local afterReason = record.runtime
+                    and record.runtime.factionBehaviorReason
+                if beforeReason ~= afterReason then
+                    memberIntentChanged = true
+                end
+                if memberIntentChanged then
+                    job.intentsChanged =
+                        job.intentsChanged + 1
+                end
+            end
+        end
+    end
+    return processed
+end
+
+function Behavior.GetReconciliationSnapshot()
+    local output = {}
+    for _, job in ipairs(Behavior.ReconciliationQueue) do
+        output[#output + 1] = {
+            key = job.key,
+            sourceFactionID = job.sourceFactionID,
+            targetFactionID = job.targetFactionID,
+            operation = job.operation,
+            createdAt = job.createdAt,
+            memberCount = job.memberCount,
+            processedCount = job.processedCount,
+            staleTargetsCleared = job.staleTargetsCleared,
+            intentsChanged = job.intentsChanged,
+        }
+    end
+    return output
 end
 
 return Behavior

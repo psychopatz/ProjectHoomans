@@ -348,6 +348,20 @@ relationship values. Detailed automatic logs require
 `PNC.Config.Relationships.DebugSocialEvents = true`; normal cooldown and
 non-qualifying encounter paths do not spam production logs.
 
+The admin-only NPC faction world overlay also displays each visible NPC's
+directed relationship toward the current player character. Its persistent
+summary line contains approval, respect, familiarity, state, relationship
+revision, and NPC morale. Every committed relationship mutation appends a
+primitive runtime-only diagnostic entry containing the mutation kind, event
+and memory type when applicable, knowledge source, before/after state, and
+approval/respect/familiarity/morale deltas. The feed is bounded to 16 entries
+per NPC, is filtered to the exact current-player entity key, is not saved, and
+does not increment any revision. The newest change is highlighted over the
+NPC for 12 seconds. This covers `memory_added`, `social_event`,
+`memory_removed`, `relationship_recalculated`, and `memories_pruned`, so a
+future conversation pipeline is visible automatically when it uses the
+existing relationship mutation APIs.
+
 Player identity and combat callback delivery have separate opt-in flags:
 `DebugPlayerIdentity` and `DebugCombatCallbacks`. Both default to `false`.
 

@@ -15,9 +15,19 @@ local Definitions = PNC.FactionIncidentDefinitions
 local Math = PNC.FactionDiplomacyMath
 local EntityRef = PNC.EntityRef
 local Core = PNC.Core
+local Balance = PNC.FactionBalance
 
 Service.RuntimeEpisodes = Service.RuntimeEpisodes or {}
 Service.RuntimeCallbackIDs = Service.RuntimeCallbackIDs or {}
+Service.RuntimeCallbackOrder =
+    Service.RuntimeCallbackOrder or {}
+Service.LastRuntimePumpAtMS =
+    tonumber(Service.LastRuntimePumpAtMS) or 0
+
+local function tuning(name, fallback)
+    local value = Balance and Balance.Get and Balance.Get(name)
+    return value == nil and fallback or value
+end
 
 local function authority()
     return Core and Core.IsAuthority
@@ -54,14 +64,17 @@ local function pushID(relation, incidentID)
         #relation.recentIncidentIDs + 1
     ] = incidentID
     while #relation.recentIncidentIDs
-        > Constants.RECENT_INCIDENT_ID_LIMIT
+        > tuning("recentIncidentIDLimit",
+            Constants.RECENT_INCIDENT_ID_LIMIT)
     do
         table.remove(relation.recentIncidentIDs, 1)
     end
 end
 
 local function trimIncidents(relation)
-    while #relation.incidents > Constants.INCIDENT_LIMIT do
+    while #relation.incidents > tuning(
+        "incidentHistoryLimit", Constants.INCIDENT_LIMIT
+    ) do
         local weakest
         for index, incident in ipairs(relation.incidents) do
             if incident.preserve ~= true
@@ -146,32 +159,47 @@ local function maybeEscalate(
         or warReasonFor(incident.type, leader)
     if not shouldDeclare and incident.type == "member_killed" then
         shouldDeclare = leader
-            or (tonumber(policy.retaliation) or 0.5) >= 0.25
+            or (tonumber(policy.retaliation) or 0.5)
+                >= tuning("killedRetaliationMinimum", 0.25)
     elseif not shouldDeclare
         and incident.type == "member_attacked_severe"
     then
         local score = relation.grievance
-            + (tonumber(policy.retaliation) or 0.5) * 35
-            + (tonumber(policy.aggression) or 0.5) * 15
+            + (tonumber(policy.retaliation) or 0.5)
+                * tuning("escalationRetaliationWeight", 35)
+            + (tonumber(policy.aggression) or 0.5)
+                * tuning("escalationAggressionWeight", 15)
         shouldDeclare = score
             >= (tonumber(policy.warThreshold) or 70)
             or leader
-                and (tonumber(policy.retaliation) or 0.5) >= 0.25
+                and (tonumber(policy.retaliation) or 0.5)
+                    >= tuning(
+                        "leaderRetaliationMinimum", 0.25
+                    )
     elseif not shouldDeclare
         and incident.type == "member_attacked_minor"
     then
         shouldDeclare = relation.state == "hostile"
-            and (tonumber(policy.retaliation) or 0.5) >= 0.5
+            and (tonumber(policy.retaliation) or 0.5)
+                >= tuning(
+                    "hostileMinorRetaliationMinimum", 0.5
+                )
     elseif not shouldDeclare
         and incident.type == "personal_grievance_report"
     then
         local rank = tostring(spec.authorityRank or "member")
-        local influence = rank == "leader" and 20
-            or rank == "second" and 15
-            or rank == "officer" and 10 or 0
+        local influence = rank == "leader"
+            and tuning("leaderAuthorityInfluence", 20)
+            or rank == "second"
+                and tuning("secondAuthorityInfluence", 15)
+            or rank == "officer"
+                and tuning("officerAuthorityInfluence", 10)
+            or 0
         local score = relation.grievance + influence
-            + (tonumber(policy.retaliation) or 0.5) * 35
-            + (tonumber(policy.aggression) or 0.5) * 15
+            + (tonumber(policy.retaliation) or 0.5)
+                * tuning("escalationRetaliationWeight", 35)
+            + (tonumber(policy.aggression) or 0.5)
+                * tuning("escalationAggressionWeight", 15)
         shouldDeclare = relation.state == "hostile"
             and score >= (tonumber(policy.warThreshold) or 70)
     end
@@ -360,6 +388,31 @@ function Service.AddIncident(
         committed,
         spec
     )
+    if PNC.FactionTelemetry then
+        PNC.FactionTelemetry.RecordIncident({
+            operation = "add_incident",
+            worldAgeHours = at,
+            actorKey = incident.actorKey,
+            subjectKey = incident.subjectKey,
+            sourceFactionID = actorFactionID,
+            targetFactionID = victimFactionID,
+            result = upgradedIndex and "upgraded" or "created",
+            reason = incidentType,
+            incidentID = incident.id,
+            relationRevision = committed.revision,
+        })
+        PNC.FactionTelemetry.RecordEscalation({
+            operation = "evaluate_escalation",
+            worldAgeHours = at,
+            sourceFactionID = victimFactionID,
+            targetFactionID = actorFactionID,
+            result = escalated == true
+                and "war_declared" or "no_war",
+            reason = escalationReason,
+            incidentID = incident.id,
+            grievance = committed.grievance,
+        })
+    end
     return true, upgradedIndex and "incident_upgraded"
         or "incident_added", {
         incident = incident,
@@ -392,29 +445,117 @@ function Service.RecordAttack(
     spec = type(spec) == "table" and spec or {}
     local at = finiteTimestamp(spec.worldAgeHours)
     if not at then return false, "invalid_world_age" end
+    local actorKey = safeEntityKey(spec.actorKey)
+    local subjectKey = safeEntityKey(spec.subjectKey)
+    if not actorKey or not subjectKey then
+        if PNC.FactionTelemetry then
+            PNC.FactionTelemetry.RecordAggregation({
+                operation = "record_attack",
+                worldAgeHours = at,
+                result = "rejected",
+                reason = "invalid_attack_entity_key",
+            })
+        end
+        return false, "invalid_attack_entity_key"
+    end
+    local damage = math.max(0, tonumber(spec.damage) or 0)
+    if spec.killed ~= true and spec.severe ~= true
+        and damage > 0
+        and damage < tuning("minorAttackDamageThreshold", 0)
+    then
+        if PNC.FactionTelemetry then
+            PNC.FactionTelemetry.RecordAggregation({
+                operation = "record_attack",
+                worldAgeHours = at,
+                actorKey = spec.actorKey,
+                subjectKey = spec.subjectKey,
+                sourceFactionID = actorFactionID,
+                targetFactionID = victimFactionID,
+                result = "rejected",
+                reason = "below_minor_damage_threshold",
+                accumulatedDamage = damage,
+            })
+        end
+        return false, "below_minor_damage_threshold"
+    end
     if type(spec.callbackID) == "string"
         and spec.callbackID ~= ""
     then
         if Service.RuntimeCallbackIDs[spec.callbackID] then
+            if PNC.FactionTelemetry then
+                PNC.FactionTelemetry.RecordAggregation({
+                    operation = "record_attack",
+                    worldAgeHours = at,
+                    sourceFactionID = actorFactionID,
+                    targetFactionID = victimFactionID,
+                    result = "duplicate",
+                    reason = "duplicate_callback",
+                    callbackID = spec.callbackID,
+                })
+            end
             return false, "duplicate_callback"
         end
         Service.RuntimeCallbackIDs[spec.callbackID] = at
+        Service.RuntimeCallbackOrder[
+            #Service.RuntimeCallbackOrder + 1
+        ] = spec.callbackID
+        while #Service.RuntimeCallbackOrder
+            > tuning("callbackDedupeLimit", 2048)
+        do
+            local oldest = table.remove(
+                Service.RuntimeCallbackOrder, 1
+            )
+            Service.RuntimeCallbackIDs[oldest] = nil
+        end
     end
     local key = episodeKey(
         actorFactionID,
         victimFactionID,
-        spec.actorKey,
-        spec.subjectKey
+        actorKey,
+        subjectKey
     )
     local episode = Service.RuntimeEpisodes[key]
+    local aggregationHours = tuning(
+        "attackAggregationHours",
+        Constants.ATTACK_AGGREGATION_HOURS
+    )
     local withinEpisode = episode
         and at >= episode.lastAt
         and at - episode.lastAt
-            <= Constants.ATTACK_AGGREGATION_HOURS
+            <= aggregationHours
+    local nextHitCount = withinEpisode
+        and (episode.hitCount or 0) + 1 or 1
+    if spec.killed ~= true
+        and spec.severe ~= true
+        and damage > 0
+        and damage < tuning("minorAttackDamageThreshold", 0)
+    then
+        if PNC.FactionTelemetry then
+            PNC.FactionTelemetry.RecordAggregation({
+                operation = "record_attack",
+                worldAgeHours = at,
+                actorKey = spec.actorKey,
+                subjectKey = spec.subjectKey,
+                sourceFactionID = actorFactionID,
+                targetFactionID = victimFactionID,
+                encounterKey = key,
+                result = "rejected",
+                reason = "damage_below_minor_threshold",
+                accumulatedDamage = damage,
+            })
+        end
+        return false, "damage_below_minor_threshold"
+    end
+    local severe = spec.severe == true
+        or damage > 0
+            and damage >= tuning(
+                "severeAttackDamageThreshold", 25
+            )
+        or nextHitCount >= tuning("repeatedAttackCount", 2)
     local incidentType
     if spec.killed == true then
         incidentType = "member_killed"
-    elseif spec.severe == true or withinEpisode then
+    elseif severe then
         incidentType = "member_attacked_severe"
     else
         incidentType = "member_attacked_minor"
@@ -428,6 +569,33 @@ function Service.RecordAttack(
         else
             episode.lastAt = at
             episode.hitCount = episode.hitCount + 1
+            episode.totalDamage =
+                (episode.totalDamage or 0) + damage
+            episode.maximumDamage = math.max(
+                episode.maximumDamage or 0, damage
+            )
+            episode.expiresAt = at + aggregationHours
+            episode.state = "duplicate"
+            if PNC.FactionTelemetry then
+                PNC.FactionTelemetry.RecordAggregation({
+                    operation = "record_attack",
+                    worldAgeHours = at,
+                    actorKey = spec.actorKey,
+                    subjectKey = spec.subjectKey,
+                    sourceFactionID = actorFactionID,
+                    targetFactionID = victimFactionID,
+                    encounterKey = key,
+                    result = "duplicate",
+                    reason = "incident_already_finalized",
+                    incidentID = episode.incidentID,
+                    firstHitAt = episode.firstAt,
+                    lastHitAt = episode.lastAt,
+                    hitCount = episode.hitCount,
+                    accumulatedDamage = episode.totalDamage,
+                    maximumDamage = episode.maximumDamage,
+                    expiryTime = episode.expiresAt,
+                })
+            end
             return false, "attack_aggregated"
         end
     else
@@ -439,7 +607,15 @@ function Service.RecordAttack(
             tostring(spec.subjectKey or ""),
             tostring(at),
         }, ":")
-        episode = { hitCount = 0 }
+        episode = {
+            id = externalID,
+            key = key,
+            firstAt = at,
+            hitCount = 0,
+            totalDamage = 0,
+            maximumDamage = 0,
+            state = "new",
+        }
     end
     local request = {}
     for name, value in pairs(spec) do request[name] = value end
@@ -456,9 +632,180 @@ function Service.RecordAttack(
         episode.type = incidentType
         episode.lastAt = at
         episode.hitCount = (episode.hitCount or 0) + 1
+        episode.totalDamage =
+            (episode.totalDamage or 0) + damage
+        episode.maximumDamage = math.max(
+            episode.maximumDamage or 0, damage
+        )
+        episode.expiresAt = at + aggregationHours
+        episode.actorKey = actorKey
+        episode.subjectKey = subjectKey
+        episode.sourceFactionID = actorFactionID
+        episode.targetFactionID = victimFactionID
+        episode.leaderVictim = spec.targetRecord ~= nil
+            and Factions.Registry.byID[victimFactionID] ~= nil
+            and Factions.Registry.byID[victimFactionID]
+                .leaderNPCID == spec.targetRecord.id
+        local intentionality = type(spec.intentionality)
+            == "string" and spec.intentionality
+            or "intentional"
+        if intentionality ~= "intentional"
+            and intentionality ~= "accidental"
+            and intentionality ~= "self_defense"
+            and intentionality ~= "unknown"
+        then
+            intentionality = "unknown"
+        end
+        episode.intentionality = intentionality
+        episode.state = upgradeIncidentID
+            and "upgraded_to_severe"
+            or incidentType == "member_attacked_minor"
+                and "finalized_minor" or "finalized_severe"
         Service.RuntimeEpisodes[key] = episode
     end
+    if PNC.FactionTelemetry then
+        PNC.FactionTelemetry.RecordAggregation({
+            operation = "record_attack",
+            worldAgeHours = at,
+            actorKey = spec.actorKey,
+            subjectKey = spec.subjectKey,
+            sourceFactionID = actorFactionID,
+            targetFactionID = victimFactionID,
+            encounterKey = key,
+            result = ok and episode.state or "rejected",
+            reason = reason,
+            incidentID = episode.incidentID,
+            firstHitAt = episode.firstAt,
+            lastHitAt = episode.lastAt,
+            hitCount = episode.hitCount,
+            accumulatedDamage = episode.totalDamage,
+            maximumDamage = episode.maximumDamage,
+            leaderVictim = episode.leaderVictim,
+            intentionality = episode.intentionality,
+            severityBand = episode.type,
+            finalizedIncidentType = episode.type,
+            expiryTime = episode.expiresAt,
+        })
+    end
     return ok, reason, result
+end
+
+function Service.PumpRuntime(worldAgeHours)
+    local at = finiteTimestamp(worldAgeHours)
+    if not at then return 0 end
+    local nowMS = Core and Core.Now and Core.Now() or 0
+    if nowMS > 0
+        and nowMS - Service.LastRuntimePumpAtMS < 1000
+    then
+        return 0
+    end
+    Service.LastRuntimePumpAtMS = nowMS
+    local removed = 0
+    for key, episode in pairs(Service.RuntimeEpisodes) do
+        if (tonumber(episode.expiresAt) or 0) <= at then
+            Service.RuntimeEpisodes[key] = nil
+            removed = removed + 1
+            if PNC.FactionTelemetry then
+                PNC.FactionTelemetry.RecordAggregation({
+                    operation = "expire_episode",
+                    worldAgeHours = at,
+                    actorKey = episode.actorKey,
+                    subjectKey = episode.subjectKey,
+                    sourceFactionID = episode.sourceFactionID,
+                    targetFactionID = episode.targetFactionID,
+                    encounterKey = key,
+                    result = episode.type
+                        == "member_attacked_minor"
+                        and "finalized_minor"
+                        or "finalized_severe",
+                    reason = "aggregation_window_expired",
+                    incidentID = episode.incidentID,
+                    hitCount = episode.hitCount,
+                    accumulatedDamage = episode.totalDamage,
+                    maximumDamage = episode.maximumDamage,
+                })
+            end
+        end
+    end
+    local callbackCutoff = at
+        - tuning("callbackDedupeHours", 1)
+    for callbackID, createdAt in pairs(
+        Service.RuntimeCallbackIDs
+    ) do
+        if (tonumber(createdAt) or 0) <= callbackCutoff then
+            Service.RuntimeCallbackIDs[callbackID] = nil
+        end
+    end
+    local retained = {}
+    for _, callbackID in ipairs(
+        Service.RuntimeCallbackOrder
+    ) do
+        if Service.RuntimeCallbackIDs[callbackID] then
+            retained[#retained + 1] = callbackID
+        end
+    end
+    Service.RuntimeCallbackOrder = retained
+    return removed
+end
+
+function Service.CleanupEntity(entityKey, worldAgeHours, reason)
+    if not safeEntityKey(entityKey) then
+        return 0, "invalid_entity_key"
+    end
+    local removed = 0
+    for key, episode in pairs(Service.RuntimeEpisodes) do
+        if episode.actorKey == entityKey
+            or episode.subjectKey == entityKey
+        then
+            Service.RuntimeEpisodes[key] = nil
+            removed = removed + 1
+            if PNC.FactionTelemetry then
+                PNC.FactionTelemetry.RecordAggregation({
+                    operation = "cleanup_entity",
+                    worldAgeHours = finiteTimestamp(worldAgeHours)
+                        or 0,
+                    actorKey = episode.actorKey,
+                    subjectKey = episode.subjectKey,
+                    sourceFactionID = episode.sourceFactionID,
+                    targetFactionID = episode.targetFactionID,
+                    encounterKey = key,
+                    result = "canceled",
+                    reason = tostring(reason or "entity_cleanup"),
+                    incidentID = episode.incidentID,
+                })
+            end
+        end
+    end
+    return removed, "cleaned"
+end
+
+function Service.GetActiveEpisodes()
+    local output = {}
+    for _, episode in pairs(Service.RuntimeEpisodes) do
+        output[#output + 1] = {
+            id = episode.id,
+            key = episode.key,
+            actorKey = episode.actorKey,
+            subjectKey = episode.subjectKey,
+            sourceFactionID = episode.sourceFactionID,
+            targetFactionID = episode.targetFactionID,
+            incidentID = episode.incidentID,
+            type = episode.type,
+            state = episode.state,
+            firstAt = episode.firstAt,
+            lastAt = episode.lastAt,
+            expiresAt = episode.expiresAt,
+            hitCount = episode.hitCount,
+            totalDamage = episode.totalDamage,
+            maximumDamage = episode.maximumDamage,
+            leaderVictim = episode.leaderVictim,
+            intentionality = episode.intentionality,
+        }
+    end
+    table.sort(output, function(left, right)
+        return tostring(left.key) < tostring(right.key)
+    end)
+    return output
 end
 
 function Service.RecordPositiveEvent(

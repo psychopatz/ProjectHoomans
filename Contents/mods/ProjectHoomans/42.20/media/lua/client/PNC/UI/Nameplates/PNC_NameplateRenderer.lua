@@ -8,6 +8,12 @@ local Layout = Presentation.Layout
 local Fonts = Presentation.Fonts
 
 local DEBUG_COLOR = { r = 0.8, g = 0.9, b = 1.0, a = 1.0 }
+local FACTION_COLORS = {
+    danger = { r = 1.0, g = 0.20, b = 0.16, a = 1.0 },
+    warning = { r = 1.0, g = 0.72, b = 0.18, a = 1.0 },
+    success = { r = 0.22, g = 1.0, b = 0.42, a = 1.0 },
+    neutral = { r = 0.12, g = 0.88, b = 1.0, a = 1.0 },
+}
 local SCENE_COLOR = { r = 0.68, g = 0.48, b = 1.0, a = 1.0 }
 local SCENE_TRACK_COLOR = { r = 0.52, g = 0.82, b = 1.0, a = 1.0 }
 local INFECTION_COLOR = { r = 1.0, g = 0.12, b = 0.08, a = 1.0 }
@@ -98,6 +104,57 @@ local function drawDebugText(
     showScene
 )
     local lineHeight = getTextManager():getFontHeight(Fonts.debug) + 2
+    local factionColor = FACTION_COLORS[
+        entry.factionDebugTone or "neutral"
+    ] or FACTION_COLORS.neutral
+    for _, key in ipairs({
+        "factionDebugLine1",
+        "factionDebugLine2",
+        "factionDebugLine3",
+    }) do
+        local value = entry[key]
+        if value and value ~= "" then
+            Presentation.DrawOutlinedText(
+                manager,
+                value,
+                screenX - ((entry[key .. "Width"] or 0) / 2),
+                y,
+                factionColor,
+                alpha,
+                Fonts.debug
+            )
+            y = y + lineHeight
+        end
+    end
+    for _, definition in ipairs({
+        {
+            key = "relationshipDebugLine",
+            tone = entry.relationshipDebugTone,
+        },
+        {
+            key = "relationshipChangeLine",
+            tone = entry.relationshipChangeTone,
+        },
+    }) do
+        local key = definition.key
+        local value = entry[key]
+        local color = FACTION_COLORS[
+            definition.tone or "neutral"
+        ] or FACTION_COLORS.neutral
+        if value and value ~= "" then
+            Presentation.DrawOutlinedText(
+                manager,
+                value,
+                screenX
+                    - ((entry[key .. "Width"] or 0) / 2),
+                y,
+                color,
+                alpha,
+                Fonts.debug
+            )
+            y = y + lineHeight
+        end
+    end
     if entry.debugText and entry.debugText ~= "" then
         Presentation.DrawOutlinedText(
             manager,
@@ -231,7 +288,10 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
     local showAnimation = settings.showAnimationDebug == true
     local showScene =
         settings.showAnimationSceneDebug == true
-    if showDebug or showAnimation or showScene then
+    local showFaction = settings.showFactionDebug == true
+    if showDebug or showAnimation or showScene
+        or showFaction
+    then
         local debugY
         if entry.staminaVisible then
             debugY = (entry.healthVisible and staminaTop or barTop) + metrics.barHeight + Layout.debugTextGap

@@ -9,6 +9,18 @@ then
     PNC.Config.Factions
         .EnemyRelationshipCanImmediatelyDeclareWar = false
 end
+local debugFlags = {
+    "DebugDiplomacyCallbacks",
+    "DebugIncidentAggregation",
+    "DebugIntentResolution",
+    "DebugTreatyReconciliation",
+    "EnableValidationTelemetry",
+}
+for _, name in ipairs(debugFlags) do
+    if PNC.Config.Factions[name] == nil then
+        PNC.Config.Factions[name] = false
+    end
+end
 PNC.FactionConstants = PNC.FactionConstants or {}
 
 local Constants = PNC.FactionConstants

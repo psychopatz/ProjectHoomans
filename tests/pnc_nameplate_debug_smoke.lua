@@ -1,4 +1,4 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
+local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -173,6 +173,98 @@ local entriesFile = assert(io.open(entriesPath, "r"))
 local entriesSource = entriesFile:read("*a")
 entriesFile:close()
 assertNotContains(entriesSource, "hpText", "numeric HP cache returned")
+
+PNC.NameplateBodies = {}
+PNC.Network = { ClientState = { snapshots = {} } }
+PNC.FactionDebugOverlay = {
+    GetNPCDiagnostic = function()
+        return {
+            factionName = "Mill Looters",
+            archetypeID = "looter",
+            role = "raider",
+            rank = "member",
+            relationState = "war",
+            atWarWithPlayer = true,
+            intent = "attack",
+            intentReason = "factions_at_war",
+            attackAllowed = true,
+            legacyFaction = "hostile",
+            attackPlayers = true,
+            attackNPCs = true,
+            attackZombies = true,
+            orderKind = "hostile_hunt",
+            activeJob = "HuntNearestPlayer",
+            relationship = {
+                approval = 12,
+                respect = 8,
+                familiarity = 6,
+                state = "neutral",
+                revision = 2,
+            },
+            morale = 3,
+        }
+    end,
+    GetRelationshipChange = function()
+        return {
+            kind = "social_event",
+            memoryType = "treated_wound",
+            knowledgeSource = "experienced",
+            approvalDelta = 4,
+            respectDelta = 2,
+            familiarityDelta = 1,
+            moraleDelta = 1,
+            stateBefore = "unknown",
+            stateAfter = "neutral",
+        }, 1
+    end,
+}
+dofile(entriesPath)
+local factionLine1
+local factionLine2
+local factionLine3
+local relationshipLine
+local relationshipChangeLine
+local factionTone
+local relationshipTone
+local relationshipChangeTone
+factionLine1,
+factionLine2,
+factionLine3,
+relationshipLine,
+relationshipChangeLine,
+factionTone,
+relationshipTone,
+relationshipChangeTone =
+    PNC.NameplateEntries.BuildFactionDebugLines(
+        { id = "npc_debug" },
+        { showFactionDebug = true }
+    )
+assertContains(factionLine1, "Mill Looters",
+    "faction nameplate organization")
+assertContains(factionLine2, "war=true",
+    "faction nameplate war state")
+assertContains(factionLine2, "attack=true",
+    "faction nameplate resolved attack")
+assertContains(factionLine3, "order=hostile_hunt",
+    "faction nameplate tactical order")
+assertEqual(factionTone, "danger",
+    "faction nameplate hostile tone")
+assertContains(relationshipLine, "A=+12.0",
+    "relationship nameplate approval")
+assertContains(relationshipLine, "state=neutral",
+    "relationship nameplate state")
+assertContains(relationshipChangeLine,
+    "CHANGE treated_wound [social_event]",
+    "relationship nameplate change type")
+assertContains(relationshipChangeLine, "dA=+4.0",
+    "relationship nameplate approval delta")
+assertContains(relationshipChangeLine,
+    "unknown>neutral",
+    "relationship nameplate state transition")
+assertEqual(relationshipTone, "neutral",
+    "relationship nameplate current tone")
+assertEqual(relationshipChangeTone, "success",
+    "relationship nameplate positive change tone")
 
 local rendererPath = ROOT .. "PNC/UI/Nameplates/PNC_NameplateRenderer.lua"
 local rendererFile = assert(io.open(rendererPath, "r"))

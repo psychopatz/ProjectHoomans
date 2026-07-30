@@ -1,5 +1,5 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/PNC_Nameplates.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_Nameplates.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -162,5 +162,27 @@ assertEqual(
 )
 assertEqual(writes[6].value, false,
     "scene overlay disabled persisted")
+
+assertEqual(
+    PNC.Nameplates.IsFactionDebugEnabled(),
+    false,
+    "faction world overlay defaults off"
+)
+assertEqual(
+    PNC.Nameplates.ToggleFactionDebug(),
+    true,
+    "faction world overlay toggles on"
+)
+assertEqual(writes[7].key, "showFactionDebug",
+    "faction overlay setting persisted")
+assertEqual(halos[7], "UI_PNC_FactionOverlayEnabled",
+    "faction overlay enabled feedback")
+assertEqual(
+    PNC.Nameplates.ToggleFactionDebug(),
+    false,
+    "faction world overlay toggles off"
+)
+assertEqual(writes[8].value, false,
+    "faction overlay disabled persisted")
 
 print("pnc_combat_overlay_toggle_smoke: ok")

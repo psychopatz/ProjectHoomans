@@ -90,6 +90,11 @@ end
 function Lifecycle.OnPlayerDeath(first, second)
     local player = callbackPlayer(first, second)
     if player and service() then
+        local entityKey = service().GetEntityKey
+            and service().GetEntityKey(player, {
+                callback = "OnPlayerDeath",
+                worldAgeHours = worldAgeHours(),
+            }) or nil
         local faction = PNC.Factions
             and PNC.Factions.GetPlayerFaction
             and PNC.Factions.GetPlayerFaction(player)
@@ -99,6 +104,16 @@ function Lifecycle.OnPlayerDeath(first, second)
             worldAgeHours(),
             "OnPlayerDeath"
         )
+        if PNC.FactionTelemetry then
+            PNC.FactionTelemetry.RecordCallback({
+                operation = "player_death",
+                worldAgeHours = worldAgeHours(),
+                actorKey = entityKey,
+                sourceFactionID = faction and faction.id or nil,
+                result = changed and "accepted" or "rejected",
+                reason = reason,
+            })
+        end
         if faction and PNC.FactionBehavior
             and PNC.FactionBehavior.ReconcileFaction
         then
@@ -138,6 +153,34 @@ function Lifecycle.Pump(now, force)
             seen[player] = true
             players[#players + 1] = player
         end)
+    end
+    for stalePlayer, _ in pairs(
+        identity.RuntimeByPlayer or {}
+    ) do
+        if not seen[stalePlayer] then
+            local staleKey = identity.GetEntityKey
+                and identity.GetEntityKey(stalePlayer, {
+                    callback = "disconnect_sweep",
+                    worldAgeHours = at,
+                }) or nil
+            if staleKey and PNC.FactionIncidentService
+                and PNC.FactionIncidentService.CleanupEntity
+            then
+                PNC.FactionIncidentService.CleanupEntity(
+                    staleKey, at, "player_disconnect"
+                )
+            end
+            if PNC.FactionTelemetry then
+                PNC.FactionTelemetry.RecordCallback({
+                    operation = "player_disconnect_sweep",
+                    worldAgeHours = at,
+                    actorKey = staleKey,
+                    result = staleKey and "resolved" or "rejected",
+                    reason = staleKey and "stale_runtime_binding"
+                        or "actor_identity_missing",
+                })
+            end
+        end
     end
     -- Clear replaced/disconnected objects before validating current claims.
     -- This lets a newly loaded object rebind its survivor UUID instead of

@@ -241,6 +241,32 @@ assertEqual(PNC.Relationships.AddMemory(
 ), true, "player-character relationship added")
 assertEqual(PNC.Relationships.GetApproval(alice.id, playerKey), 4,
     "player-character relationship stored")
+local playerChange =
+    alice.runtime.relationshipDebugChanges[
+        #alice.runtime.relationshipDebugChanges
+    ]
+assertEqual(playerChange.targetKey, playerKey,
+    "debug change targets exact player character")
+assertEqual(playerChange.kind, "memory_added",
+    "debug change records memory mutation type")
+assertEqual(playerChange.memoryType, "test_memory",
+    "debug change records social cause")
+assertEqual(playerChange.approvalDelta, 4,
+    "debug change records approval delta")
+assertEqual(playerChange.respectDelta, 2,
+    "debug change records respect delta")
+assertEqual(playerChange.stateBefore, "unknown",
+    "debug change records prior state")
+assertSaveSafe(playerChange, "relationshipDebugChange")
+local debugFeedPayload =
+    PNC.Persistence.SerializeRecord(alice)
+assertEqual(debugFeedPayload.runtime, nil,
+    "runtime relationship change feed is not persisted")
+assertEqual(
+    debugFeedPayload.social.relationshipDebugChanges,
+    nil,
+    "debug change feed does not enter social persistence"
+)
 
 -- 6-9. Numeric clamping.
 local clampKey = PNC.EntityRef.ForNPC("npc_clamp")

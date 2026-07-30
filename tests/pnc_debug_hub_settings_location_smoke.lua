@@ -28,6 +28,7 @@ PNC = {
     NPCMonitor = { Toggle = function() end },
     RelationshipDebugUI = { Toggle = function() end },
     FactionDebugUI = { Toggle = function() end },
+    FactionDebugOverlay = { Toggle = function() end },
     Client = { CanUseDebug = function() return true end },
     Settings = { Toggle = function() end },
 }
@@ -42,6 +43,8 @@ assert(tools["pnc.relationships"],
     "relationship inspector debug tool missing")
 assert(tools["pnc.factions"],
     "faction inspector debug tool missing")
+assert(tools["pnc.factionOverlay"],
+    "faction diplomacy overlay debug tool missing")
 assertEqual(tools["pnc.settings"], nil,
     "Project Hoomans settings remained in debug hub")
 

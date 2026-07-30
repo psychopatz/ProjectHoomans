@@ -10,6 +10,137 @@ local ClientState = PNC.Network.ClientState
 
 local UPDATE_RATE = 6
 
+local function rounded(value)
+    value = tonumber(value) or 0
+    if value < 0 then
+        return math.ceil(value * 10 - 0.5) / 10
+    end
+    return math.floor(value * 10 + 0.5) / 10
+end
+
+local function signed(value)
+    value = rounded(value)
+    return (value > 0 and "+" or "") .. tostring(value)
+end
+
+local function factionDebugLines(snapshot, settings)
+    if not settings
+        or settings.showFactionDebug ~= true
+        or not PNC.FactionDebugOverlay
+        or not PNC.FactionDebugOverlay.GetNPCDiagnostic
+    then
+        return "", "", "", "", "", nil, nil, nil
+    end
+    local value =
+        PNC.FactionDebugOverlay.GetNPCDiagnostic(snapshot.id)
+    if not value then
+        return "FACTION waiting for server diagnostic",
+            "", "", "", "", "warning", "neutral", nil
+    end
+    local faction = value.factionName
+        or value.factionID or "unaffiliated"
+    local first = "FACTION " .. tostring(faction)
+        .. " [" .. tostring(value.archetypeID or "-") .. "]"
+        .. " " .. tostring(value.role or "-")
+        .. "/" .. tostring(value.rank or "-")
+    local second = "PLAYER relation="
+        .. tostring(value.relationState or "unknown")
+        .. " war=" .. tostring(value.atWarWithPlayer == true)
+        .. " intent=" .. tostring(value.intent or "observe")
+        .. " attack=" .. tostring(value.attackAllowed == true)
+        .. " (" .. tostring(value.intentReason or "-") .. ")"
+    local target = value.target
+    local third = "TACTICAL "
+        .. tostring(value.legacyFaction or "neutral")
+        .. " P/N/Z="
+        .. tostring(value.attackPlayers == true) .. "/"
+        .. tostring(value.attackNPCs == true) .. "/"
+        .. tostring(value.attackZombies == true)
+        .. " order=" .. tostring(value.orderKind or "-")
+        .. " job=" .. tostring(value.activeJob or "-")
+        .. " target=" .. tostring(
+            target and (
+                tostring(target.kind or "?")
+                    .. ":" .. tostring(target.id or "-")
+            ) or "none"
+        )
+    local tone = value.attackAllowed == true and "danger"
+        or value.commandable == true and "success"
+        or value.atWarWithPlayer == true and "warning"
+        or "neutral"
+    local relationship = value.relationship or {}
+    local fourth = "REL player A="
+        .. signed(relationship.approval)
+        .. " R=" .. signed(relationship.respect)
+        .. " F=" .. tostring(
+            rounded(relationship.familiarity)
+        )
+        .. " state=" .. tostring(
+            relationship.state or "unknown"
+        )
+        .. " rev=" .. tostring(
+            tonumber(relationship.revision) or 0
+        )
+        .. " morale=" .. signed(value.morale)
+    local relationshipTone =
+        (tonumber(relationship.approval) or 0) < 0
+            and "danger"
+        or relationship.state == "friend" and "success"
+        or relationship.state == "enemy" and "danger"
+        or relationship.state == "rival" and "warning"
+        or "neutral"
+    local change
+    local changeCount
+    if PNC.FactionDebugOverlay.GetRelationshipChange then
+        change, changeCount =
+            PNC.FactionDebugOverlay.GetRelationshipChange(
+                snapshot.id
+            )
+    end
+    local fifth = ""
+    local changeTone
+    if change then
+        local changeType = tostring(
+            change.memoryType
+                or change.kind
+                or "relationship_changed"
+        )
+        fifth = "CHANGE " .. changeType
+            .. " [" .. tostring(
+                change.kind or "relationship_changed"
+            ) .. "]"
+            .. " dA=" .. signed(change.approvalDelta)
+            .. " dR=" .. signed(change.respectDelta)
+            .. " dF=" .. signed(change.familiarityDelta)
+            .. " dM=" .. signed(change.moraleDelta)
+        if change.stateBefore ~= change.stateAfter then
+            fifth = fifth .. " "
+                .. tostring(change.stateBefore or "unknown")
+                .. ">" .. tostring(
+                    change.stateAfter or "unknown"
+                )
+        end
+        if (tonumber(changeCount) or 0) > 1 then
+            fifth = fifth .. " x"
+                .. tostring(changeCount)
+        end
+        if change.knowledgeSource then
+            fifth = fifth .. " src="
+                .. tostring(change.knowledgeSource)
+        end
+        local net = (tonumber(change.approvalDelta) or 0)
+            + (tonumber(change.respectDelta) or 0)
+            + (tonumber(change.moraleDelta) or 0)
+        changeTone = net < 0 and "danger"
+            or net > 0 and "success"
+            or "warning"
+    end
+    return first, second, third, fourth, fifth,
+        tone, relationshipTone, changeTone
+end
+
+Entries.BuildFactionDebugLines = factionDebugLines
+
 local function cacheMetrics(entry, snapshot, zombie, settings)
     local fonts = Presentation.Fonts
     local showDebug = settings and settings.showAIDebug == true
@@ -37,6 +168,20 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
         and Debug.InfectionText(snapshot, settings) or ""
     local treatmentText, treatmentColor =
         Presentation.TreatmentStatus(snapshot)
+    local factionLine1
+    local factionLine2
+    local factionLine3
+    local relationshipDebugLine
+    local relationshipChangeLine
+    factionLine1,
+    factionLine2,
+    factionLine3,
+    relationshipDebugLine,
+    relationshipChangeLine,
+    entry.factionDebugTone,
+    entry.relationshipDebugTone,
+    entry.relationshipChangeTone =
+        factionDebugLines(snapshot, settings)
     entry.treatmentColor = treatmentColor
     entry.treatmentVisible = treatmentText ~= ""
     Presentation.CacheTextMetric(entry, "name", name, fonts.name)
@@ -69,6 +214,36 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
         entry,
         "treatmentText",
         treatmentText,
+        fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "factionDebugLine1",
+        factionLine1,
+        fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "factionDebugLine2",
+        factionLine2,
+        fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "factionDebugLine3",
+        factionLine3,
+        fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "relationshipDebugLine",
+        relationshipDebugLine,
+        fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "relationshipChangeLine",
+        relationshipChangeLine,
         fonts.debug
     )
 end
@@ -118,6 +293,12 @@ local function isDebugVisible(player, snapshot)
 end
 
 function Entries.Refresh(manager, settings)
+    if settings.showFactionDebug == true
+        and PNC.FactionDebugOverlay
+        and PNC.FactionDebugOverlay.Update
+    then
+        PNC.FactionDebugOverlay.Update()
+    end
     manager:setX(getPlayerScreenLeft(manager.playerIndex))
     manager:setY(getPlayerScreenTop(manager.playerIndex))
     manager.renderWidth = getPlayerScreenWidth(manager.playerIndex)
@@ -157,7 +338,10 @@ function Entries.Refresh(manager, settings)
                 manager.entries[uuid] = entry
                 visible[uuid] = true
             end
-        elseif settings.showAIDebug and snapshot and isDebugVisible(player, snapshot) then
+        elseif (
+            settings.showAIDebug
+                or settings.showFactionDebug
+        ) and snapshot and isDebugVisible(player, snapshot) then
             local entry = manager.entries[uuid] or { uuid = uuid }
             populateDebugEntry(entry, snapshot, settings)
             manager.entries[uuid] = entry

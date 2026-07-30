@@ -556,6 +556,26 @@ function SocialEvents.Process(eventSpec)
             factionIDForEntityKey(event.actorKey)
         local targetFactionID =
             factionIDForEntityKey(event.targetKey)
+        if PNC.FactionTelemetry then
+            PNC.FactionTelemetry.RecordCallback({
+                operation = "social_event_faction_bridge",
+                worldAgeHours = event.occurredAt,
+                actorKey = event.actorKey,
+                subjectKey = event.targetKey,
+                sourceFactionID = actorFactionID,
+                targetFactionID = targetFactionID,
+                result = actorFactionID and targetFactionID
+                    and actorFactionID ~= targetFactionID
+                    and "accepted" or "rejected",
+                reason = not actorFactionID
+                    and "actor_faction_missing"
+                    or not targetFactionID
+                        and "victim_faction_missing"
+                    or actorFactionID == targetFactionID
+                        and "same_faction"
+                    or factionIncidentType,
+            })
+        end
         if actorFactionID and targetFactionID
             and actorFactionID ~= targetFactionID
         then

@@ -388,6 +388,34 @@ function Presence.Abstract(record, reason)
     if not Core.IsAuthority() or record.presenceState ~= Const.PRESENCE_LIVE then
         return false
     end
+    if PNC.FactionIncidentService
+        and PNC.FactionIncidentService.CleanupEntity
+        and PNC.EntityRef
+    then
+        PNC.FactionIncidentService.CleanupEntity(
+            PNC.EntityRef.ForNPC(record.id),
+            getGameTime and getGameTime()
+                and getGameTime().getWorldAgeHours
+                and getGameTime():getWorldAgeHours() or 0,
+            reason or "target_abstracted"
+        )
+    end
+    if PNC.FactionTelemetry then
+        PNC.FactionTelemetry.RecordCallback({
+            operation = "npc_abstraction",
+            worldAgeHours = getGameTime and getGameTime()
+                and getGameTime().getWorldAgeHours
+                and getGameTime():getWorldAgeHours() or 0,
+            actorKey = PNC.EntityRef
+                and PNC.EntityRef.ForNPC(record.id) or nil,
+            sourceFactionID = PNC.Factions
+                and PNC.Factions.GetOrganizationalFactionID
+                and PNC.Factions.GetOrganizationalFactionID(record)
+                or nil,
+            result = "accepted",
+            reason = reason or "abstract",
+        })
+    end
     if PNC.SocialEncounterTracker
         and PNC.SocialEncounterTracker.OnParticipantLeft
         and PNC.SocialEventHooks

@@ -964,8 +964,33 @@ function Factions.SetLeader(
     return true, "leader_set", copy(faction)
 end
 
+local function tracePlayerIdentity(
+    callback,
+    worldAgeHours,
+    playerKey,
+    resultReason
+)
+    if PNC.FactionTelemetry
+        and PNC.FactionTelemetry.RecordAttribution
+    then
+        PNC.FactionTelemetry.RecordAttribution({
+            operation = callback or "player_identity_resolution",
+            worldAgeHours = worldAgeHours,
+            actorKey = playerKey,
+            result = playerKey and "resolved" or "rejected",
+            reason = resultReason or (
+                playerKey and "resolved"
+                    or "actor_identity_missing"
+            ),
+        })
+    end
+end
+
 local function playerKeyFor(player, callback, ensure)
     if not player or not PNC.PlayerCharacters then
+        tracePlayerIdentity(
+            callback, 0, nil, "actor_identity_missing"
+        )
         return nil, "player_identity_unavailable"
     end
     if ensure ~= true then
@@ -978,6 +1003,10 @@ local function playerKeyFor(player, callback, ensure)
             accountIdentity,
             uuid
         ) or nil
+        local reason = key and "resolved"
+            or uuid and "invalid_character_uuid"
+            or "actor_identity_missing"
+        tracePlayerIdentity(callback, 0, key, reason)
         return key, key and "resolved"
             or "player_identity_unavailable"
     end
@@ -987,10 +1016,14 @@ local function playerKeyFor(player, callback, ensure)
     local at = getGameTime and getGameTime()
         and getGameTime().getWorldAgeHours
         and getGameTime():getWorldAgeHours() or 0
-    return PNC.PlayerCharacters.GetEntityKey(player, {
+    local key
+    local reason
+    key, reason = PNC.PlayerCharacters.GetEntityKey(player, {
         callback = callback or "faction",
         worldAgeHours = finiteTimestamp(at, 0),
     })
+    tracePlayerIdentity(callback, at, key, reason)
+    return key, reason
 end
 
 function Factions.GetFactionForPlayerKey(playerKey)
@@ -1192,7 +1225,12 @@ local function rememberIncidentID(relation, incidentID)
         #relation.recentIncidentIDs + 1
     ] = incidentID
     while #relation.recentIncidentIDs
-        > Constants.RECENT_INCIDENT_ID_LIMIT
+        > (
+            PNC.FactionBalance
+            and PNC.FactionBalance.Get(
+                "recentIncidentIDLimit"
+            ) or Constants.RECENT_INCIDENT_ID_LIMIT
+        )
     do
         table.remove(relation.recentIncidentIDs, 1)
     end
@@ -1244,14 +1282,26 @@ local function appendAudit(
     return incident ~= nil
 end
 
-local function reconcilePair(firstFactionID, secondFactionID, reason)
+local function reconcilePair(
+    firstFactionID,
+    secondFactionID,
+    reason,
+    worldAgeHours
+)
     if not PNC.FactionBehavior
-        or not PNC.FactionBehavior.ReconcileFaction
+        or not PNC.FactionBehavior.QueueTreatyReconciliation
     then
         return
     end
-    PNC.FactionBehavior.ReconcileFaction(firstFactionID, reason)
-    PNC.FactionBehavior.ReconcileFaction(secondFactionID, reason)
+    PNC.FactionBehavior.QueueTreatyReconciliation(
+        firstFactionID,
+        secondFactionID,
+        reason,
+        worldAgeHours
+    )
+    if PNC.FactionBehavior.PumpReconciliation then
+        PNC.FactionBehavior.PumpReconciliation()
+    end
 end
 
 function Factions.CommitDirectedRelation(
@@ -1414,7 +1464,8 @@ local function mutateTreaty(
     reconcilePair(
         firstFactionID,
         secondFactionID,
-        "diplomacy_" .. incidentType
+        "diplomacy_" .. incidentType,
+        at
     )
     return true, incidentType, copy(forward)
 end
@@ -1477,7 +1528,14 @@ end
 
 function Factions.StartTruce(firstFactionID, secondFactionID, options)
     options = type(options) == "table" and options or {}
-    local untilAt = finiteTimestamp(options.truceUntil, 0)
+    local at = finiteTimestamp(options.worldAgeHours, 0)
+    local untilAt = options.truceUntil ~= nil
+        and finiteTimestamp(options.truceUntil, 0)
+        or at + (
+            PNC.FactionBalance
+            and PNC.FactionBalance.Get("defaultTruceHours")
+            or 24
+        )
     return mutateTreaty(
         firstFactionID,
         secondFactionID,
@@ -1519,15 +1577,30 @@ function Factions.MakePeace(firstFactionID, secondFactionID, options)
                 relation.warEndedAt = at
                 relation.standing =
                     PNC.FactionDiplomacyMath.ClampStanding(
-                        relation.standing + 15
+                        relation.standing + (
+                            PNC.FactionBalance
+                            and PNC.FactionBalance.Get(
+                                "peaceStandingGain"
+                            ) or 15
+                        )
                     )
                 relation.trust =
                     PNC.FactionDiplomacyMath.ClampTrust(
-                        relation.trust + 10
+                        relation.trust + (
+                            PNC.FactionBalance
+                            and PNC.FactionBalance.Get(
+                                "peaceTrustGain"
+                            ) or 10
+                        )
                     )
                 relation.grievance =
                     PNC.FactionDiplomacyMath.ClampGrievance(
-                        relation.grievance * 0.5
+                        relation.grievance * (
+                            PNC.FactionBalance
+                            and PNC.FactionBalance.Get(
+                                "peaceGrievanceMultiplier"
+                            ) or 0.5
+                        )
                     )
             end
             return true
@@ -1596,12 +1669,48 @@ local function factionForPlayer(player, create, at)
     local faction
     if create then
         local ok
-        ok, _, faction = Factions.EnsurePlayerFaction(player, {
+        local reason
+        ok, reason, faction = Factions.EnsurePlayerFaction(player, {
             worldAgeHours = at,
         })
+        if PNC.FactionTelemetry then
+            PNC.FactionTelemetry.RecordAttribution({
+                operation = "player_faction_resolution",
+                worldAgeHours = at,
+                actorKey = faction and faction.ownerPlayerKey,
+                sourceFactionID = faction and faction.id,
+                result = ok and "resolved" or "rejected",
+                reason = reason or (
+                    ok and "resolved"
+                        or "actor_faction_missing"
+                ),
+            })
+        end
         return ok and faction or nil
     end
-    return Factions.GetPlayerFaction(player)
+    faction = Factions.GetPlayerFaction(player)
+    if PNC.FactionTelemetry then
+        PNC.FactionTelemetry.RecordAttribution({
+            operation = "player_faction_resolution",
+            worldAgeHours = at,
+            actorKey = faction and faction.ownerPlayerKey,
+            sourceFactionID = faction and faction.id,
+            result = faction and "resolved" or "rejected",
+            reason = faction and "existing"
+                or "actor_faction_missing",
+        })
+    end
+    return faction
+end
+
+local function traceFactionCallback(category, fields)
+    local telemetry = PNC.FactionTelemetry
+    if not telemetry then return end
+    if category == "callback" then
+        telemetry.RecordCallback(fields)
+    else
+        telemetry.RecordAttribution(fields)
+    end
 end
 
 function Factions.OnPlayerAggression(
@@ -1613,7 +1722,25 @@ function Factions.OnPlayerAggression(
     local targetFactionID =
         Factions.GetOrganizationalFactionID(targetRecord)
     local playerFaction
+    traceFactionCallback("callback", {
+        operation = context and context.callback
+            or "player_aggression",
+        worldAgeHours = worldAgeHours,
+        subjectKey = targetRecord and targetRecord.id
+            and EntityRef.ForNPC(targetRecord.id) or nil,
+        targetFactionID = targetFactionID,
+        result = "received",
+        damage = context and context.damage,
+        severe = context and context.severe,
+        killed = context and context.killed,
+    })
     if not targetFactionID then
+        traceFactionCallback("attribution", {
+            operation = "resolve_player_attack",
+            worldAgeHours = worldAgeHours,
+            result = "rejected",
+            reason = "victim_faction_missing",
+        })
         return false, "target_unaffiliated"
     end
     playerFaction = factionForPlayer(
@@ -1622,15 +1749,41 @@ function Factions.OnPlayerAggression(
         worldAgeHours
     )
     if not playerFaction then
+        traceFactionCallback("attribution", {
+            operation = "resolve_player_attack",
+            worldAgeHours = worldAgeHours,
+            targetFactionID = targetFactionID,
+            result = "rejected",
+            reason = "actor_identity_missing",
+        })
         return false, "player_faction_unavailable"
     end
     if playerFaction.id == targetFactionID then
+        traceFactionCallback("attribution", {
+            operation = "resolve_player_attack",
+            worldAgeHours = worldAgeHours,
+            actorKey = playerFaction.ownerPlayerKey,
+            sourceFactionID = playerFaction.id,
+            targetFactionID = targetFactionID,
+            result = "rejected",
+            reason = "same_faction",
+        })
         return false, "same_faction"
     end
     if not PNC.FactionIncidentService then
         return false, "incident_service_unavailable"
     end
     context = type(context) == "table" and context or {}
+    traceFactionCallback("attribution", {
+        operation = "resolve_player_attack",
+        worldAgeHours = worldAgeHours,
+        actorKey = playerFaction.ownerPlayerKey,
+        subjectKey = EntityRef.ForNPC(targetRecord.id),
+        sourceFactionID = playerFaction.id,
+        targetFactionID = targetFactionID,
+        result = "accepted",
+        reason = "accepted_cross_faction_attack",
+    })
     return PNC.FactionIncidentService.RecordAttack(
         playerFaction.id,
         targetFactionID,
@@ -1641,6 +1794,8 @@ function Factions.OnPlayerAggression(
             callbackID = context.callbackID,
             severe = context.severe,
             killed = context.killed,
+            damage = context.damage,
+            intentionality = context.intentionality,
             targetRecord = targetRecord,
         }
     )
@@ -1656,16 +1811,62 @@ function Factions.OnNPCAggression(
         Factions.GetOrganizationalFactionID(attackerRecord)
     local targetFactionID =
         Factions.GetOrganizationalFactionID(targetRecord)
+    context = type(context) == "table" and context or {}
+    traceFactionCallback("callback", {
+        operation = context.callback or "npc_aggression",
+        worldAgeHours = worldAgeHours,
+        actorKey = attackerRecord and attackerRecord.id
+            and EntityRef.ForNPC(attackerRecord.id) or nil,
+        subjectKey = targetRecord and targetRecord.id
+            and EntityRef.ForNPC(targetRecord.id) or nil,
+        sourceFactionID = attackerFactionID,
+        targetFactionID = targetFactionID,
+        result = "received",
+        damage = context.damage,
+        severe = context.severe,
+        killed = context.killed,
+    })
     if not attackerFactionID or not targetFactionID then
+        traceFactionCallback("attribution", {
+            operation = "resolve_npc_attack",
+            worldAgeHours = worldAgeHours,
+            actorKey = attackerRecord and attackerRecord.id
+                and EntityRef.ForNPC(attackerRecord.id) or nil,
+            subjectKey = targetRecord and targetRecord.id
+                and EntityRef.ForNPC(targetRecord.id) or nil,
+            sourceFactionID = attackerFactionID,
+            targetFactionID = targetFactionID,
+            result = "rejected",
+            reason = not attackerFactionID
+                and "actor_faction_missing"
+                or "victim_faction_missing",
+        })
         return false, "unaffiliated"
     end
     if attackerFactionID == targetFactionID then
+        traceFactionCallback("attribution", {
+            operation = "resolve_npc_attack",
+            worldAgeHours = worldAgeHours,
+            sourceFactionID = attackerFactionID,
+            targetFactionID = targetFactionID,
+            result = "rejected",
+            reason = "same_faction",
+        })
         return false, "same_faction"
     end
     if not PNC.FactionIncidentService then
         return false, "incident_service_unavailable"
     end
-    context = type(context) == "table" and context or {}
+    traceFactionCallback("attribution", {
+        operation = "resolve_npc_attack",
+        worldAgeHours = worldAgeHours,
+        actorKey = EntityRef.ForNPC(attackerRecord.id),
+        subjectKey = EntityRef.ForNPC(targetRecord.id),
+        sourceFactionID = attackerFactionID,
+        targetFactionID = targetFactionID,
+        result = "accepted",
+        reason = "accepted_cross_faction_attack",
+    })
     return PNC.FactionIncidentService.RecordAttack(
         attackerFactionID,
         targetFactionID,
@@ -1677,6 +1878,8 @@ function Factions.OnNPCAggression(
             callbackID = context.callbackID,
             severe = context.severe,
             killed = context.killed,
+            damage = context.damage,
+            intentionality = context.intentionality,
         }
     )
 end
@@ -1690,7 +1893,25 @@ function Factions.OnNPCAttackPlayer(
     local attackerFactionID =
         Factions.GetOrganizationalFactionID(attackerRecord)
     local playerFaction
+    context = type(context) == "table" and context or {}
+    traceFactionCallback("callback", {
+        operation = context.callback or "npc_attack_player",
+        worldAgeHours = worldAgeHours,
+        actorKey = attackerRecord and attackerRecord.id
+            and EntityRef.ForNPC(attackerRecord.id) or nil,
+        sourceFactionID = attackerFactionID,
+        result = "received",
+        damage = context.damage,
+        severe = context.severe,
+        killed = context.killed,
+    })
     if not attackerFactionID then
+        traceFactionCallback("attribution", {
+            operation = "resolve_npc_attack_player",
+            worldAgeHours = worldAgeHours,
+            result = "rejected",
+            reason = "actor_faction_missing",
+        })
         return false, "attacker_unaffiliated"
     end
     playerFaction = factionForPlayer(
@@ -1701,12 +1922,35 @@ function Factions.OnNPCAttackPlayer(
     if not playerFaction
         or playerFaction.id == attackerFactionID
     then
+        traceFactionCallback("attribution", {
+            operation = "resolve_npc_attack_player",
+            worldAgeHours = worldAgeHours,
+            actorKey = EntityRef.ForNPC(attackerRecord.id),
+            subjectKey = playerFaction
+                and playerFaction.ownerPlayerKey or nil,
+            sourceFactionID = attackerFactionID,
+            targetFactionID = playerFaction
+                and playerFaction.id or nil,
+            result = "rejected",
+            reason = not playerFaction
+                and "victim_faction_missing"
+                or "same_faction",
+        })
         return false, "same_or_missing_faction"
     end
     if not PNC.FactionIncidentService then
         return false, "incident_service_unavailable"
     end
-    context = type(context) == "table" and context or {}
+    traceFactionCallback("attribution", {
+        operation = "resolve_npc_attack_player",
+        worldAgeHours = worldAgeHours,
+        actorKey = EntityRef.ForNPC(attackerRecord.id),
+        subjectKey = playerFaction.ownerPlayerKey,
+        sourceFactionID = attackerFactionID,
+        targetFactionID = playerFaction.id,
+        result = "accepted",
+        reason = "accepted_cross_faction_attack",
+    })
     return PNC.FactionIncidentService.RecordAttack(
         attackerFactionID,
         playerFaction.id,
@@ -1717,6 +1961,8 @@ function Factions.OnNPCAttackPlayer(
             callbackID = context.callbackID,
             severe = context.severe,
             killed = context.killed,
+            damage = context.damage,
+            intentionality = context.intentionality,
         }
     )
 end
@@ -1944,6 +2190,20 @@ function Factions.OnNPCDeath(npcID)
         or nil
     local faction = affiliation and affiliation.factionID
         and registryRecord(affiliation.factionID) or nil
+    local entityKey = EntityRef and EntityRef.ForNPC
+        and Types.IsValidNPCID(npcID)
+        and EntityRef.ForNPC(npcID) or nil
+    traceFactionCallback("callback", {
+        operation = "npc_death",
+        worldAgeHours = getGameTime and getGameTime()
+            and getGameTime().getWorldAgeHours
+            and getGameTime():getWorldAgeHours() or 0,
+        subjectKey = entityKey,
+        targetFactionID = faction and faction.id or nil,
+        result = faction and "resolved" or "rejected",
+        reason = faction and "faction_member_death"
+            or "victim_faction_missing",
+    })
     if not faction then return false, "unaffiliated" end
     if faction.leaderNPCID ~= npcID then
         return false, "not_leader"

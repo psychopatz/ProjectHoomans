@@ -14,6 +14,7 @@ local EntityRef = PNC.EntityRef
 local Types = PNC.RelationshipTypes
 local Math = PNC.RelationshipMath
 local Constants = PNC.RelationshipConstants
+local DEBUG_CHANGE_LIMIT = 16
 
 local function isAuthority()
     return Core and Core.IsAuthority and Core.IsAuthority() == true
@@ -86,9 +87,99 @@ local function prepareSocial(record)
     return normalized, not Types.AreEqual(record.social, normalized)
 end
 
+local function appendDebugChange(
+    record,
+    targetKey,
+    before,
+    after,
+    moraleBefore,
+    moraleAfter,
+    worldAgeHours,
+    changeSpec
+)
+    changeSpec = type(changeSpec) == "table"
+        and changeSpec or {}
+    before = type(before) == "table" and before or {}
+    after = type(after) == "table" and after or {}
+    local approvalBefore = tonumber(before.approval) or 0
+    local approvalAfter = tonumber(after.approval) or 0
+    local respectBefore = tonumber(before.respect) or 0
+    local respectAfter = tonumber(after.respect) or 0
+    local familiarityBefore =
+        tonumber(before.familiarity) or 0
+    local familiarityAfter =
+        tonumber(after.familiarity) or 0
+    moraleBefore = tonumber(moraleBefore) or 0
+    moraleAfter = tonumber(moraleAfter) or 0
+    local stateBefore = tostring(before.state or "unknown")
+    local stateAfter = tostring(after.state or "unknown")
+    local hasChange = approvalBefore ~= approvalAfter
+        or respectBefore ~= respectAfter
+        or familiarityBefore ~= familiarityAfter
+        or moraleBefore ~= moraleAfter
+        or stateBefore ~= stateAfter
+        or changeSpec.memoryID ~= nil
+        or changeSpec.eventID ~= nil
+        or (tonumber(changeSpec.removedCount) or 0) > 0
+        or changeSpec.kind == "relationship_created"
+    if not hasChange then return end
+    record.runtime = record.runtime or {}
+    local sequence = math.max(
+        0,
+        math.floor(tonumber(
+            record.runtime.relationshipDebugSequence
+        ) or 0)
+    ) + 1
+    record.runtime.relationshipDebugSequence = sequence
+    local changes =
+        record.runtime.relationshipDebugChanges or {}
+    record.runtime.relationshipDebugChanges = changes
+    changes[#changes + 1] = {
+        sequence = sequence,
+        targetKey = targetKey,
+        kind = tostring(
+            changeSpec.kind or "relationship_changed"
+        ),
+        eventID = changeSpec.eventID,
+        memoryID = changeSpec.memoryID,
+        memoryType = changeSpec.memoryType,
+        knowledgeSource = changeSpec.knowledgeSource,
+        removedCount =
+            tonumber(changeSpec.removedCount) or 0,
+        worldAgeHours = math.max(
+            0,
+            tonumber(worldAgeHours) or 0
+        ),
+        runtimeAt = Core and Core.Now
+            and Core.Now() or 0,
+        approvalBefore = approvalBefore,
+        approvalAfter = approvalAfter,
+        approvalDelta = approvalAfter - approvalBefore,
+        respectBefore = respectBefore,
+        respectAfter = respectAfter,
+        respectDelta = respectAfter - respectBefore,
+        familiarityBefore = familiarityBefore,
+        familiarityAfter = familiarityAfter,
+        familiarityDelta =
+            familiarityAfter - familiarityBefore,
+        moraleBefore = moraleBefore,
+        moraleAfter = moraleAfter,
+        moraleDelta = moraleAfter - moraleBefore,
+        stateBefore = stateBefore,
+        stateAfter = stateAfter,
+        relationshipRevision =
+            tonumber(after.revision) or 0,
+    }
+    while #changes > DEBUG_CHANGE_LIMIT do
+        table.remove(changes, 1)
+    end
+end
+
 local function commit(record, social, targetKey, relationship,
-    relationshipChanged, worldAgeHours)
+    relationshipChanged, worldAgeHours, changeSpec)
     local existing = getRelationship(record, targetKey)
+    local moraleBefore = record.social
+        and record.social.morale or 0
     if relationshipChanged then
         relationship.revision = math.max(
             tonumber(existing and existing.revision) or 0,
@@ -106,6 +197,16 @@ local function commit(record, social, targetKey, relationship,
         tonumber(record.social and record.social.revision) or 0,
         tonumber(social.revision) or 0
     ) + 1
+    appendDebugChange(
+        record,
+        targetKey,
+        existing,
+        relationship,
+        moraleBefore,
+        social.morale,
+        worldAgeHours,
+        changeSpec
+    )
     record.social = social
     if Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "social")
@@ -214,7 +315,12 @@ function Relationships.GetOrCreate(observerNPCID, targetKey)
             targetKey,
             relationship,
             relationshipChanged,
-            nil
+            nil,
+            {
+                kind = rawRelationship == nil
+                    and "relationship_created"
+                    or "relationship_normalized",
+            }
         )
     end
     return Types.NormalizeRelationship(
@@ -314,7 +420,13 @@ function Relationships.AddMemory(observerNPCID, targetKey, memorySpec)
         targetKey,
         relationship,
         true,
-        worldAgeHours
+        worldAgeHours,
+        {
+            kind = "memory_added",
+            memoryID = memory.id,
+            memoryType = memory.type,
+            knowledgeSource = memory.knowledgeSource,
+        }
     )
     return true, "added", Types.NormalizeRelationship(
         record.social.relationships[targetKey],
@@ -447,7 +559,14 @@ function Relationships.ApplyEventMutation(
         targetKey,
         relationship,
         true,
-        worldAgeHours
+        worldAgeHours,
+        {
+            kind = "social_event",
+            eventID = eventID,
+            memoryID = memory.id,
+            memoryType = memory.type,
+            knowledgeSource = memory.knowledgeSource,
+        }
     )
     return true, "applied", {
         relationship = Types.NormalizeRelationship(
@@ -465,6 +584,7 @@ function Relationships.RemoveMemory(observerNPCID, targetKey, memoryID)
     local social
     local relationship
     local index
+    local removedMemory
     local worldAgeHours
     if not isAuthority() then
         return false, "not_authority"
@@ -494,6 +614,7 @@ function Relationships.RemoveMemory(observerNPCID, targetKey, memoryID)
     if not index then
         return false, "memory_not_found"
     end
+    removedMemory = relationship.memories[index]
     table.remove(relationship.memories, index)
     worldAgeHours = relationship.lastEvaluatedAt
     relationship = Math.RecalculateRelationship(
@@ -507,7 +628,16 @@ function Relationships.RemoveMemory(observerNPCID, targetKey, memoryID)
         targetKey,
         relationship,
         true,
-        worldAgeHours
+        worldAgeHours,
+        {
+            kind = "memory_removed",
+            memoryID = memoryID,
+            memoryType = removedMemory
+                and removedMemory.type or nil,
+            knowledgeSource = removedMemory
+                and removedMemory.knowledgeSource or nil,
+            removedCount = 1,
+        }
     )
     return true, "removed"
 end
@@ -568,7 +698,10 @@ function Relationships.Recalculate(observerNPCID, targetKey, worldAgeHours)
         targetKey,
         relationship,
         relationshipChanged,
-        worldAgeHours
+        worldAgeHours,
+        {
+            kind = "relationship_recalculated",
+        }
     )
     return true, "recalculated", Types.NormalizeRelationship(
         record.social.relationships[targetKey],
@@ -641,7 +774,11 @@ function Relationships.PruneMemories(
         targetKey,
         relationship,
         changed,
-        worldAgeHours
+        worldAgeHours,
+        {
+            kind = "memories_pruned",
+            removedCount = removed,
+        }
     )
     return true, "pruned", removed
 end

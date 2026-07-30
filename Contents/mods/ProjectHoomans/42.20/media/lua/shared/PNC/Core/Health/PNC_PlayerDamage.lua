@@ -216,7 +216,15 @@ function PlayerDamage.Apply(record, zombie, attacker, weapon, reportedDamage, so
             at,
             {
                 killed = record.alive == false,
-                severe = (tonumber(amount) or 0) >= 25,
+                severe = (tonumber(amount) or 0)
+                    >= (
+                        PNC.FactionBalance
+                        and PNC.FactionBalance.Get(
+                            "severeAttackDamageThreshold"
+                        ) or 25
+                    ),
+                damage = tonumber(amount) or 0,
+                callback = "player_weapon_hit",
             }
         )
     end

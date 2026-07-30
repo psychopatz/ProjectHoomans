@@ -9,6 +9,12 @@ local Archetypes = PNC.FactionArchetypes
 local EntityRef = PNC.EntityRef
 local DiplomacyMath = PNC.FactionDiplomacyMath
 local IncidentDefinitions = PNC.FactionIncidentDefinitions
+local Balance = PNC.FactionBalance
+
+local function tuning(name, fallback)
+    local value = Balance and Balance.Get and Balance.Get(name)
+    return value == nil and fallback or value
+end
 
 local function finite(value, fallback)
     value = tonumber(value)
@@ -357,7 +363,10 @@ local function normalizeRecentIncidentIDs(value)
             output[#output + 1] = id
         end
     end
-    while #output > Constants.RECENT_INCIDENT_ID_LIMIT do
+    while #output > tuning(
+        "recentIncidentIDLimit",
+        Constants.RECENT_INCIDENT_ID_LIMIT
+    ) do
         table.remove(output, 1)
     end
     return output
@@ -387,7 +396,9 @@ local function normalizeIncidents(
         end
         return left.id < right.id
     end)
-    while #output > Constants.INCIDENT_LIMIT do
+    while #output > tuning(
+        "incidentHistoryLimit", Constants.INCIDENT_LIMIT
+    ) do
         local weakestIndex
         for index, incident in ipairs(output) do
             if incident.preserve ~= true

@@ -12,6 +12,10 @@ local Factions = PNC.Factions
 local Archetypes = PNC.FactionArchetypes
 local Types = PNC.FactionTypes
 local Core = PNC.Core
+local Balance = PNC.FactionBalance
+
+Debug.LastValidation = Debug.LastValidation or nil
+Debug.LastScenario = Debug.LastScenario or nil
 
 local function copy(value)
     return Core.DeepCopy(value)
@@ -64,6 +68,140 @@ local function npcSummary(record)
     }
 end
 
+local function targetSummary(target)
+    if type(target) ~= "table" then return nil end
+    return {
+        kind = target.kind,
+        id = target.id or target.npcID
+            or target.onlineID or target.zombieId,
+        username = target.username,
+        visible = target.visible,
+        threatening = target.threatening,
+    }
+end
+
+local function relationshipChanges(record, playerKey)
+    local output = {}
+    local changes = record.runtime
+        and record.runtime.relationshipDebugChanges or {}
+    local first = math.max(1, #changes - 15)
+    local index
+    for index = first, #changes do
+        local change = changes[index]
+        if change.targetKey == playerKey then
+            output[#output + 1] = copy(change)
+            while #output > 5 do
+                table.remove(output, 1)
+            end
+        end
+    end
+    return output
+end
+
+local function npcDiagnostic(
+    record,
+    player,
+    playerKey,
+    playerFaction,
+    at
+)
+    local affiliation = Factions.GetNPCAffiliation(record.id)
+        or {}
+    local factionID = affiliation.factionID
+    local faction = factionID and Factions.Get(factionID) or nil
+    local relation = faction and playerFaction
+        and faction.id ~= playerFaction.id
+        and Factions.GetRelation(
+            faction.id,
+            playerFaction.id
+        ) or nil
+    local intent = player
+        and PNC.FactionBehavior
+        and PNC.FactionBehavior.ResolveIntent
+        and PNC.FactionBehavior.ResolveIntent(
+            record,
+            player,
+            {
+                worldAgeHours = at,
+                suppressTelemetry = true,
+            }
+        ) or nil
+    local hostility = record.hostility or {}
+    local runtime = record.runtime or {}
+    local relationship = playerKey
+        and PNC.Relationships
+        and PNC.Relationships.Get
+        and PNC.Relationships.Get(record.id, playerKey)
+        or nil
+    return {
+        npcID = record.id,
+        factionID = factionID,
+        factionName = faction and faction.name or nil,
+        archetypeID = faction and faction.archetypeID or nil,
+        role = affiliation.role,
+        rank = affiliation.rank,
+        membershipStatus = affiliation.membershipStatus,
+        affiliationRevision = affiliation.revision,
+        legacyFaction = record.faction,
+        recruited = record.recruited == true,
+        ownerUsername = record.ownerUsername,
+        hostilityMode = hostility.mode,
+        attackPlayers = hostility.attackPlayers == true,
+        attackNPCs = hostility.attackNPCs == true,
+        attackZombies = hostility.attackZombies == true,
+        orderKind = record.orderSpec
+            and record.orderSpec.kind or nil,
+        activeJob = record.activeJob,
+        activeBehavior = record.activeBehavior,
+        behaviorReason = runtime.factionBehaviorReason,
+        target = targetSummary(runtime.target),
+        playerFactionID =
+            playerFaction and playerFaction.id or nil,
+        relationState = relation and relation.state or "unknown",
+        atWarWithPlayer = faction and playerFaction
+            and Factions.AreAtWar(
+                faction.id,
+                playerFaction.id
+            ) or false,
+        alliedWithPlayer = relation
+            and relation.allied == true or false,
+        intent = intent and intent.intent or "observe",
+        intentReason = intent and intent.reason
+            or "player_identity_unavailable",
+        attackAllowed = intent
+            and intent.attackAllowed == true or false,
+        pursueAllowed = intent
+            and intent.pursueAllowed == true or false,
+        commandable = intent
+            and intent.commandable == true or false,
+        relationship = {
+            exists = relationship ~= nil,
+            approval = relationship
+                and relationship.approval or 0,
+            respect = relationship
+                and relationship.respect or 0,
+            familiarity = relationship
+                and relationship.familiarity or 0,
+            state = relationship
+                and relationship.state or "unknown",
+            previousState = relationship
+                and relationship.previousState or "unknown",
+            revision = relationship
+                and relationship.revision or 0,
+            lastInteractionAt = relationship
+                and relationship.lastInteractionAt or 0,
+        },
+        morale = record.social
+            and record.social.morale or 0,
+        socialRevision = record.social
+            and record.social.revision or 0,
+        relationshipChanges =
+            relationshipChanges(record, playerKey),
+        recordRevision = record.recordRevision,
+        presenceRevision = record.presenceRevision,
+    }
+end
+
 local function actionResult(ok, reason, fields)
     local result = fields or {}
     result.ok = ok == true
@@ -89,6 +227,9 @@ function Debug.BuildSnapshot(
     local relationForward
     local relationReverse
     local intentPreview
+    local intentTrace
+    local npcDiagnostics = {}
+    local at = worldAgeHours()
     Factions.EnsureLoaded()
     if player and PNC.PlayerCharacters
         and PNC.PlayerCharacters.GetEntityKey
@@ -107,6 +248,14 @@ function Debug.BuildSnapshot(
     for _, record in pairs(PNC.Registry.Data or {}) do
         if record.alive ~= false then
             roster[#roster + 1] = npcSummary(record)
+            npcDiagnostics[#npcDiagnostics + 1] =
+                npcDiagnostic(
+                    record,
+                    player,
+                    playerKey,
+                    playerFaction,
+                    at
+                )
         end
     end
     table.sort(roster, function(left, right)
@@ -114,6 +263,9 @@ function Debug.BuildSnapshot(
             return left.name < right.name
         end
         return left.id < right.id
+    end)
+    table.sort(npcDiagnostics, function(left, right)
+        return tostring(left.npcID) < tostring(right.npcID)
     end)
     if Types.IsValidFactionID(selectedFactionID) then
         local faction = Factions.Get(selectedFactionID)
@@ -148,7 +300,7 @@ function Debug.BuildSnapshot(
                         Factions.GetRelation(faction.id, targetID)
                     relationReverse =
                         Factions.GetRelation(targetID, faction.id)
-                    local preview = PNC.FactionIntent.Resolve({
+                    local preview = PNC.FactionIntent.ResolveWithTrace({
                         archetypeID = faction.archetypeID,
                         policy = faction.policy,
                         diplomaticState = relationForward
@@ -161,8 +313,41 @@ function Debug.BuildSnapshot(
                             and relationForward.truceUntil
                                 > worldAgeHours(),
                     })
-                    intentPreview = preview
+                    intentPreview = preview.result
+                    intentTrace = preview.trace
                 end
+            end
+        end
+    end
+    if Types.IsValidNPCID(selectedNPCID)
+        and selectedTarget
+        and PNC.FactionBehavior
+        and PNC.FactionBehavior.ResolveIntentWithTrace
+    then
+        local observer = PNC.Registry.Get(selectedNPCID)
+        local targetEntity
+        if playerFaction
+            and selectedTarget.id == playerFaction.id
+        then
+            targetEntity = player
+        else
+            local targetMembers =
+                Factions.GetMembers(selectedTarget.id)
+            local firstMember = targetMembers
+                and targetMembers[1] or nil
+            targetEntity = firstMember
+                and PNC.Registry.Get(firstMember.npcID) or nil
+        end
+        if observer and targetEntity then
+            local diagnostic =
+                PNC.FactionBehavior.ResolveIntentWithTrace(
+                    observer,
+                    targetEntity,
+                    { worldAgeHours = worldAgeHours() }
+                )
+            if diagnostic then
+                intentPreview = diagnostic.result
+                intentTrace = diagnostic.trace
             end
         end
     end
@@ -179,16 +364,39 @@ function Debug.BuildSnapshot(
         relationForward = relationForward,
         relationReverse = relationReverse,
         intentPreview = intentPreview,
+        intentTrace = intentTrace,
         selectedNPCID = Types.IsValidNPCID(selectedNPCID)
             and selectedNPCID or nil,
         members = members,
         diplomacy = diplomacy,
         roster = roster,
+        npcDiagnostics = npcDiagnostics,
         currentPlayerKey = playerKey,
         currentPlayerFactionID =
             playerFaction and playerFaction.id or nil,
         actionResult = copy(action),
-        generatedAt = worldAgeHours(),
+        telemetry = PNC.FactionTelemetry
+            and PNC.FactionTelemetry.BuildSnapshot({
+                maximum = 128,
+            }) or nil,
+        activeAggregationEpisodes =
+            PNC.FactionIncidentService
+            and PNC.FactionIncidentService.GetActiveEpisodes
+            and PNC.FactionIncidentService.GetActiveEpisodes()
+            or {},
+        reconciliationJobs = PNC.FactionBehavior
+            and PNC.FactionBehavior.GetReconciliationSnapshot
+            and PNC.FactionBehavior.GetReconciliationSnapshot()
+            or {},
+        validationResult = copy(Debug.LastValidation),
+        scenarioResult = copy(Debug.LastScenario),
+        scenarioNames = copy(
+            PNC.FactionValidation
+            and PNC.FactionValidation.Scenarios or {}
+        ),
+        balance = PNC.FactionBalance
+            and PNC.FactionBalance.GetAll() or {},
+        generatedAt = at,
     }
 end
 
@@ -312,7 +520,11 @@ function Debug.PerformAction(player, args)
                 targetFactionID,
                 {
                     worldAgeHours = at,
-                    truceUntil = at + 24,
+                    truceUntil = at + (
+                        Balance and Balance.Get(
+                            "defaultTruceHours"
+                        ) or 24
+                    ),
                     instigatorFactionID = factionID,
                 }
             )
@@ -336,6 +548,93 @@ function Debug.PerformAction(player, args)
                 }
             )
         end
+    elseif action == "telemetry_clear" then
+        ok, reason = PNC.FactionTelemetry.Clear()
+    elseif action == "telemetry_toggle" then
+        local config = PNC.Config.Factions
+        config.EnableValidationTelemetry =
+            config.EnableValidationTelemetry ~= true
+        ok = true
+        reason = config.EnableValidationTelemetry
+            and "telemetry_enabled" or "telemetry_disabled"
+    elseif action == "check_registry" then
+        Debug.LastValidation =
+            PNC.FactionValidation.CheckRegistry()
+        ok = Debug.LastValidation.ok
+        reason = ok and "registry_valid"
+            or "registry_invalid"
+    elseif action == "repair_indexes" then
+        ok, reason =
+            PNC.FactionValidation.RepairSecondaryIndexes()
+        if ok == false and (
+            reason == nil or reason == "unchanged"
+        ) then
+            ok = true
+            reason = "indexes_already_valid"
+        end
+        Debug.LastValidation =
+            PNC.FactionValidation.CheckRegistry()
+    elseif action == "check_relation" then
+        if not factionID or not targetFactionID
+            or factionID == targetFactionID
+        then
+            ok, reason = false, "select_distinct_factions"
+        else
+            Debug.LastValidation =
+                PNC.FactionValidation.CheckRelation(
+                    factionID, targetFactionID
+                )
+            ok = Debug.LastValidation.ok
+            reason = ok and "relation_valid"
+                or "relation_invalid"
+        end
+    elseif action == "run_scenario" then
+        Debug.LastScenario, reason =
+            PNC.FactionValidation.RunScenario(
+                args and args.scenarioName
+                    or "single_minor_attack"
+            )
+        ok = Debug.LastScenario ~= nil
+        reason = ok and "scenario_preview_complete" or reason
+    elseif action == "reconcile_treaty" then
+        if not factionID or not targetFactionID
+            or factionID == targetFactionID
+        then
+            ok, reason = false, "select_distinct_factions"
+        else
+            ok, reason = PNC.FactionBehavior
+                .QueueTreatyReconciliation(
+                    factionID,
+                    targetFactionID,
+                    "manual_debug_reconciliation",
+                    at
+                )
+        end
+    elseif action == "export_snapshot" then
+        local telemetry = PNC.FactionTelemetry.BuildSnapshot({
+            maximum = 128,
+        })
+        Core.LogInfo(
+            "Faction diagnostic snapshot schema="
+            .. tostring(PNC.FactionConstants
+                .REGISTRY_SCHEMA_VERSION)
+            .. " registryRevision="
+            .. tostring(Factions.Registry.revision)
+            .. " telemetryCount="
+            .. tostring(telemetry.count)
+            .. " selected=" .. tostring(factionID)
+            .. " target=" .. tostring(targetFactionID)
+        )
+        for _, entry in ipairs(telemetry.entries or {}) do
+            Core.LogInfo(
+                "Faction telemetry #" .. tostring(entry.sequence)
+                .. " " .. tostring(entry.category)
+                .. " op=" .. tostring(entry.operation)
+                .. " result=" .. tostring(entry.result)
+                .. " reason=" .. tostring(entry.reason)
+            )
+        end
+        ok, reason = true, "snapshot_exported_to_log"
     elseif action == "incident_minor"
         or action == "incident_severe"
         or action == "incident_killed"

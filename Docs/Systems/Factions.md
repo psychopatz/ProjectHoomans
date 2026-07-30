@@ -300,7 +300,9 @@ identity registry V3.
 
 The admin/debug-only **PNC Faction Inspector** is available from the
 PsychopatzCore Debug Hub. It has separate source and target faction lists, an
-NPC affiliation list, and a details panel showing:
+NPC affiliation list, and four focused views: Overview, Diplomacy, Members,
+and Diagnostics. Each view shows only its relevant guarded controls and
+details, including:
 
 - both directed relation records and revisions;
 - standing, trust, fear, grievance, state, and previous state;
@@ -314,6 +316,56 @@ edit score values. Available triggers are minor attack, severe attack, member
 killed, rescue, recalculation, war, 24-hour truce, peace, alliance, and
 alliance break.
 
+Phase 5B.1 also adds disabled-by-default, runtime-only telemetry for callback
+delivery, exact faction attribution, aggregation episodes, incident creation,
+escalation decisions, intent resolution, and treaty reconciliation. The
+buffer is primitive-only, FIFO-bounded to 512 entries, does not enter ModData,
+and does not increment revisions. The inspector can clear telemetry, run an
+isolated deterministic scenario, toggle the master runtime telemetry flag,
+check registry or selected-relation
+invariants, enqueue selected-pair reconciliation, and export a text-safe log
+summary. `Repair Indexes` rebuilds only `byArchetype`, `byPlayerKey`, and
+faction `memberIDs` from canonical records; it never rewrites diplomacy
+metrics or NPC affiliations. These controls remain behind the existing
+admin/debug authorization.
+
+The former read-only diplomacy dashboard is embedded in the inspector's
+**Overview** view. It visualizes the directed treaty state,
+standing/trust/fear/grievance bars, resolved intent and rule, selected NPC
+affiliation and revisions, aggregation and reconciliation activity,
+invariant status, and latest telemetry.
+
+**Toggle NPC World Overlay** enables an actual per-NPC world/nameplate
+overlay. For every visible NPC it shows the organizational faction,
+archetype, role/rank, relation and war state toward the current player's
+faction, authoritative resolved intent, cached tactical hostility flags,
+order, active job, current target, and the NPC's directed relationship toward
+the exact current player character. The relationship section shows approval,
+respect, familiarity, state, revision, and morale. A transient `CHANGE` line
+identifies the committed memory/event type and its score/state deltas. Red
+means attack is currently
+authorized, yellow means a war exists but attack is not currently authorized,
+green means the player can command the NPC, and cyan is neutral/observing.
+The same toggle is available from the Debug Hub and Options > Mods. The
+overlay refreshes from guarded server-produced diagnostics and exposes no
+mutation command.
+
+Attack episodes use authoritative NPC/player entity keys plus the faction
+pair and a 36-second server-runtime window. A first minor incident is
+persisted and later severity upgrades replace that same incident ID; the
+episode never stores separate minor and severe incidents. Expiry only removes
+runtime diagnostic/deduplication state.
+
+Treaty reconciliation is runtime-only and member-indexed. It processes at
+most 16 members per pump, preserves zombie combat, and clears a human target
+when current treaty intent no longer authorizes attack. It does not make
+former enemies into companions.
+
+See [Faction Diplomacy Balance](FactionDiplomacyBalance.md) for current
+defaults and [Faction Diplomacy Live Validation](../Testing/FactionDiplomacyLiveValidation.md) for the manual
+single-player, hosted, and dedicated-server matrix. No live rows are
+automatically marked passed.
+
 For a basic in-game check:
 
 1. Create/select a player faction and a looter faction.
@@ -326,8 +378,12 @@ For a basic in-game check:
    confirm no automatic war.
 6. Trigger member killed; confirm war becomes symmetric and both sides'
    members become enemies.
-7. Start truce or make peace; confirm attacks stop.
-8. Save/reload and confirm directed metrics, incidents, treaty, policy, and
+7. While war remains active, transfer a former player companion into the
+   enemy faction. Confirm the world overlay reports `war=true`,
+   `intent=attack`, `attack=true`, `order=hostile_hunt`, and that the NPC
+   immediately loses companion ownership and can acquire the player.
+8. Start truce or make peace; confirm attacks stop.
+9. Save/reload and confirm directed metrics, incidents, treaty, policy, and
    revisions persist.
 
 Run `lua tests/pnc_faction_diplomacy_smoke.lua` for deterministic non-engine

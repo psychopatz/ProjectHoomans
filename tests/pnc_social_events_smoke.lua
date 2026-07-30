@@ -760,6 +760,20 @@ assertEqual(cacheRecord.social.recentEventIDs[1], "social:cache:7",
     "recent event oldest-first eviction")
 assertEqual(cacheRecord.social.recentEventIDs[64], "social:cache:70",
     "recent event newest retained")
+assertEqual(
+    #cacheRecord.runtime.relationshipDebugChanges,
+    16,
+    "runtime relationship change feed bounded"
+)
+local latestRelationshipChange =
+    cacheRecord.runtime.relationshipDebugChanges[16]
+assertEqual(latestRelationshipChange.kind, "social_event",
+    "social event change type retained")
+assertEqual(latestRelationshipChange.eventID,
+    "social:cache:70",
+    "social event ID retained")
+assertEqual(latestRelationshipChange.memoryType, "cache_test",
+    "social memory type retained")
 
 -- 28-30. Persisted output is save-safe, round-trips event memories, and a
 -- deterministic authoritative event remains idempotent after the round trip.

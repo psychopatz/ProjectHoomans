@@ -13,6 +13,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
         showAIDebug = false,
         showPathDebug = false,
         showCombatDebug = false,
+        showFactionDebug = false,
         showAnimationDebug = false,
         showAnimationSceneDebug = false,
         debugShowPresence = true,
@@ -33,6 +34,9 @@ if Nameplates.Settings.enabled == nil then Nameplates.Settings.enabled = true en
 if Nameplates.Settings.showAIDebug == nil then Nameplates.Settings.showAIDebug = false end
 if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDebug = false end
 if Nameplates.Settings.showCombatDebug == nil then Nameplates.Settings.showCombatDebug = false end
+if Nameplates.Settings.showFactionDebug == nil then
+    Nameplates.Settings.showFactionDebug = false
+end
 if Nameplates.Settings.showAnimationDebug == nil then Nameplates.Settings.showAnimationDebug = false end
 if Nameplates.Settings.showAnimationSceneDebug == nil then
     Nameplates.Settings.showAnimationSceneDebug = false
@@ -140,6 +144,42 @@ end
 
 function Nameplates.IsCombatDebugEnabled()
     return Settings.showCombatDebug == true
+end
+
+function Nameplates.IsFactionDebugEnabled()
+    return Settings.showFactionDebug == true
+end
+
+function Nameplates.SetFactionDebugEnabled(enabled, announce)
+    local player = getSpecificPlayer(0)
+    Settings.showFactionDebug = enabled == true
+    PNC.SettingsStore:Set(
+        "showFactionDebug",
+        Settings.showFactionDebug,
+        true
+    )
+    if announce ~= false
+        and player
+        and HaloTextHelper
+        and HaloTextHelper.addText
+    then
+        HaloTextHelper.addText(
+            player,
+            getText(
+                Settings.showFactionDebug
+                    and "UI_PNC_FactionOverlayEnabled"
+                    or "UI_PNC_FactionOverlayDisabled"
+            )
+        )
+    end
+    return Settings.showFactionDebug
+end
+
+function Nameplates.ToggleFactionDebug()
+    return Nameplates.SetFactionDebugEnabled(
+        not Settings.showFactionDebug,
+        true
+    )
 end
 
 function Nameplates.ToggleCombatDebug()

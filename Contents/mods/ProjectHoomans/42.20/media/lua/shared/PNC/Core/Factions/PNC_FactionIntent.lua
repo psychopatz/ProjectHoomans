@@ -4,6 +4,12 @@ PNC = PNC or {}
 PNC.FactionIntent = PNC.FactionIntent or {}
 
 local Intent = PNC.FactionIntent
+local Balance = PNC.FactionBalance
+
+local function tuning(name, fallback)
+    local value = Balance and Balance.Get and Balance.Get(name)
+    return value == nil and fallback or value
+end
 
 local function result(intent, attack, pursue, commandable, reason)
     return {
@@ -60,14 +66,19 @@ function Intent.Resolve(spec)
     end
     if state == "hostile" then
         if archetypeID == "looter"
-            and (tonumber(policy.aggression) or 0) >= 0.70
-            and targetStrength <= observerStrength * 0.75
+            and (tonumber(policy.aggression) or 0)
+                >= tuning(
+                    "looterHostileAggressionMinimum", 0.70
+                )
+            and targetStrength <= observerStrength
+                * tuning("looterAdvantageRatio", 0.75)
         then
             return result("attack", true, true, false,
                 "hostile_predatory_advantage")
         end
         return result(
-            (tonumber(policy.caution) or 0.5) >= 0.65
+            (tonumber(policy.caution) or 0.5)
+                >= tuning("hostileCautionMinimum", 0.65)
                 and "avoid" or "threaten",
             false,
             false,
@@ -93,7 +104,9 @@ function Intent.Resolve(spec)
     if archetypeID == "looter"
         or policy.outsiderPolicy == "predatory"
     then
-        if targetStrength > observerStrength * 1.15 then
+        if targetStrength > observerStrength
+            * tuning("looterStrongerTargetRatio", 1.15)
+        then
             return result("avoid", false, false, false,
                 "predatory_target_stronger")
         end
@@ -118,6 +131,42 @@ function Intent.Resolve(spec)
     end
     return result("observe", false, false, false,
         "neutral_outsider_policy")
+end
+
+function Intent.ResolveWithTrace(spec)
+    spec = type(spec) == "table" and spec or {}
+    local resolved = Intent.Resolve(spec)
+    local policy = type(spec.policy) == "table"
+        and spec.policy or {}
+    return {
+        result = resolved,
+        trace = {
+            immediateSelfDefense =
+                spec.immediateSelfDefense == true,
+            targetAggression = spec.targetAggression == true,
+            samePlayerFaction =
+                spec.samePlayerOwnedFaction == true,
+            sameFaction = spec.sameFaction == true,
+            diplomaticState = tostring(
+                spec.diplomaticState or "unknown"
+            ),
+            atWar = spec.atWar == true,
+            allied = spec.allied == true,
+            truceActive = spec.activeTruce == true,
+            archetype = tostring(spec.archetypeID or ""),
+            aggression = tonumber(policy.aggression) or 0,
+            retaliation = tonumber(policy.retaliation) or 0,
+            caution = tonumber(policy.caution) or 0,
+            personalState = tostring(
+                spec.personalState or "unknown"
+            ),
+            observerStrength =
+                tonumber(spec.observerStrength) or 1,
+            targetStrength = tonumber(spec.targetStrength) or 1,
+            selectedRule = resolved.reason,
+            fallback = "observe",
+        },
+    }
 end
 
 return Intent

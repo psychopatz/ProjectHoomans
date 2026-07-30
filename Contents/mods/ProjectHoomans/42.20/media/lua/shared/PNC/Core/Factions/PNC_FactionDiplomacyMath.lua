@@ -5,6 +5,12 @@ PNC.FactionDiplomacyMath = PNC.FactionDiplomacyMath or {}
 
 local Math = PNC.FactionDiplomacyMath
 local Constants = PNC.FactionConstants
+local Balance = PNC.FactionBalance
+
+local function tuning(name, fallback)
+    local value = Balance and Balance.Get and Balance.Get(name)
+    return value == nil and fallback or value
+end
 
 function Math.Clamp(value, minimum, maximum)
     value = tonumber(value)
@@ -94,40 +100,58 @@ function Math.ResolveState(relation, worldAgeHours)
     end
 
     if current == "friendly"
-        and standing >= 20
-        and grievance <= 30
+        and standing >= tuning("friendlyExitStanding", 20)
+        and grievance <= tuning(
+            "friendlyExitMaxGrievance", 30
+        )
     then
         return "friendly"
     end
     if current == "hostile"
-        and (standing <= -30 or grievance >= 50)
+        and (
+            standing <= tuning("hostileExitStanding", -30)
+            or grievance >= tuning(
+                "hostileExitGrievance", 50
+            )
+        )
     then
         return "hostile"
     end
     if current == "wary"
         and not (
-            standing > -5
-            and trust > -15
-            and fear < 40
-            and grievance < 20
+            standing > tuning("waryExitStanding", -5)
+            and trust > tuning("waryExitTrust", -15)
+            and fear < tuning("waryExitFear", 40)
+            and grievance < tuning("waryExitGrievance", 20)
         )
     then
-        if standing <= -45 or grievance >= 65 then
+        if standing <= tuning("hostileEntryStanding", -45)
+            or grievance >= tuning(
+                "hostileEntryGrievance", 65
+            )
+        then
             return "hostile"
         end
         return "wary"
     end
 
-    if standing <= -45 or grievance >= 65 then
+    if standing <= tuning("hostileEntryStanding", -45)
+        or grievance >= tuning("hostileEntryGrievance", 65)
+    then
         return "hostile"
     end
-    if standing >= 30 and trust >= 10
-        and grievance <= 20
+    if standing >= tuning("friendlyEntryStanding", 30)
+        and trust >= tuning("friendlyEntryTrust", 10)
+        and grievance <= tuning(
+            "friendlyEntryMaxGrievance", 20
+        )
     then
         return "friendly"
     end
-    if standing <= -15 or trust <= -25
-        or fear >= 50 or grievance >= 30
+    if standing <= tuning("waryEntryStanding", -15)
+        or trust <= tuning("waryEntryTrust", -25)
+        or fear >= tuning("waryEntryFear", 50)
+        or grievance >= tuning("waryEntryGrievance", 30)
     then
         return "wary"
     end
@@ -154,21 +178,23 @@ function Math.RecalculateRelation(relation, worldAgeHours)
     if elapsedDays > 0 then
         output.standing = Math.ClampStanding(driftToZero(
             Math.ClampStanding(output.standing),
-            Constants.STANDING_DECAY_PER_DAY * elapsedDays
+            tuning("standingDecayPerDay", 0.05) * elapsedDays
         ))
         output.trust = Math.ClampTrust(driftToZero(
             Math.ClampTrust(output.trust),
-            Constants.TRUST_DECAY_PER_DAY * elapsedDays
+            tuning("trustDecayPerDay", 0.025) * elapsedDays
         ))
         output.fear = Math.ClampFear(
             Math.ClampFear(output.fear)
-                - Constants.FEAR_DECAY_PER_DAY * elapsedDays
+                - tuning("fearDecayPerDay", 0.10) * elapsedDays
         )
         if output.atWar ~= true then
             output.grievance = Math.ClampGrievance(
                 Math.ClampGrievance(output.grievance)
-                    - Constants.GRIEVANCE_DECAY_PER_DAY
-                    * Constants.PEACE_GRIEVANCE_DECAY_MULTIPLIER
+                    - tuning("grievanceDecayPerDay", 0.01)
+                    * tuning(
+                        "peaceGrievanceDecayMultiplier", 2
+                    )
                     * elapsedDays
             )
         else

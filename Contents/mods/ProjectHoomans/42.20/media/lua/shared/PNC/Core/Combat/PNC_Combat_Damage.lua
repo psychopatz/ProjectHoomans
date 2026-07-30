@@ -380,7 +380,14 @@ function Damage.ApplyNPCDamage(targetRecord, targetBody, hit)
                     killed = targetRecord.alive == false,
                     severe = hit and (
                         tonumber(hit.amount) or 0
-                    ) >= 25,
+                    ) >= (
+                        PNC.FactionBalance
+                        and PNC.FactionBalance.Get(
+                            "severeAttackDamageThreshold"
+                        ) or 25
+                    ),
+                    damage = hit and tonumber(hit.amount) or 0,
+                    callback = "npc_damage",
                 }
             )
         end
@@ -559,7 +566,14 @@ function Damage.ApplyTargetDamage(attackerRecord, attackerBody, target, options)
                 target.player,
                 at,
                 {
-                    severe = hit.amount >= 25,
+                    severe = hit.amount >= (
+                        PNC.FactionBalance
+                        and PNC.FactionBalance.Get(
+                            "severeAttackDamageThreshold"
+                        ) or 25
+                    ),
+                    damage = hit.amount,
+                    callback = "npc_attack_player",
                     killed = target.player.isDead
                         and target.player:isDead() == true,
                 }

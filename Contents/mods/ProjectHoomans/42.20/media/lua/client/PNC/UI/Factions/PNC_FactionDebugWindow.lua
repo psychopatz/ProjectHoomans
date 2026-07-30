@@ -1,5 +1,6 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PNC/UI/Factions/PNC_FactionDebugModel"
+require "PNC/UI/Factions/PNC_FactionDebugOverlay"
 
 PNC.FactionDebugUI = PNC.FactionDebugUI or {}
 
@@ -14,30 +15,51 @@ local function text(key)
     return getText and getText(key) or key
 end
 
+local function views(first, second)
+    local values = {}
+    if first then values[first] = true end
+    if second then values[second] = true end
+    return values
+end
+
 local CONTROLS = {
     { id = "refresh", titleKey = "UI_PNC_MonitorRefresh", variant = "quiet" },
-    { id = "create_player_faction", titleKey = "UI_PNC_FactionCreatePlayer", variant = "success" },
-    { id = "create_settler", titleKey = "UI_PNC_FactionCreateSettler", variant = "success" },
-    { id = "create_looter", titleKey = "UI_PNC_FactionCreateLooter", variant = "danger" },
-    { id = "create_trader", titleKey = "UI_PNC_FactionCreateTrader", variant = "default" },
-    { id = "create_refugee", titleKey = "UI_PNC_FactionCreateRefugee", variant = "default" },
-    { id = "assign", titleKey = "UI_PNC_FactionAssignNPC", variant = "success" },
-    { id = "transfer", titleKey = "UI_PNC_FactionTransferNPC", variant = "default" },
-    { id = "remove", titleKey = "UI_PNC_FactionRemoveNPC", variant = "danger" },
-    { id = "leader", titleKey = "UI_PNC_FactionSetLeader", variant = "default" },
-    { id = "role", titleKey = "UI_PNC_FactionNextRole", variant = "quiet" },
-    { id = "rank", titleKey = "UI_PNC_FactionNextRank", variant = "quiet" },
-    { id = "archive", titleKey = "UI_PNC_FactionArchive", variant = "danger" },
-    { id = "war", titleKey = "UI_PNC_FactionDeclareWar", variant = "danger" },
-    { id = "truce", titleKey = "UI_PNC_FactionStartTruce", variant = "quiet" },
-    { id = "peace", titleKey = "UI_PNC_FactionMakePeace", variant = "success" },
-    { id = "alliance", titleKey = "UI_PNC_FactionFormAlliance", variant = "success" },
-    { id = "break_alliance", titleKey = "UI_PNC_FactionBreakAlliance", variant = "danger" },
-    { id = "incident_minor", titleKey = "UI_PNC_FactionMinorAttack", variant = "quiet" },
-    { id = "incident_severe", titleKey = "UI_PNC_FactionSevereAttack", variant = "danger" },
-    { id = "incident_killed", titleKey = "UI_PNC_FactionMemberKilled", variant = "danger" },
-    { id = "incident_rescue", titleKey = "UI_PNC_FactionMemberRescued", variant = "success" },
-    { id = "recalculate", titleKey = "UI_PNC_FactionRecalculate", variant = "quiet" },
+    { id = "overlay", titleKey = "UI_PNC_FactionToggleOverlay", variant = "quiet" },
+    { id = "view_overview", titleKey = "UI_PNC_FactionViewOverview", variant = "quiet" },
+    { id = "view_diplomacy", titleKey = "UI_PNC_FactionViewDiplomacy", variant = "quiet" },
+    { id = "view_members", titleKey = "UI_PNC_FactionViewMembers", variant = "quiet" },
+    { id = "view_diagnostics", titleKey = "UI_PNC_FactionViewDiagnostics", variant = "quiet" },
+    { id = "create_player_faction", titleKey = "UI_PNC_FactionCreatePlayer", variant = "success", views = views("overview") },
+    { id = "create_settler", titleKey = "UI_PNC_FactionCreateSettler", variant = "success", views = views("overview") },
+    { id = "create_looter", titleKey = "UI_PNC_FactionCreateLooter", variant = "danger", views = views("overview") },
+    { id = "create_trader", titleKey = "UI_PNC_FactionCreateTrader", variant = "default", views = views("overview") },
+    { id = "create_refugee", titleKey = "UI_PNC_FactionCreateRefugee", variant = "default", views = views("overview") },
+    { id = "archive", titleKey = "UI_PNC_FactionArchive", variant = "danger", views = views("overview") },
+    { id = "assign", titleKey = "UI_PNC_FactionAssignNPC", variant = "success", views = views("members") },
+    { id = "transfer", titleKey = "UI_PNC_FactionTransferNPC", variant = "default", views = views("members") },
+    { id = "remove", titleKey = "UI_PNC_FactionRemoveNPC", variant = "danger", views = views("members") },
+    { id = "leader", titleKey = "UI_PNC_FactionSetLeader", variant = "default", views = views("members") },
+    { id = "role", titleKey = "UI_PNC_FactionNextRole", variant = "quiet", views = views("members") },
+    { id = "rank", titleKey = "UI_PNC_FactionNextRank", variant = "quiet", views = views("members") },
+    { id = "war", titleKey = "UI_PNC_FactionDeclareWar", variant = "danger", views = views("diplomacy") },
+    { id = "truce", titleKey = "UI_PNC_FactionStartTruce", variant = "quiet", views = views("diplomacy") },
+    { id = "peace", titleKey = "UI_PNC_FactionMakePeace", variant = "success", views = views("diplomacy") },
+    { id = "alliance", titleKey = "UI_PNC_FactionFormAlliance", variant = "success", views = views("diplomacy") },
+    { id = "break_alliance", titleKey = "UI_PNC_FactionBreakAlliance", variant = "danger", views = views("diplomacy") },
+    { id = "incident_minor", titleKey = "UI_PNC_FactionMinorAttack", variant = "quiet", views = views("diplomacy") },
+    { id = "incident_severe", titleKey = "UI_PNC_FactionSevereAttack", variant = "danger", views = views("diplomacy") },
+    { id = "incident_killed", titleKey = "UI_PNC_FactionMemberKilled", variant = "danger", views = views("diplomacy") },
+    { id = "incident_rescue", titleKey = "UI_PNC_FactionMemberRescued", variant = "success", views = views("diplomacy") },
+    { id = "recalculate", titleKey = "UI_PNC_FactionRecalculate", variant = "quiet", views = views("diplomacy") },
+    { id = "check_relation", titleKey = "UI_PNC_FactionCheckRelation", variant = "quiet", views = views("diplomacy", "diagnostics") },
+    { id = "reconcile_treaty", titleKey = "UI_PNC_FactionReconcileTreaty", variant = "quiet", views = views("diplomacy", "diagnostics") },
+    { id = "telemetry_toggle", titleKey = "UI_PNC_FactionEnableTelemetry", variant = "success", views = views("diagnostics") },
+    { id = "telemetry_clear", titleKey = "UI_PNC_FactionClearTelemetry", variant = "danger", views = views("diagnostics") },
+    { id = "next_scenario", titleKey = "UI_PNC_FactionNextScenario", variant = "quiet", views = views("diagnostics") },
+    { id = "run_scenario", titleKey = "UI_PNC_FactionRunScenario", variant = "success", views = views("diagnostics") },
+    { id = "check_registry", titleKey = "UI_PNC_FactionCheckRegistry", variant = "quiet", views = views("diagnostics") },
+    { id = "repair_indexes", titleKey = "UI_PNC_FactionRepairIndexes", variant = "danger", views = views("diagnostics") },
+    { id = "export_snapshot", titleKey = "UI_PNC_FactionExportSnapshot", variant = "default", views = views("diagnostics") },
 }
 
 local function drawEntity(list, y, entry, alternate)
@@ -127,7 +149,13 @@ function ISPNCFactionDebugWindow:createChildren()
         itemHeight = Layout.Pixels(27, self.uiScale),
         doDrawItem = drawDetail,
     })
+    self.dashboard = PNC.FactionDebugOverlay.NewDashboard(
+        0, 0, 430, 492
+    )
+    self:addChild(self.dashboard)
     self.controls = {}
+    self.scenarioIndex = 1
+    self.viewMode = "overview"
     for _, definition in ipairs(CONTROLS) do
         local button = UI.CreateButton(self, {
             id = definition.id,
@@ -144,10 +172,20 @@ end
 
 function ISPNCFactionDebugWindow:onResponsiveLayout()
     local rect = self:getContentRect({ top = 28, bottom = 12 })
+    local visibleControls = {}
+    for index, button in ipairs(self.controls) do
+        local definition = CONTROLS[index]
+        local visible = definition.views == nil
+            or definition.views[self.viewMode] == true
+        button:setVisible(visible)
+        if visible then
+            visibleControls[#visibleControls + 1] = button
+        end
+    end
     local controls = Layout.Flow(
-        self.controls,
+        visibleControls,
         { x = rect.x, y = rect.y, width = rect.width },
-        { scale = self.uiScale, minWidth = 86 }
+        { scale = self.uiScale, minWidth = 76 }
     )
     local top = controls.bottom + Layout.Pixels(25, self.uiScale)
     local height = math.max(100, rect.y + rect.height - top)
@@ -181,12 +219,15 @@ function ISPNCFactionDebugWindow:onResponsiveLayout()
         [self.targets] = self.layout.target,
         [self.npcs] = self.layout.npc,
         [self.details] = self.layout.detail,
+        [self.dashboard] = self.layout.detail,
     }) do
         Layout.SetBounds(
             widget,
             bounds.x, bounds.y, bounds.width, bounds.height
         )
     end
+    self.dashboard:setVisible(self.viewMode == "overview")
+    self.details:setVisible(self.viewMode ~= "overview")
 end
 
 function ISPNCFactionDebugWindow:getFaction()
@@ -284,10 +325,11 @@ function ISPNCFactionDebugWindow:refreshSnapshot()
         self.npcs.selected = 1
     end
     self.details:clear()
-    for _, item in ipairs(Model.BuildRows(
+    for _, item in ipairs(Model.BuildGUIRows(
         snapshot,
         ClientState.factionDebugAuthorized,
-        ClientState.factionDebugReason
+        ClientState.factionDebugReason,
+        self.viewMode
     )) do
         self.details:addItem(item.label, item)
     end
@@ -320,6 +362,43 @@ function ISPNCFactionDebugWindow:onAction(button)
         self:requestSnapshot()
         return
     end
+    if internal == "overlay" then
+        local visible = PNC.FactionDebugOverlay.Toggle()
+        if visible then
+            PNC.FactionDebugOverlay.SetSelection(
+                faction and faction.id,
+                target and target.id,
+                npc and npc.id
+            )
+        end
+        return
+    end
+    if string.sub(internal, 1, 5) == "view_" then
+        local view = string.sub(internal, 6)
+        if Model.Views[view] then
+            self.viewMode = view
+            self:refreshSnapshot()
+            self:requestResponsiveLayout(true)
+        end
+        return
+    end
+    if internal == "next_scenario" then
+        local names = ClientState.factionDebug
+            and ClientState.factionDebug.scenarioNames or {}
+        if #names > 0 then
+            self.scenarioIndex =
+                ((tonumber(self.scenarioIndex) or 1) % #names) + 1
+            self.scenarioName = names[self.scenarioIndex]
+            if button.setTitle then
+                button:setTitle(
+                    text("UI_PNC_FactionNextScenario")
+                        .. ": " .. self.scenarioName
+                )
+                self:requestResponsiveLayout(true)
+            end
+        end
+        return
+    end
     local payload = {
         factionID = faction and faction.id,
         npcID = npc and npc.id,
@@ -332,6 +411,13 @@ function ISPNCFactionDebugWindow:onAction(button)
         payload.archetypeID = string.sub(internal, 8)
     else
         payload.factionAction = internal
+    end
+    if internal == "run_scenario" then
+        local names = ClientState.factionDebug
+            and ClientState.factionDebug.scenarioNames or {}
+        payload.scenarioName = self.scenarioName
+            or names[self.scenarioIndex or 1]
+            or "single_minor_attack"
     end
     if internal == "role" and faction and npc then
         local archetype = PNC.FactionArchetypes.Get(
@@ -392,9 +478,17 @@ function ISPNCFactionDebugWindow:prerender()
     local allied = relation.allied == true
     for index, button in ipairs(self.controls) do
         local internal = CONTROLS[index].id
+        local definition = CONTROLS[index]
+        local visible = definition.views == nil
+            or definition.views[self.viewMode] == true
+        button:setVisible(visible)
         local create = string.sub(internal, 1, 7) == "create_"
             and internal ~= "create_player_faction"
-        local enabled = internal == "refresh" or create
+        local enabled = internal == "refresh"
+            or internal == "overlay" or create
+        if string.sub(internal, 1, 5) == "view_" then
+            enabled = string.sub(internal, 6) ~= self.viewMode
+        end
         if internal == "create_player_faction" then
             enabled = playerFactionID == nil
         elseif internal == "war" then
@@ -417,6 +511,19 @@ function ISPNCFactionDebugWindow:prerender()
             or internal == "recalculate"
         then
             enabled = pairSelected
+        elseif internal == "check_relation"
+            or internal == "reconcile_treaty"
+        then
+            enabled = pairSelected
+        elseif internal == "telemetry_clear"
+            or internal == "telemetry_toggle"
+            or internal == "next_scenario"
+            or internal == "run_scenario"
+            or internal == "check_registry"
+            or internal == "repair_indexes"
+            or internal == "export_snapshot"
+        then
+            enabled = true
         elseif internal == "archive" then
             enabled = faction ~= nil
         elseif internal == "assign" then
@@ -434,6 +541,18 @@ function ISPNCFactionDebugWindow:prerender()
             enabled = sameFaction
         end
         button:setEnable(enabled)
+        if internal == "telemetry_toggle"
+            and button.setTitle
+        then
+            local titleKey = snapshot.telemetry
+                and snapshot.telemetry.enabled
+                and "UI_PNC_FactionDisableTelemetry"
+                or "UI_PNC_FactionEnableTelemetry"
+            local title = text(titleKey)
+            if button.title ~= title then
+                button:setTitle(title)
+            end
+        end
     end
     PsychopatzWindow.prerender(self)
 end
@@ -442,25 +561,31 @@ function ISPNCFactionDebugWindow:render()
     PsychopatzWindow.render(self)
     if not self.layout then return end
     UI.DrawSectionTitle(
-        self, "Persistent factions",
+        self, text("UI_PNC_FactionSectionPersistent"),
         self.layout.faction.x,
         self.layout.faction.y - Layout.Pixels(21, self.uiScale),
         self.layout.faction.width
     )
     UI.DrawSectionTitle(
-        self, "Target faction",
+        self, text("UI_PNC_FactionSectionTarget"),
         self.layout.target.x,
         self.layout.target.y - Layout.Pixels(21, self.uiScale),
         self.layout.target.width
     )
     UI.DrawSectionTitle(
-        self, "NPC affiliation",
+        self, text("UI_PNC_FactionSectionNPC"),
         self.layout.npc.x,
         self.layout.npc.y - Layout.Pixels(21, self.uiScale),
         self.layout.npc.width
     )
     UI.DrawSectionTitle(
-        self, "Faction details and members",
+        self, text(
+            "UI_PNC_FactionSection"
+                .. string.upper(string.sub(
+                    self.viewMode, 1, 1
+                ))
+                .. string.sub(self.viewMode, 2)
+        ),
         self.layout.detail.x,
         self.layout.detail.y - Layout.Pixels(21, self.uiScale),
         self.layout.detail.width
@@ -490,12 +615,16 @@ function FactionUI.Open()
         return nil
     end
     if not window then
+        local screenWidth = getCore and getCore()
+            and getCore():getScreenWidth() or 1280
+        local screenHeight = getCore and getCore()
+            and getCore():getScreenHeight() or 800
         window = UI.NewWindow(ISPNCFactionDebugWindow, {
             title = getText("UI_PNC_FactionInspectorTitle"),
             resizable = true,
             responsiveSpec = {
-                width = 1280,
-                height = 800,
+                width = math.min(1280, screenWidth - 24),
+                height = math.min(800, screenHeight - 40),
                 minWidth = 820,
                 minHeight = 540,
                 maxWidth = 1500,

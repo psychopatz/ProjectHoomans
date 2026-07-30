@@ -76,6 +76,7 @@ PNC.Core.IsAuthority = function() return authorityEnabled end
 dofile(SHARED .. "Base/PNC_Constants.lua")
 dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
 dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
+dofile(SHARED .. "Factions/PNC_FactionBalance.lua")
 dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
 dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
 dofile(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
@@ -89,8 +90,10 @@ PNC.Registry = {
     MarkDirty = function() return true end,
 }
 
+dofile(SERVER .. "PNC_FactionTelemetry.lua")
 dofile(SERVER .. "PNC_FactionService.lua")
 dofile(SERVER .. "PNC_FactionIncidentService.lua")
+dofile(SERVER .. "PNC_FactionValidation.lua")
 
 local Factions = PNC.Factions
 local Types = PNC.FactionTypes
@@ -389,6 +392,18 @@ truthy(companionIntent.commandable,
 
 -- Attack callbacks aggregate: first hit is minor, a death upgrades the same
 -- persisted episode and can escalate under victim policy.
+local invalidAttackRevision = Factions.Registry.revision
+equal(PNC.FactionIncidentService.RecordAttack(
+    alpha.id,
+    delta.id,
+    {
+        worldAgeHours = worldHour + 9,
+        actorKey = "malformed",
+        subjectKey = "npc:victim",
+    }
+), false, "malformed attack key rejected")
+equal(Factions.Registry.revision, invalidAttackRevision,
+    "malformed attack key revision neutral")
 truthy(PNC.FactionIncidentService.RecordAttack(
     alpha.id,
     delta.id,
@@ -424,6 +439,116 @@ equal(attackIncidents[1].type,
     "member_killed", "episode upgraded to death")
 truthy(Factions.AreAtWar(alpha.id, delta.id),
     "death policy escalates")
+local episode = PNC.FactionIncidentService
+    .GetActiveEpisodes()[1]
+truthy(episode ~= nil, "aggregation diagnostics available")
+equal(episode.hitCount, 2, "aggregation hit count")
+equal(episode.state, "upgraded_to_severe",
+    "aggregation upgrade state")
+equal(episode.actorKey, "npc:attacker",
+    "aggregation stable actor key")
+equal(PNC.FactionIncidentService.PumpRuntime(
+    worldHour + 11
+), 1, "aggregation expiry cleanup")
+equal(#PNC.FactionIncidentService.GetActiveEpisodes(), 0,
+    "expired aggregation removed")
+
+-- Optional intent traces preserve the ordinary result and are read-only.
+local intentSpec = {
+    archetypeID = "looter",
+    policy = bravo.policy,
+    diplomaticState = "neutral",
+    observerStrength = 1,
+    targetStrength = 2,
+}
+local ordinaryIntent = PNC.FactionIntent.Resolve(intentSpec)
+local tracedIntent = PNC.FactionIntent.ResolveWithTrace(intentSpec)
+equal(tracedIntent.result.intent, ordinaryIntent.intent,
+    "intent trace matches ordinary result")
+equal(tracedIntent.result.reason, ordinaryIntent.reason,
+    "intent trace matches ordinary reason")
+equal(tracedIntent.trace.selectedRule, ordinaryIntent.reason,
+    "intent trace selected rule")
+
+-- Runtime telemetry is safe, bounded, copied, and revision-neutral.
+PNC.Config.Factions.EnableValidationTelemetry = true
+local telemetryRevision = Factions.Registry.revision
+PNC.Config.Factions.reconciliationBatchSize = 999999
+equal(PNC.FactionBalance.Get("reconciliationBatchSize"),
+    128, "balance override clamped")
+PNC.Config.Factions.reconciliationBatchSize = nil
+for index = 1, 520 do
+    PNC.FactionTelemetry.RecordCallback({
+        operation = "test_callback",
+        worldAgeHours = worldHour,
+        result = "accepted",
+        sequenceInput = index,
+        unsafe = function() end,
+    })
+end
+local telemetrySnapshot =
+    PNC.FactionTelemetry.BuildSnapshot({ maximum = 600 })
+equal(telemetrySnapshot.count, 512,
+    "telemetry bounded")
+equal(#telemetrySnapshot.entries, 512,
+    "telemetry snapshot bounded")
+equal(telemetrySnapshot.entries[1].sequenceInput, 9,
+    "telemetry FIFO deterministic")
+equal(telemetrySnapshot.entries[1].unsafe, nil,
+    "telemetry strips functions")
+telemetrySnapshot.entries[1].result = "tampered"
+equal(PNC.FactionTelemetry.GetRecent(512)[1].result,
+    "accepted", "telemetry reads copied")
+equal(Factions.Registry.revision, telemetryRevision,
+    "telemetry revision neutral")
+equal(globalData.PNC_Factions.telemetry, nil,
+    "telemetry never enters faction ModData")
+
+-- Isolated scenarios are deterministic and never touch persistence.
+local scenarioRevision = Factions.Registry.revision
+local scenarioA = PNC.FactionValidation.RunScenario(
+    "war_then_peace"
+)
+local scenarioB = PNC.FactionValidation.RunScenario(
+    "war_then_peace"
+)
+equal(scenarioA.finalDiplomaticState,
+    scenarioB.finalDiplomaticState,
+    "scenario deterministic")
+equal(scenarioA.revisionDeltas.registry, 0,
+    "scenario registry delta zero")
+equal(Factions.Registry.revision, scenarioRevision,
+    "scenario preview persistence neutral")
+
+local repairRevision = Factions.Registry.revision
+Factions.Registry.byArchetype = {}
+truthy(PNC.FactionValidation.RepairSecondaryIndexes(),
+    "safe secondary index repair")
+equal(Factions.Registry.revision, repairRevision + 1,
+    "secondary repair increments registry once")
+equal(PNC.FactionValidation.RepairSecondaryIndexes(),
+    false, "secondary repair deterministic")
+
+-- The read-only checker detects treaty asymmetry.
+local savedReverse = Types.NormalizeRelation(
+    Factions.Registry.byID[delta.id].relations[alpha.id],
+    delta.id,
+    alpha.id
+)
+Factions.Registry.byID[delta.id]
+    .relations[alpha.id].atWar = false
+local checkerRevision = Factions.Registry.revision
+local invalidPair = PNC.FactionValidation.CheckRelation(
+    alpha.id, delta.id
+)
+equal(invalidPair.ok, false,
+    "invariant checker detects asymmetric war")
+equal(Factions.Registry.revision, checkerRevision,
+    "invariant checker read-only")
+Factions.Registry.byID[delta.id].relations[alpha.id] =
+    savedReverse
+truthy(PNC.FactionValidation.CheckRegistry().ok,
+    "registry invariants hold after restoration")
 
 -- Invalid time and non-authority mutations are rejected without revisions.
 local rejectedRevision = Factions.Registry.revision

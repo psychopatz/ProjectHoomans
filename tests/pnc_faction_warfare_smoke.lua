@@ -68,6 +68,7 @@ dofile(SHARED .. "Base/PNC_Core.lua")
 dofile(SHARED .. "Base/PNC_Constants.lua")
 dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
 dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
+dofile(SHARED .. "Factions/PNC_FactionBalance.lua")
 dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
 dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
 dofile(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
@@ -119,6 +120,15 @@ PNC.OrderSystem = {
     end,
 }
 PNC.SimulationClock = { Wake = function() end }
+local broadcasts = {}
+PNC.Network = {
+    BroadcastRecord = function(record, reason)
+        broadcasts[#broadcasts + 1] = {
+            id = record.id,
+            reason = reason,
+        }
+    end,
+}
 
 local playerKey = "player:Patrick:char_player"
 local player = {
@@ -165,6 +175,7 @@ end
 
 local looterNPC = npc("npc_looter")
 local playerNPC = npc("npc_player_member")
+local transferredNPC = npc("npc_transferred_member")
 local traderNPC = npc("npc_trader")
 
 dofile(SERVER .. "PNC_FactionService.lua")
@@ -242,6 +253,13 @@ truthy(PNC.CompanionCommands.IsOwnedByPlayer(
     playerNPC,
     player
 ), "owner character can command member")
+truthy(Factions.AddNPC(
+    playerFaction.id,
+    transferredNPC.id,
+    { joinedAt = hour }
+), "assign transfer test companion")
+equal(transferredNPC.recruited, true,
+    "transfer test starts as companion")
 local replacementSurvivor = {
     uuid = "char_replacement",
     getUsername = function() return "Patrick" end,
@@ -302,6 +320,38 @@ equal(Factions.DeclareWar(
 equal(Factions.Registry.revision,
     beforeWarRevision + 1, "duplicate war no revision")
 
+-- Moving an existing companion into a faction whose war is already active
+-- must immediately replace companion behavior with faction-war behavior.
+local broadcastsBeforeTransfer = #broadcasts
+truthy(Factions.TransferNPC(
+    transferredNPC.id,
+    traderFaction.id,
+    { worldAgeHours = hour }
+), "transfer companion into active enemy faction")
+equal(transferredNPC.faction, "hostile",
+    "transferred member tactical class")
+equal(transferredNPC.recruited, false,
+    "transferred member no longer companion")
+equal(transferredNPC.ownerUsername, nil,
+    "transferred member owner cleared")
+equal(transferredNPC.hostility.attackPlayers, true,
+    "transferred member attacks enemy player faction")
+equal(transferredNPC.orderSpec.kind,
+    PNC.Const.ORDER_HOSTILE_HUNT,
+    "transferred member receives hostile hunt order")
+truthy(Factions.CanNPCTargetPlayer(transferredNPC, player),
+    "transferred member can target player immediately")
+equal(#broadcasts, broadcastsBeforeTransfer + 1,
+    "transfer broadcasts live behavior immediately")
+equal(broadcasts[#broadcasts].reason,
+    "faction_transferred",
+    "transfer broadcast reason")
+traderNPC.runtime.target = {
+    kind = "player",
+    player = player,
+}
+traderNPC.runtime.attackAction = { active = true }
+
 -- Peace restores external factions to nonlethal policy.
 truthy(Factions.MakePeace(
     playerFaction.id,
@@ -315,10 +365,93 @@ equal(traderNPC.faction, "neutral",
     "peace restores neutral behavior")
 equal(Factions.CanNPCTargetPlayer(traderNPC, player),
     false, "peace stops player targeting")
+equal(traderNPC.runtime.target, nil,
+    "peace clears stale faction-war player target")
 equal(PNC.Relationships.AreNPCsEnemies(
     looterNPC,
     playerNPC
 ), false, "looter policy alone is nonlethal")
+
+-- Treaty behavior changes preserve unrelated higher-priority zombie combat.
+truthy(Factions.DeclareWar(
+    playerFaction.id,
+    traderFaction.id,
+    {
+        worldAgeHours = hour + 1.1,
+        reason = "manual_debug",
+        instigatorFactionID = playerFaction.id,
+    }
+), "declare second war")
+local zombieTarget = {
+    kind = "zombie",
+    zombieId = 99,
+}
+traderNPC.runtime.target = zombieTarget
+truthy(Factions.MakePeace(
+    playerFaction.id,
+    traderFaction.id,
+    {
+        worldAgeHours = hour + 1.2,
+        reason = "manual_debug",
+    }
+), "second peace")
+equal(traderNPC.runtime.target, zombieTarget,
+    "peace preserves unrelated zombie target")
+equal(#PNC.FactionBehavior.ReconciliationQueue, 0,
+    "small treaty reconciliation completes immediately")
+
+truthy(Factions.DeclareWar(
+    playerFaction.id,
+    traderFaction.id,
+    {
+        worldAgeHours = hour + 1.3,
+        reason = "manual_debug",
+        instigatorFactionID = playerFaction.id,
+    }
+), "declare self-defense test war")
+local activeAttackerTarget = {
+    kind = "player",
+    player = player,
+    targetAggression = true,
+}
+traderNPC.runtime.target = activeAttackerTarget
+truthy(Factions.MakePeace(
+    playerFaction.id,
+    traderFaction.id,
+    {
+        worldAgeHours = hour + 1.4,
+        reason = "manual_debug",
+    }
+), "self-defense test peace")
+equal(traderNPC.runtime.target, activeAttackerTarget,
+    "peace preserves immediate self-defense target")
+traderNPC.runtime.target = {
+    kind = "player",
+    player = player,
+}
+truthy(Factions.FormAlliance(
+    playerFaction.id,
+    traderFaction.id,
+    {
+        worldAgeHours = hour + 1.5,
+        instigatorFactionID = playerFaction.id,
+        override = true,
+    }
+), "form alliance for stale target test")
+equal(traderNPC.runtime.target, nil,
+    "alliance clears stale allied target")
+truthy(Factions.BreakAlliance(
+    playerFaction.id,
+    traderFaction.id,
+    {
+        worldAgeHours = hour + 1.6,
+        instigatorFactionID = playerFaction.id,
+    }
+), "break alliance after target test")
+equal(Factions.AreAtWar(
+    playerFaction.id,
+    traderFaction.id
+), false, "breaking alliance does not declare war")
 
 -- Personal enemy state is reported only by faction authority and does not
 -- immediately declare war under the safe default.
@@ -380,6 +513,39 @@ equal(playerNPC.presenceRevision, 9,
     "player faction behavior leaves presence revision")
 equal(traderNPC.presenceRevision, 9,
     "war behavior leaves presence revision")
+
+-- Large-pair reconciliation is runtime-only, bounded, and deduplicated.
+for index = 1, 20 do
+    local record = npc("npc_queue_" .. tostring(index))
+    truthy(Factions.AddNPC(
+        looterFaction.id,
+        record.id,
+        { joinedAt = hour + 2 }
+    ), "queue test member")
+end
+truthy(PNC.FactionBehavior.QueueTreatyReconciliation(
+    playerFaction.id,
+    looterFaction.id,
+    "queue_test",
+    hour + 2
+), "reconciliation queued")
+equal(PNC.FactionBehavior.QueueTreatyReconciliation(
+    playerFaction.id,
+    looterFaction.id,
+    "queue_test_duplicate",
+    hour + 2
+), false, "reconciliation request deduplicated")
+equal(#PNC.FactionBehavior.ReconciliationQueue, 1,
+    "one runtime reconciliation job")
+equal(PNC.FactionBehavior.PumpReconciliation(5), 5,
+    "reconciliation bounded per pump")
+equal(PNC.FactionBehavior.ReconciliationQueue[1]
+    .processedCount, 5, "reconciliation cursor retained")
+while #PNC.FactionBehavior.ReconciliationQueue > 0 do
+    PNC.FactionBehavior.PumpReconciliation(5)
+end
+equal(#PNC.FactionBehavior.ReconciliationQueue, 0,
+    "reconciliation completes")
 
 -- V2 pair diplomacy deterministically migrates to two V3 directions.
 local migrated = PNC.FactionTypes.NormalizeFactionRegistry({

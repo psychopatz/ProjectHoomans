@@ -496,6 +496,48 @@ assertEqual(alice.recordRevision, unchangedRecord,
     "identical rank record revision")
 
 -- 56-60. Debug formatting/snapshots are primitive-only.
+local debugPlayerKey = "player:Patrick:char_debug"
+Factions.GetFactionForPlayerKey = function()
+    return nil
+end
+PNC.PlayerCharacters = {
+    GetEntityKey = function()
+        return debugPlayerKey
+    end,
+}
+PNC.Relationships = {
+    Get = function(npcID, targetKey)
+        if npcID == alice.id
+            and targetKey == debugPlayerKey
+        then
+            return {
+                approval = 9,
+                respect = 6,
+                familiarity = 4,
+                state = "unknown",
+                previousState = "unknown",
+                revision = 2,
+                lastInteractionAt = 100,
+            }
+        end
+        return nil
+    end,
+}
+alice.runtime = alice.runtime or {}
+alice.runtime.relationshipDebugChanges = {
+    {
+        sequence = 1,
+        targetKey = debugPlayerKey,
+        kind = "social_event",
+        memoryType = "treated_wound",
+        approvalDelta = 4,
+        respectDelta = 2,
+        familiarityDelta = 2,
+        moraleDelta = 2,
+        stateBefore = "unknown",
+        stateAfter = "unknown",
+    },
+}
 dofile(SERVER .. "PNC_FactionDebug.lua")
 assertTrue(string.find(
     PNC.FactionDebug.FormatList(),
@@ -513,10 +555,85 @@ assertTrue(string.find(
     1, true
 ) ~= nil, "debug member formatting")
 local debugSnapshot =
-    PNC.FactionDebug.BuildSnapshot(traderID, alice.id)
+    PNC.FactionDebug.BuildSnapshot(
+        traderID,
+        alice.id,
+        nil,
+        {}
+    )
 assertSaveSafe(debugSnapshot)
 assertEqual(debugSnapshot.roster[1].inventory,
     nil, "debug excludes inventory")
+assertEqual(
+    #debugSnapshot.npcDiagnostics,
+    #debugSnapshot.roster,
+    "debug includes one primitive diagnostic per living NPC"
+)
+assertEqual(
+    debugSnapshot.npcDiagnostics[1].presenceRevision
+        ~= nil,
+    true,
+    "debug diagnostic includes revision evidence"
+)
+local aliceDiagnostic
+for _, diagnostic in ipairs(
+    debugSnapshot.npcDiagnostics
+) do
+    if diagnostic.npcID == alice.id then
+        aliceDiagnostic = diagnostic
+        break
+    end
+end
+assertEqual(aliceDiagnostic.relationship.approval, 9,
+    "debug diagnostic includes player relationship")
+assertEqual(
+    aliceDiagnostic.relationshipChanges[1].memoryType,
+    "treated_wound",
+    "debug diagnostic includes relationship change type"
+)
+
+-- Guarded GUI diagnostics toggle changes runtime config only.
+PNC.FactionTelemetry = {
+    BuildSnapshot = function()
+        return {
+            enabled = PNC.Config.Factions
+                .EnableValidationTelemetry == true,
+            count = 0,
+            maximum = 512,
+            entries = {},
+        }
+    end,
+}
+PNC.Config.Factions.EnableValidationTelemetry = false
+local enabledDiagnostics =
+    PNC.FactionDebug.PerformAction(nil, {
+        factionAction = "telemetry_toggle",
+        factionID = traderID,
+        npcID = alice.id,
+    })
+assertTrue(
+    PNC.Config.Factions.EnableValidationTelemetry,
+    "debug GUI enables runtime telemetry"
+)
+assertTrue(
+    enabledDiagnostics.actionResult.ok,
+    "enable telemetry action succeeds"
+)
+local disabledDiagnostics =
+    PNC.FactionDebug.PerformAction(nil, {
+        factionAction = "telemetry_toggle",
+        factionID = traderID,
+        npcID = alice.id,
+    })
+assertFalse(
+    PNC.Config.Factions.EnableValidationTelemetry,
+    "debug GUI disables runtime telemetry"
+)
+assertEqual(
+    disabledDiagnostics.actionResult.reason,
+    "telemetry_disabled",
+    "disable telemetry result"
+)
 
 -- Save/load registry remains primitive-only and copy-safe.
 assertTrue(Factions.Save(), "faction save")
