@@ -127,6 +127,26 @@ function Model.BuildRows(snapshot, authorized, reason)
             .. number(community.home.z)
             .. " r=" .. number(community.home.radius)
     )
+    local site = community.site
+    rows[#rows + 1] = row(
+        text("UI_PNC_CommunitySite"),
+        site and (
+            tostring(site.kind) .. " / "
+                .. tostring(site.status) .. " / "
+                .. tostring(site.id)
+        ) or text("UI_PNC_CommunityNone"),
+        site and (
+            site.status == "occupied"
+                and "success" or "warning"
+        ) or "textMuted"
+    )
+    if site and site.claimantKey then
+        rows[#rows + 1] = row(
+            text("UI_PNC_CommunitySiteClaim"),
+            site.claimantKey,
+            "warning"
+        )
+    end
     rows[#rows + 1] = row(
         text("UI_PNC_CommunityLeader"),
         community.leaderNPCID or text("UI_PNC_CommunityNone")

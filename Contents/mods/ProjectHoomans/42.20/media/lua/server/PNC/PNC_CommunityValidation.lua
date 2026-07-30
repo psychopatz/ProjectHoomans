@@ -151,6 +151,28 @@ function Validation.ValidateRegistry()
                 communityID
             )
         end
+        if community.siteID then
+            local site = Communities.Registry.sitesByID[
+                community.siteID
+            ]
+            if not site then
+                issue(
+                    output,
+                    "error",
+                    "missing_site_reference",
+                    communityID .. ":" .. community.siteID
+                )
+            elseif community.status == "active"
+                and site.occupantCommunityID ~= communityID
+            then
+                issue(
+                    output,
+                    "error",
+                    "site_occupancy_mismatch",
+                    communityID .. ":" .. community.siteID
+                )
+            end
+        end
         checkRange(
             output,
             community.home and community.home.radius,
@@ -286,6 +308,81 @@ function Validation.ValidateRegistry()
                     factionID .. ":" .. communityID
                 )
             end
+        end
+    end
+    for siteID, site in pairs(
+        Communities.Registry.sitesByID or {}
+    ) do
+        output.checks = output.checks + 1
+        if site.id ~= siteID
+            or not Types.IsValidSiteID(siteID)
+        then
+            issue(
+                output,
+                "error",
+                "site_id_mismatch",
+                siteID
+            )
+        end
+        if not Constants.VALID_SITE_KINDS[site.kind]
+            or not Constants.VALID_SITE_STATUSES[
+                site.status
+            ]
+        then
+            issue(
+                output,
+                "error",
+                "invalid_site_classification",
+                siteID
+            )
+        end
+        if not Types.NormalizeSite(site, siteID) then
+            issue(
+                output,
+                "error",
+                "invalid_site",
+                siteID
+            )
+        end
+        if site.occupantCommunityID then
+            local community = Communities.Registry.byID[
+                site.occupantCommunityID
+            ]
+            if not community
+                or community.status ~= "active"
+                or community.siteID ~= siteID
+                or site.claimantKey ~= nil
+                or site.status ~= "occupied"
+            then
+                issue(
+                    output,
+                    "error",
+                    "invalid_site_occupant",
+                    siteID
+                )
+            end
+        elseif site.claimantKey then
+            if not PNC.EntityRef
+                or not PNC.EntityRef.IsPlayer
+                or not PNC.EntityRef.IsPlayer(
+                    site.claimantKey
+                )
+                or site.status ~= "claimed"
+            then
+                issue(
+                    output,
+                    "error",
+                    "invalid_site_claim",
+                    siteID
+                )
+            end
+        elseif site.status ~= "vacant" then
+            issue(
+                output,
+                "error",
+                "vacant_site_status_mismatch",
+                siteID
+            )
         end
     end
     for npcID, record in pairs(

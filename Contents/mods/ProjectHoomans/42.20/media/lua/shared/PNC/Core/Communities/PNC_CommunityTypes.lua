@@ -43,6 +43,15 @@ function Types.IsValidCommunityID(value)
         and string.match(value, "^[%w_%-%.]+$") ~= nil
 end
 
+function Types.IsValidSiteID(value)
+    return type(value) == "string"
+        and #value > #Constants.SITE_ID_PREFIX
+        and #value <= Constants.SITE_ID_MAX_LENGTH
+        and string.sub(value, 1, #Constants.SITE_ID_PREFIX)
+            == Constants.SITE_ID_PREFIX
+        and string.match(value, "^[%w_%-%.]+$") ~= nil
+end
+
 function Types.IsValidFactionID(value)
     return PNC.FactionTypes
         and PNC.FactionTypes.IsValidFactionID
@@ -109,6 +118,93 @@ function Types.NormalizeHome(value, mode)
             Constants.RADIUS_MAX,
             profile.radius
         ),
+    }
+end
+
+function Types.NormalizeSiteBounds(value, home)
+    local source = type(value) == "table" and value or {}
+    local minX = CommunityMath.IsFinite(source.minX)
+        and tonumber(source.minX) or home and home.x
+    local minY = CommunityMath.IsFinite(source.minY)
+        and tonumber(source.minY) or home and home.y
+    local maxX = CommunityMath.IsFinite(source.maxX)
+        and tonumber(source.maxX) or minX
+    local maxY = CommunityMath.IsFinite(source.maxY)
+        and tonumber(source.maxY) or minY
+    if not minX or not minY or not maxX or not maxY then
+        return nil
+    end
+    if maxX < minX then minX, maxX = maxX, minX end
+    if maxY < minY then minY, maxY = maxY, minY end
+    local minZ = integer(
+        source.minZ,
+        Constants.Z_MIN,
+        Constants.Z_MAX,
+        home and home.z or 0
+    )
+    local maxZ = integer(
+        source.maxZ,
+        Constants.Z_MIN,
+        Constants.Z_MAX,
+        home and home.z or 0
+    )
+    if maxZ < minZ then minZ, maxZ = maxZ, minZ end
+    return {
+        minX = minX,
+        minY = minY,
+        maxX = maxX,
+        maxY = maxY,
+        minZ = minZ,
+        maxZ = maxZ,
+    }
+end
+
+function Types.NormalizeSite(value, siteID)
+    local source = type(value) == "table" and value or {}
+    local id = Types.IsValidSiteID(siteID)
+        and siteID
+        or Types.IsValidSiteID(source.id) and source.id
+        or nil
+    local kind = Constants.VALID_SITE_KINDS[source.kind]
+        and source.kind or "radius"
+    local home = Types.NormalizeHome(
+        source.home or {
+            x = source.x,
+            y = source.y,
+            z = source.z,
+            radius = source.radius,
+        },
+        "settled"
+    )
+    local bounds = Types.NormalizeSiteBounds(
+        source.bounds,
+        home
+    )
+    if not id or not home or not bounds then return nil end
+    local claimantKey = PNC.EntityRef
+        and PNC.EntityRef.IsPlayer
+        and PNC.EntityRef.IsPlayer(source.claimantKey)
+        and source.claimantKey or nil
+    local occupantCommunityID =
+        Types.IsValidCommunityID(source.occupantCommunityID)
+        and source.occupantCommunityID or nil
+    local status = claimantKey and "claimed"
+        or occupantCommunityID and "occupied"
+        or "vacant"
+    return {
+        schemaVersion = Constants.SITE_SCHEMA_VERSION,
+        id = id,
+        kind = kind,
+        home = home,
+        bounds = bounds,
+        occupantCommunityID = occupantCommunityID,
+        claimantKey = claimantKey,
+        status = status,
+        createdAt = timestamp(source.createdAt, 0),
+        vacatedAt = timestamp(source.vacatedAt, 0),
+        claimedAt = claimantKey
+            and timestamp(source.claimedAt, 0) or 0,
+        revision = revision(source.revision),
     }
 end
 
@@ -236,6 +332,8 @@ function Types.NormalizeCommunity(value, communityID)
             Constants.NAME_MAX_LENGTH
         ),
         home = home,
+        siteID = Types.IsValidSiteID(source.siteID)
+            and source.siteID or nil,
         leaderNPCID = Types.IsValidNPCID(source.leaderNPCID)
             and source.leaderNPCID or nil,
         memberIDs = Types.NormalizeMemberIDs(source.memberIDs),
@@ -281,6 +379,7 @@ function Types.NormalizeRegistry(value)
         revision = revision(source.revision),
         byID = {},
         byFaction = {},
+        sitesByID = {},
     }
     for communityID, raw in pairs(
         type(source.byID) == "table" and source.byID or {}
@@ -295,6 +394,42 @@ function Types.NormalizeRegistry(value)
                 output.byFaction[community.factionID] or {}
             output.byFaction[community.factionID][communityID] =
                 true
+        end
+    end
+    for siteID, raw in pairs(
+        type(source.sitesByID) == "table"
+            and source.sitesByID or {}
+    ) do
+        local site = Types.NormalizeSite(raw, siteID)
+        if site and site.id == siteID then
+            output.sitesByID[siteID] = site
+        end
+    end
+    -- Occupancy is derived deterministically from active communities. Retired
+    -- communities keep siteID as history but do not reserve the reusable site.
+    local activeBySite = {}
+    for communityID, community in pairs(output.byID) do
+        local siteID = community.siteID
+        local site = siteID and output.sitesByID[siteID] or nil
+        if site and community.status == "active"
+            and not site.claimantKey
+        then
+            local current = activeBySite[siteID]
+            if not current or communityID < current then
+                activeBySite[siteID] = communityID
+            end
+        elseif siteID and not site then
+            community.siteID = nil
+        end
+    end
+    for siteID, site in pairs(output.sitesByID) do
+        if site.claimantKey then
+            site.occupantCommunityID = nil
+            site.status = "claimed"
+        else
+            site.occupantCommunityID = activeBySite[siteID]
+            site.status = site.occupantCommunityID
+                and "occupied" or "vacant"
         end
     end
     return output

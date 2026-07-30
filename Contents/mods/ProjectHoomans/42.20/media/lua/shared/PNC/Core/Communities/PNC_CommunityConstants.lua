@@ -6,10 +6,13 @@ PNC.CommunityConstants = PNC.CommunityConstants or {}
 local Constants = PNC.CommunityConstants
 
 Constants.REGISTRY_MODDATA_KEY = "PNC_Communities"
-Constants.REGISTRY_SCHEMA_VERSION = 1
-Constants.RECORD_SCHEMA_VERSION = 1
+Constants.REGISTRY_SCHEMA_VERSION = 2
+Constants.RECORD_SCHEMA_VERSION = 2
+Constants.SITE_SCHEMA_VERSION = 1
 Constants.ID_PREFIX = "community_"
+Constants.SITE_ID_PREFIX = "community_site_"
 Constants.ID_MAX_LENGTH = 192
+Constants.SITE_ID_MAX_LENGTH = 240
 Constants.NAME_MAX_LENGTH = 96
 Constants.ID_GENERATION_RETRIES = 32
 
@@ -36,6 +39,38 @@ Constants.VALID_STATUSES = {}
 for _, status in ipairs(Constants.STATUSES) do
     Constants.VALID_STATUSES[status] = true
 end
+
+Constants.SITE_KINDS = {
+    "building",
+    "radius",
+}
+Constants.VALID_SITE_KINDS = {}
+for _, kind in ipairs(Constants.SITE_KINDS) do
+    Constants.VALID_SITE_KINDS[kind] = true
+end
+
+Constants.SITE_STATUSES = {
+    "vacant",
+    "occupied",
+    "claimed",
+}
+Constants.VALID_SITE_STATUSES = {}
+for _, status in ipairs(Constants.SITE_STATUSES) do
+    Constants.VALID_SITE_STATUSES[status] = true
+end
+
+Constants.GROUP_PRESENCE_MODES = {
+    "auto",
+    "abstract",
+    "live",
+}
+Constants.VALID_GROUP_PRESENCE_MODES = {}
+for _, mode in ipairs(Constants.GROUP_PRESENCE_MODES) do
+    Constants.VALID_GROUP_PRESENCE_MODES[mode] = true
+end
+Constants.GROUP_SIZE_MIN = 1
+Constants.GROUP_SIZE_MAX = 24
+Constants.GROUP_SIZE_DEFAULT = 4
 
 Constants.ROLES = {
     "leader",

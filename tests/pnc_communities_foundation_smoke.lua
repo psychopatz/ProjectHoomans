@@ -84,6 +84,7 @@ ModData = {
 
 PNC = {}
 dofile(SHARED .. "Base/PNC_Core.lua")
+dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
 dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
 dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
 dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
@@ -137,9 +138,11 @@ end
 
 -- Pure defaults, normalization, bounds, and geometry.
 local empty = CommunityTypes.NewRegistry()
-assertEqual(empty.schemaVersion, 1, "community registry schema")
+assertEqual(empty.schemaVersion, 2, "community registry schema")
 assertEqual(empty.revision, 0, "community registry revision")
 assertEqual(tableSize(empty.byID), 0, "community registry empty")
+assertEqual(tableSize(empty.sitesByID), 0,
+    "community site registry empty")
 local settledDefaults =
     CommunityTypes.BuildCreationDefaults("settled", "settler")
 assertEqual(settledDefaults.radius, 35, "settled radius")
@@ -288,6 +291,36 @@ local _, _, camp = PNC.Communities.Create({
     home = { x = 300, y = 300, z = 0 },
 })
 local campID = camp.id
+local farmSite = {
+    kind = "building",
+    home = { x = 140, y = 100, z = 0, radius = 12 },
+    bounds = {
+        minX = 134, minY = 94,
+        maxX = 146, maxY = 106,
+        minZ = 0, maxZ = 0,
+    },
+}
+farmSite.id = PNC.Communities.BuildSiteID(farmSite)
+assertTrue(PNC.Communities.ReserveSite(
+    farmID, farmSite, worldHour
+), "reserve building site")
+assertEqual(PNC.Communities.GetSite(
+    farmSite.id
+).occupantCommunityID, farmID,
+    "site occupancy stored")
+local campSite = {
+    kind = "radius",
+    home = { x = 300, y = 300, z = 0, radius = 15 },
+    bounds = {
+        minX = 285, minY = 285,
+        maxX = 315, maxY = 315,
+        minZ = 0, maxZ = 0,
+    },
+}
+campSite.id = PNC.Communities.BuildSiteID(campSite)
+assertTrue(PNC.Communities.ReserveSite(
+    campID, campSite, worldHour
+), "reserve camp site")
 assertEqual(#PNC.Communities.GetForFaction(settlers.id), 2,
     "multiple communities per faction")
 assertEqual(#PNC.Communities.GetForFaction(refugees.id), 1,
@@ -309,12 +342,18 @@ assertFalse(PNC.Communities.Create({
 local alice = newNPC("npc_alice")
 local bob = newNPC("npc_bob")
 local outsider = newNPC("npc_outsider")
+local firstCommunityID = "community_collision"
 assertTrue(PNC.Factions.AddNPC(settlers.id, alice.id, {}),
     "alice joins settlers")
 assertTrue(PNC.Factions.AddNPC(settlers.id, bob.id, {}),
     "bob joins settlers")
 assertTrue(PNC.Factions.AddNPC(refugees.id, outsider.id, {}),
     "outsider joins refugees")
+assertTrue(PNC.Communities.AddNPC(
+    firstCommunityID,
+    bob.id,
+    { communityRole = "resident", joinedAt = 200 }
+), "bob joins first community")
 local alicePresence = alice.presenceRevision
 local aliceSocial = alice.social.revision
 local aliceRelationship =
@@ -347,7 +386,6 @@ assertEqual(PNC.Factions.Get(settlers.id).revision,
 assertFalse(PNC.Communities.AddNPC(
     farmID, outsider.id, {}
 ), "owning faction required")
-local firstCommunityID = "community_collision"
 assertFalse(PNC.Communities.AddNPC(
     firstCommunityID, alice.id, {}
 ), "one current community")
@@ -398,7 +436,7 @@ assertEqual(PNC.Communities.Get(
 ).leaderNPCID, nil, "death clears leadership")
 assertEqual(PNC.Communities.Get(
     firstCommunityID
-).currentPopulation, 0, "death updates population")
+).currentPopulation, 1, "death updates population")
 alice.alive = true
 assertTrue(PNC.Communities.AddNPC(
     firstCommunityID,
@@ -478,10 +516,13 @@ assertEqual(alice.presenceRevision, presenceBeforeRemoval,
     "faction removal presence unchanged")
 
 -- Faction archive and destroy retire owned community records.
-assertTrue(PNC.Communities.AddNPC(
-    farmID,
+assertTrue(PNC.Communities.TransferNPC(
     bob.id,
-    { communityRole = "worker" }
+    farmID,
+    {
+        communityRole = "worker",
+        worldAgeHours = 219,
+    }
 ), "bob community assignment")
 assertTrue(PNC.Factions.Archive(
     settlers.id,
@@ -498,6 +539,71 @@ for _, community in ipairs(
     assertEqual(tableSize(community.memberIDs), 0,
         "archived community members clear")
 end
+
+-- Wiped communities release their sites for reuse; a stable player-character
+-- claim prevents later occupation without persisting an IsoPlayer.
+assertTrue(PNC.Communities.AddNPC(
+    campID,
+    outsider.id,
+    { communityRole = "resident" }
+), "outsider occupies camp")
+outsider.alive = false
+local wiped, wipedReason =
+    PNC.Communities.OnNPCDeath(outsider.id)
+assertTrue(wiped, "wipeout reconciles")
+assertEqual(wipedReason, "community_wiped_out",
+    "last death destroys community")
+assertEqual(PNC.Communities.Get(campID).status,
+    "destroyed", "wiped community destroyed")
+assertEqual(PNC.Communities.GetSite(campSite.id).status,
+    "vacant", "wiped site released")
+local _, _, replacement = PNC.Communities.Create({
+    factionID = refugees.id,
+    name = "Replacement Camp",
+    mode = "camped",
+    home = campSite.home,
+    createdAt = 222,
+})
+assertTrue(PNC.Communities.ReserveSite(
+    replacement.id,
+    campSite,
+    222
+), "vacant site reoccupied")
+assertTrue(PNC.Communities.Destroy(
+    replacement.id,
+    "claim_test",
+    223
+), "replacement releases site")
+local playerKey = PNC.EntityRef.ForPlayerIdentity(
+    "Patrick",
+    "char_site_test"
+)
+assertTrue(PNC.Communities.ClaimSite(
+    campSite.id,
+    playerKey,
+    224
+), "player character claims site")
+assertEqual(PNC.Communities.GetSite(
+    campSite.id
+).claimantKey, playerKey,
+    "stable claimant stored")
+local _, _, blockedCommunity = PNC.Communities.Create({
+    factionID = refugees.id,
+    name = "Blocked Camp",
+    mode = "camped",
+    home = campSite.home,
+    createdAt = 225,
+})
+local reserved, reserveReason =
+    PNC.Communities.ReserveSite(
+        blockedCommunity.id,
+        campSite,
+        225
+    )
+assertFalse(reserved, "claimed site cannot be occupied")
+assertEqual(reserveReason, "site_claimed",
+    "claim blocks occupation specifically")
+outsider.alive = true
 assertEqual(bob.affiliation.communityID, nil,
     "faction archive clears community affiliation")
 assertTrue(PNC.Factions.Destroy(

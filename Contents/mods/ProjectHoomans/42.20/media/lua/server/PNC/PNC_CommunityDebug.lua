@@ -159,6 +159,7 @@ function Debug.BuildSnapshot(
             count = #communities,
         },
         communities = communities,
+        sites = Communities.ListSites(),
         factions = factions,
         roster = roster,
         members = selectedMembers(selected),
@@ -210,7 +211,24 @@ function Debug.PerformAction(player, args)
             home = { x = x, y = y, z = z },
             createdAt = at,
         })
-        if ok then communityID = value.id end
+        if ok then
+            communityID = value.id
+            local site = PNC.CommunitySiteResolver
+                and PNC.CommunitySiteResolver.DescribeAt
+                and PNC.CommunitySiteResolver.DescribeAt(
+                    x,
+                    y,
+                    z,
+                    { createdAt = at }
+                ) or nil
+            if site then
+                ok, reason, value = Communities.ReserveSite(
+                    communityID,
+                    site,
+                    at
+                )
+            end
+        end
     elseif action == "assign" then
         ok, reason, value = Communities.AddNPC(
             communityID,
@@ -322,6 +340,29 @@ function Debug.PerformAction(player, args)
             communityID,
             "manual_debug",
             at
+        )
+    elseif action == "claim_site" then
+        local playerKey = PNC.PlayerCharacters
+            and PNC.PlayerCharacters.GetEntityKey
+            and PNC.PlayerCharacters.GetEntityKey(player, {
+                callback = "community_site_claim",
+                worldAgeHours = at,
+            }) or nil
+        ok, reason, value = Communities.ClaimSite(
+            args and args.siteID,
+            playerKey,
+            at
+        )
+    elseif action == "unclaim_site" then
+        local playerKey = PNC.PlayerCharacters
+            and PNC.PlayerCharacters.GetEntityKey
+            and PNC.PlayerCharacters.GetEntityKey(player, {
+                callback = "community_site_unclaim",
+                worldAgeHours = at,
+            }) or nil
+        ok, reason, value = Communities.UnclaimSite(
+            args and args.siteID,
+            playerKey
         )
     elseif action == "validate" then
         Debug.LastValidation =

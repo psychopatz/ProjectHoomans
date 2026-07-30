@@ -45,9 +45,22 @@ local function worldAge(value, fallback)
     )
 end
 
+local function currentWorldAgeHours()
+    local gameTime = getGameTime and getGameTime() or nil
+    if gameTime and gameTime.getWorldAgeHours then
+        return worldAge(gameTime:getWorldAgeHours(), 0)
+    end
+    return 0
+end
+
 local function registryRecord(communityID)
     return Types.IsValidCommunityID(communityID)
         and Communities.Registry.byID[communityID] or nil
+end
+
+local function siteRecord(siteID)
+    return Types.IsValidSiteID(siteID)
+        and Communities.Registry.sitesByID[siteID] or nil
 end
 
 local function npcRecord(npcID, allowDead)
@@ -66,10 +79,27 @@ local function factionRecord(factionID)
         and PNC.Factions.Get(factionID) or nil
 end
 
+local function factionHasPlayerMembers(factionID)
+    local faction = factionRecord(factionID)
+    for _, present in pairs(
+        faction and faction.playerMemberKeys or {}
+    ) do
+        if present == true then return true end
+    end
+    return false
+end
+
 local function touchCommunity(community)
     community.revision = math.max(
         0,
         math.floor(tonumber(community.revision) or 0)
+    ) + 1
+end
+
+local function touchSite(site)
+    site.revision = math.max(
+        0,
+        math.floor(tonumber(site.revision) or 0)
     ) + 1
 end
 
@@ -147,7 +177,31 @@ local function publicCommunity(community)
         community.capacity.population
     output.overcrowded = output.currentPopulation
         > output.populationCapacity
+    output.site = community.siteID
+        and copy(Communities.Registry.sitesByID[
+            community.siteID
+        ]) or nil
     return output
+end
+
+local function publicSite(site)
+    return site and copy(site) or nil
+end
+
+local function releaseSiteOccupancy(community, at)
+    local site = community and community.siteID
+        and siteRecord(community.siteID) or nil
+    if not site
+        or site.occupantCommunityID ~= community.id
+    then
+        return false
+    end
+    site.occupantCommunityID = nil
+    site.status = site.claimantKey
+        and "claimed" or "vacant"
+    site.vacatedAt = worldAge(at, 0)
+    touchSite(site)
+    return true
 end
 
 local function sortedMemberIDs(community)
@@ -194,6 +248,40 @@ local function rebuildDerivedIndexes()
             byFaction[community.factionID] or {}
         byFaction[community.factionID][communityID] = true
         memberIDs[communityID] = {}
+    end
+    local occupiedBySite = {}
+    for communityID, community in pairs(
+        Communities.Registry.byID
+    ) do
+        if community.status == "active"
+            and community.siteID
+            and Communities.Registry.sitesByID[
+                community.siteID
+            ]
+        then
+            local current = occupiedBySite[community.siteID]
+            if not current or communityID < current then
+                occupiedBySite[community.siteID] = communityID
+            end
+        end
+    end
+    for siteID, site in pairs(
+        Communities.Registry.sitesByID
+    ) do
+        local occupant = site.claimantKey
+            and nil or occupiedBySite[siteID]
+        local status = site.claimantKey
+            and "claimed"
+            or occupant and "occupied"
+            or "vacant"
+        if site.occupantCommunityID ~= occupant
+            or site.status ~= status
+        then
+            site.occupantCommunityID = occupant
+            site.status = status
+            touchSite(site)
+            changed = true
+        end
     end
     for npcID, record in pairs(
         PNC.Registry and PNC.Registry.Data or {}
@@ -403,6 +491,179 @@ function Communities.GetForFaction(factionID)
         return left.id < right.id
     end)
     return output
+end
+
+function Communities.BuildSiteID(siteSpec)
+    local source = type(siteSpec) == "table"
+        and siteSpec or {}
+    local bounds = type(source.bounds) == "table"
+        and source.bounds or {}
+    local home = type(source.home) == "table"
+        and source.home or source
+    local kind = Constants.VALID_SITE_KINDS[source.kind]
+        and source.kind or "radius"
+    local function token(value)
+        value = tonumber(value) or 0
+        if value >= 0 then
+            return tostring(math.floor(value * 10 + 0.5))
+        end
+        return tostring(math.ceil(value * 10 - 0.5))
+    end
+    return Constants.SITE_ID_PREFIX .. kind .. "_"
+        .. token(bounds.minX or home.x) .. "_"
+        .. token(bounds.minY or home.y) .. "_"
+        .. token(bounds.maxX or home.x) .. "_"
+        .. token(bounds.maxY or home.y) .. "_"
+        .. token(home.z)
+end
+
+function Communities.GetSite(siteID)
+    Communities.EnsureLoaded()
+    local site = siteRecord(siteID)
+    return publicSite(site),
+        site and nil or "site_not_found"
+end
+
+function Communities.ListSites()
+    Communities.EnsureLoaded()
+    local output = {}
+    for _, site in pairs(Communities.Registry.sitesByID) do
+        output[#output + 1] = publicSite(site)
+    end
+    table.sort(output, function(left, right)
+        return left.id < right.id
+    end)
+    return output
+end
+
+function Communities.ReserveSite(
+    communityID,
+    siteSpec,
+    worldAgeHours
+)
+    if not authority() then return false, "not_authority" end
+    Communities.EnsureLoaded()
+    local community = registryRecord(communityID)
+    if not community then
+        return false, "community_not_found"
+    end
+    if community.status ~= "active" then
+        return false, "community_not_active"
+    end
+    siteSpec = type(siteSpec) == "table"
+        and copy(siteSpec) or {}
+    siteSpec.id = Types.IsValidSiteID(siteSpec.id)
+        and siteSpec.id
+        or Communities.BuildSiteID(siteSpec)
+    siteSpec.createdAt = worldAge(
+        siteSpec.createdAt,
+        worldAgeHours
+    )
+    local normalized = Types.NormalizeSite(
+        siteSpec,
+        siteSpec.id
+    )
+    if not normalized then return false, "invalid_site" end
+    local existing = siteRecord(normalized.id)
+    if existing and existing.claimantKey then
+        return false, "site_claimed"
+    end
+    if existing and existing.occupantCommunityID
+        and existing.occupantCommunityID ~= communityID
+    then
+        return false, "site_occupied"
+    end
+    if community.siteID
+        and community.siteID ~= normalized.id
+    then
+        releaseSiteOccupancy(community, worldAgeHours)
+    end
+    local site = existing or normalized
+    if not existing then
+        site.revision = math.max(1, site.revision)
+        Communities.Registry.sitesByID[site.id] = site
+    end
+    site.occupantCommunityID = communityID
+    site.claimantKey = nil
+    site.claimedAt = 0
+    site.status = "occupied"
+    if existing then touchSite(site) end
+    community.siteID = site.id
+    community.home = copy(site.home)
+    touchCommunity(community)
+    touchRegistry()
+    return true, "site_reserved", publicSite(site)
+end
+
+function Communities.ReleaseSite(
+    communityID,
+    worldAgeHours
+)
+    if not authority() then return false, "not_authority" end
+    Communities.EnsureLoaded()
+    local community = registryRecord(communityID)
+    if not community then
+        return false, "community_not_found"
+    end
+    if not releaseSiteOccupancy(community, worldAgeHours) then
+        return false, "site_not_occupied_by_community"
+    end
+    community.siteID = nil
+    touchCommunity(community)
+    touchRegistry()
+    return true, "site_released",
+        publicSite(siteRecord(community.siteID))
+end
+
+function Communities.ClaimSite(
+    siteID,
+    playerKey,
+    worldAgeHours
+)
+    if not authority() then return false, "not_authority" end
+    Communities.EnsureLoaded()
+    local site = siteRecord(siteID)
+    if not site then return false, "site_not_found" end
+    if not PNC.EntityRef
+        or not PNC.EntityRef.IsPlayer
+        or not PNC.EntityRef.IsPlayer(playerKey)
+    then
+        return false, "invalid_player_key"
+    end
+    if site.occupantCommunityID then
+        return false, "site_occupied"
+    end
+    if site.claimantKey then
+        if site.claimantKey == playerKey then
+            return false, "already_claimed_by_player"
+        end
+        return false, "site_claimed"
+    end
+    site.claimantKey = playerKey
+    site.claimedAt = worldAge(worldAgeHours, 0)
+    site.status = "claimed"
+    touchSite(site)
+    touchRegistry()
+    return true, "site_claimed", publicSite(site)
+end
+
+function Communities.UnclaimSite(siteID, playerKey)
+    if not authority() then return false, "not_authority" end
+    Communities.EnsureLoaded()
+    local site = siteRecord(siteID)
+    if not site then return false, "site_not_found" end
+    if not site.claimantKey then
+        return false, "site_not_claimed"
+    end
+    if playerKey and site.claimantKey ~= playerKey then
+        return false, "site_claimed_by_other_player"
+    end
+    site.claimantKey = nil
+    site.claimedAt = 0
+    site.status = "vacant"
+    touchSite(site)
+    touchRegistry()
+    return true, "site_unclaimed", publicSite(site)
 end
 
 function Communities.GetNPCAffiliation(npcID)
@@ -1001,6 +1262,7 @@ local function retireCommunity(
     at
 )
     clearMembers(community)
+    releaseSiteOccupancy(community, at)
     community.mode = status == "destroyed"
         and "destroyed" or "abandoned"
     community.status = status
@@ -1145,6 +1407,20 @@ function Communities.OnNPCDeath(npcID)
         community.leaderNPCID = nil
     end
     commitAffiliation(record, clearAffiliationCommunity(record))
+    if community.status == "active"
+        and population(community) <= 0
+        and not factionHasPlayerMembers(
+            community.factionID
+        )
+    then
+        retireCommunity(
+            community,
+            "destroyed",
+            "population_wiped_out",
+            currentWorldAgeHours()
+        )
+        return true, "community_wiped_out"
+    end
     touchCommunity(community)
     touchRegistry()
     return true, "death_reconciled"

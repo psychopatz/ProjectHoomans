@@ -17,6 +17,18 @@ local Balance = PNC.FactionBalance
 Debug.LastValidation = Debug.LastValidation or nil
 Debug.LastScenario = Debug.LastScenario or nil
 
+local function groupSpec(player, args, at)
+    return {
+        x = player and player.getX and player:getX() or 0,
+        y = player and player.getY and player:getY() or 0,
+        z = player and player.getZ and player:getZ() or 0,
+        groupSize = args and args.groupSize,
+        presenceMode = args and args.presenceMode,
+        worldAgeHours = at,
+        debug = true,
+    }
+end
+
 local function copy(value)
     return Core.DeepCopy(value)
 end
@@ -442,6 +454,7 @@ function Debug.PerformAction(player, args)
     local ok
     local reason
     local value
+    local groupResult
     if action == "create" then
         local archetypeID = tostring(
             args and args.archetypeID or ""
@@ -462,7 +475,14 @@ function Debug.PerformAction(player, args)
             createdAt = at,
             tags = { debugCreated = true },
         })
-        if ok then factionID = value.id end
+        if ok then
+            factionID = value.id
+            ok, reason, groupResult =
+                PNC.CommunityDirector.GenerateForFaction(
+                    factionID,
+                    groupSpec(player, args, at)
+                )
+        end
     elseif action == "create_player_faction" then
         ok, reason, value = Factions.CreatePlayerFaction(
             player,
@@ -472,7 +492,20 @@ function Debug.PerformAction(player, args)
                 tags = { debugCreated = true },
             }
         )
-        if ok and value then factionID = value.id end
+        if ok and value then
+            factionID = value.id
+            ok, reason, groupResult =
+                PNC.CommunityDirector.GenerateForFaction(
+                    factionID,
+                    groupSpec(player, args, at)
+                )
+        end
+    elseif action == "generate_group" then
+        ok, reason, groupResult =
+            PNC.CommunityDirector.GenerateForFaction(
+                factionID,
+                groupSpec(player, args, at)
+            )
     elseif action == "assign" then
         ok, reason, value = Factions.AddNPC(
             factionID,
@@ -717,6 +750,7 @@ function Debug.PerformAction(player, args)
             factionID = factionID,
             npcID = npcID,
             resultingRevision = value and value.revision,
+            groupResult = copy(groupResult),
         }),
         player,
         targetFactionID

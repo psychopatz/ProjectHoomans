@@ -318,6 +318,21 @@ function Model.BuildRows(snapshot, authorized, reason)
                 or tostring(action.reason),
             action.ok and "success" or "warning"
         )
+        local group = action.groupResult
+        if group then
+            rows[#rows + 1] = row(
+                "Generated group",
+                tostring(group.createdCount or 0)
+                    .. " NPCs / live "
+                    .. tostring(group.liveCount or 0)
+                    .. " / abstract "
+                    .. tostring(group.abstractCount or 0)
+                    .. " / " .. tostring(
+                        group.siteKind or "site"
+                    ),
+                "success"
+            )
+        end
         rows[#rows + 1] = row(
             "  faction", action.factionID or "(none)"
         )

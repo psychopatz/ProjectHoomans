@@ -15,7 +15,7 @@
 - separate `PNC_PlayerCharacters` player-character registry schema v3
 - separate `PNC_Factions` organizational/diplomacy registry schema v3
 - primitive NPC affiliation schema v2, including optional community identity
-- separate `PNC_Communities` community registry schema v1
+- separate `PNC_Communities` community/site registry schema v2
 - body-part wounds and infection timing, stage, progress, fever, and temperature
 - runtime rebuild defaults after load
 - dirty-record tracking and v4 monolithic-store migration

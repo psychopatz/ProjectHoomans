@@ -37,6 +37,8 @@
   and camp anchors, affiliation-V2 placement, rebuildable living-population
   indexes, leadership, abstract capacity/security/morale/supplies, and guarded
   inspector/world-overlay diagnostics
+- Phase 5C.1 reusable primitive hideout sites, abstract-first faction group
+  generation, wipeout release/reoccupation, and guarded world-map claims
 - shared world census, numeric spatial cells, budgeted active-zombie aggro,
   cached perception frames, and staggered LOD scheduling
 - right-click debug spawning, NPC selection hub, and character window

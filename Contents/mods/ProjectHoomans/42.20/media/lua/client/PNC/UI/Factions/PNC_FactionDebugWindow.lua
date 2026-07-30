@@ -34,6 +34,9 @@ local CONTROLS = {
     { id = "create_looter", titleKey = "UI_PNC_FactionCreateLooter", variant = "danger", views = views("overview") },
     { id = "create_trader", titleKey = "UI_PNC_FactionCreateTrader", variant = "default", views = views("overview") },
     { id = "create_refugee", titleKey = "UI_PNC_FactionCreateRefugee", variant = "default", views = views("overview") },
+    { id = "generate_group", titleKey = "UI_PNC_FactionGenerateGroup", variant = "success", views = views("overview") },
+    { id = "group_size", titleKey = "UI_PNC_FactionGroupSize", variant = "quiet", views = views("overview") },
+    { id = "presence_mode", titleKey = "UI_PNC_FactionPresenceMode", variant = "quiet", views = views("overview") },
     { id = "archive", titleKey = "UI_PNC_FactionArchive", variant = "danger", views = views("overview") },
     { id = "assign", titleKey = "UI_PNC_FactionAssignNPC", variant = "success", views = views("members") },
     { id = "transfer", titleKey = "UI_PNC_FactionTransferNPC", variant = "default", views = views("members") },
@@ -155,11 +158,20 @@ function ISPNCFactionDebugWindow:createChildren()
     self:addChild(self.dashboard)
     self.controls = {}
     self.scenarioIndex = 1
+    self.groupSize = 4
+    self.presenceMode = "auto"
     self.viewMode = "overview"
     for _, definition in ipairs(CONTROLS) do
+        local title = text(definition.titleKey)
+        if definition.id == "group_size" then
+            title = title .. ": "
+                .. tostring(self.groupSize)
+        elseif definition.id == "presence_mode" then
+            title = title .. ": " .. self.presenceMode
+        end
         local button = UI.CreateButton(self, {
             id = definition.id,
-            title = text(definition.titleKey),
+            title = title,
             target = self,
             onclick = ISPNCFactionDebugWindow.onAction,
             variant = definition.variant,
@@ -399,10 +411,46 @@ function ISPNCFactionDebugWindow:onAction(button)
         end
         return
     end
+    if internal == "group_size" then
+        local sizes = { 2, 4, 6, 8, 12 }
+        local nextIndex = 1
+        for index, size in ipairs(sizes) do
+            if size == self.groupSize then
+                nextIndex = (index % #sizes) + 1
+                break
+            end
+        end
+        self.groupSize = sizes[nextIndex]
+        button:setTitle(
+            text("UI_PNC_FactionGroupSize")
+                .. ": " .. tostring(self.groupSize)
+        )
+        self:requestResponsiveLayout(true)
+        return
+    end
+    if internal == "presence_mode" then
+        local modes = { "auto", "abstract", "live" }
+        local nextIndex = 1
+        for index, mode in ipairs(modes) do
+            if mode == self.presenceMode then
+                nextIndex = (index % #modes) + 1
+                break
+            end
+        end
+        self.presenceMode = modes[nextIndex]
+        button:setTitle(
+            text("UI_PNC_FactionPresenceMode")
+                .. ": " .. self.presenceMode
+        )
+        self:requestResponsiveLayout(true)
+        return
+    end
     local payload = {
         factionID = faction and faction.id,
         npcID = npc and npc.id,
         targetFactionID = target and target.id,
+        groupSize = self.groupSize,
+        presenceMode = self.presenceMode,
     }
     if internal == "create_player_faction" then
         payload.factionAction = internal
@@ -491,6 +539,13 @@ function ISPNCFactionDebugWindow:prerender()
         end
         if internal == "create_player_faction" then
             enabled = playerFactionID == nil
+        elseif internal == "generate_group" then
+            enabled = faction ~= nil
+                and faction.faction.status == "active"
+        elseif internal == "group_size"
+            or internal == "presence_mode"
+        then
+            enabled = true
         elseif internal == "war" then
             enabled = pairSelected and not atWar
         elseif internal == "truce" then

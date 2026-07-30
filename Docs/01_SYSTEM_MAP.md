@@ -157,11 +157,12 @@
   leadership/archive operations, index repair, and sanitized inspection
 - `PNC_FactionBehavior`: centralized derivation of legacy companion,
   ownership, order, and hostility fields from canonical faction state
-- `PNC_CommunityService`, `PNC_CommunityValidation`, and
+- `PNC_CommunityService`, `PNC_CommunitySiteResolver`,
+  `PNC_CommunityDirector`, `PNC_CommunityValidation`, and
   `PNC_CommunityDebug`: separate `PNC_Communities` ModData authority,
-  faction-owned fixed settlements/camps, affiliation-V2 placement,
-  atomic membership and summary mutations, invariant checks, and sanitized
-  debug snapshots
+  reusable primitive hideout sites, abstract-first group generation,
+  faction-owned settlements/camps, affiliation-V2 placement, atomic
+  membership and summary mutations, invariant checks, and sanitized snapshots
 - `PNC_RelationshipService`: authoritative directed relationship mutations
 - `PNC_RelationshipDebug`: read-only selected-pair snapshots/formatting plus
   admin/debug-only named-event test dispatch through the real event service
@@ -182,10 +183,10 @@
   source/target organization inspection with both directed opinions, policy,
   incident/intent diagnostics, and service-backed incident, treaty,
   membership, player-faction, role/rank, leader, transfer, and archive controls
-- `PNC_CommunityDebugWindow`, `PNC_CommunityDebugModel`, and
-  `PNC_CommunityDebugOverlay`: guarded fixed-community inspection and
-  service-backed controls plus read-only community diagnostics above visible
-  NPCs
+- `PNC_CommunityDebugWindow`, `PNC_CommunityDebugModel`,
+  `PNC_CommunityDebugOverlay`, and `PNC_MapLayer_Communities`: guarded
+  fixed-community inspection, service-backed controls, NPC diagnostics,
+  hideout map shapes, and vacant-site claim dispatch
 - `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
 - `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby
   embodied NPCs, including canonical-instance selection and duplicate shell

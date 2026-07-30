@@ -56,6 +56,16 @@ resolution, UI scale, server type, and save name for every run.
 | 24 | UI scale above 100% | Controls/lists remain reachable | NOT RUN |
 | 25 | Hosted authority | Admin succeeds; ordinary client rejects | NOT RUN |
 | 26 | Dedicated authority | Persistence and guarded commands behave identically | NOT RUN |
+| 27 | Create faction with group size 4 / auto | Faction, community, site, four memberships, leader generated | NOT RUN |
+| 28 | Auto mode at loaded building | Site uses building bounds; eligible NPCs report live | NOT RUN |
+| 29 | Abstract mode at loaded building | All generated NPCs remain abstract | NOT RUN |
+| 30 | Primitive unloaded site / live request | Records persist abstract; no materialization error/crash | NOT RUN |
+| 31 | World map community layer | Radius/bounds/name and status color render at correct coordinates | NOT RUN |
+| 32 | Kill final community member | Community becomes destroyed and site becomes vacant | NOT RUN |
+| 33 | Reoccupy released site | New active community can reserve the same site ID | NOT RUN |
+| 34 | Right-click vacant hideout | Stable current player-character key claims site | NOT RUN |
+| 35 | Attempt occupation after claim | `site_claimed`; no partial community/NPC mutation | NOT RUN |
+| 36 | Character death/new survivor | New character UUID does not inherit old site claim identity | NOT RUN |
 
 ## Result record
 
