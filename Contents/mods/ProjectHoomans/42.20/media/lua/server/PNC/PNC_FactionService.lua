@@ -672,6 +672,12 @@ function Factions.AddNPC(factionID, npcID, options)
             and affiliation.joinedAt or at,
         originArchetypeID = affiliation.originArchetypeID
             or faction.archetypeID,
+        communityID = affiliation.factionID == factionID
+            and affiliation.communityID or nil,
+        communityRole = affiliation.factionID == factionID
+            and affiliation.communityRole or "resident",
+        communityJoinedAt = affiliation.factionID == factionID
+            and affiliation.communityJoinedAt or 0,
         formerFactionIDs = affiliation.formerFactionIDs,
         revision = affiliation.revision,
     }, faction)
@@ -729,6 +735,11 @@ function Factions.RemoveNPC(
         formerFactionIDs = former,
         revision = affiliation.revision,
     })
+    if PNC.Communities
+        and PNC.Communities.OnFactionMembershipChanging
+    then
+        PNC.Communities.OnFactionMembershipChanging(record)
+    end
     faction.memberIDs[npcID] = nil
     if faction.leaderNPCID == npcID then
         faction.leaderNPCID = nil
@@ -785,6 +796,11 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
     at = finiteTimestamp(options.worldAgeHours, 0)
     former = affiliation.formerFactionIDs
     if source then
+        if PNC.Communities
+            and PNC.Communities.OnFactionMembershipChanging
+        then
+            PNC.Communities.OnFactionMembershipChanging(record)
+        end
         former = addHistory(
             affiliation,
             source.id,
@@ -2114,6 +2130,12 @@ function Factions.Archive(factionID, reason, worldAgeHours)
             end
         end
     end
+    if Factions.DestroyingFactionID ~= factionID
+        and PNC.Communities
+        and PNC.Communities.OnFactionArchived
+    then
+        PNC.Communities.OnFactionArchived(factionID, at)
+    end
     faction.status = "archived"
     faction.archivedAt = at
     faction.leaderNPCID = nil
@@ -2181,10 +2203,51 @@ function Factions.Archive(factionID, reason, worldAgeHours)
     return true, "archived", copy(faction)
 end
 
+function Factions.Destroy(factionID, reason, worldAgeHours)
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    local faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    if faction.status == "destroyed" then
+        return false, "already_destroyed"
+    end
+    local at = finiteTimestamp(
+        worldAgeHours,
+        faction.createdAt
+    )
+    if faction.status ~= "archived" then
+        Factions.DestroyingFactionID = factionID
+        local ok, archiveReason =
+            Factions.Archive(factionID, reason, at)
+        Factions.DestroyingFactionID = nil
+        if not ok and archiveReason ~= "already_archived" then
+            return false, archiveReason
+        end
+        faction = registryRecord(factionID)
+    end
+    faction.status = "destroyed"
+    faction.archivedAt = at
+    faction.tags = faction.tags or {}
+    faction.tags.destroyReason = tostring(
+        reason or "destroyed"
+    )
+    if PNC.Communities
+        and PNC.Communities.OnFactionDestroyed
+    then
+        PNC.Communities.OnFactionDestroyed(factionID, at)
+    end
+    touchFaction(faction)
+    touchRegistry()
+    return true, "destroyed", copy(faction)
+end
+
 function Factions.OnNPCDeath(npcID)
     if not authority() then return false, "not_authority" end
     Factions.EnsureLoaded()
     local record = PNC.Registry.Get(npcID)
+    if PNC.Communities and PNC.Communities.OnNPCDeath then
+        PNC.Communities.OnNPCDeath(npcID)
+    end
     local affiliation = record
         and Types.NormalizeAffiliation(record.affiliation)
         or nil

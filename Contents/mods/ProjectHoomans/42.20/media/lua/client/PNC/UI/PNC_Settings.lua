@@ -50,6 +50,13 @@ local definitions = {
         end,
     },
     {
+        id = "showCommunityDebug",
+        label = "UI_PNC_Settings_ShowCommunityDebug",
+        get = function()
+            return currentFlag("showCommunityDebug", false)
+        end,
+    },
+    {
         id = "showAnimationDebug",
         label = "UI_PNC_Settings_ShowAnimationDebug",
         get = function() return currentFlag("showAnimationDebug", false) end,

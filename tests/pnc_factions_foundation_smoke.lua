@@ -133,7 +133,7 @@ assertEqual(registryDefault.schemaVersion, 3, "registry schema")
 assertEqual(registryDefault.revision, 0, "registry revision")
 assertEqual(next(registryDefault.byID), nil, "registry starts empty")
 local affiliationDefault = Types.NewAffiliation()
-assertEqual(affiliationDefault.schemaVersion, 1, "affiliation schema")
+assertEqual(affiliationDefault.schemaVersion, 2, "affiliation schema")
 assertEqual(affiliationDefault.membershipStatus,
     "unaffiliated", "default status")
 assertEqual(affiliationDefault.role, "civilian", "default role")

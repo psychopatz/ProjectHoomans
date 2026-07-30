@@ -141,6 +141,72 @@ end
 
 Entries.BuildFactionDebugLines = factionDebugLines
 
+local function communityDebugLines(snapshot, settings)
+    if not settings
+        or settings.showCommunityDebug ~= true
+        or not PNC.CommunityDebugOverlay
+        or not PNC.CommunityDebugOverlay.GetNPCDiagnostic
+    then
+        return "", "", "neutral"
+    end
+    local value =
+        PNC.CommunityDebugOverlay.GetNPCDiagnostic(snapshot.id)
+    if not value then
+        return "COMMUNITY waiting for server diagnostic",
+            "", "warning"
+    end
+    if not value.communityID then
+        return "COMMUNITY none | faction="
+            .. tostring(value.factionID or "unaffiliated"),
+            "LOCATION "
+                .. tostring(math.floor(value.x or 0))
+                .. "," .. tostring(math.floor(value.y or 0))
+                .. "," .. tostring(math.floor(value.z or 0)),
+            "neutral"
+    end
+    local snapshotValue = ClientState.communityDebug
+        and ClientState.communityDebug.communities or {}
+    local community
+    for _, item in ipairs(snapshotValue) do
+        if item.id == value.communityID then
+            community = item
+            break
+        end
+    end
+    local first = "COMMUNITY "
+        .. tostring(value.communityName or value.communityID)
+        .. " role=" .. tostring(value.communityRole)
+        .. " " .. tostring(
+            community and community.mode or "-"
+        )
+        .. "/" .. tostring(
+            community and community.status or "-"
+        )
+    local second = "HOME distance="
+        .. tostring(rounded(value.distanceFromHome))
+        .. " inside=" .. tostring(value.insideHome == true)
+        .. " population="
+        .. tostring(
+            community and community.currentPopulation or 0
+        )
+        .. "/" .. tostring(
+            community and community.populationCapacity or 0
+        )
+        .. " security=" .. tostring(
+            community and community.security or 0
+        )
+        .. " morale=" .. signed(
+            community and community.morale or 0
+        )
+        .. " rev=" .. tostring(
+            community and community.revision or 0
+        )
+    return first, second,
+        value.insideHome == true and "success" or "warning"
+end
+
+Entries.BuildCommunityDebugLines = communityDebugLines
+
 local function cacheMetrics(entry, snapshot, zombie, settings)
     local fonts = Presentation.Fonts
     local showDebug = settings and settings.showAIDebug == true
@@ -173,6 +239,8 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
     local factionLine3
     local relationshipDebugLine
     local relationshipChangeLine
+    local communityDebugLine1
+    local communityDebugLine2
     factionLine1,
     factionLine2,
     factionLine3,
@@ -182,6 +250,10 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
     entry.relationshipDebugTone,
     entry.relationshipChangeTone =
         factionDebugLines(snapshot, settings)
+    communityDebugLine1,
+    communityDebugLine2,
+    entry.communityDebugTone =
+        communityDebugLines(snapshot, settings)
     entry.treatmentColor = treatmentColor
     entry.treatmentVisible = treatmentText ~= ""
     Presentation.CacheTextMetric(entry, "name", name, fonts.name)
@@ -246,6 +318,18 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
         relationshipChangeLine,
         fonts.debug
     )
+    Presentation.CacheTextMetric(
+        entry,
+        "communityDebugLine1",
+        communityDebugLine1,
+        fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "communityDebugLine2",
+        communityDebugLine2,
+        fonts.debug
+    )
 end
 
 local function populateLiveEntry(entry, snapshot, zombie, currentTime, settings)
@@ -299,6 +383,12 @@ function Entries.Refresh(manager, settings)
     then
         PNC.FactionDebugOverlay.Update()
     end
+    if settings.showCommunityDebug == true
+        and PNC.CommunityDebugOverlay
+        and PNC.CommunityDebugOverlay.Update
+    then
+        PNC.CommunityDebugOverlay.Update()
+    end
     manager:setX(getPlayerScreenLeft(manager.playerIndex))
     manager:setY(getPlayerScreenTop(manager.playerIndex))
     manager.renderWidth = getPlayerScreenWidth(manager.playerIndex)
@@ -341,6 +431,7 @@ function Entries.Refresh(manager, settings)
         elseif (
             settings.showAIDebug
                 or settings.showFactionDebug
+                or settings.showCommunityDebug
         ) and snapshot and isDebugVisible(player, snapshot) then
             local entry = manager.entries[uuid] or { uuid = uuid }
             populateDebugEntry(entry, snapshot, settings)

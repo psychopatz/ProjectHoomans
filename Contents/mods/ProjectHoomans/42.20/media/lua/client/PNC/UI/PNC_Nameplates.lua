@@ -14,6 +14,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
         showPathDebug = false,
         showCombatDebug = false,
         showFactionDebug = false,
+        showCommunityDebug = false,
         showAnimationDebug = false,
         showAnimationSceneDebug = false,
         debugShowPresence = true,
@@ -36,6 +37,9 @@ if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDeb
 if Nameplates.Settings.showCombatDebug == nil then Nameplates.Settings.showCombatDebug = false end
 if Nameplates.Settings.showFactionDebug == nil then
     Nameplates.Settings.showFactionDebug = false
+end
+if Nameplates.Settings.showCommunityDebug == nil then
+    Nameplates.Settings.showCommunityDebug = false
 end
 if Nameplates.Settings.showAnimationDebug == nil then Nameplates.Settings.showAnimationDebug = false end
 if Nameplates.Settings.showAnimationSceneDebug == nil then
@@ -178,6 +182,42 @@ end
 function Nameplates.ToggleFactionDebug()
     return Nameplates.SetFactionDebugEnabled(
         not Settings.showFactionDebug,
+        true
+    )
+end
+
+function Nameplates.IsCommunityDebugEnabled()
+    return Settings.showCommunityDebug == true
+end
+
+function Nameplates.SetCommunityDebugEnabled(enabled, announce)
+    local player = getSpecificPlayer(0)
+    Settings.showCommunityDebug = enabled == true
+    PNC.SettingsStore:Set(
+        "showCommunityDebug",
+        Settings.showCommunityDebug,
+        true
+    )
+    if announce ~= false
+        and player
+        and HaloTextHelper
+        and HaloTextHelper.addText
+    then
+        HaloTextHelper.addText(
+            player,
+            getText(
+                Settings.showCommunityDebug
+                    and "UI_PNC_CommunityOverlayEnabled"
+                    or "UI_PNC_CommunityOverlayDisabled"
+            )
+        )
+    end
+    return Settings.showCommunityDebug
+end
+
+function Nameplates.ToggleCommunityDebug()
+    return Nameplates.SetCommunityDebugEnabled(
+        not Settings.showCommunityDebug,
         true
     )
 end

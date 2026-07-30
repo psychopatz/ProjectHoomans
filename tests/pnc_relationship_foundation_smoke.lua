@@ -520,9 +520,9 @@ assertEqual(countMemories(
     normalizedOnce.relationships[clampKey]
 ), 1, "invalid memory discarded")
 
--- 24-25. Older records migrate deterministically to V14 and can run again.
-assertEqual(PNC.Const.PERSISTENCE_VERSION, 14,
-    "persistence schema advanced to V14")
+-- 24-25. Older records migrate deterministically to V15 and can run again.
+assertEqual(PNC.Const.PERSISTENCE_VERSION, 15,
+    "persistence schema advanced to V15")
 local oldRaw = {
     schemaVersion = 10,
     recordRevision = 7,
@@ -555,8 +555,8 @@ assertEqual(migrated.affiliation.membershipStatus,
 assertEqual(migrated.affiliation.factionID, nil,
     "migration invents no faction membership")
 local migratedPayload = PNC.Persistence.SerializeRecord(migrated)
-assertEqual(migratedPayload.schemaVersion, 14,
-    "migration writes V14")
+assertEqual(migratedPayload.schemaVersion, 15,
+    "migration writes V15")
 local migratedAgain = PNC.Persistence.DeserializeRecord(
     migratedPayload,
     migrated.id

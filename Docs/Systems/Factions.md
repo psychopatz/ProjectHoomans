@@ -248,9 +248,9 @@ players or organizations. Social changes never advance `presenceRevision`.
 
 ## Membership, Leadership, and Player Factions
 
-Affiliation remains NPC schema V1 and contains faction ID, membership status,
+Affiliation is now NPC schema V2 and contains faction ID, membership status,
 role, rank, joined/left world-age hours, origin archetype, bounded former
-factions, and revision.
+factions, optional community ID/role/joined time, and revision.
 
 Player factions store stable
 `player:<accountIdentity>:<characterUUID>` membership. A new survivor UUID on
@@ -274,7 +274,7 @@ Copied reads include:
 - `AreAtWar`, `AreAllied`, `GetTruceUntil`, `IsFactionAtWar`;
 - `GetOrganizationalFactionID`, `GetLegacyFactionClass`.
 
-Authority mutation also includes membership, leadership, archival,
+Authority mutation also includes membership, leadership, archival/destruction,
 `CommitDirectedRelation`, `RecalculateRelation`, and
 `PNC.FactionIncidentService.AddIncident/RecordAttack/RecordPositiveEvent`.
 
@@ -293,7 +293,7 @@ V2 peace becomes neutral meaningful contact. V3 normalization is idempotent
 and safely repairs one-sided treaty flags to their strongest symmetric
 invariant.
 
-NPC persistence remains V14, affiliation V1, social V3, conduct V1, and player
+NPC persistence is V15, affiliation V2, social V3, conduct V1, and player
 identity registry V3.
 
 ## Debugging and Live Validation

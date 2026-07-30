@@ -393,7 +393,7 @@ assertTrue(deepEqual(
     authoredNPC.social.personality,
     loaded.social.personality
 ), "save/load does not reroll")
-assertEqual(serialized.schemaVersion, 14, "NPC schema V14")
+assertEqual(serialized.schemaVersion, 15, "NPC schema V15")
 assertSaveSafe(serialized.social)
 
 local oldNPC = PNC.Persistence.DeserializeRecord({

@@ -155,6 +155,28 @@ local function drawDebugText(
             y = y + lineHeight
         end
     end
+    for _, key in ipairs({
+        "communityDebugLine1",
+        "communityDebugLine2",
+    }) do
+        local value = entry[key]
+        if value and value ~= "" then
+            local color = FACTION_COLORS[
+                entry.communityDebugTone or "neutral"
+            ] or FACTION_COLORS.neutral
+            Presentation.DrawOutlinedText(
+                manager,
+                value,
+                screenX
+                    - ((entry[key .. "Width"] or 0) / 2),
+                y,
+                color,
+                alpha,
+                Fonts.debug
+            )
+            y = y + lineHeight
+        end
+    end
     if entry.debugText and entry.debugText ~= "" then
         Presentation.DrawOutlinedText(
             manager,
@@ -289,8 +311,10 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
     local showScene =
         settings.showAnimationSceneDebug == true
     local showFaction = settings.showFactionDebug == true
+    local showCommunity =
+        settings.showCommunityDebug == true
     if showDebug or showAnimation or showScene
-        or showFaction
+        or showFaction or showCommunity
     then
         local debugY
         if entry.staminaVisible then

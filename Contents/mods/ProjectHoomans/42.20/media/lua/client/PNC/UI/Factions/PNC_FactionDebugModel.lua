@@ -500,6 +500,13 @@ function Model.BuildDashboard(snapshot, authorized, reason)
             memberCount = tonumber(source.memberCount) or 0,
             playerMemberCount =
                 tonumber(source.playerMemberCount) or 0,
+            communityCount =
+                tonumber(source.communityCount) or 0,
+            communityNames = source.communityNames or {},
+            communityPopulation =
+                tonumber(source.communityPopulation) or 0,
+            communitySupplies =
+                source.communitySupplies or {},
         } or nil,
         target = target and {
             id = target.id,
@@ -633,6 +640,37 @@ function Model.BuildGUIRows(
             "Members",
             tostring(source.memberCount) .. " NPC / "
                 .. tostring(source.playerMemberCount) .. " player"
+        )
+        rows[#rows + 1] = row(
+            "Communities",
+            tostring(source.communityCount)
+                .. " / active population "
+                .. tostring(source.communityPopulation)
+        )
+        rows[#rows + 1] = row(
+            "Community names",
+            #(source.communityNames or {}) > 0
+                and table.concat(
+                    source.communityNames,
+                    ", "
+                ) or "(none)"
+        )
+        local supplies = source.communitySupplies or {}
+        rows[#rows + 1] = row(
+            "Community supplies",
+            "food=" .. tostring(supplies.food or 0)
+                .. " med=" .. tostring(
+                    supplies.medicine or 0
+                )
+                .. " ammo=" .. tostring(
+                    supplies.ammunition or 0
+                )
+                .. " tools=" .. tostring(
+                    supplies.tools or 0
+                )
+                .. " materials=" .. tostring(
+                    supplies.materials or 0
+                )
         )
         rows[#rows + 1] = row(
             "Target faction",

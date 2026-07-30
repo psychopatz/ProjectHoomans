@@ -45,6 +45,10 @@
   enums, four deterministic policy archetypes, pure directed-state
   math/intent, server-owned incident balance, V3 registry normalization,
   player keys, and primitive NPC affiliation/history
+- `PNC_CommunityConstants`, `PNC_CommunityProfiles`,
+  `PNC_CommunityMath`, and `PNC_CommunityTypes`: fixed community modes,
+  creation-only defaults, pure home-area geometry, V1 registry records, and
+  deterministic secondary-index normalization
 - `PNC_SpatialIndex`: nested numeric-cell player, NPC, and zombie queries built
   from the shared world census; player identity maps also provide constant-time
   owner lookup
@@ -153,6 +157,11 @@
   leadership/archive operations, index repair, and sanitized inspection
 - `PNC_FactionBehavior`: centralized derivation of legacy companion,
   ownership, order, and hostility fields from canonical faction state
+- `PNC_CommunityService`, `PNC_CommunityValidation`, and
+  `PNC_CommunityDebug`: separate `PNC_Communities` ModData authority,
+  faction-owned fixed settlements/camps, affiliation-V2 placement,
+  atomic membership and summary mutations, invariant checks, and sanitized
+  debug snapshots
 - `PNC_RelationshipService`: authoritative directed relationship mutations
 - `PNC_RelationshipDebug`: read-only selected-pair snapshots/formatting plus
   admin/debug-only named-event test dispatch through the real event service
@@ -173,6 +182,10 @@
   source/target organization inspection with both directed opinions, policy,
   incident/intent diagnostics, and service-backed incident, treaty,
   membership, player-faction, role/rank, leader, transfer, and archive controls
+- `PNC_CommunityDebugWindow`, `PNC_CommunityDebugModel`, and
+  `PNC_CommunityDebugOverlay`: guarded fixed-community inspection and
+  service-backed controls plus read-only community diagnostics above visible
+  NPCs
 - `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
 - `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby
   embodied NPCs, including canonical-instance selection and duplicate shell

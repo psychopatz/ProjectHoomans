@@ -163,6 +163,21 @@ local function appendFaction(rows, title, faction)
         "  affiliation revision",
         faction.affiliationRevision or 0
     )
+    if faction.communityID then
+        rows[#rows + 1] = row(
+            "  community",
+            tostring(faction.communityName)
+                .. " (" .. tostring(faction.communityID) .. ")"
+        )
+        rows[#rows + 1] = row(
+            "  community role",
+            faction.communityRole
+        )
+        rows[#rows + 1] = row(
+            "  inside community home",
+            tostring(faction.insideCommunityHome == true)
+        )
+    end
 end
 
 local function signedBand(value)

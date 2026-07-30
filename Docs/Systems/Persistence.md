@@ -5,7 +5,7 @@
 - `PNC_Registry` delegates all long-lived record writes to this subsystem.
 
 ## Owned Data
-- v14 versioned per-NPC persisted schema
+- v15 versioned per-NPC persisted schema
 - `PNC_Core_Global.records` directory pointers
 - isolated `PNC_NPC_<id>` record tables
 - canonical persisted fields only
@@ -14,7 +14,8 @@
 - sparse, directed `social` relationship and memory payload
 - separate `PNC_PlayerCharacters` player-character registry schema v3
 - separate `PNC_Factions` organizational/diplomacy registry schema v3
-- primitive NPC affiliation schema v1
+- primitive NPC affiliation schema v2, including optional community identity
+- separate `PNC_Communities` community registry schema v1
 - body-part wounds and infection timing, stage, progress, fever, and temperature
 - runtime rebuild defaults after load
 - dirty-record tracking and v4 monolithic-store migration
@@ -53,7 +54,7 @@
   snapshots and dirties only records whose position or stamina actually
   differs at save time
 - records loaded from an older per-NPC schema are accepted, marked
-  `schema_migration`, and rewritten as v14 on the next save
+  `schema_migration`, and rewritten as v15 on the next save
 - player-character identity uses its own Global ModData table and schema.
   Phase 3B adds a UUID-owned primitive social profile to each record
 - the player registry's canonical `byUUID` records contain primitives only;

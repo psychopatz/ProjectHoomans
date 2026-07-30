@@ -10,7 +10,7 @@
 - zombie aggro bridge so zombies can acquire embodied NPCs
 - custom HP, body-part wounds, bandage-driven incapacitation recovery, and stamina
 - seeded identity, archetype registry, and compact inventory persistence
-- v14 compact health/inventory/stamina/social/affiliation persistence with save-time dirty
+- v15 compact health/inventory/stamina/social/affiliation persistence with save-time dirty
   snapshots and a 100-NPC/4,000-acquired-item scale gate
 - sparse, directed NPC-to-NPC and NPC-to-player-character relationship records
   with deterministic memories, decay, and hysteresis-aware social states
@@ -33,6 +33,10 @@
   deterministic archetype policy, symmetric official treaties, policy-aware
   escalation/intent, and a centralized bridge to legacy companion/combat
   behavior
+- Phase 5C separate persistent faction-owned communities, fixed settlement
+  and camp anchors, affiliation-V2 placement, rebuildable living-population
+  indexes, leadership, abstract capacity/security/morale/supplies, and guarded
+  inspector/world-overlay diagnostics
 - shared world census, numeric spatial cells, budgeted active-zombie aggro,
   cached perception frames, and staggered LOD scheduling
 - right-click debug spawning, NPC selection hub, and character window

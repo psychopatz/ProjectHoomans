@@ -23,6 +23,50 @@ PsychopatzCore.DebugHub.RegisterTool({
 })
 
 PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.communities",
+    source = "ProjectHoomans",
+    order = 230,
+    title = getText
+        and getText("UI_PNC_CommunityInspectorTitle")
+        or "UI_PNC_CommunityInspectorTitle",
+    description =
+        "Inspect persistent communities, membership, anchors, capacity, and supplies.",
+    available = function()
+        return PNC
+            and PNC.CommunityDebugUI
+            and PNC.CommunityDebugUI.Toggle
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        PNC.CommunityDebugUI.Toggle()
+    end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.communityOverlay",
+    source = "ProjectHoomans",
+    order = 231,
+    title = getText
+        and getText("UI_PNC_CommunityWorldOverlayTitle")
+        or "UI_PNC_CommunityWorldOverlayTitle",
+    description =
+        "Toggle server-resolved community diagnostics above visible NPCs.",
+    available = function()
+        return PNC
+            and PNC.CommunityDebugOverlay
+            and PNC.CommunityDebugOverlay.Toggle
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        PNC.CommunityDebugOverlay.Toggle()
+    end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.relationships",
     source = "ProjectHoomans",
     order = 210,

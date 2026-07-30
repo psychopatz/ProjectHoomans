@@ -156,8 +156,8 @@ supply their own deterministic or event-owned ID.
 
 ## Persistence and Revisions
 
-NPC persistence schema V14 stores social schema V3 personality and conduct
-data plus the separate affiliation schema V1. V13 and
+NPC persistence schema V15 stores social schema V3 personality and conduct
+data plus the separate affiliation schema V2. V14 and
 older records deserialize through `NormalizeSocialState`, deterministically
 generating a profile from the existing identity seed while preserving
 relationships and event state and adding neutral conduct without reconstructing

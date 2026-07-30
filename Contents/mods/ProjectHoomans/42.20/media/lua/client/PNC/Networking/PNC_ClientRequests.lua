@@ -184,6 +184,55 @@ function Client.RequestFactionDebug(
     return snapshot ~= nil
 end
 
+function Client.RequestCommunityDebug(
+    communityID,
+    factionID,
+    npcID
+)
+    local player = getSpecificPlayer
+        and getSpecificPlayer(0) or nil
+    local args = {
+        communityID = communityID,
+        factionID = factionID,
+        npcID = npcID,
+    }
+    local snapshot
+    if not Client.CanUseDebug() then
+        ClientState.communityDebugAuthorized = false
+        ClientState.communityDebug = nil
+        ClientState.communityDebugReason = "not_authorized"
+        return false
+    end
+    ClientState.lastCommunityDebugRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(
+                player,
+                Const.MODULE,
+                Const.CMD_COMMUNITY_DEBUG_REQUEST,
+                args
+            )
+            return true
+        end
+        return false
+    end
+    if not PNC.CommunityDebug
+        or not PNC.CommunityDebug.BuildSnapshot
+    then
+        return false
+    end
+    snapshot = PNC.CommunityDebug.BuildSnapshot(
+        communityID,
+        factionID,
+        npcID
+    )
+    ClientState.communityDebugAuthorized = true
+    ClientState.communityDebug = snapshot
+    ClientState.communityDebugReason = nil
+    ClientState.lastCommunityDebugReceiveAt = Core.Now()
+    return snapshot ~= nil
+end
+
 function Client.RequestCharacterPayload(npcId)
     local player = getSpecificPlayer(0)
     local payload

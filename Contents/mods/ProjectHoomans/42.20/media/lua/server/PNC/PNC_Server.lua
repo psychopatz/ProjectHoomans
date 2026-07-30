@@ -576,6 +576,29 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_COMMUNITY_DEBUG_REQUEST then
+        if not canUseDebug(player) then
+            Network.SendCommunityDebug(
+                player,
+                nil,
+                false,
+                "not_authorized"
+            )
+            return
+        end
+        Network.SendCommunityDebug(
+            player,
+            PNC.CommunityDebug.BuildSnapshot(
+                args and args.communityID,
+                args and args.factionID,
+                args and args.npcID
+            ),
+            true,
+            nil
+        )
+        return
+    end
+
     if command ~= Const.CMD_DEBUG then
         return
     end
@@ -616,6 +639,16 @@ local function onClientCommand(module, command, player, args)
         Network.SendFactionDebug(
             player,
             PNC.FactionDebug.PerformAction(player, args),
+            true,
+            nil
+        )
+        return
+    end
+
+    if args and args.action == "community_debug_action" then
+        Network.SendCommunityDebug(
+            player,
+            PNC.CommunityDebug.PerformAction(player, args),
             true,
             nil
         )
@@ -756,6 +789,9 @@ local function onServerStarted()
     Registry.Load()
     if PNC.Factions and PNC.Factions.Load then
         PNC.Factions.Load()
+    end
+    if PNC.Communities and PNC.Communities.Load then
+        PNC.Communities.Load()
     end
     if PlayerCharacterLifecycle
         and PlayerCharacterLifecycle.OnServerStarted

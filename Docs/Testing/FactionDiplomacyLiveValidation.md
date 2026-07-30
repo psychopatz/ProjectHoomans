@@ -72,6 +72,15 @@ is the key diagnostic for identity or treaty mismatches. The inspector and
 world overlay consume the guarded server snapshot and cannot directly set
 scores or bypass server authority.
 
+### Phase 5B.1 live-status gate
+
+As of Phase 5C implementation, the overlay's automated smoke coverage has run,
+but no recorded Project Zomboid live session has validated opening/closing,
+duplicate-handler behavior, 1280×720, normal development resolution, UI scale
+above 100%, source/target refresh, telemetry toggling, attack episode
+visualization, or treaty reconciliation visualization. Every one of those live
+checks remains **NOT TESTED** until a result is recorded below.
+
 ## Result Record
 
 Copy this row for every run.

@@ -576,10 +576,22 @@ function Types.NormalizeAffiliation(value, faction)
         and source.role or nil
     local rank = Types.IsValidFactionRank(source.rank)
         and source.rank or "member"
+    local communityID = PNC.CommunityTypes
+        and PNC.CommunityTypes.IsValidCommunityID
+        and PNC.CommunityTypes.IsValidCommunityID(
+            source.communityID
+        )
+        and source.communityID or nil
+    local communityRole = PNC.CommunityConstants
+        and PNC.CommunityConstants.VALID_ROLES[
+            source.communityRole
+        ] and source.communityRole or "resident"
     if not factionID then
         status = "unaffiliated"
         role = "civilian"
         rank = "member"
+        communityID = nil
+        communityRole = "resident"
     else
         status = status == "unaffiliated" and "member"
             or status or "member"
@@ -599,6 +611,10 @@ function Types.NormalizeAffiliation(value, faction)
         rank = rank,
         joinedAt = factionID and timestamp(source.joinedAt, 0) or 0,
         leftAt = factionID and 0 or timestamp(source.leftAt, 0),
+        communityID = communityID,
+        communityRole = communityRole,
+        communityJoinedAt = communityID
+            and timestamp(source.communityJoinedAt, 0) or 0,
         originArchetypeID =
             Archetypes.Exists(source.originArchetypeID)
                 and source.originArchetypeID or nil,

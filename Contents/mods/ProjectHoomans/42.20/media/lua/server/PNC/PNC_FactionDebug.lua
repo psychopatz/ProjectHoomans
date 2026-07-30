@@ -35,6 +35,35 @@ end
 
 local function factionSummary(faction)
     local archetype = Archetypes.Get(faction.archetypeID)
+    local communities = PNC.Communities
+        and PNC.Communities.GetForFaction
+        and PNC.Communities.GetForFaction(faction.id)
+        or {}
+    local communityNames = {}
+    local communityPopulation = 0
+    local communitySupplies = {
+        food = 0,
+        medicine = 0,
+        ammunition = 0,
+        tools = 0,
+        materials = 0,
+    }
+    for _, community in ipairs(communities) do
+        communityNames[#communityNames + 1] =
+            community.name .. " (" .. community.mode
+                .. "/" .. community.status .. ")"
+        if community.status == "active" then
+            communityPopulation = communityPopulation
+                + (tonumber(community.currentPopulation) or 0)
+        end
+        for category, amount in pairs(
+            community.supplies or {}
+        ) do
+            communitySupplies[category] =
+                (tonumber(communitySupplies[category]) or 0)
+                + (tonumber(amount) or 0)
+        end
+    end
     return {
         id = faction.id,
         name = faction.name,
@@ -52,6 +81,10 @@ local function factionSummary(faction)
         tags = copy(faction.tags),
         policy = copy(faction.policy),
         revision = faction.revision,
+        communityCount = #communities,
+        communityNames = communityNames,
+        communityPopulation = communityPopulation,
+        communitySupplies = communitySupplies,
     }
 end
 

@@ -183,6 +183,12 @@ local function factionSnapshot(record)
         and affiliation.factionID
         and PNC.Factions.Get(affiliation.factionID)
         or nil
+    local community = affiliation
+        and affiliation.communityID
+        and PNC.Communities
+        and PNC.Communities.Get
+        and PNC.Communities.Get(affiliation.communityID)
+        or nil
     return {
         organizationalFaction = faction ~= nil,
         label = faction and faction.name
@@ -196,6 +202,18 @@ local function factionSnapshot(record)
         rank = affiliation and affiliation.rank or "member",
         affiliationRevision = affiliation
             and affiliation.revision or 0,
+        communityID = community and community.id or nil,
+        communityName = community and community.name or nil,
+        communityRole = affiliation
+            and affiliation.communityRole or nil,
+        insideCommunityHome = community
+            and PNC.CommunityMath
+            and PNC.CommunityMath.IsInsideHomeArea(
+                community,
+                record.x,
+                record.y,
+                record.z
+            ) or false,
     }
 end
 

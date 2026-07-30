@@ -53,6 +53,17 @@ Internal.RegisterServerCommand(
     end
 )
 
+Internal.RegisterServerCommand(
+    Const.CMD_COMMUNITY_DEBUG,
+    function(args)
+        ClientState.communityDebugAuthorized =
+            args.authorized == true
+        ClientState.communityDebug = args.snapshot
+        ClientState.communityDebugReason = args.reason
+        ClientState.lastCommunityDebugReceiveAt = Core.Now()
+    end
+)
+
 Internal.RegisterServerCommand(Const.CMD_MAP_COMMAND_RESULT, function(args)
     if PNC.MapCommands and PNC.MapCommands.HandleResult then
         PNC.MapCommands.HandleResult(args)

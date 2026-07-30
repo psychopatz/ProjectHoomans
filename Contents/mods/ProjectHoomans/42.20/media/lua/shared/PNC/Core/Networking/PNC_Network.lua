@@ -17,6 +17,8 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     relationshipDebugAuthorized = false,
     factionDebug = nil,
     factionDebugAuthorized = false,
+    communityDebug = nil,
+    communityDebugAuthorized = false,
 }
 PNC.Network.ServerState = PNC.Network.ServerState or {
     interests = {},
@@ -25,6 +27,9 @@ PNC.Network.ServerState = PNC.Network.ServerState or {
     lastInterestRefreshAt = 0,
     lastRosterFlushAt = 0,
 }
+if PNC.Network.ClientState.communityDebugAuthorized == nil then
+    PNC.Network.ClientState.communityDebugAuthorized = false
+end
 PNC.Network.Internal = PNC.Network.Internal or {}
 
 local Network = PNC.Network
