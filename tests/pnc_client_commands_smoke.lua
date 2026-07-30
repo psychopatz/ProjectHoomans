@@ -27,6 +27,7 @@ PNC = {
     Const = {
         MODULE = "PNC",
         CMD_DEBUG_ROSTER = "DebugRoster",
+        CMD_FACTION_DEBUG = "FactionDebug",
         CMD_MAP_COMMAND_RESULT = "MapCommandResult",
         CMD_ZOMBIE_REACTION = "ZombieReaction",
         CMD_ZOMBIE_BITE = "ZombieBite",
@@ -200,6 +201,17 @@ Client.HandleServerCommand("InventoryResult", { success = true })
 assertEqual(inventoryResult.success, true, "inventory result dispatched")
 Client.HandleServerCommand("MapCommandResult", { ok = true })
 assertEqual(mapResult.ok, true, "map result dispatched")
+Client.HandleServerCommand("FactionDebug", {
+    authorized = true,
+    snapshot = {
+        registryRevision = 3,
+        factions = {},
+    },
+})
+assertEqual(State.factionDebugAuthorized, true,
+    "faction debug authorization")
+assertEqual(State.factionDebug.registryRevision, 3,
+    "faction debug snapshot dispatched")
 Client.HandleServerCommand("FirearmShot", { shotId = "shot:1" })
 assertEqual(firearmShot.shotId, "shot:1", "firearm event dispatched")
 Client.HandleServerCommand("RemoveBody", { bodyInstanceID = "17" })

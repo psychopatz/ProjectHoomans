@@ -171,6 +171,9 @@ dofile(ROOT .. "Conduct/PNC_ConductConstants.lua")
 dofile(ROOT .. "Conduct/PNC_ConductTypes.lua")
 dofile(ROOT .. "Conduct/PNC_ConductMath.lua")
 dofile(ROOT .. "Conduct/PNC_ConductDefinitions.lua")
+dofile(ROOT .. "Factions/PNC_FactionConstants.lua")
+dofile(ROOT .. "Factions/PNC_FactionArchetypes.lua")
+dofile(ROOT .. "Factions/PNC_FactionTypes.lua")
 dofile(ROOT .. "Identity/PNC_PlayerCharacterTypes.lua")
 dofile(ROOT .. "Relationships/PNC_RelationshipConstants.lua")
 dofile(ROOT .. "Relationships/PNC_RelationshipStates.lua")
@@ -390,7 +393,7 @@ assertTrue(deepEqual(
     authoredNPC.social.personality,
     loaded.social.personality
 ), "save/load does not reroll")
-assertEqual(serialized.schemaVersion, 13, "NPC schema V13")
+assertEqual(serialized.schemaVersion, 14, "NPC schema V14")
 assertSaveSafe(serialized.social)
 
 local oldNPC = PNC.Persistence.DeserializeRecord({

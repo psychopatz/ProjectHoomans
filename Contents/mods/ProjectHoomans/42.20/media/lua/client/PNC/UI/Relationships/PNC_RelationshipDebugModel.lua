@@ -140,6 +140,31 @@ local function appendConduct(rows, title, conduct)
     end
 end
 
+local function appendFaction(rows, title, faction)
+    faction = faction or {}
+    rows[#rows + 1] = row(
+        title,
+        faction.label or "No organizational faction",
+        faction.organizationalFaction and "success" or "textMuted"
+    )
+    if not faction.organizationalFaction then return end
+    rows[#rows + 1] = row(
+        "  faction ID", faction.factionID
+    )
+    rows[#rows + 1] = row(
+        "  archetype", faction.archetypeID
+    )
+    rows[#rows + 1] = row(
+        "  membership", faction.membershipStatus
+    )
+    rows[#rows + 1] = row("  role", faction.role)
+    rows[#rows + 1] = row("  rank", faction.rank)
+    rows[#rows + 1] = row(
+        "  affiliation revision",
+        faction.affiliationRevision or 0
+    )
+end
+
 function Model.BuildTargets(roster, observerNPCID)
     local targets = {
         {
@@ -201,6 +226,8 @@ function Model.BuildRows(snapshot, authorized, reason)
     rows[#rows + 1] = row("Observer key", observer.key)
     rows[#rows + 1] = row("Target", target.label)
     rows[#rows + 1] = row("Target key", target.key)
+    appendFaction(rows, "Observer faction", observer.faction)
+    appendFaction(rows, "Target faction", target.faction)
     rows[#rows + 1] = row(
         "Snapshot world age",
         number(snapshot.generatedAt, 3) .. " h"

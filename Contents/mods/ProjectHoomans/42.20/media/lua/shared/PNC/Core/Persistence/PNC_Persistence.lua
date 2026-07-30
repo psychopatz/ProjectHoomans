@@ -9,6 +9,7 @@ local Types = PNC.Types
 local Inventory = PNC.Inventory
 local RelationshipTypes = PNC.RelationshipTypes
 local RelationshipMath = PNC.RelationshipMath
+local FactionTypes = PNC.FactionTypes
 local HEALTH_PART_IDS = {
     "Head", "Neck", "Torso_Upper", "Torso_Lower", "Groin",
     "UpperArm_L", "UpperArm_R", "ForeArm_L", "ForeArm_R",
@@ -759,6 +760,10 @@ function Persistence.SerializeRecord(record)
             record.identitySeed,
             record.archetypeID
         ),
+        affiliation = FactionTypes
+            and FactionTypes.NormalizeAffiliation(
+                record.affiliation
+            ) or nil,
         progression = progression,
         corpse = sanitizeCorpse(record.corpse, record),
         travel = PNC.Travel
@@ -840,6 +845,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
             raw.identitySeed or (identity and identity.seed),
             raw.archetypeID or (identity and identity.archetypeID)
         ),
+        affiliation = raw.affiliation,
         mapPresentation = raw.mapPresentation,
     }
     record = Types.NewRecord(definition)
@@ -884,6 +890,9 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         record.identitySeed,
         record.archetypeID
     )
+    record.affiliation = FactionTypes
+        and FactionTypes.NormalizeAffiliation(raw.affiliation)
+        or nil
     record.persist = raw.persist ~= false
     record.corpse = sanitizeCorpse(raw.corpse, record)
     if record.alive == false and not record.corpse then

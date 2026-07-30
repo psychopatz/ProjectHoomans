@@ -65,6 +65,20 @@ function Client.SendDebug(action, payload)
         ClientState.lastRelationshipDebugReceiveAt = Core.Now()
         return snapshot ~= nil, reason
     end
+    if action == "faction_debug_action" then
+        local snapshot
+        if not PNC.FactionDebug
+            or not PNC.FactionDebug.PerformAction
+        then
+            return false
+        end
+        snapshot = PNC.FactionDebug.PerformAction(player, args)
+        ClientState.factionDebugAuthorized = true
+        ClientState.factionDebug = snapshot
+        ClientState.factionDebugReason = nil
+        ClientState.lastFactionDebugReceiveAt = Core.Now()
+        return snapshot ~= nil
+    end
     if action == "spawn" and PNC.API and PNC.API.Spawn then
         local variant = tostring(args.variant or "colonist")
         local legacyFaction = (variant == "hostile_melee" or variant == "hostile_ranged")

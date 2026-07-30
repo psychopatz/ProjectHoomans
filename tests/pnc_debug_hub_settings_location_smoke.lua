@@ -27,6 +27,7 @@ PsychopatzCore = {
 PNC = {
     NPCMonitor = { Toggle = function() end },
     RelationshipDebugUI = { Toggle = function() end },
+    FactionDebugUI = { Toggle = function() end },
     Client = { CanUseDebug = function() return true end },
     Settings = { Toggle = function() end },
 }
@@ -39,6 +40,8 @@ dofile(FILE)
 assert(tools["pnc.npcMonitor"], "NPC monitor debug tool missing")
 assert(tools["pnc.relationships"],
     "relationship inspector debug tool missing")
+assert(tools["pnc.factions"],
+    "faction inspector debug tool missing")
 assertEqual(tools["pnc.settings"], nil,
     "Project Hoomans settings remained in debug hub")
 

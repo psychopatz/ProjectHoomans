@@ -483,3 +483,32 @@ function Network.SendRelationshipDebug(
         )
     end
 end
+
+function Network.SendFactionDebug(
+    targetPlayer,
+    snapshot,
+    authorized,
+    reason
+)
+    local payload = {
+        authorized = authorized == true,
+        snapshot = authorized == true and snapshot or nil,
+        reason = reason,
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(
+            targetPlayer,
+            Const.MODULE,
+            Const.CMD_FACTION_DEBUG,
+            payload
+        )
+    elseif not isServer or not isServer() then
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_FACTION_DEBUG,
+            payload
+        )
+    end
+end

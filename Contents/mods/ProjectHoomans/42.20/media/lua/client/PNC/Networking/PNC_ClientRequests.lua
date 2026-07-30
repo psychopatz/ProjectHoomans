@@ -133,6 +133,49 @@ function Client.RequestRelationshipDebug(
     return snapshot ~= nil
 end
 
+function Client.RequestFactionDebug(factionID, npcID)
+    local player = getSpecificPlayer
+        and getSpecificPlayer(0) or nil
+    local args = {
+        factionID = factionID,
+        npcID = npcID,
+    }
+    local snapshot
+    if not Client.CanUseDebug() then
+        ClientState.factionDebugAuthorized = false
+        ClientState.factionDebug = nil
+        ClientState.factionDebugReason = "not_authorized"
+        return false
+    end
+    ClientState.lastFactionDebugRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(
+                player,
+                Const.MODULE,
+                Const.CMD_FACTION_DEBUG_REQUEST,
+                args
+            )
+            return true
+        end
+        return false
+    end
+    if not PNC.FactionDebug
+        or not PNC.FactionDebug.BuildSnapshot
+    then
+        return false
+    end
+    snapshot = PNC.FactionDebug.BuildSnapshot(
+        factionID,
+        npcID
+    )
+    ClientState.factionDebugAuthorized = true
+    ClientState.factionDebug = snapshot
+    ClientState.factionDebugReason = nil
+    ClientState.lastFactionDebugReceiveAt = Core.Now()
+    return snapshot ~= nil
+end
+
 function Client.RequestCharacterPayload(npcId)
     local player = getSpecificPlayer(0)
     local payload

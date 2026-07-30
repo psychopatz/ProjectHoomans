@@ -59,6 +59,9 @@ local function onResetLua()
     ClientState.relationshipDebug = nil
     ClientState.relationshipDebugAuthorized = false
     ClientState.relationshipDebugReason = nil
+    ClientState.factionDebug = nil
+    ClientState.factionDebugAuthorized = false
+    ClientState.factionDebugReason = nil
     ClientState.inventoryResult = nil
     ClientState.inventoryRequestSerial = 0
     Client.BiteReplicas = {}

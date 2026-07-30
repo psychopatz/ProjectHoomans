@@ -41,6 +41,26 @@ PsychopatzCore.DebugHub.RegisterTool({
     end,
 })
 
+PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.factions",
+    source = "ProjectHoomans",
+    order = 220,
+    title = getText and getText("UI_PNC_FactionInspectorTitle")
+        or "UI_PNC_FactionInspectorTitle",
+    description = "Inspect persistent organizations, affiliations, roles, ranks, and leadership.",
+    available = function()
+        return PNC
+            and PNC.FactionDebugUI
+            and PNC.FactionDebugUI.Toggle
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        PNC.FactionDebugUI.Toggle()
+    end,
+})
+
 -- Project Hoomans settings belong to the standard in-game settings registry.
 -- Remove the old debug-hub launcher as well when this file is hot-reloaded.
 PsychopatzCore.DebugHub.UnregisterTool("pnc.settings")

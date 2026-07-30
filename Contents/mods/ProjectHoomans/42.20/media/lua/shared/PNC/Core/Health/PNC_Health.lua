@@ -344,6 +344,9 @@ function Health.Kill(record, zombie, reason)
     record.runtime.lastPathX = nil
     record.runtime.lastPathY = nil
     record.deathReason = reason or "unknown"
+    if PNC.Factions and PNC.Factions.OnNPCDeath then
+        PNC.Factions.OnNPCDeath(record.id)
+    end
     if PNC.SocialEventHooks then
         if PNC.SocialEventHooks.DiscardRescueContributions then
             PNC.SocialEventHooks.DiscardRescueContributions(record)

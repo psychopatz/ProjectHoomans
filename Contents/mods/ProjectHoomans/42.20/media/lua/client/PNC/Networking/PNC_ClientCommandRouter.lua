@@ -42,6 +42,17 @@ Internal.RegisterServerCommand(
     end
 )
 
+Internal.RegisterServerCommand(
+    Const.CMD_FACTION_DEBUG,
+    function(args)
+        ClientState.factionDebugAuthorized =
+            args.authorized == true
+        ClientState.factionDebug = args.snapshot
+        ClientState.factionDebugReason = args.reason
+        ClientState.lastFactionDebugReceiveAt = Core.Now()
+    end
+)
+
 Internal.RegisterServerCommand(Const.CMD_MAP_COMMAND_RESULT, function(args)
     if PNC.MapCommands and PNC.MapCommands.HandleResult then
         PNC.MapCommands.HandleResult(args)

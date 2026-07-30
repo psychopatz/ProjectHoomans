@@ -229,6 +229,10 @@ Phase 4 later advances these domains to NPC V13, social V3, and player
 registry V3 solely to add behavioral conduct. Profile generation and values
 remain unchanged.
 
+Phase 5A advances only the containing NPC record to V14 for organizational
+affiliation. Social profiles remain unchanged, and faction archetypes never
+generate or modify personality.
+
 The top-level NPC schema advances because the existing registry marks old
 records for rewrite from that marker. V11 records deterministically generate a
 personality from their persisted seed while preserving relationships,

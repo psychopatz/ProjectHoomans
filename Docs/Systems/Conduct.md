@@ -105,6 +105,10 @@ registry to V3. Migration adds neutral records to existing living/dead
 characters and NPCs, generates no evidence, and does not infer history from
 approval or old memories.
 
+Phase 5A subsequently advances the containing NPC record to V14 for
+organizational affiliation. Conduct remains schema V1 and is not modified by
+faction membership or archetype.
+
 The admin/debug-only Relationship Inspector displays observer and target
 conduct, scores, revisions, evidence effects, current strength, decay,
 visibility, source event, subject, timestamps, and tags. Its five named event

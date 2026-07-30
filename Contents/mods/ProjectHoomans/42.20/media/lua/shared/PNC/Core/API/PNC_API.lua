@@ -73,6 +73,30 @@ local function finalizeNewRecord(record, definition)
     OrderSystem.SetOrder(record, definition.orderSpec)
     OrderSystem.SetHostility(record, definition.hostility or Types.DefaultHostility(definition.faction))
     Registry.AddRecord(record)
+    if definition.organizationalFactionID
+        and PNC.Factions
+        and PNC.Factions.AddNPC
+    then
+        local assigned, reason = PNC.Factions.AddNPC(
+            definition.organizationalFactionID,
+            record.id,
+            {
+                membershipStatus = definition.membershipStatus,
+                role = definition.factionRole,
+                rank = definition.factionRank,
+                joinedAt = definition.factionJoinedAt,
+            }
+        )
+        if not assigned then
+            Core.LogWarn(
+                "PNC organizational faction assignment rejected id="
+                    .. tostring(record.id)
+                    .. " factionID="
+                    .. tostring(definition.organizationalFactionID)
+                    .. " reason=" .. tostring(reason)
+            )
+        end
+    end
     if definition.forceLive == true then
         record.runtime.forceLive = true
         local materialized, materializeReason = Presence.Materialize(record, "force_live_spawn")

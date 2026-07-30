@@ -105,6 +105,9 @@ dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileMath.lua")
 dofile(SHARED_ROOT .. "Conduct/PNC_ConductConstants.lua")
 dofile(SHARED_ROOT .. "Conduct/PNC_ConductTypes.lua")
 dofile(SHARED_ROOT .. "Conduct/PNC_ConductMath.lua")
+dofile(SHARED_ROOT .. "Factions/PNC_FactionConstants.lua")
+dofile(SHARED_ROOT .. "Factions/PNC_FactionArchetypes.lua")
+dofile(SHARED_ROOT .. "Factions/PNC_FactionTypes.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipConstants.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipStates.lua")
 dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipTypes.lua")
@@ -189,6 +192,10 @@ assertEqual(type(defaults.relationships), "table",
 -- 2-5. Directed keys and safe parsing.
 local alice = newRecord("npc_alice")
 local bob = newRecord("npc_bob")
+assertEqual(alice.affiliation.membershipStatus,
+    "unaffiliated", "new NPC affiliation default")
+assertEqual(alice.affiliation.factionID, nil,
+    "new NPC has no invented faction")
 local aliceKey = PNC.EntityRef.ForNPC(alice.id)
 local bobKey = PNC.EntityRef.ForNPC(bob.id)
 local playerKey = PNC.EntityRef.ForPlayerIdentity(
@@ -487,9 +494,9 @@ assertEqual(countMemories(
     normalizedOnce.relationships[clampKey]
 ), 1, "invalid memory discarded")
 
--- 24-25. Older records migrate deterministically to V13 and can run again.
-assertEqual(PNC.Const.PERSISTENCE_VERSION, 13,
-    "persistence schema advanced to V13")
+-- 24-25. Older records migrate deterministically to V14 and can run again.
+assertEqual(PNC.Const.PERSISTENCE_VERSION, 14,
+    "persistence schema advanced to V14")
 local oldRaw = {
     schemaVersion = 10,
     recordRevision = 7,
@@ -517,9 +524,13 @@ assertEqual(migrated.social.conduct.scores.reliability, 0,
     "migration adds neutral NPC conduct")
 assertEqual(#migrated.social.conduct.evidence, 0,
     "migration does not infer conduct evidence")
+assertEqual(migrated.affiliation.membershipStatus,
+    "unaffiliated", "migration adds neutral affiliation")
+assertEqual(migrated.affiliation.factionID, nil,
+    "migration invents no faction membership")
 local migratedPayload = PNC.Persistence.SerializeRecord(migrated)
-assertEqual(migratedPayload.schemaVersion, 13,
-    "migration writes V13")
+assertEqual(migratedPayload.schemaVersion, 14,
+    "migration writes V14")
 local migratedAgain = PNC.Persistence.DeserializeRecord(
     migratedPayload,
     migrated.id
@@ -528,6 +539,10 @@ assertEqual(PNC.RelationshipTypes.AreEqual(
     migrated.social,
     migratedAgain.social
 ), true, "migration rerun is safe")
+assertEqual(PNC.FactionTypes.AreEqual(
+    migrated.affiliation,
+    migratedAgain.affiliation
+), true, "affiliation migration rerun is safe")
 
 -- 26. Serialized payload is primitive/table-only and has no metatables.
 assertSaveSafe(migratedPayload)

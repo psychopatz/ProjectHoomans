@@ -6,7 +6,9 @@ cannot prove Build 42.20 trait-screen presentation or callback behavior.
 **Status:** these scenarios have not been run in live Project Zomboid during
 Phase 3B implementation. Phase 3A single-player, hosted, and dedicated-server
 UUID persistence/reconnect/death/new-survivor validation also remains unrun
-and is a release blocker.
+and is a release blocker. Phase 4 real treatment/combat callback delivery,
+single-trigger reciprocal-memory behavior, relationship/conduct save reload,
+and Phase 5A faction persistence/compatibility are likewise not live-validated.
 
 Optional diagnostics:
 
@@ -70,6 +72,43 @@ memory payloads; the server derives the stable player-character key and routes
 the selected named event through the production social-event service. A
 missing inspector entry normally means debug/admin authorization failed or
 the PsychopatzCore Debug Hub dependency did not load.
+
+## Faction Inspector
+
+These Phase 5A scenarios have not been run live. They remain part of the same
+single-player, hosted-server, and dedicated-server release gate.
+
+1. Open **PsychopatzCore Debug Hub → PNC Faction Inspector**.
+2. Use the four creation buttons once each. Confirm Settlement, Looter Gang,
+   Trading Company, and Refugee Group records appear after refresh.
+3. Select a faction and NPC, then click **Assign NPC**. Confirm the faction
+   detail member list and NPC affiliation update.
+4. Open the Relationship Inspector for that NPC. Confirm faction name, ID,
+   archetype, membership status, role, and rank match.
+5. Select another faction and click **Assign NPC** for the same NPC. Confirm
+   the unintended dual membership is rejected and revisions do not change.
+6. Click **Transfer NPC**. Confirm the destination membership and bounded
+   former-faction history update together.
+7. Use **Next Role** and **Next Rank**. Confirm only roles allowed by the
+   selected archetype are chosen.
+8. Click **Set Leader**. Confirm `leaderNPCID` and the NPC's leader role/rank.
+9. Remove the leader. Confirm leadership clears and no successor is selected.
+10. Archive a faction. Confirm its record remains visible, status becomes
+    archived, membership becomes former history, and its ID is preserved.
+11. Save/reload. Confirm faction identity, membership, history, and revisions
+    persist while relationships, conduct, personality, inventory, and
+    recruitment remain intact.
+12. Confirm `presenceRevision` does not change from faction edits.
+13. Assign legacy hostile, neutral, and colonist NPCs to different
+    organizational archetypes. Confirm `record.faction`, `attackPlayers`,
+    `attackNPCs`, companion commands, and observed combat behavior remain
+    unchanged. In particular, looters must not attack automatically and
+    traders must not become automatically friendly.
+
+The client sends only named guarded actions and selected IDs. The server
+generates faction IDs and validates archetype, membership, role, rank, and
+status; the inspector has no diplomacy, raid, trade, reputation, or hostility
+controls.
 
 ## Trait Screen
 

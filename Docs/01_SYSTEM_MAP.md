@@ -38,6 +38,9 @@
 - `PNC_ConductConstants`, `PNC_ConductTypes`, `PNC_ConductMath`, and
   `PNC_ConductDefinitions`: actor-owned behavioral schema, objective score
   derivation/decay, evidence limits, and the five accepted-event mappings
+- `PNC_FactionConstants`, `PNC_FactionArchetypes`, and `PNC_FactionTypes`:
+  organizational enums, four data-only archetypes, faction registry/record
+  normalization, and primitive NPC affiliation/history
 - `PNC_SpatialIndex`: nested numeric-cell player, NPC, and zombie queries built
   from the shared world census; player identity maps also provide constant-time
   owner lookup
@@ -139,6 +142,9 @@
   read-only player/NPC formatters
 - `PNC_ConductService` and `PNC_ConductDebug`: authority-only evidence
   mutation, UUID/NPC ownership, copied reads, and sanitized formatting
+- `PNC_FactionService` and `PNC_FactionDebug`: separate `PNC_Factions`
+  ModData ownership, generated identity, copied queries, atomic membership,
+  leadership/archive operations, index repair, and sanitized inspection
 - `PNC_RelationshipService`: authoritative directed relationship mutations
 - `PNC_RelationshipDebug`: read-only selected-pair snapshots/formatting plus
   admin/debug-only named-event test dispatch through the real event service
@@ -155,6 +161,9 @@
 - `PNC_RelationshipDebugWindow` and `PNC_RelationshipDebugModel`:
   admin/debug-only directed relationship inspection, reverse-direction
   comparison, memory/revision diagnostics, and guarded named-event triggers
+- `PNC_FactionDebugWindow` and `PNC_FactionDebugModel`: admin/debug-only
+  organization/member inspection and service-backed create, membership,
+  role/rank, leader, transfer, and archive controls
 - `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
 - `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby
   embodied NPCs, including canonical-instance selection and duplicate shell

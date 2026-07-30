@@ -10,7 +10,7 @@
 - zombie aggro bridge so zombies can acquire embodied NPCs
 - custom HP, body-part wounds, bandage-driven incapacitation recovery, and stamina
 - seeded identity, archetype registry, and compact inventory persistence
-- v13 compact health/inventory/stamina/social persistence with save-time dirty
+- v14 compact health/inventory/stamina/social/affiliation persistence with save-time dirty
   snapshots and a 100-NPC/4,000-acquired-item scale gate
 - sparse, directed NPC-to-NPC and NPC-to-player-character relationship records
   with deterministic memories, decay, and hysteresis-aware social states
@@ -26,14 +26,18 @@
 - Phase 4 actor-owned player/NPC conduct with seven objective dimensions,
   deterministic decaying evidence, accepted-event integration, and
   admin/debug inspector presentation
+- Phase 5A persistent organizational faction registry, data-only settler,
+  looter, trader, and refugee archetypes, NPC affiliation/role/rank,
+  leadership, archival, and guarded faction inspection; legacy tactical
+  `record.faction` remains unchanged
 - shared world census, numeric spatial cells, budgeted active-zombie aggro,
   cached perception frames, and staggered LOD scheduling
 - right-click debug spawning, NPC selection hub, and character window
 
 ## Immediate Next Steps
 - execute the documented SP, hosted, and dedicated player-identity, trait,
-  profile, conduct, and inspector validation matrices before expanding social
-  attribution
+  profile, conduct, relationship, faction, and inspector validation matrices
+  before expanding social attribution
 - smoother live motion and tighter SP/MP parity for chase and follow
 - richer animation bindings and better weapon-specific timing
 - better ranged aim, muzzle/projectile treatment, and combat diagnostics

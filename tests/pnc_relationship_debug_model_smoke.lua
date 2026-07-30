@@ -35,6 +35,16 @@ local rows = PNC.RelationshipDebugModel.BuildRows({
         recordRevision = 8,
         presenceRevision = 2,
         socialRevision = 4,
+        faction = {
+            organizationalFaction = true,
+            label = "Riverside Cooperative",
+            factionID = "faction_riverside",
+            archetypeID = "settler",
+            membershipStatus = "member",
+            role = "guard",
+            rank = "officer",
+            affiliationRevision = 2,
+        },
         personality = {
             socialStyle = "outgoing",
             compassion = 0.7,
@@ -49,6 +59,10 @@ local rows = PNC.RelationshipDebugModel.BuildRows({
     target = {
         label = "Bob",
         key = "npc:bob",
+        faction = {
+            organizationalFaction = false,
+            label = "No organizational faction",
+        },
     },
     observerConduct = {
         entityKey = "npc:alice",
@@ -152,6 +166,10 @@ local rows = PNC.RelationshipDebugModel.BuildRows({
 
 assertContains(rows, "Approval", "12.00")
 assertContains(rows, "Revisions", "presence 2")
+assertContains(rows, "Observer faction", "Riverside Cooperative")
+assertContains(rows, "  faction ID", "faction_riverside")
+assertContains(rows, "  membership", "member")
+assertContains(rows, "Target faction", "No organizational faction")
 assertContains(rows, "Reverse direction", "stored")
 assertContains(rows, "Saturation treated_wound", "approval=4")
 assertContains(rows, "Observer conduct", "revision 2")

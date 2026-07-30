@@ -168,6 +168,37 @@ local function personalitySnapshot(record)
     }
 end
 
+local function factionSnapshot(record)
+    if not record then
+        return {
+            organizationalFaction = false,
+            label = "No organizational faction",
+        }
+    end
+    local affiliation = PNC.Factions
+        and PNC.Factions.GetNPCAffiliation
+        and PNC.Factions.GetNPCAffiliation(record.id)
+        or nil
+    local faction = affiliation
+        and affiliation.factionID
+        and PNC.Factions.Get(affiliation.factionID)
+        or nil
+    return {
+        organizationalFaction = faction ~= nil,
+        label = faction and faction.name
+            or "No organizational faction",
+        factionID = faction and faction.id or nil,
+        archetypeID = faction and faction.archetypeID or nil,
+        membershipStatus = affiliation
+            and affiliation.membershipStatus
+            or "unaffiliated",
+        role = affiliation and affiliation.role or "civilian",
+        rank = affiliation and affiliation.rank or "member",
+        affiliationRevision = affiliation
+            and affiliation.revision or 0,
+    }
+end
+
 local function actionSnapshot(value)
     if type(value) ~= "table" then return nil end
     local details = {}
@@ -276,8 +307,16 @@ function Debug.BuildSnapshot(
             socialRevision = observer.social
                 and observer.social.revision or 0,
             personality = personalitySnapshot(observer),
+            faction = factionSnapshot(observer),
         },
-        target = copy(target),
+        target = (function()
+            local output = copy(target)
+            local targetRecord = target
+                and target.kind == "npc"
+                and Registry.Get(target.npcID) or nil
+            output.faction = factionSnapshot(targetRecord)
+            return output
+        end)(),
         observerConduct = PNC.ConductDebug
             and PNC.ConductDebug.BuildSnapshot(observerKey, at)
             or nil,

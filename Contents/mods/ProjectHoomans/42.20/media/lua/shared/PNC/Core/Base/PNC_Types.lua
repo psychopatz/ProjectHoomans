@@ -6,6 +6,7 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Identity = PNC.Identity
 local RelationshipTypes = PNC.RelationshipTypes
+local FactionTypes = PNC.FactionTypes
 
 local function normalizeString(value)
     if value == nil or value == "" then
@@ -201,6 +202,13 @@ function Types.NormalizeDefinition(definition)
         recruited = def.recruited == true,
         social = type(def.social) == "table"
             and Core.DeepCopy(def.social) or nil,
+        organizationalFactionID = normalizeString(
+            def.organizationalFactionID or def.factionID
+        ),
+        membershipStatus = normalizeString(def.membershipStatus),
+        factionRole = normalizeString(def.factionRole or def.role),
+        factionRank = normalizeString(def.factionRank or def.rank),
+        factionJoinedAt = tonumber(def.factionJoinedAt),
         mapPresentation = PNC.MapPresentation
             and PNC.MapPresentation.Normalize(def.mapPresentation)
             or nil,
@@ -256,6 +264,8 @@ function Types.NewRecord(definition)
             unarmedCooldownMs = tonumber(def.combatProfile.unarmedCooldownMs) or Const.UNARMED_COOLDOWN_MS,
         },
         hostility = Core.DeepCopy(def.hostility),
+        affiliation = FactionTypes
+            and FactionTypes.NewAffiliation() or nil,
         social = nil,
         health = {
             current = def.hpMax,
