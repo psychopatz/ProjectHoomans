@@ -52,6 +52,13 @@ function Intent.Resolve(spec)
         return result("cooperate", false, false,
             spec.commandable == true, "same_faction")
     end
+    -- A temporary player-scoped exception suppresses proactive faction
+    -- aggression, including war aggression. Immediate self-defense above
+    -- deliberately remains authoritative.
+    if spec.playerPacified == true then
+        return result("tolerate", false, false, false,
+            "player_pacification")
+    end
     if spec.atWar == true or state == "war" then
         return result("attack", true, true, false,
             "faction_war")
@@ -66,15 +73,10 @@ function Intent.Resolve(spec)
     end
     if state == "hostile" then
         if archetypeID == "looter"
-            and (tonumber(policy.aggression) or 0)
-                >= tuning(
-                    "looterHostileAggressionMinimum", 0.70
-                )
-            and targetStrength <= observerStrength
-                * tuning("looterAdvantageRatio", 0.75)
+            or policy.outsiderPolicy == "predatory"
         then
             return result("attack", true, true, false,
-                "hostile_predatory_advantage")
+                "hostile_predatory_default")
         end
         return result(
             (tonumber(policy.caution) or 0.5)
@@ -104,14 +106,8 @@ function Intent.Resolve(spec)
     if archetypeID == "looter"
         or policy.outsiderPolicy == "predatory"
     then
-        if targetStrength > observerStrength
-            * tuning("looterStrongerTargetRatio", 1.15)
-        then
-            return result("avoid", false, false, false,
-                "predatory_target_stronger")
-        end
-        return result("threaten", false, false, false,
-            "predatory_pressure")
+        return result("attack", true, true, false,
+            "predatory_default_hostility")
     end
     if archetypeID == "refugee"
         or policy.outsiderPolicy == "cautious"
@@ -147,6 +143,12 @@ function Intent.ResolveWithTrace(spec)
             samePlayerFaction =
                 spec.samePlayerOwnedFaction == true,
             sameFaction = spec.sameFaction == true,
+            playerPacified = spec.playerPacified == true,
+            playerPacifiedUntil =
+                tonumber(spec.playerPacifiedUntil) or 0,
+            playerPacificationReason = tostring(
+                spec.playerPacificationReason or ""
+            ),
             diplomaticState = tostring(
                 spec.diplomaticState or "unknown"
             ),

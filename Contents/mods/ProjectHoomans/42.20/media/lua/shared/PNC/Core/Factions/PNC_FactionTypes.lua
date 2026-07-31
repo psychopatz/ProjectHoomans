@@ -118,6 +118,65 @@ local function normalizeIDSet(value, validator)
     return output
 end
 
+function Types.NormalizePlayerPacification(value, playerKey)
+    local source = type(value) == "table" and value or {}
+    if not EntityRef.IsPlayer(playerKey) then return nil end
+    local untilWorldAgeHours = timestamp(
+        source.untilWorldAgeHours,
+        0
+    )
+    if untilWorldAgeHours <= 0 then return nil end
+    local createdAt = timestamp(source.createdAt, 0)
+    return {
+        schemaVersion =
+            Constants.PLAYER_PACIFICATION_SCHEMA_VERSION,
+        playerKey = playerKey,
+        createdAt = math.min(createdAt, untilWorldAgeHours),
+        untilWorldAgeHours = untilWorldAgeHours,
+        reason = safeString(
+            source.reason,
+            Constants.PLAYER_PACIFICATION_REASON_MAX_LENGTH
+        ) or "temporary_pacification",
+        sourceNPCID = Types.IsValidNPCID(source.sourceNPCID)
+            and source.sourceNPCID or nil,
+        revision = revision(source.revision),
+    }
+end
+
+function Types.NormalizePlayerPacifications(value)
+    local output = {}
+    local ordered = {}
+    for playerKey, raw in pairs(
+        type(value) == "table" and value or {}
+    ) do
+        local entry = Types.NormalizePlayerPacification(
+            raw,
+            playerKey
+        )
+        if entry then
+            ordered[#ordered + 1] = entry
+        end
+    end
+    table.sort(ordered, function(left, right)
+        if left.untilWorldAgeHours
+            ~= right.untilWorldAgeHours
+        then
+            return left.untilWorldAgeHours
+                > right.untilWorldAgeHours
+        end
+        return left.playerKey < right.playerKey
+    end)
+    while #ordered
+        > Constants.PLAYER_PACIFICATION_LIMIT
+    do
+        table.remove(ordered)
+    end
+    for _, entry in ipairs(ordered) do
+        output[entry.playerKey] = entry
+    end
+    return output
+end
+
 local function clamp(value, minimum, maximum)
     return DiplomacyMath and DiplomacyMath.Clamp
         and DiplomacyMath.Clamp(value, minimum, maximum)
@@ -692,6 +751,10 @@ function Types.NormalizeFaction(value, factionID)
             archetypeID,
             tostring(id) .. ":" .. tostring(name)
         ),
+        playerPacifications =
+            Types.NormalizePlayerPacifications(
+                source.playerPacifications
+            ),
         relations = {},
         tags = normalizeTags(source.tags),
         revision = revision(source.revision),

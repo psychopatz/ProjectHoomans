@@ -358,8 +358,7 @@ truthy(PNC.FactionIncidentService.AddIncident(
 truthy(Factions.AreAtWar(alpha.id, charlie.id),
     "truce attack renews war")
 
--- Tactical policy is nonlethal unless war, self-defense, or an explicitly
--- hostile predatory advantage permits an attack.
+-- Predatory looters are hostile to outsiders by default.
 local neutralLooter = PNC.FactionIntent.Resolve({
     archetypeID = "looter",
     policy = bravo.policy,
@@ -367,10 +366,25 @@ local neutralLooter = PNC.FactionIntent.Resolve({
     observerStrength = 2,
     targetStrength = 1,
 })
-equal(neutralLooter.intent, "threaten",
-    "looter neutral threat")
-equal(neutralLooter.attackAllowed, false,
-    "looter neutral nonlethal")
+equal(neutralLooter.intent, "attack",
+    "looter neutral attack")
+equal(neutralLooter.attackAllowed, true,
+    "looter default hostility")
+local pacifiedLooter = PNC.FactionIntent.Resolve({
+    archetypeID = "looter",
+    policy = bravo.policy,
+    diplomaticState = "war",
+    playerPacified = true,
+})
+equal(pacifiedLooter.intent, "tolerate",
+    "player-scoped pacification suppresses looter attack")
+equal(pacifiedLooter.attackAllowed, false,
+    "pacification is nonlethal")
+truthy(PNC.FactionIntent.Resolve({
+    archetypeID = "looter",
+    playerPacified = true,
+    immediateSelfDefense = true,
+}).attackAllowed, "self-defense overrides pacification")
 truthy(PNC.FactionIntent.Resolve({
     archetypeID = "trader",
     policy = charlie.policy,

@@ -195,6 +195,7 @@ local function factionSnapshot(record)
             or "No organizational faction",
         factionID = faction and faction.id or nil,
         archetypeID = faction and faction.archetypeID or nil,
+        policy = faction and copy(faction.policy) or nil,
         membershipStatus = affiliation
             and affiliation.membershipStatus
             or "unaffiliated",
@@ -295,6 +296,7 @@ function Debug.BuildSnapshot(
     local targetFactionSnapshot
     local factionRelation
     local factionIntent
+    local playerPacification
     local index
     if not observer or observer.alive == false then
         return nil, "observer_not_found"
@@ -342,22 +344,37 @@ function Debug.BuildSnapshot(
     else
         targetFactionSnapshot = playerFactionSnapshot(targetKey)
     end
-    if observerFactionSnapshot.organizationalFaction
-        and targetFactionSnapshot.organizationalFaction
-        and observerFactionSnapshot.factionID
-            ~= targetFactionSnapshot.factionID
-    then
-        factionRelation = PNC.Factions.GetRelation(
-            observerFactionSnapshot.factionID,
-            targetFactionSnapshot.factionID
-        )
+    if observerFactionSnapshot.organizationalFaction then
+        local sameFaction =
+            targetFactionSnapshot.organizationalFaction
+            and observerFactionSnapshot.factionID
+                == targetFactionSnapshot.factionID
+        if targetFactionSnapshot.organizationalFaction
+            and not sameFaction
+        then
+            factionRelation = PNC.Factions.GetRelation(
+                observerFactionSnapshot.factionID,
+                targetFactionSnapshot.factionID
+            )
+        end
         local observerFaction = PNC.Factions.Get(
             observerFactionSnapshot.factionID
         )
+        if EntityRef.IsPlayer(targetKey)
+            and PNC.Factions.GetPlayerPacification
+        then
+            playerPacification =
+                PNC.Factions.GetPlayerPacification(
+                    observerFactionSnapshot.factionID,
+                    targetKey,
+                    at
+                )
+        end
         factionIntent = PNC.FactionIntent.Resolve({
             archetypeID = observerFaction
                 and observerFaction.archetypeID,
             policy = observerFaction and observerFaction.policy,
+            sameFaction = sameFaction,
             diplomaticState = factionRelation
                 and factionRelation.state or "unknown",
             atWar = factionRelation
@@ -367,6 +384,11 @@ function Debug.BuildSnapshot(
             activeTruce = factionRelation
                 and factionRelation.truceUntil > at,
             personalState = relationship.state,
+            playerPacified = playerPacification ~= nil,
+            playerPacifiedUntil = playerPacification
+                and playerPacification.untilWorldAgeHours or 0,
+            playerPacificationReason = playerPacification
+                and playerPacification.reason or nil,
         })
     end
     return {
@@ -393,6 +415,7 @@ function Debug.BuildSnapshot(
         end)(),
         factionRelation = factionRelation,
         factionIntent = factionIntent,
+        playerPacification = copy(playerPacification),
         observerConduct = PNC.ConductDebug
             and PNC.ConductDebug.BuildSnapshot(observerKey, at)
             or nil,
@@ -414,6 +437,70 @@ function Debug.BuildSnapshot(
         ) or nil,
         actionResult = actionSnapshot(actionResult),
     }
+end
+
+function Debug.SetPlayerPacification(player, args)
+    local at = worldAgeHours()
+    local observerNPCID = tostring(
+        args and args.observerNPCID or ""
+    )
+    local observer = Registry and Registry.Get
+        and Registry.Get(observerNPCID) or nil
+    local targetKey
+    local target
+    local reason
+    local ok
+    local value
+    if not observer or observer.alive == false then
+        return nil, "observer_not_found"
+    end
+    targetKey, target, reason = resolveTarget(player, {
+        targetKind = "current_player",
+    }, at)
+    if not targetKey then return nil, reason end
+    local factionID = PNC.Factions
+        and PNC.Factions.GetOrganizationalFactionID
+        and PNC.Factions.GetOrganizationalFactionID(observer)
+        or nil
+    if not factionID then
+        return nil, "observer_has_no_faction"
+    end
+    local mode = tostring(args and args.mode or "pacify")
+    if mode == "clear" then
+        ok, reason, value =
+            PNC.Factions.ClearPlayerPacification(
+                factionID,
+                targetKey
+            )
+    else
+        ok, reason, value = PNC.Factions.PacifyForPlayer(
+            factionID,
+            targetKey,
+            {
+                worldAgeHours = at,
+                durationHours = tonumber(
+                    args and args.durationHours
+                ) or 24,
+                reason = "debug_bribe_preview",
+                sourceNPCID = observer.id,
+            }
+        )
+    end
+    local snapshot, snapshotReason = Debug.BuildSnapshot(
+        observer.id,
+        targetKey,
+        target,
+        at,
+        nil
+    )
+    if snapshot then
+        snapshot.pacificationAction = {
+            ok = ok == true,
+            reason = reason,
+            value = copy(value),
+        }
+    end
+    return snapshot, snapshotReason or reason
 end
 
 function Debug.BuildSnapshotForRequest(player, args, actionResult)

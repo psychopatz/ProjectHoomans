@@ -15,11 +15,17 @@ local function roleLabel(value)
         value,
         "(%a)([%w']*)",
         function(first, rest)
+            -- Build 42.20's Kahlua string library does not expose
+            -- string.lower() reliably. Faction role IDs are normalized to
+            -- lowercase at the persistence boundary, so title-casing only
+            -- the first character is both sufficient and runtime-safe.
             return string.upper(first)
-                .. string.lower(rest)
+                .. rest
         end
     )
 end
+
+Conversation.FormatRoleLabel = roleLabel
 
 local function factionPresentation(entry)
     local snapshot = entry and entry.snapshot or {}
@@ -36,6 +42,7 @@ local function factionPresentation(entry)
         name = name,
         role = role,
         id = faction.id,
+        emblem = faction.emblem,
     }
 end
 
@@ -93,6 +100,7 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             factionID = faction and faction.id or nil,
             factionName = faction and faction.name or nil,
             factionRole = faction and faction.role or nil,
+            factionEmblem = faction and faction.emblem or nil,
             npcType = Palette.ResolveType(entry),
         },
         lifecycle = Lifecycle.Create(),

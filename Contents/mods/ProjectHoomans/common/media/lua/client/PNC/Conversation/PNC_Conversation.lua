@@ -1,4 +1,5 @@
 require "PsychopatzCore/UI/Conversation/PsychopatzConversation"
+require "PNC/Conversation/PNC_ConversationFactionEmblem"
 require "PNC/Conversation/PNC_ConversationTime"
 require "PNC/Conversation/Content/PNC_ConversationRegistry"
 require "PNC/Conversation/PNC_ConversationRelationship"

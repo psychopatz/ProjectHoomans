@@ -198,6 +198,59 @@ Mutators return a success boolean followed by a stable reason string and,
 where useful, a canonical result. There are no client commands for changing
 relationship scores.
 
+## Approval / Respect Outcome Map
+
+`PNC.RelationshipGraph` is a pure shared presentation and eligibility module.
+It maps respect to the horizontal axis and approval to the vertical axis. The
+four broad labels are derived interpretations, not persistent emotions:
+
+| Approval | Respect | Display attitude |
+|---|---|---|
+| positive | positive | admire |
+| positive | negative | pity |
+| negative | positive | fear |
+| negative | negative | despise |
+
+A neutral band of `-10` through `10` prevents label flicker. Inside that band
+the detailed labels are `indifferent`, `sympathetic`, `impressed`, `dislikes`,
+or `dismissive`. Pity therefore remains “likes but looks down on,” never a
+third relationship axis.
+
+The reusable client `PNC.RelationshipGraphPanel` draws the current directed
+relationship as a white marker. A selected interaction supplies a plain-table
+requirement:
+
+```lua
+{
+    id = "challenge_extorter",
+    approvalWeight = 0.10,
+    respectWeight = 0.80,
+    threshold = 35,
+}
+```
+
+The green region contains points where:
+
+```text
+approval * approvalWeight
++ respect * respectWeight
++ context modifiers
+>= threshold
+```
+
+Built-in inspection profiles cover recruit, ask for mercy, offer less,
+challenge an extorter, and claim to have few supplies. These profiles are
+presentation/eligibility foundations only; this phase does not implement an
+extortion conversation, payment, deception, or relationship outcome events.
+Future conversation instances can register another plain requirement and
+reuse the same evaluator and panel.
+
+The developer relationship inspector embeds the graph, lets the tester switch
+interaction profiles, adjust a manual context modifier, and inspect the base
+score, contextual contribution, threshold, and current result. It also offers
+guarded `Pacify for 24h` and `Clear Pacification` controls when the target is
+the current stable player character.
+
 ## Social-Event Pipeline
 
 Gameplay systems report completed milestones through

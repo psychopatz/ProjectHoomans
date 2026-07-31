@@ -79,6 +79,15 @@ end
 dofile(ROOT .. "PNC/Conversation/PNC_ConversationDefinition.lua")
 dofile(ROOT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua")
 
+local originalStringLower = string.lower
+string.lower = nil
+assertEqual(
+    PNC.Conversation.FormatRoleLabel("lead_scavenger"),
+    "Lead Scavenger",
+    "role label does not depend on unavailable Kahlua string.lower"
+)
+string.lower = originalStringLower
+
 local Time = PNC.Conversation.Time
 assertEqual(Time.Resolve(4.9), "twilight", "twilight band")
 assertEqual(Time.Resolve(5.0), "dawn", "dawn band")
@@ -117,6 +126,15 @@ local entry = {
             name = "Crossroads Exchange",
             role = "trader",
             rank = "member",
+            emblem = {
+                backgroundColorID = "black",
+                layers = {
+                    {
+                        symbolID = "map_star",
+                        colorID = "white",
+                    },
+                },
+            },
         },
     },
 }
@@ -129,6 +147,11 @@ assertEqual(definition.context.relationshipID,
     "Crossroads Exchange", "portrait faction name")
 assertEqual(definition.context.timeID, "Trader",
     "portrait faction role")
+assertEqual(
+    definition.context.factionEmblem.backgroundColorID,
+    "black",
+    "portrait faction emblem"
+)
 assertEqual(definition.context.conversationRelationshipID,
     "Lover", "semantic relationship category")
 assertEqual(definition.context.conversationTimeID,

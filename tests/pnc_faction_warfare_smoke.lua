@@ -221,20 +221,59 @@ local _, _, traderFaction = Factions.Create({
     createdAt = hour,
 })
 
--- Looter assignment strips companion ownership, but archetype alone does
--- not grant lethal intent.
+-- Looter assignment strips companion ownership and immediately applies
+-- its default outsider hostility.
 truthy(Factions.AddNPC(
     looterFaction.id,
     looterNPC.id,
     { joinedAt = hour }
 ), "assign looter")
-equal(looterNPC.faction, "neutral", "looter tactical class")
+equal(looterNPC.faction, "hostile", "looter tactical class")
 equal(looterNPC.recruited, false, "looter not companion")
 equal(looterNPC.ownerUsername, nil, "looter owner cleared")
-equal(looterNPC.hostility.attackPlayers, false,
-    "looter does not auto-attack outsiders")
-equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_ROAM,
-    "looter follows nonlethal policy")
+equal(looterNPC.hostility.attackPlayers, true,
+    "looter attacks outsiders by default")
+equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_HUNT,
+    "looter follows hostile hunt policy")
+truthy(Factions.CanNPCTargetPlayer(looterNPC, player),
+    "looter can target player by default")
+looterNPC.runtime.target = {
+    kind = "player",
+    player = player,
+}
+truthy(Factions.PacifyForPlayer(
+    looterFaction.id,
+    playerKey,
+    {
+        worldAgeHours = hour,
+        durationHours = 24,
+        reason = "test_bribe",
+        sourceNPCID = looterNPC.id,
+    }
+), "specific player pacified")
+equal(looterNPC.runtime.target, nil,
+    "pacification clears current player target")
+equal(Factions.CanNPCTargetPlayer(looterNPC, player),
+    false, "pacified player is ignored")
+local sameAccountOtherCharacter = {
+    uuid = "char_other",
+    getUsername = function() return "Patrick" end,
+    getDisplayName = function() return "Patrick II" end,
+    getOnlineID = function() return 8 end,
+}
+truthy(Factions.CanNPCTargetPlayer(
+    looterNPC,
+    sameAccountOtherCharacter
+), "pacification does not transfer to another character UUID")
+truthy(PNC.FactionBehavior.ResolveIntent(
+    looterNPC,
+    player,
+    { immediateSelfDefense = true }
+).attackAllowed, "self-defense remains available")
+hour = hour + 25
+truthy(Factions.CanNPCTargetPlayer(looterNPC, player),
+    "expired pacification restores hostility")
+hour = hour - 25
 
 -- Player-owned faction membership derives companion ownership.
 truthy(Factions.AddNPC(
@@ -371,7 +410,7 @@ equal(traderNPC.runtime.target, nil,
 equal(PNC.Relationships.AreNPCsEnemies(
     looterNPC,
     playerNPC
-), false, "looter policy alone is nonlethal")
+), true, "looter policy is hostile to outsider NPCs")
 
 -- Treaty behavior changes preserve unrelated higher-priority zombie combat.
 truthy(Factions.DeclareWar(
@@ -548,7 +587,8 @@ end
 equal(#PNC.FactionBehavior.ReconciliationQueue, 0,
     "reconciliation completes")
 
--- V2 diplomacy migrates to directed relations and V4 emblems.
+-- V2 diplomacy migrates to directed relations, emblems, and V5
+-- player-scoped pacification storage.
 local migrated = PNC.FactionTypes.NormalizeFactionRegistry({
     schemaVersion = 2,
     revision = 3,
@@ -574,7 +614,7 @@ local migrated = PNC.FactionTypes.NormalizeFactionRegistry({
         },
     },
 })
-equal(migrated.schemaVersion, 4, "registry migrated to V4")
+equal(migrated.schemaVersion, 5, "registry migrated to V5")
 truthy(type(migrated.byPlayerKey) == "table",
     "player index added")
 equal(migrated.diplomacy, nil,
@@ -587,10 +627,13 @@ truthy(migrated.byID.faction_old_b
     "reverse war migrated")
 truthy(#migrated.byID.faction_old_a.emblem.layers > 0,
     "old faction receives deterministic emblem")
+truthy(type(migrated.byID.faction_old_a
+    .playerPacifications) == "table",
+    "old faction receives pacification table")
 truthy(PNC.FactionTypes.AreEqual(
     migrated,
     PNC.FactionTypes.NormalizeFactionRegistry(migrated)
-), "V4 faction migration idempotent")
+), "V5 faction migration idempotent")
 saveSafe(Factions.Registry)
 
 print("pnc_faction_warfare_smoke: ok")

@@ -18,8 +18,8 @@ local DEFINITIONS = {
         },
         defaultRole = "civilian",
         behavior = {
-            hostileToOutsiders = false,
-            defaultLegacyFaction = "neutral",
+            hostileToOutsiders = true,
+            defaultLegacyFaction = "hostile",
         },
         policyDefaults = {
             aggression = 0.30,

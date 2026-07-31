@@ -1,5 +1,7 @@
 require "PsychopatzCore/UI/PsychopatzUI"
+require "ISUI/ISComboBox"
 require "PNC/UI/Relationships/PNC_RelationshipDebugModel"
+require "PNC/UI/Relationships/PNC_RelationshipGraphPanel"
 
 PNC.RelationshipDebugUI = PNC.RelationshipDebugUI or {}
 
@@ -104,6 +106,38 @@ function ISPNCRelationshipDebugWindow:createChildren()
         itemHeight = Layout.Pixels(27, self.uiScale),
         doDrawItem = drawDetail,
     })
+    self.actionCombo = ISComboBox:new(
+        0,
+        0,
+        240,
+        Layout.Pixels(26, self.uiScale),
+        self,
+        ISPNCRelationshipDebugWindow.onActionChanged
+    )
+    self.actionCombo:initialise()
+    self.actionCombo:instantiate()
+    self:addChild(self.actionCombo)
+    for _, requirement in ipairs(
+        PNC.RelationshipGraph.ListRequirements()
+    ) do
+        self.actionCombo:addOptionWithData(
+            requirement.label,
+            requirement.id
+        )
+    end
+    if self.actionCombo.selectData then
+        self.actionCombo:selectData("inspect")
+    end
+    self.graph = ISPNCRelationshipGraphPanel:new(
+        0,
+        0,
+        320,
+        420
+    )
+    self.graph:initialise()
+    self.graph:instantiate()
+    self:addChild(self.graph)
+    self.contextBonus = 0
     self.controls = {}
     self.refreshButton = UI.CreateButton(self, {
         id = "refresh",
@@ -119,6 +153,53 @@ function ISPNCRelationshipDebugWindow:createChildren()
             title = definition.title,
             target = self,
             onclick = ISPNCRelationshipDebugWindow.onTrigger,
+            variant = definition.variant,
+        })
+        self.controls[#self.controls + 1] = button
+    end
+    local extraControls = {
+        {
+            id = "pacify_24h",
+            title = "Pacify for 24h",
+            callback =
+                ISPNCRelationshipDebugWindow.onPacification,
+            variant = "success",
+        },
+        {
+            id = "clear_pacification",
+            title = "Clear Pacification",
+            callback =
+                ISPNCRelationshipDebugWindow.onPacification,
+            variant = "danger",
+        },
+        {
+            id = "context_minus",
+            title = "Context -5",
+            callback =
+                ISPNCRelationshipDebugWindow.onContext,
+            variant = "quiet",
+        },
+        {
+            id = "context_reset",
+            title = "Context Reset",
+            callback =
+                ISPNCRelationshipDebugWindow.onContext,
+            variant = "quiet",
+        },
+        {
+            id = "context_plus",
+            title = "Context +5",
+            callback =
+                ISPNCRelationshipDebugWindow.onContext,
+            variant = "quiet",
+        },
+    }
+    for _, definition in ipairs(extraControls) do
+        local button = UI.CreateButton(self, {
+            id = definition.id,
+            title = definition.title,
+            target = self,
+            onclick = definition.callback,
             variant = definition.variant,
         })
         self.controls[#self.controls + 1] = button
@@ -142,12 +223,16 @@ function ISPNCRelationshipDebugWindow:onResponsiveLayout()
     )
     local gap = Layout.Pixels(8, self.uiScale)
     local leftWidth = math.max(
-        150,
-        math.floor((rect.width - gap * 2) * 0.23)
+        145,
+        math.floor(rect.width * 0.15)
+    )
+    local graphWidth = math.max(
+        300,
+        math.min(410, math.floor(rect.width * 0.31))
     )
     local detailWidth = math.max(
         240,
-        rect.width - leftWidth * 2 - gap * 2
+        rect.width - leftWidth * 2 - graphWidth - gap * 3
     )
     self.layout = {
         observer = {
@@ -158,8 +243,14 @@ function ISPNCRelationshipDebugWindow:onResponsiveLayout()
             x = rect.x + leftWidth + gap, y = top,
             width = leftWidth, height = height,
         },
-        detail = {
+        graph = {
             x = rect.x + leftWidth * 2 + gap * 2, y = top,
+            width = graphWidth, height = height,
+        },
+        detail = {
+            x = rect.x + leftWidth * 2
+                + graphWidth + gap * 3,
+            y = top,
             width = detailWidth, height = height,
         },
     }
@@ -178,12 +269,55 @@ function ISPNCRelationshipDebugWindow:onResponsiveLayout()
         self.layout.target.height
     )
     Layout.SetBounds(
+        self.actionCombo,
+        self.layout.graph.x,
+        self.layout.graph.y,
+        self.layout.graph.width,
+        Layout.Pixels(26, self.uiScale)
+    )
+    Layout.SetBounds(
+        self.graph,
+        self.layout.graph.x,
+        self.layout.graph.y + Layout.Pixels(32, self.uiScale),
+        self.layout.graph.width,
+        self.layout.graph.height - Layout.Pixels(32, self.uiScale)
+    )
+    Layout.SetBounds(
         self.details,
         self.layout.detail.x,
         self.layout.detail.y,
         self.layout.detail.width,
         self.layout.detail.height
     )
+end
+
+function ISPNCRelationshipDebugWindow:getActionID()
+    local combo = self.actionCombo
+    if combo and combo.getOptionData then
+        return combo:getOptionData(combo.selected)
+            or "inspect"
+    end
+    if combo and combo.optiondata then
+        return combo.optiondata[combo.selected] or "inspect"
+    end
+    local option = combo and combo.options
+        and combo.options[combo.selected] or nil
+    return type(option) == "table"
+        and option.data or "inspect"
+end
+
+function ISPNCRelationshipDebugWindow:refreshGraph()
+    local evaluation = Model.BuildGraph(
+        ClientState.relationshipDebug,
+        self:getActionID(),
+        {
+            bonus = tonumber(self.contextBonus) or 0,
+        }
+    )
+    if evaluation and self.graph then
+        self.graph:setEvaluation(evaluation)
+    end
+    return evaluation
 end
 
 function ISPNCRelationshipDebugWindow:getObserver()
@@ -292,10 +426,12 @@ function ISPNCRelationshipDebugWindow:requestRelationship()
 end
 
 function ISPNCRelationshipDebugWindow:refreshDetails()
+    local evaluation = self:refreshGraph()
     local rows = Model.BuildRows(
         ClientState.relationshipDebug,
         ClientState.relationshipDebugAuthorized,
-        ClientState.relationshipDebugReason
+        ClientState.relationshipDebugReason,
+        evaluation
     )
     self.details:clear()
     for _, item in ipairs(rows) do
@@ -304,6 +440,44 @@ function ISPNCRelationshipDebugWindow:refreshDetails()
     self.lastRelationshipReceiveAt =
         tonumber(ClientState.lastRelationshipDebugReceiveAt)
         or PNC.Core.Now()
+end
+
+function ISPNCRelationshipDebugWindow:onActionChanged()
+    self:refreshDetails()
+end
+
+function ISPNCRelationshipDebugWindow:onContext(button)
+    if button.internal == "context_minus" then
+        self.contextBonus = math.max(
+            -100,
+            (tonumber(self.contextBonus) or 0) - 5
+        )
+    elseif button.internal == "context_plus" then
+        self.contextBonus = math.min(
+            100,
+            (tonumber(self.contextBonus) or 0) + 5
+        )
+    else
+        self.contextBonus = 0
+    end
+    self:refreshDetails()
+end
+
+function ISPNCRelationshipDebugWindow:onPacification(button)
+    local observer = self:getObserver()
+    local target = self:getTarget()
+    if not observer or not target
+        or target.kind ~= "current_player"
+        or not PNC.Client
+    then
+        return
+    end
+    PNC.Client.SendDebug("relationship_pacification", {
+        observerNPCID = observer.id,
+        mode = button.internal == "clear_pacification"
+            and "clear" or "pacify",
+        durationHours = 24,
+    })
 end
 
 function ISPNCRelationshipDebugWindow:onRefresh()
@@ -360,7 +534,19 @@ function ISPNCRelationshipDebugWindow:prerender()
     end
     local enabled = signature ~= nil
     for index = 2, #self.controls do
-        self.controls[index]:setEnable(enabled)
+        local button = self.controls[index]
+        local pacificationControl =
+            button.internal == "pacify_24h"
+            or button.internal == "clear_pacification"
+        button:setEnable(
+            enabled
+            and (
+                not pacificationControl
+                or self:getTarget()
+                    and self:getTarget().kind
+                        == "current_player"
+            )
+        )
     end
     PsychopatzWindow.prerender(self)
 end
@@ -370,6 +556,13 @@ function ISPNCRelationshipDebugWindow:render()
     if not self.layout then
         return
     end
+    UI.DrawSectionTitle(
+        self,
+        "Approval / respect outcome map",
+        self.layout.graph.x,
+        self.layout.graph.y - Layout.Pixels(21, self.uiScale),
+        self.layout.graph.width
+    )
     UI.DrawSectionTitle(
         self,
         "Observer NPC",
@@ -423,7 +616,7 @@ function RelationshipUI.Open(observerNPCID)
             responsiveSpec = {
                 width = 1180,
                 height = 760,
-                minWidth = 760,
+                minWidth = 980,
                 minHeight = 500,
                 maxWidth = 1420,
                 maxHeight = 920,

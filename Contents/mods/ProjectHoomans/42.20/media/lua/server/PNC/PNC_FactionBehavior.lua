@@ -170,7 +170,7 @@ function Behavior.ResolveIntent(observerRecord, target, context)
         targetFactionID
     ) or nil
     local at = tonumber(context.worldAgeHours)
-        or tonumber(relation and relation.lastEvaluatedAt) or 0
+        or currentWorldAgeHours()
     local state = relation
         and PNC.FactionDiplomacyMath.ResolveState(relation, at)
         or "unknown"
@@ -186,6 +186,21 @@ function Behavior.ResolveIntent(observerRecord, target, context)
             targetIsOwner
             or observerFaction.playerMemberKeys[targetKey] == true
         )
+    local pacification = targetKey
+        and EntityRef.IsPlayer(targetKey)
+        and Factions.GetPlayerPacification
+        and Factions.GetPlayerPacification(
+            observerFactionID,
+            targetKey,
+            at
+        ) or nil
+    local runtimeSelfDefense = (
+        tonumber(
+            observerRecord.runtime
+                and observerRecord.runtime
+                    .factionSelfDefenseUntil
+        ) or 0
+    ) > Core.Now()
     local spec = {
         archetypeID = observerFaction.archetypeID,
         policy = observerFaction.policy,
@@ -194,14 +209,21 @@ function Behavior.ResolveIntent(observerRecord, target, context)
         samePlayerOwnedFaction = samePlayerOwnedFaction,
         targetIsOwner = targetIsOwner,
         commandable = commandable,
+        playerPacified = pacification ~= nil,
+        playerPacifiedUntil = pacification
+            and pacification.untilWorldAgeHours or 0,
+        playerPacificationReason = pacification
+            and pacification.reason or nil,
         atWar = relation and relation.atWar == true,
         allied = relation and relation.allied == true,
         activeTruce = relation
             and relation.truceUntil > at,
         personalState = personal and personal.state,
         immediateSelfDefense =
-            context.immediateSelfDefense == true,
-        targetAggression = context.targetAggression == true,
+            context.immediateSelfDefense == true
+            or runtimeSelfDefense,
+        targetAggression = context.targetAggression == true
+            or runtimeSelfDefense,
         observerStrength = context.observerStrength,
         targetStrength = context.targetStrength,
     }
@@ -388,16 +410,61 @@ function Behavior.ApplyNPC(record, reason)
         }
         return apply(record, "player_owned", owner, reason)
     end
-    aggressive = Factions.IsFactionAtWar(factionID)
+    aggressive = faction.archetypeID == "looter"
+        or Archetypes.IsHostileToOutsiders(
+            faction.archetypeID
+        )
+        or Factions.IsFactionAtWar(factionID)
     return apply(
         record,
         aggressive and "aggressive" or "neutral",
         {
             attackPlayers =
-                factionAtWarWithPlayerFaction(factionID),
+                faction.archetypeID == "looter"
+                or Archetypes.IsHostileToOutsiders(
+                    faction.archetypeID
+                )
+                or factionAtWarWithPlayerFaction(factionID),
         },
         reason
     )
+end
+
+function Behavior.ReconcilePlayerPacification(
+    factionID,
+    playerKey,
+    reason
+)
+    local faction = Factions.Registry.byID[factionID]
+    local cleared = 0
+    if not faction or not EntityRef.IsPlayer(playerKey) then
+        return 0
+    end
+    for npcID, _ in pairs(faction.memberIDs or {}) do
+        local record = PNC.Registry.Get(npcID)
+        local target = record and record.runtime
+            and record.runtime.target or nil
+        local targetKey = target
+            and target.kind == "player"
+            and target.player
+            and playerEntityKey(target.player) or nil
+        if targetKey == playerKey then
+            clearCombatRuntime(record)
+            record.runtime.factionBehaviorReason =
+                tostring(reason or "player_pacified")
+            if PNC.SimulationClock
+                and PNC.SimulationClock.Wake
+            then
+                PNC.SimulationClock.Wake(
+                    record,
+                    nil,
+                    Core.Now()
+                )
+            end
+            cleared = cleared + 1
+        end
+    end
+    return cleared
 end
 
 function Behavior.ApplyUnaffiliated(record, reason)

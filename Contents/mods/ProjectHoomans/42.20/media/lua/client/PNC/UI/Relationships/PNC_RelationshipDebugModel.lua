@@ -4,6 +4,7 @@ PNC = PNC or {}
 PNC.RelationshipDebugModel = PNC.RelationshipDebugModel or {}
 
 local Model = PNC.RelationshipDebugModel
+local Graph = PNC.RelationshipGraph
 
 local function row(label, value, tone)
     return {
@@ -229,7 +230,81 @@ function Model.BuildTargets(roster, observerNPCID)
     return targets
 end
 
-function Model.BuildRows(snapshot, authorized, reason)
+function Model.BuildGraph(snapshot, actionID, context)
+    local relationship = snapshot and snapshot.relationship or {}
+    if not Graph or not Graph.Evaluate then return nil end
+    context = type(context) == "table" and context or {}
+    local modifiers = {}
+    local profile = snapshot and snapshot.observer
+        and snapshot.observer.personality or {}
+    local policy = snapshot and snapshot.observer
+        and snapshot.observer.faction
+        and snapshot.observer.faction.policy or {}
+    local function modifier(id, label, value)
+        value = tonumber(value) or 0
+        if math.abs(value) < 0.01 then return end
+        modifiers[#modifiers + 1] = {
+            id = id,
+            label = label,
+            value = value,
+        }
+    end
+    if actionID == "request_mercy" then
+        modifier(
+            "compassion",
+            "Extorter compassion",
+            (tonumber(profile.compassion) or 0) * 20
+        )
+        modifier(
+            "materialism",
+            "Extorter materialism",
+            -(tonumber(profile.materialism) or 0) * 15
+        )
+        modifier(
+            "aggression",
+            "Extorter aggression",
+            -(tonumber(profile.aggression) or 0) * 20
+        )
+    elseif actionID == "challenge_extorter" then
+        modifier(
+            "caution",
+            "Faction caution",
+            (tonumber(policy.caution) or 0) * 15
+        )
+        modifier(
+            "aggression",
+            "Extorter aggression",
+            -(tonumber(profile.aggression) or 0) * 15
+        )
+    elseif actionID == "offer_less" then
+        modifier(
+            "materialism",
+            "Extorter materialism",
+            -(tonumber(profile.materialism) or 0) * 12
+        )
+    end
+    modifier(
+        "manual_debug",
+        "Manual debug context",
+        context.bonus
+    )
+    return Graph.Evaluate(
+        relationship.approval,
+        relationship.respect,
+        actionID or "inspect",
+        {
+            modifiers = modifiers,
+            neutralBand = context.neutralBand,
+        }
+    )
+end
+
+function Model.BuildRows(
+    snapshot,
+    authorized,
+    reason,
+    graphEvaluation
+)
     local rows = {}
     local observer
     local target
@@ -300,6 +375,67 @@ function Model.BuildRows(snapshot, authorized, reason)
             snapshot.factionIntent.attackAllowed
                 and "danger" or "success"
         )
+    end
+    if snapshot.playerPacification then
+        rows[#rows + 1] = row(
+            "Player pacification",
+            tostring(snapshot.playerPacification.reason)
+                .. " / until "
+                .. number(
+                    snapshot.playerPacification
+                        .untilWorldAgeHours,
+                    3
+                ) .. " h",
+            "success"
+        )
+    elseif target.kind == "player" then
+        rows[#rows + 1] = row(
+            "Player pacification",
+            "inactive",
+            "textMuted"
+        )
+    end
+    if snapshot.pacificationAction then
+        rows[#rows + 1] = row(
+            "Pacification action",
+            tostring(snapshot.pacificationAction.reason),
+            snapshot.pacificationAction.ok
+                and "success" or "warning"
+        )
+    end
+    graphEvaluation = graphEvaluation
+        or Model.BuildGraph(snapshot, "inspect")
+    if graphEvaluation then
+        rows[#rows + 1] = row(
+            "Derived attitude",
+            tostring(graphEvaluation.attitude)
+        )
+        rows[#rows + 1] = row(
+            "Selected interaction",
+            tostring(graphEvaluation.requirement.label)
+        )
+        if graphEvaluation.requirement.enabled then
+            rows[#rows + 1] = row(
+                "Interaction score",
+                number(graphEvaluation.finalScore)
+                    .. " / threshold "
+                    .. number(graphEvaluation.threshold)
+            )
+            rows[#rows + 1] = row(
+                "Inside green region",
+                tostring(
+                    graphEvaluation.insideSuccessRegion
+                ),
+                graphEvaluation.insideSuccessRegion
+                    and "success" or "warning"
+            )
+            rows[#rows + 1] = row(
+                "Score components",
+                "base=" .. number(graphEvaluation.baseScore)
+                    .. " context="
+                    .. signed(graphEvaluation.contextBonus)
+            )
+        end
     end
     rows[#rows + 1] = row(
         "Snapshot world age",

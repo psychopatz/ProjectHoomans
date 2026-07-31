@@ -12,20 +12,21 @@ It deliberately separates four concepts:
 - legacy `record.faction` is derived tactical compatibility state.
 
 `record.affiliation.factionID` is canonical membership. Assigning an NPC to a
-looter organization removes player ownership, but the archetype is not itself
-permission to attack. Tactical intent combines faction policy, the directed
-relation, official treaties, relative strength, and immediate self-defense.
+looter organization removes player ownership and applies the looter
+archetype's default outsider hostility. Tactical intent combines faction
+policy, the directed relation, official treaties, player-scoped exceptions,
+and immediate self-defense.
 
 This phase does not implement territory, economy, raids, autonomous strategy,
 dialogue, diplomacy UI for ordinary players, or faction simulation.
 
-## Persistence Schema V4
+## Persistence Schema V5
 
 The authority owns the separate `PNC_Factions` Global ModData table:
 
 ```lua
 {
-    schemaVersion = 4,
+    schemaVersion = 5,
     revision = 0,
     byID = {
         faction_123 = {
@@ -74,6 +75,17 @@ The authority owns the separate `PNC_Factions` Global ModData table:
                     },
                 },
                 revision = 0,
+            },
+            playerPacifications = {
+                ["player:Patrick:char_f8d31a"] = {
+                    schemaVersion = 1,
+                    playerKey = "player:Patrick:char_f8d31a",
+                    createdAt = 182.5,
+                    untilWorldAgeHours = 206.5,
+                    reason = "extortion_bribe",
+                    sourceNPCID = "npc_123",
+                    revision = 1,
+                },
             },
             relations = {
                 faction_456 = {
@@ -273,11 +285,24 @@ archetype policy, then personal disposition.
   player-character UUID;
 - war allows attack/pursuit against the opposing faction;
 - truce prevents attack;
-- neutral looters threaten or avoid stronger targets but do not automatically
-  attack;
-- a hostile predatory looter attacks only with sufficient policy aggression
-  and a clear strength advantage;
+- looters attack outside players and NPC factions by default, even when no
+  official war record exists;
+- `playerPacifications[playerKey]` can suppress proactive attacks against one
+  stable player character until a deterministic world-age-hour timestamp;
+- immediate self-defense overrides a player pacification;
 - traders tolerate, refugees avoid, and settlers observe neutral outsiders.
+
+Player pacification is a narrow future extortion/bribery hook, not an
+alliance, truce, friendship score, or account-wide exemption. The public
+server APIs are `PacifyForPlayer`, `PacifyForRuntimePlayer`,
+`GetPlayerPacification`, `IsPacifiedForPlayer`,
+`ClearPlayerPacification`, and `PrunePlayerPacifications`. The default
+duration is 24 world-age hours. Expiry is checked on reads and targeting;
+physical removal is an explicit prune operation.
+
+V4 faction records migrate to V5 by receiving an empty
+`playerPacifications` map. Normalization is deterministic, bounded to 64
+entries, serialization-safe, and idempotent.
 
 The legacy tactical bridge sets external peaceful members to neutral roaming.
 It uses hostile-hunt compatibility state only while the faction has an active
