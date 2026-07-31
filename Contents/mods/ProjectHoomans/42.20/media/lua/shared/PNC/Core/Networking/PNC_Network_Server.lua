@@ -513,6 +513,33 @@ function Network.SendFactionDebug(
     end
 end
 
+function Network.SendFactionMembers(
+    targetPlayer,
+    snapshot,
+    reason
+)
+    local payload = {
+        snapshot = snapshot,
+        reason = reason,
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(
+            targetPlayer,
+            Const.MODULE,
+            Const.CMD_FACTION_MEMBERS,
+            payload
+        )
+    elseif not isServer or not isServer() then
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_FACTION_MEMBERS,
+            payload
+        )
+    end
+end
+
 function Network.SendCommunityDebug(
     targetPlayer,
     snapshot,

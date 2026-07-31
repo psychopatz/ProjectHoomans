@@ -576,6 +576,35 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_FACTION_MEMBERS_REQUEST then
+        local snapshot
+        local reason
+        snapshot, reason =
+            PNC.FactionMembership.BuildSnapshot(player)
+        Network.SendFactionMembers(
+            player,
+            snapshot,
+            reason
+        )
+        return
+    end
+
+    if command == Const.CMD_FACTION_MEMBER_ACTION then
+        local snapshot
+        local reason
+        snapshot, reason =
+            PNC.FactionMembership.PerformAction(
+                player,
+                args or {}
+            )
+        Network.SendFactionMembers(
+            player,
+            snapshot,
+            reason
+        )
+        return
+    end
+
     if command == Const.CMD_COMMUNITY_DEBUG_REQUEST then
         if not canUseDebug(player) then
             Network.SendCommunityDebug(

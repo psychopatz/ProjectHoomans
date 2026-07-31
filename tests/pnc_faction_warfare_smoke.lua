@@ -132,6 +132,7 @@ PNC.Network = {
 }
 
 local playerKey = "player:Patrick:char_player"
+local memberKey = "player:Alex:char_member"
 local player = {
     uuid = "char_player",
     getUsername = function() return "Patrick" end,
@@ -139,7 +140,40 @@ local player = {
     getOnlineID = function() return 7 end,
 }
 PNC.PlayerCharacters = {
-    RuntimeByUUID = { char_player = player },
+    Registry = {
+        byUUID = {
+            char_player = {
+                uuid = "char_player",
+                accountIdentity = "Patrick",
+                displayName = "Patrick",
+                status = "active",
+            },
+            char_member = {
+                uuid = "char_member",
+                accountIdentity = "Alex",
+                displayName = "Alex",
+                status = "active",
+            },
+            char_join = {
+                uuid = "char_join",
+                accountIdentity = "Morgan",
+                displayName = "Morgan",
+                status = "active",
+            },
+        },
+    },
+    RuntimeByUUID = {
+        char_player = player,
+        char_member = {
+            uuid = "char_member",
+            getUsername = function() return "Alex" end,
+        },
+        char_join = {
+            uuid = "char_join",
+            getUsername = function() return "Morgan" end,
+        },
+    },
+    EnsureLoaded = function() return true end,
     GetCharacterUUID = function(value)
         return value and value.uuid
     end,
@@ -182,6 +216,7 @@ local traderNPC = npc("npc_trader")
 dofile(SERVER .. "PNC_FactionService.lua")
 dofile(SERVER .. "PNC_FactionIncidentService.lua")
 dofile(SERVER .. "PNC_FactionBehavior.lua")
+dofile(SERVER .. "PNC_FactionMembershipService.lua")
 dofile(SHARED .. "Relationships/PNC_Relationships.lua")
 dofile(SHARED .. "Commands/PNC_CompanionCommandRegistry.lua")
 
@@ -209,6 +244,25 @@ equal(playerFaction.ownerPlayerKey, playerKey,
     "stable player owner key")
 equal(Factions.GetPlayerFaction(player).id,
     playerFaction.id, "player faction lookup")
+truthy(Factions.AddPlayerMember(
+    playerFaction.id,
+    memberKey,
+    { actorKey = playerKey }
+), "owner adds second player member")
+equal(Factions.Registry.byPlayerKey[memberKey],
+    playerFaction.id, "second player indexed")
+truthy(Factions.TransferPlayerLeadership(
+    playerFaction.id,
+    memberKey,
+    { actorKey = playerKey }
+), "leadership transfers to player member")
+equal(Factions.Get(playerFaction.id).ownerPlayerKey,
+    memberKey, "one transferred player leader")
+truthy(Factions.TransferPlayerLeadership(
+    playerFaction.id,
+    playerKey,
+    { actorKey = memberKey }
+), "leadership transfers back")
 
 local _, _, looterFaction = Factions.Create({
     name = "Mill Looters",
@@ -634,6 +688,75 @@ truthy(PNC.FactionTypes.AreEqual(
     migrated,
     PNC.FactionTypes.NormalizeFactionRegistry(migrated)
 ), "V5 faction migration idempotent")
+
+local memberSnapshot = PNC.FactionMembership.BuildSnapshot(player)
+equal(memberSnapshot.faction.id, playerFaction.id,
+    "membership snapshot is scoped to actor faction")
+equal(memberSnapshot.canManage, true,
+    "faction owner can manage players")
+equal(#memberSnapshot.playerMembers, 2,
+    "membership snapshot lists player members")
+equal(#memberSnapshot.availablePlayers, 1,
+    "membership snapshot lists eligible online player")
+memberSnapshot = PNC.FactionMembership.PerformAction(player, {
+    memberAction = "add_player",
+    playerKey = "player:Morgan:char_join",
+})
+equal(memberSnapshot.actionResult.ok, true,
+    "membership channel adds selected player")
+equal(#memberSnapshot.playerMembers, 3,
+    "added player appears in snapshot")
+memberSnapshot = PNC.FactionMembership.PerformAction(player, {
+    memberAction = "banish_player",
+    playerKey = "player:Morgan:char_join",
+})
+equal(memberSnapshot.actionResult.ok, true,
+    "membership channel banishes selected player")
+equal(Factions.Registry.byPlayerKey[
+    "player:Morgan:char_join"
+], nil, "banished player index removed")
+saveSafe(memberSnapshot)
+
+-- Player-character death removes the dead UUID. A living player member
+-- succeeds first; when no player successor remains, the organization becomes
+-- a neutral refugee faction instead of lingering as a duplicate player
+-- faction.
+PNC.PlayerCharacters.Registry.byUUID.char_player.status = "dead"
+truthy(Factions.HandlePlayerCharacterDeath(
+    playerKey,
+    hour + 3
+), "dead owner reconciled")
+equal(Factions.Get(playerFaction.id).ownerPlayerKey,
+    memberKey, "living player member succeeds")
+equal(Factions.Registry.byPlayerKey[playerKey], nil,
+    "dead player faction index removed")
+PNC.PlayerCharacters.Registry.byUUID.char_member.status = "dead"
+truthy(Factions.HandlePlayerCharacterDeath(
+    memberKey,
+    hour + 4
+), "last player leader reconciled")
+local refugeeFaction = Factions.Get(playerFaction.id)
+equal(refugeeFaction.ownerPlayerKey, nil,
+    "refugee faction has no player owner")
+equal(refugeeFaction.archetypeID, "refugee",
+    "orphaned player faction becomes refugees")
+equal(refugeeFaction.name, "Patrick Refugees",
+    "orphaned faction receives distinct refugee name")
+equal(Factions.Registry.byPlayerKey[memberKey], nil,
+    "last dead player faction index removed")
+equal(playerNPC.affiliation.factionID, playerFaction.id,
+    "surviving NPC remains with refugee faction")
+equal(playerNPC.faction, "neutral",
+    "former companion becomes neutral refugee")
+equal(playerNPC.recruited, false,
+    "former companion is no longer recruited")
+equal(playerNPC.presenceRevision, 9,
+    "player death reconciliation leaves presence revision")
+local reconciledRevision = Factions.Registry.revision
+equal(Factions.ReconcilePlayerMemberships(hour + 5), 0,
+    "repeat player membership reconciliation is idempotent")
+equal(Factions.Registry.revision, reconciledRevision,
+    "idempotent reconciliation leaves registry revision")
 saveSafe(Factions.Registry)
 
 print("pnc_faction_warfare_smoke: ok")

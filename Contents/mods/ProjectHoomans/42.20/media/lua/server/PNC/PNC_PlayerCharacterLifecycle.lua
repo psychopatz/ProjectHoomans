@@ -90,10 +90,11 @@ end
 function Lifecycle.OnPlayerDeath(first, second)
     local player = callbackPlayer(first, second)
     if player and service() then
+        local at = worldAgeHours()
         local entityKey = service().GetEntityKey
             and service().GetEntityKey(player, {
                 callback = "OnPlayerDeath",
-                worldAgeHours = worldAgeHours(),
+                worldAgeHours = at,
             }) or nil
         local faction = PNC.Factions
             and PNC.Factions.GetPlayerFaction
@@ -101,13 +102,21 @@ function Lifecycle.OnPlayerDeath(first, second)
             or nil
         local changed, reason = service().MarkDead(
             player,
-            worldAgeHours(),
+            at,
             "OnPlayerDeath"
         )
+        if entityKey and PNC.Factions
+            and PNC.Factions.HandlePlayerCharacterDeath
+        then
+            PNC.Factions.HandlePlayerCharacterDeath(
+                entityKey,
+                at
+            )
+        end
         if PNC.FactionTelemetry then
             PNC.FactionTelemetry.RecordCallback({
                 operation = "player_death",
-                worldAgeHours = worldAgeHours(),
+                worldAgeHours = at,
                 actorKey = entityKey,
                 sourceFactionID = faction and faction.id or nil,
                 result = changed and "accepted" or "rejected",
@@ -201,6 +210,11 @@ function Lifecycle.Pump(now, force)
                 at
             )
         end
+    end
+    if PNC.Factions
+        and PNC.Factions.ReconcilePlayerMemberships
+    then
+        PNC.Factions.ReconcilePlayerMemberships(at)
     end
     return staleCount, "pumped"
 end

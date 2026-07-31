@@ -322,10 +322,41 @@ the same account is a different social/faction person and cannot inherit
 command authority.
 
 Add rejects unintended dual membership. Transfer changes source/destination
-indexes and history atomically. Leadership requires a living member. Removing
-or killing a leader clears leadership without inventing a successor.
+indexes and history atomically. A player faction has exactly one player
+leader in `ownerPlayerKey`; all other stable player keys are members.
+Leader-authorized membership mutations can add an active character, banish a
+non-leader, or transfer leadership to another active member.
+
+Player death reconciliation is deterministic and idempotent:
+
+1. the dead character UUID is removed from faction membership and the reverse
+   player index;
+2. if that character was the player leader, the lexicographically first
+   remaining active player member becomes leader;
+3. if there is no active player successor, the same persistent faction is
+   renamed from `... Survivors` to `... Refugees`, converted to the `refugee`
+   archetype and refugee policy, and stripped of all player command ownership;
+4. surviving NPC members remain together, receive refugee-compatible roles,
+   and one deterministic living NPC becomes their organizational leader;
+5. official wars, alliances, and truces involving the disbanded player
+   organization end so former companions do not remain combat-authorized.
+
+The repair also runs after faction load and during the player lifecycle pump.
+This fixes saves in which an older dead character already left a duplicate
+active player faction. It does not use username matching and therefore never
+grants the replacement survivor the dead character's authority.
+
 Archiving preserves faction identity, removes current membership, and clears
 all symmetric treaty flags involving the archived faction.
+
+The normal-player **Faction Members and Commands** window uses a dedicated
+server-authoritative request/action channel rather than admin debug mutation.
+It shows player members, eligible online characters, and faction NPCs. Only
+the current player leader can add, banish, or transfer player membership.
+Every destructive or authority-changing action uses a confirmation modal.
+Any current player member may use the existing companion-command authority
+path for nearby faction NPCs; the window provides selected-NPC and group
+follow/stay controls plus selected-NPC attack-mode controls.
 
 ## Public API and Revisions
 
@@ -335,6 +366,11 @@ Copied reads include:
   `GetLeader`;
 - `GetNPCFaction`, `GetNPCAffiliation`, `IsMember`;
 - `GetPlayerFaction`, `GetFactionForPlayerKey`;
+- `AddPlayerMember`, `RemovePlayerMember`,
+  `TransferPlayerLeadership`;
+- `AddPlayerToCurrentFaction`, `BanishPlayerFromCurrentFaction`,
+  `TransferCurrentFactionLeadership`;
+- `HandlePlayerCharacterDeath`, `ReconcilePlayerMemberships`;
 - `SetEmblem`, `SetPlayerFactionEmblem`;
 - `GetRelation` (`GetDiplomacy` is a directed compatibility alias);
 - `AreAtWar`, `AreAllied`, `GetTruceUntil`, `IsFactionAtWar`;
@@ -480,7 +516,8 @@ coverage.
 ## Future Extension Points
 
 Current data can later support authored policy changes, faction reputation,
-negotiation, tribute, leadership succession, autonomous strategy, incident
-consolidation, communities, settlements, and normal-player diplomacy UI.
+negotiation, tribute, invitation/acceptance workflows, autonomous strategy,
+incident consolidation, communities, settlements, and normal-player
+diplomacy UI.
 Those systems must consume the existing authority API rather than mutate
 relations or treaty flags directly.

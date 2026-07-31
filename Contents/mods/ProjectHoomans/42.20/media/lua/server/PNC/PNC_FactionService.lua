@@ -360,6 +360,13 @@ function Factions.Load()
     Factions.Loaded = true
     Factions.Dirty = not Types.AreEqual(raw, normalized)
     rebuildIndexes()
+    if Factions.ReconcilePlayerMemberships then
+        Factions.ReconcilePlayerMemberships(
+            getGameTime and getGameTime()
+                and getGameTime().getWorldAgeHours
+                and getGameTime():getWorldAgeHours() or 0
+        )
+    end
     if PNC.FactionBehavior
         and PNC.FactionBehavior.ReconcileAll
     then
@@ -1074,6 +1081,523 @@ function Factions.GetPlayerFaction(player)
     )
     if not playerKey then return nil, reason end
     return Factions.GetFactionForPlayerKey(playerKey)
+end
+
+local function playerCharacterRecord(playerKey)
+    local parsed = EntityRef.Parse(playerKey)
+    if not parsed or parsed.kind ~= "player"
+        or not PNC.PlayerCharacters
+    then
+        return nil
+    end
+    if PNC.PlayerCharacters.EnsureLoaded then
+        PNC.PlayerCharacters.EnsureLoaded()
+    end
+    return PNC.PlayerCharacters.Registry
+        and PNC.PlayerCharacters.Registry.byUUID
+        and PNC.PlayerCharacters.Registry.byUUID[
+            parsed.characterUUID
+        ] or nil
+end
+
+local function activePlayerMemberKeys(faction)
+    local output = {}
+    for playerKey, enabled in pairs(
+        faction and faction.playerMemberKeys or {}
+    ) do
+        local record = enabled == true
+            and playerCharacterRecord(playerKey) or nil
+        if record and record.status == "active" then
+            output[#output + 1] = playerKey
+        end
+    end
+    table.sort(output)
+    return output
+end
+
+local function membershipActorAllowed(faction, options)
+    options = type(options) == "table" and options or {}
+    if options.system == true then return true end
+    return EntityRef.IsPlayer(options.actorKey)
+        and faction.ownerPlayerKey == options.actorKey
+end
+
+function Factions.AddPlayerMember(
+    factionID,
+    playerKey,
+    options
+)
+    local faction
+    local character
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    options = type(options) == "table" and options or {}
+    faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    if faction.status ~= "active" then
+        return false, "faction_not_active"
+    end
+    if not membershipActorAllowed(faction, options) then
+        return false, "not_faction_owner"
+    end
+    if not EntityRef.IsPlayer(playerKey) then
+        return false, "invalid_player_key"
+    end
+    character = playerCharacterRecord(playerKey)
+    if not character then
+        return false, "player_character_not_found"
+    end
+    if character.status ~= "active" then
+        return false, "player_character_not_active"
+    end
+    if faction.playerMemberKeys[playerKey] == true then
+        return false, "already_member"
+    end
+    if Factions.Registry.byPlayerKey[playerKey] then
+        return false, "player_already_affiliated"
+    end
+    faction.playerMemberKeys[playerKey] = true
+    Factions.Registry.byPlayerKey[playerKey] = faction.id
+    touchFaction(faction)
+    touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileFaction
+    then
+        PNC.FactionBehavior.ReconcileFaction(
+            faction.id,
+            "player_member_added"
+        )
+    end
+    return true, "player_member_added", copy(faction)
+end
+
+function Factions.RemovePlayerMember(
+    factionID,
+    playerKey,
+    options
+)
+    local faction
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    options = type(options) == "table" and options or {}
+    faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    if not membershipActorAllowed(faction, options) then
+        return false, "not_faction_owner"
+    end
+    if faction.playerMemberKeys[playerKey] ~= true then
+        return false, "not_member"
+    end
+    if faction.ownerPlayerKey == playerKey
+        and options.system ~= true
+    then
+        return false, "cannot_banish_faction_owner"
+    end
+    faction.playerMemberKeys[playerKey] = nil
+    if Factions.Registry.byPlayerKey[playerKey] == faction.id then
+        Factions.Registry.byPlayerKey[playerKey] = nil
+    end
+    if faction.ownerPlayerKey == playerKey then
+        faction.ownerPlayerKey = nil
+    end
+    touchFaction(faction)
+    touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileFaction
+    then
+        PNC.FactionBehavior.ReconcileFaction(
+            faction.id,
+            tostring(options.reason or "player_member_removed")
+        )
+    end
+    return true, "player_member_removed", copy(faction)
+end
+
+function Factions.TransferPlayerLeadership(
+    factionID,
+    playerKey,
+    options
+)
+    local faction
+    local character
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    options = type(options) == "table" and options or {}
+    faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    if not membershipActorAllowed(faction, options) then
+        return false, "not_faction_owner"
+    end
+    if faction.playerMemberKeys[playerKey] ~= true then
+        return false, "target_not_member"
+    end
+    character = playerCharacterRecord(playerKey)
+    if not character or character.status ~= "active" then
+        return false, "player_character_not_active"
+    end
+    if faction.ownerPlayerKey == playerKey then
+        return false, "unchanged"
+    end
+    faction.ownerPlayerKey = playerKey
+    touchFaction(faction)
+    touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileFaction
+    then
+        PNC.FactionBehavior.ReconcileFaction(
+            faction.id,
+            tostring(options.reason or "leadership_transferred")
+        )
+    end
+    return true, "leadership_transferred", copy(faction)
+end
+
+local function actorFaction(player, callback)
+    local actorKey
+    local reason
+    local faction
+    actorKey, reason = playerKeyFor(
+        player,
+        callback,
+        true
+    )
+    if not actorKey then return nil, nil, reason end
+    faction, reason = Factions.GetFactionForPlayerKey(actorKey)
+    if not faction then return nil, actorKey, reason end
+    return faction, actorKey
+end
+
+function Factions.AddPlayerToCurrentFaction(
+    player,
+    targetPlayerKey
+)
+    local faction, actorKey, reason = actorFaction(
+        player,
+        "add_player_faction_member"
+    )
+    if not faction then return false, reason end
+    return Factions.AddPlayerMember(
+        faction.id,
+        targetPlayerKey,
+        { actorKey = actorKey }
+    )
+end
+
+function Factions.BanishPlayerFromCurrentFaction(
+    player,
+    targetPlayerKey,
+    worldAgeHours
+)
+    local faction, actorKey, reason = actorFaction(
+        player,
+        "banish_player_faction_member"
+    )
+    if not faction then return false, reason end
+    return Factions.RemovePlayerMember(
+        faction.id,
+        targetPlayerKey,
+        {
+            actorKey = actorKey,
+            reason = "banished",
+            worldAgeHours = worldAgeHours,
+        }
+    )
+end
+
+function Factions.TransferCurrentFactionLeadership(
+    player,
+    targetPlayerKey
+)
+    local faction, actorKey, reason = actorFaction(
+        player,
+        "transfer_player_faction_leadership"
+    )
+    if not faction then return false, reason end
+    return Factions.TransferPlayerLeadership(
+        faction.id,
+        targetPlayerKey,
+        {
+            actorKey = actorKey,
+            reason = "leader_transfer",
+        }
+    )
+end
+
+local function refugeeFactionName(faction)
+    local base = tostring(faction.name or "Former Survivors")
+    local stripped = string.match(base, "^(.-)%s+Survivors$")
+    if stripped and stripped ~= "" then base = stripped end
+    if not string.match(base, "%s+Refugees$") then
+        base = base .. " Refugees"
+    end
+    base = string.sub(base, 1, Constants.NAME_MAX_LENGTH)
+    for otherID, other in pairs(Factions.Registry.byID or {}) do
+        if otherID ~= faction.id and other.name == base then
+            local suffix = " " .. string.sub(faction.id, -6)
+            base = string.sub(
+                base,
+                1,
+                Constants.NAME_MAX_LENGTH - #suffix
+            ) .. suffix
+            break
+        end
+    end
+    return base
+end
+
+local function endFactionTreaties(faction, at)
+    local reconcileIDs = {}
+    for otherID, relation in pairs(faction.relations or {}) do
+        local other = registryRecord(otherID)
+        local reverse = other and other.relations
+            and other.relations[faction.id] or nil
+        local changed = relation.atWar == true
+            or relation.allied == true
+            or (tonumber(relation.truceUntil) or 0) > 0
+            or reverse and (
+                reverse.atWar == true
+                or reverse.allied == true
+                or (tonumber(reverse.truceUntil) or 0) > 0
+            )
+        if changed then
+            for _, item in ipairs({ relation, reverse }) do
+                if item then
+                    item.atWar = false
+                    item.allied = false
+                    item.truceUntil = 0
+                    item.warEndedAt = at
+                    item.state =
+                        PNC.FactionDiplomacyMath.ResolveState(
+                            item,
+                            at
+                        )
+                    item.revision = math.max(
+                        0,
+                        math.floor(tonumber(item.revision) or 0)
+                    ) + 1
+                end
+            end
+            if other then touchFaction(other) end
+            reconcileIDs[otherID] = true
+        end
+    end
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileFaction
+    then
+        for otherID, _ in pairs(reconcileIDs) do
+            PNC.FactionBehavior.ReconcileFaction(
+                otherID,
+                "player_faction_disbanded"
+            )
+        end
+    end
+end
+
+local function convertPlayerFactionToRefugees(
+    faction,
+    formerOwnerKey,
+    at
+)
+    local previousArchetypeID = faction.archetypeID
+    local livingMembers = {}
+    for npcID, _ in pairs(faction.memberIDs or {}) do
+        local record = PNC.Registry.Get(npcID)
+        if record and record.alive ~= false then
+            livingMembers[#livingMembers + 1] = npcID
+        end
+    end
+    table.sort(livingMembers)
+
+    Factions.Registry.byArchetype[previousArchetypeID] =
+        Factions.Registry.byArchetype[previousArchetypeID]
+        or {}
+    Factions.Registry.byArchetype[previousArchetypeID][
+        faction.id
+    ] = nil
+    Factions.Registry.byArchetype.refugee =
+        Factions.Registry.byArchetype.refugee or {}
+    Factions.Registry.byArchetype.refugee[faction.id] = true
+
+    faction.name = refugeeFactionName(faction)
+    faction.archetypeID = "refugee"
+    faction.policy = Types.NormalizePolicy(
+        {},
+        "refugee",
+        faction.id
+    )
+    for playerKey, _ in pairs(
+        faction.playerMemberKeys or {}
+    ) do
+        if Factions.Registry.byPlayerKey[playerKey]
+            == faction.id
+        then
+            Factions.Registry.byPlayerKey[playerKey] = nil
+        end
+    end
+    faction.ownerPlayerKey = nil
+    faction.playerMemberKeys = {}
+    faction.leaderNPCID = livingMembers[1]
+    faction.tags = faction.tags or {}
+    faction.tags.formerPlayerFaction = true
+    faction.tags.disbandReason = "player_leadership_ended"
+    if EntityRef.IsPlayer(formerOwnerKey) then
+        faction.tags.formerOwnerKey = formerOwnerKey
+    end
+    endFactionTreaties(faction, at)
+
+    for _, npcID in ipairs(livingMembers) do
+        local record = PNC.Registry.Get(npcID)
+        local affiliation = affiliationFor(record, faction)
+        if npcID == faction.leaderNPCID then
+            affiliation.role = "leader"
+            affiliation.rank = "leader"
+        else
+            if not Archetypes.IsRoleAllowed(
+                "refugee",
+                affiliation.role
+            ) then
+                affiliation.role =
+                    Archetypes.GetDefaultRole("refugee")
+            end
+            if affiliation.rank == "leader" then
+                affiliation.rank = "member"
+            end
+        end
+        commitAffiliation(
+            record,
+            Types.NormalizeAffiliation(affiliation, faction)
+        )
+    end
+
+    touchFaction(faction)
+    touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileFaction
+    then
+        PNC.FactionBehavior.ReconcileFaction(
+            faction.id,
+            "player_faction_became_refugees"
+        )
+    end
+    return true, "converted_to_refugees", copy(faction)
+end
+
+function Factions.HandlePlayerCharacterDeath(
+    playerKey,
+    worldAgeHours
+)
+    local factionID
+    local faction
+    local wasOwner
+    local successors
+    local at
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    if not EntityRef.IsPlayer(playerKey) then
+        return false, "invalid_player_key"
+    end
+    factionID = Factions.Registry.byPlayerKey[playerKey]
+    faction = factionID and registryRecord(factionID) or nil
+    if not faction
+        or faction.playerMemberKeys[playerKey] ~= true
+    then
+        return false, "player_not_affiliated"
+    end
+    at = finiteTimestamp(worldAgeHours, faction.createdAt)
+    wasOwner = faction.ownerPlayerKey == playerKey
+    faction.playerMemberKeys[playerKey] = nil
+    Factions.Registry.byPlayerKey[playerKey] = nil
+
+    if not wasOwner then
+        touchFaction(faction)
+        touchRegistry()
+        return true, "dead_member_removed", copy(faction)
+    end
+
+    faction.ownerPlayerKey = nil
+    successors = activePlayerMemberKeys(faction)
+    if #successors > 0 then
+        faction.ownerPlayerKey = successors[1]
+        touchFaction(faction)
+        touchRegistry()
+        if PNC.FactionBehavior
+            and PNC.FactionBehavior.ReconcileFaction
+        then
+            PNC.FactionBehavior.ReconcileFaction(
+                faction.id,
+                "player_leadership_succeeded"
+            )
+        end
+        return true, "leadership_succeeded", copy(faction)
+    end
+    return convertPlayerFactionToRefugees(
+        faction,
+        playerKey,
+        at
+    )
+end
+
+function Factions.ReconcilePlayerMemberships(worldAgeHours)
+    if not authority() then return 0, "not_authority" end
+    if not Factions.Loaded then Factions.EnsureLoaded() end
+    local removals = {}
+    for factionID, faction in pairs(
+        Factions.Registry.byID or {}
+    ) do
+        for playerKey, enabled in pairs(
+            faction.playerMemberKeys or {}
+        ) do
+            local character = enabled == true
+                and playerCharacterRecord(playerKey) or nil
+            if character and (
+                character.status == "dead"
+                or character.status == "retired"
+            ) then
+                removals[#removals + 1] = {
+                    factionID = factionID,
+                    playerKey = playerKey,
+                }
+            end
+        end
+    end
+    table.sort(removals, function(left, right)
+        if left.factionID ~= right.factionID then
+            return left.factionID < right.factionID
+        end
+        return left.playerKey < right.playerKey
+    end)
+    local changed = 0
+    for _, item in ipairs(removals) do
+        local ok = Factions.HandlePlayerCharacterDeath(
+            item.playerKey,
+            worldAgeHours
+        )
+        if ok then changed = changed + 1 end
+    end
+    for _, faction in pairs(
+        Factions.Registry.byID or {}
+    ) do
+        if faction.status == "active"
+            and faction.ownerPlayerKey == nil
+        then
+            local successors = activePlayerMemberKeys(faction)
+            if #successors > 0 then
+                faction.ownerPlayerKey = successors[1]
+                touchFaction(faction)
+                touchRegistry()
+                changed = changed + 1
+                if PNC.FactionBehavior
+                    and PNC.FactionBehavior.ReconcileFaction
+                then
+                    PNC.FactionBehavior.ReconcileFaction(
+                        faction.id,
+                        "player_leadership_repaired"
+                    )
+                end
+            end
+        end
+    end
+    return changed, changed > 0 and "reconciled" or "unchanged"
 end
 
 function Factions.GetPlayerPacification(

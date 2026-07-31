@@ -184,6 +184,36 @@ function Client.RequestFactionDebug(
     return snapshot ~= nil
 end
 
+function Client.RequestFactionMembers()
+    local player = getSpecificPlayer
+        and getSpecificPlayer(0) or nil
+    if not player then return false end
+    ClientState.lastFactionMembersRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not sendClientCommand then return false end
+        sendClientCommand(
+            player,
+            Const.MODULE,
+            Const.CMD_FACTION_MEMBERS_REQUEST,
+            {}
+        )
+        return true
+    end
+    if not PNC.FactionMembership
+        or not PNC.FactionMembership.BuildSnapshot
+    then
+        return false
+    end
+    local snapshot
+    local reason
+    snapshot, reason =
+        PNC.FactionMembership.BuildSnapshot(player)
+    ClientState.factionMembers = snapshot
+    ClientState.factionMembersReason = reason
+    ClientState.lastFactionMembersReceiveAt = Core.Now()
+    return snapshot ~= nil
+end
+
 function Client.RequestCommunityDebug(
     communityID,
     factionID,

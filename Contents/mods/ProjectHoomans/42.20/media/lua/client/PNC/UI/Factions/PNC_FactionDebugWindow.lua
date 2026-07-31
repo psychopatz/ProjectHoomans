@@ -3,6 +3,7 @@ require "ISUI/ISTextEntryBox"
 require "PNC/UI/Factions/PNC_FactionDebugModel"
 require "PNC/UI/Factions/PNC_FactionDebugOverlay"
 require "PNC/UI/Factions/PNC_FactionEmblemEditor"
+require "PNC/UI/Factions/PNC_FactionMemberWindow"
 
 PNC.FactionDebugUI = PNC.FactionDebugUI or {}
 
@@ -42,6 +43,7 @@ local CONTROLS = {
     { id = "presence_mode", titleKey = "UI_PNC_FactionPresenceMode", variant = "quiet", views = views("overview") },
     { id = "archive", titleKey = "UI_PNC_FactionArchive", variant = "danger", views = views("overview") },
     { id = "assign", titleKey = "UI_PNC_FactionAssignNPC", variant = "success", views = views("members") },
+    { id = "manage_player_members", titleKey = "UI_PNC_FactionManageMembers", variant = "success", views = views("members") },
     { id = "transfer", titleKey = "UI_PNC_FactionTransferNPC", variant = "default", views = views("members") },
     { id = "remove", titleKey = "UI_PNC_FactionRemoveNPC", variant = "danger", views = views("members") },
     { id = "leader", titleKey = "UI_PNC_FactionSetLeader", variant = "default", views = views("members") },
@@ -407,6 +409,10 @@ function ISPNCFactionDebugWindow:onAction(button)
         end
         return
     end
+    if internal == "manage_player_members" then
+        PNC.FactionMemberUI.Open()
+        return
+    end
     if internal == "create_player_faction"
         or internal == "edit_emblem"
     then
@@ -657,6 +663,9 @@ function ISPNCFactionDebugWindow:prerender()
         elseif internal == "assign" then
             enabled = faction ~= nil and npc ~= nil
                 and currentFactionID == nil
+        elseif internal == "manage_player_members" then
+            enabled = faction ~= nil
+                and playerFactionID == faction.id
         elseif internal == "transfer" then
             enabled = faction ~= nil and npc ~= nil
                 and currentFactionID ~= nil

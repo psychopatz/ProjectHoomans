@@ -17,6 +17,8 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     relationshipDebugAuthorized = false,
     factionDebug = nil,
     factionDebugAuthorized = false,
+    factionMembers = nil,
+    factionMembersReason = nil,
     communityDebug = nil,
     communityDebugAuthorized = false,
 }

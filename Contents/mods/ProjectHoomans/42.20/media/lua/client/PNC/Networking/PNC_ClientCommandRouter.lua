@@ -54,6 +54,15 @@ Internal.RegisterServerCommand(
 )
 
 Internal.RegisterServerCommand(
+    Const.CMD_FACTION_MEMBERS,
+    function(args)
+        ClientState.factionMembers = args.snapshot
+        ClientState.factionMembersReason = args.reason
+        ClientState.lastFactionMembersReceiveAt = Core.Now()
+    end
+)
+
+Internal.RegisterServerCommand(
     Const.CMD_COMMUNITY_DEBUG,
     function(args)
         ClientState.communityDebugAuthorized =
