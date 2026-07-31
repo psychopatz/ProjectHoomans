@@ -10,19 +10,26 @@ local Palette = PNC.NPCTypePalette
 
 local function roleLabel(value)
     value = tostring(value or "")
-    value = string.gsub(value, "_", " ")
-    return string.gsub(
-        value,
-        "(%a)([%w']*)",
-        function(first, rest)
-            -- Build 42.20's Kahlua string library does not expose
-            -- string.lower() reliably. Faction role IDs are normalized to
-            -- lowercase at the persistence boundary, so title-casing only
-            -- the first character is both sufficient and runtime-safe.
-            return string.upper(first)
-                .. rest
+    local output = {}
+    local capitalize = true
+    local index
+    for index = 1, #value do
+        local character = string.sub(value, index, index)
+        if character == "_" then
+            output[#output + 1] = " "
+            capitalize = true
+        else
+            if capitalize then
+                character = string.upper(character)
+                capitalize = false
+            end
+            output[#output + 1] = character
         end
-    )
+    end
+    -- Build 42.20's Kahlua string.gsub callback does not reliably pass
+    -- every capture. Role IDs are normalized lowercase identifiers, so a
+    -- small deterministic loop is safer than callback-based title casing.
+    return table.concat(output)
 end
 
 Conversation.FormatRoleLabel = roleLabel

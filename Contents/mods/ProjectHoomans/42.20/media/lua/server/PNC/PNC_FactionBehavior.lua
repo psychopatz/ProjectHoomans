@@ -99,10 +99,40 @@ local function targetContext(target)
             Factions.GetOrganizationalFactionID(target)
         return factionID, EntityRef.ForNPC(target.id), target
     end
-    local playerFaction = Factions.GetPlayerFaction(target)
+    local playerFaction =
+        Factions.GetPlayerDiplomacyFaction(target)
     return playerFaction and playerFaction.id or nil,
         playerEntityKey(target),
         nil
+end
+
+local function insideFactionCommunity(factionID, target)
+    if not target or not target.getX or not target.getY
+        or not PNC.Communities
+        or not PNC.Communities.GetForFaction
+        or not PNC.CommunityMath
+        or not PNC.CommunityMath.IsInsideHomeArea
+    then
+        return false
+    end
+    local x = target:getX()
+    local y = target:getY()
+    local z = target.getZ and target:getZ() or 0
+    for _, community in ipairs(
+        PNC.Communities.GetForFaction(factionID) or {}
+    ) do
+        if community.status == "active"
+            and PNC.CommunityMath.IsInsideHomeArea(
+                community,
+                x,
+                y,
+                z
+            )
+        then
+            return true
+        end
+    end
+    return false
 end
 
 function Behavior.ResolveIntent(observerRecord, target, context)
@@ -226,6 +256,16 @@ function Behavior.ResolveIntent(observerRecord, target, context)
             or runtimeSelfDefense,
         observerStrength = context.observerStrength,
         targetStrength = context.targetStrength,
+        territorialToll =
+            Factions.IsTerritorialTollFaction(
+                observerFaction
+            ),
+        targetInsideTerritory =
+            not targetRecord
+            and insideFactionCommunity(
+                observerFactionID,
+                target
+            ) or false,
     }
     local resolved = context.returnDebugTrace == true
         and PNC.FactionIntent.ResolveWithTrace(spec)
@@ -410,7 +450,12 @@ function Behavior.ApplyNPC(record, reason)
         }
         return apply(record, "player_owned", owner, reason)
     end
-    aggressive = faction.archetypeID == "looter"
+    local territorialToll =
+        Factions.IsTerritorialTollFaction(faction)
+    aggressive = (
+        faction.archetypeID == "looter"
+            and not territorialToll
+        )
         or Archetypes.IsHostileToOutsiders(
             faction.archetypeID
         )
@@ -421,6 +466,7 @@ function Behavior.ApplyNPC(record, reason)
         {
             attackPlayers =
                 faction.archetypeID == "looter"
+                    and not territorialToll
                 or Archetypes.IsHostileToOutsiders(
                     faction.archetypeID
                 )

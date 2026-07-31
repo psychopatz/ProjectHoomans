@@ -70,6 +70,21 @@ function Model.BuildFactionItems(snapshot)
     return output
 end
 
+function Model.BuildTargetFactionItems(snapshot)
+    local output = Model.BuildFactionItems(snapshot)
+    local provisional = snapshot
+        and snapshot.currentPlayerDiplomacyFaction or nil
+    if provisional then
+        output[#output + 1] = {
+            id = provisional.id,
+            label = provisional.name,
+            detail = "Player diplomacy identity / provisional",
+            faction = provisional,
+        }
+    end
+    return output
+end
+
 function Model.BuildNPCItems(snapshot)
     local output = {}
     for _, npc in ipairs(snapshot and snapshot.roster or {}) do
@@ -114,6 +129,16 @@ function Model.BuildRows(snapshot, authorized, reason)
         snapshot.currentPlayerFactionID
             and "success" or "warning"
     )
+    if snapshot.currentPlayerDiplomacyFactionID
+        and snapshot.currentPlayerDiplomacyFactionID
+            ~= snapshot.currentPlayerFactionID
+    then
+        rows[#rows + 1] = row(
+            "Diplomacy identity",
+            snapshot.currentPlayerDiplomacyFactionID,
+            "textMuted"
+        )
+    end
     faction = snapshot.selectedFaction
     if not faction then
         rows[#rows + 1] = row(

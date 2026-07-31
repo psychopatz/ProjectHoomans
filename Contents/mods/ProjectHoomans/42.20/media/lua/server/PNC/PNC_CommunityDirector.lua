@@ -273,6 +273,16 @@ function Director.GenerateForFaction(factionID, spec)
         at
     )
     if not community then return false, reason end
+    if faction.archetypeID == "looter"
+        and community.mode == "settled"
+        and Factions.MarkTerritorialTollFaction
+    then
+        Factions.MarkTerritorialTollFaction(
+            faction.id,
+            "settled_looter_community_generated"
+        )
+        faction = Factions.Get(faction.id) or faction
+    end
     site = community.site or site
     local count = normalizedGroupSize(spec.groupSize)
     local presenceMode =

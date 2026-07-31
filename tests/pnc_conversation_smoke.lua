@@ -80,13 +80,16 @@ dofile(ROOT .. "PNC/Conversation/PNC_ConversationDefinition.lua")
 dofile(ROOT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua")
 
 local originalStringLower = string.lower
+local originalStringGsub = string.gsub
 string.lower = nil
+string.gsub = nil
 assertEqual(
     PNC.Conversation.FormatRoleLabel("lead_scavenger"),
     "Lead Scavenger",
-    "role label does not depend on unavailable Kahlua string.lower"
+    "role label avoids unsupported Kahlua string callbacks"
 )
 string.lower = originalStringLower
+string.gsub = originalStringGsub
 
 local Time = PNC.Conversation.Time
 assertEqual(Time.Resolve(4.9), "twilight", "twilight band")

@@ -38,7 +38,8 @@ local function factionIDForEntityKey(key)
     end
     if parsed.kind == "player" then
         local faction =
-            PNC.Factions.GetFactionForPlayerKey(key)
+            PNC.Factions
+                .GetDiplomacyFactionForPlayerKey(key)
         return faction and faction.id or nil
     end
     return nil

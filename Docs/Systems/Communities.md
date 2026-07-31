@@ -195,6 +195,12 @@ for a loaded site; live also falls back safely to abstract if the site is
 unloaded; abstract sets a transient force-abstract policy. There is no
 continuous director tick.
 
+The Faction Inspector exposes separate **Create Friendly Settlement** and
+**Create Looter Settlement** actions. Both choose an available random house
+and honor the entered population/presence mode. The looter-settlement action
+tags its owning faction for the territorial toll flow; it does not create the
+future roaming looter-group type.
+
 ## Revisions
 
 A changed community increments `community.revision` and the community registry
@@ -213,7 +219,7 @@ NPC persistence remains V15 and affiliation remains V2. Community registry and
 records advance from V1 to V2. Normalization adds an empty `sitesByID` registry
 and nil `siteID` references, so existing communities remain valid but do not
 acquire invented buildings. The community migration itself does not mutate
-factions; the separate faction registry is now V4 for layered faction emblems.
+factions; the separate faction registry remains V5.
 
 Loading normalizes partial registry data, clears invalid/missing/dead/currently
 retired community references, and deterministically rebuilds both secondary

@@ -1,5 +1,5 @@
 local CLIENT_ROOT =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
 package.path = CLIENT_ROOT .. "?.lua;" .. package.path
 
 local FILE = CLIENT_ROOT .. "PNC/PNC_Client.lua"
@@ -18,6 +18,7 @@ local firearmShot
 local inventoryResult
 local mapResult
 local removedBody
+local tollMessage
 
 package.preload["PsychopatzCore/World/PsychopatzTeleport"] = function()
     return { ToCoordinates = function() return true end }
@@ -29,6 +30,7 @@ PNC = {
         CMD_DEBUG_ROSTER = "DebugRoster",
         CMD_FACTION_DEBUG = "FactionDebug",
         CMD_MAP_COMMAND_RESULT = "MapCommandResult",
+        CMD_FACTION_TOLL = "FactionToll",
         CMD_ZOMBIE_REACTION = "ZombieReaction",
         CMD_ZOMBIE_BITE = "ZombieBite",
         CMD_FIREARM_SHOT = "FirearmShot",
@@ -78,6 +80,11 @@ PNC = {
     },
     MapCommands = {
         HandleResult = function(args) mapResult = args end,
+    },
+    FactionTollUI = {
+        HandleServerMessage = function(args)
+            tollMessage = args
+        end,
     },
 }
 
@@ -201,6 +208,12 @@ Client.HandleServerCommand("InventoryResult", { success = true })
 assertEqual(inventoryResult.success, true, "inventory result dispatched")
 Client.HandleServerCommand("MapCommandResult", { ok = true })
 assertEqual(mapResult.ok, true, "map result dispatched")
+Client.HandleServerCommand("FactionToll", {
+    kind = "demand",
+    amount = 12,
+})
+assertEqual(tollMessage.amount, 12,
+    "faction toll dispatched")
 Client.HandleServerCommand("FactionDebug", {
     authorized = true,
     snapshot = {

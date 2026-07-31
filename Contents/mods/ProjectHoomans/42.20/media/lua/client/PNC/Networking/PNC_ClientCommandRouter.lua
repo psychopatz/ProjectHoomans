@@ -79,6 +79,17 @@ Internal.RegisterServerCommand(Const.CMD_MAP_COMMAND_RESULT, function(args)
     end
 end)
 
+Internal.RegisterServerCommand(Const.CMD_FACTION_TOLL, function(args)
+    if not PNC.FactionTollUI then
+        require "PNC/UI/Factions/PNC_FactionTollWindow"
+    end
+    if PNC.FactionTollUI
+        and PNC.FactionTollUI.HandleServerMessage
+    then
+        PNC.FactionTollUI.HandleServerMessage(args or {})
+    end
+end)
+
 function Client.HandleServerCommand(command, args)
     local handler
     ClientState.lastSyncReceiveAt = Core.Now()

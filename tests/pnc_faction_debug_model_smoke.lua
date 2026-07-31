@@ -174,6 +174,25 @@ assert(#npcItems == 1, "one NPC item")
 assert(npcItems[1].detail == "faction_test",
     "NPC affiliation formatting")
 
+local provisionalSnapshot = {
+    factions = snapshot.factions,
+    currentPlayerDiplomacyFaction = {
+        id = "faction_provisional",
+        name = "Patrick Diplomacy",
+        archetypeID = "settler",
+        archetypeLabel = "Settlement",
+        status = "active",
+    },
+}
+local targetItems =
+    PNC.FactionDebugModel.BuildTargetFactionItems(
+        provisionalSnapshot
+    )
+assert(#targetItems == 2,
+    "provisional diplomacy identity is target-selectable")
+assert(targetItems[2].id == "faction_provisional",
+    "provisional identity remains hidden from source list")
+
 local rows =
     PNC.FactionDebugModel.BuildRows(snapshot, true)
 assertContains(rows, "Registry", "revision 4")

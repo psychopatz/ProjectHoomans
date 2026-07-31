@@ -53,6 +53,14 @@ local function registryRecord(factionID)
         and Factions.Registry.byID[factionID] or nil
 end
 
+local function isProvisionalFaction(faction)
+    return type(faction) == "table"
+        and type(faction.tags) == "table"
+        and faction.tags.provisionalPlayerFaction == true
+end
+
+local retireProvisionalFaction
+
 local function npcRecord(npcID, allowDead)
     local record = Types.IsValidNPCID(npcID)
         and PNC.Registry and PNC.Registry.Get
@@ -436,11 +444,16 @@ function Factions.GetPresentation(factionID)
     }
 end
 
-function Factions.List()
+function Factions.List(options)
     local output = {}
+    options = type(options) == "table" and options or {}
     Factions.EnsureLoaded()
     for _, faction in pairs(Factions.Registry.byID) do
-        output[#output + 1] = copy(faction)
+        if options.includeProvisional == true
+            or not isProvisionalFaction(faction)
+        then
+            output[#output + 1] = copy(faction)
+        end
     end
     table.sort(output, function(left, right)
         if left.name ~= right.name then return left.name < right.name end
@@ -458,7 +471,11 @@ function Factions.GetByArchetype(archetypeID)
     for factionID, _ in pairs(
         Factions.Registry.byArchetype[archetypeID] or {}
     ) do
-        if Factions.Registry.byID[factionID] then
+        if Factions.Registry.byID[factionID]
+            and not isProvisionalFaction(
+                Factions.Registry.byID[factionID]
+            )
+        then
             output[#output + 1] =
                 copy(Factions.Registry.byID[factionID])
         end
@@ -1070,6 +1087,21 @@ function Factions.GetFactionForPlayerKey(playerKey)
     end
     local factionID = Factions.Registry.byPlayerKey[playerKey]
     if not factionID then return nil, "unaffiliated" end
+    local faction = registryRecord(factionID)
+    if isProvisionalFaction(faction) then
+        return nil, "provisional_only"
+    end
+    return faction and copy(faction) or nil,
+        faction and nil or "faction_not_found"
+end
+
+function Factions.GetDiplomacyFactionForPlayerKey(playerKey)
+    Factions.EnsureLoaded()
+    if not EntityRef.IsPlayer(playerKey) then
+        return nil, "invalid_player_key"
+    end
+    local factionID = Factions.Registry.byPlayerKey[playerKey]
+    if not factionID then return nil, "unaffiliated" end
     return Factions.Get(factionID)
 end
 
@@ -1081,6 +1113,99 @@ function Factions.GetPlayerFaction(player)
     )
     if not playerKey then return nil, reason end
     return Factions.GetFactionForPlayerKey(playerKey)
+end
+
+function Factions.GetPlayerDiplomacyFaction(player)
+    local playerKey, reason = playerKeyFor(
+        player,
+        "get_player_diplomacy_faction",
+        false
+    )
+    if not playerKey then return nil, reason end
+    return Factions.GetDiplomacyFactionForPlayerKey(playerKey)
+end
+
+function Factions.IsProvisionalPlayerFaction(factionOrID)
+    local faction = type(factionOrID) == "table"
+        and factionOrID or registryRecord(factionOrID)
+    return isProvisionalFaction(faction)
+end
+
+function Factions.IsTerritorialTollFaction(factionOrID)
+    local faction = type(factionOrID) == "table"
+        and factionOrID or registryRecord(factionOrID)
+    return type(faction) == "table"
+        and faction.archetypeID == "looter"
+        and type(faction.tags) == "table"
+        and faction.tags.territorialToll == true
+end
+
+function Factions.MarkTerritorialTollFaction(factionID, reason)
+    local faction
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    if faction.archetypeID ~= "looter" then
+        return false, "not_looter_faction"
+    end
+    if Factions.IsTerritorialTollFaction(faction) then
+        return true, "unchanged", copy(faction)
+    end
+    faction.tags = faction.tags or {}
+    faction.tags.settlementType = "looter_toll"
+    faction.tags.territorialToll = true
+    touchFaction(faction)
+    touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileFaction
+    then
+        PNC.FactionBehavior.ReconcileFaction(
+            faction.id,
+            tostring(reason or "territorial_toll_enabled")
+        )
+    end
+    return true, "territorial_toll_enabled", copy(faction)
+end
+
+function Factions.ReconcileTerritorialLooterFactions()
+    if not authority() then return 0, "not_authority" end
+    Factions.EnsureLoaded()
+    if not PNC.Communities
+        or not PNC.Communities.GetForFaction
+    then
+        return 0, "communities_unavailable"
+    end
+    local candidates = {}
+    for factionID, faction in pairs(
+        Factions.Registry.byID or {}
+    ) do
+        if faction.status == "active"
+            and faction.archetypeID == "looter"
+            and not Factions.IsTerritorialTollFaction(faction)
+        then
+            for _, community in ipairs(
+                PNC.Communities.GetForFaction(factionID)
+                    or {}
+            ) do
+                if community.status == "active"
+                    and community.mode == "settled"
+                then
+                    candidates[#candidates + 1] = factionID
+                    break
+                end
+            end
+        end
+    end
+    table.sort(candidates)
+    for _, factionID in ipairs(candidates) do
+        Factions.MarkTerritorialTollFaction(
+            factionID,
+            "existing_looter_settlement_reconciled"
+        )
+    end
+    return #candidates,
+        #candidates > 0 and "reconciled" or "unchanged"
 end
 
 local function playerCharacterRecord(playerKey)
@@ -1153,8 +1278,18 @@ function Factions.AddPlayerMember(
     if faction.playerMemberKeys[playerKey] == true then
         return false, "already_member"
     end
-    if Factions.Registry.byPlayerKey[playerKey] then
-        return false, "player_already_affiliated"
+    local existingID = Factions.Registry.byPlayerKey[playerKey]
+    if existingID then
+        local existing = registryRecord(existingID)
+        if not isProvisionalFaction(existing) then
+            return false, "player_already_affiliated"
+        end
+        retireProvisionalFaction(
+            existing,
+            playerKey,
+            options.worldAgeHours,
+            "joined_player_faction"
+        )
     end
     faction.playerMemberKeys[playerKey] = true
     Factions.Registry.byPlayerKey[playerKey] = faction.id
@@ -1393,6 +1528,43 @@ local function endFactionTreaties(faction, at)
     end
 end
 
+retireProvisionalFaction = function(
+    faction,
+    playerKey,
+    worldAgeHours,
+    reason
+)
+    if not isProvisionalFaction(faction) then
+        return false, "not_provisional"
+    end
+    local at = finiteTimestamp(
+        worldAgeHours,
+        faction.createdAt
+    )
+    if EntityRef.IsPlayer(playerKey) then
+        faction.playerMemberKeys[playerKey] = nil
+        if Factions.Registry.byPlayerKey[playerKey]
+            == faction.id
+        then
+            Factions.Registry.byPlayerKey[playerKey] = nil
+        end
+    end
+    faction.ownerPlayerKey = nil
+    faction.playerMemberKeys = {}
+    faction.status = "archived"
+    faction.archivedAt = at
+    faction.tags = faction.tags or {}
+    faction.tags.hiddenFromFactionLists = true
+    faction.tags.provisionalRetired = true
+    faction.tags.retiredReason = tostring(
+        reason or "player_identity_ended"
+    )
+    endFactionTreaties(faction, at)
+    touchFaction(faction)
+    touchRegistry()
+    return true, "provisional_retired", copy(faction)
+end
+
 local function convertPlayerFactionToRefugees(
     faction,
     formerOwnerKey,
@@ -1504,6 +1676,13 @@ function Factions.HandlePlayerCharacterDeath(
         return false, "player_not_affiliated"
     end
     at = finiteTimestamp(worldAgeHours, faction.createdAt)
+    if isProvisionalFaction(faction) then
+        return retireProvisionalFaction(
+            faction,
+            playerKey,
+            at
+        )
+    end
     wasOwner = faction.ownerPlayerKey == playerKey
     faction.playerMemberKeys[playerKey] = nil
     Factions.Registry.byPlayerKey[playerKey] = nil
@@ -1786,11 +1965,133 @@ function Factions.PrunePlayerPacifications(worldAgeHours)
         removed
 end
 
+local function defaultPlayerFactionName(player, playerKey)
+    local parsed = EntityRef.Parse(playerKey)
+    local playerName = tostring(
+        player and player.getDisplayName
+            and player:getDisplayName()
+            or parsed and parsed.accountIdentity
+            or "Player"
+    )
+    return string.sub(playerName, 1, 80)
+        .. " Survivors"
+end
+
+function Factions.EnsurePlayerDiplomacyFaction(player, options)
+    local playerKey
+    local reason
+    local existing
+    local parsed
+    local ok
+    local faction
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    playerKey, reason = playerKeyFor(
+        player,
+        "ensure_player_diplomacy_faction",
+        true
+    )
+    if not playerKey then return false, reason end
+    existing = Factions.GetDiplomacyFactionForPlayerKey(
+        playerKey
+    )
+    if existing then
+        return true,
+            isProvisionalFaction(existing)
+                and "existing_provisional" or "existing",
+            existing
+    end
+    options = type(options) == "table" and options or {}
+    parsed = EntityRef.Parse(playerKey)
+    ok, reason, faction = Factions.Create({
+        name = string.sub(
+            tostring(
+                parsed and parsed.accountIdentity
+                    or "Player"
+            ) .. " Diplomacy",
+            1,
+            Constants.NAME_MAX_LENGTH
+        ),
+        archetypeID = "settler",
+        createdAt = options.worldAgeHours,
+        tags = {
+            provisionalPlayerFaction = true,
+            hiddenFromFactionLists = true,
+        },
+        ownerPlayerKey = playerKey,
+        playerMemberKeys = {
+            [playerKey] = true,
+        },
+    })
+    if not ok then return false, reason, faction end
+    return true, "provisional_created", faction
+end
+
+local function promoteProvisionalFaction(
+    faction,
+    playerKey,
+    player,
+    spec
+)
+    local archetypeID = spec.archetypeID or "settler"
+    local name = spec.name
+        or defaultPlayerFactionName(player, playerKey)
+    local candidate = Types.NewFaction({
+        id = faction.id,
+        name = name,
+        archetypeID = archetypeID,
+        status = "active",
+        createdAt = faction.createdAt,
+        ownerPlayerKey = playerKey,
+        playerMemberKeys = {
+            [playerKey] = true,
+        },
+        policy = spec.policy,
+        emblem = spec.emblem,
+        tags = spec.tags,
+    })
+    if not candidate then return false, "invalid_name" end
+    if faction.archetypeID ~= candidate.archetypeID then
+        Factions.Registry.byArchetype[
+            faction.archetypeID
+        ] = Factions.Registry.byArchetype[
+            faction.archetypeID
+        ] or {}
+        Factions.Registry.byArchetype[
+            faction.archetypeID
+        ][faction.id] = nil
+        Factions.Registry.byArchetype[
+            candidate.archetypeID
+        ] = Factions.Registry.byArchetype[
+            candidate.archetypeID
+        ] or {}
+        Factions.Registry.byArchetype[
+            candidate.archetypeID
+        ][faction.id] = true
+    end
+    faction.name = candidate.name
+    faction.archetypeID = candidate.archetypeID
+    faction.status = "active"
+    faction.archivedAt = 0
+    faction.ownerPlayerKey = playerKey
+    faction.playerMemberKeys = {
+        [playerKey] = true,
+    }
+    faction.policy = candidate.policy
+    faction.emblem = candidate.emblem
+    faction.tags = Types.NormalizeTags(spec.tags)
+    faction.tags.promotedFromProvisional = true
+    Factions.Registry.byPlayerKey[playerKey] = faction.id
+    touchFaction(faction)
+    touchRegistry()
+    return true, "promoted_provisional", copy(faction)
+end
+
 function Factions.CreatePlayerFaction(player, spec)
     local playerKey
     local reason
-    local parsed
     local name
+    local existing
     if not authority() then return false, "not_authority" end
     Factions.EnsureLoaded()
     playerKey, reason = playerKeyFor(
@@ -1799,25 +2100,24 @@ function Factions.CreatePlayerFaction(player, spec)
         true
     )
     if not playerKey then return false, reason end
-    if Factions.Registry.byPlayerKey[playerKey] then
-        return false, "player_already_affiliated",
-            Factions.Get(
-                Factions.Registry.byPlayerKey[playerKey]
-            )
-    end
     spec = type(spec) == "table" and spec or {}
-    parsed = EntityRef.Parse(playerKey)
-    name = spec.name
-    if not name then
-        local playerName = tostring(
-            player.getDisplayName
-                and player:getDisplayName()
-                or parsed and parsed.accountIdentity
-                or "Player"
+    existing = Factions.GetDiplomacyFactionForPlayerKey(
+        playerKey
+    )
+    if existing and isProvisionalFaction(existing) then
+        return promoteProvisionalFaction(
+            registryRecord(existing.id),
+            playerKey,
+            player,
+            spec
         )
-        name = string.sub(playerName, 1, 80)
-            .. " Survivors"
     end
+    if existing then
+        return false, "player_already_affiliated",
+            existing
+    end
+    name = spec.name
+        or defaultPlayerFactionName(player, playerKey)
     return Factions.Create({
         name = name,
         archetypeID = spec.archetypeID or "settler",
@@ -1904,7 +2204,9 @@ end
 
 function Factions.IsPlayerFaction(factionID)
     local faction = registryRecord(factionID)
-    if not faction then return false end
+    if not faction or isProvisionalFaction(faction) then
+        return false
+    end
     for _, _ in pairs(faction.playerMemberKeys or {}) do
         return true
     end
@@ -2459,9 +2761,11 @@ local function factionForPlayer(player, create, at)
     if create then
         local ok
         local reason
-        ok, reason, faction = Factions.EnsurePlayerFaction(player, {
-            worldAgeHours = at,
-        })
+        ok, reason, faction =
+            Factions.EnsurePlayerDiplomacyFaction(
+                player,
+                { worldAgeHours = at }
+            )
         if PNC.FactionTelemetry then
             PNC.FactionTelemetry.RecordAttribution({
                 operation = "player_faction_resolution",
@@ -2477,7 +2781,7 @@ local function factionForPlayer(player, create, at)
         end
         return ok and faction or nil
     end
-    faction = Factions.GetPlayerFaction(player)
+    faction = Factions.GetPlayerDiplomacyFaction(player)
     if PNC.FactionTelemetry then
         PNC.FactionTelemetry.RecordAttribution({
             operation = "player_faction_resolution",
@@ -2788,7 +3092,8 @@ function Factions.OnRelationshipChanged(
     then
         return false, "not_faction_enemy"
     end
-    targetFaction = Factions.GetFactionForPlayerKey(targetKey)
+    targetFaction =
+        Factions.GetDiplomacyFactionForPlayerKey(targetKey)
     if not targetFaction then
         parsed = EntityRef.Parse(targetKey)
         livePlayer = parsed

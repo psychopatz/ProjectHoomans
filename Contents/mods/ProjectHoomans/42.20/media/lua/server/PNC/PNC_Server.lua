@@ -245,6 +245,9 @@ function Server.OnTick()
                 and getGameTime():getWorldAgeHours() or 0
         )
     end
+    if PNC.FactionTolls and PNC.FactionTolls.Pump then
+        PNC.FactionTolls.Pump(now)
+    end
     if PNC.EnginePathPlanner
         and PNC.EnginePathPlanner.PumpServerFrame
     then
@@ -475,6 +478,18 @@ local function onClientCommand(module, command, player, args)
                 Const.MODULE,
                 Const.CMD_MAP_COMMAND_RESULT,
                 result
+            )
+        end
+        return
+    end
+
+    if command == Const.CMD_FACTION_TOLL_RESPONSE then
+        if PNC.FactionTolls
+            and PNC.FactionTolls.HandleResponse
+        then
+            PNC.FactionTolls.HandleResponse(
+                player,
+                args or {}
             )
         end
         return
@@ -840,6 +855,12 @@ local function onServerStarted()
     end
     if PNC.Communities and PNC.Communities.Load then
         PNC.Communities.Load()
+    end
+    if PNC.Factions
+        and PNC.Factions
+            .ReconcileTerritorialLooterFactions
+    then
+        PNC.Factions.ReconcileTerritorialLooterFactions()
     end
     if PlayerCharacterLifecycle
         and PlayerCharacterLifecycle.OnServerStarted

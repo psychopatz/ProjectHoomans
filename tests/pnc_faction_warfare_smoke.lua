@@ -177,8 +177,14 @@ PNC.PlayerCharacters = {
     GetCharacterUUID = function(value)
         return value and value.uuid
     end,
-    GetEntityKey = function()
-        return playerKey, "resolved"
+    GetEntityKey = function(value)
+        local uuid = value and value.uuid
+        local account = value and value.getUsername
+            and value:getUsername() or nil
+        return uuid and PNC.EntityRef.ForPlayerIdentity(
+            account,
+            uuid
+        ) or playerKey, "resolved"
     end,
 }
 
@@ -212,6 +218,8 @@ local looterNPC = npc("npc_looter")
 local playerNPC = npc("npc_player_member")
 local transferredNPC = npc("npc_transferred_member")
 local traderNPC = npc("npc_trader")
+local tollLooterNPC = npc("npc_toll_looter")
+local settlerNPC = npc("npc_settler")
 
 dofile(SERVER .. "PNC_FactionService.lua")
 dofile(SERVER .. "PNC_FactionIncidentService.lua")
@@ -226,6 +234,11 @@ local ids = {
     "faction_player",
     "faction_looter",
     "faction_trader",
+    "faction_toll_looter",
+    "faction_settler",
+    "faction_provisional_promote",
+    "faction_provisional_join",
+    "faction_provisional_death",
 }
 local idIndex = 0
 Factions.IDGenerator = function()
@@ -274,6 +287,20 @@ local _, _, traderFaction = Factions.Create({
     archetypeID = "trader",
     createdAt = hour,
 })
+local _, _, tollLooterFaction = Factions.Create({
+    name = "Bridge Toll",
+    archetypeID = "looter",
+    createdAt = hour,
+    tags = {
+        settlementType = "looter_toll",
+        territorialToll = true,
+    },
+})
+local _, _, settlerFaction = Factions.Create({
+    name = "Oakridge Enclave",
+    archetypeID = "settler",
+    createdAt = hour,
+})
 
 -- Looter assignment strips companion ownership and immediately applies
 -- its default outsider hostility.
@@ -291,6 +318,28 @@ equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_HUNT,
     "looter follows hostile hunt policy")
 truthy(Factions.CanNPCTargetPlayer(looterNPC, player),
     "looter can target player by default")
+
+-- A base-owning looter settlement starts in a toll posture. It remains
+-- distinct from roaming looter gangs, which retain proactive hostility.
+truthy(Factions.AddNPC(
+    tollLooterFaction.id,
+    tollLooterNPC.id,
+    { joinedAt = hour }
+), "assign territorial toll looter")
+equal(tollLooterNPC.faction, "neutral",
+    "toll settlement does not start shoot-on-sight")
+equal(Factions.CanNPCTargetPlayer(tollLooterNPC, player),
+    false, "toll settlement awaits escalation")
+local tollIntent = PNC.FactionIntent.Resolve({
+    archetypeID = "looter",
+    policy = tollLooterFaction.policy,
+    territorialToll = true,
+    targetInsideTerritory = true,
+})
+equal(tollIntent.intent, "threaten",
+    "territorial looter requests toll inside base")
+equal(tollIntent.attackAllowed, false,
+    "unrefused toll is nonlethal")
 looterNPC.runtime.target = {
     kind = "player",
     player = player,
@@ -376,6 +425,20 @@ equal(traderNPC.recruited, false,
     "trader not companion")
 equal(Factions.CanNPCTargetPlayer(traderNPC, player),
     false, "neutral trader ignores player")
+
+-- Settlements use neutral outsider policy unless diplomacy or immediate
+-- self-defense explicitly escalates them.
+truthy(Factions.AddNPC(
+    settlerFaction.id,
+    settlerNPC.id,
+    { joinedAt = hour }
+), "assign peaceful settler")
+equal(settlerNPC.faction, "neutral",
+    "settler is not colored hostile without war")
+equal(settlerNPC.hostility.attackPlayers, false,
+    "settler does not attack neutral outsider")
+equal(settlerNPC.orderSpec.kind, PNC.Const.ORDER_ROAM,
+    "settler receives neutral roam order")
 
 -- War is symmetric, revisioned once, and updates every member's behavior.
 local beforeWarRevision = Factions.Registry.revision
@@ -641,6 +704,30 @@ end
 equal(#PNC.FactionBehavior.ReconciliationQueue, 0,
     "reconciliation completes")
 
+-- Existing looter factions that already own a settled community are
+-- deterministically upgraded to territorial toll behavior on load.
+PNC.Communities = {
+    GetForFaction = function(factionID)
+        if factionID == looterFaction.id then
+            return {
+                {
+                    id = "community_legacy_looter_base",
+                    status = "active",
+                    mode = "settled",
+                },
+            }
+        end
+        return {}
+    end,
+}
+equal(Factions.ReconcileTerritorialLooterFactions(), 1,
+    "legacy looter settlement reconciled")
+truthy(Factions.IsTerritorialTollFaction(
+    looterFaction.id
+), "legacy looter settlement receives toll tag")
+equal(looterNPC.faction, "neutral",
+    "legacy looter base stops shoot-on-sight behavior")
+
 -- V2 diplomacy migrates to directed relations, emblems, and V5
 -- player-scoped pacification storage.
 local migrated = PNC.FactionTypes.NormalizeFactionRegistry({
@@ -757,6 +844,111 @@ equal(Factions.ReconcilePlayerMemberships(hour + 5), 0,
     "repeat player membership reconciliation is idempotent")
 equal(Factions.Registry.revision, reconciledRevision,
     "idempotent reconciliation leaves registry revision")
+
+-- Every active character can own a hidden diplomacy container without
+-- appearing to have founded a playable faction. Founding promotes that same
+-- record so accumulated diplomacy is not discarded.
+local provisionalPlayer = {
+    uuid = "char_provisional",
+    getUsername = function() return "Taylor" end,
+    getDisplayName = function() return "Taylor" end,
+}
+PNC.PlayerCharacters.Registry.byUUID.char_provisional = {
+    uuid = "char_provisional",
+    accountIdentity = "Taylor",
+    displayName = "Taylor",
+    status = "active",
+}
+truthy(Factions.EnsurePlayerDiplomacyFaction(
+    provisionalPlayer,
+    { worldAgeHours = hour + 6 }
+), "provisional diplomacy faction created")
+local provisionalKey =
+    "player:Taylor:char_provisional"
+local provisional =
+    Factions.GetDiplomacyFactionForPlayerKey(provisionalKey)
+truthy(Factions.IsProvisionalPlayerFaction(provisional),
+    "diplomacy container is provisional")
+equal(Factions.GetFactionForPlayerKey(provisionalKey), nil,
+    "provisional container is not a playable faction")
+local visibleBeforePromotion = #Factions.List()
+local promotedOK, promotedReason, promoted =
+    Factions.CreatePlayerFaction(provisionalPlayer, {
+        name = "Taylor Union",
+        createdAt = hour + 7,
+    })
+truthy(promotedOK, "provisional faction promoted")
+equal(promotedReason, "promoted_provisional",
+    "promotion result is explicit")
+equal(promoted.id, provisional.id,
+    "promotion preserves diplomacy faction identity")
+equal(#Factions.List(), visibleBeforePromotion + 1,
+    "promoted faction becomes visible")
+
+local joiningPlayer = {
+    uuid = "char_provisional_join",
+    getUsername = function() return "Casey" end,
+    getDisplayName = function() return "Casey" end,
+}
+PNC.PlayerCharacters.Registry.byUUID.char_provisional_join = {
+    uuid = "char_provisional_join",
+    accountIdentity = "Casey",
+    displayName = "Casey",
+    status = "active",
+}
+truthy(Factions.EnsurePlayerDiplomacyFaction(
+    joiningPlayer,
+    { worldAgeHours = hour + 7.2 }
+), "joining player provisional container created")
+local joiningKey = "player:Casey:char_provisional_join"
+local joiningProvisional =
+    Factions.GetDiplomacyFactionForPlayerKey(joiningKey)
+truthy(Factions.AddPlayerMember(
+    promoted.id,
+    joiningKey,
+    {
+        actorKey = provisionalKey,
+        worldAgeHours = hour + 7.3,
+    }
+), "provisional player joins founded faction")
+equal(Factions.GetFactionForPlayerKey(joiningKey).id,
+    promoted.id, "joining player receives actual membership")
+equal(Factions.Get(joiningProvisional.id).status,
+    "archived", "joining retires provisional container")
+
+local doomedPlayer = {
+    uuid = "char_provisional_dead",
+    getUsername = function() return "Robin" end,
+    getDisplayName = function() return "Robin" end,
+}
+PNC.PlayerCharacters.Registry.byUUID.char_provisional_dead = {
+    uuid = "char_provisional_dead",
+    accountIdentity = "Robin",
+    displayName = "Robin",
+    status = "active",
+}
+truthy(Factions.EnsurePlayerDiplomacyFaction(
+    doomedPlayer,
+    { worldAgeHours = hour + 8 }
+), "second provisional container created")
+local doomedKey = "player:Robin:char_provisional_dead"
+local doomed = Factions.GetDiplomacyFactionForPlayerKey(
+    doomedKey
+)
+PNC.PlayerCharacters.Registry.byUUID
+    .char_provisional_dead.status = "dead"
+local retiredOK, retiredReason =
+    Factions.HandlePlayerCharacterDeath(
+        doomedKey,
+        hour + 9
+    )
+truthy(retiredOK, "dead provisional player reconciled")
+equal(retiredReason, "provisional_retired",
+    "provisional death does not create refugees")
+equal(Factions.Registry.byPlayerKey[doomedKey], nil,
+    "dead provisional identity index removed")
+equal(Factions.Get(doomed.id).status, "archived",
+    "dead provisional container archived")
 saveSafe(Factions.Registry)
 
 print("pnc_faction_warfare_smoke: ok")

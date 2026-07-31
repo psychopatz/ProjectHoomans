@@ -153,9 +153,9 @@ function Membership.BuildSnapshot(player, actionResult)
                 ) or nil
             if availableKey
                 and availableKey ~= key
-                and not Factions.Registry.byPlayerKey[
+                and not Factions.GetFactionForPlayerKey(
                     availableKey
-                ]
+                )
             then
                 availablePlayers[
                     #availablePlayers + 1

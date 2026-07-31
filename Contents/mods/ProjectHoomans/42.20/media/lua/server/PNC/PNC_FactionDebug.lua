@@ -23,6 +23,7 @@ local function groupSpec(player, args, at)
         y = player and player.getY and player:getY() or 0,
         z = player and player.getZ and player:getZ() or 0,
         siteSelection = "random_house",
+        communityMode = "settled",
         groupSize = args and args.groupSize,
         presenceMode = args and args.presenceMode,
         worldAgeHours = at,
@@ -305,6 +306,7 @@ function Debug.BuildSnapshot(
     local members = {}
     local playerKey
     local playerFaction
+    local playerDiplomacyFaction
     local diplomacy = {}
     local selectedTarget
     local relationForward
@@ -324,6 +326,10 @@ function Debug.BuildSnapshot(
         playerFaction = playerKey
             and Factions.GetFactionForPlayerKey(playerKey)
             or nil
+        playerDiplomacyFaction = playerKey
+            and Factions
+                .GetDiplomacyFactionForPlayerKey(playerKey)
+            or nil
     end
     for _, faction in ipairs(Factions.List()) do
         factions[#factions + 1] = factionSummary(faction)
@@ -336,7 +342,7 @@ function Debug.BuildSnapshot(
                     record,
                     player,
                     playerKey,
-                    playerFaction,
+                    playerDiplomacyFaction,
                     at
                 )
         end
@@ -370,10 +376,10 @@ function Debug.BuildSnapshot(
             local targetID = Types.IsValidFactionID(
                 selectedTargetFactionID
             ) and selectedTargetFactionID or nil
-            if not targetID and playerFaction
-                and playerFaction.id ~= faction.id
+            if not targetID and playerDiplomacyFaction
+                and playerDiplomacyFaction.id ~= faction.id
             then
-                targetID = playerFaction.id
+                targetID = playerDiplomacyFaction.id
             end
             if targetID and targetID ~= faction.id then
                 local target = Factions.Get(targetID)
@@ -409,8 +415,9 @@ function Debug.BuildSnapshot(
     then
         local observer = PNC.Registry.Get(selectedNPCID)
         local targetEntity
-        if playerFaction
-            and selectedTarget.id == playerFaction.id
+        if playerDiplomacyFaction
+            and selectedTarget.id
+                == playerDiplomacyFaction.id
         then
             targetEntity = player
         else
@@ -457,6 +464,18 @@ function Debug.BuildSnapshot(
         currentPlayerKey = playerKey,
         currentPlayerFactionID =
             playerFaction and playerFaction.id or nil,
+        currentPlayerDiplomacyFactionID =
+            playerDiplomacyFaction
+            and playerDiplomacyFaction.id or nil,
+        currentPlayerDiplomacyFaction =
+            playerDiplomacyFaction
+            and (
+                not playerFaction
+                or playerDiplomacyFaction.id
+                    ~= playerFaction.id
+            )
+            and factionSummary(playerDiplomacyFaction)
+            or nil,
         actionResult = copy(action),
         telemetry = PNC.FactionTelemetry
             and PNC.FactionTelemetry.BuildSnapshot({
@@ -506,11 +525,20 @@ function Debug.PerformAction(player, args)
                 player
             )
         end
+        local tags = {
+            debugCreated = true,
+        }
+        if archetypeID == "settler" then
+            tags.settlementType = "friendly"
+        elseif archetypeID == "looter" then
+            tags.settlementType = "looter_toll"
+            tags.territorialToll = true
+        end
         ok, reason, value = Factions.Create({
             name = generatedFactionName(archetypeID, at),
             archetypeID = archetypeID,
             createdAt = at,
-            tags = { debugCreated = true },
+            tags = tags,
         })
         if ok then
             factionID = value.id

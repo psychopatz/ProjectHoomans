@@ -119,6 +119,7 @@ function Debug.BuildSnapshot(
     local selectedNPC
     local playerKey
     local playerFaction
+    local actualPlayerFaction
     local factionRelations = {}
     Communities.EnsureLoaded()
     if player and PNC.PlayerCharacters
@@ -129,8 +130,13 @@ function Debug.BuildSnapshot(
             worldAgeHours = worldAgeHours(),
         })
         playerFaction = playerKey
-            and PNC.Factions.GetFactionForPlayerKey(playerKey)
+            and PNC.Factions
+                .GetDiplomacyFactionForPlayerKey(playerKey)
             or nil
+        actualPlayerFaction = playerKey
+            and PNC.Factions.GetFactionForPlayerKey(
+                playerKey
+            ) or nil
     end
     for _, faction in ipairs(PNC.Factions.List()) do
         factions[#factions + 1] = factionSummary(faction)
@@ -205,6 +211,9 @@ function Debug.BuildSnapshot(
         selectedNPC = copy(selectedNPC),
         currentPlayerKey = playerKey,
         currentPlayerFactionID =
+            actualPlayerFaction
+            and actualPlayerFaction.id or nil,
+        currentPlayerDiplomacyFactionID =
             playerFaction and playerFaction.id or nil,
         factionRelations = factionRelations,
         npcDiagnostics = diagnostics,

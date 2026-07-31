@@ -12,13 +12,14 @@ It deliberately separates four concepts:
 - legacy `record.faction` is derived tactical compatibility state.
 
 `record.affiliation.factionID` is canonical membership. Assigning an NPC to a
-looter organization removes player ownership and applies the looter
-archetype's default outsider hostility. Tactical intent combines faction
-policy, the directed relation, official treaties, player-scoped exceptions,
-and immediate self-defense.
+looter organization removes player ownership. Roaming looter organizations
+apply proactive outsider hostility; territorial looter settlements instead
+threaten entrants with a toll before escalating. Tactical intent combines
+faction policy, the directed relation, official treaties, player-scoped
+exceptions, territorial context, and immediate self-defense.
 
-This phase does not implement territory, economy, raids, autonomous strategy,
-dialogue, diplomacy UI for ordinary players, or faction simulation.
+This phase does not implement raids, autonomous faction strategy, tribute
+agreements, or roaming-group simulation.
 
 ## Persistence Schema V5
 
@@ -128,6 +129,56 @@ The authority owns the separate `PNC_Factions` Global ModData table:
 indexes. Persistent data contains only serialization-safe primitives and
 tables—never NPC records, players, zombies, inventory items, Java objects,
 functions, coroutines, or metatables.
+
+## Provisional Player Diplomacy Identity
+
+Every active player character receives one hidden provisional faction record.
+It is a server-owned diplomacy container, not a founded player organization:
+
+- its tags include `provisionalPlayerFaction=true` and
+  `hiddenFromFactionLists=true`;
+- it has no settlement and does not appear in normal faction lists;
+- faction incidents and relations can target the character before they found
+  or join an organization;
+- `GetPlayerFaction` and `GetFactionForPlayerKey` exclude it, while
+  `GetPlayerDiplomacyFaction` and
+  `GetDiplomacyFactionForPlayerKey` include it;
+- founding a faction promotes the same record in place, preserving its
+  faction ID and directed diplomacy;
+- joining another player faction retires the provisional record before adding
+  membership;
+- character death archives it instead of producing a refugee organization.
+
+This remains UUID-scoped. A replacement survivor using the same account name
+receives a different provisional identity and cannot inherit the dead
+character's membership or authority.
+
+## Territorial Looter Tolls
+
+Debug-created looter settlements carry
+`settlementType="looter_toll"` and `territorialToll=true`. A low-frequency
+server check detects a player crossing an active community home radius:
+
+- payment consumes vanilla `Base.Money` on the server and applies
+  the existing player-character-specific pacification for 24 world hours;
+- leaving grants a short runtime grace period; remaining inside after it
+  expires declares war;
+- refusal declares symmetric war between the looter faction and the player's
+  real or provisional diplomacy faction;
+- payment/refusal outcomes add a directed relationship memory to the faction
+  leader (or deterministic first living member), so the relationship debug
+  overlay reports the approval/respect change and memory type;
+- self-defense, an existing war, and ordinary treaty rules remain
+  authoritative;
+- regular looter factions without the territorial tag retain proactive
+  hostility and are the foundation for the future roaming director.
+
+Pending toll prompts are runtime-only. Payment pacification and resulting war
+relations use the existing persistent faction schema, so registry V5 does not
+change. On load, an active looter faction that already owns an active settled
+community is tagged deterministically; this upgrades bases created by the old
+**Create Looter Gang** debug action while leaving homeless/roaming looter
+factions unchanged.
 
 ## Layered Emblems
 
@@ -278,15 +329,18 @@ Already-current treaty requests are revision-neutral.
 ```
 
 Intent priority is immediate self-defense, player-owned membership, same
-faction, war, truce, alliance, directed hostility, directed caution/friendship,
-archetype policy, then personal disposition.
+faction, player pacification, war, truce, alliance, territorial toll policy,
+directed hostility, directed caution/friendship, archetype policy, then
+personal disposition.
 
 - player-owned members remain commandable companions for the exact stable
   player-character UUID;
 - war allows attack/pursuit against the opposing faction;
 - truce prevents attack;
-- looters attack outside players and NPC factions by default, even when no
-  official war record exists;
+- roaming looters attack outside players and NPC factions by default, even
+  when no official war record exists;
+- territorial looter settlements threaten players inside their home radius
+  until payment, departure, or refusal resolves the encounter;
 - `playerPacifications[playerKey]` can suppress proactive attacks against one
   stable player character until a deterministic world-age-hour timestamp;
 - immediate self-defense overrides a player pacification;
@@ -304,11 +358,13 @@ V4 faction records migrate to V5 by receiving an empty
 `playerPacifications` map. Normalization is deterministic, bounded to 64
 entries, serialization-safe, and idempotent.
 
-The legacy tactical bridge sets external peaceful members to neutral roaming.
-It uses hostile-hunt compatibility state only while the faction has an active
-war. Final target filtering still resolves the exact opposing faction, so a
-war with one player faction does not authorize attacks against unrelated
-players or organizations. Social changes never advance `presenceRevision`.
+The legacy tactical bridge sets peaceful settlers, traders, refugees, and
+territorial toll factions to neutral roaming. Regular roaming looters use
+hostile-hunt compatibility state by default; other archetypes use it only
+while their faction has an active war. Final target filtering still resolves
+the exact opposing faction, so a war with one player faction does not
+authorize attacks against unrelated players or organizations. Social changes
+never advance `presenceRevision`.
 
 ## Membership, Leadership, and Player Factions
 
@@ -366,6 +422,13 @@ Copied reads include:
   `GetLeader`;
 - `GetNPCFaction`, `GetNPCAffiliation`, `IsMember`;
 - `GetPlayerFaction`, `GetFactionForPlayerKey`;
+- `GetPlayerDiplomacyFaction`,
+  `GetDiplomacyFactionForPlayerKey`,
+  `EnsurePlayerDiplomacyFaction`,
+  `IsProvisionalPlayerFaction`,
+  `IsTerritorialTollFaction`,
+  `MarkTerritorialTollFaction`,
+  `ReconcileTerritorialLooterFactions`;
 - `AddPlayerMember`, `RemovePlayerMember`,
   `TransferPlayerLeadership`;
 - `AddPlayerToCurrentFaction`, `BanishPlayerFromCurrentFaction`,

@@ -220,8 +220,9 @@ end
 
 local function playerFactionSnapshot(targetKey)
     local faction = PNC.Factions
-        and PNC.Factions.GetFactionForPlayerKey
-        and PNC.Factions.GetFactionForPlayerKey(targetKey)
+        and PNC.Factions.GetDiplomacyFactionForPlayerKey
+        and PNC.Factions
+            .GetDiplomacyFactionForPlayerKey(targetKey)
         or nil
     if not faction then return factionSnapshot(nil) end
     return {

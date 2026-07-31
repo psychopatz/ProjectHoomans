@@ -67,6 +67,7 @@ ModData = {
 
 PNC = {}
 dofile(SHARED .. "Base/PNC_Core.lua")
+dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
 dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
 dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
 dofile(SHARED .. "Factions/PNC_FactionEmblems.lua")

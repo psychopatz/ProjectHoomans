@@ -122,20 +122,23 @@ function PlayerDamage.CanDamageRecord(record, attacker)
     then
         return false
     end
-    local attackerFaction = PNC.Factions.GetPlayerFaction
-        and PNC.Factions.GetPlayerFaction(attacker)
+    local attackerFaction =
+        PNC.Factions.GetPlayerDiplomacyFaction
+        and PNC.Factions
+            .GetPlayerDiplomacyFaction(attacker)
         or nil
     if not attackerFaction
-        and PNC.Factions.EnsurePlayerFaction
+        and PNC.Factions.EnsurePlayerDiplomacyFaction
     then
         local at = getGameTime and getGameTime()
             and getGameTime().getWorldAgeHours
             and getGameTime():getWorldAgeHours() or 0
         local ok
         ok, _, attackerFaction =
-            PNC.Factions.EnsurePlayerFaction(attacker, {
-                worldAgeHours = at,
-            })
+            PNC.Factions.EnsurePlayerDiplomacyFaction(
+                attacker,
+                { worldAgeHours = at }
+            )
         if not ok then attackerFaction = nil end
     end
     return attackerFaction == nil

@@ -325,7 +325,9 @@ function ISPNCFactionDebugWindow:refreshSnapshot()
         self.factions.selected = 1
     end
     self.targets:clear()
-    for _, item in ipairs(Model.BuildFactionItems(snapshot)) do
+    for _, item in ipairs(
+        Model.BuildTargetFactionItems(snapshot)
+    ) do
         self.targets:addItem(item.label, item)
     end
     restoreSelection(

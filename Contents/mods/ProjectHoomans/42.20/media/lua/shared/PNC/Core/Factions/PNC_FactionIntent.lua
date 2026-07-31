@@ -71,6 +71,17 @@ function Intent.Resolve(spec)
         return result("cooperate", false, false, false,
             "faction_alliance")
     end
+    -- Territorial looter settlements demand tribute inside their home
+    -- radius. They do not inherit roaming-gang shoot-on-sight behavior;
+    -- refusal can escalate through the normal war/incident path above.
+    if spec.territorialToll == true then
+        if spec.targetInsideTerritory == true then
+            return result("threaten", false, false, false,
+                "territorial_toll_required")
+        end
+        return result("observe", false, false, false,
+            "territorial_boundary")
+    end
     if state == "hostile" then
         if archetypeID == "looter"
             or policy.outsiderPolicy == "predatory"
@@ -165,6 +176,10 @@ function Intent.ResolveWithTrace(spec)
             observerStrength =
                 tonumber(spec.observerStrength) or 1,
             targetStrength = tonumber(spec.targetStrength) or 1,
+            territorialToll =
+                spec.territorialToll == true,
+            targetInsideTerritory =
+                spec.targetInsideTerritory == true,
             selectedRule = resolved.reason,
             fallback = "observe",
         },
