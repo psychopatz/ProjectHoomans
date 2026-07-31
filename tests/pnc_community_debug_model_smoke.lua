@@ -178,5 +178,12 @@ assertEqual(
 )
 assertEqual(PNC.CommunityDebugOverlay.Toggle(), false,
     "overlay toggles off")
+PNC.MapDisplay = {
+    AreBasesVisible = function() return true end,
+}
+assertEqual(PNC.CommunityDebugOverlay.Update(true), true,
+    "map bases request diagnostics independently")
+assertEqual(requested, 2,
+    "map bases generated a sanitized request")
 
 print("pnc_community_debug_model_smoke: PASS")

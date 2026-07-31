@@ -1,4 +1,4 @@
-local FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/Map/"
+local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
     .. "PNC_MapDisplaySettings.lua"
 
 package.preload["ISUI/Maps/ISWorldMap"] = function() return true end
@@ -50,14 +50,24 @@ setmetatable(map, { __index = ISWorldMap })
 map:createChildren()
 
 assert(map.pncNamesButton ~= nil, "NPC names button was not attached")
+assert(map.pncBasesButton ~= nil, "community bases button was not attached")
 assert(map.pncNamesButton.x == 176,
     "NPC names button was not placed left of vanilla controls")
+assert(map.pncBasesButton.x == 52,
+    "community bases button was not placed beside names")
 assert(map.pncNamesButton.title == "NPC NAMES: OFF",
     "NPC names default was not off")
+assert(map.pncBasesButton.title == "BASES: OFF",
+    "community bases default was not off")
 map.pncNamesButton.onclick()
 assert(PNC.MapDisplay.AreNamesVisible(),
     "NPC names button did not enable labels")
 assert(map.pncNamesButton.title == "NPC NAMES: ON",
     "NPC names button title did not update")
+map.pncBasesButton.onclick()
+assert(PNC.MapDisplay.AreBasesVisible(),
+    "community bases button did not enable sites")
+assert(map.pncBasesButton.title == "BASES: ON",
+    "community bases button title did not update")
 
 print("pnc_map_display_settings_smoke: ok")

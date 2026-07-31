@@ -267,7 +267,8 @@ all symmetric treaty flags involving the archived faction.
 
 Copied reads include:
 
-- `Get`, `List`, `GetByArchetype`, `GetMembers`, `GetLeader`;
+- `Get`, `GetPresentation`, `List`, `GetByArchetype`, `GetMembers`,
+  `GetLeader`;
 - `GetNPCFaction`, `GetNPCAffiliation`, `IsMember`;
 - `GetPlayerFaction`, `GetFactionForPlayerKey`;
 - `GetRelation` (`GetDiplomacy` is a directed compatibility alias);
@@ -315,6 +316,11 @@ Its incident/treaty buttons invoke production server APIs. They never send or
 edit score values. Available triggers are minor attack, severe attack, member
 killed, rescue, recalculation, war, 24-hour truce, peace, alliance, and
 alliance break.
+
+Creating a faction in the Overview accepts a typed NPC population and invokes
+the community director immediately. It assigns a free random residential
+building, generates archetype-aware faction/community names and roles, and
+keeps residents abstract when that building is unloaded.
 
 Phase 5B.1 also adds disabled-by-default, runtime-only telemetry for callback
 delivery, exact faction attribution, aggregation episodes, incident creation,

@@ -1,4 +1,5 @@
 require "PsychopatzCore/UI/PsychopatzUI"
+require "ISUI/ISTextEntryBox"
 require "PNC/UI/Factions/PNC_FactionDebugModel"
 require "PNC/UI/Factions/PNC_FactionDebugOverlay"
 
@@ -35,7 +36,7 @@ local CONTROLS = {
     { id = "create_trader", titleKey = "UI_PNC_FactionCreateTrader", variant = "default", views = views("overview") },
     { id = "create_refugee", titleKey = "UI_PNC_FactionCreateRefugee", variant = "default", views = views("overview") },
     { id = "generate_group", titleKey = "UI_PNC_FactionGenerateGroup", variant = "success", views = views("overview") },
-    { id = "group_size", titleKey = "UI_PNC_FactionGroupSize", variant = "quiet", views = views("overview") },
+    { id = "population_label", titleKey = "UI_PNC_FactionGroupSize", variant = "quiet", views = views("overview") },
     { id = "presence_mode", titleKey = "UI_PNC_FactionPresenceMode", variant = "quiet", views = views("overview") },
     { id = "archive", titleKey = "UI_PNC_FactionArchive", variant = "danger", views = views("overview") },
     { id = "assign", titleKey = "UI_PNC_FactionAssignNPC", variant = "success", views = views("members") },
@@ -163,10 +164,7 @@ function ISPNCFactionDebugWindow:createChildren()
     self.viewMode = "overview"
     for _, definition in ipairs(CONTROLS) do
         local title = text(definition.titleKey)
-        if definition.id == "group_size" then
-            title = title .. ": "
-                .. tostring(self.groupSize)
-        elseif definition.id == "presence_mode" then
+        if definition.id == "presence_mode" then
             title = title .. ": " .. self.presenceMode
         end
         local button = UI.CreateButton(self, {
@@ -178,6 +176,20 @@ function ISPNCFactionDebugWindow:createChildren()
         })
         self.controls[#self.controls + 1] = button
     end
+    self.groupSizeEntry = ISTextEntryBox:new(
+        tostring(self.groupSize),
+        0,
+        0,
+        64,
+        26
+    )
+    self.groupSizeEntry:initialise()
+    self.groupSizeEntry:instantiate()
+    self.groupSizeEntry:setOnlyNumbers(true)
+    self.groupSizeEntry.psychopatzPreferredWidth = 64
+    self.groupSizeEntry.tooltip =
+        text("UI_PNC_FactionGroupSizeTooltip")
+    self:addChild(self.groupSizeEntry)
     self:requestResponsiveLayout(true)
     self:requestSnapshot()
 end
@@ -192,7 +204,15 @@ function ISPNCFactionDebugWindow:onResponsiveLayout()
         button:setVisible(visible)
         if visible then
             visibleControls[#visibleControls + 1] = button
+            if definition.id == "population_label" then
+                self.groupSizeEntry:setVisible(true)
+                visibleControls[#visibleControls + 1] =
+                    self.groupSizeEntry
+            end
         end
+    end
+    if self.viewMode ~= "overview" then
+        self.groupSizeEntry:setVisible(false)
     end
     local controls = Layout.Flow(
         visibleControls,
@@ -411,23 +431,6 @@ function ISPNCFactionDebugWindow:onAction(button)
         end
         return
     end
-    if internal == "group_size" then
-        local sizes = { 2, 4, 6, 8, 12 }
-        local nextIndex = 1
-        for index, size in ipairs(sizes) do
-            if size == self.groupSize then
-                nextIndex = (index % #sizes) + 1
-                break
-            end
-        end
-        self.groupSize = sizes[nextIndex]
-        button:setTitle(
-            text("UI_PNC_FactionGroupSize")
-                .. ": " .. tostring(self.groupSize)
-        )
-        self:requestResponsiveLayout(true)
-        return
-    end
     if internal == "presence_mode" then
         local modes = { "auto", "abstract", "live" }
         local nextIndex = 1
@@ -445,11 +448,26 @@ function ISPNCFactionDebugWindow:onAction(button)
         self:requestResponsiveLayout(true)
         return
     end
+    local enteredGroupSize = tonumber(
+        self.groupSizeEntry
+            and self.groupSizeEntry:getText()
+            or self.groupSize
+    )
+    enteredGroupSize = math.max(
+        1,
+        math.min(24, math.floor(enteredGroupSize or 4))
+    )
+    self.groupSize = enteredGroupSize
+    if self.groupSizeEntry then
+        self.groupSizeEntry:setText(
+            tostring(enteredGroupSize)
+        )
+    end
     local payload = {
         factionID = faction and faction.id,
         npcID = npc and npc.id,
         targetFactionID = target and target.id,
-        groupSize = self.groupSize,
+        groupSize = enteredGroupSize,
         presenceMode = self.presenceMode,
     }
     if internal == "create_player_faction" then
@@ -542,8 +560,9 @@ function ISPNCFactionDebugWindow:prerender()
         elseif internal == "generate_group" then
             enabled = faction ~= nil
                 and faction.faction.status == "active"
-        elseif internal == "group_size"
-            or internal == "presence_mode"
+        elseif internal == "population_label" then
+            enabled = false
+        elseif internal == "presence_mode"
         then
             enabled = true
         elseif internal == "war" then

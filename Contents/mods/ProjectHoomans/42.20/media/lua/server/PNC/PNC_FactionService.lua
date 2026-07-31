@@ -416,6 +416,18 @@ function Factions.Get(factionID)
         faction and nil or "faction_not_found"
 end
 
+function Factions.GetPresentation(factionID)
+    Factions.EnsureLoaded()
+    local faction = registryRecord(factionID)
+    if not faction then return nil, "faction_not_found" end
+    return {
+        id = faction.id,
+        name = faction.name,
+        archetypeID = faction.archetypeID,
+        status = faction.status,
+    }
+end
+
 function Factions.List()
     local output = {}
     Factions.EnsureLoaded()

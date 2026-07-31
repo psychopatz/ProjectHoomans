@@ -1,7 +1,7 @@
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/"
+local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
 package.path = SHARED_ROOT .. "?.lua;" .. package.path
 
-local FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Networking/PNC_Network.lua"
+local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Networking/PNC_Network.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -148,6 +148,18 @@ PNC = {
             })
         end,
     },
+    Factions = {
+        Get = function(id)
+            if id == "faction_crossroads" then
+                return {
+                    id = id,
+                    name = "Crossroads Exchange",
+                    archetypeID = "trader",
+                }
+            end
+            return nil
+        end,
+    },
 }
 
 local nearbyRecord = {
@@ -166,6 +178,12 @@ local nearbyRecord = {
     equipment = { worn = {}, attached = {} },
     runtime = {},
     presenceRevision = 1,
+    affiliation = {
+        factionID = "faction_crossroads",
+        membershipStatus = "member",
+        role = "trader",
+        rank = "member",
+    },
     travel = {
         journeyId = "journey:network",
         state = "en_route",
@@ -229,6 +247,18 @@ assertEqual(
     PNC.Network.BuildSnapshot(nearbyRecord).ownerUsername,
     "player_1",
     "detailed snapshot owner identity"
+)
+assertEqual(
+    PNC.Network.BuildRosterSnapshot(nearbyRecord)
+        .organizationalFaction.name,
+    "Crossroads Exchange",
+    "roster faction presentation"
+)
+assertEqual(
+    PNC.Network.BuildSnapshot(nearbyRecord)
+        .organizationalFaction.role,
+    "trader",
+    "detailed faction role"
 )
 assertEqual(
     #PNC.Network.BuildRosterSnapshot(nearbyRecord).travel.route.points,

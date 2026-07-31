@@ -29,6 +29,22 @@ local function invokeNumber(object, methodName)
     return ok and finite(value) or nil
 end
 
+local function invokeBoolean(object, methodName)
+    if not object or not object[methodName] then return nil end
+    local ok
+    local value
+    ok, value = pcall(object[methodName], object)
+    return ok and value == true or false
+end
+
+local function invokeObject(object, methodName)
+    if not object or not object[methodName] then return nil end
+    local ok
+    local value
+    ok, value = pcall(object[methodName], object)
+    return ok and value or nil
+end
+
 local function getSquare(x, y, z)
     local cell = getCell and getCell() or nil
     if not cell or not cell.getGridSquare then return nil end
@@ -39,16 +55,7 @@ local function getSquare(x, y, z)
     )
 end
 
-local function buildingBounds(building)
-    local definition
-    local ok
-    if building and building.getDef then
-        ok, definition = pcall(
-            building.getDef,
-            building
-        )
-        if not ok then definition = nil end
-    end
+local function definitionBounds(definition)
     if not definition then return nil end
     local minX = invokeNumber(definition, "getX")
     local minY = invokeNumber(definition, "getY")
@@ -63,6 +70,12 @@ local function buildingBounds(building)
         maxX = math.max(minX, maxX - 1),
         maxY = math.max(minY, maxY - 1),
     }
+end
+
+local function buildingBounds(building)
+    return definitionBounds(
+        invokeObject(building, "getDef")
+    )
 end
 
 local function radiusForBounds(bounds, fallback)
@@ -84,6 +97,34 @@ local function radiusForBounds(bounds, fallback)
         Constants.RADIUS_MAX,
         fallback
     )
+end
+
+function Resolver.DescribeBuildingDefinition(
+    definition,
+    z,
+    options
+)
+    options = type(options) == "table" and options or {}
+    z = finite(z) or 0
+    local bounds = definitionBounds(definition)
+    if not bounds then return nil, "invalid_building_definition" end
+    local home = {
+        x = (bounds.minX + bounds.maxX) / 2,
+        y = (bounds.minY + bounds.maxY) / 2,
+        z = z,
+        radius = radiusForBounds(bounds, 12),
+    }
+    bounds.minZ = z
+    bounds.maxZ = z
+    local site = {
+        kind = "building",
+        home = home,
+        bounds = bounds,
+        createdAt = tonumber(options.createdAt) or 0,
+    }
+    site.id = PNC.Communities.BuildSiteID(site)
+    return Types.NormalizeSite(site, site.id),
+        "building_definition"
 end
 
 function Resolver.DescribeAt(x, y, z, options)
@@ -156,6 +197,172 @@ local function siteIsAvailable(site)
     if not site then return false end
     local existing = PNC.Communities.GetSite(site.id)
     return existing == nil or existing.status == "vacant"
+end
+
+local function listValues(list)
+    local output = {}
+    if not list then return output end
+    local size = invokeNumber(list, "size")
+    if size == nil or not list.get then return output end
+    size = math.floor(size)
+    if size <= 0 then return output end
+    local index
+    for index = 0, size - 1 do
+        local ok
+        local value
+        ok, value = pcall(list.get, list, index)
+        if ok and value then output[#output + 1] = value end
+    end
+    return output
+end
+
+local function definitionContains(definition, roomName)
+    if not definition or not definition.containsRoom then
+        return false
+    end
+    local ok
+    local result
+    ok, result = pcall(
+        definition.containsRoom,
+        definition,
+        roomName
+    )
+    return ok and result == true
+end
+
+local function definitionIsHouse(definition)
+    local bedroom = definitionContains(
+        definition,
+        "bedroom"
+    ) or definitionContains(
+        definition,
+        "bedroom2"
+    )
+    local kitchen = definitionContains(
+        definition,
+        "kitchen"
+    ) or definitionContains(
+        definition,
+        "kitchen2"
+    )
+    local living = definitionContains(
+        definition,
+        "livingroom"
+    ) or definitionContains(
+        definition,
+        "livingroom2"
+    )
+    return bedroom and (kitchen or living)
+end
+
+local function addCandidate(
+    candidates,
+    seen,
+    definition,
+    z,
+    options,
+    assumeHouse
+)
+    if assumeHouse ~= true
+        and not definitionIsHouse(definition)
+    then
+        return
+    end
+    local site = Resolver.DescribeBuildingDefinition(
+        definition,
+        z,
+        options
+    )
+    if site and not seen[site.id]
+        and siteIsAvailable(site)
+    then
+        seen[site.id] = true
+        candidates[#candidates + 1] = site
+    end
+end
+
+local function addLoadedBuildingCandidates(
+    candidates,
+    seen,
+    z,
+    options
+)
+    local cell = getCell and getCell() or nil
+    local buildings = cell
+        and invokeObject(cell, "getBuildingList") or nil
+    for _, building in ipairs(listValues(buildings)) do
+        if invokeBoolean(building, "isResidential")
+            and not invokeBoolean(building, "isToxic")
+        then
+            local definition =
+                invokeObject(building, "getDef")
+            addCandidate(
+                candidates,
+                seen,
+                definition,
+                z,
+                options,
+                true
+            )
+        end
+    end
+end
+
+local function randomCandidateIndex(count, options)
+    local requested = math.floor(
+        tonumber(options.randomIndex) or 0
+    )
+    if requested >= 1 and requested <= count then
+        return requested
+    end
+    if ZombRand then
+        local ok
+        local value
+        ok, value = pcall(ZombRand, count)
+        value = ok and tonumber(value) or nil
+        if value then
+            return (math.floor(value) % count) + 1
+        end
+    end
+    return 1
+end
+
+function Resolver.FindRandomHouse(options)
+    options = type(options) == "table" and options or {}
+    local candidates = {}
+    local seen = {}
+    local z = finite(options.z) or 0
+    local world = getWorld and getWorld() or nil
+    local metaGrid = world
+        and invokeObject(world, "getMetaGrid") or nil
+    local definitions = metaGrid
+        and invokeObject(metaGrid, "getBuildings") or nil
+    for _, definition in ipairs(listValues(definitions)) do
+        addCandidate(
+            candidates,
+            seen,
+            definition,
+            z,
+            options
+        )
+    end
+    if #candidates == 0 then
+        addLoadedBuildingCandidates(
+            candidates,
+            seen,
+            z,
+            options
+        )
+    end
+    table.sort(candidates, function(left, right)
+        return left.id < right.id
+    end)
+    if #candidates == 0 then
+        return nil, "no_available_house"
+    end
+    return candidates[
+        randomCandidateIndex(#candidates, options)
+    ], "random_house_found"
 end
 
 function Resolver.FindAvailableNear(x, y, z, options)

@@ -74,6 +74,31 @@ local function buildIdentitySummary(record)
     }
 end
 
+local function buildOrganizationalFactionSummary(record)
+    local affiliation = type(record) == "table"
+        and record.affiliation or nil
+    local factionID = type(affiliation) == "table"
+        and affiliation.factionID or nil
+    if not factionID then return nil end
+    local faction
+    if PNC.Factions and PNC.Factions.GetPresentation then
+        faction = PNC.Factions.GetPresentation(factionID)
+    elseif PNC.Factions and PNC.Factions.Get then
+        faction = PNC.Factions.Get(factionID)
+    end
+    return {
+        id = tostring(factionID),
+        name = faction and tostring(faction.name)
+            or tostring(factionID),
+        archetypeID = faction
+            and faction.archetypeID or nil,
+        membershipStatus =
+            affiliation.membershipStatus,
+        role = affiliation.role,
+        rank = affiliation.rank,
+    }
+end
+
 local function buildCombatSummary(record, equipmentInfo)
     local target = record.runtime and record.runtime.target or nil
     local tactical = record.runtime and record.runtime.combatTactical or {}
@@ -332,6 +357,8 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
             and Identity.BuildPortraitSummary(record)
             or nil,
         faction = record.faction,
+        organizationalFaction =
+            buildOrganizationalFactionSummary(record),
         presenceState = record.presenceState,
         zombieTargetable = Settings
             and Settings.CanZombieTargetRecord
@@ -590,6 +617,8 @@ Internal.SnapshotParts = {
     BuildMapPresentationSummary = buildMapPresentationSummary,
     ResolveAIState = resolveAIState,
     BuildIdentitySummary = buildIdentitySummary,
+    BuildOrganizationalFactionSummary =
+        buildOrganizationalFactionSummary,
     BuildCombatSummary = buildCombatSummary,
     BuildCommandFeedback = buildCommandFeedback,
     BuildBandageFeedback = buildBandageFeedback,

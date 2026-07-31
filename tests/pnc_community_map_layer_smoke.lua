@@ -53,6 +53,9 @@ PNC = {
         end,
     },
     MapCommands = { Active = false },
+    MapDisplay = {
+        AreBasesVisible = function() return true end,
+    },
     CommunityDebugOverlay = {
         IsVisible = function() return true end,
         Update = function() return true end,

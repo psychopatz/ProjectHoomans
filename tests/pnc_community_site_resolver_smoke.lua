@@ -32,6 +32,10 @@ local function definition(minX, minY, maxX, maxY)
         getY = function() return minY end,
         getX2 = function() return maxX + 1 end,
         getY2 = function() return maxY + 1 end,
+        containsRoom = function(_, roomName)
+            return roomName == "bedroom"
+                or roomName == "kitchen"
+        end,
     }
 end
 
@@ -43,6 +47,7 @@ end
 
 local firstBuilding = building(definition(0, 0, 4, 4))
 local secondBuilding = building(definition(9, 0, 13, 4))
+local distantDefinition = definition(1000, 1200, 1008, 1208)
 
 local function buildingAt(x, y)
     if x >= 0 and x <= 4 and y >= 0 and y <= 4 then
@@ -68,6 +73,28 @@ function cell:getGridSquare(x, y, z)
     }
 end
 function getCell() return cell end
+
+local metaDefinitions = {
+    firstBuilding:getDef(),
+    distantDefinition,
+}
+local metaList = {
+    size = function() return #metaDefinitions end,
+    get = function(_, index)
+        return metaDefinitions[index + 1]
+    end,
+}
+function getWorld()
+    return {
+        getMetaGrid = function()
+            return {
+                getBuildings = function()
+                    return metaList
+                end,
+            }
+        end,
+    }
+end
 
 local occupiedID
 PNC.Communities = {
@@ -124,6 +151,21 @@ assertEqual(available.bounds.maxX, 13,
     "second building bounds")
 assertTrue(available.id ~= occupiedID,
     "distinct stable site ID")
+
+local randomHouse, randomReason =
+    PNC.CommunitySiteResolver.FindRandomHouse({
+        createdAt = 11,
+        randomIndex = 1,
+    })
+assertEqual(randomReason, "random_house_found",
+    "random house allocation reason")
+assertEqual(randomHouse.bounds.minX, 1000,
+    "occupied house skipped during world scan")
+assertEqual(
+    PNC.CommunitySiteResolver.IsSiteLoaded(randomHouse),
+    false,
+    "unloaded meta-grid house remains primitive"
+)
 
 local points =
     PNC.CommunitySiteResolver.FindSpawnPoints(

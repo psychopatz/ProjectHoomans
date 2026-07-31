@@ -57,6 +57,7 @@ PNC.Const = {
 dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
 dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
 dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
+dofile(SHARED .. "Factions/PNC_FactionNameGenerator.lua")
 dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
 dofile(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
 dofile(SHARED .. "Communities/PNC_CommunityConstants.lua")
@@ -193,6 +194,12 @@ assertEqual(community.currentPopulation, 4,
     "community population")
 assertEqual(community.site.status, "occupied",
     "site occupied")
+assert(string.find(
+    community.name,
+    faction.name,
+    1,
+    true
+), "community name retains faction identity")
 assertEqual(community.leaderNPCID, result.npcIDs[1],
     "community leader generated")
 assertEqual(PNC.Factions.Get(
@@ -213,6 +220,16 @@ for _, npcID in ipairs(result.npcIDs) do
     assertEqual(record.faction, "neutral",
         "legacy combat classification preserved")
 end
+assertEqual(
+    PNC.Registry.Get(result.npcIDs[2]).affiliation.role,
+    "raider",
+    "looter group receives archetype role"
+)
+assertEqual(
+    PNC.Registry.Get(result.npcIDs[3]).affiliation.role,
+    "enforcer",
+    "looter group receives second archetype role"
+)
 
 -- A second generation reuses the existing community and site.
 local second

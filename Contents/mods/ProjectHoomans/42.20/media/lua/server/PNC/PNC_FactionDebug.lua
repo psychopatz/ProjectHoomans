@@ -22,11 +22,48 @@ local function groupSpec(player, args, at)
         x = player and player.getX and player:getX() or 0,
         y = player and player.getY and player:getY() or 0,
         z = player and player.getZ and player:getZ() or 0,
+        siteSelection = "random_house",
         groupSize = args and args.groupSize,
         presenceMode = args and args.presenceMode,
         worldAgeHours = at,
         debug = true,
     }
+end
+
+local function generatedFactionName(archetypeID, at)
+    local Generator = PNC.FactionNameGenerator
+    if not Generator or not Generator.GenerateFactionName then
+        return "Survivor " .. tostring(archetypeID)
+    end
+    local randomSalt = 0
+    if ZombRand then
+        local ok
+        local value
+        ok, value = pcall(ZombRand, 1000000)
+        if ok then randomSalt = tonumber(value) or 0 end
+    end
+    local used = {}
+    for _, faction in ipairs(Factions.List()) do
+        used[faction.name] = true
+    end
+    local attempt
+    for attempt = 1, 32 do
+        local seed = table.concat({
+            tostring(archetypeID),
+            tostring(math.floor((tonumber(at) or 0) * 1000)),
+            tostring(randomSalt),
+            tostring(attempt),
+        }, ":")
+        local name = Generator.GenerateFactionName(
+            archetypeID,
+            seed
+        )
+        if not used[name] then return name end
+    end
+    return "New " .. Generator.GenerateFactionName(
+        archetypeID,
+        tostring(at) .. ":fallback"
+    )
 end
 
 local function copy(value)
@@ -469,8 +506,7 @@ function Debug.PerformAction(player, args)
             )
         end
         ok, reason, value = Factions.Create({
-            name = "Debug " .. archetype.label .. " "
-                .. tostring(math.floor(at * 1000)),
+            name = generatedFactionName(archetypeID, at),
             archetypeID = archetypeID,
             createdAt = at,
             tags = { debugCreated = true },
@@ -487,6 +523,7 @@ function Debug.PerformAction(player, args)
         ok, reason, value = Factions.CreatePlayerFaction(
             player,
             {
+                name = generatedFactionName("settler", at),
                 archetypeID = "settler",
                 createdAt = at,
                 tags = { debugCreated = true },

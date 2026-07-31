@@ -15,9 +15,9 @@ local function text(key, fallback)
 end
 
 local function isVisible()
-    return PNC.CommunityDebugOverlay
-        and PNC.CommunityDebugOverlay.IsVisible
-        and PNC.CommunityDebugOverlay.IsVisible()
+    return PNC.MapDisplay
+        and PNC.MapDisplay.AreBasesVisible
+        and PNC.MapDisplay.AreBasesVisible()
         and ClientState.communityDebugAuthorized == true
 end
 

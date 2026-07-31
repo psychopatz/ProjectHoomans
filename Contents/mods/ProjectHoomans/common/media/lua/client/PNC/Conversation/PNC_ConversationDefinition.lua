@@ -8,6 +8,37 @@ local Relationship = Conversation.Relationship
 local Lifecycle = Conversation.Lifecycle
 local Palette = PNC.NPCTypePalette
 
+local function roleLabel(value)
+    value = tostring(value or "")
+    value = string.gsub(value, "_", " ")
+    return string.gsub(
+        value,
+        "(%a)([%w']*)",
+        function(first, rest)
+            return string.upper(first)
+                .. string.lower(rest)
+        end
+    )
+end
+
+local function factionPresentation(entry)
+    local snapshot = entry and entry.snapshot or {}
+    local record = entry and entry.record or {}
+    local faction = snapshot.organizationalFaction
+        or record.organizationalFaction
+    if type(faction) ~= "table" then return nil end
+    local name = tostring(faction.name or "")
+    local role = roleLabel(
+        faction.role or faction.rank
+    )
+    if name == "" or role == "" then return nil end
+    return {
+        name = name,
+        role = role,
+        id = faction.id,
+    }
+end
+
 local function portraitSpec(entry)
     local snapshot = entry and entry.snapshot or {}
     local record = entry and entry.record or {}
@@ -39,6 +70,7 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         npcID,
         day
     )
+    local faction = factionPresentation(entry)
     return {
         namespace = "ProjectHoomans",
         npcID = npcID,
@@ -50,8 +82,17 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             entry = entry,
             player = player,
             npcName = name,
-            timeID = timeID,
-            relationshipID = relationshipID,
+            -- PsychopatzCore currently renders these two context fields as
+            -- the portrait subtitle. Preserve the semantic IDs separately
+            -- while showing faction identity when the server supplied it.
+            timeID = faction and faction.role or timeID,
+            relationshipID =
+                faction and faction.name or relationshipID,
+            conversationTimeID = timeID,
+            conversationRelationshipID = relationshipID,
+            factionID = faction and faction.id or nil,
+            factionName = faction and faction.name or nil,
+            factionRole = faction and faction.role or nil,
             npcType = Palette.ResolveType(entry),
         },
         lifecycle = Lifecycle.Create(),

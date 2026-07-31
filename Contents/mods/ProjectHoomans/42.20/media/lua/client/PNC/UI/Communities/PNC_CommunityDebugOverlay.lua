@@ -9,9 +9,13 @@ local ClientState = PNC.Network.ClientState
 Overlay.lastRequestAt = Overlay.lastRequestAt or 0
 
 function Overlay.Update(force)
-    if not PNC.Nameplates
-        or not PNC.Nameplates.IsCommunityDebugEnabled
-        or not PNC.Nameplates.IsCommunityDebugEnabled()
+    local nameplatesVisible = PNC.Nameplates
+        and PNC.Nameplates.IsCommunityDebugEnabled
+        and PNC.Nameplates.IsCommunityDebugEnabled()
+    local mapBasesVisible = PNC.MapDisplay
+        and PNC.MapDisplay.AreBasesVisible
+        and PNC.MapDisplay.AreBasesVisible()
+    if not nameplatesVisible and not mapBasesVisible
     then
         return false
     end

@@ -9,6 +9,7 @@ PNC.MapDisplay = PNC.MapDisplay or {}
 local Display = PNC.MapDisplay
 
 Display.NamesVisible = Display.NamesVisible == true
+Display.BasesVisible = Display.BasesVisible == true
 
 local function numberFrom(object, field, method, fallback)
     local value = object and tonumber(object[field]) or nil
@@ -18,7 +19,7 @@ local function numberFrom(object, field, method, fallback)
     return value or fallback
 end
 
-local function syncButton(button)
+local function syncNamesButton(button)
     if not button then return end
     local title = Display.NamesVisible
         and "NPC NAMES: ON" or "NPC NAMES: OFF"
@@ -28,14 +29,46 @@ local function syncButton(button)
         or "Show NPC names on the world map"
 end
 
+local function syncBasesButton(button)
+    if not button then return end
+    local title = Display.BasesVisible
+        and "BASES: ON" or "BASES: OFF"
+    if button.setTitle then button:setTitle(title) else button.title = title end
+    button.tooltip = Display.BasesVisible
+        and "Hide community base radii and names"
+        or "Show community base radii and names"
+end
+
 function Display.AreNamesVisible()
     return Display.NamesVisible == true
 end
 
 function Display.SetNamesVisible(visible)
     Display.NamesVisible = visible == true
-    syncButton(Display.LastButton)
+    syncNamesButton(Display.LastNamesButton)
     return Display.NamesVisible
+end
+
+function Display.AreBasesVisible()
+    return Display.BasesVisible == true
+end
+
+function Display.SetBasesVisible(visible)
+    Display.BasesVisible = visible == true
+    syncBasesButton(Display.LastBasesButton)
+    if Display.BasesVisible
+        and PNC.CommunityDebugOverlay
+        and PNC.CommunityDebugOverlay.Update
+    then
+        PNC.CommunityDebugOverlay.Update(true)
+    end
+    return Display.BasesVisible
+end
+
+function Display.ToggleBases()
+    return Display.SetBasesVisible(
+        not Display.BasesVisible
+    )
 end
 
 function Display.ToggleNames()
@@ -44,8 +77,11 @@ end
 
 function Display.LayoutButton(map)
     local button = map and map.pncNamesButton or nil
+    local basesButton = map and map.pncBasesButton or nil
     local panel = map and map.buttonPanel or nil
-    if not button or not panel then return false end
+    if not button or not basesButton or not panel then
+        return false
+    end
     local gap = 8
     local panelX = numberFrom(panel, "x", "getX", 0)
     local panelY = numberFrom(panel, "y", "getY", 0)
@@ -58,38 +94,63 @@ function Display.LayoutButton(map)
     else button.y = panelY end
     if button.setHeight then button:setHeight(height)
     else button.height = height end
-    syncButton(button)
+    local basesWidth = numberFrom(
+        basesButton,
+        "width",
+        "getWidth",
+        116
+    )
+    local namesX = panelX - width - gap
+    if basesButton.setX then
+        basesButton:setX(namesX - basesWidth - gap)
+    else
+        basesButton.x = namesX - basesWidth - gap
+    end
+    if basesButton.setY then basesButton:setY(panelY)
+    else basesButton.y = panelY end
+    if basesButton.setHeight then
+        basesButton:setHeight(height)
+    else
+        basesButton.height = height
+    end
+    syncNamesButton(button)
+    syncBasesButton(basesButton)
     return true
 end
 
 function Display.EnsureButton(map)
-    if not map or map.pncNamesButton then
-        if map then Display.LayoutButton(map) end
-        return map and map.pncNamesButton or nil
-    end
+    if not map then return nil end
     if not map.buttonPanel or not ISButton or not ISButton.new then
         return nil
     end
-    local button = ISButton:new(
-        0,
-        0,
-        116,
-        32,
-        "",
-        map,
-        function()
-            Display.ToggleNames()
-        end
-    )
-    if button.initialise then button:initialise() end
-    if button.instantiate then button:instantiate() end
-    button.anchorBottom = true
-    button.anchorRight = true
-    if map.addChild then map:addChild(button) end
-    map.pncNamesButton = button
-    Display.LastButton = button
+    if not map.pncNamesButton then
+        local button = ISButton:new(
+            0, 0, 116, 32, "", map,
+            function() Display.ToggleNames() end
+        )
+        if button.initialise then button:initialise() end
+        if button.instantiate then button:instantiate() end
+        button.anchorBottom = true
+        button.anchorRight = true
+        if map.addChild then map:addChild(button) end
+        map.pncNamesButton = button
+    end
+    if not map.pncBasesButton then
+        local button = ISButton:new(
+            0, 0, 116, 32, "", map,
+            function() Display.ToggleBases() end
+        )
+        if button.initialise then button:initialise() end
+        if button.instantiate then button:instantiate() end
+        button.anchorBottom = true
+        button.anchorRight = true
+        if map.addChild then map:addChild(button) end
+        map.pncBasesButton = button
+    end
+    Display.LastNamesButton = map.pncNamesButton
+    Display.LastBasesButton = map.pncBasesButton
     Display.LayoutButton(map)
-    return button
+    return map.pncNamesButton
 end
 
 if ISWorldMap and not ISWorldMap._pncMapDisplayPatched then

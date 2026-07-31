@@ -66,6 +66,12 @@ resolution, UI scale, server type, and save name for every run.
 | 34 | Right-click vacant hideout | Stable current player-character key claims site | NOT RUN |
 | 35 | Attempt occupation after claim | `site_claimed`; no partial community/NPC mutation | NOT RUN |
 | 36 | Character death/new survivor | New character UUID does not inherit old site claim identity | NOT RUN |
+| 37 | Type population then click Create Settlement | Exact clamped population generated without manual assignment | NOT RUN |
+| 38 | Chosen random house is unloaded | Site persists and all auto residents remain abstract | NOT RUN |
+| 39 | Chosen random house is loaded | Auto mode may materialize residents at valid interior points | NOT RUN |
+| 40 | Toggle BASES beside NPC NAMES | Base radius/name toggles independently of NPC labels | NOT RUN |
+| 41 | Talk to faction NPC | Portrait subtitle shows faction name and role | NOT RUN |
+| 42 | Create each archetype | Immersive names and archetype-appropriate roles appear | NOT RUN |
 
 ## Result record
 

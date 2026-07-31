@@ -35,12 +35,17 @@ local function worldAge(value)
 end
 
 local function normalizedGroupSize(value)
+    value = tonumber(value)
+    if value == nil or value ~= value
+        or value == math.huge or value == -math.huge
+    then
+        value = Constants.GROUP_SIZE_DEFAULT
+    end
     return math.max(
         Constants.GROUP_SIZE_MIN,
         math.min(
             Constants.GROUP_SIZE_MAX,
-            math.floor(tonumber(value)
-                or Constants.GROUP_SIZE_DEFAULT)
+            math.floor(value)
         )
     )
 end
@@ -50,13 +55,31 @@ local function normalizedPresenceMode(value)
         and value or "auto"
 end
 
+local ROLE_ORDER = {
+    settler = {
+        "leader", "guard", "medic", "farmer",
+        "builder", "scavenger", "cook", "mechanic",
+    },
+    looter = {
+        "leader", "raider", "enforcer", "scavenger",
+        "guard", "medic",
+    },
+    trader = {
+        "leader", "trader", "guard", "medic",
+        "mechanic", "scavenger", "laborer",
+    },
+    refugee = {
+        "leader", "medic", "guard", "caregiver",
+        "scavenger",
+    },
+}
+
 local function factionRole(archetypeID, index)
-    if index == 1 then return "leader" end
-    if index == 2 then return "guard" end
-    if index == 3 then return "medic" end
-    return PNC.FactionArchetypes.GetDefaultRole(
-        archetypeID
-    )
+    local ordered = ROLE_ORDER[archetypeID] or {}
+    return ordered[index]
+        or PNC.FactionArchetypes.GetDefaultRole(
+            archetypeID
+        )
 end
 
 local function communityRole(index)
@@ -91,11 +114,18 @@ local function createCommunity(
 )
     local mode = spec.communityMode == "camped"
         and "camped" or "settled"
-    local name = tostring(
-        spec.communityName
+    local generatedName = PNC.FactionNameGenerator
+        and PNC.FactionNameGenerator.GenerateCommunityName
+        and PNC.FactionNameGenerator.GenerateCommunityName(
+            faction.archetypeID,
+            faction.name,
+            tostring(faction.id) .. ":" .. tostring(site.id)
+        )
         or faction.name .. (
             mode == "camped" and " Camp" or " Hideout"
         )
+    local name = tostring(
+        spec.communityName or generatedName
     )
     local ok
     local reason
@@ -213,16 +243,24 @@ function Director.GenerateForFaction(factionID, spec)
         and "existing_community_site"
         or site and "primitive_site" or nil
     if not site then
-        site, siteReason = Resolver.FindAvailableNear(
-            spec.x,
-            spec.y,
-            spec.z,
-            {
+        if spec.siteSelection == "random_house" then
+            site, siteReason = Resolver.FindRandomHouse({
+                z = spec.z,
+                createdAt = at,
+                randomIndex = spec.randomHouseIndex,
+            })
+        else
+            site, siteReason = Resolver.FindAvailableNear(
+                spec.x,
+                spec.y,
+                spec.z,
+                {
                 radius = spec.radius,
                 createdAt = at,
                 searchRadius = spec.searchRadius,
-            }
-        )
+                }
+            )
+        end
     end
     if not site then return false, siteReason end
     local community

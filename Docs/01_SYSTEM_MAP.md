@@ -160,7 +160,8 @@
 - `PNC_CommunityService`, `PNC_CommunitySiteResolver`,
   `PNC_CommunityDirector`, `PNC_CommunityValidation`, and
   `PNC_CommunityDebug`: separate `PNC_Communities` ModData authority,
-  reusable primitive hideout sites, abstract-first group generation,
+  reusable primitive hideout sites, loaded/meta-building discovery, random
+  residential debug allocation, abstract-first group generation,
   faction-owned settlements/camps, affiliation-V2 placement, atomic
   membership and summary mutations, invariant checks, and sanitized snapshots
 - `PNC_RelationshipService`: authoritative directed relationship mutations

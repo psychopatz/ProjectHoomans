@@ -65,10 +65,13 @@ classification, primitive home/bounds coordinates, occupancy or stable
 player-character claim, world-age timestamps, and revision. Building and
 square objects are inspected transiently by
 `PNC.CommunitySiteResolver.DescribeAt()` and are never retained.
-Debug creation uses `FindAvailableNear()` to select the current building or
-the nearest unreserved loaded building deterministically. A future unloaded
-world director must supply a pre-resolved primitive site because unloaded
-grid-square/building objects do not exist.
+`FindAvailableNear()` remains available for current or nearby placement.
+Faction-debug creation uses `FindRandomHouse()` to scan persistent world
+building definitions for residential room combinations, discard occupied or
+claimed sites, and randomly choose from the stable sorted candidates. Only the
+resulting primitive bounds and coordinates cross into persistence. An unloaded
+house is valid: auto generation leaves its residents abstract until normal
+presence admission can materialize them.
 
 An active community may reserve one site. Archiving, destroying, or wiping out
 the last living member releases that occupancy while preserving both the
@@ -185,6 +188,8 @@ community state.
 event-driven group-generation entry point. It creates or reuses a community,
 reserves a primitive site, generates faction/community-affiliated NPC records,
 and assigns leaders. `presenceMode` accepts `auto`, `abstract`, or `live`.
+`siteSelection = "random_house"` selects a free residential building
+definition, including one in an unloaded chunk.
 Records are always created abstract first. Auto requests materialization only
 for a loaded site; live also falls back safely to abstract if the site is
 unloaded; abstract sets a transient force-abstract policy. There is no
@@ -228,15 +233,26 @@ NPCs, set leaders/roles/home, adjust summaries, validate/repair, archive, and
 destroy. A separate optional Community NPC World Overlay requests sanitized
 server diagnostics and draws community, role, mode/status, distance,
 containment, population/capacity, security, morale, and revision above visible
-NPCs. The same toggle enables a world-map layer that outlines building bounds,
-draws the configured hideout radius and community name, and colors occupied,
-vacant, and claimed sites. In admin/debug mode, right-clicking a vacant shape
-offers a guarded server-authoritative player-character claim.
+NPCs. The world map has an independent **BASES: ON/OFF** control beside
+**NPC NAMES**. It outlines building bounds, draws the configured hideout radius
+and community name, and colors occupied, vacant, and claimed sites. In
+admin/debug mode, right-clicking a vacant shape offers a guarded
+server-authoritative player-character claim.
 
 Faction debug creation now runs the community director automatically. The
-inspector includes group-size and presence-mode controls plus a standalone
+inspector includes a typed 1–24 NPC-population field and presence-mode control
+plus a standalone
 **Generate NPC Group** action for existing factions. The result reports live
-and abstract counts so unloaded-site behavior is visible.
+and abstract counts so unloaded-site behavior is visible. New factions and
+communities use archetype-aware naming pools rather than debug timestamps.
+Generated roles are archetype-aware as well, so trading companies receive a
+trader and looter gangs receive raiders and enforcers.
+
+Normal roster and detailed snapshots expose only a bounded faction
+presentation summary: faction ID/name/archetype plus the NPC's membership,
+role, and rank. Conversation portraits use that summary to show
+**Faction Name / Role** below the NPC name. Relationship category and
+time-of-day remain separate semantic context values for greeting selection.
 
 The Faction Inspector includes a compact owned-community count, names/modes,
 active population, and total abstract supplies. The Relationship Inspector
@@ -245,7 +261,7 @@ participants only.
 
 ## Deferred extensions
 
-Autonomous director scheduling, strategic building scoring across unloaded cells,
+Autonomous director scheduling, strategic building scoring,
 safehouse/base construction, mobile parties, caravans, patrols, raids,
 territory, markets, detailed
 inventories, tribute, robbery, construction, farming, recruitment strategy,

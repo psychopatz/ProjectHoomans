@@ -112,6 +112,12 @@ local entry = {
         appearance = { hairModel = "Long" },
         equipmentSummary = { worn = { Hat = "Base.Hat" } },
         relationshipCategory = "Lover",
+        organizationalFaction = {
+            id = "faction_crossroads",
+            name = "Crossroads Exchange",
+            role = "trader",
+            rank = "member",
+        },
     },
 }
 local definition = PNC.Conversation.BuildDefinition(entry, {}, "twilight")
@@ -119,7 +125,14 @@ assertEqual(definition.namespace, "ProjectHoomans", "history namespace")
 assertEqual(definition.npcID, "npc-12", "history NPC id")
 assertEqual(definition.character, entry.zombie, "live portrait target")
 assertEqual(definition.backgroundID, "twilight", "portrait background")
-assertEqual(definition.context.relationshipID, "Lover", "relationship category")
+assertEqual(definition.context.relationshipID,
+    "Crossroads Exchange", "portrait faction name")
+assertEqual(definition.context.timeID, "Trader",
+    "portrait faction role")
+assertEqual(definition.context.conversationRelationshipID,
+    "Lover", "semantic relationship category")
+assertEqual(definition.context.conversationTimeID,
+    "twilight", "semantic conversation time")
 assertEqual(definition.context.npcType, "hostile", "conversation NPC type")
 assertEqual(definition.theme.accent.r, 1, "hostile conversation red")
 assertEqual(definition.theme.accent.g, 0.25, "hostile palette matches map")

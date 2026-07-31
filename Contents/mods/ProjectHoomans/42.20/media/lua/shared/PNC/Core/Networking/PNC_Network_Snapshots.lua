@@ -23,6 +23,8 @@ local buildTravelSummary = Parts.BuildTravelSummary
 local buildMapPresentationSummary = Parts.BuildMapPresentationSummary
 local resolveAIState = Parts.ResolveAIState
 local buildIdentitySummary = Parts.BuildIdentitySummary
+local buildOrganizationalFactionSummary =
+    Parts.BuildOrganizationalFactionSummary
 local buildCombatSummary = Parts.BuildCombatSummary
 local buildCommandFeedback = Parts.BuildCommandFeedback
 local buildBandageFeedback = Parts.BuildBandageFeedback
@@ -94,6 +96,8 @@ function Network.BuildSnapshot(record)
         recruited = record.recruited == true,
         persist = record.persist ~= false,
         faction = record.faction,
+        organizationalFaction =
+            buildOrganizationalFactionSummary(record),
         visualProfile = record.visualProfile,
         isFemale = identity.isFemale,
         identity = identity,
