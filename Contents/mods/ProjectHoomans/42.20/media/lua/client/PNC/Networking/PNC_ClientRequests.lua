@@ -224,7 +224,9 @@ function Client.RequestCommunityDebug(
     snapshot = PNC.CommunityDebug.BuildSnapshot(
         communityID,
         factionID,
-        npcID
+        npcID,
+        nil,
+        player
     )
     ClientState.communityDebugAuthorized = true
     ClientState.communityDebug = snapshot

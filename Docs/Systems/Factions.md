@@ -19,13 +19,13 @@ relation, official treaties, relative strength, and immediate self-defense.
 This phase does not implement territory, economy, raids, autonomous strategy,
 dialogue, diplomacy UI for ordinary players, or faction simulation.
 
-## Persistence Schema V3
+## Persistence Schema V4
 
 The authority owns the separate `PNC_Factions` Global ModData table:
 
 ```lua
 {
-    schemaVersion = 3,
+    schemaVersion = 4,
     revision = 0,
     byID = {
         faction_123 = {
@@ -53,6 +53,27 @@ The authority owns the separate `PNC_Factions` Global ModData table:
                 peaceThreshold = 25,
                 generatedFromArchetype = true,
                 generationVersion = 1,
+            },
+            emblem = {
+                schemaVersion = 1,
+                backgroundColorID = "green",
+                layers = {
+                    {
+                        symbolID = "House",
+                        colorID = "white",
+                        scale = 0.76,
+                        offsetX = 0,
+                        offsetY = 0,
+                    },
+                    {
+                        symbolID = "Star",
+                        colorID = "gold",
+                        scale = 0.34,
+                        offsetX = -0.08,
+                        offsetY = -0.08,
+                    },
+                },
+                revision = 0,
             },
             relations = {
                 faction_456 = {
@@ -95,6 +116,24 @@ The authority owns the separate `PNC_Factions` Global ModData table:
 indexes. Persistent data contains only serialization-safe primitives and
 tables—never NPC records, players, zombies, inventory items, Java objects,
 functions, coroutines, or metatables.
+
+## Layered Emblems
+
+Every faction owns a bounded emblem made from one background color and up to
+three overlapping vanilla Build 42 map-symbol layers. Persistence stores only
+stable symbol IDs, palette IDs, scales, offsets, and revisions. Texture
+objects are resolved and cached on the client and never enter ModData.
+
+AI-owned factions receive an archetype-aware deterministic emblem generated
+from faction identity. V3 records without an emblem receive the same emblem on
+every normalization, making the V4 migration idempotent. A missing or
+malformed authored emblem also falls back to that deterministic result.
+
+The player-faction creation control opens the emblem creator before sending
+the guarded create request. A player faction owner may reopen it with **Edit
+Emblem**. Server APIs normalize the submitted primitives and reject edits by
+non-owners. The reusable client editor supports background color plus three
+symbol/color/size layers.
 
 ## Archetypes and Policy
 
@@ -271,6 +310,7 @@ Copied reads include:
   `GetLeader`;
 - `GetNPCFaction`, `GetNPCAffiliation`, `IsMember`;
 - `GetPlayerFaction`, `GetFactionForPlayerKey`;
+- `SetEmblem`, `SetPlayerFactionEmblem`;
 - `GetRelation` (`GetDiplomacy` is a directed compatibility alias);
 - `AreAtWar`, `AreAllied`, `GetTruceUntil`, `IsFactionAtWar`;
 - `GetOrganizationalFactionID`, `GetLegacyFactionClass`.
@@ -293,6 +333,10 @@ timestamps, initiator, and revision. It invents no opinion score or incident.
 V2 peace becomes neutral meaningful contact. V3 normalization is idempotent
 and safely repairs one-sided treaty flags to their strongest symmetric
 invariant.
+
+Faction registry V4 adds the serialization-safe layered `emblem` record.
+Existing V3 factions receive deterministic archetype-aware emblems without
+changing memberships, policy, diplomacy, hostility, or NPC presence.
 
 NPC persistence is V15, affiliation V2, social V3, conduct V1, and player
 identity registry V3.
@@ -321,6 +365,19 @@ Creating a faction in the Overview accepts a typed NPC population and invokes
 the community director immediately. It assigns a free random residential
 building, generates archetype-aware faction/community names and roles, and
 keeps residents abstract when that building is unloaded.
+
+Creating the player's faction first opens the layered emblem editor. AI
+factions use the deterministic generator. The emblem appears in the NPC map
+hover badge and at its community base marker.
+
+The **BASES** map layer uses the same relation palette as NPC map markers:
+player-owned is dark green, allied/friendly is bright green, neutral is
+yellow, war/hostile is red, and collapsed or vacant is gray. Persistent map
+labels use a darker shade for legibility. Hovering within six pixels of a
+base radius or building boundary displays a compact name, population, and
+player-faction status card. NPC marker hit-testing takes priority and the base
+layer renders underneath NPC dots, so base inspection does not block NPC
+portrait hover.
 
 Phase 5B.1 also adds disabled-by-default, runtime-only telemetry for callback
 delivery, exact faction attribution, aggregation episodes, incident creation,

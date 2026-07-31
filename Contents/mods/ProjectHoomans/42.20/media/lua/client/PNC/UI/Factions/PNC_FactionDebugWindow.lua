@@ -2,6 +2,7 @@ require "PsychopatzCore/UI/PsychopatzUI"
 require "ISUI/ISTextEntryBox"
 require "PNC/UI/Factions/PNC_FactionDebugModel"
 require "PNC/UI/Factions/PNC_FactionDebugOverlay"
+require "PNC/UI/Factions/PNC_FactionEmblemEditor"
 
 PNC.FactionDebugUI = PNC.FactionDebugUI or {}
 
@@ -31,6 +32,7 @@ local CONTROLS = {
     { id = "view_members", titleKey = "UI_PNC_FactionViewMembers", variant = "quiet" },
     { id = "view_diagnostics", titleKey = "UI_PNC_FactionViewDiagnostics", variant = "quiet" },
     { id = "create_player_faction", titleKey = "UI_PNC_FactionCreatePlayer", variant = "success", views = views("overview") },
+    { id = "edit_emblem", titleKey = "UI_PNC_FactionEditEmblem", variant = "default", views = views("overview") },
     { id = "create_settler", titleKey = "UI_PNC_FactionCreateSettler", variant = "success", views = views("overview") },
     { id = "create_looter", titleKey = "UI_PNC_FactionCreateLooter", variant = "danger", views = views("overview") },
     { id = "create_trader", titleKey = "UI_PNC_FactionCreateTrader", variant = "default", views = views("overview") },
@@ -405,6 +407,54 @@ function ISPNCFactionDebugWindow:onAction(button)
         end
         return
     end
+    if internal == "create_player_faction"
+        or internal == "edit_emblem"
+    then
+        local snapshot = ClientState.factionDebug or {}
+        local selected = faction and faction.faction or nil
+        PNC.FactionEmblemEditor.Open({
+            archetypeID = selected
+                and selected.archetypeID or "settler",
+            emblem = internal == "edit_emblem"
+                and selected and selected.emblem or nil,
+            seed = selected and selected.id
+                or snapshot.currentPlayerKey
+                or "player_faction",
+            context = {
+                action = internal,
+                groupSize = tonumber(
+                    self.groupSizeEntry
+                        and self.groupSizeEntry:getText()
+                        or self.groupSize
+                ) or 4,
+                presenceMode = self.presenceMode,
+            },
+            onSave = function(emblem, context)
+                PNC.Client.SendDebug(
+                    "faction_debug_action",
+                    {
+                        factionAction =
+                            context.action == "edit_emblem"
+                                and "set_emblem"
+                                or "create_player_faction",
+                        factionID = selected and selected.id,
+                        emblem = emblem,
+                        groupSize = math.max(
+                            1,
+                            math.min(
+                                24,
+                                math.floor(
+                                    context.groupSize or 4
+                                )
+                            )
+                        ),
+                        presenceMode = context.presenceMode,
+                    }
+                )
+            end,
+        })
+        return
+    end
     if string.sub(internal, 1, 5) == "view_" then
         local view = string.sub(internal, 6)
         if Model.Views[view] then
@@ -557,6 +607,10 @@ function ISPNCFactionDebugWindow:prerender()
         end
         if internal == "create_player_faction" then
             enabled = playerFactionID == nil
+        elseif internal == "edit_emblem" then
+            enabled = faction ~= nil
+                and playerFactionID == faction.id
+                and faction.faction.ownerPlayerKey ~= nil
         elseif internal == "generate_group" then
             enabled = faction ~= nil
                 and faction.faction.status == "active"

@@ -13,7 +13,7 @@
 - compact `inventory` payload
 - sparse, directed `social` relationship and memory payload
 - separate `PNC_PlayerCharacters` player-character registry schema v3
-- separate `PNC_Factions` organizational/diplomacy registry schema v3
+- separate `PNC_Factions` organizational/diplomacy/emblem registry schema v4
 - primitive NPC affiliation schema v2, including optional community identity
 - separate `PNC_Communities` community/site registry schema v2
 - body-part wounds and infection timing, stage, progress, fever, and temperature
@@ -73,7 +73,10 @@
 - faction-registry V1 data normalizes through V2 membership indexes. V2
   symmetric pair diplomacy normalizes to V3 directed relation records while
   preserving official war/peace state, timestamps, initiator, and revision.
-  It invents no opinion metrics, incidents, factions, or memberships
+  V3 normalizes to V4 by assigning each faction a deterministic,
+  archetype-aware layered emblem made only from primitive map-symbol IDs,
+  colors, and numeric transforms. It invents no opinion metrics, incidents,
+  factions, or memberships
 - full NPC records never persist after death. The registry directory instead
   keeps a minimal `deathMarkers` map with identity, name, position, corpse token,
   infection state, and delay metadata

@@ -71,6 +71,30 @@ local function resolvePortrait(snapshot)
     return nil
 end
 
+local function resolveOrganizationalFaction(snapshot)
+    if type(snapshot and snapshot.organizationalFaction)
+        == "table"
+    then
+        return snapshot.organizationalFaction
+    end
+    local affiliation = type(snapshot and snapshot.affiliation)
+        == "table" and snapshot.affiliation or nil
+    local factionID = affiliation and affiliation.factionID
+    if not factionID then return nil end
+    local faction = PNC.Factions
+        and PNC.Factions.GetPresentation
+        and PNC.Factions.GetPresentation(factionID) or nil
+    return {
+        id = factionID,
+        name = faction and faction.name or factionID,
+        archetypeID = faction and faction.archetypeID or nil,
+        emblem = faction and faction.emblem or nil,
+        membershipStatus = affiliation.membershipStatus,
+        role = affiliation.role,
+        rank = affiliation.rank,
+    }
+end
+
 local function currentWorldHour()
     local gameTime = getGameTime and getGameTime() or nil
     return gameTime and gameTime.getWorldAgeHours
@@ -142,6 +166,8 @@ function Directory.GetProjected(npcId, atWorldHour)
                 snapshot.displayName or snapshot.name or snapshot.id
             ),
             faction = tostring(snapshot.faction or "neutral"),
+            organizationalFaction =
+                resolveOrganizationalFaction(snapshot),
             recruited = snapshot.recruited == true,
             colonist = snapshot.colonist == true
                 or snapshot.recruited == true
@@ -151,7 +177,12 @@ function Directory.GetProjected(npcId, atWorldHour)
             orderKind = snapshot.orderKind,
             portrait = resolvePortrait(snapshot),
             roleTag = snapshot.mapPresentation
-                and snapshot.mapPresentation.roleTag or nil,
+                and snapshot.mapPresentation.roleTag
+                or snapshot.organizationalFaction
+                    and snapshot.organizationalFaction.role
+                or snapshot.affiliation
+                    and snapshot.affiliation.role
+                or nil,
             iconID = snapshot.mapPresentation
                 and snapshot.mapPresentation.iconID or nil,
             mapVisibility = snapshot.mapPresentation
@@ -203,6 +234,8 @@ function Directory.GetProjected(npcId, atWorldHour)
             snapshot.displayName or snapshot.name or snapshot.id
         ),
         faction = tostring(snapshot.faction or "neutral"),
+        organizationalFaction =
+            resolveOrganizationalFaction(snapshot),
         recruited = snapshot.recruited == true,
         colonist = snapshot.colonist == true
             or snapshot.recruited == true
@@ -212,7 +245,12 @@ function Directory.GetProjected(npcId, atWorldHour)
         orderKind = snapshot.orderKind,
         portrait = resolvePortrait(snapshot),
         roleTag = snapshot.mapPresentation
-            and snapshot.mapPresentation.roleTag or nil,
+            and snapshot.mapPresentation.roleTag
+            or snapshot.organizationalFaction
+                and snapshot.organizationalFaction.role
+            or snapshot.affiliation
+                and snapshot.affiliation.role
+            or nil,
         iconID = snapshot.mapPresentation
             and snapshot.mapPresentation.iconID or nil,
         mapVisibility = snapshot.mapPresentation

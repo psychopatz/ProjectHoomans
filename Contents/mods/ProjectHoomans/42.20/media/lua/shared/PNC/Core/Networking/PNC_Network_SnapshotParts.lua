@@ -92,6 +92,8 @@ local function buildOrganizationalFactionSummary(record)
             or tostring(factionID),
         archetypeID = faction
             and faction.archetypeID or nil,
+        emblem = faction
+            and Core.DeepCopy(faction.emblem) or nil,
         membershipStatus =
             affiliation.membershipStatus,
         role = affiliation.role,

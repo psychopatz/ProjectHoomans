@@ -1,5 +1,5 @@
-local SHARED = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
-local CLIENT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/"
+local SHARED = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local CLIENT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
 
 local worldHour = 0.5
 getGameTime = function()
@@ -122,12 +122,35 @@ PNC.Network.ClientState.snapshots["idle:1"] = {
         appearance = { hairModel = "Short" },
         equipment = { worn = {} },
     },
+    organizationalFaction = {
+        id = "faction_idle",
+        name = "Idle Survivors",
+        archetypeID = "settler",
+        emblem = {
+            schemaVersion = 1,
+            backgroundColorID = "green",
+            layers = {
+                {
+                    symbolID = "House",
+                    colorID = "white",
+                    scale = 0.76,
+                    offsetX = 0,
+                    offsetY = 0,
+                },
+            },
+            revision = 2,
+        },
+    },
 }
 local idle = assert(PNC.TravelDirectory.GetProjected("idle:1"))
 assert(idle.name == "Idle NPC" and idle.x == 25 and idle.state == "idle",
     "non-travelling NPC was missing from the map directory")
 assert(idle.portrait and idle.portrait.appearance.hairModel == "Short",
     "map projection dropped compact portrait metadata")
+assert(idle.organizationalFaction
+    and idle.organizationalFaction.emblem
+    and idle.organizationalFaction.emblem.revision == 2,
+    "map projection dropped layered faction emblem")
 
 PNC.Network.ClientState.snapshots["dead:neutral"] = {
     id = "dead:neutral",

@@ -10,6 +10,7 @@ local EntityRef = PNC.EntityRef
 local DiplomacyMath = PNC.FactionDiplomacyMath
 local IncidentDefinitions = PNC.FactionIncidentDefinitions
 local Balance = PNC.FactionBalance
+local Emblems = PNC.FactionEmblems
 
 local function tuning(name, fallback)
     local value = Balance and Balance.Get and Balance.Get(name)
@@ -685,6 +686,11 @@ function Types.NormalizeFaction(value, factionID)
             source.policy,
             archetypeID,
             id
+        ),
+        emblem = Emblems.Normalize(
+            source.emblem,
+            archetypeID,
+            tostring(id) .. ":" .. tostring(name)
         ),
         relations = {},
         tags = normalizeTags(source.tags),

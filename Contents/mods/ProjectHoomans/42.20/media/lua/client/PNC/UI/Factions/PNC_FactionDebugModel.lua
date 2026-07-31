@@ -36,6 +36,22 @@ local function enabledKeys(values)
     return #keys > 0 and table.concat(keys, ", ") or "(none)"
 end
 
+local function emblemText(emblem)
+    if type(emblem) ~= "table" then return "(generated on load)" end
+    local layers = {}
+    local index
+    for index = 1, #(emblem.layers or {}) do
+        local layer = emblem.layers[index]
+        layers[#layers + 1] = tostring(layer.symbolID)
+            .. "/" .. tostring(layer.colorID)
+    end
+    return tostring(emblem.backgroundColorID or "unknown")
+        .. " | " .. (
+            #layers > 0 and table.concat(layers, " + ")
+                or "(no layers)"
+        )
+end
+
 function Model.BuildFactionItems(snapshot)
     local output = {}
     for _, faction in ipairs(
@@ -129,6 +145,10 @@ function Model.BuildRows(snapshot, authorized, reason)
                 .. " player"
         )
         rows[#rows + 1] = row("Revision", faction.revision)
+        rows[#rows + 1] = row(
+            "Emblem",
+            emblemText(faction.emblem)
+        )
         rows[#rows + 1] = row(
             "Created", tostring(faction.createdAt) .. " h"
         )

@@ -108,7 +108,8 @@ function Debug.BuildSnapshot(
     selectedCommunityID,
     selectedFactionID,
     selectedNPCID,
-    action
+    action,
+    player
 )
     local communities = Communities.List()
     local factions = {}
@@ -116,9 +117,45 @@ function Debug.BuildSnapshot(
     local diagnostics = {}
     local selected
     local selectedNPC
+    local playerKey
+    local playerFaction
+    local factionRelations = {}
     Communities.EnsureLoaded()
+    if player and PNC.PlayerCharacters
+        and PNC.PlayerCharacters.GetEntityKey
+    then
+        playerKey = PNC.PlayerCharacters.GetEntityKey(player, {
+            callback = "community_debug_snapshot",
+            worldAgeHours = worldAgeHours(),
+        })
+        playerFaction = playerKey
+            and PNC.Factions.GetFactionForPlayerKey(playerKey)
+            or nil
+    end
     for _, faction in ipairs(PNC.Factions.List()) do
         factions[#factions + 1] = factionSummary(faction)
+        local relation = playerFaction
+            and faction.id ~= playerFaction.id
+            and PNC.Factions.GetRelation(
+                faction.id,
+                playerFaction.id
+            ) or nil
+        factionRelations[faction.id] = {
+            isPlayerFaction = playerFaction ~= nil
+                and faction.id == playerFaction.id,
+            state = relation and relation.state
+                or playerFaction and "neutral" or "unknown",
+            atWar = playerFaction ~= nil
+                and faction.id ~= playerFaction.id
+                and PNC.Factions.AreAtWar(
+                    faction.id,
+                    playerFaction.id
+                ) or false,
+            allied = relation
+                and relation.allied == true or false,
+            factionStatus = faction.status,
+            emblem = copy(faction.emblem),
+        }
     end
     for _, community in ipairs(communities) do
         if community.id == selectedCommunityID then
@@ -166,6 +203,10 @@ function Debug.BuildSnapshot(
         selectedCommunity = copy(selected),
         selectedFactionID = selectedFactionID,
         selectedNPC = copy(selectedNPC),
+        currentPlayerKey = playerKey,
+        currentPlayerFactionID =
+            playerFaction and playerFaction.id or nil,
+        factionRelations = factionRelations,
         npcDiagnostics = diagnostics,
         validation = copy(Debug.LastValidation),
         action = copy(action),
@@ -385,7 +426,8 @@ function Debug.PerformAction(player, args)
         communityID,
         factionID,
         npcID,
-        actionResult(ok, reason, action)
+        actionResult(ok, reason, action),
+        player
     )
 end
 

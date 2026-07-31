@@ -425,6 +425,7 @@ function Factions.GetPresentation(factionID)
         name = faction.name,
         archetypeID = faction.archetypeID,
         status = faction.status,
+        emblem = copy(faction.emblem),
     }
 end
 
@@ -579,6 +580,7 @@ function Factions.Create(spec)
         ownerPlayerKey = spec.ownerPlayerKey,
         playerMemberKeys = spec.playerMemberKeys,
         policy = spec.policy,
+        emblem = spec.emblem,
         revision = 1,
     })
     if not faction then return false, "invalid_name" end
@@ -1111,11 +1113,60 @@ function Factions.CreatePlayerFaction(player, spec)
         archetypeID = spec.archetypeID or "settler",
         createdAt = spec.createdAt,
         tags = spec.tags,
+        emblem = spec.emblem,
         ownerPlayerKey = playerKey,
         playerMemberKeys = {
             [playerKey] = true,
         },
     })
+end
+
+function Factions.SetEmblem(factionID, value)
+    local faction
+    local normalized
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    if type(value) ~= "table" then
+        return false, "invalid_emblem"
+    end
+    normalized = PNC.FactionEmblems.Normalize(
+        value,
+        faction.archetypeID,
+        faction.id .. ":" .. faction.name
+    )
+    normalized.revision = math.max(
+        tonumber(faction.emblem and faction.emblem.revision) or 0,
+        tonumber(normalized.revision) or 0
+    )
+    if Types.AreEqual(faction.emblem, normalized) then
+        return true, "unchanged", copy(faction)
+    end
+    normalized.revision = normalized.revision + 1
+    faction.emblem = normalized
+    touchFaction(faction)
+    touchRegistry()
+    return true, "updated", copy(faction)
+end
+
+function Factions.SetPlayerFactionEmblem(player, value)
+    local playerKey
+    local reason
+    local faction
+    if not authority() then return false, "not_authority" end
+    playerKey, reason = playerKeyFor(
+        player,
+        "set_player_faction_emblem",
+        true
+    )
+    if not playerKey then return false, reason end
+    faction, reason = Factions.GetFactionForPlayerKey(playerKey)
+    if not faction then return false, reason end
+    if faction.ownerPlayerKey ~= playerKey then
+        return false, "not_faction_owner"
+    end
+    return Factions.SetEmblem(faction.id, value)
 end
 
 function Factions.EnsurePlayerFaction(player, options)

@@ -129,6 +129,7 @@ local function factionSummary(faction)
         archivedAt = faction.archivedAt,
         tags = copy(faction.tags),
         policy = copy(faction.policy),
+        emblem = copy(faction.emblem),
         revision = faction.revision,
         communityCount = #communities,
         communityNames = communityNames,
@@ -527,6 +528,7 @@ function Debug.PerformAction(player, args)
                 archetypeID = "settler",
                 createdAt = at,
                 tags = { debugCreated = true },
+                emblem = args and args.emblem,
             }
         )
         if ok and value then
@@ -535,8 +537,15 @@ function Debug.PerformAction(player, args)
                 PNC.CommunityDirector.GenerateForFaction(
                     factionID,
                     groupSpec(player, args, at)
-                )
+            )
         end
+    elseif action == "set_emblem" then
+        ok, reason, value =
+            Factions.SetPlayerFactionEmblem(
+                player,
+                args and args.emblem
+            )
+        if ok and value then factionID = value.id end
     elseif action == "generate_group" then
         ok, reason, groupResult =
             PNC.CommunityDirector.GenerateForFaction(

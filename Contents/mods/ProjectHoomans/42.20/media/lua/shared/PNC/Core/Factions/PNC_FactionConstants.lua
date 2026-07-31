@@ -26,10 +26,11 @@ PNC.FactionConstants = PNC.FactionConstants or {}
 local Constants = PNC.FactionConstants
 
 Constants.REGISTRY_MODDATA_KEY = "PNC_Factions"
-Constants.REGISTRY_SCHEMA_VERSION = 3
+Constants.REGISTRY_SCHEMA_VERSION = 4
 Constants.AFFILIATION_SCHEMA_VERSION = 2
 Constants.RELATION_SCHEMA_VERSION = 1
 Constants.POLICY_SCHEMA_VERSION = 1
+Constants.EMBLEM_SCHEMA_VERSION = 1
 Constants.POLICY_GENERATION_VERSION = 1
 Constants.ID_PREFIX = "faction_"
 Constants.ID_MAX_LENGTH = 192

@@ -69,6 +69,7 @@ PNC = {}
 dofile(SHARED .. "Base/PNC_Core.lua")
 dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
 dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
+dofile(SHARED .. "Factions/PNC_FactionEmblems.lua")
 dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
 dofile(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
 dofile(SHARED .. "Factions/PNC_FactionTypes.lua")
@@ -129,7 +130,7 @@ end
 
 -- 1-4. Pure defaults and all four data-only archetypes.
 local registryDefault = Types.NewFactionRegistry()
-assertEqual(registryDefault.schemaVersion, 3, "registry schema")
+assertEqual(registryDefault.schemaVersion, 4, "registry schema")
 assertEqual(registryDefault.revision, 0, "registry revision")
 assertEqual(next(registryDefault.byID), nil, "registry starts empty")
 local affiliationDefault = Types.NewAffiliation()
@@ -230,6 +231,41 @@ Factions.List()
 Factions.GetByArchetype("settler")
 assertEqual(Factions.Registry.revision, readRevision,
     "pure faction reads")
+
+-- Persistent emblem edits are normalized and revision-aware.
+local emblemFactionBefore = Factions.Get(settlementID)
+local emblemRegistryBefore = Factions.Registry.revision
+ok, reason = Factions.SetEmblem(settlementID, {
+    backgroundColorID = "red",
+    layers = {
+        {
+            symbolID = "Skull",
+            colorID = "white",
+            scale = 0.95,
+        },
+    },
+})
+assertTrue(ok, "emblem mutation")
+local emblemFactionAfter = Factions.Get(settlementID)
+assertEqual(emblemFactionAfter.emblem.backgroundColorID,
+    "red", "emblem persisted")
+assertEqual(emblemFactionAfter.revision,
+    emblemFactionBefore.revision + 1,
+    "emblem touches faction")
+assertEqual(Factions.Registry.revision,
+    emblemRegistryBefore + 1,
+    "emblem touches registry")
+local unchangedRegistry = Factions.Registry.revision
+ok, reason = Factions.SetEmblem(
+    settlementID,
+    emblemFactionAfter.emblem
+)
+assertTrue(ok, "identical emblem accepted")
+assertEqual(reason, "unchanged",
+    "identical emblem is revision-neutral")
+assertEqual(Factions.Registry.revision,
+    unchangedRegistry,
+    "identical emblem does not touch registry")
 
 -- 13-18. Membership is separate from every legacy behavior field.
 local alice = newNPC("npc_alice", "hostile")

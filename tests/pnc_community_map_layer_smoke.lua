@@ -39,10 +39,33 @@ package.preload["ISUI/Maps/ISWorldMap"] =
     function() return ISWorldMap end
 package.preload["ISUI/ISContextMenu"] =
     function() return ISContextMenu end
+package.preload["PNC/UI/PNC_NPCTypePalette"] =
+    function() return true end
+package.preload["PNC/UI/Factions/PNC_FactionEmblemRenderer"] =
+    function() return true end
 
 local registered
 local sent
+local markerBlocksBase = false
 PNC = {
+    NPCTypePalette = {
+        Get = function(typeID)
+            local colors = {
+                dead = { r = 0.55, g = 0.55, b = 0.55 },
+                neutral = { r = 0.95, g = 0.75, b = 0.20 },
+                hostile = { r = 1.00, g = 0.25, b = 0.20 },
+                colonist = { r = 0.08, g = 0.42, b = 0.16 },
+                follower = { r = 0.15, g = 0.90, b = 0.25 },
+            }
+            return colors[typeID] or colors.neutral
+        end,
+    },
+    MapTravelLayer = {
+        FindMarkerAt = function()
+            return markerBlocksBase and { id = "npc_hover" }
+                or nil
+        end,
+    },
     MapLayers = {
         Register = function(id, definition)
             registered = {
@@ -112,8 +135,22 @@ function getText(key)
         UI_PNC_CommunityMapUnoccupied =
             "Unoccupied hideout",
         UI_PNC_CommunityMapVacant = "vacant",
+        UI_PNC_CommunityMapAtWar =
+            "At war with your faction",
+        UI_PNC_CommunityMapPopulation = "Population",
+        UI_PNC_CommunityMapCollapsed =
+            "Collapsed / unoccupied",
+        UI_PNC_CommunityMapRelation = "Relation",
     }
     return values[key] or key
+end
+function getTextManager()
+    return {
+        MeasureStringX = function(_, _, value)
+            return #tostring(value) * 7
+        end,
+        getFontHeight = function() return 14 end,
+    }
 end
 
 dofile(
@@ -123,9 +160,13 @@ dofile(
 
 assertEqual(registered.id, "pnc_community_sites",
     "community layer registered")
+assertEqual(registered.definition.order, 90,
+    "community layer remains below NPC dots")
 
 local lineCount = 0
 local label
+local popupLines = {}
+local rectangles = {}
 local map = {
     width = 500,
     height = 500,
@@ -143,7 +184,13 @@ local map = {
     },
     getMouseX = function() return 10 end,
     getMouseY = function() return 10 end,
-    drawRect = function() end,
+    drawRect = function(_, ...)
+        rectangles[#rectangles + 1] = { ... }
+    end,
+    drawRectBorder = function() end,
+    drawText = function(_, value)
+        popupLines[#popupLines + 1] = value
+    end,
     drawTextCentre = function(_, value)
         label = value
     end,
@@ -156,6 +203,41 @@ registered.definition.render(map)
 assertEqual(lineCount, 32, "radius rendered")
 assertEqual(label, "Old Mill Gang [vacant]",
     "community label rendered")
+local vacantMarker = rectangles[1]
+assertEqual(vacantMarker[6], 0.55,
+    "collapsed site uses dead gray palette")
+
+-- Active enemy communities use the same hostile red as NPC map markers.
+local state = PNC.Network.ClientState.communityDebug
+state.communities[1].status = "active"
+state.communities[1].currentPopulation = 4
+state.communities[1].populationCapacity = 12
+state.communities[1].factionID = "faction_enemy"
+state.sites[1].status = "occupied"
+state.factionRelations = {
+    faction_enemy = {
+        state = "war",
+        atWar = true,
+        allied = false,
+    },
+}
+map.getMouseX = function() return 15 end
+rectangles = {}
+popupLines = {}
+registered.definition.render(map)
+assertEqual(rectangles[1][6], 1,
+    "enemy base uses hostile red palette")
+assertEqual(popupLines[3], "At war with your faction",
+    "base edge hover reports faction war status")
+
+-- NPC marker hit-testing always wins over the base-outline hover card.
+markerBlocksBase = true
+popupLines = {}
+registered.definition.render(map)
+assertEqual(#popupLines, 0,
+    "base hover card suppressed over NPC marker")
+markerBlocksBase = false
+state.sites[1].status = "vacant"
 
 assertTrue(map:onRightMouseUp(10, 10),
     "vacant site consumes right click")

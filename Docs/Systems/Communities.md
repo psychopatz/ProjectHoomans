@@ -212,8 +212,8 @@ diplomacy revisions.
 NPC persistence remains V15 and affiliation remains V2. Community registry and
 records advance from V1 to V2. Normalization adds an empty `sitesByID` registry
 and nil `siteID` references, so existing communities remain valid but do not
-acquire invented buildings. Faction registry remains V3 because this migration
-is wholly inside the separate community ModData registry.
+acquire invented buildings. The community migration itself does not mutate
+factions; the separate faction registry is now V4 for layered faction emblems.
 
 Loading normalizes partial registry data, clears invalid/missing/dead/currently
 retired community references, and deterministically rebuilds both secondary

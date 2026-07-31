@@ -70,6 +70,7 @@ dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
 dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
 dofile(SHARED .. "Factions/PNC_FactionBalance.lua")
 dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
+dofile(SHARED .. "Factions/PNC_FactionEmblems.lua")
 dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
 dofile(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
 dofile(SHARED .. "Factions/PNC_FactionIntent.lua")
@@ -547,7 +548,7 @@ end
 equal(#PNC.FactionBehavior.ReconciliationQueue, 0,
     "reconciliation completes")
 
--- V2 pair diplomacy deterministically migrates to two V3 directions.
+-- V2 diplomacy migrates to directed relations and V4 emblems.
 local migrated = PNC.FactionTypes.NormalizeFactionRegistry({
     schemaVersion = 2,
     revision = 3,
@@ -573,7 +574,7 @@ local migrated = PNC.FactionTypes.NormalizeFactionRegistry({
         },
     },
 })
-equal(migrated.schemaVersion, 3, "registry migrated to V3")
+equal(migrated.schemaVersion, 4, "registry migrated to V4")
 truthy(type(migrated.byPlayerKey) == "table",
     "player index added")
 equal(migrated.diplomacy, nil,
@@ -584,6 +585,12 @@ truthy(migrated.byID.faction_old_a
 truthy(migrated.byID.faction_old_b
     .relations.faction_old_a.atWar,
     "reverse war migrated")
+truthy(#migrated.byID.faction_old_a.emblem.layers > 0,
+    "old faction receives deterministic emblem")
+truthy(PNC.FactionTypes.AreEqual(
+    migrated,
+    PNC.FactionTypes.NormalizeFactionRegistry(migrated)
+), "V4 faction migration idempotent")
 saveSafe(Factions.Registry)
 
 print("pnc_faction_warfare_smoke: ok")

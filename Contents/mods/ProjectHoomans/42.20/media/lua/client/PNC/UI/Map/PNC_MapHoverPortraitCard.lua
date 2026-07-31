@@ -2,6 +2,7 @@
 
 require "ISUI/ISPanel"
 require "PsychopatzCore/UI/Components/PsychopatzPortraitPanel"
+require "PNC/UI/Factions/PNC_FactionEmblemRenderer"
 
 PNC = PNC or {}
 
@@ -19,6 +20,7 @@ PNCMapHoverPortraitCard.DebugBackground = false
 
 local FACTION_COLOR = { r = 0.82, g = 0.61, b = 0.16 }
 local WORKER_COLOR = { r = 0.16, g = 0.55, b = 0.78 }
+local EmblemRenderer = PNC.FactionEmblemRenderer
 
 local function firstGlyph(value, fallback)
     local text = tostring(value or "")
@@ -65,23 +67,47 @@ end
 
 function PNCMapHoverPortraitCard:setContext(entry)
     local name = tostring(entry and entry.name or entry and entry.id or "NPC")
-    local faction = tostring(entry and entry.faction or "")
-    local workerRole = tostring(entry and entry.roleTag or "")
+    local organizational = entry
+        and entry.organizationalFaction or nil
+    local faction = tostring(
+        organizational and organizational.name
+            or entry and entry.faction or ""
+    )
+    local factionID = tostring(
+        organizational and organizational.id or faction
+    )
+    local workerRole = tostring(
+        entry and entry.roleTag
+            or organizational and organizational.role
+            or ""
+    )
+    local emblem = organizational and organizational.emblem or nil
+    local emblemRevision = emblem
+        and tonumber(emblem.revision) or -1
     if self.contextName == name
         and self.contextFaction == faction
+        and self.contextFactionID == factionID
         and self.contextWorkerRole == workerRole
+        and self.contextEmblemRevision == emblemRevision
     then
         return
     end
     self.contextName = name
     self.contextFaction = faction
+    self.contextFactionID = factionID
     self.contextWorkerRole = workerRole
+    self.contextEmblemRevision = emblemRevision
+    self.factionEmblem = emblem
     self.factionGlyph = firstGlyph(faction, "?")
     self.workerGlyph = firstGlyph(workerRole, "?")
 end
 
 function PNCMapHoverPortraitCard:setFactionIcon(texture)
     self.factionIcon = texture
+end
+
+function PNCMapHoverPortraitCard:setFactionEmblem(emblem)
+    self.factionEmblem = emblem
 end
 
 function PNCMapHoverPortraitCard:setWorkerIcon(texture)
@@ -141,6 +167,38 @@ function PNCMapHoverPortraitCard:drawBadge(x, color, glyph, texture)
     )
 end
 
+function PNCMapHoverPortraitCard:drawFactionBadge(x)
+    local y = self.portraitSize - self.badgeSize - self.badgeInset
+    if self.factionEmblem and EmblemRenderer
+        and EmblemRenderer.Draw
+    then
+        self:drawRect(
+            x + 2,
+            y + 2,
+            self.badgeSize,
+            self.badgeSize,
+            0.55,
+            0,
+            0,
+            0
+        )
+        EmblemRenderer.Draw(
+            self,
+            self.factionEmblem,
+            x,
+            y,
+            self.badgeSize
+        )
+        return
+    end
+    self:drawBadge(
+        x,
+        FACTION_COLOR,
+        self.factionGlyph,
+        self.factionIcon
+    )
+end
+
 function PNCMapHoverPortraitCard:render()
     ISPanel.render(self)
     local nameY = self.portraitSize
@@ -174,12 +232,7 @@ function PNCMapHoverPortraitCard:render()
         1,
         UIFont.Small
     )
-    self:drawBadge(
-        self.badgeInset,
-        FACTION_COLOR,
-        self.factionGlyph,
-        self.factionIcon
-    )
+    self:drawFactionBadge(self.badgeInset)
     self:drawBadge(
         self.width - self.badgeSize - self.badgeInset,
         WORKER_COLOR,

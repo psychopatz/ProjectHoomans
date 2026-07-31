@@ -1,5 +1,5 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/Map/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
         .. "PNC_MapHoverPortrait.lua"
 
 package.preload["PNC/UI/Map/PNC_MapHoverPortraitCard"] =

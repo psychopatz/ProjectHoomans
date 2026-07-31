@@ -1,9 +1,11 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/Map/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
         .. "PNC_MapHoverPortraitCard.lua"
 
 package.preload["ISUI/ISPanel"] = function() return true end
 package.preload["PsychopatzCore/UI/Components/PsychopatzPortraitPanel"] =
+    function() return true end
+package.preload["PNC/UI/Factions/PNC_FactionEmblemRenderer"] =
     function() return true end
 
 local Panel = {}
@@ -61,7 +63,15 @@ function PortraitPanel:setTarget(_, spec)
 end
 
 PsychopatzCore = { UI = { PortraitPanel = PortraitPanel } }
-PNC = {}
+local emblemDrawCount = 0
+PNC = {
+    FactionEmblemRenderer = {
+        Draw = function(_, emblem)
+            emblemDrawCount = emblemDrawCount + 1
+            return emblem ~= nil
+        end,
+    },
+}
 UIFont = { Small = "small" }
 IsoDirections = { S = "south" }
 
@@ -115,6 +125,24 @@ card:setWorkerIcon("worker_texture")
 assert(card.factionIcon == "faction_texture"
     and card.workerIcon == "worker_texture",
     "portrait badge slots cannot accept future icon textures")
+
+card:setContext({
+    id = "npc_card",
+    name = "Dion Amaya",
+    faction = "neutral",
+    roleTag = "farmer",
+    organizationalFaction = {
+        name = "Ashwood Haven",
+        emblem = {
+            revision = 3,
+            backgroundColorID = "green",
+            layers = {},
+        },
+    },
+})
+card:render()
+assert(emblemDrawCount == 1,
+    "layered organizational faction emblem did not replace placeholder")
 
 card:setCardPosition(20, 30)
 assert(card.x == 20 and card.y == 30,

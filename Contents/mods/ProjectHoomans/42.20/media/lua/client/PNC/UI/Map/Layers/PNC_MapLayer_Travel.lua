@@ -41,6 +41,48 @@ local function listProjectedEntries()
     return cached
 end
 
+function TravelLayer.GetProjectedEntries()
+    return listProjectedEntries()
+end
+
+function TravelLayer.GetDotSize(map)
+    local zoom = map and map.mapAPI
+        and tonumber(map.mapAPI:getZoomF()) or 0
+    return math.max(
+        7,
+        math.min(13, 7 + (zoom - 10) * 0.8)
+    )
+end
+
+function TravelLayer.FindMarkerAt(map, x, y, padding)
+    if not TravelLayer.Enabled or not map or not map.mapAPI then
+        return nil
+    end
+    local entries = listProjectedEntries()
+    local half = TravelLayer.GetDotSize(map) / 2
+        + (tonumber(padding) or 3)
+    local index
+    for index = #entries, 1, -1 do
+        local entry = entries[index]
+        if entry.x and entry.y then
+            local sx = map.mapAPI:worldToUIX(
+                entry.x,
+                entry.y
+            )
+            local sy = map.mapAPI:worldToUIY(
+                entry.x,
+                entry.y
+            )
+            if math.abs(x - sx) <= half
+                and math.abs(y - sy) <= half
+            then
+                return entry, sx, sy
+            end
+        end
+    end
+    return nil
+end
+
 local function colorFor(entry)
     return Palette.Resolve(entry)
 end
@@ -180,10 +222,9 @@ function TravelLayer.Render(map)
     end
     if Display and Display.EnsureButton then Display.EnsureButton(map) end
     local entries = listProjectedEntries()
-    local zoom = tonumber(map.mapAPI:getZoomF()) or 0
     local showLabels = Display and Display.AreNamesVisible
         and Display.AreNamesVisible() or false
-    local dotSize = math.max(7, math.min(13, 7 + (zoom - 10) * 0.8))
+    local dotSize = TravelLayer.GetDotSize(map)
     local mouseX = map:getMouseX()
     local mouseY = map:getMouseY()
     local hoveredEntry
