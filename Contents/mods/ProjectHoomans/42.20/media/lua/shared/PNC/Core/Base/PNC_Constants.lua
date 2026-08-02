@@ -49,6 +49,7 @@ Const.CMD_MAP_COMMAND = "MapCommand"
 Const.CMD_MAP_COMMAND_RESULT = "MapCommandResult"
 Const.CMD_FACTION_TOLL = "FactionToll"
 Const.CMD_FACTION_TOLL_RESPONSE = "FactionTollResponse"
+Const.CMD_CONVERSATION_CEASEFIRE_RESULT = "ConversationCeasefireResult"
 Const.PRESENCE_LIVE = "live"
 Const.PRESENCE_ABSTRACT = "abstract"
 Const.PRESENCE_CORPSE = "corpse"
@@ -72,6 +73,7 @@ Const.ATTACK_TYPE_NONE = "none"
 
 Const.JOB_ROAM = "RoamArea"
 Const.ROAM_MODE_AREA = "area"
+Const.ROAM_MODE_PLAYER = "player"
 
 Const.TICK_LIVE_HOT_MS = 100
 Const.TICK_LIVE_WARM_MS = 250

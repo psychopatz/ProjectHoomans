@@ -90,6 +90,17 @@ Internal.RegisterServerCommand(Const.CMD_FACTION_TOLL, function(args)
     end
 end)
 
+Internal.RegisterServerCommand(
+    Const.CMD_CONVERSATION_CEASEFIRE_RESULT,
+    function(args)
+        if PNC.Conversation
+            and PNC.Conversation.HandleCeasefireResult
+        then
+            PNC.Conversation.HandleCeasefireResult(args or {})
+        end
+    end
+)
+
 function Client.HandleServerCommand(command, args)
     local handler
     ClientState.lastSyncReceiveAt = Core.Now()

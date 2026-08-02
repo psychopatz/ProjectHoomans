@@ -213,6 +213,13 @@ function Director.GenerateForFaction(factionID, spec)
     if faction.status ~= "active" then
         return false, "faction_not_active"
     end
+    -- A mobile group only carries a transient primitive staging site. It is
+    -- not a community and must never reserve a building or acquire a home.
+    if Factions.IsMobileGroup
+        and Factions.IsMobileGroup(faction)
+    then
+        return false, "mobile_faction_cannot_create_community"
+    end
     local at = worldAge(spec.worldAgeHours)
     local preferredCommunity = spec.communityID
         and Communities.Get(spec.communityID) or nil

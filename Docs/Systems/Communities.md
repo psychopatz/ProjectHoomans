@@ -93,8 +93,10 @@ mode; destroyed status and mode normalize together. Archiving or destroying a
 community clears active membership and leadership but preserves its historical
 record.
 
-No evacuation movement, mobile parties, territory claims, or proximity-driven
-diplomacy exists in this phase.
+No evacuation movement or generic community travel exists in this phase.
+Mobile looter/refugee groups are intentionally not communities: they keep a
+separate primitive faction staging site, reserve no hideout, and cannot create
+or join a Community through the mobile-group director.
 
 ## Home anchor and pure spatial helpers
 
@@ -198,8 +200,10 @@ continuous director tick.
 The Faction Inspector exposes separate **Create Friendly Settlement** and
 **Create Looter Settlement** actions. Both choose an available random house
 and honor the entered population/presence mode. The looter-settlement action
-tags its owning faction for the territorial toll flow; it does not create the
-future roaming looter-group type.
+tags its owning faction for the territorial toll flow. It does not create a
+mobile looter group; **Create Mobile Looter Group** and **Create Refugee
+Group** use the separate mobile director and intentionally create no
+Community.
 
 ## Revisions
 
@@ -219,7 +223,7 @@ NPC persistence remains V15 and affiliation remains V2. Community registry and
 records advance from V1 to V2. Normalization adds an empty `sitesByID` registry
 and nil `siteID` references, so existing communities remain valid but do not
 acquire invented buildings. The community migration itself does not mutate
-factions; the separate faction registry remains V5.
+factions; the separate faction registry is V6.
 
 Loading normalizes partial registry data, clears invalid/missing/dead/currently
 retired community references, and deterministically rebuilds both secondary
@@ -267,8 +271,8 @@ participants only.
 
 ## Deferred extensions
 
-Autonomous director scheduling, strategic building scoring,
-safehouse/base construction, mobile parties, caravans, patrols, raids,
+Strategic building scoring, safehouse/base construction, caravans, patrols,
+raids,
 territory, markets, detailed
 inventories, tribute, robbery, construction, farming, recruitment strategy,
 proximity diplomacy, and normal-player management UI remain future work.

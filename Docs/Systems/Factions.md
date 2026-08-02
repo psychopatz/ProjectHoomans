@@ -19,15 +19,15 @@ faction policy, the directed relation, official treaties, player-scoped
 exceptions, territorial context, and immediate self-defense.
 
 This phase does not implement raids, autonomous faction strategy, tribute
-agreements, or roaming-group simulation.
+agreements, or live long-range travel simulation.
 
-## Persistence Schema V5
+## Persistence Schema V6
 
 The authority owns the separate `PNC_Factions` Global ModData table:
 
 ```lua
 {
-    schemaVersion = 5,
+    schemaVersion = 6,
     revision = 0,
     byID = {
         faction_123 = {
@@ -113,6 +113,21 @@ The authority owns the separate `PNC_Factions` Global ModData table:
                 },
             },
             tags = {},
+            mobile = {
+                schemaVersion = 1,
+                active = true,
+                pathMode = "random", -- random | player
+                site = { -- primitive staging-site snapshot, not a Community
+                    id = "community_site_building_123",
+                    kind = "building",
+                    home = { x = 10200, y = 9800, z = 0, radius = 14 },
+                },
+                lastMovedAt = 182.5,
+                nextMoveAt = 206.5,
+                relocationHours = 24,
+                relocationCount = 3,
+                revision = 1,
+            },
             revision = 1,
         },
     },
@@ -171,11 +186,11 @@ server check detects a player crossing an active community home radius:
 - self-defense, an existing war, and ordinary treaty rules remain
   authoritative;
 - regular looter factions without the territorial tag retain proactive
-  hostility and are the foundation for the future roaming director.
+  hostility. The mobile director may give an explicitly mobile group a
+  primitive staging site and abstract 24-hour relocation schedule.
 
 Pending toll prompts are runtime-only. Payment pacification and resulting war
-relations use the existing persistent faction schema, so registry V5 does not
-change. On load, an active looter faction that already owns an active settled
+relations use the existing persistent faction schema. On load, an active looter faction that already owns an active settled
 community is tagged deterministically; this upgrades bases created by the old
 **Create Looter Gang** debug action while leaving homeless/roaming looter
 factions unchanged.
@@ -358,6 +373,33 @@ V4 faction records migrate to V5 by receiving an empty
 `playerPacifications` map. Normalization is deterministic, bounded to 64
 entries, serialization-safe, and idempotent.
 
+V5 faction records migrate to V6 with `mobile = nil`. A mobile state is only
+created by the mobile-group director; migration never turns an existing
+community or ordinary faction into a mobile group.
+
+## Mobile Groups Versus Settlements
+
+There are two intentionally different looter forms:
+
+- A **looter settlement** owns a Community, has a fixed hideout radius, and
+  uses the territorial toll interaction.
+- A **mobile looter group** has no Community, no site reservation, no base
+  radius, and is proactively hostile to outsiders. It never asks for a toll.
+
+Refugee groups use the same mobile data foundation but retain refugee tactical
+policy. Their `mobile.site` is only a primitive staging snapshot; it is not a
+claimed building and may later be occupied by a settlement. Members relocate
+together only when all living members are abstract. By default the director
+selects another available building every 24 world-age hours, updates primitive
+coordinates/anchors/orders, and leaves normal presence admission to
+materialize them later.
+
+`pathMode = "random"` gives a live group its local area-roaming order. For
+mobile looters, `pathMode = "player"` gives the existing hostile-hunt order;
+for mobile refugees it gives the non-combat player-following roam mode. The
+Faction Inspector exposes both path modes and a guarded **Move Mobile Group
+Now** control for testing.
+
 The legacy tactical bridge sets peaceful settlers, traders, refugees, and
 territorial toll factions to neutral roaming. Regular roaming looters use
 hostile-hunt compatibility state by default; other archetypes use it only
@@ -428,7 +470,8 @@ Copied reads include:
   `IsProvisionalPlayerFaction`,
   `IsTerritorialTollFaction`,
   `MarkTerritorialTollFaction`,
-  `ReconcileTerritorialLooterFactions`;
+  `ReconcileTerritorialLooterFactions`, `IsMobileGroup`, and
+  `GetMobileGroup`;
 - `AddPlayerMember`, `RemovePlayerMember`,
   `TransferPlayerLeadership`;
 - `AddPlayerToCurrentFaction`, `BanishPlayerFromCurrentFaction`,
@@ -442,6 +485,9 @@ Copied reads include:
 Authority mutation also includes membership, leadership, archival/destruction,
 `CommitDirectedRelation`, `RecalculateRelation`, and
 `PNC.FactionIncidentService.AddIncident/RecordAttack/RecordPositiveEvent`.
+`SetMobileGroup`, `UpdateMobileGroup`, and `ClearMobileGroup` are
+server-authoritative mobile lifecycle APIs. `PNC.MobileGroupDirector` owns
+generation, abstract relocation, its due check, and debug path-mode changes.
 
 A directed relation mutation increments that relation, its source faction,
 and the registry. An official treaty increments both relation records, both
@@ -461,6 +507,11 @@ invariant.
 Faction registry V4 adds the serialization-safe layered `emblem` record.
 Existing V3 factions receive deterministic archetype-aware emblems without
 changing memberships, policy, diplomacy, hostility, or NPC presence.
+
+Faction registry V6 adds optional `mobile` group state. It normalizes only
+primitive site coordinates, path mode, world-age timestamps, and revisions;
+it does not reserve a community site, create a Community, or materialize an
+engine object.
 
 NPC persistence is V15, affiliation V2, social V3, conduct V1, and player
 identity registry V3.
@@ -485,10 +536,13 @@ edit score values. Available triggers are minor attack, severe attack, member
 killed, rescue, recalculation, war, 24-hour truce, peace, alliance, and
 alliance break.
 
-Creating a faction in the Overview accepts a typed NPC population and invokes
-the community director immediately. It assigns a free random residential
-building, generates archetype-aware faction/community names and roles, and
-keeps residents abstract when that building is unloaded.
+Creating a settlement in the Overview accepts a typed NPC population and
+invokes the community director immediately. It assigns a free random
+residential building, generates archetype-aware faction/community names and
+roles, and keeps residents abstract when that building is unloaded. **Create
+Mobile Looter Group** and **Create Refugee Group** invoke the separate mobile
+director instead, create no community record, and use the selected mobile path
+mode.
 
 Creating the player's faction first opens the layered emblem editor. AI
 factions use the deterministic generator. The emblem appears in the NPC map
@@ -572,6 +626,22 @@ For a basic in-game check:
 8. Start truce or make peace; confirm attacks stop.
 9. Save/reload and confirm directed metrics, incidents, treaty, policy, and
    revisions persist.
+
+For the mobile/parley debug check:
+
+1. In **PNC Faction Inspector > Overview**, choose **Presence Mode: abstract**,
+   enter a population, and click **Create Mobile Looter Group**. Confirm it
+   has a `mobile` staging site in the details list but no community count/base
+   marker.
+2. Choose **Mobile Path: random** to verify local roaming, or **player** to
+   verify the existing hostile hunt path. Use **Move Mobile Group Now** and
+   confirm its staging-site ID and member anchors change together.
+3. Talk to one of its hostile members. The conversation must remain open for
+   the speaking NPC and show **Ceasefire. Stand down for now.** Nearby enemies
+   remain a danger and still close the conversation.
+4. Select that option. Confirm the server reports a one-hour ceasefire and the
+   group stops proactively targeting only that player character. After the
+   world-age expiry, normal mobile looter hostility resumes.
 
 Run `lua tests/pnc_faction_diplomacy_smoke.lua` for deterministic non-engine
 coverage.

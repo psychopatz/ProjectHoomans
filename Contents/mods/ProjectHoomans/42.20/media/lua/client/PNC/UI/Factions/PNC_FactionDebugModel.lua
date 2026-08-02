@@ -183,6 +183,32 @@ function Model.BuildRows(snapshot, authorized, reason)
         rows[#rows + 1] = row(
             "Tags", enabledKeys(faction.tags)
         )
+        local mobile = faction.mobile
+        if mobile and mobile.active == true then
+            local site = mobile.site or {}
+            local home = site.home or {}
+            rows[#rows + 1] = row(
+                "Group type", "mobile / "
+                    .. tostring(mobile.pathMode or "random"),
+                "warning"
+            )
+            rows[#rows + 1] = row(
+                "Mobile staging site",
+                tostring(site.id or "unknown")
+                    .. " @ " .. string.format(
+                        "%.1f, %.1f, %.0f",
+                        tonumber(home.x) or 0,
+                        tonumber(home.y) or 0,
+                        tonumber(home.z) or 0
+                    )
+            )
+            rows[#rows + 1] = row(
+                "Next relocation",
+                tostring(mobile.nextMoveAt or 0)
+                    .. " h / count "
+                    .. tostring(mobile.relocationCount or 0)
+            )
+        end
         local policy = faction.policy or {}
         rows[#rows + 1] = row(
             "Policy",

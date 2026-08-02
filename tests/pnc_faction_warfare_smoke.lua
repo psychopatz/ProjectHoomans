@@ -319,6 +319,25 @@ equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_HUNT,
 truthy(Factions.CanNPCTargetPlayer(looterNPC, player),
     "looter can target player by default")
 
+-- Mobile-group state changes only path/order selection. It must preserve the
+-- looter's hostile outsider policy while offering both debug-selectable modes.
+Factions.Registry.byID[looterFaction.id].mobile = {
+    active = true,
+    pathMode = "random",
+    site = { home = { x = 300, y = 400, z = 0, radius = 12 } },
+}
+PNC.FactionBehavior.ApplyNPC(looterNPC, "mobile_random_test")
+equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_ROAM,
+    "mobile random looters roam locally")
+equal(looterNPC.hostility.attackPlayers, true,
+    "mobile random looters remain aggressive")
+Factions.Registry.byID[looterFaction.id].mobile.pathMode = "player"
+PNC.FactionBehavior.ApplyNPC(looterNPC, "mobile_player_test")
+equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_HUNT,
+    "mobile player looters use hostile hunt")
+Factions.Registry.byID[looterFaction.id].mobile = nil
+PNC.FactionBehavior.ApplyNPC(looterNPC, "mobile_reset_test")
+
 -- A base-owning looter settlement starts in a toll posture. It remains
 -- distinct from roaming looter gangs, which retain proactive hostility.
 truthy(Factions.AddNPC(
@@ -728,7 +747,7 @@ truthy(Factions.IsTerritorialTollFaction(
 equal(looterNPC.faction, "neutral",
     "legacy looter base stops shoot-on-sight behavior")
 
--- V2 diplomacy migrates to directed relations, emblems, and V5
+-- V2 diplomacy migrates to directed relations, emblems, and V6
 -- player-scoped pacification storage.
 local migrated = PNC.FactionTypes.NormalizeFactionRegistry({
     schemaVersion = 2,
@@ -755,7 +774,7 @@ local migrated = PNC.FactionTypes.NormalizeFactionRegistry({
         },
     },
 })
-equal(migrated.schemaVersion, 5, "registry migrated to V5")
+equal(migrated.schemaVersion, 6, "registry migrated to V6")
 truthy(type(migrated.byPlayerKey) == "table",
     "player index added")
 equal(migrated.diplomacy, nil,
@@ -774,7 +793,7 @@ truthy(type(migrated.byID.faction_old_a
 truthy(PNC.FactionTypes.AreEqual(
     migrated,
     PNC.FactionTypes.NormalizeFactionRegistry(migrated)
-), "V5 faction migration idempotent")
+), "V6 faction migration idempotent")
 
 local memberSnapshot = PNC.FactionMembership.BuildSnapshot(player)
 equal(memberSnapshot.faction.id, playerFaction.id,

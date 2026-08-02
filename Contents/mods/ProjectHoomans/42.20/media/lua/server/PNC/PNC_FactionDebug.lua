@@ -31,6 +31,19 @@ local function groupSpec(player, args, at)
     }
 end
 
+local function mobileGroupSpec(player, args, at)
+    return {
+        x = player and player.getX and player:getX() or 0,
+        y = player and player.getY and player:getY() or 0,
+        z = player and player.getZ and player:getZ() or 0,
+        groupSize = args and args.groupSize,
+        presenceMode = args and args.presenceMode,
+        mobilePathMode = args and args.mobilePathMode,
+        worldAgeHours = at,
+        debug = true,
+    }
+end
+
 local function generatedFactionName(archetypeID, at)
     local Generator = PNC.FactionNameGenerator
     if not Generator or not Generator.GenerateFactionName then
@@ -131,6 +144,7 @@ local function factionSummary(faction)
         tags = copy(faction.tags),
         policy = copy(faction.policy),
         emblem = copy(faction.emblem),
+        mobile = copy(faction.mobile),
         revision = faction.revision,
         communityCount = #communities,
         communityNames = communityNames,
@@ -528,11 +542,20 @@ function Debug.PerformAction(player, args)
         local tags = {
             debugCreated = true,
         }
+        local mobileGroup = args and args.creationKind
+            == "mobile_group"
+            or archetypeID == "refugee"
         if archetypeID == "settler" then
             tags.settlementType = "friendly"
-        elseif archetypeID == "looter" then
+        elseif archetypeID == "looter" and not mobileGroup then
             tags.settlementType = "looter_toll"
             tags.territorialToll = true
+        end
+        if mobileGroup then
+            tags.mobileGroup = true
+            tags.mobilePathMode = tostring(
+                args and args.mobilePathMode or "random"
+            )
         end
         ok, reason, value = Factions.Create({
             name = generatedFactionName(archetypeID, at),
@@ -542,11 +565,19 @@ function Debug.PerformAction(player, args)
         })
         if ok then
             factionID = value.id
-            ok, reason, groupResult =
-                PNC.CommunityDirector.GenerateForFaction(
-                    factionID,
-                    groupSpec(player, args, at)
-                )
+            if mobileGroup then
+                ok, reason, groupResult =
+                    PNC.MobileGroupDirector.GenerateForFaction(
+                        factionID,
+                        mobileGroupSpec(player, args, at)
+                    )
+            else
+                ok, reason, groupResult =
+                    PNC.CommunityDirector.GenerateForFaction(
+                        factionID,
+                        groupSpec(player, args, at)
+                    )
+            end
         end
     elseif action == "create_player_faction" then
         ok, reason, value = Factions.CreatePlayerFaction(
@@ -575,10 +606,31 @@ function Debug.PerformAction(player, args)
             )
         if ok and value then factionID = value.id end
     elseif action == "generate_group" then
-        ok, reason, groupResult =
-            PNC.CommunityDirector.GenerateForFaction(
+        local faction = factionID and Factions.Get(factionID)
+        if faction and Factions.IsMobileGroup(faction) then
+            ok, reason, groupResult =
+                PNC.MobileGroupDirector.GenerateForFaction(
+                    factionID,
+                    mobileGroupSpec(player, args, at)
+                )
+        else
+            ok, reason, groupResult =
+                PNC.CommunityDirector.GenerateForFaction(
+                    factionID,
+                    groupSpec(player, args, at)
+                )
+        end
+    elseif action == "mobile_path_mode" then
+        ok, reason, value = PNC.MobileGroupDirector.SetPathMode(
+            factionID,
+            args and args.mobilePathMode
+        )
+    elseif action == "mobile_relocate" then
+        ok, reason, value =
+            PNC.MobileGroupDirector.RelocateFaction(
                 factionID,
-                groupSpec(player, args, at)
+                at,
+                true
             )
     elseif action == "assign" then
         ok, reason, value = Factions.AddNPC(

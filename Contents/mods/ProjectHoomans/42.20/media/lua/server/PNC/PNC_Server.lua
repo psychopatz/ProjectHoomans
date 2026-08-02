@@ -248,6 +248,11 @@ function Server.OnTick()
     if PNC.FactionTolls and PNC.FactionTolls.Pump then
         PNC.FactionTolls.Pump(now)
     end
+    if PNC.MobileGroupDirector
+        and PNC.MobileGroupDirector.Pump
+    then
+        PNC.MobileGroupDirector.Pump(now)
+    end
     if PNC.EnginePathPlanner
         and PNC.EnginePathPlanner.PumpServerFrame
     then
@@ -412,6 +417,7 @@ local function onClientCommand(module, command, player, args)
         and (
             command == ConversationScene.CMD_BEGIN
             or command == ConversationScene.CMD_END
+            or command == ConversationScene.CMD_CEASEFIRE
         )
     then
         ConversationScene.HandleClientCommand(

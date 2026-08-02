@@ -13,7 +13,7 @@
 - compact `inventory` payload
 - sparse, directed `social` relationship and memory payload
 - separate `PNC_PlayerCharacters` player-character registry schema v3
-- separate `PNC_Factions` organizational/diplomacy/emblem registry schema v4
+- separate `PNC_Factions` organizational/diplomacy/emblem/mobile registry schema v6
 - primitive NPC affiliation schema v2, including optional community identity
 - separate `PNC_Communities` community/site registry schema v2
 - body-part wounds and infection timing, stage, progress, fever, and temperature
@@ -77,6 +77,10 @@
   archetype-aware layered emblem made only from primitive map-symbol IDs,
   colors, and numeric transforms. It invents no opinion metrics, incidents,
   factions, or memberships
+- V4 normalizes to V5 by adding bounded player-specific pacification entries.
+  V5 normalizes to V6 with `mobile = nil`; only the mobile-group director can
+  add a primitive staging site, and it never stores a Community or engine
+  object there
 - full NPC records never persist after death. The registry directory instead
   keeps a minimal `deathMarkers` map with identity, name, position, corpse token,
   infection state, and delay metadata

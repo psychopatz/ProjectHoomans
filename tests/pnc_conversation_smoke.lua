@@ -164,7 +164,8 @@ assertEqual(definition.theme.accent.r, 1, "hostile conversation red")
 assertEqual(definition.theme.accent.g, 0.25, "hostile palette matches map")
 assertEqual(definition.lifecycle.kind, "conversation_lifecycle",
     "conversation safety lifecycle attached")
-assertEqual(#definition.nodes.greeting.choices, 3, "code-block choices")
+assertEqual(#definition.nodes.greeting.choices, 2,
+    "hostile conversation uses ceasefire choices")
 assert(definition.nodes.greeting.npc.key:find("Lover_Twilight", 1, true),
     "time greeting selected")
 assertEqual(
@@ -176,10 +177,34 @@ assertEqual(
 local firstChoice = definition.nodes.greeting.choices[1]
 assertEqual(
     PsychopatzCore.Conversation.Text.Resolve({ key = firstChoice.textKey }),
-    "How are you holding up?",
-    "Build 42 UI.json choice translation"
+    "Ceasefire. Stand down for now.",
+    "Build 42 UI.json ceasefire translation"
 )
 assertEqual(firstChoice.textDomain, nil, "no custom translation domain")
+
+local hostileEntry = {
+    id = "npc-hostile",
+    name = "Aggressive NPC",
+    snapshot = {
+        faction = "hostile",
+        hostility = { attackPlayers = true },
+    },
+}
+local hostileDefinition = PNC.Conversation.BuildDefinition(
+    hostileEntry, {}, "twilight"
+)
+assertEqual(hostileDefinition.context.allowHostileParley, true,
+    "hostile conversation exposes parley context")
+assertEqual(hostileDefinition.nodes.greeting.choices[1].id,
+    "ceasefire", "hostile greeting starts with ceasefire choice")
+
+local neutralDefinition = PNC.Conversation.BuildDefinition({
+    id = "npc-neutral",
+    name = "Neutral NPC",
+    snapshot = { faction = "neutral" },
+}, {}, "twilight")
+assertEqual(#neutralDefinition.nodes.greeting.choices, 3,
+    "neutral conversation retains normal choices")
 
 local totalGreetings = 0
 for relationshipIndex = 1, #relationships do

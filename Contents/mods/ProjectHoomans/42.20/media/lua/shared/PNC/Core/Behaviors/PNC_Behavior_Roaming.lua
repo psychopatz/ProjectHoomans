@@ -228,6 +228,34 @@ local function areaMode(record, zombie, order)
     return true
 end
 
+-- A non-hostile mobile group can be configured to trail the nearest player
+-- without becoming a companion or gaining combat authority. Hostile mobile
+-- looters use the existing hunt order instead, so their player path remains
+-- explicitly aggressive.
+local function playerMode(record, zombie, order)
+    local target = Core.GetNearestPlayerPosition
+        and Core.GetNearestPlayerPosition(record.x, record.y)
+        or nil
+    if not target then return areaMode(record, zombie, order) end
+    Common.ClearCombatTarget(record, "mobile_player_roam", zombie)
+    record.activeBehavior = "Roam:player"
+    Common.MoveRecord(
+        record,
+        zombie,
+        target.x,
+        target.y,
+        target.z,
+        tostring(order.moveMode or "walk"),
+        math.max(
+            1.5,
+            tonumber(order.reachedDistance)
+                or Const.ROAM_REACHED_DISTANCE
+        ),
+        "mobile_roam_to_player"
+    )
+    return true
+end
+
 function Roaming.RegisterMode(mode, handler)
     mode = tostring(mode or "")
     if mode == "" or type(handler) ~= "function" then return false end
@@ -249,6 +277,7 @@ function Roaming.Tick(record, zombie)
 end
 
 Roaming.RegisterMode(Const.ROAM_MODE_AREA, areaMode)
+Roaming.RegisterMode(Const.ROAM_MODE_PLAYER, playerMode)
 OrderSystem.RegisterNormalizer(Const.ORDER_ROAM, normalizeOrder)
 OrderSystem.RegisterNormalizer(Const.ORDER_HOSTILE_ROAM, normalizeOrder)
 JobSystem.RegisterOrder(Const.ORDER_ROAM, Const.JOB_ROAM)

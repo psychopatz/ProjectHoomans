@@ -34,6 +34,37 @@ end
 
 Conversation.FormatRoleLabel = roleLabel
 
+local function isAggressive(entry)
+    local snapshot = entry and entry.snapshot or {}
+    local record = entry and entry.record or {}
+    local hostility = snapshot.hostility or record.hostility or {}
+    return tostring(snapshot.faction or record.faction or "")
+        == "hostile"
+        and hostility.attackPlayers ~= false
+end
+
+function Conversation.RequestCeasefire(context)
+    return Lifecycle and Lifecycle.RequestCeasefire
+        and Lifecycle.RequestCeasefire(context)
+        or false
+end
+
+function Conversation.HandleCeasefireResult(args)
+    args = type(args) == "table" and args or {}
+    Conversation.lastCeasefireResult = args
+    local player = getSpecificPlayer and getSpecificPlayer(0)
+        or getPlayer and getPlayer() or nil
+    if player and HaloTextHelper and HaloTextHelper.addText then
+        HaloTextHelper.addText(
+            player,
+            getText(args.ok == true
+                and "UI_PNC_Conversation_CeasefireAccepted"
+                or "UI_PNC_Conversation_CeasefireRejected")
+        )
+    end
+    return args.ok == true, args.reason
+end
+
 local function factionPresentation(entry)
     local snapshot = entry and entry.snapshot or {}
     local record = entry and entry.record or {}
@@ -85,6 +116,58 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         day
     )
     local faction = factionPresentation(entry)
+    local aggressive = isAggressive(entry)
+    local greetingChoices
+    if aggressive then
+        greetingChoices = {
+            {
+                id = "ceasefire",
+                textKey = "UI_PNC_Conversation_ChoiceCeasefire",
+                response = {
+                    key = "UI_PNC_Conversation_ResponseCeasefire",
+                },
+                action = function(context)
+                    Conversation.RequestCeasefire(context)
+                end,
+                next = "ceasefire",
+            },
+            {
+                id = "goodbye",
+                textKey = "UI_PNC_Conversation_ChoiceGoodbye",
+                response = {
+                    key = "UI_PNC_Conversation_ResponseGoodbye",
+                },
+                close = true,
+            },
+        }
+    else
+        greetingChoices = {
+            {
+                id = "condition",
+                textKey = "UI_PNC_Conversation_ChoiceCondition",
+                response = {
+                    key = "UI_PNC_Conversation_ResponseCondition",
+                },
+                next = "followup",
+            },
+            {
+                id = "situation",
+                textKey = "UI_PNC_Conversation_ChoiceSituation",
+                response = {
+                    key = "UI_PNC_Conversation_ResponseSituation",
+                },
+                next = "followup",
+            },
+            {
+                id = "goodbye",
+                textKey = "UI_PNC_Conversation_ChoiceGoodbye",
+                response = {
+                    key = "UI_PNC_Conversation_ResponseGoodbye",
+                },
+                close = true,
+            },
+        }
+    end
     return {
         namespace = "ProjectHoomans",
         npcID = npcID,
@@ -109,29 +192,18 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             factionRole = faction and faction.role or nil,
             factionEmblem = faction and faction.emblem or nil,
             npcType = Palette.ResolveType(entry),
+            allowHostileParley = aggressive,
         },
         lifecycle = Lifecycle.Create(),
         start = "greeting",
         nodes = {
             greeting = {
                 npc = greeting,
+                choices = greetingChoices,
+            },
+            ceasefire = {
+                npc = { key = "UI_PNC_Conversation_ResponseCeasefire" },
                 choices = {
-                    {
-                        id = "condition",
-                        textKey = "UI_PNC_Conversation_ChoiceCondition",
-                        response = {
-                            key = "UI_PNC_Conversation_ResponseCondition",
-                        },
-                        next = "followup",
-                    },
-                    {
-                        id = "situation",
-                        textKey = "UI_PNC_Conversation_ChoiceSituation",
-                        response = {
-                            key = "UI_PNC_Conversation_ResponseSituation",
-                        },
-                        next = "followup",
-                    },
                     {
                         id = "goodbye",
                         textKey = "UI_PNC_Conversation_ChoiceGoodbye",

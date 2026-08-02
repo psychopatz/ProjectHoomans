@@ -39,6 +39,7 @@ local function targetMatches(target, player, zombie, npcID)
     if target == player or target == zombie then return true end
     if type(target) ~= "table" then return false end
     return tostring(target.id or "") == tostring(npcID or "")
+        or target.player == player
         or target.worldObject == player
         or target.worldObject == zombie
 end
@@ -114,15 +115,25 @@ local function managedCandidateIsEnemy(candidate, currentRecord, npcID)
         or false
 end
 
-function Safety.HasDanger(player, zombie, record, npcID, radius)
+function Safety.HasDanger(
+    player,
+    zombie,
+    record,
+    npcID,
+    radius,
+    allowTalkingHostile
+)
     local current = PNC.Core and PNC.Core.Now and PNC.Core.Now()
         or getTimeInMillis and getTimeInMillis()
         or 0
     local runtime = record and record.runtime or {}
     local health = record and record.health or {}
-    if runtime.target ~= nil
-        or runtime.attackAction ~= nil
-        or current < (tonumber(runtime.inCombatUntil) or 0)
+    local hostileTalkingTarget = allowTalkingHostile == true
+        and targetMatches(runtime.target, player, zombie, npcID)
+    if (runtime.target ~= nil and not hostileTalkingTarget)
+        or (runtime.attackAction ~= nil and not hostileTalkingTarget)
+        or (current < (tonumber(runtime.inCombatUntil) or 0)
+            and not hostileTalkingTarget)
         or current < (tonumber(health.recentDamageUntil) or 0)
     then
         return true
@@ -166,7 +177,9 @@ function Safety.Check(spec)
             zombie,
             record,
             npcID,
-            Safety.GetDangerRadius()
+            Safety.GetDangerRadius(),
+            spec and spec.context
+                and spec.context.allowHostileParley == true
         )
     then
         return "danger"

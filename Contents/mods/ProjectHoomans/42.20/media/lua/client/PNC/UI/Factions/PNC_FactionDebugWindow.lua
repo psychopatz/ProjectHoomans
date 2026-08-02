@@ -36,9 +36,12 @@ local CONTROLS = {
     { id = "edit_emblem", titleKey = "UI_PNC_FactionEditEmblem", variant = "default", views = views("overview") },
     { id = "create_settler", titleKey = "UI_PNC_FactionCreateSettler", variant = "success", views = views("overview") },
     { id = "create_looter", titleKey = "UI_PNC_FactionCreateLooter", variant = "danger", views = views("overview") },
+    { id = "create_looter_group", titleKey = "UI_PNC_FactionCreateLooterGroup", variant = "danger", views = views("overview") },
     { id = "create_trader", titleKey = "UI_PNC_FactionCreateTrader", variant = "default", views = views("overview") },
     { id = "create_refugee", titleKey = "UI_PNC_FactionCreateRefugee", variant = "default", views = views("overview") },
     { id = "generate_group", titleKey = "UI_PNC_FactionGenerateGroup", variant = "success", views = views("overview") },
+    { id = "mobile_path_mode", titleKey = "UI_PNC_FactionMobilePathMode", variant = "quiet", views = views("overview") },
+    { id = "mobile_relocate", titleKey = "UI_PNC_FactionMobileRelocate", variant = "quiet", views = views("overview") },
     { id = "population_label", titleKey = "UI_PNC_FactionGroupSize", variant = "quiet", views = views("overview") },
     { id = "presence_mode", titleKey = "UI_PNC_FactionPresenceMode", variant = "quiet", views = views("overview") },
     { id = "archive", titleKey = "UI_PNC_FactionArchive", variant = "danger", views = views("overview") },
@@ -165,11 +168,14 @@ function ISPNCFactionDebugWindow:createChildren()
     self.scenarioIndex = 1
     self.groupSize = 4
     self.presenceMode = "auto"
+    self.mobilePathMode = "random"
     self.viewMode = "overview"
     for _, definition in ipairs(CONTROLS) do
         local title = text(definition.titleKey)
         if definition.id == "presence_mode" then
             title = title .. ": " .. self.presenceMode
+        elseif definition.id == "mobile_path_mode" then
+            title = title .. ": " .. self.mobilePathMode
         end
         local button = UI.CreateButton(self, {
             id = definition.id,
@@ -506,6 +512,36 @@ function ISPNCFactionDebugWindow:onAction(button)
         self:requestResponsiveLayout(true)
         return
     end
+    if internal == "mobile_path_mode" then
+        local modes = { "random", "player" }
+        local nextIndex = 1
+        for index, mode in ipairs(modes) do
+            if mode == self.mobilePathMode then
+                nextIndex = (index % #modes) + 1
+                break
+            end
+        end
+        self.mobilePathMode = modes[nextIndex]
+        button:setTitle(
+            text("UI_PNC_FactionMobilePathMode")
+                .. ": " .. self.mobilePathMode
+        )
+        if faction and faction.faction
+            and faction.faction.mobile
+            and faction.faction.mobile.active == true
+        then
+            PNC.Client.SendDebug(
+                "faction_debug_action",
+                {
+                    factionAction = "mobile_path_mode",
+                    factionID = faction.id,
+                    mobilePathMode = self.mobilePathMode,
+                }
+            )
+        end
+        self:requestResponsiveLayout(true)
+        return
+    end
     local enteredGroupSize = tonumber(
         self.groupSizeEntry
             and self.groupSizeEntry:getText()
@@ -527,9 +563,24 @@ function ISPNCFactionDebugWindow:onAction(button)
         targetFactionID = target and target.id,
         groupSize = enteredGroupSize,
         presenceMode = self.presenceMode,
+        mobilePathMode = self.mobilePathMode,
     }
     if internal == "create_player_faction" then
         payload.factionAction = internal
+    elseif internal == "create_looter_group" then
+        payload.factionAction = "create"
+        payload.archetypeID = "looter"
+        payload.creationKind = "mobile_group"
+    elseif internal == "create_refugee" then
+        payload.factionAction = "create"
+        payload.archetypeID = "refugee"
+        payload.creationKind = "mobile_group"
+    elseif internal == "mobile_relocate" then
+        payload.factionAction = "mobile_relocate"
+    elseif internal == "generate_group" then
+        payload.factionAction = "generate_group"
+    elseif internal == "mobile_path_mode" then
+        payload.factionAction = "mobile_path_mode"
     elseif string.sub(internal, 1, 7) == "create_" then
         payload.factionAction = "create"
         payload.archetypeID = string.sub(internal, 8)
@@ -622,6 +673,12 @@ function ISPNCFactionDebugWindow:prerender()
         elseif internal == "generate_group" then
             enabled = faction ~= nil
                 and faction.faction.status == "active"
+        elseif internal == "mobile_path_mode" then
+            enabled = true
+        elseif internal == "mobile_relocate" then
+            enabled = faction ~= nil
+                and faction.faction.mobile ~= nil
+                and faction.faction.mobile.active == true
         elseif internal == "population_label" then
             enabled = false
         elseif internal == "presence_mode"

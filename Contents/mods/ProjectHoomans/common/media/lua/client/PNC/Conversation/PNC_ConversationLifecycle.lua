@@ -18,18 +18,25 @@ local function isNetworkClient()
     return isClient and isClient() == true
 end
 
-local function send(command, state, reason)
+local function send(command, state, reason, extra)
     if not sendClientCommand or not Scene then return false end
+    local payload = {
+        id = state.npcID,
+        token = state.token,
+        reason = reason,
+        maximumDistance = Safety.GetMaximumDistance(),
+        dangerRadius = Safety.GetDangerRadius(),
+        allowHostileParley = state.allowHostileParley == true,
+    }
+    if type(extra) == "table" then
+        for key, value in pairs(extra) do
+            payload[key] = value
+        end
+    end
     sendClientCommand(
         PNC.Const and PNC.Const.MODULE or "PNC",
         command,
-        {
-            id = state.npcID,
-            token = state.token,
-            reason = reason,
-            maximumDistance = Safety.GetMaximumDistance(),
-            dangerRadius = Safety.GetDangerRadius(),
-        }
+        payload
     )
     return true
 end
@@ -69,12 +76,15 @@ function Lifecycle.Create()
                 lastHeartbeatAt = 0,
                 nextSafetyCheckAt = 0,
                 cachedSafetyReason = nil,
+                allowHostileParley = spec and spec.context
+                    and spec.context.allowHostileParley == true,
             }
             local started, startReason = refresh(state, spec)
             if not isNetworkClient() and started ~= true then
                 return false, startReason or "npc_unavailable"
             end
             state.lastHeartbeatAt = currentTime()
+            spec.context.conversationLifecycleState = state
             return state
         end,
         update = function(_, spec, state)
@@ -110,6 +120,17 @@ function Lifecycle.Create()
             end
         end,
     }
+end
+
+function Lifecycle.RequestCeasefire(context)
+    local state = context and context.conversationLifecycleState or nil
+    if not state or not state.allowHostileParley then
+        return false, "ceasefire_unavailable"
+    end
+    if isNetworkClient() then
+        return send(Scene and Scene.CMD_CEASEFIRE, state)
+    end
+    return false, "server_only"
 end
 
 return Lifecycle

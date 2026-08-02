@@ -39,6 +39,13 @@ function Intent.Resolve(spec)
         return result("attack", true, true, false,
             "immediate_self_defense")
     end
+    -- A conversation parley only pauses the NPC who accepted the dialogue.
+    -- It cannot override a fresh player attack or defend the player from
+    -- other nearby hostile members.
+    if spec.conversationParley == true then
+        return result("tolerate", false, false, false,
+            "conversation_parley")
+    end
     if spec.samePlayerOwnedFaction == true then
         return result(
             spec.targetIsOwner and "obey" or "protect",

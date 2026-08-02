@@ -1208,6 +1208,106 @@ function Factions.ReconcileTerritorialLooterFactions()
         #candidates > 0 and "reconciled" or "unchanged"
 end
 
+function Factions.IsMobileGroup(factionOrID)
+    local faction = type(factionOrID) == "table"
+        and factionOrID or registryRecord(factionOrID)
+    return type(faction) == "table"
+        and type(faction.mobile) == "table"
+        and faction.mobile.active == true
+end
+
+function Factions.GetMobileGroup(factionID)
+    Factions.EnsureLoaded()
+    local faction = registryRecord(factionID)
+    if not faction then return nil, "faction_not_found" end
+    if not Factions.IsMobileGroup(faction) then
+        return nil, "not_mobile_group"
+    end
+    return copy(faction.mobile)
+end
+
+local function mobileArchetypeAllowed(faction)
+    return faction and (
+        faction.archetypeID == "looter"
+        or faction.archetypeID == "refugee"
+    )
+end
+
+function Factions.SetMobileGroup(factionID, spec, reason)
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    local faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    if not mobileArchetypeAllowed(faction) then
+        return false, "mobile_archetype_not_allowed"
+    end
+    local mobile = Types.NormalizeMobileGroup(spec)
+    if not mobile then return false, "invalid_mobile_group" end
+    if Types.AreEqual(faction.mobile, mobile) then
+        return true, "unchanged", copy(faction.mobile)
+    end
+    faction.mobile = mobile
+    faction.tags = faction.tags or {}
+    faction.tags.mobileGroup = true
+    faction.tags.mobilePathMode = mobile.pathMode
+    touchFaction(faction)
+    touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileFaction
+    then
+        PNC.FactionBehavior.ReconcileFaction(
+            faction.id,
+            tostring(reason or "mobile_group_updated")
+        )
+    end
+    return true, "mobile_group_updated", copy(faction.mobile)
+end
+
+function Factions.UpdateMobileGroup(factionID, patch, reason)
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    local faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    if not Factions.IsMobileGroup(faction) then
+        return false, "not_mobile_group"
+    end
+    patch = type(patch) == "table" and patch or {}
+    local candidate = copy(faction.mobile)
+    for key, value in pairs(patch) do
+        candidate[key] = copy(value)
+    end
+    return Factions.SetMobileGroup(
+        factionID,
+        candidate,
+        reason or "mobile_group_updated"
+    )
+end
+
+function Factions.ClearMobileGroup(factionID, reason)
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    local faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    if not Factions.IsMobileGroup(faction) then
+        return true, "unchanged", nil
+    end
+    faction.mobile = nil
+    faction.tags = faction.tags or {}
+    faction.tags.mobileGroup = false
+    faction.tags.mobilePathMode = nil
+    touchFaction(faction)
+    touchRegistry()
+    if PNC.FactionBehavior
+        and PNC.FactionBehavior.ReconcileFaction
+    then
+        PNC.FactionBehavior.ReconcileFaction(
+            faction.id,
+            tostring(reason or "mobile_group_cleared")
+        )
+    end
+    return true, "mobile_group_cleared", nil
+end
+
 local function playerCharacterRecord(playerKey)
     local parsed = EntityRef.Parse(playerKey)
     if not parsed or parsed.kind ~= "player"

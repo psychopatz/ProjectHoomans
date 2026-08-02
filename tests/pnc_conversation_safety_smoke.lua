@@ -16,6 +16,7 @@ local stoppedReason
 local held = 0
 local definitions = {}
 local staleAttacker
+local pacifications = {}
 
 local player = {
     x = 0,
@@ -58,6 +59,8 @@ local record = {
     presenceState = "live",
     activeJob = "FollowOwner",
     activeBehavior = "FollowOwner",
+    faction = "hostile",
+    hostility = { attackPlayers = true },
     health = {},
     runtime = {},
 }
@@ -99,6 +102,26 @@ PNC = {
     SpatialIndex = {
         QueryZombies = function() return candidates end,
         QueryNPCs = function() return {} end,
+    },
+    PlayerCharacters = {
+        GetEntityKey = function()
+            return "player:Tester:char_tester", "resolved"
+        end,
+    },
+    Factions = {
+        GetOrganizationalFactionID = function()
+            return "faction_hostile"
+        end,
+        PacifyForPlayer = function(factionID, key, options)
+            pacifications[#pacifications + 1] = {
+                factionID = factionID,
+                key = key,
+                options = options,
+            }
+            return true, "pacified", {
+                untilWorldAgeHours = 1,
+            }
+        end,
     },
 }
 PsychopatzCore = {
@@ -210,5 +233,60 @@ record.runtime.target = nil
 lifecycle.finish({}, spec, state, "danger")
 assertEqual(record.runtime.conversationLease, nil,
     "finish releases idle scene")
+
+-- The talking NPC can offer a short parley while it is targeting this
+-- player. This only ignores that direct hostile target; nearby threats still
+-- use the regular close-on-danger rule above.
+candidates = {}
+record.runtime = {
+    target = { player = player },
+    attackAction = { kind = "melee" },
+    inCombatUntil = now + 1000,
+}
+spec.context.allowHostileParley = true
+assertEqual(Safety.Check(spec), nil,
+    "client allows direct hostile parley")
+local parleyStarted, parleyLease = Scene.Begin(
+    record,
+    npc,
+    player,
+    "lease-parley",
+    {
+        maximumDistance = 5.5,
+        dangerRadius = 8,
+        allowHostileParley = true,
+    }
+)
+assertEqual(parleyStarted, true, "server accepts hostile parley")
+assertEqual(parleyLease.hostileParley, true,
+    "lease records hostile parley")
+assertEqual(record.runtime.conversationParley.playerKey,
+    "player:Tester:char_tester", "parley ties to stable player key")
+assertEqual(record.runtime.target, nil,
+    "parley clears only the speaking NPC's current attack")
+now = now + 1000
+Scene.Begin(record, npc, player, "lease-parley", {
+    maximumDistance = 5.5,
+    dangerRadius = 8,
+    allowHostileParley = true,
+})
+assertEqual(record.runtime.conversationParley.untilAt,
+    now + Scene.LEASE_MS,
+    "parley lease extends with conversation heartbeat")
+local ceasefireOK = Scene.HandleClientCommand(
+    player,
+    Scene.CMD_CEASEFIRE,
+    { id = "npc-1", token = "lease-parley" }
+)
+assertEqual(ceasefireOK, true, "ceasefire request accepted")
+assertEqual(#pacifications, 1,
+    "ceasefire creates player-scoped faction pacification")
+assertEqual(pacifications[1].factionID, "faction_hostile",
+    "ceasefire uses observer faction")
+assertEqual(pacifications[1].options.durationHours,
+    Scene.CEASEFIRE_HOURS, "ceasefire duration is explicit")
+Scene.End(record, npc, "lease-parley", "test")
+assertEqual(record.runtime.conversationParley, nil,
+    "ending conversation restores normal hostile policy")
 
 print("pnc_conversation_safety_smoke: ok")

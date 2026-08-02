@@ -107,6 +107,61 @@ local function normalizeTags(value)
     return output
 end
 
+-- Mobile groups deliberately store a primitive site snapshot rather than a
+-- Community record. A mobile faction has no reservation, population ledger,
+-- or home claim; the snapshot is only its current abstract staging point.
+function Types.NormalizeMobileGroup(value)
+    local source = type(value) == "table" and value or {}
+    local CommunityTypes = PNC.CommunityTypes
+    local site
+    local lastMovedAt
+    local nextMoveAt
+    local relocationHours
+    if source.active ~= true then return nil end
+    if not CommunityTypes or not CommunityTypes.NormalizeSite then
+        return nil
+    end
+    site = CommunityTypes.NormalizeSite(
+        source.site,
+        source.site and source.site.id
+    )
+    if not site then return nil end
+    lastMovedAt = timestamp(source.lastMovedAt, 0)
+    relocationHours = math.max(
+        Constants.MOBILE_GROUP_MIN_RELOCATION_HOURS,
+        math.min(
+            Constants.MOBILE_GROUP_MAX_RELOCATION_HOURS,
+            finite(
+                source.relocationHours,
+                Constants.MOBILE_GROUP_RELOCATION_HOURS
+            )
+        )
+    )
+    nextMoveAt = timestamp(
+        source.nextMoveAt,
+        lastMovedAt + relocationHours
+    )
+    if nextMoveAt <= lastMovedAt then
+        nextMoveAt = lastMovedAt + relocationHours
+    end
+    return {
+        schemaVersion = Constants.MOBILE_GROUP_SCHEMA_VERSION,
+        active = true,
+        pathMode = Constants.VALID_MOBILE_PATH_MODES[
+            source.pathMode
+        ] and source.pathMode or Constants.MOBILE_PATH_RANDOM,
+        site = site,
+        lastMovedAt = lastMovedAt,
+        nextMoveAt = nextMoveAt,
+        relocationHours = relocationHours,
+        relocationCount = math.max(
+            0,
+            math.floor(finite(source.relocationCount, 0))
+        ),
+        revision = revision(source.revision),
+    }
+end
+
 local function normalizeIDSet(value, validator)
     local output = {}
     if type(value) ~= "table" then return output end
@@ -757,6 +812,7 @@ function Types.NormalizeFaction(value, factionID)
             ),
         relations = {},
         tags = normalizeTags(source.tags),
+        mobile = Types.NormalizeMobileGroup(source.mobile),
         revision = revision(source.revision),
     }
     for targetFactionID, rawRelation in pairs(

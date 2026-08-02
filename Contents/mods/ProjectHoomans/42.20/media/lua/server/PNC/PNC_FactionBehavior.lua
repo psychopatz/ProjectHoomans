@@ -86,6 +86,18 @@ local function playerEntityKey(player)
         or nil
 end
 
+local function conversationParleyActive(record, targetKey)
+    local parley = record and record.runtime
+        and record.runtime.conversationParley or nil
+    if type(parley) ~= "table" then return false end
+    if (tonumber(parley.untilAt) or 0) <= Core.Now() then
+        record.runtime.conversationParley = nil
+        return false
+    end
+    return targetKey ~= nil
+        and targetKey == parley.playerKey
+end
+
 local function targetContext(target)
     if type(target) ~= "table"
         and type(target) ~= "userdata"
@@ -231,6 +243,10 @@ function Behavior.ResolveIntent(observerRecord, target, context)
                     .factionSelfDefenseUntil
         ) or 0
     ) > Core.Now()
+    local activeParley = conversationParleyActive(
+        observerRecord,
+        targetKey
+    )
     local spec = {
         archetypeID = observerFaction.archetypeID,
         policy = observerFaction.policy,
@@ -252,6 +268,7 @@ function Behavior.ResolveIntent(observerRecord, target, context)
         immediateSelfDefense =
             context.immediateSelfDefense == true
             or runtimeSelfDefense,
+        conversationParley = activeParley,
         targetAggression = context.targetAggression == true
             or runtimeSelfDefense,
         observerStrength = context.observerStrength,
@@ -323,7 +340,42 @@ local function clearCombatRuntime(record)
     record.nextThinkAt = Core.Now()
 end
 
-local function desiredOrder(record, mode, owner)
+local function desiredOrder(record, mode, owner, faction)
+    local mobile = faction and faction.mobile
+    local home = mobile and mobile.site and mobile.site.home
+    if mobile and mobile.active == true and home then
+        local pathMode = mobile.pathMode
+        if mode == "aggressive" then
+            if pathMode == PNC.FactionConstants.MOBILE_PATH_RANDOM then
+                return {
+                    kind = Const.ORDER_HOSTILE_ROAM,
+                    roamMode = Const.ROAM_MODE_AREA,
+                    x = home.x,
+                    y = home.y,
+                    z = home.z,
+                    radius = home.radius,
+                    targetRadius = Const.ROAM_TARGET_RADIUS,
+                }
+            end
+            return {
+                kind = Const.ORDER_HOSTILE_HUNT,
+                x = home.x,
+                y = home.y,
+                z = home.z,
+            }
+        end
+        return {
+            kind = Const.ORDER_ROAM,
+            roamMode = pathMode
+                == PNC.FactionConstants.MOBILE_PATH_PLAYER
+                and Const.ROAM_MODE_PLAYER
+                or Const.ROAM_MODE_AREA,
+            x = home.x,
+            y = home.y,
+            z = home.z,
+            radius = home.radius,
+        }
+    end
     if mode == "player_owned" then
         return {
             kind = Const.ORDER_FOLLOW,
@@ -349,17 +401,17 @@ local function desiredOrder(record, mode, owner)
     }
 end
 
-local function apply(record, mode, owner, reason)
+local function apply(record, mode, owner, reason, faction)
     local changed = false
-    local faction
+    local legacyFaction
     local hostility
     local order
     if not record or record.alive == false then
         return false, "invalid_record"
     end
     if mode == "player_owned" then
-        faction = Const.FACTION_COLONIST
-        hostility = Types.DefaultHostility(faction)
+        legacyFaction = Const.FACTION_COLONIST
+        hostility = Types.DefaultHostility(legacyFaction)
         changed = assign(record, "recruited", true) or changed
         changed = assign(
             record,
@@ -372,7 +424,7 @@ local function apply(record, mode, owner, reason)
             owner.onlineID
         ) or changed
     elseif mode == "aggressive" then
-        faction = Const.FACTION_HOSTILE
+        legacyFaction = Const.FACTION_HOSTILE
         hostility = {
             mode = "faction_war",
             attackPlayers = owner.attackPlayers == true,
@@ -383,18 +435,18 @@ local function apply(record, mode, owner, reason)
         changed = assign(record, "ownerUsername", nil) or changed
         changed = assign(record, "ownerOnlineID", nil) or changed
     else
-        faction = Const.FACTION_NEUTRAL
-        hostility = Types.DefaultHostility(faction)
+        legacyFaction = Const.FACTION_NEUTRAL
+        hostility = Types.DefaultHostility(legacyFaction)
         changed = assign(record, "recruited", false) or changed
         changed = assign(record, "ownerUsername", nil) or changed
         changed = assign(record, "ownerOnlineID", nil) or changed
     end
-    changed = assign(record, "faction", faction) or changed
+    changed = assign(record, "faction", legacyFaction) or changed
     if not same(record.hostility, hostility) then
         record.hostility = hostility
         changed = true
     end
-    order = desiredOrder(record, mode, owner)
+    order = desiredOrder(record, mode, owner, faction)
     if not same(record.orderSpec, order) then
         if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
             PNC.OrderSystem.SetOrder(record, order)
@@ -448,7 +500,7 @@ function Behavior.ApplyNPC(record, reason)
                 and livePlayer.getOnlineID
                 and livePlayer:getOnlineID() or nil,
         }
-        return apply(record, "player_owned", owner, reason)
+        return apply(record, "player_owned", owner, reason, faction)
     end
     local territorialToll =
         Factions.IsTerritorialTollFaction(faction)
@@ -472,7 +524,8 @@ function Behavior.ApplyNPC(record, reason)
                 )
                 or factionAtWarWithPlayerFaction(factionID),
         },
-        reason
+        reason,
+        faction
     )
 end
 
@@ -514,7 +567,7 @@ function Behavior.ReconcilePlayerPacification(
 end
 
 function Behavior.ApplyUnaffiliated(record, reason)
-    return apply(record, "neutral", {}, reason)
+    return apply(record, "neutral", {}, reason, nil)
 end
 
 function Behavior.ReconcileFaction(factionID, reason)

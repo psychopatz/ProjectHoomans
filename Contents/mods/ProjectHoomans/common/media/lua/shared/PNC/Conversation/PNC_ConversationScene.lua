@@ -6,9 +6,11 @@ local Scene = PNC.ConversationScene
 Scene.ID = "social.conversation"
 Scene.CMD_BEGIN = "conversationBegin"
 Scene.CMD_END = "conversationEnd"
+Scene.CMD_CEASEFIRE = "conversationCeasefire"
 Scene.LEASE_MS = 3500
 Scene.START_DISTANCE = 6.0
 Scene.DANGER_RADIUS = 8.0
+Scene.CEASEFIRE_HOURS = 1
 
 local function now()
     return PNC.Core and PNC.Core.Now and PNC.Core.Now()
@@ -46,6 +48,69 @@ local function sameTarget(target, player, zombie, record)
         or target.worldObject == zombie
 end
 
+local function targetsPlayer(target, player)
+    if not target or not player then return false end
+    if target == player then return true end
+    return type(target) == "table"
+        and (target.player == player or target.worldObject == player)
+end
+
+local function worldAgeHours()
+    local gameTime = getGameTime and getGameTime() or nil
+    return gameTime and gameTime.getWorldAgeHours
+        and math.max(0, tonumber(gameTime:getWorldAgeHours()) or 0)
+        or 0
+end
+
+local function playerKey(player, callback)
+    if not player or not PNC.PlayerCharacters
+        or not PNC.PlayerCharacters.GetEntityKey
+    then
+        return nil
+    end
+    return PNC.PlayerCharacters.GetEntityKey(player, {
+        callback = callback or "conversation",
+        worldAgeHours = worldAgeHours(),
+    })
+end
+
+local function applyParley(record, zombie, reason)
+    -- Do not derive a globally neutral legacy faction here: a parley is
+    -- scoped to one NPC/player pair, not a ceasefire for every player. The
+    -- target filter in FactionBehavior.ResolveIntent handles re-acquisition
+    -- for this stable player key while this clears the existing attack.
+    if PNC.BehaviorCommon
+        and PNC.BehaviorCommon.ClearCombatTarget
+    then
+        PNC.BehaviorCommon.ClearCombatTarget(record, reason, zombie)
+    else
+        record.runtime = record.runtime or {}
+        record.runtime.target = nil
+    end
+    record.runtime = record.runtime or {}
+    record.runtime.attackAction = nil
+    record.runtime.inCombatUntil = 0
+    record.nextThinkAt = now()
+end
+
+local function sendCeasefireResult(player, ok, reason, value)
+    local network = PNC.Network
+    local command = PNC.Const
+        and PNC.Const.CMD_CONVERSATION_CEASEFIRE_RESULT or nil
+    if not command or not network or not network.Internal
+        or not network.Internal.SendToPlayer
+    then
+        return false
+    end
+    return network.Internal.SendToPlayer(player, command, {
+        ok = ok == true,
+        reason = tostring(reason or "unknown"),
+        factionID = value and value.factionID or nil,
+        untilWorldAgeHours = value
+            and value.untilWorldAgeHours or nil,
+    })
+end
+
 function Scene.EnsureRegistered()
     local scenes = PNC.AnimationScenes
     if not scenes or not scenes.Register then
@@ -77,13 +142,17 @@ function Scene.EnsureRegistered()
     })
 end
 
-function Scene.HasThreat(record, zombie, player, radius)
+function Scene.HasThreat(record, zombie, player, radius, options)
+    options = type(options) == "table" and options or {}
     local runtime = record and record.runtime or {}
     local health = record and record.health or {}
     local current = now()
-    if runtime.target ~= nil
-        or runtime.attackAction ~= nil
-        or current < (tonumber(runtime.inCombatUntil) or 0)
+    local hostileTalkingTarget = options.ignoreTalkingNPC == true
+        and targetsPlayer(runtime.target, player)
+    if (runtime.target ~= nil and not hostileTalkingTarget)
+        or (runtime.attackAction ~= nil and not hostileTalkingTarget)
+        or (current < (tonumber(runtime.inCombatUntil) or 0)
+            and not hostileTalkingTarget)
         or current < (tonumber(health.recentDamageUntil) or 0)
     then
         return true
@@ -163,11 +232,19 @@ function Scene.Begin(record, zombie, player, token, options)
     if distanceSq(player, zombie) > maximumDistance * maximumDistance then
         return false, "distance"
     end
+    -- The client may request a parley, but only the authoritative hostile
+    -- compatibility state may grant one. It is useful even before the NPC
+    -- has acquired the player as a direct runtime target.
+    local hostileParley = options.allowHostileParley == true
+        and tostring(record.faction or "") == "hostile"
+        and (type(record.hostility) ~= "table"
+            or record.hostility.attackPlayers ~= false)
     if Scene.HasThreat(
         record,
         zombie,
         player,
-        dangerRadius
+        dangerRadius,
+        { ignoreTalkingNPC = hostileParley }
     ) then
         return false, "danger"
     end
@@ -184,6 +261,15 @@ function Scene.Begin(record, zombie, player, token, options)
         and record.runtime.animationScene.id == Scene.ID
     then
         current.expiresAt = currentTime + Scene.LEASE_MS
+        if current.hostileParley == true
+            and record.runtime.conversationParley
+            and tostring(
+                record.runtime.conversationParley.token or ""
+            ) == token
+        then
+            record.runtime.conversationParley.untilAt =
+                current.expiresAt
+        end
         return true, current
     end
     if current
@@ -221,7 +307,25 @@ function Scene.Begin(record, zombie, player, token, options)
         previousBehavior = record.activeBehavior,
         maximumDistance = maximumDistance,
         dangerRadius = dangerRadius,
+        hostileParley = hostileParley,
     }
+    if hostileParley then
+        local key = playerKey(player, "conversation_parley")
+        if not key then
+            PNC.AnimationScenes.Stop(
+                record,
+                zombie,
+                "conversation_identity_unavailable"
+            )
+            return false, "player_identity_unavailable"
+        end
+        record.runtime.conversationParley = {
+            token = token,
+            playerKey = key,
+            untilAt = currentTime + Scene.LEASE_MS,
+        }
+        applyParley(record, zombie, "conversation_parley_started")
+    end
     record.runtime.conversationLease = lease
     record.nextThinkAt = currentTime
     return true, lease
@@ -237,6 +341,12 @@ function Scene.End(record, zombie, token, reason)
         return false
     end
     runtime.conversationLease = nil
+    local parley = runtime.conversationParley
+    if parley and (token == nil or tostring(token) == ""
+        or tostring(parley.token or "") == tostring(token))
+    then
+        runtime.conversationParley = nil
+    end
     if runtime.animationScene
         and runtime.animationScene.id == Scene.ID
         and PNC.AnimationScenes
@@ -288,11 +398,69 @@ function Scene.Pump(record, zombie, currentTime)
         record,
         zombie,
         player,
-        tonumber(lease.dangerRadius) or Scene.DANGER_RADIUS
+        tonumber(lease.dangerRadius) or Scene.DANGER_RADIUS,
+        { ignoreTalkingNPC = lease.hostileParley == true }
     ) then
         return Scene.End(record, zombie, lease.token, "conversation_danger")
     end
     return false
+end
+
+local function handleCeasefire(player, record, zombie, token)
+    local runtime = record and record.runtime or nil
+    local lease = runtime and runtime.conversationLease or nil
+    local parley = runtime and runtime.conversationParley or nil
+    if not lease or not parley
+        or tostring(lease.token or "") ~= tostring(token or "")
+        or tostring(parley.token or "") ~= tostring(token or "")
+    then
+        sendCeasefireResult(player, false, "no_active_parley")
+        return false, "no_active_parley"
+    end
+    if tostring(lease.playerUsername or "") ~= tostring(
+        player and player.getUsername and player:getUsername() or ""
+    ) then
+        sendCeasefireResult(player, false, "lease_owner_mismatch")
+        return false, "lease_owner_mismatch"
+    end
+    if lease.playerOnlineID ~= nil
+        and tostring(lease.playerOnlineID) ~= tostring(
+            player and player.getOnlineID and player:getOnlineID()
+                or ""
+        )
+    then
+        sendCeasefireResult(player, false, "lease_owner_mismatch")
+        return false, "lease_owner_mismatch"
+    end
+    local factionID = PNC.Factions
+        and PNC.Factions.GetOrganizationalFactionID
+        and PNC.Factions.GetOrganizationalFactionID(record) or nil
+    if not factionID or not PNC.Factions.PacifyForPlayer then
+        sendCeasefireResult(player, false, "faction_unavailable")
+        return false, "faction_unavailable"
+    end
+    local key = playerKey(player, "conversation_ceasefire")
+    if not key or key ~= parley.playerKey then
+        sendCeasefireResult(player, false, "player_identity_unavailable")
+        return false, "player_identity_unavailable"
+    end
+    local ok, reason, entry = PNC.Factions.PacifyForPlayer(
+        factionID,
+        key,
+        {
+            worldAgeHours = worldAgeHours(),
+            durationHours = Scene.CEASEFIRE_HOURS,
+            reason = "conversation_ceasefire",
+            sourceNPCID = record.id,
+        }
+    )
+    if ok then
+        entry = entry or {}
+        entry.factionID = factionID
+        applyParley(record, zombie, "conversation_ceasefire")
+    end
+    sendCeasefireResult(player, ok, reason, entry)
+    return ok, reason, entry
 end
 
 function Scene.HandleClientCommand(player, command, args)
@@ -304,6 +472,7 @@ function Scene.HandleClientCommand(player, command, args)
         return Scene.Begin(record, zombie, player, args.token, {
             maximumDistance = args.maximumDistance,
             dangerRadius = args.dangerRadius,
+            allowHostileParley = args.allowHostileParley == true,
         })
     end
     if command == Scene.CMD_END then
@@ -313,6 +482,9 @@ function Scene.HandleClientCommand(player, command, args)
             args.token,
             args.reason or "conversation_client_close"
         )
+    end
+    if command == Scene.CMD_CEASEFIRE then
+        return handleCeasefire(player, record, zombie, args.token)
     end
     return false, "unknown_command"
 end
