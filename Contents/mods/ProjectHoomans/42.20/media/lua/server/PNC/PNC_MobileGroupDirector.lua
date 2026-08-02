@@ -1,6 +1,6 @@
 -- Server-authoritative mobile faction generation and abstract relocation.
 --
--- Mobile looter gangs and refugee groups are not Communities: they do not
+-- Mobile looter groups, trading caravans, and refugee groups are not Communities: they do not
 -- reserve sites, claim homes, or create a base radius. Their faction carries
 -- one primitive staging site so abstract members can relocate together.
 
@@ -27,6 +27,10 @@ local ROLE_ORDER = {
     looter = {
         "leader", "raider", "enforcer", "scavenger",
         "guard", "medic",
+    },
+    trader = {
+        "leader", "trader", "guard", "medic",
+        "mechanic", "scavenger", "laborer",
     },
     refugee = {
         "leader", "medic", "guard", "caregiver",
@@ -265,6 +269,7 @@ function Director.GenerateForFaction(factionID, spec)
         return false, "faction_not_active"
     end
     if faction.archetypeID ~= "looter"
+        and faction.archetypeID ~= "trader"
         and faction.archetypeID ~= "refugee"
     then
         return false, "mobile_archetype_not_allowed"

@@ -571,6 +571,10 @@ function ISPNCFactionDebugWindow:onAction(button)
         payload.factionAction = "create"
         payload.archetypeID = "looter"
         payload.creationKind = "mobile_group"
+    elseif internal == "create_trader" then
+        payload.factionAction = "create"
+        payload.archetypeID = "trader"
+        payload.creationKind = "mobile_group"
     elseif internal == "create_refugee" then
         payload.factionAction = "create"
         payload.archetypeID = "refugee"
@@ -651,11 +655,19 @@ function ISPNCFactionDebugWindow:prerender()
     local relation = snapshot.relationForward or {}
     local atWar = relation.atWar == true
     local allied = relation.allied == true
+    local isMobileFaction = faction ~= nil
+        and faction.faction.mobile ~= nil
+        and faction.faction.mobile.active == true
     for index, button in ipairs(self.controls) do
         local internal = CONTROLS[index].id
         local definition = CONTROLS[index]
         local visible = definition.views == nil
             or definition.views[self.viewMode] == true
+        if internal == "mobile_path_mode"
+            or internal == "mobile_relocate"
+        then
+            visible = visible and isMobileFaction
+        end
         button:setVisible(visible)
         local create = string.sub(internal, 1, 7) == "create_"
             and internal ~= "create_player_faction"
@@ -674,11 +686,9 @@ function ISPNCFactionDebugWindow:prerender()
             enabled = faction ~= nil
                 and faction.faction.status == "active"
         elseif internal == "mobile_path_mode" then
-            enabled = true
+            enabled = isMobileFaction
         elseif internal == "mobile_relocate" then
-            enabled = faction ~= nil
-                and faction.faction.mobile ~= nil
-                and faction.faction.mobile.active == true
+            enabled = isMobileFaction
         elseif internal == "population_label" then
             enabled = false
         elseif internal == "presence_mode"

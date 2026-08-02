@@ -17,6 +17,7 @@ local held = 0
 local definitions = {}
 local staleAttacker
 local pacifications = {}
+local enemyTarget
 
 local player = {
     x = 0,
@@ -45,6 +46,7 @@ local enemy = {
     getY = function(self) return self.y end,
     getZ = function() return 0 end,
     isDead = function() return false end,
+    getTarget = function() return enemyTarget end,
     getModData = function() return {} end,
 }
 local deadEnemy = {
@@ -203,6 +205,19 @@ candidates = { npc }
 assertEqual(Scene.HasThreat(record, npc, player, 8), false,
     "talking NPC is not its own threat")
 candidates = { enemy }
+local idleStarted = Scene.Begin(
+    record,
+    npc,
+    player,
+    "lease-idle-enemy",
+    { maximumDistance = 5.5, dangerRadius = 8 }
+)
+assertEqual(idleStarted, true,
+    "idle nearby enemy does not reject conversation")
+Scene.End(record, npc, "lease-idle-enemy", "test")
+assertEqual(Safety.Check(spec), nil,
+    "idle nearby enemy does not close client conversation")
+enemyTarget = player
 local dangerStarted, dangerReason = Scene.Begin(
     record,
     npc,
@@ -210,11 +225,14 @@ local dangerStarted, dangerReason = Scene.Begin(
     "lease-danger",
     { maximumDistance = 5.5, dangerRadius = 8 }
 )
-assertEqual(dangerStarted, false, "nearby enemy rejects conversation")
+assertEqual(dangerStarted, false,
+    "nearby enemy in combat rejects conversation")
 assertEqual(dangerReason, "danger", "server danger reason")
-assertEqual(Safety.Check(spec), "danger", "client danger reason")
+assertEqual(Safety.Check(spec), "danger",
+    "client detects nearby enemy in combat")
 
 candidates = {}
+enemyTarget = nil
 player.x = 8
 assertEqual(Safety.Check(spec), "distance", "client distance reason")
 player.x = 0

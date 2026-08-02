@@ -55,6 +55,44 @@ local function targetsPlayer(target, player)
         and (target.player == player or target.worldObject == player)
 end
 
+-- Proximity is not danger by itself. A nearby body becomes a conversation
+-- threat only when it is actively targeting the player or the NPC currently
+-- being spoken to. This avoids collapsing dialogue because an idle zombie or
+-- unrelated hostile happens to be inside the configured radius.
+local function engineTargetsConversation(candidate, player, zombie)
+    if not candidate or not candidate.getTarget then return false end
+    local target = candidate:getTarget()
+    return target == player or target == zombie
+end
+
+local function recordTargetsConversation(
+    candidate,
+    record,
+    player,
+    zombie
+)
+    local runtime = candidate and candidate.runtime or {}
+    if sameTarget(runtime.target, player, zombie, record) then
+        return true
+    end
+    local live = candidate and PNC.Registry
+        and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(candidate.id) or nil
+    return engineTargetsConversation(live, player, zombie)
+end
+
+local function zombieIsConversationEnemy(candidate, record, relationships)
+    local candidateRecord = PNC.Registry
+        and PNC.Registry.FindRecordByZombie
+        and PNC.Registry.FindRecordByZombie(candidate) or nil
+    if not candidateRecord then return true end -- vanilla zombie
+    return candidateRecord ~= record
+        and relationships
+        and relationships.AreNPCsEnemies
+        and relationships.AreNPCsEnemies(record, candidateRecord)
+        or false
+end
+
 local function worldAgeHours()
     local gameTime = getGameTime and getGameTime() or nil
     return gameTime and gameTime.getWorldAgeHours
@@ -174,6 +212,12 @@ function Scene.HasThreat(record, zombie, player, radius, options)
                     distanceSq(candidate, player) <= radius * radius
                     or distanceSq(candidate, zombie) <= radius * radius
                 )
+                and zombieIsConversationEnemy(
+                    candidate,
+                    record,
+                    relationships
+                )
+                and engineTargetsConversation(candidate, player, zombie)
             then
                 return true
             end
@@ -189,16 +233,14 @@ function Scene.HasThreat(record, zombie, player, radius, options)
             local candidate = candidates[index]
             if candidate ~= record
                 and candidate.alive ~= false
-                and (
-                    relationships
-                    and relationships.AreNPCsEnemies
-                    and relationships.AreNPCsEnemies(record, candidate)
-                    or sameTarget(
-                        candidate.runtime and candidate.runtime.target,
-                        player,
-                        zombie,
-                        record
-                    )
+                and relationships
+                and relationships.AreNPCsEnemies
+                and relationships.AreNPCsEnemies(record, candidate)
+                and recordTargetsConversation(
+                    candidate,
+                    record,
+                    player,
+                    zombie
                 )
             then
                 return true

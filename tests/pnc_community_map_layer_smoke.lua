@@ -47,7 +47,21 @@ package.preload["PNC/UI/Factions/PNC_FactionEmblemRenderer"] =
 local registered
 local sent
 local markerBlocksBase = false
+local emblemDraw
 PNC = {
+    FactionEmblemRenderer = {
+        Draw = function(target, emblem, x, y, size, options)
+            emblemDraw = {
+                target = target,
+                emblem = emblem,
+                x = x,
+                y = y,
+                size = size,
+                options = options,
+            }
+            return true
+        end,
+    },
     NPCTypePalette = {
         Get = function(typeID)
             local colors = {
@@ -219,6 +233,10 @@ state.factionRelations = {
         state = "war",
         atWar = true,
         allied = false,
+        emblem = {
+            backgroundColorID = "red",
+            layers = {},
+        },
     },
 }
 map.getMouseX = function() return 15 end
@@ -229,6 +247,12 @@ assertEqual(rectangles[1][6], 1,
     "enemy base uses hostile red palette")
 assertEqual(popupLines[3], "At war with your faction",
     "base edge hover reports faction war status")
+assertTrue(emblemDraw ~= nil,
+    "base hover renders the faction emblem")
+assertEqual(emblemDraw.target, map,
+    "hover emblem renders on the map")
+assertEqual(emblemDraw.size, 52,
+    "hover emblem uses the enlarged left panel")
 
 -- NPC marker hit-testing always wins over the base-outline hover card.
 markerBlocksBase = true

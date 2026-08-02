@@ -1229,6 +1229,7 @@ end
 local function mobileArchetypeAllowed(faction)
     return faction and (
         faction.archetypeID == "looter"
+        or faction.archetypeID == "trader"
         or faction.archetypeID == "refugee"
     )
 end

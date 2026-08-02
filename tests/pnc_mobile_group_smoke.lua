@@ -262,4 +262,52 @@ equal(deepEqual(
     PNC.FactionTypes.NormalizeFaction(normalized, faction.id)
 ), true, "mobile normalization is idempotent")
 
+PNC.Factions.IDGenerator = function() return "faction_trading_caravan" end
+local caravanOK, _, caravan = PNC.Factions.Create({
+    name = "Frontier Trading Caravan",
+    archetypeID = "trader",
+    createdAt = worldHour,
+})
+truthy(caravanOK, "trading caravan faction created")
+local caravanGenerated
+caravanOK, _, caravanGenerated =
+    PNC.MobileGroupDirector.GenerateForFaction(
+        caravan.id,
+        {
+            groupSize = 3,
+            presenceMode = "abstract",
+            worldAgeHours = worldHour,
+            mobilePathMode = "random",
+        }
+    )
+truthy(caravanOK, "trading caravan group generated")
+equal(caravanGenerated.createdCount, 3,
+    "trading caravan population")
+equal(PNC.Factions.Get(caravan.id).mobile.active, true,
+    "trading caravan is mobile")
+for _, npcID in ipairs(caravanGenerated.npcIDs) do
+    local record = PNC.Registry.Get(npcID)
+    equal(record.affiliation.communityID, nil,
+        "trading caravan member has no settlement affiliation")
+    equal(record.orderSpec.kind, PNC.Const.ORDER_ROAM,
+        "trading caravan roams across the map")
+end
+
+dofile(SERVER .. "PNC_FactionDebug.lua")
+local debugSnapshot = PNC.FactionDebug.BuildSnapshot(
+    caravan.id,
+    nil,
+    nil,
+    nil,
+    nil
+)
+local labels = {}
+for _, summary in ipairs(debugSnapshot.factions) do
+    labels[summary.id] = summary.archetypeLabel
+end
+equal(labels[faction.id], "Mobile Looter Group",
+    "inspector distinguishes mobile looters from settlements")
+equal(labels[caravan.id], "Trading Caravan",
+    "inspector identifies traders as mobile caravans")
+
 print("pnc_mobile_group_smoke: PASS")

@@ -637,8 +637,9 @@ For the mobile/parley debug check:
    verify the existing hostile hunt path. Use **Move Mobile Group Now** and
    confirm its staging-site ID and member anchors change together.
 3. Talk to one of its hostile members. The conversation must remain open for
-   the speaking NPC and show **Ceasefire. Stand down for now.** Nearby enemies
-   remain a danger and still close the conversation.
+   the speaking NPC and show **Ceasefire. Stand down for now.** A nearby enemy
+   only closes the conversation when it is actively targeting the player or
+   the speaking NPC.
 4. Select that option. Confirm the server reports a one-hour ceasefire and the
    group stops proactively targeting only that player character. After the
    world-age expiry, normal mobile looter hostility resumes.

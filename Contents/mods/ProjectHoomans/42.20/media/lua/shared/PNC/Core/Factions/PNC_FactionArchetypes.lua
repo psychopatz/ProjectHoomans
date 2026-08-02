@@ -34,8 +34,8 @@ local DEFINITIONS = {
     },
     looter = {
         id = "looter",
-        label = "Looter Gang",
-        description = "A survivor organization that commonly relies on coercion, theft, tribute, or raids for resources.",
+        label = "Looter Settlement",
+        description = "A territorial survivor settlement that commonly relies on coercion, theft, tribute, or raids for resources.",
         allowedRoles = {
             leader = true, lieutenant = true, enforcer = true,
             raider = true, guard = true, scavenger = true,
@@ -59,8 +59,8 @@ local DEFINITIONS = {
     },
     trader = {
         id = "trader",
-        label = "Trading Company",
-        description = "A survivor organization focused on exchange, transport, and commercial relationships.",
+        label = "Trading Caravan",
+        description = "A mobile survivor caravan focused on exchange, transport, and commercial relationships while travelling between settlements.",
         allowedRoles = {
             leader = true, trader = true, guard = true, medic = true,
             mechanic = true, scavenger = true, laborer = true,

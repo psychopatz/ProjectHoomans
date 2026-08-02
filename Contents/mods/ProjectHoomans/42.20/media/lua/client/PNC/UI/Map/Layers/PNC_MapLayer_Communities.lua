@@ -345,6 +345,11 @@ local function drawHoverCard(
     mouseY,
     color
 )
+    local relation = relationFor(snapshot, community)
+    local emblem = relation and relation.emblem
+    local emblemSize = 52
+    local emblemPanelWidth = emblemSize + 12
+    local cardPadding = 9
     local name = community and community.name
         or text(
             "UI_PNC_CommunityMapUnoccupied",
@@ -365,7 +370,7 @@ local function drawHoverCard(
         statusText(snapshot, site, community),
     }
     local manager = getTextManager and getTextManager() or nil
-    local width = 130
+    local infoWidth = 130
     local index
     for index = 1, #lines do
         local measured = manager and manager.MeasureStringX
@@ -373,11 +378,15 @@ local function drawHoverCard(
                 UIFont.Small,
                 lines[index]
             ) or #lines[index] * 7
-        width = math.max(width, measured + 18)
+        infoWidth = math.max(infoWidth, measured + cardPadding * 2)
     end
     local lineHeight = manager and manager.getFontHeight
         and manager:getFontHeight(UIFont.Small) or 14
-    local height = lineHeight * #lines + 14
+    local height = math.max(
+        lineHeight * #lines + 14,
+        emblemSize + 12
+    )
+    local width = emblemPanelWidth + infoWidth
     local x = math.min(
         map.width - width - 5,
         mouseX + 12
@@ -399,11 +408,31 @@ local function drawHoverCard(
         color.g,
         color.b
     )
+    map:drawRect(
+        x + emblemPanelWidth,
+        y + 1,
+        1,
+        height - 2,
+        0.72,
+        color.r,
+        color.g,
+        color.b
+    )
+    if emblem and EmblemRenderer and EmblemRenderer.Draw then
+        EmblemRenderer.Draw(
+            map,
+            emblem,
+            x + 6,
+            y + (height - emblemSize) / 2,
+            emblemSize,
+            { border = true }
+        )
+    end
     for index = 1, #lines do
         local shade = index == 1 and 1 or 0.78
         map:drawText(
             lines[index],
-            x + 9,
+            x + emblemPanelWidth + cardPadding,
             y + 5 + (index - 1) * lineHeight,
             shade,
             shade,

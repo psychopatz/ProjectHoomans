@@ -98,6 +98,16 @@ end
 
 local function factionSummary(faction)
     local archetype = Archetypes.Get(faction.archetypeID)
+    local mobile = faction.mobile
+    local archetypeLabel = archetype and archetype.label
+        or faction.archetypeID
+    if mobile and mobile.active == true then
+        if faction.archetypeID == "looter" then
+            archetypeLabel = "Mobile Looter Group"
+        elseif faction.archetypeID == "trader" then
+            archetypeLabel = "Trading Caravan"
+        end
+    end
     local communities = PNC.Communities
         and PNC.Communities.GetForFaction
         and PNC.Communities.GetForFaction(faction.id)
@@ -131,8 +141,7 @@ local function factionSummary(faction)
         id = faction.id,
         name = faction.name,
         archetypeID = faction.archetypeID,
-        archetypeLabel = archetype and archetype.label
-            or faction.archetypeID,
+        archetypeLabel = archetypeLabel,
         status = faction.status,
         leaderNPCID = faction.leaderNPCID,
         memberCount = Core.TableSize(faction.memberIDs),
@@ -144,7 +153,7 @@ local function factionSummary(faction)
         tags = copy(faction.tags),
         policy = copy(faction.policy),
         emblem = copy(faction.emblem),
-        mobile = copy(faction.mobile),
+        mobile = copy(mobile),
         revision = faction.revision,
         communityCount = #communities,
         communityNames = communityNames,

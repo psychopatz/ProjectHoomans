@@ -44,6 +44,12 @@ local function targetMatches(target, player, zombie, npcID)
         or target.worldObject == zombie
 end
 
+local function engineTargetsConversation(candidate, player, zombie)
+    if not candidate or not candidate.getTarget then return false end
+    local target = candidate:getTarget()
+    return targetMatches(target, player, zombie, nil)
+end
+
 function Safety.ResolveActors(spec)
     local context = spec and spec.context or {}
     local entry = context.entry or {}
@@ -83,7 +89,7 @@ local function managedCandidateIsEnemy(candidate, currentRecord, npcID)
         or nil
     if candidateRecord then
         if tostring(candidateRecord.id or "") == tostring(npcID) then
-            return false
+            return false, candidateRecord
         end
         local relationships = PNC.Relationships
         return relationships
@@ -93,26 +99,40 @@ local function managedCandidateIsEnemy(candidate, currentRecord, npcID)
                 currentRecord,
                 candidateRecord
             )
-            or targetMatches(
-                candidateRecord.runtime
-                    and candidateRecord.runtime.target,
-                nil,
-                nil,
-                npcID
-            )
+            or false,
+            candidateRecord
     end
     local modData = candidate.getModData
         and candidate:getModData() or nil
     local managedID = modData and modData.PNC_UUID or nil
-    if not managedID then return true end
-    if tostring(managedID) == tostring(npcID) then return false end
+    if not managedID then return true, nil end
+    if tostring(managedID) == tostring(npcID) then return false, nil end
     local snapshots = PNC.Network
         and PNC.Network.ClientState
         and PNC.Network.ClientState.snapshots
         or {}
     local snapshot = snapshots[tostring(managedID)]
     return snapshot and tostring(snapshot.faction or "") == "hostile"
-        or false
+        or false, nil
+end
+
+local function candidateTargetsConversation(
+    candidate,
+    candidateRecord,
+    player,
+    zombie,
+    npcID
+)
+    local runtime = candidateRecord and candidateRecord.runtime or nil
+    if runtime and targetMatches(
+        runtime.target,
+        player,
+        zombie,
+        npcID
+    ) then
+        return true
+    end
+    return engineTargetsConversation(candidate, player, zombie)
 end
 
 function Safety.HasDanger(
@@ -146,15 +166,25 @@ function Safety.HasDanger(
     local radiusSq = radius * radius
     for index = 0, list:size() - 1 do
         local candidate = list:get(index)
+        local hostile
+        local candidateRecord
+        hostile, candidateRecord = managedCandidateIsEnemy(
+            candidate,
+            record,
+            npcID
+        )
         if candidate ~= zombie
             and alive(candidate)
             and (
                 distanceSq(candidate, player) <= radiusSq
                 or distanceSq(candidate, zombie) <= radiusSq
             )
-            and managedCandidateIsEnemy(
+            and hostile == true
+            and candidateTargetsConversation(
                 candidate,
-                record,
+                candidateRecord,
+                player,
+                zombie,
                 npcID
             )
         then

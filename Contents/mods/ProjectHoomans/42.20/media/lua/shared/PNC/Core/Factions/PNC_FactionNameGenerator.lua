@@ -42,8 +42,8 @@ local POOLS = {
             "Safe Passage", "Three Rivers", "Westbound",
         },
         second = {
-            "Caravan", "Exchange", "Mercantile",
-            "Supply Company", "Trading Company",
+            "Caravan", "Exchange Caravan", "Mercantile Caravan",
+            "Supply Caravan", "Trading Caravan",
         },
         site = { "Depot", "Exchange", "Market", "Waystation" },
     },
