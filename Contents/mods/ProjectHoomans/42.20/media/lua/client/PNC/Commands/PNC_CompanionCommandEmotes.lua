@@ -3,6 +3,7 @@
 -- scopes. Nested groups stay private so vanilla never exposes them as roots.
 
 require "ISUI/ISEmoteRadialMenu"
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
 PNC = PNC or {}
 PNC.CompanionCommandEmotes = PNC.CompanionCommandEmotes or {}
@@ -12,6 +13,7 @@ local Commands = PNC.CompanionCommands
 local Const = PNC.Const
 local Registry = PNC.Registry
 local ClientState = PNC.Network and PNC.Network.ClientState or nil
+local Identity = PNC.NPCIdentityPresentation
 local CLOSEST_MENU_KEY = "PNC_ClosestCompanionCommands"
 local GROUP_MENU_KEY = "PNC_GroupCompanionCommands"
 local CLOSEST_COMMAND_PREFIX = "PNC_ClosestCommand_"
@@ -43,11 +45,7 @@ local function replaceTokens(text, values)
 end
 
 local function targetName(source)
-    return tostring(source and (
-        source.displayName
-        or source.name
-        or source.characterWindow and source.characterWindow.displayName
-    ) or "Companion")
+    return Identity.GetName(source or { recruited = true })
 end
 
 local function hasOwnerIdentity(source)

@@ -88,6 +88,26 @@ function Presentation.BuildDossierRows(snapshot)
     return rows
 end
 
+function Presentation.GetFact(snapshot, descriptorID)
+    for _, category in ipairs(snapshot and snapshot.categories or {}) do
+        for _, descriptor in ipairs(category.descriptors or {}) do
+            if tostring(descriptor.descriptorID) == tostring(descriptorID)
+                and descriptor.status ~= nil
+            then return descriptor end
+        end
+    end
+    return nil
+end
+
+function Presentation.GetKnownValue(snapshot, descriptorID, fallback)
+    local fact = Presentation.GetFact(snapshot, descriptorID)
+    return fact and fact.value ~= nil and fact.value or fallback
+end
+
+function Presentation.IsKnown(snapshot, descriptorID)
+    return Presentation.GetFact(snapshot, descriptorID) ~= nil
+end
+
 function Presentation.BuildDossierModel(snapshot)
     local sections = Presentation.BuildDossierRows(snapshot)
     local tabs = { { id = "overview", title = "Overview" } }

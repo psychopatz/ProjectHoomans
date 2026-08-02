@@ -1,6 +1,7 @@
 require "ISUI/ISPanel"
 require "ISUI/ISTabPanel"
 require "PsychopatzCore/UI/PsychopatzUI"
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
 PNC = PNC or {}
 PNC.CharacterWindow = PNC.CharacterWindow or {}
@@ -11,6 +12,7 @@ local Tabs = PNC.CharacterWindowTabs
 local Shared = PNC.CharacterWindowShared
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
+local IdentityPresentation = PNC.NPCIdentityPresentation
 
 local TAB_ORDER = {
     { id = "Info", label = "Info" },
@@ -159,15 +161,20 @@ function ISPNCCharacterWindow:refreshViews()
     end
 end
 
+function ISPNCCharacterWindow:refreshTitle()
+    local name = IdentityPresentation.GetName(self.npcId)
+    local archetype = IdentityPresentation.GetArchetype(self.npcId)
+    self.title = tostring(name) .. " - " .. tostring(archetype)
+    if self.setTitle then self:setTitle(self.title) end
+end
+
 function ISPNCCharacterWindow:setNPC(npcId)
     local summary
     self.npcId = npcId and tostring(npcId) or nil
     self.snapshot = ClientState.snapshots and ClientState.snapshots[self.npcId] or nil
     self.payload = ClientState.characterPayloads and ClientState.characterPayloads[self.npcId] or nil
     summary = Shared.GetCharacterData(self.snapshot, self.payload)
-    self.title = tostring(summary.displayName or self.snapshot and self.snapshot.name or "NPC")
-        .. " - " .. tostring(summary.archetypeLabel or self.snapshot and self.snapshot.archetypeLabel or "Survivor")
-    if self.setTitle then self:setTitle(self.title) end
+    self:refreshTitle()
     self:refreshViews()
     if PNC.Client and PNC.Client.RequestCharacterPayload and self.npcId then
         PNC.Client.RequestCharacterPayload(self.npcId)
@@ -193,10 +200,7 @@ function ISPNCCharacterWindow:updateSnapshot()
     if signature ~= self.contextSignature then
         self.contextSignature = signature
         self:refreshViews()
-        local summary = Shared.GetCharacterData(snapshot, payload)
-        if summary.displayName and self.setTitle then
-            self:setTitle(tostring(summary.displayName) .. " - " .. tostring(summary.archetypeLabel or "Survivor"))
-        end
+        self:refreshTitle()
     end
 end
 
@@ -251,6 +255,7 @@ function CharacterWindow.ReceiveKnowledgeSnapshot(snapshot)
     local window = CharacterWindow.instance
     if window and snapshot and tostring(snapshot.npcID) == tostring(window.npcId) then
         window:refreshViews()
+        window:refreshTitle()
     end
 end
 

@@ -53,6 +53,7 @@ end
 
 local function onResetLua()
     ClientState.snapshots = {}
+    ClientState.npcKnowledge = {}
     ClientState.characterPayloads = {}
     ClientState.debugRoster = {}
     ClientState.debugAuthorized = false

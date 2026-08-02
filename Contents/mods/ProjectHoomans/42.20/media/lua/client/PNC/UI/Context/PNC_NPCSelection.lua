@@ -7,10 +7,13 @@
 PNC = PNC or {}
 PNC.NPCSelection = PNC.NPCSelection or {}
 
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+
 local Selection = PNC.NPCSelection
 local Const = PNC.Const
 local Registry = PNC.Registry
 local ClientState = PNC.Network.ClientState
+local Identity = PNC.NPCIdentityPresentation
 
 local function getWorldSquare(worldObjects)
     local i
@@ -38,7 +41,10 @@ local function buildEntry(zombie, record, snapshot, referenceX, referenceY)
         record = record,
         snapshot = snapshot,
         id = record and record.id or snapshot and snapshot.id or zombie and zombie.getModData and zombie:getModData().PNC_UUID or nil,
-        name = record and record.name or snapshot and (snapshot.displayName or snapshot.name) or "PNC NPC",
+        name = Identity.GetName(snapshot or record or {
+            id = zombie and zombie.getModData
+                and zombie:getModData().PNC_UUID or nil,
+        }),
         archetypeLabel = record and record.archetypeLabel or snapshot and snapshot.archetypeLabel or "NPC",
         debugRecording = record and record.runtime and record.runtime.debug == true
             or debugState and debugState.debugEnabled == true

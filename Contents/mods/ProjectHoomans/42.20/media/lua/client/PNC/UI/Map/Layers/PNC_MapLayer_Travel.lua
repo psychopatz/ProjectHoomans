@@ -1,6 +1,7 @@
 -- Named, locally extrapolated NPC journey dots for the vanilla world map.
 
 require "PNC/UI/PNC_NPCTypePalette"
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
 PNC = PNC or {}
 PNC.MapTravelLayer = PNC.MapTravelLayer or {}
@@ -12,6 +13,7 @@ local Display = PNC.MapDisplay
 local Icons = PNC.MapMarkerIcons
 local HoverPortrait = PNC.MapHoverPortrait
 local Palette = PNC.NPCTypePalette
+local Identity = PNC.NPCIdentityPresentation
 
 TravelLayer.Enabled = TravelLayer.Enabled ~= false
 TravelLayer.DotTexture = TravelLayer.DotTexture
@@ -99,7 +101,7 @@ local function etaText(entry)
 end
 
 local function displayLabel(entry)
-    local name = tostring(entry and entry.name or entry and entry.id or "NPC")
+    local name = Identity.GetName(entry)
     local roleTag = entry and entry.roleTag
     if roleTag ~= nil and tostring(roleTag) ~= "" then
         return name .. " [" .. tostring(roleTag) .. "]"

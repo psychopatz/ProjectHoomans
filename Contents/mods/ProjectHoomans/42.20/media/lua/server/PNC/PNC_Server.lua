@@ -410,6 +410,15 @@ local function onClientCommand(module, command, player, args)
     if command == Const.CMD_FULL_SYNC_REQUEST then
         snapshots = buildSnapshotList()
         Network.BroadcastFullSync(player, snapshots)
+        if PNC.NPCKnowledge
+            and PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer
+        then
+            local knowledgeSnapshots =
+                PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer(player)
+            for _, knowledgeSnapshot in ipairs(knowledgeSnapshots or {}) do
+                Network.SendNPCKnowledge(player, knowledgeSnapshot)
+            end
+        end
         return
     end
 
@@ -591,6 +600,24 @@ local function onClientCommand(module, command, player, args)
     if command == Const.CMD_NPC_KNOWLEDGE_REQUEST then
         local snapshot
         local reason
+        if PNC.NPCKnowledge and args and args.allKnown == true
+            and PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer
+        then
+            local knowledgeSnapshots
+            knowledgeSnapshots, reason =
+                PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer(player)
+            for _, knowledgeSnapshot in ipairs(knowledgeSnapshots or {}) do
+                Network.SendNPCKnowledge(player, knowledgeSnapshot)
+            end
+            return
+        end
+        if PNC.NPCKnowledge and args and args.topicID
+            and PNC.NPCKnowledge.DiscoverTopicForPlayer
+        then
+            _, reason = PNC.NPCKnowledge.DiscoverTopicForPlayer(
+                player, args.npcID, args.topicID, nil, "direct_disclosure"
+            )
+        end
         if PNC.NPCKnowledge and PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer then
             snapshot, reason = PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer(
                 player, args and args.npcID

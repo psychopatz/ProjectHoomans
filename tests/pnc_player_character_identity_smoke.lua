@@ -365,6 +365,20 @@ assertEqual(retainedHistoricalConduct.scores.compassion, 8,
 assertEqual(#retainedHistoricalConduct.evidence, 1,
     "dead survivor evidence retained")
 
+-- A local single-player restart can lose the player ModData mirror. Reuse the
+-- matching active account character instead of silently minting a new UUID.
+assertTrue(Service.Unbind(newAlice, "restart_without_mirror"),
+    "active character unbound for restart")
+local recoveredAlice, recoveredAliceData = makePlayer("Alice", {}, {
+    onlineID = 14,
+    forename = "Alicia",
+})
+assertEqual(Service.EnsureIdentity(recoveredAlice, {
+    worldAgeHours = 106,
+    callback = "restart_without_mirror",
+}), newAliceUUID, "missing local mirror recovers active character")
+newAlice, newAliceData = recoveredAlice, recoveredAliceData
+
 -- 14-15. Another account cannot claim Alice's active UUID.
 local malloryData = {
     PNC_CharacterUUID = newAliceUUID,

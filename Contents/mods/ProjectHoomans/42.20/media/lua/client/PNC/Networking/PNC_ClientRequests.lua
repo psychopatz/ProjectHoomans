@@ -31,6 +31,9 @@ local function requestFullSync()
             ClientState.snapshots[snapshot.id] = snapshot
         end)
         ClientState.lastSyncReceiveAt = Core.Now()
+        if Client.RequestKnownNPCKnowledge then
+            Client.RequestKnownNPCKnowledge()
+        end
     end
 end
 
@@ -190,6 +193,61 @@ function Client.RequestNPCKnowledge(npcID)
         if PNC.NPCDossierUI and PNC.NPCDossierUI.ReceiveSnapshot then PNC.NPCDossierUI.ReceiveSnapshot(snapshot) end
     end
     return snapshot ~= nil, reason
+end
+
+-- Restores only this player's sparse, previously learned NPC facts. The
+-- server uses the same path for multiplayer full sync; this local branch
+-- covers single-player where the client calls services in-process.
+function Client.RequestKnownNPCKnowledge()
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE, Const.CMD_NPC_KNOWLEDGE_REQUEST, {
+                allKnown = true,
+            })
+            return true
+        end
+        return false, "player_unavailable"
+    end
+    if not PNC.NPCKnowledge
+        or not PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer
+    then
+        return false, "knowledge_service_unavailable"
+    end
+    local snapshots, reason = PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer(player)
+    if not snapshots then return false, reason end
+    ClientState.npcKnowledge = {}
+    for _, snapshot in ipairs(snapshots) do
+        ClientState.npcKnowledge[tostring(snapshot.npcID)] = snapshot
+    end
+    ClientState.lastNPCKnowledgeReceiveAt = Core.Now()
+    return true
+end
+
+function Client.RequestNPCKnowledgeTopic(npcID, topicID)
+    npcID = tostring(npcID or "")
+    topicID = tostring(topicID or "")
+    if npcID == "" or topicID == "" then return false, "invalid_knowledge_topic" end
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local args = { npcID = npcID, topicID = topicID }
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE, Const.CMD_NPC_KNOWLEDGE_REQUEST, args)
+            return true
+        end
+        return false, "player_unavailable"
+    end
+    if not PNC.NPCKnowledge or not PNC.NPCKnowledge.DiscoverTopicForPlayer then
+        return false, "knowledge_service_unavailable"
+    end
+    local _, reason = PNC.NPCKnowledge.DiscoverTopicForPlayer(player, npcID, topicID, nil, "direct_disclosure")
+    local snapshot, snapshotReason = PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer(player, npcID)
+    if snapshot then
+        ClientState.npcKnowledge = ClientState.npcKnowledge or {}
+        ClientState.npcKnowledge[npcID] = snapshot
+        if PNC.NPCDossierUI and PNC.NPCDossierUI.ReceiveSnapshot then PNC.NPCDossierUI.ReceiveSnapshot(snapshot) end
+    end
+    return snapshot ~= nil, reason or snapshotReason
 end
 
 function Client.RequestKnowledgeDebug(npcID, showTruth, descriptorID)

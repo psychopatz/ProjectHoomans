@@ -3,9 +3,12 @@
 PNC = PNC or {}
 PNC.CompanionCommandPresentation = PNC.CompanionCommandPresentation or {}
 
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+
 local Presentation = PNC.CompanionCommandPresentation
 local Commands = PNC.CompanionCommands
 local Flavor = PNC.CompanionCommandFlavor
+local Identity = PNC.NPCIdentityPresentation
 
 Presentation.FlavorRevision = Presentation.FlavorRevision or 0
 
@@ -23,17 +26,7 @@ local function speak(actor, text)
 end
 
 local function targetName(target)
-    return tostring(target and (
-        target.name
-        or target.displayName
-        or target.characterWindow and target.characterWindow.displayName
-        or target.source and (
-            target.source.name
-            or target.source.displayName
-            or target.source.characterWindow
-                and target.source.characterWindow.displayName
-        )
-    ) or "Companion")
+    return Identity.GetName(target or { recruited = true })
 end
 
 local function normalizeTargets(context)
@@ -142,10 +135,8 @@ function Presentation.SyncAcknowledgement(zombie, snapshot, modData)
             "npc",
             tostring(snapshot.id or "") .. ":" .. tostring(revision),
             {
-                name = tostring(snapshot.displayName or snapshot.name
-                    or "Companion"),
-                names = tostring(snapshot.displayName or snapshot.name
-                    or "Companion"),
+                name = Identity.GetName(snapshot),
+                names = Identity.GetName(snapshot),
                 count = 1,
                 player = tostring(player and player.getUsername
                     and player:getUsername() or "Survivor"),

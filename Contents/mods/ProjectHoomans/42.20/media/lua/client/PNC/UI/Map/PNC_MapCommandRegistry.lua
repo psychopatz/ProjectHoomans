@@ -8,6 +8,7 @@
 
 require "ISUI/Maps/ISWorldMap"
 require "ISUI/ISContextMenu"
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
 PNC = PNC or {}
 PNC.MapCommands = PNC.MapCommands or {}
@@ -15,6 +16,7 @@ PNC.MapCommands = PNC.MapCommands or {}
 local Commands = PNC.MapCommands
 local Core = PNC.Core
 local Layers = PNC.MapLayers
+local Identity = PNC.NPCIdentityPresentation
 
 Commands.Providers = Commands.Providers or {}
 Commands.Ordered = Commands.Ordered or {}
@@ -57,9 +59,7 @@ local function normalizedSelection(raw)
             seen[id] = true
             output[#output + 1] = {
                 id = id,
-                name = tostring(
-                    source.displayName or source.name or source.id
-                ),
+                name = Identity.GetName(source),
                 x = tonumber(source.x),
                 y = tonumber(source.y),
                 z = tonumber(source.z) or 0,

@@ -471,11 +471,12 @@ function Knowledge.BuildPlayerSnapshotForPlayer(player, npcID)
     local faction = record.affiliation and PNC.Factions
         and PNC.Factions.GetPresentation
         and PNC.Factions.GetPresentation(record.affiliation.factionID) or nil
+    local knownFaction = Knowledge.GetDescriptor(characterUUID, npcID, "faction.identity")
     snapshot.identity = {
         displayName = identity.displayName or record.name or "Unknown",
         archetypeLabel = identity.archetypeLabel,
-        factionName = faction and faction.name or nil,
-        factionRole = record.affiliation and record.affiliation.role or nil,
+        factionName = knownFaction and faction and faction.name or nil,
+        factionRole = knownFaction and record.affiliation and record.affiliation.role or nil,
         firstMetAt = snapshot.firstMetAt,
         lastInteractionAt = snapshot.lastInteractionAt,
     }
@@ -485,10 +486,44 @@ function Knowledge.BuildPlayerSnapshotForPlayer(player, npcID)
         snapshot.portrait.preferDescriptor = true
         snapshot.portrait.faceOnly = true
     end
+    if knownFaction and faction then
+        snapshot.knownFaction = deepCopy(faction)
+    end
     if PNC.RelationshipPresentation and PNC.RelationshipPresentation.BuildForConversation then
         snapshot.relationship = PNC.RelationshipPresentation.BuildForConversation(player, npcID)
     end
     return snapshot
+end
+
+-- Login/full-sync hydration is deliberately sparse: only NPCs this character
+-- already knows are sent back to that player. This restores client-side name
+-- presentation after a reload without exposing an all-NPC knowledge matrix.
+function Knowledge.BuildKnownSnapshotsForPlayer(player)
+    local characterUUID = PlayerCharacters
+        and PlayerCharacters.GetCharacterUUID
+        and PlayerCharacters.GetCharacterUUID(player) or nil
+    local character
+    local ids = {}
+    local snapshots = {}
+    if not characterUUID and PlayerCharacters
+        and PlayerCharacters.EnsureIdentity
+    then
+        characterUUID = PlayerCharacters.EnsureIdentity(player, {
+            callback = "knowledge_full_sync",
+        })
+    end
+    if not characterUUID then return nil, "character_identity_unavailable" end
+    Knowledge.EnsureLoaded()
+    character = Knowledge.Registry.byCharacter[characterUUID]
+    for npcID in pairs(character and character.byNPC or {}) do
+        ids[#ids + 1] = tostring(npcID)
+    end
+    table.sort(ids)
+    for _, npcID in ipairs(ids) do
+        local snapshot = Knowledge.BuildPlayerSnapshotForPlayer(player, npcID)
+        if snapshot then snapshots[#snapshots + 1] = snapshot end
+    end
+    return snapshots
 end
 
 function Knowledge.BuildDebugSnapshot(characterUUID, npcID, showTruth, detailDescriptorID)
@@ -528,7 +563,7 @@ function Knowledge.BuildDebugSnapshotForPlayer(player, npcID, showTruth, detailD
     return Knowledge.BuildDebugSnapshot(characterUUID, npcID, showTruth, detailDescriptorID)
 end
 
-function Knowledge.ForceRevealForPlayer(player, npcID, descriptorID, at)
+function Knowledge.ForceRevealForPlayer(player, npcID, descriptorID, at, sourceType)
     local characterUUID = PlayerCharacters and PlayerCharacters.GetCharacterUUID
         and PlayerCharacters.GetCharacterUUID(player) or nil
     local descriptor = Definitions.Get(descriptorID)
@@ -538,8 +573,31 @@ function Knowledge.ForceRevealForPlayer(player, npcID, descriptorID, at)
     local truth, reason = Providers.GetTruth(record, descriptor)
     if truth == nil then return nil, reason end
     return Knowledge.RecordEvidence({ characterUUID = characterUUID, npcID = npcID, descriptorID = descriptor.id,
-        sourceType = "debug", strength = 1, reliability = 1, direction = 0,
+        sourceType = sourceType or "debug", strength = 1, reliability = 1, direction = 0,
         payload = { observedValue = truth }, worldAgeHours = at })
+end
+
+-- Temporary debug counterpart to future conversational disclosures. A topic
+-- only reveals descriptors the NPC would reasonably discuss in that topic;
+-- it never turns the whole dossier into an omniscient dump.
+function Knowledge.DiscoverTopicForPlayer(player, npcID, topicID, at, sourceType)
+    local topic = tostring(topicID or "")
+    local revealed = {}
+    local failures = {}
+    if topic == "" then return nil, "unknown_knowledge_topic" end
+    for _, descriptor in ipairs(Definitions.List()) do
+        local presentation = descriptor.presentation or {}
+        if tostring(presentation.topicID or "") == topic then
+            local result, reason = Knowledge.ForceRevealForPlayer(player, npcID, descriptor.id, at, sourceType or "direct_disclosure")
+            if result then
+                revealed[#revealed + 1] = descriptor.id
+            else
+                failures[#failures + 1] = descriptor.id .. ":" .. tostring(reason)
+            end
+        end
+    end
+    if #revealed == 0 and #failures == 0 then return nil, "unknown_knowledge_topic" end
+    return { topicID = topic, revealed = revealed, failures = failures }
 end
 
 function Knowledge.ExecuteDebugForPlayer(player, args)
@@ -553,13 +611,8 @@ function Knowledge.ExecuteDebugForPlayer(player, args)
     if not characterUUID or npcID == "" then return nil, "character_identity_unavailable" end
     if action == "reveal" or action == "force_disclosure" then
         result, reason = Knowledge.ForceRevealForPlayer(player, npcID, descriptorID, args.worldAgeHours)
-    elseif action == "reveal_all" then
-        local revealed, failures = 0, {}
-        for _, descriptor in ipairs(Definitions.List()) do
-            local forced, forceReason = Knowledge.ForceRevealForPlayer(player, npcID, descriptor.id, args.worldAgeHours)
-            if forced then revealed = revealed + 1 else failures[#failures + 1] = descriptor.id .. ":" .. tostring(forceReason) end
-        end
-        result = { revealed = revealed, failures = failures }
+    elseif action == "discover_topic" then
+        result, reason = Knowledge.DiscoverTopicForPlayer(player, npcID, args.topicID, args.worldAgeHours, "debug")
     elseif action == "forget" then
         result, reason = Knowledge.Clear(characterUUID, npcID, descriptorID)
     elseif action == "add_evidence" then

@@ -114,6 +114,32 @@ Providers.Register("pnc_social_profile", {
     end,
 })
 
+Providers.Register("pnc_identity", {
+    GetValue = function(record, descriptor)
+        local identity = PNC.Identity and PNC.Identity.GetCharacterSummary
+            and PNC.Identity.GetCharacterSummary(record) or {}
+        local field = descriptor and descriptor.presentation and descriptor.presentation.truthField
+        return identity and field and identity[field] or nil
+    end,
+})
+
+Providers.Register("pnc_skill", {
+    GetValue = function(record, descriptor)
+        local skillID = descriptor and descriptor.presentation and descriptor.presentation.skillID
+        return PNC.Skills and PNC.Skills.GetLevel and skillID
+            and PNC.Skills.GetLevel(record, skillID) or nil
+    end,
+})
+
+Providers.Register("pnc_faction", {
+    GetValue = function(record)
+        local factionID = record and record.affiliation and record.affiliation.factionID or nil
+        local faction = factionID and PNC.Factions and PNC.Factions.GetPresentation
+            and PNC.Factions.GetPresentation(factionID) or nil
+        return faction and faction.name or nil
+    end,
+})
+
 local function descriptor(id, category, field, valueType, resolverID, privacy, discovery, presentation)
     presentation = presentation or {}
     presentation.truthField = field
@@ -129,15 +155,46 @@ end
 
 local observable = { allowInference = true, allowObservation = true, allowDisclosure = true, minimumFamiliarity = 10, suspectedThreshold = .30, knownThreshold = .70 }
 local personal = { allowInference = false, allowObservation = false, allowDisclosure = true, minimumFamiliarity = 25, suspectedThreshold = .30, knownThreshold = .70 }
-descriptor("personality.orientation", "social", "orientation", "categorical", "direct_fact", "private", personal)
-descriptor("preference.food", "preferences", "foodPreference", "categorical", "categorical_votes", "personal", personal)
-descriptor("personality.romance_style", "personality", "romanceStyle", "categorical", "categorical_votes", "private", personal)
-descriptor("personality.jealousy_style", "personality", "jealousyStyle", "categorical", "categorical_votes", "private", personal)
-descriptor("personality.social_style", "personality", "socialStyle", "categorical", "categorical_votes", "observable", observable)
+descriptor("personality.orientation", "social", "orientation", "categorical", "direct_fact", "private", personal, { topicID = "social" })
+descriptor("preference.food", "preferences", "foodPreference", "categorical", "categorical_votes", "personal", personal, { topicID = "preferences" })
+descriptor("personality.romance_style", "personality", "romanceStyle", "categorical", "categorical_votes", "private", personal, { topicID = "personality" })
+descriptor("personality.jealousy_style", "personality", "jealousyStyle", "categorical", "categorical_votes", "private", personal, { topicID = "personality" })
+descriptor("personality.social_style", "personality", "socialStyle", "categorical", "categorical_votes", "observable", observable, { topicID = "personality" })
 for _, field in ipairs({ "compassion", "sociability", "forgiveness", "bravery", "materialism", "aggression", "loyalty" }) do
     descriptor("personality." .. field, "personality", field, "band", "signed_evidence", "observable", observable, {
-        positiveLabel = field, negativeLabel = "not_" .. field,
+        positiveLabel = field, negativeLabel = "not_" .. field, topicID = "personality",
     })
+end
+
+Descriptors.Register({
+    id = "identity.name", version = 1, category = "identity", providerID = "pnc_identity",
+    resolverID = "direct_fact", valueType = "text_enum", privacy = "personal",
+    discovery = personal, capabilities = { disclosable = true, decayable = false },
+    presentation = { truthField = "displayName", topicID = "identity_name" },
+})
+Descriptors.Register({
+    id = "identity.archetype", version = 1, category = "identity", providerID = "pnc_identity",
+    resolverID = "direct_fact", valueType = "text_enum", privacy = "personal",
+    discovery = personal, capabilities = { disclosable = true, decayable = false },
+    presentation = { truthField = "archetypeLabel", topicID = "background" },
+})
+Descriptors.Register({
+    id = "faction.identity", version = 1, category = "faction", providerID = "pnc_faction",
+    resolverID = "direct_fact", valueType = "text_enum", privacy = "personal",
+    discovery = personal, capabilities = { disclosable = true, decayable = false },
+    presentation = { topicID = "identity_name" },
+})
+
+for _, group in ipairs(PNC.SkillCatalog and PNC.SkillCatalog.GetGroups and PNC.SkillCatalog.GetGroups() or {}) do
+    for _, skill in ipairs(group.skills or {}) do
+        Descriptors.Register({
+            id = "skill." .. tostring(skill.id), version = 1, category = "capabilities",
+            providerID = "pnc_skill", resolverID = "direct_fact", valueType = "scalar",
+            privacy = "personal", discovery = personal,
+            capabilities = { disclosable = true, observable = true, decayable = true },
+            presentation = { skillID = skill.id, topicID = "skill." .. tostring(skill.id) },
+        })
+    end
 end
 
 return Registry

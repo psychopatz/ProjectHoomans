@@ -3,11 +3,14 @@
 PNC = PNC or {}
 PNC.TravelDirectory = PNC.TravelDirectory or {}
 
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+
 local Directory = PNC.TravelDirectory
 local ClientState = PNC.Network.ClientState
 local Core = PNC.Core
 local Projection = PNC.Travel and PNC.Travel.Projection
 local Route = PNC.Travel and PNC.Travel.Route
+local Identity = PNC.NPCIdentityPresentation
 
 Directory.VisibilityFilters = Directory.VisibilityFilters or {}
 
@@ -162,9 +165,7 @@ function Directory.GetProjected(npcId, atWorldHour)
         return {
             id = tostring(snapshot.id),
             npcId = tostring(snapshot.id),
-            name = tostring(
-                snapshot.displayName or snapshot.name or snapshot.id
-            ),
+            name = Identity.GetName(snapshot),
             faction = tostring(snapshot.faction or "neutral"),
             organizationalFaction =
                 resolveOrganizationalFaction(snapshot),
@@ -231,9 +232,7 @@ function Directory.GetProjected(npcId, atWorldHour)
     return {
         id = tostring(snapshot.id),
         npcId = tostring(snapshot.id),
-        name = tostring(
-            snapshot.displayName or snapshot.name or snapshot.id
-        ),
+        name = Identity.GetName(snapshot),
         faction = tostring(snapshot.faction or "neutral"),
         organizationalFaction =
             resolveOrganizationalFaction(snapshot),

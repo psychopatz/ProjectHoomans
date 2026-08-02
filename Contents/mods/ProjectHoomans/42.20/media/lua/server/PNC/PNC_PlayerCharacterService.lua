@@ -229,6 +229,57 @@ local function updateInformation(record, player, at, updateLastSeen)
     return changed
 end
 
+-- The engine does not reliably preserve player ModData for every local
+-- single-player restart. The registry is authoritative, so recover the most
+-- recent unbound active character for this account when that mirror is gone.
+-- A valid mirror still wins, and an invalid mirror is never silently replaced.
+local function recoverAccountCharacter(accountIdentity, player)
+    local candidates = PlayerCharacters.Registry.byAccount[accountIdentity]
+        or {}
+    local info = informationalFields(player)
+    local selected
+    local function matchesPlayer(record)
+        if info and info.displayName and record.displayName
+            and info.displayName ~= record.displayName
+        then
+            return false
+        end
+        if info and info.forename and record.forename
+            and info.forename ~= record.forename
+        then
+            return false
+        end
+        if info and info.surname and record.surname
+            and info.surname ~= record.surname
+        then
+            return false
+        end
+        return true
+    end
+    local function newerThan(left, right)
+        local leftSeen = tonumber(left.lastSeenAt) or 0
+        local rightSeen = tonumber(right.lastSeenAt) or 0
+        if leftSeen ~= rightSeen then return leftSeen > rightSeen end
+        local leftCreated = tonumber(left.createdAt) or 0
+        local rightCreated = tonumber(right.createdAt) or 0
+        if leftCreated ~= rightCreated then return leftCreated > rightCreated end
+        return tostring(left.uuid) > tostring(right.uuid)
+    end
+    for uuid in pairs(candidates) do
+        local record = PlayerCharacters.Registry.byUUID[uuid]
+        if record
+            and record.status == Constants.STATUS_ACTIVE
+            and record.accountIdentity == accountIdentity
+            and not PlayerCharacters.RuntimeByUUID[uuid]
+            and matchesPlayer(record)
+            and (not selected or newerThan(record, selected))
+        then
+            selected = record
+        end
+    end
+    return selected
+end
+
 local function bind(player, uuid)
     PlayerCharacters.RuntimeByPlayer[player] = uuid
     PlayerCharacters.RuntimeByUUID[uuid] = player
@@ -566,6 +617,27 @@ function PlayerCharacters.EnsureIdentity(player, context)
             result = "rejected",
             reason = reason,
         })
+    else
+        record = recoverAccountCharacter(accountIdentity, player)
+        if record then
+            bind(player, record.uuid)
+            setMirror(player, record.uuid)
+            if updateInformation(record, player, at, true) then
+                PlayerCharacters.Registry.byUUID[record.uuid] = record
+                markRecordChanged(record)
+            end
+            logIdentity({
+                callback = callback,
+                accountIdentity = accountIdentity,
+                characterUUID = record.uuid,
+                status = record.status,
+                worldAgeHours = at,
+                onlineID = onlineIDFor(player),
+                result = "reused",
+                reason = "account_recovery",
+            })
+            return record.uuid, "reused"
+        end
     end
     uuid, reason = createIdentity(player, accountIdentity, at)
     if not uuid then

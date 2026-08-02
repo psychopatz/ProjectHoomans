@@ -1,12 +1,15 @@
 PNC = PNC or {}
 PNC.NameplateEntries = PNC.NameplateEntries or {}
 
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+
 local Entries = PNC.NameplateEntries
 local Bodies = PNC.NameplateBodies
 local Debug = PNC.NameplateDebug
 local Presentation = PNC.NameplatePresentation
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
+local Identity = PNC.NPCIdentityPresentation
 
 local UPDATE_RATE = 6
 
@@ -210,7 +213,7 @@ Entries.BuildCommunityDebugLines = communityDebugLines
 local function cacheMetrics(entry, snapshot, zombie, settings)
     local fonts = Presentation.Fonts
     local showDebug = settings and settings.showAIDebug == true
-    local name = snapshot and snapshot.name or "PNC NPC"
+    local name = Identity.GetName(snapshot)
     local debugText = showDebug
         and Debug.BuildText(snapshot, zombie ~= nil, settings) or ""
     if showDebug and settings.debugShowAnimation ~= false then
@@ -420,7 +423,7 @@ function Entries.Refresh(manager, settings)
         local zombie = Bodies.Resolve(bodyIndex, uuid, snapshot)
         local alive = snapshot and snapshot.alive ~= false
             and snapshot.presenceState == Const.PRESENCE_LIVE
-        if zombie and alive then
+        if zombie and alive and Identity.IsNameKnown(snapshot) then
             Bodies.Tag(zombie, uuid, snapshot)
             if isLiveVisible(player, zombie) then
                 local entry = manager.entries[uuid] or { uuid = uuid }
@@ -432,7 +435,7 @@ function Entries.Refresh(manager, settings)
             settings.showAIDebug
                 or settings.showFactionDebug
                 or settings.showCommunityDebug
-        ) and snapshot and isDebugVisible(player, snapshot) then
+        ) and snapshot and Identity.IsNameKnown(snapshot) and isDebugVisible(player, snapshot) then
             local entry = manager.entries[uuid] or { uuid = uuid }
             populateDebugEntry(entry, snapshot, settings)
             manager.entries[uuid] = entry

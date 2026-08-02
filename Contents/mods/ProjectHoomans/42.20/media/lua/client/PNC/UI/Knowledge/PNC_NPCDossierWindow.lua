@@ -17,6 +17,9 @@ function Dossier.ReceiveSnapshot(snapshot)
     if PNC.CharacterWindow and PNC.CharacterWindow.ReceiveKnowledgeSnapshot then
         PNC.CharacterWindow.ReceiveKnowledgeSnapshot(snapshot)
     end
+    if PNC.Conversation and PNC.Conversation.ReceiveKnowledgeSnapshot then
+        PNC.Conversation.ReceiveKnowledgeSnapshot(snapshot)
+    end
 end
 
 function Dossier.ReceiveDebugSnapshot(snapshot)

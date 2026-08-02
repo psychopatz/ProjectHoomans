@@ -7,8 +7,11 @@
 PNC = PNC or {}
 PNC.ContextHub = PNC.ContextHub or {}
 
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+
 local ContextHub = PNC.ContextHub
 local Selection = PNC.NPCSelection
+local Identity = PNC.NPCIdentityPresentation
 
 ContextHub.Providers = ContextHub.Providers or {}
 ContextHub.ProviderOrder = ContextHub.ProviderOrder or {}
@@ -71,14 +74,15 @@ local function hasEnabledProvider(entry, player, contextData)
 end
 
 local function formatEntryLabel(entry)
-    local label = tostring(entry and entry.name or "PNC NPC")
+    local known = Identity.IsNameKnown(entry)
+    local label = Identity.GetContextLabel(entry)
     local distance = math.sqrt(tonumber(entry and entry.distSq) or 0)
     local debugPresentation = PNC.Runtime and PNC.Runtime.debugEnabled == true
         or entry and entry.debugRecording == true
     if debugPresentation then
         label = label
             .. " ["
-            .. tostring(entry and entry.archetypeLabel or "NPC")
+            .. tostring(known and Identity.GetArchetype(entry) or "Unknown")
             .. "] "
             .. string.format("(%.1f)", distance)
     end

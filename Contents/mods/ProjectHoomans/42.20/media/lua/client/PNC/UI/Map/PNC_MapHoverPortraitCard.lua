@@ -3,6 +3,7 @@
 require "ISUI/ISPanel"
 require "PsychopatzCore/UI/Components/PsychopatzPortraitPanel"
 require "PNC/UI/Factions/PNC_FactionEmblemRenderer"
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
 PNC = PNC or {}
 
@@ -21,6 +22,7 @@ PNCMapHoverPortraitCard.DebugBackground = false
 local FACTION_COLOR = { r = 0.82, g = 0.61, b = 0.16 }
 local WORKER_COLOR = { r = 0.16, g = 0.55, b = 0.78 }
 local EmblemRenderer = PNC.FactionEmblemRenderer
+local Identity = PNC.NPCIdentityPresentation
 
 local function firstGlyph(value, fallback)
     local text = tostring(value or "")
@@ -66,21 +68,17 @@ function PNCMapHoverPortraitCard:setTarget(spec)
 end
 
 function PNCMapHoverPortraitCard:setContext(entry)
-    local name = tostring(entry and entry.name or entry and entry.id or "NPC")
-    local organizational = entry
-        and entry.organizationalFaction or nil
-    local faction = tostring(
-        organizational and organizational.name
-            or entry and entry.faction or ""
-    )
+    local name = Identity.GetName(entry)
+    -- Faction presentation is gated by the same learned identity pipeline as
+    -- the name.  Map payloads may still carry affiliation for mechanics.
+    local organizational = Identity.GetFaction(entry)
+    local faction = tostring(organizational and organizational.name or "")
     local factionID = tostring(
         organizational and organizational.id or faction
     )
-    local workerRole = tostring(
-        entry and entry.roleTag
-            or organizational and organizational.role
-            or ""
-    )
+    local workerRole = tostring(organizational and (
+        entry and entry.roleTag or organizational.role
+    ) or "")
     local emblem = organizational and organizational.emblem or nil
     local emblemRevision = emblem
         and tonumber(emblem.revision) or -1

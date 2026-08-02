@@ -90,11 +90,11 @@ local debugAction = Knowledge.ExecuteDebugForPlayer({}, {
 })
 truth(debugAction and debugAction.actionResult ~= nil,
     "generic debug action uses separate outer and inner action identifiers")
-local revealAll = Knowledge.ExecuteDebugForPlayer({}, {
-    knowledgeAction = "reveal_all", npcID = npc.id, showTruth = false,
+local topicDiscovery = Knowledge.ExecuteDebugForPlayer({}, {
+    knowledgeAction = "discover_topic", npcID = npc.id, topicID = "personality", showTruth = false,
 })
-truth(revealAll and revealAll.actionResult and revealAll.actionResult.revealed >= 13,
-    "debug reveal-all discovers the registered trait descriptors")
+truth(topicDiscovery and topicDiscovery.actionResult and #topicDiscovery.actionResult.revealed == 10,
+    "debug discovery reveals only the selected conversational topic")
 local debugCompassion = Knowledge.GetDescriptor("char_a", npc.id, "personality.compassion")
 eq(debugCompassion.status, "confirmed", "debug discovery confirms numeric trait bands")
 eq(debugCompassion.value, "high", "debug discovery resolves numeric trait direction")
@@ -138,6 +138,21 @@ for npcIndex = 1, 100 do
     end
 end
 eq(learned, 2000, "sparse scale evidence count")
-eq(#PNC.KnowledgeDescriptors.List(), 63, "scale descriptors registered without schema migration")
+eq(#PNC.KnowledgeDescriptors.List(), 66, "scale descriptors registered without schema migration")
+safe(Knowledge.Registry)
+
+-- Learned facts are world ModData, keyed by persistent character UUID. A
+-- reload must retain them for single-player and multiplayer server startup.
+truth(Knowledge.Save(), "knowledge writes through the normal world-save path")
+Knowledge.Registry = { schemaVersion = 1, revision = 0, byCharacter = {} }
+Knowledge.Loaded = false
+Knowledge.Dirty = false
+truth(Knowledge.Load(), "knowledge reloads from world ModData")
+eq(Knowledge.GetDescriptor("char_a", npc.id, "identity.name"), nil,
+    "unlearned identity remains absent after reload")
+eq(Knowledge.GetDescriptor("char_a", npc.id, "test.favorite_color").value,
+    "blue", "learned fact survives reload")
+local restored = Knowledge.BuildKnownSnapshotsForPlayer({})
+truth(#restored > 0, "known snapshots hydrate a reconnecting client")
 safe(Knowledge.Registry)
 print("pnc_knowledge_smoke: ok")

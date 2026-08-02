@@ -1,12 +1,17 @@
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
+if not PNC.NPCIdentityPresentation then
+    require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+end
+
 local Conversation = PNC.Conversation
 local Time = Conversation.Time
 local Content = Conversation.Content
 local Relationship = Conversation.Relationship
 local Lifecycle = Conversation.Lifecycle
 local Palette = PNC.NPCTypePalette
+local IdentityPresentation = PNC.NPCIdentityPresentation
 
 local function roleLabel(value)
     value = tostring(value or "")
@@ -66,10 +71,7 @@ function Conversation.HandleCeasefireResult(args)
 end
 
 local function factionPresentation(entry)
-    local snapshot = entry and entry.snapshot or {}
-    local record = entry and entry.record or {}
-    local faction = snapshot.organizationalFaction
-        or record.organizationalFaction
+    local faction = IdentityPresentation.GetFaction(entry)
     if type(faction) ~= "table" then return nil end
     local name = tostring(faction.name or "")
     local role = roleLabel(
@@ -103,11 +105,18 @@ local function portraitSpec(entry)
     }
 end
 
+function Conversation.RequestKnowledgeTopic(npcID, topicID)
+    if PNC.Client and PNC.Client.RequestNPCKnowledgeTopic then
+        return PNC.Client.RequestNPCKnowledgeTopic(npcID, topicID)
+    end
+    return false
+end
+
 function Conversation.BuildDefinition(entry, player, forcedTime)
     local timeID = forcedTime or Time.Resolve()
     local relationshipID = Relationship.Resolve(entry, player)
     local npcID = tostring(entry and entry.id or "debug-npc")
-    local name = tostring(entry and entry.name or "NPC")
+    local name = IdentityPresentation.GetName(entry)
     local day = PsychopatzCore.Conversation.History.GetDay()
     local greeting = Content.GetGreeting(
         relationshipID,
@@ -116,12 +125,14 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         day
     )
     local faction = factionPresentation(entry)
+    local identityKnown = IdentityPresentation.IsNameKnown(entry)
     local aggressive = isAggressive(entry)
     local relationshipPresentation = Relationship.GetPresentation(npcID)
     local greetingChoices
     local debugStandingChoices = {}
     local debugEventChoices = {}
     local debugMenuChoices = {}
+    local debugKnowledgeChoices = {}
     if aggressive then
         greetingChoices = {
             {
@@ -172,6 +183,23 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             },
         }
     end
+    if not identityKnown then
+        local rawFaction = IdentityPresentation.GetDisclosureFaction(entry)
+        local introduction = "I'm "
+            .. IdentityPresentation.GetDisclosureName(entry) .. "."
+        if rawFaction and rawFaction.name then
+            introduction = introduction .. " I'm with " .. tostring(rawFaction.name) .. "."
+        end
+        table.insert(greetingChoices, 1, {
+            id = "ask_name",
+            text = "What's your name?",
+            response = { fallback = introduction },
+            action = function()
+                Conversation.RequestKnowledgeTopic(npcID, "identity_name")
+            end,
+            next = "greeting",
+        })
+    end
     if PNC.Client and PNC.Client.CanUseDebug
         and PNC.Client.CanUseDebug()
     then
@@ -203,6 +231,11 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             id = "debug_social_event",
             text = "Trigger real social event",
             next = "debug_social_events",
+        }
+        debugMenuChoices[#debugMenuChoices + 1] = {
+            id = "debug_knowledge_topics",
+            text = "DEBUG: Discovery topics",
+            next = "debug_knowledge_topics",
         }
         debugMenuChoices[#debugMenuChoices + 1] = {
             id = "debug_toggle_relation_card",
@@ -268,6 +301,55 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             id = "debug_events_back",
             text = "Back",
             next = "debug_relationship",
+        }
+        local topicChoices = {
+            { id = "identity_name", label = "Ask their name", reply = "They introduce themselves." },
+            { id = "background", label = "Ask about their background", reply = "They tell you what they did before all this." },
+            { id = "personality", label = "Talk about their outlook", reply = "They open up about how they see people and the world." },
+            { id = "preferences", label = "Ask about their preferences", reply = "They share a personal preference." },
+            { id = "social", label = "Discuss personal boundaries", reply = "They share something personal." },
+        }
+        for _, topic in ipairs(topicChoices) do
+            local topicID = topic.id
+            local label = topic.label
+            local reply = topic.reply
+            debugKnowledgeChoices[#debugKnowledgeChoices + 1] = {
+                id = "debug_topic_" .. topicID,
+                text = "DEBUG: " .. label,
+                response = { fallback = reply },
+                action = function()
+                    if PNC.Client and PNC.Client.SendDebug then
+                        PNC.Client.SendDebug("knowledge_debug_action", {
+                            knowledgeAction = "discover_topic", npcID = npcID, topicID = topicID,
+                            showTruth = false,
+                        })
+                    end
+                end,
+                next = "debug_knowledge_topics",
+            }
+        end
+        for _, group in ipairs(PNC.SkillCatalog and PNC.SkillCatalog.GetGroups and PNC.SkillCatalog.GetGroups() or {}) do
+            for _, skill in ipairs(group.skills or {}) do
+                local topicID = "skill." .. tostring(skill.id)
+                local label = tostring(skill.display or skill.id)
+                debugKnowledgeChoices[#debugKnowledgeChoices + 1] = {
+                    id = "debug_topic_" .. tostring(skill.id),
+                    text = "DEBUG: Ask about " .. label,
+                    response = { fallback = "They talk about their experience with " .. label .. "." },
+                    action = function()
+                        if PNC.Client and PNC.Client.SendDebug then
+                            PNC.Client.SendDebug("knowledge_debug_action", {
+                                knowledgeAction = "discover_topic", npcID = npcID, topicID = topicID,
+                                showTruth = false,
+                            })
+                        end
+                    end,
+                    next = "debug_knowledge_topics",
+                }
+            end
+        end
+        debugKnowledgeChoices[#debugKnowledgeChoices + 1] = {
+            id = "debug_knowledge_back", text = "Back", next = "debug_relationship",
         }
         debugMenuChoices[#debugMenuChoices + 1] = {
             id = "debug_relationship_back",
@@ -383,6 +465,12 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
                 },
                 choices = debugEventChoices,
             },
+            debug_knowledge_topics = {
+                npc = {
+                    fallback = "Debug: choose a topic the NPC discusses. Only that topic becomes known.",
+                },
+                choices = debugKnowledgeChoices,
+            },
         },
     }
 end
@@ -394,6 +482,23 @@ function Conversation.Open(entry, player, forcedTime)
     )
     Relationship.RequestPresentation(definition.npcID)
     return view
+end
+
+function Conversation.ReceiveKnowledgeSnapshot(snapshot)
+    local view = PsychopatzCore and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.instance or nil
+    if not view or not snapshot or tostring(snapshot.npcID) ~= tostring(view.spec and view.spec.npcID) then
+        return false
+    end
+    local context = view.spec and view.spec.context or {}
+    local entry = context.entry
+    if not entry then return false end
+    local updated = Conversation.BuildDefinition(
+        entry,
+        context.player,
+        context.conversationTimeID
+    )
+    return view.refreshConversationSpec and view:refreshConversationSpec(updated) == true
 end
 
 return Conversation

@@ -1,9 +1,13 @@
 PNC = PNC or {}
 PNC.CharacterWindowTabs = PNC.CharacterWindowTabs or {}
 
+require "PNC/UI/Knowledge/PNC_KnowledgePresentation"
+
 local Tabs = PNC.CharacterWindowTabs
 local Catalog = PNC.SkillCatalog
 local Shared = PNC.CharacterWindowShared
+local KnowledgePresentation = PNC.KnowledgePresentation
+local ClientState = PNC.Network.ClientState
 
 local filledTexture
 local borderTexture
@@ -42,6 +46,7 @@ function Tabs.RenderSkills(view, snapshot, payload, topY)
     local resolved = Shared.GetSnapshot(snapshot, payload)
     local groups = Catalog and Catalog.GetGroups and Catalog.GetGroups() or {}
     local skillLevels = resolved.skillLevels or {}
+    local knowledge = ClientState.npcKnowledge and ClientState.npcKnowledge[view.npcId] or nil
     local padding = 12
     local y = topY
     local i
@@ -65,10 +70,14 @@ function Tabs.RenderSkills(view, snapshot, payload, topY)
         y = y + 7
         for j = 1, #(group.skills or {}) do
             skill = group.skills[j]
-            local level = Shared.Clamp(math.floor(tonumber(skillLevels[skill.id]) or 0), 0, 10)
+            local unlocked = KnowledgePresentation.IsKnown(knowledge, "skill." .. tostring(skill.id))
+            local level = unlocked and Shared.Clamp(math.floor(tonumber(skillLevels[skill.id]) or 0), 0, 10) or 0
             local label = PsychopatzCore.UI.Layout.Ellipsize(skill.display, UIFont.Small, math.max(60, barX - labelX - 10))
-            view:drawText(label, labelX, y, 0.9, 0.9, 0.9, 1, UIFont.Small)
+            view:drawText(label, labelX, y, unlocked and 0.9 or 0.5, unlocked and 0.9 or 0.5, unlocked and 0.9 or 0.5, 1, UIFont.Small)
             local unit = drawSkillUnits(view, level, barX, y + math.floor((fontHeight - 10) / 2), barWidth)
+            if not unlocked then
+                view:drawText("LOCKED", barX, y, 0.7, 0.55, 0.18, 1, UIFont.Small)
+            end
             y = y + math.max(fontHeight + 5, unit + 5)
         end
         y = y + 9

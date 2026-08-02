@@ -6,9 +6,12 @@ require "PNC/UI/Inventory/PNC_InventoryUI_ContainerList"
 require "PNC/UI/Inventory/PNC_InventoryQuantityModal"
 
 PNC = PNC or {}
+
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 PNC.InventoryWindow = PNC.InventoryWindow or {}
 
 local InventoryWindow = PNC.InventoryWindow
+local Identity = PNC.NPCIdentityPresentation
 local Model = PNC.InventoryUIModel
 local ClientState = PNC.Network.ClientState
 local Actions = PNC.InventoryActions
@@ -303,9 +306,9 @@ function ISPNCInventoryWindow:refreshInventory(force)
     )
     local snapshot = self.npcId and ClientState.snapshots
         and ClientState.snapshots[self.npcId] or nil
-    local npcName = payload and payload.snapshot and (
-        payload.snapshot.displayName or payload.snapshot.name
-    ) or snapshot and (snapshot.displayName or snapshot.name) or "Companion"
+    local npcName = Identity.GetName(
+        payload and payload.snapshot or snapshot or { id = self.npcId }
+    )
     self.npcDisplayName = tostring(npcName)
     if self.setTitle then
         self:setTitle(tr("UI_PNC_Inventory_Title", "Inventory") .. " - " .. tostring(npcName))

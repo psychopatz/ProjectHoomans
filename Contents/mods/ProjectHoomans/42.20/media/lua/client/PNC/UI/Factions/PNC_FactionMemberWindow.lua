@@ -1,6 +1,7 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PNC/UI/Factions/PNC_FactionEmblemRenderer"
 require "PNC/UI/Factions/PNC_FactionMemberModal"
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
 PNC = PNC or {}
 PNC.FactionMemberUI = PNC.FactionMemberUI or {}
@@ -11,6 +12,7 @@ local ClientState = PNC.Network.ClientState
 local UI = PsychopatzCore.UI
 local Theme = UI.Theme
 local Layout = UI.Layout
+local Identity = PNC.NPCIdentityPresentation
 
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
@@ -286,9 +288,10 @@ function ISPNCFactionMemberWindow:refreshSnapshot()
 
     self.npcMembers:clear()
     for _, member in ipairs(snapshot.npcMembers or {}) do
-        self.npcMembers:addItem(member.name, {
+        local label = Identity.GetName(member)
+        self.npcMembers:addItem(label, {
             id = member.id,
-            label = member.name,
+            label = label,
             detail = tostring(member.role)
                 .. " / " .. tostring(member.rank)
                 .. " / " .. tostring(member.presenceState),

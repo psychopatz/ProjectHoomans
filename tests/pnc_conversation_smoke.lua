@@ -50,6 +50,7 @@ getGameTime = function()
 end
 
 dofile(CORE_TEXT)
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
 dofile(ROOT .. "PNC/Conversation/PNC_ConversationTime.lua")
 dofile(ROOT .. "PNC/Conversation/Content/PNC_ConversationRegistry.lua")
 dofile(ROOT .. "PNC/Conversation/PNC_ConversationRelationship.lua")
@@ -235,7 +236,7 @@ local debugDefinition = PNC.Conversation.BuildDefinition({
 }, {}, "twilight")
 assertEqual(#debugDefinition.nodes.greeting.choices, 5,
     "debug conversation exposes relationship tools")
-assertEqual(#debugDefinition.nodes.debug_relationship.choices, 5,
+assertEqual(#debugDefinition.nodes.debug_relationship.choices, 6,
     "debug relationship hub exposes every tool")
 assertEqual(#debugDefinition.nodes.debug_synthetic_baseline.choices, 6,
     "debug synthetic baseline menu exposes every preset")
@@ -256,6 +257,13 @@ assertEqual(debugActions[2].action, "social_trigger_event",
     "conversation debug uses social event pipeline")
 assertEqual(debugActions[2].args.eventType, "treated_wound",
     "conversation debug selects requested social event")
+assertEqual(#debugDefinition.nodes.debug_knowledge_topics.choices, 6,
+    "debug discovery menu exposes topic-scoped conversation probes")
+debugDefinition.nodes.debug_knowledge_topics.choices[1].action()
+assertEqual(debugActions[3].action, "knowledge_debug_action",
+    "conversation topic uses the knowledge debug pipeline")
+assertEqual(debugActions[3].args.topicID, "identity_name",
+    "conversation topic discovers the NPC name only")
 
 local totalGreetings = 0
 for relationshipIndex = 1, #relationships do

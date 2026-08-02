@@ -1,4 +1,5 @@
 require "PsychopatzCore/UI/Components/PsychopatzPortraitPanel"
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
 PNC = PNC or {}
 PNC.CharacterWindowTabs = PNC.CharacterWindowTabs or {}
@@ -6,6 +7,7 @@ PNC.CharacterWindowTabs = PNC.CharacterWindowTabs or {}
 local Tabs = PNC.CharacterWindowTabs
 local Shared = PNC.CharacterWindowShared
 local Layout = PsychopatzCore.UI.Layout
+local IdentityPresentation = PNC.NPCIdentityPresentation
 
 function Tabs.CreateInfoChildren(view)
     view.portraitPanel = PsychopatzCore.UI.PortraitPanel:new(12, 12, 132, 264, {
@@ -49,14 +51,15 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
     local carry = Shared.GetCarry(snapshot, payload)
     local equipment = Shared.GetEquipment(snapshot, payload)
     local appearance = resolved.appearance or {}
+    local knownFaction = IdentityPresentation.GetFaction(view.npcId)
     local padding = 12
     local portraitRight = view.portraitPanel and view.portraitPanel:getRight() or math.floor(view.width * 0.33)
     local x = portraitRight + padding
     local width = math.max(100, view.width - x - padding)
     local labelWidth = math.min(112, math.floor(width * 0.42))
     local y = topY
-    local name = data.displayName or resolved.displayName or resolved.name or "Unknown"
-    local archetype = data.archetypeLabel or resolved.archetypeLabel or "Survivor"
+    local name = IdentityPresentation.GetName(view.npcId)
+    local archetype = IdentityPresentation.GetArchetype(view.npcId)
     local hp = tostring(math.floor(tonumber(resolved.hpCurrent) or 0)) .. "/" .. tostring(math.floor(tonumber(resolved.hpMax) or 0))
     local stamina = tostring(math.floor(tonumber(resolved.staminaCurrent) or 0)) .. "/" .. tostring(math.floor(tonumber(resolved.staminaMax) or 0))
     local carryText = tostring(Shared.Round(carry.usedWeight or 0, 1)) .. "/" .. tostring(Shared.Round(carry.maxWeight or 0, 1))
@@ -67,7 +70,7 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
     view:drawRect(x, y, width, 1, 0.8, 0.5, 0.5, 0.5)
     y = y + 14
 
-    y = Shared.DrawLabelValue(view, "Faction", resolved.faction or "-", x, y, labelWidth)
+    y = Shared.DrawLabelValue(view, "Faction", knownFaction and knownFaction.name or "Unknown", x, y, labelWidth)
     y = Shared.DrawLabelValue(view, "Status", resolved.aiState or resolved.activeBehavior or "Idle", x, y, labelWidth)
     y = Shared.DrawLabelValue(view, "Health", hp, x, y, labelWidth)
     y = Shared.DrawLabelValue(view, "Stamina", stamina, x, y, labelWidth)

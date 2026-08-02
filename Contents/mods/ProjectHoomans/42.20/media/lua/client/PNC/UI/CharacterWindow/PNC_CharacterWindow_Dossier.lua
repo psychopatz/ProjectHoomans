@@ -25,17 +25,6 @@ local function rebuildModel(view)
 end
 
 function Tabs.CreateDossierChildren(view)
-    view.discoverTraitsButton = UI.CreateButton(view, {
-        id = "discover_traits", title = "DEBUG: Discover traits", target = view,
-        onclick = function(target)
-            if canDebug() and PNC.Client and PNC.Client.SendDebug then
-                PNC.Client.SendDebug("knowledge_debug_action", {
-                    knowledgeAction = "reveal_all", npcID = target.npcId,
-                    showTruth = false,
-                })
-            end
-        end, variant = "default",
-    })
     view.refreshDossierButton = UI.CreateButton(view, {
         id = "refresh_dossier", title = "Refresh", target = view,
         onclick = function(target)
@@ -54,14 +43,8 @@ function Tabs.LayoutDossier(view)
     local pad = Layout.Pixels(12, view.uiScale)
     local height = Layout.Pixels(26, view.uiScale)
     local refreshWidth = Layout.Pixels(82, view.uiScale)
-    local discoverWidth = Layout.Pixels(148, view.uiScale)
     local right = view.width - pad
-    local debugAllowed = canDebug()
-    view.discoverTraitsButton:setVisible(debugAllowed)
     Layout.SetBounds(view.refreshDossierButton, right - refreshWidth, pad, refreshWidth, height)
-    if debugAllowed then
-        Layout.SetBounds(view.discoverTraitsButton, right - refreshWidth - pad - discoverWidth, pad, discoverWidth, height)
-    end
 end
 
 function Tabs.RenderDossier(view, _, _, topY)
@@ -77,6 +60,10 @@ function Tabs.RenderDossier(view, _, _, topY)
         view:drawText("NO OBSERVATIONS YET", pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
         y = y + Layout.Pixels(24, view.uiScale)
         view:drawText("Talk to, watch, or spend time with this NPC to build their dossier.", pad, y, color.r, color.g, color.b, color.a, UIFont.Small)
+        if canDebug() then
+            y = y + Layout.Pixels(22, view.uiScale)
+            view:drawText("Debug: use Talk > Relationship tools > Discovery topics.", pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+        end
         return y + Layout.Pixels(30, view.uiScale)
     end
     view:drawText("KNOWN INFORMATION", pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
