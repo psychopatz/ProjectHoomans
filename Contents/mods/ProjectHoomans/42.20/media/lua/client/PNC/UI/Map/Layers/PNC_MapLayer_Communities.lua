@@ -347,6 +347,7 @@ local function drawHoverCard(
 )
     local relation = relationFor(snapshot, community)
     local emblem = relation and relation.emblem
+    local leaderName = relation and relation.leaderName
     local emblemSize = 52
     local emblemPanelWidth = emblemSize + 12
     local cardPadding = 9
@@ -363,6 +364,10 @@ local function drawHoverCard(
         or "0"
     local lines = {
         name,
+        text(
+            "UI_PNC_CommunityMapLeader",
+            "Leader"
+        ) .. ": " .. tostring(leaderName or "Unassigned"),
         text(
             "UI_PNC_CommunityMapPopulation",
             "Population"

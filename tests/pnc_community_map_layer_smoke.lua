@@ -152,6 +152,7 @@ function getText(key)
         UI_PNC_CommunityMapAtWar =
             "At war with your faction",
         UI_PNC_CommunityMapPopulation = "Population",
+        UI_PNC_CommunityMapLeader = "Leader",
         UI_PNC_CommunityMapCollapsed =
             "Collapsed / unoccupied",
         UI_PNC_CommunityMapRelation = "Relation",
@@ -237,6 +238,7 @@ state.factionRelations = {
             backgroundColorID = "red",
             layers = {},
         },
+        leaderName = "Mara Vance",
     },
 }
 map.getMouseX = function() return 15 end
@@ -245,7 +247,9 @@ popupLines = {}
 registered.definition.render(map)
 assertEqual(rectangles[1][6], 1,
     "enemy base uses hostile red palette")
-assertEqual(popupLines[3], "At war with your faction",
+assertEqual(popupLines[2], "Leader: Mara Vance",
+    "base hover identifies the faction leader")
+assertEqual(popupLines[4], "At war with your faction",
     "base edge hover reports faction war status")
 assertTrue(emblemDraw ~= nil,
     "base hover renders the faction emblem")

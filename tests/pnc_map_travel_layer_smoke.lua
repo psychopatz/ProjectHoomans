@@ -8,6 +8,7 @@ local layer
 local dots = 0
 local labels = {}
 local colors = {}
+local iconColors = {}
 local namesVisible = false
 local mouseX = -100
 local mouseY = -100
@@ -71,8 +72,9 @@ PNC = {
                 {
                     id = "dead",
                     name = "Dead NPC",
-                    deathMarker = true,
+                    alive = false,
                     colonist = false,
+                    iconID = "dead_icon",
                     state = "corpse",
                     x = 70,
                     y = 80,
@@ -112,7 +114,16 @@ PNC = {
         end,
     },
     MapMarkerIcons = {
-        Resolve = function() return nil end,
+        Resolve = function(iconID)
+            if iconID == "dead_icon" then
+                return {
+                    glyph = "X",
+                    size = 10,
+                    color = { r = 1, g = 0, b = 0 },
+                }
+            end
+            return nil
+        end,
     },
 }
 
@@ -136,8 +147,16 @@ local map = {
         colors[#colors + 1] = { r = r, g = g, b = b }
     end,
     drawRectBorder = function() end,
-    drawTextCentre = function(_, text)
-        labels[#labels + 1] = text
+    drawTextCentre = function(_, text, _, _, r, g, b)
+        if text == "X" then
+            iconColors[#iconColors + 1] = {
+                r = r,
+                g = g,
+                b = b,
+            }
+        else
+            labels[#labels + 1] = text
+        end
     end,
 }
 
@@ -154,8 +173,10 @@ assert(colors[3].r == 0.15 and colors[3].g == 0.90,
     "following colonist marker was not green")
 assert(colors[4].r == 0.55 and colors[4].g == 0.55,
     "dead NPC marker was not grey")
-assert(colors[5].r == 0.95 and colors[5].g == 0.45,
-    "dead colonist marker was not orange")
+assert(colors[5].r == 0.55 and colors[5].g == 0.55,
+    "dead colonist marker was not grey")
+assert(iconColors[1].r == 0.55 and iconColors[1].g == 0.55,
+    "dead NPC icon was not greyed out")
 assert(labels[1] == "Moving Follower [trader]",
     "selected NPC label or role postfix was not preserved")
 

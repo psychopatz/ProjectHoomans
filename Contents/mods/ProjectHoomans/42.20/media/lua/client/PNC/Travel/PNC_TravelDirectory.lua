@@ -173,6 +173,7 @@ function Directory.GetProjected(npcId, atWorldHour)
                 or snapshot.recruited == true
                 or tostring(snapshot.faction or "") == "colonist",
             deathMarker = snapshot.deathMarker == true,
+            alive = snapshot.alive ~= false,
             infected = snapshot.infected == true,
             orderKind = snapshot.orderKind,
             portrait = resolvePortrait(snapshot),
@@ -241,6 +242,7 @@ function Directory.GetProjected(npcId, atWorldHour)
             or snapshot.recruited == true
             or tostring(snapshot.faction or "") == "colonist",
         deathMarker = snapshot.deathMarker == true,
+        alive = snapshot.alive ~= false,
         infected = snapshot.infected == true,
         orderKind = snapshot.orderKind,
         portrait = resolvePortrait(snapshot),

@@ -7,7 +7,7 @@ Palette.COLORS = Palette.COLORS or {
     colonist = { r = 0.08, g = 0.42, b = 0.16 },
     follower = { r = 0.15, g = 0.90, b = 0.25 },
     dead = { r = 0.55, g = 0.55, b = 0.55 },
-    deadColonist = { r = 0.95, g = 0.45, b = 0.10 },
+    deadColonist = { r = 0.55, g = 0.55, b = 0.55 },
     neutral = { r = 0.95, g = 0.75, b = 0.20 },
     hostile = { r = 1.00, g = 0.25, b = 0.20 },
 }
@@ -29,6 +29,8 @@ local function entryFacts(entry)
     local record = type(entry.record) == "table" and entry.record or {}
     local orderSpec = type(record.orderSpec) == "table"
         and record.orderSpec or {}
+    local corpseState = PNC.Const
+        and PNC.Const.PRESENCE_CORPSE
     local faction = string.lower(tostring(firstValue(
         entry.faction,
         snapshot.faction,
@@ -45,6 +47,14 @@ local function entryFacts(entry)
     local deathMarker = entry.deathMarker == true
         or snapshot.deathMarker == true
         or record.deathMarker == true
+        or entry.alive == false
+        or snapshot.alive == false
+        or record.alive == false
+        or corpseState ~= nil and (
+            entry.presenceState == corpseState
+            or snapshot.presenceState == corpseState
+            or record.presenceState == corpseState
+        )
     local orderKind = string.lower(tostring(firstValue(
         entry.orderKind,
         snapshot.orderKind,

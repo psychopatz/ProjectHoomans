@@ -150,6 +150,7 @@ for _, id in ipairs({ "settler", "looter", "trader", "refugee" }) do
 end
 
 dofile(SERVER .. "PNC_FactionService.lua")
+dofile(SERVER .. "PNC_FactionLeadership.lua")
 local Factions = PNC.Factions
 Factions.Load()
 
@@ -270,7 +271,7 @@ assertEqual(Factions.Registry.revision,
 
 -- 13-18. Membership is separate from every legacy behavior field.
 local alice = newNPC("npc_alice", "hostile")
-local bob = newNPC("npc_bob", "colonist")
+local bob = newNPC("npc_bob", "neutral")
 local cara = newNPC("npc_cara", "neutral")
 local dana = newNPC("npc_dana", "neutral")
 local aliceLegacy = {
@@ -404,22 +405,24 @@ assertTrue(Factions.RemoveNPC(
     123
 ), "remove leader")
 assertEqual(Factions.Get(traderID).leaderNPCID,
-    nil, "remove clears leader")
-assertTrue(Factions.SetLeader(
-    traderID,
-    bob.id,
-    124
-), "restore leader")
-bob.alive = false
-assertTrue(Factions.OnNPCDeath(bob.id),
+    alice.id, "AI factions select the highest-ranked successor")
+alice.alive = false
+assertTrue(Factions.OnNPCDeath(alice.id),
     "death reconciliation")
 assertEqual(Factions.Get(traderID).leaderNPCID,
-    nil, "death clears leader")
-assertTrue(Factions.Get(traderID).memberIDs[bob.id],
+    bob.id, "death promotes the next eligible AI leader")
+assertTrue(Factions.Get(traderID).memberIDs[alice.id],
     "death hook only changes leadership")
 assertEqual(Factions.Get(traderID).status,
     "active", "death does not archive")
-bob.alive = true
+alice.alive = true
+assertTrue(Factions.TransferNPC(bob.id, refugeeID, {
+    role = "guard",
+    membershipStatus = "member",
+    worldAgeHours = 124,
+}), "recruitment-style transfer succeeds")
+assertEqual(Factions.Get(traderID).leaderNPCID,
+    alice.id, "transferred AI leader is replaced")
 
 -- 38-40. Archive preserves identity and removes affiliations.
 assertTrue(Factions.SetLeader(

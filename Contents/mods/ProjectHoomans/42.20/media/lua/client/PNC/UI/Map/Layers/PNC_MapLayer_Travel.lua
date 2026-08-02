@@ -112,8 +112,18 @@ local function drawMarkerIcon(map, entry, sx, sy, dotSize)
         and Icons.Resolve(entry and entry.iconID) or nil
     local color
     local size
+    local corpseState = PNC.Const
+        and PNC.Const.PRESENCE_CORPSE
     if not definition then return end
-    color = definition.color or { r = 0.05, g = 0.05, b = 0.05, a = 1 }
+    local deceased = entry and (
+        entry.deathMarker == true
+        or entry.alive == false
+        or corpseState ~= nil
+            and entry.presenceState == corpseState
+    )
+    color = deceased and Palette.Get("dead")
+        or definition.color
+        or { r = 0.05, g = 0.05, b = 0.05, a = 1 }
     size = math.max(dotSize, tonumber(definition.size) or dotSize)
     if definition.texture and map.drawTextureScaledAspect then
         map:drawTextureScaledAspect(

@@ -38,6 +38,7 @@
     "UI_PNC_CommunityMapCollapsed": "Collapsed / unoccupied",
     "UI_PNC_CommunityMapOwnFaction": "Your faction",
     "UI_PNC_CommunityMapPopulation": "Population",
+    "UI_PNC_CommunityMapLeader": "Leader",
     "UI_PNC_CommunityMapRelation": "Relation",
     "UI_PNC_CommunityMapUnoccupied": "Unoccupied hideout",
     "UI_PNC_CommunityMapVacant": "vacant",

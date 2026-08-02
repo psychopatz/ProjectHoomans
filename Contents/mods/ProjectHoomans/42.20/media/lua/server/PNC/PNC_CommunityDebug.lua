@@ -140,6 +140,8 @@ function Debug.BuildSnapshot(
     end
     for _, faction in ipairs(PNC.Factions.List()) do
         factions[#factions + 1] = factionSummary(faction)
+        local leader = faction.leaderNPCID
+            and PNC.Registry.Get(faction.leaderNPCID) or nil
         local relation = playerFaction
             and faction.id ~= playerFaction.id
             and PNC.Factions.GetRelation(
@@ -161,6 +163,9 @@ function Debug.BuildSnapshot(
                 and relation.allied == true or false,
             factionStatus = faction.status,
             emblem = copy(faction.emblem),
+            leaderID = leader and leader.id or nil,
+            leaderName = leader and leader.alive ~= false
+                and tostring(leader.name or leader.id) or nil,
         }
     end
     for _, community in ipairs(communities) do

@@ -793,6 +793,15 @@ function Factions.RemoveNPC(
             "faction_removed"
         )
     end
+    if PNC.FactionLeadership
+        and PNC.FactionLeadership.OnMemberDeparture
+    then
+        PNC.FactionLeadership.OnMemberDeparture(
+            factionID,
+            "member_removed",
+            worldAgeHours
+        )
+    end
     return true, "removed", copy(nextAffiliation)
 end
 
@@ -872,6 +881,15 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
         PNC.FactionBehavior.ApplyNPC(
             record,
             "faction_transferred"
+        )
+    end
+    if source and PNC.FactionLeadership
+        and PNC.FactionLeadership.OnMemberDeparture
+    then
+        PNC.FactionLeadership.OnMemberDeparture(
+            source.id,
+            "member_transferred",
+            at
         )
     end
     return true, "transferred", copy(nextAffiliation)
@@ -3450,9 +3468,32 @@ function Factions.OnNPCDeath(npcID)
     if faction.leaderNPCID ~= npcID then
         return false, "not_leader"
     end
+    local leaderAffiliation = affiliationFor(record, faction)
+    leaderAffiliation.rank = "member"
+    if leaderAffiliation.role == "leader" then
+        leaderAffiliation.role = Archetypes.GetDefaultRole(
+            faction.archetypeID
+        )
+    end
+    commitAffiliation(record, leaderAffiliation)
     faction.leaderNPCID = nil
     touchFaction(faction)
     touchRegistry()
+    if PNC.FactionLeadership
+        and PNC.FactionLeadership.OnMemberDeparture
+    then
+        local succeeded, reason =
+            PNC.FactionLeadership.OnMemberDeparture(
+                faction.id,
+                "leader_died"
+            )
+        if succeeded then
+            return true, "leader_succeeded"
+        end
+        if reason == "no_eligible_successor" then
+            return true, "leader_lost"
+        end
+    end
     return true, "death_reconciled"
 end
 
