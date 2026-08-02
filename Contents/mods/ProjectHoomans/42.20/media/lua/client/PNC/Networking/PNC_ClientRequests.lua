@@ -14,6 +14,13 @@ local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 local isWorldReady = Internal.IsWorldReady
 
+local function applyKnowledgeSnapshot(snapshot, reason)
+    if Internal.ApplyNPCKnowledgeSnapshot then
+        return Internal.ApplyNPCKnowledgeSnapshot(snapshot, reason)
+    end
+    return false
+end
+
 local function requestFullSync()
     local player = getSpecificPlayer(0)
     if not isWorldReady() then
@@ -187,11 +194,7 @@ function Client.RequestNPCKnowledge(npcID)
         return false, "knowledge_service_unavailable"
     end
     local snapshot, reason = PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer(player, npcID)
-    if snapshot then
-        ClientState.npcKnowledge = ClientState.npcKnowledge or {}
-        ClientState.npcKnowledge[npcID] = snapshot
-        if PNC.NPCDossierUI and PNC.NPCDossierUI.ReceiveSnapshot then PNC.NPCDossierUI.ReceiveSnapshot(snapshot) end
-    end
+    applyKnowledgeSnapshot(snapshot, reason)
     return snapshot ~= nil, reason
 end
 
@@ -218,9 +221,8 @@ function Client.RequestKnownNPCKnowledge()
     if not snapshots then return false, reason end
     ClientState.npcKnowledge = {}
     for _, snapshot in ipairs(snapshots) do
-        ClientState.npcKnowledge[tostring(snapshot.npcID)] = snapshot
+        applyKnowledgeSnapshot(snapshot)
     end
-    ClientState.lastNPCKnowledgeReceiveAt = Core.Now()
     return true
 end
 
@@ -240,14 +242,17 @@ function Client.RequestNPCKnowledgeTopic(npcID, topicID)
     if not PNC.NPCKnowledge or not PNC.NPCKnowledge.DiscoverTopicForPlayer then
         return false, "knowledge_service_unavailable"
     end
-    local _, reason = PNC.NPCKnowledge.DiscoverTopicForPlayer(player, npcID, topicID, nil, "direct_disclosure")
+    local disclosure, reason = PNC.NPCKnowledge.DiscoverTopicForPlayer(
+        player,
+        npcID,
+        topicID,
+        nil,
+        "direct_disclosure"
+    )
+    if not disclosure then return false, reason end
     local snapshot, snapshotReason = PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer(player, npcID)
-    if snapshot then
-        ClientState.npcKnowledge = ClientState.npcKnowledge or {}
-        ClientState.npcKnowledge[npcID] = snapshot
-        if PNC.NPCDossierUI and PNC.NPCDossierUI.ReceiveSnapshot then PNC.NPCDossierUI.ReceiveSnapshot(snapshot) end
-    end
-    return snapshot ~= nil, reason or snapshotReason
+    applyKnowledgeSnapshot(snapshot, snapshotReason)
+    return snapshot ~= nil, snapshotReason
 end
 
 function Client.RequestKnowledgeDebug(npcID, showTruth, descriptorID)
@@ -424,6 +429,53 @@ function Client.RequestNeedsDebug(groupID, npcID)
     ClientState.needsDebugReason = nil
     ClientState.lastNeedsDebugReceiveAt = Core.Now()
     return true
+end
+
+function Client.RequestColonyManagement()
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then sendClientCommand(player, Const.MODULE, Const.CMD_COLONY_MANAGEMENT_REQUEST, {}); return true end
+        return false
+    end
+    if not PNC.ColonyManagement or not PNC.ColonyManagement.BuildSnapshot then return false end
+    ClientState.colonyManagement = PNC.ColonyManagement.BuildSnapshot(player)
+    ClientState.lastColonyManagementReceiveAt = Core.Now()
+    return true
+end
+
+function Client.RenameColony(communityID, name)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local args = {
+        action = "rename",
+        communityID = tostring(communityID or ""),
+        name = tostring(name or ""),
+    }
+    if args.communityID == "" then return false, "invalid_community" end
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not player or not sendClientCommand then
+            return false, "player_unavailable"
+        end
+        sendClientCommand(
+            player,
+            Const.MODULE,
+            Const.CMD_COLONY_MANAGEMENT_ACTION,
+            args
+        )
+        return true
+    end
+    if not PNC.ColonyManagement
+        or not PNC.ColonyManagement.RenameForPlayer
+    then
+        return false, "colony_management_unavailable"
+    end
+    local snapshot, result = PNC.ColonyManagement.RenameForPlayer(
+        player,
+        args
+    )
+    snapshot.actionResult = result
+    ClientState.colonyManagement = snapshot
+    ClientState.lastColonyManagementReceiveAt = Core.Now()
+    return result and result.ok == true, result and result.reason
 end
 
 function Client.RequestCharacterPayload(npcId)

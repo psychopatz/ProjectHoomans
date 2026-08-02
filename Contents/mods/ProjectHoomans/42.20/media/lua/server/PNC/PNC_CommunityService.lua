@@ -718,6 +718,7 @@ function Communities.Create(spec)
         id = id,
         factionID = faction.id,
         name = spec.name,
+        renamePending = spec.renamePending == true,
         mode = spec.mode,
         status = (
             spec.mode == "settled"
@@ -1015,6 +1016,26 @@ local function setCommunityField(
     touchCommunity(community)
     touchRegistry()
     return true, "updated", publicCommunity(community)
+end
+
+function Communities.SetName(communityID, value)
+    if not authority() then return false, "not_authority" end
+    Communities.EnsureLoaded()
+    local community = registryRecord(communityID)
+    if not community then return false, "community_not_found" end
+    local name = type(value) == "string"
+        and string.match(value, "^%s*(.-)%s*$") or nil
+    if not name or name == "" or #name > Constants.NAME_MAX_LENGTH then
+        return false, "invalid_name"
+    end
+    if community.name == name and community.renamePending ~= true then
+        return false, "unchanged"
+    end
+    community.name = name
+    community.renamePending = false
+    touchCommunity(community)
+    touchRegistry()
+    return true, "renamed", publicCommunity(community)
 end
 
 function Communities.SetMode(communityID, mode, worldAgeHours)

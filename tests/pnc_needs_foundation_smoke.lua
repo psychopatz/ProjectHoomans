@@ -36,6 +36,9 @@ PNC.Factions = {
 dofile(root .. "server/PNC/PNC_IndividualNeeds.lua")
 dofile(root .. "server/PNC/PNC_GroupNeeds.lua")
 dofile(root .. "server/PNC/PNC_NeedsScheduler.lua")
+PNC.CompanionCommands = { IsOwnedByPlayer = function(record) return record.recruited == true end }
+PNC.Factions.GetPlayerFaction = function() return nil end
+dofile(root .. "server/PNC/PNC_ColonyManagement.lua")
 PNC.GroupNeeds.RegisterListener("level_changed", function(...) levelEvents[#levelEvents + 1] = { values = { ... } } end)
 
 factions.small = { id = "small", name = "Small", mobile = { active = true }, memberIDs = { a = true, b = true } }
@@ -69,5 +72,9 @@ assertTrue(needs.hunger >= 80 and needs.hunger <= 100, "individual lazy initiali
 PNC.IndividualNeeds.Set(npc, "hunger", 50, "test")
 PNC.IndividualNeeds.Update(npc, 1, "test")
 assertTrue(PNC.IndividualNeeds.Get(npc, "hunger") < 50, "individual elapsed update")
+PNC.Registry.Data[npc.id] = npc
+local colonySnapshot = PNC.ColonyManagement.BuildSnapshot({})
+assertEqual(#colonySnapshot.people, 1, "colony companion summary")
+assertTrue(colonySnapshot.levels.hunger ~= nil, "colony need-level summary")
 
 print("pnc_needs_foundation_smoke: OK")

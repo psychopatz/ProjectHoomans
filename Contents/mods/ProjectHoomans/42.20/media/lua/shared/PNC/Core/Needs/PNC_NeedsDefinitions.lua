@@ -27,6 +27,16 @@ Definitions.GROUP_INITIAL_MAX = 100
 Definitions.INDIVIDUAL_RATES_PER_HOUR = {
     hunger = 0.45, hydration = 0.70, fatigue = 0.35,
 }
+Definitions.INDIVIDUAL_ACTIVITY = {
+    idle = { hunger = 1.0, hydration = 1.0, fatigue = 1.0 },
+    walking = { hunger = 1.1, hydration = 1.15, fatigue = 1.25 },
+    running = { hunger = 1.3, hydration = 1.45, fatigue = 1.65 },
+    fighting = { hunger = 1.45, hydration = 1.60, fatigue = 1.85 },
+    working = { hunger = 1.2, hydration = 1.3, fatigue = 1.45 },
+    traveling = { hunger = 1.2, hydration = 1.35, fatigue = 1.5 },
+    resting = { hunger = 0.9, hydration = 0.9, fatigue = -4.0 },
+    sleeping = { hunger = 0.7, hydration = 0.75, fatigue = -7.5 },
+}
 Definitions.GROUP_RATES_PER_HOUR = {
     hunger = 0.55, hydration = 0.85, fatigue = 0.45,
 }

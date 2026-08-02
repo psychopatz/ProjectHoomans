@@ -55,6 +55,41 @@ local function safeString(value, limit)
     return value
 end
 
+-- Knowledge is keyed by the persistent player-character UUID, never by a
+-- transient IsoPlayer instance or username.  Lifecycle callbacks normally
+-- establish this binding first, but client commands can race those callbacks
+-- during single-player startup and multiplayer reconnects.  Resolve it at the
+-- authoritative boundary and commit a newly recovered/created identity before
+-- storing knowledge under it.
+local function characterUUIDForPlayer(player, callback)
+    local characterUUID
+    local reason
+    if not PlayerCharacters then
+        return nil, "character_identity_service_unavailable"
+    end
+    if PlayerCharacters.GetCharacterUUID then
+        characterUUID, reason = PlayerCharacters.GetCharacterUUID(player)
+    end
+    if not characterUUID and PlayerCharacters.EnsureIdentity then
+        characterUUID, reason = PlayerCharacters.EnsureIdentity(player, {
+            callback = callback or "npc_knowledge",
+        })
+    end
+    if not characterUUID then
+        return nil, reason or "character_identity_unavailable"
+    end
+    -- GetCharacterUUID may succeed for an identity created earlier in the
+    -- same frame while its registry is still dirty.  Save on either path so
+    -- the knowledge registry can never become durable before its UUID owner.
+    if PlayerCharacters.Save then
+        local saved, saveReason = PlayerCharacters.Save()
+        if saved == false and saveReason ~= "not_dirty" then
+            return nil, saveReason or "character_identity_save_failed"
+        end
+    end
+    return characterUUID
+end
+
 local function normalizeDiscovered(raw, descriptorID)
     local value = type(raw) == "table" and raw or {}
     local status = tostring(value.status or "")
@@ -172,13 +207,12 @@ end
 
 function Knowledge.Save()
     Knowledge.EnsureLoaded()
-    if not Knowledge.Dirty then return false end
+    if not Knowledge.Dirty then return false, "not_dirty" end
     local target = ModData and ModData.getOrCreate and ModData.getOrCreate(KEY) or nil
-    if target then
-        for key in pairs(target) do target[key] = nil end
-        for key, value in pairs(Knowledge.Registry) do target[key] = deepCopy(value) end
-        if GlobalModData and GlobalModData.save then GlobalModData.save() end
-    end
+    if not target then return false, "moddata_unavailable" end
+    for key in pairs(target) do target[key] = nil end
+    for key, value in pairs(Knowledge.Registry) do target[key] = deepCopy(value) end
+    if GlobalModData and GlobalModData.save then GlobalModData.save() end
     Knowledge.Dirty = false
     return true
 end
@@ -459,10 +493,11 @@ function Knowledge.BuildPlayerSnapshot(characterUUID, npcID)
 end
 
 function Knowledge.BuildPlayerSnapshotForPlayer(player, npcID)
-    local characterUUID = PlayerCharacters
-        and PlayerCharacters.GetCharacterUUID
-        and PlayerCharacters.GetCharacterUUID(player) or nil
-    if not characterUUID then return nil, "character_identity_unavailable" end
+    local characterUUID, identityReason = characterUUIDForPlayer(
+        player,
+        "knowledge_snapshot"
+    )
+    if not characterUUID then return nil, identityReason end
     local snapshot = Knowledge.BuildPlayerSnapshot(characterUUID, npcID)
     local record = Registry and Registry.Get and Registry.Get(tostring(npcID or "")) or nil
     if not record then return nil, "npc_not_found" end
@@ -499,20 +534,14 @@ end
 -- already knows are sent back to that player. This restores client-side name
 -- presentation after a reload without exposing an all-NPC knowledge matrix.
 function Knowledge.BuildKnownSnapshotsForPlayer(player)
-    local characterUUID = PlayerCharacters
-        and PlayerCharacters.GetCharacterUUID
-        and PlayerCharacters.GetCharacterUUID(player) or nil
+    local characterUUID, identityReason = characterUUIDForPlayer(
+        player,
+        "knowledge_full_sync"
+    )
     local character
     local ids = {}
     local snapshots = {}
-    if not characterUUID and PlayerCharacters
-        and PlayerCharacters.EnsureIdentity
-    then
-        characterUUID = PlayerCharacters.EnsureIdentity(player, {
-            callback = "knowledge_full_sync",
-        })
-    end
-    if not characterUUID then return nil, "character_identity_unavailable" end
+    if not characterUUID then return nil, identityReason end
     Knowledge.EnsureLoaded()
     character = Knowledge.Registry.byCharacter[characterUUID]
     for npcID in pairs(character and character.byNPC or {}) do
@@ -556,19 +585,22 @@ function Knowledge.BuildDebugSnapshot(characterUUID, npcID, showTruth, detailDes
 end
 
 function Knowledge.BuildDebugSnapshotForPlayer(player, npcID, showTruth, detailDescriptorID)
-    local characterUUID = PlayerCharacters
-        and PlayerCharacters.GetCharacterUUID
-        and PlayerCharacters.GetCharacterUUID(player) or nil
-    if not characterUUID then return nil, "character_identity_unavailable" end
+    local characterUUID, identityReason = characterUUIDForPlayer(
+        player,
+        "knowledge_debug_snapshot"
+    )
+    if not characterUUID then return nil, identityReason end
     return Knowledge.BuildDebugSnapshot(characterUUID, npcID, showTruth, detailDescriptorID)
 end
 
 function Knowledge.ForceRevealForPlayer(player, npcID, descriptorID, at, sourceType)
-    local characterUUID = PlayerCharacters and PlayerCharacters.GetCharacterUUID
-        and PlayerCharacters.GetCharacterUUID(player) or nil
+    local characterUUID, identityReason = characterUUIDForPlayer(
+        player,
+        "knowledge_disclosure"
+    )
     local descriptor = Definitions.Get(descriptorID)
     local record = Registry and Registry.Get and Registry.Get(tostring(npcID or "")) or nil
-    if not characterUUID then return nil, "character_identity_unavailable" end
+    if not characterUUID then return nil, identityReason end
     if not descriptor then return nil, "unknown_descriptor" end
     local truth, reason = Providers.GetTruth(record, descriptor)
     if truth == nil then return nil, reason end
@@ -597,18 +629,31 @@ function Knowledge.DiscoverTopicForPlayer(player, npcID, topicID, at, sourceType
         end
     end
     if #revealed == 0 and #failures == 0 then return nil, "unknown_knowledge_topic" end
+    -- A direct answer changes player-facing identity immediately. Commit at
+    -- the disclosure boundary so learned names survive a restart even when no
+    -- later periodic world save occurs.
+    if #revealed > 0 then
+        local saved, saveReason = Knowledge.Save()
+        if saved == false and saveReason ~= "not_dirty" then
+            return nil, saveReason or "knowledge_save_failed"
+        end
+    end
     return { topicID = topic, revealed = revealed, failures = failures }
 end
 
 function Knowledge.ExecuteDebugForPlayer(player, args)
     args = type(args) == "table" and args or {}
-    local characterUUID = PlayerCharacters and PlayerCharacters.GetCharacterUUID
-        and PlayerCharacters.GetCharacterUUID(player) or nil
+    local characterUUID, identityReason = characterUUIDForPlayer(
+        player,
+        "knowledge_debug_action"
+    )
     local action = tostring(args.knowledgeAction or args.action or "")
     local npcID = tostring(args.npcID or "")
     local descriptorID = tostring(args.descriptorID or "")
     local result, reason
-    if not characterUUID or npcID == "" then return nil, "character_identity_unavailable" end
+    if not characterUUID or npcID == "" then
+        return nil, characterUUID and "invalid_npc_id" or identityReason
+    end
     if action == "reveal" or action == "force_disclosure" then
         result, reason = Knowledge.ForceRevealForPlayer(player, npcID, descriptorID, args.worldAgeHours)
     elseif action == "discover_topic" then

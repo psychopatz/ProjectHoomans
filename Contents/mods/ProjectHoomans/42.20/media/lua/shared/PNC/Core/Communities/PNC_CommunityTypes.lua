@@ -318,6 +318,7 @@ function Types.NormalizeCommunity(value, communityID)
         id = id,
         factionID = factionID,
         name = name,
+        renamePending = source.renamePending == true,
         mode = mode,
         status = status,
         createdAt = timestamp(source.createdAt, 0),

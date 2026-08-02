@@ -7,6 +7,37 @@ local Needs = PNC.IndividualNeeds
 local Definitions = PNC.NeedsDefinitions
 local Utils = PNC.NeedsUtils
 
+Needs.Listeners = Needs.Listeners or {}
+function Needs.RegisterListener(eventName, listener)
+    eventName = tostring(eventName or "")
+    if eventName == "" or type(listener) ~= "function" then return false end
+    Needs.Listeners[eventName] = Needs.Listeners[eventName] or {}
+    Needs.Listeners[eventName][#Needs.Listeners[eventName] + 1] = listener
+    return true
+end
+function Needs.Emit(eventName, ...)
+    for _, listener in ipairs(Needs.Listeners[tostring(eventName or "")] or {}) do
+        local ok, errorValue = pcall(listener, ...)
+        if not ok and PNC.Core and PNC.Core.LogWarn then PNC.Core.LogWarn("PNC companion needs listener failed: " .. tostring(errorValue)) end
+    end
+end
+local function runtime(record)
+    record.runtime = record.runtime or {}
+    record.runtime.needs = record.runtime.needs or { cachedLevels = {} }
+    return record.runtime.needs
+end
+local function activity(record)
+    local value = runtime(record).activityOverride
+    if Definitions.INDIVIDUAL_ACTIVITY[value] then return value end
+    if tostring(record.activeJob or "") == "Sleep" then return "sleeping" end
+    if tostring(record.activeBehavior or "") == "resting" then return "resting" end
+    if record.runtime and record.runtime.attackAction then return "fighting" end
+    if record.travel and record.travel.state == "active" then return "traveling" end
+    if record.runtime and record.runtime.pathing and record.runtime.pathing.phase == "active" then return "walking" end
+    if record.activeJob then return "working" end
+    return "idle"
+end
+
 local function owned(record)
     return record and (record.recruited == true
         or record.ownerUsername ~= nil or record.ownerOnlineID ~= nil)
@@ -46,6 +77,7 @@ function Needs.Ensure(record, initial)
     else
         record.needs = Utils.NormalizeState(record.needs, at)
     end
+    runtime(record)
     return record.needs
 end
 
@@ -63,6 +95,11 @@ function Needs.Set(record, needType, value, reason)
     state[needType] = after
     if before ~= after then
         log(record, needType, before, after, reason)
+        local oldLevel, newLevel = Definitions.GetLevel(before), Definitions.GetLevel(after)
+        if oldLevel ~= newLevel then
+            runtime(record).cachedLevels[needType] = newLevel
+            Needs.Emit("level_changed", record, needType, oldLevel, newLevel, reason)
+        end
         if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "individual_needs_" .. tostring(reason or "update")) end
     end
     return after
@@ -76,12 +113,39 @@ function Needs.GetLevel(record, needType)
     return Definitions.GetLevel(Needs.Get(record, needType) or 0)
 end
 
+function Needs.GetActivity(record) return activity(record) end
+function Needs.SetActivityOverride(record, value)
+    value = tostring(value or "")
+    if value ~= "" and not Definitions.INDIVIDUAL_ACTIVITY[value] then return false, "invalid_activity" end
+    runtime(record).activityOverride = value ~= "" and value or nil
+    return true
+end
+function Needs.GetRates(record)
+    local modifiers = Definitions.INDIVIDUAL_ACTIVITY[activity(record)] or Definitions.INDIVIDUAL_ACTIVITY.idle
+    local output = {}
+    for _, needType in ipairs(Definitions.TYPES) do output[needType] = Definitions.INDIVIDUAL_RATES_PER_HOUR[needType] * (modifiers[needType] or 1) end
+    return output
+end
+function Needs.GetPriority(record, needType)
+    local value = Needs.Get(record, needType) or 100
+    return math.max(0, math.min(100, 100 - value))
+end
+function Needs.GetHighestPriority(record)
+    local bestType, bestValue
+    for _, needType in ipairs(Definitions.TYPES) do
+        local value = Needs.GetPriority(record, needType)
+        if not bestValue or value > bestValue then bestType, bestValue = needType, value end
+    end
+    return bestType, bestValue
+end
+
 function Needs.Update(record, elapsedHours, reason)
     local state = Needs.Ensure(record)
     if not state then return false end
     elapsedHours = math.max(0, tonumber(elapsedHours) or 0)
+    local rates = Needs.GetRates(record)
     for _, needType in ipairs(Definitions.TYPES) do
-        Needs.Modify(record, needType, -Definitions.INDIVIDUAL_RATES_PER_HOUR[needType] * elapsedHours, reason or "passive_decay")
+        Needs.Modify(record, needType, -rates[needType] * elapsedHours, reason or "passive_decay")
     end
     state.lastUpdateWorldAge = Utils.WorldAgeHours()
     return true

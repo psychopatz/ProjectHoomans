@@ -80,6 +80,10 @@ Individual API (`PNC.IndividualNeeds`):
   `UpdateToNow(record)`, `Reset(record)`
 - `InitializeFromGroup(record, groupNeeds)` is the transition foundation for a
   future group-member-to-companion conversion.
+- `GetActivity(record)`, `SetActivityOverride(record, activity)`, and
+  `GetRates(record)` centralize companion activity effects.
+- `GetPriority(record, needType)` and `GetHighestPriority(record)` expose
+  survival pressure to AI without allowing Needs to choose navigation/actions.
 
 Group API (`PNC.GroupNeeds`):
 
@@ -110,6 +114,32 @@ end)
 Do not call Project Zomboid's `triggerEvent` for this hook. Engine events must
 be declared by the game, so Needs uses its own guarded listener registry.
 `UnregisterListener(eventName, listener)` removes a callback.
+
+Companion level transitions use the same guarded listener pattern through
+`PNC.IndividualNeeds.RegisterListener("level_changed", function(record,
+needType, oldLevel, newLevel, reason) ... end)`. The current activity set is
+`idle`, `walking`, `running`, `fighting`, `working`, `traveling`, `resting`,
+and `sleeping`; their rate modifiers are centralized in
+`PNC_NeedsDefinitions`.
+
+## Colony Management
+
+`PNC.ColonyManagement` builds an on-demand, server-authoritative presentation
+for the current player's existing owned/recruited companions. It does not add
+a second colony record or aggregate canonical Need pool. The summary derives:
+
+- companion roster, role, activity/job, health state, and individual reserves;
+- per-Need condition-level counts;
+- ordered LOW/CRITICAL/EMERGENCY attention entries;
+- the first active existing Community belonging to the player's faction, when
+  that data exists.
+
+`PNC_ColonyManagementWindow` provides `OVERVIEW`, `PEOPLE`, and `NEEDS` pages.
+It is opened from the vanilla in-game radio window. The single visible action
+is labelled `Colony Management`; when other mods register radio actions, the
+same core button becomes a `Mod Services` menu instead of crowding the radio
+screen. Community resource numbers are deliberately absent unless a future
+cached/indexed resource source is introduced.
 
 ## Debugging
 

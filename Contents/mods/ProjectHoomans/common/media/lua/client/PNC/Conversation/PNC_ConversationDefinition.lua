@@ -48,6 +48,17 @@ local function isAggressive(entry)
         and hostility.attackPlayers ~= false
 end
 
+local function isDebugRecruitable(entry)
+    local snapshot = entry and entry.snapshot or {}
+    local record = entry and entry.record or {}
+    local faction = PNC.Types and PNC.Types.NormalizeFaction
+        and PNC.Types.NormalizeFaction(snapshot.faction or record.faction)
+        or tostring(snapshot.faction or record.faction or "")
+    return (faction == "neutral" or faction == "hostile")
+        and snapshot.recruited ~= true
+        and record.recruited ~= true
+end
+
 function Conversation.RequestCeasefire(context)
     return Lifecycle and Lifecycle.RequestCeasefire
         and Lifecycle.RequestCeasefire(context)
@@ -211,6 +222,23 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             text = "DEBUG: Relationship tools",
             next = "debug_relationship",
         }
+        if isDebugRecruitable(entry) then
+            greetingChoices[#greetingChoices + 1] = {
+                id = "debug_recruit_companion",
+                text = "DEBUG: Recruit as companion",
+                response = {
+                    fallback = "Debug recruitment requested. They will now follow you.",
+                },
+                action = function()
+                    if PNC.Client and PNC.Client.SendDebug then
+                        PNC.Client.SendDebug("conversation_debug_recruit", {
+                            npcID = npcID,
+                        })
+                    end
+                end,
+                close = true,
+            }
+        end
         debugMenuChoices[#debugMenuChoices + 1] = {
             id = "debug_open_laboratory",
             text = "Open relationship laboratory",

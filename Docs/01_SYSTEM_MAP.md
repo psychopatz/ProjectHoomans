@@ -171,6 +171,9 @@
   `PNC_NeedsDebug`: server-authoritative companion Need records, one aggregate
   Need state per mobile faction, elapsed-time-only simulation, guarded future
   AI listener hooks, and debug snapshots/actions
+- `PNC_ColonyManagement`: server-built player-companion/Community presentation
+  snapshot; it derives warnings and condition summaries without duplicate Need
+  storage
 - `PNC_RelationshipService`: authoritative directed relationship mutations
 - `PNC_RelationshipDebug`: read-only selected-pair snapshots/formatting plus
   admin/debug-only named-event test dispatch through the real event service
@@ -197,6 +200,8 @@
   hideout map shapes, and vacant-site claim dispatch
 - `PNC_NeedsDebugWindow`: admin/debug-only inspection and testing of
   individual and mobile-group Need reserves
+- `PNC_ColonyManagementWindow`: normal player-facing overview, people, and
+  Needs pages opened from the in-game radio UI
 - `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
 - `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby
   embodied NPCs, including canonical-instance selection and duplicate shell

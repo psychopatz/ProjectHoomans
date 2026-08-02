@@ -456,6 +456,15 @@ Any current player member may use the existing companion-command authority
 path for nearby faction NPCs; the window provides selected-NPC and group
 follow/stay controls plus selected-NPC attack-mode controls.
 
+During development, an authorized user can open a neutral or hostile NPC's
+conversation and select **DEBUG: Recruit as companion**. The server creates
+the player's faction when needed, then uses the same atomic NPC transfer/add
+path as faction tooling. The recruit is added to the player's active community
+(creating a temporary camp at the player's position on the first recruit), is
+given the normal follow order, and prompts the player once to name that new
+community. It is intentionally unavailable for existing companions and is not
+a normal recruitment mechanic.
+
 ## Public API and Revisions
 
 Copied reads include:

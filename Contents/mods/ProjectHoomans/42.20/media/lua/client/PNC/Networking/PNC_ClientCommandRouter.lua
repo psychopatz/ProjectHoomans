@@ -65,17 +65,27 @@ Internal.RegisterServerCommand(
     end
 )
 
-Internal.RegisterServerCommand(Const.CMD_NPC_KNOWLEDGE, function(args)
-    local snapshot = args.snapshot
+-- Both network replies (multiplayer) and direct in-process service calls
+-- (single-player) enter through this receiver.  Keeping cache mutation and UI
+-- invalidation here prevents the two topologies from drifting apart.
+function Internal.ApplyNPCKnowledgeSnapshot(snapshot, reason)
     if type(snapshot) == "table" and snapshot.npcID then
         ClientState.npcKnowledge = ClientState.npcKnowledge or {}
         ClientState.npcKnowledge[tostring(snapshot.npcID)] = snapshot
     end
-    ClientState.npcKnowledgeReason = args.reason
+    ClientState.npcKnowledgeReason = reason
     ClientState.lastNPCKnowledgeReceiveAt = Core.Now()
     if PNC.NPCDossierUI and PNC.NPCDossierUI.ReceiveSnapshot then
         PNC.NPCDossierUI.ReceiveSnapshot(snapshot)
     end
+    if PNC.Conversation and PNC.Conversation.ReceiveKnowledgeSnapshot then
+        PNC.Conversation.ReceiveKnowledgeSnapshot(snapshot)
+    end
+    return type(snapshot) == "table" and snapshot.npcID ~= nil
+end
+
+Internal.RegisterServerCommand(Const.CMD_NPC_KNOWLEDGE, function(args)
+    Internal.ApplyNPCKnowledgeSnapshot(args.snapshot, args.reason)
 end)
 
 Internal.RegisterServerCommand(Const.CMD_KNOWLEDGE_DEBUG, function(args)
@@ -127,6 +137,13 @@ Internal.RegisterServerCommand(Const.CMD_NEEDS_DEBUG, function(args)
     ClientState.needsDebug = args.snapshot
     ClientState.needsDebugReason = args.reason
     ClientState.lastNeedsDebugReceiveAt = Core.Now()
+end)
+Internal.RegisterServerCommand(Const.CMD_COLONY_MANAGEMENT, function(args)
+    ClientState.colonyManagement = args.snapshot
+    ClientState.lastColonyManagementReceiveAt = Core.Now()
+    if PNC.ColonyNamePrompt and PNC.ColonyNamePrompt.OpenIfNeeded then
+        PNC.ColonyNamePrompt.OpenIfNeeded(args.snapshot)
+    end
 end)
 
 Internal.RegisterServerCommand(Const.CMD_MAP_COMMAND_RESULT, function(args)

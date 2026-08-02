@@ -25,18 +25,62 @@ dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
 dofile(SHARED .. "Knowledge/PNC_KnowledgeRegistry.lua")
 dofile(SHARED .. "Knowledge/PNC_KnowledgeBuiltins.lua")
 
-local npc = { id = "npc_russell", social = { personality = {
+local npc = { id = "npc_russell", name = "Burton Gilmore", social = { personality = {
     orientation = "gay", foodPreference = "spicy", romanceStyle = "reserved", jealousyStyle = "normal", socialStyle = "friendly",
     compassion = .82, sociability = .31, forgiveness = .60, bravery = .91, materialism = .20, aggression = .15, loyalty = .88,
 } } }
 PNC.Registry = { Get = function(id) return tostring(id) == npc.id and npc or nil end }
+PNC.Identity = {
+    GetCharacterSummary = function(record)
+        return { displayName = record and record.name }
+    end,
+}
+local characterUUID
+local identityEnsureCalls = 0
+local identitySaveCalls = 0
 PNC.PlayerCharacters = {
-    GetRegistryRecord = function(uuid) return uuid == "char_a" and { accountIdentity = "Patrick" } or nil end,
-    GetCharacterUUID = function() return "char_a" end,
+    GetRegistryRecord = function(uuid)
+        return (uuid == "char_a" or uuid == "char_recovered")
+            and { accountIdentity = "Patrick" } or nil
+    end,
+    GetCharacterUUID = function() return characterUUID end,
+    EnsureIdentity = function(_, context)
+        identityEnsureCalls = identityEnsureCalls + 1
+        eq(context.callback, "knowledge_disclosure",
+            "disclosure owns identity recovery callback")
+        characterUUID = "char_a"
+        return characterUUID, "new_identity"
+    end,
+    Save = function()
+        identitySaveCalls = identitySaveCalls + 1
+        return true
+    end,
 }
 PNC.Relationships = { Get = function() return { familiarity = 50, approval = 25 } end }
 dofile(SERVER .. "PNC_NPCKnowledgeService.lua")
 local Knowledge = PNC.NPCKnowledge
+
+-- Asking a stranger's name must be a real persisted disclosure even at zero
+-- familiarity. This is the restart regression that previously showed the raw
+-- dialogue answer while silently rejecting the learned fact.
+PNC.Relationships.Get = function()
+    return { familiarity = 0, approval = 0 }
+end
+local introduction = Knowledge.DiscoverTopicForPlayer(
+    {}, npc.id, "identity_name", 5, "direct_disclosure"
+)
+truth(introduction and introduction.revealed[1] == "identity.name",
+    "stranger introduction reveals identity name")
+eq(identityEnsureCalls, 1,
+    "disclosure recovers identity when lifecycle has not bound it")
+truth(identitySaveCalls >= 1,
+    "recovered identity commits before learned knowledge")
+eq(Knowledge.GetDescriptor("char_a", npc.id, "identity.name").value,
+    "Burton Gilmore", "introduced name is recorded")
+eq(Knowledge.Dirty, false, "introduction commits immediately")
+PNC.Relationships.Get = function()
+    return { familiarity = 50, approval = 25 }
+end
 
 -- Registration is generic and duplicate IDs reject safely.
 truth(PNC.KnowledgeProviders.Register("test_provider", { GetValue = function() return "blue" end }), "provider registration")
@@ -95,6 +139,8 @@ local topicDiscovery = Knowledge.ExecuteDebugForPlayer({}, {
 })
 truth(topicDiscovery and topicDiscovery.actionResult and #topicDiscovery.actionResult.revealed == 10,
     "debug discovery reveals only the selected conversational topic")
+eq(Knowledge.Dirty, false,
+    "topic disclosure commits learned facts immediately")
 local debugCompassion = Knowledge.GetDescriptor("char_a", npc.id, "personality.compassion")
 eq(debugCompassion.status, "confirmed", "debug discovery confirms numeric trait bands")
 eq(debugCompassion.value, "high", "debug discovery resolves numeric trait direction")
@@ -148,8 +194,8 @@ Knowledge.Registry = { schemaVersion = 1, revision = 0, byCharacter = {} }
 Knowledge.Loaded = false
 Knowledge.Dirty = false
 truth(Knowledge.Load(), "knowledge reloads from world ModData")
-eq(Knowledge.GetDescriptor("char_a", npc.id, "identity.name"), nil,
-    "unlearned identity remains absent after reload")
+eq(Knowledge.GetDescriptor("char_a", npc.id, "identity.name").value,
+    "Burton Gilmore", "introduced identity survives reload")
 eq(Knowledge.GetDescriptor("char_a", npc.id, "test.favorite_color").value,
     "blue", "learned fact survives reload")
 local restored = Knowledge.BuildKnownSnapshotsForPlayer({})

@@ -19,6 +19,8 @@ local inventoryResult
 local mapResult
 local removedBody
 local tollMessage
+local knowledgeRefreshes = 0
+local sentCommand
 
 package.preload["PsychopatzCore/World/PsychopatzTeleport"] = function()
     return { ToCoordinates = function() return true end }
@@ -45,6 +47,8 @@ PNC = {
         CMD_CHARACTER_PAYLOAD = "CharacterPayload",
         CMD_INVENTORY_DELTA = "InventoryDelta",
         CMD_INVENTORY_RESULT = "InventoryResult",
+        CMD_NPC_KNOWLEDGE = "NPCKnowledge",
+        CMD_NPC_KNOWLEDGE_REQUEST = "RequestNPCKnowledge",
     },
     Core = {
         Now = function() return 5000 end,
@@ -86,12 +90,62 @@ PNC = {
             tollMessage = args
         end,
     },
+    Conversation = {
+        ReceiveKnowledgeSnapshot = function(snapshot)
+            if snapshot then knowledgeRefreshes = knowledgeRefreshes + 1 end
+        end,
+    },
 }
 
 dofile(FILE)
 
 local Client = PNC.Client
 local State = PNC.Network.ClientState
+
+Client.HandleServerCommand("NPCKnowledge", {
+    snapshot = { npcID = "npc_known", categories = {} },
+})
+assertEqual(State.npcKnowledge.npc_known.npcID, "npc_known",
+    "multiplayer knowledge reply updates client cache")
+assertEqual(knowledgeRefreshes, 1,
+    "multiplayer knowledge reply refreshes active conversation")
+
+PNC.NPCKnowledge = {
+    DiscoverTopicForPlayer = function()
+        return { revealed = { "identity.name" } }
+    end,
+    BuildPlayerSnapshotForPlayer = function()
+        return {
+            npcID = "npc_direct",
+            categories = {
+                { descriptors = {
+                    { descriptorID = "identity.name", value = "Burton Gilmore", status = "confirmed" },
+                } },
+            },
+        }
+    end,
+}
+assertEqual(Client.RequestNPCKnowledgeTopic(
+    "npc_direct", "identity_name"
+), true, "single-player disclosure succeeds in process")
+assertEqual(State.npcKnowledge.npc_direct.categories[1].descriptors[1].value,
+    "Burton Gilmore", "single-player disclosure uses shared cache receiver")
+assertEqual(knowledgeRefreshes, 2,
+    "single-player disclosure refreshes active conversation")
+
+PNC.Core.IsClientOnly = function() return true end
+getSpecificPlayer = function() return {} end
+sendClientCommand = function(_, module, command, args)
+    sentCommand = { module = module, command = command, args = args }
+end
+assertEqual(Client.RequestNPCKnowledgeTopic(
+    "npc_remote", "identity_name"
+), true, "multiplayer disclosure request is sent")
+assertEqual(sentCommand.command, "RequestNPCKnowledge",
+    "multiplayer disclosure uses authoritative server command")
+assertEqual(sentCommand.args.topicID, "identity_name",
+    "multiplayer disclosure retains topic")
+PNC.Core.IsClientOnly = function() return false end
 
 local customPayload
 Client.Internal.RegisterServerCommand(

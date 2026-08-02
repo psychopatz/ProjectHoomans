@@ -41,6 +41,27 @@ function Client.SendDebug(action, payload)
         sendClientCommand(player, Const.MODULE, Const.CMD_DEBUG, args)
         return true
     end
+    if action == "conversation_debug_recruit" then
+        local ok
+        local reason
+        if not PNC.DebugCompanionRecruit
+            or not PNC.DebugCompanionRecruit.Try
+        then
+            return false, "debug_recruit_service_unavailable"
+        end
+        ok, reason = PNC.DebugCompanionRecruit.Try(player, args)
+        if ok and Client.RequestColonyManagement then
+            Client.RequestColonyManagement()
+            if PNC.ColonyNamePrompt
+                and PNC.ColonyNamePrompt.OpenIfNeeded
+            then
+                PNC.ColonyNamePrompt.OpenIfNeeded(
+                    ClientState.colonyManagement
+                )
+            end
+        end
+        return ok, reason
+    end
     if action == "audit_bodies" and PNC.BodyLifecycle and PNC.BodyLifecycle.AuditLoadedBodies then
         PNC.BodyLifecycle.AuditLoadedBodies(Core.Now(), true)
         Client.RequestDebugRoster(false)

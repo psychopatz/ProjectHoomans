@@ -603,6 +603,7 @@ local function onClientCommand(module, command, player, args)
     if command == Const.CMD_NPC_KNOWLEDGE_REQUEST then
         local snapshot
         local reason
+        local disclosureReason
         if PNC.NPCKnowledge and args and args.allKnown == true
             and PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer
         then
@@ -617,7 +618,7 @@ local function onClientCommand(module, command, player, args)
         if PNC.NPCKnowledge and args and args.topicID
             and PNC.NPCKnowledge.DiscoverTopicForPlayer
         then
-            _, reason = PNC.NPCKnowledge.DiscoverTopicForPlayer(
+            _, disclosureReason = PNC.NPCKnowledge.DiscoverTopicForPlayer(
                 player, args.npcID, args.topicID, nil, "direct_disclosure"
             )
         end
@@ -628,7 +629,7 @@ local function onClientCommand(module, command, player, args)
         else
             reason = "knowledge_service_unavailable"
         end
-        Network.SendNPCKnowledge(player, snapshot, reason)
+        Network.SendNPCKnowledge(player, snapshot, disclosureReason or reason)
         return
     end
 
@@ -740,6 +741,28 @@ local function onClientCommand(module, command, player, args)
         ), true, nil)
         return
     end
+    if command == Const.CMD_COLONY_MANAGEMENT_REQUEST then
+        Network.SendColonyManagement(player, PNC.ColonyManagement.BuildSnapshot(player))
+        return
+    end
+    if command == Const.CMD_COLONY_MANAGEMENT_ACTION then
+        local snapshot
+        local result
+        if PNC.ColonyManagement and PNC.ColonyManagement.RenameForPlayer
+            and args and args.action == "rename"
+        then
+            snapshot, result = PNC.ColonyManagement.RenameForPlayer(
+                player,
+                args
+            )
+        else
+            snapshot = PNC.ColonyManagement.BuildSnapshot(player)
+            result = { ok = false, reason = "unknown_colony_action" }
+        end
+        snapshot.actionResult = result
+        Network.SendColonyManagement(player, snapshot)
+        return
+    end
 
     if command ~= Const.CMD_DEBUG then
         return
@@ -829,6 +852,29 @@ local function onClientCommand(module, command, player, args)
             true,
             reason
         )
+        return
+    end
+
+    if args and args.action == "conversation_debug_recruit" then
+        local ok
+        local reason
+        if PNC.DebugCompanionRecruit
+            and PNC.DebugCompanionRecruit.Try
+        then
+            ok, reason = PNC.DebugCompanionRecruit.Try(player, args)
+        else
+            ok, reason = false, "debug_recruit_service_unavailable"
+        end
+        if ok ~= true then
+            Core.LogWarn("Rejected debug companion recruit npc="
+                .. tostring(args.npcID or args.id or "unknown")
+                .. " reason=" .. tostring(reason))
+        elseif PNC.ColonyManagement and PNC.ColonyManagement.BuildSnapshot then
+            Network.SendColonyManagement(
+                player,
+                PNC.ColonyManagement.BuildSnapshot(player)
+            )
+        end
         return
     end
 

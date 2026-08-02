@@ -155,6 +155,10 @@ end
 
 local observable = { allowInference = true, allowObservation = true, allowDisclosure = true, minimumFamiliarity = 10, suspectedThreshold = .30, knownThreshold = .70 }
 local personal = { allowInference = false, allowObservation = false, allowDisclosure = true, minimumFamiliarity = 25, suspectedThreshold = .30, knownThreshold = .70 }
+-- A direct introduction is basic identity exchange, not a private fact that
+-- requires an established relationship. Other personal descriptors retain
+-- their familiarity gate.
+local introduction = { allowInference = false, allowObservation = false, allowDisclosure = true, minimumFamiliarity = 0, suspectedThreshold = .30, knownThreshold = .70 }
 descriptor("personality.orientation", "social", "orientation", "categorical", "direct_fact", "private", personal, { topicID = "social" })
 descriptor("preference.food", "preferences", "foodPreference", "categorical", "categorical_votes", "personal", personal, { topicID = "preferences" })
 descriptor("personality.romance_style", "personality", "romanceStyle", "categorical", "categorical_votes", "private", personal, { topicID = "personality" })
@@ -169,7 +173,7 @@ end
 Descriptors.Register({
     id = "identity.name", version = 1, category = "identity", providerID = "pnc_identity",
     resolverID = "direct_fact", valueType = "text_enum", privacy = "personal",
-    discovery = personal, capabilities = { disclosable = true, decayable = false },
+    discovery = introduction, capabilities = { disclosable = true, decayable = false },
     presentation = { truthField = "displayName", topicID = "identity_name" },
 })
 Descriptors.Register({

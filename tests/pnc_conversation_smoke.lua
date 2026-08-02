@@ -234,8 +234,8 @@ local debugDefinition = PNC.Conversation.BuildDefinition({
     name = "Debug NPC",
     snapshot = { faction = "neutral" },
 }, {}, "twilight")
-assertEqual(#debugDefinition.nodes.greeting.choices, 5,
-    "debug conversation exposes relationship tools")
+assertEqual(#debugDefinition.nodes.greeting.choices, 6,
+    "debug neutral conversation exposes relationship tools and recruitment")
 assertEqual(#debugDefinition.nodes.debug_relationship.choices, 6,
     "debug relationship hub exposes every tool")
 assertEqual(#debugDefinition.nodes.debug_synthetic_baseline.choices, 6,
@@ -264,6 +264,16 @@ assertEqual(debugActions[3].action, "knowledge_debug_action",
     "conversation topic uses the knowledge debug pipeline")
 assertEqual(debugActions[3].args.topicID, "identity_name",
     "conversation topic discovers the NPC name only")
+local recruitChoice
+for _, choice in ipairs(debugDefinition.nodes.greeting.choices) do
+    if choice.id == "debug_recruit_companion" then recruitChoice = choice end
+end
+assert(recruitChoice, "neutral debug conversation exposes recruitment")
+recruitChoice.action()
+assertEqual(debugActions[4].action, "conversation_debug_recruit",
+    "conversation debug uses the companion recruit action")
+assertEqual(debugActions[4].args.npcID, "npc-debug",
+    "conversation debug recruitment targets speaking NPC")
 
 local totalGreetings = 0
 for relationshipIndex = 1, #relationships do
@@ -289,5 +299,52 @@ registeredProvider.addOptions(menu, entry, {})
 assertEqual(option.label, "Talk", "Talk translation fallback")
 option.callback()
 assertEqual(opened.npcID, "npc-12", "Talk opens selected NPC")
+
+-- A knowledge result must rebuild the open conversation in place. This is
+-- shared by the synchronous single-player receiver and asynchronous MP reply.
+PNC.Client.CanUseDebug = function() return false end
+PNC.Network = { ClientState = { npcKnowledge = {} } }
+local strangerEntry = {
+    id = "npc-introduction",
+    name = "Burton Gilmore",
+    snapshot = { faction = "neutral" },
+}
+local strangerDefinition = PNC.Conversation.BuildDefinition(
+    strangerEntry, {}, "twilight"
+)
+assertEqual(strangerDefinition.context.npcName, "Unknown survivor",
+    "undisclosed NPC starts as stranger")
+assertEqual(strangerDefinition.nodes.greeting.choices[1].id, "ask_name",
+    "undisclosed NPC offers name question")
+local refreshedDefinition
+PsychopatzCore.Conversation.instance = {
+    spec = strangerDefinition,
+    refreshConversationSpec = function(self, spec)
+        refreshedDefinition = spec
+        self.spec = spec
+        return true
+    end,
+}
+local learnedSnapshot = {
+    npcID = strangerEntry.id,
+    categories = {
+        { descriptors = {
+            {
+                descriptorID = "identity.name",
+                value = "Burton Gilmore",
+                status = "confirmed",
+            },
+        } },
+    },
+}
+PNC.Network.ClientState.npcKnowledge[strangerEntry.id] = learnedSnapshot
+assertEqual(PNC.Conversation.ReceiveKnowledgeSnapshot(learnedSnapshot), true,
+    "knowledge result refreshes open conversation")
+assertEqual(refreshedDefinition.context.npcName, "Burton Gilmore",
+    "open conversation adopts learned name")
+for _, choice in ipairs(refreshedDefinition.nodes.greeting.choices) do
+    assert(choice.id ~= "ask_name",
+        "learned name question remained after refresh")
+end
 
 print("pnc_conversation_smoke: ok")
