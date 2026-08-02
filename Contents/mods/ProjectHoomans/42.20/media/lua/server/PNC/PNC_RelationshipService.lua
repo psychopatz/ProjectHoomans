@@ -329,10 +329,10 @@ function Relationships.GetOrCreate(observerNPCID, targetKey)
     ), rawRelationship == nil and "created" or "existing"
 end
 
--- Debug-only preset support. The server command that calls this is admin
--- gated; keeping it here still preserves normal relationship commit, revision,
--- faction-notification, and persistence behavior.
-function Relationships.DebugSetStanding(
+-- Debug-only synthetic baseline support. The server command that calls this
+-- is admin gated. Memories, cooldowns, saturation, and familiarity are left
+-- intact so the normal recalculation remains explainable and reproducible.
+function Relationships.SetDebugBaseline(
     observerNPCID,
     targetKey,
     standing,
@@ -369,14 +369,6 @@ function Relationships.DebugSetStanding(
         Constants.RESPECT_MIN,
         Constants.RESPECT_MAX
     )
-    relationship.familiarity = Math.Clamp(
-        standing.familiarity == nil and 100 or standing.familiarity,
-        Constants.FAMILIARITY_MIN,
-        Constants.FAMILIARITY_MAX
-    )
-    relationship.memories = {}
-    relationship.cooldowns = {}
-    relationship.saturation = {}
     relationship = Math.RecalculateRelationship(
         relationship,
         targetKey,
@@ -389,7 +381,7 @@ function Relationships.DebugSetStanding(
         relationship,
         socialChanged or not Types.AreEqual(rawRelationship, relationship),
         worldAgeHours,
-        { kind = "debug_standing_set" }
+        { kind = "debug_baseline_set" }
     )
     return Types.NormalizeRelationship(
         record.social.relationships[targetKey],

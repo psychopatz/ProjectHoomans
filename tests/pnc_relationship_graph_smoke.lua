@@ -42,6 +42,9 @@ equal(
     "pity",
     "presentation uses shared attitude graph"
 )
+local syntheticFear = Presentation.GetDebugStandingPreset("fear")
+equal(syntheticFear.approval, -65, "fear baseline approval")
+equal(syntheticFear.respect, 65, "fear baseline respect")
 
 equal(Graph.ResolveAttitude(40, 40), "admire",
     "positive approval and respect")

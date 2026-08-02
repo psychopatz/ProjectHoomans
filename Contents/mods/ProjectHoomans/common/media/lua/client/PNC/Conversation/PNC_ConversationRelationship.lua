@@ -109,6 +109,30 @@ function Relationship.ReceivePresentation(summary)
     return true
 end
 
+function Relationship.ReceiveDebugSnapshot(snapshot)
+    local observer = snapshot and snapshot.observer or nil
+    local target = snapshot and snapshot.target or nil
+    local relationship = snapshot and snapshot.relationship or nil
+    if not observer or not relationship
+        or not target or target.kind ~= "player"
+    then
+        return false
+    end
+    local summary = PNC.RelationshipPresentation.Summarize(
+        relationship,
+        relationship.exists == true
+    )
+    summary.npcID = tostring(observer.npcID or "")
+    if summary.npcID == "" then return false end
+    local state = PNC.Network and PNC.Network.ClientState or nil
+    if state then
+        state.conversationRelationships =
+            state.conversationRelationships or {}
+        state.conversationRelationships[summary.npcID] = summary
+    end
+    return Relationship.ReceivePresentation(summary)
+end
+
 function Relationship.RequestPresentation(npcID)
     if PNC.Client and PNC.Client.RequestConversationRelationship then
         return PNC.Client.RequestConversationRelationship(npcID)
@@ -139,10 +163,32 @@ function Relationship.ApplyDebugStanding(npcID, standingID)
     then
         return false, "not_authorized"
     end
-    return PNC.Client.SendDebug("conversation_relationship_standing", {
+    return PNC.Client.SendDebug("relationship_debug_baseline", {
         observerNPCID = tostring(npcID or ""),
+        targetKind = "current_player",
         standingID = tostring(standingID or ""),
     })
+end
+
+function Relationship.TriggerDebugEvent(npcID, eventType)
+    if not PNC.Client or not PNC.Client.CanUseDebug
+        or not PNC.Client.CanUseDebug()
+        or not PNC.Client.SendDebug
+    then
+        return false, "not_authorized"
+    end
+    return PNC.Client.SendDebug("social_trigger_event", {
+        observerNPCID = tostring(npcID or ""),
+        targetKind = "current_player",
+        eventType = tostring(eventType or ""),
+    })
+end
+
+function Relationship.OpenLaboratory(npcID)
+    if PNC.RelationshipDebugUI and PNC.RelationshipDebugUI.Open then
+        return PNC.RelationshipDebugUI.Open(npcID)
+    end
+    return nil
 end
 
 return Relationship

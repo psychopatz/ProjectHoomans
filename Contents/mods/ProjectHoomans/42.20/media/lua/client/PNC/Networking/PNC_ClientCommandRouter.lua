@@ -39,6 +39,11 @@ Internal.RegisterServerCommand(
         ClientState.relationshipDebug = args.snapshot
         ClientState.relationshipDebugReason = args.reason
         ClientState.lastRelationshipDebugReceiveAt = Core.Now()
+        local relationship = PNC.Conversation
+            and PNC.Conversation.Relationship
+        if relationship and relationship.ReceiveDebugSnapshot then
+            relationship.ReceiveDebugSnapshot(args.snapshot)
+        end
     end
 )
 

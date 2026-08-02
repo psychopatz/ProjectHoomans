@@ -120,6 +120,8 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
     local relationshipPresentation = Relationship.GetPresentation(npcID)
     local greetingChoices
     local debugStandingChoices = {}
+    local debugEventChoices = {}
+    local debugMenuChoices = {}
     if aggressive then
         greetingChoices = {
             {
@@ -178,7 +180,41 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         }
         greetingChoices[#greetingChoices + 1] = {
             id = "debug_relationship",
-            text = "DEBUG: Set their opinion of me",
+            text = "DEBUG: Relationship tools",
+            next = "debug_relationship",
+        }
+        debugMenuChoices[#debugMenuChoices + 1] = {
+            id = "debug_open_laboratory",
+            text = "Open relationship laboratory",
+            response = {
+                fallback = "Opened the relationship laboratory for this NPC.",
+            },
+            action = function()
+                Relationship.OpenLaboratory(npcID)
+            end,
+            next = "debug_relationship",
+        }
+        debugMenuChoices[#debugMenuChoices + 1] = {
+            id = "debug_synthetic_baseline",
+            text = "Set synthetic relationship baseline",
+            next = "debug_synthetic_baseline",
+        }
+        debugMenuChoices[#debugMenuChoices + 1] = {
+            id = "debug_social_event",
+            text = "Trigger real social event",
+            next = "debug_social_events",
+        }
+        debugMenuChoices[#debugMenuChoices + 1] = {
+            id = "debug_toggle_relation_card",
+            text = "Toggle current-relation graph",
+            response = {
+                fallback = "Toggled the current-relation graph.",
+            },
+            action = function()
+                Relationship.SetPresentationVisible(
+                    not Relationship.IsPresentationVisible()
+                )
+            end,
             next = "debug_relationship",
         }
         for _, standingID in ipairs(standingOrder) do
@@ -198,12 +234,43 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
                     action = function()
                         Relationship.ApplyDebugStanding(npcID, selectedID)
                     end,
-                    next = "debug_relationship",
+                    next = "debug_synthetic_baseline",
                 }
             end
         end
         debugStandingChoices[#debugStandingChoices + 1] = {
-            id = "debug_back",
+            id = "debug_synthetic_back",
+            text = "Back",
+            next = "debug_relationship",
+        }
+        local socialEvents = {
+            { id = "treated_wound", label = "Treat wound" },
+            { id = "saved_from_incapacitation", label = "Save from incapacitation" },
+            { id = "protected_from_attacker", label = "Protect from attacker" },
+            { id = "survived_combat_together", label = "Survive combat together" },
+            { id = "abandoned_in_combat", label = "Abandon in combat" },
+        }
+        for _, event in ipairs(socialEvents) do
+            local eventID = event.id
+            debugEventChoices[#debugEventChoices + 1] = {
+                id = "debug_event_" .. eventID,
+                text = "DEBUG: " .. event.label,
+                response = {
+                    fallback = "Debug social event sent through the relationship pipeline.",
+                },
+                action = function()
+                    Relationship.TriggerDebugEvent(npcID, eventID)
+                end,
+                next = "debug_social_events",
+            }
+        end
+        debugEventChoices[#debugEventChoices + 1] = {
+            id = "debug_events_back",
+            text = "Back",
+            next = "debug_relationship",
+        }
+        debugMenuChoices[#debugMenuChoices + 1] = {
+            id = "debug_relationship_back",
             text = "Back",
             next = "followup",
         }
@@ -286,9 +353,21 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             },
             debug_relationship = {
                 npc = {
-                    fallback = "Debug: set this NPC's opinion of the current player.",
+                    fallback = "Debug relationship tools for the current player.",
+                },
+                choices = debugMenuChoices,
+            },
+            debug_synthetic_baseline = {
+                npc = {
+                    fallback = "Debug: set a synthetic relationship baseline. This preserves memories and other relationship history.",
                 },
                 choices = debugStandingChoices,
+            },
+            debug_social_events = {
+                npc = {
+                    fallback = "Debug: trigger a real social event through the authoritative relationship pipeline.",
+                },
+                choices = debugEventChoices,
             },
         },
     }

@@ -1,5 +1,6 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 require "ISUI/ISComboBox"
+require "ISUI/ISTextEntryBox"
 require "PNC/UI/Relationships/PNC_RelationshipDebugModel"
 require "PNC/UI/Relationships/PNC_RelationshipGraphPanel"
 
@@ -18,6 +19,25 @@ local EVENTS = {
     { id = "protected_from_attacker", title = "Protect", variant = "default" },
     { id = "survived_combat_together", title = "Survive Together", variant = "default" },
     { id = "abandoned_in_combat", title = "Abandon", variant = "danger" },
+}
+
+local SECTIONS = {
+    { id = "relationship", title = "Relationship" },
+    { id = "personality", title = "Personality" },
+    { id = "memories", title = "Memories" },
+    { id = "conduct", title = "Conduct" },
+    { id = "context", title = "Faction / intent" },
+    { id = "trace", title = "Event trace" },
+    { id = "diagnostics", title = "Diagnostics" },
+    { id = "all", title = "All data" },
+}
+
+local PRESETS = {
+    { id = "admire", title = "Set Admire" },
+    { id = "pity", title = "Set Pity" },
+    { id = "fear", title = "Set Fear" },
+    { id = "despise", title = "Set Despise" },
+    { id = "indifferent", title = "Set Indifferent" },
 }
 
 local function drawEntity(list, y, entry, alternate)
@@ -139,6 +159,7 @@ function ISPNCRelationshipDebugWindow:createChildren()
     self:addChild(self.graph)
     self.contextBonus = 0
     self.controls = {}
+    self.sectionControls = {}
     self.refreshButton = UI.CreateButton(self, {
         id = "refresh",
         title = "Refresh",
@@ -204,6 +225,58 @@ function ISPNCRelationshipDebugWindow:createChildren()
         })
         self.controls[#self.controls + 1] = button
     end
+    for _, definition in ipairs(PRESETS) do
+        local button = UI.CreateButton(self, {
+            id = "baseline_" .. definition.id,
+            title = definition.title,
+            target = self,
+            onclick = ISPNCRelationshipDebugWindow.onBaseline,
+            variant = "quiet",
+        })
+        button.standingID = definition.id
+        self.controls[#self.controls + 1] = button
+    end
+    self.swapButton = UI.CreateButton(self, {
+        id = "swap_direction",
+        title = "Swap Direction",
+        target = self,
+        onclick = ISPNCRelationshipDebugWindow.onSwapDirection,
+        variant = "quiet",
+    })
+    self.controls[#self.controls + 1] = self.swapButton
+    for _, definition in ipairs(SECTIONS) do
+        local button = UI.CreateButton(self, {
+            id = "section_" .. definition.id,
+            title = definition.title,
+            target = self,
+            onclick = ISPNCRelationshipDebugWindow.onSection,
+            variant = "quiet",
+        })
+        button.sectionID = definition.id
+        self.sectionControls[#self.sectionControls + 1] = button
+    end
+    self.currentSection = "relationship"
+    self.customApproval = ISTextEntryBox:new(
+        "0", 0, 0, Layout.Pixels(86, self.uiScale),
+        Layout.Pixels(26, self.uiScale)
+    )
+    self.customApproval:initialise()
+    self.customApproval:instantiate()
+    self:addChild(self.customApproval)
+    self.customRespect = ISTextEntryBox:new(
+        "0", 0, 0, Layout.Pixels(86, self.uiScale),
+        Layout.Pixels(26, self.uiScale)
+    )
+    self.customRespect:initialise()
+    self.customRespect:instantiate()
+    self:addChild(self.customRespect)
+    self.applyCustomButton = UI.CreateButton(self, {
+        id = "apply_custom_baseline",
+        title = "Apply synthetic baseline",
+        target = self,
+        onclick = ISPNCRelationshipDebugWindow.onCustomBaseline,
+        variant = "quiet",
+    })
     self:requestResponsiveLayout(true)
     self:refreshRoster()
     self:requestRoster()
@@ -216,7 +289,39 @@ function ISPNCRelationshipDebugWindow:onResponsiveLayout()
         { x = rect.x, y = rect.y, width = rect.width },
         { scale = self.uiScale, minWidth = 72 }
     )
-    local top = controls.bottom + Layout.Pixels(25, self.uiScale)
+    local customY = controls.bottom + Layout.Pixels(5, self.uiScale)
+    local entryWidth = Layout.Pixels(86, self.uiScale)
+    Layout.SetBounds(
+        self.customApproval,
+        rect.x,
+        customY,
+        entryWidth,
+        Layout.Pixels(26, self.uiScale)
+    )
+    Layout.SetBounds(
+        self.customRespect,
+        rect.x + entryWidth + Layout.Pixels(5, self.uiScale),
+        customY,
+        entryWidth,
+        Layout.Pixels(26, self.uiScale)
+    )
+    Layout.SetBounds(
+        self.applyCustomButton,
+        rect.x + entryWidth * 2 + Layout.Pixels(10, self.uiScale),
+        customY,
+        Layout.Pixels(180, self.uiScale),
+        Layout.Pixels(26, self.uiScale)
+    )
+    local tabs = Layout.Flow(
+        self.sectionControls,
+        {
+            x = rect.x,
+            y = customY + Layout.Pixels(31, self.uiScale),
+            width = rect.width,
+        },
+        { scale = self.uiScale, minWidth = 82 }
+    )
+    local top = tabs.bottom + Layout.Pixels(25, self.uiScale)
     local height = math.max(
         100,
         rect.y + rect.height - top
@@ -235,6 +340,11 @@ function ISPNCRelationshipDebugWindow:onResponsiveLayout()
         rect.width - leftWidth * 2 - graphWidth - gap * 3
     )
     self.layout = {
+        custom = {
+            x = rect.x,
+            y = customY,
+            width = rect.width,
+        },
         observer = {
             x = rect.x, y = top,
             width = leftWidth, height = height,
@@ -433,6 +543,7 @@ function ISPNCRelationshipDebugWindow:refreshDetails()
         ClientState.relationshipDebugReason,
         evaluation
     )
+    rows = Model.FilterRows(rows, self.currentSection)
     self.details:clear()
     for _, item in ipairs(rows) do
         self.details:addItem(item.label, item)
@@ -461,6 +572,63 @@ function ISPNCRelationshipDebugWindow:onContext(button)
         self.contextBonus = 0
     end
     self:refreshDetails()
+end
+
+function ISPNCRelationshipDebugWindow:onSection(button)
+    self.currentSection = button.sectionID or "relationship"
+    self:refreshDetails()
+end
+
+function ISPNCRelationshipDebugWindow:onBaseline(button)
+    local observer = self:getObserver()
+    local target = self:getTarget()
+    if not observer or not target or not PNC.Client then return end
+    PNC.Client.SendDebug("relationship_debug_baseline", {
+        observerNPCID = observer.id,
+        targetKind = target.kind,
+        targetNPCID = target.npcID,
+        standingID = button.standingID,
+    })
+end
+
+function ISPNCRelationshipDebugWindow:onCustomBaseline()
+    local observer = self:getObserver()
+    local target = self:getTarget()
+    if not observer or not target or not PNC.Client then return end
+    local approval = tonumber(self.customApproval:getText())
+    local respect = tonumber(self.customRespect:getText())
+    if not approval or not respect then return end
+    PNC.Client.SendDebug("relationship_debug_baseline", {
+        observerNPCID = observer.id,
+        targetKind = target.kind,
+        targetNPCID = target.npcID,
+        approval = math.max(-100, math.min(100, approval)),
+        respect = math.max(-100, math.min(100, respect)),
+    })
+end
+
+function ISPNCRelationshipDebugWindow:onSwapDirection()
+    local observer = self:getObserver()
+    local target = self:getTarget()
+    if not observer or not target or target.kind ~= "npc" then return end
+    for index, entry in ipairs(self.observers.items or {}) do
+        if tostring(entry.item.id) == tostring(target.id) then
+            self.observers.selected = index
+            break
+        end
+    end
+    self.lastObserverID = nil
+    self:refreshTargets()
+    for index, entry in ipairs(self.targets.items or {}) do
+        if entry.item.kind == "npc"
+            and tostring(entry.item.id) == tostring(observer.id)
+        then
+            self.targets.selected = index
+            break
+        end
+    end
+    self.requestedSignature = nil
+    self:requestRelationship()
 end
 
 function ISPNCRelationshipDebugWindow:onPacification(button)
@@ -548,6 +716,16 @@ function ISPNCRelationshipDebugWindow:prerender()
             )
         )
     end
+    if self.swapButton then
+        self.swapButton:setEnable(enabled and self:getTarget()
+            and self:getTarget().kind == "npc")
+    end
+    if self.applyCustomButton then
+        self.applyCustomButton:setEnable(enabled)
+    end
+    for _, button in ipairs(self.sectionControls or {}) do
+        button:setEnable(ClientState.relationshipDebug ~= nil)
+    end
     PsychopatzWindow.prerender(self)
 end
 
@@ -556,9 +734,19 @@ function ISPNCRelationshipDebugWindow:render()
     if not self.layout then
         return
     end
+    self:drawText(
+        "Synthetic baseline  Approval / Respect",
+        self.layout.custom.x,
+        self.layout.custom.y - Layout.Pixels(17, self.uiScale),
+        Theme.colors.textMuted.r,
+        Theme.colors.textMuted.g,
+        Theme.colors.textMuted.b,
+        Theme.colors.textMuted.a,
+        UIFont.Small
+    )
     UI.DrawSectionTitle(
         self,
-        "Approval / respect outcome map",
+        "Relationship graph / interaction preview",
         self.layout.graph.x,
         self.layout.graph.y - Layout.Pixels(21, self.uiScale),
         self.layout.graph.width
@@ -579,7 +767,8 @@ function ISPNCRelationshipDebugWindow:render()
     )
     UI.DrawSectionTitle(
         self,
-        "Authoritative relationship data",
+        "Relationship laboratory: "
+            .. tostring(self.currentSection or "relationship"),
         self.layout.detail.x,
         self.layout.detail.y - Layout.Pixels(21, self.uiScale),
         self.layout.detail.width
@@ -611,7 +800,7 @@ function RelationshipUI.Open(observerNPCID)
     end
     if not window then
         window = UI.NewWindow(ISPNCRelationshipDebugWindow, {
-            title = "PNC Relationship Inspector",
+            title = "PNC Relationship Laboratory",
             resizable = true,
             responsiveSpec = {
                 width = 1180,

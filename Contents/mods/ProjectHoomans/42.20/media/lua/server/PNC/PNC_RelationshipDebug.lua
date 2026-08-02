@@ -398,6 +398,12 @@ function Debug.BuildSnapshot(
             npcID = observer.id,
             key = EntityRef.ForNPC(observer.id),
             label = displayName(observer),
+            identitySeed = observer.identitySeed
+                or observer.identitySummary
+                    and observer.identitySummary.identitySeed,
+            archetypeID = observer.archetypeID
+                or observer.identitySummary
+                    and observer.identitySummary.archetypeID,
             morale = observer.social
                 and observer.social.morale or 0,
             moraleBaseline = observer.social
@@ -531,7 +537,7 @@ function Debug.BuildSnapshotForRequest(player, args, actionResult)
     )
 end
 
-function Debug.SetConversationStanding(player, args)
+function Debug.SetDebugBaseline(player, args)
     local at = worldAgeHours()
     local observerNPCID = tostring(args and args.observerNPCID or "")
     local observer = Registry and Registry.Get
@@ -547,13 +553,24 @@ function Debug.SetConversationStanding(player, args)
     if not observer or observer.alive == false then
         return nil, "observer_not_found"
     end
-    if not preset then return nil, "invalid_standing" end
+    if not preset then
+        preset = {
+            approval = args and args.approval,
+            respect = args and args.respect,
+        }
+    end
+    if tonumber(preset.approval) == nil
+        or tonumber(preset.respect) == nil
+    then
+        return nil, "invalid_standing"
+    end
     targetKey, target, reason = resolveTarget(player, {
-        targetKind = "current_player",
+        targetKind = args and args.targetKind or "current_player",
+        targetNPCID = args and args.targetNPCID,
     }, at)
     if not targetKey then return nil, reason end
     local relationship
-    relationship, reason = Relationships.DebugSetStanding(
+    relationship, reason = Relationships.SetDebugBaseline(
         observer.id,
         targetKey,
         preset,
@@ -567,6 +584,22 @@ function Debug.SetConversationStanding(player, args)
     summary.npcID = tostring(observer.id)
     return summary
 end
+
+function Debug.ApplyDebugBaseline(player, args)
+    local summary
+    local reason
+    summary, reason = Debug.SetDebugBaseline(player, args)
+    if not summary then return nil, reason end
+    return Debug.BuildSnapshotForRequest(player, {
+        observerNPCID = args and args.observerNPCID,
+        targetKind = args and args.targetKind or "current_player",
+        targetNPCID = args and args.targetNPCID,
+    })
+end
+
+-- Retained for the temporary conversation debug option. The inspector uses
+-- SetDebugBaseline directly and always receives its full debug snapshot.
+Debug.SetConversationStanding = Debug.SetDebugBaseline
 
 function Debug.TriggerSocialEvent(player, args)
     local eventType = tostring(args and args.eventType or "")

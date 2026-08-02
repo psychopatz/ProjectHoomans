@@ -206,6 +206,57 @@ local neutralDefinition = PNC.Conversation.BuildDefinition({
 assertEqual(#neutralDefinition.nodes.greeting.choices, 3,
     "neutral conversation retains normal choices")
 
+local debugActions = {}
+local openedLaboratoryFor
+PNC.Client = {
+    CanUseDebug = function() return true end,
+    SendDebug = function(action, args)
+        debugActions[#debugActions + 1] = {
+            action = action,
+            args = args,
+        }
+        return true
+    end,
+}
+PNC.RelationshipPresentation = {
+    GetDebugStandingPreset = function(standingID)
+        return { label = standingID }
+    end,
+}
+PNC.RelationshipDebugUI = {
+    Open = function(npcID)
+        openedLaboratoryFor = npcID
+    end,
+}
+local debugDefinition = PNC.Conversation.BuildDefinition({
+    id = "npc-debug",
+    name = "Debug NPC",
+    snapshot = { faction = "neutral" },
+}, {}, "twilight")
+assertEqual(#debugDefinition.nodes.greeting.choices, 4,
+    "debug conversation exposes relationship tools")
+assertEqual(#debugDefinition.nodes.debug_relationship.choices, 5,
+    "debug relationship hub exposes every tool")
+assertEqual(#debugDefinition.nodes.debug_synthetic_baseline.choices, 6,
+    "debug synthetic baseline menu exposes every preset")
+assertEqual(#debugDefinition.nodes.debug_social_events.choices, 6,
+    "debug social event menu exposes every event")
+debugDefinition.nodes.debug_relationship.choices[1].action()
+assertEqual(openedLaboratoryFor, "npc-debug",
+    "conversation debug opens selected NPC laboratory")
+debugDefinition.nodes.debug_synthetic_baseline.choices[1].action()
+assertEqual(debugActions[1].action, "relationship_debug_baseline",
+    "conversation debug uses authoritative baseline action")
+assertEqual(debugActions[1].args.observerNPCID, "npc-debug",
+    "conversation debug baseline targets speaking NPC")
+assertEqual(debugActions[1].args.targetKind, "current_player",
+    "conversation debug baseline targets current player")
+debugDefinition.nodes.debug_social_events.choices[1].action()
+assertEqual(debugActions[2].action, "social_trigger_event",
+    "conversation debug uses social event pipeline")
+assertEqual(debugActions[2].args.eventType, "treated_wound",
+    "conversation debug selects requested social event")
+
 local totalGreetings = 0
 for relationshipIndex = 1, #relationships do
     local relationship = relationships[relationshipIndex]

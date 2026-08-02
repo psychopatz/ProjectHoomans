@@ -198,6 +198,15 @@ local function grievanceBand(value)
     return "low"
 end
 
+local function personalityBand(value)
+    value = tonumber(value) or 0
+    if value < 0.20 then return "Very Low" end
+    if value < 0.40 then return "Low" end
+    if value < 0.60 then return "Average" end
+    if value < 0.80 then return "High" end
+    return "Very High"
+end
+
 function Model.BuildTargets(roster, observerNPCID)
     local targets = {
         {
@@ -484,6 +493,19 @@ function Model.BuildRows(
         "Personality",
         tostring(profile.socialStyle or "unknown")
     )
+    rows[#rows + 1] = row("  orientation", profile.orientation)
+    rows[#rows + 1] = row(
+        "  food preference", profile.foodPreference
+    )
+    rows[#rows + 1] = row("  romance style", profile.romanceStyle)
+    rows[#rows + 1] = row("  jealousy style", profile.jealousyStyle)
+    rows[#rows + 1] = row("  social style", profile.socialStyle)
+    rows[#rows + 1] = row(
+        "  identity seed", observer.identitySeed or "(unavailable)"
+    )
+    rows[#rows + 1] = row(
+        "  archetype", observer.archetypeID or "(unavailable)"
+    )
     for _, dimension in ipairs({
         "compassion", "sociability", "forgiveness", "bravery",
         "materialism", "aggression", "loyalty",
@@ -491,6 +513,7 @@ function Model.BuildRows(
         rows[#rows + 1] = row(
             "  " .. dimension,
             number(profile[dimension])
+                .. " (" .. personalityBand(profile[dimension]) .. ")"
         )
     end
     reverse = snapshot.reverse
@@ -521,6 +544,21 @@ function Model.BuildRows(
     rows[#rows + 1] = row(
         "Memories",
         tostring(#(snapshot.memories or {}))
+    )
+    local approvalContribution = 0
+    local respectContribution = 0
+    for _, memory in ipairs(snapshot.memories or {}) do
+        approvalContribution = approvalContribution
+            + (tonumber(memory.approvalEffect) or 0)
+                * (tonumber(memory.currentStrength) or 0)
+        respectContribution = respectContribution
+            + (tonumber(memory.respectEffect) or 0)
+                * (tonumber(memory.currentStrength) or 0)
+    end
+    rows[#rows + 1] = row(
+        "  contribution total",
+        "approval " .. signed(approvalContribution)
+            .. " / respect " .. signed(respectContribution)
     )
     for index, memory in ipairs(snapshot.memories or {}) do
         rows[#rows + 1] = row(
@@ -608,6 +646,80 @@ function Model.BuildRows(
         end
     end
     return rows
+end
+
+-- Sections deliberately preserve the separation between personal
+-- relationship, personality, memories, conduct, and faction/tactical context.
+-- The full row builder remains the single source of presentation data.
+function Model.FilterRows(rows, section)
+    if section == nil or section == "all" then return rows or {} end
+    local output = {}
+    local mode = nil
+    local relationshipLabels = {
+        ["Observer"] = true, ["Observer key"] = true,
+        ["Target"] = true, ["Target key"] = true,
+        ["Derived attitude"] = true, ["Selected interaction"] = true,
+        ["Interaction score"] = true, ["Inside green region"] = true,
+        ["Score components"] = true, ["Stored record"] = true,
+        ["Approval"] = true, ["Respect"] = true,
+        ["Familiarity"] = true, ["State"] = true,
+        ["Previous state"] = true, ["Baseline approval"] = true,
+        ["Baseline respect"] = true, ["Morale"] = true,
+        ["Morale baseline"] = true, ["Reverse direction"] = true,
+        ["  scores"] = true, ["  state"] = true,
+    }
+    local personalityLabels = {
+        ["Personality"] = true,
+        ["  orientation"] = true, ["  food preference"] = true,
+        ["  romance style"] = true, ["  jealousy style"] = true,
+        ["  social style"] = true, ["  identity seed"] = true,
+        ["  archetype"] = true,
+        ["  compassion"] = true, ["  sociability"] = true,
+        ["  forgiveness"] = true, ["  bravery"] = true,
+        ["  materialism"] = true, ["  aggression"] = true,
+        ["  loyalty"] = true,
+    }
+    local diagnosticsLabels = {
+        ["Snapshot world age"] = true, ["Revisions"] = true,
+        ["Last interaction"] = true, ["Last evaluated"] = true,
+    }
+    for _, item in ipairs(rows or {}) do
+        local label = tostring(item.label or "")
+        local include = false
+        if section == "relationship" then
+            include = relationshipLabels[label] == true
+        elseif section == "personality" then
+            include = personalityLabels[label] == true
+        elseif section == "context" then
+            include = string.find(label, "faction", 1, true) ~= nil
+                or string.find(label, "Faction", 1, true) ~= nil
+                or label == "Player pacification"
+        elseif section == "conduct" then
+            if label == "Observer conduct" or label == "Target conduct" then
+                mode = "conduct"
+            elseif mode == "conduct" and string.sub(label, 1, 2) ~= "  " then
+                mode = nil
+            end
+            include = mode == "conduct"
+        elseif section == "memories" then
+            if label == "Memories" then
+                mode = "memories"
+            elseif mode == "memories" and label == "Last trigger" then
+                mode = nil
+            end
+            include = mode == "memories"
+        elseif section == "trace" then
+            if label == "Last trigger" then mode = "trace" end
+            include = mode == "trace"
+        elseif section == "diagnostics" then
+            include = diagnosticsLabels[label] == true
+        end
+        if include then output[#output + 1] = item end
+    end
+    if #output == 0 then
+        output[1] = row("Status", "No data for this section", "textMuted")
+    end
+    return output
 end
 
 return Model

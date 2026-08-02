@@ -183,6 +183,24 @@ assertContains(rows, "Last trigger", "treated_wound")
 assertContains(rows, "  approval effect", "+4.00 -> +5.00")
 assertContains(rows, "  modifier compassion", "1.25")
 
+local relationshipRows = PNC.RelationshipDebugModel.FilterRows(
+    rows,
+    "relationship"
+)
+assertContains(relationshipRows, "Approval", "12.00")
+assertContains(relationshipRows, "Baseline approval", "0.00")
+
+local personalityRows = PNC.RelationshipDebugModel.FilterRows(
+    rows,
+    "personality"
+)
+assertContains(personalityRows, "Personality", "outgoing")
+assertContains(personalityRows, "  compassion", "0.70")
+
+local memoryRows = PNC.RelationshipDebugModel.FilterRows(rows, "memories")
+assertContains(memoryRows, "Memories", "1")
+assertContains(memoryRows, "1. treated_wound", "memory:1")
+
 local unauthorized =
     PNC.RelationshipDebugModel.BuildRows(nil, false)
 assertContains(unauthorized, "Access", "Admin/debug mode required")

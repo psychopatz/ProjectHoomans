@@ -8,10 +8,10 @@ PNC.RelationshipPresentation = PNC.RelationshipPresentation or {}
 local Presentation = PNC.RelationshipPresentation
 
 Presentation.DebugStandingPresets = {
-    admire = { label = "Admire", approval = 70, respect = 70 },
-    pity = { label = "Pity", approval = 70, respect = -70 },
-    fear = { label = "Fear", approval = -70, respect = 70 },
-    despise = { label = "Despise", approval = -70, respect = -70 },
+    admire = { label = "Admire", approval = 65, respect = 65 },
+    pity = { label = "Pity", approval = 65, respect = -65 },
+    fear = { label = "Fear", approval = -65, respect = 65 },
+    despise = { label = "Despise", approval = -65, respect = -65 },
     indifferent = { label = "Indifferent", approval = 0, respect = 0 },
 }
 

@@ -714,6 +714,17 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if args and args.action == "relationship_debug_baseline" then
+        local snapshot
+        local reason
+        snapshot, reason = PNC.RelationshipDebug.ApplyDebugBaseline(
+            player,
+            args
+        )
+        Network.SendRelationshipDebug(player, snapshot, true, reason)
+        return
+    end
+
     if args and args.action == "relationship_pacification" then
         local snapshot
         local reason

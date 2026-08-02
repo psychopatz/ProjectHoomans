@@ -63,6 +63,11 @@ function Client.SendDebug(action, payload)
         ClientState.relationshipDebug = snapshot
         ClientState.relationshipDebugReason = reason
         ClientState.lastRelationshipDebugReceiveAt = Core.Now()
+        local relationship = PNC.Conversation
+            and PNC.Conversation.Relationship
+        if relationship and relationship.ReceiveDebugSnapshot then
+            relationship.ReceiveDebugSnapshot(snapshot)
+        end
         return snapshot ~= nil, reason
     end
     if action == "conversation_relationship_standing" then
@@ -91,6 +96,29 @@ function Client.SendDebug(action, payload)
             end
         end
         return summary ~= nil, reason
+    end
+    if action == "relationship_debug_baseline" then
+        local snapshot
+        local reason
+        if not PNC.RelationshipDebug
+            or not PNC.RelationshipDebug.ApplyDebugBaseline
+        then
+            return false
+        end
+        snapshot, reason = PNC.RelationshipDebug.ApplyDebugBaseline(
+            player,
+            args
+        )
+        ClientState.relationshipDebugAuthorized = true
+        ClientState.relationshipDebug = snapshot
+        ClientState.relationshipDebugReason = reason
+        ClientState.lastRelationshipDebugReceiveAt = Core.Now()
+        local relationship = PNC.Conversation
+            and PNC.Conversation.Relationship
+        if relationship and relationship.ReceiveDebugSnapshot then
+            relationship.ReceiveDebugSnapshot(snapshot)
+        end
+        return snapshot ~= nil, reason
     end
     if action == "faction_debug_action" then
         local snapshot
