@@ -168,6 +168,51 @@ function Client.RequestConversationRelationship(npcID)
     return summary ~= nil, reason
 end
 
+function Client.RequestNPCKnowledge(npcID)
+    npcID = tostring(npcID or "")
+    if npcID == "" then return false, "invalid_npc_id" end
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    ClientState.lastNPCKnowledgeRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE, Const.CMD_NPC_KNOWLEDGE_REQUEST, { npcID = npcID })
+            return true
+        end
+        return false, "player_unavailable"
+    end
+    if not PNC.NPCKnowledge or not PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer then
+        return false, "knowledge_service_unavailable"
+    end
+    local snapshot, reason = PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer(player, npcID)
+    if snapshot then
+        ClientState.npcKnowledge = ClientState.npcKnowledge or {}
+        ClientState.npcKnowledge[npcID] = snapshot
+        if PNC.NPCDossierUI and PNC.NPCDossierUI.ReceiveSnapshot then PNC.NPCDossierUI.ReceiveSnapshot(snapshot) end
+    end
+    return snapshot ~= nil, reason
+end
+
+function Client.RequestKnowledgeDebug(npcID, showTruth)
+    if not Client.CanUseDebug() then return false, "not_authorized" end
+    npcID = tostring(npcID or "")
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local args = { npcID = npcID, showTruth = showTruth ~= false }
+    ClientState.lastKnowledgeDebugRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE, Const.CMD_KNOWLEDGE_DEBUG_REQUEST, args)
+            return true
+        end
+        return false, "player_unavailable"
+    end
+    if not PNC.NPCKnowledge or not PNC.NPCKnowledge.BuildDebugSnapshotForPlayer then return false, "knowledge_service_unavailable" end
+    local snapshot, reason = PNC.NPCKnowledge.BuildDebugSnapshotForPlayer(player, npcID, args.showTruth)
+    ClientState.knowledgeDebugAuthorized = true
+    ClientState.knowledgeDebug, ClientState.knowledgeDebugReason = snapshot, reason
+    if PNC.KnowledgeDebugUI and PNC.KnowledgeDebugUI.ReceiveSnapshot then PNC.KnowledgeDebugUI.ReceiveSnapshot(snapshot) end
+    return snapshot ~= nil, reason
+end
+
 function Client.RequestFactionDebug(
     factionID,
     npcID,

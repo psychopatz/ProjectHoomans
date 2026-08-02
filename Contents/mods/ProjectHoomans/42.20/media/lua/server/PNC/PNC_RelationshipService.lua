@@ -220,6 +220,19 @@ local function commit(record, social, targetKey, relationship,
             relationship
         )
     end
+    local parsedTarget = EntityRef.Parse(targetKey)
+    if parsedTarget and parsedTarget.kind == "player"
+        and PNC.NPCKnowledge
+        and PNC.NPCKnowledge.OnFamiliarityMilestone
+    then
+        PNC.NPCKnowledge.OnFamiliarityMilestone(
+            parsedTarget.characterUUID,
+            record.id,
+            tonumber(existing and existing.familiarity) or 0,
+            tonumber(relationship and relationship.familiarity) or 0,
+            worldAgeHours
+        )
+    end
 end
 
 local function findMemory(relationship, memoryID)

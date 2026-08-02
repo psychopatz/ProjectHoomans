@@ -120,6 +120,14 @@ function Client.SendDebug(action, payload)
         end
         return snapshot ~= nil, reason
     end
+    if action == "knowledge_debug_action" then
+        if not PNC.NPCKnowledge or not PNC.NPCKnowledge.ExecuteDebugForPlayer then return false end
+        local snapshot, reason = PNC.NPCKnowledge.ExecuteDebugForPlayer(player, args)
+        ClientState.knowledgeDebugAuthorized = true
+        ClientState.knowledgeDebug, ClientState.knowledgeDebugReason = snapshot, reason
+        if PNC.KnowledgeDebugUI and PNC.KnowledgeDebugUI.ReceiveSnapshot then PNC.KnowledgeDebugUI.ReceiveSnapshot(snapshot) end
+        return snapshot ~= nil, reason
+    end
     if action == "faction_debug_action" then
         local snapshot
         if not PNC.FactionDebug

@@ -588,6 +588,38 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_NPC_KNOWLEDGE_REQUEST then
+        local snapshot
+        local reason
+        if PNC.NPCKnowledge and PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer then
+            snapshot, reason = PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer(
+                player, args and args.npcID
+            )
+        else
+            reason = "knowledge_service_unavailable"
+        end
+        Network.SendNPCKnowledge(player, snapshot, reason)
+        return
+    end
+
+    if command == Const.CMD_KNOWLEDGE_DEBUG_REQUEST then
+        if not canUseDebug(player) then
+            Network.SendKnowledgeDebug(player, nil, false, "not_authorized")
+            return
+        end
+        local snapshot
+        local reason
+        if PNC.NPCKnowledge and PNC.NPCKnowledge.BuildDebugSnapshotForPlayer then
+            snapshot, reason = PNC.NPCKnowledge.BuildDebugSnapshotForPlayer(
+                player, args and args.npcID, args and args.showTruth ~= false
+            )
+        else
+            reason = "knowledge_service_unavailable"
+        end
+        Network.SendKnowledgeDebug(player, snapshot, true, reason)
+        return
+    end
+
     if command == Const.CMD_FACTION_DEBUG_REQUEST then
         if not canUseDebug(player) then
             Network.SendFactionDebug(
@@ -722,6 +754,22 @@ local function onClientCommand(module, command, player, args)
             args
         )
         Network.SendRelationshipDebug(player, snapshot, true, reason)
+        return
+    end
+
+    if args and args.action == "knowledge_debug_action" then
+        if not canUseDebug(player) then
+            Network.SendKnowledgeDebug(player, nil, false, "not_authorized")
+            return
+        end
+        local snapshot
+        local reason
+        if PNC.NPCKnowledge and PNC.NPCKnowledge.ExecuteDebugForPlayer then
+            snapshot, reason = PNC.NPCKnowledge.ExecuteDebugForPlayer(player, args)
+        else
+            reason = "knowledge_service_unavailable"
+        end
+        Network.SendKnowledgeDebug(player, snapshot, true, reason)
         return
     end
 
@@ -894,6 +942,9 @@ end
 
 local function onServerStarted()
     Registry.Load()
+    if PNC.NPCKnowledge and PNC.NPCKnowledge.Load then
+        PNC.NPCKnowledge.Load()
+    end
     if PNC.Factions and PNC.Factions.Load then
         PNC.Factions.Load()
     end

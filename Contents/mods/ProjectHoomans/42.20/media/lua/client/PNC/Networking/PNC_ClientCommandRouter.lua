@@ -65,6 +65,29 @@ Internal.RegisterServerCommand(
     end
 )
 
+Internal.RegisterServerCommand(Const.CMD_NPC_KNOWLEDGE, function(args)
+    local snapshot = args.snapshot
+    if type(snapshot) == "table" and snapshot.npcID then
+        ClientState.npcKnowledge = ClientState.npcKnowledge or {}
+        ClientState.npcKnowledge[tostring(snapshot.npcID)] = snapshot
+    end
+    ClientState.npcKnowledgeReason = args.reason
+    ClientState.lastNPCKnowledgeReceiveAt = Core.Now()
+    if PNC.NPCDossierUI and PNC.NPCDossierUI.ReceiveSnapshot then
+        PNC.NPCDossierUI.ReceiveSnapshot(snapshot)
+    end
+end)
+
+Internal.RegisterServerCommand(Const.CMD_KNOWLEDGE_DEBUG, function(args)
+    ClientState.knowledgeDebugAuthorized = args.authorized == true
+    ClientState.knowledgeDebug = args.snapshot
+    ClientState.knowledgeDebugReason = args.reason
+    ClientState.lastKnowledgeDebugReceiveAt = Core.Now()
+    if PNC.KnowledgeDebugUI and PNC.KnowledgeDebugUI.ReceiveSnapshot then
+        PNC.KnowledgeDebugUI.ReceiveSnapshot(args.snapshot)
+    end
+end)
+
 Internal.RegisterServerCommand(
     Const.CMD_FACTION_DEBUG,
     function(args)

@@ -621,6 +621,12 @@ function SocialEvents.Process(eventSpec)
     if PNC.SocialEventDebug and PNC.SocialEventDebug.LogProcessed then
         PNC.SocialEventDebug.LogProcessed(output, definition)
     end
+    if PNC.KnowledgeSocialEventAdapter
+        and PNC.KnowledgeSocialEventAdapter.Record
+    then
+        output.knowledgeEvidenceCreated =
+            PNC.KnowledgeSocialEventAdapter.Record(event)
+    end
     return output
 end
 
