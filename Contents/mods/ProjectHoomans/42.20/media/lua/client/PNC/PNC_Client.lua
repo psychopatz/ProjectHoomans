@@ -66,6 +66,9 @@ local function onResetLua()
     ClientState.factionDebugReason = nil
     ClientState.inventoryResult = nil
     ClientState.inventoryRequestSerial = 0
+    ClientState.needsDebug = nil
+    ClientState.needsDebugAuthorized = false
+    ClientState.needsDebugReason = nil
     Client.BiteReplicas = {}
     Client.ZombieReactionReplicas = {}
     if PNC.ClientFirearmEffects and PNC.ClientFirearmEffects.Reset then

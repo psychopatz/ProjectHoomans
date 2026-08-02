@@ -57,6 +57,9 @@
 - `PNC_Perception_Frame`: short-lived per-NPC zombie candidate, LOS, and
   multi-radius threat-count cache
 - `PNC_Stamina`: stamina authority, recovery, attack costs, and visibility timers
+- `PNC_NeedsDefinitions` and `PNC_NeedsUtils`: centralized 0–100 Need
+  definitions, condition levels, initialization ranges, elapsed-time rate
+  inputs, and serialization-safe state normalization
 - `PNC_Visuals`: owns appearance application and reusable body-visual operations such as clothing visuals, attached-item cleanup, and model refresh
 - `PNC_Animation`: single animation state writer
 - `PNC_Health`: custom HP, incapacitation, death ownership
@@ -164,6 +167,10 @@
   residential debug allocation, abstract-first group generation,
   faction-owned settlements/camps, affiliation-V2 placement, atomic
   membership and summary mutations, invariant checks, and sanitized snapshots
+- `PNC_IndividualNeeds`, `PNC_GroupNeeds`, `PNC_NeedsScheduler`, and
+  `PNC_NeedsDebug`: server-authoritative companion Need records, one aggregate
+  Need state per mobile faction, elapsed-time-only simulation, guarded future
+  AI listener hooks, and debug snapshots/actions
 - `PNC_RelationshipService`: authoritative directed relationship mutations
 - `PNC_RelationshipDebug`: read-only selected-pair snapshots/formatting plus
   admin/debug-only named-event test dispatch through the real event service
@@ -188,6 +195,8 @@
   `PNC_CommunityDebugOverlay`, and `PNC_MapLayer_Communities`: guarded
   fixed-community inspection, service-backed controls, NPC diagnostics,
   hideout map shapes, and vacant-site claim dispatch
+- `PNC_NeedsDebugWindow`: admin/debug-only inspection and testing of
+  individual and mobile-group Need reserves
 - `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
 - `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby
   embodied NPCs, including canonical-instance selection and duplicate shell

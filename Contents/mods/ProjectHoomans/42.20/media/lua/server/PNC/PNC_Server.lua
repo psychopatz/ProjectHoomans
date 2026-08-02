@@ -253,6 +253,9 @@ function Server.OnTick()
     then
         PNC.MobileGroupDirector.Pump(now)
     end
+    if PNC.NeedsScheduler and PNC.NeedsScheduler.Pump then
+        PNC.NeedsScheduler.Pump(now)
+    end
     if PNC.EnginePathPlanner
         and PNC.EnginePathPlanner.PumpServerFrame
     then
@@ -727,6 +730,17 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_NEEDS_DEBUG_REQUEST then
+        if not canUseDebug(player) then
+            Network.SendNeedsDebug(player, nil, false, "not_authorized")
+            return
+        end
+        Network.SendNeedsDebug(player, PNC.NeedsDebug.BuildSnapshot(
+            args and args.groupID, args and args.npcID, nil
+        ), true, nil)
+        return
+    end
+
     if command ~= Const.CMD_DEBUG then
         return
     end
@@ -835,6 +849,11 @@ local function onClientCommand(module, command, player, args)
             true,
             nil
         )
+        return
+    end
+
+    if args and args.action == "needs_debug_action" then
+        Network.SendNeedsDebug(player, PNC.NeedsDebug.PerformAction(args), true, nil)
         return
     end
 

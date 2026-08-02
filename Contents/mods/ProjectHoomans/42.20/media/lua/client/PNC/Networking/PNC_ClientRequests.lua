@@ -403,6 +403,29 @@ function Client.RequestCommunityDebug(
     return snapshot ~= nil
 end
 
+function Client.RequestNeedsDebug(groupID, npcID)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not Client.CanUseDebug() then
+        ClientState.needsDebugAuthorized, ClientState.needsDebug = false, nil
+        ClientState.needsDebugReason = "not_authorized"
+        return false
+    end
+    ClientState.lastNeedsDebugRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE, Const.CMD_NEEDS_DEBUG_REQUEST, { groupID = groupID, npcID = npcID })
+            return true
+        end
+        return false
+    end
+    if not PNC.NeedsDebug or not PNC.NeedsDebug.BuildSnapshot then return false end
+    ClientState.needsDebugAuthorized = true
+    ClientState.needsDebug = PNC.NeedsDebug.BuildSnapshot(groupID, npcID, nil)
+    ClientState.needsDebugReason = nil
+    ClientState.lastNeedsDebugReceiveAt = Core.Now()
+    return true
+end
+
 function Client.RequestCharacterPayload(npcId)
     local player = getSpecificPlayer(0)
     local payload

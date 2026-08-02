@@ -813,6 +813,12 @@ function Types.NormalizeFaction(value, factionID)
         relations = {},
         tags = normalizeTags(source.tags),
         mobile = Types.NormalizeMobileGroup(source.mobile),
+        -- Group Needs are one aggregate state for a mobile faction, never a
+        -- per-member resource table. The Needs module validates the values.
+        needs = PNC.NeedsUtils and PNC.NeedsUtils.NormalizeState
+            and Types.NormalizeMobileGroup(source.mobile)
+            and PNC.NeedsUtils.NormalizeState(source.needs, 0)
+            or nil,
         revision = revision(source.revision),
     }
     for targetFactionID, rawRelation in pairs(

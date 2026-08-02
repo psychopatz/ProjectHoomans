@@ -1244,6 +1244,30 @@ function Factions.GetMobileGroup(factionID)
     return copy(faction.mobile)
 end
 
+-- Canonical aggregate Need state for autonomous mobile groups. This stays on
+-- the existing faction record so normal faction save/load owns persistence.
+function Factions.GetNeeds(factionID)
+    Factions.EnsureLoaded()
+    local faction = registryRecord(factionID)
+    if not faction then return nil, "faction_not_found" end
+    return copy(faction.needs)
+end
+
+function Factions.SetNeeds(factionID, needs, reason)
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    local faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    if not Factions.IsMobileGroup(faction) then return false, "not_mobile_group" end
+    local normalized = PNC.NeedsUtils and PNC.NeedsUtils.NormalizeState
+        and PNC.NeedsUtils.NormalizeState(needs, 0) or nil
+    if not normalized then return false, "needs_unavailable" end
+    faction.needs = normalized
+    touchFaction(faction)
+    touchRegistry()
+    return true, reason or "group_needs_updated", copy(faction.needs)
+end
+
 local function mobileArchetypeAllowed(faction)
     return faction and (
         faction.archetypeID == "looter"
@@ -3287,6 +3311,9 @@ function Factions.Archive(factionID, reason, worldAgeHours)
     Factions.EnsureLoaded()
     faction = registryRecord(factionID)
     if not faction then return false, "faction_not_found" end
+    if PNC.NeedsDebug and PNC.NeedsDebug.CleanupGroup then
+        PNC.NeedsDebug.CleanupGroup(factionID)
+    end
     if faction.status == "archived" then
         return false, "already_archived"
     end

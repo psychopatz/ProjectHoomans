@@ -17,6 +17,8 @@
 - primitive NPC affiliation schema v2, including optional community identity
 - separate `PNC_Communities` community/site registry schema v2
 - body-part wounds and infection timing, stage, progress, fever, and temperature
+- optional NPC `needs` schema V1 for player-owned/recruited individual Needs
+- optional mobile-faction `needs` schema V1 for aggregate group Needs
 - runtime rebuild defaults after load
 - dirty-record tracking and v4 monolithic-store migration
 - save-time position/stamina snapshots and v5-v7 per-record compaction migration
@@ -55,6 +57,10 @@
   differs at save time
 - records loaded from an older per-NPC schema are accepted, marked
   `schema_migration`, and rewritten as v15 on the next save
+- missing Need state is intentionally valid for old saves. Individual state is
+  initialized only when existing ownership/recruitment makes it eligible;
+  group state is initialized only for an active mobile faction. Need debug
+  histories and profiler counters are runtime-only
 - player-character identity uses its own Global ModData table and schema.
   Phase 3B adds a UUID-owned primitive social profile to each record
 - the player registry's canonical `byUUID` records contain primitives only;

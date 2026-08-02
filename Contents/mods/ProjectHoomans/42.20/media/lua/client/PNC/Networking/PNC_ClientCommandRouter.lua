@@ -122,6 +122,13 @@ Internal.RegisterServerCommand(
     end
 )
 
+Internal.RegisterServerCommand(Const.CMD_NEEDS_DEBUG, function(args)
+    ClientState.needsDebugAuthorized = args.authorized == true
+    ClientState.needsDebug = args.snapshot
+    ClientState.needsDebugReason = args.reason
+    ClientState.lastNeedsDebugReceiveAt = Core.Now()
+end)
+
 Internal.RegisterServerCommand(Const.CMD_MAP_COMMAND_RESULT, function(args)
     if PNC.MapCommands and PNC.MapCommands.HandleResult then
         PNC.MapCommands.HandleResult(args)

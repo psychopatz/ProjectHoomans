@@ -1,5 +1,7 @@
 require "PNC/Core/Base/PNC_Core"
 require "PNC/Core/Base/PNC_Constants"
+require "PNC/Core/Needs/PNC_NeedsDefinitions"
+require "PNC/Core/Needs/PNC_NeedsUtils"
 require "PNC/Core/Base/PNC_Sandbox"
 require "PNC/Core/Performance/PNC_Performance"
 require "PNC/Core/World/PNC_WorldCensus"
