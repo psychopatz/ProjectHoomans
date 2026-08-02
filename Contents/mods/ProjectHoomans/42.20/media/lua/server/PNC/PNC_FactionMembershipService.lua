@@ -148,7 +148,7 @@ function Membership.BuildSnapshot(player, actionResult)
             local availableKey = character
                 and character.status == "active"
                 and EntityRef.ForPlayerIdentity(
-                    character.accountIdentity,
+                    character.accountKey or character.accountIdentity,
                     uuid
                 ) or nil
             if availableKey

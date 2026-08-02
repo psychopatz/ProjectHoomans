@@ -45,8 +45,12 @@ local function resolve(entityKey)
         and PNC.PlayerCharacters.GetRegistryRecord(
             parsed.characterUUID
         ) or nil
+    local legacyMatch = record and record.legacyAccountIdentities
+        and record.legacyAccountIdentities[parsed.accountIdentity] == true
     if not record
-        or record.accountIdentity ~= parsed.accountIdentity
+        or (record.accountKey ~= parsed.accountIdentity
+            and record.accountIdentity ~= parsed.accountIdentity
+            and not legacyMatch)
     then
         return nil, "player_character_not_found"
     end
@@ -164,7 +168,7 @@ function Conduct.GetForPlayerCharacter(characterUUID)
         or nil
     if not record then return nil, "character_not_found" end
     local key = EntityRef.ForPlayerIdentity(
-        record.accountIdentity,
+        record.accountKey or record.accountIdentity,
         record.uuid
     )
     return Conduct.GetForEntity(key)

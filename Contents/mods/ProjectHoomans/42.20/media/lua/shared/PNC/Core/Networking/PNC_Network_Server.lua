@@ -516,6 +516,28 @@ function Network.SendNPCKnowledge(targetPlayer, snapshot, reason)
     end
 end
 
+local function sendIdentityPayload(targetPlayer, command, payload)
+    payload = payload or {}
+    payload.serverTime = Core.Now()
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(targetPlayer, Const.MODULE, command, payload)
+    elseif not isServer or not isServer() then
+        triggerEvent("OnServerCommand", Const.MODULE, command, payload)
+    end
+end
+
+function Network.SendPlayerBootstrap(targetPlayer, payload)
+    sendIdentityPayload(targetPlayer, Const.CMD_PLAYER_BOOTSTRAP, payload)
+end
+
+function Network.SendNPCPresentation(targetPlayer, payload)
+    sendIdentityPayload(targetPlayer, Const.CMD_NPC_PRESENTATION, payload)
+end
+
+function Network.SendKnowledgeDisclosure(targetPlayer, payload)
+    sendIdentityPayload(targetPlayer, Const.CMD_KNOWLEDGE_DISCLOSURE, payload)
+end
+
 function Network.SendKnowledgeDebug(targetPlayer, snapshot, authorized, reason)
     local payload = { authorized = authorized == true, snapshot = authorized == true and snapshot or nil, reason = reason, serverTime = Core.Now() }
     if isServer and isServer() and targetPlayer then

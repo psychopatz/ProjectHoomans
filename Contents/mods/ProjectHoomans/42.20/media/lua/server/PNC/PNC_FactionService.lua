@@ -1066,15 +1066,18 @@ local function playerKeyFor(player, callback, ensure)
         return nil, "player_identity_unavailable"
     end
     if ensure ~= true then
-        local uuid = PNC.PlayerCharacters.GetCharacterUUID
-            and PNC.PlayerCharacters.GetCharacterUUID(player)
-            or nil
-        local accountIdentity = player.getUsername
-            and player:getUsername() or nil
-        local key = uuid and EntityRef.ForPlayerIdentity(
-            accountIdentity,
-            uuid
-        ) or nil
+        local context = PNC.PlayerContext and PNC.PlayerContext.Peek
+            and PNC.PlayerContext.Peek(player) or nil
+        local uuid = context and context.characterUUID
+            or PNC.PlayerCharacters.GetCharacterUUID
+                and PNC.PlayerCharacters.GetCharacterUUID(player) or nil
+        local record = uuid and PNC.PlayerCharacters.Registry
+            and PNC.PlayerCharacters.Registry.byUUID
+            and PNC.PlayerCharacters.Registry.byUUID[uuid] or nil
+        local key = context and context.entityKey
+            or record and EntityRef.ForPlayerIdentity(
+                record.accountKey or record.accountIdentity, uuid
+            ) or nil
         local reason = key and "resolved"
             or uuid and "invalid_character_uuid"
             or "actor_identity_missing"

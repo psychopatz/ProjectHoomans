@@ -167,16 +167,14 @@ function SocialProfiles.GetPlayerProfile(characterUUID)
 end
 
 function SocialProfiles.GetPlayerProfileForPlayer(player)
-    local uuid
-    local reason
-    if not PlayerCharacters or not PlayerCharacters.GetCharacterUUID then
+    if not PNC.PlayerContext or not PNC.PlayerContext.Resolve then
         return nil, "identity_service_unavailable"
     end
-    uuid, reason = PlayerCharacters.GetCharacterUUID(player)
-    if not uuid then
-        return nil, reason
-    end
-    return SocialProfiles.GetPlayerProfile(uuid)
+    local context, reason = PNC.PlayerContext.Resolve(
+        player, "social_profile_read"
+    )
+    if not context then return nil, reason end
+    return SocialProfiles.GetPlayerProfile(context.characterUUID)
 end
 
 function SocialProfiles.ResolvePlayerProfile(player, at)
@@ -194,13 +192,10 @@ function SocialProfiles.ResolvePlayerProfile(player, at)
     if not player or not player.getModData then
         return nil, "invalid_player"
     end
-    uuid, reason = PlayerCharacters.EnsureIdentity(player, {
-        callback = "social_profile",
-        worldAgeHours = worldAgeHours(at),
-    })
-    if not uuid then
-        return nil, reason
-    end
+    local context
+    context, reason = PNC.PlayerContext.Resolve(player, "social_profile")
+    if not context then return nil, reason end
+    uuid = context.characterUUID
     record = PlayerCharacters.GetRegistryRecord(uuid)
     current = ProfileTypes.NormalizePlayerSocialProfile(
         record and record.socialProfile
@@ -252,9 +247,9 @@ function SocialProfiles.EnsurePlayerProfile(player, at)
     local uuid
     local cached
     local record
-    uuid = PlayerCharacters
-        and PlayerCharacters.GetCharacterUUID
-        and PlayerCharacters.GetCharacterUUID(player) or nil
+    local context = PNC.PlayerContext and PNC.PlayerContext.Peek
+        and PNC.PlayerContext.Peek(player) or nil
+    uuid = context and context.characterUUID or nil
     cached = SocialProfiles.RuntimePlayers[player]
     if uuid and cached and cached.uuid == uuid then
         record = PlayerCharacters.GetRegistryRecord(uuid)

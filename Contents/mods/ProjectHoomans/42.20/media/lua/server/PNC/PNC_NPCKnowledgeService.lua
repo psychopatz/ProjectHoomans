@@ -62,32 +62,16 @@ end
 -- authoritative boundary and commit a newly recovered/created identity before
 -- storing knowledge under it.
 local function characterUUIDForPlayer(player, callback)
-    local characterUUID
-    local reason
-    if not PlayerCharacters then
+    if not PNC.PlayerContext or not PNC.PlayerContext.Resolve then
         return nil, "character_identity_service_unavailable"
     end
-    if PlayerCharacters.GetCharacterUUID then
-        characterUUID, reason = PlayerCharacters.GetCharacterUUID(player)
-    end
-    if not characterUUID and PlayerCharacters.EnsureIdentity then
-        characterUUID, reason = PlayerCharacters.EnsureIdentity(player, {
-            callback = callback or "npc_knowledge",
-        })
-    end
-    if not characterUUID then
+    local context, reason = PNC.PlayerContext.Resolve(
+        player, callback or "npc_knowledge"
+    )
+    if not context then
         return nil, reason or "character_identity_unavailable"
     end
-    -- GetCharacterUUID may succeed for an identity created earlier in the
-    -- same frame while its registry is still dirty.  Save on either path so
-    -- the knowledge registry can never become durable before its UUID owner.
-    if PlayerCharacters.Save then
-        local saved, saveReason = PlayerCharacters.Save()
-        if saved == false and saveReason ~= "not_dirty" then
-            return nil, saveReason or "character_identity_save_failed"
-        end
-    end
-    return characterUUID
+    return context.characterUUID
 end
 
 local function normalizeDiscovered(raw, descriptorID)
@@ -205,14 +189,16 @@ function Knowledge.EnsureLoaded()
     return true
 end
 
-function Knowledge.Save()
+function Knowledge.Save(flushGlobal)
     Knowledge.EnsureLoaded()
     if not Knowledge.Dirty then return false, "not_dirty" end
     local target = ModData and ModData.getOrCreate and ModData.getOrCreate(KEY) or nil
     if not target then return false, "moddata_unavailable" end
     for key in pairs(target) do target[key] = nil end
     for key, value in pairs(Knowledge.Registry) do target[key] = deepCopy(value) end
-    if GlobalModData and GlobalModData.save then GlobalModData.save() end
+    if flushGlobal ~= false and GlobalModData and GlobalModData.save then
+        GlobalModData.save()
+    end
     Knowledge.Dirty = false
     return true
 end
@@ -264,7 +250,8 @@ end
 
 local function familiarity(characterUUID, npcID)
     local character = PlayerCharacters and PlayerCharacters.GetRegistryRecord and PlayerCharacters.GetRegistryRecord(characterUUID) or nil
-    local key = character and character.accountIdentity and EntityRef.ForPlayerIdentity(character.accountIdentity, characterUUID) or nil
+    local key = character and character.accountKey
+        and EntityRef.ForPlayerIdentity(character.accountKey, characterUUID) or nil
     local relationship = key and Relationships and Relationships.Get and Relationships.Get(npcID, key) or nil
     return tonumber(relationship and relationship.familiarity) or 0, tonumber(relationship and relationship.approval) or 0
 end
@@ -612,7 +599,9 @@ end
 -- Temporary debug counterpart to future conversational disclosures. A topic
 -- only reveals descriptors the NPC would reasonably discuss in that topic;
 -- it never turns the whole dossier into an omniscient dump.
-function Knowledge.DiscoverTopicForPlayer(player, npcID, topicID, at, sourceType)
+function Knowledge.DiscoverTopicForPlayer(
+    player, npcID, topicID, at, sourceType, deferCommit
+)
     local topic = tostring(topicID or "")
     local revealed = {}
     local failures = {}
@@ -632,10 +621,17 @@ function Knowledge.DiscoverTopicForPlayer(player, npcID, topicID, at, sourceType
     -- A direct answer changes player-facing identity immediately. Commit at
     -- the disclosure boundary so learned names survive a restart even when no
     -- later periodic world save occurs.
-    if #revealed > 0 then
-        local saved, saveReason = Knowledge.Save()
-        if saved == false and saveReason ~= "not_dirty" then
-            return nil, saveReason or "knowledge_save_failed"
+    if #revealed > 0 and deferCommit ~= true then
+        if PNC.PersistenceCoordinator and PNC.PersistenceCoordinator.Commit then
+            local committed, saveReason = PNC.PersistenceCoordinator.Commit(
+                "knowledge_disclosure"
+            )
+            if not committed then return nil, saveReason or "knowledge_save_failed" end
+        else
+            local saved, saveReason = Knowledge.Save()
+            if saved == false and saveReason ~= "not_dirty" then
+                return nil, saveReason or "knowledge_save_failed"
+            end
         end
     end
     return { topicID = topic, revealed = revealed, failures = failures }

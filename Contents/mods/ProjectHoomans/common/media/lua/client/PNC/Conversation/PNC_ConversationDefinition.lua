@@ -127,7 +127,17 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
     local timeID = forcedTime or Time.Resolve()
     local relationshipID = Relationship.Resolve(entry, player)
     local npcID = tostring(entry and entry.id or "debug-npc")
-    local name = IdentityPresentation.GetName(entry)
+    local clientState = PNC.Network and PNC.Network.ClientState or {}
+    local identityProjection = clientState.npcPresentations
+        and clientState.npcPresentations[npcID] or nil
+    local identityState = identityProjection and identityProjection.state
+        or (not PNC.Network and IdentityPresentation.IsNameKnown(entry)
+            and "known" or "loading")
+    local name = identityState == "known"
+        and tostring(identityProjection and identityProjection.displayName
+            or IdentityPresentation.GetName(entry))
+        or identityState == "loading" and "Checking what you know..."
+        or IdentityPresentation.UnknownName
     local day = PsychopatzCore.Conversation.History.GetDay()
     local greeting = Content.GetGreeting(
         relationshipID,
@@ -136,7 +146,7 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         day
     )
     local faction = factionPresentation(entry)
-    local identityKnown = IdentityPresentation.IsNameKnown(entry)
+    local identityKnown = identityState == "known"
     local aggressive = isAggressive(entry)
     local relationshipPresentation = Relationship.GetPresentation(npcID)
     local greetingChoices
@@ -194,21 +204,33 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             },
         }
     end
-    if not identityKnown then
-        local rawFaction = IdentityPresentation.GetDisclosureFaction(entry)
-        local introduction = "I'm "
-            .. IdentityPresentation.GetDisclosureName(entry) .. "."
-        if rawFaction and rawFaction.name then
-            introduction = introduction .. " I'm with " .. tostring(rawFaction.name) .. "."
-        end
+    if identityState == "loading" then
+        greetingChoices = {
+            {
+                id = "identity_loading",
+                text = "Checking what you know...",
+                enabled = false,
+            },
+        }
+    elseif identityState == "error" then
+        greetingChoices = {
+            {
+                id = "identity_retry",
+                text = "Retry saving introduction",
+                action = function()
+                    Conversation.RequestKnowledgeTopic(npcID, "identity_name")
+                end,
+            },
+            greetingChoices[#greetingChoices],
+        }
+    elseif not identityKnown and identityProjection.canAskName == true then
         table.insert(greetingChoices, 1, {
             id = "ask_name",
             text = "What's your name?",
-            response = { fallback = introduction },
             action = function()
+                identityProjection.state = "loading"
                 Conversation.RequestKnowledgeTopic(npcID, "identity_name")
             end,
-            next = "greeting",
         })
     end
     if PNC.Client and PNC.Client.CanUseDebug
@@ -395,6 +417,8 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
     return {
         namespace = "ProjectHoomans",
         npcID = npcID,
+        characterUUID = clientState.playerContext
+            and clientState.playerContext.characterUUID or "unbound",
         character = entry and entry.zombie or nil,
         portrait = portraitSpec(entry),
         backgroundID = Content.GetBackground(timeID),
@@ -403,6 +427,7 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             entry = entry,
             player = player,
             npcName = name,
+            identityState = identityState,
             -- PsychopatzCore currently renders these two context fields as
             -- the portrait subtitle. Preserve the semantic IDs separately
             -- while showing faction identity when the server supplied it.
@@ -504,11 +529,23 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
 end
 
 function Conversation.Open(entry, player, forcedTime)
+    local npcID = tostring(entry and entry.id or "debug-npc")
+    local state = PNC.Network and PNC.Network.ClientState
+    if state then
+        state.npcPresentations = state.npcPresentations or {}
+        state.npcPresentations[npcID] = {
+            npcID = npcID,
+            state = "loading",
+        }
+    end
     local definition = Conversation.BuildDefinition(entry, player, forcedTime)
     local view = PsychopatzCore.Conversation.Open(
         definition
     )
     Relationship.RequestPresentation(definition.npcID)
+    if PNC.Client and PNC.Client.RequestNPCKnowledge then
+        PNC.Client.RequestNPCKnowledge(definition.npcID)
+    end
     return view
 end
 
@@ -527,6 +564,49 @@ function Conversation.ReceiveKnowledgeSnapshot(snapshot)
         context.conversationTimeID
     )
     return view.refreshConversationSpec and view:refreshConversationSpec(updated) == true
+end
+
+function Conversation.ReceiveIdentityPresentation(presentation)
+    local view = PsychopatzCore and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.instance or nil
+    if not view or not presentation
+        or tostring(presentation.npcID) ~= tostring(view.spec and view.spec.npcID)
+    then return false end
+    local context = view.spec and view.spec.context or {}
+    if not context.entry then return false end
+    local updated = Conversation.BuildDefinition(
+        context.entry, context.player, context.conversationTimeID
+    )
+    return view.refreshConversationSpec
+        and view:refreshConversationSpec(updated) == true
+end
+
+function Conversation.ReceiveDisclosureResult(result)
+    local view = PsychopatzCore and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.instance or nil
+    if not view or not result
+        or tostring(result.npcID) ~= tostring(view.spec and view.spec.npcID)
+    then return false end
+    if result.success == true and result.responseText
+        and view.session and view.session.append
+    then
+        view.session:append("npc", { fallback = tostring(result.responseText) })
+    end
+    if result.success ~= true then
+        local state = PNC.Network and PNC.Network.ClientState
+        if state and state.npcPresentations then
+            state.npcPresentations[tostring(result.npcID)] = {
+                npcID = tostring(result.npcID), state = "error",
+                reason = result.reason,
+            }
+        end
+    end
+    return Conversation.ReceiveIdentityPresentation(
+        result.presentation or {
+            npcID = result.npcID,
+            state = result.success and "known" or "error",
+        }
+    )
 end
 
 return Conversation

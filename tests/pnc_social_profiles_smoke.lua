@@ -460,7 +460,7 @@ PNC.PlayerCharacters.Load()
 local historical = PNC.PlayerCharacters.GetRegistryRecord(
     "char_historical"
 )
-assertEqual(PNC.PlayerCharacters.GetRegistrySnapshot().schemaVersion, 3,
+assertEqual(PNC.PlayerCharacters.GetRegistrySnapshot().schemaVersion, 4,
     "player registry V2 migration")
 assertEqual(historical.socialProfile.orientation, "straight",
     "historical profile neutral orientation")

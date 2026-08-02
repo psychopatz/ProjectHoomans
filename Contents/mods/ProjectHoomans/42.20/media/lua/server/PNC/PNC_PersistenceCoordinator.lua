@@ -1,0 +1,110 @@
+-- One authority-side commit boundary for identity-dependent state.
+
+if isClient and isClient() and (not isServer or not isServer()) then return end
+
+PNC = PNC or {}
+PNC.PersistenceCoordinator = PNC.PersistenceCoordinator or {}
+
+local Coordinator = PNC.PersistenceCoordinator
+local Core = PNC.Core
+
+local function copy(value)
+    return Core and Core.DeepCopy and Core.DeepCopy(value) or value
+end
+
+local function validate()
+    local characters = PNC.PlayerCharacters
+    if not characters or not characters.Registry then
+        return false, "identity_registry_unavailable"
+    end
+    local normalized = PNC.PlayerCharacterTypes.NormalizeRegistry(
+        characters.Registry
+    )
+    if not normalized or type(normalized.byUUID) ~= "table" then
+        return false, "identity_registry_invalid"
+    end
+    for oldUUID, canonicalUUID in pairs(normalized.uuidAliases or {}) do
+        if not normalized.byUUID[oldUUID]
+            or not normalized.byUUID[canonicalUUID]
+        then
+            return false, "identity_alias_invalid"
+        end
+    end
+    return true
+end
+
+function Coordinator.Commit(reason)
+    local valid, validationReason = validate()
+    if not valid then return false, validationReason end
+
+    local results = {}
+    local initialDirty = {
+        identity = PNC.PlayerCharacters and PNC.PlayerCharacters.Dirty == true,
+        knowledge = PNC.NPCKnowledge and PNC.NPCKnowledge.Dirty == true,
+        factions = PNC.Factions and PNC.Factions.Dirty == true,
+        communities = PNC.Communities and PNC.Communities.Dirty == true,
+        npcByID = copy(PNC.Registry and PNC.Registry.DirtyByID or {}),
+        npcDomains = copy(PNC.Registry and PNC.Registry.DirtyDomains or {}),
+        npcDirectory = PNC.Registry and PNC.Registry.DirectoryDirty == true,
+    }
+    local function failure(why)
+        if PNC.PlayerCharacters and initialDirty.identity then
+            PNC.PlayerCharacters.Dirty = true
+        end
+        if PNC.NPCKnowledge and initialDirty.knowledge then
+            PNC.NPCKnowledge.Dirty = true
+        end
+        if PNC.Factions and initialDirty.factions then PNC.Factions.Dirty = true end
+        if PNC.Communities and initialDirty.communities then
+            PNC.Communities.Dirty = true
+        end
+        if PNC.Registry then
+            PNC.Registry.DirtyByID = initialDirty.npcByID
+            PNC.Registry.DirtyDomains = initialDirty.npcDomains
+            PNC.Registry.DirectoryDirty = initialDirty.npcDirectory
+        end
+        Coordinator.LastFailure = {
+            reason = tostring(why or "commit_failed"),
+            operation = reason or "unspecified",
+            at = Core and Core.Now and Core.Now() or 0,
+        }
+        return false, Coordinator.LastFailure.reason
+    end
+    local function save(name, service)
+        if not service or not service.Save then return true end
+        local ok, result, why = pcall(service.Save, false)
+        if not ok then return false, tostring(result) end
+        results[name] = { changed = result == true, reason = why }
+        if result == false and why ~= "not_dirty" then
+            return false, why or (name .. "_save_failed")
+        end
+        return true
+    end
+
+    local ok, why = save("identity", PNC.PlayerCharacters)
+    if not ok then return failure(why) end
+    ok, why = save("knowledge", PNC.NPCKnowledge)
+    if not ok then return failure(why) end
+    ok, why = save("factions", PNC.Factions)
+    if not ok then return failure(why) end
+    ok, why = save("communities", PNC.Communities)
+    if not ok then return failure(why) end
+
+    if PNC.Registry and PNC.Registry.FlushDirty then
+        local flushed, flushError = pcall(PNC.Registry.FlushDirty)
+        if not flushed then return failure(tostring(flushError)) end
+        results.npcs = { changed = (tonumber(flushError) or 0) > 0 }
+    end
+    if GlobalModData and GlobalModData.save then
+        local flushed, flushError = pcall(GlobalModData.save)
+        if not flushed then return failure(tostring(flushError)) end
+    end
+    Coordinator.LastCommit = {
+        reason = reason or "unspecified",
+        at = Core and Core.Now and Core.Now() or 0,
+        results = copy(results),
+    }
+    return true, "committed", copy(Coordinator.LastCommit)
+end
+
+return Coordinator

@@ -194,10 +194,12 @@ local IdentityConstants = PNC.PlayerCharacterConstants
 
 -- 1. New registry defaults.
 local defaults = IdentityTypes.NewRegistry()
-assertEqual(defaults.schemaVersion, 3, "registry schema")
+assertEqual(defaults.schemaVersion, 4, "registry schema")
 assertEqual(defaults.revision, 0, "registry revision")
 assertEqual(type(defaults.byUUID), "table", "registry UUID map")
 assertEqual(type(defaults.byAccount), "table", "registry account map")
+assertEqual(type(defaults.byAccountKey), "table", "registry account-key map")
+assertEqual(type(defaults.uuidAliases), "table", "registry alias map")
 
 -- 2. New character record defaults.
 local defaultRecord = IdentityTypes.NewCharacterRecord({
@@ -592,7 +594,7 @@ assertEqual(normalizedOnce.byUUID.char_missing_account, nil,
 
 -- 32-33. An old save gets an empty registry; repeating migration is safe.
 local migrated = IdentityTypes.NormalizeRegistry({})
-assertEqual(migrated.schemaVersion, 3, "old save migration")
+assertEqual(migrated.schemaVersion, 4, "old save migration")
 assertTrue(simpleEqual(
     migrated,
     IdentityTypes.NormalizeRegistry(migrated)

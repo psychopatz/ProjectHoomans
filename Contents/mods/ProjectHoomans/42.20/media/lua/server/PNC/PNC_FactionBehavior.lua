@@ -76,14 +76,18 @@ local function factionAtWarWithPlayerFaction(factionID)
 end
 
 local function playerEntityKey(player)
+    local context = PNC.PlayerContext and PNC.PlayerContext.Peek
+        and PNC.PlayerContext.Peek(player) or nil
+    if context then return context.entityKey end
     local uuid = PNC.PlayerCharacters
         and PNC.PlayerCharacters.GetCharacterUUID
-        and PNC.PlayerCharacters.GetCharacterUUID(player)
-        or nil
-    local account = player and player.getUsername
-        and player:getUsername() or nil
-    return uuid and EntityRef.ForPlayerIdentity(account, uuid)
-        or nil
+        and PNC.PlayerCharacters.GetCharacterUUID(player) or nil
+    local record = uuid and PNC.PlayerCharacters.Registry
+        and PNC.PlayerCharacters.Registry.byUUID
+        and PNC.PlayerCharacters.Registry.byUUID[uuid] or nil
+    return record and EntityRef.ForPlayerIdentity(
+        record.accountKey or record.accountIdentity, uuid
+    ) or nil
 end
 
 local function conversationParleyActive(record, targetKey)

@@ -88,6 +88,83 @@ Internal.RegisterServerCommand(Const.CMD_NPC_KNOWLEDGE, function(args)
     Internal.ApplyNPCKnowledgeSnapshot(args.snapshot, args.reason)
 end)
 
+local function projectionIsCurrent(payload)
+    local context = ClientState.playerContext
+    if not context or not payload then return true end
+    if payload.characterUUID
+        and payload.characterUUID ~= context.characterUUID
+    then return false end
+    if payload.bindingRevision
+        and tonumber(payload.bindingRevision)
+            < tonumber(context.bindingRevision or 0)
+    then return false end
+    return true
+end
+
+function Internal.ApplyNPCPresentation(payload)
+    if type(payload) ~= "table" or not payload.npcID
+        or not projectionIsCurrent(payload)
+    then return false end
+    local npcID = tostring(payload.npcID)
+    ClientState.npcPresentations = ClientState.npcPresentations or {}
+    local current = ClientState.npcPresentations[npcID]
+    if current and tonumber(payload.knowledgeRevision)
+        and tonumber(payload.knowledgeRevision)
+            < (tonumber(current.knowledgeRevision) or 0)
+    then return false end
+    ClientState.npcPresentations[npcID] = payload
+    if payload.snapshot then
+        Internal.ApplyNPCKnowledgeSnapshot(payload.snapshot, payload.reason)
+    end
+    if PNC.Conversation and PNC.Conversation.ReceiveIdentityPresentation then
+        PNC.Conversation.ReceiveIdentityPresentation(payload)
+    end
+    return true
+end
+
+Internal.RegisterServerCommand(Const.CMD_PLAYER_BOOTSTRAP, function(args)
+    if ClientState.activeBootstrapRequestID and args.requestID
+        and args.requestID ~= ClientState.activeBootstrapRequestID
+    then return end
+    local currentRevision = tonumber(ClientState.bootstrapKnowledgeRevision) or -1
+    local incomingRevision = tonumber(args.knowledgeRevision) or 0
+    if incomingRevision < currentRevision then return end
+    ClientState.bootstrapState = args.state or "error"
+    ClientState.bootstrapReason = args.reason
+    if args.context then ClientState.playerContext = args.context end
+    if tonumber(args.chunkIndex) == 1 and projectionIsCurrent(args) then
+        ClientState.npcKnowledge = {}
+        ClientState.bootstrapKnowledgeRevision = incomingRevision
+    end
+    if projectionIsCurrent(args) then
+        for _, snapshot in ipairs(args.snapshots or {}) do
+            Internal.ApplyNPCKnowledgeSnapshot(snapshot)
+        end
+    end
+end)
+
+Internal.RegisterServerCommand(Const.CMD_NPC_PRESENTATION, function(args)
+    Internal.ApplyNPCPresentation(args)
+end)
+
+Internal.RegisterServerCommand(Const.CMD_KNOWLEDGE_DISCLOSURE, function(args)
+    local npcID = args.npcID and tostring(args.npcID) or nil
+    local pending = npcID and ClientState.pendingDisclosure
+        and ClientState.pendingDisclosure[npcID] or nil
+    if pending and args.requestID and pending ~= args.requestID then return end
+    if pending and npcID then ClientState.pendingDisclosure[npcID] = nil end
+    if args.success and args.presentation then
+        Internal.ApplyNPCPresentation(args.presentation)
+    elseif args.npcID then
+        Internal.ApplyNPCPresentation(args.presentation or {
+            npcID = args.npcID, state = "error", reason = args.reason,
+        })
+    end
+    if PNC.Conversation and PNC.Conversation.ReceiveDisclosureResult then
+        PNC.Conversation.ReceiveDisclosureResult(args)
+    end
+end)
+
 Internal.RegisterServerCommand(Const.CMD_KNOWLEDGE_DEBUG, function(args)
     ClientState.knowledgeDebugAuthorized = args.authorized == true
     ClientState.knowledgeDebug = args.snapshot

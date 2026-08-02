@@ -6,6 +6,7 @@ end
 
 PNC = PNC or {}
 PNC.PlayerCharacters = PNC.PlayerCharacters or {}
+PNC.PlayerContext = PNC.PlayerContext or {}
 
 local PlayerCharacters = PNC.PlayerCharacters
 local Constants = PNC.PlayerCharacterConstants
@@ -21,6 +22,8 @@ PlayerCharacters.RuntimeByPlayer = PlayerCharacters.RuntimeByPlayer
     or setmetatable({}, { __mode = "k" })
 PlayerCharacters.RuntimeByUUID =
     PlayerCharacters.RuntimeByUUID or {}
+PlayerCharacters.RuntimeContexts = PlayerCharacters.RuntimeContexts
+    or setmetatable({}, { __mode = "k" })
 PlayerCharacters.UUIDGenerator =
     PlayerCharacters.UUIDGenerator or function()
         return Core.GenerateID(Constants.UUID_PREFIX)
@@ -119,8 +122,29 @@ local function logIdentity(fields)
     end
 end
 
-local function accountIdentityFor(player)
+local function presentationIdentityFor(player)
     return Types.NormalizeAccountIdentity(call(player, "getUsername"))
+end
+
+local function isSinglePlayerAuthority()
+    local server = isServer and isServer() == true
+    local client = isClient and isClient() == true
+    return not server and not client
+end
+
+local function accountKeyFor(player)
+    local existing = PlayerCharacters.RuntimeContexts[player]
+    if existing and existing.accountKey then return existing.accountKey end
+    if isSinglePlayerAuthority() then
+        local slot = tonumber(call(player, "getPlayerNum"))
+        if slot == nil then slot = tonumber(call(player, "getPlayerIndex")) end
+        if slot ~= nil then
+            return "sp_slot_" .. tostring(math.max(0, math.floor(slot)))
+        end
+        -- Compatibility for non-engine test doubles. Real IsoPlayer objects
+        -- always expose their local player slot.
+    end
+    return presentationIdentityFor(player)
 end
 
 local function onlineIDFor(player)
@@ -156,7 +180,7 @@ local function informationalFields(player)
     })
 end
 
-local function setMirror(player, uuid)
+local function setMirror(player, uuid, accountKey)
     local data = playerModData(player)
     if not data then
         return false
@@ -164,6 +188,7 @@ local function setMirror(player, uuid)
     data[Constants.MODDATA_UUID_FIELD] = uuid
     data[Constants.MODDATA_VERSION_FIELD] =
         Constants.IDENTITY_VERSION
+    data[Constants.MODDATA_ACCOUNT_KEY_FIELD] = accountKey
     return true
 end
 
@@ -192,7 +217,11 @@ end
 
 local function indexRecord(record)
     local accountIdentity = record.accountIdentity
+    local accountKey = record.accountKey or accountIdentity
     local uuid = record.uuid
+    PlayerCharacters.Registry.byAccountKey[accountKey] =
+        PlayerCharacters.Registry.byAccountKey[accountKey] or {}
+    PlayerCharacters.Registry.byAccountKey[accountKey][uuid] = true
     PlayerCharacters.Registry.byAccount[accountIdentity] =
         PlayerCharacters.Registry.byAccount[accountIdentity] or {}
     PlayerCharacters.Registry.byAccount[accountIdentity][uuid] = true
@@ -233,17 +262,16 @@ end
 -- single-player restart. The registry is authoritative, so recover the most
 -- recent unbound active character for this account when that mirror is gone.
 -- A valid mirror still wins, and an invalid mirror is never silently replaced.
-local function recoverAccountCharacter(accountIdentity, player)
-    local candidates = PlayerCharacters.Registry.byAccount[accountIdentity]
+local function recoverAccountCharacter(accountKey, player)
+    local candidates = PlayerCharacters.Registry.byAccountKey[accountKey]
         or {}
     local info = informationalFields(player)
     local selected
+    local matchCount = 0
     local function matchesPlayer(record)
-        if info and info.displayName and record.displayName
-            and info.displayName ~= record.displayName
-        then
-            return false
-        end
+        -- Display name and username are mutable presentation. Descriptor
+        -- names are only a guard against binding a genuinely different live
+        -- survivor when the engine dropped the ModData mirror.
         if info and info.forename and record.forename
             and info.forename ~= record.forename
         then
@@ -269,20 +297,35 @@ local function recoverAccountCharacter(accountIdentity, player)
         local record = PlayerCharacters.Registry.byUUID[uuid]
         if record
             and record.status == Constants.STATUS_ACTIVE
-            and record.accountIdentity == accountIdentity
+            and record.accountKey == accountKey
             and not PlayerCharacters.RuntimeByUUID[uuid]
             and matchesPlayer(record)
-            and (not selected or newerThan(record, selected))
         then
-            selected = record
+            matchCount = matchCount + 1
+            if not selected or newerThan(record, selected) then
+                selected = record
+            end
         end
     end
-    return selected
+    if matchCount > 1 then return nil, "identity_ambiguous" end
+    return selected, selected and "recovered" or "not_found"
 end
 
-local function bind(player, uuid)
+local function bind(player, uuid, accountKey)
     PlayerCharacters.RuntimeByPlayer[player] = uuid
     PlayerCharacters.RuntimeByUUID[uuid] = player
+    local record = PlayerCharacters.Registry.byUUID[uuid]
+    local revision = math.max(0, math.floor(tonumber(
+        PlayerCharacters.Registry.revision
+    ) or 0))
+    PlayerCharacters.RuntimeContexts[player] = {
+        accountKey = accountKey or (record and record.accountKey),
+        characterUUID = uuid,
+        entityKey = EntityRef.ForPlayerIdentity(
+            accountKey or (record and record.accountKey), uuid
+        ),
+        bindingRevision = revision,
+    }
 end
 
 local function unbindRuntime(player)
@@ -291,6 +334,7 @@ local function unbindRuntime(player)
         return nil
     end
     PlayerCharacters.RuntimeByPlayer[player] = nil
+    PlayerCharacters.RuntimeContexts[player] = nil
     if PlayerCharacters.RuntimeByUUID[uuid] == player then
         PlayerCharacters.RuntimeByUUID[uuid] = nil
     end
@@ -306,6 +350,11 @@ function PlayerCharacters.Load()
     raw = ModData and ModData.getOrCreate
         and ModData.getOrCreate(Constants.REGISTRY_MODDATA_KEY)
         or {}
+    if (tonumber(raw.schemaVersion) or 0)
+        < Constants.REGISTRY_SCHEMA_VERSION
+    then
+        PlayerCharacters.PendingLegacyBackup = copy(raw)
+    end
     normalized = Types.NormalizeRegistry(raw)
     PlayerCharacters.Registry = normalized
     PlayerCharacters.Loaded = true
@@ -321,7 +370,7 @@ function PlayerCharacters.EnsureLoaded()
     return true
 end
 
-function PlayerCharacters.Save()
+function PlayerCharacters.Save(flushGlobal)
     local target
     PlayerCharacters.EnsureLoaded()
     if not PlayerCharacters.Dirty then
@@ -337,7 +386,7 @@ function PlayerCharacters.Save()
         PlayerCharacters.Registry
     ))
     PlayerCharacters.Dirty = false
-    if GlobalModData and GlobalModData.save then
+    if flushGlobal ~= false and GlobalModData and GlobalModData.save then
         GlobalModData.save()
     end
     return true
@@ -360,7 +409,9 @@ end
 function PlayerCharacters.GetRegistryRecord(characterUUID)
     local record
     PlayerCharacters.EnsureLoaded()
-    characterUUID = Types.NormalizeUUID(characterUUID)
+    characterUUID = Types.ResolveUUID(
+        PlayerCharacters.Registry, characterUUID
+    )
     record = characterUUID
         and PlayerCharacters.Registry.byUUID[characterUUID] or nil
     return record and copy(record) or nil
@@ -447,18 +498,18 @@ function PlayerCharacters.IsCharacterDead(characterUUID)
 end
 
 function PlayerCharacters.ValidateClaim(player, claimedUUID)
-    local accountIdentity
+    local accountKey
     local record
     local boundPlayer
     PlayerCharacters.EnsureLoaded()
     if not player or not player.getModData then
         return false, "invalid_player"
     end
-    accountIdentity = accountIdentityFor(player)
-    if not accountIdentity then
+    accountKey = accountKeyFor(player)
+    if not accountKey then
         return false, "account_identity_unavailable"
     end
-    claimedUUID = Types.NormalizeUUID(claimedUUID)
+    claimedUUID = Types.ResolveUUID(PlayerCharacters.Registry, claimedUUID)
     if not claimedUUID then
         return false, "malformed_uuid"
     end
@@ -466,7 +517,7 @@ function PlayerCharacters.ValidateClaim(player, claimedUUID)
     if not record then
         return false, "unknown_uuid"
     end
-    if record.accountIdentity ~= accountIdentity then
+    if record.accountKey ~= accountKey then
         return false, "account_mismatch"
     end
     if record.status == Constants.STATUS_DEAD then
@@ -499,7 +550,7 @@ function PlayerCharacters.GenerateUUID()
     return nil, "uuid_generation_exhausted"
 end
 
-local function createIdentity(player, accountIdentity, at)
+local function createIdentity(player, accountKey, at)
     local uuid
     local reason
     local info
@@ -511,7 +562,8 @@ local function createIdentity(player, accountIdentity, at)
     info = informationalFields(player)
     record = Types.NewCharacterRecord({
         uuid = uuid,
-        accountIdentity = accountIdentity,
+        accountKey = accountKey,
+        accountIdentity = presentationIdentityFor(player) or accountKey,
         status = Constants.STATUS_ACTIVE,
         createdAt = at,
         firstSeenAt = at,
@@ -527,8 +579,8 @@ local function createIdentity(player, accountIdentity, at)
     PlayerCharacters.Registry.byUUID[uuid] = record
     indexRecord(record)
     incrementRegistryRevision()
-    setMirror(player, uuid)
-    bind(player, uuid)
+    setMirror(player, uuid, accountKey)
+    bind(player, uuid, accountKey)
     return uuid, "new_identity"
 end
 
@@ -538,7 +590,7 @@ function PlayerCharacters.EnsureIdentity(player, context)
     )
     local callback = type(context) == "table"
         and context.callback or "ensure"
-    local accountIdentity
+    local accountKey
     local runtimeUUID
     local record
     local claimedUUID
@@ -549,8 +601,8 @@ function PlayerCharacters.EnsureIdentity(player, context)
     if not player or not player.getModData then
         return nil, "invalid_player"
     end
-    accountIdentity = accountIdentityFor(player)
-    if not accountIdentity then
+    accountKey = accountKeyFor(player)
+    if not accountKey then
         unbindRuntime(player)
         logIdentity({
             callback = callback,
@@ -561,18 +613,37 @@ function PlayerCharacters.EnsureIdentity(player, context)
         })
         return nil, "account_identity_unavailable"
     end
+    if not PlayerCharacters.RuntimeByPlayer[player]
+        and PNC.PlayerIdentityMigration
+        and PNC.PlayerIdentityMigration.RunForPlayer
+    then
+        local _, migrationReason =
+            PNC.PlayerIdentityMigration.RunForPlayer(player, accountKey, at)
+        if migrationReason == "identity_ambiguous" then
+            return nil, migrationReason
+        end
+        if migrationReason and migrationReason ~= "migrated"
+            and migrationReason ~= "already_migrated"
+            and migrationReason ~= "not_singleplayer"
+            and migrationReason ~= "no_legacy_candidate"
+        then
+            return nil, migrationReason
+        end
+    end
     runtimeUUID = PlayerCharacters.RuntimeByPlayer[player]
     record = runtimeUUID
         and PlayerCharacters.Registry.byUUID[runtimeUUID] or nil
     if record
         and record.status == Constants.STATUS_ACTIVE
-        and record.accountIdentity == accountIdentity
         and PlayerCharacters.RuntimeByUUID[runtimeUUID] == player
     then
-        setMirror(player, runtimeUUID)
+        -- A binding is immutable for the lifetime of this IsoPlayer. Username
+        -- and display-name changes are presentation updates only.
+        updateInformation(record, player, at, false)
+        setMirror(player, runtimeUUID, record.accountKey)
         logIdentity({
             callback = callback,
-            accountIdentity = accountIdentity,
+            accountKey = record.accountKey,
             characterUUID = runtimeUUID,
             status = record.status,
             worldAgeHours = at,
@@ -589,15 +660,15 @@ function PlayerCharacters.EnsureIdentity(player, context)
     valid, reason, record =
         PlayerCharacters.ValidateClaim(player, claimedUUID)
     if valid then
-        bind(player, record.uuid)
-        setMirror(player, record.uuid)
+        bind(player, record.uuid, accountKey)
+        setMirror(player, record.uuid, accountKey)
         if updateInformation(record, player, at, true) then
             PlayerCharacters.Registry.byUUID[record.uuid] = record
             markRecordChanged(record)
         end
         logIdentity({
             callback = callback,
-            accountIdentity = accountIdentity,
+            accountKey = accountKey,
             characterUUID = record.uuid,
             status = record.status,
             worldAgeHours = at,
@@ -610,7 +681,7 @@ function PlayerCharacters.EnsureIdentity(player, context)
     if claimedUUID ~= nil then
         logIdentity({
             callback = callback,
-            accountIdentity = accountIdentity,
+            accountKey = accountKey,
             characterUUID = Types.NormalizeUUID(claimedUUID),
             worldAgeHours = at,
             onlineID = onlineIDFor(player),
@@ -618,17 +689,25 @@ function PlayerCharacters.EnsureIdentity(player, context)
             reason = reason,
         })
     else
-        record = recoverAccountCharacter(accountIdentity, player)
+        local recoveryReason
+        record, recoveryReason = recoverAccountCharacter(accountKey, player)
+        if recoveryReason == "identity_ambiguous" then
+            PlayerCharacters.Registry.migration.status = "ambiguous"
+            PlayerCharacters.Registry.migration.diagnostic =
+                "multiple_active_account_bindings"
+            PlayerCharacters.Dirty = true
+            return nil, "identity_ambiguous"
+        end
         if record then
-            bind(player, record.uuid)
-            setMirror(player, record.uuid)
+            bind(player, record.uuid, accountKey)
+            setMirror(player, record.uuid, accountKey)
             if updateInformation(record, player, at, true) then
                 PlayerCharacters.Registry.byUUID[record.uuid] = record
                 markRecordChanged(record)
             end
             logIdentity({
                 callback = callback,
-                accountIdentity = accountIdentity,
+                accountKey = accountKey,
                 characterUUID = record.uuid,
                 status = record.status,
                 worldAgeHours = at,
@@ -639,13 +718,20 @@ function PlayerCharacters.EnsureIdentity(player, context)
             return record.uuid, "reused"
         end
     end
-    uuid, reason = createIdentity(player, accountIdentity, at)
+    -- An authority migration may detect multiple plausible survivors. Never
+    -- mint another record in that state; surface a diagnostic instead.
+    if PlayerCharacters.Registry.migration
+        and PlayerCharacters.Registry.migration.status == "ambiguous"
+    then
+        return nil, "identity_ambiguous"
+    end
+    uuid, reason = createIdentity(player, accountKey, at)
     if not uuid then
         return nil, reason
     end
     logIdentity({
         callback = callback,
-        accountIdentity = accountIdentity,
+        accountKey = accountKey,
         characterUUID = uuid,
         status = Constants.STATUS_ACTIVE,
         worldAgeHours = at,
@@ -671,7 +757,7 @@ function PlayerCharacters.GetCharacterUUID(player)
         record = PlayerCharacters.Registry.byUUID[runtimeUUID]
         if record
             and record.status == Constants.STATUS_ACTIVE
-            and record.accountIdentity == accountIdentityFor(player)
+            and PlayerCharacters.RuntimeByUUID[runtimeUUID] == player
         then
             return runtimeUUID
         end
@@ -689,16 +775,14 @@ end
 function PlayerCharacters.GetEntityKey(player, context)
     local uuid
     local reason
-    local accountIdentity
+    local contextValue
     uuid, reason = PlayerCharacters.EnsureIdentity(player, context)
     if not uuid then
         return nil, reason
     end
-    accountIdentity = accountIdentityFor(player)
-    if not accountIdentity then
-        return nil, "account_identity_unavailable"
-    end
-    local key = EntityRef.ForPlayerIdentity(accountIdentity, uuid)
+    contextValue = PlayerCharacters.RuntimeContexts[player]
+    local key = contextValue and contextValue.entityKey
+        or EntityRef.ForPlayerIdentity(accountKeyFor(player), uuid)
     if not key then
         return nil, "entity_key_invalid"
     end
@@ -712,11 +796,16 @@ function PlayerCharacters.ResolveEntityKey(entityKey)
     if not parsed or parsed.kind ~= "player" then
         return nil, "invalid_player_entity_key"
     end
-    record = PlayerCharacters.Registry.byUUID[
-        parsed.characterUUID
-    ]
+    local canonicalUUID = Types.ResolveUUID(
+        PlayerCharacters.Registry, parsed.characterUUID
+    )
+    record = PlayerCharacters.Registry.byUUID[canonicalUUID]
+    local legacyMatch = record and record.legacyAccountIdentities
+        and record.legacyAccountIdentities[parsed.accountIdentity] == true
     if not record
-        or record.accountIdentity ~= parsed.accountIdentity
+        or (record.accountKey ~= parsed.accountIdentity
+            and record.accountIdentity ~= parsed.accountIdentity
+            and not legacyMatch)
     then
         return nil, "player_character_not_found"
     end
@@ -726,19 +815,21 @@ end
 function PlayerCharacters.MarkDead(player, at, reason)
     local uuid
     local record
-    local accountIdentity
+    local accountKey
     local claimedUUID
     local boundPlayer
     at = worldAgeHours(at)
     PlayerCharacters.EnsureLoaded()
     uuid = PlayerCharacters.RuntimeByPlayer[player]
     if not uuid then
-        accountIdentity = accountIdentityFor(player)
-        claimedUUID = Types.NormalizeUUID(mirroredUUID(player))
+        accountKey = accountKeyFor(player)
+        claimedUUID = Types.ResolveUUID(
+            PlayerCharacters.Registry, mirroredUUID(player)
+        )
         record = claimedUUID
             and PlayerCharacters.Registry.byUUID[claimedUUID] or nil
         if record
-            and record.accountIdentity == accountIdentity
+            and record.accountKey == accountKey
             and record.status == Constants.STATUS_DEAD
         then
             return false, "already_dead", claimedUUID
@@ -746,12 +837,12 @@ function PlayerCharacters.MarkDead(player, at, reason)
         boundPlayer = claimedUUID
             and PlayerCharacters.RuntimeByUUID[claimedUUID] or nil
         if record
-            and record.accountIdentity == accountIdentity
+            and record.accountKey == accountKey
             and record.status == Constants.STATUS_ACTIVE
             and (not boundPlayer or boundPlayer == player)
         then
             uuid = claimedUUID
-            bind(player, uuid)
+            bind(player, uuid, accountKey)
         else
             uuid = PlayerCharacters.EnsureIdentity(player, {
                 callback = "death_fallback",
@@ -760,10 +851,10 @@ function PlayerCharacters.MarkDead(player, at, reason)
         end
     end
     record = uuid and PlayerCharacters.Registry.byUUID[uuid] or nil
-    accountIdentity = accountIdentity or accountIdentityFor(player)
+    accountKey = accountKey or accountKeyFor(player)
     if not record
         or PlayerCharacters.RuntimeByPlayer[player] ~= uuid
-        or record.accountIdentity ~= accountIdentity
+        or record.accountKey ~= accountKey
     then
         unbindRuntime(player)
         return false, "death_identity_unavailable"
@@ -783,7 +874,7 @@ function PlayerCharacters.MarkDead(player, at, reason)
     unbindRuntime(player)
     logIdentity({
         callback = "player_death",
-        accountIdentity = accountIdentity,
+        accountKey = accountKey,
         characterUUID = uuid,
         status = record.status,
         worldAgeHours = at,
@@ -868,6 +959,23 @@ function PlayerCharacters.ResetRuntimeBindings(reason)
     PlayerCharacters.RuntimeByPlayer =
         setmetatable({}, { __mode = "k" })
     PlayerCharacters.RuntimeByUUID = {}
+    PlayerCharacters.RuntimeContexts =
+        setmetatable({}, { __mode = "k" })
+end
+
+function PNC.PlayerContext.Resolve(player, reason)
+    local uuid, why = PlayerCharacters.EnsureIdentity(player, {
+        callback = reason or "player_context",
+    })
+    if not uuid then return nil, why end
+    local value = PlayerCharacters.RuntimeContexts[player]
+    if not value then return nil, "binding_context_unavailable" end
+    return copy(value), why or "resolved"
+end
+
+function PNC.PlayerContext.Peek(player)
+    local value = PlayerCharacters.RuntimeContexts[player]
+    return value and copy(value) or nil
 end
 
 return PlayerCharacters

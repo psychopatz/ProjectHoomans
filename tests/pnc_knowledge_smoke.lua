@@ -41,7 +41,7 @@ local identitySaveCalls = 0
 PNC.PlayerCharacters = {
     GetRegistryRecord = function(uuid)
         return (uuid == "char_a" or uuid == "char_recovered")
-            and { accountIdentity = "Patrick" } or nil
+            and { accountKey = "Patrick", accountIdentity = "Patrick" } or nil
     end,
     GetCharacterUUID = function() return characterUUID end,
     EnsureIdentity = function(_, context)
@@ -56,9 +56,32 @@ PNC.PlayerCharacters = {
         return true
     end,
 }
+PNC.PlayerContext = {
+    Resolve = function(_, reason)
+        if not characterUUID then
+            identityEnsureCalls = identityEnsureCalls + 1
+            eq(reason, "knowledge_disclosure",
+                "disclosure owns identity recovery callback")
+            characterUUID = "char_a"
+        end
+        return {
+            accountKey = "Patrick",
+            characterUUID = characterUUID,
+            entityKey = "player:Patrick:" .. characterUUID,
+            bindingRevision = 1,
+        }
+    end,
+}
 PNC.Relationships = { Get = function() return { familiarity = 50, approval = 25 } end }
 dofile(SERVER .. "PNC_NPCKnowledgeService.lua")
 local Knowledge = PNC.NPCKnowledge
+PNC.PersistenceCoordinator = {
+    Commit = function()
+        PNC.PlayerCharacters.Save(false)
+        local saved, reason = Knowledge.Save(false)
+        return saved == true or reason == "not_dirty", reason or "committed"
+    end,
+}
 
 -- Asking a stranger's name must be a real persisted disclosure even at zero
 -- familiarity. This is the restart regression that previously showed the raw

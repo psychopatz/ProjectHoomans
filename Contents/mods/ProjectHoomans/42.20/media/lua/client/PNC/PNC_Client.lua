@@ -54,6 +54,12 @@ end
 local function onResetLua()
     ClientState.snapshots = {}
     ClientState.npcKnowledge = {}
+    ClientState.npcPresentations = {}
+    ClientState.playerContext = nil
+    ClientState.bootstrapState = "idle"
+    ClientState.activeBootstrapRequestID = nil
+    ClientState.bootstrapKnowledgeRevision = nil
+    ClientState.pendingDisclosure = {}
     ClientState.characterPayloads = {}
     ClientState.debugRoster = {}
     ClientState.debugAuthorized = false

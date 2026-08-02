@@ -49,6 +49,12 @@ PNC = {
         CMD_INVENTORY_RESULT = "InventoryResult",
         CMD_NPC_KNOWLEDGE = "NPCKnowledge",
         CMD_NPC_KNOWLEDGE_REQUEST = "RequestNPCKnowledge",
+        CMD_PLAYER_BOOTSTRAP_REQUEST = "PlayerBootstrapRequest",
+        CMD_PLAYER_BOOTSTRAP = "PlayerBootstrap",
+        CMD_NPC_PRESENTATION_REQUEST = "NPCPresentationRequest",
+        CMD_NPC_PRESENTATION = "NPCPresentation",
+        CMD_KNOWLEDGE_DISCLOSURE_REQUEST = "KnowledgeDisclosureRequest",
+        CMD_KNOWLEDGE_DISCLOSURE = "KnowledgeDisclosure",
     },
     Core = {
         Now = function() return 5000 end,
@@ -125,6 +131,23 @@ PNC.NPCKnowledge = {
         }
     end,
 }
+PNC.PlayerKnowledgeCommands = {
+    HandleDisclosure = function(_, args)
+        local disclosure = PNC.NPCKnowledge.DiscoverTopicForPlayer()
+        local snapshot = PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer()
+        Client.HandleServerCommand("KnowledgeDisclosure", {
+            requestID = args.requestID,
+            npcID = args.npcID,
+            success = disclosure ~= nil,
+            presentation = {
+                npcID = args.npcID,
+                state = "known",
+                displayName = "Burton Gilmore",
+                snapshot = snapshot,
+            },
+        })
+    end,
+}
 assertEqual(Client.RequestNPCKnowledgeTopic(
     "npc_direct", "identity_name"
 ), true, "single-player disclosure succeeds in process")
@@ -141,7 +164,7 @@ end
 assertEqual(Client.RequestNPCKnowledgeTopic(
     "npc_remote", "identity_name"
 ), true, "multiplayer disclosure request is sent")
-assertEqual(sentCommand.command, "RequestNPCKnowledge",
+assertEqual(sentCommand.command, "KnowledgeDisclosureRequest",
     "multiplayer disclosure uses authoritative server command")
 assertEqual(sentCommand.args.topicID, "identity_name",
     "multiplayer disclosure retains topic")

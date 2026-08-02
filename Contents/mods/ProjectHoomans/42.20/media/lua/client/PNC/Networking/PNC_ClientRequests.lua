@@ -13,6 +13,37 @@ local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 local isWorldReady = Internal.IsWorldReady
+ClientState.identityRequestSerial = ClientState.identityRequestSerial or 0
+
+local function requestID(prefix)
+    ClientState.identityRequestSerial = ClientState.identityRequestSerial + 1
+    return tostring(prefix) .. ":" .. tostring(Core.Now()) .. ":"
+        .. tostring(ClientState.identityRequestSerial)
+end
+
+local function dispatchIdentity(player, command, args, localHandler)
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not player or not sendClientCommand then
+            return false, "player_unavailable"
+        end
+        sendClientCommand(player, Const.MODULE, command, args)
+        return true, "sent"
+    end
+    if not PNC.PlayerKnowledgeCommands
+        or not PNC.PlayerKnowledgeCommands[localHandler]
+    then return false, "identity_command_handler_unavailable" end
+    PNC.PlayerKnowledgeCommands[localHandler](player, args)
+    return true, "dispatched"
+end
+
+function Client.RequestPlayerBootstrap()
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local args = { requestID = requestID("bootstrap") }
+    ClientState.bootstrapState = "loading"
+    ClientState.activeBootstrapRequestID = args.requestID
+    return dispatchIdentity(player, Const.CMD_PLAYER_BOOTSTRAP_REQUEST,
+        args, "HandleBootstrap")
+end
 
 local function applyKnowledgeSnapshot(snapshot, reason)
     if Internal.ApplyNPCKnowledgeSnapshot then
@@ -29,6 +60,7 @@ local function requestFullSync()
     ClientState.lastFullSyncRequestAt = Core.Now()
     if player and sendClientCommand then
         sendClientCommand(player, Const.MODULE, Const.CMD_FULL_SYNC_REQUEST, {})
+        Client.RequestPlayerBootstrap()
         return
     end
     if PNC.Registry and PNC.Network and PNC.Network.BuildSnapshot then
@@ -38,8 +70,8 @@ local function requestFullSync()
             ClientState.snapshots[snapshot.id] = snapshot
         end)
         ClientState.lastSyncReceiveAt = Core.Now()
-        if Client.RequestKnownNPCKnowledge then
-            Client.RequestKnownNPCKnowledge()
+        if Client.RequestPlayerBootstrap then
+            Client.RequestPlayerBootstrap()
         end
     end
 end
@@ -183,47 +215,20 @@ function Client.RequestNPCKnowledge(npcID)
     if npcID == "" then return false, "invalid_npc_id" end
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     ClientState.lastNPCKnowledgeRequestAt = Core.Now()
-    if Core.IsClientOnly and Core.IsClientOnly() then
-        if player and sendClientCommand then
-            sendClientCommand(player, Const.MODULE, Const.CMD_NPC_KNOWLEDGE_REQUEST, { npcID = npcID })
-            return true
-        end
-        return false, "player_unavailable"
-    end
-    if not PNC.NPCKnowledge or not PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer then
-        return false, "knowledge_service_unavailable"
-    end
-    local snapshot, reason = PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer(player, npcID)
-    applyKnowledgeSnapshot(snapshot, reason)
-    return snapshot ~= nil, reason
+    ClientState.npcPresentations = ClientState.npcPresentations or {}
+    ClientState.npcPresentations[npcID] = {
+        npcID = npcID, state = "loading", requestID = requestID("presentation"),
+    }
+    local args = ClientState.npcPresentations[npcID]
+    return dispatchIdentity(player, Const.CMD_NPC_PRESENTATION_REQUEST,
+        { npcID = npcID, requestID = args.requestID }, "HandlePresentation")
 end
 
 -- Restores only this player's sparse, previously learned NPC facts. The
 -- server uses the same path for multiplayer full sync; this local branch
 -- covers single-player where the client calls services in-process.
 function Client.RequestKnownNPCKnowledge()
-    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
-    if Core.IsClientOnly and Core.IsClientOnly() then
-        if player and sendClientCommand then
-            sendClientCommand(player, Const.MODULE, Const.CMD_NPC_KNOWLEDGE_REQUEST, {
-                allKnown = true,
-            })
-            return true
-        end
-        return false, "player_unavailable"
-    end
-    if not PNC.NPCKnowledge
-        or not PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer
-    then
-        return false, "knowledge_service_unavailable"
-    end
-    local snapshots, reason = PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer(player)
-    if not snapshots then return false, reason end
-    ClientState.npcKnowledge = {}
-    for _, snapshot in ipairs(snapshots) do
-        applyKnowledgeSnapshot(snapshot)
-    end
-    return true
+    return Client.RequestPlayerBootstrap()
 end
 
 function Client.RequestNPCKnowledgeTopic(npcID, topicID)
@@ -231,28 +236,15 @@ function Client.RequestNPCKnowledgeTopic(npcID, topicID)
     topicID = tostring(topicID or "")
     if npcID == "" or topicID == "" then return false, "invalid_knowledge_topic" end
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
-    local args = { npcID = npcID, topicID = topicID }
-    if Core.IsClientOnly and Core.IsClientOnly() then
-        if player and sendClientCommand then
-            sendClientCommand(player, Const.MODULE, Const.CMD_NPC_KNOWLEDGE_REQUEST, args)
-            return true
-        end
-        return false, "player_unavailable"
-    end
-    if not PNC.NPCKnowledge or not PNC.NPCKnowledge.DiscoverTopicForPlayer then
-        return false, "knowledge_service_unavailable"
-    end
-    local disclosure, reason = PNC.NPCKnowledge.DiscoverTopicForPlayer(
-        player,
-        npcID,
-        topicID,
-        nil,
-        "direct_disclosure"
-    )
-    if not disclosure then return false, reason end
-    local snapshot, snapshotReason = PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer(player, npcID)
-    applyKnowledgeSnapshot(snapshot, snapshotReason)
-    return snapshot ~= nil, snapshotReason
+    local args = {
+        requestID = requestID("disclosure"),
+        npcID = npcID,
+        topicID = topicID,
+    }
+    ClientState.pendingDisclosure = ClientState.pendingDisclosure or {}
+    ClientState.pendingDisclosure[npcID] = args.requestID
+    return dispatchIdentity(player, Const.CMD_KNOWLEDGE_DISCLOSURE_REQUEST,
+        args, "HandleDisclosure")
 end
 
 function Client.RequestKnowledgeDebug(npcID, showTruth, descriptorID)

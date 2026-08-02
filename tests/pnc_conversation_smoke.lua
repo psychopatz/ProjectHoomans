@@ -312,10 +312,24 @@ local strangerEntry = {
 local strangerDefinition = PNC.Conversation.BuildDefinition(
     strangerEntry, {}, "twilight"
 )
+assertEqual(strangerDefinition.context.npcName, "Checking what you know...",
+    "conversation waits for authoritative identity")
+assertEqual(strangerDefinition.nodes.greeting.choices[1].id, "identity_loading",
+    "loading conversation does not offer name question")
+PNC.Network.ClientState.npcPresentations = {
+    [strangerEntry.id] = {
+        npcID = strangerEntry.id,
+        state = "unknown",
+        canAskName = true,
+    },
+}
+strangerDefinition = PNC.Conversation.BuildDefinition(
+    strangerEntry, {}, "twilight"
+)
 assertEqual(strangerDefinition.context.npcName, "Unknown survivor",
-    "undisclosed NPC starts as stranger")
+    "authoritative unknown state uses stranger label")
 assertEqual(strangerDefinition.nodes.greeting.choices[1].id, "ask_name",
-    "undisclosed NPC offers name question")
+    "authoritative unknown state offers name question")
 local refreshedDefinition
 PsychopatzCore.Conversation.instance = {
     spec = strangerDefinition,
@@ -338,8 +352,14 @@ local learnedSnapshot = {
     },
 }
 PNC.Network.ClientState.npcKnowledge[strangerEntry.id] = learnedSnapshot
-assertEqual(PNC.Conversation.ReceiveKnowledgeSnapshot(learnedSnapshot), true,
-    "knowledge result refreshes open conversation")
+PNC.Network.ClientState.npcPresentations[strangerEntry.id] = {
+    npcID = strangerEntry.id,
+    state = "known",
+    displayName = "Burton Gilmore",
+}
+assertEqual(PNC.Conversation.ReceiveIdentityPresentation(
+    PNC.Network.ClientState.npcPresentations[strangerEntry.id]
+), true, "identity result refreshes open conversation")
 assertEqual(refreshedDefinition.context.npcName, "Burton Gilmore",
     "open conversation adopts learned name")
 for _, choice in ipairs(refreshedDefinition.nodes.greeting.choices) do

@@ -410,18 +410,24 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_PLAYER_BOOTSTRAP_REQUEST then
+        PNC.PlayerKnowledgeCommands.HandleBootstrap(player, args or {})
+        return
+    end
+
+    if command == Const.CMD_NPC_PRESENTATION_REQUEST then
+        PNC.PlayerKnowledgeCommands.HandlePresentation(player, args or {})
+        return
+    end
+
+    if command == Const.CMD_KNOWLEDGE_DISCLOSURE_REQUEST then
+        PNC.PlayerKnowledgeCommands.HandleDisclosure(player, args or {})
+        return
+    end
+
     if command == Const.CMD_FULL_SYNC_REQUEST then
         snapshots = buildSnapshotList()
         Network.BroadcastFullSync(player, snapshots)
-        if PNC.NPCKnowledge
-            and PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer
-        then
-            local knowledgeSnapshots =
-                PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer(player)
-            for _, knowledgeSnapshot in ipairs(knowledgeSnapshots or {}) do
-                Network.SendNPCKnowledge(player, knowledgeSnapshot)
-            end
-        end
         return
     end
 

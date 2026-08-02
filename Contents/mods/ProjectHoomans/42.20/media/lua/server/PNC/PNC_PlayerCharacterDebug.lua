@@ -20,6 +20,7 @@ local function emit(prefix, fields)
     local keys = {
         "callback",
         "accountIdentity",
+        "accountKey",
         "characterUUID",
         "status",
         "worldAgeHours",
@@ -69,10 +70,21 @@ function Debug.FormatRecord(characterUUID)
         return "Player Character Identity\nUUID: "
             .. tostring(characterUUID) .. "\nStatus: not found"
     end
+    local snapshot = service.GetRegistrySnapshot
+        and service.GetRegistrySnapshot() or {}
+    local aliases = 0
+    for _, canonicalUUID in pairs(snapshot.uuidAliases or {}) do
+        if canonicalUUID == record.uuid then aliases = aliases + 1 end
+    end
     return table.concat({
         "Player Character Identity",
         "UUID: " .. tostring(record.uuid),
         "Account: " .. tostring(record.accountIdentity),
+        "Account key: " .. tostring(record.accountKey),
+        "Superseded by: " .. tostring(record.supersededBy),
+        "Aliases: " .. tostring(aliases),
+        "Migration: " .. tostring(snapshot.migration
+            and snapshot.migration.status),
         "Status: " .. tostring(record.status),
         "Created: " .. tostring(record.createdAt),
         "First seen: " .. tostring(record.firstSeenAt),

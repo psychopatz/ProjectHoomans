@@ -75,7 +75,19 @@ function Types.NewRegistry()
         schemaVersion = Constants.REGISTRY_SCHEMA_VERSION,
         revision = 0,
         byUUID = {},
+        byAccountKey = {},
+        -- Compatibility index for older readers. New code must use
+        -- byAccountKey; both indexes are rebuilt from records on load.
         byAccount = {},
+        uuidAliases = {},
+        legacyAccountIdentities = {},
+        migration = {
+            revision = 0,
+            status = "pending",
+            completedAt = 0,
+            canonicalUUID = nil,
+            diagnostic = nil,
+        },
     }
 end
 
@@ -86,17 +98,30 @@ function Types.NewCharacterRecord(spec)
     local createdAt
     spec = type(spec) == "table" and spec or {}
     uuid = Types.NormalizeUUID(spec.uuid)
-    accountIdentity = Types.NormalizeAccountIdentity(
-        spec.accountIdentity
+    accountIdentity = Types.NormalizeAccountIdentity(spec.accountIdentity)
+    local accountKey = Types.NormalizeAccountIdentity(
+        spec.accountKey or accountIdentity
     )
-    if not uuid or not accountIdentity then
+    if not uuid or not accountKey then
         return nil
     end
+    accountIdentity = accountIdentity or accountKey
     status = Constants.VALID_STATUSES[spec.status]
         and spec.status or Constants.STATUS_ACTIVE
     createdAt = timestamp(spec.createdAt, 0)
+    local legacyAccountIdentities = {}
+    for identity, enabled in pairs(
+        type(spec.legacyAccountIdentities) == "table"
+            and spec.legacyAccountIdentities or {}
+    ) do
+        identity = Types.NormalizeAccountIdentity(identity)
+        if identity and enabled == true then
+            legacyAccountIdentities[identity] = true
+        end
+    end
     return {
         uuid = uuid,
+        accountKey = accountKey,
         accountIdentity = accountIdentity,
         status = status,
         createdAt = createdAt,
@@ -106,6 +131,8 @@ function Types.NewCharacterRecord(spec)
             and timestamp(spec.diedAt, 0) or 0,
         retiredAt = status == Constants.STATUS_RETIRED
             and timestamp(spec.retiredAt, 0) or 0,
+        supersededBy = Types.NormalizeUUID(spec.supersededBy),
+        legacyAccountIdentities = legacyAccountIdentities,
         forename = optionalString(spec.forename),
         surname = optionalString(spec.surname),
         displayName = optionalString(spec.displayName),
@@ -140,6 +167,7 @@ function Types.NormalizeCharacterRecord(value, registryUUID)
         and value.status or Constants.STATUS_RETIRED
     spec = {
         uuid = registryUUID,
+        accountKey = value.accountKey or value.accountIdentity,
         accountIdentity = value.accountIdentity,
         status = status,
         createdAt = value.createdAt,
@@ -147,6 +175,8 @@ function Types.NormalizeCharacterRecord(value, registryUUID)
         lastSeenAt = value.lastSeenAt,
         diedAt = value.diedAt,
         retiredAt = value.retiredAt,
+        supersededBy = value.supersededBy,
+        legacyAccountIdentities = value.legacyAccountIdentities,
         forename = value.forename,
         surname = value.surname,
         displayName = value.displayName,
@@ -166,6 +196,18 @@ function Types.NormalizeRegistry(value)
     local uuid
     local record
     output.revision = revision(source.revision)
+    output.migration = {
+        revision = revision(type(source.migration) == "table"
+            and source.migration.revision or 0),
+        status = optionalString(type(source.migration) == "table"
+            and source.migration.status) or "pending",
+        completedAt = timestamp(type(source.migration) == "table"
+            and source.migration.completedAt or 0),
+        canonicalUUID = Types.NormalizeUUID(type(source.migration) == "table"
+            and source.migration.canonicalUUID),
+        diagnostic = optionalString(type(source.migration) == "table"
+            and source.migration.diagnostic),
+    }
     for uuid, record in pairs(
         type(source.byUUID) == "table" and source.byUUID or {}
     ) do
@@ -174,12 +216,51 @@ function Types.NormalizeRegistry(value)
             and Types.NormalizeCharacterRecord(record, uuid) or nil
         if record then
             output.byUUID[uuid] = record
+            output.byAccountKey[record.accountKey] =
+                output.byAccountKey[record.accountKey] or {}
+            output.byAccountKey[record.accountKey][uuid] = true
             output.byAccount[record.accountIdentity] =
                 output.byAccount[record.accountIdentity] or {}
             output.byAccount[record.accountIdentity][uuid] = true
+            for legacyIdentity, enabled in pairs(
+                type(record.legacyAccountIdentities) == "table"
+                    and record.legacyAccountIdentities or {}
+            ) do
+                legacyIdentity = Types.NormalizeAccountIdentity(legacyIdentity)
+                if legacyIdentity and enabled == true then
+                    output.legacyAccountIdentities[legacyIdentity] =
+                        output.legacyAccountIdentities[legacyIdentity] or {}
+                    output.legacyAccountIdentities[legacyIdentity][uuid] = true
+                end
+            end
+        end
+    end
+    for oldUUID, canonicalUUID in pairs(
+        type(source.uuidAliases) == "table" and source.uuidAliases or {}
+    ) do
+        oldUUID = Types.NormalizeUUID(oldUUID)
+        canonicalUUID = Types.NormalizeUUID(canonicalUUID)
+        if oldUUID and canonicalUUID and oldUUID ~= canonicalUUID
+            and output.byUUID[oldUUID] and output.byUUID[canonicalUUID]
+        then
+            output.uuidAliases[oldUUID] = canonicalUUID
         end
     end
     return output
+end
+
+function Types.ResolveUUID(registry, value)
+    local uuid = Types.NormalizeUUID(value)
+    local seen = {}
+    while uuid and type(registry) == "table"
+        and type(registry.uuidAliases) == "table"
+        and registry.uuidAliases[uuid]
+        and not seen[uuid]
+    do
+        seen[uuid] = true
+        uuid = Types.NormalizeUUID(registry.uuidAliases[uuid])
+    end
+    return uuid
 end
 
 return Types

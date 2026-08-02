@@ -37,10 +37,9 @@ local function ensureIdentityAndProfile(player, callback, at)
     if not identity then
         return nil, "service_unavailable"
     end
-    uuid, reason = identity.EnsureIdentity(player, {
-        callback = callback,
-        worldAgeHours = at,
-    })
+    local context
+    context, reason = PNC.PlayerContext.Resolve(player, callback)
+    uuid = context and context.characterUUID or nil
     if uuid and PNC.SocialProfiles
         and PNC.SocialProfiles.EnsurePlayerProfile
     then
