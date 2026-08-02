@@ -86,6 +86,9 @@ Internal.RegisterServerCommand(Const.CMD_KNOWLEDGE_DEBUG, function(args)
     if PNC.KnowledgeDebugUI and PNC.KnowledgeDebugUI.ReceiveSnapshot then
         PNC.KnowledgeDebugUI.ReceiveSnapshot(args.snapshot)
     end
+    if PNC.NPCDossierUI and PNC.NPCDossierUI.ReceiveDebugSnapshot then
+        PNC.NPCDossierUI.ReceiveDebugSnapshot(args.snapshot)
+    end
 end)
 
 Internal.RegisterServerCommand(

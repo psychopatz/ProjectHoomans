@@ -433,7 +433,8 @@ end
 
 function Knowledge.BuildPlayerSnapshot(characterUUID, npcID)
     local note = mutableNote(characterUUID, npcID, false)
-    local output = { schemaVersion = SCHEMA, npcID = tostring(npcID or ""), categories = {}, revision = note and note.revision or 0 }
+    local output = { schemaVersion = SCHEMA, npcID = tostring(npcID or ""), categories = {}, revision = note and note.revision or 0,
+        firstMetAt = note and note.firstMetAt or nil, lastInteractionAt = note and note.lastInteractionAt or nil }
     if not note then return output end
     for descriptorID, fact in pairs(note.discovered) do
         local descriptor = Definitions.Get(descriptorID)
@@ -462,10 +463,35 @@ function Knowledge.BuildPlayerSnapshotForPlayer(player, npcID)
         and PlayerCharacters.GetCharacterUUID
         and PlayerCharacters.GetCharacterUUID(player) or nil
     if not characterUUID then return nil, "character_identity_unavailable" end
-    return Knowledge.BuildPlayerSnapshot(characterUUID, npcID)
+    local snapshot = Knowledge.BuildPlayerSnapshot(characterUUID, npcID)
+    local record = Registry and Registry.Get and Registry.Get(tostring(npcID or "")) or nil
+    if not record then return nil, "npc_not_found" end
+    local identity = PNC.Identity and PNC.Identity.GetCharacterSummary
+        and PNC.Identity.GetCharacterSummary(record) or {}
+    local faction = record.affiliation and PNC.Factions
+        and PNC.Factions.GetPresentation
+        and PNC.Factions.GetPresentation(record.affiliation.factionID) or nil
+    snapshot.identity = {
+        displayName = identity.displayName or record.name or "Unknown",
+        archetypeLabel = identity.archetypeLabel,
+        factionName = faction and faction.name or nil,
+        factionRole = record.affiliation and record.affiliation.role or nil,
+        firstMetAt = snapshot.firstMetAt,
+        lastInteractionAt = snapshot.lastInteractionAt,
+    }
+    snapshot.portrait = PNC.Identity and PNC.Identity.BuildPortraitSummary
+        and PNC.Identity.BuildPortraitSummary(record) or nil
+    if snapshot.portrait then
+        snapshot.portrait.preferDescriptor = true
+        snapshot.portrait.faceOnly = true
+    end
+    if PNC.RelationshipPresentation and PNC.RelationshipPresentation.BuildForConversation then
+        snapshot.relationship = PNC.RelationshipPresentation.BuildForConversation(player, npcID)
+    end
+    return snapshot
 end
 
-function Knowledge.BuildDebugSnapshot(characterUUID, npcID, showTruth)
+function Knowledge.BuildDebugSnapshot(characterUUID, npcID, showTruth, detailDescriptorID)
     local note = mutableNote(characterUUID, npcID, false)
     local record = Registry and Registry.Get and Registry.Get(tostring(npcID or "")) or nil
     local rows = {}
@@ -473,26 +499,33 @@ function Knowledge.BuildDebugSnapshot(characterUUID, npcID, showTruth)
         local fact = note and note.discovered[descriptor.id] or nil
         local truth, reason
         if showTruth ~= false then truth, reason = Providers.GetTruth(record, descriptor) end
+        local evidence = note and evidenceFor(note, descriptor.id) or {}
         rows[#rows + 1] = { descriptorID = descriptor.id, category = descriptor.category, providerID = descriptor.providerID,
             resolverID = descriptor.resolverID, valueType = descriptor.valueType, privacy = descriptor.privacy,
             capabilities = deepCopy(descriptor.capabilities), discovery = deepCopy(descriptor.discovery), truth = truth,
-            truthReason = reason, known = fact and deepCopy(fact) or nil, evidence = note and evidenceFor(note, descriptor.id) or {}, orphaned = false }
+            truthReason = reason, known = fact and deepCopy(fact) or nil, evidenceCount = #evidence,
+            evidence = detailDescriptorID == descriptor.id and deepCopy(evidence) or nil, orphaned = false }
     end
     if note then
         for descriptorID in pairs(note.discovered) do
-            if not Definitions.Get(descriptorID) then rows[#rows + 1] = { descriptorID = descriptorID, orphaned = true, known = deepCopy(note.discovered[descriptorID]), evidence = evidenceFor(note, descriptorID) } end
+            if not Definitions.Get(descriptorID) then
+                local evidence = evidenceFor(note, descriptorID)
+                rows[#rows + 1] = { descriptorID = descriptorID, orphaned = true, known = deepCopy(note.discovered[descriptorID]),
+                    evidenceCount = #evidence, evidence = detailDescriptorID == descriptorID and deepCopy(evidence) or nil }
+            end
         end
     end
     table.sort(rows, function(a, b) return a.descriptorID < b.descriptorID end)
-    return { schemaVersion = SCHEMA, characterUUID = characterUUID, npcID = tostring(npcID or ""), rows = rows, revision = note and note.revision or 0 }
+    return { schemaVersion = SCHEMA, characterUUID = characterUUID, npcID = tostring(npcID or ""), rows = rows,
+        detailDescriptorID = detailDescriptorID, revision = note and note.revision or 0 }
 end
 
-function Knowledge.BuildDebugSnapshotForPlayer(player, npcID, showTruth)
+function Knowledge.BuildDebugSnapshotForPlayer(player, npcID, showTruth, detailDescriptorID)
     local characterUUID = PlayerCharacters
         and PlayerCharacters.GetCharacterUUID
         and PlayerCharacters.GetCharacterUUID(player) or nil
     if not characterUUID then return nil, "character_identity_unavailable" end
-    return Knowledge.BuildDebugSnapshot(characterUUID, npcID, showTruth)
+    return Knowledge.BuildDebugSnapshot(characterUUID, npcID, showTruth, detailDescriptorID)
 end
 
 function Knowledge.ForceRevealForPlayer(player, npcID, descriptorID, at)
@@ -520,6 +553,13 @@ function Knowledge.ExecuteDebugForPlayer(player, args)
     if not characterUUID or npcID == "" then return nil, "character_identity_unavailable" end
     if action == "reveal" or action == "force_disclosure" then
         result, reason = Knowledge.ForceRevealForPlayer(player, npcID, descriptorID, args.worldAgeHours)
+    elseif action == "reveal_all" then
+        local revealed, failures = 0, {}
+        for _, descriptor in ipairs(Definitions.List()) do
+            local forced, forceReason = Knowledge.ForceRevealForPlayer(player, npcID, descriptor.id, args.worldAgeHours)
+            if forced then revealed = revealed + 1 else failures[#failures + 1] = descriptor.id .. ":" .. tostring(forceReason) end
+        end
+        result = { revealed = revealed, failures = failures }
     elseif action == "forget" then
         result, reason = Knowledge.Clear(characterUUID, npcID, descriptorID)
     elseif action == "add_evidence" then

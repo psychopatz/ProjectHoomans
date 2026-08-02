@@ -47,7 +47,11 @@ Resolvers.Register("signed_evidence", {
             local weight = Registry.Clamp(entry.strength, 0, 1)
                 * Registry.Clamp(entry.reliability or source.reliability, 0, 1)
             if not source.bypassFamiliarity then weight = weight * familiarityMultiplier(familiarity) end
-            signed = signed + (tonumber(entry.direction) or 0) * weight
+            local direction = tonumber(entry.direction) or 0
+            if direction == 0 and source.mayConfirm and entry.payload and entry.payload.observedValue ~= nil then
+                direction = tonumber(entry.payload.observedValue) and tonumber(entry.payload.observedValue) >= .5 and 1 or -1
+            end
+            signed = signed + direction * weight
             total = total + math.abs(weight)
             confirms = confirms or source.mayConfirm == true
         end
@@ -62,7 +66,7 @@ Resolvers.Register("signed_evidence", {
 
 Resolvers.Register("categorical_votes", {
     Resolve = function(descriptor, evidence, familiarity)
-        local votes, total = {}, 0
+        local votes, total, confirms = {}, 0, false
         for _, entry in ipairs(evidence or {}) do
             local payload = entry.payload or {}
             local value = payload.observedValue
@@ -72,6 +76,7 @@ Resolvers.Register("categorical_votes", {
                 if not source.bypassFamiliarity then weight = weight * familiarityMultiplier(familiarity) end
                 votes[tostring(value)] = (votes[tostring(value)] or 0) + weight
                 total = total + weight
+                confirms = confirms or source.mayConfirm == true
             end
         end
         local value, weight
@@ -80,7 +85,7 @@ Resolvers.Register("categorical_votes", {
         end
         if not value then return nil end
         local confidence = Registry.Clamp((weight or 0) / math.max(1, total), 0, 1) * math.min(1, total)
-        local resolvedStatus = status(descriptor, confidence, false)
+        local resolvedStatus = status(descriptor, confidence, confirms)
         return resolvedStatus and { value = value, confidence = confidence, status = resolvedStatus } or nil
     end,
 })

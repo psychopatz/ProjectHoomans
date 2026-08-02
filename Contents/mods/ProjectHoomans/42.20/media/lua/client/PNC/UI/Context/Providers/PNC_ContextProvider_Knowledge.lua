@@ -7,8 +7,8 @@ local Provider = { id = "npc_knowledge" }
 
 function Provider.addOptions(menu, entry)
     menu:addOption("NPC Dossier", nil, function()
-        if PNC.NPCDossierUI and PNC.NPCDossierUI.Open then
-            PNC.NPCDossierUI.Open(entry.id)
+        if PNC.CharacterWindow and PNC.CharacterWindow.OpenDossier then
+            PNC.CharacterWindow.OpenDossier(entry.id)
         end
     end)
     if PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() then

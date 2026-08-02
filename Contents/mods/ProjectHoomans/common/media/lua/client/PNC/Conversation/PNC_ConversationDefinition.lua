@@ -275,6 +275,13 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             next = "followup",
         }
     end
+    greetingChoices[#greetingChoices + 1] = {
+        id = "view_dossier",
+        text = "View dossier",
+        response = { fallback = "Opening your notes about this survivor." },
+        action = function() Relationship.OpenDossier(npcID) end,
+        next = "greeting",
+    }
     return {
         namespace = "ProjectHoomans",
         npcID = npcID,
@@ -339,6 +346,13 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
                         response = {
                             key = "UI_PNC_Conversation_ResponseAnythingElse",
                         },
+                        next = "followup",
+                    },
+                    {
+                        id = "view_dossier",
+                        text = "View dossier",
+                        response = { fallback = "Opening your notes about this survivor." },
+                        action = function() Relationship.OpenDossier(npcID) end,
                         next = "followup",
                     },
                     {

@@ -126,6 +126,7 @@ function Client.SendDebug(action, payload)
         ClientState.knowledgeDebugAuthorized = true
         ClientState.knowledgeDebug, ClientState.knowledgeDebugReason = snapshot, reason
         if PNC.KnowledgeDebugUI and PNC.KnowledgeDebugUI.ReceiveSnapshot then PNC.KnowledgeDebugUI.ReceiveSnapshot(snapshot) end
+        if PNC.NPCDossierUI and PNC.NPCDossierUI.ReceiveDebugSnapshot then PNC.NPCDossierUI.ReceiveDebugSnapshot(snapshot) end
         return snapshot ~= nil, reason
     end
     if action == "faction_debug_action" then

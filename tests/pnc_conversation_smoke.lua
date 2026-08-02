@@ -164,8 +164,8 @@ assertEqual(definition.theme.accent.r, 1, "hostile conversation red")
 assertEqual(definition.theme.accent.g, 0.25, "hostile palette matches map")
 assertEqual(definition.lifecycle.kind, "conversation_lifecycle",
     "conversation safety lifecycle attached")
-assertEqual(#definition.nodes.greeting.choices, 2,
-    "hostile conversation uses ceasefire choices")
+assertEqual(#definition.nodes.greeting.choices, 3,
+    "hostile conversation includes dossier access")
 assert(definition.nodes.greeting.npc.key:find("Lover_Twilight", 1, true),
     "time greeting selected")
 assertEqual(
@@ -203,8 +203,8 @@ local neutralDefinition = PNC.Conversation.BuildDefinition({
     name = "Neutral NPC",
     snapshot = { faction = "neutral" },
 }, {}, "twilight")
-assertEqual(#neutralDefinition.nodes.greeting.choices, 3,
-    "neutral conversation retains normal choices")
+assertEqual(#neutralDefinition.nodes.greeting.choices, 4,
+    "neutral conversation includes dossier access")
 
 local debugActions = {}
 local openedLaboratoryFor
@@ -233,7 +233,7 @@ local debugDefinition = PNC.Conversation.BuildDefinition({
     name = "Debug NPC",
     snapshot = { faction = "neutral" },
 }, {}, "twilight")
-assertEqual(#debugDefinition.nodes.greeting.choices, 4,
+assertEqual(#debugDefinition.nodes.greeting.choices, 5,
     "debug conversation exposes relationship tools")
 assertEqual(#debugDefinition.nodes.debug_relationship.choices, 5,
     "debug relationship hub exposes every tool")

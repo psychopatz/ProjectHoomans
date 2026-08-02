@@ -611,7 +611,8 @@ local function onClientCommand(module, command, player, args)
         local reason
         if PNC.NPCKnowledge and PNC.NPCKnowledge.BuildDebugSnapshotForPlayer then
             snapshot, reason = PNC.NPCKnowledge.BuildDebugSnapshotForPlayer(
-                player, args and args.npcID, args and args.showTruth ~= false
+                player, args and args.npcID, args and args.showTruth ~= false,
+                args and args.descriptorID
             )
         else
             reason = "knowledge_service_unavailable"

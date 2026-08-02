@@ -66,18 +66,38 @@ eq(normal.truth, nil, "normal snapshot contains no truth")
 dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Knowledge/PNC_KnowledgePresentation.lua")
 local dossierRows = PNC.KnowledgePresentation.BuildDossierRows(normal)
 truth(#dossierRows > 0, "generic dossier model displays discovered descriptors")
+local dossierModel = PNC.KnowledgePresentation.BuildDossierModel(normal)
+truth(#dossierModel.tabs > 1 and dossierModel.tabs[1].id == "overview",
+    "dossier tabs are generated from safe descriptor categories")
 local debug = Knowledge.BuildDebugSnapshot("char_a", npc.id, true)
 local found = false
 for _, row in ipairs(debug.rows) do if row.descriptorID == "personality.compassion" then found = row.truth == .82 end end
 truth(found, "debug snapshot is descriptor driven and can show truth")
 truth(#PNC.KnowledgePresentation.BuildDebugRows(debug, { showTruth = true }) >= 13,
     "generic debug model displays registered descriptors")
+for _, row in ipairs(debug.rows) do
+    eq(row.evidence, nil, "debug summary defers raw evidence")
+end
+local debugDetail = Knowledge.BuildDebugSnapshot("char_a", npc.id, true, "personality.compassion")
+local detailedEvidence = nil
+for _, row in ipairs(debugDetail.rows) do
+    if row.descriptorID == "personality.compassion" then detailedEvidence = row.evidence end
+end
+truth(type(detailedEvidence) == "table", "debug detail request includes selected evidence only")
 local debugAction = Knowledge.ExecuteDebugForPlayer({}, {
     knowledgeAction = "add_evidence", npcID = npc.id,
     descriptorID = "personality.bravery", direction = 1, strength = 1,
 })
 truth(debugAction and debugAction.actionResult ~= nil,
     "generic debug action uses separate outer and inner action identifiers")
+local revealAll = Knowledge.ExecuteDebugForPlayer({}, {
+    knowledgeAction = "reveal_all", npcID = npc.id, showTruth = false,
+})
+truth(revealAll and revealAll.actionResult and revealAll.actionResult.revealed >= 13,
+    "debug reveal-all discovers the registered trait descriptors")
+local debugCompassion = Knowledge.GetDescriptor("char_a", npc.id, "personality.compassion")
+eq(debugCompassion.status, "confirmed", "debug discovery confirms numeric trait bands")
+eq(debugCompassion.value, "high", "debug discovery resolves numeric trait direction")
 for index = 1, 20 do
     Knowledge.RecordEvidence({ characterUUID = "char_a", npcID = npc.id, descriptorID = "personality.loyalty",
         sourceType = "observed_behavior", direction = 1, strength = .4, worldAgeHours = 40 + index })

@@ -86,6 +86,30 @@ PsychopatzCore.DebugHub.RegisterTool({
 })
 
 PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.knowledge",
+    source = "ProjectHoomans",
+    order = 211,
+    title = "NPC Knowledge Lab",
+    description = "Compare NPC truth with one character's discovered notes and evidence.",
+    available = function()
+        return PNC and PNC.KnowledgeDebugUI and PNC.KnowledgeDebugUI.Open
+            and PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        local roster = PNC.Network and PNC.Network.ClientState and PNC.Network.ClientState.debugRoster or {}
+        local npcID = roster[1] and roster[1].id or nil
+        if not npcID then
+            for id in pairs(PNC.Network and PNC.Network.ClientState
+                and PNC.Network.ClientState.snapshots or {}) do
+                npcID = id
+                break
+            end
+        end
+        if npcID then PNC.KnowledgeDebugUI.Open(npcID) end
+    end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.factions",
     source = "ProjectHoomans",
     order = 220,

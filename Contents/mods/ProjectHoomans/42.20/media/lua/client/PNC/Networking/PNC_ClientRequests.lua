@@ -192,11 +192,11 @@ function Client.RequestNPCKnowledge(npcID)
     return snapshot ~= nil, reason
 end
 
-function Client.RequestKnowledgeDebug(npcID, showTruth)
+function Client.RequestKnowledgeDebug(npcID, showTruth, descriptorID)
     if not Client.CanUseDebug() then return false, "not_authorized" end
     npcID = tostring(npcID or "")
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
-    local args = { npcID = npcID, showTruth = showTruth ~= false }
+    local args = { npcID = npcID, showTruth = showTruth ~= false, descriptorID = descriptorID }
     ClientState.lastKnowledgeDebugRequestAt = Core.Now()
     if Core.IsClientOnly and Core.IsClientOnly() then
         if player and sendClientCommand then
@@ -206,7 +206,7 @@ function Client.RequestKnowledgeDebug(npcID, showTruth)
         return false, "player_unavailable"
     end
     if not PNC.NPCKnowledge or not PNC.NPCKnowledge.BuildDebugSnapshotForPlayer then return false, "knowledge_service_unavailable" end
-    local snapshot, reason = PNC.NPCKnowledge.BuildDebugSnapshotForPlayer(player, npcID, args.showTruth)
+    local snapshot, reason = PNC.NPCKnowledge.BuildDebugSnapshotForPlayer(player, npcID, args.showTruth, descriptorID)
     ClientState.knowledgeDebugAuthorized = true
     ClientState.knowledgeDebug, ClientState.knowledgeDebugReason = snapshot, reason
     if PNC.KnowledgeDebugUI and PNC.KnowledgeDebugUI.ReceiveSnapshot then PNC.KnowledgeDebugUI.ReceiveSnapshot(snapshot) end

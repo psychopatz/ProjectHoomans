@@ -191,4 +191,11 @@ function Relationship.OpenLaboratory(npcID)
     return nil
 end
 
+function Relationship.OpenDossier(npcID)
+    if PNC.NPCDossierUI and PNC.NPCDossierUI.Open then
+        return PNC.NPCDossierUI.Open(npcID)
+    end
+    return nil
+end
+
 return Relationship

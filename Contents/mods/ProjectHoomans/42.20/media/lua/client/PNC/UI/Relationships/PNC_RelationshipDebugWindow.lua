@@ -168,6 +168,14 @@ function ISPNCRelationshipDebugWindow:createChildren()
         variant = "quiet",
     })
     self.controls[#self.controls + 1] = self.refreshButton
+    self.knowledgeButton = UI.CreateButton(self, {
+        id = "knowledge_notes",
+        title = "Knowledge / Notes",
+        target = self,
+        onclick = ISPNCRelationshipDebugWindow.onKnowledge,
+        variant = "quiet",
+    })
+    self.controls[#self.controls + 1] = self.knowledgeButton
     for _, definition in ipairs(EVENTS) do
         local button = UI.CreateButton(self, {
             id = definition.id,
@@ -651,6 +659,13 @@ end
 function ISPNCRelationshipDebugWindow:onRefresh()
     self:requestRoster()
     self:requestRelationship()
+end
+
+function ISPNCRelationshipDebugWindow:onKnowledge()
+    local observer = self:getObserver()
+    if observer and PNC.KnowledgeDebugUI and PNC.KnowledgeDebugUI.Open then
+        PNC.KnowledgeDebugUI.Open(observer.id)
+    end
 end
 
 function ISPNCRelationshipDebugWindow:onTrigger(button)

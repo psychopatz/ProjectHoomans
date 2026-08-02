@@ -14,6 +14,7 @@ local Layout = UI.Layout
 
 local TAB_ORDER = {
     { id = "Info", label = "Info" },
+    { id = "Dossier", label = "Dossier" },
     { id = "Skills", label = "Skills" },
     { id = "Health", label = "Health" },
     { id = "Protection", label = "Protection" },
@@ -171,6 +172,9 @@ function ISPNCCharacterWindow:setNPC(npcId)
     if PNC.Client and PNC.Client.RequestCharacterPayload and self.npcId then
         PNC.Client.RequestCharacterPayload(self.npcId)
     end
+    if PNC.Client and PNC.Client.RequestNPCKnowledge and self.npcId then
+        PNC.Client.RequestNPCKnowledge(self.npcId)
+    end
 end
 
 function ISPNCCharacterWindow:updateSnapshot()
@@ -181,6 +185,8 @@ function ISPNCCharacterWindow:updateSnapshot()
         tostring(snapshot and snapshot.inventorySummary and snapshot.inventorySummary.revision or 0),
         tostring(payload and payload.revision or 0),
         tostring(payload and payload.inventory and payload.inventory.revision or 0),
+        tostring(ClientState.npcKnowledge and ClientState.npcKnowledge[self.npcId]
+            and ClientState.npcKnowledge[self.npcId].revision or 0),
     }, "|")
     self.snapshot = snapshot
     self.payload = payload
@@ -238,6 +244,21 @@ function CharacterWindow.Toggle(npcId)
     window:setVisible(true)
     window:setNPC(npcId)
     window:bringToTop()
+    return window
+end
+
+function CharacterWindow.ReceiveKnowledgeSnapshot(snapshot)
+    local window = CharacterWindow.instance
+    if window and snapshot and tostring(snapshot.npcID) == tostring(window.npcId) then
+        window:refreshViews()
+    end
+end
+
+function CharacterWindow.OpenDossier(npcId)
+    local window = CharacterWindow.Toggle(npcId)
+    if window and window.tabPanel and window.tabPanel.activateViewById then
+        window.tabPanel:activateViewById("Dossier")
+    end
     return window
 end
 
