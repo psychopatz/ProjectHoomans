@@ -133,6 +133,41 @@ function Client.RequestRelationshipDebug(
     return snapshot ~= nil
 end
 
+function Client.RequestConversationRelationship(npcID)
+    npcID = tostring(npcID or "")
+    if npcID == "" then return false, "invalid_npc_id" end
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    ClientState.lastConversationRelationshipRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE,
+                Const.CMD_CONVERSATION_RELATIONSHIP_REQUEST,
+                { npcID = npcID })
+            return true
+        end
+        return false, "player_unavailable"
+    end
+    if not PNC.RelationshipPresentation
+        or not PNC.RelationshipPresentation.BuildForConversation
+    then
+        return false, "presentation_unavailable"
+    end
+    local presentation = PNC.RelationshipPresentation
+    local summary, reason = presentation.BuildForConversation(player, npcID)
+    if summary then
+        ClientState.conversationRelationships =
+            ClientState.conversationRelationships or {}
+        ClientState.conversationRelationships[npcID] = summary
+        ClientState.lastConversationRelationshipReceiveAt = Core.Now()
+        local relationship = PNC.Conversation
+            and PNC.Conversation.Relationship
+        if relationship and relationship.ReceivePresentation then
+            relationship.ReceivePresentation(summary)
+        end
+    end
+    return summary ~= nil, reason
+end
+
 function Client.RequestFactionDebug(
     factionID,
     npcID,

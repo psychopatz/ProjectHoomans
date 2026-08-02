@@ -572,6 +572,22 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_CONVERSATION_RELATIONSHIP_REQUEST then
+        local summary
+        local reason
+        local presentation = PNC.RelationshipPresentation
+        if presentation and presentation.BuildForConversation then
+            summary, reason = presentation.BuildForConversation(
+                player,
+                args and args.npcID
+            )
+        else
+            reason = "presentation_unavailable"
+        end
+        Network.SendConversationRelationship(player, summary, reason)
+        return
+    end
+
     if command == Const.CMD_FACTION_DEBUG_REQUEST then
         if not canUseDebug(player) then
             Network.SendFactionDebug(
@@ -684,6 +700,17 @@ local function onClientCommand(module, command, player, args)
             true,
             reason
         )
+        return
+    end
+
+    if args and args.action == "conversation_relationship_standing" then
+        local summary
+        local reason
+        summary, reason = PNC.RelationshipDebug.SetConversationStanding(
+            player,
+            args
+        )
+        Network.SendConversationRelationship(player, summary, reason)
         return
     end
 

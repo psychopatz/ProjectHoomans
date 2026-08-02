@@ -63,6 +63,10 @@ function ISPNCRelationshipGraphPanel:setEvaluation(evaluation)
     end
 end
 
+function ISPNCRelationshipGraphPanel:setGraphOnly(enabled)
+    self.graphOnly = enabled == true
+end
+
 function ISPNCRelationshipGraphPanel:drawColorRect(
     x,
     y,
@@ -236,27 +240,29 @@ function ISPNCRelationshipGraphPanel:render()
         0,
         "inspect"
     )
-    local top = 28
-    local graphSize = math.max(
-        120,
-        math.min(self.width - 24, self.height - 154)
-    )
+    local graphOnly = self.graphOnly == true
+    local top = graphOnly and 0 or 28
+    local graphSize = graphOnly
+        and math.max(2, math.min(self.width, self.height))
+        or math.max(120, math.min(self.width - 24, self.height - 154))
     local graphX = math.floor((self.width - graphSize) / 2)
     local graphY = top
     local half = graphSize / 2
     self:drawColorRect(
         0, 0, self.width, self.height, COLORS.background
     )
-    self:drawTextCentre(
-        tostring(evaluation.requirement.label),
-        self.width / 2,
-        6,
-        0.90,
-        0.93,
-        0.95,
-        1,
-        UIFont.Small
-    )
+    if not graphOnly then
+        self:drawTextCentre(
+            tostring(evaluation.requirement.label),
+            self.width / 2,
+            6,
+            0.90,
+            0.93,
+            0.95,
+            1,
+            UIFont.Small
+        )
+    end
     self:drawColorRect(graphX, graphY, half, half, COLORS.pity)
     self:drawColorRect(
         graphX + half, graphY, half, half, COLORS.admire
@@ -325,16 +331,6 @@ function ISPNCRelationshipGraphPanel:render()
             UIFont.Small
         )
     end
-    self:drawTextCentre(
-        "RESPECT  -100                                      +100",
-        self.width / 2,
-        graphY + graphSize + 7,
-        0.62,
-        0.68,
-        0.73,
-        1,
-        UIFont.Small
-    )
     local markerX, markerY = Graph.RelationshipToScreen(
         evaluation.approval,
         evaluation.respect,
@@ -344,70 +340,82 @@ function ISPNCRelationshipGraphPanel:render()
         graphSize
     )
     self:drawDiamond(markerX, markerY)
-    local summaryY = graphY + graphSize + 29
-    self:drawText(
-        "Attitude: " .. capitalize(evaluation.attitude)
-            .. "   Approval " .. signed(evaluation.approval)
-            .. "   Respect " .. signed(evaluation.respect),
-        10,
-        summaryY,
-        0.90,
-        0.93,
-        0.95,
-        1,
-        UIFont.Small
-    )
-    local resultText = evaluation.requirement.enabled
-        and (
-            "Score " .. signed(evaluation.finalScore)
-            .. " / threshold "
-            .. signed(evaluation.threshold)
-            .. " / inside green: "
-            .. tostring(evaluation.insideSuccessRegion)
-        ) or "Green region disabled for relationship-only inspection"
-    self:drawText(
-        resultText,
-        10,
-        summaryY + 20,
-        evaluation.insideSuccessRegion and 0.35 or 0.72,
-        evaluation.insideSuccessRegion and 0.90 or 0.74,
-        evaluation.insideSuccessRegion and 0.45 or 0.76,
-        1,
-        UIFont.Small
-    )
-    self:drawText(
-        "Context " .. signed(evaluation.contextBonus)
-            .. "   Base " .. signed(evaluation.baseScore),
-        10,
-        summaryY + 40,
-        0.62,
-        0.68,
-        0.73,
-        1,
-        UIFont.Small
-    )
-    local modifierY = summaryY + 60
-    for index = 1, math.min(2, #(evaluation.modifiers or {})) do
-        local modifier = evaluation.modifiers[index]
-        self:drawText(
-            signed(modifier.value) .. " " .. modifier.label,
-            10,
-            modifierY + (index - 1) * 18,
-            modifier.value >= 0 and 0.42 or 0.93,
-            modifier.value >= 0 and 0.82 or 0.52,
-            modifier.value >= 0 and 0.48 or 0.45,
+    if not graphOnly then
+        self:drawTextCentre(
+            "RESPECT  -100                                      +100",
+            self.width / 2,
+            graphY + graphSize + 7,
+            0.62,
+            0.68,
+            0.73,
             1,
             UIFont.Small
         )
+        local summaryY = graphY + graphSize + 29
+        self:drawText(
+            "Attitude: " .. capitalize(evaluation.attitude)
+                .. "   Approval " .. signed(evaluation.approval)
+                .. "   Respect " .. signed(evaluation.respect),
+            10,
+            summaryY,
+            0.90,
+            0.93,
+            0.95,
+            1,
+            UIFont.Small
+        )
+        local resultText = evaluation.requirement.enabled
+            and (
+                "Score " .. signed(evaluation.finalScore)
+                .. " / threshold "
+                .. signed(evaluation.threshold)
+                .. " / inside green: "
+                .. tostring(evaluation.insideSuccessRegion)
+            ) or "Green region disabled for relationship-only inspection"
+        self:drawText(
+            resultText,
+            10,
+            summaryY + 20,
+            evaluation.insideSuccessRegion and 0.35 or 0.72,
+            evaluation.insideSuccessRegion and 0.90 or 0.74,
+            evaluation.insideSuccessRegion and 0.45 or 0.76,
+            1,
+            UIFont.Small
+        )
+        self:drawText(
+            "Context " .. signed(evaluation.contextBonus)
+                .. "   Base " .. signed(evaluation.baseScore),
+            10,
+            summaryY + 40,
+            0.62,
+            0.68,
+            0.73,
+            1,
+            UIFont.Small
+        )
+        local modifierY = summaryY + 60
+        for index = 1, math.min(2, #(evaluation.modifiers or {})) do
+            local modifier = evaluation.modifiers[index]
+            self:drawText(
+                signed(modifier.value) .. " " .. modifier.label,
+                10,
+                modifierY + (index - 1) * 18,
+                modifier.value >= 0 and 0.42 or 0.93,
+                modifier.value >= 0 and 0.82 or 0.52,
+                modifier.value >= 0 and 0.48 or 0.45,
+                1,
+                UIFont.Small
+            )
+        end
+        self:drawHover(
+            graphX,
+            graphY,
+            graphSize,
+            markerX,
+            markerY,
+            evaluation
+        )
     end
-    self:drawHover(
-        graphX,
-        graphY,
-        graphSize,
-        markerX,
-        markerY,
-        evaluation
-    )
 end
 
 function ISPNCRelationshipGraphPanel:new(x, y, width, height)
@@ -415,6 +423,7 @@ function ISPNCRelationshipGraphPanel:new(x, y, width, height)
     setmetatable(object, self)
     self.__index = self
     object.evaluation = Graph.Evaluate(0, 0, "inspect")
+    object.graphOnly = false
     return object
 end
 

@@ -43,6 +43,24 @@ Internal.RegisterServerCommand(
 )
 
 Internal.RegisterServerCommand(
+    Const.CMD_CONVERSATION_RELATIONSHIP,
+    function(args)
+        local summary = args.summary
+        if type(summary) ~= "table" or not summary.npcID then return end
+        ClientState.conversationRelationships =
+            ClientState.conversationRelationships or {}
+        ClientState.conversationRelationships[tostring(summary.npcID)] =
+            summary
+        ClientState.lastConversationRelationshipReceiveAt = Core.Now()
+        local relationship = PNC.Conversation
+            and PNC.Conversation.Relationship
+        if relationship and relationship.ReceivePresentation then
+            relationship.ReceivePresentation(summary)
+        end
+    end
+)
+
+Internal.RegisterServerCommand(
     Const.CMD_FACTION_DEBUG,
     function(args)
         ClientState.factionDebugAuthorized =

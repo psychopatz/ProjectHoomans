@@ -5,6 +5,7 @@ PNC.RelationshipDebugModel = PNC.RelationshipDebugModel or {}
 
 local Model = PNC.RelationshipDebugModel
 local Graph = PNC.RelationshipGraph
+local Presentation = PNC.RelationshipPresentation
 
 local function row(label, value, tone)
     return {
@@ -232,7 +233,7 @@ end
 
 function Model.BuildGraph(snapshot, actionID, context)
     local relationship = snapshot and snapshot.relationship or {}
-    if not Graph or not Graph.Evaluate then return nil end
+    if not Presentation or not Presentation.BuildEvaluation then return nil end
     context = type(context) == "table" and context or {}
     local modifiers = {}
     local profile = snapshot and snapshot.observer
@@ -288,9 +289,8 @@ function Model.BuildGraph(snapshot, actionID, context)
         "Manual debug context",
         context.bonus
     )
-    return Graph.Evaluate(
-        relationship.approval,
-        relationship.respect,
+    return Presentation.BuildEvaluation(
+        Presentation.Summarize(relationship, relationship.exists == true),
         actionID or "inspect",
         {
             modifiers = modifiers,

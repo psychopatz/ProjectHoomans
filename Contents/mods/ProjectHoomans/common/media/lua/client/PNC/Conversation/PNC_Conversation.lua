@@ -3,6 +3,7 @@ require "PNC/Conversation/PNC_ConversationFactionEmblem"
 require "PNC/Conversation/PNC_ConversationTime"
 require "PNC/Conversation/Content/PNC_ConversationRegistry"
 require "PNC/Conversation/PNC_ConversationRelationship"
+require "PNC/Conversation/PNC_ConversationRelationshipPanel"
 require "PNC/Conversation/PNC_ConversationLifecycle"
 require "PNC/UI/PNC_NPCTypePalette"
 

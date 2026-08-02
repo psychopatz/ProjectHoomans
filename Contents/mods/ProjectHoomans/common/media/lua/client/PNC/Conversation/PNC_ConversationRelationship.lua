@@ -11,6 +11,11 @@ Relationship.categories = {
     Lover = true,
 }
 
+-- Kept on during development. Gameplay can disable this before opening a
+-- conversation, then reveal it in a dialogue branch such as "What do you
+-- think of me?" without changing the relationship data flow.
+Relationship.presentationVisible = Relationship.presentationVisible ~= false
+
 local aliases = {
     firstmeet = "FirstMeet",
     first_meet = "FirstMeet",
@@ -79,6 +84,65 @@ function Relationship.Resolve(entry, player)
     local key = playerKey(player)
     if key and knownBy[key] == true then return "Acquaintance" end
     return Relationship.Normalize(value)
+end
+
+function Relationship.GetPresentation(npcID)
+    local state = PNC.Network and PNC.Network.ClientState or {}
+    return state.conversationRelationships
+        and state.conversationRelationships[tostring(npcID or "")]
+        or nil
+end
+
+function Relationship.ReceivePresentation(summary)
+    if type(summary) ~= "table" or not summary.npcID then return false end
+    local view = PsychopatzCore
+        and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.instance or nil
+    if view and view.spec
+        and tostring(view.spec.npcID or "") == tostring(summary.npcID)
+        and view.extensionParts
+        and view.extensionParts.relationship
+        and view.extensionParts.relationship.setRelationship
+    then
+        view.extensionParts.relationship:setRelationship(summary)
+    end
+    return true
+end
+
+function Relationship.RequestPresentation(npcID)
+    if PNC.Client and PNC.Client.RequestConversationRelationship then
+        return PNC.Client.RequestConversationRelationship(npcID)
+    end
+    return false, "presentation_unavailable"
+end
+
+function Relationship.IsPresentationVisible()
+    return Relationship.presentationVisible ~= false
+end
+
+function Relationship.SetPresentationVisible(visible)
+    Relationship.presentationVisible = visible == true
+    local view = PsychopatzCore
+        and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.instance or nil
+    local panel = view and view.extensionParts
+        and view.extensionParts.relationship or nil
+    if panel and panel.setVisible then
+        panel:setVisible(Relationship.IsPresentationVisible())
+    end
+end
+
+function Relationship.ApplyDebugStanding(npcID, standingID)
+    if not PNC.Client or not PNC.Client.CanUseDebug
+        or not PNC.Client.CanUseDebug()
+        or not PNC.Client.SendDebug
+    then
+        return false, "not_authorized"
+    end
+    return PNC.Client.SendDebug("conversation_relationship_standing", {
+        observerNPCID = tostring(npcID or ""),
+        standingID = tostring(standingID or ""),
+    })
 end
 
 return Relationship

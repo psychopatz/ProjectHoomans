@@ -65,6 +65,33 @@ function Client.SendDebug(action, payload)
         ClientState.lastRelationshipDebugReceiveAt = Core.Now()
         return snapshot ~= nil, reason
     end
+    if action == "conversation_relationship_standing" then
+        local summary
+        local reason
+        if not PNC.RelationshipDebug
+            or not PNC.RelationshipDebug.SetConversationStanding
+        then
+            return false
+        end
+        summary, reason = PNC.RelationshipDebug.SetConversationStanding(
+            player,
+            args
+        )
+        if summary then
+            ClientState.conversationRelationships =
+                ClientState.conversationRelationships or {}
+            ClientState.conversationRelationships[
+                tostring(summary.npcID)
+            ] = summary
+            ClientState.lastConversationRelationshipReceiveAt = Core.Now()
+            local relationship = PNC.Conversation
+                and PNC.Conversation.Relationship
+            if relationship and relationship.ReceivePresentation then
+                relationship.ReceivePresentation(summary)
+            end
+        end
+        return summary ~= nil, reason
+    end
     if action == "faction_debug_action" then
         local snapshot
         if not PNC.FactionDebug

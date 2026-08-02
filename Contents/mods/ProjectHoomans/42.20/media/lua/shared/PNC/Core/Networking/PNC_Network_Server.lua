@@ -484,6 +484,29 @@ function Network.SendRelationshipDebug(
     end
 end
 
+function Network.SendConversationRelationship(targetPlayer, summary, reason)
+    local payload = {
+        summary = summary,
+        reason = reason,
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(
+            targetPlayer,
+            Const.MODULE,
+            Const.CMD_CONVERSATION_RELATIONSHIP,
+            payload
+        )
+    elseif not isServer or not isServer() then
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_CONVERSATION_RELATIONSHIP,
+            payload
+        )
+    end
+end
+
 function Network.SendFactionDebug(
     targetPlayer,
     snapshot,

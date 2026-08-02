@@ -4,6 +4,9 @@ local FILE =
 local MODEL =
     "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
     .. "UI/Relationships/PNC_RelationshipDebugModel.lua"
+local PRESENTATION =
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    .. "Relationships/PNC_RelationshipPresentation.lua"
 
 local function equal(actual, expected, label)
     if actual ~= expected then
@@ -19,8 +22,26 @@ end
 
 PNC = {}
 dofile(FILE)
+dofile(PRESENTATION)
 
 local Graph = PNC.RelationshipGraph
+local Presentation = PNC.RelationshipPresentation
+
+local summary = Presentation.Summarize({
+    approval = 25,
+    respect = -30,
+    familiarity = 7,
+    state = "wary",
+    revision = 4.9,
+}, true)
+equal(summary.approval, 25, "presentation retains approval")
+equal(summary.respect, -30, "presentation retains respect")
+equal(summary.revision, 4, "presentation normalizes revision")
+equal(
+    Presentation.BuildEvaluation(summary, "inspect").attitude,
+    "pity",
+    "presentation uses shared attitude graph"
+)
 
 equal(Graph.ResolveAttitude(40, 40), "admire",
     "positive approval and respect")

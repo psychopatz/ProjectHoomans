@@ -329,6 +329,74 @@ function Relationships.GetOrCreate(observerNPCID, targetKey)
     ), rawRelationship == nil and "created" or "existing"
 end
 
+-- Debug-only preset support. The server command that calls this is admin
+-- gated; keeping it here still preserves normal relationship commit, revision,
+-- faction-notification, and persistence behavior.
+function Relationships.DebugSetStanding(
+    observerNPCID,
+    targetKey,
+    standing,
+    worldAgeHours
+)
+    local record
+    local reason
+    local social
+    local socialChanged
+    local rawRelationship
+    local relationship
+    if not isAuthority() then return nil, "not_authority" end
+    if type(standing) ~= "table" then return nil, "invalid_standing" end
+    worldAgeHours = finiteNumber(worldAgeHours)
+    if worldAgeHours == nil or worldAgeHours < 0 then
+        return nil, "invalid_world_age_hours"
+    end
+    record, reason = resolveObserver(observerNPCID)
+    if not record then return nil, reason end
+    targetKey, reason = validateTarget(targetKey)
+    if not targetKey then return nil, reason end
+    social, socialChanged = prepareSocial(record)
+    rawRelationship = getRelationship(record, targetKey)
+    relationship = rawRelationship
+        and Types.NormalizeRelationship(rawRelationship, targetKey)
+        or Types.NewRelationship(targetKey)
+    relationship.baselineApproval = Math.Clamp(
+        standing.approval,
+        Constants.APPROVAL_MIN,
+        Constants.APPROVAL_MAX
+    )
+    relationship.baselineRespect = Math.Clamp(
+        standing.respect,
+        Constants.RESPECT_MIN,
+        Constants.RESPECT_MAX
+    )
+    relationship.familiarity = Math.Clamp(
+        standing.familiarity == nil and 100 or standing.familiarity,
+        Constants.FAMILIARITY_MIN,
+        Constants.FAMILIARITY_MAX
+    )
+    relationship.memories = {}
+    relationship.cooldowns = {}
+    relationship.saturation = {}
+    relationship = Math.RecalculateRelationship(
+        relationship,
+        targetKey,
+        worldAgeHours
+    )
+    commit(
+        record,
+        social,
+        targetKey,
+        relationship,
+        socialChanged or not Types.AreEqual(rawRelationship, relationship),
+        worldAgeHours,
+        { kind = "debug_standing_set" }
+    )
+    return Types.NormalizeRelationship(
+        record.social.relationships[targetKey],
+        targetKey
+    )
+end
+
 local function getNumeric(observerNPCID, targetKey, field)
     local relationship
     local reason

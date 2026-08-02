@@ -531,6 +531,43 @@ function Debug.BuildSnapshotForRequest(player, args, actionResult)
     )
 end
 
+function Debug.SetConversationStanding(player, args)
+    local at = worldAgeHours()
+    local observerNPCID = tostring(args and args.observerNPCID or "")
+    local observer = Registry and Registry.Get
+        and Registry.Get(observerNPCID) or nil
+    local targetKey
+    local target
+    local reason
+    local preset = PNC.RelationshipPresentation
+        and PNC.RelationshipPresentation.GetDebugStandingPreset
+        and PNC.RelationshipPresentation.GetDebugStandingPreset(
+            args and args.standingID
+        ) or nil
+    if not observer or observer.alive == false then
+        return nil, "observer_not_found"
+    end
+    if not preset then return nil, "invalid_standing" end
+    targetKey, target, reason = resolveTarget(player, {
+        targetKind = "current_player",
+    }, at)
+    if not targetKey then return nil, reason end
+    local relationship
+    relationship, reason = Relationships.DebugSetStanding(
+        observer.id,
+        targetKey,
+        preset,
+        at
+    )
+    if not relationship then return nil, reason end
+    local summary = PNC.RelationshipPresentation.Summarize(
+        relationship,
+        true
+    )
+    summary.npcID = tostring(observer.id)
+    return summary
+end
+
 function Debug.TriggerSocialEvent(player, args)
     local eventType = tostring(args and args.eventType or "")
     local sourceSystem = DEBUG_EVENTS[eventType]

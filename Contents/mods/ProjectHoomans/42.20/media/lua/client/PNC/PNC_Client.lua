@@ -59,6 +59,7 @@ local function onResetLua()
     ClientState.relationshipDebug = nil
     ClientState.relationshipDebugAuthorized = false
     ClientState.relationshipDebugReason = nil
+    ClientState.conversationRelationships = {}
     ClientState.factionDebug = nil
     ClientState.factionDebugAuthorized = false
     ClientState.factionDebugReason = nil

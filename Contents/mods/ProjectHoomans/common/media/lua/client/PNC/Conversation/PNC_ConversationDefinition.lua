@@ -117,7 +117,9 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
     )
     local faction = factionPresentation(entry)
     local aggressive = isAggressive(entry)
+    local relationshipPresentation = Relationship.GetPresentation(npcID)
     local greetingChoices
+    local debugStandingChoices = {}
     if aggressive then
         greetingChoices = {
             {
@@ -168,6 +170,44 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             },
         }
     end
+    if PNC.Client and PNC.Client.CanUseDebug
+        and PNC.Client.CanUseDebug()
+    then
+        local standingOrder = {
+            "admire", "pity", "fear", "despise", "indifferent",
+        }
+        greetingChoices[#greetingChoices + 1] = {
+            id = "debug_relationship",
+            text = "DEBUG: Set their opinion of me",
+            next = "debug_relationship",
+        }
+        for _, standingID in ipairs(standingOrder) do
+            local preset = PNC.RelationshipPresentation
+                and PNC.RelationshipPresentation.GetDebugStandingPreset
+                and PNC.RelationshipPresentation.GetDebugStandingPreset(
+                    standingID
+                ) or nil
+            if preset then
+                local selectedID = standingID
+                debugStandingChoices[#debugStandingChoices + 1] = {
+                    id = "debug_standing_" .. selectedID,
+                    text = "DEBUG: " .. tostring(preset.label),
+                    response = {
+                        fallback = "Debug relationship standing updated.",
+                    },
+                    action = function()
+                        Relationship.ApplyDebugStanding(npcID, selectedID)
+                    end,
+                    next = "debug_relationship",
+                }
+            end
+        end
+        debugStandingChoices[#debugStandingChoices + 1] = {
+            id = "debug_back",
+            text = "Back",
+            next = "followup",
+        }
+    end
     return {
         namespace = "ProjectHoomans",
         npcID = npcID,
@@ -193,6 +233,16 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             factionEmblem = faction and faction.emblem or nil,
             npcType = Palette.ResolveType(entry),
             allowHostileParley = aggressive,
+        },
+        extensionParts = {
+            {
+                partID = "relationship",
+                factory = Conversation.CreateRelationshipPanel,
+                relationship = relationshipPresentation,
+                visible = Relationship.IsPresentationVisible(),
+                title = { fallback = "CURRENT RELATION" },
+                editLabel = { fallback = "Current relation" },
+            },
         },
         lifecycle = Lifecycle.Create(),
         start = "greeting",
@@ -234,14 +284,23 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
                     },
                 },
             },
+            debug_relationship = {
+                npc = {
+                    fallback = "Debug: set this NPC's opinion of the current player.",
+                },
+                choices = debugStandingChoices,
+            },
         },
     }
 end
 
 function Conversation.Open(entry, player, forcedTime)
-    return PsychopatzCore.Conversation.Open(
-        Conversation.BuildDefinition(entry, player, forcedTime)
+    local definition = Conversation.BuildDefinition(entry, player, forcedTime)
+    local view = PsychopatzCore.Conversation.Open(
+        definition
     )
+    Relationship.RequestPresentation(definition.npcID)
+    return view
 end
 
 return Conversation
