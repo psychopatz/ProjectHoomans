@@ -408,6 +408,9 @@ function ISPNCFactionDebugWindow:onAction(button)
     end
     if internal == "overlay" then
         local visible = PNC.FactionDebugOverlay.Toggle()
+        if PNC.MapDisplay and PNC.MapDisplay.SetBasesVisible then
+            PNC.MapDisplay.SetBasesVisible(visible)
+        end
         if visible then
             PNC.FactionDebugOverlay.SetSelection(
                 faction and faction.id,

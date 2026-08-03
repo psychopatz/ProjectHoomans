@@ -363,9 +363,11 @@ tie-breaking, member counts, and community-party seeds all derive from that
 world seed plus generation type, sector, and serial. Weighted choices are
 therefore varied between worlds but repeatable inside the same save.
 
-Commit creates a canonical mobile faction, delegates canonical abstract NPC
-creation to `PNC.MobileGroupDirector` with an explicit bounded site and forced
-abstract presence, then imports the result through `PNC.AbstractGroups`. The
+Commit creates a canonically named/tagged mobile faction and delegates NPC
+creation to `PNC.MobileGroupDirector` with an explicit bounded site and `auto`
+presence, then imports the result through `PNC.AbstractGroups`. An unloaded site
+starts abstract, but its members remain eligible for the normal range-enter
+materialization pipeline when a player visits. The
 legacy mobile Director remains a relocation/helper layer; it is not a second
 automatic population generator. Failed canonical creation rolls back members
 and a newly created faction. Successful groups enter the existing traversal,
@@ -389,8 +391,11 @@ non-player, non-mobile faction when possible; otherwise it creates one canonical
 faction from an existing archetype. Commit revalidates the plan, delegates
 community/site/member/leader ownership to `PNC.CommunityDirector`, promotes the
 existing Abstract Location to `SETTLEMENT`, updates indexes and provenance, and
-emits the population event. Initial members are small, canonical, abstract NPC
-records. Patrol/scavenge groups are not created in that transaction.
+emits the population event. Initial members are small canonical NPC records
+using the same generated faction/community names, tags, equipment, affiliation,
+and `auto` presence rules as guarded debug creation. A startup migration clears
+the obsolete `forceAbstract` runtime override from population-generated records
+in existing saves. Patrol/scavenge groups are not created in that transaction.
 
 Community-party reconciliation later forms at most the configured supported
 party budget. The initial implementation forms a scavenging party only when a
@@ -398,14 +403,17 @@ community has enough living unassigned members. It never creates NPCs to fill a
 party budget and leaves richer patrol/trade/raid budgeting to later behavior
 work.
 
-On an empty new world, the post-grace live bootstrap queues a priority-100
-starter settlement using the bounded meta-building candidates. While that
-starter is pending, settlement work is processed before roaming groups so the
-NPC world cannot remain empty merely because group work consumed the per-pump
-NPC-record allowance. The first successful canonical community is persisted as
-the starter settlement. A bounded hourly retry remains active until success;
-normal regeneration, density budgets, cooldowns, and seeded roaming-group
-generation continue afterward.
+On an empty new world, the first authority tick with an available player queues
+a priority-100 starter settlement and a priority-90 seeded roaming group using
+bounded meta-building candidates. This starter package is the only population
+work allowed to bypass the normal startup grace; both entries still use the
+normal plan/validate/commit queues and a separate one-time NPC-record budget.
+Single-player therefore receives the package as soon as the world/player are
+ready, while a dedicated server waits for its first connected player. The first
+successful canonical community is persisted as the starter settlement. A
+throttled runtime probe and bounded hourly retry remain active until success;
+normal regeneration, density budgets, cooldowns, and seeded generation continue
+afterward behind the dry/grace pass.
 
 ### Regeneration and persistence
 
@@ -449,6 +457,13 @@ cooldown time remaining, suppression reasons, persistence dirty state, and the
 latest bounded Population Director log. Guarded controls can retry the starter,
 discover sites for the selected sector, process one population queue pump, and
 clear the transient population log without bypassing generation validation.
+
+The authorized world-map `NPC WORLD` control is enabled by default and renders
+canonical settlement geometry plus current abstract refugee, looter, scavenger,
+and wanderer group markers. The Faction Inspector's NPC World Overlay toggle
+controls the same map visibility. Both layers refresh their guarded server
+snapshots in single-player and multiplayer; they do not expose strategic state
+to unauthorized multiplayer clients.
 
 The Director also writes bounded, structured server log entries with the
 searchable `[PopulationDirector]` prefix. Startup/grace transitions, resolved

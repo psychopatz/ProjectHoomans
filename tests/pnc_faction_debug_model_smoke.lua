@@ -258,6 +258,17 @@ local diagnostics = PNC.FactionDebugModel.BuildGUIRows(
 assertContains(diagnostics, "Invariant validation", "PASS")
 assertContains(diagnostics, "#7 aggregation", "record_attack")
 
+local populationPending = PNC.FactionDebugModel.BuildGUIRows({
+    factions = {}, roster = {}, populationDirector = {
+        currentSettlements = 0, currentGroups = 0,
+        pendingSettlements = 1, pendingGroups = 1,
+        bootstrapPhase = "STARTER_IMMEDIATE",
+        starter = { completed = false },
+    },
+}, true, nil, "overview")
+assertContains(populationPending, "Population starter", "PENDING")
+assertContains(populationPending, "Generated population", "pending=1/1")
+
 local unauthorized =
     PNC.FactionDebugModel.BuildRows(nil, false)
 assertContains(

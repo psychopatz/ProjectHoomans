@@ -11,6 +11,7 @@ local Sectors = PNC.PopulationSectors
 local Candidates = PNC.SettlementCandidates
 local Locations = PNC.AbstractLocations
 local Store = PNC.AbstractWorldStore
+local Identity = PNC.PopulationIdentity
 
 Generator.Metrics = Generator.Metrics or { attempts = 0, successes = 0,
     failures = 0, npcRecordsCreated = 0, candidateEvaluations = 0 }
@@ -161,10 +162,9 @@ function Generator.Commit(plan, context)
     local factionID, createdFaction = plan.factionId, false
     if not factionID then
         local ok, createReason, faction = PNC.Factions.Create({
-            name = "Population " .. tostring(plan.factionArchetypeId) .. " "
-                .. string.sub(plan.generationId, -4),
+            name = Identity.FactionName(plan.factionArchetypeId, plan.seed),
             archetypeID = plan.factionArchetypeId, createdAt = now,
-            tags = { populationGenerated = true },
+            tags = Identity.FactionTags(plan.factionArchetypeId, "SETTLEMENT"),
         })
         if not ok then
             Candidates.Release(plan.locationId, plan.generationId)
@@ -175,10 +175,13 @@ function Generator.Commit(plan, context)
     end
     local generation = { source = plan.source, generationId = plan.generationId,
         sectorId = plan.sectorId, createdAt = now, seed = plan.seed }
+    local presence = Identity.PresenceSpec()
     local ok, createReason, result = PNC.CommunityDirector.GenerateForFaction(
         factionID, { useExisting = false, siteSpec = location.sourceSite,
-            groupSize = plan.initialPopulation, presenceMode = "abstract",
-            allowLive = false, worldAgeHours = now, generation = generation,
+            groupSize = plan.initialPopulation,
+            presenceMode = presence.presenceMode,
+            allowLive = presence.allowLive,
+            worldAgeHours = now, generation = generation,
             communityMode = "settled" })
     if not ok then
         if createdFaction then rollbackFaction(factionID, now) end
@@ -234,7 +237,9 @@ function Generator.Commit(plan, context)
     Store.Emit("SETTLEMENT_CREATED", { communityId = community.id,
         generationId = plan.generationId, sectorId = plan.sectorId })
     return { ok = true, reason = "SETTLEMENT_CREATED", community = community,
-        createdNPCs = result.createdCount or 0 }
+        createdNPCs = result.createdCount or 0,
+        liveNPCs = result.liveCount or 0,
+        abstractNPCs = result.abstractCount or 0 }
 end
 
 return Generator

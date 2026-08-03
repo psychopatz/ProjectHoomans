@@ -128,6 +128,9 @@ end
 
 function Director.Pump()
     if not Director.Initialized then Director.Initialize() end
+    if PNC.PopulationDirector and PNC.PopulationDirector.Pump then
+        PNC.PopulationDirector.Pump(Store.WorldAgeHours())
+    end
     return Scheduler.PumpJobs(Store.WorldAgeHours())
 end
 

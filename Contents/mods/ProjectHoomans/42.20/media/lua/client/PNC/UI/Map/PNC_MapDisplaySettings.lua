@@ -9,7 +9,7 @@ PNC.MapDisplay = PNC.MapDisplay or {}
 local Display = PNC.MapDisplay
 
 Display.NamesVisible = Display.NamesVisible == true
-Display.BasesVisible = Display.BasesVisible == true
+if Display.BasesVisible == nil then Display.BasesVisible = true end
 
 local function numberFrom(object, field, method, fallback)
     local value = object and tonumber(object[field]) or nil
@@ -32,11 +32,11 @@ end
 local function syncBasesButton(button)
     if not button then return end
     local title = Display.BasesVisible
-        and "BASES: ON" or "BASES: OFF"
+        and "NPC WORLD: ON" or "NPC WORLD: OFF"
     if button.setTitle then button:setTitle(title) else button.title = title end
     button.tooltip = Display.BasesVisible
-        and "Hide community base radii and names"
-        or "Show community base radii and names"
+        and "Hide generated settlements and abstract survivor groups"
+        or "Show generated settlements and abstract survivor groups"
 end
 
 function Display.AreNamesVisible()
@@ -61,6 +61,12 @@ function Display.SetBasesVisible(visible)
         and PNC.CommunityDebugOverlay.Update
     then
         PNC.CommunityDebugOverlay.Update(true)
+    end
+    if Display.BasesVisible
+        and PNC.AbstractGroupMapLayer
+        and PNC.AbstractGroupMapLayer.Update
+    then
+        PNC.AbstractGroupMapLayer.Update(true)
     end
     return Display.BasesVisible
 end

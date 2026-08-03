@@ -704,8 +704,20 @@ function Model.BuildGUIRows(
         }
     end
     if dashboard.status ~= "ready" then
+        local population = snapshot and snapshot.populationDirector or {}
+        local starter = population.starter or {}
         return {
             row("Status", dashboard.status, "warning"),
+            row("Population starter", starter.completed and "READY" or "PENDING",
+                starter.completed and "success" or "warning"),
+            row("Generated population", string.format(
+                "settlements=%d groups=%d pending=%d/%d",
+                population.currentSettlements or 0,
+                population.currentGroups or 0,
+                population.pendingSettlements or 0,
+                population.pendingGroups or 0)),
+            row("Bootstrap phase", tostring(
+                population.bootstrapPhase or "initializing")),
         }
     end
     local source = dashboard.source

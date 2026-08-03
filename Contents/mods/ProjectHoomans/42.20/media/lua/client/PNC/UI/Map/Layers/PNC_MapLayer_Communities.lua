@@ -23,7 +23,9 @@ local function isVisible()
     return PNC.MapDisplay
         and PNC.MapDisplay.AreBasesVisible
         and PNC.MapDisplay.AreBasesVisible()
-        and ClientState.communityDebugAuthorized == true
+        and (ClientState.communityDebugAuthorized == true
+            or PNC.Client and PNC.Client.CanUseDebug
+                and PNC.Client.CanUseDebug())
 end
 
 local function communitiesBySite(snapshot)
@@ -457,6 +459,7 @@ function CommunityLayer.Render(map)
     then
         PNC.CommunityDebugOverlay.Update(false)
     end
+    if ClientState.communityDebugAuthorized ~= true then return end
     local snapshot = ClientState.communityDebug or {}
     local communityLookup = communitiesBySite(snapshot)
     local mouseX = map:getMouseX()

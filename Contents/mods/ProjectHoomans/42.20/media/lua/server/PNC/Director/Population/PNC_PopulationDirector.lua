@@ -24,6 +24,33 @@ Director.Metrics = Director.Metrics or { queueRuns = 0, queueFailures = 0,
     queueSuccesses = 0, npcRecordsCreated = 0, processingRuns = 0,
     totalProcessingMS = 0, maxProcessingMS = 0 }
 Director.RateHistory = Director.RateHistory or { GROUP = {}, SETTLEMENT = {} }
+Director.NextStarterRuntimeProbeAt = Director.NextStarterRuntimeProbeAt or 0
+
+local function releaseLegacyPresenceOverrides()
+    local released = 0
+    for _, record in pairs(PNC.Registry and PNC.Registry.Data or {}) do
+        local source = record.generation and tostring(
+            record.generation.source or "") or ""
+        if string.sub(source, 1, 16) == "WORLD_POPULATION"
+            and record.runtime and record.runtime.forceAbstract == true
+        then
+            record.runtime.forceAbstract = nil
+            record.runtime.forcePresenceCheck = true
+            if PNC.SpatialIndex and PNC.SpatialIndex.UpdateNPC then
+                PNC.SpatialIndex.UpdateNPC(record)
+            end
+            if PNC.Registry.MarkDirty then
+                PNC.Registry.MarkDirty(record,
+                    "population_presence_policy_migrated")
+            end
+            released = released + 1
+        end
+    end
+    if released > 0 then
+        Log.Info("LEGACY_PRESENCE_OVERRIDE_RELEASED", { records = released })
+    end
+    return released
+end
 
 local function rateAllowed(kind, now)
     local history = Director.RateHistory[kind]
@@ -165,7 +192,9 @@ local function processRequest(kind, now, remainingNPCs)
             archetype = plan.archetype or plan.factionArchetypeId,
             entityId = result.group and result.group.id
                 or result.community and result.community.id,
-            createdNPCs = created })
+            createdNPCs = created, liveNPCs = result.liveNPCs or 0,
+            abstractNPCs = result.abstractNPCs or 0,
+            presenceMode = "auto" })
         return 1, remainingNPCs - created
     end
     Sectors.SetSuppression(request.sectorId, kind, result.reason)
@@ -181,11 +210,13 @@ local function processRequest(kind, now, remainingNPCs)
     return 1, remainingNPCs
 end
 
-local function processQueues(now)
+local function processQueues(now, allowDuringGrace, npcBudget)
     if Director.Paused or PNC.WorldDirector and PNC.WorldDirector.Paused
-        or now < Director.StartupGraceUntil then return 0 end
+        or now < Director.StartupGraceUntil and allowDuringGrace ~= true
+    then return 0 end
     local startedAt = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
-    local remaining = Config.HARD_MAX_NPC_RECORDS_PER_PUMP
+    local remaining = math.max(1, math.floor(tonumber(npcBudget)
+        or Config.HARD_MAX_NPC_RECORDS_PER_PUMP))
     local processed = 0
     local starterPending = Starter and Starter.IsPending
         and Starter.IsPending() or false
@@ -221,6 +252,25 @@ local function processQueues(now)
     return processed
 end
 
+local function ensureStarterPopulation(now, forceProbe)
+    if not Starter or not Starter.IsPending or not Starter.IsPending() then
+        return 0, "starter_ready"
+    end
+    local runtimeNow = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    if forceProbe ~= true
+        and runtimeNow < (tonumber(Director.NextStarterRuntimeProbeAt) or 0)
+    then
+        return 0, "probe_throttled"
+    end
+    Director.NextStarterRuntimeProbeAt = runtimeNow
+        + Config.STARTER_RUNTIME_RETRY_MS
+    refresh(now)
+    if #Sectors.PlayerPositions == 0 then return 0, "waiting_for_player" end
+    local queued, reason = Starter.Run(now)
+    if not queued then return 0, reason end
+    return processQueues(now, true, Config.STARTER_NPC_RECORD_BUDGET), reason
+end
+
 local function bootstrap(now, budget)
     refresh(now)
     if Director.BootstrapPhase == "WAITING_DRY" then
@@ -254,6 +304,14 @@ end
 function Director.Initialize(force)
     if Director.Initialized and force ~= true then return true, "initialized" end
     Store.EnsureLoaded()
+    releaseLegacyPresenceOverrides()
+    local metadataMigrated = PNC.PopulationIdentity
+        and PNC.PopulationIdentity.MigrateLegacyMetadata
+        and PNC.PopulationIdentity.MigrateLegacyMetadata() or 0
+    if metadataMigrated > 0 then
+        Log.Info("LEGACY_POPULATION_METADATA_MIGRATED", {
+            records = metadataMigrated })
+    end
     Queue.Clear()
     Director.RateHistory = { GROUP = {}, SETTLEMENT = {} }
     local recentGenerations = {}
@@ -279,6 +337,7 @@ function Director.Initialize(force)
     Director.StartupGraceUntil = now + Config.STARTUP_GRACE_HOURS
     Director.DryRunPending = { GROUP = true, SETTLEMENT = true }
     Director.BootstrapPhase = "WAITING_DRY"
+    ensureStarterPopulation(now, true)
     Scheduler.RegisterJob("PopulationBootstrapReconciliation",
         Config.BOOTSTRAP_RECONCILE_DELAY_HOURS, bootstrap,
         { budget = Config.RECONCILE_SECTOR_BUDGET,
@@ -352,6 +411,15 @@ function Director.RequestReconciliation(kind, sectorID, now)
 end
 
 function Director.ProcessQueues(now) return processQueues(now or Store.WorldAgeHours()) end
+
+function Director.Pump(now)
+    if not Director.Initialized then Director.Initialize() end
+    return ensureStarterPopulation(tonumber(now) or Store.WorldAgeHours(), false)
+end
+
+function Director.ProcessStarterPopulation(now)
+    return ensureStarterPopulation(tonumber(now) or Store.WorldAgeHours(), true)
+end
 
 function Director.SetPaused(paused)
     Director.Paused = paused == true

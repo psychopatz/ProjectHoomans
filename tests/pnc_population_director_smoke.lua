@@ -69,6 +69,7 @@ function PNC.Registry.GetLiveZombie() return nil end
 function PNC.Registry.MarkDirty() return true end
 
 local factionSerial, communitySerial, npcSerial = 0, 0, 0
+local lastMobileSpec, lastCommunitySpec
 local factions, communities = {}, {}
 PNC.FactionArchetypes = { Get = function(id)
     return ({ settler = true, trader = true, refugee = true, looter = true })[id]
@@ -134,6 +135,7 @@ function PNC.Communities.BuildSiteID(site)
         .. "_" .. tostring(math.floor(site.home.y))
 end
 
+dofile(SHARED .. "Factions/PNC_FactionNameGenerator.lua")
 dofile(SHARED .. "Director/PNC_DirectorConfig.lua")
 dofile(SHARED .. "Director/PNC_AbstractWorldTypes.lua")
 dofile(SHARED .. "Scheduling/PNC_Scheduler.lua")
@@ -142,6 +144,7 @@ dofile(DIRECTOR .. "PNC_AbstractLocationManager.lua")
 dofile(DIRECTOR .. "PNC_AbstractGroupManager.lua")
 dofile(POP .. "PNC_PopulationSandbox.lua")
 dofile(POP .. "PNC_PopulationLog.lua")
+dofile(POP .. "PNC_PopulationIdentity.lua")
 dofile(POP .. "PNC_PopulationSectorManager.lua")
 dofile(POP .. "PNC_PopulationBudget.lua")
 dofile(POP .. "PNC_GenerationQueue.lua")
@@ -152,6 +155,7 @@ dofile(POP .. "PNC_StarterPopulation.lua")
 
 PNC.MobileGroupDirector = {}
 function PNC.MobileGroupDirector.GenerateForFaction(factionID, spec)
+    lastMobileSpec = PNC.Core.DeepCopy(spec)
     local faction = factions[factionID]
     faction.mobile = { active = true, site = PNC.Core.DeepCopy(spec.siteSpec) }
     for index = 1, spec.groupSize do
@@ -171,6 +175,7 @@ end
 
 PNC.CommunityDirector = {}
 function PNC.CommunityDirector.GenerateForFaction(factionID, spec)
+    lastCommunitySpec = PNC.Core.DeepCopy(spec)
     communitySerial = communitySerial + 1
     local id = "community_population_" .. communitySerial
     local members = {}
@@ -271,6 +276,8 @@ equal(starterReason, "queued", "starter queue reason")
 truthy(starterDebug.discovered > 0, "bounded meta discovery finds starter site")
 equal(PNC.GenerationQueue.Snapshot(worldHour)[1].source,
     "WORLD_POPULATION_BOOTSTRAP", "starter queue provenance")
+equal(PNC.GenerationQueue.Count("GROUP"), 1,
+    "starter package queues one seeded roaming group")
 PNC.GenerationQueue.Clear()
 local groupFallbackDefinition = {
     getX = function() return -820 end,
@@ -301,6 +308,47 @@ for _, line in ipairs(directorLogLines) do
     then sawMetaTrace = true break end
 end
 truthy(sawMetaTrace, "bounded group discovery writes a structured trace")
+
+PNC.GenerationQueue.Clear()
+PNC.PopulationDirector.StartupGraceUntil = worldHour + 1
+local startupProcessed = PNC.PopulationDirector.ProcessStarterPopulation(
+    worldHour)
+truthy(startupProcessed >= 2,
+    "immediate starter pump commits settlement and roaming group")
+equal(#PNC.Communities.List(), 1,
+    "new world immediately receives one canonical settlement")
+truthy(#PNC.AbstractGroups.List() >= 1,
+    "new world immediately receives a seeded abstract roaming group")
+truthy(PNC.StarterPopulation.GetDebugSnapshot().completed,
+    "starter completion is recorded by the immediate pump")
+
+-- Return to a clean world for the remaining focused transaction tests.
+factions, communities = {}, {}
+PNC.Registry.Data = {}
+PNC.AbstractWorldStore.Registry = PNC.AbstractWorldTypes.NewRegistry()
+PNC.AbstractWorldStore.Loaded = true
+PNC.AbstractWorldStore.Dirty = false
+PNC.AbstractLocations.Cells, PNC.AbstractLocations.Membership = {}, {}
+PNC.AbstractLocations.IndexedRevision = -1
+PNC.AbstractLocations.RebuildIndex()
+PNC.PopulationSectors.Runtime, PNC.PopulationSectors.GroupIDs = {}, {}
+PNC.PopulationSectors.CommunityIDs, PNC.PopulationSectors.GroupSector = {}, {}
+PNC.PopulationSectors.CommunitySector = {}
+PNC.PopulationSectors.PlayerPositions = {}
+PNC.SettlementCandidates.Pools = {}
+PNC.SettlementCandidates.Reservations = {}
+PNC.GenerationQueue.Clear()
+PNC.PopulationDirector.Initialized = false
+PNC.StarterPopulation.LastRun = nil
+PNC.PopulationSectors.RefreshPlayers()
+sectorID = PNC.PopulationSectors.IDForPosition(0, 0)
+sector = PNC.PopulationSectors.Get(sectorID)
+local resetSeed = PNC.PopulationSectors.WorldSeed()
+equal(resetSeed, populationSeed, "reset retains deterministic engine seed")
+truthy(PNC.StarterPopulation.Run(worldHour),
+    "clean test world can queue its starter package")
+PNC.GenerationQueue.Clear()
+
 equal(PNC.GroupGenerator.ChooseArchetype(sectorID, worldHour, 4567),
     PNC.GroupGenerator.ChooseArchetype(sectorID, worldHour, 4567),
     "archetype selection is seed deterministic")
@@ -413,6 +461,15 @@ local groupPlan = assert(PNC.GroupGenerator.BuildPlan({ sectorId = sectorID }, o
 truthy(PNC.GroupGenerator.Validate(groupPlan, onePlayer), "group plan validates")
 local groupResult = PNC.GroupGenerator.Commit(groupPlan, onePlayer)
 truthy(groupResult.ok, "group transaction commits")
+equal(lastMobileSpec.presenceMode, "auto",
+    "director mobile group uses canonical auto presence")
+truthy(lastMobileSpec.allowLive,
+    "director mobile group remains eligible for live materialization")
+truthy(PNC.Factions.Get(groupResult.group.factionId).tags.mobileGroup,
+    "director mobile faction receives canonical metadata tags")
+falsy(string.find(PNC.Factions.Get(groupResult.group.factionId).name,
+    "Population ", 1, true) == 1,
+    "director mobile faction uses canonical generated naming")
 truthy(PNC.AbstractGroups.Get(groupResult.group.id) ~= nil,
     "canonical abstract group registered")
 equal(#groupResult.group.memberIds, groupPlan.memberCount, "canonical NPC membership")
@@ -482,6 +539,13 @@ truthy(PNC.SettlementGenerator.Validate(settlementPlan, onePlayer),
     "settlement plan validates")
 local settlementResult = PNC.SettlementGenerator.Commit(settlementPlan, onePlayer)
 truthy(settlementResult.ok, "settlement transaction commits")
+equal(lastCommunitySpec.presenceMode, "auto",
+    "director settlement uses canonical auto presence")
+truthy(lastCommunitySpec.allowLive,
+    "director settlement remains eligible for live materialization")
+falsy(string.find(PNC.Factions.Get(settlementResult.community.factionID).name,
+    "Population ", 1, true) == 1,
+    "director settlement faction uses canonical generated naming")
 truthy(PNC.Communities.Get(settlementResult.community.id) ~= nil,
     "canonical community registered")
 local settlementLocation = PNC.AbstractLocations.Get(settlementPlan.locationId)
@@ -554,7 +618,14 @@ truthy((PNC.AbstractWorldStore.Registry.population.starterAttempts or 0) > 0,
 
 players = { { getX = function() return 0 end, getY = function() return 0 end,
     getZ = function() return 0 end } }
+PNC.Registry.Data.npc_legacy_population = {
+    id = "npc_legacy_population", alive = true, presenceState = "abstract",
+    generation = { source = "WORLD_POPULATION_DIRECTOR" },
+    runtime = { forceAbstract = true }, x = 10, y = 10, z = 0,
+}
 truthy(PNC.PopulationDirector.Initialize(true), "population director initializes")
+falsy(PNC.Registry.Data.npc_legacy_population.runtime.forceAbstract == true,
+    "legacy director NPC is released to normal presence materialization")
 equal(PNC.PopulationDirector.BootstrapPhase, "WAITING_DRY",
     "bootstrap begins with grace")
 PNC.Scheduler.PumpJobs(PNC.PopulationDirector.StartupGraceUntil - 0.01)

@@ -57,17 +57,22 @@ assert(map.pncBasesButton.x == 52,
     "community bases button was not placed beside names")
 assert(map.pncNamesButton.title == "NPC NAMES: OFF",
     "NPC names default was not off")
-assert(map.pncBasesButton.title == "BASES: OFF",
-    "community bases default was not off")
+assert(map.pncBasesButton.title == "NPC WORLD: ON",
+    "authorized NPC-world map presentation was not enabled by default")
 map.pncNamesButton.onclick()
 assert(PNC.MapDisplay.AreNamesVisible(),
     "NPC names button did not enable labels")
 assert(map.pncNamesButton.title == "NPC NAMES: ON",
     "NPC names button title did not update")
 map.pncBasesButton.onclick()
+assert(not PNC.MapDisplay.AreBasesVisible(),
+    "NPC-world button did not disable strategic markers")
+assert(map.pncBasesButton.title == "NPC WORLD: OFF",
+    "NPC-world disabled title did not update")
+map.pncBasesButton.onclick()
 assert(PNC.MapDisplay.AreBasesVisible(),
-    "community bases button did not enable sites")
-assert(map.pncBasesButton.title == "BASES: ON",
-    "community bases button title did not update")
+    "NPC-world button did not enable strategic markers")
+assert(map.pncBasesButton.title == "NPC WORLD: ON",
+    "NPC-world enabled title did not update")
 
 print("pnc_map_display_settings_smoke: ok")

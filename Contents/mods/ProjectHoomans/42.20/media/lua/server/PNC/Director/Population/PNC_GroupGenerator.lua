@@ -12,6 +12,7 @@ local Locations = PNC.AbstractLocations
 local Candidates = PNC.SettlementCandidates
 local Groups = PNC.AbstractGroups
 local Store = PNC.AbstractWorldStore
+local Identity = PNC.PopulationIdentity
 
 Generator.Metrics = Generator.Metrics or { attempts = 0, successes = 0,
     failures = 0, npcRecordsCreated = 0 }
@@ -168,10 +169,10 @@ function Generator.Commit(plan, context)
     local createdFaction = false
     if not factionID then
         local ok, createReason, faction = PNC.Factions.Create({
-            name = "Population " .. tostring(plan.archetype) .. " "
-                .. string.sub(plan.generationId, -4),
+            name = Identity.FactionName(plan.factionArchetypeId, plan.seed),
             archetypeID = plan.factionArchetypeId, createdAt = now,
-            tags = { populationGenerated = true },
+            tags = Identity.FactionTags(plan.factionArchetypeId,
+                "MOBILE_GROUP"),
         })
         if not ok then
             Generator.Metrics.failures = Generator.Metrics.failures + 1
@@ -181,10 +182,11 @@ function Generator.Commit(plan, context)
     end
     local generation = { source = plan.source, generationId = plan.generationId,
         sectorId = plan.sectorId, createdAt = now, seed = plan.seed }
+    local presence = Identity.PresenceSpec()
     local ok, createReason, result = PNC.MobileGroupDirector.GenerateForFaction(
         factionID, { siteSpec = location.sourceSite,
-            groupSize = plan.memberCount, presenceMode = "abstract",
-            allowLive = false, mobilePathMode = "random",
+            groupSize = plan.memberCount, presenceMode = presence.presenceMode,
+            allowLive = presence.allowLive, mobilePathMode = "random",
             worldAgeHours = now, generation = generation })
     if not ok then
         if createdFaction then rollbackFaction(factionID, now) end
@@ -224,7 +226,9 @@ function Generator.Commit(plan, context)
     Store.Emit("POPULATION_GROUP_CREATED", { groupId = group.id,
         generationId = plan.generationId, sectorId = plan.sectorId })
     return { ok = true, reason = "GROUP_CREATED", group = group,
-        createdNPCs = result and result.createdCount or 0 }
+        createdNPCs = result and result.createdCount or 0,
+        liveNPCs = result and result.liveCount or 0,
+        abstractNPCs = result and result.abstractCount or 0 }
 end
 
 return Generator

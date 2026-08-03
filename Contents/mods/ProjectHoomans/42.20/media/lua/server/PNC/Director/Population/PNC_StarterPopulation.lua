@@ -127,6 +127,7 @@ function Starter.Run(now, force)
         end
     end
     local queued, reason = false, "no_starter_candidate"
+    local groupQueued, groupReason = false, "starter_settlement_not_queued"
     if selectedSector then
         queued, reason = Queue.Enqueue("SETTLEMENT", {
             sectorId = selectedSector,
@@ -135,16 +136,29 @@ function Starter.Run(now, force)
             source = "WORLD_POPULATION_BOOTSTRAP",
         }, now)
         if reason == "queue_duplicate" then queued, reason = true, "already_queued" end
+        if queued then
+            groupQueued, groupReason = Queue.Enqueue("GROUP", {
+                sectorId = selectedSector,
+                qualifier = "STARTER",
+                priority = 90,
+                source = "WORLD_POPULATION_BOOTSTRAP",
+            }, now)
+            if groupReason == "queue_duplicate" then
+                groupQueued, groupReason = true, "already_queued"
+            end
+        end
     end
     Starter.LastRun = { at = now, attempt = population.starterAttempts,
         worldSeed = seedString, populationSeed = worldSeed,
         sectorsQueried = queried, discovered = discovered,
         selectedSectorId = selectedSector, queued = queued == true,
-        reason = reason, diagnostics = diagnostics }
+        reason = reason, groupQueued = groupQueued == true,
+        groupReason = groupReason, diagnostics = diagnostics }
     local fields = { attempt = population.starterAttempts,
         populationSeed = worldSeed, worldSeed = seedString,
         sectorsQueried = queried, discovered = discovered,
-        sectorId = selectedSector, queued = queued == true, reason = reason }
+        sectorId = selectedSector, queued = queued == true, reason = reason,
+        groupQueued = groupQueued == true, groupReason = groupReason }
     if queued then Log.Info("STARTER_SETTLEMENT_QUEUED", fields)
     else Log.Warn("STARTER_SETTLEMENT_DEFERRED", fields) end
     return queued == true, reason, Starter.LastRun

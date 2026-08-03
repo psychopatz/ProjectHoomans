@@ -521,6 +521,9 @@ function Debug.BuildSnapshot(
         ),
         balance = PNC.FactionBalance
             and PNC.FactionBalance.GetAll() or {},
+        populationDirector = PNC.PopulationDirector
+            and PNC.PopulationDirector.GetMetrics
+            and copy(PNC.PopulationDirector.GetMetrics()) or nil,
         generatedAt = at,
     }
 end

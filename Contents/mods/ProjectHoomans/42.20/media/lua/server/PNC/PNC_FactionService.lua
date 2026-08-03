@@ -667,6 +667,42 @@ function Factions.Create(spec)
     return true, "created", copy(faction)
 end
 
+function Factions.SetName(factionID, value)
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    local faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    local name = type(value) == "string"
+        and string.match(value, "^%s*(.-)%s*$") or nil
+    if not name or name == "" or #name > Constants.NAME_MAX_LENGTH then
+        return false, "invalid_name"
+    end
+    if faction.name == name then return false, "unchanged", copy(faction) end
+    faction.name = name
+    touchFaction(faction)
+    touchRegistry()
+    return true, "renamed", copy(faction)
+end
+
+function Factions.MergeTags(factionID, values)
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    local faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    local merged = copy(faction.tags or {})
+    for key, value in pairs(type(values) == "table" and values or {}) do
+        merged[key] = value
+    end
+    merged = Types.NormalizeTags(merged)
+    if Types.AreEqual(faction.tags, merged) then
+        return false, "unchanged", copy(faction)
+    end
+    faction.tags = merged
+    touchFaction(faction)
+    touchRegistry()
+    return true, "tags_merged", copy(faction)
+end
+
 function Factions.AddNPC(factionID, npcID, options)
     local faction
     local record
