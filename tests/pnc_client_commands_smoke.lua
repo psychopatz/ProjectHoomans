@@ -178,17 +178,38 @@ Client.Internal.RegisterServerCommand(
 Client.HandleServerCommand("CustomCommand", { value = 7 })
 assertEqual(customPayload.value, 7, "extensible command registry")
 
+Client.HandleServerCommand("PlayerBootstrap", {
+    requestID = "bootstrap:restart",
+    state = "known",
+    context = {
+        characterUUID = "player:restart",
+        bindingRevision = 1,
+    },
+    knowledgeRevision = 3,
+    chunkIndex = 1,
+    chunkCount = 1,
+    snapshots = {
+        { npcID = "npc_bootstrap", categories = {} },
+    },
+})
+assertEqual(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
+    "restart bootstrap hydrates NPC knowledge")
+
 Client.HandleServerCommand("FullSync", {
     snapshots = {
         { id = "npc_full", x = 1 },
     },
 })
 assertEqual(State.snapshots.npc_full.x, 1, "legacy full sync")
+assertEqual(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
+    "legacy full sync cannot erase bootstrapped NPC knowledge")
 
 Client.HandleServerCommand("RosterSyncBegin", {
     directoryRevision = 4,
     chunkCount = 1,
 })
+assertEqual(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
+    "roster sync begin cannot erase bootstrapped NPC knowledge")
 Client.HandleServerCommand("RosterSyncChunk", {
     chunkIndex = 1,
     snapshots = {

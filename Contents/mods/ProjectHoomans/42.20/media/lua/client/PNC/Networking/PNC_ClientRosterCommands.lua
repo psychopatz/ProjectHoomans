@@ -62,7 +62,6 @@ Internal.RegisterServerCommand(Const.CMD_FULL_SYNC, function(args)
     local snapshot
     local i
     ClientState.snapshots = {}
-    ClientState.npcKnowledge = {}
     ClientState.characterPayloads = {}
     for i = 1, #(args.snapshots or {}) do
         snapshot = args.snapshots[i]
@@ -72,7 +71,6 @@ end)
 
 Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_BEGIN, function(args)
     ClientState.pendingRoster = {}
-    ClientState.npcKnowledge = {}
     ClientState.pendingRosterRevision = args.directoryRevision or 0
     ClientState.pendingRosterExpectedChunks = args.chunkCount or 0
     ClientState.pendingRosterChunks = {}
