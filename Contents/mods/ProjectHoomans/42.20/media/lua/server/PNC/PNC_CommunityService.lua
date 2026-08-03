@@ -1338,6 +1338,11 @@ function Communities.Destroy(
     if community.status == "destroyed" then
         return false, "already_destroyed"
     end
+    if PNC.PopulationDirector and PNC.PopulationDirector.OnSettlementDestroyed then
+        PNC.PopulationDirector.OnSettlementDestroyed(
+            publicCommunity(community), reason,
+            worldAge(worldAgeHours, community.createdAt))
+    end
     retireCommunity(
         community,
         "destroyed",

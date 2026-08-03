@@ -1,5 +1,68 @@
 VERSION = 1,
 
+option ProjectHoomans.NPCPopulation
+{
+    type = enum,
+    numValues = 6,
+    default = 4,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCPopulation,
+}
+
+option ProjectHoomans.SettlementDensity
+{
+    type = enum,
+    numValues = 6,
+    default = 4,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.SettlementDensity,
+}
+
+option ProjectHoomans.RoamingGroupDensity
+{
+    type = enum,
+    numValues = 6,
+    default = 4,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.RoamingGroupDensity,
+}
+
+option ProjectHoomans.PopulationRegeneration
+{
+    type = enum,
+    numValues = 6,
+    default = 4,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.PopulationRegeneration,
+}
+
+option ProjectHoomans.SettlementRegeneration
+{
+    type = enum,
+    numValues = 6,
+    default = 4,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.SettlementRegeneration,
+}
+
+option ProjectHoomans.MultiplayerPopulationScaling
+{
+    type = enum,
+    numValues = 6,
+    default = 4,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.MultiplayerPopulationScaling,
+}
+
+option ProjectHoomans.PopulationGenerationDistance
+{
+    type = enum,
+    numValues = 6,
+    default = 4,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.PopulationGenerationDistance,
+}
+
 option ProjectHoomans.NPCMeleeWeaponSpawnChance
 {
     type = double,

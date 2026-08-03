@@ -756,7 +756,8 @@ local function onClientCommand(module, command, player, args)
         end
         Network.SendDirectorDebug(player,
             PNC.AbstractDirectorDebug.BuildSnapshot(
-                args and args.groupID, args and args.locationID, nil),
+                args and args.groupID, args and args.locationID, nil,
+                args and args.populationSectorID),
             true, nil)
         return
     end

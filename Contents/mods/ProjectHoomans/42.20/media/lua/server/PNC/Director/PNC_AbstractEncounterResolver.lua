@@ -237,6 +237,12 @@ function Resolver.Resolve(report)
     first.recentEncounterId, second.recentEncounterId = report.id, report.id
     restoreState(first, saved[first.id], at)
     restoreState(second, saved[second.id], at)
+    if #(first.memberIds or {}) == 0 then
+        Groups.Remove(first.id, "abstract_combat_destroyed")
+    end
+    if #(second.memberIds or {}) == 0 then
+        Groups.Remove(second.id, "abstract_combat_destroyed")
+    end
     Resolver.Metrics.resolved = Resolver.Metrics.resolved + 1
     Store.Touch("abstract_encounter_resolved")
     Store.Emit("ABSTRACT_ENCOUNTER_RESOLVED", report)

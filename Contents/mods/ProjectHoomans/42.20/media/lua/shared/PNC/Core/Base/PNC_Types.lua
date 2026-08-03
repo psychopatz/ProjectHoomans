@@ -212,6 +212,8 @@ function Types.NormalizeDefinition(definition)
         mapPresentation = PNC.MapPresentation
             and PNC.MapPresentation.Normalize(def.mapPresentation)
             or nil,
+        generation = type(def.generation) == "table"
+            and Core.DeepCopy(def.generation) or nil,
     }
 end
 
@@ -300,6 +302,8 @@ function Types.NewRecord(definition)
             and PNC.MapPresentation.Normalize(def.mapPresentation)
             or nil,
         persist = def.persist ~= false,
+        generation = type(def.generation) == "table"
+            and Core.DeepCopy(def.generation) or nil,
         runtime = {
             target = nil,
             lastPathX = nil,

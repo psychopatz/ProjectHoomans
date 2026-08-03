@@ -81,6 +81,9 @@ function Director.Initialize(force)
         Groups.RefreshLOD(group, now)
     end
     Locations.ReconcileOccupancy()
+    if PNC.PopulationDirector and PNC.PopulationDirector.Initialize then
+        PNC.PopulationDirector.Initialize(force)
+    end
     for _, report in ipairs(Store.Registry.encounters) do
         if report.outcome == "QUEUED" then EncounterResolver.Enqueue(report) end
     end
@@ -151,6 +154,9 @@ end
 
 function Director.SetPaused(paused)
     Director.Paused = paused == true
+    if PNC.PopulationDirector and PNC.PopulationDirector.SetPaused then
+        PNC.PopulationDirector.SetPaused(Director.Paused)
+    end
     return Director.Paused
 end
 
@@ -165,6 +171,9 @@ function Director.GetMetrics()
         if group.action then activeActions = activeActions + 1 end
         if group.activeEncounterId then engaged = engaged + 1 end
     end
+    local population = PNC.PopulationDirector
+        and PNC.PopulationDirector.GetMetrics
+        and PNC.PopulationDirector.GetMetrics() or nil
     return {
         groups = #groups, locations = #locations,
         traveling = traveling, materialized = materialized,
@@ -184,6 +193,7 @@ function Director.GetMetrics()
         scheduledJobs = #Scheduler.GetJobs(), paused = Director.Paused,
         registryRevision = Store.Registry.revision,
         dirty = Store.Dirty == true,
+        population = population,
     }
 end
 

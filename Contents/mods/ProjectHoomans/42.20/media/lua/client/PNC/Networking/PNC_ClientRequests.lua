@@ -423,9 +423,10 @@ function Client.RequestNeedsDebug(groupID, npcID)
     return true
 end
 
-function Client.RequestDirectorDebug(groupID, locationID)
+function Client.RequestDirectorDebug(groupID, locationID, populationSectorID)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
-    local args = { groupID = groupID, locationID = locationID }
+    local args = { groupID = groupID, locationID = locationID,
+        populationSectorID = populationSectorID }
     if not Client.CanUseDebug() then
         ClientState.directorDebugAuthorized = false
         ClientState.directorDebug = nil
@@ -444,7 +445,7 @@ function Client.RequestDirectorDebug(groupID, locationID)
     if not PNC.AbstractDirectorDebug then return false end
     ClientState.directorDebugAuthorized = true
     ClientState.directorDebug = PNC.AbstractDirectorDebug.BuildSnapshot(
-        groupID, locationID, nil)
+        groupID, locationID, nil, populationSectorID)
     ClientState.directorDebugReason = nil
     ClientState.lastDirectorDebugReceiveAt = Core.Now()
     return true

@@ -778,6 +778,8 @@ function Persistence.SerializeRecord(record)
             and type(record.needs) == "table"
             and PNC.NeedsUtils.NormalizeState(record.needs, 0)
             or nil,
+        generation = type(record.generation) == "table"
+            and PNC.Core.DeepCopy(record.generation) or nil,
     }
     startupBodyHint = record.runtime and record.runtime.startupBodyHint or nil
     if record.liveBodyInstanceID ~= nil or startupBodyHint then
@@ -851,6 +853,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         ),
         affiliation = raw.affiliation,
         mapPresentation = raw.mapPresentation,
+        generation = raw.generation,
     }
     record = Types.NewRecord(definition)
     if not record then
@@ -898,6 +901,8 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         and FactionTypes.NormalizeAffiliation(raw.affiliation)
         or nil
     record.persist = raw.persist ~= false
+    record.generation = type(raw.generation) == "table"
+        and PNC.Core.DeepCopy(raw.generation) or nil
     if PNC.NeedsUtils and PNC.NeedsUtils.NormalizeState
         and type(raw.needs) == "table"
     then

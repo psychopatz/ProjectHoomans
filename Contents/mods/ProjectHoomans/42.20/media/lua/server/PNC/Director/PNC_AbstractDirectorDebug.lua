@@ -70,7 +70,8 @@ local function locationSummary(location)
         occupantGroupIds = occupants, revision = location.revision }
 end
 
-function Debug.BuildSnapshot(selectedGroupID, selectedLocationID, action)
+function Debug.BuildSnapshot(selectedGroupID, selectedLocationID, action,
+    requestedSectorID)
     Director.Initialize()
     local groups, locations = {}, {}
     local selected = Groups.Get(selectedGroupID) or Groups.List()[1]
@@ -82,6 +83,28 @@ function Debug.BuildSnapshot(selectedGroupID, selectedLocationID, action)
     for _, location in ipairs(Locations.List()) do
         locations[#locations + 1] = locationSummary(location)
     end
+    local populationSectors = PNC.PopulationSectors
+        and PNC.PopulationSectors.ListRelevant() or {}
+    local selectedSectorID = PNC.PopulationSectors
+        and PNC.PopulationSectors.Get(requestedSectorID)
+        and requestedSectorID
+        or selectedLocation and PNC.PopulationSectors
+        and PNC.PopulationSectors.IDForPosition(
+            selectedLocation.x, selectedLocation.y)
+        or populationSectors[1] and populationSectors[1].id
+    for _, sector in ipairs(populationSectors) do
+        sector.pendingGroups = PNC.GenerationQueue.CountForSector(
+            "GROUP", sector.id)
+        sector.pendingSettlements = PNC.GenerationQueue.CountForSector(
+            "SETTLEMENT", sector.id)
+        sector.candidatePool = PNC.SettlementCandidates.PoolCount(sector.id)
+        sector.groupCooldownRemaining = math.max(0,
+            (tonumber(sector.groupGenerationCooldownUntil) or 0)
+                - Store.WorldAgeHours())
+        sector.settlementCooldownRemaining = math.max(0,
+            (tonumber(sector.settlementGenerationCooldownUntil) or 0)
+                - Store.WorldAgeHours())
+    end
     return {
         metrics = Director.GetMetrics(), groups = groups, locations = locations,
         selectedGroupId = selected and selected.id,
@@ -89,6 +112,43 @@ function Debug.BuildSnapshot(selectedGroupID, selectedLocationID, action)
         jobs = copy(PNC.Scheduler.GetJobs()),
         recentEncounters = copy(Store.Registry.encounters),
         generatedAt = Store.WorldAgeHours(), action = copy(action),
+        population = {
+            metrics = PNC.PopulationDirector
+                and PNC.PopulationDirector.GetMetrics() or {},
+            resolved = copy(PNC.PopulationDirector
+                and PNC.PopulationDirector.LastResolved
+                or PNC.PopulationSandbox and PNC.PopulationSandbox.Resolve() or {}),
+            sectors = copy(populationSectors),
+            selectedSectorId = selectedSectorID,
+            starter = copy(PNC.StarterPopulation
+                and PNC.StarterPopulation.GetDebugSnapshot
+                and PNC.StarterPopulation.GetDebugSnapshot() or {}),
+            queue = copy(PNC.GenerationQueue
+                and PNC.GenerationQueue.Snapshot
+                and PNC.GenerationQueue.Snapshot(Store.WorldAgeHours()) or {}),
+            reservations = copy(PNC.SettlementCandidates
+                and PNC.SettlementCandidates.ReservationSnapshot
+                and PNC.SettlementCandidates.ReservationSnapshot(
+                    Store.WorldAgeHours()) or {}),
+            selectedDiscovery = copy(PNC.SettlementCandidates
+                and PNC.SettlementCandidates.LastMetaDiscovery
+                and PNC.SettlementCandidates.LastMetaDiscovery[
+                    selectedSectorID] or {}),
+            store = { revision = Store.Registry.revision,
+                dirty = Store.Dirty == true,
+                lastMutationReason = Store.LastMutationReason },
+            history = copy(PNC.PopulationSectors
+                and PNC.PopulationSectors.History or {}),
+            log = copy(PNC.PopulationLog
+                and PNC.PopulationLog.GetEntries
+                and PNC.PopulationLog.GetEntries() or {}),
+            candidateMetrics = copy(PNC.SettlementCandidates
+                and PNC.SettlementCandidates.Metrics or {}),
+            candidateEvaluations = copy(PNC.SettlementCandidates
+                and PNC.SettlementCandidates.LastEvaluations
+                and PNC.SettlementCandidates.LastEvaluations[selectedSectorID]
+                or {}),
+        },
     }
 end
 
@@ -128,9 +188,54 @@ function Debug.PerformAction(args)
     elseif operation == "toggle_pause" then
         Director.SetPaused(not Director.Paused)
         ok, reason = true, Director.Paused and "paused" or "resumed"
+    elseif operation == "force_population_reconcile" then
+        local count = PNC.PopulationDirector.RequestReconciliation(
+            "GROUP", args.populationSectorID, Store.WorldAgeHours())
+        count = count + PNC.PopulationDirector.RequestReconciliation(
+            "SETTLEMENT", args.populationSectorID, Store.WorldAgeHours())
+        ok, reason = true, "reconciled_" .. tostring(count)
+    elseif operation == "queue_population_group" then
+        ok, reason = PNC.GenerationQueue.Enqueue("GROUP", {
+            sectorId = args.populationSectorID, priority = 10,
+            source = "DEBUG" }, Store.WorldAgeHours())
+    elseif operation == "queue_population_settlement" then
+        ok, reason = PNC.GenerationQueue.Enqueue("SETTLEMENT", {
+            sectorId = args.populationSectorID, priority = 10,
+            source = "DEBUG" }, Store.WorldAgeHours())
+    elseif operation == "clear_group_cooldown" then
+        ok, reason = PNC.PopulationDirector.ClearCooldown(
+            args.populationSectorID, "GROUP")
+    elseif operation == "clear_settlement_cooldown" then
+        ok, reason = PNC.PopulationDirector.ClearCooldown(
+            args.populationSectorID, "SETTLEMENT")
+    elseif operation == "rebuild_population_index" then
+        ok, reason = PNC.PopulationSectors.RebuildIndexes(), "index_rebuilt"
+    elseif operation == "toggle_population_pause" then
+        local paused = PNC.PopulationDirector.SetPaused(
+            not PNC.PopulationDirector.Paused)
+        ok, reason = true, paused and "population_paused" or "population_resumed"
+    elseif operation == "retry_starter_population" then
+        ok, reason = PNC.StarterPopulation.Run(Store.WorldAgeHours(), true)
+    elseif operation == "discover_population_sites" then
+        local worldSeed = PNC.PopulationSectors.WorldSeed()
+        local found
+        found, reason = PNC.SettlementCandidates.DiscoverMeta(
+            args.populationSectorID,
+            PNC.PopulationSectors.Seed(tostring(worldSeed) .. ":DEBUG:"
+                .. tostring(args.populationSectorID)), "DEBUG_DISCOVERY")
+        ok = found > 0
+        reason = type(reason) == "table" and reason.reason or reason
+    elseif operation == "process_population_queue" then
+        local processed = PNC.PopulationDirector.ProcessQueues(
+            Store.WorldAgeHours())
+        ok, reason = true, "processed_" .. tostring(processed)
+    elseif operation == "clear_population_log" then
+        PNC.PopulationLog.Clear()
+        ok, reason = true, "population_log_cleared"
     end
     return Debug.BuildSnapshot(args.groupID, args.locationID, {
-        action = operation, ok = ok, reason = reason })
+        action = operation, ok = ok, reason = reason },
+        args.populationSectorID)
 end
 
 return Debug

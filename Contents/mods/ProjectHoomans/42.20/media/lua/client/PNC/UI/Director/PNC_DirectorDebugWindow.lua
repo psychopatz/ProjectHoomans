@@ -52,6 +52,7 @@ function ISPNCDirectorDebugWindow:createChildren()
     PsychopatzWindow.createChildren(self)
     self.groups = UI.CreateList(self, { itemHeight = 42, doDrawItem = drawEntity })
     self.locations = UI.CreateList(self, { itemHeight = 42, doDrawItem = drawEntity })
+    self.sectors = UI.CreateList(self, { itemHeight = 42, doDrawItem = drawEntity })
     self.details = UI.CreateList(self, { itemHeight = 25, doDrawItem = drawDetail })
     self.controls = {}
     for _, definition in ipairs({
@@ -64,6 +65,17 @@ function ISPNCDirectorDebugWindow:createChildren()
         { "force_complete_action", "COMPLETE ACTION", "quiet" },
         { "force_encounter", "EVALUATE ENCOUNTER", "danger" },
         { "toggle_pause", "PAUSE / RESUME", "danger" },
+        { "force_population_reconcile", "RECONCILE POPULATION", "success" },
+        { "queue_population_group", "QUEUE AUTO GROUP", "success" },
+        { "queue_population_settlement", "QUEUE AUTO SETTLEMENT", "success" },
+        { "clear_group_cooldown", "CLEAR GROUP COOLDOWN", "quiet" },
+        { "clear_settlement_cooldown", "CLEAR SETTLEMENT COOLDOWN", "quiet" },
+        { "rebuild_population_index", "REBUILD POP INDEX", "quiet" },
+        { "discover_population_sites", "DISCOVER SITES", "quiet" },
+        { "retry_starter_population", "RETRY STARTER", "success" },
+        { "process_population_queue", "PROCESS POP QUEUE", "success" },
+        { "clear_population_log", "CLEAR POP LOG", "quiet" },
+        { "toggle_population_pause", "PAUSE POPULATION", "danger" },
     }) do
         self.controls[#self.controls + 1] = UI.CreateButton(self, {
             id = definition[1], title = definition[2], target = self,
@@ -81,25 +93,30 @@ function ISPNCDirectorDebugWindow:onResponsiveLayout()
         { x = rect.x, y = rect.y, width = rect.width },
         { scale = self.uiScale, minWidth = 85 })
     local top, gap = flow.bottom + 24, 8
-    local listWidth = math.max(170, math.floor((rect.width - gap * 2) * 0.22))
+    local listWidth = math.max(150, math.floor((rect.width - gap * 3) * 0.17))
     local height = rect.height - (top - rect.y)
     self.layout = {
         groups = { x = rect.x, y = top, width = listWidth, height = height },
         locations = { x = rect.x + listWidth + gap, y = top,
             width = listWidth, height = height },
-        details = { x = rect.x + listWidth * 2 + gap * 2, y = top,
-            width = rect.width - listWidth * 2 - gap * 2, height = height },
+        sectors = { x = rect.x + listWidth * 2 + gap * 2, y = top,
+            width = listWidth, height = height },
+        details = { x = rect.x + listWidth * 3 + gap * 3, y = top,
+            width = rect.width - listWidth * 3 - gap * 3, height = height },
     }
     for widget, bounds in pairs({ [self.groups] = self.layout.groups,
         [self.locations] = self.layout.locations,
+        [self.sectors] = self.layout.sectors,
         [self.details] = self.layout.details }) do
         Layout.SetBounds(widget, bounds.x, bounds.y, bounds.width, bounds.height)
     end
 end
 
 function ISPNCDirectorDebugWindow:requestSnapshot()
-    local group, location = selected(self.groups), selected(self.locations)
-    PNC.Client.RequestDirectorDebug(group and group.id, location and location.id)
+    local group, location, sector = selected(self.groups), selected(self.locations),
+        selected(self.sectors)
+    PNC.Client.RequestDirectorDebug(group and group.id, location and location.id,
+        sector and sector.id)
     self.lastRequestAt = PNC.Core.Now()
 end
 
@@ -112,7 +129,8 @@ end
 
 function ISPNCDirectorDebugWindow:refreshSnapshot()
     local snapshot = ClientState.directorDebug or {}
-    local oldGroup, oldLocation = selected(self.groups), selected(self.locations)
+    local oldGroup, oldLocation, oldSector = selected(self.groups),
+        selected(self.locations), selected(self.sectors)
     self.groups:clear()
     for _, item in ipairs(Model.GroupItems(snapshot)) do
         self.groups:addItem(item.label, item)
@@ -124,10 +142,19 @@ function ISPNCDirectorDebugWindow:refreshSnapshot()
     end
     restore(self.locations, snapshot.selectedLocationId
         or oldLocation and oldLocation.id)
+    self.sectors:clear()
+    for _, item in ipairs(Model.SectorItems(snapshot)) do
+        self.sectors:addItem(item.label, item)
+    end
+    restore(self.sectors, snapshot.population
+        and snapshot.population.selectedSectorId
+        or oldSector and oldSector.id)
     self.details:clear()
-    local group, location = selected(self.groups), selected(self.locations)
+    local group, location, sector = selected(self.groups), selected(self.locations),
+        selected(self.sectors)
     for _, item in ipairs(Model.DetailRows(snapshot,
         group and group.value, location and location.value,
+        sector and sector.value,
         ClientState.directorDebugAuthorized,
         ClientState.directorDebugReason)) do
         self.details:addItem(item.label, item)
@@ -137,11 +164,13 @@ end
 
 function ISPNCDirectorDebugWindow:onAction(button)
     if button.internal == "refresh" then self:requestSnapshot() return end
-    local group, location = selected(self.groups), selected(self.locations)
+    local group, location, sector = selected(self.groups), selected(self.locations),
+        selected(self.sectors)
     PNC.Client.SendDebug("director_debug_action", {
         directorAction = button.internal,
         groupID = group and group.id,
         locationID = location and location.id,
+        populationSectorID = sector and sector.id,
     })
 end
 
@@ -161,7 +190,9 @@ function ISPNCDirectorDebugWindow:render()
             self.layout.groups.y - 20, self.layout.groups.width)
         UI.DrawSectionTitle(self, "LOCATIONS", self.layout.locations.x,
             self.layout.locations.y - 20, self.layout.locations.width)
-        UI.DrawSectionTitle(self, "TRAVERSAL / COMBAT PROFILE / SCHEDULER",
+        UI.DrawSectionTitle(self, "POPULATION SECTORS", self.layout.sectors.x,
+            self.layout.sectors.y - 20, self.layout.sectors.width)
+        UI.DrawSectionTitle(self, "DIRECTOR / POPULATION / QUEUES / LOGS",
             self.layout.details.x, self.layout.details.y - 20,
             self.layout.details.width)
     end

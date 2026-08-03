@@ -255,6 +255,10 @@ local function definitionIsHouse(definition)
     return bedroom and (kitchen or living)
 end
 
+function Resolver.IsResidentialDefinition(definition)
+    return definitionIsHouse(definition)
+end
+
 local function addCandidate(
     candidates,
     seen,

@@ -169,6 +169,15 @@ local function resolveSite(faction, spec, at, forceNew)
         spec.mobilePathMode,
         mobile and mobile.pathMode
     )
+    if type(spec.siteSpec) == "table" then
+        local explicit = copy(spec.siteSpec)
+        if not PNC.CommunityTypes.IsValidSiteID(explicit.id) then
+            explicit.id = PNC.Communities.BuildSiteID(explicit)
+        end
+        explicit = PNC.CommunityTypes.NormalizeSite(explicit, explicit.id)
+        if explicit then return explicit, "explicit_bounded_site" end
+        return nil, "invalid_explicit_site"
+    end
     if forceNew ~= true and spec.useExisting ~= false then
         local existing = currentSite(faction)
         if existing then return existing, "existing_mobile_site" end
@@ -319,6 +328,7 @@ function Director.GenerateForFaction(factionID, spec)
             factionRole = factionRole(faction, index),
             factionJoinedAt = at,
             debug = spec.debug == true,
+            generation = spec.generation,
         })
         if not record then
             for _, prior in ipairs(created) do
@@ -367,12 +377,21 @@ function Director.GenerateForFaction(factionID, spec)
         state,
         "mobile_group_generated"
     )
-    if not ok then return false, reason end
+    if not ok then
+        for _, prior in ipairs(created) do
+            if PNC.Factions and PNC.Factions.RemoveNPC then
+                PNC.Factions.RemoveNPC(faction.id, prior.id,
+                    "group_generation_rollback", at)
+            end
+            if PNC.API and PNC.API.Despawn then PNC.API.Despawn(prior.id) end
+        end
+        return false, reason
+    end
     if not faction.leaderNPCID and created[1] then
         Factions.SetLeader(faction.id, created[1].id, at)
     end
     if PNC.AbstractGroups and PNC.AbstractGroups.ImportMobileFaction then
-        PNC.AbstractGroups.ImportMobileFaction(faction)
+        PNC.AbstractGroups.ImportMobileFaction(Factions.Get(faction.id))
     end
     local ids = {}
     for _, record in ipairs(created) do

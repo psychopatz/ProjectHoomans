@@ -14,6 +14,8 @@ local Core = PNC.Core
 Locations.Cells = Locations.Cells or {}
 Locations.Membership = Locations.Membership or {}
 Locations.IndexedRevision = Locations.IndexedRevision or -1
+Locations.DiscoveryCursor = Locations.DiscoveryCursor or 0
+Locations.LastMetaDiscovery = Locations.LastMetaDiscovery or nil
 
 local function authority()
     return Core and Core.IsAuthority and Core.IsAuthority() == true
@@ -143,7 +145,7 @@ end
 function Locations.DiscoverLoadedNear(x, y, z, radius, limit)
     local cell = getCell and getCell() or nil
     local list = cell and cell.getBuildingList and cell:getBuildingList() or nil
-    local found = 0
+    local found, inspected = 0, 0
     radius = math.max(1, tonumber(radius) or Config.DESTINATION_QUERY_RADIUS)
     limit = math.max(1, math.floor(tonumber(limit)
         or Config.LOADED_BUILDING_DISCOVERY_LIMIT))
@@ -151,8 +153,13 @@ function Locations.DiscoverLoadedNear(x, y, z, radius, limit)
     local count = list.size and list:size() or #list
     local first = list.size and 0 or 1
     local last = list.size and count - 1 or count
-    for indexValue = first, last do
+    if count <= 0 then return 0 end
+    local start = first + (Locations.DiscoveryCursor % count)
+    local scanBudget = math.min(count, limit * 4)
+    for step = 0, scanBudget - 1 do
+        local indexValue = first + ((start - first + step) % count)
         if found >= limit then break end
+        inspected = inspected + 1
         local building = list.get and list:get(indexValue) or list[indexValue]
         local definition = building and building.getDef and building:getDef() or nil
         local site = definition and PNC.CommunitySiteResolver
@@ -168,7 +175,91 @@ function Locations.DiscoverLoadedNear(x, y, z, radius, limit)
             end
         end
     end
+    Locations.DiscoveryCursor = (Locations.DiscoveryCursor + inspected) % count
     return found
+end
+
+-- Bounded strategic-site discovery for starter population. Unlike the legacy
+-- random-house helper, this asks the meta-grid for one explicit rectangle and
+-- inspects only a capped, seed-rotated slice of that result.
+function Locations.DiscoverMetaBuildingsInBounds(bounds, z, seed, limit,
+    inspectionLimit)
+    bounds = type(bounds) == "table" and bounds or {}
+    limit = math.max(1, math.floor(tonumber(limit) or 1))
+    inspectionLimit = math.max(limit,
+        math.floor(tonumber(inspectionLimit) or limit))
+    local diagnostic = { found = 0, matched = 0, inspected = 0,
+        residential = 0, locationIds = {}, reason = "META_GRID_UNAVAILABLE" }
+    local world = getWorld and getWorld() or nil
+    local metaGrid = world and world.getMetaGrid and world:getMetaGrid() or nil
+    if not metaGrid or not metaGrid.getBuildingsIntersecting
+        or not ArrayList or not ArrayList.new
+        or not PNC.CommunitySiteResolver
+    then
+        Locations.LastMetaDiscovery = diagnostic
+        return 0, diagnostic
+    end
+    local definitions = ArrayList.new()
+    local minX = math.floor(tonumber(bounds.minX) or 0)
+    local minY = math.floor(tonumber(bounds.minY) or 0)
+    local maxX = math.floor(tonumber(bounds.maxX) or minX)
+    local maxY = math.floor(tonumber(bounds.maxY) or minY)
+    local ok = pcall(metaGrid.getBuildingsIntersecting, metaGrid,
+        minX, minY, maxX, maxY, definitions)
+    if not ok then
+        diagnostic.reason = "META_QUERY_FAILED"
+        Locations.LastMetaDiscovery = diagnostic
+        return 0, diagnostic
+    end
+    local count = definitions.size and tonumber(definitions:size()) or 0
+    diagnostic.matched = math.max(0, math.floor(count or 0))
+    if diagnostic.matched <= 0 then
+        diagnostic.reason = "NO_META_BUILDINGS_IN_SECTOR"
+        Locations.LastMetaDiscovery = diagnostic
+        return 0, diagnostic
+    end
+    local maximum = math.min(diagnostic.matched, inspectionLimit)
+    local start = math.floor(tonumber(seed) or 0) % diagnostic.matched
+    local inspectedDefinitions = {}
+    for offset = 0, maximum - 1 do
+        local indexValue = (start + offset) % diagnostic.matched
+        local definition = definitions.get and definitions:get(indexValue) or nil
+        if definition then
+            inspectedDefinitions[#inspectedDefinitions + 1] = definition
+            diagnostic.inspected = diagnostic.inspected + 1
+        end
+    end
+    local seen = {}
+    local function register(definition, residential)
+        if #diagnostic.locationIds >= limit then return end
+        local site = PNC.CommunitySiteResolver.DescribeBuildingDefinition(
+            definition, tonumber(z) or 0, {})
+        if not site or seen[site.id] then return end
+        seen[site.id] = true
+        local location, reason = Locations.RegisterSite(site, {
+            tags = residential and { HOUSE = true, RESIDENTIAL = true }
+                or { BUILDING = true },
+        })
+        if location and (reason == "registered" or reason == "existing") then
+            diagnostic.locationIds[#diagnostic.locationIds + 1] = location.id
+            if residential then diagnostic.residential = diagnostic.residential + 1 end
+        end
+    end
+    for _, definition in ipairs(inspectedDefinitions) do
+        if PNC.CommunitySiteResolver.IsResidentialDefinition(definition) then
+            register(definition, true)
+        end
+    end
+    if #diagnostic.locationIds == 0 then
+        for _, definition in ipairs(inspectedDefinitions) do
+            register(definition, false)
+        end
+    end
+    diagnostic.found = #diagnostic.locationIds
+    diagnostic.reason = diagnostic.found > 0 and "META_BUILDINGS_REGISTERED"
+        or "NO_USABLE_META_BUILDINGS"
+    Locations.LastMetaDiscovery = diagnostic
+    return diagnostic.found, diagnostic
 end
 
 function Locations.GetNearby(x, y, radius, limit)

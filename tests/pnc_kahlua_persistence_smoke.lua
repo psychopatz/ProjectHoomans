@@ -140,6 +140,9 @@ local record = {
     runtime = {
         bodyLease = "lease-persisted",
     },
+    generation = { source = "WORLD_POPULATION_DIRECTOR",
+        generationId = "POP_GROUP_0000042", sectorId = "psector_1_2",
+        createdAt = 34, seed = 42 },
 }
 
 local payload = PNC.Persistence.SerializeRecord(record)
@@ -156,6 +159,8 @@ assert(payload.equipmentSpawnMode == "ranged", "equipment spawn override was not
 assert(payload.equipmentPoolID == "Default", "equipment pool was not serialized")
 assert(payload.bodyHint.instanceID == 9191, "live body instance hint was not serialized")
 assert(payload.bodyHint.lease == "lease-persisted", "live body lease hint was not serialized")
+assert(payload.generation.generationId == "POP_GROUP_0000042",
+    "population provenance was not serialized")
 
 local restored = PNC.Persistence.DeserializeRecord(payload, record.id)
 assert(restored, "deserialization failed without next()")
@@ -173,6 +178,8 @@ assert(restored.runtime.startupBodyHint.instanceID == "9191",
     "startup body instance hint did not round trip")
 assert(restored.runtime.startupBodyHint.lease == "lease-persisted",
     "startup body lease hint did not round trip")
+assert(restored.generation.generationId == "POP_GROUP_0000042",
+    "population provenance did not round trip")
 
 next = originalNext
 print("pnc_kahlua_persistence_smoke: ok")

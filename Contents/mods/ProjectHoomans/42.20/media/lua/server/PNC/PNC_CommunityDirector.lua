@@ -338,6 +338,7 @@ function Director.GenerateForFaction(factionID, spec)
             factionRole = role,
             factionJoinedAt = at,
             debug = spec.debug == true,
+            generation = spec.generation,
         })
         if not record then
             for _, prior in ipairs(created) do

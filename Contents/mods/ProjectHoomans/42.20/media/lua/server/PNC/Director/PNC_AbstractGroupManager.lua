@@ -134,7 +134,22 @@ function Groups.ReconcileMembers(groupOrID, faction)
     faction = faction or group and group.factionId and PNC.Factions
         and PNC.Factions.Get(group.factionId) or nil
     if not group or not faction then return false, "missing_group_or_faction" end
-    local ids = memberIDs(faction)
+    local ids
+    if group.homeCommunityId then
+        ids = {}
+        local community = PNC.Communities and PNC.Communities.Get
+            and PNC.Communities.Get(group.homeCommunityId) or nil
+        for _, npcID in ipairs(group.memberIds or {}) do
+            local record = PNC.Registry and PNC.Registry.Get(npcID) or nil
+            if record and record.alive ~= false and community
+                and community.memberIDs and community.memberIDs[npcID] == true then
+                ids[#ids + 1] = npcID
+            end
+        end
+        table.sort(ids)
+    else
+        ids = memberIDs(faction)
+    end
     local signature = memberSignature(ids)
     group.diagnostics = group.diagnostics or {}
     if group.diagnostics.memberSignature == signature then
@@ -340,6 +355,13 @@ function Groups.Remove(groupID, reason)
     Locations.Depart(group, Store.WorldAgeHours())
     Store.Registry.groupsByID[group.id] = nil
     Store.Touch(reason or "group_removed")
+    Store.Emit("GROUP_DESTROYED", { groupId = group.id,
+        factionId = group.factionId,
+        homeCommunityId = group.homeCommunityId,
+        sectorId = PNC.PopulationSectors and group.location
+            and PNC.PopulationSectors.IDForPosition(
+                group.location.x, group.location.y) or nil,
+        reason = reason or "group_removed" })
     return true, "removed"
 end
 

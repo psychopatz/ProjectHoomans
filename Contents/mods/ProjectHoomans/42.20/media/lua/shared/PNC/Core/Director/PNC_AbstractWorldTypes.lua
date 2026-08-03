@@ -78,6 +78,21 @@ local function resources(value)
     }
 end
 
+local function generation(value)
+    local source = type(value) == "table" and value or nil
+    if not source then return nil end
+    local generationID = safeID(source.generationId)
+    if not generationID then return nil end
+    return {
+        source = type(source.source) == "string" and source.source
+            or "WORLD_POPULATION_DIRECTOR",
+        generationId = generationID,
+        sectorId = safeID(source.sectorId),
+        createdAt = math.max(0, finite(source.createdAt, 0)),
+        seed = integer(source.seed, 0, 2147483647, 0),
+    }
+end
+
 function Types.NormalizeLocationRef(value)
     local source = type(value) == "table" and value or {}
     local id = safeID(source.id, "aloc_")
@@ -224,6 +239,7 @@ function Types.NormalizeGroup(value, groupID)
         revision = integer(source.revision, 0, 2147483647, 0),
         diagnostics = type(source.diagnostics) == "table"
             and copy(source.diagnostics) or {},
+        generation = generation(source.generation),
     }
 end
 
@@ -259,20 +275,92 @@ function Types.NormalizeLocation(value, locationID)
             and copy(source.visitHistory) or {},
         sourceSite = type(source.sourceSite) == "table"
             and copy(source.sourceSite) or nil,
+        populationHistory = type(source.populationHistory) == "table" and {
+            formerSettlement = source.populationHistory.formerSettlement == true,
+            destroyedAt = math.max(0,
+                finite(source.populationHistory.destroyedAt, 0)),
+            regenerationBlockedUntil = math.max(0,
+                finite(source.populationHistory.regenerationBlockedUntil, 0)),
+        } or nil,
         revision = integer(source.revision, 0, 2147483647, 0),
     }
 end
 
+local function normalizePopulation(value)
+    local source = type(value) == "table" and value or {}
+    local output = {
+        nextGenerationSerial = integer(source.nextGenerationSerial,
+            1, 2147483647, 1),
+        bootstrapCompleted = source.bootstrapCompleted == true,
+        bootstrapCompletedAt = math.max(0,
+            finite(source.bootstrapCompletedAt, 0)),
+        starterSettlementId = safeID(source.starterSettlementId),
+        starterAttempts = integer(source.starterAttempts,
+            0, 2147483647, 0),
+        worldSeed = integer(source.worldSeed, 0, 2147483647, 0),
+        worldSeedString = type(source.worldSeedString) == "string"
+            and string.sub(source.worldSeedString, 1, 128) or nil,
+        sectors = {}, siteHistory = {}, provenance = {},
+        committedGenerationIds = {}, committedOrder = {},
+    }
+    for id, raw in pairs(type(source.sectors) == "table" and source.sectors or {}) do
+        if safeID(id, "psector_") and type(raw) == "table" then
+            output.sectors[id] = {
+                id = id, discovered = raw.discovered == true,
+                hadGroups = raw.hadGroups == true,
+                hadSettlements = raw.hadSettlements == true,
+                groupGenerationCooldownUntil = math.max(0,
+                    finite(raw.groupGenerationCooldownUntil, 0)),
+                settlementGenerationCooldownUntil = math.max(0,
+                    finite(raw.settlementGenerationCooldownUntil, 0)),
+                lastReconciledAt = math.max(0,
+                    finite(raw.lastReconciledAt, 0)),
+            }
+        end
+    end
+    for locationID, raw in pairs(type(source.siteHistory) == "table"
+        and source.siteHistory or {}) do
+        if safeID(locationID, "aloc_") and type(raw) == "table" then
+            output.siteHistory[locationID] = {
+                formerSettlement = raw.formerSettlement == true,
+                destroyedAt = math.max(0, finite(raw.destroyedAt, 0)),
+                regenerationBlockedUntil = math.max(0,
+                    finite(raw.regenerationBlockedUntil, 0)),
+            }
+        end
+    end
+    for entityID, raw in pairs(type(source.provenance) == "table"
+        and source.provenance or {}) do
+        local normalized = generation(raw)
+        if safeID(entityID) and normalized then output.provenance[entityID] = normalized end
+    end
+    local order = idArray(source.committedOrder)
+    local limit = Config.Population.COMMITTED_GENERATION_HISTORY_LIMIT
+    local first = math.max(1, #order - limit + 1)
+    for index = first, #order do
+        local id = order[index]
+        if source.committedGenerationIds and source.committedGenerationIds[id] == true then
+            output.committedOrder[#output.committedOrder + 1] = id
+            output.committedGenerationIds[id] = true
+        end
+    end
+    return output
+end
+
+Types.NormalizePopulation = normalizePopulation
+
 function Types.NewRegistry()
     return { schemaVersion = Config.SCHEMA_VERSION, revision = 0,
         groupsByID = {}, locationsByID = {}, encounters = {},
-        encounterCooldowns = {}, nextEncounterSerial = 1 }
+        encounterCooldowns = {}, nextEncounterSerial = 1,
+        population = normalizePopulation(nil) }
 end
 
 function Types.NormalizeRegistry(value)
     local source = type(value) == "table" and value or {}
     local output = Types.NewRegistry()
     output.revision = integer(source.revision, 0, 2147483647, 0)
+    output.population = normalizePopulation(source.population)
     for id, raw in pairs(type(source.locationsByID) == "table"
         and source.locationsByID or {}) do
         local location = Types.NormalizeLocation(raw, id)
