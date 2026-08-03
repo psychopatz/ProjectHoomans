@@ -11,6 +11,8 @@ Scheduler.Buckets = Scheduler.Buckets or {}
 Scheduler.SlotByID = Scheduler.SlotByID or {}
 Scheduler.Initialized = Scheduler.Initialized or false
 Scheduler.LastSlot = Scheduler.LastSlot or nil
+Scheduler.Jobs = Scheduler.Jobs or {}
+Scheduler.JobOrder = Scheduler.JobOrder or {}
 
 function Scheduler.GetCadence(record)
     if LOD and LOD.GetCadence then
@@ -138,4 +140,94 @@ function Scheduler.Remove(id)
     if id ~= nil then
         Scheduler.SlotByID[tostring(id)] = nil
     end
+end
+
+-- Register a lightweight periodic system job. Strategic jobs use world hours;
+-- callers provide the current value to PumpJobs so no wall-clock conversion is
+-- hidden in the scheduler. Re-registering a name updates it in place.
+function Scheduler.RegisterJob(name, interval, callback, options)
+    name = tostring(name or "")
+    interval = tonumber(interval)
+    options = type(options) == "table" and options or {}
+    if name == "" or not interval or interval <= 0
+        or type(callback) ~= "function"
+    then return false, "invalid_job" end
+    local job = Scheduler.Jobs[name]
+    if not job then
+        job = { name = name, runs = 0, errors = 0 }
+        Scheduler.Jobs[name] = job
+        Scheduler.JobOrder[#Scheduler.JobOrder + 1] = name
+        table.sort(Scheduler.JobOrder)
+    end
+    job.interval = interval
+    job.callback = callback
+    job.budget = math.max(1, math.floor(tonumber(options.budget) or 1))
+    job.enabled = options.enabled ~= false
+    job.nextRun = tonumber(options.startAt) or job.nextRun
+    return true, job
+end
+
+function Scheduler.UnregisterJob(name)
+    name = tostring(name or "")
+    if not Scheduler.Jobs[name] then return false end
+    Scheduler.Jobs[name] = nil
+    for index = #Scheduler.JobOrder, 1, -1 do
+        if Scheduler.JobOrder[index] == name then
+            table.remove(Scheduler.JobOrder, index)
+        end
+    end
+    return true
+end
+
+function Scheduler.SetJobEnabled(name, enabled)
+    local job = Scheduler.Jobs[tostring(name or "")]
+    if not job then return false end
+    job.enabled = enabled == true
+    return true
+end
+
+function Scheduler.PumpJobs(now)
+    now = tonumber(now) or 0
+    local ran = 0
+    for _, name in ipairs(Scheduler.JobOrder) do
+        local job = Scheduler.Jobs[name]
+        if job and job.enabled ~= false then
+            if job.nextRun == nil then job.nextRun = now + job.interval end
+            if now >= job.nextRun then
+                local startedAt = Performance and Performance.Begin
+                    and Performance.Begin() or nil
+                local ok, result = pcall(job.callback, now, job.budget, job)
+                job.lastRun = now
+                job.nextRun = now + job.interval
+                job.runs = (tonumber(job.runs) or 0) + 1
+                job.lastResult = ok and result or nil
+                job.lastError = ok and nil or tostring(result)
+                if not ok then job.errors = (tonumber(job.errors) or 0) + 1 end
+                if Performance then
+                    Performance.Count("scheduler.jobs", 1)
+                    if not ok then Performance.Count("scheduler.jobErrors", 1) end
+                    Performance.Finish("scheduler.job." .. name, startedAt)
+                end
+                ran = ran + 1
+            end
+        end
+    end
+    return ran
+end
+
+function Scheduler.GetJobs()
+    local output = {}
+    for _, name in ipairs(Scheduler.JobOrder) do
+        local job = Scheduler.Jobs[name]
+        if job then
+            output[#output + 1] = {
+                name = name, interval = job.interval,
+                nextRun = job.nextRun, lastRun = job.lastRun,
+                runs = job.runs, errors = job.errors,
+                enabled = job.enabled ~= false,
+                lastError = job.lastError,
+            }
+        end
+    end
+    return output
 end

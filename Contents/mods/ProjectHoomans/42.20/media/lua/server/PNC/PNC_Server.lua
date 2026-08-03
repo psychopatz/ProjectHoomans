@@ -248,11 +248,6 @@ function Server.OnTick()
     if PNC.FactionTolls and PNC.FactionTolls.Pump then
         PNC.FactionTolls.Pump(now)
     end
-    if PNC.MobileGroupDirector
-        and PNC.MobileGroupDirector.Pump
-    then
-        PNC.MobileGroupDirector.Pump(now)
-    end
     if PNC.NeedsScheduler and PNC.NeedsScheduler.Pump then
         PNC.NeedsScheduler.Pump(now)
     end
@@ -282,6 +277,13 @@ function Server.OnTick()
         lastLivePositionSafetyRefreshAt = now
     end
     Spatial.Rebuild(now, false)
+    -- Player buckets must be current before the Director evaluates abstract
+    -- arrivals or encounter observation safety.
+    if PNC.WorldDirector and PNC.WorldDirector.Pump then
+        PNC.WorldDirector.Pump()
+    elseif PNC.MobileGroupDirector and PNC.MobileGroupDirector.Pump then
+        PNC.MobileGroupDirector.Pump(now)
+    end
     if Presence.RefreshMaterializationCandidates then
         Presence.RefreshMaterializationCandidates(now, false)
     end
@@ -747,6 +749,17 @@ local function onClientCommand(module, command, player, args)
         ), true, nil)
         return
     end
+    if command == Const.CMD_DIRECTOR_DEBUG_REQUEST then
+        if not canUseDebug(player) then
+            Network.SendDirectorDebug(player, nil, false, "not_authorized")
+            return
+        end
+        Network.SendDirectorDebug(player,
+            PNC.AbstractDirectorDebug.BuildSnapshot(
+                args and args.groupID, args and args.locationID, nil),
+            true, nil)
+        return
+    end
     if command == Const.CMD_COLONY_MANAGEMENT_REQUEST then
         Network.SendColonyManagement(player, PNC.ColonyManagement.BuildSnapshot(player))
         return
@@ -908,6 +921,11 @@ local function onClientCommand(module, command, player, args)
         Network.SendNeedsDebug(player, PNC.NeedsDebug.PerformAction(args), true, nil)
         return
     end
+    if args and args.action == "director_debug_action" then
+        Network.SendDirectorDebug(player,
+            PNC.AbstractDirectorDebug.PerformAction(args), true, nil)
+        return
+    end
 
     if args and args.action == "force_live" then
         API.DebugCommand(args.id, "force_live", args)
@@ -1049,6 +1067,12 @@ local function onServerStarted()
     end
     if PNC.Communities and PNC.Communities.Load then
         PNC.Communities.Load()
+    end
+    if PNC.AbstractWorldStore and PNC.AbstractWorldStore.Load then
+        PNC.AbstractWorldStore.Load()
+    end
+    if PNC.WorldDirector and PNC.WorldDirector.Initialize then
+        PNC.WorldDirector.Initialize(true)
     end
     if PNC.Factions
         and PNC.Factions

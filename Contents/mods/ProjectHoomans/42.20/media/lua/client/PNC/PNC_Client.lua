@@ -75,6 +75,9 @@ local function onResetLua()
     ClientState.needsDebug = nil
     ClientState.needsDebugAuthorized = false
     ClientState.needsDebugReason = nil
+    ClientState.directorDebug = nil
+    ClientState.directorDebugAuthorized = false
+    ClientState.directorDebugReason = nil
     ClientState.colonyManagement = nil
     Client.BiteReplicas = {}
     Client.ZombieReactionReplicas = {}

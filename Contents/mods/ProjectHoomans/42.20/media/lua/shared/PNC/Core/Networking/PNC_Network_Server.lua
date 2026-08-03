@@ -642,6 +642,19 @@ function Network.SendNeedsDebug(targetPlayer, snapshot, authorized, reason)
     end
 end
 
+function Network.SendDirectorDebug(targetPlayer, snapshot, authorized, reason)
+    local payload = { authorized = authorized == true,
+        snapshot = authorized == true and snapshot or nil,
+        reason = reason, serverTime = Core.Now() }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(targetPlayer, Const.MODULE,
+            Const.CMD_DIRECTOR_DEBUG, payload)
+    elseif not isServer or not isServer() then
+        triggerEvent("OnServerCommand", Const.MODULE,
+            Const.CMD_DIRECTOR_DEBUG, payload)
+    end
+end
+
 function Network.SendColonyManagement(targetPlayer, snapshot)
     local payload = { snapshot=snapshot, serverTime=Core.Now() }
     if isServer and isServer() and targetPlayer then sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_COLONY_MANAGEMENT, payload)

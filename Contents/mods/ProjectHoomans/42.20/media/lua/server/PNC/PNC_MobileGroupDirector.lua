@@ -371,6 +371,9 @@ function Director.GenerateForFaction(factionID, spec)
     if not faction.leaderNPCID and created[1] then
         Factions.SetLeader(faction.id, created[1].id, at)
     end
+    if PNC.AbstractGroups and PNC.AbstractGroups.ImportMobileFaction then
+        PNC.AbstractGroups.ImportMobileFaction(faction)
+    end
     local ids = {}
     for _, record in ipairs(created) do
         ids[#ids + 1] = record.id
@@ -469,7 +472,10 @@ function Director.Pump(now)
     for factionID, faction in pairs(
         Factions.Registry and Factions.Registry.byID or {}
     ) do
-        if faction.status == "active"
+        local strategicallyOwned = PNC.AbstractGroups
+            and PNC.AbstractGroups.FindByFactionID
+            and PNC.AbstractGroups.FindByFactionID(factionID) ~= nil
+        if not strategicallyOwned and faction.status == "active"
             and Factions.IsMobileGroup(faction)
             and at >= (tonumber(faction.mobile.nextMoveAt) or 0)
         then

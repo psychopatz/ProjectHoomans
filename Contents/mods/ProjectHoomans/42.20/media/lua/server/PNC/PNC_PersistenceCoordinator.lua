@@ -43,6 +43,8 @@ function Coordinator.Commit(reason)
         knowledge = PNC.NPCKnowledge and PNC.NPCKnowledge.Dirty == true,
         factions = PNC.Factions and PNC.Factions.Dirty == true,
         communities = PNC.Communities and PNC.Communities.Dirty == true,
+        abstractWorld = PNC.AbstractWorldStore
+            and PNC.AbstractWorldStore.Dirty == true,
         npcByID = copy(PNC.Registry and PNC.Registry.DirtyByID or {}),
         npcDomains = copy(PNC.Registry and PNC.Registry.DirtyDomains or {}),
         npcDirectory = PNC.Registry and PNC.Registry.DirectoryDirty == true,
@@ -57,6 +59,9 @@ function Coordinator.Commit(reason)
         if PNC.Factions and initialDirty.factions then PNC.Factions.Dirty = true end
         if PNC.Communities and initialDirty.communities then
             PNC.Communities.Dirty = true
+        end
+        if PNC.AbstractWorldStore and initialDirty.abstractWorld then
+            PNC.AbstractWorldStore.Dirty = true
         end
         if PNC.Registry then
             PNC.Registry.DirtyByID = initialDirty.npcByID
@@ -88,6 +93,8 @@ function Coordinator.Commit(reason)
     ok, why = save("factions", PNC.Factions)
     if not ok then return failure(why) end
     ok, why = save("communities", PNC.Communities)
+    if not ok then return failure(why) end
+    ok, why = save("abstractWorld", PNC.AbstractWorldStore)
     if not ok then return failure(why) end
 
     if PNC.Registry and PNC.Registry.FlushDirty then

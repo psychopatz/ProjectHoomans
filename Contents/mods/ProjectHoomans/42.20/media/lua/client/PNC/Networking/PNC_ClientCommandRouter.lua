@@ -215,6 +215,12 @@ Internal.RegisterServerCommand(Const.CMD_NEEDS_DEBUG, function(args)
     ClientState.needsDebugReason = args.reason
     ClientState.lastNeedsDebugReceiveAt = Core.Now()
 end)
+Internal.RegisterServerCommand(Const.CMD_DIRECTOR_DEBUG, function(args)
+    ClientState.directorDebugAuthorized = args.authorized == true
+    ClientState.directorDebug = args.snapshot
+    ClientState.directorDebugReason = args.reason
+    ClientState.lastDirectorDebugReceiveAt = Core.Now()
+end)
 Internal.RegisterServerCommand(Const.CMD_COLONY_MANAGEMENT, function(args)
     ClientState.colonyManagement = args.snapshot
     ClientState.lastColonyManagementReceiveAt = Core.Now()

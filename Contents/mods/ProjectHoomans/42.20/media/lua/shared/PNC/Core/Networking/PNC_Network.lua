@@ -29,6 +29,8 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     communityDebugAuthorized = false,
     needsDebug = nil,
     needsDebugAuthorized = false,
+    directorDebug = nil,
+    directorDebugAuthorized = false,
     colonyManagement = nil,
 }
 PNC.Network.ServerState = PNC.Network.ServerState or {
@@ -40,6 +42,9 @@ PNC.Network.ServerState = PNC.Network.ServerState or {
 }
 if PNC.Network.ClientState.communityDebugAuthorized == nil then
     PNC.Network.ClientState.communityDebugAuthorized = false
+end
+if PNC.Network.ClientState.directorDebugAuthorized == nil then
+    PNC.Network.ClientState.directorDebugAuthorized = false
 end
 PNC.Network.Internal = PNC.Network.Internal or {}
 

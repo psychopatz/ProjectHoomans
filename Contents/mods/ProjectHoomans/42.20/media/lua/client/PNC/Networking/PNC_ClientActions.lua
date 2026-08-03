@@ -190,6 +190,15 @@ function Client.SendDebug(action, payload)
         ClientState.lastNeedsDebugReceiveAt = Core.Now()
         return snapshot ~= nil
     end
+    if action == "director_debug_action" then
+        if not PNC.AbstractDirectorDebug then return false end
+        local snapshot = PNC.AbstractDirectorDebug.PerformAction(args)
+        ClientState.directorDebugAuthorized = true
+        ClientState.directorDebug = snapshot
+        ClientState.directorDebugReason = nil
+        ClientState.lastDirectorDebugReceiveAt = Core.Now()
+        return snapshot ~= nil
+    end
     if action == "spawn" and PNC.API and PNC.API.Spawn then
         local variant = tostring(args.variant or "colonist")
         local legacyFaction = (variant == "hostile_melee" or variant == "hostile_ranged")

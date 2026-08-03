@@ -423,6 +423,33 @@ function Client.RequestNeedsDebug(groupID, npcID)
     return true
 end
 
+function Client.RequestDirectorDebug(groupID, locationID)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local args = { groupID = groupID, locationID = locationID }
+    if not Client.CanUseDebug() then
+        ClientState.directorDebugAuthorized = false
+        ClientState.directorDebug = nil
+        ClientState.directorDebugReason = "not_authorized"
+        return false
+    end
+    ClientState.lastDirectorDebugRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE,
+                Const.CMD_DIRECTOR_DEBUG_REQUEST, args)
+            return true
+        end
+        return false
+    end
+    if not PNC.AbstractDirectorDebug then return false end
+    ClientState.directorDebugAuthorized = true
+    ClientState.directorDebug = PNC.AbstractDirectorDebug.BuildSnapshot(
+        groupID, locationID, nil)
+    ClientState.directorDebugReason = nil
+    ClientState.lastDirectorDebugReceiveAt = Core.Now()
+    return true
+end
+
 function Client.RequestColonyManagement()
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     if Core.IsClientOnly and Core.IsClientOnly() then

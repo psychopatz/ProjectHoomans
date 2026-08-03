@@ -55,6 +55,20 @@ PsychopatzCore.DebugHub.RegisterTool({
 })
 
 PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.abstractDirector",
+    source = "ProjectHoomans",
+    order = 226,
+    title = "Abstract World Director",
+    description = "Inspect strategic groups, locations, traversal, occupancy, combat-profile caches, encounters, and scheduled jobs.",
+    available = function()
+        return PNC and PNC.DirectorDebugUI and PNC.DirectorDebugUI.Toggle
+            and PNC.Client and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function() PNC.DirectorDebugUI.Toggle() end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.communityOverlay",
     source = "ProjectHoomans",
     order = 231,
