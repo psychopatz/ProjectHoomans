@@ -59,6 +59,10 @@ function ISPNCDirectorDebugWindow:createChildren()
         { "force_update", "FORCE UPDATE", "success" },
         { "force_arrival", "FORCE ARRIVAL", "quiet" },
         { "rebuild_profile", "REBUILD PROFILE", "quiet" },
+        { "rebuild_behavior", "REBUILD BEHAVIOR", "quiet" },
+        { "force_start_scavenge", "START SCAVENGE", "success" },
+        { "force_complete_action", "COMPLETE ACTION", "quiet" },
+        { "force_encounter", "EVALUATE ENCOUNTER", "danger" },
         { "toggle_pause", "PAUSE / RESUME", "danger" },
     }) do
         self.controls[#self.controls + 1] = UI.CreateButton(self, {

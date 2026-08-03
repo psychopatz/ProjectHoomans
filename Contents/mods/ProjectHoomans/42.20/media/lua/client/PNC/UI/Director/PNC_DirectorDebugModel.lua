@@ -39,11 +39,19 @@ function Model.DetailRows(snapshot, group, location, authorized, reason)
     rows[#rows + 1] = row("Registry", "revision " .. tostring(metrics.registryRevision or 0)
         .. (metrics.dirty and " / dirty" or " / saved"))
     rows[#rows + 1] = row("Population", string.format(
-        "groups=%d traveling=%d active=%d", metrics.groups or 0,
-        metrics.traveling or 0, metrics.materialized or 0))
+        "groups=%d traveling=%d active=%d actions=%d engaged=%d", metrics.groups or 0,
+        metrics.traveling or 0, metrics.materialized or 0,
+        metrics.activeActions or 0, metrics.engaged or 0))
     rows[#rows + 1] = row("World", string.format(
         "locations=%d encounters=%d jobs=%d", metrics.locations or 0,
         metrics.encounters or 0, metrics.scheduledJobs or 0))
+    rows[#rows + 1] = row("Director work", string.format(
+        "actions=%d/%d queue=%d resolved=%d combat=%d retreat=%d casualty=%d invalidations=%d avgEncounter=%.2fms",
+        metrics.actionsCompleted or 0, metrics.actionsStarted or 0,
+        metrics.encountersQueued or 0, metrics.encountersResolved or 0,
+        metrics.abstractCombats or 0, metrics.abstractRetreats or 0,
+        metrics.casualties or 0, metrics.profileInvalidations or 0,
+        metrics.averageEncounterProcessingMS or 0))
     if snapshot and snapshot.action then
         rows[#rows + 1] = row("Last action",
             tostring(snapshot.action.action) .. ": " .. tostring(snapshot.action.reason),
@@ -57,6 +65,11 @@ function Model.DetailRows(snapshot, group, location, authorized, reason)
         rows[#rows + 1] = row("Members / leader", tostring(#(group.memberIds or {}))
             .. " / " .. tostring(group.leaderId or "none"))
         rows[#rows + 1] = row("Mission + state", group.mission .. " + " .. group.state)
+        local action = group.action
+        rows[#rows + 1] = row("Current action", action and string.format(
+            "%s @ %s / %.3f -> %.3f / seed %s", action.type,
+            action.locationId, action.startedAt or 0, action.endsAt or 0,
+            tostring(action.seed)) or "none")
         rows[#rows + 1] = row("Current location", group.location and group.location.id or "none")
         rows[#rows + 1] = row("Target", group.targetLocation and group.targetLocation.id or "none")
         rows[#rows + 1] = row("State time", string.format("%.3f -> %.3f",
@@ -64,10 +77,26 @@ function Model.DetailRows(snapshot, group, location, authorized, reason)
         local needs = group.needs or {}
         rows[#rows + 1] = row("Needs H/W/R", string.format("%.1f / %.1f / %.1f",
             needs.hunger or 0, needs.hydration or 0, needs.fatigue or 0))
+        local shortages = group.resourceNeeds or {}
+        rows[#rows + 1] = row("Shortage F/W/A/Med/Mat", string.format(
+            "%.2f / %.2f / %.2f / %.2f / %.2f", shortages.food or 0,
+            shortages.water or 0, shortages.ammo or 0,
+            shortages.medical or 0, shortages.materials or 0))
         local resources = group.resources or {}
         rows[#rows + 1] = row("Resources F/W/A/M", string.format("%.0f / %.0f / %.0f / %.0f",
             resources.food or 0, resources.water or 0, resources.ammo or 0,
             resources.medical or 0))
+        rows[#rows + 1] = row("Morale / desperation", string.format("%.2f / %.2f",
+            group.morale or 0, group.desperation or 0))
+        local behavior = group.behaviorProfile or {}
+        rows[#rows + 1] = row("Behavior A/B/G/C/M/D", string.format(
+            "%.2f / %.2f / %.2f / %.2f / %.2f / %.2f",
+            behavior.aggression or 0, behavior.bravery or 0,
+            behavior.greed or 0, behavior.caution or 0,
+            behavior.mercy or 0, behavior.discipline or 0))
+        rows[#rows + 1] = row("Encounter active / recent",
+            tostring(group.activeEncounterId or "none") .. " / "
+                .. tostring(group.recentEncounterId or "none"))
         rows[#rows + 1] = row("Combat cache",
             (group.combatProfileDirty and "DIRTY" or "CACHED") .. " / "
                 .. tostring(group.combatProfileCacheState or group.combatProfileReason or "none"),
@@ -88,6 +117,20 @@ function Model.DetailRows(snapshot, group, location, authorized, reason)
                     c.final or 0, c.resources or 0, c.tags or 0, c.mission or 0,
                     c.unvisited or 0, c.distance or 0, c.danger or 0,
                     c.scavenged or 0))
+        end
+        local scavenge = group.lastScavenge
+        if scavenge then
+            rows[#rows + 1] = row("SCAVENGE", string.format(
+                "depletion %.2f -> %.2f / total +%.0f / seed %s",
+                scavenge.scavengedBefore or 0, scavenge.scavengedAfter or 0,
+                scavenge.totalYield or 0, tostring(scavenge.seed)))
+            for category, detail in pairs(scavenge.components or {}) do
+                rows[#rows + 1] = row("SCAVENGE " .. category, string.format(
+                    "potential %.1f need %.2f remain %.2f scav %.2f var %.2f => +%d",
+                    detail.potential or 0, detail.need or 0,
+                    detail.remainingFactor or 0, detail.scavengerFactor or 0,
+                    detail.variance or 0, detail.yield or 0))
+            end
         end
     end
     if location then
@@ -116,6 +159,21 @@ function Model.DetailRows(snapshot, group, location, authorized, reason)
                 .. " / " .. table.concat(report.participants or {}, " vs "),
             report.outcome == "MATERIALIZATION_REQUIRED"
                 and "warning" or "textMuted")
+        for groupID, intent in pairs(report.intentScores or {}) do
+            local scoreText = {}
+            for _, name in ipairs({ "IGNORE", "AVOID", "FLEE", "NEGOTIATE",
+                "EXTORT", "ROB", "ATTACK" }) do
+                scoreText[#scoreText + 1] = name .. "="
+                    .. string.format("%.1f", intent.scores and intent.scores[name] or 0)
+            end
+            rows[#rows + 1] = row("INTENT " .. groupID,
+                tostring(intent.selected) .. " | " .. table.concat(scoreText, " "))
+        end
+        for _, roundReport in ipairs(report.combatResult
+            and report.combatResult.roundReports or {}) do
+            rows[#rows + 1] = row("COMBAT ROUND " .. tostring(roundReport.round),
+                "aggregate pressure/casualties available in report")
+        end
     end
     return rows
 end

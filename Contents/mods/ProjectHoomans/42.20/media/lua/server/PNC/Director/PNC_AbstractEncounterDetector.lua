@@ -1,4 +1,4 @@
--- Shared-location encounter detection only. Resolution is intentionally deferred.
+-- Shared-location collision detection, persistent report creation, and queueing.
 
 if isClient and isClient() and (not isServer or not isServer()) then return end
 
@@ -10,6 +10,7 @@ local Store = PNC.AbstractWorldStore
 local Groups = PNC.AbstractGroups
 local Locations = PNC.AbstractLocations
 local Config = PNC.DirectorConfig
+local Resolver = PNC.AbstractEncounterResolver
 
 local function deterministicSeed(text)
     local hash = 2166136261
@@ -34,10 +35,22 @@ function Encounters.IsPlayerNearby(location, radius)
     return false
 end
 
+function Encounters.TrimHistory()
+    local reports = Store.Registry.encounters
+    while #reports > Config.ENCOUNTER_HISTORY_LIMIT do
+        local removable
+        for index, existing in ipairs(reports) do
+            if existing.outcome ~= "QUEUED" then removable = index break end
+        end
+        if not removable then break end
+        table.remove(reports, removable)
+    end
+end
+
 local function append(report)
     local reports = Store.Registry.encounters
     reports[#reports + 1] = report
-    while #reports > Config.ENCOUNTER_HISTORY_LIMIT do table.remove(reports, 1) end
+    Encounters.TrimHistory()
     Store.Touch("abstract_encounter_detected")
     Store.Emit("ABSTRACT_ENCOUNTER_STARTED", report)
 end
@@ -46,23 +59,47 @@ function Encounters.Create(location, firstGroup, secondGroup, at)
     if not location or not firstGroup or not secondGroup
         or firstGroup.id == secondGroup.id
     then return nil, "invalid_participants" end
+    at = tonumber(at) or Store.WorldAgeHours()
+    local participants = { firstGroup.id, secondGroup.id }
+    table.sort(participants)
+    local pairKey = location.id .. ":" .. table.concat(participants, ":")
+    local playerNearby = Encounters.IsPlayerNearby(location)
+    local cooldownUntil = Store.Registry.encounterCooldowns[pairKey] or 0
+    if not playerNearby and at < cooldownUntil then return nil, "pair_cooldown" end
+    local cooldownCount = 0
+    for key, expiry in pairs(Store.Registry.encounterCooldowns) do
+        if expiry <= at then Store.Registry.encounterCooldowns[key] = nil
+        else cooldownCount = cooldownCount + 1 end
+    end
+    if cooldownCount >= Config.ENCOUNTER_HISTORY_LIMIT * 4 then
+        local oldestKey, oldestExpiry
+        for key, expiry in pairs(Store.Registry.encounterCooldowns) do
+            if not oldestExpiry or expiry < oldestExpiry then
+                oldestKey, oldestExpiry = key, expiry
+            end
+        end
+        if oldestKey then Store.Registry.encounterCooldowns[oldestKey] = nil end
+    end
+    Store.Registry.encounterCooldowns[pairKey] = at
+        + Config.EncounterQueue.PAIR_COOLDOWN_HOURS
     local serial = Store.Registry.nextEncounterSerial
     Store.Registry.nextEncounterSerial = serial + 1
     local id = "encounter_" .. tostring(serial)
-    local participants = { firstGroup.id, secondGroup.id }
-    table.sort(participants)
-    local playerNearby = Encounters.IsPlayerNearby(location)
     local report = {
         id = id,
-        timestamp = tonumber(at) or Store.WorldAgeHours(),
+        timestamp = at,
         locationId = location.id,
         participants = participants,
+        initiatorId = firstGroup.id,
+        targetId = secondGroup.id,
         encounterType = "GROUP_COLLISION",
         decisions = {},
-        outcome = playerNearby and "MATERIALIZATION_REQUIRED" or "DETECTED",
+        outcome = playerNearby and "MATERIALIZATION_REQUIRED" or "QUEUED",
         reasonEnded = playerNearby and "PLAYER_OBSERVATION_SAFETY"
-            or "RESOLUTION_DEFERRED",
-        seed = deterministicSeed(id .. ":" .. table.concat(participants, ":")),
+            or "AWAITING_RESOLUTION",
+        seed = deterministicSeed(location.id .. ":"
+            .. table.concat(participants, ":") .. ":"
+            .. tostring(math.floor(at * 60 + 0.5))),
         abstractResolutionAllowed = not playerNearby,
     }
     append(report)
@@ -71,7 +108,7 @@ function Encounters.Create(location, firstGroup, secondGroup, at)
             encounterId = id, locationId = location.id,
             participantIds = participants,
         })
-    end
+    else Resolver.Enqueue(report) end
     return report, report.outcome
 end
 

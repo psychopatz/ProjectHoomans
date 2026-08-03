@@ -45,6 +45,8 @@ function Store.Load()
             or type(group.simulation) ~= "table"
             or type(group.resources) ~= "table"
             or group.combatProfileDirty == nil
+            or group.morale == nil
+            or type(group.recentAvoidedLocations) ~= "table"
         then needsMigration = true break end
     end
     Store.Registry = Types.NormalizeRegistry(raw)

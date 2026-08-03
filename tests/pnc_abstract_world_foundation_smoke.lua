@@ -90,6 +90,15 @@ dofile(SERVER .. "PNC_AbstractWorldStore.lua")
 dofile(SERVER .. "PNC_AbstractLocationManager.lua")
 dofile(SERVER .. "PNC_AbstractGroupManager.lua")
 dofile(SERVER .. "PNC_AbstractCombatProfile.lua")
+dofile(SERVER .. "PNC_AbstractResourceNeeds.lua")
+dofile(SERVER .. "PNC_AbstractBehaviorProfile.lua")
+dofile(SERVER .. "PNC_AbstractScavengeResolver.lua")
+dofile(SERVER .. "PNC_AbstractActionResolver.lua")
+dofile(SERVER .. "PNC_AbstractEncounterEvaluator.lua")
+dofile(SERVER .. "PNC_AbstractCasualtyResolver.lua")
+dofile(SERVER .. "PNC_AbstractRetreatResolver.lua")
+dofile(SERVER .. "PNC_AbstractCombatResolver.lua")
+dofile(SERVER .. "PNC_AbstractEncounterResolver.lua")
 dofile(SERVER .. "PNC_AbstractEncounterDetector.lua")
 dofile(SERVER .. "PNC_AbstractTraversal.lua")
 dofile(SERVER .. "PNC_WorldDirector.lua")
@@ -126,13 +135,13 @@ equal(#PNC.AbstractLocations.GetGroupOccupants(store), 1,
 worldHour = group.stateEndsAt
 truthy(PNC.AbstractTraversal.Arrive(group, worldHour))
 equal(group.location.id, store.id, "logical arrival")
-equal(group.state, "ARRIVED", "arrival state")
+equal(group.state, "PERFORMING_ACTION", "arrival starts mission action")
 equal(PNC.Registry.Data.npc_1.x, store.x - 1,
     "abstract member moved without body")
 equal(#PNC.AbstractWorldStore.Registry.encounters, 1,
     "shared-location encounter detected")
-equal(PNC.AbstractWorldStore.Registry.encounters[1].outcome, "DETECTED",
-    "combat intentionally unresolved")
+equal(PNC.AbstractWorldStore.Registry.encounters[1].outcome, "QUEUED",
+    "collision queues bounded resolution")
 
 PNC.SpatialIndex.QueryPlayers = function()
     return { { getX = function() return store.x end,

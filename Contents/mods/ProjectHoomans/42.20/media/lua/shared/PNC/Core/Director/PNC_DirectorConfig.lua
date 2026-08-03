@@ -18,10 +18,13 @@ Config.MAX_TRAVEL_HOURS = 12
 Config.TRAVERSAL_INTERVAL_HOURS = 2 / 60
 Config.DECISION_INTERVAL_HOURS = 10 / 60
 Config.RECONCILE_INTERVAL_HOURS = 30 / 60
+Config.ACTION_INTERVAL_HOURS = 2 / 60
+Config.ENCOUNTER_INTERVAL_HOURS = 1 / 60
 Config.DIRECTOR_JOB_BUDGET = 12
 Config.ACTIVE_SIMULATION_RADIUS = 80
 Config.ENCOUNTER_HISTORY_LIMIT = 100
 Config.OCCUPANCY_HISTORY_LIMIT = 12
+Config.RECENT_THREAT_HISTORY_LIMIT = 24
 Config.MIN_MISSION_DURATION_HOURS = 10 / 60
 Config.MISSION_REPLACEMENT_THRESHOLD = 12
 Config.MANPOWER_EXPONENT = 0.72
@@ -43,7 +46,115 @@ Config.STATES = {
     IDLE = true, SELECTING_DESTINATION = true, TRAVELING = true,
     ARRIVED = true, PERFORMING_ACTION = true, SEARCHING = true,
     WAITING = true, RETREATING = true, MATERIALIZING = true,
-    ACTIVE = true,
+    ACTIVE = true, ACTION_COMPLETE = true, ENGAGED = true,
+}
+
+Config.RESOURCE_CATEGORIES = { "food", "water", "ammo", "medical", "materials" }
+
+Config.Actions = {
+    DEFAULT_DURATION_HOURS = 30 / 60,
+}
+
+Config.Scavenging = {
+    DURATION_MIN_HOURS = 35 / 60,
+    DURATION_MAX_HOURS = 95 / 60,
+    BASE_YIELD_SCALE = 0.22,
+    MIN_REMAINING_FACTOR = 0.04,
+    VARIANCE_MIN = 0.90,
+    VARIANCE_MAX = 1.10,
+    EFFECTIVE_SCAVENGER_EXPONENT = 0.62,
+    DEPLETION_BASE = 2.5,
+    DEPLETION_PER_YIELD = 0.07,
+    MAX_YIELD_PER_RESOURCE = 40,
+    NEED_YIELD_BONUS = 0.35,
+    NEED_RESTORE_PER_RESOURCE = { food = 0.7, water = 0.9 },
+}
+
+Config.ResourceNeeds = {
+    TARGET_PER_MEMBER = { food = 10, water = 10, ammo = 12,
+        medical = 3, materials = 5 },
+    DESTINATION_BASE_WEIGHT = { food = 1.0, water = 1.0, ammo = 0.70,
+        medical = 0.75, materials = 0.35 },
+    MIN_DESTINATION_WEIGHT = 0.10,
+}
+
+Config.Behavior = {
+    ARCHETYPES = {
+        REFUGEE = { aggression = 0.10, bravery = 0.32, greed = 0.12,
+            caution = 0.88, mercy = 0.80, discipline = 0.42,
+            civilianHostility = 0.03 },
+        LOOTER = { aggression = 0.82, bravery = 0.62, greed = 0.90,
+            caution = 0.34, mercy = 0.15, discipline = 0.55,
+            civilianHostility = 0.78 },
+        SCAVENGER = { aggression = 0.24, bravery = 0.44, greed = 0.48,
+            caution = 0.72, mercy = 0.58, discipline = 0.52,
+            civilianHostility = 0.12 },
+        PATROL = { aggression = 0.42, bravery = 0.68, greed = 0.12,
+            caution = 0.55, mercy = 0.50, discipline = 0.82,
+            civilianHostility = 0.18 },
+        TRADER = { aggression = 0.18, bravery = 0.40, greed = 0.58,
+            caution = 0.72, mercy = 0.62, discipline = 0.60,
+            civilianHostility = 0.08 },
+        WANDERER = { aggression = 0.28, bravery = 0.45, greed = 0.35,
+            caution = 0.62, mercy = 0.55, discipline = 0.42,
+            civilianHostility = 0.15 },
+        RAIDER = { aggression = 0.90, bravery = 0.72, greed = 0.88,
+            caution = 0.25, mercy = 0.08, discipline = 0.62,
+            civilianHostility = 0.88 },
+        SETTLEMENT_PARTY = { aggression = 0.30, bravery = 0.58,
+            greed = 0.25, caution = 0.60, mercy = 0.62,
+            discipline = 0.67, civilianHostility = 0.12 },
+    },
+    DESPERATION_WEIGHTS = { food = 0.30, water = 0.34,
+        medical = 0.12, ammo = 0.08, morale = 0.10, condition = 0.06 },
+}
+
+Config.Intent = {
+    OPTIONS = { "IGNORE", "AVOID", "FLEE", "NEGOTIATE", "EXTORT", "ROB", "ATTACK" },
+    BASE = { IGNORE = 20, AVOID = 18, FLEE = 4, NEGOTIATE = 15,
+        EXTORT = 4, ROB = 2, ATTACK = 3 },
+    VARIANCE = 2.5,
+    FRIENDLY_HOSTILE_PENALTY = 120,
+    HOSTILE_BONUS = 28,
+    OVERWHELMING_RATIO = 0.48,
+}
+
+Config.CombatResolution = {
+    MAX_ABSTRACT_COMBAT_ROUNDS = 3,
+    VARIANCE = 0.10,
+    CASUALTY_PRESSURE_SCALE = 0.42,
+    MAX_CASUALTIES_PER_ROUND = 2,
+    AMMO_EXPENDITURE_SCALE = 0.34,
+    MORALE_CASUALTY_LOSS = 0.13,
+    MORALE_PRESSURE_LOSS = 0.045,
+    ENVIRONMENT = {
+        BUILDING = { defense = 1.08, mobility = 0.94, ranged = 0.96 },
+        SETTLEMENT = { defense = 1.12, mobility = 0.92, ranged = 1.0 },
+        POI = { defense = 1.0, mobility = 1.0, ranged = 1.0 },
+        TEMPORARY = { defense = 1.0, mobility = 1.05, ranged = 1.02 },
+    },
+}
+
+Config.Casualties = {
+    DAMAGE = { MINOR = 6, SERIOUS = 18, CRITICAL = 36 },
+    WOUND_TYPE = { MINOR = "scratch", SERIOUS = "laceration",
+        CRITICAL = "bullet" },
+}
+
+Config.Retreat = {
+    MORALE_BREAK_THRESHOLD = 0.38,
+    OUTMATCHED_RATIO = 0.52,
+    BASE_SUCCESS = 0.42,
+    FAILED_RETREAT_PRESSURE = 0.35,
+    FLEE_MORALE_PENALTY = 0.10,
+    ABANDON_RESOURCE_FRACTION = 0.05,
+    RECENT_THREAT_COOLDOWN_HOURS = 12,
+}
+
+Config.EncounterQueue = {
+    WORK_BUDGET = 4,
+    PAIR_COOLDOWN_HOURS = 2,
+    MAX_ATTEMPTS = 3,
 }
 
 Config.LOCATION_TYPES = {

@@ -13,6 +13,8 @@ local Locations = PNC.AbstractLocations
 local Core = PNC.Core
 local Const = PNC.Const
 
+Groups.Metrics = Groups.Metrics or { profileInvalidations = 0 }
+
 local function authority()
     return Core and Core.IsAuthority and Core.IsAuthority() == true
 end
@@ -75,6 +77,9 @@ function Groups.Create(spec)
         return Store.Registry.groupsByID[group.id], "existing"
     end
     Store.Registry.groupsByID[group.id] = group
+    if PNC.AbstractBehaviorProfile and PNC.AbstractBehaviorProfile.Build then
+        PNC.AbstractBehaviorProfile.Build(group)
+    end
     touch(group, "group_created")
     Locations.Arrive(group, Store.WorldAgeHours(), 0)
     Store.Emit("GROUP_CREATED", { groupId = group.id })
@@ -147,6 +152,9 @@ function Groups.MarkCombatProfileDirty(groupOrID, reason)
     local group = type(groupOrID) == "table" and groupOrID
         or Groups.Get(groupOrID)
     if not group then return false end
+    if group.combatProfileDirty ~= true then
+        Groups.Metrics.profileInvalidations = Groups.Metrics.profileInvalidations + 1
+    end
     group.combatProfileDirty = true
     group.combatProfileReason = tostring(reason or "meaningful_change")
     return true
@@ -178,6 +186,48 @@ function Groups.GetNeeds(groupOrID)
     return { hunger = 100, hydration = 100, fatigue = 100 }
 end
 
+function Groups.GetResourceNeeds(groupOrID)
+    if PNC.AbstractResourceNeeds and PNC.AbstractResourceNeeds.Get then
+        return PNC.AbstractResourceNeeds.Get(groupOrID)
+    end
+    return { food = 0, water = 0, ammo = 0,
+        medical = 0, materials = 0 }, "resource_needs_unavailable"
+end
+
+local function rememberExpiry(map, key, expiry, now)
+    map[key] = expiry
+    local count = 0
+    for existing, existingExpiry in pairs(map) do
+        if existingExpiry <= now then map[existing] = nil
+        else count = count + 1 end
+    end
+    while count > Config.RECENT_THREAT_HISTORY_LIMIT do
+        local oldestKey, oldestExpiry
+        for existing, existingExpiry in pairs(map) do
+            if not oldestExpiry or existingExpiry < oldestExpiry then
+                oldestKey, oldestExpiry = existing, existingExpiry
+            end
+        end
+        if not oldestKey then break end
+        map[oldestKey] = nil
+        count = count - 1
+    end
+end
+
+function Groups.RememberThreat(groupOrID, locationID, hostileGroupID, expiry, now)
+    local group = type(groupOrID) == "table" and groupOrID or Groups.Get(groupOrID)
+    if not group then return false end
+    now = tonumber(now) or Store.WorldAgeHours()
+    expiry = math.max(now, tonumber(expiry) or now)
+    group.recentAvoidedLocations = group.recentAvoidedLocations or {}
+    group.recentHostileGroups = group.recentHostileGroups or {}
+    if locationID then rememberExpiry(group.recentAvoidedLocations,
+        tostring(locationID), expiry, now) end
+    if hostileGroupID then rememberExpiry(group.recentHostileGroups,
+        tostring(hostileGroupID), expiry, now) end
+    return true
+end
+
 function Groups.HasLiveMembers(groupOrID)
     local group = type(groupOrID) == "table" and groupOrID
         or Groups.Get(groupOrID)
@@ -203,6 +253,11 @@ function Groups.RefreshLOD(groupOrID, at)
         Locations.Depart(group, at)
         group.simulation.lod = "ACTIVE"
         group.targetLocation = nil
+        if group.action then
+            Store.Emit("ABSTRACT_ACTION_INTERRUPTED", { groupId = group.id,
+                actionType = group.action.type, reason = "materialized" })
+            group.action = nil
+        end
         Groups.SetState(group, "ACTIVE", at, at)
         Store.Emit("GROUP_MATERIALIZED", { groupId = group.id })
     elseif not live and lod == "ACTIVE" then

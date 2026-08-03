@@ -107,6 +107,62 @@ function Types.NormalizeCombatProfile(value)
     return output
 end
 
+function Types.NormalizeBehaviorProfile(value)
+    local source = type(value) == "table" and value or {}
+    local output = {}
+    for _, field in ipairs({ "aggression", "bravery", "greed", "caution",
+        "mercy", "discipline", "civilianHostility" }) do
+        output[field] = math.max(0, math.min(1, finite(source[field], 0)))
+    end
+    output.builtAt = math.max(0, finite(source.builtAt, 0))
+    output.source = type(source.source) == "string" and source.source or "normalized"
+    return output
+end
+
+function Types.NormalizeAction(value)
+    local source = type(value) == "table" and value or nil
+    if not source then return nil end
+    local actionType = tostring(source.type or "")
+    local locationID = safeID(source.locationId, "aloc_")
+    if actionType == "" or not locationID then return nil end
+    local startedAt = math.max(0, finite(source.startedAt, 0))
+    local endsAt = math.max(startedAt, finite(source.endsAt, startedAt))
+    return { type = actionType, locationId = locationID,
+        startedAt = startedAt, endsAt = endsAt,
+        seed = integer(source.seed, 0, 2147483647, 0),
+        status = type(source.status) == "string" and source.status or "ACTIVE" }
+end
+
+local function previousMission(value)
+    local source = type(value) == "table" and value or nil
+    if not source or not Config.MISSIONS[source.type] then return nil end
+    return { type = source.type,
+        targetLocationId = safeID(source.targetLocationId, "aloc_") }
+end
+
+local function expiryMap(value, prefix)
+    local output = {}
+    for key, expiry in pairs(type(value) == "table" and value or {}) do
+        if safeID(key, prefix) then
+            output[key] = math.max(0, finite(expiry, 0))
+        end
+    end
+    local count = 0
+    for _ in pairs(output) do count = count + 1 end
+    while count > Config.RECENT_THREAT_HISTORY_LIMIT do
+        local oldestKey, oldestExpiry
+        for key, expiry in pairs(output) do
+            if not oldestExpiry or expiry < oldestExpiry then
+                oldestKey, oldestExpiry = key, expiry
+            end
+        end
+        if not oldestKey then break end
+        output[oldestKey] = nil
+        count = count - 1
+    end
+    return output
+end
+
 function Types.NormalizeGroup(value, groupID)
     local source = type(value) == "table" and value or {}
     local id = safeID(groupID or source.id, "agroup_")
@@ -117,6 +173,13 @@ function Types.NormalizeGroup(value, groupID)
     local state = Config.STATES[source.state] and source.state or "IDLE"
     local target = Types.NormalizeLocationRef(source.targetLocation)
     if state == "TRAVELING" and not target then state = "IDLE" end
+    local action = Types.NormalizeAction(source.action)
+    if action and action.locationId ~= location.id then action = nil end
+    if action and state ~= "ACTIVE" and state ~= "TRAVELING" then
+        state = "PERFORMING_ACTION"
+    elseif (state == "PERFORMING_ACTION" or state == "ENGAGED") and not action then
+        state = "ARRIVED"
+    end
     return {
         schemaVersion = Config.SCHEMA_VERSION,
         id = id,
@@ -134,8 +197,15 @@ function Types.NormalizeGroup(value, groupID)
         stateEndsAt = math.max(0, finite(source.stateEndsAt, 0)),
         missionStartedAt = math.max(0, finite(source.missionStartedAt, 0)),
         resources = resources(source.resources),
+        action = action,
+        previousMission = previousMission(source.previousMission),
         behaviorProfile = type(source.behaviorProfile) == "table"
-            and copy(source.behaviorProfile) or nil,
+            and Types.NormalizeBehaviorProfile(source.behaviorProfile) or nil,
+        morale = math.max(0, math.min(1, finite(source.morale, 0.65))),
+        recentAvoidedLocations = expiryMap(source.recentAvoidedLocations, "aloc_"),
+        recentHostileGroups = expiryMap(source.recentHostileGroups, "agroup_"),
+        activeEncounterId = safeID(source.activeEncounterId, "encounter_"),
+        recentEncounterId = safeID(source.recentEncounterId, "encounter_"),
         knowledge = type(source.knowledge) == "table"
             and copy(source.knowledge) or {},
         visited = stringSet(source.visited),
@@ -196,7 +266,7 @@ end
 function Types.NewRegistry()
     return { schemaVersion = Config.SCHEMA_VERSION, revision = 0,
         groupsByID = {}, locationsByID = {}, encounters = {},
-        nextEncounterSerial = 1 }
+        encounterCooldowns = {}, nextEncounterSerial = 1 }
 end
 
 function Types.NormalizeRegistry(value)
@@ -222,7 +292,32 @@ function Types.NormalizeRegistry(value)
         end
     end
     while #output.encounters > Config.ENCOUNTER_HISTORY_LIMIT do
-        table.remove(output.encounters, 1)
+        local removable
+        for index, report in ipairs(output.encounters) do
+            if report.outcome ~= "QUEUED" then removable = index break end
+        end
+        if not removable then break end
+        table.remove(output.encounters, removable)
+    end
+    for key, expiry in pairs(type(source.encounterCooldowns) == "table"
+        and source.encounterCooldowns or {}) do
+        if type(key) == "string" and #key <= 640 then
+            output.encounterCooldowns[key] = math.max(0, finite(expiry, 0))
+        end
+    end
+    local cooldownLimit = Config.ENCOUNTER_HISTORY_LIMIT * 4
+    local cooldownCount = 0
+    for _ in pairs(output.encounterCooldowns) do cooldownCount = cooldownCount + 1 end
+    while cooldownCount > cooldownLimit do
+        local oldestKey, oldestExpiry
+        for key, expiry in pairs(output.encounterCooldowns) do
+            if not oldestExpiry or expiry < oldestExpiry then
+                oldestKey, oldestExpiry = key, expiry
+            end
+        end
+        if not oldestKey then break end
+        output.encounterCooldowns[oldestKey] = nil
+        cooldownCount = cooldownCount - 1
     end
     output.nextEncounterSerial = integer(source.nextEncounterSerial,
         1, 2147483647, #output.encounters + 1)

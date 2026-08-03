@@ -12,6 +12,11 @@ local Locations = PNC.AbstractLocations
 local Combat = PNC.AbstractCombatProfile
 local Traversal = PNC.AbstractTraversal
 local Store = PNC.AbstractWorldStore
+local Actions = PNC.AbstractActions
+local Behavior = PNC.AbstractBehaviorProfile
+local ResourceNeeds = PNC.AbstractResourceNeeds
+local Encounters = PNC.AbstractEncounters
+local EncounterResolver = PNC.AbstractEncounterResolver
 local Core = PNC.Core
 
 local function copy(value)
@@ -22,6 +27,8 @@ local function groupSummary(group, selected)
     local profile, cacheState
     if selected then profile, cacheState = Combat.Get(group, false) end
     local needs = Groups.GetNeeds(group)
+    local resourceNeeds = ResourceNeeds.Get(group)
+    local behavior = Behavior.GetContext(group, profile or group.combatProfile)
     return {
         id = group.id, factionId = group.factionId,
         homeCommunityId = group.homeCommunityId,
@@ -30,14 +37,22 @@ local function groupSummary(group, selected)
         location = copy(group.location), targetLocation = copy(group.targetLocation),
         stateStartedAt = group.stateStartedAt, stateEndsAt = group.stateEndsAt,
         missionStartedAt = group.missionStartedAt,
-        needs = copy(needs), resources = copy(group.resources),
+        action = copy(group.action), previousMission = copy(group.previousMission),
+        needs = copy(needs), resourceNeeds = copy(resourceNeeds),
+        resources = copy(group.resources), morale = group.morale,
+        behaviorProfile = copy(behavior and behavior.stable),
+        desperation = behavior and behavior.desperation or 0,
+        activeEncounterId = group.activeEncounterId,
+        recentEncounterId = group.recentEncounterId,
         combatProfile = copy(profile or group.combatProfile),
         combatProfileDirty = group.combatProfileDirty == true,
         combatProfileReason = group.combatProfileReason,
+        combatProfileSignature = group.combatProfileSignature,
         combatProfileCacheState = cacheState,
         destinationEvaluations = copy(group.diagnostics
             and group.diagnostics.destinationEvaluations or {}),
         travel = copy(group.diagnostics and group.diagnostics.travel),
+        lastScavenge = copy(group.diagnostics and group.diagnostics.lastScavenge),
         revision = group.revision,
     }
 end
@@ -89,6 +104,27 @@ function Debug.PerformAction(args)
         local profile
         profile, reason = Combat.Get(args.groupID, true)
         ok = profile ~= nil
+    elseif operation == "rebuild_behavior" then
+        local profile
+        profile, reason = Behavior.Get(args.groupID, true)
+        ok = profile ~= nil
+    elseif operation == "force_start_scavenge" then
+        local action
+        action, reason = Actions.Start(args.groupID, "SCAVENGE",
+            Store.WorldAgeHours())
+        ok = action ~= nil
+    elseif operation == "force_complete_action" then
+        local result
+        result, reason = Actions.Complete(args.groupID,
+            Store.WorldAgeHours(), true)
+        ok = result ~= nil
+    elseif operation == "force_encounter" then
+        local group = Groups.Get(args.groupID)
+        local reports = group and Encounters.DetectAt(group.location.id,
+            group, Store.WorldAgeHours()) or {}
+        EncounterResolver.ProcessBatch(Store.WorldAgeHours(),
+            PNC.DirectorConfig.EncounterQueue.WORK_BUDGET)
+        ok, reason = #reports > 0, #reports > 0 and "evaluated" or "no_collision"
     elseif operation == "toggle_pause" then
         Director.SetPaused(not Director.Paused)
         ok, reason = true, Director.Paused and "paused" or "resumed"

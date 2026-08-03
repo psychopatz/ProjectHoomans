@@ -10,27 +10,23 @@ local Store = PNC.AbstractWorldStore
 local Groups = PNC.AbstractGroups
 local Locations = PNC.AbstractLocations
 local Encounters = PNC.AbstractEncounters
+local Actions = PNC.AbstractActions
+local ResourceNeeds = PNC.AbstractResourceNeeds
 local Config = PNC.DirectorConfig
 
 Traversal.TravelCursor = Traversal.TravelCursor or 0
 Traversal.DecisionCursor = Traversal.DecisionCursor or 0
 
 local function resourceValue(group, location)
-    local potential = location.resourcePotential or {}
-    local needs = Groups.GetNeeds(group) or {}
-    local foodShortage = (100 - (tonumber(needs.hunger) or 100)) / 100
-    local waterShortage = (100 - (tonumber(needs.hydration) or 100)) / 100
-    return (tonumber(potential.food) or 0) * (0.5 + foodShortage)
-        + (tonumber(potential.water) or 0) * (0.5 + waterShortage)
-        + (tonumber(potential.medical) or 0) * 0.45
-        + (tonumber(potential.weapons) or 0) * 0.35
-        + (tonumber(potential.materials) or 0) * 0.2
+    return ResourceNeeds.ValuePotential(group, location.resourcePotential or {})
 end
 
 function Traversal.ScoreDestination(group, location, distance)
     local tuning = Config.GetArchetype(group.groupType)
     local components = {}
-    components.resources = resourceValue(group, location) * tuning.resourceWeight
+    local resourceScore, resourceNeeds = resourceValue(group, location)
+    components.resourceNeeds = resourceNeeds
+    components.resources = resourceScore * tuning.resourceWeight
     components.distance = -(tonumber(distance) or 0) / 10 * tuning.distanceWeight
     components.danger = -(tonumber(location.danger) or 0) * tuning.dangerWeight
     components.unvisited = group.visited[location.id]
@@ -42,13 +38,18 @@ function Traversal.ScoreDestination(group, location, distance)
                 + (tonumber(tuning.tagWeights[tag]) or 0)
         end
     end
-    components.scavenged = -(tonumber(location.scavengedLevel) or 0) * 0.35
+    components.scavenged = -(tonumber(location.scavengedLevel) or 0) * 0.65
+    local avoidedUntil = group.recentAvoidedLocations
+        and group.recentAvoidedLocations[location.id] or 0
+    components.recentThreat = avoidedUntil > Store.WorldAgeHours() and -250 or 0
     components.mission = group.mission == "RETURN_HOME"
         and group.homeCommunityId and location.type == "SETTLEMENT" and 40
         or group.mission == "REST" and location.tags.SAFE and 30
         or group.mission == "SCAVENGE" and components.resources * 0.35 or 0
     local total = 0
-    for _, value in pairs(components) do total = total + value end
+    for _, value in pairs(components) do
+        if type(value) == "number" then total = total + value end
+    end
     components.final = total
     return total, components
 end
@@ -79,6 +80,27 @@ function Traversal.ChooseDestination(group)
     group.diagnostics = group.diagnostics or {}
     group.diagnostics.destinationEvaluations = evaluations
     return best, best and "selected" or "no_candidate"
+end
+
+function Traversal.ChooseFallback(group, threatLocationID)
+    if not group or not group.location then return nil, "invalid_group" end
+    local nearby = Locations.GetNearby(group.location.x, group.location.y,
+        Config.DESTINATION_QUERY_RADIUS, Config.DESTINATION_CANDIDATE_LIMIT)
+    local best, bestScore
+    for _, candidate in ipairs(nearby) do
+        local location = candidate.location
+        if location.id ~= group.location.id and location.id ~= threatLocationID then
+            local occupied = #Locations.GetGroupOccupants(location, group.id)
+            local safe = (location.tags.SAFE and 80 or 0)
+                + (location.tags.FRIENDLY and 45 or 0)
+                - (tonumber(location.danger) or 0) * 1.5
+                - occupied * 35 - candidate.distance * 0.025
+            if not best or safe > bestScore
+                or safe == bestScore and location.id < best.id
+            then best, bestScore = location, safe end
+        end
+    end
+    return best, best and "fallback_selected" or "no_fallback"
 end
 
 function Traversal.CalculateTravelHours(group, target)
@@ -141,10 +163,18 @@ function Traversal.Arrive(groupOrID, at)
             relocationCount = (tonumber(faction.mobile.relocationCount) or 0) + 1,
         }, "abstract_group_arrival")
     end
-    local reports = Encounters.DetectAt(target, group, at)
     Locations.Arrive(group, at, 0)
+    local reports = Encounters.DetectAt(target, group, at)
     Store.Emit("GROUP_ARRIVED", { groupId = group.id,
         locationId = target.id, encounters = #reports })
+    if group.mission == "FLEE" then
+        local previous = group.previousMission
+        Groups.SetMission(group, previous and previous.type or "SCAVENGE", at, true)
+        group.previousMission = nil
+        Groups.SetState(group, "ACTION_COMPLETE", at, at)
+    elseif Actions then
+        Actions.StartForMission(group, at)
+    end
     return true, "arrived", reports
 end
 
@@ -158,7 +188,7 @@ function Traversal.Advance(group, at)
         return false, "in_transit"
     end
     if group.state == "IDLE" or group.state == "ARRIVED"
-        or group.state == "WAITING"
+        or group.state == "WAITING" or group.state == "ACTION_COMPLETE"
     then
         local target = Traversal.ChooseDestination(group)
         if target then return Traversal.Begin(group, target, at) end
@@ -195,7 +225,8 @@ end
 function Traversal.DecideBatch(at, budget)
     return runBatch(at, budget, "DecisionCursor",
         function(group) return group.state ~= "TRAVELING"
-            and group.state ~= "ACTIVE" end)
+            and group.state ~= "ACTIVE" and group.state ~= "PERFORMING_ACTION"
+            and group.state ~= "ENGAGED" end)
 end
 
 function Traversal.AdvanceBatch(at, budget)
