@@ -68,18 +68,13 @@ function PNCMapHoverPortraitCard:setTarget(spec)
 end
 
 function PNCMapHoverPortraitCard:setContext(entry)
-    local name = Identity.GetName(entry)
-    -- Faction presentation is gated by the same learned identity pipeline as
-    -- the name.  Map payloads may still carry affiliation for mechanics.
-    local organizational = Identity.GetFaction(entry)
-    local faction = tostring(organizational and organizational.name or "")
-    local factionID = tostring(
-        organizational and organizational.id or faction
-    )
-    local workerRole = tostring(organizational and (
-        entry and entry.roleTag or organizational.role
-    ) or "")
-    local emblem = organizational and organizational.emblem or nil
+    local presentation = PNC.FactionPresentation
+        and PNC.FactionPresentation.Resolve(entry) or nil
+    local name = presentation and presentation.npcName or Identity.GetName(entry)
+    local faction = presentation and presentation.factionName or ""
+    local factionID = presentation and presentation.factionID or faction
+    local workerRole = presentation and presentation.factionRole or ""
+    local emblem = presentation and presentation.emblem or nil
     local emblemRevision = emblem
         and tonumber(emblem.revision) or -1
     if self.contextName == name
@@ -139,6 +134,18 @@ function PNCMapHoverPortraitCard:drawBadge(x, color, glyph, texture)
         color.g,
         color.b
     )
+    if self.drawRectBorder then
+        self:drawRectBorder(
+            x,
+            y,
+            self.badgeSize,
+            self.badgeSize,
+            1,
+            0.05,
+            0.05,
+            0.05
+        )
+    end
     if texture and self.drawTextureScaledAspect then
         self:drawTextureScaledAspect(
             texture,
@@ -167,8 +174,8 @@ end
 
 function PNCMapHoverPortraitCard:drawFactionBadge(x)
     local y = self.portraitSize - self.badgeSize - self.badgeInset
-    if self.factionEmblem and EmblemRenderer
-        and EmblemRenderer.Draw
+    if self.factionEmblem and PNC.FactionPresentation
+        and PNC.FactionPresentation.DrawBadge
     then
         self:drawRect(
             x + 2,
@@ -180,7 +187,7 @@ function PNCMapHoverPortraitCard:drawFactionBadge(x)
             0,
             0
         )
-        EmblemRenderer.Draw(
+        PNC.FactionPresentation.DrawBadge(
             self,
             self.factionEmblem,
             x,

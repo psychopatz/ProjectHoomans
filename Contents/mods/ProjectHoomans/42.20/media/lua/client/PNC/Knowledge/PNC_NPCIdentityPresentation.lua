@@ -83,10 +83,15 @@ end
 
 function Identity.GetFaction(npc)
     local knowledge = Identity.GetKnowledge(npc)
-    if knowledge then return knowledge.knownFaction end
-    if not clientState() and type(npc) == "table" then
+    if knowledge and knowledge.knownFaction then return knowledge.knownFaction end
+    if type(npc) == "table" then
         local source = sourceFor(npc)
-        return source.knownFaction or source.organizationalFaction
+        if type(source) == "table" then
+            if source.knownFaction then return source.knownFaction end
+            if source.organizationalFaction and (Identity.IsNameKnown(npc) or not clientState()) then
+                return source.organizationalFaction
+            end
+        end
     end
     return nil
 end

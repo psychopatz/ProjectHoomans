@@ -75,9 +75,12 @@ PNC = {
 UIFont = { Small = "small" }
 IsoDirections = { S = "south" }
 
+package.preload["PNC/UI/Factions/PNC_FactionPresentation"] =
+    function() return PNC.FactionPresentation end
 dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionPresentation.lua")
 dofile(FILE)
 
 local card = PNC.MapHoverPortraitCard:new(0, 0, 128, {

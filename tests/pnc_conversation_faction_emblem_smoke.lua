@@ -51,12 +51,22 @@ package.preload["PNC/UI/Factions/PNC_FactionEmblemRenderer"] =
         return PNC.FactionEmblemRenderer
     end
 
+package.loaded["PNC/UI/Factions/PNC_FactionPresentation"] = nil
+package.preload["PNC/UI/Factions/PNC_FactionPresentation"] =
+    function()
+        return PNC.FactionPresentation
+    end
+
+dofile(
+    ROOT
+        .. "PNC/UI/Factions/PNC_FactionPresentation.lua"
+)
 dofile(
     ROOT
         .. "PNC/Conversation/PNC_ConversationFactionEmblem.lua"
 )
 
-local drawnText
+local drawnTexts = {}
 local portrait = {
     reveal = 1,
     width = 460,
@@ -64,6 +74,8 @@ local portrait = {
     owner = {
         spec = {
             context = {
+                identityState = "known",
+                npcName = "Darrel Driscoll",
                 factionName = "The Cold Crows",
                 factionRole = "Scavenger",
                 factionEmblem = {
@@ -81,11 +93,11 @@ local portrait = {
     end,
     drawRect = function() end,
     drawText = function(_, text, x, y)
-        drawnText = {
+        table.insert(drawnTexts, {
             text = text,
             x = x,
             y = y,
-        }
+        })
     end,
 }
 setmetatable(
@@ -98,13 +110,17 @@ setmetatable(
 portrait:render()
 assertEqual(originalRenderCount, 1, "core portrait render preserved")
 assertEqual(emblemDraw.target, portrait, "emblem target")
-assertEqual(emblemDraw.size, 18, "conversation emblem size")
+assertEqual(emblemDraw.size, 36, "conversation emblem size is larger (36)")
+assertEqual(emblemDraw.x, 10, "emblem x position on far left")
+assertEqual(#drawnTexts, 2, "two text elements drawn (name and faction)")
+assertEqual(drawnTexts[1].text, "DARREL DRISCOLL", "npc name rendered")
+assertEqual(drawnTexts[1].x, 56, "npc name offset to right of emblem")
 assertEqual(
-    drawnText.text,
+    drawnTexts[2].text,
     "THE COLD CROWS  /  SCAVENGER",
-    "faction subtitle"
+    "faction subtitle rendered"
 )
-assertEqual(drawnText.x > emblemDraw.x, true, "text follows emblem")
+assertEqual(drawnTexts[2].x, 56, "faction subtitle aligned under name")
 
 PNC.ConversationFactionEmblem.Install()
 portrait:render()
@@ -115,8 +131,16 @@ assertEqual(
 )
 
 emblemDraw = nil
+drawnTexts = {}
+portrait.owner.spec.context.identityState = "unknown"
+portrait:render()
+assertEqual(emblemDraw, nil, "unknown name suppresses emblem rendering")
+
+emblemDraw = nil
+drawnTexts = {}
+portrait.owner.spec.context.identityState = "known"
 portrait.owner.spec.context.factionEmblem = nil
 portrait:render()
-assertEqual(emblemDraw, nil, "missing emblem keeps core subtitle")
+assertEqual(emblemDraw, nil, "missing emblem suppresses faction rendering")
 
 print("pnc_conversation_faction_emblem_smoke: ok")
