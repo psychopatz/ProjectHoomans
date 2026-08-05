@@ -99,6 +99,11 @@ end
 function Commands.HandleBootstrap(player, args)
     args = type(args) == "table" and args or {}
     local context, reason = contextFor(player, "player_bootstrap")
+    if context and PNC.SocialProfiles and PNC.SocialProfiles.GetPlayerProfile then
+        context.socialProfile = PNC.SocialProfiles.GetPlayerProfile(
+            context.characterUUID
+        )
+    end
     local payload
     if not context then
         payload = { requestID = args.requestID, state = "error", reason = reason }

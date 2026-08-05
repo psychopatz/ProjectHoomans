@@ -651,6 +651,49 @@ function Relationships.ApplyEventMutation(
     }
 end
 
+-- Conversation outcomes use the normal directed relationship/memory mutation
+-- boundary. They do not maintain a second, block-local points system.
+function Relationships.ApplyConversationEffect(
+    observerNPCID,
+    targetKey,
+    effect,
+    context
+)
+    effect = type(effect) == "table" and effect or {}
+    context = type(context) == "table" and context or {}
+    local at = math.max(0, tonumber(context.worldAgeHours) or 0)
+    local identity = table.concat({
+        tostring(context.blockID or "block"),
+        tostring(context.choiceID or "choice"),
+        tostring(context.outcomeID or "outcome"),
+        tostring(math.floor(at * 1000)),
+    }, ":")
+    local memoryID = "conversation:" .. identity
+    return Relationships.ApplyEventMutation(observerNPCID, targetKey, {
+        eventID = memoryID,
+        worldAgeHours = at,
+        familiarityDelta = tonumber(effect.familiarity) or 0,
+        moraleDelta = tonumber(effect.morale) or 0,
+        memory = {
+            id = memoryID,
+            type = "conversation_outcome",
+            aboutKey = targetKey,
+            createdAt = at,
+            lastEvaluatedAt = at,
+            approvalEffect = tonumber(effect.approval) or 0,
+            respectEffect = tonumber(effect.respect) or 0,
+            moraleEffect = 0,
+            strength = 1,
+            decayPerDay = tonumber(effect.decayPerDay) or 0.05,
+            permanent = effect.permanent == true,
+            shareable = effect.shareable == true,
+            knowledgeSource = "experienced",
+            sourceKey = targetKey,
+            tags = { conversation = true },
+        },
+    })
+end
+
 function Relationships.RemoveMemory(observerNPCID, targetKey, memoryID)
     local record
     local reason

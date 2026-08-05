@@ -1,0 +1,7 @@
+{
+  "opening": "They meet your eyes and answer honestly.",
+  "choice.condition": "How are you really doing?",
+  "response.condition": "Better now that you're here.",
+  "choice.offer_help": "Let me help.",
+  "response.offer_help": "All right. Just stay close for a minute."
+}

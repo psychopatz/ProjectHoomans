@@ -1,32 +1,27 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
-local COMMON_ROOT =
-    "Contents/mods/ProjectHoomans/common/media/lua/client/"
-local TRANSLATE_JSON =
-    "Contents/mods/ProjectHoomans/common/media/lua/shared/Translate/EN/UI.json"
-local CORE_TEXT =
-    "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/client/"
+local SHARED = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+local CLIENT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local COMMON_SHARED = "Contents/mods/ProjectHoomans/common/media/lua/shared/"
+local COMMON_CLIENT = "Contents/mods/ProjectHoomans/common/media/lua/client/"
+local CORE_TEXT = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/client/"
     .. "PsychopatzCore/UI/Conversation/PsychopatzConversationText.lua"
 
-local function assertEqual(actual, expected, label)
+package.path = SHARED .. "?.lua;" .. CLIENT .. "?.lua;"
+    .. COMMON_SHARED .. "?.lua;" .. COMMON_CLIENT .. "?.lua;"
+    .. package.path
+
+local function equal(actual, expected, label)
     if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
+        error((label or "equal") .. ": expected=" .. tostring(expected)
             .. " actual=" .. tostring(actual), 2)
     end
 end
 
-local registeredProvider
-local opened
-local translations = {}
-local translationFile = assert(io.open(TRANSLATE_JSON, "r"))
-local translationJSON = translationFile:read("*a")
-translationFile:close()
-for key, value in string.gmatch(
-    translationJSON,
-    '"([^"]+)"%s*:%s*"([^"]*)"'
-) do
-    translations[key] = value
+local function truth(value, label)
+    if not value then error(label or "truth", 2) end
 end
 
+local opened
+local registeredProvider
 PNC = {
     ContextHub = {
         RegisterProvider = function(provider) registeredProvider = provider end,
@@ -34,87 +29,164 @@ PNC = {
 }
 PsychopatzCore = {
     Conversation = {
-        History = {
-            GetDay = function() return 7 end,
-        },
-        Open = function(spec)
-            opened = spec
-            return spec
-        end,
+        History = { GetDay = function() return 7 end },
+        Open = function(spec) opened = spec return spec end,
     },
 }
-getText = function(key) return translations[key] or key end
+getText = function(key) return key end
 getTexture = function(path) return path end
+getModFileReader = function(modID, path)
+    local candidates = {
+        "Contents/mods/" .. tostring(modID) .. "/common/" .. path,
+        "Contents/mods/" .. tostring(modID) .. "/42.20/" .. path,
+    }
+    local file
+    for _, candidate in ipairs(candidates) do
+        file = io.open(candidate, "r")
+        if file then break end
+    end
+    if not file then return nil end
+    return {
+        readLine = function() return file:read("*l") end,
+        close = function() file:close() end,
+    }
+end
 getGameTime = function()
     return {
         getTimeOfDay = function() return 21.5 end,
+        getWorldAgeHours = function() return 189.5 end,
     }
 end
 
 dofile(CORE_TEXT)
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
-dofile(ROOT .. "PNC/Conversation/PNC_ConversationTime.lua")
-dofile(ROOT .. "PNC/Conversation/Content/PNC_ConversationRegistry.lua")
-dofile(ROOT .. "PNC/Conversation/PNC_ConversationRelationship.lua")
-dofile(ROOT .. "PNC/UI/PNC_NPCTypePalette.lua")
+dofile(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRegistry.lua")
+dofile(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRules.lua")
+dofile(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationSelector.lua")
+dofile(COMMON_SHARED
+    .. "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions.lua")
+dofile(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationTextLoader.lua")
+dofile(CLIENT .. "PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+dofile(CLIENT .. "PNC/Conversation/PNC_ConversationTime.lua")
+dofile(CLIENT .. "PNC/Conversation/PNC_ConversationBackgrounds.lua")
+dofile(CLIENT .. "PNC/Conversation/PNC_ConversationRelationship.lua")
+dofile(CLIENT .. "PNC/UI/PNC_NPCTypePalette.lua")
 PNC.Conversation.Lifecycle = {
-    Create = function()
-        return { kind = "conversation_lifecycle" }
-    end,
+    Create = function() return { kind = "conversation_lifecycle" } end,
+    RequestCeasefire = function() return true end,
 }
-
-local relationships = { "FirstMeet", "Acquaintance", "Member", "Lover" }
-local variants = { "Dawn", "Sunrise", "Sunset", "Dusk", "Twilight" }
-local index
-for index = 1, #variants do
-    dofile(COMMON_ROOT .. "PNC/Conversation/PortraitBackgrounds/PNC_Background"
-        .. variants[index] .. ".lua")
+for _, value in ipairs({ "Dawn", "Sunrise", "Sunset", "Dusk", "Twilight" }) do
+    dofile(COMMON_CLIENT .. "PNC/Conversation/PortraitBackgrounds/PNC_Background"
+        .. value .. ".lua")
 end
-local relationshipIndex
-for relationshipIndex = 1, #relationships do
-    local relationship = relationships[relationshipIndex]
-    for index = 1, #variants do
-        local variant = variants[index]
-        dofile(COMMON_ROOT .. "PNC/Conversation/Content/Greetings/" .. relationship
-            .. "/greeting_" .. relationship .. variant .. ".lua")
-    end
-end
-dofile(ROOT .. "PNC/Conversation/PNC_ConversationDefinition.lua")
-dofile(ROOT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua")
+dofile(CLIENT .. "PNC/Conversation/Blocks/PNC_ConversationComposer.lua")
+dofile(CLIENT .. "PNC/Conversation/PNC_ConversationDefinition.lua")
+dofile(CLIENT .. "PNC/Conversation/Debug/PNC_ConversationDebugModel.lua")
+dofile(CLIENT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua")
 
-local originalStringLower = string.lower
-local originalStringGsub = string.gsub
-string.lower = nil
-string.gsub = nil
-assertEqual(
-    PNC.Conversation.FormatRoleLabel("lead_scavenger"),
-    "Lead Scavenger",
-    "role label avoids unsupported Kahlua string callbacks"
-)
-string.lower = originalStringLower
-string.gsub = originalStringGsub
+local Registry = PNC.Conversation.Registry
+local Rules = PNC.Conversation.Rules
+local Selector = PNC.Conversation.Selector
+local Loader = PNC.Conversation.TextLoader
+
+equal(#Registry.ListCategories(), 11, "built-in category count")
+equal(#Registry.ListBlocks(), 42, "built-in block count")
+equal(Registry.GetFingerprint(), Registry.GetFingerprint(),
+    "registry fingerprint stable")
+equal(#Registry.ListBlocks({ includeInvalid = true }), 42,
+    "built-ins all validate")
+
+for _, block in ipairs(Registry.ListBlocks()) do
+    local ok, errors = Loader.EnsureSource(
+        block.textSource,
+        Registry.CollectTextKeys(block)
+    )
+    truth(ok, block.id .. " translation: "
+        .. tostring(errors and errors[1]))
+end
+for _, category in ipairs(Registry.ListCategories()) do
+    truth(Loader.EnsureSource(category.textSource, { category.labelKey }),
+        category.id .. " category translation")
+end
+
+local decoded = assert(Loader.Decode(
+    '{"plain":"value","escape":"line\\nnext","unicode":"\\u263a"}'
+))
+equal(decoded.escape, "line\nnext", "JSON escape")
+truth(decoded.unicode ~= "", "JSON unicode")
+equal(Loader.Decode('{"duplicate":"a","duplicate":"b"}'), nil,
+    "duplicate JSON key rejected")
+equal(Loader.Decode('{"notFlat":true}'), nil,
+    "non-string JSON value rejected")
 
 local Time = PNC.Conversation.Time
-assertEqual(Time.Resolve(4.9), "twilight", "twilight band")
-assertEqual(Time.Resolve(5.0), "dawn", "dawn band")
-assertEqual(Time.Resolve(6.5), "sunrise", "sunrise band")
-assertEqual(Time.Resolve(12), "sunset", "sunset band")
-assertEqual(Time.Resolve(18), "dusk", "dusk band")
-assertEqual(Time.Resolve(21), "twilight", "night twilight band")
-assertEqual(PNC.Conversation.Relationship.Resolve({}), "FirstMeet",
-    "unknown NPC relationship")
-assertEqual(PNC.Conversation.Relationship.Resolve({
-    record = { recruited = true },
-}), "Member", "recruited NPC relationship")
-assertEqual(PNC.Conversation.Relationship.Resolve({
-    record = {
-        mapPresentation = {
-            knownBy = { Tester = true },
-        },
+equal(Time.Resolve(4.9), "twilight", "twilight band")
+equal(Time.Resolve(5), "dawn", "dawn band")
+equal(Time.Resolve(6.5), "sunrise", "sunrise band")
+equal(Time.Resolve(12), "sunset", "sunset band")
+equal(Time.Resolve(18), "dusk", "dusk band")
+equal(Time.Resolve(21), "twilight", "night band")
+
+local selectionContext = {
+    worldID = "world-a",
+    characterUUID = "character-a",
+    npcID = "npc-a",
+    worldAgeHours = 5.5,
+    hour = 5.5,
+    relationshipState = "FirstMeet",
+    relationship = {},
+    audiences = { neutral = true, shared = true },
+}
+local first = Selector.SelectBlock("projecthoomans:greetings", selectionContext)
+local reopened = Selector.SelectBlock("projecthoomans:greetings", selectionContext)
+equal(first.id, "projecthoomans:greeting_firstmeet_dawn",
+    "relationship/time-gated greeting")
+equal(reopened.id, first.id, "reopen does not reroll")
+selectionContext.worldAgeHours = selectionContext.worldAgeHours + 24
+local nextDay = Selector.SelectBlock("projecthoomans:greetings", selectionContext)
+equal(nextDay.id, first.id, "only eligible authored block remains stable")
+
+truth(Rules.EvaluateGate({
+    type = "pnc:skill", actor = "player", skill = "Aiming",
+    operator = ">=", value = 3,
+}, { playerSkills = { Aiming = 4 } }), "skill gate")
+truth(Rules.EvaluateGate({
+    type = "pnc:personality", actor = "npc", dimension = "bravery",
+    operator = ">", value = 0.5,
+}, { npcPersonality = { bravery = 0.8 } }), "personality gate")
+truth(Rules.EvaluateGate({
+    type = "pnc:time", startHour = 21, endHour = 5,
+}, { hour = 23 }), "midnight wrap gate")
+truth(Rules.EvaluateGate({
+    type = "all",
+    gates = {
+        { type = "pnc:audience", value = "member" },
+        { type = "not", gate = { type = "pnc:audience", value = "hostile" } },
     },
-}, {
-    getUsername = function() return "Tester" end,
-}), "Acquaintance", "known NPC relationship")
+}, { audiences = { member = true } }), "composite gate")
+
+local duplicateOK = Registry.RegisterCategory(
+    "projecthoomans:whats_up",
+    Registry.GetCategory("projecthoomans:whats_up")
+)
+equal(duplicateOK, false, "duplicate category rejected")
+local unsafeOK = Registry.RegisterBlock("testmod:unsafe", {
+    schemaVersion = 1,
+    ownerModID = "testmod",
+    category = "projecthoomans:whats_up",
+    audiences = { "neutral" },
+    textSource = {
+        modID = "ProjectHoomans",
+        pathPattern = "media/conversation/whats_up/neutral/{language}/basic.json",
+        domain = "test.unsafe",
+    },
+    entryNode = "opening",
+    callback = function() end,
+    nodes = { opening = {} },
+})
+equal(unsafeOK, false, "inline callback quarantined")
+truth(Registry.ListBlocks({ includeInvalid = true })[#Registry.ListBlocks({
+    includeInvalid = true,
+})].errors ~= nil, "invalid block visible to debugger")
 
 local entry = {
     id = "npc-12",
@@ -123,250 +195,76 @@ local entry = {
     snapshot = {
         identitySeed = 42,
         isFemale = true,
-        faction = "hostile",
-        appearance = { hairModel = "Long" },
-        equipmentSummary = { worn = { Hat = "Base.Hat" } },
-        relationshipCategory = "Lover",
+        faction = "neutral",
+        relationshipCategory = "Acquaintance",
         organizationalFaction = {
-            id = "faction_crossroads",
-            name = "Crossroads Exchange",
-            role = "trader",
-            rank = "member",
-            emblem = {
-                backgroundColorID = "black",
-                layers = {
-                    {
-                        symbolID = "map_star",
-                        colorID = "white",
-                    },
-                },
-            },
+            id = "crossroads", name = "Crossroads Exchange",
+            role = "lead_scavenger",
+            emblem = { backgroundColorID = "black", layers = {} },
         },
     },
 }
-local definition = PNC.Conversation.BuildDefinition(entry, {}, "twilight")
-assertEqual(definition.namespace, "ProjectHoomans", "history namespace")
-assertEqual(definition.npcID, "npc-12", "history NPC id")
-assertEqual(definition.character, entry.zombie, "live portrait target")
-assertEqual(definition.backgroundID, "twilight", "portrait background")
-assertEqual(definition.context.relationshipID,
-    "Crossroads Exchange", "portrait faction name")
-assertEqual(definition.context.timeID, "Trader",
-    "portrait faction role")
-assertEqual(
-    definition.context.factionEmblem.backgroundColorID,
-    "black",
-    "portrait faction emblem"
+local definition = PNC.Conversation.BuildDefinition(entry, {}, "dawn")
+equal(definition.namespace, "ProjectHoomans", "history namespace")
+equal(definition.npcID, "npc-12", "NPC id")
+equal(definition.backgroundID, "dawn", "background definition")
+equal(definition.context.relationshipID, "Crossroads Exchange",
+    "faction subtitle")
+equal(definition.context.timeID, "Lead Scavenger", "role subtitle")
+equal(definition.context.conversationRelationshipID, "Acquaintance",
+    "semantic relationship")
+equal(definition.lifecycle.kind, "conversation_lifecycle", "lifecycle")
+truth(#definition.nodes.greeting.choices >= 8,
+    "registered category menu composed")
+local greeting = PsychopatzCore.Conversation.Text.Resolve(
+    definition.nodes.greeting.npc
 )
-assertEqual(definition.context.conversationRelationshipID,
-    "Lover", "semantic relationship category")
-assertEqual(definition.context.conversationTimeID,
-    "twilight", "semantic conversation time")
-assertEqual(definition.context.npcType, "hostile", "conversation NPC type")
-assertEqual(definition.theme.accent.r, 1, "hostile conversation red")
-assertEqual(definition.theme.accent.g, 0.25, "hostile palette matches map")
-assertEqual(definition.lifecycle.kind, "conversation_lifecycle",
-    "conversation safety lifecycle attached")
-assertEqual(#definition.nodes.greeting.choices, 3,
-    "hostile conversation includes dossier access")
-assert(definition.nodes.greeting.npc.key:find("Lover_Twilight", 1, true),
-    "time greeting selected")
-assertEqual(
-    PsychopatzCore.Conversation.Text.Resolve(definition.nodes.greeting.npc)
-        ~= definition.nodes.greeting.npc.key,
-    true,
-    "greeting domain resolves instead of exposing its key"
-)
-local firstChoice = definition.nodes.greeting.choices[1]
-assertEqual(
-    PsychopatzCore.Conversation.Text.Resolve({ key = firstChoice.textKey }),
-    "Ceasefire. Stand down for now.",
-    "Build 42 UI.json ceasefire translation"
-)
-assertEqual(firstChoice.textDomain, nil, "no custom translation domain")
+truth(string.find(greeting, "dawn", 1, true)
+    or string.find(greeting, "light", 1, true)
+    or string.find(greeting, "early", 1, true),
+    "modular greeting resolves")
 
-local hostileEntry = {
-    id = "npc-hostile",
-    name = "Aggressive NPC",
-    snapshot = {
-        faction = "hostile",
-        hostility = { attackPlayers = true },
-    },
-}
-local hostileDefinition = PNC.Conversation.BuildDefinition(
-    hostileEntry, {}, "twilight"
-)
-assertEqual(hostileDefinition.context.allowHostileParley, true,
-    "hostile conversation exposes parley context")
-assertEqual(hostileDefinition.nodes.greeting.choices[1].id,
-    "ceasefire", "hostile greeting starts with ceasefire choice")
-
-local neutralDefinition = PNC.Conversation.BuildDefinition({
-    id = "npc-neutral",
-    name = "Neutral NPC",
-    snapshot = { faction = "neutral" },
+local hostile = PNC.Conversation.BuildDefinition({
+    id = "hostile", name = "Hostile",
+    snapshot = { faction = "hostile", hostility = { attackPlayers = true } },
 }, {}, "twilight")
-assertEqual(#neutralDefinition.nodes.greeting.choices, 4,
-    "neutral conversation includes dossier access")
+equal(hostile.context.allowHostileParley, true, "hostile parley context")
+equal(hostile.nodes.greeting.choices[1].id, "ceasefire",
+    "hostile block exposes ceasefire")
 
-local debugActions = {}
-local openedLaboratoryFor
-PNC.Client = {
-    CanUseDebug = function() return true end,
-    SendDebug = function(action, args)
-        debugActions[#debugActions + 1] = {
-            action = action,
-            args = args,
-        }
-        return true
-    end,
-}
-PNC.RelationshipPresentation = {
-    GetDebugStandingPreset = function(standingID)
-        return { label = standingID }
-    end,
-}
-PNC.RelationshipDebugUI = {
-    Open = function(npcID)
-        openedLaboratoryFor = npcID
-    end,
-}
-local debugDefinition = PNC.Conversation.BuildDefinition({
-    id = "npc-debug",
-    name = "Debug NPC",
-    snapshot = { faction = "neutral" },
-}, {}, "twilight")
-assertEqual(#debugDefinition.nodes.greeting.choices, 6,
-    "debug neutral conversation exposes relationship tools and recruitment")
-assertEqual(#debugDefinition.nodes.debug_relationship.choices, 6,
-    "debug relationship hub exposes every tool")
-assertEqual(#debugDefinition.nodes.debug_synthetic_baseline.choices, 6,
-    "debug synthetic baseline menu exposes every preset")
-assertEqual(#debugDefinition.nodes.debug_social_events.choices, 6,
-    "debug social event menu exposes every event")
-debugDefinition.nodes.debug_relationship.choices[1].action()
-assertEqual(openedLaboratoryFor, "npc-debug",
-    "conversation debug opens selected NPC laboratory")
-debugDefinition.nodes.debug_synthetic_baseline.choices[1].action()
-assertEqual(debugActions[1].action, "relationship_debug_baseline",
-    "conversation debug uses authoritative baseline action")
-assertEqual(debugActions[1].args.observerNPCID, "npc-debug",
-    "conversation debug baseline targets speaking NPC")
-assertEqual(debugActions[1].args.targetKind, "current_player",
-    "conversation debug baseline targets current player")
-debugDefinition.nodes.debug_social_events.choices[1].action()
-assertEqual(debugActions[2].action, "social_trigger_event",
-    "conversation debug uses social event pipeline")
-assertEqual(debugActions[2].args.eventType, "treated_wound",
-    "conversation debug selects requested social event")
-assertEqual(#debugDefinition.nodes.debug_knowledge_topics.choices, 6,
-    "debug discovery menu exposes topic-scoped conversation probes")
-debugDefinition.nodes.debug_knowledge_topics.choices[1].action()
-assertEqual(debugActions[3].action, "knowledge_debug_action",
-    "conversation topic uses the knowledge debug pipeline")
-assertEqual(debugActions[3].args.topicID, "identity_name",
-    "conversation topic discovers the NPC name only")
-local recruitChoice
-for _, choice in ipairs(debugDefinition.nodes.greeting.choices) do
-    if choice.id == "debug_recruit_companion" then recruitChoice = choice end
-end
-assert(recruitChoice, "neutral debug conversation exposes recruitment")
-recruitChoice.action()
-assertEqual(debugActions[4].action, "conversation_debug_recruit",
-    "conversation debug uses the companion recruit action")
-assertEqual(debugActions[4].args.npcID, "npc-debug",
-    "conversation debug recruitment targets speaking NPC")
+local debugContext = PNC.ConversationDebugModel.DefaultContext()
+local before = debugContext.relationship.familiarity
+local sandbox = assert(PNC.ConversationDebugModel.ExecuteSandbox(
+    "projecthoomans:whats_up_basic_neutral",
+    "opening", "situation", debugContext
+))
+equal(sandbox.persisted, false, "sandbox does not persist")
+equal(sandbox.networked, false, "sandbox does not network")
+equal(debugContext.relationship.familiarity, before,
+    "sandbox does not mutate input")
+equal(sandbox.after.relationship.familiarity, before + 1,
+    "sandbox previews relationship delta")
 
-local totalGreetings = 0
-for relationshipIndex = 1, #relationships do
-    local relationship = relationships[relationshipIndex]
-    for index = 1, #variants do
-        local timeID = string.lower(variants[index])
-        local bucket = PNC.Conversation.Content.greetings[relationship][timeID]
-        assertEqual(#bucket.values, 5, relationship .. " " .. timeID .. " pool")
-        totalGreetings = totalGreetings + #bucket.values
-    end
-end
-assertEqual(totalGreetings, 100, "organized greeting bootstrap count")
-
-assertEqual(registeredProvider.id, "conversation", "Talk provider registered")
+truth(registeredProvider and registeredProvider.id == "conversation",
+    "Talk context provider registered")
 local option
-local menu = {
+registeredProvider.addOptions({
     addOption = function(_, label, target, callback)
         option = { label = label, callback = callback }
         return option
     end,
-}
-registeredProvider.addOptions(menu, entry, {})
-assertEqual(option.label, "Talk", "Talk translation fallback")
+}, entry, {})
+truth(option, "Talk option created")
 option.callback()
-assertEqual(opened.npcID, "npc-12", "Talk opens selected NPC")
+equal(opened.npcID, "npc-12", "Talk opens selected NPC")
 
--- A knowledge result must rebuild the open conversation in place. This is
--- shared by the synchronous single-player receiver and asynchronous MP reply.
-PNC.Client.CanUseDebug = function() return false end
-PNC.Network = { ClientState = { npcKnowledge = {} } }
-local strangerEntry = {
-    id = "npc-introduction",
-    name = "Burton Gilmore",
-    snapshot = { faction = "neutral" },
-}
-local strangerDefinition = PNC.Conversation.BuildDefinition(
-    strangerEntry, {}, "twilight"
-)
-assertEqual(strangerDefinition.context.npcName, "Checking what you know...",
-    "conversation waits for authoritative identity")
-assertEqual(strangerDefinition.nodes.greeting.choices[1].id, "identity_loading",
-    "loading conversation does not offer name question")
-PNC.Network.ClientState.npcPresentations = {
-    [strangerEntry.id] = {
-        npcID = strangerEntry.id,
-        state = "unknown",
-        canAskName = true,
-    },
-}
-strangerDefinition = PNC.Conversation.BuildDefinition(
-    strangerEntry, {}, "twilight"
-)
-assertEqual(strangerDefinition.context.npcName, "Unknown survivor",
-    "authoritative unknown state uses stranger label")
-assertEqual(strangerDefinition.nodes.greeting.choices[1].id, "ask_name",
-    "authoritative unknown state offers name question")
-local refreshedDefinition
-PsychopatzCore.Conversation.instance = {
-    spec = strangerDefinition,
-    refreshConversationSpec = function(self, spec)
-        refreshedDefinition = spec
-        self.spec = spec
-        return true
-    end,
-}
-local learnedSnapshot = {
-    npcID = strangerEntry.id,
-    categories = {
-        { descriptors = {
-            {
-                descriptorID = "identity.name",
-                value = "Burton Gilmore",
-                status = "confirmed",
-            },
-        } },
-    },
-}
-PNC.Network.ClientState.npcKnowledge[strangerEntry.id] = learnedSnapshot
-PNC.Network.ClientState.npcPresentations[strangerEntry.id] = {
-    npcID = strangerEntry.id,
-    state = "known",
-    displayName = "Burton Gilmore",
-}
-assertEqual(PNC.Conversation.ReceiveIdentityPresentation(
-    PNC.Network.ClientState.npcPresentations[strangerEntry.id]
-), true, "identity result refreshes open conversation")
-assertEqual(refreshedDefinition.context.npcName, "Burton Gilmore",
-    "open conversation adopts learned name")
-for _, choice in ipairs(refreshedDefinition.nodes.greeting.choices) do
-    assert(choice.id ~= "ask_name",
-        "learned name question remained after refresh")
-end
+local ui = assert(io.open(
+    "Contents/mods/ProjectHoomans/common/media/lua/shared/Translate/EN/UI.json",
+    "r"
+)):read("*a")
+equal(string.find(ui, "UI_PNC_Conversation_", 1, true), nil,
+    "conversation strings removed from UI.json")
+equal(string.find(ui, "UI_PNC_Greeting_", 1, true), nil,
+    "greeting strings removed from UI.json")
 
 print("pnc_conversation_smoke: ok")

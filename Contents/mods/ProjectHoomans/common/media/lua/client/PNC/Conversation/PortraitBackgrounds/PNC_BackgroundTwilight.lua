@@ -1,3 +1,1 @@
-local Registry = PNC.Conversation.Content
-Registry.RegisterBackground("twilight", { id = "twilight" })
-return Registry.backgrounds.twilight
+return PNC.Conversation.Backgrounds.Register("twilight", { id = "twilight" })

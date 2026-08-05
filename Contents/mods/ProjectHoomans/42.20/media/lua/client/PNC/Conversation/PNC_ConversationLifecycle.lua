@@ -56,6 +56,7 @@ local function refresh(state, spec)
             {
                 maximumDistance = Safety.GetMaximumDistance(),
                 dangerRadius = Safety.GetDangerRadius(),
+                allowHostileParley = state.allowHostileParley == true,
             }
         )
         or false

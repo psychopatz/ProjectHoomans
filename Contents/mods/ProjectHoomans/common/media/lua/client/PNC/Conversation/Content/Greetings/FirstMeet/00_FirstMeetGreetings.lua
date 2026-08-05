@@ -1,5 +1,0 @@
-require "PNC/Conversation/Content/Greetings/FirstMeet/greeting_FirstMeetDawn"
-require "PNC/Conversation/Content/Greetings/FirstMeet/greeting_FirstMeetSunrise"
-require "PNC/Conversation/Content/Greetings/FirstMeet/greeting_FirstMeetSunset"
-require "PNC/Conversation/Content/Greetings/FirstMeet/greeting_FirstMeetDusk"
-require "PNC/Conversation/Content/Greetings/FirstMeet/greeting_FirstMeetTwilight"

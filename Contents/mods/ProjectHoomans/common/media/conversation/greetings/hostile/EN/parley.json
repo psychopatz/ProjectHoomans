@@ -1,0 +1,7 @@
+{
+  "opening": "The survivor watches you carefully, ready to fight.",
+  "choice.ceasefire": "Ceasefire. Stand down for now.",
+  "response.ceasefire": "You ask for a short ceasefire.",
+  "result.accepted": "Ceasefire accepted for one hour.",
+  "result.rejected": "Ceasefire refused."
+}

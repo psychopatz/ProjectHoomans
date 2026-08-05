@@ -1,0 +1,7 @@
+{
+  "opening": "They look tired, but attentive.",
+  "choice.condition": "How are you holding up?",
+  "response.condition": "I'm still breathing. That's enough for now.",
+  "choice.offer_help": "Do you need any help?",
+  "response.offer_help": "I'll manage, but thanks for asking."
+}

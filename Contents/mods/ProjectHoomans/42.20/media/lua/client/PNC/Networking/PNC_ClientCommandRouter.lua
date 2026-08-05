@@ -257,6 +257,18 @@ Internal.RegisterServerCommand(
     end
 )
 
+Internal.RegisterServerCommand(Const.CMD_CONVERSATION_BLOCK, function(args)
+    if PNC.Conversation and PNC.Conversation.Composer then
+        PNC.Conversation.Composer.ReceiveBlock(args or {})
+    end
+end)
+
+Internal.RegisterServerCommand(Const.CMD_CONVERSATION_OUTCOME, function(args)
+    if PNC.Conversation and PNC.Conversation.Composer then
+        PNC.Conversation.Composer.ReceiveOutcome(args or {})
+    end
+end)
+
 function Client.HandleServerCommand(command, args)
     local handler
     ClientState.lastSyncReceiveAt = Core.Now()

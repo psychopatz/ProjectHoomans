@@ -1,6 +1,24 @@
+-- PsychopatzCore is an external dependency and therefore the only failure
+-- boundary here; Project Hoomans debug registration remains direct afterward.
 local ok = pcall(require, "PsychopatzCore/UI/PsychopatzDebugHubWindow")
 if not ok or not (PsychopatzCore and PsychopatzCore.DebugHub) then
     return
+end
+
+if PNC and PNC.ConversationDebugUI and PNC.ConversationDebugUI.Text then
+    PsychopatzCore.DebugHub.RegisterTool({
+        id = "pnc.conversations",
+        source = "ProjectHoomans",
+        order = 205,
+        title = PNC.ConversationDebugUI.Text("hub.title"),
+        description = PNC.ConversationDebugUI.Text("hub.description"),
+        available = function()
+            return PNC.ConversationDebugUI.Toggle
+                and PNC.Client and PNC.Client.CanUseDebug
+                and PNC.Client.CanUseDebug()
+        end,
+        action = function() PNC.ConversationDebugUI.Toggle() end,
+    })
 end
 
 PsychopatzCore.DebugHub.RegisterTool({

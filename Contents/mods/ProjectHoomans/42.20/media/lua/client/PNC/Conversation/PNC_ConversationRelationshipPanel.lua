@@ -103,7 +103,8 @@ function ISPNCConversationRelationshipPanel:new(x, y, width, height, options)
     options.minimumWidth = options.minimumWidth or 200
     options.minimumHeight = options.minimumHeight or 200
     options.title = options.title or {
-        fallback = "CURRENT RELATION",
+        key = "panel.current_relation",
+        domain = "pnc.system.shared.categories",
     }
     local object = PsychopatzConversationPart.new(
         self,

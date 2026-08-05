@@ -1,5 +1,0 @@
-require "PNC/Conversation/Content/Greetings/Lover/greeting_LoverDawn"
-require "PNC/Conversation/Content/Greetings/Lover/greeting_LoverSunrise"
-require "PNC/Conversation/Content/Greetings/Lover/greeting_LoverSunset"
-require "PNC/Conversation/Content/Greetings/Lover/greeting_LoverDusk"
-require "PNC/Conversation/Content/Greetings/Lover/greeting_LoverTwilight"
