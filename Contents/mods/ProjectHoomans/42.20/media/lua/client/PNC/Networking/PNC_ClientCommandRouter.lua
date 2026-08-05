@@ -163,6 +163,8 @@ Internal.RegisterServerCommand(Const.CMD_PLAYER_BOOTSTRAP, function(args)
         ClientState.npcKnowledge = {}
         ClientState.npcPresentations = {}
         ClientState.conversationHistory = {}
+        ClientState.conversationDiary = {}
+        ClientState.conversationDiaryRevision = 0
         ClientState.lastConversationDelta = nil
         ClientState.bootstrapKnowledgeRevision = incomingRevision
     end

@@ -72,7 +72,25 @@ function ISPNCConversationRelationshipPanel:setRelationship(summary)
     )
     if self.graph then
         self.graph:setEvaluation(
-            Presentation.BuildEvaluation(self.relationship, "inspect")
+            Presentation.BuildEvaluation(
+                self.relationship,
+                self.requirement or "inspect",
+                self.requirementContext
+            )
+        )
+    end
+end
+
+function ISPNCConversationRelationshipPanel:setRequirement(requirement, context)
+    self.requirement = requirement or "inspect"
+    self.requirementContext = type(context) == "table" and context or {}
+    if self.graph then
+        self.graph:setEvaluation(
+            Presentation.BuildEvaluation(
+                self.relationship or {},
+                self.requirement,
+                self.requirementContext
+            )
         )
     end
 end
@@ -115,6 +133,8 @@ function ISPNCConversationRelationshipPanel:new(x, y, width, height, options)
         options
     )
     object.relationship = options.relationship
+    object.requirement = options.requirement or "inspect"
+    object.requirementContext = options.requirementContext or {}
     return object
 end
 

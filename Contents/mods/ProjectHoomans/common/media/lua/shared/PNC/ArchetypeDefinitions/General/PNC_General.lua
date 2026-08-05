@@ -49,9 +49,9 @@ local bundle = {
     loadout = {
         bagChoices = { "Base.Bag_Schoolbag", "Base.Bag_DuffelBag" },
         supplies = {
-            { type = "Base.Bandage", stack = 2, preferredContainer = "bag" },
-            { type = "Base.WaterBottleFull", stack = 1, preferredContainer = "bag" },
-            { type = "Base.Crisps", stack = 1, preferredContainer = "bag" },
+            { key = "general_bandage", type = "Base.Bandage", stack = 2, preferredContainer = "bag" },
+            { key = "general_water", type = "Base.WaterBottleFull", stack = 1, preferredContainer = "bag" },
+            { key = "general_crisps", type = "Base.Crisps", stack = 1, preferredContainer = "bag" },
         },
     },
 }

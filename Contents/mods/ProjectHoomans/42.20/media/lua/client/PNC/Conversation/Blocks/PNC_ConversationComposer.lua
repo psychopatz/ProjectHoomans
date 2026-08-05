@@ -10,6 +10,8 @@ local Registry = Conversation.Registry
 local Selector = Conversation.Selector
 local Rules = Conversation.Rules
 local Loader = Conversation.TextLoader
+local Relationship = Conversation.Relationship
+local Diary = Conversation.Diary
 Composer.requestSerial = tonumber(Composer.requestSerial) or 0
 Composer.localRequests = Composer.localRequests or {}
 
@@ -17,6 +19,15 @@ local SYSTEM_SOURCE = {
     modID = "ProjectHoomans",
     pathPattern = "media/conversation/system/shared/{language}/categories.json",
     domain = "pnc.system.shared.categories",
+}
+
+-- The needs block normally supplies the gift text source. Keep a neutral
+-- fallback so an inventory result can never become a silent transaction when
+-- a stale/reloaded conversation view no longer has its active block attached.
+local NEEDS_FALLBACK_SOURCE = {
+    modID = "ProjectHoomans",
+    pathPattern = "media/conversation/needs/neutral/{language}/basic.json",
+    domain = "pnc.needs.neutral.basic",
 }
 
 local RECRUIT_SYSTEM_KEYS = {
@@ -37,6 +48,13 @@ local RECRUIT_SYSTEM_KEYS = {
     "response.recruit.reject.general.1",
     "response.recruit.reject.general.2",
     "response.recruit.reject.general.3",
+}
+
+local GIFT_OFFER_KEYS = {
+    "gift.offer.single",
+    "gift.offer.single.alt",
+    "gift.offer.multiple",
+    "gift.offer.multiple.alt",
 }
 
 local GOODBYE_SOURCE = {
@@ -145,6 +163,114 @@ local function dialoguePayload(source, key, context, args)
     return payload(source, key, merged)
 end
 
+local function resolvedDialogue(value)
+    if not value then return nil end
+    local text = PsychopatzCore and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.Text or nil
+    return text and text.Resolve and text.Resolve(value) or tostring(value)
+end
+
+local function appendDiary(npcID, entry)
+    if Diary and Diary.Append then
+        return Diary.Append(npcID, entry)
+    end
+    return false
+end
+
+local function receiveRelationshipAfter(npcID, after)
+    if type(after) ~= "table" then return false end
+    local summary = {
+        npcID = npcID,
+        exists = true,
+        approval = after.approval,
+        respect = after.respect,
+        familiarity = after.familiarity,
+        state = after.state,
+        previousState = after.previousState,
+        revision = after.revision,
+    }
+    if Relationship and Relationship.ReceivePresentation then
+        Relationship.ReceivePresentation(summary)
+    end
+    local view = activeView(npcID)
+    local context = view and view.spec and view.spec.context
+        and view.spec.context.conversationBlockContext or nil
+    if context then
+        context.relationship = summary
+        context.relationshipState = summary.state
+    end
+    return true
+end
+
+local function friendlyGiftName(itemType)
+    local value = tostring(itemType or "")
+    local short = string.match(value, "([^%.]+)$") or value
+    short = string.gsub(short, "_", " ")
+    short = string.gsub(short, "(%l)(%u)", "%1 %2")
+    short = string.gsub(short, "(%a)(%d)", "%1 %2")
+    short = string.gsub(short, "(%d)(%a)", "%1 %2")
+    short = string.gsub(short, "^%s+", "")
+    short = string.gsub(short, "%s+$", "")
+    return short ~= "" and short or "item"
+end
+
+local function giftArticle(value)
+    local initial = string.lower(string.sub(tostring(value or "item"), 1, 1))
+    return string.find("aeiou", initial, 1, true) and "an" or "a"
+end
+
+local function formatGiftOffer(itemTypes)
+    local counts = {}
+    local order = {}
+    for _, itemType in ipairs(type(itemTypes) == "table" and itemTypes or {}) do
+        local name = friendlyGiftName(itemType)
+        if not counts[name] then
+            counts[name] = 0
+            order[#order + 1] = name
+        end
+        counts[name] = counts[name] + 1
+    end
+    local total = 0
+    local parts = {}
+    for _, name in ipairs(order) do
+        local count = counts[name]
+        total = total + count
+        parts[#parts + 1] = count > 1
+            and tostring(count) .. " x " .. name or name
+    end
+    if total == 1 then
+        local name = order[1] or "item"
+        return {
+            count = 1,
+            itemName = giftArticle(name) .. " " .. name,
+            itemSummary = name,
+            variant = "single",
+        }
+    end
+    return {
+        count = total,
+        itemName = #parts > 0 and table.concat(parts, ", ") or "these items",
+        itemSummary = #parts > 0 and table.concat(parts, ", ") or "these items",
+        variant = "multiple",
+    }
+end
+
+local function giftOfferKey(offer, itemTypes, context)
+    local hash = 17
+    local source = table.concat({
+        tostring(context and context.npcID or ""),
+        table.concat(type(itemTypes) == "table" and itemTypes or {}, ":"),
+        tostring(math.floor(tonumber(context and context.worldAgeHours) or 0) / 24),
+    }, "|")
+    for index = 1, #source do
+        hash = (hash * 31 + string.byte(source, index)) % 2147483647
+    end
+    if offer.variant == "single" then
+        return hash % 2 == 0 and "gift.offer.single" or "gift.offer.single.alt"
+    end
+    return hash % 2 == 0 and "gift.offer.multiple" or "gift.offer.multiple.alt"
+end
+
 function Composer.SetIdentityArguments(context, values)
     if type(context) ~= "table" then return false end
     context.textArgs = {}
@@ -160,6 +286,27 @@ local function ensureBlockText(block)
         block.textSource,
         Registry.CollectTextKeys(block)
     )
+end
+
+local function conversationDebugEnabled()
+    return PNC.Client and PNC.Client.CanUseDebug
+        and PNC.Client.CanUseDebug() == true
+end
+
+local function readableReason(reason)
+    local value = tostring(reason or "unavailable")
+    value = string.gsub(value, "_", " ")
+    return value
+end
+
+local function debugCategoryText(source, labelKey, reason)
+    local label = PsychopatzCore.Conversation.Text.Resolve(payload(
+        source,
+        labelKey
+    ))
+    return {
+        text = label .. " (" .. readableReason(reason) .. ")",
+    }
 end
 
 local function selectedTextKey(block, nodeID, node, context)
@@ -448,6 +595,17 @@ function Composer.ReceiveBlock(args)
             if view.session and view.session.currentNodeID == "menu" then
                 view.session.currentNode = view.spec.nodes.menu
             end
+            -- A persisted server history can outlive this client session. The
+            -- first stale click teaches the client about the daily limit; do
+            -- not turn that expected rejection into an ugly transcript line.
+            if PNC.Core and PNC.Core.LogInfo then
+                PNC.Core.LogInfo("Conversation category hidden after server daily limit npc="
+                    .. tostring(args.npcID or "unknown") .. " category="
+                    .. tostring(args.categoryID) .. " debug="
+                    .. tostring(conversationDebugEnabled()))
+            end
+            restoreCurrentChoices(view)
+            return false, args.reason
         end
         notifyFailure(view, "status.block_unavailable", args.reason)
         return false, args.reason
@@ -498,6 +656,33 @@ function Composer.ReceiveOutcome(args)
     end
     local context = view.spec.context.conversationBlockContext
     rememberCategoryUse(context, block.category, args.outcomeID)
+    local nodeID = args.nodeID or block.entryNode
+    local choice = Selector.GetChoice(block, nodeID, args.choiceID)
+    local playerPayload = choice and dialoguePayload(
+        block.textSource,
+        choice.textKey,
+        context
+    ) or nil
+    local npcPayload = args.responseKey and dialoguePayload(
+        block.textSource,
+        args.responseKey,
+        context
+    ) or nil
+    appendDiary(args.npcID, {
+        kind = "conversation",
+        categoryID = block.category,
+        blockID = args.blockID,
+        nodeID = nodeID,
+        choiceID = args.choiceID,
+        outcomeID = args.outcomeID,
+        playerText = resolvedDialogue(playerPayload),
+        npcText = resolvedDialogue(npcPayload),
+        delta = args.relationshipDelta,
+        before = args.relationshipBefore,
+        after = args.relationshipAfter,
+        at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+    })
+    receiveRelationshipAfter(args.npcID, args.relationshipAfter)
     local clientState = PNC.Network and PNC.Network.ClientState
     if args.relationshipDelta and clientState then
         clientState.lastConversationDelta = {
@@ -586,6 +771,7 @@ function Composer.ReceiveRecruitOutcome(args)
                 at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
             }
         end
+        receiveRelationshipAfter(args.npcID, args.relationshipAfter)
         view.spec.context.lastConversationError = tostring(
             args.reason or "recruitment_rejected"
         )
@@ -596,6 +782,27 @@ function Composer.ReceiveRecruitOutcome(args)
         end
         local session = view.session
         local context = view.spec.context.conversationBlockContext
+        if context then
+            appendDiary(args.npcID, {
+                kind = "recruitment",
+                choiceID = "recruit",
+                playerText = resolvedDialogue(dialoguePayload(
+                    SYSTEM_SOURCE, "choice.recruit", context
+                )),
+                npcText = args.responseKey and resolvedDialogue(dialoguePayload(
+                    SYSTEM_SOURCE,
+                    args.responseKey,
+                    context,
+                    { route = args.route or "none" }
+                )) or nil,
+                delta = args.relationshipDelta,
+                before = args.relationshipBefore,
+                after = args.relationshipAfter,
+                recruitment = args.recruitment,
+                reason = args.reason,
+                at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+            })
+        end
         if session and args.responseKey then
             session:queueMessage("npc", dialoguePayload(
                 SYSTEM_SOURCE,
@@ -622,6 +829,26 @@ function Composer.ReceiveRecruitOutcome(args)
         relationship = args.relationship,
         reason = args.reason,
     }
+    appendDiary(args.npcID, {
+        kind = "recruitment",
+        choiceID = "recruit",
+        playerText = resolvedDialogue(dialoguePayload(
+            SYSTEM_SOURCE, "choice.recruit", context
+        )),
+        npcText = resolvedDialogue(dialoguePayload(
+            SYSTEM_SOURCE,
+            args.responseKey or "response.recruit.admire.1",
+            context,
+            { route = args.route or "admire" }
+        )),
+        delta = args.relationshipDelta,
+        before = args.relationshipBefore,
+        after = args.relationshipAfter,
+        recruitment = args.relationship,
+        reason = args.reason,
+        at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+    })
+    receiveRelationshipAfter(args.npcID, args.relationshipAfter)
     if PNC.Core and PNC.Core.LogInfo then
         PNC.Core.LogInfo("Conversation recruitment committed npc="
             .. tostring(args.npcID or "unknown") .. " route="
@@ -675,17 +902,84 @@ function Composer.ReceiveGiftResult(args)
         }
         context.giftConversationActive = nil
     end
+    local offer = formatGiftOffer(args.itemTypes)
+    local offerArgs = {
+        giftItemName = offer.itemName,
+        giftItemSummary = offer.itemSummary,
+        giftItemCount = offer.count,
+    }
+    local offerKey = giftOfferKey(offer, args.itemTypes, context)
+    local activeBlock = context and context.activeConversationBlockID
+        and Registry.GetBlock(context.activeConversationBlockID) or nil
+    local giftSource = activeBlock and activeBlock.textSource
+        or NEEDS_FALLBACK_SOURCE
+    local giftReplyKey = args.giftReplyKey
+        or "gift.received." .. tostring(args.giftEffect
+            and args.giftEffect.kind or "general")
+    -- Use the authoritative after-state immediately, then request a full
+    -- presentation as a persistence/network consistency check.
+    receiveRelationshipAfter(args.npcId, args.relationshipAfter)
+    if Relationship and Relationship.RequestPresentation then
+        -- The authoritative effect is committed before this callback. Refresh
+        -- the live conversation panel so its marker and attitude use the same
+        -- relationship snapshot that the debug laboratory displays.
+        Relationship.RequestPresentation(args.npcId)
+    end
     if PNC.InventoryWindow and PNC.InventoryWindow.Close then
         PNC.InventoryWindow.Close()
     end
-    local activeBlock = context and context.activeConversationBlockID
-        and Registry.GetBlock(context.activeConversationBlockID) or nil
-    if view.session and activeBlock and args.giftReplyKey then
-        view.session:append("npc", dialoguePayload(
-            activeBlock.textSource,
-            args.giftReplyKey,
-            context
+    if view.session and view.session.append then
+        local requiredKeys = {}
+        for _, key in ipairs(GIFT_OFFER_KEYS) do
+            requiredKeys[#requiredKeys + 1] = key
+        end
+        requiredKeys[#requiredKeys + 1] = giftReplyKey
+        Loader.EnsureSource(giftSource, requiredKeys)
+        -- The item selection is a spoken player line, not an inventory-only
+        -- event. Keep it in the same transcript before the NPC reacts.
+        view.session:append("player", dialoguePayload(
+            giftSource,
+            offerKey,
+            context,
+            offerArgs
         ))
+        view.session:append("npc", dialoguePayload(
+            giftSource,
+            giftReplyKey,
+            context,
+            offerArgs
+        ))
+    end
+    appendDiary(args.npcId, {
+        kind = "gift",
+        blockID = context and context.activeConversationBlockID,
+        choiceID = "gift",
+        playerText = resolvedDialogue(dialoguePayload(
+            giftSource,
+            offerKey,
+            context,
+            offerArgs
+        )),
+        npcText = resolvedDialogue(dialoguePayload(
+            giftSource,
+            giftReplyKey,
+            context,
+            offerArgs
+        )),
+        itemSummary = offer.itemSummary,
+        itemTypes = args.itemTypes,
+        delta = args.relationshipDelta,
+        before = args.relationshipBefore,
+        after = args.relationshipAfter,
+        at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+    })
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo("Conversation gift result npc="
+            .. tostring(args.npcId or "unknown")
+            .. " items=" .. tostring(#(args.itemTypes or {}))
+            .. " reply=" .. tostring(giftReplyKey)
+            .. " relationship_refresh="
+            .. tostring(args.relationshipAfter ~= nil))
     end
     -- The authored gift node is already the next node of the conversation.
     -- Closing the modal reveals it; do not reroll or append a second response.
@@ -701,35 +995,56 @@ end
 
 local function categoryChoices(context)
     local choices = {}
+    local debug = conversationDebugEnabled()
     for _, category in ipairs(Registry.ListCategories()) do
-        local categoryEligible = Selector.IsCategoryEligible(
+        local categoryEligible, categoryReason = Selector.IsCategoryEligible(
             category.id, context, false
         )
-        if categoryEligible then
-            local categoryTextValid = Loader.EnsureSource(
-                category.textSource,
-                { category.labelKey }
-            )
-            local selected = Selector.SelectBlock(category.id, context)
-            local textValid = selected and ensureBlockText(selected)
-            if selected and textValid and categoryTextValid then
-                local selectedCategory = category
-                choices[#choices + 1] = {
-                    id = selectedCategory.id,
-                    text = payload(
-                        selectedCategory.textSource,
-                        selectedCategory.labelKey
-                    ),
-                    -- Ask About is a topic browser and stays out of the
-                    -- transcript; ordinary categories are player lines so
-                    -- the NPC never appears to start a one-sided exchange.
-                    log = selectedCategory.id
-                        ~= "projecthoomans:ask_about",
-                    action = function()
-                        Composer.RequestCategory(context.npcID, selectedCategory.id)
-                    end,
-                }
+        local categoryTextValid = Loader.EnsureSource(
+            category.textSource,
+            { category.labelKey }
+        )
+        local selected, selection = Selector.SelectBlock(category.id, context)
+        local textValid = selected and ensureBlockText(selected)
+        if categoryEligible and selected and textValid and categoryTextValid then
+            local selectedCategory = category
+            choices[#choices + 1] = {
+                id = selectedCategory.id,
+                text = payload(
+                    selectedCategory.textSource,
+                    selectedCategory.labelKey
+                ),
+                -- Ask About is a topic browser and stays out of the
+                -- transcript; ordinary categories are player lines so
+                -- the NPC never appears to start a one-sided exchange.
+                log = selectedCategory.id
+                    ~= "projecthoomans:ask_about",
+                action = function()
+                    Composer.RequestCategory(context.npcID, selectedCategory.id)
+                end,
+            }
+        elseif debug and categoryTextValid then
+            local reason = categoryReason
+            if not reason and selection and selection.candidates then
+                reason = "no_eligible_block"
+                for _, candidate in ipairs(selection.candidates) do
+                    if candidate.reason then
+                        reason = candidate.reason
+                        break
+                    end
+                end
             end
+            local selectedCategory = category
+            choices[#choices + 1] = {
+                id = selectedCategory.id,
+                text = debugCategoryText(
+                    selectedCategory.textSource,
+                    selectedCategory.labelKey,
+                    reason or "no_eligible_block"
+                ),
+                enabled = false,
+                log = false,
+            }
         end
     end
     return choices
@@ -792,6 +1107,12 @@ function Composer.BuildRootNode(context, options)
                     SYSTEM_SOURCE, "choice.recruit", context
                 ),
                 action = function()
+                    if Relationship and Relationship.SetPreviewRequirement then
+                        Relationship.SetPreviewRequirement(
+                            context.npcID,
+                            "recruit"
+                        )
+                    end
                     Composer.RequestRecruit(context.npcID)
                 end,
             }

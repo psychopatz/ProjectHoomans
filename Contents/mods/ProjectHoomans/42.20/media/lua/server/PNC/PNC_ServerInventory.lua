@@ -474,6 +474,14 @@ function Service.Transfer(player, args)
     end
     if success and giftMode then
         local gift = giftEffect(details and details.itemTypes or {})
+        details = details or {}
+        -- The acknowledgement is part of the conversation contract even if
+        -- the relationship service is temporarily unavailable. The transfer
+        -- remains authoritative; in that degraded case the axes simply do
+        -- not change and the client still receives an honest flavour reply.
+        details.giftEffect = gift
+        details.giftReplyKey = "gift.received."
+            .. tostring(gift and gift.kind or "general")
         local playerKey = PNC.PlayerCharacters
             and PNC.PlayerCharacters.GetEntityKey
             and PNC.PlayerCharacters.GetEntityKey(player, {
@@ -514,11 +522,15 @@ function Service.Transfer(player, args)
                 respect = relationshipAfter.respect - relationshipBefore.respect,
                 familiarity = relationshipAfter.familiarity - relationshipBefore.familiarity,
             }
-            details.giftEffect = gift
-            details.giftReplyKey = "gift.received."
-                .. tostring(gift.kind or "general")
         else
             details.giftEffectError = applyReason or "relationship_unavailable"
+            details.relationshipBefore = relationshipBefore
+            details.relationshipAfter = relationshipBefore
+            details.relationshipDelta = {
+                approval = 0,
+                respect = 0,
+                familiarity = 0,
+            }
         end
         if Registry.Save then Registry.Save() end
     end

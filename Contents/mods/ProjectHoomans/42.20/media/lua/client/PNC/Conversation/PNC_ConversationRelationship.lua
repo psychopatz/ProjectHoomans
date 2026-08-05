@@ -96,6 +96,11 @@ end
 
 function Relationship.ReceivePresentation(summary)
     if type(summary) ~= "table" or not summary.npcID then return false end
+    local state = PNC.Network and PNC.Network.ClientState or nil
+    if state then
+        state.conversationRelationships = state.conversationRelationships or {}
+        state.conversationRelationships[tostring(summary.npcID)] = summary
+    end
     local view = PsychopatzCore
         and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.instance or nil
@@ -139,6 +144,28 @@ function Relationship.RequestPresentation(npcID)
         return PNC.Client.RequestConversationRelationship(npcID)
     end
     return false, "presentation_unavailable"
+end
+
+function Relationship.SetPreviewRequirement(npcID, requirement, context)
+    local view = PsychopatzCore
+        and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.instance or nil
+    if not view or not view.spec
+        or tostring(view.spec.npcID or "") ~= tostring(npcID or "")
+    then
+        return false, "conversation_unavailable"
+    end
+    local panel = view.extensionParts
+        and view.extensionParts.relationship or nil
+    if not panel or not panel.setRequirement then
+        return false, "relationship_panel_unavailable"
+    end
+    panel:setRequirement(requirement, context)
+    return true
+end
+
+function Relationship.ClearPreviewRequirement(npcID)
+    return Relationship.SetPreviewRequirement(npcID, "inspect")
 end
 
 function Relationship.IsPresentationVisible()

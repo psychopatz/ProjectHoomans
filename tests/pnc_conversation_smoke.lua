@@ -83,6 +83,7 @@ for _, value in ipairs({ "Dawn", "Sunrise", "Sunset", "Dusk", "Twilight" }) do
     dofile(COMMON_CLIENT .. "PNC/Conversation/PortraitBackgrounds/PNC_Background"
         .. value .. ".lua")
 end
+dofile(CLIENT .. "PNC/Conversation/PNC_ConversationDiary.lua")
 dofile(CLIENT .. "PNC/Conversation/Blocks/PNC_ConversationComposer.lua")
 dofile(CLIENT .. "PNC/Conversation/PNC_ConversationDefinition.lua")
 dofile(CLIENT .. "PNC/Conversation/Debug/PNC_ConversationDebugModel.lua")
@@ -404,6 +405,78 @@ equal(
     "dialogue name placeholders resolve"
 )
 
+local giftMessages = {}
+local relationshipRefreshes = 0
+fakeSession.currentNodeID = "block:gift"
+fakeSession.append = function(_, speaker, value)
+    giftMessages[#giftMessages + 1] = {
+        speaker = speaker,
+        value = value,
+    }
+end
+definition.context.conversationBlockContext.activeConversationBlockID =
+    "projecthoomans:needs_basic_neutral"
+PNC.Client = {
+    RequestConversationRelationship = function()
+        relationshipRefreshes = relationshipRefreshes + 1
+        return true
+    end,
+}
+PsychopatzCore.Conversation.instance = fakeView
+truth(PNC.Conversation.Composer.ReceiveGiftResult({
+    success = true,
+    npcId = "npc-12",
+    itemTypes = { "Base.Katana" },
+    giftReplyKey = "gift.received.equipment",
+    relationshipDelta = { approval = 0, respect = 2, familiarity = 0.5 },
+}), "gift result accepted")
+equal(giftMessages[1].speaker, "player", "gift offer is a player line")
+equal(
+    PsychopatzCore.Conversation.Text.Resolve(giftMessages[1].value),
+    "Here's a Katana.",
+    "gift offer names and formats the item"
+)
+equal(giftMessages[2].speaker, "npc", "gift response is an NPC line")
+equal(relationshipRefreshes, 1, "gift refreshes the live relationship panel")
+truth(PNC.Conversation.Diary.Get("npc-12")[1],
+    "gift is recorded in the interaction diary")
+giftMessages = {}
+truth(PNC.Conversation.Composer.ReceiveGiftResult({
+    success = true,
+    npcId = "npc-12",
+    itemTypes = { "Base.WaterBottleFull", "Base.Bandage" },
+    giftEffect = { kind = "medical" },
+}), "gift result without an optional reply key is accepted")
+truth(#giftMessages == 2, "gift still appends offer and reply without reply key")
+local formattedGift = PsychopatzCore.Conversation.Text.Resolve(
+    giftMessages[1].value
+)
+truth(string.find(formattedGift, "Water Bottle Full", 1, true),
+    "gift offer includes the current water item")
+truth(string.find(formattedGift, "Bandage", 1, true),
+    "gift offer includes the current bandage item")
+PsychopatzCore.Conversation.instance = nil
+
+local previewRequirement
+PsychopatzCore.Conversation.instance = {
+    spec = { npcID = "npc-12" },
+    extensionParts = {
+        relationship = {
+            setRequirement = function(_, value)
+                previewRequirement = value
+            end,
+        },
+    },
+}
+truth(
+    PNC.Conversation.Relationship.SetPreviewRequirement(
+        "npc-12", "recruit"
+    ),
+    "recruit preview requirement accepted"
+)
+equal(previewRequirement, "recruit", "recruit uses the threshold graph")
+PsychopatzCore.Conversation.instance = nil
+
 PNC.Network = { ClientState = {
     playerContext = {
         characterUUID = "character-alex",
@@ -485,6 +558,23 @@ equal(dailyCategoryVisible, false,
 truth(PNC.Network.ClientState.conversationHistory["npc-daily"]
     ["category:projecthoomans:whats_up"],
     "client remembers the authoritative daily use for the active session")
+PNC.Client.CanUseDebug = function() return true end
+local debugDailyMenu = PNC.Conversation.Composer.BuildMenuNode(
+    dailyDefinition.context.conversationBlockContext,
+    dailyDefinition.context.conversationMenuOptions
+)
+local debugDailyLabel
+for _, choiceValue in ipairs(debugDailyMenu.choices or {}) do
+    if choiceValue.id == "projecthoomans:whats_up" then
+        debugDailyLabel = PsychopatzCore.Conversation.Text.Resolve(
+            choiceValue.text
+        )
+        equal(choiceValue.enabled, false,
+            "debug exposes a used daily topic as disabled")
+    end
+end
+truth(debugDailyLabel and string.find(debugDailyLabel, "once per day used", 1, true),
+    "debug daily topic includes the unavailable reason")
 PsychopatzCore.Conversation.instance = nil
 PNC.Network = nil
 

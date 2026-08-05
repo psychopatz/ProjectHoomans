@@ -58,6 +58,8 @@ end
 
 dofile(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryUI_Model.lua")
 dofile(SHARED_ROOT .. "PNC/Conversation/PNC_ConversationGifts.lua")
+assertEqual(PNC.Gifts.IsValidItemType("Base.Crisps"), true,
+    "crisps are valid food gifts")
 
 package.preload["PNC/UI/Inventory/PNC_InventoryUI_Model"] = function()
     return PNC.InventoryUIModel

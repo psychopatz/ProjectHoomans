@@ -235,6 +235,26 @@ at midnight instead of requiring 24 elapsed hours. Category policies are the
 correct choice when a weighted topic pool must be usable only once as a whole;
 putting the policy on each block would allow another block from the pool.
 
+In normal play, a category whose repeat policy is no longer available is
+removed from the response channel. If a saved server history makes the client
+show a stale button, the authoritative rejection updates the local history and
+rebuilds the menu without adding a rejection line to the conversation log.
+With conversation debug access enabled, unavailable categories remain visible
+as disabled entries with the machine reason appended (for example, `What's
+up? (once per day used)`) so the debugger can explain the state without making
+that entry selectable.
+
+## Interaction diary
+
+The NPC character window has an **Interactions** tab. It is a bounded
+presentation journal for the current player/NPC pair: committed conversation
+choices, gifts, and recruitment attempts are listed newest-first with the
+player line, NPC reply, item summary, and authoritative `Approval`, `Respect`,
+and `Familiarity` deltas. It reads the same `PNC.Network.ClientState`
+relationship snapshots used by the conversation graph; it is not a second
+relationship store and cannot mutate live values. The **Clear** action only
+clears this client-side presentation journal.
+
 ## Branching and deterministic randomization
 
 Every outcome must specify exactly one of:
@@ -306,10 +326,13 @@ Gift mode requires the active conversation lease and rejects hostile targets.
 It applies the resulting Approval/Respect/Familiarity change through
 `PNC.Relationships.ApplyConversationEffect`: food and medical items primarily
 raise Approval, while tools, weapons, and ammunition primarily raise Respect.
-The server returns a kind-specific NPC acknowledgement so the gift is part of
-the transcript rather than a silent inventory transaction. Addons that need
-item-specific values should provide their own authoritative gift service rather
-than changing the conversation registry.
+The client turns the authoritative item types and count into a spoken player
+line (for example, `Here's a Katana.` or `I have 2 x Bandage for you.`), then
+the server returns a kind-specific NPC acknowledgement. The gift is therefore
+part of the transcript rather than a silent inventory transaction, and the live
+conversation relationship marker is refreshed from the committed server
+snapshot. Addons that need item-specific values should provide their own
+authoritative gift service rather than changing the conversation registry.
 
 Recruitment is a root-menu action for non-hostile NPCs. The player’s request is
 logged as a spoken line, and the NPC answers with a deterministic, varied reply
@@ -320,8 +343,10 @@ requirement: the normal route is the upper-right (approval and respect)
 region, and a high-Respect negative-Approval route represents fear or
 intimidation. Successful recruitment then uses the existing faction transfer,
 community assignment, follow order, persistence, and lease shutdown services.
-Failed requests report the authoritative reason without mutating relationship
-state.
+Selecting the recruit line immediately switches the in-conversation quadrant to
+the same green `recruit` threshold region used by the Relationship Laboratory;
+the authoritative response still decides the final route. Failed requests
+report the authoritative reason without mutating relationship state.
 
 After each authoritative outcome (including gifts), the client stores
 `PNC.Network.ClientState.lastConversationDelta`. The Relationship Laboratory

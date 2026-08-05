@@ -46,10 +46,10 @@ local bundle = {
     loadout = {
         bagChoices = { "Base.Bag_Satchel", "Base.Bag_DuffelBag" },
         supplies = {
-            { type = "Base.Bandage", stack = 2, preferredContainer = "bag" },
-            { type = "Base.WaterBottleFull", stack = 1, preferredContainer = "bag" },
-            { type = "Base.Cabbage", stack = 1, preferredContainer = "bag" },
-            { type = "Base.SeedBag", stack = 1, preferredContainer = "bag" },
+            { key = "farmer_bandage", type = "Base.Bandage", stack = 2, preferredContainer = "bag" },
+            { key = "farmer_water", type = "Base.WaterBottleFull", stack = 1, preferredContainer = "bag" },
+            { key = "farmer_cabbage", type = "Base.Cabbage", stack = 1, preferredContainer = "bag" },
+            { key = "farmer_seed_bag", type = "Base.SeedBag", stack = 1, preferredContainer = "bag" },
         },
     },
 }
