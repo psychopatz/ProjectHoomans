@@ -121,9 +121,12 @@
 - `PNC_API`: external entry points
 
 ## Layout Rule
-- reusable archetype definitions, translation files, clothing XML, and other version-agnostic content belong in `common/media/...`
-- `42.16/media/...` should hold only build-specific runtime Lua and assets that genuinely differ by Project Zomboid version
-- common archetype definition files must store declarative bundles only; runtime registry ownership stays in the versioned core loader/registry
+- reusable definitions, translation catalogs, clothing XML, animations, and
+  other version-agnostic content belong in `common/media/...`
+- `42.20/media/...` owns executable Lua and assets coupled to the current
+  Project Zomboid runtime/API
+- common definition files must remain declarative; runtime registries,
+  lifecycle services, UI integrations, and engine adapters stay in `42.20`
 
 ## Ownership and Load-Order Rules
 - use `PNC.Core.IsManagedNPCBody` instead of defining subsystem-local checks for the `PNC_NPC` body marker

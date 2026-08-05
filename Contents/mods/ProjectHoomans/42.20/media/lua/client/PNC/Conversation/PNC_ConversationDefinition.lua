@@ -1,3 +1,4 @@
+-- Build 42.20 conversation presentation implementation.
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 

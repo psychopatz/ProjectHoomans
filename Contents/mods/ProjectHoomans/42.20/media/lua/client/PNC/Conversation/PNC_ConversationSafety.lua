@@ -1,3 +1,4 @@
+-- Build 42.20 engine-facing conversation safety checks.
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 

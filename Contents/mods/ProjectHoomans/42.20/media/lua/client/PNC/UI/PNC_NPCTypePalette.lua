@@ -1,3 +1,4 @@
+-- Build 42.20 NPC presentation palette implementation.
 PNC = PNC or {}
 PNC.NPCTypePalette = PNC.NPCTypePalette or {}
 

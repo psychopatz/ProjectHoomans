@@ -1,27 +1,20 @@
-Project Hoomans Conversation Translation Guide
-==============================================
+Project Hoomans Translation Guide
+=================================
 
-Build 42.20 format
-- Project Zomboid loads UI translations from
-  `media/lua/shared/Translate/<LANG>/UI.json`.
-- The generated catalog lives in the mod's `common` layer so every compatible
-  Build 42 version uses the same conversation strings.
-- Every entry in that catalog must use a `UI_` key.
-- Legacy `UI_<LANG>.txt` files and arbitrary Lua translation tables are not
-  loaded by the Build 42.20 Translator.
-- `UI.json` is generated output. Do not maintain conversation prose there.
+Project Zomboid Build 42.20 layout
+- Translation catalogs are packaged directly at
+  `common/media/lua/shared/Translate/<LANG>/*.json`.
+- `UI.json` is the canonical UI and conversation catalog. Maintain it directly;
+  it is not generated from a repository-root source tree.
+- `Sandbox.json` is the canonical sandbox-options catalog.
+- Every UI entry must use a stable `UI_` key and every catalog must remain a
+  valid JSON object containing string keys and string values.
 
-Scalable authoring structure
-- Shared UI entries:
-  `translation-src/<LANG>/UI.base.json`
-- Conversation choices and responses:
-  `translation-src/<LANG>/Conversation/Core.json`
-- Greeting prose:
-  `translation-src/<LANG>/Greetings/<Relationship>/
-  greeting_<Relationship><Time>.json`
-- Greeting selection keys:
-  `PNC/Conversation/Content/Greetings/<Relationship>/
-  greeting_<Relationship><Time>.lua`
+Conversation content layout
+- Greeting selection definitions are reusable content and live at
+  `common/media/lua/client/PNC/Conversation/Content/Greetings/...`.
+- Conversation runtime code, registries, lifecycle logic, and UI integration
+  live in `42.20/media/lua/...`.
 
 Greeting categories
 - FirstMeet
@@ -37,20 +30,20 @@ Time variants
 - Twilight
 
 Adding a greeting
-1. Add a stable `UI_PNC_Greeting_...` key and its prose to the matching
-   modular JSON source.
-2. Add only that key to the matching greeting Lua module.
-3. Run `python3 tools/build_conversation_translations.py`.
-4. Commit both the modular source and the generated
-   `common/media/lua/shared/Translate/<LANG>/UI.json`.
+1. Add a stable `UI_PNC_Greeting_...` key and prose directly to the language's
+   `UI.json` catalog.
+2. Add only that key to the matching reusable greeting definition under
+   `common/media/lua/client/PNC/Conversation/Content/Greetings/...`.
+3. Run the conversation smoke test to verify every referenced key is present.
 
 Adding a relationship category
-1. Add the category to `PNC_ConversationRelationship.lua`.
-2. Create the matching translation and greeting Lua folders.
-3. Require the category bootstrap from `PNC_Conversation.lua`.
+1. Add the runtime category to
+   `42.20/media/lua/client/PNC/Conversation/PNC_ConversationRelationship.lua`.
+2. Add its reusable greeting definitions under `common/media/.../Greetings`.
+3. Require the definition bootstrap from the Build 42.20 conversation runtime.
 
 Adding another language
-1. Mirror `translation-src/EN` under the language code, for example `FR`.
-2. Preserve every key and translate only the values.
-3. Run:
-   `python3 tools/build_conversation_translations.py --language FR`
+1. Create `common/media/lua/shared/Translate/<LANG>/UI.json` using the same keys
+   as the English catalog.
+2. Translate values only; do not rename keys.
+3. Add the corresponding `Sandbox.json` when sandbox labels are translated.

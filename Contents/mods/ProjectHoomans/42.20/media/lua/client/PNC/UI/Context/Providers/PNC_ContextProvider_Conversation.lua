@@ -1,3 +1,4 @@
+-- Build 42.20 world-context integration for conversations.
 PNC = PNC or {}
 PNC.ContextHub = PNC.ContextHub or {}
 

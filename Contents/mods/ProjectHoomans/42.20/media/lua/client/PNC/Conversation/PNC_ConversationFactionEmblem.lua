@@ -1,3 +1,4 @@
+-- Build 42.20 conversation faction-emblem renderer integration.
 -- Project Hoomans presentation extension for PsychopatzCore conversations.
 -- Persistent conversation data carries only the serialization-safe emblem
 -- specification. Vanilla map-symbol textures are resolved by the client

@@ -1,3 +1,4 @@
+-- Build 42.20 relationship resolver for conversations.
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 

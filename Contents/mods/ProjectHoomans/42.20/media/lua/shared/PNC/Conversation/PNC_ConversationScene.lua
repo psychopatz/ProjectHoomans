@@ -1,3 +1,4 @@
+-- Build 42.20 shared conversation authority and lease implementation.
 PNC = PNC or {}
 PNC.ConversationScene = PNC.ConversationScene or {}
 

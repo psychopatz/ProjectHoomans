@@ -1,3 +1,4 @@
+-- Build 42.20 conversation lifecycle implementation.
 require "PNC/Conversation/PNC_ConversationSafety"
 
 PNC = PNC or {}

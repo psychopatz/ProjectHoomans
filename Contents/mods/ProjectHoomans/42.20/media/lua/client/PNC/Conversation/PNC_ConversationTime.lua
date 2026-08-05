@@ -1,3 +1,4 @@
+-- Build 42.20 game-time adapter for conversation content.
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 

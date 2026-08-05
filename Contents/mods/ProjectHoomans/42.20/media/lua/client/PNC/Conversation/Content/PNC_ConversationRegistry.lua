@@ -1,3 +1,4 @@
+-- Build 42.20 registry implementation for common conversation definitions.
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 

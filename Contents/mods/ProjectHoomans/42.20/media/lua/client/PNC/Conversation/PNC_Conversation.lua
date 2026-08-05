@@ -1,3 +1,4 @@
+-- Build 42.20 conversation runtime composition root.
 require "PsychopatzCore/UI/Conversation/PsychopatzConversation"
 require "PNC/Conversation/PNC_ConversationFactionEmblem"
 require "PNC/Conversation/PNC_ConversationTime"
