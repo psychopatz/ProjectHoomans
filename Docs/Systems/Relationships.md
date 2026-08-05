@@ -239,11 +239,13 @@ approval * approvalWeight
 ```
 
 Built-in inspection profiles cover recruit, ask for mercy, offer less,
-challenge an extorter, and claim to have few supplies. These profiles are
-presentation/eligibility foundations only; this phase does not implement an
-extortion conversation, payment, deception, or relationship outcome events.
-Future conversation instances can register another plain requirement and
-reuse the same evaluator and panel.
+challenge an extorter, and claim to have few supplies. The recruit profile is
+an Approval/Respect requirement only; it is not a fifth relationship value.
+The Build 42.20 conversation resolver applies the normal upper-right
+admiration route and the high-Respect fear route, then delegates successful
+faction/community transfer to the recruitment service. Future conversation
+instances can register another plain requirement and reuse the same evaluator
+and panel.
 
 The developer relationship inspector embeds the graph, lets the tester switch
 interaction profiles, adjust a manual context modifier, and inspect the base

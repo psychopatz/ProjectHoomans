@@ -163,6 +163,7 @@ Internal.RegisterServerCommand(Const.CMD_PLAYER_BOOTSTRAP, function(args)
         ClientState.npcKnowledge = {}
         ClientState.npcPresentations = {}
         ClientState.conversationHistory = {}
+        ClientState.lastConversationDelta = nil
         ClientState.bootstrapKnowledgeRevision = incomingRevision
     end
     if projectionIsCurrent(args) then
@@ -295,6 +296,12 @@ end)
 Internal.RegisterServerCommand(Const.CMD_CONVERSATION_OUTCOME, function(args)
     if PNC.Conversation and PNC.Conversation.Composer then
         PNC.Conversation.Composer.ReceiveOutcome(args or {})
+    end
+end)
+
+Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RECRUIT_RESULT, function(args)
+    if PNC.Conversation and PNC.Conversation.Composer then
+        PNC.Conversation.Composer.ReceiveRecruitOutcome(args or {})
     end
 end)
 

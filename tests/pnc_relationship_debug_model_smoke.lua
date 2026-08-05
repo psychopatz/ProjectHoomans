@@ -162,7 +162,13 @@ local rows = PNC.RelationshipDebugModel.BuildRows({
             },
         },
     },
-}, true)
+}, true, nil, nil, {
+    npcID = "npc:alice",
+    source = "conversation",
+    blockID = "projecthoomans:whats_up_local_activity_neutral",
+    delta = { approval = 2, respect = -1, familiarity = 1 },
+    effects = { { type = "pnc:relationship" } },
+})
 
 assertContains(rows, "Approval", "12.00")
 assertContains(rows, "Revisions", "presence 2")
@@ -182,6 +188,8 @@ assertContains(rows, "  strength", "0.9500 current")
 assertContains(rows, "Last trigger", "treated_wound")
 assertContains(rows, "  approval effect", "+4.00 -> +5.00")
 assertContains(rows, "  modifier compassion", "1.25")
+assertContains(rows, "  changed", "Approval +2.00")
+assertContains(rows, "Last conversation", "whats_up_local_activity")
 
 local relationshipRows = PNC.RelationshipDebugModel.FilterRows(
     rows,

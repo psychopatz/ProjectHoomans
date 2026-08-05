@@ -56,14 +56,28 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
         textColor, textColor, textColor, 1, UIFont.Small
     )
     local categoryX = math.floor(self.width * 0.64)
-    self:drawText(
-        tostring(row.category or "Item"),
-        categoryX, y + 7,
-        dimmed and 0.38 or 0.64,
-        dimmed and 0.38 or 0.64,
-        dimmed and 0.42 or 0.82,
-        1, UIFont.Small
-    )
+    if self.ownerWindow and self.ownerWindow.giftMode
+        and self.role == "player"
+        and row.giftScore
+        and PNC.Gifts and PNC.Gifts.FormatShortScore
+    then
+        local scoreText = PNC.Gifts.FormatShortScore(row.giftScore)
+        self:drawText(
+            scoreText,
+            categoryX,
+            y + 7,
+            0.50, 0.92, 0.70, 1, UIFont.Small
+        )
+    else
+        self:drawText(
+            tostring(row.category or "Item"),
+            categoryX, y + 7,
+            dimmed and 0.38 or 0.64,
+            dimmed and 0.38 or 0.64,
+            dimmed and 0.42 or 0.82,
+            1, UIFont.Small
+        )
+    end
     return y + self.itemheight
 end
 

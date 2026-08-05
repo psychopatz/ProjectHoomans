@@ -22,17 +22,65 @@ local function canUseDebug(player)
     return string.lower(access) == "admin"
 end
 
-local function notify(player, success, reason, args)
+local function notify(player, success, reason, args, details)
     local payload = {
         success = success == true,
         reason = tostring(reason or (success and "ok" or "failed")),
         npcId = args and args.id and tostring(args.id) or nil,
         requestId = args and args.requestId and tostring(args.requestId) or nil,
     }
+    for key, value in pairs(type(details) == "table" and details or {}) do
+        payload[key] = value
+    end
     if player and sendServerCommand then
         sendServerCommand(player, Const.MODULE, Const.CMD_INVENTORY_RESULT, payload)
     end
-    return success == true, payload.reason
+    return success == true, payload.reason, payload
+end
+
+local function canGift(player, record, args)
+    if not player or not record then return false, "npc_not_found" end
+    if args.direction ~= "player_to_npc" then
+        return false, "gift_direction_invalid"
+    end
+    local lease = record.runtime and record.runtime.conversationLease or nil
+    if not lease or tostring(lease.token or "")
+        ~= tostring(args.conversationToken or "")
+    then
+        return false, "conversation_lease_required"
+    end
+    local faction = tostring(record.faction or "")
+    if faction == tostring(Const.FACTION_HOSTILE) then
+        return false, "hostile_gift_forbidden"
+    end
+    if PNC.ConversationScene and PNC.ConversationScene.Begin then
+        local ok, reason = PNC.ConversationScene.Begin(
+            record,
+            Registry.GetLiveZombie(record.id),
+            player,
+            args.conversationToken,
+            {
+                maximumDistance = lease.maximumDistance,
+                dangerRadius = lease.dangerRadius,
+                allowHostileParley = false,
+            }
+        )
+        if ok ~= true then return false, reason or "conversation_unavailable" end
+    end
+    return true, "gift_authorized"
+end
+
+PNC.Gifts = PNC.Gifts or {}
+local giftEffect = PNC.Gifts.EvaluateEffect
+
+local function relationshipSnapshot(value)
+    value = type(value) == "table" and value or {}
+    return {
+        approval = tonumber(value.approval) or 0,
+        respect = tonumber(value.respect) or 0,
+        familiarity = tonumber(value.familiarity) or 0,
+        state = value.state,
+    }
 end
 
 local function canManage(player, record)
@@ -228,9 +276,11 @@ local function transferPlayerToNPC(player, record, args, sinceRevision)
         end
     end
     local specs = {}
+    local itemTypes = {}
     for index = 1, #resolved do
         specs[index], reason = compactSpec(resolved[index])
         if not specs[index] then return false, reason end
+        itemTypes[#itemTypes + 1] = specs[index].type
     end
     local added, addReason, compactIDs = Inventory.AddItems(
         record,
@@ -246,7 +296,10 @@ local function transferPlayerToNPC(player, record, args, sinceRevision)
     end
     refreshLiveEquipment(record)
     syncResult(player, record, sinceRevision)
-    return true, "transferred_to_npc"
+    return true, "transferred_to_npc", {
+        itemTypes = itemTypes,
+        itemCount = #itemTypes,
+    }
 end
 
 local function transferNPCToPlayer(player, record, args, sinceRevision)
@@ -387,7 +440,13 @@ end
 function Service.Transfer(player, args)
     args = args or {}
     local record = args.id and Registry.Get(tostring(args.id)) or nil
-    local allowed, reason = canManage(player, record)
+    local giftMode = args.gift == true
+    local allowed, reason
+    if giftMode then
+        allowed, reason = canGift(player, record, args)
+    else
+        allowed, reason = canManage(player, record)
+    end
     if not allowed then return notify(player, false, reason, args) end
     local revisionOK, sinceRevision = checkRevision(record, args)
     if not revisionOK then
@@ -397,14 +456,65 @@ function Service.Transfer(player, args)
         return notify(player, false, sinceRevision, args)
     end
     local success
+    local details
     if args.direction == "player_to_npc" then
-        success, reason = transferPlayerToNPC(player, record, args, sinceRevision)
+        success, reason, details = transferPlayerToNPC(
+            player, record, args, sinceRevision
+        )
     elseif args.direction == "npc_to_player" then
         success, reason = transferNPCToPlayer(player, record, args, sinceRevision)
     else
         success, reason = false, "invalid_direction"
     end
-    return notify(player, success, reason, args)
+    if success and giftMode then
+        local gift = giftEffect(details and details.itemTypes or {})
+        local playerKey = PNC.PlayerCharacters
+            and PNC.PlayerCharacters.GetEntityKey
+            and PNC.PlayerCharacters.GetEntityKey(player, {
+                callback = "conversation_gift",
+                worldAgeHours = getGameTime and getGameTime()
+                    and getGameTime():getWorldAgeHours() or 0,
+            }) or nil
+        local applied
+        local applyReason
+        local result
+        local relationshipBefore = PNC.Relationships
+            and PNC.Relationships.Get
+            and relationshipSnapshot(PNC.Relationships.Get(record.id, playerKey))
+            or relationshipSnapshot(nil)
+        if playerKey and PNC.Relationships
+            and PNC.Relationships.ApplyConversationEffect
+        then
+            applied, applyReason, result = PNC.Relationships.ApplyConversationEffect(
+                record.id,
+                playerKey,
+                gift,
+                {
+                    blockID = "projecthoomans:needs_gift",
+                    choiceID = "gift",
+                    outcomeID = args.requestId or details and details.itemTypes
+                        and details.itemTypes[1] or "gift",
+                    worldAgeHours = getGameTime and getGameTime()
+                        and getGameTime():getWorldAgeHours() or 0,
+                }
+            )
+        end
+        if applied == true and result and result.relationship then
+            local relationshipAfter = relationshipSnapshot(result.relationship)
+            details.relationshipBefore = relationshipBefore
+            details.relationshipAfter = relationshipAfter
+            details.relationshipDelta = {
+                approval = relationshipAfter.approval - relationshipBefore.approval,
+                respect = relationshipAfter.respect - relationshipBefore.respect,
+                familiarity = relationshipAfter.familiarity - relationshipBefore.familiarity,
+            }
+            details.giftEffect = gift
+        else
+            details.giftEffectError = applyReason or "relationship_unavailable"
+        end
+        if Registry.Save then Registry.Save() end
+    end
+    return notify(player, success, reason, args, details)
 end
 
 local function dropItem(player, record, item, sinceRevision)

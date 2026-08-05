@@ -200,6 +200,17 @@ local function notifyFailure(view, key, reason)
         key,
         { reason = tostring(reason or "unavailable") }
     ))
+    -- A rejected authoritative request is part of the conversation.  Keep it
+    -- in the log as well as the transient halo so a failed recruit, stale
+    -- lease, or inventory action is never indistinguishable from a blank UI.
+    local session = view and view.session
+    if session and session.append then
+        session:append("npc", payload(
+            SYSTEM_SOURCE,
+            key,
+            { reason = tostring(reason or "unavailable") }
+        ))
+    end
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
     if player and HaloTextHelper and HaloTextHelper.addText then
@@ -240,6 +251,10 @@ function Composer.PumpLocalRequests()
             and Conversation.Authority.HandleChoice
         then
             Conversation.Authority.HandleChoice(request.player, request.payload)
+        elseif request.command == PNC.Const.CMD_CONVERSATION_RECRUIT_REQUEST
+            and Conversation.Authority.HandleRecruit
+        then
+            Conversation.Authority.HandleRecruit(request.player, request.payload)
         end
     end
 end
@@ -292,6 +307,32 @@ function Composer.RequestChoice(npcID, blockID, nodeID, choiceID)
         choiceID = choiceID,
         registryFingerprint = Registry.GetFingerprint(),
     })
+    if not sent then
+        view.spec.context.pendingConversationRequest = nil
+        notifyFailure(view, "status.choice_rejected", reason)
+    end
+    return sent, reason
+end
+
+function Composer.RequestRecruit(npcID)
+    local view = activeView(npcID)
+    local lifecycle = lifecycleState(view)
+    if not view then return false, "conversation_not_ready" end
+    if not lifecycle then
+        notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
+        return false, "conversation_not_ready"
+    end
+    local id = requestID("recruit")
+    view.spec.context.pendingConversationRequest = id
+    local sent, reason = sendRequest(
+        PNC.Const.CMD_CONVERSATION_RECRUIT_REQUEST,
+        {
+            requestID = id,
+            npcID = tostring(npcID),
+            token = lifecycle.token,
+            registryFingerprint = Registry.GetFingerprint(),
+        }
+    )
     if not sent then
         view.spec.context.pendingConversationRequest = nil
         notifyFailure(view, "status.choice_rejected", reason)
@@ -437,6 +478,21 @@ function Composer.ReceiveOutcome(args)
     end
     local context = view.spec.context.conversationBlockContext
     rememberCategoryUse(context, block.category, args.outcomeID)
+    local clientState = PNC.Network and PNC.Network.ClientState
+    if args.relationshipDelta and clientState then
+        clientState.lastConversationDelta = {
+            npcID = args.npcID,
+            source = "conversation",
+            blockID = args.blockID,
+            choiceID = args.choiceID,
+            outcomeID = args.outcomeID,
+            delta = args.relationshipDelta,
+            before = args.relationshipBefore,
+            after = args.relationshipAfter,
+            effects = args.effectResults,
+            at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+        }
+    end
     if args.responseKey then
         session:queueMessage("npc", dialoguePayload(
             block.textSource,
@@ -459,6 +515,13 @@ function Composer.ReceiveOutcome(args)
     session.pendingClose = args.close == true
     session.pendingCloseReason = args.closeReason
     if args.nextNodeID == "$root" then
+        if context.giftConversationActive
+            and PNC.InventoryWindow
+            and PNC.InventoryWindow.Close
+        then
+            PNC.InventoryWindow.Close()
+            context.giftConversationActive = nil
+        end
         view.spec.nodes.menu = Composer.BuildMenuNode(
             context,
             context.conversationMenuOptions
@@ -467,8 +530,116 @@ function Composer.ReceiveOutcome(args)
     else
         session.pendingNext = args.nextNodeID
             and "block:" .. tostring(args.nextNodeID) or nil
+        if args.nextNodeID == "gift"
+            and PNC.InventoryWindow
+            and PNC.InventoryWindow.Open
+        then
+            local lifecycle = lifecycleState(view)
+            context.giftConversationActive = true
+            PNC.InventoryWindow.Open(args.npcID, {
+                mode = "gift",
+                token = lifecycle and lifecycle.token,
+            })
+        end
     end
     if #session.queue == 0 then session:finishPending() end
+    return true
+end
+
+function Composer.ReceiveRecruitOutcome(args)
+    args = type(args) == "table" and args or {}
+    local view = activeView(args.npcID)
+    if not view then return false end
+    if args.requestID ~= view.spec.context.pendingConversationRequest then
+        return false
+    end
+    view.spec.context.pendingConversationRequest = nil
+    if args.success ~= true then
+        local state = PNC.Network and PNC.Network.ClientState
+        if state and args.relationshipDelta then
+            state.lastConversationDelta = {
+                npcID = args.npcID,
+                source = "recruitment_rejected",
+                delta = args.relationshipDelta,
+                before = args.relationshipBefore,
+                after = args.relationshipAfter,
+                at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+            }
+        end
+        notifyFailure(view, "status.choice_rejected", args.reason)
+        return false, args.reason
+    end
+    local context = view.spec.context.conversationBlockContext
+    view.spec.context.lastConversationRecruitment = {
+        route = args.route,
+        relationship = args.relationship,
+        reason = args.reason,
+    }
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo("Conversation recruitment committed npc="
+            .. tostring(args.npcID or "unknown") .. " route="
+            .. tostring(args.route or "unknown"))
+    end
+    local session = view.session
+    if session then
+        session:queueMessage("npc", dialoguePayload(
+            SYSTEM_SOURCE, "response.recruit", context,
+            { route = args.route or "admire" }
+        ))
+        session.pendingClose = true
+        session.pendingCloseReason = args.closeReason or "recruited"
+        if #session.queue == 0 then session:finishPending() end
+    end
+    return true
+end
+
+function Composer.ReceiveGiftResult(args)
+    args = type(args) == "table" and args or {}
+    local view = activeView(args.npcId)
+    if not view then return false end
+    local context = view.spec and view.spec.context
+        and view.spec.context.conversationBlockContext or nil
+    local state = PNC.Network and PNC.Network.ClientState
+    if args.relationshipDelta and state then
+        state.lastConversationDelta = {
+            npcID = args.npcId,
+            source = "gift",
+            delta = args.relationshipDelta,
+            before = args.relationshipBefore,
+            after = args.relationshipAfter,
+            effects = args.giftEffect,
+            itemTypes = args.itemTypes,
+            at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+        }
+    end
+    if args.success ~= true then
+        if PNC.Core and PNC.Core.LogWarn then
+            PNC.Core.LogWarn("Conversation gift rejected npc="
+                .. tostring(args.npcId or "unknown") .. " reason="
+                .. tostring(args.reason or "unknown"))
+        end
+        return false, args.reason
+    end
+    if context then
+        context.lastGift = {
+            itemTypes = args.itemTypes,
+            relationshipDelta = args.relationshipDelta,
+            effect = args.giftEffect,
+        }
+        context.giftConversationActive = nil
+    end
+    if PNC.InventoryWindow and PNC.InventoryWindow.Close then
+        PNC.InventoryWindow.Close()
+    end
+    -- The authored gift node is already the next node of the conversation.
+    -- Closing the modal reveals it; do not reroll or append a second response.
+    if view.session and view.session.currentNodeID ~= "block:gift"
+        and #view.session.queue == 0
+        and view.session.finishPending
+    then
+        view.session.pendingNext = "block:gift"
+        view.session:finishPending()
+    end
     return true
 end
 
@@ -551,9 +722,24 @@ function Composer.BuildRootNode(context, options)
             table.insert(choices, 1, options.askNameChoice)
         end
         if options.dossierChoice then choices[#choices + 1] = options.dossierChoice end
+        local record = context.npcRecord or {}
+        if record.recruited ~= true
+            and tostring(record.faction or "") ~= "hostile"
+        then
+            choices[#choices + 1] = {
+                id = "recruit",
+                text = dialoguePayload(
+                    SYSTEM_SOURCE, "choice.recruit", context
+                ),
+                action = function()
+                    Composer.RequestRecruit(context.npcID)
+                end,
+            }
+        end
     end
     Loader.EnsureSource(SYSTEM_SOURCE, {
         "status.block_unavailable", "status.choice_rejected",
+        "choice.recruit", "response.recruit",
     })
     local goodbyeValid = Loader.EnsureSource(GOODBYE_SOURCE, {
         "choice.goodbye", "response.goodbye",

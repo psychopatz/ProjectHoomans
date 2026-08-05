@@ -11,6 +11,8 @@
   "category.relationship": "Relationship",
   "category.goodbye": "Goodbye",
   "choice.view_dossier": "View dossier",
+  "choice.recruit": "Would you like to join us?",
+  "response.recruit": "All right. I will follow your lead.",
   "locked.familiarity": "You do not know each other well enough yet.",
   "locked.approval": "This relationship is not close enough yet.",
   "status.loading": "Checking what you know...",

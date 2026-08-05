@@ -82,6 +82,8 @@ local function playerItemRow(item, containerKey, player)
     local metadata = probe(fullType)
     local customName = safeCall(item, "getName", nil)
     local displayName = tostring(customName or metadata.name or fullType)
+    local giftScore = PNC.Gifts and PNC.Gifts.GetItemScore
+        and PNC.Gifts.GetItemScore(fullType) or nil
     return {
         source = "player",
         id = tostring(safeCall(item, "getID", "")),
@@ -96,6 +98,7 @@ local function playerItemRow(item, containerKey, player)
         equipped = isPlayerItemEquipped(player, item),
         favorite = safeCall(item, "isFavorite", false) == true,
         restricted = false,
+        giftScore = giftScore,
     }
 end
 

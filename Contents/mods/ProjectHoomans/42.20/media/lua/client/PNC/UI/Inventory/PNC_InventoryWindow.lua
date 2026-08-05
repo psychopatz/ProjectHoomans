@@ -161,10 +161,16 @@ function ISPNCInventoryWindow:onGiveAll()
         npcContainer = self.selectedNPCContainer,
         inventoryRevision = inventory.revision,
         bulk = true,
+        gift = self.giftMode == true,
+        conversationToken = self.giftToken,
     })
 end
 
 function ISPNCInventoryWindow:onTakeAll()
+    if self.giftMode then
+        self.statusText = "Gift mode: taking items is disabled"
+        return false
+    end
     local inventory = self:inventory()
     local ids = InventoryWindow.CollectBulkTransferIDs(self.npcList)
     if not inventory or #ids < 1 then return false end
@@ -184,11 +190,24 @@ function ISPNCInventoryWindow:setNPC(npcId)
     self.selectedPlayerContainer = "root"
     self.expandedPlayerGroups = {}
     self.expandedNPCGroups = {}
+    self.giftMode = false
+    self.giftToken = nil
     self.contextSignature = nil
     if PNC.Client and PNC.Client.RequestCharacterPayload and self.npcId then
         PNC.Client.RequestCharacterPayload(self.npcId)
     end
     self:refreshInventory(true)
+end
+
+function ISPNCInventoryWindow:setConversationMode(mode, token)
+    self.giftMode = mode == "gift"
+    self.giftToken = token and tostring(token) or nil
+    self.statusText = self.giftMode
+        and "Gift mode: select an item to offer"
+        or self.statusText
+    if self.takeAllButton and self.takeAllButton.setVisible then
+        self.takeAllButton:setVisible(not self.giftMode)
+    end
 end
 
 function ISPNCInventoryWindow:payload()
@@ -291,8 +310,12 @@ function ISPNCInventoryWindow:refreshInventory(force)
     end
     if self.takeAllButton and self.takeAllButton.setEnable then
         self.takeAllButton:setEnable(
-            #InventoryWindow.CollectBulkTransferIDs(self.npcList) > 0
+            not self.giftMode
+                and #InventoryWindow.CollectBulkTransferIDs(self.npcList) > 0
         )
+    end
+    if self.takeAllButton and self.takeAllButton.setVisible then
+        self.takeAllButton:setVisible(not self.giftMode)
     end
     resetContainerList(
         self.playerContainerList,
@@ -316,6 +339,10 @@ function ISPNCInventoryWindow:refreshInventory(force)
 end
 
 function ISPNCInventoryWindow:beginInventoryDrag(role, row)
+    if self.giftMode and role == "npc" then
+        self.statusText = "Gift mode: taking items is disabled"
+        return false
+    end
     if not row or row.restricted == true then return false end
     self.dragState = { source = role, row = row }
     return true
@@ -330,6 +357,10 @@ function ISPNCInventoryWindow:sendTransfer(
     local inventory = self:inventory()
     local selection
     if not inventory or not row or row.restricted == true then return false end
+    if self.giftMode and direction ~= "player_to_npc" then
+        self.statusText = "Gift mode: taking items is disabled"
+        return false
+    end
     selection = Model.BuildTransferSelection(row, quantity)
     if not selection then return false end
     self.statusText = tr("UI_PNC_Inventory_Transferring", "Transferring...")
@@ -341,6 +372,8 @@ function ISPNCInventoryWindow:sendTransfer(
             quantity = selection.quantity,
             npcContainer = destinationOverride or self.selectedNPCContainer,
             inventoryRevision = inventory.revision,
+            gift = self.giftMode == true,
+            conversationToken = self.giftToken,
         })
     end
     return PNC.Client.SendInventoryTransfer({
@@ -360,6 +393,10 @@ function ISPNCInventoryWindow:requestTransfer(
 )
     local maximum = Model.GetRowQuantity(row)
     if not row or row.restricted == true then return false end
+    if self.giftMode and direction ~= "player_to_npc" then
+        self.statusText = "Gift mode: taking items is disabled"
+        return false
+    end
     if maximum <= 1 then
         return self:sendTransfer(direction, row, destinationOverride, 1)
     end
@@ -406,6 +443,10 @@ end
 function ISPNCInventoryWindow:completeInventoryDrop(targetRole)
     local drag = self.dragState
     self.dragState = nil
+    if self.giftMode and drag and drag.source == "npc" then
+        self.statusText = "Gift mode: taking items is disabled"
+        return false
+    end
     if drag and drag.source ~= targetRole then
         return self:requestTransfer(
             drag.source == "player" and "player_to_npc" or "npc_to_player",
@@ -432,6 +473,11 @@ function ISPNCInventoryWindow:completeInventoryDrop(targetRole)
 end
 
 function ISPNCInventoryWindow:completeInventoryDropAtMouse()
+    if self.giftMode and self.dragState and self.dragState.source == "npc" then
+        self.dragState = nil
+        self.statusText = "Gift mode: taking items is disabled"
+        return false
+    end
     if mouseInside(self.playerList) then return self:completeInventoryDrop("player") end
     if mouseInside(self.playerContainerList) then
         return self:completeInventoryDrop("player")
@@ -457,6 +503,15 @@ end
 
 function ISPNCInventoryWindow:showItemContext(role, row)
     local context = ISContextMenu.get(0, getMouseX(), getMouseY())
+    if self.giftMode and role == "npc" then
+        local option = context:addOption(
+            "Gift mode: taking items is disabled",
+            nil,
+            nil
+        )
+        if option then option.notAvailable = true end
+        return
+    end
     if row.restricted == true then
         local option = context:addOption(
             tr("UI_PNC_Inventory_OffLimits", "Off Limits"),
@@ -504,6 +559,10 @@ function ISPNCInventoryWindow:showItemContext(role, row)
 end
 
 function ISPNCInventoryWindow:sendItemAction(actionID, itemID)
+    if self.giftMode then
+        self.statusText = "Gift mode: item actions are disabled"
+        return false
+    end
     local inventory = self:inventory()
     if not inventory then return false end
     local item = inventory.items and inventory.items[tostring(itemID)] or nil
@@ -625,9 +684,18 @@ function ISPNCInventoryWindow:prerender()
     local listY = self.playerList and self.playerList:getY() or containerY + 38
     self:drawText("Item", self.playerList:getX() + 40, listY - 19,
         0.85, 0.85, 0.85, 1, UIFont.Small)
-    self:drawText("Category",
-        self.playerList:getX() + math.floor(self.playerList.width * 0.64),
-        listY - 19, 0.85, 0.85, 0.85, 1, UIFont.Small)
+    if self.giftMode then
+        self:drawText(
+            "Gift score (A / R / F)",
+            self.playerList:getX() + math.floor(self.playerList.width * 0.64),
+            listY - 19,
+            0.55, 0.88, 0.68, 1, UIFont.Small
+        )
+    else
+        self:drawText("Category",
+            self.playerList:getX() + math.floor(self.playerList.width * 0.64),
+            listY - 19, 0.85, 0.85, 0.85, 1, UIFont.Small)
+    end
     self:drawText("Item", self.npcList:getX() + 40, listY - 19,
         0.85, 0.85, 0.85, 1, UIFont.Small)
     self:drawText("Category",
@@ -685,7 +753,7 @@ function ISPNCInventoryWindow:new(x, y, width, height, options)
     return o
 end
 
-function InventoryWindow.Open(npcId)
+function InventoryWindow.Open(npcId, options)
     local window = InventoryWindow.instance
     if not window then
         local spec = {
@@ -708,6 +776,8 @@ function InventoryWindow.Open(npcId)
     end
     window:setVisible(true)
     window:setNPC(npcId)
+    options = type(options) == "table" and options or {}
+    window:setConversationMode(options.mode, options.token)
     window:bringToTop()
     return window
 end
@@ -723,6 +793,18 @@ function InventoryWindow.OnResult(result)
         and tr("UI_PNC_Inventory_Complete", "Transfer complete")
         or (tr("UI_PNC_Inventory_Failed", "Inventory action failed") .. ": " .. readable)
     window.contextSignature = nil
+    if window.giftMode
+        and PNC.Conversation
+        and PNC.Conversation.Composer
+        and PNC.Conversation.Composer.ReceiveGiftResult
+    then
+        PNC.Conversation.Composer.ReceiveGiftResult(result)
+    end
+end
+
+function InventoryWindow.Close()
+    local window = InventoryWindow.instance
+    if window then window:close() end
 end
 
 return InventoryWindow

@@ -462,6 +462,13 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_CONVERSATION_RECRUIT_REQUEST
+        and PNC.Conversation and PNC.Conversation.Authority
+    then
+        PNC.Conversation.Authority.HandleRecruit(player, args or {})
+        return
+    end
+
     if command == Const.CMD_REQUEST_CHARACTER and args and args.id then
         local record = Registry.Get(args.id)
         if record and Network.CanViewCharacter(player, record) then

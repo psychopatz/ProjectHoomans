@@ -159,6 +159,18 @@ end)
 
 Internal.RegisterServerCommand(Const.CMD_INVENTORY_RESULT, function(args)
     ClientState.inventoryResult = Core.DeepCopy(args)
+    if args.relationshipDelta then
+        ClientState.lastConversationDelta = {
+            npcID = args.npcId,
+            source = args.giftEffect and "gift" or "inventory",
+            delta = Core.DeepCopy(args.relationshipDelta),
+            before = Core.DeepCopy(args.relationshipBefore),
+            after = Core.DeepCopy(args.relationshipAfter),
+            effects = Core.DeepCopy(args.giftEffect),
+            itemTypes = Core.DeepCopy(args.itemTypes),
+            at = Core.Now(),
+        }
+    end
     if PNC.InventoryWindow and PNC.InventoryWindow.OnResult then
         PNC.InventoryWindow.OnResult(ClientState.inventoryResult)
     end

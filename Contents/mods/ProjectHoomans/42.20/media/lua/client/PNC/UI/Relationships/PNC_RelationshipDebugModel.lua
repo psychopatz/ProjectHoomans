@@ -241,9 +241,18 @@ function Model.BuildTargets(roster, observerNPCID)
 end
 
 function Model.BuildGraph(snapshot, actionID, context)
-    local relationship = snapshot and snapshot.relationship or {}
-    if not Presentation or not Presentation.BuildEvaluation then return nil end
     context = type(context) == "table" and context or {}
+    local relationship = snapshot and snapshot.relationship or {}
+    local delta = context.conversationDelta
+    local observer = snapshot and snapshot.observer or {}
+    if type(delta) == "table" and delta.after
+        and tostring(delta.npcID or "") == tostring(
+            observer.npcID or observer.id or ""
+        )
+    then
+        relationship = delta.after
+    end
+    if not Presentation or not Presentation.BuildEvaluation then return nil end
     local modifiers = {}
     local profile = snapshot and snapshot.observer
         and snapshot.observer.personality or {}
@@ -312,7 +321,8 @@ function Model.BuildRows(
     snapshot,
     authorized,
     reason,
-    graphEvaluation
+    graphEvaluation,
+    conversationDelta
 )
     local rows = {}
     local observer
@@ -336,6 +346,14 @@ function Model.BuildRows(
     observer = snapshot.observer or {}
     target = snapshot.target or {}
     relationship = snapshot.relationship or {}
+    if type(conversationDelta) == "table"
+        and conversationDelta.after
+        and tostring(conversationDelta.npcID or "") == tostring(
+            observer.npcID or observer.id or observer.key or ""
+        )
+    then
+        relationship = conversationDelta.after
+    end
     profile = observer.personality or {}
     rows[#rows + 1] = row("Observer", observer.label)
     rows[#rows + 1] = row("Observer key", observer.key)
@@ -456,6 +474,38 @@ function Model.BuildRows(
     rows[#rows + 1] = row("Approval", number(relationship.approval))
     rows[#rows + 1] = row("Respect", number(relationship.respect))
     rows[#rows + 1] = row("Familiarity", number(relationship.familiarity))
+    if type(conversationDelta) == "table"
+        and tostring(conversationDelta.npcID or "") == tostring(
+            observer.npcID or observer.id or observer.key or ""
+        )
+    then
+        local delta = conversationDelta.delta or {}
+        rows[#rows + 1] = row(
+            "Last conversation",
+            tostring(conversationDelta.source or "conversation")
+                .. " / " .. tostring(conversationDelta.blockID or "gift"),
+            "success"
+        )
+        rows[#rows + 1] = row(
+            "  changed",
+            "Approval " .. signed(delta.approval)
+                .. " / Respect " .. signed(delta.respect)
+                .. " / Familiarity " .. signed(delta.familiarity),
+            "success"
+        )
+        if conversationDelta.effects then
+            rows[#rows + 1] = row(
+                "  effects",
+                mapValue(conversationDelta.effects)
+            )
+        end
+        if conversationDelta.itemTypes then
+            rows[#rows + 1] = row(
+                "  gift items",
+                table.concat(conversationDelta.itemTypes, ", ")
+            )
+        end
+    end
     rows[#rows + 1] = row("State", relationship.state)
     rows[#rows + 1] = row("Previous state", relationship.previousState)
     rows[#rows + 1] = row(

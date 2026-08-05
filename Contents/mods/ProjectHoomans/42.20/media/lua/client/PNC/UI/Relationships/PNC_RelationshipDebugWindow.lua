@@ -430,6 +430,7 @@ function ISPNCRelationshipDebugWindow:refreshGraph()
         self:getActionID(),
         {
             bonus = tonumber(self.contextBonus) or 0,
+            conversationDelta = ClientState.lastConversationDelta,
         }
     )
     if evaluation and self.graph then
@@ -549,7 +550,8 @@ function ISPNCRelationshipDebugWindow:refreshDetails()
         ClientState.relationshipDebug,
         ClientState.relationshipDebugAuthorized,
         ClientState.relationshipDebugReason,
-        evaluation
+        evaluation,
+        ClientState.lastConversationDelta
     )
     rows = Model.FilterRows(rows, self.currentSection)
     self.details:clear()
@@ -690,6 +692,8 @@ function ISPNCRelationshipDebugWindow:prerender()
         or 0
     local relationshipReceiveAt =
         tonumber(ClientState.lastRelationshipDebugReceiveAt) or 0
+    local conversationDeltaAt = ClientState.lastConversationDelta
+        and tonumber(ClientState.lastConversationDelta.at) or 0
     local signature = self:selectionSignature()
     local observer = self:getObserver()
     local observerID = observer and observer.id
@@ -711,6 +715,12 @@ function ISPNCRelationshipDebugWindow:prerender()
         (tonumber(self.lastRelationshipReceiveAt) or 0)
     then
         self:refreshDetails()
+    end
+    if conversationDeltaAt >
+        (tonumber(self.lastConversationDeltaAt) or 0)
+    then
+        self:refreshDetails()
+        self.lastConversationDeltaAt = conversationDeltaAt
     end
     if now - (tonumber(self.lastRosterRequestAt) or 0) > 2000 then
         self:requestRoster()

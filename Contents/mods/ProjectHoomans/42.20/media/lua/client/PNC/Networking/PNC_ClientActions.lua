@@ -414,15 +414,26 @@ function Client.SendInventoryTransfer(args)
         return true
     end
     if PNC.ServerInventory and PNC.ServerInventory.Transfer then
-        local success, reason = PNC.ServerInventory.Transfer(player, args)
+        local success, reason, result = PNC.ServerInventory.Transfer(player, args)
+        if result and result.relationshipDelta then
+            ClientState.lastConversationDelta = {
+                npcID = result.npcId or args.id,
+                source = result.giftEffect and "gift" or "inventory",
+                delta = Core.DeepCopy(result.relationshipDelta),
+                before = Core.DeepCopy(result.relationshipBefore),
+                after = Core.DeepCopy(result.relationshipAfter),
+                itemTypes = Core.DeepCopy(result.itemTypes),
+                at = Core.Now(),
+            }
+        end
         Client.RequestCharacterPayload(args.id)
         if PNC.InventoryWindow and PNC.InventoryWindow.OnResult then
-            PNC.InventoryWindow.OnResult({
-                success = success == true,
-                reason = reason,
-                npcId = args.id,
-                requestId = args.requestId,
-            })
+            result = result or {}
+            result.success = success == true
+            result.reason = reason
+            result.npcId = args.id
+            result.requestId = args.requestId
+            PNC.InventoryWindow.OnResult(result)
         end
         return success == true
     end

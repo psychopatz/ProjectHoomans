@@ -10,10 +10,12 @@ PNC = PNC or {}
 PNC.DebugCompanionRecruit = PNC.DebugCompanionRecruit or {}
 
 local Recruit = PNC.DebugCompanionRecruit
+PNC.Recruitment = PNC.Recruitment or Recruit
 local Const = PNC.Const
 local Core = PNC.Core
 local Factions = PNC.Factions
 local Registry = PNC.Registry
+local Graph = PNC.RelationshipGraph
 
 local function worldAgeHours()
     local gameTime = getGameTime and getGameTime() or nil
@@ -31,6 +33,70 @@ function Recruit.IsEligible(record)
         or tostring(record.faction or "")
     return faction == Const.FACTION_NEUTRAL
         or faction == Const.FACTION_HOSTILE
+end
+
+-- Recruitment is an action requirement, not another relationship axis.  The
+-- normal route is the upper-right (approval + respect) region; a frightened
+-- NPC may also accept when respect is exceptionally high even though approval
+-- is negative.  Hostile audience classification is always rejected by the
+-- conversation path, regardless of its coordinates.
+function Recruit.EvaluateConversation(record, relationship)
+    relationship = type(relationship) == "table" and relationship or {}
+    if not record or record.alive == false then
+        return { eligible = false, reason = "npc_unavailable" }
+    end
+    if record.recruited == true then
+        return { eligible = false, reason = "already_recruited" }
+    end
+    local faction = PNC.Types and PNC.Types.NormalizeFaction
+        and PNC.Types.NormalizeFaction(record.faction)
+        or tostring(record.faction or "")
+    if faction == Const.FACTION_HOSTILE then
+        return { eligible = false, reason = "hostile_audience" }
+    end
+    local approval = tonumber(relationship.approval) or 0
+    local respect = tonumber(relationship.respect) or 0
+    local personality = record.personality or record.socialProfile or {}
+    local loyalty = math.max(0, math.min(1,
+        tonumber(personality.loyalty) or 0))
+    local bravery = math.max(0, math.min(1,
+        tonumber(personality.bravery) or 0))
+    local loyaltyPenalty = loyalty * 20
+    local admireScore = respect * 0.55 + approval * 0.45
+        - loyaltyPenalty
+    local fearScore = respect * 0.70
+        + math.max(0, -approval) * 0.30
+        - bravery * 25 - loyaltyPenalty
+    local normal = approval >= 25 and respect >= 35 and admireScore >= 60
+    local fear = approval <= -30 and respect >= 70
+        and fearScore >= 60 and bravery < 0.85
+    local affiliation = PNC.Factions and PNC.Factions.GetNPCAffiliation
+        and PNC.Factions.GetNPCAffiliation(record.id) or nil
+    local leader = record.leader == true
+        or affiliation and (affiliation.role == "leader"
+            or affiliation.rank == "leader" or affiliation.role == "chief")
+    if leader and not record.leaderAlone then
+        normal, fear = false, false
+    end
+    local route = normal and "admire" or fear and "fear" or nil
+    local evaluation = Graph and Graph.Evaluate
+        and Graph.Evaluate(approval, respect, "recruit") or nil
+    return {
+        eligible = route ~= nil,
+        reason = route and "eligible"
+            or leader and "leader_active"
+            or "relationship_threshold",
+        route = route,
+        approval = approval,
+        respect = respect,
+        attitude = evaluation and evaluation.attitude or nil,
+        score = evaluation and evaluation.finalScore or nil,
+        threshold = evaluation and evaluation.threshold or 35,
+        admireScore = admireScore,
+        fearScore = fearScore,
+        loyaltyPenalty = loyaltyPenalty,
+        leaderBlocked = leader == true and route == nil,
+    }
 end
 
 local function playerPosition(player)
@@ -203,6 +269,27 @@ function Recruit.Try(player, args)
         communityID = community.id,
         communityCreated = communityCreated == true,
     }
+end
+
+function Recruit.TryConversation(player, args, relationship)
+    args = type(args) == "table" and args or {}
+    local npcID = tostring(args.npcID or args.id or "")
+    local record = npcID ~= "" and Registry.Get(npcID) or nil
+    if not record then return false, "npc_not_found" end
+    local evaluation = Recruit.EvaluateConversation(record, relationship)
+    if not evaluation.eligible then
+        return false, evaluation.reason, evaluation
+    end
+    local ok, reason, result = Recruit.Try(player, { npcID = npcID })
+    if not ok then return false, reason, result end
+    result = type(result) == "table" and result or {}
+    result.route = evaluation.route
+    result.relationship = {
+        approval = evaluation.approval,
+        respect = evaluation.respect,
+        attitude = evaluation.attitude,
+    }
+    return true, reason, result
 end
 
 return Recruit

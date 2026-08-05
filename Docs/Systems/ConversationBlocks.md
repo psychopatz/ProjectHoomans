@@ -294,6 +294,34 @@ These callbacks run on both sides for prediction/inspection, but only the server
 authoritatively applies effects. Third-party callbacks are the sole protected
 failure boundary; blocks themselves remain serialization-safe data.
 
+### Gifts and recruitment
+
+The `needs` family includes a `gift` branch. Selecting it opens the existing
+Build 42.20 inventory window in gift mode; the player chooses one or more
+items, and the normal server inventory transaction moves them into the NPC
+inventory. Gift mode requires the active conversation lease and rejects
+hostile targets. It applies the resulting Approval/Respect/Familiarity change
+through `PNC.Relationships.ApplyConversationEffect`: food and medical items
+primarily raise Approval, while tools, weapons, and ammunition primarily raise
+Respect. Addons that need item-specific values should provide their own
+authoritative gift service rather than changing the conversation registry.
+
+Recruitment is a root-menu action for non-hostile NPCs. It never adds a
+relationship axis or stores an attitude label. The server evaluates the
+current directed Approval/Respect coordinates using the `recruit` graph
+requirement: the normal route is the upper-right (approval and respect)
+region, and a high-Respect negative-Approval route represents fear or
+intimidation. Successful recruitment then uses the existing faction transfer,
+community assignment, follow order, persistence, and lease shutdown services.
+Failed requests report the authoritative reason without mutating relationship
+state.
+
+After each authoritative outcome (including gifts), the client stores
+`PNC.Network.ClientState.lastConversationDelta`. The Relationship Laboratory
+debug overlay renders the last Approval, Respect, and Familiarity change,
+effect count, and gifted item types for the selected NPC, making graph movement
+visible while testing.
+
 ## Debugging and authority
 
 Open PsychopatzCore DebugHub and select **PNC Conversation Blocks**. The tool can

@@ -723,6 +723,9 @@ function API.Conversations.GetCapabilities()
         derivedAttitudes = { "ADMIRE", "PITY", "FEAR", "DESPISE" },
         repeatScopes = { "pair", "character", "npc", "world" },
         oncePerDayRepeat = true,
+        giftFlow = true,
+        recruitmentResolver = true,
+        relationshipDeltaDebug = true,
         registryFingerprint = true,
         sandboxDebugger = true,
     }

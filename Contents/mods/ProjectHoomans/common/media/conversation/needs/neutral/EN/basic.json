@@ -3,5 +3,10 @@
   "choice.supplies": "Need any supplies?",
   "response.supplies": "Food and clean water never hurt.",
   "choice.medical": "Any medical problems?",
-  "response.medical": "Nothing I cannot handle right now."
+  "response.medical": "Nothing I cannot handle right now.",
+  "choice.gift": "I have something you might need.",
+  "response.gift": "Let me see what you can spare.",
+  "gift.opening": "Choose something to give me, then return to the conversation.",
+  "choice.gift_return": "I will hold on to the rest.",
+  "response.gift_return": "Understood."
 }

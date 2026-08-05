@@ -444,6 +444,7 @@ function Rules.ValidateEffects(effects, context)
 end
 
 function Rules.ApplyEffects(effects, context)
+    local results = {}
     for _, effect in ipairs(effects or {}) do
         local handler = Registry.effectHandlers[effect.type]
         local ok, reason, result
@@ -456,8 +457,12 @@ function Rules.ApplyEffects(effects, context)
             if not called then return false, "effect_handler_error" end
         end
         if ok ~= true then return false, reason or "effect_failed", result end
+        results[#results + 1] = {
+            type = effect.type,
+            result = result,
+        }
     end
-    return true
+    return true, "applied", results
 end
 
 function Rules.SimulateEffects(effects, context)
