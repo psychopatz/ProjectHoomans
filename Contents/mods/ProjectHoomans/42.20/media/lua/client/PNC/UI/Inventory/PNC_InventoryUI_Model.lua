@@ -84,6 +84,8 @@ local function playerItemRow(item, containerKey, player)
     local displayName = tostring(customName or metadata.name or fullType)
     local giftScore = PNC.Gifts and PNC.Gifts.GetItemScore
         and PNC.Gifts.GetItemScore(fullType) or nil
+    local giftValid = giftScore and PNC.Gifts.IsValidItemType
+        and PNC.Gifts.IsValidItemType(fullType) == true or false
     return {
         source = "player",
         id = tostring(safeCall(item, "getID", "")),
@@ -99,6 +101,7 @@ local function playerItemRow(item, containerKey, player)
         favorite = safeCall(item, "isFavorite", false) == true,
         restricted = false,
         giftScore = giftScore,
+        giftValid = giftValid,
     }
 end
 
@@ -255,13 +258,16 @@ function Model.BuildPlayerContainers(player)
     return output
 end
 
-function Model.BuildPlayerRows(containerEntry, player, expandedGroups)
+function Model.BuildPlayerRows(containerEntry, player, expandedGroups, giftOnly)
     local rows = {}
     local container = containerEntry and containerEntry.container or nil
     local items = container and container.getItems and container:getItems() or nil
     if items and items.size and items.get then
         for index = 0, items:size() - 1 do
-            rows[#rows + 1] = playerItemRow(items:get(index), containerEntry.id, player)
+            local row = playerItemRow(items:get(index), containerEntry.id, player)
+            if not giftOnly or row.giftValid == true then
+                rows[#rows + 1] = row
+            end
         end
     end
     table.sort(rows, function(a, b)

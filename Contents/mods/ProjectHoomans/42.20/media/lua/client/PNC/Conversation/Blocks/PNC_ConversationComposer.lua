@@ -19,6 +19,26 @@ local SYSTEM_SOURCE = {
     domain = "pnc.system.shared.categories",
 }
 
+local RECRUIT_SYSTEM_KEYS = {
+    "choice.recruit",
+    "response.recruit.admire.1",
+    "response.recruit.admire.2",
+    "response.recruit.admire.3",
+    "response.recruit.fear.1",
+    "response.recruit.fear.2",
+    "response.recruit.fear.3",
+    "response.recruit.reject.relationship.1",
+    "response.recruit.reject.relationship.2",
+    "response.recruit.reject.relationship.3",
+    "response.recruit.reject.leader.1",
+    "response.recruit.reject.leader.2",
+    "response.recruit.reject.cooldown.1",
+    "response.recruit.reject.cooldown.2",
+    "response.recruit.reject.general.1",
+    "response.recruit.reject.general.2",
+    "response.recruit.reject.general.3",
+}
+
 local GOODBYE_SOURCE = {
     modID = "ProjectHoomans",
     pathPattern = "media/conversation/goodbye/shared/{language}/goodbye.json",
@@ -566,7 +586,34 @@ function Composer.ReceiveRecruitOutcome(args)
                 at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
             }
         end
-        notifyFailure(view, "status.choice_rejected", args.reason)
+        view.spec.context.lastConversationError = tostring(
+            args.reason or "recruitment_rejected"
+        )
+        if PNC.Core and PNC.Core.LogWarn then
+            PNC.Core.LogWarn("Conversation recruitment rejected npc="
+                .. tostring(args.npcID or "unknown") .. " reason="
+                .. tostring(args.reason or "unknown"))
+        end
+        local session = view.session
+        local context = view.spec.context.conversationBlockContext
+        if session and args.responseKey then
+            session:queueMessage("npc", dialoguePayload(
+                SYSTEM_SOURCE,
+                args.responseKey,
+                context,
+                { route = args.route or "none" }
+            ))
+            view.spec.nodes.menu = Composer.BuildMenuNode(
+                context,
+                context and context.conversationMenuOptions
+            )
+            session.pendingClose = false
+            session.pendingCloseReason = nil
+            session.pendingNext = "menu"
+            if #session.queue == 0 then session:finishPending() end
+        else
+            notifyFailure(view, "status.choice_rejected", args.reason)
+        end
         return false, args.reason
     end
     local context = view.spec.context.conversationBlockContext
@@ -583,7 +630,7 @@ function Composer.ReceiveRecruitOutcome(args)
     local session = view.session
     if session then
         session:queueMessage("npc", dialoguePayload(
-            SYSTEM_SOURCE, "response.recruit", context,
+            SYSTEM_SOURCE, args.responseKey or "response.recruit.admire.1", context,
             { route = args.route or "admire" }
         ))
         session.pendingClose = true
@@ -631,6 +678,15 @@ function Composer.ReceiveGiftResult(args)
     if PNC.InventoryWindow and PNC.InventoryWindow.Close then
         PNC.InventoryWindow.Close()
     end
+    local activeBlock = context and context.activeConversationBlockID
+        and Registry.GetBlock(context.activeConversationBlockID) or nil
+    if view.session and activeBlock and args.giftReplyKey then
+        view.session:append("npc", dialoguePayload(
+            activeBlock.textSource,
+            args.giftReplyKey,
+            context
+        ))
+    end
     -- The authored gift node is already the next node of the conversation.
     -- Closing the modal reveals it; do not reroll or append a second response.
     if view.session and view.session.currentNodeID ~= "block:gift"
@@ -664,7 +720,11 @@ local function categoryChoices(context)
                         selectedCategory.textSource,
                         selectedCategory.labelKey
                     ),
-                    log = false,
+                    -- Ask About is a topic browser and stays out of the
+                    -- transcript; ordinary categories are player lines so
+                    -- the NPC never appears to start a one-sided exchange.
+                    log = selectedCategory.id
+                        ~= "projecthoomans:ask_about",
                     action = function()
                         Composer.RequestCategory(context.npcID, selectedCategory.id)
                     end,
@@ -737,10 +797,13 @@ function Composer.BuildRootNode(context, options)
             }
         end
     end
-    Loader.EnsureSource(SYSTEM_SOURCE, {
+    local requiredSystemKeys = {
         "status.block_unavailable", "status.choice_rejected",
-        "choice.recruit", "response.recruit",
-    })
+    }
+    for _, key in ipairs(RECRUIT_SYSTEM_KEYS) do
+        requiredSystemKeys[#requiredSystemKeys + 1] = key
+    end
+    Loader.EnsureSource(SYSTEM_SOURCE, requiredSystemKeys)
     local goodbyeValid = Loader.EnsureSource(GOODBYE_SOURCE, {
         "choice.goodbye", "response.goodbye",
     })

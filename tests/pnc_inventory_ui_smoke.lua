@@ -1,4 +1,5 @@
 local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -56,6 +57,7 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
 end
 
 dofile(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryUI_Model.lua")
+dofile(SHARED_ROOT .. "PNC/Conversation/PNC_ConversationGifts.lua")
 
 package.preload["PNC/UI/Inventory/PNC_InventoryUI_Model"] = function()
     return PNC.InventoryUIModel
@@ -172,6 +174,14 @@ assertEqual(playerRowsByID["42"].favorite, true, "player favorite row state")
 assertEqual(playerRowsByID["42"].equipped, true, "player equipped row state")
 assertEqual(playerRowsByID["43"].equipped, true,
     "player worn item protected even when InventoryItem:isEquipped is false")
+local giftRows = PNC.InventoryUIModel.BuildPlayerRows(
+    playerContainers[1], player, nil, true
+)
+assert(#giftRows > 0, "gift mode retains valid equipment gifts")
+assert(#giftRows < #playerRows, "gift mode removes ordinary non-gifts")
+for _, row in ipairs(giftRows) do
+    assertEqual(row.giftValid, true, "gift mode filters invalid item rows")
+end
 local playerAmmoGroup
 for _, row in ipairs(playerRows) do
     if row.fullType == "Base.Bullets9mm" then playerAmmoGroup = row end

@@ -280,6 +280,12 @@ local function transferPlayerToNPC(player, record, args, sinceRevision)
     for index = 1, #resolved do
         specs[index], reason = compactSpec(resolved[index])
         if not specs[index] then return false, reason end
+        if args.gift == true and PNC.Gifts
+            and PNC.Gifts.IsValidItemType
+            and not PNC.Gifts.IsValidItemType(specs[index].type)
+        then
+            return false, "gift_item_invalid"
+        end
         itemTypes[#itemTypes + 1] = specs[index].type
     end
     local added, addReason, compactIDs = Inventory.AddItems(
@@ -509,6 +515,8 @@ function Service.Transfer(player, args)
                 familiarity = relationshipAfter.familiarity - relationshipBefore.familiarity,
             }
             details.giftEffect = gift
+            details.giftReplyKey = "gift.received."
+                .. tostring(gift.kind or "general")
         else
             details.giftEffectError = applyReason or "relationship_unavailable"
         end

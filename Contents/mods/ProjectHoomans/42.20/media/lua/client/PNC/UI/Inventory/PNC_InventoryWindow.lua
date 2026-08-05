@@ -153,7 +153,12 @@ end
 function ISPNCInventoryWindow:onGiveAll()
     local inventory = self:inventory()
     local ids = InventoryWindow.CollectBulkTransferIDs(self.playerList)
-    if not inventory or #ids < 1 then return false end
+    if not inventory or #ids < 1 then
+        self.statusText = self.giftMode
+            and "No valid gifts in this container"
+            or self.statusText
+        return false
+    end
     return PNC.Client.SendInventoryTransfer({
         id = self.npcId,
         direction = "player_to_npc",
@@ -203,11 +208,13 @@ function ISPNCInventoryWindow:setConversationMode(mode, token)
     self.giftMode = mode == "gift"
     self.giftToken = token and tostring(token) or nil
     self.statusText = self.giftMode
-        and "Gift mode: select an item to offer"
+        and "Gift mode: valid gifts only | A Approval (like) / R Respect / F Familiarity"
         or self.statusText
     if self.takeAllButton and self.takeAllButton.setVisible then
         self.takeAllButton:setVisible(not self.giftMode)
     end
+    self.contextSignature = nil
+    self:refreshInventory(true)
 end
 
 function ISPNCInventoryWindow:payload()
@@ -254,7 +261,8 @@ function ISPNCInventoryWindow:refreshInventory(force)
     local currentPlayerRows = Model.BuildPlayerRows(
         currentPlayerContainer,
         player,
-        self.expandedPlayerGroups
+        self.expandedPlayerGroups,
+        self.giftMode == true
     )
     local protectedState = {}
     for index = 1, #currentPlayerRows do
@@ -295,7 +303,8 @@ function ISPNCInventoryWindow:refreshInventory(force)
         Model.BuildPlayerRows(
             Model.FindContainer(self.playerContainers, self.selectedPlayerContainer),
             player,
-            self.expandedPlayerGroups
+            self.expandedPlayerGroups,
+            self.giftMode == true
         )
     )
     resetList(self.npcList, Model.BuildNPCRows(

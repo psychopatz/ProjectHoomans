@@ -78,12 +78,17 @@ function Gifts.GetItemScore(itemType)
     }
 end
 
+function Gifts.IsValidItemType(itemType)
+    return Gifts.GetItemScore(itemType).kind ~= "general"
+end
+
 function Gifts.EvaluateEffect(itemTypes)
     local approval = 0
     local respect = 0
     local familiarity = 0
     local bestType = "gift"
     local bestScore = -math.huge
+    local bestKind = "general"
 
     for _, itemType in ipairs(itemTypes or {}) do
         local score = Gifts.GetItemScore(itemType)
@@ -93,6 +98,7 @@ function Gifts.EvaluateEffect(itemTypes)
         if score.score > bestScore then
             bestScore = score.score
             bestType = itemType or bestType
+            bestKind = score.kind
         end
     end
 
@@ -101,6 +107,7 @@ function Gifts.EvaluateEffect(itemTypes)
         respect = math.min(8, respect),
         familiarity = math.min(3, familiarity),
         memoryID = bestType,
+        kind = bestKind,
     }
 end
 

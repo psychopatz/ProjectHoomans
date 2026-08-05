@@ -319,7 +319,11 @@ for _, choice in ipairs(definition.nodes.greeting.choices) do
         askAboutChoice = choice
     end
     if string.sub(tostring(choice.id), 1, 15) == "projecthoomans:" then
-        equal(choice.log, false, "category choices are navigation only")
+        equal(
+            choice.log,
+            choice.id ~= "projecthoomans:ask_about",
+            "ordinary categories speak; Ask About remains a silent topic browser"
+        )
     end
 end
 truth(askAboutChoice, "Ask About category is available")

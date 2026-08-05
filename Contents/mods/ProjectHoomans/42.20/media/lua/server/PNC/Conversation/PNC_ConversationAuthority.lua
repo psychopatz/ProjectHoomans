@@ -47,6 +47,61 @@ local function send(player, command, payload)
     return internal.SendToPlayer(player, command, payload)
 end
 
+local RECRUIT_REPLY_VARIANTS = {
+    admire = {
+        "response.recruit.admire.1",
+        "response.recruit.admire.2",
+        "response.recruit.admire.3",
+    },
+    fear = {
+        "response.recruit.fear.1",
+        "response.recruit.fear.2",
+        "response.recruit.fear.3",
+    },
+    relationship = {
+        "response.recruit.reject.relationship.1",
+        "response.recruit.reject.relationship.2",
+        "response.recruit.reject.relationship.3",
+    },
+    leader = {
+        "response.recruit.reject.leader.1",
+        "response.recruit.reject.leader.2",
+    },
+    cooldown = {
+        "response.recruit.reject.cooldown.1",
+        "response.recruit.reject.cooldown.2",
+    },
+    general = {
+        "response.recruit.reject.general.1",
+        "response.recruit.reject.general.2",
+        "response.recruit.reject.general.3",
+    },
+}
+
+local function stableVariantIndex(value, count)
+    local hash = 7
+    value = tostring(value or "")
+    for index = 1, #value do
+        hash = (hash * 31 + string.byte(value, index)) % 2147483647
+    end
+    return (hash % count) + 1
+end
+
+local function recruitReplyKey(npcID, reason, route, worldAgeHours)
+    local group = route == "admire" and "admire"
+        or route == "fear" and "fear"
+        or reason == "relationship_threshold" and "relationship"
+        or reason == "leader_active" and "leader"
+        or reason == "cooldown_active" and "cooldown"
+        or "general"
+    local variants = RECRUIT_REPLY_VARIANTS[group]
+    local index = stableVariantIndex(table.concat({
+        tostring(npcID or ""), tostring(reason or ""), tostring(route or ""),
+        tostring(math.floor(tonumber(worldAgeHours) or 0) / 24),
+    }, ":"), #variants)
+    return variants[index]
+end
+
 local function relationshipCategory(record, relationship)
     local explicit = record and (
         record.conversationRelationship or record.relationshipCategory
@@ -259,6 +314,12 @@ function Authority.HandleRecruit(player, args)
             success = false,
             reason = rejection,
             npcID = tostring(args.npcID or ""),
+            responseKey = recruitReplyKey(
+                args.npcID,
+                rejection,
+                nil,
+                worldAgeHours()
+            ),
         }
         for key, value in pairs(type(details) == "table" and details or {}) do
             payload[key] = value
@@ -335,6 +396,12 @@ function Authority.HandleRecruit(player, args)
         reason = reason or "recruited",
         npcID = tostring(args.npcID or ""),
         route = result and result.route,
+        responseKey = recruitReplyKey(
+            args.npcID,
+            nil,
+            result and result.route,
+            context.worldAgeHours
+        ),
         relationship = result and result.relationship,
         registryFingerprint = Registry.GetFingerprint(),
         close = true,

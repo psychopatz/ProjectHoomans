@@ -7,6 +7,10 @@
   "choice.gift": "I have something you might need.",
   "response.gift": "Let me see what you can spare.",
   "gift.opening": "Choose something to give me, then return to the conversation.",
+  "gift.received.medical": "That is useful. Thank you for thinking ahead instead of waiting for a crisis.",
+  "gift.received.food": "This will not go to waste. I appreciate you sharing it with me.",
+  "gift.received.equipment": "Good choice. Something like this can keep a bad day from getting worse.",
+  "gift.received.general": "I can make use of this. Thank you.",
   "choice.gift_return": "I will hold on to the rest.",
   "response.gift_return": "Understood."
 }
