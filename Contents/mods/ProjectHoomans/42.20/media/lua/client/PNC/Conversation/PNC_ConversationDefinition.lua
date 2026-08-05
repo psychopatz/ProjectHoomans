@@ -5,6 +5,7 @@ PNC.Conversation = PNC.Conversation or {}
 if not PNC.NPCIdentityPresentation then
     require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 end
+require "PNC/Conversation/Blocks/PNC_ConversationIdentityChoice"
 
 local Conversation = PNC.Conversation
 local Time = Conversation.Time
@@ -16,6 +17,7 @@ local Palette = PNC.NPCTypePalette
 local IdentityPresentation = PNC.NPCIdentityPresentation
 local Loader = Conversation.TextLoader
 local Registry = Conversation.Registry
+local IdentityChoice = Conversation.IdentityChoice
 
 local SYSTEM_SOURCE = {
     modID = "ProjectHoomans",
@@ -208,13 +210,6 @@ local function portraitSpec(entry)
     }
 end
 
-function Conversation.RequestKnowledgeTopic(npcID, topicID)
-    if PNC.Client and PNC.Client.RequestNPCKnowledgeTopic then
-        return PNC.Client.RequestNPCKnowledgeTopic(npcID, topicID)
-    end
-    return false
-end
-
 local function identityProjection(entry)
     local npcID = tostring(entry and entry.id or "debug-npc")
     local clientState = PNC.Network and PNC.Network.ClientState or {}
@@ -273,18 +268,11 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
     end
     local askNameChoice
     if identityState == "unknown" and projection and projection.canAskName == true then
-        askNameChoice = {
-            id = "ask_name",
-            text = {
-                key = "choice.ask_name",
-                domain = "pnc.system.shared.categories",
-                args = identityArguments,
-            },
-            action = function()
-                projection.state = "loading"
-                Conversation.RequestKnowledgeTopic(npcID, "identity_name")
-            end,
-        }
+        askNameChoice = IdentityChoice.Build(
+            npcID,
+            projection,
+            identityArguments
+        )
     end
     local dossierChoice = {
         id = "view_dossier",
@@ -297,11 +285,13 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         action = function() Relationship.OpenDossier(npcID) end,
         next = "greeting",
     }
-    local root = Composer.BuildRootNode(blockContext, {
+    local menuOptions = {
         askNameChoice = askNameChoice,
         dossierChoice = dossierChoice,
         presentationContext = presentationContext,
-    })
+    }
+    blockContext.conversationMenuOptions = menuOptions
+    local root = Composer.BuildRootNode(blockContext, menuOptions)
     if identityState == "loading" then
         local goodbyeChoice
         for _, choice in ipairs(root.choices or {}) do

@@ -123,6 +123,9 @@ local function validateRepeat(policy, errors, path)
     if policy.maxUses ~= nil
         and (tonumber(policy.maxUses) or 0) < 1
     then addError(errors, path .. ".maxUses must be positive") end
+    if policy.oncePerDay ~= nil and type(policy.oncePerDay) ~= "boolean" then
+        addError(errors, path .. ".oncePerDay must be boolean")
+    end
 end
 
 local function validateGates(gates, errors, path)
@@ -186,6 +189,7 @@ function Registry.ValidateCategory(id, definition)
         addError(errors, "labelKey is required")
     end
     validateGates(definition.gates, errors, "gates")
+    validateRepeat(definition["repeat"], errors, "repeat")
     return #errors == 0, errors
 end
 

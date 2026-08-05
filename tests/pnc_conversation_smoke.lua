@@ -94,11 +94,26 @@ local Selector = PNC.Conversation.Selector
 local Loader = PNC.Conversation.TextLoader
 
 equal(#Registry.ListCategories(), 11, "built-in category count")
-equal(#Registry.ListBlocks(), 42, "built-in block count")
+equal(#Registry.ListBlocks(), 48, "expanded built-in block count")
 equal(Registry.GetFingerprint(), Registry.GetFingerprint(),
     "registry fingerprint stable")
-equal(#Registry.ListBlocks({ includeInvalid = true }), 42,
+equal(#Registry.ListBlocks({ includeInvalid = true }), 48,
     "built-ins all validate")
+
+local whatsUpBlocks = Registry.ListBlocks({
+    category = "projecthoomans:whats_up",
+})
+equal(#whatsUpBlocks, 9, "What's Up has three daily topics per audience")
+for _, block in ipairs(whatsUpBlocks) do
+    equal(#block.nodes, 0, "nodes are keyed rather than array-shaped")
+    local nodeCount = 0
+    for _ in pairs(block.nodes) do nodeCount = nodeCount + 1 end
+    equal(nodeCount, 5, block.id .. " supports a five-node branch graph")
+    equal(#block.nodes.opening.choices[1].outcomes, 2,
+        block.id .. " uses weighted randomized outcomes")
+end
+equal(Registry.GetCategory("projecthoomans:whats_up")["repeat"].oncePerDay,
+    true, "What's Up category is limited to one trigger per world day")
 
 for _, block in ipairs(Registry.ListBlocks()) do
     local ok, errors = Loader.EnsureSource(
@@ -149,6 +164,66 @@ equal(reopened.id, first.id, "reopen does not reroll")
 selectionContext.worldAgeHours = selectionContext.worldAgeHours + 24
 local nextDay = Selector.SelectBlock("projecthoomans:greetings", selectionContext)
 equal(nextDay.id, first.id, "only eligible authored block remains stable")
+
+local dailyTopicContext = {
+    worldID = "daily-topic-world",
+    characterUUID = "daily-topic-character",
+    npcID = "daily-topic-npc",
+    worldAgeHours = 12,
+    hour = 12,
+    relationshipState = "Acquaintance",
+    relationship = { approval = 12, respect = 8, familiarity = 12 },
+    audiences = { neutral = true, shared = true },
+}
+local dailyTopics = {}
+for day = 0, 20 do
+    dailyTopicContext.worldAgeHours = day * 24 + 12
+    local topic = Selector.SelectBlock(
+        "projecthoomans:whats_up",
+        dailyTopicContext
+    )
+    truth(topic, "daily What's Up topic selected")
+    equal(Selector.SelectBlock(
+        "projecthoomans:whats_up",
+        dailyTopicContext
+    ).id, topic.id, "same day cannot reroll the daily topic")
+    dailyTopics[topic.id] = true
+end
+local dailyTopicCount = 0
+for _ in pairs(dailyTopics) do dailyTopicCount = dailyTopicCount + 1 end
+truth(dailyTopicCount >= 2,
+    "different world days produce different deterministic topics")
+local randomizedOutcomes = {}
+local randomBlock = Registry.GetBlock(
+    "projecthoomans:whats_up_local_activity_neutral"
+)
+local randomChoice = Selector.GetChoice(randomBlock, "details", "press")
+for day = 0, 20 do
+    dailyTopicContext.worldAgeHours = day * 24 + 12
+    dailyTopicContext.historySlot = day
+    local randomOutcome = Selector.SelectOutcome(
+        randomBlock,
+        "details",
+        randomChoice,
+        dailyTopicContext
+    )
+    randomizedOutcomes[randomOutcome.id] = true
+end
+truth(randomizedOutcomes.open and randomizedOutcomes.guarded,
+    "daily deterministic outcomes vary relationship consequences")
+equal(Rules.CheckRepeat({ oncePerDay = true }, {
+    lastUsedWorldHour = 26,
+}, 47), false, "once-per-day rejects another use before midnight")
+truth(Rules.CheckRepeat({ oncePerDay = true }, {
+    lastUsedWorldHour = 26,
+}, 48), "once-per-day resets at the next world day")
+
+local categoriesManifest = assert(io.open(
+    COMMON_SHARED .. "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions.lua",
+    "r"
+)):read("*a")
+equal(string.find(categoriesManifest, "RegisterBlock", 1, true), nil,
+    "definition manifest remains require-only rather than monolithic")
 
 truth(Rules.EvaluateGate({
     type = "pnc:skill", actor = "player", skill = "Aiming",
@@ -353,6 +428,60 @@ equal(unknownDefinition.context.npcLastName, "Stranger",
     "unknown NPC last name is hidden")
 equal(unknownDefinition.context.playerFullName, "Stranger",
     "player name is hidden from an unintroduced NPC")
+
+PNC.Network.ClientState.npcPresentations["npc-daily"] = {
+    state = "known",
+    canAskName = false,
+    displayName = "Daily NPC",
+}
+local dailyDefinition = PNC.Conversation.BuildDefinition({
+    id = "npc-daily",
+    snapshot = {
+        displayName = "Daily NPC",
+        survivor = { forename = "Daily", surname = "NPC" },
+        faction = "neutral",
+        relationshipCategory = "Acquaintance",
+    },
+}, player, "dawn")
+local dailySession = {
+    queue = {},
+    currentNodeID = "menu",
+    currentNode = dailyDefinition.nodes.menu,
+    queueMessage = function(self, speaker, value)
+        self.queue[#self.queue + 1] = { speaker = speaker, value = value }
+    end,
+    setChoices = function() end,
+    finishPending = function() end,
+}
+dailyDefinition.context.pendingConversationRequest = "daily-outcome"
+PsychopatzCore.Conversation.instance = {
+    spec = dailyDefinition,
+    session = dailySession,
+}
+truth(PNC.Conversation.Composer.ReceiveOutcome({
+    requestID = "daily-outcome",
+    success = true,
+    npcID = "npc-daily",
+    blockID = "projecthoomans:whats_up_local_activity_neutral",
+    nodeID = "followup",
+    choiceID = "wrap_up",
+    outcomeID = "open",
+    responseKey = "response.wrap_up.open",
+    nextNodeID = "$root",
+    close = false,
+}), "client accepts completed daily topic")
+local dailyCategoryVisible = false
+for _, choiceValue in ipairs(dailyDefinition.nodes.menu.choices or {}) do
+    if choiceValue.id == "projecthoomans:whats_up" then
+        dailyCategoryVisible = true
+    end
+end
+equal(dailyCategoryVisible, false,
+    "completed daily topic disappears from the live category menu")
+truth(PNC.Network.ClientState.conversationHistory["npc-daily"]
+    ["category:projecthoomans:whats_up"],
+    "client remembers the authoritative daily use for the active session")
+PsychopatzCore.Conversation.instance = nil
 PNC.Network = nil
 
 local relationshipEffects = Registry.effectHandlers["pnc:relationship"]
@@ -379,7 +508,7 @@ equal(preview.relationship.morale, nil, "morale is not a conversation axis")
 local debugContext = PNC.ConversationDebugModel.DefaultContext()
 local before = debugContext.relationship.familiarity
 local sandboxDefinition = assert(PNC.ConversationDebugModel.BuildSandboxDefinition(
-    "projecthoomans:whats_up_basic_neutral",
+    "projecthoomans:whats_up_local_activity_neutral",
     debugContext
 ))
 equal(sandboxDefinition.persistHistory, false,
@@ -402,7 +531,7 @@ end
 equal(browsedBlockCount, #Registry.ListBlocks(),
     "GUI sandbox lists every registered conversation block")
 local sandboxOpeningID =
-    "sandbox:block:projecthoomans:whats_up_basic_neutral:opening"
+    "sandbox:block:projecthoomans:whats_up_local_activity_neutral:opening"
 equal(#sandboxDefinition.nodes[sandboxOpeningID].choices, 3,
     "GUI sandbox exposes authored choices plus browser navigation")
 local sandboxRelationshipUpdate
@@ -416,8 +545,9 @@ local sandboxSession = {
 local sandboxChoice = sandboxDefinition.nodes[sandboxOpeningID].choices[1]
 sandboxChoice.action(nil, nil, sandboxSession)
 truth(sandboxChoice.response(), "GUI sandbox resolves an NPC response")
-equal(sandboxChoice.next(), sandboxDefinition.start,
-    "terminal sandbox outcome returns to the block browser")
+equal(sandboxChoice.next(),
+    "sandbox:block:projecthoomans:whats_up_local_activity_neutral:details",
+    "sandbox follows the authored multi-node branch")
 equal(sandboxDefinition.context.relationship.familiarity, before + 1,
     "GUI sandbox updates only its cloned relationship")
 equal(debugContext.relationship.familiarity, before,
@@ -492,8 +622,8 @@ equal(hostile.nodes.greeting.choices[1].id, "ceasefire",
     "hostile block exposes ceasefire")
 
 local sandbox = assert(PNC.ConversationDebugModel.ExecuteSandbox(
-    "projecthoomans:whats_up_basic_neutral",
-    "opening", "situation", debugContext
+    "projecthoomans:whats_up_local_activity_neutral",
+    "opening", "detail", debugContext
 ))
 equal(sandbox.persisted, false, "sandbox does not persist")
 equal(sandbox.networked, false, "sandbox does not network")

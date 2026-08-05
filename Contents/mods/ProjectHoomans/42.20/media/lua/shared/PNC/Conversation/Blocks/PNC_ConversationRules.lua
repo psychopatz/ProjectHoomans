@@ -411,6 +411,10 @@ end
 function Rules.CheckRepeat(policy, entry, worldAgeHours)
     if type(policy) ~= "table" then return true end
     entry = type(entry) == "table" and entry or {}
+    if policy.oncePerDay == true and entry.lastUsedWorldHour ~= nil
+        and math.floor((tonumber(entry.lastUsedWorldHour) or 0) / 24)
+            == math.floor((tonumber(worldAgeHours) or 0) / 24)
+    then return false, "once_per_day_used" end
     if policy.maxUses ~= nil
         and (tonumber(entry.useCount) or 0) >= tonumber(policy.maxUses)
     then return false, "max_uses_reached" end

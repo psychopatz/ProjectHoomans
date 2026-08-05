@@ -162,6 +162,7 @@ Internal.RegisterServerCommand(Const.CMD_PLAYER_BOOTSTRAP, function(args)
     if tonumber(args.chunkIndex) == 1 and projectionIsCurrent(args) then
         ClientState.npcKnowledge = {}
         ClientState.npcPresentations = {}
+        ClientState.conversationHistory = {}
         ClientState.bootstrapKnowledgeRevision = incomingRevision
     end
     if projectionIsCurrent(args) then

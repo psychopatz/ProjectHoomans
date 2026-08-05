@@ -102,6 +102,11 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
             { category.labelKey }
         )
     end
+    state.conversationHistory = state.conversationHistory or {}
+    state.conversationHistory[npcID] = state.conversationHistory[npcID] or {}
+    context.historyLookup = function(subjectID)
+        return state.conversationHistory[npcID][tostring(subjectID or "")]
+    end
     return context
 end
 
@@ -205,6 +210,22 @@ local function notifyFailure(view, key, reason)
             .. tostring(reason or "unavailable"))
     end
     restoreCurrentChoices(view)
+end
+
+local function rememberCategoryUse(context, categoryID, outcomeID)
+    if type(context) ~= "table" or not categoryID then return false end
+    local history = PNC.Network and PNC.Network.ClientState
+        and PNC.Network.ClientState.conversationHistory or nil
+    if type(history) ~= "table" then return false end
+    local npcID = tostring(context.npcID or "")
+    local subject = "category:" .. tostring(categoryID)
+    history[npcID] = history[npcID] or {}
+    local previous = history[npcID][subject] or { useCount = 0 }
+    previous.useCount = (tonumber(previous.useCount) or 0) + 1
+    previous.lastUsedWorldHour = context.worldAgeHours
+    previous.lastOutcomeID = outcomeID
+    history[npcID][subject] = previous
+    return true
 end
 
 function Composer.PumpLocalRequests()
@@ -356,6 +377,17 @@ function Composer.ReceiveBlock(args)
     end
     view.spec.context.pendingConversationRequest = nil
     if args.success ~= true then
+        if args.reason == "once_per_day_used" and args.categoryID then
+            local context = view.spec.context.conversationBlockContext
+            rememberCategoryUse(context, args.categoryID)
+            view.spec.nodes.menu = Composer.BuildMenuNode(
+                context,
+                context and context.conversationMenuOptions
+            )
+            if view.session and view.session.currentNodeID == "menu" then
+                view.session.currentNode = view.spec.nodes.menu
+            end
+        end
         notifyFailure(view, "status.block_unavailable", args.reason)
         return false, args.reason
     end
@@ -404,6 +436,7 @@ function Composer.ReceiveOutcome(args)
         return false, "block_unavailable"
     end
     local context = view.spec.context.conversationBlockContext
+    rememberCategoryUse(context, block.category, args.outcomeID)
     if args.responseKey then
         session:queueMessage("npc", dialoguePayload(
             block.textSource,
@@ -426,6 +459,10 @@ function Composer.ReceiveOutcome(args)
     session.pendingClose = args.close == true
     session.pendingCloseReason = args.closeReason
     if args.nextNodeID == "$root" then
+        view.spec.nodes.menu = Composer.BuildMenuNode(
+            context,
+            context.conversationMenuOptions
+        )
         session.pendingNext = "menu"
     else
         session.pendingNext = args.nextNodeID
@@ -534,6 +571,12 @@ function Composer.BuildRootNode(context, options)
         closeReason = "goodbye",
     }
     return { npc = greeting, choices = choices }
+end
+
+function Composer.BuildMenuNode(context, options)
+    local node = Composer.BuildRootNode(context, options)
+    node.npc = nil
+    return node
 end
 
 return Composer

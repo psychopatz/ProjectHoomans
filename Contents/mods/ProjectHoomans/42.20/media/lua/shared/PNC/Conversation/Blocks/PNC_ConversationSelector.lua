@@ -34,6 +34,7 @@ function Selector.Seed(context, channel)
 end
 
 local function historyEntry(context, subjectID, policy)
+    context = type(context) == "table" and context or {}
     if type(context.historyLookup) == "function" then
         return context.historyLookup(subjectID, policy and policy.scope)
     end
@@ -59,6 +60,16 @@ function Selector.IsCategoryEligible(categoryID, context, allowSystem)
     if category.system == true and allowSystem ~= true then
         return false, "system_category"
     end
+    local repeatOK, repeatReason = Rules.CheckRepeat(
+        category["repeat"],
+        historyEntry(
+            context,
+            "category:" .. tostring(categoryID),
+            category["repeat"]
+        ),
+        context and context.worldAgeHours
+    )
+    if not repeatOK then return false, repeatReason end
     local eligible, reason = Rules.EvaluateAll(category.gates, context)
     if not eligible then return false, reason end
     if context and type(context.categoryValidator) == "function" then

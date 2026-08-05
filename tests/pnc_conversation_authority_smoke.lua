@@ -163,8 +163,11 @@ local categoryResult = sent[#sent]
 equal(categoryResult.command, PNC.Const.CMD_CONVERSATION_BLOCK,
     "block response command")
 equal(categoryResult.payload.success, true, "block response success")
-equal(categoryResult.payload.blockID,
-    "projecthoomans:whats_up_basic_neutral", "eligible neutral block")
+truth(string.find(categoryResult.payload.blockID,
+    "projecthoomans:whats_up_", 1, true) == 1,
+    "eligible randomized neutral topic selected")
+truth(string.sub(categoryResult.payload.blockID, -8) == "_neutral",
+    "selected daily topic matches the neutral audience")
 
 truth(Authority.HandleChoice(player, {
     requestID = "choice-1",
@@ -172,16 +175,18 @@ truth(Authority.HandleChoice(player, {
     token = "lease-token",
     blockID = categoryResult.payload.blockID,
     nodeID = "opening",
-    choiceID = "situation",
+    choiceID = "detail",
     registryFingerprint = fingerprint,
 }), "authoritative choice accepted")
 local outcome = sent[#sent]
 equal(outcome.command, PNC.Const.CMD_CONVERSATION_OUTCOME,
     "outcome response command")
 equal(outcome.payload.success, true, "outcome success")
-equal(outcome.payload.outcomeID, "reply", "deterministic outcome")
-equal(outcome.payload.nextNodeID, "$root",
-    "built-in subtopic returns to the conversation menu")
+truth(outcome.payload.outcomeID == "open"
+    or outcome.payload.outcomeID == "guarded",
+    "deterministic weighted outcome")
+equal(outcome.payload.nextNodeID, "details",
+    "daily topic enters its authored detail branch")
 equal(outcome.payload.close, false,
     "built-in subtopic does not close the conversation")
 equal(outcome.payload.closeReason, nil,
@@ -194,19 +199,57 @@ local categoryHistory = History.Get(
 )
 equal(categoryHistory.useCount, 1, "category use slot advances after commit")
 
+truth(Authority.HandleChoice(player, {
+    requestID = "choice-2",
+    npcID = record.id,
+    token = "lease-token",
+    blockID = categoryResult.payload.blockID,
+    nodeID = "details",
+    choiceID = "offer_help",
+    registryFingerprint = fingerprint,
+}), "authoritative branch choice accepted")
+local branchOutcome = sent[#sent]
+equal(branchOutcome.payload.nextNodeID, "followup",
+    "daily topic can continue through multiple nodes")
+equal(relationshipEffects, 2,
+    "each committed branch applies its relationship outcome once")
+
 local replayed, replayReason = Authority.HandleChoice(player, {
     requestID = "choice-1",
     npcID = record.id,
     token = "lease-token",
     blockID = categoryResult.payload.blockID,
     nodeID = "opening",
-    choiceID = "situation",
+    choiceID = "detail",
     registryFingerprint = fingerprint,
 })
 equal(replayed, false, "replay rejected")
 equal(replayReason, "replayed_request", "replay rejection reason")
-equal(relationshipEffects, 1, "replay does not duplicate effect")
+equal(relationshipEffects, 2, "replay does not duplicate effect")
 equal(sent[#sent].payload.success, false, "replay response rejected")
+
+truth(History.Save(false), "daily conversation history saves")
+History.Load()
+local repeatedDaily, repeatedDailyReason = Authority.HandleCategory(player, {
+    requestID = "category-same-day",
+    npcID = record.id,
+    token = "lease-token",
+    categoryID = "projecthoomans:whats_up",
+    registryFingerprint = fingerprint,
+})
+equal(repeatedDaily, false,
+    "What's Up cannot be triggered twice after save-history reload")
+equal(repeatedDailyReason, "once_per_day_used",
+    "same-day category rejection explains the daily policy")
+worldHours = 124
+truth(Authority.HandleCategory(player, {
+    requestID = "category-next-day",
+    npcID = record.id,
+    token = "lease-token",
+    categoryID = "projecthoomans:whats_up",
+    registryFingerprint = fingerprint,
+}), "What's Up becomes available after the world day changes")
+worldHours = 100
 
 local accepted, reason = Authority.HandleCategory(player, {
     requestID = "category-forged",
