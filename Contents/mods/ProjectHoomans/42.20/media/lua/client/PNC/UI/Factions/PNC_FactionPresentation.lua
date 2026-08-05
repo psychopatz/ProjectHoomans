@@ -165,29 +165,33 @@ function FactionPresentation.RenderPortraitPlate(portraitUI, rawContext)
         alpha = alpha * 0.96,
     })
 
-    -- Draw NPC Name
+    -- Select bold/medium font for the NPC Name to establish clear visual hierarchy
+    local nameFont = UIFont.MediumBold or UIFont.SmallBold or UIFont.Medium or UIFont.Small
+    local subtitleFont = UIFont.Small
+
+    -- Draw NPC Name (Bold/Medium Header)
     portraitUI:drawText(
         string.upper(tostring(presentation.npcName or "")),
         textX,
-        plateY + 7,
+        plateY + 5,
         bright.r or 1,
         bright.g or 1,
         bright.b or 1,
         alpha,
-        UIFont.Small
+        nameFont
     )
 
-    -- Draw Faction Subtitle (only if subtitle exists)
+    -- Draw Faction Subtitle (Small Secondary Label)
     if presentation.subtitle then
         portraitUI:drawText(
             string.upper(tostring(presentation.subtitle)),
             textX,
-            plateY + 27,
-            bright.r or 1,
-            bright.g or 1,
-            bright.b or 1,
-            alpha * 0.92,
-            UIFont.Small
+            plateY + 28,
+            (bright.r or 1) * 0.88,
+            (bright.g or 1) * 0.88,
+            (bright.b or 1) * 0.88,
+            alpha * 0.85,
+            subtitleFont
         )
     end
 end
