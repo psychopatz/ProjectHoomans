@@ -1,5 +1,5 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/PNC_Combat_AttackActions.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_AttackActions.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

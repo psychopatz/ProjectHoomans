@@ -1,4 +1,4 @@
-local FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Pathing/PNC_FakeLocomotion.lua"
 
 PNC = {

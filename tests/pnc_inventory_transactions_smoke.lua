@@ -1,5 +1,5 @@
-local SERVER_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/server/"
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/"
+local SERVER_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
+local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
 package.path = SERVER_ROOT .. "?.lua;" .. SHARED_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)

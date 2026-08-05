@@ -1,4 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/common/media/lua/client/"
+local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local COMMON_ROOT =
+    "Contents/mods/ProjectHoomans/common/media/lua/client/"
 local TRANSLATE_JSON =
     "Contents/mods/ProjectHoomans/common/media/lua/shared/Translate/EN/UI.json"
 local CORE_TEXT =
@@ -65,7 +67,7 @@ local relationships = { "FirstMeet", "Acquaintance", "Member", "Lover" }
 local variants = { "Dawn", "Sunrise", "Sunset", "Dusk", "Twilight" }
 local index
 for index = 1, #variants do
-    dofile(ROOT .. "PNC/Conversation/PortraitBackgrounds/PNC_Background"
+    dofile(COMMON_ROOT .. "PNC/Conversation/PortraitBackgrounds/PNC_Background"
         .. variants[index] .. ".lua")
 end
 local relationshipIndex
@@ -73,7 +75,7 @@ for relationshipIndex = 1, #relationships do
     local relationship = relationships[relationshipIndex]
     for index = 1, #variants do
         local variant = variants[index]
-        dofile(ROOT .. "PNC/Conversation/Content/Greetings/" .. relationship
+        dofile(COMMON_ROOT .. "PNC/Conversation/Content/Greetings/" .. relationship
             .. "/greeting_" .. relationship .. variant .. ".lua")
     end
 end

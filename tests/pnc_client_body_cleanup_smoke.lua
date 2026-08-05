@@ -1,8 +1,8 @@
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
+local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
 package.path = CLIENT_ROOT .. "?.lua;" .. package.path
 
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/PNC_ClientPresenceSync.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_ClientPresenceSync.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

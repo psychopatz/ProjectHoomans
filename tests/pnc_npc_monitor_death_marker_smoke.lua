@@ -1,5 +1,5 @@
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
+local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

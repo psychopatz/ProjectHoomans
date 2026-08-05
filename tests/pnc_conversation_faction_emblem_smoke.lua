@@ -1,5 +1,5 @@
 local ROOT =
-    "Contents/mods/ProjectHoomans/common/media/lua/client/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

@@ -1,5 +1,5 @@
 local CATALOG_FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/Debug/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Debug/"
         .. "PNC_AnimationDebugCatalog.lua"
 
 PNC = {}

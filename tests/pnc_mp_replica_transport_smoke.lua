@@ -1,26 +1,26 @@
 local BODY_CONTROL =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Pathing/PNC_LiveBodyControl.lua"
 local CLIENT_TICK =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
     .. "PresenceSync/PNC_ClientPresenceTick.lua"
 local CLIENT_INIT =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
     .. "00_PNC_Client_Init.lua"
 local CLIENT_CONTROLLER =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
     .. "PresenceSync/PNC_ClientNativePathController.lua"
 local CLIENT_VISUALS =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
     .. "PresenceSync/PNC_ClientPresenceVisuals.lua"
 local ANIMATION =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Visuals/PNC_Animation.lua"
 local PATH_CONTEXT =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Pathing/PNC_PathService/PNC_PathService_Context.lua"
 local TRAVERSAL_RUNTIME =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Pathing/PNC_PathService/PNC_PathService_TraversalRuntime.lua"
 
 local function readAll(path)
@@ -347,7 +347,7 @@ assert(
     "removed interpolation transport is still loaded"
 )
 local interpolationFile = io.open(
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
         .. "PNC_ClientInterpolation.lua",
     "rb"
 )

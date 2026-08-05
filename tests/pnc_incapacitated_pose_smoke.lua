@@ -1,7 +1,7 @@
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
+local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
 package.path = CLIENT_ROOT .. "?.lua;" .. package.path
 
-local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -187,7 +187,7 @@ PNC.Network = {
     },
 }
 
-dofile("Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/PNC_ClientPresenceSync.lua")
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_ClientPresenceSync.lua")
 PNC.ClientPresenceSync.BodyByOnlineID["77"] = zombie
 
 local visualKeySnapshot = {

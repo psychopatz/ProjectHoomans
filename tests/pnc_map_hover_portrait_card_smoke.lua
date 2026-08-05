@@ -75,6 +75,9 @@ PNC = {
 UIFont = { Small = "small" }
 IsoDirections = { S = "south" }
 
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
+    function() return PNC.NPCIdentityPresentation end
 dofile(FILE)
 
 local card = PNC.MapHoverPortraitCard:new(0, 0, 128, {
@@ -112,6 +115,11 @@ card:setContext({
     name = "Dion Amaya",
     faction = "colonist",
     roleTag = "farmer",
+    organizationalFaction = {
+        id = "colonist",
+        name = "Colonists",
+        role = "farmer",
+    },
 })
 card:render()
 assert(card.texts[1] == "Dion Amaya",

@@ -1,6 +1,6 @@
-local LIVE_BODY_FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Pathing/PNC_LiveBodyControl.lua"
-local CLIENT_FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/PNC_ClientHumanNPCSafeguards.lua"
-local SLEEP_PATCH_FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/Patches/PNC_HumanNPCSleepPatch.lua"
+local LIVE_BODY_FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/PNC_LiveBodyControl.lua"
+local CLIENT_FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_ClientHumanNPCSafeguards.lua"
+local SLEEP_PATCH_FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Patches/PNC_HumanNPCSleepPatch.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

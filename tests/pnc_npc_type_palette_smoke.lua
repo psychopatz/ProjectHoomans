@@ -1,5 +1,5 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/common/media/lua/client/PNC/UI/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/"
     .. "PNC_NPCTypePalette.lua"
 
 local function assertEqual(actual, expected, label)

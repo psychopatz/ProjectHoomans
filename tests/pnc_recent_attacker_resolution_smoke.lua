@@ -1,4 +1,4 @@
-local FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Perception/PNC_Perception.lua"
 
 local now = 1000

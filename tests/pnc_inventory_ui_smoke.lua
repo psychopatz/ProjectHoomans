@@ -1,4 +1,4 @@
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
+local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -266,6 +266,9 @@ assertEqual(#npcNailsSelection.itemIDs, 2, "quantity spans compact stacks")
 assertEqual(npcRowsByID["identity_card"].restricted, true,
     "off-limits item model state")
 
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
+    function() return PNC.NPCIdentityPresentation end
 dofile(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryWindow.lua")
 
 local window = setmetatable({}, { __index = ISPNCInventoryWindow })

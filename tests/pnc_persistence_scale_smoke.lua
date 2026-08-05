@@ -1,7 +1,7 @@
 -- Reuse the real deterministic inventory bootstrap and its Kahlua checks.
 dofile("tests/pnc_seed_delta_smoke.lua")
 
-local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

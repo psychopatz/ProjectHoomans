@@ -218,6 +218,9 @@ PNC.FactionDebugOverlay = {
         }, 1
     end,
 }
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
+    function() return PNC.NPCIdentityPresentation end
 dofile(entriesPath)
 local factionLine1
 local factionLine2

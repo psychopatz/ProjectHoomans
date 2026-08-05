@@ -1,5 +1,5 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
     .. "PresenceSync/PNC_ClientZombieAggroController.lua"
 
 local now = 1000
@@ -184,7 +184,7 @@ assert(pathRequests == 2,
     "managed NPC body entered vanilla zombie aggro control")
 
 local serverFile = assert(io.open(
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
         .. "Zombies/PNC_ZombieAggro_Update.lua",
     "rb"
 ))
@@ -204,7 +204,7 @@ assert(not string.find(
 ), "MP server binds the IsoZombie NPC as a network character goal")
 
 local biteFile = assert(io.open(
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
         .. "Zombies/PNC_ZombieAggro_Bite.lua",
     "rb"
 ))

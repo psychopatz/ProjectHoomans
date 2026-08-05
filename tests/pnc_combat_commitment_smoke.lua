@@ -1,5 +1,5 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Behaviors/PNC_Behavior_Combat.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Behaviors/PNC_Behavior_Combat.lua"
 
 local handApplications = 0
 local attackPumps = 0
@@ -89,7 +89,7 @@ assert(attackPumps == 2,
     "expired committed attack skipped its finish pump")
 
 local behaviorFile = assert(io.open(
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
         .. "Behaviors/PNC_BehaviorSystem.lua",
     "rb"
 ))

@@ -1,7 +1,7 @@
 local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
     .. "Layers/PNC_MapLayer_Travel.lua"
 local PALETTE =
-    "Contents/mods/ProjectHoomans/common/media/lua/client/PNC/UI/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/"
     .. "PNC_NPCTypePalette.lua"
 
 local layer
@@ -125,11 +125,18 @@ PNC = {
             return nil
         end,
     },
+    NPCIdentityPresentation = {
+        GetName = function(entry)
+            return entry and entry.name or "Unknown"
+        end,
+    },
 }
 
 dofile(PALETTE)
 package.preload["PNC/UI/PNC_NPCTypePalette"] =
     function() return PNC.NPCTypePalette end
+package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
+    function() return PNC.NPCIdentityPresentation end
 dofile(FILE)
 
 local map = {

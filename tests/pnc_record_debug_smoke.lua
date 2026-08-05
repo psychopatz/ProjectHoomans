@@ -1,5 +1,5 @@
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/"
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
+local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -118,6 +118,9 @@ ISContextMenu = {
     end,
 }
 
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
+    function() return PNC.NPCIdentityPresentation end
 dofile(CLIENT_ROOT .. "PNC/UI/Context/PNC_ContextHub.lua")
 PNC.ContextHub.RegisterProvider({
     id = "smoke",

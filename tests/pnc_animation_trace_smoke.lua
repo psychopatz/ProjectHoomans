@@ -1,5 +1,5 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/"
     .. "Core/Visuals/PNC_AnimationTrace.lua"
 
 local function assertEqual(actual, expected, label)

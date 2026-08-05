@@ -1,4 +1,4 @@
-local FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/PNC_Combat_Firearms.lua"
+local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Firearms.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -212,7 +212,7 @@ assertEqual(debugState.unlimitedReserve, true, "debug infinite reserve")
 PNC.Const = { PRESENCE_LIVE = "live" }
 PNC.Core = { Now = function() return 0 end }
 local NameplateDebug = dofile(
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/Nameplates/PNC_NameplateDebug.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateDebug.lua"
 )
 local overlay = NameplateDebug.BuildText({
     presenceState = "live",

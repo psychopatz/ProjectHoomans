@@ -1,4 +1,4 @@
-local FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/Map/"
+local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
     .. "PNC_MapLayerRegistry.lua"
 
 local calls = {}

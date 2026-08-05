@@ -1,7 +1,7 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Behaviors/PNC_Behavior_Combat.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Behaviors/PNC_Behavior_Combat.lua"
 local ENGAGEMENT_FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/PNC_Combat_Engagement.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Engagement.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

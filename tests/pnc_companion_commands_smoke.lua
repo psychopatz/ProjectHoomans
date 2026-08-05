@@ -1,7 +1,7 @@
 local SHARED_ROOT =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Commands/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Commands/"
 local CLIENT_ROOT =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -241,6 +241,9 @@ player.Say = function(_, text)
 end
 player.playEmote = function() end
 PNC.CompanionCommandPresentation = nil
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
+    function() return PNC.NPCIdentityPresentation end
 dofile(CLIENT_ROOT .. "Commands/PNC_CompanionCommandPresentation.lua")
 for i = 1, 8 do
     PNC.CompanionCommandPresentation.ShowPlayerFlavor(

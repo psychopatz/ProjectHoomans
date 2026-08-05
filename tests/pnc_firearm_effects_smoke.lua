@@ -1,5 +1,5 @@
-local SHARED_FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/PNC_Combat_FirearmEffects.lua"
-local CLIENT_FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/PNC_ClientFirearmEffects.lua"
+local SHARED_FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_FirearmEffects.lua"
+local CLIENT_FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_ClientFirearmEffects.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -69,7 +69,7 @@ PNC = {
     },
 }
 
-dofile("Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/PNC_Combat_Firearms.lua")
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Firearms.lua")
 dofile(SHARED_FILE)
 
 local record = {

@@ -28,7 +28,7 @@ local function newMenu()
     return menu
 end
 
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
+local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
 local debugAuthorized = false
 local registeredProvider
 local sent = {}

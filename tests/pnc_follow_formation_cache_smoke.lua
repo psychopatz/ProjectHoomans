@@ -1,5 +1,5 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Behaviors/PNC_Behavior_Companion.lua"
 
 local now = 1000

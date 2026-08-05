@@ -1,4 +1,4 @@
-local FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Spatial/PNC_SpatialIndex.lua"
+local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Spatial/PNC_SpatialIndex.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

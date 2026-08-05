@@ -1,5 +1,5 @@
 local ACTION_PATH =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/Actions/PNC_BandageAction.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Actions/PNC_BandageAction.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

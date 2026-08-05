@@ -1,5 +1,5 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/"
+local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
 local COMMON_ROOT = "Contents/mods/ProjectHoomans/common/media/lua/shared/"
 
 package.path = SHARED_ROOT .. "?.lua;" .. COMMON_ROOT .. "?.lua;" .. package.path

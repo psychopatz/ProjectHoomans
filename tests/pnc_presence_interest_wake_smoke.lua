@@ -1,4 +1,4 @@
-local FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Presence/PNC_Presence.lua"
+local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Presence/PNC_Presence.lua"
 local now = 1000
 local scheduled = 0
 local woken = 0

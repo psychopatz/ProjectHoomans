@@ -1,5 +1,5 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
     .. "Networking/PNC_ClientCombatCommands.lua"
 
 local now = 1000

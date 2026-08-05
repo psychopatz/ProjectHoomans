@@ -1,5 +1,5 @@
 local PATCH_FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/Patches/PNC_WashMedicalMaterialPatch.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Patches/PNC_WashMedicalMaterialPatch.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

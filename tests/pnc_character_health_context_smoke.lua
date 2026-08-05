@@ -1,6 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/CharacterWindow/"
+local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/"
 local BANDAGE_MENU_FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/Context/PNC_BandageMenu.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_BandageMenu.lua"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -161,7 +161,7 @@ assertEqual(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 70, 70), true, "b
 assertEqual(rootMenu.options[1].name, "Debug Injury", "blank health menu only offers debug injury")
 assertEqual(rootMenu.options[2].name, "Debug Infection", "blank health menu offers infection debug")
 
-local healthUIPath = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Health.lua"
+local healthUIPath = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Health.lua"
 local healthUIFile = assert(io.open(healthUIPath, "r"))
 local healthUISource = healthUIFile:read("*a")
 healthUIFile:close()

@@ -1,4 +1,4 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
 
 local records = {
     one = { id = "one", alive = true },

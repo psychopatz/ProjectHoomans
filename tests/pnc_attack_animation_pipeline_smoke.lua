@@ -1,9 +1,9 @@
 local ANIMATION =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Visuals/PNC_Animation.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_Animation.lua"
 local CLIENT_SYNC =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/PresenceSync/PNC_ClientPresenceVisuals.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/PNC_ClientPresenceVisuals.lua"
 local PATH_MOTION =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Pathing/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/"
     .. "PNC_PathService/PNC_PathService_Motion.lua"
 local ATTACK_XML =
     "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Attack1H1.xml"
@@ -36,23 +36,23 @@ local clientAttackPresentation = assert(string.match(
     "    attackKey =.-\n    specialKey ="
 ))
 local combat = readAll(
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
         .. "PNC_Combat.lua"
 )
 local melee = readAll(
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
         .. "PNC_Combat_Melee.lua"
 )
 local attackActions = readAll(
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
         .. "PNC_Combat_AttackActions.lua"
 )
 local unarmed = readAll(
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
         .. "PNC_Combat_Unarmed.lua"
 )
 local firearms = readAll(
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Combat/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
         .. "PNC_Combat_Firearms.lua"
 )
 local playBump = assert(string.match(

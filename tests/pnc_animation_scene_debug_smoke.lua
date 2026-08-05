@@ -1,7 +1,7 @@
 local SHARED_ROOT =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
 local CLIENT_ROOT =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
 local SCENES = SHARED_ROOT
     .. "PNC/Core/Visuals/PNC_AnimationScenes.lua"
 local DEFINITIONS = SHARED_ROOT

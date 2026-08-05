@@ -1,5 +1,5 @@
 local FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/PresenceSync/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/"
         .. "PNC_ClientPresenceVisuals.lua"
 
 local maintained = 0

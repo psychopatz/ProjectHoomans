@@ -46,6 +46,21 @@ PNC = {
     Network = {
         ClientState = {
             snapshots = {},
+            npcKnowledge = {
+                ["idle:1"] = {
+                    categories = {
+                        {
+                            descriptors = {
+                                {
+                                    descriptorID = "identity.name",
+                                    status = "known",
+                                    value = "Idle NPC",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         },
     },
     MapCommands = {
@@ -58,6 +73,9 @@ dofile(SHARED .. "Travel/PNC_Travel_Route.lua")
 dofile(SHARED .. "Travel/PNC_Travel_Providers.lua")
 dofile(SHARED .. "Travel/PNC_Travel_Model.lua")
 dofile(SHARED .. "Travel/PNC_Travel_Projection.lua")
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
+    function() return PNC.NPCIdentityPresentation end
 dofile(CLIENT .. "Travel/PNC_TravelDirectory.lua")
 
 local record = {

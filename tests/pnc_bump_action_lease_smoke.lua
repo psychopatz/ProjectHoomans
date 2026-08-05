@@ -1,8 +1,8 @@
 local LIVE_BODY =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Pathing/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/"
     .. "PNC_LiveBodyControl.lua"
 local ANIMATION =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Visuals/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/"
     .. "PNC_Animation.lua"
 
 local function assertEqual(actual, expected, label)

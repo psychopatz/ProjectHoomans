@@ -1,4 +1,4 @@
-local FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/client/PNC/UI/Map/"
+local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
 local sent
 local registeredLayer
 local gameSpeed = 0
@@ -95,6 +95,9 @@ PNC = {
     },
 }
 
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
+    function() return PNC.NPCIdentityPresentation end
 dofile(FILE .. "PNC_MapCommandRegistry.lua")
 dofile(FILE .. "Commands/PNC_MapCommand_Travel.lua")
 

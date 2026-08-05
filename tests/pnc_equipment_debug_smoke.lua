@@ -1,5 +1,5 @@
 local ROOT =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/"
 
 local function readAll(path)
     local file = assert(io.open(path, "rb"))

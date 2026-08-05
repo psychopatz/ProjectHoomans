@@ -6,7 +6,7 @@ local function readAll(path)
 end
 
 local ROOT =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/"
 local api = readAll(
     ROOT .. "shared/PNC/Core/API/PNC_API.lua"
 )

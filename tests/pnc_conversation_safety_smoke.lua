@@ -1,7 +1,7 @@
 local SHARED =
-    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/Conversation/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/"
 local CLIENT =
-    "Contents/mods/ProjectHoomans/common/media/lua/client/PNC/Conversation/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

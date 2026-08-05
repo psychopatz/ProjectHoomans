@@ -1,4 +1,4 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/Presence/PNC_BodyLifecycle/"
+local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Presence/PNC_BodyLifecycle/"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

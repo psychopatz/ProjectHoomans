@@ -1,16 +1,16 @@
-local FILE = "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Pathing/PNC_EnginePathPlanner.lua"
 local CONTEXT_FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Pathing/PNC_EnginePathPlanner_Context.lua"
 local MOTION_FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Pathing/PNC_PathService/PNC_PathService_Motion.lua"
 local BODY_CONTROL_FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/shared/PNC/Core/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Pathing/PNC_LiveBodyControl.lua"
 local SERVER_FILE =
-    "Contents/mods/ProjectHoomans/42.19/media/lua/server/PNC/"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
     .. "PNC_Server.lua"
 
 local function readAll(path)

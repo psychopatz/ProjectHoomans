@@ -78,6 +78,9 @@ package.preload[
     "PNC/UI/Factions/PNC_FactionMemberModal"
 ] = function() return PNC.FactionMemberModal end
 
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
+    function() return PNC.NPCIdentityPresentation end
 dofile(
     CLIENT
         .. "UI/Factions/PNC_FactionMemberWindow.lua"
