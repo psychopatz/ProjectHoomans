@@ -1,5 +1,5 @@
 {
-  "opening": "Their expression softens as the conversation becomes personal.",
+  "opening": "All right, {playerFirstName}. We can talk about us.",
   "choice.trust": "You can trust me.",
   "response.trust": "I know. That still means more than I can say.",
   "locked.familiarity": "You do not know each other well enough yet."

@@ -142,6 +142,54 @@ local function noEffectApply()
     return true, "no_effect"
 end
 
+local DERIVED_RELATIONSHIP_FIELDS = {
+    admire = true,
+    admiration = true,
+    pity = true,
+    fear = true,
+    despise = true,
+    attitude = true,
+    relationshipstate = true,
+    like = true,
+    hate = true,
+    contempt = true,
+    morale = true,
+}
+
+local RELATIONSHIP_EFFECT_FIELDS = {
+    type = true,
+    approval = true,
+    respect = true,
+    familiarity = true,
+    decayPerDay = true,
+    permanent = true,
+    shareable = true,
+}
+
+local function validateRelationshipDeltas(effect, strict)
+    if type(effect) ~= "table" then return false, "invalid_effect" end
+    for key in pairs(effect) do
+        local normalized = type(key) == "string" and string.lower(key) or key
+        if DERIVED_RELATIONSHIP_FIELDS[normalized] then
+            return false, "derived_relationship_effect_forbidden"
+        end
+        if strict and RELATIONSHIP_EFFECT_FIELDS[key] ~= true then
+            return false, "unknown_relationship_effect_field"
+        end
+    end
+    for _, key in ipairs({ "approval", "respect", "familiarity" }) do
+        local raw = effect[key]
+        local value = raw ~= nil and tonumber(raw) or 0
+        if raw ~= nil and (value == nil or value ~= value) then
+            return false, "relationship_delta_not_numeric"
+        end
+        if value < -100 or value > 100 then
+            return false, "relationship_delta_out_of_range"
+        end
+    end
+    return true
+end
+
 if not Registry.effectHandlers["pnc:none"] then
     Registry.RegisterEffectHandler("pnc:none", {
         validate = noEffectValidate,
@@ -157,15 +205,7 @@ if not Registry.effectHandlers["pnc:relationship"] then
             if not context.npcID or not context.playerEntityKey then
                 return false, "relationship_context_unavailable"
             end
-            for _, key in ipairs({
-                "approval", "respect", "familiarity", "morale",
-            }) do
-                local value = tonumber(effect[key]) or 0
-                if value < -100 or value > 100 then
-                    return false, "relationship_delta_out_of_range"
-                end
-            end
-            return true
+            return validateRelationshipDeltas(effect, true)
         end,
         apply = function(context, effect)
             if not PNC.Relationships
@@ -189,7 +229,6 @@ if not Registry.effectHandlers["pnc:relationship"] then
                     approval = tonumber(effect.approval) or 0,
                     respect = tonumber(effect.respect) or 0,
                     familiarity = tonumber(effect.familiarity) or 0,
-                    morale = tonumber(effect.morale) or 0,
                 },
             }
         end,
@@ -225,6 +264,11 @@ if not Registry.effectHandlers["pnc:memory"] then
             if not context.npcID or not context.playerEntityKey then
                 return false, "relationship_context_unavailable"
             end
+            local deltasValid, deltaReason = validateRelationshipDeltas(effect)
+            if not deltasValid then return false, deltaReason end
+            if effect.familiarity ~= nil then
+                return false, "memory_familiarity_effect_forbidden"
+            end
             if type(effect.memoryID) ~= "string" or effect.memoryID == ""
                 or type(effect.memoryType) ~= "string" or effect.memoryType == ""
             then return false, "memory_identity_required" end
@@ -244,7 +288,7 @@ if not Registry.effectHandlers["pnc:memory"] then
                     lastEvaluatedAt = context.worldAgeHours,
                     approvalEffect = tonumber(effect.approval) or 0,
                     respectEffect = tonumber(effect.respect) or 0,
-                    moraleEffect = tonumber(effect.morale) or 0,
+                    moraleEffect = 0,
                     strength = tonumber(effect.strength) or 1,
                     decayPerDay = tonumber(effect.decayPerDay) or 0,
                     permanent = effect.permanent == true,

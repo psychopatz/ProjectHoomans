@@ -1,5 +1,5 @@
 {
-  "opening": "They take a moment to check themselves over.",
+  "opening": "Still standing. Go ahead.",
   "choice.condition": "How are you holding up?",
   "response.condition": "Tired, but ready if the group needs me.",
   "choice.offer_help": "Do you need any help?",

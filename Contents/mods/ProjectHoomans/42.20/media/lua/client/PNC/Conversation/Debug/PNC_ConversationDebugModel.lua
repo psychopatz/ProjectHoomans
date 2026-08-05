@@ -8,6 +8,12 @@ local Selector = PNC.Conversation.Selector
 local Rules = PNC.Conversation.Rules
 local Loader = PNC.Conversation.TextLoader
 
+local DEBUG_SOURCE = {
+    modID = "ProjectHoomans",
+    pathPattern = "media/conversation/system/shared/{language}/debugger.json",
+    domain = "pnc.system.shared.debugger",
+}
+
 local function copy(value, seen)
     if type(value) ~= "table" then return value end
     seen = seen or {}
@@ -283,12 +289,338 @@ function Model.ExecuteSandbox(blockID, nodeID, choiceID, context)
         roll = roll,
         totalWeight = total,
         responseKey = outcome.responseKey,
+        nextNodeID = outcome.next,
+        close = outcome.close == true,
         before = before,
         after = after,
         effects = previews,
         persisted = false,
         networked = false,
     }
+end
+
+local function sandboxText(block, key, context)
+    return Loader.Payload(block.textSource, key, context.textArgs)
+end
+
+local function debugText(key, args)
+    Loader.EnsureSource(DEBUG_SOURCE, { key })
+    return Loader.Payload(DEBUG_SOURCE, key, args)
+end
+
+local function sandboxCategoryNodeID(categoryID)
+    return "sandbox:category:" .. tostring(categoryID)
+end
+
+local function sandboxBlockNodeID(blockID, nodeID)
+    return table.concat({ "sandbox:block", blockID, nodeID }, ":")
+end
+
+local function sandboxNodeTextKey(block, nodeID, node, context)
+    if node.textKey then return node.textKey end
+    local keys = node.textKeys or {}
+    if #keys == 0 then return nil end
+    local seed = Selector.Seed(
+        context,
+        table.concat({ "sandbox_node", block.id, nodeID }, ":")
+    )
+    return keys[seed % #keys + 1]
+end
+
+local function updateSandboxRelationship(session, context)
+    local panel = session and session.view and session.view.extensionParts
+        and session.view.extensionParts.relationship or nil
+    if panel and panel.setRelationship then
+        local summary = copy(context.relationship)
+        summary.exists = true
+        panel:setRelationship(summary)
+    end
+end
+
+local function sandboxChoice(block, nodeID, choice, context, categoryNodeID)
+    local runtime = {}
+    local function eligible()
+        return Selector.IsChoiceEligible(block, nodeID, choice, context)
+    end
+    local function choiceText()
+        local passed, reason = eligible()
+        if passed then
+            return sandboxText(block, choice.textKey, context)
+        end
+        local label = PsychopatzCore.Conversation.Text.Resolve(
+            sandboxText(block, choice.textKey, context)
+        )
+        local reasonKey = choice.lockedReasonKey or reason
+        local explanation = reasonKey and PsychopatzCore.Conversation.Text.Resolve(
+            sandboxText(block, reasonKey, context)
+        ) or tostring(reason or "gated")
+        return { text = label .. " (" .. explanation .. ")" }
+    end
+    return {
+        id = choice.id,
+        text = choiceText,
+        -- The debugger reveals authored hidden choices as disabled rows so the
+        -- cloned context can be adjusted until their gates pass.
+        visible = true,
+        enabled = function()
+            local passed = eligible()
+            return passed
+        end,
+        action = function(_, _, session)
+            local result, reason = Model.ExecuteSandbox(
+                block.id,
+                nodeID,
+                choice.id,
+                context
+            )
+            runtime.result = result
+            runtime.reason = reason
+            if not result then return end
+            context.relationship = copy(result.after.relationship)
+            context.historyEntry = context.historyEntry or { useCount = 0 }
+            context.historyEntry.useCount =
+                (tonumber(context.historyEntry.useCount) or 0) + 1
+            context.historyEntry.lastUsedWorldHour = context.worldAgeHours
+            context.historyEntry.lastOutcomeID = result.outcomeID
+            context.historySlot = context.historyEntry.useCount
+            Model.lastSandbox = copy(result)
+            updateSandboxRelationship(session, context)
+        end,
+        response = function()
+            if runtime.result and runtime.result.responseKey then
+                return sandboxText(
+                    block,
+                    runtime.result.responseKey,
+                    context
+                )
+            end
+            if runtime.reason then
+                return { text = "Sandbox rejected: " .. tostring(runtime.reason) }
+            end
+            return nil
+        end,
+        next = function()
+            if not runtime.result then
+                return sandboxBlockNodeID(block.id, nodeID)
+            end
+            local nextNodeID = runtime.result.nextNodeID
+            if nextNodeID and nextNodeID ~= "$root" then
+                return sandboxBlockNodeID(block.id, nextNodeID)
+            end
+            -- Terminal outcomes loop back into the browser in a sandbox. This
+            -- preserves the cloned graph and lets another block be exercised.
+            return categoryNodeID
+        end,
+        close = false,
+    }
+end
+
+function Model.BuildSandboxDefinition(blockID, context)
+    local selectedBlock = Registry.GetBlock(blockID)
+    if not selectedBlock then return nil, "block_not_found" end
+    context = Model.NormalizeContext(context)
+    context.relationship = type(context.relationship) == "table"
+        and context.relationship or {}
+    context.relationship.exists = true
+    context.playerName = context.playerName or "Sandbox Player"
+    context.playerFullName = context.playerFullName or context.playerName
+    context.playerFirstName = context.playerFirstName or "Sandbox"
+    context.playerLastName = context.playerLastName or "Player"
+    context.npcName = context.npcName or "Sandbox NPC"
+    context.npcFullName = context.npcFullName or context.npcName
+    context.npcFirstName = context.npcFirstName or "Sandbox"
+    context.npcLastName = context.npcLastName or "NPC"
+    context.textArgs = {
+        playerName = context.playerName,
+        playerFullName = context.playerFullName,
+        playerFirstName = context.playerFirstName,
+        playerLastName = context.playerLastName,
+        npcName = context.npcName,
+        npcFullName = context.npcFullName,
+        npcFirstName = context.npcFirstName,
+        npcLastName = context.npcLastName,
+    }
+    context.sandbox = true
+    context.sandboxBlockID = selectedBlock.id
+
+    local nodes = {}
+    local blocksByCategory = {}
+    local runnableBlocks = 0
+    for _, block in ipairs(Registry.ListBlocks()) do
+        local categoryNodeID = sandboxCategoryNodeID(block.category)
+        local textValid = Loader.EnsureSource(
+            block.textSource,
+            Registry.CollectTextKeys(block)
+        )
+        local blockEntry = {
+            block = block,
+            textValid = textValid == true,
+        }
+        blocksByCategory[block.category] = blocksByCategory[block.category] or {}
+        blocksByCategory[block.category][#blocksByCategory[block.category] + 1]
+            = blockEntry
+        if textValid then
+            runnableBlocks = runnableBlocks + 1
+            for nodeID, node in pairs(block.nodes or {}) do
+                local choices = {}
+                for _, choice in ipairs(node.choices or {}) do
+                    choices[#choices + 1] = sandboxChoice(
+                        block,
+                        nodeID,
+                        choice,
+                        context,
+                        categoryNodeID
+                    )
+                end
+                choices[#choices + 1] = {
+                    id = "sandbox_back_to_blocks",
+                    text = debugText("sandbox.back_to_blocks"),
+                    log = false,
+                    next = categoryNodeID,
+                }
+                nodes[sandboxBlockNodeID(block.id, nodeID)] = {
+                    npc = sandboxText(
+                        block,
+                        sandboxNodeTextKey(block, nodeID, node, context),
+                        context
+                    ),
+                    choices = choices,
+                }
+            end
+        end
+    end
+
+    local categoryChoices = {}
+    for _, category in ipairs(Registry.ListCategories()) do
+        local entries = blocksByCategory[category.id] or {}
+        if #entries > 0 then
+            Loader.EnsureSource(category.textSource, { category.labelKey })
+            local categoryLabel = Loader.Payload(
+                category.textSource,
+                category.labelKey
+            )
+            categoryChoices[#categoryChoices + 1] = {
+                id = category.id,
+                text = categoryLabel,
+                log = false,
+                next = sandboxCategoryNodeID(category.id),
+            }
+            local blockChoices = {}
+            for _, entry in ipairs(entries) do
+                local eligible, reason = Selector.IsBlockEligible(
+                    entry.block,
+                    context
+                )
+                blockChoices[#blockChoices + 1] = {
+                    id = entry.block.id,
+                    text = debugText("sandbox.block_choice", {
+                        id = entry.block.id,
+                        audiences = table.concat(entry.block.audiences or {}, ","),
+                        status = not entry.textValid and "missing translation"
+                            or eligible and "eligible"
+                            or "gated: " .. tostring(reason or "unknown"),
+                    }),
+                    log = false,
+                    enabled = entry.textValid,
+                    next = entry.textValid and sandboxBlockNodeID(
+                        entry.block.id,
+                        entry.block.entryNode
+                    ) or nil,
+                }
+            end
+            blockChoices[#blockChoices + 1] = {
+                id = "sandbox_back_to_categories",
+                text = debugText("sandbox.back_to_categories"),
+                log = false,
+                next = "sandbox:categories",
+            }
+            nodes[sandboxCategoryNodeID(category.id)] = {
+                npc = debugText("sandbox.category_prompt", {
+                    category = PsychopatzCore.Conversation.Text.Resolve(
+                        categoryLabel
+                    ),
+                    count = #entries,
+                }),
+                choices = blockChoices,
+            }
+        end
+    end
+    nodes["sandbox:categories"] = {
+        npc = debugText("sandbox.categories_prompt", {
+            count = runnableBlocks,
+        }),
+        choices = categoryChoices,
+    }
+    context.sandboxBlockCount = runnableBlocks
+
+    local extensions = {}
+    if PNC.Conversation.CreateRelationshipPanel then
+        extensions[#extensions + 1] = {
+            partID = "relationship",
+            factory = PNC.Conversation.CreateRelationshipPanel,
+            relationship = copy(context.relationship),
+            visible = true,
+            title = {
+                key = "panel.current_relation",
+                domain = "pnc.system.shared.categories",
+            },
+            editLabel = {
+                key = "panel.current_relation_edit",
+                domain = "pnc.system.shared.categories",
+            },
+        }
+    end
+    local fakeEntry = {
+        id = context.npcID,
+        snapshot = {
+            faction = context.audiences.hostile and "hostile" or "neutral",
+        },
+    }
+    return {
+        namespace = "ProjectHoomansConversationSandbox",
+        npcID = "sandbox:registry",
+        characterUUID = "sandbox-character",
+        persistHistory = false,
+        portrait = {
+            id = "sandbox:registry",
+            identitySeed = Selector.Seed(
+                context,
+                "sandbox_portrait:" .. selectedBlock.id
+            ),
+            isFemale = false,
+            faceOnly = true,
+            preferDescriptor = true,
+            appearance = {},
+            equipment = { worn = {} },
+        },
+        backgroundID = PNC.Conversation.Backgrounds
+            and PNC.Conversation.Backgrounds.Get("twilight") or "twilight",
+        theme = PNC.NPCTypePalette
+            and PNC.NPCTypePalette.BuildConversationTheme(fakeEntry) or nil,
+        context = context,
+        extensionParts = extensions,
+        start = sandboxCategoryNodeID(selectedBlock.category),
+        nodes = nodes,
+        lifecycle = {
+            begin = function() return {} end,
+            finish = function(_, _, _, reason)
+                if PNC.Core and PNC.Core.LogInfo then
+                    PNC.Core.LogInfo("Conversation sandbox closed reason="
+                        .. tostring(reason or "closed"))
+                end
+            end,
+        },
+    }
+end
+
+function Model.OpenSandbox(blockID, context)
+    local definition, reason = Model.BuildSandboxDefinition(blockID, context)
+    if not definition then return nil, reason end
+    local conversation = PsychopatzCore and PsychopatzCore.Conversation
+    if not conversation or not conversation.Open then
+        return nil, "conversation_gui_unavailable"
+    end
+    return conversation.Open(definition), "opened"
 end
 
 return Model

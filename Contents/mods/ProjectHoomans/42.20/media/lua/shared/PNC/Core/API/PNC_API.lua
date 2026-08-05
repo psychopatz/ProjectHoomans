@@ -719,6 +719,8 @@ function API.Conversations.GetCapabilities()
         languageFallback = "EN",
         customConditions = true,
         customEffects = true,
+        relationshipAxes = { "approval", "respect", "familiarity" },
+        derivedAttitudes = { "ADMIRE", "PITY", "FEAR", "DESPISE" },
         repeatScopes = { "pair", "character", "npc", "world" },
         registryFingerprint = true,
         sandboxDebugger = true,

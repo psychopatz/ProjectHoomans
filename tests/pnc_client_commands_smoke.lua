@@ -189,11 +189,27 @@ Client.HandleServerCommand("PlayerBootstrap", {
     chunkIndex = 1,
     chunkCount = 1,
     snapshots = {
-        { npcID = "npc_bootstrap", categories = {} },
+        {
+            npcID = "npc_bootstrap",
+            revision = 4,
+            categories = {
+                { descriptors = {
+                    {
+                        descriptorID = "identity.name",
+                        value = "Persisted Name",
+                        status = "confirmed",
+                    },
+                } },
+            },
+        },
     },
 })
 assertEqual(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
     "restart bootstrap hydrates NPC knowledge")
+assertEqual(State.npcPresentations.npc_bootstrap.state, "known",
+    "restart bootstrap hydrates known identity presentation")
+assertEqual(State.npcPresentations.npc_bootstrap.displayName, "Persisted Name",
+    "restart bootstrap restores the learned NPC name")
 
 Client.HandleServerCommand("FullSync", {
     snapshots = {

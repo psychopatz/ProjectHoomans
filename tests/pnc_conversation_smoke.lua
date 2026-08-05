@@ -23,6 +23,11 @@ end
 local opened
 local registeredProvider
 PNC = {
+    Const = {
+        MODULE = "ProjectHoomans",
+        CMD_CONVERSATION_CATEGORY_REQUEST = "ConversationCategoryRequest",
+        CMD_CONVERSATION_CHOICE_REQUEST = "ConversationChoiceRequest",
+    },
     ContextHub = {
         RegisterProvider = function(provider) registeredProvider = provider end,
     },
@@ -190,9 +195,11 @@ truth(Registry.ListBlocks({ includeInvalid = true })[#Registry.ListBlocks({
 
 local entry = {
     id = "npc-12",
-    name = "Morgan",
+    name = "Morgan Hale",
     zombie = { live = true },
     snapshot = {
+        displayName = "Morgan Hale",
+        survivor = { forename = "Morgan", surname = "Hale" },
         identitySeed = 42,
         isFemale = true,
         faction = "neutral",
@@ -204,7 +211,16 @@ local entry = {
         },
     },
 }
-local definition = PNC.Conversation.BuildDefinition(entry, {}, "dawn")
+local player = {
+    getDisplayName = function() return "Alex Mercer" end,
+    getDescriptor = function()
+        return {
+            getForename = function() return "Alex" end,
+            getSurname = function() return "Mercer" end,
+        }
+    end,
+}
+local definition = PNC.Conversation.BuildDefinition(entry, player, "dawn")
 equal(definition.namespace, "ProjectHoomans", "history namespace")
 equal(definition.npcID, "npc-12", "NPC id")
 equal(definition.backgroundID, "dawn", "background definition")
@@ -213,9 +229,25 @@ equal(definition.context.relationshipID, "Crossroads Exchange",
 equal(definition.context.timeID, "Lead Scavenger", "role subtitle")
 equal(definition.context.conversationRelationshipID, "Acquaintance",
     "semantic relationship")
+equal(definition.context.playerFullName, "Alex Mercer", "player full name")
+equal(definition.context.playerFirstName, "Alex", "player first name")
+equal(definition.context.playerLastName, "Mercer", "player last name")
+equal(definition.context.npcFullName, "Morgan Hale", "NPC full name")
+equal(definition.context.npcFirstName, "Morgan", "NPC first name")
+equal(definition.context.npcLastName, "Hale", "NPC last name")
 equal(definition.lifecycle.kind, "conversation_lifecycle", "lifecycle")
 truth(#definition.nodes.greeting.choices >= 8,
     "registered category menu composed")
+local askAboutChoice
+for _, choice in ipairs(definition.nodes.greeting.choices) do
+    if choice.id == "projecthoomans:ask_about" then
+        askAboutChoice = choice
+    end
+    if string.sub(tostring(choice.id), 1, 15) == "projecthoomans:" then
+        equal(choice.log, false, "category choices are navigation only")
+    end
+end
+truth(askAboutChoice, "Ask About category is available")
 local greeting = PsychopatzCore.Conversation.Text.Resolve(
     definition.nodes.greeting.npc
 )
@@ -223,6 +255,233 @@ truth(string.find(greeting, "dawn", 1, true)
     or string.find(greeting, "light", 1, true)
     or string.find(greeting, "early", 1, true),
     "modular greeting resolves")
+
+local enteredNode
+local routedChoices
+local fakeSession = {
+    spec = definition,
+    queue = {},
+    enterNode = function(self, nodeID)
+        enteredNode = nodeID
+        self.currentNode = self.spec.nodes[nodeID]
+        routedChoices = self.currentNode and self.currentNode.choices or nil
+    end,
+    setChoices = function(_, choices) routedChoices = choices end,
+    queueMessage = function(self, speaker, value)
+        self.queue[#self.queue + 1] = { speaker = speaker, value = value }
+    end,
+    finishPending = function(self) self.finishedPending = true end,
+}
+local fakeView = { spec = definition, session = fakeSession }
+definition.context.conversationLifecycleState = { token = "lease-test" }
+PsychopatzCore.Conversation.instance = fakeView
+PNC.Conversation.Authority = {
+    HandleCategory = function(_, args)
+        return PNC.Conversation.Composer.ReceiveBlock({
+            requestID = args.requestID,
+            success = true,
+            npcID = args.npcID,
+            categoryID = args.categoryID,
+            blockID = "projecthoomans:ask_about_basic_neutral",
+            nodeID = "opening",
+        })
+    end,
+}
+askAboutChoice.action()
+PNC.Conversation.Composer.PumpLocalRequests()
+equal(enteredNode, "block:opening", "Ask About opens its topic node")
+equal(#routedChoices, 2, "Ask About exposes authored topic choices")
+equal(routedChoices[1].id, "background", "first Ask About topic")
+equal(routedChoices[2].id, "skills", "second Ask About topic")
+definition.context.pendingConversationRequest = "choice:return-to-root"
+truth(PNC.Conversation.Composer.ReceiveOutcome({
+    requestID = "choice:return-to-root",
+    success = true,
+    npcID = "npc-12",
+    blockID = "projecthoomans:ask_about_basic_neutral",
+    nodeID = "opening",
+    choiceID = "background",
+    outcomeID = "reply",
+    responseKey = "response.background",
+    nextNodeID = "$root",
+    close = false,
+}), "client accepts a menu-return outcome")
+equal(fakeSession.pendingNext, "menu",
+    "reserved root route maps back to the category menu")
+equal(definition.nodes.menu.npc, nil,
+    "returning to the menu does not repeat greeting dialogue")
+equal(fakeSession.pendingClose, false,
+    "menu-return outcome leaves the GUI open")
+PsychopatzCore.Conversation.instance = nil
+
+local memberAskNode = PNC.Conversation.Composer.BuildBlockNode(
+    Registry.GetBlock("projecthoomans:ask_about_basic_member"),
+    "opening",
+    definition.context.conversationBlockContext
+)
+equal(
+    PsychopatzCore.Conversation.Text.Resolve(memberAskNode.npc),
+    "Go ahead, Alex. What do you want to ask about?",
+    "dialogue name placeholders resolve"
+)
+
+PNC.Network = { ClientState = {
+    playerContext = {
+        characterUUID = "character-alex",
+        forename = "Alex",
+        surname = "Mercer",
+        displayName = "Alex Mercer",
+    },
+    npcPresentations = {
+        ["npc-unknown"] = { state = "unknown", canAskName = true },
+    },
+} }
+local unknownDefinition = PNC.Conversation.BuildDefinition({
+    id = "npc-unknown",
+    snapshot = {
+        displayName = "Hidden Name",
+        survivor = { forename = "Hidden", surname = "Name" },
+        faction = "neutral",
+        relationshipCategory = "FirstMeet",
+    },
+}, player, "dawn")
+equal(unknownDefinition.context.npcFullName, "Stranger",
+    "unknown NPC full name is hidden")
+equal(unknownDefinition.context.npcFirstName, "Stranger",
+    "unknown NPC first name is hidden")
+equal(unknownDefinition.context.npcLastName, "Stranger",
+    "unknown NPC last name is hidden")
+equal(unknownDefinition.context.playerFullName, "Stranger",
+    "player name is hidden from an unintroduced NPC")
+PNC.Network = nil
+
+local relationshipEffects = Registry.effectHandlers["pnc:relationship"]
+truth(relationshipEffects.validate({
+    npcID = "npc-12", playerEntityKey = "player:alex",
+}, { approval = 2, respect = -1, familiarity = 1 }),
+    "canonical conversation relationship deltas validate")
+local moraleValid = relationshipEffects.validate({
+    npcID = "npc-12", playerEntityKey = "player:alex",
+}, { morale = 1 })
+equal(moraleValid, false, "conversation morale points are rejected")
+local attitudeValid = relationshipEffects.validate({
+    npcID = "npc-12", playerEntityKey = "player:alex",
+}, { admire = 1 })
+equal(attitudeValid, false, "derived attitude points are rejected")
+local preview = relationshipEffects.simulate({}, {
+    approval = 2, respect = 1, familiarity = 3,
+})
+equal(preview.relationship.approval, 2, "approval delta preview")
+equal(preview.relationship.respect, 1, "respect delta preview")
+equal(preview.relationship.familiarity, 3, "familiarity delta preview")
+equal(preview.relationship.morale, nil, "morale is not a conversation axis")
+
+local debugContext = PNC.ConversationDebugModel.DefaultContext()
+local before = debugContext.relationship.familiarity
+local sandboxDefinition = assert(PNC.ConversationDebugModel.BuildSandboxDefinition(
+    "projecthoomans:whats_up_basic_neutral",
+    debugContext
+))
+equal(sandboxDefinition.persistHistory, false,
+    "GUI sandbox conversation history is non-persistent")
+equal(sandboxDefinition.start,
+    "sandbox:category:projecthoomans:whats_up",
+    "GUI sandbox opens the selected block's registry category")
+truth(sandboxDefinition.nodes["sandbox:categories"],
+    "GUI sandbox exposes the complete category browser")
+local browsedBlockCount = 0
+for nodeID, node in pairs(sandboxDefinition.nodes) do
+    if string.sub(nodeID, 1, 17) == "sandbox:category:" then
+        for _, choice in ipairs(node.choices or {}) do
+            if string.sub(tostring(choice.id), 1, 15) == "projecthoomans:" then
+                browsedBlockCount = browsedBlockCount + 1
+            end
+        end
+    end
+end
+equal(browsedBlockCount, #Registry.ListBlocks(),
+    "GUI sandbox lists every registered conversation block")
+local sandboxOpeningID =
+    "sandbox:block:projecthoomans:whats_up_basic_neutral:opening"
+equal(#sandboxDefinition.nodes[sandboxOpeningID].choices, 3,
+    "GUI sandbox exposes authored choices plus browser navigation")
+local sandboxRelationshipUpdate
+local sandboxSession = {
+    view = { extensionParts = { relationship = {
+        setRelationship = function(_, value)
+            sandboxRelationshipUpdate = value
+        end,
+    } } },
+}
+local sandboxChoice = sandboxDefinition.nodes[sandboxOpeningID].choices[1]
+sandboxChoice.action(nil, nil, sandboxSession)
+truth(sandboxChoice.response(), "GUI sandbox resolves an NPC response")
+equal(sandboxChoice.next(), sandboxDefinition.start,
+    "terminal sandbox outcome returns to the block browser")
+equal(sandboxDefinition.context.relationship.familiarity, before + 1,
+    "GUI sandbox updates only its cloned relationship")
+equal(debugContext.relationship.familiarity, before,
+    "GUI sandbox leaves debugger source context unchanged")
+equal(sandboxRelationshipUpdate.familiarity, before + 1,
+    "GUI sandbox refreshes the real relationship panel")
+local sandboxView = assert(PNC.ConversationDebugModel.OpenSandbox(
+    "projecthoomans:ask_about_basic_neutral",
+    debugContext
+))
+equal(sandboxView.start,
+    "sandbox:category:projecthoomans:ask_about",
+    "sandbox execution opens the actual GUI registry browser")
+
+local refreshedSpec
+definition.context.conversationLifecycleState = { token = "lease-persist" }
+definition.context.pendingConversationRequest = "category:pending"
+definition.context.activeConversationBlockID =
+    "projecthoomans:ask_about_basic_neutral"
+PsychopatzCore.Conversation.instance = {
+    spec = definition,
+    refreshConversationSpec = function(self, value)
+        refreshedSpec = value
+        self.spec = value
+        return true
+    end,
+}
+PNC.Network = { ClientState = {
+    playerContext = {
+        characterUUID = "character-alex",
+        forename = "Alex",
+        surname = "Mercer",
+        displayName = "Alex Mercer",
+    },
+    npcKnowledge = {
+        ["npc-12"] = {
+            npcID = "npc-12",
+            categories = { { descriptors = { {
+                descriptorID = "identity.name",
+                value = "Morgan Hale",
+                status = "confirmed",
+            } } } },
+        },
+    },
+    npcPresentations = {
+        ["npc-12"] = { state = "unknown", canAskName = true },
+    },
+} }
+truth(PNC.Conversation.ReceiveKnowledgeSnapshot({ npcID = "npc-12" }),
+    "identity refresh updates the active conversation")
+equal(refreshedSpec.context.conversationLifecycleState.token, "lease-persist",
+    "identity refresh preserves the conversation lease")
+equal(refreshedSpec.context.pendingConversationRequest, "category:pending",
+    "identity refresh preserves an in-flight category request")
+truth(refreshedSpec.nodes["block:opening"],
+    "identity refresh rebuilds the active authored block")
+equal(refreshedSpec.context.npcFullName, "Morgan Hale",
+    "persisted knowledge wins over a stale unknown presentation")
+for _, choice in ipairs(refreshedSpec.nodes.greeting.choices or {}) do
+    truth(choice.id ~= "ask_name",
+        "persisted identity does not offer Ask Name again")
+end
+PNC.Network = nil
+PsychopatzCore.Conversation.instance = nil
 
 local hostile = PNC.Conversation.BuildDefinition({
     id = "hostile", name = "Hostile",
@@ -232,8 +491,6 @@ equal(hostile.context.allowHostileParley, true, "hostile parley context")
 equal(hostile.nodes.greeting.choices[1].id, "ceasefire",
     "hostile block exposes ceasefire")
 
-local debugContext = PNC.ConversationDebugModel.DefaultContext()
-local before = debugContext.relationship.familiarity
 local sandbox = assert(PNC.ConversationDebugModel.ExecuteSandbox(
     "projecthoomans:whats_up_basic_neutral",
     "opening", "situation", debugContext

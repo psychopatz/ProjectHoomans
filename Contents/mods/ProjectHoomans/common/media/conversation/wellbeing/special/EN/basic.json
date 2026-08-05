@@ -1,5 +1,5 @@
 {
-  "opening": "They meet your eyes and answer honestly.",
+  "opening": "I'll be honest with you, {playerFirstName}. Ask.",
   "choice.condition": "How are you really doing?",
   "response.condition": "Better now that you're here.",
   "choice.offer_help": "Let me help.",

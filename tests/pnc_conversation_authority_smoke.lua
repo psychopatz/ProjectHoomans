@@ -180,6 +180,12 @@ equal(outcome.command, PNC.Const.CMD_CONVERSATION_OUTCOME,
     "outcome response command")
 equal(outcome.payload.success, true, "outcome success")
 equal(outcome.payload.outcomeID, "reply", "deterministic outcome")
+equal(outcome.payload.nextNodeID, "$root",
+    "built-in subtopic returns to the conversation menu")
+equal(outcome.payload.close, false,
+    "built-in subtopic does not close the conversation")
+equal(outcome.payload.closeReason, nil,
+    "non-terminal outcome has no close reason")
 equal(relationshipEffects, 1, "effect applied exactly once")
 local categoryHistory = History.Get(
     "category:projecthoomans:whats_up",
@@ -211,6 +217,8 @@ local accepted, reason = Authority.HandleCategory(player, {
 })
 equal(accepted, false, "forged lease rejected")
 equal(reason, "invalid_lease", "forged lease reason")
+equal(sent[#sent].payload.npcID, record.id,
+    "rejection identifies the conversation for client recovery")
 
 accepted, reason = Authority.HandleCategory(player, {
     requestID = "category-mismatch",
@@ -221,5 +229,7 @@ accepted, reason = Authority.HandleCategory(player, {
 })
 equal(accepted, false, "registry mismatch rejected")
 equal(reason, "registry_mismatch", "registry mismatch reason")
+equal(sent[#sent].payload.npcID, record.id,
+    "registry rejection identifies the active conversation")
 
 print("pnc_conversation_authority_smoke: ok")

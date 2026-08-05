@@ -1,5 +1,5 @@
 {
-  "opening": "They raise an eyebrow at the idea of bargaining with you.",
+  "opening": "With you, {playerFirstName}? Fine. Let's make a deal.",
   "choice.trade": "Want to trade?",
   "response.trade": "With you? We can probably skip the hard bargaining."
 }

@@ -673,7 +673,7 @@ function Relationships.ApplyConversationEffect(
         eventID = memoryID,
         worldAgeHours = at,
         familiarityDelta = tonumber(effect.familiarity) or 0,
-        moraleDelta = tonumber(effect.morale) or 0,
+        moraleDelta = 0,
         memory = {
             id = memoryID,
             type = "conversation_outcome",

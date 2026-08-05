@@ -7,12 +7,14 @@
   "button.hour": "Hour: {hour}",
   "button.approval_down": "Approval -5",
   "button.approval_up": "Approval +5",
+  "button.respect_down": "Respect -5",
+  "button.respect_up": "Respect +5",
   "button.familiarity_down": "Familiarity -5",
   "button.familiarity_up": "Familiarity +5",
   "button.skill": "Gate skill +1",
   "button.personality": "Gate personality +0.1",
   "button.history": "History uses: {uses}",
-  "button.simulate": "Sandbox Execute",
+  "button.simulate": "Open Sandbox Conversation",
   "status.valid": "valid",
   "status.invalid": "invalid",
   "status.text_ok": "text:ok",
@@ -37,5 +39,11 @@
   "sandbox.outcome": "SANDBOX outcome: {value}",
   "sandbox.roll": "SANDBOX roll: {roll}/{total}",
   "sandbox.relationship": "SANDBOX relationship {axis}: {before} -> {after}",
-  "sandbox.no_mutation": "SANDBOX persisted=false networked=false"
+  "sandbox.no_mutation": "SANDBOX persisted=false networked=false",
+  "sandbox.open_failed": "SANDBOX could not open: {reason}",
+  "sandbox.categories_prompt": "Sandbox registry: choose a conversation category ({count} runnable blocks).",
+  "sandbox.category_prompt": "Choose a registered {category} block ({count} total).",
+  "sandbox.block_choice": "{id} [{audiences}] — {status}",
+  "sandbox.back_to_blocks": "Back to this category's conversation blocks",
+  "sandbox.back_to_categories": "All conversation categories"
 }

@@ -15,6 +15,7 @@ local Backgrounds = Conversation.Backgrounds
 local Palette = PNC.NPCTypePalette
 local IdentityPresentation = PNC.NPCIdentityPresentation
 local Loader = Conversation.TextLoader
+local Registry = Conversation.Registry
 
 local SYSTEM_SOURCE = {
     modID = "ProjectHoomans",
@@ -28,6 +29,92 @@ local function systemText(key)
         key = key,
         domain = SYSTEM_SOURCE.domain,
     })
+end
+
+local function cleanName(value)
+    value = type(value) == "string" and value or nil
+    if not value then return nil end
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    return value ~= "" and value or nil
+end
+
+local function nameParts(fullName, firstName, lastName)
+    fullName = cleanName(fullName)
+    firstName = cleanName(firstName)
+    lastName = cleanName(lastName)
+    if not firstName and fullName then
+        firstName = string.match(fullName, "^(%S+)")
+    end
+    if not lastName and fullName then
+        lastName = string.match(fullName, "^%S+%s+(.+)$")
+    end
+    if not fullName then
+        fullName = table.concat({ firstName or "", lastName or "" }, " ")
+        fullName = cleanName(fullName)
+    end
+    return fullName, firstName, lastName
+end
+
+local function playerIdentity(player, clientState)
+    local context = clientState and clientState.playerContext or {}
+    local descriptor = player and player.getDescriptor
+        and player:getDescriptor() or nil
+    local firstName = context.forename
+        or descriptor and descriptor.getForename and descriptor:getForename()
+    local lastName = context.surname
+        or descriptor and descriptor.getSurname and descriptor:getSurname()
+    local fullName = context.displayName
+        or player and player.getDisplayName and player:getDisplayName()
+    return nameParts(fullName, firstName, lastName)
+end
+
+local function npcIdentity(entry, projection, displayedName)
+    local snapshot = projection and projection.snapshot
+        or entry and entry.snapshot or {}
+    local record = entry and entry.record or {}
+    local identity = snapshot.identity or record.identity or {}
+    local survivor = identity.survivor or snapshot.survivor
+        or record.survivor or {}
+    return nameParts(
+        displayedName,
+        survivor.forename or snapshot.forename or record.forename,
+        survivor.surname or snapshot.surname or record.surname
+    )
+end
+
+local function visibleIdentityArguments(
+    entry,
+    player,
+    projection,
+    clientState,
+    npcName,
+    npcKnown,
+    playerKnown
+)
+    local stranger = systemText("identity.stranger")
+    local playerFull, playerFirst, playerLast = playerIdentity(
+        player, clientState
+    )
+    local npcFull, npcFirst, npcLast = npcIdentity(
+        entry, projection, npcName
+    )
+    if not playerKnown then
+        playerFull, playerFirst, playerLast = stranger, stranger, stranger
+    end
+    if not npcKnown then
+        npcFull, npcFirst, npcLast = stranger, stranger, stranger
+    end
+    return {
+        playerName = playerFull or stranger,
+        playerFullName = playerFull or stranger,
+        playerFirstName = playerFirst or playerFull or stranger,
+        playerLastName = playerLast or "",
+        npcName = npcFull or stranger,
+        npcFullName = npcFull or stranger,
+        npcFirstName = npcFirst or npcFull or stranger,
+        npcLastName = npcLast or "",
+    }
 end
 
 local function roleLabel(value)
@@ -133,14 +220,15 @@ local function identityProjection(entry)
     local clientState = PNC.Network and PNC.Network.ClientState or {}
     local projection = clientState.npcPresentations
         and clientState.npcPresentations[npcID] or nil
-    local state = projection and projection.state
+    local learnedName = IdentityPresentation.GetFact(entry, "identity.name")
+    local state = learnedName and "known" or projection and projection.state
         or (not PNC.Network and IdentityPresentation.IsNameKnown(entry)
             and "known" or "loading")
     local name = state == "known"
-        and tostring(projection and projection.displayName
+        and tostring(learnedName and learnedName.value
+            or projection and projection.displayName
             or IdentityPresentation.GetName(entry))
-        or state == "loading" and systemText("status.loading")
-        or IdentityPresentation.UnknownName
+        or systemText("identity.stranger")
     return state, name, projection, clientState
 end
 
@@ -153,6 +241,16 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
     local blockContext = Composer.BuildContext(
         entry, player, timeID, relationshipID
     )
+    local identityArguments = visibleIdentityArguments(
+        entry,
+        player,
+        projection,
+        clientState,
+        name,
+        identityState == "known",
+        relationshipID ~= "FirstMeet"
+    )
+    Composer.SetIdentityArguments(blockContext, identityArguments)
     local presentationContext = {
         entry = entry,
         player = player,
@@ -170,6 +268,9 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         allowHostileParley = isAggressive(entry),
         conversationBlockContext = blockContext,
     }
+    for key, value in pairs(identityArguments) do
+        presentationContext[key] = value
+    end
     local askNameChoice
     if identityState == "unknown" and projection and projection.canAskName == true then
         askNameChoice = {
@@ -177,6 +278,7 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             text = {
                 key = "choice.ask_name",
                 domain = "pnc.system.shared.categories",
+                args = identityArguments,
             },
             action = function()
                 projection.state = "loading"
@@ -186,13 +288,11 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
     end
     local dossierChoice = {
         id = "view_dossier",
+        log = false,
         text = {
             key = "choice.view_dossier",
             domain = "pnc.system.shared.categories",
-        },
-        response = {
-            key = "response.view_dossier",
-            domain = "pnc.system.shared.categories",
+            args = identityArguments,
         },
         action = function() Relationship.OpenDossier(npcID) end,
         next = "greeting",
@@ -247,7 +347,12 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         },
         lifecycle = Lifecycle.Create(),
         start = "greeting",
-        nodes = { greeting = root },
+        nodes = {
+            greeting = root,
+            -- Returning from an authored subtopic must reveal the category
+            -- selector without replaying the opening greeting in the log.
+            menu = { choices = root.choices },
+        },
     }
 end
 
@@ -256,7 +361,13 @@ function Conversation.Open(entry, player, forcedTime)
     local state = PNC.Network and PNC.Network.ClientState
     if state then
         state.npcPresentations = state.npcPresentations or {}
-        state.npcPresentations[npcID] = { npcID = npcID, state = "loading" }
+        local current = state.npcPresentations[npcID]
+        if not current or current.state ~= "known" then
+            state.npcPresentations[npcID] = {
+                npcID = npcID,
+                state = "loading",
+            }
+        end
     end
     local definition = Conversation.BuildDefinition(entry, player, forcedTime)
     local view = PsychopatzCore.Conversation.Open(definition)
@@ -278,6 +389,27 @@ local function refreshForNPC(npcID)
     local updated = Conversation.BuildDefinition(
         context.entry, context.player, context.conversationTimeID
     )
+    local updatedContext = updated.context or {}
+    for _, key in ipairs({
+        "conversationLifecycleState",
+        "pendingConversationRequest",
+        "pendingConversationAutoChoice",
+        "activeConversationBlockID",
+        "lastConversationError",
+    }) do
+        if context[key] ~= nil then updatedContext[key] = context[key] end
+    end
+    updated.context = updatedContext
+    updated.lifecycle = view.spec.lifecycle or updated.lifecycle
+    local activeBlockID = context.activeConversationBlockID
+    local activeBlock = activeBlockID and Registry.GetBlock(activeBlockID) or nil
+    if activeBlock then
+        Composer.AttachBlock(
+            updated,
+            activeBlock,
+            updatedContext.conversationBlockContext
+        )
+    end
     return view.refreshConversationSpec
         and view:refreshConversationSpec(updated) == true
 end

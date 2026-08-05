@@ -1,5 +1,5 @@
 {
-  "opening": "They wait, sensing this matters.",
+  "opening": "I'm listening, {playerFirstName}. Say what you need to say.",
   "choice.us": "Can we talk about us?",
   "response.us": "Yes. We probably should.",
   "locked.approval": "This relationship is not close enough yet."

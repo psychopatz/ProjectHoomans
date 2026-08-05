@@ -106,6 +106,15 @@ function Lifecycle.Create()
             return nil
         end,
         finish = function(_, spec, state, reason)
+            if PNC.Core and PNC.Core.LogInfo then
+                PNC.Core.LogInfo(table.concat({
+                    "Conversation closed",
+                    "npc=" .. tostring(state and state.npcID
+                        or spec and spec.npcID or "unknown"),
+                    "token=" .. tostring(state and state.token or "none"),
+                    "reason=" .. tostring(reason or "closed"),
+                }, " "))
+            end
             if not state then return end
             if isNetworkClient() then
                 send(Scene.CMD_END, state, reason)

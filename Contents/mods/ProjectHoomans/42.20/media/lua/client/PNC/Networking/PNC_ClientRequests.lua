@@ -216,10 +216,13 @@ function Client.RequestNPCKnowledge(npcID)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     ClientState.lastNPCKnowledgeRequestAt = Core.Now()
     ClientState.npcPresentations = ClientState.npcPresentations or {}
-    ClientState.npcPresentations[npcID] = {
-        npcID = npcID, state = "loading", requestID = requestID("presentation"),
-    }
-    local args = ClientState.npcPresentations[npcID]
+    local existing = ClientState.npcPresentations[npcID]
+    local args = type(existing) == "table"
+        and Core.DeepCopy(existing) or { npcID = npcID, state = "loading" }
+    args.npcID = npcID
+    args.requestID = requestID("presentation")
+    if args.state ~= "known" then args.state = "loading" end
+    ClientState.npcPresentations[npcID] = args
     return dispatchIdentity(player, Const.CMD_NPC_PRESENTATION_REQUEST,
         { npcID = npcID, requestID = args.requestID }, "HandlePresentation")
 end

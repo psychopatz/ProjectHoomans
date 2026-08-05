@@ -1,5 +1,5 @@
 {
-  "opening": "They trust you enough not to dodge the question.",
+  "opening": "You can ask me anything, {playerFirstName}.",
   "choice.background": "Tell me something about your old life.",
   "response.background": "Only if you tell me something about yours afterward.",
   "choice.skills": "What are you proud of?",

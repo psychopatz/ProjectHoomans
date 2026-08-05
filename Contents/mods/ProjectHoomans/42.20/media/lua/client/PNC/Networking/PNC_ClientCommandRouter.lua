@@ -68,10 +68,37 @@ Internal.RegisterServerCommand(
 -- Both network replies (multiplayer) and direct in-process service calls
 -- (single-player) enter through this receiver.  Keeping cache mutation and UI
 -- invalidation here prevents the two topologies from drifting apart.
+local function identityNameFact(snapshot)
+    for _, category in ipairs(snapshot and snapshot.categories or {}) do
+        for _, descriptor in ipairs(category.descriptors or {}) do
+            if descriptor.descriptorID == "identity.name"
+                and descriptor.value ~= nil
+            then return descriptor end
+        end
+    end
+    return nil
+end
+
 function Internal.ApplyNPCKnowledgeSnapshot(snapshot, reason)
     if type(snapshot) == "table" and snapshot.npcID then
+        local npcID = tostring(snapshot.npcID)
         ClientState.npcKnowledge = ClientState.npcKnowledge or {}
-        ClientState.npcKnowledge[tostring(snapshot.npcID)] = snapshot
+        ClientState.npcKnowledge[npcID] = snapshot
+        local nameFact = identityNameFact(snapshot)
+        if nameFact then
+            ClientState.npcPresentations = ClientState.npcPresentations or {}
+            local presentation = ClientState.npcPresentations[npcID] or {}
+            presentation.npcID = npcID
+            presentation.state = "known"
+            presentation.canAskName = false
+            presentation.displayName = tostring(nameFact.value)
+            presentation.snapshot = snapshot
+            presentation.characterUUID = snapshot.characterUUID
+                or ClientState.playerContext
+                    and ClientState.playerContext.characterUUID
+            presentation.knowledgeRevision = tonumber(snapshot.revision) or 0
+            ClientState.npcPresentations[npcID] = presentation
+        end
     end
     ClientState.npcKnowledgeReason = reason
     ClientState.lastNPCKnowledgeReceiveAt = Core.Now()
@@ -134,6 +161,7 @@ Internal.RegisterServerCommand(Const.CMD_PLAYER_BOOTSTRAP, function(args)
     if args.context then ClientState.playerContext = args.context end
     if tonumber(args.chunkIndex) == 1 and projectionIsCurrent(args) then
         ClientState.npcKnowledge = {}
+        ClientState.npcPresentations = {}
         ClientState.bootstrapKnowledgeRevision = incomingRevision
     end
     if projectionIsCurrent(args) then

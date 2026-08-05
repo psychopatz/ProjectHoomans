@@ -138,6 +138,7 @@ function Authority.HandleCategory(player, args)
     if not ok then
         send(player, PNC.Const.CMD_CONVERSATION_BLOCK, {
             requestID = args.requestID, success = false, reason = reason,
+            npcID = tostring(args.npcID or ""),
         })
         return false, reason
     end
@@ -148,6 +149,7 @@ function Authority.HandleCategory(player, args)
             requestID = args.requestID,
             success = false,
             reason = "replayed_request",
+            npcID = tostring(args.npcID or ""),
         })
         return false, "replayed_request"
     end
@@ -155,13 +157,22 @@ function Authority.HandleCategory(player, args)
         send(player, PNC.Const.CMD_CONVERSATION_BLOCK, {
             requestID = args.requestID, success = false,
             reason = "registry_mismatch",
+            npcID = tostring(args.npcID or ""),
             registryFingerprint = Registry.GetFingerprint(),
         })
         return false, "registry_mismatch"
     end
     local context
     context, reason = Authority.BuildContext(player, record, args.token)
-    if not context then return false, reason end
+    if not context then
+        send(player, PNC.Const.CMD_CONVERSATION_BLOCK, {
+            requestID = args.requestID,
+            success = false,
+            reason = reason,
+            npcID = tostring(args.npcID or ""),
+        })
+        return false, reason
+    end
     local categoryEligible
     categoryEligible, reason = Selector.IsCategoryEligible(
         args.categoryID,
@@ -174,6 +185,7 @@ function Authority.HandleCategory(player, args)
             requestID = args.requestID,
             success = false,
             reason = reason,
+            npcID = tostring(args.npcID or ""),
             categoryID = args.categoryID,
         })
         return false, reason
@@ -189,6 +201,7 @@ function Authority.HandleCategory(player, args)
         send(player, PNC.Const.CMD_CONVERSATION_BLOCK, {
             requestID = args.requestID, success = false,
             reason = "no_eligible_block", categoryID = args.categoryID,
+            npcID = tostring(args.npcID or ""),
         })
         return false, "no_eligible_block"
     end
@@ -229,6 +242,7 @@ function Authority.HandleChoice(player, args)
             requestID = args.requestID,
             success = false,
             reason = "replayed_request",
+            npcID = tostring(args.npcID or ""),
         })
         return false, "replayed_request"
     end
@@ -243,6 +257,7 @@ function Authority.HandleChoice(player, args)
     if not ok then
         send(player, PNC.Const.CMD_CONVERSATION_OUTCOME, {
             requestID = args.requestID, success = false, reason = reason,
+            npcID = tostring(args.npcID or ""),
         })
         return false, reason
     end
@@ -250,7 +265,15 @@ function Authority.HandleChoice(player, args)
     local choice = Selector.GetChoice(block, state.nodeID, args.choiceID)
     local context
     context, reason = Authority.BuildContext(player, record, args.token)
-    if not context then return false, reason end
+    if not context then
+        send(player, PNC.Const.CMD_CONVERSATION_OUTCOME, {
+            requestID = args.requestID,
+            success = false,
+            reason = reason,
+            npcID = tostring(args.npcID or ""),
+        })
+        return false, reason
+    end
     context.blockID = block and block.id
     context.choiceID = choice and choice.id
     local eligible
@@ -260,6 +283,7 @@ function Authority.HandleChoice(player, args)
     if not eligible then
         send(player, PNC.Const.CMD_CONVERSATION_OUTCOME, {
             requestID = args.requestID, success = false, reason = reason,
+            npcID = tostring(args.npcID or ""),
         })
         return false, reason
     end
@@ -272,6 +296,7 @@ function Authority.HandleChoice(player, args)
             requestID = args.requestID,
             success = false,
             reason = "no_eligible_outcome",
+            npcID = tostring(args.npcID or ""),
         })
         return false, "no_eligible_outcome"
     end
@@ -281,6 +306,7 @@ function Authority.HandleChoice(player, args)
     if not ok then
         send(player, PNC.Const.CMD_CONVERSATION_OUTCOME, {
             requestID = args.requestID, success = false, reason = reason,
+            npcID = tostring(args.npcID or ""),
         })
         return false, reason
     end
@@ -304,6 +330,9 @@ function Authority.HandleChoice(player, args)
         responseKey = outcome.responseKey,
         nextNodeID = outcome.next,
         close = outcome.close == true,
+        closeReason = outcome.close == true and table.concat({
+            "authored_outcome", block.id, state.nodeID, choice.id, outcome.id,
+        }, ":") or nil,
         registryFingerprint = Registry.GetFingerprint(),
     }
     state.processed[args.requestID] = payload

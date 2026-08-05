@@ -109,6 +109,27 @@ local function payload(source, key, args)
     return Loader.Payload(source, key, args)
 end
 
+local function dialoguePayload(source, key, context, args)
+    local merged = {}
+    for name, value in pairs(context and context.textArgs or {}) do
+        merged[name] = value
+    end
+    for name, value in pairs(type(args) == "table" and args or {}) do
+        merged[name] = value
+    end
+    return payload(source, key, merged)
+end
+
+function Composer.SetIdentityArguments(context, values)
+    if type(context) ~= "table" then return false end
+    context.textArgs = {}
+    for name, value in pairs(type(values) == "table" and values or {}) do
+        context.textArgs[name] = value
+        context[name] = value
+    end
+    return true
+end
+
 local function ensureBlockText(block)
     return Loader.EnsureSource(
         block.textSource,
@@ -140,7 +161,7 @@ end
 
 local function sendRequest(command, payloadValue)
     if isClient and isClient() == true then
-        if not sendClientCommand then return false end
+        if not sendClientCommand then return false, "transport_unavailable" end
         sendClientCommand(PNC.Const.MODULE, command, payloadValue)
         return true
     end
@@ -155,7 +176,35 @@ local function sendRequest(command, payloadValue)
         }
         return true
     end
-    return false
+    return false, "authority_unavailable"
+end
+
+local function restoreCurrentChoices(view)
+    local session = view and view.session
+    if session and session.currentNode then
+        session:setChoices(session.currentNode.choices or {})
+    end
+end
+
+local function notifyFailure(view, key, reason)
+    if view and view.spec and view.spec.context then
+        view.spec.context.lastConversationError = tostring(reason or "unavailable")
+    end
+    local value = PsychopatzCore.Conversation.Text.Resolve(payload(
+        SYSTEM_SOURCE,
+        key,
+        { reason = tostring(reason or "unavailable") }
+    ))
+    local player = getSpecificPlayer and getSpecificPlayer(0)
+        or getPlayer and getPlayer() or nil
+    if player and HaloTextHelper and HaloTextHelper.addText then
+        HaloTextHelper.addText(player, value)
+    end
+    if PNC.Core and PNC.Core.LogWarn then
+        PNC.Core.LogWarn("Conversation request rejected: "
+            .. tostring(reason or "unavailable"))
+    end
+    restoreCurrentChoices(view)
 end
 
 function Composer.PumpLocalRequests()
@@ -177,29 +226,43 @@ end
 function Composer.RequestCategory(npcID, categoryID, autoChoiceID)
     local view = activeView(npcID)
     local lifecycle = lifecycleState(view)
-    if not view or not lifecycle then return false, "conversation_not_ready" end
+    if not view then return false, "conversation_not_ready" end
+    if not lifecycle then
+        notifyFailure(view, "status.block_unavailable", "conversation_not_ready")
+        return false, "conversation_not_ready"
+    end
     local id = requestID("category")
     view.spec.context.pendingConversationRequest = id
     view.spec.context.pendingConversationAutoChoice = autoChoiceID and {
         categoryID = categoryID,
         choiceID = autoChoiceID,
     } or nil
-    return sendRequest(PNC.Const.CMD_CONVERSATION_CATEGORY_REQUEST, {
+    local sent, reason = sendRequest(PNC.Const.CMD_CONVERSATION_CATEGORY_REQUEST, {
         requestID = id,
         npcID = tostring(npcID),
         token = lifecycle.token,
         categoryID = categoryID,
         registryFingerprint = Registry.GetFingerprint(),
     })
+    if not sent then
+        view.spec.context.pendingConversationRequest = nil
+        view.spec.context.pendingConversationAutoChoice = nil
+        notifyFailure(view, "status.block_unavailable", reason)
+    end
+    return sent, reason
 end
 
 function Composer.RequestChoice(npcID, blockID, nodeID, choiceID)
     local view = activeView(npcID)
     local lifecycle = lifecycleState(view)
-    if not view or not lifecycle then return false, "conversation_not_ready" end
+    if not view then return false, "conversation_not_ready" end
+    if not lifecycle then
+        notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
+        return false, "conversation_not_ready"
+    end
     local id = requestID("choice")
     view.spec.context.pendingConversationRequest = id
-    return sendRequest(PNC.Const.CMD_CONVERSATION_CHOICE_REQUEST, {
+    local sent, reason = sendRequest(PNC.Const.CMD_CONVERSATION_CHOICE_REQUEST, {
         requestID = id,
         npcID = tostring(npcID),
         token = lifecycle.token,
@@ -208,14 +271,25 @@ function Composer.RequestChoice(npcID, blockID, nodeID, choiceID)
         choiceID = choiceID,
         registryFingerprint = Registry.GetFingerprint(),
     })
+    if not sent then
+        view.spec.context.pendingConversationRequest = nil
+        notifyFailure(view, "status.choice_rejected", reason)
+    end
+    return sent, reason
 end
 
-local function lockedText(block, choice, reason)
+local function lockedText(block, choice, reason, context)
     local key = choice.lockedReasonKey or reason
-    if not key then return payload(block.textSource, choice.textKey) end
+    if not key then
+        return dialoguePayload(block.textSource, choice.textKey, context)
+    end
     local text = PsychopatzCore.Conversation.Text
-    local label = text.Resolve(payload(block.textSource, choice.textKey))
-    local explanation = text.Resolve(payload(block.textSource, key))
+    local label = text.Resolve(dialoguePayload(
+        block.textSource, choice.textKey, context
+    ))
+    local explanation = text.Resolve(dialoguePayload(
+        block.textSource, key, context
+    ))
     return { text = label .. " (" .. explanation .. ")" }
 end
 
@@ -233,8 +307,12 @@ function Composer.BuildBlockNode(block, nodeID, context)
             choices[#choices + 1] = {
                 id = selectedChoice.id,
                 text = passed
-                    and payload(block.textSource, selectedChoice.textKey)
-                    or lockedText(block, selectedChoice, reason),
+                    and dialoguePayload(
+                        block.textSource,
+                        selectedChoice.textKey,
+                        context
+                    )
+                    or lockedText(block, selectedChoice, reason, context),
                 enabled = passed,
                 action = passed and function()
                     Composer.RequestChoice(
@@ -248,9 +326,10 @@ function Composer.BuildBlockNode(block, nodeID, context)
         end
     end
     return {
-        npc = payload(
+        npc = dialoguePayload(
             block.textSource,
-            selectedTextKey(block, nodeID, node, context)
+            selectedTextKey(block, nodeID, node, context),
+            context
         ),
         choices = choices,
     }
@@ -268,13 +347,6 @@ function Composer.AttachBlock(spec, block, context)
     return true, "block:" .. block.entryNode
 end
 
-local function restoreCurrentChoices(view)
-    local session = view and view.session
-    if session and session.currentNode then
-        session:setChoices(session.currentNode.choices or {})
-    end
-end
-
 function Composer.ReceiveBlock(args)
     args = type(args) == "table" and args or {}
     local view = activeView(args.npcID)
@@ -284,20 +356,20 @@ function Composer.ReceiveBlock(args)
     end
     view.spec.context.pendingConversationRequest = nil
     if args.success ~= true then
-        if view.session then
-            view.session:append("npc", payload(SYSTEM_SOURCE,
-                "status.block_unavailable", {
-                    reason = tostring(args.reason or "unavailable"),
-                }))
-        end
-        restoreCurrentChoices(view)
+        notifyFailure(view, "status.block_unavailable", args.reason)
         return false, args.reason
     end
     local block = Registry.GetBlock(args.blockID)
     local context = view.spec.context.conversationBlockContext
-    if not block or not context then return false, "block_unavailable" end
+    if not block or not context then
+        notifyFailure(view, "status.block_unavailable", "block_unavailable")
+        return false, "block_unavailable"
+    end
     local attached, nodeID = Composer.AttachBlock(view.spec, block, context)
-    if not attached then return false, nodeID end
+    if not attached then
+        notifyFailure(view, "status.block_unavailable", nodeID)
+        return false, nodeID
+    end
     local automatic = view.spec.context.pendingConversationAutoChoice
     view.spec.context.pendingConversationAutoChoice = nil
     if automatic and automatic.categoryID == args.categoryID then
@@ -323,23 +395,42 @@ function Composer.ReceiveOutcome(args)
     view.spec.context.pendingConversationRequest = nil
     local session = view.session
     if args.success ~= true then
-        if session then
-            session:append("npc", payload(SYSTEM_SOURCE,
-                "status.choice_rejected", {
-                    reason = tostring(args.reason or "unavailable"),
-                }))
-        end
-        restoreCurrentChoices(view)
+        notifyFailure(view, "status.choice_rejected", args.reason)
         return false, args.reason
     end
     local block = Registry.GetBlock(args.blockID)
-    if not block or not session then return false end
+    if not block or not session then
+        notifyFailure(view, "status.choice_rejected", "block_unavailable")
+        return false, "block_unavailable"
+    end
+    local context = view.spec.context.conversationBlockContext
     if args.responseKey then
-        session:queueMessage("npc", payload(block.textSource, args.responseKey))
+        session:queueMessage("npc", dialoguePayload(
+            block.textSource,
+            args.responseKey,
+            context
+        ))
+    end
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(table.concat({
+            "Conversation outcome",
+            "npc=" .. tostring(args.npcID or "unknown"),
+            "block=" .. tostring(args.blockID or "unknown"),
+            "choice=" .. tostring(args.choiceID or "unknown"),
+            "outcome=" .. tostring(args.outcomeID or "unknown"),
+            "next=" .. tostring(args.nextNodeID or "none"),
+            "close=" .. tostring(args.close == true),
+            "reason=" .. tostring(args.closeReason or "continued"),
+        }, " "))
     end
     session.pendingClose = args.close == true
-    session.pendingNext = args.nextNodeID
-        and "block:" .. tostring(args.nextNodeID) or nil
+    session.pendingCloseReason = args.closeReason
+    if args.nextNodeID == "$root" then
+        session.pendingNext = "menu"
+    else
+        session.pendingNext = args.nextNodeID
+            and "block:" .. tostring(args.nextNodeID) or nil
+    end
     if #session.queue == 0 then session:finishPending() end
     return true
 end
@@ -365,6 +456,7 @@ local function categoryChoices(context)
                         selectedCategory.textSource,
                         selectedCategory.labelKey
                     ),
+                    log = false,
                     action = function()
                         Composer.RequestCategory(context.npcID, selectedCategory.id)
                     end,
@@ -385,9 +477,10 @@ function Composer.BuildGreeting(context)
     local valid, reason = ensureBlockText(block)
     if not valid then return nil, reason end
     local node = block.nodes[block.entryNode]
-    return payload(
+    return dialoguePayload(
         block.textSource,
-        selectedTextKey(block, block.entryNode, node, context)
+        selectedTextKey(block, block.entryNode, node, context),
+        context
     ), block
 end
 
@@ -401,7 +494,11 @@ function Composer.BuildRootNode(context, options)
         if choice then
             choices[#choices + 1] = {
                 id = "ceasefire",
-                text = payload(greetingBlock.textSource, choice.textKey),
+                text = dialoguePayload(
+                    greetingBlock.textSource,
+                    choice.textKey,
+                    context
+                ),
                 action = function()
                     Composer.RequestCategory(
                         context.npcID,
@@ -427,9 +524,14 @@ function Composer.BuildRootNode(context, options)
     if not goodbyeValid then return { npc = greeting, choices = choices } end
     choices[#choices + 1] = {
         id = "goodbye",
-        text = payload(GOODBYE_SOURCE, "choice.goodbye"),
-        response = payload(GOODBYE_SOURCE, "response.goodbye"),
+        text = dialoguePayload(
+            GOODBYE_SOURCE, "choice.goodbye", context
+        ),
+        response = dialoguePayload(
+            GOODBYE_SOURCE, "response.goodbye", context
+        ),
         close = true,
+        closeReason = "goodbye",
     }
     return { npc = greeting, choices = choices }
 end

@@ -1,5 +1,5 @@
 {
-  "opening": "They relax a little when you approach.",
+  "opening": "Hey, {playerFirstName}. What's on your mind?",
   "choice.situation": "What's the situation?",
   "response.situation": "Things are quiet. I'm more interested in how you're doing.",
   "choice.anything_else": "Anything else I should know?",

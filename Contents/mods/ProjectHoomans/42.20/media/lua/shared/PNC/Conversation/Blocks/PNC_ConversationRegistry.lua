@@ -339,6 +339,7 @@ function Registry.ValidateBlock(id, definition)
                                     outcomePath .. " requires next or close")
                             end
                             if outcome.next ~= nil
+                                and outcome.next ~= "$root"
                                 and not definition.nodes[outcome.next]
                             then addError(errors, outcomePath .. ".next is dangling") end
                             if outcome.next ~= nil and outcome.close == true then

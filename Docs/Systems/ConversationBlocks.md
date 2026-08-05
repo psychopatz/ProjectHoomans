@@ -93,10 +93,25 @@ The corresponding JSON bundle is a flat string map:
 }
 ```
 
+Dialogue text may use `{playerName}`, `{playerFullName}`, `{playerFirstName}`,
+`{playerLastName}`, `{npcName}`, `{npcFullName}`, `{npcFirstName}`, and
+`{npcLastName}`. Name values resolve from the authoritative character and NPC
+identity records. Until the observer knows that identity, every name form
+resolves to the translated `identity.stranger` string instead of leaking the
+hidden name. Learned NPC names are persisted by player-character UUID and are
+rehydrated into both the knowledge and conversation-presentation caches during
+bootstrap, so asking for a name is not repeated after restarting the save.
+
 Use `GetVersion()` and `GetCapabilities()` before depending on optional
 features. `GetCategory`, `GetBlock`, and list methods return copies; mutating
 them never changes the canonical registry. `ValidateBlock` can validate content
 before registration. Unregister and register again for a deliberate reload.
+
+Outcomes normally use `next = "node_id"` for an authored node or `close = true`
+for a terminal exchange. Project Hoomans also reserves `next = "$root"` to
+return to the ordered category menu after the NPC response. Built-in subtopics
+use this route, so choosing one does not end the whole conversation. `Goodbye`
+and explicitly terminal outcomes still close it.
 
 ## Gates, effects, and repetition
 
@@ -113,8 +128,12 @@ Repeat policies accept `scope` (`pair`, `character`, `npc`, or `world`),
 Built-in effects are `pnc:none`, `pnc:relationship`, `pnc:memory`,
 `pnc:knowledge_disclosure`, and `pnc:ceasefire`.
 Relationship effects route through the existing authoritative relationship and
-social-event service. Addon effects must provide separate `validate`, `apply`,
-and `simulate` callbacks:
+social-event service. Conversation relationship effects may change only the
+persistent directed `approval`, `respect`, and `familiarity` axes. They cannot
+award morale or `ADMIRE`, `PITY`, `FEAR`, or `DESPISE` directly. The relationship
+system derives those attitudes from the resulting Approval/Respect coordinates;
+recruitment remains a separate authoritative evaluation. Addon effects must
+provide separate `validate`, `apply`, and `simulate` callbacks:
 
 ```lua
 Conversations.RegisterConditionHandler("examplemod:has_radio", {
@@ -145,7 +164,23 @@ failure boundary; blocks themselves remain serialization-safe data.
 Open PsychopatzCore DebugHub and select **PNC Conversation Blocks**. The tool can
 search and filter blocks, browse node/choice/outcome trees, show schema and text
 diagnostics, explain gates, inspect deterministic rolls, edit a cloned context,
-and simulate effects without networking, persistence, or live-state mutation.
+and open the selected block's category in the real conversation GUI. The
+sandbox is a navigable registry browser: it lists every valid registered block,
+provides category/block/back navigation that is omitted from the dialogue log,
+and reveals gated authored choices as disabled rows with their reasons. Terminal
+outcomes loop back to the block browser so multiple graphs can be tested in one
+session. It uses the normal portrait, translated dialogue, authored choices,
+relationship quadrant, gate evaluation, deterministic outcomes, and cloned
+Approval/Respect/Familiarity state. Its conversation history is memory-only and
+its effects never use networking, persistence, an NPC lease, or live-state
+mutation.
+
+Every real conversation shutdown reaches the lifecycle with a reason such as
+`goodbye`, `escape`, `missing_node:<id>`, a safety interruption, or an
+`authored_outcome:<block>:<node>:<choice>:<outcome>` identifier. Build 42.20
+writes that reason with the NPC and lease token to the PNC log. Authoritative
+outcome routing is logged separately, including its block, choice, outcome,
+next node, terminal flag, and close reason.
 
 The server revalidates the lease token, distance/danger state, registry
 fingerprint, category, selected block, current node, choice, gates, history, and

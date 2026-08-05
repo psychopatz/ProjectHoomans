@@ -86,6 +86,8 @@ function ISPNCConversationDebugWindow:createChildren()
         { id = "time", title = tr("button.hour", { hour = 12 }) },
         { id = "approval_down", title = tr("button.approval_down") },
         { id = "approval_up", title = tr("button.approval_up") },
+        { id = "respect_down", title = tr("button.respect_down") },
+        { id = "respect_up", title = tr("button.respect_up") },
         { id = "familiarity_down", title = tr("button.familiarity_down") },
         { id = "familiarity_up", title = tr("button.familiarity_up") },
         { id = "skill", title = tr("button.skill") },
@@ -285,6 +287,9 @@ function ISPNCConversationDebugWindow:onAction(button)
     elseif id == "approval_down" or id == "approval_up" then
         self.context.relationship.approval = self.context.relationship.approval
             + (id == "approval_down" and -5 or 5)
+    elseif id == "respect_down" or id == "respect_up" then
+        self.context.relationship.respect = self.context.relationship.respect
+            + (id == "respect_down" and -5 or 5)
     elseif id == "familiarity_down" or id == "familiarity_up" then
         self.context.relationship.familiarity = self.context.relationship.familiarity
             + (id == "familiarity_down" and -5 or 5)
@@ -305,17 +310,12 @@ function ISPNCConversationDebugWindow:onAction(button)
         button:setTitle(tr("button.history", { uses = uses }))
     elseif id == "simulate" then
         local item = selected(self.blocks)
-        local inspection = item and Model.Inspect(item.id, self.context)
-        for _, node in ipairs(inspection and inspection.nodes or {}) do
-            for _, choice in ipairs(node.choices or {}) do
-                if choice.eligible then
-                    local result = Model.ExecuteSandbox(
-                        item.id, node.id, choice.id, self.context
-                    )
-                    self:refreshDetails(result)
-                    return
-                end
-            end
+        if not item then return end
+        local view, reason = Model.OpenSandbox(item.id, self.context)
+        if not view then
+            self:addDetail(tr("sandbox.open_failed", {
+                reason = tostring(reason or "unavailable"),
+            }))
         end
         return
     end

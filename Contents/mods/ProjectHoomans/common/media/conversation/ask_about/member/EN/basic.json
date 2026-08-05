@@ -1,5 +1,5 @@
 {
-  "opening": "They seem willing to share what they know.",
+  "opening": "Go ahead, {playerFirstName}. What do you want to ask about?",
   "choice.background": "Tell me about your old life.",
   "response.background": "It feels like someone else's life now.",
   "choice.skills": "What can you teach the group?",

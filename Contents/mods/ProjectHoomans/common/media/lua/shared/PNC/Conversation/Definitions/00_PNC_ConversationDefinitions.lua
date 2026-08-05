@@ -82,7 +82,7 @@ local continueChoice = function(id, effects)
         textKey = "choice." .. id,
         outcomes = {
             outcome("reply", "response." .. id, {
-                close = true,
+                next = "$root",
                 effects = effects,
             }),
         },

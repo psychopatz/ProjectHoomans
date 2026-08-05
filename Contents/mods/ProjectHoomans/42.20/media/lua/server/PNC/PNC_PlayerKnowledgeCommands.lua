@@ -104,6 +104,18 @@ function Commands.HandleBootstrap(player, args)
             context.characterUUID
         )
     end
+    if context and PNC.PlayerCharacters
+        and PNC.PlayerCharacters.GetRegistryRecord
+    then
+        local playerRecord = PNC.PlayerCharacters.GetRegistryRecord(
+            context.characterUUID
+        )
+        if playerRecord then
+            context.forename = playerRecord.forename
+            context.surname = playerRecord.surname
+            context.displayName = playerRecord.displayName
+        end
+    end
     local payload
     if not context then
         payload = { requestID = args.requestID, state = "error", reason = reason }
@@ -124,6 +136,9 @@ function Commands.HandleBootstrap(player, args)
         else
             for index = 1, #snapshots do
                 snapshots[index] = sanitizeSnapshot(snapshots[index])
+                snapshots[index].characterUUID = context.characterUUID
+                snapshots[index].accountKey = context.accountKey
+                snapshots[index].bindingRevision = context.bindingRevision
             end
             local chunkCount = math.max(1, math.ceil(
                 #snapshots / BOOTSTRAP_CHUNK_SIZE
