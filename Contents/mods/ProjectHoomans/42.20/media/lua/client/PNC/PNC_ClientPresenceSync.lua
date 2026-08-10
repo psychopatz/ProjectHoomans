@@ -26,7 +26,7 @@ Sync.lastLocalVisualMaintainAt = Sync.lastLocalVisualMaintainAt or 0
 
 require "PNC/PresenceSync/PNC_ClientPresenceRuntime"
 require "PNC/PresenceSync/PNC_ClientPresenceFacing"
-require "PNC/PresenceSync/PNC_ClientPresenceVisuals"
+require "PNC/PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals"
 require "PNC/PresenceSync/PNC_ClientPresenceBodies"
 require "PNC/PresenceSync/PNC_ClientNativePathController"
 require "PNC/PresenceSync/PNC_ClientZombieAggroController"

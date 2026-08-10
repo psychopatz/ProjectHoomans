@@ -12,7 +12,7 @@ local CLIENT_CONTROLLER =
     .. "PresenceSync/PNC_ClientNativePathController.lua"
 local CLIENT_VISUALS =
     "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
-    .. "PresenceSync/PNC_ClientPresenceVisuals.lua"
+    .. "PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals_Locomotion.lua"
 local ANIMATION =
     "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Visuals/PNC_Animation.lua"

@@ -1,6 +1,9 @@
-local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/"
+local LUA_ROOT =
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local FILE = LUA_ROOT .. "PNC/PresenceSync/PresenceVisuals/"
     .. "PNC_ClientPresenceVisuals.lua"
+
+package.path = LUA_ROOT .. "?.lua;" .. package.path
 
 local calls = {
     apply = 0,

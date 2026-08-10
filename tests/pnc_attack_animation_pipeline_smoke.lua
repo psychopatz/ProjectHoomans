@@ -1,7 +1,11 @@
 local ANIMATION =
     "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_Animation.lua"
-local CLIENT_SYNC =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/PNC_ClientPresenceVisuals.lua"
+local CLIENT_ATTACK =
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/"
+    .. "PresenceVisuals/PNC_ClientPresenceVisuals_Attack.lua"
+local CLIENT_MOTION =
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/"
+    .. "PresenceVisuals/PNC_ClientPresenceVisuals_ActionMotion.lua"
 local PATH_MOTION =
     "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/"
     .. "PNC_PathService/PNC_PathService_Motion.lua"
@@ -26,15 +30,11 @@ local function assertContains(value, needle, label)
 end
 
 local animation = readAll(ANIMATION)
-local clientSync = readAll(CLIENT_SYNC)
+local clientSync = readAll(CLIENT_ATTACK) .. readAll(CLIENT_MOTION)
 local pathMotion = readAll(PATH_MOTION)
 local attackXML = readAll(ATTACK_XML)
 local attackVariantXML = readAll(ATTACK_VARIANT_XML)
 local shoveVariantXML = readAll(SHOVE_VARIANT_XML)
-local clientAttackPresentation = assert(string.match(
-    clientSync,
-    "    attackKey =.-\n    specialKey ="
-))
 local combat = readAll(
     "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
         .. "PNC_Combat.lua"

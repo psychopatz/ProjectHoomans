@@ -1,9 +1,13 @@
 local VISUALS =
     "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Visuals/PNC_Visuals.lua"
-local CLIENT_VISUALS =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
-    .. "PresenceSync/PNC_ClientPresenceVisuals.lua"
+local LUA_ROOT =
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local CLIENT_VISUALS = LUA_ROOT
+    .. "PNC/PresenceSync/PresenceVisuals/"
+    .. "PNC_ClientPresenceVisuals.lua"
+
+package.path = LUA_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
