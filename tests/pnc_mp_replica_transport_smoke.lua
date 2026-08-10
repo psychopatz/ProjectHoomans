@@ -7,9 +7,14 @@ local CLIENT_TICK =
 local CLIENT_INIT =
     "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
     .. "00_PNC_Client_Init.lua"
-local CLIENT_CONTROLLER =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
-    .. "PresenceSync/PNC_ClientNativePathController.lua"
+local CLIENT_LUA_ROOT =
+    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local CLIENT_CONTROLLER_ROOT = CLIENT_LUA_ROOT
+    .. "PNC/PresenceSync/ClientNativePathController/"
+local CLIENT_CONTROLLER = CLIENT_CONTROLLER_ROOT
+    .. "PNC_ClientNativePathController.lua"
+
+package.path = CLIENT_LUA_ROOT .. "?.lua;" .. package.path
 local CLIENT_VISUALS =
     "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
     .. "PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals_Locomotion.lua"
@@ -520,7 +525,26 @@ local interpolationFile = io.open(
 assert(interpolationFile == nil,
     "legacy position interpolation module still exists")
 
-local controllerSource = readAll(CLIENT_CONTROLLER)
+local controllerSource = ""
+local controllerModules = {
+    "PNC_ClientNativePathController.lua",
+    "PNC_ClientNativePathController_Constants.lua",
+    "PNC_ClientNativePathController_State.lua",
+    "PNC_ClientNativePathController_Goal.lua",
+    "PNC_ClientNativePathController_Passage.lua",
+    "PNC_ClientNativePathController_Binding.lua",
+    "PNC_ClientNativePathController_Request.lua",
+    "PNC_ClientNativePathController_Update.lua",
+    "PNC_ClientNativePathController_Lifecycle.lua",
+}
+local controllerModuleIndex
+for controllerModuleIndex = 1, #controllerModules do
+    controllerSource = controllerSource
+        .. readAll(
+            CLIENT_CONTROLLER_ROOT
+                .. controllerModules[controllerModuleIndex]
+        )
+end
 assert(string.find(
         controllerSource,
         "Events.OnZombieUpdate.Add",

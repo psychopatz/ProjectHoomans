@@ -28,7 +28,7 @@ require "PNC/PresenceSync/PNC_ClientPresenceRuntime"
 require "PNC/PresenceSync/PNC_ClientPresenceFacing"
 require "PNC/PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals"
 require "PNC/PresenceSync/PNC_ClientPresenceBodies"
-require "PNC/PresenceSync/PNC_ClientNativePathController"
+require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController"
 require "PNC/PresenceSync/PNC_ClientZombieAggroController"
 require "PNC/PresenceSync/PNC_ClientPresenceTick"
 
