@@ -15,14 +15,37 @@ PNC.ClientPresenceSync.Internal =
 local Sync = PNC.ClientPresenceSync
 local Internal = Sync.Internal
 local Core = PNC.Core
+local Const = PNC.Const or {}
 local LiveBodyControl = PNC.LiveBodyControl
 local Network = PNC.Network
 
-local RETRY_DELAY_MS = 500
-local MAX_RETRIES = 3
 local CONTROLLER_CHECK_MS = 250
-local ROUTE_TIMEOUT_MS = 15000
 local PROGRESS_EPSILON_SQ = 0.0025
+local STALL_TIMEOUT_MS = math.max(
+    1500,
+    tonumber(Const and Const.CLIENT_NATIVE_PATH_STALL_MS)
+        or 3000
+)
+local RETRY_BASE_MS = math.max(
+    250,
+    tonumber(Const and Const.CLIENT_NATIVE_PATH_RETRY_BASE_MS)
+        or 350
+)
+local RETRY_MAX_MS = math.max(
+    RETRY_BASE_MS,
+    tonumber(Const and Const.CLIENT_NATIVE_PATH_RETRY_MAX_MS)
+        or 4000
+)
+local REQUEST_GRACE_MS = math.max(
+    500,
+    tonumber(Const and Const.CLIENT_NATIVE_PATH_REQUEST_GRACE_MS)
+        or 900
+)
+local MOVEMENT_LEASE_MS = math.max(
+    250,
+    tonumber(Const and Const.CLIENT_NATIVE_MOVEMENT_LEASE_MS)
+        or 750
+)
 
 Sync.NativePathStateByBody =
     Sync.NativePathStateByBody or {}
@@ -87,38 +110,114 @@ end
 
 local function clearOwnedPath(body, state)
     local behavior
-    if not body or not state or state.owned ~= true then
+    local leaseKey
+    if not body or not state then
         return
     end
-    behavior = body.getPathFindBehavior2
-        and body:getPathFindBehavior2() or nil
-    if behavior then
-        if behavior.cancel then
-            behavior:cancel()
+    leaseKey = state.leaseKey
+    if state.owned == true then
+        behavior = body.getPathFindBehavior2
+            and body:getPathFindBehavior2() or nil
+        if behavior then
+            if behavior.cancel then
+                behavior:cancel()
+            end
+            if behavior.reset then
+                behavior:reset()
+            end
         end
-        if behavior.reset then
-            behavior:reset()
+        if body.setPath2 then
+            body:setPath2(nil)
+        end
+        local actionState = body.getActionStateName
+            and string.lower(tostring(
+                body:getActionStateName() or ""
+            ))
+            or ""
+        if actionState == "pathfind"
+            and body.changeState
+            and ZombieIdleState
+            and ZombieIdleState.instance
+        then
+            body:changeState(ZombieIdleState.instance())
         end
     end
-    if body.setPath2 then
+    if LiveBodyControl
+        and LiveBodyControl.EndNativeMovementLease
+    then
+        LiveBodyControl.EndNativeMovementLease(
+            body,
+            leaseKey
+        )
+    end
+    state.owned = false
+    state.leaseKey = nil
+    state.requestKey = nil
+    state.completed = false
+    state.failed = false
+end
+
+local function beginMovementLease(body, state, key, now)
+    state.leaseKey = key
+    if LiveBodyControl
+        and LiveBodyControl.BeginNativeMovementLease
+    then
+        LiveBodyControl.BeginNativeMovementLease(
+            body,
+            key,
+            now,
+            MOVEMENT_LEASE_MS
+        )
+    elseif body and body.setUseless then
+        body:setUseless(false)
+    end
+end
+
+local function finishOwnedPath(body, state, behavior)
+    local leaseKey = state and state.leaseKey or nil
+    if behavior then
+        if behavior.cancel then behavior:cancel() end
+        if behavior.reset then behavior:reset() end
+    end
+    if body and body.setPath2 then
         body:setPath2(nil)
     end
-    local actionState = body.getActionStateName
+    if LiveBodyControl
+        and LiveBodyControl.EndNativeMovementLease
+    then
+        LiveBodyControl.EndNativeMovementLease(
+            body,
+            leaseKey
+        )
+    end
+    state.owned = false
+    state.leaseKey = nil
+    state.completed = true
+    state.failed = false
+end
+
+local function nativeActionOwnsMovement(body)
+    local actionState = body
+        and body.getActionStateName
         and string.lower(tostring(
             body:getActionStateName() or ""
         ))
         or ""
-    if actionState == "pathfind"
-        and body.changeState
-        and ZombieIdleState
-        and ZombieIdleState.instance
-    then
-        body:changeState(ZombieIdleState.instance())
-    end
-    state.owned = false
-    state.requestKey = nil
-    state.completed = false
-    state.failed = false
+    return actionState == "pathfind"
+        or actionState == "climbfence"
+        or actionState == "climbwindow"
+        or actionState == "climbwall"
+end
+
+local function retryDelay(state)
+    local retries = math.max(
+        0,
+        math.min(4, tonumber(state and state.retries) or 0)
+    )
+    return math.min(
+        RETRY_MAX_MS,
+        RETRY_BASE_MS * (2 ^ retries)
+    )
 end
 
 local function hasBodyActionLock(body)
@@ -250,6 +349,7 @@ function Internal.BindNativePathSnapshot(snapshot, body, now)
         or (Core.Now and Core.Now() or 0)
     local state = ensureState(body)
     local goal = buildGoal(snapshot, body)
+    local key = goal and requestKey(snapshot, goal) or nil
     state.snapshot = snapshot
     state.lastSeenAt = now
     state.releasePending = false
@@ -269,6 +369,23 @@ function Internal.BindNativePathSnapshot(snapshot, body, now)
         )
     then
         clearOwnedPath(body, state)
+    end
+    if goal
+        and (
+            state.requestKey ~= key
+            or state.owned == true
+        )
+    then
+        beginMovementLease(body, state, key, now)
+    elseif not goal
+        and LiveBodyControl
+        and LiveBodyControl.EndNativeMovementLease
+    then
+        LiveBodyControl.EndNativeMovementLease(
+            body,
+            state.leaseKey
+        )
+        state.leaseKey = nil
     end
     if (goal or hasBodyActionLock(body))
         and LiveBodyControl
@@ -309,17 +426,6 @@ function Internal.UpdateNativePathController(
         clearOwnedPath(body, state)
         return false, "native_goal_inactive"
     end
-    if LiveBodyControl
-        and LiveBodyControl.SetManagedBodyUseless
-    then
-        LiveBodyControl.SetManagedBodyUseless(
-            body,
-            false,
-            true
-        )
-    elseif body.setUseless then
-        body:setUseless(false)
-    end
     if state.localController == nil
         or now >= (
             tonumber(state.nextControllerCheckAt) or 0
@@ -331,8 +437,11 @@ function Internal.UpdateNativePathController(
             now + CONTROLLER_CHECK_MS
     end
     if state.localController ~= true then
-        if state.owned == true then
+        local wasOwned = state.owned == true
+        if wasOwned or state.leaseKey ~= nil then
             clearOwnedPath(body, state)
+        end
+        if wasOwned then
             logState(
                 snapshot,
                 "native_controller_release",
@@ -345,6 +454,9 @@ function Internal.UpdateNativePathController(
     local behavior = body.getPathFindBehavior2
         and body:getPathFindBehavior2() or nil
     if not behavior or not body.pathToLocationF then
+        if state.owned == true or state.leaseKey ~= nil then
+            clearOwnedPath(body, state)
+        end
         return false, "native_path_api_unavailable"
     end
 
@@ -353,7 +465,6 @@ function Internal.UpdateNativePathController(
         state.requestKey ~= key
         or (
             state.failed == true
-            and state.retries < MAX_RETRIES
             and now >= (tonumber(state.retryAt) or 0)
         )
     if shouldRequest then
@@ -385,6 +496,7 @@ function Internal.UpdateNativePathController(
         state.lastX = body:getX()
         state.lastY = body:getY()
         state.lastZ = body:getZ()
+        beginMovementLease(body, state, key, now)
         logState(
             snapshot,
             "native_controller_start",
@@ -402,11 +514,15 @@ function Internal.UpdateNativePathController(
             or "native_path_retry_wait"
     end
 
+    if state.owned == true then
+        beginMovementLease(body, state, key, now)
+    end
+
     rememberProgress(body, state, now)
     if distanceToGoalSquared(body, goal)
         <= goal.stopDistance * goal.stopDistance
     then
-        state.completed = true
+        finishOwnedPath(body, state, behavior)
         logState(
             snapshot,
             "native_controller_complete",
@@ -414,19 +530,49 @@ function Internal.UpdateNativePathController(
         )
         return true, "native_path_succeeded"
     end
-    if now - (tonumber(state.lastProgressAt) or now)
-        >= ROUTE_TIMEOUT_MS
+    if nativeActionOwnsMovement(body) then
+        local actionState = string.lower(tostring(
+            body:getActionStateName() or ""
+        ))
+        if actionState ~= "pathfind" then
+            state.lastProgressAt = now
+        end
+    end
+    local hasPath = body.getPath2
+        and body:getPath2() ~= nil or false
+    local requestDropped = state.owned == true
+        and now - (tonumber(state.startedAt) or now)
+            >= REQUEST_GRACE_MS
+        and not hasPath
+        and not nativeActionOwnsMovement(body)
+    if requestDropped
+        or now - (tonumber(state.lastProgressAt) or now)
+            >= STALL_TIMEOUT_MS
     then
         if behavior.cancel then behavior:cancel() end
         if behavior.reset then behavior:reset() end
         if body.setPath2 then body:setPath2(nil) end
+        if LiveBodyControl
+            and LiveBodyControl.EndNativeMovementLease
+        then
+            LiveBodyControl.EndNativeMovementLease(
+                body,
+                state.leaseKey
+            )
+        end
         state.failed = true
         state.owned = false
-        state.retryAt = now + RETRY_DELAY_MS
+        state.leaseKey = nil
+        state.retryAt = now + retryDelay(state)
         logState(
             snapshot,
             "native_controller_failed",
-            "revision=" .. tostring(goal.revision)
+            "reason=" .. tostring(
+                requestDropped
+                    and "engine_request_dropped"
+                    or "movement_stalled"
+            )
+                .. " revision=" .. tostring(goal.revision)
                 .. " retry=" .. tostring(state.retries)
                 .. describeBody(body)
         )

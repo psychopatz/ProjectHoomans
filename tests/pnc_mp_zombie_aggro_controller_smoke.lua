@@ -150,7 +150,7 @@ assert(pathRequests == 1,
     "unchanged NPC destination ignored pursuit refresh throttle")
 
 npcBody.x = 2
-now = 1500
+now = 1600
 registered(zombie)
 assert(pathRequests == 2,
     "coordinate pursuit stopped outside bite range")
@@ -159,7 +159,7 @@ assert(target == nil and attackedBy == nil
     "MP pursuit bound the IsoZombie NPC as a character target")
 
 npcBody.x = 0.8
-now = 1900
+now = 2000
 registered(zombie)
 assert(pathRequests == 2 and faced == 1,
     "bite-range pursuit submitted another path instead of facing")
@@ -169,7 +169,7 @@ assert(forbiddenCharacterCalls == 0,
 playerIsTarget = true
 player.x = 0.5
 target = nil
-now = 2000
+now = 2200
 registered(zombie)
 assert(pathRequests == 2 and target == nil,
     "closer live player target was incorrectly replaced")
@@ -178,7 +178,7 @@ assert(noLunge == false,
 
 playerIsTarget = false
 managed = true
-now = 2300
+now = 2400
 registered(zombie)
 assert(pathRequests == 2,
     "managed NPC body entered vanilla zombie aggro control")

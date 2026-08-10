@@ -14,6 +14,9 @@ local Core = PNC.Core
 local SUPPRESSION_AUDIO_COOLDOWN_MS = 250
 local NEXT_AUDIO_SUPPRESSION_AT = setmetatable({}, { __mode = "k" })
 local SAFETY_REPAIR_LOGGED = setmetatable({}, { __mode = "k" })
+local NATIVE_MOVEMENT_LEASE_KEY = "PNC_NativeMovementLease"
+local NATIVE_MOVEMENT_LEASE_UNTIL_KEY =
+    "PNC_NativeMovementLeaseUntil"
 local ZOMBIE_VOICE_SOUNDS = {
     "FemaleZombieVoiceA",
     "FemaleZombieVoiceB",
@@ -254,6 +257,88 @@ function LiveBodyControl.SetManagedBodyUseless(
     return desiredUseless
 end
 
+function LiveBodyControl.BeginNativeMovementLease(
+    zombie,
+    leaseKey,
+    now,
+    durationMs
+)
+    local modData
+    if not zombie or not zombie.getModData then
+        return false
+    end
+    now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
+    durationMs = math.max(
+        250,
+        tonumber(durationMs)
+            or tonumber(PNC.Const and PNC.Const.CLIENT_NATIVE_MOVEMENT_LEASE_MS)
+            or 750
+    )
+    modData = zombie:getModData()
+    if not modData then
+        return false
+    end
+    modData[NATIVE_MOVEMENT_LEASE_KEY] =
+        tostring(leaseKey or "native_path")
+    modData[NATIVE_MOVEMENT_LEASE_UNTIL_KEY] =
+        now + durationMs
+    LiveBodyControl.SetManagedBodyUseless(
+        zombie,
+        false,
+        true
+    )
+    return true
+end
+
+function LiveBodyControl.EndNativeMovementLease(
+    zombie,
+    leaseKey
+)
+    local modData
+    if not zombie or not zombie.getModData then
+        return false
+    end
+    modData = zombie:getModData()
+    if not modData then
+        return false
+    end
+    if leaseKey ~= nil
+        and modData[NATIVE_MOVEMENT_LEASE_KEY] ~= nil
+        and tostring(modData[NATIVE_MOVEMENT_LEASE_KEY])
+            ~= tostring(leaseKey)
+    then
+        return false
+    end
+    modData[NATIVE_MOVEMENT_LEASE_KEY] = nil
+    modData[NATIVE_MOVEMENT_LEASE_UNTIL_KEY] = nil
+    return true
+end
+
+function LiveBodyControl.HasNativeMovementLease(zombie, now)
+    local modData
+    local leaseKey
+    local leaseUntil
+    if not zombie or not zombie.getModData then
+        return false
+    end
+    modData = zombie:getModData()
+    leaseKey = modData and modData[NATIVE_MOVEMENT_LEASE_KEY]
+        or nil
+    if leaseKey == nil then
+        return false
+    end
+    now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
+    leaseUntil = tonumber(
+        modData[NATIVE_MOVEMENT_LEASE_UNTIL_KEY]
+    ) or 0
+    if now <= leaseUntil then
+        return true
+    end
+    modData[NATIVE_MOVEMENT_LEASE_KEY] = nil
+    modData[NATIVE_MOVEMENT_LEASE_UNTIL_KEY] = nil
+    return false
+end
+
 function LiveBodyControl.SuppressVanillaIntent(
     zombie,
     keepEngineMovementActive
@@ -465,6 +550,12 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
         and zombie:getModData()
         or nil
     local now = Core and Core.Now and Core.Now() or 0
+    -- The nearest multiplayer client owns PathFindState for replicated
+    -- IsoZombie bodies. That body-local lease is authoritative for the Java
+    -- action graph even though the client does not own NPC decisions.
+    if LiveBodyControl.HasNativeMovementLease(zombie, now) then
+        return true
+    end
     -- MP replicas own their local animation ActionContext even though they do
     -- not own combat decisions. Honor that body-local lease before applying
     -- the authority-only restriction used by navigation records.

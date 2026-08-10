@@ -457,7 +457,13 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                                 destX = destSquare:getX() + 0.5
                                 destY = destSquare:getY() + 0.5
                                 destZ = destSquare:getZ()
-                                if not improvesGoalDistance(fromX, fromY, destX, destY, goalX, goalY) then
+                                -- A blocked edge reported by the pathfinder is
+                                -- stronger evidence than the goal-distance
+                                -- heuristic. Building traversal can require a
+                                -- brief sideways or backward window crossing.
+                                if object ~= blockedPassage
+                                    and not improvesGoalDistance(fromX, fromY, destX, destY, goalX, goalY)
+                                then
                                     if Internal.noteTraversalAttempt then
                                         Internal.noteTraversalAttempt(lane, "window_climb", actionKey, fromX, fromY, fromZ, destX, destY, destZ, now, lane and lane.goalRevision or 0)
                                     end
@@ -537,7 +543,11 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
         landingZ = landingSquare:getZ()
         fenceSquare = fence.square
         fenceKey = "fence:" .. Internal.describeSquare(fenceSquare)
-        if not improvesGoalDistance(fromX, fromY, landingX, landingY, goalX, goalY) then
+        -- Trust an exact blocked edge at fence corners even when its landing
+        -- tile does not immediately approach the final goal.
+        if not blockedFence
+            and not improvesGoalDistance(fromX, fromY, landingX, landingY, goalX, goalY)
+        then
             logTraversalReject(record, zombie, lane, "traversal_rejected", "fence_not_progressive", "object=" .. tostring(fenceKey))
             return false, nil
         end

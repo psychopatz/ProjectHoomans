@@ -115,13 +115,26 @@ getWorld = function()
     }
 end
 
-local nativeZombieUpdateHandler
+local zombieUpdateHandlers = {}
+local function runZombieUpdates(candidate)
+    local index
+    for index = 1, #zombieUpdateHandlers do
+        zombieUpdateHandlers[index](candidate)
+    end
+end
 Events = {
     OnZombieUpdate = {
         Add = function(handler)
-            nativeZombieUpdateHandler = handler
+            zombieUpdateHandlers[#zombieUpdateHandlers + 1] = handler
         end,
-        Remove = function() end,
+        Remove = function(handler)
+            local index
+            for index = #zombieUpdateHandlers, 1, -1 do
+                if zombieUpdateHandlers[index] == handler then
+                    table.remove(zombieUpdateHandlers, index)
+                end
+            end
+        end,
     },
     OnGameStart = {
         Add = function() end,
@@ -211,13 +224,13 @@ assert(
     ),
     "presence tick did not bind the delegated native goal"
 )
-assert(nativeZombieUpdateHandler,
+assert(#zombieUpdateHandlers == 2,
     "native path controller was not registered on OnZombieUpdate")
 body.target = localPlayer
 body.targetSeenTime = 12
 body.eatBodyTarget = localPlayer
 body.aggroCleared = false
-nativeZombieUpdateHandler(body)
+runZombieUpdates(body)
 assert(requestCount == 1 and updateCount == 0,
     "nearest MP client did not start movement in zombie update context")
 PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
@@ -225,7 +238,7 @@ PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
     body,
     clientNow + 16
 )
-nativeZombieUpdateHandler(body)
+runZombieUpdates(body)
 assert(requestCount == 1,
     "unchanged delegated goal was submitted more than once")
 assert(updateCount == 0,
@@ -246,7 +259,7 @@ localPlayer.y = 200
 remotePlayer.x = 1
 remotePlayer.y = 1
 clientNow = 1300
-nativeZombieUpdateHandler(body)
+runZombieUpdates(body)
 assert(cancelCount == 1 and resetCount == 1,
     "controller handoff did not release the previous local path")
 
@@ -280,7 +293,7 @@ assert(cancelCount == 2 and resetCount == 2,
 assert(useless == false,
     "attack action lease did not keep the MP action context active")
 local requestsBeforeAttackUpdate = requestCount
-nativeZombieUpdateHandler(body)
+runZombieUpdates(body)
 assert(requestCount == requestsBeforeAttackUpdate,
     "MP zombie update started movement during the attack action lease")
 assert(useless == false,
@@ -306,9 +319,48 @@ assert(
     ),
     "post-attack movement bypassed the body-local bump tail"
 )
-nativeZombieUpdateHandler(body)
+runZombieUpdates(body)
 assert(requestCount == requestsBeforeAttackUpdate,
     "native path started before the local bump lifecycle exited")
+
+bodyModData.PNC_BumpActionLease = nil
+bodyModData.PNC_BumpActionLeaseUntil = nil
+localPlayer.x = 0
+localPlayer.y = 0
+remotePlayer.x = 100
+remotePlayer.y = 100
+clientNow = 2000
+local retrySnapshot = {
+    id = snapshot.id,
+    liveBodyLease = snapshot.liveBodyLease,
+    visualState = {
+        nativeMoveActive = true,
+        attackActive = false,
+        nativeMoveX = 8,
+        nativeMoveY = 4,
+        nativeMoveZ = 0,
+        nativeMoveRevision = 5,
+    },
+}
+assert(PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
+    retrySnapshot,
+    body,
+    clientNow
+), "retry path did not bind")
+runZombieUpdates(body)
+local requestsBeforeRetries = requestCount
+local attempt
+for attempt = 1, 5 do
+    body.actionState = "idle"
+    clientNow = clientNow + 1000
+    runZombieUpdates(body)
+    clientNow = clientNow + 5000
+    runZombieUpdates(body)
+end
+assert(requestCount == requestsBeforeRetries + 5,
+    "same native goal stopped retrying after repeated engine drops")
+assert(useless == false,
+    "retrying native movement lost its multiplayer movement lease")
 
 local tickSource = readAll(CLIENT_TICK)
 assert(not string.find(
