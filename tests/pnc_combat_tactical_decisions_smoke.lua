@@ -1,4 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+local ROOT = SHARED_ROOT .. "PNC/Core/"
+package.path = SHARED_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -158,7 +160,7 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Combat/PNC_Combat_Tactics.lua")
+dofile(ROOT .. "Combat/CombatTactics/PNC_Combat_Tactics.lua")
 
 local function makeRecord(id)
     return {
