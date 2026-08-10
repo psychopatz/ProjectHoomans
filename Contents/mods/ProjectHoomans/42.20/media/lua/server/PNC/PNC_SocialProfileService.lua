@@ -16,6 +16,7 @@ local Generator = PNC.SocialProfileGenerator
 local ProfileMath = PNC.SocialProfileMath
 local SocialTraits = PNC.SocialTraits
 local RelationshipTypes = PNC.RelationshipTypes
+local CoreTraits = PsychopatzCore and PsychopatzCore.Traits
 
 SocialProfiles.RuntimePlayers = SocialProfiles.RuntimePlayers
     or setmetatable({}, { __mode = "k" })
@@ -91,6 +92,9 @@ local function extractTraitID(trait)
 end
 
 local function extractTraitSet(player)
+    if CoreTraits and CoreTraits.ReadPlayer then
+        return CoreTraits.ReadPlayer(player, "ProjectHoomans.Social")
+    end
     local characterTraits = call(player, "getCharacterTraits")
     local known = call(characterTraits, "getKnownTraits")
     local output = {}
@@ -99,7 +103,7 @@ local function extractTraitSet(player)
     local trait
     local id
     if not known then
-        return output
+        return output, "ready"
     end
     size = call(known, "size")
     if size ~= nil and known.get then
@@ -114,7 +118,7 @@ local function extractTraitSet(player)
                 end
             end
         end
-        return output
+        return output, "ready"
     end
     for _, trait in pairs(known) do
         id = extractTraitID(trait)
@@ -122,7 +126,7 @@ local function extractTraitSet(player)
             output[id] = true
         end
     end
-    return output
+    return output, "ready"
 end
 
 local function logProfile(kind, fields)
@@ -200,9 +204,10 @@ function SocialProfiles.ResolvePlayerProfile(player, at)
     current = ProfileTypes.NormalizePlayerSocialProfile(
         record and record.socialProfile
     )
-    resolved, conflicts, fingerprint = SocialTraits.ResolveTraits(
-        extractTraitSet(player)
-    )
+    local traitSet
+    traitSet, reason = extractTraitSet(player)
+    if not traitSet then return nil, reason or "traits_not_ready" end
+    resolved, conflicts, fingerprint = SocialTraits.ResolveTraits(traitSet)
     if current.resolvedAt > 0
         and SocialTraits.Fingerprint(current.sourceTraits)
             == fingerprint

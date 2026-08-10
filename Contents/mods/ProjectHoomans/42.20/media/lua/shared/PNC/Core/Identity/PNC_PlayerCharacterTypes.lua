@@ -70,6 +70,51 @@ function Types.IsValidUUID(value)
     return Types.NormalizeUUID(value) ~= nil
 end
 
+function Types.NormalizeStartingCompanionGrant(value)
+    if type(value) ~= "table" then return nil end
+    local status = tostring(value.status or "")
+    if status ~= "pending" and status ~= "granted" and status ~= "none" then
+        return nil
+    end
+    return {
+        status = status,
+        traitID = optionalString(value.traitID),
+        relationshipKind = optionalString(value.relationshipKind),
+        npcID = optionalString(value.npcID),
+        selectedAt = timestamp(value.selectedAt, 0),
+        grantedAt = timestamp(value.grantedAt, 0),
+        enrichmentVersion = revision(value.enrichmentVersion),
+    }
+end
+
+function Types.NormalizeStartingCompanionState(value)
+    local output = { resolved = false, grants = {} }
+    if type(value) ~= "table" then return output end
+    output.resolved = value.resolved == true
+    local source = type(value.grants) == "table" and value.grants or {}
+    local traitID
+    local grant
+    for key, item in pairs(source) do
+        grant = Types.NormalizeStartingCompanionGrant(item)
+        traitID = optionalString(grant and (grant.traitID or key))
+        if grant and traitID and grant.status ~= "none" then
+            grant.traitID = traitID
+            output.grants[traitID] = grant
+        end
+    end
+    -- Version 5 stored one grant directly. Promote it without spawning a
+    -- duplicate when the registry is normalized after this update.
+    grant = Types.NormalizeStartingCompanionGrant(value)
+    traitID = optionalString(grant and grant.traitID)
+    if grant and grant.status == "none" then
+        output.resolved = true
+    elseif grant and traitID then
+        output.resolved = true
+        output.grants[traitID] = grant
+    end
+    return output
+end
+
 function Types.NewRegistry()
     return {
         schemaVersion = Constants.REGISTRY_SCHEMA_VERSION,
@@ -149,6 +194,9 @@ function Types.NewCharacterRecord(spec)
         conduct = ConductTypes
             and ConductTypes.NormalizeConductRecord(spec.conduct)
             or nil,
+        startingCompanions = Types.NormalizeStartingCompanionState(
+            spec.startingCompanions or spec.startingCompanion
+        ),
         revision = revision(spec.revision),
     }
 end
@@ -185,6 +233,8 @@ function Types.NormalizeCharacterRecord(value, registryUUID)
         lastKnownZ = value.lastKnownZ,
         socialProfile = value.socialProfile,
         conduct = value.conduct,
+        startingCompanions = value.startingCompanions
+            or value.startingCompanion,
         revision = value.revision,
     }
     return Types.NewCharacterRecord(spec)

@@ -156,6 +156,7 @@ local function makePlayer(account, selected, modData)
     return player
 end
 
+dofile("../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/PsychopatzCore/Traits/PsychopatzTraitRegistry.lua")
 PNC = {}
 dofile(ROOT .. "Base/PNC_Core.lua")
 dofile(ROOT .. "Base/PNC_Constants.lua")
@@ -460,7 +461,7 @@ PNC.PlayerCharacters.Load()
 local historical = PNC.PlayerCharacters.GetRegistryRecord(
     "char_historical"
 )
-assertEqual(PNC.PlayerCharacters.GetRegistrySnapshot().schemaVersion, 4,
+assertEqual(PNC.PlayerCharacters.GetRegistrySnapshot().schemaVersion, 6,
     "player registry V2 migration")
 assertEqual(historical.socialProfile.orientation, "straight",
     "historical profile neutral orientation")

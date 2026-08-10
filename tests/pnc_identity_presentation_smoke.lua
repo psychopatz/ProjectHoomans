@@ -52,5 +52,12 @@ assertEqual(Identity.GetFactionName(stranger), "Ashwood Haven",
 assertEqual(Identity.GetName({
     id = "npc-companion", displayName = "Riley", recruited = true,
 }), "Riley", "player companion name remains usable")
+PNC.Network.ClientState.snapshots["npc-starting-family"] = {
+    id = "npc-starting-family",
+    displayName = "Casey Survivor",
+    recruited = true,
+}
+assertEqual(Identity.GetName("npc-starting-family"), "Casey Survivor",
+    "companion lookup by ID uses its replicated identity immediately")
 
 print("pnc_identity_presentation_smoke: ok")

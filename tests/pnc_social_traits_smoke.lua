@@ -2,6 +2,8 @@ local ROOT =
     "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
 local CLIENT_ROOT =
     "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+local EN_UI_CATALOG =
+    "Contents/mods/ProjectHoomans/common/media/lua/shared/Translate/EN/UI.json"
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -121,6 +123,7 @@ CharacterTraitDefinition = {
     end,
 }
 
+dofile("../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/PsychopatzCore/Traits/PsychopatzTraitRegistry.lua")
 PNC = {}
 dofile(ROOT .. "Identity/PNC_Identity.lua")
 dofile(ROOT .. "Relationships/PNC_SocialProfileConstants.lua")
@@ -171,6 +174,40 @@ local repeatCount = 0
 for _, _ in pairs(engineDefinitions) do repeatCount = repeatCount + 1 end
 assertEqual(repeatCount, definitionCount, "registration idempotent")
 
+-- Starting relationships are independent two-point traits backed by the same
+-- Core registry, allowing any combination of family, lover, and friend.
+dofile(ROOT .. "Traits/PNC_StartingCompanionTraits.lua")
+local StartingTraits = PNC.StartingCompanionTraits
+assertEqual(#StartingTraits.DEFINITIONS, 6, "six starting companion traits")
+assertEqual(#StartingTraits.EXCLUSIONS, 0,
+    "starting companion traits are not mutually exclusive")
+local catalogFile = assert(io.open(EN_UI_CATALOG, "r"))
+local englishCatalog = catalogFile:read("*a")
+catalogFile:close()
+for _, spec in ipairs(StartingTraits.DEFINITIONS) do
+    local trait = PsychopatzCore.Traits.EngineTraits[spec.id]
+    assertEqual(engineDefinitions[trait].cost, 2,
+        spec.id .. " costs two points")
+    assertEqual(engineDefinitions[trait].disabledInMP, false,
+        spec.id .. " multiplayer enabled")
+    assertTrue(string.find(
+        englishCatalog, '"' .. spec.uiName .. '"', 1, true
+    ) ~= nil, spec.id .. " has translated name")
+    assertTrue(string.find(
+        englishCatalog, '"' .. spec.uiDescription .. '"', 1, true
+    ) ~= nil, spec.id .. " has translated description")
+end
+local loverSpec = StartingTraits.GetDefinition(StartingTraits.IDS.LOVER)
+assertTrue(StartingTraits.ResolveCompanionFemale(
+    loverSpec, true, "gay", false
+), "gay female survivor receives female lover")
+assertEqual(StartingTraits.ResolveCompanionFemale(
+    loverSpec, false, "straight", false
+), true, "straight male survivor receives female lover")
+assertEqual(StartingTraits.ResolveCompanionFemale(
+    loverSpec, false, "bisexual", false
+), false, "bisexual lover follows deterministic roll")
+
 -- Build 42.20's vanilla trait lists exclude cost-zero definitions. The
 -- client adapter keeps the standard screen and adds only PNC's eight
 -- zero-point definitions to its normal positive-trait list.
@@ -208,6 +245,7 @@ package.preload["OptionScreens/CharacterCreationProfession"] =
     function()
         return CharacterCreationProfession
     end
+dofile("../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/client/PsychopatzCore/Traits/PsychopatzTraitCharacterCreation.lua")
 dofile(
     CLIENT_ROOT
         .. "Patches/PNC_SocialTraitCharacterCreationPatch.lua"

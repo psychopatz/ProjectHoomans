@@ -23,8 +23,12 @@ for _, source in ipairs({
     { "witnessed_event", .75, false, false }, { "item_observation", .85, false, false },
     { "skill_observation", .85, false, false }, { "trusted_gossip", .65, false, false },
     { "rumor", .35, false, false }, { "debug", 1, true, true },
+    { "lifelong_relationship", 1, true, true, true },
 }) do
-    Sources.Register(source[1], { reliability = source[2], mayConfirm = source[3], bypassFamiliarity = source[4] })
+    Sources.Register(source[1], {
+        reliability = source[2], mayConfirm = source[3],
+        bypassFamiliarity = source[4], bypassDiscovery = source[5],
+    })
 end
 
 local function familiarityMultiplier(familiarity)
@@ -140,6 +144,13 @@ Providers.Register("pnc_faction", {
     end,
 })
 
+Providers.Register("pnc_starting_relationship", {
+    GetValue = function(record)
+        return record and record.generation
+            and record.generation.relationshipKind or nil
+    end,
+})
+
 local function descriptor(id, category, field, valueType, resolverID, privacy, discovery, presentation)
     presentation = presentation or {}
     presentation.truthField = field
@@ -175,6 +186,14 @@ Descriptors.Register({
     resolverID = "direct_fact", valueType = "text_enum", privacy = "personal",
     discovery = introduction, capabilities = { disclosable = true, decayable = false },
     presentation = { truthField = "displayName", topicID = "identity_name" },
+})
+Descriptors.Register({
+    id = "history.relationship", version = 1, category = "history",
+    providerID = "pnc_starting_relationship", resolverID = "direct_fact",
+    valueType = "categorical", privacy = "personal",
+    discovery = personal,
+    capabilities = { disclosable = true, decayable = false },
+    presentation = { topicID = "relationship_history" },
 })
 Descriptors.Register({
     id = "identity.archetype", version = 1, category = "identity", providerID = "pnc_identity",

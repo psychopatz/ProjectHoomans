@@ -25,7 +25,8 @@ dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
 dofile(SHARED .. "Knowledge/PNC_KnowledgeRegistry.lua")
 dofile(SHARED .. "Knowledge/PNC_KnowledgeBuiltins.lua")
 
-local npc = { id = "npc_russell", name = "Burton Gilmore", social = { personality = {
+local npc = { id = "npc_russell", name = "Burton Gilmore",
+    generation = { relationshipKind = "brother" }, social = { personality = {
     orientation = "gay", foodPreference = "spicy", romanceStyle = "reserved", jealousyStyle = "normal", socialStyle = "friendly",
     compassion = .82, sociability = .31, forgiveness = .60, bravery = .91, materialism = .20, aggression = .15, loyalty = .88,
 } } }
@@ -104,6 +105,18 @@ eq(Knowledge.Dirty, false, "introduction commits immediately")
 PNC.Relationships.Get = function()
     return { familiarity = 50, approval = 25 }
 end
+
+local lifelong = Knowledge.DiscoverAllForPlayer(
+    {}, npc.id, 6, "lifelong_relationship"
+)
+truth(lifelong and #lifelong.revealed >= 13,
+    "lifelong companion initializes every available dossier fact")
+eq(Knowledge.GetDescriptor(
+    "char_a", npc.id, "history.relationship"
+).value, "brother", "dossier identifies the family relationship")
+eq(Knowledge.GetDescriptor(
+    "char_a", npc.id, "personality.orientation"
+).value, "gay", "lifelong dossier includes private facts")
 
 -- Registration is generic and duplicate IDs reject safely.
 truth(PNC.KnowledgeProviders.Register("test_provider", { GetValue = function() return "blue" end }), "provider registration")
@@ -207,7 +220,7 @@ for npcIndex = 1, 100 do
     end
 end
 eq(learned, 2000, "sparse scale evidence count")
-eq(#PNC.KnowledgeDescriptors.List(), 66, "scale descriptors registered without schema migration")
+eq(#PNC.KnowledgeDescriptors.List(), 67, "scale descriptors registered without schema migration")
 safe(Knowledge.Registry)
 
 -- Learned facts are world ModData, keyed by persistent character UUID. A

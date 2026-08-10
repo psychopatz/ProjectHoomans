@@ -6,7 +6,7 @@ PNC.PlayerCharacterConstants = PNC.PlayerCharacterConstants or {}
 local Constants = PNC.PlayerCharacterConstants
 
 Constants.REGISTRY_MODDATA_KEY = "PNC_PlayerCharacters"
-Constants.REGISTRY_SCHEMA_VERSION = 4
+Constants.REGISTRY_SCHEMA_VERSION = 6
 Constants.IDENTITY_VERSION = 2
 Constants.UUID_PREFIX = "char"
 Constants.MAX_COMPONENT_LENGTH = 128

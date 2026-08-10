@@ -266,7 +266,21 @@ local function mergeConduct(canonical, candidates, canonicalKey, oldKeys, at)
     local merged = copy(canonical.conduct or {})
     merged.evidence = merged.evidence or {}
     local selectedProfile = canonical.socialProfile
+    local startingState = PNC.PlayerCharacterTypes
+        .NormalizeStartingCompanionState(canonical.startingCompanions)
     for _, record in ipairs(candidates) do
+        local candidateState = PNC.PlayerCharacterTypes
+            .NormalizeStartingCompanionState(record.startingCompanions)
+        startingState.resolved = startingState.resolved
+            or candidateState.resolved
+        for traitID, grant in pairs(candidateState.grants or {}) do
+            local existing = startingState.grants[traitID]
+            local prefer = not existing
+                or existing.status ~= "granted" and grant.status == "granted"
+                or (tonumber(grant.enrichmentVersion) or 0)
+                    > (tonumber(existing and existing.enrichmentVersion) or 0)
+            if prefer then startingState.grants[traitID] = copy(grant) end
+        end
         merged.evidence = mergeListByID(
             merged.evidence, record.conduct and record.conduct.evidence
         )
@@ -308,6 +322,7 @@ local function mergeConduct(canonical, candidates, canonicalKey, oldKeys, at)
     end
     canonical.conduct = merged
     canonical.socialProfile = copy(selectedProfile)
+    canonical.startingCompanions = startingState
 end
 
 local function mergeFactions(canonicalKey, oldKeys)

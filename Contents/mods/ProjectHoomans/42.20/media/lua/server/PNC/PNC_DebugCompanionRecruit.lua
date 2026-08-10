@@ -149,7 +149,7 @@ local function ensureCommunity(playerFaction, player, record, at)
     return community, created, nil
 end
 
-local function forceFollow(record, player)
+local function forceFollow(record, player, reason)
     local username = player and player.getUsername
         and player:getUsername() or nil
     local onlineID = player and player.getOnlineID
@@ -173,7 +173,7 @@ local function forceFollow(record, player)
         }
     end
     if Registry.MarkDirty then
-        Registry.MarkDirty(record, "debug_companion_recruit")
+        Registry.MarkDirty(record, reason or "companion_recruit")
     end
 end
 
@@ -190,6 +190,81 @@ local function saveRecruitment()
     if GlobalModData and GlobalModData.save then GlobalModData.save() end
 end
 
+
+-- Shared authoritative assignment boundary used by both normal/debug
+-- recruitment and character-start companions. Eligibility belongs to the
+-- caller; this function owns the cross-store faction/community transaction.
+function Recruit.Assign(player, record, args)
+    args = type(args) == "table" and args or {}
+    if not player then return false, "player_unavailable" end
+    if not record or record.alive == false then return false, "npc_not_found" end
+    if not Factions or not Factions.EnsurePlayerFaction then
+        return false, "factions_unavailable"
+    end
+    local at = worldAgeHours()
+    local ok
+    local reason
+    local playerFaction
+    ok, reason, playerFaction = Factions.EnsurePlayerFaction(player, {
+        worldAgeHours = at,
+        tags = args.tags,
+    })
+    if not ok or not playerFaction then
+        return false, reason or "player_faction_unavailable"
+    end
+    local affiliation = Factions.GetNPCAffiliation
+        and Factions.GetNPCAffiliation(record.id) or nil
+    local options = {
+        role = "civilian",
+        rank = "member",
+        membershipStatus = "member",
+        worldAgeHours = at,
+        joinedAt = at,
+    }
+    if affiliation and affiliation.factionID then
+        ok, reason = Factions.TransferNPC(record.id, playerFaction.id, options)
+    else
+        ok, reason = Factions.AddNPC(playerFaction.id, record.id, options)
+    end
+    if not ok and reason ~= "unchanged" then
+        return false, reason or "membership_change_failed"
+    end
+
+    local community
+    local communityCreated
+    community, communityCreated, reason = ensureCommunity(
+        playerFaction, player, record, at
+    )
+    if not community then
+        return false, reason or "community_assignment_failed"
+    end
+    local source = tostring(args.source or "companion_recruit")
+    forceFollow(record, player, source)
+    if PNC.Network and PNC.Network.BroadcastRecord then
+        PNC.Network.BroadcastRecord(record, source)
+    end
+    if PNC.IndividualNeeds and PNC.IndividualNeeds.Ensure then
+        PNC.IndividualNeeds.Ensure(record)
+    end
+    if args.endConversation ~= false
+        and PNC.ConversationScene and PNC.ConversationScene.End
+    then
+        PNC.ConversationScene.End(
+            record,
+            Registry.GetLiveZombie and Registry.GetLiveZombie(record.id),
+            nil,
+            source
+        )
+    end
+    saveRecruitment()
+    return true, "recruited", {
+        npcID = record.id,
+        factionID = playerFaction.id,
+        communityID = community.id,
+        communityCreated = communityCreated == true,
+    }
+end
+
 function Recruit.Try(player, args)
     args = type(args) == "table" and args or {}
     if not player then return false, "player_unavailable" end
@@ -199,76 +274,20 @@ function Recruit.Try(player, args)
     if not Recruit.IsEligible(record) then
         return false, "npc_not_debug_recruitable"
     end
-    if not Factions or not Factions.EnsurePlayerFaction then
-        return false, "factions_unavailable"
-    end
-
     local ok
     local reason
-    local playerFaction
-    ok, reason, playerFaction = Factions.EnsurePlayerFaction(player, {
-        worldAgeHours = worldAgeHours(),
+    local result
+    ok, reason, result = Recruit.Assign(player, record, {
+        source = "debug_companion_recruit",
         tags = { debugCreated = true },
     })
-    if not ok or not playerFaction then
-        return false, reason or "player_faction_unavailable"
-    end
-
-    local affiliation = Factions.GetNPCAffiliation
-        and Factions.GetNPCAffiliation(record.id) or nil
-    local options = {
-        role = "civilian",
-        rank = "member",
-        membershipStatus = "member",
-        worldAgeHours = worldAgeHours(),
-        joinedAt = worldAgeHours(),
-    }
-    if affiliation and affiliation.factionID then
-        ok, reason = Factions.TransferNPC(record.id, playerFaction.id, options)
-    else
-        ok, reason = Factions.AddNPC(playerFaction.id, record.id, options)
-    end
-    if not ok then return false, reason or "membership_change_failed" end
-
-    local at = worldAgeHours()
-    local community
-    local communityCreated
-    community, communityCreated, reason = ensureCommunity(
-        playerFaction,
-        player,
-        record,
-        at
-    )
-    if not community then return false, reason or "community_assignment_failed" end
-
-    forceFollow(record, player)
-    if PNC.Network and PNC.Network.BroadcastRecord then
-        PNC.Network.BroadcastRecord(record, "debug_companion_recruit")
-    end
-
-    if PNC.IndividualNeeds and PNC.IndividualNeeds.Ensure then
-        PNC.IndividualNeeds.Ensure(record)
-    end
-    if PNC.ConversationScene and PNC.ConversationScene.End then
-        PNC.ConversationScene.End(
-            record,
-            Registry.GetLiveZombie and Registry.GetLiveZombie(record.id),
-            nil,
-            "debug_recruited"
-        )
-    end
-    saveRecruitment()
+    if not ok then return false, reason end
     if Core and Core.LogInfo then
         Core.LogInfo("PNC debug recruited npc=" .. tostring(record.id)
             .. " player=" .. tostring(player and player.getUsername
                 and player:getUsername() or "unknown"))
     end
-    return true, "recruited", {
-        npcID = record.id,
-        factionID = playerFaction.id,
-        communityID = community.id,
-        communityCreated = communityCreated == true,
-    }
+    return true, "recruited", result
 end
 
 function Recruit.TryConversation(player, args, relationship)

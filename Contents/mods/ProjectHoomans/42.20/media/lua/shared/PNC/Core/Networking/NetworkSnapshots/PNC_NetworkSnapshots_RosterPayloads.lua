@@ -65,6 +65,15 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
         aiState = aiState,
         inCombat = inCombat,
         recruited = record.recruited == true,
+        relationshipCategory = record.generation
+                and record.generation.relationshipKind == "lover"
+            and "Lover" or nil,
+        startingRelationship = record.generation
+            and record.generation.source == "starting_companion_trait"
+            and {
+                kind = record.generation.relationshipKind,
+                since = record.generation.relationshipSince,
+            } or nil,
         persist = record.persist ~= false,
         travel = Parts.BuildTravelSummary(record, includeTravelRoute ~= false),
         mapPresentation = Parts.BuildMapPresentationSummary(record),

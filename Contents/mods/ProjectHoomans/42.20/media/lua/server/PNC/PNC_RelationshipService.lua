@@ -345,11 +345,12 @@ end
 -- Debug-only synthetic baseline support. The server command that calls this
 -- is admin gated. Memories, cooldowns, saturation, and familiarity are left
 -- intact so the normal recalculation remains explainable and reproducible.
-function Relationships.SetDebugBaseline(
+local function setBaseline(
     observerNPCID,
     targetKey,
     standing,
-    worldAgeHours
+    worldAgeHours,
+    eventKind
 )
     local record
     local reason
@@ -382,6 +383,13 @@ function Relationships.SetDebugBaseline(
         Constants.RESPECT_MIN,
         Constants.RESPECT_MAX
     )
+    if standing.familiarity ~= nil then
+        relationship.familiarity = Math.Clamp(
+            standing.familiarity,
+            Constants.FAMILIARITY_MIN,
+            Constants.FAMILIARITY_MAX
+        )
+    end
     relationship = Math.RecalculateRelationship(
         relationship,
         targetKey,
@@ -394,11 +402,30 @@ function Relationships.SetDebugBaseline(
         relationship,
         socialChanged or not Types.AreEqual(rawRelationship, relationship),
         worldAgeHours,
-        { kind = "debug_baseline_set" }
+        { kind = eventKind or "baseline_set" }
     )
     return Types.NormalizeRelationship(
         record.social.relationships[targetKey],
         targetKey
+    )
+end
+
+
+function Relationships.SetInitialBaseline(
+    observerNPCID, targetKey, standing, worldAgeHours
+)
+    return setBaseline(
+        observerNPCID, targetKey, standing, worldAgeHours,
+        "initial_baseline_set"
+    )
+end
+
+function Relationships.SetDebugBaseline(
+    observerNPCID, targetKey, standing, worldAgeHours
+)
+    return setBaseline(
+        observerNPCID, targetKey, standing, worldAgeHours,
+        "debug_baseline_set"
     )
 end
 

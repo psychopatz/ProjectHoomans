@@ -78,6 +78,15 @@ function Network.BuildSnapshot(record)
         archetypeID = identity.archetypeID,
         archetypeLabel = identity.archetypeLabel,
         recruited = record.recruited == true,
+        relationshipCategory = record.generation
+                and record.generation.relationshipKind == "lover"
+            and "Lover" or nil,
+        startingRelationship = record.generation
+            and record.generation.source == "starting_companion_trait"
+            and {
+                kind = record.generation.relationshipKind,
+                since = record.generation.relationshipSince,
+            } or nil,
         persist = record.persist ~= false,
         faction = record.faction,
         -- The legacy faction value can mean "at war with another NPC

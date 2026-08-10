@@ -12,6 +12,16 @@ local Diary = PNC.Conversation.Diary
 local Layout = PsychopatzCore.UI.Layout
 local Theme = PsychopatzCore.UI.Theme
 local ClientState = PNC.Network.ClientState
+local Shared = PNC.CharacterWindowShared
+
+local function translated(key, fallback)
+    return Shared and Shared.Text and Shared.Text(key, fallback) or fallback
+end
+
+local function relationshipLabel(value)
+    local text = tostring(value or "companion")
+    return string.upper(string.sub(text, 1, 1)) .. string.sub(text, 2)
+end
 
 local function signed(value)
     return string.format("%+.1f", tonumber(value) or 0)
@@ -72,7 +82,26 @@ function Tabs.RenderInteractions(view, _, _, topY)
     local color = Theme.colors.text
     local muted = Theme.colors.textMuted
     local y = topY + Layout.Pixels(6, view.uiScale)
+    local established = view.snapshot and view.snapshot.startingRelationship
+        or view.payload and view.payload.startingRelationship
+    if established then
+        view:drawText(translated(
+            "UI_PNC_EstablishedRelationship",
+            "ESTABLISHED RELATIONSHIP"
+        ), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+        y = y + lineHeight + 4
+        view:drawText(relationshipLabel(established.kind), pad, y,
+            color.r, color.g, color.b, color.a, UIFont.Small)
+        y = y + lineHeight
+        view:drawText(translated(
+            "UI_PNC_KnownBeforeOutbreak",
+            "Known since before the outbreak • Lifelong familiarity"
+        ), pad + Layout.Pixels(10, view.uiScale), y,
+            muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+        y = y + lineHeight + Layout.Pixels(12, view.uiScale)
+    end
     if #entries == 0 then
+        if established then return y + pad end
         view:drawText("NO PLAYER INTERACTIONS RECORDED", pad, y,
             muted.r, muted.g, muted.b, muted.a, UIFont.Small)
         y = y + lineHeight * 2

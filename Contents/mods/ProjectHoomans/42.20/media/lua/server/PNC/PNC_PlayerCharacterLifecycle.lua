@@ -67,6 +67,11 @@ local function ensureIdentityAndProfile(player, callback, at)
             )
         end
     end
+    if uuid and PNC.StartingCompanions
+        and PNC.StartingCompanions.Ensure
+    then
+        PNC.StartingCompanions.Ensure(player, uuid, at)
+    end
     return uuid, reason
 end
 

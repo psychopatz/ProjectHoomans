@@ -172,6 +172,7 @@ function Sources.Register(id, definition)
         reliability = Registry.Clamp(definition.reliability, 0, 1),
         mayConfirm = definition.mayConfirm == true,
         bypassFamiliarity = definition.bypassFamiliarity == true,
+        bypassDiscovery = definition.bypassDiscovery == true,
     }
     return true
 end

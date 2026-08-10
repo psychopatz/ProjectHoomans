@@ -27,7 +27,12 @@ local function normalizeID(value)
 end
 
 local function sourceFor(npc)
-    if type(npc) ~= "table" then return npc end
+    if type(npc) ~= "table" then
+        local state = clientState()
+        local id = normalizeID(npc)
+        return id and state and state.snapshots
+            and state.snapshots[id] or npc
+    end
     return npc.snapshot or npc.record or npc.source or npc
 end
 

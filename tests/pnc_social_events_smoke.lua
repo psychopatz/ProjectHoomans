@@ -68,6 +68,7 @@ local function assertSaveSafe(value, seen)
     seen[value] = nil
 end
 
+dofile("../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/PsychopatzCore/Traits/PsychopatzTraitRegistry.lua")
 PNC = {}
 dofile(SHARED_ROOT .. "Base/PNC_Core.lua")
 dofile(SHARED_ROOT .. "Base/PNC_Constants.lua")

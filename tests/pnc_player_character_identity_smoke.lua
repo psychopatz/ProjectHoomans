@@ -111,6 +111,7 @@ local function makePlayer(accountIdentity, modData, options)
     return player, modData
 end
 
+dofile("../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/PsychopatzCore/Traits/PsychopatzTraitRegistry.lua")
 PNC = {}
 dofile(SHARED_ROOT .. "Base/PNC_Core.lua")
 dofile(SHARED_ROOT .. "Base/PNC_Constants.lua")
@@ -194,7 +195,7 @@ local IdentityConstants = PNC.PlayerCharacterConstants
 
 -- 1. New registry defaults.
 local defaults = IdentityTypes.NewRegistry()
-assertEqual(defaults.schemaVersion, 4, "registry schema")
+assertEqual(defaults.schemaVersion, 6, "registry schema")
 assertEqual(defaults.revision, 0, "registry revision")
 assertEqual(type(defaults.byUUID), "table", "registry UUID map")
 assertEqual(type(defaults.byAccount), "table", "registry account map")
@@ -215,6 +216,21 @@ assertEqual(defaultRecord.conduct.scores.reliability, 0,
     "new character conduct neutral")
 assertEqual(#defaultRecord.conduct.evidence, 0,
     "new character has no conduct evidence")
+local promotedGrant = IdentityTypes.NewCharacterRecord({
+    uuid = "char_old_starting_grant",
+    accountIdentity = "Account",
+    startingCompanion = {
+        status = "granted",
+        traitID = "PNC_HasBrother",
+        relationshipKind = "brother",
+        npcID = "pnc_starting_char_old_starting_grant",
+    },
+})
+assertTrue(promotedGrant.startingCompanions.resolved,
+    "version five starting grant promoted to resolved collection")
+assertEqual(promotedGrant.startingCompanions.grants.PNC_HasBrother.npcID,
+    "pnc_starting_char_old_starting_grant",
+    "version five companion identity preserved")
 
 Service.Load()
 local originalGenerator = Service.UUIDGenerator
@@ -594,7 +610,7 @@ assertEqual(normalizedOnce.byUUID.char_missing_account, nil,
 
 -- 32-33. An old save gets an empty registry; repeating migration is safe.
 local migrated = IdentityTypes.NormalizeRegistry({})
-assertEqual(migrated.schemaVersion, 4, "old save migration")
+assertEqual(migrated.schemaVersion, 6, "old save migration")
 assertTrue(simpleEqual(
     migrated,
     IdentityTypes.NormalizeRegistry(migrated)

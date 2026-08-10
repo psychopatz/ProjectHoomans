@@ -460,6 +460,44 @@ function PlayerCharacters.ApplyResolvedSocialProfile(
     return true, "updated", copy(normalized)
 end
 
+-- Authoritative idempotence marker for character-creation companion grants.
+-- It belongs to the character UUID rather than the account, so multiplayer
+-- reconnects cannot duplicate it and a genuinely new survivor remains
+-- eligible for their own selected trait.
+function PlayerCharacters.ApplyStartingCompanionState(characterUUID, value)
+    local record
+    local normalized
+    PlayerCharacters.EnsureLoaded()
+    characterUUID = Types.NormalizeUUID(characterUUID)
+    record = characterUUID
+        and PlayerCharacters.Registry.byUUID[characterUUID] or nil
+    if not record then return false, "character_not_found" end
+    normalized = Types.NormalizeStartingCompanionState(value)
+    if deepEqual(record.startingCompanions, normalized) then
+        return false, "unchanged", copy(normalized)
+    end
+    record.startingCompanions = normalized
+    markRecordChanged(record)
+    return true, "updated", copy(normalized)
+end
+
+
+-- Version 5 compatibility for external integrations that still submit one
+-- grant. New code should commit the complete state atomically.
+function PlayerCharacters.ApplyStartingCompanionGrant(characterUUID, value)
+    local record = PlayerCharacters.GetRegistryRecord(characterUUID)
+    local state = Types.NormalizeStartingCompanionState(
+        record and record.startingCompanions
+    )
+    local grant = Types.NormalizeStartingCompanionGrant(value)
+    if not grant then return false, "invalid_grant" end
+    state.resolved = true
+    if grant.status ~= "none" and grant.traitID then
+        state.grants[grant.traitID] = grant
+    end
+    return PlayerCharacters.ApplyStartingCompanionState(characterUUID, state)
+end
+
 -- Internal conduct commit boundary. The conduct service performs evidence
 -- validation and revision calculation; this method owns character/registry
 -- revision updates.

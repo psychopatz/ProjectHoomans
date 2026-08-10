@@ -332,6 +332,7 @@ function Knowledge.RecordEvidence(spec)
     if not source then return nil, "unknown_evidence_source" end
     if spec.sourceType == "direct_disclosure" and descriptor.discovery.allowDisclosure ~= true then return nil, "disclosure_not_allowed" end
     if spec.sourceType ~= "direct_disclosure" and spec.sourceType ~= "debug"
+        and source.bypassDiscovery ~= true
         and descriptor.discovery.allowObservation ~= true and descriptor.discovery.allowInference ~= true
     then return nil, "discovery_not_allowed" end
     local payload, payloadOK = Shared.SanitizePayload(spec.payload)
@@ -608,6 +609,45 @@ function Knowledge.ForceRevealForPlayer(player, npcID, descriptorID, at, sourceT
     return Knowledge.RecordEvidence({ characterUUID = characterUUID, npcID = npcID, descriptorID = descriptor.id,
         sourceType = sourceType or "debug", strength = 1, reliability = 1, direction = 0,
         payload = { observedValue = truth }, worldAgeHours = at })
+end
+
+
+-- Trusted initialization path for NPCs the character knew before the game
+-- began. It reveals every descriptor that currently has authoritative truth;
+-- future descriptor packs automatically participate without changing this
+-- service or the starting-companion feature.
+function Knowledge.DiscoverAllForPlayer(
+    player, npcID, at, sourceType, deferCommit
+)
+    local revealed = {}
+    local failures = {}
+    for _, descriptor in ipairs(Definitions.List()) do
+        local result
+        local reason
+        result, reason = Knowledge.ForceRevealForPlayer(
+            player, npcID, descriptor.id, at,
+            sourceType or "lifelong_relationship"
+        )
+        if result then
+            revealed[#revealed + 1] = descriptor.id
+        else
+            failures[#failures + 1] = descriptor.id .. ":" .. tostring(reason)
+        end
+    end
+    if #revealed > 0 and deferCommit ~= true then
+        if PNC.PersistenceCoordinator and PNC.PersistenceCoordinator.Commit then
+            local committed, reason = PNC.PersistenceCoordinator.Commit(
+                "lifelong_knowledge_disclosure"
+            )
+            if not committed then return nil, reason end
+        else
+            local saved, reason = Knowledge.Save()
+            if saved == false and reason ~= "not_dirty" then
+                return nil, reason
+            end
+        end
+    end
+    return { revealed = revealed, failures = failures }
 end
 
 -- Temporary debug counterpart to future conversational disclosures. A topic

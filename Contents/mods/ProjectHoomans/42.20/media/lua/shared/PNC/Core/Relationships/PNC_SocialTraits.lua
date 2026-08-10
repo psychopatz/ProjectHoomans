@@ -1,13 +1,18 @@
 -- Build 42 social-trait catalog, registration, and pure profile resolution.
 
+if not PsychopatzCore or not PsychopatzCore.Traits then
+    require "PsychopatzCore/Traits/PsychopatzTraitRegistry"
+end
+
 PNC = PNC or {}
 PNC.SocialTraits = PNC.SocialTraits or {}
 
 local SocialTraits = PNC.SocialTraits
 local Constants = PNC.SocialProfileConstants
 local ProfileTypes = PNC.SocialProfileTypes
+local CoreTraits = PsychopatzCore.Traits
 
-SocialTraits.EngineTraits = SocialTraits.EngineTraits or {}
+SocialTraits.EngineTraits = CoreTraits.EngineTraits
 SocialTraits.Registered = SocialTraits.Registered == true
 
 local aliasToID = {}
@@ -149,87 +154,13 @@ function SocialTraits.ResolveTraits(traitSet)
     return profile, conflicts, SocialTraits.Fingerprint(sourceTraits)
 end
 
-local function engineTraitFor(resource)
-    local location
-    local ok
-    local trait
-    if not CharacterTrait or not ResourceLocation
-        or not ResourceLocation.of
-    then
-        return nil, "api_unavailable"
-    end
-    ok, location = pcall(ResourceLocation.of, resource)
-    if not ok or not location then
-        return nil, "invalid_resource"
-    end
-    if CharacterTrait.get then
-        ok, trait = pcall(CharacterTrait.get, location)
-        if not ok then
-            trait = nil
-        end
-    end
-    if not trait and CharacterTrait.register then
-        ok, trait = pcall(CharacterTrait.register, resource)
-        if not ok then
-            return nil, tostring(trait)
-        end
-    end
-    return trait
-end
-
 function SocialTraits.Register()
-    local traits = {}
-    local trait
-    local existing
-    local ok
-    local left
-    local right
-    if not CharacterTrait
-        or not CharacterTraitDefinition
-        or not CharacterTraitDefinition.addCharacterTraitDefinition
-    then
-        return false, "api_unavailable"
-    end
-    for index = 1, #Constants.TRAIT_DEFINITIONS do
-        definition = Constants.TRAIT_DEFINITIONS[index]
-        trait = SocialTraits.EngineTraits[definition.id]
-        if not trait then
-            trait = engineTraitFor(definition.resource)
-        end
-        if not trait then
-            return false, "trait_registration_failed:" .. definition.id
-        end
-        SocialTraits.EngineTraits[definition.id] = trait
-        traits[definition.id] = trait
-        existing = CharacterTraitDefinition.getCharacterTraitDefinition
-            and CharacterTraitDefinition.getCharacterTraitDefinition(trait)
-            or nil
-        if not existing then
-            ok, existing = pcall(
-                CharacterTraitDefinition.addCharacterTraitDefinition,
-                trait,
-                definition.uiName,
-                definition.cost,
-                definition.uiDescription,
-                false,
-                false
-            )
-            if not ok or not existing then
-                return false, "definition_registration_failed:"
-                    .. definition.id
-            end
-        end
-    end
-    for index = 1, #Constants.EXCLUSION_GROUPS do
-        left = traits[Constants.EXCLUSION_GROUPS[index][1]]
-        right = traits[Constants.EXCLUSION_GROUPS[index][2]]
-        if left and right
-            and CharacterTraitDefinition.setMutualExclusive
-        then
-            CharacterTraitDefinition.setMutualExclusive(left, right)
-        end
-    end
-    SocialTraits.Registered = true
+    local registered, reason = CoreTraits.RegisterCatalog(
+        "ProjectHoomans.Social",
+        Constants.TRAIT_DEFINITIONS,
+        Constants.EXCLUSION_GROUPS
+    )
+    SocialTraits.Registered = registered == true
     if PNC.Config
         and PNC.Config.Relationships
         and PNC.Config.Relationships.DebugSocialProfiles == true
@@ -242,18 +173,11 @@ function SocialTraits.Register()
             .. tostring(#Constants.TRAIT_DEFINITIONS)
         )
     end
-    return true, "registered"
+    return registered, reason
 end
 
 -- Shared bootstrap runs before the character-creation screen is built. The
 -- guarded call is also safe in developer Lua tests without engine classes.
 SocialTraits.Register()
-if Events
-    and Events.OnGameBoot
-    and not SocialTraits.GameBootHookRegistered
-then
-    Events.OnGameBoot.Add(SocialTraits.Register)
-    SocialTraits.GameBootHookRegistered = true
-end
 
 return SocialTraits
