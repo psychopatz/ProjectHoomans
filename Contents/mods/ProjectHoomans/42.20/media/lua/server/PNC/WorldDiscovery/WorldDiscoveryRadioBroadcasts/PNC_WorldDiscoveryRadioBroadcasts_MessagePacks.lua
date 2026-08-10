@@ -1,3 +1,5 @@
+if isClient and isClient() and (not isServer or not isServer()) then return end
+
 local Types = PNC.WorldDiscoveryTypes
 local Channel = PNC.RadioDiscoveryChannel
 local Radio = PsychopatzCore.CustomRadio

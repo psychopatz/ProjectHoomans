@@ -1,5 +1,7 @@
 -- Radio, debug, and conversation discovery sources.
 
+if isClient and isClient() and (not isServer or not isServer()) then return end
+
 local Discovery = PNC.WorldDiscovery
 local Internal = Discovery.Internal
 local Types = PNC.WorldDiscoveryTypes

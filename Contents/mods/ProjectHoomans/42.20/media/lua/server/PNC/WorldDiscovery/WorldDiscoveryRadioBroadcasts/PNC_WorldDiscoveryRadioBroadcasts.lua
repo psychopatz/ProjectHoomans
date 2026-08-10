@@ -1,3 +1,5 @@
+if isClient and isClient() and (not isServer or not isServer()) then return end
+
 local Discovery = PNC.WorldDiscovery
 Discovery.RadioBroadcastsInternal = Discovery.RadioBroadcastsInternal or {}
 
