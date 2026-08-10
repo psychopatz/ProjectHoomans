@@ -48,6 +48,9 @@ PNC = {
                 inventory = {
                     items = { item_1 = { fullType = "Base.Hammer", stack = 1 } },
                     containers = { root = { items = { "item_1" } } },
+                    equipped = { primary = "item_1" },
+                    worn = { Back = "item_1" },
+                    attached = { Belt = "item_1" },
                 },
                 runtime = { inventory = { nextItemSerial = 1, opLog = { { revision = 1 } } } },
             },
@@ -62,6 +65,10 @@ equal(report.runtimeRecords.recordCount, 1, "runtime record count")
 equal(report.inventories.itemCount, 1, "inventory item count")
 equal(report.inventories.operationLogEntries, 1, "inventory op-log count")
 equal(report.npcRecords.records[1].name, "Alex Morgan", "NPC display name")
+equal(report.npcRecords.records[1].wornItems, 1, "NPC worn item count")
+equal(report.npcRecords.records[1].equippedItems, 1, "NPC equipped item count")
+equal(report.npcRecords.records[1].attachedItems, 1, "NPC attached item count")
+equal(report.npcRecords.records[1].inventoryContainers, 1, "NPC container count")
 truthy(report.npcRecords.records[1].runtimeContent.inventory, "runtime content missing")
 truthy(report.npcRecords.records[1].persistedContent.inventory, "persisted content missing")
 truthy(report.persisted.estimatedBytes > 0, "persisted estimate missing")

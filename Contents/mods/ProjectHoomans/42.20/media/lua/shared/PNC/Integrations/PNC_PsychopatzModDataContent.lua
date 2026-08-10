@@ -76,12 +76,17 @@ function Content.Scan()
             and PNC.Registry.StorageKeyForID(entry.id) or nil
         local persisted = storageKey and ModData and ModData.get and ModData.get(storageKey) or nil
         local persistedContent, persistedStats = capture(persisted)
+        local inventory = record and record.inventory or nil
         output.records[#output.records + 1] = {
             id = entry.id,
             name = entry.name,
             faction = tostring(record and record.faction or "unknown"),
             presence = tostring(record and record.presenceState or "unknown"),
-            inventoryItems = countMap(record and record.inventory and record.inventory.items),
+            inventoryItems = countMap(inventory and inventory.items),
+            wornItems = countMap(inventory and inventory.worn),
+            equippedItems = countMap(inventory and inventory.equipped),
+            attachedItems = countMap(inventory and inventory.attached),
+            inventoryContainers = countMap(inventory and inventory.containers),
             runtimeEstimatedBytes = runtimeStats.estimatedBytes,
             persistedEstimatedBytes = persistedStats.estimatedBytes,
             runtimeTruncated = runtimeStats.truncated,
