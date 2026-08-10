@@ -1,5 +1,9 @@
-local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_AttackActions.lua"
+local SHARED_ROOT =
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+local FILE = SHARED_ROOT
+    .. "PNC/Core/Combat/AttackExecution/PNC_AttackExecution.lua"
+
+package.path = SHARED_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then

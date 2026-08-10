@@ -176,7 +176,10 @@ local biteSource = biteFile:read("*a")
 biteFile:close()
 assert(not string.find(biteSource, "npc_parry", 1, true), "wound-roll rejection must not force a parry shove")
 
-local actionFile = assert(io.open(ROOT .. "Combat/PNC_Combat_AttackActions.lua", "r"))
+local actionFile = assert(io.open(
+    ROOT .. "Combat/AttackExecution/PNC_AttackExecution_HitResolution.lua",
+    "r"
+))
 local actionSource = actionFile:read("*a")
 actionFile:close()
 assert(not string.find(actionSource, "pressure_shove", 1, true), "armed hits must not be replaced by pressure shoves")

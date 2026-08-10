@@ -44,8 +44,8 @@ local melee = readAll(
         .. "PNC_Combat_Melee.lua"
 )
 local attackActions = readAll(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
-        .. "PNC_Combat_AttackActions.lua"
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/AttackExecution/"
+        .. "PNC_AttackExecution_Pump.lua"
 )
 local unarmed = readAll(
     "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
