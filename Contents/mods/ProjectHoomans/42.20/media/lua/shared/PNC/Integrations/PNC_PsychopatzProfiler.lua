@@ -38,6 +38,10 @@ end
 
 Profiler.RegisterNamespace("ProjectHoomans", { displayName = "Project Hoomans" })
 Profiler.RegisterStopHook("ProjectHoomans.restore", Integration.Restore)
+local ModDataProfiler = nil
+if Profiler.GetMode and Profiler.GetMode() == Profiler.MODE_DETAILED then
+    ModDataProfiler = require "PNC/Integrations/PNC_PsychopatzModDataProfiler"
+end
 
 wrap(PNC.SpatialIndex, "Rebuild", "ProjectHoomans.Spatial.Rebuild")
 wrap(PNC.WorldCensus, "Refresh", "ProjectHoomans.WorldCensus.Refresh")
@@ -59,6 +63,15 @@ Profiler.RegisterSampler("ProjectHoomans.shared", function(api)
     api.SetGauge("ProjectHoomans.World.ManagedBodies", #(Census and Census.ManagedBodies or {}))
     api.SetGauge("ProjectHoomans.ZombieAggro.Active", Aggro and (#Aggro.order - (Aggro.holes or 0)) or 0)
     api.SetGauge("ProjectHoomans.Scheduler.PendingBuckets", countMap(PNC.Scheduler and PNC.Scheduler.Buckets))
+    local report = ModDataProfiler and ModDataProfiler.Scan and ModDataProfiler.Scan(false) or nil
+    if report then
+        api.SetGauge("ProjectHoomans.ModData.PersistedEstimatedBytes", report.persisted.estimatedBytes)
+        api.SetGauge("ProjectHoomans.ModData.RuntimeEstimatedBytes", report.runtimeRecords.estimatedBytes)
+        api.SetGauge("ProjectHoomans.ModData.InventoryEstimatedBytes", report.inventories.estimatedBytes)
+        api.SetGauge("ProjectHoomans.ModData.InventoryItems", report.inventories.itemCount)
+        api.SetGauge("ProjectHoomans.ModData.InventoryOperationLogEntries", report.inventories.operationLogEntries)
+        api.SetGauge("ProjectHoomans.ModData.ScanMs", report.scanMs)
+    end
 end)
 
 function Integration.InstallServer()
