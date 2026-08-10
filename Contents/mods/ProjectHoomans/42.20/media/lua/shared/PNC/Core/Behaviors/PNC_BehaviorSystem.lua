@@ -14,7 +14,7 @@ require "PNC/Core/Behaviors/PNC_BehaviorRegistry"
 require "PNC/Core/Behaviors/PNC_Behavior_Travel"
 require "PNC/Core/Behaviors/PNC_Behavior_Incapacitated"
 require "PNC/Core/Behaviors/PNC_Behavior_Treatment"
-require "PNC/Core/Behaviors/PNC_Behavior_Companion"
+require "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion"
 require "PNC/Core/Behaviors/PNC_Behavior_Hostile"
 require "PNC/Core/Behaviors/PNC_Behavior_Roaming"
 

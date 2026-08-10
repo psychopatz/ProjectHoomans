@@ -1,5 +1,6 @@
 local ROOT =
     "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+package.path = ROOT .. "../../?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -109,7 +110,10 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Behaviors/PNC_Behavior_Companion.lua")
+dofile(
+    ROOT
+        .. "Behaviors/BehaviorCompanion/PNC_BehaviorCompanion.lua"
+)
 
 local record = {
     id = "companion",

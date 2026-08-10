@@ -1,6 +1,10 @@
+local LUA_ROOT =
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+package.path = LUA_ROOT .. "?.lua;" .. package.path
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-    .. "Behaviors/PNC_Behavior_Companion.lua"
+    LUA_ROOT .. "PNC/Core/"
+    .. "Behaviors/BehaviorCompanion/PNC_BehaviorCompanion.lua"
 
 local now = 1000
 local engageTicks = 0
