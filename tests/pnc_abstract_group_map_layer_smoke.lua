@@ -7,6 +7,7 @@ UIFont = { Small = "small" }
 
 local registered, requests = nil, 0
 PNC = {
+    WorldDiscoveryDebugMap = { ShowRawEntities = false },
     Core = { Now = function() return 2000 end },
     MapDisplay = {
         AreBasesVisible = function() return true end,
@@ -39,6 +40,9 @@ assert(registered and registered.id == "pnc_abstract_groups",
     "abstract group layer was not registered")
 assert(registered.definition.order > 90,
     "group markers should render above community geometry")
+assert(registered.definition.isVisible() == false,
+    "raw group overlay must be hidden by default")
+PNC.WorldDiscoveryDebugMap.ShowRawEntities = true
 
 local rectangles, labels, hover = {}, {}, {}
 local map = {

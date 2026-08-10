@@ -49,6 +49,7 @@ local sent
 local markerBlocksBase = false
 local emblemDraw
 PNC = {
+    WorldDiscoveryDebugMap = { ShowRawEntities = true },
     FactionEmblemRenderer = {
         Draw = function(target, emblem, x, y, size, options)
             emblemDraw = {

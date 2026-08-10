@@ -132,8 +132,14 @@ function Internal.ApplyWorldDiscoverySnapshot(payload)
     then return false end
     ClientState.worldDiscovery = payload
     ClientState.lastWorldDiscoveryReceiveAt = Core.Now()
-    if PNC.WorldDiscoveryUI and PNC.WorldDiscoveryUI.ReceiveSnapshot then
-        PNC.WorldDiscoveryUI.ReceiveSnapshot(payload)
+    local contactsUI = PNC.ContactsUI or PNC.WorldDiscoveryUI
+    if contactsUI and contactsUI.ReceiveSnapshot then
+        contactsUI.ReceiveSnapshot(payload)
+    end
+    if PNC.RadioDiscoveryPresentation
+        and PNC.RadioDiscoveryPresentation.ShowResult
+    then
+        PNC.RadioDiscoveryPresentation.ShowResult(payload)
     end
     return true
 end

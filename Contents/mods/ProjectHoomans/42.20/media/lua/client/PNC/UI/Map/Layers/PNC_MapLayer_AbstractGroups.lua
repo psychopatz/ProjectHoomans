@@ -21,6 +21,8 @@ local COLORS = {
 local function isVisible()
     return PNC.MapDisplay and PNC.MapDisplay.AreBasesVisible
         and PNC.MapDisplay.AreBasesVisible()
+        and PNC.WorldDiscoveryDebugMap
+        and PNC.WorldDiscoveryDebugMap.ShowRawEntities == true
         and PNC.Client and PNC.Client.CanUseDebug
         and PNC.Client.CanUseDebug()
 end

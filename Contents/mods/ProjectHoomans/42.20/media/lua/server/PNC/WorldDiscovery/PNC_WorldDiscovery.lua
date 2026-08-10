@@ -13,6 +13,7 @@ Discovery.Registry = Discovery.Registry or {
     schemaVersion = Types.SCHEMA_VERSION,
     revision = 0,
     players = {},
+    frequencies = { settlements = {}, refugees = {} },
 }
 Discovery.Loaded = Discovery.Loaded == true
 Discovery.Dirty = Discovery.Dirty == true
@@ -25,6 +26,7 @@ Discovery.RADIO_COOLDOWN_HOURS = 0.01
 
 require "PNC/WorldDiscovery/PNC_WorldDiscovery_Storage"
 require "PNC/WorldDiscovery/PNC_WorldDiscovery_Entities"
+require "PNC/WorldDiscovery/WorldDiscoveryRadioBroadcasts/PNC_WorldDiscoveryRadioBroadcasts"
 require "PNC/WorldDiscovery/PNC_WorldDiscovery_Actions"
 require "PNC/WorldDiscovery/PNC_WorldDiscovery_Proximity"
 

@@ -4,9 +4,16 @@ require "ISUI/Maps/ISWorldMap"
 require "ISUI/ISContextMenu"
 
 PNC = PNC or {}
+PNC.WorldDiscoveryDebugMap = PNC.WorldDiscoveryDebugMap or {}
 
 local State = PNC.Network.ClientState
 local Types = PNC.WorldDiscoveryTypes
+local DebugMap = PNC.WorldDiscoveryDebugMap
+DebugMap.ShowRawEntities = DebugMap.ShowRawEntities == true
+
+local function text(key)
+    return getText and getText(key) or key
+end
 
 local function canDebug()
     return PNC.Client and PNC.Client.CanUseDebug
@@ -21,6 +28,28 @@ local function sendDiscovery(target)
         kind = target.kind,
         entityID = target.entityID,
     })
+end
+
+local function sendDiscoveryAll(scope)
+    if not PNC.Client or not PNC.Client.RequestWorldDiscovery then
+        return false
+    end
+    return PNC.Client.RequestWorldDiscovery("debug_discover_all", {
+        scope = tostring(scope or "all"),
+    })
+end
+
+local function toggleRawEntities()
+    DebugMap.ShowRawEntities = not DebugMap.ShowRawEntities
+    if DebugMap.ShowRawEntities and PNC.Client then
+        if PNC.Client.RequestCommunityDebug then
+            PNC.Client.RequestCommunityDebug()
+        end
+        if PNC.Client.RequestDirectorDebug then
+            PNC.Client.RequestDirectorDebug()
+        end
+    end
+    return true
 end
 
 local function communityAt(map, x, y)
@@ -83,6 +112,7 @@ if ISWorldMap and not ISWorldMap._pncWorldDiscoveryDebugPatched then
     ISWorldMap._pncWorldDiscoveryDebugPatched = true
     local originalRightMouseUp = ISWorldMap.onRightMouseUp
     function ISWorldMap:onRightMouseUp(x, y)
+        local originalResult = originalRightMouseUp(self, x, y)
         if canDebug() and self.mapAPI
             and not (PNC.MapCommands and PNC.MapCommands.Active)
         then
@@ -90,24 +120,42 @@ if ISWorldMap and not ISWorldMap._pncWorldDiscoveryDebugPatched then
                 communityAt(self, x, y),
                 groupAt(self, x, y),
             }
-            local context
+            local context = ISContextMenu.get(
+                tonumber(self.playerNum) or 0,
+                x + self:getAbsoluteX(),
+                y + self:getAbsoluteY()
+            )
             for _, target in ipairs(targets) do
                 if target then
-                    context = context or ISContextMenu.get(
-                        tonumber(self.playerNum) or 0,
-                        x + self:getAbsoluteX(),
-                        y + self:getAbsoluteY()
-                    )
                     context:addOption(
-                        "[DEBUG] Discover " .. target.label,
+                        text("UI_PNC_DebugDiscoveryDiscover")
+                            .. " " .. target.label,
                         target,
                         sendDiscovery
                     )
                 end
             end
-            if context then return true end
+            context:addOption(
+                text("UI_PNC_DebugDiscoveryAllSettlements"),
+                "settlements", sendDiscoveryAll
+            )
+            context:addOption(
+                text("UI_PNC_DebugDiscoveryAllGroups"),
+                "mobile_groups", sendDiscoveryAll
+            )
+            context:addOption(
+                text("UI_PNC_DebugDiscoveryAllSignals"),
+                "all", sendDiscoveryAll
+            )
+            context:addOption(
+                text(DebugMap.ShowRawEntities
+                    and "UI_PNC_DebugDiscoveryHideRaw"
+                    or "UI_PNC_DebugDiscoveryShowRaw"),
+                nil, toggleRawEntities
+            )
+            return true
         end
-        return originalRightMouseUp(self, x, y)
+        return originalResult
     end
 end
 

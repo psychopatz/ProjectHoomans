@@ -10,6 +10,12 @@ local function factionName(factionID, fallback)
     return tostring(faction and faction.name or fallback or "Unknown signal")
 end
 
+local function factionArchetype(factionID)
+    local faction = factionID and PNC.Factions and PNC.Factions.Get
+        and PNC.Factions.Get(factionID) or nil
+    return faction and faction.archetypeID or nil
+end
+
 local function settlementEntity(community)
     local site = community and community.site
     local home = site and site.home or community and community.home
@@ -21,6 +27,7 @@ local function settlementEntity(community)
         kind = Types.KIND_SETTLEMENT,
         name = tostring(community.name or "Survivor settlement"),
         factionID = community.factionID,
+        archetypeID = factionArchetype(community.factionID),
         x = tonumber(home.x), y = tonumber(home.y),
         z = tonumber(home.z) or 0,
         population = tonumber(community.currentPopulation) or 0,
@@ -37,6 +44,7 @@ local function mobileGroupEntity(group)
         kind = Types.KIND_MOBILE_GROUP,
         name = factionName(group.factionId, group.groupType or "Mobile group"),
         factionID = group.factionId,
+        archetypeID = factionArchetype(group.factionId),
         groupType = group.groupType,
         x = tonumber(location.x), y = tonumber(location.y),
         z = tonumber(location.z) or 0,
@@ -68,20 +76,16 @@ end
 function Discovery.ResolveEntity(kind, entityID)
     kind = tostring(kind or "")
     entityID = tostring(entityID or "")
-    if kind == Types.KIND_SETTLEMENT then
-        local community = PNC.Communities and PNC.Communities.Get
-            and PNC.Communities.Get(entityID) or nil
-        return settlementEntity(community)
-    end
-    if kind == Types.KIND_MOBILE_GROUP then
-        local group = PNC.AbstractGroups and PNC.AbstractGroups.Get
-            and PNC.AbstractGroups.Get(entityID) or nil
-        return mobileGroupEntity(group)
+    if not Types.IsKind(kind) then return nil end
+    for _, candidate in ipairs(Discovery.ListWorldEntities()) do
+        if candidate.kind == kind and candidate.entityID == entityID then
+            return candidate
+        end
     end
     return nil
 end
 
-function Discovery.SetPhase(player, kind, entityID, phase, source)
+function Discovery.SetPhase(player, kind, entityID, phase, source, deferSave)
     if not Types.IsKind(kind) then return nil, "invalid_kind" end
     local entity = Discovery.ResolveEntity(kind, entityID)
     if not entity then return nil, "entity_not_found" end
@@ -108,7 +112,7 @@ function Discovery.SetPhase(player, kind, entityID, phase, source)
     Discovery.Registry.revision =
         (tonumber(Discovery.Registry.revision) or 0) + 1
     Discovery.Dirty = true
-    Discovery.Save()
+    if deferSave ~= true then Discovery.Save() end
     return current, "advanced"
 end
 
@@ -127,12 +131,19 @@ function Discovery.BuildSnapshot(player, result)
         return { state = "error", reason = uuid, entities = {} }
     end
     local entities = {}
+    local currentByKind = {
+        settlement = {},
+        mobile_group = {},
+    }
+    for _, current in ipairs(Discovery.ListWorldEntities()) do
+        currentByKind[current.kind][current.entityID] = current
+    end
     for _, kind in ipairs({
         Types.KIND_SETTLEMENT,
         Types.KIND_MOBILE_GROUP,
     }) do
         for entityID, entry in pairs(record.entities[kind] or {}) do
-            local current = Discovery.ResolveEntity(kind, entityID)
+            local current = currentByKind[kind][entityID]
             local phase = Types.ClampPhase(entry.phase)
             local x = current and current.x or entry.x
             local y = current and current.y or entry.y

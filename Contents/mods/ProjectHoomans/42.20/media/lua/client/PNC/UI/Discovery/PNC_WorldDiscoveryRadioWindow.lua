@@ -1,11 +1,12 @@
--- Dedicated radio console for scanning and reviewing strategic signals.
+-- Contact directory for discovered settlements and mobile groups.
 
 require "PsychopatzCore/UI/PsychopatzUI"
 
 PNC = PNC or {}
-PNC.WorldDiscoveryUI = PNC.WorldDiscoveryUI or {}
+PNC.ContactsUI = PNC.ContactsUI or PNC.WorldDiscoveryUI or {}
+PNC.WorldDiscoveryUI = PNC.ContactsUI
 
-local DiscoveryUI = PNC.WorldDiscoveryUI
+local DiscoveryUI = PNC.ContactsUI
 local UI = PsychopatzCore.UI
 local Theme = UI.Theme
 local Layout = UI.Layout
@@ -35,7 +36,7 @@ local function drawSignal(list, y, entry, alternate)
         UIFont.Small
     )
     list:drawText(
-        phase .. " · " .. tostring(entity.kind or "signal"),
+        phase .. " · " .. tostring(entity.kind or "contact"),
         10, y + 28,
         color.r, color.g, color.b, color.a,
         UIFont.Small
@@ -43,68 +44,48 @@ local function drawSignal(list, y, entry, alternate)
     return y + list.itemheight
 end
 
-ISPNCWorldDiscoveryRadioWindow = PsychopatzWindow:derive(
-    "ISPNCWorldDiscoveryRadioWindow"
+ISPNCContactsWindow = PsychopatzWindow:derive(
+    "ISPNCContactsWindow"
 )
 
-function ISPNCWorldDiscoveryRadioWindow:initialise()
+function ISPNCContactsWindow:initialise()
     PsychopatzWindow.initialise(self)
 end
 
-function ISPNCWorldDiscoveryRadioWindow:createChildren()
+function ISPNCContactsWindow:createChildren()
     PsychopatzWindow.createChildren(self)
     self.signals = UI.CreateList(self, {
         itemHeight = 50,
         doDrawItem = drawSignal,
     })
-    self.scanButton = UI.CreateButton(self, {
-        id = "scan",
-        title = getText("UI_PNC_DiscoveryScan"),
-        target = self,
-        onclick = ISPNCWorldDiscoveryRadioWindow.onScan,
-        variant = "primary",
-    })
     self.refreshButton = UI.CreateButton(self, {
         id = "refresh",
         title = getText("UI_PNC_DiscoveryRefresh"),
         target = self,
-        onclick = ISPNCWorldDiscoveryRadioWindow.onRefresh,
+        onclick = ISPNCContactsWindow.onRefresh,
         variant = "quiet",
     })
     self:requestResponsiveLayout(true)
     self:refresh()
 end
 
-function ISPNCWorldDiscoveryRadioWindow:onResponsiveLayout()
+function ISPNCContactsWindow:onResponsiveLayout()
     local rect = self:getContentRect({ top = 50, bottom = 54 })
     Layout.SetBounds(self.signals,
         rect.x, rect.y, rect.width, rect.height)
     local buttonY = rect.y + rect.height + Layout.Pixels(10, self.uiScale)
-    local refreshWidth = Layout.Pixels(110, self.uiScale)
-    Layout.SetBounds(self.scanButton,
-        rect.x, buttonY,
-        math.max(160, rect.width - refreshWidth - 8),
-        Layout.Pixels(30, self.uiScale))
     Layout.SetBounds(self.refreshButton,
-        rect.x + rect.width - refreshWidth, buttonY,
-        refreshWidth, Layout.Pixels(30, self.uiScale))
+        rect.x, buttonY, rect.width, Layout.Pixels(30, self.uiScale))
 end
 
-function ISPNCWorldDiscoveryRadioWindow:onScan()
-    if PNC.Client and PNC.Client.RequestWorldDiscovery then
-        PNC.Client.RequestWorldDiscovery("radio_scan")
-        self.statusText = "Scanning frequencies..."
-    end
-end
-
-function ISPNCWorldDiscoveryRadioWindow:onRefresh()
+function ISPNCContactsWindow:onRefresh()
     if PNC.Client and PNC.Client.RequestWorldDiscovery then
         PNC.Client.RequestWorldDiscovery("snapshot")
         self.statusText = "Refreshing receiver memory..."
     end
 end
 
-function ISPNCWorldDiscoveryRadioWindow:refresh()
+function ISPNCContactsWindow:refresh()
     local snapshot = State.worldDiscovery or {}
     self.signals:clear()
     for _, entity in ipairs(snapshot.entities or {}) do
@@ -131,19 +112,19 @@ function ISPNCWorldDiscoveryRadioWindow:refresh()
                 .. tostring(result.reason or "unknown")
         end
     elseif #(snapshot.entities or {}) == 0 then
-        self.statusText = "No signals recorded. Start a frequency scan."
+        self.statusText = "No contacts recorded. Listen to the scan channel."
     else
         self.statusText = tostring(#(snapshot.entities or {}))
-            .. " strategic signals stored."
+            .. " contacts recorded."
     end
 end
 
-function ISPNCWorldDiscoveryRadioWindow:prerender()
+function ISPNCContactsWindow:prerender()
     PsychopatzWindow.prerender(self)
     self:drawText(
         string.upper(tr(
-            "UI_PNC_WorldSignalScanner",
-            "World Signal Scanner"
+            "UI_PNC_Contacts",
+            "Contacts"
         )),
         Layout.Pixels(14, self.uiScale),
         Layout.Pixels(32, self.uiScale),
@@ -161,13 +142,13 @@ function ISPNCWorldDiscoveryRadioWindow:prerender()
     )
 end
 
-function ISPNCWorldDiscoveryRadioWindow:close()
+function ISPNCContactsWindow:close()
     self:setVisible(false)
     self:removeFromUIManager()
     DiscoveryUI.instance = nil
 end
 
-function ISPNCWorldDiscoveryRadioWindow:new(x, y, width, height, options)
+function ISPNCContactsWindow:new(x, y, width, height, options)
     local object = PsychopatzWindow:new(x, y, width, height, options)
     setmetatable(object, self)
     self.__index = self
@@ -181,13 +162,13 @@ end
 function DiscoveryUI.Open()
     local window = DiscoveryUI.instance
     if not window then
-        window = UI.NewWindow(ISPNCWorldDiscoveryRadioWindow, {
+        window = UI.NewWindow(ISPNCContactsWindow, {
             title = tr(
-                "UI_PNC_WorldSignalScanner",
-                "World Signal Scanner"
+                "UI_PNC_Contacts",
+                "Contacts"
             ),
             resizable = true,
-            persistenceKey = "PNC.WorldDiscoveryRadio",
+            persistenceKey = "PNC.Contacts",
             responsiveSpec = {
                 width = 520,
                 height = 520,

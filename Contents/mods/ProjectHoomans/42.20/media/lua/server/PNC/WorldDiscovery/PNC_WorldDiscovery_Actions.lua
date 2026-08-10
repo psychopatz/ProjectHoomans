@@ -4,25 +4,19 @@ local Discovery = PNC.WorldDiscovery
 local Internal = Discovery.Internal
 local Types = PNC.WorldDiscoveryTypes
 
-function Discovery.RadioScan(player)
+function Discovery.RadioScan(player, channelID, frequency)
     local record, reason = Internal.PlayerRecord(player, true)
     if not record then return Discovery.BuildSnapshot(player, {
         ok = false, reason = reason,
     }) end
-    local at = Internal.WorldHour()
-    local remaining = Discovery.RADIO_COOLDOWN_HOURS
-        - (at - (tonumber(record.lastRadioScanAt) or 0))
-    if record.lastRadioScanAt and record.lastRadioScanAt > 0
-        and remaining > 0
+    local scanChannel = PNC.RadioDiscoveryChannel
+    if tostring(channelID or "") ~= scanChannel.ID
+        or math.floor(tonumber(frequency) or 0) ~= scanChannel.FREQUENCY
     then
         return Discovery.BuildSnapshot(player, {
-            ok = false,
-            reason = "radio_cooldown",
-            cooldownSeconds = math.ceil(remaining * 3600),
+            ok = false, reason = "invalid_channel",
         })
     end
-    record.lastRadioScanAt = at
-    Discovery.Dirty = true
     local best
     local bestDistance
     for _, entity in ipairs(Discovery.ListWorldEntities()) do
@@ -40,13 +34,32 @@ function Discovery.RadioScan(player)
         Discovery.Save()
         return Discovery.BuildSnapshot(player, {
             ok = false, reason = "no_signal",
+            channelID = scanChannel.ID,
         })
     end
+    local at = Internal.WorldHour()
+    local remaining = Discovery.RADIO_COOLDOWN_HOURS
+        - (at - (tonumber(record.lastRadioScanAt) or 0))
+    if record.lastRadioScanAt and record.lastRadioScanAt > 0
+        and remaining > 0
+    then
+        return Discovery.BuildSnapshot(player, {
+            ok = false,
+            reason = "radio_cooldown",
+            cooldownSeconds = math.ceil(remaining * 3600),
+            channelID = scanChannel.ID,
+        })
+    end
+    record.lastRadioScanAt = at
+    Discovery.Dirty = true
     local existing = record.entities[best.kind][best.entityID]
     local nextPhase = existing and Types.PHASE_LOCATED
         or Types.PHASE_RUMORED
     Discovery.SetPhase(player, best.kind, best.entityID,
         nextPhase, "radio")
+    local _, _, broadcast = Discovery.BroadcastRadioDiscovery(
+        player, best, nextPhase
+    )
     return Discovery.BuildSnapshot(player, {
         ok = true,
         reason = nextPhase == Types.PHASE_RUMORED
@@ -54,6 +67,13 @@ function Discovery.RadioScan(player)
         entityID = best.entityID,
         kind = best.kind,
         phase = nextPhase,
+        groupType = best.groupType,
+        identityRevealed = broadcast
+            and broadcast.identityIntroduced == true or false,
+        notificationID = tostring(best.entityID) .. ":"
+            .. tostring(nextPhase) .. ":"
+            .. tostring(record.revision or 0),
+        channelID = scanChannel.ID,
     })
 end
 
@@ -70,7 +90,9 @@ end
 function Discovery.HandleAction(player, args)
     args = type(args) == "table" and args or {}
     local action = tostring(args.action or "snapshot")
-    if action == "radio_scan" then return Discovery.RadioScan(player) end
+    if action == "radio_scan" then
+        return Discovery.RadioScan(player, args.channelID, args.frequency)
+    end
     if action == "debug_discover" then
         if not Discovery.CanUseDebug(player) then
             return Discovery.BuildSnapshot(player, {
@@ -88,6 +110,40 @@ function Discovery.HandleAction(player, args)
             entityID = args.entityID,
             kind = args.kind,
             phase = entry and entry.phase,
+        })
+    end
+    if action == "debug_discover_all" then
+        if not Discovery.CanUseDebug(player) then
+            return Discovery.BuildSnapshot(player, {
+                ok = false, reason = "not_authorized",
+            })
+        end
+        local scope = tostring(args.scope or "all")
+        local requestedKind = scope == "settlements"
+            and Types.KIND_SETTLEMENT
+            or scope == "mobile_groups"
+                and Types.KIND_MOBILE_GROUP or nil
+        if scope ~= "all" and not requestedKind then
+            return Discovery.BuildSnapshot(player, {
+                ok = false, reason = "invalid_scope",
+            })
+        end
+        local advanced = 0
+        for _, entity in ipairs(Discovery.ListWorldEntities()) do
+            if not requestedKind or entity.kind == requestedKind then
+                local _, reason = Discovery.SetPhase(
+                    player, entity.kind, entity.entityID,
+                    Types.PHASE_LOCATED, "debug_map_all", true
+                )
+                if reason == "advanced" then advanced = advanced + 1 end
+            end
+        end
+        Discovery.Save()
+        return Discovery.BuildSnapshot(player, {
+            ok = true,
+            reason = "debug_discovered_all",
+            scope = scope,
+            count = advanced,
         })
     end
     return Discovery.BuildSnapshot(player)
