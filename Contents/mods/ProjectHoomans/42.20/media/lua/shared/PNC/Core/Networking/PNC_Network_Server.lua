@@ -209,43 +209,62 @@ function Network.FlushRosterDeltas(now, force)
     return #entries
 end
 
-function Network.BroadcastRecord(record, eventName)
-    local payload
-    local path
+function Internal.QueueBroadcastRoster(record, eventName)
+    if eventName ~= "tick" and eventName ~= "materialize" and eventName ~= "interest_enter" then
+        return Network.QueueRosterDelta(record, false, eventName)
+    end
+    return false
+end
+
+function Internal.CollectRecordRecipients(record)
     local recipients = {}
     local state
-    if not Core.IsAuthority() then
-        return
-    end
-    if eventName ~= "tick" and eventName ~= "materialize" and eventName ~= "interest_enter" then
-        Network.QueueRosterDelta(record, false, eventName)
-    end
     if isServer and isServer() then
         for _, state in pairs(ServerState.interests) do
             if state.player and state.ids and state.ids[record.id] then
                 recipients[#recipients + 1] = state.player
             end
         end
-        if #recipients <= 0 then
-            return
-        end
     end
-    payload = {
+    return recipients
+end
+
+function Internal.BuildRecordPayload(record, eventName)
+    return {
         event = eventName or "update",
-        snapshot = eventName == "tick" and Network.BuildPresenceDelta(record) or Network.BuildSnapshot(record),
+        snapshot = eventName == "tick" and Network.BuildPresenceDelta(record)
+            or Network.BuildSnapshot(record),
     }
-    path = record and record.runtime and record.runtime.pathing or nil
-    if path and MotionHints and MotionHints.MarkBroadcast then
-        MotionHints.MarkBroadcast(record, path, Core.Now())
-    end
+end
+
+function Internal.SendRecordPayload(recipients, payload)
     if isServer and isServer() then
         local i
         for i = 1, #recipients do
             sendToPlayer(recipients[i], Const.CMD_SYNC_RECORD, payload)
         end
-        return
+        return #recipients
     end
     triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_SYNC_RECORD, payload)
+    return 1
+end
+
+function Network.BroadcastRecord(record, eventName)
+    local payload
+    local path
+    local recipients
+    if not Core.IsAuthority() then
+        return
+    end
+    Internal.QueueBroadcastRoster(record, eventName)
+    recipients = Internal.CollectRecordRecipients(record)
+    if isServer and isServer() and #recipients <= 0 then return end
+    payload = Internal.BuildRecordPayload(record, eventName)
+    path = record and record.runtime and record.runtime.pathing or nil
+    if path and MotionHints and MotionHints.MarkBroadcast then
+        MotionHints.MarkBroadcast(record, path, Core.Now())
+    end
+    Internal.SendRecordPayload(recipients, payload)
 end
 
 function Network.BroadcastRemoval(id, reason)

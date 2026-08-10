@@ -41,8 +41,10 @@ Profiler.Start("DETAILED", {
 
 PNC = {
     Registry = {
+        StorageKeyForID = function() return "PNC_NPC_secret_dynamic_identifier_abcdefghijklmnopqrstuvwxyz" end,
         Data = {
             npc_one = {
+                name = "Alex Morgan",
                 inventory = {
                     items = { item_1 = { fullType = "Base.Hammer", stack = 1 } },
                     containers = { root = { items = { "item_1" } } },
@@ -59,6 +61,9 @@ equal(report.persisted.modDataTables, 2, "only PNC ModData stores counted")
 equal(report.runtimeRecords.recordCount, 1, "runtime record count")
 equal(report.inventories.itemCount, 1, "inventory item count")
 equal(report.inventories.operationLogEntries, 1, "inventory op-log count")
+equal(report.npcRecords.records[1].name, "Alex Morgan", "NPC display name")
+truthy(report.npcRecords.records[1].runtimeContent.inventory, "runtime content missing")
+truthy(report.npcRecords.records[1].persistedContent.inventory, "persisted content missing")
 truthy(report.persisted.estimatedBytes > 0, "persisted estimate missing")
 truthy(report.inventories.estimatedBytes > 0, "inventory estimate missing")
 equal(report.valuesRedacted, true, "report must redact values")

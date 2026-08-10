@@ -3,6 +3,7 @@ PNC.ModDataProfiler = PNC.ModDataProfiler or {}
 
 local Analyzer = PNC.ModDataProfiler
 local Profiler = PsychopatzCore and PsychopatzCore.Profiler
+local Content = require "PNC/Integrations/PNC_PsychopatzModDataContent"
 
 if not Profiler or not Profiler.IsRunning or not Profiler.IsRunning() then
     return Analyzer
@@ -203,13 +204,13 @@ function Analyzer.Scan(force)
     local started = now
     local report = {
         reportVersion = 1,
-        capturedAtMs = now,
-        estimateMethod = "bounded_lua_shape_v1",
+        estimateMethod = "shape_v1",
         valuesRedacted = true,
         limits = { maxNodesPerSection = MAX_NODES, maxDepth = MAX_DEPTH, topPaths = MAX_TOP_PATHS },
         persisted = scanPersisted(),
         runtimeRecords = scanRuntimeRecords(),
         inventories = scanInventories(),
+        npcRecords = Content.Scan(),
     }
     report.scanMs = math.max(0, nowMs() - started)
     Analyzer.lastReport = report

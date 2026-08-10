@@ -23,6 +23,7 @@ Profiler.Start("BASIC", {
 })
 
 local originalSpatial = function() return "spatial" end
+local originalBuildPayload = function() return "payload" end
 PNC = {
     SpatialIndex = { Rebuild = originalSpatial },
     WorldCensus = { Refresh = function() end, OrdinaryZombies = { 1, 2 }, ManagedBodies = { 1 } },
@@ -32,17 +33,24 @@ PNC = {
     Scheduler = { PopDue = function() end, PumpJobs = function() end, Buckets = { one = {} } },
     Registry = { Data = { a = {}, b = {} }, LiveByID = { a = {} } },
     ZombieAggro = { ActiveSet = { order = { 1, 2 }, holes = 1 } },
+    Network = { Internal = { BuildRecordPayload = originalBuildPayload } },
 }
 
 local Integration = require "PNC/Integrations/PNC_PsychopatzProfiler"
 if PNC.SpatialIndex.Rebuild == originalSpatial then error("active integration did not wrap") end
 equal(PNC.SpatialIndex.Rebuild(), "spatial", "wrapper changed return")
+Integration.InstallServer()
+if PNC.Network.Internal.BuildRecordPayload == originalBuildPayload then
+    error("server network phase was not wrapped")
+end
+equal(PNC.Network.Internal.BuildRecordPayload(), "payload", "network phase wrapper changed return")
 now = 1000
 Profiler.Sample(1000)
 local gauges = Profiler.GetMetrics("gauge", "ProjectHoomans")
 if #gauges < 6 then error("Project Hoomans samplers were not registered") end
 Profiler.Stop()
 equal(PNC.SpatialIndex.Rebuild, originalSpatial, "stop did not restore original hot function")
+equal(PNC.Network.Internal.BuildRecordPayload, originalBuildPayload, "network phase did not restore")
 equal(callback, nil, "profiler callback survived stop")
 
 Bootstrap.mode = "OFF"
