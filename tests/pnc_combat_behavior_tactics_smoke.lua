@@ -134,7 +134,7 @@ preMoved = false
 mode = "ranged"
 PNC.BehaviorCombat.TickEngage(record, {}, target)
 assertEqual(calls[1], "pre", "ranged precheck runs")
-assertEqual(calls[2], "spacing", "ranged spacing runs before aim")
+assertEqual(calls[2], "hold", "ranged attack holds before spacing")
 assertEqual(calls[#calls - 1], "ranged", "ranged attack checks fire lane")
 assertEqual(
     calls[#calls],

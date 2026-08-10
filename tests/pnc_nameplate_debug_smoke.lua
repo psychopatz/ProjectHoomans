@@ -75,6 +75,31 @@ assertEqual(filtered, "Target: zombie", "component filtering")
 assertNotContains(filtered, "AI:", "hidden AI component")
 assertNotContains(filtered, "Weapon:", "hidden combat component")
 
+snapshot.combatDebugState = {
+    attackType = "auto",
+    mode = "melee",
+    decision = "lone_threat_counter",
+    visibleZombieCount = 1,
+    nearbyZombieCount = 2,
+}
+local combatSummary = PNC.NameplateDebug.BuildText(snapshot, true, {
+    debugShowPresence = false,
+    debugShowAI = false,
+    debugShowJob = false,
+    debugShowOrder = false,
+    debugShowTarget = false,
+    debugShowCombat = true,
+    debugShowMagazine = false,
+    debugShowStamina = false,
+    debugShowBlock = false,
+})
+assertContains(combatSummary, "Intent: auto/melee",
+    "combat intent summary")
+assertContains(combatSummary, "Tactic: lone_threat_counter",
+    "combat tactic summary")
+assertContains(combatSummary, "ViewZ: 1/2",
+    "visible zombie summary")
+
 local infected = PNC.NameplateDebug.InfectionText(snapshot, {
     debugShowInfection = true,
 })
@@ -365,6 +390,46 @@ assertContains(
 assertContains(combatLines[5], "state=bumped", "attack action state")
 assertContains(combatLines[6], "MOVE strafe/walk", "tactical movement")
 
+local viewLines = PNC.NameplateRenderer.BuildCombatDebugLines({
+    mode = "melee",
+    attackType = "auto",
+    decision = "melee_commit_window",
+    visibleZombieCount = 2,
+    nearbyZombieCount = 3,
+    tacticalState = "retreat",
+    retreatPhase = "retreat",
+    retreatReason = "near_miss_kite",
+    biteLaneClear = false,
+    biteLaneReason = "bite_lane_wall",
+    viewZombies = {
+        {
+            id = "z1",
+            distSq = 1.44,
+            intent = "selected",
+            actionState = "walktoward",
+            visibilityKind = "clear",
+        },
+        {
+            id = "z2",
+            distSq = 4,
+            intent = "biting",
+            actionState = "bumped",
+            visibilityKind = "clear",
+            bumpType = "Bite",
+        },
+    },
+})
+assertContains(viewLines[3], "VIEW zombies=2/3",
+    "combat view counts")
+assertContains(viewLines[3], "intent=auto",
+    "combat attack intent")
+assertContains(viewLines[3], "biteLane=bite_lane_wall",
+    "blocked zombie attack lane")
+assertContains(viewLines[4], "id=z1 d=1.2 mode=selected",
+    "selected visible zombie detail")
+assertContains(viewLines[5], "id=z2 d=2.0 mode=biting",
+    "biting visible zombie detail")
+
 local animationLine =
     PNC.NameplateRenderer.BuildBodyAnimationDebugLine({
         getModData = function()
@@ -582,5 +647,67 @@ assertContains(
     "state=bumped bump=Bite",
     "zombie attacker action graph rendered"
 )
+
+local unknownBody = {
+    getX = function() return 2 end,
+    getY = function() return 2 end,
+    getZ = function() return 0 end,
+}
+PNC.NameplateBodies.Index = function() return {} end
+PNC.NameplateBodies.Resolve = function(_, uuid)
+    return uuid == "unknown-npc" and unknownBody or nil
+end
+PNC.NameplateBodies.Tag = function() end
+PNC.Network.ClientState.snapshots = {
+    ["unknown-npc"] = {
+        id = "unknown-npc",
+        name = "Secret Name",
+        alive = true,
+        presenceState = "LIVE",
+        x = 2,
+        y = 2,
+        z = 0,
+        hpCurrent = 100,
+        hpMax = 100,
+        staminaCurrent = 100,
+        staminaMax = 100,
+        healthState = "normal",
+        debugState = { aiState = "Combat" },
+    },
+}
+getPlayerScreenLeft = function() return 0 end
+getPlayerScreenTop = function() return 0 end
+getPlayerScreenWidth = function() return 1280 end
+getPlayerScreenHeight = function() return 720 end
+getTimeInMillis = function() return 1000 end
+getCell = function()
+    return { getZombieList = function() return {} end }
+end
+getSpecificPlayer = function()
+    return {
+        getX = function() return 0 end,
+        getY = function() return 0 end,
+        getZ = function() return 0 end,
+    }
+end
+local overlayManager = {
+    playerIndex = 0,
+    entries = {},
+    updateCounter = 5,
+    setX = function() end,
+    setY = function() end,
+    setWidth = function() end,
+    setHeight = function() end,
+}
+PNC.NameplateEntries.Refresh(overlayManager, {
+    enabled = true,
+    showAIDebug = true,
+    debugShowAnimation = false,
+})
+assert(overlayManager.entries["unknown-npc"] ~= nil,
+    "debug overlay stayed hidden until the name introduction")
+assertEqual(overlayManager.entries["unknown-npc"].name,
+    "Unknown survivor",
+    "debug overlay leaked an undisclosed NPC name")
 
 print("pnc_nameplate_debug_smoke: ok")

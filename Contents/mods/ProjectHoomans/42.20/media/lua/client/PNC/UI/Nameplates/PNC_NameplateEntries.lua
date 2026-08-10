@@ -380,6 +380,13 @@ local function isDebugVisible(player, snapshot)
 end
 
 function Entries.Refresh(manager, settings)
+    local debugActive = settings.showAIDebug == true
+        or settings.showPathDebug == true
+        or settings.showCombatDebug == true
+        or settings.showAnimationDebug == true
+        or settings.showAnimationSceneDebug == true
+        or settings.showFactionDebug == true
+        or settings.showCommunityDebug == true
     if settings.showFactionDebug == true
         and PNC.FactionDebugOverlay
         and PNC.FactionDebugOverlay.Update
@@ -423,7 +430,9 @@ function Entries.Refresh(manager, settings)
         local zombie = Bodies.Resolve(bodyIndex, uuid, snapshot)
         local alive = snapshot and snapshot.alive ~= false
             and snapshot.presenceState == Const.PRESENCE_LIVE
-        if zombie and alive and Identity.IsNameKnown(snapshot) then
+        if zombie and alive
+            and (Identity.IsNameKnown(snapshot) or debugActive)
+        then
             Bodies.Tag(zombie, uuid, snapshot)
             if isLiveVisible(player, zombie) then
                 local entry = manager.entries[uuid] or { uuid = uuid }
@@ -431,11 +440,7 @@ function Entries.Refresh(manager, settings)
                 manager.entries[uuid] = entry
                 visible[uuid] = true
             end
-        elseif (
-            settings.showAIDebug
-                or settings.showFactionDebug
-                or settings.showCommunityDebug
-        ) and snapshot and Identity.IsNameKnown(snapshot) and isDebugVisible(player, snapshot) then
+        elseif debugActive and snapshot and isDebugVisible(player, snapshot) then
             local entry = manager.entries[uuid] or { uuid = uuid }
             populateDebugEntry(entry, snapshot, settings)
             manager.entries[uuid] = entry

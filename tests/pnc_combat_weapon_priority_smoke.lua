@@ -13,6 +13,7 @@ local weaponAnimationCount = 0
 local groundAnimationCount = 0
 local grounded = false
 local action
+local canSpendAttack = true
 local targetZombie = { isDead = function() return false end }
 local equippedWeapon = {
     IsWeapon = function() return true end,
@@ -70,6 +71,9 @@ PNC = {
     CombatTactics = {
         ShouldUseGroundFinisher = function() return true end,
     },
+    Stamina = {
+        CanSpendAttack = function() return canSpendAttack end,
+    },
 }
 
 dofile(ROOT .. "Combat/PNC_Combat_Melee.lua")
@@ -124,6 +128,21 @@ assertEqual(started, true, "armed tactical shove starts")
 assertEqual(reason, "pressure_shove", "tactical shove reason")
 assertEqual(action.attackKind, "shove", "tactical shove action kind")
 assertEqual(shoveCount, 2, "tactical shove animation count")
+
+now = now + 1000
+action = nil
+canSpendAttack = false
+started, reason = PNC.Combat.TryShove(
+    record(),
+    {},
+    target,
+    "exhausted_defensive_shove"
+)
+assertEqual(started, true, "exhausted defensive shove was stamina-blocked")
+assertEqual(reason, "exhausted_defensive_shove",
+    "exhausted defensive shove reason")
+assertEqual(action.attackKind, "shove",
+    "exhausted defense did not build a shove action")
 
 local biteFile = assert(io.open(ROOT .. "Zombies/PNC_ZombieAggro_Bite.lua", "r"))
 local biteSource = biteFile:read("*a")

@@ -18,6 +18,7 @@ local nearbyPlayers = {}
 local moves = {}
 local skillLevel = 0
 local grounded = false
+local canSpendAttack = true
 
 local targetZombie = {
     isDead = function() return false end,
@@ -134,6 +135,7 @@ PNC = {
     },
     Stamina = {
         GetRatio = function() return 1 end,
+        CanSpendAttack = function() return canSpendAttack end,
     },
     TraversalQuery = {
         CanStep = function() return true end,
@@ -209,6 +211,45 @@ assertEqual(
     4,
     "skill and equipment influence pressure tolerance"
 )
+
+-- An avoided bite from one zombie opens a counter-shove instead of making
+-- the NPC turn its back and enter a retreat path.
+now = now + 250
+pressureCount = 1
+visiblePressureCount = 1
+hordeCount = 1
+visibleHordeCount = 1
+record = makeRecord("lone_counter")
+PNC.CombatTactics.MarkZombieNearMiss(record, 1, 0, 0, now)
+moved, reason, action = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, false, "lone near miss incorrectly triggered retreat")
+assertEqual(reason, "lone_threat_counter", "lone counter reason")
+assertEqual(action, "shove", "lone near miss did not counter-shove")
+
+-- An exhausted fighter still gets one defensive shove against a lone threat;
+-- ordinary weapon attacks remain stamina-gated.
+now = now + 250
+canSpendAttack = false
+record = makeRecord("exhausted_counter")
+record.stamina.current = 5
+moved, reason, action = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, false, "exhausted lone fighter entered retreat first")
+assertEqual(reason, "exhausted_defensive_shove",
+    "exhausted lone counter reason")
+assertEqual(action, "shove", "exhausted lone fighter did not defend")
+canSpendAttack = true
 
 -- Crowd pressure alone must not make a healthy follower abandon the player.
 -- A real avoided zombie impact arms the short reactive kite.

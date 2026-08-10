@@ -144,6 +144,8 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
         travelDurationMs = travelDurationMs,
         hardFinishAt = now + hardTimeoutMs,
         sawBumpState = false,
+        obstacle = spec.obstacle,
+        interactionApplied = false,
     }
     lane.specialMoveUntil = now + hardTimeoutMs
     lane.specialAnim = lane.traversalAction.anim
@@ -276,6 +278,14 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     timedOut = now >= (tonumber(action.hardFinishAt) or now)
     if progress < 1 then
         return true, action.kind
+    end
+    if action.kind == "window_smash"
+        and action.interactionApplied ~= true
+    then
+        action.interactionApplied = true
+        if Internal.smashWindowForNPC then
+            Internal.smashWindowForNPC(zombie, action.obstacle)
+        end
     end
     nextX = tonumber(action.endX) or zombie:getX()
     nextY = tonumber(action.endY) or zombie:getY()

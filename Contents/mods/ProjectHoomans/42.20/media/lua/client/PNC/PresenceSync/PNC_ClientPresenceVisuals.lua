@@ -19,6 +19,8 @@ local LiveBodyControl = PNC.LiveBodyControl
 local AnimationTrace = PNC.AnimationTrace
 local logClientMotionDebug = Internal.LogClientMotionDebug
 local LOCOMOTION_MAINTAIN_MS = 500
+local ATTACK_BUMP_REARM_MS = 100
+local ATTACK_BUMP_MAX_REARMS = 1
 
 local function getActionStateName(zombie)
     if zombie and zombie.getActionStateName then
@@ -79,6 +81,57 @@ local function observeClientAttackBump(zombie, modData)
         getActionStateName(zombie)
     modData.PNC_ClientAttackBumpType =
         getBumpType(zombie)
+end
+
+local function rearmDroppedClientAttackBump(
+    snapshot,
+    zombie,
+    recordView,
+    modData,
+    attackKey,
+    anim,
+    now
+)
+    local startedAt
+    local retries
+    local actionState
+    if not zombie or not modData or not attackKey then return false end
+    startedAt = tonumber(modData.PNC_ClientAttackLocalStartedAt) or now
+    retries = tonumber(modData.PNC_ClientAttackRetries) or 0
+    actionState = getActionStateName(zombie)
+    if actionState == "bumped"
+        or now - startedAt < ATTACK_BUMP_REARM_MS
+        or retries >= ATTACK_BUMP_MAX_REARMS
+    then
+        return false
+    end
+    -- PathFindState can consume the first BumpType change while it exits,
+    -- leaving the requested selector installed but the ActionContext idle.
+    -- Toggle the selector once to create a fresh edge after path ownership has
+    -- been released. Never do this after BumpedState has actually started.
+    if zombie.setBumpType then zombie:setBumpType("") end
+    if Animation and Animation.PlayBump then
+        Animation.PlayBump(zombie, recordView, anim, {
+            leaseUntil = snapshot
+                and snapshot.visualState
+                and snapshot.visualState.attackFinishAt
+                or nil,
+        })
+    end
+    modData.PNC_ClientAttackRetries = retries + 1
+    observeClientAttackBump(zombie, modData)
+    logClientMotionDebug(
+        snapshot,
+        snapshot and snapshot.id or nil,
+        "attack_anim_rearm",
+        "anim=" .. tostring(anim)
+            .. " bump=" .. getBumpType(zombie)
+            .. " action=" .. getActionStateName(zombie)
+    )
+    if AnimationTrace and AnimationTrace.Sample then
+        AnimationTrace.Sample(zombie, "client_attack_rearm", now, true)
+    end
+    return true
 end
 
 local function buildRecordView(snapshot)
@@ -735,9 +788,15 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
         return
     end
     if attackKey then
-        -- Bandits selects BumpType exactly once. Re-clearing and replaying it
-        -- because one expected action-state label was not observed restarts
-        -- valid clips before their weapon-swing keyframe.
+        rearmDroppedClientAttackBump(
+            snapshot,
+            zombie,
+            recordView,
+            modData,
+            attackKey,
+            visualState.attackAnim,
+            now
+        )
         observeClientAttackBump(zombie, modData)
         if AnimationTrace and AnimationTrace.Sample then
             AnimationTrace.Sample(

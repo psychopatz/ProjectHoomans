@@ -130,10 +130,10 @@ local target = {
 }
 
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assertEqual(calls[1], "spacing", "ranged spacing owns movement before aiming")
-assertEqual(calls[2], "hold", "ranged aim stops stale movement first")
-assertEqual(calls[3], "face", "ranged aim faces after stopping")
-assertEqual(calls[4], "try_ranged", "ranged attack evaluates after facing")
+assertEqual(calls[1], "hold", "ranged aim stops stale movement first")
+assertEqual(calls[2], "face", "ranged aim faces after stopping")
+assertEqual(calls[3], "try_ranged", "ranged attack evaluates before spacing")
+assertEqual(calls[4], "spacing", "cooldown spacing follows the fire attempt")
 
 for _ = 1, 39 do
     now = now + 75
@@ -158,9 +158,11 @@ target.distSq = 1
 repositionClose = true
 local attemptsBeforeClose = rangedAttempts
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assertEqual(rangedAttempts, attemptsBeforeClose, "unsafe point-blank range repositions before firing")
-assertEqual(calls[1], "spacing", "preferred-distance controller evaluates point-blank response first")
-assertEqual(calls[2], "reposition:target_too_close", "short standoff remains the fallback point-blank response")
+assertEqual(rangedAttempts, attemptsBeforeClose + 1,
+    "point-blank spacing starved the ranged attack check")
+assertEqual(calls[1], "hold", "point-blank shooter acquires an attack hold first")
+assertEqual(calls[3], "try_ranged", "point-blank shooter checks fire before retreat")
+assertEqual(calls[4], "spacing", "point-blank cooldown then creates space")
 
 -- Tactics: a normal cooldown with only one enemy in safe firing range must not
 -- generate a retreat intent.
@@ -253,6 +255,17 @@ assertEqual(retreatMoves, 0, "safe cooldown does not author movement")
 repositioned = PNC.CombatTactics.MaintainRangedSpacing(record, {}, target)
 assertEqual(repositioned, true, "ranged spacing retreats from a nearby enemy")
 assertEqual(retreatMoves, 1, "ranged spacing authors retreat movement")
+local preMoved = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "ranged",
+    {}
+)
+assertEqual(preMoved, false,
+    "active ranged spacing preempted the next fire attempt")
+assertEqual(retreatMoves, 1,
+    "ranged precheck refreshed movement before attack arbitration")
 PNC.CombatTactics.ClearRetreatState(record)
 target.x = 6
 target.distSq = 36

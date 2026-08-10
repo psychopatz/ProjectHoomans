@@ -36,6 +36,9 @@ local requestCount = 0
 local updateCount = 0
 local cancelCount = 0
 local resetCount = 0
+local nativePassageObject
+local windowSmashStarted = 0
+local windowSmashFinished = 0
 local bodyModData = {
     PNC_NPC = true,
     PNC_UUID = "remote_replica",
@@ -91,6 +94,15 @@ local body = {
     end,
     clearAggroList = function(self)
         self.aggroCleared = true
+    end,
+    faceThisObject = function(self, object)
+        self.facedObject = object
+    end,
+    setBumpType = function(self, value)
+        self.bumpType = value
+    end,
+    changeState = function(self, value)
+        self.actionState = value and value.name or "idle"
     end,
 }
 
@@ -165,6 +177,58 @@ PNC.ClientPresenceSync = {
         LogClientMotionDebug = function() end,
     },
     NativePathStateByBody = {},
+}
+PNC.TraversalQuery = {
+    FindPassageToward = function()
+        return nativePassageObject
+            and { object = nativePassageObject }
+            or nil
+    end,
+    IsDoor = function(object)
+        return object and object.kind == "door"
+    end,
+    IsWindow = function(object)
+        return object and object.kind == "window"
+    end,
+}
+PNC.PathService = {
+    Internal = {
+        openDoorForNPC = function(_, object)
+            object.open = true
+            return true
+        end,
+        openWindowForNPC = function(_, object)
+            if object.locked then return false end
+            object.open = true
+            return true
+        end,
+        smashWindowForNPC = function(_, object)
+            object.smashed = true
+            return true
+        end,
+    },
+}
+PNC.Animation = {
+    PlayBump = function(_, _, bumpType)
+        assert(bumpType == "PNC_WindowSmash",
+            "native breach selected the wrong animation")
+        windowSmashStarted = windowSmashStarted + 1
+        return true
+    end,
+    FinishBump = function()
+        windowSmashFinished = windowSmashFinished + 1
+    end,
+}
+ClimbThroughWindowState = {
+    instance = function()
+        return {
+            name = "climbwindow",
+            setParams = function(self, candidate, object)
+                self.body = candidate
+                self.object = object
+            end,
+        }
+    end,
 }
 local localPlayer = {
     x = 0,
@@ -351,8 +415,9 @@ runZombieUpdates(body)
 local requestsBeforeRetries = requestCount
 local attempt
 for attempt = 1, 5 do
-    body.actionState = "idle"
-    clientNow = clientNow + 1000
+    body.actionState = attempt == 1
+        and "climbfence" or "idle"
+    clientNow = clientNow + (attempt == 1 and 3100 or 1000)
     runZombieUpdates(body)
     clientNow = clientNow + 5000
     runZombieUpdates(body)
@@ -361,6 +426,55 @@ assert(requestCount == requestsBeforeRetries + 5,
     "same native goal stopped retrying after repeated engine drops")
 assert(useless == false,
     "retrying native movement lost its multiplayer movement lease")
+
+PNC.ClientPresenceSync.Internal.ClearNativePathControllers()
+local breachWindow = {
+    kind = "window",
+    locked = true,
+    open = false,
+    smashed = false,
+    IsOpen = function(self) return self.open end,
+    isSmashed = function(self) return self.smashed end,
+    canClimbThrough = function(self) return self.smashed end,
+}
+nativePassageObject = breachWindow
+body.actionState = "idle"
+clientNow = clientNow + 100
+local breachSnapshot = {
+    id = snapshot.id,
+    liveBodyLease = snapshot.liveBodyLease,
+    visualState = {
+        nativeMoveActive = true,
+        attackActive = false,
+        nativeMoveX = 8,
+        nativeMoveY = 4,
+        nativeMoveZ = 0,
+        nativeMoveRevision = 6,
+    },
+}
+PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
+    breachSnapshot,
+    body,
+    clientNow
+)
+runZombieUpdates(body)
+assert(windowSmashStarted == 1,
+    "locked native-route window did not start a breach")
+clientNow = clientNow + 700
+runZombieUpdates(body)
+assert(breachWindow.smashed == true,
+    "native-route window was not broken at impact")
+clientNow = clientNow + 400
+runZombieUpdates(body)
+assert(windowSmashFinished == 1,
+    "window breach animation did not release")
+clientNow = clientNow + 600
+body.actionState = "idle"
+runZombieUpdates(body)
+assert(body.actionState == "climbwindow",
+    "smashed native-route window did not force climb recovery")
+assert(body.bumpType == "ClimbWindow",
+    "forced window climb did not use the engine traversal selector")
 
 local tickSource = readAll(CLIENT_TICK)
 assert(not string.find(

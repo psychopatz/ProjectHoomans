@@ -9,6 +9,8 @@ local Health = PNC.Health
 local Settings = PNC.Sandbox
 local Stealth = PNC.Stealth
 local CombatDefense = PNC.CombatDefense
+local Perception = PNC.Perception
+local TraversalQuery = PNC.TraversalQuery
 
 local State = ZombieAggro.State
 local Internal = ZombieAggro.Internal
@@ -30,6 +32,60 @@ end
 
 local function actionState(zombie)
     return zombie and zombie.getActionStateName and tostring(zombie:getActionStateName() or "") or ""
+end
+
+local function rememberAttackLane(record, clear, reason)
+    if not record then return end
+    record.runtime = record.runtime or {}
+    record.runtime.zombieAttackLane = {
+        clear = clear == true,
+        reason = tostring(reason or (clear and "clear" or "blocked")),
+        checkedAt = Core.Now(),
+    }
+end
+
+function ZombieAggro.HasBiteLane(zombie, npcBody, record)
+    local canStep
+    local stepReason
+    local visible
+    local visibilityKind
+    if not zombie or not npcBody or not record then
+        return false, "bite_lane_missing"
+    end
+    if math.abs(zombie:getZ() - npcBody:getZ()) >= 0.3 then
+        return false, "bite_lane_floor"
+    end
+    if TraversalQuery and TraversalQuery.CanStep then
+        canStep, stepReason = TraversalQuery.CanStep(
+            zombie:getX(),
+            zombie:getY(),
+            zombie:getZ(),
+            npcBody:getX(),
+            npcBody:getY(),
+            npcBody:getZ(),
+            getCell and getCell() or nil
+        )
+        if canStep ~= true then
+            return false, "bite_lane_" .. tostring(
+                stepReason or "blocked"
+            )
+        end
+    end
+    if Perception and Perception.CanSeeWorldObject then
+        visible, visibilityKind =
+            Perception.CanSeeWorldObject(record, zombie)
+        if visibilityKind ~= nil
+            and (
+                visible ~= true
+                or visibilityKind == "clearthroughwindow"
+            )
+        then
+            return false, "bite_los_" .. tostring(
+                visibilityKind or "blocked"
+            )
+        end
+    end
+    return true, visibilityKind or stepReason or "clear"
 end
 
 local function setBiteDiagnostic(record, entry, reason)
@@ -179,10 +235,21 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
     local bumpType
     local now
     local entry
+    local laneClear
+    local laneReason
 
     if not zombie or not npcBody or not record
         or shouldPreventZombieAttack(record)
     then
+        return false
+    end
+    laneClear, laneReason = ZombieAggro.HasBiteLane(
+        zombie,
+        npcBody,
+        record
+    )
+    rememberAttackLane(record, laneClear, laneReason)
+    if not laneClear then
         return false
     end
     zombieId = Internal.ensureZombieID(zombie)
@@ -349,6 +416,8 @@ function ZombieAggro.UpdateBiteState(zombie, now)
     local npcBody
     local dist
     local asn
+    local laneClear
+    local laneReason
     if not zombie then
         return false
     end
@@ -391,6 +460,21 @@ function ZombieAggro.UpdateBiteState(zombie, now)
     dist = Core.Distance(zombie:getX(), zombie:getY(), npcBody:getX(), npcBody:getY())
     if dist > (Const.ZOMBIE_BITE_DISTANCE * 1.35) then
         beginRelease(zombieId, npcBody, "target_out_of_range", now)
+        return true
+    end
+    laneClear, laneReason = ZombieAggro.HasBiteLane(
+        zombie,
+        npcBody,
+        record
+    )
+    rememberAttackLane(record, laneClear, laneReason)
+    if not laneClear then
+        beginRelease(
+            zombieId,
+            npcBody,
+            laneReason or "bite_lane_blocked",
+            now
+        )
         return true
     end
     if entry.appliedDamage ~= true and now >= (tonumber(entry.applyAt) or now) then

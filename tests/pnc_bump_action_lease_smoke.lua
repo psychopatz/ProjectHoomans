@@ -41,6 +41,9 @@ local bumpType = ""
 local bumpDone = true
 local useless = true
 local actionState = "idle"
+ZombieIdleState = {
+    instance = function() return "idle_state" end,
+}
 local body = {
     getModData = function()
         return modData
@@ -64,6 +67,10 @@ local body = {
         bumpDone = value == true
     end,
     setBumpFall = function() end,
+    changeState = function(_, value)
+        assertEqual(value, "idle_state", "forced bump recovery state")
+        actionState = "idle"
+    end,
     setRunning = function() end,
     setMoving = function() end,
     setSneaking = function() end,
@@ -272,5 +279,34 @@ assertEqual(
     "locomotion did not recover after a cancelled bump"
 )
 assertEqual(variables.bMoving, true, "recovered body did not animate its legs")
+
+now = 2000
+actionState = "bumped"
+started = PNC.Animation.PlayBump(
+    body,
+    record,
+    "PNC_Attack1H1"
+)
+assertEqual(started, true, "stuck bump scenario started")
+PNC.Animation.FinishBump(body, true)
+now = 2400
+assertEqual(
+    PNC.Animation.PumpBumpRelease(body, now),
+    true,
+    "bumped state was force-cleared before its recovery grace"
+)
+now = 2800
+assertEqual(
+    PNC.Animation.PumpBumpRelease(body, now),
+    false,
+    "stuck bumped state survived the hard recovery timeout"
+)
+assertEqual(bumpType, "", "stuck bump selector was not cleared")
+assertEqual(actionState, "idle", "stuck bump did not return to idle")
+assertEqual(
+    modData.PNC_BumpActionLease,
+    nil,
+    "stuck bump retained its body action lease"
+)
 
 print("pnc_bump_action_lease_smoke: ok")

@@ -91,48 +91,24 @@ local function clearAction(record, zombie, reason)
     record.runtime.tacticalState = nil
 end
 
-local function needsRecoveryRetreat(record)
-    return CombatTactics
-        and CombatTactics.NeedsRecoveryRetreat
-        and CombatTactics.NeedsRecoveryRetreat(record) == true
-end
-
-local function requestRetreat(record, zombie, threat)
+local function yieldToCombat(record, zombie, threat, now)
     local state = ensureState(record)
-    local moved
-    local reason
-    if CombatTactics and CombatTactics.AvoidThreat then
-        moved, reason = CombatTactics.AvoidThreat(
-            record,
-            zombie,
-            threat,
-            {
-                radius = tonumber(Const.SELF_BANDAGE_THREAT_RADIUS) or 10,
-                distance = tonumber(Const.SELF_BANDAGE_RETREAT_DISTANCE) or 5,
-                stopDistance =
-                    tonumber(Const.SELF_BANDAGE_RETREAT_STOP_DISTANCE) or 1,
-                lockMs = tonumber(Const.COMPANION_AVOID_THREAT_LOCK_MS) or 750,
-                mode = "walk",
-                reason = "self_treatment_retreat",
-                recoveryMode = "retreat_to_treat",
-            }
-        )
-    end
-    if not moved then
+    if state.phase == "bandaging" then
+        clearAction(record, zombie, "threat_nearby")
+    else
         state.phase = "idle"
-        state.interruptedReason = reason or "retreat_unavailable"
+        state.interruptedReason = "threat_nearby"
         record.runtime.tacticalState = nil
-        return false, state.interruptedReason
     end
-    record.activeBehavior = "SelfTreatmentRetreat"
-    state.phase = "retreat"
-    state.interruptedReason = "threat_nearby"
-    record.runtime.tacticalState = "retreat_to_treat"
-    -- Keep the threat visible to the combat layer. If native movement stalls,
-    -- Treatment.Tick returns false and the same tick can defend instead of
-    -- standing unarmed while repeatedly rebuilding a retreat.
+    state.retryAt = now + (tonumber(Const.SELF_BANDAGE_RETRY_MS) or 5000)
     record.runtime.target = threat
-    return true, reason or "self_treatment_retreat"
+    -- Treatment must never choose movement while an enemy owns the tactical
+    -- lane. The combat layer decides whether to counter, shove, or retreat.
+    -- Returning false lets that decision happen in this same behavior tick.
+    if CombatTactics and CombatTactics.ClearRetreatState then
+        CombatTactics.ClearRetreatState(record)
+    end
+    return false
 end
 
 local function startBandage(record, zombie, partId, now)
@@ -248,21 +224,30 @@ function Behavior.Tick(record, zombie, now)
         return false
     end
 
-    threat = findThreat(record, tonumber(Const.SELF_BANDAGE_THREAT_RADIUS) or 10)
+    threat = Perception and Perception.ResolveRecentAttacker
+        and Perception.ResolveRecentAttacker(record, now) or nil
+    if not threat and Perception and Perception.FindImmediateZombieThreat then
+        threat = Perception.FindImmediateZombieThreat(
+            record,
+            tonumber(Const.SELF_BANDAGE_THREAT_RADIUS) or 10
+        )
+    end
+    if not threat then
+        threat = findThreat(
+            record,
+            tonumber(Const.SELF_BANDAGE_THREAT_RADIUS) or 10
+        )
+    end
     interruptRadius = tonumber(Const.SELF_BANDAGE_INTERRUPT_RADIUS) or 7
     if state.phase == "bandaging" then
         if threat and (tonumber(threat.distSq) or math.huge)
             <= interruptRadius * interruptRadius
         then
-            clearAction(record, zombie, "threat_nearby")
-            state.retryAt = now + (tonumber(Const.SELF_BANDAGE_RETRY_MS) or 5000)
             if record.health and record.health.state == "incapacitated" then
+                clearAction(record, zombie, "threat_nearby")
                 return false
             end
-            if needsRecoveryRetreat(record) then
-                return requestRetreat(record, zombie, threat)
-            end
-            return false
+            return yieldToCombat(record, zombie, threat, now)
         end
         record.activeBehavior = "SelfBandage"
         if MoveIntent and MoveIntent.Hold then
@@ -300,18 +285,7 @@ function Behavior.Tick(record, zombie, now)
         if record.health and record.health.state == "incapacitated" then
             return false
         end
-        if needsRecoveryRetreat(record) then
-            return requestRetreat(record, zombie, threat)
-        end
-        if state.phase == "retreat"
-            and CombatTactics
-            and CombatTactics.ClearRetreatState
-        then
-            CombatTactics.ClearRetreatState(record)
-        end
-        state.phase = "idle"
-        record.runtime.tacticalState = nil
-        return false
+        return yieldToCombat(record, zombie, threat, now)
     end
     if state.phase == "retreat"
         and CombatTactics

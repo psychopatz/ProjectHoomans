@@ -479,14 +479,15 @@ function Perception.FindNearestEnemyZombie(record, radius)
     return best
 end
 
--- A nearby zombie is actionable even when LosUtil has not produced a usable
--- result on the authoritative MP server yet. This reads the already-cached
--- spatial frame and is deliberately short range, so it neither adds another
--- world scan nor turns distant zombies behind buildings into targets.
+-- Immediate proximity does not override walls. Treating every nearby spatial
+-- candidate as actionable made NPCs stare at zombies in the next room while
+-- scripted bite damage continued through the shared wall.
 function Perception.FindImmediateEnemyZombie(record, radius)
     local frame
     local entries
     local entry
+    local visible
+    local visibilityKind
     local i
     local limit = tonumber(radius)
         or tonumber(Const.TARGET_IMMEDIATE_THREAT_RADIUS)
@@ -503,15 +504,74 @@ function Perception.FindImmediateEnemyZombie(record, radius)
     for i = 1, #(entries or {}) do
         entry = entries[i]
         if entry and entry.zombie and entry.distSq <= limitSq then
-            return buildZombieTarget(
-                record,
-                entry.zombie,
-                entry.distSq,
-                "proximity"
-            )
+            visible, visibilityKind =
+                Perception.CanSeeWorldObject(
+                    record,
+                    entry.zombie
+                )
+            if visible then
+                return buildZombieTarget(
+                    record,
+                    entry.zombie,
+                    entry.distSq,
+                    visibilityKind or "proximity"
+                )
+            end
         end
     end
     return nil
+end
+
+-- A no-initiation policy does not make a zombie harmless. This query is
+-- deliberately independent of attackZombies and only returns a visible
+-- zombie whose engine target is this NPC (or one remembered from damage).
+function Perception.FindImmediateZombieThreat(record, radius)
+    local recent
+    local frame
+    local entries
+    local entry
+    local candidate
+    local best
+    local visible
+    local visibilityKind
+    local i
+    local limit = tonumber(radius)
+        or tonumber(Const.TARGET_IMMEDIATE_THREAT_RADIUS)
+        or 4
+    if not record then return nil end
+    recent = Perception.ResolveRecentAttacker(
+        record,
+        Core.Now and Core.Now() or 0
+    )
+    if recent and recent.kind == "zombie" then
+        return recent
+    end
+    if not Perception.GetZombieFrame then return nil end
+    frame = Perception.GetZombieFrame(record, limit)
+    entries = frame and frame.entries or nil
+    for i = 1, #(entries or {}) do
+        entry = entries[i]
+        if entry and entry.zombie
+            and (tonumber(entry.distSq) or math.huge) <= limit * limit
+        then
+            visible, visibilityKind = Perception.CanSeeWorldObject(
+                record,
+                entry.zombie
+            )
+            if visible then
+                candidate = buildZombieTarget(
+                    record,
+                    entry.zombie,
+                    entry.distSq,
+                    visibilityKind or "immediate_threat"
+                )
+                if candidate and candidate.threatening == true then
+                    best = pickNearest(best, candidate)
+                end
+            end
+        end
+    end
+    return best
 end
 
 function Perception.FindBestEnemyZombie(record, radius)
@@ -739,12 +799,15 @@ function Perception.ResolveCompanionTarget(record)
     local immediateZombie
     local defenseRadius = getCompanionDefenseRadius()
 
+    local recentAttacker = Perception.ResolveRecentAttacker(
+        record,
+        Core.Now and Core.Now() or 0
+    )
+    if recentAttacker then return recentAttacker end
     owner = Core.ResolvePlayerByOnlineID(record.ownerOnlineID) or Core.ResolvePlayerByUsername(record.ownerUsername)
-    if not record.hostility or record.hostility.attackZombies ~= false then
-        immediateZombie = Perception.FindImmediateEnemyZombie(record)
-        if immediateZombie then
-            return immediateZombie
-        end
+    immediateZombie = Perception.FindImmediateZombieThreat(record)
+    if immediateZombie then
+        return immediateZombie
     end
     if owner and (not record.hostility or record.hostility.attackZombies ~= false) then
         ownerThreatZombie = findZombieTargetingOwner(
@@ -806,6 +869,12 @@ function Perception.ResolveHostileTarget(record)
     local npcTarget = nil
     local playerTarget = nil
     local zombieTarget = nil
+    local immediateThreat = Perception.ResolveRecentAttacker(
+        record,
+        Core.Now and Core.Now() or 0
+    ) or Perception.FindImmediateZombieThreat(record)
+
+    if immediateThreat then return immediateThreat end
 
     if hostileConfig.attackNPCs ~= false then
         npcTarget = Perception.FindNearestEnemyNPC(record, 12)
@@ -835,6 +904,12 @@ function Perception.ResolveRoamingTarget(record, radius)
     local npcTarget = nil
     local playerTarget = nil
     local zombieTarget = nil
+    local immediateThreat = Perception.ResolveRecentAttacker(
+        record,
+        Core.Now and Core.Now() or 0
+    ) or Perception.FindImmediateZombieThreat(record, searchRadius)
+
+    if immediateThreat then return immediateThreat end
 
     if hostility.attackNPCs ~= false then
         npcTarget = Perception.FindNearestEnemyNPC(record, searchRadius)

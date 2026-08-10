@@ -116,6 +116,23 @@ function ISPNCNPCMonitor:onOverlay()
     if PNC.Nameplates and PNC.Nameplates.ToggleDebug then PNC.Nameplates.ToggleDebug() end
 end
 
+function ISPNCNPCMonitor:onOverlayType(button)
+    local internal = button and button.internal or ""
+    local id = string.match(tostring(internal), "^overlay_(.+)$")
+    if not id
+        or not PNC.Nameplates
+        or not PNC.Nameplates.ToggleOverlay
+    then
+        return
+    end
+    PNC.Nameplates.ToggleOverlay(id)
+    if PNC.NPCMonitorView
+        and PNC.NPCMonitorView.RefreshOverlayControls
+    then
+        PNC.NPCMonitorView.RefreshOverlayControls(self)
+    end
+end
+
 function ISPNCNPCMonitor:onPathOverlay()
     if not PNC.Nameplates or not PNC.Nameplates.TogglePathDebug then return end
     local enabled = PNC.Nameplates.TogglePathDebug()

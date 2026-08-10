@@ -196,6 +196,65 @@ function Internal.openDoorForNPC(zombie, object)
     return opened
 end
 
+function Internal.openWindowForNPC(zombie, object)
+    local square
+    if not object or methodReturnsTrue(object, { "IsOpen", "isOpen" }) then
+        return object ~= nil
+    end
+    if methodReturnsTrue(object, { "isSmashed", "IsSmashed" })
+        or methodReturnsTrue(object, { "isPermaLocked" })
+    then
+        return false
+    end
+    if object.ToggleWindow then
+        object:ToggleWindow(zombie)
+    elseif object.toggleWindow then
+        object:toggleWindow(zombie)
+    else
+        return false
+    end
+    if not methodReturnsTrue(object, { "IsOpen", "isOpen" }) then
+        return false
+    end
+    square = object.getSquare and object:getSquare() or nil
+    if object.syncIsoObject then
+        object:syncIsoObject(false, 1, nil, nil)
+    end
+    if square and square.InvalidateSpecialObjectPaths then
+        square:InvalidateSpecialObjectPaths()
+    end
+    if square and square.RecalcProperties then
+        square:RecalcProperties()
+    end
+    if zombie and zombie.playSound then
+        zombie:playSound("OpenWindow")
+    end
+    return true
+end
+
+function Internal.smashWindowForNPC(zombie, object)
+    local square
+    if not object then return false end
+    if methodReturnsTrue(object, { "isSmashed", "IsSmashed" }) then
+        return true
+    end
+    if not object.smashWindow then
+        return false
+    end
+    object:smashWindow()
+    if not methodReturnsTrue(object, { "isSmashed", "IsSmashed" }) then
+        return false
+    end
+    square = object.getSquare and object:getSquare() or nil
+    if square and square.InvalidateSpecialObjectPaths then
+        square:InvalidateSpecialObjectPaths()
+    end
+    if square and square.RecalcProperties then
+        square:RecalcProperties()
+    end
+    return true
+end
+
 function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY, goalZ)
     local cell
     local now
@@ -398,34 +457,45 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                         if object ~= blockedPassage and not isObstacleAhead(zombie, objectSquare, goalX, goalY, candidateCenterX, candidateCenterY) then
                             logTraversalReject(record, zombie, lane, "traversal_rejected", "window_not_ahead", "object=" .. tostring(objectKey or "nil"))
                         elseif objectSquare then
-                            if (not object:IsOpen()) and (not object:isSmashed()) and (not object:isPermaLocked()) then
+                            if (not object:IsOpen()) and (not object:isSmashed()) then
                                 actionKey = "window_open:" .. Internal.describeSquare(objectSquare)
                                 if Internal.shouldSuppressSpecialAction(lane, actionKey, now) then
                                     logTraversalReject(record, zombie, lane, "traversal_rejected", "window_special_cooldown", "object=" .. tostring(objectKey or "nil"))
                                     return false, nil
                                 end
-                                object:ToggleWindow(zombie)
-                                if not object:IsOpen() then
-                                    Internal.logMoveWarning(record, zombie, lane, "window_open_failed", "engine_state_closed", "object=" .. tostring(objectKey or "nil"))
-                                    logTraversalReject(record, zombie, lane, "traversal_rejected", "window_open_failed", "object=" .. tostring(objectKey or "nil"))
+                                if Internal.openWindowForNPC(zombie, object) then
+                                    Internal.rememberSpecialAction(lane, actionKey, now)
+                                    if Internal.MotionHints and Internal.MotionHints.RememberHold then
+                                        Internal.MotionHints.RememberHold(lane, zombie:getX(), zombie:getY(), zombie:getZ(), now, 250, {
+                                            kind = "window_open",
+                                            profile = lane.motionProfile,
+                                        })
+                                    end
+                                    Internal.logMoveWarning(record, zombie, lane, "window_open", "window_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
+                                    return true, "window_open"
+                                end
+                                actionKey = "window_smash:" .. Internal.describeSquare(objectSquare)
+                                if not Internal.beginTraversalAction
+                                    or not Internal.beginTraversalAction(zombie, record, lane, {
+                                        kind = "window_smash",
+                                        anim = "PNC_WindowSmash",
+                                        obstacle = object,
+                                        fromX = fromX,
+                                        fromY = fromY,
+                                        fromZ = fromZ,
+                                        toX = fromX,
+                                        toY = fromY,
+                                        toZ = fromZ,
+                                        travelDurationMs = 650,
+                                        finishHoldMs = 260,
+                                    })
+                                then
+                                    logTraversalReject(record, zombie, lane, "traversal_rejected", "window_smash_runtime_unavailable", "object=" .. tostring(objectKey or "nil"))
                                     return false, nil
                                 end
-                                if object.syncIsoObject then
-                                    object:syncIsoObject(false, 1, nil, nil)
-                                end
-                                if objectSquare then
-                                    objectSquare:InvalidateSpecialObjectPaths()
-                                    objectSquare:RecalcProperties()
-                                end
                                 Internal.rememberSpecialAction(lane, actionKey, now)
-                                if Internal.MotionHints and Internal.MotionHints.RememberHold then
-                                    Internal.MotionHints.RememberHold(lane, zombie:getX(), zombie:getY(), zombie:getZ(), now, 250, {
-                                        kind = "window_open",
-                                        profile = lane.motionProfile,
-                                    })
-                                end
-                                Internal.logMoveWarning(record, zombie, lane, "window_open", "window_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
-                                return true, "window_open"
+                                Internal.logMoveWarning(record, zombie, lane, "window_smash", "window_open_failed", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare))
+                                return true, "window_smash"
                             end
                             if object:canClimbThrough(zombie) then
                                 actionKey = "window_climb:" .. Internal.describeSquare(objectSquare)

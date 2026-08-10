@@ -508,6 +508,65 @@ function Renderer.BuildCombatDebugLines(debugState, currentTargetDistance)
                 or "-"
         )
 
+    if debugState.visibleZombieCount ~= nil
+        or debugState.nearbyZombieCount ~= nil
+    then
+        lines[#lines + 1] = "VIEW zombies="
+            .. tostring(
+                tonumber(debugState.visibleZombieCount) or 0
+            )
+            .. "/" .. tostring(
+                tonumber(debugState.nearbyZombieCount) or 0
+            )
+            .. " intent=" .. tostring(
+                debugState.attackType or "auto"
+            )
+            .. " tactical=" .. tostring(
+                debugState.tacticalState or "-"
+            )
+            .. " retreat=" .. tostring(
+                debugState.retreatPhase or "-"
+            )
+            .. ":" .. tostring(
+                debugState.retreatReason or "-"
+            )
+            .. " biteLane=" .. tostring(
+                debugState.biteLaneClear == true
+                    and "clear"
+                    or debugState.biteLaneReason or "-"
+            )
+    end
+    if type(debugState.viewZombies) == "table" then
+        local index
+        local viewed
+        for index = 1, #debugState.viewZombies do
+            viewed = debugState.viewZombies[index]
+            lines[#lines + 1] = "Z" .. tostring(index)
+                .. " id=" .. tostring(viewed.id or "-")
+                .. " d=" .. tostring(
+                    rounded(
+                        viewed.distSq
+                            and math.sqrt(
+                                tonumber(viewed.distSq) or 0
+                            ),
+                        2
+                    ) or "-"
+                )
+                .. " mode=" .. tostring(viewed.intent or "visible")
+                .. " state=" .. tostring(
+                    viewed.actionState or "-"
+                )
+                .. " los=" .. tostring(
+                    viewed.visibilityKind or "-"
+                )
+                .. (
+                    tostring(viewed.bumpType or "") ~= ""
+                        and " bump=" .. tostring(viewed.bumpType)
+                        or ""
+                )
+        end
+    end
+
     target = debugState.target
     if type(target) == "table" then
         targetLine = "TARGET " .. tostring(target.kind or "unknown")

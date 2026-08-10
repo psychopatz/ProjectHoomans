@@ -161,10 +161,20 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     retryBody,
     true
 )
-assert(calls.play == 4,
-    "MP attack bump was replayed instead of observed once")
-assert(not clearedBeforeRetry,
-    "MP attack bump was cleared during its active clip")
+assert(calls.play == 5,
+    "dropped MP attack bump was not re-armed once")
+assert(clearedBeforeRetry,
+    "idle MP selector did not receive a fresh transition edge")
+assert(retryModData.PNC_ClientAttackRetries == 1,
+    "MP attack bump re-arm was not bounded")
+now = now + 100
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    attackSnapshot,
+    retryBody,
+    true
+)
+assert(calls.play == 5,
+    "dropped MP attack bump re-armed more than once")
 
 local finishedLocalSnapshot = {
     id = attackSnapshot.id,

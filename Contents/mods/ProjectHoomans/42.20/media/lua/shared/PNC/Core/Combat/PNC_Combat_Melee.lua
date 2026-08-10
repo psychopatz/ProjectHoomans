@@ -179,6 +179,7 @@ function Combat.TryShove(record, zombie, target, reason)
     end
     if Stamina and Stamina.CanSpendAttack
         and not Stamina.CanSpendAttack(record, "melee", "Strength")
+        and reason ~= "exhausted_defensive_shove"
     then
         return false, "stamina_exhausted"
     end

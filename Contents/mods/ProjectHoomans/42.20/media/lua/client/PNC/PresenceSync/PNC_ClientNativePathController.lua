@@ -18,6 +18,9 @@ local Core = PNC.Core
 local Const = PNC.Const or {}
 local LiveBodyControl = PNC.LiveBodyControl
 local Network = PNC.Network
+local TraversalQuery = PNC.TraversalQuery
+local PathInternal = PNC.PathService and PNC.PathService.Internal or nil
+local Animation = PNC.Animation
 
 local CONTROLLER_CHECK_MS = 250
 local PROGRESS_EPSILON_SQ = 0.0025
@@ -46,6 +49,9 @@ local MOVEMENT_LEASE_MS = math.max(
     tonumber(Const and Const.CLIENT_NATIVE_MOVEMENT_LEASE_MS)
         or 750
 )
+local WINDOW_SMASH_IMPACT_MS = 650
+local WINDOW_SMASH_FINISH_MS = 1050
+local WINDOW_CLIMB_RECOVERY_MS = 500
 
 Sync.NativePathStateByBody =
     Sync.NativePathStateByBody or {}
@@ -155,6 +161,7 @@ local function clearOwnedPath(body, state)
     state.requestKey = nil
     state.completed = false
     state.failed = false
+    state.forcedTraversalUntil = nil
 end
 
 local function beginMovementLease(body, state, key, now)
@@ -337,6 +344,206 @@ local function describeBody(body)
         .. " path2=" .. tostring(hasPath)
 end
 
+local function objectBool(object, methodName)
+    local method = object and object[methodName] or nil
+    return type(method) == "function" and method(object) == true
+end
+
+local function finishPassageBump(body)
+    if Animation and Animation.FinishBump then
+        Animation.FinishBump(body, true)
+    elseif body and body.setVariable then
+        body:setVariable("BumpAnimFinished", true)
+    end
+end
+
+local function updateWindowSmash(body, state, now)
+    local action = state and state.passageAction or nil
+    if not action then return false, nil end
+    if not Internal.IsLocalZombieController(body) then
+        finishPassageBump(body)
+        state.passageAction = nil
+        return false, "native_passage_owner_changed"
+    end
+    if body.faceThisObject and action.object then
+        body:faceThisObject(action.object)
+    end
+    if action.applied ~= true
+        and now >= (tonumber(action.impactAt) or now)
+    then
+        action.applied = true
+        if PathInternal and PathInternal.smashWindowForNPC then
+            PathInternal.smashWindowForNPC(body, action.object)
+        elseif action.object and action.object.smashWindow then
+            action.object:smashWindow()
+        end
+    end
+    if now < (tonumber(action.finishAt) or now) then
+        beginMovementLease(body, state, action.key, now)
+        return true, "native_window_smash"
+    end
+    finishPassageBump(body)
+    state.passageAction = nil
+    state.requestKey = nil
+    state.failed = true
+    state.retryAt = now + RETRY_BASE_MS
+    return true, "native_window_smashed"
+end
+
+local function startWindowSmash(
+    snapshot,
+    body,
+    state,
+    object,
+    now
+)
+    clearOwnedPath(body, state)
+    local key = "window_smash:"
+        .. tostring(snapshot and snapshot.id or "npc")
+        .. ":" .. tostring(now)
+    state.passageAction = {
+        kind = "window_smash",
+        key = key,
+        object = object,
+        startedAt = now,
+        impactAt = now + WINDOW_SMASH_IMPACT_MS,
+        finishAt = now + WINDOW_SMASH_FINISH_MS,
+        applied = false,
+    }
+    state.lastProgressAt = now
+    if body.faceThisObject then
+        body:faceThisObject(object)
+    end
+    if Animation and Animation.PlayBump then
+        Animation.PlayBump(
+            body,
+            snapshot,
+            "PNC_WindowSmash",
+            {
+                sceneId = "native_window_smash",
+                leaseUntil = now + WINDOW_SMASH_FINISH_MS,
+                keepManagedUseless = false,
+            }
+        )
+    elseif body.setBumpType then
+        body:setBumpType("PNC_WindowSmash")
+    end
+    beginMovementLease(body, state, key, now)
+    logState(snapshot, "native_window_smash_start", describeBody(body))
+    return true, "native_window_smash"
+end
+
+local function forceWindowClimb(
+    snapshot,
+    body,
+    state,
+    object,
+    now
+)
+    if not ClimbThroughWindowState
+        or not ClimbThroughWindowState.instance
+        or not body.changeState
+    then
+        return false, nil
+    end
+    local climbState = ClimbThroughWindowState.instance()
+    if not climbState or not climbState.setParams then
+        return false, nil
+    end
+    clearOwnedPath(body, state)
+    climbState:setParams(body, object)
+    body:changeState(climbState)
+    if body.setBumpType then
+        body:setBumpType("ClimbWindow")
+    end
+    state.forcedTraversalUntil = now + STALL_TIMEOUT_MS
+    state.requestKey = nil
+    beginMovementLease(
+        body,
+        state,
+        "window_climb:" .. tostring(now),
+        now
+    )
+    logState(snapshot, "native_window_climb_forced", describeBody(body))
+    return true, "native_window_climb"
+end
+
+local function tryNativePassage(
+    snapshot,
+    body,
+    state,
+    goal,
+    now
+)
+    if not TraversalQuery
+        or not TraversalQuery.FindPassageToward
+        or not PathInternal
+    then
+        return false, nil
+    end
+    local passage = TraversalQuery.FindPassageToward(
+        body,
+        goal.x,
+        goal.y,
+        goal.z
+    )
+    local object = passage and passage.object or nil
+    if not object then return false, nil end
+    if TraversalQuery.IsDoor
+        and TraversalQuery.IsDoor(object)
+        and not objectBool(object, "IsOpen")
+        and not objectBool(object, "isOpen")
+    then
+        if PathInternal.openDoorForNPC(body, object) then
+            clearOwnedPath(body, state)
+            state.failed = true
+            state.retryAt = now + 180
+            logState(snapshot, "native_door_open", describeBody(body))
+            return true, "native_door_open"
+        end
+        return false, "native_door_blocked"
+    end
+    if not TraversalQuery.IsWindow
+        or not TraversalQuery.IsWindow(object)
+    then
+        return false, nil
+    end
+    local open = objectBool(object, "IsOpen")
+        or objectBool(object, "isOpen")
+    local smashed = objectBool(object, "isSmashed")
+        or objectBool(object, "IsSmashed")
+    if not open and not smashed then
+        if PathInternal.openWindowForNPC(body, object) then
+            clearOwnedPath(body, state)
+            state.failed = true
+            state.retryAt = now + 250
+            logState(snapshot, "native_window_open", describeBody(body))
+            return true, "native_window_open"
+        end
+        return startWindowSmash(
+            snapshot,
+            body,
+            state,
+            object,
+            now
+        )
+    end
+    if object.canClimbThrough
+        and object:canClimbThrough(body)
+        and now - (tonumber(state.lastProgressAt) or now)
+            >= WINDOW_CLIMB_RECOVERY_MS
+    then
+        return forceWindowClimb(
+            snapshot,
+            body,
+            state,
+            object,
+            now
+        )
+    end
+    return false, nil
+end
+
 function Internal.BindNativePathSnapshot(snapshot, body, now)
     if not body
         or not Core
@@ -353,6 +560,14 @@ function Internal.BindNativePathSnapshot(snapshot, body, now)
     state.snapshot = snapshot
     state.lastSeenAt = now
     state.releasePending = false
+    if state.passageAction
+        and snapshot
+        and snapshot.visualState
+        and snapshot.visualState.attackActive == true
+    then
+        finishPassageBump(body)
+        state.passageAction = nil
+    end
     -- Presence visuals run immediately after this bind. Release a delegated
     -- PathFindBehavior2 route here, before PlayBump selects the attack clip;
     -- waiting for the later OnZombieUpdate callback lets pathfind locomotion
@@ -421,6 +636,9 @@ function Internal.UpdateNativePathController(
     local state = ensureState(body)
     state.snapshot = snapshot
     state.lastSeenAt = now
+    if state.passageAction then
+        return updateWindowSmash(body, state, now)
+    end
     local goal = buildGoal(snapshot, body)
     if not goal then
         clearOwnedPath(body, state)
@@ -461,6 +679,40 @@ function Internal.UpdateNativePathController(
     end
 
     local key = requestKey(snapshot, goal)
+    if state.forcedTraversalUntil then
+        local actionState = body.getActionStateName
+            and string.lower(tostring(
+                body:getActionStateName() or ""
+            )) or ""
+        if actionState == "climbwindow"
+            and now < state.forcedTraversalUntil
+        then
+            beginMovementLease(body, state, key, now)
+            return true, "native_window_climb"
+        end
+        if actionState == "climbwindow"
+            and LiveBodyControl
+            and LiveBodyControl.SuppressZombieState
+        then
+            LiveBodyControl.SuppressZombieState(body, state, now)
+        end
+        state.forcedTraversalUntil = nil
+        state.requestKey = nil
+        state.failed = true
+        state.retryAt = now + RETRY_BASE_MS
+    end
+    local passageHandled
+    local passageState
+    passageHandled, passageState = tryNativePassage(
+        snapshot,
+        body,
+        state,
+        goal,
+        now
+    )
+    if passageHandled then
+        return true, passageState
+    end
     local shouldRequest =
         state.requestKey ~= key
         or (
@@ -530,14 +782,6 @@ function Internal.UpdateNativePathController(
         )
         return true, "native_path_succeeded"
     end
-    if nativeActionOwnsMovement(body) then
-        local actionState = string.lower(tostring(
-            body:getActionStateName() or ""
-        ))
-        if actionState ~= "pathfind" then
-            state.lastProgressAt = now
-        end
-    end
     local hasPath = body.getPath2
         and body:getPath2() ~= nil or false
     local requestDropped = state.owned == true
@@ -552,6 +796,11 @@ function Internal.UpdateNativePathController(
         if behavior.cancel then behavior:cancel() end
         if behavior.reset then behavior:reset() end
         if body.setPath2 then body:setPath2(nil) end
+        if LiveBodyControl
+            and LiveBodyControl.SuppressZombieState
+        then
+            LiveBodyControl.SuppressZombieState(body, state, now)
+        end
         if LiveBodyControl
             and LiveBodyControl.EndNativeMovementLease
         then

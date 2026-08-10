@@ -16,6 +16,7 @@ local Stamina = PNC.Stamina
 local MotionHints = PNC.MotionHints
 local Identity = PNC.Identity
 local Settings = PNC.Sandbox
+local Perception = PNC.Perception
 
 local function buildTravelSummary(record, includeRoute)
     return PNC.Travel
@@ -474,6 +475,95 @@ local function buildPathDebugState(record)
     }
 end
 
+local function buildVisibleZombieDebug(record, target)
+    local radius = tonumber(Const.COMBAT_DEBUG_CONE_RADIUS) or 8.5
+    local limit = math.max(
+        1,
+        math.floor(
+            tonumber(Const.COMBAT_DEBUG_VISIBLE_ZOMBIE_LIMIT) or 6
+        )
+    )
+    local frame = Perception
+        and Perception.GetZombieFrame
+        and Perception.GetZombieFrame(record, radius)
+        or nil
+    local entries = Perception
+        and Perception.GetVisibleZombieEntries
+        and Perception.GetVisibleZombieEntries(record, radius)
+        or {}
+    local output = {}
+    local nearbyCount = 0
+    local radiusSq = radius * radius
+    local targetID = target and tostring(
+        target.zombieId or target.id or ""
+    ) or ""
+    local i
+    local entry
+    local zombie
+    local modData
+    local zombieID
+    local actionState
+    local bumpType
+    local intent
+    if frame and type(frame.entries) == "table" then
+        for i = 1, #frame.entries do
+            if (tonumber(frame.entries[i].distSq) or math.huge)
+                <= radiusSq
+            then
+                nearbyCount = nearbyCount + 1
+            else
+                break
+            end
+        end
+    end
+    for i = 1, math.min(#entries, limit) do
+        entry = entries[i]
+        zombie = entry and entry.zombie or nil
+        if zombie then
+            modData = zombie.getModData
+                and zombie:getModData() or nil
+            zombieID = modData and modData.PNC_ZombieID or nil
+            if zombieID == nil and zombie.getOnlineID then
+                zombieID = zombie:getOnlineID()
+            end
+            actionState = zombie.getActionStateName
+                and tostring(zombie:getActionStateName() or "")
+                or ""
+            bumpType = zombie.getBumpType
+                and tostring(zombie:getBumpType() or "")
+                or ""
+            if targetID ~= ""
+                and tostring(zombieID or "") == targetID
+            then
+                intent = "selected"
+            elseif string.lower(actionState) == "bumped"
+                and (
+                    bumpType == "Bite"
+                    or bumpType == "BiteLow"
+                )
+            then
+                intent = "biting"
+            elseif zombie.getPath2 and zombie:getPath2() ~= nil then
+                intent = "pursuing"
+            else
+                intent = "visible"
+            end
+            output[#output + 1] = {
+                id = zombieID,
+                x = zombie:getX(),
+                y = zombie:getY(),
+                z = zombie:getZ(),
+                distSq = entry.distSq,
+                visibilityKind = entry.visibilityKind,
+                actionState = actionState,
+                bumpType = bumpType,
+                intent = intent,
+            }
+        end
+    end
+    return output, #entries, frame and nearbyCount or #entries
+end
+
 local function buildCombatDebugState(record, combat, firearmState)
     local runtime = record.runtime or {}
     local target = runtime.target
@@ -485,11 +575,17 @@ local function buildCombatDebugState(record, combat, firearmState)
     local action = runtime.attackAction
     local now = Core.Now()
     local zombieAttacker = runtime.zombieAttacker
+    local attackLane = runtime.zombieAttackLane
     local zombieAttackerAge = zombieAttacker
         and math.max(
             0,
             now - (tonumber(zombieAttacker.observedAt) or now)
         ) or nil
+    local viewZombies
+    local visibleZombieCount
+    local nearbyZombieCount
+    viewZombies, visibleZombieCount, nearbyZombieCount =
+        buildVisibleZombieDebug(record, target)
     return {
         target = target and {
             kind = target.kind,
@@ -507,6 +603,19 @@ local function buildCombatDebugState(record, combat, firearmState)
         weaponStatus = combat.weaponStatus,
         blockReason = combat.combatBlockReason,
         decision = tactical.decision,
+        attackType = record.attackType or "auto",
+        tacticalState = runtime.tacticalState,
+        retreatPhase = retreat.phase,
+        retreatReason = retreat.reason,
+        biteLaneClear = attackLane and attackLane.clear == true or nil,
+        biteLaneReason = attackLane and attackLane.reason or nil,
+        biteLaneAgeMs = attackLane and math.max(
+            0,
+            now - (tonumber(attackLane.checkedAt) or now)
+        ) or nil,
+        viewZombies = viewZombies,
+        visibleZombieCount = visibleZombieCount,
+        nearbyZombieCount = nearbyZombieCount,
         surroundedCount = tactical.surrounded,
         pressureCount = tactical.pressure,
         visiblePressureCount = tactical.visiblePressure,

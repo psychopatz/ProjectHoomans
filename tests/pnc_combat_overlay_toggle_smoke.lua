@@ -185,4 +185,30 @@ assertEqual(
 assertEqual(writes[8].value, false,
     "faction overlay disabled persisted")
 
+assertEqual(
+    #PNC.Nameplates.GetOverlayDefinitions(),
+    7,
+    "all overlay types share one registry"
+)
+assertEqual(
+    PNC.Nameplates.GetOverlaySummary(),
+    "ON: none",
+    "central overlay summary reports inactive state"
+)
+assertEqual(
+    PNC.Nameplates.ToggleOverlay("path"),
+    true,
+    "central dispatcher toggles path overlay"
+)
+assertEqual(
+    PNC.Nameplates.IsOverlayEnabled("path"),
+    true,
+    "central registry reports path overlay state"
+)
+assertEqual(
+    PNC.Nameplates.GetOverlaySummary(),
+    "ON: Paths",
+    "central overlay summary lists active type"
+)
+
 print("pnc_combat_overlay_toggle_smoke: ok")

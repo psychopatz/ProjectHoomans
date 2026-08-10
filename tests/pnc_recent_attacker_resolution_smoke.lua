@@ -28,6 +28,8 @@ local npcRecord = {
 PNC = {
     Const = {
         TARGET_RECENT_ATTACKER_MS = 5000,
+        ROAM_TARGET_RADIUS = 12,
+        ZOMBIE_TARGET_RADIUS = 12,
     },
     Core = {
         Now = function() return now end,
@@ -60,6 +62,7 @@ PNC = {
         end,
     },
     Stealth = {},
+    Perception = {},
 }
 
 dofile(FILE)
@@ -98,6 +101,17 @@ assert(PNC.Perception.RememberAttacker(record, {
 }, now), "zombie attacker was not remembered")
 target = PNC.Perception.ResolveRecentAttacker(record, now)
 assert(target and target.kind == "zombie" and target.zombieId == "zed-1", "zombie attacker was not resolved")
+
+record.hostility = { attackZombies = false, attackNPCs = false }
+target = PNC.Perception.ResolveRoamingTarget(record, 12)
+assert(target and target.zombieId == "zed-1",
+    "roaming self-defense ignored a recent zombie attacker")
+target = PNC.Perception.ResolveCompanionTarget(record)
+assert(target and target.zombieId == "zed-1",
+    "companion self-defense ignored a recent zombie attacker")
+target = PNC.Perception.ResolveHostileTarget(record)
+assert(target and target.zombieId == "zed-1",
+    "hostile resolver ignored a recent zombie attacker")
 
 now = 7000
 assert(PNC.Perception.ResolveRecentAttacker(record, now) == nil, "expired attacker remained active")

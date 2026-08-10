@@ -16,6 +16,11 @@ local AnimationTrace = PNC.AnimationTrace
 local BUMP_RELEASE_SETTLE_MS = 50
 local BUMP_ACTION_LEASE_TIMEOUT_MS = 10000
 local BUMP_ACTION_ENTRY_GRACE_MS = 350
+local BUMP_RELEASE_HARD_TIMEOUT_MS = math.max(
+    250,
+    tonumber(PNC.Const and PNC.Const.BUMP_RELEASE_HARD_TIMEOUT_MS)
+        or 750
+)
 
 -- PNC owns a namespaced copy of Bandits' complete combat bump graph. Never
 -- translate these requests back to Bandits' global BumpType values: doing so
@@ -318,6 +323,8 @@ function Animation.SyncNativeLocomotionStyle(zombie, record)
     local walkType
     local engineWalkType
     local animSpeed
+    local actionState
+    local nativeMoving
     if not zombie then
         return
     end
@@ -341,6 +348,13 @@ function Animation.SyncNativeLocomotionStyle(zombie, record)
         profile and profile.animSpeed
             or path and path.animSpeed
     ) or 1.0
+    actionState = getActionStateName(zombie)
+    nativeMoving = zombie.getPath2
+            and zombie:getPath2() ~= nil
+        or actionState == "climbfence"
+        or actionState == "climbwindow"
+        or actionState == "climbwall"
+        or zombie.isMoving and zombie:isMoving() == true
     setPNCStateVars(
         zombie,
         record,
@@ -366,7 +380,11 @@ function Animation.SyncNativeLocomotionStyle(zombie, record)
                 or path and path.isCrawling == true
                 or false
         )
-        zombie:setVariable("PNCMoving", true)
+        -- A published native goal is an intent, not proof of movement. Keep
+        -- the run/walk selector idle while PathFindBehavior2 is dropped or
+        -- waiting for a retry, otherwise the body loops Bob_Run against a
+        -- wall with isMoving=false indefinitely.
+        zombie:setVariable("PNCMoving", nativeMoving == true)
     end
     applyWalkType(zombie, engineWalkType, animSpeed)
     setManagedUseless(zombie, false, true)
@@ -844,7 +862,12 @@ function Animation.PumpBumpRelease(zombie, now)
         zombie:setVariable("BumpAnimFinished", true)
     end
     actionState = getActionStateName(zombie)
-    if (now - releaseAt) < BUMP_RELEASE_SETTLE_MS or actionState == "bumped" then
+    if (now - releaseAt) < BUMP_RELEASE_SETTLE_MS
+        or (
+            actionState == "bumped"
+            and (now - releaseAt) < BUMP_RELEASE_HARD_TIMEOUT_MS
+        )
+    then
         if AnimationTrace and AnimationTrace.Sample then
             AnimationTrace.Sample(
                 zombie,
@@ -853,6 +876,32 @@ function Animation.PumpBumpRelease(zombie, now)
             )
         end
         return true
+    end
+    -- BumpedState occasionally misses both completion latches after a native
+    -- path/traversal handoff. Waiting forever leaves the NPC frozen in a
+    -- mid-swing or climbing pose. Past the grace window, clear the selector
+    -- and force only this demonstrably stuck action back to idle.
+    if actionState == "bumped"
+        and (now - releaseAt) >= BUMP_RELEASE_HARD_TIMEOUT_MS
+    then
+        if zombie.reportEvent then
+            zombie:reportEvent("ActiveAnimFinishing")
+        end
+        if zombie.setBumpType then
+            zombie:setBumpType("")
+        end
+        if zombie.changeState
+            and ZombieIdleState
+            and ZombieIdleState.instance
+        then
+            zombie:changeState(ZombieIdleState.instance())
+        end
+        if Core and Core.LogWarn then
+            Core.LogWarn(
+                "bump_release_recovered action=bumped requested="
+                    .. tostring(modData.PNC_BumpRequestedType or "")
+            )
+        end
     end
     -- BumpedState.exit owns clearing BumpAnimFinished and BumpType. This
     -- fallback only normalizes a body that has already left that state.

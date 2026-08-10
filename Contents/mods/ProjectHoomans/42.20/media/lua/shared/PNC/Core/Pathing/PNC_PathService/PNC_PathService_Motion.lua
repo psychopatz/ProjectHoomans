@@ -229,7 +229,7 @@ function Internal.updateActiveMove(zombie, record, lane)
             return true, "traversal_completed"
         end
     end
-    if (lane.ownerMode == "window_climb" or lane.ownerMode == "window_open" or lane.ownerMode == "door_open" or lane.ownerMode == "fence_climb")
+    if (lane.ownerMode == "window_climb" or lane.ownerMode == "window_open" or lane.ownerMode == "window_smash" or lane.ownerMode == "door_open" or lane.ownerMode == "fence_climb")
         and now < (tonumber(lane.specialMoveUntil) or 0)
     then
         lane.lastProgressAt = now
@@ -260,6 +260,8 @@ function Internal.updateActiveMove(zombie, record, lane)
                 lane.ownerMode = "window_open"
                 lane.specialMoveUntil = now + 250
                 lane.specialAnim = nil
+            elseif interactType == "window_smash" then
+                lane.ownerMode = "window_smash"
             elseif interactType == "fence_climb" then
                 lane.ownerMode = "fence_climb"
             else
@@ -288,6 +290,8 @@ function Internal.updateActiveMove(zombie, record, lane)
                 lane.ownerMode = "window_open"
                 lane.specialMoveUntil = now + 250
                 lane.specialAnim = nil
+            elseif interactType == "window_smash" then
+                lane.ownerMode = "window_smash"
             elseif interactType == "fence_climb" then
                 lane.ownerMode = "fence_climb"
             else
@@ -315,6 +319,8 @@ function Internal.updateActiveMove(zombie, record, lane)
                 lane.ownerMode = "door_open"
             elseif interactType == "window_open" then
                 lane.ownerMode = "window_open"
+            elseif interactType == "window_smash" then
+                lane.ownerMode = "window_smash"
             end
             Internal.logMoveDebug(record, zombie, lane, "adopt_traversal", interactType or lane.lastActionState, "")
             return true, interactType or "traversal"
@@ -337,7 +343,7 @@ function Internal.updateActiveMove(zombie, record, lane)
         then
             Internal.FakeLocomotion.PrepareBody(zombie, lane, now)
         end
-        if lane.ownerMode ~= "window_climb" and lane.ownerMode ~= "window_open" and lane.ownerMode ~= "fence_climb" then
+        if lane.ownerMode ~= "window_climb" and lane.ownerMode ~= "window_open" and lane.ownerMode ~= "window_smash" and lane.ownerMode ~= "fence_climb" then
             Internal.setWalkAnim(zombie, record, lane.resolvedMode or lane.mode or "walk", false)
         end
         if lane.lastSuppressedWarnState ~= suppressedState
@@ -468,6 +474,8 @@ function Internal.updateActiveMove(zombie, record, lane)
                 lane.ownerMode = "window_open"
                 lane.specialMoveUntil = now + 250
                 lane.specialAnim = nil
+            elseif interactType == "window_smash" then
+                lane.ownerMode = "window_smash"
             elseif interactType == "fence_climb" then
                 lane.ownerMode = "fence_climb"
             else
@@ -684,9 +692,57 @@ function PathService.Pump(record, zombie)
             local handled
             local nativeState
             local nativeTraversalState
+            local passageInteracted
+            local passageKind
             local fromX = zombie:getX()
             local fromY = zombie:getY()
             local fromZ = zombie:getZ()
+            -- Dedicated MP routes publish movement to the nearest client, but
+            -- doors are authoritative world objects. Resolve an adjacent
+            -- closed passage here before asking the client to re-path through
+            -- it; the old fallback-only interaction branch was never reached
+            -- by an engine_path lane.
+            if lane.goal
+                and Internal.hasClosedPassageToward
+                and Internal.hasClosedPassageToward(
+                    zombie,
+                    lane.goal.x,
+                    lane.goal.y,
+                    lane.goal.z
+                )
+                and Internal.tryDoorOrWindowInteraction
+            then
+                passageInteracted, passageKind =
+                    Internal.tryDoorOrWindowInteraction(
+                        zombie,
+                        record,
+                        lane,
+                        lane.goal.x,
+                        lane.goal.y,
+                        lane.goal.z
+                    )
+                if passageInteracted then
+                    if enginePlanner.Invalidate then
+                        enginePlanner.Invalidate(
+                            record,
+                            "native_" .. tostring(passageKind),
+                            zombie
+                        )
+                    end
+                    lane.ownerMode = passageKind or "passage_interact"
+                    lane.lastProgressAt = now
+                    lane.lastIssueAt = now
+                    Internal.logMoveDebug(
+                        record,
+                        zombie,
+                        lane,
+                        "native_passage_interact",
+                        passageKind or "passage",
+                        ""
+                    )
+                    return true, passageKind or "passage_interact"
+                end
+            end
             nativeTraversalState = enginePlanner.Internal
                 and enginePlanner.Internal.GetNativeTraversalState
                 and enginePlanner.Internal.GetNativeTraversalState(

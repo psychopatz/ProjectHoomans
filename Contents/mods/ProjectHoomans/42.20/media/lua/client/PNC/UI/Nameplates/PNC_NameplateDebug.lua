@@ -70,6 +70,7 @@ end
 
 function Debug.BuildText(snapshot, hasBoundBody, settings)
     local debugState = snapshot and snapshot.debugState or nil
+    local combatDebug = snapshot and snapshot.combatDebugState or nil
     local firearmState = snapshot and snapshot.firearmState or nil
     local parts = {}
     if not debugState then
@@ -102,6 +103,24 @@ function Debug.BuildText(snapshot, hasBoundBody, settings)
         )
         parts[#parts + 1] =
             "Weapon: " .. tostring(debugState.weaponStatus or "-")
+        if combatDebug then
+            parts[#parts + 1] = "Intent: "
+                .. tostring(combatDebug.attackType or "auto")
+                .. "/" .. tostring(combatDebug.mode or "-")
+            parts[#parts + 1] = "Tactic: " .. tostring(
+                combatDebug.decision
+                    or combatDebug.retreatReason
+                    or combatDebug.blockReason
+                    or "observing"
+            )
+            parts[#parts + 1] = "ViewZ: "
+                .. tostring(
+                    tonumber(combatDebug.visibleZombieCount) or 0
+                )
+                .. "/" .. tostring(
+                    tonumber(combatDebug.nearbyZombieCount) or 0
+                )
+        end
     end
     if settingEnabled(settings, "debugShowMagazine") and firearmState then
         parts[#parts + 1] = "Mag: "

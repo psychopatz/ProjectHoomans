@@ -57,6 +57,39 @@ local function createToolbarButton(window, definition, collection)
     return button
 end
 
+local function overlayButtonTitle(id)
+    local label = PNC.Nameplates
+        and PNC.Nameplates.GetOverlayLabel
+        and PNC.Nameplates.GetOverlayLabel(id)
+        or tostring(id)
+    local enabled = PNC.Nameplates
+        and PNC.Nameplates.IsOverlayEnabled
+        and PNC.Nameplates.IsOverlayEnabled(id)
+    return tostring(label) .. ": " .. (enabled and "ON" or "OFF")
+end
+
+function View.RefreshOverlayControls(window)
+    if not window or not window.overlayButtons then return end
+    local id
+    local button
+    local enabled
+    for id, button in pairs(window.overlayButtons) do
+        enabled = PNC.Nameplates
+            and PNC.Nameplates.IsOverlayEnabled
+            and PNC.Nameplates.IsOverlayEnabled(id)
+            or false
+        if button.setTitle then
+            button:setTitle(overlayButtonTitle(id))
+        else
+            button.title = overlayButtonTitle(id)
+        end
+        UI.SetButtonVariant(
+            button,
+            enabled and "selected" or "quiet"
+        )
+    end
+end
+
 function View.CreateChildren(window)
     window.filterButtons = {}
     window.topControls = {}
@@ -108,53 +141,40 @@ function View.CreateChildren(window)
         { "relationships", "UI_PNC_MonitorRelationships", "Relationships", ISPNCNPCMonitor.onRelationships, "default" },
         { "audit", "UI_PNC_MonitorAuditBodies", "Audit Bodies", ISPNCNPCMonitor.onAudit, "warning" },
         { "refresh", "UI_PNC_MonitorRefresh", "Refresh", ISPNCNPCMonitor.onRefresh, "quiet" },
-        { "overlay", "UI_PNC_MonitorToggleOverlay", "Toggle Overlay", ISPNCNPCMonitor.onOverlay, "quiet" },
-        { "paths", "UI_PNC_MonitorTogglePaths", "Toggle Paths", ISPNCNPCMonitor.onPathOverlay, "quiet" },
-        { "combat", "UI_PNC_MonitorToggleCombat", "Toggle Combat", ISPNCNPCMonitor.onCombatOverlay, "quiet" },
-        { "animation", "UI_PNC_MonitorToggleAnimation", "Toggle Animation", ISPNCNPCMonitor.onAnimationOverlay, "quiet" },
+        { "overlay_ai", nil, overlayButtonTitle("ai"), ISPNCNPCMonitor.onOverlayType, "quiet", "ai" },
+        { "overlay_path", nil, overlayButtonTitle("path"), ISPNCNPCMonitor.onOverlayType, "quiet", "path" },
+        { "overlay_combat", nil, overlayButtonTitle("combat"), ISPNCNPCMonitor.onOverlayType, "quiet", "combat" },
+        { "overlay_animation", nil, overlayButtonTitle("animation"), ISPNCNPCMonitor.onOverlayType, "quiet", "animation" },
+        { "overlay_scenes", nil, overlayButtonTitle("scenes"), ISPNCNPCMonitor.onOverlayType, "quiet", "scenes" },
+        { "overlay_faction", nil, overlayButtonTitle("faction"), ISPNCNPCMonitor.onOverlayType, "quiet", "faction" },
+        { "overlay_community", nil, overlayButtonTitle("community"), ISPNCNPCMonitor.onOverlayType, "quiet", "community" },
     }
     window.selectionControls = {}
+    window.overlayButtons = {}
     for _, action in ipairs(actions) do
         local variant = action[5]
-        if action[1] == "paths"
+        if action[6]
             and PNC.Nameplates
-            and PNC.Nameplates.IsPathDebugEnabled
-            and PNC.Nameplates.IsPathDebugEnabled()
-        then
-            variant = "selected"
-        end
-        if action[1] == "combat"
-            and PNC.Nameplates
-            and PNC.Nameplates.IsCombatDebugEnabled
-            and PNC.Nameplates.IsCombatDebugEnabled()
-        then
-            variant = "selected"
-        end
-        if action[1] == "animation"
-            and PNC.Nameplates
-            and PNC.Nameplates.IsAnimationDebugEnabled
-            and PNC.Nameplates.IsAnimationDebugEnabled()
+            and PNC.Nameplates.IsOverlayEnabled
+            and PNC.Nameplates.IsOverlayEnabled(action[6])
         then
             variant = "selected"
         end
         local button = createToolbarButton(window, {
-            id = action[1], title = Support.Tr(action[2], action[3]), target = window,
+            id = action[1],
+            title = action[2]
+                and Support.Tr(action[2], action[3])
+                or action[3],
+            target = window,
             onclick = action[4], variant = variant,
         }, window.footerControls)
-        if action[1] == "paths" then window.pathOverlayButton = button end
-        if action[1] == "combat" then
-            window.combatOverlayButton = button
-        end
-        if action[1] == "animation" then
-            window.animationOverlayButton = button
+        if action[6] then
+            window.overlayButtons[action[6]] = button
         end
         if action[1] == "toggle_debug" then window.recordDebugButton = button end
         if action[1] ~= "audit"
             and action[1] ~= "refresh"
-            and action[1] ~= "overlay"
-            and action[1] ~= "paths"
-            and action[1] ~= "combat"
-            and action[1] ~= "animation"
+            and not action[6]
         then
             window.selectionControls[#window.selectionControls + 1] = button
         end
@@ -181,7 +201,15 @@ end
 function View.Render(window, roster, selected)
     if not window.mainLayout then return end
     local suffix = tostring(window.visibleRosterCount or 0) .. " / " .. tostring(#(roster or {}))
-    UI.DrawSectionTitle(window, "NPC roster", window.mainLayout.first.x, window.mainLayout.first.y - Layout.Pixels(21, window.uiScale), window.mainLayout.first.width, suffix)
+    local overlaySummary = PNC.Nameplates
+        and PNC.Nameplates.GetOverlaySummary
+        and PNC.Nameplates.GetOverlaySummary()
+        or "ON: none"
+    if window.lastOverlaySummary ~= overlaySummary then
+        window.lastOverlaySummary = overlaySummary
+        View.RefreshOverlayControls(window)
+    end
+    UI.DrawSectionTitle(window, "NPC roster", window.mainLayout.first.x, window.mainLayout.first.y - Layout.Pixels(21, window.uiScale), window.mainLayout.first.width, suffix .. "  •  Overlays " .. overlaySummary)
     UI.DrawSectionTitle(window, "Lifecycle details", window.mainLayout.second.x, window.mainLayout.second.y - Layout.Pixels(21, window.uiScale), window.mainLayout.second.width, selected and tostring(selected.name or selected.id) or "")
 end
 

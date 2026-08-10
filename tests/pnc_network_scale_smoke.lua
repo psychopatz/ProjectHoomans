@@ -23,6 +23,7 @@ for i = 1, 16 do
 end
 
 local sent = {}
+local debugVisibleZombieEntries = {}
 sendServerCommand = function(player, module, command, payload)
     sent[#sent + 1] = { player = player, module = module, command = command, payload = payload }
 end
@@ -119,6 +120,14 @@ PNC = {
     Sandbox = {
         CanZombieTargetRecord = function(record)
             return record.zombieTargetable ~= false
+        end,
+    },
+    Perception = {
+        GetZombieFrame = function()
+            return { entries = debugVisibleZombieEntries }
+        end,
+        GetVisibleZombieEntries = function()
+            return debugVisibleZombieEntries
         end,
     },
     VisualProfiles = { RollAppearance = function() return {} end },
@@ -356,6 +365,19 @@ nearbyRecord.runtime.target = {
     distSq = 9,
     visible = true,
 }
+debugVisibleZombieEntries[1] = {
+    zombie = {
+        getModData = function() return { PNC_ZombieID = "z1" } end,
+        getX = function() return 4 end,
+        getY = function() return 0 end,
+        getZ = function() return 0 end,
+        getActionStateName = function() return "walktoward" end,
+        getBumpType = function() return nil end,
+        getPath2 = function() return nil end,
+    },
+    distSq = 9,
+    visibilityKind = "clear",
+}
 nearbyRecord.runtime.combatTactical = {
     decision = "melee_pressure_retreat",
     pressure = 4,
@@ -400,6 +422,21 @@ assertEqual(
     55,
     "combat cone snapshot"
 )
+assertEqual(
+    combatSnapshot.combatDebugState.visibleZombieCount,
+    1,
+    "combat visible zombie count snapshot"
+)
+assertEqual(
+    combatSnapshot.combatDebugState.nearbyZombieCount,
+    1,
+    "combat nearby zombie count snapshot"
+)
+assertEqual(
+    combatSnapshot.combatDebugState.viewZombies[1].intent,
+    "selected",
+    "combat visible zombie intent snapshot"
+)
 nearbyRecord.runtime.combatDebugReplicatedAt = nil
 local combatDelta = PNC.Network.BuildPresenceDelta(nearbyRecord)
 assertEqual(combatDelta.attackMode, true, "combat delta attack mode")
@@ -414,6 +451,7 @@ assertEqual(
     "combat debug presence delta throttle"
 )
 nearbyRecord.runtime.target = nil
+debugVisibleZombieEntries[1] = nil
 nearbyRecord.runtime.combatTactical = nil
 nearbyRecord.runtime.combatRetreat = nil
 local idleCombatDelta = PNC.Network.BuildPresenceDelta(nearbyRecord)

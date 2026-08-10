@@ -21,6 +21,7 @@ local COMBAT_NAVIGATION = {
     navigationPolicy = "combat",
     navigationProvider = "engine_path",
 }
+local maintainRangedSpacing
 
 local function setDebug(context, reason, mode, weaponStatus)
     Common.SetCombatDebug(
@@ -391,6 +392,13 @@ local function handleRanged(context, debugMode, stopFactor)
         moveToRangedRange(context, debugMode, stopFactor)
         return true
     end
+    -- Fire/aim arbitration comes first. Spacing is a cooldown recovery action,
+    -- not a reason to replace every valid shot with another retreat path.
+    if reason == "cooldown_active"
+        and maintainRangedSpacing(context)
+    then
+        return true
+    end
     if tryReposition(
         context,
         "ranged",
@@ -425,7 +433,7 @@ local function investigateHiddenTarget(context)
     setDebug(context, reason)
 end
 
-local function maintainRangedSpacing(context)
+maintainRangedSpacing = function(context)
     local moved
     local reason
     if context.mode ~= "ranged"
@@ -445,22 +453,6 @@ local function maintainRangedSpacing(context)
         setDebug(context, reason or "ranged_disengage")
     end
     return moved
-end
-
-local function maintainEmergencyStandoff(context)
-    if context.mode ~= "ranged"
-        or context.target.kind ~= "zombie"
-        or context.distance
-            >= (tonumber(Const.RANGED_MIN_STANDOFF) or 2.2)
-    then
-        return false
-    end
-    return tryReposition(
-        context,
-        "ranged",
-        "target_too_close",
-        "maintaining_range"
-    )
 end
 
 function Engagement.Tick(record, zombie, target)
@@ -541,12 +533,6 @@ function Engagement.Tick(record, zombie, target)
     then
         clearRetreatFor(context)
         return handleMelee(context, "mixed", true)
-    end
-    if maintainRangedSpacing(context) then
-        return true
-    end
-    if maintainEmergencyStandoff(context) then
-        return true
     end
     if context.mode == "melee" then
         return handleMelee(context, "melee", true)

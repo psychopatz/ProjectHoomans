@@ -585,6 +585,18 @@ local function tryNearMissRetreat(record, zombie, target, state, now, report)
     then
         return false, nil
     end
+    if report
+        and report.pressureCount
+            < (
+                tonumber(Const.COMBAT_TACTICAL_RETREAT_MIN_PRESSURE)
+                    or 2
+            )
+    then
+        -- A lone zombie is a counterattack problem, not a kiting problem.
+        -- Consume the near miss so it cannot repeatedly steal attack windows.
+        state.nearMissUntil = 0
+        return false, "lone_threat_counter"
+    end
     state.nearMissUntil = 0
     if record.runtime and record.runtime.combatTactical then
         record.runtime.combatTactical.decision = "near_miss_kite"
@@ -954,6 +966,8 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
     local meleeSkill
     local pressureTolerance
     local shouldShove
+    local canSpendMelee
+    local retreatMinPressure
     local continued
     local continueReason
     if not record or not zombie or not target or target.kind ~= "zombie" then
@@ -961,6 +975,17 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
     end
     now = Core.Now()
     state = ensureRetreatState(record)
+    dist = math.sqrt(tonumber(target.distSq)
+        or Core.DistanceSq(record.x, record.y, target.x, target.y))
+    meleeLane = effectiveMode == "melee"
+        or (
+            effectiveMode == "mixed"
+            and dist <= (tonumber(Const.MELEE_RANGE) or 1.3) * 1.1
+        )
+    -- Ranged spacing must never own the tick before the weapon gets another
+    -- chance to fire. Its existing retreat is refreshed later only when the
+    -- ranged attempt is still cooling down.
+    if not meleeLane then return false, nil, nil end
     continued, continueReason = continueLockedRetreat(
         record,
         zombie,
@@ -975,17 +1000,21 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
         return false, continueReason, nil
     end
 
-    dist = math.sqrt(tonumber(target.distSq)
-        or Core.DistanceSq(record.x, record.y, target.x, target.y))
-    meleeLane = effectiveMode == "melee"
-        or (
-            effectiveMode == "mixed"
-            and dist <= (tonumber(Const.MELEE_RANGE) or 1.3) * 1.1
-        )
-    if not meleeLane then return false, nil, nil end
-
     report = assessThreat(record, target)
     grounded = Tactics.IsGroundTarget(target)
+    retreatMinPressure = tonumber(
+        Const.COMBAT_TACTICAL_RETREAT_MIN_PRESSURE
+    ) or 2
+    if not grounded
+        and now <= (tonumber(state.nearMissUntil) or 0)
+        and report.pressureCount < retreatMinPressure
+        and dist <= (tonumber(Const.COMBAT_SHOVE_RANGE) or 1.35)
+    then
+        state.nearMissUntil = 0
+        record.runtime.combatTactical.decision =
+            "lone_threat_counter"
+        return false, "lone_threat_counter", "shove"
+    end
     if tryNearMissRetreat(record, zombie, target, state, now, report) then
         return true, "near_miss_kite", nil
     end
@@ -1024,7 +1053,12 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
         return false, "pressure_shove", "shove"
     end
 
-    if Tactics.NeedsRecoveryRetreat(record) then
+    canSpendMelee = not Stamina
+        or not Stamina.CanSpendAttack
+        or Stamina.CanSpendAttack(record, "melee", skillID)
+    if Tactics.NeedsRecoveryRetreat(record)
+        and report.pressureCount >= retreatMinPressure
+    then
         sourceX, sourceY, centroidCount = buildZombieThreatCentroid(
             record,
             Const.COMBAT_HORDE_RADIUS
@@ -1044,6 +1078,15 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
             sourceY,
             record.z
         )
+    end
+    if Tactics.NeedsRecoveryRetreat(record)
+        and not canSpendMelee
+        and not grounded
+        and dist <= (tonumber(Const.COMBAT_SHOVE_RANGE) or 1.35)
+    then
+        record.runtime.combatTactical.decision =
+            "exhausted_defensive_shove"
+        return false, "exhausted_defensive_shove", "shove"
     end
     record.runtime.combatTactical.decision = grounded
         and "ground_finisher_window" or "melee_commit_window"
@@ -1157,7 +1200,10 @@ function Tactics.MaintainRangedSpacing(record, zombie, target)
     retreatDistance = (tonumber(Const.RANGED_RETREAT_STEP) or 3.2)
         + math.max(0, preferredMin - dist)
         + math.min(tonumber(centroidCount) or 0, 5) * 0.2
-    mode = report.staminaRatio > Const.COMBAT_RETREAT_STAMINA_RATIO and "run" or "walk"
+    mode = pressure
+        and report.staminaRatio > Const.COMBAT_RETREAT_STAMINA_RATIO
+        and "run"
+        or "walk"
     reason = pressure and "ranged_avoiding_horde" or "ranged_disengage"
     return startRetreat(
         record,
@@ -1267,7 +1313,12 @@ function Tactics.TryReposition(record, zombie, target, effectiveMode, reason, eq
         return true, "near_miss_kite"
     end
 
-    if Tactics.NeedsRecoveryRetreat(record) then
+    if Tactics.NeedsRecoveryRetreat(record)
+        and report.pressureCount >= (
+            tonumber(Const.COMBAT_TACTICAL_RETREAT_MIN_PRESSURE)
+                or 2
+        )
+    then
         return startRetreat(
             record,
             zombie,

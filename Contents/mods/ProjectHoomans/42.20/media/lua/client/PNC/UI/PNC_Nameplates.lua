@@ -77,6 +77,64 @@ local Debug = PNC.NameplateDebug
 local Entries = PNC.NameplateEntries
 local Renderer = PNC.NameplateRenderer
 
+local overlayDefinitions = {
+    { id = "ai", setting = "showAIDebug", label = "AI" },
+    { id = "path", setting = "showPathDebug", label = "Paths" },
+    { id = "combat", setting = "showCombatDebug", label = "Combat" },
+    {
+        id = "animation",
+        setting = "showAnimationDebug",
+        label = "Animation",
+    },
+    {
+        id = "scenes",
+        setting = "showAnimationSceneDebug",
+        label = "Scenes",
+    },
+    {
+        id = "faction",
+        setting = "showFactionDebug",
+        label = "Faction",
+    },
+    {
+        id = "community",
+        setting = "showCommunityDebug",
+        label = "Community",
+    },
+}
+local overlayDefinitionByID = {}
+for _, definition in ipairs(overlayDefinitions) do
+    overlayDefinitionByID[definition.id] = definition
+end
+
+function Nameplates.GetOverlayDefinitions()
+    return overlayDefinitions
+end
+
+function Nameplates.IsOverlayEnabled(id)
+    local definition = overlayDefinitionByID[tostring(id or "")]
+    return definition ~= nil
+        and Settings[definition.setting] == true
+end
+
+function Nameplates.GetOverlayLabel(id)
+    local definition = overlayDefinitionByID[tostring(id or "")]
+    return definition and definition.label or tostring(id or "Overlay")
+end
+
+function Nameplates.GetOverlaySummary()
+    local active = {}
+    local definition
+    for _, definition in ipairs(overlayDefinitions) do
+        if Settings[definition.setting] == true then
+            active[#active + 1] = definition.label
+        end
+    end
+    return #active > 0
+        and ("ON: " .. table.concat(active, ", "))
+        or "ON: none"
+end
+
 ISPNCNameplateManager = ISUIElement:derive("ISPNCNameplateManager")
 
 function ISPNCNameplateManager:initialise()
@@ -284,6 +342,29 @@ function Nameplates.ToggleAnimationSceneDebug()
         )
     end
     return Settings.showAnimationSceneDebug
+end
+
+-- One dispatch point for every world-overlay type. The NPC monitor and any
+-- future debug surface use this instead of maintaining independent toggle
+-- lists whose selected states drift apart.
+function Nameplates.ToggleOverlay(id)
+    id = tostring(id or "")
+    if id == "ai" then return Nameplates.ToggleDebug() end
+    if id == "path" then return Nameplates.TogglePathDebug() end
+    if id == "combat" then return Nameplates.ToggleCombatDebug() end
+    if id == "animation" then
+        return Nameplates.ToggleAnimationDebug()
+    end
+    if id == "scenes" then
+        return Nameplates.ToggleAnimationSceneDebug()
+    end
+    if id == "faction" then
+        return Nameplates.ToggleFactionDebug()
+    end
+    if id == "community" then
+        return Nameplates.ToggleCommunityDebug()
+    end
+    return nil
 end
 
 function Nameplates.DebugDescribeSnapshot(snapshot)

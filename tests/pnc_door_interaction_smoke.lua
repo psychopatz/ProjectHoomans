@@ -208,4 +208,35 @@ assertEqual(interacted, true, "goal-directed passage probe opens nearby window")
 assertEqual(interaction, "window_open", "proactive window interaction")
 assertEqual(windowOpened, true, "proactive window state")
 
+local windowSmashed = false
+windowOpened = false
+window.isPermaLocked = function() return true end
+window.isSmashed = function() return windowSmashed end
+window.smashWindow = function() windowSmashed = true end
+PNC.PathService.Internal.beginTraversalAction = function(
+    _,
+    _,
+    activeLane,
+    spec
+)
+    activeLane.testTraversalSpec = spec
+    return true
+end
+lane = {}
+interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
+    zombie, { id = "window_break_test" }, lane, 2.5, 0.5, 0
+)
+assertEqual(interacted, true, "locked window begins breach")
+assertEqual(interaction, "window_smash", "locked window breach mode")
+assertEqual(lane.testTraversalSpec.anim, "PNC_WindowSmash",
+    "window breach animation")
+assertEqual(lane.testTraversalSpec.obstacle, window,
+    "window breach retains obstacle")
+assertEqual(
+    PNC.PathService.Internal.smashWindowForNPC(zombie, window),
+    true,
+    "window breach applies breakage"
+)
+assertEqual(windowSmashed, true, "window glass was broken")
+
 print("pnc_door_interaction_smoke: ok")
