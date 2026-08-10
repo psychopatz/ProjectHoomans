@@ -133,6 +133,32 @@ assert(calls.pump == 2, "remote replica did not maintain bump release")
 assert(engineMovementActive == true,
     "remote attack did not retain its action-context update lease")
 
+local traversalAttackSnapshot = {
+    id = "traversal_attack_authority",
+    alive = true,
+    attackMode = true,
+    healthState = "normal",
+    presenceRevision = 1,
+    presenceState = "live",
+    visualState = {
+        anim = "PNC_Attack1H1",
+        attackActive = true,
+        attackAnim = "PNC_Attack1H1",
+        attackFinishAt = 1700,
+        nativeTraversalActive = true,
+        nativeTraversalState = "ClimbWindow",
+        moving = false,
+    },
+}
+local playsBeforeTraversal = calls.play
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    traversalAttackSnapshot,
+    body(),
+    true
+)
+assert(calls.play == playsBeforeTraversal,
+    "remote attack overwrote native traversal")
+
 local retryModData = {}
 local retryBumpType = ""
 local clearedBeforeRetry = false

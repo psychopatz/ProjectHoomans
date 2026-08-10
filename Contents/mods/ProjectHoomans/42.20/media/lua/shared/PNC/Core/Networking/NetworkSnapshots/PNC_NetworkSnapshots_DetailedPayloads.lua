@@ -156,6 +156,10 @@ function Network.BuildSnapshot(record)
             primaryFullType = record.equipment and record.equipment.primaryFullType or nil,
             secondaryFullType = record.equipment and record.equipment.secondaryFullType or nil,
             worn = Core.DeepCopy(record.equipment and record.equipment.worn or {}),
+            wornVisuals = Equipment
+                and Equipment.BuildWornVisualSummary
+                and Equipment.BuildWornVisualSummary(record)
+                or {},
             attached = Core.DeepCopy(record.equipment and record.equipment.attached or {}),
         },
         inventorySummary = inventorySummary,

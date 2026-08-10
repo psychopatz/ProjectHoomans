@@ -7,6 +7,8 @@ PNC = PNC or {}
 PNC.ClientPresenceSync = PNC.ClientPresenceSync or {}
 
 local Sync = PNC.ClientPresenceSync
+local Core = PNC.Core
+local ClientState = PNC.Network and PNC.Network.ClientState
 
 Sync.BodyByID = Sync.BodyByID or {}
 Sync.BodyByOnlineID = Sync.BodyByOnlineID or {}
@@ -49,8 +51,56 @@ local function onResetLua()
     end
 end
 
+function Sync.OnReplicaVisualUpdate(zombie)
+    local modData
+    local id
+    local snapshot
+    if not zombie
+        or not Core
+        or not Core.IsClientOnly
+        or Core.IsClientOnly() ~= true
+    then
+        return
+    end
+    modData = zombie.getModData
+        and zombie:getModData() or nil
+    id = modData and modData.PNC_NPC == true
+        and modData.PNC_UUID or nil
+    snapshot = id and ClientState
+        and ClientState.snapshots
+        and ClientState.snapshots[tostring(id)]
+        or nil
+    if not snapshot
+        or snapshot.interestDetailed == false
+        or snapshot.presenceState
+            ~= PNC.Const.PRESENCE_LIVE
+        or snapshot.alive == false
+    then
+        return
+    end
+    if Sync.Internal.EnsureReplicaClothingSnapshot then
+        Sync.Internal.EnsureReplicaClothingSnapshot(
+            snapshot,
+            zombie
+        )
+    end
+end
+
 if Events and Events.OnTick then
     Events.OnTick.Add(Sync.OnTick)
+end
+
+if Events and Events.OnZombieUpdate then
+    if Sync.ReplicaVisualUpdateHandler then
+        Events.OnZombieUpdate.Remove(
+            Sync.ReplicaVisualUpdateHandler
+        )
+    end
+    Sync.ReplicaVisualUpdateHandler =
+        Sync.OnReplicaVisualUpdate
+    Events.OnZombieUpdate.Add(
+        Sync.ReplicaVisualUpdateHandler
+    )
 end
 
 if Events and Events.OnResetLua then

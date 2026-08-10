@@ -752,6 +752,10 @@ function Persistence.SerializeRecord(record)
             primaryFullType = normalizeString(record.equipment and record.equipment.primaryFullType),
             secondaryFullType = normalizeString(record.equipment and record.equipment.secondaryFullType),
             worn = copyStringMap(record.equipment and record.equipment.worn),
+            wornVisuals = record.equipment
+                and record.equipment.wornVisuals
+                and Core.DeepCopy(record.equipment.wornVisuals)
+                or {},
             attached = copyStringMap(record.equipment and record.equipment.attached),
         },
         inventory = inventoryPayload,

@@ -11,6 +11,16 @@ local resolveModeFromPrimaryType
 Equipment.DescriptorCache = Equipment.DescriptorCache or {}
 Equipment.PRESENTATION_REVISION = 2
 
+local function isNetworkedGame()
+    return (isClient and isClient() == true)
+        or (isServer and isServer() == true)
+end
+
+local function isClientOnlyGame()
+    return isClient and isClient() == true
+        and (not isServer or isServer() ~= true)
+end
+
 local function copyDescriptor(source, item, createReason)
     return {
         fullType = source and source.fullType or nil,
@@ -195,6 +205,36 @@ local function clearExplicitWornItems(zombie)
     end
 end
 
+local function hasClothingVisual(zombie, fullType)
+    local visuals = zombie and zombie.getItemVisuals
+        and zombie:getItemVisuals() or nil
+    local visual
+    local visualType
+    local i
+    if not visuals or not visuals.size or not visuals.get then return false end
+    for i = 0, visuals:size() - 1 do
+        visual = visuals:get(i)
+        visualType = visual and visual.getItemType
+            and visual:getItemType() or nil
+        if (visualType == nil or visualType == "")
+            and visual and visual.getClothingItemName
+        then
+            visualType = visual:getClothingItemName()
+        end
+        if tostring(visualType or "") == tostring(fullType or "") then
+            return true
+        end
+    end
+    return false
+end
+
+local function getWornInventoryItem(record, bodyLocation)
+    local inventory = record and record.inventory or nil
+    local itemID = inventory and inventory.worn
+        and inventory.worn[bodyLocation] or nil
+    return itemID and inventory.items and inventory.items[itemID] or nil
+end
+
 local function applyInventoryState(item, record, bodyLocation)
     local inventory = record and record.inventory or nil
     local itemID = inventory and inventory.worn and inventory.worn[bodyLocation] or nil
@@ -209,6 +249,57 @@ local function applyInventoryState(item, record, bodyLocation)
         item:setUses(math.max(0, tonumber(state.uses) or 0))
     end
     return item
+end
+
+local function applyItemVisualState(item, visualState)
+    local visual
+    if not item or type(visualState) ~= "table" then
+        return false
+    end
+    visual = item.getVisual and item:getVisual() or nil
+    if not visual then return false end
+    if visualState.baseTexture ~= nil
+        and visual.setBaseTexture
+    then
+        visual:setBaseTexture(
+            tonumber(visualState.baseTexture) or -1
+        )
+    end
+    if visualState.textureChoice ~= nil
+        and visual.setTextureChoice
+    then
+        visual:setTextureChoice(
+            tonumber(visualState.textureChoice) or -1
+        )
+    end
+    if visualState.decal ~= nil and visual.setDecal then
+        visual:setDecal(tostring(visualState.decal))
+    end
+    if visualState.tint
+        and ImmutableColor
+        and visual.setTint
+    then
+        visual:setTint(ImmutableColor.new(
+            tonumber(visualState.tint.r) or 1,
+            tonumber(visualState.tint.g) or 1,
+            tonumber(visualState.tint.b) or 1,
+            1
+        ))
+    end
+    return true
+end
+
+local function visualStateSignature(state)
+    local tint = state and state.tint or {}
+    return table.concat({
+        tostring(state and state.fullType or ""),
+        tostring(state and state.baseTexture or ""),
+        tostring(state and state.textureChoice or ""),
+        tostring(state and state.decal or ""),
+        tostring(tint.r or ""),
+        tostring(tint.g or ""),
+        tostring(tint.b or ""),
+    }, ":")
 end
 
 local function applyPrimaryInventoryState(item, record)
@@ -243,6 +334,10 @@ local function applyWornItems(zombie, equipment, record)
     local visualReason
     local wornOk
     local wornReason
+    local storedVisual
+    local capturedVisual
+    local inventoryItem
+    local visualStateChanged = false
 
     if #entries <= 0 then
         clearExplicitWornItems(zombie)
@@ -253,10 +348,28 @@ local function applyWornItems(zombie, equipment, record)
 
     for i = 1, #entries do
         entry = entries[i]
-        visualOk, visualReason = Visuals.AddClothingVisual(zombie, entry.fullType)
+        storedVisual = nil
+        capturedVisual = nil
+        inventoryItem = nil
         item, createReason = Equipment.CreateItem(entry.fullType)
         if item then
             applyInventoryState(item, record, entry.bodyLocation)
+            inventoryItem = getWornInventoryItem(
+                record,
+                entry.bodyLocation
+            )
+            storedVisual = inventoryItem
+                and Equipment.VisualStateFromItemState
+                and Equipment.VisualStateFromItemState(
+                    inventoryItem.itemState,
+                    inventoryItem.type
+                ) or nil
+            if not storedVisual then
+                storedVisual = equipment.wornVisuals
+                    and equipment.wornVisuals[entry.bodyLocation]
+                    or nil
+            end
+            applyItemVisualState(item, storedVisual)
             typedBodyLocation = item.getBodyLocation and item:getBodyLocation() or nil
             if (not typedBodyLocation or tostring(typedBodyLocation) == "")
                 and item.canBeEquipped
@@ -271,22 +384,93 @@ local function applyWornItems(zombie, equipment, record)
             else
                 wornOk, wornReason = false, "missing_typed_body_location"
             end
-            if visualOk or wornOk then
+            if wornOk then
                 appliedCount = appliedCount + 1
+                capturedVisual = Equipment.CaptureItemVisualState
+                    and Equipment.CaptureItemVisualState(
+                        item,
+                        entry.fullType
+                    ) or nil
+                if capturedVisual and inventoryItem
+                    and Equipment.StoreVisualStateInItemState
+                    and visualStateSignature(
+                        Equipment.VisualStateFromItemState(
+                            inventoryItem.itemState,
+                            inventoryItem.type
+                        )
+                    ) ~= visualStateSignature(capturedVisual)
+                then
+                    Equipment.StoreVisualStateInItemState(
+                        inventoryItem,
+                        capturedVisual
+                    )
+                    visualStateChanged = true
+                end
+                if capturedVisual
+                    and visualStateSignature(storedVisual)
+                        ~= visualStateSignature(capturedVisual)
+                then
+                    equipment.wornVisuals[entry.bodyLocation] =
+                        capturedVisual
+                    visualStateChanged = true
+                end
+                if not isNetworkedGame()
+                    and not hasClothingVisual(
+                        zombie,
+                        entry.fullType
+                    )
+                then
+                    visualOk, visualReason = Visuals.AddClothingVisual(
+                        zombie,
+                        entry.fullType,
+                        capturedVisual or storedVisual
+                    )
+                    if not visualOk then
+                        failureCount = failureCount + 1
+                        Core.LogWarn("PNC equipment mechanically wore but could not display " .. tostring(entry.fullType) .. ": " .. tostring(visualReason))
+                    end
+                end
+            else
+                visualOk, visualReason = false, "network_authority_no_visual_fallback"
+                if not isNetworkedGame() then
+                    visualOk, visualReason = Visuals.AddClothingVisual(
+                        zombie,
+                        entry.fullType,
+                        storedVisual
+                    )
+                end
+                if visualOk then
+                    appliedCount = appliedCount + 1
+                    Core.LogWarn("PNC equipment displayed but could not mechanically wear " .. tostring(entry.fullType) .. ": " .. tostring(wornReason))
+                else
+                    failureCount = failureCount + 1
+                    Core.LogWarn("PNC equipment failed to wear " .. tostring(entry.fullType) .. " on " .. tostring(entry.bodyLocation) .. ": visual=" .. tostring(visualReason) .. ", worn=" .. tostring(wornReason))
+                end
+            end
+        else
+            visualOk, visualReason = false, "network_authority_no_visual_fallback"
+            if not isNetworkedGame() then
+                visualOk, visualReason = Visuals.AddClothingVisual(
+                    zombie,
+                    entry.fullType,
+                    storedVisual
+                )
+            end
+            if visualOk then
+                appliedCount = appliedCount + 1
+                Core.LogWarn("PNC equipment displayed visual-only worn item " .. tostring(entry.fullType) .. ": " .. tostring(createReason))
             else
                 failureCount = failureCount + 1
-                Core.LogWarn("PNC equipment failed to wear " .. tostring(entry.fullType) .. " on " .. tostring(entry.bodyLocation) .. ": visual=" .. tostring(visualReason) .. ", worn=" .. tostring(wornReason))
+                Core.LogWarn("PNC equipment could not create or display worn item " .. tostring(entry.fullType) .. ": create=" .. tostring(createReason) .. ", visual=" .. tostring(visualReason))
             end
-            if visualOk and not wornOk then
-                Core.LogWarn("PNC equipment displayed but could not mechanically wear " .. tostring(entry.fullType) .. ": " .. tostring(wornReason))
-            end
-        elseif visualOk then
-            appliedCount = appliedCount + 1
-            Core.LogWarn("PNC equipment displayed visual-only worn item " .. tostring(entry.fullType) .. ": " .. tostring(createReason))
-        else
-            failureCount = failureCount + 1
-            Core.LogWarn("PNC equipment could not create or display worn item " .. tostring(entry.fullType) .. ": create=" .. tostring(createReason) .. ", visual=" .. tostring(visualReason))
         end
+    end
+
+    if visualStateChanged
+        and PNC.Registry
+        and PNC.Registry.MarkDirty
+    then
+        PNC.Registry.MarkDirty(record, "equipment_visuals")
     end
 
     if failureCount > 0 then
@@ -522,8 +706,21 @@ function Equipment.Apply(zombie, record)
     if not zombie or not record then
         return false, "missing_body_or_record"
     end
+    if isClientOnlyGame() then
+        return Equipment.ApplyReplicaVisuals(zombie, record)
+    end
 
     equipment = Equipment.EnsureRecordEquipment(record)
+    if isServer and isServer() == true then
+        laneOk, reasons[#reasons + 1] =
+            applyWornItems(zombie, equipment, record)
+        if not laneOk then ok = false end
+        laneOk, reasons[#reasons + 1] =
+            Equipment.ApplyReplicaHands(zombie, record)
+        if not laneOk then ok = false end
+        Visuals.RefreshModel(zombie)
+        return ok, table.concat(reasons, "|")
+    end
     descriptor = buildWeaponDescriptor(equipment.primaryFullType, true)
 
     laneOk, reasons[#reasons + 1] = applyWornItems(zombie, equipment, record)
@@ -556,6 +753,9 @@ function Equipment.ApplyHands(zombie, record)
     if not zombie or not record then
         return false, "missing_body_or_record"
     end
+    if isNetworkedGame() then
+        return Equipment.ApplyReplicaHands(zombie, record)
+    end
 
     equipment = Equipment.EnsureRecordEquipment(record)
     descriptor = buildWeaponDescriptor(equipment.primaryFullType, true)
@@ -568,6 +768,154 @@ function Equipment.ApplyHands(zombie, record)
     )
     Visuals.RefreshModel(zombie)
     return ok, reason
+end
+
+-- Remote multiplayer bodies are presentation replicas. Their real worn items
+-- remain server-owned. ItemVisuals are repaired only when the synchronized
+-- worn set is genuinely absent, mirroring Bandits' appearance latch.
+local function getItemVisualType(visual)
+    local value
+    if not visual then return nil end
+    if visual.getItemType then
+        value = visual:getItemType()
+    end
+    if (value == nil or value == "")
+        and visual.getClothingItemName
+    then
+        value = visual:getClothingItemName()
+    end
+    return value ~= nil and tostring(value) or nil
+end
+
+local function replicaPresentationSignature(equipment)
+    local entries = Equipment.GetOrderedWornEntries(equipment)
+    local wornVisuals = equipment.wornVisuals or {}
+    local parts = {}
+    local i
+    for i = 1, #entries do
+        parts[#parts + 1] = table.concat({
+            tostring(entries[i].bodyLocation),
+            visualStateSignature(
+                wornVisuals[entries[i].bodyLocation]
+                    or { fullType = entries[i].fullType }
+            ),
+        }, "=")
+    end
+    return table.concat(parts, "|")
+end
+
+function Equipment.ReplicaVisualsMatch(zombie, record)
+    local equipment
+    local entries
+    local expected = {}
+    local visuals
+    local i
+    local fullType
+    if not zombie or not record then return false end
+    equipment = Equipment.EnsureRecordEquipment(record)
+    entries = Equipment.GetOrderedWornEntries(equipment)
+    visuals = zombie.getItemVisuals
+        and zombie:getItemVisuals() or nil
+    if not visuals or not visuals.size or not visuals.get then
+        return false
+    end
+    if visuals:size() ~= #entries then return false end
+    for i = 1, #entries do
+        fullType = tostring(entries[i].fullType)
+        expected[fullType] = (expected[fullType] or 0) + 1
+    end
+    for i = 0, visuals:size() - 1 do
+        fullType = getItemVisualType(visuals:get(i))
+        if fullType and expected[fullType]
+            and expected[fullType] > 0
+        then
+            expected[fullType] = expected[fullType] - 1
+        end
+    end
+    for _, count in pairs(expected) do
+        if count > 0 then return false end
+    end
+    return true
+end
+
+function Equipment.ApplyReplicaVisuals(zombie, record)
+    local equipment
+    local entries
+    local wornVisuals
+    local visuals
+    local applied = 0
+    local failed = 0
+    local i
+    local handsOk
+    local handsReason
+    local modData
+    local desiredSignature
+    local signatureCurrent
+    if not zombie or not record then
+        return false, "missing_body_or_record"
+    end
+    handsOk, handsReason =
+        Equipment.ApplyReplicaHands(zombie, record)
+    equipment = Equipment.EnsureRecordEquipment(record)
+    desiredSignature = replicaPresentationSignature(equipment)
+    modData = zombie.getModData and zombie:getModData() or nil
+    signatureCurrent = not modData
+        or modData.PNCReplicaVisualSignature == desiredSignature
+    if signatureCurrent
+        and Equipment.ReplicaVisualsMatch(zombie, record)
+    then
+        return handsOk,
+            handsOk and "replica_current" or handsReason
+    end
+    entries = Equipment.GetOrderedWornEntries(equipment)
+    wornVisuals = equipment.wornVisuals or {}
+    visuals = zombie.getItemVisuals
+        and zombie:getItemVisuals() or nil
+    if not visuals or not visuals.clear then
+        return false, "missing_item_visuals"
+    end
+    visuals:clear()
+    for i = 1, #entries do
+        if Visuals.AddClothingVisual(
+            zombie,
+            entries[i].fullType,
+            wornVisuals[entries[i].bodyLocation]
+        ) then
+            applied = applied + 1
+        else
+            failed = failed + 1
+        end
+    end
+    Visuals.RefreshModel(zombie)
+    if failed == 0 and modData then
+        modData.PNCReplicaVisualSignature = desiredSignature
+    end
+    return failed == 0 and handsOk,
+        "replica_repaired:applied=" .. tostring(applied)
+            .. ",failed=" .. tostring(failed)
+end
+
+Equipment.EnsureReplicaVisuals =
+    Equipment.ApplyReplicaVisuals
+
+function Equipment.ApplyReplicaHands(zombie, record)
+    local equipment
+    local descriptor
+    if not zombie or not record then
+        return false, "missing_body_or_record"
+    end
+    equipment = Equipment.EnsureRecordEquipment(record)
+    descriptor = buildWeaponDescriptor(
+        equipment.primaryFullType,
+        false
+    )
+    setEquipmentVariables(
+        zombie,
+        descriptor.primaryType,
+        descriptor.fullType,
+        equipment.secondaryFullType
+    )
+    return true, "replica_variables"
 end
 
 function Equipment.IsAttackMode(record)
@@ -584,6 +932,9 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
 
     if not zombie or not record then
         return false, "missing_body_or_record"
+    end
+    if isNetworkedGame() then
+        return Equipment.ApplyReplicaHands(zombie, record)
     end
     record.runtime = record.runtime or {}
     attackMode = attackMode == true
@@ -616,6 +967,9 @@ function Equipment.EnsureCombatHands(zombie, record)
     local reason
     if not zombie or not record then
         return false, "missing_body_or_record"
+    end
+    if isNetworkedGame() then
+        return Equipment.ApplyReplicaHands(zombie, record)
     end
     equipment = Equipment.EnsureRecordEquipment(record)
     descriptor = buildWeaponDescriptor(equipment.primaryFullType, false)

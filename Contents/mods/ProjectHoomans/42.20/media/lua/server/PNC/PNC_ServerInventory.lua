@@ -245,6 +245,33 @@ local function compactContainerHasItems(inv, item)
     return container and type(container.items) == "table" and #container.items > 0 or false
 end
 
+local function portableCompactItemState(record, item)
+    local state = {}
+    local visual = item and item.wornSlot
+        and record and record.equipment
+        and record.equipment.wornVisuals
+        and record.equipment.wornVisuals[item.wornSlot] or nil
+    for key, value in pairs(item and item.itemState or {}) do
+        state[key] = value
+    end
+    if visual then
+        state.visualFullType = tostring(visual.fullType or item.type)
+        state.visualBaseTexture = tonumber(visual.baseTexture)
+        state.visualTextureChoice = tonumber(visual.textureChoice)
+        state.visualDecal = visual.decal
+            and tostring(visual.decal) or nil
+        state.visualTintR = visual.tint and tonumber(visual.tint.r) or nil
+        state.visualTintG = visual.tint and tonumber(visual.tint.g) or nil
+        state.visualTintB = visual.tint and tonumber(visual.tint.b) or nil
+    end
+    state.condition = item and (item.cond or state.condition) or state.condition
+    state.usedDelta = item and (item.uses or state.usedDelta) or state.usedDelta
+    state.ammoCount = item and (item.ammoCount or state.ammoCount) or state.ammoCount
+    state.favorite = item and item.fav == true or false
+    state.customName = item and (item.customName or state.customName) or state.customName
+    return state
+end
+
 local function transferPlayerToNPC(player, record, args, sinceRevision)
     local itemIDs = type(args.itemIDs) == "table" and args.itemIDs or {}
     local maxItems = tonumber(Const.INVENTORY_TRANSFER_MAX_ITEMS) or 64
@@ -359,15 +386,7 @@ local function transferNPCToPlayer(player, record, args, sinceRevision)
                 and math.min(available, math.max(0, remaining))
                 or available
             if transferCount > 0 then
-                local state = {}
-                for key, value in pairs(item.itemState or {}) do
-                    state[key] = value
-                end
-                state.condition = item.cond or state.condition
-                state.usedDelta = item.uses or state.usedDelta
-                state.ammoCount = item.ammoCount or state.ammoCount
-                state.favorite = item.fav == true
-                state.customName = item.customName or state.customName
+                local state = portableCompactItemState(record, item)
                 local created, reason = ItemTransfer.GiveToPlayerContainer(
                     player,
                     args.playerContainer,
@@ -552,12 +571,7 @@ local function dropItem(player, record, item, sinceRevision)
         )
     end
     if not square then return false, "square_unavailable" end
-    local state = {}
-    for key, value in pairs(item.itemState or {}) do state[key] = value end
-    state.condition = item.cond or state.condition
-    state.usedDelta = item.uses or state.usedDelta
-    state.ammoCount = item.ammoCount or state.ammoCount
-    state.customName = item.customName or state.customName
+    local state = portableCompactItemState(record, item)
     local dropped, reason = ItemTransfer.DropToSquare(
         square,
         item.type,

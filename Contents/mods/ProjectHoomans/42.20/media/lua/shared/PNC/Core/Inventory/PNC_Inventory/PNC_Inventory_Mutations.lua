@@ -9,6 +9,20 @@ PNC.Inventory = PNC.Inventory or {}
 local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
 
+local function preserveWornItemVisual(record, inv, wornSlot)
+    local itemID = wornSlot and inv and inv.worn
+        and inv.worn[wornSlot] or nil
+    local item = itemID and inv.items and inv.items[itemID] or nil
+    local visual = record and record.equipment
+        and record.equipment.wornVisuals
+        and record.equipment.wornVisuals[wornSlot] or nil
+    if item and visual and PNC.Equipment
+        and PNC.Equipment.StoreVisualStateInItemState
+    then
+        PNC.Equipment.StoreVisualStateInItemState(item, visual)
+    end
+end
+
 local function applyAddOperation(record, inv, op)
     local item
     if type(op.item) ~= "table" then
@@ -372,6 +386,8 @@ function Inventory.SetWorn(record, itemID, wornSlot, reason)
     if itemID and not item then return false, "item_not_found" end
     if itemID and not wornSlot then return false, "worn_slot_missing" end
 
+    preserveWornItemVisual(record, inv, wornSlot)
+
     if item then
         if item.container ~= "root" then
             Internal.setItemContainer(inv, item, "root")
@@ -381,6 +397,7 @@ function Inventory.SetWorn(record, itemID, wornSlot, reason)
             })
         end
         oldSlot = item.wornSlot
+        preserveWornItemVisual(record, inv, oldSlot)
         if oldSlot and inv.worn[oldSlot] == itemID then
             inv.worn[oldSlot] = nil
         end

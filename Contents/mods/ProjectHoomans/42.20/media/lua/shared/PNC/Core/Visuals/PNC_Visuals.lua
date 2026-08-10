@@ -4,6 +4,11 @@ PNC.Visuals = PNC.Visuals or {}
 local Visuals = PNC.Visuals
 local Profiles = PNC.VisualProfiles
 
+local function isNetworkedGame()
+    return (isClient and isClient() == true)
+        or (isServer and isServer() == true)
+end
+
 local function makeImmutableColor(color)
     if not color or not ImmutableColor then
         return nil
@@ -131,7 +136,7 @@ local function safeSetWornItem(zombie, item)
     end)
 end
 
-function Visuals.AddClothingVisual(zombie, fullType)
+function Visuals.AddClothingVisual(zombie, fullType, visualState)
     local itemVisuals
     local itemVisual
     if not zombie or not fullType or not ItemVisual then
@@ -147,6 +152,38 @@ function Visuals.AddClothingVisual(zombie, fullType)
     end
     if itemVisual.setClothingItemName then
         itemVisual:setClothingItemName(fullType)
+    end
+    if visualState then
+        if visualState.baseTexture ~= nil
+            and itemVisual.setBaseTexture
+        then
+            itemVisual:setBaseTexture(
+                tonumber(visualState.baseTexture) or -1
+            )
+        end
+        if visualState.textureChoice ~= nil
+            and itemVisual.setTextureChoice
+        then
+            itemVisual:setTextureChoice(
+                tonumber(visualState.textureChoice) or -1
+            )
+        end
+        if visualState.decal ~= nil
+            and itemVisual.setDecal
+        then
+            itemVisual:setDecal(tostring(visualState.decal))
+        end
+        if visualState.tint
+            and ImmutableColor
+            and itemVisual.setTint
+        then
+            itemVisual:setTint(ImmutableColor.new(
+                tonumber(visualState.tint.r) or 1,
+                tonumber(visualState.tint.g) or 1,
+                tonumber(visualState.tint.b) or 1,
+                1
+            ))
+        end
     end
     itemVisuals:add(itemVisual)
     return true, "visual_added"
@@ -212,11 +249,54 @@ function Visuals.ApplyResolvedAppearance(zombie, appearance, isFemale)
     Visuals.MaintainHumanAppearance(zombie, appearance, isFemale, true)
 end
 
+-- Multiplayer bodies keep their worn inventory and ItemVisuals under server
+-- ownership.  The client may repair human-only fields, but must never clear or
+-- rebuild clothing: native zombie/equipment packets apply those collections.
+function Visuals.ApplyReplicaAppearance(zombie, appearance, isFemale)
+    local humanVisual
+    if not zombie or not appearance then
+        return false, "missing_body_or_appearance"
+    end
+    humanVisual = zombie.getHumanVisual and zombie:getHumanVisual() or nil
+    clearBodySoiledState(humanVisual)
+    Visuals.MaintainHumanAppearance(
+        zombie,
+        appearance,
+        isFemale,
+        true
+    )
+    return true, "replica_appearance"
+end
+
+function Visuals.HasClothingVisuals(zombie)
+    local itemVisuals
+    if not zombie or not zombie.getItemVisuals then
+        return false
+    end
+    itemVisuals = zombie:getItemVisuals()
+    return itemVisuals
+        and itemVisuals.size
+        and itemVisuals:size() > 0
+        or false
+end
+
 function Visuals.ApplyHumanVisuals(zombie, record)
     local appearance
     if not zombie or not record then
         return
     end
     appearance = Profiles.RollAppearance(record)
-    Visuals.ApplyResolvedAppearance(zombie, appearance, record.isFemale == true)
+    if isNetworkedGame() then
+        Visuals.ApplyReplicaAppearance(
+            zombie,
+            appearance,
+            record.isFemale == true
+        )
+    else
+        Visuals.ApplyResolvedAppearance(
+            zombie,
+            appearance,
+            record.isFemale == true
+        )
+    end
 end

@@ -19,6 +19,13 @@ local ITEM_STATE_SCALAR_FIELDS = {
     "ammoCount",
     "fluidAmount",
     "fluidType",
+    "visualBaseTexture",
+    "visualTextureChoice",
+    "visualDecal",
+    "visualTintR",
+    "visualTintG",
+    "visualTintB",
+    "visualFullType",
 }
 
 local function boundedString(value)

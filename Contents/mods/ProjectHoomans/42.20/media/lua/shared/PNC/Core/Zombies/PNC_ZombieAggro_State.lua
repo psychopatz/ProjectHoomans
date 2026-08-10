@@ -114,11 +114,17 @@ function Internal.clearZombieTarget(zombie)
     if zombie.clearAggroList then
         zombie:clearAggroList()
     end
-    if zombie.setTarget then
-        zombie:setTarget(nil)
-    end
-    if zombie.setAttackedBy then
-        zombie:setAttackedBy(nil)
+    -- On an MP server the owning client drives the native zombie mind, as in
+    -- Bandits. Do not broadcast a target clear every authority pump and fight
+    -- that client's pursuit/attack state. The server lease still decides which
+    -- NPC is valid and remains authoritative for bite damage.
+    if not (isServer and isServer() == true) then
+        if zombie.setTarget then
+            zombie:setTarget(nil)
+        end
+        if zombie.setAttackedBy then
+            zombie:setAttackedBy(nil)
+        end
     end
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", false)
@@ -298,11 +304,13 @@ function Internal.forceAggro(zombie, npcBody)
     then
         return
     end
-    if zombie.setTarget then
-        zombie:setTarget(nil)
-    end
-    if zombie.setAttackedBy then
-        zombie:setAttackedBy(nil)
+    if not (isServer and isServer() == true) then
+        if zombie.setTarget then
+            zombie:setTarget(nil)
+        end
+        if zombie.setAttackedBy then
+            zombie:setAttackedBy(nil)
+        end
     end
     return npcId ~= nil
 end

@@ -179,6 +179,18 @@ assertEqual(deltaSince, 3, "delta starts at client revision")
 
 record.inventory.revision = 8
 record.inventory.items["npc-item"].fav = true
+record.inventory.items["npc-item"].wornSlot = "Shirt"
+record.equipment = {
+    wornVisuals = {
+        Shirt = {
+            fullType = "Base.Axe",
+            baseTexture = 2,
+            textureChoice = 7,
+            decal = "SpiffoLogo",
+            tint = { r = 0.9, g = 0.8, b = 0.1 },
+        },
+    },
+}
 ok, reason = Service.Transfer(player, {
     id = record.id,
     direction = "npc_to_player",
@@ -194,7 +206,16 @@ assertEqual(granted.fullType, "Base.Axe", "native recreation type")
 assertEqual(granted.state.condition, 7, "native recreation condition")
 assertEqual(granted.state.customName, "Trusted Axe", "native recreation custom name")
 assertEqual(granted.state.favorite, true, "explicit favorite transfer allowed")
+assertEqual(granted.state.visualFullType, "Base.Axe",
+    "native recreation lost visual item identity")
+assertEqual(granted.state.visualTextureChoice, 7,
+    "native recreation lost visual texture")
+assertEqual(granted.state.visualDecal, "SpiffoLogo",
+    "native recreation lost shirt decal")
+assertEqual(granted.state.visualTintG, 0.8,
+    "native recreation lost visual tint")
 assertEqual(removedIDs[1], "npc-item", "compact source removed")
+record.inventory.items["npc-item"].wornSlot = nil
 
 record.inventory.revision = 10
 record.inventory.items["npc-item"].stack = 5

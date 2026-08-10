@@ -2,9 +2,8 @@
 --
 -- Build 42 delegates nearby IsoZombie simulation to a client. The server
 -- remains authoritative for PNC health and bite damage, while this controller
--- owns coordinate pursuit on the owning client. PNC NPC bodies are IsoZombie
--- shells, so they must never be installed as NetworkZombieMind character
--- goals; the server owns the target lease and bite damage separately.
+-- owns native pursuit and targeting on the owning client. This follows the
+-- proven Bandits pattern for human NPCs represented by IsoZombie shells.
 
 PNC = PNC or {}
 PNC.ClientPresenceSync = PNC.ClientPresenceSync or {}
@@ -25,6 +24,7 @@ local PATH_REFRESH_DISTANCE = tonumber(
 ) or 0.6
 local AGGRO_RADIUS = tonumber(Const.ZOMBIE_AGGRO_RADIUS) or 12
 local BITE_DISTANCE = tonumber(Const.ZOMBIE_BITE_DISTANCE) or 1.2
+local NATIVE_TARGET_DISTANCE = 3
 local CONTROLLER_CHECK_MS = 250
 local INDEX_REFRESH_MS = math.max(
     50,
@@ -253,6 +253,7 @@ end
 
 local function applyAggro(zombie, body, distanceSq, now)
     local currentTarget
+    local canSee = true
     if body.setZombiesDontAttack then
         body:setZombiesDontAttack(false)
     end
@@ -262,15 +263,14 @@ local function applyAggro(zombie, body, distanceSq, now)
         zombie:setUseless(false)
     end
     currentTarget = zombie.getTarget and zombie:getTarget() or nil
-    if isManagedBody(currentTarget) and zombie.setTarget then
-        zombie:setTarget(nil)
+    if zombie.CanSee then
+        canSee = zombie:CanSee(body) == true
     end
-    if distanceSq > BITE_DISTANCE * BITE_DISTANCE then
-        -- PathFindState may pursue coordinates for an IsoZombie-shaped NPC.
-        -- pathToCharacter/setTarget/spotted are intentionally forbidden here:
-        -- Build 42's MP zombie mind can only network supported character goals.
+    if distanceSq > NATIVE_TARGET_DISTANCE * NATIVE_TARGET_DISTANCE then
         if shouldRefreshPath(zombie, body, now) then
-            if zombie.pathToLocationF then
+            if canSee and zombie.pathToCharacter then
+                zombie:pathToCharacter(body)
+            elseif zombie.pathToLocationF then
                 zombie:pathToLocationF(
                     body:getX(),
                     body:getY(),
@@ -278,22 +278,61 @@ local function applyAggro(zombie, body, distanceSq, now)
                 )
             end
         end
-    elseif zombie.faceLocation then
-        zombie:faceLocation(
-            body:getX(),
-            body:getY()
-        )
-    elseif zombie.faceThisObject then
-        zombie:faceThisObject(body)
-    end
-    if zombie.getAttackedBy and zombie.setAttackedBy then
-        local attackedBy = zombie:getAttackedBy()
-        if isManagedBody(attackedBy) then
-            zombie:setAttackedBy(nil)
+    else
+        -- Bandits establishes all four native relationships. Merely walking
+        -- to coordinates never puts the zombie into its attack state.
+        if zombie.spotted then
+            zombie:spotted(body, true)
+        end
+        if zombie.addAggro then
+            zombie:addAggro(body, 1)
+        end
+        if currentTarget ~= body and zombie.setTarget then
+            zombie:setTarget(body)
+        end
+        if zombie.setAttackedBy then
+            zombie:setAttackedBy(body)
+        end
+        if distanceSq <= BITE_DISTANCE * BITE_DISTANCE then
+            if zombie.faceThisObject then
+                zombie:faceThisObject(body)
+            elseif zombie.faceLocation then
+                zombie:faceLocation(
+                    body:getX(),
+                    body:getY()
+                )
+            end
         end
     end
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", true)
+        if isManagedBody(zombie.getTarget and zombie:getTarget() or nil) then
+            zombie:setVariable("ZombieBiteDone", true)
+        end
+    end
+    if zombie.setNoTeeth
+        and isManagedBody(zombie.getTarget and zombie:getTarget() or nil)
+    then
+        zombie:setNoTeeth(true)
+    end
+end
+
+local function releaseManagedTarget(zombie)
+    local target = zombie.getTarget and zombie:getTarget() or nil
+    local attackedBy = zombie.getAttackedBy
+        and zombie:getAttackedBy() or nil
+    if isManagedBody(target) and zombie.setTarget then
+        zombie:setTarget(nil)
+    end
+    if isManagedBody(attackedBy) and zombie.setAttackedBy then
+        zombie:setAttackedBy(nil)
+    end
+    if zombie.setVariable then
+        zombie:setVariable("NoLungeAttack", false)
+        zombie:setVariable("ZombieBiteDone", false)
+    end
+    if zombie.setNoTeeth then
+        zombie:setNoTeeth(false)
     end
 end
 
@@ -326,9 +365,7 @@ function Internal.UpdateClientZombieAggro(zombie, now)
     if not body
         or currentPlayerDistanceSq(zombie) <= distanceSq
     then
-        if zombie.setVariable then
-            zombie:setVariable("NoLungeAttack", false)
-        end
+        releaseManagedTarget(zombie)
         return false
     end
     applyAggro(

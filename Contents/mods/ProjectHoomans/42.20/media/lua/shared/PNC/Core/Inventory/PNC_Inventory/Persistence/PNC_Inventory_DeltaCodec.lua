@@ -6,6 +6,26 @@ PNC.Inventory = PNC.Inventory or {}
 local Internal = PNC.Inventory.Internal
 local Core = PNC.Core
 
+local function tablesEqual(left, right)
+    local key
+    local value
+    if left == right then return true end
+    if type(left) ~= "table" or type(right) ~= "table" then
+        return false
+    end
+    for key, value in pairs(left) do
+        if type(value) == "table" then
+            if not tablesEqual(value, right[key]) then return false end
+        elseif value ~= right[key] then
+            return false
+        end
+    end
+    for key, _ in pairs(right) do
+        if left[key] == nil then return false end
+    end
+    return true
+end
+
 local function applySavedSlots(inv, item, changed)
     if changed.wornSlot == nil and changed.attachedSlot == nil and changed.equipSlot == nil then
         return
@@ -104,6 +124,13 @@ function Internal.applySavedDelta(record, inv, delta)
                         changed.interactionLockReason
                     )
                 end
+                if changed.itemState == false then
+                    item.itemState = {}
+                elseif type(changed.itemState) == "table" then
+                    item.itemState = Internal.sanitizeItemState(
+                        changed.itemState
+                    )
+                end
                 if changed.container ~= nil then
                     Internal.setItemContainer(inv, item,
                         Internal.resolveSavedContainer(inv, changed.container))
@@ -183,6 +210,17 @@ function Internal.buildCompactDelta(record, inv)
                 then
                     itemChanges.interactionLockReason =
                         item.interactionLockReason or false
+                end
+                local itemState = Internal.sanitizeItemState(
+                    item.itemState
+                )
+                local templateItemState = Internal.sanitizeItemState(
+                    templateItem.itemState
+                )
+                if not tablesEqual(itemState, templateItemState) then
+                    itemChanges.itemState =
+                        Internal.countMapEntries(itemState) > 0
+                            and itemState or false
                 end
                 if item.wornSlot ~= templateItem.wornSlot then
                     itemChanges.wornSlot = item.wornSlot or false

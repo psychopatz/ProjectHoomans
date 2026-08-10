@@ -7,7 +7,9 @@ local registered
 local pathRequests = 0
 local target
 local attackedBy
-local forbiddenCharacterCalls = 0
+local nativeCharacterPaths = 0
+local spottedCalls = 0
+local aggroCalls = 0
 local faced = 0
 local noLunge
 local managed = false
@@ -56,32 +58,38 @@ local zombie = {
         assert(x == npcBody.x and y == npcBody.y and z == npcBody.z)
         pathRequests = pathRequests + 1
     end,
-    pathToCharacter = function()
-        forbiddenCharacterCalls = forbiddenCharacterCalls + 1
+    CanSee = function(_, value)
+        return value == npcBody
+    end,
+    pathToCharacter = function(_, value)
+        assert(value == npcBody)
+        pathRequests = pathRequests + 1
+        nativeCharacterPaths = nativeCharacterPaths + 1
     end,
     setTarget = function(_, value)
         target = value
-        if value == npcBody then
-            forbiddenCharacterCalls = forbiddenCharacterCalls + 1
-        end
     end,
     getAttackedBy = function() return attackedBy end,
     setAttackedBy = function(_, value)
         attackedBy = value
-        if value == npcBody then
-            forbiddenCharacterCalls = forbiddenCharacterCalls + 1
-        end
     end,
-    spotted = function()
-        forbiddenCharacterCalls = forbiddenCharacterCalls + 1
+    spotted = function(_, value, immediate)
+        assert(value == npcBody and immediate == true)
+        spottedCalls = spottedCalls + 1
     end,
-    addAggro = function()
-        forbiddenCharacterCalls = forbiddenCharacterCalls + 1
+    addAggro = function(_, value, amount)
+        assert(value == npcBody and amount == 1)
+        aggroCalls = aggroCalls + 1
     end,
     faceLocation = function(_, x, y)
         assert(x == npcBody.x and y == npcBody.y)
         faced = faced + 1
     end,
+    faceThisObject = function(_, value)
+        assert(value == npcBody)
+        faced = faced + 1
+    end,
+    setNoTeeth = function() end,
     setVariable = function(_, key, value)
         if key == "NoLungeAttack" then noLunge = value end
     end,
@@ -97,7 +105,8 @@ PNC = {
     Core = {
         Now = function() return now end,
         IsManagedNPCBody = function(candidate)
-            return managed and candidate == zombie
+            return candidate == npcBody
+                or (managed and candidate == zombie)
         end,
     },
     Network = {
@@ -141,8 +150,8 @@ assert(pathRequests == 1,
     "owning client did not submit proactive zombie pursuit")
 assert(target == nil and attackedBy == nil,
     "distant pursuit mixed PathFindState with target state")
-assert(forbiddenCharacterCalls == 0 and noLunge == true,
-    "distant pursuit installed an invalid character goal")
+assert(nativeCharacterPaths == 1 and noLunge == true,
+    "distant pursuit did not use Bandits-style character pathing")
 
 now = 1100
 registered(zombie)
@@ -152,26 +161,27 @@ assert(pathRequests == 1,
 npcBody.x = 2
 now = 1600
 registered(zombie)
-assert(pathRequests == 2,
-    "coordinate pursuit stopped outside bite range")
-assert(target == nil and attackedBy == nil
-        and forbiddenCharacterCalls == 0,
-    "MP pursuit bound the IsoZombie NPC as a character target")
+assert(pathRequests == 1,
+    "near pursuit unexpectedly submitted another path")
+assert(target == npcBody and attackedBy == npcBody,
+    "near pursuit did not bind the native NPC target")
+assert(spottedCalls == 1 and aggroCalls == 1,
+    "near pursuit did not establish native zombie aggro")
 
 npcBody.x = 0.8
 now = 2000
 registered(zombie)
-assert(pathRequests == 2 and faced == 1,
+assert(pathRequests == 1 and faced == 1,
     "bite-range pursuit submitted another path instead of facing")
-assert(forbiddenCharacterCalls == 0,
-    "bite-range pursuit installed an invalid network mind goal")
+assert(target == npcBody and attackedBy == npcBody,
+    "bite-range pursuit released the native NPC target")
 
 playerIsTarget = true
 player.x = 0.5
 target = nil
 now = 2200
 registered(zombie)
-assert(pathRequests == 2 and target == nil,
+assert(pathRequests == 1,
     "closer live player target was incorrectly replaced")
 assert(noLunge == false,
     "player targeting retained the NPC no-lunge override")
@@ -180,7 +190,7 @@ playerIsTarget = false
 managed = true
 now = 2400
 registered(zombie)
-assert(pathRequests == 2,
+assert(pathRequests == 1,
     "managed NPC body entered vanilla zombie aggro control")
 
 local serverFile = assert(io.open(
@@ -202,6 +212,20 @@ assert(not string.find(
     1,
     true
 ), "MP server binds the IsoZombie NPC as a network character goal")
+
+local stateFile = assert(io.open(
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+        .. "Zombies/PNC_ZombieAggro_State.lua",
+    "rb"
+))
+local stateSource = stateFile:read("*a")
+stateFile:close()
+assert(string.find(
+    stateSource,
+    "if not (isServer and isServer() == true) then",
+    1,
+    true
+), "MP server still clears the owning client's native target")
 
 local biteFile = assert(io.open(
     "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"

@@ -157,10 +157,12 @@ local function buildRecordView(snapshot)
         },
         outfit = snapshot and snapshot.appearance and snapshot.appearance.outfit or nil,
         identity = snapshot and snapshot.identity or nil,
+        appearance = snapshot and snapshot.appearance or nil,
         equipment = {
             primaryFullType = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.primaryFullType or nil,
             secondaryFullType = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.secondaryFullType or nil,
             worn = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.worn or {},
+            wornVisuals = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.wornVisuals or {},
             attached = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.attached or {},
         },
         runtime = {
@@ -201,6 +203,22 @@ local function buildRecordView(snapshot)
     }
 end
 
+local function ensureReplicaClothingSnapshot(snapshot, zombie)
+    if not snapshot or not zombie
+        or not Equipment
+        or not Equipment.EnsureReplicaVisuals
+    then
+        return false
+    end
+    return Equipment.EnsureReplicaVisuals(
+        zombie,
+        buildRecordView(snapshot)
+    )
+end
+
+Internal.EnsureReplicaClothingSnapshot =
+    ensureReplicaClothingSnapshot
+
 local function stableTableSignature(tbl)
     local keys = {}
     local i = 0
@@ -233,6 +251,7 @@ local function buildVisualKey(snapshot)
         tostring(appearance.hairModel or ""),
         tostring(appearance.beardModel or ""),
         stableTableSignature(equipment.worn),
+        stableTableSignature(equipment.wornVisuals),
         stableTableSignature(equipment.attached),
     }, "|")
 end
@@ -557,7 +576,11 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
         PNC.AnimationDebugPlayer.Maintain(zombie, now)
         return
     end
-    attackKey = visualState.attackActive
+    attackKey = not (
+            remoteReplica
+            and visualState.nativeTraversalActive == true
+        )
+        and visualState.attackActive
         and visualState.attackAnim
         and (
             tostring(visualState.attackAnim)
@@ -679,32 +702,52 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     visualKey = buildVisualKey(snapshot)
     handsKey = buildHandsKey(snapshot)
     if modData and modData.PNC_ClientVisualKey ~= visualKey then
-        if not (
-                remoteReplica
-                and visualState.nativeMoveActive == true
-            )
+        if not remoteReplica
             and Animation
             and Animation.ApplyLiveSetup
         then
             Animation.ApplyLiveSetup(zombie, recordView)
         end
-        if Visuals and Visuals.ApplyResolvedAppearance then
+        if remoteReplica
+            and Visuals
+            and Visuals.ApplyReplicaAppearance
+        then
+            Visuals.ApplyReplicaAppearance(
+                zombie,
+                snapshot.appearance or {},
+                snapshot.isFemale == true
+            )
+        elseif Visuals and Visuals.ApplyResolvedAppearance then
             Visuals.ApplyResolvedAppearance(zombie, snapshot.appearance or {}, snapshot.isFemale == true)
         end
-        if Equipment and Equipment.Apply then
+        if remoteReplica
+            and Equipment
+            and Equipment.ApplyReplicaVisuals
+        then
+            Equipment.ApplyReplicaVisuals(
+                zombie,
+                recordView
+            )
+        elseif Equipment and Equipment.Apply then
             Equipment.Apply(zombie, recordView)
         end
         modData.PNC_ClientVisualKey = visualKey
         modData.PNC_ClientHandsKey = handsKey
     elseif modData and modData.PNC_ClientHandsKey ~= handsKey then
-        if Equipment and Equipment.ApplyHands then
+        if remoteReplica
+            and Equipment
+            and Equipment.ApplyReplicaHands
+        then
+            Equipment.ApplyReplicaHands(zombie, recordView)
+        elseif Equipment and Equipment.ApplyHands then
             Equipment.ApplyHands(zombie, recordView)
         elseif Equipment and Equipment.Apply then
             Equipment.Apply(zombie, recordView)
         end
         modData.PNC_ClientHandsKey = handsKey
     end
-    if snapshot.attackMode == true
+    if not remoteReplica
+        and snapshot.attackMode == true
         and Equipment
         and Equipment.EnsureCombatHands
     then
@@ -718,18 +761,6 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
             "client_post_equipment",
             now
         )
-    end
-
-    -- The multiplayer zombie packet may reapply rot, blood, dirt, or a zombie
-    -- skin after the one-time visual snapshot. Reassert only the inexpensive
-    -- human visual fields on a bounded cadence; clothes and inventory stay put.
-    if Visuals and Visuals.MaintainHumanAppearance
-        and (not modData or now >= (tonumber(modData.PNC_ClientHumanVisualAt) or 0))
-    then
-        Visuals.MaintainHumanAppearance(zombie, snapshot.appearance or {}, snapshot.isFemale == true, true)
-        if modData then
-            modData.PNC_ClientHumanVisualAt = now + 1000
-        end
     end
 
     motionKey = buildMotionKey(snapshot)

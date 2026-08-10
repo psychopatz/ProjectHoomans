@@ -35,7 +35,6 @@ function Parts.BuildVisualState(record)
     local moveAnim = moving and tostring(path.moveAnim or "") or ""
     local engineWalkType = moving and tostring(path.engineWalkType or "") or ""
     local anim = "Idle"
-    local attackActive = attack ~= nil and now < (tonumber(attack.finishAt) or 0)
     -- A composite scene remains authoritative during its short inter-step
     -- gap even though no bump selector is active in that interval.
     local sceneActive = scene ~= nil
@@ -44,6 +43,12 @@ function Parts.BuildVisualState(record)
         and navigation.nativeTraversalState or nil
     local nativeTraversalActive =
         nativeTraversalState ~= nil
+    -- A native climb/fence action already owns the zombie action graph.
+    -- Publishing an overlapping attack bump makes clients replace ClimbWindow
+    -- with the combat selector midway through traversal.
+    local attackActive = not nativeTraversalActive
+        and attack ~= nil
+        and now < (tonumber(attack.finishAt) or 0)
     local nativeMoveActive = moving
         and navigation
         and navigation.nativeActive == true

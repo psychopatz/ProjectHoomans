@@ -99,7 +99,22 @@ PNC = {
             }
         end,
     },
-    Equipment = { Describe = function() return { combatModeResolved = "melee", weaponStatus = "ready" } end },
+    Equipment = {
+        Describe = function()
+            return {
+                combatModeResolved = "melee",
+                weaponStatus = "ready",
+            }
+        end,
+        BuildWornVisualSummary = function()
+            return {
+                Shirt = {
+                    fullType = "Base.Shirt_FormalWhite",
+                    textureChoice = 3,
+                },
+            }
+        end,
+    },
     Inventory = {
         BuildSummaryPayload = function() return { revision = 0, itemCount = 3 } end,
         BuildFullPayload = function() return { summary = { revision = 0 }, items = {}, containers = {} } end,
@@ -421,6 +436,11 @@ nearbyRecord.runtime.zombieAttacker = {
 local combatSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
 assertEqual(combatSnapshot.attackMode, true, "combat snapshot attack mode")
 assertEqual(
+    combatSnapshot.equipmentSummary.wornVisuals.Shirt.textureChoice,
+    3,
+    "worn inventory visual metadata snapshot"
+)
+assertEqual(
     combatSnapshot.combatDebugState.decision,
     "melee_pressure_retreat",
     "combat tactical decision snapshot"
@@ -440,6 +460,17 @@ assertEqual(
     -2,
     "combat movement goal snapshot"
 )
+nearbyRecord.runtime.localNavigation = {
+    nativeTraversalState = "ClimbWindow",
+}
+local traversalCombatSnapshot =
+    PNC.Network.BuildSnapshot(nearbyRecord)
+assertEqual(
+    traversalCombatSnapshot.visualState.attackActive,
+    false,
+    "native traversal published an overlapping attack"
+)
+nearbyRecord.runtime.localNavigation = nil
 assertEqual(
     combatSnapshot.combatDebugState.coneHalfAngleDegrees,
     55,

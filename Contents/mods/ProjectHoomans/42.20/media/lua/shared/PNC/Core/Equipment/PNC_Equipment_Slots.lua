@@ -146,6 +146,107 @@ local function normalizeWornMap(source)
     return output
 end
 
+local function normalizeVisualColor(source)
+    if type(source) ~= "table" then
+        return nil
+    end
+    return {
+        r = tonumber(source.r) or 1,
+        g = tonumber(source.g) or 1,
+        b = tonumber(source.b) or 1,
+    }
+end
+
+local function normalizeWornVisualMap(source, worn)
+    local output = {}
+    local location
+    local state
+    local fullType
+    if type(source) ~= "table" then
+        return output
+    end
+    for rawLocation, rawState in pairs(source) do
+        location = normalizeBodyLocation(rawLocation)
+        state = type(rawState) == "table" and rawState or nil
+        fullType = location and worn[location] or nil
+        if state and fullType
+            and (
+                state.fullType == nil
+                or tostring(state.fullType) == tostring(fullType)
+            )
+        then
+            output[location] = {
+                fullType = fullType,
+                baseTexture = tonumber(state.baseTexture),
+                textureChoice = tonumber(state.textureChoice),
+                decal = normalizeString(state.decal),
+                tint = normalizeVisualColor(state.tint),
+            }
+        end
+    end
+    return output
+end
+
+function Equipment.VisualStateFromItemState(itemState, fullType)
+    local tint
+    if type(itemState) ~= "table" then return nil end
+    if itemState.visualFullType ~= nil
+        and tostring(itemState.visualFullType)
+            ~= tostring(fullType or "")
+    then
+        return nil
+    end
+    if itemState.visualTintR ~= nil
+        and itemState.visualTintG ~= nil
+        and itemState.visualTintB ~= nil
+    then
+        tint = {
+            r = tonumber(itemState.visualTintR) or 1,
+            g = tonumber(itemState.visualTintG) or 1,
+            b = tonumber(itemState.visualTintB) or 1,
+        }
+    end
+    if itemState.visualBaseTexture == nil
+        and itemState.visualTextureChoice == nil
+        and itemState.visualDecal == nil
+        and tint == nil
+    then
+        return nil
+    end
+    return {
+        fullType = fullType and tostring(fullType) or nil,
+        baseTexture = tonumber(itemState.visualBaseTexture),
+        textureChoice = tonumber(itemState.visualTextureChoice),
+        decal = itemState.visualDecal
+            and tostring(itemState.visualDecal) or nil,
+        tint = tint,
+    }
+end
+
+function Equipment.StoreVisualStateInItemState(item, visualState)
+    local state
+    local tint
+    if type(item) ~= "table" or type(visualState) ~= "table" then
+        return false
+    end
+    item.itemState = type(item.itemState) == "table"
+        and item.itemState or {}
+    state = item.itemState
+    tint = visualState.tint
+    state.visualFullType = visualState.fullType
+        and tostring(visualState.fullType)
+        or item.type and tostring(item.type)
+        or nil
+    state.visualBaseTexture = tonumber(visualState.baseTexture)
+    state.visualTextureChoice = tonumber(visualState.textureChoice)
+    state.visualDecal = visualState.decal
+        and tostring(visualState.decal) or nil
+    state.visualTintR = tint and tonumber(tint.r) or nil
+    state.visualTintG = tint and tonumber(tint.g) or nil
+    state.visualTintB = tint and tonumber(tint.b) or nil
+    return true
+end
+
 local function getBodyLocationPriority()
     local i
     if BODY_LOCATION_PRIORITY then
@@ -185,10 +286,15 @@ end
 
 function Equipment.NormalizeLoadoutSpec(loadoutSpec)
     local source = type(loadoutSpec) == "table" and loadoutSpec or {}
+    local worn = normalizeWornMap(source.worn)
     return {
         primaryFullType = normalizeString(source.primaryFullType),
         secondaryFullType = normalizeString(source.secondaryFullType),
-        worn = normalizeWornMap(source.worn),
+        worn = worn,
+        wornVisuals = normalizeWornVisualMap(
+            source.wornVisuals,
+            worn
+        ),
         attached = normalizeStringMap(source.attached),
     }
 end
@@ -231,16 +337,23 @@ end
 
 local function setSlotValue(record, collectionName, location, fullType, normalizeLocation)
     local equipment
+    local previous
     location = normalizeLocation(location)
     if not record or not location then
         return false
     end
     equipment = Equipment.EnsureRecordEquipment(record)
+    previous = equipment[collectionName][location]
     fullType = normalizeString(fullType)
     if fullType then
         equipment[collectionName][location] = fullType
     else
         equipment[collectionName][location] = nil
+    end
+    if collectionName == "worn"
+        and tostring(previous or "") ~= tostring(fullType or "")
+    then
+        equipment.wornVisuals[location] = nil
     end
     return true
 end
@@ -374,6 +487,149 @@ function Equipment.GetOrderedAttachedEntries(equipment)
         return tostring(left.location) < tostring(right.location)
     end)
     return entries
+end
+
+local function readVisualValue(visual, methodName, ...)
+    local method
+    local ok
+    local value
+    if not visual then return nil end
+    method = visual[methodName]
+    if type(method) ~= "function" then return nil end
+    ok, value = pcall(method, visual, ...)
+    return ok and value or nil
+end
+
+local function visualStateSignature(state)
+    local tint = state and state.tint or {}
+    return table.concat({
+        tostring(state and state.fullType or ""),
+        tostring(state and state.baseTexture or ""),
+        tostring(state and state.textureChoice or ""),
+        tostring(state and state.decal or ""),
+        tostring(tint.r or ""),
+        tostring(tint.g or ""),
+        tostring(tint.b or ""),
+    }, ":")
+end
+
+function Equipment.CaptureItemVisualState(item, fullType)
+    local visual
+    local clothingItem
+    local tint
+    if not item then return nil end
+    visual = item.getVisual and item:getVisual() or nil
+    if not visual then return nil end
+    clothingItem = item.getClothingItem
+        and item:getClothingItem() or nil
+    tint = readVisualValue(
+        visual,
+        "getTint",
+        clothingItem
+    )
+    return {
+        fullType = fullType
+            or item.getFullType
+                and tostring(item:getFullType())
+            or nil,
+        baseTexture = tonumber(readVisualValue(
+            visual,
+            "getBaseTexture"
+        )),
+        textureChoice = tonumber(readVisualValue(
+            visual,
+            "getTextureChoice"
+        )),
+        decal = readVisualValue(
+            visual,
+            "getDecal",
+            clothingItem
+        ),
+        tint = tint and {
+            r = tonumber(tint:getRedFloat()),
+            g = tonumber(tint:getGreenFloat()),
+            b = tonumber(tint:getBlueFloat()),
+        } or nil,
+    }
+end
+
+-- Capture the concrete visual choices of the server's real worn inventory.
+-- Item type alone is insufficient: many PZ clothes and bags randomly select
+-- a base texture, texture choice, or tint when an ItemVisual is constructed.
+function Equipment.BuildWornVisualSummary(record)
+    local registry = PNC.Registry
+    local body = registry and registry.GetLiveZombie
+        and registry.GetLiveZombie(record and record.id) or nil
+    local wornItems = body and body.getWornItems
+        and body:getWornItems() or nil
+    local output = {}
+    local i
+    local entry
+    local item
+    local location
+    local captured
+    local changed = false
+    local inventory = record and record.inventory or nil
+    local inventoryItem
+    local itemID
+    local equipment = record
+        and Equipment.EnsureRecordEquipment(record) or nil
+    if equipment and PNC.Core and PNC.Core.DeepCopy then
+        output = PNC.Core.DeepCopy(
+            equipment.wornVisuals or {}
+        )
+    end
+    if not wornItems or not wornItems.size then
+        return output
+    end
+    for i = 0, wornItems:size() - 1 do
+        entry = wornItems:get(i)
+        item = entry and entry.getItem and entry:getItem() or nil
+        location = entry and entry.getLocation
+            and entry:getLocation() or nil
+        if item and location then
+            captured = Equipment.CaptureItemVisualState(item)
+            if captured then
+                output[tostring(location)] = captured
+                itemID = inventory and inventory.worn
+                    and inventory.worn[tostring(location)] or nil
+                inventoryItem = itemID and inventory.items
+                    and inventory.items[itemID] or nil
+                if inventoryItem
+                    and visualStateSignature(
+                        Equipment.VisualStateFromItemState(
+                            inventoryItem.itemState,
+                            inventoryItem.type
+                        )
+                    ) ~= visualStateSignature(captured)
+                then
+                    Equipment.StoreVisualStateInItemState(
+                        inventoryItem,
+                        captured
+                    )
+                    changed = true
+                end
+                if equipment
+                    and visualStateSignature(
+                        equipment.wornVisuals[location]
+                    ) ~= visualStateSignature(captured)
+                then
+                    equipment.wornVisuals[location] = captured
+                    changed = true
+                end
+            end
+        end
+    end
+    if changed
+        and PNC.Registry
+        and PNC.Registry.MarkDirty
+    then
+        PNC.Registry.MarkDirty(
+            record,
+            "equipment_visuals"
+        )
+    end
+    return output
 end
 
 function Equipment.CaptureCharacterLoadout(character)
