@@ -59,6 +59,12 @@ local function onResetLua()
     ClientState.bootstrapState = "idle"
     ClientState.activeBootstrapRequestID = nil
     ClientState.bootstrapKnowledgeRevision = nil
+    ClientState.lastBootstrapRequestAt = nil
+    ClientState.bootstrapRetryAttempt = nil
+    ClientState.bootstrapReason = nil
+    if PNC.KnowledgeInterest and PNC.KnowledgeInterest.Reset then
+        PNC.KnowledgeInterest.Reset()
+    end
     ClientState.pendingDisclosure = {}
     ClientState.characterPayloads = {}
     ClientState.debugRoster = {}

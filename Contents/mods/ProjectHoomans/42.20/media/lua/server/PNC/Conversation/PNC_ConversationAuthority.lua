@@ -118,8 +118,8 @@ end
 
 local function audienceMap(record, category)
     local hostile = tostring(record and record.faction or "") == "hostile"
-        and (type(record.hostility) ~= "table"
-            or record.hostility.attackPlayers ~= false)
+        and type(record.hostility) == "table"
+        and record.hostility.attackPlayers == true
     return {
         hostile = hostile,
         neutral = not hostile and category ~= "Member" and category ~= "Lover",
@@ -162,7 +162,7 @@ function Authority.BuildContext(player, record, token)
         npcPersonality = record.personality or record.socialProfile,
         npcTraits = record.traits or record.socialTraits,
         audiences = audienceMap(record, category),
-        allowHostileParley = tostring(record.faction or "") == "hostile",
+        allowHostileParley = audienceMap(record, category).hostile,
         worldAgeHours = worldAgeHours(),
         hour = worldAgeHours() % 24,
         worldID = tostring(getWorld and getWorld() or "world"),

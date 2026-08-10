@@ -199,6 +199,12 @@ local nearbyRecord = {
     name = "Nearby",
     identitySeed = 123,
     faction = "colonist",
+    hostility = {
+        mode = "faction_war",
+        attackPlayers = false,
+        attackNPCs = true,
+        attackZombies = true,
+    },
     presenceState = "live",
     alive = true,
     recruited = false,
@@ -279,6 +285,11 @@ assertEqual(
     PNC.Network.BuildSnapshot(nearbyRecord).ownerUsername,
     "player_1",
     "detailed snapshot owner identity"
+)
+assertEqual(
+    PNC.Network.BuildSnapshot(nearbyRecord).hostility.attackPlayers,
+    false,
+    "detailed snapshot omitted explicit player hostility"
 )
 assertEqual(
     PNC.Network.BuildRosterSnapshot(nearbyRecord)

@@ -55,6 +55,7 @@ PNC = {
         CMD_NPC_PRESENTATION = "NPCPresentation",
         CMD_KNOWLEDGE_DISCLOSURE_REQUEST = "KnowledgeDisclosureRequest",
         CMD_KNOWLEDGE_DISCLOSURE = "KnowledgeDisclosure",
+        PRESENCE_LIVE = "live",
     },
     Core = {
         Now = function() return 5000 end,
@@ -168,6 +169,101 @@ assertEqual(sentCommand.command, "KnowledgeDisclosureRequest",
     "multiplayer disclosure uses authoritative server command")
 assertEqual(sentCommand.args.topicID, "identity_name",
     "multiplayer disclosure retains topic")
+PNC.Core.IsClientOnly = function() return false end
+
+-- Roster success must not mask a failed/early identity bootstrap. The retry
+-- is separately throttled and stops only after a character-bound response.
+PNC.Core.IsClientOnly = function() return true end
+State.bootstrapState = "error"
+State.playerContext = nil
+State.lastBootstrapRequestAt = 0
+State.snapshots = {
+    npc_live = {
+        id = "npc_live", presenceState = "live", alive = true,
+        interestDetailed = true,
+    },
+    npc_abstract = {
+        id = "npc_abstract", presenceState = "abstract", alive = true,
+        interestDetailed = true,
+    },
+}
+sentCommand = nil
+local bootstrapRequested, bootstrapReason =
+    Client.EnsurePlayerBootstrap(5000, false)
+assertEqual(bootstrapRequested, true,
+    "failed startup bootstrap retries independently of roster state")
+assertEqual(sentCommand.command, "PlayerBootstrapRequest",
+    "bootstrap retry uses authoritative MP command")
+assertEqual(#sentCommand.args.npcIDs, 1,
+    "bootstrap requests only live interested NPCs")
+assertEqual(sentCommand.args.npcIDs[1], "npc_live",
+    "abstract NPC is excluded from bootstrap request")
+assertEqual(sentCommand.args.scope, "interest",
+    "bootstrap uses centralized knowledge-interest scope")
+assertEqual(State.bootstrapState, "loading",
+    "bootstrap retry records loading state")
+local requestBeforeKnown = sentCommand.args.requestID
+Client.HandleServerCommand("PlayerBootstrap", {
+    requestID = requestBeforeKnown,
+    state = "known",
+    context = {
+        characterUUID = "player:retry",
+        bindingRevision = 1,
+    },
+    knowledgeRevision = 0,
+    chunkIndex = 1,
+    chunkCount = 1,
+    scope = "live",
+    snapshots = {
+        { npcID = "npc_live", revision = 0, categories = {} },
+    },
+})
+sentCommand = nil
+local bootstrapCurrent, currentReason =
+    Client.EnsurePlayerBootstrap(10000, false)
+assertEqual(bootstrapCurrent, true,
+    "character-bound bootstrap stops retries")
+assertEqual(currentReason, "current",
+    "completed bootstrap reports current")
+assertEqual(sentCommand, nil,
+    "completed bootstrap does not send another request")
+
+-- A visible map consumer may demand an abstract NPC without widening the
+-- bootstrap to every abstract record. The tick-facing debounce batches rapid
+-- hover changes, and hydration removes the ID from the demand set.
+local queued, queueReason = PNC.KnowledgeInterest.Require(
+    "npc_abstract", "map_hover")
+assertEqual(queued, true, "map hover queues distant NPC knowledge")
+assertEqual(queueReason, "queued", "new map demand reports queued")
+assertEqual(PNC.KnowledgeInterest.ConsumeFlush(5099), false,
+    "map knowledge demand observes batching debounce")
+assertEqual(PNC.KnowledgeInterest.ConsumeFlush(5100), true,
+    "map knowledge demand becomes ready as one batch")
+sentCommand = nil
+local mapRequested = Client.EnsurePlayerBootstrap(5100, true)
+assertEqual(mapRequested, true, "map demand forces a scoped bootstrap")
+assertEqual(#sentCommand.args.npcIDs, 1,
+    "map demand does not resend hydrated live NPCs")
+assertEqual(sentCommand.args.npcIDs[1], "npc_abstract",
+    "map demand requests only the hovered abstract NPC")
+Client.HandleServerCommand("PlayerBootstrap", {
+    requestID = sentCommand.args.requestID,
+    state = "known",
+    context = {
+        characterUUID = "player:retry",
+        bindingRevision = 1,
+    },
+    knowledgeRevision = 0,
+    chunkIndex = 1,
+    chunkCount = 1,
+    scope = "interest",
+    snapshots = {
+        { npcID = "npc_abstract", revision = 0, categories = {} },
+    },
+})
+assertEqual(PNC.KnowledgeInterest.CollectNPCIDs(true)[1], nil,
+    "hydrated map demand leaves no retry work")
+State.activeBootstrapRequestID = nil
 PNC.Core.IsClientOnly = function() return false end
 
 local customPayload

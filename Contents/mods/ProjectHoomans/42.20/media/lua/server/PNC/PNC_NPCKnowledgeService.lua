@@ -520,7 +520,7 @@ end
 -- Login/full-sync hydration is deliberately sparse: only NPCs this character
 -- already knows are sent back to that player. This restores client-side name
 -- presentation after a reload without exposing an all-NPC knowledge matrix.
-function Knowledge.BuildKnownSnapshotsForPlayer(player)
+function Knowledge.BuildKnownSnapshotsForPlayer(player, requestedNPCIDs)
     local characterUUID, identityReason = characterUUIDForPlayer(
         player,
         "knowledge_full_sync"
@@ -531,8 +531,22 @@ function Knowledge.BuildKnownSnapshotsForPlayer(player)
     if not characterUUID then return nil, identityReason end
     Knowledge.EnsureLoaded()
     character = Knowledge.Registry.byCharacter[characterUUID]
-    for npcID in pairs(character and character.byNPC or {}) do
-        ids[#ids + 1] = tostring(npcID)
+    if type(requestedNPCIDs) == "table" then
+        local seen = {}
+        for index = 1, math.min(#requestedNPCIDs, 512) do
+            local requestedID = tostring(requestedNPCIDs[index] or "")
+            if requestedID ~= "" and #requestedID <= 128
+                and not string.find(requestedID, "%c")
+                and not seen[requestedID]
+            then
+                seen[requestedID] = true
+                ids[#ids + 1] = requestedID
+            end
+        end
+    else
+        for npcID in pairs(character and character.byNPC or {}) do
+            ids[#ids + 1] = tostring(npcID)
+        end
     end
     table.sort(ids)
     for _, npcID in ipairs(ids) do

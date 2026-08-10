@@ -280,8 +280,8 @@ function Scene.Begin(record, zombie, player, token, options)
     -- has acquired the player as a direct runtime target.
     local hostileParley = options.allowHostileParley == true
         and tostring(record.faction or "") == "hostile"
-        and (type(record.hostility) ~= "table"
-            or record.hostility.attackPlayers ~= false)
+        and type(record.hostility) == "table"
+        and record.hostility.attackPlayers == true
     if Scene.HasThreat(
         record,
         zombie,

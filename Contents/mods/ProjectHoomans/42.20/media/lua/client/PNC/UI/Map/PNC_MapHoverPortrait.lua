@@ -1,6 +1,7 @@
 -- One reusable NPC portrait card for world-map hover feedback.
 
 require "PNC/UI/Map/PNC_MapHoverPortraitCard"
+require "PNC/Knowledge/PNC_KnowledgeInterest"
 
 PNC = PNC or {}
 PNC.MapHoverPortrait = PNC.MapHoverPortrait or {}
@@ -136,11 +137,14 @@ function HoverPortrait.Update(map, entry, markerX, markerY)
         HoverPortrait.Hide(map)
         return false
     end
+    id = tostring(entry.id)
+    if PNC.KnowledgeInterest and PNC.KnowledgeInterest.Require then
+        PNC.KnowledgeInterest.Require(id, "map_hover")
+    end
     if type(entry.portrait) ~= "table" then
         HoverPortrait.Hide(map)
         return false
     end
-    id = tostring(entry.id)
     bindingKey = id .. ":" .. tostring(entry.portrait.revision or 0)
     now = nowMilliseconds()
     if map._pncPortraitCandidateID ~= id then

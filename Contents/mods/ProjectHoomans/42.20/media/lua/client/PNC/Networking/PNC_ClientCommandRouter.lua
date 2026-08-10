@@ -84,6 +84,9 @@ function Internal.ApplyNPCKnowledgeSnapshot(snapshot, reason)
         local npcID = tostring(snapshot.npcID)
         ClientState.npcKnowledge = ClientState.npcKnowledge or {}
         ClientState.npcKnowledge[npcID] = snapshot
+        if PNC.KnowledgeInterest and PNC.KnowledgeInterest.Acknowledge then
+            PNC.KnowledgeInterest.Acknowledge(npcID)
+        end
         local nameFact = identityNameFact(snapshot)
         if nameFact then
             ClientState.npcPresentations = ClientState.npcPresentations or {}
@@ -156,10 +159,20 @@ Internal.RegisterServerCommand(Const.CMD_PLAYER_BOOTSTRAP, function(args)
     local currentRevision = tonumber(ClientState.bootstrapKnowledgeRevision) or -1
     local incomingRevision = tonumber(args.knowledgeRevision) or 0
     if incomingRevision < currentRevision then return end
+    local previousCharacterUUID = ClientState.playerContext
+        and ClientState.playerContext.characterUUID or nil
     ClientState.bootstrapState = args.state or "error"
     ClientState.bootstrapReason = args.reason
     if args.context then ClientState.playerContext = args.context end
-    if tonumber(args.chunkIndex) == 1 and projectionIsCurrent(args) then
+    local incomingCharacterUUID = ClientState.playerContext
+        and ClientState.playerContext.characterUUID or nil
+    local characterChanged = previousCharacterUUID ~= nil
+        and tostring(previousCharacterUUID)
+            ~= tostring(incomingCharacterUUID or "")
+    if tonumber(args.chunkIndex) == 1 and projectionIsCurrent(args)
+        and (args.scope ~= "live"
+            and args.scope ~= "interest" or characterChanged)
+    then
         ClientState.npcKnowledge = {}
         ClientState.npcPresentations = {}
         ClientState.conversationHistory = {}
@@ -172,6 +185,9 @@ Internal.RegisterServerCommand(Const.CMD_PLAYER_BOOTSTRAP, function(args)
         for _, snapshot in ipairs(args.snapshots or {}) do
             Internal.ApplyNPCKnowledgeSnapshot(snapshot)
         end
+    end
+    if args.state == "known" then
+        ClientState.bootstrapRetryAttempt = 0
     end
 end)
 

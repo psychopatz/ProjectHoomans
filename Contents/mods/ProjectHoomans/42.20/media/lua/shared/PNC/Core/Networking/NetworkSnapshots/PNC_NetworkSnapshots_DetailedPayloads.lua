@@ -80,6 +80,10 @@ function Network.BuildSnapshot(record)
         recruited = record.recruited == true,
         persist = record.persist ~= false,
         faction = record.faction,
+        -- The legacy faction value can mean "at war with another NPC
+        -- faction". Replicate the explicit target classes with it so MP
+        -- clients never infer player hostility from the coarse value alone.
+        hostility = Core.DeepCopy(record.hostility or {}),
         organizationalFaction =
             buildOrganizationalFactionSummary(record),
         visualProfile = record.visualProfile,

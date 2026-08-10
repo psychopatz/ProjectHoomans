@@ -1,5 +1,6 @@
 require "PNC/00_PNC_Init"
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+require "PNC/Knowledge/PNC_KnowledgeInterest"
 require "PNC/Patches/PNC_SocialTraitCharacterCreationPatch"
 require "PNC/Patches/PNC_FishingPatch"
 require "PNC/Patches/PNC_VehicleSeatPatch"

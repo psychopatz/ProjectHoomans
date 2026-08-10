@@ -91,7 +91,12 @@ local function audienceMap(entry, relationshipID)
     local record = entry and entry.record or {}
     local faction = tostring(snapshot.faction or record.faction or "")
     local hostility = snapshot.hostility or record.hostility or {}
-    local hostile = faction == "hostile" and hostility.attackPlayers ~= false
+    -- `record.faction == "hostile"` is also the legacy compatibility state
+    -- used when an organizational faction is fighting another NPC faction.
+    -- Only an explicit player-hostility bit makes this player a hostile
+    -- conversation audience. Missing replica data must fail closed.
+    local hostile = faction == "hostile"
+        and hostility.attackPlayers == true
     return {
         hostile = hostile,
         neutral = not hostile and relationshipID ~= "Member"

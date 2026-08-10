@@ -169,6 +169,15 @@ function Sync.OnTick()
     if not isWorldReady() then
         return
     end
+    -- Knowledge bootstrap is independent of roster/presence health. Keep
+    -- retrying it in both SP and MP until it is bound to a character UUID.
+    if Client and Client.EnsurePlayerBootstrap then
+        local forceKnowledge = PNC.KnowledgeInterest
+            and PNC.KnowledgeInterest.ConsumeFlush
+            and PNC.KnowledgeInterest.ConsumeFlush(now)
+            or false
+        Client.EnsurePlayerBootstrap(now, forceKnowledge)
+    end
     remoteReplica = canRequestRemoteSync()
     if remoteReplica then
         requestSyncIfStale(now)

@@ -130,7 +130,17 @@ function Commands.HandleBootstrap(player, args)
             return payload
         end
         local snapshots
-        snapshots, reason = PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer(player)
+        local scopedRequest = args.scope == "live"
+            or args.scope == "interest"
+        local requestedNPCIDs
+        if scopedRequest then
+            requestedNPCIDs = type(args.npcIDs) == "table"
+                and args.npcIDs or {}
+        end
+        snapshots, reason = PNC.NPCKnowledge.BuildKnownSnapshotsForPlayer(
+            player,
+            requestedNPCIDs
+        )
         if not snapshots then
             payload = { requestID = args.requestID, state = "error", reason = reason }
         else
@@ -153,6 +163,8 @@ function Commands.HandleBootstrap(player, args)
                 for index = first, last do chunk[#chunk + 1] = snapshots[index] end
                 payload = {
                     requestID = args.requestID,
+                    scope = requestedNPCIDs
+                        and tostring(args.scope) or "all",
                     state = chunkIndex == chunkCount and "known" or "loading",
                     context = context,
                     snapshots = chunk,

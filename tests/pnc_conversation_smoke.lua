@@ -715,6 +715,23 @@ equal(hostile.context.allowHostileParley, true, "hostile parley context")
 equal(hostile.nodes.greeting.choices[1].id, "ceasefire",
     "hostile block exposes ceasefire")
 
+local factionWarOnly = PNC.Conversation.BuildDefinition({
+    id = "faction-war-only", name = "Faction War Only",
+    snapshot = {
+        faction = "hostile",
+        hostility = { attackPlayers = false, attackNPCs = true },
+    },
+}, {}, "twilight")
+equal(factionWarOnly.context.allowHostileParley, false,
+    "NPC-only faction war does not bleed into player hostility")
+
+local incompleteReplica = PNC.Conversation.BuildDefinition({
+    id = "incomplete-replica", name = "Incomplete Replica",
+    snapshot = { faction = "hostile" },
+}, {}, "twilight")
+equal(incompleteReplica.context.allowHostileParley, false,
+    "missing MP hostility data fails closed")
+
 local sandbox = assert(PNC.ConversationDebugModel.ExecuteSandbox(
     "projecthoomans:whats_up_local_activity_neutral",
     "opening", "detail", debugContext

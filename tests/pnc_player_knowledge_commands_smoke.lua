@@ -64,8 +64,18 @@ PNC = {
                 } } } or {},
             }
         end,
-        BuildKnownSnapshotsForPlayer = function()
+        BuildKnownSnapshotsForPlayer = function(_, requestedNPCIDs)
             local output = {}
+            if type(requestedNPCIDs) == "table" then
+                for index = 1, #requestedNPCIDs do
+                    output[index] = {
+                        npcID = requestedNPCIDs[index], revision = 1,
+                        identity = { displayName = "RAW " .. index },
+                        categories = {},
+                    }
+                end
+                return output
+            end
             for index = 1, 65 do
                 output[index] = {
                     npcID = "npc_" .. index, revision = 1,
@@ -143,5 +153,37 @@ equal(sent.bootstrap[3].state, "known", "last bootstrap chunk completes")
 equal(sent.bootstrap[1].snapshots[1].identity.displayName, nil,
     "bootstrap also strips undisclosed raw names")
 equal(bootstrap.context.characterUUID, "char_one", "bootstrap binds context")
+
+sent.bootstrap = {}
+local scoped = Commands.HandleBootstrap({}, {
+    requestID = "bootstrap:live",
+    scope = "live",
+    npcIDs = { "npc_live_1", "npc_live_2" },
+})
+equal(#sent.bootstrap, 1, "live bootstrap remains one batched response")
+equal(#scoped.snapshots, 2, "live bootstrap returns only requested NPCs")
+equal(scoped.snapshots[1].npcID, "npc_live_1",
+    "live bootstrap preserves requested identity")
+equal(scoped.scope, "live", "live bootstrap echoes merge scope")
+
+sent.bootstrap = {}
+local interested = Commands.HandleBootstrap({}, {
+    requestID = "bootstrap:interest",
+    scope = "interest",
+    npcIDs = { "npc_live_2" },
+})
+equal(#sent.bootstrap, 1, "interest bootstrap remains batched")
+equal(#interested.snapshots, 1,
+    "interest bootstrap returns only consumer-requested NPCs")
+equal(interested.scope, "interest",
+    "interest bootstrap echoes non-destructive merge scope")
+
+sent.bootstrap = {}
+local malformedInterest = Commands.HandleBootstrap({}, {
+    requestID = "bootstrap:interest:malformed",
+    scope = "interest",
+})
+equal(#malformedInterest.snapshots, 0,
+    "malformed scoped request cannot fall back to every known NPC")
 
 print("pnc_player_knowledge_commands_smoke: ok")
