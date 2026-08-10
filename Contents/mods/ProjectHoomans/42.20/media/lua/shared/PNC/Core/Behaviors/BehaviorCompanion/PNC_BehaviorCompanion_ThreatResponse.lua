@@ -10,7 +10,19 @@ local Perception = PNC.Perception
 local CombatTactics = PNC.CombatTactics
 local Performance = PNC.Performance
 
-local function tryEngageTarget(record, zombie)
+local function targetWithinConstraint(target, constraint)
+    local dx
+    local dy
+    local radius
+    if type(constraint) ~= "table" then return true end
+    if not target or target.x == nil or target.y == nil then return false end
+    radius = math.max(0, tonumber(constraint.radius) or 0)
+    dx = (tonumber(target.x) or 0) - (tonumber(constraint.x) or 0)
+    dy = (tonumber(target.y) or 0) - (tonumber(constraint.y) or 0)
+    return (dx * dx) + (dy * dy) <= radius * radius
+end
+
+local function tryEngageTarget(record, zombie, constraint)
     if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
         == tostring(Const.ATTACK_TYPE_NONE or "none")
     then
@@ -18,6 +30,10 @@ local function tryEngageTarget(record, zombie)
     end
     local target = Targeting.ResolveCompanionEngageTarget(record)
     if not target then
+        return false
+    end
+    if not targetWithinConstraint(target, constraint) then
+        Common.ClearCombatTarget(record, "target_outside_order_leash", zombie)
         return false
     end
     record.runtime.target = target
@@ -60,9 +76,9 @@ local function tryAvoidThreat(record, zombie)
     return false
 end
 
-function Internal.TryRespondToThreat(record, zombie)
+function Internal.TryRespondToThreat(record, zombie, constraint)
     if tryAvoidThreat(record, zombie) then return true end
-    return tryEngageTarget(record, zombie)
+    return tryEngageTarget(record, zombie, constraint)
 end
 
 function Internal.ShouldScanFollowThreat(record, now, active)

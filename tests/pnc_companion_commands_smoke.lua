@@ -13,6 +13,7 @@ end
 local records = {}
 local broadcasts = {}
 local marked = {}
+local liveBodies = {}
 
 local function companion(id, owner, x)
     return {
@@ -63,7 +64,7 @@ PNC = {
     },
     Registry = {
         Get = function(id) return records[tostring(id)] end,
-        GetLiveZombie = function() return nil end,
+        GetLiveZombie = function(id) return liveBodies[tostring(id)] end,
         ForEach = function(callback)
             local id
             local record
@@ -147,6 +148,13 @@ local player = {
     isDead = function() return false end,
 }
 
+liveBodies.owned = {
+    isDead = function() return false end,
+    getX = function() return 3.5 end,
+    getY = function() return 1.5 end,
+    getZ = function() return 0 end,
+}
+
 -- Single-player factions use the slot account key, not the display username.
 PNC.PlayerCharacters = {
     GetCharacterUUID = function() return "char_alice" end,
@@ -205,7 +213,8 @@ local affected, reason = PNC.CompanionCommands.Execute(player, {
 assertEqual(affected, 1, "targeted companion command")
 assertEqual(reason, "commanded", "targeted companion result")
 assertEqual(records.owned.orderSpec.kind, "guard", "stay order")
-assertEqual(records.owned.orderSpec.x, 2, "stay anchor")
+assertEqual(records.owned.orderSpec.x, 3.5, "stay live-body anchor x")
+assertEqual(records.owned.orderSpec.y, 1.5, "stay live-body anchor y")
 
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "neutral",

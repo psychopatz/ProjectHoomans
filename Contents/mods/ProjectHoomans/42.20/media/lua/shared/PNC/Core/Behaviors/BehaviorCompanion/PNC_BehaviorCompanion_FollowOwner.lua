@@ -114,12 +114,12 @@ function Internal.TickFollowOwner(record, zombie)
         hazard.expiresAt = 0
     end
     hordeCount = tonumber(hazard and hazard.count) or 0
-    prioritizeOwner = followState.ownerMoving == true
-        and (
-            ownerDist >= (
-                tonumber(Const.FOLLOW_COMBAT_LEASH_DISTANCE) or 5.5
-            )
-            or hordeCount
+    prioritizeOwner = ownerDist >= (
+            tonumber(Const.FOLLOW_COMBAT_LEASH_DISTANCE) or 5.5
+        )
+        or (
+            followState.ownerMoving == true
+            and hordeCount
                 >= (tonumber(Const.FOLLOW_HORDE_AVOID_COUNT) or 3)
         )
     if not ownerVehicle

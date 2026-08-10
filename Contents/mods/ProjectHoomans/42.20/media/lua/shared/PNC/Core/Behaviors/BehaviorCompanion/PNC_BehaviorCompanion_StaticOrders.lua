@@ -7,18 +7,35 @@ local Common = PNC.BehaviorCommon
 
 function Internal.TickGuardAnchor(record, zombie)
     local order = record.orderSpec or {}
-    if Internal.TryRespondToThreat(record, zombie) then
+    local anchorX = tonumber(order.x) or record.anchorX
+    local anchorY = tonumber(order.y) or record.anchorY
+    local anchorZ = tonumber(order.z) or record.anchorZ
+    local guardRadius = tonumber(Const.GUARD_ENGAGE_RADIUS)
+        or tonumber(Const.GUARD_RADIUS) or 3
+    local anchorDistance = Core.Distance(
+        record.x,
+        record.y,
+        anchorX,
+        anchorY
+    )
+    if anchorDistance > guardRadius then
+        Common.ClearCombatTarget(record, "returning_to_guard_anchor", zombie)
+    elseif Internal.TryRespondToThreat(record, zombie, {
+        x = anchorX,
+        y = anchorY,
+        radius = guardRadius,
+    }) then
         return true
     end
     Common.ClearCombatTarget(record, "guarding_anchor")
     Common.MoveRecord(
         record,
         zombie,
-        tonumber(order.x) or record.anchorX,
-        tonumber(order.y) or record.anchorY,
-        tonumber(order.z) or record.anchorZ,
+        anchorX,
+        anchorY,
+        anchorZ,
         "walk",
-        Const.GUARD_RADIUS,
+        tonumber(Const.GUARD_STOP_DISTANCE) or 0.45,
         "guard_anchor"
     )
     return true

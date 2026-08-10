@@ -36,7 +36,7 @@ for index = 1, 5 do
         ownerUsername = "alice",
         presenceState = "live",
         runtime = {},
-        x = 10 + index,
+        x = 2 + (index * 0.2),
         y = 0,
         z = 0,
     }

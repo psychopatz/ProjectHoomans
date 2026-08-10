@@ -344,7 +344,7 @@ local function clearCombatRuntime(record)
     record.nextThinkAt = Core.Now()
 end
 
-local function desiredOrder(record, mode, owner, faction)
+local function desiredOrder(record, mode, owner, faction, preservePlayerOrder)
     local mobile = faction and faction.mobile
     local home = mobile and mobile.site and mobile.site.home
     if mobile and mobile.active == true and home then
@@ -381,6 +381,15 @@ local function desiredOrder(record, mode, owner, faction)
         }
     end
     if mode == "player_owned" then
+        local current = record.orderSpec or {}
+        local kind = tostring(current.kind or "")
+        if preservePlayerOrder == true and (
+            kind == Const.ORDER_GUARD
+            or kind == Const.ORDER_PATROL
+            or kind == Const.ORDER_TRAVEL
+        ) then
+            return Core.DeepCopy(current)
+        end
         return {
             kind = Const.ORDER_FOLLOW,
             ownerUsername = owner.username,
@@ -410,9 +419,27 @@ local function apply(record, mode, owner, reason, faction)
     local legacyFaction
     local hostility
     local order
+    local preservePlayerOrder
+    local recordOwnerUsername
+    local ownerUsername
+    local recordOwnerOnlineID
+    local ownerOnlineID
     if not record or record.alive == false then
         return false, "invalid_record"
     end
+    recordOwnerUsername = tostring(record.ownerUsername or "")
+    ownerUsername = tostring(owner and owner.username or "")
+    recordOwnerOnlineID = tonumber(record.ownerOnlineID)
+    ownerOnlineID = tonumber(owner and owner.onlineID)
+    preservePlayerOrder = mode == "player_owned"
+        and record.recruited == true
+        and (
+            recordOwnerUsername ~= ""
+                and recordOwnerUsername == ownerUsername
+            or recordOwnerOnlineID ~= nil
+                and ownerOnlineID ~= nil
+                and recordOwnerOnlineID == ownerOnlineID
+        )
     if mode == "player_owned" then
         legacyFaction = Const.FACTION_COLONIST
         hostility = Types.DefaultHostility(legacyFaction)
@@ -450,7 +477,13 @@ local function apply(record, mode, owner, reason, faction)
         record.hostility = hostility
         changed = true
     end
-    order = desiredOrder(record, mode, owner, faction)
+    order = desiredOrder(
+        record,
+        mode,
+        owner,
+        faction,
+        preservePlayerOrder
+    )
     if not same(record.orderSpec, order) then
         if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
             PNC.OrderSystem.SetOrder(record, order)

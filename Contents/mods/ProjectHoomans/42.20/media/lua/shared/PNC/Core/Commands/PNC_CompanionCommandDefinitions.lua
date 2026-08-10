@@ -28,6 +28,18 @@ local function followOrder(_, player)
     }
 end
 
+local function currentPosition(record)
+    local zombie = record and record.id and PNC.Registry
+        and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record.id) or nil
+    if zombie and (not zombie.isDead or not zombie:isDead()) then
+        return zombie:getX(), zombie:getY(), zombie:getZ()
+    end
+    return tonumber(record and record.x) or 0,
+        tonumber(record and record.y) or 0,
+        tonumber(record and record.z) or 0
+end
+
 Commands.Register({
     id = "follow",
     group = "movement",
@@ -46,11 +58,12 @@ Commands.Register({
     emote = "freeze",
     icon = "media/ui/Emotes/PNC_EmoteStay.png",
     buildOrder = function(record)
+        local x, y, z = currentPosition(record)
         return {
             kind = Const.ORDER_GUARD,
-            x = tonumber(record.x) or 0,
-            y = tonumber(record.y) or 0,
-            z = tonumber(record.z) or 0,
+            x = x,
+            y = y,
+            z = z,
         }
     end,
 })

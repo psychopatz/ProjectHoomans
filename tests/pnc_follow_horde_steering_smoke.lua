@@ -10,6 +10,7 @@ local now = 1000
 local engageTicks = 0
 local lastMove
 local ownerX = 10
+local ownerMoving = true
 local nearbyZombies
 local owner = {
     getForwardDirection = function()
@@ -24,7 +25,7 @@ local owner = {
     getX = function() return ownerX end,
     getY = function() return 0 end,
     getZ = function() return 0 end,
-    isPlayerMoving = function() return true end,
+    isPlayerMoving = function() return ownerMoving end,
     isRunning = function() return false end,
     isSprinting = function() return false end,
 }
@@ -183,5 +184,31 @@ assert(engageTicks == 1,
     "a single nearby zombie was mistaken for a horde and delayed combat")
 assert(lastMove == nil,
     "single-zombie combat response was overwritten by follow movement")
+
+-- A stationary owner is still the follower's priority once the companion
+-- reaches its combat leash. Otherwise an idle player lets followers chase
+-- targets indefinitely and disappear from the formation.
+now = now + 200
+ownerMoving = false
+record.x = 0
+ownerX = 10
+record.runtime.followHazard = nil
+record.runtime.target = { kind = "zombie", zombieId = "zed" }
+nearbyZombies = { zombie(0.8, 0) }
+lastMove = nil
+local engagesBeforeLeash = engageTicks
+assert(PNC.BehaviorCompanion.Tick(record, {
+    getX = function() return record.x end,
+    getY = function() return record.y end,
+    getZ = function() return record.z end,
+}, "FollowOwner"))
+assert(engageTicks == engagesBeforeLeash,
+    "far follower chased combat while its owner was stationary")
+assert(lastMove ~= nil and string.find(
+    tostring(lastMove.reason),
+    "follow_owner",
+    1,
+    true
+), "far follower did not resume its owner catch-up")
 
 print("pnc_follow_horde_steering_smoke: ok")

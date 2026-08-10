@@ -94,6 +94,8 @@ function OrderSystem.Normalize(record, orderSpec)
 end
 
 function OrderSystem.SetOrder(record, orderSpec)
+    local zombie
+    record.runtime = record.runtime or {}
     record.orderSpec = OrderSystem.Normalize(record, orderSpec)
     if record.orderSpec.kind == Const.ORDER_FOLLOW then
         record.ownerUsername = record.orderSpec.ownerUsername
@@ -107,6 +109,16 @@ function OrderSystem.SetOrder(record, orderSpec)
     record.runtime.roamGoalX = nil
     record.runtime.roamGoalY = nil
     record.runtime.roamGoalZ = nil
+    record.activeJob = nil
+    record.activeBehavior = nil
+    zombie = PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record.id) or nil
+    if zombie and PNC.PathService and PNC.PathService.Reset then
+        PNC.PathService.Reset(zombie, record)
+    else
+        record.runtime.moveIntent = nil
+        record.runtime.pathing = nil
+    end
     if record.orderSpec.kind == Const.ORDER_PATROL and record.patrolIndex == nil then
         record.patrolIndex = 1
     end
