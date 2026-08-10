@@ -417,6 +417,16 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if command == Const.CMD_WORLD_DISCOVERY_REQUEST
+        or command == Const.CMD_WORLD_DISCOVERY_ACTION
+    then
+        Network.SendWorldDiscovery(
+            player,
+            PNC.WorldDiscovery.HandleAction(player, args or {})
+        )
+        return
+    end
+
     if command == Const.CMD_NPC_PRESENTATION_REQUEST then
         PNC.PlayerKnowledgeCommands.HandlePresentation(player, args or {})
         return

@@ -178,6 +178,9 @@ function Sync.OnTick()
             or false
         Client.EnsurePlayerBootstrap(now, forceKnowledge)
     end
+    if Client and Client.EnsureWorldDiscovery then
+        Client.EnsureWorldDiscovery(now, false)
+    end
     remoteReplica = canRequestRemoteSync()
     if remoteReplica then
         requestSyncIfStale(now)

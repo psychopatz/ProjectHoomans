@@ -118,6 +118,31 @@ Internal.RegisterServerCommand(Const.CMD_NPC_KNOWLEDGE, function(args)
     Internal.ApplyNPCKnowledgeSnapshot(args.snapshot, args.reason)
 end)
 
+function Internal.ApplyWorldDiscoverySnapshot(payload)
+    if type(payload) ~= "table" then return false end
+    local current = ClientState.worldDiscovery
+    if current and current.characterUUID and payload.characterUUID
+        and tostring(current.characterUUID)
+            ~= tostring(payload.characterUUID)
+    then
+        current = nil
+    end
+    if current and tonumber(payload.revision)
+        < (tonumber(current.revision) or 0)
+    then return false end
+    ClientState.worldDiscovery = payload
+    ClientState.lastWorldDiscoveryReceiveAt = Core.Now()
+    if PNC.WorldDiscoveryUI and PNC.WorldDiscoveryUI.ReceiveSnapshot then
+        PNC.WorldDiscoveryUI.ReceiveSnapshot(payload)
+    end
+    return true
+end
+
+Internal.RegisterServerCommand(
+    Const.CMD_WORLD_DISCOVERY_STATE,
+    Internal.ApplyWorldDiscoverySnapshot
+)
+
 local function projectionIsCurrent(payload)
     local context = ClientState.playerContext
     if not context or not payload then return true end

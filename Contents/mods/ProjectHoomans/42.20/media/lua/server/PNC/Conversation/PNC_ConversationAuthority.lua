@@ -131,6 +131,9 @@ end
 
 function Authority.BuildContext(player, record, token)
     if not player or not record then return nil, "actors_unavailable" end
+    if PNC.WorldDiscovery and PNC.WorldDiscovery.DiscoverNPCContext then
+        PNC.WorldDiscovery.DiscoverNPCContext(player, record.id)
+    end
     local playerEntityKey, reason = PNC.PlayerCharacters.GetEntityKey(player, {
         callback = "conversation_block",
         worldAgeHours = worldAgeHours(),

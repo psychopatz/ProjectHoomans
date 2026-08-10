@@ -13,6 +13,25 @@ end
 
 if RadioActions and RadioActions.Register then
     RadioActions.Register({
+        id = "projecthoomans.world_discovery",
+        label = tr("UI_PNC_WorldSignalScanner", "World Signal Scanner"),
+        signalLabel = tr(
+            "UI_PNC_WorldSignalScanner",
+            "World Signal Scanner"
+        ),
+        placement = RadioActions.PLACEMENT_SIGNAL
+            or "psychopatz.radio.signal",
+        order = 90,
+        isAvailable = function()
+            return PNC.WorldDiscoveryUI
+                and PNC.WorldDiscoveryUI.Open ~= nil
+        end,
+        onClick = function()
+            PNC.WorldDiscoveryUI.Open()
+            return true
+        end,
+    })
+    RadioActions.Register({
         id = "projecthoomans.colony_management",
         label = tr("UI_PNC_ProjectHoomansColony", "Project Hoomans Colony"),
         signalLabel = tr(

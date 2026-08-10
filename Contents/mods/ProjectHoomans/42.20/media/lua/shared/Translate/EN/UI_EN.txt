@@ -1,0 +1,7 @@
+UI_EN = {
+    UI_PNC_WorldSignalScanner = "World Signal Scanner",
+    UI_PNC_DiscoveryScan = "Scan Frequencies",
+    UI_PNC_DiscoveryRefresh = "Refresh",
+    UI_PNC_UnknownSignal = "Unknown signal",
+    UI_PNC_MobileGroup = "Mobile group",
+}

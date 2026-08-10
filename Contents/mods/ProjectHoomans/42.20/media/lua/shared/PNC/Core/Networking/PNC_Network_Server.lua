@@ -660,3 +660,11 @@ function Network.SendColonyManagement(targetPlayer, snapshot)
     if isServer and isServer() and targetPlayer then sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_COLONY_MANAGEMENT, payload)
     elseif not isServer or not isServer() then triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_COLONY_MANAGEMENT, payload) end
 end
+
+function Network.SendWorldDiscovery(targetPlayer, payload)
+    sendIdentityPayload(
+        targetPlayer,
+        Const.CMD_WORLD_DISCOVERY_STATE,
+        payload
+    )
+end

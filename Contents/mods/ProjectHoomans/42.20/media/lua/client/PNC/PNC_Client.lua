@@ -89,6 +89,8 @@ local function onResetLua()
     ClientState.directorDebugAuthorized = false
     ClientState.directorDebugReason = nil
     ClientState.colonyManagement = nil
+    ClientState.worldDiscovery = nil
+    ClientState.lastWorldDiscoveryRequestAt = nil
     Client.BiteReplicas = {}
     Client.ZombieReactionReplicas = {}
     if PNC.ClientFirearmEffects and PNC.ClientFirearmEffects.Reset then
