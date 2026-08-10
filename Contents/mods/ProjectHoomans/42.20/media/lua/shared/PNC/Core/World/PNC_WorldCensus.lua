@@ -8,7 +8,6 @@ PNC.WorldCensus = PNC.WorldCensus or {}
 local Census = PNC.WorldCensus
 local Core = PNC.Core
 local Const = PNC.Const
-local Performance = PNC.Performance
 
 Census.AllZombies = Census.AllZombies or {}
 Census.OrdinaryZombies = Census.OrdinaryZombies or {}
@@ -63,7 +62,6 @@ local function refreshInterval()
 end
 
 function Census.Refresh(now, force)
-    local startedAt
     local cell
     local zombieList
     local zombie
@@ -77,8 +75,6 @@ function Census.Refresh(now, force)
     then
         return false
     end
-    startedAt = Performance and Performance.Begin and Performance.Begin() or nil
-
     Census.LastRefreshAt = now
     clearArray(Census.AllZombies)
     clearArray(Census.OrdinaryZombies)
@@ -120,17 +116,6 @@ function Census.Refresh(now, force)
     end
 
     Census.Generation = Census.Generation + 1
-    if Performance then
-        Performance.Count("worldCensus.refreshes", 1)
-        Performance.Count("worldCensus.zombiesScanned", #Census.AllZombies)
-        Performance.SetGauge("worldCensus.loadedZombies", #Census.OrdinaryZombies)
-        Performance.SetGauge("worldCensus.managedBodies", #Census.ManagedBodies)
-        Performance.SetGauge(
-            "worldCensus.lifecycleCandidates",
-            #Census.LifecycleCandidates
-        )
-        Performance.Finish("worldCensus.refresh", startedAt)
-    end
     return true
 end
 

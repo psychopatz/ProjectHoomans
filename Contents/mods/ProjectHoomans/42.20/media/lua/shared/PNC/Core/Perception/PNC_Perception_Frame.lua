@@ -8,7 +8,6 @@ local Perception = PNC.Perception
 local Core = PNC.Core
 local Const = PNC.Const
 local Spatial = PNC.SpatialIndex
-local Performance = PNC.Performance
 
 local function frameRadius(requested)
     return math.max(
@@ -32,7 +31,6 @@ local function frameIsReusable(frame, record, radius, now)
 end
 
 local function buildFrame(record, radius, now)
-    local startedAt = Performance and Performance.Begin and Performance.Begin() or nil
     local candidates = Spatial and Spatial.QueryZombies
         and Spatial.QueryZombies(record.x, record.y, radius) or {}
     local entries = {}
@@ -76,11 +74,6 @@ local function buildFrame(record, radius, now)
         createdAt = now,
         expiresAt = now + (tonumber(Const.PERCEPTION_FRAME_MS) or 200),
     }
-    if Performance then
-        Performance.Count("perception.framesBuilt", 1)
-        Performance.Count("perception.candidates", #candidates)
-        Performance.Finish("perception.buildFrame", startedAt)
-    end
     return frame
 end
 
@@ -101,7 +94,6 @@ function Perception.GetZombieFrame(record, requestedRadius)
     radius = frameRadius(requestedRadius)
     frame = record.runtime.perceptionFrame
     if frameIsReusable(frame, record, radius, now) then
-        if Performance then Performance.Count("perception.frameHits", 1) end
         return frame
     end
     frame = buildFrame(record, radius, now)
@@ -146,7 +138,6 @@ function Perception.GetVisibleZombieEntries(record, requestedRadius)
                 record,
                 entry.zombie
             )
-            if Performance then Performance.Count("perception.losChecks", 1) end
             if visible then
                 output[#output + 1] = {
                     zombie = entry.zombie,
@@ -176,9 +167,6 @@ function Perception.GetVisibleZombieEntries(record, requestedRadius)
                         record,
                         entry.zombie
                     )
-                    if Performance then
-                        Performance.Count("perception.losChecks", 1)
-                    end
                     if visible then
                         output[#output + 1] = {
                             zombie = entry.zombie,

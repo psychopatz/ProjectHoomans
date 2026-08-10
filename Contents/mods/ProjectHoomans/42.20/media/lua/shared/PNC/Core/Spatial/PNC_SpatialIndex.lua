@@ -6,7 +6,6 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Registry = PNC.Registry
 local Census = PNC.WorldCensus
-local Performance = PNC.Performance
 
 Spatial.PlayerCells = Spatial.PlayerCells or {}
 Spatial.PlayerByOnlineID = Spatial.PlayerByOnlineID or {}
@@ -150,7 +149,6 @@ local function ensureZombieID(zombie)
 end
 
 function Spatial.Rebuild(now, force)
-    local startedAt
     local zombieList
     local censusZombies
     local zombie
@@ -165,7 +163,6 @@ function Spatial.Rebuild(now, force)
     then
         return false
     end
-    startedAt = Performance and Performance.Begin and Performance.Begin() or nil
     Spatial.LastRebuildAt = now
     Spatial.PlayerCells = {}
     Spatial.PlayerByOnlineID = {}
@@ -218,9 +215,6 @@ function Spatial.Rebuild(now, force)
                 end
             end
             Spatial.LastCensusGeneration = generation
-            if Performance then
-                Performance.Count("spatial.zombieIndexRebuilds", 1)
-            end
         end
     elseif getCell then
         Spatial.ZombieCells = {}
@@ -238,10 +232,6 @@ function Spatial.Rebuild(now, force)
                 end
             end
         end
-    end
-    if Performance then
-        Performance.Count("spatial.rebuilds", 1)
-        Performance.Finish("spatial.rebuild", startedAt)
     end
     return true
 end

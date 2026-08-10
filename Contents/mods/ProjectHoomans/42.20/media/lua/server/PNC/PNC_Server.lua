@@ -25,7 +25,6 @@ local PathService = PNC.PathService
 local Scheduler = PNC.Scheduler
 local SimulationClock = PNC.SimulationClock
 local SimulationLOD = PNC.SimulationLOD
-local Performance = PNC.Performance
 local Network = PNC.Network
 local API = PNC.API
 local ZombieAggro = PNC.ZombieAggro
@@ -219,7 +218,6 @@ end
 
 function Server.OnTick()
     local now = Core.Now()
-    local startedAt = Performance and Performance.Begin and Performance.Begin() or nil
     local due
     local i
     if Presence.BeginServerTick then
@@ -312,9 +310,6 @@ function Server.OnTick()
         PNC.SocialEncounterTracker.Pump(
             PNC.SocialEventHooks.WorldAgeHours()
         )
-    end
-    if Performance then
-        Performance.Finish("server.tick", startedAt)
     end
 end
 
@@ -580,12 +575,6 @@ local function onClientCommand(module, command, player, args)
         end
         if args and args.audit == true and BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
             BodyLifecycle.AuditLoadedBodies(Core.Now(), true)
-        end
-        if args and args.performance == true
-            and Performance
-            and Performance.Enable
-        then
-            Performance.Enable(60000)
         end
         Network.SendDebugRoster(
             player,
@@ -1133,6 +1122,11 @@ local function onServerStarted()
     Core.LogInfo("PNC server started.")
 end
 
-Events.OnTick.Add(Server.OnTick)
+local serverTick = Server.OnTick
+if PNC.ProfilerIntegration and PNC.ProfilerIntegration.WrapServerTick then
+    serverTick = PNC.ProfilerIntegration.WrapServerTick(serverTick)
+    Server.OnTick = serverTick
+end
+Events.OnTick.Add(serverTick)
 Events.OnClientCommand.Add(onClientCommand)
 Events.OnServerStarted.Add(onServerStarted)

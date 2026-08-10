@@ -6,7 +6,6 @@ local now = 1000
 local haltCount = 0
 local moveCount = 0
 local threatScans = 0
-local counters = {}
 local registeredTick
 
 PNC = {
@@ -29,13 +28,6 @@ PNC = {
             local dx = x2 - x1
             local dy = y2 - y1
             return math.sqrt((dx * dx) + (dy * dy))
-        end,
-    },
-    Performance = {
-        Count = function(name, amount)
-            counters[name] =
-                (tonumber(counters[name]) or 0)
-                + (tonumber(amount) or 0)
         end,
     },
     BehaviorCommon = {
@@ -145,9 +137,6 @@ assert(moveCount == 0,
     "roamer moved during its dwell window")
 assert(threatScans == 1,
     "idle threat query ignored its negative-result cache")
-assert(counters["roaming.idleTicks"] == 1,
-    "idle population counter was not recorded")
-
 now = 1500
 record.runtime.target = { id = "stale_target" }
 assert(registeredTick(record, {}))

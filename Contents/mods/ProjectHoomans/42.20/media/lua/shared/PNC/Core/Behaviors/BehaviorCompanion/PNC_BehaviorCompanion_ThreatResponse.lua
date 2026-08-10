@@ -8,7 +8,6 @@ local Targeting = PNC.BehaviorTargeting
 local BehaviorCombat = PNC.BehaviorCombat
 local Perception = PNC.Perception
 local CombatTactics = PNC.CombatTactics
-local Performance = PNC.Performance
 
 local function targetWithinConstraint(target, constraint)
     local dx
@@ -94,8 +93,5 @@ function Internal.ShouldScanFollowThreat(record, now, active)
         return false
     end
     state.nextThreatScanAt = now + interval
-    if Performance then
-        Performance.Count("follow.threatScans", 1)
-    end
     return true
 end

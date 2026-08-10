@@ -17,7 +17,6 @@ local BehaviorCombat = PNC.BehaviorCombat
 local Common = PNC.BehaviorCommon
 local Core = PNC.Core
 local Const = PNC.Const
-local Performance = PNC.Performance
 
 Roaming.Modes = Roaming.Modes or {}
 
@@ -141,9 +140,6 @@ local function resolveRoamingThreat(
         return nil
     end
     state.nextThreatScanAt = now + interval
-    if Performance then
-        Performance.Count("roaming.threatScans", 1)
-    end
     return Targeting.ResolveRoamingEngageTarget(
         record,
         targetRadius
@@ -199,9 +195,6 @@ local function areaMode(record, zombie, order)
     elseif state.waitUntil then
         if now < state.waitUntil then
             state.phase = "idle"
-            if Performance then
-                Performance.Count("roaming.idleTicks", 1)
-            end
             record.activeBehavior = "Roam:area:idle"
             return true
         end

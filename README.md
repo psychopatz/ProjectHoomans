@@ -2,6 +2,16 @@
 
 Standalone NPC framework for Project Zomboid Build 42.
 
+## Performance profiling
+
+Project Hoomans consumes the opt-in PsychopatzCore profiler. It owns only its
+static `ProjectHoomans.*` metric names and startup-selected wrappers; the metric
+engine, histories, snapshots, GUI, and lifecycle remain in PsychopatzCore. With
+profiling OFF, the integration performs one startup gate and leaves the original
+hot functions and event callbacks installed directly.
+
+See PsychopatzCore's `docs/profiler.md` for activation and interpretation.
+
 This repository starts with a server-authoritative V1 slice:
 
 - colonist NPCs with `Follow`, `Guard`, and `Patrol`

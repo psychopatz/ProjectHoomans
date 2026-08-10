@@ -4,7 +4,6 @@ PNC.Scheduler = PNC.Scheduler or {}
 local Scheduler = PNC.Scheduler
 local Const = PNC.Const
 local LOD = PNC.SimulationLOD
-local Performance = PNC.Performance
 
 Scheduler.SLOT_MS = 50
 Scheduler.Buckets = Scheduler.Buckets or {}
@@ -127,12 +126,6 @@ function Scheduler.PopDue(records, now)
             (tonumber(now) or 0) + Scheduler.SLOT_MS
         )
     end
-    if Performance then
-        Performance.Count("scheduler.processed", #output)
-        Performance.Count("scheduler.deferred", #deferred)
-        Performance.SetGauge("scheduler.lastDue", #output)
-        Performance.SetGauge("scheduler.lastDeferred", #deferred)
-    end
     return output
 end
 
@@ -194,8 +187,6 @@ function Scheduler.PumpJobs(now)
         if job and job.enabled ~= false then
             if job.nextRun == nil then job.nextRun = now + job.interval end
             if now >= job.nextRun then
-                local startedAt = Performance and Performance.Begin
-                    and Performance.Begin() or nil
                 local ok, result = pcall(job.callback, now, job.budget, job)
                 job.lastRun = now
                 job.nextRun = now + job.interval
@@ -203,11 +194,6 @@ function Scheduler.PumpJobs(now)
                 job.lastResult = ok and result or nil
                 job.lastError = ok and nil or tostring(result)
                 if not ok then job.errors = (tonumber(job.errors) or 0) + 1 end
-                if Performance then
-                    Performance.Count("scheduler.jobs", 1)
-                    if not ok then Performance.Count("scheduler.jobErrors", 1) end
-                    Performance.Finish("scheduler.job." .. name, startedAt)
-                end
                 ran = ran + 1
             end
         end

@@ -9,7 +9,6 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Registry = PNC.Registry
 local Spatial = PNC.SpatialIndex
-local Performance = PNC.Performance
 local Internal = ZombieAggro.Internal
 
 ZombieAggro.ActiveSet = ZombieAggro.ActiveSet or {
@@ -113,9 +112,6 @@ function ZombieAggro.RefreshActiveSet(now, force)
     if state.holes > 32 and state.holes * 3 > #state.order then
         compact()
     end
-    if Performance then
-        Performance.SetGauge("zombieAggro.active", #state.order - state.holes)
-    end
     return true
 end
 
@@ -154,10 +150,6 @@ function ZombieAggro.PumpActiveSet(now, callback)
             state.holes = state.holes + 1
         end
     end
-    if Performance then
-        Performance.Count("zombieAggro.processed", processed)
-        Performance.SetGauge("zombieAggro.active", #state.order - state.holes)
-    end
     return processed
 end
 
@@ -170,15 +162,9 @@ function ZombieAggro.ConsumePathRequestBudget()
         )
     )
     if (tonumber(state.pathRequestsThisPump) or 0) >= maximum then
-        if Performance then
-            Performance.Count("zombieAggro.pathRequestsDeferred", 1)
-        end
         return false
     end
     state.pathRequestsThisPump = (tonumber(state.pathRequestsThisPump) or 0) + 1
-    if Performance then
-        Performance.Count("zombieAggro.pathRequests", 1)
-    end
     return true
 end
 

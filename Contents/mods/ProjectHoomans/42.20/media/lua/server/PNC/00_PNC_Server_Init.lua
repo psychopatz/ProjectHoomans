@@ -75,4 +75,7 @@ require "PNC/PNC_SocialEventHooks"
 require "PNC/Conversation/PNC_ConversationHistory"
 require "PNC/Conversation/PNC_ConversationAuthority"
 require "PNC/PNC_ServerInventory"
+if PNC.ProfilerIntegration and PNC.ProfilerIntegration.InstallServer then
+    PNC.ProfilerIntegration.InstallServer()
+end
 require "PNC/PNC_Server"
