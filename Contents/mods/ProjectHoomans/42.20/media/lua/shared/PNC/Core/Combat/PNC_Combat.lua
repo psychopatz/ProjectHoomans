@@ -27,6 +27,17 @@ Internal.MELEE_BUMP_TYPES = {
     knife = { "PNC_AttackKnife" },
 }
 
+Internal.UNARMED_BUMP_TYPES = {
+    "PNC_AttackBareHands1",
+    "PNC_AttackBareHands2",
+    "PNC_AttackBareHands3",
+    "PNC_AttackBareHands4",
+    "PNC_AttackBareHands5",
+    "PNC_AttackBareHands6",
+    "PNC_FrontKick",
+    "PNC_HighKick",
+}
+
 Internal.RANGED_BUMP_TYPES = {
     handgun = { "PNC_AttackPistol" },
     rifle = { "PNC_AttackRifle" },
@@ -35,7 +46,7 @@ Internal.RANGED_BUMP_TYPES = {
 Internal.ATTACK_TIMINGS = {
     melee = { hitDelay = 320, duration = 760 },
     ranged = { hitDelay = 180, duration = 620 },
-    shove = { hitDelay = 130, duration = 480 },
+    shove = { hitDelay = 180, duration = 850 },
     ground = { hitDelay = 240, duration = 760 },
 }
 
@@ -263,6 +274,14 @@ function Internal.triggerMeleeWeaponAnim(
     end
     -- The authority selects and snapshots the animation. Presentation is
     -- client-owned in SP, listen-server, and dedicated multiplayer alike.
+    return options[ZombRand(#options) + 1]
+end
+
+function Internal.triggerUnarmedAttackAnim()
+    local options = Internal.UNARMED_BUMP_TYPES
+    if not options or #options <= 0 then
+        return "PNC_AttackBareHands1"
+    end
     return options[ZombRand(#options) + 1]
 end
 

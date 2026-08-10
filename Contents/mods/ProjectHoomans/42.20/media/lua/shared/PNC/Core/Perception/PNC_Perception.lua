@@ -300,9 +300,16 @@ function Perception.CanSeeWorldObject(record, targetObject)
     return visible == true, resultName
 end
 
-local function buildZombieTarget(record, zombie, distSq, visibilityKind)
+local function buildZombieTarget(
+    record,
+    zombie,
+    distSq,
+    visibilityKind,
+    knownZombieId
+)
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
-    local zombieId = modData and modData.PNC_ZombieID or nil
+    local zombieId = knownZombieId
+        or (modData and modData.PNC_ZombieID or nil)
     if not zombieId and Spatial and Spatial.GetZombieID then
         zombieId = Spatial.GetZombieID(zombie)
     end
@@ -527,6 +534,13 @@ end
 -- zombie whose engine target is this NPC (or one remembered from damage).
 function Perception.FindImmediateZombieThreat(record, radius)
     local recent
+    local observed
+    local observedZombie
+    local observedDistSq
+    local observedVisible
+    local observedVisibilityKind
+    local observedTarget
+    local now
     local frame
     local entries
     local entry
@@ -539,12 +553,56 @@ function Perception.FindImmediateZombieThreat(record, radius)
         or tonumber(Const.TARGET_IMMEDIATE_THREAT_RADIUS)
         or 4
     if not record then return nil end
+    now = Core.Now and Core.Now() or 0
     recent = Perception.ResolveRecentAttacker(
         record,
-        Core.Now and Core.Now() or 0
+        now
     )
     if recent and recent.kind == "zombie" then
         return recent
+    end
+
+    -- In multiplayer, coordinate pursuit deliberately does not set an engine
+    -- target because an NPC body is represented by IsoZombie. ZombieAggro is
+    -- authoritative for that forced pursuit and refreshes this observation.
+    -- Require a fresh record, live body, range, floor, and LOS so the bridge
+    -- cannot revive stale threats or permit engagement through walls.
+    observed = record.runtime and record.runtime.zombieAttacker or nil
+    if observed
+        and now - (tonumber(observed.observedAt) or 0)
+            <= (tonumber(Const.ZOMBIE_ATTACKER_OBSERVATION_MS) or 1500)
+    then
+        observedZombie = Perception.FindZombieByID
+            and Perception.FindZombieByID(observed.zombieId)
+            or nil
+        if observedZombie
+            and not observedZombie:isDead()
+            and math.abs(observedZombie:getZ() - record.z) < 1
+        then
+            observedDistSq = Core.DistanceSq(
+                record.x,
+                record.y,
+                observedZombie:getX(),
+                observedZombie:getY()
+            )
+            if observedDistSq <= limit * limit then
+                observedVisible, observedVisibilityKind =
+                    Perception.CanSeeWorldObject(record, observedZombie)
+                if observedVisible then
+                    observedTarget = buildZombieTarget(
+                        record,
+                        observedZombie,
+                        observedDistSq,
+                        observedVisibilityKind or "aggro_observed",
+                        observed.zombieId
+                    )
+                    if observedTarget then
+                        observedTarget.threatening = true
+                        return observedTarget
+                    end
+                end
+            end
+        end
     end
     if not Perception.GetZombieFrame then return nil end
     frame = Perception.GetZombieFrame(record, limit)

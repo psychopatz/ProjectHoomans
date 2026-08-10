@@ -28,6 +28,8 @@ local npcRecord = {
 PNC = {
     Const = {
         TARGET_RECENT_ATTACKER_MS = 5000,
+        TARGET_IMMEDIATE_THREAT_RADIUS = 6,
+        ZOMBIE_ATTACKER_OBSERVATION_MS = 1500,
         ROAM_TARGET_RADIUS = 12,
         ZOMBIE_TARGET_RADIUS = 12,
     },
@@ -116,5 +118,29 @@ assert(target and target.zombieId == "zed-1",
 now = 7000
 assert(PNC.Perception.ResolveRecentAttacker(record, now) == nil, "expired attacker remained active")
 assert(record.runtime.recentThreat == nil, "expired attacker state was not cleared")
+
+-- MP coordinate pursuit intentionally leaves zombie:getTarget() unset. The
+-- server-side ZombieAggro observation must still trigger visible self-defense.
+record.runtime.zombieAttacker = {
+    zombieId = "zed-1",
+    observedAt = now,
+    phase = "pursuit",
+    distSq = 16,
+}
+PNC.Perception.CanSeeWorldObject = function(_, candidate)
+    return candidate == zombieBody, "clear"
+end
+target = PNC.Perception.FindImmediateZombieThreat(record, 6)
+assert(target and target.zombieId == "zed-1",
+    "fresh MP zombie pursuit observation was not acquired")
+assert(target.threatening == true,
+    "observed MP pursuer was not marked as an active threat")
+target = PNC.Perception.ResolveRoamingTarget(record, 12)
+assert(target and target.zombieId == "zed-1",
+    "neutral roamer ignored an authoritative MP zombie pursuer")
+
+now = now + 1501
+assert(PNC.Perception.FindImmediateZombieThreat(record, 6) == nil,
+    "stale MP zombie pursuit observation remained actionable")
 
 print("pnc_recent_attacker_resolution_smoke: ok")

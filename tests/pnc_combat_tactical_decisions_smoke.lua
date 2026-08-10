@@ -19,6 +19,7 @@ local moves = {}
 local skillLevel = 0
 local grounded = false
 local canSpendAttack = true
+local holds = 0
 
 local targetZombie = {
     isDead = function() return false end,
@@ -52,8 +53,12 @@ PNC = {
         RANGED_RELOAD_BREAK_PRESSURE_COUNT = 2,
         COMBAT_RETREAT_STAMINA_RATIO = 0.1,
         COMBAT_RETREAT_STAMINA_CURRENT = 20,
+        NPC_ZOMBIE_DEFENSE_RADIUS = 2.2,
         COMBAT_KITE_NEAR_MISS_WINDOW_MS = 1400,
         COMBAT_REENGAGE_STAMINA_RATIO = 0.28,
+        COMBAT_EXHAUSTED_COUNTER_MS = 1800,
+        COMBAT_EXHAUSTED_REENGAGE_CURRENT = 35,
+        COMBAT_RETREAT_SAFETY_BUFFER = 0.25,
         COMBAT_SURROUND_RADIUS = 1.8,
         COMBAT_SURROUND_COUNT = 3,
         COMBAT_PRESSURE_RADIUS = 3,
@@ -97,6 +102,10 @@ PNC = {
         end,
     },
     BehaviorMoveIntent = {
+        Hold = function()
+            holds = holds + 1
+            return true
+        end,
         RequestMove = function(_, x, y, _, mode, _, reason)
             moves[#moves + 1] = {
                 x = x,
@@ -232,8 +241,8 @@ assertEqual(moved, false, "lone near miss incorrectly triggered retreat")
 assertEqual(reason, "lone_threat_counter", "lone counter reason")
 assertEqual(action, "shove", "lone near miss did not counter-shove")
 
--- An exhausted fighter still gets one defensive shove against a lone threat;
--- ordinary weapon attacks remain stamina-gated.
+-- An exhausted fighter commits a weakened emergency strike against one
+-- adjacent zombie instead of entering a stamina-draining shove loop.
 now = now + 250
 canSpendAttack = false
 record = makeRecord("exhausted_counter")
@@ -246,9 +255,51 @@ moved, reason, action = PNC.CombatTactics.PreAttackDecision(
     { hasWeapon = true }
 )
 assertEqual(moved, false, "exhausted lone fighter entered retreat first")
-assertEqual(reason, "exhausted_defensive_shove",
+assertEqual(reason, "exhausted_lone_counter",
     "exhausted lone counter reason")
-assertEqual(action, "shove", "exhausted lone fighter did not defend")
+assertEqual(action, nil, "exhausted lone fighter did not commit melee")
+assertEqual(record.runtime.emergencyMeleeUntil, now + 300,
+    "emergency melee lease was not armed")
+
+-- The counter window is finite. Afterwards the NPC takes one bounded step
+-- outside the red circle, then holds position until enough stamina returns.
+now = now + 1801
+moved, reason = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, true, "exhausted counter never yielded to retreat")
+assertEqual(reason, "exhausted_recovery_retreat",
+    "exhausted recovery retreat reason")
+record.x = -1.3
+target.distSq = 5.29
+now = now + 250
+moved, reason = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, true, "safe exhausted fighter did not hold to recover")
+assertEqual(reason, "recovering_stamina_safe",
+    "safe recovery hold reason")
+assertEqual(holds > 0, true, "safe recovery did not stop locomotion")
+record.stamina.current = 35
+record.x = 0
+target.distSq = 1
+now = now + 250
+moved = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, false, "recovered fighter did not re-engage")
 canSpendAttack = true
 
 -- Crowd pressure alone must not make a healthy follower abandon the player.
@@ -293,7 +344,7 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
 assertEqual(moved, true, "locked retreat remains authoritative")
 assert(
     moves[#moves].x < record.x,
-    "locked retreat refresh must continue away from danger"
+    "fixed retreat leg must continue away from danger"
 )
 
 -- A native route that makes no physical progress releases combat ownership

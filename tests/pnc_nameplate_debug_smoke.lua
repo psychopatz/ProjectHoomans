@@ -408,6 +408,10 @@ local viewLines = PNC.NameplateRenderer.BuildCombatDebugLines({
             intent = "selected",
             actionState = "walktoward",
             visibilityKind = "clear",
+            targetKind = "npc",
+            targetId = "npc-a",
+            targetName = "Alex",
+            targetSource = "aggro_lease",
         },
         {
             id = "z2",
@@ -423,6 +427,10 @@ assertContains(viewLines[3], "VIEW zombies=2/3",
     "combat view counts")
 assertContains(viewLines[3], "intent=auto",
     "combat attack intent")
+assertContains(viewLines[4], "target=npc[Alex] via=aggro_lease",
+    "zombie NPC target identity")
+assertContains(viewLines[5], "target=none",
+    "zombie without target identity")
 assertContains(viewLines[3], "biteLane=bite_lane_wall",
     "blocked zombie attack lane")
 assertContains(viewLines[4], "id=z1 d=1.2 mode=selected",
@@ -587,6 +595,9 @@ PNC.NameplateRenderer.RenderCombatDebug(manager, {
             decision = "clearing_fire_lane",
             zombieAttacker = {
                 zombieId = "attacker-zed",
+                targetKind = "npc",
+                targetId = "npc-debug",
+                targetName = "Alex Mercer",
                 phase = "windup",
                 ageMs = 40,
                 x = 1,
@@ -639,8 +650,8 @@ assertContains(
 )
 assertContains(
     renderedTextJoined,
-    "ZED->NPC attacker-zed",
-    "zombie attacker overlay rendered"
+    "ZED -> Alex Mercer | zed=attacker-zed",
+    "zombie attacker target name rendered"
 )
 assertContains(
     renderedTextJoined,

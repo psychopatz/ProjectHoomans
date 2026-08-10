@@ -76,6 +76,12 @@ local function findThreat(record, radius)
     return threat
 end
 
+local function insideSafetyRadius(threat, radius)
+    return threat ~= nil
+        and (tonumber(threat.distSq) or math.huge)
+            <= radius * radius
+end
+
 local function clearAction(record, zombie, reason)
     local state = ensureState(record)
     if state.phase == "bandaging" and zombie and Animation and Animation.FinishBump then
@@ -201,7 +207,7 @@ function Behavior.Tick(record, zombie, now)
     local state
     local partId
     local threat
-    local interruptRadius
+    local safetyRadius
     local applied
     local label
     if not record or record.alive == false or not Wounds
@@ -224,25 +230,28 @@ function Behavior.Tick(record, zombie, now)
         return false
     end
 
+    safetyRadius = tonumber(Const.NPC_ZOMBIE_DEFENSE_RADIUS)
+        or tonumber(Const.SELF_BANDAGE_INTERRUPT_RADIUS)
+        or 2.2
     threat = Perception and Perception.ResolveRecentAttacker
         and Perception.ResolveRecentAttacker(record, now) or nil
+    if not insideSafetyRadius(threat, safetyRadius) then
+        threat = nil
+    end
     if not threat and Perception and Perception.FindImmediateZombieThreat then
         threat = Perception.FindImmediateZombieThreat(
             record,
-            tonumber(Const.SELF_BANDAGE_THREAT_RADIUS) or 10
+            safetyRadius
         )
     end
     if not threat then
         threat = findThreat(
             record,
-            tonumber(Const.SELF_BANDAGE_THREAT_RADIUS) or 10
+            safetyRadius
         )
     end
-    interruptRadius = tonumber(Const.SELF_BANDAGE_INTERRUPT_RADIUS) or 7
     if state.phase == "bandaging" then
-        if threat and (tonumber(threat.distSq) or math.huge)
-            <= interruptRadius * interruptRadius
-        then
+        if insideSafetyRadius(threat, safetyRadius) then
             if record.health and record.health.state == "incapacitated" then
                 clearAction(record, zombie, "threat_nearby")
                 return false
@@ -281,7 +290,7 @@ function Behavior.Tick(record, zombie, now)
         return true
     end
 
-    if threat then
+    if insideSafetyRadius(threat, safetyRadius) then
         if record.health and record.health.state == "incapacitated" then
             return false
         end

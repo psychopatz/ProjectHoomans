@@ -28,6 +28,7 @@ PNC = {
         FACTION_HOSTILE = "hostile",
         SELF_BANDAGE_THREAT_RADIUS = 10,
         SELF_BANDAGE_INTERRUPT_RADIUS = 7,
+        NPC_ZOMBIE_DEFENSE_RADIUS = 2.2,
         SELF_BANDAGE_RETREAT_DISTANCE = 5,
         SELF_BANDAGE_RETREAT_STOP_DISTANCE = 1,
         SELF_BANDAGE_RETRY_MS = 5000,
@@ -153,6 +154,11 @@ assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
     "safe treatment remains active")
 assertEqual(maintainedBumps, 1,
     "authority did not maintain the bandage selector")
+
+threat = { kind = "zombie", x = 2.3, y = 0, z = 0, distSq = 5.29 }
+now = now + 100
+assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
+    "enemy outside red safety radius does not cancel treatment")
 
 threat = { kind = "zombie", x = 2, y = 0, z = 0, distSq = 4 }
 now = now + 100

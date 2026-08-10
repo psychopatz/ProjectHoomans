@@ -59,6 +59,9 @@ local function ensureRetreatState(record)
     state.approachActive = state.approachActive == true
     state.recoveryMode = state.recoveryMode or nil
     state.retreatDistance = tonumber(state.retreatDistance) or nil
+    state.safetyRadius = tonumber(state.safetyRadius) or nil
+    state.lowStaminaPhase = state.lowStaminaPhase or nil
+    state.lowStaminaAttackUntil = tonumber(state.lowStaminaAttackUntil) or 0
     state.refreshAt = tonumber(state.refreshAt) or 0
     state.startedAt = tonumber(state.startedAt) or 0
     state.lastProgressAt = tonumber(state.lastProgressAt) or 0
@@ -95,6 +98,20 @@ local function requestMove(record, zombie, x, y, z, mode, stopDistance, reason)
             reason,
             COMBAT_NAVIGATION
         )
+    end
+    return false
+end
+
+local function requestHold(record, zombie, reason)
+    local MoveIntent = PNC.BehaviorMoveIntent
+    if MoveIntent and MoveIntent.Hold
+        and record and record.presenceState == Const.PRESENCE_LIVE
+    then
+        return MoveIntent.Hold(record, reason)
+    end
+    if PathService and PathService.Reset then
+        PathService.Reset(record, zombie, reason)
+        return true
     end
     return false
 end
@@ -288,6 +305,7 @@ local function clearActiveRetreat(record, state)
         state.vectorY = nil
         state.recoveryMode = nil
         state.retreatDistance = nil
+        state.safetyRadius = nil
         state.refreshAt = 0
         state.startedAt = 0
         state.lastProgressAt = 0
@@ -321,6 +339,8 @@ function Tactics.ClearRetreatState(record)
     clearActiveRetreat(record, state)
     if state then
         state.retryAt = 0
+        state.lowStaminaPhase = nil
+        state.lowStaminaAttackUntil = 0
     end
 end
 
@@ -422,9 +442,6 @@ function Tactics.ResolveMeleeApproach(record, dist)
 end
 
 local function continueLockedRetreat(record, zombie, target, state, now)
-    local retreat
-    local sourceX
-    local sourceY
     local currentX
     local currentY
     local movedX
@@ -434,6 +451,9 @@ local function continueLockedRetreat(record, zombie, target, state, now)
     local stopDistance
     local stallMs
     local retryMs
+    local safetyRadius
+    local recoveryRetreat
+    local targetDistance
     if not state or state.phase ~= "retreat" then
         return false, nil
     end
@@ -447,11 +467,37 @@ local function continueLockedRetreat(record, zombie, target, state, now)
     goalX = tonumber(state.goalX) or currentX
     goalY = tonumber(state.goalY) or currentY
     stopDistance = tonumber(state.goalStopDistance) or 0.8
+    safetyRadius = tonumber(state.safetyRadius)
+    recoveryRetreat = state.lowStaminaPhase == "retreat"
+    if safetyRadius and target and target.x ~= nil and target.y ~= nil then
+        targetDistance = math.sqrt(Core.DistanceSq(
+            currentX,
+            currentY,
+            target.x,
+            target.y
+        ))
+        if targetDistance >= safetyRadius then
+            clearActiveRetreat(record, state)
+            requestHold(record, zombie, "recovering_stamina_safe")
+            if recoveryRetreat then
+                state.lowStaminaPhase = "recover"
+                return true, "recovering_stamina_safe"
+            end
+            return false, "retreat_safe_radius"
+        end
+    end
     if Core.DistanceSq(currentX, currentY, goalX, goalY)
         <= stopDistance * stopDistance
     then
         clearActiveRetreat(record, state)
         state.retryAt = 0
+        if recoveryRetreat then
+            -- If the attacker closed the distance during this bounded leg,
+            -- counter briefly before choosing a new escape direction.
+            state.lowStaminaPhase = "counter"
+            state.lowStaminaAttackUntil = now
+                + (tonumber(Const.COMBAT_EXHAUSTED_COUNTER_MS) or 1800)
+        end
         return false, "retreat_complete"
     end
     if state.lastX == nil or state.lastY == nil then
@@ -476,27 +522,9 @@ local function continueLockedRetreat(record, zombie, target, state, now)
         state.retryAt = now + retryMs
         return false, "retreat_stalled"
     end
-    if now >= (tonumber(state.refreshAt) or 0) then
-        sourceX, sourceY = buildZombieThreatCentroid(
-            record,
-            Const.COMBAT_HORDE_RADIUS
-        )
-        retreat = buildRetreatFromSource(
-            record,
-            target,
-            tonumber(state.retreatDistance) or 2.4,
-            sourceX,
-            sourceY,
-            record.z,
-            state
-        )
-        if retreat then
-            state.goalX = retreat.x
-            state.goalY = retreat.y
-            state.goalZ = retreat.z
-        end
-        state.refreshAt = now + 220
-    end
+    -- Keep one fixed destination for this leg. Rebuilding it from the NPC's
+    -- current position moved the finish line every tick and caused endless
+    -- flight in one direction.
     setRetreatState(record, true, state.recoveryMode)
     if not requestMove(
         record,
@@ -515,7 +543,7 @@ local function continueLockedRetreat(record, zombie, target, state, now)
     return true, state.reason or "combat_retreat"
 end
 
-local function startRetreat(record, zombie, target, distance, mode, stopDistance, lockMs, reason, recoveryMode, sourceX, sourceY, sourceZ)
+local function startRetreat(record, zombie, target, distance, mode, stopDistance, lockMs, reason, recoveryMode, sourceX, sourceY, sourceZ, safetyRadius)
     local state = ensureRetreatState(record)
     local retreat
     local now = Core.Now()
@@ -539,6 +567,7 @@ local function startRetreat(record, zombie, target, distance, mode, stopDistance
     state.goalStopDistance = tonumber(stopDistance) or 0.8
     state.recoveryMode = recoveryMode
     state.retreatDistance = distance
+    state.safetyRadius = tonumber(safetyRadius)
     state.refreshAt = now + 220
     state.startedAt = now
     state.lastProgressAt = now
@@ -970,6 +999,10 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
     local retreatMinPressure
     local continued
     local continueReason
+    local safetyRadius
+    local safetyBuffer
+    local recoveryThreshold
+    local retreatDistance
     if not record or not zombie or not target or target.kind ~= "zombie" then
         return false, nil, nil
     end
@@ -977,6 +1010,11 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
     state = ensureRetreatState(record)
     dist = math.sqrt(tonumber(target.distSq)
         or Core.DistanceSq(record.x, record.y, target.x, target.y))
+    safetyRadius = tonumber(Const.NPC_ZOMBIE_DEFENSE_RADIUS) or 2.2
+    safetyBuffer = tonumber(Const.COMBAT_RETREAT_SAFETY_BUFFER) or 0.25
+    recoveryThreshold = tonumber(
+        Const.COMBAT_EXHAUSTED_REENGAGE_CURRENT
+    ) or 35
     meleeLane = effectiveMode == "melee"
         or (
             effectiveMode == "mixed"
@@ -994,7 +1032,7 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
         now
     )
     if continued then
-        return true, state.reason or "combat_retreat", nil
+        return true, continueReason or state.reason or "combat_retreat", nil
     end
     if continueReason == "retreat_stalled" then
         return false, continueReason, nil
@@ -1005,6 +1043,43 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
     retreatMinPressure = tonumber(
         Const.COMBAT_TACTICAL_RETREAT_MIN_PRESSURE
     ) or 2
+    if state.lowStaminaPhase == "recover" then
+        if staminaCurrent(record) >= recoveryThreshold then
+            state.lowStaminaPhase = nil
+            state.lowStaminaAttackUntil = 0
+        elseif dist < safetyRadius then
+            retreatDistance = math.max(
+                0.8,
+                safetyRadius - dist + safetyBuffer
+            )
+            record.runtime.combatTactical.decision =
+                "exhausted_recovery_retreat"
+            continued, continueReason = startRetreat(
+                record,
+                zombie,
+                target,
+                retreatDistance,
+                "walk",
+                0.3,
+                tonumber(Const.COMBAT_KITE_RETREAT_LOCK_MS) or 1100,
+                "exhausted_recovery_retreat",
+                "retreat",
+                nil,
+                nil,
+                nil,
+                safetyRadius
+            )
+            if continued then
+                state.lowStaminaPhase = "retreat"
+            end
+            return continued, continueReason, nil
+        else
+            record.runtime.combatTactical.decision =
+                "recovering_stamina_safe"
+            requestHold(record, zombie, "recovering_stamina_safe")
+            return true, "recovering_stamina_safe", nil
+        end
+    end
     if not grounded
         and now <= (tonumber(state.nearMissUntil) or 0)
         and report.pressureCount < retreatMinPressure
@@ -1064,7 +1139,7 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
             Const.COMBAT_HORDE_RADIUS
         )
         record.runtime.combatTactical.decision = "recovering_stamina"
-        return startRetreat(
+        continued, continueReason = startRetreat(
             record,
             zombie,
             target,
@@ -1076,17 +1151,56 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
             "retreat",
             sourceX,
             sourceY,
-            record.z
+            record.z,
+            safetyRadius
         )
+        if continued then
+            state.lowStaminaPhase = "retreat"
+        end
+        return continued, continueReason, nil
     end
-    if Tactics.NeedsRecoveryRetreat(record)
-        and not canSpendMelee
-        and not grounded
-        and dist <= (tonumber(Const.COMBAT_SHOVE_RANGE) or 1.35)
-    then
+    if Tactics.NeedsRecoveryRetreat(record) and not grounded then
+        if state.lowStaminaPhase ~= "counter" then
+            state.lowStaminaPhase = "counter"
+            state.lowStaminaAttackUntil = now
+                + (tonumber(Const.COMBAT_EXHAUSTED_COUNTER_MS) or 1800)
+        end
+        if now < (tonumber(state.lowStaminaAttackUntil) or 0) then
+            -- Keep fighting briefly instead of turning away the instant the
+            -- reserve threshold is crossed. The emergency lease permits a
+            -- weakened strike when normal stamina spending is unavailable.
+            record.runtime.combatTactical.decision =
+                "exhausted_lone_counter"
+            if not canSpendMelee then
+                record.runtime.emergencyMeleeUntil = now + 300
+            end
+            return false, "exhausted_lone_counter", nil
+        end
+        retreatDistance = math.max(
+            0.8,
+            safetyRadius - dist + safetyBuffer
+        )
         record.runtime.combatTactical.decision =
-            "exhausted_defensive_shove"
-        return false, "exhausted_defensive_shove", "shove"
+            "exhausted_recovery_retreat"
+        continued, continueReason = startRetreat(
+            record,
+            zombie,
+            target,
+            retreatDistance,
+            "walk",
+            0.3,
+            tonumber(Const.COMBAT_KITE_RETREAT_LOCK_MS) or 1100,
+            "exhausted_recovery_retreat",
+            "retreat",
+            nil,
+            nil,
+            nil,
+            safetyRadius
+        )
+        if continued then
+            state.lowStaminaPhase = "retreat"
+        end
+        return continued, continueReason, nil
     end
     record.runtime.combatTactical.decision = grounded
         and "ground_finisher_window" or "melee_commit_window"

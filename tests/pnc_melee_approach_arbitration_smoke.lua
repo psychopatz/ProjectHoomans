@@ -19,7 +19,7 @@ PNC = {
     },
     Const = {
         MELEE_RANGE = 1.3,
-        MELEE_COMMIT_RANGE = 1.0,
+        MELEE_COMMIT_RANGE = 1.15,
         MELEE_APPROACH_STOP_DISTANCE = 0.92,
         COMBAT_BLOCK_LOG_REPEAT_MS = 5000,
     },
@@ -126,9 +126,10 @@ assertEqual(
 )
 
 move = nil
-target.distSq = 0.95 * 0.95
+target.distSq = 1.1 * 1.1
 tryReason = "cooldown_active"
 PNC.CombatEngagement.Tick(record, {}, target)
-assertEqual(move, nil, "cooldown moved an NPC already inside commit range")
+assertEqual(move, nil,
+    "formation-slot distance remained outside the melee commit window")
 
 print("pnc_melee_approach_arbitration_smoke: ok")

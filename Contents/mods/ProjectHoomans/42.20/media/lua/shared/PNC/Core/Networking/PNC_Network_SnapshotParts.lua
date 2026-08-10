@@ -17,6 +17,7 @@ local MotionHints = PNC.MotionHints
 local Identity = PNC.Identity
 local Settings = PNC.Sandbox
 local Perception = PNC.Perception
+local Registry = PNC.Registry
 
 local function buildTravelSummary(record, includeRoute)
     return PNC.Travel
@@ -176,10 +177,16 @@ local function buildVisualState(record)
         and runtime.animationSceneDebug or nil
     local now = Core.Now()
     local healthState = record and record.health and tostring(record.health.state or "normal") or "normal"
-    local moving = path and (
+    local pathIntentMoving = path and (
         path.phase == "requested"
         or path.phase == "active"
-        or now < (tonumber(path.visualMovingUntil) or 0)
+    ) or false
+    local fakeLocomotion = path
+        and path.ownerMode == "fake_locomotion"
+        or false
+    local moving = path and (
+        now < (tonumber(path.visualMovingUntil) or 0)
+        or (pathIntentMoving and not fakeLocomotion)
     ) or false
     local mode = moving and tostring(path.resolvedMode or path.mode or "walk") or nil
     local walkType = moving and tostring(path.walkType or "") or ""
@@ -505,6 +512,12 @@ local function buildVisibleZombieDebug(record, target)
     local actionState
     local bumpType
     local intent
+    local engineTarget
+    local targetRecord
+    local targetKind
+    local targetId
+    local targetName
+    local targetSource
     if frame and type(frame.entries) == "table" then
         for i = 1, #frame.entries do
             if (tonumber(frame.entries[i].distSq) or math.huge)
@@ -532,6 +545,52 @@ local function buildVisibleZombieDebug(record, target)
             bumpType = zombie.getBumpType
                 and tostring(zombie:getBumpType() or "")
                 or ""
+            targetKind = nil
+            targetId = nil
+            targetName = nil
+            targetSource = nil
+            if modData
+                and modData.PNC_AggroNPCId ~= nil
+                and Core.Now() < (
+                    tonumber(modData.PNC_AggroNPCUntil) or 0
+                )
+            then
+                targetKind = "npc"
+                targetId = modData.PNC_AggroNPCId
+                targetSource = "aggro_lease"
+                targetRecord = Registry and Registry.Get
+                    and Registry.Get(targetId) or nil
+                targetName = targetRecord and (
+                    targetRecord.displayName or targetRecord.name
+                ) or nil
+            else
+                engineTarget = zombie.getTarget
+                    and zombie:getTarget() or nil
+                if engineTarget
+                    and Core.IsManagedNPCBody
+                    and Core.IsManagedNPCBody(engineTarget)
+                then
+                    targetKind = "npc"
+                    targetSource = "engine"
+                    targetRecord = Registry
+                        and Registry.FindRecordByZombie
+                        and Registry.FindRecordByZombie(engineTarget)
+                        or nil
+                    targetId = targetRecord and targetRecord.id or nil
+                    targetName = targetRecord and (
+                        targetRecord.displayName or targetRecord.name
+                    ) or nil
+                elseif engineTarget and instanceof
+                    and instanceof(engineTarget, "IsoPlayer")
+                then
+                    targetKind = "player"
+                    targetSource = "engine"
+                    targetId = engineTarget.getOnlineID
+                        and engineTarget:getOnlineID() or nil
+                    targetName = engineTarget.getUsername
+                        and engineTarget:getUsername() or nil
+                end
+            end
             if targetID ~= ""
                 and tostring(zombieID or "") == targetID
             then
@@ -558,6 +617,10 @@ local function buildVisibleZombieDebug(record, target)
                 actionState = actionState,
                 bumpType = bumpType,
                 intent = intent,
+                targetKind = targetKind,
+                targetId = targetId,
+                targetName = targetName,
+                targetSource = targetSource,
             }
         end
     end
@@ -566,6 +629,7 @@ end
 
 local function buildCombatDebugState(record, combat, firearmState)
     local runtime = record.runtime or {}
+    local npcIdentity = buildIdentitySummary(record)
     local target = runtime.target
     local tactical = runtime.combatTactical or {}
     local aim = runtime.combatAim or {}
@@ -650,6 +714,12 @@ local function buildCombatDebugState(record, combat, firearmState)
             and zombieAttackerAge <= 1500 and {
                 zombieId = zombieAttacker.zombieId,
                 onlineID = zombieAttacker.onlineID,
+                targetKind = "npc",
+                targetId = record.id,
+                targetName = npcIdentity.displayName
+                    or record.displayName
+                    or record.name
+                    or "Unknown survivor",
                 phase = zombieAttacker.phase,
                 ageMs = zombieAttackerAge,
                 x = zombieAttacker.x,

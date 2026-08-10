@@ -194,9 +194,9 @@ Const.VEHICLE_AVOIDANCE_MAX_SCAN_RADIUS = 24
 Const.MELEE_RANGE = 1.3
 Const.MELEE_HIT_TOLERANCE = 0.12
 Const.MELEE_APPROACH_STOP_DISTANCE = 0.92
--- Commit inside the damage radius so a moving zombie cannot step out during
--- the melee wind-up. MELEE_RANGE remains the authoritative hit reach.
-Const.MELEE_COMMIT_RANGE = 1.0
+-- Formation slots sit about 1.05 tiles from a target. Keep the commit window
+-- outside that ring while retaining margin inside the authoritative hit reach.
+Const.MELEE_COMMIT_RANGE = 1.15
 Const.RANGED_RANGE = 8.5
 Const.RANGED_MIN_STANDOFF = 2.2
 Const.RANGED_PREFERRED_MIN_DISTANCE = 5.0
@@ -302,7 +302,9 @@ Const.SELF_BANDAGE_FIRST_AID_REDUCTION_MS = 350
 Const.SELF_BANDAGE_MIN_DURATION_MS = 3000
 Const.SELF_BANDAGE_RETRY_MS = 5000
 Const.SELF_BANDAGE_THREAT_RADIUS = 10
-Const.SELF_BANDAGE_INTERRUPT_RADIUS = 10
+-- Must match the red combat-defense circle. Treatment is safe only while no
+-- hostile occupies this personal-space radius.
+Const.SELF_BANDAGE_INTERRUPT_RADIUS = 2.2
 Const.SELF_BANDAGE_RETREAT_DISTANCE = 5
 Const.SELF_BANDAGE_RETREAT_STOP_DISTANCE = 1
 Const.ABSTRACT_SELF_BANDAGE_INTERVAL_MS = 30000
@@ -330,6 +332,10 @@ Const.ZOMBIE_TARGET_RADIUS = 12
 Const.TARGET_VISUAL_MEMORY_MS = 2200
 Const.TARGET_REASSESS_MS = 350
 Const.TARGET_IMMEDIATE_THREAT_RADIUS = 6.0
+-- Server zombie aggro records are refreshed continuously while a zombie owns
+-- an NPC pursuit lease. Perception uses this short window in multiplayer,
+-- where the zombie's unsupported IsoZombie-shaped engine target stays unset.
+Const.ZOMBIE_ATTACKER_OBSERVATION_MS = 1500
 Const.TARGET_SWITCH_DISTANCE_RATIO = 0.72
 Const.TARGET_RECENT_ATTACKER_MS = 5000
 Const.ZOMBIE_AGGRO_RADIUS = 14
@@ -426,6 +432,11 @@ Const.CHARACTER_DETAIL_DISTANCE = 5
 Const.COMBAT_RETREAT_STAMINA_CURRENT = 20
 Const.COMBAT_RETREAT_STAMINA_RATIO = 0.10
 Const.COMBAT_REENGAGE_STAMINA_RATIO = 0.28
+-- Low-stamina melee uses a short counter window, then creates only enough
+-- space to clear the red defense circle and recovers before re-engaging.
+Const.COMBAT_EXHAUSTED_COUNTER_MS = 1800
+Const.COMBAT_EXHAUSTED_REENGAGE_CURRENT = 35
+Const.COMBAT_RETREAT_SAFETY_BUFFER = 0.25
 Const.COMBAT_SURROUND_RADIUS = 1.8
 Const.COMBAT_SURROUND_COUNT = 3
 Const.COMBAT_PRESSURE_RADIUS = 3.0

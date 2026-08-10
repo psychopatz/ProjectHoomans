@@ -122,6 +122,14 @@ PNC = {
             return record.zombieTargetable ~= false
         end,
     },
+    Registry = {
+        Get = function(id)
+            if id == "npc_near" then
+                return { id = id, name = "Nearby" }
+            end
+            return nil
+        end,
+    },
     Perception = {
         GetZombieFrame = function()
             return { entries = debugVisibleZombieEntries }
@@ -367,7 +375,13 @@ nearbyRecord.runtime.target = {
 }
 debugVisibleZombieEntries[1] = {
     zombie = {
-        getModData = function() return { PNC_ZombieID = "z1" } end,
+        getModData = function()
+            return {
+                PNC_ZombieID = "z1",
+                PNC_AggroNPCId = "npc_near",
+                PNC_AggroNPCUntil = 3000,
+            }
+        end,
         getX = function() return 4 end,
         getY = function() return 0 end,
         getZ = function() return 0 end,
@@ -394,6 +408,15 @@ nearbyRecord.runtime.combatRetreat = {
     goalZ = 0,
     goalMode = "run",
     lockUntil = 2300,
+}
+nearbyRecord.runtime.zombieAttacker = {
+    zombieId = "z1",
+    observedAt = 1950,
+    phase = "pursuit",
+    x = 4,
+    y = 0,
+    z = 0,
+    distSq = 9,
 }
 local combatSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
 assertEqual(combatSnapshot.attackMode, true, "combat snapshot attack mode")
@@ -437,6 +460,48 @@ assertEqual(
     "selected",
     "combat visible zombie intent snapshot"
 )
+assertEqual(
+    combatSnapshot.combatDebugState.viewZombies[1].targetKind,
+    "npc",
+    "combat zombie target kind snapshot"
+)
+assertEqual(
+    combatSnapshot.combatDebugState.viewZombies[1].targetId,
+    "npc_near",
+    "combat zombie target ID snapshot"
+)
+assertEqual(
+    combatSnapshot.combatDebugState.viewZombies[1].targetName,
+    "Nearby",
+    "combat zombie target name snapshot"
+)
+assertEqual(
+    combatSnapshot.combatDebugState.zombieAttacker.targetName,
+    "Nearby",
+    "zombie attacker NPC display name snapshot"
+)
+assertEqual(
+    combatSnapshot.combatDebugState.zombieAttacker.targetId,
+    "npc_near",
+    "zombie attacker NPC ID snapshot"
+)
+nearbyRecord.runtime.pathing = {
+    phase = "active",
+    ownerMode = "fake_locomotion",
+    resolvedMode = "run",
+    mode = "run",
+    moveAnim = "Run",
+    isRunning = true,
+    visualMovingUntil = 0,
+}
+local stalledMotionSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
+assertEqual(stalledMotionSnapshot.visualState.moving, false,
+    "fake movement intent was published as physical movement")
+nearbyRecord.runtime.pathing.visualMovingUntil = 2100
+local progressedMotionSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
+assertEqual(progressedMotionSnapshot.visualState.moving, true,
+    "recent fake physical movement lost its visual continuity lease")
+nearbyRecord.runtime.pathing = nil
 nearbyRecord.runtime.combatDebugReplicatedAt = nil
 local combatDelta = PNC.Network.BuildPresenceDelta(nearbyRecord)
 assertEqual(combatDelta.attackMode, true, "combat delta attack mode")

@@ -38,6 +38,7 @@ function Combat.TryMelee(record, zombie, target)
     local strengthLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, "Strength") or 0
     local groundSafe
     local liveTarget
+    local emergencyMelee
 
     if not target then
         return false, "no_target"
@@ -71,7 +72,16 @@ function Combat.TryMelee(record, zombie, target)
     if not Internal.canAttack(record, now, cooldownMs) then
         return false, "cooldown_active"
     end
-    if Stamina and Stamina.CanSpendAttack and not Stamina.CanSpendAttack(record, "melee", skillID) then
+    emergencyMelee = target.kind == "zombie"
+        and record.runtime
+        and now <= (
+            tonumber(record.runtime.emergencyMeleeUntil) or 0
+        )
+        or false
+    if Stamina and Stamina.CanSpendAttack
+        and not Stamina.CanSpendAttack(record, "melee", skillID)
+        and not emergencyMelee
+    then
         return false, "stamina_exhausted"
     end
 
@@ -79,6 +89,10 @@ function Combat.TryMelee(record, zombie, target)
         damage = Damage.GetAttackDamage(record, "melee", weaponItem, damage, skillLevel)
     else
         damage = damage * (0.9 + math.min(skillLevel, 8) * 0.04 + math.min(strengthLevel, 6) * 0.02)
+    end
+    if emergencyMelee then
+        damage = damage * 0.55
+        record.runtime.emergencyMeleeUntil = nil
     end
     if Internal.prepareAttackMovement then
         Internal.prepareAttackMovement(
@@ -115,18 +129,13 @@ function Combat.TryMelee(record, zombie, target)
                 return true, "ground_attack_started"
             end
         end
-        if isBarehand and zombieTarget then
-            if Unarmed and Unarmed.PlayShove then
-                Unarmed.PlayShove(zombie, record, zombieTarget)
-            end
-            Internal.buildAttackAction(record, target, "shove", "melee", "PNC_Shove", tonumber(profile.unarmedDamage) or Const.UNARMED_DAMAGE, "Strength")
-            return true, "shove_started"
-        end
     end
 
     if isBarehand then
         damage = tonumber(profile.unarmedDamage) or Const.UNARMED_DAMAGE
-        anim = "PNC_Shove"
+        anim = Internal.triggerUnarmedAttackAnim
+            and Internal.triggerUnarmedAttackAnim()
+            or "PNC_AttackBareHands1"
     else
         Internal.playAttackSound(zombie, record, weaponItem)
         anim = Internal.triggerMeleeWeaponAnim(
@@ -144,7 +153,9 @@ function Combat.TryMelee(record, zombie, target)
         damage,
         skillID
     )
-    return true, "melee_attack_started"
+    return true, isBarehand
+        and "unarmed_attack_started"
+        or "melee_attack_started"
 end
 
 function Combat.TryShove(record, zombie, target, reason)

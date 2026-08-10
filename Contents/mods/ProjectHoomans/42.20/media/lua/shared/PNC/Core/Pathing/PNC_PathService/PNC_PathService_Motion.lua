@@ -75,7 +75,14 @@ function Internal.startRequestedMove(zombie, record, lane)
     then
         Internal.FakeLocomotion.PrepareBody(zombie, lane, now)
     end
-    Internal.setWalkAnim(zombie, record, lane.resolvedMode or lane.mode or goal.mode, true)
+    if lane.navigationProvider == "engine_path" then
+        Internal.setWalkAnim(
+            zombie,
+            record,
+            lane.resolvedMode or lane.mode or goal.mode,
+            true
+        )
+    end
     lane.startedAt = now
     lane.lastIssueAt = now
     lane.lastProgressAt = now
@@ -399,7 +406,6 @@ function Internal.updateActiveMove(zombie, record, lane)
     then
         Internal.FakeLocomotion.PrepareBody(zombie, lane, now)
     end
-    Internal.setWalkAnim(zombie, record, lane.resolvedMode or lane.mode or goal.mode, false)
     if Internal.FakeLocomotion and Internal.FakeLocomotion.StepTowardGoal then
         stepped, stepResult, stepDistance = Internal.FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
     else
@@ -409,6 +415,12 @@ function Internal.updateActiveMove(zombie, record, lane)
     end
 
     if stepped then
+        Internal.setWalkAnim(
+            zombie,
+            record,
+            lane.resolvedMode or lane.mode or goal.mode,
+            false
+        )
         lane.ownerMode = "fake_locomotion"
         lane.recoveryCount = 0
         lane.lastRecoveryReason = nil
@@ -424,6 +436,13 @@ function Internal.updateActiveMove(zombie, record, lane)
         end
         Internal.logMoveDebug(record, zombie, lane, "progress", "fake_step", "step=" .. tostring(stepResult or "direct") .. " dist=" .. string.format("%.3f", tonumber(stepDistance) or 0))
         return true, "moving"
+    end
+
+    -- A requested fake path is movement intent, not physical movement. Do
+    -- not loop Run/Walk while throttled or blocked unless a real step occurred
+    -- inside the short visual continuity lease.
+    if now >= (tonumber(lane.visualMovingUntil) or 0) then
+        Internal.applyHoldAnimation(zombie, record, lane)
     end
 
     if stepResult == "blocked"

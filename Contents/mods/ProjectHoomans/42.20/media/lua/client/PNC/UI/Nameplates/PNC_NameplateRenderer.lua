@@ -564,6 +564,25 @@ function Renderer.BuildCombatDebugLines(debugState, currentTargetDistance)
                         and " bump=" .. tostring(viewed.bumpType)
                         or ""
                 )
+                .. (
+                    viewed.targetKind ~= nil
+                        and " target="
+                            .. tostring(viewed.targetKind)
+                            .. "["
+                            .. tostring(
+                                viewed.targetName
+                                    or viewed.targetId
+                                    or "?"
+                            )
+                            .. "]"
+                            .. (
+                                viewed.targetSource ~= nil
+                                    and " via="
+                                        .. tostring(viewed.targetSource)
+                                    or ""
+                            )
+                        or " target=none"
+                )
         end
     end
 
@@ -1139,7 +1158,13 @@ local function drawZombieAttackerDebug(
     screenX, screenY = screenPoint(manager, x, y, z)
     lineHeight =
         getTextManager():getFontHeight(Fonts.debug) + 2
-    firstLine = "ZED->NPC "
+    firstLine = "ZED -> "
+        .. tostring(
+            attacker.targetName
+                or attacker.targetId
+                or "Unknown survivor"
+        )
+        .. " | zed="
         .. tostring(attacker.zombieId or attacker.onlineID or "?")
         .. " phase=" .. tostring(attacker.phase or "-")
         .. " d=" .. tostring(rounded(distance, 2) or "-")

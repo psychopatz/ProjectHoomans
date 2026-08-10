@@ -11,6 +11,7 @@ local mode = "armed"
 local shoveCount = 0
 local weaponAnimationCount = 0
 local groundAnimationCount = 0
+local unarmedAnimationCount = 0
 local grounded = false
 local action
 local canSpendAttack = true
@@ -43,6 +44,10 @@ PNC = {
             triggerMeleeWeaponAnim = function()
                 weaponAnimationCount = weaponAnimationCount + 1
                 return "PNC_Attack1H1"
+            end,
+            triggerUnarmedAttackAnim = function()
+                unarmedAnimationCount = unarmedAnimationCount + 1
+                return "PNC_AttackBareHands1"
             end,
             buildAttackAction = function(_, _, attackKind, attackType, anim)
                 action = { attackKind = attackKind, attackType = attackType, anim = anim }
@@ -99,9 +104,31 @@ mode = "barehand"
 action = nil
 started, reason = PNC.Combat.TryMelee(record(), {}, target)
 assertEqual(started, true, "barehand attack starts")
-assertEqual(reason, "shove_started", "barehand shove reason")
-assertEqual(action.attackKind, "shove", "barehand attack kind")
-assertEqual(shoveCount, 1, "barehand shove retained")
+assertEqual(reason, "unarmed_attack_started", "barehand attack reason")
+assertEqual(action.attackKind, "melee", "barehand attack kind")
+assertEqual(action.anim, "PNC_AttackBareHands1",
+    "barehand attack animation retained")
+assertEqual(unarmedAnimationCount, 1, "barehand animation count")
+assertEqual(shoveCount, 0, "ordinary barehand attack became a shove")
+
+now = now + 1000
+canSpendAttack = false
+action = nil
+local exhaustedRecord = record()
+exhaustedRecord.runtime.emergencyMeleeUntil = now + 300
+started, reason = PNC.Combat.TryMelee(
+    exhaustedRecord,
+    {},
+    target
+)
+assertEqual(started, true, "exhausted lone emergency attack starts")
+assertEqual(reason, "unarmed_attack_started",
+    "exhausted lone emergency attack reason")
+assertEqual(action.attackKind, "melee",
+    "exhausted lone emergency attack kind")
+assertEqual(exhaustedRecord.runtime.emergencyMeleeUntil, nil,
+    "emergency melee lease was not consumed")
+canSpendAttack = true
 
 now = now + 1000
 mode = "armed"
@@ -127,7 +154,7 @@ started, reason = PNC.Combat.TryShove(
 assertEqual(started, true, "armed tactical shove starts")
 assertEqual(reason, "pressure_shove", "tactical shove reason")
 assertEqual(action.attackKind, "shove", "tactical shove action kind")
-assertEqual(shoveCount, 2, "tactical shove animation count")
+assertEqual(shoveCount, 1, "tactical shove animation count")
 
 now = now + 1000
 action = nil
