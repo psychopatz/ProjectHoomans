@@ -61,7 +61,6 @@ function Network.ResetServerState()
     ServerState.lastRosterFlushAt = 0
 end
 
-require "PNC/Core/Networking/PNC_Network_SnapshotParts"
-require "PNC/Core/Networking/PNC_Network_Snapshots"
+require "PNC/Core/Networking/NetworkSnapshots/PNC_NetworkSnapshots"
 require "PNC/Core/Networking/PNC_Network_Server"
 require "PNC/Core/Networking/PNC_Network_CombatEvents"
