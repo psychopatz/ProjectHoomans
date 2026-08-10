@@ -20,9 +20,12 @@ local relationshipCount = 0
 local knowledgeCount = 0
 local commitCount = 0
 local specs = {
-    { id = "PNC_HasBrother", relationshipKind = "brother", sex = "male" },
-    { id = "PNC_HasLover", relationshipKind = "lover", sex = "orientation" },
-    { id = "PNC_HasFriend", relationshipKind = "friend", sex = "random" },
+    { id = "PNC_HasBrother", relationshipKind = "brother", sex = "male",
+        sharesSurname = true },
+    { id = "PNC_HasLover", relationshipKind = "lover", sex = "orientation",
+        sharesSurname = true },
+    { id = "PNC_HasFriend", relationshipKind = "friend", sex = "random",
+        sharesSurname = false },
 }
 local byID = {}
 for _, spec in ipairs(specs) do byID[spec.id] = spec end
@@ -92,7 +95,28 @@ PNC = {
             assignCount = assignCount + 1
             npc.recruited = true
             npc.ownerUsername = player:getUsername()
+            npc.affiliation = {
+                factionID = "faction_player",
+                communityID = "community_player",
+            }
             return true, "recruited"
+        end,
+    },
+    Factions = {
+        GetPlayerFaction = function() return { id = "faction_player" } end,
+        GetNPCAffiliation = function(npc)
+            return npcs[npc] and npcs[npc].affiliation or nil
+        end,
+    },
+    Communities = {
+        GetNPCCommunity = function(npc)
+            local affiliation = npcs[npc] and npcs[npc].affiliation or nil
+            return affiliation and affiliation.communityID
+                and {
+                    id = affiliation.communityID,
+                    factionID = affiliation.factionID,
+                    status = "active",
+                } or nil
         end,
     },
     Relationships = {
@@ -162,8 +186,8 @@ local lover = npcs[record.startingCompanions.grants.PNC_HasLover.npcID]
 local friend = npcs[record.startingCompanions.grants.PNC_HasFriend.npcID]
 assertEqual(brother.identity.survivor.surname, "SurvivorFamily",
     "family companion shares player surname")
-assertEqual(lover.identity.survivor.surname, "Random",
-    "lover keeps independently generated surname")
+assertEqual(lover.identity.survivor.surname, "SurvivorFamily",
+    "married lover shares player surname")
 assertEqual(friend.identity.survivor.surname, "Random",
     "friend keeps independently generated surname")
 assertEqual(lover.isFemale, true,
@@ -176,5 +200,29 @@ assertEqual(granted, false, "reconnect does not grant again")
 assertEqual(reason, "granted", "reconnect sees persisted grants")
 assertEqual(spawnCount, 3, "reconnect creates no duplicates")
 assertEqual(assignCount, 3, "reconnect performs no reassignment")
+
+-- Existing grants repair a stale faction/community link exactly once.
+lover.affiliation = nil
+record.startingCompanions.grants.PNC_HasLover.enrichmentVersion = 2
+granted, reason = PNC.StartingCompanions.Ensure(
+    player, record.uuid, 14
+)
+assertEqual(granted, true, "stale enrollment is repaired")
+assertEqual(reason, "granted", "repair completes grant")
+assertEqual(assignCount, 4, "only stale companion is reassigned")
+granted, reason = PNC.StartingCompanions.Ensure(
+    player, record.uuid, 15
+)
+assertEqual(granted, false, "completed repair is not repeated")
+assertEqual(reason, "granted", "completed repair remains resolved")
+assertEqual(assignCount, 4, "repair performs no per-frame reassignment")
+local stableCommitCount = commitCount
+for frame = 1, 120 do
+    PNC.StartingCompanions.Ensure(player, record.uuid, 15 + frame)
+end
+assertEqual(assignCount, 4,
+    "steady lifecycle checks never repeat companion assignment")
+assertEqual(commitCount, stableCommitCount,
+    "steady lifecycle checks never save companion state per frame")
 
 print("pnc_starting_companion_smoke: ok")

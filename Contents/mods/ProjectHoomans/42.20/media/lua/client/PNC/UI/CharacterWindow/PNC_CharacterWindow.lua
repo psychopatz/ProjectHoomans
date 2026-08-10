@@ -33,6 +33,8 @@ end
 
 function ISPNCCharacterTab:createChildren()
     ISPanel.createChildren(self)
+    if self.setScrollChildren then self:setScrollChildren(true) end
+    if self.addScrollBars then self:addScrollBars() end
     local createHook = Tabs["Create" .. tostring(self.tabId) .. "Children"]
     if createHook then createHook(self) end
 end
@@ -46,6 +48,12 @@ function ISPNCCharacterTab:setContext(npcId, snapshot, payload)
 end
 
 function ISPNCCharacterTab:onResize()
+    if self.vscroll then
+        local scrollWidth = self.vscroll.getWidth
+            and self.vscroll:getWidth() or self.vscroll.width or 13
+        self.vscroll:setX(math.max(0, self.width - scrollWidth))
+        self.vscroll:setHeight(self.height)
+    end
     local layoutHook = Tabs["Layout" .. tostring(self.tabId)]
     if layoutHook then layoutHook(self) end
 end
@@ -60,16 +68,32 @@ end
 function ISPNCCharacterTab:render()
     ISPanel.render(self)
     local renderer = Tabs["Render" .. tostring(self.tabId)]
-    local top = 12 - (tonumber(self.scrollY) or 0)
+    local nativeScroll = self.getYScroll
+        and (tonumber(self:getYScroll()) or 0) or 0
+    local top = 12 + nativeScroll
     local bottom = renderer and renderer(self, self.snapshot or {}, self.payload or {}, top) or top
-    self.contentHeight = math.max(self.height, (tonumber(bottom) or top) + (tonumber(self.scrollY) or 0) + 12)
+    self.contentHeight = math.max(
+        self.height,
+        (tonumber(bottom) or top) - nativeScroll + 12
+    )
+    if self.setScrollHeight then self:setScrollHeight(self.contentHeight) end
     self.maxScroll = math.max(0, self.contentHeight - self.height)
-    self.scrollY = Shared.Clamp(self.scrollY or 0, 0, self.maxScroll)
+    if self.setYScroll then
+        self:setYScroll(Shared.Clamp(nativeScroll, -self.maxScroll, 0))
+    end
     self:clearStencilRect()
 end
 
 function ISPNCCharacterTab:onMouseWheel(del)
-    self.scrollY = Shared.Clamp((self.scrollY or 0) - (del * 30), 0, self.maxScroll or 0)
+    local current = self.getYScroll
+        and (tonumber(self:getYScroll()) or 0) or 0
+    if self.setYScroll then
+        self:setYScroll(Shared.Clamp(
+            current + (del * 30),
+            -(self.maxScroll or 0),
+            0
+        ))
+    end
     return true
 end
 
@@ -84,7 +108,6 @@ function ISPNCCharacterTab:new(x, y, width, height, tabId)
     setmetatable(o, self)
     self.__index = self
     o.tabId = tabId
-    o.scrollY = 0
     o.maxScroll = 0
     return o
 end

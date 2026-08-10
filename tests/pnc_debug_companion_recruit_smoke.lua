@@ -11,9 +11,16 @@ local records = {
     hostile = { id = "hostile", faction = "hostile", alive = true },
     neutral = { id = "neutral", faction = "neutral", alive = true },
     companion = { id = "companion", faction = "colonist", recruited = true },
+    stale = {
+        id = "stale",
+        faction = "colonist",
+        recruited = true,
+        alive = true,
+    },
 }
 local affiliations = {
     hostile = { factionID = "raiders" },
+    stale = { factionID = "player-faction" },
 }
 local transferCalls = 0
 local addCalls = 0
@@ -127,5 +134,16 @@ assertEqual(communitySaves, 2, "each recruit commits community membership")
 ok, reason = Recruit.Try(player, { npcID = "companion" })
 assertEqual(ok, false, "existing companion rejected")
 assertEqual(reason, "npc_not_debug_recruitable", "existing companion reason")
+
+ok, reason = Recruit.Assign(player, records.stale, {
+    source = "starting_companion_repair",
+    endConversation = false,
+})
+assertEqual(ok, true, "existing faction member can repair enrollment")
+assertEqual(reason, "recruited", "existing membership repair result")
+assertEqual(transferCalls, 1,
+    "same-faction repair does not attempt an invalid transfer")
+assertEqual(addCalls, 2,
+    "same-faction repair uses idempotent faction add")
 
 print("pnc_debug_companion_recruit_smoke: ok")

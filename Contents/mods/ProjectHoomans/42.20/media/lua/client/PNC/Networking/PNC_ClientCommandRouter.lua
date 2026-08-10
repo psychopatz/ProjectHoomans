@@ -83,7 +83,13 @@ function Internal.ApplyNPCKnowledgeSnapshot(snapshot, reason)
     if type(snapshot) == "table" and snapshot.npcID then
         local npcID = tostring(snapshot.npcID)
         ClientState.npcKnowledge = ClientState.npcKnowledge or {}
+        local previous = ClientState.npcKnowledge[npcID]
         ClientState.npcKnowledge[npcID] = snapshot
+        if PNC.KnowledgePresentation
+            and PNC.KnowledgePresentation.ShowLearnedFacts
+        then
+            PNC.KnowledgePresentation.ShowLearnedFacts(previous, snapshot)
+        end
         if PNC.KnowledgeInterest and PNC.KnowledgeInterest.Acknowledge then
             PNC.KnowledgeInterest.Acknowledge(npcID)
         end

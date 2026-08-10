@@ -174,15 +174,20 @@ function Commands.IsOwnedByPlayer(record, player)
             and PNC.PlayerCharacters.GetCharacterUUID
             and PNC.PlayerCharacters.GetCharacterUUID(player)
             or nil
-        playerKey = uuid
-            and PNC.EntityRef
-            and PNC.EntityRef.ForPlayerIdentity(
-                player.getUsername
-                    and player:getUsername() or nil,
-                uuid
-            ) or nil
-        return playerKey ~= nil
-            and organization.playerMemberKeys[playerKey] == true
+        local context = PNC.PlayerContext and PNC.PlayerContext.Peek
+            and PNC.PlayerContext.Peek(player) or nil
+        local character = uuid and PNC.PlayerCharacters.Registry
+            and PNC.PlayerCharacters.Registry.byUUID
+            and PNC.PlayerCharacters.Registry.byUUID[uuid] or nil
+        playerKey = context and context.entityKey
+            or uuid and character and PNC.EntityRef
+                and PNC.EntityRef.ForPlayerIdentity(
+                    character.accountKey or character.accountIdentity,
+                    uuid
+                ) or nil
+        if playerKey then
+            return organization.playerMemberKeys[playerKey] == true
+        end
     end
     recordUsername = ownerUsername(record)
     recordOnlineID = tonumber(ownerOnlineID(record))

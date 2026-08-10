@@ -105,10 +105,10 @@ if RadioActions and RadioActions.Register then
     })
     RadioActions.Register({
         id = "projecthoomans.colony_management",
-        label = tr("UI_PNC_ProjectHoomansColony", "Project Hoomans Colony"),
+        label = tr("UI_PNC_ColonyManagement", "Colony Management"),
         signalLabel = tr(
-            "UI_PNC_ProjectHoomansColony",
-            "Project Hoomans Colony"
+            "UI_PNC_ColonyManagement",
+            "Colony Management"
         ),
         placement = RadioActions.PLACEMENT_SIGNAL or "psychopatz.radio.signal",
         order = 100,

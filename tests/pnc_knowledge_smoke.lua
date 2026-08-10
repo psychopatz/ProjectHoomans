@@ -146,6 +146,64 @@ eq(normal.truth, nil, "normal snapshot contains no truth")
 dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Knowledge/PNC_KnowledgePresentation.lua")
 local dossierRows = PNC.KnowledgePresentation.BuildDossierRows(normal)
 truth(#dossierRows > 0, "generic dossier model displays discovered descriptors")
+local dossierWithoutSkills = PNC.KnowledgePresentation.BuildDossierRows({
+    categories = {
+        {
+            id = "capabilities",
+            descriptors = {
+                { descriptorID = "skill.Aiming", value = 4 },
+            },
+        },
+        {
+            id = "identity",
+            descriptors = {
+                { descriptorID = "identity.name", value = "Burton" },
+            },
+        },
+    },
+})
+eq(#dossierWithoutSkills, 1,
+    "dossier omits capabilities already represented by Skills tab")
+eq(dossierWithoutSkills[1].id, "identity",
+    "non-skill dossier knowledge remains visible")
+local learned = PNC.KnowledgePresentation.GetNewFacts(
+    { categories = {} },
+    { categories = { {
+        id = "identity",
+        descriptors = { { descriptorID = "identity.name" } },
+    } } }
+)
+eq(#learned, 1, "new dossier facts produce visual-feedback candidates")
+eq(PNC.KnowledgePresentation.GetFactLabel(learned[1]), "Name",
+    "learned feedback has a readable fact label")
+local haloMessages = {}
+getSpecificPlayer = function() return {} end
+getText = function(key, value)
+    if key == "UI_PNC_KnowledgeLearned" then
+        return "Learned: " .. tostring(value)
+    end
+    return key
+end
+HaloTextHelper = {
+    getColorGreen = function() return {} end,
+    addTextWithArrow = function(_, message, positive)
+        haloMessages[#haloMessages + 1] = {
+            message = message,
+            positive = positive,
+        }
+    end,
+}
+eq(PNC.KnowledgePresentation.ShowLearnedFacts(
+    { categories = {} },
+    { categories = { {
+        id = "identity",
+        descriptors = { { descriptorID = "identity.name" } },
+    } } }
+), 1, "one learned fact produces one halo notification")
+eq(haloMessages[1].message, "Learned: Name",
+    "learned halo uses translated formatting")
+eq(haloMessages[1].positive, true,
+    "learned halo uses the positive level-up arrow")
 local dossierModel = PNC.KnowledgePresentation.BuildDossierModel(normal)
 truth(#dossierModel.tabs > 1 and dossierModel.tabs[1].id == "overview",
     "dossier tabs are generated from safe descriptor categories")

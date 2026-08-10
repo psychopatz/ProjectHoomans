@@ -147,6 +147,39 @@ local player = {
     isDead = function() return false end,
 }
 
+-- Single-player factions use the slot account key, not the display username.
+PNC.PlayerCharacters = {
+    GetCharacterUUID = function() return "char_alice" end,
+    Registry = {
+        byUUID = {
+            char_alice = {
+                accountKey = "sp_slot_0",
+                accountIdentity = "alice",
+            },
+        },
+    },
+}
+PNC.EntityRef = {
+    ForPlayerIdentity = function(account, uuid)
+        return "player:" .. tostring(account) .. ":" .. tostring(uuid)
+    end,
+}
+PNC.Factions = {
+    Registry = {
+        byID = {
+            faction_alice = {
+                ownerPlayerKey = "player:sp_slot_0:char_alice",
+                playerMemberKeys = {
+                    ["player:sp_slot_0:char_alice"] = true,
+                },
+            },
+        },
+    },
+}
+records.owned.affiliation = { factionID = "faction_alice" }
+assertEqual(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
+    true, "single-player faction ownership uses canonical account key")
+
 assertEqual(#PNC.CompanionCommands.List(), 6, "registered command count")
 assertEqual(#PNC.CompanionCommands.ListGroups(), 2,
     "registered command group count")

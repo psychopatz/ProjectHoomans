@@ -221,7 +221,9 @@ function Recruit.Assign(player, record, args)
         worldAgeHours = at,
         joinedAt = at,
     }
-    if affiliation and affiliation.factionID then
+    if affiliation and affiliation.factionID == playerFaction.id then
+        ok, reason = Factions.AddNPC(playerFaction.id, record.id, options)
+    elseif affiliation and affiliation.factionID then
         ok, reason = Factions.TransferNPC(record.id, playerFaction.id, options)
     else
         ok, reason = Factions.AddNPC(playerFaction.id, record.id, options)

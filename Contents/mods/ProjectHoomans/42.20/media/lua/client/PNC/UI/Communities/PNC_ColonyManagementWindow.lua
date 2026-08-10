@@ -9,6 +9,11 @@ local Theme = UI.Theme
 local Layout = UI.Layout
 local State = PNC.Network.ClientState
 
+local function tr(key, fallback)
+    local value = getText and getText(key) or nil
+    return value and value ~= "" and value ~= key and value or fallback
+end
+
 local NEED_TYPES = { "hunger", "hydration", "fatigue" }
 local LEVELS = { "GOOD", "STABLE", "LOW", "CRITICAL", "EMERGENCY" }
 local LEVEL_COLORS = {
@@ -400,7 +405,10 @@ function ColonyUI.Open()
     local window = ColonyUI.instance
     if not window then
         window = UI.NewWindow(ISPNCColonyManagementWindow, {
-            title = "COLONY MANAGEMENT",
+            title = string.upper(tr(
+                "UI_PNC_ColonyManagement",
+                "Colony Management"
+            )),
             resizable = true,
             persistenceKey = "PNC.ColonyManagement",
             responsiveSpec = {

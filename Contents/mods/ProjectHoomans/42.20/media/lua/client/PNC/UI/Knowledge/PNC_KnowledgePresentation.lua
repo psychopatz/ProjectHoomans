@@ -8,6 +8,11 @@ PNC.KnowledgeUIRenderers = PNC.KnowledgeUIRenderers or {}
 local Presentation = PNC.KnowledgePresentation
 local Renderers = PNC.KnowledgeUIRenderers
 
+Presentation.DOSSIER_HIDDEN_CATEGORIES =
+    Presentation.DOSSIER_HIDDEN_CATEGORIES or {
+        capabilities = true,
+    }
+
 Renderers.byValueType = Renderers.byValueType or {}
 function Renderers.Register(valueType, renderer)
     if type(valueType) ~= "string" or type(renderer) ~= "function" then return false end
@@ -71,21 +76,97 @@ end
 function Presentation.BuildDossierRows(snapshot)
     local rows = {}
     for _, category in ipairs(snapshot and snapshot.categories or {}) do
-        local section = { id = category.id, title = words(category.id), rows = {} }
-        for _, descriptor in ipairs(category.descriptors or {}) do
-            section.rows[#section.rows + 1] = {
-                descriptorID = descriptor.descriptorID,
-                label = words(string.match(descriptor.descriptorID, "%.(.+)$") or descriptor.descriptorID),
-                value = Presentation.FormatFact(descriptor),
-                confidence = tonumber(descriptor.confidence) or 0,
-                status = descriptor.status,
-                sourceSummary = descriptor.primarySource,
-                tooltipLines = { descriptor.descriptorID, "Based on: " .. tostring(descriptor.primarySource or "your observations") },
+        if not Presentation.DOSSIER_HIDDEN_CATEGORIES[category.id] then
+            local section = {
+                id = category.id,
+                title = words(category.id),
+                rows = {},
             }
+            for _, descriptor in ipairs(category.descriptors or {}) do
+                section.rows[#section.rows + 1] = {
+                    descriptorID = descriptor.descriptorID,
+                    label = words(string.match(
+                        descriptor.descriptorID, "%.(.+)$"
+                    ) or descriptor.descriptorID),
+                    value = Presentation.FormatFact(descriptor),
+                    confidence = tonumber(descriptor.confidence) or 0,
+                    status = descriptor.status,
+                    sourceSummary = descriptor.primarySource,
+                    tooltipLines = {
+                        descriptor.descriptorID,
+                        "Based on: " .. tostring(
+                            descriptor.primarySource or "your observations"
+                        ),
+                    },
+                }
+            end
+            if #section.rows > 0 then rows[#rows + 1] = section end
         end
-        if #section.rows > 0 then rows[#rows + 1] = section end
     end
     return rows
+end
+
+local function knownFacts(snapshot)
+    local output = {}
+    for _, category in ipairs(snapshot and snapshot.categories or {}) do
+        for _, descriptor in ipairs(category.descriptors or {}) do
+            if descriptor.descriptorID then
+                output[tostring(descriptor.descriptorID)] = descriptor
+            end
+        end
+    end
+    return output
+end
+
+function Presentation.GetNewFacts(previous, current)
+    local output = {}
+    if type(previous) ~= "table" or type(current) ~= "table" then
+        return output
+    end
+    local before = knownFacts(previous)
+    for descriptorID, descriptor in pairs(knownFacts(current)) do
+        if not before[descriptorID] then
+            output[#output + 1] = descriptor
+        end
+    end
+    table.sort(output, function(left, right)
+        return tostring(left.descriptorID) < tostring(right.descriptorID)
+    end)
+    return output
+end
+
+function Presentation.GetFactLabel(descriptor)
+    local descriptorID = tostring(
+        descriptor and descriptor.descriptorID or "information"
+    )
+    local skillID = string.match(descriptorID, "^skill%.(.+)$")
+    local skill = skillID and PNC.SkillCatalog
+        and PNC.SkillCatalog.Find and PNC.SkillCatalog.Find(skillID) or nil
+    if skill and skill.display then return tostring(skill.display) end
+    return words(string.match(descriptorID, "%.(.+)$") or descriptorID)
+end
+
+function Presentation.ShowLearnedFacts(previous, current)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not player or not HaloTextHelper
+        or not HaloTextHelper.addTextWithArrow
+    then return 0 end
+    local facts = Presentation.GetNewFacts(previous, current)
+    for _, descriptor in ipairs(facts) do
+        local label = Presentation.GetFactLabel(descriptor)
+        local message = getText
+            and getText("UI_PNC_KnowledgeLearned", label) or nil
+        if not message or message == ""
+            or message == "UI_PNC_KnowledgeLearned"
+        then message = "Learned: " .. label end
+        HaloTextHelper.addTextWithArrow(
+            player,
+            message,
+            true,
+            HaloTextHelper.getColorGreen()
+        )
+    end
+    return #facts
 end
 
 function Presentation.GetFact(snapshot, descriptorID)

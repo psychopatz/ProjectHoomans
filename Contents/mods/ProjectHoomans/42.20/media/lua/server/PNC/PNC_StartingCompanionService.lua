@@ -12,7 +12,7 @@ local Registry = PNC.Registry
 
 Starting.NextRetryAt = Starting.NextRetryAt or {}
 Starting.RETRY_DELAY_MS = 5000
-Starting.ENRICHMENT_VERSION = 2
+Starting.ENRICHMENT_VERSION = 3
 
 local function nowMs()
     return PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
@@ -85,10 +85,8 @@ local function makeNPCID(characterUUID, traitID)
         .. "_" .. safeID(traitID)
 end
 
-local function isFamily(spec)
-    local kind = spec and spec.relationshipKind
-    return kind == "brother" or kind == "sister"
-        or kind == "mother" or kind == "father"
+local function sharesSurname(spec)
+    return spec and spec.sharesSurname == true
 end
 
 local function buildIdentity(player, npcID, spec, isFemale, seed)
@@ -99,7 +97,7 @@ local function buildIdentity(player, npcID, spec, isFemale, seed)
         identitySeed = seed,
         archetypeID = "General",
     })
-    local surname = isFamily(spec) and playerSurname(player) or nil
+    local surname = sharesSurname(spec) and playerSurname(player) or nil
     if surname and identity then
         identity.survivor = identity.survivor or {}
         local forename = tostring(identity.survivor.forename or "")
@@ -115,8 +113,8 @@ local function buildIdentity(player, npcID, spec, isFemale, seed)
     return identity
 end
 
-local function applyFamilySurname(player, record, spec)
-    local surname = isFamily(spec) and playerSurname(player) or nil
+local function applySharedSurname(player, record, spec)
+    local surname = sharesSurname(spec) and playerSurname(player) or nil
     local identity = record and record.identity or nil
     if not surname or not identity then return false end
     identity.survivor = identity.survivor or {}
@@ -135,9 +133,26 @@ local function applyFamilySurname(player, record, spec)
     identity.displayName = forename .. " " .. surname
     record.name = identity.displayName
     if Registry.MarkDirty then
-        Registry.MarkDirty(record, "starting_companion_family_name")
+        Registry.MarkDirty(record, "starting_companion_shared_name")
     end
     return true
+end
+
+local function hasCanonicalAssignment(player, record)
+    if not ownerMatches(record, player)
+        or not PNC.Factions or not PNC.Factions.GetPlayerFaction
+        or not PNC.Factions.GetNPCAffiliation
+        or not PNC.Communities or not PNC.Communities.GetNPCCommunity
+    then return false end
+    local playerFaction = PNC.Factions.GetPlayerFaction(player)
+    local affiliation = PNC.Factions.GetNPCAffiliation(record.id)
+    if not playerFaction or not affiliation
+        or affiliation.factionID ~= playerFaction.id
+    then return false end
+    local community = PNC.Communities.GetNPCCommunity(record.id)
+    return community ~= nil
+        and community.status == "active"
+        and community.factionID == playerFaction.id
 end
 
 local function applyLifelongKnowledge(player, character, npcID, spec, at)
@@ -243,8 +258,8 @@ local function ensureOne(player, character, state, spec, index, at)
     if Registry.MarkDirty then
         Registry.MarkDirty(record, "starting_companion_relationship")
     end
-    local renamed = applyFamilySurname(player, record, spec)
-    if not ownerMatches(record, player) then
+    local renamed = applySharedSurname(player, record, spec)
+    if not hasCanonicalAssignment(player, record) then
         local assigned
         local reason
         assigned, reason = PNC.Recruitment.Assign(player, record, {
@@ -256,7 +271,7 @@ local function ensureOne(player, character, state, spec, index, at)
     end
     applyLifelongKnowledge(player, character, npcID, spec, at)
     if renamed and PNC.Network and PNC.Network.BroadcastRecord then
-        PNC.Network.BroadcastRecord(record, "starting_companion_family_name")
+        PNC.Network.BroadcastRecord(record, "starting_companion_shared_name")
     end
     state.grants[spec.id] = {
         status = "granted",
