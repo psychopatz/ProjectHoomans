@@ -14,7 +14,7 @@ local Const = PNC.Const
 local Equipment = PNC.Equipment
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
-local Damage = PNC.CombatDamage
+local Resolution = PNC.CombatResolution
 local Firearms = PNC.Firearms
 local Tactics = PNC.CombatTactics
 
@@ -111,8 +111,8 @@ function Combat.TryRanged(record, zombie, target)
         end
     end
 
-    if Damage and Damage.GetAttackDamage and Damage.IsWeaponDamageEnabled and Damage.IsWeaponDamageEnabled() then
-        damage = Damage.GetAttackDamage(record, "ranged", weaponItem, damage, aimingLevel)
+    if Resolution and Resolution.GetAttackDamage and Resolution.IsWeaponDamageEnabled and Resolution.IsWeaponDamageEnabled() then
+        damage = Resolution.GetAttackDamage(record, "ranged", weaponItem, damage, aimingLevel)
     else
         damage = damage * (0.9 + math.min(aimingLevel, 8) * 0.05)
     end

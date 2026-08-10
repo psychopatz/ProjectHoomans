@@ -1,4 +1,6 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+package.path = SHARED_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -109,7 +111,7 @@ PNC = {
 
 dofile(ROOT .. "Health/PNC_Health.lua")
 dofile(ROOT .. "Health/PNC_NPCWounds.lua")
-dofile(ROOT .. "Combat/PNC_Combat_Damage.lua")
+require "PNC/Core/Combat/CombatResolution/PNC_CombatResolution"
 
 local function makeRecord(id)
     return {
@@ -148,7 +150,7 @@ local targetBody = makeNPCBody()
 records[targetRecord.id] = targetRecord
 bodies[targetRecord.id] = targetBody
 
-local applied, reason, result = PNC.CombatDamage.ApplyTargetDamage(attacker, attackerBody, {
+local applied, reason, result = PNC.CombatResolution.ApplyTargetDamage(attacker, attackerBody, {
     kind = "npc",
     id = targetRecord.id,
 }, {
@@ -164,7 +166,7 @@ assertNear(targetRecord.health.current, 90, "NPC target overall health")
 assertNear(targetRecord.health.body.parts.Head.current, 80, "NPC target part health")
 assertEqual(targetRecord.health.body.wounds.Head.type, "laceration", "NPC target wound record")
 assertEqual(recordBroadcasts, 1, "NPC damage immediately synchronized")
-applied, reason = PNC.CombatDamage.ApplyTargetDamage(nil, nil, {
+applied, reason = PNC.CombatResolution.ApplyTargetDamage(nil, nil, {
     kind = "npc",
     id = targetRecord.id,
 }, {
@@ -203,7 +205,7 @@ local player = {
     getBodyDamage = function() return playerBodyDamage end,
     sendPlayerStatsPacket = function() playerPackets = playerPackets + 1 end,
 }
-applied, reason, result = PNC.CombatDamage.ApplyTargetDamage(attacker, attackerBody, {
+applied, reason, result = PNC.CombatResolution.ApplyTargetDamage(attacker, attackerBody, {
     kind = "player",
     player = player,
 }, {
@@ -233,7 +235,7 @@ PNC.CombatZombieReaction = {
         return true
     end,
 }
-applied, reason, result = PNC.CombatDamage.ApplyTargetDamage(attacker, attackerBody, {
+applied, reason, result = PNC.CombatResolution.ApplyTargetDamage(attacker, attackerBody, {
     kind = "zombie",
     worldObject = zombie,
 }, {
@@ -253,7 +255,7 @@ dyingRecord.health.downedAt = 0
 local dyingBody = makeNPCBody()
 records[dyingRecord.id] = dyingRecord
 bodies[dyingRecord.id] = dyingBody
-applied, reason = PNC.CombatDamage.ApplyTargetDamage(attacker, attackerBody, {
+applied, reason = PNC.CombatResolution.ApplyTargetDamage(attacker, attackerBody, {
     kind = "npc",
     id = dyingRecord.id,
 }, {
@@ -269,7 +271,7 @@ assertEqual(removals, 1, "NPC death immediately synchronized")
 
 authority = false
 local beforeHealth = targetRecord.health.current
-applied, reason = PNC.CombatDamage.ApplyTargetDamage(attacker, attackerBody, {
+applied, reason = PNC.CombatResolution.ApplyTargetDamage(attacker, attackerBody, {
     kind = "npc",
     id = targetRecord.id,
 }, {
@@ -281,4 +283,4 @@ assertEqual(applied, false, "client-only damage rejected")
 assertEqual(reason, "not_authority", "client-only rejection reason")
 assertEqual(targetRecord.health.current, beforeHealth, "client-only target unchanged")
 
-print("pnc_combat_damage_standardization_smoke: ok")
+print("pnc_combat_resolution_standardization_smoke: ok")

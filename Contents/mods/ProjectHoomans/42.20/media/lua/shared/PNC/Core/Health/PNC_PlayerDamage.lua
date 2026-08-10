@@ -177,9 +177,9 @@ function PlayerDamage.Apply(record, zombie, attacker, weapon, reportedDamage, so
         restoreEngineBuffer(zombie, record)
         return false, "invalid_damage"
     end
-    if PNC.CombatDamage and PNC.CombatDamage.ApplyTargetDamage then
+    if PNC.CombatResolution and PNC.CombatResolution.ApplyTargetDamage then
         usedCombatService = true
-        applied = PNC.CombatDamage.ApplyTargetDamage(nil, attacker, {
+        applied = PNC.CombatResolution.ApplyTargetDamage(nil, attacker, {
             kind = "npc",
             id = record.id,
         }, {

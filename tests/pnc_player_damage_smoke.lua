@@ -1,4 +1,6 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+package.path = SHARED_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -73,7 +75,7 @@ PNC = {
 dofile(ROOT .. "Base/PNC_Types.lua")
 dofile(ROOT .. "Health/PNC_Health.lua")
 dofile(ROOT .. "Health/PNC_NPCWounds.lua")
-dofile(ROOT .. "Combat/PNC_Combat_Damage.lua")
+require "PNC/Core/Combat/CombatResolution/PNC_CombatResolution"
 dofile(ROOT .. "Health/PNC_PlayerDamage.lua")
 
 assertEqual(PNC.Types.NormalizeFaction("colonist"), "colonist", "colonist faction")

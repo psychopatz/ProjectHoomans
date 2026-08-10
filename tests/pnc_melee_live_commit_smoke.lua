@@ -112,7 +112,7 @@ PNC = {
             return true
         end,
     },
-    CombatDamage = {
+    CombatResolution = {
         IsWeaponDamageEnabled = function() return false end,
     },
     CombatUnarmed = {

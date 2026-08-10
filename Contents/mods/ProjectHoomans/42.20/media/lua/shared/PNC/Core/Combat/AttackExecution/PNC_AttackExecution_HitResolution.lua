@@ -7,7 +7,7 @@ local Perception = PNC.Perception
 local Unarmed = PNC.CombatUnarmed
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
-local Damage = PNC.CombatDamage
+local Resolution = PNC.CombatResolution
 local FirearmEffects = PNC.FirearmEffects
 
 function Internal.applyAttackActionHit(record, zombie, action, target)
@@ -22,8 +22,8 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
         local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record) or nil
         local consumed
         local ammoReason
-        if Damage and Damage.ConsumeAmmo then
-            consumed, ammoReason = Damage.ConsumeAmmo(record, weaponItem)
+        if Resolution and Resolution.ConsumeAmmo then
+            consumed, ammoReason = Resolution.ConsumeAmmo(record, weaponItem)
             if not consumed then
                 return false, ammoReason or "out_of_ammo"
             end
@@ -62,8 +62,8 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
 
     if action.attackKind == "ground" or action.attackType == "melee" then
         if target.kind == "player" then
-            attackApplied, attackReason = Damage and Damage.ApplyTargetDamage
-                and Damage.ApplyTargetDamage(record, zombie, target, {
+            attackApplied, attackReason = Resolution and Resolution.ApplyTargetDamage
+                and Resolution.ApplyTargetDamage(record, zombie, target, {
                     damage = action.damage,
                     attackType = "melee",
                     attackKind = action.attackKind,
@@ -83,8 +83,8 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
             return false, attackReason or "invalid_player_target"
         end
         if target.kind == "npc" then
-            attackApplied, attackReason = Damage and Damage.ApplyTargetDamage
-                and Damage.ApplyTargetDamage(record, zombie, target, {
+            attackApplied, attackReason = Resolution and Resolution.ApplyTargetDamage
+                and Resolution.ApplyTargetDamage(record, zombie, target, {
                     damage = action.damage,
                     attackType = "melee",
                     attackKind = action.attackKind,
@@ -121,8 +121,8 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
 
     if action.attackType == "ranged" then
         if target.kind == "player" then
-            attackApplied, attackReason = Damage and Damage.ApplyTargetDamage
-                and Damage.ApplyTargetDamage(record, zombie, target, {
+            attackApplied, attackReason = Resolution and Resolution.ApplyTargetDamage
+                and Resolution.ApplyTargetDamage(record, zombie, target, {
                     damage = action.damage,
                     attackType = "ranged",
                     attackKind = action.attackKind,
@@ -142,8 +142,8 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
             return false, attackReason or "invalid_player_target"
         end
         if target.kind == "npc" then
-            attackApplied, attackReason = Damage and Damage.ApplyTargetDamage
-                and Damage.ApplyTargetDamage(record, zombie, target, {
+            attackApplied, attackReason = Resolution and Resolution.ApplyTargetDamage
+                and Resolution.ApplyTargetDamage(record, zombie, target, {
                     damage = action.damage,
                     attackType = "ranged",
                     attackKind = action.attackKind,

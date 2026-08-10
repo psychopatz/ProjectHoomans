@@ -3,20 +3,20 @@
 local Combat = PNC.Combat
 local Internal = Combat.Internal
 local AttackExecution = Internal.AttackExecution
-local Damage = PNC.CombatDamage
+local Resolution = PNC.CombatResolution
 
 function AttackExecution.applyWeaponWear(record)
     local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record) or nil
-    if Damage and Damage.ApplyWeaponConditionLoss then
-        Damage.ApplyWeaponConditionLoss(record, weaponItem)
+    if Resolution and Resolution.ApplyWeaponConditionLoss then
+        Resolution.ApplyWeaponConditionLoss(record, weaponItem)
     end
 end
 
 function Internal.applyDamageToZombie(record, attackerZombie, target, damage, attackType)
-    if not Damage or not Damage.ApplyTargetDamage then
+    if not Resolution or not Resolution.ApplyTargetDamage then
         return false, "damage_service_unavailable"
     end
-    return Damage.ApplyTargetDamage(record, attackerZombie, target, {
+    return Resolution.ApplyTargetDamage(record, attackerZombie, target, {
         damage = damage,
         attackType = attackType,
         attackKind = attackType,

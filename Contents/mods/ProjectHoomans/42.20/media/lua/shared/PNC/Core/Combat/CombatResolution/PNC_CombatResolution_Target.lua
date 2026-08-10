@@ -1,0 +1,54 @@
+local Resolution = PNC.CombatResolution
+local Core = PNC.Core
+
+function Resolution.ApplyTargetDamage(attackerRecord, attackerBody, target, options)
+    local registry = PNC.Registry
+    local hit
+    if Core and Core.IsAuthority and not Core.IsAuthority() then
+        return false, "not_authority"
+    end
+    if not target then return false, "missing_target" end
+    hit = Resolution.BuildHitEvent(attackerRecord, target, options)
+    if hit.amount <= 0 then return false, "invalid_damage", hit end
+    if target.kind == "player" then
+        local applied = Resolution.ApplyPlayerDamage(target.player, hit.amount, hit.attackType, hit.weaponItem, hit)
+        if applied == true
+            and attackerRecord
+            and PNC.Factions
+            and PNC.Factions.OnNPCAttackPlayer
+        then
+            local at = getGameTime and getGameTime()
+                and getGameTime().getWorldAgeHours
+                and getGameTime():getWorldAgeHours() or 0
+            PNC.Factions.OnNPCAttackPlayer(
+                attackerRecord,
+                target.player,
+                at,
+                {
+                    severe = hit.amount >= (
+                        PNC.FactionBalance
+                        and PNC.FactionBalance.Get(
+                            "severeAttackDamageThreshold"
+                        ) or 25
+                    ),
+                    damage = hit.amount,
+                    callback = "npc_attack_player",
+                    killed = target.player.isDead
+                        and target.player:isDead() == true,
+                }
+            )
+        end
+        return applied == true, applied == true and "hit_player" or "invalid_player_target", hit
+    end
+    if target.kind == "npc" then
+        local targetRecord = registry and registry.Get and registry.Get(target.id) or nil
+        local targetBody = registry and registry.GetLiveZombie and registry.GetLiveZombie(target.id) or nil
+        return Resolution.ApplyNPCDamage(targetRecord, targetBody, hit)
+    end
+    if target.kind == "zombie" then
+        return Resolution.ApplyZombieDamage(attackerRecord, attackerBody, target, hit)
+    end
+    return false, "unknown_target", hit
+end
+
+return Resolution

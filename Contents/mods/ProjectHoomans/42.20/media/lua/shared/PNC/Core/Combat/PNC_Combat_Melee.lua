@@ -16,7 +16,7 @@ local Perception = PNC.Perception
 local Unarmed = PNC.CombatUnarmed
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
-local Damage = PNC.CombatDamage
+local Resolution = PNC.CombatResolution
 local Tactics = PNC.CombatTactics
 
 function Combat.TryMelee(record, zombie, target)
@@ -85,8 +85,8 @@ function Combat.TryMelee(record, zombie, target)
         return false, "stamina_exhausted"
     end
 
-    if not isBarehand and Damage and Damage.GetAttackDamage and Damage.IsWeaponDamageEnabled and Damage.IsWeaponDamageEnabled() then
-        damage = Damage.GetAttackDamage(record, "melee", weaponItem, damage, skillLevel)
+    if not isBarehand and Resolution and Resolution.GetAttackDamage and Resolution.IsWeaponDamageEnabled and Resolution.IsWeaponDamageEnabled() then
+        damage = Resolution.GetAttackDamage(record, "melee", weaponItem, damage, skillLevel)
     else
         damage = damage * (0.9 + math.min(skillLevel, 8) * 0.04 + math.min(strengthLevel, 6) * 0.02)
     end
