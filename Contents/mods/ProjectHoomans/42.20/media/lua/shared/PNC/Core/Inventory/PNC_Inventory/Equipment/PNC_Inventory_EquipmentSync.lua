@@ -9,6 +9,7 @@ local Internal = Inventory.Internal
 function Inventory.SyncEquipmentFromInventory(record)
     local inv
     local previousWornVisuals
+    local previousPrimaryVisual
     local item
     local itemVisual
     local itemID
@@ -31,7 +32,34 @@ function Inventory.SyncEquipmentFromInventory(record)
             attached = {},
         })
     previousWornVisuals = record.equipment.wornVisuals or {}
+    previousPrimaryVisual = record.equipment.primaryVisual
     record.equipment.primaryFullType = fullTypeFor(inv.equipped.primary)
+    item = inv.equipped.primary
+        and inv.items
+        and inv.items[inv.equipped.primary] or nil
+    itemVisual = item
+        and PNC.Equipment
+        and PNC.Equipment.VisualStateFromItemState
+        and PNC.Equipment.VisualStateFromItemState(
+            item.itemState,
+            item.type
+        ) or nil
+    if itemVisual then
+        record.equipment.primaryVisual = itemVisual
+    elseif previousPrimaryVisual
+        and tostring(previousPrimaryVisual.fullType or "")
+            == tostring(record.equipment.primaryFullType or "")
+    then
+        record.equipment.primaryVisual = previousPrimaryVisual
+        if item and PNC.Equipment.StoreVisualStateInItemState then
+            PNC.Equipment.StoreVisualStateInItemState(
+                item,
+                previousPrimaryVisual
+            )
+        end
+    else
+        record.equipment.primaryVisual = nil
+    end
     record.equipment.secondaryFullType = fullTypeFor(inv.equipped.secondary)
     record.equipment.worn = {}
     record.equipment.wornVisuals = {}
@@ -77,6 +105,7 @@ function Inventory.SyncFromEquipment(record, reason)
     local preserved = {}
     local previousInv
     local promotedBackItem
+    local primaryItemID
     local function assignItem(slotType, slotValue, fullType)
         local item
         if not fullType then return end
@@ -127,7 +156,24 @@ function Inventory.SyncFromEquipment(record, reason)
     then
         promotedBackItem = assignItem("equip", "bag", equipment.attached.Back)
     end
-    if equipment.primaryFullType then assignItem("equip", "primary", equipment.primaryFullType) end
+    if equipment.primaryFullType then
+        primaryItemID = assignItem(
+            "equip",
+            "primary",
+            equipment.primaryFullType
+        )
+        if primaryItemID
+            and equipment.primaryVisual
+            and inv.items[primaryItemID]
+            and PNC.Equipment
+            and PNC.Equipment.StoreVisualStateInItemState
+        then
+            PNC.Equipment.StoreVisualStateInItemState(
+                inv.items[primaryItemID],
+                equipment.primaryVisual
+            )
+        end
+    end
     if equipment.secondaryFullType then assignItem("equip", "secondary", equipment.secondaryFullType) end
     for key, _ in pairs(equipment.worn or {}) do
         assignItem("worn", key, equipment.worn[key])

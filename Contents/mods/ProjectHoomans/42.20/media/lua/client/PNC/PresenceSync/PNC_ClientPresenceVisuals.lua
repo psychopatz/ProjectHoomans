@@ -160,6 +160,7 @@ local function buildRecordView(snapshot)
         appearance = snapshot and snapshot.appearance or nil,
         equipment = {
             primaryFullType = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.primaryFullType or nil,
+            primaryVisual = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.primaryVisual or nil,
             secondaryFullType = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.secondaryFullType or nil,
             worn = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.worn or {},
             wornVisuals = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.wornVisuals or {},
@@ -219,22 +220,44 @@ end
 Internal.EnsureReplicaClothingSnapshot =
     ensureReplicaClothingSnapshot
 
-local function stableTableSignature(tbl)
-    local keys = {}
-    local i = 0
+local function stableValueSignature(value, seen)
+    local valueType = type(value)
+    local entries
     local key
+    local entry
+    local i
+    if valueType ~= "table" then
+        return valueType .. ":" .. tostring(value)
+    end
+    if seen[value] then
+        return "table:<cycle>"
+    end
+    seen[value] = true
+    entries = {}
+    for key, _ in pairs(value) do
+        entries[#entries + 1] = {
+            key = key,
+            keySignature = type(key) .. ":" .. tostring(key),
+        }
+    end
+    table.sort(entries, function(left, right)
+        return left.keySignature < right.keySignature
+    end)
+    for i = 1, #entries do
+        entry = entries[i]
+        entries[i] = entry.keySignature
+            .. "="
+            .. stableValueSignature(value[entry.key], seen)
+    end
+    seen[value] = nil
+    return "table:{" .. table.concat(entries, ";") .. "}"
+end
+
+local function stableTableSignature(tbl)
     if type(tbl) ~= "table" then
         return ""
     end
-    for key, _ in pairs(tbl) do
-        i = i + 1
-        keys[i] = tostring(key)
-    end
-    table.sort(keys)
-    for i = 1, #keys do
-        keys[i] = keys[i] .. "=" .. tostring(tbl[keys[i]] or "")
-    end
-    return table.concat(keys, ";")
+    return stableValueSignature(tbl, {})
 end
 
 local function buildVisualKey(snapshot)
@@ -264,6 +287,7 @@ local function buildHandsKey(snapshot)
         tostring(snapshot and snapshot.liveBodyOnlineID or ""),
         tostring(snapshot and snapshot.attackMode == true),
         tostring(equipment.primaryFullType or ""),
+        stableTableSignature(equipment.primaryVisual),
         tostring(equipment.secondaryFullType or ""),
     }, "|")
 end

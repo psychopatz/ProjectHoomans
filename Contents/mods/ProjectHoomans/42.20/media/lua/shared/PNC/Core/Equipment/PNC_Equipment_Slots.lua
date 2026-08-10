@@ -157,6 +157,28 @@ local function normalizeVisualColor(source)
     }
 end
 
+local function normalizeVisualState(source, fullType)
+    local state = type(source) == "table" and source or nil
+    if not state or not fullType
+        or (
+            state.fullType ~= nil
+            and tostring(state.fullType) ~= tostring(fullType)
+        )
+    then
+        return nil
+    end
+    return {
+        fullType = tostring(fullType),
+        baseTexture = tonumber(state.baseTexture),
+        textureChoice = tonumber(state.textureChoice),
+        decal = normalizeString(state.decal),
+        tint = normalizeVisualColor(state.tint),
+        modelIndex = tonumber(state.modelIndex),
+        customColor = state.customColor == true,
+        color = normalizeVisualColor(state.color),
+    }
+end
+
 local function normalizeWornVisualMap(source, worn)
     local output = {}
     local location
@@ -169,20 +191,7 @@ local function normalizeWornVisualMap(source, worn)
         location = normalizeBodyLocation(rawLocation)
         state = type(rawState) == "table" and rawState or nil
         fullType = location and worn[location] or nil
-        if state and fullType
-            and (
-                state.fullType == nil
-                or tostring(state.fullType) == tostring(fullType)
-            )
-        then
-            output[location] = {
-                fullType = fullType,
-                baseTexture = tonumber(state.baseTexture),
-                textureChoice = tonumber(state.textureChoice),
-                decal = normalizeString(state.decal),
-                tint = normalizeVisualColor(state.tint),
-            }
-        end
+        output[location] = normalizeVisualState(state, fullType)
     end
     return output
 end
@@ -209,6 +218,10 @@ function Equipment.VisualStateFromItemState(itemState, fullType)
     if itemState.visualBaseTexture == nil
         and itemState.visualTextureChoice == nil
         and itemState.visualDecal == nil
+        and itemState.visualModelIndex == nil
+        and itemState.visualColorR == nil
+        and itemState.visualColorG == nil
+        and itemState.visualColorB == nil
         and tint == nil
     then
         return nil
@@ -220,6 +233,17 @@ function Equipment.VisualStateFromItemState(itemState, fullType)
         decal = itemState.visualDecal
             and tostring(itemState.visualDecal) or nil,
         tint = tint,
+        modelIndex = tonumber(itemState.visualModelIndex),
+        customColor = itemState.visualCustomColor == true,
+        color = itemState.visualColorR ~= nil
+            and itemState.visualColorG ~= nil
+            and itemState.visualColorB ~= nil
+            and {
+                r = tonumber(itemState.visualColorR) or 1,
+                g = tonumber(itemState.visualColorG) or 1,
+                b = tonumber(itemState.visualColorB) or 1,
+            }
+            or nil,
     }
 end
 
@@ -244,6 +268,15 @@ function Equipment.StoreVisualStateInItemState(item, visualState)
     state.visualTintR = tint and tonumber(tint.r) or nil
     state.visualTintG = tint and tonumber(tint.g) or nil
     state.visualTintB = tint and tonumber(tint.b) or nil
+    state.visualModelIndex = tonumber(visualState.modelIndex)
+    state.visualCustomColor = visualState.customColor == true
+        and true or nil
+    state.visualColorR = visualState.color
+        and tonumber(visualState.color.r) or nil
+    state.visualColorG = visualState.color
+        and tonumber(visualState.color.g) or nil
+    state.visualColorB = visualState.color
+        and tonumber(visualState.color.b) or nil
     return true
 end
 
@@ -287,8 +320,13 @@ end
 function Equipment.NormalizeLoadoutSpec(loadoutSpec)
     local source = type(loadoutSpec) == "table" and loadoutSpec or {}
     local worn = normalizeWornMap(source.worn)
+    local primaryFullType = normalizeString(source.primaryFullType)
     return {
-        primaryFullType = normalizeString(source.primaryFullType),
+        primaryFullType = primaryFullType,
+        primaryVisual = normalizeVisualState(
+            source.primaryVisual,
+            primaryFullType
+        ),
         secondaryFullType = normalizeString(source.secondaryFullType),
         worn = worn,
         wornVisuals = normalizeWornVisualMap(
@@ -317,11 +355,18 @@ end
 
 function Equipment.SetPrimary(record, fullType)
     local equipment
+    local previous
     if not record then
         return false
     end
     equipment = Equipment.EnsureRecordEquipment(record)
+    previous = equipment.primaryFullType
     equipment.primaryFullType = normalizeString(fullType)
+    if tostring(previous or "")
+        ~= tostring(equipment.primaryFullType or "")
+    then
+        equipment.primaryVisual = nil
+    end
     return true
 end
 
@@ -502,6 +547,7 @@ end
 
 local function visualStateSignature(state)
     local tint = state and state.tint or {}
+    local color = state and state.color or {}
     return table.concat({
         tostring(state and state.fullType or ""),
         tostring(state and state.baseTexture or ""),
@@ -510,6 +556,11 @@ local function visualStateSignature(state)
         tostring(tint.r or ""),
         tostring(tint.g or ""),
         tostring(tint.b or ""),
+        tostring(state and state.modelIndex or ""),
+        tostring(state and state.customColor == true),
+        tostring(color.r or ""),
+        tostring(color.g or ""),
+        tostring(color.b or ""),
     }, ":")
 end
 
@@ -517,40 +568,129 @@ function Equipment.CaptureItemVisualState(item, fullType)
     local visual
     local clothingItem
     local tint
+    local modelIndex
+    local customColor
+    local color
     if not item then return nil end
     visual = item.getVisual and item:getVisual() or nil
-    if not visual then return nil end
     clothingItem = item.getClothingItem
         and item:getClothingItem() or nil
-    tint = readVisualValue(
-        visual,
-        "getTint",
-        clothingItem
-    )
+    tint = visual and readVisualValue(
+        visual, "getTint", clothingItem
+    ) or nil
+    modelIndex = item.getModelIndex
+        and tonumber(item:getModelIndex()) or nil
+    customColor = item.isCustomColor
+        and item:isCustomColor() == true or false
+    if item.getColorRed
+        and item.getColorGreen
+        and item.getColorBlue
+    then
+        color = {
+            r = tonumber(item:getColorRed()),
+            g = tonumber(item:getColorGreen()),
+            b = tonumber(item:getColorBlue()),
+        }
+    end
     return {
         fullType = fullType
             or item.getFullType
                 and tostring(item:getFullType())
             or nil,
-        baseTexture = tonumber(readVisualValue(
-            visual,
-            "getBaseTexture"
-        )),
-        textureChoice = tonumber(readVisualValue(
-            visual,
-            "getTextureChoice"
-        )),
-        decal = readVisualValue(
-            visual,
-            "getDecal",
-            clothingItem
-        ),
+        baseTexture = visual and tonumber(readVisualValue(
+            visual, "getBaseTexture"
+        )) or nil,
+        textureChoice = visual and tonumber(readVisualValue(
+            visual, "getTextureChoice"
+        )) or nil,
+        decal = visual and readVisualValue(
+            visual, "getDecal", clothingItem
+        ) or nil,
         tint = tint and {
             r = tonumber(tint:getRedFloat()),
             g = tonumber(tint:getGreenFloat()),
             b = tonumber(tint:getBlueFloat()),
         } or nil,
+        modelIndex = modelIndex,
+        customColor = customColor,
+        color = color,
     }
+end
+
+function Equipment.BuildPrimaryVisualSummary(record)
+    local registry = PNC.Registry
+    local equipment = record
+        and Equipment.EnsureRecordEquipment(record) or nil
+    local inventory = record and record.inventory or nil
+    local itemID = inventory and inventory.equipped
+        and inventory.equipped.primary or nil
+    local inventoryItem = itemID and inventory.items
+        and inventory.items[itemID] or nil
+    local state = inventoryItem
+        and Equipment.VisualStateFromItemState(
+            inventoryItem.itemState,
+            inventoryItem.type
+        ) or equipment and equipment.primaryVisual or nil
+    local item
+    local body
+    local attachedItems
+    local entry
+    local attachedItem
+    local i
+    if state then
+        if equipment then equipment.primaryVisual = state end
+        return state
+    end
+    if not equipment or not equipment.primaryFullType then return nil end
+    body = registry and registry.GetLiveZombie
+        and registry.GetLiveZombie(record and record.id) or nil
+    item = body and body.getPrimaryHandItem
+        and body:getPrimaryHandItem() or nil
+    if item and item.getFullType
+        and tostring(item:getFullType() or "")
+            ~= tostring(equipment.primaryFullType)
+    then
+        item = nil
+    end
+    if not item and body and body.getAttachedItems then
+        attachedItems = body:getAttachedItems()
+        if attachedItems and attachedItems.size
+            and attachedItems.get
+        then
+            for i = 0, attachedItems:size() - 1 do
+                entry = attachedItems:get(i)
+                attachedItem = entry and entry.getItem
+                    and entry:getItem() or nil
+                if attachedItem
+                    and attachedItem.getFullType
+                    and tostring(attachedItem:getFullType() or "")
+                        == tostring(equipment.primaryFullType)
+                then
+                    item = attachedItem
+                    break
+                end
+            end
+        end
+    end
+    if not item then
+        item = Equipment.CreateItem(equipment.primaryFullType)
+    end
+    state = Equipment.CaptureItemVisualState(
+        item,
+        equipment.primaryFullType
+    )
+    if not state then return nil end
+    equipment.primaryVisual = state
+    if inventoryItem then
+        Equipment.StoreVisualStateInItemState(
+            inventoryItem,
+            state
+        )
+    end
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "equipment_visuals")
+    end
+    return state
 end
 
 -- Capture the concrete visual choices of the server's real worn inventory.

@@ -356,12 +356,64 @@ function LiveBodyControl.SuppressVanillaIntent(
     return true
 end
 
+local function hasBumpActionLease(zombie, now)
+    local modData = zombie
+        and zombie.getModData
+        and zombie:getModData()
+        or nil
+    now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
+    return modData
+        and modData.PNC_BumpActionLease == true
+        and now <= (
+            tonumber(modData.PNC_BumpActionLeaseUntil)
+                or now
+        )
+        or false
+end
+
+local function applyActionLeaseSafeguards(zombie, modData)
+    local descriptor
+    clearVanillaIntent(zombie)
+    if zombie.setVariable then
+        zombie:setVariable("NoLungeTarget", true)
+        zombie:setVariable("NoLungeAttack", true)
+        zombie:setVariable("PNCLive", true)
+    end
+    if zombie.setNoTeeth then
+        zombie:setNoTeeth(true)
+    end
+    if zombie.setReanimatedForGrappleOnly then
+        zombie:setReanimatedForGrappleOnly(false)
+    end
+    if zombie.getDescriptor then
+        descriptor = zombie:getDescriptor()
+        if descriptor and descriptor.setVoicePrefix then
+            descriptor:setVoicePrefix("NotAZombie")
+        end
+    end
+    LiveBodyControl.SetManagedBodyUseless(
+        zombie,
+        modData and modData.PNC_BumpKeepUseless == true,
+        not modData or modData.PNC_BumpKeepUseless ~= true
+    )
+end
+
 function LiveBodyControl.ApplyHumanizedBodyFlags(
     zombie,
     keepEngineMovementActive
 )
     local descriptor
+    local modData
     if not zombie then
+        return
+    end
+    modData = zombie.getModData and zombie:getModData() or nil
+    if hasBumpActionLease(zombie) then
+        -- This function has several callers outside the regular maintenance
+        -- pass (notably fake locomotion). Make the protection central: prone,
+        -- fall, crawler, and bump setters can eject BumpedState on the exact
+        -- frame a PNC melee clip enters it.
+        applyActionLeaseSafeguards(zombie, modData)
         return
     end
     if PNC.AnimationTrace and PNC.AnimationTrace.Sample then
@@ -485,49 +537,20 @@ function LiveBodyControl.MaintainHumanizedBody(
     now,
     keepEngineMovementActive
 )
-    local descriptor
     local modData
     local nextAudioAt
     local actionLeaseActive
     if not zombie then return false end
     now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
     modData = zombie.getModData and zombie:getModData() or nil
-    actionLeaseActive = modData
-        and modData.PNC_BumpActionLease == true
-        and now <= (
-            tonumber(modData.PNC_BumpActionLeaseUntil)
-                or now
-        )
-        or false
+    actionLeaseActive = hasBumpActionLease(zombie, now)
     if actionLeaseActive then
         -- During a PNC special action, do not repeatedly write prone, crawler,
         -- fall, or usefulness setters. Those setters are appropriate while
         -- repairing an idle zombie shell, but can make BumpedState exit on the
         -- very frame its XML node is selected. Keep only safeguards that do
         -- not own the action graph.
-        clearVanillaIntent(zombie)
-        if zombie.setVariable then
-            zombie:setVariable("NoLungeTarget", true)
-            zombie:setVariable("NoLungeAttack", true)
-            zombie:setVariable("PNCLive", true)
-        end
-        if zombie.setNoTeeth then
-            zombie:setNoTeeth(true)
-        end
-        if zombie.setReanimatedForGrappleOnly then
-            zombie:setReanimatedForGrappleOnly(false)
-        end
-        if zombie.getDescriptor then
-            descriptor = zombie:getDescriptor()
-            if descriptor and descriptor.setVoicePrefix then
-                descriptor:setVoicePrefix("NotAZombie")
-            end
-        end
-        LiveBodyControl.SetManagedBodyUseless(
-            zombie,
-            modData.PNC_BumpKeepUseless == true,
-            modData.PNC_BumpKeepUseless ~= true
-        )
+        applyActionLeaseSafeguards(zombie, modData)
     else
         LiveBodyControl.ApplyHumanizedBodyFlags(
             zombie,
@@ -601,6 +624,8 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local npcId
     local record
     local keepEngineMovementActive
+    local now
+    local actionLeaseActive
     if not zombie or not Core or not Core.IsManagedNPCBody
         or not Core.IsManagedNPCBody(zombie)
     then
@@ -611,8 +636,10 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     end
     -- Native movement and bumped action leases temporarily keep the body
     -- useful so Java can advance their action states.
+    now = Core.Now and Core.Now() or 0
     keepEngineMovementActive =
         LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
+    actionLeaseActive = hasBumpActionLease(zombie, now)
     hadTarget = zombie.getTarget and zombie:getTarget() ~= nil or false
     wasUseless = zombie.isUseless and zombie:isUseless() or false
     hadTeeth = zombie.isNoTeeth and not zombie:isNoTeeth() or false
@@ -620,7 +647,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         and zombie:isReanimatedForGrappleOnly() or false
     LiveBodyControl.MaintainHumanizedBody(
         zombie,
-        Core.Now and Core.Now() or 0,
+        now,
         keepEngineMovementActive
     )
     actionState = LiveBodyControl.GetActionStateName(zombie)
@@ -629,12 +656,13 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     -- presentation ownership; that graph has no PNC walk nodes and produces
     -- Bob_Idle sliding while fake locomotion continues.
     if not keepEngineMovementActive
+        and not actionLeaseActive
         and LiveBodyControl.IsSuppressedActionState(actionState)
     then
         LiveBodyControl.SuppressZombieState(
             zombie,
             nil,
-            Core.Now and Core.Now() or 0
+            now
         )
     end
     if (

@@ -177,9 +177,12 @@ assertEqual(
 )
 
 local weapon = {
+    modelIndex = 1,
     IsWeapon = function() return true end,
     isRequiresEquippedBothHands = function() return false end,
     getAttachmentType = function() return "BigWeapon" end,
+    getModelIndex = function(self) return self.modelIndex end,
+    setModelIndex = function(self, value) self.modelIndex = value end,
 }
 PNC.Equipment.CreateItem = function()
     return weapon, "test_item"
@@ -225,11 +228,16 @@ local applied = PNC.Equipment.ApplyHands(zombie, record)
 assertEqual(applied, true, "idle equipment apply")
 assertEqual(zombie.primary, nil, "idle primary hand cleared")
 assertEqual(zombie.attached.Back, weapon, "idle primary implicitly holstered")
+assertEqual(record.equipment.primaryVisual.modelIndex, 1,
+    "primary weapon model variant was not captured")
 
 record.runtime = { target = { kind = "zombie" } }
+weapon.modelIndex = 0
 applied = PNC.Equipment.ApplyCombatState(zombie, record, true)
 assertEqual(applied, true, "combat equipment apply")
 assertEqual(zombie.primary, weapon, "combat primary hand")
+assertEqual(weapon.modelIndex, 1,
+    "new primary weapon ignored its persisted model variant")
 assertEqual(zombie.attached.Back, nil, "combat holster cleared")
 
 zombie.primary = nil
@@ -377,6 +385,8 @@ local replicaVisualClears = 0
 local replicaWornClears = 0
 local replicaVisualTypes = {}
 local replicaModData = {}
+local replicaPrimarySets = 0
+local replicaSecondarySets = 0
 local replicaZombie = {
     visualTypes = replicaVisualTypes,
     setVariable = function(_, key, value)
@@ -385,15 +395,22 @@ local replicaZombie = {
     setWornItem = function()
         error("replica touched worn-item packets")
     end,
-    setAttachedItem = function()
-        error("replica touched attached-item packets")
+    setAttachedItem = function(self, location, item)
+        self.attached = self.attached or {}
+        self.attached[location] = item
     end,
-    setPrimaryHandItem = function()
-        error("replica touched primary-hand packets")
+    setPrimaryHandItem = function(self, item)
+        self.primary = item
+        replicaPrimarySets = replicaPrimarySets + 1
     end,
-    setSecondaryHandItem = function()
-        error("replica touched secondary-hand packets")
+    getPrimaryHandItem = function(self)
+        return self.primary
     end,
+    setSecondaryHandItem = function(self, item)
+        self.secondary = item
+        replicaSecondarySets = replicaSecondarySets + 1
+    end,
+    resetEquippedHandsModels = function() end,
     getItemVisuals = function()
         return {
             clear = function()
@@ -476,6 +493,27 @@ assertEqual(
     "Base.Torch",
     "replica secondary animation variable"
 )
+assertEqual(replicaZombie.primary, weapon,
+    "client replica did not materialize its primary hand model")
+assertEqual(replicaZombie.secondary, weapon,
+    "client replica did not materialize its secondary hand model")
+assertEqual(replicaPrimarySets, 2,
+    "unchanged replica primary hand was rebuilt per update")
+assertEqual(replicaSecondarySets, 2,
+    "unchanged replica secondary hand was rebuilt per update")
+replicaZombie.primary = nil
+assertEqual(
+    PNC.Equipment.ApplyReplicaHands(
+        replicaZombie,
+        replicaRecord
+    ),
+    true,
+    "discarded replica hand model repair"
+)
+assertEqual(replicaZombie.primary, weapon,
+    "replica hand latch did not repair an engine-discarded model")
+assertEqual(replicaPrimarySets, 4,
+    "replica hand repair did not perform exactly one rebuild")
 assertEqual(replicaVisualClears, 1,
     "replica did not repair exactly one missing visual set")
 assertEqual(replicaWornClears, 0,

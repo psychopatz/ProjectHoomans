@@ -246,4 +246,69 @@ assertEqual(calls.authoritativeEquipment, 1,
 assertEqual(calls.liveSetup, 1,
     "authoritative live setup changed")
 
+local firstNestedVisualSnapshot = {
+    equipmentSummary = {
+        worn = { Hat = "Base.Hat_Beany" },
+        wornVisuals = {
+            Hat = {
+                fullType = "Base.Hat_Beany",
+                baseTexture = 2,
+                textureChoice = 4,
+                tint = { r = 0.2, g = 0.3, b = 0.4 },
+            },
+        },
+        attached = {},
+    },
+}
+local secondNestedVisualSnapshot = {
+    equipmentSummary = {
+        worn = { Hat = "Base.Hat_Beany" },
+        wornVisuals = {
+            Hat = {
+                fullType = "Base.Hat_Beany",
+                baseTexture = 2,
+                textureChoice = 4,
+                tint = { r = 0.2, g = 0.3, b = 0.4 },
+            },
+        },
+        attached = {},
+    },
+}
+local firstNestedVisualKey =
+    PNC.ClientPresenceSync.Internal.BuildVisualKey(
+        firstNestedVisualSnapshot
+    )
+assertEqual(
+    PNC.ClientPresenceSync.Internal.BuildVisualKey(
+        secondNestedVisualSnapshot
+    ),
+    firstNestedVisualKey,
+    "equivalent decoded visual tables changed the presentation key"
+)
+snapshot.equipmentSummary.wornVisuals =
+    firstNestedVisualSnapshot.equipmentSummary.wornVisuals
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    snapshot,
+    localBody,
+    false
+)
+assertEqual(calls.authoritativeEquipment, 2,
+    "first persisted worn visual was not applied")
+snapshot.equipmentSummary.wornVisuals =
+    secondNestedVisualSnapshot.equipmentSummary.wornVisuals
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    snapshot,
+    localBody,
+    false
+)
+assertEqual(calls.authoritativeEquipment, 2,
+    "single-player rebuilt equivalent decoded item visuals")
+secondNestedVisualSnapshot.equipmentSummary
+    .wornVisuals.Hat.tint.g = 0.8
+if PNC.ClientPresenceSync.Internal.BuildVisualKey(
+    secondNestedVisualSnapshot
+) == firstNestedVisualKey then
+    error("real nested tint change did not invalidate presentation")
+end
+
 print("pnc_mp_replica_visual_ownership_smoke: ok")

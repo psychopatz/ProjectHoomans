@@ -26,6 +26,11 @@ local ITEM_STATE_SCALAR_FIELDS = {
     "visualTintG",
     "visualTintB",
     "visualFullType",
+    "visualModelIndex",
+    "visualCustomColor",
+    "visualColorR",
+    "visualColorG",
+    "visualColorB",
 }
 
 local function boundedString(value)

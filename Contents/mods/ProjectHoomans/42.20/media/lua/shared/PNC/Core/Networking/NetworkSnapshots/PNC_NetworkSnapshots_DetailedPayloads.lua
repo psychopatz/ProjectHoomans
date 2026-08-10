@@ -154,6 +154,10 @@ function Network.BuildSnapshot(record)
         mapPresentation = buildMapPresentationSummary(record),
         equipmentSummary = {
             primaryFullType = record.equipment and record.equipment.primaryFullType or nil,
+            primaryVisual = Equipment
+                and Equipment.BuildPrimaryVisualSummary
+                and Equipment.BuildPrimaryVisualSummary(record)
+                or nil,
             secondaryFullType = record.equipment and record.equipment.secondaryFullType or nil,
             worn = Core.DeepCopy(record.equipment and record.equipment.worn or {}),
             wornVisuals = Equipment

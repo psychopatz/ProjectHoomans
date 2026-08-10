@@ -72,6 +72,11 @@ local managedBody = {
     isAlive = function() return true end,
     isDead = function() return false end,
     getActionStateName = function() return actionState end,
+    setBumpFall = function(_, value)
+        if value == false and actionState == "bumped" then
+            actionState = "idle"
+        end
+    end,
     changeState = function()
         actionState = "idle"
     end,
@@ -138,6 +143,19 @@ assertEqual(
     uselessWrites,
     writesBeforeActionMaintenance,
     "active animation lease repeated setUseless and reset ActionContext"
+)
+actionState = "bumped"
+PNC.LiveBodyControl.ApplyHumanizedBodyFlags(managedBody)
+assertEqual(
+    actionState,
+    "bumped",
+    "direct humanization cancelled an active PNC action lease"
+)
+zombieUpdateHandler(managedBody)
+assertEqual(
+    actionState,
+    "bumped",
+    "managed safety suppressed the active PNC melee action"
 )
 modData.PNC_BumpActionLease = nil
 modData.PNC_BumpActionLeaseUntil = nil

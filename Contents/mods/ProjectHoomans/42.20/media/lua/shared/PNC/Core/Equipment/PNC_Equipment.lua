@@ -9,7 +9,7 @@ local resolvePrimaryType
 local resolveModeFromPrimaryType
 
 Equipment.DescriptorCache = Equipment.DescriptorCache or {}
-Equipment.PRESENTATION_REVISION = 2
+Equipment.PRESENTATION_REVISION = 3
 
 local function isNetworkedGame()
     return (isClient and isClient() == true)
@@ -253,11 +253,37 @@ end
 
 local function applyItemVisualState(item, visualState)
     local visual
+    local applied = false
     if not item or type(visualState) ~= "table" then
         return false
     end
+    if visualState.modelIndex ~= nil
+        and item.setModelIndex
+    then
+        item:setModelIndex(
+            math.floor(tonumber(visualState.modelIndex) or -1)
+        )
+        applied = true
+    end
+    if visualState.color then
+        if item.setColorRed then
+            item:setColorRed(tonumber(visualState.color.r) or 1)
+            applied = true
+        end
+        if item.setColorGreen then
+            item:setColorGreen(tonumber(visualState.color.g) or 1)
+            applied = true
+        end
+        if item.setColorBlue then
+            item:setColorBlue(tonumber(visualState.color.b) or 1)
+            applied = true
+        end
+        if item.setCustomColor then
+            item:setCustomColor(visualState.customColor == true)
+        end
+    end
     visual = item.getVisual and item:getVisual() or nil
-    if not visual then return false end
+    if not visual then return applied end
     if visualState.baseTexture ~= nil
         and visual.setBaseTexture
     then
@@ -291,6 +317,7 @@ end
 
 local function visualStateSignature(state)
     local tint = state and state.tint or {}
+    local color = state and state.color or {}
     return table.concat({
         tostring(state and state.fullType or ""),
         tostring(state and state.baseTexture or ""),
@@ -299,6 +326,11 @@ local function visualStateSignature(state)
         tostring(tint.r or ""),
         tostring(tint.g or ""),
         tostring(tint.b or ""),
+        tostring(state and state.modelIndex or ""),
+        tostring(state and state.customColor == true),
+        tostring(color.r or ""),
+        tostring(color.g or ""),
+        tostring(color.b or ""),
     }, ":")
 end
 
@@ -306,8 +338,51 @@ local function applyPrimaryInventoryState(item, record)
     local inventory = record and record.inventory or nil
     local itemID = inventory and inventory.equipped and inventory.equipped.primary or nil
     local state = itemID and inventory.items and inventory.items[itemID] or nil
+    local equipment = record
+        and Equipment.EnsureRecordEquipment(record) or nil
+    local storedVisual = state
+        and Equipment.VisualStateFromItemState
+        and Equipment.VisualStateFromItemState(
+            state.itemState,
+            state.type
+        ) or equipment and equipment.primaryVisual or nil
+    local capturedVisual
+    local visualChanged = false
     local maximum
-    if not item or not state then return item end
+    if not item then return item end
+    if storedVisual then
+        applyItemVisualState(item, storedVisual)
+    end
+    capturedVisual = Equipment.CaptureItemVisualState
+        and Equipment.CaptureItemVisualState(
+            item,
+            equipment and equipment.primaryFullType or nil
+        ) or nil
+    if capturedVisual and state
+        and Equipment.StoreVisualStateInItemState
+        and visualStateSignature(storedVisual)
+            ~= visualStateSignature(capturedVisual)
+    then
+        Equipment.StoreVisualStateInItemState(
+            state,
+            capturedVisual
+        )
+        visualChanged = true
+    end
+    if capturedVisual and equipment
+        and visualStateSignature(equipment.primaryVisual)
+            ~= visualStateSignature(capturedVisual)
+    then
+        equipment.primaryVisual = capturedVisual
+        visualChanged = true
+    end
+    if visualChanged
+        and PNC.Registry
+        and PNC.Registry.MarkDirty
+    then
+        PNC.Registry.MarkDirty(record, "equipment_visuals")
+    end
+    if not state then return item end
     maximum = item.getConditionMax and tonumber(item:getConditionMax()) or 0
     if state.cond ~= nil and item.setCondition then
         item:setCondition(math.max(0, math.min(
@@ -479,7 +554,12 @@ local function applyWornItems(zombie, equipment, record)
     return true, "worn:" .. tostring(appliedCount)
 end
 
-local function applyAttachedItems(zombie, equipment, implicitHolsterFullType)
+local function applyAttachedItems(
+    zombie,
+    equipment,
+    implicitHolsterFullType,
+    activeHandFullType
+)
     local entries = Equipment.GetOrderedAttachedEntries(equipment)
     local appliedCount = 0
     local failureCount = 0
@@ -500,28 +580,50 @@ local function applyAttachedItems(zombie, equipment, implicitHolsterFullType)
 
     for i = 1, #entries do
         entry = entries[i]
-        occupiedLocations[entry.location] = true
-        if implicitHolsterFullType and entry.fullType == implicitHolsterFullType then
-            alreadyAttached = true
-        end
-        item, createReason = Equipment.CreateItem(entry.fullType)
-        if item then
-            ok, errorMessage = safeInvoke(zombie, "setAttachedItem", entry.location, item)
-            if ok then
-                if item.setAttachedToModel then
-                    item:setAttachedToModel(entry.location)
+        -- A weapon can remain in the synchronized attached-slot map while it
+        -- is actively held. Do not render the same item on the back and in the
+        -- hand at once; the hand presentation owns it until combat ends.
+        if not activeHandFullType
+            or entry.fullType ~= activeHandFullType
+        then
+            occupiedLocations[entry.location] = true
+            if implicitHolsterFullType
+                and entry.fullType == implicitHolsterFullType
+            then
+                alreadyAttached = true
+            end
+            item, createReason = Equipment.CreateItem(entry.fullType)
+            if item then
+                if entry.fullType == equipment.primaryFullType
+                    and equipment.primaryVisual
+                then
+                    applyItemVisualState(
+                        item,
+                        equipment.primaryVisual
+                    )
                 end
-                if item.setAttachedSlotType and entry.slotType then
-                    item:setAttachedSlotType(entry.slotType)
+                ok, errorMessage = safeInvoke(
+                    zombie,
+                    "setAttachedItem",
+                    entry.location,
+                    item
+                )
+                if ok then
+                    if item.setAttachedToModel then
+                        item:setAttachedToModel(entry.location)
+                    end
+                    if item.setAttachedSlotType and entry.slotType then
+                        item:setAttachedSlotType(entry.slotType)
+                    end
+                    appliedCount = appliedCount + 1
+                else
+                    failureCount = failureCount + 1
+                    Core.LogWarn("PNC equipment failed to attach " .. tostring(entry.fullType) .. " at " .. tostring(entry.location) .. ": " .. tostring(errorMessage))
                 end
-                appliedCount = appliedCount + 1
             else
                 failureCount = failureCount + 1
-                Core.LogWarn("PNC equipment failed to attach " .. tostring(entry.fullType) .. " at " .. tostring(entry.location) .. ": " .. tostring(errorMessage))
+                Core.LogWarn("PNC equipment could not create attached item " .. tostring(entry.fullType) .. ": " .. tostring(createReason))
             end
-        else
-            failureCount = failureCount + 1
-            Core.LogWarn("PNC equipment could not create attached item " .. tostring(entry.fullType) .. ": " .. tostring(createReason))
         end
     end
 
@@ -530,6 +632,12 @@ local function applyAttachedItems(zombie, equipment, implicitHolsterFullType)
         local holsterSlotType
         item, createReason = Equipment.CreateItem(implicitHolsterFullType)
         if item then
+            if equipment.primaryVisual then
+                applyItemVisualState(
+                    item,
+                    equipment.primaryVisual
+                )
+            end
             holsterLocation, holsterSlotType = Equipment.ResolveAttachedLocation(
                 item,
                 nil,
@@ -591,6 +699,8 @@ local function applyHands(zombie, record, equipment, descriptor, attackMode)
         return false, descriptor.weaponStatus
     end
 
+    applyPrimaryInventoryState(item, record)
+
     if attackMode ~= true then
         setEquipmentVariables(
             zombie,
@@ -601,7 +711,6 @@ local function applyHands(zombie, record, equipment, descriptor, attackMode)
         return true, descriptor.weaponStatus .. ":holstered"
     end
 
-    applyPrimaryInventoryState(item, record)
     primaryType = descriptor.primaryType
     ok, errorMessage = safeInvoke(zombie, "setPrimaryHandItem", item)
     if not ok then
@@ -648,10 +757,16 @@ local function applyCombatPresentation(zombie, record, equipment, descriptor, at
     if attackMode ~= true then
         holsterFullType = descriptor.fullType
     end
+    if descriptor.item then
+        -- Establish the inventory-owned variant before a separate holster
+        -- presentation item is constructed below.
+        applyPrimaryInventoryState(descriptor.item, record)
+    end
     attachedOk, attachedReason = applyAttachedItems(
         zombie,
         equipment,
-        holsterFullType
+        holsterFullType,
+        attackMode == true and descriptor.fullType or nil
     )
     handsOk, handsReason = applyHands(zombie, record, equipment, descriptor, attackMode)
 
@@ -901,10 +1016,21 @@ Equipment.EnsureReplicaVisuals =
 function Equipment.ApplyReplicaHands(zombie, record)
     local equipment
     local descriptor
+    local attackMode
+    local handStateCurrent
+    local attachedEntries
+    local signatureParts
+    local signature
+    local modData
+    local ok
+    local attachedReason
+    local handsReason
+    local i
     if not zombie or not record then
         return false, "missing_body_or_record"
     end
     equipment = Equipment.EnsureRecordEquipment(record)
+    attackMode = isAttackMode(record)
     descriptor = buildWeaponDescriptor(
         equipment.primaryFullType,
         false
@@ -915,7 +1041,71 @@ function Equipment.ApplyReplicaHands(zombie, record)
         descriptor.fullType,
         equipment.secondaryFullType
     )
-    return true, "replica_variables"
+
+    -- The server remains the authority for inventory and equipped slots. It
+    -- publishes only the animation variables here; materializing InventoryItem
+    -- instances on the server would compete with normal item packets.
+    if isServer and isServer() == true then
+        return true, "replica_variables_server"
+    end
+
+    if not equipment.primaryVisual
+        and equipment.primaryFullType
+        and Equipment.BuildPrimaryVisualSummary
+    then
+        Equipment.BuildPrimaryVisualSummary(record)
+        equipment = Equipment.EnsureRecordEquipment(record)
+    end
+
+    -- Remote IsoZombie bodies do not receive a usable primary-hand item from
+    -- our virtual inventory snapshots. Like Bandits, create that item locally
+    -- for presentation. Latch the synchronized state so the update loop does
+    -- not clear/recreate hand and attachment models every frame.
+    signatureParts = {
+        tostring(equipment.primaryFullType or ""),
+        visualStateSignature(equipment.primaryVisual),
+        tostring(equipment.secondaryFullType or ""),
+        attackMode and "attack" or "idle",
+    }
+    attachedEntries = Equipment.GetOrderedAttachedEntries(equipment)
+    for i = 1, #attachedEntries do
+        signatureParts[#signatureParts + 1] = table.concat({
+            tostring(attachedEntries[i].location or ""),
+            tostring(attachedEntries[i].fullType or ""),
+            tostring(attachedEntries[i].slotType or ""),
+        }, "=")
+    end
+    signature = table.concat(signatureParts, "|")
+    modData = zombie.getModData and zombie:getModData() or nil
+    handStateCurrent = isPrimaryHandStateCurrent(
+        zombie,
+        descriptor,
+        attackMode
+    )
+    if modData
+        and modData.PNCReplicaHandsSignature == signature
+        and handStateCurrent == true
+    then
+        return true, "replica_hands_current"
+    end
+
+    descriptor = buildWeaponDescriptor(
+        equipment.primaryFullType,
+        true
+    )
+    ok, attachedReason, handsReason = applyCombatPresentation(
+        zombie,
+        record,
+        equipment,
+        descriptor,
+        attackMode
+    )
+    Visuals.RefreshModel(zombie)
+    if ok and modData then
+        modData.PNCReplicaHandsSignature = signature
+    end
+    return ok,
+        tostring(attachedReason) .. "|" .. tostring(handsReason)
 end
 
 function Equipment.IsAttackMode(record)
