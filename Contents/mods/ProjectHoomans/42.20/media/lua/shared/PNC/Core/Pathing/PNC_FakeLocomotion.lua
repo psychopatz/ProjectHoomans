@@ -247,7 +247,14 @@ function FakeLocomotion.PrepareBody(zombie, lane, now)
     if not zombie then
         return
     end
-    if LiveBodyControl and LiveBodyControl.ApplyHumanizedBodyFlags then
+    if LiveBodyControl and LiveBodyControl.MaintainHumanizedBody then
+        LiveBodyControl.MaintainHumanizedBody(
+            zombie,
+            now,
+            false,
+            false
+        )
+    elseif LiveBodyControl and LiveBodyControl.ApplyHumanizedBodyFlags then
         LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
     end
     if LiveBodyControl and LiveBodyControl.TrySilenceEmitter then

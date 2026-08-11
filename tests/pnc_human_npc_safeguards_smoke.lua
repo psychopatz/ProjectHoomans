@@ -37,6 +37,7 @@ local actionState = "idle"
 local modData = { PNC_NPC = true }
 local managedRecord
 local nativeFramePumps = 0
+local registryFindCalls = 0
 local emitter = {
     stopSoundByName = function(_, name)
         stopped[#stopped + 1] = name
@@ -97,6 +98,7 @@ PNC = {
     },
     Registry = {
         FindRecordByZombie = function()
+            registryFindCalls = registryFindCalls + 1
             return managedRecord
         end,
     },
@@ -119,6 +121,15 @@ Events = {
 
 dofile(LIVE_BODY_FILE)
 
+zombieUpdateHandler({
+    getModData = function() return {} end,
+})
+assertEqual(
+    registryFindCalls,
+    0,
+    "ordinary zombie update reached the managed NPC registry"
+)
+
 assertEqual(PNC.LiveBodyControl.SuppressZombieSounds(managedBody), true,
     "specific zombie channels suppressed")
 assertEqual(voicePrefix, "NotAZombie", "human voice prefix")
@@ -129,10 +140,21 @@ assertEqual(useless, true, "humanized useless flag reasserted")
 assertEqual(noTeeth, true, "humanized no-teeth fail-safe reasserted")
 assertEqual(vanillaTarget, nil, "humanized vanilla target cleared")
 assertEqual(#stopped, 12, "first maintenance suppresses voices")
+local writesAfterInitialMaintenance = uselessWrites
 PNC.LiveBodyControl.MaintainHumanizedBody(managedBody, 1100)
 assertEqual(#stopped, 12, "voice suppression is cadence bounded")
+assertEqual(
+    uselessWrites,
+    writesAfterInitialMaintenance,
+    "body safety rewrote Java flags before maintenance was due"
+)
 PNC.LiveBodyControl.MaintainHumanizedBody(managedBody, 1300)
 assertEqual(#stopped, 18, "voice suppression repeats after cooldown")
+assertEqual(
+    uselessWrites,
+    writesAfterInitialMaintenance,
+    "audio cadence triggered a full body safety rewrite"
+)
 
 modData.PNC_BumpActionLease = true
 modData.PNC_BumpActionLeaseUntil = 2000

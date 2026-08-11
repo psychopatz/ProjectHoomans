@@ -12,7 +12,10 @@ local LiveBodyControl = PNC.LiveBodyControl
 local Core = PNC.Core
 
 local SUPPRESSION_AUDIO_COOLDOWN_MS = 250
+local BODY_MAINTENANCE_INTERVAL_MS = 500
 local NEXT_AUDIO_SUPPRESSION_AT = setmetatable({}, { __mode = "k" })
+local NEXT_BODY_MAINTENANCE_AT = setmetatable({}, { __mode = "k" })
+local LAST_KEEP_ENGINE_ACTIVE = setmetatable({}, { __mode = "k" })
 local SAFETY_REPAIR_LOGGED = setmetatable({}, { __mode = "k" })
 local NATIVE_MOVEMENT_LEASE_KEY = "PNC_NativeMovementLease"
 local NATIVE_MOVEMENT_LEASE_UNTIL_KEY =
@@ -535,27 +538,41 @@ end
 function LiveBodyControl.MaintainHumanizedBody(
     zombie,
     now,
-    keepEngineMovementActive
+    keepEngineMovementActive,
+    force
 )
     local modData
     local nextAudioAt
+    local nextMaintenanceAt
     local actionLeaseActive
     if not zombie then return false end
     now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
     modData = zombie.getModData and zombie:getModData() or nil
     actionLeaseActive = hasBumpActionLease(zombie, now)
-    if actionLeaseActive then
-        -- During a PNC special action, do not repeatedly write prone, crawler,
-        -- fall, or usefulness setters. Those setters are appropriate while
-        -- repairing an idle zombie shell, but can make BumpedState exit on the
-        -- very frame its XML node is selected. Keep only safeguards that do
-        -- not own the action graph.
-        applyActionLeaseSafeguards(zombie, modData)
-    else
-        LiveBodyControl.ApplyHumanizedBodyFlags(
-            zombie,
-            keepEngineMovementActive
-        )
+    if LAST_KEEP_ENGINE_ACTIVE[zombie]
+        ~= (keepEngineMovementActive == true)
+    then
+        force = true
+    end
+    nextMaintenanceAt = tonumber(
+        NEXT_BODY_MAINTENANCE_AT[zombie]
+    ) or 0
+    if force == true or now >= nextMaintenanceAt then
+        if actionLeaseActive then
+            -- During a PNC special action, do not repeatedly write prone,
+            -- crawler, fall, or usefulness setters. Those setters can eject
+            -- BumpedState on the frame its XML node is selected.
+            applyActionLeaseSafeguards(zombie, modData)
+        else
+            LiveBodyControl.ApplyHumanizedBodyFlags(
+                zombie,
+                keepEngineMovementActive
+            )
+        end
+        NEXT_BODY_MAINTENANCE_AT[zombie] =
+            now + BODY_MAINTENANCE_INTERVAL_MS
+        LAST_KEEP_ENGINE_ACTIVE[zombie] =
+            keepEngineMovementActive == true
     end
     nextAudioAt = tonumber(NEXT_AUDIO_SUPPRESSION_AT[zombie]) or 0
     if now >= nextAudioAt then
@@ -626,6 +643,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local keepEngineMovementActive
     local now
     local actionLeaseActive
+    local needsImmediateRepair
     if not zombie or not Core or not Core.IsManagedNPCBody
         or not Core.IsManagedNPCBody(zombie)
     then
@@ -645,12 +663,22 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     hadTeeth = zombie.isNoTeeth and not zombie:isNoTeeth() or false
     wasGrappleOnly = zombie.isReanimatedForGrappleOnly
         and zombie:isReanimatedForGrappleOnly() or false
+    actionState = LiveBodyControl.GetActionStateName(zombie)
+    needsImmediateRepair = hadTarget
+        or (not wasUseless and not keepEngineMovementActive)
+        or hadTeeth
+        or wasGrappleOnly
+        or (
+            not keepEngineMovementActive
+            and not actionLeaseActive
+            and LiveBodyControl.IsSuppressedActionState(actionState)
+        )
     LiveBodyControl.MaintainHumanizedBody(
         zombie,
         now,
-        keepEngineMovementActive
+        keepEngineMovementActive,
+        needsImmediateRepair
     )
-    actionState = LiveBodyControl.GetActionStateName(zombie)
     -- PNC weapon actions live in BumpedState. A managed body reaching the
     -- vanilla zombie attack/lunge graph outside an engine lease has escaped
     -- presentation ownership; that graph has no PNC walk nodes and produces
@@ -662,7 +690,8 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         LiveBodyControl.SuppressZombieState(
             zombie,
             nil,
-            now
+            now,
+            true
         )
     end
     if (
@@ -709,7 +738,14 @@ function LiveBodyControl.ScanLoadedManagedBodies(source)
 end
 
 function LiveBodyControl.OnZombieUpdate(zombie)
-    LiveBodyControl.EnforceManagedSafety(zombie, "zombie_update")
+    -- OnZombieUpdate runs for every loaded vanilla zombie. Avoid registry and
+    -- planner work entirely unless this is one of our managed NPC bodies.
+    if not LiveBodyControl.EnforceManagedSafety(
+        zombie,
+        "zombie_update"
+    ) then
+        return
+    end
     if Core
         and Core.IsAuthority
         and Core.IsAuthority()
@@ -745,17 +781,24 @@ function LiveBodyControl.TrySilenceEmitter(zombie, lane, now)
     return true
 end
 
-function LiveBodyControl.SuppressZombieState(zombie, lane, now)
+function LiveBodyControl.SuppressZombieState(
+    zombie,
+    lane,
+    now,
+    bodyFlagsApplied
+)
     local actionState = LiveBodyControl.GetActionStateName(zombie)
     local needsIdleReset
     if not zombie then
         return false, actionState
     end
-    LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
-    LiveBodyControl.TrySilenceEmitter(zombie, lane, now)
     if not LiveBodyControl.IsSuppressedActionState(actionState) then
         return false, actionState
     end
+    if bodyFlagsApplied ~= true then
+        LiveBodyControl.ApplyHumanizedBodyFlags(zombie)
+    end
+    LiveBodyControl.TrySilenceEmitter(zombie, lane, now)
     needsIdleReset = IDLE_RESET_STATES[actionState or ""] == true
     if isDamageReactionState(actionState) then
         LiveBodyControl.ReleaseDamageReaction(zombie, actionState)
