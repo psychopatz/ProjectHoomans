@@ -11,7 +11,9 @@ local engageTicks = 0
 local lastMove
 local ownerX = 10
 local ownerMoving = true
+local ownerAttacking = false
 local nearbyZombies
+local urgentThreat
 local owner = {
     getForwardDirection = function()
         return {
@@ -28,6 +30,7 @@ local owner = {
     isPlayerMoving = function() return ownerMoving end,
     isRunning = function() return false end,
     isSprinting = function() return false end,
+    isAttacking = function() return ownerAttacking end,
 }
 
 local function zombie(x, y)
@@ -60,6 +63,7 @@ PNC = {
         ORDER_FOLLOW = "follow",
         FOLLOW_DISTANCE = 1.8,
         FOLLOW_WALK_DISTANCE = 4,
+        FOLLOW_RUN_DISTANCE = 10,
         FOLLOW_SLOT_DISTANCE = 2.25,
         FOLLOW_SLOT_LATERAL = 1.15,
         FOLLOW_SLOT_ROW_DISTANCE = 0.85,
@@ -73,9 +77,9 @@ PNC = {
         FOLLOW_HORDE_AVOID_RADIUS = 6.5,
         FOLLOW_HORDE_AVOID_COUNT = 3,
         FOLLOW_HORDE_NEAR_DISTANCE = 2.4,
-        FOLLOW_HORDE_STEER_DISTANCE = 3.4,
+        FOLLOW_HORDE_STEER_DISTANCE = 1.8,
         FOLLOW_HORDE_SCAN_MS = 150,
-        FOLLOW_HORDE_STEER_MS = 350,
+        FOLLOW_HORDE_STEER_MS = 700,
     },
     Core = {
         Now = function() return now end,
@@ -93,8 +97,8 @@ PNC = {
     },
     Stealth = {
         UpdateFollowState = function() end,
-        ResolveFollowMoveMode = function(_, _, _, _, hazardCount)
-            return hazardCount >= 3 and "run" or "walk"
+        ResolveFollowMoveMode = function(_, _, ownerDist)
+            return ownerDist >= 10 and "run" or "walk"
         end,
     },
     Animation = {},
@@ -117,8 +121,14 @@ PNC = {
         HaltMovement = function() end,
     },
     BehaviorTargeting = {
-        ResolveCompanionEngageTarget = function()
-            return { kind = "zombie", zombieId = "zed" }
+        ResolveCompanionProtectionTarget = function(_, ownerEngaged)
+            if not ownerEngaged then return nil end
+            return {
+                kind = "zombie",
+                zombieId = "zed",
+                x = ownerX - 1,
+                y = 0,
+            }
         end,
     },
     BehaviorCombat = {
@@ -126,7 +136,14 @@ PNC = {
             engageTicks = engageTicks + 1
         end,
     },
-    Perception = {},
+    Perception = {
+        ResolveRecentAttacker = function()
+            return urgentThreat
+        end,
+        FindImmediateZombieThreat = function()
+            return urgentThreat
+        end,
+    },
     Registry = {
         ForEach = function(callback)
             callback(record)
@@ -163,13 +180,14 @@ assert(math.abs(lastMove.y) > 0.5,
 assert(lastMove.x > record.x,
     "horde steering stopped making progress toward the owner")
 assert(lastMove.mode == "run",
-    "horde escape did not use catch-up locomotion")
+    "severely separated follower did not use catch-up locomotion")
 
 -- One close zombie still sets the steering hazard active flag, but it is not
 -- a horde and must not suppress the follower's combat response.
 now = now + 200
 record.x = 6
 ownerX = 10
+ownerAttacking = true
 record.runtime.followHazard = nil
 nearbyZombies = {
     zombie(6.8, 0),
@@ -185,11 +203,31 @@ assert(engageTicks == 1,
 assert(lastMove == nil,
     "single-zombie combat response was overwritten by follow movement")
 
+-- Once the owner's short combat intent expires, a passive nearby zombie must
+-- not drag the follower into an opportunistic chase.
+now = now + 1600
+ownerAttacking = false
+record.runtime.followState.ownerEngagedUntil = 0
+record.runtime.target = nil
+record.runtime.nextTargetReassessAt = 0
+lastMove = nil
+local engagesBeforePassive = engageTicks
+assert(PNC.BehaviorCompanion.Tick(record, {
+    getX = function() return record.x end,
+    getY = function() return record.y end,
+    getZ = function() return record.z end,
+}, "FollowOwner"))
+assert(engageTicks == engagesBeforePassive,
+    "passive nearby zombie pulled follower out of formation")
+assert(lastMove ~= nil,
+    "passive follower did not resume formation movement")
+
 -- A stationary owner is still the follower's priority once the companion
 -- reaches its combat leash. Otherwise an idle player lets followers chase
 -- targets indefinitely and disappear from the formation.
 now = now + 200
 ownerMoving = false
+ownerAttacking = false
 record.x = 0
 ownerX = 10
 record.runtime.followHazard = nil
@@ -210,5 +248,27 @@ assert(lastMove ~= nil and string.find(
     1,
     true
 ), "far follower did not resume its owner catch-up")
+
+-- A direct attacker is the sole exception to the owner leash. The companion
+-- must defend itself immediately even while badly separated from the owner.
+now = now + 200
+record.runtime.recentThreat = { kind = "zombie" }
+urgentThreat = {
+    kind = "zombie",
+    zombieId = "direct_attacker",
+    x = record.x + 1,
+    y = record.y,
+    threatening = true,
+}
+local engagesBeforeDefense = engageTicks
+assert(PNC.BehaviorCompanion.Tick(record, {
+    getX = function() return record.x end,
+    getY = function() return record.y end,
+    getZ = function() return record.z end,
+}, "FollowOwner"))
+assert(engageTicks == engagesBeforeDefense + 1,
+    "direct self-defense was blocked by the owner leash")
+assert(record.runtime.followState.mode == "combat_self_defense",
+    "direct attacker did not short-circuit follow movement")
 
 print("pnc_follow_horde_steering_smoke: ok")

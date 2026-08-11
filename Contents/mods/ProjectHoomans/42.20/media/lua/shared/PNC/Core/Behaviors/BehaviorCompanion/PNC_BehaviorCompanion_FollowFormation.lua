@@ -100,7 +100,7 @@ function Internal.ResolveFollowSlot(record, owner, ownerMoving)
     if not owner then
         return nil
     end
-    now = Core.Now()
+    now = Core.Now and Core.Now() or 0
     ownerKey = resolveFollowOwnerKey(record, owner)
     cache = FollowFormationCache[ownerKey]
     if not cache

@@ -22,6 +22,7 @@ function Internal.TickFollowOwner(record, zombie)
     local moveTarget
     local prioritizeOwner
     local hordeCount
+    local ownerEngaged
     if Stealth and Stealth.UpdateFollowState then
         Stealth.UpdateFollowState(record, owner)
     end
@@ -58,6 +59,7 @@ function Internal.TickFollowOwner(record, zombie)
     end
     record.ownerOnlineID = owner:getOnlineID()
     followState = Internal.UpdateOwnerMotionState(record, owner, now)
+    ownerEngaged = Internal.UpdateOwnerCombatState(record, owner, now)
     -- A follower may still be inside its formation tolerance when the owner
     -- first moves. End ambient presentation immediately instead of waiting
     -- for MoveRecord to be requested several ticks later.
@@ -122,6 +124,19 @@ function Internal.TickFollowOwner(record, zombie)
             and hordeCount
                 >= (tonumber(Const.FOLLOW_HORDE_AVOID_COUNT) or 3)
         )
+    -- Damage memory and the zombie-aggro bridge are cheap urgent signals.
+    -- They bypass the owner leash so a separated follower never ignores an
+    -- attacker just because it was already trying to catch up.
+    if record.runtime.recentThreat
+        or record.runtime.zombieAttacker
+        or record.runtime.target
+            and record.runtime.target.immediateSelfDefense == true
+    then
+        if Internal.TryRespondToImmediateThreat(record, zombie) then
+            Internal.SetFollowMode(record, "combat_self_defense")
+            return true
+        end
+    end
     if not ownerVehicle
         and not prioritizeOwner
         and Internal.ShouldScanFollowThreat(
@@ -132,7 +147,16 @@ function Internal.TickFollowOwner(record, zombie)
                     tonumber(Const.FOLLOW_WALK_DISTANCE) or 4
                 )
         )
-        and Internal.TryRespondToThreat(record, zombie)
+        and Internal.TryRespondToThreat(
+            record,
+            zombie,
+            {
+                x = owner:getX(),
+                y = owner:getY(),
+                radius = tonumber(Const.FOLLOW_COMBAT_LEASH_DISTANCE) or 5.5,
+            },
+            { ownerEngaged = ownerEngaged }
+        )
     then
         Internal.SetFollowMode(record, "combat")
         return true
@@ -194,9 +218,7 @@ function Internal.TickFollowOwner(record, zombie)
         )
         or (
             ownerDist >= (
-                tonumber(Const.FOLLOW_WALK_DISTANCE)
-                    or tonumber(Const.FOLLOW_RUN_DISTANCE)
-                    or 4
+                tonumber(Const.FOLLOW_RUN_DISTANCE) or 10
             )
             and "run"
             or "walk"

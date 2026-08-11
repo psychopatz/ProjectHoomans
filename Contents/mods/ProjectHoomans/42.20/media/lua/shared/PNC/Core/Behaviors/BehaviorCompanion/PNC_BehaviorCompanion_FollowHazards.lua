@@ -182,7 +182,7 @@ function Internal.ResolveHordeAwareFollowTarget(
         )
     )
     dot = dirX and ((dirX * baseX) + (dirY * baseY)) or -1
-    if dot < 0.25 then
+    if dot < 0.55 then
         tangentX = -baseY
         tangentY = baseX
         if (tangentX * repelX) + (tangentY * repelY) < 0 then
@@ -190,8 +190,8 @@ function Internal.ResolveHordeAwareFollowTarget(
             tangentY = -tangentY
         end
         dirX, dirY = Internal.NormalizeDirection(
-            (baseX * 0.38) + (tangentX * 0.92),
-            (baseY * 0.38) + (tangentY * 0.92)
+            (baseX * 0.68) + (tangentX * 0.72),
+            (baseY * 0.68) + (tangentY * 0.72)
         )
     end
     if not dirX then
@@ -216,8 +216,8 @@ function Internal.ResolveHordeAwareFollowTarget(
     ) then
         -- The opposite side still makes forward progress toward the owner.
         dirX, dirY = Internal.NormalizeDirection(
-            (baseX * 0.38) + (baseY * 0.92),
-            (baseY * 0.38) - (baseX * 0.92)
+            (baseX * 0.68) + (baseY * 0.72),
+            (baseY * 0.68) - (baseX * 0.72)
         )
         candidateX = record.x + (dirX * distance)
         candidateY = record.y + (dirY * distance)

@@ -195,6 +195,7 @@ function Perception.ResolveRecentAttacker(record, now)
     target.visibilityKind = "recent_attacker"
     target.lastSeenAt = now
     target.threatening = true
+    target.immediateSelfDefense = true
     return target
 end
 
@@ -915,6 +916,41 @@ function Perception.ResolveCompanionTarget(record)
         return pickNearest(hostileToOwnerNPC, hostileToOwnerZombie)
     end
 
+    return nil
+end
+
+-- Companion orders are protective, not an invitation to hunt everything in
+-- perception range. Direct attackers always win; otherwise companions defend
+-- the owner, and only broaden target selection while the owner is fighting.
+function Perception.ResolveCompanionProtectionTarget(record, ownerEngaged)
+    local now = Core.Now and Core.Now() or 0
+    local immediate = Perception.ResolveRecentAttacker(record, now)
+    local owner
+    local ownerThreat
+    if immediate then
+        immediate.immediateSelfDefense = true
+        return immediate
+    end
+    immediate = Perception.FindImmediateZombieThreat(record)
+    if immediate then
+        immediate.immediateSelfDefense = true
+        return immediate
+    end
+    owner = Core.ResolvePlayerByOnlineID(record.ownerOnlineID)
+        or Core.ResolvePlayerByUsername(record.ownerUsername)
+    if owner and (not record.hostility
+        or record.hostility.attackZombies ~= false)
+    then
+        ownerThreat = findZombieTargetingOwner(
+            record,
+            owner,
+            getCompanionDefenseRadius()
+        )
+        if ownerThreat then return ownerThreat end
+    end
+    if ownerEngaged == true then
+        return Perception.ResolveCompanionTarget(record)
+    end
     return nil
 end
 

@@ -210,6 +210,25 @@ function Targeting.ResolveCompanionEngageTarget(record)
     return Targeting.ResolveEngageTarget(record, Perception.ResolveCompanionTarget)
 end
 
+function Targeting.ResolveCompanionProtectionTarget(record, ownerEngaged)
+    local runtime = record and record.runtime or nil
+    local now = Core.Now()
+    -- Protection targets must be proven again at each reassessment. This
+    -- prevents a one-frame attack from turning into an unlimited chase.
+    if runtime and runtime.target
+        and ownerEngaged ~= true
+        and now >= (tonumber(runtime.nextTargetReassessAt) or 0)
+    then
+        runtime.target = nil
+    end
+    return Targeting.ResolveEngageTarget(record, function(source)
+        return Perception.ResolveCompanionProtectionTarget(
+            source,
+            ownerEngaged
+        )
+    end)
+end
+
 function Targeting.ResolveHostileEngageTarget(record)
     return Targeting.ResolveEngageTarget(record, Perception.ResolveHostileTarget)
 end

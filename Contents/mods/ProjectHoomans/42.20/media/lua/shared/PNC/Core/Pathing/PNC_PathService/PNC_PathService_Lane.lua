@@ -242,19 +242,25 @@ function Internal.noteNativeGoalFailure(lane, goal, now)
     lane.nativeFailureGoalZ = tonumber(goal.z)
     lane.nativeFailureCount =
         (tonumber(lane.nativeFailureCount) or 0) + 1
+    local failureLimit = tonumber(Const.ENGINE_PATH_FAILURE_LIMIT) or 2
+    local followGoal = string.sub(tostring(lane.intentReason or ""), 1, 12)
+        == "follow_owner"
+    if followGoal then
+        failureLimit = 1
+    end
     if lane.nativeFailureCount < math.max(
         1,
-        math.floor(tonumber(Const.ENGINE_PATH_FAILURE_LIMIT) or 2)
+        math.floor(failureLimit)
     ) then
         return false
     end
     lane.nativeBlockedGoalX = lane.nativeFailureGoalX
     lane.nativeBlockedGoalY = lane.nativeFailureGoalY
     lane.nativeBlockedGoalZ = lane.nativeFailureGoalZ
-    lane.nativeBlockedUntil = now + math.max(
-        1000,
-        tonumber(Const.ENGINE_PATH_BLOCKED_GOAL_COOLDOWN_MS) or 10000
-    )
+    local blockedCooldown = followGoal
+        and (tonumber(Const.FOLLOW_PATH_BLOCKED_COOLDOWN_MS) or 1200)
+        or (tonumber(Const.ENGINE_PATH_BLOCKED_GOAL_COOLDOWN_MS) or 10000)
+    lane.nativeBlockedUntil = now + math.max(1000, blockedCooldown)
     return true
 end
 

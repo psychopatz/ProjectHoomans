@@ -405,7 +405,8 @@ function Stealth.ResolveFollowMoveMode(
 )
     local runtime = record and record.runtime or {}
     local state = runtime.followState or {}
-    local enterDistance = tonumber(Const.FOLLOW_WALK_DISTANCE) or 4
+    local walkDistance = tonumber(Const.FOLLOW_WALK_DISTANCE) or 4
+    local enterDistance = tonumber(Const.FOLLOW_RUN_DISTANCE) or 10
     local exitDistance = tonumber(
         Const.FOLLOW_CATCHUP_EXIT_DISTANCE
     ) or 3
@@ -426,21 +427,15 @@ function Stealth.ResolveFollowMoveMode(
         return "sneak"
     end
 
-    if ownerRunning
-        or (tonumber(ownerDist) or 0) >= enterDistance
-        or (tonumber(slotDist) or 0) >= enterDistance
-        or (
-            state.ownerMoving == true
-            and (tonumber(hazardCount) or 0)
-                >= (tonumber(Const.FOLLOW_HORDE_AVOID_COUNT) or 3)
-        )
+    local separation = math.max(
+        tonumber(ownerDist) or 0,
+        tonumber(slotDist) or 0
+    )
+    if separation >= enterDistance
+        or (ownerRunning and separation >= walkDistance)
     then
         state.catchingUp = true
-    elseif state.catchingUp == true
-        and math.max(
-            tonumber(ownerDist) or 0,
-            tonumber(slotDist) or 0
-        ) > exitDistance
+    elseif state.catchingUp == true and separation > exitDistance
     then
         state.catchingUp = true
     else

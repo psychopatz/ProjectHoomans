@@ -100,3 +100,18 @@ function Internal.UpdateOwnerMotionState(record, owner, now)
     state.ownerSampleAt = now
     return state
 end
+
+function Internal.UpdateOwnerCombatState(record, owner, now)
+    local state = Internal.GetFollowState(record)
+    local attacking = owner and owner.isAttacking and owner:isAttacking()
+    if not attacking and owner and owner.isAttackStarted then
+        attacking = owner:isAttackStarted()
+    end
+    if attacking then
+        state.ownerEngagedUntil = now + (
+            tonumber(Const.FOLLOW_OWNER_COMBAT_MEMORY_MS) or 1400
+        )
+    end
+    state.ownerEngaged = now < (tonumber(state.ownerEngagedUntil) or 0)
+    return state.ownerEngaged
+end

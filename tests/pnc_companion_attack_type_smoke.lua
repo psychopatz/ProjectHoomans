@@ -62,13 +62,14 @@ PNC = {
         HaltMovement = function() end,
     },
     BehaviorTargeting = {
-        ResolveCompanionEngageTarget = function()
+        ResolveCompanionProtectionTarget = function()
             return {
                 kind = "zombie",
                 x = 2,
                 y = 0,
                 z = 0,
                 distSq = 4,
+                immediateSelfDefense = true,
             }
         end,
     },
@@ -78,13 +79,14 @@ PNC = {
         end,
     },
     Perception = {
-        ResolveCompanionTarget = function()
+        ResolveCompanionProtectionTarget = function()
             return {
                 kind = "zombie",
                 x = 2,
                 y = 0,
                 z = 0,
                 distSq = 4,
+                immediateSelfDefense = true,
             }
         end,
     },

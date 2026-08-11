@@ -13,6 +13,7 @@ local function targetWithinConstraint(target, constraint)
     local dx
     local dy
     local radius
+    if target and target.immediateSelfDefense == true then return true end
     if type(constraint) ~= "table" then return true end
     if not target or target.x == nil or target.y == nil then return false end
     radius = math.max(0, tonumber(constraint.radius) or 0)
@@ -21,16 +22,8 @@ local function targetWithinConstraint(target, constraint)
     return (dx * dx) + (dy * dy) <= radius * radius
 end
 
-local function tryEngageTarget(record, zombie, constraint)
-    if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
-        == tostring(Const.ATTACK_TYPE_NONE or "none")
-    then
-        return false
-    end
-    local target = Targeting.ResolveCompanionEngageTarget(record)
-    if not target then
-        return false
-    end
+local function engageResolvedTarget(record, zombie, target, constraint)
+    if not target then return false end
     if not targetWithinConstraint(target, constraint) then
         Common.ClearCombatTarget(record, "target_outside_order_leash", zombie)
         return false
@@ -45,7 +38,25 @@ local function tryEngageTarget(record, zombie, constraint)
     return true
 end
 
-local function tryAvoidThreat(record, zombie)
+local function tryEngageTarget(record, zombie, constraint, options)
+    if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
+        == tostring(Const.ATTACK_TYPE_NONE or "none")
+    then
+        return false
+    end
+    local target
+    if Targeting.ResolveCompanionProtectionTarget then
+        target = Targeting.ResolveCompanionProtectionTarget(
+            record,
+            options and options.ownerEngaged == true
+        )
+    else
+        target = Targeting.ResolveCompanionEngageTarget(record)
+    end
+    return engageResolvedTarget(record, zombie, target, constraint)
+end
+
+local function tryAvoidThreat(record, zombie, options)
     local threat
     local moved
     local reason
@@ -55,8 +66,11 @@ local function tryAvoidThreat(record, zombie)
         return false
     end
     Common.ClearCombatTarget(record, "attack_disabled", zombie)
-    threat = Perception and Perception.ResolveCompanionTarget
-        and Perception.ResolveCompanionTarget(record) or nil
+    threat = Perception and Perception.ResolveCompanionProtectionTarget
+        and Perception.ResolveCompanionProtectionTarget(
+            record,
+            options and options.ownerEngaged == true
+        ) or nil
     if not threat or not CombatTactics or not CombatTactics.AvoidThreat then
         return false
     end
@@ -75,9 +89,27 @@ local function tryAvoidThreat(record, zombie)
     return false
 end
 
-function Internal.TryRespondToThreat(record, zombie, constraint)
-    if tryAvoidThreat(record, zombie) then return true end
-    return tryEngageTarget(record, zombie, constraint)
+function Internal.TryRespondToThreat(record, zombie, constraint, options)
+    if tryAvoidThreat(record, zombie, options) then return true end
+    return tryEngageTarget(record, zombie, constraint, options)
+end
+
+function Internal.TryRespondToImmediateThreat(record, zombie)
+    local target = Perception and Perception.ResolveRecentAttacker
+        and Perception.ResolveRecentAttacker(record, PNC.Core.Now()) or nil
+    if not target and Perception and Perception.FindImmediateZombieThreat then
+        target = Perception.FindImmediateZombieThreat(record)
+    end
+    if not target then return false end
+    target.immediateSelfDefense = true
+    if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
+        == tostring(Const.ATTACK_TYPE_NONE or "none")
+    then
+        local moved = CombatTactics and CombatTactics.AvoidThreat
+            and CombatTactics.AvoidThreat(record, zombie, target)
+        return moved == true
+    end
+    return engageResolvedTarget(record, zombie, target, nil)
 end
 
 function Internal.ShouldScanFollowThreat(record, now, active)
