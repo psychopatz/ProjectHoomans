@@ -17,10 +17,15 @@ function ResearchTab.Layout(window, Layout, content)
         math.min(260, content.width), 28)
 end
 
-function ResearchTab.ApplyVisibility(window)
-    window.researchUpgrade:setVisible(window.tab == "research"
+function ResearchTab.ApplyVisibility(window, active, Layout)
+    window.researchUpgrade:setVisible(active
         and window.snapshot and window.snapshot.storage
         and window.snapshot.storage.debugAuthorized == true)
+    if active and Layout then
+        window:layoutPane(window.detailsPane, window.layout.content.x,
+            window.layout.content.y + 38, window.layout.content.width,
+            math.max(60, window.layout.content.height - 38))
+    end
 end
 
 function ResearchTab.OnUpgrade(window, button)

@@ -3,6 +3,7 @@ require "PNC/UI/Inventory/PNC_InventoryUI_List"
 
 local StorageTabs = {}
 local ViewModel = require "PNC/UI/Communities/PNC_ColonyStorageViewModel"
+local Components = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
 local SORT_LABEL_KEY = "UI_PNC_Storage_Sort"
 
 function StorageTabs.Create(window, UI, tr)
@@ -109,17 +110,14 @@ function StorageTabs.Layout(window, Layout, content)
     end
 end
 
-function StorageTabs.ApplyLayout(window, Layout)
+function StorageTabs.ApplyLayout(window, Layout, active)
     if not window.layout then return end
-    local storageMode = window.tab == "storage"
-    local researchMode = window.tab == "research"
-    window.peoplePane:setVisible(not storageMode and not researchMode)
-    window.storageSearch:setVisible(storageMode)
-    window.storageList:setVisible(storageMode)
-    window.storageSortButton:setVisible(storageMode)
-    window.storageTransferButton:setVisible(storageMode
+    window.storageSearch:setVisible(active)
+    window.storageList:setVisible(active)
+    window.storageSortButton:setVisible(active)
+    window.storageTransferButton:setVisible(active
         and window.snapshot and window.snapshot.storage ~= nil)
-    local debugVisible = storageMode and window.snapshot
+    local debugVisible = active and window.snapshot
         and window.snapshot.storage
         and window.snapshot.storage.debugAuthorized == true
     window.storageDebugToggle:setVisible(debugVisible)
@@ -128,54 +126,44 @@ function StorageTabs.ApplyLayout(window, Layout)
     for _, button in ipairs(window.storageControls or {}) do
         button:setVisible(drawerVisible)
     end
-    if storageMode then
-        local content = window.layout.content
-        local scale = window.uiScale
-        local gap = Layout.Pixels(12, scale)
-        local bottom = content.y + content.height
-        local compactDrawer = drawerVisible and Layout.IsCompact(
-            content.width, Layout.Pixels(820, scale))
-        local listWidth = content.width
-        if drawerVisible and not compactDrawer then
-            local drawerWidth = math.max(Layout.Pixels(300, scale),
-                math.floor((content.width - gap) * 0.36))
-            listWidth = content.width - gap - drawerWidth
-        end
-        local listHeight = bottom - window.layout.storageListY
-        if compactDrawer then
-            listHeight = math.max(Layout.Pixels(110, scale),
-                math.floor(listHeight * 0.48))
-        end
-        Layout.SetBounds(window.storageList, content.x,
-            window.layout.storageListY, listWidth,
-            math.max(Layout.Pixels(60, scale), listHeight))
-        window.detailsPane:setVisible(drawerVisible)
-        if drawerVisible then
-            local drawerX = compactDrawer and content.x
-                or content.x + listWidth + gap
-            local drawerWidth = compactDrawer and content.width
-                or content.width - listWidth - gap
-            local controlsY = compactDrawer
-                and window.layout.storageListY + listHeight + gap
-                or window.layout.storageListY
-            local flow = Layout.Flow(window.storageControls,
-                { x = drawerX, y = controlsY, width = drawerWidth },
-                { scale = window.uiScale, minWidth = 104, gap = 5 })
-            local detailsY = flow.bottom + Layout.Pixels(28, scale)
-            window:layoutPane(window.detailsPane, drawerX, detailsY,
-                drawerWidth, math.max(Layout.Pixels(40, scale),
-                    bottom - detailsY))
-        end
-    elseif researchMode then
-        window.detailsPane:setVisible(true)
-        window:layoutPane(window.detailsPane, window.layout.content.x,
-            window.layout.content.y + 38, window.layout.content.width,
-            math.max(60, window.layout.content.height - 38))
-    else
-        window.detailsPane:setVisible(true)
-        window:layoutPane(window.detailsPane,
-            window.layout.details.x, window.layout.details.y,
-            window.layout.details.width, window.layout.details.height)
+    if not active then return end
+    local content = window.layout.content
+    local scale = window.uiScale
+    local gap = Layout.Pixels(12, scale)
+    local bottom = content.y + content.height
+    local compactDrawer = drawerVisible and Layout.IsCompact(
+        content.width, Layout.Pixels(820, scale))
+    local listWidth = content.width
+    if drawerVisible and not compactDrawer then
+        local drawerWidth = math.max(Layout.Pixels(300, scale),
+            math.floor((content.width - gap) * 0.36))
+        listWidth = content.width - gap - drawerWidth
+    end
+    local listHeight = bottom - window.layout.storageListY
+    if compactDrawer then
+        listHeight = math.max(Layout.Pixels(110, scale),
+            math.floor(listHeight * 0.48))
+    end
+    Layout.SetBounds(window.storageList, content.x,
+        window.layout.storageListY, listWidth,
+        math.max(Layout.Pixels(60, scale), listHeight))
+    Components.LayoutScrollbar(window.storageList)
+    window.detailsPane:setVisible(drawerVisible)
+    if drawerVisible then
+        local drawerX = compactDrawer and content.x
+            or content.x + listWidth + gap
+        local drawerWidth = compactDrawer and content.width
+            or content.width - listWidth - gap
+        local controlsY = compactDrawer
+            and window.layout.storageListY + listHeight + gap
+            or window.layout.storageListY
+        local flow = Layout.Flow(window.storageControls,
+            { x = drawerX, y = controlsY, width = drawerWidth },
+            { scale = window.uiScale, minWidth = 104, gap = 5 })
+        local detailsY = flow.bottom + Layout.Pixels(28, scale)
+        window:layoutPane(window.detailsPane, drawerX, detailsY,
+            drawerWidth, math.max(Layout.Pixels(40, scale),
+                bottom - detailsY))
     end
 end
 

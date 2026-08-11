@@ -1,0 +1,105 @@
+local Shared = {}
+
+Shared.NEED_TYPES = { "hunger", "hydration", "fatigue" }
+Shared.LEVELS = { "GOOD", "STABLE", "LOW", "CRITICAL", "EMERGENCY" }
+Shared.LEVEL_COLORS = {
+    GOOD = "success",
+    STABLE = "accent",
+    LOW = "warning",
+    CRITICAL = "danger",
+    EMERGENCY = "danger",
+}
+Shared.NEED_LABEL_KEYS = {
+    hunger = "UI_PNC_Need_Hunger",
+    hydration = "UI_PNC_Need_Hydration",
+    fatigue = "UI_PNC_Need_Fatigue",
+}
+Shared.CONDITION_LABEL_KEYS = {
+    stress = "UI_PNC_Stat_Stress",
+    boredom = "UI_PNC_Stat_Boredom",
+    panic = "UI_PNC_Stat_Panic",
+}
+Shared.MORALE_LABEL_KEY = "UI_PNC_Stat_Morale"
+Shared.REFRESH_LABEL_KEY = "UI_PNC_Colony_Refresh"
+Shared.DIAGNOSTICS_LABEL_KEY = "UI_PNC_Colony_Diagnostics"
+Shared.NEED_METER_THRESHOLDS = {
+    hunger = {
+        { maximum = 0.15, color = "success" },
+        { maximum = 0.25, color = "accent" },
+        { maximum = 0.45, color = "warning" },
+        { maximum = 1.00, color = "danger" },
+    },
+    hydration = {
+        { maximum = 0.12, color = "success" },
+        { maximum = 0.25, color = "accent" },
+        { maximum = 0.70, color = "warning" },
+        { maximum = 1.00, color = "danger" },
+    },
+    fatigue = {
+        { maximum = 0.60, color = "success" },
+        { maximum = 0.70, color = "accent" },
+        { maximum = 0.80, color = "warning" },
+        { maximum = 1.00, color = "danger" },
+    },
+}
+
+function Shared.Tr(key, fallback)
+    local value = getText and getText(key) or nil
+    return value and value ~= "" and value ~= key and value or fallback
+end
+
+function Shared.Text(value, fallback)
+    value = value ~= nil and tostring(value) or ""
+    return value ~= "" and value or tostring(fallback or "")
+end
+
+function Shared.ListValue(list)
+    local entry = list and list.getItem and list:getItem() or nil
+    return entry and entry.item or nil
+end
+
+function Shared.NeedLevel(needType, value)
+    if PNC.NeedsDefinitions and PNC.NeedsDefinitions.GetLevel then
+        return PNC.NeedsDefinitions.GetLevel(needType, tonumber(value) or 0)
+    end
+    return "STABLE"
+end
+
+function Shared.NeedMeterColor(value, _, spec)
+    return Shared.LEVEL_COLORS[
+        Shared.NeedLevel(spec.needType, value)
+    ] or "accent"
+end
+
+function Shared.ConditionMeterColor(value, _, spec)
+    local level = PNC.ConditionStats and PNC.ConditionStats.GetLevel
+        and PNC.ConditionStats.GetLevel(spec.conditionType, value) or "STABLE"
+    return Shared.LEVEL_COLORS[level] or "accent"
+end
+
+function Shared.MoraleMeterColor(value)
+    value = tonumber(value) or 0
+    if value < -50 then return "danger" end
+    if value < 0 then return "warning" end
+    if value < 50 then return "accent" end
+    return "success"
+end
+
+function Shared.WorstNeed(person)
+    local worstIndex = 1
+    local worstType = Shared.NEED_TYPES[1]
+    for _, needType in ipairs(Shared.NEED_TYPES) do
+        local level = Shared.NeedLevel(
+            needType, person.needs and person.needs[needType]
+        )
+        for index, candidate in ipairs(Shared.LEVELS) do
+            if candidate == level and index > worstIndex then
+                worstIndex = index
+                worstType = needType
+            end
+        end
+    end
+    return Shared.LEVELS[worstIndex], worstType
+end
+
+return Shared

@@ -308,6 +308,8 @@ Internal.RegisterServerCommand(Const.CMD_DIRECTOR_DEBUG, function(args)
 end)
 Internal.RegisterServerCommand(Const.CMD_COLONY_MANAGEMENT, function(args)
     ClientState.colonyManagement = args.snapshot
+    ClientState.colonyManagementRevision =
+        (tonumber(ClientState.colonyManagementRevision) or 0) + 1
     ClientState.lastColonyManagementReceiveAt = Core.Now()
     if args.snapshot and args.snapshot.actionResult
         and (args.snapshot.actionResult.action == "storage_player_deposit"

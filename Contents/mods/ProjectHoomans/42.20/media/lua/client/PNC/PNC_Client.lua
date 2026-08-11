@@ -89,6 +89,7 @@ local function onResetLua()
     ClientState.directorDebugAuthorized = false
     ClientState.directorDebugReason = nil
     ClientState.colonyManagement = nil
+    ClientState.colonyManagementRevision = 0
     ClientState.worldDiscovery = nil
     ClientState.lastWorldDiscoveryRequestAt = nil
     Client.BiteReplicas = {}

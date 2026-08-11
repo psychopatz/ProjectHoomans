@@ -513,6 +513,8 @@ function Client.RequestColonyManagement()
     end
     if not PNC.ColonyManagement or not PNC.ColonyManagement.BuildSnapshot then return false end
     ClientState.colonyManagement = PNC.ColonyManagement.BuildSnapshot(player)
+    ClientState.colonyManagementRevision =
+        (tonumber(ClientState.colonyManagementRevision) or 0) + 1
     ClientState.lastColonyManagementReceiveAt = Core.Now()
     return true
 end
@@ -542,6 +544,8 @@ function Client.RequestColonyAction(action, options)
     local snapshot, result = PNC.ColonyManagement.HandleAction(player, args)
     snapshot.actionResult = result
     ClientState.colonyManagement = snapshot
+    ClientState.colonyManagementRevision =
+        (tonumber(ClientState.colonyManagementRevision) or 0) + 1
     ClientState.lastColonyManagementReceiveAt = Core.Now()
     if (result.action == "storage_player_deposit"
             or result.action == "storage_player_withdraw"
@@ -661,6 +665,8 @@ function Client.RenameColony(communityID, name)
     )
     snapshot.actionResult = result
     ClientState.colonyManagement = snapshot
+    ClientState.colonyManagementRevision =
+        (tonumber(ClientState.colonyManagementRevision) or 0) + 1
     ClientState.lastColonyManagementReceiveAt = Core.Now()
     return result and result.ok == true, result and result.reason
 end
