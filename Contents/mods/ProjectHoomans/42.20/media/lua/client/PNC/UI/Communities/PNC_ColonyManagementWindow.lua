@@ -1,4 +1,5 @@
 require "PsychopatzCore/UI/PsychopatzUI"
+require "ISUI/ISPanel"
 local StorageTabs = require "PNC/UI/Communities/PNC_ColonyManagementStorageTabs"
 local ResearchTab = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
 
@@ -25,6 +26,36 @@ local LEVEL_COLORS = {
     CRITICAL = "danger",
     EMERGENCY = "danger",
 }
+local NEED_LABEL_KEYS = {
+    hunger = "UI_PNC_Need_Hunger",
+    hydration = "UI_PNC_Need_Hydration",
+    fatigue = "UI_PNC_Need_Fatigue",
+}
+local CONDITION_LABEL_KEYS = {
+    stress = "UI_PNC_Stat_Stress",
+    boredom = "UI_PNC_Stat_Boredom",
+    panic = "UI_PNC_Stat_Panic",
+}
+local NEED_METER_THRESHOLDS = {
+    hunger = {
+        { maximum = 0.15, color = "success" },
+        { maximum = 0.25, color = "accent" },
+        { maximum = 0.45, color = "warning" },
+        { maximum = 1.00, color = "danger" },
+    },
+    hydration = {
+        { maximum = 0.12, color = "success" },
+        { maximum = 0.25, color = "accent" },
+        { maximum = 0.70, color = "warning" },
+        { maximum = 1.00, color = "danger" },
+    },
+    fatigue = {
+        { maximum = 0.60, color = "success" },
+        { maximum = 0.70, color = "accent" },
+        { maximum = 0.80, color = "warning" },
+        { maximum = 1.00, color = "danger" },
+    },
+}
 
 local function text(value, fallback)
     value = value ~= nil and tostring(value) or ""
@@ -36,18 +67,39 @@ local function listValue(list)
     return entry and entry.item or nil
 end
 
-local function needLevel(value)
+local function needLevel(needType, value)
     if PNC.NeedsDefinitions and PNC.NeedsDefinitions.GetLevel then
-        return PNC.NeedsDefinitions.GetLevel(tonumber(value) or 0)
+        return PNC.NeedsDefinitions.GetLevel(
+            needType, tonumber(value) or 0
+        )
     end
     return "STABLE"
+end
+
+local function needMeterColor(value, _, spec)
+    return LEVEL_COLORS[needLevel(spec.needType, value)] or "accent"
+end
+
+local function conditionMeterColor(value, _, spec)
+    local level = PNC.ConditionStats and PNC.ConditionStats.GetLevel
+        and PNC.ConditionStats.GetLevel(spec.conditionType, value) or "STABLE"
+    return LEVEL_COLORS[level] or "accent"
+end
+
+local function moraleMeterColor(value)
+    value = tonumber(value) or 0
+    if value < -50 then return "danger" end
+    if value < 0 then return "warning" end
+    if value < 50 then return "accent" end
+    return "success"
 end
 
 local function worstNeed(person)
     local worstIndex = 1
     local worstType = NEED_TYPES[1]
     for _, needType in ipairs(NEED_TYPES) do
-        local level = needLevel(person.needs and person.needs[needType])
+        local level = needLevel(needType,
+            person.needs and person.needs[needType])
         for index, candidate in ipairs(LEVELS) do
             if candidate == level and index > worstIndex then
                 worstIndex = index
@@ -100,14 +152,63 @@ local function drawDetail(list, y, entry, alternate)
         labelColor.r, labelColor.g, labelColor.b, labelColor.a,
         UIFont.Small
     )
-    list:drawText(
-        Layout.Ellipsize(item.detail, UIFont.Small, list:getWidth() - 20),
-        10, y + 27,
-        Theme.colors.textMuted.r, Theme.colors.textMuted.g,
-        Theme.colors.textMuted.b, Theme.colors.textMuted.a,
-        UIFont.Small
-    )
+    if item.meter then
+        UI.Meter.Draw(list, {
+            x = 10, y = y + 25,
+            width = math.max(40, list:getWidth() - 20), height = 18,
+            value = item.value, minimum = item.minimum or 0,
+            maximum = item.maximum or 1,
+            colorName = item.colorName,
+            colorResolver = item.colorResolver or needMeterColor,
+            needType = item.needType,
+            conditionType = item.conditionType,
+            thresholds = item.thresholds,
+            decimals = item.decimals == nil and 2 or item.decimals,
+            showMaximum = true,
+        })
+    else
+        list:drawText(
+            Layout.Ellipsize(item.detail, UIFont.Small, list:getWidth() - 20),
+            10, y + 27,
+            Theme.colors.textMuted.r, Theme.colors.textMuted.g,
+            Theme.colors.textMuted.b, Theme.colors.textMuted.a,
+            UIFont.Small
+        )
+    end
     return y + list.itemheight
+end
+
+ISPNCColonyPane = ISPanel:derive("ISPNCColonyPane")
+
+function ISPNCColonyPane:initialise()
+    ISPanel.initialise(self)
+    self:noBackground()
+end
+
+function ISPNCColonyPane:setHeader(title, suffix)
+    self.headerTitle = tostring(title or "")
+    self.headerSuffix = suffix ~= nil and tostring(suffix) or nil
+end
+
+function ISPNCColonyPane:layoutContent()
+    if not self.content then return end
+    local headerHeight = Layout.Pixels(25, self.uiScale)
+    Layout.SetBounds(self.content, 0, headerHeight, self:getWidth(),
+        math.max(1, self:getHeight() - headerHeight))
+end
+
+function ISPNCColonyPane:render()
+    ISPanel.render(self)
+    UI.DrawSectionTitle(self, self.headerTitle, 0, 0, self:getWidth(),
+        self.headerSuffix)
+end
+
+function ISPNCColonyPane:new(x, y, width, height, uiScale)
+    local object = ISPanel:new(x, y, width, height)
+    setmetatable(object, self)
+    self.__index = self
+    object.uiScale = uiScale
+    return object
 end
 
 ISPNCColonyManagementWindow = PsychopatzWindow:derive(
@@ -137,14 +238,31 @@ function ISPNCColonyManagementWindow:createChildren()
             variant = definition.id == self.tab and "selected" or "quiet",
         })
     end
-    self.people = UI.CreateList(self, {
+    self.provisionButton = UI.CreateButton(self, {
+        id = "provision",
+        title = tr("UI_PNC_Provision_Open"),
+        target = self,
+        onclick = ISPNCColonyManagementWindow.onProvisionSettings,
+        variant = "quiet",
+    })
+    self.peoplePane = ISPNCColonyPane:new(0, 0, 1, 1, self.uiScale)
+    self.peoplePane:initialise()
+    self.peoplePane:instantiate()
+    self:addChild(self.peoplePane)
+    self.people = UI.CreateList(self.peoplePane, {
         itemHeight = 52,
         doDrawItem = drawPerson,
     })
-    self.details = UI.CreateList(self, {
+    self.peoplePane.content = self.people
+    self.detailsPane = ISPNCColonyPane:new(0, 0, 1, 1, self.uiScale)
+    self.detailsPane:initialise()
+    self.detailsPane:instantiate()
+    self:addChild(self.detailsPane)
+    self.details = UI.CreateList(self.detailsPane, {
         itemHeight = 48,
         doDrawItem = drawDetail,
     })
+    self.detailsPane.content = self.details
     StorageTabs.Create(self, UI, tr)
     ResearchTab.Create(self, UI, tr)
     self.people.onMouseDown = function(list, x, y)
@@ -159,14 +277,17 @@ end
 
 function ISPNCColonyManagementWindow:onResponsiveLayout()
     local rect = self:getContentRect({ top = 34, bottom = 12 })
+    local navigation = {}
+    for _, button in ipairs(self.tabs) do navigation[#navigation + 1] = button end
+    navigation[#navigation + 1] = self.provisionButton
     local flow = Layout.Flow(
-        self.tabs,
+        navigation,
         { x = rect.x, y = rect.y, width = rect.width },
         { scale = self.uiScale, minWidth = 92, gap = 6 }
     )
     local summaryHeight = Layout.Pixels(64, self.uiScale)
     local summaryY = flow.bottom + Layout.Pixels(10, self.uiScale)
-    local sectionY = summaryY + summaryHeight + Layout.Pixels(28, self.uiScale)
+    local sectionY = summaryY + summaryHeight + Layout.Pixels(10, self.uiScale)
     local content = {
         x = rect.x,
         y = sectionY,
@@ -192,13 +313,13 @@ function ISPNCColonyManagementWindow:onResponsiveLayout()
         compact = split.compact,
         content = content,
     }
-    Layout.SetBounds(
-        self.people,
+    self:layoutPane(
+        self.peoplePane,
         split.first.x, split.first.y,
         split.first.width, split.first.height
     )
-    Layout.SetBounds(
-        self.details,
+    self:layoutPane(
+        self.detailsPane,
         split.second.x, split.second.y,
         split.second.width, split.second.height
     )
@@ -207,7 +328,27 @@ function ISPNCColonyManagementWindow:onResponsiveLayout()
     self:applyTabLayout()
 end
 
+function ISPNCColonyManagementWindow:layoutPane(
+    pane, x, y, width, height
+)
+    Layout.SetBounds(pane, x, y, width, height)
+    pane.uiScale = self.uiScale
+    pane:layoutContent()
+end
+
+function ISPNCColonyManagementWindow:onProvisionSettings()
+    if PNC.ProvisionSettingsUI then PNC.ProvisionSettingsUI.Open() end
+end
+
 function ISPNCColonyManagementWindow:applyTabLayout()
+    local peopleCount = #(self.snapshot and self.snapshot.people or {})
+    self.peoplePane:setHeader("COMPANIONS", peopleCount)
+    local detailTitle = self.tab == "people" and "COMPANION DETAILS"
+        or self.tab == "needs" and "NEEDS OVERVIEW"
+        or self.tab == "research" and "COLONY RESEARCH"
+        or self.tab == "storage" and "DEBUG DETAILS"
+        or "COLONY STATUS"
+    self.detailsPane:setHeader(detailTitle)
     StorageTabs.ApplyLayout(self, Layout)
     ResearchTab.ApplyVisibility(self)
 end
@@ -251,6 +392,41 @@ function ISPNCColonyManagementWindow:addDetail(label, detail, colorName)
     })
 end
 
+function ISPNCColonyManagementWindow:addNeedMeter(needType, amount)
+    local level = needLevel(needType, amount)
+    self.details:addItem(tostring(needType), {
+        label = tr(NEED_LABEL_KEYS[needType], string.upper(needType)),
+        meter = true,
+        value = tonumber(amount) or 0,
+        minimum = 0,
+        maximum = 1,
+        needType = needType,
+        colorName = LEVEL_COLORS[level] or "accent",
+        thresholds = NEED_METER_THRESHOLDS[needType],
+    })
+end
+
+function ISPNCColonyManagementWindow:addConditionMeter(statType, amount)
+    local definition = PNC.ConditionStats
+        and PNC.ConditionStats.DEFINITIONS[statType] or nil
+    if not definition then return end
+    self.details:addItem(statType, {
+        label = tr(CONDITION_LABEL_KEYS[statType], string.upper(statType)),
+        meter = true, value = tonumber(amount) or definition.default,
+        minimum = definition.minimum, maximum = definition.maximum,
+        conditionType = statType, colorResolver = conditionMeterColor,
+        decimals = statType == "stress" and 2 or 0,
+    })
+end
+
+function ISPNCColonyManagementWindow:addMoraleMeter(amount)
+    self.details:addItem("morale", {
+        label = tr("UI_PNC_Stat_Morale", "MORALE"), meter = true,
+        value = tonumber(amount) or 0, minimum = -100, maximum = 100,
+        colorResolver = moraleMeterColor, decimals = 0,
+    })
+end
+
 function ISPNCColonyManagementWindow:rebuildDetails()
     local snapshot = self.snapshot or {}
     local colony = snapshot.colony or {}
@@ -276,7 +452,7 @@ function ISPNCColonyManagementWindow:rebuildDetails()
                 self:addDetail(
                     text(warning.name, "Unknown companion"),
                     string.upper(text(warning.needType, "need")) .. "  "
-                        .. string.format("%.0f / 100", tonumber(warning.value) or 0),
+                        .. string.format("%.2f / 1", tonumber(warning.value) or 0),
                     LEVEL_COLORS[warning.severity] or "warning"
                 )
             end
@@ -295,35 +471,29 @@ function ISPNCColonyManagementWindow:rebuildDetails()
         self:addDetail("HEALTH", string.upper(text(value.health, "Unknown")))
         for _, needType in ipairs(NEED_TYPES) do
             local amount = tonumber(value.needs and value.needs[needType]) or 0
-            local level = needLevel(amount)
-            self:addDetail(
-                string.upper(needType),
-                string.format("%.1f / 100  -  %s", amount, level),
-                LEVEL_COLORS[level]
-            )
+            self:addNeedMeter(needType, amount)
         end
     elseif self.tab == "needs" then
+        local person = listValue(self.people)
+        if not person then
+            self:addDetail(tr("UI_PNC_Needs_NoCompanions",
+                "NO COMPANIONS"), "")
+            return
+        end
+        local value = person.value or {}
+        self:addDetail(text(value.name, value.id),
+            string.upper(text(value.role, "Companion")), "accent")
         for _, needType in ipairs(NEED_TYPES) do
-            local counts = snapshot.levels and snapshot.levels[needType] or {}
-            self:addDetail(
-                string.upper(needType),
-                string.format(
-                    "Good %d   Stable %d   Low %d   Critical %d   Emergency %d",
-                    counts.GOOD or 0,
-                    counts.STABLE or 0,
-                    counts.LOW or 0,
-                    counts.CRITICAL or 0,
-                    counts.EMERGENCY or 0
-                )
-            )
+            self:addNeedMeter(needType,
+                tonumber(value.needs and value.needs[needType]) or 0)
         end
-        for _, warning in ipairs(snapshot.attention or {}) do
-            self:addDetail(
-                text(warning.name, "Unknown companion"),
-                string.upper(text(warning.needType, "need")) .. " needs attention",
-                LEVEL_COLORS[warning.severity] or "warning"
-            )
+        for _, statType in ipairs(PNC.ConditionStats
+            and PNC.ConditionStats.TYPES or {})
+        do
+            self:addConditionMeter(statType,
+                value.conditionStats and value.conditionStats[statType])
         end
+        self:addMoraleMeter(value.morale)
     end
 end
 
@@ -338,7 +508,9 @@ end
 function ISPNCColonyManagementWindow:onPersonSelected()
     local person = listValue(self.people)
     self.selectedPersonID = person and person.id or self.selectedPersonID
-    if self.tab == "people" then self:rebuildDetails() end
+    if self.tab == "people" or self.tab == "needs" then
+        self:rebuildDetails()
+    end
 end
 
 function ISPNCColonyManagementWindow:refresh()
@@ -406,26 +578,10 @@ function ISPNCColonyManagementWindow:render()
         Theme.colors.textMuted.b, Theme.colors.textMuted.a,
         UIFont.Small
     )
-    if self.tab ~= "storage" and self.tab ~= "research" then
-        UI.DrawSectionTitle(
-            self, "COMPANIONS",
-            self.layout.people.x, self.layout.people.y - 21,
-            self.layout.people.width,
-            tostring(#(snapshot.people or {}))
-        )
-    end
-    local detailTitle = self.tab == "people" and "COMPANION DETAILS"
-        or self.tab == "needs" and "NEEDS OVERVIEW"
-        or self.tab == "storage" and "GENERAL STOCKPILE"
-        or self.tab == "research" and "COLONY RESEARCH"
-        or "COLONY STATUS"
-    local titleTarget = self.tab == "storage" and self.storageList or self.details
-    UI.DrawSectionTitle(self, detailTitle,
-        titleTarget:getX(), titleTarget:getY() - 21, titleTarget:getWidth())
-    if self.tab == "storage" and self.storageDebugExpanded == true then
-        UI.DrawSectionTitle(self, "DEBUG DETAILS",
-            self.details:getX(), self.details:getY() - 21,
-            self.details:getWidth())
+    if self.tab == "storage" then
+        UI.DrawSectionTitle(self, "GENERAL STOCKPILE",
+            self.storageList:getX(), self.storageList:getY() - 21,
+            self.storageList:getWidth())
     end
     StorageTabs.RenderSummary(self, Theme)
 end

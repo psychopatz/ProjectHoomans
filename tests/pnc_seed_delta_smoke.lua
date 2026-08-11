@@ -329,6 +329,7 @@ end
 local function nativeItem(fullType)
     local item = { fullType = fullType, modData = {}, weight = 0.1 }
     local food = fullType == "Base.Apple"
+        or fullType == "Base.FractionalApple"
         or string.find(fullType, "Mod.Food", 1, true) == 1
     local water = fullType == "Base.WaterBottleFull"
         or string.find(fullType, "Mod.Water", 1, true) == 1
@@ -353,8 +354,11 @@ local function nativeItem(fullType)
     function item:setActualWeight(value) self.weight = value end
     function item:getCurrentAmmoCount() return self.ammoCount end
     function item:setCurrentAmmoCount(value) self.ammoCount = value end
-    function item:getHungerChange() return food and -20 or 0 end
-    function item:getThirstChange() return water and -15 or 0 end
+    function item:getHungerChange()
+        if fullType == "Base.FractionalApple" then return -0.15 end
+        return food and -0.20 or 0
+    end
+    function item:getThirstChange() return water and -0.15 or 0 end
     function item:getUseDelta() return water and 0.25 or 0 end
     function item:isWaterSource() return water end
     function item:isBandage() return fullType == "Base.Bandage" end
@@ -559,6 +563,14 @@ dofile(SERVER_ROOT .. "PNC/PNC_IndividualNeeds.lua")
 require "PNC/Supply/PNC_SupplyRequest"
 require "PNC/Supply/PNC_SupplyMetrics"
 require "PNC/Supply/PNC_ItemUtility"
+local fractionalTypeID = PsychopatzCore.Inventory.getItemTypeId(
+    "Base.FractionalApple", true
+)
+local fractionalProfile = PNC.ItemUtility.GetStatic(
+    fractionalTypeID, "Base.FractionalApple"
+)
+assertEqual(fractionalProfile.hunger, 0.15,
+    "native fractional hunger utility preservation")
 require "PNC/Supply/PNC_SupplyIndex"
 require "PNC/Supply/PNC_SupplySelector"
 require "PNC/Supply/PNC_StorageAccessPolicy"
@@ -613,9 +625,9 @@ local function supplyNPC(id, options)
     supplyRecords[id] = value
     supplyCommunity.memberIDs[id] = true
     PNC.IndividualNeeds.Ensure(value, {
-        hunger = options.hunger or 30,
-        hydration = options.hydration or 30,
-        fatigue = 100,
+        hunger = options.hunger or 0.30,
+        hydration = options.hydration or 0.30,
+        fatigue = 0,
     })
     return value
 end
@@ -635,12 +647,12 @@ assert(PNC.Inventory.AddItems(personalNPC, {
 local storageBeforePersonal = supplyStorage.inventory:getLogicalItemCount()
 local personalOK = SupplyService.Process({
     requesterId = personalNPC.id, resourceKind = "FOOD",
-    required = { hunger = 20 }, priority = 70,
+    required = { hunger = 0.20 }, priority = 70,
 })
 assertEqual(personalOK, true, "personal food request")
 assertEqual(supplyStorage.inventory:getLogicalItemCount(), storageBeforePersonal,
     "personal food withdrew storage")
-assert(PNC.IndividualNeeds.Get(personalNPC, "hunger") > 30,
+assert(PNC.IndividualNeeds.Get(personalNPC, "hunger") < 0.30,
     "personal food did not change hunger")
 assertEqual(PNC.Inventory.Serialize(personalNPC)[2], "SEED_ONLY",
     "temporary personal food delta did not compact")
@@ -652,12 +664,12 @@ local foodNPC = supplyNPC("supply_food", { emptyBaseline = true })
 local applesBefore = supplyStorage.inventory:count("Base.Apple")
 local foodOK = SupplyService.Process({
     requesterId = foodNPC.id, resourceKind = "FOOD",
-    required = { hunger = 20 }, priority = 80,
+    required = { hunger = 0.20 }, priority = 80,
 })
 assertEqual(foodOK, true, "storage food request")
 assertEqual(supplyStorage.inventory:count("Base.Apple"), applesBefore - 1,
     "storage food count did not decrease exactly once")
-assert(PNC.IndividualNeeds.Get(foodNPC, "hunger") > 30,
+assert(PNC.IndividualNeeds.Get(foodNPC, "hunger") < 0.30,
     "storage food was not used from NPC inventory")
 assertEqual(PNC.Inventory.Serialize(foodNPC)[2], "SEED_ONLY",
     "acquired and consumed apple left sparse history")
@@ -669,12 +681,12 @@ local multiFoodNPC = supplyNPC("supply_multi_food", { emptyBaseline = true })
 local multiBefore = supplyStorage.inventory:count("Base.Apple")
 local multiFoodOK = SupplyService.Process({
     requesterId = multiFoodNPC.id, resourceKind = "FOOD",
-    required = { hunger = 40 }, priority = 85,
+    required = { hunger = 0.40 }, priority = 85,
 })
 assertEqual(multiFoodOK, true, "multiple food request")
 assertEqual(supplyStorage.inventory:count("Base.Apple"), multiBefore - 2,
     "multiple food request did not acquire bounded quantity")
-assert(PNC.IndividualNeeds.Get(multiFoodNPC, "hunger") >= 70,
+assert(PNC.IndividualNeeds.Get(multiFoodNPC, "hunger") <= 0.001,
     "multiple acquired foods did not reach target")
 assertEqual(PNC.Inventory.Serialize(multiFoodNPC)[2], "SEED_ONLY",
     "multiple temporary foods did not compact")
@@ -694,7 +706,7 @@ PNC.SupplyIndex.Invalidate(supplyStorage)
 local fefoNPC = supplyNPC("supply_fefo", { emptyBaseline = true })
 assertEqual(SupplyService.Process({
     requesterId = fefoNPC.id, resourceKind = "FOOD",
-    required = { hunger = 20 }, priority = 80,
+    required = { hunger = 0.20 }, priority = 80,
 }), true, "FEFO food request")
 local remainingExpiry = {}
 for _, coreRecord in ipairs(supplyStorage.inventory.records) do
@@ -712,7 +724,7 @@ assert(CoreInventory.deposit(supplyStorage.inventory,
 local waterNPC = supplyNPC("supply_water", { emptyBaseline = true })
 local waterOK = SupplyService.Process({
     requesterId = waterNPC.id, resourceKind = "HYDRATION",
-    required = { thirst = 15 }, priority = 90,
+    required = { thirst = 0.15 }, priority = 90,
 })
 assertEqual(waterOK, true, "storage hydration request")
 local retainedWater
@@ -721,7 +733,7 @@ for _, compact in pairs(waterNPC.inventory.items) do
 end
 assert(retainedWater and math.abs((retainedWater.uses or 0) - 0.75) < 0.001,
     "hydration remaining-use state was not retained")
-assert(PNC.IndividualNeeds.Get(waterNPC, "hydration") > 30,
+assert(PNC.IndividualNeeds.Get(waterNPC, "hydration") < 0.30,
     "hydration use did not change need")
 
 -- Medical acquisition precedes the existing treatment use path.
@@ -748,14 +760,14 @@ local scarceNPC = supplyNPC("supply_scarce", { emptyBaseline = true })
 local queriesBefore = PNC.SupplyMetrics.candidateQueries
 local scarceOK, scarceReason = SupplyService.Process({
     requesterId = scarceNPC.id, resourceKind = "FOOD",
-    required = { hunger = 20 }, priority = 60,
+    required = { hunger = 0.20 }, priority = 60,
 })
 assertEqual(scarceOK, false, "scarcity request unexpectedly succeeded")
 assertEqual(scarceReason, "no_supply", "scarcity reason")
 local queriesAfter = PNC.SupplyMetrics.candidateQueries
 local retryOK, retryReason = SupplyService.Process({
     requesterId = scarceNPC.id, resourceKind = "FOOD",
-    required = { hunger = 20 }, priority = 60,
+    required = { hunger = 0.20 }, priority = 60,
 })
 assertEqual(retryOK, false, "scarcity retry unexpectedly succeeded")
 assertEqual(retryReason, "retry_suppressed", "scarcity retry cooldown")
@@ -770,9 +782,9 @@ PNC.SupplyIndex.Invalidate(supplyStorage)
 local firstNPC = supplyNPC("supply_first", { emptyBaseline = true })
 local secondNPC = supplyNPC("supply_second", { emptyBaseline = true })
 local firstOK = SupplyService.Process({ requesterId = firstNPC.id,
-    resourceKind = "FOOD", required = { hunger = 20 }, priority = 80 })
+    resourceKind = "FOOD", required = { hunger = 0.20 }, priority = 80 })
 local secondOK = SupplyService.Process({ requesterId = secondNPC.id,
-    resourceKind = "FOOD", required = { hunger = 20 }, priority = 80 })
+    resourceKind = "FOOD", required = { hunger = 0.20 }, priority = 80 })
 assertEqual(firstOK, true, "first reservation claimant")
 assertEqual(secondOK, false, "second claimant duplicated single food")
 assertEqual(supplyStorage.inventory:count("Base.Apple"), 0,
@@ -810,14 +822,14 @@ local liveSupplyBody = {
 supplyBodies[liveSupplyNPC.id] = liveSupplyBody
 local liveAcquire = SupplyService.Process({
     requesterId = liveSupplyNPC.id, resourceKind = "FOOD",
-    required = { hunger = 20 }, priority = 80,
+    required = { hunger = 0.20 }, priority = 80,
 }, { acquireOnly = true })
 assertEqual(liveAcquire, true, "live instant acquisition")
 assertEqual(#liveSupplyItems, 1,
     "live acquisition did not enter physical inventory")
 local liveUse, liveUseReason = SupplyService.Process({
     requesterId = liveSupplyNPC.id, resourceKind = "FOOD",
-    required = { hunger = 20 }, priority = 80,
+    required = { hunger = 0.20 }, priority = 80,
 })
 local liveSupplyState = PNC.NPCSupplyService.GetDebugState(liveSupplyNPC)
 assertEqual(liveUse, true, "live personal use " .. tostring(liveUseReason)
@@ -833,7 +845,7 @@ PNC.SupplyIndex.Invalidate(supplyStorage)
 local saveNPC = supplyNPC("supply_save", { emptyBaseline = true })
 local saveAcquire = SupplyService.Process({
     requesterId = saveNPC.id, resourceKind = "HYDRATION",
-    required = { thirst = 15 }, priority = 80,
+    required = { thirst = 0.15 }, priority = 80,
 }, { acquireOnly = true })
 assertEqual(saveAcquire, true, "save/load acquisition")
 local supplySaved = PNC.Inventory.Serialize(saveNPC)
@@ -875,7 +887,7 @@ PNC.SupplyIndex.Invalidate(supplyStorage)
 local unknownNPC = supplyNPC("supply_unknown", { emptyBaseline = true })
 local unknownOK, unknownReason = SupplyService.Process({
     requesterId = unknownNPC.id, resourceKind = "FOOD",
-    required = { hunger = 20 }, priority = 70,
+    required = { hunger = 0.20 }, priority = 70,
 })
 assertEqual(unknownOK, false, "unknown item selected as food")
 assertEqual(unknownReason, "no_supply", "unknown item failure reason")
@@ -904,7 +916,7 @@ assertEqual(acceptsFull, false,
     "test full inventory preflight " .. tostring(acceptsFullReason))
 local rollbackOK, rollbackReason = SupplyService.Process({
     requesterId = fullNPC.id, resourceKind = "FOOD",
-    required = { hunger = 20 }, priority = 80,
+    required = { hunger = 0.20 }, priority = 80,
 })
 assertEqual(rollbackOK, false, "full inventory acquisition succeeded")
 assertEqual(rollbackReason, "no_capacity", "full inventory rejection reason")
@@ -930,7 +942,7 @@ PNC.SupplyIndex.Invalidate(supplyStorage)
 local boundedNPC = supplyNPC("supply_bounded", { emptyBaseline = true })
 local evaluatedBefore = PNC.SupplyMetrics.candidateItemsEvaluated
 SupplyService.Process({ requesterId = boundedNPC.id,
-    resourceKind = "FOOD", required = { hunger = 20 }, priority = 80 },
+    resourceKind = "FOOD", required = { hunger = 0.20 }, priority = 80 },
     { acquireOnly = true })
 local evaluatedDelta = PNC.SupplyMetrics.candidateItemsEvaluated
     - evaluatedBefore
@@ -939,7 +951,7 @@ assert(evaluatedDelta <= PNC.NeedsDefinitions.SUPPLY_MAX_CANDIDATES,
 
 -- Stable Needs evaluation performs zero stockpile queries.
 local stableNPC = supplyNPC("supply_stable", {
-    emptyBaseline = true, hunger = 90, hydration = 90,
+    emptyBaseline = true, hunger = 0.10, hydration = 0.10,
 })
 local stableQueries = PNC.SupplyMetrics.candidateQueries
 PNC.NeedSupplyBridge.Evaluate(stableNPC)

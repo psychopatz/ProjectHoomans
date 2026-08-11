@@ -24,22 +24,23 @@ local companion = {
     ownerUsername = "Tester",
     affiliation = { factionID = "faction_player", communityRole = "resident" },
     health = { state = "normal" },
-    needs = { hunger = 18, hydration = 74, fatigue = 63 },
+    needs = { hunger = 0.82, hydration = 0.10, fatigue = 0.10 },
 }
 
 PNC = {
     NeedsDefinitions = {
         TYPES = { "hunger", "hydration", "fatigue" },
-        GetLevel = function(value)
-            if value < 20 then return "CRITICAL" end
-            if value < 40 then return "LOW" end
-            if value < 70 then return "STABLE" end
+        GetLevel = function(_, value)
+            if value >= 0.70 then return "EMERGENCY" end
+            if value >= 0.45 then return "CRITICAL" end
+            if value >= 0.25 then return "LOW" end
+            if value >= 0.15 then return "STABLE" end
             return "GOOD"
         end,
     },
     IndividualNeeds = {
         Ensure = function(record) return record.needs end,
-        GetHighestPriority = function() return "hunger", 18 end,
+        GetHighestPriority = function() return "hunger", 82 end,
         GetActivity = function() return "Following" end,
     },
     NeedsUtils = { WorldAgeHours = function() return 42 end },

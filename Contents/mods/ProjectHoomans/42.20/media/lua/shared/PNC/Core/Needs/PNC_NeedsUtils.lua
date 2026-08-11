@@ -12,6 +12,8 @@ end
 
 function Utils.NormalizeState(value, at, defaults)
     local source = type(value) == "table" and value or {}
+    local legacy = tonumber(source.version) ~= nil
+        and tonumber(source.version) < Definitions.VERSION
     local state = {
         version = Definitions.VERSION,
         lastUpdateWorldAge = math.max(0, tonumber(source.lastUpdateWorldAge) or tonumber(at) or 0),
@@ -19,9 +21,10 @@ function Utils.NormalizeState(value, at, defaults)
     for _, needType in ipairs(Definitions.TYPES) do
         local default = defaults and defaults[needType]
             or Definitions.Get(needType).default
-        state[needType] = Definitions.Clamp(
-            needType, source[needType] == nil and default or source[needType]
-        )
+        local raw = source[needType] == nil and default or source[needType]
+        if legacy then raw = 1 - math.max(0, math.min(100,
+            tonumber(raw) or 100)) / 100 end
+        state[needType] = Definitions.Clamp(needType, raw)
     end
     if Definitions.GROUP_ACTIVITY[tostring(source.debugActivity or "")] then
         state.debugActivity = tostring(source.debugActivity)
@@ -41,13 +44,17 @@ function Utils.GroupSizeModifier(memberCount)
 end
 
 function Utils.RandomInRange(minimum, maximum, seed)
-    minimum = math.floor(tonumber(minimum) or 0)
-    maximum = math.max(minimum, math.floor(tonumber(maximum) or minimum))
+    minimum = tonumber(minimum) or 0
+    maximum = math.max(minimum, tonumber(maximum) or minimum)
+    local precision = 10000
     if seed ~= nil and PNC.Identity and PNC.Identity.MixSeed then
-        return minimum + (PNC.Identity.MixSeed(seed, "needs") % (maximum - minimum + 1))
+        local ratio = (PNC.Identity.MixSeed(seed, "needs") % (precision + 1))
+            / precision
+        return minimum + (maximum - minimum) * ratio
     end
-    return ZombRand and ZombRand(minimum, maximum + 1)
-        or math.random(minimum, maximum)
+    local roll = ZombRand and ZombRand(0, precision + 1)
+        or math.random(0, precision)
+    return minimum + (maximum - minimum) * roll / precision
 end
 
 return Utils

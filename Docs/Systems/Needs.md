@@ -2,12 +2,13 @@
 
 ## Purpose
 
-Phase 1 establishes low-cost survival-condition state without attempting to
-simulate vanilla survival mechanics for every NPC. Need values are reserves:
-`100` is healthy/supplied and `0` is depleted. Lower is always worse.
+Needs use the same normalized direction and bounds as Build 42 `CharacterStat`:
+`0` is satisfied and `1` is the maximum hunger, thirst, or fatigue deficit.
+Higher is always worse. Food and fluid effects retain their native values, so
+an item with `HungerChange = -0.15` removes `0.15` NPC hunger.
 
-The initial Need types are `hunger`, `hydration`, and `fatigue`. Fatigue is a
-rest reserve in this model: a higher fatigue value means a better-rested owner.
+The initial Need types are `hunger`, `hydration` (vanilla thirst), and
+`fatigue`.
 
 ## Fidelity models
 
@@ -17,10 +18,10 @@ Player-owned or recruited NPC records lazily receive:
 
 ```lua
 record.needs = {
-    version = 1,
-    hunger = 100,
-    hydration = 100,
-    fatigue = 100,
+    version = 2,
+    hunger = 0,
+    hydration = 0,
+    fatigue = 0,
     lastUpdateWorldAge = 0,
 }
 ```
@@ -35,10 +36,10 @@ An active mobile faction stores one aggregate state at `faction.needs`:
 
 ```lua
 faction.needs = {
-    version = 1,
-    hunger = 100,
-    hydration = 100,
-    fatigue = 100,
+    version = 2,
+    hunger = 0,
+    hydration = 0,
+    fatigue = 0,
     lastUpdateWorldAge = 0,
 }
 ```
@@ -53,9 +54,9 @@ All mutations occur on the server. NPC Needs are serialized through
 `PNC.Persistence`; group Needs are part of the existing normalized faction
 record and therefore use the existing `PNC_Factions` persistence lifecycle.
 
-Older saves with no Need state remain valid. State is initialized lazily and
-uses `version = 1` for future Need-specific migrations. Runtime debug histories
-and profiler data are never serialized.
+Older saves with no Need state remain valid. Version 1 reserve values migrate
+with `deficit = 1 - reserve / 100`; the conversion is performed once when the
+state is normalized. Runtime debug histories and profiler data are not saved.
 
 ## Simulation contract
 
@@ -64,10 +65,17 @@ owner analytically from `lastUpdateWorldAge` to current world age. It does not
 perform per-second updates, world searches, pathfinding, container scans,
 inventory iteration, or individual group-member simulation.
 
-Group depletion is calculated from centralized base rates, group-size modifier,
+At the standard 60-minute day, the installed Build 42 constants are expressed
+as world-hour rates of `0.0432` base awake hunger, `0.03456` thirst, and
+`0.044712` fatigue. Hunger follows the player's remaining-appetite factor
+`(1 - hunger)`; running, fighting, and sleeping select their corresponding
+vanilla hunger rate. Item effects are never rescaled: `HungerChange = -0.20`
+removes `0.20` hunger and `ThirstChange = -0.15` removes `0.15` thirst.
+
+Group accumulation is calculated from centralized base rates, group-size modifier,
 abstract activity modifier, and elapsed world hours. Supported Phase 1
 activities are `idle`, `traveling`, `scavenging`, `fighting`, `resting`, and
-`at_home`. Resting recovers the fatigue/rest reserve. The current implementation
+`at_home`. Resting slows awake fatigue accumulation, as vanilla does. The current implementation
 only provides a persisted debug activity override; it does not alter existing
 mobile-group AI.
 
@@ -94,14 +102,14 @@ Group API (`PNC.GroupNeeds`):
 - `SetDebugActivity(...)` and `DebugAbstractScavenge(...)` are test tools only.
 
 Every mutation clamps to the definition bounds and accepts an optional reason,
-such as `passive_decay`, `debug_simulate_time`, or
+such as `passive_increase`, `debug_simulate_time`, or
 `debug_abstract_scavenge`.
 
 ## Condition hooks
 
-Levels are centralized as `GOOD` (75–100), `STABLE` (50–74), `LOW` (25–49),
-`CRITICAL` (10–24), and `EMERGENCY` (0–9). A group callback runs only when a
-level changes:
+Levels use the installed Build 42 moodle thresholds. Hunger transitions at
+`0.15/0.25/0.45/0.70`, thirst at `0.12/0.25/0.70/0.84`, and fatigue at
+`0.60/0.70/0.80/0.90`. A group callback runs only when a level changes:
 
 ```lua
 PNC.GroupNeeds.RegisterListener("level_changed", function(
@@ -120,7 +128,60 @@ Companion level transitions use the same guarded listener pattern through
 needType, oldLevel, newLevel, reason) ... end)`. The current activity set is
 `idle`, `walking`, `running`, `fighting`, `working`, `traveling`, `resting`,
 and `sleeping`; their rate modifiers are centralized in
-`PNC_NeedsDefinitions`.
+`PNC_PlayerNeedsModel`.
+
+## Vanilla physiological traits
+
+NPC physiological traits are stored in `record.vanillaTraits` as a boolean map
+and persisted with the NPC. Spawn definitions may provide `vanillaTraits` or
+the legacy alias `physiologicalTraits`. `PNC.PlayerNeedsModel.SetTraits` is the
+authoritative mutation API.
+
+When a spawn definition does not author a trait set, the canonical NPC record
+receives a deterministic selection based on its permanent `identitySeed` and
+archetype. The generator independently considers thirst, appetite, sleep need,
+sleep quality, and body-weight groups. Neutral outcomes remain most common and
+the Build 42 mutual exclusions are enforced. Generated traits are versioned and
+saved, so they never reroll on materialization or reload. Supplying an explicit
+empty `vanillaTraits = {}` intentionally creates a traitless NPC. Legacy NPCs
+without trait metadata receive the same deterministic initialization during
+load or their next individual-Needs update.
+
+The Build 42 multipliers are preserved: High Thirst `2.0`, Low Thirst `0.5`,
+Hearty Appetite `1.5`, Light Eater `0.75`, Wakeful/Needs Less Sleep `0.7`
+awake fatigue, and Sleepyhead/Needs More Sleep `1.3`. Insomniac halves sleep
+recovery and Night Owl multiplies it by `1.4`. Weight traits are retained in
+the same trait map but do not directly modify hunger or thirst, matching the
+base game; they belong to the nutrition, weight, endurance, and movement model.
+The NPC Character window displays the assigned vanilla trait names using the
+base game's own translated trait labels.
+
+## Project Hoomans dynamic traits and secondary stats
+
+`PNC.ConditionStats` adds player-like secondary condition values without
+duplicating the relationship system's existing morale:
+
+- `stress`: native-style `0..1`, higher is worse;
+- `boredom`: native-style `0..100`, higher is worse;
+- `panic`: native-style `0..100`, higher is worse;
+- `record.social.morale`: existing `-100..100` social morale, displayed by the
+  same reusable meter UI.
+
+Stress reacts to unmet primary needs and negative social morale. Idle/resting
+time raises boredom while purposeful activity reduces it. Fighting raises
+panic; safe time recovers it. All updates remain elapsed-world-hour based and
+run in the existing Needs scheduler rather than adding a second timer.
+
+NPCs also receive one deterministic outcome from each custom trait group:
+
+- **Iron Nerves / Frayed Nerves** alter stress and panic gain/recovery;
+- **Busy Hands / Restless Soul** alter boredom gain/recovery;
+- **Hardy Constitution / Delicate Constitution** alter hunger and thirst gain;
+- **Second Wind / Heavy Sleeper** alter fatigue behavior and sleep recovery.
+
+The custom set is stored separately at `record.dynamicTraits`, persists without
+rerolling, and supports authored `dynamicTraits` (or `pncTraits`) spawn values.
+An explicit empty table disables generated custom traits for that NPC.
 
 ## Colony Management
 
@@ -128,7 +189,7 @@ and `sleeping`; their rate modifiers are centralized in
 for the current player's existing owned/recruited companions. It does not add
 a second colony record or aggregate canonical Need pool. The summary derives:
 
-- companion roster, role, activity/job, health state, and individual reserves;
+- companion roster, role, activity/job, health state, and individual deficits;
 - per-Need condition-level counts;
 - ordered LOW/CRITICAL/EMERGENCY attention entries;
 - the first active existing Community belonging to the player's faction, when
@@ -157,6 +218,5 @@ broadcast to clients.
 
 - destination selection or autonomous scavenging AI;
 - food/water searches, container scans, and exact group inventories;
-- NPC eating, drinking, sleeping, moodles, relationships, or personality
-  effects;
+- full calorie/macronutrient body-weight simulation and thermoregulation;
 - individual Need records for every autonomous group member.

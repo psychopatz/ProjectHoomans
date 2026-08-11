@@ -782,6 +782,23 @@ function Persistence.SerializeRecord(record)
             and type(record.needs) == "table"
             and PNC.NeedsUtils.NormalizeState(record.needs, 0)
             or nil,
+        vanillaTraits = PNC.PlayerNeedsModel
+            and PNC.PlayerNeedsModel.NormalizeTraits(record.vanillaTraits)
+            or {},
+        vanillaTraitsAuthored = record.vanillaTraitsAuthored == true,
+        vanillaTraitsGenerationVersion = math.max(0, math.floor(
+            tonumber(record.vanillaTraitsGenerationVersion) or 0
+        )),
+        dynamicTraits = PNC.ConditionStats
+            and PNC.ConditionStats.NormalizeTraits(record.dynamicTraits) or {},
+        dynamicTraitsAuthored = record.dynamicTraitsAuthored == true,
+        dynamicTraitsGenerationVersion = math.max(0, math.floor(
+            tonumber(record.dynamicTraitsGenerationVersion) or 0
+        )),
+        conditionStats = PNC.ConditionStats
+            and type(record.conditionStats) == "table"
+            and PNC.ConditionStats.NormalizeState(record.conditionStats, 0)
+            or nil,
         generation = type(record.generation) == "table"
             and PNC.Core.DeepCopy(record.generation) or nil,
     }
@@ -858,6 +875,16 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         affiliation = raw.affiliation,
         mapPresentation = raw.mapPresentation,
         generation = raw.generation,
+        vanillaTraits = raw.vanillaTraits or raw.physiologicalTraits,
+        vanillaTraitsAuthored = raw.vanillaTraitsAuthored == true
+            or (raw.vanillaTraitsAuthored == nil and hasTableEntries(
+                raw.vanillaTraits or raw.physiologicalTraits
+            )),
+        dynamicTraits = raw.dynamicTraits or raw.pncTraits,
+        dynamicTraitsAuthored = raw.dynamicTraitsAuthored == true
+            or (raw.dynamicTraitsAuthored == nil and hasTableEntries(
+                raw.dynamicTraits or raw.pncTraits
+            )),
     }
     record = Types.NewRecord(definition)
     if not record then
@@ -907,6 +934,44 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     record.persist = raw.persist ~= false
     record.generation = type(raw.generation) == "table"
         and PNC.Core.DeepCopy(raw.generation) or nil
+    local persistedVanillaTraits = raw.vanillaTraits
+        or raw.physiologicalTraits
+    local persistedTraitsAuthored = raw.vanillaTraitsAuthored == true
+        or (raw.vanillaTraitsAuthored == nil
+            and hasTableEntries(persistedVanillaTraits))
+    local persistedTraitsVersion = math.max(0, math.floor(
+        tonumber(raw.vanillaTraitsGenerationVersion) or 0
+    ))
+    if PNC.PlayerNeedsModel
+        and (persistedTraitsAuthored or persistedTraitsVersion > 0)
+    then
+        record.vanillaTraits = PNC.PlayerNeedsModel.NormalizeTraits(
+            persistedVanillaTraits
+        )
+        record.vanillaTraitsAuthored = persistedTraitsAuthored
+        record.vanillaTraitsGenerationVersion = persistedTraitsAuthored
+            and 0 or persistedTraitsVersion
+    end
+    local persistedDynamicTraits = raw.dynamicTraits or raw.pncTraits
+    local persistedDynamicAuthored = raw.dynamicTraitsAuthored == true
+        or (raw.dynamicTraitsAuthored == nil
+            and hasTableEntries(persistedDynamicTraits))
+    local persistedDynamicVersion = math.max(0, math.floor(
+        tonumber(raw.dynamicTraitsGenerationVersion) or 0
+    ))
+    if PNC.ConditionStats
+        and (persistedDynamicAuthored or persistedDynamicVersion > 0)
+    then
+        record.dynamicTraits = PNC.ConditionStats.NormalizeTraits(
+            persistedDynamicTraits)
+        record.dynamicTraitsAuthored = persistedDynamicAuthored
+        record.dynamicTraitsGenerationVersion = persistedDynamicAuthored
+            and 0 or persistedDynamicVersion
+    end
+    if PNC.ConditionStats and type(raw.conditionStats) == "table" then
+        record.conditionStats = PNC.ConditionStats.NormalizeState(
+            raw.conditionStats, 0)
+    end
     if PNC.NeedsUtils and PNC.NeedsUtils.NormalizeState
         and type(raw.needs) == "table"
     then

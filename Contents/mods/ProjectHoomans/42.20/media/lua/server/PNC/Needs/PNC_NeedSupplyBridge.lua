@@ -7,7 +7,8 @@ local Bridge = PNC.NeedSupplyBridge
 local Definitions = PNC.NeedsDefinitions
 
 local function priority(definition, current)
-    local severity = math.max(0, math.min(100, 100 - (tonumber(current) or 100)))
+    local severity = math.max(0, math.min(100,
+        (tonumber(current) or 0) * 100))
     return math.max(definition.priorityBase,
         math.min(100, definition.priorityBase + severity * 0.4))
 end
@@ -16,10 +17,10 @@ function Bridge.RequestForNeed(record, needType, force)
     local definition = Definitions.SUPPLY[needType]
     if not definition then return false, "supply_not_supported" end
     local current = PNC.IndividualNeeds.Get(record, needType)
-    if not force and current > definition.trigger then
+    if not force and current < definition.trigger then
         return false, "trigger_not_reached"
     end
-    local required = math.max(1, definition.target - current)
+    local required = math.max(0.001, current - definition.target)
     return PNC.NPCSupplyService.Process({
         requesterId = record.id,
         purpose = "NEED",
@@ -55,7 +56,7 @@ function Bridge.Evaluate(record, forceKind)
     local changed = false
     if not forceKind or forceKind == "FOOD" then
         local current = PNC.IndividualNeeds.Get(record, "hunger")
-        if forceKind == "FOOD" or current <= Definitions.SUPPLY.hunger.trigger then
+        if forceKind == "FOOD" or current >= Definitions.SUPPLY.hunger.trigger then
             local ok = Bridge.RequestForNeed(record, "hunger", forceKind == "FOOD")
             changed = ok or changed
         end
@@ -63,7 +64,7 @@ function Bridge.Evaluate(record, forceKind)
     if not forceKind or forceKind == "HYDRATION" then
         local current = PNC.IndividualNeeds.Get(record, "hydration")
         if forceKind == "HYDRATION"
-            or current <= Definitions.SUPPLY.hydration.trigger
+            or current >= Definitions.SUPPLY.hydration.trigger
         then
             local ok = Bridge.RequestForNeed(
                 record, "hydration", forceKind == "HYDRATION"

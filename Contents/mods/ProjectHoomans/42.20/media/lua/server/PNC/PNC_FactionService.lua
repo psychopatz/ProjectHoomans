@@ -380,6 +380,11 @@ function Factions.Load()
     then
         PNC.FactionBehavior.ReconcileAll("registry_load")
     end
+    if PNC.ProvisionScheduler then
+        for factionID in pairs(Factions.Registry.byID or {}) do
+            PNC.ProvisionScheduler.MarkFactionDirty(factionID)
+        end
+    end
     return true, Factions.Dirty
 end
 
@@ -706,6 +711,21 @@ function Factions.MergeTags(factionID, values)
     return true, "tags_merged", copy(faction)
 end
 
+function Factions.SetProvisionPolicy(factionID, value)
+    if not authority() then return false, "not_authority" end
+    Factions.EnsureLoaded()
+    local faction = registryRecord(factionID)
+    if not faction then return false, "faction_not_found" end
+    local normalized = PNC.ProvisionPolicy.Normalize(value)
+    if Types.AreEqual(faction.provision, normalized) then
+        return false, "unchanged", copy(faction.provision)
+    end
+    faction.provision = normalized
+    touchFaction(faction)
+    touchRegistry()
+    return true, "updated", copy(faction.provision)
+end
+
 function Factions.AddNPC(factionID, npcID, options)
     local faction
     local record
@@ -772,6 +792,9 @@ function Factions.AddNPC(factionID, npcID, options)
     then
         PNC.FactionBehavior.ApplyNPC(record, "faction_joined")
     end
+    if PNC.ProvisionScheduler then
+        PNC.ProvisionScheduler.MarkAllDirty(record)
+    end
     return true, "added", copy(nextAffiliation)
 end
 
@@ -818,6 +841,9 @@ function Factions.RemoveNPC(
         PNC.Communities.OnFactionMembershipChanging(record)
     end
     faction.memberIDs[npcID] = nil
+    if PNC.ProvisionScheduler then
+        PNC.ProvisionScheduler.CancelNPC(record)
+    end
     if faction.leaderNPCID == npcID then
         faction.leaderNPCID = nil
     end
@@ -931,6 +957,10 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
             at
         )
     end
+    if PNC.ProvisionScheduler then
+        PNC.ProvisionScheduler.CancelNPC(record)
+        PNC.ProvisionScheduler.MarkAllDirty(record)
+    end
     return true, "transferred", copy(nextAffiliation)
 end
 
@@ -983,7 +1013,11 @@ function Factions.SetNPCRole(npcID, role)
     if not faction then return false, "unaffiliated" end
     role = normalizeRole(faction, role)
     if not role then return false, "role_not_allowed" end
-    return updateAffiliationField(npcID, "role", role)
+    local ok, reason, result = updateAffiliationField(npcID, "role", role)
+    if ok and PNC.ProvisionScheduler then
+        PNC.ProvisionScheduler.MarkAllDirty(npcID)
+    end
+    return ok, reason, result
 end
 
 function Factions.SetNPCRank(npcID, rank)

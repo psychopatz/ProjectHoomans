@@ -801,6 +801,8 @@ function Types.NormalizeFaction(value, factionID)
             archetypeID,
             id
         ),
+        provision = PNC.ProvisionPolicy and PNC.ProvisionPolicy.Normalize
+            and PNC.ProvisionPolicy.Normalize(source.provision) or nil,
         emblem = Emblems.Normalize(
             source.emblem,
             archetypeID,

@@ -9,6 +9,29 @@ local Shared = PNC.CharacterWindowShared
 local Layout = PsychopatzCore.UI.Layout
 local IdentityPresentation = PNC.NPCIdentityPresentation
 
+local function traitText(snapshot)
+    local model = PNC.PlayerNeedsModel
+    local ids = model and model.GetActiveTraitIDs
+        and model.GetActiveTraitIDs(snapshot.vanillaTraits) or {}
+    local labels = {}
+    local index
+    for index = 1, #ids do
+        local key = model.GetTraitLabelKey(ids[index])
+        labels[#labels + 1] = Shared.Text(key, ids[index])
+    end
+    local dynamics = PNC.ConditionStats
+    local dynamicIDs = dynamics and dynamics.GetActiveTraitIDs
+        and dynamics.GetActiveTraitIDs(snapshot.dynamicTraits) or {}
+    for index = 1, #dynamicIDs do
+        local key = dynamics.GetTraitLabelKey(dynamicIDs[index])
+        labels[#labels + 1] = Shared.Text(key, dynamicIDs[index])
+    end
+    if #labels == 0 then
+        return Shared.Text("UI_PNC_Character_Traits_None", "None")
+    end
+    return table.concat(labels, ", ")
+end
+
 function Tabs.CreateInfoChildren(view)
     view.portraitPanel = PsychopatzCore.UI.PortraitPanel:new(12, 12, 132, 264, {
         -- Match the vanilla player-info full-body preview. The NPC's live
@@ -71,6 +94,12 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
     y = y + 14
 
     y = Shared.DrawLabelValue(view, "Faction", knownFaction and knownFaction.name or "Unknown", x, y, labelWidth)
+    y = Shared.DrawLabelValue(
+        view,
+        Shared.Text("UI_PNC_Character_Traits", "Traits"),
+        traitText(resolved),
+        x, y, labelWidth
+    )
     y = Shared.DrawLabelValue(view, "Status", resolved.aiState or resolved.activeBehavior or "Idle", x, y, labelWidth)
     y = Shared.DrawLabelValue(view, "Health", hp, x, y, labelWidth)
     y = Shared.DrawLabelValue(view, "Stamina", stamina, x, y, labelWidth)

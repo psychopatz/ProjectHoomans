@@ -30,6 +30,18 @@ function Scheduler.Pump(now)
         for _, record in pairs(PNC.Registry.Data) do
             if record.alive ~= false and PNC.IndividualNeeds.IsEligible(record) then
                 PNC.IndividualNeeds.UpdateToNow(record, "passive_decay")
+                if PNC.ConditionStats then
+                    local at = Utils.WorldAgeHours()
+                    local condition = PNC.ConditionStats.Ensure(record, at)
+                    local elapsed = math.max(0, at
+                        - (tonumber(condition.lastUpdateWorldAge) or at))
+                    PNC.ConditionStats.Update(record, elapsed,
+                        PNC.IndividualNeeds.GetActivity(record), at)
+                    if elapsed > 0 and PNC.Registry.MarkDirty then
+                        PNC.Registry.MarkDirty(record,
+                            "condition_stats_update")
+                    end
+                end
                 if PNC.NeedSupplyBridge and PNC.NeedSupplyBridge.Evaluate then
                     PNC.NeedSupplyBridge.Evaluate(record)
                 end
@@ -49,7 +61,13 @@ function Scheduler.SimulateGroup(faction, elapsedHours)
 end
 
 function Scheduler.SimulateIndividual(record, elapsedHours)
-    return PNC.IndividualNeeds and PNC.IndividualNeeds.Update(record, elapsedHours, "debug_simulate_time")
+    local updated = PNC.IndividualNeeds and PNC.IndividualNeeds.Update(
+        record, elapsedHours, "debug_simulate_time")
+    if updated and PNC.ConditionStats then
+        PNC.ConditionStats.Update(record, elapsedHours,
+            PNC.IndividualNeeds.GetActivity(record), Utils.WorldAgeHours())
+    end
+    return updated
 end
 
 return Scheduler

@@ -35,7 +35,7 @@ function ISPNCNeedsDebugWindow:createChildren()
     self.individuals = UI.CreateList(self, { itemHeight = 40, doDrawItem = drawItem })
     self.details = UI.CreateList(self, { itemHeight = 24, doDrawItem = drawDetail })
     self.controls = {}
-    local actions = { "refresh", "group_mode", "individual_mode", "profile", "supply_log", "need", "minus10", "plus10", "set0", "set25", "set50", "set75", "set100", "reset", "hour", "six_hours", "day", "scavenge", "activity", "force_eval", "force_food", "force_water", "force_medical", "clear_retry", "dump_scores" }
+    local actions = { "refresh", "group_mode", "individual_mode", "profile", "supply_log", "need", "minus10", "plus10", "set0", "set25", "set50", "set75", "set100", "reset", "hour", "six_hours", "day", "scavenge", "activity", "force_eval", "force_food", "force_water", "force_medical", "clear_retry", "dump_scores", "force_provision", "provision_dirty", "provision_retry", "dump_provision" }
     for _, id in ipairs(actions) do self.controls[#self.controls + 1] = UI.CreateButton(self, { id = id, title = id:gsub("_", " "):upper(), target = self, onclick = ISPNCNeedsDebugWindow.onAction, variant = id == "scavenge" and "success" or "quiet" }) end
     self:requestResponsiveLayout(true)
     self.needIndex = 1
@@ -59,8 +59,8 @@ function ISPNCNeedsDebugWindow:refreshSnapshot()
     local snapshot = ClientState.needsDebug or {}
     local oldGroup, oldNPC = selected(self.groups), selected(self.individuals)
     self.groups:clear(); self.individuals:clear(); self.details:clear()
-    for _, group in ipairs(snapshot.groups or {}) do self.groups:addItem(group.name, { id=group.id, label=group.name, detail=string.format("%s | %d | H %.0f W %.0f R %.0f", group.type, group.members, group.needs.hunger, group.needs.hydration, group.needs.fatigue), value=group }) end
-    for _, npc in ipairs(snapshot.individuals or {}) do self.individuals:addItem(npc.name, { id=npc.id, label=npc.name, detail=string.format("H %.0f W %.0f R %.0f", npc.needs.hunger, npc.needs.hydration, npc.needs.fatigue), value=npc }) end
+    for _, group in ipairs(snapshot.groups or {}) do self.groups:addItem(group.name, { id=group.id, label=group.name, detail=string.format("%s | %d | H %.2f W %.2f R %.2f", group.type, group.members, group.needs.hunger, group.needs.hydration, group.needs.fatigue), value=group }) end
+    for _, npc in ipairs(snapshot.individuals or {}) do self.individuals:addItem(npc.name, { id=npc.id, label=npc.name, detail=string.format("H %.2f W %.2f R %.2f", npc.needs.hunger, npc.needs.hydration, npc.needs.fatigue), value=npc }) end
     local function restore(list, id)
         for index, entry in ipairs(list.items or {}) do
             if entry.item and entry.item.id == id then list.selected = index; return end
@@ -80,14 +80,29 @@ function ISPNCNeedsDebugWindow:refreshSnapshot()
     end
     self.details:addItem("supply logging", { label="Supply transaction log", value=snapshot.supplyLoggingEnabled and "enabled" or "disabled" })
     if profiler.supply then
-        for _, metric in ipairs({ "supplyRequests", "supplyRequestsSatisfiedFromPersonalInventory", "supplyRequestsSentToStorage", "supplyRequestsSucceeded", "supplyRequestsFailed", "candidateQueries", "candidateItemsEvaluated", "supplyRetriesSuppressed", "reservationsCreated", "reservationFailures", "instantAcquisitions", "acquisitionFailures", "deltaInventoryMutations", "deltaInventoryCompactions", "deltaToFullPromotions" }) do
+        for _, metric in ipairs({ "supplyRequests", "supplyRequestsSatisfiedFromPersonalInventory", "supplyRequestsSentToStorage", "supplyRequestsSucceeded", "supplyRequestsFailed", "candidateQueries", "candidateItemsEvaluated", "supplyRetriesSuppressed", "reservationsCreated", "reservationFailures", "instantAcquisitions", "acquisitionFailures", "deltaInventoryMutations", "deltaInventoryCompactions", "deltaToFullPromotions", "provisionPolicyRevision", "provisionDirtyNPCs", "provisionEvaluations", "provisionRulesEvaluated", "provisionRulesSatisfied", "provisionRulesDeficient", "provisionRequestsCreated", "provisionRequestsSucceeded", "provisionRequestsFailed", "provisionRequestsSuppressedByIncoming", "provisionRequestsSuppressedByNeedRequest", "provisionSchedulerQueueSize", "provisionSchedulerProcessed", "provisionStorageShortages" }) do
             self.details:addItem(metric, { label=metric, value=tostring(profiler.supply[metric] or 0) })
         end
     end
     if owner then
         for _, line in ipairs({ {"Owner", owner.owner or owner.faction or owner.name}, {"ID", owner.id}, {"Activity", owner.activity or "idle"}, {"Location", owner.location and string.format("%.0f, %.0f, %.0f", owner.location.x or 0, owner.location.y or 0, owner.location.z or 0) or "n/a"}, {"Next destination", owner.destination and tostring(owner.destination) or "n/a"}, {"Last update", tostring(owner.needs.lastUpdateWorldAge)}, {"Elapsed hours", string.format("%.2f", owner.elapsed or 0)} }) do self.details:addItem(line[1], { label=line[1], value=line[2] }) end
-        for _, needType in ipairs(Definitions.TYPES) do self.details:addItem(needType, { label=needType:upper() .. " / condition", value=string.format("%.1f / 100  %s%s", owner.needs[needType], Definitions.GetLevel(owner.needs[needType]), owner.rates and string.format("  rate -%.2f/h", owner.rates[needType]) or "") }) end
+        for _, needType in ipairs(Definitions.TYPES) do self.details:addItem(needType, { label=needType:upper() .. " / condition", value=string.format("%.2f / 1  %s%s", owner.needs[needType], Definitions.GetLevel(needType, owner.needs[needType]), owner.rates and string.format("  rate %+.4f/h", owner.rates[needType]) or "") }) end
         if self.mode == "individual" then
+            for _, statType in ipairs(PNC.ConditionStats
+                and PNC.ConditionStats.TYPES or {})
+            do
+                local definition = PNC.ConditionStats.DEFINITIONS[statType]
+                local amount = tonumber(owner.conditionStats
+                    and owner.conditionStats[statType]) or definition.default
+                self.details:addItem("condition " .. statType, {
+                    label = statType:upper() .. " / condition",
+                    value = string.format("%.2f / %.2f  %s  rate %+.3f/h",
+                        amount, definition.maximum,
+                        PNC.ConditionStats.GetLevel(statType, amount),
+                        tonumber(owner.conditionRates
+                            and owner.conditionRates[statType]) or 0),
+                })
+            end
             self.details:addItem("inventory mode", { label="Inventory mode", value=tostring(owner.inventoryMode or "UNKNOWN") })
             self.details:addItem("delta records", { label="Delta record count", value=tostring(owner.deltaRecordCount or 0) })
             self.details:addItem("promotion", { label="FULL promotion reason", value=tostring(owner.fullPromotionReason or "none") })
@@ -100,6 +115,22 @@ function ISPNCNeedsDebugWindow:refreshSnapshot()
                 for _, selectedItem in ipairs(lane.selected or {}) do
                     self.details:addItem("selected", { label="  selected", value=string.format("%s x%d score %.1f", tostring(selectedItem.fullType), tonumber(selectedItem.quantity) or 0, tonumber(selectedItem.score) or 0) })
                 end
+            end
+            local provision = owner.provision or {}
+            self.details:addItem("provision last", { label="Provision last evaluation", value=tostring(provision.lastEvaluation or "none") })
+            for _, definition in ipairs(PNC.ProvisionRuleRegistry.List()) do
+                local value = provision.evaluations
+                    and provision.evaluations[definition.id] or {}
+                self.details:addItem("provision " .. definition.id, {
+                    label = "Provision " .. definition.id,
+                    value = string.format("on %.1f + in %.1f | < %.1f -> %.1f | %s | %s",
+                        tonumber(value.onHand) or 0,
+                        tonumber(value.incoming) or 0,
+                        tonumber(value.refillBelow) or 0,
+                        tonumber(value.target) or 0,
+                        value.satisfied and "satisfied" or "deficient",
+                        tostring(value.policySource or "unknown")),
+                })
             end
         end
         for _, entry in ipairs(owner.history or {}) do self.details:addItem("history", { label=tostring(entry.reason), value=tostring(entry.needType) .. " " .. tostring(entry.before) .. " -> " .. tostring(entry.after) }) end
@@ -135,6 +166,10 @@ function ISPNCNeedsDebugWindow:onAction(button)
     elseif id == "force_medical" and target == "individual" then payload.operation = "force_medical_supply"
     elseif id == "clear_retry" and target == "individual" then payload.operation = "clear_supply_retry"
     elseif id == "dump_scores" and target == "individual" then payload.operation = "dump_candidate_scores"
+    elseif id == "force_provision" and target == "individual" then payload.operation = "force_provision_evaluation"
+    elseif id == "provision_dirty" and target == "individual" then payload.operation = "mark_provision_dirty"
+    elseif id == "provision_retry" and target == "individual" then payload.operation = "clear_provision_retry"
+    elseif id == "dump_provision" and target == "individual" then payload.operation = "dump_effective_provision"
     elseif id == "minus10" or id == "plus10" then payload.operation, payload.needType, payload.amount = "modify", Definitions.TYPES[self.needIndex or 1], id == "minus10" and -10 or 10
     elseif id == "set0" or id == "set25" or id == "set50" or id == "set75" or id == "set100" then payload.operation, payload.needType, payload.value = "set", Definitions.TYPES[self.needIndex or 1], tonumber(id:sub(4))
     elseif id == "reset" then payload.operation = "reset"

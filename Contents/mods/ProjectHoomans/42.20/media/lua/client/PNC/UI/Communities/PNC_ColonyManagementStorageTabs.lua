@@ -113,7 +113,7 @@ function StorageTabs.ApplyLayout(window, Layout)
     if not window.layout then return end
     local storageMode = window.tab == "storage"
     local researchMode = window.tab == "research"
-    window.people:setVisible(not storageMode and not researchMode)
+    window.peoplePane:setVisible(not storageMode and not researchMode)
     window.storageSearch:setVisible(storageMode)
     window.storageList:setVisible(storageMode)
     window.storageSortButton:setVisible(storageMode)
@@ -149,7 +149,7 @@ function StorageTabs.ApplyLayout(window, Layout)
         Layout.SetBounds(window.storageList, content.x,
             window.layout.storageListY, listWidth,
             math.max(Layout.Pixels(60, scale), listHeight))
-        window.details:setVisible(drawerVisible)
+        window.detailsPane:setVisible(drawerVisible)
         if drawerVisible then
             local drawerX = compactDrawer and content.x
                 or content.x + listWidth + gap
@@ -162,18 +162,18 @@ function StorageTabs.ApplyLayout(window, Layout)
                 { x = drawerX, y = controlsY, width = drawerWidth },
                 { scale = window.uiScale, minWidth = 104, gap = 5 })
             local detailsY = flow.bottom + Layout.Pixels(28, scale)
-            Layout.SetBounds(window.details, drawerX, detailsY,
+            window:layoutPane(window.detailsPane, drawerX, detailsY,
                 drawerWidth, math.max(Layout.Pixels(40, scale),
                     bottom - detailsY))
         end
     elseif researchMode then
-        window.details:setVisible(true)
-        Layout.SetBounds(window.details, window.layout.content.x,
+        window.detailsPane:setVisible(true)
+        window:layoutPane(window.detailsPane, window.layout.content.x,
             window.layout.content.y + 38, window.layout.content.width,
             math.max(60, window.layout.content.height - 38))
     else
-        window.details:setVisible(true)
-        Layout.SetBounds(window.details,
+        window.detailsPane:setVisible(true)
+        window:layoutPane(window.detailsPane,
             window.layout.details.x, window.layout.details.y,
             window.layout.details.width, window.layout.details.height)
     end

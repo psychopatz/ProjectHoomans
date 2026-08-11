@@ -46,9 +46,19 @@ local function individualSummary(record)
         id = record.id, name = tostring(record.name or record.id), owner = record.ownerUsername or "Player",
         activity = record.activeBehavior or record.activeJob or record.orderSpec and record.orderSpec.kind or "idle",
         needs = state, history = copy(Debug.individualHistory[record.id] or {}),
+        conditionStats = PNC.ConditionStats
+            and PNC.ConditionStats.Ensure(record, Utils.WorldAgeHours()) or {},
+        conditionRates = PNC.ConditionStats
+            and PNC.ConditionStats.GetRates(record,
+                PNC.IndividualNeeds.GetActivity(record)) or {},
+        dynamicTraits = copy(record.dynamicTraits or {}),
         elapsed = math.max(0, Utils.WorldAgeHours() - (tonumber(state.lastUpdateWorldAge) or 0)),
         supply = PNC.NPCSupplyService and PNC.NPCSupplyService.GetDebugState
             and PNC.NPCSupplyService.GetDebugState(record) or { byKind = {} },
+        provision = PNC.ProvisionEvaluator
+            and PNC.ProvisionEvaluator.GetDebugState
+            and PNC.ProvisionEvaluator.GetDebugState(record)
+            or { evaluations = {}, dirtyRules = {} },
         inventoryMode = mode,
         deltaRecordCount = delta and (#(delta[2] or {}) + #(delta[3] or {})) or 0,
         fullPromotionReason = record.inventoryPromotionReason,
@@ -65,7 +75,10 @@ function Debug.BuildSnapshot(selectedGroupID, selectedNPCID, action)
             groups[#groups + 1] = summary
             members = members + summary.members
             for _, needType in ipairs(Definitions.TYPES) do
-                if not lowest[needType] or summary.needs[needType] < lowest[needType].needs[needType] then lowest[needType] = summary end
+                if not lowest[needType]
+                    or summary.needs[needType]
+                        > lowest[needType].needs[needType]
+                then lowest[needType] = summary end
             end
         end
     end
@@ -149,6 +162,27 @@ function Debug.PerformAction(args)
             value = kind and supply.byKind and supply.byKind[kind]
                 and copy(supply.byKind[kind].candidateScores) or {}
             ok, reason = true, "candidate_scores_dumped"
+        elseif operation == "force_provision_evaluation" then
+            PNC.ProvisionScheduler.MarkAllDirty(owner)
+            local slices = math.ceil(#PNC.ProvisionRuleRegistry.List()
+                / PNC.ProvisionScheduler.MAX_PER_SLICE)
+            for index = 1, slices do
+                PNC.ProvisionScheduler.Pump(
+                    PNC.Core.Now() + index * 1001
+                )
+            end
+            ok, reason = true, "provision_evaluated"
+        elseif operation == "mark_provision_dirty" then
+            PNC.ProvisionScheduler.MarkAllDirty(owner)
+            ok, reason = true, "provision_marked_dirty"
+        elseif operation == "clear_provision_retry" then
+            for _, kind in ipairs({ "FOOD", "HYDRATION", "MEDICAL" }) do
+                PNC.NPCSupplyService.ClearRetry(owner, kind)
+            end
+            ok, reason = true, "provision_retry_cleared"
+        elseif operation == "dump_effective_provision" then
+            value, reason = PNC.ProvisionResolver.GetEffectivePolicy(owner)
+            ok = value ~= nil
         end
         if value ~= nil then ok, reason = true, "updated" end
     end

@@ -11,12 +11,12 @@ local Util = require "PsychopatzCore/Inventory/PsychopatzInventoryUtil"
 
 local function requiredAmount(request)
     if request.resourceKind == "FOOD" then
-        return math.max(1, tonumber(request.required.hunger) or 1)
+        return math.max(0.001, tonumber(request.required.hunger) or 0.001)
     end
     if request.resourceKind == "HYDRATION" then
-        return math.max(1, tonumber(request.required.thirst) or 1)
+        return math.max(0.001, tonumber(request.required.thirst) or 0.001)
     end
-    return 1
+    return math.max(1, tonumber(request.required.count) or 1)
 end
 
 function Selector.Score(descriptor, request, remaining)
@@ -96,7 +96,9 @@ function Selector.SelectFromStorage(storage, request)
         local available = math.max(0,
             storage.inventory:count(exactQuery(candidate.entry.record), false))
         local quantity = math.min(available,
-            math.max(1, math.ceil(remaining / math.max(1, contribution))))
+            math.max(1, math.ceil(
+                remaining / math.max(0.001, contribution)
+            )))
         quantity = math.min(quantity, maxSelections - selectedUnits)
         if quantity > 0 then
             selected[#selected + 1] = {

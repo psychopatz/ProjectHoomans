@@ -106,9 +106,9 @@ function Builder.Build(groupOrID)
     local effectiveManpower = combatants ^ Config.MANPOWER_EXPONENT
     local needs = Groups.GetNeeds(group) or {}
     local morale = 0.5
-        + clamp((tonumber(needs.hunger) or 100) / 100, 0, 1) * 0.15
-        + clamp((tonumber(needs.hydration) or 100) / 100, 0, 1) * 0.15
-        + clamp((tonumber(needs.fatigue) or 100) / 100, 0, 1) * 0.2
+        + (1 - clamp(tonumber(needs.hunger) or 0, 0, 1)) * 0.15
+        + (1 - clamp(tonumber(needs.hydration) or 0, 0, 1)) * 0.15
+        + (1 - clamp(tonumber(needs.fatigue) or 0, 0, 1)) * 0.2
     local profile = {
         manpower = effectiveManpower,
         meleePower = melee,

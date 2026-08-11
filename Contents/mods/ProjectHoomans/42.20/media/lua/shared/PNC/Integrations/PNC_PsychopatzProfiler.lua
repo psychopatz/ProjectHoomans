@@ -135,6 +135,15 @@ Profiler.RegisterSampler("ProjectHoomans.shared", function(api)
         "candidateItemsEvaluated", "supplyRetriesSuppressed",
         "deltaInventoryMutations", "deltaInventoryCompactions",
         "deltaToFullPromotions",
+        "provisionPolicyRevision", "provisionDirtyNPCs",
+        "provisionEvaluations", "provisionRulesEvaluated",
+        "provisionRulesSatisfied", "provisionRulesDeficient",
+        "provisionRequestsCreated", "provisionRequestsSucceeded",
+        "provisionRequestsFailed",
+        "provisionRequestsSuppressedByIncoming",
+        "provisionRequestsSuppressedByNeedRequest",
+        "provisionSchedulerQueueSize", "provisionSchedulerProcessed",
+        "provisionStorageShortages",
     }) do
         api.SetGauge("ProjectHoomans.NPCSupply." .. name,
             supplyMetrics[name] or 0)

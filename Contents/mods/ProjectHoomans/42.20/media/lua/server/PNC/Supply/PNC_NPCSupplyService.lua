@@ -38,6 +38,7 @@ local function log(record, request, result, details)
         "[PNC][NPC_SUPPLY]",
         "npc=" .. tostring(record and record.id or "none"),
         "kind=" .. tostring(request and request.resourceKind or "none"),
+        "purpose=" .. tostring(request and request.purpose or "none"),
         "priority=" .. tostring(request and request.priority or 0),
         "result=" .. tostring(result or "none"),
         "source=" .. tostring(details and details.source or "none"),
@@ -163,12 +164,12 @@ end
 local function updateNeed(record, request, effect)
     if request.resourceKind == "FOOD" then
         return PNC.IndividualNeeds.Modify(
-            record, "hunger", effect.hunger, "consumed_food"
+            record, "hunger", -effect.hunger, "consumed_food"
         )
     end
     if request.resourceKind == "HYDRATION" then
         return PNC.IndividualNeeds.Modify(
-            record, "hydration", effect.thirst, "consumed_hydration"
+            record, "hydration", -effect.thirst, "consumed_hydration"
         )
     end
     return nil
@@ -179,7 +180,7 @@ local function usePersonal(record, request, state, options)
         and tonumber(request.required.hunger)
         or request.resourceKind == "HYDRATION"
             and tonumber(request.required.thirst) or 1
-    required = math.max(1, required or 1)
+    required = math.max(0.001, required or 0.001)
     local candidates = SupplyInventory.FindPersonal(record, request, required)
     state.personalCandidateCount = #candidates
     state.personalCandidates = {}
@@ -263,9 +264,22 @@ function Service.Process(rawRequest, options)
     state.lastFailureReason = nil
     root.currentKind = request.resourceKind
 
-    local personalOK, personalReason, remaining = usePersonal(
-        record, request, state, options
-    )
+    local personalOK, personalReason, remaining
+    if options.ignorePersonal then
+        state.personalCandidateCount = 0
+        state.personalCandidates = {}
+        personalOK = false
+        personalReason = "personal_already_measured"
+        remaining = request.resourceKind == "FOOD"
+            and math.max(0.001, tonumber(request.required.hunger) or 0.001)
+            or request.resourceKind == "HYDRATION"
+                and math.max(0.001, tonumber(request.required.thirst) or 0.001)
+                or math.max(1, tonumber(request.required.count) or 1)
+    else
+        personalOK, personalReason, remaining = usePersonal(
+            record, request, state, options
+        )
+    end
     if personalOK and (options.acquireOnly or remaining <= 0
         or request.resourceKind == "MEDICAL")
     then
@@ -386,6 +400,16 @@ end
 function Service.GetDebugState(record)
     local root = record and record.runtime and record.runtime.supply or nil
     return root and PNC.Core.DeepCopy(root) or { byKind = {} }
+end
+
+function Service.HasRecentNeedRequest(record, kind, withinHours)
+    local root = record and record.runtime and record.runtime.supply
+    local state = root and root.byKind
+        and root.byKind[string.upper(tostring(kind or ""))] or nil
+    local request = state and state.request or nil
+    if not request or request.purpose ~= "NEED" then return false end
+    return worldHour() - (tonumber(state.lastAttemptAt) or -math.huge)
+        <= math.max(0, tonumber(withinHours) or 0)
 end
 
 return Service

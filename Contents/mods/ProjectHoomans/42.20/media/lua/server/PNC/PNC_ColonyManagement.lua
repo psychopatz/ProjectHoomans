@@ -15,6 +15,10 @@ local function summary(record)
         role=record.affiliation and record.affiliation.communityRole or record.affiliation and record.affiliation.role or "companion",
         activity=PNC.IndividualNeeds.GetActivity(record), job=record.activeJob,
         health=record.health and record.health.state or "unknown", needs=needs,
+        conditionStats=PNC.ConditionStats
+            and PNC.ConditionStats.Ensure(record,
+                PNC.NeedsUtils.WorldAgeHours()) or {},
+        morale=record.social and record.social.morale or 0,
         priorityType=priorityType, priority=priority,
         location={x=record.x,y=record.y,z=record.z} }
 end
@@ -30,7 +34,7 @@ function Management.BuildSnapshot(player, options)
         if record.alive ~= false and owned(record, player) then
             local value = summary(record); people[#people+1]=value
             for _, needType in ipairs(Definitions.TYPES) do
-                local level=Definitions.GetLevel(value.needs[needType]); counts[needType][level]=(counts[needType][level] or 0)+1
+                local level=Definitions.GetLevel(needType, value.needs[needType]); counts[needType][level]=(counts[needType][level] or 0)+1
                 if level == "EMERGENCY" or level == "CRITICAL" or level == "LOW" then attention[#attention+1]={ severity=level, npcID=value.id, name=value.name, needType=needType, value=value.needs[needType] } end
             end
             local supply = record.runtime and record.runtime.supply
@@ -53,7 +57,7 @@ function Management.BuildSnapshot(player, options)
         end
     end
     table.sort(people,function(a,b) return a.name<b.name end)
-    table.sort(attention,function(a,b) return a.value<b.value end)
+    table.sort(attention,function(a,b) return a.value>b.value end)
     local storage = PNC.ColonyStorageService
         and PNC.ColonyStorageService.BuildSnapshot
         and PNC.ColonyStorageService.BuildSnapshot(player, options) or nil
@@ -62,8 +66,12 @@ function Management.BuildSnapshot(player, options)
     local research = PNC.ColonyResearchService
         and PNC.ColonyResearchService.BuildSnapshot(storageState)
         or { entries = {} }
+    local provisionSettings = PNC.ProvisionPolicyService
+        and PNC.ProvisionPolicyService.BuildSnapshot
+        and PNC.ProvisionPolicyService.BuildSnapshot(player) or nil
     return { colony=colony, people=people, attention=attention, levels=counts,
         storage=storage, research=research, supplyShortages=supplyShortages,
+        provisionSettings=provisionSettings,
         generatedAt=PNC.NeedsUtils.WorldAgeHours() }
 end
 
@@ -128,6 +136,10 @@ function Management.HandleAction(player, args)
     elseif action == "research_debug_upgrade" then
         ok, reason, storage = PNC.ColonyResearchService.DebugUpgrade(
             player, tostring(args.researchId or ""), args
+        )
+    elseif action == "provision_set" then
+        ok, reason, details = PNC.ProvisionPolicyService.Apply(
+            player, args.submission
         )
     else
         ok, reason = false, "unknown_colony_action"

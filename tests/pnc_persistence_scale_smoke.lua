@@ -62,9 +62,12 @@ PNC.Identity.ApplyRecordIdentity = function(record, definition)
     record.archetypeID = definition.archetypeID or record.archetypeID
     record.name = definition.displayName or definition.name or record.name
 end
+dofile(ROOT .. "Needs/PNC_NeedsDefinitions.lua")
+dofile(ROOT .. "Needs/PNC_ConditionStats.lua")
+dofile(ROOT .. "Needs/PNC_PlayerNeedsModel.lua")
 PNC.Types = {
     NewRecord = function(definition)
-        return {
+        local record = {
             id = tostring(definition.id),
             name = definition.displayName or definition.name,
             faction = definition.faction or "neutral",
@@ -98,6 +101,16 @@ PNC.Types = {
                 and PNC.MapPresentation.Normalize(definition.mapPresentation)
                 or nil,
         }
+        record.vanillaTraits,
+            record.vanillaTraitsAuthored,
+            record.vanillaTraitsGenerationVersion =
+            PNC.PlayerNeedsModel.ResolveInitialTraits(
+                definition.vanillaTraits,
+                record.identitySeed,
+                record.archetypeID,
+                definition.vanillaTraitsAuthored
+            )
+        return record
     end,
 }
 
@@ -173,6 +186,8 @@ for npcIndex = 1, 100 do
             iconID = "trader",
         },
     }
+    PNC.PlayerNeedsModel.EnsureTraits(record)
+    PNC.ConditionStats.EnsureTraits(record)
     for partIndex = 1, #partIDs do
         record.health.body.parts[partIDs[partIndex]] = {
             current = partIDs[partIndex] == "Head" and 70 or 92,
@@ -222,6 +237,16 @@ assertEqual(PNC.Core.TableSize and PNC.Core.TableSize(payloads) or 100, 100,
     "scale payload count")
 local sample = payloads.scale_npc_1
 assertEqual(sample.schemaVersion, 10, "scale schema version")
+assertEqual(sample.vanillaTraitsAuthored, false,
+    "generated NPC traits marked as authored")
+assertEqual(sample.vanillaTraitsGenerationVersion,
+    PNC.PlayerNeedsModel.GENERATION_VERSION,
+    "generated NPC trait version")
+assertEqual(sample.dynamicTraitsAuthored, false,
+    "generated custom traits marked as authored")
+assertEqual(sample.dynamicTraitsGenerationVersion,
+    PNC.ConditionStats.TRAIT_GENERATION_VERSION,
+    "generated custom trait version")
 assertEqual(sample.inventory[1], 2, "NPC inventory schema")
 assertEqual(sample.inventory[2], "BASELINE_DELTA", "NPC inventory mode")
 assertEqual(sample.inventory[5][1], 1, "core delta schema")
@@ -254,16 +279,28 @@ assertEqual(restored.mapPresentation.roleTag, "trader",
     "map role round trip")
 assertEqual(restored.mapPresentation.knownBy.scale_player, true,
     "map knowledge round trip")
+assertEqual(table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(restored), "|"),
+    table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(sample.vanillaTraits), "|"),
+    "generated vanilla traits round trip")
+assertEqual(table.concat(PNC.ConditionStats.GetActiveTraitIDs(restored), "|"),
+    table.concat(PNC.ConditionStats.GetActiveTraitIDs(sample.dynamicTraits), "|"),
+    "generated custom traits round trip")
 
 local legacyPayload = PNC.Core.DeepCopy(sample)
 legacyPayload.schemaVersion = 9
 legacyPayload.inventory.maxWeight = 999
 legacyPayload.inventory.cachedWeight = 888
+legacyPayload.vanillaTraits = {}
+legacyPayload.vanillaTraitsAuthored = nil
+legacyPayload.vanillaTraitsGenerationVersion = nil
 local legacyRecord = PNC.Persistence.DeserializeRecord(
     legacyPayload,
     "scale_npc_1"
 )
 assertEqual(legacyRecord.inventory, nil, "legacy inventory hydrated during load")
+assertEqual(legacyRecord.vanillaTraitsGenerationVersion,
+    PNC.PlayerNeedsModel.GENERATION_VERSION,
+    "legacy NPC received deterministic vanilla traits")
 local migratedPayload = PNC.Persistence.SerializeRecord(legacyRecord)
 assertEqual(migratedPayload.schemaVersion, 10, "lazy migration schema")
 assertEqual(migratedPayload.inventory.maxWeight, nil,

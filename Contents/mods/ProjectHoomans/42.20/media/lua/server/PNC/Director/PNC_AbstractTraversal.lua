@@ -107,8 +107,10 @@ function Traversal.CalculateTravelHours(group, target)
     local dx, dy = target.x - group.location.x, target.y - group.location.y
     local distance = math.sqrt(dx * dx + dy * dy)
     local needs = Groups.GetNeeds(group) or {}
-    local fatigue = tonumber(needs.fatigue) or 100
-    local fatigueModifier = 0.65 + math.max(0, math.min(100, fatigue)) / 100 * 0.35
+    local fatigue = math.max(0, math.min(1,
+        tonumber(needs.fatigue) or 0
+    ))
+    local fatigueModifier = 1 - fatigue * 0.35
     local speed = Config.TRAVEL_SPEED_TILES_PER_HOUR * fatigueModifier
     return math.max(Config.MIN_TRAVEL_HOURS,
         math.min(Config.MAX_TRAVEL_HOURS, distance / math.max(1, speed))), distance

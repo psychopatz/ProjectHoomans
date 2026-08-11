@@ -73,6 +73,9 @@ PNC = {
     },
 }
 
+PNC.NeedsDefinitions = {}
+dofile(ROOT .. "Needs/PNC_PlayerNeedsModel.lua")
+
 local originalNext = next
 next = nil
 dofile(ROOT .. "Persistence/PNC_Persistence.lua")
@@ -143,6 +146,8 @@ local record = {
     generation = { source = "WORLD_POPULATION_DIRECTOR",
         generationId = "POP_GROUP_0000042", sectorId = "psector_1_2",
         createdAt = 34, seed = 42 },
+    vanillaTraits = { "Base.HighThirst", "Overweight" },
+    vanillaTraitsAuthored = true,
 }
 
 local payload = PNC.Persistence.SerializeRecord(record)
@@ -161,6 +166,12 @@ assert(payload.bodyHint.instanceID == 9191, "live body instance hint was not ser
 assert(payload.bodyHint.lease == "lease-persisted", "live body lease hint was not serialized")
 assert(payload.generation.generationId == "POP_GROUP_0000042",
     "population provenance was not serialized")
+assert(payload.vanillaTraits.highthirst == true,
+    "vanilla physiological trait was not serialized")
+assert(payload.vanillaTraits.overweight == true,
+    "vanilla weight trait was not serialized")
+assert(payload.vanillaTraitsAuthored == true,
+    "authored trait source was not serialized")
 
 local restored = PNC.Persistence.DeserializeRecord(payload, record.id)
 assert(restored, "deserialization failed without next()")
@@ -180,6 +191,12 @@ assert(restored.runtime.startupBodyHint.lease == "lease-persisted",
     "startup body lease hint did not round trip")
 assert(restored.generation.generationId == "POP_GROUP_0000042",
     "population provenance did not round trip")
+assert(restored.vanillaTraits.highthirst == true,
+    "vanilla physiological trait did not round trip")
+assert(restored.vanillaTraits.overweight == true,
+    "vanilla weight trait did not round trip")
+assert(restored.vanillaTraitsAuthored == true,
+    "authored trait source did not round trip")
 
 next = originalNext
 print("pnc_kahlua_persistence_smoke: ok")

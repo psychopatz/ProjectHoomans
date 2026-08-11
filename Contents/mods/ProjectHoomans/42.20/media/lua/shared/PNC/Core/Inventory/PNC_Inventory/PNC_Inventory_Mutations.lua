@@ -151,6 +151,9 @@ function Inventory.ApplyDelta(record, ops, reason)
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "inventory")
     end
+    if PNC.ProvisionScheduler and PNC.ProvisionScheduler.MarkInventoryDirty then
+        PNC.ProvisionScheduler.MarkInventoryDirty(record)
+    end
     return true, appliedOps
 end
 

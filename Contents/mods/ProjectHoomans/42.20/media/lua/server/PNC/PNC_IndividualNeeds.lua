@@ -6,6 +6,7 @@ PNC.IndividualNeeds = PNC.IndividualNeeds or {}
 local Needs = PNC.IndividualNeeds
 local Definitions = PNC.NeedsDefinitions
 local Utils = PNC.NeedsUtils
+local PlayerModel = PNC.PlayerNeedsModel
 
 Needs.Listeners = Needs.Listeners or {}
 function Needs.RegisterListener(eventName, listener)
@@ -58,6 +59,9 @@ function Needs.IsEligible(record) return owned(record) end
 
 function Needs.Ensure(record, initial)
     if not owned(record) then return nil, "not_player_owned" end
+    if PlayerModel and PlayerModel.EnsureTraits then
+        PlayerModel.EnsureTraits(record)
+    end
     local at = Utils.WorldAgeHours()
     if type(record.needs) ~= "table" then
         local defaults = initial or {}
@@ -95,7 +99,8 @@ function Needs.Set(record, needType, value, reason)
     state[needType] = after
     if before ~= after then
         log(record, needType, before, after, reason)
-        local oldLevel, newLevel = Definitions.GetLevel(before), Definitions.GetLevel(after)
+        local oldLevel = Definitions.GetLevel(needType, before)
+        local newLevel = Definitions.GetLevel(needType, after)
         if oldLevel ~= newLevel then
             runtime(record).cachedLevels[needType] = newLevel
             Needs.Emit("level_changed", record, needType, oldLevel, newLevel, reason)
@@ -110,7 +115,7 @@ function Needs.Modify(record, needType, amount, reason)
 end
 
 function Needs.GetLevel(record, needType)
-    return Definitions.GetLevel(Needs.Get(record, needType) or 0)
+    return Definitions.GetLevel(needType, Needs.Get(record, needType) or 0)
 end
 
 function Needs.GetActivity(record) return activity(record) end
@@ -121,14 +126,11 @@ function Needs.SetActivityOverride(record, value)
     return true
 end
 function Needs.GetRates(record)
-    local modifiers = Definitions.INDIVIDUAL_ACTIVITY[activity(record)] or Definitions.INDIVIDUAL_ACTIVITY.idle
-    local output = {}
-    for _, needType in ipairs(Definitions.TYPES) do output[needType] = Definitions.INDIVIDUAL_RATES_PER_HOUR[needType] * (modifiers[needType] or 1) end
-    return output
+    return PlayerModel.GetRates(record, Needs.Ensure(record), activity(record))
 end
 function Needs.GetPriority(record, needType)
-    local value = Needs.Get(record, needType) or 100
-    return math.max(0, math.min(100, 100 - value))
+    local value = Needs.Get(record, needType) or 0
+    return math.max(0, math.min(100, value * 100))
 end
 function Needs.GetHighestPriority(record)
     local bestType, bestValue
@@ -145,7 +147,8 @@ function Needs.Update(record, elapsedHours, reason)
     elapsedHours = math.max(0, tonumber(elapsedHours) or 0)
     local rates = Needs.GetRates(record)
     for _, needType in ipairs(Definitions.TYPES) do
-        Needs.Modify(record, needType, -rates[needType] * elapsedHours, reason or "passive_decay")
+        Needs.Modify(record, needType, rates[needType] * elapsedHours,
+            reason or "passive_increase")
     end
     state.lastUpdateWorldAge = Utils.WorldAgeHours()
     return true

@@ -77,6 +77,20 @@ function Network.BuildSnapshot(record)
             or nil,
         archetypeID = identity.archetypeID,
         archetypeLabel = identity.archetypeLabel,
+        vanillaTraits = PNC.PlayerNeedsModel
+            and PNC.PlayerNeedsModel.NormalizeTraits(record.vanillaTraits)
+            or {},
+        vanillaTraitsAuthored = record.vanillaTraitsAuthored == true,
+        vanillaTraitsGenerationVersion = math.max(0, math.floor(
+            tonumber(record.vanillaTraitsGenerationVersion) or 0
+        )),
+        dynamicTraits = PNC.ConditionStats
+            and PNC.ConditionStats.NormalizeTraits(record.dynamicTraits) or {},
+        dynamicTraitsAuthored = record.dynamicTraitsAuthored == true,
+        conditionStats = PNC.ConditionStats
+            and PNC.ConditionStats.NormalizeState(record.conditionStats, 0)
+            or {},
+        morale = record.social and record.social.morale or 0,
         recruited = record.recruited == true,
         relationshipCategory = record.generation
                 and record.generation.relationshipKind == "lover"

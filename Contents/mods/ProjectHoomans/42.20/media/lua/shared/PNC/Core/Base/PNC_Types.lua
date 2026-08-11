@@ -161,6 +161,17 @@ function Types.NormalizeDefinition(definition)
     local z = tonumber(def.z) or 0
     local isHostile = faction == "hostile"
     local explicitName = normalizeString(def.displayName or def.name)
+    local vanillaTraitSource = def.vanillaTraits
+        or def.physiologicalTraits
+    local vanillaTraitsAuthored = def.vanillaTraitsAuthored
+    if vanillaTraitsAuthored == nil then
+        vanillaTraitsAuthored = vanillaTraitSource ~= nil
+    end
+    local dynamicTraitSource = def.dynamicTraits or def.pncTraits
+    local dynamicTraitsAuthored = def.dynamicTraitsAuthored
+    if dynamicTraitsAuthored == nil then
+        dynamicTraitsAuthored = dynamicTraitSource ~= nil
+    end
 
     return {
         id = def.id,
@@ -214,6 +225,14 @@ function Types.NormalizeDefinition(definition)
             or nil,
         generation = type(def.generation) == "table"
             and Core.DeepCopy(def.generation) or nil,
+        vanillaTraits = PNC.PlayerNeedsModel
+            and PNC.PlayerNeedsModel.NormalizeTraits(
+                vanillaTraitSource
+            ) or {},
+        vanillaTraitsAuthored = vanillaTraitsAuthored == true,
+        dynamicTraits = PNC.ConditionStats
+            and PNC.ConditionStats.NormalizeTraits(dynamicTraitSource) or {},
+        dynamicTraitsAuthored = dynamicTraitsAuthored == true,
     }
 end
 
@@ -304,6 +323,13 @@ function Types.NewRecord(definition)
         persist = def.persist ~= false,
         generation = type(def.generation) == "table"
             and Core.DeepCopy(def.generation) or nil,
+        vanillaTraits = {},
+        vanillaTraitsAuthored = def.vanillaTraitsAuthored == true,
+        vanillaTraitsGenerationVersion = 0,
+        dynamicTraits = {},
+        dynamicTraitsAuthored = def.dynamicTraitsAuthored == true,
+        dynamicTraitsGenerationVersion = 0,
+        conditionStats = nil,
         runtime = {
             target = nil,
             lastPathX = nil,
@@ -336,6 +362,33 @@ function Types.NewRecord(definition)
         Identity.ApplyRecordIdentity(record, def)
     else
         record.name = record.name or ((hostile and "Hostile NPC") or (def.faction == "neutral" and "Neutral NPC") or "Colonist NPC")
+    end
+
+    if PNC.PlayerNeedsModel
+        and PNC.PlayerNeedsModel.ResolveInitialTraits
+    then
+        record.vanillaTraits,
+            record.vanillaTraitsAuthored,
+            record.vanillaTraitsGenerationVersion =
+            PNC.PlayerNeedsModel.ResolveInitialTraits(
+                def.vanillaTraits,
+                record.identitySeed,
+                record.archetypeID,
+                def.vanillaTraitsAuthored
+            )
+    else
+        record.vanillaTraits = Core.DeepCopy(def.vanillaTraits or {})
+    end
+    if PNC.ConditionStats and PNC.ConditionStats.ResolveInitialTraits then
+        record.dynamicTraits,
+            record.dynamicTraitsAuthored,
+            record.dynamicTraitsGenerationVersion =
+            PNC.ConditionStats.ResolveInitialTraits(
+                def.dynamicTraits, record.identitySeed,
+                record.archetypeID, def.dynamicTraitsAuthored
+            )
+    else
+        record.dynamicTraits = Core.DeepCopy(def.dynamicTraits or {})
     end
 
     record.social = RelationshipTypes

@@ -75,8 +75,8 @@ local function history(faction, needType, before, after, reason)
 end
 
 local function publishLevelChange(faction, needType, oldValue, newValue, reason)
-    local oldLevel = Definitions.GetLevel(oldValue)
-    local newLevel = Definitions.GetLevel(newValue)
+    local oldLevel = Definitions.GetLevel(needType, oldValue)
+    local newLevel = Definitions.GetLevel(needType, newValue)
     if oldLevel == newLevel then return end
     history(faction, needType .. "_level", oldLevel, newLevel, reason or "level_changed")
     Needs.Emit("level_changed", faction.id, needType, oldLevel, newLevel, reason)
@@ -132,11 +132,13 @@ function Needs.Modify(factionOrID, needType, amount, reason)
 end
 
 function Needs.Restore(factionOrID, needType, amount, reason)
-    return Needs.Modify(factionOrID, needType, math.abs(tonumber(amount) or 0), reason or "restore")
+    return Needs.Modify(factionOrID, needType,
+        -math.abs(tonumber(amount) or 0), reason or "restore")
 end
 
 function Needs.GetLevel(factionOrID, needType)
-    return Definitions.GetLevel(Needs.Get(factionOrID, needType) or 0)
+    return Definitions.GetLevel(needType,
+        Needs.Get(factionOrID, needType) or 0)
 end
 
 function Needs.GetActivity(factionOrID)
@@ -171,11 +173,15 @@ function Needs.Update(factionOrID, elapsedHours, reason)
     local rates = Needs.GetRates(faction)
     for _, needType in ipairs(Definitions.TYPES) do
         local before = state[needType]
-        local after = Definitions.Clamp(needType, before - rates[needType] * elapsedHours)
+        local after = Definitions.Clamp(
+            needType, before + rates[needType] * elapsedHours
+        )
         state[needType] = after
         if before ~= after then
-            history(faction, needType, before, after, reason or "passive_decay")
-            publishLevelChange(faction, needType, before, after, reason or "passive_decay")
+            history(faction, needType, before, after,
+                reason or "passive_increase")
+            publishLevelChange(faction, needType, before, after,
+                reason or "passive_increase")
         end
     end
     state.lastUpdateWorldAge = Utils.WorldAgeHours()
