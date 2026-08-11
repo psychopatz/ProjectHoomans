@@ -152,7 +152,30 @@ local function areaMode(record, zombie, order)
     local targetRadius = math.max(1, tonumber(order.targetRadius) or Const.ROAM_TARGET_RADIUS)
     local now = Core.Now()
     local target
+    local pathing
     record.runtime.roaming = state
+    pathing = record.runtime.pathing
+    if state.goalX ~= nil
+        and pathing
+        and pathing.phase == "blocked"
+        and (
+            pathing.blockReason == "native_path_unreachable"
+            or pathing.blockReason == "native_goal_cooldown"
+        )
+    then
+        state.goalX = nil
+        state.goalY = nil
+        state.goalZ = nil
+        if beginAreaPause(
+            record,
+            zombie,
+            order,
+            state,
+            now
+        ) then
+            return true
+        end
+    end
     target = resolveRoamingThreat(
         record,
         state,

@@ -420,6 +420,7 @@ end
 
 function Communities.Save()
     local target
+    local normalized
     Communities.EnsureLoaded()
     if not Communities.Dirty then return false, "not_dirty" end
     target = ModData and ModData.getOrCreate
@@ -427,10 +428,9 @@ function Communities.Save()
             Constants.REGISTRY_MODDATA_KEY
         ) or nil
     if not target then return false, "moddata_unavailable" end
-    assignTable(target, Types.NormalizeRegistry(
-        Communities.Registry
-    ))
-    Communities.Registry = Types.NormalizeRegistry(target)
+    normalized = Types.NormalizeRegistry(Communities.Registry)
+    assignTable(target, copy(normalized))
+    Communities.Registry = normalized
     Communities.Dirty = false
     return true, "saved"
 end
@@ -1478,22 +1478,11 @@ local function onInitGlobalModData()
     Communities.Load()
 end
 
-local function onSave()
-    Communities.Save()
-end
-
 if Events and Events.OnInitGlobalModData
     and not Communities.GlobalModDataHookRegistered
 then
     Events.OnInitGlobalModData.Add(onInitGlobalModData)
     Communities.GlobalModDataHookRegistered = true
-end
-
-if Events and Events.OnSave
-    and not Communities.SaveHookRegistered
-then
-    Events.OnSave.Add(onSave)
-    Communities.SaveHookRegistered = true
 end
 
 return Communities

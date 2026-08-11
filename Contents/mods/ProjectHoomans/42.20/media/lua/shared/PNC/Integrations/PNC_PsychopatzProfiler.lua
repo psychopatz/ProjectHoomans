@@ -30,6 +30,47 @@ local function countMap(values)
     return count
 end
 
+local function installScheduledJobPerformance()
+    local scheduler = PNC.Scheduler
+    local metricPrefix =
+        "ProjectHoomans.Server.Update.Director.ScheduledJobs."
+    local function wrapJob(name, job)
+        if not job or type(job.callback) ~= "function" then
+            return false
+        end
+        return wrap(
+            job,
+            "callback",
+            metricPrefix .. tostring(name or "Unknown")
+        )
+    end
+    if not scheduler or type(scheduler.RegisterJob) ~= "function" then
+        return false
+    end
+    for name, job in pairs(scheduler.Jobs or {}) do
+        wrapJob(name, job)
+    end
+    Integration.originals = Integration.originals or {}
+    local hookMetric = metricPrefix .. "RegisterHook"
+    if Integration.originals[hookMetric] then return true end
+    local original = scheduler.RegisterJob
+    Integration.originals[hookMetric] = {
+        owner = scheduler,
+        key = "RegisterJob",
+        callback = original,
+    }
+    scheduler.RegisterJob = function(name, interval, callback, options)
+        local registered
+        local job
+        registered, job = original(name, interval, callback, options)
+        if registered then
+            wrapJob(name, job)
+        end
+        return registered, job
+    end
+    return true
+end
+
 function Integration.Restore()
     for _, entry in pairs(Integration.originals or {}) do
         if entry.owner and entry.owner[entry.key] then entry.owner[entry.key] = entry.callback end
@@ -50,6 +91,7 @@ wrap(PNC.BehaviorSystem, "Tick", "ProjectHoomans.Server.Update.NPC.Decision")
 wrap(PNC.PathService, "Pump", "ProjectHoomans.Server.Update.NPC.Pathfinding")
 wrap(PNC.Scheduler, "PopDue", "ProjectHoomans.Server.Update.Scheduler.PopDue")
 wrap(PNC.Scheduler, "PumpJobs", "ProjectHoomans.Server.Update.Director.ScheduledJobs")
+installScheduledJobPerformance()
 wrap(PNC.Network, "BroadcastRecord", "ProjectHoomans.Network.BroadcastRecord")
 wrap(PNC.Network, "FlushRosterDeltas", "ProjectHoomans.Server.Update.Network.FlushRosterDeltas")
 
@@ -80,6 +122,15 @@ function Integration.InstallServer()
     wrap(PNC.WorldDirector, "Pump", "ProjectHoomans.Server.Update.Director")
     wrap(PNC.PopulationDirector, "Pump", "ProjectHoomans.Server.Update.Director.Population")
     wrap(PNC.PersistenceCoordinator, "Commit", "ProjectHoomans.Persistence.Commit")
+    wrap(PNC.PlayerCharacters, "Save", "ProjectHoomans.Persistence.PlayerCharacters")
+    wrap(PNC.NPCKnowledge, "Save", "ProjectHoomans.Persistence.NPCKnowledge")
+    wrap(PNC.Factions, "Save", "ProjectHoomans.Persistence.Factions")
+    wrap(PNC.Communities, "Save", "ProjectHoomans.Persistence.Communities")
+    wrap(PNC.AbstractWorldStore, "Save", "ProjectHoomans.Persistence.AbstractWorld")
+    wrap(PNC.WorldDiscovery, "Save", "ProjectHoomans.Persistence.WorldDiscovery")
+    wrap(PNC.Conversation and PNC.Conversation.History, "Save",
+        "ProjectHoomans.Persistence.ConversationHistory")
+    wrap(PNC.Registry, "FlushDirty", "ProjectHoomans.Persistence.NPCRecords")
     wrap(PNC.PlayerCharacterLifecycle, "Pump", "ProjectHoomans.Server.Update.PlayerCharacters")
     wrap(PNC.FactionBehavior, "PumpReconciliation", "ProjectHoomans.Server.Update.FactionReconciliation")
     wrap(PNC.FactionIncidentService, "PumpRuntime", "ProjectHoomans.Server.Update.FactionIncidents")
@@ -90,6 +141,7 @@ function Integration.InstallServer()
     wrap(PNC.BodyLifecycle, "AuditLoadedBodies", "ProjectHoomans.Server.Update.BodyAudit")
     wrap(PNC.CompanionVehicle, "AuditLoadedReservations", "ProjectHoomans.Server.Update.VehicleAudit")
     wrap(PNC.Presence, "RefreshMaterializationCandidates", "ProjectHoomans.Server.Update.MaterializationCandidates")
+    wrap(PNC.Presence, "Materialize", "ProjectHoomans.Server.Update.NPC.Materialize")
     wrap(PNC.Network, "RefreshInterestSets", "ProjectHoomans.Server.Update.Network.RefreshInterestSets")
     wrap(PNC.ZombieAggro, "Pump", "ProjectHoomans.Server.Update.ZombieAggro")
     wrap(PNC.SocialEncounterTracker, "Pump", "ProjectHoomans.Server.Update.SocialEncounters")
@@ -109,9 +161,21 @@ function Integration.InstallServer()
         local groups = PNC.AbstractGroups and PNC.AbstractGroups.List and PNC.AbstractGroups.List() or {}
         local sites = PNC.Communities and PNC.Communities.ListSites and PNC.Communities.ListSites() or {}
         local dirty = countMap(PNC.Registry and PNC.Registry.DirtyByID)
+        local blockedPaths = 0
+        local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+        for _, record in pairs(PNC.Registry and PNC.Registry.Data or {}) do
+            local lane = record and record.runtime
+                and record.runtime.pathing or nil
+            if lane and lane.nativeBlockedGoalX ~= nil
+                and now < (tonumber(lane.nativeBlockedUntil) or 0)
+            then
+                blockedPaths = blockedPaths + 1
+            end
+        end
         api.SetGauge("ProjectHoomans.Groups.Total", #groups)
         api.SetGauge("ProjectHoomans.Settlements.Total", #sites)
         api.SetGauge("ProjectHoomans.Persistence.DirtyRecords", dirty)
+        api.SetGauge("ProjectHoomans.Pathing.BlockedGoals", blockedPaths)
     end)
     Integration.serverInstalled = true
     return true

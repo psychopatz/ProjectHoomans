@@ -299,24 +299,11 @@ local function onInitGlobalModData()
     end
 end
 
-local function onSave()
-    if service() then
-        service().Save()
-    end
-end
-
 if Events and Events.OnInitGlobalModData
     and not Lifecycle.GlobalModDataHookRegistered
 then
     Events.OnInitGlobalModData.Add(onInitGlobalModData)
     Lifecycle.GlobalModDataHookRegistered = true
-end
-
-if Events and Events.OnSave
-    and not Lifecycle.SaveHookRegistered
-then
-    Events.OnSave.Add(onSave)
-    Lifecycle.SaveHookRegistered = true
 end
 
 if Events and Events.OnCreatePlayer

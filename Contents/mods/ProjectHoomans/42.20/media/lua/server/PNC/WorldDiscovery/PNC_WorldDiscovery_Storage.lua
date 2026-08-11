@@ -132,11 +132,7 @@ function Internal.PlayerRecord(player, create)
 end
 
 local function onInitGlobalModData() Discovery.Load() end
-local function onSave() Discovery.Save() end
-
 if Events and Events.OnInitGlobalModData then
     Events.OnInitGlobalModData.Add(onInitGlobalModData)
 end
-if Events and Events.OnSave then Events.OnSave.Add(onSave) end
-
 return Discovery

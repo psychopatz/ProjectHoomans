@@ -114,7 +114,10 @@ Const.SIMULATION_LIVE_IDLE_MS = 1000
 Const.SIMULATION_VITALS_HOT_MS = 250
 Const.SIMULATION_VITALS_LIVE_MS = 1000
 Const.SIMULATION_VITALS_ABSTRACT_MS = 5000
-Const.STAMINA_DERIVED_REFRESH_MS = 1000
+-- Inventory revision changes invalidate this immediately. Keep the periodic
+-- skill/encumbrance fallback longer than the one-second live-vitals cadence,
+-- otherwise every Stamina.Update call defeats the cache.
+Const.STAMINA_DERIVED_REFRESH_MS = 5000
 Const.SIMULATION_PRESENCE_LIVE_MS = 500
 Const.SIMULATION_PRESENCE_ABSTRACT_MS = 3000
 Const.SIMULATION_PATH_HOT_MS = 50
@@ -143,6 +146,9 @@ Const.ZOMBIE_AGGRO_ACTIVE_REFRESH_MS = 250
 Const.ZOMBIE_AGGRO_ACTIVE_TTL_MS = 1500
 Const.ZOMBIE_AGGRO_MAX_PER_TICK = 64
 Const.ZOMBIE_AGGRO_PATH_REQUESTS_PER_TICK = 16
+-- Strategic jobs can each be bounded internally yet still align on the same
+-- world-time frame. Spread due jobs across frames to prevent aggregate hitches.
+Const.SCHEDULER_MAX_JOBS_PER_TICK = 1
 Const.PERCEPTION_FRAME_MS = 200
 Const.PERCEPTION_FRAME_MOVE_TOLERANCE = 0.5
 Const.PERCEPTION_LOS_MAX_CANDIDATES = 6
@@ -178,6 +184,12 @@ Const.ENGINE_PATH_ROUTE_TIMEOUT_MS = 15000
 Const.ENGINE_PATH_TRAVERSAL_TIMEOUT_MS = 3000
 Const.ENGINE_PATH_REPLAN_MS = 1000
 Const.ENGINE_PATH_TARGET_REPLAN_DISTANCE = 1.5
+-- Bandits completes a Move task as soon as Behavior2 reports Failed. Allow
+-- one retry for a door/window world-state change, then stop the identical
+-- destination from generating path requests every few seconds.
+Const.ENGINE_PATH_FAILURE_LIMIT = 2
+Const.ENGINE_PATH_BLOCKED_GOAL_COOLDOWN_MS = 10000
+Const.ENGINE_PATH_BLOCKED_GOAL_CHANGE_DISTANCE = 1.5
 Const.ENGINE_PATH_MIN_ROUTE_DISTANCE = 1.0
 Const.CLIENT_NATIVE_PATH_STALL_MS = 3000
 Const.CLIENT_NATIVE_PATH_RETRY_BASE_MS = 350

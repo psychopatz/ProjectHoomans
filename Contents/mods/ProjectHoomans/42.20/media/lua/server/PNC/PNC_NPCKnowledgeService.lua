@@ -742,8 +742,4 @@ end
 if Events and Events.OnInitGlobalModData then
     Events.OnInitGlobalModData.Add(function() Knowledge.Load() end)
 end
-if Events and Events.OnSave then
-    Events.OnSave.Add(function() Knowledge.Save() end)
-end
-
 return Knowledge

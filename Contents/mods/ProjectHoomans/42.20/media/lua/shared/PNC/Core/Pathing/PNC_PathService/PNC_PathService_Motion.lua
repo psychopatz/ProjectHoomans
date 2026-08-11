@@ -856,18 +856,53 @@ function PathService.Pump(record, zombie)
                 local stepDistance = math.sqrt(
                     (dx * dx) + (dy * dy)
                 )
+                local nativeFailed = nativeState == "engine_path_failed"
+                    or nativeState == "engine_path_timeout"
+                if nativeFailed then
+                    lane.ownerMode = "engine_path_waiting"
+                    lane.lastStepAt = now
+                    lane.lastStepDistance = 0
+                    lane.lastStepLabel = nativeState
+                    if Internal.noteNativeGoalFailure
+                        and Internal.noteNativeGoalFailure(
+                            lane,
+                            lane.goal,
+                            now
+                        )
+                    then
+                        Internal.logMoveWarning(
+                            record,
+                            zombie,
+                            lane,
+                            "native_goal_blocked",
+                            "failure_limit",
+                            "goal=" .. Internal.describeGoal(lane.goal)
+                        )
+                        return Internal.completeMove(
+                            zombie,
+                            record,
+                            lane,
+                            "blocked",
+                            "native_path_unreachable"
+                        )
+                    end
+                    if now >= (tonumber(lane.visualMovingUntil) or 0) then
+                        Internal.applyHoldAnimation(zombie, record, lane)
+                    end
+                    return true, nativeState
+                end
                 nativeTraversalState = nativeNavigation
                     and nativeNavigation.nativeTraversalState
                     or nil
                 lane.ownerMode = nativeTraversalState
                     and "engine_traversal"
                     or "engine_path"
-                lane.lastProgressAt = now
                 lane.lastIssueAt = now
                 lane.lastStepAt = now
                 lane.lastStepDistance = stepDistance
                 lane.lastStepLabel = nativeState
                 if stepDistance > 0.0001 then
+                    lane.lastProgressAt = now
                     lane.lastPhysicalMoveAt = now
                     lane.lastX = toX
                     lane.lastY = toY

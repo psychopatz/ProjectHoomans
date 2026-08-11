@@ -220,6 +220,27 @@ assertEqual(windowOpened, true, "proactive window state")
 assertEqual(lane.testTraversalSpec.kind, "window_climb",
     "opened window did not acquire scripted traversal")
 
+-- IsoWindow:getOppositeSquare() is fixed to the object's storage side, not
+-- relative to the actor. Approaching the same window from its opposite side
+-- must therefore land on object:getSquare(), never back on the actor's tile.
+windowOpened = true
+zombie.getX = function() return 1.25 end
+zombie.getForwardDirection = function()
+    return { getX = function() return -1 end, getY = function() return 0 end }
+end
+lane = {}
+interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
+    zombie, { id = "reverse_window_test" }, lane, -1.5, 0.5, 0
+)
+assertEqual(interacted, true, "reverse-side window traversal starts")
+assertEqual(interaction, "window_climb", "reverse-side window action")
+assertEqual(lane.testTraversalSpec.toX, 0.5,
+    "reverse-side window selected the actor's own square")
+zombie.getX = function() return 0.75 end
+zombie.getForwardDirection = function()
+    return { getX = function() return 1 end, getY = function() return 0 end }
+end
+
 local windowSmashed = false
 windowOpened = false
 window.isPermaLocked = function() return true end
@@ -241,5 +262,22 @@ assertEqual(
     "window breach applies breakage"
 )
 assertEqual(windowSmashed, true, "window glass was broken")
+
+-- A merely adjacent window must not steal a failed native route by rotating
+-- the NPC toward itself. Bandits only acts on the collision-facing object.
+windowOpened = true
+window.isPermaLocked = function() return false end
+window.isSmashed = function() return false end
+fromSquare.getWindowTo = function() return nil end
+toSquare.getWindowTo = function() return nil end
+zombie.isFacingObject = function() return false end
+zombie.faceThisObject = function()
+    error("unrelated window should not take facing ownership")
+end
+lane = {}
+interacted = PNC.PathService.Internal.tryDoorOrWindowInteraction(
+    zombie, { id = "side_window_reject_test" }, lane, 0.75, 2.5, 0
+)
+assertEqual(interacted, false, "non-facing adjacent window was selected")
 
 print("pnc_door_interaction_smoke: ok")

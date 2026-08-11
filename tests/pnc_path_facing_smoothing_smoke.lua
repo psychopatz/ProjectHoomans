@@ -45,4 +45,28 @@ assert(
 )
 assert(faceCalls == 2, "locomotion heading was not refreshed dynamically")
 
+local traversalLane = {}
+PNC.PathService.Internal.noteTraversalAttempt(
+    traversalLane,
+    "fence_climb",
+    "fence:10:10:0",
+    10.5,
+    9.5,
+    0,
+    10.5,
+    10.5,
+    0,
+    1000,
+    1
+)
+assert(PNC.PathService.Internal.isRepeatedTraversalAttempt(
+    traversalLane,
+    "fence:10:10:0",
+    10.5,
+    11.5,
+    0,
+    99,
+    1200
+), "moving goal allowed an immediate reverse fence crossing")
+
 print("pnc_path_facing_smoothing_smoke: ok")

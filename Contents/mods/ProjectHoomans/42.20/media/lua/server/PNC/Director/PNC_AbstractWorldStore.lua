@@ -72,9 +72,11 @@ function Store.Save()
     if not Store.Dirty then return false, "not_dirty" end
     local target = ModData and ModData.getOrCreate
         and ModData.getOrCreate(Config.MODDATA_KEY) or nil
+    local normalized
     if not target then return false, "moddata_unavailable" end
-    assign(target, Types.NormalizeRegistry(Store.Registry))
-    Store.Registry = Types.NormalizeRegistry(target)
+    normalized = Types.NormalizeRegistry(Store.Registry)
+    assign(target, Core.DeepCopy(normalized))
+    Store.Registry = normalized
     Store.Dirty = false
     return true, "saved"
 end
@@ -99,15 +101,8 @@ function Store.Emit(eventName, payload)
 end
 
 local function onInitGlobalModData() Store.Load() end
-local function onSave() Store.Save() end
-
 if Events and Events.OnInitGlobalModData and not Store.LoadHookRegistered then
     Events.OnInitGlobalModData.Add(onInitGlobalModData)
     Store.LoadHookRegistered = true
 end
-if Events and Events.OnSave and not Store.SaveHookRegistered then
-    Events.OnSave.Add(onSave)
-    Store.SaveHookRegistered = true
-end
-
 return Store

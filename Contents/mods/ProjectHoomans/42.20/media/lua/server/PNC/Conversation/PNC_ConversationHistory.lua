@@ -10,6 +10,7 @@ History.MODDATA_KEY = "PNC_ConversationHistory"
 History.VERSION = 1
 History.Registry = History.Registry or { version = History.VERSION, entries = {} }
 History.Loaded = History.Loaded == true
+History.Dirty = History.Dirty == true
 
 local function copy(value)
     if type(value) ~= "table" then return value end
@@ -49,6 +50,7 @@ function History.Load()
         entries = type(raw.entries) == "table" and copy(raw.entries) or {},
     }
     History.Loaded = true
+    History.Dirty = false
     return true
 end
 
@@ -59,6 +61,7 @@ end
 
 function History.Save(flush)
     History.EnsureLoaded()
+    if not History.Dirty then return false, "not_dirty" end
     local target = ModData and ModData.getOrCreate
         and ModData.getOrCreate(History.MODDATA_KEY) or nil
     if type(target) ~= "table" then return false end
@@ -67,6 +70,7 @@ function History.Save(flush)
     if flush ~= false and GlobalModData and GlobalModData.save then
         GlobalModData.save()
     end
+    History.Dirty = false
     return true
 end
 
@@ -101,6 +105,7 @@ function History.Commit(subjectID, policy, context, outcomeID)
     entry.lastUsedWorldHour = math.max(0, tonumber(context.worldAgeHours) or 0)
     entry.lastOutcomeID = outcomeID and tostring(outcomeID) or nil
     History.Registry.entries[key] = entry
+    History.Dirty = true
     return copy(entry)
 end
 
@@ -113,9 +118,4 @@ if Events and Events.OnInitGlobalModData and not History.InitHookRegistered then
     Events.OnInitGlobalModData.Add(function() History.Load() end)
     History.InitHookRegistered = true
 end
-if Events and Events.OnSave and not History.SaveHookRegistered then
-    Events.OnSave.Add(function() History.Save(false) end)
-    History.SaveHookRegistered = true
-end
-
 return History

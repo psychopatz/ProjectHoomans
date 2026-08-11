@@ -29,6 +29,27 @@ local function buildObstacleSquareKey(square)
     return square and ("sq:" .. Internal.describeSquare(square)) or nil
 end
 
+local function sameSquare(left, right)
+    return left ~= nil and right ~= nil
+        and left:getX() == right:getX()
+        and left:getY() == right:getY()
+        and left:getZ() == right:getZ()
+end
+
+local function windowDestination(object, actorSquare)
+    local objectSquare = object and object.getSquare
+        and object:getSquare() or nil
+    local oppositeSquare = object and object.getOppositeSquare
+        and object:getOppositeSquare() or nil
+    if sameSquare(actorSquare, objectSquare) then
+        return oppositeSquare
+    end
+    if sameSquare(actorSquare, oppositeSquare) then
+        return objectSquare
+    end
+    return nil
+end
+
 local function logTraversalReject(record, zombie, lane, event, reason, extra)
     Internal.logMoveDebug(record, zombie, lane, event or "traversal_rejected", reason or "rejected", extra or "")
 end
@@ -272,8 +293,6 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     local object
     local objectSquare
     local facingSatisfied
-    local targetDx
-    local targetDy
     local candidatesByGoal
     local actionKey
     local fromPoint
@@ -304,6 +323,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     local collided
     local traversalProfile
     local windowOpened
+    local actorSquare
 
     if not zombie or not getCell then
         return false, nil
@@ -317,15 +337,13 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     fromX = zombie:getX()
     fromY = zombie:getY()
     fromZ = zz
+    actorSquare = zombie.getSquare and zombie:getSquare()
+        or cell:getGridSquare(zx, zy, zz)
     fromPoint = Internal.describePoint(string.format("%.2f", fromX), string.format("%.2f", fromY), zz)
     collided = Internal.isDoorCollision(zombie)
     fd = zombie:getForwardDirection()
     fdx = Internal.roundHalf(fd:getX())
     fdy = Internal.roundHalf(fd:getY())
-    targetDx = Internal.roundHalf((goalX or zombie:getX()) - zombie:getX())
-    targetDy = Internal.roundHalf((goalY or zombie:getY()) - zombie:getY())
-    if targetDx > 1 then targetDx = 1 elseif targetDx < -1 then targetDx = -1 end
-    if targetDy > 1 then targetDy = 1 elseif targetDy < -1 then targetDy = -1 end
     blockedSquare = lane and lane.blockedStepToX ~= nil
         and cell:getGridSquare(math.floor(lane.blockedStepToX), math.floor(lane.blockedStepToY), lane.blockedStepToZ or zz)
         or nil
@@ -369,15 +387,13 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
         end
     end
 
+    -- Bandits inspects only the collision-facing square. Scanning every
+    -- neighboring tile made an invalid Behavior2 route adopt unrelated
+    -- windows along the same wall, producing smash/climb/replan loops.
     candidates = {
         { x = zx, y = zy, z = zz },
         blockedSquare and { x = blockedSquare:getX(), y = blockedSquare:getY(), z = blockedSquare:getZ() } or { x = zx, y = zy, z = zz, skip = true },
         { x = zx + fdx, y = zy + fdy, z = zz },
-        { x = zx + targetDx, y = zy + targetDy, z = goalZ or zz },
-        { x = zx + 1, y = zy, z = zz },
-        { x = zx - 1, y = zy, z = zz },
-        { x = zx, y = zy + 1, z = zz },
-        { x = zx, y = zy - 1, z = zz },
     }
 
     candidatesByGoal = {}
@@ -404,7 +420,10 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                     candidateCenterY = candidates[i].y + 0.5
                     facingSatisfied = zombie.isFacingObject and zombie:isFacingObject(object, 0.5)
                     if (instanceof(object, "IsoDoor") or (instanceof(object, "IsoThumpable") and object.isDoor and object:isDoor() == true)) then
-                        if (not facingSatisfied) and zombie.faceThisObject then
+                        if (not facingSatisfied)
+                            and object == blockedPassage
+                            and zombie.faceThisObject
+                        then
                             zombie:faceThisObject(object)
                             facingSatisfied = true
                         end
@@ -447,7 +466,10 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                         end
                     end
                     if instanceof(object, "IsoWindow") then
-                        if (not facingSatisfied) and zombie.faceThisObject then
+                        if (not facingSatisfied)
+                            and object == blockedPassage
+                            and zombie.faceThisObject
+                        then
                             zombie:faceThisObject(object)
                             facingSatisfied = true
                         end
@@ -521,7 +543,10 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                                 then
                                     destSquare = blockedSquare
                                 elseif object.getOppositeSquare then
-                                    destSquare = object:getOppositeSquare()
+                                    destSquare = windowDestination(
+                                        object,
+                                        actorSquare
+                                    )
                                 else
                                     destSquare = nil
                                 end

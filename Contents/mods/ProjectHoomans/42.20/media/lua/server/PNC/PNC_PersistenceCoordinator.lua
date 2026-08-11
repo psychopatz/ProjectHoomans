@@ -45,6 +45,11 @@ function Coordinator.Commit(reason)
         communities = PNC.Communities and PNC.Communities.Dirty == true,
         abstractWorld = PNC.AbstractWorldStore
             and PNC.AbstractWorldStore.Dirty == true,
+        worldDiscovery = PNC.WorldDiscovery
+            and PNC.WorldDiscovery.Dirty == true,
+        conversationHistory = PNC.Conversation
+            and PNC.Conversation.History
+            and PNC.Conversation.History.Dirty == true,
         npcByID = copy(PNC.Registry and PNC.Registry.DirtyByID or {}),
         npcDomains = copy(PNC.Registry and PNC.Registry.DirtyDomains or {}),
         npcDirectory = PNC.Registry and PNC.Registry.DirectoryDirty == true,
@@ -62,6 +67,14 @@ function Coordinator.Commit(reason)
         end
         if PNC.AbstractWorldStore and initialDirty.abstractWorld then
             PNC.AbstractWorldStore.Dirty = true
+        end
+        if PNC.WorldDiscovery and initialDirty.worldDiscovery then
+            PNC.WorldDiscovery.Dirty = true
+        end
+        if PNC.Conversation and PNC.Conversation.History
+            and initialDirty.conversationHistory
+        then
+            PNC.Conversation.History.Dirty = true
         end
         if PNC.Registry then
             PNC.Registry.DirtyByID = initialDirty.npcByID
@@ -96,6 +109,11 @@ function Coordinator.Commit(reason)
     if not ok then return failure(why) end
     ok, why = save("abstractWorld", PNC.AbstractWorldStore)
     if not ok then return failure(why) end
+    ok, why = save("worldDiscovery", PNC.WorldDiscovery)
+    if not ok then return failure(why) end
+    ok, why = save("conversationHistory",
+        PNC.Conversation and PNC.Conversation.History)
+    if not ok then return failure(why) end
 
     if PNC.Registry and PNC.Registry.FlushDirty then
         local flushed, flushError = pcall(PNC.Registry.FlushDirty)
@@ -112,6 +130,19 @@ function Coordinator.Commit(reason)
         results = copy(results),
     }
     return true, "committed", copy(Coordinator.LastCommit)
+end
+
+local function onSave()
+    local ok, reason = Coordinator.Commit("world_save")
+    if not ok and Core and Core.LogWarn then
+        Core.LogWarn("PNC world-save commit failed reason="
+            .. tostring(reason or "unknown"))
+    end
+end
+
+if Events and Events.OnSave and not Coordinator.SaveHookRegistered then
+    Events.OnSave.Add(onSave)
+    Coordinator.SaveHookRegistered = true
 end
 
 return Coordinator

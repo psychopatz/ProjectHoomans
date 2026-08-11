@@ -619,9 +619,4 @@ local function onInitGlobalModData()
     Registry.Load()
 end
 
-local function onSave()
-    Registry.Save()
-end
-
 Events.OnInitGlobalModData.Add(onInitGlobalModData)
-Events.OnSave.Add(onSave)

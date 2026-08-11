@@ -10,6 +10,7 @@ local PathService = PNC.PathService
 PathService.Internal = PathService.Internal or {}
 
 local Internal = PathService.Internal
+local Const = PNC.Const or {}
 
 local TRAVERSAL_OWNER_MODES = {
     door_open = true,
@@ -106,6 +107,20 @@ function Internal.ensureMoveLane(record)
     lane.visualMovingUntil = tonumber(lane.visualMovingUntil) or 0
     lane.lastRecoverAt = tonumber(lane.lastRecoverAt) or 0
     lane.noProgressCount = tonumber(lane.noProgressCount) or 0
+    lane.nativeFailureCount = tonumber(lane.nativeFailureCount) or 0
+    lane.nativeFailureGoalX = lane.nativeFailureGoalX ~= nil
+        and tonumber(lane.nativeFailureGoalX) or nil
+    lane.nativeFailureGoalY = lane.nativeFailureGoalY ~= nil
+        and tonumber(lane.nativeFailureGoalY) or nil
+    lane.nativeFailureGoalZ = lane.nativeFailureGoalZ ~= nil
+        and tonumber(lane.nativeFailureGoalZ) or nil
+    lane.nativeBlockedGoalX = lane.nativeBlockedGoalX ~= nil
+        and tonumber(lane.nativeBlockedGoalX) or nil
+    lane.nativeBlockedGoalY = lane.nativeBlockedGoalY ~= nil
+        and tonumber(lane.nativeBlockedGoalY) or nil
+    lane.nativeBlockedGoalZ = lane.nativeBlockedGoalZ ~= nil
+        and tonumber(lane.nativeBlockedGoalZ) or nil
+    lane.nativeBlockedUntil = tonumber(lane.nativeBlockedUntil) or 0
     lane.lastSpecialActionKey = lane.lastSpecialActionKey or nil
     lane.lastSpecialActionAt = tonumber(lane.lastSpecialActionAt) or 0
     lane.specialMoveUntil = tonumber(lane.specialMoveUntil) or 0
@@ -168,6 +183,79 @@ function Internal.ensureMoveLane(record)
     lane.vehicleBlockedAt = tonumber(lane.vehicleBlockedAt) or 0
     lane.vehicleBlockedReason = lane.vehicleBlockedReason or nil
     return lane
+end
+
+function Internal.clearNativeGoalBlock(lane)
+    if not lane then return end
+    lane.nativeFailureCount = 0
+    lane.nativeFailureGoalX = nil
+    lane.nativeFailureGoalY = nil
+    lane.nativeFailureGoalZ = nil
+    lane.nativeBlockedGoalX = nil
+    lane.nativeBlockedGoalY = nil
+    lane.nativeBlockedGoalZ = nil
+    lane.nativeBlockedUntil = 0
+end
+
+local function nativeGoalDistance(lane, goal, prefix)
+    local x = tonumber(lane[prefix .. "X"])
+    local y = tonumber(lane[prefix .. "Y"])
+    local z = tonumber(lane[prefix .. "Z"])
+    if x == nil or y == nil or not goal then return math.huge end
+    local dx = (tonumber(goal.x) or 0) - x
+    local dy = (tonumber(goal.y) or 0) - y
+    local dz = (tonumber(goal.z) or 0) - (z or 0)
+    return math.sqrt((dx * dx) + (dy * dy) + (dz * dz))
+end
+
+function Internal.isNativeGoalBlocked(lane, goal, now)
+    if not lane or lane.nativeBlockedGoalX == nil then return false end
+    now = tonumber(now) or Internal.Core.Now()
+    local changeDistance = math.max(
+        0.5,
+        tonumber(Const.ENGINE_PATH_BLOCKED_GOAL_CHANGE_DISTANCE) or 1.5
+    )
+    if now >= (tonumber(lane.nativeBlockedUntil) or 0)
+        or nativeGoalDistance(lane, goal, "nativeBlockedGoal")
+            >= changeDistance
+    then
+        Internal.clearNativeGoalBlock(lane)
+        return false
+    end
+    return true
+end
+
+function Internal.noteNativeGoalFailure(lane, goal, now)
+    if not lane or not goal then return false end
+    now = tonumber(now) or Internal.Core.Now()
+    local changeDistance = math.max(
+        0.5,
+        tonumber(Const.ENGINE_PATH_BLOCKED_GOAL_CHANGE_DISTANCE) or 1.5
+    )
+    if nativeGoalDistance(lane, goal, "nativeFailureGoal")
+        >= changeDistance
+    then
+        lane.nativeFailureCount = 0
+    end
+    lane.nativeFailureGoalX = tonumber(goal.x)
+    lane.nativeFailureGoalY = tonumber(goal.y)
+    lane.nativeFailureGoalZ = tonumber(goal.z)
+    lane.nativeFailureCount =
+        (tonumber(lane.nativeFailureCount) or 0) + 1
+    if lane.nativeFailureCount < math.max(
+        1,
+        math.floor(tonumber(Const.ENGINE_PATH_FAILURE_LIMIT) or 2)
+    ) then
+        return false
+    end
+    lane.nativeBlockedGoalX = lane.nativeFailureGoalX
+    lane.nativeBlockedGoalY = lane.nativeFailureGoalY
+    lane.nativeBlockedGoalZ = lane.nativeFailureGoalZ
+    lane.nativeBlockedUntil = now + math.max(
+        1000,
+        tonumber(Const.ENGINE_PATH_BLOCKED_GOAL_COOLDOWN_MS) or 10000
+    )
+    return true
 end
 
 function Internal.clearVehicleBlockedGoal(lane)
@@ -433,6 +521,18 @@ function Internal.consumeMoveIntent(record, lane, zombie)
 
     goal = Internal.buildGoal(intent.x, intent.y, intent.z, intent.mode, intent.stopDistance)
     Internal.captureIntentContext(record, lane, intent)
+    if Internal.isNativeGoalBlocked
+        and Internal.isNativeGoalBlocked(
+            lane,
+            goal,
+            Internal.Core.Now()
+        )
+    then
+        lane.pendingGoal = nil
+        lane.pendingGoalAt = 0
+        lane.blockReason = "native_goal_cooldown"
+        return "navigation_blocked"
+    end
     if zombie and Internal.isAtGoal(zombie, goal, goal.stopDistance) then
         lane.pendingGoal = nil
         lane.pendingGoalAt = 0

@@ -335,23 +335,20 @@ function Internal.noteTraversalAttempt(lane, kind, obstacleKey, fromX, fromY, fr
 end
 
 function Internal.isRepeatedTraversalAttempt(lane, obstacleKey, fromX, fromY, fromZ, goalRevision, now)
-    local fromKey
     if not lane or not obstacleKey or not lane.lastTraversalObstacleKey or not lane.lastTraversalFromKey then
         return false
     end
-    fromKey = buildTraversalPointKey(fromX, fromY, fromZ)
     if tostring(lane.lastTraversalObstacleKey) ~= tostring(obstacleKey) then
-        return false
-    end
-    if tostring(lane.lastTraversalFromKey) ~= tostring(fromKey) then
         return false
     end
     if (tonumber(now) or Core.Now()) - (tonumber(lane.lastTraversalAttemptAt) or 0) > Internal.TRAVERSAL_REPEAT_COOLDOWN_MS then
         return false
     end
-    if goalRevision ~= nil and (tonumber(goalRevision) or 0) > (tonumber(lane.lastTraversalGoalRevision) or 0) then
-        return false
-    end
+    -- A moving follow target increments goalRevision continuously. Letting a
+    -- revision bypass this guard allowed injured followers to vault the same
+    -- fence back and forth, starting another path immediately on each side.
+    -- refreshTraversalMemory clears the guard once the NPC has made real
+    -- progress away from the landing edge.
     return true
 end
 

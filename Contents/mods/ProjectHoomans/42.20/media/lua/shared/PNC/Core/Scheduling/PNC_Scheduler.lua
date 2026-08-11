@@ -182,6 +182,9 @@ end
 function Scheduler.PumpJobs(now)
     now = tonumber(now) or 0
     local ran = 0
+    local maximum = math.max(1, math.floor(
+        tonumber(Const.SCHEDULER_MAX_JOBS_PER_TICK) or 1
+    ))
     for _, name in ipairs(Scheduler.JobOrder) do
         local job = Scheduler.Jobs[name]
         if job and job.enabled ~= false then
@@ -195,6 +198,9 @@ function Scheduler.PumpJobs(now)
                 job.lastError = ok and nil or tostring(result)
                 if not ok then job.errors = (tonumber(job.errors) or 0) + 1 end
                 ran = ran + 1
+                if ran >= maximum then
+                    break
+                end
             end
         end
     end

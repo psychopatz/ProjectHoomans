@@ -6,6 +6,7 @@ PNC = {
         TICK_LIVE_WARM_MS = 250,
         TICK_LIVE_COLD_MS = 1000,
         SCHEDULER_MAX_RECORDS_PER_TICK = 24,
+        SCHEDULER_MAX_JOBS_PER_TICK = 1,
     },
     Identity = {
         MixSeed = function(seed) return (tonumber(seed) or 1) * 97 end,
@@ -75,5 +76,19 @@ local passenger = {
     },
 }
 assert(PNC.Scheduler.GetCadence(passenger) <= 100, "vehicle passenger tracking cadence is too slow")
+
+local strategicRuns = {}
+PNC.Scheduler.RegisterJob("strategic_a", 10, function()
+    strategicRuns[#strategicRuns + 1] = "a"
+end, { startAt = 2000 })
+PNC.Scheduler.RegisterJob("strategic_b", 10, function()
+    strategicRuns[#strategicRuns + 1] = "b"
+end, { startAt = 2000 })
+assert(PNC.Scheduler.PumpJobs(2000) == 1,
+    "scheduler ran aligned strategic jobs in one frame")
+assert(#strategicRuns == 1,
+    "strategic per-frame budget was not enforced")
+assert(PNC.Scheduler.PumpJobs(2000) == 1 and #strategicRuns == 2,
+    "deferred strategic job did not run on the next frame")
 
 print("pnc_scheduler_smoke: ok")

@@ -390,18 +390,16 @@ end
 
 function Factions.Save()
     local target
+    local normalized
     Factions.EnsureLoaded()
     if not Factions.Dirty then return false, "not_dirty" end
     target = ModData and ModData.getOrCreate
         and ModData.getOrCreate(Constants.REGISTRY_MODDATA_KEY)
         or nil
     if not target then return false, "moddata_unavailable" end
-    assignTable(
-        target,
-        Types.NormalizeFactionRegistry(Factions.Registry)
-    )
-    Factions.Registry =
-        Types.NormalizeFactionRegistry(target)
+    normalized = Types.NormalizeFactionRegistry(Factions.Registry)
+    assignTable(target, copy(normalized))
+    Factions.Registry = normalized
     Factions.Dirty = false
     return true, "saved"
 end
@@ -3572,22 +3570,11 @@ local function onInitGlobalModData()
     Factions.Load()
 end
 
-local function onSave()
-    Factions.Save()
-end
-
 if Events and Events.OnInitGlobalModData
     and not Factions.GlobalModDataHookRegistered
 then
     Events.OnInitGlobalModData.Add(onInitGlobalModData)
     Factions.GlobalModDataHookRegistered = true
-end
-
-if Events and Events.OnSave
-    and not Factions.SaveHookRegistered
-then
-    Events.OnSave.Add(onSave)
-    Factions.SaveHookRegistered = true
 end
 
 return Factions
