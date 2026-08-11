@@ -44,6 +44,12 @@ function Inventory.Serialize(record)
         if PNC.Core and PNC.Core.LogWarn then
             PNC.Core.LogWarn("NPC delta encode failed: " .. tostring(reason))
         end
+        record.inventoryPersistenceMode = "FULL"
+        record.inventoryPromotionReason = "delta_unrepresentable:"
+            .. tostring(reason or "unknown")
+        if PNC.SupplyMetrics and PNC.SupplyMetrics.Increment then
+            PNC.SupplyMetrics.Increment("deltaToFullPromotions")
+        end
         return { NPC_PERSISTENCE_SCHEMA, "FULL", Bridge.serialize(record) }
     end
     local deltaPayload

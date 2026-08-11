@@ -119,6 +119,9 @@ function Internal.CommitStorage(storage)
     storage.revision = storage.revision + 1
     storage.inventory.maxWeight = Definitions.GetCapacity(storage.tier)
     Repository.MarkDirty()
+    if PNC.SupplyIndex and PNC.SupplyIndex.Invalidate then
+        PNC.SupplyIndex.Invalidate(storage)
+    end
 end
 
 function Internal.TransferIntoStorage(storage, source, quantity)

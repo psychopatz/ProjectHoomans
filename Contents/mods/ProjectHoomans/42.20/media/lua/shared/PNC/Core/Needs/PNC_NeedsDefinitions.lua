@@ -55,6 +55,24 @@ Definitions.ABSTRACT_SCAVENGE = {
 }
 Definitions.DEBUG_HISTORY_LIMIT = 40
 Definitions.SCHEDULER_INTERVAL_MS = 30000
+Definitions.SUPPLY = {
+    hunger = {
+        resourceKind = "FOOD", trigger = 50, target = 75,
+        priorityBase = 55, retryHours = 0.25, urgentRetryHours = 0.05,
+    },
+    hydration = {
+        resourceKind = "HYDRATION", trigger = 55, target = 80,
+        priorityBase = 70, retryHours = 0.20, urgentRetryHours = 0.04,
+    },
+    medical = {
+        resourceKind = "MEDICAL", priorityBase = 95,
+        retryHours = 0.10, urgentRetryHours = 0.025,
+    },
+}
+Definitions.SUPPLY_MATERIAL_CHANGE = 10
+Definitions.SUPPLY_MAX_CANDIDATES = 24
+Definitions.SUPPLY_MAX_SELECTIONS = 3
+Definitions.SUPPLY_MAX_USES = 8
 
 function Definitions.Get(needType)
     return Definitions.BY_ID[tostring(needType or "")]

@@ -20,6 +20,7 @@ local function summary(record)
 end
 function Management.BuildSnapshot(player, options)
     local people, attention, counts = {}, {}, { hunger={}, hydration={}, fatigue={} }
+    local supplyShortages = { food = {}, hydration = {}, medical = {} }
     local playerFaction, colony
     if PNC.Factions and PNC.Factions.GetPlayerFaction then playerFaction = PNC.Factions.GetPlayerFaction(player) end
     if playerFaction and PNC.Communities and PNC.Communities.GetForFaction then
@@ -31,6 +32,23 @@ function Management.BuildSnapshot(player, options)
             for _, needType in ipairs(Definitions.TYPES) do
                 local level=Definitions.GetLevel(value.needs[needType]); counts[needType][level]=(counts[needType][level] or 0)+1
                 if level == "EMERGENCY" or level == "CRITICAL" or level == "LOW" then attention[#attention+1]={ severity=level, npcID=value.id, name=value.name, needType=needType, value=value.needs[needType] } end
+            end
+            local supply = record.runtime and record.runtime.supply
+                and record.runtime.supply.byKind or {}
+            for kind, bucket in pairs({
+                FOOD = supplyShortages.food,
+                HYDRATION = supplyShortages.hydration,
+                MEDICAL = supplyShortages.medical,
+            }) do
+                local lane = supply[kind]
+                if lane and lane.phase == "FAILED" then
+                    bucket[#bucket + 1] = {
+                        npcID = record.id,
+                        name = tostring(record.name or record.id),
+                        reason = lane.lastFailureReason,
+                        nextRetry = lane.nextRetry,
+                    }
+                end
             end
         end
     end
@@ -45,7 +63,7 @@ function Management.BuildSnapshot(player, options)
         and PNC.ColonyResearchService.BuildSnapshot(storageState)
         or { entries = {} }
     return { colony=colony, people=people, attention=attention, levels=counts,
-        storage=storage, research=research,
+        storage=storage, research=research, supplyShortages=supplyShortages,
         generatedAt=PNC.NeedsUtils.WorldAgeHours() }
 end
 

@@ -76,6 +76,10 @@ function Settings.CompanionAmmoRealismEnabled()
     return Settings.GetBoolean("NPCAmmoConsumption", false)
 end
 
+function Settings.NPCSupplyTransactionLoggingEnabled()
+    return Settings.GetBoolean("NPCSupplyTransactionLogging", false)
+end
+
 function Settings.ZombiesTargetDownedNPC()
     return Settings.GetBoolean("ZombiesTargetDownedNPC", false)
 end

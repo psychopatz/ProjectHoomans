@@ -30,6 +30,9 @@ function Scheduler.Pump(now)
         for _, record in pairs(PNC.Registry.Data) do
             if record.alive ~= false and PNC.IndividualNeeds.IsEligible(record) then
                 PNC.IndividualNeeds.UpdateToNow(record, "passive_decay")
+                if PNC.NeedSupplyBridge and PNC.NeedSupplyBridge.Evaluate then
+                    PNC.NeedSupplyBridge.Evaluate(record)
+                end
                 if profiling then Scheduler.Profile.individualUpdates = Scheduler.Profile.individualUpdates + 1 end
                 count = count + 1
             end

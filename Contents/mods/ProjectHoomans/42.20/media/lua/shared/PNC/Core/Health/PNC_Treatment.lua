@@ -83,13 +83,6 @@ local function findNPCBandage(record)
     local i
     local item
     if not record then return nil end
-    if not isPlayerOwned(record) then
-        return {
-            virtual = true,
-            fullType = "Base.RippedSheets",
-            displayName = BANDAGE_NAMES["Base.RippedSheets"],
-        }
-    end
     inv = Inventory and Inventory.EnsureRecordInventory
         and Inventory.EnsureRecordInventory(record) or record.inventory
     types = bandageTypes()
@@ -99,7 +92,6 @@ local function findNPCBandage(record)
                 and math.max(1, tonumber(item.stack) or 1) > 0
             then
                 return {
-                    virtual = false,
                     itemID = item.id,
                     fullType = item.type,
                     displayName = BANDAGE_NAMES[tostring(item.type)]
@@ -112,25 +104,35 @@ local function findNPCBandage(record)
 end
 
 local function consumeNPCBandage(record, supply)
-    local inv
-    local item
-    local stack
-    local operation
-    if supply and supply.virtual == true then return true end
-    if not record or not supply or not Inventory or not Inventory.ApplyDelta then
-        return false
+    if not record or not supply then return false, nil end
+    if PNC.SupplyInventory and PNC.SupplyInventory.Consume then
+        local ok, _, effect = PNC.SupplyInventory.Consume(
+            record,
+            supply.itemID,
+            {
+                resourceKind = "MEDICAL",
+                treatment = "BANDAGE",
+                required = {},
+            }
+        )
+        return ok, effect and effect.undo or nil
     end
-    inv = Inventory.EnsureRecordInventory
+    local inv = Inventory and Inventory.EnsureRecordInventory
         and Inventory.EnsureRecordInventory(record) or record.inventory
-    item = inv and inv.items and inv.items[supply.itemID] or nil
-    if not item then return false end
-    stack = math.max(1, math.floor(tonumber(item.stack) or 1))
-    if stack > 1 then
-        operation = { op = "update", itemID = item.id, stack = stack - 1 }
-    else
-        operation = { op = "remove", itemID = item.id }
+    local item = inv and inv.items and inv.items[supply.itemID] or nil
+    if not item or not Inventory or not Inventory.ApplyDelta then
+        return false, nil
     end
-    return Inventory.ApplyDelta(record, { operation }, "self_bandage") == true
+    local undo = Core.DeepCopy(inv)
+    local stack = math.max(1, math.floor(tonumber(item.stack) or 1))
+    local op = stack > 1
+        and { op = "update", itemID = item.id, stack = stack - 1 }
+        or { op = "remove", itemID = item.id }
+    local applied = Inventory.ApplyDelta(record, { op }, "self_bandage") == true
+    return applied, applied and function()
+        record.inventory = undo
+        return true
+    end or nil
 end
 
 local function findBandage(player, requestedType)
@@ -225,6 +227,8 @@ function Treatment.TryNPCBandage(record, partId)
     if not Core.IsAuthority() then return false, "not_authority" end
     supply = findNPCBandage(record)
     if not supply then return false, "missing_bandage" end
+    local consumed, undo = consumeNPCBandage(record, supply)
+    if not consumed then return false, "bandage_consumption_failed" end
     applied, reason = Treatment.ApplyBandage(record, partId, {
         bandageType = supply.fullType,
         bandageName = supply.displayName,
@@ -232,9 +236,9 @@ function Treatment.TryNPCBandage(record, partId)
         syncEvent = "self_bandaged",
         broadcast = false,
     })
-    if not applied then return false, reason end
-    if not consumeNPCBandage(record, supply) then
-        return false, "bandage_consumption_failed"
+    if not applied then
+        if undo then undo() end
+        return false, reason
     end
     if Skills and Skills.AddXP then
         Skills.AddXP(record, "FirstAid", 1)

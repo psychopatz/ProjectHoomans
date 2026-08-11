@@ -333,9 +333,10 @@ PNC.NPCWounds.ApplyDebugWound(
     4
 )
 success, reason = PNC.Treatment.TryNPCBandage(unownedTreatment, "Hand_R")
-assertEqual(success, true, "unowned NPC virtual rag")
-assertEqual(unownedTreatment.health.body.wounds.Hand_R.bandageType,
-    "Base.RippedSheets", "unowned NPC uses unlimited ripped sheets")
+assertEqual(success, false, "unowned NPC created a virtual rag")
+assertEqual(reason, "missing_bandage", "unowned NPC missing supply reason")
+assertEqual(unownedTreatment.health.body.wounds.Hand_R.bandaged, false,
+    "unowned NPC changed condition without inventory supply")
 
 local debugRecord = makeRecord("debug_bandage")
 records[debugRecord.id] = debugRecord

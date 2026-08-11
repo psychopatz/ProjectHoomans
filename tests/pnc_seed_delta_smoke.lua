@@ -328,6 +328,13 @@ local function javaList(values)
 end
 local function nativeItem(fullType)
     local item = { fullType = fullType, modData = {}, weight = 0.1 }
+    local food = fullType == "Base.Apple"
+        or string.find(fullType, "Mod.Food", 1, true) == 1
+    local water = fullType == "Base.WaterBottleFull"
+        or string.find(fullType, "Mod.Water", 1, true) == 1
+    item.isFood = food
+    item.isDrainable = water
+    item.usedDelta = water and 1 or nil
     function item:getFullType() return self.fullType end
     function item:getCondition() return self.condition end
     function item:getConditionMax() return 10 end
@@ -346,6 +353,18 @@ local function nativeItem(fullType)
     function item:setActualWeight(value) self.weight = value end
     function item:getCurrentAmmoCount() return self.ammoCount end
     function item:setCurrentAmmoCount(value) self.ammoCount = value end
+    function item:getHungerChange() return food and -20 or 0 end
+    function item:getThirstChange() return water and -15 or 0 end
+    function item:getUseDelta() return water and 0.25 or 0 end
+    function item:isWaterSource() return water end
+    function item:isBandage() return fullType == "Base.Bandage" end
+    function item:getAge() return self.age or 0 end
+    function item:getOffAge() return food and 5 or nil end
+    function item:getOffAgeMax() return food and 10 or nil end
+    function item:isCooked() return false end
+    function item:isBurnt() return false end
+    function item:isFrozen() return false end
+    function item:getFreezingTime() return 0 end
     return item
 end
 InventoryItemFactory = { CreateItem = nativeItem }
@@ -524,5 +543,408 @@ StorageService.RequestNPCDeposit({
 })
 assertEqual(#transactionLogs, 2,
     "disabled transaction logging still emitted output")
+
+-- Needs -> supply -> inventory -> use vertical slice.
+PNC.Core.Now = function() return 0 end
+PNC.Core.IsAuthority = function() return true end
+PNC.Core.LogRecordDebug = function() end
+PNC.Const.BANDAGE_TYPE = "Base.Bandage"
+PNC.Const.BANDAGE_TYPES = { "Base.Bandage" }
+getGameTime = function()
+    return { getWorldAgeHours = function() return 100 end }
+end
+dofile(SHARED_ROOT .. "PNC/Core/Needs/PNC_NeedsDefinitions.lua")
+dofile(SHARED_ROOT .. "PNC/Core/Needs/PNC_NeedsUtils.lua")
+dofile(SERVER_ROOT .. "PNC/PNC_IndividualNeeds.lua")
+require "PNC/Supply/PNC_SupplyRequest"
+require "PNC/Supply/PNC_SupplyMetrics"
+require "PNC/Supply/PNC_ItemUtility"
+require "PNC/Supply/PNC_SupplyIndex"
+require "PNC/Supply/PNC_SupplySelector"
+require "PNC/Supply/PNC_StorageAccessPolicy"
+require "PNC/Supply/PNC_SupplyInventory"
+require "PNC/Supply/PNC_NPCSupplyService"
+require "PNC/Needs/PNC_NeedSupplyBridge"
+PNC.Skills = PNC.Skills or {}
+PNC.Skills.AddXP = function() end
+PNC.NPCWounds = {
+    Bandage = function(record, partID)
+        record.bandagedPart = partID
+        return true, "bandaged"
+    end,
+    FindTreatableWound = function() return "ForeArm_L", { damage = 5 } end,
+}
+dofile(SHARED_ROOT .. "PNC/Core/Health/PNC_Treatment.lua")
+
+local supplyTestOriginalSupplies = loadout.supplies
+loadout.supplies = {}
+local supplyRecords = {}
+local supplyBodies = {}
+PNC.Registry.Get = function(id) return supplyRecords[id] end
+PNC.Registry.GetLiveZombie = function(id) return supplyBodies[id] end
+PNC.Registry.MarkDirty = function() end
+local supplyFaction = { id = "supply_faction" }
+local supplyCommunity = {
+    id = "supply_colony", factionID = supplyFaction.id, status = "active",
+    home = { x = 10, y = 10, z = 0, radius = 20 }, memberIDs = {},
+}
+PNC.Factions.GetNPCFaction = function(id)
+    return supplyCommunity.memberIDs[id] and supplyFaction or nil
+end
+PNC.Communities.GetNPCCommunity = function(id)
+    return supplyCommunity.memberIDs[id] and supplyCommunity or nil
+end
+
+local supplySerial = 0
+local function supplyNPC(id, options)
+    options = options or {}
+    supplySerial = supplySerial + 1
+    local savedSupplies = loadout.supplies
+    if options.emptyBaseline then loadout.supplies = {} end
+    local value = {
+        id = id, identitySeed = 1000 + supplySerial, archetypeID = "Test",
+        faction = "colonist", recruited = true, alive = true,
+        x = 10, y = 10, z = 0,
+        progression = { skillLevelDeltas = {}, skillXP = {} },
+        equipment = { worn = {}, attached = {} }, runtime = {},
+    }
+    PNC.Inventory.CreateFromTemplate(value)
+    loadout.supplies = savedSupplies
+    supplyRecords[id] = value
+    supplyCommunity.memberIDs[id] = true
+    PNC.IndividualNeeds.Ensure(value, {
+        hunger = options.hunger or 30,
+        hydration = options.hydration or 30,
+        fatigue = 100,
+    })
+    return value
+end
+
+local supplyStorage = PNC.ColonyStorageRepository.GetPrimary(
+    supplyFaction.id, supplyCommunity.id
+)
+supplyStorage.inventory:clear()
+local SupplyService = PNC.NPCSupplyService
+local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
+
+-- Personal inventory is consumed before storage is queried.
+local personalNPC = supplyNPC("supply_personal", { emptyBaseline = true })
+assert(PNC.Inventory.AddItems(personalNPC, {
+    { type = "Base.Apple", stack = 1, itemState = { age = 1 } },
+}, "root", "test_personal_food"))
+local storageBeforePersonal = supplyStorage.inventory:getLogicalItemCount()
+local personalOK = SupplyService.Process({
+    requesterId = personalNPC.id, resourceKind = "FOOD",
+    required = { hunger = 20 }, priority = 70,
+})
+assertEqual(personalOK, true, "personal food request")
+assertEqual(supplyStorage.inventory:getLogicalItemCount(), storageBeforePersonal,
+    "personal food withdrew storage")
+assert(PNC.IndividualNeeds.Get(personalNPC, "hunger") > 30,
+    "personal food did not change hunger")
+assertEqual(PNC.Inventory.Serialize(personalNPC)[2], "SEED_ONLY",
+    "temporary personal food delta did not compact")
+
+-- Instant storage food acquisition enters inventory, then is consumed once.
+assert(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.Apple"), 2))
+local foodNPC = supplyNPC("supply_food", { emptyBaseline = true })
+local applesBefore = supplyStorage.inventory:count("Base.Apple")
+local foodOK = SupplyService.Process({
+    requesterId = foodNPC.id, resourceKind = "FOOD",
+    required = { hunger = 20 }, priority = 80,
+})
+assertEqual(foodOK, true, "storage food request")
+assertEqual(supplyStorage.inventory:count("Base.Apple"), applesBefore - 1,
+    "storage food count did not decrease exactly once")
+assert(PNC.IndividualNeeds.Get(foodNPC, "hunger") > 30,
+    "storage food was not used from NPC inventory")
+assertEqual(PNC.Inventory.Serialize(foodNPC)[2], "SEED_ONLY",
+    "acquired and consumed apple left sparse history")
+
+assert(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.Apple"), 2))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local multiFoodNPC = supplyNPC("supply_multi_food", { emptyBaseline = true })
+local multiBefore = supplyStorage.inventory:count("Base.Apple")
+local multiFoodOK = SupplyService.Process({
+    requesterId = multiFoodNPC.id, resourceKind = "FOOD",
+    required = { hunger = 40 }, priority = 85,
+})
+assertEqual(multiFoodOK, true, "multiple food request")
+assertEqual(supplyStorage.inventory:count("Base.Apple"), multiBefore - 2,
+    "multiple food request did not acquire bounded quantity")
+assert(PNC.IndividualNeeds.Get(multiFoodNPC, "hunger") >= 70,
+    "multiple acquired foods did not reach target")
+assertEqual(PNC.Inventory.Serialize(multiFoodNPC)[2], "SEED_ONLY",
+    "multiple temporary foods did not compact")
+
+-- FEFO chooses earlier-expiring safe food, never the rotten candidate.
+supplyStorage.inventory:clear()
+local freshApple = nativeItem("Base.Apple")
+freshApple.age = 1
+local oldApple = nativeItem("Base.Apple")
+oldApple.age = 8
+local rottenApple = nativeItem("Base.Apple")
+rottenApple.age = 12
+assert(CoreInventory.deposit(supplyStorage.inventory, freshApple, 1))
+assert(CoreInventory.deposit(supplyStorage.inventory, oldApple, 1))
+assert(CoreInventory.deposit(supplyStorage.inventory, rottenApple, 1))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local fefoNPC = supplyNPC("supply_fefo", { emptyBaseline = true })
+assertEqual(SupplyService.Process({
+    requesterId = fefoNPC.id, resourceKind = "FOOD",
+    required = { hunger = 20 }, priority = 80,
+}), true, "FEFO food request")
+local remainingExpiry = {}
+for _, coreRecord in ipairs(supplyStorage.inventory.records) do
+    local descriptor = PNC.ItemUtility.DescribeCoreRecord(coreRecord)
+    remainingExpiry[#remainingExpiry + 1] = descriptor.expiry
+end
+table.sort(remainingExpiry)
+assertEqual(#remainingExpiry, 2, "FEFO removed wrong quantity")
+assert(remainingExpiry[1] < 0.2 and remainingExpiry[2] >= 1,
+    "FEFO did not remove earlier-expiring safe food")
+
+-- Hydration retains the drainable with its remaining state.
+assert(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.WaterBottleFull"), 1))
+local waterNPC = supplyNPC("supply_water", { emptyBaseline = true })
+local waterOK = SupplyService.Process({
+    requesterId = waterNPC.id, resourceKind = "HYDRATION",
+    required = { thirst = 15 }, priority = 90,
+})
+assertEqual(waterOK, true, "storage hydration request")
+local retainedWater
+for _, compact in pairs(waterNPC.inventory.items) do
+    if compact.type == "Base.WaterBottleFull" then retainedWater = compact end
+end
+assert(retainedWater and math.abs((retainedWater.uses or 0) - 0.75) < 0.001,
+    "hydration remaining-use state was not retained")
+assert(PNC.IndividualNeeds.Get(waterNPC, "hydration") > 30,
+    "hydration use did not change need")
+
+-- Medical acquisition precedes the existing treatment use path.
+assert(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.Bandage"), 1))
+local medicalNPC = supplyNPC("supply_medical", { emptyBaseline = true })
+local medicalAcquire = PNC.NeedSupplyBridge.EnsureMedical(
+    medicalNPC, "BANDAGE", "ForeArm_L", true
+)
+assertEqual(medicalAcquire, true, "medical acquisition")
+assert(PNC.Treatment.HasNPCBandage(medicalNPC),
+    "bandage did not enter NPC inventory")
+assertEqual(PNC.Treatment.TryNPCBandage(medicalNPC, "ForeArm_L"), true,
+    "existing treatment did not use acquired bandage")
+assertEqual(medicalNPC.bandagedPart, "ForeArm_L",
+    "medical condition was not changed by treatment")
+assertEqual(PNC.Treatment.HasNPCBandage(medicalNPC), false,
+    "used bandage remained in NPC inventory")
+
+-- Scarcity sets a cooldown and the retry performs no second candidate query.
+supplyStorage.inventory:clear()
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local scarceNPC = supplyNPC("supply_scarce", { emptyBaseline = true })
+local queriesBefore = PNC.SupplyMetrics.candidateQueries
+local scarceOK, scarceReason = SupplyService.Process({
+    requesterId = scarceNPC.id, resourceKind = "FOOD",
+    required = { hunger = 20 }, priority = 60,
+})
+assertEqual(scarceOK, false, "scarcity request unexpectedly succeeded")
+assertEqual(scarceReason, "no_supply", "scarcity reason")
+local queriesAfter = PNC.SupplyMetrics.candidateQueries
+local retryOK, retryReason = SupplyService.Process({
+    requesterId = scarceNPC.id, resourceKind = "FOOD",
+    required = { hunger = 20 }, priority = 60,
+})
+assertEqual(retryOK, false, "scarcity retry unexpectedly succeeded")
+assertEqual(retryReason, "retry_suppressed", "scarcity retry cooldown")
+assertEqual(PNC.SupplyMetrics.candidateQueries, queriesAfter,
+    "retry cooldown still queried storage")
+assert(queriesAfter > queriesBefore, "initial scarcity did not query candidates")
+
+-- One item cannot be duplicated across two NPC requests.
+assert(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.Apple"), 1))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local firstNPC = supplyNPC("supply_first", { emptyBaseline = true })
+local secondNPC = supplyNPC("supply_second", { emptyBaseline = true })
+local firstOK = SupplyService.Process({ requesterId = firstNPC.id,
+    resourceKind = "FOOD", required = { hunger = 20 }, priority = 80 })
+local secondOK = SupplyService.Process({ requesterId = secondNPC.id,
+    resourceKind = "FOOD", required = { hunger = 20 }, priority = 80 })
+assertEqual(firstOK, true, "first reservation claimant")
+assertEqual(secondOK, false, "second claimant duplicated single food")
+assertEqual(supplyStorage.inventory:count("Base.Apple"), 0,
+    "single reserved food remained in storage")
+
+-- A live NPC receives a native InventoryItem before personal use removes it.
+assert(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.Apple"), 1))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local liveSupplyNPC = supplyNPC("supply_live", { emptyBaseline = true })
+local liveSupplyItems = {}
+local liveSupplyContainer = {}
+function liveSupplyContainer:getItems() return javaList(liveSupplyItems) end
+function liveSupplyContainer:AddItem(value)
+    liveSupplyItems[#liveSupplyItems + 1] = value
+    value.owner = self
+    value.getContainer = function(self) return self.owner end
+    return value
+end
+function liveSupplyContainer:DoRemoveItem(value)
+    for index = #liveSupplyItems, 1, -1 do
+        if liveSupplyItems[index] == value then
+            table.remove(liveSupplyItems, index)
+            return true
+        end
+    end
+    return false
+end
+local liveSupplyBody = {
+    getInventory = function() return liveSupplyContainer end,
+    getX = function() return 10 end,
+    getY = function() return 10 end,
+    getZ = function() return 0 end,
+}
+supplyBodies[liveSupplyNPC.id] = liveSupplyBody
+local liveAcquire = SupplyService.Process({
+    requesterId = liveSupplyNPC.id, resourceKind = "FOOD",
+    required = { hunger = 20 }, priority = 80,
+}, { acquireOnly = true })
+assertEqual(liveAcquire, true, "live instant acquisition")
+assertEqual(#liveSupplyItems, 1,
+    "live acquisition did not enter physical inventory")
+local liveUse, liveUseReason = SupplyService.Process({
+    requesterId = liveSupplyNPC.id, resourceKind = "FOOD",
+    required = { hunger = 20 }, priority = 80,
+})
+local liveSupplyState = PNC.NPCSupplyService.GetDebugState(liveSupplyNPC)
+assertEqual(liveUse, true, "live personal use " .. tostring(liveUseReason)
+    .. " / " .. tostring(liveSupplyState.byKind.FOOD.lastUseFailure))
+assertEqual(#liveSupplyItems, 0,
+    "live food use did not mutate physical inventory")
+supplyBodies[liveSupplyNPC.id] = nil
+
+-- Acquired compact state survives save/load without FULL promotion.
+assert(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.WaterBottleFull"), 1))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local saveNPC = supplyNPC("supply_save", { emptyBaseline = true })
+local saveAcquire = SupplyService.Process({
+    requesterId = saveNPC.id, resourceKind = "HYDRATION",
+    required = { thirst = 15 }, priority = 80,
+}, { acquireOnly = true })
+assertEqual(saveAcquire, true, "save/load acquisition")
+local supplySaved = PNC.Inventory.Serialize(saveNPC)
+assertEqual(supplySaved[2], "BASELINE_DELTA",
+    "single acquisition promoted NPC to FULL")
+local saveReloaded = {
+    id = saveNPC.id, identitySeed = saveNPC.identitySeed,
+    archetypeID = saveNPC.archetypeID, faction = "colonist",
+    recruited = true, alive = true, progression = saveNPC.progression,
+    equipment = { worn = {}, attached = {} }, runtime = {},
+}
+PNC.Inventory.Deserialize(saveReloaded, supplySaved)
+local reloadedWater
+for _, compact in pairs(saveReloaded.inventory.items) do
+    if compact.type == "Base.WaterBottleFull" then reloadedWater = compact end
+end
+assert(reloadedWater and math.abs((reloadedWater.uses or 0) - 1) < 0.001,
+    "acquired drainable state did not survive save/load")
+
+-- Consuming one baseline bandage records one missing template item.
+loadout.supplies = {{ key = "baseline_bandage", type = "Base.Bandage",
+    stack = 2, preferredContainer = "root" }}
+local baselineMedicalNPC = supplyNPC("supply_baseline_medical")
+assertEqual(PNC.Treatment.TryNPCBandage(
+    baselineMedicalNPC, "ForeArm_L"), true,
+    "baseline bandage use")
+local baselineMedicalSaved = PNC.Inventory.Serialize(baselineMedicalNPC)
+assertEqual(baselineMedicalSaved[2], "BASELINE_DELTA",
+    "baseline bandage use promoted FULL")
+assertEqual(#(baselineMedicalSaved[5][3] or {}), 1,
+    "baseline bandage decrement was not a sparse upsert")
+loadout.supplies = {}
+
+-- Unknown items fail conservatively instead of becoming food.
+supplyStorage.inventory:clear()
+assert(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Mod.UnknownWidget"), 1))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local unknownNPC = supplyNPC("supply_unknown", { emptyBaseline = true })
+local unknownOK, unknownReason = SupplyService.Process({
+    requesterId = unknownNPC.id, resourceKind = "FOOD",
+    required = { hunger = 20 }, priority = 70,
+})
+assertEqual(unknownOK, false, "unknown item selected as food")
+assertEqual(unknownReason, "no_supply", "unknown item failure reason")
+
+local modWaterRecord = CoreInventory.encodeItem(
+    nativeItem("Mod.WaterCanteen"), 1
+)
+local modWaterUtility = PNC.ItemUtility.DescribeCoreRecord(modWaterRecord)
+assertEqual(modWaterUtility.hydration, true,
+    "compatible modded drink was not recognized")
+assertEqual(CoreInventory.getItemFullType(modWaterRecord[1]),
+    "Mod.WaterCanteen", "modded ItemTypeId identity round trip")
+
+-- Destination failure rolls the InventoryTransaction back and releases stock.
+supplyStorage.inventory:clear()
+assert(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.Apple"), 1))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local fullNPC = supplyNPC("supply_full", { emptyBaseline = true })
+fullNPC.inventory.maxWeight = 0
+PNC.Const.INVENTORY_HARD_CAPACITY = 0
+local acceptsFull, acceptsFullReason = PNC.Inventory.CanAccept(fullNPC, {
+    { type = "Base.Apple", stack = 1 },
+}, "root")
+assertEqual(acceptsFull, false,
+    "test full inventory preflight " .. tostring(acceptsFullReason))
+local rollbackOK, rollbackReason = SupplyService.Process({
+    requesterId = fullNPC.id, resourceKind = "FOOD",
+    required = { hunger = 20 }, priority = 80,
+})
+assertEqual(rollbackOK, false, "full inventory acquisition succeeded")
+assertEqual(rollbackReason, "no_capacity", "full inventory rejection reason")
+assertEqual(supplyStorage.inventory:count("Base.Apple"), 1,
+    "failed transaction lost storage item")
+assertEqual(next(supplyStorage.inventory.reservations), nil,
+    "failed transaction leaked reservation")
+local fullHasApple = false
+for _, compact in pairs(fullNPC.inventory.items) do
+    fullHasApple = fullHasApple or compact.type == "Base.Apple"
+end
+assertEqual(fullHasApple, false, "failed transaction changed NPC inventory")
+PNC.Const.INVENTORY_HARD_CAPACITY = nil
+
+-- Candidate evaluation is bounded by records, never logical quantities.
+supplyStorage.inventory:clear()
+supplyStorage.inventory.maxWeight = 100000000
+for index = 1, 60 do
+    assert(CoreInventory.deposit(supplyStorage.inventory,
+        nativeItem("Mod.Food" .. tostring(index)), 10000))
+end
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local boundedNPC = supplyNPC("supply_bounded", { emptyBaseline = true })
+local evaluatedBefore = PNC.SupplyMetrics.candidateItemsEvaluated
+SupplyService.Process({ requesterId = boundedNPC.id,
+    resourceKind = "FOOD", required = { hunger = 20 }, priority = 80 },
+    { acquireOnly = true })
+local evaluatedDelta = PNC.SupplyMetrics.candidateItemsEvaluated
+    - evaluatedBefore
+assert(evaluatedDelta <= PNC.NeedsDefinitions.SUPPLY_MAX_CANDIDATES,
+    "candidate evaluation exceeded bound")
+
+-- Stable Needs evaluation performs zero stockpile queries.
+local stableNPC = supplyNPC("supply_stable", {
+    emptyBaseline = true, hunger = 90, hydration = 90,
+})
+local stableQueries = PNC.SupplyMetrics.candidateQueries
+PNC.NeedSupplyBridge.Evaluate(stableNPC)
+assertEqual(PNC.SupplyMetrics.candidateQueries, stableQueries,
+    "stable NPC searched stockpile")
+loadout.supplies = supplyTestOriginalSupplies
 
 print("pnc_seed_delta_smoke: ok")

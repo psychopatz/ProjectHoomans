@@ -187,6 +187,9 @@ local function tickAbstract(record, now, partId)
     if not Treatment or not Treatment.HasNPCBandage
         or not Treatment.HasNPCBandage(record)
     then
+        if PNC.NeedSupplyBridge and PNC.NeedSupplyBridge.EnsureMedical then
+            PNC.NeedSupplyBridge.EnsureMedical(record, "BANDAGE", partId, false)
+        end
         return false
     end
     state.nextAbstractAt = now
@@ -226,6 +229,9 @@ function Behavior.Tick(record, zombie, now)
         return tickAbstract(record, now, partId)
     end
     if not Treatment.HasNPCBandage(record) then
+        if PNC.NeedSupplyBridge and PNC.NeedSupplyBridge.EnsureMedical then
+            PNC.NeedSupplyBridge.EnsureMedical(record, "BANDAGE", partId, false)
+        end
         if state.phase ~= "idle" then clearAction(record, zombie, "missing_bandage") end
         return false
     end

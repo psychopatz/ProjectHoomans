@@ -11,6 +11,7 @@ local Utils = PNC.NeedsUtils
 Debug.groupHistory = Debug.groupHistory or {}
 Debug.individualHistory = Debug.individualHistory or {}
 Debug.ProfilingEnabled = Debug.ProfilingEnabled == true
+Debug.SupplyLoggingEnabled = Debug.SupplyLoggingEnabled == true
 
 local function copy(value)
     return PNC.Core and PNC.Core.DeepCopy and PNC.Core.DeepCopy(value) or value
@@ -36,11 +37,21 @@ end
 
 local function individualSummary(record)
     local state = PNC.IndividualNeeds.Ensure(record)
+    local persistence = PNC.Inventory and PNC.Inventory.Serialize
+        and PNC.Inventory.Serialize(record) or nil
+    local mode = PNC.Inventory and PNC.Inventory.GetPersistenceMode
+        and PNC.Inventory.GetPersistenceMode(record) or "UNKNOWN"
+    local delta = mode == "BASELINE_DELTA" and persistence and persistence[5] or nil
     return state and {
         id = record.id, name = tostring(record.name or record.id), owner = record.ownerUsername or "Player",
         activity = record.activeBehavior or record.activeJob or record.orderSpec and record.orderSpec.kind or "idle",
         needs = state, history = copy(Debug.individualHistory[record.id] or {}),
         elapsed = math.max(0, Utils.WorldAgeHours() - (tonumber(state.lastUpdateWorldAge) or 0)),
+        supply = PNC.NPCSupplyService and PNC.NPCSupplyService.GetDebugState
+            and PNC.NPCSupplyService.GetDebugState(record) or { byKind = {} },
+        inventoryMode = mode,
+        deltaRecordCount = delta and (#(delta[2] or {}) + #(delta[3] or {})) or 0,
+        fullPromotionReason = record.inventoryPromotionReason,
     } or nil
 end
 
@@ -75,7 +86,11 @@ function Debug.BuildSnapshot(selectedGroupID, selectedNPCID, action)
         groups = groups, individuals = individuals, selectedGroup = selectedGroup, selectedNPC = selectedNPC,
         summary = { groupCount = #groups, individualCount = #individuals, totalGroupMembers = members, lowest = lowest },
         profiler = { enabled = Debug.ProfilingEnabled == true,
-            data = Debug.ProfilingEnabled and copy(PNC.NeedsScheduler and PNC.NeedsScheduler.Profile or {}) or nil }, action = action,
+            data = Debug.ProfilingEnabled and copy(PNC.NeedsScheduler and PNC.NeedsScheduler.Profile or {}) or nil,
+            supply = PNC.SupplyMetrics and PNC.SupplyMetrics.Snapshot
+                and PNC.SupplyMetrics.Snapshot() or {} },
+        supplyLoggingEnabled = Debug.SupplyLoggingEnabled == true,
+        action = action,
         generatedAt = Utils.WorldAgeHours(),
     }
 end
@@ -88,6 +103,15 @@ function Debug.PerformAction(args)
         Debug.ProfilingEnabled = args.enabled == true
         return Debug.BuildSnapshot(args.groupID, args.npcID, {
             ok = true, reason = Debug.ProfilingEnabled and "profiling_enabled" or "profiling_disabled", operation = operation,
+        })
+    end
+    if operation == "supply_logging" then
+        Debug.SupplyLoggingEnabled = args.enabled == true
+        return Debug.BuildSnapshot(args.groupID, args.npcID, {
+            ok = true,
+            reason = Debug.SupplyLoggingEnabled
+                and "supply_logging_enabled" or "supply_logging_disabled",
+            operation = operation,
         })
     end
     local owner = target == "group" and PNC.Factions.Get(args.ownerID)
@@ -106,6 +130,26 @@ function Debug.PerformAction(args)
         elseif operation == "modify" then value = PNC.IndividualNeeds.Modify(owner, args.needType, args.amount, "debug")
         elseif operation == "reset" then ok, reason = PNC.IndividualNeeds.Reset(owner), "reset"
         elseif operation == "simulate" then ok, reason = PNC.NeedsScheduler.SimulateIndividual(owner, args.hours), "simulated" end
+        if operation == "force_supply_evaluation" then
+            ok, reason = PNC.NeedSupplyBridge.Evaluate(owner)
+        elseif operation == "force_food_supply" then
+            ok, reason = PNC.NeedSupplyBridge.Evaluate(owner, "FOOD")
+        elseif operation == "force_hydration_supply" then
+            ok, reason = PNC.NeedSupplyBridge.Evaluate(owner, "HYDRATION")
+        elseif operation == "force_medical_supply" then
+            ok, reason = PNC.NeedSupplyBridge.Evaluate(owner, "MEDICAL")
+        elseif operation == "clear_supply_retry" then
+            for _, kind in ipairs({ "FOOD", "HYDRATION", "MEDICAL" }) do
+                PNC.NPCSupplyService.ClearRetry(owner, kind)
+            end
+            ok, reason = true, "supply_retry_cleared"
+        elseif operation == "dump_candidate_scores" then
+            local supply = PNC.NPCSupplyService.GetDebugState(owner)
+            local kind = supply.currentKind
+            value = kind and supply.byKind and supply.byKind[kind]
+                and copy(supply.byKind[kind].candidateScores) or {}
+            ok, reason = true, "candidate_scores_dumped"
+        end
         if value ~= nil then ok, reason = true, "updated" end
     end
     return Debug.BuildSnapshot(args.groupID or (target == "group" and args.ownerID), args.npcID or (target == "individual" and args.ownerID), {

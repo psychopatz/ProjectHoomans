@@ -1,5 +1,10 @@
 # Colony storage and research foundation
 
+NPC Needs withdrawals use the supply policy documented in `docs/npc-supply.md`.
+They are server-authoritative, exact-record reserved, and currently fulfilled
+instantly into the NPC inventory before any use effect. Runtime semantic indexes
+are derived from storage contents and are never persisted.
+
 ## Faction storage
 
 Each authoritative faction owns a primary storage with the stable ID

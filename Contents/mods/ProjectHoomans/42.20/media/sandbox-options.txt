@@ -192,3 +192,11 @@ option ProjectHoomans.NPCWeaponConditionLoss
     page = ProjectHoomans,
     translation = ProjectHoomans.NPCWeaponConditionLoss,
 }
+
+option ProjectHoomans.NPCSupplyTransactionLogging
+{
+    type = boolean,
+    default = false,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCSupplyTransactionLogging,
+}

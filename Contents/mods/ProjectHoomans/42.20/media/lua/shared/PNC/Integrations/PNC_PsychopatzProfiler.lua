@@ -125,6 +125,20 @@ Profiler.RegisterSampler("ProjectHoomans.shared", function(api)
     api.SetGauge("ProjectHoomans.ColonyStorage.Withdrawals", storageMetrics.withdrawals or 0)
     api.SetGauge("ProjectHoomans.ColonyStorage.TransferFailures", storageMetrics.transferFailures or 0)
     api.SetGauge("ProjectHoomans.ColonyStorage.CapacityRejects", storageMetrics.capacityRejects or 0)
+    local supplyMetrics = PNC.SupplyMetrics or {}
+    for _, name in ipairs({
+        "supplyRequests", "supplyRequestsSatisfiedFromPersonalInventory",
+        "supplyRequestsSentToStorage", "supplyRequestsSucceeded",
+        "supplyRequestsFailed", "foodRequests", "hydrationRequests",
+        "medicalRequests", "reservationsCreated", "reservationFailures",
+        "instantAcquisitions", "acquisitionFailures", "candidateQueries",
+        "candidateItemsEvaluated", "supplyRetriesSuppressed",
+        "deltaInventoryMutations", "deltaInventoryCompactions",
+        "deltaToFullPromotions",
+    }) do
+        api.SetGauge("ProjectHoomans.NPCSupply." .. name,
+            supplyMetrics[name] or 0)
+    end
     local report = ModDataProfiler and ModDataProfiler.Scan and ModDataProfiler.Scan(false) or nil
     if report then
         api.SetGauge("ProjectHoomans.ModData.PersistedEstimatedBytes", report.persisted.estimatedBytes)
