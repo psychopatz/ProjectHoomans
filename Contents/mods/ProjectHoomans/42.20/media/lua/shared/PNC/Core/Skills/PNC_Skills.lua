@@ -6,6 +6,8 @@ local Identity = PNC.Identity
 local Catalog = PNC.SkillCatalog
 local Archetypes = PNC.Archetypes
 local Types = PNC.Types
+local Events = require "PsychopatzCore/Events/PC_EventBus"
+local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 
 local function ensureProgress(record)
     if type(record) ~= "table" then
@@ -156,6 +158,7 @@ function Skills.AddXP(record, skillID, amount)
     local progression
     local xpMap
     local currentLevel
+    local originalLevel
     local xpValue
     local threshold
     if not Skills.CanLearn(record) or not skillID then
@@ -164,6 +167,7 @@ function Skills.AddXP(record, skillID, amount)
     progression = ensureProgress(record)
     xpMap = progression.skillXP
     currentLevel = Skills.GetLevel(record, skillID)
+    originalLevel = currentLevel
     xpValue = math.max(0, tonumber(xpMap[skillID]) or 0) + math.max(0, tonumber(amount) or 0)
     threshold = resolveXPThreshold(currentLevel)
     while xpValue >= threshold and currentLevel < 10 do
@@ -173,6 +177,11 @@ function Skills.AddXP(record, skillID, amount)
         threshold = resolveXPThreshold(currentLevel)
     end
     xpMap[skillID] = xpValue
+    local finalLevel = Skills.GetLevel(record, skillID)
+    if finalLevel > originalLevel then
+        Events.emit(EventTypes.NPC_SKILL_LEVEL_UP,
+            record, skillID, finalLevel)
+    end
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "skills")
     end

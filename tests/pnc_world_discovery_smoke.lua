@@ -1,7 +1,8 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
 local CORE_ROOT = "../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/"
+local CORE_COMMON = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
 package.path = ROOT .. "shared/?.lua;" .. ROOT .. "server/?.lua;"
-    .. CORE_ROOT .. "shared/?.lua;"
+    .. CORE_COMMON .. "?.lua;" .. CORE_ROOT .. "shared/?.lua;"
     .. package.path
 
 local function equal(actual, expected, label)

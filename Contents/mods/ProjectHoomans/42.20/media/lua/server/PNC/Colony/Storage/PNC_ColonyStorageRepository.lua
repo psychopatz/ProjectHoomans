@@ -49,7 +49,7 @@ local function hydrate(raw)
     if not store then return nil, reason end
     local tier = Definitions.NormalizeTier(raw.tier)
     store.maxWeight = Definitions.GetCapacity(tier)
-    return {
+    local storage = {
         id = tostring(raw.storageId),
         ownerFactionId = tostring(raw.ownerFactionId),
         settlementId = raw.settlementId and tostring(raw.settlementId) or nil,
@@ -57,14 +57,18 @@ local function hydrate(raw)
         tier = tier,
         revision = math.max(0, math.floor(tonumber(raw.revision) or 0)),
         inventory = store,
-        activityJournal = Journal.Deserialize(raw.activityJournal),
     }
+    Journal.Deserialize(raw.activityJournal, storage.id)
+    return storage
 end
 
 function Repository.Load()
     if Repository.Loaded then return true end
     local raw = ModData and ModData.getOrCreate
         and ModData.getOrCreate(Definitions.MODDATA_KEY) or {}
+    for storageID, _ in pairs(Repository.ByID) do
+        Journal.Remove(storageID)
+    end
     Repository.ByID = {}
     Repository.PrimaryByFaction = {}
     for storageID, payload in pairs(raw.byID or {}) do
@@ -129,7 +133,6 @@ function Repository.GetPrimary(factionID, settlementID)
             storageType = Definitions.PRIMARY_TYPE,
             tier = tier,
             revision = 0,
-            activityJournal = {},
             inventory = Inventory.createVirtualInventory({
                 maxWeight = Definitions.GetCapacity(tier),
                 authority = "server",

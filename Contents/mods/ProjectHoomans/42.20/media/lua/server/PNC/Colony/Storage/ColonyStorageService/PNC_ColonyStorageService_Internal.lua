@@ -3,7 +3,8 @@ local Internal = Service.Internal
 local Definitions = require "PNC/Core/Colony/Storage/PNC_ColonyStorageDefinitions"
 local Repository = require "PNC/Colony/Storage/PNC_ColonyStorageRepository"
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
-local Journal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
+local Events = require "PsychopatzCore/Events/PC_EventBus"
+local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 
 Service.Metrics = Service.Metrics or {
@@ -15,7 +16,6 @@ Internal.Definitions = Definitions
 Internal.Repository = Repository
 Internal.CoreInventory = CoreInventory
 Internal.Constants = C
-Internal.Journal = Journal
 
 function Internal.PlayerName(player)
     return player and player.getUsername
@@ -51,11 +51,33 @@ function Internal.StorageSelectionSpecs(storage, selections)
 end
 
 function Internal.RecordActivity(storage, operation, actor, items, reason)
-    local count = Journal.RecordMany(
-        storage, operation, actor, items, reason
-    )
-    if count > 0 then Repository.MarkDirty() end
-    return count
+    local eventType = string.upper(tostring(operation or "")) == "TAKE"
+        and EventTypes.STORAGE_ITEM_WITHDRAWN
+        or string.upper(tostring(operation or "")) == "STORE"
+            and EventTypes.STORAGE_ITEM_DEPOSITED or nil
+    if not eventType or not storage then return 0 end
+    local grouped = {}
+    local order = {}
+    for _, item in ipairs(type(items) == "table" and items or {}) do
+        local typeID = math.floor(tonumber(item and item.typeId) or 0)
+        if typeID <= 0 then
+            typeID = CoreInventory.getItemTypeId(item and item.fullType, false)
+        end
+        local quantity = math.max(0, math.floor(
+            tonumber(item and item.quantity) or 0))
+        if typeID and typeID > 0 and quantity > 0 then
+            if not grouped[typeID] then
+                grouped[typeID] = 0
+                order[#order + 1] = typeID
+            end
+            grouped[typeID] = grouped[typeID] + quantity
+        end
+    end
+    for _, typeID in ipairs(order) do
+        Events.emit(eventType, storage.id, actor, typeID,
+            grouped[typeID], reason)
+    end
+    return #order
 end
 
 function Internal.LogTransaction(player, args, action, ok, reason, storage, details)

@@ -9,6 +9,8 @@ local Wounds = PNC.NPCWounds
 local Core = PNC.Core
 local Const = PNC.Const
 local Settings = PNC.Sandbox
+local Events = require "PsychopatzCore/Events/PC_EventBus"
+local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 
 Wounds.Parts = {
     Head =       { id = "Head", label = "Head", engine = "Head", x = 0.50, y = 0.08, weight = 5 },
@@ -531,6 +533,8 @@ local function addWound(record, part, woundType, now, woundDamage)
     body.wounds[part.id] = wound
     if woundType == "bite" then infect(record, part.id, worldHour()) end
     Wounds.Recalculate(record)
+    Events.emit(EventTypes.NPC_WOUNDED, record, part.id,
+        wound.type, severityDamage)
     return wound, stats.damage
 end
 

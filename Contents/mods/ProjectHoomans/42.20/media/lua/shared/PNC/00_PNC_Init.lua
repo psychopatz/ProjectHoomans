@@ -1,5 +1,6 @@
 require "PNC/Core/Base/PNC_Core"
 require "PNC/Core/Base/PNC_Constants"
+require "PNC/Core/Events/PNC_EventDefinitions"
 require "PNC/Core/Needs/PNC_NeedsDefinitions"
 require "PNC/Core/Needs/PNC_ConditionStats"
 require "PNC/Core/Needs/PNC_PlayerNeedsModel"

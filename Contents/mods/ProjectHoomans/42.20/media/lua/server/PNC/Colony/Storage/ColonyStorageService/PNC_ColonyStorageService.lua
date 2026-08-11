@@ -13,13 +13,8 @@ function PNC.ColonyStorageService.RecordActivity(storageOrID, event)
     local storage = type(storageOrID) == "table" and storageOrID
         or PNC.ColonyStorageService.Internal.Repository.Get(storageOrID)
     if not storage then return false, "storage_not_found" end
-    local ok, entry = PNC.ColonyStorageService.Internal.Journal.Record(
-        storage, event
-    )
-    if ok then
-        PNC.ColonyStorageService.Internal.Repository.MarkDirty()
-    end
-    return ok, entry
+    local Journal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
+    return Journal.Record(storage, event)
 end
 
 return PNC.ColonyStorageService

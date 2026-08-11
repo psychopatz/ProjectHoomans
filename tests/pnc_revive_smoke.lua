@@ -1,4 +1,7 @@
 local root = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local sharedRoot = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+local coreRoot = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
+package.path = sharedRoot .. "?.lua;" .. coreRoot .. "?.lua;" .. package.path
 local now = 10000
 local records = {}
 local bodies = {}

@@ -603,6 +603,7 @@ require "PNC/Supply/PNC_SupplyIndex"
 require "PNC/Supply/PNC_SupplySelector"
 require "PNC/Supply/PNC_StorageAccessPolicy"
 require "PNC/Supply/PNC_SupplyInventory"
+require "PNC/Journals/PNC_JournalRoutes"
 require "PNC/Supply/PNC_NPCSupplyService"
 require "PNC/Needs/PNC_NeedSupplyBridge"
 PNC.Skills = PNC.Skills or {}
@@ -721,10 +722,9 @@ assertEqual(supplyStorage.inventory:count("Base.Apple"), applesBefore - 1,
     "storage food count did not decrease exactly once")
 assert(PNC.IndividualNeeds.Get(foodNPC, "hunger") < 0.30,
     "storage food was not used from NPC inventory")
-local provisionEntry = supplyStorage.activityJournal[
-    #supplyStorage.activityJournal
-]
 local Journal = PNC.ColonyStorageJournal
+local provisionActivity = Journal.Snapshot(supplyStorage)
+local provisionEntry = provisionActivity[#provisionActivity]
 assertEqual(provisionEntry[Journal.FIELD.OPERATION], Journal.OPERATION.TAKE,
     "provision storage journal operation")
 assertEqual(provisionEntry[Journal.FIELD.ACTOR], foodNPC.name,

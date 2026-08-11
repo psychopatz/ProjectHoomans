@@ -12,7 +12,8 @@ local Access = PNC.StorageAccessPolicy
 local Index = PNC.SupplyIndex
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local Repository = require "PNC/Colony/Storage/PNC_ColonyStorageRepository"
-local StorageJournal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
+local Events = require "PsychopatzCore/Events/PC_EventBus"
+local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 
 local function worldHour()
     return PNC.NeedsUtils and PNC.NeedsUtils.WorldAgeHours
@@ -160,8 +161,11 @@ local function acquireInstant(record, storage, request, selected, state)
             quantity = selected[index].quantity,
         }
     end
-    StorageJournal.RecordMany(storage, "TAKE",
-        tostring(record.name or record.id), activityItems, "provision")
+    for index = 1, #activityItems do
+        Events.emit(EventTypes.STORAGE_ITEM_WITHDRAWN, storage.id,
+            tostring(record.name or record.id), activityItems[index].typeId,
+            activityItems[index].quantity, "provision")
+    end
     Index.AfterRemoval(storage)
     if PNC.ColonyStorageService and PNC.ColonyStorageService.Metrics then
         PNC.ColonyStorageService.Metrics.withdrawals =

@@ -92,32 +92,44 @@ fields. Rows rebuild only after snapshot revision receipt or a filter/sort
 change; the render loop does not scan inventory records. Development controls
 and storage diagnostics live in a collapsed debug drawer.
 
-The Storage tab also contains a Recent Activity pane. The server keeps only
-the latest ten successful interactions. Newest entries render first; rejected
-or rolled-back transactions are never recorded.
+The Storage tab also contains a Recent Activity pane backed by the reusable
+PsychopatzCore journal service. Authoritative storage mutations emit
+`projecthoomans.storage.itemDeposited` or
+`projecthoomans.storage.itemWithdrawn`; a server route stores only the latest
+ten successful interactions. Newest entries render first; rejected or
+rolled-back transactions are never recorded.
 
 Activity is persisted as structured data rather than translated sentences.
-Each tuple contains exactly six fields: operation code, world minute, actor
+Each Core entry contains a namespaced event ID followed by world minute, actor
 label, numeric item type ID, quantity, and an optional reason token. The client
-resolves item names and translation templates at render time. This bounds
-memory and save growth while allowing future reasons such as `lumber`,
-`fishing`, or `scavenging` to add only a translation key.
+snapshot adapter converts it to the established six-field UI tuple and resolves
+item names and translation templates only at render time. This bounds memory
+and save growth while allowing future reasons such as `lumber`, `fishing`, or
+`scavenging` to add only a translation key.
 
-Server systems can record a successful external interaction through:
+The old public helper remains as a compatibility adapter, but new gameplay
+systems emit the semantic event after a successful mutation:
 
 ```lua
-PNC.ColonyStorageService.RecordActivity(storage, {
-    operation = "STORE", -- or "TAKE"
-    actor = npc.name,
-    fullType = "Base.Log",
-    quantity = 4,
-    reason = "lumber", -- optional translation token
-})
+PC_Events.emit("projecthoomans.storage.itemDeposited",
+    storage.id, npc.name, itemTypeID, 4, "lumber")
 ```
 
 The optional reason key is `UI_PNC_Storage_Reason_<token>`. Inventory mutation
-must succeed before this API is called; it records the event and marks
-repository persistence dirty but does not mutate inventory itself.
+must succeed before the event is emitted. The route records it and marks the
+repository dirty but never mutates inventory itself. Saves retain the existing
+`activityJournal` key; version-1 tuples are migrated into the Core ring on load,
+and only the Core journal remains the runtime source of truth. Multiplayer uses
+the existing on-demand Colony Management snapshot rather than global history
+replication.
+
+Player-owned NPC history uses a separate 32-entry journal. Its centralized
+route accepts only recruited records with a player owner, so world, hostile,
+neutral, and abstract NPCs do not allocate journals. Current semantic events
+cover food consumption, drink consumption, skill level-up, and wounds. The NPC
+record serializer exports/imports this journal; no translated UI strings are
+saved. A polished NPC History panel and the full radio discovery archive remain
+separate future UI work.
 
 `Manage Inventory` opens the same responsive two-pane exchange window used for
 player-to-NPC transfers. Its right side is supplied by a storage endpoint, so

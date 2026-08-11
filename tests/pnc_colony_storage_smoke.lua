@@ -116,10 +116,12 @@ local function container(items)
 end
 
 local Definitions = require "PNC/Core/Colony/Storage/PNC_ColonyStorageDefinitions"
+require "PNC/Journals/PNC_JournalRoutes"
 local Repository = require "PNC/Colony/Storage/PNC_ColonyStorageRepository"
 local Service = require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService"
 local Journal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
 local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
+local function activity(storage) return Journal.Snapshot(storage) end
 
 equal(Definitions.GetCapacity(1), 200, "tier one capacity")
 equal(Definitions.GetCapacity(2), 250, "tier two capacity")
@@ -158,10 +160,10 @@ equal(storageA.inventory:getLogicalItemCount(), 1, "storage destination add")
 equal(storageB.inventory:getLogicalItemCount(), 0, "other faction unchanged")
 equal(provisionWakeups[#provisionWakeups], "faction_a",
     "storage deposit immediately wakes provision scheduler")
-equal(#storageA.activityJournal, 1, "successful deposit journal entry")
-equal(storageA.activityJournal[1][Journal.FIELD.OPERATION],
+equal(#activity(storageA), 1, "successful deposit journal entry")
+equal(activity(storageA)[1][Journal.FIELD.OPERATION],
     Journal.OPERATION.STORE, "deposit journal operation")
-equal(storageA.activityJournal[1][Journal.FIELD.ACTOR], "player_a",
+equal(activity(storageA)[1][Journal.FIELD.ACTOR], "player_a",
     "deposit journal actor")
 
 ok, reason = Service.RequestPlayerDeposit(playerA, {
@@ -170,7 +172,7 @@ ok, reason = Service.RequestPlayerDeposit(playerA, {
 })
 equal(ok, false, "duplicate request rejected")
 equal(reason, "duplicate_request", "duplicate request reason")
-equal(#storageA.activityJournal, 1,
+equal(#activity(storageA), 1,
     "rejected transaction entered activity journal")
 
 local foreignItem = item("Base.Hammer", 1)
@@ -220,7 +222,7 @@ truthy(loaded, "storage persisted")
 equal(loaded.tier, 2, "persisted tier")
 equal(loaded.inventory:getLogicalItemCount(), 100, "persisted contents")
 equal(loaded.inventory.maxWeight, 250, "capacity rederived from tier")
-equal(#loaded.activityJournal, 1, "activity journal persisted")
+equal(#activity(loaded), 1, "activity journal persisted")
 
 local snapshot = Service.BuildSnapshot(playerA)
 equal(snapshot.logicalItemCount, 100, "snapshot logical quantity")
@@ -245,10 +247,10 @@ equal(loaded.inventory:getLogicalItemCount(), 95,
     "withdrawal removes storage quantity once")
 equal(#playerContainer.values, 7,
     "withdrawal materializes items in player inventory")
-equal(#loaded.activityJournal, 2, "withdrawal journal entry")
-equal(loaded.activityJournal[2][Journal.FIELD.OPERATION],
+equal(#activity(loaded), 2, "withdrawal journal entry")
+equal(activity(loaded)[2][Journal.FIELD.OPERATION],
     Journal.OPERATION.TAKE, "withdrawal journal operation")
-equal(loaded.activityJournal[2][Journal.FIELD.QUANTITY], 5,
+equal(activity(loaded)[2][Journal.FIELD.QUANTITY], 5,
     "withdrawal journal quantity")
 
 ok, reason = Service.RequestPlayerWithdrawal(playerA, {
@@ -306,18 +308,25 @@ for index = 1, 12 do
         reason = index == 12 and "fishing" or nil,
     }), "public journal API")
 end
-equal(#loaded.activityJournal, 10, "journal hard cap")
-equal(loaded.activityJournal[1][Journal.FIELD.ACTOR], "worker_3",
+equal(#activity(loaded), 10, "journal hard cap")
+equal(activity(loaded)[1][Journal.FIELD.ACTOR], "worker_3",
     "journal discarded oldest entry")
-equal(loaded.activityJournal[10][Journal.FIELD.REASON], "fishing",
+equal(activity(loaded)[10][Journal.FIELD.REASON], "fishing",
     "optional extensible reason token")
 local serialized = Repository.SerializeStorage(loaded)
 equal(serialized.activityJournal[1], Journal.VERSION,
     "journal serialization version")
-equal(#serialized.activityJournal[2], 10,
+equal(#serialized.activityJournal[2].entries, 10,
     "serialized journal hard cap")
-equal(#serialized.activityJournal[2][1], 6,
-    "compact positional journal entry")
+equal(#serialized.activityJournal[2].entries[1], 6,
+    "compact semantic journal entry")
+local legacyID = "legacy_storage"
+truthy(Journal.Deserialize({ 1, {{
+    Journal.OPERATION.STORE, 123, "legacy_actor",
+    serialized.activityJournal[2].entries[1][4], 2, "scavenging",
+}} }, legacyID), "legacy journal migration")
+equal(Journal.Snapshot(legacyID)[1][Journal.FIELD.ACTOR], "legacy_actor",
+    "legacy journal actor retained")
 snapshot = Service.BuildSnapshot(playerA)
 equal(#snapshot.activity, 10, "snapshot activity cap")
 getText = function(key) return key end

@@ -801,6 +801,8 @@ function Persistence.SerializeRecord(record)
             or nil,
         generation = type(record.generation) == "table"
             and PNC.Core.DeepCopy(record.generation) or nil,
+        npcJournal = PNC.Journals and PNC.Journals.ExportNPC
+            and PNC.Journals.ExportNPC(record) or nil,
     }
     startupBodyHint = record.runtime and record.runtime.startupBodyHint or nil
     if record.liveBodyInstanceID ~= nil or startupBodyHint then
@@ -1014,6 +1016,17 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     record.inventory = nil
     record.persistedInventory = type(raw.inventory) == "table" and Core.DeepCopy(raw.inventory) or nil
     record = Persistence.RebuildRuntime(record)
+    if PNC.Journals and PNC.Journals.RemoveNPC then
+        PNC.Journals.RemoveNPC(record.id)
+    end
+    if type(raw.npcJournal) == "table"
+        and PNC.Journals and PNC.Journals.ImportNPC
+    then
+        local imported = pcall(PNC.Journals.ImportNPC, record, raw.npcJournal)
+        if not imported and Core and Core.LogWarn then
+            Core.LogWarn("Rejected NPC journal id=" .. tostring(record.id))
+        end
+    end
     if type(raw.travel) == "table"
         and PNC.Travel
         and PNC.Travel.Model

@@ -10,6 +10,8 @@ local ItemRecord = require "PsychopatzCore/Inventory/PsychopatzItemRecord"
 local StateCodec = require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 local Util = require "PsychopatzCore/Inventory/PsychopatzInventoryUtil"
+local Events = require "PsychopatzCore/Events/PC_EventBus"
+local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 
 local function cloneSpec(record)
     local spec = StateCodec.readState(record)
@@ -271,6 +273,14 @@ function SupplyInventory.Consume(record, itemID, request)
         PNC.Inventory.RebuildCaches(record)
         if physicalUndo then physicalUndo() end
         return true
+    end
+    local eventType = request.resourceKind == "FOOD"
+        and EventTypes.NPC_FOOD_CONSUMED
+        or request.resourceKind == "HYDRATION"
+            and EventTypes.NPC_DRINK_CONSUMED or nil
+    if eventType then
+        Events.emit(eventType, record, effect.fullType,
+            request.resourceKind == "FOOD" and effect.hunger or effect.thirst)
     end
     return true, "consumed", effect
 end

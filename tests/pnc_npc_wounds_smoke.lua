@@ -1,4 +1,7 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local SHARED = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+local CORE = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
+package.path = SHARED .. "?.lua;" .. CORE .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
