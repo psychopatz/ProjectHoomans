@@ -128,7 +128,9 @@ route accepts only recruited records with a player owner, so world, hostile,
 neutral, and abstract NPCs do not allocate journals. Current semantic events
 cover food consumption, drink consumption, skill level-up, and wounds. The NPC
 record serializer exports/imports this journal; no translated UI strings are
-saved. A polished NPC History panel and the full radio discovery archive remain
+saved. Colony Management requests the bounded history with its existing
+on-demand snapshot and renders it newest-first below the selected colonist's
+needs in People > Companion Details. The full radio discovery archive remains
 separate future UI work.
 
 `Manage Inventory` opens the same responsive two-pane exchange window used for

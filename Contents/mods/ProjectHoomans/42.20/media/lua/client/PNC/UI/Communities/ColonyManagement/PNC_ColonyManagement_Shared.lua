@@ -48,6 +48,12 @@ function Shared.Tr(key, fallback)
     return value and value ~= "" and value ~= key and value or fallback
 end
 
+function Shared.TrFormat(key, fallback, ...)
+    local value = getText and getText(key, ...) or nil
+    if value and value ~= "" and value ~= key then return value end
+    return string.format(fallback, ...)
+end
+
 function Shared.Text(value, fallback)
     value = value ~= nil and tostring(value) or ""
     return value ~= "" and value or tostring(fallback or "")

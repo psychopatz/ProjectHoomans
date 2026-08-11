@@ -11,6 +11,10 @@ end
 local function summary(record)
     local needs = PNC.IndividualNeeds.Ensure(record)
     local priorityType, priority = PNC.IndividualNeeds.GetHighestPriority(record)
+    local journal = PNC.Journals and PNC.Journals.GetNPC
+        and PNC.Journals.GetNPC(record.id,
+            PNC.Journals.NPC_CAPACITY or 32, true)
+        or {}
     return { id=record.id, name=tostring(record.name or record.id),
         role=record.affiliation and record.affiliation.communityRole or record.affiliation and record.affiliation.role or "companion",
         activity=PNC.IndividualNeeds.GetActivity(record), job=record.activeJob,
@@ -25,6 +29,7 @@ local function summary(record)
         supply=PNC.NPCSupplyService
             and PNC.NPCSupplyService.GetDebugState
             and PNC.NPCSupplyService.GetDebugState(record) or {},
+        journal=journal,
         priorityType=priorityType, priority=priority,
         location={x=record.x,y=record.y,z=record.z} }
 end

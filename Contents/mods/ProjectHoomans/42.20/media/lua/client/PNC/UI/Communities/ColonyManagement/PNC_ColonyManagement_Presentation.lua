@@ -1,4 +1,5 @@
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+local JournalPresentation = require "PNC/UI/Communities/PNC_ColonistJournalPresentation"
 local Presentation = {}
 
 function Presentation.Detail(label, detail, colorName)
@@ -123,6 +124,21 @@ function Presentation.BuildPeople(person)
         rows[#rows + 1] = Presentation.NeedMeter(
             needType, value.needs and value.needs[needType]
         )
+    end
+    local journalRows = JournalPresentation.Rows(value.journal)
+    rows[#rows + 1] = Presentation.Detail(Shared.Tr(
+        "UI_PNC_Journal_Title", "COLONIST JOURNAL"), Shared.TrFormat(
+            "UI_PNC_Journal_EntryCount", "%s entries",
+            tostring(#journalRows)), "accent")
+    if #journalRows == 0 then
+        rows[#rows + 1] = Presentation.Detail(Shared.Tr(
+            "UI_PNC_Journal_Empty", "No recorded history yet"), "")
+    else
+        for _, journalRow in ipairs(journalRows) do
+            rows[#rows + 1] = Presentation.Detail(
+                journalRow.message, journalRow.time
+            )
+        end
     end
     return rows
 end

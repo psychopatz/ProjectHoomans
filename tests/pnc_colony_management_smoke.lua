@@ -71,6 +71,18 @@ PNC = {
             return id == companion.id and companion or nil
         end,
     },
+    Journals = {
+        NPC_CAPACITY = 32,
+        GetNPC = function(id, limit, newestFirst)
+            equal(id, companion.id, "journal request uses companion id")
+            equal(limit, 32, "journal request stays bounded")
+            equal(newestFirst, true, "journal request is newest first")
+            return {
+                { "projecthoomans.npc.needs.foodConsumed", 120,
+                    "Base.Apple", 0.2 },
+            }
+        end,
+    },
     Factions = {
         GetPlayerFaction = function() return { id = "faction_player" } end,
     },
@@ -93,6 +105,7 @@ local snapshot = Management.BuildSnapshot(player)
 
 equal(#snapshot.people, 1, "owned companion appears")
 equal(snapshot.people[1].name, "Alex Rivera", "companion identity presented")
+equal(#snapshot.people[1].journal, 1, "companion journal included")
 equal(#snapshot.attention, 1, "critical need appears in attention")
 equal(snapshot.attention[1].needType, "hunger", "critical need type")
 
