@@ -179,3 +179,40 @@ function Internal.ResolveFollowSlot(record, owner, ownerMoving)
     end
     return target
 end
+
+function Internal.ResolveSampledFollowSlot(record, owner, ownerMoving, now)
+    local state = Internal.GetFollowState(record)
+    local target = state.sampledFollowTarget
+    local ownerX = owner:getX()
+    local ownerY = owner:getY()
+    local ownerZ = owner:getZ()
+    local dx = ownerX - (tonumber(state.sampledOwnerX) or ownerX)
+    local dy = ownerY - (tonumber(state.sampledOwnerY) or ownerY)
+    local threshold = tonumber(Const.FOLLOW_RETARGET_OWNER_DISTANCE) or 0.75
+    local refresh = not target
+        or state.sampledOwnerMoving ~= (ownerMoving == true)
+        or math.abs(ownerZ - (tonumber(state.sampledOwnerZ) or ownerZ)) >= 1
+        or (dx * dx) + (dy * dy) >= threshold * threshold
+        or now >= (tonumber(state.sampledTargetExpiresAt) or 0)
+    local resolved
+    if not refresh then return target end
+    resolved = Internal.ResolveFollowSlot(record, owner, ownerMoving)
+    if not resolved then return nil end
+    target = target or {}
+    state.sampledFollowTarget = target
+    target.x = resolved.x
+    target.y = resolved.y
+    target.z = resolved.z
+    target.stopDistance = resolved.stopDistance
+    target.indoorApproach = resolved.indoorApproach
+    target.personalSpaceCorrection = resolved.personalSpaceCorrection
+    target.avoidance = nil
+    state.sampledOwnerX = ownerX
+    state.sampledOwnerY = ownerY
+    state.sampledOwnerZ = ownerZ
+    state.sampledOwnerMoving = ownerMoving == true
+    state.sampledTargetExpiresAt = now + (
+        tonumber(Const.FOLLOW_RETARGET_MAX_MS) or 650
+    )
+    return target
+end

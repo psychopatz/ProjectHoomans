@@ -20,8 +20,53 @@ function Internal.SetFollowMode(record, mode)
     return state, changed
 end
 
+function Internal.ResetFollowMoveIssue(record)
+    local state = Internal.GetFollowState(record)
+    state.issuedTargetX = nil
+    state.issuedTargetY = nil
+    state.issuedTargetZ = nil
+    state.issuedMode = nil
+    state.issuedAvoidance = nil
+    state.issuedAt = 0
+end
+
+function Internal.ShouldIssueFollowMove(record, target, mode, now)
+    local state = Internal.GetFollowState(record)
+    local epsilon = tonumber(Const.FOLLOW_MOVE_INTENT_EPSILON) or 0.35
+    local dx
+    local dy
+    local changed
+    if not target then return true end
+    dx = (tonumber(target.x) or 0) - (
+        tonumber(state.issuedTargetX) or math.huge
+    )
+    dy = (tonumber(target.y) or 0) - (
+        tonumber(state.issuedTargetY) or math.huge
+    )
+    changed = state.issuedTargetX == nil
+        or (dx * dx) + (dy * dy) >= epsilon * epsilon
+        or math.abs(
+            (tonumber(target.z) or 0)
+                - (tonumber(state.issuedTargetZ) or 0)
+        ) >= 1
+        or tostring(state.issuedMode or "") ~= tostring(mode or "walk")
+        or (state.issuedAvoidance == true) ~= (target.avoidance == true)
+        or now - (tonumber(state.issuedAt) or 0) >= (
+            tonumber(Const.FOLLOW_MOVE_INTENT_REFRESH_MS) or 1500
+        )
+    if not changed then return false end
+    state.issuedTargetX = tonumber(target.x)
+    state.issuedTargetY = tonumber(target.y)
+    state.issuedTargetZ = tonumber(target.z)
+    state.issuedMode = tostring(mode or "walk")
+    state.issuedAvoidance = target.avoidance == true
+    state.issuedAt = now
+    return true
+end
+
 function Internal.HoldAndFaceOwner(record, zombie, owner, mode, reason)
     local _, changed = Internal.SetFollowMode(record, mode)
+    Internal.ResetFollowMoveIssue(record)
     record.activeBehavior = mode == "idle_near_owner"
         and "FollowOwner:idle" or "FollowOwner:formation_hold"
     Common.ClearCombatTarget(record, reason)
@@ -29,7 +74,9 @@ function Internal.HoldAndFaceOwner(record, zombie, owner, mode, reason)
 
     if changed then
         Common.HaltMovement(record, zombie, "follow_hold")
-        Animation.Apply(zombie, record, "Idle")
+        if Animation and Animation.Apply then
+            Animation.Apply(zombie, record, "Idle")
+        end
     end
     if PNC.PathService and PNC.PathService.RequestIdleFacing then
         PNC.PathService.RequestIdleFacing(
@@ -74,6 +121,7 @@ end
 
 function Internal.UpdateOwnerMotionState(record, owner, now)
     local state = Internal.GetFollowState(record)
+    local wasMoving = state.ownerMoving == true
     local ownerX = owner:getX()
     local ownerY = owner:getY()
     local elapsed = now - (tonumber(state.ownerSampleAt) or now)
@@ -82,12 +130,11 @@ function Internal.UpdateOwnerMotionState(record, owner, now)
     local dy
     local epsilon = tonumber(Const.FOLLOW_OWNER_MOVE_EPSILON) or 0.08
 
-    if owner.isPlayerMoving and owner:isPlayerMoving() then
-        moved = true
-    elseif owner.isRunning and owner:isRunning() then
-        moved = true
-    elseif owner.isSprinting and owner:isSprinting() then
-        moved = true
+    if owner.isPlayerMoving or owner.isRunning or owner.isSprinting then
+        moved = (owner.isPlayerMoving and owner:isPlayerMoving())
+            or (owner.isRunning and owner:isRunning())
+            or (owner.isSprinting and owner:isSprinting())
+            or false
     elseif state.ownerSampleX ~= nil and elapsed > 0 then
         dx = ownerX - state.ownerSampleX
         dy = ownerY - state.ownerSampleY
@@ -95,6 +142,9 @@ function Internal.UpdateOwnerMotionState(record, owner, now)
     end
 
     state.ownerMoving = moved
+    if moved and not wasMoving then
+        state.nextThreatScanAt = 0
+    end
     state.ownerSampleX = ownerX
     state.ownerSampleY = ownerY
     state.ownerSampleAt = now

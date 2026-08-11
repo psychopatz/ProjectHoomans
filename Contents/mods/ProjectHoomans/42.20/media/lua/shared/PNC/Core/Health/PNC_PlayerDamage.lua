@@ -145,6 +145,22 @@ function PlayerDamage.CanDamageRecord(record, attacker)
         or attackerFaction.id ~= organizationID
 end
 
+function PlayerDamage.IsFriendlyOwner(record, attacker)
+    local onlineID
+    local username
+    if not record or not attacker then return false end
+    onlineID = attacker.getOnlineID and tonumber(attacker:getOnlineID()) or nil
+    username = attacker.getUsername
+        and tostring(attacker:getUsername() or "") or ""
+    if onlineID ~= nil and tonumber(record.ownerOnlineID) ~= nil
+        and onlineID == tonumber(record.ownerOnlineID)
+    then
+        return true
+    end
+    return username ~= ""
+        and tostring(record.ownerUsername or "") == username
+end
+
 function PlayerDamage.ScaleDamage(reportedDamage, weapon)
     local raw = tonumber(reportedDamage) or 0
     local weaponMaximum = weapon and weapon.getMaxDamage and tonumber(weapon:getMaxDamage()) or 1
@@ -170,6 +186,16 @@ function PlayerDamage.Apply(record, zombie, attacker, weapon, reportedDamage, so
     end
     if not PlayerDamage.CanDamageRecord(record, attacker) then
         restoreEngineBuffer(zombie, record)
+        if PlayerDamage.IsFriendlyOwner(record, attacker)
+            and PNC.LiveBodyControl
+            and PNC.LiveBodyControl.RecoverGroundedBody
+        then
+            PNC.LiveBodyControl.RecoverGroundedBody(
+                record,
+                zombie,
+                "friendly_owner_hit"
+            )
+        end
         return false, "colonist_protected"
     end
     amount = PlayerDamage.ScaleDamage(reportedDamage, weapon)
@@ -335,6 +361,19 @@ local function onWeaponHitCharacter(attacker, target, weapon, damage)
     end
     if Core.IsClientOnly and Core.IsClientOnly() then
         if isLocalPlayer(attacker) then
+            record = Registry.Get(modData.PNC_UUID)
+            if PlayerDamage.IsFriendlyOwner(record, attacker)
+                and PNC.LiveBodyControl
+                and PNC.LiveBodyControl.RecoverGroundedBody
+            then
+                PNC.LiveBodyControl.RecoverGroundedBody(
+                    record,
+                    target,
+                    "friendly_owner_hit_local"
+                )
+                restoreEngineBuffer(target, record)
+                return
+            end
             reportClientHit(attacker, target, weapon, damage)
             restoreEngineBuffer(target, nil)
         end

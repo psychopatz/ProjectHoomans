@@ -21,6 +21,14 @@ function BehaviorCombat.TickCommittedAction(record, zombie)
     local reason
     local target
     local interrupt
+    if PNC.LiveBodyControl and PNC.LiveBodyControl.IsGrounded
+        and PNC.LiveBodyControl.IsGrounded(zombie)
+    then
+        if Combat and Combat.CancelAttackAction then
+            Combat.CancelAttackAction(record, zombie, nil, "actor_grounded")
+        end
+        return false
+    end
     if not Combat
         or not Combat.PumpAttackAction
         or not record
@@ -73,6 +81,14 @@ function BehaviorCombat.TickCommittedAction(record, zombie)
 end
 
 function BehaviorCombat.TickEngage(record, zombie, target)
+    if PNC.LiveBodyControl and PNC.LiveBodyControl.IsGrounded
+        and PNC.LiveBodyControl.IsGrounded(zombie)
+    then
+        if Combat and Combat.CancelAttackAction then
+            Combat.CancelAttackAction(record, zombie, nil, "actor_grounded")
+        end
+        return true
+    end
     local scene = record and record.runtime
         and record.runtime.animationScene or nil
     if scene and scene.blocking == true then

@@ -201,7 +201,7 @@ function Internal.ResolveHordeAwareFollowTarget(
 
     distance = math.min(
         tonumber(Const.FOLLOW_HORDE_STEER_DISTANCE) or 3.4,
-        math.max(1.4, tonumber(slotDist) or 1.4)
+        math.max(0.65, tonumber(slotDist) or 0.65)
     )
     candidateZ = tonumber(slotTarget.z) or record.z
     candidateX = record.x + (dirX * distance)

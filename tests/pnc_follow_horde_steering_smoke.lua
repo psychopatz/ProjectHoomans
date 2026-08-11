@@ -9,6 +9,8 @@ local FILE =
 local now = 1000
 local engageTicks = 0
 local lastMove
+local moveCalls = 0
+local haltCalls = 0
 local ownerX = 10
 local ownerMoving = true
 local ownerAttacking = false
@@ -72,6 +74,10 @@ PNC = {
         FOLLOW_INDOOR_APPROACH_DISTANCE = 1.6,
         FOLLOW_PERSONAL_SPACE_MIN = 1.25,
         FOLLOW_FORMATION_CACHE_MS = 250,
+        FOLLOW_RETARGET_OWNER_DISTANCE = 0.75,
+        FOLLOW_RETARGET_MAX_MS = 650,
+        FOLLOW_MOVE_INTENT_EPSILON = 0.35,
+        FOLLOW_MOVE_INTENT_REFRESH_MS = 1500,
         FOLLOW_OWNER_MOVE_EPSILON = 0.08,
         FOLLOW_COMBAT_LEASH_DISTANCE = 5.5,
         FOLLOW_HORDE_AVOID_RADIUS = 6.5,
@@ -108,6 +114,7 @@ PNC = {
             current.runtime.target = nil
         end,
         MoveRecord = function(_, _, x, y, z, mode, stopDistance, reason)
+            moveCalls = moveCalls + 1
             lastMove = {
                 x = x,
                 y = y,
@@ -118,7 +125,9 @@ PNC = {
             }
             return true
         end,
-        HaltMovement = function() end,
+        HaltMovement = function()
+            haltCalls = haltCalls + 1
+        end,
     },
     BehaviorTargeting = {
         ResolveCompanionProtectionTarget = function(_, ownerEngaged)
@@ -182,11 +191,60 @@ assert(lastMove.x > record.x,
 assert(lastMove.mode == "run",
     "severely separated follower did not use catch-up locomotion")
 
+-- Sub-tile owner movement keeps the existing path intent. The path pump still
+-- advances it, but behavior does not rebuild routing or increment revisions.
+local movesBeforeSmallStep = moveCalls
+now = now + 100
+ownerX = ownerX + 0.2
+assert(PNC.BehaviorCompanion.Tick(record, {
+    getX = function() return record.x end,
+    getY = function() return record.y end,
+    getZ = function() return record.z end,
+}, "FollowOwner"))
+assert(moveCalls == movesBeforeSmallStep,
+    "sub-tile owner movement rebuilt the follow intent")
+
+-- A nearby follower holds where it is when the owner stops. Facing changes
+-- must not make it orbit around freshly recomputed formation slots.
+now = now + 200
+ownerMoving = false
+ownerX = 2.8
+nearbyZombies = {}
+record.runtime.followHazard = nil
+lastMove = nil
+local haltsBeforeStandstill = haltCalls
+assert(PNC.BehaviorCompanion.Tick(record, {
+    getX = function() return record.x end,
+    getY = function() return record.y end,
+    getZ = function() return record.z end,
+}, "FollowOwner"))
+assert(lastMove == nil, "stationary owner caused formation roaming")
+assert(haltCalls == haltsBeforeStandstill + 1,
+    "stationary owner did not cancel the active follow path")
+assert(record.runtime.followState.mode == "idle_near_owner",
+    "stationary follower did not enter idle cadence")
+
+-- Local hazard steering must never turn a close formation correction into a
+-- long step past the owner's sampled anchor.
+record.runtime.followAvoidanceTarget = nil
+local closeSteer = PNC.BehaviorCompanion.Internal
+    .ResolveHordeAwareFollowTarget(
+        record,
+        { x = 0.5, y = 0, z = 0, stopDistance = 0.35 },
+        0.5,
+        { active = true, count = 3, repelX = 0, repelY = 1 },
+        now
+    )
+assert(closeSteer ~= nil, "close hazard steering was not resolved")
+assert(PNC.Core.Distance(record.x, record.y, closeSteer.x, closeSteer.y)
+    <= 0.651, "hazard steering overshot a close follow anchor")
+
 -- One close zombie still sets the steering hazard active flag, but it is not
 -- a horde and must not suppress the follower's combat response.
 now = now + 200
 record.x = 6
 ownerX = 10
+ownerMoving = true
 ownerAttacking = true
 record.runtime.followHazard = nil
 nearbyZombies = {

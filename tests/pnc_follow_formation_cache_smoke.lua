@@ -11,6 +11,7 @@ local scans = 0
 local targetScans = 0
 local records = {}
 local moves = {}
+local ownerMoving = true
 local owner = {
     getForwardDirection = function()
         return {
@@ -24,6 +25,9 @@ local owner = {
     getX = function() return 0 end,
     getY = function() return 0 end,
     getZ = function() return 0 end,
+    isPlayerMoving = function() return ownerMoving end,
+    isRunning = function() return false end,
+    isSprinting = function() return false end,
 }
 
 for index = 1, 5 do
@@ -131,6 +135,7 @@ assert(
 -- Being close to the owner is not itself a valid formation hold. A lone
 -- follower inside personal space must move back to its assigned rear slot.
 now = 1251
+ownerMoving = false
 records = {
     {
         id = "solo",
@@ -184,7 +189,8 @@ getCell = function()
         end,
     }
 end
-records[1].x = 2
+records[1].x = 4
+records[1].runtime.followState.sampledTargetExpiresAt = 0
 now = 1600
 PNC.BehaviorCompanion.Tick(records[1], {}, "FollowOwner")
 assert(targetScans == 6,

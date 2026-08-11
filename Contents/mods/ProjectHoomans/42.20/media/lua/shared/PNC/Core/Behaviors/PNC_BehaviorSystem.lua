@@ -32,6 +32,7 @@ local Companion = PNC.BehaviorCompanion
 local Hostile = PNC.BehaviorHostile
 local Combat = PNC.BehaviorCombat
 local AnimationScenes = PNC.AnimationScenes
+local LiveBodyControl = PNC.LiveBodyControl
 
 function Behavior.Tick(record, zombie, now)
     local job
@@ -62,6 +63,15 @@ function Behavior.Tick(record, zombie, now)
             )
         end
         Incapacitated.Tick(record, zombie)
+        return
+    end
+
+    -- Knockdown owns the actor before scenes, attacks, movement, or ordinary
+    -- jobs. This guarantees a grounded NPC cannot start an attack lease that
+    -- prevents its get-up recovery.
+    if LiveBodyControl and LiveBodyControl.TickGroundedRecovery
+        and LiveBodyControl.TickGroundedRecovery(record, zombie, now)
+    then
         return
     end
 

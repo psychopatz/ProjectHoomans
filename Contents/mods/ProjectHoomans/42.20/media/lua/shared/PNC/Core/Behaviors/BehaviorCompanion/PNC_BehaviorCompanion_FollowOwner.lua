@@ -161,10 +161,33 @@ function Internal.TickFollowOwner(record, zombie)
         Internal.SetFollowMode(record, "combat")
         return true
     end
-    slotTarget = Internal.ResolveFollowSlot(
+    -- A stationary owner is the formation anchor. Nearby followers keep their
+    -- current safe position instead of orbiting through synthetic slots every
+    -- time the player's facing direction changes.
+    if followState.ownerMoving ~= true
+        and ownerDist >= (
+            tonumber(Const.FOLLOW_PERSONAL_SPACE_MIN) or 1.25
+        )
+        and ownerDist <= (
+            tonumber(Const.FOLLOW_IDLE_EXIT_DISTANCE) or 3.2
+        )
+        and math.abs(owner:getZ() - record.z) < 1
+    then
+        followState.stationaryHolding = true
+        return Internal.HoldAndFaceOwner(
+            record,
+            zombie,
+            owner,
+            "idle_near_owner",
+            "owner_stationary_hold"
+        )
+    end
+    followState.stationaryHolding = false
+    slotTarget = Internal.ResolveSampledFollowSlot(
         record,
         owner,
-        followState.ownerMoving == true
+        followState.ownerMoving == true,
+        now
     )
     slotTarget = Internal.EnforceOwnerPersonalSpace(
         record,
@@ -223,6 +246,14 @@ function Internal.TickFollowOwner(record, zombie)
             and "run"
             or "walk"
         )
+    if not Internal.ShouldIssueFollowMove(
+        record,
+        moveTarget,
+        moveMode,
+        now
+    ) then
+        return true
+    end
     Common.ClearCombatTarget(
         record,
         moveTarget and moveTarget.avoidance
