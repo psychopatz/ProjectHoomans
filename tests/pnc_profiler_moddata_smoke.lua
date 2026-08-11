@@ -74,6 +74,10 @@ truthy(report.npcRecords.records[1].persistedContent.inventory, "persisted conte
 truthy(report.persisted.estimatedBytes > 0, "persisted estimate missing")
 truthy(report.inventories.estimatedBytes > 0, "inventory estimate missing")
 equal(report.valuesRedacted, true, "report must redact values")
+equal(report.npcRecords.limits.maxNPCs, 12,
+    "periodic profiler NPC content limit")
+equal(report.npcRecords.limits.maxNodesPerView, 120,
+    "periodic profiler record node limit")
 local snapshot = Profiler.BuildSnapshot()
 truthy(snapshot.diagnostics["ProjectHoomans.modData"], "diagnostic missing from snapshot")
 for _, item in ipairs(report.persisted.topPaths) do

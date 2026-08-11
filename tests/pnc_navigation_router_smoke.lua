@@ -7,6 +7,12 @@ local plannerInvalidations = 0
 
 PNC = {
     EnginePathPlanner = {
+        CanUseNativePath = function(body)
+            if body and body.nativeUnsafe == true then
+                return false, "native_body_damage_unavailable"
+            end
+            return true
+        end,
         GetSteeringTarget = function(_, _, target)
             plannerCalls = plannerCalls + 1
             return {
@@ -45,6 +51,19 @@ assert(policy == "combat", "active combat did not select combat policy")
 assert(provider == "engine_path",
     "combat policy did not select native engine pathing")
 assert(plannerCalls == 0, "policy resolution invoked native planning")
+
+local unsafeRecord = { runtime = {} }
+local unsafePolicy, unsafeProvider = PNC.NavigationRouter.Resolve(
+    unsafeRecord,
+    "follow_owner",
+    nil,
+    { nativeUnsafe = true }
+)
+assert(unsafePolicy == "local" and unsafeProvider == "direct",
+    "unsafe humanized body did not select direct fallback")
+assert(unsafeRecord.runtime.navigationRouter.lastFallbackReason
+        == "native_body_damage_unavailable",
+    "router did not retain native fallback reason")
 
 local travelRecord = {
     activeBehavior = "Travel:en_route",

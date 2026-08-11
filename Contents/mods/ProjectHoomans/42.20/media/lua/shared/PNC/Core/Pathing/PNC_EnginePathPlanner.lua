@@ -13,6 +13,26 @@ local Internal = Planner.Internal or {}
 local Core = PNC.Core
 local Const = PNC.Const or {}
 
+function Planner.CanUseNativePath(body)
+    if not body or not body.pathToLocationF then
+        return false, "native_path_unavailable"
+    end
+    -- Dedicated authority publishes the destination without entering a local
+    -- Java movement state. Preserve that transport path for the owning client.
+    if Internal.IsMultiplayerAuthority
+        and Internal.IsMultiplayerAuthority()
+    then
+        return true
+    end
+    -- Humanized IsoZombie bodies can legitimately have no BodyDamage object.
+    -- Build 42's ClimbOverFenceState dereferences it unconditionally, so a
+    -- native route that selects a fence would throw from IsoWorld.update.
+    if body.getBodyDamage and body:getBodyDamage() == nil then
+        return false, "native_body_damage_unavailable"
+    end
+    return true
+end
+
 local function targetDriftSquared(navigation, finalTarget)
     local requestX = tonumber(navigation and navigation.requestX)
     local requestY = tonumber(navigation and navigation.requestY)
@@ -31,10 +51,11 @@ end
 local function beginRequest(body, finalTarget, navigation, now, reason)
     local multiplayerAuthority =
         Internal.IsMultiplayerAuthority()
-    if not multiplayerAuthority
-        and (not body or not body.pathToLocationF)
-    then
-        navigation.lastPlanReason = "native_path_unavailable"
+    local nativeSafe
+    local unsafeReason
+    nativeSafe, unsafeReason = Planner.CanUseNativePath(body)
+    if not nativeSafe then
+        navigation.lastPlanReason = unsafeReason
         navigation.plannedAt = now
         navigation.planFailures =
             (tonumber(navigation.planFailures) or 0) + 1
@@ -86,6 +107,16 @@ function Planner.GetSteeringTarget(record, body, finalTarget)
     local navigation = Internal.EnsureNavigation(record)
     navigation.body = body
     local now = Core and Core.Now and Core.Now() or 0
+    local nativeSafe
+    local unsafeReason
+    nativeSafe, unsafeReason = Planner.CanUseNativePath(body)
+    if not nativeSafe then
+        Internal.ClearEngineRequest(body, navigation)
+        navigation.lastPlanReason = unsafeReason
+        navigation.plannedAt = now
+        navigation.steeringKind = "safe_direct_fallback"
+        return finalTarget
+    end
     local replanMs = math.max(
         250,
         tonumber(Const.ENGINE_PATH_REPLAN_MS) or 1000

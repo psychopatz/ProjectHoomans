@@ -9,10 +9,17 @@ if not Profiler or not Profiler.IsRunning or not Profiler.IsRunning() then
     return Analyzer
 end
 
-local MAX_NODES = 25000
+-- This diagnostic runs inside the game thread. Keep each section bounded so a
+-- large save cannot turn profiling itself into a multi-second frame stall.
+-- Truncated reports explicitly advertise the limit and remain useful for
+-- identifying the largest roots and paths.
+local MAX_NODES = 2000
 local MAX_DEPTH = 12
 local MAX_TOP_PATHS = 30
-local SCAN_INTERVAL_MS = 10000
+-- Heap shape changes slowly compared with gameplay. A one-minute refresh is
+-- enough for growth diagnosis and avoids repeated allocation/GC spikes while
+-- DETAILED profiling is left running.
+local SCAN_INTERVAL_MS = 60000
 
 local function countMap(values)
     local count = 0

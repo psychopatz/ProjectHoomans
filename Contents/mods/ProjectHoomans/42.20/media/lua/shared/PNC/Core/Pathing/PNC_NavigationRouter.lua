@@ -100,7 +100,7 @@ local function inferPolicy(record, reason)
     return "local"
 end
 
-function Router.Resolve(record, reason, options)
+function Router.Resolve(record, reason, options, body)
     local requested = options and (
         options.navigationPolicy or options.policy
     ) or nil
@@ -110,6 +110,19 @@ function Router.Resolve(record, reason, options)
     local providerName = tostring(
         policy.provider or Router.DIRECT_PROVIDER
     )
+    local fallbackReason
+    local planner = PNC.EnginePathPlanner
+    if providerName == "engine_path"
+        and planner
+        and planner.CanUseNativePath
+    then
+        local nativeSafe
+        nativeSafe, fallbackReason =
+            planner.CanUseNativePath(body)
+        if not nativeSafe then
+            providerName = Router.DIRECT_PROVIDER
+        end
+    end
     local state = ensureState(record)
     if state and (
         state.policy ~= policyName or state.provider ~= providerName
@@ -120,6 +133,9 @@ function Router.Resolve(record, reason, options)
         state.policy = policyName
         state.provider = providerName
         state.switches = (tonumber(state.switches) or 0) + 1
+    end
+    if state then
+        state.lastFallbackReason = fallbackReason
     end
     return policyName, providerName, policy
 end

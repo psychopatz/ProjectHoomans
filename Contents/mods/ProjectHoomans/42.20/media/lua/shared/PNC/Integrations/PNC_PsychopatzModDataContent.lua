@@ -2,10 +2,14 @@ PNC = PNC or {}
 PNC.ModDataProfilerContent = PNC.ModDataProfilerContent or {}
 
 local Content = PNC.ModDataProfilerContent
-local MAX_NPCS = 50
-local MAX_NODES = 500
-local MAX_DEPTH = 8
-local MAX_STRING = 160
+-- This content is embedded in the profiler's once-per-second JSON snapshot.
+-- Keep the live inspector useful without serializing an entire settlement on
+-- the game thread. Live records sort first; explicit scans still report the
+-- total record count and truncation state.
+local MAX_NPCS = 12
+local MAX_NODES = 120
+local MAX_DEPTH = 6
+local MAX_STRING = 120
 
 local function countMap(values)
     local count = 0
@@ -60,9 +64,15 @@ function Content.Scan()
     local source = PNC.Registry and PNC.Registry.Data or {}
     local ordered = {}
     for id, record in pairs(source) do
-        ordered[#ordered + 1] = { id = tostring(id), name = recordName(record), record = record }
+        ordered[#ordered + 1] = {
+            id = tostring(id),
+            name = recordName(record),
+            record = record,
+            live = record and record.presenceState == "live",
+        }
     end
     table.sort(ordered, function(left, right)
+        if left.live ~= right.live then return left.live == true end
         if left.name == right.name then return left.id < right.id end
         return left.name < right.name
     end)

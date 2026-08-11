@@ -13,6 +13,12 @@ local Core = PNC.Core
 local Constants = PNC.PlayerCharacterConstants
 
 Lifecycle.LastPumpAt = Lifecycle.LastPumpAt
+Lifecycle.ValidatedUUIDByPlayer =
+    Lifecycle.ValidatedUUIDByPlayer
+    or setmetatable({}, { __mode = "k" })
+Lifecycle.LastValidationAtByPlayer =
+    Lifecycle.LastValidationAtByPlayer
+    or setmetatable({}, { __mode = "k" })
 
 local function worldAgeHours()
     if getGameTime and getGameTime()
@@ -149,6 +155,14 @@ function Lifecycle.OnPlayerDeath(first, second)
     return false, "player_unavailable"
 end
 
+function Lifecycle.IsDue(now, force)
+    now = tonumber(now) or (Core and Core.Now and Core.Now()) or 0
+    return force == true
+        or Lifecycle.LastPumpAt == nil
+        or now - Lifecycle.LastPumpAt
+            >= Constants.LIFECYCLE_PUMP_MS
+end
+
 function Lifecycle.Pump(now, force)
     local identity = service()
     local seen = {}
@@ -157,11 +171,7 @@ function Lifecycle.Pump(now, force)
     local staleCount
     local at
     now = tonumber(now) or (Core and Core.Now and Core.Now()) or 0
-    if force ~= true
-        and Lifecycle.LastPumpAt ~= nil
-        and now - Lifecycle.LastPumpAt
-            < Constants.LIFECYCLE_PUMP_MS
-    then
+    if not Lifecycle.IsDue(now, force) then
         return 0, "not_due"
     end
     Lifecycle.LastPumpAt = now
@@ -180,6 +190,8 @@ function Lifecycle.Pump(now, force)
         identity.RuntimeByPlayer or {}
     ) do
         if not seen[stalePlayer] then
+            Lifecycle.ValidatedUUIDByPlayer[stalePlayer] = nil
+            Lifecycle.LastValidationAtByPlayer[stalePlayer] = nil
             local staleKey = identity.GetEntityKey
                 and identity.GetEntityKey(stalePlayer, {
                     callback = "disconnect_sweep",
@@ -211,17 +223,42 @@ function Lifecycle.Pump(now, force)
     for index = 1, #players do
         local player = players[index]
         if player.isDead and player:isDead() then
+            Lifecycle.ValidatedUUIDByPlayer[player] = nil
+            Lifecycle.LastValidationAtByPlayer[player] = nil
             identity.MarkDead(
                 player,
                 at,
                 "authoritative_sweep"
             )
         else
-            ensureIdentityAndProfile(
-                player,
-                "authoritative_sweep",
-                at
+            local boundUUID = identity.RuntimeByPlayer
+                and identity.RuntimeByPlayer[player] or nil
+            local validatedUUID =
+                Lifecycle.ValidatedUUIDByPlayer[player]
+            local lastValidatedAt = tonumber(
+                Lifecycle.LastValidationAtByPlayer[player]
+            ) or 0
+            local refreshMs = math.max(
+                tonumber(Constants.LIFECYCLE_PUMP_MS) or 1000,
+                tonumber(
+                    Constants.LIFECYCLE_VALIDATION_REFRESH_MS
+                ) or 30000
             )
+            if not boundUUID
+                or validatedUUID ~= boundUUID
+                or now - lastValidatedAt >= refreshMs
+            then
+                local ensuredUUID = ensureIdentityAndProfile(
+                    player,
+                    "authoritative_sweep",
+                    at
+                )
+                if ensuredUUID then
+                    Lifecycle.ValidatedUUIDByPlayer[player] =
+                        ensuredUUID
+                    Lifecycle.LastValidationAtByPlayer[player] = now
+                end
+            end
         end
     end
     if PNC.Factions
@@ -248,6 +285,10 @@ function Lifecycle.OnServerStarted(now)
         PNC.SocialProfiles.ResetRuntimePlayers()
     end
     Lifecycle.LastPumpAt = nil
+    Lifecycle.ValidatedUUIDByPlayer =
+        setmetatable({}, { __mode = "k" })
+    Lifecycle.LastValidationAtByPlayer =
+        setmetatable({}, { __mode = "k" })
     Lifecycle.Pump(now, true)
     return true
 end

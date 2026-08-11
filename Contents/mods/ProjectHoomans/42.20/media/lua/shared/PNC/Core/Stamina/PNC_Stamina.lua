@@ -100,13 +100,25 @@ local function applySevereEncumbranceDamage(record, zombie, now)
     return false
 end
 
-local function updateState(record)
-    local stamina = ensureState(record)
+local function ratioFor(stamina)
+    if not stamina then
+        return 1
+    end
+    return clamp(
+        (tonumber(stamina.current) or tonumber(stamina.max) or 1)
+            / math.max(1, tonumber(stamina.max) or 1),
+        0,
+        1
+    )
+end
+
+local function updateState(record, stamina)
     local ratio
+    stamina = stamina or ensureState(record)
     if not stamina then
         return nil
     end
-    ratio = Stamina.GetRatio(record)
+    ratio = ratioFor(stamina)
     if ratio <= 0.15 then
         stamina.state = "exhausted"
     elseif ratio <= 0.4 then
@@ -121,10 +133,7 @@ end
 
 function Stamina.GetRatio(record)
     local stamina = ensureState(record)
-    if not stamina then
-        return 1
-    end
-    return clamp((tonumber(stamina.current) or tonumber(stamina.max) or 1) / math.max(1, tonumber(stamina.max) or 1), 0, 1)
+    return ratioFor(stamina)
 end
 
 function Stamina.GetAttackDrain(record, attackType, skillID)
@@ -162,7 +171,7 @@ function Stamina.SpendAttack(record, attackType, skillID)
     drain = Stamina.GetAttackDrain(record, attackType, skillID)
     stamina.current = clamp((tonumber(stamina.current) or 0) - drain, 0, tonumber(stamina.max) or 100)
     stamina.visibleUntil = Core.Now() + Const.STAMINA_VISIBLE_MS
-    updateState(record)
+    updateState(record, stamina)
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "stamina")
     end
@@ -219,11 +228,17 @@ function Stamina.Update(record, zombie, now)
 
     local previous = tonumber(stamina.current) or 0
     stamina.current = clamp(previous + (recoverRate * elapsed), 0, tonumber(stamina.max) or 100)
-    updateState(record)
+    updateState(record, stamina)
 end
 
 function Stamina.BuildSnapshot(record)
-    local stamina = ensureState(record)
+    -- Vitals updates own derived stamina/encumbrance refreshes. Replication is
+    -- much more frequent and must not redo skill and inventory resolution for
+    -- every recipient payload. Newly created records still initialize here.
+    local stamina = record and record.stamina or nil
+    if type(stamina) ~= "table" then
+        stamina = ensureState(record)
+    end
     return {
         current = stamina and stamina.current or 0,
         max = stamina and stamina.max or 100,

@@ -391,9 +391,23 @@ PNC.Health = {
     end,
 }
 PNC.Registry = { MarkDirty = function() end }
+local staminaAverageReads = 0
+local staminaLevelReads = 0
+local staminaEncumbranceReads = 0
+local originalGetEncumbranceState = PNC.Inventory.GetEncumbranceState
+PNC.Inventory.GetEncumbranceState = function(record)
+    staminaEncumbranceReads = staminaEncumbranceReads + 1
+    return originalGetEncumbranceState(record)
+end
 PNC.Skills = {
-    GetAverage = function() return 2 end,
-    GetLevel = function() return 2 end,
+    GetAverage = function()
+        staminaAverageReads = staminaAverageReads + 1
+        return 2
+    end,
+    GetLevel = function()
+        staminaLevelReads = staminaLevelReads + 1
+        return 2
+    end,
 }
 dofile(ROOT .. "Stamina/PNC_Stamina.lua")
 local staminaSnapshot = PNC.Stamina.BuildSnapshot(interactionRecord)
@@ -401,7 +415,23 @@ assert(staminaSnapshot.max < staminaSnapshot.baseMax,
     "encumbrance lowers maximum stamina")
 assertEqual(staminaSnapshot.encumbranceLevel, "severe",
     "stamina snapshot carries encumbrance")
+local snapshotAverageReads = staminaAverageReads
+local snapshotLevelReads = staminaLevelReads
+local snapshotEncumbranceReads = staminaEncumbranceReads
+PNC.Stamina.BuildSnapshot(interactionRecord)
+assertEqual(staminaAverageReads, snapshotAverageReads,
+    "stamina replication recalculated skills")
+assertEqual(staminaLevelReads, snapshotLevelReads,
+    "stamina replication recalculated skill levels")
+assertEqual(staminaEncumbranceReads, snapshotEncumbranceReads,
+    "stamina replication recalculated encumbrance")
+local averagesBeforeUpdate = staminaAverageReads
+local encumbranceBeforeUpdate = staminaEncumbranceReads
 PNC.Stamina.Update(interactionRecord, nil, 10000)
+assertEqual(staminaAverageReads - averagesBeforeUpdate, 1,
+    "stamina update recalculated its skill average more than once")
+assertEqual(staminaEncumbranceReads - encumbranceBeforeUpdate, 1,
+    "stamina update recalculated encumbrance more than once")
 PNC.Stamina.Update(interactionRecord, nil, 16000)
 assertEqual(strainDamageCalls, 1, "severe load periodic strain damage")
 

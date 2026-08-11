@@ -94,7 +94,8 @@ function Common.MoveRecord(
             policyName, providerName, policy = NavigationRouter.Resolve(
                 record,
                 moveReason,
-                navigationOptions
+                navigationOptions,
+                zombie
             )
             -- The direct route is allocation-free. This is the normal combat
             -- and kiting path, where goals can change on every behavior tick.

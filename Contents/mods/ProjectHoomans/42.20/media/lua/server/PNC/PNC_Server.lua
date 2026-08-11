@@ -226,6 +226,10 @@ function Server.OnTick()
     Registry.EnsureLoaded()
     if PlayerCharacterLifecycle
         and PlayerCharacterLifecycle.Pump
+        and (
+            not PlayerCharacterLifecycle.IsDue
+            or PlayerCharacterLifecycle.IsDue(now, false)
+        )
     then
         PlayerCharacterLifecycle.Pump(now, false)
     end

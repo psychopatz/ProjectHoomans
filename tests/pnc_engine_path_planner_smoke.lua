@@ -251,6 +251,37 @@ PNC.EnginePathPlanner.GetSteeringTarget(
 assert(requestCount == requestsBeforeOpenRoute + 1,
     "meaningful open-ground movement did not use native pathing")
 
+local unsafeRequestCount = requestCount
+local unsafeBody = {
+    x = 0.5,
+    y = 0.5,
+    z = 0,
+    square = outsideSquare,
+    getX = body.getX,
+    getY = body.getY,
+    getZ = body.getZ,
+    getSquare = body.getSquare,
+    getPathFindBehavior2 = body.getPathFindBehavior2,
+    getPath2 = body.getPath2,
+    setPath2 = body.setPath2,
+    pathToLocationF = body.pathToLocationF,
+    getActionStateName = body.getActionStateName,
+    getBodyDamage = function() return nil end,
+}
+local unsafeRecord = {
+    runtime = { pathing = { phase = "active" } },
+}
+PNC.EnginePathPlanner.GetSteeringTarget(
+    unsafeRecord,
+    unsafeBody,
+    directTarget
+)
+assert(requestCount == unsafeRequestCount,
+    "body without BodyDamage entered native pathing")
+assert(unsafeRecord.runtime.localNavigation.lastPlanReason
+        == "native_body_damage_unavailable",
+    "unsafe native path did not publish its fallback reason")
+
 local closeRecord = {
     runtime = {
         pathing = { phase = "active" },
