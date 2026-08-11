@@ -86,6 +86,10 @@ function ISPNCColonyPane:layoutContent()
 end
 
 function Components.LayoutScrollbar(list)
+    if Layout.SyncNativeScrollbars then
+        Layout.SyncNativeScrollbars(list)
+        return
+    end
     local scrollbar = list and list.vscroll or nil
     if not scrollbar then return end
     local width = scrollbar.getWidth and scrollbar:getWidth()
@@ -120,6 +124,10 @@ local function createPane(window, itemHeight, drawItem)
     })
     pane.content = list
     return pane, list
+end
+
+function Components.CreatePane(window, itemHeight, drawItem)
+    return createPane(window, itemHeight, drawItem)
 end
 
 function Components.CreateRosterPane(window)

@@ -67,6 +67,14 @@ function ISPNCColonyManagementWindow:onResearchUpgrade(button)
     return Research.OnUpgrade(self, button)
 end
 
+function ISPNCColonyManagementWindow:onDebugControl(button)
+    local definition = Registry.Get("debug")
+    if definition and definition.onControl then
+        return definition.onControl(self, button)
+    end
+    return false
+end
+
 function ISPNCColonyManagementWindow:requestSnapshot(source)
     if PNC.Client and PNC.Client.RequestColonyManagement then
         PNC.Client.RequestColonyManagement()

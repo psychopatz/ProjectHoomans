@@ -8,6 +8,9 @@ local Registry = PNC.ProvisionRuleRegistry
 local Resolver = PNC.ProvisionResolver
 local SupplyInventory = PNC.SupplyInventory
 local Metrics = PNC.SupplyMetrics
+local Access = PNC.StorageAccessPolicy
+local Selector = PNC.SupplySelector
+local Index = PNC.SupplyIndex
 
 local function provisionRuntime(record)
     record.runtime = record.runtime or {}
@@ -130,6 +133,170 @@ function Evaluator.GetDebugState(record)
     return runtime and PNC.Core.DeepCopy(runtime) or {
         incoming = {}, refilling = {}, evaluations = {}, dirtyRules = {},
     }
+end
+
+function Evaluator.MeasureStorage(storage)
+    local output = {}
+    if not storage or not storage.inventory then return output end
+    for _, definition in ipairs(Registry.List()) do
+        local request = requestFor(definition)
+        local entries = Index.Query(storage, request)
+        local amount = 0
+        local calories = 0
+        local items = {}
+        for index = 1, #entries do
+            local descriptor = entries[index].descriptor
+            local quantity = math.max(1, tonumber(descriptor.quantity) or 1)
+            if definition.measure == "HUNGER_UTILITY" then
+                amount = amount + descriptor.hunger * quantity
+                calories = calories + (tonumber(descriptor.calories) or 0)
+                    * quantity
+            elseif definition.measure == "THIRST_UTILITY" then
+                amount = amount + descriptor.thirst
+                    * math.max(0, tonumber(descriptor.remainingUses) or 0)
+                    * quantity
+            elseif definition.measure == "COUNT" then
+                amount = amount + quantity
+            end
+            if #items < 12 then
+                items[#items + 1] = {
+                    fullType = descriptor.fullType,
+                    quantity = quantity,
+                    hunger = descriptor.hunger,
+                    thirst = descriptor.thirst,
+                    calories = descriptor.calories,
+                    remainingUses = descriptor.remainingUses,
+                }
+            end
+        end
+        output[definition.id] = {
+            amount = amount,
+            calories = calories,
+            candidateTypes = #entries,
+            items = items,
+        }
+    end
+    return output
+end
+
+local function personalItems(record, definition)
+    local output = {}
+    local candidates = SupplyInventory.FindPersonal(
+        record, requestFor(definition), 999999
+    )
+    for index = 1, math.min(#candidates, 12) do
+        local descriptor = candidates[index].descriptor
+        output[#output + 1] = {
+            fullType = descriptor.fullType,
+            quantity = descriptor.quantity,
+            hunger = descriptor.hunger,
+            thirst = descriptor.thirst,
+            remainingUses = descriptor.remainingUses,
+            bandage = descriptor.bandage == true,
+            unsafe = descriptor.unsafe == true,
+        }
+    end
+    return output
+end
+
+local function queued(record, ruleID)
+    local scheduler = PNC.ProvisionScheduler
+    for _, entry in ipairs(scheduler and scheduler.Queue or {}) do
+        if tostring(entry.npcID) == tostring(record.id)
+            and tostring(entry.ruleID) == tostring(ruleID)
+        then
+            return true, entry.readyAt
+        end
+    end
+    return false, nil
+end
+
+function Evaluator.Inspect(record)
+    if not record or record.alive == false then return nil, "npc_missing" end
+    local storage, accessReason, community = Access.Resolve(record)
+    if not community and PNC.Communities and PNC.Communities.GetNPCCommunity then
+        community = PNC.Communities.GetNPCCommunity(record.id)
+    end
+    local home = community and community.home or nil
+    local homeDistance
+    if home and tonumber(record.x) and tonumber(record.y) and tonumber(record.z) then
+        local dx = tonumber(record.x) - tonumber(home.x)
+        local dy = tonumber(record.y) - tonumber(home.y)
+        local dz = tonumber(record.z) - tonumber(home.z)
+        homeDistance = math.sqrt(dx * dx + dy * dy + dz * dz)
+    end
+    local output = {
+        npcID = record.id,
+        name = tostring(record.name or record.id),
+        inventoryRevision = record.inventory and record.inventory.revision or 0,
+        inventoryMode = PNC.Inventory.GetPersistenceMode(record),
+        storageAccess = storage ~= nil,
+        storageAccessReason = storage and "allowed"
+            or tostring(accessReason or "unknown"),
+        storageAccessMode = Access.GetAccessMode
+            and Access.GetAccessMode() or "unknown",
+        storageID = storage and storage.id or nil,
+        location = { x = record.x, y = record.y, z = record.z },
+        home = home,
+        homeDistance = homeDistance,
+        storageSummary = Evaluator.MeasureStorage(storage),
+        rules = {},
+        generatedAt = PNC.NeedsUtils.WorldAgeHours(),
+    }
+    for _, definition in ipairs(Registry.List()) do
+        local evaluation, evaluationReason = Evaluator.Evaluate(
+            record, definition
+        )
+        local isQueued, readyAt = queued(record, definition.id)
+        local laneKind = definition.resourceKind or definition.selector
+        local supply = record.runtime and record.runtime.supply
+        local lane = supply and supply.byKind and supply.byKind[laneKind] or {}
+        local rule = {
+            id = definition.id,
+            measure = definition.measure,
+            evaluationReason = evaluationReason,
+            enabled = evaluation and evaluation.enabled == true,
+            onHand = evaluation and evaluation.onHand or 0,
+            refillBelow = evaluation and evaluation.refillBelow or 0,
+            target = evaluation and evaluation.target or 0,
+            deficit = evaluation and evaluation.deficit or 0,
+            refilling = evaluation and evaluation.refilling == true,
+            queued = isQueued,
+            readyAt = readyAt,
+            personalItems = personalItems(record, definition),
+            phase = lane.phase,
+            lastResult = lane.lastResult,
+            lastFailureReason = lane.lastFailureReason,
+            nextRetry = lane.nextRetry,
+            personalCandidateCount = lane.personalCandidateCount,
+            storageCandidateCount = 0,
+            selected = {},
+        }
+        if storage and evaluation and evaluation.deficit > 0 then
+            local request = Evaluator.BuildRequest(
+                record, definition, evaluation
+            )
+            if request then
+                local selected, candidateCount = Selector.SelectFromStorage(
+                    storage, request
+                )
+                rule.storageCandidateCount = candidateCount
+                for index = 1, math.min(#selected, 8) do
+                    rule.selected[#rule.selected + 1] = {
+                        fullType = selected[index].descriptor.fullType,
+                        quantity = selected[index].quantity,
+                        hunger = selected[index].descriptor.hunger,
+                        thirst = selected[index].descriptor.thirst,
+                        remainingUses = selected[index].descriptor.remainingUses,
+                        bandage = selected[index].descriptor.bandage == true,
+                        unsafe = selected[index].descriptor.unsafe == true,
+                    }
+                end
+            end
+        end
+        output.rules[#output.rules + 1] = rule
+    end
+    return output
 end
 
 return Evaluator

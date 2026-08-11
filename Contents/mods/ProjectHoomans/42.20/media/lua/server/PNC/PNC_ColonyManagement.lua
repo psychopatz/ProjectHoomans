@@ -19,13 +19,90 @@ local function summary(record)
             and PNC.ConditionStats.Ensure(record,
                 PNC.NeedsUtils.WorldAgeHours()) or {},
         morale=record.social and record.social.morale or 0,
+        provision=PNC.ProvisionEvaluator
+            and PNC.ProvisionEvaluator.GetDebugState
+            and PNC.ProvisionEvaluator.GetDebugState(record) or {},
+        supply=PNC.NPCSupplyService
+            and PNC.NPCSupplyService.GetDebugState
+            and PNC.NPCSupplyService.GetDebugState(record) or {},
         priorityType=priorityType, priority=priority,
         location={x=record.x,y=record.y,z=record.z} }
+end
+
+local function canUseDebug(player)
+    if not isServer or not isServer() then
+        if isDebugEnabled then return isDebugEnabled() == true end
+        return getCore and getCore() and getCore():getDebug() == true or false
+    end
+    local access = player and player.getAccessLevel
+        and tostring(player:getAccessLevel() or "") or ""
+    return string.lower(access) == "admin"
+end
+
+local function debugNeedAction(player, args)
+    if not canUseDebug(player) then return false, "not_authorized" end
+    local record = PNC.Registry and PNC.Registry.Get(args.npcID) or nil
+    if not record or record.alive == false or not owned(record, player) then
+        return false, "npc_not_owned"
+    end
+    if PNC.Recruitment and PNC.Recruitment.ReconcileOwned then
+        local reconciled, reconcileReason =
+            PNC.Recruitment.ReconcileOwned(player, record)
+        if not reconciled and reconcileReason ~= "unchanged" then
+            return false, reconcileReason or "membership_repair_failed"
+        end
+    end
+    local operation = tostring(args.operation or "")
+    if operation == "modify" then
+        local needType = tostring(args.needType or "")
+        if not Definitions.Get(needType) then return false, "unknown_need" end
+        local amount = math.max(-1, math.min(1, tonumber(args.amount) or 0))
+        local value = PNC.IndividualNeeds.Modify(
+            record, needType, amount, "colony_debug"
+        )
+        return value ~= nil, value ~= nil and "updated" or "update_failed", {
+            npcID = record.id, needType = needType, value = value,
+        }
+    end
+    if operation == "reset" then
+        return PNC.IndividualNeeds.Reset(record) == true, "reset"
+    end
+    if operation == "force_provision" then
+        for _, kind in ipairs({ "FOOD", "HYDRATION", "MEDICAL" }) do
+            PNC.NPCSupplyService.ClearRetry(record, kind)
+        end
+        local _, results = PNC.ProvisionScheduler.ReconcileRecord(record)
+        local diagnostics = PNC.ProvisionEvaluator.Inspect(record) or {
+            npcID = record.id,
+        }
+        diagnostics.forceResults = results
+        local failed = false
+        local attempted = false
+        for _, result in ipairs(results or {}) do
+            attempted = result.attempted == true or attempted
+            if result.ok ~= true then failed = true end
+        end
+        local reason = failed and "provision_grab_failed"
+            or attempted and "provision_grabbed" or "provision_already_satisfied"
+        return not failed, reason, diagnostics
+    end
+    if operation == "inspect_provision" then
+        local diagnostics, reason = PNC.ProvisionEvaluator.Inspect(record)
+        return diagnostics ~= nil, reason or "provision_inspected", diagnostics
+    end
+    return false, "unknown_debug_operation"
 end
 function Management.BuildSnapshot(player, options)
     local people, attention, counts = {}, {}, { hunger={}, hydration={}, fatigue={} }
     local supplyShortages = { food = {}, hydration = {}, medical = {} }
     local playerFaction, colony
+    if PNC.Recruitment and PNC.Recruitment.ReconcileOwned then
+        for _, record in pairs(PNC.Registry.Data or {}) do
+            if record.alive ~= false and owned(record, player) then
+                PNC.Recruitment.ReconcileOwned(player, record)
+            end
+        end
+    end
     if PNC.Factions and PNC.Factions.GetPlayerFaction then playerFaction = PNC.Factions.GetPlayerFaction(player) end
     if playerFaction and PNC.Communities and PNC.Communities.GetForFaction then
         for _, value in ipairs(PNC.Communities.GetForFaction(playerFaction.id) or {}) do if value.status == "active" then colony=value; break end end
@@ -69,8 +146,12 @@ function Management.BuildSnapshot(player, options)
     local provisionSettings = PNC.ProvisionPolicyService
         and PNC.ProvisionPolicyService.BuildSnapshot
         and PNC.ProvisionPolicyService.BuildSnapshot(player) or nil
+    local provisionStorage = PNC.ProvisionEvaluator
+        and PNC.ProvisionEvaluator.MeasureStorage
+        and PNC.ProvisionEvaluator.MeasureStorage(storageState) or {}
     return { colony=colony, people=people, attention=attention, levels=counts,
         storage=storage, research=research, supplyShortages=supplyShortages,
+        provisionStorage=provisionStorage,
         provisionSettings=provisionSettings,
         generatedAt=PNC.NeedsUtils.WorldAgeHours() }
 end
@@ -141,6 +222,8 @@ function Management.HandleAction(player, args)
         ok, reason, details = PNC.ProvisionPolicyService.Apply(
             player, args.submission
         )
+    elseif action == "debug_need" then
+        ok, reason, details = debugNeedAction(player, args)
     else
         ok, reason = false, "unknown_colony_action"
     end

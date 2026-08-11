@@ -3,6 +3,7 @@ local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyMana
 local Storage = require "PNC/UI/Communities/PNC_ColonyManagementStorageTabs"
 local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+local DebugTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_DebugTab"
 
 Registry.Register({
     id = "overview",
@@ -78,6 +79,31 @@ Registry.Register({
         return Research.Rebuild(window, snapshot, Shared.Tr)
     end,
 })
+
+if PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() then
+    Registry.Register({
+        id = "debug",
+        title = function()
+            return Shared.Tr("UI_PNC_ColonyDebug_Tab", "DEBUG")
+        end,
+        detailTitle = "COLONIST DEBUG",
+        showRoster = true,
+        create = function(window)
+            DebugTab.Create(window)
+        end,
+        apply = function(window, active)
+            DebugTab.Apply(window, active)
+        end,
+        buildRows = function(context)
+            return DebugTab.BuildRows(
+                context.selectedPerson, context.snapshot
+            )
+        end,
+        onControl = function(window, button)
+            return DebugTab.OnControl(window, button)
+        end,
+    })
+end
 
 Registry.Register({
     id = "refresh",

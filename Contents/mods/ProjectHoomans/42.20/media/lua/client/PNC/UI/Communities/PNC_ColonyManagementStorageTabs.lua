@@ -3,8 +3,25 @@ require "PNC/UI/Inventory/PNC_InventoryUI_List"
 
 local StorageTabs = {}
 local ViewModel = require "PNC/UI/Communities/PNC_ColonyStorageViewModel"
+local ActivityPresentation = require "PNC/UI/Communities/PNC_ColonyStorageActivityPresentation"
 local Components = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
 local SORT_LABEL_KEY = "UI_PNC_Storage_Sort"
+
+local function drawActivityRow(list, y, entry, alternate)
+    local item = entry.item or {}
+    local UI = PsychopatzCore.UI
+    local Theme = UI.Theme
+    UI.DrawListSelection(list, y, list.itemheight, false, alternate)
+    local timeWidth = Theme.TextWidth(UIFont.Small, item.time or "")
+    local maximum = math.max(40, list:getWidth() - timeWidth - 28)
+    list:drawText(UI.Layout.Ellipsize(item.message, UIFont.Small, maximum),
+        8, y + 5, Theme.colors.text.r, Theme.colors.text.g,
+        Theme.colors.text.b, Theme.colors.text.a, UIFont.Small)
+    list:drawTextRight(item.time or "", list:getWidth() - 8, y + 5,
+        Theme.colors.textMuted.r, Theme.colors.textMuted.g,
+        Theme.colors.textMuted.b, Theme.colors.textMuted.a, UIFont.Small)
+    return y + list.itemheight
+end
 
 function StorageTabs.Create(window, UI, tr)
     window.storageSearch = ISTextEntryBox:new("", 0, 0, 180, 26)
@@ -21,6 +38,10 @@ function StorageTabs.Create(window, UI, tr)
     window.storageList:initialise()
     window.storageList:instantiate()
     window:addChild(window.storageList)
+    window.storageActivityPane, window.storageActivityList =
+        Components.CreatePane(window, 24, drawActivityRow)
+    window.storageActivityPane:setHeader(
+        tr("UI_PNC_Storage_RecentActivity", "RECENT ACTIVITY"), "10")
     window.storageSortButton = UI.CreateButton(window, {
         id = "sort",
         title = tr("UI_PNC_Storage_SortName", "Sort: Name"),
@@ -114,6 +135,7 @@ function StorageTabs.ApplyLayout(window, Layout, active)
     if not window.layout then return end
     window.storageSearch:setVisible(active)
     window.storageList:setVisible(active)
+    window.storageActivityPane:setVisible(active)
     window.storageSortButton:setVisible(active)
     window.storageTransferButton:setVisible(active
         and window.snapshot and window.snapshot.storage ~= nil)
@@ -139,7 +161,15 @@ function StorageTabs.ApplyLayout(window, Layout, active)
             math.floor((content.width - gap) * 0.36))
         listWidth = content.width - gap - drawerWidth
     end
-    local listHeight = bottom - window.layout.storageListY
+    local availableHeight = bottom - window.layout.storageListY
+    local showActivity = not compactDrawer
+    window.storageActivityPane:setVisible(showActivity)
+    local activityHeight = showActivity and math.min(
+        Layout.Pixels(265, scale),
+        math.max(Layout.Pixels(105, scale),
+            availableHeight - Layout.Pixels(120, scale) - gap)) or 0
+    local listHeight = availableHeight
+        - (showActivity and activityHeight + gap or 0)
     if compactDrawer then
         listHeight = math.max(Layout.Pixels(110, scale),
             math.floor(listHeight * 0.48))
@@ -148,6 +178,11 @@ function StorageTabs.ApplyLayout(window, Layout, active)
         window.layout.storageListY, listWidth,
         math.max(Layout.Pixels(60, scale), listHeight))
     Components.LayoutScrollbar(window.storageList)
+    if showActivity then
+        window:layoutPane(window.storageActivityPane, content.x,
+            window.layout.storageListY + listHeight + gap,
+            listWidth, activityHeight)
+    end
     window.detailsPane:setVisible(drawerVisible)
     if drawerVisible then
         local drawerX = compactDrawer and content.x
@@ -261,9 +296,26 @@ local function rebuildStorage(window, snapshot)
     end
 end
 
+local function rebuildActivity(window, storage, tr)
+    Components.SetRows(window.storageActivityList, {})
+    local rows = ActivityPresentation.Rows(storage and storage.activity or {})
+    if #rows == 0 then
+        rows[1] = {
+            message = tr("UI_PNC_Storage_NoActivity",
+                "No inventory activity yet"),
+            time = "",
+        }
+    end
+    window.storageActivityPane:setHeader(
+        tr("UI_PNC_Storage_RecentActivity", "RECENT ACTIVITY"),
+        tostring(storage and #(storage.activity or {}) or 0))
+    Components.SetRows(window.storageActivityList, rows)
+end
+
 function StorageTabs.Rebuild(window, snapshot, tr)
     if window.tab == "storage" then
         rebuildStorage(window, snapshot)
+        rebuildActivity(window, snapshot.storage, tr)
         return true
     end
     return false

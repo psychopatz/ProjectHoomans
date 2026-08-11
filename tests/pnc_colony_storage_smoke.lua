@@ -1,8 +1,9 @@
 local SHARED = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
 local SERVER = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
+local CLIENT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
 local CORE = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
-package.path = SHARED .. "?.lua;" .. SERVER .. "?.lua;" .. CORE .. "?.lua;"
-    .. package.path
+package.path = SHARED .. "?.lua;" .. SERVER .. "?.lua;" .. CLIENT
+    .. "?.lua;" .. CORE .. "?.lua;" .. package.path
 
 local function equal(actual, expected, label)
     if actual ~= expected then
@@ -45,6 +46,13 @@ PNC = {
     Inventory = { Internal = {} },
     Registry = { Get = function() return nil end },
     Equipment = {},
+}
+local provisionWakeups = {}
+PNC.ProvisionScheduler = {
+    MarkFactionDirty = function(factionID)
+        provisionWakeups[#provisionWakeups + 1] = factionID
+        return 0
+    end,
 }
 
 local factions = {
@@ -110,6 +118,7 @@ end
 local Definitions = require "PNC/Core/Colony/Storage/PNC_ColonyStorageDefinitions"
 local Repository = require "PNC/Colony/Storage/PNC_ColonyStorageRepository"
 local Service = require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService"
+local Journal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
 local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 
 equal(Definitions.GetCapacity(1), 200, "tier one capacity")
@@ -147,6 +156,13 @@ equal(reason, "deposited", "player deposit reason")
 equal(#playerContainer.values, 0, "player source removal")
 equal(storageA.inventory:getLogicalItemCount(), 1, "storage destination add")
 equal(storageB.inventory:getLogicalItemCount(), 0, "other faction unchanged")
+equal(provisionWakeups[#provisionWakeups], "faction_a",
+    "storage deposit immediately wakes provision scheduler")
+equal(#storageA.activityJournal, 1, "successful deposit journal entry")
+equal(storageA.activityJournal[1][Journal.FIELD.OPERATION],
+    Journal.OPERATION.STORE, "deposit journal operation")
+equal(storageA.activityJournal[1][Journal.FIELD.ACTOR], "player_a",
+    "deposit journal actor")
 
 ok, reason = Service.RequestPlayerDeposit(playerA, {
     requestId = "deposit:1",
@@ -154,6 +170,8 @@ ok, reason = Service.RequestPlayerDeposit(playerA, {
 })
 equal(ok, false, "duplicate request rejected")
 equal(reason, "duplicate_request", "duplicate request reason")
+equal(#storageA.activityJournal, 1,
+    "rejected transaction entered activity journal")
 
 local foreignItem = item("Base.Hammer", 1)
 playerContainer:AddItem(foreignItem)
@@ -202,6 +220,7 @@ truthy(loaded, "storage persisted")
 equal(loaded.tier, 2, "persisted tier")
 equal(loaded.inventory:getLogicalItemCount(), 100, "persisted contents")
 equal(loaded.inventory.maxWeight, 250, "capacity rederived from tier")
+equal(#loaded.activityJournal, 1, "activity journal persisted")
 
 local snapshot = Service.BuildSnapshot(playerA)
 equal(snapshot.logicalItemCount, 100, "snapshot logical quantity")
@@ -226,6 +245,11 @@ equal(loaded.inventory:getLogicalItemCount(), 95,
     "withdrawal removes storage quantity once")
 equal(#playerContainer.values, 7,
     "withdrawal materializes items in player inventory")
+equal(#loaded.activityJournal, 2, "withdrawal journal entry")
+equal(loaded.activityJournal[2][Journal.FIELD.OPERATION],
+    Journal.OPERATION.TAKE, "withdrawal journal operation")
+equal(loaded.activityJournal[2][Journal.FIELD.QUANTITY], 5,
+    "withdrawal journal quantity")
 
 ok, reason = Service.RequestPlayerWithdrawal(playerA, {
     requestId = "withdraw:stale",
@@ -272,5 +296,42 @@ ok, reason = Service.DebugAction(playerA, {
 equal(ok, true, "debug add test item")
 equal(loaded.inventory:count("Base.Nails"), 100,
     "debug add item did not reach storage")
+
+for index = 1, 12 do
+    truthy(Service.RecordActivity(loaded, {
+        operation = "STORE",
+        actor = "worker_" .. tostring(index),
+        fullType = "Base.Nails",
+        quantity = index,
+        reason = index == 12 and "fishing" or nil,
+    }), "public journal API")
+end
+equal(#loaded.activityJournal, 10, "journal hard cap")
+equal(loaded.activityJournal[1][Journal.FIELD.ACTOR], "worker_3",
+    "journal discarded oldest entry")
+equal(loaded.activityJournal[10][Journal.FIELD.REASON], "fishing",
+    "optional extensible reason token")
+local serialized = Repository.SerializeStorage(loaded)
+equal(serialized.activityJournal[1], Journal.VERSION,
+    "journal serialization version")
+equal(#serialized.activityJournal[2], 10,
+    "serialized journal hard cap")
+equal(#serialized.activityJournal[2][1], 6,
+    "compact positional journal entry")
+snapshot = Service.BuildSnapshot(playerA)
+equal(#snapshot.activity, 10, "snapshot activity cap")
+getText = function(key) return key end
+getItemNameFromFullType = function(fullType)
+    return fullType == "Base.Nails" and "Nails" or fullType
+end
+local ActivityPresentation = require
+    "PNC/UI/Communities/PNC_ColonyStorageActivityPresentation"
+local activityRows = ActivityPresentation.Rows(snapshot.activity)
+equal(#activityRows, 10, "activity presentation row count")
+truthy(string.find(activityRows[1].message,
+    "worker_12 stored 12 x Nails", 1, true),
+    "structured activity translated at render time")
+truthy(string.find(activityRows[1].message, "(fishing)", 1, true),
+    "activity reason presentation")
 
 print("pnc_colony_storage_smoke: ok")

@@ -1,6 +1,7 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PsychopatzCore/EventMarkers/PsychopatzEventMarkerHandler"
 require "PNC/UI/NPCMonitor/PNC_NPCMonitorSupport"
+require "PNC/UI/Communities/ColonyManagement/PNC_ProvisionDiagnosticsModal"
 require "ISUI/ISContextMenu"
 
 PNC.NPCMonitor = PNC.NPCMonitor or {}
@@ -109,6 +110,16 @@ function ISPNCNPCMonitor:onRelationships()
         and PNC.RelationshipDebugUI.Open
     then
         PNC.RelationshipDebugUI.Open(item.id)
+    end
+end
+
+function ISPNCNPCMonitor:onProvisionDiagnostics()
+    local item = self:getSelectedDiagnostic()
+    if item and item.deathMarker ~= true
+        and PNC.ProvisionDiagnosticsUI
+        and PNC.ProvisionDiagnosticsUI.Open
+    then
+        PNC.ProvisionDiagnosticsUI.Open(item)
     end
 end
 

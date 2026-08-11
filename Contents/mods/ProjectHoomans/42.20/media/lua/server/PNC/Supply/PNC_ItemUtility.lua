@@ -6,7 +6,13 @@ local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 local StateCodec = require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
 
-Utility.StaticByTypeID = Utility.StaticByTypeID or {}
+Utility.STATIC_SCHEMA = 2
+if Utility.StaticSchema ~= Utility.STATIC_SCHEMA then
+    Utility.StaticByTypeID = {}
+    Utility.StaticSchema = Utility.STATIC_SCHEMA
+else
+    Utility.StaticByTypeID = Utility.StaticByTypeID or {}
+end
 Utility.Adapters = Utility.Adapters or {}
 
 local function call(target, method, ...)
@@ -44,16 +50,32 @@ end
 
 local function probeFor(fullType)
     local item
+    local ok
     if InventoryItemFactory then
         if InventoryItemFactory.CreateItem then
-            item = InventoryItemFactory.CreateItem(fullType)
-        elseif InventoryItemFactory.instanceItem then
-            item = InventoryItemFactory.instanceItem(fullType)
+            ok, item = pcall(InventoryItemFactory.CreateItem, fullType)
+            if not ok then item = nil end
         end
+        if not item and InventoryItemFactory.instanceItem then
+            ok, item = pcall(InventoryItemFactory.instanceItem, fullType)
+            if not ok then item = nil end
+        end
+    end
+    if not item and instanceItem then
+        ok, item = pcall(instanceItem, fullType)
+        if not ok then item = nil end
     end
     local scriptItem = getScriptManager and getScriptManager()
         and getScriptManager():getItem(fullType) or nil
     return item, scriptItem
+end
+
+local function normalizeNeedChange(value)
+    value = number(value, 0) or 0
+    -- ScriptItem stores vanilla need changes as percentage points (-15),
+    -- while InventoryItem exposes normalized need units (-0.15).
+    if math.abs(value) > 2 then return value / 100 end
+    return value
 end
 
 local function readNumber(item, scriptItem, methods, fallback)
@@ -91,6 +113,9 @@ local function buildStatic(fullType, typeID)
         { "getHungerChange", "getHungChange" }, 0)
     local thirstChange = readNumber(item, scriptItem,
         { "getThirstChange" }, 0)
+    hungerChange = normalizeNeedChange(hungerChange)
+    thirstChange = normalizeNeedChange(thirstChange)
+    local calories = readNumber(item, scriptItem, { "getCalories" }, 0)
     local typeString = string.lower(tostring(
         call(scriptItem, "getTypeString") or call(item, "getType") or ""))
     local bandage = hasAny(tags, { "bandage", "medicalbandage", "canbandage" })
@@ -103,6 +128,7 @@ local function buildStatic(fullType, typeID)
         fullType = fullType,
         hunger = math.max(0, -(hungerChange or 0)),
         thirst = math.max(0, -(thirstChange or 0)),
+        calories = math.max(0, calories or 0),
         negativeThirst = math.max(0, thirstChange or 0),
         useDelta = math.max(0, readNumber(item, scriptItem,
             { "getUseDelta" }, 0) or 0),
@@ -167,6 +193,7 @@ local function describe(profile, state, quantity)
         quantity = math.max(1, math.floor(number(quantity, 1) or 1)),
         hunger = profile.hunger,
         thirst = profile.thirst,
+        calories = profile.calories,
         negativeThirst = profile.negativeThirst,
         useDelta = useDelta,
         remainingUses = remainingUses,

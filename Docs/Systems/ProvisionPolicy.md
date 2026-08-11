@@ -60,11 +60,21 @@ adapter flow. `acquireOnly` prevents consumption and `ignorePersonal` tells the
 service the evaluator has already accounted for personal inventory.
 
 Inventory changes, faction joins, role changes, policy changes, and explicit
-debug actions mark rules dirty. The scheduler processes at most two rules per
+debug actions mark rules dirty. A successful colony-storage deposit also wakes
+every provision rule in the owning faction immediately, clearing a stale
+shortage deadline when new supplies arrive. The scheduler processes at most two rules per
 one-second slice. Policy changes enqueue members but never synchronously query
 their stockpiles. Successful and partial acquisitions are re-evaluated; failures
-reuse the supply lane's retry deadline. A recent higher-priority Need request for
-the same NPC/resource suppresses routine provisioning briefly.
+reuse the supply lane's retry deadline. A bounded ten-second audit re-enqueues
+faction members so an inventory change from an integration that missed the
+normal dirty hook cannot leave reserves stale indefinitely.
+
+Provisioning and need consumption are deliberately separate. Provision requests
+may acquire from the current base and stop once the item is in the colonist's
+inventory. Hunger and thirst requests use `personalOnly`; they can consume a
+carried allocation but cannot fetch from colony storage. Provision requests also
+bypass a need-consumption retry cooldown, so an earlier attempt to eat an empty
+reserve cannot prevent that reserve from being replenished.
 
 The existing inventory mutation path is unchanged, so LIVE inventory mirroring,
 FULL persistence, SEED_ONLY to BASELINE_DELTA overlays, and delta compaction all
@@ -129,8 +139,37 @@ currently rendered.
 ## Diagnostics
 
 Supply metrics include policy revision, dirty NPC and queue gauges, evaluations,
-satisfied/deficient rules, request outcomes, Need/incoming suppression, scheduler
-throughput, and storage shortages. The Needs debug snapshot includes each rule's
+satisfied/deficient rules, request outcomes, audit counts, scheduler throughput,
+and storage shortages. The Needs debug snapshot includes each rule's
 on-hand, incoming, threshold, target, status, policy source, last evaluation,
 dirty rules, last request, and failure. Debug actions can force evaluation, mark
 rules dirty, clear retry deadlines, and dump the effective policy.
+
+`Provision Diagnostics` is available from both Colony Management's Debug tab
+and the debug NPC Monitor. It requests one selected NPC on demand rather than
+including every diagnostic in routine snapshots. The modal reports personal
+food/hydration/medicine measurements, threshold and target values, scheduler
+queue state, storage access (including `storage_not_at_base`), recognized
+storage candidates, selected items, and the last supply failure/retry state.
+The storage summary reports food in vanilla hunger utility and total calories,
+plus hydration utility and usable bandage count.
+
+`Force Grab Provisions` clears supply retry deadlines, immediately evaluates
+all registered provision rules, and reports one result per rule. A result says
+whether acquisition was actually attempted and gives the authoritative reason
+(`acquired`, `satisfied`, `no_supply`, `storage_not_at_base`, and so on); the
+button never substitutes a generic success for a failed or blocked evaluation.
+
+Old saves can contain an owned companion record that predates canonical faction
+or community membership. Colony Management reconciles those owned records
+before resolving the snapshot and before every debug provision action. Repair
+uses the normal recruitment membership transaction, preserves the colonist's
+current order, persists all registries, and immediately marks provision rules
+dirty.
+
+Colony storage currently uses the centralized `VIRTUAL_COLONY` access mode
+because physical bases do not exist yet. Valid community members can therefore
+acquire provisions from their virtual colony storage from any world position.
+The access policy retains a `PHYSICAL_HOME` mode that applies the existing home
+radius check; enabling that one policy when bases arrive does not require
+changes to provision scheduling, selection, or inventory transfer.

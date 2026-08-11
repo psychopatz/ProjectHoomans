@@ -150,6 +150,9 @@ function Needs.Update(record, elapsedHours, reason)
         Needs.Modify(record, needType, rates[needType] * elapsedHours,
             reason or "passive_increase")
     end
+    if PNC.NeedHealthConsequences and PNC.NeedHealthConsequences.Apply then
+        PNC.NeedHealthConsequences.Apply(record, elapsedHours)
+    end
     state.lastUpdateWorldAge = Utils.WorldAgeHours()
     return true
 end

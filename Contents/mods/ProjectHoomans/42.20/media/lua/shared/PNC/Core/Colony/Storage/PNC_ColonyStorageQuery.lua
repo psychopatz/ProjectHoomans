@@ -3,6 +3,7 @@ PNC.ColonyStorageQuery = PNC.ColonyStorageQuery or {}
 
 local Query = PNC.ColonyStorageQuery
 local Definitions = require "PNC/Core/Colony/Storage/PNC_ColonyStorageDefinitions"
+local Journal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
 local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 local ItemRecord = require "PsychopatzCore/Inventory/PsychopatzItemRecord"
@@ -84,6 +85,7 @@ function Query.BuildSnapshot(storage, options)
         batchCount = batchCount,
         uniqueRecordCount = #allRows - batchCount,
         rows = rows,
+        activity = Journal.Snapshot(storage),
     }
 end
 

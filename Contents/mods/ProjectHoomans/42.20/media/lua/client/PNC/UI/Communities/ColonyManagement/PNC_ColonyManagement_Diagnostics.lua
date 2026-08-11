@@ -48,6 +48,15 @@ function Diagnostics.SetEnabled(window, enabled)
     window.diagnosticsEnabled = debugAvailable() and enabled == true
     PNC.ColonyManagementUI.DiagnosticsEnabled =
         window.diagnosticsEnabled == true
+    -- The same opt-in also enables the concise server-side supply transaction
+    -- trace. This makes the checkbox useful for diagnosing needs failures in
+    -- SP and MP without enabling broad or per-tick logging.
+    if PNC.Client and PNC.Client.SendDebug then
+        PNC.Client.SendDebug("needs_debug_action", {
+            operation = "supply_logging",
+            enabled = window.diagnosticsEnabled == true,
+        })
+    end
     Diagnostics.Log(window, "diagnostics_changed", {
         source = window.diagnosticsEnabled and "enabled" or "disabled",
     })

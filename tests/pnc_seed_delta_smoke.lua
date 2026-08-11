@@ -571,6 +571,34 @@ local fractionalProfile = PNC.ItemUtility.GetStatic(
 )
 assertEqual(fractionalProfile.hunger, 0.15,
     "native fractional hunger utility preservation")
+local savedCreateItem = InventoryItemFactory.CreateItem
+local savedScriptManager = getScriptManager
+InventoryItemFactory.CreateItem = function() return nil end
+getScriptManager = function()
+    return { getItem = function(_, fullType)
+        if fullType ~= "Base.ScriptScaleFood" then return nil end
+        return {
+            getHungerChange = function() return -15 end,
+            getThirstChange = function() return 5 end,
+            getCalories = function() return 720 end,
+            getTypeString = function() return "Food" end,
+        }
+    end }
+end
+local scriptScaleTypeID = PsychopatzCore.Inventory.getItemTypeId(
+    "Base.ScriptScaleFood", true
+)
+local scriptScaleProfile = PNC.ItemUtility.GetStatic(
+    scriptScaleTypeID, "Base.ScriptScaleFood"
+)
+assert(math.abs(scriptScaleProfile.hunger - 0.15) < 0.000001,
+    "script hunger percentage was not normalized")
+assert(math.abs(scriptScaleProfile.negativeThirst - 0.05) < 0.000001,
+    "script thirst percentage was not normalized")
+assertEqual(scriptScaleProfile.calories, 720,
+    "script calories were incorrectly normalized")
+InventoryItemFactory.CreateItem = savedCreateItem
+getScriptManager = savedScriptManager
 require "PNC/Supply/PNC_SupplyIndex"
 require "PNC/Supply/PNC_SupplySelector"
 require "PNC/Supply/PNC_StorageAccessPolicy"
@@ -615,6 +643,7 @@ local function supplyNPC(id, options)
     if options.emptyBaseline then loadout.supplies = {} end
     local value = {
         id = id, identitySeed = 1000 + supplySerial, archetypeID = "Test",
+        name = id,
         faction = "colonist", recruited = true, alive = true,
         x = 10, y = 10, z = 0,
         progression = { skillLevelDeltas = {}, skillXP = {} },
@@ -638,6 +667,27 @@ local supplyStorage = PNC.ColonyStorageRepository.GetPrimary(
 supplyStorage.inventory:clear()
 local SupplyService = PNC.NPCSupplyService
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
+
+-- Storage is virtual while colony bases have no physical implementation. The
+-- same centralized policy can later enable the already-supported home check.
+local remoteNPC = supplyNPC("supply_remote", { emptyBaseline = true })
+remoteNPC.x, remoteNPC.y = 1000, 1000
+local remoteStorage, remoteReason =
+    PNC.StorageAccessPolicy.Resolve(remoteNPC)
+assertEqual(remoteStorage, supplyStorage,
+    "virtual colony access rejected a remote member")
+assertEqual(remoteReason, nil, "virtual colony access returned a failure")
+assertEqual(PNC.StorageAccessPolicy.SetAccessMode(
+    PNC.StorageAccessPolicy.MODE.PHYSICAL_HOME), true,
+    "physical storage access mode was rejected")
+remoteStorage, remoteReason = PNC.StorageAccessPolicy.Resolve(remoteNPC)
+assertEqual(remoteStorage, nil,
+    "physical colony access admitted a remote member")
+assertEqual(remoteReason, "storage_not_at_base",
+    "physical colony access did not enforce the home area")
+assertEqual(PNC.StorageAccessPolicy.SetAccessMode(
+    PNC.StorageAccessPolicy.MODE.VIRTUAL_COLONY), true,
+    "virtual storage access mode could not be restored")
 
 -- Personal inventory is consumed before storage is queried.
 local personalNPC = supplyNPC("supply_personal", { emptyBaseline = true })
@@ -671,6 +721,16 @@ assertEqual(supplyStorage.inventory:count("Base.Apple"), applesBefore - 1,
     "storage food count did not decrease exactly once")
 assert(PNC.IndividualNeeds.Get(foodNPC, "hunger") < 0.30,
     "storage food was not used from NPC inventory")
+local provisionEntry = supplyStorage.activityJournal[
+    #supplyStorage.activityJournal
+]
+local Journal = PNC.ColonyStorageJournal
+assertEqual(provisionEntry[Journal.FIELD.OPERATION], Journal.OPERATION.TAKE,
+    "provision storage journal operation")
+assertEqual(provisionEntry[Journal.FIELD.ACTOR], foodNPC.name,
+    "provision storage journal actor")
+assertEqual(provisionEntry[Journal.FIELD.REASON], "provision",
+    "provision storage journal reason")
 assertEqual(PNC.Inventory.Serialize(foodNPC)[2], "SEED_ONLY",
     "acquired and consumed apple left sparse history")
 
@@ -775,7 +835,44 @@ assertEqual(PNC.SupplyMetrics.candidateQueries, queriesAfter,
     "retry cooldown still queried storage")
 assert(queriesAfter > queriesBefore, "initial scarcity did not query candidates")
 
+-- Hunger consumes only an already-carried provision.  It must not turn into
+-- an implicit trip to colony storage; the independent provision request
+-- allocates the food first, and a later need request consumes it.
+assert(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.Apple"), 2))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local provisionedNPC = supplyNPC(
+    "supply_personal_boundary", { emptyBaseline = true }
+)
+local storageBeforeNeed = supplyStorage.inventory:count("Base.Apple")
+local missingProvision, missingReason = SupplyService.Process({
+    requesterId = provisionedNPC.id, resourceKind = "FOOD",
+    required = { hunger = 0.20 }, priority = 80,
+}, { personalOnly = true, force = true })
+assertEqual(missingProvision, false,
+    "empty carried provision unexpectedly satisfied hunger")
+assertEqual(missingReason, "personal_missing",
+    "empty carried provision failure reason")
+assertEqual(supplyStorage.inventory:count("Base.Apple"), storageBeforeNeed,
+    "hunger response fetched food directly from colony storage")
+local provisionAcquire = SupplyService.Process({
+    requesterId = provisionedNPC.id, purpose = "PROVISION",
+    resourceKind = "FOOD", required = { hunger = 0.20 }, priority = 80,
+}, { acquireOnly = true, ignorePersonal = true, force = true })
+assertEqual(provisionAcquire, true,
+    "reserve provision could not bypass need retry cooldown")
+assertEqual(supplyStorage.inventory:count("Base.Apple"),
+    storageBeforeNeed - 1, "provision did not allocate carried food")
+local carriedUse = SupplyService.Process({
+    requesterId = provisionedNPC.id, resourceKind = "FOOD",
+    required = { hunger = 0.20 }, priority = 80,
+}, { personalOnly = true, force = true })
+assertEqual(carriedUse, true, "carried provision was not consumed")
+assertEqual(supplyStorage.inventory:count("Base.Apple"),
+    storageBeforeNeed - 1, "carried consumption touched colony storage")
+
 -- One item cannot be duplicated across two NPC requests.
+supplyStorage.inventory:clear()
 assert(CoreInventory.deposit(supplyStorage.inventory,
     nativeItem("Base.Apple"), 1))
 PNC.SupplyIndex.Invalidate(supplyStorage)
@@ -837,6 +934,70 @@ assertEqual(liveUse, true, "live personal use " .. tostring(liveUseReason)
 assertEqual(#liveSupplyItems, 0,
     "live food use did not mutate physical inventory")
 supplyBodies[liveSupplyNPC.id] = nil
+
+-- A temporary native projection failure must not roll back authoritative
+-- compact provisioning. The missing projection can reconcile on a later spawn.
+assert(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.Apple"), 1))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local projectionNPC = supplyNPC(
+    "supply_projection_fallback", { emptyBaseline = true }
+)
+liveSupplyItems = {}
+supplyBodies[projectionNPC.id] = liveSupplyBody
+local projectionFactory = InventoryItemFactory.CreateItem
+InventoryItemFactory.CreateItem = function() return nil end
+instanceItem = nil
+local projectionOK, projectionReason, projectionDetails =
+    SupplyService.Process({
+        requesterId = projectionNPC.id, resourceKind = "FOOD",
+        required = { hunger = 0.20 }, priority = 80,
+    }, { acquireOnly = true })
+InventoryItemFactory.CreateItem = projectionFactory
+assertEqual(projectionOK, true,
+    "native projection failure blocked compact provision: "
+        .. tostring(projectionReason))
+assertEqual(projectionDetails.physicalProjectionMissing, true,
+    "native projection failure was not reported")
+assertEqual(#liveSupplyItems, 0,
+    "failed physical projection left partial native items")
+local compactProjectionApple = false
+for _, compactItem in pairs(
+    PNC.Inventory.EnsureRecordInventory(projectionNPC).items or {}
+) do
+    if compactItem.type == "Base.Apple" then
+        compactProjectionApple = true
+        break
+    end
+end
+assertEqual(compactProjectionApple, true,
+    "compact provision was not retained")
+supplyBodies[projectionNPC.id] = nil
+
+-- Persisted compact state is authoritative when a newly spawned body's
+-- physical projection has not caught up yet. The stale projection must not
+-- permanently block that valid personal item (and therefore all supply).
+local staleProjectionNPC = supplyNPC(
+    "supply_stale_projection", { emptyBaseline = true }
+)
+assert(PNC.Inventory.AddItems(staleProjectionNPC, {
+    { type = "Base.Apple", stack = 1, itemState = { age = 1 } },
+}, "root", "test_stale_projection_food"))
+local staleItems = {}
+local staleContainer = {}
+function staleContainer:getItems() return javaList(staleItems) end
+local staleBody = { getInventory = function() return staleContainer end }
+supplyBodies[staleProjectionNPC.id] = staleBody
+local staleOK, staleReason = SupplyService.Process({
+    requesterId = staleProjectionNPC.id, resourceKind = "FOOD",
+    required = { hunger = 0.20 }, priority = 80,
+})
+assertEqual(staleOK, true,
+    "stale physical projection blocked compact food: "
+        .. tostring(staleReason))
+assert(PNC.IndividualNeeds.Get(staleProjectionNPC, "hunger") < 0.30,
+    "stale-projection compact food did not satisfy hunger")
+supplyBodies[staleProjectionNPC.id] = nil
 
 -- Acquired compact state survives save/load without FULL promotion.
 assert(CoreInventory.deposit(supplyStorage.inventory,

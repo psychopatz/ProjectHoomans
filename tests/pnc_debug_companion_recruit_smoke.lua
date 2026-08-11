@@ -17,6 +17,11 @@ local records = {
         recruited = true,
         alive = true,
     },
+    orphaned = {
+        id = "orphaned", faction = "colonist", recruited = true,
+        alive = true, ownerUsername = "Tester",
+        orderSpec = { kind = "guard" },
+    },
 }
 local affiliations = {
     hostile = { factionID = "raiders" },
@@ -33,6 +38,7 @@ local registrySaves = 0
 local factionSaves = 0
 local communitySaves = 0
 local playerCommunities = {}
+local communityByNPC = {}
 
 PNC = {
     Const = {
@@ -56,6 +62,11 @@ PNC = {
             return true, "existing", { id = "player-faction" }
         end,
         GetNPCAffiliation = function(id) return affiliations[id] end,
+        GetPlayerFaction = function() return { id = "player-faction" } end,
+        GetNPCFaction = function(id)
+            return affiliations[id]
+                and { id = affiliations[id].factionID } or nil
+        end,
         TransferNPC = function(id, factionID)
             transferCalls = transferCalls + 1
             records[id].faction = "colonist"
@@ -93,14 +104,24 @@ PNC = {
             playerCommunities[#playerCommunities + 1] = community
             return true, "created", community
         end,
-        AddNPC = function()
+        AddNPC = function(_, npcID)
             communityAdds = communityAdds + 1
+            communityByNPC[npcID] = playerCommunities[1]
             return true, "added"
+        end,
+        GetNPCCommunity = function(npcID)
+            return communityByNPC[npcID]
         end,
         Save = function() communitySaves = communitySaves + 1 end,
     },
     ConversationScene = {
         End = function() endedCalls = endedCalls + 1 end,
+    },
+    CompanionCommands = {
+        IsOwnedByPlayer = function(record, owner)
+            return record.recruited == true
+                and record.ownerUsername == owner:getUsername()
+        end,
     },
 }
 
@@ -145,5 +166,16 @@ assertEqual(transferCalls, 1,
     "same-faction repair does not attempt an invalid transfer")
 assertEqual(addCalls, 2,
     "same-faction repair uses idempotent faction add")
+
+local ordersBeforeRepair = orderCalls
+ok, reason = Recruit.ReconcileOwned(player, records.orphaned)
+assertEqual(ok, true, "owned orphan membership repaired")
+assertEqual(reason, "recruited", "owned orphan repair result")
+assertEqual(affiliations.orphaned.factionID, "player-faction",
+    "owned orphan joined player faction")
+assertEqual(records.orphaned.orderSpec.kind, "guard",
+    "membership repair preserves current companion order")
+assertEqual(orderCalls, ordersBeforeRepair,
+    "membership repair did not force follow")
 
 print("pnc_debug_companion_recruit_smoke: ok")

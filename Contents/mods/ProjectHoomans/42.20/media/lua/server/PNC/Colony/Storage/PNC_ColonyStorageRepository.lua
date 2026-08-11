@@ -5,6 +5,7 @@ PNC.ColonyStorageRepository = PNC.ColonyStorageRepository or {}
 
 local Repository = PNC.ColonyStorageRepository
 local Definitions = require "PNC/Core/Colony/Storage/PNC_ColonyStorageDefinitions"
+local Journal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
 local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 
 Repository.ByID = Repository.ByID or {}
@@ -34,6 +35,7 @@ local function serializedStorage(storage)
         tier = storage.tier,
         revision = storage.revision,
         inventorySnapshot = snapshot,
+        activityJournal = Journal.Serialize(storage),
     }
 end
 
@@ -55,6 +57,7 @@ local function hydrate(raw)
         tier = tier,
         revision = math.max(0, math.floor(tonumber(raw.revision) or 0)),
         inventory = store,
+        activityJournal = Journal.Deserialize(raw.activityJournal),
     }
 end
 
@@ -126,6 +129,7 @@ function Repository.GetPrimary(factionID, settlementID)
             storageType = Definitions.PRIMARY_TYPE,
             tier = tier,
             revision = 0,
+            activityJournal = {},
             inventory = Inventory.createVirtualInventory({
                 maxWeight = Definitions.GetCapacity(tier),
                 authority = "server",

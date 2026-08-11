@@ -12,6 +12,7 @@ local Access = PNC.StorageAccessPolicy
 local Index = PNC.SupplyIndex
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local Repository = require "PNC/Colony/Storage/PNC_ColonyStorageRepository"
+local StorageJournal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
 
 local function worldHour()
     return PNC.NeedsUtils and PNC.NeedsUtils.WorldAgeHours
@@ -48,6 +49,9 @@ local function log(record, request, result, details)
         "quantity=" .. tostring(details and details.quantity or 0),
         "inventoryMode=" .. tostring(PNC.Inventory.GetPersistenceMode(record)),
         "needAfter=" .. tostring(details and details.needAfter or "none"),
+        "projectionMissing=" .. tostring(
+            details and details.projectionMissing == true
+        ),
     }
     if PNC.Core and PNC.Core.LogInfo then
         PNC.Core.LogInfo(table.concat(fields, " "))
@@ -149,6 +153,15 @@ local function acquireInstant(record, storage, request, selected, state)
     if not added then return false, reason end
     storage.revision = math.max(0, tonumber(storage.revision) or 0) + 1
     Repository.MarkDirty()
+    local activityItems = {}
+    for index = 1, #selected do
+        activityItems[#activityItems + 1] = {
+            typeId = selected[index].descriptor.typeId,
+            quantity = selected[index].quantity,
+        }
+    end
+    StorageJournal.RecordMany(storage, "TAKE",
+        tostring(record.name or record.id), activityItems, "provision")
     Index.AfterRemoval(storage)
     if PNC.ColonyStorageService and PNC.ColonyStorageService.Metrics then
         PNC.ColonyStorageService.Metrics.withdrawals =
@@ -158,6 +171,8 @@ local function acquireInstant(record, storage, request, selected, state)
     Metrics.Increment("instantAcquisitions")
     return true, "acquired", {
         physicalItems = destination.physicalItems,
+        physicalProjectionMissing =
+            destination.physicalProjectionMissing == true,
     }
 end
 
@@ -292,6 +307,8 @@ function Service.Process(rawRequest, options)
             source = "personal",
             fullType = state.lastUsedItem and state.lastUsedItem.fullType,
             typeId = state.lastUsedItem and state.lastUsedItem.typeId,
+            projectionMissing = state.lastUsedItem
+                and state.lastUsedItem.physicalProjectionMissing == true,
             needAfter = request.resourceKind == "FOOD"
                 and PNC.IndividualNeeds.Get(record, "hunger")
                 or request.resourceKind == "HYDRATION"
@@ -300,6 +317,24 @@ function Service.Process(rawRequest, options)
         return true, personalReason
     end
     if #state.personalCandidates > 0 and not personalOK then
+        return fail(record, request, state, personalReason, {
+            source = "personal",
+        })
+    end
+
+    -- Need fulfillment consumes only an already-issued provision.  Fetching
+    -- from colony storage is the provision scheduler's responsibility, not a
+    -- side effect of becoming hungry or thirsty.
+    if options.personalOnly then
+        if personalOK then
+            state.phase = "REEVALUATE"
+            state.lastResult = personalReason
+            state.nextRetry = remaining > 0
+                and (worldHour() + retryHours(request)) or 0
+            Metrics.Increment("supplyRequestsSatisfiedFromPersonalInventory")
+            Metrics.Increment("supplyRequestsSucceeded")
+            return true, personalReason
+        end
         return fail(record, request, state, personalReason, {
             source = "personal",
         })
@@ -382,6 +417,10 @@ function Service.Process(rawRequest, options)
         fullType = selected[1].descriptor.fullType,
         typeId = selected[1].descriptor.typeId,
         quantity = selected[1].quantity,
+        projectionMissing = state.lastUsedItem
+            and state.lastUsedItem.physicalProjectionMissing == true
+            or acquireDetails
+                and acquireDetails.physicalProjectionMissing == true,
         needAfter = request.resourceKind == "FOOD"
             and PNC.IndividualNeeds.Get(record, "hunger")
             or request.resourceKind == "HYDRATION"

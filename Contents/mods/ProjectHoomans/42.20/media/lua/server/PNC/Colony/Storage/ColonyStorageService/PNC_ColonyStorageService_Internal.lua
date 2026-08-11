@@ -3,6 +3,7 @@ local Internal = Service.Internal
 local Definitions = require "PNC/Core/Colony/Storage/PNC_ColonyStorageDefinitions"
 local Repository = require "PNC/Colony/Storage/PNC_ColonyStorageRepository"
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
+local Journal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 
 Service.Metrics = Service.Metrics or {
@@ -14,6 +15,48 @@ Internal.Definitions = Definitions
 Internal.Repository = Repository
 Internal.CoreInventory = CoreInventory
 Internal.Constants = C
+Internal.Journal = Journal
+
+function Internal.PlayerName(player)
+    return player and player.getUsername
+        and tostring(player:getUsername() or "") or ""
+end
+
+function Internal.NativeItemSpecs(items)
+    local output = {}
+    for _, item in ipairs(items or {}) do
+        output[#output + 1] = {
+            fullType = item and item.getFullType and item:getFullType() or nil,
+            quantity = 1,
+        }
+    end
+    return output
+end
+
+function Internal.StorageSelectionSpecs(storage, selections)
+    local output = {}
+    for _, selection in ipairs(selections or {}) do
+        local record = storage and storage.inventory
+            and storage.inventory.records[tonumber(selection.recordIndex) or 0]
+        if record then
+            output[#output + 1] = {
+                typeId = record[C.TYPE_ID],
+                quantity = math.max(1, math.floor(
+                    tonumber(selection.quantity) or 1
+                )),
+            }
+        end
+    end
+    return output
+end
+
+function Internal.RecordActivity(storage, operation, actor, items, reason)
+    local count = Journal.RecordMany(
+        storage, operation, actor, items, reason
+    )
+    if count > 0 then Repository.MarkDirty() end
+    return count
+end
 
 function Internal.LogTransaction(player, args, action, ok, reason, storage, details)
     if not args or args.transactionLogging ~= true then return end
@@ -125,6 +168,11 @@ function Internal.CommitStorage(storage)
     Repository.MarkDirty()
     if PNC.SupplyIndex and PNC.SupplyIndex.Invalidate then
         PNC.SupplyIndex.Invalidate(storage)
+    end
+    if PNC.ProvisionScheduler and PNC.ProvisionScheduler.MarkFactionDirty
+        and storage.ownerFactionId
+    then
+        PNC.ProvisionScheduler.MarkFactionDirty(storage.ownerFactionId)
     end
 end
 

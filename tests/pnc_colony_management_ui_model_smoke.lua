@@ -86,10 +86,28 @@ package.preload["ISUI/ISPanel"] = function() return ISPanel end
 package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
     return PsychopatzCore.UI
 end
+package.preload[
+    "PNC/UI/Communities/ColonyManagement/PNC_ProvisionDiagnosticsModal"
+] = function()
+    return { Open = function() end }
+end
 
 local Components = require(
     "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
 )
+local DebugTab = require(
+    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_DebugTab"
+)
+local debugPerson = snapshot.people[1]
+debugPerson.provision = { evaluations = {
+    food = { onHand = 0.2, target = 0.8, refilling = true },
+    hydration = { onHand = 0.7, target = 0.7, refilling = false },
+} }
+local debugRows = DebugTab.BuildRows(debugPerson, {})
+equal(#debugRows, 8, "debug tab need, storage, and provision rows")
+equal(debugRows[1].meter, true, "debug tab reuses need meters")
+equal(debugRows[7].key, "debug_provision_food",
+    "debug tab exposes food provision state")
 local bound = {
     items = { { stale = true } },
     yScroll = -900,

@@ -27,9 +27,16 @@ local companion = {
     needs = { hunger = 0.82, hydration = 0.10, fatigue = 0.10 },
 }
 
+isDebugEnabled = function() return true end
+
 PNC = {
     NeedsDefinitions = {
         TYPES = { "hunger", "hydration", "fatigue" },
+        Get = function(needType)
+            if needType == "hunger" or needType == "hydration"
+                or needType == "fatigue"
+            then return { id = needType } end
+        end,
         GetLevel = function(_, value)
             if value >= 0.70 then return "EMERGENCY" end
             if value >= 0.45 then return "CRITICAL" end
@@ -42,6 +49,15 @@ PNC = {
         Ensure = function(record) return record.needs end,
         GetHighestPriority = function() return "hunger", 82 end,
         GetActivity = function() return "Following" end,
+        Modify = function(record, needType, amount)
+            record.needs[needType] = math.max(0,
+                math.min(1, record.needs[needType] + amount))
+            return record.needs[needType]
+        end,
+        Reset = function(record)
+            record.needs = { hunger = 0, hydration = 0, fatigue = 0 }
+            return true
+        end,
     },
     NeedsUtils = { WorldAgeHours = function() return 42 end },
     CompanionCommands = {
@@ -49,7 +65,12 @@ PNC = {
             return record.ownerUsername == player:getUsername()
         end,
     },
-    Registry = { Data = { [companion.id] = companion } },
+    Registry = {
+        Data = { [companion.id] = companion },
+        Get = function(id)
+            return id == companion.id and companion or nil
+        end,
+    },
     Factions = {
         GetPlayerFaction = function() return { id = "faction_player" } end,
     },
@@ -83,5 +104,13 @@ equal(result.ok, true, "owned colony rename succeeds")
 equal(renamed.colony.name, "Riverside Watch", "renamed snapshot returned")
 equal(renamed.colony.renamePending, false, "name prompt is cleared")
 equal(communitySaves, 1, "rename commits community state immediately")
+
+local debugSnapshot, debugResult = Management.HandleAction(player, {
+    action = "debug_need", npcID = companion.id, operation = "modify",
+    needType = "hydration", amount = 0.25,
+})
+equal(debugResult.ok, true, "debug need mutation succeeds")
+equal(debugSnapshot.people[1].needs.hydration, 0.35,
+    "debug tab action returns the authoritative updated need")
 
 print("pnc_colony_management_smoke: ok")

@@ -29,6 +29,7 @@ storageType
 tier
 revision
 inventorySnapshot  (PsychopatzCore serializer payload)
+activityJournal    (version + at most 10 compact event tuples)
 ```
 
 Capacity, used weight, indexes, display rows, filters, and other derived state
@@ -90,6 +91,33 @@ and name/quantity/weight sorting operate on presentation rows, not raw codec
 fields. Rows rebuild only after snapshot revision receipt or a filter/sort
 change; the render loop does not scan inventory records. Development controls
 and storage diagnostics live in a collapsed debug drawer.
+
+The Storage tab also contains a Recent Activity pane. The server keeps only
+the latest ten successful interactions. Newest entries render first; rejected
+or rolled-back transactions are never recorded.
+
+Activity is persisted as structured data rather than translated sentences.
+Each tuple contains exactly six fields: operation code, world minute, actor
+label, numeric item type ID, quantity, and an optional reason token. The client
+resolves item names and translation templates at render time. This bounds
+memory and save growth while allowing future reasons such as `lumber`,
+`fishing`, or `scavenging` to add only a translation key.
+
+Server systems can record a successful external interaction through:
+
+```lua
+PNC.ColonyStorageService.RecordActivity(storage, {
+    operation = "STORE", -- or "TAKE"
+    actor = npc.name,
+    fullType = "Base.Log",
+    quantity = 4,
+    reason = "lumber", -- optional translation token
+})
+```
+
+The optional reason key is `UI_PNC_Storage_Reason_<token>`. Inventory mutation
+must succeed before this API is called; it records the event and marks
+repository persistence dirty but does not mutate inventory itself.
 
 `Manage Inventory` opens the same responsive two-pane exchange window used for
 player-to-NPC transfers. Its right side is supplied by a storage endpoint, so

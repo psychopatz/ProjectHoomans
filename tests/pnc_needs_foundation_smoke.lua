@@ -5,6 +5,12 @@ end
 local function assertEqual(actual, expected, message)
     if actual ~= expected then error((message or "values differ") .. ": " .. tostring(actual) .. " ~= " .. tostring(expected), 2) end
 end
+local function assertNear(actual, expected, tolerance, message)
+    if math.abs(actual - expected) > tolerance then
+        error((message or "values not near") .. ": " .. tostring(actual)
+            .. " ~= " .. tostring(expected), 2)
+    end
+end
 
 PNC = {
     Core = {
@@ -36,6 +42,7 @@ PNC.Factions = {
 }
 dofile(root .. "server/PNC/PNC_IndividualNeeds.lua")
 dofile(root .. "server/PNC/PNC_GroupNeeds.lua")
+dofile(root .. "server/PNC/Needs/PNC_NeedHealthConsequences.lua")
 dofile(root .. "server/PNC/PNC_NeedsScheduler.lua")
 PNC.CompanionCommands = { IsOwnedByPlayer = function(record) return record.recruited == true end }
 PNC.Factions.GetPlayerFaction = function() return nil end
@@ -121,6 +128,32 @@ PNC.IndividualNeeds.Ensure(overweight)
 assertEqual(PNC.IndividualNeeds.GetRates(overweight).hunger,
     PNC.IndividualNeeds.GetRates(normal).hunger,
     "Overweight does not alter vanilla hunger stat")
+local starving = { id = "starving", recruited = true, alive = true,
+    vanillaTraits = {}, vanillaTraitsAuthored = true,
+    health = { current = 100, max = 100, state = "normal" } }
+PNC.Health = {
+    ApplyDamage = function(record, _, event)
+        record.health.current = record.health.current - event.amount
+        return true
+    end,
+}
+PNC.IndividualNeeds.Ensure(starving, {
+    hunger = 0.71, hydration = 0.85, fatigue = 1,
+})
+PNC.IndividualNeeds.Update(starving, 1, "test_emergency_damage")
+local expectedDamage = PNC.NeedHealthConsequences.DAMAGE_PER_WORLD_HOUR.hunger
+    + PNC.NeedHealthConsequences.DAMAGE_PER_WORLD_HOUR.hydration
+assertNear(starving.health.current, 100 - expectedDamage, 0.000001,
+    "vanilla emergency hunger and thirst health damage")
+local exhausted = { id = "exhausted", recruited = true, alive = true,
+    vanillaTraits = {}, vanillaTraitsAuthored = true,
+    health = { current = 100, max = 100, state = "normal" } }
+PNC.IndividualNeeds.Ensure(exhausted, {
+    hunger = 0, hydration = 0, fatigue = 1,
+})
+PNC.IndividualNeeds.Update(exhausted, 1, "test_fatigue_no_damage")
+assertEqual(exhausted.health.current, 100,
+    "vanilla fatigue does not directly damage health")
 local migrated = PNC.NeedsUtils.NormalizeState({
     version = 1, hunger = 25, hydration = 80, fatigue = 100,
 }, age)

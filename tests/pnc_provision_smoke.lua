@@ -119,6 +119,36 @@ PNC.SupplyInventory = {
             and candidates[record.id][request.resourceKind] or {}
     end,
 }
+PNC.StorageAccessPolicy = {
+    Resolve = function() return nil, "storage_not_at_base" end,
+}
+PNC.SupplySelector = {
+    SelectFromStorage = function() return {}, 0, {} end,
+}
+PNC.SupplyIndex = {
+    Query = function(_, request)
+        if request.resourceKind == "FOOD" then
+            return {{ descriptor = {
+                fullType = "Base.Apple", hunger = 0.10, thirst = 0,
+                calories = 95, quantity = 2, remainingUses = 1,
+            } }}
+        end
+        if request.resourceKind == "HYDRATION" then
+            return {{ descriptor = {
+                fullType = "Base.WaterBottleFull", hunger = 0,
+                thirst = 0.10, calories = 0, quantity = 1,
+                remainingUses = 3,
+            } }}
+        end
+        return {{ descriptor = {
+            fullType = "Base.Bandage", hunger = 0, thirst = 0,
+            calories = 0, quantity = 2, remainingUses = 1,
+        } }}
+    end,
+}
+PNC.Inventory = {
+    GetPersistenceMode = function() return "SEED_ONLY" end,
+}
 dofile(ROOT .. "server/PNC/Provision/PNC_ProvisionEvaluator.lua")
 
 local function candidate(descriptor)
@@ -139,6 +169,24 @@ near(hydration.onHand, 0.30, "hydration remaining uses measured")
 local bandage = PNC.ProvisionEvaluator.Evaluate(npc, "bandage")
 equal(bandage.onHand, 2, "usable bandages counted")
 equal(bandage.satisfied, true, "bandage above strict threshold")
+local inspected = PNC.ProvisionEvaluator.Inspect(npc)
+equal(inspected.storageAccess, false, "diagnostics storage access state")
+equal(inspected.storageAccessReason, "storage_not_at_base",
+    "diagnostics exposes provision access blocker")
+equal(#inspected.rules, 3, "diagnostics includes every provision rule")
+near(inspected.rules[1].onHand, 0.20,
+    "diagnostics exposes measured carried food")
+local storageMeasurement = PNC.ProvisionEvaluator.MeasureStorage({
+    inventory = {},
+})
+near(storageMeasurement.food.amount, 0.20,
+    "diagnostics exposes colony storage hunger utility")
+near(storageMeasurement.food.calories, 190,
+    "diagnostics exposes colony storage calories")
+near(storageMeasurement.hydration.amount, 0.30,
+    "diagnostics exposes colony storage hydration utility")
+equal(storageMeasurement.bandage.amount, 2,
+    "diagnostics exposes usable medicine count")
 
 candidates[npc.id].FOOD = {
     candidate({ hunger = 0.10, thirst = 0, quantity = 4 }),
@@ -169,6 +217,7 @@ PNC.NPCSupplyService = {
     Process = function(raw, options)
         truthy(options.acquireOnly, "provision acquires only")
         truthy(options.ignorePersonal, "measured personal inventory skipped")
+        truthy(options.force, "provision bypasses need-consumption cooldown")
         local record = records[raw.requesterId]
         record.processed = (record.processed or 0) + 1
         if record.shortage then
@@ -234,9 +283,26 @@ candidates[blocked.id] = { FOOD = {}, HYDRATION = {}, MEDICAL = {} }
 PNC.ProvisionScheduler.MarkDirty(blocked, "food")
 nowMs = 3003
 PNC.ProvisionScheduler.Pump(nowMs)
-equal(blocked.processed, nil, "recent need suppresses provision request")
-equal(PNC.SupplyMetrics.provisionRequestsSuppressedByNeedRequest, 1,
-    "need suppression metric")
+equal(blocked.processed, 1,
+    "recent hunger check does not suppress reserve provisioning")
+
+PNC.ProvisionScheduler.Queue = {}
+PNC.ProvisionScheduler.Queued = {}
+local forced = {
+    id = "npc_forced", alive = true,
+    affiliation = { factionID = faction.id },
+}
+records[forced.id] = forced
+candidates[forced.id] = { FOOD = {}, HYDRATION = {}, MEDICAL = {} }
+local forcedCount, forcedResults =
+    PNC.ProvisionScheduler.ReconcileRecord(forced)
+equal(forcedCount, 3, "forced provision evaluates every configured rule")
+equal(#forcedResults, 3, "forced provision returns one result per rule")
+equal(forcedResults[1].ruleId, "food", "forced result identifies food rule")
+equal(forcedResults[1].attempted, true,
+    "forced result distinguishes an actual storage acquisition attempt")
+equal(forcedResults[1].reason, "acquired",
+    "forced result exposes the acquisition outcome")
 
 PNC.ProvisionScheduler.Queue = {}
 PNC.ProvisionScheduler.Queued = {}

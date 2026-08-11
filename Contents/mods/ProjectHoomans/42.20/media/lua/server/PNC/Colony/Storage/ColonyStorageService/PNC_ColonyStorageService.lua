@@ -9,4 +9,17 @@ require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_Source
 require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_Deposits"
 require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_DebugApi"
 
+function PNC.ColonyStorageService.RecordActivity(storageOrID, event)
+    local storage = type(storageOrID) == "table" and storageOrID
+        or PNC.ColonyStorageService.Internal.Repository.Get(storageOrID)
+    if not storage then return false, "storage_not_found" end
+    local ok, entry = PNC.ColonyStorageService.Internal.Journal.Record(
+        storage, event
+    )
+    if ok then
+        PNC.ColonyStorageService.Internal.Repository.MarkDirty()
+    end
+    return ok, entry
+end
+
 return PNC.ColonyStorageService

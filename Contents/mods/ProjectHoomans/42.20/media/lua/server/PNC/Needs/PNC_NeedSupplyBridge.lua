@@ -33,7 +33,10 @@ function Bridge.RequestForNeed(record, needType, force)
         sourcePolicy = "CURRENT_BASE",
         fulfillment = "INSTANT",
         debug = force == true,
-    }, { force = force == true })
+    }, {
+        force = force == true,
+        personalOnly = true,
+    })
 end
 
 function Bridge.EnsureMedical(record, treatment, partID, force)

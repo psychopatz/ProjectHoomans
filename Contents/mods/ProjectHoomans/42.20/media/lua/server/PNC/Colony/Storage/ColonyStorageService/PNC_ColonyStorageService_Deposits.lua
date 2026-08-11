@@ -30,6 +30,10 @@ function Service.RequestPlayerDeposit(player, args)
     )
     if not ok then
         Service.Metrics.transferFailures = Service.Metrics.transferFailures + 1
+    else
+        Internal.RecordActivity(storage, "STORE",
+            Internal.PlayerName(player), Internal.NativeItemSpecs(items),
+            args.reason)
     end
     return finish(ok, why, details, storage)
 end
@@ -63,6 +67,7 @@ function Service.RequestPlayerWithdrawal(player, args)
     if quantity > maxQuantity then
         return finish(false, "invalid_quantity", nil, storage)
     end
+    local activityItems = Internal.StorageSelectionSpecs(storage, selections)
     local owner = "player:" .. tostring(player and player.getUsername
         and player:getUsername() or player)
     local source
@@ -88,6 +93,8 @@ function Service.RequestPlayerWithdrawal(player, args)
         return finish(false, reason, nil, storage)
     end
     Internal.CommitStorage(storage)
+    Internal.RecordActivity(storage, "TAKE", Internal.PlayerName(player),
+        activityItems, args.reason)
     Service.Metrics.withdrawals = Service.Metrics.withdrawals + 1
     return finish(true, "withdrawn", { quantity = quantity }, storage)
 end
@@ -139,6 +146,12 @@ function Service.RequestNPCDeposit(player, args)
     )
     if not ok then
         Service.Metrics.transferFailures = Service.Metrics.transferFailures + 1
+    else
+        Internal.RecordActivity(storage, "STORE",
+            tostring(record.name or record.id), {{
+                fullType = item.type,
+                quantity = quantity,
+            }}, args.reason)
     end
     return finish(ok, why, details, storage, record)
 end

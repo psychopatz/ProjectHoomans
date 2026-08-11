@@ -31,6 +31,7 @@ PNC.SupplyMetrics = PNC.SupplyMetrics or {
     provisionRequestsSuppressedByNeedRequest = 0,
     provisionSchedulerQueueSize = 0,
     provisionSchedulerProcessed = 0,
+    provisionAuditedNPCs = 0,
     provisionStorageShortages = 0,
 }
 

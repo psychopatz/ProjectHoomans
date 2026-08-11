@@ -163,14 +163,7 @@ function Debug.PerformAction(args)
                 and copy(supply.byKind[kind].candidateScores) or {}
             ok, reason = true, "candidate_scores_dumped"
         elseif operation == "force_provision_evaluation" then
-            PNC.ProvisionScheduler.MarkAllDirty(owner)
-            local slices = math.ceil(#PNC.ProvisionRuleRegistry.List()
-                / PNC.ProvisionScheduler.MAX_PER_SLICE)
-            for index = 1, slices do
-                PNC.ProvisionScheduler.Pump(
-                    PNC.Core.Now() + index * 1001
-                )
-            end
+            PNC.ProvisionScheduler.ReconcileRecord(owner)
             ok, reason = true, "provision_evaluated"
         elseif operation == "mark_provision_dirty" then
             PNC.ProvisionScheduler.MarkAllDirty(owner)

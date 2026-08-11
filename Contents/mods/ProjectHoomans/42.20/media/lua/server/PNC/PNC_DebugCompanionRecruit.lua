@@ -177,6 +177,20 @@ local function forceFollow(record, player, reason)
     end
 end
 
+local function preserveOwnedState(record, player, reason)
+    record.recruited = true
+    record.faction = Const.FACTION_COLONIST
+    if not record.ownerUsername and player and player.getUsername then
+        record.ownerUsername = player:getUsername()
+    end
+    if record.ownerOnlineID == nil and player and player.getOnlineID then
+        record.ownerOnlineID = player:getOnlineID()
+    end
+    if Registry.MarkDirty then
+        Registry.MarkDirty(record, reason or "companion_membership_repair")
+    end
+end
+
 -- Recruitment crosses three authoritative stores: the NPC record, faction
 -- membership, and community membership. Commit all three at the successful
 -- boundary so a restart cannot expose a half-recruited NPC or recreate the
@@ -241,12 +255,19 @@ function Recruit.Assign(player, record, args)
         return false, reason or "community_assignment_failed"
     end
     local source = tostring(args.source or "companion_recruit")
-    forceFollow(record, player, source)
+    if args.preserveOrder == true then
+        preserveOwnedState(record, player, source)
+    else
+        forceFollow(record, player, source)
+    end
     if PNC.Network and PNC.Network.BroadcastRecord then
         PNC.Network.BroadcastRecord(record, source)
     end
     if PNC.IndividualNeeds and PNC.IndividualNeeds.Ensure then
         PNC.IndividualNeeds.Ensure(record)
+    end
+    if PNC.ProvisionScheduler and PNC.ProvisionScheduler.MarkAllDirty then
+        PNC.ProvisionScheduler.MarkAllDirty(record)
     end
     if args.endConversation ~= false
         and PNC.ConversationScene and PNC.ConversationScene.End
@@ -265,6 +286,33 @@ function Recruit.Assign(player, record, args)
         communityID = community.id,
         communityCreated = communityCreated == true,
     }
+end
+
+function Recruit.ReconcileOwned(player, record)
+    if not player or not record or record.alive == false then
+        return false, "npc_not_found"
+    end
+    if not PNC.CompanionCommands
+        or not PNC.CompanionCommands.IsOwnedByPlayer
+        or not PNC.CompanionCommands.IsOwnedByPlayer(record, player)
+    then
+        return false, "npc_not_owned"
+    end
+    local playerFaction = Factions.GetPlayerFaction(player)
+    local npcFaction = Factions.GetNPCFaction(record.id)
+    local community = PNC.Communities
+        and PNC.Communities.GetNPCCommunity
+        and PNC.Communities.GetNPCCommunity(record.id) or nil
+    if playerFaction and npcFaction and npcFaction.id == playerFaction.id
+        and community and community.factionID == playerFaction.id
+    then
+        return true, "unchanged"
+    end
+    return Recruit.Assign(player, record, {
+        source = "companion_membership_repair",
+        endConversation = false,
+        preserveOrder = true,
+    })
 end
 
 function Recruit.Try(player, args)

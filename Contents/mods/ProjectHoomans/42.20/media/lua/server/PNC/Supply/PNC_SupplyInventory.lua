@@ -40,17 +40,23 @@ function SupplyInventory.AddCoreRecords(record, records, reason)
     local body = liveBody(record)
     local physical
     local physicalItems = {}
+    local physicalProjectionMissing = false
     if body then
         physical, why = CoreInventory.wrapPhysicalInventory(body:getInventory())
-        if not physical then return false, why end
-        for index = 1, #records do
-            local ok, added = physical:add(records[index])
-            if not ok then
-                removeNativeList(physical, physicalItems)
-                return false, added
-            end
-            for itemIndex = 1, #added do
-                physicalItems[#physicalItems + 1] = added[itemIndex]
+        if not physical then
+            physicalProjectionMissing = true
+        else
+            for index = 1, #records do
+                local ok, added = physical:add(records[index])
+                if not ok then
+                    removeNativeList(physical, physicalItems)
+                    physicalItems = {}
+                    physicalProjectionMissing = true
+                    break
+                end
+                for itemIndex = 1, #added do
+                    physicalItems[#physicalItems + 1] = added[itemIndex]
+                end
             end
         end
     end
@@ -65,6 +71,7 @@ function SupplyInventory.AddCoreRecords(record, records, reason)
     return true, "added", {
         itemIDs = itemIDs,
         physicalItems = physicalItems,
+        physicalProjectionMissing = physicalProjectionMissing,
         records = records,
     }
 end
@@ -76,6 +83,7 @@ function SupplyInventory.CreateDestination(record, reason)
             PNC.Inventory.EnsureRecordInventory(record)
         ),
         physicalItems = {},
+        physicalProjectionMissing = false,
         rolledBack = false,
     }
     function destination:add(coreRecord)
@@ -87,6 +95,8 @@ function SupplyInventory.CreateDestination(record, reason)
             self.physicalItems[#self.physicalItems + 1] =
                 details.physicalItems[index]
         end
+        self.physicalProjectionMissing = details.physicalProjectionMissing
+            or self.physicalProjectionMissing
         return true, details
     end
     function destination:remove()
@@ -198,26 +208,41 @@ function SupplyInventory.Consume(record, itemID, request)
     local ops, remainingUses = canonicalConsumptionOps(item, descriptor)
     local body = liveBody(record)
     local physicalUndo
+    local physicalProjectionMissing = false
     if body then
         local candidates = nativeCandidates(body, item)
         local selected = candidates[1]
-        if not selected then return false, "physical_item_missing" end
-        local adapter = CoreInventory.wrapPhysicalInventory(selected.container)
-        if descriptor.hydration and descriptor.useDelta > 0
-            and remainingUses > 0.0001
-        then
-            local before = selected.item.getUsedDelta
-                and selected.item:getUsedDelta() or tonumber(item.uses) or 1
-            if not selected.item.setUsedDelta then
-                return false, "physical_drainable_unavailable"
+        if selected then
+            local adapter = CoreInventory.wrapPhysicalInventory(
+                selected.container
+            )
+            if descriptor.hydration and descriptor.useDelta > 0
+                and remainingUses > 0.0001
+            then
+                local before = selected.item.getUsedDelta
+                    and selected.item:getUsedDelta()
+                    or tonumber(item.uses) or 1
+                if not selected.item.setUsedDelta then
+                    return false, "physical_drainable_unavailable"
+                end
+                selected.item:setUsedDelta(remainingUses)
+                physicalUndo = function()
+                    selected.item:setUsedDelta(before)
+                end
+            else
+                if not adapter:_nativeRemove(selected.item) then
+                    return false, "physical_remove_failed"
+                end
+                physicalUndo = function()
+                    adapter:_nativeAdd(selected.item)
+                end
             end
-            selected.item:setUsedDelta(remainingUses)
-            physicalUndo = function() selected.item:setUsedDelta(before) end
         else
-            if not adapter:_nativeRemove(selected.item) then
-                return false, "physical_remove_failed"
-            end
-            physicalUndo = function() adapter:_nativeAdd(selected.item) end
+            -- Compact inventory is the authoritative persisted state. A live
+            -- body can briefly lack its projected native item after spawning
+            -- or reconciliation; rejecting here permanently blocks needs on
+            -- the same otherwise-valid personal candidate.
+            physicalProjectionMissing = true
         end
     end
     local applied = PNC.Inventory.ApplyDelta(
@@ -239,6 +264,7 @@ function SupplyInventory.Consume(record, itemID, request)
         fullType = descriptor.fullType,
         typeId = descriptor.typeId,
         remainingUses = remainingUses,
+        physicalProjectionMissing = physicalProjectionMissing,
     }
     effect.undo = function()
         record.inventory = inventoryUndo

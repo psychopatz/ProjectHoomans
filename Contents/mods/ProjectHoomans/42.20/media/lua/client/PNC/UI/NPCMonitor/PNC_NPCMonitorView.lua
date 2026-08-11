@@ -139,6 +139,7 @@ function View.CreateChildren(window)
         { "map_marker", "UI_PNC_MonitorMapMarker", "Map Marker", ISPNCNPCMonitor.onMapMarker, "default" },
         { "equipment", "UI_PNC_MonitorEquipment", "Equipment", ISPNCNPCMonitor.onEquipment, "default" },
         { "relationships", "UI_PNC_MonitorRelationships", "Relationships", ISPNCNPCMonitor.onRelationships, "default" },
+        { "provision_stats", "UI_PNC_MonitorProvisionStats", "Provision Stats", ISPNCNPCMonitor.onProvisionDiagnostics, "selected" },
         { "audit", "UI_PNC_MonitorAuditBodies", "Audit Bodies", ISPNCNPCMonitor.onAudit, "warning" },
         { "refresh", "UI_PNC_MonitorRefresh", "Refresh", ISPNCNPCMonitor.onRefresh, "quiet" },
         { "overlay_ai", nil, overlayButtonTitle("ai"), ISPNCNPCMonitor.onOverlayType, "quiet", "ai" },

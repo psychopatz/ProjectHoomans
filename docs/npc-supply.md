@@ -17,9 +17,17 @@ Requests are runtime-only while fulfillment is instant.
 policy. `PHYSICAL` is a recognized boundary and currently returns
 `physical_fulfillment_unavailable`; Needs callers do not depend on the policy.
 
-Every operation checks the compact NPC inventory first. Storage is resolved
-only for an NPC whose faction and active community own the primary storage and
-whose current position is inside that community's home radius.
+Every operation checks the compact NPC inventory first. Storage resolution is
+centralized in `PNC_StorageAccessPolicy`. Its current default mode is
+`VIRTUAL_COLONY`: a canonical member of the owning active community can access
+its primary storage regardless of world position because physical colony bases
+are not implemented yet. Faction/community/storage ownership is still enforced.
+
+When physical bases are implemented, call
+`PNC.StorageAccessPolicy.SetAccessMode(PNC.StorageAccessPolicy.MODE.PHYSICAL_HOME)`.
+That switches the same resolution boundary to the existing community-home
+radius check; provision evaluation, selection, reservation, inventory transfer,
+and consumption require no changes.
 
 ## Item discovery and selection
 
@@ -44,8 +52,11 @@ withdrawal. The PsychopatzCore reservation token retains its state predicate so
 FEFO does not reserve one state and remove another instance of the same type.
 All reservations are released on failure. Committed compact records are added
 to the NPC inventory; live NPCs are also materialized through the physical
-adapter. Destination failure restores storage and removes partial physical
-materialization.
+adapter. The compact inventory is authoritative: a temporary native-item
+factory/projection failure is recorded as `physicalProjectionMissing` but does
+not roll back a valid provision. Any partial native projection is removed, and
+the normal spawn/reconciliation boundary can project the compact item later.
+Actual compact destination failures still restore storage atomically.
 
 Consumption happens afterward. Live food, water, and bandages mutate the native
 InventoryItem before the canonical compact mutation. Hydration reduces the
@@ -82,8 +93,8 @@ suppressed retries, and delta mutations/compactions/promotions.
 
 ## Future physical fulfillment
 
-The next step is an execution policy implementing `PHYSICAL`: retain the
-reservation, create an acquisition job containing the semantic request and
-reservation token, travel to the resolved storage, transfer through the same
-inventory adapter, then commit. Needs, selectors, access policy, and item-use
-code do not need redesign.
+The next step is an execution policy implementing `PHYSICAL`: enable
+`PHYSICAL_HOME`, retain the reservation, create an acquisition job containing
+the semantic request and reservation token, travel to the resolved storage,
+transfer through the same inventory adapter, then commit. Needs, selectors,
+and item-use code do not need redesign.
