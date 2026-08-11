@@ -317,6 +317,7 @@ end
 -- the path every frame.
 function Animation.SyncNativeLocomotionStyle(zombie, record)
     local runtime
+    local navigation
     local path
     local profile
     local moveAnim
@@ -333,6 +334,7 @@ function Animation.SyncNativeLocomotionStyle(zombie, record)
         return false
     end
     runtime = record and record.runtime or nil
+    navigation = runtime and runtime.localNavigation or nil
     path = runtime and runtime.pathing or nil
     profile = path and path.motionProfile or nil
     moveAnim = profile and profile.moveAnim
@@ -387,7 +389,17 @@ function Animation.SyncNativeLocomotionStyle(zombie, record)
         zombie:setVariable("PNCMoving", nativeMoving == true)
     end
     applyWalkType(zombie, engineWalkType, animSpeed)
-    setManagedUseless(zombie, false, true)
+    -- Manual Behavior2 movement follows Bandits' SP body mode: keep the
+    -- IsoZombie useless so its normal Java update cannot concurrently consume
+    -- path2 and force WalkTowardState. Client-delegated MP movement still
+    -- requires a useful body because PathFindState is the movement owner.
+    if navigation
+        and navigation.controllerMode == "behavior2_move"
+    then
+        setManagedUseless(zombie, true, false)
+    else
+        setManagedUseless(zombie, false, true)
+    end
 end
 
 function Animation.ApplyLiveSetup(zombie, record)

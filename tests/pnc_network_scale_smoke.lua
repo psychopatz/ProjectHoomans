@@ -638,6 +638,19 @@ sent = {}
 PNC.Network.BroadcastRecord(nearbyRecord, "tick")
 assertEqual(#sent, 8, "interest recipients did not switch")
 
+local loopbackEvents = 0
+triggerEvent = function()
+    loopbackEvents = loopbackEvents + 1
+end
+isServer = function() return false end
+PNC.Network.BroadcastRecord(nearbyRecord, "tick")
+assertEqual(loopbackEvents, 0,
+    "single-player rebuilt a periodic network tick payload")
+PNC.Network.BroadcastRecord(nearbyRecord, "materialize")
+assertEqual(loopbackEvents, 1,
+    "single-player explicit mutation event lost its local notification")
+isServer = function() return true end
+
 nearbyRecord.ownerUsername = "player_16"
 nearbyRecord.x = 1
 assertEqual(PNC.Network.CanViewCharacter(players[1], nearbyRecord), true, "nearby detail access")

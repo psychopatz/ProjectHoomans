@@ -9,7 +9,7 @@ PNC = {
     EnginePathPlanner = {
         CanUseNativePath = function(body)
             if body and body.nativeUnsafe == true then
-                return false, "native_body_damage_unavailable"
+                return false, "native_behavior_unavailable"
             end
             return true
         end,
@@ -59,10 +59,10 @@ local unsafePolicy, unsafeProvider = PNC.NavigationRouter.Resolve(
     nil,
     { nativeUnsafe = true }
 )
-assert(unsafePolicy == "local" and unsafeProvider == "direct",
-    "unsafe humanized body did not select direct fallback")
+assert(unsafePolicy == "local" and unsafeProvider == "engine_path",
+    "body without a native behavior escaped unified native ownership")
 assert(unsafeRecord.runtime.navigationRouter.lastFallbackReason
-        == "native_body_damage_unavailable",
+        == "native_behavior_unavailable",
     "router did not retain native fallback reason")
 
 local travelRecord = {

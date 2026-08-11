@@ -1,8 +1,9 @@
 --[[
-    Uses Project Zomboid's native PathFindBehavior2 for the short, complicated
-    routes that fake locomotion cannot solve reliably and for meaningful
-    movement. Fake locomotion remains the fallback for sub-tile corrections,
-    unavailable native routes, and committed attack animation leases.
+    Unified native movement ownership based on Bandits' proven split:
+    single-player directly advances PathFindBehavior2 (Move), while dedicated
+    multiplayer publishes a goal for the nearest client character wrapper
+    (GoTo). Scripted traversal owns passages the zombie pathfinder cannot
+    safely enter. Embodied movement never falls back to setX/setY stepping.
 ]]
 
 PNC = PNC or {}
@@ -14,7 +15,7 @@ local Core = PNC.Core
 local Const = PNC.Const or {}
 
 function Planner.CanUseNativePath(body)
-    if not body or not body.pathToLocationF then
+    if not body then
         return false, "native_path_unavailable"
     end
     -- Dedicated authority publishes the destination without entering a local
@@ -22,13 +23,17 @@ function Planner.CanUseNativePath(body)
     if Internal.IsMultiplayerAuthority
         and Internal.IsMultiplayerAuthority()
     then
+        if not body.pathToLocationF then
+            return false, "native_path_unavailable"
+        end
         return true
     end
-    -- Humanized IsoZombie bodies can legitimately have no BodyDamage object.
-    -- Build 42's ClimbOverFenceState dereferences it unconditionally, so a
-    -- native route that selects a fence would throw from IsoWorld.update.
-    if body.getBodyDamage and body:getBodyDamage() == nil then
-        return false, "native_body_damage_unavailable"
+    local behavior = Internal.GetPathBehavior(body)
+    if not behavior
+        or not behavior.pathToLocation
+        or not behavior.update
+    then
+        return false, "native_behavior_unavailable"
     end
     return true
 end
@@ -46,6 +51,31 @@ local function targetDriftSquared(navigation, finalTarget)
     local dx = targetX - requestX
     local dy = targetY - requestY
     return (dx * dx) + (dy * dy)
+end
+
+local function handoffUpcomingPassage(record, body, navigation)
+    local handled
+    local state
+    if not Internal.StageUpcomingPathPassage
+        or not Internal.StageUpcomingPathPassage(
+            record,
+            body,
+            navigation
+        )
+    then
+        return false, nil
+    end
+    -- Stop Behavior2 before its next update can queue one of the vanilla
+    -- climb states. Those states dereference BodyDamage during enter(), so an
+    -- exception there would prevent any post-update recovery from running.
+    Internal.ClearEngineRequest(body, navigation)
+    if PNC.PathService and PNC.PathService.Pump then
+        handled, state = PNC.PathService.Pump(record, body)
+        return true, state or (handled
+            and "native_passage_handoff"
+            or "native_passage_waiting")
+    end
+    return true, "native_passage_waiting"
 end
 
 local function beginRequest(body, finalTarget, navigation, now, reason)
@@ -66,16 +96,21 @@ local function beginRequest(body, finalTarget, navigation, now, reason)
     local x = tonumber(finalTarget.x) or body:getX()
     local y = tonumber(finalTarget.y) or body:getY()
     local z = tonumber(finalTarget.z) or body:getZ()
-    -- Build 42 assigns multiplayer zombie simulation to a client. The
-    -- dedicated server publishes the goal and observes the replicated body;
-    -- it must not create a second native path controller. In SP and on the
-    -- owning MP client, pathToLocationF enters PathFindState and the engine
-    -- exclusively advances PathFindBehavior2.
+    -- Bandits' SP Move action submits and updates PathFindBehavior2 directly.
+    -- This avoids PathFindState selecting ClimbOverFenceState, whose B42
+    -- implementation assumes a BodyDamage object that humanized zombies lack.
+    -- Dedicated MP remains goal-only; the nearest client owns its GoTo call.
     if not multiplayerAuthority then
-        body:pathToLocationF(x, y, z)
+        local behavior = Internal.GetPathBehavior(body)
+        behavior:pathToLocation(x, y, z)
     end
     navigation.requestPending = true
     navigation.nativeActive = true
+    navigation.controllerMode = multiplayerAuthority
+        and "client_goto" or "behavior2_move"
+    navigation.lastBehaviorResult = nil
+    navigation.lastBehaviorUpdateAt = multiplayerAuthority
+        and 0 or now
     navigation.clientDelegated =
         multiplayerAuthority == true
     navigation.requestRevision =
@@ -95,8 +130,20 @@ local function beginRequest(body, finalTarget, navigation, now, reason)
     navigation.lastObservedZ = body:getZ()
     navigation.lastPhysicalProgressAt = now
     navigation.lastPlanReason = reason or "native_request"
-    navigation.steeringKind = "engine_native"
+    navigation.steeringKind = multiplayerAuthority
+        and "engine_native_client"
+        or "engine_native_behavior2"
     Internal.SetServerMovementLease(body, navigation, true)
+    if not multiplayerAuthority then
+        local handedOff = handoffUpcomingPassage(
+            navigation.record,
+            body,
+            navigation
+        )
+        if handedOff then
+            return true
+        end
+    end
     return true
 end
 
@@ -114,7 +161,7 @@ function Planner.GetSteeringTarget(record, body, finalTarget)
         Internal.ClearEngineRequest(body, navigation)
         navigation.lastPlanReason = unsafeReason
         navigation.plannedAt = now
-        navigation.steeringKind = "safe_direct_fallback"
+        navigation.steeringKind = "native_unavailable"
         return finalTarget
     end
     local replanMs = math.max(
@@ -173,7 +220,10 @@ function Planner.GetSteeringTarget(record, body, finalTarget)
                     (tonumber(navigation.deferredPlans) or 0) + 1
             end
         end
-        navigation.steeringKind = "engine_native"
+        navigation.steeringKind = navigation.controllerMode
+            == "behavior2_move"
+            and "engine_native_behavior2"
+            or "engine_native_client"
         return finalTarget
     end
 
@@ -184,9 +234,8 @@ function Planner.GetSteeringTarget(record, body, finalTarget)
         return finalTarget
     end
 
-    -- Starting a fresh fake-locomotion lane deliberately resets every native
-    -- path controller. Wait until that lane is active so this asynchronous
-    -- request cannot be cancelled later in the same authority tick.
+    -- Wait until PathService has committed the movement lane so a behavior
+    -- change cannot cancel a native request later in the same authority tick.
     local lane = record.runtime and record.runtime.pathing or nil
     if not lane or lane.phase ~= "active" then
         navigation.lastPlanReason = "native_waiting_for_move_lane"
@@ -258,9 +307,16 @@ function Planner.Pump(record, body, source)
         return true, navigation.lastPlanReason
     end
 
-    if not body or not body.pathToLocationF then
+    local behavior = Internal.GetPathBehavior(body)
+    if navigation.controllerMode == "behavior2_move"
+        and (
+            not behavior
+            or not behavior.pathToLocation
+            or not behavior.update
+        )
+    then
         Internal.ClearEngineRequest(body, navigation)
-        navigation.lastPlanReason = "native_path_api_unavailable"
+        navigation.lastPlanReason = "native_behavior_unavailable"
         navigation.planFailures =
             (tonumber(navigation.planFailures) or 0) + 1
         return true, "engine_path_failed"
@@ -273,6 +329,54 @@ function Planner.Pump(record, body, source)
         navigation.planFailures = 0
         navigation.completedAt = now
         return true, "engine_path_succeeded"
+    end
+
+    -- Match Bandits Move.onWorking: the zombie update event is the sole
+    -- PathFindBehavior2 update owner. The scheduled path pump may observe,
+    -- interact with passages, and publish state, but never advances A* a
+    -- second time in the same frame.
+    if navigation.controllerMode == "behavior2_move"
+        and source == "zombie_update"
+        and (tonumber(navigation.lastBehaviorUpdateAt) or 0) ~= now
+    then
+        -- Inspect the already-built route before advancing Java. This is the
+        -- critical fence/window interception point: doing it only afterward
+        -- is too late when ClimbOverFenceState.enter() itself throws.
+        local handedOff
+        local handoffResult
+        handedOff, handoffResult = handoffUpcomingPassage(
+            record,
+            body,
+            navigation
+        )
+        if handedOff then
+            return true, handoffResult
+        end
+        local result = behavior:update()
+        navigation.lastBehaviorResult = result
+        navigation.lastBehaviorUpdateAt = now
+        if Internal.ResultMatches(result, "Failed") then
+            Internal.ClearEngineRequest(body, navigation)
+            navigation.lastPlanReason = "native_behavior_failed"
+            navigation.planFailures =
+                (tonumber(navigation.planFailures) or 0) + 1
+            return true, "engine_path_failed"
+        end
+        if Internal.ResultMatches(result, "Succeeded") then
+            Internal.ClearEngineRequest(body, navigation)
+            navigation.lastPlanReason = "native_behavior_succeeded"
+            navigation.planFailures = 0
+            navigation.completedAt = now
+            return true, "engine_path_succeeded"
+        end
+        handedOff, handoffResult = handoffUpcomingPassage(
+            record,
+            body,
+            navigation
+        )
+        if handedOff then
+            return true, handoffResult
+        end
     end
 
     local traversalState =
@@ -385,11 +489,20 @@ function Planner.Pump(record, body, source)
         )
         return true, navigation.lastPlanReason
     end
-    navigation.requestPending =
-        not hasPath and movementState == "pathfind"
-    navigation.lastPlanReason = navigation.requestPending
-        and "native_path_pending" or "native_path_moving"
-    navigation.steeringKind = "engine_native"
+    navigation.requestPending = navigation.controllerMode
+        == "behavior2_move"
+        and not hasPath
+        or (not hasPath and movementState == "pathfind")
+    if navigation.controllerMode == "behavior2_move" then
+        navigation.lastPlanReason = navigation.requestPending
+            and "native_behavior_pending"
+            or "native_behavior_moving"
+        navigation.steeringKind = "engine_native_behavior2"
+    else
+        navigation.lastPlanReason = navigation.requestPending
+            and "native_path_pending" or "native_path_moving"
+        navigation.steeringKind = "engine_native"
+    end
     return true, navigation.lastPlanReason
 end
 
@@ -401,6 +514,30 @@ function Planner.PumpFrame(record, body)
         and record.runtime.pathing or nil
     if not lane or lane.phase ~= "active" then
         return false, "move_lane_inactive"
+    end
+    local navigation = record and record.runtime
+        and record.runtime.localNavigation or nil
+    if (lane.traversalAction or lane.blockedStepToX ~= nil)
+        and PNC.PathService
+        and PNC.PathService.Pump
+    then
+        -- The ordinary scheduler is intentionally throttled; advance the
+        -- short scripted crossing on zombie frames for smooth motion and keep
+        -- Behavior2 dormant until the action has completely released.
+        return PNC.PathService.Pump(record, body)
+    end
+    if navigation
+        and navigation.controllerMode == "behavior2_move"
+        and Internal.IsBodyCollided
+        and Internal.IsBodyCollided(body)
+    then
+        -- Do not run Behavior2 again at contact. Let the path service cancel
+        -- native ownership and begin its BodyDamage-safe scripted passage on
+        -- this same zombie-update frame.
+        if PNC.PathService and PNC.PathService.Pump then
+            return PNC.PathService.Pump(record, body)
+        end
+        return true, "native_collision_waiting"
     end
     return Planner.Pump(record, body, "zombie_update")
 end

@@ -118,7 +118,8 @@ function Internal.startRequestedMove(zombie, record, lane)
     if (not preserveVisualMotion) and Internal.MotionHints and Internal.MotionHints.Clear then
         Internal.MotionHints.Clear(lane)
     end
-    lane.ownerMode = "fake_locomotion"
+    lane.ownerMode = lane.navigationProvider == "engine_path"
+        and "engine_path" or "fake_locomotion"
     Internal.setLanePhase(record, lane, "active", "started")
     Internal.logMoveTransition(record, zombie, lane, "request_issued", "started")
     return true, "started"
@@ -248,11 +249,22 @@ function Internal.updateActiveMove(zombie, record, lane)
     Internal.refreshResolvedLocomotion(record, lane, zombie, goal)
     lane.lastActionState = Internal.getActionStateName(zombie)
     if Internal.tryDoorOrWindowInteraction
-        and Internal.hasClosedPassageToward
-        and Internal.hasClosedPassageToward(zombie, goal.x, goal.y, goal.z)
+        and (
+            lane.blockedStepToX ~= nil
+            or Internal.hasClosedPassageToward
+                and Internal.hasClosedPassageToward(
+                    zombie,
+                    goal.x,
+                    goal.y,
+                    goal.z
+                )
+        )
     then
         interacted, interactType = Internal.tryDoorOrWindowInteraction(zombie, record, lane, goal.x, goal.y, goal.z)
         if interacted then
+            if Internal.clearBlockedStep then
+                Internal.clearBlockedStep(lane)
+            end
             lane.lastIssueAt = now
             lane.lastProgressAt = now
             lane.noProgressCount = 0
@@ -283,6 +295,9 @@ function Internal.updateActiveMove(zombie, record, lane)
     then
         interacted, interactType = Internal.tryDoorOrWindowInteraction(zombie, record, lane, goal.x, goal.y, goal.z)
         if interacted then
+            if Internal.clearBlockedStep then
+                Internal.clearBlockedStep(lane)
+            end
             lane.lastIssueAt = now
             lane.lastProgressAt = now
             lane.noProgressCount = 0
@@ -316,6 +331,9 @@ function Internal.updateActiveMove(zombie, record, lane)
     then
         interacted, interactType = Internal.tryDoorOrWindowInteraction(zombie, record, lane, goal.x, goal.y, goal.z)
         if interacted then
+            if Internal.clearBlockedStep then
+                Internal.clearBlockedStep(lane)
+            end
             lane.lastIssueAt = now
             lane.noProgressCount = 0
             if interactType == "fence_climb" then
@@ -610,7 +628,14 @@ function PathService.Pump(record, zombie)
 
     lane = Internal.ensureMoveLane(record)
     now = Internal.Core.Now()
-    if Internal.repairInvalidBodyPosition then
+    -- A scripted window/fence crossing intentionally interpolates through a
+    -- normally solid edge. Running generic unstuck recovery during that lease
+    -- repeatedly teleports the body to the landing tile, after which the next
+    -- traversal frame places it back inside the edge (the live log showed five
+    -- recoveries during one window climb).
+    if not lane.traversalAction
+        and Internal.repairInvalidBodyPosition
+    then
         positionRepaired = Internal.repairInvalidBodyPosition(
             record,
             zombie,
@@ -687,6 +712,35 @@ function PathService.Pump(record, zombie)
         local enginePlanner = PNC.EnginePathPlanner
         local nativeNavigation = record.runtime
             and record.runtime.localNavigation or nil
+        local scriptedPassageOwner = lane.traversalAction ~= nil
+            or lane.blockedStepToX ~= nil
+            or (
+                Internal.LiveBodyControl
+                and Internal.LiveBodyControl.IsMultiplayer
+                and not Internal.LiveBodyControl.IsMultiplayer()
+                and (
+                    Internal.isDoorCollision
+                    and Internal.isDoorCollision(zombie)
+                    or Internal.hasClosedPassageToward
+                    and lane.goal
+                    and Internal.hasClosedPassageToward(
+                        zombie,
+                        lane.goal.x,
+                        lane.goal.y,
+                        lane.goal.z
+                    )
+                )
+            )
+        -- Bandits resolves collisions before processing its Move task. Preserve
+        -- that ordering: scripted passage ownership must advance or acquire
+        -- the obstacle before any new Behavior2 request can be submitted.
+        if scriptedPassageOwner then
+            return Internal.updateActiveMove(
+                zombie,
+                record,
+                lane
+            )
+        end
         if lane.navigationProvider == "engine_path"
             and enginePlanner
             and enginePlanner.GetSteeringTarget
@@ -741,6 +795,9 @@ function PathService.Pump(record, zombie)
                         lane.goal.z
                     )
                 if passageInteracted then
+                    if Internal.clearBlockedStep then
+                        Internal.clearBlockedStep(lane)
+                    end
                     if enginePlanner.Invalidate then
                         enginePlanner.Invalidate(
                             record,
@@ -853,6 +910,17 @@ function PathService.Pump(record, zombie)
                 end
                 return true, nativeState
             end
+        end
+        -- Native policies have one transport owner. A deferred, failed, or
+        -- retrying engine request must remain stationary until it is
+        -- resubmitted; falling through here would silently reactivate the old
+        -- Lua setX/setY controller and duplicate collision/path work.
+        if lane.navigationProvider == "engine_path" then
+            lane.ownerMode = "engine_path_waiting"
+            if now >= (tonumber(lane.visualMovingUntil) or 0) then
+                Internal.applyHoldAnimation(zombie, record, lane)
+            end
+            return true, "native_waiting"
         end
         return Internal.updateActiveMove(zombie, record, lane)
     end

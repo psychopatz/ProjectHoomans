@@ -200,19 +200,7 @@ toSquare.getWindowTo = function(_, other)
     if other == fromSquare then return window end
     return nil
 end
-lane = {}
-interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
-    zombie, { id = "proactive_window_test" }, lane, 2.5, 0.5, 0
-)
-assertEqual(interacted, true, "goal-directed passage probe opens nearby window")
-assertEqual(interaction, "window_open", "proactive window interaction")
-assertEqual(windowOpened, true, "proactive window state")
-
-local windowSmashed = false
-windowOpened = false
-window.isPermaLocked = function() return true end
-window.isSmashed = function() return windowSmashed end
-window.smashWindow = function() windowSmashed = true end
+PNC.PathService.Internal.isSquareWalkable = function() return true end
 PNC.PathService.Internal.beginTraversalAction = function(
     _,
     _,
@@ -222,6 +210,21 @@ PNC.PathService.Internal.beginTraversalAction = function(
     activeLane.testTraversalSpec = spec
     return true
 end
+lane = {}
+interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
+    zombie, { id = "proactive_window_test" }, lane, 2.5, 0.5, 0
+)
+assertEqual(interacted, true, "goal-directed passage probe opens nearby window")
+assertEqual(interaction, "window_climb", "opened window transfers directly to traversal")
+assertEqual(windowOpened, true, "proactive window state")
+assertEqual(lane.testTraversalSpec.kind, "window_climb",
+    "opened window did not acquire scripted traversal")
+
+local windowSmashed = false
+windowOpened = false
+window.isPermaLocked = function() return true end
+window.isSmashed = function() return windowSmashed end
+window.smashWindow = function() windowSmashed = true end
 lane = {}
 interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
     zombie, { id = "window_break_test" }, lane, 2.5, 0.5, 0

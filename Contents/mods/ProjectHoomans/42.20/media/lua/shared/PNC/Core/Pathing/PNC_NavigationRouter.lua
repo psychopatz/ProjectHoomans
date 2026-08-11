@@ -5,10 +5,10 @@
     coordinator. A provider may adjust a steering target or ask PathService for
     a bounded native-engine movement handoff.
 
-    The direct provider is intentionally a no-op fallback. Meaningful movement
-    uses the native engine controller across local, travel, and combat
-    policies. SP may retain allocation-free sub-tile corrections; MP always
-    keeps a single client-native movement owner.
+    The direct provider remains available only as an explicit legacy policy.
+    It is never selected automatically. All normal embodied movement,
+    including unavailable/retrying requests and sub-tile corrections, stays
+    on one native movement lane.
 ]]
 
 PNC = PNC or {}
@@ -119,9 +119,6 @@ function Router.Resolve(record, reason, options, body)
         local nativeSafe
         nativeSafe, fallbackReason =
             planner.CanUseNativePath(body)
-        if not nativeSafe then
-            providerName = Router.DIRECT_PROVIDER
-        end
     end
     local state = ensureState(record)
     if state and (

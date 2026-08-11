@@ -256,6 +256,16 @@ function Network.BroadcastRecord(record, eventName)
     if not Core.IsAuthority() then
         return
     end
+    -- Single-player shares the authoritative registry and live body with its
+    -- UI; rebuilding and loopback-dispatching a presence payload every sync
+    -- interval has no consumer-side value. Keep explicit mutation events for
+    -- existing UI hooks, but remove the high-frequency tick payload and its
+    -- observed 11-15 ms BuildPayload spikes.
+    if eventName == "tick"
+        and (not isServer or isServer() ~= true)
+    then
+        return
+    end
     Internal.QueueBroadcastRoster(record, eventName)
     recipients = Internal.CollectRecordRecipients(record)
     if isServer and isServer() and #recipients <= 0 then return end

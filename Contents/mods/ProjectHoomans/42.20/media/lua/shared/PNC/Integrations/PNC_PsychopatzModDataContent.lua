@@ -7,6 +7,7 @@ local Content = PNC.ModDataProfilerContent
 -- the game thread. Live records sort first; explicit scans still report the
 -- total record count and truncation state.
 local MAX_NPCS = 12
+local MAX_ROSTER = 100
 local MAX_NODES = 120
 local MAX_DEPTH = 6
 local MAX_STRING = 120
@@ -60,7 +61,43 @@ local function recordName(record)
         or identity and identity.displayName or "Unknown NPC")
 end
 
-function Content.Scan()
+local function selectedIDMap(values)
+    local selected = {}
+    for _, value in ipairs(values or {}) do selected[tostring(value)] = true end
+    return selected
+end
+
+local function captureRecord(entry)
+    local record = entry.record
+    local runtimeContent, runtimeStats = capture(record)
+    local storageKey = PNC.Registry and PNC.Registry.StorageKeyForID
+        and PNC.Registry.StorageKeyForID(entry.id) or nil
+    local persisted = storageKey and ModData and ModData.get and ModData.get(storageKey) or nil
+    local persistedContent, persistedStats = capture(persisted)
+    local inventory = record and record.inventory or nil
+    return {
+        id = entry.id,
+        name = entry.name,
+        faction = tostring(record and record.faction or "unknown"),
+        presence = tostring(record and record.presenceState or "unknown"),
+        inventoryItems = countMap(inventory and inventory.items),
+        wornItems = countMap(inventory and inventory.worn),
+        equippedItems = countMap(inventory and inventory.equipped),
+        attachedItems = countMap(inventory and inventory.attached),
+        inventoryContainers = countMap(inventory and inventory.containers),
+        runtimeEstimatedBytes = runtimeStats.estimatedBytes,
+        persistedEstimatedBytes = persistedStats.estimatedBytes,
+        runtimeTruncated = runtimeStats.truncated,
+        persistedTruncated = persistedStats.truncated,
+        runtimeContent = runtimeContent,
+        persistedContent = persistedContent,
+    }
+end
+
+function Content.Scan(options)
+    local explicitOptions = options ~= nil
+    options = options or {}
+    if not explicitOptions then options.scope = "all_bounded" end
     local source = PNC.Registry and PNC.Registry.Data or {}
     local ordered = {}
     for id, record in pairs(source) do
@@ -76,18 +113,13 @@ function Content.Scan()
         if left.name == right.name then return left.id < right.id end
         return left.name < right.name
     end)
-    local output = { totalRecords = #ordered, truncated = #ordered > MAX_NPCS, records = {} }
-    local limit = math.min(#ordered, MAX_NPCS)
-    for index = 1, limit do
+    local output = { totalRecords = #ordered, records = {}, roster = {} }
+    local rosterLimit = math.min(#ordered, MAX_ROSTER)
+    for index = 1, rosterLimit do
         local entry = ordered[index]
         local record = entry.record
-        local runtimeContent, runtimeStats = capture(record)
-        local storageKey = PNC.Registry and PNC.Registry.StorageKeyForID
-            and PNC.Registry.StorageKeyForID(entry.id) or nil
-        local persisted = storageKey and ModData and ModData.get and ModData.get(storageKey) or nil
-        local persistedContent, persistedStats = capture(persisted)
         local inventory = record and record.inventory or nil
-        output.records[#output.records + 1] = {
+        output.roster[#output.roster + 1] = {
             id = entry.id,
             name = entry.name,
             faction = tostring(record and record.faction or "unknown"),
@@ -97,15 +129,20 @@ function Content.Scan()
             equippedItems = countMap(inventory and inventory.equipped),
             attachedItems = countMap(inventory and inventory.attached),
             inventoryContainers = countMap(inventory and inventory.containers),
-            runtimeEstimatedBytes = runtimeStats.estimatedBytes,
-            persistedEstimatedBytes = persistedStats.estimatedBytes,
-            runtimeTruncated = runtimeStats.truncated,
-            persistedTruncated = persistedStats.truncated,
-            runtimeContent = runtimeContent,
-            persistedContent = persistedContent,
         }
     end
-    output.limits = { maxNPCs = MAX_NPCS, maxNodesPerView = MAX_NODES,
+    output.rosterTruncated = #ordered > MAX_ROSTER
+    local selected = selectedIDMap(options.ids)
+    for index = 1, #ordered do
+        local entry = ordered[index]
+        if options.scope == "all_bounded" or selected[entry.id] then
+            output.records[#output.records + 1] = captureRecord(entry)
+            if #output.records >= MAX_NPCS then break end
+        end
+    end
+    output.truncated = options.scope == "all_bounded" and #ordered > MAX_NPCS or false
+    output.capturedRecords = #output.records
+    output.limits = { maxNPCs = MAX_NPCS, maxRoster = MAX_ROSTER, maxNodesPerView = MAX_NODES,
         maxDepth = MAX_DEPTH, maxString = MAX_STRING }
     return output
 end

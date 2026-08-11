@@ -216,6 +216,14 @@ assertEqual(useless, false,
     "multiplayer native movement lease was stomped by body safety")
 assertEqual(nativeFramePumps, 1,
     "multiplayer native route was not advanced from zombie update")
+managedRecord.runtime.localNavigation.controllerMode = "behavior2_move"
+managedRecord.runtime.localNavigation.serverMovementLease = false
+useless = false
+zombieUpdateHandler(managedBody)
+assertEqual(useless, true,
+    "single-player Behavior2 route lost Bandits useless-body isolation")
+assertEqual(nativeFramePumps, 2,
+    "single-player Behavior2 route was not manually frame-pumped")
 PNC.Core.IsAuthority = function() return false end
 useless = false
 PNC.LiveBodyControl.EnforceManagedSafety(managedBody, "client_replica")

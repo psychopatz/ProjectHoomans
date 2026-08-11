@@ -5,13 +5,15 @@ PNC.ProfilerIntegration = PNC.ProfilerIntegration or {}
 
 local Integration = PNC.ProfilerIntegration
 local Bootstrap = require "PsychopatzCore/Profiler/PsychopatzProfilerBootstrap"
+local BridgeBootstrap = PsychopatzCore and PsychopatzCore.BridgeBootstrap
+local liveControlEnabled = BridgeBootstrap and BridgeBootstrap.IsEnabled
+    and BridgeBootstrap.IsEnabled() or false
 
-if not Bootstrap.IsEnabled() then
+if not Bootstrap.IsEnabled() and not liveControlEnabled then
     return Integration
 end
 
 local Profiler = PsychopatzCore and PsychopatzCore.Profiler
-if not Profiler or not Profiler.IsRunning() then return Integration end
 
 local function wrap(owner, key, metricName)
     if not owner or type(owner[key]) ~= "function" then return false end
@@ -36,13 +38,11 @@ function Integration.Restore()
     Integration.serverInstalled = false
 end
 
+local ModDataProfiler = nil
+
+local function installSharedPerformance()
 Profiler.RegisterNamespace("ProjectHoomans", { displayName = "Project Hoomans" })
 Profiler.RegisterStopHook("ProjectHoomans.restore", Integration.Restore)
-local ModDataProfiler = nil
-if Profiler.GetMode and Profiler.GetMode() == Profiler.MODE_DETAILED then
-    ModDataProfiler = require "PNC/Integrations/PNC_PsychopatzModDataProfiler"
-end
-
 wrap(PNC.SpatialIndex, "Rebuild", "ProjectHoomans.Server.Update.Spatial.Rebuild")
 wrap(PNC.WorldCensus, "Refresh", "ProjectHoomans.WorldCensus.Refresh")
 wrap(PNC.Perception, "GetZombieFrame", "ProjectHoomans.Server.Update.NPC.Perception")
@@ -73,8 +73,9 @@ Profiler.RegisterSampler("ProjectHoomans.shared", function(api)
         api.SetGauge("ProjectHoomans.ModData.ScanMs", report.scanMs)
     end
 end)
-
+end
 function Integration.InstallServer()
+    if not Profiler.IsSectionEnabled("performance") then return false end
     if Integration.serverInstalled then return false end
     wrap(PNC.WorldDirector, "Pump", "ProjectHoomans.Server.Update.Director")
     wrap(PNC.PopulationDirector, "Pump", "ProjectHoomans.Server.Update.Director.Population")
@@ -118,6 +119,7 @@ end
 
 function Integration.WrapServerTick(callback)
     if type(callback) ~= "function" then return callback end
+    if not Profiler.IsSectionEnabled("performance") then return callback end
     local wrapped = Profiler.Wrap("ProjectHoomans.Server.Update", callback)
     Profiler.RegisterStopHook("ProjectHoomans.serverTick", function()
         if Events and Events.OnTick and Events.OnTick.Remove then
@@ -128,5 +130,40 @@ function Integration.WrapServerTick(callback)
     end)
     return wrapped
 end
+
+function Integration.ApplyCaptureConfig(config)
+    Profiler = PsychopatzCore and PsychopatzCore.Profiler
+    if not Profiler or not Profiler.IsRunning or not Profiler.IsRunning() then
+        Integration.Restore()
+        return config.mode == "OFF"
+    end
+    if Profiler.IsSectionEnabled("moddata") then
+        ModDataProfiler = require "PNC/Integrations/PNC_PsychopatzModDataProfiler"
+        if ModDataProfiler.Register then ModDataProfiler.Register(config) end
+    else
+        ModDataProfiler = nil
+    end
+    if Profiler.IsSectionEnabled("npc") then
+        local NPCProfiler = require "PNC/Integrations/PNC_PsychopatzNPCProfiler"
+        if NPCProfiler.Register then NPCProfiler.Register(config) end
+    end
+    if Profiler.IsSectionEnabled("performance") then
+        installSharedPerformance()
+        Integration.InstallServer()
+        if PNC.Server and type(PNC.Server.OnTick) == "function" then
+            local original = PNC.Server.OnTick
+            local wrapped = Integration.WrapServerTick(original)
+            if wrapped ~= original then
+                if Events and Events.OnTick and Events.OnTick.Remove then Events.OnTick.Remove(original) end
+                if Events and Events.OnTick and Events.OnTick.Add then Events.OnTick.Add(wrapped) end
+                PNC.Server.OnTick = wrapped
+            end
+        end
+    end
+    return true
+end
+
+Bootstrap.RegisterCaptureController("ProjectHoomans", Integration.ApplyCaptureConfig)
+Integration.ApplyCaptureConfig(Bootstrap.GetCaptureConfig())
 
 return Integration

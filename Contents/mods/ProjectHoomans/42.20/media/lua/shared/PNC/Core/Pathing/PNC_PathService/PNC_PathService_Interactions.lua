@@ -303,6 +303,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     local passageAhead
     local collided
     local traversalProfile
+    local windowOpened
 
     if not zombie or not getCell then
         return false, nil
@@ -463,7 +464,11 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                                     logTraversalReject(record, zombie, lane, "traversal_rejected", "window_special_cooldown", "object=" .. tostring(objectKey or "nil"))
                                     return false, nil
                                 end
-                                if Internal.openWindowForNPC(zombie, object) then
+                                windowOpened = Internal.openWindowForNPC(
+                                    zombie,
+                                    object
+                                )
+                                if windowOpened then
                                     Internal.rememberSpecialAction(lane, actionKey, now)
                                     if Internal.MotionHints and Internal.MotionHints.RememberHold then
                                         Internal.MotionHints.RememberHold(lane, zombie:getX(), zombie:getY(), zombie:getZ(), now, 250, {
@@ -472,30 +477,30 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                                         })
                                     end
                                     Internal.logMoveWarning(record, zombie, lane, "window_open", "window_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
-                                    return true, "window_open"
+                                else
+                                    actionKey = "window_smash:" .. Internal.describeSquare(objectSquare)
+                                    if not Internal.beginTraversalAction
+                                        or not Internal.beginTraversalAction(zombie, record, lane, {
+                                            kind = "window_smash",
+                                            anim = "PNC_WindowSmash",
+                                            obstacle = object,
+                                            fromX = fromX,
+                                            fromY = fromY,
+                                            fromZ = fromZ,
+                                            toX = fromX,
+                                            toY = fromY,
+                                            toZ = fromZ,
+                                            travelDurationMs = 650,
+                                            finishHoldMs = 260,
+                                        })
+                                    then
+                                        logTraversalReject(record, zombie, lane, "traversal_rejected", "window_smash_runtime_unavailable", "object=" .. tostring(objectKey or "nil"))
+                                        return false, nil
+                                    end
+                                    Internal.rememberSpecialAction(lane, actionKey, now)
+                                    Internal.logMoveWarning(record, zombie, lane, "window_smash", "window_open_failed", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare))
+                                    return true, "window_smash"
                                 end
-                                actionKey = "window_smash:" .. Internal.describeSquare(objectSquare)
-                                if not Internal.beginTraversalAction
-                                    or not Internal.beginTraversalAction(zombie, record, lane, {
-                                        kind = "window_smash",
-                                        anim = "PNC_WindowSmash",
-                                        obstacle = object,
-                                        fromX = fromX,
-                                        fromY = fromY,
-                                        fromZ = fromZ,
-                                        toX = fromX,
-                                        toY = fromY,
-                                        toZ = fromZ,
-                                        travelDurationMs = 650,
-                                        finishHoldMs = 260,
-                                    })
-                                then
-                                    logTraversalReject(record, zombie, lane, "traversal_rejected", "window_smash_runtime_unavailable", "object=" .. tostring(objectKey or "nil"))
-                                    return false, nil
-                                end
-                                Internal.rememberSpecialAction(lane, actionKey, now)
-                                Internal.logMoveWarning(record, zombie, lane, "window_smash", "window_open_failed", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare))
-                                return true, "window_smash"
                             end
                             if object:canClimbThrough(zombie) then
                                 actionKey = "window_climb:" .. Internal.describeSquare(objectSquare)

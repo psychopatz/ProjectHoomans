@@ -6,6 +6,16 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Skills = PNC.Skills
 
+local MAX_STAMINA_SKILLS = {
+    "Axe",
+    "LongBlade",
+    "LongBlunt",
+    "ShortBlade",
+    "ShortBlunt",
+    "Spear",
+    "Aiming",
+}
+
 local function clamp(value, minValue, maxValue)
     local numeric = tonumber(value) or minValue
     if numeric < minValue then
@@ -17,7 +27,7 @@ local function clamp(value, minValue, maxValue)
     return numeric
 end
 
-local function ensureState(record)
+local function ensureState(record, nowOverride)
     local averageCombat
     local endurance
     local strength
@@ -26,10 +36,50 @@ local function ensureState(record)
     local encumbrance
     local previousBaseMax
     local current
+    local runtime
+    local derivedCache
+    local inventoryRevision
+    local now
     if type(record) ~= "table" then
         return nil
     end
-    averageCombat = Skills.GetAverage(record, { "Axe", "LongBlade", "LongBlunt", "ShortBlade", "ShortBlunt", "Spear", "Aiming" })
+    now = tonumber(nowOverride) or Core.Now()
+    record.runtime = record.runtime or {}
+    runtime = record.runtime
+    inventoryRevision = tonumber(
+        record.inventory and record.inventory.revision
+    ) or 0
+    derivedCache = runtime.staminaDerivedCache
+    if derivedCache
+        and inventoryRevision
+            == (tonumber(derivedCache.inventoryRevision) or 0)
+        and now < (tonumber(derivedCache.refreshAt) or 0)
+    then
+        if type(record.stamina) ~= "table" then
+            record.stamina = {}
+        end
+        record.stamina.baseMax = derivedCache.baseMax
+        record.stamina.max = derivedCache.max
+        record.stamina.encumbranceLevel = derivedCache.encumbranceLevel
+        record.stamina.encumbranceRatio = derivedCache.encumbranceRatio
+        record.stamina.encumbranceDrainMultiplier =
+            derivedCache.encumbranceDrainMultiplier
+        record.stamina.encumbranceRecoveryMultiplier =
+            derivedCache.encumbranceRecoveryMultiplier
+        record.stamina.current = clamp(
+            tonumber(record.stamina.current)
+                or tonumber(derivedCache.max) or 100,
+            0,
+            tonumber(derivedCache.max) or 100
+        )
+        record.stamina.state = record.stamina.state or "fresh"
+        record.stamina.visibleUntil =
+            tonumber(record.stamina.visibleUntil) or 0
+        record.stamina.lastUpdatedAt =
+            tonumber(record.stamina.lastUpdatedAt) or now
+        return record.stamina
+    end
+    averageCombat = Skills.GetAverage(record, MAX_STAMINA_SKILLS)
     endurance = Skills.GetLevel(record, "Fitness")
     strength = Skills.GetLevel(record, "Strength")
     resolvedMax = math.floor(100 + ((averageCombat + endurance + strength) * 2.5))
@@ -60,7 +110,25 @@ local function ensureState(record)
         encumbrance and encumbrance.recoveryMultiplier or 1
     record.stamina.state = record.stamina.state or "fresh"
     record.stamina.visibleUntil = tonumber(record.stamina.visibleUntil) or 0
-    record.stamina.lastUpdatedAt = tonumber(record.stamina.lastUpdatedAt) or Core.Now()
+    record.stamina.lastUpdatedAt =
+        tonumber(record.stamina.lastUpdatedAt) or now
+    runtime.staminaDerivedCache = {
+        inventoryRevision = tonumber(
+            record.inventory and record.inventory.revision
+        ) or inventoryRevision,
+        refreshAt = now + math.max(
+            250,
+            tonumber(Const.STAMINA_DERIVED_REFRESH_MS) or 1000
+        ),
+        baseMax = record.stamina.baseMax,
+        max = record.stamina.max,
+        encumbranceLevel = record.stamina.encumbranceLevel,
+        encumbranceRatio = record.stamina.encumbranceRatio,
+        encumbranceDrainMultiplier =
+            record.stamina.encumbranceDrainMultiplier,
+        encumbranceRecoveryMultiplier =
+            record.stamina.encumbranceRecoveryMultiplier,
+    }
     return record.stamina
 end
 
@@ -179,16 +247,17 @@ function Stamina.SpendAttack(record, attackType, skillID)
 end
 
 function Stamina.Update(record, zombie, now)
-    local stamina = ensureState(record)
+    local stamina
     local lastUpdatedAt
     local elapsed
     local recoverRate
     local runtime
     local moveDrain
+    now = tonumber(now) or Core.Now()
+    stamina = ensureState(record, now)
     if not stamina then
         return
     end
-    now = tonumber(now) or Core.Now()
     runtime = record and record.runtime or nil
     lastUpdatedAt = tonumber(stamina.lastUpdatedAt) or now
     elapsed = math.max(0, now - lastUpdatedAt) / 1000

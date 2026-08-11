@@ -74,6 +74,7 @@ dofile(CONTEXT_FILE)
 dofile(FILE)
 
 local requestCount = 0
+local wrapperRequestCount = 0
 local cancelCount = 0
 local resetCount = 0
 local updateCount = 0
@@ -82,7 +83,7 @@ local body
 local serverMode = false
 isServer = function() return serverMode end
 local behavior = {
-    pathToLocationF = function(self, x, y, z)
+    pathToLocation = function(self, x, y, z)
         self.target = { x = x, y = y, z = z }
         requestCount = requestCount + 1
     end,
@@ -92,6 +93,10 @@ local behavior = {
     end,
     cancel = function() cancelCount = cancelCount + 1 end,
     reset = function() resetCount = resetCount + 1 end,
+}
+local forwardDirection = {
+    getX = function() return 1 end,
+    getY = function() return 0 end,
 }
 body = {
     x = 0.5,
@@ -104,11 +109,12 @@ body = {
     getY = function(self) return self.y end,
     getZ = function(self) return self.z end,
     getSquare = function(self) return self.square end,
+    getForwardDirection = function() return forwardDirection end,
     getPathFindBehavior2 = function() return behavior end,
     getPath2 = function(self) return self.path2 end,
     setPath2 = function(self, path) self.path2 = path end,
     pathToLocationF = function(self, x, y, z)
-        behavior:pathToLocationF(x, y, z)
+        wrapperRequestCount = wrapperRequestCount + 1
         self.actionState = "pathfind"
     end,
     getActionStateName = function(self)
@@ -116,6 +122,13 @@ body = {
     end,
     isUseless = function(self) return self.useless end,
     setUseless = function(self, value) self.useless = value == true end,
+    isCollidedWithDoor = function(self)
+        return self.collidedWithDoor == true
+    end,
+    isCollidedThisFrame = function(self)
+        return self.collidedThisFrame == true
+    end,
+    isCollided = function(self) return self.collided == true end,
 }
 local record = {
     runtime = {
@@ -130,6 +143,126 @@ local target = {
     stopDistance = 0.65,
 }
 
+local function pathSquare(x, y)
+    return {
+        getX = function() return x end,
+        getY = function() return y end,
+        getZ = function() return 0 end,
+    }
+end
+local pathSquare0 = pathSquare(0, 10)
+local pathSquare1 = pathSquare(1, 10)
+local pathSquare2 = pathSquare(2, 10)
+squares["0:10"] = pathSquare0
+squares["1:10"] = pathSquare1
+squares["2:10"] = pathSquare2
+local pathFence = {}
+local selectedPath = {}
+local pathBody = {
+    getX = function() return 0.5 end,
+    getY = function() return 10.5 end,
+    getZ = function() return 0 end,
+    getSquare = function() return pathSquare0 end,
+    getForwardDirection = function() return forwardDirection end,
+    getPath2 = function() return selectedPath end,
+}
+PNC.TraversalQuery = {
+    GetPassageBetween = function() return nil end,
+    GetFenceBetween = function(from, to)
+        if from == pathSquare0 and to == pathSquare1 then
+            return pathFence, false
+        end
+        return nil, false
+    end,
+}
+local passageNavigation = { requestX = 3.5, requestY = 10.5 }
+local upcomingPassage =
+    PNC.EnginePathPlanner.Internal.GetUpcomingPathPassage(
+        pathBody,
+        passageNavigation
+    )
+assert(upcomingPassage and upcomingPassage.object == pathFence,
+    "native approach did not expose its immediate fence edge")
+local passageRecord = { runtime = { pathing = {} } }
+assert(PNC.EnginePathPlanner.Internal.StageUpcomingPathPassage(
+        passageRecord,
+        pathBody,
+        passageNavigation
+    ),
+    "nearby native fence edge did not transfer to scripted ownership")
+assert(passageRecord.runtime.pathing.blockedStepReason
+        == "native_path_fence",
+    "native fence handoff lost its exact blocked edge")
+PNC.TraversalQuery = nil
+
+-- A route can be available immediately after pathToLocation(). Intercept its
+-- obstacle before the first Behavior2 update; otherwise Java may enter the
+-- unsafe vanilla fence state before Lua regains control.
+local preUpdateCount = 0
+local preHandoffCount = 0
+local preBody
+local preBehavior = {
+    pathToLocation = function()
+        preBody.path2 = selectedPath
+    end,
+    update = function()
+        preUpdateCount = preUpdateCount + 1
+        return BehaviorResult.Working
+    end,
+    cancel = function() end,
+    reset = function() end,
+}
+preBody = {
+    x = 0.5,
+    y = 10.5,
+    z = 0,
+    square = pathSquare0,
+    useless = true,
+    getX = body.getX,
+    getY = body.getY,
+    getZ = body.getZ,
+    getSquare = body.getSquare,
+    getForwardDirection = body.getForwardDirection,
+    getPath2 = body.getPath2,
+    setPath2 = body.setPath2,
+    getPathFindBehavior2 = function() return preBehavior end,
+    getActionStateName = function() return "idle" end,
+    isUseless = body.isUseless,
+    setUseless = body.setUseless,
+}
+local preRecord = {
+    runtime = { pathing = { phase = "active" } },
+}
+PNC.TraversalQuery = {
+    GetPassageBetween = function() return nil end,
+    GetFenceBetween = function(from, to)
+        if from == pathSquare0 and to == pathSquare1 then
+            return pathFence, false
+        end
+        return nil, false
+    end,
+}
+PNC.PathService = {
+    Pump = function()
+        preHandoffCount = preHandoffCount + 1
+        return true, "fence_climb"
+    end,
+}
+now = now + 200
+PNC.EnginePathPlanner.GetSteeringTarget(preRecord, preBody, {
+    x = 3.5,
+    y = 10.5,
+    z = 0,
+    stopDistance = 0.5,
+})
+assert(preHandoffCount == 1,
+    "upcoming native fence was not handed off before Behavior2 update")
+assert(preUpdateCount == 0,
+    "Behavior2 entered an obstacle before scripted traversal handoff")
+PNC.PathService = nil
+PNC.TraversalQuery = nil
+now = now + 200
+
 local steering = PNC.EnginePathPlanner.GetSteeringTarget(
     record,
     body,
@@ -143,7 +276,9 @@ steering = PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 assert(steering == target, "pending native request changed the target")
 assert(requestCount == 1, "building transition did not request native path")
 assert(updateCount == 0,
-    "native request bypassed the single native update pump")
+    "Bandits-style request advanced PathFindBehavior2 during startup")
+assert(wrapperRequestCount == 0,
+    "single-player request entered the character PathFindState wrapper")
 
 PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 assert(requestCount == 1, "pending request was submitted twice")
@@ -152,12 +287,12 @@ local state
 local cancelsAfterStart = cancelCount
 local resetsAfterStart = resetCount
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
-assert(handled and state == "native_path_pending",
+assert(handled and state == "native_behavior_pending",
     "native path did not remain active while working")
 assert(updateCount == 0,
-    "Lua manually advanced engine-owned PathFindBehavior2")
-assert(body.useless == false,
-    "native route did not keep the managed body useful")
+    "scheduled observer double-pumped PathFindBehavior2")
+assert(body.useless == true,
+    "single-player Behavior2 route exposed the body to IsoZombie.update")
 assert(cancelCount == cancelsAfterStart
     and resetCount == resetsAfterStart,
     "working native path was cancelled or reset")
@@ -271,16 +406,17 @@ local unsafeBody = {
 local unsafeRecord = {
     runtime = { pathing = { phase = "active" } },
 }
+now = now + 200
 PNC.EnginePathPlanner.GetSteeringTarget(
     unsafeRecord,
     unsafeBody,
     directTarget
 )
-assert(requestCount == unsafeRequestCount,
-    "body without BodyDamage entered native pathing")
-assert(unsafeRecord.runtime.localNavigation.lastPlanReason
-        == "native_body_damage_unavailable",
-    "unsafe native path did not publish its fallback reason")
+assert(requestCount == unsafeRequestCount + 1,
+    "body without BodyDamage did not enter native pathing")
+assert(unsafeRecord.runtime.localNavigation.controllerMode
+        == "behavior2_move",
+    "single-player body did not select Bandits Move ownership")
 
 local closeRecord = {
     runtime = {
@@ -294,21 +430,29 @@ local closeTarget = {
     stopDistance = 0.3,
 }
 local requestsBeforeCloseAdjustment = requestCount
+now = now + 200
 PNC.EnginePathPlanner.GetSteeringTarget(
     closeRecord,
     directBody,
     closeTarget
 )
-assert(requestCount == requestsBeforeCloseAdjustment,
-    "sub-tile adjustment launched a native path request")
+assert(requestCount == requestsBeforeCloseAdjustment + 1,
+    "sub-tile adjustment did not stay on native movement")
 
 local plannerSource = readAll(FILE) .. readAll(CONTEXT_FILE)
 assert(not string.find(plannerSource, "pcall", 1, true),
     "native planner must not hide path errors with pcall")
 assert(not string.find(plannerSource, "getClassField", 1, true),
     "native planner depends on debug-only Java reflection")
-assert(not string.find(plannerSource, "behavior:update(", 1, true),
-    "planner manually pumps PathFindBehavior2 instead of PathFindState")
+assert(not string.find(plannerSource, "not path.size", 1, true)
+        and not string.find(plannerSource, "not path.getNode", 1, true),
+    "native planner probes Java Path methods as Lua table fields")
+assert(not string.find(plannerSource, "path:size", 1, true)
+        and not string.find(plannerSource, "path:crossesSquare", 1, true)
+        and not string.find(plannerSource, "path:getNode", 1, true),
+    "native planner calls opaque zombie.pathfind.Path userdata")
+assert(string.find(plannerSource, "behavior:update(", 1, true),
+    "single-player planner does not use Bandits PathFindBehavior2 Move")
 local motionSource = readAll(MOTION_FILE)
 assert(string.find(motionSource, "combat_attack_lease", 1, true),
     "combat attack lease does not cancel native movement")
@@ -322,14 +466,24 @@ local nativePumpAt = assert(string.find(
     1,
     true
 ))
-local fakePumpAt = assert(string.find(
+local scriptedPassageAt = assert(string.find(
     pumpSource,
-    "Internal.updateActiveMove",
+    "scriptedPassageOwner",
     1,
     true
 ))
+local fakePumpAt = assert(string.find(
+    pumpSource,
+    "Internal.updateActiveMove",
+    nativePumpAt + 1,
+    true
+))
+assert(scriptedPassageAt < nativePumpAt,
+    "native path can reacquire ownership before scripted traversal")
 assert(nativePumpAt < fakePumpAt,
-    "fake locomotion runs before native path ownership")
+    "ordinary fake locomotion runs before native path ownership")
+assert(string.find(pumpSource, "engine_path_waiting", 1, true),
+    "deferred native lane can still fall through to fake locomotion")
 assert(string.find(pumpSource, "Internal.MotionHints.Remember", 1, true),
     "native movement does not publish interpolation hints")
 assert(string.find(pumpSource, "Internal.refreshResolvedLocomotion", 1, true),
@@ -356,15 +510,47 @@ now = now + 2000
 record.runtime.pathing.phase = "active"
 nextResult = BehaviorResult.Working
 PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
+local updatesBeforeFrame = updateCount
+now = now + 16
 handled, state = PNC.EnginePathPlanner.PumpFrame(record, body)
-assert(handled and state == "native_path_pending",
-    "authoritative observer lost engine-owned native movement")
+assert(handled and state == "native_behavior_pending",
+    "authoritative frame lost Bandits-style native movement")
+assert(updateCount == updatesBeforeFrame + 1,
+    "zombie frame did not advance PathFindBehavior2 exactly once")
+local collisionHandoffCount = 0
+PNC.PathService = {
+    Pump = function()
+        collisionHandoffCount = collisionHandoffCount + 1
+        return true, "fence_climb"
+    end,
+}
+body.collidedThisFrame = true
+local updatesBeforeCollision = updateCount
+handled, state = PNC.EnginePathPlanner.PumpFrame(record, body)
+assert(handled and state == "fence_climb",
+    "native collision was not handed to scripted traversal")
+assert(collisionHandoffCount == 1,
+    "native collision did not pump the path service exactly once")
+assert(updateCount == updatesBeforeCollision,
+    "Behavior2 advanced after collision instead of yielding traversal")
+body.collidedThisFrame = false
+PNC.PathService = nil
 local updatesAfterFrame = updateCount
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
-assert(handled and state == "native_path_pending",
+assert(handled and state == "native_behavior_pending",
     "scheduled fallback lost native ownership after frame pump")
 assert(updateCount == updatesAfterFrame,
     "observer pump manually advanced PathFindBehavior2")
+
+nextResult = BehaviorResult.Failed
+now = now + 16
+handled, state = PNC.EnginePathPlanner.PumpFrame(record, body)
+assert(handled and state == "engine_path_failed",
+    "Bandits-style behavior failure did not release native ownership")
+assert(not record.runtime.localNavigation.nativeActive,
+    "failed PathFindBehavior2 retained movement ownership")
+assert(body.useless == true,
+    "failed native route did not restore managed-body safety")
 
 serverMode = true
 now = now + 2000

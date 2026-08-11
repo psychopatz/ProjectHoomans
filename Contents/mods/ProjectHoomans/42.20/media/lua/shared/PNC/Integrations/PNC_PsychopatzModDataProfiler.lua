@@ -3,7 +3,7 @@ PNC.ModDataProfiler = PNC.ModDataProfiler or {}
 
 local Analyzer = PNC.ModDataProfiler
 local Profiler = PsychopatzCore and PsychopatzCore.Profiler
-local Content = require "PNC/Integrations/PNC_PsychopatzModDataContent"
+local Bootstrap = require "PsychopatzCore/Profiler/PsychopatzProfilerBootstrap"
 
 if not Profiler or not Profiler.IsRunning or not Profiler.IsRunning() then
     return Analyzer
@@ -19,7 +19,7 @@ local MAX_TOP_PATHS = 30
 -- Heap shape changes slowly compared with gameplay. A one-minute refresh is
 -- enough for growth diagnosis and avoids repeated allocation/GC spikes while
 -- DETAILED profiling is left running.
-local SCAN_INTERVAL_MS = 60000
+local SCAN_INTERVAL_MS = Bootstrap.GetCaptureConfig().modDataIntervalMs or 60000
 
 local function countMap(values)
     local count = 0
@@ -217,7 +217,6 @@ function Analyzer.Scan(force)
         persisted = scanPersisted(),
         runtimeRecords = scanRuntimeRecords(),
         inventories = scanInventories(),
-        npcRecords = Content.Scan(),
     }
     report.scanMs = math.max(0, nowMs() - started)
     Analyzer.lastReport = report
@@ -225,8 +224,17 @@ function Analyzer.Scan(force)
     return report
 end
 
-Profiler.RegisterSnapshotProvider("ProjectHoomans.modData", function()
-    return Analyzer.Scan(false)
-end)
+function Analyzer.Register(config)
+    Profiler = PsychopatzCore and PsychopatzCore.Profiler
+    if not Profiler or not Profiler.IsRunning or not Profiler.IsRunning() then return false end
+    config = config or Bootstrap.GetCaptureConfig()
+    SCAN_INTERVAL_MS = config.modDataIntervalMs or 60000
+    Analyzer.lastReport, Analyzer.lastScanAt = nil, nil
+    return Profiler.RegisterSnapshotProvider("ProjectHoomans.modData", function()
+        return Analyzer.Scan(false)
+    end, { section = "moddata", intervalMs = SCAN_INTERVAL_MS })
+end
+
+Analyzer.Register(Bootstrap.GetCaptureConfig())
 
 return Analyzer

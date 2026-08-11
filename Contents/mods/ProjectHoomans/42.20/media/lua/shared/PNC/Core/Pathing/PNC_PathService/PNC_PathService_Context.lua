@@ -45,6 +45,17 @@ Internal.LOCOMOTION_VISUAL_LEASE_MS = 420
 Internal.VEHICLE_BLOCKED_GOAL_CHANGE_DISTANCE = 1.75
 Internal.POSITION_RECOVERY_LOG_INTERVAL_MS = 15000
 
+function Internal.clearBlockedStep(lane)
+    if not lane then return end
+    lane.blockedStepFromX = nil
+    lane.blockedStepFromY = nil
+    lane.blockedStepFromZ = nil
+    lane.blockedStepToX = nil
+    lane.blockedStepToY = nil
+    lane.blockedStepToZ = nil
+    lane.blockedStepReason = nil
+end
+
 local ALLOWED_MOVE_ACTION_STATES = {
     [""] = true,
     ["idle"] = true,

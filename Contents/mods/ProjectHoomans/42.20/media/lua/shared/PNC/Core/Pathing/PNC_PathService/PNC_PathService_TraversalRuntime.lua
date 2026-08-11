@@ -125,6 +125,18 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
     if not zombie or not record or not lane or type(spec) ~= "table" then
         return false
     end
+    -- Collision processing runs ahead of movement processing in Bandits. Make
+    -- that ownership transfer explicit here as well: an obstacle action must
+    -- cancel Behavior2 before it creates the scripted traversal lease.
+    if PNC.EnginePathPlanner
+        and PNC.EnginePathPlanner.Invalidate
+    then
+        PNC.EnginePathPlanner.Invalidate(
+            record,
+            "scripted_" .. tostring(spec.kind or "traversal"),
+            zombie
+        )
+    end
     now = Internal.Core.Now()
     travelDurationMs = math.max(250, tonumber(spec.travelDurationMs) or 600)
     finishHoldMs = math.max(120, tonumber(spec.finishHoldMs) or 320)

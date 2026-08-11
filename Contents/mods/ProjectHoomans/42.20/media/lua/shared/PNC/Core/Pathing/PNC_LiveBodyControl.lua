@@ -625,10 +625,16 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
     if treatment and treatment.phase == "bandaging" then
         return true
     end
-    return navigation
-        and navigation.provider == "engine_path"
-        and navigation.nativeActive == true
-        or false
+    if not navigation
+        or navigation.provider ~= "engine_path"
+        or navigation.nativeActive ~= true
+    then
+        return false
+    end
+    -- SP Behavior2 is manually pumped and must retain Bandits' useless-body
+    -- isolation. Only delegated/PathFindState movement leases the vanilla
+    -- IsoZombie update loop.
+    return navigation.controllerMode ~= "behavior2_move"
 end
 
 function LiveBodyControl.EnforceManagedSafety(zombie, source)
