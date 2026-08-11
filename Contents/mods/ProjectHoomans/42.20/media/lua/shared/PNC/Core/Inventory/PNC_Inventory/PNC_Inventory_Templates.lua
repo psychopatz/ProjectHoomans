@@ -187,7 +187,6 @@ function Inventory.CreateFromTemplate(record, options)
         return nil
     end
     inv = Internal.buildTemplateSnapshot(record)
-    inv.deltaMode = "template_plus_delta"
     generatedTemplate = inv.template or {}
     inv.template = {
         archetypeID = record.archetypeID,

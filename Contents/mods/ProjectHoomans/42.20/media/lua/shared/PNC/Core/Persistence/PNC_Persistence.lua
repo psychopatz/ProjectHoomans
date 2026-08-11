@@ -948,7 +948,6 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     sanitizeStamina(raw.stamina, record)
     record.inventory = nil
     record.persistedInventory = type(raw.inventory) == "table" and Core.DeepCopy(raw.inventory) or nil
-    record.legacyEquipmentInventory = not raw.inventory and type(raw.equipment) == "table"
     record = Persistence.RebuildRuntime(record)
     if type(raw.travel) == "table"
         and PNC.Travel

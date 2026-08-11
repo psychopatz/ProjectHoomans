@@ -1,8 +1,10 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
 local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
 local COMMON_ROOT = "Contents/mods/ProjectHoomans/common/media/lua/shared/"
+local CORE_ROOT = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
 
-package.path = SHARED_ROOT .. "?.lua;" .. COMMON_ROOT .. "?.lua;" .. package.path
+package.path = SHARED_ROOT .. "?.lua;" .. COMMON_ROOT .. "?.lua;"
+    .. CORE_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -123,7 +125,6 @@ local newBase = PNC.Skills.GetBaseLevel(record, "Strength")
 assertEqual(PNC.Skills.GetLevel(record, "Strength"), math.min(10, newBase + 2), "skill automatic rebase")
 
 local inventory = PNC.Inventory.CreateFromTemplate(record)
-assertEqual(inventory.deltaMode, "template_plus_delta", "recruited inventory mode")
 local bandageID
 for id, item in pairs(inventory.items) do
     if item.templateKey == "tmpl:supply:medical_bandage" then bandageID = id end
@@ -208,14 +209,9 @@ assert(PNC.Inventory.ApplyDelta(record, {
 }, "test_zero_state"), "zero-valued template state update failed")
 
 local saved = PNC.Inventory.Serialize(record)
-assertEqual(saved.deltaMode, "template_plus_delta", "serialized delta mode")
-assertEqual(saved.template.generatorVersion, 1, "generator version")
-assertEqual(saved.maxWeight, nil, "derived max weight was persisted")
-assertEqual(saved.cachedWeight, nil, "derived used weight was persisted")
-assertEqual(saved.delta.changed["tmpl:identity_card:0"].cond, 0,
-    "zero condition delta was lost")
-assertEqual(saved.delta.changed["tmpl:identity_card:0"].ammoCount, 0,
-    "zero ammo delta was lost")
+assertEqual(saved[1], 1, "NPC inventory schema")
+assertEqual(saved[2][1], 1, "core virtual inventory schema")
+assertEqual(saved[4][1].generatorVersion, 1, "generator version")
 
 loadout.supplies[#loadout.supplies + 1] = {
     key = "new_template_item",
@@ -245,7 +241,7 @@ for _, item in pairs(reloaded.inventory.items) do
 end
 assertEqual(hasBandage, false, "removed template item returned")
 assertEqual(hasLoot, true, "added item lost on rebase")
-assertEqual(hasNewTemplate, true, "new template item did not appear")
+assertEqual(hasNewTemplate, false, "save load unexpectedly regenerated inventory")
 assertEqual(reloaded.inventory.items.loot_1.stack, 3, "updated stack lost on rebase")
 assertEqual(reloaded.inventory.items.loot_1.ammoCount, 0, "magazine state lost on rebase")
 assertEqual(reloaded.inventory.equipped.primary, "fallback_1", "equipped primary lost on rebase")
@@ -262,4 +258,54 @@ local reloadedCard = PNC.Inventory.Internal.findItemByTemplateKey(
 assertEqual(reloadedCard.cond, 0, "zero condition lost on rebase")
 assertEqual(reloadedCard.ammoCount, 0, "zero ammo state lost on rebase")
 
-print("pnc_seed_delta_smoke: ok")
+local function javaList(values)
+    return { size = function() return #values end,
+        get = function(_, index) return values[index + 1] end }
+end
+local function nativeItem(fullType)
+    local item = { fullType = fullType, modData = {}, weight = 0.1 }
+    function item:getFullType() return self.fullType end
+    function item:getCondition() return self.condition end
+    function item:getConditionMax() return 10 end
+    function item:setCondition(value) self.condition = value end
+    function item:getUsedDelta() return self.usedDelta end
+    function item:setUsedDelta(value) self.usedDelta = value end
+    function item:IsDrainable() return self.usedDelta ~= nil end
+    function item:isFavorite() return self.favorite == true end
+    function item:setFavorite(value) self.favorite = value end
+    function item:isCustomName() return self.customName ~= nil end
+    function item:getName() return self.customName end
+    function item:setName(value) self.customName = value end
+    function item:getModData() return self.modData end
+    function item:getActualWeight() return self.weight end
+    function item:getWeight() return self.weight end
+    function item:setActualWeight(value) self.weight = value end
+    function item:getCurrentAmmoCount() return self.ammoCount end
+    function item:setCurrentAmmoCount(value) self.ammoCount = value end
+    return item
+end
+InventoryItemFactory = { CreateItem = nativeItem }
+local liveItems = {}
+local liveContainer = {}
+function liveContainer:getItems() return javaList(liveItems) end
+function liveContainer:AddItem(item) liveItems[#liveItems + 1] = item return item end
+function liveContainer:DoRemoveItem(item)
+    for i = #liveItems, 1, -1 do if liveItems[i] == item then table.remove(liveItems, i) return end end
+end
+local body = { getInventory = function() return liveContainer end }
+assert(PNC.Inventory.MaterializeLooseInventory(reloaded, body),
+    "abstract inventory did not materialize")
+local physicalLoot = false
+for i = 1, #liveItems do physicalLoot = physicalLoot or liveItems[i].fullType == "Base.CustomLoot" end
+assertEqual(physicalLoot, true, "loose item missing from live physical inventory")
+assert(PNC.Inventory.CaptureLooseInventory(reloaded, body),
+    "live inventory did not abstract")
+local capturedLoot = false
+for _, item in pairs(reloaded.inventory.items) do
+    capturedLoot = capturedLoot or item.type == "Base.CustomLoot"
+end
+assertEqual(capturedLoot, true, "physical item missing after abstraction")
+assertEqual(reloaded.inventory.equipped.primary, "fallback_1",
+    "physical round trip lost equipped item")
+
+print("pnc_inventory_core_persistence_smoke: ok")

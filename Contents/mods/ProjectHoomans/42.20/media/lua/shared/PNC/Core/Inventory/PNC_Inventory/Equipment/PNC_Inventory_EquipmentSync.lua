@@ -204,7 +204,6 @@ function Inventory.SyncFromEquipment(record, reason)
             Internal.createItem(record, inv, item)
         end
     end
-    inv.deltaMode = "template_plus_delta"
     if hadInventory then inv.revision = math.max(1, tonumber(inv.revision) or 0) end
     Internal.refreshNextItemSerial(record, inv)
     Inventory.RebuildCaches(record)

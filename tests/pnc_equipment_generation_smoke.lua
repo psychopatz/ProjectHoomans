@@ -1,8 +1,10 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
 local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
 local COMMON_ROOT = "Contents/mods/ProjectHoomans/common/media/lua/shared/"
+local CORE_ROOT = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
 
-package.path = SHARED_ROOT .. "?.lua;" .. COMMON_ROOT .. "?.lua;" .. package.path
+package.path = SHARED_ROOT .. "?.lua;" .. COMMON_ROOT .. "?.lua;"
+    .. CORE_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
     if actual ~= expected then
@@ -216,8 +218,8 @@ end
 assertEqual(ammoFound, true, "ranged equipment grant ammunition")
 
 local saved = PNC.Inventory.Serialize(bothRecord)
-assertEqual(saved.template.equipmentPoolID, "Default", "persisted equipment pool")
-assertEqual(saved.template.weaponMode, "mixed", "persisted generated weapon mode")
+assertEqual(saved[4][1].equipmentPoolID, "Default", "persisted equipment pool")
+assertEqual(saved[4][1].weaponMode, "mixed", "persisted generated weapon mode")
 
 local repeated = makeRecord("natural_both_2", 8142, "Doctor")
 local repeatedInventory = PNC.Inventory.CreateFromTemplate(repeated)

@@ -527,5 +527,10 @@ function Inventory.RebuildCaches(record)
         tostring(record.equipment and record.equipment.primaryFullType or ""),
         tostring(record.equipment and record.equipment.secondaryFullType or ""),
     }, ":")
+    -- The map is the ProjectHoomans gameplay projection. PsychopatzCore's
+    -- virtual store remains the canonical compact item identity/state model.
+    if Inventory.CoreBridge and Inventory.CoreBridge.refreshCanonical then
+        Inventory.CoreBridge.refreshCanonical(record, inv)
+    end
     return inv
 end

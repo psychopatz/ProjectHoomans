@@ -340,6 +340,13 @@ function Presence.Materialize(record, reason, nearest)
     record.runtime.target = nil
     Animation.ApplyLiveSetup(zombie, record)
     Visuals.ApplyHumanVisuals(zombie, record)
+    if PNC.Inventory and PNC.Inventory.MaterializeLooseInventory then
+        local inventoryOk, inventoryReason = PNC.Inventory.MaterializeLooseInventory(record, zombie)
+        if not inventoryOk then
+            Core.LogWarn("PNC inventory materialization failed npc=" .. tostring(record.id)
+                .. " reason=" .. tostring(inventoryReason))
+        end
+    end
     Equipment.Apply(zombie, record)
     if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
         LiveBodyControl.SetManagedBodyUseless(zombie, true)
@@ -436,6 +443,13 @@ function Presence.Abstract(record, reason)
     record.runtime.roamGoalZ = nil
 
     if zombie then
+        if PNC.Inventory and PNC.Inventory.CaptureLooseInventory then
+            local inventoryOk, inventoryReason = PNC.Inventory.CaptureLooseInventory(record, zombie)
+            if not inventoryOk then
+                Core.LogWarn("PNC inventory abstraction failed npc=" .. tostring(record.id)
+                    .. " reason=" .. tostring(inventoryReason))
+            end
+        end
         if PNC.Travel and PNC.Travel.Service then
             PNC.Travel.Service.OnAbstracted(record, zombie)
         end

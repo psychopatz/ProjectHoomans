@@ -25,10 +25,6 @@ function Inventory.EnsureRecordInventory(record)
         end
         return hydrated
     end
-    if type(record.inventory) ~= "table" and record.legacyEquipmentInventory == true then
-        record.legacyEquipmentInventory = nil
-        return Inventory.SyncFromEquipment(record, "legacy_equipment_load")
-    end
     if type(record.inventory) ~= "table" or not record.inventory.items or not record.inventory.containers then
         return Inventory.CreateFromTemplate(record)
     end
@@ -37,7 +33,6 @@ function Inventory.EnsureRecordInventory(record)
     generatorVersion = inv.template and tonumber(inv.template.generatorVersion) or 0
     currentGenerator = PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1
     inv.revision = math.max(0, math.floor(tonumber(inv.revision) or 0))
-    inv.deltaMode = "template_plus_delta"
     inv.cachedWeight = tonumber(inv.cachedWeight) or 0
     inv.rootMaxWeight = Internal.buildBaseCarryWeight(record)
     inv.maxWeight = tonumber(inv.maxWeight) or inv.rootMaxWeight

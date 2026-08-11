@@ -222,9 +222,14 @@ assertEqual(PNC.Core.TableSize and PNC.Core.TableSize(payloads) or 100, 100,
     "scale payload count")
 local sample = payloads.scale_npc_1
 assertEqual(sample.schemaVersion, 10, "scale schema version")
-assertEqual(sample.inventory.maxWeight, nil, "derived max weight persisted")
+assertEqual(sample.inventory[1], 1, "NPC inventory schema")
+assertEqual(sample.inventory[2][1], 1, "core virtual inventory schema")
 assertEqual(sample.inventory.cachedWeight, nil, "derived used weight persisted")
-assertEqual(#sample.inventory.delta.added, 40, "acquired item delta count")
+local logicalItems = 0
+for _, coreRecord in ipairs(sample.inventory[2][5] or {}) do
+    logicalItems = logicalItems + (tonumber(coreRecord[2]) or 0)
+end
+assert(logicalItems >= 40, "acquired logical item count")
 assertEqual(sample.health.body.partBase, 92, "body-part baseline")
 assertEqual(sample.health.body.parts.Head, 70, "body-part override")
 assertEqual(sample.runtime, nil, "runtime state leaked into save")

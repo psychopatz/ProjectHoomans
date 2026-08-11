@@ -114,7 +114,6 @@ function Internal.createBaseInventory(record)
     local maxWeight = Internal.buildBaseCarryWeight(record)
     return {
         revision = 0,
-        deltaMode = "template_plus_delta",
         cachedWeight = 0,
         maxWeight = maxWeight,
         rootMaxWeight = maxWeight,
