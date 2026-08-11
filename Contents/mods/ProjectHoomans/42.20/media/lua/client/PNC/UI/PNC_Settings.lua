@@ -123,6 +123,13 @@ local definitions = {
         label = "UI_PNC_Settings_DebugAnimation",
         get = function() return currentFlag("debugShowAnimation", true) end,
     },
+    {
+        id = "storageTransactionLogging",
+        label = "UI_PNC_Settings_StorageTransactionLogging",
+        get = function()
+            return currentFlag("storageTransactionLogging", false)
+        end,
+    },
 }
 
 local function applyDefinition(definition, value)
@@ -151,6 +158,10 @@ if ModOptions and not Settings.nativeRegistered then
         if index == 7 then
             options:addSeparator()
             options:addTitle("UI_PNC_Settings_OverlayPartsSection")
+        end
+        if index == 19 then
+            options:addSeparator()
+            options:addTitle("UI_PNC_Settings_LoggingSection")
         end
         local definition = definitions[index]
         local option = options:addTickBox(

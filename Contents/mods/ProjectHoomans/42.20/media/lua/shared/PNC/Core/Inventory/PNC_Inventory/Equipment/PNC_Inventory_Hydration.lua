@@ -16,7 +16,10 @@ function Inventory.EnsureRecordInventory(record)
     if not record then return nil end
     if type(record.inventory) ~= "table" and type(record.persistedInventory) == "table" then
         local persisted = record.persistedInventory
-        local persistedGenerator = persisted.template and tonumber(persisted.template.generatorVersion) or nil
+        local persistedTemplate = persisted.template
+            or (tonumber(persisted[1]) == 2 and persisted[4])
+        local persistedGenerator = persistedTemplate
+            and tonumber(persistedTemplate.generatorVersion) or nil
         local currentGenerator = PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1
         record.persistedInventory = nil
         local hydrated = Inventory.Deserialize(record, persisted)

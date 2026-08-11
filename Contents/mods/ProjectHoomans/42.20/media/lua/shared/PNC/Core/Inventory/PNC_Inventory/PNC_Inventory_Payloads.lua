@@ -37,7 +37,7 @@ function Inventory.BuildSummaryPayload(record)
         itemCount = tonumber(inv.itemCount) or Internal.countMapEntries(inv.items),
         containerCount = tonumber(inv.containerCount) or Internal.countMapEntries(inv.containers),
         signature = inv.signature,
-        deltaMode = inv.deltaMode,
+        persistenceMode = inv.persistenceMode,
     }
 end
 
@@ -60,7 +60,7 @@ function Inventory.BuildFullPayload(record)
     end
     return {
         revision = inv.revision,
-        deltaMode = inv.deltaMode,
+        persistenceMode = inv.persistenceMode,
         template = Core.DeepCopy(inv.template or {}),
         summary = Inventory.BuildSummaryPayload(record),
         equipped = Core.DeepCopy(inv.equipped or {}),

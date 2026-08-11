@@ -105,6 +105,26 @@ Profiler.RegisterSampler("ProjectHoomans.shared", function(api)
     api.SetGauge("ProjectHoomans.World.ManagedBodies", #(Census and Census.ManagedBodies or {}))
     api.SetGauge("ProjectHoomans.ZombieAggro.Active", Aggro and (#Aggro.order - (Aggro.holes or 0)) or 0)
     api.SetGauge("ProjectHoomans.Scheduler.PendingBuckets", countMap(PNC.Scheduler and PNC.Scheduler.Buckets))
+    local storageRepository = PNC.ColonyStorageRepository
+    local storageService = PNC.ColonyStorageService
+    local storageMetrics = storageService and storageService.Metrics or {}
+    local storageCount, logicalItems, records, usedWeight, capacity = 0, 0, 0, 0, 0
+    for _, storage in pairs(storageRepository and storageRepository.ByID or {}) do
+        storageCount = storageCount + 1
+        logicalItems = logicalItems + storage.inventory:getLogicalItemCount()
+        records = records + storage.inventory:getRecordCount()
+        usedWeight = usedWeight + storage.inventory:getWeight()
+        capacity = capacity + (storage.inventory.maxWeight or 0)
+    end
+    api.SetGauge("ProjectHoomans.ColonyStorage.Count", storageCount)
+    api.SetGauge("ProjectHoomans.ColonyStorage.LogicalItems", logicalItems)
+    api.SetGauge("ProjectHoomans.ColonyStorage.SerializedRecords", records)
+    api.SetGauge("ProjectHoomans.ColonyStorage.UsedWeight", usedWeight)
+    api.SetGauge("ProjectHoomans.ColonyStorage.Capacity", capacity)
+    api.SetGauge("ProjectHoomans.ColonyStorage.Deposits", storageMetrics.deposits or 0)
+    api.SetGauge("ProjectHoomans.ColonyStorage.Withdrawals", storageMetrics.withdrawals or 0)
+    api.SetGauge("ProjectHoomans.ColonyStorage.TransferFailures", storageMetrics.transferFailures or 0)
+    api.SetGauge("ProjectHoomans.ColonyStorage.CapacityRejects", storageMetrics.capacityRejects or 0)
     local report = ModDataProfiler and ModDataProfiler.Scan and ModDataProfiler.Scan(false) or nil
     if report then
         api.SetGauge("ProjectHoomans.ModData.PersistedEstimatedBytes", report.persisted.estimatedBytes)
@@ -126,6 +146,8 @@ function Integration.InstallServer()
     wrap(PNC.NPCKnowledge, "Save", "ProjectHoomans.Persistence.NPCKnowledge")
     wrap(PNC.Factions, "Save", "ProjectHoomans.Persistence.Factions")
     wrap(PNC.Communities, "Save", "ProjectHoomans.Persistence.Communities")
+    wrap(PNC.ColonyStorageRepository, "Save",
+        "ProjectHoomans.Persistence.ColonyStorage")
     wrap(PNC.AbstractWorldStore, "Save", "ProjectHoomans.Persistence.AbstractWorld")
     wrap(PNC.WorldDiscovery, "Save", "ProjectHoomans.Persistence.WorldDiscovery")
     wrap(PNC.Conversation and PNC.Conversation.History, "Save",

@@ -222,11 +222,13 @@ assertEqual(PNC.Core.TableSize and PNC.Core.TableSize(payloads) or 100, 100,
     "scale payload count")
 local sample = payloads.scale_npc_1
 assertEqual(sample.schemaVersion, 10, "scale schema version")
-assertEqual(sample.inventory[1], 1, "NPC inventory schema")
-assertEqual(sample.inventory[2][1], 1, "core virtual inventory schema")
+assertEqual(sample.inventory[1], 2, "NPC inventory schema")
+assertEqual(sample.inventory[2], "BASELINE_DELTA", "NPC inventory mode")
+assertEqual(sample.inventory[5][1], 1, "core delta schema")
 assertEqual(sample.inventory.cachedWeight, nil, "derived used weight persisted")
 local logicalItems = 0
-for _, coreRecord in ipairs(sample.inventory[2][5] or {}) do
+for _, upsert in ipairs(sample.inventory[5][3] or {}) do
+    local coreRecord = upsert[2]
     logicalItems = logicalItems + (tonumber(coreRecord[2]) or 0)
 end
 assert(logicalItems >= 40, "acquired logical item count")

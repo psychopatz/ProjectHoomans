@@ -1,0 +1,117 @@
+# Colony storage and research foundation
+
+## Faction storage
+
+Each authoritative faction owns a primary storage with the stable ID
+`storage:<faction-id>:primary`. The record stores the owning faction ID, the
+current settlement ID (when one exists), storage type, tier, storage revision,
+and a PsychopatzCore `VirtualInventory`. Faction and community creation eagerly
+initialize/update it; lookup also creates missing development-save state lazily.
+
+Tier and contents are independent. `PNC_ColonyStorageDefinitions` is the sole
+capacity authority: tier 1 is 200 weight and every additional tier adds 50, up
+to the configured maximum. A capacity decrease never deletes contents; an
+over-capacity store rejects deposits until enough weight is removed.
+
+`PNC_ColonyStorageRepository` persists:
+
+```text
+schemaVersion
+storageId
+ownerFactionId
+settlementId
+storageType
+tier
+revision
+inventorySnapshot  (PsychopatzCore serializer payload)
+```
+
+Capacity, used weight, indexes, display rows, filters, and other derived state
+are not persisted. Capacity is recalculated from the tier after load.
+
+## Server authority and logistics boundary
+
+UI code submits intent through `RequestColonyAction`; it never mutates storage.
+The server resolves the requesting player's current faction and primary
+storage, rejects a requested foreign storage ID, validates source identity and
+revision, preflights capacity, and executes a PsychopatzCore inventory
+transaction. Successful operations increment both inventory and storage
+revisions. Request IDs are retained in a bounded per-player cache to prevent a
+repeated packet or double click from applying twice.
+
+`requestDeposit` currently executes immediately. This is deliberately the
+execution policy behind the intent boundary. A later warehouse/hauling system
+can turn the same request into a hauling job without changing either inventory
+UI or Colony Management UI callers.
+
+Player and live-NPC transfers use `PhysicalInventoryAdapter` against real item
+containers. Ambient/abstract NPC transfers use a small source adapter over the
+existing ProjectHoomans inventory projection and emit PsychopatzCore records.
+Both use the same transaction destination and rollback semantics. Equipped,
+worn, attached, locked, and player-favorite items are rejected rather than
+leaving stale equipment references.
+
+For live NPCs, lookup prefers an exact encoded-state match and then accepts a
+loose item with the same full type. If a body predates inventory
+materialization and its physical mirror is missing, the source adapter supplies
+the missing quantity directly from the authoritative compact record. It does
+not depend on `InventoryItemFactory` reconstruction. Existing physical matches
+are still removed, and rollback restores both those objects and the compact
+inventory state.
+
+## NPC baseline/delta interaction
+
+NPC persistence retains three modes:
+
+- `SEED_ONLY`: the deterministic archetype/template inventory is unchanged.
+- `BASELINE_DELTA`: sparse removals and upserts are layered over that baseline.
+- `FULL`: explicit fallback for records without a stable baseline, or records
+  deliberately marked for full persistence.
+
+Delta upserts contain PsychopatzCore compact ItemRecords plus only the
+ProjectHoomans placement/equipment metadata needed to reconstruct the NPC
+projection. For example, taking one item from a baseline `Bandage x2` creates a
+changed baseline upsert with quantity one. It does not snapshot the whole NPC
+inventory and does not promote the NPC to `FULL`.
+
+## Colony Management UI
+
+The existing window now owns five tabs: Overview, People, Needs, Storage, and
+Research. Storage shows the general stockpile tier, used/max/free weight,
+over-capacity state and logical quantity. It reuses the inventory icon-list
+renderer, with localized item metadata and collapsible category groups. Search
+and name/quantity/weight sorting operate on presentation rows, not raw codec
+fields. Rows rebuild only after snapshot revision receipt or a filter/sort
+change; the render loop does not scan inventory records. Development controls
+and storage diagnostics live in a collapsed debug drawer.
+
+Research is definition-driven and currently exposes only Storage Capacity. Its
+clearly labelled debug upgrade is server-authoritative, changes tier/capacity,
+and leaves the inventory snapshot untouched.
+
+## Development controls
+
+When debug access is authorized, NPC/player inventory context menus offer
+`Deposit to Colony Storage`. The Storage tab also exposes Add Test Item (100
+`Base.Nails`), Remove Selected, Clear Storage, Fill Test Storage, Validate,
+Compact, and Recalculate Weight. These controls are hidden and inert when debug
+authorization is absent.
+
+`Options > Mods > Project Hoomans > Logging` contains **Log colony storage
+transactions**. It defaults off. When enabled, each storage request writes one
+structured `[PNC][STORAGE_TX]` line with action, commit/reject outcome, reason,
+request/source identifiers, quantity, and live-mirror shortfall count when
+applicable. Disabled mode does not format or emit transaction messages.
+
+Profiler sampling, when enabled, reports storage count, logical items, records,
+used weight, capacity, deposits, withdrawals, transfer failures, and capacity
+rejections. Validation/compaction counters are also included in storage
+snapshots for the development diagnostics.
+
+## Deferred work
+
+This foundation does not create warehouse world objects, construction,
+hauling/courier jobs, routes, animations, or physical crates. The next vertical
+slice should bind a storage ID to a warehouse `IsoObject`, then replace the
+instant request executor with a hauling job while preserving this repository,
+transaction, persistence, snapshot, and UI contract.

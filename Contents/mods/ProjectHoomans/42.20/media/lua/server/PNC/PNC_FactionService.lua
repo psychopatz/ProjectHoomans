@@ -654,6 +654,11 @@ function Factions.Create(spec)
     end
     if leader then commitAffiliation(leader, leaderAffiliation) end
     touchRegistry()
+    if PNC.ColonyStorageRepository
+        and PNC.ColonyStorageRepository.GetPrimary
+    then
+        PNC.ColonyStorageRepository.GetPrimary(id)
+    end
     if leader and PNC.FactionBehavior
         and PNC.FactionBehavior.ApplyNPC
     then

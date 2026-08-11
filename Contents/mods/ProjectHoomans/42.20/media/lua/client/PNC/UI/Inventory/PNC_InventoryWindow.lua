@@ -82,6 +82,18 @@ function ISPNCInventoryWindow:createChildren()
     self.takeAllButton:initialise()
     self.takeAllButton:instantiate()
     self:addChild(self.takeAllButton)
+    self.depositStorageButton = ISButton:new(
+        416, 440, 180, 22,
+        tr("UI_PNC_Storage_Deposit", "Deposit to Colony Storage"),
+        self, ISPNCInventoryWindow.onDepositStorage
+    )
+    self.depositStorageButton:initialise()
+    self.depositStorageButton:instantiate()
+    self.depositStorageButton:setVisible(
+        PNC.Client and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug() == true
+    )
+    self:addChild(self.depositStorageButton)
     self:onResponsiveLayout()
     self:refreshInventory(true)
 end
@@ -121,12 +133,30 @@ function ISPNCInventoryWindow:onResponsiveLayout()
     )
     Layout.SetBounds(self.giveAllButton, gap, buttonY, 92, 22)
     Layout.SetBounds(self.takeAllButton, npcX, buttonY, 92, 22)
+    Layout.SetBounds(self.depositStorageButton, npcX + 100, buttonY,
+        math.max(80, paneWidth - 100), 22)
     self.playerPaneX = gap
     self.npcPaneX = npcX
     self.paneWidth = paneWidth
     self.headingY = titleHeight + 8
     self.containerLabelY = titleHeight + 29
     self.statusY = buttonY + 27
+end
+
+function ISPNCInventoryWindow:onDepositStorage()
+    local entry = self.npcList and self.npcList.getItem
+        and self.npcList:getItem() or nil
+    local row = entry and entry.item or nil
+    local inventory = self:inventory()
+    if not row or row.groupHeader == true or row.restricted == true
+        or not inventory
+    then return false end
+    local selection = Model.BuildTransferSelection(row)
+    if not selection then return false end
+    self.statusText = tr("UI_PNC_Storage_Depositing", "Depositing...")
+    return PNC.Client.DepositNPCItemToColony(
+        self.npcId, row.id, selection.quantity, inventory.revision
+    )
 end
 
 function InventoryWindow.CollectBulkTransferIDs(list)
@@ -212,6 +242,12 @@ function ISPNCInventoryWindow:setConversationMode(mode, token)
         or self.statusText
     if self.takeAllButton and self.takeAllButton.setVisible then
         self.takeAllButton:setVisible(not self.giftMode)
+    end
+    if self.depositStorageButton and self.depositStorageButton.setVisible then
+        self.depositStorageButton:setVisible(
+            not self.giftMode and PNC.Client and PNC.Client.CanUseDebug
+                and PNC.Client.CanUseDebug() == true
+        )
     end
     self.contextSignature = nil
     self:refreshInventory(true)
@@ -538,6 +574,24 @@ function ISPNCInventoryWindow:showItemContext(role, row)
                 target:requestTransfer("player_to_npc", row)
             end
         )
+        if PNC.Client and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+        then
+            context:addOption(
+                tr("UI_PNC_Storage_Deposit", "Deposit to Colony Storage"),
+                self,
+                function(target)
+                    local selection = Model.BuildTransferSelection(row)
+                    if not selection then return false end
+                    target.statusText = tr(
+                        "UI_PNC_Storage_Depositing", "Depositing..."
+                    )
+                    return PNC.Client.DepositPlayerItemsToColony(
+                        selection.itemIDs
+                    )
+                end
+            )
+        end
         return
     end
     local inventory = self:inventory()
@@ -565,6 +619,27 @@ function ISPNCInventoryWindow:showItemContext(role, row)
             target:requestTransfer("npc_to_player", row)
         end
     )
+    if row.groupHeader ~= true and PNC.Client and PNC.Client.CanUseDebug
+        and PNC.Client.CanUseDebug()
+    then
+        context:addOption(
+            tr("UI_PNC_Storage_Deposit", "Deposit to Colony Storage"),
+            self,
+            function(target)
+                local selection = Model.BuildTransferSelection(row)
+                if not selection then return false end
+                target.statusText = tr(
+                    "UI_PNC_Storage_Depositing", "Depositing..."
+                )
+                return PNC.Client.DepositNPCItemToColony(
+                    target.npcId,
+                    row.id,
+                    selection.quantity,
+                    inventory.revision
+                )
+            end
+        )
+    end
 end
 
 function ISPNCInventoryWindow:sendItemAction(actionID, itemID)
@@ -809,6 +884,32 @@ function InventoryWindow.OnResult(result)
     then
         PNC.Conversation.Composer.ReceiveGiftResult(result)
     end
+end
+
+function InventoryWindow.OnColonyStorageResult(result)
+    local window = InventoryWindow.instance
+    if not window or type(result) ~= "table" then return end
+    local reason = tostring(result.reason or "failed"):gsub("_", " ")
+    local details = result.details or {}
+    if result.ok == true then
+        window.statusText = tr(
+            "UI_PNC_Storage_DepositComplete", "Deposited to colony storage"
+        )
+    elseif result.reason == "storage_full" then
+        window.statusText = string.format(
+            "%s  %s: %.1f  %s: %.1f",
+            tr("UI_PNC_Storage_Full", "Storage full"),
+            tr("UI_PNC_Storage_Requires", "Requires"),
+            tonumber(details.requiredWeight) or 0,
+            tr("UI_PNC_Storage_Available", "Available"),
+            tonumber(details.availableWeight) or 0
+        )
+    else
+        window.statusText = tr(
+            "UI_PNC_Storage_DepositFailed", "Storage deposit failed"
+        ) .. ": " .. reason
+    end
+    window.contextSignature = nil
 end
 
 function InventoryWindow.Close()

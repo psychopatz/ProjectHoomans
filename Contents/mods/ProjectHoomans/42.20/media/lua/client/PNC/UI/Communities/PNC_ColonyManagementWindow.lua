@@ -1,4 +1,6 @@
 require "PsychopatzCore/UI/PsychopatzUI"
+local StorageTabs = require "PNC/UI/Communities/PNC_ColonyManagementStorageTabs"
+local ResearchTab = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
 
 PNC = PNC or {}
 PNC.ColonyManagementUI = PNC.ColonyManagementUI or {}
@@ -124,6 +126,8 @@ function ISPNCColonyManagementWindow:createChildren()
         { id = "overview", title = "OVERVIEW" },
         { id = "people", title = "PEOPLE" },
         { id = "needs", title = "NEEDS" },
+        { id = "storage", title = "STORAGE" },
+        { id = "research", title = "RESEARCH" },
     }) do
         self.tabs[#self.tabs + 1] = UI.CreateButton(self, {
             id = definition.id,
@@ -141,6 +145,8 @@ function ISPNCColonyManagementWindow:createChildren()
         itemHeight = 48,
         doDrawItem = drawDetail,
     })
+    StorageTabs.Create(self, UI, tr)
+    ResearchTab.Create(self, UI, tr)
     self.people.onMouseDown = function(list, x, y)
         local handled = ISScrollingListBox.onMouseDown(list, x, y)
         self:onPersonSelected()
@@ -184,6 +190,7 @@ function ISPNCColonyManagementWindow:onResponsiveLayout()
         people = split.first,
         details = split.second,
         compact = split.compact,
+        content = content,
     }
     Layout.SetBounds(
         self.people,
@@ -195,6 +202,14 @@ function ISPNCColonyManagementWindow:onResponsiveLayout()
         split.second.x, split.second.y,
         split.second.width, split.second.height
     )
+    StorageTabs.Layout(self, Layout, content)
+    ResearchTab.Layout(self, Layout, content)
+    self:applyTabLayout()
+end
+
+function ISPNCColonyManagementWindow:applyTabLayout()
+    StorageTabs.ApplyLayout(self, Layout)
+    ResearchTab.ApplyVisibility(self)
 end
 
 function ISPNCColonyManagementWindow:updateTabStyles()
@@ -209,7 +224,16 @@ end
 function ISPNCColonyManagementWindow:onTab(button)
     self.tab = button and button.internal or "overview"
     self:updateTabStyles()
+    self:applyTabLayout()
     self:rebuildDetails()
+end
+
+function ISPNCColonyManagementWindow:onStorageControl(button)
+    return StorageTabs.OnControl(self, button, tr)
+end
+
+function ISPNCColonyManagementWindow:onResearchUpgrade(button)
+    return ResearchTab.OnUpgrade(self, button)
 end
 
 function ISPNCColonyManagementWindow:requestSnapshot()
@@ -231,6 +255,10 @@ function ISPNCColonyManagementWindow:rebuildDetails()
     local snapshot = self.snapshot or {}
     local colony = snapshot.colony or {}
     self.details:clear()
+    if self.storageList then self.storageList:clear() end
+    if StorageTabs.Rebuild(self, snapshot, tr)
+        or ResearchTab.Rebuild(self, snapshot, tr)
+    then return end
     if self.tab == "overview" then
         self:addDetail("STATUS", "Active community")
         self:addDetail("HOME", colony.mode and string.upper(colony.mode)
@@ -274,7 +302,7 @@ function ISPNCColonyManagementWindow:rebuildDetails()
                 LEVEL_COLORS[level]
             )
         end
-    else
+    elseif self.tab == "needs" then
         for _, needType in ipairs(NEED_TYPES) do
             local counts = snapshot.levels and snapshot.levels[needType] or {}
             self:addDetail(
@@ -297,6 +325,14 @@ function ISPNCColonyManagementWindow:rebuildDetails()
             )
         end
     end
+end
+
+function ISPNCColonyManagementWindow:toggleInventoryGroup(role, groupKey)
+    if role ~= "storage" or not groupKey then return end
+    self.storageCollapsedGroups = self.storageCollapsedGroups or {}
+    self.storageCollapsedGroups[groupKey] =
+        self.storageCollapsedGroups[groupKey] ~= true
+    self:rebuildDetails()
 end
 
 function ISPNCColonyManagementWindow:onPersonSelected()
@@ -333,6 +369,7 @@ function ISPNCColonyManagementWindow:refresh()
         self.selectedPersonID = nil
     end
     self:updateTabStyles()
+    self:applyTabLayout()
     self:rebuildDetails()
     self.lastReceiveAt = State.lastColonyManagementReceiveAt
         or PNC.Core.Now()
@@ -343,9 +380,6 @@ function ISPNCColonyManagementWindow:prerender()
         > (self.lastReceiveAt or 0)
     then
         self:refresh()
-    end
-    if PNC.Core.Now() - (self.lastRequestAt or 0) > 3000 then
-        self:requestSnapshot()
     end
     PsychopatzWindow.prerender(self)
 end
@@ -372,20 +406,28 @@ function ISPNCColonyManagementWindow:render()
         Theme.colors.textMuted.b, Theme.colors.textMuted.a,
         UIFont.Small
     )
-    UI.DrawSectionTitle(
-        self, "COMPANIONS",
-        self.layout.people.x, self.layout.people.y - 21,
-        self.layout.people.width,
-        tostring(#(snapshot.people or {}))
-    )
+    if self.tab ~= "storage" and self.tab ~= "research" then
+        UI.DrawSectionTitle(
+            self, "COMPANIONS",
+            self.layout.people.x, self.layout.people.y - 21,
+            self.layout.people.width,
+            tostring(#(snapshot.people or {}))
+        )
+    end
     local detailTitle = self.tab == "people" and "COMPANION DETAILS"
         or self.tab == "needs" and "NEEDS OVERVIEW"
+        or self.tab == "storage" and "GENERAL STOCKPILE"
+        or self.tab == "research" and "COLONY RESEARCH"
         or "COLONY STATUS"
-    UI.DrawSectionTitle(
-        self, detailTitle,
-        self.layout.details.x, self.layout.details.y - 21,
-        self.layout.details.width
-    )
+    local titleTarget = self.tab == "storage" and self.storageList or self.details
+    UI.DrawSectionTitle(self, detailTitle,
+        titleTarget:getX(), titleTarget:getY() - 21, titleTarget:getWidth())
+    if self.tab == "storage" and self.storageDebugExpanded == true then
+        UI.DrawSectionTitle(self, "DEBUG DETAILS",
+            self.details:getX(), self.details:getY() - 21,
+            self.details:getWidth())
+    end
+    StorageTabs.RenderSummary(self, Theme)
 end
 
 function ISPNCColonyManagementWindow:close()

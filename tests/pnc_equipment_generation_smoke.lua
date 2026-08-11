@@ -218,8 +218,8 @@ end
 assertEqual(ammoFound, true, "ranged equipment grant ammunition")
 
 local saved = PNC.Inventory.Serialize(bothRecord)
-assertEqual(saved[4][1].equipmentPoolID, "Default", "persisted equipment pool")
-assertEqual(saved[4][1].weaponMode, "mixed", "persisted generated weapon mode")
+assertEqual(saved[4].equipmentPoolID, "Default", "persisted equipment pool")
+assertEqual(saved[4].weaponMode, "mixed", "persisted generated weapon mode")
 
 local repeated = makeRecord("natural_both_2", 8142, "Doctor")
 local repeatedInventory = PNC.Inventory.CreateFromTemplate(repeated)

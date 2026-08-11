@@ -42,6 +42,8 @@ local function probe(fullType)
     return result
 end
 
+Model.Probe = probe
+
 local function listContainsItem(list, item)
     local entry
     local candidate

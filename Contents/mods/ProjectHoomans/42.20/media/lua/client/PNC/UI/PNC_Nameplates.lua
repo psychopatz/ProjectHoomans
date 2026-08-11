@@ -28,6 +28,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
         debugShowBlock = true,
         debugShowInfection = true,
         debugShowAnimation = true,
+        storageTransactionLogging = false,
     },
 })
 Nameplates.Settings = PNC.SettingsStore.values
@@ -57,6 +58,7 @@ local debugSettingDefaults = {
     debugShowBlock = true,
     debugShowInfection = true,
     debugShowAnimation = true,
+    storageTransactionLogging = false,
 }
 for key, value in pairs(debugSettingDefaults) do
     if Nameplates.Settings[key] == nil then Nameplates.Settings[key] = value end

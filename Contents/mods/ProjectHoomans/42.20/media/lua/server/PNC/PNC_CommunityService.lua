@@ -746,6 +746,11 @@ function Communities.Create(spec)
         Communities.Registry.byFaction[faction.id] or {}
     Communities.Registry.byFaction[faction.id][id] = true
     touchRegistry()
+    if PNC.ColonyStorageRepository
+        and PNC.ColonyStorageRepository.GetPrimary
+    then
+        PNC.ColonyStorageRepository.GetPrimary(faction.id, community.id)
+    end
     return true, "created", publicCommunity(community)
 end
 

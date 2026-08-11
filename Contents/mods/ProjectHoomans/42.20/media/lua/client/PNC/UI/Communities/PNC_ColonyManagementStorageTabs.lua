@@ -1,0 +1,251 @@
+require "ISUI/ISTextEntryBox"
+require "PNC/UI/Inventory/PNC_InventoryUI_List"
+
+local StorageTabs = {}
+local ViewModel = require "PNC/UI/Communities/PNC_ColonyStorageViewModel"
+local SORT_LABEL_KEY = "UI_PNC_Storage_Sort"
+
+function StorageTabs.Create(window, UI, tr)
+    window.storageSearch = ISTextEntryBox:new("", 0, 0, 180, 26)
+    window.storageSearch:initialise()
+    window.storageSearch:instantiate()
+    if window.storageSearch.setClearButton then
+        window.storageSearch:setClearButton(true)
+    end
+    window.storageSearch.onTextChange = function()
+        window:rebuildDetails()
+    end
+    window:addChild(window.storageSearch)
+    window.storageList = ISPNCInventoryList:new(0, 0, 100, 100, window, "storage")
+    window.storageList:initialise()
+    window.storageList:instantiate()
+    window:addChild(window.storageList)
+    window.storageSortButton = UI.CreateButton(window, {
+        id = "sort",
+        title = tr("UI_PNC_Storage_SortName", "Sort: Name"),
+        target = window,
+        onclick = ISPNCColonyManagementWindow.onStorageControl,
+        variant = "quiet",
+    })
+    window.storageDebugToggle = UI.CreateButton(window, {
+        id = "debug_toggle",
+        title = tr("UI_PNC_Storage_DebugTools", "Debug Tools") .. "  >",
+        target = window,
+        onclick = ISPNCColonyManagementWindow.onStorageControl,
+        variant = "quiet",
+    })
+    window.storageControls = {}
+    local definitions = {
+        { "add", "UI_PNC_Storage_AddTest", "Add Test Item" },
+        { "remove", "UI_PNC_Storage_RemoveSelected", "Remove Selected" },
+        { "clear", "UI_PNC_Storage_Clear", "Clear Storage" },
+        { "fill", "UI_PNC_Storage_FillTest", "Fill Test Storage" },
+        { "validate", "UI_PNC_Storage_Validate", "Validate" },
+        { "compact", "UI_PNC_Storage_Compact", "Compact" },
+        { "recalculate", "UI_PNC_Storage_Recalculate", "Recalculate Weight" },
+    }
+    for _, definition in ipairs(definitions) do
+        window.storageControls[#window.storageControls + 1] = UI.CreateButton(
+            window,
+            {
+                id = definition[1],
+                title = tr(definition[2], definition[3]),
+                target = window,
+                onclick = ISPNCColonyManagementWindow.onStorageControl,
+                variant = "quiet",
+            }
+        )
+    end
+end
+
+function StorageTabs.Layout(window, Layout, content)
+    local scale = window.uiScale
+    local gap = Layout.Pixels(6, scale)
+    local height = Layout.Pixels(28, scale)
+    local sortWidth = Layout.Pixels(132, scale)
+    local debugWidth = Layout.Pixels(152, scale)
+    local searchWidth = math.max(Layout.Pixels(100, scale),
+        content.width - sortWidth - debugWidth - gap * 2)
+    Layout.SetBounds(window.storageSearch, content.x, content.y,
+        searchWidth, height)
+    Layout.SetBounds(window.storageSortButton,
+        content.x + searchWidth + gap, content.y, sortWidth, height)
+    Layout.SetBounds(window.storageDebugToggle,
+        content.x + content.width - debugWidth, content.y, debugWidth, height)
+    window.layout.storageListY = content.y + Layout.Pixels(56, scale)
+end
+
+function StorageTabs.ApplyLayout(window, Layout)
+    if not window.layout then return end
+    local storageMode = window.tab == "storage"
+    local researchMode = window.tab == "research"
+    window.people:setVisible(not storageMode and not researchMode)
+    window.storageSearch:setVisible(storageMode)
+    window.storageList:setVisible(storageMode)
+    window.storageSortButton:setVisible(storageMode)
+    local debugVisible = storageMode and window.snapshot
+        and window.snapshot.storage
+        and window.snapshot.storage.debugAuthorized == true
+    window.storageDebugToggle:setVisible(debugVisible)
+    if not debugVisible then window.storageDebugExpanded = false end
+    local drawerVisible = debugVisible and window.storageDebugExpanded == true
+    for _, button in ipairs(window.storageControls or {}) do
+        button:setVisible(drawerVisible)
+    end
+    if storageMode then
+        local content = window.layout.content
+        local scale = window.uiScale
+        local gap = Layout.Pixels(12, scale)
+        local bottom = content.y + content.height
+        local compactDrawer = drawerVisible and Layout.IsCompact(
+            content.width, Layout.Pixels(820, scale))
+        local listWidth = content.width
+        if drawerVisible and not compactDrawer then
+            local drawerWidth = math.max(Layout.Pixels(300, scale),
+                math.floor((content.width - gap) * 0.36))
+            listWidth = content.width - gap - drawerWidth
+        end
+        local listHeight = bottom - window.layout.storageListY
+        if compactDrawer then
+            listHeight = math.max(Layout.Pixels(110, scale),
+                math.floor(listHeight * 0.48))
+        end
+        Layout.SetBounds(window.storageList, content.x,
+            window.layout.storageListY, listWidth,
+            math.max(Layout.Pixels(60, scale), listHeight))
+        window.details:setVisible(drawerVisible)
+        if drawerVisible then
+            local drawerX = compactDrawer and content.x
+                or content.x + listWidth + gap
+            local drawerWidth = compactDrawer and content.width
+                or content.width - listWidth - gap
+            local controlsY = compactDrawer
+                and window.layout.storageListY + listHeight + gap
+                or window.layout.storageListY
+            local flow = Layout.Flow(window.storageControls,
+                { x = drawerX, y = controlsY, width = drawerWidth },
+                { scale = window.uiScale, minWidth = 104, gap = 5 })
+            local detailsY = flow.bottom + Layout.Pixels(28, scale)
+            Layout.SetBounds(window.details, drawerX, detailsY,
+                drawerWidth, math.max(Layout.Pixels(40, scale),
+                    bottom - detailsY))
+        end
+    elseif researchMode then
+        window.details:setVisible(true)
+        Layout.SetBounds(window.details, window.layout.content.x,
+            window.layout.content.y + 38, window.layout.content.width,
+            math.max(60, window.layout.content.height - 38))
+    else
+        window.details:setVisible(true)
+        Layout.SetBounds(window.details,
+            window.layout.details.x, window.layout.details.y,
+            window.layout.details.width, window.layout.details.height)
+    end
+end
+
+function StorageTabs.OnControl(window, button, tr)
+    local action = button and button.internal or ""
+    if action == "debug_toggle" then
+        window.storageDebugExpanded = window.storageDebugExpanded ~= true
+        button:setTitle(tr("UI_PNC_Storage_DebugTools", "Debug Tools")
+            .. (window.storageDebugExpanded and "  v" or "  >"))
+        window:applyTabLayout()
+        window:rebuildDetails()
+        return
+    end
+    if action == "sort" then
+        local order = { "name", "quantity", "weight" }
+        local nextIndex = 1
+        for index = 1, #order do
+            if order[index] == window.storageSort then
+                nextIndex = index % #order + 1
+            end
+        end
+        window.storageSort = order[nextIndex]
+        button:setTitle(tr(SORT_LABEL_KEY, "Sort") .. ": "
+            .. string.upper(window.storageSort))
+        window:rebuildDetails()
+        return
+    end
+    local selected = window.storageList and window.storageList:selectedRow() or nil
+    PNC.Client.RequestColonyAction("storage_debug", {
+        storageId = window.snapshot and window.snapshot.storage
+            and window.snapshot.storage.storageId,
+        debugAction = action,
+        recordIndex = selected and selected.recordIndex,
+        fullType = "Base.Nails",
+        quantity = action == "remove" and selected
+            and math.max(1, math.floor(tonumber(selected.stack) or 1)) or 100,
+        search = window.storageSearch:getText(),
+        sort = window.storageSort,
+    })
+end
+
+local function rebuildStorage(window, snapshot)
+    local storage = snapshot.storage
+    if not storage then
+        window.storageList:addItem("Storage unavailable", {
+            name = "Storage unavailable",
+            category = "No faction stockpile",
+            stack = 1,
+            restricted = true,
+        })
+        return
+    end
+    if storage.debugAuthorized == true and window.storageDebugExpanded == true then
+        window:addDetail("STORAGE ID", tostring(storage.storageId), "accent")
+        window:addDetail("OWNER FACTION", tostring(storage.ownerFactionId))
+        window:addDetail("REVISION", string.format("Storage %d  |  Inventory %d",
+            storage.revision or 0, storage.inventoryRevision or 0))
+        window:addDetail("RECORDS", string.format(
+            "Logical %d  |  Serialized %d  |  Batches %d  |  Unique %d",
+            storage.logicalItemCount or 0,
+            storage.serializedRecordCount or 0,
+            storage.batchCount or 0,
+            storage.uniqueRecordCount or 0))
+        local result = snapshot.actionResult
+        if result and (result.reason == "valid" or result.reason == "invalid") then
+            window:addDetail("VALIDATION", string.upper(result.reason),
+                result.ok and "success" or "danger")
+        end
+    end
+    local rows = ViewModel.BuildInventoryRows(storage,
+        window.storageSearch:getText(), window.storageSort,
+        window.storageCollapsedGroups)
+    if #rows == 0 then
+        window.storageList:addItem("No items stored", {
+            name = "No items stored",
+            category = "Deposit from an inventory",
+            stack = 1,
+            restricted = true,
+        })
+        return
+    end
+    for _, row in ipairs(rows) do
+        window.storageList:addItem(row.name, row)
+    end
+end
+
+function StorageTabs.Rebuild(window, snapshot, tr)
+    if window.tab == "storage" then
+        rebuildStorage(window, snapshot)
+        return true
+    end
+    return false
+end
+
+function StorageTabs.RenderSummary(window, Theme)
+    local storage = window.snapshot and window.snapshot.storage or nil
+    if window.tab ~= "storage" or not storage then return end
+    local summary = window.layout.summary
+    window:drawTextRight(
+        string.format("TIER %d  |  %.1f / %.1f  |  FREE %.1f%s",
+            storage.tier or 1, storage.usedWeight or 0,
+            storage.capacity or 0, storage.freeWeight or 0,
+            storage.overCapacity and "  OVER CAPACITY" or ""),
+        summary.x + summary.width - 14, summary.y + summary.height - 23,
+        Theme.colors.textMuted.r, Theme.colors.textMuted.g,
+        Theme.colors.textMuted.b, Theme.colors.textMuted.a, UIFont.Small)
+end
+
+return StorageTabs

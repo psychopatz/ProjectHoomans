@@ -517,6 +517,59 @@ function Client.RequestColonyManagement()
     return true
 end
 
+function Client.RequestColonyAction(action, options)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local args = type(options) == "table" and Core.DeepCopy(options) or {}
+    args.action = tostring(action or "")
+    args.requestId = args.requestId or requestID("colony")
+    if PNC.Nameplates and PNC.Nameplates.Settings
+        and PNC.Nameplates.Settings.storageTransactionLogging == true
+    then
+        args.transactionLogging = true
+    end
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not player or not sendClientCommand then
+            return false, "player_unavailable"
+        end
+        sendClientCommand(
+            player, Const.MODULE, Const.CMD_COLONY_MANAGEMENT_ACTION, args
+        )
+        return true, "sent"
+    end
+    if not PNC.ColonyManagement or not PNC.ColonyManagement.HandleAction then
+        return false, "colony_management_unavailable"
+    end
+    local snapshot, result = PNC.ColonyManagement.HandleAction(player, args)
+    snapshot.actionResult = result
+    ClientState.colonyManagement = snapshot
+    ClientState.lastColonyManagementReceiveAt = Core.Now()
+    if (result.action == "storage_player_deposit"
+            or result.action == "storage_npc_deposit")
+        and PNC.InventoryWindow
+        and PNC.InventoryWindow.OnColonyStorageResult
+    then
+        PNC.InventoryWindow.OnColonyStorageResult(result)
+    end
+    return result and result.ok == true, result and result.reason
+end
+
+function Client.DepositPlayerItemsToColony(itemIDs, storageId)
+    return Client.RequestColonyAction("storage_player_deposit", {
+        itemIDs = itemIDs,
+        storageId = storageId,
+    })
+end
+
+function Client.DepositNPCItemToColony(npcId, itemID, quantity, revision, storageId)
+    return Client.RequestColonyAction("storage_npc_deposit", {
+        npcId = npcId,
+        itemID = itemID,
+        quantity = quantity,
+        inventoryRevision = revision,
+        storageId = storageId,
+    })
+end
+
 function Client.RequestWorldDiscovery(action, options)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local args = type(options) == "table"

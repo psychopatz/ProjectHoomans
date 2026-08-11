@@ -1,0 +1,220 @@
+local SHARED = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+local SERVER = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
+local CORE = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
+package.path = SHARED .. "?.lua;" .. SERVER .. "?.lua;" .. CORE .. "?.lua;"
+    .. package.path
+
+local function equal(actual, expected, label)
+    if actual ~= expected then
+        error((label or "equal") .. ": expected=" .. tostring(expected)
+            .. " actual=" .. tostring(actual))
+    end
+end
+
+local function truthy(value, label)
+    if not value then error(label or "expected truthy value") end
+end
+
+local modData = {}
+ModData = {
+    getOrCreate = function(key)
+        modData[key] = modData[key] or {}
+        return modData[key]
+    end,
+}
+isServer = function() return false end
+isClient = function() return false end
+isDebugEnabled = function() return true end
+
+PNC = {
+    Core = {
+        DeepCopy = function(value)
+            if type(value) ~= "table" then return value end
+            local output = {}
+            for key, child in pairs(value) do
+                output[key] = PNC.Core.DeepCopy(child)
+            end
+            return output
+        end,
+        LogWarn = function() end,
+    },
+    Inventory = { Internal = {} },
+    Registry = { Get = function() return nil end },
+    Equipment = {},
+}
+
+local factions = {
+    A = { id = "faction_a" },
+    B = { id = "faction_b" },
+}
+PNC.Factions = {
+    GetPlayerFaction = function(player) return factions[player.factionKey] end,
+}
+PNC.Communities = {
+    GetForFaction = function(factionID)
+        return {{ id = "colony_" .. factionID, status = "active" }}
+    end,
+}
+
+local function list(values)
+    return {
+        size = function() return #values end,
+        get = function(_, index) return values[index + 1] end,
+    }
+end
+
+local nextID = 0
+local function item(fullType, weight)
+    nextID = nextID + 1
+    local value = { fullType = fullType, weight = weight, id = nextID, modData = {} }
+    function value:getID() return self.id end
+    function value:getFullType() return self.fullType end
+    function value:getActualWeight() return self.weight end
+    function value:getWeight() return self.weight end
+    function value:getModData() return self.modData end
+    function value:isFavorite() return false end
+    function value:getAge() return 0 end
+    function value:getCurrentAmmoCount() return 0 end
+    function value:getWetness() return 0 end
+    return value
+end
+
+local function container(items)
+    local value = { values = items }
+    function value:getItems() return list(self.values) end
+    function value:DoRemoveItem(target)
+        for index = #self.values, 1, -1 do
+            if self.values[index] == target then
+                table.remove(self.values, index)
+                return true
+            end
+        end
+        return false
+    end
+    function value:AddItem(target)
+        self.values[#self.values + 1] = target
+        target.owner = self
+        return target
+    end
+    for index = 1, #items do
+        items[index].owner = value
+        items[index].getContainer = function(self) return self.owner end
+    end
+    return value
+end
+
+local Definitions = require "PNC/Core/Colony/Storage/PNC_ColonyStorageDefinitions"
+local Repository = require "PNC/Colony/Storage/PNC_ColonyStorageRepository"
+local Service = require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService"
+local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
+
+equal(Definitions.GetCapacity(1), 200, "tier one capacity")
+equal(Definitions.GetCapacity(2), 250, "tier two capacity")
+
+local playerItem = item("Base.Bandage", 0.1)
+local playerContainer = container({ playerItem })
+local playerA = {
+    factionKey = "A",
+    getUsername = function() return "player_a" end,
+    getInventory = function() return playerContainer end,
+    getAccessLevel = function() return "" end,
+    isEquipped = function() return false end,
+}
+local playerB = {
+    factionKey = "B",
+    getUsername = function() return "player_b" end,
+    getInventory = function() return container({}) end,
+    getAccessLevel = function() return "" end,
+    isEquipped = function() return false end,
+}
+
+local storageA = Repository.GetPrimary("faction_a", "colony_faction_a")
+local storageB = Repository.GetPrimary("faction_b", "colony_faction_b")
+truthy(storageA and storageB and storageA ~= storageB, "faction isolation")
+equal(storageA.tier, 1, "initial tier")
+equal(storageA.inventory:getLogicalItemCount(), 0, "initial empty storage")
+
+local ok, reason = Service.RequestPlayerDeposit(playerA, {
+    requestId = "deposit:1",
+    itemIDs = { tostring(playerItem:getID()) },
+})
+equal(ok, true, "player deposit")
+equal(reason, "deposited", "player deposit reason")
+equal(#playerContainer.values, 0, "player source removal")
+equal(storageA.inventory:getLogicalItemCount(), 1, "storage destination add")
+equal(storageB.inventory:getLogicalItemCount(), 0, "other faction unchanged")
+
+ok, reason = Service.RequestPlayerDeposit(playerA, {
+    requestId = "deposit:1",
+    itemIDs = { tostring(playerItem:getID()) },
+})
+equal(ok, false, "duplicate request rejected")
+equal(reason, "duplicate_request", "duplicate request reason")
+
+local foreignItem = item("Base.Hammer", 1)
+playerContainer:AddItem(foreignItem)
+ok, reason = Service.RequestPlayerDeposit(playerA, {
+    requestId = "deposit:foreign",
+    storageId = storageB.id,
+    itemIDs = { tostring(foreignItem:getID()) },
+})
+equal(ok, false, "foreign storage rejected")
+equal(reason, "storage_not_owned", "foreign storage reason")
+equal(#playerContainer.values, 1, "foreign rejection preserved source")
+
+storageA.inventory:clear()
+local heavy = item("Base.HeavyTest", 201)
+playerContainer:AddItem(heavy)
+ok, reason = Service.RequestPlayerDeposit(playerA, {
+    requestId = "deposit:heavy",
+    itemIDs = { tostring(heavy:getID()) },
+})
+equal(ok, false, "capacity rejection")
+equal(reason, "storage_full", "capacity rejection reason")
+equal(#playerContainer.values, 2, "capacity rollback preserved source")
+equal(storageA.inventory:getLogicalItemCount(), 0, "capacity rollback preserved destination")
+
+local nails = item("Base.Nails", 0.01)
+truthy(Inventory.deposit(storageA.inventory, nails, 100), "nails batch deposit")
+equal(storageA.inventory:getLogicalItemCount(), 100, "nails logical quantity")
+equal(storageA.inventory:getRecordCount(), 1, "nails batched record")
+local beforeWeight = storageA.inventory:getWeight()
+local beforeRecords = storageA.inventory:getRecordCount()
+ok = Service.DebugUpgrade(playerA, { storageId = storageA.id })
+equal(ok, true, "debug tier upgrade")
+equal(storageA.tier, 2, "upgraded tier")
+equal(storageA.inventory.maxWeight, 250, "upgraded capacity")
+equal(storageA.inventory:getWeight(), beforeWeight, "upgrade retained contents")
+equal(storageA.inventory:getRecordCount(), beforeRecords, "upgrade retained records")
+
+Repository.MarkDirty()
+truthy(Repository.Save(), "storage save")
+Repository.ByID = {}
+Repository.PrimaryByFaction = {}
+Repository.Loaded = false
+truthy(Repository.Load(), "storage load")
+local loaded = Repository.Get(storageA.id)
+truthy(loaded, "storage persisted")
+equal(loaded.tier, 2, "persisted tier")
+equal(loaded.inventory:getLogicalItemCount(), 100, "persisted contents")
+equal(loaded.inventory.maxWeight, 250, "capacity rederived from tier")
+
+local snapshot = Service.BuildSnapshot(playerA)
+equal(snapshot.logicalItemCount, 100, "snapshot logical quantity")
+equal(#snapshot.rows, 1, "snapshot batched row")
+equal(snapshot.rows[1].quantity, 100, "snapshot row quantity")
+
+PNC.Equipment.CreateItem = function(fullType)
+    return item(fullType, fullType == "Base.Nails" and 0.01 or 1)
+end
+ok, reason = Service.DebugAction(playerA, {
+    storageId = loaded.id,
+    debugAction = "add",
+    fullType = "Base.Nails",
+    quantity = 5,
+})
+equal(ok, true, "debug add test item")
+equal(loaded.inventory:count("Base.Nails"), 105,
+    "debug add item did not reach storage")
+
+print("pnc_colony_storage_smoke: ok")

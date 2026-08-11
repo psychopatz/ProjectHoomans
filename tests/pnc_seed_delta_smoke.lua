@@ -1,9 +1,11 @@
 local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
 local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
 local COMMON_ROOT = "Contents/mods/ProjectHoomans/common/media/lua/shared/"
+local SERVER_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
 local CORE_ROOT = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
 
 package.path = SHARED_ROOT .. "?.lua;" .. COMMON_ROOT .. "?.lua;"
+    .. SERVER_ROOT .. "?.lua;"
     .. CORE_ROOT .. "?.lua;" .. package.path
 
 local function assertEqual(actual, expected, label)
@@ -125,6 +127,9 @@ local newBase = PNC.Skills.GetBaseLevel(record, "Strength")
 assertEqual(PNC.Skills.GetLevel(record, "Strength"), math.min(10, newBase + 2), "skill automatic rebase")
 
 local inventory = PNC.Inventory.CreateFromTemplate(record)
+local seedOnly = PNC.Inventory.Serialize(record)
+assertEqual(seedOnly[2], "SEED_ONLY", "unchanged baseline persistence mode")
+assertEqual(seedOnly[5], nil, "seed-only inventory persisted a delta")
 local bandageID
 for id, item in pairs(inventory.items) do
     if item.templateKey == "tmpl:supply:medical_bandage" then bandageID = id end
@@ -209,9 +214,10 @@ assert(PNC.Inventory.ApplyDelta(record, {
 }, "test_zero_state"), "zero-valued template state update failed")
 
 local saved = PNC.Inventory.Serialize(record)
-assertEqual(saved[1], 1, "NPC inventory schema")
-assertEqual(saved[2][1], 1, "core virtual inventory schema")
-assertEqual(saved[4][1].generatorVersion, 1, "generator version")
+assertEqual(saved[1], 2, "NPC inventory schema")
+assertEqual(saved[2], "BASELINE_DELTA", "NPC persistence mode")
+assertEqual(saved[4].generatorVersion, 1, "generator version")
+assertEqual(saved[5][1], 1, "core delta schema")
 
 loadout.supplies[#loadout.supplies + 1] = {
     key = "new_template_item",
@@ -241,7 +247,7 @@ for _, item in pairs(reloaded.inventory.items) do
 end
 assertEqual(hasBandage, false, "removed template item returned")
 assertEqual(hasLoot, true, "added item lost on rebase")
-assertEqual(hasNewTemplate, false, "save load unexpectedly regenerated inventory")
+assertEqual(hasNewTemplate, true, "new baseline item did not appear")
 assertEqual(reloaded.inventory.items.loot_1.stack, 3, "updated stack lost on rebase")
 assertEqual(reloaded.inventory.items.loot_1.ammoCount, 0, "magazine state lost on rebase")
 assertEqual(reloaded.inventory.equipped.primary, "fallback_1", "equipped primary lost on rebase")
@@ -257,6 +263,64 @@ local reloadedCard = PNC.Inventory.Internal.findItemByTemplateKey(
 )
 assertEqual(reloadedCard.cond, 0, "zero condition lost on rebase")
 assertEqual(reloadedCard.ammoCount, 0, "zero ammo state lost on rebase")
+
+isServer = function() return false end
+isClient = function() return false end
+isDebugEnabled = function() return true end
+local modData = {}
+ModData = { getOrCreate = function(key)
+    modData[key] = modData[key] or {}
+    return modData[key]
+end }
+local depositRecord = {
+    id = "npc_storage_delta",
+    identitySeed = 99,
+    archetypeID = "Test",
+    faction = "neutral",
+    weaponMode = "melee",
+    progression = { skillLevelDeltas = {}, skillXP = {} },
+    equipment = { worn = {}, attached = {} },
+    runtime = {},
+}
+PNC.Inventory.CreateFromTemplate(depositRecord)
+local depositBandageID
+for itemID, compact in pairs(depositRecord.inventory.items) do
+    if compact.templateKey == "tmpl:supply:medical_bandage" then
+        depositBandageID = itemID
+    end
+end
+PNC.Registry = {
+    Get = function(id) return id == depositRecord.id and depositRecord or nil end,
+    GetLiveZombie = function() return nil end,
+    MarkDirty = function() end,
+}
+PNC.Factions = { GetPlayerFaction = function() return { id = "faction_a" } end }
+PNC.Communities = { GetForFaction = function()
+    return {{ id = "colony_a", status = "active" }}
+end }
+local StorageService = require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService"
+local deposited, depositReason = StorageService.RequestNPCDeposit({
+    getUsername = function() return "tester" end,
+    getAccessLevel = function() return "" end,
+}, {
+    requestId = "npc-storage:1",
+    npcId = depositRecord.id,
+    itemID = depositBandageID,
+    quantity = 1,
+    inventoryRevision = depositRecord.inventory.revision,
+})
+assertEqual(deposited, true, "abstract NPC storage deposit")
+assertEqual(depositReason, "deposited", "abstract NPC deposit reason")
+assertEqual(depositRecord.inventory.items[depositBandageID].stack, 1,
+    "baseline NPC sparse removal")
+assertEqual(depositRecord.inventory.persistenceMode, "BASELINE_DELTA",
+    "baseline NPC persistence mode after deposit")
+local depositedPersistence = PNC.Inventory.Serialize(depositRecord)
+assertEqual(depositedPersistence[2], "BASELINE_DELTA",
+    "storage deposit forced full NPC persistence")
+local factionStorage = PNC.ColonyStorageRepository.GetPrimary("faction_a")
+assertEqual(factionStorage.inventory:getLogicalItemCount(), 1,
+    "NPC deposit missing from faction storage")
 
 local function javaList(values)
     return { size = function() return #values end,
@@ -308,4 +372,157 @@ assertEqual(capturedLoot, true, "physical item missing after abstraction")
 assertEqual(reloaded.inventory.equipped.primary, "fallback_1",
     "physical round trip lost equipped item")
 
-print("pnc_inventory_core_persistence_smoke: ok")
+local liveRecord = {
+    id = "npc_storage_live",
+    identitySeed = 123,
+    archetypeID = "Test",
+    faction = "neutral",
+    weaponMode = "melee",
+    progression = { skillLevelDeltas = {}, skillXP = {} },
+    equipment = { worn = {}, attached = {} },
+    runtime = {},
+}
+PNC.Inventory.CreateFromTemplate(liveRecord)
+local liveBandageID
+for itemID, compact in pairs(liveRecord.inventory.items) do
+    if compact.templateKey == "tmpl:supply:medical_bandage" then
+        liveBandageID = itemID
+    end
+end
+local transferItems = {}
+local transferContainer = {}
+function transferContainer:getItems() return javaList(transferItems) end
+function transferContainer:AddItem(item)
+    transferItems[#transferItems + 1] = item
+    return item
+end
+function transferContainer:DoRemoveItem(item)
+    for index = #transferItems, 1, -1 do
+        if transferItems[index] == item then
+            table.remove(transferItems, index)
+            return true
+        end
+    end
+    return false
+end
+local transferBody = { getInventory = function() return transferContainer end }
+assert(PNC.Inventory.MaterializeLooseInventory(liveRecord, transferBody),
+    "live NPC inventory did not materialize")
+local physicalBefore = #transferItems
+PNC.Registry.Get = function(id)
+    return id == liveRecord.id and liveRecord or nil
+end
+PNC.Registry.GetLiveZombie = function(id)
+    return id == liveRecord.id and transferBody or nil
+end
+local liveDeposited, liveReason = StorageService.RequestNPCDeposit({
+    getUsername = function() return "tester" end,
+    getAccessLevel = function() return "" end,
+}, {
+    requestId = "npc-storage:live",
+    npcId = liveRecord.id,
+    itemID = liveBandageID,
+    quantity = 1,
+    inventoryRevision = liveRecord.inventory.revision,
+})
+assertEqual(liveDeposited, true, "live NPC storage deposit")
+assertEqual(liveReason, "deposited", "live NPC deposit reason")
+assertEqual(#transferItems, physicalBefore - 1,
+    "live physical adapter did not remove item")
+assertEqual(liveRecord.inventory.items[liveBandageID].stack, 1,
+    "live compact overlay did not track removal")
+assertEqual(PNC.Inventory.Serialize(liveRecord)[2], "BASELINE_DELTA",
+    "live NPC deposit promoted persistence to FULL")
+
+local repairRecord = {
+    id = "npc_storage_live_repair",
+    identitySeed = 456,
+    archetypeID = "Test",
+    faction = "neutral",
+    weaponMode = "melee",
+    progression = { skillLevelDeltas = {}, skillXP = {} },
+    equipment = { worn = {}, attached = {} },
+    runtime = {},
+}
+PNC.Inventory.CreateFromTemplate(repairRecord)
+local repairBandageID
+for itemID, compact in pairs(repairRecord.inventory.items) do
+    if compact.templateKey == "tmpl:supply:medical_bandage" then
+        repairBandageID = itemID
+    end
+end
+local repairItems = {}
+local repairContainer = {}
+function repairContainer:getItems() return javaList(repairItems) end
+function repairContainer:AddItem(value)
+    repairItems[#repairItems + 1] = value
+    return value
+end
+function repairContainer:DoRemoveItem(value)
+    for index = #repairItems, 1, -1 do
+        if repairItems[index] == value then
+            table.remove(repairItems, index)
+            return true
+        end
+    end
+    return false
+end
+local repairBody = { getInventory = function() return repairContainer end }
+PNC.Registry.Get = function(id)
+    return id == repairRecord.id and repairRecord or nil
+end
+PNC.Registry.GetLiveZombie = function(id)
+    return id == repairRecord.id and repairBody or nil
+end
+local transactionLogs = {}
+PNC.Core.LogInfo = function(message)
+    transactionLogs[#transactionLogs + 1] = message
+end
+local repairedDeposit, repairedReason = StorageService.RequestNPCDeposit({
+    getUsername = function() return "tester" end,
+    getAccessLevel = function() return "" end,
+}, {
+    requestId = "npc-storage:repair",
+    npcId = repairRecord.id,
+    itemID = repairBandageID,
+    quantity = 1,
+    inventoryRevision = repairRecord.inventory.revision,
+    transactionLogging = true,
+})
+assertEqual(repairedDeposit, true, "missing live mirror storage deposit")
+assertEqual(repairedReason, "deposited", "missing live mirror deposit reason")
+assertEqual(#repairItems, 0, "live mirror repair leaked a physical item")
+assertEqual(#transactionLogs, 1, "committed transaction was not logged once")
+assert(string.find(transactionLogs[1], "outcome=commit", 1, true),
+    "transaction log omitted commit outcome")
+assert(string.find(transactionLogs[1], "mirror_shortfall=1", 1, true),
+    "transaction log omitted live mirror shortfall")
+local rejectedDeposit = StorageService.RequestNPCDeposit({
+    getUsername = function() return "tester" end,
+    getAccessLevel = function() return "" end,
+}, {
+    requestId = "npc-storage:missing",
+    npcId = repairRecord.id,
+    itemID = "missing",
+    quantity = 1,
+    inventoryRevision = repairRecord.inventory.revision,
+    transactionLogging = true,
+})
+assertEqual(rejectedDeposit, false, "missing item transaction was not rejected")
+assertEqual(#transactionLogs, 2, "rejected transaction was not logged once")
+assert(string.find(transactionLogs[2], "outcome=reject", 1, true),
+    "transaction log omitted rejection outcome")
+StorageService.RequestNPCDeposit({
+    getUsername = function() return "tester" end,
+    getAccessLevel = function() return "" end,
+}, {
+    requestId = "npc-storage:logging-off",
+    npcId = repairRecord.id,
+    itemID = "missing",
+    quantity = 1,
+    inventoryRevision = repairRecord.inventory.revision,
+})
+assertEqual(#transactionLogs, 2,
+    "disabled transaction logging still emitted output")
+
+print("pnc_seed_delta_smoke: ok")

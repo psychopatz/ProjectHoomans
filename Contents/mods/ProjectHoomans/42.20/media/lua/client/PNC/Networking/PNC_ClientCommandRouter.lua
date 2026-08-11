@@ -309,6 +309,14 @@ end)
 Internal.RegisterServerCommand(Const.CMD_COLONY_MANAGEMENT, function(args)
     ClientState.colonyManagement = args.snapshot
     ClientState.lastColonyManagementReceiveAt = Core.Now()
+    if args.snapshot and args.snapshot.actionResult
+        and (args.snapshot.actionResult.action == "storage_player_deposit"
+            or args.snapshot.actionResult.action == "storage_npc_deposit")
+        and PNC.InventoryWindow
+        and PNC.InventoryWindow.OnColonyStorageResult
+    then
+        PNC.InventoryWindow.OnColonyStorageResult(args.snapshot.actionResult)
+    end
     if PNC.ColonyNamePrompt and PNC.ColonyNamePrompt.OpenIfNeeded then
         PNC.ColonyNamePrompt.OpenIfNeeded(args.snapshot)
     end

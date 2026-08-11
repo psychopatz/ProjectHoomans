@@ -792,10 +792,9 @@ local function onClientCommand(module, command, player, args)
     if command == Const.CMD_COLONY_MANAGEMENT_ACTION then
         local snapshot
         local result
-        if PNC.ColonyManagement and PNC.ColonyManagement.RenameForPlayer
-            and args and args.action == "rename"
+        if PNC.ColonyManagement and PNC.ColonyManagement.HandleAction
         then
-            snapshot, result = PNC.ColonyManagement.RenameForPlayer(
+            snapshot, result = PNC.ColonyManagement.HandleAction(
                 player,
                 args
             )
@@ -1092,6 +1091,9 @@ local function onServerStarted()
     end
     if PNC.Communities and PNC.Communities.Load then
         PNC.Communities.Load()
+    end
+    if PNC.ColonyStorageRepository and PNC.ColonyStorageRepository.Load then
+        PNC.ColonyStorageRepository.Load()
     end
     if PNC.AbstractWorldStore and PNC.AbstractWorldStore.Load then
         PNC.AbstractWorldStore.Load()

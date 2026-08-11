@@ -71,6 +71,8 @@ assert(options:getOption("showAIDebug"),
     "AI overlay missing from native options")
 assert(options:getOption("debugShowAnimation"),
     "animation detail missing from native options")
+assert(options:getOption("storageTransactionLogging"),
+    "storage transaction logging missing from native options")
 
 options:getOption("showAIDebug").value = true
 options:apply()
@@ -78,6 +80,12 @@ assertEqual(PNC.Nameplates.Settings.showAIDebug, true,
     "native settings did not apply AI overlay")
 assertEqual(writes.showAIDebug, true,
     "native settings did not persist AI overlay")
+options:getOption("storageTransactionLogging").value = true
+options:apply()
+assertEqual(PNC.Nameplates.Settings.storageTransactionLogging, true,
+    "storage transaction logging setting did not apply")
+assertEqual(writes.storageTransactionLogging, true,
+    "storage transaction logging setting did not persist")
 assertEqual(PNC.Settings.Open(), options,
     "compatibility settings surface")
 

@@ -92,9 +92,13 @@ function ISPNCInventoryList:onMouseDown(x, y)
     end
     local row = self:selectedRow()
     if row and self.ownerWindow then
-        if row.groupHeader and x <= 16 then
+        if row.groupHeader and x <= 16
+            and self.ownerWindow.toggleInventoryGroup
+        then
             self.ownerWindow:toggleInventoryGroup(self.role, row.groupKey)
-        elseif row.restricted ~= true then
+        elseif row.restricted ~= true
+            and self.ownerWindow.beginInventoryDrag
+        then
             self.ownerWindow:beginInventoryDrag(self.role, row)
         end
     end
@@ -105,7 +109,7 @@ function ISPNCInventoryList:onMouseUp(x, y)
     if ISScrollingListBox.onMouseUp then
         ISScrollingListBox.onMouseUp(self, x, y)
     end
-    if self.ownerWindow then
+    if self.ownerWindow and self.ownerWindow.completeInventoryDrop then
         self.ownerWindow:completeInventoryDrop(self.role)
     end
     return true
@@ -115,7 +119,7 @@ function ISPNCInventoryList:onMouseUpOutside(x, y)
     if ISScrollingListBox.onMouseUpOutside then
         ISScrollingListBox.onMouseUpOutside(self, x, y)
     end
-    if self.ownerWindow then
+    if self.ownerWindow and self.ownerWindow.completeInventoryDropAtMouse then
         self.ownerWindow:completeInventoryDropAtMouse()
     end
     return true
@@ -126,7 +130,7 @@ function ISPNCInventoryList:onRightMouseUp(x, y)
         ISScrollingListBox.onMouseDown(self, x, y)
     end
     local row = self:selectedRow()
-    if row and self.ownerWindow then
+    if row and self.ownerWindow and self.ownerWindow.showItemContext then
         self.ownerWindow:showItemContext(self.role, row)
         return true
     end

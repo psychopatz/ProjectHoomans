@@ -18,7 +18,7 @@ local function summary(record)
         priorityType=priorityType, priority=priority,
         location={x=record.x,y=record.y,z=record.z} }
 end
-function Management.BuildSnapshot(player)
+function Management.BuildSnapshot(player, options)
     local people, attention, counts = {}, {}, { hunger={}, hydration={}, fatigue={} }
     local playerFaction, colony
     if PNC.Factions and PNC.Factions.GetPlayerFaction then playerFaction = PNC.Factions.GetPlayerFaction(player) end
@@ -36,7 +36,16 @@ function Management.BuildSnapshot(player)
     end
     table.sort(people,function(a,b) return a.name<b.name end)
     table.sort(attention,function(a,b) return a.value<b.value end)
+    local storage = PNC.ColonyStorageService
+        and PNC.ColonyStorageService.BuildSnapshot
+        and PNC.ColonyStorageService.BuildSnapshot(player, options) or nil
+    local storageState = storage and PNC.ColonyStorageRepository
+        and PNC.ColonyStorageRepository.Get(storage.storageId) or nil
+    local research = PNC.ColonyResearchService
+        and PNC.ColonyResearchService.BuildSnapshot(storageState)
+        or { entries = {} }
     return { colony=colony, people=people, attention=attention, levels=counts,
+        storage=storage, research=research,
         generatedAt=PNC.NeedsUtils.WorldAgeHours() }
 end
 
@@ -73,6 +82,43 @@ function Management.RenameForPlayer(player, args)
         ok = ok == true,
         reason = reason,
         communityID = communityID,
+    }
+end
+
+function Management.HandleAction(player, args)
+    args = type(args) == "table" and args or {}
+    local action = tostring(args.action or "")
+    if action == "rename" then return Management.RenameForPlayer(player, args) end
+    local ok, reason, details, storage, record
+    if action == "storage_player_deposit" then
+        ok, reason, details, storage =
+            PNC.ColonyStorageService.RequestPlayerDeposit(player, args)
+    elseif action == "storage_npc_deposit" then
+        ok, reason, details, storage, record =
+            PNC.ColonyStorageService.RequestNPCDeposit(player, args)
+        if record and PNC.Network and PNC.Network.SendInventoryDelta then
+            PNC.Network.SendInventoryDelta(
+                player, record, tonumber(args.inventoryRevision) or 0
+            )
+        end
+    elseif action == "storage_debug" then
+        ok, reason, storage, details =
+            PNC.ColonyStorageService.DebugAction(player, args)
+    elseif action == "research_debug_upgrade" then
+        ok, reason, storage = PNC.ColonyResearchService.DebugUpgrade(
+            player, tostring(args.researchId or ""), args
+        )
+    else
+        ok, reason = false, "unknown_colony_action"
+    end
+    local snapshot = Management.BuildSnapshot(player)
+    return snapshot, {
+        ok = ok == true,
+        reason = reason,
+        details = details,
+        storageId = storage and storage.id or nil,
+        requestId = args.requestId,
+        action = action,
     }
 end
 return Management

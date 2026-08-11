@@ -143,6 +143,9 @@ function Inventory.ApplyDelta(record, ops, reason)
         return false, {}
     end
     Internal.bumpRevision(record, appliedOps, reason)
+    if inv.persistenceMode ~= "FULL" then
+        inv.persistenceMode = "BASELINE_DELTA"
+    end
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)
     if PNC.Registry and PNC.Registry.MarkDirty then

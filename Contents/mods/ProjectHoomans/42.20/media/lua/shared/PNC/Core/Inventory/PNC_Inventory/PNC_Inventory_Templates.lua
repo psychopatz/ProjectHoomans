@@ -206,6 +206,7 @@ function Inventory.CreateFromTemplate(record, options)
         inv.revision = 0
     end
     runtime.opLog = {}
+    inv.persistenceMode = "SEED_ONLY"
     Internal.refreshNextItemSerial(record, inv)
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)

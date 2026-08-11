@@ -43,6 +43,8 @@ function Coordinator.Commit(reason)
         knowledge = PNC.NPCKnowledge and PNC.NPCKnowledge.Dirty == true,
         factions = PNC.Factions and PNC.Factions.Dirty == true,
         communities = PNC.Communities and PNC.Communities.Dirty == true,
+        colonyStorage = PNC.ColonyStorageRepository
+            and PNC.ColonyStorageRepository.Dirty == true,
         abstractWorld = PNC.AbstractWorldStore
             and PNC.AbstractWorldStore.Dirty == true,
         worldDiscovery = PNC.WorldDiscovery
@@ -64,6 +66,9 @@ function Coordinator.Commit(reason)
         if PNC.Factions and initialDirty.factions then PNC.Factions.Dirty = true end
         if PNC.Communities and initialDirty.communities then
             PNC.Communities.Dirty = true
+        end
+        if PNC.ColonyStorageRepository and initialDirty.colonyStorage then
+            PNC.ColonyStorageRepository.Dirty = true
         end
         if PNC.AbstractWorldStore and initialDirty.abstractWorld then
             PNC.AbstractWorldStore.Dirty = true
@@ -106,6 +111,8 @@ function Coordinator.Commit(reason)
     ok, why = save("factions", PNC.Factions)
     if not ok then return failure(why) end
     ok, why = save("communities", PNC.Communities)
+    if not ok then return failure(why) end
+    ok, why = save("colonyStorage", PNC.ColonyStorageRepository)
     if not ok then return failure(why) end
     ok, why = save("abstractWorld", PNC.AbstractWorldStore)
     if not ok then return failure(why) end

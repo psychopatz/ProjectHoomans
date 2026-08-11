@@ -129,6 +129,7 @@ function Internal.createBaseInventory(record)
             seed = record and record.identitySeed or 1,
             generatorVersion = PNC.Const and PNC.Const.GENERATOR_VERSION or 1,
         },
+        persistenceMode = "SEED_ONLY",
     }
 end
 

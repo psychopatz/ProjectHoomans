@@ -57,6 +57,23 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
 end
 
 dofile(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryUI_Model.lua")
+dofile(CLIENT_ROOT .. "PNC/UI/Communities/PNC_ColonyStorageViewModel.lua")
+local storageRows = PNC.ColonyStorageViewModel.BuildInventoryRows({ rows = {
+    { recordIndex = 1, fullType = "Base.Crisps", name = "Crisps",
+        quantity = 3, totalWeight = 0.6 },
+    { recordIndex = 2, fullType = "Base.Bandage", name = "Bandage",
+        quantity = 2, totalWeight = 0.2 },
+} }, "", "name", {})
+assertEqual(storageRows[1].groupHeader, true,
+    "storage inventory category header missing")
+assertEqual(storageRows[2].texture ~= nil, true,
+    "storage inventory row texture missing")
+local collapsedStorageRows = PNC.ColonyStorageViewModel.BuildInventoryRows({ rows = {
+    { recordIndex = 1, fullType = "Base.Crisps", name = "Crisps",
+        quantity = 3, totalWeight = 0.6 },
+} }, "", "name", { ["storage-category:item"] = true })
+assertEqual(#collapsedStorageRows, 1,
+    "collapsed storage category still exposed child rows")
 dofile(SHARED_ROOT .. "PNC/Conversation/PNC_ConversationGifts.lua")
 assertEqual(PNC.Gifts.IsValidItemType("Base.Crisps"), true,
     "crisps are valid food gifts")
