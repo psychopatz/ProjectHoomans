@@ -558,6 +558,50 @@ function Client.RequestColonyAction(action, options)
     return result and result.ok == true, result and result.reason
 end
 
+function Client.RequestCreateBase(options)
+    return Client.RequestColonyAction("base_create", options)
+end
+
+function Client.RequestExpandBase(options)
+    return Client.RequestColonyAction("base_expand", options)
+end
+
+function Client.RequestShrinkBase(options)
+    return Client.RequestColonyAction("base_shrink", options)
+end
+
+function Client.RequestBuildBarricade(options)
+    return Client.RequestColonyAction("barricade_build", options)
+end
+
+function Client.RequestUpgradeHQ(options)
+    return Client.RequestColonyAction("hq_upgrade", options)
+end
+
+function Client.RequestCreateFacility(options)
+    return Client.RequestColonyAction("facility_create", options)
+end
+
+function Client.RequestUpgradeFacility(options)
+    return Client.RequestColonyAction("facility_upgrade", options)
+end
+
+function Client.RequestSetFacilityComponent(options)
+    return Client.RequestColonyAction("facility_component_set", options)
+end
+
+function Client.RequestRemoveFacilityComponent(options)
+    return Client.RequestColonyAction("facility_component_remove", options)
+end
+
+function Client.RequestDestroyFacility(options)
+    return Client.RequestColonyAction("facility_destroy", options)
+end
+
+function Client.RequestCreateStockpileAccessNode(options)
+    return Client.RequestColonyAction("stockpile_node_create", options)
+end
+
 function Client.DepositPlayerItemsToColony(itemIDs, storageId)
     return Client.RequestColonyAction("storage_player_deposit", {
         itemIDs = itemIDs,

@@ -4,6 +4,7 @@ local Storage = require "PNC/UI/Communities/PNC_ColonyManagementStorageTabs"
 local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
 local DebugTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_DebugTab"
+local BaseTab = require "PNC/UI/Communities/ColonyManagement/PNC_SettlementManagementTab"
 
 Registry.Register({
     id = "overview",
@@ -22,6 +23,30 @@ Registry.Register({
     showRoster = true,
     buildRows = function(context)
         return Presentation.BuildPeople(context.selectedPerson)
+    end,
+})
+
+Registry.Register({
+    id = "base",
+    title = function()
+        return Shared.Tr("UI_PNC_Base_Tab", "BASE")
+    end,
+    detailTitle = "SETTLEMENT & FACILITIES",
+    showRoster = false,
+    create = function(window, UI)
+        BaseTab.Create(window, UI)
+    end,
+    layout = function(window, Layout, content)
+        BaseTab.Layout(window, Layout, content)
+    end,
+    apply = function(window, active)
+        BaseTab.Apply(window, active)
+    end,
+    rebuild = function(window, snapshot)
+        return BaseTab.Rebuild(window, snapshot)
+    end,
+    onControl = function(window, button)
+        return BaseTab.OnControl(window, button)
     end,
 })
 
@@ -96,7 +121,7 @@ if PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() then
         end,
         buildRows = function(context)
             return DebugTab.BuildRows(
-                context.selectedPerson, context.snapshot
+                context.selectedPerson, context.snapshot, context.window
             )
         end,
         onControl = function(window, button)

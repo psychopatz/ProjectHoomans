@@ -806,7 +806,22 @@ local function onClientCommand(module, command, player, args)
             result = { ok = false, reason = "unknown_colony_action" }
         end
         snapshot.actionResult = result
-        Network.SendColonyManagement(player, snapshot)
+        local settlementAction = {
+            base_create = true, base_expand = true, base_shrink = true,
+            barricade_build = true, hq_upgrade = true,
+            facility_create = true, facility_upgrade = true,
+            facility_component_set = true, facility_component_remove = true,
+            facility_destroy = true, stockpile_node_create = true,
+            stockpile_node_remove = true,
+        }
+        if settlementAction[tostring(args and args.action or "")]
+            and Network.SendSettlementDelta
+        then
+            Network.SendSettlementDelta(player, snapshot.settlement, result,
+                snapshot.storage)
+        else
+            Network.SendColonyManagement(player, snapshot)
+        end
         return
     end
 

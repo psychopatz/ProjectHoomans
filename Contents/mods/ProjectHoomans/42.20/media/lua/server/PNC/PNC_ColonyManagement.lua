@@ -3,11 +3,26 @@ if isClient and isClient() and (not isServer or not isServer()) then return end
 PNC = PNC or {}
 PNC.ColonyManagement = PNC.ColonyManagement or {}
 local Management, Definitions = PNC.ColonyManagement, PNC.NeedsDefinitions
+Management.SettlementResults = Management.SettlementResults or {}
+Management.SettlementResultOrder = Management.SettlementResultOrder or {}
+Management.MAX_SETTLEMENT_RESULTS = 256
+
+local function rememberSettlementResult(requestId, value)
+    if not requestId then return end
+    requestId = tostring(requestId)
+    Management.SettlementResults[requestId] = PNC.Core.DeepCopy(value)
+    Management.SettlementResultOrder[#Management.SettlementResultOrder + 1] = requestId
+    if #Management.SettlementResultOrder > Management.MAX_SETTLEMENT_RESULTS then
+        local expired = table.remove(Management.SettlementResultOrder, 1)
+        Management.SettlementResults[expired] = nil
+    end
+end
 
 local function owned(record, player)
     return PNC.CompanionCommands and PNC.CompanionCommands.IsOwnedByPlayer
         and PNC.CompanionCommands.IsOwnedByPlayer(record, player)
 end
+local canUseDebug
 local function summary(record)
     local needs = PNC.IndividualNeeds.Ensure(record)
     local priorityType, priority = PNC.IndividualNeeds.GetHighestPriority(record)
@@ -30,11 +45,61 @@ local function summary(record)
             and PNC.NPCSupplyService.GetDebugState
             and PNC.NPCSupplyService.GetDebugState(record) or {},
         journal=journal,
+        facilityDebugWork=record.runtime and record.runtime.facilityDebugWork
+            and PNC.Core.DeepCopy(record.runtime.facilityDebugWork) or nil,
         priorityType=priorityType, priority=priority,
         location={x=record.x,y=record.y,z=record.z} }
 end
 
-local function canUseDebug(player)
+local function debugFacilityWorkAction(player, args)
+    if not canUseDebug(player) then return false, "not_authorized" end
+    local record = PNC.Registry and PNC.Registry.Get(args.npcID) or nil
+    if not record or record.alive == false or not owned(record, player) then
+        return false, "npc_not_owned"
+    end
+    record.runtime = record.runtime or {}
+    if tostring(args.operation or "start") == "stop" then
+        local state = record.runtime.facilityDebugWork
+        if not state then return false, "facility_work_not_active" end
+        local previous = state.previousOrder
+        record.runtime.facilityDebugWork = nil
+        PNC.OrderSystem.SetOrder(record, previous)
+        return true, "facility_work_stopped", { npcID = record.id }
+    end
+    local facility = PNC.SettlementRepository.GetFacility(args.facilityId)
+    local base = facility and PNC.BaseService.Get(facility.baseId) or nil
+    if not base then return false, "FACILITY_NOT_FOUND" end
+    if not PNC.BaseValidationService.CanUse(player, base) then
+        return false, "NO_PERMISSION"
+    end
+    local target, reason = PNC.FacilityService.ResolveWorkTarget(facility)
+    if not target then return false, reason end
+    local definition = PNC.FacilityDefinitions.Get(facility.definitionId)
+    local previous = record.runtime.facilityDebugWork
+        and record.runtime.facilityDebugWork.previousOrder
+        or PNC.Core.DeepCopy(record.orderSpec)
+    local facilityName = definition and definition.displayNameKey
+        and tostring(definition.displayNameKey) or facility.definitionId
+    record.runtime.facilityDebugWork = {
+        facilityId = facility.id,
+        facilityName = facilityName,
+        componentId = target.componentId,
+        role = target.role,
+        phase = "QUEUED",
+        target = { x = target.x, y = target.y, z = target.z },
+        previousOrder = previous,
+    }
+    PNC.OrderSystem.SetOrder(record, {
+        kind = "facility_debug_work", facilityId = facility.id,
+        facilityName = facilityName, componentId = target.componentId,
+        role = target.role, x = target.x, y = target.y, z = target.z,
+    })
+    return true, "facility_work_started", {
+        npcID = record.id, facilityId = facility.id, target = target,
+    }
+end
+
+canUseDebug = function(player)
     if not isServer or not isServer() then
         if isDebugEnabled then return isDebugEnabled() == true end
         return getCore and getCore() and getCore():getDebug() == true or false
@@ -154,10 +219,36 @@ function Management.BuildSnapshot(player, options)
     local provisionStorage = PNC.ProvisionEvaluator
         and PNC.ProvisionEvaluator.MeasureStorage
         and PNC.ProvisionEvaluator.MeasureStorage(storageState) or {}
+    local base = colony and PNC.BaseService
+        and PNC.BaseService.GetForColony(colony.id) or nil
+    local settlement = base and PNC.BaseService.BuildSnapshot(base) or nil
+    if settlement then
+        settlement.facilities = {}
+        settlement.stockpileNodes = {}
+        for facilityId, _ in pairs(base.facilityIds or {}) do
+            local facility = PNC.FacilityService.BuildSnapshot(facilityId)
+            if facility then settlement.facilities[#settlement.facilities + 1] = facility end
+        end
+        for nodeId, _ in pairs(base.stockpileNodeIds or {}) do
+            local node = PNC.SettlementRepository.GetStockpileNode(nodeId)
+            if node then settlement.stockpileNodes[#settlement.stockpileNodes + 1] = PNC.Core.DeepCopy(node) end
+        end
+        table.sort(settlement.facilities, function(a, b)
+            local first = tostring(a.definitionId or "") .. ":"
+                .. tostring(a.id or "")
+            local second = tostring(b.definitionId or "") .. ":"
+                .. tostring(b.id or "")
+            return first < second
+        end)
+        table.sort(settlement.stockpileNodes, function(a, b)
+            return tostring(a.id or "") < tostring(b.id or "")
+        end)
+    end
     return { colony=colony, people=people, attention=attention, levels=counts,
         storage=storage, research=research, supplyShortages=supplyShortages,
         provisionStorage=provisionStorage,
         provisionSettings=provisionSettings,
+        settlement=settlement,
         generatedAt=PNC.NeedsUtils.WorldAgeHours() }
 end
 
@@ -202,7 +293,31 @@ function Management.HandleAction(player, args)
     local action = tostring(args.action or "")
     if action == "rename" then return Management.RenameForPlayer(player, args) end
     local ok, reason, details, storage, record
-    if action == "storage_player_deposit" then
+    local settlementActions = {
+        base_create = PNC.BaseService and PNC.BaseService.Create,
+        base_expand = PNC.BaseService and PNC.BaseService.Expand,
+        base_shrink = PNC.BaseService and PNC.BaseService.Shrink,
+        barricade_build = PNC.BaseService and PNC.BaseService.BuildBarricade,
+        hq_upgrade = PNC.BaseService and PNC.BaseService.UpgradeHQ,
+        facility_create = PNC.FacilityService and PNC.FacilityService.Create,
+        facility_upgrade = PNC.FacilityService and PNC.FacilityService.Upgrade,
+        facility_component_set = PNC.FacilityService and PNC.FacilityService.SetComponent,
+        facility_component_remove = PNC.FacilityService and PNC.FacilityService.RemoveComponent,
+        facility_destroy = PNC.FacilityService and PNC.FacilityService.Destroy,
+        stockpile_node_create = PNC.StockpileAccessService and PNC.StockpileAccessService.Create,
+        stockpile_node_remove = PNC.StockpileAccessService and PNC.StockpileAccessService.Remove,
+    }
+    local settlementHandler = settlementActions[action]
+    local cached = args.requestId and Management.SettlementResults[tostring(args.requestId)] or nil
+    if settlementHandler and cached then
+        details, ok, reason = PNC.Core.DeepCopy(cached), cached.ok, cached.reason
+    elseif settlementHandler then
+        details = settlementHandler(player, args)
+        ok, reason = details and details.ok == true, details and details.reason
+        if args.requestId then
+            rememberSettlementResult(args.requestId, details)
+        end
+    elseif action == "storage_player_deposit" then
         ok, reason, details, storage =
             PNC.ColonyStorageService.RequestPlayerDeposit(player, args)
     elseif action == "storage_player_withdraw" then
@@ -229,6 +344,8 @@ function Management.HandleAction(player, args)
         )
     elseif action == "debug_need" then
         ok, reason, details = debugNeedAction(player, args)
+    elseif action == "debug_facility_work" then
+        ok, reason, details = debugFacilityWorkAction(player, args)
     else
         ok, reason = false, "unknown_colony_action"
     end

@@ -67,6 +67,14 @@ function ISPNCColonyManagementWindow:onResearchUpgrade(button)
     return Research.OnUpgrade(self, button)
 end
 
+function ISPNCColonyManagementWindow:onBaseControl(button)
+    local definition = Registry.Get("base")
+    if definition and definition.onControl then
+        return definition.onControl(self, button)
+    end
+    return false
+end
+
 function ISPNCColonyManagementWindow:onDebugControl(button)
     local definition = Registry.Get("debug")
     if definition and definition.onControl then

@@ -104,6 +104,10 @@ PsychopatzCore = {
     },
 }
 package.preload["ISUI/ISPanel"] = function() return ISPanel end
+package.preload["ISUI/ISComboBox"] = function()
+    ISComboBox = ISComboBox or {}
+    return ISComboBox
+end
 package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
     return PsychopatzCore.UI
 end

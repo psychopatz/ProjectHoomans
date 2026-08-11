@@ -325,6 +325,17 @@ Internal.RegisterServerCommand(Const.CMD_COLONY_MANAGEMENT, function(args)
     end
 end)
 
+Internal.RegisterServerCommand(Const.CMD_SETTLEMENT_DELTA, function(args)
+    local snapshot = ClientState.colonyManagement or {}
+    snapshot.settlement = args.settlement
+    if args.storage then snapshot.storage = args.storage end
+    snapshot.actionResult = args.actionResult
+    ClientState.colonyManagement = snapshot
+    ClientState.colonyManagementRevision =
+        (tonumber(ClientState.colonyManagementRevision) or 0) + 1
+    ClientState.lastColonyManagementReceiveAt = Core.Now()
+end)
+
 Internal.RegisterServerCommand(Const.CMD_MAP_COMMAND_RESULT, function(args)
     if PNC.MapCommands and PNC.MapCommands.HandleResult then
         PNC.MapCommands.HandleResult(args)

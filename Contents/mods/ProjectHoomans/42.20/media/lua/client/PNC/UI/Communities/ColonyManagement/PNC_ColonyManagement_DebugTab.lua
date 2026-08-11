@@ -1,4 +1,5 @@
 require "ISUI/ISPanel"
+require "ISUI/ISComboBox"
 require "PsychopatzCore/UI/PsychopatzUI"
 
 local Components = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
@@ -22,6 +23,10 @@ local ACTIONS = {
         fallback = "FORCE GRAB PROVISIONS" },
     { id = "inspect_provision", key = "UI_PNC_ColonyDebug_InspectProvision",
         fallback = "PROVISION DIAGNOSTICS" },
+    { id = "facility_work", key = "UI_PNC_ColonyDebug_FacilityWork",
+        fallback = "SEND TO WORK FACILITY" },
+    { id = "facility_stop", key = "UI_PNC_ColonyDebug_StopFacilityWork",
+        fallback = "STOP FACILITY TEST" },
 }
 
 function DebugTab.Create(window)
@@ -34,6 +39,10 @@ function DebugTab.Create(window)
     window:addChild(pane)
     window.debugControlsPane = pane
     window.debugControls = {}
+    window.debugFacilityCombo = ISComboBox:new(0, 0, 220, 26, window, nil)
+    window.debugFacilityCombo:initialise()
+    window.debugFacilityCombo:instantiate()
+    pane:addChild(window.debugFacilityCombo)
     for _, action in ipairs(ACTIONS) do
         local button = UI.CreateButton(pane, {
             id = action.id,
@@ -51,23 +60,53 @@ function DebugTab.Apply(window, active)
     local pane = window.debugControlsPane
     if not pane or not window.layout then return end
     pane:setVisible(active == true)
+    window.debugFacilityCombo:setVisible(active == true)
     if not active then return end
     local rect = window.layout.details
     local gap = Layout.Pixels(8, window.uiScale)
-    local height = Layout.Pixels(84, window.uiScale)
+    local height = Layout.Pixels(126, window.uiScale)
     local detailHeight = math.max(80, rect.height - height - gap)
     window:layoutPane(window.detailsPane, rect.x, rect.y,
         rect.width, detailHeight)
     Layout.SetBounds(pane, rect.x, rect.y + detailHeight + gap,
         rect.width, height)
+    Layout.SetBounds(window.debugFacilityCombo,
+        Layout.Pixels(8, window.uiScale), Layout.Pixels(8, window.uiScale),
+        math.max(1, rect.width - Layout.Pixels(16, window.uiScale)),
+        Layout.Pixels(27, window.uiScale))
     Layout.Flow(window.debugControls, {
         x = Layout.Pixels(8, window.uiScale),
-        y = Layout.Pixels(8, window.uiScale),
+        y = Layout.Pixels(42, window.uiScale),
         width = math.max(1, rect.width - Layout.Pixels(16, window.uiScale)),
     }, { scale = window.uiScale, minWidth = 132, gap = 6 })
 end
 
-function DebugTab.BuildRows(person, snapshot)
+local function syncFacilities(window, snapshot)
+    local combo = window and window.debugFacilityCombo
+    if not combo then return end
+    local previous = combo:getOptionData(combo.selected)
+    local previousId = previous and previous.id
+    combo:clear()
+    local selected = 1
+    local facilities = snapshot and snapshot.settlement
+        and snapshot.settlement.facilities or {}
+    for index, facility in ipairs(facilities) do
+        local definition = PNC.FacilityDefinitions.Get(facility.definitionId)
+        combo:addOptionWithData(Shared.Tr(
+            definition and definition.displayNameKey or "",
+            facility.definitionId) .. " - " .. tostring(facility.cachedState),
+            facility)
+        if facility.id == previousId then selected = index end
+    end
+    if #facilities == 0 then
+        combo:addOptionWithData(Shared.Tr(
+            "UI_PNC_Facility_None", "NO FACILITIES"), false)
+    end
+    combo.selected = selected
+end
+
+function DebugTab.BuildRows(person, snapshot, window)
+    syncFacilities(window, snapshot)
     if not person then
         local selectLabel = Shared.Tr(
             "UI_PNC_ColonyDebug_Select", "Select a colonist"
@@ -81,6 +120,22 @@ function DebugTab.BuildRows(person, snapshot)
         }}
     end
     local rows = {}
+    if person.facilityDebugWork then
+        local work = person.facilityDebugWork
+        local target = work.target or {}
+        rows[#rows + 1] = {
+            key = "debug_facility_work",
+            label = Shared.Tr("UI_PNC_ColonyDebug_FacilityWorkState",
+                "Facility test job"),
+            detail = string.format("%s | %s | %s | %.0f, %.0f, %.0f",
+                Shared.Tr(work.facilityName,
+                    tostring(work.facilityId or "facility")),
+                tostring(work.role or "work"), tostring(work.phase or "QUEUED"),
+                tonumber(target.x) or 0, tonumber(target.y) or 0,
+                tonumber(target.z) or 0),
+            colorName = work.phase == "WORKING" and "success" or "accent",
+        }
+    end
     for _, needType in ipairs(Shared.NEED_TYPES) do
         rows[#rows + 1] = {
             key = "debug_need_" .. needType,
@@ -145,7 +200,9 @@ function DebugTab.BuildRows(person, snapshot)
         end
     end
     local result = snapshot and snapshot.actionResult
-    if result and result.action == "debug_need" then
+    if result and (result.action == "debug_need"
+        or result.action == "debug_facility_work")
+    then
         local lastActionLabel = Shared.Tr(
             "UI_PNC_ColonyDebug_LastAction", "Last action"
         )
@@ -189,6 +246,18 @@ function DebugTab.OnControl(window, button)
     elseif id == "inspect_provision" then
         ProvisionDiagnostics.Open(person)
         return true
+    elseif id == "facility_work" then
+        local facility = window.debugFacilityCombo
+            and window.debugFacilityCombo:getOptionData(
+                window.debugFacilityCombo.selected) or nil
+        if not facility then return false end
+        return PNC.Client.RequestColonyAction("debug_facility_work", {
+            npcID = person.id, facilityId = facility.id, operation = "start",
+        })
+    elseif id == "facility_stop" then
+        return PNC.Client.RequestColonyAction("debug_facility_work", {
+            npcID = person.id, operation = "stop",
+        })
     else
         return false
     end

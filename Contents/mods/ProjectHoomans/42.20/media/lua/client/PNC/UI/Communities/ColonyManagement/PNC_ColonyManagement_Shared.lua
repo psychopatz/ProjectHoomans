@@ -22,6 +22,23 @@ Shared.CONDITION_LABEL_KEYS = {
 Shared.MORALE_LABEL_KEY = "UI_PNC_Stat_Morale"
 Shared.REFRESH_LABEL_KEY = "UI_PNC_Colony_Refresh"
 Shared.DIAGNOSTICS_LABEL_KEY = "UI_PNC_Colony_Diagnostics"
+Shared.SETTLEMENT_REASON_KEYS = {
+    NO_PERMISSION = "UI_PNC_SettlementReason_NoPermission",
+    REVISION_CONFLICT = "UI_PNC_SettlementReason_RevisionConflict",
+    EMPTY_REGION = "UI_PNC_SettlementReason_EmptyRegion",
+    BASE_DISCONNECTED = "UI_PNC_SettlementReason_Disconnected",
+    BASE_CAPACITY_EXCEEDED = "UI_PNC_SettlementReason_CapacityExceeded",
+    NO_NEW_TERRITORY = "UI_PNC_SettlementReason_NoNewTerritory",
+    NO_TERRITORY_REMOVED = "UI_PNC_SettlementReason_NoneRemoved",
+    HQ_TERRITORY_LIMIT = "UI_PNC_SettlementReason_HQLimit",
+    HQ_LEVEL_TOO_LOW = "UI_PNC_SettlementReason_HQTooLow",
+    MAX_LEVEL = "UI_PNC_SettlementReason_MaxLevel",
+    FACILITY_COMPONENT_LIMIT = "UI_PNC_SettlementReason_ComponentLimit",
+    FACILITY_AREA_TOO_LARGE = "UI_PNC_SettlementReason_AreaTooLarge",
+    OUTSIDE_BASE = "UI_PNC_SettlementReason_OutsideBase",
+    OVERLAP_NOT_ALLOWED = "UI_PNC_SettlementReason_Overlap",
+    INSUFFICIENT_BUILD_MATERIALS = "UI_PNC_SettlementReason_Materials",
+}
 Shared.NEED_METER_THRESHOLDS = {
     hunger = {
         { maximum = 0.15, color = "success" },
@@ -57,6 +74,12 @@ end
 function Shared.Text(value, fallback)
     value = value ~= nil and tostring(value) or ""
     return value ~= "" and value or tostring(fallback or "")
+end
+
+function Shared.SettlementReason(reason)
+    reason = tostring(reason or "")
+    local key = Shared.SETTLEMENT_REASON_KEYS[reason]
+    return key and Shared.Tr(key, reason) or reason
 end
 
 function Shared.ListValue(list)
