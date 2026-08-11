@@ -37,8 +37,9 @@ are not persisted. Capacity is recalculated from the tier after load.
 ## Server authority and logistics boundary
 
 UI code submits intent through `RequestColonyAction`; it never mutates storage.
-The server resolves the requesting player's current faction and primary
-storage, rejects a requested foreign storage ID, validates source identity and
+The server resolves the requesting player's current faction and requested
+owned storage (defaulting to the primary colony stockpile), rejects foreign
+storage IDs, validates source identity and
 revision, preflights capacity, and executes a PsychopatzCore inventory
 transaction. Successful operations increment both inventory and storage
 revisions. Request IDs are retained in a bounded per-player cache to prevent a
@@ -90,14 +91,22 @@ fields. Rows rebuild only after snapshot revision receipt or a filter/sort
 change; the render loop does not scan inventory records. Development controls
 and storage diagnostics live in a collapsed debug drawer.
 
+`Manage Inventory` opens the same responsive two-pane exchange window used for
+player-to-NPC transfers. Its right side is supplied by a storage endpoint, so
+icons, category collapsing, quantity selection, bag selection, drag/drop, and
+bulk actions remain shared. Deposits and exact-record withdrawals are normal
+faction-owner operations; debug authorization is required only for destructive
+test controls. Withdrawals reserve selected records before the atomic
+PsychopatzCore transfer and release/restore them on failure.
+
 Research is definition-driven and currently exposes only Storage Capacity. Its
 clearly labelled debug upgrade is server-authoritative, changes tier/capacity,
 and leaves the inventory snapshot untouched.
 
 ## Development controls
 
-When debug access is authorized, NPC/player inventory context menus offer
-`Deposit to Colony Storage`. The Storage tab also exposes Add Test Item (100
+Owned NPC/player inventory context menus may deposit into Colony Storage. When
+debug access is authorized, the Storage tab additionally exposes Add Test Item (100
 `Base.Nails`), Remove Selected, Clear Storage, Fill Test Storage, Validate,
 Compact, and Recalculate Weight. These controls are hidden and inert when debug
 authorization is absent.

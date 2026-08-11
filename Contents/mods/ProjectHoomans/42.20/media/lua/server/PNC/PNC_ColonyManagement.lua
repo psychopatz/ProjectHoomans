@@ -111,6 +111,9 @@ function Management.HandleAction(player, args)
     if action == "storage_player_deposit" then
         ok, reason, details, storage =
             PNC.ColonyStorageService.RequestPlayerDeposit(player, args)
+    elseif action == "storage_player_withdraw" then
+        ok, reason, details, storage =
+            PNC.ColonyStorageService.RequestPlayerWithdrawal(player, args)
     elseif action == "storage_npc_deposit" then
         ok, reason, details, storage, record =
             PNC.ColonyStorageService.RequestNPCDeposit(player, args)

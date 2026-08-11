@@ -27,6 +27,104 @@ function Internal.SelectedPlayerItems(player, ids)
     return found
 end
 
+function Internal.ResolvePlayerContainer(player, containerItemID)
+    local root = player and player.getInventory and player:getInventory() or nil
+    containerItemID = tostring(containerItemID or "root")
+    if containerItemID == "" or containerItemID == "root" then return root end
+    local function visit(container, depth)
+        if not container or depth > 4 then return nil end
+        local items = container.getItems and container:getItems() or nil
+        if not items or not items.size or not items.get then return nil end
+        for index = 0, items:size() - 1 do
+            local item = items:get(index)
+            if item and item.getID
+                and tostring(item:getID()) == containerItemID
+            then
+                return item.getItemContainer and item:getItemContainer()
+                    or item.getInventory and item:getInventory() or nil
+            end
+            local nested = item and item.getItemContainer
+                and item:getItemContainer() or nil
+            local found = nested and visit(nested, depth + 1) or nil
+            if found then return found end
+        end
+        return nil
+    end
+    return visit(root, 1)
+end
+
+function Internal.PlayerDestination(player, containerItemID)
+    local container = Internal.ResolvePlayerContainer(player, containerItemID)
+    if not container then return nil, "player_container_not_found" end
+    return CoreInventory.wrapPhysicalInventory(container)
+end
+
+function Internal.StorageSelectionSource(storage, selections, owner)
+    local source = { revision = storage.inventory.revision, tokens = {} }
+    local total = 0
+    for index = 1, #(selections or {}) do
+        local selection = selections[index]
+        local record = storage.inventory.records[
+            math.floor(tonumber(selection.recordIndex) or 0)
+        ]
+        local quantity = math.max(1,
+            math.floor(tonumber(selection.quantity) or 1))
+        if not record then
+            for tokenIndex = 1, #source.tokens do
+                storage.inventory:releaseReservation(source.tokens[tokenIndex])
+            end
+            return nil, "record_not_found"
+        end
+        local selectedRecord = record
+        local token, reason = storage.inventory:reserve({
+            typeId = selectedRecord[Internal.Constants.TYPE_ID],
+            predicate = function(candidate) return candidate == selectedRecord end,
+        }, quantity, owner)
+        if not token then
+            for tokenIndex = 1, #source.tokens do
+                storage.inventory:releaseReservation(source.tokens[tokenIndex])
+            end
+            return nil, reason or "reservation_failed"
+        end
+        source.tokens[#source.tokens + 1] = token
+        total = total + quantity
+    end
+    source.quantity = total
+    function source:remove(_, quantity)
+        if quantity ~= self.quantity then return false, "quantity_mismatch" end
+        local removed = {}
+        for index = 1, #self.tokens do
+            local ok, records = storage.inventory:commitReservation(
+                self.tokens[index]
+            )
+            if not ok then
+                for pending = index + 1, #self.tokens do
+                    storage.inventory:releaseReservation(self.tokens[pending])
+                end
+                self:restoreRemoved(removed)
+                return false, records
+            end
+            for recordIndex = 1, #records do
+                removed[#removed + 1] = records[recordIndex]
+            end
+        end
+        return true, removed
+    end
+    function source:restoreRemoved(removed)
+        for index = 1, #(removed or {}) do
+            local ok = storage.inventory:add(removed[index])
+            if not ok then return false end
+        end
+        return true
+    end
+    function source:release()
+        for index = 1, #self.tokens do
+            storage.inventory:releaseReservation(self.tokens[index])
+        end
+    end
+    return source
+end
+
 function Internal.PhysicalSelectionSource(items)
     local source = { revision = 0, items = items }
     function source:preview()

@@ -27,6 +27,10 @@ isClient = function() return false end
 isDebugEnabled = function() return true end
 
 PNC = {
+    Const = {
+        INVENTORY_TRANSFER_MAX_ITEMS = 64,
+        INVENTORY_TRANSFER_MAX_QUANTITY = 1024,
+    },
     Core = {
         DeepCopy = function(value)
             if type(value) ~= "table" then return value end
@@ -204,6 +208,58 @@ equal(snapshot.logicalItemCount, 100, "snapshot logical quantity")
 equal(#snapshot.rows, 1, "snapshot batched row")
 equal(snapshot.rows[1].quantity, 100, "snapshot row quantity")
 
+InventoryItemFactory = {
+    CreateItem = function(fullType)
+        return item(fullType, fullType == "Base.Nails" and 0.01 or 1)
+    end,
+}
+ok, reason = Service.RequestPlayerWithdrawal(playerA, {
+    requestId = "withdraw:1",
+    storageId = loaded.id,
+    inventoryRevision = loaded.inventory.revision,
+    playerContainer = "root",
+    records = {{ recordIndex = 1, quantity = 5 }},
+})
+equal(ok, true, "player withdrawal: " .. tostring(reason))
+equal(reason, "withdrawn", "player withdrawal reason")
+equal(loaded.inventory:getLogicalItemCount(), 95,
+    "withdrawal removes storage quantity once")
+equal(#playerContainer.values, 7,
+    "withdrawal materializes items in player inventory")
+
+ok, reason = Service.RequestPlayerWithdrawal(playerA, {
+    requestId = "withdraw:stale",
+    storageId = loaded.id,
+    inventoryRevision = loaded.inventory.revision - 1,
+    records = {{ recordIndex = 1, quantity = 1 }},
+})
+equal(ok, false, "stale withdrawal rejected")
+equal(reason, "revision_conflict", "stale withdrawal reason")
+
+local failingContainer = container({})
+failingContainer.AddItem = function() return nil end
+local failingPlayer = {
+    factionKey = "A",
+    getUsername = function() return "player_failure" end,
+    getInventory = function() return failingContainer end,
+    getAccessLevel = function() return "" end,
+}
+local beforeRollback = loaded.inventory:getLogicalItemCount()
+local workingFactory = InventoryItemFactory.CreateItem
+InventoryItemFactory.CreateItem = function() return nil end
+ok, reason = Service.RequestPlayerWithdrawal(failingPlayer, {
+    requestId = "withdraw:rollback",
+    storageId = loaded.id,
+    inventoryRevision = loaded.inventory.revision,
+    records = {{ recordIndex = 1, quantity = 2 }},
+})
+InventoryItemFactory.CreateItem = workingFactory
+equal(ok, false, "failed player destination rejects withdrawal")
+equal(loaded.inventory:getLogicalItemCount(), beforeRollback,
+    "failed withdrawal restores storage")
+equal(next(loaded.inventory.reservations), nil,
+    "failed withdrawal releases reservations")
+
 PNC.Equipment.CreateItem = function(fullType)
     return item(fullType, fullType == "Base.Nails" and 0.01 or 1)
 end
@@ -214,7 +270,7 @@ ok, reason = Service.DebugAction(playerA, {
     quantity = 5,
 })
 equal(ok, true, "debug add test item")
-equal(loaded.inventory:count("Base.Nails"), 105,
+equal(loaded.inventory:count("Base.Nails"), 100,
     "debug add item did not reach storage")
 
 print("pnc_colony_storage_smoke: ok")

@@ -66,13 +66,17 @@ function Service.ResolveForPlayer(player, requestedStorageID)
     local faction, reason = PNC.Factions and PNC.Factions.GetPlayerFaction
         and PNC.Factions.GetPlayerFaction(player) or nil, "unaffiliated"
     if not faction then return nil, reason end
-    local colony = activeColony(faction.id)
     local storage
-    storage, reason = Repository.GetPrimary(faction.id, colony and colony.id or nil)
-    if not storage then return nil, reason end
-    if requestedStorageID and tostring(requestedStorageID) ~= storage.id then
-        return nil, "storage_not_owned"
+    local colony = activeColony(faction.id)
+    if requestedStorageID and tostring(requestedStorageID) ~= "" then
+        storage = Repository.Get(tostring(requestedStorageID))
+        reason = storage and nil or "storage_not_found"
+    else
+        storage, reason = Repository.GetPrimary(
+            faction.id, colony and colony.id or nil
+        )
     end
+    if not storage then return nil, reason end
     if storage.ownerFactionId ~= faction.id then return nil, "storage_not_owned" end
     return storage, nil, faction, colony
 end

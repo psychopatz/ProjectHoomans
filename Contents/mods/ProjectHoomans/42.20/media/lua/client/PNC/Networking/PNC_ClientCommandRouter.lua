@@ -311,6 +311,7 @@ Internal.RegisterServerCommand(Const.CMD_COLONY_MANAGEMENT, function(args)
     ClientState.lastColonyManagementReceiveAt = Core.Now()
     if args.snapshot and args.snapshot.actionResult
         and (args.snapshot.actionResult.action == "storage_player_deposit"
+            or args.snapshot.actionResult.action == "storage_player_withdraw"
             or args.snapshot.actionResult.action == "storage_npc_deposit")
         and PNC.InventoryWindow
         and PNC.InventoryWindow.OnColonyStorageResult

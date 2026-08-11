@@ -27,6 +27,13 @@ function StorageTabs.Create(window, UI, tr)
         onclick = ISPNCColonyManagementWindow.onStorageControl,
         variant = "quiet",
     })
+    window.storageTransferButton = UI.CreateButton(window, {
+        id = "transfer",
+        title = tr("UI_PNC_Storage_Manage", "Manage Inventory"),
+        target = window,
+        onclick = ISPNCColonyManagementWindow.onStorageControl,
+        variant = "primary",
+    })
     window.storageDebugToggle = UI.CreateButton(window, {
         id = "debug_toggle",
         title = tr("UI_PNC_Storage_DebugTools", "Debug Tools") .. "  >",
@@ -63,16 +70,43 @@ function StorageTabs.Layout(window, Layout, content)
     local gap = Layout.Pixels(6, scale)
     local height = Layout.Pixels(28, scale)
     local sortWidth = Layout.Pixels(132, scale)
+    local transferWidth = Layout.Pixels(150, scale)
     local debugWidth = Layout.Pixels(152, scale)
-    local searchWidth = math.max(Layout.Pixels(100, scale),
-        content.width - sortWidth - debugWidth - gap * 2)
-    Layout.SetBounds(window.storageSearch, content.x, content.y,
-        searchWidth, height)
-    Layout.SetBounds(window.storageSortButton,
-        content.x + searchWidth + gap, content.y, sortWidth, height)
-    Layout.SetBounds(window.storageDebugToggle,
-        content.x + content.width - debugWidth, content.y, debugWidth, height)
-    window.layout.storageListY = content.y + Layout.Pixels(56, scale)
+    local minimumSearch = Layout.Pixels(100, scale)
+    local required = minimumSearch + sortWidth + transferWidth + debugWidth
+        + gap * 3
+    local compact = content.width < required
+    local searchWidth
+    if compact then
+        searchWidth = math.max(minimumSearch,
+            content.width - sortWidth - gap)
+        Layout.SetBounds(window.storageSearch, content.x, content.y,
+            searchWidth, height)
+        Layout.SetBounds(window.storageSortButton,
+            content.x + searchWidth + gap, content.y, sortWidth, height)
+        local secondY = content.y + height + gap
+        Layout.SetBounds(window.storageTransferButton,
+            content.x, secondY, transferWidth, height)
+        Layout.SetBounds(window.storageDebugToggle,
+            content.x + content.width - debugWidth,
+            secondY, debugWidth, height)
+        window.layout.storageListY = secondY + height
+            + Layout.Pixels(28, scale)
+    else
+        searchWidth = content.width - sortWidth - transferWidth
+            - debugWidth - gap * 3
+        Layout.SetBounds(window.storageSearch, content.x, content.y,
+            searchWidth, height)
+        Layout.SetBounds(window.storageSortButton,
+            content.x + searchWidth + gap, content.y, sortWidth, height)
+        Layout.SetBounds(window.storageTransferButton,
+            content.x + searchWidth + sortWidth + gap * 2,
+            content.y, transferWidth, height)
+        Layout.SetBounds(window.storageDebugToggle,
+            content.x + content.width - debugWidth,
+            content.y, debugWidth, height)
+        window.layout.storageListY = content.y + Layout.Pixels(56, scale)
+    end
 end
 
 function StorageTabs.ApplyLayout(window, Layout)
@@ -83,6 +117,8 @@ function StorageTabs.ApplyLayout(window, Layout)
     window.storageSearch:setVisible(storageMode)
     window.storageList:setVisible(storageMode)
     window.storageSortButton:setVisible(storageMode)
+    window.storageTransferButton:setVisible(storageMode
+        and window.snapshot and window.snapshot.storage ~= nil)
     local debugVisible = storageMode and window.snapshot
         and window.snapshot.storage
         and window.snapshot.storage.debugAuthorized == true
@@ -145,6 +181,17 @@ end
 
 function StorageTabs.OnControl(window, button, tr)
     local action = button and button.internal or ""
+    if action == "transfer" then
+        local storage = window.snapshot and window.snapshot.storage or nil
+        if not storage then return false end
+        if not PNC.InventoryWindow then
+            require "PNC/UI/Inventory/PNC_InventoryWindow"
+        end
+        PNC.InventoryWindow.OpenStorage(storage.storageId, {
+            displayName = tr("UI_PNC_Storage_Colony", "Colony Storage"),
+        })
+        return true
+    end
     if action == "debug_toggle" then
         window.storageDebugExpanded = window.storageDebugExpanded ~= true
         button:setTitle(tr("UI_PNC_Storage_DebugTools", "Debug Tools")

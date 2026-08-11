@@ -544,6 +544,7 @@ function Client.RequestColonyAction(action, options)
     ClientState.colonyManagement = snapshot
     ClientState.lastColonyManagementReceiveAt = Core.Now()
     if (result.action == "storage_player_deposit"
+            or result.action == "storage_player_withdraw"
             or result.action == "storage_npc_deposit")
         and PNC.InventoryWindow
         and PNC.InventoryWindow.OnColonyStorageResult
@@ -558,6 +559,17 @@ function Client.DepositPlayerItemsToColony(itemIDs, storageId)
         itemIDs = itemIDs,
         storageId = storageId,
     })
+end
+
+function Client.TransferPlayerStorage(options)
+    options = type(options) == "table" and options or {}
+    if options.direction == "player_to_storage" then
+        return Client.RequestColonyAction("storage_player_deposit", options)
+    end
+    if options.direction == "storage_to_player" then
+        return Client.RequestColonyAction("storage_player_withdraw", options)
+    end
+    return false, "invalid_direction"
 end
 
 function Client.DepositNPCItemToColony(npcId, itemID, quantity, revision, storageId)

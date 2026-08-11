@@ -89,6 +89,9 @@ package.preload["PNC/UI/Inventory/PNC_InventoryUI_ContainerList"] = function()
     ISPNCInventoryContainerList = {}
     return ISPNCInventoryContainerList
 end
+package.preload["PNC/UI/Communities/PNC_ColonyStorageViewModel"] = function()
+    return PNC.ColonyStorageViewModel
+end
 local quantityRequest
 package.preload["PNC/UI/Inventory/PNC_InventoryQuantityModal"] = function()
     PNC.InventoryQuantityModal = {
@@ -298,7 +301,38 @@ assertEqual(npcRowsByID["identity_card"].restricted, true,
 dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
+dofile(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryTransferEndpoint.lua")
+package.preload["PNC/UI/Inventory/PNC_InventoryTransferEndpoint"] = function()
+    return PNC.InventoryTransferEndpoint
+end
 dofile(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryWindow.lua")
+
+local storageEndpoint = PNC.InventoryTransferEndpoint.Storage("storage_a")
+PNC.Network.ClientState.colonyManagement = { storage = {
+    storageId = "storage_a",
+    inventoryRevision = 7,
+    usedWeight = 4,
+    capacity = 200,
+    rows = {{
+        recordIndex = 3,
+        fullType = "Base.Nails",
+        name = "Nails",
+        quantity = 25,
+        totalWeight = 0.25,
+    }},
+} }
+assertEqual(storageEndpoint:revision(), 7, "storage endpoint revision")
+assertEqual(#storageEndpoint:rows(), 2,
+    "storage endpoint reuses category inventory rows")
+local storageSelection = PNC.InventoryTransferEndpoint.SelectionForRow(
+    storageEndpoint,
+    storageEndpoint:rows()[2],
+    10
+)
+assertEqual(storageSelection.records[1].recordIndex, 3,
+    "storage selection retains authoritative record index")
+assertEqual(storageSelection.records[1].quantity, 10,
+    "storage selection retains requested quantity")
 
 local window = setmetatable({}, { __index = ISPNCInventoryWindow })
 local eligibleIDs = PNC.InventoryWindow.CollectBulkTransferIDs({

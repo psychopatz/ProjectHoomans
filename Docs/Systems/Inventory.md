@@ -74,6 +74,12 @@ continue to call only the public `PNC.Inventory` functions.
   and drag transfer in both directions. Each pane has a vanilla-style icon rail
   on its right edge: the inventory icon selects the root and bag icons select
   accessible backpacks or other item containers.
+- `PNC_InventoryTransferEndpoint` supplies the right-hand pane through a small
+  endpoint contract (snapshot, rows, containers, weight, revision, transfer).
+  The existing window therefore serves player-to-NPC and player-to-storage
+  exchanges without duplicating list, grouping, quantity, drag/drop, icon-rail,
+  or responsive-layout code. New faction structures can provide another
+  endpoint over the same contract.
 - The vanilla player inventory pane is bridged to the companion pane, so native
   inventory items can be dropped directly onto the companion window and compact
   NPC items can be dropped into the player's selected inventory or backpack.

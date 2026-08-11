@@ -4,6 +4,7 @@ require "PNC/UI/Inventory/PNC_InventoryUI_Model"
 require "PNC/UI/Inventory/PNC_InventoryUI_List"
 require "PNC/UI/Inventory/PNC_InventoryUI_ContainerList"
 require "PNC/UI/Inventory/PNC_InventoryQuantityModal"
+require "PNC/UI/Inventory/PNC_InventoryTransferEndpoint"
 
 PNC = PNC or {}
 
@@ -16,6 +17,7 @@ local Model = PNC.InventoryUIModel
 local ClientState = PNC.Network.ClientState
 local Actions = PNC.InventoryActions
 local QuantityModal = PNC.InventoryQuantityModal
+local TransferEndpoint = PNC.InventoryTransferEndpoint
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
 
@@ -181,20 +183,16 @@ function InventoryWindow.CollectBulkTransferIDs(list)
 end
 
 function ISPNCInventoryWindow:onGiveAll()
-    local inventory = self:inventory()
-    local ids = InventoryWindow.CollectBulkTransferIDs(self.playerList)
-    if not inventory or #ids < 1 then
+    local endpoint = self.transferEndpoint
+    local selection = TransferEndpoint.BulkSelection(nil, self.playerList)
+    if not endpoint or #selection.itemIDs < 1 then
         self.statusText = self.giftMode
             and "No valid gifts in this container"
             or self.statusText
         return false
     end
-    return PNC.Client.SendInventoryTransfer({
-        id = self.npcId,
-        direction = "player_to_npc",
-        itemIDs = ids,
-        npcContainer = self.selectedNPCContainer,
-        inventoryRevision = inventory.revision,
+    return endpoint:send("to_target", selection,
+        endpoint.selectedContainer, {
         bulk = true,
         gift = self.giftMode == true,
         conversationToken = self.giftToken,
@@ -206,21 +204,23 @@ function ISPNCInventoryWindow:onTakeAll()
         self.statusText = "Gift mode: taking items is disabled"
         return false
     end
-    local inventory = self:inventory()
-    local ids = InventoryWindow.CollectBulkTransferIDs(self.npcList)
-    if not inventory or #ids < 1 then return false end
-    return PNC.Client.SendInventoryTransfer({
-        id = self.npcId,
-        direction = "npc_to_player",
-        itemIDs = ids,
-        playerContainer = self.selectedPlayerContainer,
-        inventoryRevision = inventory.revision,
-        bulk = true,
-    })
+    local endpoint = self.transferEndpoint
+    local selection = TransferEndpoint.BulkSelection(endpoint, self.npcList)
+    local available = endpoint and endpoint.kind == "storage"
+        and #selection.records or #selection.itemIDs
+    if not endpoint or available < 1 then return false end
+    return endpoint:send("to_player", selection,
+        self.selectedPlayerContainer, { bulk = true })
 end
 
 function ISPNCInventoryWindow:setNPC(npcId)
     self.npcId = npcId and tostring(npcId) or nil
+    self:setTransferEndpoint(TransferEndpoint.NPC(self.npcId))
+end
+
+function ISPNCInventoryWindow:setTransferEndpoint(endpoint)
+    self.transferEndpoint = endpoint
+    self.npcId = endpoint and endpoint.kind == "npc" and endpoint.id or nil
     self.selectedNPCContainer = "root"
     self.selectedPlayerContainer = "root"
     self.expandedPlayerGroups = {}
@@ -228,8 +228,23 @@ function ISPNCInventoryWindow:setNPC(npcId)
     self.giftMode = false
     self.giftToken = nil
     self.contextSignature = nil
-    if PNC.Client and PNC.Client.RequestCharacterPayload and self.npcId then
-        PNC.Client.RequestCharacterPayload(self.npcId)
+    if endpoint then endpoint:requestSnapshot() end
+    if self.npcList then self.npcList.role = "npc" end
+    if self.npcContainerList then self.npcContainerList.role = "npc" end
+    if self.giveAllButton and self.giveAllButton.setTitle then
+        self.giveAllButton:setTitle(endpoint and endpoint.kind == "storage"
+            and tr("UI_PNC_Storage_DepositAll", "Deposit All >")
+            or tr("UI_PNC_Inventory_GiveAll", "Give All >"))
+    end
+    if self.takeAllButton and self.takeAllButton.setTitle then
+        self.takeAllButton:setTitle(endpoint and endpoint.kind == "storage"
+            and tr("UI_PNC_Storage_WithdrawAll", "< Withdraw All")
+            or tr("UI_PNC_Inventory_TakeAll", "< Take All"))
+    end
+    if self.depositStorageButton and self.depositStorageButton.setVisible then
+        self.depositStorageButton:setVisible(endpoint and endpoint.kind == "npc"
+            and PNC.Client and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug() == true)
     end
     self:refreshInventory(true)
 end
@@ -245,7 +260,9 @@ function ISPNCInventoryWindow:setConversationMode(mode, token)
     end
     if self.depositStorageButton and self.depositStorageButton.setVisible then
         self.depositStorageButton:setVisible(
-            not self.giftMode and PNC.Client and PNC.Client.CanUseDebug
+            not self.giftMode and self.transferEndpoint
+                and self.transferEndpoint.kind == "npc"
+                and PNC.Client and PNC.Client.CanUseDebug
                 and PNC.Client.CanUseDebug() == true
         )
     end
@@ -254,14 +271,13 @@ function ISPNCInventoryWindow:setConversationMode(mode, token)
 end
 
 function ISPNCInventoryWindow:payload()
-    return self.npcId and ClientState.characterPayloads
-        and ClientState.characterPayloads[self.npcId]
-        or nil
+    return self.transferEndpoint and self.transferEndpoint.payload
+        and self.transferEndpoint:payload() or nil
 end
 
 function ISPNCInventoryWindow:inventory()
-    local payload = self:payload()
-    return payload and payload.inventory or nil
+    return self.transferEndpoint and self.transferEndpoint.inventory
+        and self.transferEndpoint:inventory() or nil
 end
 
 local function resetList(list, rows)
@@ -282,8 +298,12 @@ end
 
 function ISPNCInventoryWindow:refreshInventory(force)
     local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
+    local endpoint = self.transferEndpoint
+    if not endpoint then return end
+    endpoint.selectedContainer = self.selectedNPCContainer or "root"
+    endpoint.expandedGroups = self.expandedNPCGroups or {}
     local inventory = self:inventory()
-    local revision = inventory and tonumber(inventory.revision) or -1
+    local revision = endpoint:revision()
     local currentPlayerContainer = Model.FindContainer(
         self.playerContainers,
         self.selectedPlayerContainer
@@ -316,7 +336,8 @@ function ISPNCInventoryWindow:refreshInventory(force)
         and player:getInventory():getItems():size()
         or 0
     local signature = table.concat({
-        tostring(self.npcId or ""),
+        tostring(endpoint.kind),
+        tostring(endpoint.id or ""),
         tostring(revision),
         tostring(playerCount),
         table.concat(protectedState, ","),
@@ -330,7 +351,7 @@ function ISPNCInventoryWindow:refreshInventory(force)
     if not Model.FindContainer(self.playerContainers, self.selectedPlayerContainer) then
         self.selectedPlayerContainer = "root"
     end
-    self.npcContainers = Model.BuildNPCContainers(inventory)
+    self.npcContainers = endpoint:containers()
     if not Model.FindContainer(self.npcContainers, self.selectedNPCContainer) then
         self.selectedNPCContainer = "root"
     end
@@ -343,11 +364,8 @@ function ISPNCInventoryWindow:refreshInventory(force)
             self.giftMode == true
         )
     )
-    resetList(self.npcList, Model.BuildNPCRows(
-        inventory,
-        self.selectedNPCContainer,
-        self.expandedNPCGroups
-    ))
+    endpoint.selectedContainer = self.selectedNPCContainer
+    resetList(self.npcList, endpoint:rows())
     if self.giveAllButton and self.giveAllButton.setEnable then
         self.giveAllButton:setEnable(
             #InventoryWindow.CollectBulkTransferIDs(self.playerList) > 0
@@ -374,9 +392,12 @@ function ISPNCInventoryWindow:refreshInventory(force)
     )
     local snapshot = self.npcId and ClientState.snapshots
         and ClientState.snapshots[self.npcId] or nil
-    local npcName = Identity.GetName(
-        payload and payload.snapshot or snapshot or { id = self.npcId }
-    )
+    local payload = self:payload()
+    local npcName = endpoint.kind == "storage"
+        and tostring(endpoint.displayName or "Colony Storage")
+        or Identity.GetName(
+            payload and payload.snapshot or snapshot or { id = self.npcId }
+        )
     self.npcDisplayName = tostring(npcName)
     if self.setTitle then
         self:setTitle(tr("UI_PNC_Inventory_Title", "Inventory") .. " - " .. tostring(npcName))
@@ -399,35 +420,23 @@ function ISPNCInventoryWindow:sendTransfer(
     destinationOverride,
     quantity
 )
-    local inventory = self:inventory()
+    local endpoint = self.transferEndpoint
     local selection
-    if not inventory or not row or row.restricted == true then return false end
+    if not endpoint or not row or row.restricted == true then return false end
     if self.giftMode and direction ~= "player_to_npc" then
         self.statusText = "Gift mode: taking items is disabled"
         return false
     end
-    selection = Model.BuildTransferSelection(row, quantity)
+    selection = TransferEndpoint.SelectionForRow(endpoint, row, quantity)
     if not selection then return false end
     self.statusText = tr("UI_PNC_Inventory_Transferring", "Transferring...")
-    if direction == "player_to_npc" then
-        return PNC.Client.SendInventoryTransfer({
-            id = self.npcId,
-            direction = direction,
-            itemIDs = selection.itemIDs,
-            quantity = selection.quantity,
-            npcContainer = destinationOverride or self.selectedNPCContainer,
-            inventoryRevision = inventory.revision,
-            gift = self.giftMode == true,
-            conversationToken = self.giftToken,
-        })
-    end
-    return PNC.Client.SendInventoryTransfer({
-        id = self.npcId,
-        direction = direction,
-        itemIDs = selection.itemIDs,
-        quantity = selection.quantity,
-        playerContainer = destinationOverride or self.selectedPlayerContainer,
-        inventoryRevision = inventory.revision,
+    return endpoint:send(
+        direction == "player_to_npc" and "to_target" or "to_player",
+        selection,
+        destinationOverride or (direction == "player_to_npc"
+            and self.selectedNPCContainer or self.selectedPlayerContainer), {
+        gift = self.giftMode == true,
+        conversationToken = self.giftToken,
     })
 end
 
@@ -568,13 +577,16 @@ function ISPNCInventoryWindow:showItemContext(role, row)
     end
     if role == "player" then
         context:addOption(
-            tr("UI_PNC_Inventory_Give", "Transfer to Companion"),
+            self.transferEndpoint and self.transferEndpoint.kind == "storage"
+                and tr("UI_PNC_Storage_Deposit", "Deposit to Storage")
+                or tr("UI_PNC_Inventory_Give", "Transfer to Companion"),
             self,
             function(target)
                 target:requestTransfer("player_to_npc", row)
             end
         )
-        if PNC.Client and PNC.Client.CanUseDebug
+        if self.transferEndpoint and self.transferEndpoint.kind ~= "storage"
+            and PNC.Client and PNC.Client.CanUseDebug
             and PNC.Client.CanUseDebug()
         then
             context:addOption(
@@ -596,7 +608,9 @@ function ISPNCInventoryWindow:showItemContext(role, row)
     end
     local inventory = self:inventory()
     local compact = inventory and inventory.items and inventory.items[row.id] or nil
-    if row.groupHeader ~= true then
+    if self.transferEndpoint and self.transferEndpoint.kind ~= "storage"
+        and row.groupHeader ~= true
+    then
         for _, definition in ipairs(Actions.List()) do
             if Actions.IsAvailable(definition, nil, compact) then
                 local option = context:addOption(
@@ -613,13 +627,16 @@ function ISPNCInventoryWindow:showItemContext(role, row)
         end
     end
     context:addOption(
-        tr("UI_PNC_Inventory_Take", "Transfer to Player"),
+        self.transferEndpoint and self.transferEndpoint.kind == "storage"
+            and tr("UI_PNC_Storage_Withdraw", "Withdraw to Player")
+            or tr("UI_PNC_Inventory_Take", "Transfer to Player"),
         self,
         function(target)
             target:requestTransfer("npc_to_player", row)
         end
     )
-    if row.groupHeader ~= true and PNC.Client and PNC.Client.CanUseDebug
+    if self.transferEndpoint and self.transferEndpoint.kind ~= "storage"
+        and row.groupHeader ~= true and PNC.Client and PNC.Client.CanUseDebug
         and PNC.Client.CanUseDebug()
     then
         context:addOption(
@@ -728,21 +745,23 @@ function ISPNCInventoryWindow:prerender()
     )
     self:drawText(
         Layout.Ellipsize(
-            string.upper(tostring(self.npcDisplayName or "Companion")) .. "'S INVENTORY",
+            self.transferEndpoint and self.transferEndpoint.kind == "storage"
+                and string.upper(tostring(self.npcDisplayName or "Storage"))
+                or string.upper(tostring(self.npcDisplayName or "Companion"))
+                    .. "'S INVENTORY",
             UIFont.Small,
             paneWidth - 8
         ),
         npcX + 4, headingY, 1.00, 0.82, 0.62, 1, UIFont.Small
     )
-    local inventory = self:inventory()
     local playerUsed, playerMax = Model.GetPlayerContainerWeight(
         Model.FindContainer(self.playerContainers, self.selectedPlayerContainer),
         player
     )
-    local npcUsed, npcMax = Model.GetNPCContainerWeight(
-        inventory,
-        self.selectedNPCContainer
-    )
+    local npcUsed, npcMax = 0, 0
+    if self.transferEndpoint then
+        npcUsed, npcMax = self.transferEndpoint:weight()
+    end
     local playerContainerText = tr("UI_PNC_Inventory_Container", "Container") .. ": "
         .. selectedContainerLabel(self.playerContainers, self.selectedPlayerContainer)
     local npcContainerText = tr("UI_PNC_Inventory_Container", "Container") .. ": "
@@ -837,7 +856,7 @@ function ISPNCInventoryWindow:new(x, y, width, height, options)
     return o
 end
 
-function InventoryWindow.Open(npcId, options)
+local function getOrCreateWindow()
     local window = InventoryWindow.instance
     if not window then
         local spec = {
@@ -859,6 +878,11 @@ function InventoryWindow.Open(npcId, options)
         InventoryWindow.instance = window
     end
     window:setVisible(true)
+    return window
+end
+
+function InventoryWindow.Open(npcId, options)
+    local window = getOrCreateWindow()
     window:setNPC(npcId)
     options = type(options) == "table" and options or {}
     window:setConversationMode(options.mode, options.token)
@@ -866,8 +890,22 @@ function InventoryWindow.Open(npcId, options)
     return window
 end
 
+function InventoryWindow.OpenStorage(storageID, options)
+    options = type(options) == "table" and options or {}
+    local window = getOrCreateWindow()
+    local endpoint = TransferEndpoint.Storage(storageID)
+    endpoint.displayName = options.displayName or "Colony Storage"
+    window:setTransferEndpoint(endpoint)
+    window:setConversationMode(nil, nil)
+    window:bringToTop()
+    return window
+end
+
 function InventoryWindow.OnResult(result)
     local window = InventoryWindow.instance
+    if window and window.transferEndpoint
+        and window.transferEndpoint.kind ~= "npc"
+    then return end
     if not window or not result or tostring(result.npcId or "") ~= tostring(window.npcId or "") then
         return
     end
@@ -889,11 +927,15 @@ end
 function InventoryWindow.OnColonyStorageResult(result)
     local window = InventoryWindow.instance
     if not window or type(result) ~= "table" then return end
+    if window.transferEndpoint and window.transferEndpoint.kind == "storage"
+        and result.storageId
+        and tostring(result.storageId) ~= tostring(window.transferEndpoint.id)
+    then return end
     local reason = tostring(result.reason or "failed"):gsub("_", " ")
     local details = result.details or {}
     if result.ok == true then
         window.statusText = tr(
-            "UI_PNC_Storage_DepositComplete", "Deposited to colony storage"
+            "UI_PNC_Storage_TransferComplete", "Storage transfer complete"
         )
     elseif result.reason == "storage_full" then
         window.statusText = string.format(
@@ -906,7 +948,7 @@ function InventoryWindow.OnColonyStorageResult(result)
         )
     else
         window.statusText = tr(
-            "UI_PNC_Storage_DepositFailed", "Storage deposit failed"
+            "UI_PNC_Storage_TransferFailed", "Storage transfer failed"
         ) .. ": " .. reason
     end
     window.contextSignature = nil
