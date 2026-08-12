@@ -13,7 +13,7 @@ Adapter.TYPE = {
     NPC_HISTORY = "projecthoomans.npcHistory",
 }
 Adapter.NPC_CAPACITY = 32
-Adapter.STORAGE_CAPACITY = 10
+Adapter.STORAGE_CAPACITY = 20
 
 CoreJournals.registerType(Adapter.TYPE.COLONY_ACTIVITY, {
     storage = "boundedRing",
