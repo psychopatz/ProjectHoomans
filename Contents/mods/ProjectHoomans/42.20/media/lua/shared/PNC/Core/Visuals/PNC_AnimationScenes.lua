@@ -134,11 +134,13 @@ end
 local function clearScene(record, zombie, reason, release)
     local runtime
     local scene
+    local definition
     if not record then return false end
     runtime = record.runtime or {}
     record.runtime = runtime
     scene = runtime.animationScene
     if not scene then return false end
+    definition = Scenes.Get(scene.id)
     runtime.lastAnimationScene = {
         id = scene.id,
         revision = scene.revision,
@@ -158,6 +160,15 @@ local function clearScene(record, zombie, reason, release)
         PNC.Animation.FinishBump(zombie, true)
     end
     markSceneSync(record, "animation_scene_stop")
+    if definition and type(definition.onStop) == "function" then
+        local ok, errorValue = pcall(
+            definition.onStop, record, zombie, scene,
+            reason or "stopped")
+        if not ok and Core and Core.LogWarn then
+            Core.LogWarn("PNC animation scene stop callback failed: "
+                .. tostring(errorValue))
+        end
+    end
     return true
 end
 
@@ -451,6 +462,10 @@ function Scenes.Register(sceneId, definition)
             tonumber(definition.stepGapJitterMs) or 0
         ),
         interrupts = copyInterrupts(definition.interrupts),
+        onTick = type(definition.onTick) == "function"
+            and definition.onTick or nil,
+        onStop = type(definition.onStop) == "function"
+            and definition.onStop or nil,
     }
     removeFromPools(sceneId)
     Scenes.Definitions[sceneId] = normalized
@@ -791,6 +806,22 @@ function Scenes.Tick(record, zombie, now)
             clearScene(record, zombie, "abstracted", false)
         end
         return false
+    end
+    if type(definition.onTick) == "function" then
+        local ok, keepRunning = pcall(
+            definition.onTick, record, zombie, scene, now)
+        if not ok then
+            if Core and Core.LogWarn then
+                Core.LogWarn("PNC animation scene tick callback failed: "
+                    .. tostring(keepRunning))
+            end
+            clearScene(record, zombie, "tick_callback_failed", true)
+            return false
+        end
+        if keepRunning == false then
+            clearScene(record, zombie, "callback_complete", true)
+            return false
+        end
     end
     if scene.bump == nil then
         if now >= (tonumber(scene.nextStepAt) or 0) then

@@ -38,6 +38,9 @@ Shared.SETTLEMENT_REASON_KEYS = {
     OUTSIDE_BASE = "UI_PNC_SettlementReason_OutsideBase",
     OVERLAP_NOT_ALLOWED = "UI_PNC_SettlementReason_Overlap",
     INSUFFICIENT_BUILD_MATERIALS = "UI_PNC_SettlementReason_Materials",
+    BED_REQUIRED = "UI_PNC_SettlementReason_BedRequired",
+    FARMLAND_REQUIRED = "UI_PNC_SettlementReason_FarmlandRequired",
+    WORLD_SQUARE_UNLOADED = "UI_PNC_SettlementReason_SquareUnloaded",
 }
 Shared.NEED_METER_THRESHOLDS = {
     hunger = {

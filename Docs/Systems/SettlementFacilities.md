@@ -52,13 +52,16 @@ are rebuilt on load or facility mutation, never every tick.
 ### Initial definitions
 
 Barracks levels expose `sleep` and `rest`, require at least one sleeping area
-and one bed, and permit 4/8/14 bed anchors at levels 1/2/3. Higher levels require
-matching HQ levels. Separate connected sleeping regions may be assigned on
-different floors.
+and one sleep spot, and permit 4/8/14 sleep anchors at levels 1/2/3. Higher
+levels require matching HQ levels. Separate connected sleeping regions may be
+assigned on different floors. The legacy role name `sleep.bed` is retained for
+save compatibility, but its square does not require furniture.
 
 Farm levels expose `farm.work`, allow one exclusive irregular `farm.field`,
 and cap field area at 100/180 tiles at levels 1/2. Worker capacity is separate
 activity-limit data (2/4 concurrent workers).
+Every selected field tile must be cultivated farmland; ordinary ground is
+rejected in the selector and again by the authority.
 
 Facility definitions also own presentation metadata and declarative build
 costs. Barracks and Farm currently each consume one `Base.Money`; this is an
@@ -85,6 +88,40 @@ reservation plus an anchor target when applicable. Active NPCs can resolve and
 path to that target; abstract NPCs pass `abstract=true` and perform only the
 logical availability/capacity step. Interaction-target resolution remains a
 service boundary and no live IsoObject is persisted.
+
+Reusable square predicates live in PsychopatzCore's
+`PsychopatzSquareRules`. The region selector can require any registered rule,
+colors the hovered tile green/red, and validates every selected square. Project
+Hoomans maps component-definition `worldRule` values onto the same authority
+checks. Farmland remains assignment policy; bed detection is a reusable runtime
+query because furniture at a sleep spot can change after assignment.
+
+## Facility jobs and animation scenes
+
+Facility work is a data-defined activity pipeline. Definitions map a capability
+to its component role, active job, animation scene, need effect, arrival range,
+and completion threshold. The server acquires and renews a reservation, while
+the shared behavior owns travel, interaction positioning, scene playback, and
+order restoration.
+
+Barracks sleep reserves one `sleep.bed` spot and examines its loaded square at
+job acquisition time. With no real bed, the NPC paths directly to the spot and
+loops `facility.sleep.floor` through `BumpType=PNC_Sleep`
+(`Bob_SitGround_SleepIdle`). With a real bed, the NPC instead paths to a free
+cardinal neighbor, then is authoritatively positioned at the center of the
+possibly multi-tile bed, aligned to its long axis, and loops
+`facility.sleep.bed` through `BumpType=PNC_SleepBed` (`Bob_Asleep`). Furniture
+changes are detected without rebuilding the component. Both scenes reduce
+fatigue using elapsed game hours, complete at the rested threshold, and restore
+the preceding order. Idle guards above the fatigue threshold automatically seek
+an operational sleep spot.
+
+Animation scenes now expose guarded tick/stop lifecycle callbacks. Combat,
+movement, damage, abstraction, and external bumps still interrupt through the
+central scene arbiter. A sleep interruption immediately restores the actor to
+the safe approach tile; the facility order remains queued and resumes after the
+threat. The owner's NPC context menu exposes `Stop Current Activity`, which
+releases the reservation, stops the scene, and restores the prior order.
 
 ## Stockpile access
 
@@ -139,12 +176,14 @@ calculation run only on load, explicit query, or mutation.
 Open Colony Management and select `BASE`. Before a Base exists, use `CLAIM
 TERRITORY`; drag in the world and use Replace/Add/Erase to form one connected
 footprint, then confirm. Once established, the tab exposes Expand, Shrink,
-Reinforce, Upgrade HQ, Build a Building, Assign Area, Assign Bed, Upgrade
+Reinforce, Upgrade HQ, Build a Building, Assign Area, Assign Sleep Spot, Upgrade
 Facility, and Place Stockpile. `BUILD A BUILDING` opens a card chooser with the
 definition image, material cost, availability state, and description. The
-facility selector chooses which instance
-the assignment and upgrade controls target. Facility components are shown with
-their role, exact floor, coordinates or area, and tile count.
+Base tab now uses a building browser instead of a flat selector/control pile.
+The left pane lists building instances and operational state; the inspector
+nests required component slots and their assigned areas/anchors. Contextual
+zone/bed/upgrade controls act on the selected building. Facility components are
+shown with their role, exact floor, coordinates or area, and tile count.
 
 `SHOW BASE LAYOUT` is a persistent toggle for the world overlay. It draws the
 exact saved Base spans, facility regions, anchor tiles, and stockpile access
@@ -152,10 +191,11 @@ nodes in separate colors. Facility assignment selectors also receive these
 layers as guides, so already allocated tiles remain visible while editing.
 
 In debug mode, select a colonist and a facility, then use `SEND TO WORK
-FACILITY`. This installs the temporary `facility_debug_work` order, routes it
-through the normal navigation stack, and reports `QUEUED`, `TRAVELLING`, or
-`WORKING` in the Debug details. `STOP FACILITY TEST` restores the preceding
-order.
+FACILITY`. This starts the same reserved `facility_activity` used by production
+jobs, routes it through the normal navigation and animation stacks, and reports
+`QUEUED`, `TRAVELLING`, `STARTING`, `SLEEPING`, or `INTERRUPTED` in the Debug
+details. Debug hold keeps the scene running after fatigue is cured so animation
+testing is convenient. `STOP FACILITY TEST` restores the preceding order.
 
 `PLACE STOCKPILE` currently creates the authoritative logical access waypoint
 at the selected tile, which is sufficient to test containment, persistence,
@@ -175,6 +215,7 @@ Run:
 lua tests/pnc_settlement_foundation_smoke.lua
 lua tests/pnc_settlement_layout_overlay_smoke.lua
 lua tests/pnc_facility_debug_work_smoke.lua
+lua ../psychopatzCore/tests/psychopatz_square_rules_smoke.lua
 ```
 
 The smoke suite covers normalization, connected expansion, island and diagonal
@@ -194,10 +235,16 @@ Manual in-game check:
 4. Put at least two `Base.Money` items in the player inventory. Open `BUILD A
    BUILDING`, inspect the two placeholder cards, then create a Barracks and
    confirm one money item is consumed.
-5. Select the Barracks, assign a connected sleeping area and a bed tile; verify
-   the component floor/coordinates and operational state.
-6. Create a Farm and verify an area above 100 tiles is rejected at level 1.
+5. Select the Barracks in the building browser, assign a connected sleeping
+   area, assign one empty-ground sleep spot, and verify its nested component and
+   operational state. Repeat on a real bed to exercise furniture detection.
+6. Create a Farm and verify ordinary ground is rejected, cultivated farmland is
+   accepted, and an area above 100 tiles is rejected at level 1.
 7. Place a stockpile waypoint inside the Base and verify its node count rises.
 8. In Debug, select a colonist and the Barracks, send the colonist to work, and
-   verify they path to the assigned bed/area and enter `WORKING`; stop the test
-   and confirm their previous order resumes.
+   verify the empty spot loops `PNC_Sleep`, while the bed spot approaches from a
+   neighboring tile, centers the NPC on the bed, and loops `PNC_SleepBed`.
+   Trigger a nearby
+   enemy and verify the scene interrupts/restores position, then resumes after
+   danger. Right-click the NPC, choose `Stop Current Activity`, and confirm the
+   previous order resumes.

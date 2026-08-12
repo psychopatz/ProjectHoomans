@@ -11,8 +11,6 @@ package.path = table.concat({
 }, ";")
 
 getText = function(key) return key end
-ISComboBox = {}
-package.preload["ISUI/ISComboBox"] = function() return ISComboBox end
 
 local styled
 PsychopatzCore = { UI = {
@@ -24,23 +22,15 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
     return PsychopatzCore.UI
 end
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
-] = function() return { SetRows = function() end } end
+    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Actions"
+] = function() return { Handle = function() return true end } end
+local browserRebuilt = false
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
-] = function() return { BuildSettlement = function() return {} end } end
-package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
-] = function() return { SettlementReason = function(value) return value end } end
-package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
-    return {}
-end
-package.preload[
-    "PsychopatzCore/UI/World/PsychopatzGridRegionSelector"
-] = function() return {} end
-package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal"
-] = function() return {} end
+    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityBrowser"
+] = function() return {
+    Rebuild = function() browserRebuilt = true end,
+    GetSelected = function() return nil end,
+} end
 package.preload[
     "PNC/UI/Communities/ColonyManagement/PNC_SettlementLayoutOverlay"
 ] = function()
@@ -52,20 +42,13 @@ end
 
 PNC = { FacilityDefinitions = { Get = function() end } }
 local BaseTab = require(
-    "PNC/UI/Communities/ColonyManagement/PNC_SettlementManagementTab"
+    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
 )
 local title
 local overlayButton = { setTitle = function(_, value) title = value end }
-local combo = {
-    selected = 1,
-    getOptionData = function() return nil end,
-    clear = function() end,
-    addOptionWithData = function() end,
-}
 local window = {
-    baseFacilityCombo = combo,
     baseControls = { overlay = overlayButton },
-    details = {},
+    baseContextControls = {},
 }
 
 equal(BaseTab.Rebuild(window, { settlement = { facilities = {} } }), true,
@@ -73,5 +56,6 @@ equal(BaseTab.Rebuild(window, { settlement = { facilities = {} } }), true,
 equal(title, "HIDE BASE LAYOUT", "enabled overlay title")
 equal(styled.button, overlayButton, "overlay button styling target")
 equal(styled.variant, "warning", "enabled overlay style")
+equal(browserRebuilt, true, "facility browser rebuild")
 
 print("pnc_settlement_tab_overlay_button_smoke: ok")

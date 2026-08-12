@@ -83,7 +83,13 @@ function Validation.NormalizeComponent(base, facility, input)
         kind = input.kind, role = input.role, revision = tonumber(input.revision) or 0,
         targetResolver = input.targetResolver and tostring(input.targetResolver) or nil,
         objectTag = input.objectTag and tostring(input.objectTag) or nil,
+        worldRule = limit.worldRule and tostring(limit.worldRule) or nil,
     }
+    if input.kind == "anchor" and component.role == "sleep.bed" then
+        component.targetResolver = "sleepSpot"
+        component.objectTag = nil
+        component.worldRule = nil
+    end
     if input.kind == "anchor" then
         component.x = math.floor(tonumber(input.x) or 0)
         component.y = math.floor(tonumber(input.y) or 0)

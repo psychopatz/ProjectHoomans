@@ -188,7 +188,7 @@ records.owned.affiliation = { factionID = "faction_alice" }
 assertEqual(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
     true, "single-player faction ownership uses canonical account key")
 
-assertEqual(#PNC.CompanionCommands.List(), 6, "registered command count")
+assertEqual(#PNC.CompanionCommands.List(), 7, "registered command count")
 assertEqual(#PNC.CompanionCommands.ListGroups(), 2,
     "registered command group count")
 assertEqual(

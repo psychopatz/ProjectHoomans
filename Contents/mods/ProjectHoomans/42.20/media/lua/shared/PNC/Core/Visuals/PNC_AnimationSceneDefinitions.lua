@@ -110,4 +110,95 @@ Scenes.Register("social.surrender", {
     },
 })
 
+Scenes.Register("facility.sleep.floor", {
+    label = "Sleep on Floor",
+    description = "A persistent ground sleep loop used when no bed is present.",
+    category = "facility",
+    bump = "Sleep",
+    priority = 45,
+    repeatMode = "loop",
+    blocking = true,
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = function(record, zombie, scene, now)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneTick then
+            return jobs.OnSceneTick(record, zombie, scene, now)
+        end
+        return true
+    end,
+    onStop = function(record, zombie, scene, reason)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneStopped then
+            jobs.OnSceneStopped(record, zombie, scene, reason)
+        end
+    end,
+})
+
+Scenes.Register("facility.sleep.bed", {
+    label = "Sleep in Bed",
+    description = "A persistent bed sleep loop owned by a facility job.",
+    category = "facility",
+    bump = "SleepBed",
+    priority = 45,
+    repeatMode = "loop",
+    blocking = true,
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = function(record, zombie, scene, now)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneTick then
+            return jobs.OnSceneTick(record, zombie, scene, now)
+        end
+        return true
+    end,
+    onStop = function(record, zombie, scene, reason)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneStopped then
+            jobs.OnSceneStopped(record, zombie, scene, reason)
+        end
+    end,
+})
+
+Scenes.Register("facility.farm.work", {
+    label = "Work Farm Plot",
+    description = "A loop of cultivation primitives for farm work.",
+    category = "facility",
+    priority = 40,
+    repeatMode = "loop",
+    blocking = true,
+    stepGapMs = 350,
+    steps = {
+        { id = "dig", bump = "DigShovel", durationMs = 4600 },
+        { id = "water", bump = "PourWateringCan", durationMs = 3800 },
+    },
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = function(record, zombie, scene, now)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneTick then
+            return jobs.OnSceneTick(record, zombie, scene, now)
+        end
+        return true
+    end,
+    onStop = function(record, zombie, scene, reason)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneStopped then
+            jobs.OnSceneStopped(record, zombie, scene, reason)
+        end
+    end,
+})
+
 return Scenes

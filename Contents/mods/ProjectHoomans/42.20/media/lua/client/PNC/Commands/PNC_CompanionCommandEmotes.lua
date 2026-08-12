@@ -187,7 +187,9 @@ function Emotes.BuildMenuDefinition(scope, target, nestedMenus)
     local commandKey
     for i = 1, #definitions do
         definition = definitions[i]
-        if not (scope == "group" and definition.attackType ~= nil) then
+        if definition.contextOnly ~= true
+            and not (scope == "group" and definition.attackType ~= nil)
+        then
             groupID = tostring(definition.group or "")
             group = Commands and Commands.GetGroup
                 and Commands.GetGroup(groupID) or nil

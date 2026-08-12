@@ -2,7 +2,7 @@
 <animNode>
 	<m_Name>PNC_Anim_SleepBed</m_Name>
 	<m_AnimName>Bob_Asleep</m_AnimName>
-	<m_Looped>false</m_Looped>
+	<m_Looped>true</m_Looped>
 	<m_UpperOnly>false</m_UpperOnly>
 	<m_EarlyBlendOut>false</m_EarlyBlendOut>
 	<m_SpeedScale>0.80</m_SpeedScale>
@@ -19,10 +19,4 @@
 		<m_Type>STRING</m_Type>
 		<m_StringValue>PNC_SleepBed</m_StringValue>
 	</m_Conditions>
-	<m_Events>
-		<m_EventName>SetVariable</m_EventName>
-		<m_Time>End</m_Time>
-		<m_ParameterValue>BumpAnimFinished=true</m_ParameterValue>
-	</m_Events>
-
 </animNode>

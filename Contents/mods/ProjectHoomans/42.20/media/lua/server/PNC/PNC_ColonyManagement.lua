@@ -59,12 +59,9 @@ local function debugFacilityWorkAction(player, args)
     end
     record.runtime = record.runtime or {}
     if tostring(args.operation or "start") == "stop" then
-        local state = record.runtime.facilityDebugWork
-        if not state then return false, "facility_work_not_active" end
-        local previous = state.previousOrder
-        record.runtime.facilityDebugWork = nil
-        PNC.OrderSystem.SetOrder(record, previous)
-        return true, "facility_work_stopped", { npcID = record.id }
+        local stopped, stopReason = PNC.FacilityJobs.Stop(
+            record, "debug_stop")
+        return stopped, stopReason, { npcID = record.id }
     end
     local facility = PNC.SettlementRepository.GetFacility(args.facilityId)
     local base = facility and PNC.BaseService.Get(facility.baseId) or nil
@@ -72,31 +69,9 @@ local function debugFacilityWorkAction(player, args)
     if not PNC.BaseValidationService.CanUse(player, base) then
         return false, "NO_PERMISSION"
     end
-    local target, reason = PNC.FacilityService.ResolveWorkTarget(facility)
-    if not target then return false, reason end
-    local definition = PNC.FacilityDefinitions.Get(facility.definitionId)
-    local previous = record.runtime.facilityDebugWork
-        and record.runtime.facilityDebugWork.previousOrder
-        or PNC.Core.DeepCopy(record.orderSpec)
-    local facilityName = definition and definition.displayNameKey
-        and tostring(definition.displayNameKey) or facility.definitionId
-    record.runtime.facilityDebugWork = {
-        facilityId = facility.id,
-        facilityName = facilityName,
-        componentId = target.componentId,
-        role = target.role,
-        phase = "QUEUED",
-        target = { x = target.x, y = target.y, z = target.z },
-        previousOrder = previous,
-    }
-    PNC.OrderSystem.SetOrder(record, {
-        kind = "facility_debug_work", facilityId = facility.id,
-        facilityName = facilityName, componentId = target.componentId,
-        role = target.role, x = target.x, y = target.y, z = target.z,
+    return PNC.FacilityJobs.StartForFacility(record, facility.id, {
+        debugHold = true,
     })
-    return true, "facility_work_started", {
-        npcID = record.id, facilityId = facility.id, target = target,
-    }
 end
 
 canUseDebug = function(player)

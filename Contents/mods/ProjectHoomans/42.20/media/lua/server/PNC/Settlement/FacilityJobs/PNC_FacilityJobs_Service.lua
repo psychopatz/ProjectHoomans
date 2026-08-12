@@ -1,0 +1,153 @@
+if isClient and isClient() and (not isServer or not isServer()) then return end
+
+PNC = PNC or {}
+PNC.FacilityJobs = PNC.FacilityJobs or {}
+
+local Jobs = PNC.FacilityJobs
+local Repository = PNC.SettlementRepository
+local AUTO_FATIGUE_THRESHOLD = 0.68
+local AUTO_SCAN_MS = 5000
+
+local function definitionCapability(facility)
+    local level = facility and PNC.FacilityDefinitions.GetLevel(
+        facility.definitionId, facility.level) or nil
+    local index
+    for index = 1, #(level and level.capabilities or {}) do
+        local capability = level.capabilities[index]
+        if PNC.FacilityJobDefinitions.Get(capability) then return capability end
+    end
+    return nil
+end
+
+local function baseForRecord(record)
+    local affiliation = record and record.affiliation or {}
+    local factionId = tostring(affiliation.factionID
+        or affiliation.factionId or record and record.factionId or "")
+    local colonyId = tostring(affiliation.communityID
+        or affiliation.communityId or record and record.communityId or "")
+    local id
+    local base
+    for id, base in pairs(Repository.State.bases or {}) do
+        if factionId ~= "" and tostring(base.factionId or "") == factionId then
+            return base
+        end
+        if colonyId ~= "" and tostring(base.colonyId or "") == colonyId then
+            return base
+        end
+    end
+    return nil
+end
+
+function Jobs.Start(record, facilityOrId, capability, options)
+    options = type(options) == "table" and options or {}
+    local facility = type(facilityOrId) == "table" and facilityOrId
+        or Repository.GetFacility(facilityOrId)
+    local base = facility and PNC.BaseService.Get(facility.baseId) or nil
+    capability = tostring(capability or definitionCapability(facility) or "")
+    local definition = PNC.FacilityJobDefinitions.Get(capability)
+    if not record or record.alive == false then return false, "NPC_UNAVAILABLE" end
+    if not base or not facility then return false, "FACILITY_NOT_FOUND" end
+    if not definition then return false, "FACILITY_HAS_NO_ACTIVITY" end
+    if record.runtime and record.runtime.facilityActivity then
+        Jobs.Stop(record, "activity_replaced")
+    end
+    local acquired = PNC.FacilityService.AcquireActivity(
+        base.id, record.id, capability, { ttlMs = 30000 })
+    if not acquired.ok or not acquired.target then
+        return false, acquired.reason or "FACILITY_HAS_NO_WORK_TARGET"
+    end
+    local target = acquired.target
+    local sceneId = tostring(target.sceneId or definition.sceneId or "")
+    local facilityDefinition = PNC.FacilityDefinitions.Get(facility.definitionId)
+    local previousOrder = PNC.Core.DeepCopy(record.orderSpec)
+    record.runtime = record.runtime or {}
+    record.runtime.facilityActivity = {
+        capability = capability,
+        facilityId = facility.id,
+        facilityName = facilityDefinition and facilityDefinition.displayNameKey
+            or facility.definitionId,
+        componentId = acquired.componentId,
+        reservationId = acquired.reservationId,
+        sceneId = sceneId,
+        sleepSurface = tostring(target.sleepSurface or ""),
+        phase = "QUEUED",
+        target = { x = target.x, y = target.y, z = target.z },
+        previousOrder = previousOrder,
+        debugHold = options.debugHold == true,
+        automatic = options.automatic == true,
+    }
+    if options.debugHold == true then
+        record.runtime.facilityDebugWork = record.runtime.facilityActivity
+    end
+    PNC.OrderSystem.SetOrder(record, {
+        kind = "facility_activity",
+        capability = capability,
+        facilityId = facility.id,
+        facilityName = record.runtime.facilityActivity.facilityName,
+        componentId = acquired.componentId,
+        reservationId = acquired.reservationId,
+        x = target.x, y = target.y, z = target.z,
+        interactionX = target.interactionX,
+        interactionY = target.interactionY,
+        interactionZ = target.interactionZ,
+        interactionAxis = target.interactionAxis,
+        interactionFacing = target.interactionFacing,
+        sceneId = sceneId,
+        sleepSurface = target.sleepSurface,
+        debugHold = options.debugHold == true,
+    })
+    return true, "facility_activity_started", {
+        npcID = record.id,
+        facilityId = facility.id,
+        capability = capability,
+        target = { x = target.x, y = target.y, z = target.z },
+    }
+end
+
+function Jobs.StartForFacility(record, facilityId, options)
+    local facility = Repository.GetFacility(facilityId)
+    return Jobs.Start(record, facility, definitionCapability(facility), options)
+end
+
+local function eligibleForAutomaticSleep(record)
+    local order = record and record.orderSpec or {}
+    local kind = tostring(order.kind or "")
+    return record and record.alive ~= false
+        and tostring(record.presenceState or PNC.Const.PRESENCE_LIVE)
+            == tostring(PNC.Const.PRESENCE_LIVE)
+        and (not record.runtime or not record.runtime.facilityActivity)
+        and (kind == "" or kind == tostring(PNC.Const.ORDER_GUARD))
+        and PNC.CompanionCommands.IsCompanion(record)
+end
+
+function Jobs.ScanAutomatic()
+    if not PNC.IndividualNeeds then return 0 end
+    local started = 0
+    PNC.Registry.ForEach(function(record)
+        if not eligibleForAutomaticSleep(record) then return end
+        local fatigue = tonumber(PNC.IndividualNeeds.Get(record, "fatigue")) or 0
+        if fatigue < AUTO_FATIGUE_THRESHOLD then return end
+        local base = baseForRecord(record)
+        local facilities = base and PNC.FacilityService.ListByCapability(
+            base.id, "sleep") or {}
+        local index
+        for index = 1, #facilities do
+            local ok = Jobs.Start(record, facilities[index], "sleep", {
+                automatic = true,
+            })
+            if ok then started = started + 1; return end
+        end
+    end)
+    return started
+end
+
+local function onTick()
+    local now = PNC.Core.Now()
+    if now < (tonumber(Jobs.NextAutomaticScanAt) or 0) then return end
+    Jobs.NextAutomaticScanAt = now + AUTO_SCAN_MS
+    Jobs.ScanAutomatic()
+end
+
+if Events and Events.OnTick then Events.OnTick.Add(onTick) end
+
+return Jobs

@@ -69,6 +69,27 @@ Commands.Register({
 })
 
 Commands.Register({
+    id = "stop_activity",
+    group = "movement",
+    labelKey = "UI_PNC_CommandStopActivity",
+    label = "Stop Current Activity",
+    icon = "media/ui/Emotes/PNC_EmoteStay.png",
+    contextOnly = true,
+    isVisible = function(record)
+        return record and (
+            record.runtime and record.runtime.facilityActivity ~= nil
+            or record.orderSpec
+                and record.orderSpec.kind == "facility_activity"
+            or tostring(record.activeJob or "") == "Sleep"
+        )
+    end,
+    apply = function(record)
+        return PNC.FacilityJobs and PNC.FacilityJobs.Stop
+            and PNC.FacilityJobs.Stop(record, "player_stop") == true
+    end,
+})
+
+Commands.Register({
     id = "attack_auto",
     group = "attack_type",
     labelKey = "UI_PNC_CommandAttackAuto",

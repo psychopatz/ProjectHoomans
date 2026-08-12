@@ -48,6 +48,13 @@ function Provider.addOptions(menu, entry, player)
     end
     for i = 1, #definitions do
         definition = definitions[i]
+        if definition.contextOnly == true
+            and type(definition.isVisible) == "function"
+            and definition.isVisible(commandTarget(entry)) ~= true
+        then
+            definition = nil
+        end
+        if definition then
         local commandID = definition.id
         groupID = tostring(definition.group or "")
         group = Commands.GetGroup and Commands.GetGroup(groupID) or nil
@@ -104,6 +111,7 @@ function Provider.addOptions(menu, entry, player)
                 disabled = true,
                 color = "bad",
             })
+        end
         end
     end
 end

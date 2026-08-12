@@ -75,6 +75,12 @@ assert(PNC.AnimationScenes.Get("social.surrender").blocking == true,
     "surrender scene is not blocking")
 assert(PNC.AnimationScenes.Get("idle.ambient").repeatMode == "loop",
     "idle scene repeat policy is not explicit")
+assert(PNC.AnimationScenes.Get("facility.sleep.floor").steps[1].loop == true,
+    "floor sleep must remain in one persistent XML playback")
+assert(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].loop == true,
+    "bed sleep must remain in one persistent XML playback")
+assert(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].durationMs == 0,
+    "bed sleep must not be force-finished on a timer")
 
 local registered, custom = PNC.AnimationScenes.Register(
     "example.wave",
@@ -240,5 +246,29 @@ assert(PNC.AnimationScenes.Tick(record, body, now) == false
         and record.runtime.animationScene == nil,
     "combat state allowed a fresh idle queue")
 record.runtime.target = nil
+
+local callbackTicks = 0
+local callbackStopReason
+PNC.AnimationScenes.Register("test.lifecycle", {
+    bump = "Sneeze",
+    durationMs = 1000,
+    blocking = true,
+    onTick = function()
+        callbackTicks = callbackTicks + 1
+        return false
+    end,
+    onStop = function(_, _, _, reason)
+        callbackStopReason = reason
+    end,
+})
+started = PNC.AnimationScenes.Request(record, body, "test.lifecycle", {
+    now = now,
+})
+assert(started and PNC.AnimationScenes.Tick(record, body, now + 1) == false,
+    "scene lifecycle callback did not complete the scene")
+assert(callbackTicks == 1 and callbackStopReason == "callback_complete",
+    "scene lifecycle callbacks were not dispatched")
+assert(record.runtime.animationScene == nil,
+    "callback-completed scene remained active")
 
 print("pnc_animation_scenes_smoke: ok")

@@ -75,7 +75,8 @@ Definitions.Register({
             capabilities = { "farm.work" },
             componentLimits = {
                 ["farm.field"] = { kind = "region", minCount = 1,
-                    maxCount = 1, maxTotalTiles = 100, overlap = "exclusive" },
+                    maxCount = 1, maxTotalTiles = 100, overlap = "exclusive",
+                    worldRule = "farmland" },
             },
             activityLimits = { ["farm.work"] = { maxConcurrent = 2 } },
         },
@@ -84,7 +85,8 @@ Definitions.Register({
             capabilities = { "farm.work" },
             componentLimits = {
                 ["farm.field"] = { kind = "region", minCount = 1,
-                    maxCount = 1, maxTotalTiles = 180, overlap = "exclusive" },
+                    maxCount = 1, maxTotalTiles = 180, overlap = "exclusive",
+                    worldRule = "farmland" },
             },
             activityLimits = { ["farm.work"] = { maxConcurrent = 4 } },
         },

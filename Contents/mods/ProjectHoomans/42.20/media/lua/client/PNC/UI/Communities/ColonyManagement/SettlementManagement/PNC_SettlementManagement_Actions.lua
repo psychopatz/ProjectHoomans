@@ -1,0 +1,48 @@
+local Territory = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_TerritoryActions"
+local Facility = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityActions"
+local BuildModal = require "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal"
+local LayoutOverlay = require "PNC/UI/Communities/ColonyManagement/PNC_SettlementLayoutOverlay"
+local Support = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
+
+local Actions = {}
+
+function Actions.Handle(window, action, facility)
+    local settlement = window.snapshot and window.snapshot.settlement
+    if action == "claim" then Territory.Begin(window, "create"); return true end
+    if not settlement then return false end
+    if action == "expand" then Territory.Begin(window, "expand"); return true end
+    if action == "shrink" then Territory.Begin(window, "shrink"); return true end
+    if action == "overlay" then LayoutOverlay.Toggle(settlement); return true end
+    if action == "build_facility" then
+        BuildModal.Open(settlement, function(definitionId)
+            PNC.Client.RequestCreateFacility({ baseId = settlement.id,
+                expectedRevision = settlement.revision, definitionId = definitionId })
+            Support.ApplyLocalResult(window)
+        end, window.snapshot and window.snapshot.storage)
+        return true
+    end
+    if action == "barricade" then
+        PNC.Client.RequestBuildBarricade({ baseId = settlement.id,
+            expectedRevision = settlement.revision })
+    elseif action == "hq" then
+        PNC.Client.RequestUpgradeHQ({ baseId = settlement.id,
+            expectedRevision = settlement.revision })
+    elseif action == "stockpile" then
+        Facility.BeginPoint(window, "stockpile"); return true
+    elseif not facility then
+        return false
+    elseif action == "facility_area" then
+        return Facility.BeginArea(window, facility)
+    elseif action == "facility_anchor" and facility.definitionId == "barracks" then
+        Facility.BeginPoint(window, "bed", facility); return true
+    elseif action == "facility_upgrade" then
+        PNC.Client.RequestUpgradeFacility({ facilityId = facility.id,
+            expectedRevision = facility.revision })
+    else
+        return false
+    end
+    Support.ApplyLocalResult(window)
+    return true
+end
+
+return Actions

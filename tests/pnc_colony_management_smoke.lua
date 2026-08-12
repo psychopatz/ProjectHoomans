@@ -131,6 +131,22 @@ PNC = {
     FacilityDefinitions = {
         Get = function() return { displayNameKey = "UI_PNC_Facility_Farm" } end,
     },
+    FacilityJobs = {
+        StartForFacility = function(record, facilityId, options)
+            record.runtime = record.runtime or {}
+            record.runtime.facilityActivity = {
+                facilityId = facilityId, phase = "QUEUED", debugHold = true,
+            }
+            record.runtime.facilityDebugWork = record.runtime.facilityActivity
+            record.orderSpec = { kind = "facility_activity", capability = "farm.work" }
+            return true, "facility_activity_started"
+        end,
+        Stop = function(record)
+            record.runtime.facilityActivity = nil
+            record.runtime.facilityDebugWork = nil
+            return true, "facility_activity_stopped"
+        end,
+    },
     OrderSystem = {
         SetOrder = function(record, order)
             record.orderSpec = order or { kind = "guard", x = 0, y = 0, z = 0 }
@@ -170,7 +186,7 @@ local workSnapshot, workResult = Management.HandleAction(player, {
     facilityId = "facility_farm", operation = "start",
 })
 equal(workResult.ok, true, "debug facility work starts")
-equal(companion.orderSpec.kind, "facility_debug_work",
+equal(companion.orderSpec.kind, "facility_activity",
     "debug facility work installs production order")
 equal(workSnapshot.people[1].facilityDebugWork.phase, "QUEUED",
     "facility work state is visible in management snapshot")

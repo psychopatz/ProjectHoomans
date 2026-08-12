@@ -4,7 +4,7 @@ local Storage = require "PNC/UI/Communities/PNC_ColonyManagementStorageTabs"
 local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
 local DebugTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_DebugTab"
-local BaseTab = require "PNC/UI/Communities/ColonyManagement/PNC_SettlementManagementTab"
+local BaseTab = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
 
 Registry.Register({
     id = "overview",
@@ -33,6 +33,7 @@ Registry.Register({
     end,
     detailTitle = "SETTLEMENT & FACILITIES",
     showRoster = false,
+    showDetails = false,
     create = function(window, UI)
         BaseTab.Create(window, UI)
     end,
