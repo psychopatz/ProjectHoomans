@@ -38,6 +38,12 @@ local TREATMENT_COLORS = {
     dirty = { r = 1.0, g = 0.55, b = 0.12, a = 1.0 },
     clean = { r = 0.35, g = 0.95, b = 0.35, a = 1.0 },
 }
+local ACTION_COLOR = { r = 0.35, g = 0.88, b = 1.0, a = 1.0 }
+
+local function tr(key, fallback)
+    local value = getText and getText(key) or nil
+    return value and value ~= "" and value ~= key and value or fallback
+end
 
 local function clamp(value, minValue, maxValue)
     if value < minValue then return minValue end
@@ -136,6 +142,83 @@ function Presentation.TreatmentStatus(snapshot)
             false
     end
     return "", TREATMENT_COLORS.clean, false
+end
+
+local function facilityName(info)
+    local definition = PNC.FacilityDefinitions
+        and PNC.FacilityDefinitions.Get(info.facilityDefinitionId) or nil
+    return definition and tr(definition.displayNameKey,
+        tostring(info.facilityDefinitionId or "Building"))
+        or tr("UI_PNC_Action_BuildingTarget", "Building")
+end
+
+local function itemName(fullType, fallback)
+    if fullType and getItemNameFromFullType then
+        local value = getItemNameFromFullType(fullType)
+        if value and value ~= "" then return value end
+    end
+    return fallback
+end
+
+local function recipeTarget(info)
+    local resolved = info.recipeId and PNC.RecipeKnowledgeRegistry
+        and PNC.RecipeKnowledgeRegistry.Queries
+        and PNC.RecipeKnowledgeRegistry.Queries.Resolve(info.recipeId) or nil
+    local output = resolved and resolved.descriptor
+        and resolved.descriptor.outputs and resolved.descriptor.outputs[1] or nil
+    local fullType = output and output.itemTypes and output.itemTypes[1] or nil
+    return itemName(fullType, tr("UI_PNC_Action_ItemTarget", "item"))
+end
+
+function Presentation.WorkActionStatus(snapshot)
+    local info = snapshot and snapshot.actionInformation or nil
+    if not info or info.kind ~= "work_order" then return "", ACTION_COLOR, false end
+    local operation = tostring(info.operation or "")
+    local verb, target
+    if operation == "CONSTRUCT" then
+        verb, target = tr("UI_PNC_Action_Building", "Building"), facilityName(info)
+    elseif operation == "RECONSTRUCT" then
+        verb, target = tr("UI_PNC_Action_Reconstructing", "Reconstructing"),
+            facilityName(info)
+    elseif operation == "DECONSTRUCT" then
+        verb, target = tr("UI_PNC_Action_Deconstructing", "Deconstructing"),
+            facilityName(info)
+    elseif operation == "CRAFT" then
+        verb, target = tr("UI_PNC_Action_Crafting", "Crafting"), recipeTarget(info)
+    elseif operation == "DISASSEMBLE" then
+        verb = tr("UI_PNC_Action_Disassembling", "Disassembling")
+        target = itemName(info.specimenFullType,
+            tr("UI_PNC_Action_ItemTarget", "item"))
+    elseif operation == "RESEARCH" then
+        verb = tr("UI_PNC_Action_Researching", "Researching")
+        local definition = PNC.ColonyResearchDefinitions
+            and PNC.ColonyResearchDefinitions.Get(info.technologyId) or nil
+        target = definition and tr(definition.labelKey,
+            tostring(info.technologyId or "technology"))
+            or tr("UI_PNC_Action_KnowledgeTarget", "knowledge")
+    else
+        verb = tr("UI_PNC_Action_Working", "Working")
+        target = tostring(operation)
+    end
+    local text = verb .. " " .. target
+    local status = tostring(info.status or "")
+    if status == "TRAVEL_TO_STOCKPILE" then
+        text = tr("UI_PNC_Action_CollectingMaterials", "Collecting materials for")
+            .. " " .. target
+    elseif status == "TRAVEL_TO_STATION" then
+        text = text .. " - " .. tr("UI_PNC_Action_Traveling", "traveling")
+    elseif status == "BLOCKED" then
+        text = text .. " - " .. tr("UI_PNC_Action_Blocked", "blocked")
+    end
+    return text .. "  " .. tostring(math.max(0,
+        math.min(100, math.floor(tonumber(info.percent) or 0)))) .. "%",
+        ACTION_COLOR, true
+end
+
+function Presentation.ActionStatus(snapshot)
+    local text, color, active = Presentation.WorkActionStatus(snapshot)
+    if text ~= "" then return text, color, active end
+    return Presentation.TreatmentStatus(snapshot)
 end
 
 function Presentation.ShouldShowHealth(snapshot, currentTime)

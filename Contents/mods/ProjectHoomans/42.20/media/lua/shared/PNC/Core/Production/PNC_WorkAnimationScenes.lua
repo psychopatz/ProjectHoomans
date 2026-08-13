@@ -16,7 +16,9 @@ Scenes.Register("production.research", {
     label = RESEARCH_LABEL,
     description = tr("UI_PNC_WorkScene_ResearchDescription"),
     category = "production", priority = 40, repeatMode = "loop",
-    blocking = true, bump = "Read", durationMs = 4200,
+    -- WorkBehavior must keep ticking while the scene supplies presentation;
+    -- otherwise a blocking loop owns BehaviorSystem and freezes work progress.
+    blocking = false, bump = "Read", durationMs = 4200,
     interrupts = interrupts(),
 })
 
@@ -24,7 +26,7 @@ Scenes.Register("production.craft", {
     label = CRAFT_LABEL,
     description = tr("UI_PNC_WorkScene_CraftDescription"),
     category = "production", priority = 40, repeatMode = "loop",
-    blocking = true, stepGapMs = 250,
+    blocking = false, stepGapMs = 250,
     steps = {
         { id = "measure", bump = "Build", durationMs = 3200 },
         { id = "assemble", bump = "SawLog", durationMs = 4200 },
@@ -36,7 +38,7 @@ Scenes.Register("production.disassemble", {
     label = DISASSEMBLY_LABEL,
     description = tr("UI_PNC_WorkScene_DisassembleDescription"),
     category = "production", priority = 40, repeatMode = "loop",
-    blocking = true, bump = "Build", durationMs = 3800,
+    blocking = false, bump = "Build", durationMs = 3800,
     interrupts = interrupts(),
 })
 

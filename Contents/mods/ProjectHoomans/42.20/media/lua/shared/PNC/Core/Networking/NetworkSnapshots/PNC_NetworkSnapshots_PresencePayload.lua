@@ -15,6 +15,7 @@ local resolveAIState = Parts.ResolveAIState
 local buildCombatSummary = Parts.BuildCombatSummary
 local buildCommandFeedback = Parts.BuildCommandFeedback
 local buildBandageFeedback = Parts.BuildBandageFeedback
+local buildActionInformation = Parts.BuildActionInformation
 local buildVisualState = Parts.BuildVisualState
 local buildPathDebugState = Parts.BuildPathDebugState
 local buildCombatDebugState = Parts.BuildCombatDebugState
@@ -83,6 +84,7 @@ function Network.BuildPresenceDelta(record)
         attackType = record.attackType or "auto",
         commandFeedback = buildCommandFeedback(record),
         bandageFeedback = buildBandageFeedback(record),
+        actionInformation = buildActionInformation(record),
         treatmentState = PNC.BehaviorTreatment
             and PNC.BehaviorTreatment.BuildSnapshot
             and PNC.BehaviorTreatment.BuildSnapshot(record) or nil,

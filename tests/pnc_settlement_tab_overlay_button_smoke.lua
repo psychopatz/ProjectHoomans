@@ -23,13 +23,19 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
 end
 package.preload[
     "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Actions"
-] = function() return { Handle = function() return true end } end
+] = function() return {
+    Handle = function() return true end,
+    NextAnchorRole = function() return "work.craft" end,
+    AnchorAssignLabel = function() return "ASSIGN CRAFT TABLE" end,
+    AreaRole = function() return "workshop.room" end,
+} end
 local browserRebuilt = false
+local selectedFacility
 package.preload[
     "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityBrowser"
 ] = function() return {
     Rebuild = function() browserRebuilt = true end,
-    GetSelected = function() return nil end,
+    GetSelected = function() return selectedFacility end,
 } end
 package.preload[
     "PNC/UI/Communities/ColonyManagement/PNC_SettlementLayoutOverlay"
@@ -57,5 +63,27 @@ equal(title, "HIDE BASE LAYOUT", "enabled overlay title")
 equal(styled.button, overlayButton, "overlay button styling target")
 equal(styled.variant, "warning", "enabled overlay style")
 equal(browserRebuilt, true, "facility browser rebuild")
+
+local function control(id)
+    return { internal = id, setVisible = function(self, visible)
+        self.visible = visible
+    end, setTitle = function(self, value) self.title = value end }
+end
+local area, anchor = control("facility_area"), control("facility_anchor")
+local upgrade, destroy = control("facility_upgrade"),
+    control("facility_destroy")
+window.tab = "base"
+window.baseContextControls = { area, anchor, upgrade, destroy }
+selectedFacility = { constructionState = "UNDER_CONSTRUCTION" }
+BaseTab.UpdateContextControls(window)
+equal(area.visible, false, "area assignment hidden before building completes")
+equal(anchor.visible, false, "station assignment hidden before building completes")
+equal(upgrade.visible, false, "upgrade hidden before building completes")
+equal(destroy.visible, true, "deconstruction remains available")
+selectedFacility.constructionState = "BUILT"
+BaseTab.UpdateContextControls(window)
+equal(area.visible, true, "area assignment unlocks after construction")
+equal(anchor.visible, true, "station assignment unlocks after construction")
+equal(upgrade.visible, true, "upgrade unlocks after construction")
 
 print("pnc_settlement_tab_overlay_button_smoke: ok")

@@ -235,8 +235,7 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
     end
     local infectionDebugText = showDebug
         and Debug.InfectionText(snapshot, settings) or ""
-    local treatmentText, treatmentColor =
-        Presentation.TreatmentStatus(snapshot)
+    local actionText, actionColor = Presentation.ActionStatus(snapshot)
     local factionLine1
     local factionLine2
     local factionLine3
@@ -257,8 +256,8 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
     communityDebugLine2,
     entry.communityDebugTone =
         communityDebugLines(snapshot, settings)
-    entry.treatmentColor = treatmentColor
-    entry.treatmentVisible = treatmentText ~= ""
+    entry.actionColor = actionColor
+    entry.actionVisible = actionText ~= ""
     Presentation.CacheTextMetric(entry, "name", name, fonts.name)
     Presentation.CacheTextMetric(entry, "debugText", debugText, fonts.debug)
     Presentation.CacheTextMetric(
@@ -287,8 +286,8 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
     )
     Presentation.CacheTextMetric(
         entry,
-        "treatmentText",
-        treatmentText,
+        "actionText",
+        actionText,
         fonts.debug
     )
     Presentation.CacheTextMetric(

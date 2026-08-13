@@ -15,6 +15,9 @@ local STATE_COLORS = {
     INVALID_COMPONENT = "danger",
     DISABLED = "textMuted",
     PLANNED = "accent",
+    UNDER_CONSTRUCTION = "warning",
+    RECONSTRUCTING = "warning",
+    DECONSTRUCTING = "danger",
 }
 
 local function tr(key, fallback)
@@ -109,6 +112,21 @@ function Browser.RebuildComponents(window)
             detail = tr("UI_PNC_Facility_NoSelectionHelp",
                 "Build a facility to begin defining its rooms and stations."),
         })
+        return
+    end
+    if facility.constructionState ~= nil
+        and facility.constructionState ~= "BUILT"
+    then
+        list:addItem("construction_locked", {
+            label = tr("UI_PNC_Facility_ComponentsLocked",
+                "COMPONENTS LOCKED"),
+            detail = tr("UI_PNC_Facility_ComponentsLockedHelp",
+                "Finish construction before assigning rooms or stations."),
+            complete = false,
+        })
+        window.baseComponentPane:setHeader(
+            string.upper(facility.displayName or facility.definitionId),
+            stateText(facility.cachedState))
         return
     end
     local level = PNC.FacilityDefinitions.GetLevel(

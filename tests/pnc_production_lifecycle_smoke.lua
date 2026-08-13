@@ -18,6 +18,7 @@ end
 local clock, nextReservation = 1000, 1
 local inventory = { ["Base.Plank"] = 2, ["Base.SpearCrafted"] = 0,
     ["Base.Axe"] = 1, ["Base.Hammer"] = 1,
+    ["Base.Money"] = 1,
     ["PNC.RecipeBlueprint"] = 1 }
 local reservations, reserved, transactions = {}, {}, {}
 local descriptor = { key = "Base.MakeWoodenSpear", craftTime = 10,
@@ -149,6 +150,37 @@ PNC.FacilityService = { AcquireActivity = function(_, npcId, capability)
     return { ok = true, componentId = capability, facilityId = "facility",
         reservationId = capability, abstract = true }
 end }
+local constructionFacility = { id = "construction_facility", baseId = "b1",
+    definitionId = "barracks", constructionState = "PLANNED" }
+local constructionDestroyed = false
+local reconstructedComponent
+PNC.SettlementRepository = { GetFacility = function(id)
+    return id == constructionFacility.id and constructionFacility or nil
+end }
+PNC.FacilityDefinitions = { Get = function()
+    return { buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+        buildWork = 10, reconstructWork = 6, deconstructWork = 8 }
+end }
+function PNC.FacilityService.ResolveWorkTarget(facility)
+    if not facility then return nil, "FACILITY_NOT_FOUND" end
+    return { x = 5, y = 5, z = 0, componentId = "room" }
+end
+function PNC.FacilityService.RefreshState(facility)
+    facility.cachedState = facility.constructionState
+    return true
+end
+function PNC.FacilityService.FinalizeDestroy(id)
+    constructionDestroyed = id == constructionFacility.id
+    return constructionDestroyed, constructionDestroyed and "destroyed"
+        or "FACILITY_NOT_FOUND"
+end
+function PNC.FacilityService.FinalizeSetComponent(id, component)
+    if id ~= constructionFacility.id then return false, "FACILITY_NOT_FOUND" end
+    reconstructedComponent = copy(component)
+    constructionFacility.constructionState = "BUILT"
+    constructionFacility.constructionWorkOrderId = nil
+    return true
+end
 PNC.FacilityReservations = {
     Release = function(id) occupied[id] = nil; return true end,
     Start = function() return true end,
@@ -157,6 +189,7 @@ PNC.FacilityReservations = {
 PNC.Registry.Data.worker = { id = "worker", alive = true, factionId = "f1",
     communityId = "c1", skills = { Carpentry = 5 }, runtime = {},
     allowedJobs = { Researcher = true, WorkshopWorker = true } }
+PNC.Registry.Data.worker.allowedJobs.Constructor = true
 
 require "PNC/Core/Production/PNC_WorkDefinitions"
 require "PNC/Core/Colony/Research/PNC_ColonyResearchDefinitions"
@@ -168,6 +201,7 @@ ResearchRepository.ByColony, ResearchRepository.Runtime = {}, {}
 local Work = require "PNC/Production/PNC_WorkService"
 local Research = require "PNC/Production/PNC_ResearchService"
 local Crafting = require "PNC/Production/PNC_CraftingService"
+local Construction = require "PNC/Production/PNC_ConstructionService"
 truthy(Research.Commands.UnlockRecipe("c1", 1, "f1"), "seed known recipe")
 
 local first = assert(Crafting.Commands.QueueCraft({}, 1, 1))
@@ -215,5 +249,67 @@ equal(kit.recipeId, 1, "spear kit targets deterministic recipe")
 truthy(inventory["Base.Plank"] >= 8, "spear kit adds crafting materials")
 truthy(inventory["Base.SpearCrafted"] >= 2,
     "spear kit adds reverse-engineering and deconstruction specimens")
+
+local abandonedBuild = assert(Construction.QueueBuild({}, constructionFacility,
+    PNC.FacilityDefinitions.Get()))
+local replacement = assert(Construction.QueueDeconstruct({},
+    constructionFacility))
+equal(Work.Queries.Get(abandonedBuild.id).status, "CANCELLED",
+    "deconstruct replaces unfinished build")
+equal(reserved["Base.Money"], 0,
+    "replacing unfinished build releases its materials")
+truthy(Work.Commands.Cancel(replacement.id),
+    "cancel replacement deconstruction")
+equal(constructionFacility.constructionState, "PLANNED",
+    "cancelled replacement leaves the plan intact")
+
+local build = assert(Construction.QueueBuild({}, constructionFacility,
+    PNC.FacilityDefinitions.Get()))
+equal(constructionFacility.constructionState, "UNDER_CONSTRUCTION",
+    "build enters construction state")
+truthy(Work.Commands.Assign(build.id, "worker"), "constructor assignment")
+truthy(Work.Commands.AddProgress(build.id, "worker", 4),
+    "first constructor contributes work points")
+equal(Work.BuildActionInformation(PNC.Registry.Data.worker).percent, 40,
+    "action information reports shared order progress")
+PNC.Registry.Data.worker.alive = false
+PNC.Registry.Data.backup = { id = "backup", alive = true, factionId = "f1",
+    communityId = "c1", skills = { Carpentry = 5 }, runtime = {},
+    allowedJobs = { Constructor = true } }
+clock = clock + 1001
+Work.Tick(clock)
+equal(Work.Queries.Get(build.id).progress, 4,
+    "worker interruption preserves construction progress")
+clock = clock + 1001
+Work.Tick(clock)
+equal(Work.Queries.Get(build.id).workerId, "backup",
+    "another constructor continues the interrupted order")
+equal(Work.BuildActionInformation(PNC.Registry.Data.backup).percent, 40,
+    "replacement worker sees existing progress")
+truthy(Work.Commands.AddProgress(build.id, "backup", 100),
+    "replacement constructor completes shared work points")
+equal(inventory["Base.Money"], 0, "construction consumes reserved material")
+equal(constructionFacility.constructionState, "BUILT",
+    "construction completion activates facility")
+local reconstruct = assert(Construction.QueueReconstruct({},
+    constructionFacility, { action = "set", component = {
+        id = "room:1", kind = "region", role = "sleep.area" } }))
+equal(constructionFacility.constructionState, "RECONSTRUCTING",
+    "zone edit enters reconstruction state")
+truthy(Work.Commands.Assign(reconstruct.id, "backup"),
+    "reconstruction assignment")
+truthy(Work.Commands.AddProgress(reconstruct.id, "backup", 100),
+    "abstract reconstruction completes by work points")
+equal(reconstructedComponent.id, "room:1",
+    "zone mutation commits only after reconstruction")
+equal(constructionFacility.constructionState, "BUILT",
+    "reconstruction restores built state")
+local deconstruct = assert(Construction.QueueDeconstruct({},
+    constructionFacility))
+truthy(Work.Commands.Assign(deconstruct.id, "backup"),
+    "deconstruction assignment")
+truthy(Work.Commands.AddProgress(deconstruct.id, "backup", 100),
+    "abstract deconstruction completes by work points")
+equal(constructionDestroyed, true, "deconstruction removes facility parts")
 
 print("pnc_production_lifecycle_smoke: OK")

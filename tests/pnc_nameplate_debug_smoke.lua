@@ -193,6 +193,20 @@ treatmentText = PNC.NameplatePresentation.TreatmentStatus(snapshot)
 assertContains(treatmentText, "Dirty bandage", "dirty treatment marker")
 assertContains(treatmentText, "Bandage", "dirty treatment material")
 
+PNC.FacilityDefinitions = { Get = function(id)
+    return id == "barracks" and {
+        displayNameKey = "UI_PNC_Facility_Barracks",
+    } or nil
+end }
+snapshot.actionInformation = { kind = "work_order",
+    operation = "CONSTRUCT", status = "WORKING", percent = 10,
+    facilityDefinitionId = "barracks" }
+local actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+assertContains(actionText, "Building", "work action verb")
+assertContains(actionText, "barracks", "work action target")
+assertContains(actionText, "10%", "work action progress")
+snapshot.actionInformation = nil
+
 local entriesPath = ROOT .. "PNC/UI/Nameplates/PNC_NameplateEntries.lua"
 local entriesFile = assert(io.open(entriesPath, "r"))
 local entriesSource = entriesFile:read("*a")

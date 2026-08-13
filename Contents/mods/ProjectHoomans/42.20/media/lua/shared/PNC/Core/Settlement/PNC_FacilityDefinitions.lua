@@ -30,6 +30,9 @@ Definitions.Register({
     descriptionKey = "UI_PNC_Facility_BarracksDescription",
     iconPath = "media/ui/Facilities/PNC_Barracks_Placeholder.png",
     buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+    buildWork = 80,
+    reconstructWork = 50,
+    deconstructWork = 50,
     allowMultipleRegions = true,
     levels = {
         [1] = {
@@ -68,6 +71,9 @@ Definitions.Register({
     descriptionKey = "UI_PNC_Facility_FarmDescription",
     iconPath = "media/ui/Facilities/PNC_Farm_Placeholder.png",
     buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+    buildWork = 100,
+    reconstructWork = 65,
+    deconstructWork = 60,
     allowMultipleRegions = false,
     levels = {
         [1] = {
@@ -100,6 +106,9 @@ Definitions.Register({
     -- Reuse shipped facility art until dedicated production art is available.
     iconPath = "media/ui/Facilities/PNC_Barracks_Placeholder.png",
     buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+    buildWork = 120,
+    reconstructWork = 75,
+    deconstructWork = 70,
     allowMultipleRegions = false,
     levels = {
         [1] = {
@@ -127,6 +136,9 @@ Definitions.Register({
     -- Reuse shipped facility art until dedicated production art is available.
     iconPath = "media/ui/Facilities/PNC_Farm_Placeholder.png",
     buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+    buildWork = 140,
+    reconstructWork = 90,
+    deconstructWork = 80,
     requiredTechnology = "facility:workshop",
     allowMultipleRegions = false,
     levels = {

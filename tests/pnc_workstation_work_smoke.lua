@@ -77,6 +77,10 @@ Work.RegisterCompletion("CRAFT", function() return true end)
 Work.RegisterCompletion("DISASSEMBLE", function() return true end)
 Work.RegisterCompletion("RESEARCH", function() return true end)
 
+-- Project Zomboid's Kahlua runtime does not expose Lua's global next().
+-- Keep this absent so worker selection cannot regress to calling it directly.
+_G.next = nil
+
 local function queue(operation, requiredWork, skill)
     return Work.Commands.Queue({ operation = operation, colonyId = "c1",
         factionId = "f1", baseId = "b1", requiredWork = requiredWork or 10,
@@ -161,5 +165,35 @@ truthy(Work.Commands.CollectInputs(liveCraft.id, "liveCrafter"),
 equal(collected, true, "collection handler invoked")
 equal(PNC.Registry.Data.liveCrafter.orderSpec.phase, "WORK_AT_STATION",
     "worker continues to station after collection")
+
+truthy(Work.Commands.Cancel(liveCraft.id), "clear legacy live craft")
+local standardizedCollected = false
+PNC.WorkInputService = {
+    RequiresCollection = function(order)
+        return order.payload and order.payload.input
+            and order.payload.input.staged ~= true
+    end,
+    Collect = function(order, worker)
+        standardizedCollected = worker.id == "liveCrafter"
+        order.payload.input.staged = true
+        return true
+    end,
+    Cancel = function() return true end,
+}
+local standardCraft = assert(Work.Commands.Queue({ operation = "CRAFT",
+    colonyId = "c1", factionId = "f1", baseId = "b1", requiredWork = 10,
+    requiredSkills = {{ skillId = "Carpentry", level = 2 }},
+    payload = { input = { reservationId = "materials:2" } } }))
+truthy(Work.Commands.Assign(standardCraft.id, "liveCrafter"),
+    "standard input craft assignment")
+equal(Work.Queries.Get(standardCraft.id).status,
+    Definitions.STATUS.TRAVEL_TO_STOCKPILE,
+    "standard input contract starts at stockpile")
+truthy(Work.Commands.CollectInputs(standardCraft.id, "liveCrafter"),
+    "standard input collection")
+equal(standardizedCollected, true,
+    "standard input service takes precedence over legacy handler")
+equal(PNC.Registry.Data.liveCrafter.orderSpec.phase, "WORK_AT_STATION",
+    "standard input flow continues to workstation")
 
 print("pnc_workstation_work_smoke: OK")

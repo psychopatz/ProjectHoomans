@@ -94,6 +94,7 @@ PNC = {
     },
     Network = { BroadcastRecord = function() end },
     SimulationClock = { Wake = function() end },
+    JobSystem = { OrderJobs = { production_work = "ProductionWork" } },
 }
 
 dofile(FILE)
@@ -134,6 +135,17 @@ assert(onlineOwned.orderSpec.kind == "guard",
     "online-ID ownership reconciliation overwrote Stay with Follow")
 assert(onlineOwned.orderSpec.x == 14 and onlineOwned.orderSpec.y == 9,
     "online-ID ownership reconciliation changed the Stay anchor")
+
+local working = copy(waiting)
+working.id = "working"
+working.orderSpec = { kind = "production_work",
+    workOrderId = "work:42", operation = "CONSTRUCT" }
+working.runtime = { workOrderId = "work:42" }
+records.working = working
+PNC.FactionBehavior.ApplyNPC(working, "periodic_reconciliation")
+assert(working.orderSpec.kind == "production_work"
+        and working.orderSpec.workOrderId == "work:42",
+    "faction reconciliation interrupted a registered job order")
 
 local joining = copy(waiting)
 joining.id = "joining"

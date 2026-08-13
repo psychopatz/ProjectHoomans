@@ -9,6 +9,11 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Equipment = PNC.Equipment
 
+function Parts.BuildActionInformation(record)
+    return PNC.WorkService and PNC.WorkService.BuildActionInformation
+        and PNC.WorkService.BuildActionInformation(record) or nil
+end
+
 function Parts.ResolveAIState(record)
     local healthState = record.health and tostring(record.health.state or "normal") or "normal"
     local hasTarget = record.runtime and record.runtime.target ~= nil

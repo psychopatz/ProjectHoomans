@@ -18,6 +18,7 @@ local buildOrganizationalFactionSummary =
 local buildCombatSummary = Parts.BuildCombatSummary
 local buildCommandFeedback = Parts.BuildCommandFeedback
 local buildBandageFeedback = Parts.BuildBandageFeedback
+local buildActionInformation = Parts.BuildActionInformation
 local buildVisualState = Parts.BuildVisualState
 local buildPathDebugState = Parts.BuildPathDebugState
 local buildCombatDebugState = Parts.BuildCombatDebugState
@@ -125,6 +126,7 @@ function Network.BuildSnapshot(record)
                 and record.characterWindow.ownerOnlineID,
         commandFeedback = buildCommandFeedback(record),
         bandageFeedback = buildBandageFeedback(record),
+        actionInformation = buildActionInformation(record),
         activeJob = record.activeJob,
         activeBehavior = record.activeBehavior,
         presenceState = record.presenceState,

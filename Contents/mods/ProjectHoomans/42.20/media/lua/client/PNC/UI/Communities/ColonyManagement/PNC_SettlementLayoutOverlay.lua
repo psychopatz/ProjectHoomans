@@ -42,12 +42,19 @@ function Overlay.BuildLayers(settlement, includeBase)
     end
     for _, facility in ipairs(settlement and settlement.facilities or {}) do
         local color = COLORS[facility.definitionId] or COLORS.facility
+        local hasRegion = false
         for _, component in ipairs(facility.components or {}) do
+            if component.kind == "region" then hasRegion = true end
             local region = component.kind == "region" and component.region
                 or pointRegion(component.x, component.y, component.z)
             addLayer(layers, region,
                 component.kind == "anchor" and COLORS.anchor or color,
                 "facility", facility.id, component.role, component.id)
+        end
+        if not hasRegion then
+            addLayer(layers, facility.constructionRegion, color,
+                "facility", facility.id, "facility.footprint",
+                "footprint:" .. tostring(facility.id))
         end
     end
     for _, node in ipairs(settlement and settlement.stockpileNodes or {}) do

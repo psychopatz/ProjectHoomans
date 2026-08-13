@@ -23,6 +23,18 @@ local function owned(record, player)
         and PNC.CompanionCommands.IsOwnedByPlayer(record, player)
 end
 local canUseDebug
+local function effectiveAllowedJobs(record)
+    local configured = type(record.allowedJobs) == "table"
+        and record.allowedJobs or {}
+    local output = {}
+    local jobs = PNC.WorkDefinitions and PNC.WorkDefinitions.COLONY_JOBS
+        or { "Constructor", "Researcher", "WorkshopWorker" }
+    for _, job in ipairs(jobs) do
+        output[job] = configured[job] ~= false
+    end
+    return output
+end
+
 local function summary(record)
     local needs = PNC.IndividualNeeds.Ensure(record)
     local priorityType, priority = PNC.IndividualNeeds.GetHighestPriority(record)
@@ -45,10 +57,36 @@ local function summary(record)
             and PNC.NPCSupplyService.GetDebugState
             and PNC.NPCSupplyService.GetDebugState(record) or {},
         journal=journal,
+        allowedJobs=effectiveAllowedJobs(record),
         facilityDebugWork=record.runtime and record.runtime.facilityDebugWork
             and PNC.Core.DeepCopy(record.runtime.facilityDebugWork) or nil,
         priorityType=priorityType, priority=priority,
         location={x=record.x,y=record.y,z=record.z} }
+end
+
+local function setJobPermission(player, args)
+    local record = PNC.Registry and PNC.Registry.Get(args.npcID) or nil
+    if not record or record.alive == false or not owned(record, player) then
+        return false, "npc_not_owned"
+    end
+    local job = tostring(args.job or "")
+    local known = false
+    for _, candidate in ipairs(PNC.WorkDefinitions.COLONY_JOBS or {}) do
+        if candidate == job then known = true; break end
+    end
+    if not known then return false, "UNKNOWN_JOB" end
+    record.allowedJobs = record.allowedJobs or {}
+    record.allowedJobs[job] = args.enabled == true
+    if args.enabled ~= true and record.runtime and record.runtime.workOrderId then
+        local order = PNC.WorkRepository.Get(record.runtime.workOrderId)
+        if order and PNC.WorkDefinitions.JOB_BY_OPERATION[order.operation] == job then
+            PNC.WorkService.Commands.Cancel(order.id, "job_permission_disabled")
+        end
+    end
+    if PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "allowed_jobs") end
+    return true, args.enabled == true and "JOB_ENABLED" or "JOB_DISABLED", {
+        npcID = record.id, job = job, enabled = args.enabled == true,
+    }
 end
 
 local function debugFacilityWorkAction(player, args)
@@ -347,6 +385,8 @@ function Management.HandleAction(player, args)
     elseif action == "storage_debug" then
         ok, reason, storage, details =
             PNC.ColonyStorageService.DebugAction(player, args)
+    elseif action == "job_permission_set" then
+        ok, reason, details = setJobPermission(player, args)
     elseif action == "research_debug_upgrade" then
         ok, reason, storage = PNC.ColonyResearchService.DebugUpgrade(
             player, tostring(args.researchId or ""), args

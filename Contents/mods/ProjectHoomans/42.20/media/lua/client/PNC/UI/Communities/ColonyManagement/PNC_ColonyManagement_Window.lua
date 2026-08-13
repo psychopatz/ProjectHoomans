@@ -93,6 +93,12 @@ function ISPNCColonyManagementWindow:onColonySettingsControl(button)
     return false
 end
 
+function ISPNCColonyManagementWindow:onJobsControl(button)
+    local definition = Registry.Get("jobs")
+    return definition and definition.onControl
+        and definition.onControl(self, button) or false
+end
+
 function ISPNCColonyManagementWindow:onDebugControl(button)
     local definition = Registry.Get("debug")
     if definition and definition.onControl then

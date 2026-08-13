@@ -4,6 +4,9 @@ local FILE =
 local DEFINITIONS =
     "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
     .. "Visuals/PNC_AnimationSceneDefinitions.lua"
+local WORK_SCENES =
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    .. "Production/PNC_WorkAnimationScenes.lua"
 
 local now = 1000
 local played = {}
@@ -54,6 +57,7 @@ PNC = {
 
 dofile(FILE)
 dofile(DEFINITIONS)
+dofile(WORK_SCENES)
 
 local body = {
     getModData = function()
@@ -81,6 +85,8 @@ assert(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].loop == true,
     "bed sleep must remain in one persistent XML playback")
 assert(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].durationMs == 0,
     "bed sleep must not be force-finished on a timer")
+assert(PNC.AnimationScenes.Get("production.craft").blocking == false,
+    "production animation must not block work progress ticks")
 
 local registered, custom = PNC.AnimationScenes.Register(
     "example.wave",

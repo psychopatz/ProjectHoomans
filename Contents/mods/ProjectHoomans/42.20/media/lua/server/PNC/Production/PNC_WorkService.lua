@@ -20,6 +20,7 @@ end
 Service.CompletionHandlers = Service.CompletionHandlers or {}
 Service.PreparationHandlers = Service.PreparationHandlers or {}
 Service.CollectionHandlers = Service.CollectionHandlers or {}
+Service.TargetProviders = Service.TargetProviders or {}
 Service.ClaimsByStation = Service.ClaimsByStation or {}
 Service.ClaimsByWorker = Service.ClaimsByWorker or {}
 Service.NextPassAt = Service.NextPassAt or 0
@@ -62,9 +63,9 @@ local function workerAvailable(record, order)
     if runtime and runtime.workOrderId then return false end
     local job = Definitions.JOB_BY_OPERATION[order.operation]
     local allowed = record.allowedJobs
-    if type(allowed) == "table" and next(allowed) ~= nil
-        and allowed[job] ~= true
-    then return false end
+    -- Colony jobs are opt-out. Archetype tables predate colony production and
+    -- therefore missing keys must mean allowed, not disabled.
+    if type(allowed) == "table" and allowed[job] == false then return false end
     return requirementsMet(record, order.requiredSkills)
 end
 
@@ -100,10 +101,19 @@ function Service.RegisterCollection(operation, handler)
     return true
 end
 
+function Service.RegisterTargetProvider(operation, handler)
+    operation = tostring(operation or "")
+    if operation == "" or type(handler) ~= "function" then return false end
+    Service.TargetProviders[operation] = handler
+    return true
+end
+
 function Service.Commands.Queue(spec)
     spec = type(spec) == "table" and spec or {}
     local operation = tostring(spec.operation or "")
-    if not Definitions.CAPABILITY_BY_OPERATION[operation] then
+    if not Definitions.CAPABILITY_BY_OPERATION[operation]
+        and not Service.TargetProviders[operation]
+    then
         return nil, "UNKNOWN_OPERATION"
     end
     local order = {
@@ -129,6 +139,11 @@ end
 
 local function releaseClaim(order, reason)
     if not order then return end
+    if reason ~= "complete" and PNC.WorkInputService
+        and order.payload and order.payload.input
+    then
+        PNC.WorkInputService.Cancel(order)
+    end
     if order.stationId and Service.ClaimsByStation[order.stationId] == order.id then
         Service.ClaimsByStation[order.stationId] = nil
     end
@@ -143,6 +158,7 @@ local function releaseClaim(order, reason)
         and PNC.Registry.Get(order.workerId) or nil
     if record and record.runtime and record.runtime.workOrderId == order.id then
         record.runtime.workOrderId = nil
+        record.runtime.lastProductionWorkAt = nil
         if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
             PNC.OrderSystem.SetOrder(record, order.previousOrder)
         end
@@ -166,8 +182,9 @@ local function setLiveOrder(worker, order, target, phase)
 end
 
 local function collectionTarget(order, worker)
-    if not Service.CollectionHandlers[order.operation]
-        or order.payload and order.payload.inputsStaged == true
+    local standardized = PNC.WorkInputService
+        and PNC.WorkInputService.RequiresCollection(order)
+    if not standardized and not Service.CollectionHandlers[order.operation]
         or not PNC.StockpileAccessService
     then return nil end
     local node = PNC.StockpileAccessService.FindNearest(order.baseId,
@@ -176,13 +193,26 @@ local function collectionTarget(order, worker)
     return { x = node.x, y = node.y, z = node.z, nodeId = node.id }
 end
 
-local function claimStation(order, worker)
+local function requiresCollection(order)
+    return PNC.WorkInputService
+        and PNC.WorkInputService.RequiresCollection(order)
+        or Service.CollectionHandlers[order.operation] ~= nil
+            and not (order.payload and order.payload.inputsStaged == true)
+end
+
+local function acquireWorkTarget(order, worker, live)
+    local provider = Service.TargetProviders[order.operation]
+    if provider then return provider(order, worker, live) end
     local capability = Definitions.CAPABILITY_BY_OPERATION[order.operation]
-    local live = PNC.Registry and PNC.Registry.GetLiveZombie
-        and PNC.Registry.GetLiveZombie(worker.id) or nil
-    local acquired = PNC.FacilityService.AcquireActivity(order.baseId, worker.id,
+    return PNC.FacilityService.AcquireActivity(order.baseId, worker.id,
         capability, { abstract = live == nil, ttlMs = 30000,
             workOrderId = order.id })
+end
+
+local function claimStation(order, worker)
+    local live = PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(worker.id) or nil
+    local acquired = acquireWorkTarget(order, worker, live)
     if not acquired or not acquired.ok then
         return false, acquired and acquired.reason or "NO_AVAILABLE_WORKSTATION"
     end
@@ -194,11 +224,10 @@ local function claimStation(order, worker)
         end
         return false, "NO_AVAILABLE_WORKSTATION"
     end
-    local requiresCollection = live and Service.CollectionHandlers[order.operation]
-        and not (order.payload and order.payload.inputsStaged == true)
-    local collectTarget = requiresCollection and collectionTarget(order, worker)
+    local needsCollection = live and requiresCollection(order)
+    local collectTarget = needsCollection and collectionTarget(order, worker)
         or nil
-    if requiresCollection and not collectTarget then
+    if needsCollection and not collectTarget then
         if acquired.reservationId and PNC.FacilityReservations then
             PNC.FacilityReservations.Release(acquired.reservationId,
                 "stockpile_access_missing")
@@ -218,6 +247,7 @@ local function claimStation(order, worker)
     order.updatedAt, order.revision = now(), order.revision + 1
     worker.runtime = worker.runtime or {}
     worker.runtime.workOrderId = order.id
+    worker.runtime.lastProductionWorkAt = nil
     order.previousOrder = copy(worker.orderSpec)
     if live and acquired.target then
         setLiveOrder(worker, order, collectTarget or acquired.target,
@@ -233,10 +263,17 @@ function Service.Commands.CollectInputs(orderId, workerId)
     if tostring(order.workerId or "") ~= tostring(workerId or "") then
         return false, "WORKER_NOT_ASSIGNED"
     end
-    local handler = Service.CollectionHandlers[order.operation]
-    if not handler then return false, "COLLECTION_HANDLER_MISSING" end
     local worker = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(workerId)
-    local ok, reason = handler(order, worker)
+    local ok, reason
+    if PNC.WorkInputService
+        and PNC.WorkInputService.RequiresCollection(order)
+    then
+        ok, reason = PNC.WorkInputService.Collect(order, worker)
+    else
+        local handler = Service.CollectionHandlers[order.operation]
+        if not handler then return false, "COLLECTION_HANDLER_MISSING" end
+        ok, reason = handler(order, worker)
+    end
     if ok ~= true then
         order.status, order.blockedReason = Status.BLOCKED,
             tostring(reason or "INPUT_COLLECTION_FAILED")
@@ -415,6 +452,35 @@ function Service.Queries.Diagnostics()
     return output
 end
 
+function Service.BuildActionInformation(record)
+    local orderId = record and record.runtime and record.runtime.workOrderId
+    local order = orderId and Repository.Get(orderId) or nil
+    if not order or terminal(order) then return nil end
+    local required = math.max(1, tonumber(order.requiredWork) or 1)
+    local progress = math.max(0, math.min(required,
+        tonumber(order.progress) or 0))
+    local payload = order.payload or {}
+    local facilityId = payload.facilityId
+    local facility = facilityId and PNC.SettlementRepository
+        and PNC.SettlementRepository.GetFacility(facilityId) or nil
+    return {
+        kind = "work_order",
+        workOrderId = order.id,
+        operation = order.operation,
+        status = order.status,
+        phase = record.orderSpec and record.orderSpec.phase or nil,
+        progress = progress,
+        requiredWork = required,
+        percent = math.floor((progress / required) * 100 + 0.5),
+        facilityId = facilityId,
+        facilityDefinitionId = facility and facility.definitionId or nil,
+        recipeId = order.recipeId,
+        quantity = order.quantity,
+        technologyId = payload.technologyId,
+        specimenFullType = payload.specimenFullType,
+    }
+end
+
 local function processOrder(order, at)
     if terminal(order) or order.status == Status.PAUSED then return end
     local prepare = Service.PreparationHandlers[order.operation]
@@ -474,9 +540,7 @@ local function processOrder(order, at)
             or tostring(current.workOrderId or "") ~= order.id
         then
             local target = collectionTarget(order, worker)
-            if Service.CollectionHandlers[order.operation]
-                and not (order.payload and order.payload.inputsStaged == true)
-                and not target
+            if requiresCollection(order) and not target
             then
                 releaseClaim(order, "stockpile_access_missing")
                 order.status, order.blockedReason = Status.BLOCKED,

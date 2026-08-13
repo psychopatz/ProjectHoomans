@@ -281,14 +281,14 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
         entry.barColor = Presentation.IncapacitatedColor(currentTime)
     end
 
-    if entry.treatmentVisible and entry.treatmentText ~= "" then
-        local treatmentHeight = getTextManager():getFontHeight(Fonts.debug) + 2
+    if entry.actionVisible and entry.actionText ~= "" then
+        local actionHeight = getTextManager():getFontHeight(Fonts.debug) + 2
         Presentation.DrawOutlinedText(
             manager,
-            entry.treatmentText,
-            screenX - ((entry.treatmentTextWidth or 0) / 2),
-            nameY - treatmentHeight,
-            entry.treatmentColor,
+            entry.actionText,
+            screenX - ((entry.actionTextWidth or 0) / 2),
+            nameY - actionHeight,
+            entry.actionColor,
             0.95 * alpha,
             Fonts.debug
         )

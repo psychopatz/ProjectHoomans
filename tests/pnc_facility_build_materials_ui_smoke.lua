@@ -51,7 +51,7 @@ local options = BuildUI.BuildOptions({ hqLevel = 1 }, {
 })
 equal(options[1].enabled, true, "stockpile satisfies material cost")
 equal(options[1].costText, "1 Base.Money (1 total)", "combined total")
-equal(options[1].sourceText, "0 player + 1 stockpile", "source breakdown")
+equal(options[1].sourceText, "1 stockpile", "stockpile-only source breakdown")
 equal(options[2].enabled, false, "locked workshop is not advertised available")
 options = BuildUI.BuildOptions({ hqLevel = 1 }, {
     rows = {{ fullType = "Base.Money", quantity = 1 }},
@@ -62,9 +62,9 @@ carried = 1
 options = BuildUI.BuildOptions({ hqLevel = 1 }, {
     rows = {{ fullType = "Base.Money", quantity = 2 }},
 })
-equal(options[1].costText, "1 Base.Money (3 total)",
-    "player and stockpile aggregate")
-equal(options[1].sourceText, "1 player + 2 stockpile",
-    "aggregate source breakdown")
+equal(options[1].costText, "1 Base.Money (2 total)",
+    "stockpile remains authoritative")
+equal(options[1].sourceText, "2 stockpile",
+    "player inventory excluded from construction")
 
 print("pnc_facility_build_materials_ui_smoke: ok")

@@ -22,6 +22,7 @@ local CONTEXT = {
     { "facility_area", "UI_PNC_Facility_AssignArea", "ZONE ROOM / FIELD", "primary" },
     { "facility_anchor", "UI_PNC_Facility_AssignStation", "ASSIGN STATION", "primary" },
     { "facility_upgrade", "UI_PNC_Facility_Upgrade", "UPGRADE BUILDING", "success" },
+    { "facility_destroy", "UI_PNC_Facility_Destroy", "DECONSTRUCT", "danger" },
 }
 
 local function tr(key, fallback)
@@ -61,10 +62,12 @@ end
 function Tab.UpdateContextControls(window)
     local facility = Browser.GetSelected(window)
     local active = window.tab == "base" and facility ~= nil
+    local built = active and (facility.constructionState == nil
+        or facility.constructionState == "BUILT")
     local index
     for index = 1, #(window.baseContextControls or {}) do
         local button = window.baseContextControls[index]
-        local visible = active
+        local visible = active and (built or button.internal == "facility_destroy")
         if button.internal == "facility_anchor" then
             local role = active and Actions.NextAnchorRole
                 and Actions.NextAnchorRole(facility) or nil

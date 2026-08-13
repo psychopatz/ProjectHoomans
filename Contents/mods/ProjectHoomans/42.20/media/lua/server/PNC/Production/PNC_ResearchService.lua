@@ -3,6 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 PNC = PNC or {}
 PNC.ResearchService = PNC.ResearchService or {}
+require "PNC/Production/PNC_WorkInputService"
 local Service = PNC.ResearchService
 local Repository = PNC.ResearchRepository
 local RegistryRepository = PNC.KnowledgeRepository
@@ -228,9 +229,10 @@ function Service.Commands.ReverseEngineer(player, recordIndex)
         requiredWork = math.max(30, descriptor.craftTime
             * Definitions.POLICY.reverseEngineeringWorkMultiplier),
         requiredSkills = descriptor.requiredSkills,
-        payload = { mode = "reverse", storageId = context.storage.id,
-            reservationId = reservation.id,
-            resourceFullType = info.fullType } })
+        payload = PNC.WorkInputService.Bind({ mode = "reverse",
+            storageId = context.storage.id, reservationId = reservation.id,
+            resourceFullType = info.fullType }, context.storage.id,
+            reservation.id, "research_resource") })
     if not order then
         PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
     end
@@ -250,7 +252,10 @@ local function completion(order)
         local consume = payload.mode == "reverse"
             or Definitions.POLICY.consumeBlueprintOnCompletion == true
         local ok, reason
-        if consume then
+        if consume and payload.input then
+            ok, reason = PNC.WorkInputService.Commit(order,
+                "research_resource_consumption")
+        elseif consume then
             ok, reason = PNC.ColonyStorageService.CommitProductionReservation(
                 payload.reservationId, order.id, "research_resource",
                 payload.storageId)
@@ -268,13 +273,16 @@ end
 
 local function cancellation(order)
     local payload = order.payload or {}
-    if payload.reservationId and payload.resourceCommitted ~= true then
+    if payload.input then
+        PNC.WorkInputService.Cancel(order)
+    elseif payload.reservationId and payload.resourceCommitted ~= true then
         PNC.ColonyStorageService.ReleaseProductionReservation(payload.reservationId)
     end
 end
 
 local function prepare(order)
     local payload = order.payload or {}
+    if payload.input and PNC.WorkInputService.IsReady(order) then return true end
     if PNC.ColonyStorageService.HasProductionTransactionStage(
         payload.storageId, order.id, "research_resource")
     then payload.resourceCommitted = true; return true end
@@ -290,6 +298,9 @@ local function prepare(order)
         payload.storageId, match, 1, "research:" .. order.id)
     if not reservation then return false, reason end
     payload.reservationId = reservation.id
+    if payload.input then
+        PNC.WorkInputService.ReplaceReservation(order, reservation)
+    end
     PNC.WorkRepository.MarkDirty()
     return true
 end

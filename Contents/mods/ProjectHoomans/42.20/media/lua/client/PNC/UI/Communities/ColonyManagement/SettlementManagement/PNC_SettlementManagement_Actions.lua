@@ -42,6 +42,9 @@ function Actions.Handle(window, action, facility)
     elseif action == "facility_upgrade" then
         PNC.Client.RequestUpgradeFacility({ facilityId = facility.id,
             expectedRevision = facility.revision })
+    elseif action == "facility_destroy" then
+        PNC.Client.RequestDestroyFacility({ facilityId = facility.id,
+            expectedRevision = facility.revision })
     else
         return false
     end

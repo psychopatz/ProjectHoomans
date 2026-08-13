@@ -20,6 +20,7 @@ local bundle = {
             PatrolRoute = true,
             Researcher = true,
             WorkshopWorker = true,
+            Constructor = true,
         },
     },
     looks = {

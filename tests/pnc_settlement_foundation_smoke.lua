@@ -52,6 +52,26 @@ PNC.BasePermissions = {
 }
 PNC.SettlementRepository.Import({})
 PNC.FacilityService.RebuildIndexes()
+local constructionSequence = 0
+PNC.ConstructionService = {
+    QueueBuild = function(_, facility)
+        constructionSequence = constructionSequence + 1
+        facility.constructionState = "UNDER_CONSTRUCTION"
+        facility.constructionWorkOrderId = "construction:"
+            .. tostring(constructionSequence)
+        return { id = facility.constructionWorkOrderId,
+            operation = "CONSTRUCT" }
+    end,
+    QueueReconstruct = function(_, facility, change)
+        constructionSequence = constructionSequence + 1
+        facility.constructionState = "RECONSTRUCTING"
+        facility.constructionWorkOrderId = "reconstruction:"
+            .. tostring(constructionSequence)
+        facility.pendingTestChange = change
+        return { id = facility.constructionWorkOrderId,
+            operation = "RECONSTRUCT" }
+    end,
+}
 
 local money = {}
 local inventory = {}
@@ -206,14 +226,25 @@ local barracksResult = PNC.FacilityService.Create(player, { baseId = base.id,
     component = { kind = "region", role = "sleep.area",
         region = rectangle(0, 0, 3, 3, 1) } })
 truthy(barracksResult.ok, "barracks creation")
-equal(barracksResult.cost.receipts, nil,
-    "native material receipts do not enter network result")
-equal(barracksResult.cost.costs[1].allocations[1].sourceId, "player",
-    "player material source quoted first")
+equal(barracksResult.workOrder.operation, "CONSTRUCT",
+    "facility creation queues construction")
+equal(barracksResult.facility.cachedState, "UNDER_CONSTRUCTION",
+    "facility remains unusable during construction")
 local barracks = barracksResult.facility
-truthy(barracksResult.component
-    and barracksResult.component.role == "sleep.area",
-    "creation atomically stores selected room")
+equal(barracksResult.component, nil,
+    "construction does not create functional components")
+equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
+    expectedRevision = barracks.revision,
+    component = { kind = "anchor", role = "sleep.bed",
+        x = 0, y = 0, z = 0 } }).reason,
+    "FACILITY_NOT_BUILT", "components stay locked during construction")
+barracks.constructionState = "BUILT"
+PNC.FacilityService.RefreshState(barracks)
+truthy(PNC.FacilityService.SetComponent({}, {
+    facilityId = barracks.id, expectedRevision = barracks.revision,
+    component = { kind = "region", role = "sleep.area",
+        region = rectangle(0, 0, 3, 3, 1) },
+}).ok, "room assignment becomes available after construction")
 
 for index = 1, 4 do
     local bed = PNC.FacilityService.SetComponent({}, {
@@ -239,20 +270,17 @@ truthy(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     } }).ok, "fifth bed after upgrade")
 
 local farmResult = PNC.FacilityService.Create(player, { baseId = base.id,
-    definitionId = "farm", expectedRevision = base.revision })
+    definitionId = "farm", expectedRevision = base.revision,
+    component = { kind = "region", role = "farm.field",
+        region = rectangle(5, 5, 6, 6) } })
 truthy(farmResult.ok, "farm creation")
-equal(farmResult.cost.costs[1].allocations[2].sourceId, "stockpile",
-    "stockpile material source quoted")
-equal(farmResult.cost.costs[1].allocations[2].quantity, 1,
-    "stockpile funds construction remainder")
 local farm = farmResult.facility
-equal(#money, 0, "facility construction consumes placeholder money")
-equal(stockpileInventory:count("Base.Money"), 0,
-    "facility construction consumes stockpile remainder")
-equal(stockpileCommits, 1, "stockpile material commit")
-equal(PNC.FacilityService.Create(player, { baseId = base.id,
-    definitionId = "farm", expectedRevision = base.revision }).reason,
-    "INSUFFICIENT_BUILD_MATERIALS", "facility material requirement")
+farm.constructionState = "BUILT"
+PNC.FacilityService.RefreshState(farm)
+equal(#money, 1, "construction no longer consumes player inventory")
+equal(stockpileInventory:count("Base.Money"), 1,
+    "construction materials remain reserved until work completes")
+equal(stockpileCommits, 0, "facility creation does not commit materials")
 truthy(PNC.BaseService.Expand({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "farm_land",
     regionDelta = rectangle(10, 0, 11, 9) }).ok, "farm territory expansion")
@@ -276,7 +304,17 @@ truthy(PNC.FacilityService.Upgrade({}, { facilityId = farm.id,
 truthy(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
         id = farmComponentId, kind = "region", role = "farm.field", region = field117,
-    } }).ok, "farm expansion after upgrade")
+    } }).ok, "farm expansion queues reconstruction after upgrade")
+equal(farm.constructionState, "RECONSTRUCTING",
+    "zone edit waits for constructor work")
+equal(PNC.SettlementRepository.GetComponent(farmComponentId).tileCount, 93,
+    "old zone stays canonical until reconstruction completes")
+truthy(PNC.FacilityService.FinalizeSetComponent(farm.id,
+    farm.pendingTestChange.component), "finish reconstructed zone")
+equal(PNC.SettlementRepository.GetComponent(farmComponentId).tileCount, 117,
+    "new zone commits after constructor work")
+equal(farm.constructionState, "BUILT",
+    "completed zone reconstruction unlocks facility")
 
 local activity = PNC.FacilityService.AcquireActivity(base.id, "npc_test", "sleep")
 truthy(activity.ok and activity.target, "activity reservation")

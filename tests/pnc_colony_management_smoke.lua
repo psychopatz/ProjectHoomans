@@ -89,6 +89,9 @@ PNC = {
         Get = function(id)
             return id == companion.id and companion or nil
         end,
+        MarkDirty = function(record, reason)
+            record.lastDirtyReason = reason
+        end,
     },
     Journals = {
         NPC_CAPACITY = 32,
@@ -168,6 +171,11 @@ PNC = {
             record.orderSpec = order or { kind = "guard", x = 0, y = 0, z = 0 }
         end,
     },
+    WorkDefinitions = {
+        COLONY_JOBS = { "Constructor", "Researcher", "WorkshopWorker" },
+        JOB_BY_OPERATION = { CONSTRUCT = "Constructor" },
+    },
+    WorkRepository = { Get = function() return nil end },
 }
 
 local Management = dofile(ROOT .. "PNC_ColonyManagement.lua")
@@ -181,6 +189,10 @@ equal(#snapshot.attention, 1, "critical need appears in attention")
 equal(snapshot.attention[1].needType, "hunger", "critical need type")
 equal(snapshot.faction.name, "Rivera Enclave", "faction is in snapshot")
 equal(snapshot.faction.renamePending, true, "initial faction prompt is pending")
+equal(snapshot.people[1].allowedJobs.Constructor, true,
+    "every NPC may construct by default")
+equal(snapshot.people[1].allowedJobs.Researcher, true,
+    "missing legacy permissions render as allowed")
 
 local factionSnapshot, factionResult = Management.HandleAction(player, {
     action = "faction_rename", name = "River Wardens",
@@ -191,6 +203,23 @@ equal(factionSnapshot.faction.name, "River Wardens",
 equal(factionSnapshot.faction.renamePending, false,
     "faction prompt clears after rename")
 equal(factionSaves, 1, "faction rename commits immediately")
+
+local jobsSnapshot, jobsResult = Management.HandleAction(player, {
+    action = "job_permission_set", npcID = companion.id,
+    job = "Constructor", enabled = false,
+})
+equal(jobsResult.ok, true, "constructor permission can be disabled")
+equal(jobsSnapshot.people[1].allowedJobs.Constructor, false,
+    "explicit opt-out returns in the colony snapshot")
+jobsSnapshot, jobsResult = Management.HandleAction(player, {
+    action = "job_permission_set", npcID = companion.id,
+    job = "Constructor", enabled = true,
+})
+equal(jobsResult.ok, true, "constructor permission can be restored")
+equal(jobsSnapshot.people[1].allowedJobs.Constructor, true,
+    "restored permission returns in the colony snapshot")
+equal(companion.lastDirtyReason, "allowed_jobs",
+    "job permission persists through registry dirtiness")
 
 local renamed, result = Management.RenameForPlayer(player, {
     communityID = community.id,

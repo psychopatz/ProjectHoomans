@@ -196,16 +196,13 @@ local function buildOptions(settlement, storage, research)
         for _, cost in ipairs(recipeFor(definition)) do
             local required = math.max(0, math.floor(tonumber(
                 cost.amount or cost.quantity) or 0))
-            local carried = playerCount(cost.fullType)
             local stored = stockpileCount(storage, cost.fullType)
-            local available = carried + stored
+            local available = stored
             if available < required then affordable = false end
             costParts[#costParts + 1] = tostring(required) .. " "
                 .. tostring(cost.fullType) .. " (" .. tostring(available)
                 .. " " .. tr("UI_PNC_Facility_MaterialTotal", "total") .. ")"
-            sourceParts[#sourceParts + 1] = tostring(carried) .. " "
-                .. tr("UI_PNC_Facility_MaterialPlayer", "player") .. " + "
-                .. tostring(stored) .. " "
+            sourceParts[#sourceParts + 1] = tostring(stored) .. " "
                 .. tr("UI_PNC_Facility_MaterialStockpile", "stockpile")
         end
         local hqReady = (tonumber(settlement.hqLevel) or 0)

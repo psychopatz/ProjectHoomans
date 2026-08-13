@@ -6,6 +6,9 @@ local SCENE_BY_OPERATION = {
     RESEARCH = "production.research",
     CRAFT = "production.craft",
     DISASSEMBLE = "production.disassemble",
+    CONSTRUCT = "production.craft",
+    RECONSTRUCT = "production.craft",
+    DECONSTRUCT = "production.disassemble",
 }
 
 local function normalize(_, spec)

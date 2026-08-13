@@ -22,7 +22,8 @@ local function recover(order)
     order.stationTarget = nil
     order.executionMode = nil
     order.facilityReservationId = nil
-    if order.status == "CLAIMED" or order.status == "TRAVEL_TO_STATION"
+    if order.status == "CLAIMED" or order.status == "TRAVEL_TO_STOCKPILE"
+        or order.status == "TRAVEL_TO_STATION"
         or order.status == "WORKING"
     then
         order.status = "WAITING_FOR_WORKER"

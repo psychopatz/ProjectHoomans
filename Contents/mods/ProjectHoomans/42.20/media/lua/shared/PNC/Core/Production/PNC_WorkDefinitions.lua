@@ -4,6 +4,8 @@ PNC.WorkDefinitions = PNC.WorkDefinitions or {}
 local Definitions = PNC.WorkDefinitions
 Definitions.OPERATION = {
     RESEARCH = "RESEARCH", CRAFT = "CRAFT", DISASSEMBLE = "DISASSEMBLE",
+    CONSTRUCT = "CONSTRUCT", RECONSTRUCT = "RECONSTRUCT",
+    DECONSTRUCT = "DECONSTRUCT",
 }
 Definitions.STATUS = {
     QUEUED = "QUEUED", WAITING_FOR_WORKER = "WAITING_FOR_WORKER",
@@ -27,12 +29,16 @@ Definitions.JOB_BY_OPERATION = {
     RESEARCH = "Researcher",
     CRAFT = "WorkshopWorker",
     DISASSEMBLE = "WorkshopWorker",
+    CONSTRUCT = "Constructor",
+    RECONSTRUCT = "Constructor",
+    DECONSTRUCT = "Constructor",
 }
 Definitions.CAPABILITY_BY_OPERATION = {
     RESEARCH = "work.research",
     CRAFT = "work.craft",
     DISASSEMBLE = "work.disassemble",
 }
+Definitions.COLONY_JOBS = { "Constructor", "Researcher", "WorkshopWorker" }
 
 function Definitions.WorkRate(worker, requirements, facilityEfficiency, condition)
     local highestBonus = 0

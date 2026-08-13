@@ -383,10 +383,13 @@ local function desiredOrder(record, mode, owner, faction, preservePlayerOrder)
     if mode == "player_owned" then
         local current = record.orderSpec or {}
         local kind = tostring(current.kind or "")
+        local registeredJob = PNC.JobSystem and PNC.JobSystem.OrderJobs
+            and PNC.JobSystem.OrderJobs[kind] or nil
         if preservePlayerOrder == true and (
             kind == Const.ORDER_GUARD
             or kind == Const.ORDER_PATROL
             or kind == Const.ORDER_TRAVEL
+            or registeredJob ~= nil
         ) then
             return Core.DeepCopy(current)
         end

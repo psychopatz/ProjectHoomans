@@ -3,6 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 PNC = PNC or {}
 PNC.CraftingService = PNC.CraftingService or {}
+require "PNC/Production/PNC_WorkInputService"
 local Service = PNC.CraftingService
 local Registry = PNC.RecipeKnowledgeRegistry
 Service.Commands = Service.Commands or {}
@@ -45,8 +46,9 @@ function Service.Commands.QueueCraft(player, recipeId, quantity)
         recipeId = recipeId, quantity = quantity,
         requiredWork = math.max(20, resolved.descriptor.craftTime * quantity),
         requiredSkills = resolved.descriptor.requiredSkills,
-        payload = { storageId = ctx.storage.id,
-            reservationId = reservation.id, requirements = requirements } })
+        payload = PNC.WorkInputService.Bind({ storageId = ctx.storage.id,
+            reservationId = reservation.id, requirements = requirements },
+            ctx.storage.id, reservation.id, "craft_inputs") })
     if not order then
         PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
     end
@@ -81,8 +83,9 @@ function Service.Commands.QueueDisassembly(player, recordIndex)
         recipeId = recipeId, requiredWork = math.max(20,
             resolved.descriptor.craftTime * 0.6),
         requiredSkills = resolved.descriptor.requiredSkills,
-        payload = { storageId = ctx.storage.id,
-            reservationId = reservation.id, specimenFullType = info.fullType } })
+        payload = PNC.WorkInputService.Bind({ storageId = ctx.storage.id,
+            reservationId = reservation.id, specimenFullType = info.fullType },
+            ctx.storage.id, reservation.id, "disassembly_specimen") })
     if not order then
         PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
     end
@@ -97,7 +100,10 @@ local function craftCompletion(order)
     end
     if payload.inputsCommitted ~= true then
         local ok, reason
-        if payload.inputsStaged == true then
+        if payload.input then
+            ok, reason = PNC.WorkInputService.Commit(order,
+                "craft_input_consumption")
+        elseif payload.inputsStaged == true then
             local worker = PNC.Registry and PNC.Registry.Get
                 and PNC.Registry.Get(order.workerId) or nil
             local commands = PNC.SupplyInventory and PNC.SupplyInventory.Commands
@@ -140,7 +146,10 @@ local function disassemblyCompletion(order)
     end
     if payload.specimenCommitted ~= true then
         local ok, reason
-        if payload.inputsStaged == true then
+        if payload.input then
+            ok, reason = PNC.WorkInputService.Commit(order,
+                "disassembly_specimen_consumption")
+        elseif payload.inputsStaged == true then
             local worker = PNC.Registry and PNC.Registry.Get
                 and PNC.Registry.Get(order.workerId) or nil
             local commands = PNC.SupplyInventory and PNC.SupplyInventory.Commands
@@ -200,7 +209,9 @@ end
 
 local function cancellation(order)
     local payload = order.payload or {}
-    if payload.inputsStaged == true and payload.stagedItemIds
+    if payload.input then
+        PNC.WorkInputService.Cancel(order)
+    elseif payload.inputsStaged == true and payload.stagedItemIds
         and order.workerId
     then
         local worker = PNC.Registry and PNC.Registry.Get
@@ -237,6 +248,7 @@ end
 
 local function prepare(order)
     local payload = order.payload or {}
+    if payload.input and PNC.WorkInputService.IsReady(order) then return true end
     if order.operation == "CRAFT" and PNC.ColonyStorageService
         .HasProductionTransactionStage(payload.storageId, order.id, "craft_inputs")
     then
@@ -269,6 +281,9 @@ local function prepare(order)
     end
     if not reservation then return false, reason end
     payload.reservationId = reservation.id
+    if payload.input then
+        PNC.WorkInputService.ReplaceReservation(order, reservation)
+    end
     PNC.WorkRepository.MarkDirty()
     return true
 end
