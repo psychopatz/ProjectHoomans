@@ -26,8 +26,6 @@ local WINDOW_SMASH_IMPACT_MS =
     Controller.WINDOW_SMASH_IMPACT_MS
 local WINDOW_SMASH_FINISH_MS =
     Controller.WINDOW_SMASH_FINISH_MS
-local WINDOW_CLIMB_RECOVERY_MS =
-    Controller.WINDOW_CLIMB_RECOVERY_MS
 
 local function objectBool(object, methodName)
     local method = object and object[methodName] or nil
@@ -215,9 +213,14 @@ local function tryNativePassage(
     end
     if object.canClimbThrough
         and object:canClimbThrough(body)
-        and now - (tonumber(state.lastProgressAt) or now)
-            >= WINDOW_CLIMB_RECOVERY_MS
     then
+        -- Never hand an equipped managed IsoZombie back to vanilla between
+        -- detecting a climbable window and entering the climb state. In B42
+        -- multiplayer, IsoGameCharacter.climbThroughWindow() calls
+        -- dropHeavyItems(), which emits player-only packets and casts this
+        -- locally controlled IsoZombie to IsoPlayer. Entering the already
+        -- parameterized state directly preserves the native climb animation
+        -- without invoking that unsafe packet path.
         return forceWindowClimb(
             snapshot,
             body,
@@ -233,4 +236,3 @@ end
 Controller.FinishPassageBump = finishPassageBump
 Controller.UpdateWindowSmash = updateWindowSmash
 Controller.TryNativePassage = tryNativePassage
-

@@ -473,11 +473,15 @@ clientNow = clientNow + 400
 runZombieUpdates(body)
 assert(windowSmashFinished == 1,
     "window breach animation did not release")
-clientNow = clientNow + 600
+-- A climbable window must be intercepted immediately. Waiting for the normal
+-- stall-recovery interval lets PathFindBehavior2 call
+-- IsoGameCharacter.climbThroughWindow(), which emits player-only equipment
+-- packets for this managed IsoZombie in multiplayer.
+clientNow = clientNow + 100
 body.actionState = "idle"
 runZombieUpdates(body)
 assert(body.actionState == "climbwindow",
-    "smashed native-route window did not force climb recovery")
+    "smashed native-route window was returned to unsafe engine pathing")
 assert(body.bumpType == "ClimbWindow",
     "forced window climb did not use the engine traversal selector")
 
