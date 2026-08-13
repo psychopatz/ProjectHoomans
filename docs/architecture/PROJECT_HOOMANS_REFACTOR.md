@@ -2,7 +2,7 @@
 
 ## Current Chunk
 
-Chunk 9 — Factions (`[>]`).
+Chunk 10 — Colony / Settlement / Facilities (`[>]`).
 
 Chunk 0 established the baseline only. No gameplay, network, persistence, or
 load-order code changed.
@@ -20,8 +20,8 @@ load-order code changed.
   - [x] Chunk 6B — Colony Management shell controller/request boundary
 - [x] Chunk 7 — Conversation / Relationships / Social
 - [x] Chunk 8 — Pathing / Presence / live-body control
-- [>] Chunk 9 — Factions
-- [ ] Chunk 10 — Colony / Settlement / Facilities
+- [x] Chunk 9 — Factions
+- [>] Chunk 10 — Colony / Settlement / Facilities
 - [ ] Chunk 11 — Director / abstract simulation
 - [ ] Chunk 12 — Remaining domains, only where change is justified
 - [ ] Chunk 13 — PsychopatzCore mechanism-extraction review
@@ -29,10 +29,11 @@ load-order code changed.
 
 ## Current Goal
 
-Chunk 9 inventories Faction state ownership, membership, diplomacy, warfare,
-incidents, persistence, authority, network contracts, and presentation before
-making the smallest justified boundary change. Preserve current faction
-semantics and do not use the Monolith Decoupler during this ownership pass.
+Chunk 10 inventories Colony, Settlement, and Facility ownership, persistence,
+authority, validation, reservations, storage/research, jobs, networking, and
+presentation before making the smallest justified boundary change. Preserve
+current gameplay semantics and do not use the Monolith Decoupler during this
+ownership pass.
 
 ## Contracts Being Preserved
 
@@ -139,6 +140,28 @@ pre-approved folder moves.
 
 ## Completed This Chunk
 
+- Chunk 9 added canonical `PNC/Factions/PNC_FactionCore.lua`, explicitly
+  preserving the original Telemetry → FactionService → Leadership →
+  MembershipService order at the same server composition position.
+- Incident ingestion, tactical behavior, tolls, validation, and debug adapters
+  remain explicitly staged later because they consume runtime domains loaded
+  between those positions. Shared FactionTypes remains after Community and
+  Provision types because it normalizes their nested records. No alphabetical
+  filename ordering is used as a dependency mechanism.
+- Fixed stable-character command ownership for player-controlled factions.
+  If the exact player entity key cannot be resolved, command authorization now
+  denies access instead of falling back to account username or transient online
+  ID. This prevents a replacement survivor on the same account from inheriting
+  the dead/previous character's faction companions.
+- Companion-command and player-damage cross-domain checks now consume copied
+  faction records through `PNC.Factions.Get` rather than reading the mutable
+  faction registry directly. Legacy owner fields remain compatible only for
+  unaffiliated/legacy companion records.
+- Preserved faction ModData key/schema V6, NPC affiliation V2, directed
+  relations, treaty invariants, incident aggregation, bounded reconciliation,
+  revision rules, server authority, command payloads, and presentation. The
+  3,500-line FactionService and other large faction modules were not split; the
+  Monolith Decoupler was not used.
 - Chunk 8 established `PNC.PathService.Commands` as the canonical mutation
   boundary and `PNC.PathService.Queries` as the read boundary. Existing direct
   methods remain compatible; the canonical reset command intentionally takes
@@ -683,6 +706,25 @@ pre-approved folder moves.
   Authority direction changed: NO. Scheduler cadence/budgets changed: NO.
   Movement algorithms changed: NO. No `00_*Init.lua` anchor was modified,
   renamed, or removed.
+- Chunk 9 full Lua syntax validation passed, and `pz_verify` scanned 563 files
+  with zero Kahlua errors or warnings at ERROR severity.
+- Seventeen focused smokes passed: the full faction/emblem/diplomacy/warfare/
+  toll/member/debug/target matrix, companion commands, player damage, and
+  composition bootstrap.
+- Full Lua smoke sweep: 190 passed and 3 failed out of 193. Chunk 9 resolved the
+  previous faction-warfare same-account replacement failure. Remaining failures
+  are the colony-storage journal cap and two unrelated harness module-resolution
+  gaps in map-hover portrait and NPC monitor tracking.
+- Architecture rescan: 83.8/100 health, 68.9% coverage, 594 production files,
+  193 tests, and 130 production findings. Factions now reports 80.5/100 health
+  and 81.5% coverage; the large-module findings remain honestly recorded.
+- Codebase-memory production coverage remains excluded. Exact source reads,
+  complete focused graph-test pagination, and runtime harnesses supplied the
+  evidence fallback.
+- Chunk 9 network protocol changed: NO. Persistence/schema changed: NO.
+  Authority direction changed: NO. Treaty/incident semantics changed: NO.
+  Runtime initialization order changed: NO. No `00_*Init.lua` anchor was
+  modified, renamed, or removed.
 
 ## Open Issues
 
@@ -726,9 +768,13 @@ pre-approved folder moves.
 - Chunk 8 has static and harness coverage for composition, SP authority paths,
   and MP-native ownership contracts. Live SP, hosted-MP, and dedicated-server
   startup/movement validation remains required before runtime release.
+- Chunk 9 has static and harness coverage for exact UUID authority, persistence
+  normalization, diplomacy, warfare, and composition. The documented live SP,
+  hosted-MP, and dedicated-server faction validation matrix remains NOT RUN and
+  is required before runtime release.
 
 ## Next Chunk
 
-Chunk 9 — inventory Faction ownership, membership, diplomacy, warfare,
-incidents, persistence, authority, networking, and presentation seams before
-introducing the smallest justified boundary.
+Chunk 10 — inventory Colony, Settlement, and Facility ownership, persistence,
+authority, validation, reservations, storage/research, jobs, networking, and
+presentation seams before introducing the smallest justified boundary.

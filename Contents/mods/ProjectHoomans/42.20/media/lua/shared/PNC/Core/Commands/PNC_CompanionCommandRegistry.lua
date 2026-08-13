@@ -166,8 +166,8 @@ function Commands.IsOwnedByPlayer(record, player)
         and record.affiliation.factionID or nil
     organization = organizationID
         and PNC.Factions
-        and PNC.Factions.Registry
-        and PNC.Factions.Registry.byID[organizationID]
+        and PNC.Factions.Get
+        and PNC.Factions.Get(organizationID)
         or nil
     if organization and organization.ownerPlayerKey then
         uuid = PNC.PlayerCharacters
@@ -188,6 +188,10 @@ function Commands.IsOwnedByPlayer(record, player)
         if playerKey then
             return organization.playerMemberKeys[playerKey] == true
         end
+        -- Organizational ownership is character-UUID scoped. If the stable
+        -- key cannot be resolved, never fall back to account name or online
+        -- ID and accidentally grant a replacement survivor authority.
+        return false
     end
     recordUsername = ownerUsername(record)
     recordOnlineID = tonumber(ownerOnlineID(record))

@@ -21,6 +21,21 @@ exceptions, territorial context, and immediate self-defense.
 This phase does not implement raids, autonomous faction strategy, tribute
 agreements, or live long-range travel simulation.
 
+## Runtime composition
+
+`PNC/Factions/PNC_FactionCore.lua` is the canonical server entry for persistent
+faction identity and membership. It explicitly loads Telemetry, FactionService,
+Leadership, and MembershipService in the same order and at the same server
+composition position used before the entry existed.
+
+Incident ingestion, tactical behavior, tolls, validation, and debug tooling
+remain deliberately staged later in the server composition. They consume
+Communities, Directors, Needs, Colony Management, recruitment, or other runtime
+domains that initialize after the persistent core. Their position is explicit;
+ordinary alphabetical filename order is never a dependency mechanism. Shared
+faction definitions are likewise interleaved with Provision and Community
+types because `PNC_FactionTypes` normalizes those nested records.
+
 ## Persistence Schema V6
 
 The authority owns the separate `PNC_Factions` Global ModData table:
@@ -418,6 +433,13 @@ Player factions store stable
 `player:<accountIdentity>:<characterUUID>` membership. A new survivor UUID on
 the same account is a different social/faction person and cannot inherit
 command authority.
+
+Cross-domain companion-command and player-damage checks obtain copied faction
+records through `PNC.Factions.Get`; they do not inspect the mutable registry.
+Once an NPC belongs to a player-owned organizational faction, command ownership
+must resolve an exact stable player entity key. Failure to resolve that key is
+a denial and never falls back to account username or transient online ID. The
+legacy owner fields remain only for unaffiliated/legacy companion compatibility.
 
 Add rejects unintended dual membership. Transfer changes source/destination
 indexes and history atomically. A player faction has exactly one player

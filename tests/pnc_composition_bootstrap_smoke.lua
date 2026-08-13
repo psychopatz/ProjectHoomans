@@ -81,6 +81,14 @@ local serverCalls = capture(
 )
 assertEqual(serverCalls[1], "PNC/00_PNC_Init",
     "server composition begins with shared anchor")
+local factionCoreIndex = indexOf(
+    serverCalls,
+    "PNC/Factions/PNC_FactionCore"
+)
+assertEqual(serverCalls[factionCoreIndex - 1], "PNC/PNC_ConductDebug",
+    "server Faction core initialization predecessor")
+assertEqual(serverCalls[factionCoreIndex + 1], "PNC/PNC_CommunityService",
+    "server Faction core initialization successor")
 assertEqual(serverCalls[#serverCalls - 1], "<install-server-profiler>",
     "server profiler installation timing")
 assertEqual(serverCalls[#serverCalls], "PNC/PNC_Server",
@@ -186,5 +194,22 @@ assertEqual(conversationServerCalls[2],
     "server Conversation authority dependency")
 assertEqual(#conversationServerCalls, 2,
     "server Conversation dependency count")
+
+PNC = { Factions = {} }
+local factionCoreCalls = capture(
+    ROOT .. "server/PNC/Factions/PNC_FactionCore.lua"
+)
+local expectedFactionCore = {
+    "PNC/PNC_FactionTelemetry",
+    "PNC/PNC_FactionService",
+    "PNC/PNC_FactionLeadership",
+    "PNC/PNC_FactionMembershipService",
+}
+for index = 1, #expectedFactionCore do
+    assertEqual(factionCoreCalls[index], expectedFactionCore[index],
+        "server Faction core dependency " .. tostring(index))
+end
+assertEqual(#factionCoreCalls, #expectedFactionCore,
+    "server Faction core dependency count")
 
 print("pnc_composition_bootstrap_smoke: OK")

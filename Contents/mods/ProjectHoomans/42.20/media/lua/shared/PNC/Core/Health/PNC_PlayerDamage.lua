@@ -114,8 +114,8 @@ function PlayerDamage.CanDamageRecord(record, attacker)
         or nil
     local organization = organizationID
         and PNC.Factions
-        and PNC.Factions.Registry
-        and PNC.Factions.Registry.byID[organizationID]
+        and PNC.Factions.Get
+        and PNC.Factions.Get(organizationID)
         or nil
     if not attacker or not organization
         or not organization.ownerPlayerKey
