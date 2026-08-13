@@ -1,14 +1,9 @@
-local function equal(actual, expected, message)
-    if actual ~= expected then error((message or "mismatch") .. ": expected="
-        .. tostring(expected) .. " actual=" .. tostring(actual)) end
-end
-
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/?.lua",
-    "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/?.lua",
-    "../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/?.lua",
-    package.path,
-}, ";")
+local T = require "tests/support/test"
+T.addPackagePaths({
+    { "ProjectHoomans", "shared" },
+    { "PsychopatzCore", "common" },
+    { "PsychopatzCore", "shared" },
+})
 
 local sampleCallback
 Events = { EveryOneSecond = {
@@ -36,16 +31,16 @@ local Integration = require "PNC/Integrations/PNC_PsychopatzProfiler"
 assert(PNC.SpatialIndex.Rebuild ~= original, "performance was not initially wrapped")
 
 local result = Bootstrap.ApplyCaptureConfig({ mode = "DETAILED", capture = { "moddata" } })
-equal(result.applied, true, "ModData live configuration")
-equal(result.restart_required, false, "live controller requested restart")
-equal(PNC.SpatialIndex.Rebuild, original, "disabled performance wrapper survived")
-equal(Profiler.IsSectionEnabled("moddata"), true, "ModData capture not enabled")
+T.equal(result.applied, true, "ModData live configuration")
+T.equal(result.restart_required, false, "live controller requested restart")
+T.equal(PNC.SpatialIndex.Rebuild, original, "disabled performance wrapper survived")
+T.equal(Profiler.IsSectionEnabled("moddata"), true, "ModData capture not enabled")
 assert(Profiler.GetState().snapshotProviders["ProjectHoomans.modData"], "ModData provider missing")
 
 result = Bootstrap.ApplyCaptureConfig({ mode = "DETAILED", capture = { "performance" } })
-equal(result.applied, true, "performance live configuration")
+T.equal(result.applied, true, "performance live configuration")
 assert(PNC.SpatialIndex.Rebuild ~= original, "performance wrapper not restored live")
 Profiler.Stop()
-equal(PNC.SpatialIndex.Rebuild, original, "live wrapper did not restore")
+T.equal(PNC.SpatialIndex.Rebuild, original, "live wrapper did not restore")
 
-print("pnc profiler live reconfigure: ok")
+T.finish("pnc_profiler_live_reconfigure_smoke")

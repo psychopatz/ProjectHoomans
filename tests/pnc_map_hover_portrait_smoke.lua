@@ -1,6 +1,4 @@
-local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
-        .. "PNC_MapHoverPortrait.lua"
+local T = require "tests/support/test"
 
 package.preload["PNC/UI/Map/PNC_MapHoverPortraitCard"] =
     function() return true end
@@ -54,7 +52,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load("ProjectHoomans", "client", "PNC/UI/Map/PNC_MapHoverPortrait.lua")
 
 local map = {
     width = 500,
@@ -151,4 +149,4 @@ PNC.MapHoverPortrait.Hide(map)
 assert(map.pncHoverPortrait.visible == false,
     "hover portrait remained visible after hover ended")
 
-print("pnc_map_hover_portrait_smoke: ok")
+T.finish("pnc_map_hover_portrait_smoke")
