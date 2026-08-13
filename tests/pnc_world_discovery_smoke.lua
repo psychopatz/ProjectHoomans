@@ -97,6 +97,21 @@ PNC.Factions = {
             archetypeID = id == "faction_roam" and "refugee" or "settler" }
     end,
 }
+local settlementBaseAvailable = false
+PNC.BaseService = {
+    GetForColony = function(id)
+        if settlementBaseAvailable and id == "settlement_one" then
+            return { id = "base_one", colonyId = id }
+        end
+    end,
+    BuildSnapshot = function(base)
+        if not base then return nil end
+        return { geometry = { bounds = {
+            minX = 90, minY = 190, maxX = 110, maxY = 210,
+            minZ = 0, maxZ = 0,
+        } } }
+    end,
+}
 PNC.Registry = {
     Get = function(id)
         return {
@@ -174,6 +189,9 @@ end
 Discovery.Load()
 equal(#Discovery.BuildSnapshot(player).entities, 0,
     "new character starts with no discovered entities")
+equal(Discovery.ResolveEntity(Types.KIND_SETTLEMENT, "settlement_one"), nil,
+    "community without a claimed base emits no settlement signal")
+settlementBaseAvailable = true
 
 local rumor = Discovery.SetPhase(player, Types.KIND_SETTLEMENT,
     "settlement_one", Types.PHASE_RUMORED, "radio")

@@ -76,7 +76,17 @@ local function ensureIdentityAndProfile(player, callback, at)
     if uuid and PNC.StartingCompanions
         and PNC.StartingCompanions.Ensure
     then
-        PNC.StartingCompanions.Ensure(player, uuid, at)
+        local granted = PNC.StartingCompanions.Ensure(player, uuid, at)
+        if granted == true and PNC.Network
+            and PNC.Network.SendColonyManagement
+            and PNC.ColonyManagement
+            and PNC.ColonyManagement.BuildSnapshot
+        then
+            PNC.Network.SendColonyManagement(
+                player,
+                PNC.ColonyManagement.BuildSnapshot(player)
+            )
+        end
     end
     return uuid, reason
 end

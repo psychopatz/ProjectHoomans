@@ -5,6 +5,7 @@ local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
 local DebugTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_DebugTab"
 local BaseTab = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
+local SettingsTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_SettingsTab"
 
 Registry.Register({
     id = "overview",
@@ -58,6 +59,31 @@ Registry.Register({
     showRoster = true,
     buildRows = function(context)
         return Presentation.BuildNeeds(context.selectedPerson)
+    end,
+})
+
+Registry.Register({
+    id = "settings",
+    title = function()
+        return Shared.Tr("UI_PNC_ColonySettings_Tab", "SETTINGS")
+    end,
+    detailTitle = "COLONY SETTINGS",
+    showRoster = false,
+    showDetails = true,
+    create = function(window)
+        SettingsTab.Create(window)
+    end,
+    layout = function(window, Layout, content)
+        SettingsTab.Layout(window, Layout, content)
+    end,
+    apply = function(window, active, Layout)
+        SettingsTab.Apply(window, active, Layout)
+    end,
+    rebuild = function(window, snapshot)
+        return SettingsTab.Rebuild(window, snapshot)
+    end,
+    onControl = function(window, button)
+        return SettingsTab.OnControl(window, button)
     end,
 })
 

@@ -380,6 +380,11 @@ Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RECRUIT_RESULT, function(a
     if PNC.Conversation and PNC.Conversation.Composer then
         PNC.Conversation.Composer.ReceiveRecruitOutcome(args or {})
     end
+    if args and args.success == true
+        and PNC.Client and PNC.Client.RequestColonyManagement
+    then
+        PNC.Client.RequestColonyManagement()
+    end
 end)
 
 function Client.HandleServerCommand(command, args)

@@ -219,12 +219,38 @@ function Management.BuildSnapshot(player, options)
             return tostring(a.id or "") < tostring(b.id or "")
         end)
     end
-    return { colony=colony, people=people, attention=attention, levels=counts,
+    local factionSnapshot = playerFaction and {
+        id = playerFaction.id,
+        name = playerFaction.name,
+        revision = playerFaction.revision,
+        renamePending = playerFaction.tags
+            and playerFaction.tags.factionNamePending == true or false,
+    } or nil
+    return { colony=colony, faction=factionSnapshot,
+        people=people, attention=attention, levels=counts,
         storage=storage, research=research, supplyShortages=supplyShortages,
         provisionStorage=provisionStorage,
         provisionSettings=provisionSettings,
         settlement=settlement,
         generatedAt=PNC.NeedsUtils.WorldAgeHours() }
+end
+
+function Management.RenameFactionForPlayer(player, args)
+    args = type(args) == "table" and args or {}
+    if not PNC.Factions or not PNC.Factions.SetPlayerFactionName then
+        return Management.BuildSnapshot(player), {
+            ok = false, reason = "faction_rename_unavailable",
+        }
+    end
+    local ok, reason, faction = PNC.Factions.SetPlayerFactionName(
+        player, args.name
+    )
+    if ok == true and PNC.Factions.Save then PNC.Factions.Save() end
+    return Management.BuildSnapshot(player), {
+        ok = ok == true,
+        reason = reason,
+        factionID = faction and faction.id or nil,
+    }
 end
 
 function Management.RenameForPlayer(player, args)
@@ -267,6 +293,9 @@ function Management.HandleAction(player, args)
     args = type(args) == "table" and args or {}
     local action = tostring(args.action or "")
     if action == "rename" then return Management.RenameForPlayer(player, args) end
+    if action == "faction_rename" then
+        return Management.RenameFactionForPlayer(player, args)
+    end
     local ok, reason, details, storage, record
     local settlementActions = {
         base_create = PNC.BaseService and PNC.BaseService.Create,
@@ -289,6 +318,11 @@ function Management.HandleAction(player, args)
     elseif settlementHandler then
         details = settlementHandler(player, args)
         ok, reason = details and details.ok == true, details and details.reason
+        if ok and PNC.SettlementRepository
+            and PNC.SettlementRepository.Save
+        then
+            PNC.SettlementRepository.Save()
+        end
         if args.requestId then
             rememberSettlementResult(args.requestId, details)
         end

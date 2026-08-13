@@ -79,7 +79,10 @@ function Service.Create(player, args)
     if not Validation.CanCreateFor(player, args.colonyId, args.factionId) then
         return finishRequest(requestId, response(false, "NO_PERMISSION"))
     end
-    local check = Validation.CanCreate(args.region)
+    local check = Validation.CanCreate(args.region, {
+        colonyId = args.colonyId,
+        factionId = args.factionId,
+    })
     if not check.ok then return finishRequest(requestId, response(false, check.reason)) end
     local id = tostring(args.baseId or PNC.Core.GenerateID("base"))
     local zoneId = tostring(args.zoneId or PNC.Core.GenerateID("base_zone"))

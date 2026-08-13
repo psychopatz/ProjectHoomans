@@ -91,22 +91,23 @@ function Repository.Export()
     return output
 end
 
-function Repository.Load()
-    if Repository.Loaded then return Repository.State end
-    local raw = GlobalModData and GlobalModData.getOrCreate
-        and GlobalModData.getOrCreate(Repository.MODDATA_KEY) or nil
+function Repository.Load(force)
+    if Repository.Loaded and force ~= true then return Repository.State end
+    local raw = ModData and ModData.getOrCreate
+        and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
     return Repository.Import(raw)
 end
 
 function Repository.Save()
     Repository.Load()
     if not Repository.Dirty then return true, "unchanged" end
-    if GlobalModData and GlobalModData.getOrCreate then
-        local target = GlobalModData.getOrCreate(Repository.MODDATA_KEY)
+    if ModData and ModData.getOrCreate then
+        local target = ModData.getOrCreate(Repository.MODDATA_KEY)
         local payload = Repository.Export()
         for key, _ in pairs(target) do target[key] = nil end
         for key, value in pairs(payload) do target[key] = value end
-        if GlobalModData.transmit then GlobalModData.transmit(Repository.MODDATA_KEY) end
+    else
+        return false, "moddata_unavailable"
     end
     Repository.Dirty = false
     return true, "saved"
@@ -144,8 +145,12 @@ function Repository.FindBaseByColony(colonyId)
     return nil
 end
 
+local function onInitGlobalModData()
+    Repository.Load(true)
+end
+
 if Events and Events.OnInitGlobalModData and not Repository.LoadHookRegistered then
-    Events.OnInitGlobalModData.Add(Repository.Load)
+    Events.OnInitGlobalModData.Add(onInitGlobalModData)
     Repository.LoadHookRegistered = true
 end
 if Events and Events.OnSave and not Repository.SaveHookRegistered then

@@ -2186,14 +2186,28 @@ end
 
 local function defaultPlayerFactionName(player, playerKey)
     local parsed = EntityRef.Parse(playerKey)
-    local playerName = tostring(
-        player and player.getDisplayName
-            and player:getDisplayName()
-            or parsed and parsed.accountIdentity
-            or "Player"
-    )
-    return string.sub(playerName, 1, 80)
-        .. " Survivors"
+    local descriptor = player and player.getDescriptor
+        and player:getDescriptor() or nil
+    local surname = descriptor and descriptor.getSurname
+        and descriptor:getSurname() or nil
+    surname = type(surname) == "string"
+        and string.match(surname, "^%s*(.-)%s*$") or nil
+    if not surname or surname == "" then
+        local playerName = tostring(
+            player and player.getDisplayName
+                and player:getDisplayName()
+                or parsed and parsed.accountIdentity
+                or "Player"
+        )
+        surname = string.match(playerName, "(%S+)%s*$") or "Player"
+    end
+    local flavors = {
+        "Clan", "Group", "Enclave", "Collective",
+        "Coalition", "Fellowship", "Company", "Kin",
+    }
+    local index = ZombRand and (ZombRand(#flavors) + 1) or 1
+    return string.sub(surname .. " " .. flavors[index], 1,
+        Constants.NAME_MAX_LENGTH)
 end
 
 function Factions.EnsurePlayerDiplomacyFaction(player, options)
@@ -2403,15 +2417,33 @@ function Factions.EnsurePlayerFaction(player, options)
     local reason
     local ok
     faction, reason = Factions.GetPlayerFaction(player)
-    if faction then return true, "existing", faction end
+    if faction then
+        local record = registryRecord(faction.id)
+        local legacyGeneratedName = record
+            and type(record.name) == "string"
+            and string.find(record.name, " Survivors$") ~= nil
+        if record and record.tags
+            and (record.tags.automaticallyCreated == true
+                or legacyGeneratedName)
+            and record.tags.factionNameConfirmed ~= true
+            and record.tags.factionNamePending ~= true
+        then
+            record.tags.factionNamePending = true
+            touchFaction(record)
+            touchRegistry()
+            faction = copy(record)
+        end
+        return true, "existing", faction
+    end
     options = type(options) == "table" and options or {}
+    local tags = copy(type(options.tags) == "table" and options.tags or {})
+    tags.automaticallyCreated = true
+    tags.factionNamePending = true
     ok, reason, faction = Factions.CreatePlayerFaction(player, {
         name = options.name,
         archetypeID = options.archetypeID or "settler",
         createdAt = options.worldAgeHours,
-        tags = options.tags or {
-            automaticallyCreated = true,
-        },
+        tags = tags,
     })
     if not ok and reason == "player_already_affiliated"
         and faction
@@ -2419,6 +2451,38 @@ function Factions.EnsurePlayerFaction(player, options)
         return true, "existing", faction
     end
     return ok, reason, faction
+end
+
+function Factions.SetPlayerFactionName(player, value)
+    local playerKey
+    local reason
+    local faction
+    if not authority() then return false, "not_authority" end
+    playerKey, reason = playerKeyFor(player, "rename_player_faction", true)
+    if not playerKey then return false, reason end
+    faction, reason = Factions.GetFactionForPlayerKey(playerKey)
+    if not faction then return false, reason end
+    if faction.ownerPlayerKey ~= playerKey then
+        return false, "not_faction_owner"
+    end
+    local changed
+    changed, reason, faction = Factions.SetName(faction.id, value)
+    if not changed and reason ~= "unchanged" then
+        return false, reason, faction
+    end
+    local record = registryRecord(faction.id)
+    if record then
+        record.tags = record.tags or {}
+        if record.tags.factionNamePending ~= nil
+            or record.tags.factionNameConfirmed ~= true
+        then
+            record.tags.factionNamePending = nil
+            record.tags.factionNameConfirmed = true
+            touchFaction(record)
+            touchRegistry()
+        end
+    end
+    return true, changed and "renamed" or "name_confirmed", copy(record)
 end
 
 function Factions.IsPlayerFaction(factionID)

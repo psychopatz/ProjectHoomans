@@ -535,6 +535,42 @@ assertEqual(Factions.Registry.revision, unchangedRegistry,
 assertEqual(alice.recordRevision, unchangedRecord,
     "identical rank record revision")
 
+-- Automatically founded player factions use the character surname, retain a
+-- flavor suffix, and keep the one-time naming prompt pending until confirmed.
+local automaticPlayerKey = "player:MorganAccount:char_default_name"
+local automaticPlayer = {
+    getDisplayName = function() return "Alex Morgan" end,
+    getDescriptor = function()
+        return { getSurname = function() return "Morgan" end }
+    end,
+}
+PNC.PlayerCharacters = {
+    GetEntityKey = function() return automaticPlayerKey, "resolved" end,
+}
+local automaticOK, _, automaticFaction = Factions.EnsurePlayerFaction(
+    automaticPlayer, { worldAgeHours = worldHour }
+)
+assertTrue(automaticOK, "automatic player faction creation")
+assertEqual(automaticFaction.name, "Morgan Kin",
+    "automatic faction surname and flavor")
+assertEqual(automaticFaction.tags.factionNamePending, true,
+    "automatic faction name pending")
+local renameOK, _, renamedFaction = Factions.SetPlayerFactionName(
+    automaticPlayer, "Morgan Wardens"
+)
+assertTrue(renameOK, "player faction rename")
+assertEqual(renamedFaction.name, "Morgan Wardens", "renamed faction")
+assertEqual(renamedFaction.tags.factionNamePending, nil,
+    "rename clears faction prompt")
+assertEqual(renamedFaction.tags.factionNameConfirmed, true,
+    "rename records faction name confirmation")
+local existingOK, _, existingFaction = Factions.EnsurePlayerFaction(
+    automaticPlayer, { worldAgeHours = worldHour }
+)
+assertTrue(existingOK, "confirmed player faction remains available")
+assertEqual(existingFaction.tags.factionNamePending, nil,
+    "confirmed faction does not prompt again")
+
 -- 56-60. Debug formatting/snapshots are primitive-only.
 local debugPlayerKey = "player:Patrick:char_debug"
 Factions.GetFactionForPlayerKey = function()

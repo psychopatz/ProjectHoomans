@@ -25,7 +25,7 @@ function ISPNCColonyNamePrompt:createChildren()
     self:addChild(self.nameEntry)
     self.saveButton = UI.CreateButton(self, {
         id = "save",
-        title = "Name Colony",
+        title = "Name Faction",
         target = self,
         onclick = ISPNCColonyNamePrompt.onSave,
         variant = "primary",
@@ -62,15 +62,15 @@ function ISPNCColonyNamePrompt:onSave()
     local name = self.nameEntry and self.nameEntry:getText() or ""
     local ok
     local reason
-    if PNC.Client and PNC.Client.RenameColony then
-        ok, reason = PNC.Client.RenameColony(self.communityID, name)
+    if PNC.Client and PNC.Client.RenameFaction then
+        ok, reason = PNC.Client.RenameFaction(name)
     else
         ok, reason = false, "rename_unavailable"
     end
     if ok then
         self:close()
     else
-        self.errorText = tostring(reason or "Unable to rename colony")
+        self.errorText = tostring(reason or "Unable to rename faction")
     end
 end
 
@@ -82,7 +82,7 @@ function ISPNCColonyNamePrompt:render()
     PsychopatzWindow.render(self)
     local rect = self:getContentRect({ top = 30, bottom = 12 })
     self:drawText(
-        "Your first companion has joined. Name this community:",
+        "Your first companion has joined. Name your faction:",
         rect.x,
         rect.y + 8,
         Theme.colors.text.r,
@@ -119,18 +119,18 @@ function ISPNCColonyNamePrompt:new(x, y, width, height, options)
 end
 
 function Prompt.OpenIfNeeded(snapshot)
-    local colony = snapshot and snapshot.colony or nil
-    if not colony or colony.renamePending ~= true
+    local faction = snapshot and snapshot.faction or nil
+    if not faction or faction.renamePending ~= true
         or #(snapshot.people or {}) < 1
     then
         return false
     end
-    local revision = tonumber(colony.revision) or 0
-    if Prompt.shownRevisions[colony.id] == revision then return false end
-    Prompt.shownRevisions[colony.id] = revision
+    local revision = tonumber(faction.revision) or 0
+    if Prompt.shownRevisions[faction.id] == revision then return false end
+    Prompt.shownRevisions[faction.id] = revision
     if Prompt.instance then Prompt.instance:close() end
     local window = UI.NewWindow(ISPNCColonyNamePrompt, {
-        title = "NAME YOUR COLONY",
+        title = "NAME YOUR FACTION",
         resizable = false,
         persistGeometry = false,
         responsiveSpec = {
@@ -143,10 +143,9 @@ function Prompt.OpenIfNeeded(snapshot)
             anchor = "center",
         },
     })
-    window.communityID = colony.id
     window:initialise()
     window:instantiate()
-    window.nameEntry:setText(tostring(colony.name or "New Colony"))
+    window.nameEntry:setText(tostring(faction.name or "Survivor Group"))
     window:addToUIManager()
     window:setVisible(true)
     window:bringToTop()

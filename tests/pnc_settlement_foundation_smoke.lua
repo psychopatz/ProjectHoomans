@@ -20,6 +20,14 @@ local sequence = 0
 function ZombRand() sequence = sequence + 1; return sequence end
 function getTimeInMillis() sequence = sequence + 1; return sequence end
 
+local persistedModData = {}
+ModData = {
+    getOrCreate = function(key)
+        persistedModData[key] = persistedModData[key] or {}
+        return persistedModData[key]
+    end,
+}
+
 require "PNC/Core/Base/PNC_Core"
 require "PNC/Core/Events/PNC_EventDefinitions"
 require "PNC/Core/Settlement/PNC_SettlementDefinitions"
@@ -111,6 +119,50 @@ equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 270,
 local baseSnapshot = PNC.BaseService.BuildSnapshot(base)
 equal(baseSnapshot.geometry.region.levels[0].rows[0][1], 0,
     "authoring snapshot includes canonical footprint")
+
+local playerZoneConflict = PNC.BaseService.Create({}, {
+    colonyId = "community_other", factionId = "faction_test",
+    region = rectangle(5, 5, 7, 7), requestId = "player_zone_conflict",
+})
+equal(playerZoneConflict.reason, "PLAYER_ZONE_OCCUPIED",
+    "new base cannot overlap an existing player zone")
+
+PNC.Communities = {
+    List = function()
+        return { {
+            id = "npc_community", status = "active",
+            factionID = "faction_npc",
+            home = { x = 30, y = 30, z = 0, radius = 4 },
+        } }
+    end,
+}
+local npcBaseConflict = PNC.BaseService.Create({}, {
+    colonyId = "community_third", factionId = "faction_test",
+    region = rectangle(29, 29, 31, 31), requestId = "npc_base_conflict",
+})
+equal(npcBaseConflict.reason, "NPC_BASE_OCCUPIED",
+    "new base cannot overlap an NPC community")
+PNC.Communities = nil
+
+local safehouse = {
+    getX = function() return 40 end,
+    getY = function() return 40 end,
+    getW = function() return 5 end,
+    getH = function() return 5 end,
+}
+SafeHouse = {
+    getSafehouseList = function()
+        return { size = function() return 1 end,
+            get = function(_, index) return index == 0 and safehouse or nil end }
+    end,
+}
+local safehouseConflict = PNC.BaseService.Create({}, {
+    colonyId = "community_fourth", factionId = "faction_test",
+    region = rectangle(41, 41, 42, 42), requestId = "safehouse_conflict",
+})
+equal(safehouseConflict.reason, "PLAYER_ZONE_OCCUPIED",
+    "new base cannot overlap a vanilla safehouse")
+SafeHouse = nil
 
 for index = 1, 13 do
     local built = PNC.BaseService.BuildBarricade({}, {
@@ -250,6 +302,17 @@ equal(persisted.facilities[barracks.id].cachedState, nil,
 equal(persisted.components[farmComponentId].tileCount, nil,
     "derived tile count is not persisted")
 equal(persisted.reservations, nil, "reservations are runtime only")
+truthy(PNC.SettlementRepository.Save(), "settlement state saves to ModData")
+truthy(persistedModData[PNC.SettlementRepository.MODDATA_KEY]
+    .bases[base.id], "saved ModData contains base")
+PNC.SettlementRepository.State = {
+    schemaVersion = 1, bases = {}, facilities = {}, components = {},
+    stockpileNodes = {}, zones = {},
+}
+PNC.SettlementRepository.Loaded = false
+truthy(PNC.SettlementRepository.Load(true), "settlement state reloads")
+truthy(PNC.SettlementRepository.GetBase(base.id),
+    "base survives a simulated restart")
 truthy(PNC.SettlementRepository.Import(persisted), "persistence reload")
 PNC.FacilityService.RebuildIndexes()
 equal(PNC.SettlementRepository.GetFacility(barracks.id).cachedState,

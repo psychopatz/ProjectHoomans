@@ -13,6 +13,9 @@ env/
 # Codebase Memory MCP
 .codebase-memory/
 
+# Generated architecture audit cache and reports
+.architecture-refactor/
+
 # SQLite databases and temp files
 *.db
 *.db-shm

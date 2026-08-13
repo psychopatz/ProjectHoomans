@@ -8,6 +8,14 @@ local function equal(actual, expected, label)
 end
 
 local communitySaves = 0
+local factionSaves = 0
+local faction = {
+    id = "faction_player",
+    name = "Rivera Enclave",
+    ownerPlayerKey = "player:Tester",
+    revision = 2,
+    tags = { factionNamePending = true },
+}
 local community = {
     id = "community_player",
     factionID = "faction_player",
@@ -95,7 +103,15 @@ PNC = {
         end,
     },
     Factions = {
-        GetPlayerFaction = function() return { id = "faction_player" } end,
+        GetPlayerFaction = function() return faction end,
+        SetPlayerFactionName = function(_, name)
+            if name == "" then return false, "invalid_name" end
+            faction.name = name
+            faction.tags.factionNamePending = nil
+            faction.revision = faction.revision + 1
+            return true, "renamed", faction
+        end,
+        Save = function() factionSaves = factionSaves + 1 end,
     },
     Communities = {
         GetForFaction = function() return { community } end,
@@ -163,6 +179,18 @@ equal(snapshot.people[1].name, "Alex Rivera", "companion identity presented")
 equal(#snapshot.people[1].journal, 1, "companion journal included")
 equal(#snapshot.attention, 1, "critical need appears in attention")
 equal(snapshot.attention[1].needType, "hunger", "critical need type")
+equal(snapshot.faction.name, "Rivera Enclave", "faction is in snapshot")
+equal(snapshot.faction.renamePending, true, "initial faction prompt is pending")
+
+local factionSnapshot, factionResult = Management.HandleAction(player, {
+    action = "faction_rename", name = "River Wardens",
+})
+equal(factionResult.ok, true, "owned faction rename succeeds")
+equal(factionSnapshot.faction.name, "River Wardens",
+    "faction rename returns updated snapshot")
+equal(factionSnapshot.faction.renamePending, false,
+    "faction prompt clears after rename")
+equal(factionSaves, 1, "faction rename commits immediately")
 
 local renamed, result = Management.RenameForPlayer(player, {
     communityID = community.id,

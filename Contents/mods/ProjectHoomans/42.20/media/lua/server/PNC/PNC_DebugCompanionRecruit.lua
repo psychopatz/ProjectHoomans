@@ -130,8 +130,8 @@ local function ensureCommunity(playerFaction, player, record, at)
         local reason
         ok, reason, community = Communities.Create({
             factionID = playerFaction.id,
-            name = "New Colony",
-            renamePending = true,
+            name = playerFaction.name,
+            renamePending = false,
             mode = "camped",
             createdAt = at,
             home = playerPosition(player),

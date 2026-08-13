@@ -145,4 +145,13 @@ UI_EN = {
     UI_PNC_Needs_NoCompanions = "No companions are assigned to this colony.",
     UI_PNC_Colony_Refresh = "REFRESH",
     UI_PNC_Colony_Diagnostics = "UI DIAGNOSTICS",
+    UI_PNC_ColonySettings_Tab = "SETTINGS",
+    UI_PNC_ColonySettings_Rename = "RENAME FACTION",
+    UI_PNC_ColonySettings_CurrentFaction = "CURRENT FACTION",
+    UI_PNC_ColonySettings_NoFaction = "NO FACTION",
+    UI_PNC_ColonySettings_NoFactionHelp = "Recruit a companion to establish your faction.",
+    UI_PNC_ColonySettings_Renamed = "SAVED",
+    UI_PNC_ColonySettings_RenameFailed = "RENAME FAILED",
+    UI_PNC_SettlementReason_PlayerZoneOccupied = "That area overlaps an existing player-owned zone.",
+    UI_PNC_SettlementReason_NPCBaseOccupied = "That area overlaps an existing NPC settlement.",
 }

@@ -19,19 +19,28 @@ local function factionArchetype(factionID)
 end
 
 local function settlementEntity(community)
+    local base = community and PNC.BaseService
+        and PNC.BaseService.GetForColony
+        and PNC.BaseService.GetForColony(community.id) or nil
+    local baseSnapshot = base and PNC.BaseService.BuildSnapshot
+        and PNC.BaseService.BuildSnapshot(base) or nil
+    local bounds = baseSnapshot and baseSnapshot.geometry
+        and baseSnapshot.geometry.bounds or nil
     local site = community and community.site
     local home = site and site.home or community and community.home
     if not community or community.status ~= "active"
-        or not home or not tonumber(home.x) or not tonumber(home.y)
+        or not base or not bounds
     then return nil end
+    local x = (tonumber(bounds.minX) + tonumber(bounds.maxX)) / 2
+    local y = (tonumber(bounds.minY) + tonumber(bounds.maxY)) / 2
     return {
         entityID = tostring(community.id),
         kind = Types.KIND_SETTLEMENT,
         name = tostring(community.name or "Survivor settlement"),
         factionID = community.factionID,
         archetypeID = factionArchetype(community.factionID),
-        x = tonumber(home.x), y = tonumber(home.y),
-        z = tonumber(home.z) or 0,
+        x = x, y = y,
+        z = tonumber(bounds.minZ) or home and tonumber(home.z) or 0,
         population = tonumber(community.currentPopulation) or 0,
     }
 end

@@ -516,6 +516,9 @@ function Client.RequestColonyManagement()
     ClientState.colonyManagementRevision =
         (tonumber(ClientState.colonyManagementRevision) or 0) + 1
     ClientState.lastColonyManagementReceiveAt = Core.Now()
+    if PNC.ColonyNamePrompt and PNC.ColonyNamePrompt.OpenIfNeeded then
+        PNC.ColonyNamePrompt.OpenIfNeeded(ClientState.colonyManagement)
+    end
     return true
 end
 
@@ -713,6 +716,12 @@ function Client.RenameColony(communityID, name)
         (tonumber(ClientState.colonyManagementRevision) or 0) + 1
     ClientState.lastColonyManagementReceiveAt = Core.Now()
     return result and result.ok == true, result and result.reason
+end
+
+function Client.RenameFaction(name)
+    return Client.RequestColonyAction("faction_rename", {
+        name = tostring(name or ""),
+    })
 end
 
 function Client.RequestCharacterPayload(npcId)
