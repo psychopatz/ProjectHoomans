@@ -35,6 +35,7 @@ end
 
 function Service.RebuildIndexes()
     Service.ByType, Service.ByCapability, Service.ComponentsByRole = {}, {}, {}
+    local obsoleteComponents = {}
     for id, facility in pairs(Repository.State.facilities) do
         local base = PNC.BaseService.Get(facility.baseId)
         if base then
@@ -49,7 +50,26 @@ function Service.RebuildIndexes()
         end
     end
     for id, component in pairs(Repository.State.components) do
-        addIndex(Service.ComponentsByRole, component.role, id)
+        local facility = Repository.GetFacility(component.facilityId)
+        if facility and facility.definitionId == "research_facility"
+            and component.role == "research.room"
+        then
+            obsoleteComponents[#obsoleteComponents + 1] = id
+        else
+            addIndex(Service.ComponentsByRole, component.role, id)
+        end
+    end
+    for _, componentId in ipairs(obsoleteComponents) do
+        local component = Repository.State.components[componentId]
+        local facility = component
+            and Repository.GetFacility(component.facilityId) or nil
+        if facility and facility.componentIds then
+            facility.componentIds[componentId] = nil
+        end
+        Repository.State.components[componentId] = nil
+    end
+    if #obsoleteComponents > 0 then
+        Repository.MarkDirty()
     end
 end
 
@@ -102,8 +122,16 @@ function Service.Create(player, args)
     end
     local footprintInput = PNC.Core.DeepCopy(args.component)
     footprintInput.id = tostring(PNC.Core.GenerateID("footprint"))
-    local footprintCheck = Validation.NormalizeComponent(
-        base, facility, footprintInput)
+    local footprintCheck
+    if footprintInput.role == "facility.footprint"
+        and Validation.NormalizeFootprint
+    then
+        footprintCheck = Validation.NormalizeFootprint(
+            base, facility, footprintInput)
+    else
+        footprintCheck = Validation.NormalizeComponent(
+            base, facility, footprintInput)
+    end
     if not footprintCheck.ok then return footprintCheck end
     local constructionRegion = footprintCheck.details.component.region
     for _, other in pairs(Repository.State.facilities or {}) do

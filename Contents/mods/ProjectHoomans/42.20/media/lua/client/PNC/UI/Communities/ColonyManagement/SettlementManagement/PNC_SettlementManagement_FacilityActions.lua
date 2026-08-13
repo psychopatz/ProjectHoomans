@@ -44,7 +44,10 @@ local function areaOptions(window, facility, existing, onConfirm)
     local limit = level and level.componentLimits[role] or {}
     return {
         title = Support.Tr("UI_PNC_Facility_SelectArea", "SELECT FACILITY AREA"),
-        instruction = role == "farm.field"
+        instruction = role == "facility.footprint"
+            and Support.Tr("UI_PNC_Facility_SelectFootprintHelp",
+                "Select the building footprint inside the base territory.")
+            or role == "farm.field"
             and Support.Tr("UI_PNC_Facility_SelectFarmlandHelp",
                 "Select connected cultivated farmland inside the base.")
             or Support.Tr("UI_PNC_Facility_SelectAreaHelp",
@@ -73,8 +76,10 @@ function Facility.BeginBuild(window, definitionId)
     local settlement = window.snapshot and window.snapshot.settlement
     if not settlement then return false end
     local draft = { definitionId = definitionId, level = 1, components = {} }
-    local role = areaRole(draft)
-    if not role then return false end
+    -- The selected build area is an abstract construction footprint, not a
+    -- functional room. Facilities such as Research therefore do not need a
+    -- fake region component just to be placeable.
+    local role = areaRole(draft) or "facility.footprint"
     Support.OpenSelector(window, areaOptions(window, draft, nil, function(region)
         PNC.Client.RequestCreateFacility({ baseId = settlement.id,
             expectedRevision = settlement.revision, definitionId = definitionId,

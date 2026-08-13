@@ -139,6 +139,12 @@ equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 270,
 local baseSnapshot = PNC.BaseService.BuildSnapshot(base)
 equal(baseSnapshot.geometry.region.levels[0].rows[0][1], 0,
     "authoring snapshot includes canonical footprint")
+local researchLevel = PNC.FacilityDefinitions.GetLevel(
+    "research_facility", 1)
+equal(researchLevel.componentLimits["research.room"], nil,
+    "research room is not a functional component")
+equal(researchLevel.componentLimits["work.research"].minCount, 1,
+    "research station is the only required research component")
 
 local playerZoneConflict = PNC.BaseService.Create({}, {
     colonyId = "community_other", factionId = "faction_test",
@@ -268,6 +274,26 @@ truthy(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision, component = {
         kind = "anchor", role = "sleep.bed", x = 4, y = 0, z = 1,
     } }).ok, "fifth bed after upgrade")
+
+local researchResult = PNC.FacilityService.Create(player, {
+    baseId = base.id, definitionId = "research_facility",
+    expectedRevision = base.revision,
+    component = { kind = "region", role = "facility.footprint",
+        region = rectangle(7, 7, 8, 8) },
+})
+truthy(researchResult.ok,
+    "research facility accepts a non-component construction footprint")
+local researchFacility = researchResult.facility
+researchFacility.constructionState = "BUILT"
+PNC.FacilityService.RefreshState(researchFacility)
+truthy(PNC.FacilityService.SetComponent({}, {
+    facilityId = researchFacility.id,
+    expectedRevision = researchFacility.revision,
+    component = { kind = "anchor", role = "work.research",
+        x = 7, y = 7, z = 0 },
+}).ok, "research station assignment")
+equal(researchFacility.cachedState, "OPERATIONAL",
+    "research station alone makes the facility operational")
 
 local farmResult = PNC.FacilityService.Create(player, { baseId = base.id,
     definitionId = "farm", expectedRevision = base.revision,

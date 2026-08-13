@@ -76,6 +76,35 @@ function Validation.CanUpgrade(base, facility, expectedRevision)
     return result(true)
 end
 
+function Validation.NormalizeFootprint(base, facility, input)
+    if type(input) ~= "table" or input.kind ~= "region" then
+        return result(false, "INVALID_COMPONENT")
+    end
+    local ok, reason, region = GridRegion.validate(input.region)
+    if not ok then return result(false, reason) end
+    local levels = 0
+    for _, _ in pairs(region.levels) do levels = levels + 1 end
+    if levels ~= 1 then
+        return result(false, "FACILITY_REGION_MULTIPLE_LEVELS")
+    end
+    if not GridRegion.isConnected(region, 4) then
+        return result(false, "FACILITY_REGION_DISCONNECTED")
+    end
+    if not baseContainsRegion(base, region) then
+        return result(false, "OUTSIDE_BASE")
+    end
+    return result(true, nil, { component = {
+        schemaVersion = 1,
+        id = tostring(input.id or ""),
+        facilityId = facility.id,
+        kind = "region",
+        role = "facility.footprint",
+        region = region,
+        tileCount = GridRegion.countTiles(region),
+        revision = 0,
+    } })
+end
+
 function Validation.NormalizeComponent(base, facility, input)
     if type(input) ~= "table" or (input.kind ~= "anchor" and input.kind ~= "region")
         or type(input.role) ~= "string" or input.role == ""

@@ -115,8 +115,6 @@ Definitions.Register({
             requiredHQLevel = 1,
             capabilities = { "work.research" },
             componentLimits = {
-                ["research.room"] = { kind = "region", minCount = 1,
-                    maxCount = 1, overlap = "exclusive" },
                 ["work.research"] = { kind = "anchor", minCount = 1,
                     maxCount = 1 },
             },
