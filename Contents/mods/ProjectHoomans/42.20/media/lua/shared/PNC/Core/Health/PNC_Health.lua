@@ -333,6 +333,14 @@ function Health.Kill(record, zombie, reason)
     local corpseConverted
     local corpseCreated
     local deathMarker
+    -- Work orders own their accumulated work and staged inputs. Release the
+    -- worker while its registry record still exists so another colonist can
+    -- claim and continue the same order after this NPC is retired.
+    if PNC.WorkService and PNC.WorkService.Commands
+        and PNC.WorkService.Commands.ReleaseWorker
+    then
+        PNC.WorkService.Commands.ReleaseWorker(record.id, "worker_died")
+    end
     if PNC.CompanionVehicle and PNC.CompanionVehicle.Release then
         PNC.CompanionVehicle.Release(record, "npc_death")
     end

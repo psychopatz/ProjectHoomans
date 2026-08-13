@@ -153,6 +153,13 @@ function ISPNCColonyManagementWindow:refresh(update)
 end
 
 function ISPNCColonyManagementWindow:prerender()
+    local currentTime = PNC.Core.Now()
+    if (self.tab == "tasks" or self.tab == "base")
+        and currentTime - (tonumber(self.lastWorkPollAt) or 0) >= 2000
+    then
+        self.lastWorkPollAt = currentTime
+        self:requestSnapshot("work_progress_poll")
+    end
     local changed, update = Client.HasUpdate(
         self.lastReceiveRevision, self.lastReceiveAt
     )

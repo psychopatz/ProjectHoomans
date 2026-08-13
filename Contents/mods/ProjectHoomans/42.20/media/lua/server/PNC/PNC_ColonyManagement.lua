@@ -251,6 +251,10 @@ function Management.BuildSnapshot(player, options)
     local workshop = colony and PNC.CraftingService
         and PNC.CraftingService.Queries.BuildSnapshot(colony.id)
         or { knownRecipes = {}, orders = {} }
+    local tasks = colony and PNC.WorkService
+        and PNC.WorkService.Queries
+        and PNC.WorkService.Queries.BuildTaskSnapshot
+        and PNC.WorkService.Queries.BuildTaskSnapshot(colony.id) or {}
     local provisionSettings = PNC.ProvisionPolicyService
         and PNC.ProvisionPolicyService.BuildSnapshot
         and PNC.ProvisionPolicyService.BuildSnapshot(player) or nil
@@ -281,6 +285,15 @@ function Management.BuildSnapshot(player, options)
         table.sort(settlement.stockpileNodes, function(a, b)
             return tostring(a.id or "") < tostring(b.id or "")
         end)
+        local taskByFacility = {}
+        for _, task in ipairs(tasks) do
+            if task.facilityId then
+                taskByFacility[tostring(task.facilityId)] = task
+            end
+        end
+        for _, facility in ipairs(settlement.facilities) do
+            facility.activeTask = taskByFacility[tostring(facility.id)]
+        end
     end
     local factionSnapshot = playerFaction and {
         id = playerFaction.id,
@@ -291,7 +304,7 @@ function Management.BuildSnapshot(player, options)
     } or nil
     return { colony=colony, faction=factionSnapshot,
         people=people, attention=attention, levels=counts,
-        storage=storage, research=research, workshop=workshop,
+        storage=storage, research=research, workshop=workshop, tasks=tasks,
         supplyShortages=supplyShortages,
         provisionStorage=provisionStorage,
         provisionSettings=provisionSettings,

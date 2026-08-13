@@ -13,6 +13,7 @@ local directory = { records = {}, deathMarkers = {} }
 local removedRecords = {}
 local removalBroadcasts = {}
 local deathRetirementOrder = {}
+local releasedWorker
 
 local function recordRemovalBroadcast(id, reason)
     deathRetirementOrder[#deathRetirementOrder + 1] = "broadcast"
@@ -66,6 +67,13 @@ PNC = {
         BroadcastDeathMarkerRemoval = recordRemovalBroadcast,
     },
     BodyLifecycle = { Internal = {} },
+    WorkService = { Commands = {
+        ReleaseWorker = function(id, reason)
+            releasedWorker = { id = id, reason = reason }
+            deathRetirementOrder[#deathRetirementOrder + 1] = "release_work"
+            return true
+        end,
+    } },
 }
 
 dofile(ROOT .. "Registry/PNC_DeathMarkers.lua")
@@ -148,6 +156,10 @@ local sourceBody = { setHealth = function() end }
 local retired, normalMarker =
     PNC.Health.Kill(normalRecord, sourceBody, "weapon_damage")
 assertEqual(retired, true, "ordinary dead NPC was not retired")
+assertEqual(releasedWorker.id, normalRecord.id,
+    "death did not release the active worker")
+assertEqual(releasedWorker.reason, "worker_died",
+    "death worker release reason")
 assert(normalMarker, "ordinary death marker missing")
 assertEqual(normalMarker.infected, false, "ordinary death marked infected")
 assertEqual(normalMarker.colonist, false, "ordinary death marked colonist")

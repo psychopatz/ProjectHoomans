@@ -273,6 +273,7 @@ truthy(Work.Commands.AddProgress(build.id, "worker", 4),
 equal(Work.BuildActionInformation(PNC.Registry.Data.worker).percent, 40,
     "action information reports shared order progress")
 PNC.Registry.Data.worker.alive = false
+constructionFacility.constructionState = "PLANNED"
 PNC.Registry.Data.backup = { id = "backup", alive = true, factionId = "f1",
     communityId = "c1", skills = { Carpentry = 5 }, runtime = {},
     allowedJobs = { Constructor = true } }
@@ -280,6 +281,10 @@ clock = clock + 1001
 Work.Tick(clock)
 equal(Work.Queries.Get(build.id).progress, 4,
     "worker interruption preserves construction progress")
+equal(reserved["Base.Money"], 1,
+    "worker interruption preserves staged construction material")
+equal(constructionFacility.constructionState, "UNDER_CONSTRUCTION",
+    "active order repairs stale planned facility state")
 clock = clock + 1001
 Work.Tick(clock)
 equal(Work.Queries.Get(build.id).workerId, "backup",
@@ -311,5 +316,53 @@ truthy(Work.Commands.Assign(deconstruct.id, "backup"),
 truthy(Work.Commands.AddProgress(deconstruct.id, "backup", 100),
     "abstract deconstruction completes by work points")
 equal(constructionDestroyed, true, "deconstruction removes facility parts")
+
+-- A colonist whose legacy affiliation omitted communityID still cycles from
+-- At Home into queued work by resolving the remembered home base.
+PNC.Registry.Data.backup.communityId = nil
+PNC.Registry.Data.backup.runtime.homeBaseId = "b1"
+PNC.Registry.Data.backup.orderSpec = { kind = "colony_home", baseId = "b1" }
+PNC.HomeDutyService = {
+    IsAtHome = function(record, baseId)
+        return record.runtime.homeBaseId == baseId
+    end,
+    GetColonyId = function(record)
+        return record.runtime.homeBaseId == "b1" and "c1" or ""
+    end,
+}
+constructionFacility.constructionState = "BUILT"
+local homeTask = assert(Work.Commands.Queue({
+    operation = "RECONSTRUCT", colonyId = "c1", factionId = "f1",
+    baseId = "b1", requiredWork = 5,
+    payload = { facilityId = constructionFacility.id, change = {} },
+}))
+clock = clock + 1001
+Work.Tick(clock)
+equal(Work.Queries.Get(homeTask.id).workerId, "backup",
+    "At Home colonist claims the next queued task")
+equal(PNC.Registry.Data.backup.runtime.workOrderId, homeTask.id,
+    "At Home yields to emulated production work")
+local taskRows = Work.Queries.BuildTaskSnapshot("c1")
+local foundHomeTask
+for _, task in ipairs(taskRows) do
+    if task.id == homeTask.id then foundHomeTask = task end
+end
+truthy(foundHomeTask, "task snapshot contains active home task")
+equal(foundHomeTask.workerName, "backup", "task snapshot worker name")
+equal(foundHomeTask.executionMode, "ABSTRACT",
+    "task snapshot exposes emulated execution mode")
+truthy(Work.Commands.Cancel(homeTask.id), "cancel first cycled task")
+equal(PNC.Registry.Data.backup.orderSpec.kind, "colony_home",
+    "colonist returns to At Home between tasks")
+local nextHomeTask = assert(Work.Commands.Queue({
+    operation = "RECONSTRUCT", colonyId = "c1", factionId = "f1",
+    baseId = "b1", requiredWork = 5,
+    payload = { facilityId = constructionFacility.id, change = {} },
+}))
+clock = clock + 1001
+Work.Tick(clock)
+equal(Work.Queries.Get(nextHomeTask.id).workerId, "backup",
+    "At Home colonist cycles into another queued task")
+truthy(Work.Commands.Cancel(nextHomeTask.id), "cancel second cycled task")
 
 print("pnc_production_lifecycle_smoke: OK")

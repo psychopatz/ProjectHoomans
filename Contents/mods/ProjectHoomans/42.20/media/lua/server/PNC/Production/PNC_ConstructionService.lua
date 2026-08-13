@@ -145,6 +145,17 @@ end
 
 local function prepare(order)
     if order.operation ~= "CONSTRUCT" then return true end
+    local facility = PNC.SettlementRepository.GetFacility(
+        order.payload and order.payload.facilityId)
+    if facility and (facility.constructionState ~= "UNDER_CONSTRUCTION"
+        or tostring(facility.constructionWorkOrderId or "") ~= order.id)
+    then
+        -- Repair saves from an interrupted worker handoff. The work order is
+        -- authoritative; a stale PLANNED facility must not hide active work.
+        facility.constructionState = "UNDER_CONSTRUCTION"
+        facility.constructionWorkOrderId = order.id
+        PNC.FacilityService.RefreshState(facility)
+    end
     if PNC.WorkInputService.IsReady(order) then return true end
     local payload = order.payload or {}
     local input = payload.input or {}

@@ -211,7 +211,7 @@ assertContains(actionText, "Returning Home", "home travel action")
 assertContains(actionText, "35%", "home travel progress")
 snapshot.actionInformation = { kind = "at_home" }
 actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
-assertContains(actionText, "At Home", "at-home action")
+assertContains(actionText, "Idle", "idle-at-home action")
 snapshot.actionInformation = nil
 
 local entriesPath = ROOT .. "PNC/UI/Nameplates/PNC_NameplateEntries.lua"

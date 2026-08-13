@@ -87,6 +87,14 @@ assert(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].durationMs == 0,
     "bed sleep must not be force-finished on a timer")
 assert(PNC.AnimationScenes.Get("production.craft").blocking == false,
     "production animation must not block work progress ticks")
+local constructionDefinition =
+    PNC.AnimationScenes.Get("production.construct")
+assert(constructionDefinition.repeatMode == "loop"
+        and #constructionDefinition.steps == 2,
+    "construction must repeat its two-step animation scene")
+assert(constructionDefinition.steps[1].bump == "Hammer"
+        and constructionDefinition.steps[2].bump == "HammerLow",
+    "construction scene does not use the hammer XML nodes")
 
 local registered, custom = PNC.AnimationScenes.Register(
     "example.wave",
@@ -276,5 +284,41 @@ assert(callbackTicks == 1 and callbackStopReason == "callback_complete",
     "scene lifecycle callbacks were not dispatched")
 assert(record.runtime.animationScene == nil,
     "callback-completed scene remained active")
+
+local constructionStarted, constructionScene =
+    PNC.AnimationScenes.Request(record, body, "production.construct", {
+        now = now,
+    })
+assert(constructionStarted and played[#played].bump == "Hammer",
+    "construction did not start with the hammer animation")
+now = constructionScene.finishAt
+PNC.AnimationScenes.Tick(record, body, now)
+now = constructionScene.nextStepAt
+PNC.AnimationScenes.Tick(record, body, now)
+assert(played[#played].bump == "HammerLow"
+        and constructionScene.repeatMode == "loop",
+    "construction did not advance to the low hammer animation")
+assert(PNC.AnimationScenes.Interrupt(record, body, "combat"),
+    "construction scene did not release for combat")
+
+local holdAnimationCalls = 0
+local holdMotionClears = 0
+PNC.Animation.Apply = function()
+    holdAnimationCalls = holdAnimationCalls + 1
+end
+PNC.MotionHints = { Clear = function()
+    holdMotionClears = holdMotionClears + 1
+end }
+PNC.PathService = {}
+dofile("Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    .. "Pathing/PNC_PathService/PNC_PathService_Context.lua")
+record.runtime.animationScene = { id = "production.construct", bump = "Hammer" }
+PNC.PathService.Internal.applyHoldAnimation(body, record, {
+    visualMovingUntil = now + 1000,
+})
+assert(holdAnimationCalls == 0,
+    "path hold overwrote the active construction scene with Idle")
+assert(holdMotionClears == 1,
+    "path hold did not clear stale movement presentation for work")
 
 print("pnc_animation_scenes_smoke: ok")

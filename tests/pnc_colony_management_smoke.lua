@@ -135,13 +135,24 @@ PNC = {
         end,
     },
     BaseService = {
-        GetForColony = function() return nil end,
+        GetForColony = function()
+            return { id = "base_player", facilityIds = {
+                facility_farm = true,
+            }, stockpileNodeIds = {} }
+        end,
+        BuildSnapshot = function(base)
+            return { id = base.id }
+        end,
         Get = function(id)
             if id == "base_player" then return { id = id } end
         end,
     },
     BaseValidationService = { CanUse = function() return true end },
     FacilityService = {
+        BuildSnapshot = function(id)
+            return { id = id, definitionId = "farm",
+                constructionState = "UNDER_CONSTRUCTION" }
+        end,
         ResolveWorkTarget = function()
             return { x = 12, y = 18, z = 0, componentId = "field_a",
                 role = "farm.field" }
@@ -176,6 +187,14 @@ PNC = {
         JOB_BY_OPERATION = { CONSTRUCT = "Constructor" },
     },
     WorkRepository = { Get = function() return nil end },
+    WorkService = { Queries = {
+        BuildTaskSnapshot = function(colonyId)
+            equal(colonyId, community.id, "task snapshot colony")
+            return {{ id = "task-1", operation = "CONSTRUCT",
+                status = "WORKING", workerId = companion.id, percent = 25,
+                facilityId = "facility_farm" }}
+        end,
+    } },
 }
 
 local Management = dofile(ROOT .. "PNC_ColonyManagement.lua")
@@ -193,6 +212,11 @@ equal(snapshot.people[1].allowedJobs.Constructor, true,
     "every NPC may construct by default")
 equal(snapshot.people[1].allowedJobs.Researcher, true,
     "missing legacy permissions render as allowed")
+equal(#snapshot.tasks, 1, "active tasks included in colony snapshot")
+equal(snapshot.tasks[1].workerId, companion.id,
+    "task snapshot includes assigned colonist")
+equal(snapshot.settlement.facilities[1].activeTask.percent, 25,
+    "base facility exposes its active construction progress")
 
 local factionSnapshot, factionResult = Management.HandleAction(player, {
     action = "faction_rename", name = "River Wardens",

@@ -180,7 +180,7 @@ function Presentation.WorkActionStatus(snapshot)
             .. "%", ACTION_COLOR, true
     end
     if info.kind == "at_home" then
-        return tr("UI_PNC_Action_AtHome", "At Home"), ACTION_COLOR, true
+        return tr("UI_PNC_Action_Idle", "Idle"), ACTION_COLOR, true
     end
     if info.kind ~= "work_order" then return "", ACTION_COLOR, false end
     local operation = tostring(info.operation or "")

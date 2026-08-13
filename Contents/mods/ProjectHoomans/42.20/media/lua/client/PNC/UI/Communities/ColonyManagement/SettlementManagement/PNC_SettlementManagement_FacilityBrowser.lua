@@ -30,6 +30,12 @@ local function stateText(state)
     return string.gsub(tostring(state or "PLANNED"), "_", " ")
 end
 
+local function progressText(task)
+    if not task then return nil end
+    return tostring(math.max(0, math.min(100,
+        math.floor(tonumber(task.percent) or 0)))) .. "%"
+end
+
 local function drawFacility(list, y, entry, alternate)
     local facility = entry.item or {}
     UI.DrawListSelection(list, y, list.itemheight,
@@ -44,9 +50,19 @@ local function drawFacility(list, y, entry, alternate)
     list:drawText("L" .. tostring(facility.level or 1), list:getWidth() - 38,
         y + 9, Theme.colors.accent.r, Theme.colors.accent.g,
         Theme.colors.accent.b, Theme.colors.accent.a, UIFont.Small)
-    list:drawText(stateText(facility.cachedState), 18, y + 31,
+    local state = stateText(facility.cachedState)
+    local progress = progressText(facility.activeTask)
+    if progress then state = state .. "  •  " .. progress end
+    list:drawText(state, 18, y + 31,
         color.r, color.g, color.b, color.a, UIFont.Small)
-    list:drawText(tostring(#(facility.components or {})) .. " COMPONENTS",
+    local detail = tostring(#(facility.components or {})) .. " COMPONENTS"
+    if facility.activeTask then
+        detail = tostring(facility.activeTask.workerName
+            or tr("UI_PNC_Tasks_Unassigned", "UNASSIGNED")) .. "  •  "
+            .. stateText(facility.activeTask.executionMode
+                or facility.activeTask.status)
+    end
+    list:drawText(detail,
         18, y + 48, Theme.colors.textMuted.r, Theme.colors.textMuted.g,
         Theme.colors.textMuted.b, Theme.colors.textMuted.a, UIFont.Small)
     return y + list.itemheight
@@ -117,6 +133,19 @@ function Browser.RebuildComponents(window)
     if facility.constructionState ~= nil
         and facility.constructionState ~= "BUILT"
     then
+        local task = facility.activeTask
+        if task then
+            list:addItem("construction_progress", {
+                label = tr("UI_PNC_Facility_ConstructionProgress",
+                    "CONSTRUCTION PROGRESS") .. "  " .. progressText(task),
+                detail = tostring(task.workerName
+                    or tr("UI_PNC_Tasks_Unassigned", "UNASSIGNED"))
+                    .. "  •  " .. stateText(task.status)
+                    .. "  •  " .. stateText(task.executionMode
+                        or "EMULATED"),
+                complete = false,
+            })
+        end
         list:addItem("construction_locked", {
             label = tr("UI_PNC_Facility_ComponentsLocked",
                 "COMPONENTS LOCKED"),
@@ -126,7 +155,8 @@ function Browser.RebuildComponents(window)
         })
         window.baseComponentPane:setHeader(
             string.upper(facility.displayName or facility.definitionId),
-            stateText(facility.cachedState))
+            stateText(facility.cachedState)
+                .. (task and "  •  " .. progressText(task) or ""))
         return
     end
     local level = PNC.FacilityDefinitions.GetLevel(

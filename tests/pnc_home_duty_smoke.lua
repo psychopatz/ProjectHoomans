@@ -127,6 +127,11 @@ equal(arrived, true, "arrival handled")
 equal(npc.orderSpec.kind, "colony_home", "arrival installs At Home order")
 equal(PNC.HomeDutyService.BuildState(npc).state, "AT_HOME",
     "home state after arrival")
+npc.affiliation.communityID = nil
+equal(PNC.HomeDutyService.BuildState(npc).state, "AT_HOME",
+    "remembered home base survives missing legacy affiliation")
+equal(PNC.HomeDutyService.GetColonyId(npc), "colony-1",
+    "remembered home base resolves colony eligibility")
 
 npc.x, npc.y = 2, 3
 npc.presenceState = "live"

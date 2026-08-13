@@ -18,9 +18,26 @@ local function baseFor(record, baseId)
     if baseId and tostring(baseId) ~= "" then
         return PNC.BaseService and PNC.BaseService.Get(baseId) or nil
     end
+    local remembered = record and record.runtime
+        and record.runtime.homeBaseId
+        or record and record.orderSpec
+            and record.orderSpec.kind == "colony_home"
+            and record.orderSpec.baseId
+        or nil
+    if remembered and tostring(remembered) ~= "" then
+        local base = PNC.BaseService and PNC.BaseService.Get(remembered) or nil
+        if base then return base end
+    end
     local id = colonyId(record)
     return id ~= "" and PNC.BaseService
         and PNC.BaseService.GetForColony(id) or nil
+end
+
+function Service.GetColonyId(record)
+    local id = colonyId(record)
+    if id ~= "" then return id end
+    local base = baseFor(record)
+    return base and tostring(base.colonyId or "") or ""
 end
 
 local function homePoint(record, base)

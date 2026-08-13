@@ -84,7 +84,7 @@ function Jobs.BuildRows(context)
     local homeState = tostring(home.state or "NO_BASE")
     local homeDetails = {
         AT_HOME = Shared.Tr("UI_PNC_Jobs_AtHomeHelp",
-            "AT HOME - available for colony duties."),
+            "IDLE - available for colony duties."),
         RETURNING_HOME = Shared.Tr("UI_PNC_Jobs_ReturningHomeHelp",
             "RETURNING HOME - traveling through the world to the base."),
         AWAY = Shared.Tr("UI_PNC_Jobs_AwayHelp",

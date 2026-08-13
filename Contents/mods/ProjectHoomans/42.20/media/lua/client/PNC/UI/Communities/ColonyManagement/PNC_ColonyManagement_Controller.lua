@@ -111,6 +111,9 @@ function Controller.SelectTab(window, button)
     end
     if definition.selectable == false then return end
     window.tab = definition.id
+    if window.tab == "tasks" then
+        window:requestSnapshot("tasks_opened")
+    end
     Controller.UpdateTabStyles(window)
     Controller.ApplyTabLayout(window)
     Controller.RebuildDetails(window)

@@ -50,6 +50,11 @@ local function belongsToOrder(record, order)
         or record and record.factionId or "")
     local colonyId = tostring(affiliation.communityID or affiliation.communityId
         or record and record.communityId or "")
+    if colonyId == "" and PNC.HomeDutyService
+        and PNC.HomeDutyService.GetColonyId
+    then
+        colonyId = PNC.HomeDutyService.GetColonyId(record)
+    end
     return (order.factionId == "" or factionId == order.factionId)
         and (order.colonyId == "" or colonyId == order.colonyId)
 end
@@ -165,11 +170,15 @@ function Service.Commands.Queue(spec)
     return copy(order)
 end
 
-local function releaseClaim(order, reason)
+local function releaseClaim(order, reason, cancelInputs)
     if not order then return end
-    if reason ~= "complete" and PNC.WorkInputService
-        and order.payload and order.payload.input
+    local input = order.payload and order.payload.input
+    if PNC.WorkInputService and input
+        and (cancelInputs == true or input.staged == true)
     then
+        -- Collected inputs physically live on the current NPC and must return
+        -- to the stockpile before a replacement can collect them. An input
+        -- that is only reserved can remain attached to the durable order.
         PNC.WorkInputService.Cancel(order)
     end
     if order.stationId and Service.ClaimsByStation[order.stationId] == order.id then
@@ -390,7 +399,7 @@ function Service.Commands.Cancel(orderId, reason)
     local cancellation = Service.CancellationHandlers
         and Service.CancellationHandlers[order.operation]
     if cancellation then cancellation(order) end
-    releaseClaim(order, reason or "cancelled")
+    releaseClaim(order, reason or "cancelled", true)
     order.status, order.cancelledAt = Status.CANCELLED, now()
     order.terminalPersisted = false
     order.blockedReason, order.revision = nil, order.revision + 1
@@ -478,6 +487,45 @@ function Service.Queries.List(colonyId)
         if left.priority ~= right.priority then return left.priority > right.priority end
         return left.createdAt < right.createdAt
     end)
+    return output
+end
+
+function Service.Queries.BuildTaskSnapshot(colonyId)
+    local output = {}
+    for _, order in ipairs(Service.Queries.List(colonyId)) do
+        if not terminal(order) then
+            local worker = order.workerId and PNC.Registry
+                and PNC.Registry.Get and PNC.Registry.Get(order.workerId) or nil
+            local payload = order.payload or {}
+            local facilityId = order.facilityId or payload.facilityId
+            local facility = facilityId and PNC.SettlementRepository
+                and PNC.SettlementRepository.GetFacility(facilityId) or nil
+            local required = math.max(1, tonumber(order.requiredWork) or 1)
+            local progress = math.max(0, math.min(required,
+                tonumber(order.progress) or 0))
+            output[#output + 1] = {
+                id = order.id,
+                operation = order.operation,
+                status = order.status,
+                blockedReason = order.blockedReason,
+                progress = progress,
+                requiredWork = required,
+                percent = math.floor((progress / required) * 100 + 0.5),
+                priority = order.priority,
+                workerId = order.workerId,
+                workerName = worker and tostring(worker.name or worker.id) or nil,
+                executionMode = order.executionMode,
+                baseId = order.baseId,
+                facilityId = facilityId,
+                facilityDefinitionId = facility and facility.definitionId or nil,
+                stationId = order.stationId,
+                recipeId = order.recipeId,
+                quantity = order.quantity,
+                technologyId = payload.technologyId,
+                specimenFullType = payload.specimenFullType,
+            }
+        end
+    end
     return output
 end
 function Service.Queries.Diagnostics()

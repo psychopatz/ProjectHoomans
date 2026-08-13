@@ -8,6 +8,7 @@ local DebugTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManageme
 local BaseTab = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
 local SettingsTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_SettingsTab"
 local JobsTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_JobsTab"
+local TasksTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_TasksTab"
 
 Registry.Register({
     id = "overview",
@@ -81,6 +82,15 @@ Registry.Register({
     onControl = function(window, button)
         return JobsTab.OnControl(window, button)
     end,
+})
+
+Registry.Register({
+    id = "tasks",
+    title = function() return Shared.Tr("UI_PNC_Tasks_Tab", "TASKS") end,
+    detailTitle = "AVAILABLE COLONY TASKS",
+    showRoster = false,
+    showDetails = true,
+    buildRows = function(context) return TasksTab.BuildRows(context) end,
 })
 
 Registry.Register({

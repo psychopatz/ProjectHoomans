@@ -632,11 +632,22 @@ end
 function Internal.applyHoldAnimation(zombie, record, lane)
     local healthState = record and record.health and tostring(record.health.state or "normal") or "normal"
     local attackAction = record and record.runtime and record.runtime.attackAction or nil
+    local animationScene = record and record.runtime
+        and record.runtime.animationScene or nil
     local profile = lane and lane.motionProfile or nil
     if not zombie or not record then
         return
     end
     if attackAction and Core.Now() < (tonumber(attackAction.finishAt) or 0) then
+        return
+    end
+    if animationScene and animationScene.bump then
+        -- AnimationScenes owns stationary presentation while a work/social
+        -- scene is active. Applying the path lane's Idle pose here would
+        -- replace Hammer/HammerLow immediately after they are requested.
+        if lane and MotionHints and MotionHints.Clear then
+            MotionHints.Clear(lane)
+        end
         return
     end
     if lane and Core.Now() < (tonumber(lane.visualMovingUntil) or 0) then
