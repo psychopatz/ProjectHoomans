@@ -35,6 +35,21 @@ Client networking modules:
 - `PNC_ClientActions`: outbound debug, map, health, companion, and inventory
   commands
 
+Server command-routing modules:
+
+- `PNC_ServerCommandRouting`: canonical ordered entry point for authoritative
+  client-command routing
+- `PNC_ServerCommandRouter`: thin command-to-handler registry and dispatcher;
+  it does not reinterpret handler results or catch domain failures
+- `PNC_ServerInventoryCommandHandler`: network adapter for inventory transfer
+  and action requests; `PNC_ServerInventory` retains validation and mutation
+- `PNC_Server`: retains the single `Events.OnClientCommand` registration and
+  validates the `PNC` module namespace before router dispatch
+
+Server command families are migrated incrementally. Unregistered commands
+continue through the legacy dispatcher until their cohesive handler is
+extracted and validated.
+
 Client presence-reconciliation modules:
 
 - `PNC_ClientPresenceSync`: public facade, shared body maps, reset handling, and

@@ -9,6 +9,9 @@ if isClient() and not isServer() then
 end
 
 local Teleport = require "PsychopatzCore/World/PsychopatzTeleport"
+local CommandRouter = PNC and PNC.ServerCommandRouter or {
+    Handle = function() return false end,
+}
 
 PNC = PNC or {}
 PNC.Server = PNC.Server or {}
@@ -414,6 +417,10 @@ local function onClientCommand(module, command, player, args)
         return
     end
 
+    if CommandRouter.Handle(command, player, args) then
+        return
+    end
+
     if command == Const.CMD_PLAYER_BOOTSTRAP_REQUEST then
         PNC.PlayerKnowledgeCommands.HandleBootstrap(player, args or {})
         return
@@ -550,20 +557,6 @@ local function onClientCommand(module, command, player, args)
                 player,
                 args or {}
             )
-        end
-        return
-    end
-
-    if command == Const.CMD_INVENTORY_TRANSFER then
-        if PNC.ServerInventory and PNC.ServerInventory.Transfer then
-            PNC.ServerInventory.Transfer(player, args or {})
-        end
-        return
-    end
-
-    if command == Const.CMD_INVENTORY_ACTION then
-        if PNC.ServerInventory and PNC.ServerInventory.Action then
-            PNC.ServerInventory.Action(player, args or {})
         end
         return
     end

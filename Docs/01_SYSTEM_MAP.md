@@ -128,6 +128,22 @@
 - common definition files must remain declarative; runtime registries,
   lifecycle services, UI integrations, and engine adapters stay in `42.20`
 
+## Composition and Bootstrap
+
+- `shared/PNC/00_PNC_Init.lua`, `server/PNC/00_PNC_Server_Init.lua`, and
+  `client/PNC/00_PNC_Client_Init.lua` are deliberate PZ/Kahlua early-loading
+  anchors and must remain thin.
+- The anchors delegate respectively to `PNC_SharedComposition`,
+  `PNC_ServerComposition`, and `PNC_ClientComposition` under each runtime
+  layer's `PNC/Composition/` directory.
+- Composition roots own deterministic ordered `require(...)` calls. Ordinary
+  implementation modules must not depend on alphabetical filename order.
+- Server and client composition both begin through the shared anchor. The
+  server profiler installation and client EventMarkers binding retain their
+  established positions in their respective ordered manifests.
+- A bootstrap/load-order change requires SP, hosted-MP, and dedicated-server
+  startup validation before it is considered runtime-validated.
+
 ## Ownership and Load-Order Rules
 - use `PNC.Core.IsManagedNPCBody` instead of defining subsystem-local checks for the `PNC_NPC` body marker
 - equipment describes and applies loadout state, but reusable model and clothing-visual mutations belong to `PNC_Visuals`
