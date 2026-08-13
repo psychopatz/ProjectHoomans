@@ -598,5 +598,21 @@
     "UI_PNC_CommandStopActivity": "Stop Current Activity",
     "UI_PNC_ColonyDebug_FacilityWork": "SEND TO WORK FACILITY",
     "UI_PNC_ColonyDebug_StopFacilityWork": "STOP FACILITY TEST",
-    "UI_PNC_ColonyDebug_FacilityWorkState": "FACILITY TEST JOB"
+    "UI_PNC_ColonyDebug_FacilityWorkState": "FACILITY TEST JOB",
+    "UI_PNC_Jobs_ReturnHome": "RETURN HOME",
+    "UI_PNC_Jobs_Recover": "RECOVER NEAR STOCKPILE",
+    "UI_PNC_Jobs_HomeState": "HOME STATUS",
+    "UI_PNC_Jobs_AtHomeHelp": "AT HOME - available for colony duties.",
+    "UI_PNC_Jobs_ReturningHomeHelp": "RETURNING HOME - traveling through the world to the base.",
+    "UI_PNC_Jobs_AwayHelp": "AWAY - colony duties remain unavailable until this NPC returns.",
+    "UI_PNC_Jobs_NoBaseHelp": "NO BASE - establish a settlement before assigning duties.",
+    "UI_PNC_Action_ReturningHome": "Returning Home",
+    "UI_PNC_Action_AtHome": "At Home",
+    "UI_PNC_CommandReturnHome": "Go Home",
+    "UI_PNC_Flavor_ReturnHome_Player_1": "{names}, head home.",
+    "UI_PNC_Flavor_ReturnHome_Player_2": "Return to the base, {names}.",
+    "UI_PNC_Flavor_ReturnHome_Player_3": "{names}, get back home safely.",
+    "UI_PNC_Flavor_ReturnHome_NPC_1": "Heading home.",
+    "UI_PNC_Flavor_ReturnHome_NPC_2": "I'll return to the base.",
+    "UI_PNC_Flavor_ReturnHome_NPC_3": "On my way home."
 }

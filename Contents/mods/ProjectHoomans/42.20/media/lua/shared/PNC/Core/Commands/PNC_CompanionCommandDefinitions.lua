@@ -69,6 +69,29 @@ Commands.Register({
 })
 
 Commands.Register({
+    id = "return_home",
+    group = "movement",
+    labelKey = "UI_PNC_CommandReturnHome",
+    label = "Go Home",
+    emote = "followme",
+    icon = "media/ui/Emotes/PNC_EmoteFollow.png",
+    apply = function(record)
+        local home = PNC.HomeDutyService
+        if record.runtime and record.runtime.workOrderId
+            and PNC.WorkService and PNC.WorkService.Commands
+            and PNC.WorkService.Commands.ReleaseWorker
+        then
+            PNC.WorkService.Commands.ReleaseWorker(
+                record.id,
+                "return_home_command"
+            )
+        end
+        if not home or not home.SendHome then return false end
+        return home.SendHome(record, nil, "companion_command") == true
+    end,
+})
+
+Commands.Register({
     id = "stop_activity",
     group = "movement",
     labelKey = "UI_PNC_CommandStopActivity",

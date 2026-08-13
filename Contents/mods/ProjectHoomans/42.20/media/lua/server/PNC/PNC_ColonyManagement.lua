@@ -58,10 +58,32 @@ local function summary(record)
             and PNC.NPCSupplyService.GetDebugState(record) or {},
         journal=journal,
         allowedJobs=effectiveAllowedJobs(record),
+        home=PNC.HomeDutyService and PNC.HomeDutyService.BuildState
+            and PNC.HomeDutyService.BuildState(record) or nil,
         facilityDebugWork=record.runtime and record.runtime.facilityDebugWork
             and PNC.Core.DeepCopy(record.runtime.facilityDebugWork) or nil,
         priorityType=priorityType, priority=priority,
         location={x=record.x,y=record.y,z=record.z} }
+end
+
+
+local function colonistHomeAction(player, args, recover)
+    local record = PNC.Registry and PNC.Registry.Get(args.npcID) or nil
+    if not record or record.alive == false or not owned(record, player) then
+        return false, "npc_not_owned"
+    end
+    if not PNC.HomeDutyService then return false, "HOME_SERVICE_UNAVAILABLE" end
+    if recover == true then
+        return PNC.HomeDutyService.Recover(record, args.baseId)
+    end
+    if PNC.WorkService and PNC.WorkService.Commands
+        and PNC.WorkService.Commands.ReleaseWorker
+        and record.runtime and record.runtime.workOrderId
+    then
+        PNC.WorkService.Commands.ReleaseWorker(record.id, "return_home_requested")
+    end
+    return PNC.HomeDutyService.SendHome(
+        record, args.baseId, "player_requested")
 end
 
 local function setJobPermission(player, args)
@@ -387,6 +409,10 @@ function Management.HandleAction(player, args)
             PNC.ColonyStorageService.DebugAction(player, args)
     elseif action == "job_permission_set" then
         ok, reason, details = setJobPermission(player, args)
+    elseif action == "colonist_return_home" then
+        ok, reason, details = colonistHomeAction(player, args, false)
+    elseif action == "colonist_recover" then
+        ok, reason, details = colonistHomeAction(player, args, true)
     elseif action == "research_debug_upgrade" then
         ok, reason, storage = PNC.ColonyResearchService.DebugUpgrade(
             player, tostring(args.researchId or ""), args

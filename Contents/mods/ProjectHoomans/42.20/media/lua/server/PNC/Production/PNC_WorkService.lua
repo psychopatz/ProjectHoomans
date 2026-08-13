@@ -66,18 +66,46 @@ local function workerAvailable(record, order)
     -- Colony jobs are opt-out. Archetype tables predate colony production and
     -- therefore missing keys must mean allowed, not disabled.
     if type(allowed) == "table" and allowed[job] == false then return false end
+    if PNC.HomeDutyService and PNC.HomeDutyService.IsAtHome
+        and not PNC.HomeDutyService.IsAtHome(record, order.baseId)
+    then
+        return false
+    end
     return requirementsMet(record, order.requiredSkills)
 end
 
 local function findWorker(order)
     local selected
+    local away
     if not PNC.Registry then return nil end
     local function consider(record)
-        if not selected and workerAvailable(record, order) then selected = record end
+        if selected or not record or record.alive == false
+            or not belongsToOrder(record, order)
+        then
+            return
+        end
+        local job = Definitions.JOB_BY_OPERATION[order.operation]
+        local allowed = record.allowedJobs
+        local eligible = not Service.ClaimsByWorker[tostring(record.id)]
+            and not (record.runtime and record.runtime.workOrderId)
+            and not (type(allowed) == "table" and allowed[job] == false)
+            and requirementsMet(record, order.requiredSkills)
+        if not eligible then return end
+        if workerAvailable(record, order) then
+            selected = record
+        elseif not away then
+            away = record
+        end
     end
     if PNC.Registry.ForEach then PNC.Registry.ForEach(consider)
     else for _, record in pairs(PNC.Registry.Data or {}) do consider(record) end end
-    return selected
+    if not selected and away and PNC.HomeDutyService
+        and PNC.HomeDutyService.SendHome
+    then
+        PNC.HomeDutyService.SendHome(away, order.baseId, "work_waiting")
+        return nil, "WORKER_RETURNING_HOME"
+    end
+    return selected, selected and nil or "NO_QUALIFIED_WORKER"
 end
 
 function Service.RegisterCompletion(operation, handler)
@@ -372,6 +400,23 @@ function Service.Commands.Cancel(orderId, reason)
     return true, copy(order)
 end
 
+function Service.Commands.ReleaseWorker(workerId, reason)
+    workerId = tostring(workerId or "")
+    local orderId = Service.ClaimsByWorker[workerId]
+    local record = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(workerId) or nil
+    orderId = orderId or record and record.runtime
+        and record.runtime.workOrderId or nil
+    local order = orderId and Repository.Get(orderId) or nil
+    if not order or terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
+    releaseClaim(order, reason or "worker_released")
+    order.status = Status.WAITING_FOR_WORKER
+    order.blockedReason = nil
+    order.updatedAt, order.revision = now(), order.revision + 1
+    Repository.MarkDirty()
+    return true, copy(order)
+end
+
 function Service.Commands.Pause(orderId, paused)
     local order = Repository.Get(orderId)
     if not order or terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
@@ -455,7 +500,27 @@ end
 function Service.BuildActionInformation(record)
     local orderId = record and record.runtime and record.runtime.workOrderId
     local order = orderId and Repository.Get(orderId) or nil
-    if not order or terminal(order) then return nil end
+    if not order or terminal(order) then
+        if PNC.HomeDutyService
+            and PNC.HomeDutyService.IsReturningHome(record)
+        then
+            local progress = PNC.Travel and PNC.Travel.Service
+                and PNC.Travel.Service.GetProgress(record) or nil
+            return {
+                kind = "return_home",
+                state = progress and progress.state or "en_route",
+                percent = math.floor(math.max(0, math.min(1,
+                    tonumber(progress and progress.percent) or 0)) * 100 + 0.5),
+                baseId = record.runtime and record.runtime.homeBaseId or nil,
+            }
+        end
+        if record and record.orderSpec
+            and record.orderSpec.kind == "colony_home"
+        then
+            return { kind = "at_home", baseId = record.orderSpec.baseId }
+        end
+        return nil
+    end
     local required = math.max(1, tonumber(order.requiredWork) or 1)
     local progress = math.max(0, math.min(required,
         tonumber(order.progress) or 0))
@@ -504,10 +569,11 @@ local function processOrder(order, at)
         Repository.MarkDirty(); return
     end
     if not worker then
-        worker = findWorker(order)
+        local waitingReason
+        worker, waitingReason = findWorker(order)
         if not worker then
             order.status, order.blockedReason = Status.WAITING_FOR_WORKER,
-                "NO_QUALIFIED_WORKER"
+                waitingReason or "NO_QUALIFIED_WORKER"
             return
         end
         local ok, reason = claimStation(order, worker)
@@ -515,6 +581,16 @@ local function processOrder(order, at)
             order.status, order.blockedReason = Status.BLOCKED, reason
             Repository.MarkDirty(); return
         end
+    end
+    if PNC.HomeDutyService and PNC.HomeDutyService.IsAtHome
+        and not PNC.HomeDutyService.IsAtHome(worker, order.baseId)
+    then
+        releaseClaim(order, "worker_left_home")
+        order.status, order.blockedReason = Status.WAITING_FOR_WORKER,
+            "WORKER_RETURNING_HOME"
+        PNC.HomeDutyService.SendHome(worker, order.baseId, "worker_left_home")
+        Repository.MarkDirty()
+        return
     end
     local live = PNC.Registry.GetLiveZombie and PNC.Registry.GetLiveZombie(worker.id)
     local mode = live and "LIVE" or "ABSTRACT"

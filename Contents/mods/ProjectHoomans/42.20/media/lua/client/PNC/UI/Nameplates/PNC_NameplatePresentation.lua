@@ -172,7 +172,17 @@ end
 
 function Presentation.WorkActionStatus(snapshot)
     local info = snapshot and snapshot.actionInformation or nil
-    if not info or info.kind ~= "work_order" then return "", ACTION_COLOR, false end
+    if not info then return "", ACTION_COLOR, false end
+    if info.kind == "return_home" then
+        return tr("UI_PNC_Action_ReturningHome", "Returning Home")
+            .. "  " .. tostring(math.max(0,
+                math.min(100, math.floor(tonumber(info.percent) or 0))))
+            .. "%", ACTION_COLOR, true
+    end
+    if info.kind == "at_home" then
+        return tr("UI_PNC_Action_AtHome", "At Home"), ACTION_COLOR, true
+    end
+    if info.kind ~= "work_order" then return "", ACTION_COLOR, false end
     local operation = tostring(info.operation or "")
     local verb, target
     if operation == "CONSTRUCT" then

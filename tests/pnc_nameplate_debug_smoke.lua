@@ -205,6 +205,13 @@ local actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
 assertContains(actionText, "Building", "work action verb")
 assertContains(actionText, "barracks", "work action target")
 assertContains(actionText, "10%", "work action progress")
+snapshot.actionInformation = { kind = "return_home", percent = 35 }
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+assertContains(actionText, "Returning Home", "home travel action")
+assertContains(actionText, "35%", "home travel progress")
+snapshot.actionInformation = { kind = "at_home" }
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+assertContains(actionText, "At Home", "at-home action")
 snapshot.actionInformation = nil
 
 local entriesPath = ROOT .. "PNC/UI/Nameplates/PNC_NameplateEntries.lua"

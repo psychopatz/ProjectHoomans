@@ -14,6 +14,8 @@ local records = {}
 local broadcasts = {}
 local marked = {}
 local liveBodies = {}
+local sentHome = {}
+local releasedWorkers = {}
 
 local function companion(id, owner, x)
     return {
@@ -94,6 +96,27 @@ PNC = {
                 weaponStatus = tostring(record.weaponMode) .. "_ready",
             }
         end,
+    },
+    HomeDutyService = {
+        SendHome = function(record, _, reason)
+            sentHome[#sentHome + 1] = {
+                id = record.id,
+                reason = reason,
+            }
+            return true, "RETURNING_HOME"
+        end,
+    },
+    WorkService = {
+        Commands = {
+            ReleaseWorker = function(id, reason)
+                releasedWorkers[#releasedWorkers + 1] = {
+                    id = id,
+                    reason = reason,
+                }
+                records[tostring(id)].runtime.workOrderId = nil
+                return true
+            end,
+        },
     },
 }
 
@@ -188,7 +211,7 @@ records.owned.affiliation = { factionID = "faction_alice" }
 assertEqual(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
     true, "single-player faction ownership uses canonical account key")
 
-assertEqual(#PNC.CompanionCommands.List(), 7, "registered command count")
+assertEqual(#PNC.CompanionCommands.List(), 8, "registered command count")
 assertEqual(#PNC.CompanionCommands.ListGroups(), 2,
     "registered command group count")
 assertEqual(
@@ -262,6 +285,23 @@ assertEqual(records.owned.orderSpec.kind, "follow",
     "group follow did not update closest companion")
 assertEqual(records.owned_second.orderSpec.kind, "follow",
     "group follow did not update second companion")
+records.owned.runtime.workOrderId = "work-1"
+affected, reason = PNC.CompanionCommands.Execute(player, {
+    id = "owned",
+    commandID = "return_home",
+})
+assertEqual(affected, 1, "single go-home command target count")
+assertEqual(sentHome[#sentHome].id, "owned", "single go-home target")
+assertEqual(sentHome[#sentHome].reason, "companion_command",
+    "single go-home source")
+assertEqual(releasedWorkers[#releasedWorkers].id, "owned",
+    "go-home command released active work")
+affected, reason = PNC.CompanionCommands.Execute(player, {
+    commandID = "return_home",
+    scope = "group",
+})
+assertEqual(affected, 2, "all-nearby go-home target count")
+assertEqual(reason, "commanded", "all-nearby go-home result")
 records.owned.runtime.attackAction = { finishAt = 9999 }
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
@@ -419,16 +459,18 @@ registeredProvider.addOptions(
 )
 assertEqual(context.options[1].name, "Companion Commands",
     "context command root")
-assertEqual(#context.options[1].submenu.options, 3,
+assertEqual(#context.options[1].submenu.options, 4,
     "movement commands and nested attack root")
-assertEqual(context.options[1].submenu.options[3].name, "Attack Type",
+assertEqual(context.options[1].submenu.options[3].name, "Go Home",
+    "context go-home command")
+assertEqual(context.options[1].submenu.options[4].name, "Attack Type",
     "nested attack type root")
-local attackOptions = context.options[1].submenu.options[3].submenu.options
+local attackOptions = context.options[1].submenu.options[4].submenu.options
 assertEqual(#attackOptions, 4, "attack type definitions")
 assertEqual(attackOptions[4].notAvailable, true,
     "current attack type is disabled and red")
 assertEqual(
-    context.options[1].submenu.options[3].iconTexture,
+    context.options[1].submenu.options[4].iconTexture,
     "media/ui/emotes/no.png",
     "context attack type icon did not reflect current setting"
 )
@@ -567,6 +609,18 @@ assertEqual(
 )
 assertEqual(
     ISEmoteRadialMenu.menu.PNC_ClosestCompanionCommands
+        .subMenu.PNC_ClosestCommand_return_home,
+    "Go Home",
+    "closest radial go-home slice"
+)
+assertEqual(
+    ISEmoteRadialMenu.menu.PNC_GroupCompanionCommands
+        .subMenu.PNC_GroupCommand_return_home,
+    "Go Home",
+    "all-nearby radial go-home slice"
+)
+assertEqual(
+    ISEmoteRadialMenu.menu.PNC_ClosestCompanionCommands
         .subMenu.PNC_ClosestCommandGroup_attack_type,
     "Attack Type",
     "radial nested attack type slice"
@@ -646,6 +700,13 @@ assertEqual(radialSent[2].scope, "group", "group radial scope")
 assert(#radialFlavor.context.targets >= 1,
     "group radial flavor omitted nearby companions")
 assertEqual(originalVisual, "followme", "radial visual emote")
+radial:emote("PNC_GroupCommand_return_home")
+assertEqual(radialSent[3].commandID, "return_home",
+    "group radial go-home dispatch")
+assertEqual(radialSent[3].npcId, nil,
+    "group radial go-home target should be nil")
+assertEqual(radialSent[3].scope, "group",
+    "group radial go-home scope")
 radial:emote("wavehi")
 assertEqual(originalVisual, "wavehi", "ordinary emote delegation")
 

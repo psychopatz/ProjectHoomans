@@ -32,6 +32,16 @@ register("stay", {
     { key = "UI_PNC_Flavor_Stay_NPC_3", fallback = "I'll keep watch." },
 })
 
+register("return_home", {
+    { key = "UI_PNC_Flavor_ReturnHome_Player_1", fallback = "{names}, head home." },
+    { key = "UI_PNC_Flavor_ReturnHome_Player_2", fallback = "Return to the base, {names}." },
+    { key = "UI_PNC_Flavor_ReturnHome_Player_3", fallback = "{names}, get back home safely." },
+}, {
+    { key = "UI_PNC_Flavor_ReturnHome_NPC_1", fallback = "Heading home." },
+    { key = "UI_PNC_Flavor_ReturnHome_NPC_2", fallback = "I'll return to the base." },
+    { key = "UI_PNC_Flavor_ReturnHome_NPC_3", fallback = "On my way home." },
+})
+
 register("attack_auto", {
     { key = "UI_PNC_Flavor_AttackAuto_Player_1", fallback = "{name}, use your best judgment." },
     { key = "UI_PNC_Flavor_AttackAuto_Player_2", fallback = "{name}, handle threats as you see fit." },
