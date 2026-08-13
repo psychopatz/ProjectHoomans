@@ -2,5 +2,14 @@
 
 require "PNC/Networking/PNC_ServerCommandRouter"
 require "PNC/Networking/Handlers/PNC_ServerInventoryCommandHandler"
+require "PNC/Networking/Handlers/PNC_ServerKnowledgeCommandHandler"
+require "PNC/Networking/Handlers/PNC_ServerConversationCommandHandler"
+require "PNC/Networking/Handlers/PNC_ServerCharacterReplicationCommandHandler"
+require "PNC/Networking/Handlers/PNC_ServerHealthCombatCommandHandler"
+require "PNC/Networking/Handlers/PNC_ServerGameplayRequestCommandHandler"
+require "PNC/Networking/Handlers/PNC_ServerDiagnosticQueryCommandHandler"
+require "PNC/Networking/Handlers/PNC_ServerAuthorityDiagnosticCommandHandler"
+require "PNC/Networking/Handlers/PNC_ServerColonyManagementCommandHandler"
+require "PNC/Networking/Handlers/PNC_ServerLegacyDebugCommandHandler"
 
 return PNC.ServerCommandRouter

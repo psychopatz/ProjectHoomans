@@ -16,7 +16,10 @@ local function assertContains(value, needle, label)
 end
 
 local api = readAll(ROOT .. "shared/PNC/Core/API/PNC_API.lua")
-local server = readAll(ROOT .. "server/PNC/PNC_Server.lua")
+local serverRoute = readAll(
+    ROOT .. "server/PNC/Networking/Handlers/"
+        .. "PNC_ServerLegacyDebugCommandHandler.lua"
+)
 local monitor = readAll(ROOT .. "client/PNC/UI/PNC_NPCMonitor.lua")
 local view = readAll(
     ROOT .. "client/PNC/UI/NPCMonitor/PNC_NPCMonitorView.lua"
@@ -38,8 +41,8 @@ assertContains(
     "inventory/equipment reconciliation"
 )
 assertContains(
-    server,
-    'args.action == "set_equipment_slot"',
+    serverRoute,
+    'set_equipment_slot = true',
     "MP debug routing"
 )
 assertContains(

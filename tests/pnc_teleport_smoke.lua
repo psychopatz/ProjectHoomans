@@ -1,5 +1,7 @@
 local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
-package.path = CLIENT_ROOT .. "?.lua;" .. package.path
+local SERVER_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
+package.path = CLIENT_ROOT .. "?.lua;" .. SERVER_ROOT .. "?.lua;"
+    .. package.path
 
 local CLIENT_FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_Client.lua"
 local SERVER_FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/PNC_Server.lua"
@@ -107,6 +109,8 @@ PNC = {
     Network = {},
 }
 
+require "PNC/Networking/PNC_ServerCommandRouter"
+require "PNC/Networking/Handlers/PNC_ServerLegacyDebugCommandHandler"
 dofile(SERVER_FILE)
 onClientCommand("PNC", "DebugCommand", serverPlayer, { action = "teleport_to_npc", id = "far_npc" })
 local serverCall = coreTeleportCalls[#coreTeleportCalls]

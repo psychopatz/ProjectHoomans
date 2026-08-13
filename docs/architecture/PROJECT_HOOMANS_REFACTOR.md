@@ -2,8 +2,8 @@
 
 ## Current Chunk
 
-Chunk 3A — Server command protocol inventory and first cohesive handler (`[x]`).
-Chunk 3 remains active; Chunk 3B is next.
+Chunk 3J — Legacy debug-envelope command routing (`[x]`).
+Chunk 3 is complete; Chunk 4 is next.
 
 Chunk 0 established the baseline only. No gameplay, network, persistence, or
 load-order code changed.
@@ -13,7 +13,7 @@ load-order code changed.
 - [x] Chunk 0 — Baseline and architectural inventory
 - [x] Chunk 1 — Standard Project Hoomans domain contract
 - [x] Chunk 2 — Composition/bootstrap cleanup
-- [>] Chunk 3 — Server command routing
+- [x] Chunk 3 — Server command routing
 - [ ] Chunk 4 — Pilot vertical slice: Needs → Provision → Supply → Inventory
 - [ ] Chunk 5 — Pilot evaluation gate
 - [ ] Chunk 6 — UI boundary migration, incrementally by feature
@@ -28,11 +28,10 @@ load-order code changed.
 
 ## Current Goal
 
-Chunk 3A is complete. Chunk 3B should migrate the next cohesive direct-delegate
-command family using the established router contract. Preserve command
-identifiers, payloads, validation, authority, responses, side effects,
-fallthrough behavior, and registration timing. Do not split unrelated
-monoliths.
+Chunk 3J and the server-command routing phase are complete. Chunk 4 should
+begin the Needs → Provision → Supply → Inventory pilot vertical slice by
+confirming current ownership, writers, queries, commands, persistence, and
+runtime budgets before changing behavior. Do not split unrelated monoliths.
 
 ## Contracts Being Preserved
 
@@ -138,6 +137,96 @@ pre-approved folder moves.
 
 ## Completed This Chunk
 
+- Chunk 3J moved the legacy `CMD_DEBUG` compatibility envelope behind one
+  explicit handler while preserving its single authorization gate, all action
+  strings, early-return semantics, payload mutation, domain/API calls,
+  responses, and unknown-action no-op behavior.
+- Kept `PsychopatzTeleport` loading at its original `PNC_Server` position and
+  injected the loaded mechanism into the registered debug handler, preserving
+  initialization timing while making the dependency explicit.
+- Grouped the handler's internal action families into cohesive local helpers;
+  the final audit introduces no replacement large-function finding.
+- `PNC_Server.onClientCommand` now contains only the PNC module-namespace gate
+  and canonical router dispatch. The single `Events.OnClientCommand`
+  registration remains at its prior location.
+- Updated three source-inspection smoke tests to follow the canonical routed
+  debug entry and added comprehensive legacy-envelope behavior coverage.
+- Chunk 3I added one colony-management network adapter for snapshot and action
+  requests while leaving action policy in `PNC.ColonyManagement`.
+- Preserved raw action payload identity including nil, `actionResult`
+  attachment, the exact twelve-action settlement allowlist, settlement and
+  storage delta arguments, full-snapshot fallback, and the existing
+  `unknown_colony_action` unavailable-handler result.
+- Loaded the adapter deterministically from the canonical server routing entry
+  and added focused coverage for all allowlisted settlement actions.
+- Chunk 3H added one authority-diagnostics adapter for faction debug/member,
+  community debug, Needs debug, and Director debug requests.
+- Preserved all four admin gates, exact diagnostic snapshot arguments,
+  response flags/reasons, ungated faction membership query behavior, faction
+  member action payload identity, and nil-payload normalization.
+- Kept snapshot and mutation policy in FactionDebug, FactionMembership,
+  CommunityDebug, NeedsDebug, and AbstractDirectorDebug; the adapter only
+  translates network requests and responses.
+- Loaded the adapter deterministically from the canonical server routing entry
+  and added focused authority-diagnostics routing coverage.
+- Chunk 3G added one diagnostic-query adapter for debug-roster, relationship,
+  conversation-safe relationship, NPC-knowledge, and knowledge-debug requests.
+- Preserved multiplayer/SP debug authorization, optional body-audit timing,
+  audit metadata, response shapes/reasons, relationship payload identity,
+  all-known fan-out, direct-disclosure arguments, and unavailable-service
+  reasons.
+- Extended the router callback contract with an optional untouched raw payload
+  while preserving the normalized second argument. This retains the legacy
+  distinction between missing and empty knowledge-debug payloads without
+  changing existing handlers.
+- Loaded the adapter deterministically from the canonical server routing entry
+  and added focused diagnostic routing coverage.
+- Chunk 3F added one boundary-level gameplay-request adapter for companion
+  orders, map commands, and faction-toll responses without moving policy out
+  of their existing domains.
+- Preserved companion payload guards and identity, map payload normalization,
+  the `source = "network"` context, centralized debug authorization, exact map
+  result response command/payload, unavailable-service response, and toll
+  payload normalization.
+- Loaded the adapter from the canonical ordered server routing entry; no
+  bootstrap anchor, composition timing, or event registration changed.
+- Added focused gameplay-request routing coverage and updated protocol and
+  Networking documentation.
+- Chunk 3E added one health/combat adapter for revive, bandage, and
+  player-weapon-hit requests.
+- Preserved malformed-payload no-op behavior, `args or {}` normalization,
+  original weapon-hit payload identity, treatment options, and domain-owned
+  authoritative mutation.
+- Moved the unchanged debug authorization policy to
+  `PNC_ServerCommandRouter.CanUseDebug`; SP still uses the debug flag and
+  multiplayer still requires the admin access level.
+- Added focused health/combat routing coverage and updated protocol/Networking
+  documentation.
+- Chunk 3D added one character-replication adapter for full-sync and authorized
+  character-detail/inventory-delta requests.
+- Moved roster/death-marker list assembly out of `PNC_Server` while preserving
+  record order, optional death-marker support, snapshot builders, and broadcast
+  behavior.
+- Preserved character visibility checks, positive inventory-revision response
+  selection, original revision values, unauthorized warnings, and malformed
+  request no-op behavior.
+- Added focused replication routing coverage and updated protocol/Networking
+  documentation.
+- Chunk 3C added one conversation adapter for begin/end/ceasefire scene
+  commands and category/choice/recruit Authority requests.
+- Preserved scene command strings, original command forwarding, `args or {}`
+  normalization, optional Authority guards, and domain-owned validation,
+  mutations, history, and response construction.
+- Added focused routing coverage for scene, category, choice, recruit,
+  nil-payload, and unavailable-Authority behavior; updated protocol and
+  Networking documentation.
+- Chunk 3B added one knowledge/discovery adapter for player bootstrap, NPC
+  presentation, knowledge disclosure, and both world-discovery commands.
+- Preserved original payload-table identity, `args or {}` normalization,
+  knowledge-service validation, discovery action handling, and
+  `SendWorldDiscovery` response behavior.
+- Added focused handler coverage for all five command identifiers and the
+  discovery response path; updated the protocol inventory and Networking docs.
 - Chunk 3A inventoried all current server command families and legacy
   `CMD_DEBUG` actions in `PROJECT_HOOMANS_SERVER_COMMANDS.md`.
 - Added the canonical `PNC_ServerCommandRouting` entry point, thin
@@ -219,6 +308,128 @@ pre-approved folder moves.
   equivalent findings at 1060 lines and 680 lines; no net finding-count change.
 - Chunk 3A network protocol changed: NO. Authority changed: NO. Persistence
   changed: NO. Event registration timing changed: NO.
+- Chunk 3B `luac -p` and Kahlua checks passed for the new handler, routing entry,
+  `PNC_Server`, and focused test.
+- Seven targeted smoke tests passed: knowledge handler, server router, player
+  knowledge commands, world discovery, world-discovery MP client guard, client
+  commands, and composition bootstrap.
+- Architecture rescan: 579 production files, 182 tests, health 65.0, and 116
+  production findings. `PNC_Server` is now 1039 code lines and
+  `onClientCommand` is 655 lines; equivalent size findings remain.
+- Chunk 3B network protocol changed: NO. Authority changed: NO. Persistence
+  changed: NO. Event registration timing changed: NO.
+- Chunk 3C `luac -p` and Kahlua checks passed for the conversation adapter,
+  routing entry, `PNC_Server`, and focused test.
+- Seven actual targeted smoke tests passed: conversation handler, conversation
+  authority, conversation safety, conversation integration, debug companion
+  recruit, server router, and composition bootstrap.
+- Architecture rescan: 580 production files, 183 tests, health 65.0, and 116
+  production findings. `PNC_Server` is now 1007 code lines and
+  `onClientCommand` is 619 lines; equivalent size findings remain.
+- Chunk 3C network protocol changed: NO. Authority changed: NO. Persistence
+  changed: NO. Event registration timing changed: NO.
+- Chunk 3D `luac -p` and Kahlua checks passed for the replication adapter,
+  routing entry, `PNC_Server`, and focused test.
+- Six targeted smoke tests passed: character replication handler, network
+  scale, client commands, inventory transactions, server router, and
+  composition bootstrap.
+- Architecture rescan: 581 production files, 184 tests, health 65.0, and 116
+  production findings. `PNC_Server` is now 974 code lines and
+  `onClientCommand` is 596 lines; equivalent size findings remain.
+- Chunk 3D network protocol changed: NO. Authority changed: NO. Persistence
+  changed: NO. Event registration timing changed: NO.
+- Chunk 3E `luac -p` and Kahlua checks passed for the health/combat adapter,
+  command router, routing entry, `PNC_Server`, and focused test.
+- Ten targeted smoke tests passed: health/combat handler, character
+  replication handler, conversation handler, knowledge handler, server router,
+  bandage timed action, bandage context menu, player damage, melee live commit,
+  and composition bootstrap.
+- Architecture rescan: 582 production files, 185 tests, health 65.0, and 116
+  production findings. `PNC_Server` is now 942 code lines and
+  `onClientCommand` is 571 lines; equivalent size findings remain.
+- Codebase-memory coverage still excludes the production `media` tree; exact
+  source reads and focused tests supplied the fallback evidence for this
+  chunk. The new test has no recorded index issue but is not freshness-tracked.
+- Chunk 3E network protocol changed: NO. Authority changed: NO. Persistence
+  changed: NO. Event registration timing changed: NO.
+- Chunk 3F `luac -p` and Kahlua checks passed for the gameplay-request adapter,
+  routing entry, `PNC_Server`, and focused test.
+- Seven targeted smoke tests passed: gameplay-request handler, server router,
+  companion commands, map-command service, faction tolls, client commands, and
+  composition bootstrap.
+- Architecture rescan: 583 production files, 186 tests, health 65.0, and 116
+  production findings. `PNC_Server` is now 904 code lines and
+  `onClientCommand` is 532 lines; equivalent size findings remain.
+- Codebase-memory coverage still excludes the production `media` tree; exact
+  source reads supplied fallback evidence. The new focused test has no
+  recorded index issue but is not freshness-tracked.
+- Chunk 3F network protocol changed: NO. Authority changed: NO. Persistence
+  changed: NO. Event registration timing changed: NO.
+- Chunk 3G `luac -p` and Kahlua checks passed for the diagnostic adapter,
+  router, routing entry, `PNC_Server`, and focused test.
+- Fourteen targeted smoke tests passed: diagnostic-query handler, server
+  router, body lifecycle, knowledge, player-knowledge commands, relationship
+  foundation, relationship graph, client commands, composition bootstrap, and
+  all five previously routed server-handler suites selected by the affected
+  analysis.
+- Architecture rescan: 584 production files, 187 tests, health 65.0, and 115
+  production findings. `PNC_Server` is now 793 code lines and no longer has a
+  large-module finding; `onClientCommand` is 420 lines and remains a staged
+  large-function finding.
+- Codebase-memory coverage still excludes the production `media` tree; exact
+  source reads supplied fallback evidence. The new focused test has no
+  recorded index issue but is not freshness-tracked.
+- Chunk 3G network protocol changed: NO. Authority changed: NO. Persistence
+  changed: NO. Event registration timing changed: NO.
+- Chunk 3H `luac -p` and Kahlua checks passed for the authority-diagnostics
+  adapter, routing entry, `PNC_Server`, and focused test.
+- Nine targeted smoke tests passed: authority-diagnostics handler, server
+  router, faction foundation, community foundation, Needs foundation,
+  community Director, faction-member UI, client commands, and composition
+  bootstrap.
+- Architecture rescan: 585 production files, 188 tests, health 65.0, coverage
+  63.0%, and 115 production findings. `PNC_Server` is now 696 code lines and
+  `onClientCommand` is 319 lines; the staged large-function finding remains.
+- Codebase-memory coverage still excludes the production `media` tree; exact
+  source reads supplied fallback evidence. The new focused test has no
+  recorded index issue but is not freshness-tracked.
+- Chunk 3H network protocol changed: NO. Authority changed: NO. Persistence
+  changed: NO. Event registration timing changed: NO.
+- Chunk 3I `luac -p` and Kahlua checks passed for the colony adapter, routing
+  entry, `PNC_Server`, and focused test.
+- Eight relevant smoke tests passed: colony routing, server router, colony
+  management, colony-management UI model, settlement foundation, facility
+  debug work, client commands, and composition bootstrap.
+- `pnc_colony_storage_smoke` deterministically fails its pre-existing journal
+  hard-cap assertion (`expected=10`, `actual=14`). It imports no modified
+  routing/server modules and no storage or journal file changed in this chunk;
+  the failure is recorded rather than expanded into an unrelated fix.
+- Architecture rescan: 586 production files, 189 tests, health 65.0, coverage
+  63.0%, and 115 production findings. `PNC_Server` is now 660 code lines and
+  `onClientCommand` is 282 lines; the staged large-function finding remains.
+- Codebase-memory coverage still excludes the production `media` tree; exact
+  source reads supplied fallback evidence. The new focused test has no
+  recorded index issue but is not freshness-tracked.
+- Chunk 3I network protocol changed: NO. Authority changed: NO. Persistence
+  changed: NO. Event registration timing changed: NO.
+- Chunk 3J `luac -p` and Kahlua checks passed for the debug handler, routing
+  entry, `PNC_Server`, and affected tests.
+- Eight focused debug/routing smoke tests passed, followed by all eight other
+  server-handler suites selected for cross-handler regression coverage.
+- Full Lua smoke sweep: 186 passed and 4 failed out of 190. The failures are
+  outside modified routing code: the recorded colony journal-cap mismatch;
+  a faction-warfare ownership expectation; and missing-module harness errors
+  in map-hover portrait and NPC-monitor tracking tests. None of those four test
+  files or their cited domain modules changed in Chunk 3J.
+- Architecture rescan: 587 production files, 190 tests, health 65.0, coverage
+  63.0%, and 114 production findings. Relative to the Chunk 0 baseline, both
+  the `PNC_Server` large-module and `onClientCommand` large-function findings
+  are resolved with no replacement finding. `PNC_Server` is 320 code lines.
+- Codebase-memory coverage still excludes the production `media` tree; exact
+  source reads supplied fallback evidence. Modified tests report no recorded
+  coverage issue but metadata freshness requires reindexing.
+- Chunk 3J network protocol changed: NO. Authority changed: NO. Persistence
+  changed: NO. Event registration timing changed: NO.
 
 ## Open Issues
 
@@ -234,13 +445,16 @@ pre-approved folder moves.
   chunks.
 - Chunk 2 has static/simulated bootstrap coverage but still requires live SP,
   hosted-MP, and dedicated-server startup confirmation before runtime release.
-- Chunk 3 remains incomplete: inventory is routed, while all families listed
-  under `Remaining Direct Families` in the server command inventory still use
-  the legacy dispatcher.
+- Chunk 3 is structurally complete: every inventoried server command family is
+  routed, the namespace gate and event registration remain in `PNC_Server`,
+  and unknown commands remain no-ops.
+- The unrelated colony-storage journal-cap smoke failure described in Chunk 3I
+  remains open for its owning storage/journal work rather than being folded
+  into command routing.
 
 ## Next Chunk
 
-Chunk 3B — migrate the next cohesive direct-delegate command family through
-the established router, update the command inventory, and validate its exact
-protocol and authority behavior. Chunk 3 remains `[>]` until every planned
-family is migrated and the legacy dispatcher is thin.
+Chunk 4 — begin the Needs → Provision → Supply → Inventory pilot vertical
+slice. Confirm current ownership and contracts first, then introduce the
+smallest useful command/query boundary without changing persistence, authority,
+or runtime budgets.

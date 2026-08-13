@@ -10,8 +10,9 @@ local ROOT =
 local api = readAll(
     ROOT .. "shared/PNC/Core/API/PNC_API.lua"
 )
-local server = readAll(
-    ROOT .. "server/PNC/PNC_Server.lua"
+local serverRoute = readAll(
+    ROOT .. "server/PNC/Networking/Handlers/"
+        .. "PNC_ServerLegacyDebugCommandHandler.lua"
 )
 local context = readAll(
     ROOT
@@ -34,7 +35,7 @@ local actions = {
 for _, action in ipairs(actions) do
     assert(string.find(api, action, 1, true),
         "API route missing " .. action)
-    assert(string.find(server, action, 1, true),
+    assert(string.find(serverRoute, action, 1, true),
         "server route missing " .. action)
     assert(string.find(window, action, 1, true),
         "scene lab route missing " .. action)

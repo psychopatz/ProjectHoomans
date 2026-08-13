@@ -43,12 +43,46 @@ Server command-routing modules:
   it does not reinterpret handler results or catch domain failures
 - `PNC_ServerInventoryCommandHandler`: network adapter for inventory transfer
   and action requests; `PNC_ServerInventory` retains validation and mutation
+- `PNC_ServerKnowledgeCommandHandler`: network adapter for player bootstrap,
+  NPC presentation, knowledge disclosure, and world-discovery requests; the
+  existing knowledge/discovery services retain validation, persistence, and
+  response construction
+- `PNC_ServerConversationCommandHandler`: adapter for conversation scene,
+  category, choice, and recruit commands; scene and Authority services retain
+  leases, eligibility rules, mutations, history, and response construction
+- `PNC_ServerCharacterReplicationCommandHandler`: owns full-roster request
+  assembly and authorized character-detail response selection; existing
+  Registry and Network services retain record ownership, visibility policy,
+  snapshot schemas, deltas, and transport
+- `PNC_ServerHealthCombatCommandHandler`: adapter for revive, bandage, and
+  player-weapon-hit requests; Revive, Treatment, and PlayerDamage retain
+  validation and authoritative mutation
+- `PNC_ServerGameplayRequestCommandHandler`: boundary adapter for companion
+  orders, map commands, and faction-toll responses; their existing domain
+  services retain policy, validation, and mutation ownership
+- `PNC_ServerDiagnosticQueryCommandHandler`: authorized debug-roster,
+  relationship, conversation-safe relationship, NPC-knowledge, and
+  knowledge-debug query adapter; domain services retain snapshot policy
+- `PNC_ServerAuthorityDiagnosticCommandHandler`: faction debug/member,
+  community debug, Needs debug, and Director debug adapter; membership and
+  diagnostic services retain validation, snapshot, and mutation policy
+- `PNC_ServerColonyManagementCommandHandler`: colony snapshot/action adapter;
+  ColonyManagement retains action policy while the adapter preserves
+  action-result attachment and settlement delta/full response selection
+- `PNC_ServerLegacyDebugCommandHandler`: compatibility adapter for the legacy
+  `CMD_DEBUG` action envelope; it preserves one authorization gate and delegates
+  to existing debug/domain APIs
+- `PNC_ServerCommandRouter.CanUseDebug`: preserves the existing SP debug-mode
+  and multiplayer-admin authorization policy for routed commands
+- `PNC_ServerCommandRouter.Handle`: supplies handlers a normalized payload and
+  the untouched raw payload as an optional third argument where legacy nil
+  semantics must be preserved
 - `PNC_Server`: retains the single `Events.OnClientCommand` registration and
   validates the `PNC` module namespace before router dispatch
 
-Server command families are migrated incrementally. Unregistered commands
-continue through the legacy dispatcher until their cohesive handler is
-extracted and validated.
+All current server command families register through the canonical routing
+entry. Unknown commands are consumed by neither the router nor a fallback
+dispatcher and therefore remain no-ops.
 
 Client presence-reconciliation modules:
 

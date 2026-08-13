@@ -19,8 +19,21 @@ end
 function Router.Handle(command, player, args)
     local handler = Handlers[command]
     if not handler then return false end
-    handler(player, args or {})
+    handler(player, args or {}, args)
     return true
+end
+
+function Router.CanUseDebug(player)
+    local access
+    if not isServer or not isServer() then
+        if isDebugEnabled then
+            return isDebugEnabled() == true
+        end
+        return getCore and getCore() and getCore():getDebug() == true or false
+    end
+    access = player and player.getAccessLevel
+        and tostring(player:getAccessLevel() or "") or ""
+    return string.lower(access) == "admin"
 end
 
 return Router
