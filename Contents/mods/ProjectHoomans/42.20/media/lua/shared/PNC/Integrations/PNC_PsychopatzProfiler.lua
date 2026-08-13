@@ -272,7 +272,16 @@ function Integration.ApplyCaptureConfig(config)
     return true
 end
 
-Bootstrap.RegisterCaptureController("ProjectHoomans", Integration.ApplyCaptureConfig)
-Integration.ApplyCaptureConfig(Bootstrap.GetCaptureConfig())
+local ProfilerFeatures = require "PsychopatzCore/Profiler/PsychopatzProfilerFeatureRegistry"
+ProfilerFeatures.Register({
+    id = "ProjectHoomans",
+    namespace = "ProjectHoomans",
+    displayName = "Project Hoomans",
+    sections = { "performance", "moddata", "npc" },
+    install = function(_, config)
+        return Integration.ApplyCaptureConfig(config)
+    end,
+    uninstall = Integration.Restore,
+})
 
 return Integration
