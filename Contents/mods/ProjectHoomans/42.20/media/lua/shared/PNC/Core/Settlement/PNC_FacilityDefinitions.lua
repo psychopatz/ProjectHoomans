@@ -93,4 +93,65 @@ Definitions.Register({
     },
 })
 
+Definitions.Register({
+    id = "research_facility",
+    displayNameKey = "UI_PNC_Facility_Research",
+    descriptionKey = "UI_PNC_Facility_ResearchDescription",
+    -- Reuse shipped facility art until dedicated production art is available.
+    iconPath = "media/ui/Facilities/PNC_Barracks_Placeholder.png",
+    buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+    allowMultipleRegions = false,
+    levels = {
+        [1] = {
+            requiredHQLevel = 1,
+            capabilities = { "work.research" },
+            componentLimits = {
+                ["research.room"] = { kind = "region", minCount = 1,
+                    maxCount = 1, overlap = "exclusive" },
+                ["work.research"] = { kind = "anchor", minCount = 1,
+                    maxCount = 1 },
+            },
+            activityLimits = { ["work.research"] = { maxConcurrent = 1 } },
+            workstations = {
+                research = { operation = "RESEARCH", capacity = 1,
+                    role = "work.research", interactionAnchor = "research" },
+            },
+        },
+    },
+})
+
+Definitions.Register({
+    id = "workshop",
+    displayNameKey = "UI_PNC_Facility_Workshop",
+    descriptionKey = "UI_PNC_Facility_WorkshopDescription",
+    -- Reuse shipped facility art until dedicated production art is available.
+    iconPath = "media/ui/Facilities/PNC_Farm_Placeholder.png",
+    buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+    requiredTechnology = "facility:workshop",
+    allowMultipleRegions = false,
+    levels = {
+        [1] = {
+            requiredHQLevel = 1,
+            capabilities = { "work.craft", "work.disassemble" },
+            componentLimits = {
+                ["workshop.room"] = { kind = "region", minCount = 1,
+                    maxCount = 1, overlap = "exclusive" },
+                ["work.craft"] = { kind = "anchor", minCount = 1, maxCount = 1 },
+                ["work.disassemble"] = { kind = "anchor", minCount = 1,
+                    maxCount = 1 },
+            },
+            activityLimits = {
+                ["work.craft"] = { maxConcurrent = 1 },
+                ["work.disassemble"] = { maxConcurrent = 1 },
+            },
+            workstations = {
+                craft = { operation = "CRAFT", capacity = 1,
+                    role = "work.craft", interactionAnchor = "craft" },
+                disassemble = { operation = "DISASSEMBLE", capacity = 1,
+                    role = "work.disassemble", interactionAnchor = "disassemble" },
+            },
+        },
+    },
+})
+
 return Definitions

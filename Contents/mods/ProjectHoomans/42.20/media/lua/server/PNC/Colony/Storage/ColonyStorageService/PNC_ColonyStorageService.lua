@@ -7,6 +7,7 @@ PNC.ColonyStorageService.Internal = PNC.ColonyStorageService.Internal or {}
 require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_Internal"
 require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_SourceAdapters"
 require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_Deposits"
+require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_Production"
 require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_DebugApi"
 
 function PNC.ColonyStorageService.RecordActivity(storageOrID, event)

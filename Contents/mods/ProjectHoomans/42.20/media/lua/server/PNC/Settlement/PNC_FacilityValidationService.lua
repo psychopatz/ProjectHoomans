@@ -51,6 +51,15 @@ function Validation.CanCreate(base, definitionId, level)
     if (tonumber(base and base.hqLevel) or 0) < levelData.requiredHQLevel then
         return result(false, "HQ_LEVEL_TOO_LOW")
     end
+    if definition.requiredTechnology
+        and (not PNC.ResearchService
+            or not PNC.ResearchService.Queries.HasTechnology(
+                base.colonyId, definition.requiredTechnology))
+    then
+        return result(false, "TECHNOLOGY_REQUIRED", {
+            technologyId = definition.requiredTechnology,
+        })
+    end
     return result(true)
 end
 

@@ -32,6 +32,7 @@ Shared.SETTLEMENT_REASON_KEYS = {
     NO_TERRITORY_REMOVED = "UI_PNC_SettlementReason_NoneRemoved",
     HQ_TERRITORY_LIMIT = "UI_PNC_SettlementReason_HQLimit",
     HQ_LEVEL_TOO_LOW = "UI_PNC_SettlementReason_HQTooLow",
+    TECHNOLOGY_REQUIRED = "UI_PNC_SettlementReason_TechnologyRequired",
     MAX_LEVEL = "UI_PNC_SettlementReason_MaxLevel",
     FACILITY_COMPONENT_LIMIT = "UI_PNC_SettlementReason_ComponentLimit",
     FACILITY_AREA_TOO_LARGE = "UI_PNC_SettlementReason_AreaTooLarge",
@@ -43,6 +44,7 @@ Shared.SETTLEMENT_REASON_KEYS = {
     BED_REQUIRED = "UI_PNC_SettlementReason_BedRequired",
     FARMLAND_REQUIRED = "UI_PNC_SettlementReason_FarmlandRequired",
     WORLD_SQUARE_UNLOADED = "UI_PNC_SettlementReason_SquareUnloaded",
+    NO_STOCKPILE_ACCESS_NODE = "UI_PNC_SettlementReason_StockpileNode",
 }
 Shared.NEED_METER_THRESHOLDS = {
     hunger = {

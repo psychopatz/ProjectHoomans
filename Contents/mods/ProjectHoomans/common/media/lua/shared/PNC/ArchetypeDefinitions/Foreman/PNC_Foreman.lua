@@ -17,6 +17,8 @@ local bundle = {
             FollowOwner = true,
             GuardAnchor = true,
             PatrolRoute = true,
+            Researcher = true,
+            WorkshopWorker = true,
         },
     },
     looks = {

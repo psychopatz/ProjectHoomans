@@ -698,6 +698,12 @@ function Network.SendSettlementDelta(targetPlayer, settlement, actionResult, sto
     end
 end
 
+function Network.SendColonyKnowledgeDelta(targetPlayer, delta)
+    sendToPlayer(targetPlayer, Const.CMD_COLONY_KNOWLEDGE_DELTA, {
+        delta = delta, serverTime = Core.Now(),
+    })
+end
+
 function Network.SendWorldDiscovery(targetPlayer, payload)
     sendIdentityPayload(
         targetPlayer,

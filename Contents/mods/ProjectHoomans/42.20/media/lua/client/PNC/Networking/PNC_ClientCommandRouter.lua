@@ -336,6 +336,44 @@ Internal.RegisterServerCommand(Const.CMD_SETTLEMENT_DELTA, function(args)
     ClientState.lastColonyManagementReceiveAt = Core.Now()
 end)
 
+Internal.RegisterServerCommand(Const.CMD_COLONY_KNOWLEDGE_DELTA, function(args)
+    local delta = args and args.delta or nil
+    local snapshot = ClientState.colonyManagement
+    local research = snapshot and snapshot.research
+    if not delta or not research or not snapshot.colony
+        or tostring(snapshot.colony.id or "") ~= tostring(delta.colonyId or "")
+    then return end
+    local current = tonumber(research.knowledgeRevision) or 0
+    if tonumber(delta.revision) ~= current + 1 then
+        if PNC.Client and PNC.Client.RequestColonyManagement then
+            PNC.Client.RequestColonyManagement()
+        end
+        return
+    end
+    research.knowledgeRevision = delta.revision
+    if delta.recipeId then
+        research.learnedRecipeIds = research.learnedRecipeIds or {}
+        research.learnedRecipeIds[#research.learnedRecipeIds + 1] = delta.recipeId
+        table.sort(research.learnedRecipeIds)
+        snapshot.workshop = snapshot.workshop or {}
+        snapshot.workshop.knownRecipes = snapshot.workshop.knownRecipes or {}
+        if delta.recipe then
+            snapshot.workshop.knownRecipes[#snapshot.workshop.knownRecipes + 1]
+                = delta.recipe
+        end
+    elseif delta.technologyId then
+        research.learnedTechnologyIds = research.learnedTechnologyIds or {}
+        research.learnedTechnologyIds[#research.learnedTechnologyIds + 1]
+            = delta.technologyId
+        for _, entry in ipairs(research.entries or {}) do
+            if entry.id == delta.technologyId then entry.known = true end
+        end
+    end
+    ClientState.colonyManagementRevision =
+        (tonumber(ClientState.colonyManagementRevision) or 0) + 1
+    ClientState.lastColonyManagementReceiveAt = Core.Now()
+end)
+
 Internal.RegisterServerCommand(Const.CMD_MAP_COMMAND_RESULT, function(args)
     if PNC.MapCommands and PNC.MapCommands.HandleResult then
         PNC.MapCommands.HandleResult(args)

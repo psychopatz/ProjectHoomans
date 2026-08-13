@@ -138,8 +138,14 @@ local presenceIndex = indexOf(
     "PNC/Core/Presence/PNC_PresenceRuntime"
 )
 assertEqual(sharedCalls[presenceIndex - 1],
-    "PNC/Core/Facilities/PNC_FacilityJobs_Behavior",
+    "PNC/Core/Production/PNC_WorkBehavior",
     "Presence runtime initialization predecessor")
+assertEqual(sharedCalls[presenceIndex - 2],
+    "PNC/Core/Production/PNC_WorkAnimationScenes",
+    "Production animation scene dependency")
+assertEqual(sharedCalls[presenceIndex - 3],
+    "PNC/Core/Facilities/PNC_FacilityJobs_Behavior",
+    "Production work follows facility job behavior")
 assertEqual(sharedCalls[presenceIndex + 1],
     "PNC/Core/Scheduling/PNC_SimulationClock",
     "Presence runtime initialization successor")

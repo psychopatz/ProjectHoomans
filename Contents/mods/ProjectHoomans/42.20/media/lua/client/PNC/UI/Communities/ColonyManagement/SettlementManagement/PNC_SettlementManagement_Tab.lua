@@ -20,7 +20,7 @@ local TOOLBAR = {
 
 local CONTEXT = {
     { "facility_area", "UI_PNC_Facility_AssignArea", "ZONE ROOM / FIELD", "primary" },
-    { "facility_anchor", "UI_PNC_Facility_AssignBed", "ASSIGN SLEEP SPOT", "primary" },
+    { "facility_anchor", "UI_PNC_Facility_AssignStation", "ASSIGN STATION", "primary" },
     { "facility_upgrade", "UI_PNC_Facility_Upgrade", "UPGRADE BUILDING", "success" },
 }
 
@@ -66,10 +66,13 @@ function Tab.UpdateContextControls(window)
         local button = window.baseContextControls[index]
         local visible = active
         if button.internal == "facility_anchor" then
-            visible = visible and facility.definitionId == "barracks"
+            local role = active and Actions.NextAnchorRole
+                and Actions.NextAnchorRole(facility) or nil
+            visible = visible and role ~= nil
+            if visible then button:setTitle(Actions.AnchorAssignLabel(role)) end
         elseif button.internal == "facility_area" then
-            visible = visible and (facility.definitionId == "barracks"
-                or facility.definitionId == "farm")
+            visible = visible and Actions.AreaRole
+                and Actions.AreaRole(facility) ~= nil
         end
         button:setVisible(visible)
     end

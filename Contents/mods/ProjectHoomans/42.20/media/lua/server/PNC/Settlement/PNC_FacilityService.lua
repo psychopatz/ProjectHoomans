@@ -81,10 +81,22 @@ function Service.Create(player, args)
     local facility = { schemaVersion = 1, id = id, baseId = base.id,
         definitionId = tostring(args.definitionId), level = 1,
         componentIds = {}, revision = 0, cachedState = "PLANNED" }
+    local component
+    if type(args.component) == "table" then
+        local input = PNC.Core.DeepCopy(args.component)
+        input.id = tostring(input.id or PNC.Core.GenerateID("component"))
+        local componentCheck = Validation.NormalizeComponent(base, facility, input)
+        if not componentCheck.ok then return componentCheck end
+        component = componentCheck.details.component
+    end
     local consumed, charged = Costs.Consume(player, definition)
     if not consumed then
         return { ok = false, reason = "INSUFFICIENT_BUILD_MATERIALS",
             details = { cost = charged } }
+    end
+    if component then
+        Repository.State.components[component.id] = component
+        facility.componentIds[component.id] = true
     end
     updateState(base, facility)
     Repository.State.facilities[id] = facility
@@ -93,7 +105,7 @@ function Service.Create(player, args)
     Service.RebuildIndexes()
     emit(PNC.EventTypes.FACILITY_CREATED, { baseId = base.id,
         facilityId = id, revision = facility.revision })
-    return { ok = true, facility = facility, cost = charged,
+    return { ok = true, facility = facility, component = component, cost = charged,
         event = "FacilityCreated" }
 end
 
@@ -280,9 +292,21 @@ function Service.BuildSnapshot(facility)
     output.components = {}
     local level = Definitions.GetLevel(facility.definitionId, facility.level)
     output.capabilities = PNC.Core.DeepCopy(level and level.capabilities or {})
+    output.workstations = PNC.Core.DeepCopy(level and level.workstations or {})
     for id, _ in pairs(facility.componentIds) do
         local component = Repository.GetComponent(id)
         if component then output.components[#output.components + 1] = PNC.Core.DeepCopy(component) end
+    end
+    for _, station in pairs(output.workstations or {}) do
+        local componentId
+        for index = 1, #output.components do
+            if output.components[index].role == station.role then
+                componentId = output.components[index].id; break
+            end
+        end
+        station.componentId = componentId
+        station.workOrderId = componentId and PNC.WorkService
+            and PNC.WorkService.ClaimsByStation[componentId] or nil
     end
     return output
 end

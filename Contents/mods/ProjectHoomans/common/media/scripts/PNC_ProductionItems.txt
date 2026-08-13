@@ -1,0 +1,12 @@
+module PNC
+{
+    item RecipeBlueprint
+    {
+        DisplayCategory = Literature,
+        ItemType = base:normal,
+        Weight = 0.1,
+        Icon = Notebook,
+        DisplayName = Recipe Blueprint,
+        Tooltip = Contains compact colony manufacturing knowledge.,
+    }
+}

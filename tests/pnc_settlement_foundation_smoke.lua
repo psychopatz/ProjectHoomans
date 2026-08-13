@@ -202,17 +202,18 @@ equal(PNC.BaseService.Expand({}, { baseId = base.id,
     "BASE_DISCONNECTED", "diagonal-only expansion")
 
 local barracksResult = PNC.FacilityService.Create(player, { baseId = base.id,
-    definitionId = "barracks", expectedRevision = base.revision })
+    definitionId = "barracks", expectedRevision = base.revision,
+    component = { kind = "region", role = "sleep.area",
+        region = rectangle(0, 0, 3, 3, 1) } })
 truthy(barracksResult.ok, "barracks creation")
 equal(barracksResult.cost.receipts, nil,
     "native material receipts do not enter network result")
 equal(barracksResult.cost.costs[1].allocations[1].sourceId, "player",
     "player material source quoted first")
 local barracks = barracksResult.facility
-truthy(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
-    expectedRevision = barracks.revision, component = {
-        kind = "region", role = "sleep.area", region = rectangle(0, 0, 3, 3, 1),
-    } }).ok, "upstairs sleeping area")
+truthy(barracksResult.component
+    and barracksResult.component.role == "sleep.area",
+    "creation atomically stores selected room")
 
 for index = 1, 4 do
     local bed = PNC.FacilityService.SetComponent({}, {

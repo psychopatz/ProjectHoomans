@@ -36,6 +36,7 @@ local function serializedStorage(storage)
         revision = storage.revision,
         inventorySnapshot = snapshot,
         activityJournal = Journal.Serialize(storage),
+        productionTransactions = copy(storage.productionTransactions or {}),
     }
 end
 
@@ -57,6 +58,7 @@ local function hydrate(raw)
         tier = tier,
         revision = math.max(0, math.floor(tonumber(raw.revision) or 0)),
         inventory = store,
+        productionTransactions = copy(raw.productionTransactions or {}),
     }
     Journal.Deserialize(raw.activityJournal, storage.id)
     return storage
@@ -117,6 +119,17 @@ function Repository.Get(storageID)
     return Repository.ByID[tostring(storageID or "")]
 end
 
+function Repository.GetForSettlement(settlementID)
+    Repository.EnsureLoaded()
+    settlementID = tostring(settlementID or "")
+    for _, storage in pairs(Repository.ByID) do
+        if tostring(storage.settlementId or "") == settlementID then
+            return storage
+        end
+    end
+    return nil, "storage_not_found"
+end
+
 function Repository.GetPrimary(factionID, settlementID)
     Repository.EnsureLoaded()
     factionID = tostring(factionID or "")
@@ -137,6 +150,7 @@ function Repository.GetPrimary(factionID, settlementID)
                 maxWeight = Definitions.GetCapacity(tier),
                 authority = "server",
             }),
+            productionTransactions = {},
         }
         Repository.ByID[storageID] = storage
         Repository.PrimaryByFaction[factionID] = storageID

@@ -32,10 +32,11 @@ getSpecificPlayer = function()
     end }
 end
 
-PNC = { FacilityDefinitions = { ByID = { barracks = true } } }
-function PNC.FacilityDefinitions.Get()
-    return { id = "barracks", displayNameKey = "Barracks",
+PNC = { FacilityDefinitions = { ByID = { barracks = true, workshop = true } } }
+function PNC.FacilityDefinitions.Get(id)
+    return { id = id, displayNameKey = id,
         descriptionKey = "Barracks description",
+        requiredTechnology = id == "workshop" and "facility:workshop" or nil,
         buildCosts = {{ fullType = "Base.Money", amount = 1 }} }
 end
 function PNC.FacilityDefinitions.GetLevel()
@@ -51,6 +52,11 @@ local options = BuildUI.BuildOptions({ hqLevel = 1 }, {
 equal(options[1].enabled, true, "stockpile satisfies material cost")
 equal(options[1].costText, "1 Base.Money (1 total)", "combined total")
 equal(options[1].sourceText, "0 player + 1 stockpile", "source breakdown")
+equal(options[2].enabled, false, "locked workshop is not advertised available")
+options = BuildUI.BuildOptions({ hqLevel = 1 }, {
+    rows = {{ fullType = "Base.Money", quantity = 1 }},
+}, { learnedTechnologyIds = { "facility:workshop" } })
+equal(options[2].enabled, true, "researched workshop becomes available")
 
 carried = 1
 options = BuildUI.BuildOptions({ hqLevel = 1 }, {

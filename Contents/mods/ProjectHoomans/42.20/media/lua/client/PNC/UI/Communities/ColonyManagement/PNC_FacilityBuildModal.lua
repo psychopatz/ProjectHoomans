@@ -175,7 +175,15 @@ function ISPNCFacilityBuildWindow:new(x, y, width, height, options)
     return object
 end
 
-local function buildOptions(settlement, storage)
+local function technologyKnown(research, technologyId)
+    if not technologyId then return true end
+    for _, id in ipairs(research and research.learnedTechnologyIds or {}) do
+        if tostring(id) == tostring(technologyId) then return true end
+    end
+    return false
+end
+
+local function buildOptions(settlement, storage, research)
     local values = {}
     local ids = {}
     for id, _ in pairs(PNC.FacilityDefinitions.ByID or {}) do ids[#ids + 1] = id end
@@ -202,9 +210,13 @@ local function buildOptions(settlement, storage)
         end
         local hqReady = (tonumber(settlement.hqLevel) or 0)
             >= (tonumber(level and level.requiredHQLevel) or 1)
-        local status = hqReady and affordable
+        local technologyReady = technologyKnown(research,
+            definition.requiredTechnology)
+        local status = hqReady and affordable and technologyReady
             and tr("UI_PNC_Facility_Available", "AVAILABLE")
             or not hqReady and tr("UI_PNC_Facility_RequiresHQ", "HQ LEVEL TOO LOW")
+            or not technologyReady and tr("UI_PNC_Facility_RequiresTechnology",
+                "RESEARCH REQUIRED")
             or tr("UI_PNC_Facility_MissingMaterials", "NEED MORE MATERIALS")
         values[#values + 1] = {
             id = id,
@@ -213,7 +225,7 @@ local function buildOptions(settlement, storage)
             texture = getTexture and getTexture(definition.iconPath) or nil,
             costText = table.concat(costParts, " | "),
             sourceText = table.concat(sourceParts, " | "),
-            enabled = hqReady and affordable,
+            enabled = hqReady and affordable and technologyReady,
             status = status,
         }
     end
@@ -222,10 +234,10 @@ end
 
 BuildUI.BuildOptions = buildOptions
 
-function BuildUI.Open(settlement, onConfirm, storage)
+function BuildUI.Open(settlement, onConfirm, storage, research)
     if not settlement then return nil end
     if BuildUI.instance then BuildUI.instance:close() end
-    local options = buildOptions(settlement, storage)
+    local options = buildOptions(settlement, storage, research)
     local width, height = 690, 430
     local window = ISPNCFacilityBuildWindow:new(
         math.floor((getCore():getScreenWidth() - width) / 2),

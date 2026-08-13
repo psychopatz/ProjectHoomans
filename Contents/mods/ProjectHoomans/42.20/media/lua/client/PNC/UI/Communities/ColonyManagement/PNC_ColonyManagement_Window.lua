@@ -67,6 +67,16 @@ function ISPNCColonyManagementWindow:onResearchUpgrade(button)
     return Research.OnUpgrade(self, button)
 end
 
+function ISPNCColonyManagementWindow:onResearchControl(button)
+    local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
+    return Research.OnControl(self, button)
+end
+
+function ISPNCColonyManagementWindow:onWorkshopControl(button)
+    local Workshop = require "PNC/UI/Communities/PNC_ColonyManagementWorkshopTab"
+    return Workshop.OnControl(self, button)
+end
+
 function ISPNCColonyManagementWindow:onBaseControl(button)
     local definition = Registry.Get("base")
     if definition and definition.onControl then

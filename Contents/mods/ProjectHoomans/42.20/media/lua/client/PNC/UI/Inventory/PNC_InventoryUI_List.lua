@@ -96,7 +96,7 @@ function ISPNCInventoryList:onMouseDown(x, y)
             and self.ownerWindow.toggleInventoryGroup
         then
             self.ownerWindow:toggleInventoryGroup(self.role, row.groupKey)
-        elseif row.restricted ~= true
+        elseif self.selectOnly ~= true and row.restricted ~= true
             and self.ownerWindow.beginInventoryDrag
         then
             self.ownerWindow:beginInventoryDrag(self.role, row)

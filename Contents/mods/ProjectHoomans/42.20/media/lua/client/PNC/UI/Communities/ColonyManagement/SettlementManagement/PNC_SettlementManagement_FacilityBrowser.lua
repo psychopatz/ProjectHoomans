@@ -78,13 +78,16 @@ local function roleLabel(role)
         ["sleep.area"] = "SLEEPING AREA",
         ["sleep.bed"] = "SLEEP SPOTS",
         ["farm.field"] = "CULTIVATED FIELDS",
+        ["work.research"] = "RESEARCH STATION",
+        ["work.craft"] = "CRAFT STATION",
+        ["work.disassemble"] = "DISASSEMBLY STATION",
     }
     return labels[role] or string.upper(string.gsub(role, "[%.]", " "))
 end
 
 local function componentDetail(component)
     if component.kind == "anchor" then
-        return "BED  •  " .. tostring(component.x) .. ", "
+        return roleLabel(component.role) .. "  •  " .. tostring(component.x) .. ", "
             .. tostring(component.y) .. "  FLOOR " .. tostring(component.z)
     end
     return tostring(component.tileCount or 0) .. " TILES  •  ZONED AREA"

@@ -188,6 +188,9 @@ function Management.BuildSnapshot(player, options)
     local research = PNC.ColonyResearchService
         and PNC.ColonyResearchService.BuildSnapshot(storageState)
         or { entries = {} }
+    local workshop = colony and PNC.CraftingService
+        and PNC.CraftingService.Queries.BuildSnapshot(colony.id)
+        or { knownRecipes = {}, orders = {} }
     local provisionSettings = PNC.ProvisionPolicyService
         and PNC.ProvisionPolicyService.BuildSnapshot
         and PNC.ProvisionPolicyService.BuildSnapshot(player) or nil
@@ -228,7 +231,8 @@ function Management.BuildSnapshot(player, options)
     } or nil
     return { colony=colony, faction=factionSnapshot,
         people=people, attention=attention, levels=counts,
-        storage=storage, research=research, supplyShortages=supplyShortages,
+        storage=storage, research=research, workshop=workshop,
+        supplyShortages=supplyShortages,
         provisionStorage=provisionStorage,
         provisionSettings=provisionSettings,
         settlement=settlement,
@@ -347,6 +351,54 @@ function Management.HandleAction(player, args)
         ok, reason, storage = PNC.ColonyResearchService.DebugUpgrade(
             player, tostring(args.researchId or ""), args
         )
+    elseif action == "research_queue_technology" then
+        details, reason = PNC.ResearchService.Commands.QueueTechnology(
+            player, tostring(args.technologyId or ""))
+        ok = details ~= nil
+    elseif action == "research_study_blueprint" then
+        details, reason = PNC.ResearchService.Commands.StudyBlueprint(
+            player, args.recordIndex)
+        ok = details ~= nil
+    elseif action == "research_reverse_engineer" then
+        details, reason = PNC.ResearchService.Commands.ReverseEngineer(
+            player, args.recordIndex)
+        ok = details ~= nil
+    elseif action == "blueprint_debug_create" then
+        if canUseDebug(player) then
+            ok, reason = PNC.ResearchService.Commands.CreateBlueprint(
+                player, tostring(args.recipeKey or ""))
+        else
+            ok, reason = false, "not_authorized"
+        end
+    elseif action == "production_debug_spear_kit" then
+        if canUseDebug(player) then
+            ok, details = PNC.ResearchService.Commands.CreateSpearTestKit(player)
+            reason = ok and "SPEAR_TEST_KIT_CREATED" or details
+        else
+            ok, reason = false, "not_authorized"
+        end
+    elseif action == "craft_queue" then
+        details, reason = PNC.CraftingService.Commands.QueueCraft(
+            player, args.recipeId, args.quantity)
+        ok = details ~= nil
+    elseif action == "disassemble_queue" then
+        details, reason = PNC.CraftingService.Commands.QueueDisassembly(
+            player, args.recordIndex)
+        ok = details ~= nil
+    elseif action == "work_cancel" then
+        ok, details = PNC.WorkService.Commands.CancelForPlayer(player,
+            args.workOrderId,
+            "player_cancelled")
+        reason = ok and "CANCELLED" or details
+    elseif action == "work_pause" then
+        ok, details = PNC.WorkService.Commands.PauseForPlayer(player,
+            args.workOrderId,
+            args.paused ~= false)
+        reason = ok and "PAUSED" or details
+    elseif action == "work_priority" then
+        ok, details = PNC.WorkService.Commands.SetPriorityForPlayer(player,
+            args.workOrderId, args.priority)
+        reason = ok and "PRIORITY_CHANGED" or details
     elseif action == "provision_set" then
         ok, reason, details = PNC.ProvisionPolicyService.Apply(
             player, args.submission

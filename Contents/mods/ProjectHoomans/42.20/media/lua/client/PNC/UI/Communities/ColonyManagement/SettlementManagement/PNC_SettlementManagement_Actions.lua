@@ -6,6 +6,11 @@ local Support = require "PNC/UI/Communities/ColonyManagement/SettlementManagemen
 
 local Actions = {}
 
+Actions.NextAnchorRole = Facility.NextAnchorRole
+Actions.AnchorLabel = Facility.AnchorLabel
+Actions.AnchorAssignLabel = Facility.AnchorAssignLabel
+Actions.AreaRole = Facility.AreaRole
+
 function Actions.Handle(window, action, facility)
     local settlement = window.snapshot and window.snapshot.settlement
     if action == "claim" then Territory.Begin(window, "create"); return true end
@@ -15,10 +20,9 @@ function Actions.Handle(window, action, facility)
     if action == "overlay" then LayoutOverlay.Toggle(settlement); return true end
     if action == "build_facility" then
         BuildModal.Open(settlement, function(definitionId)
-            PNC.Client.RequestCreateFacility({ baseId = settlement.id,
-                expectedRevision = settlement.revision, definitionId = definitionId })
-            Support.ApplyLocalResult(window)
-        end, window.snapshot and window.snapshot.storage)
+            Facility.BeginBuild(window, definitionId)
+        end, window.snapshot and window.snapshot.storage,
+            window.snapshot and window.snapshot.research)
         return true
     end
     if action == "barricade" then
@@ -33,8 +37,8 @@ function Actions.Handle(window, action, facility)
         return false
     elseif action == "facility_area" then
         return Facility.BeginArea(window, facility)
-    elseif action == "facility_anchor" and facility.definitionId == "barracks" then
-        Facility.BeginPoint(window, "bed", facility); return true
+    elseif action == "facility_anchor" then
+        Facility.BeginPoint(window, "facility_anchor", facility); return true
     elseif action == "facility_upgrade" then
         PNC.Client.RequestUpgradeFacility({ facilityId = facility.id,
             expectedRevision = facility.revision })

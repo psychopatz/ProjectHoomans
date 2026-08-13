@@ -290,6 +290,43 @@ function SupplyInventory.Consume(record, itemID, request)
     return true, "consumed", effect
 end
 
+function SupplyInventory.RemoveCoreItemIds(record, itemIDs, reason)
+    if not record then return false, "npc_missing" end
+    local inv = InventoryCommands.EnsureRecordInventory(record)
+    local body = liveBody(record)
+    local physicalRemoved = {}
+    for index = 1, #(itemIDs or {}) do
+        local item = inv and inv.items and inv.items[tostring(itemIDs[index])] or nil
+        if not item then return false, "item_not_found" end
+        if body then
+            local candidate = nativeCandidates(body, item)[1]
+            if candidate then
+                local adapter = CoreInventory.wrapPhysicalInventory(candidate.container)
+                if not adapter or not adapter:_nativeRemove(candidate.item) then
+                    for undo = #physicalRemoved, 1, -1 do
+                        physicalRemoved[undo].adapter:_nativeAdd(
+                            physicalRemoved[undo].item)
+                    end
+                    return false, "physical_remove_failed"
+                end
+                physicalRemoved[#physicalRemoved + 1] = {
+                    adapter = adapter, item = candidate.item,
+                }
+            end
+        end
+    end
+    local removed, removeReason = InventoryCommands.RemoveItems(
+        record, itemIDs, reason or "production_input_consumption")
+    if not removed then
+        for index = #physicalRemoved, 1, -1 do
+            physicalRemoved[index].adapter:_nativeAdd(physicalRemoved[index].item)
+        end
+        return false, removeReason
+    end
+    Metrics.Increment("deltaInventoryMutations")
+    return true
+end
+
 local function collectPersonal(inv, request, required, includeItem)
     local candidates = {}
     for _, item in pairs(inv and inv.items or {}) do
@@ -334,6 +371,7 @@ SupplyInventory.Queries = SupplyInventory.Queries or {}
 SupplyInventory.Commands.AddCoreRecords = SupplyInventory.AddCoreRecords
 SupplyInventory.Commands.CreateDestination = SupplyInventory.CreateDestination
 SupplyInventory.Commands.Consume = SupplyInventory.Consume
+SupplyInventory.Commands.RemoveCoreItemIds = SupplyInventory.RemoveCoreItemIds
 SupplyInventory.Commands.EnsurePersonalInventory =
     InventoryCommands.EnsureRecordInventory
 SupplyInventory.Queries.FindPersonal = SupplyInventory.QueryPersonal

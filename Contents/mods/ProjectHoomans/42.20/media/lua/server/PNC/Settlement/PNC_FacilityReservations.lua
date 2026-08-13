@@ -51,7 +51,7 @@ function Reservations.Expire(at)
     return count
 end
 
-function Reservations.Reserve(facilityId, componentId, npcId, purpose, ttlMs)
+function Reservations.Reserve(facilityId, componentId, npcId, purpose, ttlMs, metadata)
     Reservations.Expire()
     componentId, npcId = tostring(componentId or ""), tostring(npcId or "")
     local component = PNC.SettlementRepository.GetComponent(componentId)
@@ -71,6 +71,7 @@ function Reservations.Reserve(facilityId, componentId, npcId, purpose, ttlMs)
     local id = PNC.Core.GenerateID("facility_reservation")
     local reservation = { id = id, facilityId = facilityId, componentId = componentId,
         npcId = npcId, purpose = tostring(purpose or "activity"), state = "RESERVED",
+        workOrderId = type(metadata) == "table" and metadata.workOrderId or nil,
         createdAt = now(), expiresAt = now() + math.max(1000,
             math.floor(tonumber(ttlMs) or Reservations.DEFAULT_TTL_MS)) }
     Reservations.ByID[id] = reservation
@@ -162,7 +163,7 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability, options)
         local component = componentForCapability(facility, capability)
         if targetValid and component then
             local ok, reservation = Reservations.Reserve(facility.id, component.id,
-                npcId, capability, options.ttlMs)
+                npcId, capability, options.ttlMs, options)
             if ok then
                 local targets = PNC.FacilityInteractionTargets
                     and PNC.FacilityInteractionTargets.Resolve(component) or {}

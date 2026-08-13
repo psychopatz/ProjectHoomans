@@ -2,6 +2,7 @@ local Registry = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManageme
 local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
 local Storage = require "PNC/UI/Communities/PNC_ColonyManagementStorageTabs"
 local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
+local Workshop = require "PNC/UI/Communities/PNC_ColonyManagementWorkshopTab"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
 local DebugTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_DebugTab"
 local BaseTab = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
@@ -129,6 +130,24 @@ Registry.Register({
     end,
     rebuild = function(window, snapshot)
         return Research.Rebuild(window, snapshot, Shared.Tr)
+    end,
+})
+
+Registry.Register({
+    id = "workshop",
+    title = "WORKSHOP",
+    detailTitle = "COLONY PRODUCTION",
+    showRoster = false,
+    showDetails = true,
+    create = function(window, UI) Workshop.Create(window, UI, Shared.Tr) end,
+    layout = function(window, Layout, content)
+        Workshop.Layout(window, Layout, content)
+    end,
+    apply = function(window, active, Layout)
+        Workshop.Apply(window, active, Layout)
+    end,
+    rebuild = function(window, snapshot)
+        return Workshop.Rebuild(window, snapshot, Shared.Tr)
     end,
 })
 

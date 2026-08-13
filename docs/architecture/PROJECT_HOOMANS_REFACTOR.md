@@ -1,5 +1,21 @@
 # Project Hoomans Refactor
 
+## Research and Production Addendum (2026-08-14)
+
+The Project Hoomans Research + Colony Production vertical slice is implemented
+and documented in `PROJECT_HOOMANS_RESEARCH_PRODUCTION.md`. It adds runtime
+RecipeCatalog indexing, compact save-stable recipe identity, per-colony
+knowledge, Research/Workshop facilities and workstations, shared live/abstract
+Work Orders, blueprint/reverse-engineering flows, crafting/disassembly, public
+Colony Storage reservations with retry-stable transaction stages, revisioned
+knowledge deltas, UI, diagnostics, and targeted tests.
+
+Static and isolated-harness validation is green. This addendum does not inherit
+the earlier user-confirmed live-SP result: the new feature still requires fresh
+SP, hosted-MP, dedicated-server, reconnect, and real-save reload validation.
+Monolith Decoupler, broad splitting, Kitchen/evolved recipes, and external
+trading integration remain explicitly deferred.
+
 ## Current Chunk
 
 Chunk 14 — Final consolidation and compatibility validation (`[x]`).

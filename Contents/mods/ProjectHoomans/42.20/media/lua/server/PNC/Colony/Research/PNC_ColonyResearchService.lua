@@ -30,7 +30,14 @@ function Service.BuildSnapshot(storage)
             }
         end
     end
-    return { entries = entries }
+    local production = storage and storage.settlementId and PNC.ResearchService
+        and PNC.ResearchService.Queries.BuildSnapshot(storage.settlementId)
+        or { entries = {}, learnedRecipeIds = {} }
+    for index = 1, #(production.entries or {}) do
+        entries[#entries + 1] = production.entries[index]
+    end
+    production.entries = entries
+    return production
 end
 
 function Service.DebugUpgrade(player, researchID, args)

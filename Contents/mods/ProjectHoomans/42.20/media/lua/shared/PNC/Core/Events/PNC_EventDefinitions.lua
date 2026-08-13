@@ -18,6 +18,11 @@ PNC.EventTypes = PNC.EventTypes or {
     FACILITY_STATE_CHANGED = "projecthoomans.facility.stateChanged",
     FACILITY_DESTROYED = "projecthoomans.facility.destroyed",
     STOCKPILE_NODE_CHANGED = "projecthoomans.stockpile.nodeChanged",
+    RECIPE_KNOWLEDGE_UNLOCKED = "projecthoomans.research.recipeUnlocked",
+    TECHNOLOGY_UNLOCKED = "projecthoomans.research.technologyUnlocked",
+    WORK_ORDER_QUEUED = "projecthoomans.work.queued",
+    WORK_ORDER_COMPLETED = "projecthoomans.work.completed",
+    WORK_ORDER_CANCELLED = "projecthoomans.work.cancelled",
 }
 
 return PNC.EventTypes

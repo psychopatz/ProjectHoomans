@@ -45,6 +45,11 @@ function Coordinator.Commit(reason)
         communities = PNC.Communities and PNC.Communities.Dirty == true,
         colonyStorage = PNC.ColonyStorageRepository
             and PNC.ColonyStorageRepository.Dirty == true,
+        recipeKnowledge = PNC.KnowledgeRepository
+            and PNC.KnowledgeRepository.Dirty == true,
+        research = PNC.ResearchRepository
+            and PNC.ResearchRepository.Dirty == true,
+        work = PNC.WorkRepository and PNC.WorkRepository.Dirty == true,
         settlements = PNC.SettlementRepository
             and PNC.SettlementRepository.Dirty == true,
         abstractWorld = PNC.AbstractWorldStore
@@ -71,6 +76,15 @@ function Coordinator.Commit(reason)
         end
         if PNC.ColonyStorageRepository and initialDirty.colonyStorage then
             PNC.ColonyStorageRepository.Dirty = true
+        end
+        if PNC.KnowledgeRepository and initialDirty.recipeKnowledge then
+            PNC.KnowledgeRepository.Dirty = true
+        end
+        if PNC.ResearchRepository and initialDirty.research then
+            PNC.ResearchRepository.Dirty = true
+        end
+        if PNC.WorkRepository and initialDirty.work then
+            PNC.WorkRepository.Dirty = true
         end
         if PNC.SettlementRepository and initialDirty.settlements then
             PNC.SettlementRepository.Dirty = true
@@ -118,6 +132,12 @@ function Coordinator.Commit(reason)
     ok, why = save("communities", PNC.Communities)
     if not ok then return failure(why) end
     ok, why = save("colonyStorage", PNC.ColonyStorageRepository)
+    if not ok then return failure(why) end
+    ok, why = save("recipeKnowledge", PNC.KnowledgeRepository)
+    if not ok then return failure(why) end
+    ok, why = save("research", PNC.ResearchRepository)
+    if not ok then return failure(why) end
+    ok, why = save("work", PNC.WorkRepository)
     if not ok then return failure(why) end
     ok, why = save("settlements", PNC.SettlementRepository)
     if not ok then return failure(why) end
