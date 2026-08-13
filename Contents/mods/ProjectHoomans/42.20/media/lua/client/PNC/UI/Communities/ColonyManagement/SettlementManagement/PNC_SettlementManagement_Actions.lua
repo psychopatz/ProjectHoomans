@@ -45,6 +45,11 @@ function Actions.Handle(window, action, facility)
     elseif action == "hq" then
         PNC.Client.RequestUpgradeHQ({ baseId = settlement.id,
             expectedRevision = settlement.revision })
+    elseif action == "storage" then
+        PNC.Client.RequestColonyAction("storage_upgrade", {
+            storageId = window.snapshot and window.snapshot.storage
+                and window.snapshot.storage.storageId,
+        })
     elseif action == "stockpile" then
         Facility.BeginPoint(window, "stockpile"); return true
     elseif not facility then

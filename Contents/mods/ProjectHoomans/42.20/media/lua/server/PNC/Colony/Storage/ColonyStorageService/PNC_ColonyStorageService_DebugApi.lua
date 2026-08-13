@@ -8,6 +8,30 @@ local CoreInventory = Internal.CoreInventory
 local C = Internal.Constants
 local Query = require "PNC/Core/Colony/Storage/PNC_ColonyStorageQuery"
 
+function Service.Upgrade(player, args)
+    local storage, reason, faction, colony = Service.ResolveForPlayer(
+        player, args and args.storageId)
+    if not storage then return false, reason end
+    local nextTier = Definitions.GetNextTier(storage.tier)
+    if not nextTier then return false, "maximum_tier", storage end
+    local technologyId = "storage:" .. tostring(nextTier)
+    if not colony or not PNC.ResearchService
+        or not PNC.ResearchService.Queries.HasTechnology(
+            colony.id, technologyId)
+    then
+        return false, "TECHNOLOGY_REQUIRED", storage, {
+            technologyId = technologyId,
+        }
+    end
+    storage.tier = nextTier
+    Internal.CommitStorage(storage)
+    Internal.LogTransaction(player, args, "storage_upgrade", true,
+        "upgraded", storage)
+    return true, "upgraded", storage, {
+        technologyId = technologyId, factionId = faction and faction.id,
+    }
+end
+
 function Service.DebugUpgrade(player, args)
     local function finish(ok, reason, storage)
         Internal.LogTransaction(player, args, "storage_upgrade", ok, reason, storage)

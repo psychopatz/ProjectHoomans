@@ -33,6 +33,13 @@ function Jobs.Create(window)
         onclick = ISPNCColonyManagementWindow.onJobsControl,
         variant = "quiet",
     })
+    window.followMeControl = UI.CreateButton(window, {
+        id = "follow_me",
+        title = Shared.Tr("UI_PNC_Jobs_FollowMe", "FOLLOW ME"),
+        target = window,
+        onclick = ISPNCColonyManagementWindow.onJobsControl,
+        variant = "quiet",
+    })
     window.recoverColonistControl = UI.CreateButton(window, {
         id = "recover_colonist",
         title = Shared.Tr("UI_PNC_Jobs_Recover", "RECOVER NEAR STOCKPILE"),
@@ -47,6 +54,7 @@ function Jobs.Layout() end
 function Jobs.Apply(window, active, Layout)
     for _, button in ipairs(window.jobControls or {}) do button:setVisible(active) end
     window.returnHomeControl:setVisible(active)
+    window.followMeControl:setVisible(active)
     window.recoverColonistControl:setVisible(active)
     if not active or not window.layout then return end
     local rect = window.layout.details
@@ -59,12 +67,14 @@ function Jobs.Apply(window, active, Layout)
             rect.y, width, height)
     end
     local actionY = rect.y + height + gap
-    local actionWidth = math.floor((rect.width - gap) / 2)
+    local actionWidth = math.floor((rect.width - gap * 2) / 3)
     Layout.SetBounds(window.returnHomeControl, rect.x, actionY,
         actionWidth, height)
     Layout.SetBounds(window.recoverColonistControl,
-        rect.x + actionWidth + gap, actionY,
-        rect.width - actionWidth - gap, height)
+        rect.x + (actionWidth + gap) * 2, actionY,
+        rect.width - (actionWidth + gap) * 2, height)
+    Layout.SetBounds(window.followMeControl,
+        rect.x + actionWidth + gap, actionY, actionWidth, height)
     local paneY = actionY + height + gap
     window:layoutPane(window.detailsPane, rect.x, paneY,
         rect.width, math.max(60, rect.height - (paneY - rect.y)))
@@ -128,6 +138,11 @@ function Jobs.OnControl(window, button)
     if not person then return false end
     if job == "return_home" then
         return PNC.Client.RequestColonyAction("colonist_return_home", {
+            npcID = person.id,
+        })
+    end
+    if job == "follow_me" then
+        return PNC.Client.RequestColonyAction("colonist_follow_player", {
             npcID = person.id,
         })
     end

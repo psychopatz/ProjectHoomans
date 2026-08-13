@@ -1,274 +1,283 @@
 require "PNC/UI/Inventory/PNC_InventoryUI_List"
 
 local Workshop = {}
-local ViewModel = require "PNC/UI/Communities/PNC_ColonyStorageViewModel"
+local InventoryModel = require "PNC/UI/Inventory/PNC_InventoryUI_Model"
+local UI = PsychopatzCore and PsychopatzCore.UI or nil
+local CATALOG_COLUMNS = {
+    { key = "category", x = 0.43 }, { key = "quantity", x = 0.59 },
+    { key = "availability", x = 0.72 }, { key = "action", x = 0.87 },
+}
+local QUEUE_COLUMNS = {
+    { key = "worker", x = 0.50 }, { key = "progress", x = 0.72 },
+}
 
-function Workshop.Create(window, UI, tr)
-    window.workshopRecipeIndex, window.workshopItemIndex = 1, 1
-    window.workshopQuantity = 1
-    window.workshopRecipeList = ISPNCInventoryList:new(
-        0, 0, 100, 100, window, "workshop_recipe")
-    window.workshopRecipeList.selectOnly = true
-    window.workshopRecipeList:initialise()
-    window.workshopRecipeList:instantiate()
-    window:addChild(window.workshopRecipeList)
-    window.workshopStockpileList = ISPNCInventoryList:new(
-        0, 0, 100, 100, window, "workshop_stockpile")
-    window.workshopStockpileList.selectOnly = true
-    window.workshopStockpileList:initialise()
-    window.workshopStockpileList:instantiate()
-    window:addChild(window.workshopStockpileList)
-    local function button(id, key, variant)
-        return UI.CreateButton(window, { id = id, title = getText(key),
-            target = window,
-            onclick = ISPNCColonyManagementWindow.onWorkshopControl,
-            variant = variant })
-    end
-    window.workshopRecipePrevious = button("recipe_previous",
-        "UI_PNC_Workshop_PreviousRecipe")
-    window.workshopRecipeNext = button("recipe_next",
-        "UI_PNC_Workshop_NextRecipe")
-    window.workshopQuantityLess = button("quantity_less",
-        "UI_PNC_Workshop_QuantityLess")
-    window.workshopQuantityMore = button("quantity_more",
-        "UI_PNC_Workshop_QuantityMore")
-    window.workshopCraft = UI.CreateButton(window, { id = "craft",
-        title = getText("UI_PNC_Workshop_Craft"), target = window,
-        onclick = ISPNCColonyManagementWindow.onWorkshopControl })
-    window.workshopItemPrevious = button("item_previous",
-        "UI_PNC_Workshop_PreviousItem")
-    window.workshopItemNext = button("item_next",
-        "UI_PNC_Workshop_NextItem")
-    window.workshopDisassemble = UI.CreateButton(window, { id = "disassemble",
-        title = getText("UI_PNC_Workshop_Disassemble"), target = window,
-        onclick = ISPNCColonyManagementWindow.onWorkshopControl })
-    window.workshopPause = button("pause", "UI_PNC_Work_Pause", "warning")
-    window.workshopCancel = UI.CreateButton(window, { id = "cancel",
-        title = getText("UI_PNC_Work_Cancel"), target = window,
-        onclick = ISPNCColonyManagementWindow.onWorkshopControl,
-        variant = "warning" })
+local function makeList(window, role, columns, callback)
+    local list = ISPNCInventoryList:new(0, 0, 100, 100, window, role)
+    list.selectOnly, list.catalogColumns, list.onCatalogCell = true, columns, callback
+    list:initialise(); list:instantiate(); window:addChild(list)
+    return list
+end
+
+local function button(window, UIBuilder, id, key, variant)
+    return UIBuilder.CreateButton(window, { id = id, title = getText(key),
+        target = window, onclick = ISPNCColonyManagementWindow.onWorkshopControl,
+        variant = variant })
+end
+
+function Workshop.Create(window, UIBuilder)
+    window.workshopQuantities = window.workshopQuantities or {}
+    window.workshopSubtab = window.workshopSubtab or "craft"
+    window.workshopQueueList = makeList(window, "workshop_queue", QUEUE_COLUMNS)
+    window.workshopRecipeList = makeList(window, "workshop_recipe",
+        CATALOG_COLUMNS, Workshop.OnCatalogCell)
+    window.workshopSalvageList = makeList(window, "workshop_salvage",
+        CATALOG_COLUMNS, Workshop.OnCatalogCell)
+    window.workshopStockpileList = window.workshopSalvageList
+    window.workshopCraftTab = button(window, UIBuilder, "tab_craft",
+        "UI_PNC_Workshop_CraftingTab")
+    window.workshopSalvageTab = button(window, UIBuilder, "tab_salvage",
+        "UI_PNC_Workshop_SalvageTab")
+    window.workshopPause = button(window, UIBuilder, "pause",
+        "UI_PNC_Work_Pause", "warning")
+    window.workshopCancel = button(window, UIBuilder, "cancel",
+        "UI_PNC_Work_Cancel", "warning")
+end
+
+local function widths(content)
+    local gap = 8
+    local minimumLeft = math.min(250, math.floor(content.width * 0.42))
+    local minimumRight = math.min(360, math.floor(content.width * 0.58))
+    local left = math.max(minimumLeft, math.floor(content.width * 0.34))
+    left = math.min(left, math.max(1, content.width - gap - minimumRight))
+    return left, math.max(1, content.width - left - gap), gap
 end
 
 function Workshop.Layout(window, Layout, content)
-    local controls = { window.workshopQuantityLess, window.workshopQuantityMore,
-        window.workshopCraft, window.workshopDisassemble,
-        window.workshopPause, window.workshopCancel }
-    local gap, columns = 6, 3
-    local width = math.floor((content.width - gap * (columns - 1)) / columns)
-    for index, control in ipairs(controls) do
-        local column, row = (index - 1) % columns, math.floor((index - 1) / columns)
-        Layout.SetBounds(control, content.x + column * (width + gap),
-            content.y + row * 32, width, 27)
-    end
-    local top = content.y + 68
-    local listHeight = math.max(110, math.floor((content.height - 80) * 0.55))
-    local listWidth = math.floor((content.width - gap) / 2)
-    Layout.SetBounds(window.workshopRecipeList, content.x, top,
-        listWidth, listHeight)
-    Layout.SetBounds(window.workshopStockpileList,
-        content.x + listWidth + gap, top, listWidth, listHeight)
-    Layout.SetBounds(window.detailsPane, content.x, top + listHeight + gap,
-        content.width, math.max(60,
-            content.y + content.height - top - listHeight - gap))
+    local left, right, gap = widths(content)
+    local halfLeft = math.floor((left - 6) / 2)
+    Layout.SetBounds(window.workshopPause, content.x, content.y, halfLeft, 27)
+    Layout.SetBounds(window.workshopCancel, content.x + halfLeft + 6,
+        content.y, left - halfLeft - 6, 27)
+    local rightX = content.x + left + gap
+    local halfRight = math.floor((right - 6) / 2)
+    Layout.SetBounds(window.workshopCraftTab, rightX, content.y, halfRight, 27)
+    Layout.SetBounds(window.workshopSalvageTab, rightX + halfRight + 6,
+        content.y, right - halfRight - 6, 27)
+    local top, height = content.y + 34, math.max(1, content.height - 34)
+    Layout.SetBounds(window.workshopQueueList, content.x, top, left, height)
+    Layout.SetBounds(window.workshopRecipeList, rightX, top, right, height)
+    Layout.SetBounds(window.workshopSalvageList, rightX, top, right, height)
 end
 
-function Workshop.Apply(window, active, Layout)
-    window.workshopCraft:setVisible(active)
-    window.workshopDisassemble:setVisible(active)
-    window.workshopCancel:setVisible(active)
-    window.workshopRecipePrevious:setVisible(active)
-    window.workshopRecipeNext:setVisible(active)
-    window.workshopQuantityLess:setVisible(active)
-    window.workshopQuantityMore:setVisible(active)
-    window.workshopItemPrevious:setVisible(active)
-    window.workshopItemNext:setVisible(active)
+local function setButtonState(button, selected, enabled)
+    if not button then return end
+    button:setEnable(enabled == true)
+    if UI and UI.SetButtonVariant then
+        UI.SetButtonVariant(button, selected and "selected" or "quiet")
+    end
+end
+
+local function applySubtab(window, active)
+    local availability = window.workshopLaneAvailability or {}
+    if availability[window.workshopSubtab] ~= true then
+        window.workshopSubtab = availability.craft and "craft"
+            or availability.salvage and "salvage" or "craft"
+    end
+    setButtonState(window.workshopCraftTab,
+        window.workshopSubtab == "craft", availability.craft)
+    setButtonState(window.workshopSalvageTab,
+        window.workshopSubtab == "salvage", availability.salvage)
+    if window.workshopRecipeList.setVisible then
+        window.workshopRecipeList:setVisible(active
+            and window.workshopSubtab == "craft")
+    end
+    if window.workshopSalvageList.setVisible then
+        window.workshopSalvageList:setVisible(active
+            and window.workshopSubtab == "salvage")
+    end
+end
+
+function Workshop.Apply(window, active)
     window.workshopPause:setVisible(active)
-    window.workshopRecipeList:setVisible(active)
-    window.workshopStockpileList:setVisible(active)
-    window.workshopRecipePrevious:setVisible(false)
-    window.workshopRecipeNext:setVisible(false)
-    window.workshopItemPrevious:setVisible(false)
-    window.workshopItemNext:setVisible(false)
+    window.workshopCancel:setVisible(active)
+    window.workshopCraftTab:setVisible(active)
+    window.workshopSalvageTab:setVisible(active)
+    window.workshopQueueList:setVisible(active)
+    if active then window.detailsPane:setVisible(false) end
+    applySubtab(window, active)
 end
 
-local function availableRecipes(window)
+local function activeOrders(snapshot)
     local output = {}
-    for _, resolved in ipairs(window.snapshot and window.snapshot.workshop
-        and window.snapshot.workshop.knownRecipes or {}) do
-        if resolved.status == "AVAILABLE" then output[#output + 1] = resolved end
-    end
-    return output
-end
-
-local function disassemblyRows(window)
-    local output = {}
-    for _, row in ipairs(window.snapshot and window.snapshot.storage
-        and window.snapshot.storage.rows or {}) do
-        if row.fullType ~= "PNC.RecipeBlueprint" then output[#output + 1] = row end
-    end
-    return output
-end
-
-local cycle
-
-local function selectedRecipe(window, recipes)
-    local row = window.workshopRecipeList:selectedRow()
-    if row and row.recipe then return row.recipe end
-    return recipes[cycle(window.workshopRecipeIndex, 0, #recipes)]
-end
-
-local function selectedItem(window, items)
-    local row = window.workshopStockpileList:selectedRow()
-    if row and row.recordIndex then return row end
-    return items[cycle(window.workshopItemIndex, 0, #items)]
-end
-
-cycle = function(value, delta, count)
-    if count <= 0 then return 1 end
-    return ((math.max(1, tonumber(value) or 1) - 1 + delta) % count) + 1
-end
-
-local function firstActive(snapshot)
     for _, order in ipairs(snapshot.workshop and snapshot.workshop.orders or {}) do
-        if order.status ~= "COMPLETED" and order.status ~= "CANCELLED" then
-            return order
-        end
+        if (order.operation == "CRAFT" or order.operation == "DISASSEMBLE")
+            and order.status ~= "COMPLETED" and order.status ~= "CANCELLED"
+        then output[#output + 1] = order end
     end
+    return output
 end
 
-function Workshop.OnControl(window, button)
-    local action = tostring(button and button.internal or "")
-    local recipes, items = availableRecipes(window), disassemblyRows(window)
-    if action == "recipe_previous" or action == "recipe_next" then
-        window.workshopRecipeIndex = cycle(window.workshopRecipeIndex,
-            action == "recipe_next" and 1 or -1, #recipes)
-        window:rebuildDetails(); return true
-    elseif action == "quantity_less" or action == "quantity_more" then
-        window.workshopQuantity = math.max(1, math.min(99,
-            (tonumber(window.workshopQuantity) or 1)
-                + (action == "quantity_more" and 1 or -1)))
-        window:rebuildDetails(); return true
-    elseif action == "item_previous" or action == "item_next" then
-        window.workshopItemIndex = cycle(window.workshopItemIndex,
-            action == "item_next" and 1 or -1, #items)
-        window:rebuildDetails(); return true
-    elseif action == "craft" then
-        local resolved = selectedRecipe(window, recipes)
-        if resolved then
-            PNC.Client.RequestColonyAction("craft_queue", {
-                recipeId = resolved.id, quantity = window.workshopQuantity,
-            })
-            return true
+local function hasLane(snapshot, definitionId, role)
+    for _, facility in ipairs(snapshot.settlement
+        and snapshot.settlement.facilities or {}) do
+        if facility.definitionId == definitionId
+            and facility.constructionState == "BUILT"
+        then
+            for _, component in ipairs(facility.components or {}) do
+                if component.role == role then return true end
+            end
         end
-    elseif action == "disassemble" then
-        local row = selectedItem(window, items)
-        if row then
-            PNC.Client.RequestColonyAction("disassemble_queue", {
-                recordIndex = row.recordIndex,
-            })
-            return true
-        end
-    elseif action == "pause" then
-        local order = firstActive(window.snapshot or {})
-        if order then PNC.Client.RequestColonyAction("work_pause", {
-            workOrderId = order.id, paused = order.status ~= "PAUSED",
-        }) return true end
-    elseif action == "cancel" then
-        local order = firstActive(window.snapshot or {})
-        if order then PNC.Client.RequestColonyAction("work_cancel", {
-            workOrderId = order.id,
-        }) return true end
     end
     return false
+end
+
+local function canCraft(resolved, quantity)
+    for index, input in ipairs(resolved.descriptor and resolved.descriptor.inputs
+        or {}) do
+        local required = math.max(1, tonumber(input.amount) or 1)
+            * (input.consumed == false and 1 or quantity)
+        if (tonumber(resolved.availability and resolved.availability[index]) or 0)
+            < required then return false end
+    end
+    return resolved.status == "AVAILABLE"
+end
+
+local function quantityFor(window, recipeId)
+    local id = tostring(recipeId or "")
+    local quantity = math.max(1, math.min(99,
+        math.floor(tonumber(window.workshopQuantities[id]) or 1)))
+    window.workshopQuantities[id] = quantity
+    return quantity
+end
+
+function Workshop.OnCatalogCell(window, row, key, localX, width)
+    if row.enabled ~= true then return end
+    if row.rowKind == "recipe" then
+        local quantity = quantityFor(window, row.recipe.id)
+        if key == "quantity" then
+            quantity = math.max(1, math.min(99, quantity
+                + (localX >= width * 0.5 and 1 or -1)))
+            window.workshopQuantities[tostring(row.recipe.id)] = quantity
+            window:rebuildDetails()
+        elseif key == "action" and canCraft(row.recipe, quantity) then
+            PNC.Client.RequestColonyAction("craft_queue",
+                { recipeId = row.recipe.id, quantity = quantity })
+        end
+    elseif row.rowKind == "salvage" and key == "action" then
+        PNC.Client.RequestColonyAction("disassemble_queue",
+            { recordIndex = row.recordIndex })
+    end
+end
+
+local function selectedOrder(window)
+    local row = window.workshopQueueList:selectedRow()
+    return row and row.order or activeOrders(window.snapshot or {})[1]
+end
+
+function Workshop.OnControl(window, buttonValue)
+    local action = tostring(buttonValue and buttonValue.internal or "")
+    if action == "tab_craft" and window.workshopLaneAvailability.craft then
+        window.workshopSubtab = "craft"; applySubtab(window, true); return true
+    elseif action == "tab_salvage" and window.workshopLaneAvailability.salvage then
+        window.workshopSubtab = "salvage"; applySubtab(window, true); return true
+    end
+    local order = selectedOrder(window)
+    if action == "pause" and order then
+        PNC.Client.RequestColonyAction("work_pause", { workOrderId = order.id,
+            paused = order.status ~= "PAUSED" }); return true
+    elseif action == "cancel" and order then
+        PNC.Client.RequestColonyAction("work_cancel", { workOrderId = order.id })
+        return true
+    end
+    return false
+end
+
+local function addCatalogHeader(list, name, availabilityTitle)
+    list:addItem(name, { name = name, restricted = true, catalogHeader = true,
+        catalogCells = { category = "CATEGORY", quantity = "COUNT",
+            availability = availabilityTitle or "STOCK", action = "ACTION" } })
+end
+
+local function rebuildQueue(window, orders)
+    if not window.workshopQueueList then return end
+    window.workshopQueueList:clear()
+    window.workshopQueueList:addItem("PRODUCTION QUEUE", { name = "PRODUCTION QUEUE",
+        restricted = true, catalogHeader = true,
+        catalogCells = { worker = "WORKER", progress = "PROGRESS" } })
+    for _, order in ipairs(orders) do
+        local required = math.max(1, tonumber(order.requiredWork) or 1)
+        local percent = math.floor(math.min(1,
+            (tonumber(order.progress) or 0) / required) * 100 + 0.5)
+        window.workshopQueueList:addItem(order.operation, { name = order.operation,
+            order = order, catalogCells = {
+                worker = tostring(order.workerId or "UNASSIGNED"),
+                progress = tostring(percent) .. "%  " .. tostring(order.status),
+            }, catalogColors = { progress = order.blockedReason
+                and "warning" or "accent" } })
+    end
 end
 
 function Workshop.Rebuild(window, snapshot, tr)
     if window.tab ~= "workshop" then return false end
     local workshop = snapshot.workshop or {}
-    window:addDetail(tr("UI_PNC_Workshop_KnownRecipes", "KNOWN RECIPES"),
-        tostring(#(workshop.knownRecipes or {})))
-    local recipes, items = availableRecipes(window), disassemblyRows(window)
+    window.workshopLaneAvailability = {
+        craft = hasLane(snapshot, "workshop", "work.craft"),
+        salvage = hasLane(snapshot, "workshop", "work.disassemble"),
+    }
+    rebuildQueue(window, activeOrders(snapshot))
     window.workshopRecipeList:clear()
-    for _, recipe in ipairs(recipes) do
-        local descriptor = recipe.descriptor or {}
-        local output = descriptor.outputs and descriptor.outputs[1]
-        window.workshopRecipeList:addItem(
-            tostring(descriptor.displayName or recipe.key), {
-                name = tostring(descriptor.displayName or recipe.key),
-                category = "Recipe",
-                stack = output and output.amount or 1,
-                recipe = recipe,
+    addCatalogHeader(window.workshopRecipeList,
+        tr("UI_PNC_Workshop_Craftable", "CRAFTABLE ITEMS"))
+    for _, recipe in ipairs(workshop.knownRecipes or {}) do
+        if recipe and recipe.descriptor and recipe.status == "AVAILABLE" then
+            local output = recipe.descriptor.outputs
+                and recipe.descriptor.outputs[1] or nil
+            local fullType = output and output.itemTypes and output.itemTypes[1]
+            local metadata, quantity = InventoryModel.Probe(fullType),
+                quantityFor(window, recipe.id)
+            local stocked = canCraft(recipe, quantity)
+            local enabled = stocked and window.workshopLaneAvailability.craft
+            window.workshopRecipeList:addItem(recipe.descriptor.displayName, {
+                rowKind = "recipe", recipe = recipe, enabled = enabled,
+                restricted = not enabled,
+                name = tostring(recipe.descriptor.displayName or recipe.key),
+                texture = metadata.texture, catalogCells = {
+                    category = tostring(metadata.category or "Recipe"),
+                    quantity = "-  " .. tostring(quantity) .. "  +",
+                    availability = stocked and "AVAILABLE" or "UNAVAILABLE",
+                    action = enabled and "CRAFT" or "NO CRAFT STATION" },
+                catalogColors = { availability = stocked and "success"
+                    or "warning", action = enabled and "accent" or "warning" },
             })
-    end
-    window.workshopStockpileList:clear()
-    local inventoryRows = ViewModel.BuildInventoryRows(snapshot.storage,
-        "", "name", {})
-    for _, row in ipairs(inventoryRows) do
-        if row.fullType ~= "PNC.RecipeBlueprint" then
-            window.workshopStockpileList:addItem(row.name, row)
         end
     end
-    if #recipes > 0 and (tonumber(window.workshopRecipeList.selected) or 0) <= 0 then
-        window.workshopRecipeList.selected = 1
-    end
-    if #inventoryRows > 0 and (tonumber(window.workshopStockpileList.selected) or 0) <= 0 then
-        window.workshopStockpileList.selected = 1
-    end
-    window.workshopRecipeIndex = cycle(window.workshopRecipeIndex, 0, #recipes)
-    window.workshopItemIndex = cycle(window.workshopItemIndex, 0, #items)
-    local selected = selectedRecipe(window, recipes)
-    if selected and selected.descriptor then
-        window:addDetail(getText("UI_PNC_Workshop_SelectedRecipe"),
-            tostring(selected.descriptor.displayName or selected.key), "success")
-        window:addDetail(getText("UI_PNC_Workshop_Quantity"),
-            tostring(window.workshopQuantity))
-        for index, input in ipairs(selected.descriptor.inputs or {}) do
-            local available = selected.availability and selected.availability[index]
-                or 0
-            window:addDetail(input.consumed == false
-                    and getText("UI_PNC_Workshop_RequiredTool")
-                    or getText("UI_PNC_Workshop_RequiredMaterial"),
-                table.concat(input.itemTypes or {}, " / ") .. "  "
-                    .. tostring(input.amount) .. "  [" .. tostring(available) .. "]",
-                available >= input.amount * (input.consumed == false and 1
-                    or window.workshopQuantity) and "success" or "warning")
+    window.workshopSalvageList:clear()
+    addCatalogHeader(window.workshopSalvageList,
+        tr("UI_PNC_Workshop_Salvageable", "SALVAGEABLE ITEMS"),
+        tr("UI_PNC_Workshop_PotentialYield", "POTENTIAL YIELD"))
+    for _, candidate in ipairs(workshop.disassemblyCandidates or {}) do
+        local metadata = InventoryModel.Probe(candidate.fullType)
+        local enabled = window.workshopLaneAvailability.salvage
+        local yields = {}
+        for _, value in ipairs(candidate.potentialYield or {}) do
+            local yieldMetadata = InventoryModel.Probe(value.fullType)
+            local quantity = tonumber(value.maximum) or 0
+            yields[#yields + 1] = tostring(quantity) .. "x "
+                .. tostring(yieldMetadata.name or value.fullType)
         end
-        for _, skill in ipairs(selected.descriptor.requiredSkills or {}) do
-            window:addDetail(getText("UI_PNC_Workshop_RequiredSkill"),
-                tostring(skill.skillId) .. " " .. tostring(skill.level))
-        end
+        local yieldText = #yields > 0 and table.concat(yields, ", ") or "NONE"
+        local row = { rowKind = "salvage", enabled = enabled,
+            restricted = not enabled, fullType = candidate.fullType,
+            name = tostring(metadata.name or candidate.fullType),
+            texture = metadata.texture, recordIndex = candidate.recordIndex,
+            catalogCells = { category = tostring(metadata.category or "Item"),
+                quantity = tostring(candidate.quantity), availability = yieldText,
+                action = enabled and "SALVAGE" or "NO DISASSEMBLY STATION" },
+            catalogColors = { availability = #yields > 0 and "success" or "warning",
+                action = enabled and "accent" or "warning" } }
+        window.workshopSalvageList:addItem(row.name, row)
     end
-    local selectedStockItem = selectedItem(window, items)
-    if selectedStockItem then window:addDetail(getText("UI_PNC_Workshop_SelectedItem"),
-        tostring(selectedStockItem.name or selectedStockItem.fullType) .. " ×"
-            .. tostring(selectedStockItem.quantity or selectedStockItem.stack or 1),
-        "accent") end
-    for _, resolved in ipairs(workshop.knownRecipes or {}) do
-        window:addDetail(resolved.descriptor and resolved.descriptor.displayName
-            or resolved.key, resolved.status,
-            resolved.status == "AVAILABLE" and "success" or "warning")
-    end
-    for _, order in ipairs(workshop.orders or {}) do
-        if order.operation ~= "RESEARCH" then
-            window:addDetail(order.operation .. " " .. order.status,
-                string.format("%.1f / %.1f WP", order.progress, order.requiredWork),
-                order.blockedReason and "warning" or "accent")
-            window:addDetail("WORKER / STATION",
-                tostring(order.workerId or "UNASSIGNED") .. " / "
-                    .. tostring(order.stationId or "UNCLAIMED"))
-            if order.blockedReason then
-                window:addDetail("BLOCKED", tostring(order.blockedReason), "warning")
-            end
-        end
-    end
-    for _, facility in ipairs(snapshot.settlement and snapshot.settlement.facilities or {}) do
-        if facility.definitionId == "workshop" then
-            for stationId, station in pairs(facility.workstations or {}) do
-                window:addDetail("STATION " .. string.upper(stationId),
-                    tostring(station.workOrderId or "AVAILABLE"))
-            end
-        end
-    end
+    applySubtab(window, true)
     return true
 end
 

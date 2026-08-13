@@ -4,32 +4,28 @@ PNC = PNC or {}
 PNC.ColonyResearchService = PNC.ColonyResearchService or {}
 
 local Service = PNC.ColonyResearchService
-local Research = require "PNC/Core/Colony/Research/PNC_ColonyResearchDefinitions"
-local StorageDefinitions = require "PNC/Core/Colony/Storage/PNC_ColonyStorageDefinitions"
+local function reconcileExistingProgression(storage)
+    if not storage or not storage.settlementId or not PNC.ResearchService then
+        return
+    end
+    local colonyId = storage.settlementId
+    local factionId = storage.ownerFactionId
+    local base = PNC.BaseService and PNC.BaseService.GetForColony
+        and PNC.BaseService.GetForColony(colonyId) or nil
+    for level = 2, math.max(1, tonumber(base and base.hqLevel) or 1) do
+        PNC.ResearchService.Commands.UnlockTechnology(colonyId,
+            "hq:" .. tostring(level), factionId)
+    end
+    for level = 2, math.max(1, tonumber(storage.tier) or 1) do
+        PNC.ResearchService.Commands.UnlockTechnology(colonyId,
+            "storage:" .. tostring(level), factionId)
+    end
+end
 
 function Service.BuildSnapshot(storage)
     if not storage then return { entries = {} } end
+    reconcileExistingProgression(storage)
     local entries = {}
-    for _, id in ipairs(Research.ORDER) do
-        local definition = Research.Get(id)
-        if definition and id == "storage_capacity" then
-            local nextTier = StorageDefinitions.GetNextTier(storage.tier)
-            entries[#entries + 1] = {
-                id = id,
-                category = definition.category,
-                labelKey = definition.labelKey,
-                currentLevel = storage.tier,
-                maxLevel = definition.maxLevel,
-                currentValue = StorageDefinitions.GetCapacity(storage.tier),
-                nextLevel = nextTier,
-                nextValue = nextTier
-                    and StorageDefinitions.GetCapacity(nextTier) or nil,
-                increase = nextTier
-                    and StorageDefinitions.GetCapacity(nextTier)
-                        - StorageDefinitions.GetCapacity(storage.tier) or nil,
-            }
-        end
-    end
     local production = storage and storage.settlementId and PNC.ResearchService
         and PNC.ResearchService.Queries.BuildSnapshot(storage.settlementId)
         or { entries = {}, learnedRecipeIds = {} }
@@ -38,13 +34,6 @@ function Service.BuildSnapshot(storage)
     end
     production.entries = entries
     return production
-end
-
-function Service.DebugUpgrade(player, researchID, args)
-    if researchID ~= "storage_capacity" then
-        return false, "unknown_research"
-    end
-    return PNC.ColonyStorageService.DebugUpgrade(player, args)
 end
 
 return Service

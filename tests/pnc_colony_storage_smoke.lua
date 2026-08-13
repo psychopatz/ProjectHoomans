@@ -149,6 +149,19 @@ truthy(storageA and storageB and storageA ~= storageB, "faction isolation")
 equal(storageA.tier, 1, "initial tier")
 equal(storageA.inventory:getLogicalItemCount(), 0, "initial empty storage")
 
+PNC.ResearchService = { Queries = { HasTechnology = function() return false end } }
+local upgraded, upgradeReason = Service.Upgrade(playerB, {
+    storageId = storageB.id,
+})
+equal(upgraded, false, "storage upgrade is research gated")
+equal(upgradeReason, "TECHNOLOGY_REQUIRED", "storage research gate reason")
+PNC.ResearchService.Queries.HasTechnology = function(_, technologyId)
+    return technologyId == "storage:2"
+end
+upgraded = Service.Upgrade(playerB, { storageId = storageB.id })
+equal(upgraded, true, "researched storage capability permits Base upgrade")
+equal(storageB.tier, 2, "Base storage action applies researched tier")
+
 local ok, reason = Service.RequestPlayerDeposit(playerA, {
     requestId = "deposit:1",
     itemIDs = { tostring(playerItem:getID()) },

@@ -134,6 +134,9 @@ local created = PNC.BaseService.Create({}, {
 })
 truthy(created.ok, "base creation")
 local base = created.base
+PNC.ResearchService = { Queries = { HasTechnology = function(_, id)
+    return id == "hq:2"
+end } }
 equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 270,
     "starting territory")
 local baseSnapshot = PNC.BaseService.BuildSnapshot(base)
@@ -144,7 +147,11 @@ local researchLevel = PNC.FacilityDefinitions.GetLevel(
 equal(researchLevel.componentLimits["research.room"], nil,
     "research room is not a functional component")
 equal(researchLevel.componentLimits["work.research"].minCount, 1,
-    "research station is the only required research component")
+    "research station remains a research component")
+equal(researchLevel.componentLimits["work.blueprint"].minCount, 1,
+    "architect bench is required for blueprint study")
+equal(researchLevel.componentLimits["work.reverse"].minCount, 1,
+    "lab is required for reverse engineering")
 local workshopLevel = PNC.FacilityDefinitions.GetLevel("workshop", 1)
 equal(workshopLevel.componentLimits["workshop.room"], nil,
     "workshop room is not a functional component")
@@ -213,6 +220,9 @@ equal(PNC.BaseService.BuildBarricade({}, { baseId = base.id,
 local upgradedHQ = PNC.BaseService.UpgradeHQ({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "hq2" })
 truthy(upgradedHQ.ok, "HQ upgrade")
+equal(PNC.BaseService.UpgradeHQ({}, { baseId = base.id,
+    expectedRevision = base.revision, requestId = "hq3_locked" }).reason,
+    "TECHNOLOGY_REQUIRED", "HQ upgrade requires its researched capability")
 equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 400,
     "HQ upgrade grants no territory")
 truthy(PNC.BaseService.BuildBarricade({}, { baseId = base.id,
@@ -237,7 +247,7 @@ equal(PNC.BaseService.Expand({}, { baseId = base.id,
 local barracksResult = PNC.FacilityService.Create(player, { baseId = base.id,
     definitionId = "barracks", expectedRevision = base.revision,
     component = { kind = "region", role = "sleep.area",
-        region = rectangle(0, 0, 3, 3, 1) } })
+        region = rectangle(0, 0, 3, 3, 0) } })
 truthy(barracksResult.ok, "barracks creation")
 equal(barracksResult.workOrder.operation, "CONSTRUCT",
     "facility creation queues construction")
@@ -256,14 +266,14 @@ PNC.FacilityService.RefreshState(barracks)
 truthy(PNC.FacilityService.SetComponent({}, {
     facilityId = barracks.id, expectedRevision = barracks.revision,
     component = { kind = "region", role = "sleep.area",
-        region = rectangle(0, 0, 3, 3, 1) },
+        region = rectangle(0, 0, 3, 3, 0) },
 }).ok, "room assignment becomes available after construction")
 
 for index = 1, 4 do
     local bed = PNC.FacilityService.SetComponent({}, {
         facilityId = barracks.id, expectedRevision = barracks.revision,
         component = { kind = "anchor", role = "sleep.bed",
-            x = index - 1, y = 0, z = index % 2,
+            x = index - 1, y = 0, z = 0,
             targetResolver = "worldObject", objectTag = "bed" },
     })
     truthy(bed.ok, "bed assignment " .. tostring(index))
@@ -273,13 +283,13 @@ local workTarget = PNC.FacilityService.ResolveWorkTarget(barracks)
 equal(workTarget.role, "sleep.bed", "facility work prefers an anchor target")
 equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision, component = {
-        kind = "anchor", role = "sleep.bed", x = 4, y = 0, z = 1,
+        kind = "anchor", role = "sleep.bed", x = 3, y = 1, z = 0,
     } }).reason, "FACILITY_COMPONENT_LIMIT", "level one bed limit")
 truthy(PNC.FacilityService.Upgrade({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision }).ok, "barracks level two")
 truthy(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision, component = {
-        kind = "anchor", role = "sleep.bed", x = 4, y = 0, z = 1,
+        kind = "anchor", role = "sleep.bed", x = 3, y = 1, z = 0,
     } }).ok, "fifth bed after upgrade")
 
 local researchResult = PNC.FacilityService.Create(player, {
@@ -299,15 +309,48 @@ truthy(PNC.FacilityService.SetComponent({}, {
     component = { kind = "anchor", role = "work.research",
         x = 7, y = 7, z = 0 },
 }).ok, "research station assignment")
+equal(PNC.FacilityService.SetComponent({}, {
+    facilityId = researchFacility.id,
+    expectedRevision = researchFacility.revision,
+    component = { kind = "anchor", role = "work.research",
+        x = 6, y = 7, z = 0 },
+}).reason, "OUTSIDE_FACILITY",
+    "station assignment stays inside its facility footprint")
+local researchStation
+for componentId, _ in pairs(researchFacility.componentIds) do
+    local component = PNC.SettlementRepository.GetComponent(componentId)
+    if component and component.role == "work.research" then
+        researchStation = component
+    end
+end
+equal(researchStation and researchStation.tileCount, 1,
+    "ordinary facility anchors occupy one fixed tile")
+equal(researchFacility.cachedState, "NEEDS_ASSIGNMENT",
+    "research facility remains incomplete without architect bench and lab")
+truthy(PNC.FacilityService.SetComponent({}, {
+    facilityId = researchFacility.id,
+    expectedRevision = researchFacility.revision,
+    component = { kind = "anchor", role = "work.blueprint",
+        x = 8, y = 7, z = 0 },
+}).ok, "architect bench assignment")
+truthy(PNC.FacilityService.SetComponent({}, {
+    facilityId = researchFacility.id,
+    expectedRevision = researchFacility.revision,
+    component = { kind = "anchor", role = "work.reverse",
+        x = 7, y = 8, z = 0 },
+}).ok, "laboratory assignment")
 equal(researchFacility.cachedState, "OPERATIONAL",
-    "research station alone makes the facility operational")
-researchFacility.cachedState = "NEEDS_ASSIGNMENT"
+    "all three research lanes complete the facility")
+equal(#PNC.FacilityService.ListByCapability(base.id, "work.blueprint"), 1,
+    "architect bench exposes blueprint activity")
+equal(#PNC.FacilityService.ListByCapability(base.id, "work.reverse"), 1,
+    "laboratory exposes reverse-engineering activity")
 local refreshedResearch = PNC.FacilityService.ListByCapability(
     base.id, "work.research")
 equal(#refreshedResearch, 1,
-    "capability lookup repairs stale research facility state")
+    "assigned research station is independently usable")
 equal(researchFacility.cachedState, "OPERATIONAL",
-    "research facility cache is refreshed before worker assignment")
+    "completed research facility remains operational")
 local retiredRoomId = "legacy:workshop.room"
 researchFacility.componentIds[retiredRoomId] = true
 PNC.SettlementRepository.State.components[retiredRoomId] = {
@@ -336,6 +379,7 @@ equal(stockpileCommits, 0, "facility creation does not commit materials")
 truthy(PNC.BaseService.Expand({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "farm_land",
     regionDelta = rectangle(10, 0, 11, 9) }).ok, "farm territory expansion")
+farm.constructionRegion = rectangle(0, 0, 11, 9, 0)
 local field93 = rectangle(0, 0, 9, 8, 0)
 field93.levels[0].rows[9] = { 0, 2 }
 truthy(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,

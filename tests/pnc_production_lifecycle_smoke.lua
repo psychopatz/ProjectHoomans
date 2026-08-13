@@ -41,6 +41,7 @@ PNC = {
         Resolve = function(id) return id == 1 and { id = 1, key = descriptor.key,
             status = "AVAILABLE", descriptor = descriptor } or nil end,
         GetKey = function(id) return id == 1 and descriptor.key or nil end,
+        GetId = function(key) return key == descriptor.key and 1 or nil end,
     } },
     KnowledgeRepository = { GetOrCreateId = function() return 1 end },
     RecipeCatalog = { Queries = {
@@ -106,7 +107,10 @@ PNC.ColonyStorageService = {
     ReserveProductionMatchingRecord = function(_, match, _, owner)
         return reserve(match.fullType, 1, owner)
     end,
-    ReadProductionRecord = function(_, recordIndex)
+    ReadProductionRecord = function(storageId, recordIndex)
+        if storageId == "money-test" then
+            return { fullType = "Base.Money", metadata = {} }
+        end
         if recordIndex == 1 then return { fullType = "PNC.RecipeBlueprint",
             metadata = { PNC = { blueprint = { rid = 1 } } } } end
         return { fullType = "Base.Axe", metadata = {} }
@@ -141,9 +145,16 @@ PNC.ColonyStorageService = {
     end,
     GetProductionDiagnostics = function() return { total = 0 } end,
 }
+PNC.ColonyStorageRepository = {
+    GetForSettlement = function()
+        return { id = "s1", inventory = { records = { {}, {} } } }
+    end,
+}
 
 local occupied = {}
+local acquiredCapabilities = {}
 PNC.FacilityService = { AcquireActivity = function(_, npcId, capability)
+    acquiredCapabilities[#acquiredCapabilities + 1] = capability
     if occupied[capability] then return { ok = false,
         reason = "NO_ACTIVITY_CAPACITY" } end
     occupied[capability] = npcId
@@ -222,6 +233,17 @@ equal(activeTechnologyCount, 1,
     "technology queue contains one authoritative task")
 truthy(Work.Commands.Cancel(technology.id),
     "technology dedupe fixture cancellation")
+local lockedHQ, lockedHQReason = Research.Commands.QueueTechnology({}, "hq:3")
+equal(lockedHQ, nil, "later HQ research remains prerequisite gated")
+equal(lockedHQReason, "PREREQUISITE_REQUIRED", "HQ prerequisite reason")
+local hqTwo = assert(Research.Commands.QueueTechnology({}, "hq:2"))
+truthy(Work.Commands.Assign(hqTwo.id, "worker"), "HQ research assignment")
+equal(acquiredCapabilities[#acquiredCapabilities], "work.research",
+    "HQ capability research routes to the Research Station")
+truthy(Work.Commands.AddProgress(hqTwo.id, "worker", 100),
+    "HQ research completion")
+truthy(Research.Queries.HasTechnology("c1", "hq:2"),
+    "HQ upgrade capability unlocks only after Work Points complete")
 local legacyLow = assert(Work.Commands.Queue({
     operation = "RESEARCH", colonyId = "c1", factionId = "f1",
     baseId = "b1", requiredWork = 60, progress = 5,
@@ -263,7 +285,31 @@ equal(inventory["Base.Plank"], 0, "recovery does not reconsume")
 equal(inventory["Base.SpearCrafted"], 1, "recovery does not duplicate output")
 
 ResearchRepository.ByColony, ResearchRepository.Runtime = {}, {}
+local workshopCatalog = Crafting.Queries.BuildSnapshot("c1")
+equal(#workshopCatalog.disassemblyCandidates, 1,
+    "workshop snapshot exposes only server-supported salvage items")
+equal(workshopCatalog.disassemblyCandidates[1].fullType, "Base.Axe",
+    "blueprints and currency do not leak into the salvage catalog")
+equal(workshopCatalog.disassemblyCandidates[1].potentialYield[1].fullType,
+    "Base.Plank", "salvage catalog exposes its potential material yield")
+equal(#Crafting.Queries.DisassemblyCandidates({ id = "money-test",
+    inventory = { records = {{}} } }), 0,
+    "currency is never offered as salvage input")
+local researchCatalog = Research.Queries.BuildSnapshot("c1")
+equal(#researchCatalog.candidates, 2,
+    "research snapshot exposes blueprint and reverse-engineering choices")
+equal(researchCatalog.candidates[1].mode, "blueprint",
+    "blueprint research choice is categorized")
+equal(researchCatalog.candidates[2].mode, "reverse",
+    "specimen research choice is categorized")
 local reverse = assert(Research.Commands.ReverseEngineer({}, 2))
+truthy(Work.Commands.Assign(reverse.id, "worker"),
+    "reverse routing assignment")
+equal(acquiredCapabilities[#acquiredCapabilities], "work.reverse",
+    "reverse engineering routes to the laboratory")
+truthy(Work.Commands.Cancel(reverse.id), "reverse routing cleanup")
+occupied["work.reverse"] = nil
+reverse = assert(Research.Commands.ReverseEngineer({}, 2))
 truthy(Work.Commands.Cancel(reverse.id), "reverse cancellation")
 equal(inventory["Base.Axe"], 1, "cancel preserves specimen")
 reverse = assert(Research.Commands.ReverseEngineer({}, 2))
@@ -275,6 +321,8 @@ truthy(Research.Queries.HasRecipe("c1", 1), "reverse unlocks recipe")
 ResearchRepository.ByColony, ResearchRepository.Runtime = {}, {}
 local blueprint = assert(Research.Commands.StudyBlueprint({}, 1))
 truthy(Work.Commands.Assign(blueprint.id, "worker"), "blueprint assignment")
+equal(acquiredCapabilities[#acquiredCapabilities], "work.blueprint",
+    "blueprint study routes to the architect bench")
 truthy(Work.Commands.AddProgress(blueprint.id, "worker", 100),
     "blueprint completion")
 equal(inventory["PNC.RecipeBlueprint"], 1, "blueprint returned by policy")

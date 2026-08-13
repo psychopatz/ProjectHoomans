@@ -235,6 +235,15 @@ function Validation.CanUpgradeHQ(base, expectedRevision)
     if not Definitions.GetHQLevel(base.hqLevel + 1) then
         return result(false, "MAX_LEVEL")
     end
+    local technologyId = "hq:" .. tostring(base.hqLevel + 1)
+    if not PNC.ResearchService
+        or not PNC.ResearchService.Queries.HasTechnology(
+            base.colonyId, technologyId)
+    then
+        return result(false, "TECHNOLOGY_REQUIRED", {
+            technologyId = technologyId,
+        })
+    end
     return result(true)
 end
 

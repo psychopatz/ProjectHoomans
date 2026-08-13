@@ -62,11 +62,6 @@ function ISPNCColonyManagementWindow:onStorageControl(button)
     return Storage.OnControl(self, button, Shared.Tr)
 end
 
-function ISPNCColonyManagementWindow:onResearchUpgrade(button)
-    local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
-    return Research.OnUpgrade(self, button)
-end
-
 function ISPNCColonyManagementWindow:onResearchControl(button)
     local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
     return Research.OnControl(self, button)

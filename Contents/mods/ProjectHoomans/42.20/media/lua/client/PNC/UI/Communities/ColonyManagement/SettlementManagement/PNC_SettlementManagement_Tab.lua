@@ -15,6 +15,7 @@ local TOOLBAR = {
     { "shrink", "UI_PNC_Base_ShrinkAction", "SHRINK", "warning" },
     { "barricade", "UI_PNC_Base_BarricadeAction", "REINFORCE", "primary" },
     { "hq", "UI_PNC_Base_UpgradeAction", "UPGRADE HQ", "primary" },
+    { "storage", "UI_PNC_Base_UpgradeStorage", "UPGRADE STORAGE", "primary" },
     { "stockpile", "UI_PNC_Stockpile_PlaceNode", "PLACE STOCKPILE", "success" },
 }
 
@@ -139,6 +140,28 @@ function Tab.Apply(window, active)
         button:setVisible(active and (
             button.internal == "claim" and not established
             or button.internal ~= "claim" and established))
+        if active and established and (button.internal == "hq"
+            or button.internal == "storage")
+        then
+            local current = button.internal == "hq"
+                and math.max(1, tonumber(window.snapshot.settlement.hqLevel) or 1)
+                or math.max(1, tonumber(window.snapshot.storage
+                    and window.snapshot.storage.tier) or 1)
+            local maximum = button.internal == "hq"
+                and math.max(current, tonumber(
+                    window.snapshot.settlement.maxHQLevel) or current)
+                or 10
+            local technologyId = button.internal .. ":" .. tostring(current + 1)
+            local learned = false
+            for _, entry in ipairs(window.snapshot.research
+                and window.snapshot.research.entries or {})
+            do
+                if entry.id == technologyId and entry.known == true then
+                    learned = true; break
+                end
+            end
+            button:setEnable(current < maximum and learned)
+        end
     end
     Browser.Apply(window, active and established)
     Tab.UpdateContextControls(window)

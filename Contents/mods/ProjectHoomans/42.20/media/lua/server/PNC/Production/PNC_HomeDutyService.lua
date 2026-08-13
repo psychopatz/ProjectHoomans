@@ -94,6 +94,26 @@ local function setAtHome(record, base, point)
     return true, "AT_HOME"
 end
 
+local function setFollowing(record, username, onlineID)
+    record.runtime = record.runtime or {}
+    record.runtime.homeState = "AWAY"
+    record.runtime.homeJourneyId = nil
+    local order = {
+        kind = PNC.Const.ORDER_FOLLOW,
+        ownerUsername = username,
+        ownerOnlineID = onlineID,
+    }
+    if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
+        PNC.OrderSystem.SetOrder(record, order)
+    else
+        record.orderSpec = order
+    end
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "follow_player")
+    end
+    return true, "FOLLOWING_PLAYER"
+end
+
 function Service.GetBase(record, baseId)
     return baseFor(record, baseId)
 end
@@ -172,6 +192,56 @@ function Service.SendHome(record, baseId, reason)
     return true, "RETURNING_HOME", journey
 end
 
+function Service.SendToPlayer(record, player, reason)
+    if not record or record.alive == false then return false, "NPC_MISSING" end
+    if not player then return false, "PLAYER_MISSING" end
+    local x = player.getX and tonumber(player:getX()) or nil
+    local y = player.getY and tonumber(player:getY()) or nil
+    local z = player.getZ and tonumber(player:getZ()) or 0
+    if not x or not y then return false, "PLAYER_LOCATION_MISSING" end
+    local username = player.getUsername and player:getUsername() or nil
+    local onlineID = player.getOnlineID and player:getOnlineID() or nil
+    if PNC.WorkService and PNC.WorkService.Commands
+        and PNC.WorkService.Commands.ReleaseWorker
+    then
+        PNC.WorkService.Commands.ReleaseWorker(record.id,
+            "follow_player_requested")
+    end
+    if PNC.Travel and PNC.Travel.Service and PNC.Travel.Model
+        and PNC.Travel.Model.IsActive(record.travel)
+    then
+        PNC.Travel.Service.Cancel(record, "follow_player_requested")
+    end
+    local dx = (tonumber(record.x) or 0) - x
+    local dy = (tonumber(record.y) or 0) - y
+    if dx * dx + dy * dy <= 100 then
+        return setFollowing(record, username, onlineID)
+    end
+    local journey, journeyReason = PNC.Travel.Service.Start(record, {
+        destination = { x = x, y = y, z = z },
+        routeProvider = "direct",
+        speedProfile = "walk",
+        ownerMod = "ProjectHoomans",
+        ownerRef = "colony_follow_player",
+        visibility = "all",
+        arrivalAction = {
+            type = "colony_follow_player",
+            ownerUsername = username,
+            ownerOnlineID = onlineID,
+        },
+        metadata = {
+            purpose = "follow_player",
+            reason = tostring(reason or "player_requested"),
+            ownerUsername = username,
+        },
+    })
+    if not journey then return false, journeyReason end
+    record.runtime = record.runtime or {}
+    record.runtime.homeState = "AWAY"
+    record.runtime.homeJourneyId = journey.journeyId
+    return true, "TRAVELING_TO_PLAYER", journey
+end
+
 function Service.Recover(record, baseId)
     if not record or record.alive == false then return false, "NPC_MISSING" end
     local point, reason, base = Service.GetHomePoint(record, baseId)
@@ -219,6 +289,12 @@ if PNC.Travel and PNC.Travel.Arrivals then
                 record, action and action.baseId)
             if not point then return false, reason end
             return setAtHome(record, base, point)
+        end)
+    PNC.Travel.Arrivals.RegisterHandler("colony_follow_player",
+        function(record, _, action)
+            return setFollowing(record,
+                action and action.ownerUsername,
+                action and action.ownerOnlineID)
         end)
 end
 

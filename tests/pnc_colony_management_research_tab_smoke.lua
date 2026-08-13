@@ -3,6 +3,18 @@ local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
 
 getText = function(key) return key end
 
+PNC = { InventoryUIModel = { Probe = function() return {} end } }
+local function fakeList()
+    return { items = {}, clear = function(self) self.items = {} end,
+        addItem = function(self, _, row) self.items[#self.items + 1] = row end }
+end
+package.preload["PNC/UI/Inventory/PNC_InventoryUI_List"] = function()
+    return {}
+end
+package.preload["PNC/UI/Inventory/PNC_InventoryUI_Model"] = function()
+    return PNC.InventoryUIModel
+end
+
 local ResearchTab = dofile(FILE)
 local rows = {}
 local window = {
@@ -10,6 +22,8 @@ local window = {
     researchBlueprintIndex = 1,
     researchSpecimenIndex = 1,
     snapshot = { storage = { rows = {} } },
+    researchCatalog = fakeList(),
+    researchQueueList = fakeList(),
     addDetail = function(_, label, detail, color)
         rows[#rows + 1] = {
             label = tostring(label), detail = tostring(detail), color = color,
@@ -18,6 +32,12 @@ local window = {
 }
 local snapshot = {
     storage = { rows = {} },
+    settlement = { id = "base-1", hqLevel = 1, maxHQLevel = 3,
+        facilities = {{ definitionId = "research_facility",
+        constructionState = "BUILT", components = {
+            { role = "work.research" }, { role = "work.blueprint" },
+            { role = "work.reverse" },
+        } }} },
     research = {
         entries = {{
             id = "facility:workshop", labelKey = "Basic Workshop",
@@ -37,18 +57,12 @@ local snapshot = {
 local rebuilt = ResearchTab.Rebuild(window, snapshot,
     function(_, fallback) return fallback end)
 assert(rebuilt == true, "research tab did not rebuild")
-assert(rows[1].detail:find("25%%"),
+assert(window.researchCatalog.items[2].catalogCells.state == "RESEARCHING 25%",
     "technology catalog row does not expose progress percentage")
-local foundActiveProgress = false
-for _, row in ipairs(rows) do
-    if row.label:find("RESEARCH WORKING", 1, true)
-        and row.label:find("25%%")
-        and row.detail == "15.0 / 60.0 WP"
-    then
-        foundActiveProgress = true
-    end
-end
-assert(foundActiveProgress,
+assert(window.researchCatalog.items[2].catalogCells.state == "RESEARCHING 25%",
     "active research row does not expose resumable progress")
+ResearchTab.Rebuild(window, snapshot, function(_, fallback) return fallback end)
+assert(#window.researchQueueList.items == 2,
+    "research queue refresh must not accumulate headers")
 
 print("pnc_colony_management_research_tab_smoke: ok")

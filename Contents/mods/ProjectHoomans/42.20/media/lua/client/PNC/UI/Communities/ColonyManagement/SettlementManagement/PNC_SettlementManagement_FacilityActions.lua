@@ -7,18 +7,24 @@ local Facility = {}
 local ANCHOR_LABELS = {
     ["sleep.bed"] = "UI_PNC_Facility_SleepSpot",
     ["work.research"] = "UI_PNC_Facility_ResearchStation",
+    ["work.blueprint"] = "UI_PNC_Facility_ArchitectBench",
+    ["work.reverse"] = "UI_PNC_Facility_Lab",
     ["work.craft"] = "UI_PNC_Facility_CraftingTable",
     ["work.disassemble"] = "UI_PNC_Facility_RecyclingSpot",
 }
 local ANCHOR_SELECT_TITLES = {
     ["sleep.bed"] = "UI_PNC_Facility_SelectBed",
     ["work.research"] = "UI_PNC_Facility_SelectResearchStation",
+    ["work.blueprint"] = "UI_PNC_Facility_SelectArchitectBench",
+    ["work.reverse"] = "UI_PNC_Facility_SelectLab",
     ["work.craft"] = "UI_PNC_Facility_SelectCraftStation",
     ["work.disassemble"] = "UI_PNC_Facility_SelectDisassemblyStation",
 }
 local ANCHOR_ASSIGN_TITLES = {
     ["sleep.bed"] = "UI_PNC_Facility_AssignBed",
     ["work.research"] = "UI_PNC_Facility_AssignResearchStation",
+    ["work.blueprint"] = "UI_PNC_Facility_AssignArchitectBench",
+    ["work.reverse"] = "UI_PNC_Facility_AssignLab",
     ["work.craft"] = "UI_PNC_Facility_AssignCraftStation",
     ["work.disassemble"] = "UI_PNC_Facility_AssignDisassemblyStation",
 }
@@ -42,6 +48,9 @@ local function areaOptions(window, facility, existing, onConfirm)
     local level = PNC.FacilityDefinitions.GetLevel(
         facility.definitionId, facility.level or 1)
     local limit = level and level.componentLimits[role] or {}
+    local isDraft = not facility or facility.id == nil
+    local boundary = isDraft and Support.BaseRegion(window)
+        or Support.FacilityRegion(facility)
     return {
         title = Support.Tr("UI_PNC_Facility_SelectArea", "SELECT FACILITY AREA"),
         instruction = role == "facility.footprint"
@@ -53,16 +62,17 @@ local function areaOptions(window, facility, existing, onConfirm)
             or Support.Tr("UI_PNC_Facility_SelectAreaHelp",
                 "Select one connected room inside the base territory."),
         initialRegion = existing and existing.region or Support.EmptyRegion(),
-        guideRegion = Support.BaseRegion(window),
+        guideRegion = boundary,
         guideLayers = Support.UsedGuideLayers(window, existing and existing.id),
         guideRenderZ = math.floor(getSpecificPlayer(0):getZ()),
         maxTiles = limit.maxTotalTiles,
         requiredSquareRule = limit.worldRule,
         validate = function(region, stats)
             local ok, reason = Support.ValidateConnected(region)
-            if ok and not GridRegion.containsRegion(
-                Support.BaseRegion(window), Support.Footprint(region))
-            then ok, reason = false, "OUTSIDE_BASE" end
+            if ok and not GridRegion.containsRegion(boundary, region) then
+                ok, reason = false, isDraft and "OUTSIDE_BASE"
+                    or "OUTSIDE_FACILITY"
+            end
             if ok and limit.maxTotalTiles and stats.tileCount > limit.maxTotalTiles then
                 ok, reason = false, "FACILITY_AREA_TOO_LARGE"
             end
@@ -142,6 +152,8 @@ function Facility.BeginPoint(window, kind, facility, requestedRole, componentId)
         or anchor and requestedRole == nil
             and Support.ComponentForRole(facility, role) or nil
     local selectTitleKey = anchor and ANCHOR_SELECT_TITLES[role] or nil
+    local boundary = anchor and Support.FacilityRegion(facility)
+        or Support.BaseRegion(window)
     Support.OpenSelector(window, {
         title = selectTitleKey and getText(selectTitleKey)
             or anchor and Support.Tr("UI_PNC_Facility_SelectStation",
@@ -152,15 +164,16 @@ function Facility.BeginPoint(window, kind, facility, requestedRole, componentId)
             or anchor and getText("UI_PNC_Facility_SelectStationHelp")
             or Support.Tr("UI_PNC_Point_SelectHelp", "Click one tile, then confirm."),
         selectionKind = "point",
-        guideRegion = Support.BaseRegion(window),
+        guideRegion = boundary,
         guideLayers = Support.UsedGuideLayers(window,
             existing and existing.id),
         guideRenderZ = math.floor(getSpecificPlayer(0):getZ()),
         validate = function(region)
             local bounds = GridRegion.bounds(region)
-            if not bounds or not GridRegion.containsXY(
-                Support.BaseRegion(window), bounds.minX, bounds.minY)
-            then return false, Shared.SettlementReason("OUTSIDE_BASE") end
+            if not bounds or not GridRegion.containsPoint(boundary,
+                bounds.minX, bounds.minY, bounds.minZ)
+            then return false, Shared.SettlementReason(
+                anchor and "OUTSIDE_FACILITY" or "OUTSIDE_BASE") end
             return true
         end,
         onConfirm = function(region)

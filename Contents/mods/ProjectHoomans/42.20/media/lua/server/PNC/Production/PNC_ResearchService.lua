@@ -101,6 +101,15 @@ local function queue(context, spec)
     return PNC.WorkService.Commands.Queue(spec)
 end
 
+local function researchTarget(order, worker, live)
+    local mode = tostring(order and order.payload and order.payload.mode or "")
+    local capability = mode == "blueprint" and "work.blueprint"
+        or mode == "reverse" and "work.reverse" or "work.research"
+    return PNC.FacilityService.AcquireActivity(order.baseId, worker.id,
+        capability, { abstract = live == nil, ttlMs = 30000,
+            workOrderId = order.id })
+end
+
 local function activeTechnologyOrders(colonyId, technologyId)
     local output = {}
     colonyId, technologyId = tostring(colonyId or ""),
@@ -171,11 +180,17 @@ function Service.Commands.QueueTechnology(player, technologyId)
     local context, reason = PNC.ProductionContext.ForPlayer(player)
     local definition = Definitions.Get(technologyId)
     if not context then return nil, reason end
-    if not definition or technologyId == "storage_capacity" then
+    if not definition then
         return nil, "TECHNOLOGY_UNKNOWN"
     end
     if Service.Queries.HasTechnology(context.colony.id, technologyId) then
         return nil, "ALREADY_KNOWN"
+    end
+    if definition.prerequisiteTechnology
+        and not Service.Queries.HasTechnology(context.colony.id,
+            definition.prerequisiteTechnology)
+    then
+        return nil, "PREREQUISITE_REQUIRED"
     end
     Service.Commands.ReconcileDuplicates()
     local existing = activeTechnologyOrders(context.colony.id, technologyId)[1]
@@ -378,6 +393,7 @@ PNC.WorkService.CancellationHandlers = PNC.WorkService.CancellationHandlers or {
 PNC.WorkService.CancellationHandlers.RESEARCH = cancellation
 PNC.WorkService.RegisterPreparation("RESEARCH", prepare)
 PNC.WorkService.RegisterCompletion("RESEARCH", completion)
+PNC.WorkService.RegisterTargetProvider("RESEARCH", researchTarget)
 PNC.WorkService.RegisterReconciler("research_duplicates",
     Service.Commands.ReconcileDuplicates)
 
@@ -387,15 +403,74 @@ function Service.Queries.BuildSnapshot(colonyId)
     local entries = {}
     for _, id in ipairs(Definitions.ORDER) do
         local definition = Definitions.Get(id)
-        if definition and id ~= "storage_capacity" then
+        if definition then
             entries[#entries + 1] = { id = id, category = definition.category,
                 labelKey = definition.labelKey,
                 known = Service.Queries.HasTechnology(colonyId, id),
+                prerequisiteTechnology = definition.prerequisiteTechnology,
+                prerequisiteKnown = not definition.prerequisiteTechnology
+                    or Service.Queries.HasTechnology(colonyId,
+                        definition.prerequisiteTechnology),
                 requiredWork = definition.requiredWork,
                 requiredSkills = definition.requiredSkills }
         end
     end
+    local candidates = {}
+    local storage = PNC.ColonyStorageRepository
+        and PNC.ColonyStorageRepository.GetForSettlement
+        and PNC.ColonyStorageRepository.GetForSettlement(colonyId) or nil
+    local grouped = {}
+    for recordIndex = 1, #(storage and storage.inventory
+        and storage.inventory.records or {}) do
+        local info = PNC.ColonyStorageService.ReadProductionRecord(
+            storage.id, recordIndex)
+        if info then
+            local mode, recipeId, descriptor
+            if info.fullType == "PNC.RecipeBlueprint" then
+                local blueprint = info.metadata and info.metadata.PNC
+                    and info.metadata.PNC.blueprint or nil
+                recipeId = math.floor(tonumber(blueprint and blueprint.rid) or 0)
+                local resolved = recipeId > 0 and Registry.Queries.Resolve(recipeId)
+                    or nil
+                descriptor = resolved and resolved.descriptor or nil
+                mode = descriptor and "blueprint" or nil
+            else
+                local producers = PNC.RecipeCatalog.Queries.GetProducerKeys(
+                    info.fullType)
+                if #producers == 1 then
+                    descriptor = PNC.RecipeCatalog.Queries.Get(producers[1])
+                    recipeId = descriptor
+                        and Registry.Queries.GetId(descriptor.key) or 0
+                    mode = descriptor and "reverse" or nil
+                end
+            end
+            if mode then
+                local key = mode .. ":" .. tostring(descriptor.key) .. ":"
+                    .. tostring(info.fullType)
+                local candidate = grouped[key]
+                if not candidate then
+                    candidate = { mode = mode, recipeId = recipeId,
+                        recipeKey = descriptor.key,
+                        displayName = tostring(descriptor.displayName
+                            or descriptor.key), fullType = info.fullType,
+                        recordIndex = recordIndex, quantity = 0,
+                        known = recipeId > 0
+                            and Service.Queries.HasRecipe(colonyId, recipeId)
+                            or false }
+                    grouped[key] = candidate
+                    candidates[#candidates + 1] = candidate
+                end
+                candidate.quantity = candidate.quantity
+                    + math.max(1, math.floor(tonumber(info.quantity) or 1))
+            end
+        end
+    end
+    table.sort(candidates, function(left, right)
+        if left.mode ~= right.mode then return left.mode < right.mode end
+        return left.displayName < right.displayName
+    end)
     return { entries = entries,
+        candidates = candidates,
         learnedRecipeIds = PNC.Core.DeepCopy(state.learnedRecipeIds),
         learnedTechnologyIds = PNC.Core.DeepCopy(state.learnedTechnologyIds),
         knowledgeRevision = state.knowledgeRevision,

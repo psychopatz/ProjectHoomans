@@ -24,6 +24,19 @@ function Definitions.GetLevel(id, level)
     return definition and definition.levels[math.floor(tonumber(level) or 1)] or nil
 end
 
+function Definitions.GetComponentLimit(id, level, role)
+    local levelData = Definitions.GetLevel(id, level)
+    local limit = levelData and levelData.componentLimits
+        and levelData.componentLimits[tostring(role or "")] or nil
+    if not limit then return nil end
+    -- Anchors occupy one selected tile unless a definition explicitly models a
+    -- multi-tile world object (beds are the first such special case).
+    if limit.kind == "anchor" and limit.fixedTileCount == nil then
+        limit.fixedTileCount = 1
+    end
+    return limit
+end
+
 Definitions.Register({
     id = "barracks",
     displayNameKey = "UI_PNC_Facility_Barracks",
@@ -40,7 +53,8 @@ Definitions.Register({
             capabilities = { "sleep", "rest" },
             componentLimits = {
                 ["sleep.area"] = { kind = "region", minCount = 1 },
-                ["sleep.bed"] = { kind = "anchor", minCount = 1, maxCount = 4 },
+                ["sleep.bed"] = { kind = "anchor", minCount = 1, maxCount = 4,
+                    fixedTileCount = 2, usesWorldObjectFootprint = true },
             },
             activityLimits = { sleep = { maxConcurrent = 4 } },
         },
@@ -49,7 +63,8 @@ Definitions.Register({
             capabilities = { "sleep", "rest" },
             componentLimits = {
                 ["sleep.area"] = { kind = "region", minCount = 1 },
-                ["sleep.bed"] = { kind = "anchor", minCount = 1, maxCount = 8 },
+                ["sleep.bed"] = { kind = "anchor", minCount = 1, maxCount = 8,
+                    fixedTileCount = 2, usesWorldObjectFootprint = true },
             },
             activityLimits = { sleep = { maxConcurrent = 8 } },
         },
@@ -58,7 +73,8 @@ Definitions.Register({
             capabilities = { "sleep", "rest" },
             componentLimits = {
                 ["sleep.area"] = { kind = "region", minCount = 1 },
-                ["sleep.bed"] = { kind = "anchor", minCount = 1, maxCount = 14 },
+                ["sleep.bed"] = { kind = "anchor", minCount = 1, maxCount = 14,
+                    fixedTileCount = 2, usesWorldObjectFootprint = true },
             },
             activityLimits = { sleep = { maxConcurrent = 14 } },
         },
@@ -113,15 +129,28 @@ Definitions.Register({
     levels = {
         [1] = {
             requiredHQLevel = 1,
-            capabilities = { "work.research" },
+            capabilities = { "work.research", "work.blueprint",
+                "work.reverse" },
             componentLimits = {
                 ["work.research"] = { kind = "anchor", minCount = 1,
                     maxCount = 1 },
+                ["work.blueprint"] = { kind = "anchor", minCount = 1,
+                    maxCount = 1 },
+                ["work.reverse"] = { kind = "anchor", minCount = 1,
+                    maxCount = 1 },
             },
-            activityLimits = { ["work.research"] = { maxConcurrent = 1 } },
+            activityLimits = {
+                ["work.research"] = { maxConcurrent = 1 },
+                ["work.blueprint"] = { maxConcurrent = 1 },
+                ["work.reverse"] = { maxConcurrent = 1 },
+            },
             workstations = {
                 research = { operation = "RESEARCH", capacity = 1,
                     role = "work.research", interactionAnchor = "research" },
+                architect = { operation = "RESEARCH", capacity = 1,
+                    role = "work.blueprint", interactionAnchor = "architect" },
+                laboratory = { operation = "RESEARCH", capacity = 1,
+                    role = "work.reverse", interactionAnchor = "laboratory" },
             },
         },
     },

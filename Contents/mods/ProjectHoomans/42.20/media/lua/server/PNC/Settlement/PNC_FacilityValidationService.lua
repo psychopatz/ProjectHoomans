@@ -44,6 +44,11 @@ local function baseContainsRegion(base, region)
     return GridRegion.containsRegion(baseZone.geometry, footprint)
 end
 
+local function facilityContainsRegion(facility, region)
+    return facility and facility.constructionRegion
+        and GridRegion.containsRegion(facility.constructionRegion, region)
+end
+
 function Validation.CanCreate(base, definitionId, level)
     local definition = Definitions.Get(definitionId)
     local levelData = definition and Definitions.GetLevel(definitionId, level or 1)
@@ -112,7 +117,10 @@ function Validation.NormalizeComponent(base, facility, input)
         return result(false, "INVALID_COMPONENT")
     end
     local levelData = levelDefinition(facility)
-    local limit = levelData and levelData.componentLimits[input.role]
+    local limit = Definitions.GetComponentLimit
+        and Definitions.GetComponentLimit(facility.definitionId,
+            facility.level, input.role)
+        or levelData and levelData.componentLimits[input.role]
     if not limit or limit.kind ~= input.kind then
         return result(false, "INVALID_COMPONENT_ROLE")
     end
@@ -132,12 +140,18 @@ function Validation.NormalizeComponent(base, facility, input)
         component.x = math.floor(tonumber(input.x) or 0)
         component.y = math.floor(tonumber(input.y) or 0)
         component.z = math.floor(tonumber(input.z) or 0)
-        component.tileCount = 0
+        component.tileCount = math.max(1,
+            math.floor(tonumber(limit.fixedTileCount) or 1))
         local baseZone = Zones.get(base.baseZoneId)
         if not baseZone or not GridRegion.containsXY(baseZone.geometry,
             component.x, component.y)
         then
             return result(false, "OUTSIDE_BASE")
+        end
+        if not facility.constructionRegion or not GridRegion.containsPoint(
+            facility.constructionRegion, component.x, component.y, component.z)
+        then
+            return result(false, "OUTSIDE_FACILITY")
         end
         if PNC.FacilityWorldValidation
             and PNC.FacilityWorldValidation.ValidateAnchor
@@ -155,6 +169,11 @@ function Validation.NormalizeComponent(base, facility, input)
             return result(false, "FACILITY_REGION_DISCONNECTED")
         end
         if not baseContainsRegion(base, region) then return result(false, "OUTSIDE_BASE") end
+        if facility.constructionRegion
+            and not facilityContainsRegion(facility, region)
+        then
+            return result(false, "OUTSIDE_FACILITY")
+        end
         component.region = region
         component.tileCount = GridRegion.countTiles(region)
         if PNC.FacilityWorldValidation

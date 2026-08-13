@@ -37,6 +37,7 @@ Shared.SETTLEMENT_REASON_KEYS = {
     FACILITY_COMPONENT_LIMIT = "UI_PNC_SettlementReason_ComponentLimit",
     FACILITY_AREA_TOO_LARGE = "UI_PNC_SettlementReason_AreaTooLarge",
     OUTSIDE_BASE = "UI_PNC_SettlementReason_OutsideBase",
+    OUTSIDE_FACILITY = "UI_PNC_SettlementReason_OutsideFacility",
     OVERLAP_NOT_ALLOWED = "UI_PNC_SettlementReason_Overlap",
     PLAYER_ZONE_OCCUPIED = "UI_PNC_SettlementReason_PlayerZoneOccupied",
     NPC_BASE_OCCUPIED = "UI_PNC_SettlementReason_NPCBaseOccupied",

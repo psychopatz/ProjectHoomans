@@ -5,6 +5,32 @@ PNC = PNC or {}
 
 ISPNCInventoryList = ISScrollingListBox:derive("ISPNCInventoryList")
 
+local function catalogColor(value, dimmed)
+    if dimmed then return 0.38, 0.38, 0.42 end
+    if value == "success" then return 0.35, 0.86, 0.50 end
+    if value == "warning" then return 0.96, 0.68, 0.20 end
+    if value == "accent" then return 0.22, 0.78, 0.94 end
+    return 0.72, 0.74, 0.78
+end
+
+local function drawCatalogColumns(self, y, row, dimmed)
+    local columns = self.catalogColumns
+    if type(columns) ~= "table" or type(row.catalogCells) ~= "table" then
+        return false
+    end
+    local index
+    for index = 1, #columns do
+        local column = columns[index]
+        local value = row.catalogCells[column.key]
+        local x = math.floor(self.width * (tonumber(column.x) or 0))
+        local r, g, b = catalogColor(row.catalogColors
+            and row.catalogColors[column.key], dimmed)
+        self:drawText(tostring(value or ""), x, y + 7,
+            r, g, b, 1, UIFont.Small)
+    end
+    return true
+end
+
 function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     local row = listItem and listItem.item or nil
     if not row then return y + self.itemheight end
@@ -55,8 +81,9 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
         39 + indent, y + 7,
         textColor, textColor, textColor, 1, UIFont.Small
     )
+    local custom = drawCatalogColumns(self, y, row, dimmed)
     local categoryX = math.floor(self.width * 0.64)
-    if self.ownerWindow and self.ownerWindow.giftMode
+    if not custom and self.ownerWindow and self.ownerWindow.giftMode
         and self.role == "player"
         and row.giftScore
         and PNC.Gifts and PNC.Gifts.FormatShortScore
@@ -68,7 +95,7 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
             y + 7,
             0.50, 0.92, 0.70, 1, UIFont.Small
         )
-    else
+    elseif not custom then
         self:drawText(
             tostring(row.category or "Item"),
             categoryX, y + 7,
@@ -92,7 +119,24 @@ function ISPNCInventoryList:onMouseDown(x, y)
     end
     local row = self:selectedRow()
     if row and self.ownerWindow then
-        if row.groupHeader and x <= 16
+        if type(self.catalogColumns) == "table"
+            and type(row.catalogCells) == "table" and row.catalogHeader ~= true
+            and self.onCatalogCell
+        then
+            local index
+            for index = #self.catalogColumns, 1, -1 do
+                local column = self.catalogColumns[index]
+                local left = math.floor(self.width * (tonumber(column.x) or 0))
+                if x >= left then
+                    local nextColumn = self.catalogColumns[index + 1]
+                    local right = nextColumn and math.floor(self.width
+                        * (tonumber(nextColumn.x) or 1)) or self.width
+                    self.onCatalogCell(self.ownerWindow, row, column.key,
+                        x - left, math.max(1, right - left))
+                    return true
+                end
+            end
+        elseif row.groupHeader and x <= 16
             and self.ownerWindow.toggleInventoryGroup
         then
             self.ownerWindow:toggleInventoryGroup(self.role, row.groupKey)

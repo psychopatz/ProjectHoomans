@@ -18,6 +18,10 @@ function Support.BaseRegion(window)
     return geometry and geometry.region or Support.EmptyRegion()
 end
 
+function Support.FacilityRegion(facility)
+    return facility and facility.constructionRegion or Support.EmptyRegion()
+end
+
 function Support.Footprint(region)
     local rows = {}
     for _, level in pairs(GridRegion.normalize(region).levels) do

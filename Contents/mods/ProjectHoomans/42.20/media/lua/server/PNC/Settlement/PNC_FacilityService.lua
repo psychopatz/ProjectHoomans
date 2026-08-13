@@ -433,7 +433,22 @@ function Service.ListByCapability(baseId, capability)
                 facility.cachedState = currentState
                 Repository.MarkDirty()
             end
-            if currentState == "OPERATIONAL" then
+            local hasRequestedWorkstation = false
+            if string.sub(tostring(capability or ""), 1, 5) == "work."
+                and facility.constructionState == "BUILT"
+            then
+                for componentId, _ in pairs(facility.componentIds or {}) do
+                    local component = Repository.GetComponent(componentId)
+                    if component and component.role == capability then
+                        hasRequestedWorkstation = true
+                        break
+                    end
+                end
+            end
+            -- Workstation lanes become usable independently. A workshop with
+            -- a craft station may craft while its disassembly station remains
+            -- unassigned, and research benches behave the same way.
+            if currentState == "OPERATIONAL" or hasRequestedWorkstation then
                 output[#output + 1] = facility
             end
         end

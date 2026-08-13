@@ -1,262 +1,290 @@
-local ResearchTab = {}
-local UPGRADE_TITLE_KEY = "UI_PNC_Research_DebugUpgradeStorage"
+require "PNC/UI/Inventory/PNC_InventoryUI_List"
 
-function ResearchTab.Create(window, UI, tr)
-    window.researchBlueprintIndex, window.researchSpecimenIndex = 1, 1
-    local function control(id, key, variant)
-        return UI.CreateButton(window, { id = id, title = getText(key),
-            target = window,
-            onclick = ISPNCColonyManagementWindow.onResearchControl,
-            variant = variant })
-    end
-    local upgradeTitle = tr(UPGRADE_TITLE_KEY, "Debug: Upgrade Storage")
-    window.researchUpgrade = UI.CreateButton(window, {
-        id = "storage_capacity",
-        title = upgradeTitle,
-        target = window,
-        onclick = ISPNCColonyManagementWindow.onResearchUpgrade,
-        variant = "warning",
-    })
-    window.researchTechnology = UI.CreateButton(window, {
-        id = "facility:workshop",
-        title = getText("UI_PNC_Research_StartWorkshop"),
-        target = window,
-        onclick = ISPNCColonyManagementWindow.onResearchControl,
-    })
-    window.researchBlueprint = UI.CreateButton(window, {
-        id = "study_blueprint",
-        title = getText("UI_PNC_Research_StudyBlueprint"),
-        target = window,
-        onclick = ISPNCColonyManagementWindow.onResearchControl,
-    })
-    window.researchReverse = UI.CreateButton(window, {
-        id = "reverse_engineer",
-        title = getText("UI_PNC_Research_ReverseEngineer"),
-        target = window,
-        onclick = ISPNCColonyManagementWindow.onResearchControl,
-    })
-    window.researchDebugBlueprint = UI.CreateButton(window, {
-        id = "debug_blueprint",
-        title = getText("UI_PNC_Research_DebugBlueprint"),
-        target = window,
-        onclick = ISPNCColonyManagementWindow.onResearchControl,
-        variant = "warning",
-    })
-    window.researchDebugSpearKit = UI.CreateButton(window, {
-        id = "debug_spear_kit",
-        title = getText("UI_PNC_Research_DebugSpearKit"),
-        target = window,
-        onclick = ISPNCColonyManagementWindow.onResearchControl,
-        variant = "warning",
-    })
-    window.researchBlueprintPrevious = control("blueprint_previous",
-        "UI_PNC_Research_PreviousBlueprint")
-    window.researchBlueprintNext = control("blueprint_next",
-        "UI_PNC_Research_NextBlueprint")
-    window.researchSpecimenPrevious = control("specimen_previous",
-        "UI_PNC_Research_PreviousSpecimen")
-    window.researchSpecimenNext = control("specimen_next",
-        "UI_PNC_Research_NextSpecimen")
-    window.researchPause = control("research_pause", "UI_PNC_Work_Pause",
+local ResearchTab = {}
+local InventoryModel = require "PNC/UI/Inventory/PNC_InventoryUI_Model"
+local UI = PsychopatzCore and PsychopatzCore.UI or nil
+local CATALOG_COLUMNS = {
+    { key = "category", x = 0.45 }, { key = "action", x = 0.65 },
+    { key = "state", x = 0.80 },
+}
+local QUEUE_COLUMNS = {
+    { key = "worker", x = 0.48 }, { key = "progress", x = 0.70 },
+}
+
+local function control(window, UIBuilder, id, key, callback, variant)
+    return UIBuilder.CreateButton(window, { id = id, title = getText(key),
+        target = window, onclick = callback, variant = variant })
+end
+
+local function makeList(window, role, columns, callback)
+    local list = ISPNCInventoryList:new(0, 0, 100, 100, window, role)
+    list.selectOnly, list.catalogColumns, list.onCatalogCell = true, columns, callback
+    list:initialise(); list:instantiate(); window:addChild(list)
+    return list
+end
+
+function ResearchTab.Create(window, UIBuilder, tr)
+    window.researchSubtab = window.researchSubtab or "base"
+    window.researchQueueList = makeList(window, "research_queue", QUEUE_COLUMNS)
+    window.researchCatalog = makeList(window, "research_catalog",
+        CATALOG_COLUMNS, ResearchTab.OnCatalogCell)
+    window.researchBaseTab = control(window, UIBuilder, "tab_base",
+        "UI_PNC_Research_BaseTab", ISPNCColonyManagementWindow.onResearchControl)
+    window.researchBlueprintTab = control(window, UIBuilder, "tab_blueprint",
+        "UI_PNC_Research_BlueprintTab", ISPNCColonyManagementWindow.onResearchControl)
+    window.researchReverseTab = control(window, UIBuilder, "tab_reverse",
+        "UI_PNC_Research_ReverseTab", ISPNCColonyManagementWindow.onResearchControl)
+    window.researchPause = control(window, UIBuilder, "research_pause",
+        "UI_PNC_Work_Pause", ISPNCColonyManagementWindow.onResearchControl,
         "warning")
-    window.researchCancel = control("research_cancel", "UI_PNC_Work_Cancel",
+    window.researchCancel = control(window, UIBuilder, "research_cancel",
+        "UI_PNC_Work_Cancel", ISPNCColonyManagementWindow.onResearchControl,
         "warning")
+    window.researchDebugBlueprint = control(window, UIBuilder, "debug_blueprint",
+        "UI_PNC_Research_DebugBlueprint",
+        ISPNCColonyManagementWindow.onResearchControl, "warning")
+    window.researchDebugSpearKit = control(window, UIBuilder, "debug_spear_kit",
+        "UI_PNC_Research_DebugSpearKit",
+        ISPNCColonyManagementWindow.onResearchControl, "warning")
+end
+
+local function widths(content)
+    local gap = 8
+    local minimumLeft = math.min(250, math.floor(content.width * 0.42))
+    local minimumRight = math.min(420, math.floor(content.width * 0.58))
+    local left = math.max(minimumLeft, math.floor(content.width * 0.34))
+    left = math.min(left, math.max(1, content.width - gap - minimumRight))
+    return left, math.max(1, content.width - left - gap), gap
 end
 
 function ResearchTab.Layout(window, Layout, content)
-    local controls = { window.researchTechnology, window.researchBlueprint,
-        window.researchReverse, window.researchPause, window.researchCancel,
-        window.researchBlueprintPrevious, window.researchBlueprintNext,
-        window.researchSpecimenPrevious, window.researchSpecimenNext,
-        window.researchDebugBlueprint, window.researchDebugSpearKit,
-        window.researchUpgrade }
-    local gap, columns = 6, 4
-    local width = math.floor((content.width - gap * (columns - 1)) / columns)
-    for index, control in ipairs(controls) do
-        local column, row = (index - 1) % columns, math.floor((index - 1) / columns)
-        Layout.SetBounds(control, content.x + column * (width + gap),
-            content.y + row * 32, width, 27)
+    local left, right, gap = widths(content)
+    local half = math.floor((left - 6) / 2)
+    Layout.SetBounds(window.researchPause, content.x, content.y, half, 27)
+    Layout.SetBounds(window.researchCancel, content.x + half + 6,
+        content.y, left - half - 6, 27)
+    local rightX, tabGap = content.x + left + gap, 5
+    local tabWidth = math.floor((right - tabGap * 2) / 3)
+    Layout.SetBounds(window.researchBaseTab, rightX, content.y, tabWidth, 27)
+    Layout.SetBounds(window.researchBlueprintTab,
+        rightX + tabWidth + tabGap, content.y, tabWidth, 27)
+    Layout.SetBounds(window.researchReverseTab,
+        rightX + (tabWidth + tabGap) * 2, content.y,
+        right - (tabWidth + tabGap) * 2, 27)
+    local debugWidth = math.floor((content.width - 6) / 2)
+    Layout.SetBounds(window.researchDebugBlueprint, content.x, content.y + 34,
+        debugWidth, 27)
+    Layout.SetBounds(window.researchDebugSpearKit,
+        content.x + debugWidth + 6, content.y + 34, debugWidth, 27)
+    local debugAuthorized = window.snapshot and window.snapshot.storage
+        and window.snapshot.storage.debugAuthorized == true
+    local controlsHeight = debugAuthorized and 68 or 34
+    local top, height = content.y + controlsHeight,
+        math.max(1, content.height - controlsHeight)
+    Layout.SetBounds(window.researchQueueList, content.x, top, left, height)
+    Layout.SetBounds(window.researchCatalog, rightX, top, right, height)
+end
+
+local function setButtonState(button, selected, enabled)
+    if not button then return end
+    button:setEnable(enabled == true)
+    if UI and UI.SetButtonVariant then
+        UI.SetButtonVariant(button, selected and "selected" or "quiet")
     end
 end
 
-function ResearchTab.ApplyVisibility(window, active, Layout)
-    window.researchUpgrade:setVisible(active
-        and window.snapshot and window.snapshot.storage
-        and window.snapshot.storage.debugAuthorized == true)
-    window.researchTechnology:setVisible(active)
-    window.researchBlueprint:setVisible(active)
-    window.researchReverse:setVisible(active)
-    window.researchBlueprintPrevious:setVisible(active)
-    window.researchBlueprintNext:setVisible(active)
-    window.researchSpecimenPrevious:setVisible(active)
-    window.researchSpecimenNext:setVisible(active)
+local function applySubtab(window)
+    local lanes = window.researchLaneAvailability or {}
+    if lanes[window.researchSubtab] ~= true then
+        window.researchSubtab = lanes.base and "base"
+            or lanes.blueprint and "blueprint"
+            or lanes.reverse and "reverse" or "base"
+    end
+    setButtonState(window.researchBaseTab,
+        window.researchSubtab == "base", lanes.base)
+    setButtonState(window.researchBlueprintTab,
+        window.researchSubtab == "blueprint", lanes.blueprint)
+    setButtonState(window.researchReverseTab,
+        window.researchSubtab == "reverse", lanes.reverse)
+end
+
+function ResearchTab.ApplyVisibility(window, active)
+    local debugAuthorized = window.snapshot and window.snapshot.storage
+        and window.snapshot.storage.debugAuthorized == true
+    window.researchQueueList:setVisible(active)
+    window.researchCatalog:setVisible(active)
+    window.researchBaseTab:setVisible(active)
+    window.researchBlueprintTab:setVisible(active)
+    window.researchReverseTab:setVisible(active)
     window.researchPause:setVisible(active)
     window.researchCancel:setVisible(active)
-    window.researchDebugBlueprint:setVisible(active
-        and window.snapshot and window.snapshot.storage
-        and window.snapshot.storage.debugAuthorized == true)
-    window.researchDebugSpearKit:setVisible(active
-        and window.snapshot and window.snapshot.storage
-        and window.snapshot.storage.debugAuthorized == true)
-    if active and Layout then
-        window:layoutPane(window.detailsPane, window.layout.content.x,
-            window.layout.content.y + 102, window.layout.content.width,
-            math.max(60, window.layout.content.height - 102))
-    end
+    window.researchDebugBlueprint:setVisible(active and debugAuthorized)
+    window.researchDebugSpearKit:setVisible(active and debugAuthorized)
+    if active then window.detailsPane:setVisible(false); applySubtab(window) end
 end
 
-local function storageRows(window, predicate)
+local function activeResearch(snapshot)
     local output = {}
-    for _, row in ipairs(window.snapshot and window.snapshot.storage
-        and window.snapshot.storage.rows or {}) do
-        if predicate(row) then output[#output + 1] = row end
+    for _, order in ipairs(snapshot.research and snapshot.research.orders or {}) do
+        if order.operation == "RESEARCH" and order.status ~= "COMPLETED"
+            and order.status ~= "CANCELLED" then output[#output + 1] = order end
     end
     return output
 end
 
-local function cycle(value, delta, count)
-    if count <= 0 then return 1 end
-    return ((math.max(1, tonumber(value) or 1) - 1 + delta) % count) + 1
-end
-
-local function activeResearch(window)
-    for _, order in ipairs(window.snapshot and window.snapshot.research
-        and window.snapshot.research.orders or {}) do
-        if order.operation == "RESEARCH" and order.status ~= "COMPLETED"
-            and order.status ~= "CANCELLED" then return order end
-    end
-end
-
-local function progressValues(order)
+local function progress(order)
     local required = math.max(1, tonumber(order and order.requiredWork) or 1)
-    local progress = math.max(0, math.min(required,
-        tonumber(order and order.progress) or 0))
-    return progress, required,
-        math.floor((progress / required) * 100 + 0.5)
+    return math.floor(math.min(1, math.max(0,
+        tonumber(order and order.progress) or 0) / required) * 100 + 0.5)
 end
 
-function ResearchTab.OnControl(window, button)
-    local action = tostring(button and button.internal or "")
-    local blueprints = storageRows(window, function(value)
-        return value.fullType == "PNC.RecipeBlueprint"
-    end)
-    local specimens = storageRows(window, function(value)
-        return value.fullType ~= "PNC.RecipeBlueprint"
-    end)
-    if action == "blueprint_previous" or action == "blueprint_next" then
-        window.researchBlueprintIndex = cycle(window.researchBlueprintIndex,
-            action == "blueprint_next" and 1 or -1, #blueprints)
-        window:rebuildDetails(); return true
-    elseif action == "specimen_previous" or action == "specimen_next" then
-        window.researchSpecimenIndex = cycle(window.researchSpecimenIndex,
-            action == "specimen_next" and 1 or -1, #specimens)
-        window:rebuildDetails(); return true
-    elseif action == "research_pause" then
-        local order = activeResearch(window)
-        if order then PNC.Client.RequestColonyAction("work_pause", {
-            workOrderId = order.id, paused = order.status ~= "PAUSED",
-        }) return true end
-    elseif action == "research_cancel" then
-        local order = activeResearch(window)
-        if order then PNC.Client.RequestColonyAction("work_cancel", {
-            workOrderId = order.id,
-        }) return true end
+local function matchingOrder(orders, mode, id)
+    for _, order in ipairs(orders) do
+        local payload = order.payload or {}
+        if payload.mode == mode and (mode == "technology"
+            and tostring(payload.technologyId) == tostring(id)
+            or mode ~= "technology" and tonumber(order.recipeId) == tonumber(id))
+        then return order end
     end
-    if action == "facility:workshop" then
-        PNC.Client.RequestColonyAction("research_queue_technology", {
-            technologyId = action,
-        })
-    elseif action == "study_blueprint" then
-        local row = blueprints[cycle(window.researchBlueprintIndex, 0,
-            #blueprints)]
-        if row then PNC.Client.RequestColonyAction("research_study_blueprint", {
-            recordIndex = row.recordIndex,
-        }) end
-    elseif action == "reverse_engineer" then
-        local row = specimens[cycle(window.researchSpecimenIndex, 0,
-            #specimens)]
-        if row then PNC.Client.RequestColonyAction("research_reverse_engineer", {
-            recordIndex = row.recordIndex,
-        }) end
+end
+
+local function hasLane(snapshot, role)
+    for _, facility in ipairs(snapshot.settlement
+        and snapshot.settlement.facilities or {}) do
+        if facility.definitionId == "research_facility"
+            and facility.constructionState == "BUILT"
+        then
+            for _, component in ipairs(facility.components or {}) do
+                if component.role == role then return true end
+            end
+        end
+    end
+    return false
+end
+
+function ResearchTab.OnCatalogCell(window, row, key)
+    if key ~= "action" or row.researchable ~= true then return end
+    if row.mode == "technology" then
+        PNC.Client.RequestColonyAction("research_queue_technology",
+            { technologyId = row.technologyId })
+    elseif row.mode == "blueprint" then
+        PNC.Client.RequestColonyAction("research_study_blueprint",
+            { recordIndex = row.recordIndex })
+    elseif row.mode == "reverse" then
+        PNC.Client.RequestColonyAction("research_reverse_engineer",
+            { recordIndex = row.recordIndex })
+    end
+end
+
+local function selectedOrder(window)
+    local row = window.researchQueueList:selectedRow()
+    return row and row.order or activeResearch(window.snapshot or {})[1]
+end
+
+function ResearchTab.OnControl(window, buttonValue)
+    local action = tostring(buttonValue and buttonValue.internal or "")
+    local tab = action == "tab_base" and "base"
+        or action == "tab_blueprint" and "blueprint"
+        or action == "tab_reverse" and "reverse" or nil
+    if tab and window.researchLaneAvailability[tab] then
+        window.researchSubtab = tab; window:rebuildDetails(); return true
+    end
+    local order = selectedOrder(window)
+    if action == "research_pause" and order then
+        PNC.Client.RequestColonyAction("work_pause", { workOrderId = order.id,
+            paused = order.status ~= "PAUSED" }); return true
+    elseif action == "research_cancel" and order then
+        PNC.Client.RequestColonyAction("work_cancel", { workOrderId = order.id })
+        return true
     elseif action == "debug_blueprint" then
-        PNC.Client.RequestColonyAction("blueprint_debug_create", {})
+        PNC.Client.RequestColonyAction("blueprint_debug_create", {}); return true
     elseif action == "debug_spear_kit" then
-        PNC.Client.RequestColonyAction("production_debug_spear_kit", {})
+        PNC.Client.RequestColonyAction("production_debug_spear_kit", {}); return true
     end
+    return false
 end
 
-function ResearchTab.OnUpgrade(window, button)
-    PNC.Client.RequestColonyAction("research_debug_upgrade", {
-        researchId = button and button.internal or "storage_capacity",
-        storageId = window.snapshot and window.snapshot.storage
-            and window.snapshot.storage.storageId,
-    })
+local function addRow(list, spec)
+    local order = spec.order
+    local state = spec.known and "LEARNED"
+        or order and ("RESEARCHING " .. tostring(progress(order)) .. "%")
+        or spec.prerequisiteKnown == false and "PREREQUISITE REQUIRED"
+        or "NOT LEARNED"
+    spec.catalogCells = { category = spec.category,
+        action = spec.known and "—" or order and "QUEUED"
+            or spec.prerequisiteKnown == false and "LOCKED"
+            or spec.laneAvailable and "RESEARCH" or spec.missingStation,
+        state = state }
+    spec.catalogColors = { action = spec.laneAvailable and not spec.known
+        and not order and "accent" or "warning",
+        state = spec.known and "success" or order and "warning" or nil }
+    spec.researchable = spec.laneAvailable and not spec.known
+        and spec.prerequisiteKnown ~= false and order == nil
+    spec.restricted = not spec.researchable
+    list:addItem(spec.name, spec)
+end
+
+local function rebuildQueue(window, orders)
+    if not window.researchQueueList then return end
+    window.researchQueueList:clear()
+    window.researchQueueList:addItem("RESEARCH QUEUE", { name = "RESEARCH QUEUE",
+        restricted = true, catalogHeader = true,
+        catalogCells = { worker = "WORKER", progress = "PROGRESS" } })
+    for _, order in ipairs(orders) do
+        local mode = tostring(order.payload and order.payload.mode or "technology")
+        window.researchQueueList:addItem(string.upper(mode), {
+            name = string.upper(mode), order = order,
+            catalogCells = { worker = tostring(order.workerId or "UNASSIGNED"),
+                progress = tostring(progress(order)) .. "%  "
+                    .. tostring(order.status) },
+            catalogColors = { progress = order.blockedReason
+                and "warning" or "accent" } })
+    end
 end
 
 function ResearchTab.Rebuild(window, snapshot, tr)
     if window.tab ~= "research" then return false end
-    local entries = snapshot.research and snapshot.research.entries or {}
-    if #entries == 0 then
-        window:addDetail("NO RESEARCH AVAILABLE",
-            "Research definitions are unavailable.")
-        return true
-    end
-    local activeByTechnology = {}
-    for _, order in ipairs(snapshot.research.orders or {}) do
-        local payload = order.payload or {}
-        if order.operation == "RESEARCH" and payload.mode == "technology"
-            and order.status ~= "COMPLETED" and order.status ~= "CANCELLED"
-        then
-            activeByTechnology[tostring(payload.technologyId or "")] = order
+    local research, orders = snapshot.research or {}, activeResearch(snapshot)
+    window.researchLaneAvailability = {
+        base = hasLane(snapshot, "work.research"),
+        blueprint = hasLane(snapshot, "work.blueprint"),
+        reverse = hasLane(snapshot, "work.reverse"),
+    }
+    applySubtab(window)
+    rebuildQueue(window, orders)
+    window.researchCatalog:clear()
+    local title = window.researchSubtab == "base" and "BASE RESEARCH"
+        or window.researchSubtab == "blueprint" and "RECIPE BLUEPRINTS"
+        or "REVERSE ENGINEERING"
+    window.researchCatalog:addItem(title, { name = title, restricted = true,
+        catalogHeader = true, catalogCells = { category = "CATEGORY",
+            action = "RESEARCH", state = "STATE / PROGRESS" } })
+    if window.researchSubtab == "base" then
+        for _, entry in ipairs(research.entries or {}) do
+            addRow(window.researchCatalog, { name = tr(entry.labelKey, entry.id),
+                mode = "technology", technologyId = entry.id,
+                category = string.upper(tostring(entry.category or "TECHNOLOGY")),
+                known = entry.known == true,
+                prerequisiteKnown = entry.prerequisiteKnown ~= false,
+                order = matchingOrder(orders, "technology", entry.id),
+                laneAvailable = window.researchLaneAvailability.base,
+                missingStation = "NO RESEARCH STATION" })
         end
-    end
-    for _, entry in ipairs(entries) do
-        if entry.id == "storage_capacity" then
-            window:addDetail(tr(entry.labelKey, "Storage Capacity"),
-                "Tier " .. tostring(entry.currentLevel), "accent")
-        else
-            local active = activeByTechnology[tostring(entry.id)]
-            local progress, required, percent = progressValues(active)
-            local detail = entry.known
-                and tr("UI_PNC_Research_Known", "UNLOCKED")
-                or active and string.format("%s  %d%%  |  %.1f / %.1f WP",
-                    tostring(active.status), percent, progress, required)
-                or tostring(entry.requiredWork) .. " WP"
-            window:addDetail(tr(entry.labelKey, entry.id),
-                detail,
-                entry.known and "success" or "accent")
-        end
-    end
-    window:addDetail(tr("UI_PNC_Research_LearnedRecipes", "LEARNED RECIPES"),
-        tostring(#(snapshot.research.learnedRecipeIds or {})))
-    local blueprints = storageRows(window, function(value)
-        return value.fullType == "PNC.RecipeBlueprint"
-    end)
-    local specimens = storageRows(window, function(value)
-        return value.fullType ~= "PNC.RecipeBlueprint"
-    end)
-    window.researchBlueprintIndex = cycle(window.researchBlueprintIndex, 0,
-        #blueprints)
-    window.researchSpecimenIndex = cycle(window.researchSpecimenIndex, 0,
-        #specimens)
-    local blueprint = blueprints[window.researchBlueprintIndex]
-    local specimen = specimens[window.researchSpecimenIndex]
-    window:addDetail(getText("UI_PNC_Research_BlueprintInput"), blueprint
-        and tostring(blueprint.name or blueprint.fullType) or getText("UI_None"))
-    window:addDetail(getText("UI_PNC_Research_SpecimenInput"), specimen
-        and tostring(specimen.name or specimen.fullType) or getText("UI_None"))
-    for _, order in ipairs(snapshot.research.orders or {}) do
-        if order.operation == "RESEARCH" and order.status ~= "COMPLETED"
-            and order.status ~= "CANCELLED"
-        then
-            local progress, required, percent = progressValues(order)
-            window:addDetail("RESEARCH " .. tostring(order.status)
-                    .. "  " .. tostring(percent) .. "%",
-                string.format("%.1f / %.1f WP", progress, required),
-                order.blockedReason and "warning" or "accent")
-            window:addDetail("WORKER", tostring(order.workerId or "UNASSIGNED"))
-            if order.blockedReason then
-                window:addDetail("BLOCKED", tostring(order.blockedReason), "warning")
+    else
+        local mode = window.researchSubtab
+        for _, candidate in ipairs(research.candidates or {}) do
+            if candidate.mode == mode then
+                local metadata = InventoryModel.Probe(candidate.fullType)
+                addRow(window.researchCatalog, { name = candidate.displayName,
+                    texture = metadata.texture, mode = candidate.mode,
+                    recipeId = candidate.recipeId,
+                    recordIndex = candidate.recordIndex,
+                    category = mode == "blueprint" and "BLUEPRINT" or "SPECIMEN",
+                    known = candidate.known == true,
+                    order = matchingOrder(orders, mode, candidate.recipeId),
+                    laneAvailable = window.researchLaneAvailability[mode],
+                    missingStation = mode == "blueprint"
+                        and "NO ARCHITECT BENCH" or "NO LAB" })
             end
         end
     end

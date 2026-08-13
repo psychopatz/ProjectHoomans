@@ -115,6 +115,8 @@ local function roleLabel(role)
         ["sleep.bed"] = "SLEEP SPOTS",
         ["farm.field"] = "CULTIVATED FIELDS",
         ["work.research"] = "RESEARCH STATION",
+        ["work.blueprint"] = "ARCHITECT BENCH",
+        ["work.reverse"] = "LAB",
         ["work.craft"] = "CRAFT STATION",
         ["work.disassemble"] = "DISASSEMBLY STATION",
     }

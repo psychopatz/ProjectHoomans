@@ -86,6 +86,18 @@ local function colonistHomeAction(player, args, recover)
         record, args.baseId, "player_requested")
 end
 
+local function colonistFollowAction(player, args)
+    local record = PNC.Registry and PNC.Registry.Get(args.npcID) or nil
+    if not record or record.alive == false or not owned(record, player) then
+        return false, "npc_not_owned"
+    end
+    if not PNC.HomeDutyService or not PNC.HomeDutyService.SendToPlayer then
+        return false, "HOME_SERVICE_UNAVAILABLE"
+    end
+    return PNC.HomeDutyService.SendToPlayer(record, player,
+        "player_requested")
+end
+
 local function setJobPermission(player, args)
     local record = PNC.Registry and PNC.Registry.Get(args.npcID) or nil
     if not record or record.alive == false or not owned(record, player) then
@@ -420,16 +432,17 @@ function Management.HandleAction(player, args)
     elseif action == "storage_debug" then
         ok, reason, storage, details =
             PNC.ColonyStorageService.DebugAction(player, args)
+    elseif action == "storage_upgrade" then
+        ok, reason, storage, details =
+            PNC.ColonyStorageService.Upgrade(player, args)
     elseif action == "job_permission_set" then
         ok, reason, details = setJobPermission(player, args)
     elseif action == "colonist_return_home" then
         ok, reason, details = colonistHomeAction(player, args, false)
+    elseif action == "colonist_follow_player" then
+        ok, reason, details = colonistFollowAction(player, args)
     elseif action == "colonist_recover" then
         ok, reason, details = colonistHomeAction(player, args, true)
-    elseif action == "research_debug_upgrade" then
-        ok, reason, storage = PNC.ColonyResearchService.DebugUpgrade(
-            player, tostring(args.researchId or ""), args
-        )
     elseif action == "research_queue_technology" then
         details, reason = PNC.ResearchService.Commands.QueueTechnology(
             player, tostring(args.technologyId or ""))

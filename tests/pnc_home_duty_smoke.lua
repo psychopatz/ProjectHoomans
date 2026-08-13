@@ -32,7 +32,8 @@ package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
 end
 
 PNC = {
-    Const = { PRESENCE_LIVE = "live", PRESENCE_ABSTRACT = "abstract" },
+    Const = { PRESENCE_LIVE = "live", PRESENCE_ABSTRACT = "abstract",
+        ORDER_FOLLOW = "follow" },
     Core = { Now = function() return 1234 end },
     BaseService = {
         Get = function(id)
@@ -149,5 +150,30 @@ equal(npc.orderSpec.kind, "colony_home", "recovered colonist is At Home")
 equal(details.stockpileNodeId, "stockpile-1", "recovery reports stockpile")
 equal(reconciled, true, "presence reconciled at destination")
 equal(broadcast, "colonist_recovered", "recovery replicated")
+
+local traveler = {
+    id = "npc-2", alive = true, x = 15, y = 16, z = 0,
+    presenceState = "abstract", runtime = {},
+    affiliation = { communityID = "colony-1" },
+}
+local player = {
+    getX = function() return 200 end,
+    getY = function() return 300 end,
+    getZ = function() return 0 end,
+    getUsername = function() return "owner" end,
+    getOnlineID = function() return 42 end,
+}
+local following, followReason = PNC.HomeDutyService.SendToPlayer(
+    traveler, player, "test")
+equal(following, true, "map-scale follow journey accepted")
+equal(followReason, "TRAVELING_TO_PLAYER", "follow journey state")
+equal(startedRequest.destination.x, 200, "follow journey targets player x")
+equal(startedRequest.arrivalAction.type, "colony_follow_player",
+    "follow journey uses durable arrival")
+local followArrived = arrivals.colony_follow_player(traveler,
+    traveler.travel, startedRequest.arrivalAction)
+equal(followArrived, true, "follow arrival handled")
+equal(traveler.orderSpec.kind, "follow", "arrival installs follow order")
+equal(traveler.orderSpec.ownerUsername, "owner", "follow owner is preserved")
 
 print("pnc_home_duty_smoke: ok")

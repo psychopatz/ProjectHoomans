@@ -176,6 +176,7 @@ function Service.BuildSnapshot(baseOrId)
     local base = type(baseOrId) == "table" and baseOrId or Service.Get(baseOrId)
     if not base then return nil end
     local output = PNC.Core.DeepCopy(base)
+    output.maxHQLevel = #(Definitions.HQ_LEVELS or {})
     output.territory = Service.GetTerritorySummary(base)
     local zone = Zones.get(base.baseZoneId)
     output.geometry = zone and {

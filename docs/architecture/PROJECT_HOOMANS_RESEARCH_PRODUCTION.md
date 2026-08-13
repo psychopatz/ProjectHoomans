@@ -60,6 +60,12 @@ salvage policy remains in Project Hoomans.
   fresh snapshot on a revision gap.
 - **Depends on:** RecipeCatalog queries, RecipeKnowledgeRegistry, Work commands,
   and Colony Storage reservation commands.
+- **Progression contract:** technology research unlocks permission; it never
+  performs the resulting settlement mutation. HQ and stockpile tiers are
+  sequential technologies completed by a Researcher at `work.research` using
+  resumable Work Points. After completion, the matching Base-tab action becomes
+  available and remains server-gated by that learned technology. Building
+  technologies such as Basic Workshop follow the same unlock-first contract.
 - **Must not depend on:** client UI or raw ModData consumers.
 
 ### Work
@@ -91,9 +97,12 @@ salvage policy remains in Project Hoomans.
 
 - **Owns:** physical availability and server-authoritative component/activity
   reservations.
-- **Definitions:** Research Facility has one `work.research` station. Workshop
-  has independent capacity-one `work.craft` and `work.disassemble` stations.
-  Additional parallel Craft work therefore requires another Workshop.
+- **Definitions:** Research Facility has independent capacity-one
+  `work.research` (Research Station), `work.blueprint` (Architect Bench), and
+  `work.reverse` (Lab) components. Workshop has independent capacity-one
+  `work.craft` and `work.disassemble` stations. A lane is enabled only when its
+  matching built component exists. Additional parallel work requires another
+  facility instance with the relevant component.
 - **Recovery:** claims renew while active. Component/facility removal invalidates
   the reservation; Work releases/reblocks it on the next bounded pass.
 - **Progression:** Research Facility is available from HQ progression. Workshop
@@ -109,7 +118,10 @@ salvage policy remains in Project Hoomans.
 - **Disassembly contract:** provenance selects the producer; unprovenanced items
   require exactly one producer. Only consumed inputs are salvage candidates.
   The deterministic, retry-stable salvage plan is skill-scaled and capped below
-  full refund.
+  full refund. Currency, recipe blueprints, and other explicitly excluded
+  system records are never salvage candidates. The catalog projects a bounded
+  potential yield from the same consumed-input policy; completion still applies
+  the assigned worker's skill and deterministic roll.
 - **Persistence:** Work owns the queue. Colony Storage persists transaction-stage
   markers with inventory state so retries cannot consume or deposit twice.
 
@@ -126,12 +138,58 @@ salvage policy remains in Project Hoomans.
 
 ## UI and diagnostics
 
-Research and Workshop are Colony Management tabs. They issue existing
-server-routed colony actions and consume snapshots/deltas. Research supports
-technology, explicit blueprint/specimen selection, progress, worker, blockers,
-pause/cancel, and authorized blueprint debug creation. Workshop supports known
-recipe selection, quantity, requirements and current availability, skill gates,
-disassembly input selection, queue/station/worker state, pause, and cancel.
+Research and Workshop are Colony Management tabs. Both keep their resumable
+queue on the left and a lane catalog on the right. Research separates Base,
+Recipe Blueprints, and Reverse Engineering; Workshop separates Crafting and
+Salvaging. Lane tabs disable when the matching physical component is absent.
+Catalog rows expose action/state, quantity where relevant, and potential salvage
+yield. Queue rebuilding is idempotent: every snapshot clears and rebuilds its
+presentation so refreshes cannot accumulate duplicate headers.
+
+## Adding a structure or component
+
+Use this checklist so a new facility is data-led and participates in building,
+overlays, work claims, and scalable UI without special-case buttons.
+
+1. Add the facility to `PNC_FacilityDefinitions.lua`. Give it a stable
+   `definitionId`, translation keys, placeholder/build-card icon, HQ/research
+   requirements, construction/deconstruction Work Points, build costs, and each
+   level's component requirements.
+2. Describe every component with a stable `role`, `kind` (`anchor` or `region`),
+   count, label/translation, and capability. Anchors occupy one tile by default;
+   declare a larger footprint only for genuine multi-tile components such as a
+   bed. Component placement is validated inside the facility room footprint.
+3. Map work-producing roles in the relevant server operation target provider.
+   A queued operation must request the exact role it walks to—for example
+   `work.craft`, `work.disassemble`, `work.research`, `work.blueprint`, or
+   `work.reverse`. Do not infer a station from the UI tab.
+4. Add the role to the appropriate catalog lane's availability check. Keep the
+   permanent queue separate from right-side subtabs; disabling one missing lane
+   must not disable sibling components in the same facility.
+5. Add translation strings for the facility, its components, unavailable-state
+   explanation, and action text. UI code may keep an English fallback, but the
+   shared translation key is canonical.
+6. Confirm construction gating: the facility room must finish before component
+   assignment; area edits and component moves create reconstruction work rather
+   than becoming operational immediately. Construction and destruction retain
+   shared progress and may be resumed by another eligible colonist.
+7. Confirm overlay presentation: the settlement area is faintest, built room
+   fills are slightly more opaque/darker, components remain prominent, and room
+   and component icons occupy a centered tile-sized marker.
+8. Add smoke coverage for definition validation, boundary/footprint rejection,
+   Work target routing, lane enablement, queue refresh idempotence, parallel
+   facility claims, save/reload recovery, and snapshot progress.
+
+The authoritative extension path is therefore:
+
+```text
+Facility definition -> validated room/component placement -> role capability
+-> Work target provider -> operation queue/snapshot -> lane catalog UI
+```
+
+Avoid adding facility-specific bottom buttons or scanning storage directly from
+the client. Catalog candidates and potential results come from server snapshots;
+the client only presents them and issues colony actions.
 
 Diagnostics cover catalog normalization, registry size/unavailable mappings,
 knowledge revision/counts, Work queues/claims/blockers, workstation ownership,
