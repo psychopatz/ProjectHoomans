@@ -2,7 +2,7 @@
 -- current player's companion.  The caller is responsible for debug authority;
 -- this service owns eligibility and canonical faction membership changes.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

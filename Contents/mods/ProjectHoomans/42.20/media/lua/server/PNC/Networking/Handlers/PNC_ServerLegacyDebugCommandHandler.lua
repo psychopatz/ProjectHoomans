@@ -1,4 +1,7 @@
 -- Legacy debug-envelope adapter. Action strings remain one compatibility API.
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
 
 PNC.ServerLegacyDebugCommandHandler =
     PNC.ServerLegacyDebugCommandHandler or {}

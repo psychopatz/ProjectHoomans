@@ -1,6 +1,6 @@
 -- Opt-in, read-only diagnostics for player identity and combat callbacks.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

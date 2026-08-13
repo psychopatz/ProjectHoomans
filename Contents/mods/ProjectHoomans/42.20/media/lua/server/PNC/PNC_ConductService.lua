@@ -1,6 +1,6 @@
 -- Server-authoritative actor-owned behavioral conduct service.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

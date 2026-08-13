@@ -1,6 +1,6 @@
 -- Idempotent lifecycle adapters around the centralized identity service.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

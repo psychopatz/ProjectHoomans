@@ -1,4 +1,6 @@
 -- Deterministic server-runtime composition root. Require order is contractual.
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
+
 require "PNC/00_PNC_Init"
 require "PNC/PNC_PlayerCharacterDebug"
 require "PNC/PNC_PlayerCharacterService"

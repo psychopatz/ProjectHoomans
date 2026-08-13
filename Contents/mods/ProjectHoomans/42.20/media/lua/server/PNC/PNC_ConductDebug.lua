@@ -1,6 +1,6 @@
 -- Read-only formatting and sanitized debug snapshots for conduct.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

@@ -1,3 +1,5 @@
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
+
 local Service = PNC.ColonyStorageService
 local Internal = Service.Internal
 local Definitions = Internal.Definitions

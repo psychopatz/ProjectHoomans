@@ -1,7 +1,7 @@
 -- Bounded, runtime-only faction diagnostics. This module never writes
 -- ModData and accepts no live engine values into its buffer.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

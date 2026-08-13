@@ -30,8 +30,9 @@ load-order code changed.
 ## Current Goal
 
 All planned architecture chunks are complete. Static and isolated-harness
-validation is green; live SP, hosted-MP, dedicated-server, and save/reload
-validation remains a mandatory release gate and is not represented as passed.
+validation is green, and live SP is user-confirmed. Hosted-MP must be retested
+after the pure-client server-file guard fix; dedicated-server and save/reload
+validation remain mandatory release gates and are not represented as passed.
 The Monolith Decoupler remains deferred to a separately requested pass.
 
 ## Contracts Being Preserved
@@ -181,6 +182,46 @@ pre-approved folder moves.
   save/reload migration validation are **NOT RUN** in this environment. Static
   composition and protocol harnesses reduce risk but do not replace those four
   release checks.
+- Post-consolidation live validation: the user confirmed SP works, while a
+  hosted-MP client exposed `PNC_Supply.lua:18` (`PNC.NPCSupplyService` was nil)
+  followed by four Colony Storage child-module errors where
+  `PNC.ColonyStorageService.Internal` was nil. Console evidence showed the pure
+  client executing the server composition and later visiting server child files
+  independently through `LoadDirBase`.
+- Added a pure-client guard to the server composition root, the canonical Supply
+  entry, and the four Colony Storage implementation children implicated by the
+  runtime trace. The `00_PNC_Server_Init.lua` anchor remains unchanged and thin.
+  Hosted and dedicated server execution is preserved because the guard permits
+  execution whenever `isServer()` is true.
+- Added `pnc_mp_server_file_guard_smoke.lua`. It verifies that the affected
+  server files perform no requires or state initialization in a pure client,
+  while hosted-server mode still composes and exports the Supply facade. The
+  complete suite now passes 194 of 194 tests; all 598 Lua files parse and the
+  Kahlua scan remains clean across 592 scanned files (six exclusions).
+- Hosted MP after this fix is **RETEST REQUIRED**. Dedicated-server and
+  save/reload validation remain **NOT RUN**.
+- A second hosted-MP retry exposed the next direct-loader family: all ten
+  `PNC_Server*CommandHandler.lua` files were visited independently on the pure
+  client and attempted `Router.Register(...)` before the server router existed.
+  The command router, routing entry, and complete handler family now use the
+  same pure-client gate. Their canonical server require order is unchanged.
+- Added reusable `PsychopatzCore.RuntimeRole` in Core common/shared code with
+  `IsClient`, `IsServer`, `IsPureClient`, `IsSinglePlayer`,
+  `AllowsServerCode`, and `AllowsClientCode`. PsychopatzCore loads it first from
+  its existing `00_PsychopatzCore_Init.lua`; `PNC.Core.IsClientOnly` and
+  `PNC.Core.IsAuthority` remain compatible delegating APIs.
+- Replaced 112 repeated raw Project Hoomans client/server predicates with calls
+  to `PsychopatzCore.RuntimeRole.AllowsServerCode`. All 138 ordinary server Lua
+  files now share the Core policy rather than duplicating engine-role logic.
+  The sole excluded server file is the deliberate `00_PNC_Server_Init.lua`
+  anchor; it remains unchanged and delegates to the guarded composition root.
+- Added a four-context Core runtime-role smoke (SP, pure client, dedicated
+  server, and combined hosted role) and expanded the Hoomans MP direct-loader
+  smoke across the routing family. PsychopatzCore now passes 25 of 25 tests,
+  including corrected active-version paths in the corpse-item and event-marker
+  harnesses. Project Hoomans passes 194 of 194 tests.
+- Hosted MP after the reusable Core-role migration is **RETEST REQUIRED**.
+  Dedicated-server and save/reload validation remain **NOT RUN**.
 - Chunk 13 completed the PsychopatzCore extraction gate without moving code.
   Extraction was treated as an evidence-based decision, not a required outcome:
   a candidate had to be policy-free and have a credible non-Hoomans consumer.
@@ -1014,6 +1055,7 @@ pre-approved folder moves.
 
 ## Next Chunk
 
-No further architecture chunk is scheduled. Perform the live SP, hosted-MP,
-dedicated-server, and save/reload release matrix next. Any monolith decoupling
-or further module splitting requires a separate explicit request.
+No further architecture chunk is scheduled. Retest hosted MP after the
+pure-client server-file guard fix, then perform dedicated-server and save/reload
+validation. Any monolith decoupling or further module splitting requires a
+separate explicit request.

@@ -3,7 +3,7 @@
 -- Roaming looter factions retain their normal predatory behavior. Only
 -- factions tagged territorialToll=true use this radius-entry demand flow.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

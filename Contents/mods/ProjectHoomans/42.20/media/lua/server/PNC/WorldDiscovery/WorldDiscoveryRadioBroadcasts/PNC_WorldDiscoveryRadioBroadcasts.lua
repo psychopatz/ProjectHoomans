@@ -1,4 +1,4 @@
-if isClient and isClient() and (not isServer or not isServer()) then return end
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 local Discovery = PNC.WorldDiscovery
 Discovery.RadioBroadcastsInternal = Discovery.RadioBroadcastsInternal or {}

@@ -1,3 +1,7 @@
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
+
 require "PNC/00_PNC_Init"
 local ItemTransfer = require "PsychopatzCore/Inventory/PsychopatzItemTransfer"
 

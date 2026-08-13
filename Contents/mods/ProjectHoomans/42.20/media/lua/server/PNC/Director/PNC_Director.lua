@@ -1,4 +1,8 @@
 -- Canonical server Director entry. Dependency order is contractual.
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
+
 require "PNC/Director/PNC_AbstractWorldStore"
 require "PNC/Director/PNC_AbstractLocationManager"
 require "PNC/Director/PNC_AbstractGroupManager"

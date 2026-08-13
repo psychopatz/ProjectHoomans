@@ -1,6 +1,6 @@
 -- Bounded structured logging for the server-authoritative Population Director.
 
-if isClient and isClient() and (not isServer or not isServer()) then return end
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
 PNC.PopulationLog = PNC.PopulationLog or {}

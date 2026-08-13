@@ -1,7 +1,7 @@
 -- Minimal server-runtime combat encounter aggregation for social milestones.
 -- This table is intentionally not persisted and contains no engine objects.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

@@ -1,4 +1,7 @@
 -- Thin authoritative boundary for domain-owned client command handlers.
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
 
 PNC = PNC or {}
 PNC.ServerCommandRouter = PNC.ServerCommandRouter or {}

@@ -1,4 +1,7 @@
 -- Health/combat network adapter. Domain services retain authoritative mutation.
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
 
 local Router = PNC.ServerCommandRouter
 local Const = PNC.Const

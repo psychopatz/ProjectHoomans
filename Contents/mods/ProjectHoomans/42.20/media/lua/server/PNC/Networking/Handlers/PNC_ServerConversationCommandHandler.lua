@@ -1,4 +1,7 @@
 -- Conversation network adapter. Conversation services retain all authority.
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
 
 local Router = PNC.ServerCommandRouter
 local Const = PNC.Const

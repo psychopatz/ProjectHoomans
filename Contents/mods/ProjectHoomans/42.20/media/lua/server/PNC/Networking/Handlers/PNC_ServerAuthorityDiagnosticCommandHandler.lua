@@ -1,4 +1,7 @@
 -- Authority diagnostic adapters. Domain services retain snapshot and action policy.
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
 
 local Router = PNC.ServerCommandRouter
 local Const = PNC.Const

@@ -1,3 +1,5 @@
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
+
 local Internal = PNC.ColonyStorageService.Internal
 local CoreInventory = Internal.CoreInventory
 local ItemRecord = require "PsychopatzCore/Inventory/PsychopatzItemRecord"

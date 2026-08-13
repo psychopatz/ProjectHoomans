@@ -1,6 +1,6 @@
 -- Small bounded, deduplicated queues. Pending requests are intentionally transient.
 
-if isClient and isClient() and (not isServer or not isServer()) then return end
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
 PNC.GenerationQueue = PNC.GenerationQueue or {}

@@ -1,6 +1,6 @@
 -- Authority-owned persistence boundary and local event bus for abstract state.
 
-if isClient and isClient() and (not isServer or not isServer()) then return end
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
 PNC.AbstractWorldStore = PNC.AbstractWorldStore or {}

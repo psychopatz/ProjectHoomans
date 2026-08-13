@@ -1,6 +1,6 @@
 -- Non-destructive schema-v4 repair for legacy single-player UUID splits.
 
-if isClient and isClient() and (not isServer or not isServer()) then return end
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
 PNC.PlayerIdentityMigration = PNC.PlayerIdentityMigration or {}

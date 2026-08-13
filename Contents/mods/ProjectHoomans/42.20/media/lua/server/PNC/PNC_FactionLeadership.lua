@@ -4,7 +4,7 @@
 -- service owns only NPC leaders for active AI factions, keeping succession
 -- separate from faction membership and community placement systems.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

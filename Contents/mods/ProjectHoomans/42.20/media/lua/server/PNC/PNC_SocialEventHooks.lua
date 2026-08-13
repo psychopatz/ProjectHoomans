@@ -1,6 +1,6 @@
 -- Narrow adapters from authoritative gameplay milestones to social events.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

@@ -1,3 +1,7 @@
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
+
 PNC = PNC or {}
 PNC.ItemUtility = PNC.ItemUtility or {}
 

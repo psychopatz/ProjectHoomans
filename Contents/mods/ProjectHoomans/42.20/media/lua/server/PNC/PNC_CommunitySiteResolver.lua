@@ -3,7 +3,7 @@
 -- Building and square objects are inspected only during this call. Returned
 -- values contain serialization-safe coordinates and identifiers exclusively.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

@@ -1,4 +1,7 @@
 -- Canonical entry point for authoritative client-command routing.
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
 
 require "PNC/Networking/PNC_ServerCommandRouter"
 require "PNC/Networking/Handlers/PNC_ServerInventoryCommandHandler"

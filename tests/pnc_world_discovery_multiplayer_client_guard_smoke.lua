@@ -3,7 +3,11 @@ local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/WorldDisco
 isClient = function() return true end
 isServer = function() return false end
 PNC = nil
-PsychopatzCore = nil
+PsychopatzCore = {
+    RuntimeRole = {
+        AllowsServerCode = function() return false end,
+    },
+}
 
 local files = {
     "PNC_WorldDiscovery.lua",

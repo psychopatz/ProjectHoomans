@@ -1,5 +1,5 @@
 -- Server-authoritative category selection, choice validation, effects, and history.
-if isClient and isClient() and (not isServer or not isServer()) then return end
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 require "PNC/Conversation/PNC_ConversationHistory"
 require "PNC/Conversation/Blocks/PNC_ConversationTextLoader"

@@ -4,7 +4,7 @@
 -- reserve sites, claim homes, or create a base radius. Their faction carries
 -- one primitive staging site so abstract members can relocate together.
 
-if isClient and isClient() and (not isServer or not isServer()) then
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then
     return
 end
 

@@ -3,6 +3,14 @@ PNC.Core = PNC.Core or {}
 PNC.Runtime = PNC.Runtime or {}
 
 local Core = PNC.Core
+local RuntimeRole = PsychopatzCore and PsychopatzCore.RuntimeRole or nil
+if not RuntimeRole then
+    local loaded, value = pcall(
+        require,
+        "PsychopatzCore/Runtime/PC_RuntimeRole"
+    )
+    if loaded and type(value) == "table" then RuntimeRole = value end
+end
 
 local function nowMillis()
     if getTimeInMillis then
@@ -18,10 +26,17 @@ local function nowMillis()
 end
 
 function Core.IsClientOnly()
-    return isClient and isClient() and (not isServer or not isServer())
+    if RuntimeRole and RuntimeRole.IsPureClient then
+        return RuntimeRole.IsPureClient()
+    end
+    return isClient and isClient()
+        and (not isServer or not isServer()) or false
 end
 
 function Core.IsAuthority()
+    if RuntimeRole and RuntimeRole.AllowsServerCode then
+        return RuntimeRole.AllowsServerCode()
+    end
     return not Core.IsClientOnly()
 end
 

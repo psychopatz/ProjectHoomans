@@ -1,6 +1,6 @@
 -- Lazy settlement candidates sourced only from registered/loaded locations.
 
-if isClient and isClient() and (not isServer or not isServer()) then return end
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
 PNC.SettlementCandidates = PNC.SettlementCandidates or {}

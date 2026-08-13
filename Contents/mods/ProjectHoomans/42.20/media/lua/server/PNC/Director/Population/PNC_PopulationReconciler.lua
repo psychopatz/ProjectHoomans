@@ -1,6 +1,6 @@
 -- Turns advisory deficits into at most one deduplicated request per sector/type.
 
-if isClient and isClient() and (not isServer or not isServer()) then return end
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
 PNC.PopulationReconciler = PNC.PopulationReconciler or {}

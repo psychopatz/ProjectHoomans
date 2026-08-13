@@ -2,7 +2,7 @@
 -- knowledge service deliberately has no event-name switch; this adapter owns
 -- the domain mapping and can be replaced/extended by future event sources.
 
-if isClient and isClient() and (not isServer or not isServer()) then return end
+if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
 PNC.KnowledgeSocialEventAdapter = PNC.KnowledgeSocialEventAdapter or {}
