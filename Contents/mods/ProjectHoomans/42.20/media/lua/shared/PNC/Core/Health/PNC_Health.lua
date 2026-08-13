@@ -177,7 +177,15 @@ function Health.EnterIncapacitated(record, zombie, reason)
     record.activeJob = "Incapacitated"
     record.activeBehavior = "Incapacitated"
     if PathService and PathService.Reset then
-        PathService.Reset(zombie, record)
+        if PathService.Commands and PathService.Commands.Reset then
+            PathService.Commands.Reset(
+                record,
+                zombie,
+                "incapacitated"
+            )
+        else
+            PathService.Reset(zombie, record)
+        end
     end
     applyIncapacitatedLiveState(record, zombie)
     -- Bite impact is pumped after the normal NPC scheduler pass. Queue a near

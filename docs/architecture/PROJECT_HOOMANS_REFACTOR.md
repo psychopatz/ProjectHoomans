@@ -2,7 +2,7 @@
 
 ## Current Chunk
 
-Chunk 8 — Pathing / Presence / live-body control (`[>]`).
+Chunk 9 — Factions (`[>]`).
 
 Chunk 0 established the baseline only. No gameplay, network, persistence, or
 load-order code changed.
@@ -19,8 +19,8 @@ load-order code changed.
   - [x] Chunk 6A — Provision Settings request/model/presentation boundary
   - [x] Chunk 6B — Colony Management shell controller/request boundary
 - [x] Chunk 7 — Conversation / Relationships / Social
-- [>] Chunk 8 — Pathing / Presence / live-body control
-- [ ] Chunk 9 — Factions
+- [x] Chunk 8 — Pathing / Presence / live-body control
+- [>] Chunk 9 — Factions
 - [ ] Chunk 10 — Colony / Settlement / Facilities
 - [ ] Chunk 11 — Director / abstract simulation
 - [ ] Chunk 12 — Remaining domains, only where change is justified
@@ -29,11 +29,10 @@ load-order code changed.
 
 ## Current Goal
 
-Chunk 8 inventories Pathing, Presence, and live-body-control ownership before
-making the smallest justified boundary change. Preserve live/abstract state
-transitions, movement ownership, engine object lifecycles, scheduler budgets,
-SP/MP authority, and current recovery behavior. Oversized modules remain
-deferred; do not use the Monolith Decoupler during this ownership pass.
+Chunk 9 inventories Faction state ownership, membership, diplomacy, warfare,
+incidents, persistence, authority, network contracts, and presentation before
+making the smallest justified boundary change. Preserve current faction
+semantics and do not use the Monolith Decoupler during this ownership pass.
 
 ## Contracts Being Preserved
 
@@ -140,6 +139,27 @@ pre-approved folder moves.
 
 ## Completed This Chunk
 
+- Chunk 8 established `PNC.PathService.Commands` as the canonical mutation
+  boundary and `PNC.PathService.Queries` as the read boundary. Existing direct
+  methods remain compatible; the canonical reset command intentionally takes
+  `(record, zombie, reason)` and adapts to the legacy body-first method.
+- Migrated order changes, abstraction, incapacitation, facility arrival,
+  behavior halt, and combat hold through the reset command with legacy fallback
+  for isolated harnesses/addons. This corrected the combat fallback's reversed
+  body/record arguments and removes OrderSystem's direct lane clear during
+  normal production composition.
+- Added deterministic `PNC_PresenceRuntime.lua`, preserving the prior contiguous
+  Admission → MaterializationSafety → Presence order at the same shared
+  composition position. `PNC_BodyLifecycle.lua` remains intentionally earlier
+  because Health and PathService consume its lifecycle facade.
+- Preserved movement algorithms, native/fake locomotion selection, live and
+  abstract transitions, engine-object lifecycle, materialization budget,
+  scheduler cadence, network traffic, and recovery behavior. The reset boundary
+  adds no tick, scan, allocation loop, scheduler wake, path request, or packet.
+- Clarified managed-body usefulness ownership: `PNC_LiveBodyControl` alone
+  switches between fake/idle suppression and temporary native/action leases.
+  The oversized PathService motion and LiveBodyControl implementations were not
+  split; the Monolith Decoupler was not used.
 - Chunk 7 established `PNC.Relationships.Personal.Queries` and `.Commands` as
   the canonical boundary for directed persisted personal relationships.
   Existing direct methods remain compatibility aliases, while shared tactical
@@ -644,6 +664,25 @@ pre-approved folder moves.
   Persistence/schema changed: NO. Runtime initialization order changed: NO.
   The two Conversation `00_*Init.lua` anchors retain their names and timing;
   the three global shared/server/client anchors remain untouched.
+- Chunk 8 full Lua syntax validation passed, and `pz_verify` scanned 562 files
+  with zero Kahlua errors or warnings at ERROR severity.
+- Seventeen focused smokes passed across the new boundary, composition,
+  PathService/native planning, simulation LOD, Presence admission/wake/position
+  recovery, BodyLifecycle, grounded/fake/vehicle locomotion, orders, facilities,
+  combat tactics/commitment, and incapacitated pose.
+- Full Lua smoke sweep: 189 passed and 4 failed out of 193. The additional pass
+  is the new boundary test; the same four unrelated failures remain.
+- Architecture rescan: 83.4/100 health, 67.6% coverage, 593 production files,
+  193 tests, and 130 production findings. Pathing pressure remains 29.5 and
+  Presence remains 6.9; affected analysis selected the facility debug-work
+  smoke as its one direct dependency.
+- Codebase-memory production coverage remains excluded. Exact source reads,
+  bounded state-writer searches, and focused harnesses supplied fallback
+  evidence.
+- Chunk 8 network protocol changed: NO. Persistence/schema changed: NO.
+  Authority direction changed: NO. Scheduler cadence/budgets changed: NO.
+  Movement algorithms changed: NO. No `00_*Init.lua` anchor was modified,
+  renamed, or removed.
 
 ## Open Issues
 
@@ -684,10 +723,12 @@ pre-approved folder moves.
 - Chunk 7 bootstrap changes have static/simulated order coverage, but live SP,
   hosted-MP, and dedicated-server startup validation could not be launched in
   this environment and remains required before runtime release.
+- Chunk 8 has static and harness coverage for composition, SP authority paths,
+  and MP-native ownership contracts. Live SP, hosted-MP, and dedicated-server
+  startup/movement validation remains required before runtime release.
 
 ## Next Chunk
 
-Chunk 8 — inventory Pathing, Presence, and live-body-control state ownership,
-writers, engine-object lifecycle, authority, scheduler budgets, dependency
-direction, and recovery seams before introducing the smallest justified
-boundary.
+Chunk 9 — inventory Faction ownership, membership, diplomacy, warfare,
+incidents, persistence, authority, networking, and presentation seams before
+introducing the smallest justified boundary.

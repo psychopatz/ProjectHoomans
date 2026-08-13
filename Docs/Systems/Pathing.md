@@ -21,6 +21,12 @@
 - doors and windows are considered opened only after their engine state reports
   open, then their object/path state is synchronized by the authoritative side
 - all path ownership lives in `PNC_PathService`
+- cross-domain movement resets use
+  `PNC.PathService.Commands.Reset(record, zombie, reason)`. The legacy
+  `PNC.PathService.Reset(zombie, record)` method remains supported, but the
+  record-first command is canonical and prevents body/record argument reversal
+- `PNC.PathService.Queries.IsTraversalActive` is the canonical read boundary;
+  its direct-method alias remains supported
 - abstract travel is elapsed-time based (`speed × elapsed`) so reducing a far
   NPC's AI cadence does not change its simulated travel speed
 - behavior writes `move intent`; only `PNC_PathService.Pump` may start, refresh, cancel, or complete live movement
@@ -53,9 +59,10 @@
   `PathFindBehavior2:update()` from the replicated body's `OnZombieUpdate`
   callback; generic client ticks only bind the latest goal. Normal zombie
   networking transports movement and native door/window/fence/stair states.
-- All multiplayer live bodies remain `setUseless(false)` throughout their
-  lifetime. There is one centralized writer so health and animation refreshes
-  cannot silently disable the active controller.
+- `PNC_LiveBodyControl` is the single writer for managed-body usefulness.
+  Native path and scripted-action leases temporarily keep the engine body
+  useful; fake locomotion and idle suppression restore the humanized useless
+  state. Health, animation, and behavior code do not write the flag directly.
 - MP sub-tile corrections also use the delegated native controller; fake
   setX/setY steps are not an alternate multiplayer transport.
 - door/window handling is goal-directed rather than opportunistic: the lane
@@ -92,6 +99,21 @@
 - a committed attack lease cancels native routing and stops the path pump
   before locomotion can overwrite the attack action graph
 - path debug logs report recovery, repath, timeout, and blocked states with the active goal only for NPCs explicitly marked `Record Debug`; global debug presentation does not opt the whole roster into movement logging
+
+## Composition and performance boundary
+
+`PNC_PathService.lua` is the canonical movement-lane entry and loads its seven
+internal modules in explicit dependency order. Supporting pathing primitives
+load earlier in the shared composition because BodyLifecycle, Health,
+animation, combat, and travel are intentionally interleaved consumers; they
+must not be regrouped based on alphabetical filenames.
+
+The command boundary adds no tick, scan, allocation loop, scheduler wake, path
+request, or network message. Reset remains an event-driven transition used by
+order changes, abstraction, incapacitation, facility arrival, and combat hold.
+Only `PNC_PathService` clears `runtime.pathing` and `runtime.moveIntent` during
+normal production composition; the OrderSystem direct clear remains solely as
+a compatibility fallback when the service is unavailable.
 
 ## Next Expansion
 - smarter repath and stuck recovery lanes

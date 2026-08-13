@@ -40,7 +40,11 @@ function Internal.RequestHold(record, zombie, reason)
         return MoveIntent.Hold(record, reason)
     end
     if PathService and PathService.Reset then
-        PathService.Reset(record, zombie, reason)
+        if PathService.Commands and PathService.Commands.Reset then
+            PathService.Commands.Reset(record, zombie, reason)
+        else
+            PathService.Reset(zombie, record, reason)
+        end
         return true
     end
     return false

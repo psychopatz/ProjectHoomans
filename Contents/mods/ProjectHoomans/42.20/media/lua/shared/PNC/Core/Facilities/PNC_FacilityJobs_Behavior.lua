@@ -165,7 +165,17 @@ function Jobs.Tick(record, zombie)
         -- A queued Behavior2 route otherwise remains visible to the scene
         -- safety arbiter and repeatedly interrupts/restarts the sleep bump.
         if PNC.PathService and PNC.PathService.Reset then
-            PNC.PathService.Reset(zombie, record)
+            if PNC.PathService.Commands
+                and PNC.PathService.Commands.Reset
+            then
+                PNC.PathService.Commands.Reset(
+                    record,
+                    zombie,
+                    "facility_arrival"
+                )
+            else
+                PNC.PathService.Reset(zombie, record)
+            end
         end
         runtime.arrivalSettled = true
     end

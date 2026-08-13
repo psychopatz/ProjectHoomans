@@ -187,6 +187,10 @@ function Common.HaltMovement(record, zombie, reason)
         return
     end
     if zombie and PathService and PathService.Reset then
-        PathService.Reset(zombie, record)
+        if PathService.Commands and PathService.Commands.Reset then
+            PathService.Commands.Reset(record, zombie, reason)
+        else
+            PathService.Reset(zombie, record, reason)
+        end
     end
 end

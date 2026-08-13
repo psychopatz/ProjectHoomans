@@ -136,6 +136,12 @@
   identity, worn items, and death-marker metadata are final
 
 ## Current Implementation
+
+- `PNC_PresenceRuntime.lua` is the deterministic runtime entry and explicitly
+  loads Admission, MaterializationSafety, then Presence at the existing shared
+  initialization point. `PNC_BodyLifecycle.lua` remains an earlier canonical
+  subdomain entry because Health and PathService consume its engine-object
+  lifecycle facade before the Presence coordinator can load
 - server checks player distance with hysteresis through the player spatial
   index, computing the nearest result once per reconciliation
 - a 250 ms player-interest wake pass schedules nearby abstract records even

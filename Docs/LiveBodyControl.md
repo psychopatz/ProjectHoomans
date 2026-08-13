@@ -10,7 +10,8 @@ locomotion lane.
 
 - `PNC_Behavior_*`: publish movement intent only.
 - `PNC_PathService`: owns the shared movement lane, move diagnostics, goal
-  stickiness, and special movement coordination.
+  stickiness, special movement coordination, and the canonical record-first
+  reset command.
 - `PNC_LiveBodyControl`: owns suppression of zombie-only body states such as
   lunge, sit-on-ground, get-up, stagger, and emitter silencing.
 - `PNC_Animation`: reuses `PNC_LiveBodyControl` when preparing a live body.
@@ -24,6 +25,9 @@ locomotion lane.
   stable call sites.
 - Live embodied NPCs are expected to remain `setUseless(true)` while fake
   locomotion owns movement.
+- Native-path and scripted-action leases temporarily require
+  `setUseless(false)`; `PNC_LiveBodyControl` is the only policy writer that
+  transitions between these modes.
 - Changes must remain authority-safe for both singleplayer and multiplayer.
 
 ## Runtime Data

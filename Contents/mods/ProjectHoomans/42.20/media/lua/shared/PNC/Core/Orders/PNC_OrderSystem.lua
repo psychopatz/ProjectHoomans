@@ -113,7 +113,11 @@ function OrderSystem.SetOrder(record, orderSpec)
     record.activeBehavior = nil
     zombie = PNC.Registry and PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
-    if zombie and PNC.PathService and PNC.PathService.Reset then
+    if PNC.PathService and PNC.PathService.Commands
+        and PNC.PathService.Commands.Reset
+    then
+        PNC.PathService.Commands.Reset(record, zombie, "order_changed")
+    elseif PNC.PathService and PNC.PathService.Reset then
         PNC.PathService.Reset(zombie, record)
     else
         record.runtime.moveIntent = nil

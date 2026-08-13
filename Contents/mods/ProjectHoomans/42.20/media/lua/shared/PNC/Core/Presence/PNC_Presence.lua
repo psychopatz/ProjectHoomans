@@ -456,7 +456,11 @@ function Presence.Abstract(record, reason)
         record.x = zombie:getX()
         record.y = zombie:getY()
         record.z = zombie:getZ()
-        PathService.Reset(zombie, record)
+        if PathService.Commands and PathService.Commands.Reset then
+            PathService.Commands.Reset(record, zombie, reason or "abstract")
+        else
+            PathService.Reset(zombie, record)
+        end
         if ZombieAggro and ZombieAggro.ClearForNPCBody then
             ZombieAggro.ClearForNPCBody(zombie)
         end
