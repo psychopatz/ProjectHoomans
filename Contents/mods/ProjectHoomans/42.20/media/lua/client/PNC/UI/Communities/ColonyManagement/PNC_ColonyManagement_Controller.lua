@@ -10,7 +10,7 @@ local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement
 local Controller = {}
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
-local State = PNC.Network.ClientState
+local Client = PNC.ColonyManagementClient
 
 local function bounds(element)
     if not element then return "none" end
@@ -162,10 +162,11 @@ function Controller.OnPersonSelected(window)
     })
 end
 
-function Controller.Refresh(window)
+function Controller.Refresh(window, update)
     local selectedID = window.selectedPersonID
     local selectedIndex
-    window.snapshot = State.colonyManagement or {}
+    update = update or Client.ReadSnapshot()
+    window.snapshot = update.snapshot or {}
     local roster = Presentation.BuildRoster(window.snapshot)
     Components.SetRows(window.people, roster)
     for index, row in ipairs(roster) do
@@ -182,10 +183,9 @@ function Controller.Refresh(window)
     Controller.UpdateTabStyles(window)
     Controller.ApplyTabLayout(window)
     Controller.RebuildDetails(window)
-    window.lastReceiveAt = State.lastColonyManagementReceiveAt
+    window.lastReceiveAt = update.receivedAt
         or PNC.Core.Now()
-    window.lastReceiveRevision =
-        tonumber(State.colonyManagementRevision) or 0
+    window.lastReceiveRevision = tonumber(update.revision) or 0
     Diagnostics.Log(window, "snapshot_applied", {
         tab = window.tab,
         selected = window.selectedPersonID or "none",

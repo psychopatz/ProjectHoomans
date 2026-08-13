@@ -14,6 +14,25 @@ Zomboid Build 42.20 implementation:
 Paths are explicit: the runtime does not recursively scan folders or generate a
 Project Zomboid `Translate/EN/UI.json` file.
 
+## Runtime composition and authority
+
+The existing shared and client `PNC/00_PNC_Conversation_Init.lua` files are
+early-loading anchors. They remain thin and delegate respectively to
+`PNC_ConversationSharedComposition.lua` and
+`PNC_ConversationClientComposition.lua`. Those composition roots preserve the
+previous dependency order explicitly; ordinary module filenames are not used
+to imply load order. The client root also owns the existing guarded local
+request-pump registration at the same initialization point.
+
+The server composition loads the canonical `PNC_ConversationServer.lua` entry,
+which loads History before Authority. Conversation definitions, rules,
+selection, and scene safety are shared. The server owns selection requests,
+choice validation, effect application, and the separate
+`PNC_ConversationHistory` ModData store. Directed personal relationship reads
+and effects go through `PNC.Relationships.Personal.Queries` and `.Commands`;
+the legacy direct relationship methods remain supported for addon and harness
+compatibility.
+
 ## Built-in module layout
 
 Built-in conversation families are intentionally separate modules:
@@ -324,7 +343,8 @@ side to valid food, medical, and equipment gifts, explains the `A` (Approval),
 `R` (Respect), and `F` (Familiarity) columns, and never exposes a take action.
 Gift mode requires the active conversation lease and rejects hostile targets.
 It applies the resulting Approval/Respect/Familiarity change through
-`PNC.Relationships.ApplyConversationEffect`: food and medical items primarily
+`PNC.Relationships.Personal.Commands.ApplyConversationEffect` (with the legacy
+direct method retained as a compatibility alias): food and medical items primarily
 raise Approval, while tools, weapons, and ammunition primarily raise Respect.
 The client turns the authoritative item types and count into a spoken player
 line (for example, `Here's a Katana.` or `I have 2 x Bandage for you.`), then

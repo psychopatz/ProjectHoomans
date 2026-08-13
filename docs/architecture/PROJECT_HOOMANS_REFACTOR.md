@@ -2,8 +2,7 @@
 
 ## Current Chunk
 
-Chunk 3J — Legacy debug-envelope command routing (`[x]`).
-Chunk 3 is complete; Chunk 4 is next.
+Chunk 8 — Pathing / Presence / live-body control (`[>]`).
 
 Chunk 0 established the baseline only. No gameplay, network, persistence, or
 load-order code changed.
@@ -14,11 +13,13 @@ load-order code changed.
 - [x] Chunk 1 — Standard Project Hoomans domain contract
 - [x] Chunk 2 — Composition/bootstrap cleanup
 - [x] Chunk 3 — Server command routing
-- [ ] Chunk 4 — Pilot vertical slice: Needs → Provision → Supply → Inventory
-- [ ] Chunk 5 — Pilot evaluation gate
-- [ ] Chunk 6 — UI boundary migration, incrementally by feature
-- [ ] Chunk 7 — Conversation / Relationships / Social
-- [ ] Chunk 8 — Pathing / Presence / live-body control
+- [x] Chunk 4 — Pilot vertical slice: Needs → Provision → Supply → Inventory
+- [x] Chunk 5 — Pilot evaluation gate
+- [x] Chunk 6 — UI boundary migration, incrementally by feature
+  - [x] Chunk 6A — Provision Settings request/model/presentation boundary
+  - [x] Chunk 6B — Colony Management shell controller/request boundary
+- [x] Chunk 7 — Conversation / Relationships / Social
+- [>] Chunk 8 — Pathing / Presence / live-body control
 - [ ] Chunk 9 — Factions
 - [ ] Chunk 10 — Colony / Settlement / Facilities
 - [ ] Chunk 11 — Director / abstract simulation
@@ -28,10 +29,11 @@ load-order code changed.
 
 ## Current Goal
 
-Chunk 3J and the server-command routing phase are complete. Chunk 4 should
-begin the Needs → Provision → Supply → Inventory pilot vertical slice by
-confirming current ownership, writers, queries, commands, persistence, and
-runtime budgets before changing behavior. Do not split unrelated monoliths.
+Chunk 8 inventories Pathing, Presence, and live-body-control ownership before
+making the smallest justified boundary change. Preserve live/abstract state
+transitions, movement ownership, engine object lifecycles, scheduler budgets,
+SP/MP authority, and current recovery behavior. Oversized modules remain
+deferred; do not use the Monolith Decoupler during this ownership pass.
 
 ## Contracts Being Preserved
 
@@ -55,8 +57,9 @@ runtime budgets before changing behavior. Do not split unrelated monoliths.
 
 ## SP / MP Risks
 
-- `PNC_Server.lua` is both an authority composition point and runtime
-  coordinator; its `onClientCommand` function is a 690-line command boundary.
+- `PNC_Server.lua` remains the authority composition/runtime coordinator, but
+  its `onClientCommand` function is now only the module gate and router
+  dispatch; routed adapters must continue preserving the protocol contract.
 - `PNC_Client.lua` already delegates inbound server commands through
   `PNC_ClientCommandRouter`; future server extraction must preserve the current
   protocol exactly.
@@ -137,6 +140,106 @@ pre-approved folder moves.
 
 ## Completed This Chunk
 
+- Chunk 7 established `PNC.Relationships.Personal.Queries` and `.Commands` as
+  the canonical boundary for directed persisted personal relationships.
+  Existing direct methods remain compatibility aliases, while shared tactical
+  and faction hostility helpers deliberately remain outside the boundary.
+- Conversation rules, server authority, and the social-event service now use
+  that personal boundary with direct-method fallback for existing addon and
+  isolated-harness compatibility. Server authority, mutation validation,
+  schemas, ModData keys, dirty marking, and network payloads are unchanged.
+- Preserved the shared and client `00_PNC_Conversation_Init.lua` paths as thin
+  early-loading anchors. Their new composition roots reproduce the prior
+  dependency order exactly, including the client local-pump registration at
+  the same guarded initialization point.
+- Added canonical `PNC_ConversationServer.lua`, which explicitly loads History
+  before Authority. The server composition delegates to it at the same point
+  formerly occupied by those two contiguous requires.
+- Documented Conversation authority/history/load order and the distinction
+  between persisted personal relationships and shared tactical hostility.
+  The oversized Conversation composer and relationship service were not split;
+  the Monolith Decoupler was not used.
+- Chunk 6B added `PNC.ColonyManagementClient` to the existing canonical client
+  entry. It projects one snapshot envelope (`snapshot`, `revision`, and
+  `receivedAt`) and owns the unchanged snapshot request call.
+- The Colony Management controller now consumes snapshot envelopes and retains
+  selection, tab binding, row coordination, and responsive-layout orchestration.
+  The window retains input, rendering, refresh timing, and controller
+  delegation. Neither reads raw client network state or issues requests
+  directly.
+- Preserved synchronous SP refresh after an immediately applied request and
+  asynchronous MP refresh when replicated revision/receive time advances.
+- Preserved the canonical nine-module Colony Management client require order,
+  all lazy storage/research controls, tab registry behavior, diagnostics, and
+  the existing controller/window file split.
+- Added focused boundary coverage for exact canonical load order, snapshot
+  projection, stale/new update detection, request result/timing, and source
+  enforcement. No new production file or generalized UI framework was added.
+- Chunk 6 is complete after two bounded feature migrations. Larger UI findings,
+  including Inventory and debug windows, remain with their owning future domain
+  or explicit decoupling work rather than becoming a repository-wide UI rewrite.
+- Chunk 6A introduced `PNC.ProvisionSettingsClient` as the existing feature's
+  explicit client gateway without adding a production file. It owns current
+  snapshot/update reads plus the unchanged colony-management snapshot and
+  `provision_set` request calls.
+- `ProvisionSettingsModel` now owns only the editable policy copy, registry-
+  driven defaults, shared pre-validation, permission snapshot, and submission
+  construction. Its client dependency is injectable for focused tests.
+- `ProvisionSettingsWindow` no longer reads `PNC.Network.ClientState` or calls
+  `PNC.Client` directly. It consumes the gateway and retains only layout,
+  translated status, refresh timing, and user interaction.
+- `ProvisionRulePanel` now uses model operations rather than mutating
+  `model.changed` directly and propagates model-set failures to the window.
+- Preserved the four-file feature shape and canonical client load chain:
+  client composition → settings window → model, rule panel, scroll panel.
+  Every file remains below the 2,000-token threshold, so no split or new
+  abstraction file was justified.
+- Chunk 5 accepted the pilot convention with constraints: canonical entries
+  are deterministic composition/navigation seams, direct APIs remain valid,
+  and command/query groupings are used only when their semantics are honest.
+- Removed Inventory's reverse dependency on Provision. Successful inventory
+  deltas now publish `NPC_INVENTORY_CHANGED`; the canonical Provision entry
+  subscribes after its scheduler loads and preserves dirty-rule timing.
+- The event replaces one direct callback with one protected dispatch per
+  successful delta. It adds no recurring tick, scan, queue, persistence write,
+  or network message, and prevents a Provision listener failure from escaping
+  an already-committed Inventory mutation.
+- Evaluated ownership, dependency direction, authority, network, persistence,
+  load order, performance, tests, context locality, fragmentation, and
+  abstraction in `PROJECT_HOOMANS_PILOT_EVALUATION.md`.
+- Typical pilot changes require two to three principal files and approximately
+  3,616–5,587 estimated tokens. Four oversized implementation files remain
+  recorded for a later explicit decoupling pass; no file was split and the
+  Monolith Decoupler was not used.
+- Selected Provision Settings for Chunk 6A: its four UI files are each below
+  2,000 estimated tokens and already include a model, making it a bounded UI
+  boundary migration before any large Inventory-window work.
+- Chunk 4 documented the actual two-lane pilot flow:
+  `NeedsScheduler → NeedSupplyBridge → NPCSupplyService` and
+  `ProvisionScheduler → ProvisionEvaluator → NPCSupplyService`, with both
+  lanes reaching canonical Inventory mutation through `SupplyInventory`.
+- Added direct command aliases to Inventory and command/query boundaries to
+  SupplyInventory. Existing public methods remain callable; the Supply query
+  reads explicitly initialized state and returns IDs/descriptors instead of
+  mutable inventory records.
+- Migrated Supply service mutation calls through `SupplyInventory.Commands`,
+  Supply reads through `SupplyInventory.Queries`, and canonical compact
+  inventory mutation through `Inventory.Commands`. Hydration-aware legacy
+  helpers remain direct methods because they are not read-only queries.
+- Added canonical `PNC_Supply.lua` and `PNC_Provision.lua` server domain entry
+  files. Each reproduces its prior contiguous implementation-module order with
+  explicit deterministic `require(...)` calls.
+- Replaced the corresponding contiguous server composition blocks with those
+  two domain entries at the same composition position. Needs remains
+  deliberately interleaved with Facility Jobs and Director dependencies; its
+  timing was documented rather than casually reordered.
+- Preserved every shared, server, and client `00_*Init.lua` anchor unchanged.
+  Authority gates, persistence ownership and schema, network protocol, event
+  registrations, scheduler cadence, work limits, retries, and save timing are
+  unchanged.
+- Added a focused executable contract for Supply and Provision internal load
+  order plus Inventory command/query aliases, and documented pilot ownership,
+  persistence, performance, and load-order findings.
 - Chunk 3J moved the legacy `CMD_DEBUG` compatibility envelope behind one
   explicit handler while preserving its single authorization gate, all action
   strings, early-return semantics, payload mutation, domain/API calls,
@@ -430,11 +533,123 @@ pre-approved folder moves.
   coverage issue but metadata freshness requires reindexing.
 - Chunk 3J network protocol changed: NO. Authority changed: NO. Persistence
   changed: NO. Event registration timing changed: NO.
+- Chunk 4 `luac -p` passed for all seven changed/new production Lua files and
+  the focused pilot contract test. `pz_verify --kahlua --severity ERROR`
+  reported zero errors for all seven production files.
+- Seven focused smoke tests passed: pilot domain boundaries, Provision, seed
+  delta, Needs foundation, inventory transactions, composition bootstrap, and
+  bandage timed action.
+- Full Lua smoke sweep: 187 passed and 4 failed out of 191. The failures are
+  unchanged from the Chunk 3J sweep: colony-storage journal-cap mismatch,
+  faction-warfare ownership expectation, and missing-module harness errors in
+  map-hover portrait and NPC-monitor tracking. No cited failing module changed
+  in Chunk 4.
+- Architecture rescan: 589 production files and 191 tests. The current audit
+  reports health 83.5/100, coverage 67.6%, and 129 production findings across
+  86 classified subsystems. This classification differs materially from prior
+  single-`PNC` scans, so its score delta is not attributed to this pilot.
+  Affected analysis is bounded to Composition, Inventory, Provision, and
+  Supply; Provision has no findings and Supply retains one large-service and
+  one low-confidence hot-path caution.
+- Codebase-memory coverage again confirms that production `media` is excluded;
+  direct reads, compilation, Kahlua checks, and smoke tests supplied fallback
+  evidence. The new pilot test has no recorded coverage issue but is not
+  freshness-tracked.
+- Chunk 4 network protocol changed: NO. Authority changed: NO. Persistence
+  changed: NO. Event registration timing changed: NO. Existing internal module
+  order changed: NO. Composition delegation changed: YES, at the same runtime
+  position through deterministic canonical entries.
+- Live SP, hosted-MP, and dedicated-server startup could not be launched in the
+  current non-game environment. Static load-order contracts pass, but all
+  three runtime startup checks remain mandatory before release.
+- Chunk 5 `luac -p` passed for the event definition, Inventory mutation module,
+  canonical Provision entry, and updated pilot test. `pz_verify --kahlua
+  --severity ERROR` reported zero Kahlua errors in the three production files.
+- Seven pilot-focused smoke tests passed. Audit-selected journal routes,
+  settlement foundation, and seed-delta tests also passed; the selected colony
+  storage test reproduced its pre-existing journal-cap failure.
+- Full Lua smoke sweep remained 187 passed and 4 failed out of 191, with the
+  same four unrelated failures recorded in Chunk 4.
+- Architecture rescan remained 83.5/100 health across 589 production files and
+  191 tests. Findings increased from 129 to 130 because the audit flags the
+  new Inventory event publisher as a low-confidence hot-path risk. The event
+  is mutation-driven rather than tick-driven and replaces an existing direct
+  callback, so the finding is accepted as heuristic evidence rather than a
+  regression. The concrete Inventory → Provision source dependency is gone.
+- Exact token-bloat tooling could not run because its optional local `tiktoken`
+  dependency is absent. The zero-dependency `pz_verify` estimator supplied the
+  recorded four-characters-per-token working-set measurements.
+- Codebase-memory still excludes production `media`; exact source reads and
+  source tests supplied fallback evidence. The focused pilot test has no
+  recorded index gap but is not freshness-tracked.
+- Chunk 5 network protocol changed: NO. Authority changed: NO. Persistence
+  changed: NO. Scheduler budgets changed: NO. Load-order impact: Provision now
+  wires one event subscription after its established internal module order;
+  every `00_*Init.lua` anchor remains unchanged.
+- Live SP, hosted-MP, and dedicated-server startup remain pending and mandatory
+  before release. The static gate passes without treating those modes as
+  validated.
+- Chunk 6A `luac -p` passed for the three changed production files and updated
+  Provision smoke test. `pz_verify --kahlua --severity ERROR` reported zero
+  Kahlua errors, and all four Provision UI files remain below 2,000 estimated
+  tokens.
+- Four focused tests passed: Provision, Colony Management UI model, client
+  commands, and composition bootstrap. The Provision test now covers injected
+  submission transport, current/stale snapshot reads, snapshot requests, and
+  verifies that the window does not bypass its client gateway.
+- Full Lua smoke sweep remained 187 passed and 4 failed out of 191, with the
+  same unrelated failures recorded in Chunks 4 and 5.
+- Architecture rescan: 83.4/100 health, 67.5% coverage, 589 production files,
+  191 tests, and 130 production findings. Affected analysis is UI-only and no
+  finding was introduced or resolved; the 0.1 displayed health change is
+  rounding after added boundary/testable-adapter LOC.
+- Codebase-memory production coverage remains excluded; targeted source reads
+  supplied the request/response and authority evidence. The modified Provision
+  test reports no recorded index gap and matching metadata.
+- Chunk 6A network protocol changed: NO. Client authority changed: NO. Server
+  validation changed: NO. Persistence changed: NO. Load order changed: NO.
+  Every `00_*Init.lua` anchor remains unchanged.
+- Chunk 6B `luac -p` and `pz_verify --kahlua --severity ERROR` passed for the
+  canonical Colony Management client entry, controller, window, and new focused
+  test. The three changed production files remain below 2,000 estimated tokens.
+- Five focused tests passed: Colony Management UI boundary, UI model, client
+  commands, authoritative Colony Management, and composition bootstrap.
+- Full Lua smoke sweep: 188 passed and 4 failed out of 192. The additional pass
+  is the new boundary test; the same four unrelated failures remain.
+- Architecture rescan: 83.4/100 health, 67.5% coverage, 589 production files,
+  192 tests, and 130 production findings. Affected analysis is UI-only with no
+  new or resolved finding.
+- Codebase-memory production coverage remains excluded. Direct source reads
+  supplied the shell, transport, and load-order evidence; existing related tests
+  have matching metadata and the new test has no recorded issue.
+- Chunk 6B network protocol changed: NO. SP/MP authority changed: NO. Server
+  behavior changed: NO. Persistence changed: NO. Internal require order changed:
+  NO. Every `00_*Init.lua` anchor remains unchanged.
+- Chunk 7 full Lua syntax validation passed, and `pz_verify` scanned 561 files
+  with zero Kahlua errors or warnings at ERROR severity.
+- Seven focused smokes passed: composition bootstrap, relationship foundation,
+  conversation, conversation safety, conversation authority, social events,
+  and social profiles.
+- Full Lua smoke sweep: 188 passed and 4 failed out of 192. The four failures
+  are unchanged and unrelated: colony-storage journal cap, faction same-account
+  replacement, and two harness module-resolution gaps in map-hover portrait and
+  NPC monitor tracking.
+- Architecture rescan: 83.4/100 health, 67.5% coverage, 592 production files,
+  192 tests, and 130 production findings. Conversation pressure remains 54.0;
+  affected analysis is limited to Composition, Conversation, Relationships,
+  and SocialEvent boundaries and introduced no new finding count.
+- Codebase-memory coverage confirms the production media tree remains excluded;
+  exact source reads and focused runtime harnesses supplied fallback evidence.
+- Chunk 7 network protocol changed: NO. Authority direction changed: NO.
+  Persistence/schema changed: NO. Runtime initialization order changed: NO.
+  The two Conversation `00_*Init.lua` anchors retain their names and timing;
+  the three global shared/server/client anchors remain untouched.
 
 ## Open Issues
 
-- Architecture-audit logical-module configuration does not yet reveal domain
-  coupling because all production files are grouped as `PNC`.
+- Architecture-audit now classifies production into domain-shaped subsystems,
+  but confidence and several coverage categories remain limited. Treat its
+  coupling and score changes as triage evidence rather than runtime proof.
 - Codebase-memory production exclusion limits graph-backed call/dependency
   analysis until its indexing configuration is corrected and refreshed.
 - Large-file findings are deferred. Per user direction, do not use the
@@ -451,10 +666,28 @@ pre-approved folder moves.
 - The unrelated colony-storage journal-cap smoke failure described in Chunk 3I
   remains open for its owning storage/journal work rather than being folded
   into command routing.
+- Chunk 4 static and harness validation is complete. Live SP, hosted-MP, and
+  dedicated-server startup validation remains open because canonical Supply
+  and Provision composition entries changed bootstrap delegation.
+- The audit still reports a broader Composition/Colony/Inventory cycle after
+  the direct Inventory → Provision dependency was removed. Its concrete edges
+  require separate owning-domain analysis; it is not expanded into Chunk 6A.
+- Provision Settings live SP/hosted-MP UI interaction was not launchable in the
+  current environment. The unchanged transport paths and SP fallback are
+  covered statically and by smoke tests; live interaction remains a release
+  validation item.
+- Colony Management live SP/hosted-MP UI interaction was not launchable in the
+  current environment. Static tests cover synchronous SP and replicated-update
+  MP paths, but live interaction remains a release validation item.
+- Large UI modules were not split in Chunk 6. They remain candidates for their
+  owning domain chunks or the later explicit decoupling pass.
+- Chunk 7 bootstrap changes have static/simulated order coverage, but live SP,
+  hosted-MP, and dedicated-server startup validation could not be launched in
+  this environment and remains required before runtime release.
 
 ## Next Chunk
 
-Chunk 4 — begin the Needs → Provision → Supply → Inventory pilot vertical
-slice. Confirm current ownership and contracts first, then introduce the
-smallest useful command/query boundary without changing persistence, authority,
-or runtime budgets.
+Chunk 8 — inventory Pathing, Presence, and live-body-control state ownership,
+writers, engine-object lifecycle, authority, scheduler budgets, dependency
+direction, and recovery seams before introducing the smallest justified
+boundary.

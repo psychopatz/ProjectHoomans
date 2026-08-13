@@ -15,6 +15,18 @@ local Rules = PNC.Conversation.Rules
 local History = PNC.Conversation.History
 local TextLoader = PNC.Conversation.TextLoader
 
+local function personalRelationshipQueries()
+    local relationships = PNC.Relationships
+    local personal = relationships and relationships.Personal
+    return personal and personal.Queries or relationships
+end
+
+local function personalRelationshipCommands()
+    local relationships = PNC.Relationships
+    local personal = relationships and relationships.Personal
+    return personal and personal.Commands or relationships
+end
+
 local function relationshipCopy(value)
     value = type(value) == "table" and value or {}
     return {
@@ -141,8 +153,9 @@ function Authority.BuildContext(player, record, token)
     if not playerEntityKey then return nil, reason end
     local parsed = PNC.EntityRef and PNC.EntityRef.Parse
         and PNC.EntityRef.Parse(playerEntityKey) or nil
-    local relationship = PNC.Relationships and PNC.Relationships.Get
-        and PNC.Relationships.Get(record.id, playerEntityKey) or nil
+    local relationshipQueries = personalRelationshipQueries()
+    local relationship = relationshipQueries and relationshipQueries.Get
+        and relationshipQueries.Get(record.id, playerEntityKey) or nil
     relationship = type(relationship) == "table" and relationship or {}
     relationship.morale = record.social and record.social.morale or 0
     local category = relationshipCategory(record, relationship)
@@ -362,11 +375,11 @@ function Authority.HandleRecruit(player, args)
         local after = before
         local delta = { approval = -2, respect = -1, familiarity = 0 }
         local appliedResult
-        if PNC.Relationships
-            and PNC.Relationships.ApplyConversationEffect
-        then
+        local relationshipCommands = personalRelationshipCommands()
+        if relationshipCommands
+            and relationshipCommands.ApplyConversationEffect then
             local applied
-            applied, _, appliedResult = PNC.Relationships.ApplyConversationEffect(
+            applied, _, appliedResult = relationshipCommands.ApplyConversationEffect(
                 record.id,
                 context.playerEntityKey,
                 { approval = -2, respect = -1 },
@@ -500,8 +513,9 @@ function Authority.HandleChoice(player, args)
         return false, reason
     end
     local relationshipAfter = relationshipBefore
-    if PNC.Relationships and PNC.Relationships.Get then
-        relationshipAfter = relationshipCopy(PNC.Relationships.Get(
+    local relationshipQueries = personalRelationshipQueries()
+    if relationshipQueries and relationshipQueries.Get then
+        relationshipAfter = relationshipCopy(relationshipQueries.Get(
             record.id, context.playerEntityKey
         ))
     end

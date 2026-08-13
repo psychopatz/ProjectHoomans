@@ -7,6 +7,12 @@ local Registry = PNC.Conversation.Registry
 local Rules = PNC.Conversation.Rules or {}
 PNC.Conversation.Rules = Rules
 
+local function personalRelationshipCommands()
+    local relationships = PNC.Relationships
+    local personal = relationships and relationships.Personal
+    return personal and personal.Commands or relationships
+end
+
 local function compare(actual, operator, expected)
     operator = operator or ">="
     if operator == "==" then return actual == expected end
@@ -208,10 +214,10 @@ if not Registry.effectHandlers["pnc:relationship"] then
             return validateRelationshipDeltas(effect, true)
         end,
         apply = function(context, effect)
-            if not PNC.Relationships
-                or not PNC.Relationships.ApplyConversationEffect
+            local commands = personalRelationshipCommands()
+            if not commands or not commands.ApplyConversationEffect
             then return false, "relationship_service_unavailable" end
-            return PNC.Relationships.ApplyConversationEffect(
+            return commands.ApplyConversationEffect(
                 context.npcID,
                 context.playerEntityKey,
                 effect,
@@ -275,10 +281,11 @@ if not Registry.effectHandlers["pnc:memory"] then
             return true
         end,
         apply = function(context, effect)
-            if not PNC.Relationships or not PNC.Relationships.AddMemory then
+            local commands = personalRelationshipCommands()
+            if not commands or not commands.AddMemory then
                 return false, "relationship_service_unavailable"
             end
-            return PNC.Relationships.AddMemory(
+            return commands.AddMemory(
                 context.npcID,
                 context.playerEntityKey,
                 {

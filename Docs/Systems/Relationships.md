@@ -181,7 +181,7 @@ tables only.
 Read APIs return canonical copies so callers cannot mutate the authoritative
 record through a getter:
 
-- `PNC.Relationships.Get(observerNPCID, targetKey)`
+- `PNC.Relationships.Personal.Queries.Get(observerNPCID, targetKey)`
 - `GetApproval`, `GetRespect`, `GetFamiliarity`, `GetState`
 
 Mutation APIs are:
@@ -193,6 +193,15 @@ Mutation APIs are:
 - `PruneMemories`
 - `ApplyEventMutation` (atomic boundary used by the server social-event
   service)
+- `ApplyConversationEffect` (atomic boundary used by authoritative
+  conversation outcomes)
+
+These mutations are exposed through `PNC.Relationships.Personal.Commands`.
+The original direct methods on `PNC.Relationships` remain compatibility aliases
+for existing integrations. Shared tactical/faction helpers such as
+`AreNPCsEnemies`, `SetFaction`, and `ProvokeNeutralByPlayer` deliberately remain
+outside `Personal`; they do not operate on the directed persisted relationship
+record.
 
 Mutators return a success boolean followed by a stable reason string and,
 where useful, a canonical result. There are no client commands for changing

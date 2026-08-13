@@ -8,6 +8,8 @@ PNC.Inventory = PNC.Inventory or {}
 
 local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
+local Events = require "PsychopatzCore/Events/PC_EventBus"
+local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 
 local function preserveWornItemVisual(record, inv, wornSlot)
     local itemID = wornSlot and inv and inv.worn
@@ -151,9 +153,7 @@ function Inventory.ApplyDelta(record, ops, reason)
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "inventory")
     end
-    if PNC.ProvisionScheduler and PNC.ProvisionScheduler.MarkInventoryDirty then
-        PNC.ProvisionScheduler.MarkInventoryDirty(record)
-    end
+    Events.emit(EventTypes.NPC_INVENTORY_CHANGED, record, appliedOps, reason)
     return true, appliedOps
 end
 

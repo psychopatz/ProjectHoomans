@@ -8,6 +8,8 @@ local Request = PNC.SupplyRequest
 local Metrics = PNC.SupplyMetrics
 local Selector = PNC.SupplySelector
 local SupplyInventory = PNC.SupplyInventory
+local SupplyCommands = SupplyInventory.Commands or SupplyInventory
+local SupplyQueries = SupplyInventory.Queries or SupplyInventory
 local Access = PNC.StorageAccessPolicy
 local Index = PNC.SupplyIndex
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
@@ -141,7 +143,7 @@ local function acquireInstant(record, storage, request, selected, state)
     function source:restoreRemoved(records)
         return restoreStorage(storage, records)
     end
-    local destination = SupplyInventory.CreateDestination(
+    local destination = SupplyCommands.CreateDestination(
         record, "colony_supply_instant"
     )
     local quantity = 0
@@ -200,12 +202,15 @@ local function usePersonal(record, request, state, options)
         or request.resourceKind == "HYDRATION"
             and tonumber(request.required.thirst) or 1
     required = math.max(0.001, required or 0.001)
-    local candidates = SupplyInventory.FindPersonal(record, request, required)
+    if SupplyCommands.EnsurePersonalInventory then
+        SupplyCommands.EnsurePersonalInventory(record)
+    end
+    local candidates = SupplyQueries.FindPersonal(record, request, required)
     state.personalCandidateCount = #candidates
     state.personalCandidates = {}
     for index = 1, math.min(#candidates, 8) do
         state.personalCandidates[index] = {
-            itemID = candidates[index].item.id,
+            itemID = candidates[index].itemID,
             fullType = candidates[index].descriptor.fullType,
             score = candidates[index].score,
         }
@@ -229,15 +234,15 @@ local function usePersonal(record, request, state, options)
         local availableUses = request.resourceKind == "HYDRATION"
             and math.max(1, candidates[index].descriptor.remainingUses)
             or math.max(1, math.floor(
-                tonumber(candidates[index].item.stack) or 1
+                tonumber(candidates[index].stack) or 1
             ))
         local candidateUses = 0
         while candidateUses < availableUses
             and used < maxUses
             and remaining > 0
         do
-            local ok, reason, effect = SupplyInventory.Consume(
-                record, candidates[index].item.id, request
+            local ok, reason, effect = SupplyCommands.Consume(
+                record, candidates[index].itemID, request
             )
             if not ok then
                 state.lastUseFailure = reason

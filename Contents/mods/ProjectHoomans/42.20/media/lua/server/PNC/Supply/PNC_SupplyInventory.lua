@@ -5,6 +5,7 @@ local SupplyInventory = PNC.SupplyInventory
 local Utility = PNC.ItemUtility
 local Selector = PNC.SupplySelector
 local Metrics = PNC.SupplyMetrics
+local InventoryCommands = PNC.Inventory.Commands or PNC.Inventory
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local ItemRecord = require "PsychopatzCore/Inventory/PsychopatzItemRecord"
 local StateCodec = require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
@@ -62,7 +63,7 @@ function SupplyInventory.AddCoreRecords(record, records, reason)
             end
         end
     end
-    local added, addReason, itemIDs = PNC.Inventory.AddItems(
+    local added, addReason, itemIDs = InventoryCommands.AddItems(
         record, specs, "root", reason or "supply_acquisition"
     )
     if not added then
@@ -82,7 +83,7 @@ function SupplyInventory.CreateDestination(record, reason)
     local destination = {
         revision = record.inventory and record.inventory.revision or 0,
         inventoryUndo = PNC.Core.DeepCopy(
-            PNC.Inventory.EnsureRecordInventory(record)
+            InventoryCommands.EnsureRecordInventory(record)
         ),
         physicalItems = {},
         physicalProjectionMissing = false,
@@ -109,7 +110,7 @@ function SupplyInventory.CreateDestination(record, reason)
         ) or nil
         if physical then removeNativeList(physical, self.physicalItems) end
         record.inventory = self.inventoryUndo
-        PNC.Inventory.RebuildCaches(record)
+        InventoryCommands.RebuildCaches(record)
         self.rolledBack = true
         return true, {}
     end
@@ -198,7 +199,7 @@ local function canonicalConsumptionOps(item, descriptor)
 end
 
 function SupplyInventory.Consume(record, itemID, request)
-    local inv = PNC.Inventory.EnsureRecordInventory(record)
+    local inv = InventoryCommands.EnsureRecordInventory(record)
     local item = inv and inv.items and inv.items[tostring(itemID or "")] or nil
     if not item then return false, "item_not_found" end
     local descriptor = Utility.DescribeNPCItem(item)
@@ -247,7 +248,7 @@ function SupplyInventory.Consume(record, itemID, request)
             physicalProjectionMissing = true
         end
     end
-    local applied = PNC.Inventory.ApplyDelta(
+    local applied = InventoryCommands.ApplyDelta(
         record, ops, "supply_item_use_" .. string.lower(request.resourceKind)
     )
     if not applied then
@@ -270,7 +271,7 @@ function SupplyInventory.Consume(record, itemID, request)
     }
     effect.undo = function()
         record.inventory = inventoryUndo
-        PNC.Inventory.RebuildCaches(record)
+        InventoryCommands.RebuildCaches(record)
         if physicalUndo then physicalUndo() end
         return true
     end
@@ -285,19 +286,21 @@ function SupplyInventory.Consume(record, itemID, request)
     return true, "consumed", effect
 end
 
-function SupplyInventory.FindPersonal(record, request, required)
-    local inv = PNC.Inventory.EnsureRecordInventory(record)
+local function collectPersonal(inv, request, required, includeItem)
     local candidates = {}
     for _, item in pairs(inv and inv.items or {}) do
         if item.interactionLocked ~= true then
             local descriptor = Utility.DescribeNPCItem(item)
             local score = Selector.Score(descriptor, request, required)
             if score then
-                candidates[#candidates + 1] = {
-                    item = item,
+                local candidate = {
+                    itemID = item.id,
+                    stack = tonumber(item.stack) or 1,
                     descriptor = descriptor,
                     score = score,
                 }
+                if includeItem then candidate.item = item end
+                candidates[#candidates + 1] = candidate
             end
         end
     end
@@ -306,9 +309,29 @@ function SupplyInventory.FindPersonal(record, request, required)
         if left.descriptor.expiry ~= right.descriptor.expiry then
             return left.descriptor.expiry > right.descriptor.expiry
         end
-        return tostring(left.item.id) < tostring(right.item.id)
+        return tostring(left.itemID) < tostring(right.itemID)
     end)
     return candidates
 end
+
+function SupplyInventory.FindPersonal(record, request, required)
+    local inv = InventoryCommands.EnsureRecordInventory(record)
+    return collectPersonal(inv, request, required, true)
+end
+
+function SupplyInventory.QueryPersonal(record, request, required)
+    local inv = record and record.inventory or nil
+    return collectPersonal(inv, request, required, false)
+end
+
+SupplyInventory.Commands = SupplyInventory.Commands or {}
+SupplyInventory.Queries = SupplyInventory.Queries or {}
+
+SupplyInventory.Commands.AddCoreRecords = SupplyInventory.AddCoreRecords
+SupplyInventory.Commands.CreateDestination = SupplyInventory.CreateDestination
+SupplyInventory.Commands.Consume = SupplyInventory.Consume
+SupplyInventory.Commands.EnsurePersonalInventory =
+    InventoryCommands.EnsureRecordInventory
+SupplyInventory.Queries.FindPersonal = SupplyInventory.QueryPersonal
 
 return SupplyInventory

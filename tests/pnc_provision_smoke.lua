@@ -371,6 +371,9 @@ PNC.ProvisionRuleRegistry.Register({
         } },
 })
 PNC.Client = {
+    RequestColonyManagement = function()
+        return true, "snapshot_requested"
+    end,
     RequestColonyAction = function(action, args)
         equal(action, "provision_set", "model submits colony action")
         truthy(args.submission.rules.dummy_radio,
@@ -390,5 +393,51 @@ model:ResetDefaults()
 equal(model:Get("bandage").target, 3, "reset uses registry defaults")
 ok = model:Submit()
 equal(ok, true, "valid working copy submits")
+
+local injectedSubmission
+local injectedClient = {
+    Submit = function(submission)
+        injectedSubmission = submission
+        return true, "injected"
+    end,
+}
+local injectedModel = UIModel.New({ provision = faction.provision,
+    policyId = "default", canEdit = true }, injectedClient)
+injectedModel:Set("bandage", "target", 6)
+ok, reason = injectedModel:Submit()
+equal(ok, true, "injected client submits")
+equal(reason, "injected", "injected client reason")
+equal(injectedSubmission.rules.bandage.target, 6,
+    "model passes validated submission to client boundary")
+
+PNC.Network = { ClientState = {
+    lastColonyManagementReceiveAt = 12,
+    colonyManagement = {
+        provisionSettings = { marker = "snapshot" },
+        actionResult = { action = "provision_set", ok = true },
+    },
+} }
+equal(PNC.ProvisionSettingsClient.CurrentSnapshot().marker, "snapshot",
+    "client boundary current snapshot")
+local update = PNC.ProvisionSettingsClient.ReadUpdate(11)
+equal(update.receivedAt, 12, "client boundary receive time")
+equal(update.result.action, "provision_set", "client boundary result")
+equal(PNC.ProvisionSettingsClient.ReadUpdate(12), nil,
+    "client boundary ignores stale state")
+ok, reason = PNC.ProvisionSettingsClient.RequestSnapshot()
+equal(ok, true, "client boundary requests snapshot")
+equal(reason, "snapshot_requested", "client boundary snapshot reason")
+
+local windowPath = ROOT
+    .. "client/PNC/UI/Provision/PNC_ProvisionSettingsWindow.lua"
+local windowFile = assert(io.open(windowPath, "r"))
+local windowSource = windowFile:read("*a")
+windowFile:close()
+equal(windowSource:find("PNC.Client.", 1, true), nil,
+    "Provision window bypasses client boundary")
+equal(windowSource:find("PNC.Network.ClientState", 1, true), nil,
+    "Provision window reads raw network state")
+truthy(windowSource:find("Client.ReadUpdate", 1, true),
+    "Provision window consumes client update boundary")
 
 print("pnc_provision_smoke: ok")

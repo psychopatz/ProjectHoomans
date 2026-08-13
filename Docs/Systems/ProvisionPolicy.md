@@ -6,6 +6,18 @@ hydration, wounds, or health. Needs and Treatment remain the only consumers.
 
 ## Architecture
 
+`PNC_Provision.lua` is the canonical server entry. It explicitly loads the
+resolver, evaluator, scheduler, and policy service in their established order,
+then exposes named evaluator, scheduler, and policy access through
+`PNC.Provision`. Existing direct domain tables remain compatible; the evaluator
+is not labeled a query because evaluation can initialize inventory and request
+authoritative supply work.
+
+After those modules load, the entry subscribes to Inventory's
+`NPC_INVENTORY_CHANGED` fact and delegates invalidation to the scheduler. This
+keeps Inventory independent from Provision while preserving the existing dirty
+rule timing after successful inventory mutation.
+
 The shared `PNC_ProvisionRuleRegistry` owns semantic rule definitions, defaults,
 validation ranges, categories, and UI field descriptors. The initial rules are:
 
@@ -76,6 +88,15 @@ carried allocation but cannot fetch from colony storage. Provision requests also
 bypass a need-consumption retry cooldown, so an earlier attempt to eat an empty
 reserve cannot prevent that reserve from being replenished.
 
+`PNC_Supply.lua` is the canonical server entry for request validation, metrics,
+item utility/indexing/selection, storage access, inventory adaptation, and the
+authoritative NPC supply service. Its implementation order is explicit rather
+than dependent on alphabetical filenames. Supply reads personal inventory
+through `SupplyInventory.Queries` and mutates it through
+`SupplyInventory.Commands`. The query operates on explicitly initialized state
+and returns item IDs, stack counts, descriptors, and scores rather than mutable
+inventory items. Supply commands delegate canonical mutations to Inventory commands.
+
 The existing inventory mutation path is unchanged, so LIVE inventory mirroring,
 FULL persistence, SEED_ONLY to BASELINE_DELTA overlays, and delta compaction all
 continue through `PNC.Inventory.AddItems` / `ApplyDelta`.
@@ -87,6 +108,22 @@ window iterates registry categories and rule UI descriptors; it has no food,
 hydration, or bandage-specific widget creation. Edits live in
 `PNC_ProvisionSettingsModel` until Apply. Reset Defaults also changes only the
 working copy.
+
+The client feature has an explicit four-part boundary:
+
+- `ProvisionSettingsClient`, defined with the model, adapts the existing colony
+  snapshot state and `RequestColonyManagement` / `provision_set` requests;
+- `ProvisionSettingsModel` owns the editable copy and shared pre-validation;
+- `ProvisionRulePanel` translates widgets to model operations without writing
+  model fields directly; and
+- `ProvisionSettingsWindow` owns layout, status text, refresh timing, and user
+  interaction while consuming only the client boundary and model.
+
+The window is the canonical client entry and deterministically loads the model,
+rule panel, and scroll panel. No new protocol or client authority is introduced.
+Client validation is convenience feedback only; the server policy service still
+re-resolves ownership, checks the expected revision and schema, validates every
+rule, applies the mutation, and persists it.
 
 Apply uses the existing colony action request. The server resolves the player's
 own faction, requires its owner identity, validates schema, policy ID, every rule

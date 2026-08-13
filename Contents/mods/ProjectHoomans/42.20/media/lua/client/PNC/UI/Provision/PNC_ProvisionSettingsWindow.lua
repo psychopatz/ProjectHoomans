@@ -9,9 +9,9 @@ PNC = PNC or {}
 PNC.ProvisionSettingsUI = PNC.ProvisionSettingsUI or {}
 
 local ProvisionUI = PNC.ProvisionSettingsUI
+local Client = PNC.ProvisionSettingsClient
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
-local State = PNC.Network.ClientState
 
 local function tr(key)
     local value = getText and getText(key) or nil
@@ -28,8 +28,7 @@ end
 
 function ISPNCProvisionSettingsWindow:createChildren()
     PsychopatzWindow.createChildren(self)
-    self.model = Model.New(State.colonyManagement
-        and State.colonyManagement.provisionSettings)
+    self.model = Model.New(Client.CurrentSnapshot(), Client)
     self.policyLabel = ISLabel:new(0, 0, 24,
         tr("UI_PNC_Provision_Policy"), 1, 1, 1, 1, UIFont.Small, true)
     self.policyLabel:initialise()
@@ -168,26 +167,24 @@ function ISPNCProvisionSettingsWindow:onApply()
 end
 
 function ISPNCProvisionSettingsWindow:requestSnapshot()
-    PNC.Client.RequestColonyManagement()
-    self.lastRequestAt = PNC.Core.Now()
+    Client.RequestSnapshot()
+    self.lastRequestAt = Client.Now()
 end
 
 function ISPNCProvisionSettingsWindow:prerender()
-    local received = State.lastColonyManagementReceiveAt or 0
-    if received > (self.lastReceiveAt or 0) then
-        local snapshot = State.colonyManagement
-            and State.colonyManagement.provisionSettings
-        if snapshot then
-            self.model:Load(snapshot)
+    local update = Client.ReadUpdate(self.lastReceiveAt)
+    if update then
+        if update.snapshot then
+            self.model:Load(update.snapshot)
             self:refreshRows()
-            local result = State.colonyManagement.actionResult
+            local result = update.result
             if result and result.action == "provision_set" then
                 self.statusLabel:setName(tr(result.ok
                     and "UI_PNC_Provision_Applied"
                     or "UI_PNC_Provision_Rejected"))
             end
         end
-        self.lastReceiveAt = received
+        self.lastReceiveAt = update.receivedAt
     end
     PsychopatzWindow.prerender(self)
 end

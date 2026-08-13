@@ -34,7 +34,7 @@ function RulePanel.Create(parent, definition, model, tr)
     row.measure = label(row.panel, tr("UI_PNC_Provision_MeasuredAs") .. ": "
         .. tr(definition.ui.measureKey))
     row.enabled = ISTickBox:new(0, 0, 70, 24, "", row, function()
-        model.changed = true
+        model:MarkChanged()
     end)
     row.enabled:initialise()
     row.enabled:addOption(tr("UI_PNC_Provision_Enabled"), 1)
@@ -82,12 +82,17 @@ local function wrap(value, maximumWidth)
 end
 
 function RulePanel.Read(row, model)
-    model:Set(row.definition.id, "enabled", row.enabled:isSelected(1))
+    local ok, reason = model:Set(
+        row.definition.id, "enabled", row.enabled:isSelected(1)
+    )
+    if not ok then return false, reason end
     for _, item in ipairs(row.entries) do
         local value = tonumber(item.entry:getText())
         if value == nil then return false, "field_type_invalid" end
-        model:Set(row.definition.id, item.definition.id,
-            value)
+        ok, reason = model:Set(
+            row.definition.id, item.definition.id, value
+        )
+        if not ok then return false, reason end
     end
     return true
 end

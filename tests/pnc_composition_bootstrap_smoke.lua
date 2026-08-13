@@ -20,6 +20,13 @@ local function capture(path, setup)
     return calls
 end
 
+local function indexOf(values, expected)
+    for index = 1, #values do
+        if values[index] == expected then return index end
+    end
+    return nil
+end
+
 local anchorCases = {
     {
         path = ROOT .. "shared/PNC/00_PNC_Init.lua",
@@ -32,6 +39,16 @@ local anchorCases = {
     {
         path = ROOT .. "client/PNC/00_PNC_Client_Init.lua",
         composition = "PNC/Composition/PNC_ClientComposition",
+    },
+    {
+        path = ROOT .. "shared/PNC/00_PNC_Conversation_Init.lua",
+        composition =
+            "PNC/Conversation/Composition/PNC_ConversationSharedComposition",
+    },
+    {
+        path = ROOT .. "client/PNC/00_PNC_Conversation_Init.lua",
+        composition =
+            "PNC/Conversation/Composition/PNC_ConversationClientComposition",
     },
 }
 
@@ -68,6 +85,16 @@ assertEqual(serverCalls[#serverCalls - 1], "<install-server-profiler>",
     "server profiler installation timing")
 assertEqual(serverCalls[#serverCalls], "PNC/PNC_Server",
     "server runtime starts after dependencies")
+local conversationServerIndex = indexOf(
+    serverCalls,
+    "PNC/Conversation/PNC_ConversationServer"
+)
+assertEqual(serverCalls[conversationServerIndex - 1],
+    "PNC/PNC_SocialEventHooks",
+    "server Conversation initialization predecessor")
+assertEqual(serverCalls[conversationServerIndex + 1],
+    "PNC/PNC_ServerInventory",
+    "server Conversation initialization successor")
 
 local eventMarkers = {}
 PNC = {}
@@ -81,5 +108,83 @@ assertEqual(clientCalls[#clientCalls], "PNC/Integrations/PNC_PsychopatzCoreDebug
     "client composition final dependency")
 assertEqual(PNC.EventMarkers, eventMarkers,
     "client EventMarkers assignment timing")
+
+PNC = { Conversation = {} }
+local conversationSharedCalls = capture(
+    ROOT
+        .. "shared/PNC/Conversation/Composition/"
+        .. "PNC_ConversationSharedComposition.lua"
+)
+local expectedConversationShared = {
+    "PNC/Conversation/Blocks/PNC_ConversationRegistry",
+    "PNC/Conversation/Blocks/PNC_ConversationRules",
+    "PNC/Conversation/Blocks/PNC_ConversationSelector",
+    "PNC/Conversation/PNC_ConversationScene",
+    "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions",
+}
+for index = 1, #expectedConversationShared do
+    assertEqual(
+        conversationSharedCalls[index],
+        expectedConversationShared[index],
+        "shared Conversation dependency " .. tostring(index)
+    )
+end
+assertEqual(#conversationSharedCalls, #expectedConversationShared,
+    "shared Conversation dependency count")
+
+local pumpRegistrations = 0
+PNC = {
+    Conversation = {
+        Composer = {
+            PumpLocalRequests = function() end,
+            LocalPumpRegistered = false,
+        },
+    },
+}
+Events = {
+    OnTick = {
+        Add = function(callback)
+            assertEqual(callback, PNC.Conversation.Composer.PumpLocalRequests,
+                "client Conversation pump callback")
+            pumpRegistrations = pumpRegistrations + 1
+        end,
+    },
+}
+local conversationClientCalls = capture(
+    ROOT
+        .. "client/PNC/Conversation/Composition/"
+        .. "PNC_ConversationClientComposition.lua"
+)
+assertEqual(conversationClientCalls[1], "PNC/Conversation/PNC_Conversation",
+    "client Conversation first dependency")
+assertEqual(conversationClientCalls[2],
+    "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation",
+    "client Conversation final dependency")
+assertEqual(#conversationClientCalls, 2,
+    "client Conversation dependency count")
+assertEqual(pumpRegistrations, 1,
+    "client Conversation pump registration timing")
+assertEqual(PNC.Conversation.Composer.LocalPumpRegistered, true,
+    "client Conversation pump registration guard")
+capture(
+    ROOT
+        .. "client/PNC/Conversation/Composition/"
+        .. "PNC_ConversationClientComposition.lua"
+)
+assertEqual(pumpRegistrations, 1,
+    "client Conversation pump registers once")
+
+PNC = { Conversation = {} }
+local conversationServerCalls = capture(
+    ROOT .. "server/PNC/Conversation/PNC_ConversationServer.lua"
+)
+assertEqual(conversationServerCalls[1],
+    "PNC/Conversation/PNC_ConversationHistory",
+    "server Conversation history dependency")
+assertEqual(conversationServerCalls[2],
+    "PNC/Conversation/PNC_ConversationAuthority",
+    "server Conversation authority dependency")
+assertEqual(#conversationServerCalls, 2,
+    "server Conversation dependency count")
 
 print("pnc_composition_bootstrap_smoke: OK")

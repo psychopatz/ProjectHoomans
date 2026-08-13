@@ -22,6 +22,16 @@
 - bounded portable item state with deterministic primitive-only modData
 
 ## Public Functions
+
+The canonical `PNC_Inventory.lua` entry also exposes boundary-oriented command
+aliases:
+
+- `PNC.Inventory.Commands`: `EnsureRecordInventory`, `ApplyDelta`, `AddItems`,
+  `RemoveItems`, and `RebuildCaches`.
+
+These are direct aliases. Existing `PNC.Inventory.*` functions remain the
+compatibility surface and have identical behavior.
+
 - `PNC.Inventory.CreateFromTemplate(record)`
 - `PNC.Inventory.RegisterEquipmentSpawnPool(poolID, specification)`
 - `PNC.Inventory.AddEquipmentSpawnEntry(poolID, category, entry)`
@@ -47,6 +57,10 @@
 
 ## Module Layout
 - `PNC_Inventory.lua` is the stable subsystem facade and load-order entry point.
+  It loads internal modules in explicit dependency order and publishes the
+  command aliases only after those implementations have loaded. Legacy helpers
+  that lazily hydrate or normalize inventory are not mislabeled as read-only
+  queries.
 - `PNC_Inventory_Model.lua` loads focused model modules for runtime/revision state,
   container membership, and item/carry-cache mechanics.
 - `Equipment/PNC_Inventory_EquipmentGeneration.lua` owns generic categorized
@@ -102,6 +116,9 @@ continue to call only the public `PNC.Inventory` functions.
 - runtime inventory operation logs remain capped and are never serialized.
   Save deltas are rebuilt from the current canonical inventory, so mutation
   history cannot grow the save indefinitely.
+- successful deltas publish `NPC_INVENTORY_CHANGED` after revision, equipment,
+  cache, and registry dirty work completes. Inventory does not depend directly
+  on Provision; server Provision may subscribe to this fact.
 
 ## Equipment Generation
 

@@ -19,6 +19,16 @@ local ProfileMath = PNC.SocialProfileMath
 local Conduct = PNC.Conduct
 local ConductDefinitions = PNC.ConductDefinitions
 
+local function personalRelationshipQueries()
+    local personal = Relationships and Relationships.Personal
+    return personal and personal.Queries or Relationships
+end
+
+local function personalRelationshipCommands()
+    local personal = Relationships and Relationships.Personal
+    return personal and personal.Commands or Relationships
+end
+
 local FACTION_INCIDENT_BY_SOCIAL_EVENT = {
     saved_from_incapacitation = "member_rescued",
     protected_from_attacker = "member_protected",
@@ -309,7 +319,7 @@ local function preflightObserver(event, definition, observer)
     if hasRecentEvent(record, event.id) then
         return nil, "duplicate_event"
     end
-    relationship, reason = Relationships.Get(
+    relationship, reason = personalRelationshipQueries().Get(
         observer.observerNPCID,
         observer.aboutKey
     )
@@ -502,7 +512,7 @@ function SocialEvents.Process(eventSpec)
     for index = 1, #work do
         prepared = work[index]
         applied, reason, mutationResult =
-            Relationships.ApplyEventMutation(
+            personalRelationshipCommands().ApplyEventMutation(
                 prepared.observerNPCID,
                 prepared.aboutKey,
                 prepared.mutation

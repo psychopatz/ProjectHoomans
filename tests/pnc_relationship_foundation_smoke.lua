@@ -144,6 +144,17 @@ end
 dofile(SERVER_ROOT .. "PNC_RelationshipService.lua")
 dofile(SERVER_ROOT .. "PNC_RelationshipDebug.lua")
 
+assertEqual(PNC.Relationships.Personal.Queries.Get,
+    PNC.Relationships.Get, "personal relationship query compatibility")
+assertEqual(PNC.Relationships.Personal.Commands.AddMemory,
+    PNC.Relationships.AddMemory, "personal relationship command compatibility")
+assertEqual(PNC.Relationships.Personal.Commands.ApplyEventMutation,
+    PNC.Relationships.ApplyEventMutation,
+    "personal relationship event command compatibility")
+assertEqual(PNC.Relationships.Personal.Commands.ApplyConversationEffect,
+    PNC.Relationships.ApplyConversationEffect,
+    "personal relationship conversation command compatibility")
+
 local function newRecord(id)
     local record = PNC.Types.NewRecord({
         id = id,

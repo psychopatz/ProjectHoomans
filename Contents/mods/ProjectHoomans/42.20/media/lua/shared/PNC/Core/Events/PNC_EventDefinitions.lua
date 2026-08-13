@@ -5,6 +5,7 @@ PNC.EventTypes = PNC.EventTypes or {
     STORAGE_ITEM_WITHDRAWN = "projecthoomans.storage.itemWithdrawn",
     NPC_FOOD_CONSUMED = "projecthoomans.npc.needs.foodConsumed",
     NPC_DRINK_CONSUMED = "projecthoomans.npc.needs.drinkConsumed",
+    NPC_INVENTORY_CHANGED = "projecthoomans.npc.inventory.changed",
     NPC_SKILL_LEVEL_UP = "projecthoomans.npc.skill.levelUp",
     NPC_WOUNDED = "projecthoomans.npc.health.wounded",
     BASE_CREATED = "projecthoomans.base.created",

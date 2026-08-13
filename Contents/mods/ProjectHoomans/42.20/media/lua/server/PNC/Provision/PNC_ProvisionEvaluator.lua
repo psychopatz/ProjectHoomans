@@ -7,10 +7,18 @@ local Evaluator = PNC.ProvisionEvaluator
 local Registry = PNC.ProvisionRuleRegistry
 local Resolver = PNC.ProvisionResolver
 local SupplyInventory = PNC.SupplyInventory
+local SupplyCommands = SupplyInventory.Commands or SupplyInventory
+local SupplyQueries = SupplyInventory.Queries or SupplyInventory
 local Metrics = PNC.SupplyMetrics
 local Access = PNC.StorageAccessPolicy
 local Selector = PNC.SupplySelector
 local Index = PNC.SupplyIndex
+
+local function ensurePersonalInventory(record)
+    if SupplyCommands.EnsurePersonalInventory then
+        SupplyCommands.EnsurePersonalInventory(record)
+    end
+end
 
 local function provisionRuntime(record)
     record.runtime = record.runtime or {}
@@ -30,7 +38,8 @@ end
 
 function Evaluator.Measure(record, definition)
     local request = requestFor(definition)
-    local candidates = SupplyInventory.FindPersonal(record, request, 999999)
+    ensurePersonalInventory(record)
+    local candidates = SupplyQueries.FindPersonal(record, request, 999999)
     local amount = 0
     for _, candidate in ipairs(candidates) do
         local descriptor = candidate.descriptor
@@ -181,7 +190,8 @@ end
 
 local function personalItems(record, definition)
     local output = {}
-    local candidates = SupplyInventory.FindPersonal(
+    ensurePersonalInventory(record)
+    local candidates = SupplyQueries.FindPersonal(
         record, requestFor(definition), 999999
     )
     for index = 1, math.min(#candidates, 12) do

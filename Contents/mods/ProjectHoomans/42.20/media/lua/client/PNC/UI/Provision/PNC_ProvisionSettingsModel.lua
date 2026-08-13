@@ -1,7 +1,9 @@
 PNC = PNC or {}
 PNC.ProvisionSettingsModel = PNC.ProvisionSettingsModel or {}
+PNC.ProvisionSettingsClient = PNC.ProvisionSettingsClient or {}
 
 local Model = PNC.ProvisionSettingsModel
+local Client = PNC.ProvisionSettingsClient
 local Policy = PNC.ProvisionPolicy
 local Registry = PNC.ProvisionRuleRegistry
 
@@ -9,13 +11,49 @@ local function copy(value)
     return PNC.Core and PNC.Core.DeepCopy and PNC.Core.DeepCopy(value) or value
 end
 
-function Model.New(snapshot)
+local function clientState()
+    return PNC.Network and PNC.Network.ClientState or {}
+end
+
+function Client.CurrentSnapshot()
+    local colony = clientState().colonyManagement
+    return colony and colony.provisionSettings or nil
+end
+
+function Client.ReadUpdate(lastReceiveAt)
+    local state = clientState()
+    local receivedAt = tonumber(state.lastColonyManagementReceiveAt) or 0
+    if receivedAt <= (tonumber(lastReceiveAt) or 0) then return nil end
+    local colony = state.colonyManagement
+    return {
+        receivedAt = receivedAt,
+        snapshot = colony and colony.provisionSettings or nil,
+        result = colony and colony.actionResult or nil,
+    }
+end
+
+function Client.RequestSnapshot()
+    return PNC.Client.RequestColonyManagement()
+end
+
+function Client.Submit(submission)
+    return PNC.Client.RequestColonyAction("provision_set", {
+        submission = submission,
+    })
+end
+
+function Client.Now()
+    return PNC.Core.Now()
+end
+
+function Model.New(snapshot, client)
     local object = {
         policyId = "default",
         revision = 0,
         rules = {},
         changed = false,
         canEdit = false,
+        client = client or Client,
     }
     return setmetatable(object, { __index = Model }):Load(snapshot)
 end
@@ -44,6 +82,10 @@ function Model:Set(ruleID, fieldID, value)
     self.rules[ruleID][fieldID] = value
     self.changed = true
     return true
+end
+
+function Model:MarkChanged()
+    self.changed = true
 end
 
 function Model:ResetDefaults()
@@ -79,9 +121,7 @@ function Model:Submit()
     if not self.canEdit then
         return false, self.permissionReason or "not_authorized"
     end
-    return PNC.Client.RequestColonyAction("provision_set", {
-        submission = submission,
-    })
+    return self.client.Submit(submission)
 end
 
 return Model

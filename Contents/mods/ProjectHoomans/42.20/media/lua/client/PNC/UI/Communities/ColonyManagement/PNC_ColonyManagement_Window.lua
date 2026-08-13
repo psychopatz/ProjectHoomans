@@ -9,9 +9,9 @@ local Registry = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManageme
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
 
 local ColonyUI = PNC.ColonyManagementUI
+local Client = PNC.ColonyManagementClient
 local UI = PsychopatzCore.UI
 local Theme = UI.Theme
-local State = PNC.Network.ClientState
 
 ISPNCColonyManagementWindow = PsychopatzWindow:derive(
     "ISPNCColonyManagementWindow"
@@ -92,10 +92,8 @@ function ISPNCColonyManagementWindow:onDebugControl(button)
 end
 
 function ISPNCColonyManagementWindow:requestSnapshot(source)
-    if PNC.Client and PNC.Client.RequestColonyManagement then
-        PNC.Client.RequestColonyManagement()
-    end
-    self.lastRequestAt = PNC.Core.Now()
+    local _, _, requestedAt = Client.RequestSnapshot()
+    self.lastRequestAt = requestedAt
     Diagnostics.Log(self, "snapshot_requested", {
         source = source or "automatic",
         tab = self.tab,
@@ -104,10 +102,11 @@ function ISPNCColonyManagementWindow:requestSnapshot(source)
 end
 
 function ISPNCColonyManagementWindow:manualRefresh()
-    local previousRevision = tonumber(State.colonyManagementRevision) or 0
+    local previousRevision = Client.ReadSnapshot().revision
     self:requestSnapshot("manual")
-    if (tonumber(State.colonyManagementRevision) or 0) > previousRevision then
-        self:refresh()
+    local update = Client.ReadSnapshot()
+    if update.revision > previousRevision then
+        self:refresh(update)
     end
 end
 
@@ -133,17 +132,16 @@ function ISPNCColonyManagementWindow:onPersonSelected()
     Controller.OnPersonSelected(self)
 end
 
-function ISPNCColonyManagementWindow:refresh()
-    Controller.Refresh(self)
+function ISPNCColonyManagementWindow:refresh(update)
+    Controller.Refresh(self, update)
 end
 
 function ISPNCColonyManagementWindow:prerender()
-    if (tonumber(State.colonyManagementRevision) or 0)
-            > (tonumber(self.lastReceiveRevision) or 0)
-        or (State.lastColonyManagementReceiveAt or 0)
-        > (self.lastReceiveAt or 0)
-    then
-        self:refresh()
+    local changed, update = Client.HasUpdate(
+        self.lastReceiveRevision, self.lastReceiveAt
+    )
+    if changed then
+        self:refresh(update)
     end
     PsychopatzWindow.prerender(self)
 end

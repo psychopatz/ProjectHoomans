@@ -16,3 +16,11 @@ require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Equipment"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Mutations"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Payloads"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Persistence"
+
+Inventory.Commands = Inventory.Commands or {}
+
+Inventory.Commands.EnsureRecordInventory = Inventory.EnsureRecordInventory
+Inventory.Commands.ApplyDelta = Inventory.ApplyDelta
+Inventory.Commands.AddItems = Inventory.AddItems
+Inventory.Commands.RemoveItems = Inventory.RemoveItems
+Inventory.Commands.RebuildCaches = Inventory.RebuildCaches

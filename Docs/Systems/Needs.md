@@ -65,6 +65,12 @@ owner analytically from `lastUpdateWorldAge` to current world age. It does not
 perform per-second updates, world searches, pathfinding, container scans,
 inventory iteration, or individual group-member simulation.
 
+Needs and Provision are two related supply lanes, not a single linear pipeline.
+Needs requests immediate personal consumption through `NeedSupplyBridge`, while
+Provision evaluates target carry stock and may acquire deficits from accessible
+colony storage. Both use the authoritative `NPCSupplyService` and canonical
+Inventory mutation boundary.
+
 At the standard 60-minute day, the installed Build 42 constants are expressed
 as world-hour rates of `0.0432` base awake hunger, `0.03456` thirst, and
 `0.044712` fatigue. Hunger follows the player's remaining-appetite factor
@@ -202,6 +208,15 @@ same core button becomes a `Mod Services` menu instead of crowding the radio
 screen. Community resource numbers are deliberately absent unless a future
 cached/indexed resource source is introduced.
 
+The client shell uses `PNC.ColonyManagementClient`, published by the canonical
+`PNC_ColonyManagement.lua` entry, as its only snapshot/request boundary. The
+gateway projects the replicated snapshot, revision, and receive time and sends
+the existing colony-management snapshot request. The controller owns selection,
+tab binding, and snapshot-to-row coordination; the window owns interaction,
+layout delegation, rendering, and refresh timing. Neither controller nor window
+reads raw `PNC.Network.ClientState` or calls `PNC.Client` directly. Server
+snapshot construction and all colony/settlement/storage policy remain unchanged.
+
 ## Debugging
 
 `NPC Needs Debug` is registered in the PsychopatzCore debug hub. It requests
@@ -220,3 +235,11 @@ broadcast to clients.
 - food/water searches, container scans, and exact group inventories;
 - full calorie/macronutrient body-weight simulation and thermoregulation;
 - individual Need records for every autonomous group member.
+
+## Load-Order Contract
+
+Server Needs loading remains deliberately interleaved: Individual Needs loads
+before Facility Jobs, which consumes it, while the scheduler loads later after
+Director dependencies. Do not collapse this sequence or rely on alphabetical
+filenames. Any future canonical Needs entry must preserve that runtime timing
+and pass SP, hosted-MP, and dedicated-server startup validation.
