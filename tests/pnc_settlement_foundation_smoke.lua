@@ -145,6 +145,13 @@ equal(researchLevel.componentLimits["research.room"], nil,
     "research room is not a functional component")
 equal(researchLevel.componentLimits["work.research"].minCount, 1,
     "research station is the only required research component")
+local workshopLevel = PNC.FacilityDefinitions.GetLevel("workshop", 1)
+equal(workshopLevel.componentLimits["workshop.room"], nil,
+    "workshop room is not a functional component")
+equal(workshopLevel.componentLimits["work.craft"].minCount, 1,
+    "craft station remains a workshop component")
+equal(workshopLevel.componentLimits["work.disassemble"].minCount, 1,
+    "disassembly station remains a workshop component")
 
 local playerZoneConflict = PNC.BaseService.Create({}, {
     colonyId = "community_other", factionId = "faction_test",
@@ -301,6 +308,18 @@ equal(#refreshedResearch, 1,
     "capability lookup repairs stale research facility state")
 equal(researchFacility.cachedState, "OPERATIONAL",
     "research facility cache is refreshed before worker assignment")
+local retiredRoomId = "legacy:workshop.room"
+researchFacility.componentIds[retiredRoomId] = true
+PNC.SettlementRepository.State.components[retiredRoomId] = {
+    id = retiredRoomId, facilityId = researchFacility.id,
+    kind = "region", role = "workshop.room",
+    region = rectangle(7, 7, 8, 8),
+}
+PNC.FacilityService.RebuildIndexes()
+equal(PNC.SettlementRepository.State.components[retiredRoomId], nil,
+    "retired room component is removed from saved settlement state")
+equal(researchFacility.componentIds[retiredRoomId], nil,
+    "retired room component is removed from its facility")
 
 local farmResult = PNC.FacilityService.Create(player, { baseId = base.id,
     definitionId = "farm", expectedRevision = base.revision,

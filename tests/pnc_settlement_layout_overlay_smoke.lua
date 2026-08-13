@@ -56,8 +56,8 @@ equal(markers[1].kind, "room", "room marker kind")
 equal(markers[1].x, 4, "room marker dynamic horizontal center")
 equal(markers[1].y, 4.5, "room marker dynamic vertical center")
 equal(markers[2].role, "work.research", "component marker role")
-equal(markers[2].size < markers[1].size, true,
-    "component marker remains subordinate to room marker")
+equal(markers[1].tileScale, 1, "room marker fills one tile")
+equal(markers[2].tileScale, 1, "component marker fills one tile")
 
 local constructionLayers = Overlay.BuildLayers({ facilities = {{
     id = "facility_building", definitionId = "research_facility",
@@ -69,6 +69,7 @@ equal(constructionLayers[1].color.r, 1,
     "active construction uses its dynamic state color")
 
 local renderedIcons = 0
+local renderedIconSizes = {}
 local renderedAreas = 0
 ISUIElement = {}
 function ISUIElement:new(x, y, width, height)
@@ -80,8 +81,11 @@ function ISUIElement:new(x, y, width, height)
         setY = function(self, value) self.y = value end,
         setWidth = function(self, value) self.width = value end,
         setHeight = function(self, value) self.height = value end,
-        drawTextureScaledAspect = function()
+        drawTextureScaledAspect = function(_, _, _, _, width, height)
             renderedIcons = renderedIcons + 1
+            renderedIconSizes[#renderedIconSizes + 1] = {
+                width = width, height = height,
+            }
         end,
     }
 end
@@ -116,5 +120,9 @@ Overlay.SetEnabled(true)
 Overlay.Render()
 equal(renderedAreas > 0, true, "overlay areas rendered")
 equal(renderedIcons, 3, "all placeholder overlay icons rendered")
+for _, size in ipairs(renderedIconSizes) do
+    equal(size.width, 40, "overlay icon tracks full projected tile width")
+    equal(size.height, 40, "overlay icon remains square")
+end
 
 print("pnc_settlement_layout_overlay_smoke: ok")

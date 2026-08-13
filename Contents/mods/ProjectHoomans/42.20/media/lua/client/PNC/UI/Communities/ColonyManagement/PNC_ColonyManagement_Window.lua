@@ -155,7 +155,7 @@ end
 function ISPNCColonyManagementWindow:prerender()
     local currentTime = PNC.Core.Now()
     if (self.tab == "tasks" or self.tab == "base"
-        or self.tab == "research")
+        or self.tab == "research" or self.tab == "storage")
         and currentTime - (tonumber(self.lastWorkPollAt) or 0) >= 2000
     then
         self.lastWorkPollAt = currentTime

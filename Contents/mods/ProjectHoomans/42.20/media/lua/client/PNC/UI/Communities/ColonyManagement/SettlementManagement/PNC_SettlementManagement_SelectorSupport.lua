@@ -40,6 +40,15 @@ function Support.ComponentForRole(facility, role)
     return nil
 end
 
+function Support.ComponentById(facility, componentId)
+    componentId = tostring(componentId or "")
+    for index = 1, #(facility and facility.components or {}) do
+        local component = facility.components[index]
+        if tostring(component.id or "") == componentId then return component end
+    end
+    return nil
+end
+
 function Support.UsedGuideLayers(window, excludedComponentId)
     local settlement = window.snapshot and window.snapshot.settlement or nil
     local layers = LayoutOverlay.BuildLayers(settlement, false)

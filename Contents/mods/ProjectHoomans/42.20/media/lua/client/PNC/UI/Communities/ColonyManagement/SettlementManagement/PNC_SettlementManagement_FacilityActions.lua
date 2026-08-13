@@ -89,10 +89,12 @@ function Facility.BeginBuild(window, definitionId)
     return true
 end
 
-function Facility.BeginArea(window, facility)
-    local role = areaRole(facility)
+function Facility.BeginArea(window, facility, requestedRole, componentId)
+    local role = requestedRole or areaRole(facility)
     if not role then return false end
-    local existing = Support.ComponentForRole(facility, role)
+    local existing = componentId and Support.ComponentById(facility, componentId)
+        or requestedRole == nil and Support.ComponentForRole(facility, role)
+        or nil
     Support.OpenSelector(window, areaOptions(window, facility, existing,
         function(region)
             PNC.Client.RequestSetFacilityComponent({ facilityId = facility.id,
@@ -130,14 +132,20 @@ function Facility.AnchorAssignLabel(role)
     return key and getText(key) or Facility.AnchorLabel(role)
 end
 
-function Facility.BeginPoint(window, kind, facility)
-    local role = kind == "facility_anchor" and Facility.NextAnchorRole(facility)
+function Facility.BeginPoint(window, kind, facility, requestedRole, componentId)
+    local role = requestedRole
+        or kind == "facility_anchor" and Facility.NextAnchorRole(facility)
         or kind == "bed" and "sleep.bed" or nil
     local anchor = role ~= nil
-    local existing = anchor and Support.ComponentForRole(facility, role) or nil
-    local label = Facility.AnchorLabel(role)
+    local existing = anchor and componentId
+        and Support.ComponentById(facility, componentId)
+        or anchor and requestedRole == nil
+            and Support.ComponentForRole(facility, role) or nil
+    local selectTitleKey = anchor and ANCHOR_SELECT_TITLES[role] or nil
     Support.OpenSelector(window, {
-        title = anchor and getText(ANCHOR_SELECT_TITLES[role])
+        title = selectTitleKey and getText(selectTitleKey)
+            or anchor and Support.Tr("UI_PNC_Facility_SelectStation",
+                "SELECT FACILITY COMPONENT")
             or Support.Tr("UI_PNC_Stockpile_SelectNode", "SELECT STOCKPILE ACCESS TILE"),
         instruction = role == "sleep.bed" and Support.Tr("UI_PNC_Facility_SelectBedHelp",
             "Choose a sleeping spot. A bed is used automatically when present; otherwise the colonist sleeps on the floor.")
@@ -145,7 +153,8 @@ function Facility.BeginPoint(window, kind, facility)
             or Support.Tr("UI_PNC_Point_SelectHelp", "Click one tile, then confirm."),
         selectionKind = "point",
         guideRegion = Support.BaseRegion(window),
-        guideLayers = Support.UsedGuideLayers(window),
+        guideLayers = Support.UsedGuideLayers(window,
+            existing and existing.id),
         guideRenderZ = math.floor(getSpecificPlayer(0):getZ()),
         validate = function(region)
             local bounds = GridRegion.bounds(region)

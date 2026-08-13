@@ -70,9 +70,9 @@ function Service.Commit(order, reason)
     local input = inputFor(order)
     if not input or input.committed == true then return true end
     local ok, why
+    local worker = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(order.workerId) or nil
     if input.staged == true then
-        local worker = PNC.Registry and PNC.Registry.Get
-            and PNC.Registry.Get(order.workerId) or nil
         local commands = PNC.SupplyInventory and PNC.SupplyInventory.Commands
         if commands and commands.RemoveCoreItemIds then
             ok, why = commands.RemoveCoreItemIds(worker, input.itemIds or {},
@@ -82,7 +82,9 @@ function Service.Commit(order, reason)
         end
     else
         ok, why = PNC.ColonyStorageService.CommitProductionReservation(
-            input.reservationId, order.id, input.stage, input.storageId)
+            input.reservationId, order.id, input.stage, input.storageId,
+            worker and tostring(worker.name or worker.id) or order.workerId,
+            reason)
     end
     if not ok then return false, why end
     input.committed = true

@@ -19,8 +19,6 @@ local TOOLBAR = {
 }
 
 local CONTEXT = {
-    { "facility_area", "UI_PNC_Facility_AssignArea", "ZONE ROOM / FIELD", "primary" },
-    { "facility_anchor", "UI_PNC_Facility_AssignStation", "ASSIGN STATION", "primary" },
     { "facility_upgrade", "UI_PNC_Facility_Upgrade", "UPGRADE BUILDING", "success" },
     { "facility_destroy", "UI_PNC_Facility_Destroy", "DECONSTRUCT", "danger" },
 }
@@ -88,6 +86,10 @@ function Tab.Create(window)
     createButtons(window, TOOLBAR, window.baseToolbarControls)
     createButtons(window, CONTEXT, window.baseContextControls)
     Browser.Create(window)
+    window.onBaseComponentAction = function(self, action)
+        return Actions.HandleComponent(self, action,
+            Browser.GetSelected(self))
+    end
     window.updateBaseContextControls = function(self)
         Tab.UpdateContextControls(self)
     end

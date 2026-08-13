@@ -144,8 +144,6 @@ Definitions.Register({
             requiredHQLevel = 1,
             capabilities = { "work.craft", "work.disassemble" },
             componentLimits = {
-                ["workshop.room"] = { kind = "region", minCount = 1,
-                    maxCount = 1, overlap = "exclusive" },
                 ["work.craft"] = { kind = "anchor", minCount = 1, maxCount = 1 },
                 ["work.disassemble"] = { kind = "anchor", minCount = 1,
                     maxCount = 1 },

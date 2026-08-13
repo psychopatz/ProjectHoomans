@@ -7,6 +7,9 @@ local Browser = {}
 local UI = PsychopatzCore.UI
 local Theme = UI.Theme
 local TextLayout = UI.Layout
+local ACTION_WIDTH = 92
+local ACTION_HEIGHT = 27
+local ACTION_RIGHT = 20
 
 local STATE_COLORS = {
     OPERATIONAL = "success",
@@ -73,22 +76,36 @@ local function drawComponent(list, y, entry, alternate)
     UI.DrawListSelection(list, y, list.itemheight, false, alternate)
     local color = Theme.colors[row.complete and "success" or "warning"]
     local indent = row.child and 26 or 10
+    local actionWidth = row.componentAction
+        and ACTION_WIDTH + ACTION_RIGHT + 4 or 0
     if not row.child then
         list:drawRect(8, y + 9, 3, list.itemheight - 18,
             color.a, color.r, color.g, color.b)
     end
     list:drawText(TextLayout.Ellipsize(row.label or "COMPONENT", UIFont.Small,
-        list:getWidth() - indent - 18), indent, y + 8,
+        list:getWidth() - indent - 18 - actionWidth), indent, y + 8,
         row.child and Theme.colors.textMuted.r or Theme.colors.text.r,
         row.child and Theme.colors.textMuted.g or Theme.colors.text.g,
         row.child and Theme.colors.textMuted.b or Theme.colors.text.b,
         1, UIFont.Small)
     list:drawText(TextLayout.Ellipsize(row.detail or "", UIFont.Small,
-        list:getWidth() - indent - 18), indent, y + 29,
+        list:getWidth() - indent - 18 - actionWidth), indent, y + 29,
         row.child and Theme.colors.accent.r or color.r,
         row.child and Theme.colors.accent.g or color.g,
         row.child and Theme.colors.accent.b or color.b,
         1, UIFont.Small)
+    if row.componentAction then
+        local buttonX = list:getWidth() - ACTION_WIDTH - ACTION_RIGHT
+        local buttonY = y + math.floor((list.itemheight - ACTION_HEIGHT) / 2)
+        local accent = Theme.colors.accent
+        list:drawRect(buttonX, buttonY, ACTION_WIDTH, ACTION_HEIGHT,
+            0.72, 0.04, 0.08, 0.10)
+        list:drawRectBorder(buttonX, buttonY, ACTION_WIDTH, ACTION_HEIGHT,
+            0.95, accent.r, accent.g, accent.b)
+        list:drawTextCentre(row.actionLabel or "ASSIGN",
+            buttonX + ACTION_WIDTH / 2, buttonY + 6,
+            accent.r, accent.g, accent.b, 1, UIFont.Small)
+    end
     return y + list.itemheight
 end
 
@@ -110,6 +127,54 @@ local function componentDetail(component)
             .. tostring(component.y) .. "  FLOOR " .. tostring(component.z)
     end
     return tostring(component.tileCount or 0) .. " TILES  •  ZONED AREA"
+end
+
+function Browser.BuildComponentRows(facility)
+    local rows = {}
+    local level = PNC.FacilityDefinitions.GetLevel(
+        facility.definitionId, facility.level)
+    local roles = {}
+    for role, _ in pairs(level and level.componentLimits or {}) do
+        roles[#roles + 1] = role
+    end
+    table.sort(roles)
+    for roleIndex = 1, #roles do
+        local role = roles[roleIndex]
+        local limit = level.componentLimits[role]
+        local assigned = {}
+        for index = 1, #(facility.components or {}) do
+            local component = facility.components[index]
+            if component.role == role then assigned[#assigned + 1] = component end
+        end
+        local minimum = tonumber(limit.minCount) or 0
+        local maximum = tonumber(limit.maxCount) or math.max(1, minimum)
+        rows[#rows + 1] = {
+            key = role,
+            label = roleLabel(role),
+            detail = tostring(#assigned) .. " / " .. tostring(maximum)
+                .. (#assigned >= minimum and "  READY" or "  REQUIRED"),
+            complete = #assigned >= minimum,
+            componentAction = #assigned < maximum and {
+                kind = limit.kind, role = role,
+            } or nil,
+            actionLabel = tr("UI_PNC_Facility_AssignInline", "ASSIGN"),
+        }
+        for index = 1, #assigned do
+            rows[#rows + 1] = {
+                key = assigned[index].id,
+                label = "- " .. roleLabel(role) .. " #" .. tostring(index),
+                detail = componentDetail(assigned[index]),
+                child = true,
+                complete = true,
+                componentAction = {
+                    kind = assigned[index].kind, role = role,
+                    componentId = assigned[index].id,
+                },
+                actionLabel = tr("UI_PNC_Facility_EditInline", "EDIT"),
+            }
+        end
+    end
+    return rows
 end
 
 function Browser.GetSelected(window)
@@ -159,41 +224,7 @@ function Browser.RebuildComponents(window)
                 .. (task and "  •  " .. progressText(task) or ""))
         return
     end
-    local level = PNC.FacilityDefinitions.GetLevel(
-        facility.definitionId, facility.level)
-    local roles = {}
-    local role
-    for role, _ in pairs(level and level.componentLimits or {}) do
-        roles[#roles + 1] = role
-    end
-    table.sort(roles)
-    local roleIndex
-    for roleIndex = 1, #roles do
-        role = roles[roleIndex]
-        local limit = level.componentLimits[role]
-        local assigned = {}
-        local index
-        for index = 1, #(facility.components or {}) do
-            local component = facility.components[index]
-            if component.role == role then assigned[#assigned + 1] = component end
-        end
-        local minimum = tonumber(limit.minCount) or 0
-        list:addItem(role, {
-            label = roleLabel(role),
-            detail = tostring(#assigned) .. " / "
-                .. tostring(limit.maxCount or math.max(minimum, #assigned))
-                .. (#assigned >= minimum and "  READY" or "  REQUIRED"),
-            complete = #assigned >= minimum,
-        })
-        for index = 1, #assigned do
-            list:addItem(assigned[index].id, {
-                label = "- " .. roleLabel(role) .. " #" .. tostring(index),
-                detail = componentDetail(assigned[index]),
-                child = true,
-                complete = true,
-            })
-        end
-    end
+    Components.SetRows(list, Browser.BuildComponentRows(facility))
     window.baseComponentPane:setHeader(
         string.upper(facility.displayName or facility.definitionId),
         stateText(facility.cachedState))
@@ -212,6 +243,20 @@ function Browser.Create(window)
         if window.updateBaseContextControls then
             window:updateBaseContextControls()
         end
+    end
+    window.baseComponentList.onMouseDown = function(list, x, y)
+        local rowIndex = list:rowAt(x, y)
+        local entry = rowIndex > 0 and list.items[rowIndex] or nil
+        local row = entry and entry.item or nil
+        if row and row.componentAction
+            and x >= list:getWidth() - ACTION_WIDTH - ACTION_RIGHT
+        then
+            if window.onBaseComponentAction then
+                window:onBaseComponentAction(row.componentAction)
+            end
+            return
+        end
+        ISScrollingListBox.onMouseDown(list, x, y)
     end
 end
 

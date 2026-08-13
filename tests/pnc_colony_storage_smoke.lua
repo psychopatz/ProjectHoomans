@@ -343,4 +343,37 @@ truthy(string.find(activityRows[1].message,
 truthy(string.find(activityRows[1].message, "(fishing)", 1, true),
     "activity reason presentation")
 
+ok, reason = Service.DebugAction(playerA, {
+    storageId = loaded.id,
+    debugAction = "add",
+    fullType = "Base.Money",
+    quantity = 2,
+})
+equal(ok, true, "production activity test money")
+PNC.SupplyInventory = { Commands = {
+    AddCoreRecords = function(_, records)
+        local ids = {}
+        for index = 1, #records do ids[index] = "carried:" .. tostring(index) end
+        return true, nil, { itemIDs = ids }
+    end,
+} }
+local productionReservation = assert(Service.ReserveProductionMaterials(
+    loaded.id, {{ itemTypes = { "Base.Money" }, amount = 2 }},
+    "construction:test"))
+local collected, collection = Service.CollectProductionReservation(
+    productionReservation.id, "work:test", "construction_materials",
+    loaded.id, { id = "npc:builder", name = "Ahmad Stahl" })
+equal(collected, true, "NPC collected construction money")
+equal(#collection.itemIds, 1, "collected stack projected to NPC inventory")
+local productionActivity = activity(loaded)
+local latestProductionActivity = productionActivity[#productionActivity]
+equal(latestProductionActivity[Journal.FIELD.OPERATION],
+    Journal.OPERATION.TAKE, "production collection journal operation")
+equal(latestProductionActivity[Journal.FIELD.ACTOR], "Ahmad Stahl",
+    "production collection journal actor")
+equal(latestProductionActivity[Journal.FIELD.QUANTITY], 2,
+    "production collection journal quantity")
+equal(latestProductionActivity[Journal.FIELD.REASON], "construction",
+    "production collection journal reason")
+
 print("pnc_colony_storage_smoke: ok")

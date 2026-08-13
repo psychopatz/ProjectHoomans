@@ -51,8 +51,13 @@ function Service.RebuildIndexes()
     end
     for id, component in pairs(Repository.State.components) do
         local facility = Repository.GetFacility(component.facilityId)
-        if facility and facility.definitionId == "research_facility"
-            and component.role == "research.room"
+        local level = facility and Definitions.GetLevel(
+            facility.definitionId, facility.level) or nil
+        -- Definitions are authoritative. Remove saved components belonging to
+        -- retired roles (research.room, workshop.room, and future migrations)
+        -- instead of allowing obsolete UI requirements to survive forever.
+        if facility and level and level.componentLimits
+            and level.componentLimits[component.role] == nil
         then
             obsoleteComponents[#obsoleteComponents + 1] = id
         else

@@ -69,21 +69,16 @@ local function control(id)
         self.visible = visible
     end, setTitle = function(self, value) self.title = value end }
 end
-local area, anchor = control("facility_area"), control("facility_anchor")
 local upgrade, destroy = control("facility_upgrade"),
     control("facility_destroy")
 window.tab = "base"
-window.baseContextControls = { area, anchor, upgrade, destroy }
+window.baseContextControls = { upgrade, destroy }
 selectedFacility = { constructionState = "UNDER_CONSTRUCTION" }
 BaseTab.UpdateContextControls(window)
-equal(area.visible, false, "area assignment hidden before building completes")
-equal(anchor.visible, false, "station assignment hidden before building completes")
 equal(upgrade.visible, false, "upgrade hidden before building completes")
 equal(destroy.visible, true, "deconstruction remains available")
 selectedFacility.constructionState = "BUILT"
 BaseTab.UpdateContextControls(window)
-equal(area.visible, true, "area assignment unlocks after construction")
-equal(anchor.visible, true, "station assignment unlocks after construction")
 equal(upgrade.visible, true, "upgrade unlocks after construction")
 
 print("pnc_settlement_tab_overlay_button_smoke: ok")

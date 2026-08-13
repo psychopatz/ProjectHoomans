@@ -70,12 +70,12 @@ local function regionCenter(region)
         z = sumZ / count }
 end
 
-local function addMarker(markers, point, kind, id, role, texturePath, size)
+local function addMarker(markers, point, kind, id, role, texturePath, tileScale)
     if not point then return end
     markers[#markers + 1] = {
         x = point.x, y = point.y, z = point.z,
         kind = kind, id = id, role = role,
-        texturePath = texturePath, size = size,
+        texturePath = texturePath, tileScale = tileScale or 1,
     }
 end
 
@@ -144,7 +144,7 @@ function Overlay.BuildMarkers(settlement)
             if component.kind == "region" then
                 hasRoom = true
                 addMarker(markers, regionCenter(component.region), "room",
-                    facility.id, component.role, roomIcon, 30)
+                    facility.id, component.role, roomIcon, 1)
             elseif component.kind == "anchor" then
                 addMarker(markers, {
                     x = (tonumber(component.x) or 0) + 0.5,
@@ -152,12 +152,12 @@ function Overlay.BuildMarkers(settlement)
                     z = tonumber(component.z) or 0,
                 }, "component", component.id, component.role,
                     COMPONENT_PLACEHOLDERS[component.role]
-                        or "media/ui/Emotes/PNC_EmoteMenu.png", 20)
+                        or "media/ui/Emotes/PNC_EmoteMenu.png", 1)
             end
         end
         if not hasRoom then
             addMarker(markers, regionCenter(facility.constructionRegion),
-                "room", facility.id, "facility.footprint", roomIcon, 30)
+                "room", facility.id, "facility.footprint", roomIcon, 1)
         end
     end
     for _, node in ipairs(settlement and settlement.stockpileNodes or {}) do
@@ -166,7 +166,7 @@ function Overlay.BuildMarkers(settlement)
             y = (tonumber(node.y) or 0) + 0.5,
             z = tonumber(node.z) or 0,
         }, "component", node.id, "stockpile.access",
-            COMPONENT_PLACEHOLDERS["stockpile.access"], 20)
+            COMPONENT_PLACEHOLDERS["stockpile.access"], 1)
     end
     return markers
 end
@@ -227,11 +227,18 @@ local function renderMarkers(playerNum)
     for _, marker in ipairs(Overlay.markers or {}) do
         local texture = markerTexture(marker.texturePath)
         if texture then
-            local size = tonumber(marker.size) or 20
             local screenX = isoToScreenX(playerNum,
                 marker.x, marker.y, marker.z) - drawer.x
             local screenY = isoToScreenY(playerNum,
                 marker.x, marker.y, marker.z) - drawer.y
+            local xStep = math.abs(isoToScreenX(playerNum,
+                marker.x + 1, marker.y, marker.z)
+                - isoToScreenX(playerNum, marker.x, marker.y, marker.z))
+            local yStep = math.abs(isoToScreenX(playerNum,
+                marker.x, marker.y + 1, marker.z)
+                - isoToScreenX(playerNum, marker.x, marker.y, marker.z))
+            local tileWidth = math.max(16, 2 * math.max(xStep, yStep))
+            local size = tileWidth * (tonumber(marker.tileScale) or 1)
             if screenX >= -size and screenY >= -size
                 and screenX <= drawer.width + size
                 and screenY <= drawer.height + size

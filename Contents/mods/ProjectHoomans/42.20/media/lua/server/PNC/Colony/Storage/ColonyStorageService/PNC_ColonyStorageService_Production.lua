@@ -3,8 +3,35 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 local Service = PNC.ColonyStorageService
 local Repository = PNC.ColonyStorageRepository
+local Internal = Service.Internal
 local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
+
+local ACTIVITY_REASON = {
+    construction_materials = "construction",
+    craft_inputs = "crafting",
+    disassembly_specimen = "disassembly",
+    research_resource = "research",
+}
+
+local function activityItems(records)
+    local output = {}
+    for index = 1, #(records or {}) do
+        output[#output + 1] = {
+            typeId = records[index][C.TYPE_ID],
+            quantity = records[index][C.QUANTITY],
+        }
+    end
+    return output
+end
+
+local function recordProductionActivity(storage, operation, actor, records,
+    stage, fallbackReason)
+    if not Internal or not Internal.RecordActivity then return end
+    Internal.RecordActivity(storage, operation, tostring(actor or ""),
+        activityItems(records), ACTIVITY_REASON[tostring(stage or "")]
+            or fallbackReason or "production")
+end
 
 Service.ProductionReservations = Service.ProductionReservations or {}
 Service.NextProductionReservationId = Service.NextProductionReservationId or 1
@@ -134,7 +161,8 @@ local function markTransactionStage(storage, transactionId, stage)
     transaction[tostring(stage)] = true
 end
 
-function Service.CommitProductionReservation(id, transactionId, stage, storageId)
+function Service.CommitProductionReservation(id, transactionId, stage,
+    storageId, actor, reason)
     local reservation = Service.ProductionReservations[tostring(id or "")]
     local storage = reservation and storageFor(reservation.storageId)
         or storageFor(storageId)
@@ -157,6 +185,7 @@ function Service.CommitProductionReservation(id, transactionId, stage, storageId
     Service.ProductionReservations[reservation.id] = nil
     markTransactionStage(storage, transactionId, stage)
     storage.revision = storage.revision + 1
+    recordProductionActivity(storage, "TAKE", actor, removed, stage, reason)
     Repository.MarkDirty()
     return true, removed
 end
@@ -202,6 +231,8 @@ function Service.CollectProductionReservation(id, transactionId, stage,
     Service.ProductionReservations[reservation.id] = nil
     markTransactionStage(storage, transactionId, stage)
     storage.revision = storage.revision + 1
+    recordProductionActivity(storage, "TAKE",
+        tostring(worker.name or worker.id), removed, stage)
     Repository.MarkDirty()
     return true, { itemIds = details and details.itemIDs or {}, records = removed }
 end
@@ -231,6 +262,8 @@ function Service.ReturnCollectedProductionRecords(storageId, worker,
         if not ok then return false, addReason end
     end
     storage.revision = storage.revision + 1
+    recordProductionActivity(storage, "STORE",
+        tostring(worker.name or worker.id), records, nil, "production_return")
     Repository.MarkDirty()
     return true
 end

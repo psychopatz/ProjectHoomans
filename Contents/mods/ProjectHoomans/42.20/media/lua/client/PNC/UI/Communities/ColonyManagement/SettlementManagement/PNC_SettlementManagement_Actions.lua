@@ -11,6 +11,20 @@ Actions.AnchorLabel = Facility.AnchorLabel
 Actions.AnchorAssignLabel = Facility.AnchorAssignLabel
 Actions.AreaRole = Facility.AreaRole
 
+function Actions.HandleComponent(window, action, facility)
+    if not facility or type(action) ~= "table" then return false end
+    if action.kind == "region" then
+        return Facility.BeginArea(window, facility, action.role,
+            action.componentId)
+    end
+    if action.kind == "anchor" then
+        Facility.BeginPoint(window, "facility_anchor", facility,
+            action.role, action.componentId)
+        return true
+    end
+    return false
+end
+
 function Actions.Handle(window, action, facility)
     local settlement = window.snapshot and window.snapshot.settlement
     if action == "claim" then Territory.Begin(window, "create"); return true end
