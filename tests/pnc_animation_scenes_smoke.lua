@@ -87,6 +87,17 @@ assert(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].durationMs == 0,
     "bed sleep must not be force-finished on a timer")
 assert(PNC.AnimationScenes.Get("production.craft").blocking == false,
     "production animation must not block work progress ticks")
+local researchDefinition =
+    PNC.AnimationScenes.Get("production.research")
+assert(researchDefinition.repeatMode == "loop"
+        and researchDefinition.blocking == false
+        and #researchDefinition.steps == 5,
+    "research must repeat its nonblocking animation scene")
+assert(researchDefinition.steps[1].bump == "ReadBook"
+        and researchDefinition.steps[2].bump == "WipeBrow"
+        and researchDefinition.steps[4].bump == "WipeHead"
+        and researchDefinition.steps[5].bump == "Yes",
+    "research scene does not use the supplied XML nodes")
 local constructionDefinition =
     PNC.AnimationScenes.Get("production.construct")
 assert(constructionDefinition.repeatMode == "loop"

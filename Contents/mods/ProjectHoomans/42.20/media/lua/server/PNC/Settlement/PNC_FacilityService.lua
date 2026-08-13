@@ -412,10 +412,25 @@ end
 
 function Service.ListByCapability(baseId, capability)
     local output = {}
+    local requestedBaseId = tostring(baseId or "")
     for id, _ in pairs(Service.ByCapability[tostring(capability or "")] or {}) do
         local facility = Repository.GetFacility(id)
-        if facility and facility.baseId == baseId and facility.cachedState == "OPERATIONAL" then
-            output[#output + 1] = facility
+        if facility and tostring(facility.baseId or "") == requestedBaseId then
+            -- Saved facilities may still carry the cached state calculated by
+            -- an older component definition (notably the retired
+            -- research.room requirement). Capability discovery is the last
+            -- gate before assigning a worker, so refresh the inexpensive
+            -- logical state here instead of leaving valid work in limbo.
+            local base = PNC.BaseService.Get(facility.baseId)
+            local currentState = base and calculatedState(base, facility)
+                or "INVALID_COMPONENT"
+            if facility.cachedState ~= currentState then
+                facility.cachedState = currentState
+                Repository.MarkDirty()
+            end
+            if currentState == "OPERATIONAL" then
+                output[#output + 1] = facility
+            end
         end
     end
     return output

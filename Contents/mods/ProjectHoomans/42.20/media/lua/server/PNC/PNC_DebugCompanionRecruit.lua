@@ -191,6 +191,27 @@ local function preserveOwnedState(record, player, reason)
     end
 end
 
+local function synchronizeRecordMembership(record, faction, community)
+    if not record or not faction or not community then return false end
+    record.affiliation = record.affiliation or {}
+    local changed = tostring(record.affiliation.factionID or "")
+            ~= tostring(faction.id or "")
+        or tostring(record.affiliation.communityID or "")
+            ~= tostring(community.id or "")
+        or tostring(record.factionId or "") ~= tostring(faction.id or "")
+        or tostring(record.communityId or "") ~= tostring(community.id or "")
+    record.affiliation.factionID = faction.id
+    record.affiliation.factionId = faction.id
+    record.affiliation.communityID = community.id
+    record.affiliation.communityId = community.id
+    record.factionId = faction.id
+    record.communityId = community.id
+    if changed and Registry and Registry.MarkDirty then
+        Registry.MarkDirty(record, "canonical_membership_sync")
+    end
+    return changed
+end
+
 -- Recruitment crosses three authoritative stores: the NPC record, faction
 -- membership, and community membership. Commit all three at the successful
 -- boundary so a restart cannot expose a half-recruited NPC or recreate the
@@ -254,6 +275,7 @@ function Recruit.Assign(player, record, args)
     if not community then
         return false, reason or "community_assignment_failed"
     end
+    synchronizeRecordMembership(record, playerFaction, community)
     local source = tostring(args.source or "companion_recruit")
     if args.preserveOrder == true then
         preserveOwnedState(record, player, source)
@@ -306,6 +328,7 @@ function Recruit.ReconcileOwned(player, record)
     if playerFaction and npcFaction and npcFaction.id == playerFaction.id
         and community and community.factionID == playerFaction.id
     then
+        synchronizeRecordMembership(record, playerFaction, community)
         return true, "unchanged"
     end
     return Recruit.Assign(player, record, {

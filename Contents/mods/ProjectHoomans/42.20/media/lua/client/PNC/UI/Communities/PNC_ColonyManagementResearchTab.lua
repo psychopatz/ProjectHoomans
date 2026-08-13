@@ -127,6 +127,14 @@ local function activeResearch(window)
     end
 end
 
+local function progressValues(order)
+    local required = math.max(1, tonumber(order and order.requiredWork) or 1)
+    local progress = math.max(0, math.min(required,
+        tonumber(order and order.progress) or 0))
+    return progress, required,
+        math.floor((progress / required) * 100 + 0.5)
+end
+
 function ResearchTab.OnControl(window, button)
     local action = tostring(button and button.internal or "")
     local blueprints = storageRows(window, function(value)
@@ -193,14 +201,29 @@ function ResearchTab.Rebuild(window, snapshot, tr)
             "Research definitions are unavailable.")
         return true
     end
+    local activeByTechnology = {}
+    for _, order in ipairs(snapshot.research.orders or {}) do
+        local payload = order.payload or {}
+        if order.operation == "RESEARCH" and payload.mode == "technology"
+            and order.status ~= "COMPLETED" and order.status ~= "CANCELLED"
+        then
+            activeByTechnology[tostring(payload.technologyId or "")] = order
+        end
+    end
     for _, entry in ipairs(entries) do
         if entry.id == "storage_capacity" then
             window:addDetail(tr(entry.labelKey, "Storage Capacity"),
                 "Tier " .. tostring(entry.currentLevel), "accent")
         else
+            local active = activeByTechnology[tostring(entry.id)]
+            local progress, required, percent = progressValues(active)
+            local detail = entry.known
+                and tr("UI_PNC_Research_Known", "UNLOCKED")
+                or active and string.format("%s  %d%%  |  %.1f / %.1f WP",
+                    tostring(active.status), percent, progress, required)
+                or tostring(entry.requiredWork) .. " WP"
             window:addDetail(tr(entry.labelKey, entry.id),
-                entry.known and tr("UI_PNC_Research_Known", "UNLOCKED")
-                    or tostring(entry.requiredWork) .. " WP",
+                detail,
                 entry.known and "success" or "accent")
         end
     end
@@ -226,9 +249,11 @@ function ResearchTab.Rebuild(window, snapshot, tr)
         if order.operation == "RESEARCH" and order.status ~= "COMPLETED"
             and order.status ~= "CANCELLED"
         then
-            window:addDetail("RESEARCH " .. tostring(order.status),
-                string.format("%.1f / %.1f WP", order.progress,
-                    order.requiredWork), order.blockedReason and "warning" or "accent")
+            local progress, required, percent = progressValues(order)
+            window:addDetail("RESEARCH " .. tostring(order.status)
+                    .. "  " .. tostring(percent) .. "%",
+                string.format("%.1f / %.1f WP", progress, required),
+                order.blockedReason and "warning" or "accent")
             window:addDetail("WORKER", tostring(order.workerId or "UNASSIGNED"))
             if order.blockedReason then
                 window:addDetail("BLOCKED", tostring(order.blockedReason), "warning")

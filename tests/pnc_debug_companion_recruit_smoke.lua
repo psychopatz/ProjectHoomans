@@ -98,6 +98,7 @@ PNC = {
             communityCreates = communityCreates + 1
             local community = {
                 id = "community_player",
+                factionID = "player-faction",
                 status = "active",
                 renamePending = true,
             }
@@ -177,5 +178,19 @@ assertEqual(records.orphaned.orderSpec.kind, "guard",
     "membership repair preserves current companion order")
 assertEqual(orderCalls, ordersBeforeRepair,
     "membership repair did not force follow")
+
+records.canonical = {
+    id = "canonical", faction = "colonist", recruited = true,
+    alive = true, ownerUsername = "Tester",
+}
+affiliations.canonical = { factionID = "player-faction" }
+communityByNPC.canonical = playerCommunities[1]
+ok, reason = Recruit.ReconcileOwned(player, records.canonical)
+assertEqual(ok, true, "canonical membership remains valid")
+assertEqual(reason, "unchanged", "canonical membership is not rebuilt")
+assertEqual(records.canonical.affiliation.communityID, "community_player",
+    "canonical community is mirrored onto the NPC record")
+assertEqual(records.canonical.communityId, "community_player",
+    "legacy scheduler community field is repaired")
 
 print("pnc_debug_companion_recruit_smoke: ok")

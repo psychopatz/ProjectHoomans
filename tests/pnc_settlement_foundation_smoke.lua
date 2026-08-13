@@ -294,6 +294,13 @@ truthy(PNC.FacilityService.SetComponent({}, {
 }).ok, "research station assignment")
 equal(researchFacility.cachedState, "OPERATIONAL",
     "research station alone makes the facility operational")
+researchFacility.cachedState = "NEEDS_ASSIGNMENT"
+local refreshedResearch = PNC.FacilityService.ListByCapability(
+    base.id, "work.research")
+equal(#refreshedResearch, 1,
+    "capability lookup repairs stale research facility state")
+equal(researchFacility.cachedState, "OPERATIONAL",
+    "research facility cache is refreshed before worker assignment")
 
 local farmResult = PNC.FacilityService.Create(player, { baseId = base.id,
     definitionId = "farm", expectedRevision = base.revision,

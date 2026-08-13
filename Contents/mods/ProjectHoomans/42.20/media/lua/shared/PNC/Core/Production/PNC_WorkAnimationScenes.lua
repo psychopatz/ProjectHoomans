@@ -19,7 +19,14 @@ Scenes.Register("production.research", {
     category = "production", priority = 40, repeatMode = "loop",
     -- WorkBehavior must keep ticking while the scene supplies presentation;
     -- otherwise a blocking loop owns BehaviorSystem and freezes work progress.
-    blocking = false, bump = "Read", durationMs = 4200,
+    blocking = false, stepGapMs = 180,
+    steps = {
+        { id = "read_book", bump = "ReadBook", durationMs = 5200 },
+        { id = "wipe_brow", bump = "WipeBrow", durationMs = 1800 },
+        { id = "read_book_again", bump = "ReadBook", durationMs = 5200 },
+        { id = "wipe_head", bump = "WipeHead", durationMs = 1900 },
+        { id = "affirm", bump = "Yes", durationMs = 1700 },
+    },
     interrupts = interrupts(),
 })
 

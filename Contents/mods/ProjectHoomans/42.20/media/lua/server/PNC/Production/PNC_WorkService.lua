@@ -21,6 +21,7 @@ Service.CompletionHandlers = Service.CompletionHandlers or {}
 Service.PreparationHandlers = Service.PreparationHandlers or {}
 Service.CollectionHandlers = Service.CollectionHandlers or {}
 Service.TargetProviders = Service.TargetProviders or {}
+Service.ReconcileHandlers = Service.ReconcileHandlers or {}
 Service.ClaimsByStation = Service.ClaimsByStation or {}
 Service.ClaimsByWorker = Service.ClaimsByWorker or {}
 Service.NextPassAt = Service.NextPassAt or 0
@@ -138,6 +139,13 @@ function Service.RegisterTargetProvider(operation, handler)
     operation = tostring(operation or "")
     if operation == "" or type(handler) ~= "function" then return false end
     Service.TargetProviders[operation] = handler
+    return true
+end
+
+function Service.RegisterReconciler(id, handler)
+    id = tostring(id or "")
+    if id == "" or type(handler) ~= "function" then return false end
+    Service.ReconcileHandlers[id] = handler
     return true
 end
 
@@ -716,6 +724,9 @@ function Service.Tick(at)
     if at < Service.NextPassAt then return 0 end
     Service.NextPassAt = at + Definitions.BALANCE.schedulerCadenceMs
     Repository.Load()
+    for _, reconcile in pairs(Service.ReconcileHandlers) do
+        reconcile()
+    end
     local ids = {}
     for id, order in pairs(Repository.State.byId) do
         if not terminal(order) then ids[#ids + 1] = id end

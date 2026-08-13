@@ -204,6 +204,43 @@ local Crafting = require "PNC/Production/PNC_CraftingService"
 local Construction = require "PNC/Production/PNC_ConstructionService"
 truthy(Research.Commands.UnlockRecipe("c1", 1, "f1"), "seed known recipe")
 
+local technology = assert(Research.Commands.QueueTechnology({},
+    "facility:workshop"))
+local sameTechnology, duplicateReason = Research.Commands.QueueTechnology({},
+    "facility:workshop")
+equal(sameTechnology.id, technology.id,
+    "duplicate technology request reuses resumable work")
+equal(duplicateReason, "ALREADY_QUEUED",
+    "duplicate technology request reports existing queue entry")
+local activeTechnologyCount = 0
+for _, order in ipairs(Work.Queries.List("c1")) do
+    if order.operation == "RESEARCH" and order.status ~= "CANCELLED"
+        and order.payload and order.payload.mode == "technology"
+    then activeTechnologyCount = activeTechnologyCount + 1 end
+end
+equal(activeTechnologyCount, 1,
+    "technology queue contains one authoritative task")
+truthy(Work.Commands.Cancel(technology.id),
+    "technology dedupe fixture cancellation")
+local legacyLow = assert(Work.Commands.Queue({
+    operation = "RESEARCH", colonyId = "c1", factionId = "f1",
+    baseId = "b1", requiredWork = 60, progress = 5,
+    payload = { mode = "technology", technologyId = "facility:workshop" },
+}))
+local legacyHigh = assert(Work.Commands.Queue({
+    operation = "RESEARCH", colonyId = "c1", factionId = "f1",
+    baseId = "b1", requiredWork = 60, progress = 25,
+    payload = { mode = "technology", technologyId = "facility:workshop" },
+}))
+equal(Research.Commands.ReconcileDuplicates(), 1,
+    "saved duplicate technology work is reconciled")
+equal(Work.Queries.Get(legacyLow.id).status, "CANCELLED",
+    "lower-progress duplicate is retired")
+equal(Work.Queries.Get(legacyHigh.id).progress, 25,
+    "most-progressed resumable research is preserved")
+truthy(Work.Commands.Cancel(legacyHigh.id),
+    "legacy research reconciliation fixture cancellation")
+
 local first = assert(Crafting.Commands.QueueCraft({}, 1, 1))
 local blocked, reason = Crafting.Commands.QueueCraft({}, 1, 1)
 equal(blocked, nil, "reservation blocks double spend")

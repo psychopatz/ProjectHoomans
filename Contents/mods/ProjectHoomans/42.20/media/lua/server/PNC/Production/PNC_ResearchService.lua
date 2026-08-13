@@ -101,6 +101,72 @@ local function queue(context, spec)
     return PNC.WorkService.Commands.Queue(spec)
 end
 
+local function activeTechnologyOrders(colonyId, technologyId)
+    local output = {}
+    colonyId, technologyId = tostring(colonyId or ""),
+        tostring(technologyId or "")
+    for _, order in ipairs(PNC.WorkService.Queries.List(colonyId)) do
+        local payload = order.payload or {}
+        if order.operation == "RESEARCH"
+            and order.status ~= "COMPLETED" and order.status ~= "CANCELLED"
+            and payload.mode == "technology"
+            and tostring(payload.technologyId or "") == technologyId
+        then
+            output[#output + 1] = order
+        end
+    end
+    table.sort(output, function(left, right)
+        local leftProgress = tonumber(left.progress) or 0
+        local rightProgress = tonumber(right.progress) or 0
+        if leftProgress ~= rightProgress then
+            return leftProgress > rightProgress
+        end
+        local leftCreated = tonumber(left.createdAt) or 0
+        local rightCreated = tonumber(right.createdAt) or 0
+        if leftCreated ~= rightCreated then return leftCreated < rightCreated end
+        return tostring(left.id or "") < tostring(right.id or "")
+    end)
+    return output
+end
+
+function Service.Commands.ReconcileDuplicates()
+    local groups = {}
+    for _, order in ipairs(PNC.WorkService.Queries.List()) do
+        local payload = order.payload or {}
+        if order.operation == "RESEARCH"
+            and order.status ~= "COMPLETED" and order.status ~= "CANCELLED"
+            and payload.mode == "technology"
+            and tostring(payload.technologyId or "") ~= ""
+        then
+            local key = tostring(order.colonyId or "") .. "\31"
+                .. tostring(payload.technologyId)
+            local bucket = groups[key]
+            if not bucket then bucket = {}; groups[key] = bucket end
+            bucket[#bucket + 1] = order
+        end
+    end
+    local removed = 0
+    for _, bucket in pairs(groups) do
+        table.sort(bucket, function(left, right)
+            local leftProgress = tonumber(left.progress) or 0
+            local rightProgress = tonumber(right.progress) or 0
+            if leftProgress ~= rightProgress then
+                return leftProgress > rightProgress
+            end
+            local leftCreated = tonumber(left.createdAt) or 0
+            local rightCreated = tonumber(right.createdAt) or 0
+            if leftCreated ~= rightCreated then return leftCreated < rightCreated end
+            return tostring(left.id or "") < tostring(right.id or "")
+        end)
+        for index = 2, #bucket do
+            local cancelled = PNC.WorkService.Commands.Cancel(
+                bucket[index].id, "duplicate_research_order")
+            if cancelled then removed = removed + 1 end
+        end
+    end
+    return removed
+end
+
 function Service.Commands.QueueTechnology(player, technologyId)
     local context, reason = PNC.ProductionContext.ForPlayer(player)
     local definition = Definitions.Get(technologyId)
@@ -111,6 +177,9 @@ function Service.Commands.QueueTechnology(player, technologyId)
     if Service.Queries.HasTechnology(context.colony.id, technologyId) then
         return nil, "ALREADY_KNOWN"
     end
+    Service.Commands.ReconcileDuplicates()
+    local existing = activeTechnologyOrders(context.colony.id, technologyId)[1]
+    if existing then return existing, "ALREADY_QUEUED" end
     return queue(context, { operation = "RESEARCH",
         requiredWork = definition.requiredWork,
         requiredSkills = definition.requiredSkills,
@@ -309,6 +378,8 @@ PNC.WorkService.CancellationHandlers = PNC.WorkService.CancellationHandlers or {
 PNC.WorkService.CancellationHandlers.RESEARCH = cancellation
 PNC.WorkService.RegisterPreparation("RESEARCH", prepare)
 PNC.WorkService.RegisterCompletion("RESEARCH", completion)
+PNC.WorkService.RegisterReconciler("research_duplicates",
+    Service.Commands.ReconcileDuplicates)
 
 function Service.Queries.BuildSnapshot(colonyId)
     local state = Repository.Get(colonyId)
