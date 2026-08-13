@@ -2,7 +2,7 @@
 
 ## Current Chunk
 
-Chunk 10 — Colony / Settlement / Facilities (`[>]`).
+Chunk 14 — Final consolidation and compatibility validation (`[x]`).
 
 Chunk 0 established the baseline only. No gameplay, network, persistence, or
 load-order code changed.
@@ -21,19 +21,18 @@ load-order code changed.
 - [x] Chunk 7 — Conversation / Relationships / Social
 - [x] Chunk 8 — Pathing / Presence / live-body control
 - [x] Chunk 9 — Factions
-- [>] Chunk 10 — Colony / Settlement / Facilities
-- [ ] Chunk 11 — Director / abstract simulation
-- [ ] Chunk 12 — Remaining domains, only where change is justified
-- [ ] Chunk 13 — PsychopatzCore mechanism-extraction review
-- [ ] Chunk 14 — Final consolidation and compatibility validation
+- [x] Chunk 10 — Colony / Settlement / Facilities
+- [x] Chunk 11 — Director / abstract simulation
+- [x] Chunk 12 — Remaining domains, only where change is justified
+- [x] Chunk 13 — PsychopatzCore mechanism-extraction review
+- [x] Chunk 14 — Final consolidation and compatibility validation
 
 ## Current Goal
 
-Chunk 10 inventories Colony, Settlement, and Facility ownership, persistence,
-authority, validation, reservations, storage/research, jobs, networking, and
-presentation before making the smallest justified boundary change. Preserve
-current gameplay semantics and do not use the Monolith Decoupler during this
-ownership pass.
+All planned architecture chunks are complete. Static and isolated-harness
+validation is green; live SP, hosted-MP, dedicated-server, and save/reload
+validation remains a mandatory release gate and is not represented as passed.
+The Monolith Decoupler remains deferred to a separately requested pass.
 
 ## Contracts Being Preserved
 
@@ -140,6 +139,234 @@ pre-approved folder moves.
 
 ## Completed This Chunk
 
+- Chunk 14 completed the static consolidation gate. No compatibility path was
+  removed: the audit did not prove any remaining adapter obsolete, and removing
+  uncertain save, network, or public-API seams would add release risk without a
+  demonstrated benefit.
+- Fixed the last two Project Hoomans smoke harnesses by preloading dependencies
+  that production now requires explicitly: Knowledge Interest for map-hover
+  portraits and Provision Diagnostics for NPC-monitor tracking. Production
+  behavior was not changed. The complete isolated Lua sweep now passes 193 of
+  193 tests.
+- Static require resolution checked all 598 executable Lua files across the
+  `42.20` and `common` roots. All 588 referenced `PNC/...` module paths resolve.
+  All 26 referenced `PsychopatzCore/...` module paths resolve against Core
+  `42.19`/`common`. No stale static module target was found.
+- The five existing `00_*Init.lua` files are unchanged and remain thin,
+  single-require bootstrap anchors. Settlement, Director, and Travel remain
+  canonical entries with deterministic internal order, and their composition
+  positions match the former inline blocks. Facility Jobs deliberately remains
+  later in server composition because its runtime dependencies initialize
+  between Settlement and that stage.
+- The public/internal review retained four known cross-domain implementation
+  seams rather than disguising them as safe cleanup: Network transport helpers
+  used by Conversation/Faction/Profiler, Combat action completion used by the
+  command registry, Path Service traversal state used by the client native-path
+  controller, and Colony Storage commit/activity helpers used by Settlement
+  facility costs. These are explicit future boundary candidates, not evidence
+  that compatibility can be removed now.
+- The Project Zomboid architecture profile reports 83.9/100 health, 70.2%
+  coverage, 56.4% confidence, 597 production files, 193 tests, and 130
+  production findings. Its 12 subsystem-cycle findings include composition
+  anchor relationships, Colony/Inventory, and Conversation/UI. They remain
+  heuristic architectural evidence; no runtime dependency was reordered merely
+  to eliminate a reported cycle.
+- Lua syntax validation passed for all 598 executable files. `pz_verify`
+  scanned 592 files (six configured exclusions) and reported zero Kahlua errors
+  or warnings at ERROR severity. `git diff --check` is clean.
+- Chunk 14 network protocol changed: NO. Authority direction changed: NO.
+  Persistence keys/schema/save order changed: NO. Runtime initialization timing
+  changed: NO. Public APIs removed: NO. The Monolith Decoupler was not used.
+- Live SP startup, hosted-MP startup/replication, dedicated-server startup, and
+  save/reload migration validation are **NOT RUN** in this environment. Static
+  composition and protocol harnesses reduce risk but do not replace those four
+  release checks.
+- Chunk 13 completed the PsychopatzCore extraction gate without moving code.
+  Extraction was treated as an evidence-based decision, not a required outcome:
+  a candidate had to be policy-free and have a credible non-Hoomans consumer.
+- PsychopatzCore already owns the reusable mechanisms surfaced by prior chunks:
+  compact/physical inventory adapters, codecs, reservations and transactions;
+  material allocation transactions; grid regions, zones and selectors; square
+  rules; event bus, ring buffer and journal storage; responsive UI; profiler;
+  radio/trait integrations; teleport; and physical item/corpse boundaries.
+  Project Hoomans consumes these while retaining domain policy.
+- Travel Route/Projection is reusable in shape, but the bounded adjacent-mod
+  search found no consumer in CurrencyExpanded, DynamicColonies,
+  DynamicObjectives, DynamicTrading, or MarketSense. Moving it would create a
+  speculative Core API before its actual abstraction requirements are known.
+- The periodic-job portion of `PNC_Scheduler` is generic-looking but currently
+  cohabits with Hoomans NPC timer-wheel scheduling and depends on Hoomans
+  constants, identity seeding, and Simulation LOD. Extracting only that portion
+  requires an explicit split/API design and a real second consumer; it was not
+  folded into this review.
+- Simulation LOD, Spatial Index, deterministic population helpers, Travel
+  Service, Presence, Director, Knowledge, Relationships, and Map policies remain
+  Hoomans-owned. Their records, constants, Registry/Census coupling, authority,
+  gameplay state, and lifecycle semantics are not generic mechanisms merely
+  because portions of their algorithms are pure.
+- Result: no Project Hoomans or PsychopatzCore production file changed in Chunk
+  13, no compatibility wrapper was added, and the Monolith Decoupler was not
+  used. Future extraction requires a concrete consuming mod and can then define
+  the smallest mechanism around both consumers instead of guessing now.
+- Six focused PsychopatzCore mechanism smokes passed: events/journals, grid
+  regions, inventory framework, material transactions, square rules, and world
+  inventory. The full Core sweep was 22 passed and 2 failed out of 24; both
+  failures are existing standalone harness paths pinned to obsolete `42.16`
+  locations for corpse items and event markers while the active Core version is
+  `42.19`. No production code was implicated.
+- Project Hoomans Lua was unchanged in this chunk, so Chunk 12's current full
+  gate remains 191 passed and 2 known harness-resolution failures, with clean
+  syntax/Kahlua verification across 566 files. Live runtime validation remains
+  deferred to the final consolidation matrix.
+- Chunk 13 network protocol changed: NO. Authority direction changed: NO.
+  Persistence/schema changed: NO. Load order changed: NO. PsychopatzCore public
+  API changed: NO. Every shared/server/client `00_*Init.lua` anchor remains
+  unchanged.
+- Chunk 12 ranked the remaining lower-pressure domains rather than applying the
+  newest pattern indiscriminately. Knowledge, Scheduling, World Discovery,
+  Needs, Conduct, Skills, Registry, Journals, Map Commands, and other small or
+  isolated systems have clear ownership and no demonstrated resilience problem,
+  so they were intentionally left unchanged.
+- Equipment retains its recorded large-module and large-function findings, and
+  Travel Directory retains its 126-line projection finding. Addressing either
+  would be an explicit decoupling task rather than a load-order fix; both remain
+  deferred and the Monolith Decoupler was not used.
+- Shared Travel was the sole justified boundary change. Route owns immutable
+  geometry; Providers owns pluggable route/speed registries; Arrivals owns
+  persistence-safe handler descriptors; Model owns canonical journey creation
+  and validation; Projection owns pure advancement/ETA; and Service owns the
+  authoritative record lifecycle, dirtying, deltas, and public events.
+- Added canonical `PNC/Core/Travel/PNC_Travel.lua`, explicitly preserving the
+  original Route → Providers → Arrivals → Model → Projection → Service order.
+  Shared composition now requires that entry at the former block's exact
+  position between Path Service and Map Command Service. No alphabetical order
+  or implicit discovery establishes Travel dependencies.
+- Travel record fields, route limits, provider IDs, arrival descriptors,
+  projection math, authority checks, Registry dirty domains, roster deltas,
+  public `PNC.Travel`/API surfaces, and event names are unchanged. No network or
+  persistence schema was introduced.
+- Full Lua syntax validation passed. `pz_verify` scanned 566 files with zero
+  Kahlua errors or warnings at ERROR severity. Ten focused composition, Travel,
+  map-command/layer, navigation, threat, traversal, and abstract-world smokes
+  passed; the audit-selected inventory transaction smoke also passed.
+- Full Lua smoke sweep remained 191 passed and 2 failed out of 193. The two
+  failures are the existing standalone harness module-resolution gaps in map-
+  hover portrait and NPC monitor tracking.
+- Project-Zomboid-profile architecture rescan: 83.9/100 health, 70.2% coverage,
+  597 production files, 193 tests, and 130 production findings. Travel remains
+  98.2/100 health with its existing client Directory finding; the canonical
+  shared entry introduced no new finding.
+- Affected analysis identified Composition, Travel, and tests, selecting the
+  inventory transaction smoke transitively. Codebase-memory still excludes
+  production `media`; exact source reads, audit evidence, and focused runtime
+  harnesses supplied the production fallback.
+- Chunk 12 network protocol changed: NO. Authority direction changed: NO.
+  Persistence/schema changed: NO. Travel math/semantics changed: NO. Runtime
+  initialization order changed: NO. Every shared/server/client `00_*Init.lua`
+  anchor remains unchanged. Live SP, hosted-MP, and dedicated-server shared
+  startup/travel validation could not be launched here and remains mandatory
+  before release.
+- Chunk 11 confirmed `PNC_AbstractWorld_v1` as the single Director persistence
+  boundary. `PNC_AbstractWorldStore` owns groups, locations, bounded encounter
+  reports/cooldowns, and optional population state. The Persistence Coordinator
+  retains save ordering; queues, plans, candidate pools, reservations, spatial
+  indexes, player positions, rate history, and debug history remain transient.
+- Abstract Groups/Locations own strategic records and indexes; Traversal and
+  Action Resolver own timer-state transitions; Encounter evaluation/resolution
+  and Combat/Casualty/Retreat modules own bounded strategic outcomes. Canonical
+  Registry, Health, Wounds, Factions, Communities, Group Needs, Presence, and
+  World Discovery remain referenced systems rather than duplicated Director
+  state. No physical NPC simulation was added or moved.
+- Population Director remains orchestration over bounded sector refresh,
+  reconciliation, generation queues, starter population, rate limits, and
+  canonical group/settlement generators. `PNC_WorldDirector` remains the sole
+  scheduler coordinator and `PNC_Server` retains its established authority-side
+  load/initialize/pump timing.
+- Added canonical `PNC/Director/PNC_Director.lua`, explicitly preserving all 33
+  former server-composition requires. World Discovery remains deliberately
+  fourth: it consumes Store → Location → Group foundation state and supplies
+  strategic sites before combat, traversal, population, World Director, and
+  debug initialization. It was not alphabetized or absorbed as Director-owned
+  state.
+- Replaced the exact contiguous server-composition block with the canonical
+  entry between Need Supply Bridge and Needs Scheduler. Shared Director config/
+  types, server callbacks, job registration, startup grace, deterministic
+  seeds, budgets, persistence schema, event names, and public `PNC` APIs are
+  unchanged. No monolith was split and the Monolith Decoupler was not used.
+- Full Lua syntax validation passed. `pz_verify` scanned 565 files with zero
+  Kahlua errors or warnings at ERROR severity. Ten focused composition,
+  abstract-world, population, community, debug, LOD, persistence, map, and
+  travel smokes passed.
+- Full Lua smoke sweep remained 191 passed and 2 failed out of 193. The two
+  failures are the existing standalone harness module-resolution gaps in map-
+  hover portrait and NPC monitor tracking.
+- Project-Zomboid-profile architecture rescan: 83.9/100 health, 70.2% coverage,
+  596 production files, 193 tests, and 130 production findings. Director now
+  reports 98.3/100 health and 81.5% coverage. Its sole finding is the existing
+  126-line `Combat.Resolve`; splitting it is deferred to an explicit decoupling
+  pass rather than mixed into this ownership phase.
+- Affected-test analysis correctly identified only the new Composition/Director
+  boundary and could not infer behavioral tests through the composition entry,
+  so the documented Director validation matrix was run manually. Codebase-
+  memory still excludes production `media`; exact source reads, the audit index,
+  and runtime harnesses supplied the production evidence fallback.
+- Chunk 11 network protocol changed: NO. Authority direction changed: NO.
+  Persistence/schema changed: NO. Deterministic generation changed: NO.
+  Scheduler cadence/budgets changed: NO. Physical/live transition behavior
+  changed: NO. Every shared/server/client `00_*Init.lua` anchor remains
+  unchanged. Live SP, hosted-MP, and dedicated-server startup/save-reload checks
+  could not be launched here and remain mandatory before release.
+- Chunk 10 confirmed that `PNC_SettlementRepository` owns the version-1 Base,
+  Facility, Component, Stockpile Node, and Core Zone store. Base/Facility
+  services own authoritative validation and mutation; facility reservations
+  remain runtime-only; Facility Jobs owns its bounded `OnTick` work loop; and
+  Colony Management plus its routed server handler retain the existing intent,
+  ownership, revision, result, snapshot, and requester-only delta boundaries.
+- Colony Storage remains a separate faction-owned repository over the
+  PsychopatzCore virtual inventory. It owns its existing ModData schema and
+  serialized `activityJournal` compatibility key. Research changes the storage
+  tier through the authoritative service without changing inventory identity.
+  Client Colony Management remains presentation/request code and receives
+  bounded snapshots rather than mutable server state.
+- Fixed the storage activity hard-cap regression by making
+  `PNC_ColonyStorageJournal.MAX_ENTRIES` the single capacity authority used by
+  the server journal route. The route had re-registered the same journal type
+  with capacity 20 after the compatibility adapter declared/documented 10,
+  allowing 14 entries in the smoke scenario. Persistence keys, journal tuple
+  format, semantic event IDs, and successful-mutation timing are unchanged.
+- Added canonical `PNC/Settlement/PNC_Settlement.lua`. It explicitly reproduces
+  the original Repository → Base Validation → Base Service → Facility World
+  Validation → Facility Validation → Facility Cost → Facility Service → Target
+  Resolver → Reservations → Stockpile Access → Settlement Debug sequence. The
+  server composition now requires this entry at the former contiguous block's
+  exact position between Community Service and Journal Routes.
+- Facility Jobs remains explicitly staged at its existing later composition
+  position because it consumes runtime domains initialized between Settlement
+  and that point. Colony Storage, Supply, Provision, and Research likewise keep
+  their established relative positions. No module was moved merely to make the
+  directory look uniform, and the Monolith Decoupler was not used.
+- Full Lua syntax validation passed. `pz_verify` scanned 564 files with zero
+  Kahlua errors or warnings at ERROR severity. Seven focused storage/journal/
+  seed-delta/composition/settlement/facility/management smokes passed.
+- Full Lua smoke sweep: 191 passed and 2 failed out of 193. Chunk 10 resolved
+  the colony-storage journal-cap failure. The remaining two failures are the
+  previously documented standalone harness module-resolution gaps in map-hover
+  portrait and NPC monitor tracking.
+- Project-Zomboid-profile architecture rescan: 83.8/100 health, 69.1% coverage,
+  595 production files, 193 tests, and 130 production findings. Settlement
+  reports 99.7/100 health with one low-confidence hot-path event heuristic;
+  Facilities reports 100/100 with no finding. The broader Colony/Inventory/
+  Composition cycle remains recorded for later semantic analysis.
+- Affected-test analysis selected colony storage, journal routes, and seed
+  delta as direct dependencies. Codebase-memory still excludes production
+  `media`; exact source reads, the audit index, and focused runtime harnesses
+  supplied the production evidence fallback.
+- Chunk 10 network protocol changed: NO. Authority direction changed: NO.
+  Persistence keys/schema changed: NO. Facility reservation or job timing
+  changed: NO. The Settlement implementation order is unchanged behind its new
+  canonical entry. Every shared/server/client `00_*Init.lua` anchor remains
+  unchanged. Live SP, hosted-MP, and dedicated-server startup/save-reload checks
+  could not be launched here and remain mandatory before release.
 - Chunk 9 added canonical `PNC/Factions/PNC_FactionCore.lua`, explicitly
   preserving the original Telemetry → FactionService → Leadership →
   MembershipService order at the same server composition position.
@@ -744,9 +971,9 @@ pre-approved folder moves.
 - Chunk 3 is structurally complete: every inventoried server command family is
   routed, the namespace gate and event registration remain in `PNC_Server`,
   and unknown commands remain no-ops.
-- The unrelated colony-storage journal-cap smoke failure described in Chunk 3I
-  remains open for its owning storage/journal work rather than being folded
-  into command routing.
+- The colony-storage journal-cap smoke failure described in Chunk 3I was
+  resolved in Chunk 10 by unifying the route and compatibility-adapter capacity
+  authority at ten entries.
 - Chunk 4 static and harness validation is complete. Live SP, hosted-MP, and
   dedicated-server startup validation remains open because canonical Supply
   and Provision composition entries changed bootstrap delegation.
@@ -772,9 +999,21 @@ pre-approved folder moves.
   normalization, diplomacy, warfare, and composition. The documented live SP,
   hosted-MP, and dedicated-server faction validation matrix remains NOT RUN and
   is required before runtime release.
+- Chunk 11 has static and harness coverage for exact Director composition,
+  persistence, deterministic population, bounded scheduling, traversal,
+  encounters, LOD, and canonical integrations. Live SP, hosted-MP, and
+  dedicated-server Director startup/save-reload validation remains NOT RUN and
+  is required before runtime release.
+- Chunk 12 has static and harness coverage for exact shared Travel composition,
+  route/model/projection behavior, map commands, navigation, and abstract-world
+  integration. Live SP, hosted-MP, and dedicated-server shared startup/travel
+  validation remains NOT RUN and is required before runtime release.
+- Chunk 13 made no production change. Its extraction conclusions are bounded by
+  the currently available adjacent mods and must be revisited when a concrete
+  second consumer requests one of the deferred mechanisms.
 
 ## Next Chunk
 
-Chunk 10 — inventory Colony, Settlement, and Facility ownership, persistence,
-authority, validation, reservations, storage/research, jobs, networking, and
-presentation seams before introducing the smallest justified boundary.
+No further architecture chunk is scheduled. Perform the live SP, hosted-MP,
+dedicated-server, and save/reload release matrix next. Any monolith decoupling
+or further module splitting requires a separate explicit request.

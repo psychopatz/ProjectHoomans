@@ -67,6 +67,12 @@ assertEqual(sharedCalls[1], "PNC/Core/Base/PNC_Core",
     "shared composition first dependency")
 assertEqual(sharedCalls[#sharedCalls], "PNC/Integrations/PNC_PsychopatzProfiler",
     "shared composition final dependency")
+local travelIndex = indexOf(sharedCalls, "PNC/Core/Travel/PNC_Travel")
+assertEqual(sharedCalls[travelIndex - 1], "PNC/Core/Pathing/PNC_PathService",
+    "shared Travel initialization predecessor")
+assertEqual(sharedCalls[travelIndex + 1],
+    "PNC/Core/MapCommands/PNC_MapCommandService",
+    "shared Travel initialization successor")
 
 PNC = {}
 local serverCalls = capture(
@@ -89,6 +95,16 @@ assertEqual(serverCalls[factionCoreIndex - 1], "PNC/PNC_ConductDebug",
     "server Faction core initialization predecessor")
 assertEqual(serverCalls[factionCoreIndex + 1], "PNC/PNC_CommunityService",
     "server Faction core initialization successor")
+local settlementIndex = indexOf(serverCalls, "PNC/Settlement/PNC_Settlement")
+assertEqual(serverCalls[settlementIndex - 1], "PNC/PNC_CommunityService",
+    "server Settlement initialization predecessor")
+assertEqual(serverCalls[settlementIndex + 1], "PNC/Journals/PNC_JournalRoutes",
+    "server Settlement initialization successor")
+local directorIndex = indexOf(serverCalls, "PNC/Director/PNC_Director")
+assertEqual(serverCalls[directorIndex - 1], "PNC/Needs/PNC_NeedSupplyBridge",
+    "server Director initialization predecessor")
+assertEqual(serverCalls[directorIndex + 1], "PNC/PNC_NeedsScheduler",
+    "server Director initialization successor")
 assertEqual(serverCalls[#serverCalls - 1], "<install-server-profiler>",
     "server profiler installation timing")
 assertEqual(serverCalls[#serverCalls], "PNC/PNC_Server",
@@ -211,5 +227,94 @@ for index = 1, #expectedFactionCore do
 end
 assertEqual(#factionCoreCalls, #expectedFactionCore,
     "server Faction core dependency count")
+
+PNC = {}
+local settlementCalls = capture(
+    ROOT .. "server/PNC/Settlement/PNC_Settlement.lua"
+)
+local expectedSettlement = {
+    "PNC/Settlement/PNC_SettlementRepository",
+    "PNC/Settlement/PNC_BaseValidationService",
+    "PNC/Settlement/PNC_BaseService",
+    "PNC/Settlement/PNC_FacilityWorldValidation",
+    "PNC/Settlement/PNC_FacilityValidationService",
+    "PNC/Settlement/PNC_FacilityCostService",
+    "PNC/Settlement/PNC_FacilityService",
+    "PNC/Settlement/PNC_InteractionTargetResolver",
+    "PNC/Settlement/PNC_FacilityReservations",
+    "PNC/Settlement/PNC_StockpileAccessService",
+    "PNC/Settlement/PNC_SettlementDebug",
+}
+for index = 1, #expectedSettlement do
+    assertEqual(settlementCalls[index], expectedSettlement[index],
+        "server Settlement dependency " .. tostring(index))
+end
+assertEqual(#settlementCalls, #expectedSettlement,
+    "server Settlement dependency count")
+
+PNC = {}
+local directorCalls = capture(
+    ROOT .. "server/PNC/Director/PNC_Director.lua"
+)
+local expectedDirector = {
+    "PNC/Director/PNC_AbstractWorldStore",
+    "PNC/Director/PNC_AbstractLocationManager",
+    "PNC/Director/PNC_AbstractGroupManager",
+    "PNC/WorldDiscovery/PNC_WorldDiscovery",
+    "PNC/Director/PNC_AbstractCombatProfile",
+    "PNC/Director/PNC_AbstractResourceNeeds",
+    "PNC/Director/PNC_AbstractBehaviorProfile",
+    "PNC/Director/PNC_AbstractScavengeResolver",
+    "PNC/Director/PNC_AbstractActionResolver",
+    "PNC/Director/PNC_AbstractEncounterEvaluator",
+    "PNC/Director/PNC_AbstractCasualtyResolver",
+    "PNC/Director/PNC_AbstractRetreatResolver",
+    "PNC/Director/PNC_AbstractCombatResolver",
+    "PNC/Director/PNC_AbstractEncounterResolver",
+    "PNC/Director/PNC_AbstractEncounterDetector",
+    "PNC/Director/PNC_AbstractTraversal",
+    "PNC/Director/Population/PNC_PopulationSandbox",
+    "PNC/Director/Population/PNC_PopulationLog",
+    "PNC/Director/Population/PNC_PopulationIdentity",
+    "PNC/Director/Population/PNC_PopulationSectorManager",
+    "PNC/Director/Population/PNC_PopulationBudget",
+    "PNC/Director/Population/PNC_GenerationQueue",
+    "PNC/Director/Population/PNC_GroupGenerationPlan",
+    "PNC/Director/Population/PNC_SettlementGenerationPlan",
+    "PNC/Director/Population/PNC_SettlementCandidateManager",
+    "PNC/Director/Population/PNC_StarterPopulation",
+    "PNC/Director/Population/PNC_GroupGenerator",
+    "PNC/Director/Population/PNC_SettlementGenerator",
+    "PNC/Director/Population/PNC_CommunityGroupFormation",
+    "PNC/Director/Population/PNC_PopulationReconciler",
+    "PNC/Director/Population/PNC_PopulationDirector",
+    "PNC/Director/PNC_WorldDirector",
+    "PNC/Director/PNC_AbstractDirectorDebug",
+}
+for index = 1, #expectedDirector do
+    assertEqual(directorCalls[index], expectedDirector[index],
+        "server Director dependency " .. tostring(index))
+end
+assertEqual(#directorCalls, #expectedDirector,
+    "server Director dependency count")
+
+PNC = { Travel = {} }
+local travelCalls = capture(
+    ROOT .. "shared/PNC/Core/Travel/PNC_Travel.lua"
+)
+local expectedTravel = {
+    "PNC/Core/Travel/PNC_Travel_Route",
+    "PNC/Core/Travel/PNC_Travel_Providers",
+    "PNC/Core/Travel/PNC_Travel_Arrivals",
+    "PNC/Core/Travel/PNC_Travel_Model",
+    "PNC/Core/Travel/PNC_Travel_Projection",
+    "PNC/Core/Travel/PNC_Travel_Service",
+}
+for index = 1, #expectedTravel do
+    assertEqual(travelCalls[index], expectedTravel[index],
+        "shared Travel dependency " .. tostring(index))
+end
+assertEqual(#travelCalls, #expectedTravel,
+    "shared Travel dependency count")
 
 print("pnc_composition_bootstrap_smoke: OK")

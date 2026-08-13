@@ -4,6 +4,8 @@ local FILE =
 
 package.preload["PNC/UI/Map/PNC_MapHoverPortraitCard"] =
     function() return true end
+package.preload["PNC/Knowledge/PNC_KnowledgeInterest"] =
+    function() return true end
 
 local portraitCreateCount = 0
 local portraitTargetCount = 0

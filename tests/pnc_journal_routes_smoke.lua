@@ -30,6 +30,14 @@ local Events = require "PsychopatzCore/Events/PC_EventBus"
 local CoreJournals = require "PsychopatzCore/Journal/PC_JournalService"
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 local Adapter = require "PNC/Journals/PNC_JournalRoutes"
+local StorageJournal = require
+    "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
+
+equal(Adapter.STORAGE_CAPACITY, StorageJournal.MAX_ENTRIES,
+    "storage journal capacity has one authority")
+equal(CoreJournals.getType(Adapter.TYPE.COLONY_ACTIVITY).capacity,
+    StorageJournal.MAX_ENTRIES,
+    "storage journal route preserves canonical capacity")
 
 local owned = {
     id = "owned", recruited = true, ownerUsername = "player", alive = true,

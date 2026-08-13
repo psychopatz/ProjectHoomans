@@ -7,13 +7,15 @@ local Adapter = PNC.Journals
 local Events = require "PsychopatzCore/Events/PC_EventBus"
 local CoreJournals = require "PsychopatzCore/Journal/PC_JournalService"
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
+local StorageJournal = require
+    "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
 
 Adapter.TYPE = {
     COLONY_ACTIVITY = "projecthoomans.colonyActivity",
     NPC_HISTORY = "projecthoomans.npcHistory",
 }
 Adapter.NPC_CAPACITY = 32
-Adapter.STORAGE_CAPACITY = 20
+Adapter.STORAGE_CAPACITY = StorageJournal.MAX_ENTRIES
 
 CoreJournals.registerType(Adapter.TYPE.COLONY_ACTIVITY, {
     storage = "boundedRing",
