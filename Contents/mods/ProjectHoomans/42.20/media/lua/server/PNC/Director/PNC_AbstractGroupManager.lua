@@ -198,7 +198,7 @@ function Groups.GetNeeds(groupOrID)
     if faction and PNC.GroupNeeds and PNC.GroupNeeds.Ensure then
         return PNC.GroupNeeds.Ensure(faction)
     end
-    return { hunger = 100, hydration = 100, fatigue = 100 }
+    return { hunger = 100, thirst = 100, fatigue = 100 }
 end
 
 function Groups.GetResourceNeeds(groupOrID)

@@ -59,8 +59,8 @@ function ISPNCNeedsDebugWindow:refreshSnapshot()
     local snapshot = ClientState.needsDebug or {}
     local oldGroup, oldNPC = selected(self.groups), selected(self.individuals)
     self.groups:clear(); self.individuals:clear(); self.details:clear()
-    for _, group in ipairs(snapshot.groups or {}) do self.groups:addItem(group.name, { id=group.id, label=group.name, detail=string.format("%s | %d | H %.2f W %.2f R %.2f", group.type, group.members, group.needs.hunger, group.needs.hydration, group.needs.fatigue), value=group }) end
-    for _, npc in ipairs(snapshot.individuals or {}) do self.individuals:addItem(npc.name, { id=npc.id, label=npc.name, detail=string.format("H %.2f W %.2f R %.2f", npc.needs.hunger, npc.needs.hydration, npc.needs.fatigue), value=npc }) end
+    for _, group in ipairs(snapshot.groups or {}) do self.groups:addItem(group.name, { id=group.id, label=group.name, detail=string.format("%s | %d | H %.2f T %.2f F %.2f", group.type, group.members, group.needs.hunger, group.needs.thirst, group.needs.fatigue), value=group }) end
+    for _, npc in ipairs(snapshot.individuals or {}) do self.individuals:addItem(npc.name, { id=npc.id, label=npc.name, detail=string.format("H %.2f T %.2f F %.2f | %.0f kcal %.1f kg", npc.needs.hunger, npc.needs.thirst, npc.needs.fatigue, npc.nutrition and npc.nutrition.calories or 0, npc.nutrition and npc.nutrition.weight or 0), value=npc }) end
     local function restore(list, id)
         for index, entry in ipairs(list.items or {}) do
             if entry.item and entry.item.id == id then list.selected = index; return end

@@ -107,7 +107,7 @@ function Builder.Build(groupOrID)
     local needs = Groups.GetNeeds(group) or {}
     local morale = 0.5
         + (1 - clamp(tonumber(needs.hunger) or 0, 0, 1)) * 0.15
-        + (1 - clamp(tonumber(needs.hydration) or 0, 0, 1)) * 0.15
+        + (1 - clamp(tonumber(needs.thirst) or 0, 0, 1)) * 0.15
         + (1 - clamp(tonumber(needs.fatigue) or 0, 0, 1)) * 0.2
     local profile = {
         manpower = effectiveManpower,

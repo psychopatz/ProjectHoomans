@@ -23,7 +23,7 @@ function ResourceNeeds.Get(groupOrID)
     local targets = Config.ResourceNeeds.TARGET_PER_MEMBER
     local output = {
         food = clamp01(tonumber(canonical.hunger) or 0),
-        water = clamp01(tonumber(canonical.hydration) or 0),
+        water = clamp01(tonumber(canonical.thirst) or 0),
     }
     for _, category in ipairs({ "ammo", "medical", "materials" }) do
         local target = math.max(1, (tonumber(targets[category]) or 1) * memberCount)

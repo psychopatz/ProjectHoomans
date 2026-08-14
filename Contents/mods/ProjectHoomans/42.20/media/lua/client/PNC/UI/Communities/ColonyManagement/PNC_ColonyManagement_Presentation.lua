@@ -99,7 +99,7 @@ function Presentation.BuildOverview(snapshot)
     }
     if #(snapshot.attention or {}) == 0 then
         rows[#rows + 1] = Presentation.Detail(
-            "ALL NEEDS STABLE",
+            "ALL NEEDS NORMAL",
             "No companion currently needs attention.", "success"
         )
     else
@@ -206,6 +206,14 @@ function Presentation.BuildPeople(person)
             needType, value.needs and value.needs[needType]
         )
     end
+    rows[#rows + 1] = Presentation.Detail(
+        Shared.Tr("UI_PNC_Nutrition_Calories", "CALORIE BALANCE"),
+        string.format("%.0f kcal", tonumber(value.nutrition
+            and value.nutrition.calories) or 0), "accent")
+    rows[#rows + 1] = Presentation.Detail(
+        Shared.Tr("UI_PNC_Nutrition_Weight", "WEIGHT"),
+        string.format("%.1f kg", tonumber(value.nutrition
+            and value.nutrition.weight) or 0), "accent")
     local journalRows = JournalPresentation.Rows(value.journal)
     rows[#rows + 1] = Presentation.Detail(Shared.Tr(
         "UI_PNC_Journal_Title", "COLONIST JOURNAL"), Shared.TrFormat(
@@ -239,6 +247,14 @@ function Presentation.BuildNeeds(person)
             needType, value.needs and value.needs[needType]
         )
     end
+    rows[#rows + 1] = Presentation.Detail(
+        Shared.Tr("UI_PNC_Nutrition_Calories", "CALORIE BALANCE"),
+        string.format("%.0f kcal", tonumber(value.nutrition
+            and value.nutrition.calories) or 0), "accent")
+    rows[#rows + 1] = Presentation.Detail(
+        Shared.Tr("UI_PNC_Nutrition_Weight", "WEIGHT"),
+        string.format("%.1f kg", tonumber(value.nutrition
+            and value.nutrition.weight) or 0), "accent")
     for _, statType in ipairs(PNC.ConditionStats
         and PNC.ConditionStats.TYPES or {})
     do

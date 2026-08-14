@@ -12,9 +12,9 @@ end
 PNC = {
     NeedsDefinitions = {
         GetLevel = function(_, value)
-            if value >= 0.70 then return "EMERGENCY" end
-            if value >= 0.25 then return "LOW" end
-            return "GOOD"
+            if value >= 0.84 then return "CRITICAL" end
+            if value >= 0.45 then return "MODERATE" end
+            return "NORMAL"
         end,
     },
     ConditionStats = {
@@ -42,7 +42,7 @@ local snapshot = {
         {
             id = "npc_1", name = "Morgan", role = "resident",
             activity = "working",
-            needs = { hunger = 0.12, hydration = 0.75, fatigue = 0.30 },
+            needs = { hunger = 0.12, thirst = 0.95, fatigue = 0.30 },
             conditionStats = { stress = 0.4, boredom = 10, panic = 20 },
             morale = 35,
             journal = {
@@ -53,41 +53,41 @@ local snapshot = {
         },
     },
     attention = {
-        { name = "Morgan", needType = "hydration", value = 0.75,
-            severity = "EMERGENCY" },
+        { name = "Morgan", needType = "thirst", value = 0.95,
+            severity = "CRITICAL" },
     },
 }
 
 local roster = Presentation.BuildRoster(snapshot)
 equal(#roster, 1, "roster row count")
 equal(roster[1].id, "npc_1", "roster preserves selection identity")
-equal(roster[1].worstLevel, "EMERGENCY", "worst need badge")
+equal(roster[1].worstLevel, "CRITICAL", "worst need badge")
 
 local overview = Presentation.BuildOverview(snapshot)
 equal(#overview, 4, "overview always produces visible rows")
 equal(overview[1].label, "STATUS", "overview status row")
 
 local people = Presentation.BuildPeople(roster[1])
-equal(#people, 10, "people tab includes journal rows")
+equal(#people, 12, "people tab includes nutrition and journal rows")
 equal(people[1].label, "Morgan", "selected person details")
 equal(people[5].meter, true, "people needs use meters")
-equal(people[8].label, "COLONIST JOURNAL", "journal section is visible")
-equal(people[9].label, "Reached Axe level 3", "newest journal entry first")
-equal(people[10].label, "Ate Apple (+20% hunger)",
+equal(people[10].label, "COLONIST JOURNAL", "journal section is visible")
+equal(people[11].label, "Reached Axe level 3", "newest journal entry first")
+equal(people[12].label, "Ate Apple (+20% hunger)",
     "journal resolves item names on the client")
 local emptyJournal = Presentation.BuildPeople({
     value = {
         id = "npc_2", name = "Taylor", needs = {}, journal = {},
     },
 })
-equal(emptyJournal[8].detail, "0 entries", "empty journal count")
-equal(emptyJournal[9].label, "No recorded history yet",
+equal(emptyJournal[10].detail, "0 entries", "empty journal count")
+equal(emptyJournal[11].label, "No recorded history yet",
     "empty journal remains visible")
 
 local needs = Presentation.BuildNeeds(roster[1])
-equal(#needs, 8, "needs and condition meter rows")
+equal(#needs, 10, "needs, nutrition, and condition meter rows")
 equal(needs[2].needType, "hunger", "hunger meter binding")
-equal(needs[8].key, "morale", "morale meter binding")
+equal(needs[10].key, "morale", "morale meter binding")
 
 ISPanel = {
     derive = function(self)

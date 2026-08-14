@@ -55,7 +55,7 @@ PNC.Factions = {
 PNC.GroupNeeds = {
     Ensure = function(factionOrID)
         local faction = type(factionOrID) == "table" and factionOrID or factions[factionOrID]
-        return faction and faction.needs or { hunger = 0, hydration = 0, fatigue = 0 }
+        return faction and faction.needs or { hunger = 0, thirst = 0, fatigue = 0 }
     end,
     Restore = function(factionOrID, needType, amount)
         local faction = type(factionOrID) == "table" and factionOrID or factions[factionOrID]
@@ -134,7 +134,7 @@ local safeSite = assert(PNC.AbstractLocations.Register({ id = "aloc_safe",
     resourcePotential = { food = 20, water = 20 } }))
 
 local scavFaction = faction("faction_scav", "refugee",
-    { hunger = 0.92, hydration = 0.10, fatigue = 0.20 })
+    { hunger = 0.92, thirst = 0.10, fatigue = 0.20 })
 local scavenger = npc("npc_scav", scavFaction, "scavenger", "Base.Axe")
 local scavGroup = group("agroup_scav", scavFaction, "SCAVENGER", origin,
     { food = 0, water = 30, ammo = 0, medical = 0 }, { scavenger.id })
@@ -165,16 +165,16 @@ truthy(scavenged.components.food.need > scavenged.components.water.need,
     "yield diagnostics expose need weights")
 
 local waterFaction = faction("faction_water", "refugee",
-    { hunger = 0.05, hydration = 0.95, fatigue = 0.20 })
+    { hunger = 0.05, thirst = 0.95, fatigue = 0.20 })
 local waterGroup = group("agroup_water", waterFaction, "SCAVENGER", origin,
     { food = 30, water = 0 }, {})
 equal(assert(PNC.AbstractTraversal.ChooseDestination(waterGroup)).id, waterSite.id,
     "water shortage weights destination")
 
 local looterFaction = faction("faction_looter", "looter",
-    { hunger = 0.10, hydration = 0.10, fatigue = 0.10 })
+    { hunger = 0.10, thirst = 0.10, fatigue = 0.10 })
 local refugeeFaction = faction("faction_refugee", "refugee",
-    { hunger = 0.30, hydration = 0.30, fatigue = 0.30 })
+    { hunger = 0.30, thirst = 0.30, fatigue = 0.30 })
 local looterIds = {}
 for index = 1, 5 do
     local record = npc("npc_looter_" .. index, looterFaction,
@@ -205,7 +205,7 @@ truthy(intents[refugees.id].scores.FLEE > intents[refugees.id].scores.ATTACK,
     "refugees favor flight from armed looters")
 
 local armedFaction = faction("faction_armed_refugee", "refugee",
-    { hunger = 0.10, hydration = 0.10, fatigue = 0.10 })
+    { hunger = 0.10, thirst = 0.10, fatigue = 0.10 })
 local armedIds = {}
 for index = 1, 9 do
     local record = npc("npc_armed_refugee_" .. index, armedFaction,
@@ -235,7 +235,7 @@ truthy(friendlyIntent.scores.IGNORE > friendlyIntent.scores.ATTACK,
 looterFaction.relations[refugeeFaction.id] = nil
 
 local suppliedContext = PNC.AbstractBehaviorProfile.GetContext(looters, looterProfile)
-looterFaction.needs.hunger, looterFaction.needs.hydration = 1, 1
+looterFaction.needs.hunger, looterFaction.needs.thirst = 1, 1
 looters.resources.food, looters.resources.water = 0, 0
 local desperateContext = PNC.AbstractBehaviorProfile.GetContext(looters, looterProfile)
 greater(desperateContext.desperation, suppliedContext.desperation,
@@ -249,7 +249,7 @@ greater(desperateScore.scores.EXTORT, suppliedScore.scores.EXTORT,
 
 -- End-to-end extortion: queue, evaluate, bounded transfer, no combat on compliance.
 looters.resources.food, looters.resources.water = 50, 50
-looterFaction.needs.hunger, looterFaction.needs.hydration = 0.10, 0.10
+looterFaction.needs.hunger, looterFaction.needs.thirst = 0.10, 0.10
 local extortReport = assert(PNC.AbstractEncounters.Create(origin, looters, refugees,
     worldHour + 3))
 PNC.AbstractEncounterResolver.ProcessBatch(worldHour, 1)
@@ -310,9 +310,9 @@ truthy(casualtyTarget ~= deathTarget, "distinct members selected")
 
 -- Observation safety is checked at detection and never queues mutations.
 local observedFactionA = faction("faction_observed_a", "looter",
-    { hunger = 0.80, hydration = 0.80, fatigue = 0.20 })
+    { hunger = 0.80, thirst = 0.80, fatigue = 0.20 })
 local observedFactionB = faction("faction_observed_b", "refugee",
-    { hunger = 0.80, hydration = 0.80, fatigue = 0.20 })
+    { hunger = 0.80, thirst = 0.80, fatigue = 0.20 })
 local observedA = group("agroup_observed_a", observedFactionA, "LOOTER", origin,
     { food = 10, water = 10 }, {})
 local observedB = group("agroup_observed_b", observedFactionB, "REFUGEE", origin,
@@ -355,7 +355,7 @@ equal(#PNC.AbstractEncounterResolver.Queue, 0,
 local actionBudgetGroups = {}
 for index = 1, 3 do
     local actionFaction = faction("faction_action_" .. index, "refugee",
-        { hunger = 0.50, hydration = 0.50, fatigue = 0.20 })
+        { hunger = 0.50, thirst = 0.50, fatigue = 0.20 })
     local actionMember = npc("npc_action_" .. index, actionFaction,
         "scavenger", "Base.Axe")
     local actionGroup = group("agroup_action_" .. index, actionFaction,
@@ -373,7 +373,7 @@ equal(PNC.AbstractActions.Metrics.completed, completedBefore + 3,
     "rotating action budget eventually completes all groups")
 
 local persistedActionFaction = faction("faction_action_persist", "refugee",
-    { hunger = 0.40, hydration = 0.40, fatigue = 0.20 })
+    { hunger = 0.40, thirst = 0.40, fatigue = 0.20 })
 local persistedActionMember = npc("npc_action_persist", persistedActionFaction,
     "scavenger", "Base.Axe")
 local persistedActionGroup = group("agroup_action_persist", persistedActionFaction,

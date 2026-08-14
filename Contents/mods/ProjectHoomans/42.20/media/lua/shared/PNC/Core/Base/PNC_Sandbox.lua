@@ -80,6 +80,10 @@ function Settings.NPCSupplyTransactionLoggingEnabled()
     return Settings.GetBoolean("NPCSupplyTransactionLogging", false)
 end
 
+function Settings.PlayerOwnedNPCNeedMortalityEnabled()
+    return Settings.GetBoolean("PlayerOwnedNPCNeedMortality", false)
+end
+
 function Settings.ZombiesTargetDownedNPC()
     return Settings.GetBoolean("ZombiesTargetDownedNPC", false)
 end

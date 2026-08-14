@@ -37,6 +37,9 @@ end
 
 local function individualSummary(record)
     local state = PNC.IndividualNeeds.Ensure(record)
+    local repositoryState = PNC.IndividualNeeds.GetState(record)
+    local rates = PNC.IndividualNeeds.GetRates(record)
+    local evaluatedAt = PNC.NeedsRepository.GetEvaluatedAt(record)
     local persistence = PNC.Inventory and PNC.Inventory.Serialize
         and PNC.Inventory.Serialize(record) or nil
     local mode = PNC.Inventory and PNC.Inventory.GetPersistenceMode
@@ -45,14 +48,26 @@ local function individualSummary(record)
     return state and {
         id = record.id, name = tostring(record.name or record.id), owner = record.ownerUsername or "Player",
         activity = record.activeBehavior or record.activeJob or record.orderSpec and record.orderSpec.kind or "idle",
-        needs = state, history = copy(Debug.individualHistory[record.id] or {}),
+        needs = state,
+        nutrition = copy(repositoryState and repositoryState.nutrition or {}),
+        severities = {
+            hunger = Definitions.GetLevel("hunger", state.hunger),
+            thirst = Definitions.GetLevel("thirst", state.thirst),
+            fatigue = Definitions.GetLevel("fatigue", state.fatigue),
+        },
+        rates = copy(rates), modifiers = copy(rates and rates.modifiers or {}),
+        mortalityEnabled = PNC.Sandbox.PlayerOwnedNPCNeedMortalityEnabled(),
+        consequences = copy(record.runtime and record.runtime.needs or {}),
+        evaluatedAt = evaluatedAt,
+        dirty = PNC.NeedsRepository.Dirty == true,
+        history = copy(Debug.individualHistory[record.id] or {}),
         conditionStats = PNC.ConditionStats
             and PNC.ConditionStats.Ensure(record, Utils.WorldAgeHours()) or {},
         conditionRates = PNC.ConditionStats
             and PNC.ConditionStats.GetRates(record,
                 PNC.IndividualNeeds.GetActivity(record)) or {},
         dynamicTraits = copy(record.dynamicTraits or {}),
-        elapsed = math.max(0, Utils.WorldAgeHours() - (tonumber(state.lastUpdateWorldAge) or 0)),
+        elapsed = math.max(0, Utils.WorldAgeHours() - evaluatedAt),
         supply = PNC.NPCSupplyService and PNC.NPCSupplyService.GetDebugState
             and PNC.NPCSupplyService.GetDebugState(record) or { byKind = {} },
         provision = PNC.ProvisionEvaluator
@@ -67,7 +82,7 @@ end
 
 function Debug.BuildSnapshot(selectedGroupID, selectedNPCID, action)
     local groups, individuals = {}, {}
-    local lowest = { hunger = nil, hydration = nil, fatigue = nil }
+    local lowest = { hunger = nil, thirst = nil, fatigue = nil }
     local members = 0
     for _, faction in ipairs(PNC.Factions.List()) do
         if PNC.GroupNeeds.IsGroup(faction) then

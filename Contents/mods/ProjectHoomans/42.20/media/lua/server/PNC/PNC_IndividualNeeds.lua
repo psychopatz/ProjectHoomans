@@ -7,6 +7,8 @@ local Needs = PNC.IndividualNeeds
 local Definitions = PNC.NeedsDefinitions
 local Utils = PNC.NeedsUtils
 local PlayerModel = PNC.PlayerNeedsModel
+local EventBus = require "PsychopatzCore/Events/PC_EventBus"
+local EventTypes = PNC.EventTypes
 
 Needs.Commands = Needs.Commands or {}
 Needs.Queries = Needs.Queries or {}
@@ -65,27 +67,28 @@ function Needs.Ensure(record, initial)
     if PlayerModel and PlayerModel.EnsureTraits then
         PlayerModel.EnsureTraits(record)
     end
-    local at = Utils.WorldAgeHours()
-    if type(record.needs) ~= "table" then
-        local defaults = initial or {}
+    local entry = PNC.NeedsRepository and PNC.NeedsRepository.Get(record, true)
+    if not entry then return nil, "repository_unavailable" end
+    if type(initial) == "table" then
         for _, needType in ipairs(Definitions.TYPES) do
-            if defaults[needType] == nil then
-                defaults[needType] = Utils.RandomInRange(
-                    Definitions.INDIVIDUAL_INITIAL_MIN,
-                    Definitions.INDIVIDUAL_INITIAL_MAX,
-                    tostring(record.id) .. ":" .. needType
-                )
+            if initial[needType] ~= nil then
+                entry.needs[needType] = Definitions.Clamp(needType,
+                    initial[needType])
             end
         end
-        record.needs = Utils.NormalizeState(nil, at, defaults)
-        if PNC.Registry and PNC.Registry.MarkDirty then
-            PNC.Registry.MarkDirty(record, "individual_needs_initialization")
-        end
-    else
-        record.needs = Utils.NormalizeState(record.needs, at)
     end
     runtime(record)
-    return record.needs
+    return entry.needs
+end
+
+function Needs.GetState(record)
+    if not owned(record) then return nil, "not_player_owned" end
+    return PNC.NeedsRepository and PNC.NeedsRepository.Get(record, true) or nil
+end
+
+function Needs.GetNutrition(record)
+    local state = Needs.GetState(record)
+    return state and state.nutrition or nil
 end
 
 function Needs.Get(record, needType)
@@ -106,9 +109,11 @@ function Needs.Set(record, needType, value, reason)
         local newLevel = Definitions.GetLevel(needType, after)
         if oldLevel ~= newLevel then
             runtime(record).cachedLevels[needType] = newLevel
-            Needs.Emit("level_changed", record, needType, oldLevel, newLevel, reason)
+            Needs.Emit("severity_changed", record, needType, oldLevel, newLevel, reason)
+            EventBus.emit(EventTypes.NPC_NEED_SEVERITY_CHANGED, record,
+                needType, oldLevel, newLevel, tostring(reason or "update"))
         end
-        if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "individual_needs_" .. tostring(reason or "update")) end
+        if PNC.NeedsRepository then PNC.NeedsRepository.MarkDirty() end
     end
     return after
 end
@@ -130,6 +135,49 @@ function Needs.SetActivityOverride(record, value)
 end
 function Needs.GetRates(record)
     return PlayerModel.GetRates(record, Needs.Ensure(record), activity(record))
+end
+
+function Needs.ModifyNutrition(record, calories, reason)
+    local state = Needs.GetState(record)
+    if not state then return nil, "not_player_owned" end
+    local tuning = Definitions.NUTRITION
+    local before = state.nutrition.calories
+    state.nutrition.calories = math.max(tuning.minimumCalories,
+        math.min(tuning.maximumCalories, before + (tonumber(calories) or 0)))
+    if before ~= state.nutrition.calories and PNC.NeedsRepository then
+        PNC.NeedsRepository.MarkDirty()
+    end
+    return state.nutrition.calories, reason
+end
+
+local function weightCategory(weight)
+    weight = tonumber(weight) or Definitions.NUTRITION.defaultWeight
+    if weight < 55 then return "EMACIATED" end
+    if weight < 65 then return "VERY_UNDERWEIGHT" end
+    if weight < 75 then return "UNDERWEIGHT" end
+    if weight >= 105 then return "OBESE" end
+    if weight >= 90 then return "OVERWEIGHT" end
+    return "NORMAL"
+end
+
+function Needs.Commands.ApplyFood(record, effect, source)
+    effect = type(effect) == "table" and effect or {}
+    Needs.Modify(record, "hunger", -(tonumber(effect.hunger) or 0),
+        source or "food_consumed")
+    Needs.ModifyNutrition(record, tonumber(effect.calories) or 0,
+        source or "food_consumed")
+    return true, Needs.GetState(record)
+end
+
+function Needs.Commands.ApplyDrink(record, effect, source)
+    effect = type(effect) == "table" and effect or {}
+    Needs.Modify(record, "thirst", -(tonumber(effect.thirst) or 0),
+        source or "drink_consumed")
+    if tonumber(effect.calories) then
+        Needs.ModifyNutrition(record, tonumber(effect.calories),
+            source or "drink_consumed")
+    end
+    return true, Needs.GetState(record)
 end
 function Needs.GetPriority(record, needType)
     local value = Needs.Get(record, needType) or 0
@@ -178,31 +226,66 @@ end
 function Needs.Update(record, elapsedHours, reason)
     local state = Needs.Ensure(record)
     if not state then return false end
-    elapsedHours = math.max(0, tonumber(elapsedHours) or 0)
+    elapsedHours = math.max(0, math.min(Definitions.MAX_CATCHUP_HOURS,
+        tonumber(elapsedHours) or 0))
     local rates = Needs.GetRates(record)
+    local beforeState = Utils.CopyState(state)
     for _, needType in ipairs(Definitions.TYPES) do
         Needs.Modify(record, needType, rates[needType] * elapsedHours,
             reason or "passive_increase")
     end
     if PNC.NeedHealthConsequences and PNC.NeedHealthConsequences.Apply then
-        PNC.NeedHealthConsequences.Apply(record, elapsedHours)
+        PNC.NeedHealthConsequences.Apply(record, beforeState, state, rates,
+            elapsedHours)
     end
-    state.lastUpdateWorldAge = Utils.WorldAgeHours()
+    local nutrition = Needs.GetNutrition(record)
+    if nutrition then
+        local tuning = Definitions.NUTRITION
+        local oldWeightCategory = weightCategory(nutrition.weight)
+        local balanceBefore = nutrition.calories
+        local burn = math.max(0, tonumber(rates.calorieBurnRate) or 0)
+            * elapsedHours
+        nutrition.calories = math.max(tuning.minimumCalories,
+            math.min(tuning.maximumCalories, balanceBefore - burn))
+        local averageBalance = (balanceBefore + nutrition.calories) / 2
+        nutrition.weight = math.max(tuning.minimumWeight,
+            math.min(tuning.maximumWeight, nutrition.weight
+                + (averageBalance / tuning.caloriesPerKilogram)
+                    * (elapsedHours / 24)))
+        local newWeightCategory = weightCategory(nutrition.weight)
+        if oldWeightCategory ~= newWeightCategory then
+            EventBus.emit(EventTypes.NPC_WEIGHT_CATEGORY_CHANGED, record,
+                oldWeightCategory, newWeightCategory, nutrition.weight)
+        end
+    end
+    if PNC.NeedsRepository then PNC.NeedsRepository.MarkDirty() end
     return true
 end
 
+function Needs.AdvanceTo(record, now, reason)
+    if not Needs.Ensure(record) then return false end
+    now = math.max(0, tonumber(now) or Utils.WorldAgeHours())
+    local previous = PNC.NeedsRepository.GetEvaluatedAt(record)
+    local updated = Needs.Update(record, math.max(0, now - previous), reason)
+    PNC.NeedsRepository.SetEvaluatedAt(record, now)
+    return updated
+end
+
 function Needs.UpdateToNow(record, reason)
-    local state = Needs.Ensure(record)
-    if not state then return false end
-    local now = Utils.WorldAgeHours()
-    return Needs.Update(record, math.max(0, now - (tonumber(state.lastUpdateWorldAge) or now)), reason)
+    return Needs.AdvanceTo(record, Utils.WorldAgeHours(), reason)
 end
 
 function Needs.Reset(record)
     local state = Needs.Ensure(record)
     if not state then return false end
     for _, needType in ipairs(Definitions.TYPES) do Needs.Set(record, needType, Definitions.Get(needType).default, "debug_reset") end
-    state.lastUpdateWorldAge = Utils.WorldAgeHours()
+    local nutrition = Needs.GetNutrition(record)
+    if nutrition then
+        nutrition.calories = Definitions.NUTRITION.defaultCalories
+        nutrition.weight = PlayerModel.GetInitialWeight(record)
+    end
+    PNC.NeedsRepository.SetEvaluatedAt(record, Utils.WorldAgeHours())
+    PNC.NeedsRepository.MarkDirty()
     return true
 end
 

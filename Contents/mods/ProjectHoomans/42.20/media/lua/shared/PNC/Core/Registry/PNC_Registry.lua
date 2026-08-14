@@ -462,6 +462,9 @@ function Registry.RemoveRecord(id)
     local entry
     Registry.EnsureLoaded()
     id = tostring(id)
+    if PNC.NeedsRepository and PNC.NeedsRepository.Remove then
+        PNC.NeedsRepository.Remove(id)
+    end
     directory = getDirectory()
     entry = directory.records[id]
     Registry.LiveByID[id] = nil

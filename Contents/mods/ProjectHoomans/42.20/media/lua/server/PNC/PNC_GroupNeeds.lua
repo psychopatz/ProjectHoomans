@@ -208,10 +208,11 @@ function Needs.DebugAbstractScavenge(factionOrID)
     local state, faction = Needs.Ensure(factionOrID)
     if not state or not faction then return nil, "not_mobile_group" end
     local hunger = Utils.RandomInRange(Definitions.ABSTRACT_SCAVENGE.hungerGainMin, Definitions.ABSTRACT_SCAVENGE.hungerGainMax)
-    local hydration = Utils.RandomInRange(Definitions.ABSTRACT_SCAVENGE.hydrationGainMin, Definitions.ABSTRACT_SCAVENGE.hydrationGainMax)
+    local thirst = Utils.RandomInRange(Definitions.ABSTRACT_SCAVENGE.thirstGainMin,
+        Definitions.ABSTRACT_SCAVENGE.thirstGainMax)
     Needs.Restore(faction, "hunger", hunger, "debug_abstract_scavenge")
-    Needs.Restore(faction, "hydration", hydration, "debug_abstract_scavenge")
-    return { hunger = hunger, hydration = hydration }
+    Needs.Restore(faction, "thirst", thirst, "debug_abstract_scavenge")
+    return { hunger = hunger, thirst = thirst }
 end
 
 return Needs

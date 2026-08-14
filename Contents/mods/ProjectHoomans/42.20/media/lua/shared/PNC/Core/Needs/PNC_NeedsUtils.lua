@@ -12,8 +12,6 @@ end
 
 function Utils.NormalizeState(value, at, defaults)
     local source = type(value) == "table" and value or {}
-    local legacy = tonumber(source.version) ~= nil
-        and tonumber(source.version) < Definitions.VERSION
     local state = {
         version = Definitions.VERSION,
         lastUpdateWorldAge = math.max(0, tonumber(source.lastUpdateWorldAge) or tonumber(at) or 0),
@@ -22,8 +20,6 @@ function Utils.NormalizeState(value, at, defaults)
         local default = defaults and defaults[needType]
             or Definitions.Get(needType).default
         local raw = source[needType] == nil and default or source[needType]
-        if legacy then raw = 1 - math.max(0, math.min(100,
-            tonumber(raw) or 100)) / 100 end
         state[needType] = Definitions.Clamp(needType, raw)
     end
     if Definitions.GROUP_ACTIVITY[tostring(source.debugActivity or "")] then

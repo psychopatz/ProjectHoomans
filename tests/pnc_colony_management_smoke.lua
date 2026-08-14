@@ -32,7 +32,7 @@ local companion = {
     ownerUsername = "Tester",
     affiliation = { factionID = "faction_player", communityRole = "resident" },
     health = { state = "normal" },
-    needs = { hunger = 0.82, hydration = 0.10, fatigue = 0.10 },
+    needs = { hunger = 0.82, thirst = 0.10, fatigue = 0.10 },
 }
 
 isDebugEnabled = function() return true end
@@ -50,18 +50,18 @@ PNC = {
         end,
     },
     NeedsDefinitions = {
-        TYPES = { "hunger", "hydration", "fatigue" },
+        TYPES = { "hunger", "thirst", "fatigue" },
         Get = function(needType)
-            if needType == "hunger" or needType == "hydration"
+            if needType == "hunger" or needType == "thirst"
                 or needType == "fatigue"
             then return { id = needType } end
         end,
         GetLevel = function(_, value)
-            if value >= 0.70 then return "EMERGENCY" end
-            if value >= 0.45 then return "CRITICAL" end
-            if value >= 0.25 then return "LOW" end
-            if value >= 0.15 then return "STABLE" end
-            return "GOOD"
+            if value >= 0.84 then return "CRITICAL" end
+            if value >= 0.70 then return "SEVERE" end
+            if value >= 0.45 then return "MODERATE" end
+            if value >= 0.15 then return "MINOR" end
+            return "NORMAL"
         end,
     },
     IndividualNeeds = {
@@ -74,7 +74,7 @@ PNC = {
             return record.needs[needType]
         end,
         Reset = function(record)
-            record.needs = { hunger = 0, hydration = 0, fatigue = 0 }
+            record.needs = { hunger = 0, thirst = 0, fatigue = 0 }
             return true
         end,
     },
@@ -256,10 +256,10 @@ equal(communitySaves, 1, "rename commits community state immediately")
 
 local debugSnapshot, debugResult = Management.HandleAction(player, {
     action = "debug_need", npcID = companion.id, operation = "modify",
-    needType = "hydration", amount = 0.25,
+    needType = "thirst", amount = 0.25,
 })
 equal(debugResult.ok, true, "debug need mutation succeeds")
-equal(debugSnapshot.people[1].needs.hydration, 0.35,
+equal(debugSnapshot.people[1].needs.thirst, 0.35,
     "debug tab action returns the authoritative updated need")
 
 local workSnapshot, workResult = Management.HandleAction(player, {

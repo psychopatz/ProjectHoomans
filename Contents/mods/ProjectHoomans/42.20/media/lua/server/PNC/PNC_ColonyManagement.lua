@@ -37,6 +37,8 @@ end
 
 local function summary(record)
     local needs = PNC.IndividualNeeds.Ensure(record)
+    local nutrition = PNC.IndividualNeeds.GetNutrition
+        and PNC.IndividualNeeds.GetNutrition(record) or nil
     local priorityType, priority = PNC.IndividualNeeds.GetHighestPriority(record)
     local journal = PNC.Journals and PNC.Journals.GetNPC
         and PNC.Journals.GetNPC(record.id,
@@ -46,6 +48,7 @@ local function summary(record)
         role=record.affiliation and record.affiliation.communityRole or record.affiliation and record.affiliation.role or "companion",
         activity=PNC.IndividualNeeds.GetActivity(record), job=record.activeJob,
         health=record.health and record.health.state or "unknown", needs=needs,
+        nutrition=nutrition,
         conditionStats=PNC.ConditionStats
             and PNC.ConditionStats.Ensure(record,
                 PNC.NeedsUtils.WorldAgeHours()) or {},
@@ -210,7 +213,7 @@ local function debugNeedAction(player, args)
     return false, "unknown_debug_operation"
 end
 function Management.BuildSnapshot(player, options)
-    local people, attention, counts = {}, {}, { hunger={}, hydration={}, fatigue={} }
+    local people, attention, counts = {}, {}, { hunger={}, thirst={}, fatigue={} }
     local supplyShortages = { food = {}, hydration = {}, medical = {} }
     local playerFaction, colony
     if PNC.Recruitment and PNC.Recruitment.ReconcileOwned then
@@ -229,7 +232,7 @@ function Management.BuildSnapshot(player, options)
             local value = summary(record); people[#people+1]=value
             for _, needType in ipairs(Definitions.TYPES) do
                 local level=Definitions.GetLevel(needType, value.needs[needType]); counts[needType][level]=(counts[needType][level] or 0)+1
-                if level == "EMERGENCY" or level == "CRITICAL" or level == "LOW" then attention[#attention+1]={ severity=level, npcID=value.id, name=value.name, needType=needType, value=value.needs[needType] } end
+                if level == "CRITICAL" or level == "SEVERE" or level == "MODERATE" then attention[#attention+1]={ severity=level, npcID=value.id, name=value.name, needType=needType, value=value.needs[needType] } end
             end
             local supply = record.runtime and record.runtime.supply
                 and record.runtime.supply.byKind or {}

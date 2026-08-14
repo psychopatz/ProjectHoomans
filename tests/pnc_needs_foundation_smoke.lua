@@ -22,6 +22,14 @@ PNC = {
     Identity = { MixSeed = function(seed) return #tostring(seed) * 17 end },
     Registry = { Data = {}, MarkDirty = function() end },
 }
+local emitted = {}
+package.preload["PsychopatzCore/Events/PC_EventBus"] = function()
+    return { emit = function(...) emitted[#emitted + 1] = { ... } end }
+end
+ModData = { values = {}, getOrCreate = function(key)
+    ModData.values[key] = ModData.values[key] or {}; return ModData.values[key]
+end }
+SandboxVars = { ProjectHoomans = {} }
 local age = 10
 getGameTime = function() return { getWorldAgeHours = function() return age end } end
 isClient = function() return false end
@@ -30,8 +38,12 @@ local levelEvents = {}
 
 local root = "Contents/mods/ProjectHoomans/42.20/media/lua/"
 dofile(root .. "shared/PNC/Core/Needs/PNC_NeedsDefinitions.lua")
+dofile(root .. "shared/PNC/Core/Events/PNC_EventDefinitions.lua")
+dofile(root .. "shared/PNC/Core/Needs/PNC_NeedsStateCodec.lua")
 dofile(root .. "shared/PNC/Core/Needs/PNC_PlayerNeedsModel.lua")
 dofile(root .. "shared/PNC/Core/Needs/PNC_NeedsUtils.lua")
+dofile(root .. "shared/PNC/Core/Base/PNC_Sandbox.lua")
+dofile(root .. "server/PNC/Needs/PNC_NeedsRepository.lua")
 
 local factions = {}
 PNC.Factions = {
@@ -66,19 +78,19 @@ assertTrue(PNC.GroupNeeds.GetRates("small").fatigue
     < PNC.NeedsDefinitions.GROUP_RATES_PER_HOUR.fatigue
         * PNC.NeedsUtils.GroupSizeModifier(2),
     "resting slows awake fatigue gain")
-PNC.GroupNeeds.Set("small", "hydration", -10, "test")
-assertEqual(PNC.GroupNeeds.Get("small", "hydration"), 0, "lower clamp")
-PNC.GroupNeeds.Set("small", "hydration", 200, "test")
-assertEqual(PNC.GroupNeeds.Get("small", "hydration"), 1, "upper clamp")
-assertEqual(PNC.NeedsDefinitions.GetLevel("hunger", 0.44), "LOW",
+PNC.GroupNeeds.Set("small", "thirst", -10, "test")
+assertEqual(PNC.GroupNeeds.Get("small", "thirst"), 0, "lower clamp")
+PNC.GroupNeeds.Set("small", "thirst", 200, "test")
+assertEqual(PNC.GroupNeeds.Get("small", "thirst"), 1, "upper clamp")
+assertEqual(PNC.NeedsDefinitions.GetLevel("hunger", 0.44), "MODERATE",
     "vanilla hunger moodle level")
-assertEqual(PNC.NeedsDefinitions.GetLevel("hunger", 0.15), "STABLE",
+assertEqual(PNC.NeedsDefinitions.GetLevel("hunger", 0.15), "MINOR",
     "vanilla hunger threshold boundary")
-PNC.GroupNeeds.Set("small", "hydration", 0.24, "test")
-PNC.GroupNeeds.Set("small", "hydration", 0.26, "test")
-assertEqual(levelEvents[#levelEvents].values[2], "hydration", "threshold listener")
+PNC.GroupNeeds.Set("small", "thirst", 0.24, "test")
+PNC.GroupNeeds.Set("small", "thirst", 0.26, "test")
+assertEqual(levelEvents[#levelEvents].values[2], "thirst", "threshold listener")
 local scavenged = PNC.GroupNeeds.DebugAbstractScavenge("small")
-assertTrue(scavenged.hunger >= 0.20 and scavenged.hydration >= 0.20,
+assertTrue(scavenged.hunger >= 0.20 and scavenged.thirst >= 0.20,
     "abstract scavenging restoration")
 
 local npc = { id = "npc", recruited = true, vanillaTraits = {},
@@ -95,14 +107,22 @@ local normal = { id = "normal", recruited = true, vanillaTraits = {},
     vanillaTraitsAuthored = true }
 PNC.IndividualNeeds.Ensure(highThirst)
 PNC.IndividualNeeds.Ensure(normal)
-assertEqual(PNC.IndividualNeeds.GetRates(highThirst).hydration,
-    PNC.IndividualNeeds.GetRates(normal).hydration * 2,
+assertNear(PNC.IndividualNeeds.GetRates(normal).hunger, 0.0216, 0.000001,
+    "owned hunger uses colony pacing")
+assertNear(PNC.IndividualNeeds.GetRates(normal).thirst, 0.01728, 0.000001,
+    "owned thirst uses colony pacing")
+assertNear(PNC.IndividualNeeds.GetRates(normal).fatigue, 0.0268272, 0.000001,
+    "owned fatigue uses colony pacing")
+assertTrue(0.25 / PNC.IndividualNeeds.GetRates(normal).hunger > 11.5,
+    "idle food threshold is not reached within a few game hours")
+assertEqual(PNC.IndividualNeeds.GetRates(highThirst).thirst,
+    PNC.IndividualNeeds.GetRates(normal).thirst * 2,
     "High Thirst vanilla multiplier")
 local lowThirst = { id = "low_thirst", recruited = true,
     vanillaTraits = { "Base.LowThirst" } }
 PNC.IndividualNeeds.Ensure(lowThirst)
-assertEqual(PNC.IndividualNeeds.GetRates(lowThirst).hydration,
-    PNC.IndividualNeeds.GetRates(normal).hydration * 0.5,
+assertEqual(PNC.IndividualNeeds.GetRates(lowThirst).thirst,
+    PNC.IndividualNeeds.GetRates(normal).thirst * 0.5,
     "Low Thirst vanilla multiplier and namespaced trait normalization")
 local hearty = { id = "hearty", recruited = true,
     vanillaTraits = { heartyappetite = true } }
@@ -138,28 +158,27 @@ PNC.Health = {
     end,
 }
 PNC.IndividualNeeds.Ensure(starving, {
-    hunger = 0.71, hydration = 0.85, fatigue = 1,
+    hunger = 0.90, thirst = 0.90, fatigue = 1,
 })
 PNC.IndividualNeeds.Update(starving, 1, "test_emergency_damage")
 local expectedDamage = PNC.NeedHealthConsequences.DAMAGE_PER_WORLD_HOUR.hunger
-    + PNC.NeedHealthConsequences.DAMAGE_PER_WORLD_HOUR.hydration
+    + PNC.NeedHealthConsequences.DAMAGE_PER_WORLD_HOUR.thirst
 assertNear(starving.health.current, 100 - expectedDamage, 0.000001,
     "vanilla emergency hunger and thirst health damage")
 local exhausted = { id = "exhausted", recruited = true, alive = true,
     vanillaTraits = {}, vanillaTraitsAuthored = true,
     health = { current = 100, max = 100, state = "normal" } }
 PNC.IndividualNeeds.Ensure(exhausted, {
-    hunger = 0, hydration = 0, fatigue = 1,
+    hunger = 0, thirst = 0, fatigue = 1,
 })
 PNC.IndividualNeeds.Update(exhausted, 1, "test_fatigue_no_damage")
 assertEqual(exhausted.health.current, 100,
     "vanilla fatigue does not directly damage health")
-local migrated = PNC.NeedsUtils.NormalizeState({
-    version = 1, hunger = 25, hydration = 80, fatigue = 100,
+local canonical = PNC.NeedsUtils.NormalizeState({
+    version = 1, hunger = 0.25, thirst = 0.80, fatigue = 1,
 }, age)
-assertEqual(migrated.hunger, 0.75, "legacy hunger reserve migration")
-assertTrue(math.abs(migrated.hydration - 0.20) < 0.000001,
-    "legacy hydration reserve migration")
+assertEqual(canonical.hunger, 0.25, "canonical pressure is not migrated")
+assertEqual(canonical.thirst, 0.80, "canonical thirst pressure")
 PNC.Registry.Data[npc.id] = npc
 local colonySnapshot = PNC.ColonyManagement.BuildSnapshot({})
 assertEqual(#colonySnapshot.people, 1, "colony companion summary")

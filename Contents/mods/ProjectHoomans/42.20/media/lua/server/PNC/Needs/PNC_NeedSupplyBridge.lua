@@ -65,12 +65,12 @@ function Bridge.Evaluate(record, forceKind)
         end
     end
     if not forceKind or forceKind == "HYDRATION" then
-        local current = PNC.IndividualNeeds.Get(record, "hydration")
+        local current = PNC.IndividualNeeds.Get(record, "thirst")
         if forceKind == "HYDRATION"
-            or current >= Definitions.SUPPLY.hydration.trigger
+            or current >= Definitions.SUPPLY.thirst.trigger
         then
             local ok = Bridge.RequestForNeed(
-                record, "hydration", forceKind == "HYDRATION"
+                record, "thirst", forceKind == "HYDRATION"
             )
             changed = ok or changed
         end

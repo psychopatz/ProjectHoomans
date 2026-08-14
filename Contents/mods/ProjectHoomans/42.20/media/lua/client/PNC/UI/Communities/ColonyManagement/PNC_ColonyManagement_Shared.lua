@@ -1,17 +1,21 @@
 local Shared = {}
 
-Shared.NEED_TYPES = { "hunger", "hydration", "fatigue" }
-Shared.LEVELS = { "GOOD", "STABLE", "LOW", "CRITICAL", "EMERGENCY" }
+Shared.NEED_TYPES = { "hunger", "thirst", "fatigue" }
+Shared.LEVELS = { "NORMAL", "MINOR", "MODERATE", "SEVERE", "CRITICAL" }
 Shared.LEVEL_COLORS = {
     GOOD = "success",
     STABLE = "accent",
     LOW = "warning",
-    CRITICAL = "danger",
     EMERGENCY = "danger",
+    NORMAL = "success",
+    MINOR = "accent",
+    MODERATE = "warning",
+    SEVERE = "danger",
+    CRITICAL = "danger",
 }
 Shared.NEED_LABEL_KEYS = {
     hunger = "UI_PNC_Need_Hunger",
-    hydration = "UI_PNC_Need_Hydration",
+    thirst = "UI_PNC_Need_Thirst",
     fatigue = "UI_PNC_Need_Fatigue",
 }
 Shared.CONDITION_LABEL_KEYS = {
@@ -59,7 +63,7 @@ Shared.NEED_METER_THRESHOLDS = {
         { maximum = 0.45, color = "warning" },
         { maximum = 1.00, color = "danger" },
     },
-    hydration = {
+    thirst = {
         { maximum = 0.12, color = "success" },
         { maximum = 0.25, color = "accent" },
         { maximum = 0.70, color = "warning" },
@@ -104,7 +108,7 @@ function Shared.NeedLevel(needType, value)
     if PNC.NeedsDefinitions and PNC.NeedsDefinitions.GetLevel then
         return PNC.NeedsDefinitions.GetLevel(needType, tonumber(value) or 0)
     end
-    return "STABLE"
+    return "NORMAL"
 end
 
 function Shared.NeedMeterColor(value, _, spec)

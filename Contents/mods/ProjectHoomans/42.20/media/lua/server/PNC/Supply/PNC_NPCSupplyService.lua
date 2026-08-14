@@ -70,7 +70,7 @@ end
 local function retryHours(request)
     local definition = PNC.NeedsDefinitions.SUPPLY[
         request.resourceKind == "FOOD" and "hunger"
-            or request.resourceKind == "HYDRATION" and "hydration"
+            or request.resourceKind == "HYDRATION" and "thirst"
             or "medical"
     ]
     local severe = request.priority >= 90
@@ -184,14 +184,12 @@ end
 
 local function updateNeed(record, request, effect)
     if request.resourceKind == "FOOD" then
-        return PNC.IndividualNeeds.Modify(
-            record, "hunger", -effect.hunger, "consumed_food"
-        )
+        return PNC.IndividualNeeds.Commands.ApplyFood(
+            record, effect, "consumed_food")
     end
     if request.resourceKind == "HYDRATION" then
-        return PNC.IndividualNeeds.Modify(
-            record, "hydration", -effect.thirst, "consumed_hydration"
-        )
+        return PNC.IndividualNeeds.Commands.ApplyDrink(
+            record, effect, "consumed_hydration")
     end
     return nil
 end
@@ -321,7 +319,7 @@ function Service.Process(rawRequest, options)
             needAfter = request.resourceKind == "FOOD"
                 and PNC.IndividualNeeds.Get(record, "hunger")
                 or request.resourceKind == "HYDRATION"
-                    and PNC.IndividualNeeds.Get(record, "hydration") or nil,
+                    and PNC.IndividualNeeds.Get(record, "thirst") or nil,
         })
         return true, personalReason
     end
@@ -433,7 +431,7 @@ function Service.Process(rawRequest, options)
         needAfter = request.resourceKind == "FOOD"
             and PNC.IndividualNeeds.Get(record, "hunger")
             or request.resourceKind == "HYDRATION"
-                and PNC.IndividualNeeds.Get(record, "hydration") or nil,
+                and PNC.IndividualNeeds.Get(record, "thirst") or nil,
     })
     return true, state.lastResult, acquireDetails
 end

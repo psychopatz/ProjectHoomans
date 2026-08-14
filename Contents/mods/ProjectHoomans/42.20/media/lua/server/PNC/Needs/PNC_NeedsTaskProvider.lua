@@ -109,7 +109,7 @@ end
 PNC.Tasking.Commands.RegisterProvider("Needs", Provider)
 
 if PNC.IndividualNeeds and PNC.IndividualNeeds.RegisterListener then
-    PNC.IndividualNeeds.RegisterListener("level_changed",
+    PNC.IndividualNeeds.RegisterListener("severity_changed",
         function(record, needType)
             if needType == "fatigue" then
                 PNC.Tasking.Commands.MarkDirty(record.id,

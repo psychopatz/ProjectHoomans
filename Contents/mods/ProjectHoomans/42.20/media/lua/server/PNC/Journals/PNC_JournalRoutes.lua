@@ -81,6 +81,24 @@ local function onDrinkConsumed(record, fullType, restored)
         tostring(fullType or ""), tonumber(restored) or 0)
 end
 
+local function onNeedSeverityChanged(record, needType, oldLevel, newLevel,
+        reason)
+    appendNPC(EventTypes.NPC_NEED_SEVERITY_CHANGED, record,
+        tostring(needType), tostring(oldLevel), tostring(newLevel),
+        tostring(reason or ""))
+end
+
+local function onCriticalNeedDamage(record, amount, mortality)
+    appendNPC(EventTypes.NPC_NEED_CRITICAL_DAMAGE, record,
+        tonumber(amount) or 0, mortality == true)
+end
+
+local function onWeightCategoryChanged(record, oldCategory, newCategory,
+        weight)
+    appendNPC(EventTypes.NPC_WEIGHT_CATEGORY_CHANGED, record,
+        tostring(oldCategory), tostring(newCategory), tonumber(weight) or 0)
+end
+
 local function onSkillLevelUp(record, skillID, level)
     appendNPC(EventTypes.NPC_SKILL_LEVEL_UP, record,
         tostring(skillID or ""), math.floor(tonumber(level) or 0))
@@ -106,6 +124,12 @@ Events.subscribe(EventTypes.STORAGE_ITEM_WITHDRAWN, onStorageWithdrawn,
 Events.subscribe(EventTypes.NPC_FOOD_CONSUMED, onFoodConsumed,
     "projecthoomans.journals")
 Events.subscribe(EventTypes.NPC_DRINK_CONSUMED, onDrinkConsumed,
+    "projecthoomans.journals")
+Events.subscribe(EventTypes.NPC_NEED_SEVERITY_CHANGED, onNeedSeverityChanged,
+    "projecthoomans.journals")
+Events.subscribe(EventTypes.NPC_NEED_CRITICAL_DAMAGE, onCriticalNeedDamage,
+    "projecthoomans.journals")
+Events.subscribe(EventTypes.NPC_WEIGHT_CATEGORY_CHANGED, onWeightCategoryChanged,
     "projecthoomans.journals")
 Events.subscribe(EventTypes.NPC_SKILL_LEVEL_UP, onSkillLevelUp,
     "projecthoomans.journals")

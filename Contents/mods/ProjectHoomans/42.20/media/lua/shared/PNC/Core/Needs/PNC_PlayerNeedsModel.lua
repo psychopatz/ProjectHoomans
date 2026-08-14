@@ -234,8 +234,8 @@ function Model.HasTrait(record, id)
     return traits[id] == true
 end
 
-function Model.AppetiteMultiplier(record, hunger)
-    local value = math.max(0, 1 - (tonumber(hunger) or 0))
+function Model.AppetiteMultiplier(record)
+    local value = 1
     if Model.HasTrait(record, Model.TRAITS.HEARTY_APPETITE) then
         value = value * 1.5
     end
@@ -243,6 +243,31 @@ function Model.AppetiteMultiplier(record, hunger)
         value = value * 0.75
     end
     return value
+end
+
+function Model.GetRateModifiers(record)
+    local calorieBurnRate = 1
+    if Model.HasTrait(record, Model.TRAITS.OBESE) then calorieBurnRate = 1.10
+    elseif Model.HasTrait(record, Model.TRAITS.OVERWEIGHT) then calorieBurnRate = 1.05
+    elseif Model.HasTrait(record, Model.TRAITS.EMACIATED) then calorieBurnRate = 0.85
+    elseif Model.HasTrait(record, Model.TRAITS.VERY_UNDERWEIGHT) then calorieBurnRate = 0.90
+    elseif Model.HasTrait(record, Model.TRAITS.UNDERWEIGHT) then calorieBurnRate = 0.95 end
+    return {
+        hungerRate = Model.AppetiteMultiplier(record),
+        thirstRate = Model.ThirstMultiplier(record),
+        fatigueRate = Model.FatigueGainMultiplier(record),
+        calorieBurnRate = calorieBurnRate,
+    }
+end
+
+function Model.GetInitialWeight(record)
+    local traits = Model.GetTraits(record)
+    if traits[Model.TRAITS.OBESE] then return 110 end
+    if traits[Model.TRAITS.OVERWEIGHT] then return 95 end
+    if traits[Model.TRAITS.EMACIATED] then return 50 end
+    if traits[Model.TRAITS.VERY_UNDERWEIGHT] then return 60 end
+    if traits[Model.TRAITS.UNDERWEIGHT] then return 70 end
+    return Definitions.NUTRITION.defaultWeight
 end
 
 function Model.ThirstMultiplier(record)
@@ -287,27 +312,36 @@ function Model.GetRates(record, state, activity)
         or activity == "running" and base.hungerRunning
         or activity == "fighting" and base.hungerFighting
         or base.hunger
-    local hunger = hungerBase * Model.AppetiteMultiplier(record, state.hunger)
-    local hydration = base.hydration * Model.ThirstMultiplier(record)
-    if activity == "running" then hydration = hydration * 1.2 end
+    local modifiers = Model.GetRateModifiers(record)
+    local hunger = hungerBase * modifiers.hungerRate
+    local thirst = base.thirst * modifiers.thirstRate
+    if activity == "running" then thirst = thirst * 1.2 end
     local fatigue
     if activity == "sleeping" then
         local high = (tonumber(state.fatigue) or 0) > 0.3
         fatigue = -(high and 0.0875 or 0.0268)
             * Model.SleepRecoveryMultiplier(record)
     else
-        fatigue = base.fatigue * Model.FatigueGainMultiplier(record)
+        fatigue = base.fatigue * modifiers.fatigueRate
             * fatigueActivity(activity)
     end
     if PNC.ConditionStats and PNC.ConditionStats.GetNeedRateMultiplier then
         hunger = hunger * PNC.ConditionStats.GetNeedRateMultiplier(
             record, "hunger", state, activity)
-        hydration = hydration * PNC.ConditionStats.GetNeedRateMultiplier(
-            record, "hydration", state, activity)
+        thirst = thirst * PNC.ConditionStats.GetNeedRateMultiplier(
+            record, "thirst", state, activity)
         fatigue = fatigue * PNC.ConditionStats.GetNeedRateMultiplier(
             record, "fatigue", state, activity)
     end
-    return { hunger = hunger, hydration = hydration, fatigue = fatigue }
+    local scale = Definitions.INDIVIDUAL_RATE_SCALE
+    hunger = hunger * scale.hunger
+    thirst = thirst * scale.thirst
+    -- Do not weaken sleep recovery; only slow awake fatigue accumulation.
+    if fatigue > 0 then fatigue = fatigue * scale.fatigue end
+    return { hunger = hunger, thirst = thirst, fatigue = fatigue,
+        calorieBurnRate = Definitions.NUTRITION.calorieBurnPerHour
+            * modifiers.calorieBurnRate,
+        modifiers = modifiers }
 end
 
 return Model

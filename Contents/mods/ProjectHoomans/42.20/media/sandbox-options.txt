@@ -1,5 +1,13 @@
 VERSION = 1,
 
+option ProjectHoomans.PlayerOwnedNPCNeedMortality
+{
+    type = boolean,
+    default = false,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.PlayerOwnedNPCNeedMortality,
+}
+
 option ProjectHoomans.NPCPopulation
 {
     type = enum,

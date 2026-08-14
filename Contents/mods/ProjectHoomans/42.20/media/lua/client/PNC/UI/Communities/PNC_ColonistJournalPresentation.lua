@@ -53,8 +53,17 @@ function Presentation.Row(entry)
             itemName(entry[3]), percent(entry[4]))
     elseif eventType == EventTypes.NPC_DRINK_CONSUMED then
         message = text("UI_PNC_Journal_DrinkConsumed",
-            "Drank %s (+%s%% hydration)", itemName(entry[3]),
+            "Drank %s (+%s%% thirst relief)", itemName(entry[3]),
             percent(entry[4]))
+    elseif eventType == EventTypes.NPC_NEED_SEVERITY_CHANGED then
+        message = string.format("%s changed from %s to %s",
+            humanize(entry[3]), humanize(entry[4]), humanize(entry[5]))
+    elseif eventType == EventTypes.NPC_NEED_CRITICAL_DAMAGE then
+        message = entry[4] == true and "Critical needs began causing lethal damage"
+            or "Critical needs reached the nonlethal health floor"
+    elseif eventType == EventTypes.NPC_WEIGHT_CATEGORY_CHANGED then
+        message = string.format("Weight changed from %s to %s (%.1f kg)",
+            humanize(entry[3]), humanize(entry[4]), tonumber(entry[5]) or 0)
     elseif eventType == EventTypes.NPC_SKILL_LEVEL_UP then
         message = text("UI_PNC_Journal_SkillLevelUp", "Reached %s level %s",
             humanize(entry[3]), tostring(math.floor(tonumber(entry[4]) or 0)))

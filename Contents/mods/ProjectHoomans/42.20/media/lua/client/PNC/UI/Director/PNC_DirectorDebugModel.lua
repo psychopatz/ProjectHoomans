@@ -241,7 +241,7 @@ function Model.DetailRows(snapshot, group, location, sector, authorized, reason)
             group.stateStartedAt or 0, group.stateEndsAt or 0))
         local needs = group.needs or {}
         rows[#rows + 1] = row("Needs H/W/R", string.format("%.1f / %.1f / %.1f",
-            needs.hunger or 0, needs.hydration or 0, needs.fatigue or 0))
+            needs.hunger or 0, needs.thirst or 0, needs.fatigue or 0))
         local shortages = group.resourceNeeds or {}
         rows[#rows + 1] = row("Shortage F/W/A/Med/Mat", string.format(
             "%.2f / %.2f / %.2f / %.2f / %.2f", shortages.food or 0,

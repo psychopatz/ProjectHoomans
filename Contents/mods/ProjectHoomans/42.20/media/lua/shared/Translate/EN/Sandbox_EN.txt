@@ -1,5 +1,9 @@
 Sandbox_EN = {
     Sandbox_ProjectHoomans = "Project Hoomans",
+    ["Sandbox_ProjectHoomans.PlayerOwnedNPCNeedMortality"] = "Player-Owned NPC Need Mortality",
+    ["Sandbox_ProjectHoomans.PlayerOwnedNPCNeedMortality_tooltip"] = "When enabled, prolonged critical hunger or thirst can eventually kill player-owned NPCs. Disabled by default; needs remain active but cannot reduce health below a safe floor.",
+    Sandbox_ProjectHoomans_PlayerOwnedNPCNeedMortality = "Player-Owned NPC Need Mortality",
+    Sandbox_ProjectHoomans_PlayerOwnedNPCNeedMortality_tooltip = "When enabled, prolonged critical hunger or thirst can eventually kill player-owned NPCs. Disabled by default; needs remain active but cannot reduce health below a safe floor.",
     ["Sandbox_ProjectHoomans.NPCPopulation"] = "NPC Population",
     ["Sandbox_ProjectHoomans.NPCPopulation_tooltip"] = "Controls automatic survivor population targets. Lowering this never deletes existing persistent survivors.",
     ["Sandbox_ProjectHoomans.NPCPopulation_option1"] = "Disabled",

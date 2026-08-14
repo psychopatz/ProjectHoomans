@@ -12,7 +12,7 @@ local function drawRosterRow(list, y, entry, alternate)
     UI.DrawListSelection(
         list, y, list.itemheight, list.selected == entry.index, alternate
     )
-    local level = person.worstLevel or "STABLE"
+    local level = person.worstLevel or "NORMAL"
     local badgeWidth = UI.DrawBadge(list, level, list:getWidth() - 7,
         y + 7, Shared.LEVEL_COLORS[level])
     local available = math.max(40, list:getWidth() - badgeWidth - 24)

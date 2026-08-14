@@ -4,7 +4,7 @@ The NPC supply slice is server-authoritative and keeps the permanent invariant:
 
 `colony storage -> NPC inventory -> item use -> need/condition change`
 
-`PNC_NeedSupplyBridge` converts hunger and hydration thresholds into semantic
+`PNC_NeedSupplyBridge` converts hunger and thirst thresholds into semantic
 requests. The existing self-treatment behavior emits a `MEDICAL/BANDAGE`
 request only when it has a real treatable wound and no carried bandage.
 Requests are runtime-only while fulfillment is instant.
@@ -75,7 +75,7 @@ records `inventoryPromotionReason = delta_unrepresentable:<reason>`.
 
 ## Scheduling, retry, and diagnostics
 
-Food and hydration evaluation runs in the existing 30-second Needs scheduler.
+Food and water evaluation runs in the bounded 30-second Needs scheduler.
 Stable NPCs perform no storage query. Trigger and target values live in
 `PNC_NeedsDefinitions.SUPPLY`. Failed attempts store one retry deadline per
 resource kind; urgent priorities retry sooner without creating timer objects.

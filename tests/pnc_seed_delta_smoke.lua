@@ -558,7 +558,10 @@ getGameTime = function()
     return { getWorldAgeHours = function() return 100 end }
 end
 dofile(SHARED_ROOT .. "PNC/Core/Needs/PNC_NeedsDefinitions.lua")
+dofile(SHARED_ROOT .. "PNC/Core/Needs/PNC_NeedsStateCodec.lua")
+dofile(SHARED_ROOT .. "PNC/Core/Needs/PNC_PlayerNeedsModel.lua")
 dofile(SHARED_ROOT .. "PNC/Core/Needs/PNC_NeedsUtils.lua")
+dofile(SERVER_ROOT .. "PNC/Needs/PNC_NeedsRepository.lua")
 dofile(SERVER_ROOT .. "PNC/PNC_IndividualNeeds.lua")
 require "PNC/Supply/PNC_SupplyRequest"
 require "PNC/Supply/PNC_SupplyMetrics"
@@ -656,7 +659,7 @@ local function supplyNPC(id, options)
     supplyCommunity.memberIDs[id] = true
     PNC.IndividualNeeds.Ensure(value, {
         hunger = options.hunger or 0.30,
-        hydration = options.hydration or 0.30,
+        thirst = options.thirst or 0.30,
         fatigue = 0,
     })
     return value
@@ -793,7 +796,7 @@ for _, compact in pairs(waterNPC.inventory.items) do
 end
 assert(retainedWater and math.abs((retainedWater.uses or 0) - 0.75) < 0.001,
     "hydration remaining-use state was not retained")
-assert(PNC.IndividualNeeds.Get(waterNPC, "hydration") < 0.30,
+assert(PNC.IndividualNeeds.Get(waterNPC, "thirst") < 0.30,
     "hydration use did not change need")
 
 -- Medical acquisition precedes the existing treatment use path.
@@ -1112,7 +1115,7 @@ assert(evaluatedDelta <= PNC.NeedsDefinitions.SUPPLY_MAX_CANDIDATES,
 
 -- Stable Needs evaluation performs zero stockpile queries.
 local stableNPC = supplyNPC("supply_stable", {
-    emptyBaseline = true, hunger = 0.10, hydration = 0.10,
+    emptyBaseline = true, hunger = 0.10, thirst = 0.10,
 })
 local stableQueries = PNC.SupplyMetrics.candidateQueries
 PNC.NeedSupplyBridge.Evaluate(stableNPC)

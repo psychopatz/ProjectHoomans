@@ -13,7 +13,7 @@ local Layout = UI.Layout
 local ACTIONS = {
     { id = "hunger", key = "UI_PNC_ColonyDebug_AddHunger",
         fallback = "INCREASE HUNGER +25%" },
-    { id = "hydration", key = "UI_PNC_ColonyDebug_AddThirst",
+    { id = "thirst", key = "UI_PNC_ColonyDebug_AddThirst",
         fallback = "INCREASE THIRST +25%" },
     { id = "fatigue", key = "UI_PNC_ColonyDebug_AddFatigue",
         fallback = "INCREASE FATIGUE +25%" },
@@ -235,7 +235,7 @@ function DebugTab.OnControl(window, button)
     end
     local id = tostring(button and button.internal or "")
     local options = { npcID = person.id }
-    if id == "hunger" or id == "hydration" or id == "fatigue" then
+    if id == "hunger" or id == "thirst" or id == "fatigue" then
         options.operation = "modify"
         options.needType = id
         options.amount = 0.25

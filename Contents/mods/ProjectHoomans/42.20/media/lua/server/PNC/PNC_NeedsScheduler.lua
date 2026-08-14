@@ -9,6 +9,19 @@ local Utils = PNC.NeedsUtils
 
 Scheduler.LastPumpAt = Scheduler.LastPumpAt or nil
 Scheduler.Profile = Scheduler.Profile or { groupUpdates = 0, individualUpdates = 0, lastDurationMs = 0 }
+Scheduler.IndividualIDs = Scheduler.IndividualIDs or {}
+Scheduler.IndividualCursor = Scheduler.IndividualCursor or 1
+
+local function refreshIndividuals()
+    Scheduler.IndividualIDs = {}
+    for id, record in pairs(PNC.Registry and PNC.Registry.Data or {}) do
+        if record.alive ~= false and PNC.IndividualNeeds.IsEligible(record) then
+            Scheduler.IndividualIDs[#Scheduler.IndividualIDs + 1] = tostring(id)
+        end
+    end
+    table.sort(Scheduler.IndividualIDs)
+    Scheduler.IndividualCursor = 1
+end
 
 function Scheduler.Pump(now)
     now = tonumber(now) or (PNC.Core and PNC.Core.Now and PNC.Core.Now()) or 0
@@ -27,8 +40,18 @@ function Scheduler.Pump(now)
         end
     end
     if PNC.Registry and PNC.Registry.Data and PNC.IndividualNeeds then
-        for _, record in pairs(PNC.Registry.Data) do
-            if record.alive ~= false and PNC.IndividualNeeds.IsEligible(record) then
+        if Scheduler.IndividualCursor > #Scheduler.IndividualIDs then
+            refreshIndividuals()
+        end
+        local processed = 0
+        while processed < Definitions.SCHEDULER_BATCH_SIZE
+            and Scheduler.IndividualCursor <= #Scheduler.IndividualIDs do
+            local id = Scheduler.IndividualIDs[Scheduler.IndividualCursor]
+            Scheduler.IndividualCursor = Scheduler.IndividualCursor + 1
+            processed = processed + 1
+            local record = PNC.Registry.Data[id]
+            if record and record.alive ~= false
+                and PNC.IndividualNeeds.IsEligible(record) then
                 PNC.IndividualNeeds.UpdateToNow(record, "passive_decay")
                 if PNC.ConditionStats then
                     local at = Utils.WorldAgeHours()

@@ -268,6 +268,7 @@ function SupplyInventory.Consume(record, itemID, request)
     local effect = {
         hunger = descriptor.hunger,
         thirst = descriptor.thirst,
+        calories = descriptor.calories,
         fullType = descriptor.fullType,
         typeId = descriptor.typeId,
         remainingUses = remainingUses,

@@ -94,7 +94,7 @@ function Scavenge.Apply(group, location, action)
     location.scavengedLevel = result.scavengedAfter
     location.revision = (tonumber(location.revision) or 0) + 1
     if group.factionId and PNC.GroupNeeds and PNC.GroupNeeds.Restore then
-        for category, needType in pairs({ food = "hunger", water = "hydration" }) do
+        for category, needType in pairs({ food = "hunger", water = "thirst" }) do
             local scale = Config.Scavenging.NEED_RESTORE_PER_RESOURCE[category] or 0
             PNC.GroupNeeds.Restore(group.factionId, needType,
                 (result.yields[category] or 0) * scale, "abstract_scavenge")

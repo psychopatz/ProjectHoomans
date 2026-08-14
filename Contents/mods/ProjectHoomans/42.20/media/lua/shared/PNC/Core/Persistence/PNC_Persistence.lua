@@ -778,10 +778,6 @@ function Persistence.SerializeRecord(record)
         mapPresentation = PNC.MapPresentation
             and PNC.MapPresentation.BuildSummary(record.mapPresentation)
             or nil,
-        needs = PNC.NeedsUtils and PNC.NeedsUtils.NormalizeState
-            and type(record.needs) == "table"
-            and PNC.NeedsUtils.NormalizeState(record.needs, 0)
-            or nil,
         vanillaTraits = PNC.PlayerNeedsModel
             and PNC.PlayerNeedsModel.NormalizeTraits(record.vanillaTraits)
             or {},
@@ -973,11 +969,6 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     if PNC.ConditionStats and type(raw.conditionStats) == "table" then
         record.conditionStats = PNC.ConditionStats.NormalizeState(
             raw.conditionStats, 0)
-    end
-    if PNC.NeedsUtils and PNC.NeedsUtils.NormalizeState
-        and type(raw.needs) == "table"
-    then
-        record.needs = PNC.NeedsUtils.NormalizeState(raw.needs, 0)
     end
     record.corpse = sanitizeCorpse(raw.corpse, record)
     if record.alive == false and not record.corpse then

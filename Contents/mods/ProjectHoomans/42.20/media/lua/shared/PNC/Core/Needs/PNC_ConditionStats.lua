@@ -179,10 +179,10 @@ end
 function Stats.GetNeedRateMultiplier(record, needType, state, activity)
     local value = 1
     if Stats.HasTrait(record, Stats.TRAITS.HARDY)
-        and (needType == "hunger" or needType == "hydration")
+        and (needType == "hunger" or needType == "thirst")
     then value = value * 0.90 end
     if Stats.HasTrait(record, Stats.TRAITS.DELICATE)
-        and (needType == "hunger" or needType == "hydration")
+        and (needType == "hunger" or needType == "thirst")
     then value = value * 1.10 end
     if needType == "fatigue" then
         if Stats.HasTrait(record, Stats.TRAITS.SECOND_WIND)
@@ -226,10 +226,12 @@ function Stats.Ensure(record, at)
 end
 
 function Stats.GetRates(record, activity)
-    local needs = record.needs or {}
+    local repositoryState = PNC.NeedsRepository
+        and PNC.NeedsRepository.Get(record, false) or nil
+    local needs = repositoryState and repositoryState.needs or {}
     local condition = record.conditionStats or {}
     local pressure = math.max(tonumber(needs.hunger) or 0,
-        tonumber(needs.hydration) or 0, tonumber(needs.fatigue) or 0)
+        tonumber(needs.thirst) or 0, tonumber(needs.fatigue) or 0)
     local morale = tonumber(record.social and record.social.morale) or 0
     local stress = -0.02 + math.max(0, pressure - 0.35) * 0.10
         + math.max(0, -morale) / 100 * 0.04
