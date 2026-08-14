@@ -94,7 +94,10 @@ PNC = {
     },
     Network = { BroadcastRecord = function() end },
     SimulationClock = { Wake = function() end },
-    JobSystem = { OrderJobs = { production_work = "ProductionWork" } },
+    JobSystem = { OrderJobs = {
+        production_work = "ProductionWork",
+        colony_home = "AtHome",
+    } },
 }
 
 dofile(FILE)
@@ -146,6 +149,32 @@ PNC.FactionBehavior.ApplyNPC(working, "periodic_reconciliation")
 assert(working.orderSpec.kind == "production_work"
         and working.orderSpec.workOrderId == "work:42",
     "faction reconciliation interrupted a registered job order")
+
+local atHomeAfterRestart = copy(waiting)
+atHomeAfterRestart.id = "at_home_after_restart"
+atHomeAfterRestart.ownerOnlineID = nil
+atHomeAfterRestart.orderSpec = {
+    kind = "colony_home",
+    baseId = "base-1",
+    x = 15,
+    y = 16,
+    z = 0,
+    radius = 2,
+}
+atHomeAfterRestart.runtime = {}
+records.at_home_after_restart = atHomeAfterRestart
+
+-- Registry/faction loading runs before the player has a live runtime entry.
+-- The durable owner key must still protect the persisted At Home order.
+PNC.PlayerCharacters.RuntimeByUUID.character_alice = nil
+PNC.FactionBehavior.ApplyNPC(atHomeAfterRestart, "registry_load")
+assert(atHomeAfterRestart.orderSpec.kind == "colony_home",
+    "offline startup reconciliation replaced At Home with Follow")
+assert(atHomeAfterRestart.orderSpec.baseId == "base-1",
+    "offline startup reconciliation lost the remembered home base")
+assert(atHomeAfterRestart.ownerUsername == "alice",
+    "offline startup reconciliation lost the durable owner identity")
+PNC.PlayerCharacters.RuntimeByUUID.character_alice = player
 
 local joining = copy(waiting)
 joining.id = "joining"

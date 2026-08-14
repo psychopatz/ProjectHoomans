@@ -534,8 +534,12 @@ function Behavior.ApplyNPC(record, reason)
     if faction.ownerPlayerKey then
         parsed, livePlayer = ownerIdentity(faction)
         owner = {
-            username = livePlayer and parsed
-                and parsed.accountIdentity or nil,
+            -- The faction key is durable, while RuntimeByUUID is populated
+            -- only after the player joins.  Startup reconciliation must use
+            -- the persisted account identity or it will mistake every
+            -- offline-owned companion for an unbound recruit and replace
+            -- saved orders (including colony_home) with Follow.
+            username = parsed and parsed.accountIdentity or nil,
             onlineID = livePlayer
                 and livePlayer.getOnlineID
                 and livePlayer:getOnlineID() or nil,
