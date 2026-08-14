@@ -1,5 +1,15 @@
 # Project Hoomans Refactor
 
+## Tasking Foundation Addendum (2026-08-14)
+
+The first NPC Tasking boundary is documented in
+`PROJECT_HOOMANS_TASKING.md`. It adds semantic precedence, runtime task intents,
+providers, leases, safe preemption, bounded dirty reevaluation, live/abstract
+executors, and lightweight diagnostics. Sleep/Bed is the only migrated gameplay
+slice: Needs owns fatigue/rest effects, Facilities owns bed slots, and Tasking
+owns arbitration. Research, Crafting, Health/Treatment, and physical Hydration
+provider migrations remain explicitly deferred.
+
 ## Research and Production Addendum (2026-08-14)
 
 The Project Hoomans Research + Colony Production vertical slice is implemented

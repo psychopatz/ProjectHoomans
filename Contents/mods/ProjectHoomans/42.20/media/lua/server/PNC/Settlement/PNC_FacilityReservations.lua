@@ -39,6 +39,10 @@ function Reservations.Release(id, reason)
     end
     reservation.state = reason == "complete" and "COMPLETED" or "RELEASED"
     reservation.releaseReason = reason
+    if PNC.Tasking and PNC.Tasking.Commands
+        and PNC.Tasking.Commands.MarkDirty
+    then PNC.Tasking.Commands.MarkDirty(reservation.npcId,
+        "FACILITY_SLOT_RELEASED") end
     return true, reservation
 end
 
@@ -97,7 +101,14 @@ function Reservations.Complete(id) return Reservations.Release(id, "complete") e
 
 function Reservations.ReleaseComponent(componentId)
     local id = Reservations.ByComponent[tostring(componentId or "")]
-    return id and Reservations.Release(id, "component_removed") or false
+    local reservation = id and Reservations.ByID[id] or nil
+    local result, details = id and Reservations.Release(id, "component_removed")
+        or false, nil
+    if reservation and PNC.Tasking and PNC.Tasking.Commands then
+        PNC.Tasking.Commands.MarkDirty(reservation.npcId,
+            "FACILITY_COMPONENT_REMOVED")
+    end
+    return result, details
 end
 
 function Reservations.ReleaseNPC(npcId, reason)

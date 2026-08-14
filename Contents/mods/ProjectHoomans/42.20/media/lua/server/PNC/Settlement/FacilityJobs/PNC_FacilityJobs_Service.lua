@@ -5,8 +5,6 @@ PNC.FacilityJobs = PNC.FacilityJobs or {}
 
 local Jobs = PNC.FacilityJobs
 local Repository = PNC.SettlementRepository
-local AUTO_FATIGUE_THRESHOLD = 0.68
-local AUTO_SCAN_MS = 5000
 
 local function definitionCapability(facility)
     local level = facility and PNC.FacilityDefinitions.GetLevel(
@@ -51,8 +49,9 @@ function Jobs.Start(record, facilityOrId, capability, options)
     if record.runtime and record.runtime.facilityActivity then
         Jobs.Stop(record, "activity_replaced")
     end
-    local acquired = PNC.FacilityService.AcquireActivity(
-        base.id, record.id, capability, { ttlMs = 30000 })
+    local acquired = options.acquired or PNC.FacilityService.AcquireActivity(
+        base.id, record.id, capability, { ttlMs = 30000,
+            abstract = options.abstract == true })
     if not acquired.ok or not acquired.target then
         return false, acquired.reason or "FACILITY_HAS_NO_WORK_TARGET"
     end
@@ -75,6 +74,8 @@ function Jobs.Start(record, facilityOrId, capability, options)
         previousOrder = previousOrder,
         debugHold = options.debugHold == true,
         automatic = options.automatic == true,
+        taskLeaseId = tostring(options.taskLeaseId or ""),
+        abstract = options.abstract == true,
     }
     if options.debugHold == true then
         record.runtime.facilityDebugWork = record.runtime.facilityActivity
@@ -94,6 +95,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
         interactionFacing = target.interactionFacing,
         sceneId = sceneId,
         sleepSurface = target.sleepSurface,
+        taskLeaseId = tostring(options.taskLeaseId or ""),
         debugHold = options.debugHold == true,
     })
     return true, "facility_activity_started", {
@@ -108,46 +110,5 @@ function Jobs.StartForFacility(record, facilityId, options)
     local facility = Repository.GetFacility(facilityId)
     return Jobs.Start(record, facility, definitionCapability(facility), options)
 end
-
-local function eligibleForAutomaticSleep(record)
-    local order = record and record.orderSpec or {}
-    local kind = tostring(order.kind or "")
-    return record and record.alive ~= false
-        and tostring(record.presenceState or PNC.Const.PRESENCE_LIVE)
-            == tostring(PNC.Const.PRESENCE_LIVE)
-        and (not record.runtime or not record.runtime.facilityActivity)
-        and (kind == "" or kind == tostring(PNC.Const.ORDER_GUARD))
-        and PNC.CompanionCommands.IsCompanion(record)
-end
-
-function Jobs.ScanAutomatic()
-    if not PNC.IndividualNeeds then return 0 end
-    local started = 0
-    PNC.Registry.ForEach(function(record)
-        if not eligibleForAutomaticSleep(record) then return end
-        local fatigue = tonumber(PNC.IndividualNeeds.Get(record, "fatigue")) or 0
-        if fatigue < AUTO_FATIGUE_THRESHOLD then return end
-        local base = baseForRecord(record)
-        local facilities = base and PNC.FacilityService.ListByCapability(
-            base.id, "sleep") or {}
-        local index
-        for index = 1, #facilities do
-            local ok = Jobs.Start(record, facilities[index], "sleep", {
-                automatic = true,
-            })
-            if ok then started = started + 1; return end
-        end
-    end)
-    return started
-end
-
-local function onTick()
-    local now = PNC.Core.Now()
-    if now < (tonumber(Jobs.NextAutomaticScanAt) or 0) then return end
-    Jobs.NextAutomaticScanAt = now + AUTO_SCAN_MS
-    Jobs.ScanAutomatic()
-end
-
-if Events and Events.OnTick then Events.OnTick.Add(onTick) end
 
 return Jobs

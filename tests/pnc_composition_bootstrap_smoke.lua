@@ -98,6 +98,10 @@ assertEqual(serverCalls[factionCoreIndex + 1], "PNC/PNC_CommunityService",
 local settlementIndex = indexOf(serverCalls, "PNC/Settlement/PNC_Settlement")
 assertEqual(serverCalls[settlementIndex - 1], "PNC/PNC_CommunityService",
     "server Settlement initialization predecessor")
+local facilityJobsIndex = indexOf(serverCalls,
+    "PNC/Settlement/FacilityJobs/PNC_FacilityJobs_Service")
+assertEqual(serverCalls[facilityJobsIndex + 1], "PNC/Tasking/PNC_Tasking",
+    "Tasking loads after its Needs and Facility Jobs dependencies")
 assertEqual(serverCalls[settlementIndex + 1], "PNC/Journals/PNC_JournalRoutes",
     "server Settlement initialization successor")
 local directorIndex = indexOf(serverCalls, "PNC/Director/PNC_Director")

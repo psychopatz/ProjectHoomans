@@ -46,12 +46,17 @@ end
 Facility.AreaRole = areaRole
 
 local function areaOptions(window, facility, existing, onConfirm)
+    local isDraft = not facility or facility.id == nil
     local role = areaRole(facility)
+    -- Construction always selects an abstract footprint. Anchor-only
+    -- facilities (research, utilities, and future workstation buildings) do
+    -- not declare a functional region role, so their draft still needs this
+    -- selector role.
+    if not role and isDraft then role = "facility.footprint" end
     if not role then return nil end
     local level = PNC.FacilityDefinitions.GetLevel(
         facility.definitionId, facility.level or 1)
     local limit = level and level.componentLimits[role] or {}
-    local isDraft = not facility or facility.id == nil
     local boundary = isDraft and Support.BaseRegion(window)
         or Support.FacilityRegion(facility)
     return {

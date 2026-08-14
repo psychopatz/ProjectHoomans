@@ -28,6 +28,7 @@ local function normalize(_, spec)
         interactionFacing = tostring(spec.interactionFacing or ""),
         sceneId = tostring(spec.sceneId or ""),
         sleepSurface = tostring(spec.sleepSurface or ""),
+        taskLeaseId = tostring(spec.taskLeaseId or ""),
         debugHold = spec.debugHold == true,
     }
 end
@@ -54,7 +55,9 @@ local function finish(record, zombie, reason)
     if not runtime or runtime.finishing == true then return false end
     runtime.finishing = true
     restorePosition(record, zombie, runtime)
-    if PNC.FacilityReservations and runtime.reservationId ~= "" then
+    if PNC.FacilityReservations and runtime.reservationId ~= ""
+        and runtime.taskLeaseId == ""
+    then
         PNC.FacilityReservations.Release(
             runtime.reservationId,
             reason == "rested" and "complete" or tostring(reason or "stopped"))
@@ -95,22 +98,35 @@ function Jobs.OnSceneTick(record, zombie, scene, now)
         PNC.FacilityReservations.Start(runtime.reservationId, 30000)
         runtime.nextReservationRenewAt = now + 10000
     end
+    if runtime.taskLeaseId ~= "" and PNC.Tasking
+        and PNC.Tasking.Commands and PNC.Tasking.Commands.SetPhase
+    then PNC.Tasking.Commands.SetPhase(record.id, "WORKING") end
     if definition.needType and PNC.IndividualNeeds and PNC.NeedsUtils then
         local worldNow = PNC.NeedsUtils.WorldAgeHours()
         local previous = tonumber(runtime.lastEffectWorldHour) or worldNow
         local elapsed = math.max(0, math.min(0.25, worldNow - previous))
         runtime.lastEffectWorldHour = worldNow
         if elapsed > 0 then
-            local value = PNC.IndividualNeeds.Modify(
-                record,
-                definition.needType,
-                -(tonumber(definition.recoveryPerGameHour) or 0) * elapsed,
-                "facility_" .. tostring(runtime.capability)
-            )
+            local ok, effectReason, value
+            if runtime.taskLeaseId ~= ""
+                and definition.needType == "fatigue"
+                and PNC.IndividualNeeds.Commands
+                and PNC.IndividualNeeds.Commands.ApplyRest
+            then
+                ok, effectReason, value = PNC.IndividualNeeds.Commands.ApplyRest(
+                    record, elapsed, "live_sleep_task")
+            else
+                value = PNC.IndividualNeeds.Modify(record,
+                    definition.needType,
+                    -(tonumber(definition.recoveryPerGameHour) or 0) * elapsed,
+                    "facility_" .. tostring(runtime.capability))
+                ok = value ~= nil
+            end
             runtime.effectValue = value
             if runtime.debugHold ~= true
-                and value ~= nil
-                and value <= (tonumber(definition.completionThreshold) or 0)
+                and ok and (effectReason == "REST_COMPLETE"
+                    or value ~= nil and value <= (tonumber(
+                        definition.completionThreshold) or 0))
             then
                 runtime.completionRequested = true
                 return false
@@ -127,7 +143,11 @@ function Jobs.OnSceneStopped(record, zombie, scene, reason)
     runtime.arrivalSettled = false
     if runtime.stopRequested == true then return end
     if runtime.completionRequested == true or reason == "callback_complete" then
+        local leaseId = runtime.taskLeaseId
         finish(record, zombie, "rested")
+        if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands then
+            PNC.Tasking.Commands.Complete(leaseId, "REST_COMPLETE")
+        end
         return
     end
     runtime.phase = "INTERRUPTED"
@@ -154,6 +174,9 @@ function Jobs.Tick(record, zombie)
         or math.abs((tonumber(record.z) or 0) - order.z) >= 0.5
     then
         runtime.phase = "TRAVELLING"
+        if runtime.taskLeaseId ~= "" and PNC.Tasking
+            and PNC.Tasking.Commands
+        then PNC.Tasking.Commands.SetPhase(record.id, "TRAVEL") end
         PNC.BehaviorCommon.ClearCombatTarget(record, "facility_travel", zombie)
         PNC.BehaviorCommon.MoveRecord(record, zombie, order.x, order.y, order.z,
             "walk", 0.7, "facility_activity")

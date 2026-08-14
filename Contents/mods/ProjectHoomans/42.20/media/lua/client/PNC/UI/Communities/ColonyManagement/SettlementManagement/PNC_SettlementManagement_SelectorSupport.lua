@@ -74,6 +74,9 @@ function Support.ApplyLocalResult(window)
 end
 
 function Support.OpenSelector(window, options)
+    if type(options) ~= "table" then
+        return false, "INVALID_SELECTOR_OPTIONS"
+    end
     options.ownerWindow = window
     options.player = getSpecificPlayer(0)
     options.playerNum = 0

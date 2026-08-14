@@ -8,6 +8,9 @@ local Definitions = PNC.NeedsDefinitions
 local Utils = PNC.NeedsUtils
 local PlayerModel = PNC.PlayerNeedsModel
 
+Needs.Commands = Needs.Commands or {}
+Needs.Queries = Needs.Queries or {}
+
 Needs.Listeners = Needs.Listeners or {}
 function Needs.RegisterListener(eventName, listener)
     eventName = tostring(eventName or "")
@@ -139,6 +142,37 @@ function Needs.GetHighestPriority(record)
         if not bestValue or value > bestValue then bestType, bestValue = needType, value end
     end
     return bestType, bestValue
+end
+
+function Needs.Queries.GetSleepIntent(record)
+    if not record or record.alive == false then return nil, "NPC_UNAVAILABLE" end
+    local fatigue = tonumber(Needs.Get(record, "fatigue")) or 0
+    local policy = Definitions.SLEEP_TASK
+    if fatigue < policy.actionable then return nil, "NOT_ACTIONABLE" end
+    return {
+        precedence = fatigue >= policy.critical
+            and "CRITICAL_NEED" or "NORMAL_NEED",
+        urgency = math.max(0, math.min(1, fatigue)),
+        completionThreshold = policy.completion,
+        recoveryPerGameHour = policy.recoveryPerGameHour,
+    }
+end
+
+function Needs.Commands.ApplyRest(record, elapsedHours, source)
+    if not record or record.alive == false then return false, "NPC_UNAVAILABLE" end
+    local metadata, reason = Needs.Queries.GetSleepIntent(record)
+    local current = tonumber(Needs.Get(record, "fatigue")) or 0
+    if not metadata and current <= Definitions.SLEEP_TASK.completion then
+        return true, "REST_COMPLETE", current
+    end
+    if not metadata and reason ~= "NOT_ACTIONABLE" then return false, reason end
+    local elapsed = math.max(0, math.min(0.25, tonumber(elapsedHours) or 0))
+    local value = Needs.Modify(record, "fatigue",
+        -Definitions.SLEEP_TASK.recoveryPerGameHour * elapsed,
+        tostring(source or "sleep_task"))
+    if value == nil then return false, "REST_FAILED" end
+    return true, value <= Definitions.SLEEP_TASK.completion
+        and "REST_COMPLETE" or "REST_APPLIED", value
 end
 
 function Needs.Update(record, elapsedHours, reason)

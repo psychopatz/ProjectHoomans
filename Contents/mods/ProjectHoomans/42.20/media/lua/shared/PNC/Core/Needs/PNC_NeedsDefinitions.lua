@@ -77,6 +77,14 @@ Definitions.SUPPLY_MATERIAL_CHANGE = 0.10
 Definitions.SUPPLY_MAX_CANDIDATES = 24
 Definitions.SUPPLY_MAX_SELECTIONS = 3
 Definitions.SUPPLY_MAX_USES = 8
+-- Needs owns when sleep becomes actionable and when rest is complete. Tasking
+-- consumes this policy as intent metadata; it must not duplicate thresholds.
+Definitions.SLEEP_TASK = {
+    actionable = 0.70,
+    critical = 0.80,
+    completion = 0.12,
+    recoveryPerGameHour = 0.45,
+}
 
 function Definitions.Get(needType)
     return Definitions.BY_ID[tostring(needType or "")]
