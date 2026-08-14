@@ -83,7 +83,10 @@ PNC = {
         },
     },
     Registry = {
-        ForEach = function(callback)
+        ForEach = function()
+            error("local presentation must not scan the abstract registry")
+        end,
+        ForEachLive = function(callback)
             callback(record)
         end,
     },

@@ -19,6 +19,9 @@ Discovery.Loaded = Discovery.Loaded == true
 Discovery.Dirty = Discovery.Dirty == true
 Discovery.LastProximityScanAt = Discovery.LastProximityScanAt or {}
 Discovery.PROXIMITY_SCAN_MS = 2000
+Discovery.PROXIMITY_SLICE_MS = 100
+Discovery.PROXIMITY_SCAN_BUDGET = 24
+Discovery.WORLD_ENTITY_CACHE_MS = 10000
 Discovery.SETTLEMENT_DISCOVERY_RANGE = 40
 Discovery.MOBILE_GROUP_DISCOVERY_RANGE = 30
 Discovery.RADIO_RANGE = 10000

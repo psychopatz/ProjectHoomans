@@ -26,6 +26,54 @@ local function visible()
             or PNC.MapDisplay.AreBasesVisible())
 end
 
+local function populationNPCVisible(snapshot)
+    local discovery = type(snapshot and snapshot.worldDiscovery) == "table"
+        and snapshot.worldDiscovery or nil
+    local generation = type(snapshot and snapshot.generation) == "table"
+        and snapshot.generation or nil
+    local generated = discovery
+        and discovery.populationGenerated == true
+        or generation
+            and string.find(tostring(generation.source or ""),
+                "WORLD_POPULATION_", 1, true) == 1
+        or false
+    if not generated then
+        return true
+    end
+    if snapshot.recruited == true or snapshot.colonist == true then
+        return true
+    end
+    if PNC.WorldDiscoveryDebugMap
+        and PNC.WorldDiscoveryDebugMap.ShowRawEntities == true
+    then
+        return true
+    end
+    local affiliation = discovery or (
+        type(snapshot.affiliation) == "table"
+            and snapshot.affiliation or {}
+    )
+    for _, entity in ipairs(State.worldDiscovery
+        and State.worldDiscovery.entities or {})
+    do
+        if tonumber(entity.phase) >= Types.PHASE_CONTACTED then
+            if entity.kind == Types.KIND_SETTLEMENT
+                and tostring(affiliation.communityID or "")
+                    == tostring(entity.entityID or "")
+            then
+                return true
+            end
+            if entity.kind == Types.KIND_MOBILE_GROUP
+                and entity.factionID
+                and tostring(affiliation.factionID or "")
+                    == tostring(entity.factionID)
+            then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 local function colorFor(entity)
     if tonumber(entity.phase) == Types.PHASE_RUMORED then
         return COLORS.rumored
@@ -149,6 +197,13 @@ if PNC.MapLayers and PNC.MapLayers.Register then
         isVisible = visible,
         render = Layer.Render,
     })
+end
+
+if PNC.TravelDirectory and PNC.TravelDirectory.RegisterVisibilityFilter then
+    PNC.TravelDirectory.RegisterVisibilityFilter(
+        "pnc_world_discovery",
+        populationNPCVisible
+    )
 end
 
 return Layer

@@ -18,7 +18,7 @@ local Identity = PNC.NPCIdentityPresentation
 TravelLayer.Enabled = TravelLayer.Enabled ~= false
 TravelLayer.DotTexture = TravelLayer.DotTexture
     or getTexture("media/ui/circle.png")
-TravelLayer.RefreshMs = 100
+TravelLayer.RefreshMs = 500
 
 local function listProjectedEntries()
     local now = getTimestampMs and tonumber(getTimestampMs()) or 0
@@ -176,6 +176,7 @@ local function isOverControls(map, x, y)
         or isInsideVisibleChild(map.buttonPanel, x, y)
         or isInsideVisibleChild(map.pncNamesButton, x, y)
         or isInsideVisibleChild(map.pncBasesButton, x, y)
+        or isInsideVisibleChild(map.pncDebugButton, x, y)
         or isInsideVisibleChild(map.pncHoverPortrait, x, y)
 end
 

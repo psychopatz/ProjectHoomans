@@ -148,6 +148,18 @@ function Discovery.HandleAction(player, args)
             count = advanced,
         })
     end
+    if action == "debug_reset" then
+        if not Discovery.CanUseDebug(player) then
+            return Discovery.BuildSnapshot(player, {
+                ok = false, reason = "not_authorized",
+            })
+        end
+        local ok, reason = Discovery.ResetPlayer(player)
+        return Discovery.BuildSnapshot(player, {
+            ok = ok == true,
+            reason = ok and "debug_reset" or reason,
+        })
+    end
     return Discovery.BuildSnapshot(player)
 end
 

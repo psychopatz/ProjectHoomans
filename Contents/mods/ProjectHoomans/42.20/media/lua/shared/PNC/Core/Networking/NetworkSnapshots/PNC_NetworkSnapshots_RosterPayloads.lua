@@ -37,6 +37,7 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
         faction = record.faction,
         organizationalFaction =
             Parts.BuildOrganizationalFactionSummary(record),
+        worldDiscovery = Parts.BuildWorldDiscoverySummary(record),
         presenceState = record.presenceState,
         zombieTargetable = Settings
             and Settings.CanZombieTargetRecord

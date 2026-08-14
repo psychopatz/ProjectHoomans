@@ -131,6 +131,19 @@ function Internal.PlayerRecord(player, create)
     return record, uuid
 end
 
+function Discovery.ResetPlayer(player)
+    local record, uuid = Internal.PlayerRecord(player, false)
+    if not record then return false, uuid end
+    record.entities = { settlement = {}, mobile_group = {} }
+    record.lastRadioScanAt = 0
+    record.revision = (tonumber(record.revision) or 0) + 1
+    Discovery.Registry.revision =
+        (tonumber(Discovery.Registry.revision) or 0) + 1
+    Discovery.Dirty = true
+    Discovery.Save()
+    return true, "reset"
+end
+
 local function onInitGlobalModData() Discovery.Load() end
 if Events and Events.OnInitGlobalModData then
     Events.OnInitGlobalModData.Add(onInitGlobalModData)

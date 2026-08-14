@@ -5,6 +5,12 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeR
 local Discovery = PNC.WorldDiscovery
 local Internal = Discovery.Internal
 local Types = PNC.WorldDiscoveryTypes
+local Core = PNC.Core
+
+Discovery.WorldEntityCache = Discovery.WorldEntityCache or {
+    list = nil,
+    builtAt = 0,
+}
 
 local function factionName(factionID, fallback)
     local faction = factionID and PNC.Factions and PNC.Factions.Get
@@ -84,6 +90,25 @@ function Discovery.ListWorldEntities()
     return output
 end
 
+function Discovery.InvalidateWorldEntityCache()
+    Discovery.WorldEntityCache.list = nil
+    Discovery.WorldEntityCache.builtAt = 0
+end
+
+function Discovery.GetCachedWorldEntities(now)
+    local cache = Discovery.WorldEntityCache
+    now = tonumber(now) or Core.Now()
+    if cache.list
+        and now - (tonumber(cache.builtAt) or 0)
+            < Discovery.WORLD_ENTITY_CACHE_MS
+    then
+        return cache.list
+    end
+    cache.list = Discovery.ListWorldEntities()
+    cache.builtAt = now
+    return cache.list
+end
+
 function Discovery.ResolveEntity(kind, entityID)
     kind = tostring(kind or "")
     entityID = tostring(entityID or "")
@@ -96,12 +121,13 @@ function Discovery.ResolveEntity(kind, entityID)
     return nil
 end
 
-function Discovery.SetPhase(player, kind, entityID, phase, source, deferSave)
-    if not Types.IsKind(kind) then return nil, "invalid_kind" end
-    local entity = Discovery.ResolveEntity(kind, entityID)
-    if not entity then return nil, "entity_not_found" end
+function Discovery.SetResolvedPhase(player, entity, phase, source, deferSave)
+    if not entity or not Types.IsKind(entity.kind) then
+        return nil, "invalid_entity"
+    end
     local record, uuid = Internal.PlayerRecord(player, true)
     if not record then return nil, uuid end
+    local kind = entity.kind
     local entries = record.entities[kind]
     local current = entries[entity.entityID]
     local nextPhase = Types.ClampPhase(phase)
@@ -125,6 +151,15 @@ function Discovery.SetPhase(player, kind, entityID, phase, source, deferSave)
     Discovery.Dirty = true
     if deferSave ~= true then Discovery.Save() end
     return current, "advanced"
+end
+
+function Discovery.SetPhase(player, kind, entityID, phase, source, deferSave)
+    if not Types.IsKind(kind) then return nil, "invalid_kind" end
+    local entity = Discovery.ResolveEntity(kind, entityID)
+    if not entity then return nil, "entity_not_found" end
+    return Discovery.SetResolvedPhase(
+        player, entity, phase, source, deferSave
+    )
 end
 
 local function approximateCoordinate(value, entityID, axis)

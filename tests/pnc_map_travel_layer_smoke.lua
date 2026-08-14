@@ -211,7 +211,7 @@ assert(labels[1] == "Idle NPC"
     and labels[4] == "Dead NPC"
     and labels[5] == "Dead Colonist",
     "NPC name toggle did not reveal ordinary labels")
-clock = 1100
+clock = 1500
 layer.render(map)
 assert(listProjectedCount == 2,
     "travel map did not refresh projected NPC entries after its throttle")

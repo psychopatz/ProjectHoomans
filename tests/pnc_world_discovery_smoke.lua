@@ -297,4 +297,38 @@ Discovery.Load()
 equal(#Discovery.BuildSnapshot(player).entities, 2,
     "discovery persists across reload")
 
+local reset = Discovery.HandleAction(player, { action = "debug_reset" })
+equal(reset.result.ok, true,
+    "debug modal can reset an accidentally revealed character")
+equal(#reset.entities, 0,
+    "reset restores radio discovery to an empty character map")
+
+local manyGroups = {}
+for index = 1, 100 do
+    manyGroups[index] = {
+        id = "scale_group_" .. tostring(index),
+        factionId = "scale_faction",
+        groupType = "WANDERER",
+        memberIds = {},
+        location = { x = 5000 + index, y = 5000, z = 0 },
+    }
+end
+PNC.AbstractGroups.List = function() return manyGroups end
+player.x, player.y = 0, 0
+Discovery.PROXIMITY_SCAN_BUDGET = 5
+Discovery.ProximityStateByPlayer = {}
+Discovery.InvalidateWorldEntityCache()
+nowMS = 10000
+Discovery.UpdateProximity()
+equal(Discovery.ProximityStateByPlayer[characterUUID].cursor, 6,
+    "proximity discovery processes only its fixed per-tick budget")
+nowMS = 10050
+Discovery.UpdateProximity()
+equal(Discovery.ProximityStateByPlayer[characterUUID].cursor, 6,
+    "proximity slices respect their short continuation throttle")
+nowMS = 10100
+Discovery.UpdateProximity()
+equal(Discovery.ProximityStateByPlayer[characterUUID].cursor, 11,
+    "large discovery scans resume from their cursor instead of restarting")
+
 print("pnc_world_discovery_smoke: ok")

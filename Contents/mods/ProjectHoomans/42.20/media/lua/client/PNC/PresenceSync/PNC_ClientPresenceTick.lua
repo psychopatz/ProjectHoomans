@@ -51,7 +51,7 @@ local function localSnapshotInterval(record, previous, now)
     if record and record.presenceState == Const.PRESENCE_LIVE then
         return tonumber(Const.CLIENT_LOCAL_SNAPSHOT_IDLE_MS) or 500
     end
-    return tonumber(Const.CLIENT_LOCAL_SNAPSHOT_ABSTRACT_MS) or 2000
+    return tonumber(Const.CLIENT_LOCAL_SNAPSHOT_IDLE_MS) or 500
 end
 
 local function refreshLocalAuthoritySnapshots(now)
@@ -79,7 +79,13 @@ local function refreshLocalAuthoritySnapshots(now)
     snapshots = ClientState.snapshots or {}
     builtAtByID = Sync.LocalSnapshotAtByID or {}
     Sync.LocalSnapshotAtByID = builtAtByID
-    Registry.ForEach(function(record)
+    local function collectLiveRecord(record)
+        if not record
+            or record.presenceState ~= Const.PRESENCE_LIVE
+            or record.alive == false
+        then
+            return
+        end
         id = tostring(record and record.id or "")
         seen[id] = true
         if record and record.health
@@ -104,7 +110,18 @@ local function refreshLocalAuthoritySnapshots(now)
             builtAtByID[id] = now
             rebuilt = true
         end
-    end)
+    end
+    -- Local-authority presentation only consumes embodied NPCs. Walking the
+    -- entire persistent registry here made every abstract NPC build a detailed
+    -- snapshot on the same two-second boundary, producing population-scaled
+    -- hitches even when no NPC body was loaded near the player.
+    if Registry.ForEachLive then
+        Registry.ForEachLive(collectLiveRecord)
+    else
+        Registry.ForEach(function(record)
+            collectLiveRecord(record)
+        end)
+    end
     for id, _ in pairs(snapshots) do
         if not seen[tostring(id)] then
             snapshots[id] = nil

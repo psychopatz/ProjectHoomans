@@ -63,4 +63,30 @@ function Parts.BuildOrganizationalFactionSummary(record)
     }
 end
 
+function Parts.BuildWorldDiscoverySummary(record)
+    local affiliation = type(record) == "table"
+        and type(record.affiliation) == "table"
+        and record.affiliation or {}
+    local generation = type(record) == "table"
+        and type(record.generation) == "table"
+        and record.generation or {}
+    local source = tostring(generation.source or "")
+    local populationGenerated = string.find(
+        source, "WORLD_POPULATION_", 1, true
+    ) == 1
+    if not populationGenerated and affiliation.factionID
+        and PNC.Factions and PNC.Factions.Get
+    then
+        local faction = PNC.Factions.Get(affiliation.factionID)
+        populationGenerated = faction and faction.tags
+            and faction.tags.populationGenerated == true or false
+    end
+    if not populationGenerated then return nil end
+    return {
+        populationGenerated = true,
+        communityID = affiliation.communityID,
+        factionID = affiliation.factionID,
+    }
+end
+
 return Parts
