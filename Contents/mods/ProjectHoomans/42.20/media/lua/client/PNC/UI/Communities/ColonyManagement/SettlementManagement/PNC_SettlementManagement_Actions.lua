@@ -22,6 +22,23 @@ function Actions.HandleComponent(window, action, facility)
             action.role, action.componentId)
         return true
     end
+    if action.kind == "abstract" then
+        if action.remove == true and action.componentId then
+            PNC.Client.RequestRemoveFacilityComponent({
+                facilityId = facility.id,
+                expectedRevision = facility.revision,
+                componentId = action.componentId,
+            })
+        else
+            PNC.Client.RequestSetFacilityComponent({
+                facilityId = facility.id,
+                expectedRevision = facility.revision,
+                component = { kind = "abstract", role = action.role },
+            })
+        end
+        Support.ApplyLocalResult(window)
+        return true
+    end
     return false
 end
 

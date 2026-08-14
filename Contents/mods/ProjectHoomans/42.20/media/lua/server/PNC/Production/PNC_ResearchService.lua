@@ -103,7 +103,10 @@ end
 
 local function researchTarget(order, worker, live)
     local mode = tostring(order and order.payload and order.payload.mode or "")
-    local capability = mode == "blueprint" and "work.blueprint"
+    local technology = mode == "technology" and Definitions.Get(
+        order.payload and order.payload.technologyId) or nil
+    local capability = technology and technology.researchCapability
+        or mode == "blueprint" and "work.blueprint"
         or mode == "reverse" and "work.reverse" or "work.research"
     return PNC.FacilityService.AcquireActivity(order.baseId, worker.id,
         capability, { abstract = live == nil, ttlMs = 30000,
@@ -411,6 +414,7 @@ function Service.Queries.BuildSnapshot(colonyId)
                 prerequisiteKnown = not definition.prerequisiteTechnology
                     or Service.Queries.HasTechnology(colonyId,
                         definition.prerequisiteTechnology),
+                researchCapability = definition.researchCapability,
                 requiredWork = definition.requiredWork,
                 requiredSkills = definition.requiredSkills }
         end

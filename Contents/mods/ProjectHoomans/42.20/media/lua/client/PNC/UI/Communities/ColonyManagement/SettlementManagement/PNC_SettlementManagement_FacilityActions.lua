@@ -11,6 +11,7 @@ local ANCHOR_LABELS = {
     ["work.reverse"] = "UI_PNC_Facility_Lab",
     ["work.craft"] = "UI_PNC_Facility_CraftingTable",
     ["work.disassemble"] = "UI_PNC_Facility_RecyclingSpot",
+    ["water.spigot"] = "UI_PNC_Facility_WaterSpigot",
 }
 local ANCHOR_SELECT_TITLES = {
     ["sleep.bed"] = "UI_PNC_Facility_SelectBed",
@@ -19,6 +20,7 @@ local ANCHOR_SELECT_TITLES = {
     ["work.reverse"] = "UI_PNC_Facility_SelectLab",
     ["work.craft"] = "UI_PNC_Facility_SelectCraftStation",
     ["work.disassemble"] = "UI_PNC_Facility_SelectDisassemblyStation",
+    ["water.spigot"] = "UI_PNC_Facility_SelectWaterSpigot",
 }
 local ANCHOR_ASSIGN_TITLES = {
     ["sleep.bed"] = "UI_PNC_Facility_AssignBed",
@@ -27,6 +29,7 @@ local ANCHOR_ASSIGN_TITLES = {
     ["work.reverse"] = "UI_PNC_Facility_AssignLab",
     ["work.craft"] = "UI_PNC_Facility_AssignCraftStation",
     ["work.disassemble"] = "UI_PNC_Facility_AssignDisassemblyStation",
+    ["water.spigot"] = "UI_PNC_Facility_AssignWaterSpigot",
 }
 
 local function areaRole(facility)

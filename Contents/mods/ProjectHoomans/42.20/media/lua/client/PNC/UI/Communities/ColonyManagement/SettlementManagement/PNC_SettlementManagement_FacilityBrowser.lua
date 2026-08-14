@@ -119,6 +119,9 @@ local function roleLabel(role)
         ["work.reverse"] = "LAB",
         ["work.craft"] = "CRAFT STATION",
         ["work.disassemble"] = "DISASSEMBLY STATION",
+        ["water.spigot"] = "SPIGOT",
+        ["water.tank"] = "WATER TANKS",
+        ["water.catcher"] = "RAIN CATCHERS",
     }
     return labels[role] or string.upper(string.gsub(role, "[%.]", " "))
 end
@@ -128,6 +131,7 @@ local function componentDetail(component)
         return roleLabel(component.role) .. "  •  " .. tostring(component.x) .. ", "
             .. tostring(component.y) .. "  FLOOR " .. tostring(component.z)
     end
+    if component.kind == "abstract" then return "ABSTRACT UTILITY MODULE" end
     return tostring(component.tileCount or 0) .. " TILES  •  ZONED AREA"
 end
 
@@ -159,7 +163,9 @@ function Browser.BuildComponentRows(facility)
             componentAction = #assigned < maximum and {
                 kind = limit.kind, role = role,
             } or nil,
-            actionLabel = tr("UI_PNC_Facility_AssignInline", "ASSIGN"),
+            actionLabel = limit.kind == "abstract"
+                and tr("UI_PNC_Facility_BuildModule", "BUILD")
+                or tr("UI_PNC_Facility_AssignInline", "ASSIGN"),
         }
         for index = 1, #assigned do
             rows[#rows + 1] = {
@@ -171,8 +177,11 @@ function Browser.BuildComponentRows(facility)
                 componentAction = {
                     kind = assigned[index].kind, role = role,
                     componentId = assigned[index].id,
+                    remove = assigned[index].kind == "abstract",
                 },
-                actionLabel = tr("UI_PNC_Facility_EditInline", "EDIT"),
+                actionLabel = assigned[index].kind == "abstract"
+                    and tr("UI_PNC_Facility_RemoveModule", "REMOVE")
+                    or tr("UI_PNC_Facility_EditInline", "EDIT"),
             }
         end
     end

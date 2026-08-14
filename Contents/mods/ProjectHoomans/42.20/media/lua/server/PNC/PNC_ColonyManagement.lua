@@ -276,6 +276,10 @@ function Management.BuildSnapshot(player, options)
     local base = colony and PNC.BaseService
         and PNC.BaseService.GetForColony(colony.id) or nil
     local settlement = base and PNC.BaseService.BuildSnapshot(base) or nil
+    local utilities = base and PNC.WaterUtilityService
+        and PNC.WaterUtilityService.BuildSnapshot(base.id)
+        or { waterLiters = 0, capacityLiters = 0, tanks = 0,
+            catchers = 0, litersPerTenMinutes = 0, facilities = {} }
     if settlement then
         settlement.facilities = {}
         settlement.stockpileNodes = {}
@@ -320,7 +324,7 @@ function Management.BuildSnapshot(player, options)
         supplyShortages=supplyShortages,
         provisionStorage=provisionStorage,
         provisionSettings=provisionSettings,
-        settlement=settlement,
+        settlement=settlement, utilities=utilities,
         generatedAt=PNC.NeedsUtils.WorldAgeHours() }
 end
 

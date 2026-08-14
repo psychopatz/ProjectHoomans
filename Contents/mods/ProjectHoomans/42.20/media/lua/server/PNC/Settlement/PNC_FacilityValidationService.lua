@@ -78,6 +78,12 @@ function Validation.CanUpgrade(base, facility, expectedRevision)
     if base.hqLevel < nextLevel.requiredHQLevel then
         return result(false, "HQ_LEVEL_TOO_LOW")
     end
+    if nextLevel.requiredTechnology
+        and (not PNC.ResearchService
+            or not PNC.ResearchService.Queries.HasTechnology(
+                base.colonyId, nextLevel.requiredTechnology))
+    then return result(false, "TECHNOLOGY_REQUIRED", {
+        technologyId = nextLevel.requiredTechnology }) end
     return result(true)
 end
 
@@ -111,7 +117,8 @@ function Validation.NormalizeFootprint(base, facility, input)
 end
 
 function Validation.NormalizeComponent(base, facility, input)
-    if type(input) ~= "table" or (input.kind ~= "anchor" and input.kind ~= "region")
+    if type(input) ~= "table" or (input.kind ~= "anchor"
+        and input.kind ~= "region" and input.kind ~= "abstract")
         or type(input.role) ~= "string" or input.role == ""
     then
         return result(false, "INVALID_COMPONENT")
@@ -136,7 +143,9 @@ function Validation.NormalizeComponent(base, facility, input)
         component.objectTag = nil
         component.worldRule = nil
     end
-    if input.kind == "anchor" then
+    if input.kind == "abstract" then
+        component.tileCount = 0
+    elseif input.kind == "anchor" then
         component.x = math.floor(tonumber(input.x) or 0)
         component.y = math.floor(tonumber(input.y) or 0)
         component.z = math.floor(tonumber(input.z) or 0)

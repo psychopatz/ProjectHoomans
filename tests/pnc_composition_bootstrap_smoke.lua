@@ -244,6 +244,7 @@ local expectedSettlement = {
     "PNC/Settlement/PNC_FacilityReservations",
     "PNC/Settlement/PNC_StockpileAccessService",
     "PNC/Settlement/PNC_SettlementDebug",
+    "PNC/Settlement/PNC_WaterUtilityService",
 }
 for index = 1, #expectedSettlement do
     assertEqual(settlementCalls[index], expectedSettlement[index],

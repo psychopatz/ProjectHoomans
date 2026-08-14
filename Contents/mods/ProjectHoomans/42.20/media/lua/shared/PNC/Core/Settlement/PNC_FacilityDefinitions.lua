@@ -39,6 +39,7 @@ end
 
 Definitions.Register({
     id = "barracks",
+    category = "housing",
     displayNameKey = "UI_PNC_Facility_Barracks",
     descriptionKey = "UI_PNC_Facility_BarracksDescription",
     iconPath = "media/ui/Facilities/PNC_Barracks_Placeholder.png",
@@ -83,6 +84,7 @@ Definitions.Register({
 
 Definitions.Register({
     id = "farm",
+    category = "food",
     displayNameKey = "UI_PNC_Facility_Farm",
     descriptionKey = "UI_PNC_Facility_FarmDescription",
     iconPath = "media/ui/Facilities/PNC_Farm_Placeholder.png",
@@ -117,6 +119,7 @@ Definitions.Register({
 
 Definitions.Register({
     id = "research_facility",
+    category = "technology",
     displayNameKey = "UI_PNC_Facility_Research",
     descriptionKey = "UI_PNC_Facility_ResearchDescription",
     -- Reuse shipped facility art until dedicated production art is available.
@@ -158,6 +161,7 @@ Definitions.Register({
 
 Definitions.Register({
     id = "workshop",
+    category = "production",
     displayNameKey = "UI_PNC_Facility_Workshop",
     descriptionKey = "UI_PNC_Facility_WorkshopDescription",
     -- Reuse shipped facility art until dedicated production art is available.
@@ -189,6 +193,39 @@ Definitions.Register({
             },
         },
     },
+})
+
+local waterLevels = {}
+for level = 1, 10 do
+    waterLevels[level] = {
+        requiredHQLevel = math.min(3, math.ceil(level / 4)),
+        requiredTechnology = "utility:water_collector:" .. tostring(level),
+        capabilities = { "utility.water" },
+        componentLimits = {
+            ["water.spigot"] = { kind = "anchor", minCount = 1,
+                maxCount = 1 },
+            ["water.tank"] = { kind = "abstract", minCount = 0,
+                maxCount = level * 4 },
+            ["water.catcher"] = { kind = "abstract", minCount = 0,
+                maxCount = level * 4 },
+        },
+        activityLimits = { ["utility.water"] = { maxConcurrent = 1 } },
+    }
+end
+
+Definitions.Register({
+    id = "water_collector",
+    category = "utilities",
+    displayNameKey = "UI_PNC_Facility_WaterCollector",
+    descriptionKey = "UI_PNC_Facility_WaterCollectorDescription",
+    iconPath = "media/ui/Facilities/PNC_Farm_Placeholder.png",
+    buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+    buildWork = 100,
+    reconstructWork = 45,
+    deconstructWork = 65,
+    requiredTechnology = "utility:water_collector:1",
+    allowMultipleRegions = false,
+    levels = waterLevels,
 })
 
 return Definitions

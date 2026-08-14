@@ -233,11 +233,31 @@ function Service.Upgrade(player, args)
     then return { ok = false, reason = "FACILITY_NOT_BUILT" } end
     local check = Validation.CanUpgrade(base, facility, args.expectedRevision)
     if not check.ok then return check end
-    facility.level = facility.level + 1
+    if not PNC.ConstructionService
+        or not PNC.ConstructionService.QueueReconstruct
+    then return { ok = false, reason = "CONSTRUCTION_SERVICE_UNAVAILABLE" } end
+    local targetLevel = facility.level + 1
+    local order, reason = PNC.ConstructionService.QueueReconstruct(
+        player, facility, { action = "upgrade", targetLevel = targetLevel })
+    if not order then return { ok = false, reason = reason } end
+    return { ok = true, facility = facility, workOrder = order,
+        event = "FacilityUpgradeQueued" }
+end
+
+function Service.FinalizeUpgrade(facilityId, targetLevel)
+    local facility = Repository.GetFacility(facilityId)
+    local base = facility and PNC.BaseService.Get(facility.baseId) or nil
+    if not base then return false, "FACILITY_NOT_FOUND" end
+    local level = math.floor(tonumber(targetLevel) or 0)
+    if level ~= facility.level + 1
+        or not Definitions.GetLevel(facility.definitionId, level)
+    then return false, "INVALID_FACILITY_LEVEL" end
+    facility.level = level
+    facility.constructionState, facility.constructionWorkOrderId = "BUILT", nil
     touch(base, facility); updateState(base, facility); Service.RebuildIndexes()
     emit(PNC.EventTypes.FACILITY_UPGRADED, { facilityId = facility.id,
         level = facility.level, revision = facility.revision })
-    return { ok = true, facility = facility, event = "FacilityUpgraded" }
+    return true, "FacilityUpgraded"
 end
 
 local function isBuilt(facility)
@@ -331,7 +351,9 @@ function Service.SetComponent(player, args)
     input.id = tostring(input.id or PNC.Core.GenerateID("component"))
     local check = Validation.NormalizeComponent(base, facility, input)
     if not check.ok then return check end
-    if existing and existing.kind == "region" then
+    if (existing and existing.kind == "region")
+        or input.kind == "abstract"
+    then
         if not PNC.ConstructionService
             or not PNC.ConstructionService.QueueReconstruct
         then return { ok = false,
@@ -363,7 +385,7 @@ function Service.RemoveComponent(player, args)
     if not component or component.facilityId ~= facility.id then
         return { ok = false, reason = "COMPONENT_NOT_FOUND" }
     end
-    if component.kind == "region" then
+    if component.kind == "region" or component.kind == "abstract" then
         if not PNC.ConstructionService
             or not PNC.ConstructionService.QueueReconstruct
         then return { ok = false,

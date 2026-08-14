@@ -42,6 +42,10 @@ local snapshot = {
         entries = {{
             id = "facility:workshop", labelKey = "Basic Workshop",
             requiredWork = 60, known = false,
+        }, {
+            id = "utility:water_collector:1", labelKey = "Water Collection I",
+            requiredWork = 65, known = false,
+            researchCapability = "work.reverse",
         }},
         learnedRecipeIds = {},
         orders = {{
@@ -61,6 +65,8 @@ assert(window.researchCatalog.items[2].catalogCells.state == "RESEARCHING 25%",
     "technology catalog row does not expose progress percentage")
 assert(window.researchCatalog.items[2].catalogCells.state == "RESEARCHING 25%",
     "active research row does not expose resumable progress")
+assert(window.researchCatalog.items[3].catalogCells.state == "NOT LEARNED",
+    "water technology should be researchable through the lab lane")
 ResearchTab.Rebuild(window, snapshot, function(_, fallback) return fallback end)
 assert(#window.researchQueueList.items == 2,
     "research queue refresh must not accumulate headers")

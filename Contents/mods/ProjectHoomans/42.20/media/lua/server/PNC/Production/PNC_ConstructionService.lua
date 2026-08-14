@@ -193,6 +193,10 @@ local function completeReconstruct(order)
         return PNC.FacilityService.FinalizeRemoveComponent(
             payload.facilityId, change.componentId)
     end
+    if change.action == "upgrade" then
+        return PNC.FacilityService.FinalizeUpgrade(
+            payload.facilityId, change.targetLevel)
+    end
     return PNC.FacilityService.FinalizeSetComponent(
         payload.facilityId, change.component)
 end

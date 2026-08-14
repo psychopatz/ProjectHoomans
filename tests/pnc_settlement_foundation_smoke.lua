@@ -159,6 +159,16 @@ equal(workshopLevel.componentLimits["work.craft"].minCount, 1,
     "craft station remains a workshop component")
 equal(workshopLevel.componentLimits["work.disassemble"].minCount, 1,
     "disassembly station remains a workshop component")
+local waterLevel = PNC.FacilityDefinitions.GetLevel("water_collector", 1)
+equal(waterLevel.componentLimits["water.spigot"].kind, "anchor",
+    "water spigot is a physical interaction component")
+equal(waterLevel.componentLimits["water.tank"].kind, "abstract",
+    "water tanks use reusable abstract components")
+equal(waterLevel.componentLimits["water.tank"].maxCount, 4,
+    "water level one permits four tanks")
+local waterLevelTen = PNC.FacilityDefinitions.GetLevel("water_collector", 10)
+equal(waterLevelTen.componentLimits["water.catcher"].maxCount, 40,
+    "water module limits scale through level ten")
 
 local playerZoneConflict = PNC.BaseService.Create({}, {
     colonyId = "community_other", factionId = "faction_test",
@@ -285,8 +295,12 @@ equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision, component = {
         kind = "anchor", role = "sleep.bed", x = 3, y = 1, z = 0,
     } }).reason, "FACILITY_COMPONENT_LIMIT", "level one bed limit")
-truthy(PNC.FacilityService.Upgrade({}, { facilityId = barracks.id,
-    expectedRevision = barracks.revision }).ok, "barracks level two")
+local upgrade = PNC.FacilityService.Upgrade({}, { facilityId = barracks.id,
+    expectedRevision = barracks.revision })
+truthy(upgrade.ok, "barracks level two queued")
+equal(barracks.level, 1, "upgrade waits for construction work")
+truthy(PNC.FacilityService.FinalizeUpgrade(barracks.id, 2),
+    "barracks level two completed")
 truthy(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision, component = {
         kind = "anchor", role = "sleep.bed", x = 3, y = 1, z = 0,
@@ -396,7 +410,9 @@ equal(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
         id = farmComponentId, kind = "region", role = "farm.field", region = field117,
     } }).reason, "FACILITY_AREA_TOO_LARGE", "farm level tile limit")
 truthy(PNC.FacilityService.Upgrade({}, { facilityId = farm.id,
-    expectedRevision = farm.revision }).ok, "farm level two")
+    expectedRevision = farm.revision }).ok, "farm level two queued")
+truthy(PNC.FacilityService.FinalizeUpgrade(farm.id, 2),
+    "farm level two completed")
 truthy(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
         id = farmComponentId, kind = "region", role = "farm.field", region = field117,

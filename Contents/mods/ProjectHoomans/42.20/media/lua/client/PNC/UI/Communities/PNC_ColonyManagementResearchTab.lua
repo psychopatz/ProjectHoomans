@@ -261,14 +261,17 @@ function ResearchTab.Rebuild(window, snapshot, tr)
             action = "RESEARCH", state = "STATE / PROGRESS" } })
     if window.researchSubtab == "base" then
         for _, entry in ipairs(research.entries or {}) do
+            local lane = entry.researchCapability == "work.reverse"
+                and "reverse" or "base"
             addRow(window.researchCatalog, { name = tr(entry.labelKey, entry.id),
                 mode = "technology", technologyId = entry.id,
                 category = string.upper(tostring(entry.category or "TECHNOLOGY")),
                 known = entry.known == true,
                 prerequisiteKnown = entry.prerequisiteKnown ~= false,
                 order = matchingOrder(orders, "technology", entry.id),
-                laneAvailable = window.researchLaneAvailability.base,
-                missingStation = "NO RESEARCH STATION" })
+                laneAvailable = window.researchLaneAvailability[lane],
+                missingStation = lane == "reverse"
+                    and "NO LAB" or "NO RESEARCH STATION" })
         end
     else
         local mode = window.researchSubtab

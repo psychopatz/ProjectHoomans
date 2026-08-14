@@ -9,6 +9,7 @@ local BaseTab = require "PNC/UI/Communities/ColonyManagement/SettlementManagemen
 local SettingsTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_SettingsTab"
 local JobsTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_JobsTab"
 local TasksTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_TasksTab"
+local UtilitiesTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_UtilitiesTab"
 
 Registry.Register({
     id = "overview",
@@ -141,6 +142,15 @@ Registry.Register({
         window:drawSectionTitle("GENERAL STOCKPILE", window.storageList)
         Storage.RenderSummary(window, Theme)
     end,
+})
+
+Registry.Register({
+    id = "utilities",
+    title = function() return Shared.Tr("UI_PNC_Utilities_Tab", "UTILITIES") end,
+    detailTitle = "COLONY UTILITIES",
+    showRoster = false,
+    showDetails = true,
+    buildRows = function(context) return UtilitiesTab.BuildRows(context) end,
 })
 
 Registry.Register({

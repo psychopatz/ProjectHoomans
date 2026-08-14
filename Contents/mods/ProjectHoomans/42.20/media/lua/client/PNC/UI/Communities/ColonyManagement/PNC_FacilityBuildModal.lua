@@ -9,6 +9,14 @@ local UI = PsychopatzCore.UI
 local Theme = UI.Theme
 local Layout = UI.Layout
 
+local CATEGORY_ORDER = { "housing", "food", "production", "technology",
+    "utilities" }
+local CATEGORY_LABELS = {
+    housing = "HOUSING", food = "FOOD", production = "PRODUCTION",
+    technology = "TECHNOLOGY", utilities = "UTILITIES",
+}
+local PAGE_SIZE = 4
+
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
     if not value or value == key then return fallback end
@@ -98,6 +106,21 @@ function ISPNCFacilityBuildWindow:createChildren()
         card:initialise(); card:instantiate(); self:addChild(card)
         self.cards[#self.cards + 1] = card
     end
+    self.categoryButtons = {}
+    local available = {}
+    for _, option in ipairs(self.options) do available[option.category] = true end
+    for _, category in ipairs(CATEGORY_ORDER) do
+        if available[category] then
+            local button = UI.CreateButton(self, {
+                id = "category:" .. category,
+                title = tr("UI_PNC_Facility_Category_" .. category,
+                    CATEGORY_LABELS[category] or string.upper(category)),
+                target = self, onclick = ISPNCFacilityBuildWindow.onAction,
+            })
+            button.facilityCategory = category
+            self.categoryButtons[#self.categoryButtons + 1] = button
+        end
+    end
     self.confirmButton = UI.CreateButton(self, {
         id = "build", title = tr("UI_PNC_Facility_BuildConfirm", "BUILD"),
         target = self, onclick = ISPNCFacilityBuildWindow.onAction,
@@ -107,7 +130,15 @@ function ISPNCFacilityBuildWindow:createChildren()
         id = "cancel", title = tr("UI_Cancel", "CANCEL"), target = self,
         onclick = ISPNCFacilityBuildWindow.onAction, variant = "danger",
     })
-    self:setSelected(self.options[1] and self.options[1].id or nil)
+    self.previousPageButton = UI.CreateButton(self, {
+        id = "page_previous", title = "<", target = self,
+        onclick = ISPNCFacilityBuildWindow.onAction, variant = "quiet",
+    })
+    self.nextPageButton = UI.CreateButton(self, {
+        id = "page_next", title = ">", target = self,
+        onclick = ISPNCFacilityBuildWindow.onAction, variant = "quiet",
+    })
+    self:setCategory(self.options[1] and self.options[1].category or nil)
     self:requestResponsiveLayout(true)
 end
 
@@ -115,20 +146,86 @@ function ISPNCFacilityBuildWindow:onResponsiveLayout()
     local rect = self:getContentRect({ top = 18, bottom = 12 })
     local gap = Layout.Pixels(12, self.uiScale)
     local buttonHeight = Layout.Pixels(30, self.uiScale)
-    local cardsHeight = math.max(250, rect.height - 105)
-    local width = math.floor((rect.width - gap * math.max(0, #self.cards - 1))
-        / math.max(1, #self.cards))
-    local x = rect.x
+    local categoryHeight = Layout.Pixels(28, self.uiScale)
+    local categoryWidth = math.floor((rect.width
+        - gap * math.max(0, #self.categoryButtons - 1))
+        / math.max(1, #self.categoryButtons))
+    local categoryX = rect.x
+    for _, button in ipairs(self.categoryButtons) do
+        Layout.SetBounds(button, categoryX, rect.y, categoryWidth, categoryHeight)
+        categoryX = categoryX + categoryWidth + gap
+    end
+    local categoryCards, visible = {}, {}
     for _, card in ipairs(self.cards) do
-        Layout.SetBounds(card, x, rect.y, width, cardsHeight)
-        x = x + width + gap
+        if card.option.category == self.selectedCategory then
+            categoryCards[#categoryCards + 1] = card
+        end
+    end
+    local pageCount = math.max(1, math.ceil(#categoryCards / PAGE_SIZE))
+    self.categoryPage = math.max(1, math.min(pageCount,
+        tonumber(self.categoryPage) or 1))
+    local first = (self.categoryPage - 1) * PAGE_SIZE + 1
+    local last = math.min(#categoryCards, first + PAGE_SIZE - 1)
+    for _, card in ipairs(self.cards) do card:setVisible(false) end
+    for index = first, last do
+        local card = categoryCards[index]
+        local shown = card ~= nil
+        card:setVisible(shown)
+        if shown then visible[#visible + 1] = card end
+    end
+    local cardsY = rect.y + categoryHeight + gap
+    local cardsHeight = math.max(250, rect.height - categoryHeight - 115)
+    local columns = math.min(4, math.max(1, #visible))
+    local width = math.floor((rect.width - gap * (columns - 1)) / columns)
+    for index, card in ipairs(visible) do
+        local column = (index - 1) % columns
+        local row = math.floor((index - 1) / columns)
+        Layout.SetBounds(card, rect.x + column * (width + gap),
+            cardsY + row * (cardsHeight + gap), width, cardsHeight)
     end
     self.descriptionX = rect.x
-    self.descriptionY = rect.y + cardsHeight + 8
+    self.descriptionY = cardsY + cardsHeight + 8
     Layout.SetBounds(self.confirmButton, rect.x,
         rect.y + rect.height - buttonHeight, 130, buttonHeight)
     Layout.SetBounds(self.cancelButton, rect.x + rect.width - 110,
         rect.y + rect.height - buttonHeight, 110, buttonHeight)
+    Layout.SetBounds(self.previousPageButton,
+        rect.x + math.floor(rect.width / 2) - 42,
+        rect.y + rect.height - buttonHeight, 36, buttonHeight)
+    Layout.SetBounds(self.nextPageButton,
+        rect.x + math.floor(rect.width / 2) + 6,
+        rect.y + rect.height - buttonHeight, 36, buttonHeight)
+    self.previousPageButton:setEnable(self.categoryPage > 1)
+    self.nextPageButton:setEnable(self.categoryPage < pageCount)
+    self.previousPageButton:setVisible(pageCount > 1)
+    self.nextPageButton:setVisible(pageCount > 1)
+end
+
+function ISPNCFacilityBuildWindow:setCategory(category)
+    self.selectedCategory = category
+    self.categoryPage = 1
+    local first
+    for _, option in ipairs(self.options) do
+        if option.category == category then first = option; break end
+    end
+    for _, button in ipairs(self.categoryButtons or {}) do
+        UI.SetButtonVariant(button, button.facilityCategory == category
+            and "selected" or "quiet")
+    end
+    self:setSelected(first and first.id or nil)
+    self:requestResponsiveLayout(true)
+end
+
+function ISPNCFacilityBuildWindow:setCategoryPage(page)
+    self.categoryPage = math.max(1, math.floor(tonumber(page) or 1))
+    local wanted, count = (self.categoryPage - 1) * PAGE_SIZE + 1, 0
+    for _, option in ipairs(self.options) do
+        if option.category == self.selectedCategory then
+            count = count + 1
+            if count == wanted then self:setSelected(option.id); break end
+        end
+    end
+    self:requestResponsiveLayout(true)
 end
 
 function ISPNCFacilityBuildWindow:setSelected(id)
@@ -154,6 +251,14 @@ function ISPNCFacilityBuildWindow:prerender()
 end
 
 function ISPNCFacilityBuildWindow:onAction(button)
+    local category = tostring(button.internal or ""):match("^category:(.+)$")
+    if category then self:setCategory(category); return end
+    if button.internal == "page_previous" then
+        self:setCategoryPage((self.categoryPage or 1) - 1); return
+    end
+    if button.internal == "page_next" then
+        self:setCategoryPage((self.categoryPage or 1) + 1); return
+    end
     if button.internal == "build" and self.selectedOption
         and self.selectedOption.enabled
     then
@@ -217,6 +322,7 @@ local function buildOptions(settlement, storage, research)
             or tr("UI_PNC_Facility_MissingMaterials", "NEED MORE MATERIALS")
         values[#values + 1] = {
             id = id,
+            category = tostring(definition.category or "production"),
             name = tr(definition.displayNameKey, id),
             description = tr(definition.descriptionKey, id),
             texture = getTexture and getTexture(definition.iconPath) or nil,

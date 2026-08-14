@@ -35,6 +35,7 @@ end
 PNC = { FacilityDefinitions = { ByID = { barracks = true, workshop = true } } }
 function PNC.FacilityDefinitions.Get(id)
     return { id = id, displayNameKey = id,
+        category = id == "workshop" and "production" or "housing",
         descriptionKey = "Barracks description",
         requiredTechnology = id == "workshop" and "facility:workshop" or nil,
         buildCosts = {{ fullType = "Base.Money", amount = 1 }} }
@@ -50,6 +51,7 @@ local options = BuildUI.BuildOptions({ hqLevel = 1 }, {
     rows = {{ fullType = "Base.Money", quantity = 1 }},
 })
 equal(options[1].enabled, true, "stockpile satisfies material cost")
+equal(options[1].category, "housing", "building category reaches catalog")
 equal(options[1].costText, "1 Base.Money (1 total)", "combined total")
 equal(options[1].sourceText, "1 stockpile", "stockpile-only source breakdown")
 equal(options[2].enabled, false, "locked workshop is not advertised available")
