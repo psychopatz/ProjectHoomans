@@ -28,6 +28,7 @@ local function openStockpile(nodeId)
     then
         PNC.InventoryWindow.OpenStorage(node.storageId, {
             displayName = tr("UI_PNC_Storage_Colony", "Colony Storage"),
+            readOnly = false,
         })
         return
     end

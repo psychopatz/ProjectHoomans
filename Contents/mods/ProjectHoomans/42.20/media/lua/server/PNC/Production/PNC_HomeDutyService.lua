@@ -199,6 +199,16 @@ function Service.SendToPlayer(record, player, reason)
     local y = player.getY and tonumber(player:getY()) or nil
     local z = player.getZ and tonumber(player:getZ()) or 0
     if not x or not y then return false, "PLAYER_LOCATION_MISSING" end
+    local courier = record.runtime and record.runtime.storageCourier or nil
+    if courier and (courier.state == "RETURNING_HOME"
+        or courier.state == "DEPOSITING")
+    then
+        courier.state = "CANCELLED"
+        courier.reason = "follow_player_requested"
+        courier.updatedAt = PNC.Core.Now()
+        courier.revision = math.max(0,
+            math.floor(tonumber(courier.revision) or 0)) + 1
+    end
     local username = player.getUsername and player:getUsername() or nil
     local onlineID = player.getOnlineID and player:getOnlineID() or nil
     if PNC.WorkService and PNC.WorkService.Commands
@@ -288,7 +298,16 @@ if PNC.Travel and PNC.Travel.Arrivals then
             local point, reason, base = Service.GetHomePoint(
                 record, action and action.baseId)
             if not point then return false, reason end
-            return setAtHome(record, base, point)
+            local ok, why = setAtHome(record, base, point)
+            local courier = record.runtime and record.runtime.storageCourier
+            if ok and courier and (courier.state == "RETURNING_HOME"
+                or courier.state == "DEPOSITING")
+                and PNC.ColonyStorageService
+                and PNC.ColonyStorageService.CompleteNPCCourier
+            then
+                return PNC.ColonyStorageService.CompleteNPCCourier(record)
+            end
+            return ok, why
         end)
     PNC.Travel.Arrivals.RegisterHandler("colony_follow_player",
         function(record, _, action)

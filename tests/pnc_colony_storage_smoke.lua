@@ -26,6 +26,20 @@ ModData = {
 isServer = function() return false end
 isClient = function() return false end
 isDebugEnabled = function() return true end
+package.preload["PsychopatzCore/World/PC_ZoneRegistry"] = function()
+    return { get = function(id)
+        if id == "zone_a" then
+            return { geometry = { minX = 0, maxX = 20,
+                minY = 0, maxY = 20 } }
+        end
+    end }
+end
+package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
+    return { containsXY = function(region, x, y)
+        return x >= region.minX and x <= region.maxX
+            and y >= region.minY and y <= region.maxY
+    end }
+end
 
 PNC = {
     Const = {
@@ -42,11 +56,26 @@ PNC = {
             return output
         end,
         LogWarn = function() end,
+        Now = function() return 1000 end,
+        GenerateID = function(prefix) return prefix .. ":test" end,
+        ResolvePlayerByUsername = function() return nil end,
     },
     Inventory = { Internal = {} },
     Registry = { Get = function() return nil end },
     Equipment = {},
+    BaseService = { GetForColony = function(id)
+        if id == "colony_faction_a" or id == "colony_faction_b" then
+            return { id = "base_" .. id, baseZoneId = "zone_a",
+                stockpileNodeIds = { stockpile = true } }
+        end
+    end },
 }
+PNC.Inventory.Internal.getItemWeight = function() return 0.1 end
+PNC.Inventory.Internal.countMapEntries = function(value)
+    local count = 0
+    for _, _ in pairs(value or {}) do count = count + 1 end
+    return count
+end
 local provisionWakeups = {}
 PNC.ProvisionScheduler = {
     MarkFactionDirty = function(factionID)
@@ -134,6 +163,8 @@ local playerA = {
     getInventory = function() return playerContainer end,
     getAccessLevel = function() return "" end,
     isEquipped = function() return false end,
+    getX = function() return 10 end,
+    getY = function() return 10 end,
 }
 local playerB = {
     factionKey = "B",
@@ -141,6 +172,8 @@ local playerB = {
     getInventory = function() return container({}) end,
     getAccessLevel = function() return "" end,
     isEquipped = function() return false end,
+    getX = function() return 10 end,
+    getY = function() return 10 end,
 }
 
 local storageA = Repository.GetPrimary("faction_a", "colony_faction_a")
@@ -148,6 +181,25 @@ local storageB = Repository.GetPrimary("faction_b", "colony_faction_b")
 truthy(storageA and storageB and storageA ~= storageB, "faction isolation")
 equal(storageA.tier, 1, "initial tier")
 equal(storageA.inventory:getLogicalItemCount(), 0, "initial empty storage")
+
+local awayItem = item("Base.Bandage", 0.1)
+local awayContainer = container({ awayItem })
+local awayPlayer = {
+    factionKey = "A",
+    getUsername = function() return "player_away" end,
+    getInventory = function() return awayContainer end,
+    getAccessLevel = function() return "" end,
+    isEquipped = function() return false end,
+    getX = function() return 30 end,
+    getY = function() return 30 end,
+}
+local awayOK, awayReason = Service.RequestPlayerDeposit(awayPlayer, {
+    requestId = "deposit:away",
+    itemIDs = { tostring(awayItem:getID()) },
+})
+equal(awayOK, false, "away player storage remains read only")
+equal(awayReason, "outside_base", "away player rejection reason")
+equal(#awayContainer.values, 1, "read-only rejection preserves inventory")
 
 PNC.ResearchService = { Queries = { HasTechnology = function() return false end } }
 local upgraded, upgradeReason = Service.Upgrade(playerB, {
@@ -282,6 +334,8 @@ local failingPlayer = {
     getUsername = function() return "player_failure" end,
     getInventory = function() return failingContainer end,
     getAccessLevel = function() return "" end,
+    getX = function() return 10 end,
+    getY = function() return 10 end,
 }
 local beforeRollback = loaded.inventory:getLogicalItemCount()
 local workingFactory = InventoryItemFactory.CreateItem
@@ -342,6 +396,7 @@ equal(Journal.Snapshot(legacyID)[1][Journal.FIELD.ACTOR], "legacy_actor",
     "legacy journal actor retained")
 snapshot = Service.BuildSnapshot(playerA)
 equal(#snapshot.activity, 10, "snapshot activity cap")
+equal(snapshot.access.writable, true, "snapshot exposes writable base access")
 getText = function(key) return key end
 getItemNameFromFullType = function(fullType)
     return fullType == "Base.Nails" and "Nails" or fullType
@@ -355,6 +410,82 @@ truthy(string.find(activityRows[1].message,
     "structured activity translated at render time")
 truthy(string.find(activityRows[1].message, "(fishing)", 1, true),
     "activity reason presentation")
+
+PNC.Inventory.EnsureRecordInventory = function(record)
+    return record.inventory
+end
+PNC.Inventory.RemoveItems = function(record, ids)
+    for _, id in ipairs(ids or {}) do
+        if not record.inventory.items[id] then return false end
+    end
+    for _, id in ipairs(ids or {}) do
+        record.inventory.items[id] = nil
+    end
+    record.inventory.revision = record.inventory.revision + 1
+    return true
+end
+PNC.Inventory.ApplyDelta = function(record, operations)
+    for _, operation in ipairs(operations or {}) do
+        local compact = record.inventory.items[operation.itemID]
+        if not compact then return false end
+        if operation.stack then compact.stack = operation.stack end
+    end
+    record.inventory.revision = record.inventory.revision + 1
+    return true
+end
+PNC.Inventory.RebuildCaches = function() return true end
+local courierNPC = {
+    id = "npc:courier", name = "Courier", alive = true,
+    runtime = {}, inventory = {
+        revision = 0, cachedWeight = 0, maxWeight = 20,
+        equipped = {}, worn = {}, attached = {},
+        items = {
+            cargo = { id = "cargo", type = "Base.Bandage",
+                container = "root", stack = 2 },
+            favorite = { id = "favorite", type = "Base.Hammer",
+                container = "root", stack = 1, fav = true },
+        },
+        containers = { root = {
+            id = "root", items = { "cargo", "favorite" },
+            maxWeight = 20,
+        } },
+    },
+}
+PNC.Registry.Get = function(id)
+    return id == courierNPC.id and courierNPC or nil
+end
+PNC.Registry.GetLiveZombie = function() return nil end
+PNC.Registry.MarkDirty = function() end
+PNC.CompanionCommands = {
+    IsOwnedByPlayer = function(record)
+        return record == courierNPC
+    end,
+}
+local courierAtHome = false
+PNC.HomeDutyService = {
+    IsAtHome = function() return courierAtHome end,
+    SendHome = function()
+        return true, "RETURNING_HOME", { journeyId = "courier:journey" }
+    end,
+}
+local courierOK, courierReason = Service.RequestNPCCourierDeposit(playerA, {
+    requestId = "courier:1", npcId = courierNPC.id,
+    storageId = loaded.id,
+})
+equal(courierOK, true, "courier job accepted away from home")
+equal(courierReason, "courier_returning_home", "courier return status")
+equal(courierNPC.runtime.storageCourier.state, "RETURNING_HOME",
+    "courier exposes in-progress state")
+courierAtHome = true
+local completed, completionReason = Service.CompleteNPCCourier(courierNPC)
+equal(completed, true, "courier deposits after reaching home")
+equal(completionReason, "deposited", "courier completion reason")
+equal(courierNPC.runtime.storageCourier.state, "COMPLETED",
+    "courier exposes completion state")
+equal(courierNPC.inventory.items.cargo, nil,
+    "courier removes deposited compact cargo")
+truthy(courierNPC.inventory.items.favorite,
+    "courier preserves favorite items")
 
 ok, reason = Service.DebugAction(playerA, {
     storageId = loaded.id,

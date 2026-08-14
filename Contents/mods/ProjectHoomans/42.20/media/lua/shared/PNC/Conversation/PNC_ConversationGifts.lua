@@ -104,9 +104,9 @@ function Gifts.EvaluateEffect(itemTypes)
     end
 
     return {
-        approval = math.min(12, approval),
-        respect = math.min(8, respect),
-        familiarity = math.min(3, familiarity),
+        approval = approval,
+        respect = respect,
+        familiarity = familiarity,
         memoryID = bestType,
         kind = bestKind,
     }

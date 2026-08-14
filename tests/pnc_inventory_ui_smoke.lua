@@ -77,6 +77,13 @@ assertEqual(#collapsedStorageRows, 1,
 dofile(SHARED_ROOT .. "PNC/Conversation/PNC_ConversationGifts.lua")
 assertEqual(PNC.Gifts.IsValidItemType("Base.Crisps"), true,
     "crisps are valid food gifts")
+local repeatedGiftEffect = PNC.Gifts.EvaluateEffect({
+    "Base.Bandage", "Base.Bandage", "Base.Bandage", "Base.Bandage",
+})
+assertEqual(repeatedGiftEffect.approval, 16,
+    "repeated gifts are no longer reputation capped")
+assertEqual(repeatedGiftEffect.familiarity, 2,
+    "repeated gift familiarity remains cumulative")
 
 package.preload["PNC/UI/Inventory/PNC_InventoryUI_Model"] = function()
     return PNC.InventoryUIModel
@@ -333,6 +340,11 @@ assertEqual(storageSelection.records[1].recordIndex, 3,
     "storage selection retains authoritative record index")
 assertEqual(storageSelection.records[1].quantity, 10,
     "storage selection retains requested quantity")
+storageEndpoint.readOnly = true
+local sent, readOnlyReason = storageEndpoint:send(
+    "to_target", { itemIDs = { "1" } }, "root")
+assertEqual(sent, false, "read-only storage endpoint rejects transfer")
+assertEqual(readOnlyReason, "read_only", "read-only transfer reason")
 
 local window = setmetatable({}, { __index = ISPNCInventoryWindow })
 local eligibleIDs = PNC.InventoryWindow.CollectBulkTransferIDs({

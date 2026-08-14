@@ -63,6 +63,8 @@ local function summary(record)
         allowedJobs=effectiveAllowedJobs(record),
         home=PNC.HomeDutyService and PNC.HomeDutyService.BuildState
             and PNC.HomeDutyService.BuildState(record) or nil,
+        storageCourier=record.runtime and record.runtime.storageCourier
+            and PNC.Core.DeepCopy(record.runtime.storageCourier) or nil,
         facilityDebugWork=record.runtime and record.runtime.facilityDebugWork
             and PNC.Core.DeepCopy(record.runtime.facilityDebugWork) or nil,
         priorityType=priorityType, priority=priority,
@@ -459,6 +461,12 @@ function Management.HandleAction(player, args)
             PNC.Network.SendInventoryDelta(
                 player, record, tonumber(args.inventoryRevision) or 0
             )
+        end
+    elseif action == "storage_npc_deposit_all" then
+        ok, reason, details, storage, record =
+            PNC.ColonyStorageService.RequestNPCCourierDeposit(player, args)
+        if record and PNC.Network and PNC.Network.SendCharacterPayload then
+            PNC.Network.SendCharacterPayload(player, record)
         end
     elseif action == "storage_debug" then
         ok, reason, storage, details =

@@ -130,6 +130,7 @@ function Endpoint.Storage(storageID)
         end
     end
     function endpoint:send(direction, selection, destination, options)
+        if self.readOnly == true then return false, "read_only" end
         if not PNC.Client or not PNC.Client.TransferPlayerStorage then
             return false
         end

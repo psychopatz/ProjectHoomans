@@ -86,15 +86,12 @@ function ISPNCInventoryWindow:createChildren()
     self:addChild(self.takeAllButton)
     self.depositStorageButton = ISButton:new(
         416, 440, 180, 22,
-        tr("UI_PNC_Storage_Deposit", "Deposit to Colony Storage"),
-        self, ISPNCInventoryWindow.onDepositStorage
+        tr("UI_PNC_Storage_DepositAllNPC", "Deposit All to Storage"),
+        self, ISPNCInventoryWindow.onDepositAllStorage
     )
     self.depositStorageButton:initialise()
     self.depositStorageButton:instantiate()
-    self.depositStorageButton:setVisible(
-        PNC.Client and PNC.Client.CanUseDebug
-            and PNC.Client.CanUseDebug() == true
-    )
+    self.depositStorageButton:setVisible(true)
     self:addChild(self.depositStorageButton)
     self:onResponsiveLayout()
     self:refreshInventory(true)
@@ -145,20 +142,16 @@ function ISPNCInventoryWindow:onResponsiveLayout()
     self.statusY = buttonY + 27
 end
 
-function ISPNCInventoryWindow:onDepositStorage()
-    local entry = self.npcList and self.npcList.getItem
-        and self.npcList:getItem() or nil
-    local row = entry and entry.item or nil
-    local inventory = self:inventory()
-    if not row or row.groupHeader == true or row.restricted == true
-        or not inventory
-    then return false end
-    local selection = Model.BuildTransferSelection(row)
-    if not selection then return false end
-    self.statusText = tr("UI_PNC_Storage_Depositing", "Depositing...")
-    return PNC.Client.DepositNPCItemToColony(
-        self.npcId, row.id, selection.quantity, inventory.revision
-    )
+function ISPNCInventoryWindow:onDepositAllStorage()
+    if not self.npcId then return false end
+    if #InventoryWindow.CollectBulkTransferIDs(self.npcList) < 1 then
+        self.statusText = tr("UI_PNC_Storage_NoCourierItems",
+            "No valid items to deposit")
+        return false
+    end
+    self.statusText = tr("UI_PNC_Storage_CourierStarting",
+        "Courier ordered: returning home with storage items...")
+    return PNC.Client.DepositAllNPCItemsToColony(self.npcId)
 end
 
 function InventoryWindow.CollectBulkTransferIDs(list)
@@ -183,6 +176,7 @@ function InventoryWindow.CollectBulkTransferIDs(list)
 end
 
 function ISPNCInventoryWindow:onGiveAll()
+    if self.readOnly then return false end
     local endpoint = self.transferEndpoint
     local selection = TransferEndpoint.BulkSelection(nil, self.playerList)
     if not endpoint or #selection.itemIDs < 1 then
@@ -200,6 +194,7 @@ function ISPNCInventoryWindow:onGiveAll()
 end
 
 function ISPNCInventoryWindow:onTakeAll()
+    if self.readOnly then return false end
     if self.giftMode then
         self.statusText = "Gift mode: taking items is disabled"
         return false
@@ -228,6 +223,10 @@ function ISPNCInventoryWindow:setTransferEndpoint(endpoint)
     self.giftMode = false
     self.giftToken = nil
     self.contextSignature = nil
+    self.readOnly = endpoint and endpoint.readOnly == true or false
+    self.courierRevision = nil
+    self.statusText = self.readOnly and tr("UI_PNC_Storage_ReadOnlyAway",
+        "Read only: enter the base to move stockpile items") or nil
     if endpoint then endpoint:requestSnapshot() end
     if self.npcList then self.npcList.role = "npc" end
     if self.npcContainerList then self.npcContainerList.role = "npc" end
@@ -242,9 +241,8 @@ function ISPNCInventoryWindow:setTransferEndpoint(endpoint)
             or tr("UI_PNC_Inventory_TakeAll", "< Take All"))
     end
     if self.depositStorageButton and self.depositStorageButton.setVisible then
-        self.depositStorageButton:setVisible(endpoint and endpoint.kind == "npc"
-            and PNC.Client and PNC.Client.CanUseDebug
-            and PNC.Client.CanUseDebug() == true)
+        self.depositStorageButton:setVisible(endpoint
+            and endpoint.kind == "npc")
     end
     self:refreshInventory(true)
 end
@@ -262,8 +260,6 @@ function ISPNCInventoryWindow:setConversationMode(mode, token)
         self.depositStorageButton:setVisible(
             not self.giftMode and self.transferEndpoint
                 and self.transferEndpoint.kind == "npc"
-                and PNC.Client and PNC.Client.CanUseDebug
-                and PNC.Client.CanUseDebug() == true
         )
     end
     self.contextSignature = nil
@@ -343,6 +339,11 @@ function ISPNCInventoryWindow:refreshInventory(force)
         table.concat(protectedState, ","),
         tostring(self.selectedNPCContainer),
         tostring(self.selectedPlayerContainer),
+        self.readOnly and "readonly" or "writable",
+        tostring(self.npcId and ClientState.snapshots
+            and ClientState.snapshots[self.npcId]
+            and ClientState.snapshots[self.npcId].storageCourier
+            and ClientState.snapshots[self.npcId].storageCourier.revision or 0),
     }, "|")
     if not force and signature == self.contextSignature then return end
     self.contextSignature = signature
@@ -368,12 +369,19 @@ function ISPNCInventoryWindow:refreshInventory(force)
     resetList(self.npcList, endpoint:rows())
     if self.giveAllButton and self.giveAllButton.setEnable then
         self.giveAllButton:setEnable(
-            #InventoryWindow.CollectBulkTransferIDs(self.playerList) > 0
+            not self.readOnly
+                and #InventoryWindow.CollectBulkTransferIDs(self.playerList) > 0
         )
     end
     if self.takeAllButton and self.takeAllButton.setEnable then
         self.takeAllButton:setEnable(
-            not self.giftMode
+            not self.readOnly and not self.giftMode
+                and #InventoryWindow.CollectBulkTransferIDs(self.npcList) > 0
+        )
+    end
+    if self.depositStorageButton and self.depositStorageButton.setEnable then
+        self.depositStorageButton:setEnable(
+            endpoint.kind == "npc" and not self.giftMode
                 and #InventoryWindow.CollectBulkTransferIDs(self.npcList) > 0
         )
     end
@@ -393,6 +401,32 @@ function ISPNCInventoryWindow:refreshInventory(force)
     local snapshot = self.npcId and ClientState.snapshots
         and ClientState.snapshots[self.npcId] or nil
     local payload = self:payload()
+    local courier = payload and payload.snapshot
+        and payload.snapshot.storageCourier or snapshot
+            and snapshot.storageCourier or nil
+    if courier and tonumber(courier.revision) ~= self.courierRevision then
+        self.courierRevision = tonumber(courier.revision)
+        local state = tostring(courier.state or "")
+        if state == "RETURNING_HOME" then
+            self.statusText = tr("UI_PNC_Storage_CourierReturning",
+                "Courier is returning home to deposit all items")
+        elseif state == "DEPOSITING" then
+            self.statusText = tr("UI_PNC_Storage_CourierDepositing",
+                "Courier arrived and is depositing items")
+        elseif state == "COMPLETED" then
+            self.statusText = string.format("%s (%d items)",
+                tr("UI_PNC_Storage_CourierComplete",
+                    "Courier job complete"),
+                tonumber(courier.quantity) or 0)
+        elseif state == "FAILED" or state == "CANCELLED" then
+            self.statusText = tr("UI_PNC_Storage_CourierFailed",
+                "Courier job ended") .. ": "
+                .. tostring(courier.reason or state):gsub("_", " ")
+        end
+    elseif self.readOnly and not self.statusText then
+        self.statusText = tr("UI_PNC_Storage_ReadOnlyAway",
+            "Read only: enter the base to move stockpile items")
+    end
     local npcName = endpoint.kind == "storage"
         and tostring(endpoint.displayName or "Colony Storage")
         or Identity.GetName(
@@ -405,6 +439,11 @@ function ISPNCInventoryWindow:refreshInventory(force)
 end
 
 function ISPNCInventoryWindow:beginInventoryDrag(role, row)
+    if self.readOnly then
+        self.statusText = tr("UI_PNC_Storage_ReadOnlyAway",
+            "Read only: enter the base to move stockpile items")
+        return false
+    end
     if self.giftMode and role == "npc" then
         self.statusText = "Gift mode: taking items is disabled"
         return false
@@ -422,7 +461,9 @@ function ISPNCInventoryWindow:sendTransfer(
 )
     local endpoint = self.transferEndpoint
     local selection
-    if not endpoint or not row or row.restricted == true then return false end
+    if self.readOnly or not endpoint or not row or row.restricted == true then
+        return false
+    end
     if self.giftMode and direction ~= "player_to_npc" then
         self.statusText = "Gift mode: taking items is disabled"
         return false
@@ -446,7 +487,7 @@ function ISPNCInventoryWindow:requestTransfer(
     destinationOverride
 )
     local maximum = Model.GetRowQuantity(row)
-    if not row or row.restricted == true then return false end
+    if self.readOnly or not row or row.restricted == true then return false end
     if self.giftMode and direction ~= "player_to_npc" then
         self.statusText = "Gift mode: taking items is disabled"
         return false
@@ -471,6 +512,7 @@ function ISPNCInventoryWindow:requestTransfer(
 end
 
 function ISPNCInventoryWindow:acceptVanillaItems(items)
+    if self.readOnly then return false end
     local members = {}
     for _, item in ipairs(items or {}) do
         if item and item.getID then
@@ -495,6 +537,10 @@ function ISPNCInventoryWindow:acceptVanillaItems(items)
 end
 
 function ISPNCInventoryWindow:completeInventoryDrop(targetRole)
+    if self.readOnly then
+        self.dragState = nil
+        return false
+    end
     local drag = self.dragState
     self.dragState = nil
     if self.giftMode and drag and drag.source == "npc" then
@@ -527,6 +573,10 @@ function ISPNCInventoryWindow:completeInventoryDrop(targetRole)
 end
 
 function ISPNCInventoryWindow:completeInventoryDropAtMouse()
+    if self.readOnly then
+        self.dragState = nil
+        return false
+    end
     if self.giftMode and self.dragState and self.dragState.source == "npc" then
         self.dragState = nil
         self.statusText = "Gift mode: taking items is disabled"
@@ -557,6 +607,14 @@ end
 
 function ISPNCInventoryWindow:showItemContext(role, row)
     local context = ISContextMenu.get(0, getMouseX(), getMouseY())
+    if self.readOnly then
+        local option = context:addOption(
+            tr("UI_PNC_Storage_ReadOnlyAway",
+                "Read only: enter the base to move stockpile items"),
+            nil, nil)
+        if option then option.notAvailable = true end
+        return
+    end
     if self.giftMode and role == "npc" then
         local option = context:addOption(
             "Gift mode: taking items is disabled",
@@ -635,28 +693,6 @@ function ISPNCInventoryWindow:showItemContext(role, row)
             target:requestTransfer("npc_to_player", row)
         end
     )
-    if self.transferEndpoint and self.transferEndpoint.kind ~= "storage"
-        and row.groupHeader ~= true and PNC.Client and PNC.Client.CanUseDebug
-        and PNC.Client.CanUseDebug()
-    then
-        context:addOption(
-            tr("UI_PNC_Storage_Deposit", "Deposit to Colony Storage"),
-            self,
-            function(target)
-                local selection = Model.BuildTransferSelection(row)
-                if not selection then return false end
-                target.statusText = tr(
-                    "UI_PNC_Storage_Depositing", "Depositing..."
-                )
-                return PNC.Client.DepositNPCItemToColony(
-                    target.npcId,
-                    row.id,
-                    selection.quantity,
-                    inventory.revision
-                )
-            end
-        )
-    end
 end
 
 function ISPNCInventoryWindow:sendItemAction(actionID, itemID)
@@ -895,6 +931,7 @@ function InventoryWindow.OpenStorage(storageID, options)
     local window = getOrCreateWindow()
     local endpoint = TransferEndpoint.Storage(storageID)
     endpoint.displayName = options.displayName or "Colony Storage"
+    endpoint.readOnly = options.readOnly == true
     window:setTransferEndpoint(endpoint)
     window:setConversationMode(nil, nil)
     window:bringToTop()
@@ -933,7 +970,10 @@ function InventoryWindow.OnColonyStorageResult(result)
     then return end
     local reason = tostring(result.reason or "failed"):gsub("_", " ")
     local details = result.details or {}
-    if result.ok == true then
+    if result.ok == true and result.reason == "courier_returning_home" then
+        window.statusText = tr("UI_PNC_Storage_CourierReturning",
+            "Courier is returning home to deposit all items")
+    elseif result.ok == true then
         window.statusText = tr(
             "UI_PNC_Storage_TransferComplete", "Storage transfer complete"
         )

@@ -128,6 +128,8 @@ function Network.BuildSnapshot(record)
         commandFeedback = buildCommandFeedback(record),
         bandageFeedback = buildBandageFeedback(record),
         actionInformation = buildActionInformation(record),
+        storageCourier = record.runtime and record.runtime.storageCourier
+            and Core.DeepCopy(record.runtime.storageCourier) or nil,
         activeJob = record.activeJob,
         activeBehavior = record.activeBehavior,
         presenceState = record.presenceState,

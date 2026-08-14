@@ -8,6 +8,8 @@ local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local Events = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
+local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
+local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 
 Service.Metrics = Service.Metrics or {
     deposits = 0, withdrawals = 0, transferFailures = 0,
@@ -146,6 +148,35 @@ function Service.ResolveForPlayer(player, requestedStorageID)
     if not storage then return nil, reason end
     if storage.ownerFactionId ~= faction.id then return nil, "storage_not_owned" end
     return storage, nil, faction, colony
+end
+
+function Service.BuildPlayerAccess(player, storage)
+    local base = storage and storage.settlementId and PNC.BaseService
+        and PNC.BaseService.GetForColony(storage.settlementId) or nil
+    local hasStockpile = false
+    for _, _ in pairs(base and base.stockpileNodeIds or {}) do
+        hasStockpile = true
+        break
+    end
+    local zone = base and Zones.get(base.baseZoneId) or nil
+    local x = player and player.getX and tonumber(player:getX()) or nil
+    local y = player and player.getY and tonumber(player:getY()) or nil
+    local insideBase = x ~= nil and y ~= nil and zone and zone.geometry
+        and GridRegion.containsXY(zone.geometry, math.floor(x), math.floor(y))
+        or false
+    return {
+        baseId = base and base.id or nil,
+        hasStockpile = hasStockpile,
+        insideBase = insideBase == true,
+        writable = hasStockpile and insideBase == true,
+        reason = not hasStockpile and "stockpile_required"
+            or not insideBase and "outside_base" or "writable",
+    }
+end
+
+function Service.RequirePlayerAccess(player, storage)
+    local access = Service.BuildPlayerAccess(player, storage)
+    return access.writable == true, access.reason, access
 end
 
 function Internal.RememberRequest(player, requestID)

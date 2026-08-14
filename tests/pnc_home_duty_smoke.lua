@@ -176,4 +176,30 @@ equal(followArrived, true, "follow arrival handled")
 equal(traveler.orderSpec.kind, "follow", "arrival installs follow order")
 equal(traveler.orderSpec.ownerUsername, "owner", "follow owner is preserved")
 
+local courierCompleted
+PNC.ColonyStorageService = {
+    CompleteNPCCourier = function(record)
+        courierCompleted = record.id
+        record.runtime.storageCourier.state = "COMPLETED"
+        return true, "deposited"
+    end,
+}
+local courier = {
+    id = "npc-courier", alive = true, x = 1, y = 2, z = 0,
+    presenceState = "abstract",
+    runtime = { storageCourier = {
+        state = "RETURNING_HOME", baseId = "base-1",
+    } },
+    affiliation = { communityID = "colony-1" },
+}
+equal(PNC.HomeDutyService.SendHome(courier, "base-1", "storage_courier"),
+    true, "courier uses home journey")
+courier.x, courier.y, courier.travel.state = 15, 16, "arrived"
+equal(arrivals.colony_home(courier, courier.travel,
+    startedRequest.arrivalAction), true, "courier arrival handled")
+equal(courierCompleted, "npc-courier",
+    "home arrival completes the pending courier job")
+equal(courier.runtime.storageCourier.state, "COMPLETED",
+    "courier completion remains visible")
+
 print("pnc_home_duty_smoke: ok")

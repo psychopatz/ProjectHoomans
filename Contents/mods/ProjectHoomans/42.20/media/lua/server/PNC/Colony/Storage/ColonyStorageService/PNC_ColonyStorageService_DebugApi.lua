@@ -109,6 +109,7 @@ function Service.BuildSnapshot(player, options)
     )
     if not storage then return nil, reason end
     local snapshot = Query.BuildSnapshot(storage, options)
+    snapshot.access = Service.BuildPlayerAccess(player, storage)
     snapshot.debugAuthorized = Internal.DebugAllowed(player)
     snapshot.metrics = {
         storageDeposits = Service.Metrics.deposits,

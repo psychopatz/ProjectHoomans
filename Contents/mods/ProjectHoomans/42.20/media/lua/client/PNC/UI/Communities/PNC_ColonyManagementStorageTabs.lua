@@ -139,6 +139,12 @@ function StorageTabs.ApplyLayout(window, Layout, active)
     window.storageSortButton:setVisible(active)
     window.storageTransferButton:setVisible(active
         and window.snapshot and window.snapshot.storage ~= nil)
+    if window.storageTransferButton.setEnable then
+        local access = window.snapshot and window.snapshot.storage
+            and window.snapshot.storage.access or nil
+        window.storageTransferButton:setEnable(access
+            and access.hasStockpile == true or false)
+    end
     local debugVisible = active and window.snapshot
         and window.snapshot.storage
         and window.snapshot.storage.debugAuthorized == true
@@ -212,6 +218,8 @@ function StorageTabs.OnControl(window, button, tr)
         end
         PNC.InventoryWindow.OpenStorage(storage.storageId, {
             displayName = tr("UI_PNC_Storage_Colony", "Colony Storage"),
+            readOnly = not storage.access
+                or storage.access.writable ~= true,
         })
         return true
     end
