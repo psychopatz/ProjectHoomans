@@ -74,16 +74,29 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
 end
 ISPNCColonyManagementWindow = { onColonySettingsControl = function() end }
 local renamed
+local savedEmblem
 PNC.Client.RenameFaction = function(name)
     renamed = name
     return true, "renamed"
 end
+PNC.Client.SetFactionEmblem = function(emblem)
+    savedEmblem = emblem
+    return true
+end
+PNC.FactionEmblemEditor = {
+    Open = function(options)
+        options.onSave({ revision = 4, backgroundColorID = "blue" },
+            options.context)
+        return true
+    end,
+}
 
 local Settings = require(
     "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_SettingsTab"
 )
 local details = {}
 local window = {
+    snapshot = snapshot,
     addChild = function() end,
     addDetail = function(_, label, detail)
         details[#details + 1] = { label = label, detail = detail }
@@ -99,5 +112,9 @@ equal(Settings.OnControl(window, window.factionRenameButton), true,
     "settings submits faction rename")
 equal(renamed, "Morgan Wardens", "settings submits edited name")
 equal(window.refreshed, true, "settings refreshes after local rename")
+equal(Settings.OnControl(window, window.factionEmblemButton), true,
+    "settings opens the faction emblem editor")
+equal(savedEmblem.backgroundColorID, "blue",
+    "settings saves the edited player faction emblem")
 
 print("pnc_colony_faction_settings_smoke: ok")

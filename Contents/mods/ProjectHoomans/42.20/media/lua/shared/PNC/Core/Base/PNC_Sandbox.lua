@@ -84,6 +84,19 @@ function Settings.PlayerOwnedNPCNeedMortalityEnabled()
     return Settings.GetBoolean("PlayerOwnedNPCNeedMortality", false)
 end
 
+function Settings.MobileGroupAccidentChance(groupType)
+    local defaults = { REFUGEE = 30, LOOTER = 10, TRADER = 1 }
+    local keys = {
+        REFUGEE = "RefugeeAccidentDeathChance",
+        LOOTER = "LooterAccidentDeathChance",
+        TRADER = "CaravanAccidentDeathChance",
+    }
+    groupType = string.upper(tostring(groupType or ""))
+    local key = keys[groupType]
+    if not key then return 0 end
+    return Settings.GetNumber(key, defaults[groupType], 0, 100)
+end
+
 function Settings.ZombiesTargetDownedNPC()
     return Settings.GetBoolean("ZombiesTargetDownedNPC", false)
 end

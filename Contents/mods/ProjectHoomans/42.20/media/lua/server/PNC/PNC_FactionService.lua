@@ -2390,6 +2390,12 @@ function Factions.SetEmblem(factionID, value)
     faction.emblem = normalized
     touchFaction(faction)
     touchRegistry()
+    for npcID, present in pairs(faction.memberIDs or {}) do
+        local member = present == true and PNC.Registry.Get(npcID) or nil
+        if member and PNC.Registry.MarkDirty then
+            PNC.Registry.MarkDirty(member, "faction_emblem")
+        end
+    end
     return true, "updated", copy(faction)
 end
 

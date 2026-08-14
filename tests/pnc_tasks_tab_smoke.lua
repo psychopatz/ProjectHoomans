@@ -56,4 +56,18 @@ contains(rows[2].detail, "UNASSIGNED", "queued task assignment")
 local empty = Tasks.BuildRows({ snapshot = { tasks = {} } })
 contains(empty[1].label, "NO AVAILABLE TASKS", "empty task state")
 
+local needs = Tasks.BuildRows({ snapshot = { tasks = {}, people = {
+    { id = "npc-2", name = "Riley", activity = "sleeping",
+        needs = { hunger = 0.31, thirst = 0.42, fatigue = 0.52 },
+        supply = { byKind = {
+            FOOD = { phase = "ACQUIRE" },
+            HYDRATION = { phase = "FAILED" },
+        } } },
+} } })
+assert(#needs == 3, "needs tasks did not include eating, drinking, and sleeping")
+local joined = needs[1].label .. " " .. needs[2].label .. " " .. needs[3].label
+contains(joined, "EAT", "hunger task")
+contains(joined, "DRINK", "thirst task")
+contains(joined, "SLEEP", "active sleep task")
+
 print("pnc_tasks_tab_smoke: ok")

@@ -13,6 +13,7 @@ local Traversal = PNC.AbstractTraversal
 local Actions = PNC.AbstractActions
 local EncounterResolver = PNC.AbstractEncounterResolver
 local CombatResolver = PNC.AbstractCombatResolver
+local MobileAccidents = PNC.AbstractMobileAccidents
 local Scheduler = PNC.Scheduler
 local Config = PNC.DirectorConfig
 
@@ -115,6 +116,14 @@ function Director.Initialize(force)
         end,
         { budget = Config.EncounterQueue.WORK_BUDGET,
             startAt = now + Config.ENCOUNTER_INTERVAL_HOURS })
+    Scheduler.RegisterJob("AbstractMobileAccidents",
+        Config.MOBILE_ACCIDENT_INTERVAL_HOURS,
+        function(at)
+            if Director.Paused then return 0 end
+            return MobileAccidents.Process(at)
+        end,
+        { budget = 1,
+            startAt = now + Config.MOBILE_ACCIDENT_INTERVAL_HOURS })
     Scheduler.RegisterJob("AbstractReconciliation", Config.RECONCILE_INTERVAL_HOURS,
         function(at, budget)
             if Director.Paused then return 0 end

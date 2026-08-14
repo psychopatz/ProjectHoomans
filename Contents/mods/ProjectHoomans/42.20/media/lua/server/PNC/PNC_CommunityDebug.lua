@@ -149,8 +149,8 @@ function Debug.BuildSnapshot(
                 playerFaction.id
             ) or nil
         factionRelations[faction.id] = {
-            isPlayerFaction = playerFaction ~= nil
-                and faction.id == playerFaction.id,
+            isPlayerFaction = actualPlayerFaction ~= nil
+                and faction.id == actualPlayerFaction.id,
             state = relation and relation.state
                 or playerFaction and "neutral" or "unknown",
             atWar = playerFaction ~= nil

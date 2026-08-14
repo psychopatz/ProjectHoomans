@@ -77,6 +77,40 @@ local function kill(record)
     return true
 end
 
+local function reconcileGroup(group, reason)
+    local surviving = {}
+    for _, npcID in ipairs(group.memberIds or {}) do
+        local record = PNC.Registry and PNC.Registry.Get(npcID) or nil
+        if record and record.alive ~= false then surviving[#surviving + 1] = npcID end
+    end
+    group.memberIds = surviving
+    Groups.MarkCombatProfileDirty(group, reason)
+    group.revision = (tonumber(group.revision) or 0) + 1
+    Store.Touch(reason)
+end
+
+function Casualties.KillMembers(group, npcIDs, reason)
+    local requested = {}
+    local deaths = {}
+    for _, npcID in ipairs(npcIDs or {}) do requested[tostring(npcID)] = true end
+    for _, npcID in ipairs(group and group.memberIds or {}) do
+        local record = requested[tostring(npcID)]
+            and PNC.Registry and PNC.Registry.Get(npcID) or nil
+        if record and record.alive ~= false then
+            kill(record)
+            deaths[#deaths + 1] = npcID
+            Store.Emit("ABSTRACT_MEMBER_KILLED", {
+                groupId = group.id, npcId = npcID,
+                reason = tostring(reason or "abstract_casualty"),
+            })
+        end
+    end
+    if #deaths > 0 then
+        reconcileGroup(group, tostring(reason or "abstract_casualties_applied"))
+    end
+    return deaths
+end
+
 function Casualties.Apply(group, severityCounts, seed, attackerID)
     local pool, output = candidates(group, seed), { injuries = {}, deaths = {}, counts = {} }
     local cursor = 1
@@ -104,15 +138,7 @@ function Casualties.Apply(group, severityCounts, seed, attackerID)
             output.counts[severity] = output.counts[severity] + 1
         end
     end
-    local surviving = {}
-    for _, npcID in ipairs(group.memberIds or {}) do
-        local record = PNC.Registry and PNC.Registry.Get(npcID) or nil
-        if record and record.alive ~= false then surviving[#surviving + 1] = npcID end
-    end
-    group.memberIds = surviving
-    Groups.MarkCombatProfileDirty(group, "abstract_casualties")
-    group.revision = (tonumber(group.revision) or 0) + 1
-    Store.Touch("abstract_casualties_applied")
+    reconcileGroup(group, "abstract_casualties_applied")
     return output
 end
 

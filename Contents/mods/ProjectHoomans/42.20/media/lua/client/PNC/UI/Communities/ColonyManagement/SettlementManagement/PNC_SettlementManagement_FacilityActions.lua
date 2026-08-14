@@ -206,4 +206,82 @@ function Facility.BeginPoint(window, kind, facility, requestedRole, componentId)
     })
 end
 
+local function anchorRegion(facility, role)
+    local levels = {}
+    for _, component in ipairs(facility and facility.components or {}) do
+        if component.kind == "anchor" and component.role == role then
+            local z = math.floor(tonumber(component.z) or 0)
+            local y = math.floor(tonumber(component.y) or 0)
+            local x = math.floor(tonumber(component.x) or 0)
+            levels[z] = levels[z] or { rows = {} }
+            levels[z].rows[y] = levels[z].rows[y] or {}
+            local spans = levels[z].rows[y]
+            spans[#spans + 1] = x
+            spans[#spans + 1] = x
+        end
+    end
+    return GridRegion.normalize({ levels = levels })
+end
+
+local function anchorsFromRegion(region)
+    local output = {}
+    for z, level in pairs(GridRegion.normalize(region).levels or {}) do
+        for y, spans in pairs(level.rows or {}) do
+            local index
+            for index = 1, #spans, 2 do
+                local x
+                for x = spans[index], spans[index + 1] do
+                    output[#output + 1] = { x = x, y = y, z = z }
+                end
+            end
+        end
+    end
+    table.sort(output, function(a, b)
+        if a.z ~= b.z then return a.z < b.z end
+        if a.y ~= b.y then return a.y < b.y end
+        return a.x < b.x
+    end)
+    return output
+end
+
+function Facility.BeginAnchorGroup(window, facility, role)
+    local level = PNC.FacilityDefinitions.GetLevel(
+        facility.definitionId, facility.level)
+    local limit = level and level.componentLimits and level.componentLimits[role]
+    if not limit or limit.kind ~= "anchor" then return false end
+    local boundary = Support.FacilityRegion(facility)
+    Support.OpenSelector(window, {
+        title = Support.Tr("UI_PNC_Facility_EditSleepSpots", "EDIT SLEEP SPOTS"),
+        instruction = Support.Tr("UI_PNC_Facility_EditSleepSpotsHelp",
+            "Select one tile for each sleeping spot. Use ADD and ERASE to reorganize every spot, then confirm once."),
+        initialRegion = anchorRegion(facility, role),
+        guideRegion = boundary,
+        guideLayers = Support.UsedGuideLayers(window),
+        guideRenderZ = math.floor(getSpecificPlayer(0):getZ()),
+        maxTiles = limit.maxCount,
+        validate = function(region, stats)
+            local count = stats and stats.tileCount or GridRegion.countTiles(region)
+            if count < (tonumber(limit.minCount) or 0) then
+                return false, Shared.SettlementReason("FACILITY_COMPONENT_REQUIRED")
+            end
+            if limit.maxCount and count > limit.maxCount then
+                return false, Shared.SettlementReason("FACILITY_COMPONENT_LIMIT")
+            end
+            if not GridRegion.containsRegion(boundary, region) then
+                return false, Shared.SettlementReason("OUTSIDE_FACILITY")
+            end
+            return true
+        end,
+        onConfirm = function(region)
+            PNC.Client.RequestReplaceFacilityAnchors({
+                facilityId = facility.id,
+                expectedRevision = facility.revision,
+                role = role, anchors = anchorsFromRegion(region),
+            })
+            Support.ApplyLocalResult(window)
+        end,
+    })
+    return true
+end
+
 return Facility

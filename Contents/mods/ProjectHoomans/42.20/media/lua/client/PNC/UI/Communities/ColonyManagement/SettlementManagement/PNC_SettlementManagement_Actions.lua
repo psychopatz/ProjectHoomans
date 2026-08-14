@@ -18,6 +18,9 @@ function Actions.HandleComponent(window, action, facility)
             action.componentId)
     end
     if action.kind == "anchor" then
+        if action.groupEdit == true then
+            return Facility.BeginAnchorGroup(window, facility, action.role)
+        end
         Facility.BeginPoint(window, "facility_anchor", facility,
             action.role, action.componentId)
         return true

@@ -71,6 +71,36 @@ option ProjectHoomans.PopulationGenerationDistance
     translation = ProjectHoomans.PopulationGenerationDistance,
 }
 
+option ProjectHoomans.RefugeeAccidentDeathChance
+{
+    type = double,
+    default = 30.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.RefugeeAccidentDeathChance,
+}
+
+option ProjectHoomans.LooterAccidentDeathChance
+{
+    type = double,
+    default = 10.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.LooterAccidentDeathChance,
+}
+
+option ProjectHoomans.CaravanAccidentDeathChance
+{
+    type = double,
+    default = 1.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.CaravanAccidentDeathChance,
+}
+
 option ProjectHoomans.NPCMeleeWeaponSpawnChance
 {
     type = double,

@@ -369,6 +369,81 @@ function Service.SetComponent(player, args)
     return applyComponent(base, facility, check.details.component)
 end
 
+function Service.ReplaceAnchorRole(player, args)
+    args = type(args) == "table" and args or {}
+    local facility = Repository.GetFacility(args.facilityId)
+    local base = facility and PNC.BaseService.Get(facility.baseId) or nil
+    if not base then return { ok = false, reason = "FACILITY_NOT_FOUND" } end
+    if not PNC.BaseValidationService.CanUse(player, base) then
+        return { ok = false, reason = "NO_PERMISSION" }
+    end
+    if not isBuilt(facility) then
+        return { ok = false, reason = "FACILITY_NOT_BUILT" }
+    end
+    if args.expectedRevision ~= nil
+        and tonumber(args.expectedRevision) ~= facility.revision
+    then return { ok = false, reason = "REVISION_CONFLICT",
+        revision = facility.revision } end
+    local role = tostring(args.role or "")
+    local level = Definitions.GetLevel(facility.definitionId, facility.level)
+    local limit = level and level.componentLimits and level.componentLimits[role]
+    local anchors = type(args.anchors) == "table" and args.anchors or {}
+    if not limit or limit.kind ~= "anchor" then
+        return { ok = false, reason = "INVALID_COMPONENT_ROLE" }
+    end
+    if #anchors < (tonumber(limit.minCount) or 0)
+        or limit.maxCount and #anchors > limit.maxCount
+    then return { ok = false, reason = "FACILITY_COMPONENT_LIMIT" } end
+    local old = {}
+    for componentId, present in pairs(facility.componentIds or {}) do
+        local component = present == true and Repository.GetComponent(componentId)
+        if component and component.role == role then
+            old[#old + 1] = component
+            facility.componentIds[componentId] = nil
+        end
+    end
+    local normalized = {}
+    local failure
+    for index, anchor in ipairs(anchors) do
+        local input = {
+            id = PNC.Core.GenerateID("component"), kind = "anchor", role = role,
+            x = anchor.x, y = anchor.y, z = anchor.z,
+            targetResolver = role == "sleep.bed" and "sleepSpot" or nil,
+        }
+        local check = Validation.NormalizeComponent(base, facility, input)
+        if check.ok ~= true then failure = check; break end
+        normalized[index] = check.details.component
+    end
+    if failure then
+        for _, component in ipairs(old) do
+            facility.componentIds[component.id] = true
+        end
+        return failure
+    end
+    for _, component in ipairs(old) do
+        Repository.State.components[component.id] = nil
+        if PNC.FacilityInteractionTargets then
+            PNC.FacilityInteractionTargets.Invalidate(component.id)
+        end
+        if PNC.FacilityReservations then
+            PNC.FacilityReservations.ReleaseComponent(component.id)
+        end
+    end
+    for _, component in ipairs(normalized) do
+        Repository.State.components[component.id] = component
+        facility.componentIds[component.id] = true
+    end
+    touch(base, facility)
+    updateState(base, facility)
+    Service.RebuildIndexes()
+    emit(PNC.EventTypes.FACILITY_COMPONENT_CHANGED, {
+        facilityId = facility.id, role = role, operation = "REPLACE_ROLE",
+        revision = facility.revision,
+    })
+    return { ok = true, facility = facility, components = normalized,
+        event = "FacilityAnchorRoleReplaced" }
+end
+
 function Service.RemoveComponent(player, args)
     args = type(args) == "table" and args or {}
     local facility = Repository.GetFacility(args.facilityId)

@@ -11,6 +11,45 @@ local OPERATION_KEYS = {
     RESEARCH = { "UI_PNC_Task_Research", "RESEARCH" },
 }
 
+local NEED_TASKS = {
+    hunger = { labelKey = "UI_PNC_Task_Eat", operation = "EAT",
+        active = "eating", trigger = 0.25 },
+    thirst = { labelKey = "UI_PNC_Task_Drink", operation = "DRINK",
+        active = "drinking", trigger = 0.25 },
+    fatigue = { labelKey = "UI_PNC_Task_Sleep", operation = "SLEEP",
+        active = "sleeping", trigger = 0.70 },
+}
+
+local function needRows(context)
+    local rows = {}
+    for _, person in ipairs(context.snapshot and context.snapshot.people or {}) do
+        for needType, definition in pairs(NEED_TASKS) do
+            local value = tonumber(person.needs and person.needs[needType]) or 0
+            local active = tostring(person.activity or "") == definition.active
+            if active or value >= definition.trigger then
+                local kind = needType == "thirst" and "HYDRATION"
+                    or needType == "hunger" and "FOOD" or nil
+                local lane = kind and person.supply and person.supply.byKind
+                    and person.supply.byKind[kind] or nil
+                local status = active and "WORKING"
+                    or lane and tostring(lane.phase or "QUEUED") or "QUEUED"
+                rows[#rows + 1] = {
+                    key = "need:" .. tostring(person.id) .. ":" .. needType,
+                    label = Shared.Tr(definition.labelKey,
+                        definition.operation) .. "  "
+                        .. tostring(person.name or person.id),
+                    detail = status .. "  |  NEED "
+                        .. tostring(math.floor(value * 100 + 0.5)) .. "%",
+                    colorName = status == "FAILED" and "warning"
+                        or active and "success" or "accent",
+                }
+            end
+        end
+    end
+    table.sort(rows, function(a, b) return a.key < b.key end)
+    return rows
+end
+
 local function facilityName(task)
     local definition = task.facilityDefinitionId
         and PNC.FacilityDefinitions
@@ -83,7 +122,8 @@ end
 
 function Tasks.BuildRows(context)
     local tasks = context.snapshot and context.snapshot.tasks or {}
-    if #tasks <= 0 then
+    local rows = needRows(context)
+    if #tasks <= 0 and #rows <= 0 then
         return {{
             key = "tasks_empty",
             label = Shared.Tr("UI_PNC_Tasks_None", "NO AVAILABLE TASKS"),
@@ -92,7 +132,6 @@ function Tasks.BuildRows(context)
             colorName = "muted",
         }}
     end
-    local rows = {}
     for index, task in ipairs(tasks) do
         local status = tostring(task.status or "")
         rows[#rows + 1] = {

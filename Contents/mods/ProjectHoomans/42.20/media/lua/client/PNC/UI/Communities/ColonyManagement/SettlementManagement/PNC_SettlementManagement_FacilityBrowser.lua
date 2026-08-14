@@ -154,20 +154,25 @@ function Browser.BuildComponentRows(facility)
         end
         local minimum = tonumber(limit.minCount) or 0
         local maximum = tonumber(limit.maxCount) or math.max(1, minimum)
+        local groupEdit = role == "sleep.bed" and limit.kind == "anchor"
         rows[#rows + 1] = {
             key = role,
             label = roleLabel(role),
             detail = tostring(#assigned) .. " / " .. tostring(maximum)
                 .. (#assigned >= minimum and "  READY" or "  REQUIRED"),
             complete = #assigned >= minimum,
-            componentAction = #assigned < maximum and {
+            componentAction = groupEdit and {
+                kind = limit.kind, role = role, groupEdit = true,
+            } or #assigned < maximum and {
                 kind = limit.kind, role = role,
             } or nil,
-            actionLabel = limit.kind == "abstract"
+            actionLabel = groupEdit
+                and tr("UI_PNC_Facility_EditSpotsInline", "EDIT SPOTS")
+                or limit.kind == "abstract"
                 and tr("UI_PNC_Facility_BuildModule", "BUILD")
                 or tr("UI_PNC_Facility_AssignInline", "ASSIGN"),
         }
-        for index = 1, #assigned do
+        for index = 1, groupEdit and 0 or #assigned do
             rows[#rows + 1] = {
                 key = assigned[index].id,
                 label = "- " .. roleLabel(role) .. " #" .. tostring(index),

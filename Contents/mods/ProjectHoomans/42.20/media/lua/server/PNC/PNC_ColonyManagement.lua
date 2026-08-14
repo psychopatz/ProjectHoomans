@@ -317,6 +317,8 @@ function Management.BuildSnapshot(player, options)
     local factionSnapshot = playerFaction and {
         id = playerFaction.id,
         name = playerFaction.name,
+        archetypeID = playerFaction.archetypeID,
+        emblem = PNC.Core.DeepCopy(playerFaction.emblem),
         revision = playerFaction.revision,
         renamePending = playerFaction.tags
             and playerFaction.tags.factionNamePending == true or false,
@@ -329,6 +331,23 @@ function Management.BuildSnapshot(player, options)
         provisionSettings=provisionSettings,
         settlement=settlement, utilities=utilities,
         generatedAt=PNC.NeedsUtils.WorldAgeHours() }
+end
+
+function Management.SetFactionEmblemForPlayer(player, args)
+    args = type(args) == "table" and args or {}
+    if not PNC.Factions or not PNC.Factions.SetPlayerFactionEmblem then
+        return Management.BuildSnapshot(player), {
+            ok = false, reason = "faction_emblem_unavailable",
+        }
+    end
+    local ok, reason, faction = PNC.Factions.SetPlayerFactionEmblem(
+        player, args.emblem)
+    if ok == true and PNC.Factions.Save then PNC.Factions.Save() end
+    return Management.BuildSnapshot(player), {
+        ok = ok == true, reason = reason,
+        action = "faction_emblem",
+        factionID = faction and faction.id or nil,
+    }
 end
 
 function Management.RenameFactionForPlayer(player, args)
@@ -392,6 +411,9 @@ function Management.HandleAction(player, args)
     if action == "faction_rename" then
         return Management.RenameFactionForPlayer(player, args)
     end
+    if action == "faction_emblem" then
+        return Management.SetFactionEmblemForPlayer(player, args)
+    end
     local ok, reason, details, storage, record
     local settlementActions = {
         base_create = PNC.BaseService and PNC.BaseService.Create,
@@ -402,6 +424,8 @@ function Management.HandleAction(player, args)
         facility_create = PNC.FacilityService and PNC.FacilityService.Create,
         facility_upgrade = PNC.FacilityService and PNC.FacilityService.Upgrade,
         facility_component_set = PNC.FacilityService and PNC.FacilityService.SetComponent,
+        facility_anchor_role_replace = PNC.FacilityService
+            and PNC.FacilityService.ReplaceAnchorRole,
         facility_component_remove = PNC.FacilityService and PNC.FacilityService.RemoveComponent,
         facility_destroy = PNC.FacilityService and PNC.FacilityService.Destroy,
         stockpile_node_create = PNC.StockpileAccessService and PNC.StockpileAccessService.Create,

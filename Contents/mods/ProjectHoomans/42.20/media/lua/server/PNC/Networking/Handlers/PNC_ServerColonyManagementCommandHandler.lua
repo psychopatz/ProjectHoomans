@@ -33,6 +33,7 @@ Router.Register(Const.CMD_COLONY_MANAGEMENT_ACTION,
             barricade_build = true, hq_upgrade = true,
             facility_create = true, facility_upgrade = true,
             facility_component_set = true, facility_component_remove = true,
+            facility_anchor_role_replace = true,
             facility_destroy = true, stockpile_node_create = true,
             stockpile_node_remove = true,
         }

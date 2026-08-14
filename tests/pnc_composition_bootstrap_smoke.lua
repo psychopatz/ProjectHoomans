@@ -273,6 +273,7 @@ local expectedDirector = {
     "PNC/Director/PNC_AbstractActionResolver",
     "PNC/Director/PNC_AbstractEncounterEvaluator",
     "PNC/Director/PNC_AbstractCasualtyResolver",
+    "PNC/Director/PNC_AbstractMobileAccidents",
     "PNC/Director/PNC_AbstractRetreatResolver",
     "PNC/Director/PNC_AbstractCombatResolver",
     "PNC/Director/PNC_AbstractEncounterResolver",

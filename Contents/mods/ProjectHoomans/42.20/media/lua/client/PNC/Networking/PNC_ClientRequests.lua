@@ -593,6 +593,10 @@ function Client.RequestSetFacilityComponent(options)
     return Client.RequestColonyAction("facility_component_set", options)
 end
 
+function Client.RequestReplaceFacilityAnchors(options)
+    return Client.RequestColonyAction("facility_anchor_role_replace", options)
+end
+
 function Client.RequestRemoveFacilityComponent(options)
     return Client.RequestColonyAction("facility_component_remove", options)
 end
@@ -721,6 +725,12 @@ end
 function Client.RenameFaction(name)
     return Client.RequestColonyAction("faction_rename", {
         name = tostring(name or ""),
+    })
+end
+
+function Client.SetFactionEmblem(emblem)
+    return Client.RequestColonyAction("faction_emblem", {
+        emblem = type(emblem) == "table" and Core.DeepCopy(emblem) or emblem,
     })
 end
 

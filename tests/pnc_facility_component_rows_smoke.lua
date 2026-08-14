@@ -62,4 +62,28 @@ assert(rows[2].componentAction.componentId == "craft:1"
 assert(rows[3].componentAction.role == "work.disassemble",
     "unplaced disassembly action disappeared after craft assignment")
 
+PNC.FacilityDefinitions.GetLevel = function()
+    return { componentLimits = {
+        ["sleep.area"] = { kind = "region", minCount = 1, maxCount = 1 },
+        ["sleep.bed"] = { kind = "anchor", minCount = 1, maxCount = 4 },
+    } }
+end
+rows = Browser.BuildComponentRows({
+    definitionId = "barracks", level = 1,
+    components = {
+        { id = "area:1", kind = "region", role = "sleep.area",
+            tileCount = 12 },
+        { id = "bed:1", kind = "anchor", role = "sleep.bed",
+            x = 10, y = 11, z = 0 },
+        { id = "bed:2", kind = "anchor", role = "sleep.bed",
+            x = 12, y = 11, z = 0 },
+    },
+})
+assert(#rows == 3,
+    "barracks should collapse individual beds into one sleep-spots editor")
+assert(rows[3].key == "sleep.bed"
+    and rows[3].componentAction.groupEdit == true
+    and rows[3].actionLabel == "EDIT SPOTS",
+    "barracks sleep spots are not managed as one uniform component group")
+
 print("pnc_facility_component_rows_smoke: ok")

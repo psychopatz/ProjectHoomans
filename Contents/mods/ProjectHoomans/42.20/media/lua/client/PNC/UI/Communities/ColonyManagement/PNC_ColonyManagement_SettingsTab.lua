@@ -20,6 +20,13 @@ function Tab.Create(window)
         onclick = ISPNCColonyManagementWindow.onColonySettingsControl,
         variant = "primary",
     })
+    window.factionEmblemButton = UI.CreateButton(window, {
+        id = "faction_emblem",
+        title = Shared.Tr("UI_PNC_ColonySettings_EditEmblem", "EDIT EMBLEM"),
+        target = window,
+        onclick = ISPNCColonyManagementWindow.onColonySettingsControl,
+        variant = "quiet",
+    })
 end
 
 function Tab.Layout(window, Layout, content)
@@ -31,15 +38,19 @@ function Tab.Layout(window, Layout, content)
     Layout.SetBounds(window.factionRenameButton,
         content.x + content.width - buttonWidth, content.y,
         buttonWidth, 28)
+    Layout.SetBounds(window.factionEmblemButton,
+        content.x + content.width - buttonWidth, content.y + 34,
+        buttonWidth, 28)
 end
 
 function Tab.Apply(window, active, Layout)
     window.factionNameEntry:setVisible(active)
     window.factionRenameButton:setVisible(active)
+    window.factionEmblemButton:setVisible(active)
     if active and Layout then
         window:layoutPane(window.detailsPane, window.layout.content.x,
-            window.layout.content.y + 40, window.layout.content.width,
-            math.max(60, window.layout.content.height - 40))
+            window.layout.content.y + 74, window.layout.content.width,
+            math.max(60, window.layout.content.height - 74))
     end
 end
 
@@ -57,9 +68,11 @@ function Tab.Rebuild(window, snapshot)
             Shared.Tr("UI_PNC_ColonySettings_NoFactionHelp",
                 "Recruit a companion to establish your faction."))
         window.factionRenameButton:setEnable(false)
+        window.factionEmblemButton:setEnable(false)
         return true
     end
     window.factionRenameButton:setEnable(true)
+    window.factionEmblemButton:setEnable(true)
     window:addDetail(
         Shared.Tr("UI_PNC_ColonySettings_CurrentFaction", "CURRENT FACTION"),
         tostring(faction.name or ""), "accent")
@@ -75,7 +88,27 @@ function Tab.Rebuild(window, snapshot)
 end
 
 function Tab.OnControl(window, button)
-    if not button or button.internal ~= "faction_rename" then return false end
+    if not button then return false end
+    if button.internal == "faction_emblem" then
+        if not PNC.FactionEmblemEditor then
+            require "PNC/UI/Factions/PNC_FactionEmblemEditor"
+        end
+        local faction = window.snapshot and window.snapshot.faction or nil
+        if not faction or not PNC.FactionEmblemEditor then return false end
+        PNC.FactionEmblemEditor.Open({
+            archetypeID = faction.archetypeID or "settler",
+            emblem = faction.emblem,
+            seed = faction.id or "player_faction",
+            context = window,
+            onSave = function(emblem, context)
+                local ok = PNC.Client and PNC.Client.SetFactionEmblem
+                    and PNC.Client.SetFactionEmblem(emblem)
+                if ok and context and context.refresh then context:refresh() end
+            end,
+        })
+        return true
+    end
+    if button.internal ~= "faction_rename" then return false end
     local name = window.factionNameEntry
         and window.factionNameEntry:getText() or ""
     local ok
