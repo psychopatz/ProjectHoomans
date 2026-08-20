@@ -44,6 +44,8 @@ local ROOM_PLACEHOLDER = "media/ui/Facilities/BuildingMenu/livingRoom.png"
 local COMPONENT_PLACEHOLDERS = {
     ["sleep.area"] = "media/ui/Facilities/Components/chair.png",
     ["sleep.bed"] = "media/ui/Facilities/Components/bed/barracks.png",
+    ["dining.table"] = "media/ui/Facilities/Components/chair.png",
+    ["health.bed"] = "media/ui/Facilities/Components/bed/hospital.png",
     ["farm.field"] = "media/ui/Facilities/Components/default.png",
     ["work.research"] =
         "media/ui/Facilities/Components/research_station/research_station.png",
@@ -130,6 +132,8 @@ local function componentName(facility, component, ordinal)
     local labels = {
         ["sleep.bed"] = "Bed",
         ["living.chair"] = "Chair",
+        ["dining.table"] = "Dining Table",
+        ["health.bed"] = "Hospital Bed",
         ["farm.field"] = "Farm Field",
         ["work.research"] = "Research Station",
         ["work.blueprint"] = "Architect Bench",
@@ -143,7 +147,9 @@ local function componentName(facility, component, ordinal)
     }
     local label = localizedName("UI_PNC_Overlay_Component_" ..
         string.gsub(role, "[^%w]", "_"), labels[role] or fallbackName(role))
-    if role == "sleep.bed" or role == "living.chair" then
+    if role == "sleep.bed" or role == "living.chair"
+        or role == "dining.table" or role == "health.bed"
+    then
         return label .. " #" .. tostring(ordinal or 1)
     end
     return label

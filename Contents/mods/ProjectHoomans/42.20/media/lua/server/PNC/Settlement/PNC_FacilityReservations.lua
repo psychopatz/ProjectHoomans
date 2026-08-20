@@ -120,10 +120,9 @@ function Reservations.ReleaseNPC(npcId, reason)
 end
 
 local function componentForCapability(facility, capability)
-    local preferredRole = capability == "sleep" and "sleep.bed"
-        or capability == "living" and "living.chair"
-        or capability == "water.drink" and "water.spigot"
-        or capability
+    local jobDefinition = PNC.FacilityJobDefinitions
+        and PNC.FacilityJobDefinitions.Get(capability) or nil
+    local preferredRole = jobDefinition and jobDefinition.role or capability
     local fallback
     for componentId, _ in pairs(facility.componentIds or {}) do
         local component = PNC.SettlementRepository.GetComponent(componentId)
@@ -135,6 +134,19 @@ local function componentForCapability(facility, capability)
         end
     end
     return fallback
+end
+
+function Reservations.HasCapacity(facility, capability)
+    if not facility or not componentForCapability(facility, capability) then
+        return false
+    end
+    local level = PNC.FacilityDefinitions.GetLevel(
+        facility.definitionId, facility.level)
+    local limit = level and level.activityLimits
+        and level.activityLimits[capability]
+        and level.activityLimits[capability].maxConcurrent
+    local key = facility.id .. ":" .. tostring(capability)
+    return not limit or (tonumber(Reservations.ByActivity[key]) or 0) < limit
 end
 
 local function regionTarget(component)

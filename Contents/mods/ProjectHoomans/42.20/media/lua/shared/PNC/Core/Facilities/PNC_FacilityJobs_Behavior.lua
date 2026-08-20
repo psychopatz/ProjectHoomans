@@ -101,60 +101,25 @@ function Jobs.OnSceneTick(record, zombie, scene, now)
     if runtime.taskLeaseId ~= "" and PNC.Tasking
         and PNC.Tasking.Commands and PNC.Tasking.Commands.SetPhase
     then PNC.Tasking.Commands.SetPhase(record.id, "WORKING") end
-    if definition.consumeWater and runtime.waterEffectApplied ~= true then
-        runtime.waterEffectStartedAt = runtime.waterEffectStartedAt
-            or (tonumber(now) or 0) + (tonumber(definition.effectDelayMs) or 0)
-        if (tonumber(now) or 0) >= runtime.waterEffectStartedAt then
-            local consumed, consumeReason = PNC.WaterUtilityService
-                and PNC.WaterUtilityService.Consume
-                and PNC.WaterUtilityService.Consume(runtime.facilityId,
-                    definition.waterLiters or 1)
-            if consumed ~= true then
-                runtime.failedReason = consumeReason or "INSUFFICIENT_WATER"
-                runtime.completionRequested = true
-            else
-                runtime.waterEffectApplied = true
-                if PNC.IndividualNeeds and PNC.IndividualNeeds.Commands
-                    and PNC.IndividualNeeds.Commands.ApplyDrink
-                then
-                    PNC.IndividualNeeds.Commands.ApplyDrink(record, {
-                        thirst = definition.thirstRelief or 0.50,
-                    }, "facility_spigot_drink")
-                end
-                runtime.completionRequested = true
-            end
-        end
-    end
-    if definition.needType and PNC.IndividualNeeds and PNC.NeedsUtils then
+    if definition.needEffect and PNC.NeedFacilityEffects
+        and PNC.NeedsUtils
+    then
         local worldNow = PNC.NeedsUtils.WorldAgeHours()
         local previous = tonumber(runtime.lastEffectWorldHour) or worldNow
         local elapsed = math.max(0, math.min(0.25, worldNow - previous))
         runtime.lastEffectWorldHour = worldNow
-        if elapsed > 0 then
-            local ok, effectReason, value
-            if runtime.taskLeaseId ~= ""
-                and definition.needType == "fatigue"
-                and PNC.IndividualNeeds.Commands
-                and PNC.IndividualNeeds.Commands.ApplyRest
-            then
-                ok, effectReason, value = PNC.IndividualNeeds.Commands.ApplyRest(
-                    record, elapsed, "live_sleep_task")
-            else
-                value = PNC.IndividualNeeds.Modify(record,
-                    definition.needType,
-                    -(tonumber(definition.recoveryPerGameHour) or 0) * elapsed,
-                    "facility_" .. tostring(runtime.capability))
-                ok = value ~= nil
-            end
-            runtime.effectValue = value
-            if runtime.debugHold ~= true
-                and ok and (effectReason == "REST_COMPLETE"
-                    or value ~= nil and value <= (tonumber(
-                        definition.completionThreshold) or 0))
-            then
-                runtime.completionRequested = true
-                return false
-            end
+        local ok, complete, effectReason, value =
+            PNC.NeedFacilityEffects.Tick(
+                record, runtime, definition, elapsed, now)
+        runtime.effectValue = value
+        if not ok then
+            runtime.failedReason = effectReason or "NEED_EFFECT_FAILED"
+            runtime.completionRequested = true
+            return false
+        end
+        if runtime.debugHold ~= true and complete then
+            runtime.completionRequested = true
+            return false
         end
     end
     return true
@@ -177,9 +142,9 @@ function Jobs.OnSceneStopped(record, zombie, scene, reason)
     end
     if runtime.completionRequested == true or reason == "callback_complete" then
         local leaseId = runtime.taskLeaseId
-        finish(record, zombie, "rested")
+        finish(record, zombie, "complete")
         if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands then
-            PNC.Tasking.Commands.Complete(leaseId, "REST_COMPLETE")
+            PNC.Tasking.Commands.Complete(leaseId, "NEED_COMPLETE")
         end
         return
     end

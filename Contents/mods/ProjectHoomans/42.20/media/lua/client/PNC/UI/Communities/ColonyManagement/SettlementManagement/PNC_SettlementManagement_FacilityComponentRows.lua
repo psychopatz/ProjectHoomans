@@ -8,6 +8,8 @@ end
 local function roleLabel(role)
     local labels = {
         ["sleep.bed"] = "SLEEPING SPOT",
+        ["dining.table"] = "DINING TABLE",
+        ["health.bed"] = "HOSPITAL BED",
         ["farm.field"] = "CULTIVATED FIELDS",
         ["work.research"] = "RESEARCH STATION",
         ["work.blueprint"] = "ARCHITECT BENCH",

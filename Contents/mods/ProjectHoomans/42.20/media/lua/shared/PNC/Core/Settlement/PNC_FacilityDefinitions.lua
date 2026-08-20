@@ -12,6 +12,8 @@ Definitions.ComponentIconPaths = Definitions.ComponentIconPaths or {
     ["sleep.bed"] = "media/ui/Facilities/Components/bed/barracks.png",
     ["living.room"] = "media/ui/Facilities/Components/chair.png",
     ["living.chair"] = "media/ui/Facilities/Components/chair.png",
+    ["dining.table"] = "media/ui/Facilities/Components/chair.png",
+    ["health.bed"] = "media/ui/Facilities/Components/bed/hospital.png",
     ["farm.field"] = "media/ui/Facilities/Components/default.png",
     ["work.research"] =
         "media/ui/Facilities/Components/research_station/research_station.png",
@@ -184,7 +186,7 @@ Definitions.Register({
     levels = {
         [1] = {
             requiredHQLevel = 1,
-            capabilities = { "living" },
+            capabilities = { "living", "recreation" },
             componentLimits = {
                 ["living.room"] = { kind = "region", minCount = 1,
                     maxCount = 1, minTotalTiles = 1, maxTotalTiles = 1000,
@@ -192,7 +194,64 @@ Definitions.Register({
                 ["living.chair"] = { kind = "anchor", minCount = 1,
                     maxCount = 8, roomGroup = "living" },
             },
-            activityLimits = { living = { maxConcurrent = 8 } },
+            activityLimits = { living = { maxConcurrent = 8 },
+                recreation = { maxConcurrent = 8 } },
+        },
+    },
+})
+
+Definitions.Register({
+    id = "dining_room",
+    category = "food",
+    displayNameKey = "UI_PNC_Facility_DiningRoom",
+    descriptionKey = "UI_PNC_Facility_DiningRoomDescription",
+    iconPath = "media/ui/Facilities/BuildingMenu/diningRoom.png",
+    buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+    componentCosts = {
+        ["dining.table"] = {{ fullType = "Base.Money", amount = 1 }},
+    },
+    buildWork = 90,
+    reconstructWork = 55,
+    deconstructWork = 50,
+    allowMultipleRegions = false,
+    levels = {
+        [1] = {
+            requiredHQLevel = 1,
+            capabilities = { "food.dine" },
+            componentLimits = {
+                ["dining.table"] = { kind = "anchor", minCount = 1,
+                    maxCount = 6 },
+            },
+            activityLimits = { ["food.dine"] = { maxConcurrent = 6 } },
+        },
+    },
+})
+
+Definitions.Register({
+    id = "hospital",
+    category = "housing",
+    displayNameKey = "UI_PNC_Facility_Hospital",
+    descriptionKey = "UI_PNC_Facility_HospitalDescription",
+    iconPath = "media/ui/Facilities/BuildingMenu/hospital.png",
+    buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+    componentCosts = {
+        ["health.bed"] = {{ fullType = "Base.Money", amount = 1 }},
+    },
+    buildWork = 120,
+    reconstructWork = 75,
+    deconstructWork = 65,
+    allowMultipleRegions = false,
+    levels = {
+        [1] = {
+            requiredHQLevel = 1,
+            capabilities = { "health.recover" },
+            componentLimits = {
+                ["health.bed"] = { kind = "anchor", minCount = 1,
+                    maxCount = 4 },
+            },
+            activityLimits = {
+                ["health.recover"] = { maxConcurrent = 4 },
+            },
         },
     },
 })

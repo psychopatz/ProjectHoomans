@@ -284,6 +284,6 @@ end
 
 
 require "PNC/Tasking/PNC_TaskExecutors"
-require "PNC/Needs/PNC_NeedsTaskProvider"
+require "PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityTriggers"
 
 return Tasking

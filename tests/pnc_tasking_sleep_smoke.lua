@@ -27,7 +27,9 @@ package.preload["PNC/Tasking/PNC_TaskPriority"] = function() return Priority end
 package.preload["PNC/Tasking/PNC_TaskIntent"] = function() return Intent end
 package.preload["PNC/Tasking/PNC_TaskLeaseService"] = function() return Leases end
 package.preload["PNC/Tasking/PNC_TaskExecutors"] = function() return {} end
-package.preload["PNC/Needs/PNC_NeedsTaskProvider"] = function() return {} end
+package.preload[
+    "PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityTriggers"
+] = function() return {} end
 local Tasking = dofile(ROOT .. "PNC/Tasking/PNC_Tasking.lua")
 
 local available, facilityValid = true, true

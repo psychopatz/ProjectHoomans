@@ -28,7 +28,8 @@ function Live.Tick(lease)
         lease.nextReservationRenewAt = now + 10000
     end
     local phase = runtime.phase == "TRAVELLING" and "TRAVEL"
-        or runtime.phase == "SLEEPING" and "WORKING" or "WAITING"
+        or runtime.phase ~= "QUEUED" and runtime.phase ~= "STARTING"
+            and "WORKING" or "WAITING"
     PNC.TaskLeaseService.SetPhase(lease.leaseId, phase)
     return true
 end
@@ -45,14 +46,20 @@ function Abstract.Tick(lease)
     lease.lastEffectWorldHour = now
     if lease.reservationId then PNC.FacilityReservations.Start(
         lease.reservationId, 30000) end
-    if elapsed <= 0 then return true end
     PNC.TaskLeaseService.SetPhase(lease.leaseId, "WORKING")
-    local ok, reason = PNC.IndividualNeeds.Commands.ApplyRest(
-        record, elapsed, "abstract_sleep_task")
-    if not ok or reason == "REST_COMPLETE" then
-        PNC.Tasking.Commands.Complete(lease.leaseId, reason)
+    local definition = PNC.FacilityJobDefinitions.Get(lease.capability)
+    local ok, complete, reason = PNC.NeedFacilityEffects.Tick(
+        record, lease, definition, elapsed, PNC.Core.Now())
+    if not ok then
+        PNC.Tasking.Commands.CancelForNPC(lease.npcId,
+            reason or "ABSTRACT_NEED_EFFECT_FAILED")
+        return false
     end
-    return ok
+    if complete then
+        PNC.Tasking.Commands.Complete(lease.leaseId,
+            reason or "NEED_COMPLETE")
+    end
+    return true
 end
 
 PNC.Tasking.Commands.RegisterExecutor("LIVE", Live)

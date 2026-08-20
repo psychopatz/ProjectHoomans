@@ -7,6 +7,7 @@ end
 
 package.path = table.concat({
     "Contents/mods/ProjectHoomans/42.20/media/lua/shared/?.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/server/?.lua",
     package.path,
 }, ";")
 
@@ -69,6 +70,7 @@ PNC = {
 IsoDirections = { E = "east", S = "south" }
 
 require "PNC/Core/Facilities/PNC_FacilityJobs_Definitions"
+require "PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityEffects"
 require "PNC/Core/Facilities/PNC_FacilityJobs_Behavior"
 equal(jobName, "FacilityActivity", "facility activity job registration")
 equal(type(handler), "function", "facility behavior registration")
