@@ -216,6 +216,8 @@ function Internal.GetUpcomingPathPassage(body, navigation)
         and navigation.inspectedDirectionY == directionKeyY
         and navigation.inspectedRequestRevision
             == navigation.requestRevision
+        and navigation.inspectedBehaviorResult
+            == navigation.lastBehaviorResult
     then
         return navigation.upcomingPassage
     end
@@ -225,6 +227,7 @@ function Internal.GetUpcomingPathPassage(body, navigation)
     navigation.inspectedDirectionX = directionKeyX
     navigation.inspectedDirectionY = directionKeyY
     navigation.inspectedRequestRevision = navigation.requestRevision
+    navigation.inspectedBehaviorResult = navigation.lastBehaviorResult
     navigation.upcomingPassage = nil
     if math.abs(directionX) >= math.abs(directionY) then
         primaryX, primaryY = directionKeyX, 0

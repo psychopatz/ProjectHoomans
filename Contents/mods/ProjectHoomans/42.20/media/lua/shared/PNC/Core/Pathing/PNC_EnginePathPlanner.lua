@@ -411,6 +411,28 @@ function Planner.Pump(record, body, source)
 
     local traversalState =
         Internal.GetNativeTraversalState(body)
+    if traversalState ~= nil
+        and navigation.controllerMode == "behavior2_move"
+    then
+        -- A humanized IsoZombie has no BodyDamage. Native fence/window states
+        -- dereference it during enter/execute, so never retain an escaped
+        -- state as a legitimate physical traversal owner in single-player.
+        Internal.ClearEngineRequest(body, navigation)
+        if PNC.LiveBodyControl
+            and PNC.LiveBodyControl.SuppressZombieState
+        then
+            PNC.LiveBodyControl.SuppressZombieState(body, nil, now)
+        end
+        navigation.lastPlanReason = "unsafe_native_traversal"
+        navigation.planFailures =
+            (tonumber(navigation.planFailures) or 0) + 1
+        if Diagnostics then
+            Diagnostics.Increment(
+                "Pathing.UnsafeNativeTraversalEscapes"
+            )
+        end
+        return true, "engine_path_failed"
+    end
     if navigation.nativeTraversalState ~= nil then
         if traversalState ~= nil then
             local traversalTimeoutMs = math.max(

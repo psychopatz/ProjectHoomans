@@ -1,6 +1,4 @@
-local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-    .. "Pathing/PNC_LiveBodyControl.lua"
+local T = require "tests/support/test"
 
 local now = 1000
 local cancelled = 0
@@ -9,7 +7,13 @@ local reactions = 0
 local stateName = "onground"
 local onFloor = true
 local knockedDown = true
+local reanimateTimer = 60
+local useless = true
 local attackedBy
+local thumpTargetClears = 0
+local onFloorWrites = 0
+local stateChanges = 0
+local authority = true
 
 local friendlyPlayer = {
     getObjectName = function() return "Player" end,
@@ -32,6 +36,9 @@ local body = {
     getActionStateName = function() return stateName end,
     isOnFloor = function() return onFloor end,
     isKnockedDown = function() return knockedDown end,
+    isUseless = function() return useless end,
+    isNoTeeth = function() return true end,
+    isReanimatedForGrappleOnly = function() return false end,
     getAttackedBy = function() return attackedBy end,
     getX = function() return 0 end,
     getY = function() return 0 end,
@@ -40,6 +47,9 @@ local body = {
     setTarget = function() end,
     setTargetSeenTime = function() end,
     setEatBodyTarget = function() end,
+    setThumpTarget = function()
+        thumpTargetClears = thumpTargetClears + 1
+    end,
     clearAggroList = function() end,
     setAttackedBy = function() attackedBy = nil end,
     setStaggerBack = function() end,
@@ -49,19 +59,24 @@ local body = {
     setBumpFall = function() end,
     setBumpType = function() end,
     setKnockedDown = function(_, value) knockedDown = value end,
-    setOnFloor = function(_, value) onFloor = value end,
+    setOnFloor = function(_, value)
+        onFloorWrites = onFloorWrites + 1
+        onFloor = value
+    end,
     setFallOnFront = function() end,
+    setReanimateTimer = function(_, value) reanimateTimer = value end,
+    getReanimateTimer = function() return reanimateTimer end,
     setCanWalk = function() end,
     setVariable = function() end,
     setSitAgainstWall = function() end,
     setCrawler = function() end,
     setFakeDead = function() end,
     setAnimatingBackwards = function() end,
-    setUseless = function() end,
+    setUseless = function(_, value) useless = value end,
     setNoTeeth = function() end,
     setReanimatedForGrappleOnly = function() end,
     changeState = function()
-        stateName = "idle"
+        stateChanges = stateChanges + 1
     end,
 }
 
@@ -73,7 +88,11 @@ PNC = {
         NPC_GROUNDED_COUNTER_STAGGER_CHANCE = 0.40,
         NPC_GROUNDED_COUNTER_STAGGER_RANGE = 2.25,
     },
-    Core = { Now = function() return now end },
+    Core = {
+        Now = function() return now end,
+        IsAuthority = function() return authority end,
+        IsManagedNPCBody = function(candidate) return candidate == body end,
+    },
     Combat = {
         CancelAttackAction = function(record)
             cancelled = cancelled + 1
@@ -104,46 +123,134 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Pathing/PNC_LiveBodyControl.lua"
+)
 
 local record = {
     id = "follower",
     ownerOnlineID = 7,
     runtime = { attackAction = { attackType = "melee" } },
 }
+PNC.Registry = {
+    FindRecordByZombie = function(candidate)
+        return candidate == body and record or nil
+    end,
+}
 
 attackedBy = friendlyPlayer
-assert(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
+T.truthy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
     "friendly owner push was not handled")
-assert(stateName == "idle" and not onFloor and not knockedDown,
-    "friendly owner push did not restore the companion immediately")
-assert(record.runtime.attackAction == nil,
+T.equal(stateName, "onground",
+    "recovery bypassed the engine action context")
+T.equal(reanimateTimer, 0,
+    "friendly owner push did not trigger native get-up")
+T.truthy(onFloor and knockedDown,
+    "recovery cleared pose flags before native get-up selected a clip")
+T.falsy(useless, "native get-up did not lease the engine body")
+T.equal(stateChanges, 0, "recovery changed only the Java state machine")
+T.truthy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now + 100),
+    "pending native get-up released movement ownership")
+T.equal(reanimateTimer, 0, "pending native get-up timer drifted")
+T.equal(record.runtime.attackAction, nil,
     "grounded companion retained an attack")
-assert(reactions == 0, "friendly owner was counter-staggered")
+T.equal(reactions, 0, "friendly owner counter-staggers")
+T.truthy(thumpTargetClears > 0, "grounded recovery retained thump target")
+local floorWritesBeforeSafety = onFloorWrites
+T.truthy(PNC.LiveBodyControl.EnforceManagedSafety(body, "test"),
+    "managed safety did not recognize get-up lease")
+T.equal(onFloorWrites, floorWritesBeforeSafety,
+    "managed safety cleared floor state during native get-up")
+
+stateName = "getup-fromonback"
+T.truthy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now + 200),
+    "native get-up state released movement ownership")
+stateName = "idle"
+onFloor = false
+knockedDown = false
+T.falsy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
+    "completed get-up action retained grounded ownership")
+T.equal(modData.PNC_NativeGetUpLease, nil,
+    "completed get-up retained its engine lease")
 
 stateName = "onground"
 onFloor = true
 knockedDown = true
 attackedBy = hostileZombie
 record.runtime.attackAction = { attackType = "melee" }
-assert(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
+T.truthy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
     "hostile knockdown was not held for recovery")
-assert(stateName == "onground", "hostile knockdown recovered too early")
-assert(reactions == 1, "40 percent grounded counter did not trigger")
-assert(record.runtime.attackAction == nil,
+T.equal(stateName, "onground", "hostile early recovery state")
+T.equal(reactions, 1, "grounded counter count")
+T.equal(record.runtime.attackAction, nil,
     "grounded hostile victim retained an attack")
 
 now = now + 500
-assert(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
+T.truthy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
     "ground recovery stopped being authoritative")
-assert(reactions == 1, "ground counter repeated every tick")
+T.equal(reactions, 1, "repeated ground counters")
 
 now = now + 1000
-assert(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
+T.truthy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
     "grounded timeout recovery was not handled")
-assert(stateName == "idle" and not onFloor and not knockedDown,
-    "hostile knockdown did not recover after timeout")
-assert(cancelled >= 2 and held >= 2,
+T.equal(stateName, "onground",
+    "hostile recovery bypassed the action context")
+T.equal(reanimateTimer, 0,
+    "hostile knockdown did not trigger native get-up after timeout")
+T.truthy(cancelled >= 2 and held >= 2,
     "ground recovery did not suppress combat and movement")
 
-print("pnc_grounded_recovery_smoke: ok")
+record.runtime.groundedRecovery = nil
+record.activeJob = "Sleep"
+record.health = { state = "normal" }
+record.runtime.facilityActivity = {
+    capability = "sleep",
+    phase = "SLEEPING",
+}
+reanimateTimer = 60
+T.falsy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
+    "sleeping NPC was forced to stand")
+T.equal(reanimateTimer, 60, "sleeping NPC get-up timer changed")
+T.equal(modData.PNC_NativeGetUpLease, nil,
+    "sleeping NPC retained a native get-up lease")
+
+record.activeJob = nil
+record.runtime.facilityActivity = nil
+record.health.state = "incapacitated"
+T.falsy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
+    "incapacitated NPC was forced to stand")
+T.equal(reanimateTimer, 60, "incapacitated NPC get-up timer changed")
+
+record.health.state = "normal"
+stateName = "getup-fromonback"
+authority = false
+local replicaFloorWrites = onFloorWrites
+T.truthy(PNC.LiveBodyControl.ShouldKeepEngineMovementActive(record, body),
+    "replica did not preserve its native get-up ActionContext")
+PNC.LiveBodyControl.MaintainHumanizedBody(body, now, true, true)
+T.equal(onFloorWrites, replicaFloorWrites,
+    "replica safety cleared floor state during native get-up")
+
+local bodyControlSource = T.read(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Pathing/PNC_LiveBodyControl.lua"
+)
+T.falsy(string.find(
+        bodyControlSource,
+        'setVariable("bKnockedDown"',
+        1,
+        true
+    ),
+    "ground recovery writes callback-owned bKnockedDown")
+T.falsy(string.find(
+        bodyControlSource,
+        "PNC.Animation.PlayBump",
+        1,
+        true
+    ),
+    "ground recovery still routes native onground through bumped")
+
+T.finish("pnc_grounded_recovery_smoke")

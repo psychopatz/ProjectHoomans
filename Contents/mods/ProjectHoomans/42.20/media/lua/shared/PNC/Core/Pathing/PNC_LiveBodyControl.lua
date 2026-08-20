@@ -21,6 +21,9 @@ local SAFETY_REPAIR_LOGGED = setmetatable({}, { __mode = "k" })
 local NATIVE_MOVEMENT_LEASE_KEY = "PNC_NativeMovementLease"
 local NATIVE_MOVEMENT_LEASE_UNTIL_KEY =
     "PNC_NativeMovementLeaseUntil"
+local NATIVE_GETUP_LEASE_KEY = "PNC_NativeGetUpLease"
+local NATIVE_GETUP_LEASE_UNTIL_KEY = "PNC_NativeGetUpLeaseUntil"
+local NATIVE_GETUP_LEASE_MS = 4000
 local GROUNDED_STATES = {
     ["falldown"] = true,
     ["onground"] = true,
@@ -59,6 +62,7 @@ local SUPPRESSED_STATES = {
     ["staggerback"] = true,
     ["staggerback-knockeddown"] = true,
     ["turnalerted"] = true,
+    ["thump"] = true,
 }
 
 local IDLE_RESET_STATES = {
@@ -74,6 +78,7 @@ local IDLE_RESET_STATES = {
     ["lunge"] = true,
     ["pathfind"] = true,
     ["turnalerted"] = true,
+    ["thump"] = true,
 }
 
 local function clearVanillaIntent(zombie)
@@ -86,6 +91,12 @@ local function clearVanillaIntent(zombie)
     end
     if zombie.setEatBodyTarget then
         zombie:setEatBodyTarget(nil, false)
+    end
+    if zombie.setThumpTarget
+        and (not zombie.getThumpTarget
+            or zombie:getThumpTarget() ~= nil)
+    then
+        zombie:setThumpTarget(nil)
     end
     if zombie.clearAggroList then
         zombie:clearAggroList()
@@ -151,33 +162,90 @@ function LiveBodyControl.IsGrounded(zombie)
     return false, actionState
 end
 
-local function clearGroundAndActionFlags(zombie)
+local function clearBumpActionLease(zombie)
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
-    if not zombie then return end
     if modData then
+        modData.PNC_BumpReleasePending = nil
+        modData.PNC_BumpReleaseAt = nil
         modData.PNC_BumpActionLease = nil
         modData.PNC_BumpActionLeaseUntil = nil
         modData.PNC_BumpActionLeaseStartedAt = nil
         modData.PNC_BumpRequestedType = nil
         modData.PNC_BumpKeepUseless = nil
     end
+end
+
+local function hasNativeGetUpLease(zombie, now)
+    local modData = zombie and zombie.getModData
+        and zombie:getModData() or nil
+    local leaseUntil
+    if not modData or modData[NATIVE_GETUP_LEASE_KEY] ~= true then
+        return false
+    end
+    now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
+    leaseUntil = tonumber(modData[NATIVE_GETUP_LEASE_UNTIL_KEY]) or 0
+    if now <= leaseUntil then return true end
+    modData[NATIVE_GETUP_LEASE_KEY] = nil
+    modData[NATIVE_GETUP_LEASE_UNTIL_KEY] = nil
+    return false
+end
+
+local function clearNativeGetUpLease(zombie)
+    local modData = zombie and zombie.getModData
+        and zombie:getModData() or nil
+    if not modData then return false end
+    modData[NATIVE_GETUP_LEASE_KEY] = nil
+    modData[NATIVE_GETUP_LEASE_UNTIL_KEY] = nil
+    return true
+end
+
+local function beginNativeGetUpLease(zombie, now)
+    local modData = zombie and zombie.getModData
+        and zombie:getModData() or nil
+    if not modData then return false end
+    now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
+    modData[NATIVE_GETUP_LEASE_KEY] = true
+    modData[NATIVE_GETUP_LEASE_UNTIL_KEY] = now + NATIVE_GETUP_LEASE_MS
+    -- ZombieOnGroundState and the zombie action group share this timer as the
+    -- supported transition trigger. Keeping the body useful for this bounded
+    -- lease lets ActionContext advance through the native get-up states.
+    if zombie.setReanimateTimer then zombie:setReanimateTimer(0) end
+    LiveBodyControl.SetManagedBodyUseless(zombie, false, true)
+    return true
+end
+
+local function prepareNativeGetUp(zombie)
+    if not zombie then return end
+    clearBumpActionLease(zombie)
     LiveBodyControl.ReleaseDamageReaction(zombie)
-    if zombie.setKnockedDown then zombie:setKnockedDown(false) end
-    if zombie.setOnFloor then zombie:setOnFloor(false) end
-    if zombie.setFallOnFront then zombie:setFallOnFront(false) end
     if zombie.setBumpFall then zombie:setBumpFall(false) end
-    if zombie.setBumpDone then zombie:setBumpDone(true) end
+    if zombie.setCrawler then zombie:setCrawler(false) end
+    if zombie.setFakeDead then zombie:setFakeDead(false) end
     if zombie.setCanWalk then zombie:setCanWalk(true) end
     if zombie.setVariable then
-        zombie:setVariable("bKnockedDown", false)
-        zombie:setVariable("FallOnFront", false)
+        -- Preserve FallOnFront and bOnFloor until the native get-up state has
+        -- selected its front/back clip. Clearing them here only changes body
+        -- flags; it does not exit the engine-owned onground ActionContext.
+        zombie:setVariable("bBecomeCrawler", false)
+        zombie:setVariable("bCrawling", false)
         zombie:setVariable("BumpFall", false)
-        zombie:setVariable("BumpDone", true)
-        zombie:setVariable("BumpAnimFinished", true)
     end
 end
 
+local function intentionallyGrounded(record)
+    local runtime = record and record.runtime or nil
+    local activity = runtime and runtime.facilityActivity or nil
+    return record and record.health
+            and record.health.state == "incapacitated"
+        or runtime and runtime.activityOverride == "sleeping"
+        or activity and activity.capability == "sleep"
+            and tostring(activity.phase or "") == "SLEEPING"
+        or false
+end
+
 function LiveBodyControl.RecoverGroundedBody(record, zombie, reason)
+    local now
+    local recovery
     if not zombie then return false end
     if PNC.Combat and PNC.Combat.CancelAttackAction then
         PNC.Combat.CancelAttackAction(
@@ -189,14 +257,22 @@ function LiveBodyControl.RecoverGroundedBody(record, zombie, reason)
     elseif record and record.runtime then
         record.runtime.attackAction = nil
     end
-    clearGroundAndActionFlags(zombie)
-    LiveBodyControl.ApplyHumanizedBodyFlags(zombie, false)
-    if zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
-        zombie:changeState(ZombieIdleState.instance())
-    end
+    prepareNativeGetUp(zombie)
+    now = Core and Core.Now and Core.Now() or 0
+    recovery = record and record.runtime
+        and record.runtime.groundedRecovery or nil
+    beginNativeGetUpLease(zombie, now)
     if record and record.runtime then
-        record.runtime.groundedRecovery = nil
+        recovery = recovery or {}
+        recovery.getUpStarted = true
+        recovery.getUpStartedAt = now
+        record.runtime.groundedRecovery = recovery
         record.runtime.forceSyncEvent = "grounded_recovery"
+    end
+    if Diagnostics then
+        Diagnostics.Increment("Body.GroundedRecoveries")
+        Diagnostics.Increment("Body.GetUpAnimations")
+        Diagnostics.Increment("Body.NativeGetUpTransitions")
     end
     return true
 end
@@ -305,11 +381,40 @@ function LiveBodyControl.TickGroundedRecovery(record, zombie, now)
     local grounded, actionState = LiveBodyControl.IsGrounded(zombie)
     local state
     local attacker
+    state = record and record.runtime
+        and record.runtime.groundedRecovery or nil
+    if intentionallyGrounded(record) then
+        if record and record.runtime then
+            record.runtime.groundedRecovery = nil
+        end
+        clearNativeGetUpLease(zombie)
+        return false
+    end
+    if state and state.getUpStarted == true then
+        now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
+        if grounded or GETUP_STATES[actionState] == true then
+            if not hasNativeGetUpLease(zombie, now) then
+                beginNativeGetUpLease(zombie, now)
+            elseif grounded and zombie.setReanimateTimer then
+                -- Idempotent while waiting for ActionContext's next update.
+                zombie:setReanimateTimer(0)
+            end
+            record.activeBehavior = "Grounded:getting_up"
+            if PNC.BehaviorMoveIntent and PNC.BehaviorMoveIntent.Hold then
+                PNC.BehaviorMoveIntent.Hold(record, "actor_getting_up")
+            end
+            return true
+        end
+        record.runtime.groundedRecovery = nil
+        clearNativeGetUpLease(zombie)
+        return false
+    end
     if not grounded then
         if record and record.runtime
             and GETUP_STATES[actionState] ~= true
         then
             record.runtime.groundedRecovery = nil
+            clearNativeGetUpLease(zombie)
         end
         return GETUP_STATES[actionState] == true
     end
@@ -683,7 +788,10 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(
         zombie:setVariable("BumpFallType", "")
         zombie:setVariable("PNCLive", true)
     end
-    if zombie.setKnockedDown then
+    if zombie.setKnockedDown
+        and zombie.isKnockedDown
+        and zombie:isKnockedDown()
+    then
         zombie:setKnockedDown(false)
     end
     if zombie.setBumpFall then
@@ -692,7 +800,10 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(
     if zombie.setSitAgainstWall then
         zombie:setSitAgainstWall(false)
     end
-    if zombie.setOnFloor then
+    if zombie.setOnFloor
+        and zombie.isOnFloor
+        and zombie:isOnFloor()
+    then
         zombie:setOnFloor(false)
     end
     if zombie.setFallOnFront then
@@ -792,10 +903,16 @@ function LiveBodyControl.MaintainHumanizedBody(
     local nextAudioAt
     local nextMaintenanceAt
     local actionLeaseActive
+    local actionState
     if not zombie then return false end
     now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
     modData = zombie.getModData and zombie:getModData() or nil
+    actionState = LiveBodyControl.GetActionStateName(zombie)
     actionLeaseActive = hasBumpActionLease(zombie, now)
+        or hasNativeGetUpLease(zombie, now)
+        or keepEngineMovementActive == true
+            and (GROUNDED_STATES[actionState] == true
+                or GETUP_STATES[actionState] == true)
     if LAST_KEEP_ENGINE_ACTIVE[zombie]
         ~= (keepEngineMovementActive == true)
     then
@@ -806,9 +923,9 @@ function LiveBodyControl.MaintainHumanizedBody(
     ) or 0
     if force == true or now >= nextMaintenanceAt then
         if actionLeaseActive then
-            -- During a PNC special action, do not repeatedly write prone,
-            -- crawler, fall, or usefulness setters. Those setters can eject
-            -- BumpedState on the frame its XML node is selected.
+            -- During a PNC special action or native get-up, do not repeatedly
+            -- write prone, crawler, fall, or usefulness setters. Those writes
+            -- can eject BumpedState or invalidate the onground/getup handoff.
             applyActionLeaseSafeguards(zombie, modData)
         else
             LiveBodyControl.ApplyHumanizedBodyFlags(
@@ -839,6 +956,21 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
         and zombie:getModData()
         or nil
     local now = Core and Core.Now and Core.Now() or 0
+    if hasNativeGetUpLease(zombie, now) then
+        return true
+    end
+    if Core and Core.IsAuthority and not Core.IsAuthority() then
+        local actionState = LiveBodyControl.GetActionStateName(zombie)
+        if not intentionallyGrounded(record)
+            and (GROUNDED_STATES[actionState] == true
+                or GETUP_STATES[actionState] == true)
+        then
+            -- Replicas own their local ActionContext. The authoritative body
+            -- lease is not guaranteed to travel in IsoZombie ModData, so keep
+            -- the replica useful while the replicated native get-up advances.
+            return true
+        end
+    end
     -- The nearest multiplayer client owns PathFindState for replicated
     -- IsoZombie bodies. That body-local lease is authoritative for the Java
     -- action graph even though the client does not own NPC decisions.
@@ -905,18 +1037,25 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     if PNC.Registry and PNC.Registry.FindRecordByZombie then
         record = PNC.Registry.FindRecordByZombie(zombie)
     end
-    -- Native movement and bumped action leases temporarily keep the body
-    -- useful so Java can advance their action states.
+    -- Native movement, get-up, and bumped action leases temporarily keep the
+    -- body useful so Java can advance their action states.
     now = Core.Now and Core.Now() or 0
     keepEngineMovementActive =
         LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
-    actionLeaseActive = hasBumpActionLease(zombie, now)
     hadTarget = zombie.getTarget and zombie:getTarget() ~= nil or false
     wasUseless = zombie.isUseless and zombie:isUseless() or false
     hadTeeth = zombie.isNoTeeth and not zombie:isNoTeeth() or false
     wasGrappleOnly = zombie.isReanimatedForGrappleOnly
         and zombie:isReanimatedForGrappleOnly() or false
     actionState = LiveBodyControl.GetActionStateName(zombie)
+    actionLeaseActive = hasBumpActionLease(zombie, now)
+        or hasNativeGetUpLease(zombie, now)
+        or keepEngineMovementActive
+            and (GROUNDED_STATES[actionState] == true
+                or GETUP_STATES[actionState] == true)
+    if actionState == "thump" and Diagnostics then
+        Diagnostics.Increment("Body.UnsafeThumpStates")
+    end
     needsImmediateRepair = hadTarget
         or (not wasUseless and not keepEngineMovementActive)
         or hadTeeth

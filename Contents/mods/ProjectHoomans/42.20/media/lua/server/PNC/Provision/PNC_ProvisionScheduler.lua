@@ -39,13 +39,26 @@ function Scheduler.DirtyNPCCount()
     return count
 end
 
-function Scheduler.MarkDirty(recordOrID, ruleID, readyAt)
+function Scheduler.MarkDirty(
+    recordOrID,
+    ruleID,
+    readyAt,
+    preserveExistingReadyAt
+)
     local npcID = type(recordOrID) == "table" and recordOrID.id or recordOrID
     if not npcID or not Registry.Get(ruleID) then return false end
     local entryKey = key(npcID, ruleID)
     local existing = Scheduler.Queued[entryKey]
     if existing then
-        existing.readyAt = math.min(existing.readyAt or 0, readyAt or 0)
+        -- Explicit inventory/policy events are allowed to wake a deferred
+        -- rule immediately. The periodic audit is only a completeness net;
+        -- it must not erase the supply service's no-stock retry deadline.
+        if preserveExistingReadyAt ~= true then
+            existing.readyAt = math.min(
+                existing.readyAt or 0,
+                readyAt or 0
+            )
+        end
         return false
     end
     local entry = { npcID = tostring(npcID), ruleID = tostring(ruleID),
@@ -64,10 +77,19 @@ function Scheduler.MarkDirty(recordOrID, ruleID, readyAt)
     return true
 end
 
-function Scheduler.MarkAllDirty(recordOrID)
+function Scheduler.MarkAllDirty(
+    recordOrID,
+    readyAt,
+    preserveExistingReadyAt
+)
     local changed = false
     for _, definition in ipairs(Registry.List()) do
-        changed = Scheduler.MarkDirty(recordOrID, definition.id) or changed
+        changed = Scheduler.MarkDirty(
+            recordOrID,
+            definition.id,
+            readyAt,
+            preserveExistingReadyAt
+        ) or changed
     end
     return changed
 end
@@ -121,7 +143,9 @@ function Scheduler.Audit(now)
     for _, record in pairs(PNC.Registry and PNC.Registry.Data or {}) do
         local factionID = record.affiliation and record.affiliation.factionID
         if record.alive ~= false and factionID then
-            if Scheduler.MarkAllDirty(record) then queued = queued + 1 end
+            if Scheduler.MarkAllDirty(record, nil, true) then
+                queued = queued + 1
+            end
         end
     end
     Metrics.Increment("provisionAuditedNPCs", queued)

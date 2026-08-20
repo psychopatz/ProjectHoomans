@@ -380,7 +380,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                     profile = lane.motionProfile,
                 })
             end
-            Internal.logMoveWarning(record, zombie, lane, "door_open", "blocked_passage",
+            Internal.logMoveDebug(record, zombie, lane, "door_open", "blocked_passage",
                 "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare)
                     .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
             return true, "door_open"
@@ -459,7 +459,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                                         profile = lane.motionProfile,
                                     })
                                 end
-                                Internal.logMoveWarning(record, zombie, lane, "door_open", "door_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
+                                Internal.logMoveDebug(record, zombie, lane, "door_open", "door_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
                                 return true, "door_open"
                             end
                             logTraversalReject(record, zombie, lane, "traversal_rejected", "door_open_failed_or_locked", "object=" .. tostring(objectKey or "nil"))
@@ -498,7 +498,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                                             profile = lane.motionProfile,
                                         })
                                     end
-                                    Internal.logMoveWarning(record, zombie, lane, "window_open", "window_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
+                                    Internal.logMoveDebug(record, zombie, lane, "window_open", "window_open", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare) .. " goal=" .. Internal.describePoint(goalX, goalY, goalZ))
                                 else
                                     actionKey = "window_smash:" .. Internal.describeSquare(objectSquare)
                                     if not Internal.beginTraversalAction
@@ -520,7 +520,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                                         return false, nil
                                     end
                                     Internal.rememberSpecialAction(lane, actionKey, now)
-                                    Internal.logMoveWarning(record, zombie, lane, "window_smash", "window_open_failed", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare))
+                                    Internal.logMoveDebug(record, zombie, lane, "window_smash", "window_open_failed", "from=" .. fromPoint .. " object=" .. Internal.describeSquare(objectSquare))
                                     return true, "window_smash"
                                 end
                             end
@@ -606,7 +606,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
                                 if Internal.noteTraversalAttempt then
                                     Internal.noteTraversalAttempt(lane, "window_climb", actionKey, fromX, fromY, fromZ, destX, destY, destZ, now, lane and lane.goalRevision or 0)
                                 end
-                                Internal.logMoveWarning(
+                                Internal.logMoveDebug(
                                     record,
                                     zombie,
                                     lane,
@@ -701,7 +701,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
         if Internal.noteTraversalAttempt then
             Internal.noteTraversalAttempt(lane, "fence_climb", fenceKey, fromX, fromY, fromZ, landingX, landingY, landingZ, now, lane and lane.goalRevision or 0)
         end
-        Internal.logMoveWarning(
+        Internal.logMoveDebug(
             record,
             zombie,
             lane,
