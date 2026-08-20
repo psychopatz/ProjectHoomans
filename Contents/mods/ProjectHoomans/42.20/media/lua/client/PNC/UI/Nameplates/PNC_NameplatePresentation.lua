@@ -225,8 +225,39 @@ function Presentation.WorkActionStatus(snapshot)
         ACTION_COLOR, true
 end
 
+function Presentation.ActivityActionStatus(snapshot)
+    local info = snapshot and snapshot.actionInformation or nil
+    if not info or info.kind ~= "activity" then
+        return "", ACTION_COLOR, false
+    end
+    local fallback = tostring(info.fallback or info.activityId or "")
+    local text = type(info.labelKey) == "string" and info.labelKey ~= ""
+        and tr(info.labelKey, fallback) or fallback
+    if info.facilityDefinitionId then
+        text = text .. " - " .. facilityName(info)
+    end
+    local phase = string.upper(tostring(info.phase or ""))
+    if phase == "TRAVELLING" or phase == "TRAVEL" then
+        text = text .. " ("
+            .. tr("UI_PNC_Action_Traveling", "traveling") .. ")"
+    elseif phase == "QUEUED" or phase == "STARTING" then
+        text = text .. " ("
+            .. tr("UI_PNC_Action_Preparing", "preparing") .. ")"
+    elseif phase == "BLOCKED" then
+        text = text .. " ("
+            .. tr("UI_PNC_Action_Blocked", "blocked") .. ")"
+    end
+    return text, ACTION_COLOR, text ~= ""
+end
+
 function Presentation.ActionStatus(snapshot)
-    local text, color, active = Presentation.WorkActionStatus(snapshot)
+    local info = snapshot and snapshot.actionInformation or nil
+    if info and info.kind == "treatment" then
+        return Presentation.TreatmentStatus(snapshot)
+    end
+    local text, color, active = Presentation.ActivityActionStatus(snapshot)
+    if text ~= "" then return text, color, active end
+    text, color, active = Presentation.WorkActionStatus(snapshot)
     if text ~= "" then return text, color, active end
     return Presentation.TreatmentStatus(snapshot)
 end

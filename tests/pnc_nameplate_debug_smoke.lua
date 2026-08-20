@@ -212,6 +212,24 @@ assertContains(actionText, "35%", "home travel progress")
 snapshot.actionInformation = { kind = "at_home" }
 actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
 assertContains(actionText, "Idle", "idle-at-home action")
+snapshot.actionInformation = {
+    kind = "activity",
+    activityId = "facility:sleep",
+    labelKey = "UI_PNC_Activity_Sleeping",
+    fallback = "Sleeping",
+    phase = "SLEEPING",
+    facilityDefinitionId = "barracks",
+}
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+assertContains(actionText, "Sleeping", "facility activity label")
+assertContains(actionText, "barracks", "facility activity target")
+snapshot.actionInformation = {
+    kind = "activity",
+    activityId = "job:GuardAnchor",
+    fallback = "Guard Anchor",
+}
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+assertContains(actionText, "Guard Anchor", "generic job activity fallback")
 snapshot.actionInformation = nil
 
 local entriesPath = ROOT .. "PNC/UI/Nameplates/PNC_NameplateEntries.lua"

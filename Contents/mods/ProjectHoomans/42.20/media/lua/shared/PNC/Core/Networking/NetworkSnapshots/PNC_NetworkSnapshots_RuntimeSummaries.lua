@@ -10,8 +10,8 @@ local Const = PNC.Const
 local Equipment = PNC.Equipment
 
 function Parts.BuildActionInformation(record)
-    return PNC.WorkService and PNC.WorkService.BuildActionInformation
-        and PNC.WorkService.BuildActionInformation(record) or nil
+    return PNC.ActivityStatus and PNC.ActivityStatus.Build
+        and PNC.ActivityStatus.Build(record) or nil
 end
 
 function Parts.ResolveAIState(record)

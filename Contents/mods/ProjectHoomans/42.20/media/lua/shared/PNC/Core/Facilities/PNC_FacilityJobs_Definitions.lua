@@ -22,6 +22,8 @@ end
 
 Definitions.Register("sleep", {
     activeJob = "Sleep",
+    activityLabelKey = "UI_PNC_Activity_Sleeping",
+    activityText = "Sleeping",
     sceneId = "facility.sleep.floor",
     role = "sleep.bed",
     needEffect = "need",
@@ -34,6 +36,8 @@ Definitions.Register("sleep", {
 
 Definitions.Register("farm.work", {
     activeJob = "FarmWork",
+    activityLabelKey = "UI_PNC_Activity_Farming",
+    activityText = "Farming",
     sceneId = "facility.farm.work",
     role = "farm.field",
     arrivalDistance = 0.8,
@@ -42,6 +46,8 @@ Definitions.Register("farm.work", {
 
 Definitions.Register("living", {
     activeJob = "LivingRoom",
+    activityLabelKey = "UI_PNC_Activity_Relaxing",
+    activityText = "Relaxing",
     sceneId = "facility.living.sit",
     role = "living.chair",
     arrivalDistance = 0.85,
@@ -50,6 +56,8 @@ Definitions.Register("living", {
 
 Definitions.Register("recreation", {
     activeJob = "Recreation",
+    activityLabelKey = "UI_PNC_Activity_Recreating",
+    activityText = "Recreating",
     sceneId = "facility.living.sit",
     role = "living.chair",
     arrivalDistance = 0.85,
@@ -62,6 +70,8 @@ Definitions.Register("recreation", {
 
 Definitions.Register("food.dine", {
     activeJob = "Dining",
+    activityLabelKey = "UI_PNC_Activity_Eating",
+    activityText = "Eating",
     sceneId = "facility.living.sit",
     role = "dining.table",
     arrivalDistance = 0.85,
@@ -73,6 +83,8 @@ Definitions.Register("food.dine", {
 
 Definitions.Register("health.recover", {
     activeJob = "HospitalRecovery",
+    activityLabelKey = "UI_PNC_Activity_Recovering",
+    activityText = "Recovering",
     sceneId = "facility.sleep.floor",
     role = "health.bed",
     arrivalDistance = 1.15,
@@ -84,6 +96,8 @@ Definitions.Register("health.recover", {
 
 Definitions.Register("water.drink", {
     activeJob = "Drink",
+    activityLabelKey = "UI_PNC_Activity_Drinking",
+    activityText = "Drinking",
     sceneId = "facility.water.drink",
     role = "water.spigot",
     arrivalDistance = 0.85,
