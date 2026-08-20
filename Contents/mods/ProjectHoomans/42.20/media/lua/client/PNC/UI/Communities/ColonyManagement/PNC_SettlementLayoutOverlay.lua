@@ -40,13 +40,26 @@ local function facilityColor(facility, color)
         b = color.b * 0.45, a = 0.14 }
 end
 
-local ROOM_PLACEHOLDER = "media/ui/Facilities/PNC_Barracks_Placeholder.png"
+local ROOM_PLACEHOLDER = "media/ui/Facilities/BuildingMenu/livingRoom.png"
 local COMPONENT_PLACEHOLDERS = {
-    ["sleep.bed"] = "media/ui/Emotes/PNC_EmoteStay.png",
-    ["work.research"] = "media/ui/Emotes/PNC_EmoteMenu.png",
-    ["work.craft"] = "media/ui/Emotes/PNC_EmoteProtect.png",
-    ["work.disassemble"] = "media/ui/Emotes/PNC_EmoteFollow.png",
-    ["stockpile.access"] = "media/ui/Emotes/PNC_EmoteMenu.png",
+    ["sleep.area"] = "media/ui/Facilities/Components/chair.png",
+    ["sleep.bed"] = "media/ui/Facilities/Components/bed/barracks.png",
+    ["farm.field"] = "media/ui/Facilities/Components/default.png",
+    ["work.research"] =
+        "media/ui/Facilities/Components/research_station/research_station.png",
+    ["work.blueprint"] =
+        "media/ui/Facilities/Components/research_station/architect_table.png",
+    ["work.reverse"] =
+        "media/ui/Facilities/Components/research_station/Lab_Station.png",
+    ["work.craft"] =
+        "media/ui/Facilities/Components/workshop/workbench.png",
+    ["work.disassemble"] =
+        "media/ui/Facilities/Components/workshop/recycling_bench.png",
+    ["water.spigot"] =
+        "media/ui/Facilities/Components/water_station/pump_spigot.png",
+    ["water.tank"] = "media/ui/Facilities/Components/default.png",
+    ["water.catcher"] = "media/ui/Facilities/Components/default.png",
+    ["stockpile.access"] = "media/ui/Facilities/Components/storage/stockpile.png",
 }
 
 local function regionCenter(region)

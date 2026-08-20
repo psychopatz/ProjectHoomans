@@ -5,6 +5,31 @@ local Definitions = PNC.FacilityDefinitions
 Definitions.SCHEMA_VERSION = 1
 Definitions.ByID = Definitions.ByID or {}
 
+Definitions.ComponentIconPaths = Definitions.ComponentIconPaths or {
+    ["sleep.area"] = "media/ui/Facilities/Components/chair.png",
+    ["sleep.bed"] = "media/ui/Facilities/Components/bed/barracks.png",
+    ["farm.field"] = "media/ui/Facilities/Components/default.png",
+    ["work.research"] =
+        "media/ui/Facilities/Components/research_station/research_station.png",
+    ["work.blueprint"] =
+        "media/ui/Facilities/Components/research_station/architect_table.png",
+    ["work.reverse"] =
+        "media/ui/Facilities/Components/research_station/Lab_Station.png",
+    ["work.craft"] =
+        "media/ui/Facilities/Components/workshop/workbench.png",
+    ["work.disassemble"] =
+        "media/ui/Facilities/Components/workshop/recycling_bench.png",
+    ["water.spigot"] =
+        "media/ui/Facilities/Components/water_station/pump_spigot.png",
+    ["water.tank"] = "media/ui/Facilities/Components/default.png",
+    ["water.catcher"] = "media/ui/Facilities/Components/default.png",
+}
+
+function Definitions.GetComponentIconPath(role)
+    return Definitions.ComponentIconPaths[tostring(role or "")]
+        or "media/ui/Facilities/Components/default.png"
+end
+
 function Definitions.Register(definition)
     if type(definition) ~= "table" or type(definition.id) ~= "string"
         or definition.id == "" or type(definition.levels) ~= "table"
@@ -42,7 +67,7 @@ Definitions.Register({
     category = "housing",
     displayNameKey = "UI_PNC_Facility_Barracks",
     descriptionKey = "UI_PNC_Facility_BarracksDescription",
-    iconPath = "media/ui/Facilities/PNC_Barracks_Placeholder.png",
+    iconPath = "media/ui/Facilities/BuildingMenu/livingRoom.png",
     buildCosts = {{ fullType = "Base.Money", amount = 1 }},
     buildWork = 80,
     reconstructWork = 50,
@@ -122,8 +147,7 @@ Definitions.Register({
     category = "technology",
     displayNameKey = "UI_PNC_Facility_Research",
     descriptionKey = "UI_PNC_Facility_ResearchDescription",
-    -- Reuse shipped facility art until dedicated production art is available.
-    iconPath = "media/ui/Facilities/PNC_Barracks_Placeholder.png",
+    iconPath = "media/ui/Facilities/BuildingMenu/researchCenter.png",
     buildCosts = {{ fullType = "Base.Money", amount = 1 }},
     buildWork = 120,
     reconstructWork = 75,
@@ -164,8 +188,7 @@ Definitions.Register({
     category = "production",
     displayNameKey = "UI_PNC_Facility_Workshop",
     descriptionKey = "UI_PNC_Facility_WorkshopDescription",
-    -- Reuse shipped facility art until dedicated production art is available.
-    iconPath = "media/ui/Facilities/PNC_Farm_Placeholder.png",
+    iconPath = "media/ui/Facilities/BuildingMenu/workshop.png",
     buildCosts = {{ fullType = "Base.Money", amount = 1 }},
     buildWork = 140,
     reconstructWork = 90,
@@ -218,7 +241,7 @@ Definitions.Register({
     category = "utilities",
     displayNameKey = "UI_PNC_Facility_WaterCollector",
     descriptionKey = "UI_PNC_Facility_WaterCollectorDescription",
-    iconPath = "media/ui/Facilities/PNC_Farm_Placeholder.png",
+    iconPath = "media/ui/Facilities/BuildingMenu/waterStation.png",
     buildCosts = {{ fullType = "Base.Money", amount = 1 }},
     buildWork = 100,
     reconstructWork = 45,

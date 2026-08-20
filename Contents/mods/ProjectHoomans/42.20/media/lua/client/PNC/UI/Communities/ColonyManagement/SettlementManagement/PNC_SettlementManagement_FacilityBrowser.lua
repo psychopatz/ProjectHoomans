@@ -75,7 +75,17 @@ local function drawComponent(list, y, entry, alternate)
     local row = entry.item or {}
     UI.DrawListSelection(list, y, list.itemheight, false, alternate)
     local color = Theme.colors[row.complete and "success" or "warning"]
-    local indent = row.child and 26 or 10
+    local iconSize = row.child and 28 or 34
+    local iconX = row.child and 8 or 5
+    local iconY = y + math.floor((list.itemheight - iconSize) / 2)
+    if row.iconPath and getTexture then
+        local icon = getTexture(row.iconPath)
+        if icon then
+            list:drawTextureScaledAspect(icon, iconX, iconY, iconSize,
+                iconSize, 0.92, 1, 1, 1)
+        end
+    end
+    local indent = row.child and 42 or 46
     local actionWidth = row.componentAction
         and ACTION_WIDTH + ACTION_RIGHT + 4 or 0
     if not row.child then
@@ -126,6 +136,12 @@ local function roleLabel(role)
     return labels[role] or string.upper(string.gsub(role, "[%.]", " "))
 end
 
+local function componentIconPath(role)
+    local definitions = PNC and PNC.FacilityDefinitions or nil
+    return definitions and definitions.GetComponentIconPath
+        and definitions.GetComponentIconPath(role) or nil
+end
+
 local function componentDetail(component)
     if component.kind == "anchor" then
         return roleLabel(component.role) .. "  •  " .. tostring(component.x) .. ", "
@@ -158,6 +174,7 @@ function Browser.BuildComponentRows(facility)
         rows[#rows + 1] = {
             key = role,
             label = roleLabel(role),
+            iconPath = componentIconPath(role),
             detail = tostring(#assigned) .. " / " .. tostring(maximum)
                 .. (#assigned >= minimum and "  READY" or "  REQUIRED"),
             complete = #assigned >= minimum,
@@ -176,6 +193,7 @@ function Browser.BuildComponentRows(facility)
             rows[#rows + 1] = {
                 key = assigned[index].id,
                 label = "- " .. roleLabel(role) .. " #" .. tostring(index),
+                iconPath = componentIconPath(role),
                 detail = componentDetail(assigned[index]),
                 child = true,
                 complete = true,
