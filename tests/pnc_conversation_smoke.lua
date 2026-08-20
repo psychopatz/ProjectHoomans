@@ -84,7 +84,7 @@ for _, value in ipairs({ "Dawn", "Sunrise", "Sunset", "Dusk", "Twilight" }) do
         .. value .. ".lua")
 end
 dofile(CLIENT .. "PNC/Conversation/PNC_ConversationDiary.lua")
-dofile(CLIENT .. "PNC/Conversation/Blocks/PNC_ConversationComposer.lua")
+dofile(CLIENT .. "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer.lua")
 dofile(CLIENT .. "PNC/Conversation/PNC_ConversationDefinition.lua")
 dofile(CLIENT .. "PNC/Conversation/Debug/PNC_ConversationDebugModel.lua")
 dofile(CLIENT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua")
