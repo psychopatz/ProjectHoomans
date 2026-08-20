@@ -31,11 +31,21 @@ function Triggers.HasFacility(record, triggerId)
     return false
 end
 
+local function hasNearbyWater(record)
+    return PNC.NearbyWaterService and PNC.NearbyWaterService.Find
+        and PNC.NearbyWaterService.Find(record) ~= nil
+end
+
+local function hasRoute(record, definition)
+    if Triggers.HasFacility(record, definition.id) then return true end
+    return definition.id == "hydration" and hasNearbyWater(record)
+end
+
 function Triggers.PreferFacility(record, triggerId)
     local definition = Definitions.Get(triggerId)
     local actionable = definition and Definitions.Evaluate(
         definition, record, false)
-    if not actionable or not Triggers.HasFacility(record, triggerId) then
+    if not actionable or not hasRoute(record, definition) then
         return false
     end
     if PNC.Tasking and PNC.Tasking.Commands then
@@ -52,15 +62,25 @@ function Triggers.GetCandidates(npcId)
     for _, definition in ipairs(Definitions.List()) do
         local actionable, metadata = Definitions.Evaluate(
             definition, record, false)
-        if actionable and Triggers.HasFacility(record, definition.id) then
+        local available = actionable and hasRoute(record, definition)
+        if available then
+            local nearby = definition.id == "hydration"
+                and not Triggers.HasFacility(record, definition.id)
+            local sourceRef = nearby and "nearby_water" or definition.id
+            local capability = nearby and "water.nearby"
+                or definition.capability
+            local suffix = nearby and PNC.NearbyWaterService.Find(record)
+                or nil
             candidates[#candidates + 1] = {
-                taskId = "need_facility:" .. definition.id .. ":"
-                    .. tostring(record.id),
+                taskId = nearby and "nearby_water:" .. tostring(suffix
+                    and suffix.key or "unknown") .. ":" .. tostring(record.id)
+                    or "need_facility:" .. definition.id .. ":"
+                        .. tostring(record.id),
                 npcId = tostring(record.id), kind = definition.kind,
-                sourceDomain = "NeedFacility", sourceRef = definition.id,
+                sourceDomain = "NeedFacility", sourceRef = sourceRef,
                 precedence = metadata.precedence,
                 urgency = metadata.urgency,
-                capability = definition.capability,
+                capability = capability,
                 interruptPolicy = "NORMAL", revision = 1,
             }
         end
@@ -70,7 +90,8 @@ end
 
 function Triggers.Validate(intent)
     local record = recordFor(intent.npcId)
-    local definition = Definitions.Get(intent.sourceRef)
+    local definition = Definitions.Get(intent.sourceRef == "nearby_water"
+        and "hydration" or intent.sourceRef)
     if not record or record.alive == false then return false, "NPC_UNAVAILABLE" end
     if not definition then return false, "TRIGGER_NOT_FOUND" end
     if not PNC.CompanionCommands.IsCompanion(record) then
@@ -84,6 +105,16 @@ function Triggers.Validate(intent)
     local activityLease = PNC.TaskLeaseService.ForNPC(record.id)
     if activity and not activityLease and activity.automatic ~= true then
         return false, "FACILITY_ACTIVITY_BUSY"
+    end
+    if intent.sourceRef == "nearby_water" then
+        if not hasNearbyWater(record) then
+            return false, "NEARBY_WATER_NOT_FOUND"
+        end
+        local actionable, metadata = Definitions.Evaluate(
+            definition, record, false)
+        if not actionable then return false, "NEED_ROUTE_NOT_ACTIONABLE" end
+        intent.precedence, intent.urgency = metadata.precedence, metadata.urgency
+        return true
     end
     local base = baseFor(record)
     if not base or not PNC.HomeDutyService.IsAtHome(record, base.id) then
@@ -100,6 +131,20 @@ end
 
 function Triggers.Assign(intent)
     local record = recordFor(intent.npcId)
+    if intent.sourceRef == "nearby_water" then
+        local source = PNC.NearbyWaterService
+            and PNC.NearbyWaterService.Find(record) or nil
+        if not source then return nil, "NEARBY_WATER_NOT_FOUND" end
+        local live = PNC.Registry and PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(record.id) or nil
+        return {
+            ok = true, facilityId = "nearby_water:" .. tostring(source.key),
+            componentId = "", reservationId = "",
+            target = { x = source.x, y = source.y, z = source.z },
+            resource = source, resourceKey = source.key,
+            executionMode = live and "LIVE" or "ABSTRACT",
+        }
+    end
     local base = record and baseFor(record) or nil
     if not base then return nil, "BASE_NOT_FOUND" end
     if record.runtime and record.runtime.facilityActivity
@@ -125,6 +170,20 @@ end
 function Triggers.Start(lease, assignment)
     local record = recordFor(lease.npcId)
     if not record then return false, "NPC_UNAVAILABLE" end
+    if lease.sourceRef == "nearby_water" then
+        local source = PNC.NearbyWaterService
+            and PNC.NearbyWaterService.Resolve(record, assignment.resourceKey)
+            or nil
+        if not source then return false, "NEARBY_WATER_NOT_FOUND" end
+        return PNC.FacilityJobs.Start(record, {
+            id = assignment.facilityId, baseId = "", definitionId = "nearby_water",
+        }, "water.nearby", {
+            automatic = true, acquired = assignment, resource = source,
+            resourceKey = source.key, resourceKind = "nearby_water",
+            taskLeaseId = lease.leaseId, nearby = true,
+            abstract = lease.executionMode == "ABSTRACT",
+        })
+    end
     local ok, reason = PNC.FacilityJobs.Start(record, assignment.facilityId,
         lease.capability, { automatic = true, acquired = assignment,
             taskLeaseId = lease.leaseId,
@@ -138,11 +197,18 @@ end
 
 function Triggers.CanContinue(lease)
     local record = recordFor(lease.npcId)
-    local definition = Definitions.Get(lease.sourceRef)
+    local definition = Definitions.Get(lease.sourceRef == "nearby_water"
+        and "hydration" or lease.sourceRef)
     if not record or record.alive == false or not definition then return false end
     if record.health and record.health.state == "incapacitated"
         or record.runtime and record.runtime.attackAction
     then return false end
+    if lease.sourceRef == "nearby_water" then
+        return PNC.NearbyWaterService
+            and PNC.NearbyWaterService.Resolve
+            and PNC.NearbyWaterService.Resolve(record, lease.resourceKey) ~= nil
+            and Definitions.Evaluate(definition, record, true) == true
+    end
     return PNC.SettlementRepository.GetFacility(lease.facilityId) ~= nil
         and PNC.FacilityReservations.ByID[lease.reservationId] ~= nil
         and Definitions.Evaluate(definition, record, true) == true

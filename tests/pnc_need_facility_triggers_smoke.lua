@@ -139,4 +139,34 @@ T.truthy(ok, "living-room recreation effect applies")
 T.equal(record.conditionStats.boredom, 35,
     "recreation reduces boredom independently of primitive needs")
 
+facilities["water.drink"] = {}
+local nearbyWater = {
+    key = "Base.WaterBottle@10.5:10.5:0#1", x = 10.5, y = 10.5, z = 0,
+    item = { getFluidContainer = function()
+        return { getAmount = function() return 1 end }
+    end },
+}
+PNC.NearbyWaterService = {
+    Find = function() return nearbyWater end,
+    Resolve = function() return nearbyWater end,
+    DesiredLiters = function() return 0.8 end,
+    Consume = function(_, _, liters) return true, liters, 0.2 end,
+}
+record.needs.thirst = 0.60
+local nearbyCandidates = Triggers.GetCandidates(record.id)
+local nearbyCandidate
+for _, candidate in ipairs(nearbyCandidates) do
+    if candidate.sourceRef == "nearby_water" then nearbyCandidate = candidate end
+end
+T.truthy(nearbyCandidate,
+    "thirst falls back to a nearby water source when no spigot is available")
+T.truthy(Triggers.PreferFacility(record, "hydration"),
+    "nearby water is preferred as a thirst route")
+local nearbyDefinition = { needEffect = "nearby_water", effectDelayMs = 0 }
+ok, complete = PNC.NeedFacilityEffects.Tick(
+    record, { resource = nearbyWater }, nearbyDefinition, 0, 1000)
+T.truthy(ok and complete, "nearby water completes through the shared effect")
+T.near(record.needs.thirst, 0.20, 0.000001,
+    "nearby water applies proportional thirst relief")
+
 T.finish("pnc_need_facility_triggers_smoke")

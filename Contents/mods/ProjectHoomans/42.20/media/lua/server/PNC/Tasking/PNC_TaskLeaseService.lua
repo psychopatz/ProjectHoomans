@@ -22,6 +22,8 @@ function Leases.Create(intent, assignment)
         facilityId = assignment and assignment.facilityId or nil,
         facilitySlotId = assignment and assignment.componentId or nil,
         reservationId = assignment and assignment.reservationId or nil,
+        resourceKey = assignment and assignment.resourceKey or nil,
+        resourceKind = assignment and assignment.resourceKind or nil,
         phase = "ASSIGNED", startedAt = PNC.Core.Now(), revision = 1,
         executionMode = assignment and assignment.executionMode or nil,
     }

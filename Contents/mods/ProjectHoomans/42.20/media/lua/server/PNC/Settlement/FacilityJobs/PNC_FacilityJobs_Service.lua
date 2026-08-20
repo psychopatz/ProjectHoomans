@@ -44,6 +44,9 @@ function Jobs.Start(record, facilityOrId, capability, options)
     capability = tostring(capability or definitionCapability(facility) or "")
     local definition = PNC.FacilityJobDefinitions.Get(capability)
     if not record or record.alive == false then return false, "NPC_UNAVAILABLE" end
+    if not base and options.nearby == true then
+        base = { id = tostring(facility.baseId or "nearby") }
+    end
     if not base or not facility then return false, "FACILITY_NOT_FOUND" end
     if not definition then return false, "FACILITY_HAS_NO_ACTIVITY" end
     if record.runtime and record.runtime.facilityActivity then
@@ -86,6 +89,9 @@ function Jobs.Start(record, facilityOrId, capability, options)
         automatic = options.automatic == true,
         taskLeaseId = tostring(options.taskLeaseId or ""),
         abstract = options.abstract == true,
+        resourceKind = tostring(options.resourceKind or ""),
+        resourceKey = tostring(options.resourceKey or ""),
+        resource = options.resource,
     }
     if options.debugHold == true then
         record.runtime.facilityDebugWork = record.runtime.facilityActivity
@@ -107,6 +113,8 @@ function Jobs.Start(record, facilityOrId, capability, options)
         sleepSurface = target.sleepSurface,
         taskLeaseId = tostring(options.taskLeaseId or ""),
         debugHold = options.debugHold == true,
+        resourceKind = tostring(options.resourceKind or ""),
+        resourceKey = tostring(options.resourceKey or ""),
     })
     return true, "facility_activity_started", {
         npcID = record.id,

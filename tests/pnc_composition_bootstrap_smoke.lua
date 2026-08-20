@@ -100,8 +100,11 @@ assertEqual(serverCalls[settlementIndex - 1], "PNC/PNC_CommunityService",
     "server Settlement initialization predecessor")
 local facilityJobsIndex = indexOf(serverCalls,
     "PNC/Settlement/FacilityJobs/PNC_FacilityJobs_Service")
-assertEqual(serverCalls[facilityJobsIndex + 1], "PNC/Tasking/PNC_Tasking",
-    "Tasking loads after its Needs and Facility Jobs dependencies")
+assertEqual(serverCalls[facilityJobsIndex + 1],
+    "PNC/World/PNC_NearbyResourceLocator",
+    "nearby resource services load before Tasking")
+assertEqual(serverCalls[facilityJobsIndex + 3], "PNC/Tasking/PNC_Tasking",
+    "Tasking loads after nearby resource services")
 assertEqual(serverCalls[settlementIndex + 1], "PNC/Journals/PNC_JournalRoutes",
     "server Settlement initialization successor")
 local directorIndex = indexOf(serverCalls, "PNC/Director/PNC_Director")

@@ -267,4 +267,34 @@ Scenes.Register("facility.water.drink", {
     end,
 })
 
+Scenes.Register("facility.water.drink.nearby", {
+    label = "Drink from Nearby Water",
+    description = "Drink clean water from a nearby container.",
+    category = "facility",
+    priority = 60,
+    repeatMode = "once",
+    blocking = true,
+    bump = "Drink",
+    durationMs = 3600,
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = function(record, zombie, scene, now)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneTick then
+            return jobs.OnSceneTick(record, zombie, scene, now)
+        end
+        return true
+    end,
+    onStop = function(record, zombie, scene, reason)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneStopped then
+            jobs.OnSceneStopped(record, zombie, scene, reason)
+        end
+    end,
+})
+
 return Scenes

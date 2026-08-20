@@ -5,8 +5,47 @@ PNC = PNC or {}
 PNC.NeedFacilityEffects = PNC.NeedFacilityEffects or {}
 
 local Effects = PNC.NeedFacilityEffects
+local afterDelay
 
-local function afterDelay(state, definition, now)
+local function applyNearbyWater(record, state, definition, now)
+    if state.effectAttempted == true or not afterDelay(state, definition, now) then
+        return true, false
+    end
+    state.effectAttempted = true
+    local source = state.resource
+    if not source and PNC.NearbyWaterService
+        and PNC.NearbyWaterService.Resolve
+    then
+        source = PNC.NearbyWaterService.Resolve(record, state.resourceKey)
+        state.resource = source
+    end
+    local container = source and source.item
+        and source.item.getFluidContainer
+        and source.item:getFluidContainer() or nil
+    local available = container and container.getAmount
+        and tonumber(container:getAmount()) or 0
+    local liters = PNC.NearbyWaterService
+        and PNC.NearbyWaterService.DesiredLiters
+        and PNC.NearbyWaterService.DesiredLiters(record, available) or 0
+    local ok, consumed, reason = false, nil, nil
+    if PNC.NearbyWaterService
+        and type(PNC.NearbyWaterService.Consume) == "function"
+    then
+        ok, consumed, reason = PNC.NearbyWaterService.Consume(
+            record, source, liters)
+    end
+    if ok ~= true then return false, true, reason or "INSUFFICIENT_WATER" end
+    if PNC.IndividualNeeds and PNC.IndividualNeeds.Commands
+        and PNC.IndividualNeeds.Commands.ApplyDrink
+    then
+        PNC.IndividualNeeds.Commands.ApplyDrink(record, {
+            thirst = (tonumber(consumed) or 0) / 2,
+        }, "nearby_water_drink")
+    end
+    return true, true, "NEED_COMPLETE", consumed
+end
+
+afterDelay = function(state, definition, now)
     state.effectReadyAt = state.effectReadyAt or ((tonumber(now) or 0)
         + (tonumber(definition.effectDelayMs) or 0))
     return (tonumber(now) or 0) >= state.effectReadyAt
@@ -108,6 +147,9 @@ function Effects.Tick(record, state, definition, elapsed, now)
     end
     if definition.needEffect == "water" then
         return applyWater(record, state, definition, now)
+    end
+    if definition.needEffect == "nearby_water" then
+        return applyNearbyWater(record, state, definition, now)
     end
     if elapsed <= 0 then return true, false end
     if definition.needEffect == "need" then

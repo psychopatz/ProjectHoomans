@@ -29,6 +29,8 @@ local function normalize(_, spec)
         sceneId = tostring(spec.sceneId or ""),
         sleepSurface = tostring(spec.sleepSurface or ""),
         taskLeaseId = tostring(spec.taskLeaseId or ""),
+        resourceKind = tostring(spec.resourceKind or ""),
+        resourceKey = tostring(spec.resourceKey or ""),
         debugHold = spec.debugHold == true,
     }
 end
@@ -160,6 +162,12 @@ function Jobs.Tick(record, zombie)
     local scene
     local sceneId
     if order.kind ~= KIND or not runtime or not definition then return false end
+    if runtime.resourceKind == "nearby_water" and not runtime.resource
+        and PNC.NearbyWaterService and PNC.NearbyWaterService.Resolve
+    then
+        runtime.resource = PNC.NearbyWaterService.Resolve(record,
+            runtime.resourceKey)
+    end
     record.activeJob = definition.activeJob or JOB
     record.activeBehavior = "Facility:" .. tostring(order.capability)
     sceneId = order.sceneId ~= "" and order.sceneId or definition.sceneId

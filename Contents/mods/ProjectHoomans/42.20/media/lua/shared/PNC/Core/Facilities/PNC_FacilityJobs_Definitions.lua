@@ -108,4 +108,16 @@ Definitions.Register("water.drink", {
     effectDelayMs = 1800,
 })
 
+Definitions.Register("water.nearby", {
+    activeJob = "Drink",
+    activityLabelKey = "UI_PNC_Activity_Drinking",
+    activityText = "Drinking",
+    sceneId = "facility.water.drink.nearby",
+    role = "water.nearby",
+    arrivalDistance = 0.85,
+    activityLabel = "DRINKING",
+    needEffect = "nearby_water",
+    effectDelayMs = 1800,
+})
+
 return Definitions

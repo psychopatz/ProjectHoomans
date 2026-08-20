@@ -1,0 +1,103 @@
+local T = require "tests/support/test"
+
+T.addPackagePaths({
+    { "ProjectHoomans", "server" },
+})
+
+PsychopatzCore = {
+    RuntimeRole = { AllowsServerCode = function() return true end },
+}
+
+local function list(values)
+    return {
+        size = function() return #values end,
+        get = function(_, index) return values[index + 1] end,
+    }
+end
+
+local function square(x, y, objects)
+    return {
+        getX = function() return x end,
+        getY = function() return y end,
+        getZ = function() return 0 end,
+        getObjects = function() return list(objects or {}) end,
+        getWorldObjects = function() return list({}) end,
+    }
+end
+
+local function waterItem(id, amount, tainted)
+    local fluid = {
+        getFluidTypeString = function() return tainted and "TaintedWater"
+            or "Water" end,
+    }
+    local container = {
+        amount = amount,
+        getItems = function() return list({}) end,
+        isEmpty = function(self) return self.amount <= 0 end,
+        getPrimaryFluid = function() return fluid end,
+        getAmount = function(self) return self.amount end,
+        contains = function() return tainted == true end,
+        adjustAmount = function(self, value) self.amount = value end,
+    }
+    local item = {
+        amount = amount,
+        getID = function() return id end,
+        getFullType = function() return "Base.WaterBottle" end,
+        getFluidContainer = function() return container end,
+        isTaintedWater = function() return tainted == true end,
+        syncItemFields = function() end,
+    }
+    return item, container
+end
+
+local cleanItem, cleanContainer = waterItem(2, 1.0, false)
+local taintedItem = waterItem(1, 1.0, true)
+local cupboard = {
+    getContainer = function()
+        return { getItems = function() return list({ taintedItem, cleanItem }) end }
+    end,
+}
+local originSquare = square(10, 10, { cupboard })
+local cell = {
+    getGridSquare = function(_, x, y)
+        if x == 10 and y == 10 then return originSquare end
+        return nil
+    end,
+}
+local body = {
+    getX = function() return 10.5 end,
+    getY = function() return 10.5 end,
+    getZ = function() return 0 end,
+}
+getCell = function() return cell end
+getTimestampMs = function() return 1000 end
+Fluid = { TaintedWater = "TaintedWater" }
+
+PNC = {}
+local Locator = T.load("ProjectHoomans", "server",
+    "PNC/World/PNC_NearbyResourceLocator.lua")
+PNC.NearbyResourceLocator = Locator
+local Service = T.load("ProjectHoomans", "server",
+    "PNC/World/PNC_NearbyWaterService.lua")
+
+local located = Locator.Find(body, {
+    cell = cell, radius = 1,
+    accept = function(entry) return entry.item == cleanItem end,
+})
+T.equal(located.item, cleanItem, "locator selects the nearest accepted item")
+
+local record = { id = "npc:water" }
+PNC.Registry = { GetLiveZombie = function() return body end }
+PNC.IndividualNeeds = { Get = function() return 0.40 end }
+local source = Service.Find(record)
+T.equal(source.item, cleanItem, "water service rejects tainted containers")
+T.equal(Service.DesiredLiters(record, 1.0), 0.80,
+    "water amount follows the NPC thirst requirement")
+local ok, consumed, remaining = Service.Consume(record, source, 0.80)
+T.truthy(ok, "clean water is consumed server-side")
+T.equal(consumed, 0.80, "only the required liters are removed")
+T.near(remaining, 0.20, 0.000001, "remaining liters are reported")
+T.near(cleanContainer.amount, 0.20, 0.000001,
+    "the original water container is preserved and partially drained")
+
+T.finish("pnc_nearby_water_smoke")
