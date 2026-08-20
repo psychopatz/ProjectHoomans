@@ -13,6 +13,7 @@ local Planner = PNC.EnginePathPlanner
 local Internal = Planner.Internal or {}
 local Core = PNC.Core
 local Const = PNC.Const or {}
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 function Planner.CanUseNativePath(body)
     if not body then
@@ -70,7 +71,11 @@ local function handoffUpcomingPassage(record, body, navigation)
     -- exception there would prevent any post-update recovery from running.
     Internal.ClearEngineRequest(body, navigation)
     if PNC.PathService and PNC.PathService.Pump then
-        handled, state = PNC.PathService.Pump(record, body)
+        handled, state = PNC.PathService.Pump(
+            record,
+            body,
+            "engine_passage_handoff"
+        )
         return true, state or (handled
             and "native_passage_handoff"
             or "native_passage_waiting")
@@ -93,6 +98,9 @@ local function beginRequest(body, finalTarget, navigation, now, reason)
     end
 
     Internal.ClearEngineRequest(body, navigation)
+    if Diagnostics then
+        Diagnostics.Increment("Pathing.EnginePathRequests")
+    end
     local x = tonumber(finalTarget.x) or body:getX()
     local y = tonumber(finalTarget.y) or body:getY()
     local z = tonumber(finalTarget.z) or body:getZ()
@@ -204,6 +212,9 @@ function Planner.GetSteeringTarget(record, body, finalTarget)
             if Internal.IsMultiplayerAuthority()
                 or Internal.ConsumeRequestBudget(now)
             then
+                if Diagnostics then
+                    Diagnostics.Increment("Pathing.Replans")
+                end
                 beginRequest(
                     body,
                     finalTarget,
@@ -271,6 +282,9 @@ function Planner.GetSteeringTarget(record, body, finalTarget)
         return finalTarget
     end
 
+    if Diagnostics and (tonumber(navigation.planFailures) or 0) > 0 then
+        Diagnostics.Increment("Pathing.Retries")
+    end
     beginRequest(body, finalTarget, navigation, now, reason)
     return finalTarget
 end
@@ -287,6 +301,16 @@ function Planner.Pump(record, body, source)
 
     local now = Core and Core.Now and Core.Now() or 0
     source = tostring(source or "scheduled")
+    if Diagnostics then
+        Diagnostics.RecordPathPump(record, source)
+        if record
+            and record.presenceState == PNC.Const.PRESENCE_ABSTRACT
+        then
+            Diagnostics.Increment(
+                "LiveAbstract.AbstractPhysicalTraversal"
+            )
+        end
+    end
     if navigation.clientDelegated == true
         and Internal.IsMultiplayerAuthority()
     then
@@ -352,6 +376,12 @@ function Planner.Pump(record, body, source)
         if handedOff then
             return true, handoffResult
         end
+        if Diagnostics then
+            Diagnostics.RecordLogicalAdvance(
+                record,
+                "engine_behavior2"
+            )
+        end
         local result = behavior:update()
         navigation.lastBehaviorResult = result
         navigation.lastBehaviorUpdateAt = now
@@ -411,6 +441,9 @@ function Planner.Pump(record, body, source)
                 "native_traversal_timeout"
             navigation.planFailures =
                 (tonumber(navigation.planFailures) or 0) + 1
+            if Diagnostics then
+                Diagnostics.Increment("Pathing.Timeouts")
+            end
             return true, "engine_path_failed"
         end
         navigation.nativeTraversalState = nil
@@ -444,6 +477,9 @@ function Planner.Pump(record, body, source)
         navigation.lastPlanReason = "native_request_timeout"
         navigation.planFailures =
             (tonumber(navigation.planFailures) or 0) + 1
+        if Diagnostics then
+            Diagnostics.Increment("Pathing.Timeouts")
+        end
         return true, "engine_path_timeout"
     end
     if (hasPath or movementState ~= nil)
@@ -466,6 +502,9 @@ function Planner.Pump(record, body, source)
         navigation.lastPlanReason = "native_route_timeout"
         navigation.planFailures =
             (tonumber(navigation.planFailures) or 0) + 1
+        if Diagnostics then
+            Diagnostics.Increment("Pathing.Timeouts")
+        end
         return true, "engine_path_timeout"
     end
 
@@ -524,7 +563,11 @@ function Planner.PumpFrame(record, body)
         -- The ordinary scheduler is intentionally throttled; advance the
         -- short scripted crossing on zombie frames for smooth motion and keep
         -- Behavior2 dormant until the action has completely released.
-        return PNC.PathService.Pump(record, body)
+        return PNC.PathService.Pump(
+            record,
+            body,
+            "zombie_update_path_service"
+        )
     end
     if navigation
         and navigation.controllerMode == "behavior2_move"
@@ -535,7 +578,11 @@ function Planner.PumpFrame(record, body)
         -- native ownership and begin its BodyDamage-safe scripted passage on
         -- this same zombie-update frame.
         if PNC.PathService and PNC.PathService.Pump then
-            return PNC.PathService.Pump(record, body)
+            return PNC.PathService.Pump(
+                record,
+                body,
+                "zombie_update_collision"
+            )
         end
         return true, "native_collision_waiting"
     end

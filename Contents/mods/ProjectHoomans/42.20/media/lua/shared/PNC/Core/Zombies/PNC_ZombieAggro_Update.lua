@@ -8,6 +8,7 @@ local Registry = PNC.Registry
 local Stealth = PNC.Stealth
 local ZombieReaction = PNC.CombatZombieReaction
 local Settings = PNC.Sandbox
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local Internal = ZombieAggro.Internal
 
@@ -83,6 +84,11 @@ local function refreshPursuitPath(zombie, npcBody, now)
     if ZombieAggro.ConsumePathRequestBudget
         and not ZombieAggro.ConsumePathRequestBudget()
     then
+        if Diagnostics then
+            Diagnostics.Increment(
+                "ZombieAggro.PathRequestsDeferred"
+            )
+        end
         return false
     end
     if modData then
@@ -94,6 +100,9 @@ local function refreshPursuitPath(zombie, npcBody, now)
     -- is IsoZombie. pathToCharacter may reject zombie-shaped targets.
     if zombie.pathToLocationF then
         zombie:pathToLocationF(targetX, targetY, npcBody:getZ())
+        if Diagnostics then
+            Diagnostics.Increment("ZombieAggro.PathRequests")
+        end
     end
     return true
 end

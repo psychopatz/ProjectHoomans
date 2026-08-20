@@ -10,6 +10,7 @@ local Const = PNC.Const
 local Registry = PNC.Registry
 local Spatial = PNC.SpatialIndex
 local Internal = ZombieAggro.Internal
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 ZombieAggro.ActiveSet = ZombieAggro.ActiveSet or {
     byID = {},
@@ -43,6 +44,9 @@ local function compact()
     state.order = compacted
     state.cursor = math.min(math.max(1, state.cursor), math.max(1, #compacted))
     state.holes = 0
+    if Diagnostics then
+        Diagnostics.Increment("ZombieAggro.Compactions")
+    end
 end
 
 function ZombieAggro.Activate(zombie, now, reason, ttl)
@@ -84,14 +88,34 @@ function ZombieAggro.RefreshActiveSet(now, force)
         return false
     end
     state.lastRefreshAt = now
+    if Diagnostics then
+        Diagnostics.Increment("ZombieAggro.AggroRefreshes")
+    end
     if Registry and Registry.ForEachLive and Spatial and Spatial.QueryZombies then
         Registry.ForEachLive(function(record, body)
             if record and body and record.alive ~= false then
+                if Diagnostics then
+                    Diagnostics.Increment("ZombieAggro.RefreshNPCs")
+                    Diagnostics.Increment("ZombieAggro.CandidateQueries")
+                    if record.presenceState
+                        ~= PNC.Const.PRESENCE_LIVE
+                    then
+                        Diagnostics.Increment(
+                            "LiveAbstract.AbstractAggroQueries"
+                        )
+                    end
+                end
                 candidates = Spatial.QueryZombies(
                     body:getX(),
                     body:getY(),
                     radius
                 )
+                if Diagnostics then
+                    Diagnostics.Increment(
+                        "ZombieAggro.CandidateCount",
+                        #candidates
+                    )
+                end
                 for i = 1, #candidates do
                     zombie = candidates[i]
                     if zombie
@@ -149,6 +173,9 @@ function ZombieAggro.PumpActiveSet(now, callback)
             state.order[state.cursor - 1] = false
             state.holes = state.holes + 1
         end
+    end
+    if Diagnostics then
+        Diagnostics.Increment("ZombieAggro.ProcessedCount", processed)
     end
     return processed
 end

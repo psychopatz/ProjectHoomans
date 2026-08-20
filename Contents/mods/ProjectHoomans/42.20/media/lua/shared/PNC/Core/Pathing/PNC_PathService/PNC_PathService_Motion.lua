@@ -10,6 +10,7 @@ local PathService = PNC.PathService
 PathService.Internal = PathService.Internal or {}
 
 local Internal = PathService.Internal
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 function Internal.finalizeCancel(zombie, record, lane)
     local now = Internal.Core.Now()
@@ -64,6 +65,9 @@ function Internal.startRequestedMove(zombie, record, lane)
     local goal = lane and lane.goal or nil
     if not zombie or not lane or not goal then
         return false, "no_goal"
+    end
+    if Diagnostics then
+        Diagnostics.Increment("Pathing.PathRequests")
     end
     now = Internal.Core.Now()
     preserveVisualMotion = now < (tonumber(lane.visualMovingUntil) or 0)
@@ -128,6 +132,14 @@ end
 function Internal.completeMove(zombie, record, lane, phase, reason)
     local now = Internal.Core.Now()
     local preserveVisualMotion = phase == "arrived" and now < (tonumber(lane and lane.visualMovingUntil) or 0)
+    if Diagnostics then
+        if phase == "arrived" then
+            Diagnostics.Increment("Pathing.CompletedRoutes")
+        elseif phase == "blocked" then
+            Diagnostics.Increment("Pathing.BlockedRoutes")
+            Diagnostics.Increment("Pathing.FailedRoutes")
+        end
+    end
     if zombie then
         Internal.hardResetMoveOwner(zombie, preserveVisualMotion)
     end
@@ -178,6 +190,7 @@ function Internal.refreshPendingGoal(zombie, record, lane, reason)
     if not lane or not lane.pendingGoal then
         return false
     end
+    if Diagnostics then Diagnostics.Increment("Pathing.Replans") end
     Internal.setLaneGoal(record, lane, lane.pendingGoal)
     lane.pendingGoal = nil
     lane.pendingGoalAt = 0
@@ -188,6 +201,10 @@ end
 function Internal.restartCurrentGoal(zombie, record, lane, reason)
     if not lane or not lane.goal then
         return false, "no_goal"
+    end
+    if Diagnostics then
+        Diagnostics.Increment("Pathing.Replans")
+        Diagnostics.Increment("Pathing.Retries")
     end
     lane.ownerMode = "requested"
     Internal.setLanePhase(record, lane, "requested", reason or "restart")
@@ -207,6 +224,13 @@ function Internal.updateActiveMove(zombie, record, lane)
 
     if not zombie or not lane or not goal then
         return false, "no_goal"
+    end
+
+    if Diagnostics then
+        Diagnostics.RecordLogicalAdvance(
+            record,
+            "path_service_active_move"
+        )
     end
 
     now = Internal.Core.Now()
@@ -538,6 +562,7 @@ function Internal.updateActiveMove(zombie, record, lane)
             return Internal.completeMove(zombie, record, lane, "blocked", "progress_timeout")
         end
         lane.lastProgressAt = now
+        if Diagnostics then Diagnostics.Increment("Pathing.Retries") end
         return true, "retry"
     end
 
@@ -573,6 +598,12 @@ function PathService.MoveToward(
     navigation
 )
     local intent
+    if Diagnostics
+        and record
+        and record.presenceState == PNC.Const.PRESENCE_ABSTRACT
+    then
+        Diagnostics.Increment("LiveAbstract.AbstractPathRequests")
+    end
     record.runtime = record.runtime or {}
     intent = record.runtime.moveIntent
     if not intent or intent.kind ~= "move" then
@@ -616,12 +647,28 @@ function PathService.MoveToward(
     return true, "move_intent"
 end
 
-function PathService.Pump(record, zombie)
+function PathService.Pump(record, zombie, caller)
     local runtime = record and record.runtime or nil
     local lane
     local intentState
     local now
     local positionRepaired
+    if Diagnostics then
+        Diagnostics.RecordPathPump(
+            record,
+            caller or "scheduler_path_service"
+        )
+        if record
+            and record.presenceState == PNC.Const.PRESENCE_ABSTRACT
+        then
+            Diagnostics.Increment("LiveAbstract.AbstractPathRequests")
+            if zombie then
+                Diagnostics.Increment(
+                    "LiveAbstract.AbstractPhysicalTraversal"
+                )
+            end
+        end
+    end
     if not zombie or not runtime then
         return false, "no_live_body"
     end

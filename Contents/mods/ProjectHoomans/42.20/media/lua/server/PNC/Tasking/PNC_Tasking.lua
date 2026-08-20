@@ -11,6 +11,7 @@ PNC.Tasking = PNC.Tasking or {}
 local Tasking = PNC.Tasking
 local Priority = PNC.TaskPriority
 local Leases = PNC.TaskLeaseService
+local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 
 Tasking.Commands = Tasking.Commands or {}
 Tasking.Queries = Tasking.Queries or {}
@@ -55,8 +56,20 @@ function Tasking.Commands.MarkDirty(npcId, cause)
     npcId = tostring(npcId or "")
     if npcId == "" then return false end
     local pending = Tasking.Dirty.byNPC[npcId]
-    if pending then pending.cause = tostring(cause or pending.cause); return true end
-    local entry = { npcId = npcId, cause = tostring(cause or "unspecified") }
+    cause = tostring(cause or (pending and pending.cause) or "unspecified")
+    if ScalingDiagnostics then
+        ScalingDiagnostics.RecordDirtyMark(cause)
+    end
+    if pending then
+        pending.cause = cause
+        if ScalingDiagnostics then
+            ScalingDiagnostics.Increment(
+                "NPCDecisions.DirtyMarksDeduplicated"
+            )
+        end
+        return true
+    end
+    local entry = { npcId = npcId, cause = cause }
     Tasking.Dirty.byNPC[npcId] = entry
     Tasking.Dirty.queue[#Tasking.Dirty.queue + 1] = entry
     return true
@@ -64,6 +77,9 @@ end
 
 local function collect(record)
     local candidates = {}
+    if ScalingDiagnostics then
+        ScalingDiagnostics.Increment("NPCDecisions.CandidateBuilds")
+    end
     for domain, provider in pairs(Tasking.Providers) do
         local ok, values = pcall(provider.GetCandidates, record.id)
         if ok then
@@ -111,6 +127,9 @@ function Tasking.Commands.Reevaluate(npcId, cause)
     Tasking.Diagnostics.byNPC[tostring(npcId)] = diagnostics
     Tasking.Diagnostics.counters.reevaluations =
         Tasking.Diagnostics.counters.reevaluations + 1
+    if ScalingDiagnostics then
+        ScalingDiagnostics.Increment("NPCDecisions.DecisionRuns")
+    end
     if not record or record.alive == false then
         local existing = Leases.ForNPC(npcId)
         if existing then stopLease(existing, "npc_unavailable") end
@@ -118,6 +137,7 @@ function Tasking.Commands.Reevaluate(npcId, cause)
         return false, diagnostics.lastReason
     end
     local current = Leases.ForNPC(npcId)
+    local previousTaskId = current and current.taskId or nil
     if current then
         local provider = Tasking.Providers[current.sourceDomain]
         local canContinue = provider and provider.CanContinue
@@ -136,6 +156,11 @@ function Tasking.Commands.Reevaluate(npcId, cause)
     if not winner then diagnostics.lastReason = current and "CURRENT_ONLY" or "NO_CANDIDATE"; return current ~= nil end
     if current and current.taskId == winner.taskId then
         current.urgency, current.precedence = winner.urgency, winner.precedence
+        if ScalingDiagnostics then
+            ScalingDiagnostics.Increment(
+                "NPCDecisions.SameTaskReselections"
+            )
+        end
         diagnostics.lastReason = "CURRENT_TASK_CONTINUES"; return true, current
     end
     if current then
@@ -147,6 +172,7 @@ function Tasking.Commands.Reevaluate(npcId, cause)
     else
         local external = externalCurrent(record)
         if external then
+            previousTaskId = external.taskId
             local allowed, reason = Priority.CanPreempt(external, winner)
             if not allowed then diagnostics.lastReason = reason; return false, reason end
             local released = PNC.WorkService and PNC.WorkService.Commands
@@ -176,6 +202,12 @@ function Tasking.Commands.Reevaluate(npcId, cause)
         return false, diagnostics.lastReason
     end
     diagnostics.lastReason, diagnostics.currentLeaseId = "ASSIGNED", lease.leaseId
+    if ScalingDiagnostics then
+        ScalingDiagnostics.Increment("NPCDecisions.TaskAssignments")
+        if previousTaskId and previousTaskId ~= winner.taskId then
+            ScalingDiagnostics.Increment("NPCDecisions.TaskSwitches")
+        end
+    end
     return true, lease
 end
 

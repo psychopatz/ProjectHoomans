@@ -10,6 +10,7 @@ local Presentation = PNC.NameplatePresentation
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
 local Identity = PNC.NPCIdentityPresentation
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local UPDATE_RATE = 6
 
@@ -335,6 +336,9 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
 end
 
 local function populateLiveEntry(entry, snapshot, zombie, currentTime, settings)
+    if Diagnostics then
+        Diagnostics.Increment("UI.NameplateEntryBuilds")
+    end
     entry.snapshot = snapshot
     entry.zombie = zombie
     entry.debugOnly = false
@@ -351,6 +355,9 @@ local function populateLiveEntry(entry, snapshot, zombie, currentTime, settings)
 end
 
 local function populateDebugEntry(entry, snapshot, settings)
+    if Diagnostics then
+        Diagnostics.Increment("UI.NameplateEntryBuilds")
+    end
     entry.snapshot = snapshot
     entry.zombie = nil
     entry.debugOnly = true
@@ -379,6 +386,9 @@ local function isDebugVisible(player, snapshot)
 end
 
 function Entries.Refresh(manager, settings)
+    if Diagnostics then
+        Diagnostics.Increment("UI.NameplateUpdateCalls")
+    end
     local debugActive = settings.showAIDebug == true
         or settings.showPathDebug == true
         or settings.showCombatDebug == true
@@ -409,17 +419,33 @@ function Entries.Refresh(manager, settings)
     local player = manager.player
     if not player or not settings.enabled or not getCell then
         manager.entries = {}
+        if Diagnostics then
+            Diagnostics.SetGauge("UI.NameplateVisibleEntries", 0)
+        end
         return
     end
 
     manager.updateCounter = (manager.updateCounter or 0) + 1
     if manager.updateCounter < UPDATE_RATE then return end
     manager.updateCounter = 0
+    if Diagnostics then
+        Diagnostics.Increment("UI.NameplateRefreshes")
+    end
 
     local zombieList = getCell():getZombieList()
     if not zombieList then
         manager.entries = {}
+        if Diagnostics then
+            Diagnostics.SetGauge("UI.NameplateVisibleEntries", 0)
+        end
         return
+    end
+    if Diagnostics then
+        Diagnostics.Increment("UI.LoadedZombieScans")
+        Diagnostics.Increment(
+            "UI.LoadedZombiesScanned",
+            zombieList:size()
+        )
     end
 
     local bodyIndex = Bodies.Index(zombieList)
@@ -449,6 +475,11 @@ function Entries.Refresh(manager, settings)
 
     for uuid, _ in pairs(manager.entries) do
         if not visible[uuid] then manager.entries[uuid] = nil end
+    end
+    if Diagnostics then
+        local visibleCount = 0
+        for _, _ in pairs(visible) do visibleCount = visibleCount + 1 end
+        Diagnostics.SetGauge("UI.NameplateVisibleEntries", visibleCount)
     end
 end
 

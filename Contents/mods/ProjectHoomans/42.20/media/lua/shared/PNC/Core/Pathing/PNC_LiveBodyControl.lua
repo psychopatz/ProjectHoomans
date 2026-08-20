@@ -10,6 +10,7 @@ PNC.LiveBodyControl = PNC.LiveBodyControl or {}
 
 local LiveBodyControl = PNC.LiveBodyControl
 local Core = PNC.Core
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local SUPPRESSION_AUDIO_COOLDOWN_MS = 250
 local BODY_MAINTENANCE_INTERVAL_MS = 500
@@ -998,6 +999,9 @@ function LiveBodyControl.OnZombieUpdate(zombie)
     ) then
         return
     end
+    if Diagnostics then
+        Diagnostics.Increment("LiveAbstract.ManagedBodyUpdates")
+    end
     if Core
         and Core.IsAuthority
         and Core.IsAuthority()
@@ -1009,6 +1013,13 @@ function LiveBodyControl.OnZombieUpdate(zombie)
     then
         local record = PNC.Registry.FindRecordByZombie(zombie)
         if record then
+            if Diagnostics
+                and record.presenceState == PNC.Const.PRESENCE_ABSTRACT
+            then
+                Diagnostics.Increment(
+                    "LiveAbstract.AbstractBodyUpdates"
+                )
+            end
             PNC.EnginePathPlanner.PumpFrame(record, zombie)
         end
     end

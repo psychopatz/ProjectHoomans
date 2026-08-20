@@ -4,6 +4,7 @@ PNC.Scheduler = PNC.Scheduler or {}
 local Scheduler = PNC.Scheduler
 local Const = PNC.Const
 local LOD = PNC.SimulationLOD
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 Scheduler.SLOT_MS = 50
 Scheduler.Buckets = Scheduler.Buckets or {}
@@ -12,6 +13,10 @@ Scheduler.Initialized = Scheduler.Initialized or false
 Scheduler.LastSlot = Scheduler.LastSlot or nil
 Scheduler.Jobs = Scheduler.Jobs or {}
 Scheduler.JobOrder = Scheduler.JobOrder or {}
+Scheduler.PhysicalEntries = tonumber(Scheduler.PhysicalEntries) or 0
+Scheduler.DiagnosticDueAtByID = Scheduler.DiagnosticDueAtByID or {}
+Scheduler.DueBacklog = tonumber(Scheduler.DueBacklog) or 0
+Scheduler.OldestOverdueMs = tonumber(Scheduler.OldestOverdueMs) or 0
 
 function Scheduler.GetCadence(record)
     if LOD and LOD.GetCadence then
@@ -46,11 +51,23 @@ function Scheduler.GetCadence(record)
     return math.min(Const.TICK_LIVE_COLD_MS, 500)
 end
 
-function Scheduler.Schedule(record, dueAt)
+function Scheduler.Schedule(record, dueAt, preserveDiagnosticDueAt)
     local slot
     local bucket
     if not record or not record.id then
         return
+    end
+    if Scheduler.SlotByID[record.id] ~= nil then
+        if Diagnostics then
+            Diagnostics.Increment("Scheduler.Reschedules")
+        end
+        if preserveDiagnosticDueAt ~= true then
+            Scheduler.DiagnosticDueAtByID[record.id] =
+                tonumber(dueAt) or 0
+        end
+    elseif Scheduler.DiagnosticDueAtByID[record.id] == nil then
+        Scheduler.DiagnosticDueAtByID[record.id] =
+            tonumber(dueAt) or 0
     end
     slot = math.floor((tonumber(dueAt) or 0) / Scheduler.SLOT_MS)
     if Scheduler.LastSlot and slot <= Scheduler.LastSlot then
@@ -63,6 +80,7 @@ function Scheduler.Schedule(record, dueAt)
         Scheduler.Buckets[slot] = bucket
     end
     bucket[#bucket + 1] = record.id
+    Scheduler.PhysicalEntries = Scheduler.PhysicalEntries + 1
 end
 
 function Scheduler.Initialize(records, now)
@@ -71,6 +89,10 @@ function Scheduler.Initialize(records, now)
     local cadence
     Scheduler.Buckets = {}
     Scheduler.SlotByID = {}
+    Scheduler.PhysicalEntries = 0
+    Scheduler.DiagnosticDueAtByID = {}
+    Scheduler.DueBacklog = 0
+    Scheduler.OldestOverdueMs = 0
     Scheduler.LastSlot = math.floor((tonumber(now) or 0) / Scheduler.SLOT_MS) - 1
     for id, record in pairs(records or {}) do
         cadence = Scheduler.GetCadence(record)
@@ -97,6 +119,9 @@ function Scheduler.PopDue(records, now)
     local bucket
     local i
     local id
+    local dueAt
+    local overdueMs
+    local oldestOverdueMs = 0
     if not Scheduler.Initialized then
         Scheduler.Initialize(records, now)
         slot = Scheduler.LastSlot
@@ -109,29 +134,66 @@ function Scheduler.PopDue(records, now)
                 id = bucket[i]
                 if Scheduler.SlotByID[id] == slot and records[id] then
                     Scheduler.SlotByID[id] = nil
+                    dueAt = Scheduler.DiagnosticDueAtByID[id]
+                    overdueMs = math.max(
+                        0,
+                        (tonumber(now) or 0)
+                            - (tonumber(dueAt) or (slot * Scheduler.SLOT_MS))
+                    )
                     if #output < maxRecords then
                         output[#output + 1] = records[id]
+                        Scheduler.DiagnosticDueAtByID[id] = nil
+                        if Diagnostics then
+                            Diagnostics.Increment("Scheduler.DueProcessed")
+                        end
                     else
                         deferred[#deferred + 1] = records[id]
+                        oldestOverdueMs = math.max(
+                            oldestOverdueMs,
+                            overdueMs
+                        )
+                        if Diagnostics then
+                            Diagnostics.Increment("Scheduler.Deferred")
+                        end
+                    end
+                else
+                    if Scheduler.SlotByID[id] == slot
+                        and not records[id]
+                    then
+                        Scheduler.DiagnosticDueAtByID[id] = nil
+                    end
+                    if Diagnostics then
+                        Diagnostics.Increment("Scheduler.StaleSkipped")
                     end
                 end
             end
+            Scheduler.PhysicalEntries = math.max(
+                0,
+                Scheduler.PhysicalEntries - #bucket
+            )
             Scheduler.Buckets[slot] = nil
         end
     end
     Scheduler.LastSlot = currentSlot
     for i = 1, #deferred do
+        if Diagnostics then
+            Diagnostics.Increment("Scheduler.Reschedules")
+        end
         Scheduler.Schedule(
             deferred[i],
-            (tonumber(now) or 0) + Scheduler.SLOT_MS
+            (tonumber(now) or 0) + Scheduler.SLOT_MS,
+            true
         )
     end
+    Scheduler.DueBacklog = #deferred
+    Scheduler.OldestOverdueMs = oldestOverdueMs
     return output
 end
 
 function Scheduler.Remove(id)
     if id ~= nil then
         Scheduler.SlotByID[tostring(id)] = nil
+        Scheduler.DiagnosticDueAtByID[tostring(id)] = nil
     end
 end
 

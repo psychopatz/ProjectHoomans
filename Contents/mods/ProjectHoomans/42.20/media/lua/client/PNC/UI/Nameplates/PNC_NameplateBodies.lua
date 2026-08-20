@@ -3,6 +3,7 @@ PNC.NameplateBodies = PNC.NameplateBodies or {}
 
 local Bodies = PNC.NameplateBodies
 local Const = PNC.Const
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local function addUnique(index, key, body)
     if key == nil then return end
@@ -22,6 +23,13 @@ function Bodies.Index(zombieList)
         byInstanceID = {},
     }
     if not zombieList then return index end
+    if Diagnostics then
+        Diagnostics.Increment("UI.BodyIndexRebuilds")
+        Diagnostics.Increment(
+            "UI.BodyIndexZombiesScanned",
+            zombieList:size()
+        )
+    end
 
     for i = 0, zombieList:size() - 1 do
         local zombie = zombieList:get(i)

@@ -2,6 +2,7 @@ PNC = PNC or {}
 PNC.NameplateRenderer = PNC.NameplateRenderer or {}
 
 local Renderer = PNC.NameplateRenderer
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 local Presentation = PNC.NameplatePresentation
 local NameplateDebug = PNC.NameplateDebug
 local Layout = Presentation.Layout
@@ -1600,6 +1601,9 @@ local function drawPathGoal(manager, entry)
 end
 
 function Renderer.Render(manager, settings)
+    if Diagnostics then
+        Diagnostics.Increment("UI.NameplateRenderCalls")
+    end
     if not settings.enabled or not manager.player then
         manager:clearStencilRect()
         return
@@ -1607,6 +1611,11 @@ function Renderer.Render(manager, settings)
 
     local metrics = Presentation.ScaleFor(manager.playerIndex)
     local currentTime = getTimeInMillis()
+    if Diagnostics then
+        local entryCount = 0
+        for _, _ in pairs(manager.entries) do entryCount = entryCount + 1 end
+        Diagnostics.Increment("UI.NameplateEntriesRendered", entryCount)
+    end
     if settings.showPathDebug then
         for _, entry in pairs(manager.entries) do
             if not entry.debugOnly then drawPathGoal(manager, entry) end

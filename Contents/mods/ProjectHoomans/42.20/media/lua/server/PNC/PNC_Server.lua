@@ -41,6 +41,7 @@ local Animation = PNC.Animation
 local BodyLifecycle = PNC.BodyLifecycle
 local ConversationScene = PNC.ConversationScene
 local PlayerCharacterLifecycle = PNC.PlayerCharacterLifecycle
+local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 local buildDebugRoster
 local lastLivePositionSafetyRefreshAt = 0
 
@@ -71,6 +72,14 @@ local function processRecord(record, now)
     local pathDue = false
     local forcePresence = record.runtime
         and record.runtime.forcePresenceCheck == true
+    if ScalingDiagnostics
+        and zombie
+        and record.presenceState == Const.PRESENCE_ABSTRACT
+    then
+        ScalingDiagnostics.Increment(
+            "LiveAbstract.AbstractBodyUpdates"
+        )
+    end
     if zombie and Registry.RefreshLivePosition then
         Registry.RefreshLivePosition(record, zombie, false)
     end
@@ -181,6 +190,9 @@ function Server.OnTick()
     local now = Core.Now()
     local due
     local i
+    if ScalingDiagnostics then
+        ScalingDiagnostics.BeginFrame()
+    end
     if Presence.BeginServerTick then
         Presence.BeginServerTick(now)
     end

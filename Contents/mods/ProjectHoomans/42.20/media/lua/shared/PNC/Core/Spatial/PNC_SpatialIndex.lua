@@ -6,6 +6,7 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Registry = PNC.Registry
 local Census = PNC.WorldCensus
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 Spatial.PlayerCells = Spatial.PlayerCells or {}
 Spatial.PlayerByOnlineID = Spatial.PlayerByOnlineID or {}
@@ -248,6 +249,8 @@ local function queryGrid(grid, x, y, radius)
     local bucket
     local column
     local i
+    local cellsExamined = (maxCellX - minCellX + 1)
+        * (maxCellY - minCellY + 1)
 
     for cellX = minCellX, maxCellX do
         for cellY = minCellY, maxCellY do
@@ -260,19 +263,41 @@ local function queryGrid(grid, x, y, radius)
             end
         end
     end
-    return results
+    return results, cellsExamined
 end
 
 function Spatial.QueryPlayers(x, y, radius)
-    return queryGrid(Spatial.PlayerCells, x, y, radius)
+    local results = queryGrid(Spatial.PlayerCells, x, y, radius)
+    return results
 end
 
 function Spatial.QueryNPCs(x, y, radius)
-    return queryGrid(Spatial.NPCCells, x, y, radius)
+    local results = queryGrid(Spatial.NPCCells, x, y, radius)
+    return results
 end
 
 function Spatial.QueryZombies(x, y, radius)
-    return queryGrid(Spatial.ZombieCells, x, y, radius)
+    local results
+    local cellsExamined
+    results, cellsExamined = queryGrid(
+        Spatial.ZombieCells,
+        x,
+        y,
+        radius
+    )
+    if Diagnostics then
+        Diagnostics.Increment("Spatial.ZombieCandidateQueries")
+        Diagnostics.Increment(
+            "Spatial.ZombieCellsExamined",
+            cellsExamined
+        )
+        Diagnostics.Increment(
+            "Spatial.ZombieCandidatesReturned",
+            #results
+        )
+        Diagnostics.Increment("Spatial.ZombieResultTables")
+    end
+    return results
 end
 
 function Spatial.FindZombieByID(zombieID)

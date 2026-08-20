@@ -34,9 +34,15 @@ local Hostile = PNC.BehaviorHostile
 local Combat = PNC.BehaviorCombat
 local AnimationScenes = PNC.AnimationScenes
 local LiveBodyControl = PNC.LiveBodyControl
+local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 
 function Behavior.Tick(record, zombie, now)
     local job
+    local previousJob = record and record.activeJob or nil
+
+    if ScalingDiagnostics then
+        ScalingDiagnostics.Increment("NPCDecisions.BehaviorTicks")
+    end
 
     if record.alive == false then
         if AnimationScenes and AnimationScenes.Stop then
@@ -107,6 +113,17 @@ function Behavior.Tick(record, zombie, now)
     end
 
     job = JobSystem.Select(record)
+    if ScalingDiagnostics then
+        if previousJob == job then
+            ScalingDiagnostics.Increment(
+                "NPCDecisions.BehaviorSameJobReselections"
+            )
+        elseif previousJob ~= nil then
+            ScalingDiagnostics.Increment(
+                "NPCDecisions.BehaviorJobSwitches"
+            )
+        end
+    end
     record.activeJob = job
     record.activeBehavior = job
 

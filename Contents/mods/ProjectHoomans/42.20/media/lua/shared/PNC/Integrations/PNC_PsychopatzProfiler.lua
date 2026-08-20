@@ -99,6 +99,10 @@ Profiler.RegisterSampler("ProjectHoomans.shared", function(api)
     local Registry = PNC.Registry
     local Census = PNC.WorldCensus
     local Aggro = PNC.ZombieAggro and PNC.ZombieAggro.ActiveSet or nil
+    local Scaling = PNC.PerformanceScalingDiagnostics
+    if Scaling and Scaling.Export then
+        Scaling.Export(api)
+    end
     api.SetGauge("ProjectHoomans.NPC.Total", countMap(Registry and Registry.Data))
     api.SetGauge("ProjectHoomans.NPC.Live", countMap(Registry and Registry.LiveByID))
     api.SetGauge("ProjectHoomans.World.LoadedZombies", #(Census and Census.OrdinaryZombies or {}))
