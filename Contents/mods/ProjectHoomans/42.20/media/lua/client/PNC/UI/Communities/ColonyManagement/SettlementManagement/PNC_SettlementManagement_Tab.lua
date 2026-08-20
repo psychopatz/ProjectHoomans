@@ -21,6 +21,7 @@ local TOOLBAR = {
 
 local CONTEXT = {
     { "facility_upgrade", "UI_PNC_Facility_Upgrade", "UPGRADE BUILDING", "success" },
+    { "facility_cancel_construction", "UI_PNC_Work_CancelConstruction", "CANCEL CONSTRUCTION", "danger" },
     { "facility_destroy", "UI_PNC_Facility_Destroy", "DECONSTRUCT", "danger" },
 }
 
@@ -66,7 +67,11 @@ function Tab.UpdateContextControls(window)
     local index
     for index = 1, #(window.baseContextControls or {}) do
         local button = window.baseContextControls[index]
-        local visible = active and (built or button.internal == "facility_destroy")
+        local visible = active and ((built
+            and button.internal ~= "facility_cancel_construction")
+            or (not built
+                and button.internal == "facility_cancel_construction"
+                and facility.constructionWorkOrderId ~= nil))
         if button.internal == "facility_anchor" then
             local role = active and Actions.NextAnchorRole
                 and Actions.NextAnchorRole(facility) or nil

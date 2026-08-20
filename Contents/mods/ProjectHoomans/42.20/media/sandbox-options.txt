@@ -248,3 +248,13 @@ option ProjectHoomans.ComponentDeconstructionRefundPercent
     page = ProjectHoomans,
     translation = ProjectHoomans.ComponentDeconstructionRefundPercent,
 }
+
+option ProjectHoomans.ConstructionCancellationRefundMultiplier
+{
+    type = double,
+    default = 1.0,
+    min = 0.0,
+    max = 2.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.ConstructionCancellationRefundMultiplier,
+}

@@ -64,7 +64,10 @@ local function drawFacility(list, y, entry, alternate)
         color.r, color.g, color.b, color.a, UIFont.Small)
     local detail = tostring(#(facility.components or {})) .. " COMPONENTS"
     if facility.activeTask then
-        detail = tostring(facility.activeTask.workerName
+        detail = (facility.activeTask.funded
+            and tr("UI_PNC_Work_MaterialsSupplied", "MATERIALS SUPPLIED")
+                .. "  •  " or "")
+            .. tostring(facility.activeTask.workerName
             or tr("UI_PNC_Tasks_Unassigned", "UNASSIGNED")) .. "  •  "
             .. stateText(facility.activeTask.executionMode
                 or facility.activeTask.status)
@@ -189,11 +192,18 @@ function Browser.RebuildComponents(window)
             list:addItem("construction_progress", {
                 label = tr("UI_PNC_Facility_ConstructionProgress",
                     "CONSTRUCTION PROGRESS") .. "  " .. progressText(task),
-                detail = tostring(task.workerName
+                detail = (tostring(task.workerName
                     or tr("UI_PNC_Tasks_Unassigned", "UNASSIGNED"))
                     .. "  •  " .. stateText(task.status)
                     .. "  •  " .. stateText(task.executionMode
-                        or "EMULATED"),
+                        or "EMULATED")
+                    .. (task.funded and "  •  "
+                        .. tr("UI_PNC_Work_MaterialsSupplied",
+                            "MATERIALS SUPPLIED") or "")
+                    .. (task.refundPercent and "  •  "
+                        .. tostring(task.refundPercent) .. "% "
+                        .. tr("UI_PNC_Work_Refundable",
+                            "RECOVERABLE") or "")),
                 complete = false,
                 resumeAction = (task.status == "BLOCKED"
                     or task.status == "PAUSED"
@@ -201,6 +211,10 @@ function Browser.RebuildComponents(window)
                         kind = "resume_work", workOrderId = task.id,
                     } or nil,
                 resumeActionLabel = tr("UI_PNC_Work_Resume", "RESUME"),
+                secondaryAction = { kind = "cancel_work", workOrderId = task.id,
+                    refundPercent = task.refundPercent },
+                secondaryActionLabel = tr("UI_PNC_Work_CancelConstruction",
+                    "CANCEL CONSTRUCTION"),
             })
         end
         list:addItem("construction_locked", {

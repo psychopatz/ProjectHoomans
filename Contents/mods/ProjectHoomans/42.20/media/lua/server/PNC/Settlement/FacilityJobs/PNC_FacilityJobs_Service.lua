@@ -55,6 +55,16 @@ function Jobs.Start(record, facilityOrId, capability, options)
     if not acquired.ok or not acquired.target then
         return false, acquired.reason or "FACILITY_HAS_NO_WORK_TARGET"
     end
+    -- The animation arbiter may be holding an ambient idle scene. Starting a
+    -- facility order must release that presentation lease immediately or the
+    -- behavior coordinator will keep servicing the idle scene and never reach
+    -- the facility job (most visible with sleep, whose scene is otherwise
+    -- perfectly valid once the NPC arrives).
+    local live = PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record.id) or nil
+    if live and PNC.AnimationScenes and PNC.AnimationScenes.Interrupt then
+        PNC.AnimationScenes.Interrupt(record, live, "movement")
+    end
     local target = acquired.target
     local sceneId = tostring(target.sceneId or definition.sceneId or "")
     local facilityDefinition = PNC.FacilityDefinitions.Get(facility.definitionId)

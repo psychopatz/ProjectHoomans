@@ -71,6 +71,7 @@ equal(constructionLayers[1].color.r, 1,
 local renderedIcons = 0
 local renderedIconSizes = {}
 local renderedAreas = 0
+local hoverLabel
 ISUIElement = {}
 function ISUIElement:new(x, y, width, height)
     return {
@@ -86,6 +87,9 @@ function ISUIElement:new(x, y, width, height)
             renderedIconSizes[#renderedIconSizes + 1] = {
                 width = width, height = height,
             }
+        end,
+        drawText = function(_, text)
+            hoverLabel = text
         end,
     }
 end
@@ -118,11 +122,17 @@ Overlay.SetSettlement({
 })
 Overlay.SetEnabled(true)
 Overlay.Render()
-equal(renderedAreas > 0, true, "overlay areas rendered")
+equal(renderedAreas, 3, "room areas stay hidden until their icon is hovered")
 equal(renderedIcons, 3, "all placeholder overlay icons rendered")
 for _, size in ipairs(renderedIconSizes) do
     equal(size.width, 40, "overlay icon tracks full projected tile width")
     equal(size.height, 40, "overlay icon remains square")
 end
+
+getMouseX = function() return 80 end
+getMouseY = function() return 90 end
+Overlay.Render()
+equal(renderedAreas, 7, "hovering a room icon reveals its room area")
+equal(hoverLabel, "Farm", "hovering a room icon shows its facility name")
 
 print("pnc_settlement_layout_overlay_smoke: ok")

@@ -152,4 +152,6 @@ Sandbox_EN = {
     Sandbox_ProjectHoomans_NPCSupplyTransactionLogging_tooltip = "Writes one structured line for each Needs supply operation. Leave disabled during normal play for near-zero logging overhead.",
     Sandbox_ProjectHoomans_ComponentDeconstructionRefundPercent = "Component Deconstruction Refund (%)",
     Sandbox_ProjectHoomans_ComponentDeconstructionRefundPercent_tooltip = "Percentage of a component's Base.Money ingredients returned to colony storage when the component is deconstructed.",
+    Sandbox_ProjectHoomans_ConstructionCancellationRefundMultiplier = "Construction Cancellation Refund Multiplier",
+    Sandbox_ProjectHoomans_ConstructionCancellationRefundMultiplier_tooltip = "Multiplies the proportional materials returned when unfinished construction is cancelled. 1.0 returns the full remaining fraction; 0 returns nothing.",
 }

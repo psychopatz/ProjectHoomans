@@ -1,18 +1,23 @@
-local LUA_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
-package.path = LUA_ROOT .. "client/?.lua;" .. package.path
-
-local function contains(value, expected, message)
-    if not string.find(tostring(value), tostring(expected), 1, true) then
-        error((message or "missing text") .. ": " .. tostring(value), 2)
-    end
-end
+local T = require "tests/support/test"
+T.addPackagePaths({ { "ProjectHoomans", "client" } })
 
 getText = function(key) return key end
 getItemNameFromFullType = function(fullType)
     return fullType == "Base.SpearCrafted" and "Crafted Spear" or fullType
 end
 
+local modalOptions
+package.preload["PNC/UI/Factions/PNC_FactionMemberModal"] = function()
+    return { Open = function(options) modalOptions = options end }
+end
+
+local cancelledId
 PNC = {
+    Client = { RequestColonyAction = function(action, options)
+        T.equal(action, "work_cancel", "task action")
+        cancelledId = options.workOrderId
+        return true
+    end },
     FacilityDefinitions = {
         Get = function(id)
             return id == "barracks" and {
@@ -46,15 +51,23 @@ local rows = Tasks.BuildRows({ snapshot = { tasks = {
     },
 } } })
 
-contains(rows[1].label, "barracks", "construction target")
-contains(rows[1].label, "40%", "construction progress")
-contains(rows[1].detail, "Peter", "assigned worker")
-contains(rows[1].detail, "ABSTRACT", "abstract execution mode")
-contains(rows[2].label, "Crafted Spear", "craft output")
-contains(rows[2].detail, "UNASSIGNED", "queued task assignment")
+T.contains(rows[1].label, "barracks", "construction target")
+T.contains(rows[1].label, "40%", "construction progress")
+T.contains(rows[1].detail, "Peter", "assigned worker")
+T.contains(rows[1].detail, "ABSTRACT", "abstract execution mode")
+T.truthy(rows[1].action == "cancel_work"
+    and rows[1].workOrder.id == "build-1",
+    "work rows expose their cancellation action")
+T.truthy(Tasks.OnRow({}, rows[1]), "cancel row opens confirmation")
+T.truthy(modalOptions and modalOptions.onConfirm,
+    "cancel confirmation supplies its handler")
+modalOptions.onConfirm(modalOptions.context)
+T.equal(cancelledId, "build-1", "confirmed row cancels selected work order")
+T.contains(rows[2].label, "Crafted Spear", "craft output")
+T.contains(rows[2].detail, "UNASSIGNED", "queued task assignment")
 
 local empty = Tasks.BuildRows({ snapshot = { tasks = {} } })
-contains(empty[1].label, "NO AVAILABLE TASKS", "empty task state")
+T.contains(empty[1].label, "NO AVAILABLE TASKS", "empty task state")
 
 local needs = Tasks.BuildRows({ snapshot = { tasks = {}, people = {
     { id = "npc-2", name = "Riley", activity = "sleeping",
@@ -64,10 +77,12 @@ local needs = Tasks.BuildRows({ snapshot = { tasks = {}, people = {
             HYDRATION = { phase = "FAILED" },
         } } },
 } } })
-assert(#needs == 3, "needs tasks did not include eating, drinking, and sleeping")
+T.equal(#needs, 3, "needs tasks include eating, drinking, and sleeping")
+T.truthy(needs[1].action == nil and needs[2].action == nil
+    and needs[3].action == nil, "need rows remain non-cancellable")
 local joined = needs[1].label .. " " .. needs[2].label .. " " .. needs[3].label
-contains(joined, "EAT", "hunger task")
-contains(joined, "DRINK", "thirst task")
-contains(joined, "SLEEP", "active sleep task")
+T.contains(joined, "EAT", "hunger task")
+T.contains(joined, "DRINK", "thirst task")
+T.contains(joined, "SLEEP", "active sleep task")
 
-print("pnc_tasks_tab_smoke: ok")
+T.finish("pnc_tasks_tab_smoke")

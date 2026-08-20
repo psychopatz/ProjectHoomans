@@ -738,6 +738,12 @@ function Scenes.TryIdle(record, zombie, now)
     then
         return false
     end
+    -- Facility activities own the actor until their scene completes. Do not
+    -- inject an ambient pose between the task order and the facility behavior
+    -- tick, otherwise sleep/work can remain queued behind an idle loop.
+    if record.orderSpec and record.orderSpec.kind == "facility_activity" then
+        return false
+    end
     runtime = record.runtime or {}
     record.runtime = runtime
     if runtime.animationScene then return false end

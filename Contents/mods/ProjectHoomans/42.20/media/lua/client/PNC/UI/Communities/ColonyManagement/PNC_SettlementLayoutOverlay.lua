@@ -92,6 +92,63 @@ local function addMarker(markers, point, kind, id, role, texturePath, tileScale)
     }
 end
 
+local function fallbackName(value)
+    local text = tostring(value or "")
+    text = string.gsub(text, "[_%.%-]+", " ")
+    -- Kahlua's gsub callback can pass a missing second capture for an empty
+    -- match. Keep this formatter deliberately simple and callback-free.
+    local first = string.sub(text, 1, 1)
+    if first ~= "" then
+        text = string.upper(first) .. string.sub(text, 2)
+    end
+    return text ~= "" and text or "Facility"
+end
+
+local function localizedName(key, fallback)
+    local value = type(key) == "string" and key ~= ""
+        and getText and getText(key) or nil
+    if value and value ~= key and value ~= "" then return value end
+    return fallback
+end
+
+local function facilityName(facility)
+    local definition = PNC.FacilityDefinitions
+        and PNC.FacilityDefinitions.Get
+        and PNC.FacilityDefinitions.Get(facility and facility.definitionId)
+        or nil
+    return localizedName(definition and definition.displayNameKey,
+        fallbackName(facility and facility.definitionId))
+end
+
+local function componentName(facility, component, ordinal)
+    local role = tostring(component and component.role or "")
+    if component and component.kind == "region"
+        or role == "facility.footprint"
+    then
+        return facilityName(facility)
+    end
+    local labels = {
+        ["sleep.bed"] = "Bed",
+        ["living.chair"] = "Chair",
+        ["farm.field"] = "Farm Field",
+        ["work.research"] = "Research Station",
+        ["work.blueprint"] = "Architect Bench",
+        ["work.reverse"] = "Laboratory",
+        ["work.craft"] = "Craft Station",
+        ["work.disassemble"] = "Disassembly Station",
+        ["water.spigot"] = "Spigot",
+        ["water.tank"] = "Water Tank",
+        ["water.catcher"] = "Rain Catcher",
+        ["stockpile.access"] = "Storage Stockpile",
+    }
+    local label = localizedName("UI_PNC_Overlay_Component_" ..
+        string.gsub(role, "[^%w]", "_"), labels[role] or fallbackName(role))
+    if role == "sleep.bed" or role == "living.chair" then
+        return label .. " #" .. tostring(ordinal or 1)
+    end
+    return label
+end
+
 local function facilityIcon(facility)
     local definition = PNC.FacilityDefinitions
         and PNC.FacilityDefinitions.Get
@@ -108,11 +165,12 @@ local function pointRegion(x, y, z)
     } })
 end
 
-local function addLayer(layers, region, color, kind, id, role, componentId)
+local function addLayer(layers, region, color, kind, id, role, componentId,
+    hoverOnly)
     if region and GridRegion.countTiles(region) > 0 then
         layers[#layers + 1] = { region = GridRegion.normalize(region),
             color = color, kind = kind, id = id, role = role,
-            componentId = componentId }
+            componentId = componentId, hoverOnly = hoverOnly == true }
     end
 end
 
@@ -133,7 +191,8 @@ function Overlay.BuildLayers(settlement, includeBase)
                 or pointRegion(component.x, component.y, component.z)
             addLayer(layers, region,
                 component.kind == "anchor" and COLORS.anchor or color,
-                "facility", facility.id, component.role, component.id)
+                "facility", facility.id, component.role, component.id,
+                component.kind == "region")
         end
         if not hasRegion then
             addLayer(layers, facility.constructionRegion, color,
@@ -153,11 +212,15 @@ function Overlay.BuildMarkers(settlement)
     for _, facility in ipairs(settlement and settlement.facilities or {}) do
         local hasRoom = false
         local roomIcon = facilityIcon(facility)
+        local ordinals = {}
         for _, component in ipairs(facility.components or {}) do
+            local role = tostring(component.role or "")
+            ordinals[role] = (ordinals[role] or 0) + 1
             if component.kind == "region" then
                 hasRoom = true
                 addMarker(markers, regionCenter(component.region), "room",
                     facility.id, component.role, roomIcon, 1)
+                markers[#markers].label = componentName(facility, component)
             elseif component.kind == "anchor" then
                 addMarker(markers, {
                     x = (tonumber(component.x) or 0) + 0.5,
@@ -166,11 +229,14 @@ function Overlay.BuildMarkers(settlement)
                 }, "component", component.id, component.role,
                     COMPONENT_PLACEHOLDERS[component.role]
                         or "media/ui/Emotes/PNC_EmoteMenu.png", 1)
+                markers[#markers].label = componentName(facility, component,
+                    ordinals[role])
             end
         end
         if not hasRoom then
             addMarker(markers, regionCenter(facility.constructionRegion),
                 "room", facility.id, "facility.footprint", roomIcon, 1)
+            markers[#markers].label = facilityName(facility)
         end
     end
     for _, node in ipairs(settlement and settlement.stockpileNodes or {}) do
@@ -180,6 +246,9 @@ function Overlay.BuildMarkers(settlement)
             z = tonumber(node.z) or 0,
         }, "component", node.id, "stockpile.access",
             COMPONENT_PLACEHOLDERS["stockpile.access"], 1)
+        markers[#markers].label = componentName(nil, {
+            role = "stockpile.access", kind = "anchor",
+        }, 1)
     end
     return markers
 end
@@ -237,9 +306,15 @@ local function renderMarkers(playerNum)
     if not isoToScreenX or not isoToScreenY then return end
     local drawer = iconDrawer(playerNum)
     if not drawer or not drawer.drawTextureScaledAspect then return end
+    local mouseX = getMouseX and getMouseX() or nil
+    local mouseY = getMouseY and getMouseY() or nil
+    if mouseX ~= nil then mouseX = mouseX - drawer.x end
+    if mouseY ~= nil then mouseY = mouseY - drawer.y end
+    local hovered, hoveredDistance
     for _, marker in ipairs(Overlay.markers or {}) do
+        marker.hovered = false
         local texture = markerTexture(marker.texturePath)
-        if texture then
+        if texture or (mouseX ~= nil and mouseY ~= nil) then
             local screenX = isoToScreenX(playerNum,
                 marker.x, marker.y, marker.z) - drawer.x
             local screenY = isoToScreenY(playerNum,
@@ -252,9 +327,18 @@ local function renderMarkers(playerNum)
                 - isoToScreenX(playerNum, marker.x, marker.y, marker.z))
             local tileWidth = math.max(16, 2 * math.max(xStep, yStep))
             local size = tileWidth * (tonumber(marker.tileScale) or 1)
+            local dx = mouseX ~= nil and mouseX - screenX or nil
+            local dy = mouseY ~= nil and mouseY - screenY or nil
+            local distance = dx and dy and dx * dx + dy * dy or nil
+            local hit = distance and math.abs(dx) <= math.max(12, size / 2)
+                and math.abs(dy) <= math.max(12, size / 2)
+            if hit and (not hoveredDistance or distance < hoveredDistance) then
+                hovered, hoveredDistance = marker, distance
+            end
             if screenX >= -size and screenY >= -size
                 and screenX <= drawer.width + size
                 and screenY <= drawer.height + size
+                and texture
             then
                 drawer:drawTextureScaledAspect(texture,
                     screenX - size / 2, screenY - size / 2,
@@ -262,6 +346,28 @@ local function renderMarkers(playerNum)
             end
         end
     end
+    if hovered then hovered.hovered = true end
+    Overlay.hoveredMarker = hovered
+    return hovered, drawer
+end
+
+local function drawHoverLabel(drawer, marker)
+    local label = marker and tostring(marker.label or "") or ""
+    if label == "" or not drawer or not drawer.drawText then return end
+    local mouseX = getMouseX and getMouseX() or drawer.x + 12
+    local mouseY = getMouseY and getMouseY() or drawer.y + 12
+    local x = mouseX - drawer.x + 12
+    local y = mouseY - drawer.y + 12
+    local width = math.max(86, #label * 7 + 18)
+    local height = 24
+    if x + width > drawer.width then x = drawer.width - width end
+    if y + height > drawer.height then y = drawer.height - height end
+    x, y = math.max(4, x), math.max(4, y)
+    if drawer.drawRect then drawer:drawRect(x, y, width, height, 0.86, 0.02, 0.05, 0.07) end
+    if drawer.drawRectBorder then
+        drawer:drawRectBorder(x, y, width, height, 0.95, 0.24, 0.72, 0.95)
+    end
+    drawer:drawText(label, x + 8, y + 5, 1, 1, 1, 1, UIFont and UIFont.Small)
 end
 
 function Overlay.Render()
@@ -269,7 +375,15 @@ function Overlay.Render()
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     if not player then return end
     local playerNum = player.getPlayerNum and player:getPlayerNum() or 0
+    local hovered = renderMarkers(playerNum)
     for _, layer in ipairs(Overlay.layers or {}) do
+        local visible = not layer.hoverOnly
+        if not visible and hovered then
+            visible = layer.id == hovered.id
+                and (not layer.componentId or layer.componentId == hovered.id
+                    or hovered.kind == "room")
+        end
+        if visible then
         for z, level in pairs(layer.region.levels or {}) do
             for y, spans in pairs(level.rows or {}) do
                 local index
@@ -281,14 +395,19 @@ function Overlay.Render()
                 end
             end
         end
+        end
     end
-    renderMarkers(playerNum)
+    if hovered then
+        local drawer = Overlay.iconDrawer
+        drawHoverLabel(drawer, hovered)
+    end
 end
 
 function Overlay.Reset()
     Overlay.enabled = false
     Overlay.layers = {}
     Overlay.markers = {}
+    Overlay.hoveredMarker = nil
     Overlay.settlementId = nil
     Overlay.revision = nil
 end

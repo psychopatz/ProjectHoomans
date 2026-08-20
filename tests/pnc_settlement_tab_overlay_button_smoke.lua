@@ -69,14 +69,16 @@ local function control(id)
         self.visible = visible
     end, setTitle = function(self, value) self.title = value end }
 end
-local upgrade, destroy = control("facility_upgrade"),
-    control("facility_destroy")
+local upgrade, cancel, destroy = control("facility_upgrade"),
+    control("facility_cancel_construction"), control("facility_destroy")
 window.tab = "base"
-window.baseContextControls = { upgrade, destroy }
-selectedFacility = { constructionState = "UNDER_CONSTRUCTION" }
+window.baseContextControls = { upgrade, cancel, destroy }
+selectedFacility = { constructionState = "UNDER_CONSTRUCTION",
+    constructionWorkOrderId = "work:1" }
 BaseTab.UpdateContextControls(window)
 equal(upgrade.visible, false, "upgrade hidden before building completes")
-equal(destroy.visible, true, "deconstruction remains available")
+equal(cancel.visible, true, "cancel construction is available before completion")
+equal(destroy.visible, false, "deconstruction is hidden before completion")
 selectedFacility.constructionState = "BUILT"
 BaseTab.UpdateContextControls(window)
 equal(upgrade.visible, true, "upgrade unlocks after construction")

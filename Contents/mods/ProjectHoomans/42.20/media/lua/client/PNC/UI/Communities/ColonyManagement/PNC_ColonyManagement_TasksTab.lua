@@ -2,6 +2,16 @@ local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement
 
 local Tasks = {}
 
+local function cancelDetail(task)
+    local detail = Shared.Tr("UI_PNC_Work_CancelTaskDetail",
+        "The active worker is released and unfinished work is removed.")
+    if task.refundPercent ~= nil then
+        detail = detail .. "  " .. tostring(task.refundPercent) .. "% "
+            .. Shared.Tr("UI_PNC_Work_Refundable", "RECOVERABLE")
+    end
+    return detail
+end
+
 local OPERATION_KEYS = {
     CONSTRUCT = { "UI_PNC_Task_Construct", "BUILD" },
     RECONSTRUCT = { "UI_PNC_Task_Reconstruct", "RECONSTRUCT" },
@@ -140,9 +150,36 @@ function Tasks.BuildRows(context)
             detail = taskDetail(task),
             colorName = status == "BLOCKED" and "warning"
                 or task.workerId and "success" or "muted",
+            action = "cancel_work",
+            actionLabel = Shared.Tr("UI_PNC_Work_Cancel", "CANCEL"),
+            actionColorName = "warning",
+            workOrder = task,
         }
     end
     return rows
+end
+
+function Tasks.OnRow(window, row)
+    local task = row and row.workOrder or nil
+    if row.action ~= "cancel_work" or not task or not task.id then
+        return false
+    end
+    local ConfirmModal = require "PNC/UI/Factions/PNC_FactionMemberModal"
+    ConfirmModal.Open({
+        title = Shared.Tr("UI_PNC_Work_CancelTitle", "Cancel Task"),
+        message = Shared.Tr("UI_PNC_Work_CancelMessage",
+            "Cancel this colony task?"),
+        detail = cancelDetail(task),
+        confirmLabel = Shared.Tr("UI_PNC_Work_Cancel", "CANCEL"),
+        danger = true,
+        context = { workOrderId = task.id },
+        onConfirm = function(context)
+            PNC.Client.RequestColonyAction("work_cancel", {
+                workOrderId = context.workOrderId,
+            })
+        end,
+    })
+    return true
 end
 
 return Tasks

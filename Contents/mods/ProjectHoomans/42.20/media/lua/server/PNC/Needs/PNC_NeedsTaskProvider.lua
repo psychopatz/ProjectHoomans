@@ -33,8 +33,10 @@ function Provider.Validate(intent)
     if not PNC.CompanionCommands.IsCompanion(record) then
         return false, "NOT_COMPANION"
     end
-    if record.runtime and record.runtime.facilityActivity
-        and not PNC.TaskLeaseService.ForNPC(record.id)
+    local activity = record.runtime and record.runtime.facilityActivity
+    local activityLease = PNC.TaskLeaseService.ForNPC(record.id)
+    if activity and not activityLease
+        and activity.automatic ~= true
     then return false, "FACILITY_ACTIVITY_BUSY" end
     local base = baseFor(record)
     if not base or not PNC.HomeDutyService.IsAtHome(record, base.id) then
@@ -50,6 +52,15 @@ function Provider.Assign(intent)
     local record = recordFor(intent.npcId)
     local base = record and baseFor(record) or nil
     if not base then return nil, "BASE_NOT_FOUND" end
+    -- Living-room sitting is an automatic idle activity. A physiological need
+    -- owns the actor over that idle reservation, but a manually commanded
+    -- facility activity remains protected by Validate above.
+    if record.runtime and record.runtime.facilityActivity
+        and record.runtime.facilityActivity.automatic == true
+        and PNC.FacilityJobs
+    then
+        PNC.FacilityJobs.Stop(record, "sleep_trigger")
+    end
     local live = PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
     PNC.Tasking.Diagnostics.counters.facilityLookups =

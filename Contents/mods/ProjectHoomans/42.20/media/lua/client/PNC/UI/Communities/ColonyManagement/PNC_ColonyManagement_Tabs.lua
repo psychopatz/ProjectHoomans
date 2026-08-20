@@ -92,6 +92,9 @@ Registry.Register({
     showRoster = false,
     showDetails = true,
     buildRows = function(context) return TasksTab.BuildRows(context) end,
+    onRow = function(window, row)
+        return TasksTab.OnRow(window, row)
+    end,
 })
 
 Registry.Register({

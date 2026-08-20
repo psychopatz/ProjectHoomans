@@ -57,6 +57,15 @@ function Controller.CreateChildren(window)
         ISScrollingListBox.onMouseDown(list, x, y)
         window:onPersonSelected()
     end
+    window.details.onMouseDown = function(list, x, y)
+        ISScrollingListBox.onMouseDown(list, x, y)
+        local entry = list.items and list.items[list.selected] or nil
+        local row = entry and entry.item or nil
+        local definition = Registry.Get(window.tab)
+        if row and row.action and definition and definition.onRow then
+            definition.onRow(window, row, x, y)
+        end
+    end
 end
 
 function Controller.ApplyResponsiveLayout(window)

@@ -34,11 +34,20 @@ local function drawDetailRow(list, y, entry, alternate)
     UI.DrawListSelection(list, y, list.itemheight, false, alternate)
     local labelColor = item.colorName and Theme.colors[item.colorName]
         or Theme.colors.text
+    local actionWidth = item.actionLabel and 96 or 0
     list:drawText(
-        Layout.Ellipsize(item.label, UIFont.Small, list:getWidth() - 20),
+        Layout.Ellipsize(item.label, UIFont.Small,
+            list:getWidth() - 20 - actionWidth),
         10, y + 7, labelColor.r, labelColor.g, labelColor.b, labelColor.a,
         UIFont.Small
     )
+    if item.actionLabel then
+        local actionColor = item.actionColorName
+            and Theme.colors[item.actionColorName] or Theme.colors.warning
+        list:drawTextRight(tostring(item.actionLabel), list:getWidth() - 12,
+            y + 7, actionColor.r, actionColor.g, actionColor.b,
+            actionColor.a, UIFont.Small)
+    end
     if item.meter then
         UI.Meter.Draw(list, {
             x = 10, y = y + 25,

@@ -1,4 +1,5 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
+local T = require "tests/support/test"
+local ROOT = T.path("ProjectHoomans", "server", "PNC/")
 
 local serverOnlyFiles = {}
 local listing = assert(io.popen(
@@ -9,7 +10,7 @@ for path in listing:lines() do
     serverOnlyFiles[#serverOnlyFiles + 1] = path
 end
 listing:close()
-assert(#serverOnlyFiles == 161,
+T.equal(#serverOnlyFiles, 164,
     "server Lua inventory changed without updating the MP loader gate")
 
 isClient = function() return true end
@@ -34,7 +35,7 @@ for _, path in ipairs(serverOnlyFiles) do
 end
 require = originalRequire
 
-assert(PNC.ServerCommandRouter == nil
+T.truthy(PNC.ServerCommandRouter == nil
     and PNC.ServerLegacyDebugCommandHandler == nil
     and PNC.Supply == nil
     and PNC.ColonyStorageService == nil,
@@ -57,8 +58,8 @@ PNC = {
 local supply = dofile(ROOT .. "Supply/PNC_Supply.lua")
 require = originalRequire
 
-assert(#calls == 8, "hosted server skipped Supply composition")
-assert(supply.Process == PNC.NPCSupplyService.Process,
+T.equal(#calls, 8, "hosted server skipped Supply composition")
+T.equal(supply.Process, PNC.NPCSupplyService.Process,
     "hosted server did not bind the Supply process facade")
 
-print("pnc_mp_server_file_guard_smoke: ok")
+T.finish("pnc_mp_server_file_guard_smoke")

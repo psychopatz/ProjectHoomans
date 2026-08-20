@@ -15,14 +15,68 @@ local function copy(value)
     return PNC.Core and PNC.Core.DeepCopy and PNC.Core.DeepCopy(value) or value
 end
 
+local function construction(order)
+    return order and (order.operation == "CONSTRUCT"
+        or order.operation == "RECONSTRUCT"
+        or order.operation == "DECONSTRUCT")
+end
+
+local function compactConstruction(order)
+    if not construction(order) then return order end
+    order.runtime = nil
+    order.workerId, order.stationId, order.stationTarget = nil, nil, nil
+    order.collectionTarget, order.executionMode = nil, nil
+    order.facilityReservationId, order.previousOrder = nil, nil
+    order.lastAbstractAt, order.blockedReason = nil, nil
+    if order.status ~= "PAUSED" and order.status ~= "COMPLETED"
+        and order.status ~= "CANCELLED"
+    then
+        order.status = "WAITING_FOR_WORKER"
+    end
+    local payload = order.payload
+    if type(payload) == "table" then
+        payload.requirements = nil
+        local input = payload.input
+        if type(input) == "table" then
+            payload.input = {
+                consume = input.consume == true,
+                funded = input.funded == true or input.committed == true,
+                committed = input.committed == true or input.funded == true,
+            }
+        end
+    end
+    return order
+end
+
 local function recover(order)
+    order.revision = math.max(0, math.floor(tonumber(order.revision) or 0))
+    order.progress = math.max(0, tonumber(order.progress) or 0)
+    order.requiredWork = math.max(1, tonumber(order.requiredWork) or 100)
     order.runtime = nil
     order.reservationId = nil
     order.stationId = nil
     order.stationTarget = nil
     order.executionMode = nil
     order.facilityReservationId = nil
-    if order.status == "CLAIMED" or order.status == "TRAVEL_TO_STOCKPILE"
+    if construction(order) then
+        order.workerId, order.stationId, order.stationTarget = nil, nil, nil
+        order.collectionTarget, order.executionMode = nil, nil
+        order.facilityReservationId, order.previousOrder = nil, nil
+        order.lastAbstractAt, order.blockedReason = nil, nil
+        if order.status ~= "PAUSED" and order.status ~= "COMPLETED"
+            and order.status ~= "CANCELLED"
+        then order.status = "WAITING_FOR_WORKER" end
+        if order.payload and order.payload.input then
+            order.payload.requirements = nil
+            order.payload.input = {
+                consume = order.payload.input.consume == true,
+                funded = order.payload.input.funded == true
+                    or order.payload.input.committed == true,
+                committed = order.payload.input.committed == true
+                    or order.payload.input.funded == true,
+            }
+        end
+    elseif order.status == "CLAIMED" or order.status == "TRAVEL_TO_STOCKPILE"
         or order.status == "TRAVEL_TO_STATION"
         or order.status == "WORKING"
     then
@@ -90,7 +144,7 @@ function Repository.Save()
         and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
     if not target then return false, "moddata_unavailable" end
     local payload = copy(Repository.State)
-    for _, order in pairs(payload.byId) do order.runtime = nil end
+    for _, order in pairs(payload.byId) do compactConstruction(order) end
     for key, _ in pairs(target) do target[key] = nil end
     for key, value in pairs(payload) do target[key] = value end
     Repository.Dirty = false

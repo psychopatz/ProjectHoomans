@@ -20,6 +20,32 @@ function Actions.HandleComponent(window, action, facility)
         Support.ApplyLocalResult(window)
         return true
     end
+    if action.kind == "cancel_work" and action.workOrderId then
+        local ConfirmModal = require "PNC/UI/Factions/PNC_FactionMemberModal"
+        ConfirmModal.Open({
+            title = Support.Tr("UI_PNC_Work_CancelConstructionTitle",
+                "Cancel Construction"),
+            message = Support.Tr("UI_PNC_Work_CancelConstructionMessage",
+                "Cancel this construction project?"),
+            detail = Support.Tr("UI_PNC_Work_CancelConstructionDetail",
+                "Supplied materials are refunded from the remaining work fraction.")
+                .. (action.refundPercent and "  "
+                    .. tostring(action.refundPercent) .. "% "
+                    .. Support.Tr("UI_PNC_Work_Refundable", "RECOVERABLE")
+                    or ""),
+            confirmLabel = Support.Tr("UI_PNC_Work_CancelConstruction",
+                "CANCEL CONSTRUCTION"),
+            danger = true,
+            context = { workOrderId = action.workOrderId },
+            onConfirm = function(context)
+                PNC.Client.RequestColonyAction("work_cancel", {
+                    workOrderId = context.workOrderId,
+                })
+                Support.ApplyLocalResult(window)
+            end,
+        })
+        return true
+    end
     if action.remove == true and action.componentId then
         PNC.Client.RequestRemoveFacilityComponent({
             facilityId = facility.id,
@@ -86,6 +112,34 @@ function Actions.Handle(window, action, facility)
     elseif action == "facility_upgrade" then
         PNC.Client.RequestUpgradeFacility({ facilityId = facility.id,
             expectedRevision = facility.revision })
+    elseif action == "facility_cancel_construction" then
+        local ConfirmModal = require "PNC/UI/Factions/PNC_FactionMemberModal"
+        local task = facility.activeTask
+        if task and task.id then
+            ConfirmModal.Open({
+                title = Support.Tr("UI_PNC_Work_CancelConstructionTitle",
+                    "Cancel Construction"),
+                message = Support.Tr("UI_PNC_Work_CancelConstructionMessage",
+                    "Cancel this construction project?"),
+                detail = Support.Tr("UI_PNC_Work_CancelConstructionDetail",
+                    "Supplied materials are refunded from the remaining work fraction.")
+                    .. (task.refundPercent and "  "
+                        .. tostring(task.refundPercent) .. "% "
+                        .. Support.Tr("UI_PNC_Work_Refundable", "RECOVERABLE")
+                        or ""),
+                confirmLabel = Support.Tr("UI_PNC_Work_CancelConstruction",
+                    "CANCEL CONSTRUCTION"),
+                danger = true,
+                context = { workOrderId = task.id },
+                onConfirm = function(context)
+                    PNC.Client.RequestColonyAction("work_cancel", {
+                        workOrderId = context.workOrderId,
+                    })
+                    Support.ApplyLocalResult(window)
+                end,
+            })
+        end
+        return true
     elseif action == "facility_destroy" then
         PNC.Client.RequestDestroyFacility({ facilityId = facility.id,
             expectedRevision = facility.revision })

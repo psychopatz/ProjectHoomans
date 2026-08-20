@@ -52,6 +52,36 @@ function Service.ReplaceReservation(order, reservation)
     return true
 end
 
+-- Construction is funded when the project is created.  This deliberately
+-- uses the storage transaction API instead of touching inventory internals;
+-- the resulting order no longer depends on a reservation surviving a save,
+-- a worker replacement, or a live/abstract handoff.
+function Service.Fund(order, actor, reason)
+    local input = inputFor(order)
+    if not input then return false, "WORK_INPUT_MISSING" end
+    if input.funded == true or input.committed == true then
+        input.funded, input.committed = true, true
+        input.reservationId, input.storageId, input.stage = nil, nil, nil
+        input.itemIds, input.records = nil, nil
+        return true, "already_funded"
+    end
+    if input.reservationId == "" or input.storageId == "" then
+        return false, "WORK_INPUT_RESERVATION_MISSING"
+    end
+    local ok, why = PNC.ColonyStorageService.CommitProductionReservation(
+        input.reservationId, order.id, input.stage, input.storageId,
+        actor and tostring(actor.name or actor.id) or order.workerId,
+        reason or "project_funding")
+    if not ok then return false, why end
+    input.funded, input.committed = true, true
+    -- Keep only the semantic marker. Reservation and collection details are
+    -- runtime/transaction state and must not be carried by the work order.
+    input.reservationId, input.storageId, input.stage = nil, nil, nil
+    input.itemIds, input.records = nil, nil
+    PNC.WorkRepository.MarkDirty()
+    return true, "funded"
+end
+
 function Service.Collect(order, worker)
     local input = inputFor(order)
     if not input then return false, "WORK_INPUT_MISSING" end

@@ -84,6 +84,11 @@ function Settings.ComponentDeconstructionRefundPercent()
     return Settings.GetNumber("ComponentDeconstructionRefundPercent", 50, 0, 100)
 end
 
+function Settings.ConstructionCancellationRefundMultiplier()
+    return Settings.GetNumber("ConstructionCancellationRefundMultiplier", 1.0,
+        0, 2)
+end
+
 function Settings.PlayerOwnedNPCNeedMortalityEnabled()
     return Settings.GetBoolean("PlayerOwnedNPCNeedMortality", false)
 end

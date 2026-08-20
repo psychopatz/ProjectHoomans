@@ -7,9 +7,25 @@ local Abstract = {}
 function Live.Tick(lease)
     local record = PNC.Registry.Get(lease.npcId)
     local runtime = record and record.runtime and record.runtime.facilityActivity
-    if not runtime or not PNC.FacilityReservations.ByID[lease.reservationId] then
+    local reservation = lease.reservationId
+        and PNC.FacilityReservations.ByID[lease.reservationId] or nil
+    if not runtime or not reservation then
         PNC.Tasking.Commands.MarkDirty(lease.npcId, "LIVE_EXECUTOR_INVALID")
         return false
+    end
+    -- Travel can take longer than the initial reservation window. Keep the
+    -- bed/workstation owned by this task until the scene is actually running;
+    -- OnSceneTick continues the same renewal once the NPC is settled.
+    local now = PNC.Core.Now()
+    if now >= (tonumber(lease.nextReservationRenewAt) or 0) then
+        local renewed = PNC.FacilityReservations.Start(
+            lease.reservationId, 30000)
+        if not renewed then
+            PNC.Tasking.Commands.MarkDirty(lease.npcId,
+                "LIVE_RESERVATION_RENEW_FAILED")
+            return false
+        end
+        lease.nextReservationRenewAt = now + 10000
     end
     local phase = runtime.phase == "TRAVELLING" and "TRAVEL"
         or runtime.phase == "SLEEPING" and "WORKING" or "WAITING"

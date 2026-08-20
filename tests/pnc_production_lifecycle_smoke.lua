@@ -212,7 +212,8 @@ ResearchRepository.ByColony, ResearchRepository.Runtime = {}, {}
 local Work = require "PNC/Production/PNC_WorkService"
 local Research = require "PNC/Production/PNC_ResearchService"
 local Crafting = require "PNC/Production/PNC_CraftingService"
-local Construction = require "PNC/Production/PNC_ConstructionService"
+local Construction = require
+    "PNC/Production/ConstructionService/PNC_ConstructionService"
 truthy(Research.Commands.UnlockRecipe("c1", 1, "f1"), "seed known recipe")
 
 local technology = assert(Research.Commands.QueueTechnology({},
@@ -350,6 +351,11 @@ equal(constructionFacility.constructionState, "PLANNED",
 
 local build = assert(Construction.QueueBuild({}, constructionFacility,
     PNC.FacilityDefinitions.Get()))
+equal(build.funded, true, "construction is funded before it enters work")
+equal(inventory["Base.Money"], 0,
+    "construction removes materials at project funding")
+equal(reserved["Base.Money"], 0,
+    "funded construction does not retain a live reservation")
 equal(constructionFacility.constructionState, "UNDER_CONSTRUCTION",
     "build enters construction state")
 truthy(Work.Commands.Assign(build.id, "worker"), "constructor assignment")
@@ -366,8 +372,8 @@ clock = clock + 1001
 Work.Tick(clock)
 equal(Work.Queries.Get(build.id).progress, 4,
     "worker interruption preserves construction progress")
-equal(reserved["Base.Money"], 1,
-    "worker interruption preserves staged construction material")
+equal(inventory["Base.Money"], 0,
+    "worker interruption does not reacquire or return funded material")
 equal(constructionFacility.constructionState, "UNDER_CONSTRUCTION",
     "active order repairs stale planned facility state")
 clock = clock + 1001
@@ -378,7 +384,8 @@ equal(Work.BuildActionInformation(PNC.Registry.Data.backup).percent, 40,
     "replacement worker sees existing progress")
 truthy(Work.Commands.AddProgress(build.id, "backup", 100),
     "replacement constructor completes shared work points")
-equal(inventory["Base.Money"], 0, "construction consumes reserved material")
+equal(inventory["Base.Money"], 0,
+    "construction completion does not consume funded material again")
 equal(constructionFacility.constructionState, "BUILT",
     "construction completion activates facility")
 inventory["Base.Money"] = 1
@@ -402,6 +409,21 @@ truthy(Work.Commands.Assign(deconstruct.id, "backup"),
 truthy(Work.Commands.AddProgress(deconstruct.id, "backup", 100),
     "abstract deconstruction completes by work points")
 equal(constructionDestroyed, true, "deconstruction removes facility parts")
+
+-- A funded project refunds its remaining materials transactionally when the
+-- player cancels it; the next project can use the returned stock immediately.
+inventory["Base.Money"] = 1
+constructionFacility.constructionState = "PLANNED"
+local cancelledBuild = assert(Construction.QueueBuild({}, constructionFacility,
+    PNC.FacilityDefinitions.Get()))
+equal(inventory["Base.Money"], 0,
+    "cancel test project is funded before work begins")
+truthy(Work.Commands.Cancel(cancelledBuild.id),
+    "funded construction can be cancelled")
+equal(inventory["Base.Money"], 1,
+    "cancelling an untouched project refunds its funded materials")
+equal(constructionFacility.constructionState, "PLANNED",
+    "cancelled construction returns to planned state")
 
 -- A colonist whose legacy affiliation omitted communityID still cycles from
 -- At Home into queued work by resolving the remembered home base.
@@ -458,5 +480,31 @@ equal(resumedOrder.blockedReason, nil,
 equal(PNC.Registry.Data.backup.runtime.workOrderId, nil,
     "resume releases the old worker claim safely")
 truthy(Work.Commands.Cancel(nextHomeTask.id), "cancel second cycled task")
+
+-- Save/load keeps the project contract but drops worker and reservation state.
+WorkRepository.Import({ schemaVersion = 1, nextId = 2, byId = {
+    ["work:1"] = { id = "work:1", operation = "CONSTRUCT",
+        status = "BLOCKED", workerId = "worker", stationId = "station",
+        blockedReason = "PATH", progress = 0, requiredWork = 10,
+        priority = 0, createdAt = 1, funded = true,
+        payload = { facilityId = "construction_facility",
+            requirements = {{ itemTypes = { "Base.Money" }, amount = 9 }},
+            input = { storageId = "s1", reservationId = "r:legacy",
+                staged = true, itemIds = { "item:1" }, funded = true } } },
+} })
+local recoveredProject = WorkRepository.Get("work:1")
+equal(recoveredProject.status, "WAITING_FOR_WORKER",
+    "recovery clears runtime blocked state for construction")
+equal(recoveredProject.workerId, nil,
+    "recovery drops construction worker assignment")
+equal(recoveredProject.payload.requirements, nil,
+    "recovery drops the duplicated construction recipe")
+equal(recoveredProject.payload.input.reservationId, nil,
+    "recovery drops the old reservation handle")
+local beforeLegacyCancel = inventory["Base.Money"]
+truthy(Work.Commands.Cancel(recoveredProject.id),
+    "recovered construction can be cancelled without its old reservation")
+equal(inventory["Base.Money"], beforeLegacyCancel + 1,
+    "recovered cancellation resolves storage and refunds remaining material")
 
 print("pnc_production_lifecycle_smoke: OK")

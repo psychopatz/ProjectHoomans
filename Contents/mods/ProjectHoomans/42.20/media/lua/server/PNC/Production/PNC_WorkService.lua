@@ -164,6 +164,9 @@ function Service.Commands.Queue(spec)
         factionId = tostring(spec.factionId or ""),
         baseId = tostring(spec.baseId or ""),
         recipeId = tonumber(spec.recipeId),
+        recipeRevision = tonumber(spec.recipeRevision),
+        funded = spec.funded == true,
+        projectLifecycle = spec.projectLifecycle,
         quantity = math.max(1, math.floor(tonumber(spec.quantity) or 1)),
         requiredWork = math.max(1, tonumber(spec.requiredWork) or 100),
         progress = math.max(0, tonumber(spec.progress) or 0),
@@ -404,9 +407,17 @@ end
 function Service.Commands.Cancel(orderId, reason)
     local order = Repository.Get(orderId)
     if not order or terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
+    if order.completionStarted == true then
+        return false, "WORK_ORDER_COMPLETION_IN_PROGRESS"
+    end
     local cancellation = Service.CancellationHandlers
         and Service.CancellationHandlers[order.operation]
-    if cancellation then cancellation(order) end
+    if cancellation then
+        local cancelled, cancellationReason = cancellation(order)
+        if cancelled == false then
+            return false, cancellationReason or "CANCELLATION_FAILED"
+        end
+    end
     releaseClaim(order, reason or "cancelled", true)
     order.status, order.cancelledAt = Status.CANCELLED, now()
     order.terminalPersisted = false
@@ -534,6 +545,17 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
             local required = math.max(1, tonumber(order.requiredWork) or 1)
             local progress = math.max(0, math.min(required,
                 tonumber(order.progress) or 0))
+            local refundPercent
+            if (order.operation == "CONSTRUCT"
+                or order.operation == "RECONSTRUCT")
+                and PNC.ConstructionService
+                and PNC.ConstructionService.Queries
+                and PNC.ConstructionService.Queries.GetCancellationRefund
+            then
+                local refund = PNC.ConstructionService.Queries
+                    .GetCancellationRefund(order)
+                refundPercent = refund and refund.percent or nil
+            end
             output[#output + 1] = {
                 id = order.id,
                 operation = order.operation,
@@ -554,6 +576,12 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
                 quantity = order.quantity,
                 technologyId = payload.technologyId,
                 specimenFullType = payload.specimenFullType,
+                funded = order.funded == true
+                    or payload.input and payload.input.funded == true,
+                projectLifecycle = order.projectLifecycle,
+                recipeRevision = order.recipeRevision
+                    or payload.recipeRevision,
+                refundPercent = refundPercent,
             }
         end
     end
