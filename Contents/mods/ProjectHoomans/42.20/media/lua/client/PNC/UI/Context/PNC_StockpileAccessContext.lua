@@ -21,6 +21,24 @@ local function findNode(nodeId)
     return nil
 end
 
+local function findNodeAtSquare(square)
+    if not square then return nil end
+    local settlement = PNC.Network and PNC.Network.ClientState
+        and PNC.Network.ClientState.colonyManagement
+        and PNC.Network.ClientState.colonyManagement.settlement or nil
+    local x, y, z = square:getX(), square:getY(), square:getZ()
+    for _, node in ipairs(settlement and settlement.stockpileNodes or {}) do
+        local radius = math.max(1, tonumber(node.radius) or 2)
+        if tonumber(node.z) == z
+            and math.abs((tonumber(node.x) or 0) - x) <= radius
+            and math.abs((tonumber(node.y) or 0) - y) <= radius
+        then
+            return node
+        end
+    end
+    return nil
+end
+
 local function openStockpile(nodeId)
     local node = findNode(nodeId)
     if node and node.storageId and PNC.InventoryWindow
@@ -40,6 +58,14 @@ end
 local function onFillWorldObjectContextMenu(_, context, worldObjects, test)
     if test or not context then return end
     local seen = {}
+    local zoneNode = findNodeAtSquare(
+        PNC.NPCSelection and PNC.NPCSelection.GetWorldSquare
+            and PNC.NPCSelection.GetWorldSquare(worldObjects) or nil)
+    if zoneNode then
+        seen[zoneNode.id] = true
+        context:addOption(tr("UI_PNC_Stockpile_Open", "Access Base Inventory"),
+            zoneNode.id, openStockpile)
+    end
     for _, object in ipairs(worldObjects or {}) do
         local value = identity(object)
         if value and not seen[value.nodeId] then

@@ -5,6 +5,22 @@ local Definitions = PNC.FacilityDefinitions
 Definitions.SCHEMA_VERSION = 1
 Definitions.ByID = Definitions.ByID or {}
 
+local DEFAULT_COMPONENT_COSTS = {
+    { fullType = "Base.Money", amount = 1 },
+}
+
+local function copyCosts(costs)
+    local output = {}
+    for _, cost in ipairs(costs or {}) do
+        output[#output + 1] = {
+            fullType = tostring(cost.fullType or "Base.Money"),
+            amount = math.max(1, math.floor(
+                tonumber(cost.amount or cost.quantity) or 1)),
+        }
+    end
+    return output
+end
+
 Definitions.ComponentIconPaths = Definitions.ComponentIconPaths or {
     ["sleep.area"] = "media/ui/Facilities/Components/chair.png",
     ["sleep.bed"] = "media/ui/Facilities/Components/bed/barracks.png",
@@ -47,6 +63,26 @@ end
 function Definitions.GetLevel(id, level)
     local definition = Definitions.Get(id)
     return definition and definition.levels[math.floor(tonumber(level) or 1)] or nil
+end
+
+function Definitions.GetComponentCosts(id, level, role)
+    local definition = Definitions.Get(id)
+    local levelData = Definitions.GetLevel(id, level)
+    local costs = levelData and levelData.componentCosts
+        and levelData.componentCosts[tostring(role or "")] or nil
+    costs = costs or definition and definition.componentCosts
+        and definition.componentCosts[tostring(role or "")] or nil
+    return copyCosts(costs or DEFAULT_COMPONENT_COSTS)
+end
+
+function Definitions.GetComponentBuildWork(id, level, role)
+    local definition = Definitions.Get(id)
+    local levelData = Definitions.GetLevel(id, level)
+    local work = levelData and levelData.componentWork
+        and levelData.componentWork[tostring(role or "")] or nil
+    work = work or definition and definition.componentWork
+        and definition.componentWork[tostring(role or "")] or nil
+    return math.max(1, tonumber(work) or 40)
 end
 
 function Definitions.GetComponentLimit(id, level, role)

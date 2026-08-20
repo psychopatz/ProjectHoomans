@@ -381,6 +381,7 @@ truthy(Work.Commands.AddProgress(build.id, "backup", 100),
 equal(inventory["Base.Money"], 0, "construction consumes reserved material")
 equal(constructionFacility.constructionState, "BUILT",
     "construction completion activates facility")
+inventory["Base.Money"] = 1
 local reconstruct = assert(Construction.QueueReconstruct({},
     constructionFacility, { action = "set", component = {
         id = "room:1", kind = "region", role = "sleep.area" } }))

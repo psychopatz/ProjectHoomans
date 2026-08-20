@@ -150,4 +150,6 @@ Sandbox_EN = {
     Sandbox_ProjectHoomans_NPCWeaponConditionLoss = "NPC Weapon Condition Loss",
     Sandbox_ProjectHoomans_NPCSupplyTransactionLogging = "Log NPC Supply Transactions",
     Sandbox_ProjectHoomans_NPCSupplyTransactionLogging_tooltip = "Writes one structured line for each Needs supply operation. Leave disabled during normal play for near-zero logging overhead.",
+    Sandbox_ProjectHoomans_ComponentDeconstructionRefundPercent = "Component Deconstruction Refund (%)",
+    Sandbox_ProjectHoomans_ComponentDeconstructionRefundPercent_tooltip = "Percentage of a component's Base.Money ingredients returned to colony storage when the component is deconstructed.",
 }

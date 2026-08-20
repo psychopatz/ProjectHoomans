@@ -83,5 +83,7 @@
     "Sandbox_ProjectHoomans.NPCAmmoConsumption": "NPC Ammo Consumption",
     "Sandbox_ProjectHoomans.NPCAmmoConsumption_tooltip": "Requires ranged PNC NPCs to carry the firearm's ammunition in their virtual inventory and consumes one round per resolved shot.",
     "Sandbox_ProjectHoomans.NPCWeaponConditionLoss": "NPC Weapon Condition Loss",
-    "Sandbox_ProjectHoomans.NPCWeaponConditionLoss_tooltip": "Allows equipped PNC NPC weapons to lose virtual condition when attacks hit."
+    "Sandbox_ProjectHoomans.NPCWeaponConditionLoss_tooltip": "Allows equipped PNC NPC weapons to lose virtual condition when attacks hit.",
+    "Sandbox_ProjectHoomans.ComponentDeconstructionRefundPercent": "Component Deconstruction Refund (%%)",
+    "Sandbox_ProjectHoomans.ComponentDeconstructionRefundPercent_tooltip": "Percentage of a component's Base.Money ingredients returned to colony storage when the component is deconstructed."
 }

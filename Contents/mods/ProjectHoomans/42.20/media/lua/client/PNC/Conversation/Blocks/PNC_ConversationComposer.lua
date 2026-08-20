@@ -111,6 +111,7 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
     local state = PNC.Network and PNC.Network.ClientState or {}
     local playerContext = state.playerContext or {}
     local record = entry and entry.record or {}
+    local colonyManagement = state.colonyManagement or {}
     local npcID = tostring(entry and entry.id or "debug-npc")
     local relationship = Conversation.Relationship
         and Conversation.Relationship.GetPresentation(npcID) or {}
@@ -132,6 +133,7 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
         worldAgeHours = at,
         hour = TIME_HOURS[timeID] or at % 24,
         worldID = "world",
+        baseEstablished = colonyManagement.settlement ~= nil,
     }
     context.blockValidator = function(block)
         return Loader.EnsureSource(
@@ -688,6 +690,15 @@ function Composer.ReceiveOutcome(args)
         at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
     })
     receiveRelationshipAfter(args.npcID, args.relationshipAfter)
+    for _, effect in ipairs(args.effectResults or {}) do
+        if effect.type == "pnc:open_territory_claim"
+            and effect.result and effect.result.openClaim == true
+            and PNC.ColonyManagementUI
+            and PNC.ColonyManagementUI.OpenClaimTerritory
+        then
+            PNC.ColonyManagementUI.OpenClaimTerritory()
+        end
+    end
     local clientState = PNC.Network and PNC.Network.ClientState
     if args.relationshipDelta and clientState then
         clientState.lastConversationDelta = {

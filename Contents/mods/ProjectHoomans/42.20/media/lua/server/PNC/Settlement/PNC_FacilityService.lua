@@ -265,6 +265,19 @@ local function isBuilt(facility)
         or facility.constructionState == "BUILT"
 end
 
+local function validationFacilityWithoutRole(facility, role)
+    local output = PNC.Core.DeepCopy(facility)
+    output.componentIds = {}
+    for componentId, present in pairs(facility.componentIds or {}) do
+        local component = present == true
+            and Repository.GetComponent(componentId) or nil
+        if not component or component.role ~= role then
+            output.componentIds[componentId] = present
+        end
+    end
+    return output
+end
+
 local function applyComponent(base, facility, input)
     input = type(input) == "table" and PNC.Core.DeepCopy(input) or {}
     local existing = input.id and Repository.GetComponent(input.id) or nil
@@ -351,22 +364,17 @@ function Service.SetComponent(player, args)
     input.id = tostring(input.id or PNC.Core.GenerateID("component"))
     local check = Validation.NormalizeComponent(base, facility, input)
     if not check.ok then return check end
-    if (existing and existing.kind == "region")
-        or input.kind == "abstract"
-    then
-        if not PNC.ConstructionService
-            or not PNC.ConstructionService.QueueReconstruct
-        then return { ok = false,
-            reason = "CONSTRUCTION_SERVICE_UNAVAILABLE" } end
-        local order, reason = PNC.ConstructionService.QueueReconstruct(
-            player, facility, { action = "set",
-                component = check.details.component })
-        if not order then return { ok = false, reason = reason } end
-        return { ok = true, facility = facility, workOrder = order,
-            pendingComponent = check.details.component,
-            event = "FacilityReconstructionQueued" }
-    end
-    return applyComponent(base, facility, check.details.component)
+    if not PNC.ConstructionService
+        or not PNC.ConstructionService.QueueReconstruct
+    then return { ok = false,
+        reason = "CONSTRUCTION_SERVICE_UNAVAILABLE" } end
+    local order, reason = PNC.ConstructionService.QueueReconstruct(
+        player, facility, { action = "set",
+            component = check.details.component })
+    if not order then return { ok = false, reason = reason } end
+    return { ok = true, facility = facility, workOrder = order,
+        pendingComponent = check.details.component,
+        event = "FacilityReconstructionQueued" }
 end
 
 function Service.ReplaceAnchorRole(player, args)
@@ -397,11 +405,11 @@ function Service.ReplaceAnchorRole(player, args)
     local old = {}
     for componentId, present in pairs(facility.componentIds or {}) do
         local component = present == true and Repository.GetComponent(componentId)
-        if component and component.role == role then
+    if component and component.role == role then
             old[#old + 1] = component
-            facility.componentIds[componentId] = nil
         end
     end
+    local validationFacility = validationFacilityWithoutRole(facility, role)
     local normalized = {}
     local failure
     for index, anchor in ipairs(anchors) do
@@ -410,17 +418,26 @@ function Service.ReplaceAnchorRole(player, args)
             x = anchor.x, y = anchor.y, z = anchor.z,
             targetResolver = role == "sleep.bed" and "sleepSpot" or nil,
         }
-        local check = Validation.NormalizeComponent(base, facility, input)
+        local check = Validation.NormalizeComponent(
+            base, validationFacility, input)
         if check.ok ~= true then failure = check; break end
         normalized[index] = check.details.component
     end
     if failure then
-        for _, component in ipairs(old) do
-            facility.componentIds[component.id] = true
-        end
         return failure
     end
+    if PNC.ConstructionService
+        and PNC.ConstructionService.QueueReconstruct
+    then
+        local order, reason = PNC.ConstructionService.QueueReconstruct(
+            player, facility, { action = "replace_role", role = role,
+                anchors = PNC.Core.DeepCopy(anchors) })
+        if not order then return { ok = false, reason = reason } end
+        return { ok = true, facility = facility, workOrder = order,
+            pendingAnchors = anchors, event = "FacilityReconstructionQueued" }
+    end
     for _, component in ipairs(old) do
+        facility.componentIds[component.id] = nil
         Repository.State.components[component.id] = nil
         if PNC.FacilityInteractionTargets then
             PNC.FacilityInteractionTargets.Invalidate(component.id)
@@ -444,6 +461,59 @@ function Service.ReplaceAnchorRole(player, args)
         event = "FacilityAnchorRoleReplaced" }
 end
 
+function Service.FinalizeReplaceAnchorRole(facilityId, role, anchors)
+    local facility = Repository.GetFacility(facilityId)
+    local base = facility and PNC.BaseService.Get(facility.baseId) or nil
+    if not base or not facility then return false, "FACILITY_NOT_FOUND" end
+    local level = Definitions.GetLevel(facility.definitionId, facility.level)
+    local limit = level and level.componentLimits and level.componentLimits[role]
+    if not limit or limit.kind ~= "anchor" then
+        return false, "INVALID_COMPONENT_ROLE"
+    end
+    anchors = type(anchors) == "table" and anchors or {}
+    if #anchors < (tonumber(limit.minCount) or 0)
+        or limit.maxCount and #anchors > limit.maxCount
+    then return false, "FACILITY_COMPONENT_LIMIT" end
+    local validationFacility = validationFacilityWithoutRole(facility, role)
+    local normalized = {}
+    for index, anchor in ipairs(anchors) do
+        local check = Validation.NormalizeComponent(base, validationFacility, {
+            id = PNC.Core.GenerateID("component"), kind = "anchor", role = role,
+            x = anchor.x, y = anchor.y, z = anchor.z,
+            targetResolver = role == "sleep.bed" and "sleepSpot" or nil,
+        })
+        if check.ok ~= true then return false, check.reason end
+        normalized[index] = check.details.component
+    end
+    for componentId, present in pairs(facility.componentIds or {}) do
+        local component = present == true and Repository.GetComponent(componentId)
+        if component and component.role == role then
+            facility.componentIds[componentId] = nil
+            Repository.State.components[componentId] = nil
+            if PNC.FacilityInteractionTargets then
+                PNC.FacilityInteractionTargets.Invalidate(componentId)
+            end
+            if PNC.FacilityReservations then
+                PNC.FacilityReservations.ReleaseComponent(componentId)
+            end
+        end
+    end
+    for _, component in ipairs(normalized) do
+        Repository.State.components[component.id] = component
+        facility.componentIds[component.id] = true
+    end
+    touch(base, facility)
+    updateState(base, facility)
+    Service.RebuildIndexes()
+    emit(PNC.EventTypes.FACILITY_COMPONENT_CHANGED, {
+        facilityId = facility.id, role = role, operation = "REPLACE_ROLE",
+        revision = facility.revision,
+    })
+    facility.constructionState, facility.constructionWorkOrderId = "BUILT", nil
+    Service.RefreshState(facility)
+    return true, "FacilityAnchorRoleReplaced"
+end
+
 function Service.RemoveComponent(player, args)
     args = type(args) == "table" and args or {}
     local facility = Repository.GetFacility(args.facilityId)
@@ -460,19 +530,23 @@ function Service.RemoveComponent(player, args)
     if not component or component.facilityId ~= facility.id then
         return { ok = false, reason = "COMPONENT_NOT_FOUND" }
     end
-    if component.kind == "region" or component.kind == "abstract" then
-        if not PNC.ConstructionService
-            or not PNC.ConstructionService.QueueReconstruct
-        then return { ok = false,
-            reason = "CONSTRUCTION_SERVICE_UNAVAILABLE" } end
-        local order, reason = PNC.ConstructionService.QueueReconstruct(
-            player, facility, { action = "remove",
-                componentId = component.id })
-        if not order then return { ok = false, reason = reason } end
-        return { ok = true, facility = facility, workOrder = order,
-            event = "FacilityReconstructionQueued" }
-    end
-    return removeComponent(base, facility, component)
+    if not PNC.ConstructionService
+        or not PNC.ConstructionService.QueueReconstruct
+    then return { ok = false,
+        reason = "CONSTRUCTION_SERVICE_UNAVAILABLE" } end
+    local costs = Definitions.GetComponentCosts(
+        facility.definitionId, facility.level, component.role)
+    local refundPercent = PNC.Sandbox
+        and PNC.Sandbox.ComponentDeconstructionRefundPercent
+        and PNC.Sandbox.ComponentDeconstructionRefundPercent() or 50
+    local order, reason = PNC.ConstructionService.QueueReconstruct(
+        player, facility, { action = "remove",
+            componentId = component.id,
+            refundRequirements = costs,
+            refundPercent = refundPercent })
+    if not order then return { ok = false, reason = reason } end
+    return { ok = true, facility = facility, workOrder = order,
+        event = "FacilityReconstructionQueued" }
 end
 
 function Service.Destroy(player, args)
@@ -588,12 +662,45 @@ function Service.BuildSnapshot(facility)
     if not facility then return nil end
     local output = PNC.Core.DeepCopy(facility)
     output.components = {}
+    output.pendingComponents = {}
     local level = Definitions.GetLevel(facility.definitionId, facility.level)
     output.capabilities = PNC.Core.DeepCopy(level and level.capabilities or {})
     output.workstations = PNC.Core.DeepCopy(level and level.workstations or {})
     for id, _ in pairs(facility.componentIds) do
         local component = Repository.GetComponent(id)
         if component then output.components[#output.components + 1] = PNC.Core.DeepCopy(component) end
+    end
+    for _, order in pairs(PNC.WorkRepository
+        and PNC.WorkRepository.State and PNC.WorkRepository.State.byId or {}) do
+        local payload = order.payload or {}
+        local change = payload.change or {}
+        if order.operation == "RECONSTRUCT"
+            and order.status ~= "COMPLETED"
+            and order.status ~= "CANCELLED"
+            and tostring(payload.facilityId or "") == tostring(facility.id)
+            and (change.action == "set" and change.component
+                or change.action == "replace_role"
+                    and type(change.anchors) == "table")
+        then
+            if change.action == "set" then
+                local pending = PNC.Core.DeepCopy(change.component)
+                pending.pending = true
+                output.pendingComponents[#output.pendingComponents + 1] = pending
+            else
+                for pendingIndex, anchor in ipairs(change.anchors) do
+                    output.pendingComponents[#output.pendingComponents + 1] = {
+                        schemaVersion = 1,
+                        id = "pending:" .. tostring(order.id) .. ":"
+                            .. tostring(pendingIndex),
+                        facilityId = facility.id,
+                        kind = "anchor",
+                        role = change.role,
+                        x = anchor.x, y = anchor.y, z = anchor.z,
+                        pending = true,
+                    }
+                end
+            end
+        end
     end
     for _, station in pairs(output.workstations or {}) do
         local componentId

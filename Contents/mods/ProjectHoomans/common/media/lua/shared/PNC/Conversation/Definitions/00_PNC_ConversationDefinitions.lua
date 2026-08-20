@@ -12,5 +12,6 @@ require "PNC/Conversation/Definitions/80_PNC_ConversationTrade"
 require "PNC/Conversation/Definitions/90_PNC_ConversationWorkOrders"
 require "PNC/Conversation/Definitions/91_PNC_ConversationPersonal"
 require "PNC/Conversation/Definitions/92_PNC_ConversationRelationship"
+require "PNC/Conversation/Definitions/93_PNC_ConversationSetTerritory"
 
 return true

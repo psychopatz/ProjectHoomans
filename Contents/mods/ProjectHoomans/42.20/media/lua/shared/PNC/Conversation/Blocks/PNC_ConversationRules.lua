@@ -132,6 +132,9 @@ local BUILTINS = {
     end,
     ["pnc:time"] = timeMatches,
     ["pnc:history"] = historyMatches,
+    ["pnc:base_not_established"] = function(context)
+        return context.baseEstablished ~= true
+    end,
 }
 
 for id, evaluate in pairs(BUILTINS) do
@@ -359,6 +362,21 @@ if not Registry.effectHandlers["pnc:knowledge_disclosure"] then
         simulate = function(_, effect)
             return { knowledgeDisclosure = effect.descriptorID }
         end,
+        builtin = true,
+    })
+end
+
+if not Registry.effectHandlers["pnc:open_territory_claim"] then
+    Registry.RegisterEffectHandler("pnc:open_territory_claim", {
+        validate = function(context)
+            return context.baseEstablished ~= true
+                and context.audiences and context.audiences.member == true,
+                "territory_claim_unavailable"
+        end,
+        apply = function()
+            return true, "territory_claim_ready", { openClaim = true }
+        end,
+        simulate = function() return { openClaim = true } end,
         builtin = true,
     })
 end

@@ -238,3 +238,13 @@ option ProjectHoomans.NPCSupplyTransactionLogging
     page = ProjectHoomans,
     translation = ProjectHoomans.NPCSupplyTransactionLogging,
 }
+
+option ProjectHoomans.ComponentDeconstructionRefundPercent
+{
+    type = double,
+    default = 50.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.ComponentDeconstructionRefundPercent,
+}

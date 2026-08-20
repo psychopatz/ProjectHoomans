@@ -273,11 +273,15 @@ equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     "FACILITY_NOT_BUILT", "components stay locked during construction")
 barracks.constructionState = "BUILT"
 PNC.FacilityService.RefreshState(barracks)
-truthy(PNC.FacilityService.SetComponent({}, {
+local roomOrder = PNC.FacilityService.SetComponent({}, {
     facilityId = barracks.id, expectedRevision = barracks.revision,
     component = { kind = "region", role = "sleep.area",
         region = rectangle(0, 0, 3, 3, 0) },
-}).ok, "room assignment becomes available after construction")
+})
+truthy(roomOrder.ok, "room assignment queues construction")
+truthy(PNC.FacilityService.FinalizeSetComponent(
+    barracks.id, roomOrder.pendingComponent),
+    "room assignment completes construction")
 
 for index = 1, 4 do
     local bed = PNC.FacilityService.SetComponent({}, {
@@ -287,6 +291,9 @@ for index = 1, 4 do
             targetResolver = "worldObject", objectTag = "bed" },
     })
     truthy(bed.ok, "bed assignment " .. tostring(index))
+    truthy(PNC.FacilityService.FinalizeSetComponent(
+        barracks.id, bed.pendingComponent),
+        "bed assignment completes construction " .. tostring(index))
 end
 equal(barracks.cachedState, "OPERATIONAL", "barracks state")
 local workTarget = PNC.FacilityService.ResolveWorkTarget(barracks)
@@ -301,10 +308,14 @@ truthy(upgrade.ok, "barracks level two queued")
 equal(barracks.level, 1, "upgrade waits for construction work")
 truthy(PNC.FacilityService.FinalizeUpgrade(barracks.id, 2),
     "barracks level two completed")
-truthy(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
+local fifthBedOrder = PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision, component = {
         kind = "anchor", role = "sleep.bed", x = 3, y = 1, z = 0,
-    } }).ok, "fifth bed after upgrade")
+    } })
+truthy(fifthBedOrder.ok, "fifth bed after upgrade")
+truthy(PNC.FacilityService.FinalizeSetComponent(
+    barracks.id, fifthBedOrder.pendingComponent),
+    "fifth bed construction completes")
 
 local researchResult = PNC.FacilityService.Create(player, {
     baseId = base.id, definitionId = "research_facility",
@@ -317,12 +328,16 @@ truthy(researchResult.ok,
 local researchFacility = researchResult.facility
 researchFacility.constructionState = "BUILT"
 PNC.FacilityService.RefreshState(researchFacility)
-truthy(PNC.FacilityService.SetComponent({}, {
+local stationOrder = PNC.FacilityService.SetComponent({}, {
     facilityId = researchFacility.id,
     expectedRevision = researchFacility.revision,
     component = { kind = "anchor", role = "work.research",
         x = 7, y = 7, z = 0 },
-}).ok, "research station assignment")
+})
+truthy(stationOrder.ok, "research station assignment")
+truthy(PNC.FacilityService.FinalizeSetComponent(
+    researchFacility.id, stationOrder.pendingComponent),
+    "research station construction completes")
 equal(PNC.FacilityService.SetComponent({}, {
     facilityId = researchFacility.id,
     expectedRevision = researchFacility.revision,
@@ -341,18 +356,26 @@ equal(researchStation and researchStation.tileCount, 1,
     "ordinary facility anchors occupy one fixed tile")
 equal(researchFacility.cachedState, "NEEDS_ASSIGNMENT",
     "research facility remains incomplete without architect bench and lab")
-truthy(PNC.FacilityService.SetComponent({}, {
+local architectOrder = PNC.FacilityService.SetComponent({}, {
     facilityId = researchFacility.id,
     expectedRevision = researchFacility.revision,
     component = { kind = "anchor", role = "work.blueprint",
         x = 8, y = 7, z = 0 },
-}).ok, "architect bench assignment")
-truthy(PNC.FacilityService.SetComponent({}, {
+})
+truthy(architectOrder.ok, "architect bench assignment")
+truthy(PNC.FacilityService.FinalizeSetComponent(
+    researchFacility.id, architectOrder.pendingComponent),
+    "architect bench construction completes")
+local laboratoryOrder = PNC.FacilityService.SetComponent({}, {
     facilityId = researchFacility.id,
     expectedRevision = researchFacility.revision,
     component = { kind = "anchor", role = "work.reverse",
         x = 7, y = 8, z = 0 },
-}).ok, "laboratory assignment")
+})
+truthy(laboratoryOrder.ok, "laboratory assignment")
+truthy(PNC.FacilityService.FinalizeSetComponent(
+    researchFacility.id, laboratoryOrder.pendingComponent),
+    "laboratory construction completes")
 equal(researchFacility.cachedState, "OPERATIONAL",
     "all three research lanes complete the facility")
 equal(#PNC.FacilityService.ListByCapability(base.id, "work.blueprint"), 1,
@@ -396,10 +419,14 @@ truthy(PNC.BaseService.Expand({}, { baseId = base.id,
 farm.constructionRegion = rectangle(0, 0, 11, 9, 0)
 local field93 = rectangle(0, 0, 9, 8, 0)
 field93.levels[0].rows[9] = { 0, 2 }
-truthy(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
+local field93Order = PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
         kind = "region", role = "farm.field", region = field93,
-    } }).ok, "93 tile farm")
+    } })
+truthy(field93Order.ok, "93 tile farm")
+truthy(PNC.FacilityService.FinalizeSetComponent(
+    farm.id, field93Order.pendingComponent),
+    "93 tile farm construction completes")
 
 local farmComponentId
 for id, _ in pairs(farm.componentIds) do farmComponentId = id end

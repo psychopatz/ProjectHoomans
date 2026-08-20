@@ -196,6 +196,18 @@ function Controller.Refresh(window, update)
         attention = #(window.snapshot.attention or {}),
         rows = #(window.details.items or {}),
     })
+    if window.pendingBaseAction == "claim" then
+        if window.snapshot.settlement then
+            window.pendingBaseAction = nil
+        elseif window.snapshot.colony then
+            window.pendingBaseAction = nil
+            window.tab = "base"
+            Controller.UpdateTabStyles(window)
+            Controller.ApplyTabLayout(window)
+            Controller.RebuildDetails(window)
+            window:onBaseControl({ internal = "claim" })
+        end
+    end
 end
 
 return Controller

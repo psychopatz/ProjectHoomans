@@ -94,11 +94,11 @@ local Rules = PNC.Conversation.Rules
 local Selector = PNC.Conversation.Selector
 local Loader = PNC.Conversation.TextLoader
 
-equal(#Registry.ListCategories(), 11, "built-in category count")
-equal(#Registry.ListBlocks(), 48, "expanded built-in block count")
+equal(#Registry.ListCategories(), 12, "built-in category count")
+equal(#Registry.ListBlocks(), 49, "expanded built-in block count")
 equal(Registry.GetFingerprint(), Registry.GetFingerprint(),
     "registry fingerprint stable")
-equal(#Registry.ListBlocks({ includeInvalid = true }), 48,
+equal(#Registry.ListBlocks({ includeInvalid = true }), 49,
     "built-ins all validate")
 
 local whatsUpBlocks = Registry.ListBlocks({

@@ -80,6 +80,10 @@ function Settings.NPCSupplyTransactionLoggingEnabled()
     return Settings.GetBoolean("NPCSupplyTransactionLogging", false)
 end
 
+function Settings.ComponentDeconstructionRefundPercent()
+    return Settings.GetNumber("ComponentDeconstructionRefundPercent", 50, 0, 100)
+end
+
 function Settings.PlayerOwnedNPCNeedMortalityEnabled()
     return Settings.GetBoolean("PlayerOwnedNPCNeedMortality", false)
 end

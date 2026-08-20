@@ -237,6 +237,20 @@ function ColonyUI.Open()
     return window
 end
 
+function ColonyUI.OpenClaimTerritory()
+    local window = ColonyUI.Open()
+    if not window then return false end
+    window.pendingBaseAction = "claim"
+    window:requestSnapshot("conversation_set_territory")
+    local snapshot = Client.ReadSnapshot().snapshot or {}
+    if snapshot.settlement then
+        window.pendingBaseAction = nil
+    elseif snapshot.colony then
+        window:refresh()
+    end
+    return true
+end
+
 function ColonyUI.Toggle()
     if ColonyUI.instance and ColonyUI.instance:getIsVisible() then
         ColonyUI.instance:close()

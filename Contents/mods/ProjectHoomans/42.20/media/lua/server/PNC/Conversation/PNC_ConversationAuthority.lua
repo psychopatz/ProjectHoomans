@@ -141,6 +141,25 @@ local function audienceMap(record, category)
     }
 end
 
+local function activeColony(factionID)
+    if not PNC.Communities or not PNC.Communities.GetForFaction then
+        return nil
+    end
+    for _, community in ipairs(PNC.Communities.GetForFaction(factionID) or {}) do
+        if community.status == "active" then return community end
+    end
+    return nil
+end
+
+local function playerSettlement(player)
+    local faction = PNC.Factions and PNC.Factions.GetPlayerFaction
+        and PNC.Factions.GetPlayerFaction(player) or nil
+    local colony = faction and activeColony(faction.id) or nil
+    local base = colony and PNC.BaseService and PNC.BaseService.GetForColony
+        and PNC.BaseService.GetForColony(colony.id) or nil
+    return faction, colony, base
+end
+
 function Authority.BuildContext(player, record, token)
     if not player or not record then return nil, "actors_unavailable" end
     if PNC.WorldDiscovery and PNC.WorldDiscovery.DiscoverNPCContext then
@@ -159,6 +178,7 @@ function Authority.BuildContext(player, record, token)
     relationship = type(relationship) == "table" and relationship or {}
     relationship.morale = record.social and record.social.morale or 0
     local category = relationshipCategory(record, relationship)
+    local faction, colony, base = playerSettlement(player)
     local playerProfile = PNC.SocialProfiles
         and PNC.SocialProfiles.GetPlayerProfile
         and PNC.SocialProfiles.GetPlayerProfile(
@@ -182,6 +202,9 @@ function Authority.BuildContext(player, record, token)
         worldAgeHours = worldAgeHours(),
         hour = worldAgeHours() % 24,
         worldID = tostring(getWorld and getWorld() or "world"),
+        factionID = faction and faction.id or nil,
+        colonyID = colony and colony.id or nil,
+        baseEstablished = base ~= nil,
     }
     context.historyLookup = function(subjectID, scope)
         return History.Get(subjectID, { scope = scope }, context)

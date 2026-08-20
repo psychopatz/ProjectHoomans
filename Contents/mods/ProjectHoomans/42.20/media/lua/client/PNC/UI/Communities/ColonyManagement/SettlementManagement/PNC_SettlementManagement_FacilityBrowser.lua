@@ -164,25 +164,33 @@ function Browser.BuildComponentRows(facility)
         local role = roles[roleIndex]
         local limit = level.componentLimits[role]
         local assigned = {}
+        local pending = {}
         for index = 1, #(facility.components or {}) do
             local component = facility.components[index]
             if component.role == role then assigned[#assigned + 1] = component end
         end
+        for index = 1, #(facility.pendingComponents or {}) do
+            local component = facility.pendingComponents[index]
+            if component.role == role then pending[#pending + 1] = component end
+        end
         local minimum = tonumber(limit.minCount) or 0
         local maximum = tonumber(limit.maxCount) or math.max(1, minimum)
         local groupEdit = role == "sleep.bed" and limit.kind == "anchor"
+        local componentAction = groupEdit and {
+            kind = limit.kind, role = role, groupEdit = true,
+        } or #assigned < maximum and {
+            kind = limit.kind, role = role,
+        } or nil
+        if #pending > 0 then componentAction = nil end
         rows[#rows + 1] = {
             key = role,
             label = roleLabel(role),
             iconPath = componentIconPath(role),
             detail = tostring(#assigned) .. " / " .. tostring(maximum)
-                .. (#assigned >= minimum and "  READY" or "  REQUIRED"),
-            complete = #assigned >= minimum,
-            componentAction = groupEdit and {
-                kind = limit.kind, role = role, groupEdit = true,
-            } or #assigned < maximum and {
-                kind = limit.kind, role = role,
-            } or nil,
+                .. (#pending > 0 and "  BUILDING"
+                    or #assigned >= minimum and "  READY" or "  REQUIRED"),
+            complete = #assigned >= minimum and #pending == 0,
+            componentAction = componentAction,
             actionLabel = groupEdit
                 and tr("UI_PNC_Facility_EditSpotsInline", "EDIT SPOTS")
                 or limit.kind == "abstract"
@@ -205,6 +213,17 @@ function Browser.BuildComponentRows(facility)
                 actionLabel = assigned[index].kind == "abstract"
                     and tr("UI_PNC_Facility_RemoveModule", "REMOVE")
                     or tr("UI_PNC_Facility_EditInline", "EDIT"),
+            }
+        end
+        for index = 1, #pending do
+            rows[#rows + 1] = {
+                key = "pending:" .. tostring(pending[index].id or role),
+                label = "- " .. roleLabel(role) .. " #" .. tostring(index)
+                    .. " (QUEUED)",
+                iconPath = componentIconPath(role),
+                detail = componentDetail(pending[index]),
+                child = true,
+                complete = false,
             }
         end
     end

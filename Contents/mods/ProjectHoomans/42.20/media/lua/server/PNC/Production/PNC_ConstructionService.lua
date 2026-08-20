@@ -6,6 +6,25 @@ PNC.ConstructionService = PNC.ConstructionService or {}
 
 local Service = PNC.ConstructionService
 
+local function componentRequirements(facility, component, count)
+    local definitions = PNC.FacilityDefinitions
+    local costs = definitions and definitions.GetComponentCosts
+        and definitions.GetComponentCosts(
+            facility.definitionId, facility.level, component and component.role)
+        or {{ fullType = "Base.Money", amount = 1 }}
+    local output = {}
+    count = math.max(1, math.floor(tonumber(count) or 1))
+    for _, cost in ipairs(costs or {}) do
+        output[#output + 1] = {
+            itemTypes = { tostring(cost.fullType or "Base.Money") },
+            amount = math.max(1, math.floor(
+                (tonumber(cost.amount) or 1) * count)),
+            consumed = true,
+        }
+    end
+    return output
+end
+
 local function contextFor(player, facility)
     local context, reason = PNC.ProductionContext.ForPlayer(player)
     if not context then return nil, reason end
@@ -118,6 +137,31 @@ function Service.QueueReconstruct(player, facility, change)
         then return nil, "FACILITY_IN_USE" end
     end
     local definition = PNC.FacilityDefinitions.Get(facility.definitionId)
+    change = PNC.Core.DeepCopy(change or {})
+    local payload = { mode = "reconstruct", facilityId = facility.id,
+        storageId = context.storage.id, change = change }
+    if change.action == "remove" then
+        payload.refundRequirements = PNC.Core.DeepCopy(
+            change.refundRequirements or {})
+        payload.refundPercent = tonumber(change.refundPercent) or 0
+    end
+    local reservation
+    if change.action == "set" or change.action == "replace_role" then
+        local component = change.component
+        local count = 1
+        if change.action == "replace_role" then
+            count = math.max(1, #(change.anchors or {}))
+            component = { role = change.role }
+        end
+        local requirements = componentRequirements(facility, component, count)
+        reservation, reason = PNC.ColonyStorageService.ReserveProductionMaterials(
+            context.storage.id, requirements, "component:" .. facility.id)
+        if not reservation then return nil, reason or "MISSING_MATERIALS" end
+        payload = PNC.WorkInputService.Bind({ mode = "reconstruct",
+            facilityId = facility.id, change = change,
+            requirements = requirements }, context.storage.id,
+            reservation.id, "component_construction")
+    end
     local order
     order, reason = PNC.WorkService.Commands.Queue({ operation = "RECONSTRUCT",
         colonyId = context.colony.id, factionId = context.faction.id,
@@ -125,9 +169,13 @@ function Service.QueueReconstruct(player, facility, change)
         requiredWork = math.max(1, tonumber(definition and
             definition.reconstructWork) or 60),
         requiredSkills = definition and definition.buildSkills or {},
-        payload = { mode = "reconstruct", facilityId = facility.id,
-            change = PNC.Core.DeepCopy(change or {}) } })
-    if not order then return nil, reason end
+        payload = payload })
+    if not order then
+        if reservation then
+            PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
+        end
+        return nil, reason
+    end
     facility.constructionState = "RECONSTRUCTING"
     facility.constructionWorkOrderId = order.id
     PNC.FacilityService.RefreshState(facility)
@@ -189,9 +237,37 @@ end
 local function completeReconstruct(order)
     local payload = order.payload or {}
     local change = payload.change or {}
+    if change.action ~= "remove" then
+        local ok, reason = PNC.WorkInputService.Commit(order,
+            "component_construction_material_consumption")
+        if not ok then return false, reason end
+    end
     if change.action == "remove" then
-        return PNC.FacilityService.FinalizeRemoveComponent(
+        local ok, reason = PNC.FacilityService.FinalizeRemoveComponent(
             payload.facilityId, change.componentId)
+        if not ok then return false, reason end
+        local percent = tonumber(payload.refundPercent) or 0
+        local products = {}
+        for _, cost in ipairs(payload.refundRequirements or {}) do
+            local quantity = math.floor((tonumber(cost.amount) or 0)
+                * percent / 100 + 0.5)
+            if quantity > 0 then
+                products[#products + 1] = { fullType = cost.fullType,
+                    quantity = quantity }
+            end
+        end
+        if #products > 0 then
+            local refunded, refundReason =
+                PNC.ColonyStorageService.DepositProductionItems(
+                    payload.storageId, products, nil, order.id,
+                    "component_deconstruction_refund")
+            if not refunded then return false, refundReason end
+        end
+        return true, "ComponentRemoved"
+    end
+    if change.action == "replace_role" then
+        return PNC.FacilityService.FinalizeReplaceAnchorRole(
+            payload.facilityId, change.role, change.anchors)
     end
     if change.action == "upgrade" then
         return PNC.FacilityService.FinalizeUpgrade(

@@ -14,6 +14,7 @@ local categories = {
     { "trade", "category.trade", 700 },
     { "personal", "category.personal", 800 },
     { "relationship", "category.relationship", 900 },
+    { "set_territory", "category.set_territory", 950 },
     { "goodbye", "category.goodbye", 10000, true },
 }
 
