@@ -146,8 +146,58 @@ local function debugFacilityWorkAction(player, args)
     if not PNC.BaseValidationService.CanUse(player, base) then
         return false, "NO_PERMISSION"
     end
+    local componentId = tostring(args.componentId or "")
+    if componentId == "" and PNC.FacilityService.ResolveWorkTarget then
+        local target = PNC.FacilityService.ResolveWorkTarget(facility)
+        componentId = tostring(target and target.componentId or "")
+    end
+    local getComponent = PNC.SettlementRepository.GetComponent
+    local component = componentId ~= "" and getComponent
+        and getComponent(componentId) or nil
+    if getComponent and componentId ~= "" and (not component
+        or component.facilityId ~= facility.id)
+    then return false, "FACILITY_COMPONENT_NOT_FOUND" end
+    local capability = component
+        and PNC.FacilityService.GetActivityCapability
+        and PNC.FacilityService.GetActivityCapability(facility, component.id)
+        or nil
+    if component and not capability then
+        return false, "FACILITY_COMPONENT_NOT_TESTABLE"
+    end
     return PNC.FacilityJobs.StartForFacility(record, facility.id, {
         debugHold = true,
+        componentId = componentId ~= "" and componentId or nil,
+        capability = capability,
+    })
+end
+
+local function debugNearbyWaterAction(player, args)
+    if not canUseDebug(player) then return false, "not_authorized" end
+    local record = PNC.Registry and PNC.Registry.Get(args.npcID) or nil
+    if not record or record.alive == false or not owned(record, player) then
+        return false, "npc_not_owned"
+    end
+    local service = PNC.NearbyWaterService
+    local source = service and service.Find and service.Find(record) or nil
+    if not source then return false, "NEARBY_WATER_NOT_FOUND" end
+    local live = PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record.id) or nil
+    local facility = {
+        id = "nearby_water:debug:" .. tostring(source.key),
+        baseId = "nearby", definitionId = "nearby_water",
+    }
+    local acquired = {
+        ok = true, facilityId = facility.id, componentId = "",
+        reservationId = "", target = {
+            x = source.x, y = source.y, z = source.z,
+        },
+    }
+    return PNC.FacilityJobs.Start(record, facility, "water.nearby", {
+        acquired = acquired, nearby = true, resource = source,
+        resourceKey = source.key,
+        resourceKind = "nearby_water",
+        debugForceWater = true,
+        abstract = live == nil,
     })
 end
 
@@ -211,6 +261,9 @@ local function debugNeedAction(player, args)
     if operation == "inspect_provision" then
         local diagnostics, reason = PNC.ProvisionEvaluator.Inspect(record)
         return diagnostics ~= nil, reason or "provision_inspected", diagnostics
+    end
+    if operation == "force_nearby_water" then
+        return debugNearbyWaterAction(player, args)
     end
     return false, "unknown_debug_operation"
 end

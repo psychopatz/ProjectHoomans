@@ -69,9 +69,29 @@ local body = {
     getY = function() return 10.5 end,
     getZ = function() return 0 end,
 }
+local faucet = {
+    getID = function() return 7 end,
+    hasFluid = function() return true end,
+    getFluidAmount = function() return 10 end,
+    getFluidContainer = function() return {
+        isEmpty = function() return false end,
+        isWaterOnlySource = function() return true end,
+    } end,
+    isTaintedWater = function() return false end,
+    moveFluidToTemporaryContainer = function(_, amount)
+        return { amount = amount }
+    end,
+}
+local faucetSquare = square(9, 10, { faucet })
+local faucetBody = {
+    getX = function() return 8.5 end,
+    getY = function() return 10.5 end,
+    getZ = function() return 0 end,
+}
 getCell = function() return cell end
 getTimestampMs = function() return 1000 end
 Fluid = { TaintedWater = "TaintedWater" }
+FluidContainer = { DisposeContainer = function() end }
 
 PNC = {}
 local Locator = T.load("ProjectHoomans", "server",
@@ -99,5 +119,18 @@ T.equal(consumed, 0.80, "only the required liters are removed")
 T.near(remaining, 0.20, 0.000001, "remaining liters are reported")
 T.near(cleanContainer.amount, 0.20, 0.000001,
     "the original water container is preserved and partially drained")
+
+cell.getGridSquare = function(_, x, y)
+    if x == 9 and y == 10 then return faucetSquare end
+    if x == 10 and y == 10 then return originSquare end
+    return nil
+end
+PNC.Registry.GetLiveZombie = function() return faucetBody end
+local faucetSource = Service.Find({ id = "npc:faucet" })
+T.equal(faucetSource.kind, "faucet", "nearby faucet is a water source")
+local faucetOK, faucetConsumed = Service.Consume(
+    { id = "npc:faucet" }, faucetSource, 0.8)
+T.truthy(faucetOK, "clean faucet water is consumable")
+T.equal(faucetConsumed, 0.8, "faucet supplies the requested liters")
 
 T.finish("pnc_nearby_water_smoke")

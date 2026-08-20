@@ -21,6 +21,8 @@ local ACTIONS = {
         fallback = "RESET NEEDS" },
     { id = "force_provision", key = "UI_PNC_ColonyDebug_Provision",
         fallback = "FORCE GRAB PROVISIONS" },
+    { id = "force_nearby_water", key = "UI_PNC_ColonyDebug_NearbyWater",
+        fallback = "FORCE DRINK NEARBY WATER" },
     { id = "inspect_provision", key = "UI_PNC_ColonyDebug_InspectProvision",
         fallback = "PROVISION DIAGNOSTICS" },
     { id = "facility_work", key = "UI_PNC_ColonyDebug_FacilityWork",
@@ -85,18 +87,46 @@ local function syncFacilities(window, snapshot)
     local combo = window and window.debugFacilityCombo
     if not combo then return end
     local previous = combo:getOptionData(combo.selected)
-    local previousId = previous and previous.id
+    local previousId = previous and previous.key
     combo:clear()
     local selected = 1
     local facilities = snapshot and snapshot.settlement
         and snapshot.settlement.facilities or {}
-    for index, facility in ipairs(facilities) do
+    local optionIndex = 0
+    for _, facility in ipairs(facilities) do
         local definition = PNC.FacilityDefinitions.Get(facility.definitionId)
-        combo:addOptionWithData(Shared.Tr(
+        local facilityLabel = Shared.Tr(
             definition and definition.displayNameKey or "",
-            facility.definitionId) .. " - " .. tostring(facility.cachedState),
-            facility)
-        if facility.id == previousId then selected = index end
+            facility.definitionId)
+        local state = facility.cachedState or facility.constructionState
+            or "UNKNOWN"
+        local components = facility.components or {}
+        table.sort(components, function(a, b)
+            return tostring(a.id or "") < tostring(b.id or "")
+        end)
+        for _, component in ipairs(components) do
+            optionIndex = optionIndex + 1
+            local key = tostring(facility.id or "") .. ":"
+                .. tostring(component.id or "")
+            local role = tostring(component.role or component.kind or "component")
+            combo:addOptionWithData(facilityLabel .. " • " .. role
+                .. " • " .. tostring(component.id or "")
+                .. " • " .. tostring(state), {
+                    key = key, facility = facility, component = component,
+                    facilityId = facility.id, componentId = component.id,
+                })
+            if key == previousId then selected = optionIndex end
+        end
+        if #components == 0 then
+            optionIndex = optionIndex + 1
+            local key = tostring(facility.id or "") .. ":none"
+            combo:addOptionWithData(facilityLabel .. " • no live components"
+                .. " • " .. tostring(state), {
+                    key = key, facility = facility, component = nil,
+                    facilityId = facility.id,
+                })
+            if key == previousId then selected = optionIndex end
+        end
     end
     if #facilities == 0 then
         combo:addOptionWithData(Shared.Tr(
@@ -130,7 +160,9 @@ function DebugTab.BuildRows(person, snapshot, window)
             detail = string.format("%s | %s | %s | %.0f, %.0f, %.0f",
                 Shared.Tr(work.facilityName,
                     tostring(work.facilityId or "facility")),
-                tostring(work.role or "work"), tostring(work.phase or "QUEUED"),
+                tostring(work.componentRole or work.role or "work") .. " / "
+                    .. tostring(work.componentId or ""),
+                tostring(work.phase or "QUEUED"),
                 tonumber(target.x) or 0, tonumber(target.y) or 0,
                 tonumber(target.z) or 0),
             colorName = work.phase == "WORKING" and "success" or "accent",
@@ -241,18 +273,22 @@ function DebugTab.OnControl(window, button)
         options.amount = 0.25
     elseif id == "reset" then
         options.operation = "reset"
+    elseif id == "force_nearby_water" then
+        options.operation = "force_nearby_water"
+        return PNC.Client.RequestColonyAction("debug_need", options)
     elseif id == "force_provision" then
         options.operation = "force_provision"
     elseif id == "inspect_provision" then
         ProvisionDiagnostics.Open(person)
         return true
     elseif id == "facility_work" then
-        local facility = window.debugFacilityCombo
+        local selection = window.debugFacilityCombo
             and window.debugFacilityCombo:getOptionData(
                 window.debugFacilityCombo.selected) or nil
-        if not facility then return false end
+        if not selection or not selection.facility then return false end
         return PNC.Client.RequestColonyAction("debug_facility_work", {
-            npcID = person.id, facilityId = facility.id, operation = "start",
+            npcID = person.id, facilityId = selection.facilityId,
+            componentId = selection.componentId, operation = "start",
         })
     elseif id == "facility_stop" then
         return PNC.Client.RequestColonyAction("debug_facility_work", {

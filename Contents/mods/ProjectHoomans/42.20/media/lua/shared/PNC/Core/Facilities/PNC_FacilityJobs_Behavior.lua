@@ -17,6 +17,7 @@ local function normalize(_, spec)
         facilityId = tostring(spec.facilityId or ""),
         facilityName = tostring(spec.facilityName or spec.facilityId or "Facility"),
         componentId = tostring(spec.componentId or ""),
+        componentRole = tostring(spec.componentRole or ""),
         reservationId = tostring(spec.reservationId or ""),
         x = tonumber(spec.x) or 0,
         y = tonumber(spec.y) or 0,

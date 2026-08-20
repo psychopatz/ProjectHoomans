@@ -11,6 +11,7 @@ PsychopatzCore = {
 
 local record = {
     id = "npc:route", alive = true, runtime = {},
+    x = 10, y = 12, z = 0,
     needs = { hunger = 0.65, thirst = 0.60, fatigue = 0.90 },
     health = { current = 60, max = 100, state = "normal" },
     conditionStats = { boredom = 65, stress = 0.4 },
@@ -26,8 +27,10 @@ local capacity = {}
 local dirty = 0
 local provider
 local supplyCalls = 0
+local atHome = true
 
 PNC = {
+    Const = { ORDER_FOLLOW = "follow" },
     NeedsDefinitions = { SUPPLY = {
         hunger = { trigger = 0.35, target = 0.10, resourceKind = "FOOD",
             priorityBase = 50 },
@@ -59,7 +62,7 @@ PNC = {
     },
     HomeDutyService = {
         GetBase = function() return { id = "base" } end,
-        IsAtHome = function() return true end,
+        IsAtHome = function() return atHome end,
     },
     FacilityService = {
         ListByCapability = function(_, capability)
@@ -168,5 +171,58 @@ ok, complete = PNC.NeedFacilityEffects.Tick(
 T.truthy(ok and complete, "nearby water completes through the shared effect")
 T.near(record.needs.thirst, 0.20, 0.000001,
     "nearby water applies proportional thirst relief")
+
+record.orderSpec = { kind = "follow" }
+atHome = false
+record.needs.hunger = 0.65
+local beforeFollowFood = supplyCalls
+T.truthy(Triggers.PreferFacility(record, "hunger"),
+    "a free follower schedules a temporary personal-food action")
+PNC.NeedSupplyBridge.Evaluate(record, "FOOD")
+T.equal(supplyCalls, beforeFollowFood,
+    "the needs scheduler does not consume follower food before its task")
+local followerCandidates = Triggers.GetCandidates(record.id)
+local followerFood
+for _, candidate in ipairs(followerCandidates) do
+    if candidate.sourceRef == "follower_food" then followerFood = candidate end
+end
+T.truthy(followerFood, "follower food uses the reusable need-task lane")
+T.equal(followerFood.capability, "survival.eat.inventory",
+    "follower food resolves to the personal eating capability")
+local valid, validationReason = Triggers.Validate(followerFood)
+T.truthy(valid, validationReason or "free follower food intent validates")
+local followerAssignment = Triggers.Assign(followerFood)
+T.equal(followerAssignment.target.x, record.x,
+    "follower food task is anchored at the NPC's current position")
+local startedCapability
+local startedOptions
+PNC.FacilityJobs = { Start = function(_, _, capability, options)
+    startedCapability, startedOptions = capability, options
+    return true, "started"
+end }
+local started = Triggers.Start({
+    npcId = record.id, sourceRef = "follower_food",
+    leaseId = "lease:food", executionMode = "LIVE",
+}, followerAssignment)
+T.truthy(started, "follower food starts through FacilityJobs")
+T.equal(startedCapability, "survival.eat.inventory",
+    "follower food uses the reusable activity executor")
+T.equal(startedOptions.taskLeaseId, "lease:food",
+    "follower food preserves its task lease")
+
+record.runtime.inCombatUntil = 2000
+PNC.Core = { Now = function() return 1000 end }
+T.falsy(Triggers.PreferFacility(record, "hunger"),
+    "a recent combat lease blocks the follower eating task")
+record.runtime.inCombatUntil = nil
+
+record.runtime.target = { id = "zombie:target" }
+local beforeCombatWater = supplyCalls
+T.falsy(Triggers.PreferFacility(record, "hydration"),
+    "active combat does not schedule a nearby-water movement task")
+PNC.NeedSupplyBridge.Evaluate(record, "HYDRATION")
+T.equal(supplyCalls, beforeCombatWater + 1,
+    "combat remains active while hydration falls back to inventory")
+record.runtime.target = nil
 
 T.finish("pnc_need_facility_triggers_smoke")

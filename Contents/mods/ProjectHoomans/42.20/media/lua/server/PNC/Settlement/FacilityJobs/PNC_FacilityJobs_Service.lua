@@ -54,7 +54,8 @@ function Jobs.Start(record, facilityOrId, capability, options)
     end
     local acquired = options.acquired or PNC.FacilityService.AcquireActivity(
         base.id, record.id, capability, { ttlMs = 30000,
-            abstract = options.abstract == true })
+            abstract = options.abstract == true,
+            componentId = options.componentId })
     if not acquired.ok or not acquired.target then
         return false, acquired.reason or "FACILITY_HAS_NO_WORK_TARGET"
     end
@@ -79,6 +80,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
         facilityName = facilityDefinition and facilityDefinition.displayNameKey
             or facility.definitionId,
         componentId = acquired.componentId,
+        componentRole = acquired.role or "",
         reservationId = acquired.reservationId,
         sceneId = sceneId,
         sleepSurface = tostring(target.sleepSurface or ""),
@@ -86,6 +88,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
         target = { x = target.x, y = target.y, z = target.z },
         previousOrder = previousOrder,
         debugHold = options.debugHold == true,
+        debugForceWater = options.debugForceWater == true,
         automatic = options.automatic == true,
         taskLeaseId = tostring(options.taskLeaseId or ""),
         abstract = options.abstract == true,
@@ -102,6 +105,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
         facilityId = facility.id,
         facilityName = record.runtime.facilityActivity.facilityName,
         componentId = acquired.componentId,
+        componentRole = acquired.role or "",
         reservationId = acquired.reservationId,
         x = target.x, y = target.y, z = target.z,
         interactionX = target.interactionX,
@@ -125,9 +129,16 @@ function Jobs.Start(record, facilityOrId, capability, options)
 end
 
 function Jobs.StartForFacility(record, facilityId, options)
+    options = type(options) == "table" and options or {}
     local facility = type(facilityId) == "table" and facilityId
         or Repository.GetFacility(facilityId)
-    return Jobs.Start(record, facility, definitionCapability(facility), options)
+    local capability = options.capability
+        or options.componentId
+            and PNC.FacilityService.GetActivityCapability
+            and PNC.FacilityService.GetActivityCapability(
+                facility, options.componentId)
+        or definitionCapability(facility)
+    return Jobs.Start(record, facility, capability, options)
 end
 
 return Jobs

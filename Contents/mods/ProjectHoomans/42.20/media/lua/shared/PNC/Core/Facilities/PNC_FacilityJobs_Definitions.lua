@@ -81,6 +81,23 @@ Definitions.Register("food.dine", {
     effectDelayMs = 1200,
 })
 
+-- Away-from-home survival actions use the same FacilityJobs state machine as
+-- home activities. The synthetic target is the follower's current square, so
+-- completion restores the previous FollowOwner order without inventing a
+-- second behavior executor.
+Definitions.Register("survival.eat.inventory", {
+    activeJob = "Eat",
+    activityLabelKey = "UI_PNC_Activity_Eating",
+    activityText = "Eating",
+    sceneId = "survival.eat.inventory",
+    role = "survival.personal_food",
+    arrivalDistance = 0.85,
+    activityLabel = "EATING",
+    needEffect = "primitive",
+    primitiveNeed = "hunger",
+    effectDelayMs = 1200,
+})
+
 Definitions.Register("health.recover", {
     activeJob = "HospitalRecovery",
     activityLabelKey = "UI_PNC_Activity_Recovering",

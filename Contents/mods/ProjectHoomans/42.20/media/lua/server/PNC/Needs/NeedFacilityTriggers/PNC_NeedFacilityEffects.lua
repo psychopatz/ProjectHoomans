@@ -23,10 +23,19 @@ local function applyNearbyWater(record, state, definition, now)
         and source.item.getFluidContainer
         and source.item:getFluidContainer() or nil
     local available = container and container.getAmount
-        and tonumber(container:getAmount()) or 0
+        and tonumber(container:getAmount()) or nil
+    if available == nil and source and source.object
+        and source.object.getWaterAmount
+    then
+        available = tonumber(source.object:getWaterAmount())
+    end
     local liters = PNC.NearbyWaterService
         and PNC.NearbyWaterService.DesiredLiters
         and PNC.NearbyWaterService.DesiredLiters(record, available) or 0
+    if state.debugForceWater == true and liters <= 0 then
+        liters = (available == nil or available < 0)
+            and 1 or math.min(1, available)
+    end
     local ok, consumed, reason = false, nil, nil
     if PNC.NearbyWaterService
         and type(PNC.NearbyWaterService.Consume) == "function"

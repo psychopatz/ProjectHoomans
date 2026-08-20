@@ -136,6 +136,31 @@ local function componentForCapability(facility, capability)
     return fallback
 end
 
+local function capabilityForComponent(facility, component)
+    local level = facility and PNC.FacilityDefinitions.GetLevel(
+        facility.definitionId, facility.level) or nil
+    for _, capability in ipairs(level and level.capabilities or {}) do
+        local definition = PNC.FacilityJobDefinitions
+            and PNC.FacilityJobDefinitions.Get(capability) or nil
+        if definition and definition.role == component.role then
+            return capability
+        end
+    end
+    return nil
+end
+
+function PNC.FacilityService.GetActivityCapability(facilityOrId,
+    componentId)
+    local facility = type(facilityOrId) == "table" and facilityOrId
+        or PNC.SettlementRepository.GetFacility(facilityOrId)
+    local component = componentId and PNC.SettlementRepository.GetComponent(
+        componentId) or nil
+    if not facility or not component
+        or component.facilityId ~= facility.id
+    then return nil end
+    return capabilityForComponent(facility, component)
+end
+
 function Reservations.HasCapacity(facility, capability)
     if not facility or not componentForCapability(facility, capability) then
         return false
@@ -182,11 +207,22 @@ end
 function PNC.FacilityService.AcquireActivity(baseId, npcId, capability, options)
     options = type(options) == "table" and options or {}
     local facilities = PNC.FacilityService.ListByCapability(baseId, capability)
+    local requested = options.componentId and PNC.SettlementRepository
+        .GetComponent(options.componentId) or nil
     for index = 1, #facilities do
         local facility = facilities[index]
         local targetValid = options.abstract == true
             or PNC.FacilityService.RevalidateTargets(facility)
-        local component = componentForCapability(facility, capability)
+        local component
+        if options.componentId and requested
+            and requested.facilityId == facility.id
+            and (requested.kind ~= "anchor"
+                or not Reservations.ByComponent[requested.id])
+        then
+            component = requested
+        elseif not options.componentId then
+            component = componentForCapability(facility, capability)
+        end
         if targetValid and component then
             local ok, reservation = Reservations.Reserve(facility.id, component.id,
                 npcId, capability, options.ttlMs, options)
@@ -197,6 +233,7 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability, options)
                     or component.kind == "region" and regionTarget(component)
                 return { ok = true, reservationId = reservation.id,
                     facilityId = facility.id, componentId = component.id,
+                    role = component.role,
                     target = target, targets = targets,
                     abstract = options.abstract == true }
             end

@@ -36,6 +36,34 @@ function Service.IsCleanWater(item)
     return (tonumber(call(container, "getAmount")) or 0) > 0
 end
 
+function Service.IsCleanFaucet(object)
+    if not object then return false end
+    if call(object, "isTaintedWater") == true then return false end
+    local container = call(object, "getFluidContainer")
+    if container and call(container, "isEmpty") == true then return false end
+    local amount = tonumber(call(object, "getFluidAmount"))
+        or tonumber(call(object, "getWaterAmount"))
+        or tonumber(call(container, "getAmount"))
+    local waterSource = call(object, "isWaterSource") == true
+        or call(container, "isWaterOnlySource") == true
+        or call(container, "isWaterSource") == true
+        or call(object, "hasFluid") == true
+    if amount == 0 then return false end
+    if amount == nil and not waterSource then return false end
+    if container then
+        local primary = call(container, "getPrimaryFluid")
+        local fluidName = waterType(primary)
+        if fluidName ~= "" and fluidName ~= "Water"
+            and fluidName ~= "CarbonatedWater"
+        then return false end
+        local tainted = Fluid and Fluid.TaintedWater or nil
+        if tainted and call(container, "contains", tainted) == true then
+            return false
+        end
+    end
+    return waterSource and (amount == nil or amount < 0 or amount > 0)
+end
+
 local function liveBody(record)
     return PNC.Registry and PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
@@ -55,13 +83,31 @@ end
 local function find(record, key)
     local origin = originFor(record)
     if not origin then return nil end
-    return Locator.Find(origin, {
+    local itemEntry = Locator.Find(origin, {
+        radius = RADIUS, cacheKey = "nearby_water:" .. tostring(record.id),
+        accept = function(entry)
+            return (not key or entry.key == key) and Service.IsCleanWater(
+                entry.item)
+        end,
+    })
+    local faucetEntry = Locator.FindObject(origin, {
         radius = RADIUS, cacheKey = "nearby_water:" .. tostring(record.id),
         accept = function(entry)
             return (not key or entry.key == key)
-                and Service.IsCleanWater(entry.item)
+                and Service.IsCleanFaucet(entry.object)
         end,
     })
+    if faucetEntry then
+        faucetEntry.kind = "faucet"
+        faucetEntry.key = faucetEntry.key or Locator.ObjectKeyFor(
+            faucetEntry.object, faucetEntry.x, faucetEntry.y, faucetEntry.z)
+    end
+    if not itemEntry then return faucetEntry end
+    if not faucetEntry or itemEntry.distSq <= faucetEntry.distSq then
+        itemEntry.kind = "container"
+        return itemEntry
+    end
+    return faucetEntry
 end
 
 function Service.Find(record)
@@ -75,17 +121,22 @@ end
 function Service.DesiredLiters(record, available)
     local thirst = PNC.IndividualNeeds and PNC.IndividualNeeds.Get
         and tonumber(PNC.IndividualNeeds.Get(record, "thirst")) or 0
-    return math.max(0, math.min(MAX_DRINK_LITERS, thirst * 2,
-        tonumber(available) or 0))
+    local amount = tonumber(available)
+    if amount == nil or amount < 0 then amount = MAX_DRINK_LITERS end
+    return math.max(0, math.min(MAX_DRINK_LITERS, thirst * 2, amount))
 end
 
 function Service.Consume(record, entry, liters)
-    if not record or not entry or not entry.item then
+    if not record or not entry then
         return false, "WATER_SOURCE_UNAVAILABLE"
     end
-    if not Service.IsCleanWater(entry.item) then
-        return false, "WATER_SOURCE_NOT_CLEAN"
-    end
+    local faucet = entry.kind == "faucet" or entry.object ~= nil
+    if faucet then
+        if not Service.IsCleanFaucet(entry.object) then
+            return false, "WATER_SOURCE_NOT_CLEAN"
+        end
+    elseif not entry.item or not Service.IsCleanWater(entry.item) then
+        return false, "WATER_SOURCE_NOT_CLEAN" end
     local origin = originFor(record)
     if not origin then return false, "WATER_SOURCE_UNAVAILABLE" end
     local dx, dy = origin:getX() - entry.x, origin:getY() - entry.y
@@ -94,22 +145,61 @@ function Service.Consume(record, entry, liters)
     then
         return false, "WATER_SOURCE_OUT_OF_RANGE"
     end
-    local container = call(entry.item, "getFluidContainer")
-    local available = tonumber(call(container, "getAmount")) or 0
-    local amount = math.max(0, math.min(available, tonumber(liters) or 0))
+    local amount, remaining
+    if faucet then
+        local sourceContainer = call(entry.object, "getFluidContainer")
+        local available = tonumber(call(entry.object, "getFluidAmount"))
+            or tonumber(call(entry.object, "getWaterAmount"))
+            or tonumber(call(sourceContainer, "getAmount"))
+        local requested = math.max(0, tonumber(liters) or 0)
+        amount = (available == nil or available < 0)
+            and requested or math.min(available, requested)
+        if amount <= 0 then return false, "INSUFFICIENT_WATER" end
+        if available ~= nil and available >= 0 then
+            remaining = math.max(0, available - amount)
+            if type(entry.object.moveFluidToTemporaryContainer) == "function"
+            then
+                local temporary = call(entry.object,
+                    "moveFluidToTemporaryContainer", amount)
+                if not temporary then
+                    return false, "WATER_FAUCET_NOT_MUTABLE"
+                end
+                if FluidContainer and FluidContainer.DisposeContainer then
+                    pcall(FluidContainer.DisposeContainer, temporary)
+                end
+            elseif sourceContainer
+                and type(sourceContainer.adjustAmount) == "function"
+            then
+                pcall(sourceContainer.adjustAmount, sourceContainer, remaining)
+            elseif type(entry.object.setWaterAmount) == "function" then
+                pcall(entry.object.setWaterAmount, entry.object, remaining)
+            elseif type(entry.object.useWater) == "function" then
+                pcall(entry.object.useWater, entry.object, amount)
+            else
+                return false, "WATER_FAUCET_NOT_MUTABLE"
+            end
+        else
+            remaining = available
+        end
+    else
+        local container = call(entry.item, "getFluidContainer")
+        local available = tonumber(call(container, "getAmount")) or 0
+        amount = math.max(0, math.min(available, tonumber(liters) or 0))
+        remaining = available - amount
+        local adjusted = call(container, "adjustAmount", remaining)
+        if adjusted == nil and type(container.adjustAmount) ~= "function" then
+            return false, "WATER_CONTAINER_NOT_MUTABLE"
+        end
+        if type(entry.item.syncItemFields) == "function" then
+            pcall(entry.item.syncItemFields, entry.item)
+        end
+        if sendItemStats then pcall(sendItemStats, entry.item) end
+    end
     if amount <= 0 then return false, "INSUFFICIENT_WATER" end
-    local adjusted = call(container, "adjustAmount", available - amount)
-    if adjusted == nil and type(container.adjustAmount) ~= "function" then
-        return false, "WATER_CONTAINER_NOT_MUTABLE"
-    end
-    if type(entry.item.syncItemFields) == "function" then
-        pcall(entry.item.syncItemFields, entry.item)
-    end
-    if sendItemStats then pcall(sendItemStats, entry.item) end
     if Locator.Invalidate then
         Locator.Invalidate("nearby_water:" .. tostring(record.id))
     end
-    return true, amount, available - amount
+    return true, amount, remaining
 end
 
 Service.RADIUS = RADIUS

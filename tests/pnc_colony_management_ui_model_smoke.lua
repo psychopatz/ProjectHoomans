@@ -1,13 +1,9 @@
-local LUA_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
-package.path = LUA_ROOT .. "client/?.lua;" .. package.path
-package.path = LUA_ROOT .. "shared/?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
+T.addPackagePaths({
+    { "ProjectHoomans", "client" },
+    { "ProjectHoomans", "shared" },
+})
 
 PNC = {
     NeedsDefinitions = {
@@ -59,35 +55,44 @@ local snapshot = {
 }
 
 local roster = Presentation.BuildRoster(snapshot)
-equal(#roster, 1, "roster row count")
-equal(roster[1].id, "npc_1", "roster preserves selection identity")
-equal(roster[1].worstLevel, "CRITICAL", "worst need badge")
+T.equal(#roster, 1, "roster row count")
+T.equal(roster[1].id, "npc_1", "roster preserves selection identity")
+T.equal(roster[1].worstLevel, "CRITICAL", "worst need badge")
+
+local selectedRoster = {
+    getItem = function() return { item = roster[1] } end,
+}
+local Shared = require(
+    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+)
+T.equal(Shared.ListValue(selectedRoster), snapshot.people[1],
+    "roster selection unwraps the colonist snapshot")
 
 local overview = Presentation.BuildOverview(snapshot)
-equal(#overview, 4, "overview always produces visible rows")
-equal(overview[1].label, "STATUS", "overview status row")
+T.equal(#overview, 4, "overview always produces visible rows")
+T.equal(overview[1].label, "STATUS", "overview status row")
 
 local people = Presentation.BuildPeople(roster[1])
-equal(#people, 12, "people tab includes nutrition and journal rows")
-equal(people[1].label, "Morgan", "selected person details")
-equal(people[5].meter, true, "people needs use meters")
-equal(people[10].label, "COLONIST JOURNAL", "journal section is visible")
-equal(people[11].label, "Reached Axe level 3", "newest journal entry first")
-equal(people[12].label, "Ate Apple (+20% hunger)",
+T.equal(#people, 12, "people tab includes nutrition and journal rows")
+T.equal(people[1].label, "Morgan", "selected person details")
+T.equal(people[5].meter, true, "people needs use meters")
+T.equal(people[10].label, "COLONIST JOURNAL", "journal section is visible")
+T.equal(people[11].label, "Reached Axe level 3", "newest journal entry first")
+T.equal(people[12].label, "Ate Apple (+20% hunger)",
     "journal resolves item names on the client")
 local emptyJournal = Presentation.BuildPeople({
     value = {
         id = "npc_2", name = "Taylor", needs = {}, journal = {},
     },
 })
-equal(emptyJournal[10].detail, "0 entries", "empty journal count")
-equal(emptyJournal[11].label, "No recorded history yet",
+T.equal(emptyJournal[10].detail, "0 entries", "empty journal count")
+T.equal(emptyJournal[11].label, "No recorded history yet",
     "empty journal remains visible")
 
 local needs = Presentation.BuildNeeds(roster[1])
-equal(#needs, 10, "needs, nutrition, and condition meter rows")
-equal(needs[2].needType, "hunger", "hunger meter binding")
-equal(needs[10].key, "morale", "morale meter binding")
+T.equal(#needs, 10, "needs, nutrition, and condition meter rows")
+T.equal(needs[2].needType, "hunger", "hunger meter binding")
+T.equal(needs[10].key, "morale", "morale meter binding")
 
 ISPanel = {
     derive = function(self)
@@ -129,10 +134,27 @@ debugPerson.provision = { evaluations = {
     hydration = { onHand = 0.7, target = 0.7, refilling = false },
 } }
 local debugRows = DebugTab.BuildRows(debugPerson, {})
-equal(#debugRows, 8, "debug tab need, storage, and provision rows")
-equal(debugRows[1].meter, true, "debug tab reuses need meters")
-equal(debugRows[7].key, "debug_provision_food",
+T.equal(#debugRows, 8, "debug tab need, storage, and provision rows")
+T.equal(debugRows[1].meter, true, "debug tab reuses need meters")
+T.equal(debugRows[1].value, 0.12,
+    "debug hunger meter uses the selected colonist value")
+T.equal(debugRows[2].value, 0.95,
+    "debug thirst meter uses the selected colonist value")
+T.equal(debugRows[7].key, "debug_provision_food",
     "debug tab exposes food provision state")
+local requestedAction
+local requestedOptions
+PNC.Client = { RequestColonyAction = function(action, options)
+    requestedAction, requestedOptions = action, options
+    return true
+end }
+T.truthy(DebugTab.OnControl({ people = selectedRoster }, {
+    internal = "force_nearby_water",
+}), "nearby-water debug control submits an action")
+T.equal(requestedAction, "debug_need",
+    "nearby-water debug control uses the needs debug route")
+T.equal(requestedOptions.operation, "force_nearby_water",
+    "nearby-water debug operation reaches the server command")
 local bound = {
     items = { { stale = true } },
     yScroll = -900,
@@ -147,10 +169,10 @@ function bound:addItem(key, row)
     self.items[#self.items + 1] = { key = key, item = row }
 end
 Components.SetRows(bound, overview)
-equal(#bound.items, 4, "detail rows are bound to the list")
-equal(bound.yScroll, 0, "stale detail scroll is reset")
-equal(bound.smoothScrollTargetY, nil, "stale smooth scroll is reset")
-equal(bound.items[1].item.label, "STATUS", "bound row remains visible")
+T.equal(#bound.items, 4, "detail rows are bound to the list")
+T.equal(bound.yScroll, 0, "stale detail scroll is reset")
+T.equal(bound.smoothScrollTargetY, nil, "stale smooth scroll is reset")
+T.equal(bound.items[1].item.label, "STATUS", "bound row remains visible")
 
 local scrollbar = { x = -13, y = 0, width = 13, height = 1 }
 function scrollbar:getWidth() return self.width end
@@ -161,7 +183,7 @@ local resizedList = { width = 420, height = 600, vscroll = scrollbar }
 function resizedList:getWidth() return self.width end
 function resizedList:getHeight() return self.height end
 Components.LayoutScrollbar(resizedList)
-equal(scrollbar.x, 407, "scrollbar follows resized container edge")
-equal(scrollbar.height, 600, "scrollbar follows resized container height")
+T.equal(scrollbar.x, 407, "scrollbar follows resized container edge")
+T.equal(scrollbar.height, 600, "scrollbar follows resized container height")
 
-print("pnc_colony_management_ui_model_smoke: ok")
+T.finish("pnc_colony_management_ui_model_smoke")

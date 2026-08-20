@@ -101,7 +101,11 @@ end
 
 function Shared.ListValue(list)
     local entry = list and list.getItem and list:getItem() or nil
-    return entry and entry.item or nil
+    local row = entry and entry.item or nil
+    -- Roster rows keep presentation metadata on the row and the authoritative
+    -- colonist snapshot in value. Detail tabs must receive the snapshot; using
+    -- the wrapper silently turns every missing need into zero.
+    return row and (row.value or row) or nil
 end
 
 function Shared.NeedLevel(needType, value)
