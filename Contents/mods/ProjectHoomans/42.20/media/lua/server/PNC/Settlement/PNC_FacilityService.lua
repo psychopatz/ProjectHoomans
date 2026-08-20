@@ -364,6 +364,12 @@ function Service.SetComponent(player, args)
     input.id = tostring(input.id or PNC.Core.GenerateID("component"))
     local check = Validation.NormalizeComponent(base, facility, input)
     if not check.ok then return check end
+    if not Definitions.RequiresComponentConstruction(
+        facility.definitionId, facility.level, check.details.component.role,
+        check.details.component.kind)
+    then
+        return applyComponent(base, facility, check.details.component)
+    end
     if not PNC.ConstructionService
         or not PNC.ConstructionService.QueueReconstruct
     then return { ok = false,
@@ -405,7 +411,7 @@ function Service.ReplaceAnchorRole(player, args)
     local old = {}
     for componentId, present in pairs(facility.componentIds or {}) do
         local component = present == true and Repository.GetComponent(componentId)
-    if component and component.role == role then
+        if component and component.role == role then
             old[#old + 1] = component
         end
     end
@@ -426,7 +432,9 @@ function Service.ReplaceAnchorRole(player, args)
     if failure then
         return failure
     end
-    if PNC.ConstructionService
+    local requiresConstruction = Definitions.RequiresComponentConstruction(
+        facility.definitionId, facility.level, role, "anchor")
+    if requiresConstruction and PNC.ConstructionService
         and PNC.ConstructionService.QueueReconstruct
     then
         local order, reason = PNC.ConstructionService.QueueReconstruct(
@@ -536,6 +544,11 @@ function Service.RemoveComponent(player, args)
         reason = "CONSTRUCTION_SERVICE_UNAVAILABLE" } end
     local costs = Definitions.GetComponentCosts(
         facility.definitionId, facility.level, component.role)
+    if not Definitions.RequiresComponentConstruction(
+        facility.definitionId, facility.level, component.role, component.kind)
+    then
+        return removeComponent(base, facility, component)
+    end
     local refundPercent = PNC.Sandbox
         and PNC.Sandbox.ComponentDeconstructionRefundPercent
         and PNC.Sandbox.ComponentDeconstructionRefundPercent() or 50

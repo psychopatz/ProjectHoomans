@@ -13,32 +13,37 @@ Actions.AreaRole = Facility.AreaRole
 
 function Actions.HandleComponent(window, action, facility)
     if not facility or type(action) ~= "table" then return false end
+    if action.kind == "resume_work" and action.workOrderId then
+        PNC.Client.RequestColonyAction("work_resume", {
+            workOrderId = action.workOrderId,
+        })
+        Support.ApplyLocalResult(window)
+        return true
+    end
+    if action.remove == true and action.componentId then
+        PNC.Client.RequestRemoveFacilityComponent({
+            facilityId = facility.id,
+            expectedRevision = facility.revision,
+            componentId = action.componentId,
+        })
+        Support.ApplyLocalResult(window)
+        return true
+    end
     if action.kind == "region" then
         return Facility.BeginArea(window, facility, action.role,
             action.componentId)
     end
     if action.kind == "anchor" then
-        if action.groupEdit == true then
-            return Facility.BeginAnchorGroup(window, facility, action.role)
-        end
         Facility.BeginPoint(window, "facility_anchor", facility,
             action.role, action.componentId)
         return true
     end
     if action.kind == "abstract" then
-        if action.remove == true and action.componentId then
-            PNC.Client.RequestRemoveFacilityComponent({
-                facilityId = facility.id,
-                expectedRevision = facility.revision,
-                componentId = action.componentId,
-            })
-        else
-            PNC.Client.RequestSetFacilityComponent({
-                facilityId = facility.id,
-                expectedRevision = facility.revision,
-                component = { kind = "abstract", role = action.role },
-            })
-        end
+        PNC.Client.RequestSetFacilityComponent({
+            facilityId = facility.id,
+            expectedRevision = facility.revision,
+            component = { kind = "abstract", role = action.role },
+        })
         Support.ApplyLocalResult(window)
         return true
     end

@@ -201,4 +201,70 @@ Scenes.Register("facility.farm.work", {
     end,
 })
 
+Scenes.Register("facility.living.sit", {
+    label = "Sit in Living Room",
+    description = "A relaxed sitting sequence for idle companions.",
+    category = "facility",
+    priority = 20,
+    repeatMode = "loop",
+    blocking = true,
+    stepGapMs = 250,
+    sequenceMode = "shuffle",
+    steps = {
+        { id = "sit", bump = "Sit", durationMs = 4200 },
+        { id = "sit_action", bump = "SitAction", durationMs = 3600 },
+        { id = "sit_making", bump = "SitMaking", durationMs = 3600 },
+        { id = "sit_rub_hands", bump = "SitRubHands", durationMs = 3600 },
+    },
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = function(record, zombie, scene, now)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneTick then
+            return jobs.OnSceneTick(record, zombie, scene, now)
+        end
+        return true
+    end,
+    onStop = function(record, zombie, scene, reason)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneStopped then
+            jobs.OnSceneStopped(record, zombie, scene, reason)
+        end
+    end,
+})
+
+Scenes.Register("facility.water.drink", {
+    label = "Drink from Spigot",
+    description = "Drink clean water from the colony spigot.",
+    category = "facility",
+    priority = 60,
+    repeatMode = "once",
+    blocking = true,
+    bump = "Drink",
+    durationMs = 3600,
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = function(record, zombie, scene, now)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneTick then
+            return jobs.OnSceneTick(record, zombie, scene, now)
+        end
+        return true
+    end,
+    onStop = function(record, zombie, scene, reason)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneStopped then
+            jobs.OnSceneStopped(record, zombie, scene, reason)
+        end
+    end,
+})
+
 return Scenes

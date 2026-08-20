@@ -526,6 +526,10 @@ function Management.HandleAction(player, args)
             args.workOrderId,
             args.paused ~= false)
         reason = ok and "PAUSED" or details
+    elseif action == "work_resume" then
+        ok, details = PNC.WorkService.Commands.ResumeForPlayer(player,
+            args.workOrderId)
+        reason = ok and "RESUMED" or details
     elseif action == "work_priority" then
         ok, details = PNC.WorkService.Commands.SetPriorityForPlayer(player,
             args.workOrderId, args.priority)

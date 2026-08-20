@@ -449,6 +449,14 @@ clock = clock + 1001
 Work.Tick(clock)
 equal(Work.Queries.Get(nextHomeTask.id).workerId, "backup",
     "At Home colonist cycles into another queued task")
+local resumed, resumedOrder = Work.Commands.Resume(nextHomeTask.id)
+truthy(resumed, "interrupted construction can be resumed")
+equal(resumedOrder.status, "WAITING_FOR_WORKER",
+    "resume returns the durable order to the scheduler")
+equal(resumedOrder.blockedReason, nil,
+    "resume clears the stale blocked reason")
+equal(PNC.Registry.Data.backup.runtime.workOrderId, nil,
+    "resume releases the old worker claim safely")
 truthy(Work.Commands.Cancel(nextHomeTask.id), "cancel second cycled task")
 
 print("pnc_production_lifecycle_smoke: OK")

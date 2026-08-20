@@ -6,6 +6,15 @@ PNC.ConstructionService = PNC.ConstructionService or {}
 
 local Service = PNC.ConstructionService
 
+local function componentBuildWork(facility, role)
+    local definitions = PNC.FacilityDefinitions
+    if definitions and definitions.GetComponentBuildWork then
+        return definitions.GetComponentBuildWork(
+            facility.definitionId, facility.level, role)
+    end
+    return 40
+end
+
 local function componentRequirements(facility, component, count)
     local definitions = PNC.FacilityDefinitions
     local costs = definitions and definitions.GetComponentCosts
@@ -162,12 +171,19 @@ function Service.QueueReconstruct(player, facility, change)
             requirements = requirements }, context.storage.id,
             reservation.id, "component_construction")
     end
+    local requiredWork = definition and definition.reconstructWork or 60
+    if change.action == "set" then
+        requiredWork = componentBuildWork(facility,
+            change.component and change.component.role)
+    elseif change.action == "replace_role" then
+        requiredWork = componentBuildWork(facility, change.role)
+            * math.max(1, #(change.anchors or {}))
+    end
     local order
     order, reason = PNC.WorkService.Commands.Queue({ operation = "RECONSTRUCT",
         colonyId = context.colony.id, factionId = context.faction.id,
         baseId = context.base.id,
-        requiredWork = math.max(1, tonumber(definition and
-            definition.reconstructWork) or 60),
+        requiredWork = math.max(1, tonumber(requiredWork) or 60),
         requiredSkills = definition and definition.buildSkills or {},
         payload = payload })
     if not order then
@@ -185,6 +201,34 @@ end
 local function target(order)
     local facility = PNC.SettlementRepository.GetFacility(
         order.payload and order.payload.facilityId)
+    local change = order.payload and order.payload.change or {}
+    local component = change.action == "remove"
+        and PNC.SettlementRepository.GetComponent(change.componentId)
+        or change.component
+    if change.action == "replace_role" then
+        local anchor = change.anchors and change.anchors[1]
+        component = anchor and { kind = "anchor", role = change.role,
+            x = anchor.x, y = anchor.y, z = anchor.z } or nil
+    end
+    if component and component.kind == "anchor"
+        and component.x ~= nil and component.y ~= nil
+    then
+        return { ok = true, componentId = component.id
+                or "construction:" .. tostring(facility and facility.id),
+            facilityId = facility and facility.id, target = {
+                x = component.x, y = component.y, z = component.z,
+                componentId = component.id, role = component.role,
+            } }
+    elseif component and component.kind == "region" and component.region then
+        local point = pointFromRegion(component.region)
+        if point then
+            return { ok = true, componentId = component.id
+                    or "construction:" .. tostring(facility and facility.id),
+                facilityId = facility and facility.id,
+                target = { x = point.x, y = point.y, z = point.z,
+                    componentId = component.id, role = component.role } }
+        end
+    end
     local point, reason = PNC.FacilityService.ResolveWorkTarget(facility)
     if not point then return { ok = false, reason = reason } end
     return { ok = true, componentId = "construction:" .. facility.id,

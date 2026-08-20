@@ -39,4 +39,24 @@ Definitions.Register("farm.work", {
     activityLabel = "FARMING",
 })
 
+Definitions.Register("living", {
+    activeJob = "LivingRoom",
+    sceneId = "facility.living.sit",
+    role = "living.chair",
+    arrivalDistance = 0.85,
+    activityLabel = "SITTING",
+})
+
+Definitions.Register("water.drink", {
+    activeJob = "Drink",
+    sceneId = "facility.water.drink",
+    role = "water.spigot",
+    arrivalDistance = 0.85,
+    activityLabel = "DRINKING",
+    consumeWater = true,
+    waterLiters = 1,
+    thirstRelief = 0.50,
+    effectDelayMs = 1800,
+})
+
 return Definitions

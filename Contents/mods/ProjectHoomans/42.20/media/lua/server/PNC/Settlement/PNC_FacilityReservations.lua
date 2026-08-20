@@ -120,7 +120,10 @@ function Reservations.ReleaseNPC(npcId, reason)
 end
 
 local function componentForCapability(facility, capability)
-    local preferredRole = capability == "sleep" and "sleep.bed" or capability
+    local preferredRole = capability == "sleep" and "sleep.bed"
+        or capability == "living" and "living.chair"
+        or capability == "water.drink" and "water.spigot"
+        or capability
     local fallback
     for componentId, _ in pairs(facility.componentIds or {}) do
         local component = PNC.SettlementRepository.GetComponent(componentId)

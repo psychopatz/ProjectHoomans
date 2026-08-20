@@ -9,7 +9,7 @@ for path in listing:lines() do
     serverOnlyFiles[#serverOnlyFiles + 1] = path
 end
 listing:close()
-assert(#serverOnlyFiles == 159,
+assert(#serverOnlyFiles == 161,
     "server Lua inventory changed without updating the MP loader gate")
 
 isClient = function() return true end

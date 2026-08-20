@@ -226,6 +226,9 @@ function Server.OnTick()
     if PNC.NeedsScheduler and PNC.NeedsScheduler.Pump then
         PNC.NeedsScheduler.Pump(now)
     end
+    if PNC.LivingRoomService and PNC.LivingRoomService.Pump then
+        PNC.LivingRoomService.Pump(now)
+    end
     if PNC.ProvisionScheduler and PNC.ProvisionScheduler.Pump then
         PNC.ProvisionScheduler.Pump(now)
     end

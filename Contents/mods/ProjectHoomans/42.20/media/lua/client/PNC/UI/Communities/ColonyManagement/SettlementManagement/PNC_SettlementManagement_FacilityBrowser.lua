@@ -2,6 +2,7 @@ require "PsychopatzCore/UI/PsychopatzUI"
 
 local Components = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+local ComponentRows = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityComponentRows"
 
 local Browser = {}
 local UI = PsychopatzCore.UI
@@ -10,6 +11,9 @@ local TextLayout = UI.Layout
 local ACTION_WIDTH = 92
 local ACTION_HEIGHT = 27
 local ACTION_RIGHT = 20
+local SECONDARY_ACTION_WIDTH = 112
+local RESUME_ACTION_WIDTH = 98
+local ACTION_GAP = 6
 
 local STATE_COLORS = {
     OPERATIONAL = "success",
@@ -86,8 +90,16 @@ local function drawComponent(list, y, entry, alternate)
         end
     end
     local indent = row.child and 42 or 46
-    local actionWidth = row.componentAction
-        and ACTION_WIDTH + ACTION_RIGHT + 4 or 0
+    local actionWidth = (row.componentAction and ACTION_WIDTH or 0)
+        + (row.secondaryAction and SECONDARY_ACTION_WIDTH or 0)
+        + (row.resumeAction and RESUME_ACTION_WIDTH or 0)
+        + (row.componentAction and row.secondaryAction and ACTION_GAP or 0)
+        + ((row.resumeAction and (row.componentAction or row.secondaryAction))
+            and ACTION_GAP or 0)
+        + ((row.componentAction or row.secondaryAction)
+            and ACTION_RIGHT + 4 or 0)
+        + (row.resumeAction and not (row.componentAction or row.secondaryAction)
+            and ACTION_RIGHT + 4 or 0)
     if not row.child then
         list:drawRect(8, y + 9, 3, list.itemheight - 18,
             color.a, color.r, color.g, color.b)
@@ -104,8 +116,38 @@ local function drawComponent(list, y, entry, alternate)
         row.child and Theme.colors.accent.g or color.g,
         row.child and Theme.colors.accent.b or color.b,
         1, UIFont.Small)
+    local right = list:getWidth() - ACTION_RIGHT
+    if row.resumeAction then
+        local buttonX = right - RESUME_ACTION_WIDTH
+        local buttonY = y + math.floor((list.itemheight - ACTION_HEIGHT) / 2)
+        local accent = Theme.colors.success
+        list:drawRect(buttonX, buttonY, RESUME_ACTION_WIDTH, ACTION_HEIGHT,
+            0.72, 0.04, 0.08, 0.10)
+        list:drawRectBorder(buttonX, buttonY, RESUME_ACTION_WIDTH,
+            ACTION_HEIGHT, 0.95, accent.r, accent.g, accent.b)
+        list:drawTextCentre(row.resumeActionLabel or "RESUME",
+            buttonX + RESUME_ACTION_WIDTH / 2, buttonY + 6,
+            accent.r, accent.g, accent.b, 1, UIFont.Small)
+        right = buttonX - ((row.componentAction or row.secondaryAction)
+            and ACTION_GAP or 0)
+    end
+    if row.secondaryAction then
+        local buttonX = right - SECONDARY_ACTION_WIDTH
+        local accent = Theme.colors.danger
+        list:drawRect(buttonX, y + math.floor((list.itemheight - ACTION_HEIGHT) / 2),
+            SECONDARY_ACTION_WIDTH, ACTION_HEIGHT, 0.72, 0.04, 0.08, 0.10)
+        list:drawRectBorder(buttonX,
+            y + math.floor((list.itemheight - ACTION_HEIGHT) / 2),
+            SECONDARY_ACTION_WIDTH, ACTION_HEIGHT, 0.95,
+            accent.r, accent.g, accent.b)
+        list:drawTextCentre(row.secondaryActionLabel or "DECONSTRUCT",
+            buttonX + SECONDARY_ACTION_WIDTH / 2,
+            y + math.floor((list.itemheight - ACTION_HEIGHT) / 2) + 6,
+            accent.r, accent.g, accent.b, 1, UIFont.Small)
+        right = buttonX - (row.componentAction and ACTION_GAP or 0)
+    end
     if row.componentAction then
-        local buttonX = list:getWidth() - ACTION_WIDTH - ACTION_RIGHT
+        local buttonX = right - ACTION_WIDTH
         local buttonY = y + math.floor((list.itemheight - ACTION_HEIGHT) / 2)
         local accent = Theme.colors.accent
         list:drawRect(buttonX, buttonY, ACTION_WIDTH, ACTION_HEIGHT,
@@ -119,116 +161,7 @@ local function drawComponent(list, y, entry, alternate)
     return y + list.itemheight
 end
 
-local function roleLabel(role)
-    local labels = {
-        ["sleep.area"] = "SLEEPING AREA",
-        ["sleep.bed"] = "SLEEP SPOTS",
-        ["farm.field"] = "CULTIVATED FIELDS",
-        ["work.research"] = "RESEARCH STATION",
-        ["work.blueprint"] = "ARCHITECT BENCH",
-        ["work.reverse"] = "LAB",
-        ["work.craft"] = "CRAFT STATION",
-        ["work.disassemble"] = "DISASSEMBLY STATION",
-        ["water.spigot"] = "SPIGOT",
-        ["water.tank"] = "WATER TANKS",
-        ["water.catcher"] = "RAIN CATCHERS",
-    }
-    return labels[role] or string.upper(string.gsub(role, "[%.]", " "))
-end
-
-local function componentIconPath(role)
-    local definitions = PNC and PNC.FacilityDefinitions or nil
-    return definitions and definitions.GetComponentIconPath
-        and definitions.GetComponentIconPath(role) or nil
-end
-
-local function componentDetail(component)
-    if component.kind == "anchor" then
-        return roleLabel(component.role) .. "  •  " .. tostring(component.x) .. ", "
-            .. tostring(component.y) .. "  FLOOR " .. tostring(component.z)
-    end
-    if component.kind == "abstract" then return "ABSTRACT UTILITY MODULE" end
-    return tostring(component.tileCount or 0) .. " TILES  •  ZONED AREA"
-end
-
-function Browser.BuildComponentRows(facility)
-    local rows = {}
-    local level = PNC.FacilityDefinitions.GetLevel(
-        facility.definitionId, facility.level)
-    local roles = {}
-    for role, _ in pairs(level and level.componentLimits or {}) do
-        roles[#roles + 1] = role
-    end
-    table.sort(roles)
-    for roleIndex = 1, #roles do
-        local role = roles[roleIndex]
-        local limit = level.componentLimits[role]
-        local assigned = {}
-        local pending = {}
-        for index = 1, #(facility.components or {}) do
-            local component = facility.components[index]
-            if component.role == role then assigned[#assigned + 1] = component end
-        end
-        for index = 1, #(facility.pendingComponents or {}) do
-            local component = facility.pendingComponents[index]
-            if component.role == role then pending[#pending + 1] = component end
-        end
-        local minimum = tonumber(limit.minCount) or 0
-        local maximum = tonumber(limit.maxCount) or math.max(1, minimum)
-        local groupEdit = role == "sleep.bed" and limit.kind == "anchor"
-        local componentAction = groupEdit and {
-            kind = limit.kind, role = role, groupEdit = true,
-        } or #assigned < maximum and {
-            kind = limit.kind, role = role,
-        } or nil
-        if #pending > 0 then componentAction = nil end
-        rows[#rows + 1] = {
-            key = role,
-            label = roleLabel(role),
-            iconPath = componentIconPath(role),
-            detail = tostring(#assigned) .. " / " .. tostring(maximum)
-                .. (#pending > 0 and "  BUILDING"
-                    or #assigned >= minimum and "  READY" or "  REQUIRED"),
-            complete = #assigned >= minimum and #pending == 0,
-            componentAction = componentAction,
-            actionLabel = groupEdit
-                and tr("UI_PNC_Facility_EditSpotsInline", "EDIT SPOTS")
-                or limit.kind == "abstract"
-                and tr("UI_PNC_Facility_BuildModule", "BUILD")
-                or tr("UI_PNC_Facility_AssignInline", "ASSIGN"),
-        }
-        for index = 1, groupEdit and 0 or #assigned do
-            rows[#rows + 1] = {
-                key = assigned[index].id,
-                label = "- " .. roleLabel(role) .. " #" .. tostring(index),
-                iconPath = componentIconPath(role),
-                detail = componentDetail(assigned[index]),
-                child = true,
-                complete = true,
-                componentAction = {
-                    kind = assigned[index].kind, role = role,
-                    componentId = assigned[index].id,
-                    remove = assigned[index].kind == "abstract",
-                },
-                actionLabel = assigned[index].kind == "abstract"
-                    and tr("UI_PNC_Facility_RemoveModule", "REMOVE")
-                    or tr("UI_PNC_Facility_EditInline", "EDIT"),
-            }
-        end
-        for index = 1, #pending do
-            rows[#rows + 1] = {
-                key = "pending:" .. tostring(pending[index].id or role),
-                label = "- " .. roleLabel(role) .. " #" .. tostring(index)
-                    .. " (QUEUED)",
-                iconPath = componentIconPath(role),
-                detail = componentDetail(pending[index]),
-                child = true,
-                complete = false,
-            }
-        end
-    end
-    return rows
-end
+Browser.BuildComponentRows = ComponentRows.Build
 
 function Browser.GetSelected(window)
     local list = window.baseFacilityList
@@ -262,6 +195,12 @@ function Browser.RebuildComponents(window)
                     .. "  •  " .. stateText(task.executionMode
                         or "EMULATED"),
                 complete = false,
+                resumeAction = (task.status == "BLOCKED"
+                    or task.status == "PAUSED"
+                    or task.status == "WAITING_FOR_WORKER") and {
+                        kind = "resume_work", workOrderId = task.id,
+                    } or nil,
+                resumeActionLabel = tr("UI_PNC_Work_Resume", "RESUME"),
             })
         end
         list:addItem("construction_locked", {
@@ -301,13 +240,37 @@ function Browser.Create(window)
         local rowIndex = list:rowAt(x, y)
         local entry = rowIndex > 0 and list.items[rowIndex] or nil
         local row = entry and entry.item or nil
-        if row and row.componentAction
-            and x >= list:getWidth() - ACTION_WIDTH - ACTION_RIGHT
-        then
-            if window.onBaseComponentAction then
-                window:onBaseComponentAction(row.componentAction)
+        if row then
+            local right = list:getWidth() - ACTION_RIGHT
+            if row.resumeAction then
+                local resumeX = right - RESUME_ACTION_WIDTH
+                if x >= resumeX and x <= right then
+                    if window.onBaseComponentAction then
+                        window:onBaseComponentAction(row.resumeAction)
+                    end
+                    return
+                end
+                right = resumeX - ((row.componentAction or row.secondaryAction)
+                    and ACTION_GAP or 0)
             end
-            return
+            if row.secondaryAction then
+                local secondaryX = right - SECONDARY_ACTION_WIDTH
+                if x >= secondaryX and x <= right then
+                    if window.onBaseComponentAction then
+                        window:onBaseComponentAction(row.secondaryAction)
+                    end
+                    return
+                end
+                right = secondaryX - (row.componentAction and ACTION_GAP or 0)
+            end
+            if row.componentAction and x >= right - ACTION_WIDTH
+                and x <= right
+            then
+                if window.onBaseComponentAction then
+                    window:onBaseComponentAction(row.componentAction)
+                end
+                return
+            end
         end
         ISScrollingListBox.onMouseDown(list, x, y)
     end

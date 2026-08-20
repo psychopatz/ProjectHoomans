@@ -101,6 +101,30 @@ function Jobs.OnSceneTick(record, zombie, scene, now)
     if runtime.taskLeaseId ~= "" and PNC.Tasking
         and PNC.Tasking.Commands and PNC.Tasking.Commands.SetPhase
     then PNC.Tasking.Commands.SetPhase(record.id, "WORKING") end
+    if definition.consumeWater and runtime.waterEffectApplied ~= true then
+        runtime.waterEffectStartedAt = runtime.waterEffectStartedAt
+            or (tonumber(now) or 0) + (tonumber(definition.effectDelayMs) or 0)
+        if (tonumber(now) or 0) >= runtime.waterEffectStartedAt then
+            local consumed, consumeReason = PNC.WaterUtilityService
+                and PNC.WaterUtilityService.Consume
+                and PNC.WaterUtilityService.Consume(runtime.facilityId,
+                    definition.waterLiters or 1)
+            if consumed ~= true then
+                runtime.failedReason = consumeReason or "INSUFFICIENT_WATER"
+                runtime.completionRequested = true
+            else
+                runtime.waterEffectApplied = true
+                if PNC.IndividualNeeds and PNC.IndividualNeeds.Commands
+                    and PNC.IndividualNeeds.Commands.ApplyDrink
+                then
+                    PNC.IndividualNeeds.Commands.ApplyDrink(record, {
+                        thirst = definition.thirstRelief or 0.50,
+                    }, "facility_spigot_drink")
+                end
+                runtime.completionRequested = true
+            end
+        end
+    end
     if definition.needType and PNC.IndividualNeeds and PNC.NeedsUtils then
         local worldNow = PNC.NeedsUtils.WorldAgeHours()
         local previous = tonumber(runtime.lastEffectWorldHour) or worldNow
@@ -142,6 +166,15 @@ function Jobs.OnSceneStopped(record, zombie, scene, reason)
     restorePosition(record, zombie, runtime)
     runtime.arrivalSettled = false
     if runtime.stopRequested == true then return end
+    if runtime.failedReason then
+        local leaseId = runtime.taskLeaseId
+        local failure = runtime.failedReason
+        finish(record, zombie, failure)
+        if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands then
+            PNC.Tasking.Commands.CancelForNPC(record.id, failure)
+        end
+        return
+    end
     if runtime.completionRequested == true or reason == "callback_complete" then
         local leaseId = runtime.taskLeaseId
         finish(record, zombie, "rested")

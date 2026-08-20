@@ -69,9 +69,21 @@ function Bridge.Evaluate(record, forceKind)
         if forceKind == "HYDRATION"
             or current >= Definitions.SUPPLY.thirst.trigger
         then
-            local ok = Bridge.RequestForNeed(
-                record, "thirst", forceKind == "HYDRATION"
-            )
+            -- A built, supplied spigot is the physical hydration route. Let
+            -- the Hydration task provider claim it before falling back to the
+            -- abstract inventory drink path.
+            local usesSpigot = PNC.HydrationTaskProvider
+                and PNC.HydrationTaskProvider.HasSpigot
+                and PNC.HydrationTaskProvider.HasSpigot(record)
+            local ok
+            if usesSpigot then
+                PNC.Tasking.Commands.MarkDirty(record.id, "THIRST_TRIGGER")
+                ok = true
+            else
+                ok = Bridge.RequestForNeed(
+                    record, "thirst", forceKind == "HYDRATION"
+                )
+            end
             changed = ok or changed
         end
     end

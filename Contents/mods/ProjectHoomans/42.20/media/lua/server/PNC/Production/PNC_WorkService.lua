@@ -443,6 +443,23 @@ function Service.Commands.Pause(orderId, paused)
     return true, copy(order)
 end
 
+-- Releasing a worker is deliberately different from cancelling an order: the
+-- order, progress, reservations, and any staged inputs remain durable. Resume
+-- uses the same claim release path, then lets the normal scheduler acquire a
+-- worker again once they are home.
+function Service.Commands.Resume(orderId)
+    local order = Repository.Get(orderId)
+    if not order or terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
+    if order.workerId or order.stationId or order.facilityReservationId then
+        releaseClaim(order, "resumed")
+    end
+    order.status = Status.WAITING_FOR_WORKER
+    order.blockedReason = nil
+    order.updatedAt, order.revision = now(), order.revision + 1
+    Repository.MarkDirty()
+    return true, copy(order)
+end
+
 function Service.Commands.SetPriority(orderId, priority)
     local order = Repository.Get(orderId)
     if not order or terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
@@ -473,6 +490,12 @@ function Service.Commands.PauseForPlayer(player, orderId, paused)
     local order, denied = authorizedOrder(player, orderId)
     if not order then return false, denied end
     return Service.Commands.Pause(order.id, paused)
+end
+
+function Service.Commands.ResumeForPlayer(player, orderId)
+    local order, denied = authorizedOrder(player, orderId)
+    if not order then return false, denied end
+    return Service.Commands.Resume(order.id)
 end
 
 

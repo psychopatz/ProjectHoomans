@@ -137,6 +137,7 @@ function Validation.NormalizeComponent(base, facility, input)
         targetResolver = input.targetResolver and tostring(input.targetResolver) or nil,
         objectTag = input.objectTag and tostring(input.objectTag) or nil,
         worldRule = limit.worldRule and tostring(limit.worldRule) or nil,
+        roomGroup = limit.roomGroup and tostring(limit.roomGroup) or nil,
     }
     if input.kind == "anchor" and component.role == "sleep.bed" then
         component.targetResolver = "sleepSpot"
@@ -204,7 +205,7 @@ function Validation.NormalizeComponent(base, facility, input)
     if limit.minTotalTiles and tiles[input.role] < limit.minTotalTiles then
         return result(false, "FACILITY_AREA_TOO_SMALL")
     end
-    if limit.overlap == "exclusive" and component.region then
+    if component.region then
         for componentId, other in pairs(Repository.State.components) do
             if componentId ~= input.id and other.region
                 and GridRegion.intersects(component.region, other.region)
@@ -212,8 +213,13 @@ function Validation.NormalizeComponent(base, facility, input)
                 local otherFacility = Repository.GetFacility(other.facilityId)
                 local otherLevel = otherFacility and levelDefinition(otherFacility)
                 local otherLimit = otherLevel and otherLevel.componentLimits[other.role]
-                if otherLimit and otherLimit.overlap == "exclusive" then
-                    return result(false, "OVERLAP_NOT_ALLOWED")
+                local exclusive = limit.overlap == "exclusive"
+                    and otherLimit and otherLimit.overlap == "exclusive"
+                local roomCollision = component.roomGroup ~= nil
+                    and otherLimit and otherLimit.roomGroup ~= nil
+                if exclusive or roomCollision then
+                    return result(false, roomCollision
+                        and "ROOM_COLLISION" or "OVERLAP_NOT_ALLOWED")
                 end
             end
         end

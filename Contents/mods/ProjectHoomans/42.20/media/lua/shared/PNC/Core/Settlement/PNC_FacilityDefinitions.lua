@@ -2,28 +2,16 @@ PNC = PNC or {}
 PNC.FacilityDefinitions = PNC.FacilityDefinitions or {}
 
 local Definitions = PNC.FacilityDefinitions
+local Policy = PNC.FacilityComponentPolicy
+    or require "PNC/Core/Settlement/PNC_FacilityComponentPolicy"
 Definitions.SCHEMA_VERSION = 1
 Definitions.ByID = Definitions.ByID or {}
-
-local DEFAULT_COMPONENT_COSTS = {
-    { fullType = "Base.Money", amount = 1 },
-}
-
-local function copyCosts(costs)
-    local output = {}
-    for _, cost in ipairs(costs or {}) do
-        output[#output + 1] = {
-            fullType = tostring(cost.fullType or "Base.Money"),
-            amount = math.max(1, math.floor(
-                tonumber(cost.amount or cost.quantity) or 1)),
-        }
-    end
-    return output
-end
 
 Definitions.ComponentIconPaths = Definitions.ComponentIconPaths or {
     ["sleep.area"] = "media/ui/Facilities/Components/chair.png",
     ["sleep.bed"] = "media/ui/Facilities/Components/bed/barracks.png",
+    ["living.room"] = "media/ui/Facilities/Components/chair.png",
+    ["living.chair"] = "media/ui/Facilities/Components/chair.png",
     ["farm.field"] = "media/ui/Facilities/Components/default.png",
     ["work.research"] =
         "media/ui/Facilities/Components/research_station/research_station.png",
@@ -68,21 +56,19 @@ end
 function Definitions.GetComponentCosts(id, level, role)
     local definition = Definitions.Get(id)
     local levelData = Definitions.GetLevel(id, level)
-    local costs = levelData and levelData.componentCosts
-        and levelData.componentCosts[tostring(role or "")] or nil
-    costs = costs or definition and definition.componentCosts
-        and definition.componentCosts[tostring(role or "")] or nil
-    return copyCosts(costs or DEFAULT_COMPONENT_COSTS)
+    return Policy.GetCosts(definition, levelData, role)
 end
 
 function Definitions.GetComponentBuildWork(id, level, role)
     local definition = Definitions.Get(id)
     local levelData = Definitions.GetLevel(id, level)
-    local work = levelData and levelData.componentWork
-        and levelData.componentWork[tostring(role or "")] or nil
-    work = work or definition and definition.componentWork
-        and definition.componentWork[tostring(role or "")] or nil
-    return math.max(1, tonumber(work) or 40)
+    return Policy.GetBuildWork(definition, levelData, role)
+end
+
+function Definitions.RequiresComponentConstruction(id, level, role, kind)
+    local definition = Definitions.Get(id)
+    local levelData = Definitions.GetLevel(id, level)
+    return Policy.RequiresConstruction(definition, levelData, role, kind)
 end
 
 function Definitions.GetComponentLimit(id, level, role)
@@ -109,12 +95,14 @@ Definitions.Register({
     reconstructWork = 50,
     deconstructWork = 50,
     allowMultipleRegions = true,
+    componentCosts = {
+        ["sleep.bed"] = {{ fullType = "Base.Money", amount = 1 }},
+    },
     levels = {
         [1] = {
             requiredHQLevel = 1,
             capabilities = { "sleep", "rest" },
             componentLimits = {
-                ["sleep.area"] = { kind = "region", minCount = 1 },
                 ["sleep.bed"] = { kind = "anchor", minCount = 1, maxCount = 4,
                     fixedTileCount = 2, usesWorldObjectFootprint = true },
             },
@@ -124,7 +112,6 @@ Definitions.Register({
             requiredHQLevel = 2,
             capabilities = { "sleep", "rest" },
             componentLimits = {
-                ["sleep.area"] = { kind = "region", minCount = 1 },
                 ["sleep.bed"] = { kind = "anchor", minCount = 1, maxCount = 8,
                     fixedTileCount = 2, usesWorldObjectFootprint = true },
             },
@@ -134,7 +121,6 @@ Definitions.Register({
             requiredHQLevel = 3,
             capabilities = { "sleep", "rest" },
             componentLimits = {
-                ["sleep.area"] = { kind = "region", minCount = 1 },
                 ["sleep.bed"] = { kind = "anchor", minCount = 1, maxCount = 14,
                     fixedTileCount = 2, usesWorldObjectFootprint = true },
             },
@@ -154,6 +140,7 @@ Definitions.Register({
     reconstructWork = 65,
     deconstructWork = 60,
     allowMultipleRegions = false,
+    componentConstruction = { ["farm.field"] = false },
     levels = {
         [1] = {
             requiredHQLevel = 1,
@@ -174,6 +161,38 @@ Definitions.Register({
                     worldRule = "farmland" },
             },
             activityLimits = { ["farm.work"] = { maxConcurrent = 4 } },
+        },
+    },
+})
+
+Definitions.Register({
+    id = "living_room",
+    category = "housing",
+    displayNameKey = "UI_PNC_Facility_LivingRoom",
+    descriptionKey = "UI_PNC_Facility_LivingRoomDescription",
+    iconPath = "media/ui/Facilities/BuildingMenu/livingRoom.png",
+    buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+    componentCosts = {
+        ["living.room"] = {{ fullType = "Base.Money", amount = 1 }},
+        ["living.chair"] = {{ fullType = "Base.Money", amount = 1 }},
+    },
+    componentWork = { ["living.room"] = 40, ["living.chair"] = 40 },
+    buildWork = 100,
+    reconstructWork = 65,
+    deconstructWork = 60,
+    allowMultipleRegions = false,
+    levels = {
+        [1] = {
+            requiredHQLevel = 1,
+            capabilities = { "living" },
+            componentLimits = {
+                ["living.room"] = { kind = "region", minCount = 1,
+                    maxCount = 1, minTotalTiles = 1, maxTotalTiles = 1000,
+                    roomGroup = "living" },
+                ["living.chair"] = { kind = "anchor", minCount = 1,
+                    maxCount = 8, roomGroup = "living" },
+            },
+            activityLimits = { living = { maxConcurrent = 8 } },
         },
     },
 })
@@ -259,7 +278,7 @@ for level = 1, 10 do
     waterLevels[level] = {
         requiredHQLevel = math.min(3, math.ceil(level / 4)),
         requiredTechnology = "utility:water_collector:" .. tostring(level),
-        capabilities = { "utility.water" },
+        capabilities = { "utility.water", "water.drink" },
         componentLimits = {
             ["water.spigot"] = { kind = "anchor", minCount = 1,
                 maxCount = 1 },
@@ -268,7 +287,10 @@ for level = 1, 10 do
             ["water.catcher"] = { kind = "abstract", minCount = 0,
                 maxCount = level * 4 },
         },
-        activityLimits = { ["utility.water"] = { maxConcurrent = 1 } },
+        activityLimits = {
+            ["utility.water"] = { maxConcurrent = 1 },
+            ["water.drink"] = { maxConcurrent = 1 },
+        },
     }
 end
 

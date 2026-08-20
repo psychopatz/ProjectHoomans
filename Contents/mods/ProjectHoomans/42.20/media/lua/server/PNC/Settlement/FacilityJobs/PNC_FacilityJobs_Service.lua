@@ -107,7 +107,8 @@ function Jobs.Start(record, facilityOrId, capability, options)
 end
 
 function Jobs.StartForFacility(record, facilityId, options)
-    local facility = Repository.GetFacility(facilityId)
+    local facility = type(facilityId) == "table" and facilityId
+        or Repository.GetFacility(facilityId)
     return Jobs.Start(record, facility, definitionCapability(facility), options)
 end
 

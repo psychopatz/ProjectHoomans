@@ -256,7 +256,7 @@ equal(PNC.BaseService.Expand({}, { baseId = base.id,
 
 local barracksResult = PNC.FacilityService.Create(player, { baseId = base.id,
     definitionId = "barracks", expectedRevision = base.revision,
-    component = { kind = "region", role = "sleep.area",
+    component = { kind = "region", role = "facility.footprint",
         region = rectangle(0, 0, 3, 3, 0) } })
 truthy(barracksResult.ok, "barracks creation")
 equal(barracksResult.workOrder.operation, "CONSTRUCT",
@@ -273,15 +273,6 @@ equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     "FACILITY_NOT_BUILT", "components stay locked during construction")
 barracks.constructionState = "BUILT"
 PNC.FacilityService.RefreshState(barracks)
-local roomOrder = PNC.FacilityService.SetComponent({}, {
-    facilityId = barracks.id, expectedRevision = barracks.revision,
-    component = { kind = "region", role = "sleep.area",
-        region = rectangle(0, 0, 3, 3, 0) },
-})
-truthy(roomOrder.ok, "room assignment queues construction")
-truthy(PNC.FacilityService.FinalizeSetComponent(
-    barracks.id, roomOrder.pendingComponent),
-    "room assignment completes construction")
 
 for index = 1, 4 do
     local bed = PNC.FacilityService.SetComponent({}, {
@@ -423,10 +414,8 @@ local field93Order = PNC.FacilityService.SetComponent({}, { facilityId = farm.id
     expectedRevision = farm.revision, component = {
         kind = "region", role = "farm.field", region = field93,
     } })
-truthy(field93Order.ok, "93 tile farm")
-truthy(PNC.FacilityService.FinalizeSetComponent(
-    farm.id, field93Order.pendingComponent),
-    "93 tile farm construction completes")
+truthy(field93Order.ok and field93Order.component,
+    "93 tile farm assigns without construction")
 
 local farmComponentId
 for id, _ in pairs(farm.componentIds) do farmComponentId = id end
@@ -443,15 +432,11 @@ truthy(PNC.FacilityService.FinalizeUpgrade(farm.id, 2),
 truthy(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
         id = farmComponentId, kind = "region", role = "farm.field", region = field117,
-    } }).ok, "farm expansion queues reconstruction after upgrade")
-equal(farm.constructionState, "RECONSTRUCTING",
-    "zone edit waits for constructor work")
-equal(PNC.SettlementRepository.GetComponent(farmComponentId).tileCount, 93,
-    "old zone stays canonical until reconstruction completes")
-truthy(PNC.FacilityService.FinalizeSetComponent(farm.id,
-    farm.pendingTestChange.component), "finish reconstructed zone")
+    } }).ok, "farm expansion assigns without reconstruction")
+equal(farm.constructionState, "BUILT",
+    "farm field edits do not create construction work")
 equal(PNC.SettlementRepository.GetComponent(farmComponentId).tileCount, 117,
-    "new zone commits after constructor work")
+    "farm field edit commits immediately")
 equal(farm.constructionState, "BUILT",
     "completed zone reconstruction unlocks facility")
 

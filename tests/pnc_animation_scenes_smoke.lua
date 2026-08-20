@@ -85,6 +85,17 @@ assert(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].loop == true,
     "bed sleep must remain in one persistent XML playback")
 assert(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].durationMs == 0,
     "bed sleep must not be force-finished on a timer")
+local livingScene = PNC.AnimationScenes.Get("facility.living.sit")
+assert(livingScene and livingScene.repeatMode == "loop"
+        and #livingScene.steps == 4,
+    "living-room sitting scene must compose all supplied sit primitives")
+assert(livingScene.steps[1].bump == "Sit"
+        and livingScene.steps[4].bump == "SitRubHands",
+    "living-room scene uses the supplied sitting bumps")
+local drinkScene = PNC.AnimationScenes.Get("facility.water.drink")
+assert(drinkScene and drinkScene.bump == "Drink"
+        and drinkScene.repeatMode == "once",
+    "spigot drinking scene must be a one-shot drink")
 assert(PNC.AnimationScenes.Get("production.craft").blocking == false,
     "production animation must not block work progress ticks")
 local researchDefinition =

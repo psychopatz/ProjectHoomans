@@ -57,22 +57,20 @@ assert(#rows == 3, "placed component should add an editable child row")
 assert(rows[1].componentAction == nil,
     "full craft role still offered an extra assignment")
 assert(rows[2].componentAction.componentId == "craft:1"
-    and rows[2].actionLabel == "EDIT",
+    and rows[2].actionLabel == "MANAGE"
+    and rows[2].secondaryAction.remove == true,
     "placed craft station does not have its own edit action")
 assert(rows[3].componentAction.role == "work.disassemble",
     "unplaced disassembly action disappeared after craft assignment")
 
 PNC.FacilityDefinitions.GetLevel = function()
     return { componentLimits = {
-        ["sleep.area"] = { kind = "region", minCount = 1, maxCount = 1 },
         ["sleep.bed"] = { kind = "anchor", minCount = 1, maxCount = 4 },
     } }
 end
 rows = Browser.BuildComponentRows({
     definitionId = "barracks", level = 1,
     components = {
-        { id = "area:1", kind = "region", role = "sleep.area",
-            tileCount = 12 },
         { id = "bed:1", kind = "anchor", role = "sleep.bed",
             x = 10, y = 11, z = 0 },
         { id = "bed:2", kind = "anchor", role = "sleep.bed",
@@ -80,10 +78,14 @@ rows = Browser.BuildComponentRows({
     },
 })
 assert(#rows == 3,
-    "barracks should collapse individual beds into one sleep-spots editor")
-assert(rows[3].key == "sleep.bed"
-    and rows[3].componentAction.groupEdit == true
-    and rows[3].actionLabel == "EDIT SPOTS",
-    "barracks sleep spots are not managed as one uniform component group")
+    "barracks should expose each bed as an individual component")
+assert(rows[2].key == "bed:1"
+    and rows[2].componentAction.componentId == "bed:1"
+    and rows[2].secondaryAction.remove == true,
+    "first bed does not have individual manage and deconstruct actions")
+assert(rows[3].key == "bed:2"
+    and rows[3].componentAction.componentId == "bed:2"
+    and rows[3].secondaryAction.remove == true,
+    "second bed does not have individual manage and deconstruct actions")
 
 print("pnc_facility_component_rows_smoke: ok")

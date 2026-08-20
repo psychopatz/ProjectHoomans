@@ -176,6 +176,19 @@ equal(followArrived, true, "follow arrival handled")
 equal(traveler.orderSpec.kind, "follow", "arrival installs follow order")
 equal(traveler.orderSpec.ownerUsername, "owner", "follow owner is preserved")
 
+local buildingWorker = {
+    id = "npc-builder", alive = true, x = 15, y = 16, z = 0,
+    presenceState = "abstract", runtime = { workOrderId = "build-1" },
+    affiliation = { communityID = "colony-1" },
+}
+local keptHome, keptReason = PNC.HomeDutyService.SendToPlayer(
+    buildingWorker, player, "player_requested")
+equal(keptHome, false, "building worker must not follow the player")
+equal(keptReason, "WORK_ORDER_IN_PROGRESS",
+    "building worker follow refusal is explicit")
+equal(buildingWorker.runtime.workOrderId, "build-1",
+    "follow refusal preserves the construction claim")
+
 local courierCompleted
 PNC.ColonyStorageService = {
     CompleteNPCCourier = function(record)

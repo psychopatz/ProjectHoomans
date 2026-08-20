@@ -195,6 +195,14 @@ end
 function Service.SendToPlayer(record, player, reason)
     if not record or record.alive == false then return false, "NPC_MISSING" end
     if not player then return false, "PLAYER_MISSING" end
+    -- Construction, reconstruction, and deconstruction are home chores. A
+    -- follow command must not tear the worker out of the job and strand its
+    -- progress behind a blocked order. The player can still use the explicit
+    -- return-home command, which releases the claim safely and leaves the
+    -- durable order resumable.
+    if record.runtime and record.runtime.workOrderId then
+        return false, "WORK_ORDER_IN_PROGRESS"
+    end
     local x = player.getX and tonumber(player:getX()) or nil
     local y = player.getY and tonumber(player:getY()) or nil
     local z = player.getZ and tonumber(player:getZ()) or 0
