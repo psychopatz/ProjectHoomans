@@ -95,6 +95,10 @@ function Jobs.Start(record, facilityOrId, capability, options)
         resourceKind = tostring(options.resourceKind or ""),
         resourceKey = tostring(options.resourceKey or ""),
         resource = options.resource,
+        approachCandidates = options.approachCandidates
+            or acquired.approachCandidates,
+        approachIndex = 1,
+        failedApproaches = {},
     }
     if options.debugHold == true then
         record.runtime.facilityDebugWork = record.runtime.facilityActivity

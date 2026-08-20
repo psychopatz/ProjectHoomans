@@ -3,6 +3,20 @@
 
 local Scenes = PNC.AnimationScenes
 
+local EAT_STEPS = {
+    { id = "eat_1", bump = "Eat", durationMs = 3000 },
+    { id = "eat_2", bump = "Eat", durationMs = 3000 },
+    { id = "eat_3", bump = "Eat", durationMs = 3000 },
+    { id = "wipe_brow", bump = "WipeBrow", durationMs = 1800 },
+    { id = "wipe_head", bump = "WipeHead", durationMs = 1900 },
+}
+
+local DRINK_STEPS = {
+    { id = "drink", bump = "Drink", durationMs = 3600 },
+    { id = "wipe_brow", bump = "WipeBrow", durationMs = 1800 },
+    { id = "wipe_head", bump = "WipeHead", durationMs = 1900 },
+}
+
 Scenes.Register("idle.shift_weight", {
     label = "Shift Weight",
     description = "A subtle weight-shift primitive.",
@@ -244,8 +258,8 @@ Scenes.Register("facility.water.drink", {
     priority = 60,
     repeatMode = "once",
     blocking = true,
-    bump = "Drink",
-    durationMs = 3600,
+    stepGapMs = 180,
+    steps = DRINK_STEPS,
     interrupts = {
         movement = true,
         combat = true,
@@ -274,8 +288,8 @@ Scenes.Register("facility.water.drink.nearby", {
     priority = 60,
     repeatMode = "once",
     blocking = true,
-    bump = "Drink",
-    durationMs = 3600,
+    stepGapMs = 180,
+    steps = DRINK_STEPS,
     interrupts = {
         movement = true,
         combat = true,
@@ -304,8 +318,8 @@ Scenes.Register("survival.eat.inventory", {
     priority = 65,
     repeatMode = "once",
     blocking = true,
-    bump = "Eat",
-    durationMs = 3000,
+    stepGapMs = 180,
+    steps = EAT_STEPS,
     interrupts = {
         movement = true,
         combat = true,

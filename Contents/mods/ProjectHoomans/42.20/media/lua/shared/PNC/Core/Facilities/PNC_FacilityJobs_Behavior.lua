@@ -53,6 +53,49 @@ local function restorePosition(record, zombie, runtime)
     runtime.positioned = false
 end
 
+local function resetPath(record, zombie, reason)
+    if not PNC.PathService or not PNC.PathService.Reset then return end
+    if PNC.PathService.Commands and PNC.PathService.Commands.Reset then
+        PNC.PathService.Commands.Reset(record, zombie, reason)
+    else
+        PNC.PathService.Reset(zombie, record)
+    end
+end
+
+local function retryWaterApproach(record, zombie, order, runtime)
+    if runtime.resourceKind ~= "nearby_water" then return true end
+    local lane = record.runtime and record.runtime.pathing or nil
+    if not lane or (lane.phase ~= "blocked" and lane.ownerMode ~= "blocked") then
+        return true
+    end
+    local candidates = runtime.approachCandidates or {}
+    runtime.failedApproaches = runtime.failedApproaches or {}
+    local current = math.max(1, tonumber(runtime.approachIndex) or 1)
+    local active = candidates[current]
+    if active and active.approachKey then
+        runtime.failedApproaches[active.approachKey] = true
+    end
+    local nextIndex = current + 1
+    while candidates[nextIndex]
+        and runtime.failedApproaches[candidates[nextIndex].approachKey]
+    do
+        nextIndex = nextIndex + 1
+    end
+    local candidate = candidates[nextIndex]
+    if not candidate then
+        runtime.failedReason = "WATER_APPROACH_UNREACHABLE"
+        return false
+    end
+    runtime.approachIndex = nextIndex
+    order.x, order.y, order.z = candidate.x, candidate.y, candidate.z
+    order.interactionFacing = candidate.interactionFacing or ""
+    runtime.target = { x = order.x, y = order.y, z = order.z }
+    runtime.distance = nil
+    runtime.phase = "REPATHING"
+    resetPath(record, zombie, "water_approach_retry")
+    return true
+end
+
 local function finish(record, zombie, reason)
     local runtime = state(record)
     if not runtime or runtime.finishing == true then return false end
@@ -122,7 +165,10 @@ function Jobs.OnSceneTick(record, zombie, scene, now)
         end
         if runtime.debugHold ~= true and complete then
             runtime.completionRequested = true
-            return false
+            -- Food and drink apply their gameplay effect during the primary
+            -- action, but retain the task lease until the ordered wipe steps
+            -- finish. Other needs keep their existing immediate completion.
+            return definition.completeWithScene == true
         end
     end
     return true
@@ -171,6 +217,15 @@ function Jobs.Tick(record, zombie)
     end
     record.activeJob = definition.activeJob or JOB
     record.activeBehavior = "Facility:" .. tostring(order.capability)
+    if not retryWaterApproach(record, zombie, order, runtime) then
+        local leaseId = runtime.taskLeaseId
+        local failure = runtime.failedReason
+        finish(record, zombie, failure)
+        if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands then
+            PNC.Tasking.Commands.CancelForNPC(record.id, failure)
+        end
+        return true
+    end
     sceneId = order.sceneId ~= "" and order.sceneId or definition.sceneId
     runtime.sceneId = sceneId
     runtime.sleepSurface = order.sleepSurface
@@ -194,19 +249,7 @@ function Jobs.Tick(record, zombie)
         -- Arrival transfers movement ownership to a stationary interaction.
         -- A queued Behavior2 route otherwise remains visible to the scene
         -- safety arbiter and repeatedly interrupts/restarts the sleep bump.
-        if PNC.PathService and PNC.PathService.Reset then
-            if PNC.PathService.Commands
-                and PNC.PathService.Commands.Reset
-            then
-                PNC.PathService.Commands.Reset(
-                    record,
-                    zombie,
-                    "facility_arrival"
-                )
-            else
-                PNC.PathService.Reset(zombie, record)
-            end
-        end
+        resetPath(record, zombie, "facility_arrival")
         runtime.arrivalSettled = true
     end
     PNC.BehaviorCommon.HaltMovement(record, zombie, "facility_working")
@@ -223,7 +266,9 @@ function Jobs.Tick(record, zombie)
         record.x, record.y, record.z = order.interactionX,
             order.interactionY, order.interactionZ or order.z
         runtime.positioned = true
-        local directionName = order.interactionFacing
+    end
+    if runtime.facingApplied ~= true and zombie then
+        local directionName = tostring(order.interactionFacing or "")
         if order.interactionAxis == "x" then directionName = "E"
         elseif order.interactionAxis == "y" then directionName = "S" end
         if directionName ~= "" and IsoDirections
@@ -236,6 +281,7 @@ function Jobs.Tick(record, zombie)
                 pcall(zombie.setForwardIsoDirection, zombie, direction)
             end
         end
+        runtime.facingApplied = true
     end
     scene = record.runtime.animationScene
     if not scene or scene.id ~= sceneId then
@@ -244,7 +290,8 @@ function Jobs.Tick(record, zombie)
             and PNC.NeedsUtils.WorldAgeHours() or nil
         PNC.AnimationScenes.Request(record, zombie, sceneId, {
             reason = "facility_" .. tostring(order.capability),
-            repeatMode = "loop",
+            repeatMode = definition.completeWithScene == true
+                and "once" or "loop",
         })
     end
     return true

@@ -72,13 +72,14 @@ Definitions.Register("food.dine", {
     activeJob = "Dining",
     activityLabelKey = "UI_PNC_Activity_Eating",
     activityText = "Eating",
-    sceneId = "facility.living.sit",
+    sceneId = "survival.eat.inventory",
     role = "dining.table",
     arrivalDistance = 0.85,
     activityLabel = "EATING",
     needEffect = "primitive",
     primitiveNeed = "hunger",
     effectDelayMs = 1200,
+    completeWithScene = true,
 })
 
 -- Away-from-home survival actions use the same FacilityJobs state machine as
@@ -96,6 +97,7 @@ Definitions.Register("survival.eat.inventory", {
     needEffect = "primitive",
     primitiveNeed = "hunger",
     effectDelayMs = 1200,
+    completeWithScene = true,
 })
 
 Definitions.Register("health.recover", {
@@ -123,6 +125,7 @@ Definitions.Register("water.drink", {
     waterLiters = 1,
     thirstRelief = 0.50,
     effectDelayMs = 1800,
+    completeWithScene = true,
 })
 
 Definitions.Register("water.nearby", {
@@ -135,6 +138,7 @@ Definitions.Register("water.nearby", {
     activityLabel = "DRINKING",
     needEffect = "nearby_water",
     effectDelayMs = 1800,
+    completeWithScene = true,
 })
 
 return Definitions

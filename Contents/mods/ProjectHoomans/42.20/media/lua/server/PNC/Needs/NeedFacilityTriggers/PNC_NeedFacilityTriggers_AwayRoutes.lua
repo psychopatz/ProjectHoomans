@@ -128,12 +128,15 @@ Routes.Register({
         local source = PNC.NearbyWaterService
             and PNC.NearbyWaterService.Find(record) or nil
         if not source then return nil, "NEARBY_WATER_NOT_FOUND" end
+        local target, approaches = PNC.NearbyWaterService.BuildApproach(
+            record, source)
+        if not target then return nil, approaches end
         local live = PNC.Registry and PNC.Registry.GetLiveZombie
             and PNC.Registry.GetLiveZombie(record.id) or nil
         return {
             ok = true, facilityId = "nearby_water:" .. tostring(source.key),
             componentId = "", reservationId = "",
-            target = { x = source.x, y = source.y, z = source.z },
+            target = target, approachCandidates = approaches,
             resource = source, resourceKey = source.key,
             executionMode = live and "LIVE" or "ABSTRACT",
         }
@@ -149,6 +152,7 @@ Routes.Register({
         }, "water.nearby", {
             automatic = true, acquired = assignment, resource = source,
             resourceKey = source.key, resourceKind = "nearby_water",
+            approachCandidates = assignment.approachCandidates,
             taskLeaseId = lease.leaseId, nearby = true,
             abstract = lease.executionMode == "ABSTRACT",
         })

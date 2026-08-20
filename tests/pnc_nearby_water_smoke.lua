@@ -128,6 +128,15 @@ end
 PNC.Registry.GetLiveZombie = function() return faucetBody end
 local faucetSource = Service.Find({ id = "npc:faucet" })
 T.equal(faucetSource.kind, "faucet", "nearby faucet is a water source")
+local exactFaucet = Service.FindAt({ id = "npc:faucet" }, 9, 10, 0)
+T.equal(exactFaucet.object, faucet,
+    "an explicitly clicked faucet resolves on the server")
+local approach, approaches = Service.BuildApproach(
+    { id = "npc:faucet" }, exactFaucet)
+T.equal(approach.x, 10.5, "faucet approach uses an adjacent square")
+T.equal(approach.y, 10.5, "faucet approach never targets its occupied tile")
+T.equal(approach.interactionFacing, "W", "NPC faces the faucet after arrival")
+T.truthy(#approaches >= 1, "faucet exposes retryable approach candidates")
 local faucetOK, faucetConsumed = Service.Consume(
     { id = "npc:faucet" }, faucetSource, 0.8)
 T.truthy(faucetOK, "clean faucet water is consumable")

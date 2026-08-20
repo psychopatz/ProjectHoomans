@@ -111,7 +111,9 @@ local function externalCurrent(record)
     end
     local kind = tostring(record and record.orderSpec
         and record.orderSpec.kind or "")
+    local followKind = tostring(PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
     if kind ~= "" and kind ~= "colony_home"
+        and kind ~= followKind
         and kind ~= tostring(PNC.Const and PNC.Const.ORDER_GUARD or "guard")
         and kind ~= "facility_activity"
     then

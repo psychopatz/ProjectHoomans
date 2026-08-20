@@ -43,6 +43,12 @@ local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, te
     if PNC.ContextHub and PNC.ContextHub.BuildWorldContext then
         PNC.ContextHub.BuildWorldContext(playerNum, context, worldobjects, test)
     end
+    if PNC.SinkCompanionContext
+        and PNC.SinkCompanionContext.BuildWorldContext
+    then
+        PNC.SinkCompanionContext.BuildWorldContext(
+            playerNum, context, worldobjects, test)
+    end
 end
 
 local function onServerCommand(module, command, args)
