@@ -594,6 +594,14 @@ function Client.RequestSetFacilityComponent(options)
     return Client.RequestColonyAction("facility_component_set", options)
 end
 
+function Client.RequestSetFarmPlotCrop(options)
+    return Client.RequestColonyAction("farm_plot_crop", options)
+end
+
+function Client.RequestSetFarmPlotPolicy(options)
+    return Client.RequestColonyAction("farm_plot_policy", options)
+end
+
 function Client.RequestReplaceFacilityAnchors(options)
     return Client.RequestColonyAction("facility_anchor_role_replace", options)
 end

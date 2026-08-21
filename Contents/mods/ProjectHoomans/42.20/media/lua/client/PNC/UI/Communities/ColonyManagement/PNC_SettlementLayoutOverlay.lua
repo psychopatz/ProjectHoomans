@@ -46,7 +46,7 @@ local COMPONENT_PLACEHOLDERS = {
     ["sleep.bed"] = "media/ui/Facilities/Components/bed/barracks.png",
     ["dining.table"] = "media/ui/Facilities/Components/chair.png",
     ["health.bed"] = "media/ui/Facilities/Components/bed/hospital.png",
-    ["farm.field"] = "media/ui/Facilities/Components/default.png",
+    ["growing.plot"] = "media/ui/Facilities/Components/default.png",
     ["work.research"] =
         "media/ui/Facilities/Components/research_station/research_station.png",
     ["work.blueprint"] =
@@ -134,7 +134,7 @@ local function componentName(facility, component, ordinal)
         ["living.chair"] = "Chair",
         ["dining.table"] = "Dining Table",
         ["health.bed"] = "Hospital Bed",
-        ["farm.field"] = "Farm Field",
+        ["growing.plot"] = "Growing Plot",
         ["work.research"] = "Research Station",
         ["work.blueprint"] = "Architect Bench",
         ["work.reverse"] = "Laboratory",

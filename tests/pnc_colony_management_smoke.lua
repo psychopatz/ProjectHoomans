@@ -156,7 +156,7 @@ PNC = {
         end,
         ResolveWorkTarget = function()
             return { x = 12, y = 18, z = 0, componentId = "field_a",
-                role = "farm.field" }
+                role = "growing.plot" }
         end,
     },
     FacilityDefinitions = {

@@ -8,6 +8,7 @@ local Repository = PNC.SettlementRepository
 local Definitions = PNC.FacilityDefinitions
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+local Farming = PNC.Farming
 
 local function result(ok, reason, details)
     return { ok = ok == true, reason = reason, details = details }
@@ -139,6 +140,21 @@ function Validation.NormalizeComponent(base, facility, input)
         worldRule = limit.worldRule and tostring(limit.worldRule) or nil,
         roomGroup = limit.roomGroup and tostring(limit.roomGroup) or nil,
     }
+    if input.role == "growing.plot" then
+        local valid, reason, info = Farming.RectangleInfo(input.region)
+        if not valid then return result(false, reason) end
+        component.logicalType = Farming.PLOT_TYPE
+        component.region = info.region
+        component.tileCount = info.tileCount
+        component.width, component.height = info.width, info.height
+        component.desiredCrop = Farming.NormalizeCrop(input.desiredCrop)
+        component.policy = Farming.NormalizePolicy(input.policy)
+        if PNC.FarmingCatalog and component.desiredCrop
+            and not PNC.FarmingCatalog.Get(component.desiredCrop)
+        then
+            return result(false, "UNKNOWN_CROP")
+        end
+    end
     if input.kind == "anchor" and component.role == "sleep.bed" then
         component.targetResolver = "sleepSpot"
         component.objectTag = nil
@@ -184,8 +200,10 @@ function Validation.NormalizeComponent(base, facility, input)
         then
             return result(false, "OUTSIDE_FACILITY")
         end
-        component.region = region
-        component.tileCount = GridRegion.countTiles(region)
+        if input.role ~= "growing.plot" then
+            component.region = region
+            component.tileCount = GridRegion.countTiles(region)
+        end
         if PNC.FacilityWorldValidation
             and PNC.FacilityWorldValidation.ValidateRegion
         then

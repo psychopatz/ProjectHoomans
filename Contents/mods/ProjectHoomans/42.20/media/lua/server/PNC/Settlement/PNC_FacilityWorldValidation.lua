@@ -32,6 +32,12 @@ function Validation.ValidateAnchor(component)
 end
 
 function Validation.ValidateRegion(component)
+    if component and component.role == "growing.plot"
+        and PNC.PZFarmingAdapter
+        and PNC.PZFarmingAdapter.ValidatePlotRegion
+    then
+        return PNC.PZFarmingAdapter.ValidatePlotRegion(component)
+    end
     local rule = componentRule(component)
     if rule == "" then return true end
     return SquareRules.ValidateRegion(component.region, rule, {

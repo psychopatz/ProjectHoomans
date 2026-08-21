@@ -39,7 +39,8 @@ Definitions.Register("farm.work", {
     activityLabelKey = "UI_PNC_Activity_Farming",
     activityText = "Farming",
     sceneId = "facility.farm.work",
-    role = "farm.field",
+    role = "growing.plot",
+    domain = "farming",
     arrivalDistance = 0.8,
     activityLabel = "FARMING",
 })

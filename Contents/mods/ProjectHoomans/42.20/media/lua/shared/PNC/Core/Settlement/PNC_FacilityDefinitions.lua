@@ -14,7 +14,7 @@ Definitions.ComponentIconPaths = Definitions.ComponentIconPaths or {
     ["living.chair"] = "media/ui/Facilities/Components/chair.png",
     ["dining.table"] = "media/ui/Facilities/Components/chair.png",
     ["health.bed"] = "media/ui/Facilities/Components/bed/hospital.png",
-    ["farm.field"] = "media/ui/Facilities/Components/default.png",
+    ["growing.plot"] = "media/ui/Facilities/Components/default.png",
     ["work.research"] =
         "media/ui/Facilities/Components/research_station/research_station.png",
     ["work.blueprint"] =
@@ -133,6 +133,7 @@ Definitions.Register({
 
 Definitions.Register({
     id = "farm",
+    logicalType = "FARM",
     category = "food",
     displayNameKey = "UI_PNC_Facility_Farm",
     descriptionKey = "UI_PNC_Facility_FarmDescription",
@@ -142,15 +143,16 @@ Definitions.Register({
     reconstructWork = 65,
     deconstructWork = 60,
     allowMultipleRegions = false,
-    componentConstruction = { ["farm.field"] = false },
+    componentConstruction = { ["growing.plot"] = false },
     levels = {
         [1] = {
             requiredHQLevel = 1,
             capabilities = { "farm.work" },
             componentLimits = {
-                ["farm.field"] = { kind = "region", minCount = 1,
-                    maxCount = 1, maxTotalTiles = 100, overlap = "exclusive",
-                    worldRule = "farmland" },
+                ["growing.plot"] = { kind = "region", minCount = 0,
+                    maxCount = 2, maxTotalTiles = 32, overlap = "exclusive",
+                    worldRule = "farming_furrow", maxWidth = 4,
+                    maxHeight = 4, rectangular = true },
             },
             activityLimits = { ["farm.work"] = { maxConcurrent = 2 } },
         },
@@ -158,9 +160,10 @@ Definitions.Register({
             requiredHQLevel = 2,
             capabilities = { "farm.work" },
             componentLimits = {
-                ["farm.field"] = { kind = "region", minCount = 1,
-                    maxCount = 1, maxTotalTiles = 180, overlap = "exclusive",
-                    worldRule = "farmland" },
+                ["growing.plot"] = { kind = "region", minCount = 0,
+                    maxCount = 4, maxTotalTiles = 64, overlap = "exclusive",
+                    worldRule = "farming_furrow", maxWidth = 4,
+                    maxHeight = 4, rectangular = true },
             },
             activityLimits = { ["farm.work"] = { maxConcurrent = 4 } },
         },

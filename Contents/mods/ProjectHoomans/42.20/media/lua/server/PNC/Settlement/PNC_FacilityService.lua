@@ -676,12 +676,27 @@ function Service.BuildSnapshot(facility)
     local output = PNC.Core.DeepCopy(facility)
     output.components = {}
     output.pendingComponents = {}
+    output.farming = PNC.FarmingService and PNC.FarmingService.BuildFacilitySnapshot
+        and PNC.FarmingService.BuildFacilitySnapshot(facility) or nil
     local level = Definitions.GetLevel(facility.definitionId, facility.level)
     output.capabilities = PNC.Core.DeepCopy(level and level.capabilities or {})
     output.workstations = PNC.Core.DeepCopy(level and level.workstations or {})
     for id, _ in pairs(facility.componentIds) do
         local component = Repository.GetComponent(id)
-        if component then output.components[#output.components + 1] = PNC.Core.DeepCopy(component) end
+        if component then
+            local snapshot = PNC.Core.DeepCopy(component)
+            if output.farming and component.role == "growing.plot" then
+                for _, plot in ipairs(output.farming.plots or {}) do
+                    if tostring(plot.id) == tostring(component.id) then
+                        snapshot.width, snapshot.height = plot.width, plot.height
+                        snapshot.status = plot.status
+                        snapshot.diagnostics = plot.diagnostics
+                        break
+                    end
+                end
+            end
+            output.components[#output.components + 1] = snapshot
+        end
     end
     for _, order in pairs(PNC.WorkRepository
         and PNC.WorkRepository.State and PNC.WorkRepository.State.byId or {}) do

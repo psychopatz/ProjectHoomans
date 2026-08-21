@@ -10,7 +10,7 @@ local function roleLabel(role)
         ["sleep.bed"] = "SLEEPING SPOT",
         ["dining.table"] = "DINING TABLE",
         ["health.bed"] = "HOSPITAL BED",
-        ["farm.field"] = "CULTIVATED FIELDS",
+        ["growing.plot"] = "GROWING PLOT",
         ["work.research"] = "RESEARCH STATION",
         ["work.blueprint"] = "ARCHITECT BENCH",
         ["work.reverse"] = "LAB",
@@ -55,7 +55,15 @@ local function componentDetail(facility, component)
     elseif component.kind == "abstract" then
         detail = "ABSTRACT UTILITY MODULE"
     else
-        detail = tostring(component.tileCount or 0) .. " TILES  •  ZONED AREA"
+        detail = tostring(component.width or "?") .. " x "
+            .. tostring(component.height or "?") .. "  •  "
+            .. tostring(component.tileCount or 0) .. " TILES"
+        if component.desiredCrop then
+            detail = detail .. "  •  CROP " .. tostring(component.desiredCrop)
+        else
+            detail = detail .. "  •  NO CROP ASSIGNED"
+        end
+        if component.status then detail = detail .. "  •  " .. component.status end
     end
     local recipe = costText(facility, component.role)
     return recipe and recipe ~= "" and detail .. "  •  " .. recipe or detail
@@ -111,10 +119,12 @@ function Rows.Build(facility)
                 detail = componentDetail(facility, component),
                 child = true,
                 complete = true,
-                componentAction = component.kind == "abstract" and nil or {
-                    kind = component.kind, role = role,
-                    componentId = component.id,
-                },
+                componentAction = component.kind == "abstract" and nil
+                    or role == "growing.plot" and {
+                        kind = "farm_plot_crop", role = role,
+                        componentId = component.id,
+                    } or { kind = component.kind, role = role,
+                        componentId = component.id },
                 secondaryAction = {
                     kind = component.kind, role = role,
                     componentId = component.id, remove = true,

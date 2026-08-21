@@ -38,7 +38,7 @@ Definitions.CAPABILITY_BY_OPERATION = {
     CRAFT = "work.craft",
     DISASSEMBLE = "work.disassemble",
 }
-Definitions.COLONY_JOBS = { "Constructor", "Researcher", "WorkshopWorker" }
+Definitions.COLONY_JOBS = { "Constructor", "Researcher", "WorkshopWorker", "Farmer" }
 
 function Definitions.WorkRate(worker, requirements, facilityEfficiency, condition)
     local highestBonus = 0

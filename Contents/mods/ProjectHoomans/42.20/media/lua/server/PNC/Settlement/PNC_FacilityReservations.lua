@@ -5,6 +5,11 @@ PNC.FacilityReservations = PNC.FacilityReservations or {}
 
 local Reservations = PNC.FacilityReservations
 
+local function isExclusiveComponent(component)
+    return component and (component.kind == "anchor"
+        or component.role == "growing.plot")
+end
+
 local function hasEntries(source)
     for _, _ in pairs(type(source) == "table" and source or {}) do
         return true
@@ -60,7 +65,7 @@ function Reservations.Reserve(facilityId, componentId, npcId, purpose, ttlMs, me
     componentId, npcId = tostring(componentId or ""), tostring(npcId or "")
     local component = PNC.SettlementRepository.GetComponent(componentId)
     if not component or component.facilityId ~= facilityId then return false, "COMPONENT_NOT_FOUND" end
-    if component.kind == "anchor" and Reservations.ByComponent[componentId] then
+    if isExclusiveComponent(component) and Reservations.ByComponent[componentId] then
         return false, "COMPONENT_RESERVED"
     end
     local facility = PNC.SettlementRepository.GetFacility(facilityId)
@@ -79,7 +84,7 @@ function Reservations.Reserve(facilityId, componentId, npcId, purpose, ttlMs, me
         createdAt = now(), expiresAt = now() + math.max(1000,
             math.floor(tonumber(ttlMs) or Reservations.DEFAULT_TTL_MS)) }
     Reservations.ByID[id] = reservation
-    if component.kind == "anchor" then Reservations.ByComponent[componentId] = id end
+    if isExclusiveComponent(component) then Reservations.ByComponent[componentId] = id end
     Reservations.ByActivity[activityKey] =
         (tonumber(Reservations.ByActivity[activityKey]) or 0) + 1
     local npc = Reservations.ByNPC[npcId]
@@ -126,7 +131,7 @@ local function componentForCapability(facility, capability)
     local fallback
     for componentId, _ in pairs(facility.componentIds or {}) do
         local component = PNC.SettlementRepository.GetComponent(componentId)
-        if component and (component.kind ~= "anchor"
+        if component and (not isExclusiveComponent(component)
             or not Reservations.ByComponent[componentId])
         then
             if component.role == preferredRole then return component end
@@ -212,11 +217,12 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability, options)
     for index = 1, #facilities do
         local facility = facilities[index]
         local targetValid = options.abstract == true
+            or options.deferWorldValidation == true
             or PNC.FacilityService.RevalidateTargets(facility)
         local component
         if options.componentId and requested
             and requested.facilityId == facility.id
-            and (requested.kind ~= "anchor"
+            and (not isExclusiveComponent(requested)
                 or not Reservations.ByComponent[requested.id])
         then
             component = requested

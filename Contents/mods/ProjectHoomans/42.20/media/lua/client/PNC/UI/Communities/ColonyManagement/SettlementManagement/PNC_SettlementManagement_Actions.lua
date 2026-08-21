@@ -55,6 +55,9 @@ function Actions.HandleComponent(window, action, facility)
         Support.ApplyLocalResult(window)
         return true
     end
+    if action.kind == "farm_plot_crop" and action.componentId then
+        return Facility.BeginCrop(window, facility, action.componentId)
+    end
     if action.kind == "region" then
         return Facility.BeginArea(window, facility, action.role,
             action.componentId)

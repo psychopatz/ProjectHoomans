@@ -41,7 +41,7 @@ Anchors preserve Z identity (`100,100,1` differs from `100,100,0`). Region
 components must normally be cardinally connected. Both validate their XY
 footprint against Base territory without charging upper floors again.
 Components use semantic roles such as `sleep.bed`, `sleep.area`, and
-`farm.field`; NPC callers request capabilities such as `sleep` or `farm.work`
+`growing.plot`; NPC callers request capabilities such as `sleep` or `farm.work`
 instead of naming a concrete facility.
 
 Operational state is derived and cached after relevant mutations. Current
@@ -57,11 +57,11 @@ levels require matching HQ levels. Separate connected sleeping regions may be
 assigned on different floors. The legacy role name `sleep.bed` is retained for
 save compatibility, but its square does not require furniture.
 
-Farm levels expose `farm.work`, allow one exclusive irregular `farm.field`,
-and cap field area at 100/180 tiles at levels 1/2. Worker capacity is separate
-activity-limit data (2/4 concurrent workers).
-Every selected field tile must be cultivated farmland; ordinary ground is
-rejected in the selector and again by the authority.
+Farm levels expose `farm.work`, provide 2/4 exclusive `growing.plot` slots,
+and cap total plot area at 32/64 tiles at levels 1/2. Each plot is a vanilla
+farming rectangle no larger than 4 x 4 tiles. Worker capacity is separate
+activity-limit data (2/4 concurrent workers). A plot must contain at least one
+existing vanilla farming furrow; Hoomans never digs or creates farmland.
 
 Facility definitions also own presentation metadata and declarative build
 costs. Barracks and Farm currently each consume one `Base.Money`; this is an

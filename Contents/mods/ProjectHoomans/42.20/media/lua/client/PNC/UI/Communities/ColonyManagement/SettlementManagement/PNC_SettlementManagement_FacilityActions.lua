@@ -1,6 +1,8 @@
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+if not ISContextMenu then pcall(require, "ISUI/ISContextMenu") end
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Support = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
+local Farming = PNC.Farming
 
 local Facility = {}
 
@@ -54,6 +56,9 @@ Facility.AreaRole = areaRole
 local function areaOptions(window, facility, existing, onConfirm)
     local isDraft = not facility or facility.id == nil
     local role = areaRole(facility)
+    if isDraft and facility.definitionId == "farm" then
+        role = "facility.footprint"
+    end
     -- Construction always selects an abstract footprint. Anchor-only
     -- facilities (research, utilities, and future workstation buildings) do
     -- not declare a functional region role, so their draft still needs this
@@ -70,7 +75,7 @@ local function areaOptions(window, facility, existing, onConfirm)
         instruction = role == "facility.footprint"
             and Support.Tr("UI_PNC_Facility_SelectFootprintHelp",
                 "Select the building footprint inside the base territory.")
-            or role == "farm.field"
+            or role == "growing.plot"
             and Support.Tr("UI_PNC_Facility_SelectFarmlandHelp",
                 "Select connected cultivated farmland inside the base.")
             or Support.Tr("UI_PNC_Facility_SelectAreaHelp",
@@ -80,7 +85,7 @@ local function areaOptions(window, facility, existing, onConfirm)
         guideLayers = Support.UsedGuideLayers(window, existing and existing.id),
         guideRenderZ = math.floor(getSpecificPlayer(0):getZ()),
         maxTiles = limit.maxTotalTiles,
-        requiredSquareRule = limit.worldRule,
+        requiredSquareRule = role == "growing.plot" and nil or limit.worldRule,
         validate = function(region, stats)
             local ok, reason = Support.ValidateConnected(region)
             if ok and not GridRegion.containsRegion(boundary, region) then
@@ -89,6 +94,27 @@ local function areaOptions(window, facility, existing, onConfirm)
             end
             if ok and limit.maxTotalTiles and stats.tileCount > limit.maxTotalTiles then
                 ok, reason = false, "FACILITY_AREA_TOO_LARGE"
+            end
+            if ok and role == "growing.plot" then
+                local valid, plotReason = Farming.RectangleInfo(region)
+                if not valid then ok, reason = false, plotReason end
+                if ok then
+                    local furrow = false
+                    local farming = CFarmingSystem and CFarmingSystem.instance or nil
+                    local bounds = GridRegion.bounds(region)
+                    if not bounds then return false, "EMPTY_REGION" end
+                    for y = bounds.minY, bounds.maxY do
+                        for x = bounds.minX, bounds.maxX do
+                            local square = getCell():getGridSquare(x, y, bounds.minZ)
+                            local plant = square and farming and farming.getLuaObjectOnSquare
+                                and farming:getLuaObjectOnSquare(square) or nil
+                            if plant and tostring(plant.state or "") == "plow" then
+                                furrow = true
+                            end
+                        end
+                    end
+                    if not furrow then ok, reason = false, "FARMING_FURROW_REQUIRED" end
+                end
             end
             return ok, ok and nil or Shared.SettlementReason(reason)
         end,
@@ -103,7 +129,8 @@ function Facility.BeginBuild(window, definitionId)
     -- The selected build area is an abstract construction footprint, not a
     -- functional room. Facilities such as Research therefore do not need a
     -- fake region component just to be placeable.
-    local role = areaRole(draft) or "facility.footprint"
+    local role = definitionId == "farm" and "facility.footprint"
+        or areaRole(draft) or "facility.footprint"
     Support.OpenSelector(window, areaOptions(window, draft, nil, function(region)
         PNC.Client.RequestCreateFacility({ baseId = settlement.id,
             expectedRevision = settlement.revision, definitionId = definitionId,
@@ -124,9 +151,45 @@ function Facility.BeginArea(window, facility, requestedRole, componentId)
             PNC.Client.RequestSetFacilityComponent({ facilityId = facility.id,
                 expectedRevision = facility.revision,
                 component = { id = existing and existing.id or nil,
-                    kind = "region", role = role, region = region } })
+                    kind = "region", role = role, region = region,
+                    desiredCrop = existing and existing.desiredCrop or nil,
+                    policy = existing and existing.policy or nil } })
             Support.ApplyLocalResult(window)
         end))
+    return true
+end
+
+function Facility.BeginCrop(window, facility, componentId)
+    local plot = Support.ComponentById(facility, componentId)
+    if not plot then return false end
+    local menu = ISContextMenu.get(0, getMouseX(), getMouseY())
+    local crops = PNC.FarmingCatalog and PNC.FarmingCatalog.List() or {}
+    for _, crop in ipairs(crops) do
+        menu:addOption(tostring(crop.displayName or crop.id), nil, function()
+            PNC.Client.RequestSetFarmPlotCrop({
+                facilityId = facility.id, plotId = plot.id,
+                expectedRevision = facility.revision, desiredCrop = crop.id,
+            })
+            Support.ApplyLocalResult(window)
+        end)
+    end
+    menu:addOption(Support.Tr("UI_PNC_Facility_ToggleAutomation",
+        "TOGGLE AUTOMATION"), nil, function()
+        local current = PNC.Farming.NormalizePolicy(plot.policy)
+        local enabled = not (current.autoPlant and current.autoWater
+            and current.autoHarvest and current.autoReplant)
+        PNC.Client.RequestSetFarmPlotPolicy({
+            facilityId = facility.id, plotId = plot.id,
+            expectedRevision = facility.revision,
+            policy = { autoPlant = enabled, autoWater = enabled,
+                autoHarvest = enabled, autoReplant = enabled },
+        })
+        Support.ApplyLocalResult(window)
+    end)
+    menu:addOption(Support.Tr("UI_PNC_Facility_EditPlotRectangle",
+        "EDIT RECTANGLE"), nil, function()
+        Facility.BeginArea(window, facility, "growing.plot", plot.id)
+    end)
     return true
 end
 

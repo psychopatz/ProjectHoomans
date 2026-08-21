@@ -535,6 +535,8 @@ function Management.HandleAction(player, args)
         facility_create = PNC.FacilityService and PNC.FacilityService.Create,
         facility_upgrade = PNC.FacilityService and PNC.FacilityService.Upgrade,
         facility_component_set = PNC.FacilityService and PNC.FacilityService.SetComponent,
+        farm_plot_crop = PNC.FarmingService and PNC.FarmingService.SetDesiredCrop,
+        farm_plot_policy = PNC.FarmingService and PNC.FarmingService.SetPolicy,
         facility_anchor_role_replace = PNC.FacilityService
             and PNC.FacilityService.ReplaceAnchorRole,
         facility_component_remove = PNC.FacilityService and PNC.FacilityService.RemoveComponent,

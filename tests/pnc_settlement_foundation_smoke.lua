@@ -31,6 +31,8 @@ ModData = {
 require "PNC/Core/Base/PNC_Core"
 require "PNC/Core/Events/PNC_EventDefinitions"
 require "PNC/Core/Settlement/PNC_SettlementDefinitions"
+require "PNC/Core/Farming/PNC_Farming"
+require "PNC/Core/Farming/PNC_PlantingCatalog"
 require "PNC/Core/Settlement/PNC_FacilityDefinitions"
 require "PsychopatzCore/Events/PC_EventBus"
 require "PNC/Settlement/PNC_SettlementRepository"
@@ -394,7 +396,7 @@ equal(researchFacility.componentIds[retiredRoomId], nil,
 
 local farmResult = PNC.FacilityService.Create(player, { baseId = base.id,
     definitionId = "farm", expectedRevision = base.revision,
-    component = { kind = "region", role = "farm.field",
+    component = { kind = "region", role = "facility.footprint",
         region = rectangle(5, 5, 6, 6) } })
 truthy(farmResult.ok, "farm creation")
 local farm = farmResult.facility
@@ -408,35 +410,42 @@ truthy(PNC.BaseService.Expand({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "farm_land",
     regionDelta = rectangle(10, 0, 11, 9) }).ok, "farm territory expansion")
 farm.constructionRegion = rectangle(0, 0, 11, 9, 0)
-local field93 = rectangle(0, 0, 9, 8, 0)
-field93.levels[0].rows[9] = { 0, 2 }
-local field93Order = PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
+local plotOne = rectangle(0, 0, 3, 3, 0)
+local plotOrder = PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
-        kind = "region", role = "farm.field", region = field93,
+        kind = "region", role = "growing.plot", region = plotOne,
     } })
-truthy(field93Order.ok and field93Order.component,
-    "93 tile farm assigns without construction")
+truthy(plotOrder.ok and plotOrder.component, "growing plot assigns immediately")
 
 local farmComponentId
 for id, _ in pairs(farm.componentIds) do farmComponentId = id end
-local field117 = rectangle(0, 0, 11, 8, 0)
-field117.levels[0].rows[9] = { 0, 8 }
+local plotTwo = PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
+    expectedRevision = farm.revision, component = {
+        kind = "region", role = "growing.plot", region = rectangle(4, 0, 7, 3, 0),
+    } })
+truthy(plotTwo.ok, "second growing plot fits level one slots")
 equal(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
-        id = farmComponentId, kind = "region", role = "farm.field", region = field117,
-    } }).reason, "FACILITY_AREA_TOO_LARGE", "farm level tile limit")
+        kind = "region", role = "growing.plot", region = rectangle(8, 0, 11, 3, 0),
+    } }).reason, "FACILITY_COMPONENT_LIMIT", "farm level plot slots")
+equal(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
+    expectedRevision = farm.revision, component = {
+        id = farmComponentId, kind = "region", role = "growing.plot",
+        region = rectangle(0, 0, 4, 3, 0),
+    } }).reason, "GROWING_PLOT_WIDTH_LIMIT", "plot width limit")
 truthy(PNC.FacilityService.Upgrade({}, { facilityId = farm.id,
     expectedRevision = farm.revision }).ok, "farm level two queued")
 truthy(PNC.FacilityService.FinalizeUpgrade(farm.id, 2),
     "farm level two completed")
 truthy(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
-        id = farmComponentId, kind = "region", role = "farm.field", region = field117,
-    } }).ok, "farm expansion assigns without reconstruction")
+        id = farmComponentId, kind = "region", role = "growing.plot",
+        region = rectangle(0, 0, 3, 3, 0),
+    } }).ok, "growing plot edits without reconstruction")
 equal(farm.constructionState, "BUILT",
-    "farm field edits do not create construction work")
-equal(PNC.SettlementRepository.GetComponent(farmComponentId).tileCount, 117,
-    "farm field edit commits immediately")
+    "growing plot edits do not create construction work")
+equal(PNC.SettlementRepository.GetComponent(farmComponentId).tileCount, 16,
+    "growing plot edit commits immediately")
 equal(farm.constructionState, "BUILT",
     "completed zone reconstruction unlocks facility")
 

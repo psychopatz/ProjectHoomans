@@ -11,6 +11,7 @@ local DEFINITIONS = {
         fallback = "RESEARCHER" },
     { id = "WorkshopWorker", key = "UI_PNC_Job_WorkshopWorker",
         fallback = "WORKSHOP WORKER" },
+    { id = "Farmer", key = "UI_PNC_Job_Farmer", fallback = "FARMER" },
 }
 
 function Jobs.Create(window)

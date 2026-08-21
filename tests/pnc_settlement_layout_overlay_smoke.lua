@@ -18,7 +18,7 @@ local layers = Overlay.BuildLayers({
     facilities = {{
         id = "facility_a", definitionId = "farm",
         constructionState = "BUILT", components = {
-            { id = "field_a", kind = "region", role = "farm.field",
+            { id = "field_a", kind = "region", role = "growing.plot",
                 region = region },
             { id = "anchor_a", kind = "anchor", role = "work.anchor",
                 x = 3, y = 4, z = 0 },
@@ -43,7 +43,7 @@ local markers = Overlay.BuildMarkers({
         id = "facility_a", definitionId = "farm",
         constructionRegion = region,
         components = {
-            { id = "field_a", kind = "region", role = "farm.field",
+            { id = "field_a", kind = "region", role = "growing.plot",
                 region = region },
             { id = "anchor_a", kind = "anchor", role = "work.research",
                 x = 3, y = 4, z = 0 },
@@ -112,7 +112,7 @@ Overlay.SetSettlement({
         id = "facility_a", definitionId = "farm",
         constructionState = "BUILT", constructionRegion = region,
         components = {
-            { id = "field_a", kind = "region", role = "farm.field",
+            { id = "field_a", kind = "region", role = "growing.plot",
                 region = region },
             { id = "anchor_a", kind = "anchor", role = "work.research",
                 x = 3, y = 4, z = 0 },

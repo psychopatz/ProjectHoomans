@@ -147,6 +147,16 @@ function Jobs.OnSceneTick(record, zombie, scene, now)
     if runtime.taskLeaseId ~= "" and PNC.Tasking
         and PNC.Tasking.Commands and PNC.Tasking.Commands.SetPhase
     then PNC.Tasking.Commands.SetPhase(record.id, "WORKING") end
+    if definition.domain == "farming" and PNC.FarmingService
+        and PNC.FarmingService.TickLive
+    then
+        local live = PNC.Registry and PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(record.id) or zombie
+        local keepScene = PNC.FarmingService.TickLive(
+            record, live, runtime, now)
+        if runtime.completionRequested == true then return false end
+        if keepScene == false then return false end
+    end
     if definition.needEffect and PNC.NeedFacilityEffects
         and PNC.NeedsUtils
     then
