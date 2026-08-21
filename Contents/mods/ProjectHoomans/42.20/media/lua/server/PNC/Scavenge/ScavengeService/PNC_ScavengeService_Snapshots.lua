@@ -86,13 +86,17 @@ function Service.BuildSnapshot(session)
     then
         progress = 100
     end
+    local disbanded = session.disbanded == true
     return {
         sessionId = session.id,
         revision = session.revision,
         npcId = session.npcId,
         npcName = session.npcName,
-        npcIds = copy(session.npcIds or { session.npcId }),
-        scavengers = scavengers,
+        npcIds = disbanded and {} or copy(
+            session.npcIds or { session.npcId }),
+        scavengers = disbanded and {} or scavengers,
+        scavengerCount = disbanded and 0 or #scavengers,
+        disbanded = disbanded,
         state = session.state,
         phase = session.phase,
         runActive = session.runActive == true,
@@ -116,7 +120,7 @@ function Service.BuildSnapshot(session)
         unavailableCount = session.unavailableCount or 0,
         truncated = session.truncated == true,
         lastFailure = session.lastFailure,
-        carry = totalMax > 0 and {
+        carry = not disbanded and totalMax > 0 and {
             usedWeight = totalUsed,
             maxWeight = totalMax,
             ratio = totalUsed / totalMax,

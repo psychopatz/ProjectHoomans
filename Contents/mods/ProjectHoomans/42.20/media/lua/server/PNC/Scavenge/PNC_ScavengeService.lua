@@ -10,6 +10,7 @@ require "PNC/Scavenge/ScavengeService/PNC_ScavengeService_Snapshots"
 require "PNC/Scavenge/ScavengeService/PNC_ScavengeService_Diagnostics"
 require "PNC/Scavenge/ScavengeService/PNC_ScavengeService_Search"
 require "PNC/Scavenge/ScavengeService/PNC_ScavengeService_Queue"
+require "PNC/Scavenge/ScavengeService/PNC_ScavengeService_Termination"
 require "PNC/Scavenge/ScavengeService/PNC_ScavengeService_Commands"
 
 return PNC.ScavengeService

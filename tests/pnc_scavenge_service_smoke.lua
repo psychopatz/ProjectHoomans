@@ -90,6 +90,7 @@ isServer = function() return false end
 
 local owner = {
     username = "alice", getUsername = function(self) return self.username end,
+    getOnlineID = function() return 42 end,
     getX = function() return 0 end, getY = function() return 0 end,
     getZ = function() return 0 end,
 }
@@ -113,6 +114,7 @@ PNC = {
         SCAVENGE_MAX_RADIUS = 24, SCAVENGE_DEFAULT_RADIUS = 12,
         SCAVENGE_MAX_CANDIDATES = 256,
         SCAVENGE_MAX_MANIFEST_ENTRIES = 512,
+        ORDER_FOLLOW = "follow",
     },
     Core = {
         Now = function() clock = clock + 1; return clock end,
@@ -133,6 +135,7 @@ PNC = {
     Registry = {
         Get = function(id) return records[tostring(id)] end,
         GetLiveZombie = function() return nil end,
+        MarkDirty = function() dirty = dirty + 1 end,
     },
     CompanionCommands = {
         CanPlayerCommand = function(record, player)
@@ -148,6 +151,9 @@ PNC = {
     Inventory = { GetEncumbranceState = function()
         return { usedWeight = 1, maxWeight = 10, ratio = 0.1,
             level = "normal" }
+    end },
+    OrderSystem = { SetOrder = function(record, order)
+        record.orderSpec = order
     end },
 }
 
@@ -305,6 +311,8 @@ T.equal(teamSnapshot.carry.maxWeight, 20,
     "team snapshot totals carry capacity")
 T.equal(#teamSnapshot.scavengers, 2,
     "team snapshot exposes each scavenger")
+T.equal(teamSnapshot.scavengerCount, 2,
+    "team snapshot exposes total scavenger count")
 team.workers.bob.currentSource = team.candidates[1]
 team.workers.bob.lastMovement = "move_intent"
 local activeSnapshot = Service.BuildSnapshot(team)
@@ -326,5 +334,37 @@ ok, reason = Service.StartSearch(owner, {
 })
 T.truthy(ok,
     "assigned scavengers can restart their owned run after leaving follow order")
+
+team = Service.Internal.SessionForNPC("bob")
+T.truthy(Service.SetAutoGrab(owner, { sessionId = team.id,
+    fullType = "Base.CannedBeans", enabled = true }),
+    "auto-grab can change before disband cleanup")
+T.truthy(PNC.ScavengePolicy.Dirty,
+    "auto-grab change is pending persistence")
+local disbanded
+ok, reason, disbanded = Service.Disband(owner, { sessionId = team.id })
+T.truthy(ok, "disband stops the shared scavenging run")
+T.equal(reason, "disbanded_following", "disband result is explicit")
+T.truthy(disbanded.disbanded, "terminal snapshot marks disband cleanup")
+T.equal(disbanded.scavengerCount, 0,
+    "terminal snapshot clears active searcher count")
+T.equal(Service.GetSession(team.id), nil,
+    "disband removes runtime session lookup")
+T.equal(Service.Internal.SessionForNPC("bob"), nil,
+    "disband removes per-NPC runtime lookup")
+T.equal(records.bob.orderSpec.kind, "follow",
+    "first scavenger returns to follow")
+T.equal(records.alice2.orderSpec.kind, "follow",
+    "second scavenger returns to follow")
+T.equal(records.bob.orderSpec.ownerOnlineID, 42,
+    "follow order retains player identity")
+T.falsy(PNC.ScavengePolicy.Dirty,
+    "disband persists auto-grab before clearing runtime state")
+T.truthy(PNC.ScavengePolicy.Matches(owner, "Base.CannedBeans"),
+    "auto-grab survives session cleanup")
+T.equal(#team.manifest, 0, "disband releases manifest memory")
+T.equal(#team.activity, 0, "disband releases activity memory")
+T.equal(team.recordBroadcasts, nil,
+    "disband releases pending broadcast memory")
 
 T.finish("pnc_scavenge_service_smoke")

@@ -422,6 +422,7 @@ local SCAVENGE_LOCAL_METHODS = {
     start_collection = "StartCollection",
     cancel_collection = "CancelCollection",
     pause = "Pause",
+    disband = "Disband",
     set_auto_grab = "SetAutoGrab",
     remove_auto_grab = "RemoveAutoGrab",
     set_preferences = "SetSearchPreferences",
@@ -464,7 +465,11 @@ function Client.SendScavengeRequest(action, payload)
         return false, "scavenge_service_unavailable"
     end
     local ok, reason, snapshot = service[method](player, args)
-    if snapshot and (snapshot.sessionId or snapshot.policyOnly == true)
+    -- Session services publish through SendSnapshot, including local games.
+    -- Applying their return value here would duplicate every UI rebuild and
+    -- bypass server-side snapshot throttling. Policy-only replies are not
+    -- published by the service and still need direct delivery.
+    if snapshot and snapshot.policyOnly == true
         and Client.Internal.ApplyScavengeSnapshot
     then
         Client.Internal.ApplyScavengeSnapshot(snapshot)

@@ -103,7 +103,9 @@ local function transferWorkerEntry(session, worker, record, body)
         if PNC.Registry and PNC.Registry.MarkDirty then
             PNC.Registry.MarkDirty(record, "inventory")
         end
-        if PNC.Network and PNC.Network.BroadcastRecord then
+        if Service.Internal.QueueRecordBroadcast then
+            Service.Internal.QueueRecordBroadcast(session, record, false)
+        elseif PNC.Network and PNC.Network.BroadcastRecord then
             PNC.Network.BroadcastRecord(record, "scavenge_collect")
         end
     else

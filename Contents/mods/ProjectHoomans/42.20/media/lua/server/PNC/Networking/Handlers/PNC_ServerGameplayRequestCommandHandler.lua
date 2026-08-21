@@ -49,6 +49,7 @@ local SCAVENGE_ACTIONS = {
     start_collection = "StartCollection",
     cancel_collection = "CancelCollection",
     pause = "Pause",
+    disband = "Disband",
     set_auto_grab = "SetAutoGrab",
     remove_auto_grab = "RemoveAutoGrab",
     set_preferences = "SetSearchPreferences",

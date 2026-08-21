@@ -100,14 +100,15 @@ function Service.QueueMultiple(player, arguments)
     if session.queueCount < 1 then
         touch(session, "ItemUnavailable", {
             reason = "no_available_entries",
-        }, true)
+        }, "immediate")
         return false, "no_available_entries"
     end
     session.state = "COLLECTION_QUEUED"
     session.phase = "COLLECTION_QUEUED"
     session.runActive = true
     session.lastFailure = nil
-    touch(session, "PickupQueued", { count = session.queueCount }, true)
+    touch(session, "PickupQueued", { count = session.queueCount },
+        "immediate")
     increment("PickupRequests", session.queueCount)
     forEachWorker(session, function(npcId)
         local worker = session.workers and session.workers[npcId] or nil

@@ -7,86 +7,13 @@ local Internal = Service.Internal
 local Policy = PNC.ScavengePolicy
 local TERMINAL_STATES = Internal.TERMINAL_STATES
 local copy = Internal.Copy
-local increment = Internal.Increment
 local touch = Internal.Touch
 local activity = Internal.Activity
 local ownerMatches = Internal.OwnerMatches
 local authorizeNPC = Internal.AuthorizeNPC
 local sessionForNPC = Internal.SessionForNPC
-local forEachWorker = Internal.ForEachWorker
-local restorePreviousOrder = Internal.RestorePreviousOrder
 local releaseReservations = Internal.ReleaseReservations
 local removeSession = Internal.RemoveSession
-
-function Service.Cancel(player, arguments)
-    arguments = type(arguments) == "table" and arguments or {}
-    local session = Service.GetSession(arguments.sessionId)
-        or sessionForNPC(arguments.npcId)
-    if not session then return false, "session_not_found" end
-    if not ownerMatches(session, player) then return false, "session_not_owned" end
-    if session.state == "ATOMIC_TRANSFER" then
-        session.cancelAfterAtomic = true
-        activity(session, "CANCEL_PENDING", nil, "atomic_transfer")
-        touch(session, "CollectionCancelPending", nil, true)
-        return true, "cancel_pending", Service.BuildSnapshot(session)
-    end
-    session.state = "CANCELLED"
-    session.phase = "CANCELLED"
-    releaseReservations(session, "cancelled")
-    WorldLoot.ReleaseSession(session.worldLootSessionId)
-    session.worldLootReleased = true
-    activity(session, "CANCELLED", nil, arguments.reason)
-    touch(session, "CollectionCancelled", nil, true)
-    session.runActive = false
-    forEachWorker(session, function(npcId)
-        PNC.Tasking.Commands.CancelForNPC(npcId, "SCAVENGE_CANCELLED")
-        restorePreviousOrder(session, npcId)
-    end)
-    increment("Cancelled")
-    return true, "cancelled", Service.BuildSnapshot(session)
-end
-
-function Service.CancelSearch(player, arguments)
-    return Service.Cancel(player, arguments)
-end
-
-function Service.CancelCollection(player, arguments)
-    return Service.Cancel(player, arguments)
-end
-
-function Service.Pause(player, arguments)
-    arguments = type(arguments) == "table" and arguments or {}
-    local session = Service.GetSession(arguments.sessionId)
-        or sessionForNPC(arguments.npcId)
-    if not session then return false, "session_not_found" end
-    if not ownerMatches(session, player) then return false, "session_not_owned" end
-    if session.state == "ATOMIC_TRANSFER" then
-        return false, "atomic_transfer_in_progress"
-    end
-    releaseReservations(session, "paused")
-    for _, entry in ipairs(session.manifest or {}) do
-        if entry.status == "QUEUED" then
-            entry.status = "AVAILABLE"
-            entry.failureReason = nil
-            entry.assignedNpcId = nil
-        end
-    end
-    session.queue = nil
-    session.queueIndex = 1
-    session.queueEntryIndex = 1
-    session.queueCount = 0
-    session.state = "PAUSED"
-    session.phase = "PAUSED"
-    session.runActive = false
-    activity(session, "PAUSED", nil, "return_to_follow")
-    touch(session, "ScavengePaused", { reason = "return_to_follow" }, true)
-    forEachWorker(session, function(npcId)
-        PNC.Tasking.Commands.CancelForNPC(npcId, "SCAVENGE_PAUSED")
-        restorePreviousOrder(session, npcId)
-    end)
-    increment("Paused")
-    return true, "paused", Service.BuildSnapshot(session)
-end
 
 function Service.SetAutoGrab(player, arguments)
     arguments = type(arguments) == "table" and arguments or {}
@@ -103,7 +30,7 @@ function Service.SetAutoGrab(player, arguments)
         touch(session, "AutoGrabChanged", {
             fullType = arguments.fullType,
             enabled = arguments.enabled == true,
-        }, true)
+        }, "immediate")
     end
     return true, "auto_grab_updated", result
 end
@@ -154,7 +81,7 @@ function Service.BringBack(record, player)
             session.worldLootReleased = true
             touch(session, "CollectionCancelled", {
                 reason = "bring_back",
-            }, true)
+            }, "immediate")
         end
         if PNC.TaskLeaseService and PNC.TaskLeaseService.ForNPC(record.id) then
             PNC.Tasking.Commands.CancelForNPC(record.id, "SCAVENGE_BRING_BACK")

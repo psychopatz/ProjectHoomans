@@ -18,7 +18,7 @@ end
 
 Internal.IsWorldReady = isWorldReady
 
-require "PNC/Networking/PNC_ClientCommandRouter"
+require "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter"
 require "PNC/Networking/PNC_ClientCombatCommands"
 require "PNC/Networking/PNC_ClientRequests"
 require "PNC/Networking/PNC_ClientRosterCommands"

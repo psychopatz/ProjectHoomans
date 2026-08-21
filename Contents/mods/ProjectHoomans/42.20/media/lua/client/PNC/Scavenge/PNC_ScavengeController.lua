@@ -124,6 +124,14 @@ function Controller.StopSearch(snapshot, npcId)
     })
 end
 
+function Controller.Disband(snapshot, npcId)
+    snapshot = type(snapshot) == "table" and snapshot or nil
+    return PNC.Client.SendScavengeRequest("disband", {
+        sessionId = snapshot and snapshot.sessionId or nil,
+        npcId = npcId or snapshot and snapshot.npcId or nil,
+    })
+end
+
 function Controller.Open(npcId, context)
     npcId = npcId and tostring(npcId) or nil
     local npcIds = Controller.TeamIDs()
@@ -141,7 +149,9 @@ function Controller.ReceiveSnapshot(snapshot)
     if type(snapshot) ~= "table" or snapshot.requestFailed == true
         or snapshot.policyOnly == true
     then return false end
-    if type(snapshot.npcIds) == "table" then
+    if snapshot.disbanded == true then
+        Controller.SetTeam({})
+    elseif type(snapshot.npcIds) == "table" then
         Controller.SetTeam(snapshot.npcIds)
     end
     return true

@@ -110,6 +110,9 @@ function Service.SendSnapshot(session, player)
     then
         PNC.Client.Internal.ApplyScavengeSnapshot(payload)
     end
+    session.lastSnapshotAt = PNC.Core.Now()
+    session.snapshotPending = nil
+    Internal.Increment("SnapshotsSent")
     return true
 end
 

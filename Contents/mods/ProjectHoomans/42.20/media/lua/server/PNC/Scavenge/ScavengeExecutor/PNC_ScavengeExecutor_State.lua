@@ -36,6 +36,10 @@ end
 
 local function pauseTeamForCapacity(session)
     if session.state == "PAUSED_CAPACITY" then return end
+    if Service.Internal.FlushRecordBroadcasts then
+        Service.Internal.FlushRecordBroadcasts(session,
+            "scavenge_capacity_pause")
+    end
     Service.Internal.ReleaseReservations(session, "capacity_pause")
     for _, entry in ipairs(session.manifest or {}) do
         if entry.status == "QUEUED" then
@@ -53,7 +57,7 @@ local function pauseTeamForCapacity(session)
         "team_capacity_reached")
     Service.Internal.Touch(session, "CollectionPaused", {
         reason = "team_capacity_reached",
-    }, true)
+    }, "immediate")
     for _, npcId in ipairs(session.npcIds or { session.npcId }) do
         PNC.Tasking.Commands.CancelForNPC(npcId, "SCAVENGE_CAPACITY_PAUSE")
         Service.Internal.RestorePreviousOrder(session, npcId)
@@ -70,6 +74,10 @@ end
 
 local function settleIdleSession(session)
     if not allWorkersIdle(session) then return end
+    if Service.Internal.FlushRecordBroadcasts then
+        Service.Internal.FlushRecordBroadcasts(session,
+            "scavenge_search_complete")
+    end
     session.searchComplete = session.nextCandidateIndex > session.candidateCount
     session.state = "WAITING_FOR_SELECTION"
     session.phase = "WAITING_FOR_SELECTION"
@@ -79,10 +87,14 @@ local function settleIdleSession(session)
     Service.Internal.Touch(session, "SearchCompleted", {
         count = #session.manifest,
         truncated = session.truncated == true,
-    }, true)
+    }, "immediate")
 end
 
 local function finishWorker(session, worker, lease)
+    if Service.Internal.FlushRecordBroadcasts then
+        Service.Internal.FlushRecordBroadcasts(session,
+            "scavenge_worker_complete", worker.npcId)
+    end
     clearWorkerAction(worker)
     worker.phase = "IDLE"
     Service.Internal.RestorePreviousOrder(session, worker.npcId)

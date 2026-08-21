@@ -154,8 +154,8 @@ function ISPNCScavengeWindow:createChildren()
         "UI_PNC_Scavenge_TakeAll", "Take All Found"), 0, 126)
     self.autoButton = makeButton(self, "take_auto", tr(
         "UI_PNC_Scavenge_TakeAuto", "Take Auto Grab"), 0, 132)
-    self.pauseButton = makeButton(self, "pause", tr(
-        "UI_PNC_Scavenge_Pause", "Pause & Follow"), 0, 124)
+    self.disbandButton = makeButton(self, "disband", tr(
+        "UI_PNC_Scavenge_Disband", "Disband & Follow"), 0, 145)
     self.debugButton = makeButton(self, "debug_dump", tr(
         "UI_PNC_Scavenge_DumpDiagnostics", "Dump Diagnostics"), 0, 120)
     self.closeButton = makeButton(self, "close", tr(
@@ -211,7 +211,7 @@ function ISPNCScavengeWindow:onResponsiveLayout()
         math.max(1, statusHeight - sectionHeaderHeight - 1))
     local x = rect.x
     for _, button in ipairs({ self.takeButton, self.takeAllButton,
-        self.autoButton, self.pauseButton })
+        self.autoButton, self.disbandButton })
     do
         local width = px(button.psychopatzBaseWidth or button.width)
         Layout.SetBounds(button, x, buttonsY, width, controlHeight)
@@ -298,6 +298,27 @@ function ISPNCScavengeWindow:onInventoryRowClick(_, row)
         if eligible(entry) then self.selectedEntries[id] = select or nil end
     end
     self:rebuildManifest()
+    self:recalculateEstimatedLoad()
+end
+
+function ISPNCScavengeWindow:recalculateEstimatedLoad()
+    local total, weightByType = 0, {}
+    for _, entry in ipairs(self.snapshot and self.snapshot.manifest or {}) do
+        if self.selectedEntries[entry.entryId] == true
+            or entry.status == "QUEUED"
+        then
+            local fullType = tostring(entry.fullType or "")
+            local weight = weightByType[fullType]
+            if weight == nil then
+                local metadata = Model.Probe(fullType)
+                weight = tonumber(metadata and metadata.weight) or 0
+                weightByType[fullType] = weight
+            end
+            total = total + weight * (tonumber(entry.quantity) or 1)
+        end
+    end
+    self.estimatedLoad = total
+    return total
 end
 
 function ISPNCScavengeWindow:showItemContext(_, row)
@@ -580,6 +601,11 @@ function ISPNCScavengeWindow:applySnapshot(snapshot)
             self.npcIds[#self.npcIds + 1] = tostring(npcId)
         end
     end
+    if snapshot.disbanded == true then
+        self.npcIds = {}
+        self.selectedEntries = {}
+        self.expandedGroups = {}
+    end
     if snapshot.sourcePolicy then
         self.sourcePolicy = {
             containers = snapshot.sourcePolicy.containers == true,
@@ -590,6 +616,7 @@ function ISPNCScavengeWindow:applySnapshot(snapshot)
     self:updateToggleTitles()
     self:updateSearchControl(Controller.IsSearchActive(snapshot))
     self:rebuildManifest()
+    self:recalculateEstimatedLoad()
     self:rebuildStatus()
 end
 
@@ -646,11 +673,8 @@ function ISPNCScavengeWindow:onAction(button)
             entryIds = ids,
         })
     end
-    if action == "pause" then
-        return PNC.Client.SendScavengeRequest("pause", {
-            sessionId = self.snapshot and self.snapshot.sessionId,
-            npcId = self.npcId,
-        })
+    if action == "disband" then
+        return Controller.Disband(self.snapshot, self.npcId)
     end
     if action == "debug_dump" then
         self.debugEnabled = not self.debugEnabled
@@ -686,27 +710,22 @@ function ISPNCScavengeWindow:prerender()
         "Search: %s%%  |  %s searched  |  %s unreachable",
         progress, tonumber(snapshot.searchedCount) or 0,
         tonumber(snapshot.unreachableCount) or 0)
+    local scavengerCount = tonumber(snapshot.scavengerCount)
+        or #(snapshot.scavengers or self.npcIds or {})
+    progressText = tr("UI_PNC_Scavenge_SearcherCount",
+        "Scavengers: %s", scavengerCount) .. "  |  " .. progressText
     self:drawText(progressText, rect.x,
         rect.y + 3, 0.72, 0.86, 0.94, 1, UIFont.Small)
     local carry = snapshot.carry
-    local estimatedLoad = 0
-    for _, entry in ipairs(snapshot.manifest or {}) do
-        if self.selectedEntries[entry.entryId] == true
-            or entry.status == "QUEUED"
-        then
-            local metadata = Model.Probe(entry.fullType)
-            estimatedLoad = estimatedLoad + (tonumber(metadata.weight) or 0)
-                * (tonumber(entry.quantity) or 1)
-        end
-    end
     local carryText = carry and tr("UI_PNC_Scavenge_Carry",
         "Carry %s / %s (%s)",
-        tonumber(carry.usedWeight) or 0,
-        tonumber(carry.maxWeight) or 0,
+        string.format("%.2f", tonumber(carry.usedWeight) or 0),
+        string.format("%.2f", tonumber(carry.maxWeight) or 0),
         readable(carry.level)) or tr("UI_PNC_Scavenge_CarryUnavailable",
             "Carry unavailable")
     carryText = carryText .. tr("UI_PNC_Scavenge_QueuedLoad",
-        "  |  Queued ~%s", estimatedLoad)
+        "  |  Queued ~%s", string.format("%.2f",
+            tonumber(self.estimatedLoad) or 0))
     self:drawTextRight(carryText, rect.x + rect.width, rect.y + 3,
         0.72, 0.74, 0.78, 1, UIFont.Small)
 end
@@ -726,6 +745,7 @@ function ISPNCScavengeWindow:new(x, y, width, height, options)
     o.entryById = {}
     o.debugEnabled = false
     o.nextDebugRequestAt = 0
+    o.estimatedLoad = 0
     return o
 end
 

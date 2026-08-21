@@ -30,7 +30,7 @@ local ACTIVE_STATES = {
 }
 
 local TERMINAL_STATES = {
-    COMPLETED = true, CANCELLED = true, FAILED = true,
+    COMPLETED = true, CANCELLED = true, FAILED = true, DISBANDED = true,
 }
 
 local function copy(value)

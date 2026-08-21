@@ -673,6 +673,8 @@
     "UI_PNC_Scavenge_Tab": "SCAVENGE",
     "UI_PNC_Scavenge_Followers": "FOLLOWERS / ASSIGNED",
     "UI_PNC_Scavenge_Pause": "PAUSE & FOLLOW",
+    "UI_PNC_Scavenge_Disband": "DISBAND & FOLLOW",
+    "UI_PNC_Scavenge_SearcherCount": "Scavengers: %s",
     "UI_PNC_Scavenge_TakeAll": "TAKE ALL FOUND",
     "UI_PNC_Scavenge_Assign": "ASSIGN SCAVENGER",
     "UI_PNC_Scavenge_Remove": "REMOVE SCAVENGER",

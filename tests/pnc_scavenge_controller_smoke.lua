@@ -36,6 +36,11 @@ Controller.StopSearch({ sessionId = "session:1", npcId = "bob" })
 T.equal(requests[2].action, "cancel_search", "search toggle routes stop action")
 T.equal(requests[2].payload.sessionId, "session:1", "stop targets active run")
 
+Controller.Disband({ sessionId = "session:1", npcId = "bob" })
+T.equal(requests[3].action, "disband", "disband routes dedicated command")
+T.equal(requests[3].payload.sessionId, "session:1",
+    "disband targets active run")
+
 T.truthy(Controller.Open("bob", { name = "Bob" }),
     "context and colony triggers share open pipeline")
 T.equal(opened.npcId, "bob", "open preserves selected NPC")
@@ -45,6 +50,10 @@ Controller.ReceiveSnapshot({ npcIds = { "sue" }, runActive = true,
     state = "DISCOVERING" })
 T.falsy(Controller.IsAssigned("bob"), "authoritative snapshot replaces party")
 T.truthy(Controller.IsAssigned("sue"), "snapshot party retained")
+Controller.ReceiveSnapshot({ npcIds = {}, disbanded = true,
+    runActive = false, state = "DISBANDED" })
+T.equal(#Controller.TeamIDs(), 0,
+    "disband snapshot clears the client scavenger party")
 T.truthy(Controller.IsSearchActive({ runActive = true,
     state = "DISCOVERING" }), "active snapshot drives toggle feedback")
 T.falsy(Controller.IsSearchActive({ runActive = false,
@@ -64,6 +73,12 @@ T.contains(windowSource, "UI_PNC_Scavenge_LogCollected",
     "activity log describes successful pickups")
 T.contains(windowSource, "snapshot.scavengeDebug",
     "live debug view renders authority-side worker and source state")
+T.contains(windowSource, "Controller.Disband",
+    "dedicated UI exposes clean disband-to-follow action")
+T.contains(windowSource, "recalculateEstimatedLoad",
+    "queued weight is cached outside the frame render path")
+T.contains(windowSource, 'string.format("%.2f"',
+    "scavenging weights render with two decimal places")
 T.contains(windowSource, "ScavengeWindow:v2",
     "rescaled window discards incompatible oversized saved geometry")
 
