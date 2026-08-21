@@ -63,6 +63,7 @@ function Commands.Register(definition)
         type(definition.buildOrder) ~= "function"
         and definition.attackType == nil
         and type(definition.apply) ~= "function"
+        and definition.clientOnly ~= true
     ) then
         return false
     end
@@ -311,6 +312,9 @@ function Commands.Apply(record, player, commandID, radius)
     local orderSpec
     if not Core.IsAuthority() then return false, "not_authority" end
     if not definition then return false, "unknown_command" end
+    if definition.clientOnly == true then
+        return false, "client_action_required"
+    end
     allowed, reason = Commands.CanPlayerCommand(record, player, radius)
     if not allowed then return false, reason end
     if type(definition.buildOrder) == "function" then
@@ -359,6 +363,9 @@ function Commands.Execute(player, args)
         return 0, "unknown_command"
     end
     if scope == "group" and definition.attackType ~= nil then
+        return 0, "personalized_command"
+    end
+    if scope == "group" and definition.personalized == true then
         return 0, "personalized_command"
     end
     if scope == "closest" then

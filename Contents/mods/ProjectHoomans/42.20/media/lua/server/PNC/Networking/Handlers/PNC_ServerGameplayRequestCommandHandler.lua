@@ -40,3 +40,52 @@ Router.Register(Const.CMD_FACTION_TOLL_RESPONSE, function(player, args)
         tolls.HandleResponse(player, args)
     end
 end)
+
+local SCAVENGE_ACTIONS = {
+    start_search = "StartSearch",
+    cancel_search = "CancelSearch",
+    queue_pickup = "QueuePickup",
+    queue_multiple = "QueueMultiple",
+    start_collection = "StartCollection",
+    cancel_collection = "CancelCollection",
+    pause = "Pause",
+    set_auto_grab = "SetAutoGrab",
+    remove_auto_grab = "RemoveAutoGrab",
+    set_preferences = "SetSearchPreferences",
+    request_policy = "RequestPolicy",
+    request_snapshot = "RequestSnapshot",
+}
+
+Router.Register(Const.CMD_SCAVENGE_REQUEST, function(player, args)
+    args = type(args) == "table" and args or {}
+    if args.action == "debug_dump" then
+        if not Router.CanUseDebug(player) then return end
+        local service = PNC.ScavengeService
+        local session = service and service.GetSession(args.sessionId)
+        local allowed = session and service.RequestSnapshot(player, args)
+        if allowed == true and sendServerCommand then
+            local payload = service.BuildSnapshot(session)
+            payload.debugDiagnostics = service.GetDiagnostics()
+            sendServerCommand(player, Const.MODULE,
+                Const.CMD_SCAVENGE_STATE, payload)
+        end
+        return
+    end
+    local method = SCAVENGE_ACTIONS[tostring(args.action or "")]
+    local service = PNC.ScavengeService
+    if not method or not service or type(service[method]) ~= "function" then
+        return
+    end
+    local ok, reason, snapshot = service[method](player, args)
+    if snapshot and snapshot.policyOnly == true and sendServerCommand then
+        sendServerCommand(player, Const.MODULE, Const.CMD_SCAVENGE_STATE,
+            snapshot)
+    elseif ok ~= true and sendServerCommand then
+        sendServerCommand(player, Const.MODULE, Const.CMD_SCAVENGE_STATE, {
+            requestFailed = true,
+            reason = tostring(reason or "scavenge_request_failed"),
+            sessionId = args.sessionId,
+            npcId = args.npcId,
+        })
+    end
+end)

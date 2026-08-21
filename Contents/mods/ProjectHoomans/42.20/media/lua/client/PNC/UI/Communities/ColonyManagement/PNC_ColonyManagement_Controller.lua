@@ -165,6 +165,9 @@ function Controller.OnPersonSelected(window)
     window.selectedPersonID = person and person.id
         or window.selectedPersonID
     local definition = Registry.Get(window.tab)
+    if definition and definition.onPersonSelected then
+        definition.onPersonSelected(window)
+    end
     if definition and definition.showRoster ~= false then
         Controller.RebuildDetails(window)
     end

@@ -16,6 +16,7 @@ local TraversalQuery = PNC.TraversalQuery
 local PathInternal = PNC.PathService
     and PNC.PathService.Internal or nil
 local Animation = PNC.Animation
+local LiveBodyControl = PNC.LiveBodyControl
 local clearOwnedPath = Controller.ClearOwnedPath
 local beginMovementLease = Controller.BeginMovementLease
 local logState = Controller.LogState
@@ -26,6 +27,7 @@ local WINDOW_SMASH_IMPACT_MS =
     Controller.WINDOW_SMASH_IMPACT_MS
 local WINDOW_SMASH_FINISH_MS =
     Controller.WINDOW_SMASH_FINISH_MS
+local FENCE_CLIMB_FINISH_MS = 900
 
 local function objectBool(object, methodName)
     local method = object and object[methodName] or nil
@@ -51,6 +53,28 @@ local function updateWindowSmash(body, state, now)
     if body.faceThisObject and action.object then
         body:faceThisObject(action.object)
     end
+    if action.kind == "fence_climb" then
+        local duration = math.max(1, action.finishAt - action.startedAt)
+        local progress = math.max(0, math.min(1,
+            (now - action.startedAt) / duration))
+        local x = action.fromX + (action.toX - action.fromX) * progress
+        local y = action.fromY + (action.toY - action.fromY) * progress
+        if LiveBodyControl and LiveBodyControl.SetAuthoritativePosition then
+            LiveBodyControl.SetAuthoritativePosition(body, x, y, action.toZ)
+        end
+        if body.setLx then body:setLx(x) end
+        if body.setLy then body:setLy(y) end
+        if now < action.finishAt then
+            beginMovementLease(body, state, action.key, now)
+            return true, "native_fence_climb"
+        end
+        finishPassageBump(body)
+        state.passageAction = nil
+        state.requestKey = nil
+        state.failed = true
+        state.retryAt = now + RETRY_BASE_MS
+        return true, "native_fence_crossed"
+    end
     if action.applied ~= true
         and now >= (tonumber(action.impactAt) or now)
     then
@@ -71,6 +95,36 @@ local function updateWindowSmash(body, state, now)
     state.failed = true
     state.retryAt = now + RETRY_BASE_MS
     return true, "native_window_smashed"
+end
+
+local function startFenceClimb(snapshot, body, state, passage, object, now)
+    local toSquare = passage and passage.toSquare or nil
+    if not toSquare then return false, nil end
+    local _, tall = TraversalQuery.IsFence(object)
+    clearOwnedPath(body, state)
+    local key = "fence_climb:"
+        .. tostring(snapshot and snapshot.id or "npc")
+        .. ":" .. tostring(now)
+    state.passageAction = {
+        kind = "fence_climb", key = key, object = object,
+        startedAt = now, finishAt = now + FENCE_CLIMB_FINISH_MS,
+        fromX = body:getX(), fromY = body:getY(),
+        toX = toSquare:getX() + 0.5,
+        toY = toSquare:getY() + 0.5,
+        toZ = toSquare:getZ(),
+    }
+    if body.faceThisObject then body:faceThisObject(object) end
+    if Animation and Animation.PlayBump then
+        Animation.PlayBump(body, snapshot,
+            tall and "PNC_ClimbFenceTall" or "PNC_ClimbFence", {
+                sceneId = "native_fence_climb",
+                leaseUntil = now + FENCE_CLIMB_FINISH_MS,
+                keepManagedUseless = false,
+            })
+    end
+    beginMovementLease(body, state, key, now)
+    logState(snapshot, "native_fence_climb_start", describeBody(body))
+    return true, "native_fence_climb"
 end
 
 local function startWindowSmash(
@@ -172,6 +226,11 @@ local function tryNativePassage(
     )
     local object = passage and passage.object or nil
     if not object then return false, nil end
+    if TraversalQuery.IsFence
+        and TraversalQuery.IsFence(object) == true
+    then
+        return startFenceClimb(snapshot, body, state, passage, object, now)
+    end
     if TraversalQuery.IsDoor
         and TraversalQuery.IsDoor(object)
         and not objectBool(object, "IsOpen")

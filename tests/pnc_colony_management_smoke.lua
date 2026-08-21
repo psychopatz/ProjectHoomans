@@ -30,6 +30,7 @@ local companion = {
     alive = true,
     recruited = true,
     ownerUsername = "Tester",
+    orderSpec = { kind = "follow", ownerUsername = "Tester" },
     affiliation = { factionID = "faction_player", communityRole = "resident" },
     health = { state = "normal" },
     needs = { hunger = 0.82, thirst = 0.10, fatigue = 0.10 },
@@ -203,6 +204,8 @@ local snapshot = Management.BuildSnapshot(player)
 
 equal(#snapshot.people, 1, "owned companion appears")
 equal(snapshot.people[1].name, "Alex Rivera", "companion identity presented")
+equal(snapshot.people[1].followingCurrentPlayer, true,
+    "snapshot marks the current player's follower")
 equal(#snapshot.people[1].journal, 1, "companion journal included")
 equal(#snapshot.attention, 1, "critical need appears in attention")
 equal(snapshot.attention[1].needType, "hunger", "critical need type")

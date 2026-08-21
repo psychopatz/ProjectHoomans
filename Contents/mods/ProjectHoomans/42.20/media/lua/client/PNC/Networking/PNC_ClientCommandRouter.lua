@@ -155,6 +155,44 @@ Internal.RegisterServerCommand(
     Internal.ApplyWorldDiscoverySnapshot
 )
 
+function Internal.ApplyScavengeSnapshot(payload)
+    if type(payload) ~= "table" then return false end
+    ClientState.scavengeSessions = ClientState.scavengeSessions or {}
+    local sessionId = payload.sessionId and tostring(payload.sessionId) or nil
+    if payload.requestFailed == true then
+        ClientState.lastScavengeFailure = payload.reason
+        if PNC.ScavengeUI and PNC.ScavengeUI.ReceiveSnapshot then
+            PNC.ScavengeUI.ReceiveSnapshot(payload)
+        end
+        if PNC.ColonyScavengeTab and PNC.ColonyScavengeTab.ReceiveSnapshot then
+            PNC.ColonyScavengeTab.ReceiveSnapshot(payload)
+        end
+        return false
+    end
+    local current = sessionId and ClientState.scavengeSessions[sessionId] or nil
+    local incomingRevision = tonumber(payload.revision)
+    if current and incomingRevision
+        < (tonumber(current.revision) or 0)
+    then return false end
+    if sessionId then ClientState.scavengeSessions[sessionId] = payload end
+    ClientState.activeScavengeSessionId = sessionId
+        or ClientState.activeScavengeSessionId
+    ClientState.lastScavengeFailure = nil
+    if PNC.ScavengeNotifications and PNC.ScavengeNotifications.Receive then
+        PNC.ScavengeNotifications.Receive(current, payload)
+    end
+    if PNC.ScavengeUI and PNC.ScavengeUI.ReceiveSnapshot then
+        PNC.ScavengeUI.ReceiveSnapshot(payload)
+    end
+    if PNC.ColonyScavengeTab and PNC.ColonyScavengeTab.ReceiveSnapshot then
+        PNC.ColonyScavengeTab.ReceiveSnapshot(payload)
+    end
+    return true
+end
+
+Internal.RegisterServerCommand(Const.CMD_SCAVENGE_STATE,
+    Internal.ApplyScavengeSnapshot)
+
 local function projectionIsCurrent(payload)
     local context = ClientState.playerContext
     if not context or not payload then return true end

@@ -87,9 +87,11 @@ function Provider.addOptions(menu, entry, player)
             tr(definition.labelKey, definition.label),
             nil,
             function()
-                local sent = PNC.Client
-                    and PNC.Client.SendCompanionCommand
-                    and PNC.Client.SendCompanionCommand(commandID, entry.id)
+                local execute = PNC.Client
+                    and (PNC.Client.ExecuteCompanionCommand
+                        or PNC.Client.SendCompanionCommand)
+                local sent = execute and execute(
+                    commandID, entry.id, nil, entry)
                 if sent and PNC.CompanionCommandPresentation
                     and PNC.CompanionCommandPresentation.PlayCommand
                 then

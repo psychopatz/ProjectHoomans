@@ -141,9 +141,12 @@ assertEqual(sharedCalls[presenceIndex - 1],
     "PNC/Core/Production/PNC_WorkBehavior",
     "Presence runtime initialization predecessor")
 assertEqual(sharedCalls[presenceIndex - 2],
+    "PNC/Core/Scavenge/PNC_ScavengeAnimationScenes",
+    "Scavenge animation scene dependency")
+assertEqual(sharedCalls[presenceIndex - 3],
     "PNC/Core/Production/PNC_WorkAnimationScenes",
     "Production animation scene dependency")
-assertEqual(sharedCalls[presenceIndex - 3],
+assertEqual(sharedCalls[presenceIndex - 4],
     "PNC/Core/Facilities/PNC_FacilityJobs_Behavior",
     "Production work follows facility job behavior")
 assertEqual(sharedCalls[presenceIndex + 1],

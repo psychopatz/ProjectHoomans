@@ -211,7 +211,9 @@ records.owned.affiliation = { factionID = "faction_alice" }
 assertEqual(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
     true, "single-player faction ownership uses canonical account key")
 
-assertEqual(#PNC.CompanionCommands.List(), 8, "registered command count")
+assertEqual(#PNC.CompanionCommands.List(), 9, "registered command count")
+assertEqual(PNC.CompanionCommands.Get("scavenge_nearby").clientOnly, true,
+    "scavenge command opens its client setup UI")
 assertEqual(#PNC.CompanionCommands.ListGroups(), 2,
     "registered command group count")
 assertEqual(
@@ -276,6 +278,13 @@ affected, reason = PNC.CompanionCommands.Execute(player, {
 assertEqual(affected, 0, "group attack type was accepted")
 assertEqual(reason, "personalized_command",
     "group attack type rejection reason")
+affected, reason = PNC.CompanionCommands.Execute(player, {
+    id = "owned",
+    commandID = "scavenge_nearby",
+})
+assertEqual(affected, 0, "server executed client-only scavenge command")
+assertEqual(reason, "client_action_required",
+    "client-only scavenge rejection reason")
 affected, reason = PNC.CompanionCommands.Execute(player, {
     commandID = "follow",
     scope = "group",
@@ -459,18 +468,20 @@ registeredProvider.addOptions(
 )
 assertEqual(context.options[1].name, "Companion Commands",
     "context command root")
-assertEqual(#context.options[1].submenu.options, 4,
+assertEqual(#context.options[1].submenu.options, 5,
     "movement commands and nested attack root")
 assertEqual(context.options[1].submenu.options[3].name, "Go Home",
     "context go-home command")
-assertEqual(context.options[1].submenu.options[4].name, "Attack Type",
+assertEqual(context.options[1].submenu.options[4].name, "Scavenge Nearby",
+    "context scavenge command")
+assertEqual(context.options[1].submenu.options[5].name, "Attack Type",
     "nested attack type root")
-local attackOptions = context.options[1].submenu.options[4].submenu.options
+local attackOptions = context.options[1].submenu.options[5].submenu.options
 assertEqual(#attackOptions, 4, "attack type definitions")
 assertEqual(attackOptions[4].notAvailable, true,
     "current attack type is disabled and red")
 assertEqual(
-    context.options[1].submenu.options[4].iconTexture,
+    context.options[1].submenu.options[5].iconTexture,
     "media/ui/emotes/no.png",
     "context attack type icon did not reflect current setting"
 )

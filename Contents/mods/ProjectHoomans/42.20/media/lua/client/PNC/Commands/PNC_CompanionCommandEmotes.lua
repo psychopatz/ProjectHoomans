@@ -188,7 +188,8 @@ function Emotes.BuildMenuDefinition(scope, target, nestedMenus)
     for i = 1, #definitions do
         definition = definitions[i]
         if definition.contextOnly ~= true
-            and not (scope == "group" and definition.attackType ~= nil)
+            and not (scope == "group" and (definition.attackType ~= nil
+                or definition.personalized == true))
         then
             groupID = tostring(definition.group or "")
             group = Commands and Commands.GetGroup
@@ -374,11 +375,14 @@ function ISEmoteRadialMenu:emote(emote)
     end
     definition = Commands and Commands.Get(commandID) or nil
     if not definition then return false end
-    if PNC.Client and PNC.Client.SendCompanionCommand then
-        sent = PNC.Client.SendCompanionCommand(
+    local execute = PNC.Client and (PNC.Client.ExecuteCompanionCommand
+        or PNC.Client.SendCompanionCommand)
+    if execute then
+        sent = execute(
             commandID,
             target and target.id or nil,
-            scope
+            scope,
+            target
         ) == true
     end
     player = getSpecificPlayer
@@ -396,6 +400,7 @@ function ISEmoteRadialMenu:emote(emote)
             }
         )
     end
+    if definition.clientOnly == true then return sent end
     return originalEmote(self, definition.emote)
 end
 

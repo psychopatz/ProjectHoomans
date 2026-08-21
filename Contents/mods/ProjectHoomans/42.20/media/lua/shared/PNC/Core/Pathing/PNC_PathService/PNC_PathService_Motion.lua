@@ -903,6 +903,22 @@ function PathService.Pump(record, zombie, caller)
                 local stepDistance = math.sqrt(
                     (dx * dx) + (dy * dy)
                 )
+                local goalDistance = Internal.Core.Distance(
+                    toX,
+                    toY,
+                    lane.goal.x,
+                    lane.goal.y
+                )
+                local bestGoalDistance = tonumber(lane.bestGoalDistance)
+                    or goalDistance
+                local goalProgress = bestGoalDistance - goalDistance
+                if lane.bestGoalDistance == nil then
+                    lane.bestGoalDistance = goalDistance
+                end
+                if lane.lastGoalProgressAt == nil then
+                    lane.lastGoalProgressAt =
+                        tonumber(lane.lastProgressAt) or now
+                end
                 local nativeFailed = nativeState == "engine_path_failed"
                     or nativeState == "engine_path_timeout"
                 if nativeFailed then
@@ -948,8 +964,9 @@ function PathService.Pump(record, zombie, caller)
                 lane.lastStepAt = now
                 lane.lastStepDistance = stepDistance
                 lane.lastStepLabel = nativeState
+                lane.goalDistance = goalDistance
+                lane.lastProgressDelta = goalProgress
                 if stepDistance > 0.0001 then
-                    lane.lastProgressAt = now
                     lane.lastPhysicalMoveAt = now
                     lane.lastX = toX
                     lane.lastY = toY
@@ -974,6 +991,20 @@ function PathService.Pump(record, zombie, caller)
                         )
                     end
                 end
+                -- Collision jitter is physical displacement, but not route
+                -- progress. Only a meaningful reduction in goal distance may
+                -- refresh the anti-stuck watchdog.
+                if goalProgress >= 0.01 then
+                    lane.bestGoalDistance = goalDistance
+                    lane.lastProgressAt = now
+                    lane.lastGoalProgressAt = now
+                    lane.nonProgressStepCount = 0
+                    lane.noProgressCount = 0
+                    lane.blockReason = nil
+                else
+                    lane.nonProgressStepCount =
+                        (tonumber(lane.nonProgressStepCount) or 0) + 1
+                end
                 if Internal.syncRecordPosition then
                     Internal.syncRecordPosition(record, zombie)
                 end
@@ -989,6 +1020,85 @@ function PathService.Pump(record, zombie, caller)
                         "arrived",
                         nativeState
                     )
+                end
+                if nativeTraversalState == nil
+                    and now - (tonumber(lane.lastGoalProgressAt) or now)
+                        >= Internal.INTERACTION_STALL_MS
+                    and Internal.tryDoorOrWindowInteraction
+                then
+                    passageInteracted, passageKind =
+                        Internal.tryDoorOrWindowInteraction(
+                            zombie,
+                            record,
+                            lane,
+                            lane.goal.x,
+                            lane.goal.y,
+                            lane.goal.z
+                        )
+                    if passageInteracted then
+                        if Internal.clearBlockedStep then
+                            Internal.clearBlockedStep(lane)
+                        end
+                        if enginePlanner.Invalidate then
+                            enginePlanner.Invalidate(
+                                record,
+                                "native_stall_" .. tostring(passageKind),
+                                zombie
+                            )
+                        end
+                        lane.ownerMode = passageKind or "passage_interact"
+                        lane.lastProgressAt = now
+                        lane.lastGoalProgressAt = now
+                        lane.noProgressCount = 0
+                        Internal.logMoveWarning(
+                            record,
+                            zombie,
+                            lane,
+                            "native_stall_recovery",
+                            passageKind or "passage",
+                            "goal=" .. Internal.describeGoal(lane.goal)
+                        )
+                        return true, passageKind or "passage_interact"
+                    end
+                end
+                if nativeTraversalState == nil
+                    and now - (tonumber(lane.lastGoalProgressAt) or now)
+                        >= Internal.PROGRESS_TIMEOUT_MS
+                then
+                    lane.noProgressCount =
+                        (tonumber(lane.noProgressCount) or 0) + 1
+                    lane.blockReason = "native_no_goal_progress"
+                    Internal.logMoveWarning(
+                        record,
+                        zombie,
+                        lane,
+                        "native_progress_timeout",
+                        lane.blockReason,
+                        "goal=" .. Internal.describeGoal(lane.goal)
+                    )
+                    if lane.noProgressCount >= 2 then
+                        return Internal.completeMove(
+                            zombie,
+                            record,
+                            lane,
+                            "blocked",
+                            "native_progress_timeout"
+                        )
+                    end
+                    if enginePlanner.Invalidate then
+                        enginePlanner.Invalidate(
+                            record,
+                            "native_progress_timeout",
+                            zombie
+                        )
+                    end
+                    lane.lastGoalProgressAt = now
+                    lane.lastNavigationInvalidatedAt = now
+                    if Diagnostics then
+                        Diagnostics.Increment("Pathing.Replans")
+                        Diagnostics.Increment("Pathing.Retries")
+                    end
+                    return true, "native_repath"
                 end
                 return true, nativeState
             end

@@ -260,6 +260,10 @@ function TraversalQuery.FindPassageToward(zombie, goalX, goalY, goalZ, cell)
         if candidate.enabled then
             nextSquare = cell:getGridSquare(candidate.x, candidate.y, originZ)
             passage = TraversalQuery.GetPassageBetween(fromSquare, nextSquare)
+            if not passage and TraversalQuery.GetFenceBetween then
+                passage = TraversalQuery.GetFenceBetween(
+                    fromSquare, nextSquare)
+            end
             if passage then
                 return {
                     object = passage,

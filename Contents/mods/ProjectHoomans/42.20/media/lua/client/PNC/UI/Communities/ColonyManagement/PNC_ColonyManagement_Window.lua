@@ -102,6 +102,12 @@ function ISPNCColonyManagementWindow:onDebugControl(button)
     return false
 end
 
+function ISPNCColonyManagementWindow:onScavengeControl(button)
+    local definition = Registry.Get("scavenge")
+    return definition and definition.onControl
+        and definition.onControl(self, button) or false
+end
+
 function ISPNCColonyManagementWindow:requestSnapshot(source)
     local _, _, requestedAt = Client.RequestSnapshot()
     self.lastRequestAt = requestedAt

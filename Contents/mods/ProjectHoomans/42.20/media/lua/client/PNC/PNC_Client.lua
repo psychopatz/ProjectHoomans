@@ -97,6 +97,12 @@ local function onResetLua()
     ClientState.colonyManagement = nil
     ClientState.colonyManagementRevision = 0
     ClientState.worldDiscovery = nil
+    ClientState.scavengeSessions = {}
+    ClientState.activeScavengeSessionId = nil
+    ClientState.lastScavengeFailure = nil
+    if PNC.ScavengeNotifications and PNC.ScavengeNotifications.Reset then
+        PNC.ScavengeNotifications.Reset()
+    end
     ClientState.lastWorldDiscoveryRequestAt = nil
     Client.BiteReplicas = {}
     Client.ZombieReactionReplicas = {}

@@ -33,6 +33,8 @@ Const.CMD_PLAYER_WEAPON_HIT = "PlayerWeaponHit"
 Const.CMD_REVIVE = "ReviveNPC"
 Const.CMD_BANDAGE = "BandageNPC"
 Const.CMD_COMPANION_COMMAND = "CompanionCommand"
+Const.CMD_SCAVENGE_REQUEST = "ScavengeRequest"
+Const.CMD_SCAVENGE_STATE = "ScavengeState"
 Const.CMD_DEBUG = "DebugCommand"
 Const.CMD_DEBUG_ROSTER_REQUEST = "RequestDebugRoster"
 Const.CMD_DEBUG_ROSTER = "DebugRoster"
@@ -95,6 +97,13 @@ Const.ORDER_ROAM = "roam"
 Const.ORDER_HOSTILE_ROAM = "hostile_roam"
 Const.ORDER_HOSTILE_HUNT = "hostile_hunt"
 Const.ORDER_TRAVEL = "travel"
+Const.ORDER_SCAVENGE = "scavenge"
+
+Const.SCAVENGE_DEFAULT_RADIUS = 12
+Const.SCAVENGE_MAX_RADIUS = 24
+Const.SCAVENGE_MAX_CANDIDATES = 256
+Const.SCAVENGE_MAX_MANIFEST_ENTRIES = 512
+Const.SCAVENGE_CAPACITY_STOP_RATIO = 1.25
 
 Const.ATTACK_TYPE_AUTO = "auto"
 Const.ATTACK_TYPE_MELEE = "melee"

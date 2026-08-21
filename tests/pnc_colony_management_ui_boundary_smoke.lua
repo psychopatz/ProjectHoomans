@@ -79,6 +79,9 @@ local controllerSource = source(ROOT
 local windowSource = source(ROOT
     .. "client/PNC/UI/Communities/ColonyManagement/"
     .. "PNC_ColonyManagement_Window.lua")
+local scavengeTabSource = source(ROOT
+    .. "client/PNC/UI/Communities/ColonyManagement/"
+    .. "PNC_ColonyManagement_ScavengeTab.lua")
 for _, value in ipairs({ controllerSource, windowSource }) do
     equal(value:find("PNC.Network.ClientState", 1, true), nil,
         "shell bypasses client snapshot boundary")
@@ -88,5 +91,19 @@ equal(windowSource:find("PNC.Client.RequestColonyManagement", 1, true), nil,
 if not windowSource:find("Client.HasUpdate", 1, true) then
     error("window update boundary missing")
 end
+if not scavengeTabSource:find("followingCurrentPlayer == true", 1, true) then
+    error("scavenge roster is not follower-only")
+end
+if not scavengeTabSource:find("or assigned", 1, true) then
+    error("assigned scavengers disappear after leaving follow order")
+end
+if not scavengeTabSource:find("UI.CreateToggleButton", 1, true) then
+    error("scavenge assignment does not use reusable toggle control")
+end
+if not scavengeTabSource:find('id = "toggle_scavenger"', 1, true)
+    or not scavengeTabSource:find('id = "open_scavenge"', 1, true)
+then error("scavenge roster controls missing") end
+equal(scavengeTabSource:find("ISPNCInventoryList", 1, true), nil,
+    "colony scavenge tab does not duplicate loot manifest UI")
 
 print("pnc_colony_management_ui_boundary_smoke: ok")

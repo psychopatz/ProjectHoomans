@@ -396,6 +396,80 @@ function Client.SendCompanionCommand(commandID, npcId, scope)
     return (tonumber(affected) or 0) > 0
 end
 
+function Client.ExecuteCompanionCommand(commandID, npcId, scope, context)
+    local definition = PNC.CompanionCommands
+        and PNC.CompanionCommands.Get(commandID) or nil
+    if not definition then return false end
+    if definition.clientOnly == true then
+        if commandID == "scavenge_nearby" then
+            if not PNC.ScavengeUI then
+                require "PNC/UI/Scavenge/PNC_ScavengeWindow"
+            end
+            return PNC.ScavengeUI and PNC.ScavengeUI.OpenSetup
+                and PNC.ScavengeUI.OpenSetup(npcId, context) or false
+        end
+        return false
+    end
+    return Client.SendCompanionCommand(commandID, npcId, scope)
+end
+
+local SCAVENGE_LOCAL_METHODS = {
+    start_search = "StartSearch",
+    cancel_search = "CancelSearch",
+    queue_pickup = "QueuePickup",
+    queue_multiple = "QueueMultiple",
+    start_collection = "StartCollection",
+    cancel_collection = "CancelCollection",
+    pause = "Pause",
+    set_auto_grab = "SetAutoGrab",
+    remove_auto_grab = "RemoveAutoGrab",
+    set_preferences = "SetSearchPreferences",
+    request_policy = "RequestPolicy",
+    request_snapshot = "RequestSnapshot",
+}
+
+function Client.SendScavengeRequest(action, payload)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not player then return false, "player_unavailable" end
+    local args = Core.DeepCopy(payload or {})
+    args.action = tostring(action or "")
+    local method = SCAVENGE_LOCAL_METHODS[args.action]
+    if args.action == "debug_dump" then
+        if not Client.CanUseDebug() then return false, "debug_denied" end
+        if Core.IsClientOnly and Core.IsClientOnly() then
+            if not sendClientCommand then return false, "network_unavailable" end
+            sendClientCommand(player, Const.MODULE, Const.CMD_SCAVENGE_REQUEST,
+                args)
+            return true, "request_sent"
+        end
+        local service = PNC.ScavengeService
+        local session = service and service.GetSession(args.sessionId)
+        if not session then return false, "session_not_found" end
+        local snapshot = service.BuildSnapshot(session)
+        snapshot.debugDiagnostics = service.GetDiagnostics()
+        Client.Internal.ApplyScavengeSnapshot(snapshot)
+        return true, "debug_snapshot", snapshot
+    end
+    if not method then return false, "scavenge_action_invalid" end
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not sendClientCommand then return false, "network_unavailable" end
+        sendClientCommand(player, Const.MODULE, Const.CMD_SCAVENGE_REQUEST,
+            args)
+        return true, "request_sent"
+    end
+    local service = PNC.ScavengeService
+    if not service or type(service[method]) ~= "function" then
+        return false, "scavenge_service_unavailable"
+    end
+    local ok, reason, snapshot = service[method](player, args)
+    if snapshot and (snapshot.sessionId or snapshot.policyOnly == true)
+        and Client.Internal.ApplyScavengeSnapshot
+    then
+        Client.Internal.ApplyScavengeSnapshot(snapshot)
+    end
+    return ok == true, reason, snapshot
+end
+
 local function nextInventoryRequestID()
     ClientState.inventoryRequestSerial = (tonumber(ClientState.inventoryRequestSerial) or 0) + 1
     return table.concat({

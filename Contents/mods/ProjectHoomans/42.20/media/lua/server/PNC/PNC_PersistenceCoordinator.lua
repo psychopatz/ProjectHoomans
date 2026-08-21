@@ -60,6 +60,8 @@ function Coordinator.Commit(reason)
         conversationHistory = PNC.Conversation
             and PNC.Conversation.History
             and PNC.Conversation.History.Dirty == true,
+        scavengePolicy = PNC.ScavengePolicy
+            and PNC.ScavengePolicy.Dirty == true,
         npcByID = copy(PNC.Registry and PNC.Registry.DirtyByID or {}),
         npcDomains = copy(PNC.Registry and PNC.Registry.DirtyDomains or {}),
         npcDirectory = PNC.Registry and PNC.Registry.DirectoryDirty == true,
@@ -103,6 +105,9 @@ function Coordinator.Commit(reason)
             and initialDirty.conversationHistory
         then
             PNC.Conversation.History.Dirty = true
+        end
+        if PNC.ScavengePolicy and initialDirty.scavengePolicy then
+            PNC.ScavengePolicy.Dirty = true
         end
         if PNC.Registry then
             PNC.Registry.DirtyByID = initialDirty.npcByID
@@ -153,6 +158,8 @@ function Coordinator.Commit(reason)
     if not ok then return failure(why) end
     ok, why = save("conversationHistory",
         PNC.Conversation and PNC.Conversation.History)
+    if not ok then return failure(why) end
+    ok, why = save("scavengePolicy", PNC.ScavengePolicy)
     if not ok then return failure(why) end
 
     if PNC.Registry and PNC.Registry.FlushDirty then

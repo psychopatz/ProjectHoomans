@@ -75,7 +75,11 @@ Commands.Register({
     label = "Go Home",
     emote = "followme",
     icon = "media/ui/Emotes/PNC_EmoteFollow.png",
-    apply = function(record)
+    apply = function(record, player)
+        if PNC.ScavengeService and PNC.ScavengeService.BringBack then
+            local handled = PNC.ScavengeService.BringBack(record, player)
+            if handled == true then return true end
+        end
         local home = PNC.HomeDutyService
         if record.runtime and record.runtime.workOrderId
             and PNC.WorkService and PNC.WorkService.Commands
@@ -89,6 +93,17 @@ Commands.Register({
         if not home or not home.SendHome then return false end
         return home.SendHome(record, nil, "companion_command") == true
     end,
+})
+
+Commands.Register({
+    id = "scavenge_nearby",
+    group = "movement",
+    labelKey = "UI_PNC_CommandScavengeNearby",
+    label = "Scavenge Nearby",
+    emote = "lookaround",
+    icon = "media/ui/Emotes/PNC_EmoteMenu.png",
+    personalized = true,
+    clientOnly = true,
 })
 
 Commands.Register({

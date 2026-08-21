@@ -35,7 +35,7 @@ local function effectiveAllowedJobs(record)
     return output
 end
 
-local function summary(record)
+local function summary(record, player)
     local needs = PNC.IndividualNeeds.Ensure(record)
     local nutrition = PNC.IndividualNeeds.GetNutrition
         and PNC.IndividualNeeds.GetNutrition(record) or nil
@@ -44,6 +44,20 @@ local function summary(record)
         and PNC.Journals.GetNPC(record.id,
             PNC.Journals.NPC_CAPACITY or 32, true)
         or {}
+    local order = record.orderSpec or {}
+    local playerOnlineID = player and player.getOnlineID
+        and tonumber(player:getOnlineID()) or nil
+    local playerUsername = player and player.getUsername
+        and tostring(player:getUsername() or "") or ""
+    local targetOnlineID = tonumber(order.ownerOnlineID
+        or record.ownerOnlineID)
+    local targetUsername = tostring(order.ownerUsername
+        or record.ownerUsername or "")
+    local followingCurrentPlayer = tostring(order.kind or "")
+        == tostring(PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
+        and (playerOnlineID ~= nil and targetOnlineID ~= nil
+            and playerOnlineID == targetOnlineID
+            or playerUsername ~= "" and playerUsername == targetUsername)
     return { id=record.id, name=tostring(record.name or record.id),
         role=record.affiliation and record.affiliation.communityRole or record.affiliation and record.affiliation.role or "companion",
         activity=PNC.IndividualNeeds.GetActivity(record), job=record.activeJob,
@@ -67,6 +81,8 @@ local function summary(record)
             and PNC.Core.DeepCopy(record.runtime.storageCourier) or nil,
         facilityDebugWork=record.runtime and record.runtime.facilityDebugWork
             and PNC.Core.DeepCopy(record.runtime.facilityDebugWork) or nil,
+        order=PNC.Core.DeepCopy(order),
+        followingCurrentPlayer=followingCurrentPlayer == true,
         priorityType=priorityType, priority=priority,
         location={x=record.x,y=record.y,z=record.z} }
 end
@@ -324,7 +340,7 @@ function Management.BuildSnapshot(player, options)
     end
     for _, record in pairs(PNC.Registry.Data or {}) do
         if record.alive ~= false and owned(record, player) then
-            local value = summary(record); people[#people+1]=value
+            local value = summary(record, player); people[#people+1]=value
             for _, needType in ipairs(Definitions.TYPES) do
                 local level=Definitions.GetLevel(needType, value.needs[needType]); counts[needType][level]=(counts[needType][level] or 0)+1
                 if level == "CRITICAL" or level == "SEVERE" or level == "MODERATE" then attention[#attention+1]={ severity=level, npcID=value.id, name=value.name, needType=needType, value=value.needs[needType] } end

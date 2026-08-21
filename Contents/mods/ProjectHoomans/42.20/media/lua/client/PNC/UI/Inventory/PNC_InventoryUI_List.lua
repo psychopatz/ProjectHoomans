@@ -119,7 +119,11 @@ function ISPNCInventoryList:onMouseDown(x, y)
     end
     local row = self:selectedRow()
     if row and self.ownerWindow then
-        if type(self.catalogColumns) == "table"
+        if row.groupHeader and x <= 16
+            and self.ownerWindow.toggleInventoryGroup
+        then
+            self.ownerWindow:toggleInventoryGroup(self.role, row.groupKey)
+        elseif type(self.catalogColumns) == "table"
             and type(row.catalogCells) == "table" and row.catalogHeader ~= true
             and self.onCatalogCell
         then
@@ -136,10 +140,8 @@ function ISPNCInventoryList:onMouseDown(x, y)
                     return true
                 end
             end
-        elseif row.groupHeader and x <= 16
-            and self.ownerWindow.toggleInventoryGroup
-        then
-            self.ownerWindow:toggleInventoryGroup(self.role, row.groupKey)
+        elseif self.ownerWindow.onInventoryRowClick then
+            self.ownerWindow:onInventoryRowClick(self.role, row)
         elseif self.selectOnly ~= true and row.restricted ~= true
             and self.ownerWindow.beginInventoryDrag
         then

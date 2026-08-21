@@ -266,7 +266,9 @@ function Tasking.Commands.Pump(at, budget)
         if #Leases.Active <= 0 then break end
         Tasking.ExecutorCursor = (Tasking.ExecutorCursor % #Leases.Active) + 1
         local lease = Leases.Get(Leases.Active[Tasking.ExecutorCursor])
-        local executor = lease and Tasking.Executors[lease.executionMode]
+        local provider = lease and Tasking.Providers[lease.sourceDomain]
+        local executor = provider and type(provider.Tick) == "function"
+            and provider or lease and Tasking.Executors[lease.executionMode]
         if executor then executor.Tick(lease); Tasking.Diagnostics.counters.executorTicks = Tasking.Diagnostics.counters.executorTicks + 1 end
     end
     return processed

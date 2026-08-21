@@ -8,6 +8,7 @@ local DebugTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManageme
 local BaseTab = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
 local SettingsTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_SettingsTab"
 local JobsTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_JobsTab"
+local ScavengeTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_ScavengeTab"
 local TasksTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_TasksTab"
 local UtilitiesTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_UtilitiesTab"
 
@@ -94,6 +95,32 @@ Registry.Register({
     buildRows = function(context) return TasksTab.BuildRows(context) end,
     onRow = function(window, row)
         return TasksTab.OnRow(window, row)
+    end,
+})
+
+Registry.Register({
+    id = "scavenge",
+    title = function()
+        return Shared.Tr("UI_PNC_Scavenge_Tab", "SCAVENGE")
+    end,
+    detailTitle = "SCAVENGING RUN",
+    showRoster = true,
+    showDetails = true,
+    create = function(window) ScavengeTab.Create(window) end,
+    layout = function(window, Layout, content)
+        ScavengeTab.Layout(window, Layout, content)
+    end,
+    apply = function(window, active, Layout)
+        ScavengeTab.Apply(window, active, Layout)
+    end,
+    buildRows = function(context)
+        return ScavengeTab.BuildRows(context)
+    end,
+    onPersonSelected = function(window)
+        return ScavengeTab.OnPersonSelected(window)
+    end,
+    onControl = function(window, button)
+        return ScavengeTab.OnControl(window, button)
     end,
 })
 
