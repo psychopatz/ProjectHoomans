@@ -331,7 +331,7 @@ local function nativeItem(fullType)
     local food = fullType == "Base.Apple"
         or fullType == "Base.FractionalApple"
         or string.find(fullType, "Mod.Food", 1, true) == 1
-    local water = fullType == "Base.WaterBottleFull"
+    local water = fullType == "Base.WaterBottle"
         or string.find(fullType, "Mod.Water", 1, true) == 1
     item.isFood = food
     item.isDrainable = water
@@ -385,8 +385,11 @@ assert(PNC.Inventory.MaterializeLooseInventory(reloaded, body),
 local physicalLoot = false
 for i = 1, #liveItems do physicalLoot = physicalLoot or liveItems[i].fullType == "Base.CustomLoot" end
 assertEqual(physicalLoot, true, "loose item missing from live physical inventory")
+local revisionBeforeCapture = reloaded.inventory.revision
 assert(PNC.Inventory.CaptureLooseInventory(reloaded, body),
     "live inventory did not abstract")
+assert(reloaded.inventory.revision > revisionBeforeCapture,
+    "physical capture did not create a durable inventory revision")
 local capturedLoot = false
 for _, item in pairs(reloaded.inventory.items) do
     capturedLoot = capturedLoot or item.type == "Base.CustomLoot"
@@ -672,6 +675,24 @@ supplyStorage.inventory:clear()
 local SupplyService = PNC.NPCSupplyService
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 
+-- Build 42 uses Base.WaterBottle; the old Full/Empty names are model names.
+-- Existing compact records are migrated when their inventory is hydrated.
+local legacyWaterNPC = supplyNPC(
+    "supply_legacy_water", { emptyBaseline = true }
+)
+assert(PNC.Inventory.AddItems(legacyWaterNPC, {
+    { type = "Base.WaterBottleFull", stack = 1 },
+}, "root", "test_legacy_water_alias"))
+local migratedWater
+for _, compact in pairs(legacyWaterNPC.inventory.items) do
+    if compact.type == "Base.WaterBottle" then migratedWater = compact end
+end
+assert(migratedWater, "legacy water alias was not normalized on creation")
+migratedWater.type = "Base.WaterBottleEmpty"
+PNC.Inventory.EnsureRecordInventory(legacyWaterNPC)
+assertEqual(migratedWater.type, "Base.WaterBottle",
+    "legacy water alias was not normalized during hydration")
+
 -- Storage is virtual while colony bases have no physical implementation. The
 -- same centralized policy can later enable the already-supported home check.
 local remoteNPC = supplyNPC("supply_remote", { emptyBaseline = true })
@@ -783,7 +804,7 @@ assert(remainingExpiry[1] < 0.2 and remainingExpiry[2] >= 1,
 
 -- Hydration retains the drainable with its remaining state.
 assert(CoreInventory.deposit(supplyStorage.inventory,
-    nativeItem("Base.WaterBottleFull"), 1))
+    nativeItem("Base.WaterBottle"), 1))
 local waterNPC = supplyNPC("supply_water", { emptyBaseline = true })
 local waterOK = SupplyService.Process({
     requesterId = waterNPC.id, resourceKind = "HYDRATION",
@@ -792,7 +813,7 @@ local waterOK = SupplyService.Process({
 assertEqual(waterOK, true, "storage hydration request")
 local retainedWater
 for _, compact in pairs(waterNPC.inventory.items) do
-    if compact.type == "Base.WaterBottleFull" then retainedWater = compact end
+    if compact.type == "Base.WaterBottle" then retainedWater = compact end
 end
 assert(retainedWater and math.abs((retainedWater.uses or 0) - 0.75) < 0.001,
     "hydration remaining-use state was not retained")
@@ -977,9 +998,8 @@ assertEqual(compactProjectionApple, true,
     "compact provision was not retained")
 supplyBodies[projectionNPC.id] = nil
 
--- Persisted compact state is authoritative when a newly spawned body's
--- physical projection has not caught up yet. The stale projection must not
--- permanently block that valid personal item (and therefore all supply).
+-- Live consumption is transactional: compact metadata cannot stand in for a
+-- missing physical item while the NPC is visible.
 local staleProjectionNPC = supplyNPC(
     "supply_stale_projection", { emptyBaseline = true }
 )
@@ -995,16 +1015,24 @@ local staleOK, staleReason = SupplyService.Process({
     requesterId = staleProjectionNPC.id, resourceKind = "FOOD",
     required = { hunger = 0.20 }, priority = 80,
 })
-assertEqual(staleOK, true,
-    "stale physical projection blocked compact food: "
+assertEqual(staleOK, false,
+    "stale physical projection allowed phantom eating: "
         .. tostring(staleReason))
-assert(PNC.IndividualNeeds.Get(staleProjectionNPC, "hunger") < 0.30,
-    "stale-projection compact food did not satisfy hunger")
+assertEqual(staleReason, "personal_use_failed",
+    "stale physical projection reported the wrong transaction failure")
+assertEqual(PNC.IndividualNeeds.Get(staleProjectionNPC, "hunger"), 0.30,
+    "failed phantom eating changed hunger")
+local staleCompactCount = 0
+for _, compact in pairs(staleProjectionNPC.inventory.items) do
+    if compact.type == "Base.Apple" then staleCompactCount = staleCompactCount + 1 end
+end
+assertEqual(staleCompactCount, 1,
+    "failed phantom eating removed compact food")
 supplyBodies[staleProjectionNPC.id] = nil
 
 -- Acquired compact state survives save/load without FULL promotion.
 assert(CoreInventory.deposit(supplyStorage.inventory,
-    nativeItem("Base.WaterBottleFull"), 1))
+    nativeItem("Base.WaterBottle"), 1))
 PNC.SupplyIndex.Invalidate(supplyStorage)
 local saveNPC = supplyNPC("supply_save", { emptyBaseline = true })
 local saveAcquire = SupplyService.Process({
@@ -1024,7 +1052,7 @@ local saveReloaded = {
 PNC.Inventory.Deserialize(saveReloaded, supplySaved)
 local reloadedWater
 for _, compact in pairs(saveReloaded.inventory.items) do
-    if compact.type == "Base.WaterBottleFull" then reloadedWater = compact end
+    if compact.type == "Base.WaterBottle" then reloadedWater = compact end
 end
 assert(reloadedWater and math.abs((reloadedWater.uses or 0) - 1) < 0.001,
     "acquired drainable state did not survive save/load")

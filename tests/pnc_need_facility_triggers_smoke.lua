@@ -28,6 +28,7 @@ local dirty = 0
 local provider
 local supplyCalls = 0
 local atHome = true
+local hasPersonalFood = true
 
 PNC = {
     Const = { ORDER_FOLLOW = "follow" },
@@ -84,11 +85,16 @@ PNC = {
     },
     TaskLeaseService = { ForNPC = function() return nil end },
     CompanionCommands = { IsCompanion = function() return true end },
-    NPCSupplyService = { Process = function()
-        supplyCalls = supplyCalls + 1
-        record.needs.hunger = 0.05
-        return true, "fulfilled"
-    end },
+    NPCSupplyService = {
+        HasPersonalSupply = function(_, kind)
+            return kind ~= "FOOD" or hasPersonalFood
+        end,
+        Process = function()
+            supplyCalls = supplyCalls + 1
+            record.needs.hunger = 0.05
+            return true, "fulfilled"
+        end,
+    },
 }
 
 local Triggers = T.load("ProjectHoomans", "server",
@@ -209,6 +215,18 @@ T.equal(startedCapability, "survival.eat.inventory",
     "follower food uses the reusable activity executor")
 T.equal(startedOptions.taskLeaseId, "lease:food",
     "follower food preserves its task lease")
+
+hasPersonalFood = false
+record.needs.hunger = 0.65
+T.falsy(Triggers.PreferFacility(record, "hunger"),
+    "an NPC without personal food never enters the eating scene")
+local noFoodCandidate
+for _, candidate in ipairs(Triggers.GetCandidates(record.id)) do
+    if candidate.sourceRef == "follower_food" then noFoodCandidate = candidate end
+end
+T.falsy(noFoodCandidate,
+    "the task provider omits follower eating when no food is available")
+hasPersonalFood = true
 
 record.runtime.inCombatUntil = 2000
 PNC.Core = { Now = function() return 1000 end }

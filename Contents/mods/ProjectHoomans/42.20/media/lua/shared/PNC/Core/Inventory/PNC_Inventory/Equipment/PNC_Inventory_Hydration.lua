@@ -51,9 +51,9 @@ function Inventory.EnsureRecordInventory(record)
     raw = inv.items
     inv.items = {}
     for itemID, item in pairs(raw) do
-        if type(item) == "table" and Internal.normalizeString(item.type) then
+        if type(item) == "table" and Internal.normalizeItemType(item.type) then
             item.id = Internal.normalizeString(item.id) or tostring(itemID)
-            item.type = Internal.normalizeString(item.type)
+            item.type = Internal.normalizeItemType(item.type)
             item.container = Internal.normalizeString(item.container) or "root"
             item.stack = math.max(1, math.floor(tonumber(item.stack) or tonumber(item.uses) or 1))
             item.uses = tonumber(item.uses)

@@ -21,7 +21,24 @@ function CoreInventory.wrapPhysicalInventory()
             physicalItems[#physicalItems + 1] = value
             return true, { value }
         end,
-        _nativeRemove = function() return true end,
+        count = function(_, fullType)
+            local count = 0
+            for _, value in ipairs(physicalItems) do
+                if CoreInventory.getItemFullType(value.record[1]) == fullType then
+                    count = count + 1
+                end
+            end
+            return count
+        end,
+        _nativeRemove = function(_, item)
+            for index = #physicalItems, 1, -1 do
+                if physicalItems[index] == item then
+                    table.remove(physicalItems, index)
+                    return true
+                end
+            end
+            return false
+        end,
     }
 end
 
@@ -47,9 +64,11 @@ package.preload["PsychopatzCore/WorldLoot/PsychopatzWorldLoot"] =
 local clock = 2000
 local records = {
     bob = { id = "bob", name = "Bob", alive = true, runtime = {},
+        inventory = { items = {} },
         x = 0, y = 0, z = 0, presenceState = "live",
         orderSpec = { kind = "follow" } },
     sue = { id = "sue", name = "Sue", alive = true, runtime = {},
+        inventory = { items = {} },
         x = 0, y = 0, z = 0, presenceState = "live",
         orderSpec = { kind = "follow" } },
 }
@@ -77,9 +96,12 @@ PNC = {
         MarkDirty = function() end,
     },
     PathService = {
-        MoveToward = function(record, _, x, y, z, _, stopDistance, reason)
+        MoveToward = function(record, _, x, y, z, _, stopDistance, reason,
+            navigationOptions)
             lastMove[record.id] = { x = x, y = y, z = z,
-                stopDistance = stopDistance, reason = reason }
+                stopDistance = stopDistance, reason = reason,
+                navigationPolicy = navigationOptions
+                    and navigationOptions.navigationPolicy }
             return true, "arrived"
         end,
         Reset = function(_, record)
@@ -95,8 +117,15 @@ PNC = {
                 maxWeight = 10, level = ratio > 1 and "encumbered" or "normal" }
         end,
         CanAccept = function() return true end,
-        CaptureLooseInventory = function()
+        CaptureLooseInventory = function(record)
             captured = captured + 1
+            record.inventory.items = {}
+            for index, value in ipairs(physicalItems) do
+                record.inventory.items["captured:" .. tostring(index)] = {
+                    type = CoreInventory.getItemFullType(value.record[1]),
+                    stack = tonumber(value.record[2]) or 1,
+                }
+            end
             return true
         end,
     },
@@ -172,10 +201,13 @@ function PNC.Tasking.Commands.CancelForNPC(npcId, reason)
 end
 
 local discoveredBy
-local function activity(session, status, entry, reason)
+local function activity(session, status, entry, reasonOrDetails)
+    local details = type(reasonOrDetails) == "table"
+        and reasonOrDetails or { reason = reasonOrDetails }
     session.activity = session.activity or {}
     session.activity[#session.activity + 1] = {
-        status = status, entryId = entry and entry.entryId, reason = reason }
+        status = status, entryId = entry and entry.entryId,
+        reason = details.reason, npcId = details.npcId }
 end
 
 PNC.ScavengeService = {
@@ -239,14 +271,18 @@ local search = {
 }
 sessions.search = search
 local lease = leaseFor(search, "bob")
-T.equal(Executor.GetCandidates("bob")[1].precedence, "HIGH_WORK",
-    "normal and critical needs can preempt scavenging")
+T.equal(Executor.GetCandidates("bob")[1].precedence, "FORCED_ORDER",
+    "explicit scavenging order outranks ordinary needs and work")
 records.bob.runtime.pathing = { phase = "blocked", blockReason = "old_order" }
 T.truthy(Executor.Start(lease), "search worker starts")
 T.equal(records.bob.runtime.pathing, nil,
     "scavenge start clears a stale blocked path lane")
 T.truthy(pathResets > 0, "scavenge start resets previous navigation")
+records.bob.runtime.recentThreat = { expiresAt = clock - 1 }
+records.bob.runtime.zombieAttacker = { observedAt = clock - 2000 }
 T.truthy(Executor.Tick(lease), "worker claims finite source")
+T.equal(search.workers.bob.phase, "READY",
+    "expired combat observations do not hold scavenger in waiting")
 T.truthy(Executor.Tick(lease), "worker routes to source and starts scene")
 T.equal(lastMove.bob.reason, "scavenge_search",
     "scavenging uses routed behavior movement")
@@ -270,6 +306,8 @@ T.truthy(Executor.Tick(lease), "scene completes before source inspection")
 T.equal(search.processedCount, 1, "source processed once")
 T.equal(search.searchedCount, 1, "source searched once")
 T.equal(discoveredBy, "bob", "search result records the finding scavenger")
+T.equal(search.activity[#search.activity].npcId, "bob",
+    "activity log attributes searched source to its scavenger")
 T.truthy(Executor.Tick(lease), "finite area settles after final source")
 T.equal(search.state, "WAITING_FOR_SELECTION",
     "fully explored area stops searching")
@@ -300,6 +338,8 @@ T.truthy(retry.workers.bob.currentSource,
 Executor.Tick(retryLease)
 T.truthy(retry.workers.bob.actionUntil,
     "worker resumes search after alternate interaction path")
+T.equal(lastMove.bob.navigationPolicy, "direct",
+    "native timeout activates bounded local movement recovery")
 Executor.Cancel(retryLease, "test_cleanup")
 leases[retryLease.leaseId] = nil
 sessions.retry = nil
@@ -376,5 +416,7 @@ T.equal(transfers, 1, "queued item transferred exactly once")
 T.equal(#physicalItems, 1, "free-capacity NPC receives item")
 T.truthy(captured > 0, "physical inventory captured into NPC model")
 T.equal(broadcasts, 1, "inventory mutation replicated")
+T.equal(team.activity[#team.activity].npcId, "sue",
+    "activity log attributes collected item to its scavenger")
 
 T.finish("pnc_scavenge_executor_smoke")

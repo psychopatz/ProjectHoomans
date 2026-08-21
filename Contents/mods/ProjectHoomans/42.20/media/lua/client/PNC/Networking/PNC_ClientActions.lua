@@ -448,6 +448,7 @@ function Client.SendScavengeRequest(action, payload)
         if not session then return false, "session_not_found" end
         local snapshot = service.BuildSnapshot(session)
         snapshot.debugDiagnostics = service.GetDiagnostics()
+        snapshot.scavengeDebug = service.BuildSessionDiagnostics(session)
         Client.Internal.ApplyScavengeSnapshot(snapshot)
         return true, "debug_snapshot", snapshot
     end

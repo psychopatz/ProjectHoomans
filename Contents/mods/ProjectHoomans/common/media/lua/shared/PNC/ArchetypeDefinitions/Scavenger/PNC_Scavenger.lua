@@ -47,7 +47,7 @@ local bundle = {
         bagChoices = { "Base.Bag_Schoolbag", "Base.Bag_DuffelBag" },
         supplies = {
             { key = "medical_bandage", type = "Base.Bandage", stack = 1, preferredContainer = "bag" },
-            { key = "scavenge_water", type = "Base.WaterBottleEmpty", stack = 1, preferredContainer = "bag" },
+            { key = "scavenge_water", type = "Base.WaterBottle", stack = 1, uses = 0, preferredContainer = "bag" },
             { key = "scavenge_food", type = "Base.Crisps", stack = 1, preferredContainer = "bag" },
         },
     },

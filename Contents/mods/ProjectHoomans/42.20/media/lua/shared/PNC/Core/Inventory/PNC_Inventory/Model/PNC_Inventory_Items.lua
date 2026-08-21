@@ -284,7 +284,7 @@ end
 
 function Internal.createItem(record, inv, spec)
     local itemID = Internal.normalizeString(spec.id) or Internal.nextItemID(record)
-    local fullType = Internal.normalizeString(spec.type)
+    local fullType = Internal.normalizeItemType(spec.type)
     local profile
     if not fullType then return nil end
     profile = Internal.getContainerProfile(fullType)

@@ -56,5 +56,15 @@ T.contains(windowSource, "UI.CreateToggleButton",
     "dedicated UI exposes start/stop visual state")
 T.contains(windowSource, "Controller.StopSearch",
     "dedicated UI owns the stop-search command")
+T.contains(windowSource, "ISPNCScavengeSection",
+    "manifest and activity lists are isolated in responsive sections")
+T.contains(windowSource, "entry.npcName",
+    "activity log identifies the scavenger who performed each action")
+T.contains(windowSource, "UI_PNC_Scavenge_LogCollected",
+    "activity log describes successful pickups")
+T.contains(windowSource, "snapshot.scavengeDebug",
+    "live debug view renders authority-side worker and source state")
+T.contains(windowSource, "ScavengeWindow:v2",
+    "rescaled window discards incompatible oversized saved geometry")
 
 T.finish("pnc_scavenge_controller_smoke")

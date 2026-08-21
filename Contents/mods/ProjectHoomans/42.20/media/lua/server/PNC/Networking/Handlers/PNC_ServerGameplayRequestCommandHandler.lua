@@ -62,10 +62,12 @@ Router.Register(Const.CMD_SCAVENGE_REQUEST, function(player, args)
         if not Router.CanUseDebug(player) then return end
         local service = PNC.ScavengeService
         local session = service and service.GetSession(args.sessionId)
-        local allowed = session and service.RequestSnapshot(player, args)
+        local allowed = session and service.CanAccessSession(
+            player, session.id)
         if allowed == true and sendServerCommand then
             local payload = service.BuildSnapshot(session)
             payload.debugDiagnostics = service.GetDiagnostics()
+            payload.scavengeDebug = service.BuildSessionDiagnostics(session)
             sendServerCommand(player, Const.MODULE,
                 Const.CMD_SCAVENGE_STATE, payload)
         end

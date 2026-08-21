@@ -140,13 +140,9 @@ function Bridge.captureLoose(record, body)
     local inv = Inventory.EnsureRecordInventory(record)
     local container = body and body.getInventory and body:getInventory() or nil
     if not inv or not container then return false, "physical_inventory_unavailable" end
-    local removeIds = {}
-    for itemId, item in pairs(inv.items or {}) do
-        if not item.wornSlot and not item.attachedSlot and not item.equipSlot then
-            removeIds[#removeIds + 1] = itemId
-        end
-    end
-    for i = 1, #removeIds do Internal.removeItemByID(inv, removeIds[i]) end
+    -- Encode the complete physical snapshot before mutating the persistent
+    -- model.  A codec failure must leave the previous NPC inventory intact.
+    local capturedSpecs = {}
     local excluded = collectPresentationItems(body)
     local physical = CoreInventory.wrapPhysicalInventory(container)
     local iterator = physical:iterate()
@@ -157,15 +153,37 @@ function Bridge.captureLoose(record, body)
             local encoded, reason = CoreInventory.encodeItem(nativeItem, 1)
             if not encoded then return false, reason end
             local fullType = CoreInventory.getItemFullType(encoded[C.TYPE_ID])
+            if not fullType then return false, "npc_item_type_unavailable" end
             local spec = StateCodec.readState(encoded)
             spec.type, spec.container = fullType, "root"
-            if not Internal.createItem(record, inv, spec) then
-                return false, "npc_item_capture_failed"
-            end
+            capturedSpecs[#capturedSpecs + 1] = spec
         end
     end
-    Inventory.SyncEquipmentFromInventory(record)
-    Inventory.RebuildCaches(record)
+
+    local removeIds = {}
+    for itemId, item in pairs(inv.items or {}) do
+        if not item.wornSlot and not item.attachedSlot and not item.equipSlot then
+            removeIds[#removeIds + 1] = itemId
+        end
+    end
+    table.sort(removeIds)
+    local ops = {}
+    for i = 1, #removeIds do
+        ops[#ops + 1] = { op = "remove", itemID = removeIds[i] }
+    end
+    for i = 1, #capturedSpecs do
+        ops[#ops + 1] = { op = "add", item = capturedSpecs[i] }
+    end
+    if #ops > 0 then
+        local applied, appliedOps = Inventory.ApplyDelta(
+            record, ops, "physical_inventory_capture")
+        if not applied or #appliedOps ~= #ops then
+            return false, "npc_item_capture_failed"
+        end
+    else
+        Inventory.SyncEquipmentFromInventory(record)
+        Inventory.RebuildCaches(record)
+    end
     return true
 end
 

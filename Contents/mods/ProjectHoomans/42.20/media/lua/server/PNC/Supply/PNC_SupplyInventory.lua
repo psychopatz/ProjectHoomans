@@ -47,7 +47,6 @@ function SupplyInventory.AddCoreRecords(record, records, reason)
     local body = liveBody(record)
     local physical
     local physicalItems = {}
-    local physicalProjectionMissing = false
     if body then
         physical, why = CoreInventory.wrapPhysicalInventory(body:getInventory())
         if not physical then
@@ -215,7 +214,6 @@ function SupplyInventory.Consume(record, itemID, request)
     local ops, remainingUses = canonicalConsumptionOps(item, descriptor)
     local body = liveBody(record)
     local physicalUndo
-    local physicalProjectionMissing = false
     if body then
         local candidates = nativeCandidates(body, item)
         local selected = candidates[1]
@@ -245,11 +243,10 @@ function SupplyInventory.Consume(record, itemID, request)
                 end
             end
         else
-            -- Compact inventory is the authoritative persisted state. A live
-            -- body can briefly lack its projected native item after spawning
-            -- or reconciliation; rejecting here permanently blocks needs on
-            -- the same otherwise-valid personal candidate.
-            physicalProjectionMissing = true
+            -- A visible NPC may only consume an item that is present in its
+            -- physical inventory. Keep compact state untouched so projection
+            -- reconciliation can repair the mismatch without phantom eating.
+            return false, "physical_item_missing"
         end
     end
     local applied = InventoryCommands.ApplyDelta(
@@ -272,7 +269,7 @@ function SupplyInventory.Consume(record, itemID, request)
         fullType = descriptor.fullType,
         typeId = descriptor.typeId,
         remainingUses = remainingUses,
-        physicalProjectionMissing = physicalProjectionMissing,
+        physicalProjectionMissing = false,
     }
     effect.undo = function()
         record.inventory = inventoryUndo

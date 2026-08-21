@@ -17,6 +17,43 @@ Tasking integration, physical travel, source preferences, exact-FullType
 auto-grab policy, capacity rules, networking, snapshots, presentation, and
 scavenging diagnostics. Active manifests and queues are runtime-only.
 
+## Current runtime map
+
+The live nearby-container feature has one authority path:
+
+1. `PNC_ScavengeController` owns the selected team and sends a player action.
+2. `PNC_ServerGameplayRequestCommandHandler` authorizes and routes that action.
+3. `PNC_ScavengeService` creates the bounded session and asks Core `WorldLoot`
+   for source tokens. It owns progress, the manifest, queue, snapshots, and
+   cancellation.
+4. `PNC_ScavengeExecutor` is the sole live worker. Its Tasking provider claims
+   one source per NPC, requests movement through `BehaviorCommon.MoveRecord`,
+   inspects on arrival, and performs collection through `WorldLoot.Transfer`.
+5. `PNC_PathService` consumes the movement intent and owns native/direct path
+   execution. The ordinary companion idle/follow behaviors do not own movement
+   while the registered `Scavenge` job is active.
+6. `PNC_ScavengeWindow` renders only authority snapshots. Live Debug requests
+   a bounded diagnostic snapshot containing each worker's current source,
+   next sources, lease/worker phase, path lane, move intent, retry state,
+   validity, and distance.
+
+The two public server entry points are intentionally thin load-order hubs.
+`ScavengeService/` separates runtime ownership/lifecycle, snapshots,
+diagnostics, discovery, queuing, and lifecycle commands. `ScavengeExecutor/`
+separates path/runtime adapters, claims, transfers, session-state transitions,
+approach recovery, worker ticking, and Tasking provider registration. Public
+callers continue to use `PNC.ScavengeService` and `PNC.ScavengeExecutor`.
+
+`PNC_AbstractScavengeResolver` is a separate off-screen Director simulation.
+It never discovers or transfers nearby physical container loot and must not be
+used as a second implementation of the live command.
+
+The explicit nearby-scavenge command uses `FORCED_ORDER` precedence. Hard
+emergencies and critical needs may preempt it; ordinary needs, facility work,
+follow, and idle may not. Combat interruption is based only on a current target,
+attack, combat hold, unexpired recent threat, or fresh zombie observation.
+Expired observation records are diagnostic history and do not block a worker.
+
 ## Existing contracts to reuse
 
 - Core item movement already has physical and virtual inventory adapters,
@@ -207,7 +244,7 @@ rollback on a rejected NPC destination, and no host-only UI/object assumption.
 - The UI model coverage proves grouped FullTypes preserve every source entry and
   that manual/Auto Grab selection emits only server-issued entry IDs.
 
-The verifier reports no Kahlua/Lua 5.1 errors. Service, executor, and window
-files exceed the generic 2,000-token advisory threshold; each remains a single
-cohesive lifecycle boundary, with policy and pure UI grouping already split
-out. This is an analysis-maintainability warning, not a runtime error.
+The verifier reports no Kahlua/Lua 5.1 errors. Every server-side scavenging
+module is below the generic 2,000-token advisory threshold. The client window
+remains a separate presentation concern and is outside the server service and
+executor refactor boundary.

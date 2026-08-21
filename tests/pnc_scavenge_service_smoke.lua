@@ -74,6 +74,7 @@ end
 function WorldLoot.ReleaseReservation() released = released + 1; return true end
 function WorldLoot.ReleaseSession(id) worldSessions[id] = nil; return true end
 function WorldLoot.GetDiagnostics() return { Searches = findCalls } end
+function WorldLoot.IsSourceValid() return true end
 
 package.preload["PsychopatzCore/WorldLoot/PsychopatzWorldLoot"] =
     function() return WorldLoot end
@@ -195,6 +196,10 @@ ok = Service.StartSearch(owner, { npcId = "bob", sourcePolicy = {
     containers = true, floorItems = true, corpses = true } })
 T.truthy(ok, "mixed search starts")
 local session = Service.Internal.SessionForNPC("bob")
+T.truthy(Service.CanAccessSession(owner, session.id),
+    "owner can inspect scavenging diagnostics")
+T.falsy(Service.CanAccessSession(intruder, session.id),
+    "non-owner cannot inspect scavenging diagnostics")
 T.equal(session.candidateCount, 3, "mixed source mask")
 for _, source in ipairs(session.candidates) do
     T.truthy(Service.AppendSourceItems(session, source),
@@ -300,6 +305,19 @@ T.equal(teamSnapshot.carry.maxWeight, 20,
     "team snapshot totals carry capacity")
 T.equal(#teamSnapshot.scavengers, 2,
     "team snapshot exposes each scavenger")
+team.workers.bob.currentSource = team.candidates[1]
+team.workers.bob.lastMovement = "move_intent"
+local activeSnapshot = Service.BuildSnapshot(team)
+T.equal(activeSnapshot.currentSourceToken,
+    team.candidates[1].sourceToken,
+    "snapshot derives current source from active workers")
+T.equal(activeSnapshot.scavengers[1].currentSource.sourceType, "container",
+    "snapshot exposes active source state per scavenger")
+local debugSnapshot = Service.BuildSessionDiagnostics(team)
+T.equal(debugSnapshot.workers[1].lastMovement, "move_intent",
+    "debug snapshot exposes latest movement state")
+T.equal(debugSnapshot.pendingSources[1].status, "NEXT",
+    "debug snapshot exposes the next source before it is claimed")
 records.bob.orderSpec = { kind = "scavenge", sessionId = team.id }
 records.alice2.orderSpec = { kind = "scavenge", sessionId = team.id }
 ok, reason = Service.StartSearch(owner, {

@@ -1,4 +1,5 @@
 require "ISUI/ISButton"
+require "ISUI/ISPanel"
 require "ISUI/ISTextEntryBox"
 require "ISUI/ISScrollingListBox"
 require "ISUI/ISContextMenu"
@@ -50,6 +51,28 @@ local function drawStatusRow(list, y, entry, alternate)
     return y + list.itemheight
 end
 
+local ISPNCScavengeSection = ISPanel:derive("ISPNCScavengeSection")
+
+function ISPNCScavengeSection:prerender()
+    ISPanel.prerender(self)
+    local suffix = self.owner and self.owner.sectionSuffix
+        and self.owner:sectionSuffix(self.kind) or ""
+    UI.DrawSectionTitle(self, self.title, 8, 5,
+        math.max(1, self:getWidth() - 16), suffix)
+end
+
+function ISPNCScavengeSection:new(owner, kind, title)
+    local o = ISPanel:new(0, 0, 1, 1)
+    setmetatable(o, self)
+    self.__index = self
+    o.owner = owner
+    o.kind = kind
+    o.title = title
+    o.backgroundColor = Theme.Color("surface")
+    o.borderColor = Theme.Color("border")
+    return o
+end
+
 local function eligible(entry)
     return entry and (entry.status == "AVAILABLE"
         or entry.status == "QUEUED")
@@ -67,6 +90,7 @@ local function makeButton(owner, id, title, x, width)
     button.internal = id
     button:initialise()
     button:instantiate()
+    button.psychopatzBaseWidth = width
     owner:addChild(button)
     return button
 end
@@ -97,13 +121,24 @@ function ISPNCScavengeWindow:createChildren()
         width = 112,
     })
 
+    self.manifestPanel = ISPNCScavengeSection:new(self, "manifest",
+        tr("UI_PNC_Scavenge_Manifest", "LOOT MANIFEST"))
+    self.manifestPanel:initialise()
+    self.manifestPanel:instantiate()
+    self:addChild(self.manifestPanel)
+
     self.manifestList = ISPNCInventoryList:new(0, 0, 100, 100,
         self, "scavenge")
     self.manifestList:initialise()
     self.manifestList:instantiate()
     self.manifestList.selectOnly = true
-    self:addChild(self.manifestList)
+    self.manifestPanel:addChild(self.manifestList)
 
+    self.statusPanel = ISPNCScavengeSection:new(self, "activity",
+        tr("UI_PNC_Scavenge_ActivityLog", "ACTIVITY LOG"))
+    self.statusPanel:initialise()
+    self.statusPanel:instantiate()
+    self:addChild(self.statusPanel)
     self.statusList = ISScrollingListBox:new(0, 0, 100, 100)
     self.statusList:initialise()
     self.statusList:instantiate()
@@ -111,7 +146,7 @@ function ISPNCScavengeWindow:createChildren()
     self.statusList.doDrawItem = drawStatusRow
     self.statusList.drawBorder = true
     self.statusList.backgroundColor = { r = 0, g = 0, b = 0, a = 0.62 }
-    self:addChild(self.statusList)
+    self.statusPanel:addChild(self.statusList)
 
     self.takeButton = makeButton(self, "take_selected", tr(
         "UI_PNC_Scavenge_TakeSelected", "Take Selected"), 0, 130)
@@ -132,39 +167,77 @@ end
 function ISPNCScavengeWindow:onResponsiveLayout()
     if not self.manifestList then return end
     local rect = self:getContentRect({ top = 12, bottom = 12 })
-    local gap = 7
-    local controlsY = rect.y + 30
-    Layout.SetBounds(self.containerButton, rect.x, controlsY, 118, 26)
-    Layout.SetBounds(self.floorButton, rect.x + 125, controlsY, 100, 26)
-    Layout.SetBounds(self.corpseButton, rect.x + 232, controlsY, 105, 26)
-    Layout.SetBounds(self.searchEntry, rect.x + 344, controlsY,
-        math.max(100, rect.width - 344 - 119), 26)
-    Layout.SetBounds(self.searchButton, rect.x + rect.width - 112,
-        controlsY, 112, 26)
-    local manifestY = controlsY + 52
-    local statusHeight = math.max(92, math.floor(rect.height * 0.22))
-    local buttonsY = rect.y + rect.height - 28
-    local statusY = buttonsY - statusHeight - 26
-    Layout.SetBounds(self.manifestList, rect.x, manifestY, rect.width,
-        math.max(100, statusY - manifestY - gap))
-    Layout.SetBounds(self.statusList, rect.x, statusY, rect.width,
+    local scale = self.uiScale or Layout.Scale()
+    local function px(value) return Layout.Pixels(value, scale) end
+    local gap, controlHeight = px(7), px(26)
+    local controlsY = rect.y + px(28)
+    local containerWidth, floorWidth = px(118), px(100)
+    local corpseWidth, searchWidth = px(105), px(112)
+    Layout.SetBounds(self.containerButton, rect.x, controlsY,
+        containerWidth, controlHeight)
+    Layout.SetBounds(self.floorButton, rect.x + containerWidth + gap,
+        controlsY, floorWidth, controlHeight)
+    Layout.SetBounds(self.corpseButton,
+        rect.x + containerWidth + floorWidth + gap * 2,
+        controlsY, corpseWidth, controlHeight)
+    local filtersWidth = containerWidth + floorWidth + corpseWidth + gap * 3
+    local compact = rect.width < px(790)
+    local searchY = compact and controlsY + controlHeight + gap or controlsY
+    local searchX = compact and rect.x or rect.x + filtersWidth
+    local entryWidth = compact and rect.width - searchWidth - gap
+        or rect.width - filtersWidth - searchWidth
+    Layout.SetBounds(self.searchEntry, searchX, searchY,
+        math.max(px(100), entryWidth), controlHeight)
+    Layout.SetBounds(self.searchButton, rect.x + rect.width - searchWidth,
+        searchY, searchWidth, controlHeight)
+    local manifestY = searchY + controlHeight + px(10)
+    local sectionHeaderHeight = px(28)
+    local statusRatio = self.debugEnabled and 0.44 or 0.30
+    local statusHeight = math.max(px(120),
+        math.min(px(self.debugEnabled and 330 or 240),
+            math.floor(rect.height * statusRatio)))
+    local buttonsY = rect.y + rect.height - controlHeight
+    local statusY = buttonsY - statusHeight - gap
+    local manifestHeight = math.max(px(120), statusY - manifestY - gap)
+    Layout.SetBounds(self.manifestPanel, rect.x, manifestY, rect.width,
+        manifestHeight)
+    Layout.SetBounds(self.manifestList, 1, sectionHeaderHeight,
+        math.max(1, rect.width - 2),
+        math.max(1, manifestHeight - sectionHeaderHeight - 1))
+    Layout.SetBounds(self.statusPanel, rect.x, statusY, rect.width,
         statusHeight)
+    Layout.SetBounds(self.statusList, 1, sectionHeaderHeight,
+        math.max(1, rect.width - 2),
+        math.max(1, statusHeight - sectionHeaderHeight - 1))
     local x = rect.x
     for _, button in ipairs({ self.takeButton, self.takeAllButton,
         self.autoButton, self.pauseButton })
     do
-        Layout.SetBounds(button, x, buttonsY, button.width, 26)
-        x = x + button.width + gap
+        local width = px(button.psychopatzBaseWidth or button.width)
+        Layout.SetBounds(button, x, buttonsY, width, controlHeight)
+        x = x + width + gap
     end
-    Layout.SetBounds(self.closeButton, rect.x + rect.width - 78,
-        buttonsY, 78, 26)
-    local debugVisible = rect.width >= 760 and PNC.Client
+    local closeWidth, debugWidth = px(78), px(132)
+    Layout.SetBounds(self.closeButton, rect.x + rect.width - closeWidth,
+        buttonsY, closeWidth, controlHeight)
+    local debugVisible = rect.width >= px(760) and PNC.Client
         and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() == true
     self.debugButton:setVisible(debugVisible)
-    Layout.SetBounds(self.debugButton, rect.x + rect.width - 205,
-        buttonsY, 120, 26)
+    Layout.SetBounds(self.debugButton,
+        rect.x + rect.width - closeWidth - debugWidth - gap,
+        buttonsY, debugWidth, controlHeight)
     self.layout = { rect = rect, controlsY = controlsY,
         manifestY = manifestY, statusY = statusY }
+end
+
+function ISPNCScavengeWindow:sectionSuffix(kind)
+    local snapshot = self.snapshot or {}
+    if kind == "manifest" then
+        return tostring(#(snapshot.manifest or {}))
+    end
+    local status = self.lastFailure or snapshot.lastFailure
+        or readable(snapshot.state or "ready")
+    return string.upper(readable(status))
 end
 
 function ISPNCScavengeWindow:updateToggleTitles()
@@ -338,21 +411,108 @@ end
 
 function ISPNCScavengeWindow:rebuildStatus()
     self.statusList:clear()
-    local rows = self.snapshot and self.snapshot.activity or {}
+    local rows = not self.debugEnabled and self.snapshot
+        and self.snapshot.activity or {}
     for index = #rows, 1, -1 do
         local entry = rows[index]
+        local actor = tostring(entry.npcName or entry.npcId
+            or tr("UI_PNC_Scavenge_Team", "Team"))
+        local source = tostring(entry.sourceLabel
+            or readable(entry.sourceType) or "")
+        local item = tostring(entry.displayName or entry.fullType
+            or tr("UI_PNC_Scavenge_Item", "item"))
+        local message = item
+        local detail = entry.reason or source
+        if entry.status == "SOURCE_SEARCHED" then
+            message = tr("UI_PNC_Scavenge_LogSearched",
+                "%s searched %s", actor, source)
+            detail = tr("UI_PNC_Scavenge_LogFound",
+                "%s items found", tonumber(entry.itemCount) or 0)
+        elseif entry.status == "COLLECTED" then
+            message = tr("UI_PNC_Scavenge_LogCollected",
+                "%s collected %s x%s", actor, item,
+                tonumber(entry.quantity) or 1)
+            detail = source ~= "" and tr("UI_PNC_Scavenge_LogFrom",
+                "from %s", source) or ""
+        elseif entry.status == "SEARCHING" then
+            message = tr("UI_PNC_Scavenge_LogSearching",
+                "%s is searching %s", actor, source)
+            detail = ""
+        elseif entry.status == "TAKING" then
+            message = tr("UI_PNC_Scavenge_LogTaking",
+                "%s is taking %s", actor, item)
+            detail = source
+        elseif entry.status == "SOURCE_SKIPPED"
+            or entry.status == "SOURCE_INVALID"
+        then
+            message = tr("UI_PNC_Scavenge_LogSkipped",
+                "%s could not search %s", actor, source)
+        elseif entry.status == "QUEUED" then
+            message = tr("UI_PNC_Scavenge_LogQueued",
+                "Queued %s", item)
+        elseif entry.status == "SEARCH_COMPLETE" then
+            message = tr("UI_PNC_Scavenge_LogComplete",
+                "Search complete")
+        end
         self.statusList:addItem(tostring(index), {
             status = entry.status,
-            item = entry.displayName or entry.fullType or "",
-            detail = entry.reason or readable(entry.sourceType),
+            item = message,
+            detail = detail,
         })
     end
-    if #rows == 0 then
+    if #rows == 0 and not self.debugEnabled then
         self.statusList:addItem("empty", { status = "WAITING",
             message = "No scavenging activity yet", detail = "" })
     end
     local diagnostics = self.snapshot and self.snapshot.debugDiagnostics
-    if diagnostics then
+    local live = self.snapshot and self.snapshot.scavengeDebug
+    if self.debugEnabled and live then
+        self.statusList:addItem("debug-session", { status = "SESSION",
+            item = tostring(live.state or "none") .. " / "
+                .. tostring(live.phase or "none"),
+            detail = string.format("sources %d/%d  next %d",
+                tonumber(live.processedCount) or 0,
+                tonumber(live.candidateCount) or 0,
+                tonumber(live.nextCandidateIndex) or 0) })
+        for _, worker in ipairs(live.workers or {}) do
+            self.statusList:addItem("worker:" .. tostring(worker.npcId), {
+                status = "WORKER", item = tostring(worker.npcName)
+                    .. " — " .. readable(worker.workerPhase),
+                detail = tostring(worker.waitReason or worker.leasePhase or "active") })
+            local source = worker.currentSource
+            if source then
+                self.statusList:addItem("source:" .. tostring(worker.npcId), {
+                    status = "SOURCE", item = tostring(source.sourceLabel
+                        or readable(source.sourceType) or source.sourceToken),
+                    detail = string.format("%s  %.1f,%.1f,%d  d2=%s  %s",
+                        tostring(source.sourceType or "source"),
+                        tonumber(source.x) or 0, tonumber(source.y) or 0,
+                        tonumber(source.z) or 0,
+                        tostring(source.workerDistanceSq or "?"),
+                        source.valid and "valid" or "INVALID") })
+            end
+            local path = worker.path or {}
+            local intent = worker.moveIntent or {}
+            self.statusList:addItem("move:" .. tostring(worker.npcId), {
+                status = "MOVE", item = tostring(worker.lastMovement
+                    or intent.kind or "none"),
+                detail = tostring(path.phase or "no lane") .. " / "
+                    .. tostring(path.reason or path.intentReason
+                        or intent.reason or worker.lastFailure or "ready") })
+        end
+        for _, source in ipairs(live.pendingSources or {}) do
+            self.statusList:addItem("pending:" .. tostring(source.index), {
+                status = source.status or "PENDING",
+                item = string.format("#%d %s", tonumber(source.index) or 0,
+                    tostring(source.sourceLabel or readable(source.sourceType))),
+                detail = string.format("%s  %.1f,%.1f,%d  %s",
+                    tostring(source.sourceType or "source"),
+                    tonumber(source.x) or 0, tonumber(source.y) or 0,
+                    tonumber(source.z) or 0,
+                    source.valid and "valid" or "INVALID") })
+        end
+    end
+    if self.debugEnabled and diagnostics then
         local snapshot = self.snapshot
         local debugRows = {
             { "DEBUG", "Session", tostring(snapshot.sessionId or "none") },
@@ -493,6 +653,13 @@ function ISPNCScavengeWindow:onAction(button)
         })
     end
     if action == "debug_dump" then
+        self.debugEnabled = not self.debugEnabled
+        self.debugButton:setTitle(self.debugEnabled and "Live Debug: ON"
+            or "Live Debug: OFF")
+        self.nextDebugRequestAt = 0
+        self:requestResponsiveLayout(true)
+        self:rebuildStatus()
+        if not self.debugEnabled then return true end
         return PNC.Client.SendScavengeRequest("debug_dump", {
             sessionId = self.snapshot and self.snapshot.sessionId,
         })
@@ -502,6 +669,15 @@ end
 
 function ISPNCScavengeWindow:prerender()
     UI.Window.prerender(self)
+    if self.debugEnabled and self.snapshot and self.snapshot.sessionId then
+        local now = getTimeInMillis and getTimeInMillis() or 0
+        if now >= (tonumber(self.nextDebugRequestAt) or 0) then
+            self.nextDebugRequestAt = now + 750
+            PNC.Client.SendScavengeRequest("debug_dump", {
+                sessionId = self.snapshot.sessionId,
+            })
+        end
+    end
     if not self.layout then return end
     local snapshot = self.snapshot or {}
     local progress = tonumber(snapshot.progress) or 0
@@ -533,27 +709,6 @@ function ISPNCScavengeWindow:prerender()
         "  |  Queued ~%s", estimatedLoad)
     self:drawTextRight(carryText, rect.x + rect.width, rect.y + 3,
         0.72, 0.74, 0.78, 1, UIFont.Small)
-    local manifestTitle = tr("UI_PNC_Scavenge_Manifest", "LOOT MANIFEST")
-    self:drawText(manifestTitle, rect.x,
-        self.manifestList:getY() - 19, 0.64, 0.78, 0.84, 1, UIFont.Small)
-    self:drawTextRight(tostring(#(snapshot.manifest or {})),
-        rect.x + rect.width, self.manifestList:getY() - 19,
-        0.64, 0.78, 0.84, 1, UIFont.Small)
-    local activityTitle = tr("UI_PNC_Scavenge_Activity", "STATUS / ACTIVITY")
-    self:drawText(activityTitle, rect.x,
-        self.statusList:getY() - 19, 0.64, 0.78, 0.84, 1, UIFont.Small)
-    local status = self.lastFailure or snapshot.lastFailure
-        or readable(snapshot.state or "ready")
-    self:drawTextRight(string.upper(readable(status)), rect.x + rect.width,
-        self.statusList:getY() - 19, 0.72, 0.74, 0.78, 1, UIFont.Small)
-    if snapshot.debugDiagnostics then
-        self:drawText(string.format("DEBUG task=%s source=%s queue=%d/%d",
-            tostring(snapshot.taskPhase or "none"),
-            tostring(snapshot.currentSourceToken or "none"),
-            tonumber(snapshot.queueIndex) or 0, #(snapshot.queue or {})),
-            rect.x + 260, self.statusList:getY() - 19,
-            0.94, 0.70, 0.27, 1, UIFont.Small)
-    end
 end
 
 function ISPNCScavengeWindow:close()
@@ -569,13 +724,15 @@ function ISPNCScavengeWindow:new(x, y, width, height, options)
     o.expandedGroups = {}
     o.selectedEntries = {}
     o.entryById = {}
+    o.debugEnabled = false
+    o.nextDebugRequestAt = 0
     return o
 end
 
 local function getOrCreate()
     if ScavengeUI.instance then return ScavengeUI.instance end
-    local spec = { width = 900, height = 650, minWidth = 660,
-        minHeight = 470, maxWidth = 1280, maxHeight = 900,
+    local spec = { width = 820, height = 600, minWidth = 700,
+        minHeight = 500, maxWidth = 1050, maxHeight = 760,
         anchor = "center" }
     local bounds = Layout.ResolveWindow(spec)
     local title = tr("UI_PNC_Scavenge_Title", "Scavenging")
@@ -583,7 +740,7 @@ local function getOrCreate()
         bounds.width, bounds.height, {
             title = title,
             responsiveSpec = spec,
-            persistenceKey = "ProjectHoomans:ScavengeWindow",
+            persistenceKey = "ProjectHoomans:ScavengeWindow:v2",
             resizable = true,
         })
     window:initialise()
@@ -618,7 +775,6 @@ function ScavengeUI.ReceiveSnapshot(snapshot)
     if window then
         window:applySnapshot(snapshot)
         window:setVisible(true)
-        window:bringToTop()
     end
     return window ~= nil
 end

@@ -35,8 +35,22 @@ function Home.HasFacility(record, triggerId)
     return false
 end
 
+local function hasRequiredPersonalSupply(record, definition)
+    if definition and definition.needType == "hunger" then
+        return PNC.NPCSupplyService
+            and PNC.NPCSupplyService.HasPersonalSupply
+            and PNC.NPCSupplyService.HasPersonalSupply(record, "FOOD", {
+                hunger = math.max(0.001, tonumber(record and record.needs
+                    and record.needs.hunger) or 0.001),
+                thirst = 0,
+            }) == true
+    end
+    return true
+end
+
 function Home.IsAvailable(record, definition)
     return Home.IsAtHome(record) and Home.HasFacility(record, definition.id)
+        and hasRequiredPersonalSupply(record, definition)
 end
 
 function Home.Validate(record, definition)
@@ -46,6 +60,9 @@ function Home.Validate(record, definition)
     end
     if not Home.HasFacility(record, definition.id) then
         return false, "NEED_ROUTE_NOT_ACTIONABLE"
+    end
+    if not hasRequiredPersonalSupply(record, definition) then
+        return false, "PERSONAL_SUPPLY_MISSING"
     end
     return true
 end

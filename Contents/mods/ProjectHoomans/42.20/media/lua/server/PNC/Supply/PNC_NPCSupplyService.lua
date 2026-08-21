@@ -259,6 +259,25 @@ local function usePersonal(record, request, state, options)
         math.max(0, remaining)
 end
 
+function Service.HasPersonalSupply(record, resourceKind, required)
+    if not record or record.alive == false then return false end
+    local request = Request.Create({
+        requesterId = record.id,
+        purpose = "NEED",
+        resourceKind = resourceKind,
+        required = type(required) == "table" and required or {},
+        fulfillment = "INSTANT",
+    })
+    if not request then return false end
+    local amount = request.resourceKind == "FOOD"
+        and tonumber(request.required.hunger)
+        or request.resourceKind == "HYDRATION"
+            and tonumber(request.required.thirst) or 1
+    local candidates = SupplyQueries.FindPersonal(
+        record, request, math.max(0.001, amount or 0.001))
+    return #candidates > 0
+end
+
 function Service.Process(rawRequest, options)
     options = type(options) == "table" and options or {}
     local request, reason = Request.Create(rawRequest)

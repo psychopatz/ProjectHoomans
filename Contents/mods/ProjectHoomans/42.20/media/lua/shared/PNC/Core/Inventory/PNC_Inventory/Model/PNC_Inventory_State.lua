@@ -7,11 +7,21 @@ local Inventory = PNC.Inventory
 Inventory.Internal = Inventory.Internal or {}
 local Internal = Inventory.Internal
 
+local LEGACY_ITEM_TYPES = {
+    ["Base.WaterBottleFull"] = "Base.WaterBottle",
+    ["Base.WaterBottleEmpty"] = "Base.WaterBottle",
+}
+
 function Internal.normalizeString(value)
     if value == nil or value == "" then
         return nil
     end
     return tostring(value)
+end
+
+function Internal.normalizeItemType(value)
+    local fullType = Internal.normalizeString(value)
+    return fullType and (LEGACY_ITEM_TYPES[fullType] or fullType) or nil
 end
 
 function Internal.shallowArrayCopy(source)

@@ -20,6 +20,16 @@ function Routes.IsCombatActive(record)
         or now < (tonumber(runtime.inCombatUntil) or 0)
 end
 
+function Routes.HasPersonalFood(record)
+    return PNC.NPCSupplyService
+        and PNC.NPCSupplyService.HasPersonalSupply
+        and PNC.NPCSupplyService.HasPersonalSupply(record, "FOOD", {
+            hunger = math.max(0.001, tonumber(record and record.needs
+                and record.needs.hunger) or 0.001),
+            thirst = 0,
+        }) == true
+end
+
 function Routes.Register(route)
     if type(route) ~= "table" or tostring(route.sourceRef or "") == ""
         or tostring(route.needId or "") == ""
@@ -65,10 +75,14 @@ Routes.Register({
     capability = "survival.eat.inventory",
     IsAvailable = function(record)
         return Routes.IsFollowing(record) and not Routes.IsCombatActive(record)
+            and Routes.HasPersonalFood(record)
     end,
     Validate = function(record)
         if not Routes.IsFollowing(record) or Routes.IsCombatActive(record) then
             return false, "FOLLOWER_NOT_FREE"
+        end
+        if not Routes.HasPersonalFood(record) then
+            return false, "PERSONAL_FOOD_MISSING"
         end
         return true
     end,
