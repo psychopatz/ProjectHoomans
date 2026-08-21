@@ -1,5 +1,4 @@
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
-if not ISContextMenu then pcall(require, "ISUI/ISContextMenu") end
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Support = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
 local Farming = PNC.Farming
@@ -162,34 +161,38 @@ end
 function Facility.BeginCrop(window, facility, componentId)
     local plot = Support.ComponentById(facility, componentId)
     if not plot then return false end
-    local menu = ISContextMenu.get(0, getMouseX(), getMouseY())
-    local crops = PNC.FarmingCatalog and PNC.FarmingCatalog.List() or {}
-    for _, crop in ipairs(crops) do
-        menu:addOption(tostring(crop.displayName or crop.id), nil, function()
+    local PlantUI = require "PNC/UI/Communities/ColonyManagement/PNC_FarmingPlantModal"
+    PlantUI.Open(window.snapshot and window.snapshot.storage, plot,
+        function(cropID)
             PNC.Client.RequestSetFarmPlotCrop({
                 facilityId = facility.id, plotId = plot.id,
-                expectedRevision = facility.revision, desiredCrop = crop.id,
+                expectedRevision = facility.revision, desiredCrop = cropID,
             })
             Support.ApplyLocalResult(window)
+        end,
+        function(debugAction)
+            PNC.Client.RequestFarmPlotDebug({
+                facilityId = facility.id, plotId = plot.id,
+                expectedRevision = facility.revision,
+                debugAction = debugAction,
+            })
+            Support.ApplyLocalResult(window)
+        end,
+        function()
+            local current = PNC.Farming.NormalizePolicy(plot.policy)
+            local enabled = not (current.autoPlant and current.autoWater
+                and current.autoHarvest and current.autoReplant)
+            PNC.Client.RequestSetFarmPlotPolicy({
+                facilityId = facility.id, plotId = plot.id,
+                expectedRevision = facility.revision,
+                policy = { autoPlant = enabled, autoWater = enabled,
+                    autoHarvest = enabled, autoReplant = enabled },
+            })
+            Support.ApplyLocalResult(window)
+        end,
+        function()
+            Facility.BeginArea(window, facility, "growing.plot", plot.id)
         end)
-    end
-    menu:addOption(Support.Tr("UI_PNC_Facility_ToggleAutomation",
-        "TOGGLE AUTOMATION"), nil, function()
-        local current = PNC.Farming.NormalizePolicy(plot.policy)
-        local enabled = not (current.autoPlant and current.autoWater
-            and current.autoHarvest and current.autoReplant)
-        PNC.Client.RequestSetFarmPlotPolicy({
-            facilityId = facility.id, plotId = plot.id,
-            expectedRevision = facility.revision,
-            policy = { autoPlant = enabled, autoWater = enabled,
-                autoHarvest = enabled, autoReplant = enabled },
-        })
-        Support.ApplyLocalResult(window)
-    end)
-    menu:addOption(Support.Tr("UI_PNC_Facility_EditPlotRectangle",
-        "EDIT RECTANGLE"), nil, function()
-        Facility.BeginArea(window, facility, "growing.plot", plot.id)
-    end)
     return true
 end
 

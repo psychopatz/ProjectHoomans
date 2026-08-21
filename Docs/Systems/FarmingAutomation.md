@@ -18,10 +18,34 @@ The first farming vertical slice treats Project Zomboid Build 42.20 as the farmi
 - `SFarmingSystem.instance:getLuaObjectAt(x, y, z)` for plant lookup.
 - `SPlantGlobalObject:seed(typeOfSeed, skill)` for planting.
 - `SPlantGlobalObject:water(nil, uses)` for watering.
+- `SPlantGlobalObject:removeObject()` through `SFarmingSystem:removePlant` when a
+  plot is cleared or its selected crop changes.
+- `SFarmingSystem:growPlant(plant, nil, true)` for the debug fast-grow action.
 - `SFarmingSystem.instance:harvest(plant, liveNpc)` for harvesting and yield.
 - The crop catalog is enumerated from `farming_vegetableconf.props`, including modded crops and their `seedTypes`.
 
-The adapter does not dig, plow, create farmland, advance growth, calculate yield, or reproduce disease/weed/season logic. If the world or farming object is unavailable, the Farmer remains in `WAITING_FOR_WORLD` and no crop or inventory state is simulated.
+The adapter does not dig or create farmland, and it does not replace vanilla
+growth, yield, disease, weed, or season logic. Clearing a live plant uses the
+vanilla remove-and-plow path so the plot remains a usable furrow. The debug
+grow, water, harvest, and clear actions are explicit server-authorized tools;
+ordinary automation remains bounded by the existing farming service.
+
+## Plant selection and diagnostics
+
+The plot action opens a dedicated plant selector. It refreshes the native
+`farming_vegetableconf.props` catalog each time, counts matching seed types in
+the base storage snapshot, and shows only crops with available seeds. Each
+card displays the vanilla icon when available, the localized crop name, seed
+quantity, growing-season months, growth time, water target, and temperature
+metadata. Modded crop entries participate automatically when they register
+the same vanilla farming properties; vanilla crops without explicit
+temperature bounds show the Build 42 cold-stress rule instead.
+
+The same modal provides `CHANGE SEEDS`, `TOGGLE AUTOMATION`, and `EDIT
+RECTANGLE`. In a debug-enabled session it also provides `AUTO GROW`, `FORCE
+WATER`, `HARVEST`, and `CLEAR PLANTS` controls. Changing the selected crop
+clears existing vanilla plants in the plot before the new configuration is
+stored.
 
 ## Work and inventory
 
@@ -31,7 +55,13 @@ Seeds and water are first looked up in the canonical/native NPC inventory. If mi
 
 ## Known Build 42 behavior
 
-Annual vanilla harvests may remain in a `harvested` plant state instead of immediately becoming a `plow` furrow. Hoomans does not remove or re-plow that object. Replanting occurs once vanilla reports the square as a plantable furrow; the `autoReplant` policy controls those post-harvest furrows. This preserves the rule that players create and maintain vanilla farming ground.
+Annual vanilla harvests may remain in a `harvested` plant state instead of
+immediately becoming a `plow` furrow. Hoomans leaves that normal automation
+state alone; explicit crop changes and `CLEAR PLANTS` use the vanilla removal
+and plow path. Replanting occurs once vanilla reports the square as a
+plantable furrow; the `autoReplant` policy controls those post-harvest
+furrows. This preserves the rule that players create and maintain vanilla
+farming ground.
 
 ## Diagnostics
 

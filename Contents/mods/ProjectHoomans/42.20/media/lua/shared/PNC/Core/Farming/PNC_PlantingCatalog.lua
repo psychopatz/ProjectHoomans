@@ -24,22 +24,68 @@ local function seedTypes(props)
     return output
 end
 
+local function copyList(value)
+    if type(value) ~= "table" then return nil end
+    local output = {}
+    for index, entry in ipairs(value) do output[index] = entry end
+    return output
+end
+
+local function firstNumber(props, keys)
+    for _, key in ipairs(keys) do
+        local value = tonumber(props and props[key])
+        if value ~= nil then return value end
+    end
+    return nil
+end
+
+local function titleFallback(value)
+    value = tostring(value or "")
+    value = string.gsub(value, "[_%-]+", " ")
+    local first = string.sub(value, 1, 1)
+    if first == "" then return value end
+    return string.upper(first) .. string.sub(value, 2)
+end
+
 local function build()
     local output, byId = {}, {}
     local props = farming_vegetableconf and farming_vegetableconf.props or {}
     for id, value in pairs(props) do
         if type(value) == "table" then
-            local crop = string.lower(tostring(id))
+            local typeOfSeed = tostring(id)
+            local crop = string.lower(typeOfSeed)
             local types = seedTypes(value)
             if crop ~= "" and #types > 0 then
-                local display = tostring(value.displayName or value.name or crop)
-                display = safeText("Farming_" .. crop, display)
+                local display = tostring(value.displayName or value.name
+                    or titleFallback(typeOfSeed))
+                display = safeText("Farming_" .. typeOfSeed, display)
                 local entry = {
                     id = crop,
+                    typeOfSeed = typeOfSeed,
+                    displayNameKey = "Farming_" .. typeOfSeed,
                     displayName = display,
                     seedTypes = types,
+                    seedName = value.seedName,
+                    icon = value.icon,
+                    texture = value.texture,
                     vegetableName = value.vegetableName,
                     growBack = value.growBack == true,
+                    sowMonth = copyList(value.sowMonth),
+                    badMonth = copyList(value.badMonth),
+                    bestMonth = copyList(value.bestMonth),
+                    riskMonth = copyList(value.riskMonth),
+                    coldHardy = value.coldHardy == true,
+                    minTemperature = firstNumber(value, {
+                        "minTemperature", "minTemp", "temperatureMin",
+                    }),
+                    maxTemperature = firstNumber(value, {
+                        "maxTemperature", "maxTemp", "temperatureMax",
+                    }),
+                    timeToGrow = tonumber(value.timeToGrow),
+                    waterLvl = tonumber(value.waterLvl),
+                    mature = tonumber(value.mature),
+                    fullGrown = tonumber(value.fullGrown),
+                    harvestLevel = tonumber(value.harvestLevel),
                 }
                 output[#output + 1] = entry
                 byId[crop] = entry
@@ -64,7 +110,13 @@ local function ensure()
 end
 
 function Catalog.Get(crop)
-    return ensure().byId[string.lower(tostring(crop or ""))]
+    local key = string.lower(tostring(crop or ""))
+    local entry = ensure().byId[key]
+    if not entry then
+        Catalog.Refresh()
+        entry = cache.byId[key]
+    end
+    return entry
 end
 
 function Catalog.List()
@@ -72,6 +124,36 @@ function Catalog.List()
     for index, value in ipairs(ensure().list) do
         output[index] = PNC.Core and PNC.Core.DeepCopy
             and PNC.Core.DeepCopy(value) or value
+    end
+    return output
+end
+
+function Catalog.InventoryCounts(storage)
+    local counts = {}
+    for _, row in ipairs(storage and storage.rows or {}) do
+        local fullType = string.lower(tostring(row.fullType or ""))
+        local quantity = math.max(0, math.floor(tonumber(row.quantity) or 0))
+        if fullType ~= "" and quantity > 0 then
+            counts[fullType] = (counts[fullType] or 0) + quantity
+        end
+    end
+    return counts
+end
+
+function Catalog.ListPlantable(storage)
+    local counts = Catalog.InventoryCounts(storage)
+    local output = {}
+    for _, entry in ipairs(ensure().list) do
+        local seedCount = 0
+        for _, seedType in ipairs(entry.seedTypes or {}) do
+            seedCount = seedCount + (counts[string.lower(tostring(seedType))] or 0)
+        end
+        if seedCount > 0 then
+            local copy = PNC.Core and PNC.Core.DeepCopy
+                and PNC.Core.DeepCopy(entry) or entry
+            copy.seedCount = seedCount
+            output[#output + 1] = copy
+        end
     end
     return output
 end

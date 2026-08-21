@@ -602,6 +602,10 @@ function Client.RequestSetFarmPlotPolicy(options)
     return Client.RequestColonyAction("farm_plot_policy", options)
 end
 
+function Client.RequestFarmPlotDebug(options)
+    return Client.RequestColonyAction("farm_plot_debug", options)
+end
+
 function Client.RequestReplaceFacilityAnchors(options)
     return Client.RequestColonyAction("facility_anchor_role_replace", options)
 end

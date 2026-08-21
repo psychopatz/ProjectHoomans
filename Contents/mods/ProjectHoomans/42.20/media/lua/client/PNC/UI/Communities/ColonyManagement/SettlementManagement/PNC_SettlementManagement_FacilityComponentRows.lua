@@ -59,7 +59,10 @@ local function componentDetail(facility, component)
             .. tostring(component.height or "?") .. "  •  "
             .. tostring(component.tileCount or 0) .. " TILES"
         if component.desiredCrop then
-            detail = detail .. "  •  CROP " .. tostring(component.desiredCrop)
+            local crop = PNC.FarmingCatalog and PNC.FarmingCatalog.Get
+                and PNC.FarmingCatalog.Get(component.desiredCrop) or nil
+            detail = detail .. "  •  CROP " .. tostring(crop
+                and crop.displayName or component.desiredCrop)
         else
             detail = detail .. "  •  NO CROP ASSIGNED"
         end
@@ -131,6 +134,8 @@ function Rows.Build(facility)
                 },
                 actionLabel = component.kind == "abstract"
                     and text("UI_PNC_Task_Deconstruct", "DECONSTRUCT")
+                    or role == "growing.plot" and text(
+                        "UI_PNC_Farming_ChangeSeeds", "CHANGE SEEDS")
                     or text("UI_PNC_Facility_EditInline", "MANAGE"),
                 secondaryActionLabel = text(
                     "UI_PNC_Task_Deconstruct", "DECONSTRUCT"),
