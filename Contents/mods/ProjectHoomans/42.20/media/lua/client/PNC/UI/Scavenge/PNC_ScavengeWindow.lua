@@ -10,6 +10,7 @@ require "PNC/UI/Scavenge/PNC_ScavengeUIModel"
 PNC = PNC or {}
 PNC.ScavengeUI = PNC.ScavengeUI or {}
 
+local Controller = require "PNC/Scavenge/PNC_ScavengeController"
 local ScavengeUI = PNC.ScavengeUI
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
@@ -85,8 +86,16 @@ function ISPNCScavengeWindow:createChildren()
         "UI_PNC_Scavenge_Floor", "Floor"), 0, 100)
     self.corpseButton = makeButton(self, "corpses", tr(
         "UI_PNC_Scavenge_Corpses", "Corpses"), 0, 105)
-    self.searchButton = makeButton(self, "search", tr(
-        "UI_PNC_Scavenge_Start", "Start Search"), 0, 112)
+    self.searchButton = UI.CreateToggleButton(self, {
+        id = "search",
+        offTitle = tr("UI_PNC_Scavenge_Start", "Start Search"),
+        onTitle = tr("UI_PNC_Scavenge_Stop", "Stop Search"),
+        target = self,
+        onclick = ISPNCScavengeWindow.onAction,
+        offVariant = "primary",
+        onVariant = "danger",
+        width = 112,
+    })
 
     self.manifestList = ISPNCInventoryList:new(0, 0, 100, 100,
         self, "scavenge")
@@ -175,6 +184,12 @@ function ISPNCScavengeWindow:updateToggleTitles()
         .. (sourcePolicy.floorItems and enabled or disabled))
     self.corpseButton:setTitle(corpses .. ": "
         .. (sourcePolicy.corpses and enabled or disabled))
+end
+
+function ISPNCScavengeWindow:updateSearchControl(active)
+    if self.searchButton and self.searchButton.setToggleState then
+        self.searchButton:setToggleState(active == true)
+    end
 end
 
 function ISPNCScavengeWindow:setNPC(npcId, context)
@@ -369,6 +384,11 @@ end
 function ISPNCScavengeWindow:applySnapshot(snapshot)
     if not snapshot or snapshot.requestFailed then
         self.lastFailure = snapshot and snapshot.reason or self.lastFailure
+        if snapshot and snapshot.requestAction == "start_search" then
+            self:updateSearchControl(false)
+        elseif snapshot and snapshot.requestAction == "cancel_search" then
+            self:updateSearchControl(true)
+        end
         return
     end
     if snapshot.policyOnly == true then
@@ -408,6 +428,7 @@ function ISPNCScavengeWindow:applySnapshot(snapshot)
         }
     end
     self:updateToggleTitles()
+    self:updateSearchControl(Controller.IsSearchActive(snapshot))
     self:rebuildManifest()
     self:rebuildStatus()
 end
@@ -429,11 +450,20 @@ function ISPNCScavengeWindow:onAction(button)
         return
     end
     if action == "search" then
-        local ok, reason = PNC.Client.SendScavengeRequest("start_search", {
-            npcId = self.npcId, npcIds = self.npcIds,
-            radius = PNC.Const.SCAVENGE_DEFAULT_RADIUS,
-            sourcePolicy = self.sourcePolicy,
-        })
+        local stopping = self.searchButton.getToggleState
+            and self.searchButton:getToggleState()
+            or Controller.IsSearchActive(self.snapshot)
+        local ok, reason
+        if stopping then
+            ok, reason = Controller.StopSearch(self.snapshot, self.npcId)
+        else
+            ok, reason = Controller.StartSearch({
+                npcId = self.npcId, npcIds = self.npcIds,
+                radius = PNC.Const.SCAVENGE_DEFAULT_RADIUS,
+                sourcePolicy = self.sourcePolicy,
+            })
+        end
+        if ok == true then self:updateSearchControl(not stopping) end
         if ok ~= true then self.lastFailure = reason or "search_failed" end
         return ok, reason
     end

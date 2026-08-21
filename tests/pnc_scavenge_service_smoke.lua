@@ -292,6 +292,8 @@ T.equal(#team.npcIds, 2, "shared session retains both scavengers")
 T.truthy(team.workers.bob and team.workers.alice2,
     "shared session creates independent worker state")
 local teamSnapshot = Service.BuildSnapshot(team)
+T.truthy(teamSnapshot.runActive,
+    "snapshot exposes active search for client toggle feedback")
 T.equal(teamSnapshot.carry.usedWeight, 2,
     "team snapshot totals carried weight")
 T.equal(teamSnapshot.carry.maxWeight, 20,

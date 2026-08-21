@@ -100,6 +100,9 @@ end
 if not scavengeTabSource:find("UI.CreateToggleButton", 1, true) then
     error("scavenge assignment does not use reusable toggle control")
 end
+if not scavengeTabSource:find("Controller.Open", 1, true) then
+    error("colony party management bypasses shared scavenging pipeline")
+end
 if not scavengeTabSource:find('id = "toggle_scavenger"', 1, true)
     or not scavengeTabSource:find('id = "open_scavenge"', 1, true)
 then error("scavenge roster controls missing") end

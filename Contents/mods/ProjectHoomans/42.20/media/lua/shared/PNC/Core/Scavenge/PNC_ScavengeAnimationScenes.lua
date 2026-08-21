@@ -10,17 +10,20 @@ end
 
 Scenes.Register("scavenge.loot", {
     category = "scavenge", priority = 45, blocking = false,
-    bump = "Loot", durationMs = 1450, interrupts = interrupts(),
+    bump = "Loot", durationMs = 650, interrupts = interrupts(),
+    pool = "scavenge.loot", weight = 1,
 })
 
 Scenes.Register("scavenge.loot_high", {
     category = "scavenge", priority = 45, blocking = false,
-    bump = "LootHigh", durationMs = 1450, interrupts = interrupts(),
+    bump = "LootHigh", durationMs = 650, interrupts = interrupts(),
+    pool = "scavenge.loot", weight = 1,
 })
 
 Scenes.Register("scavenge.loot_low", {
     category = "scavenge", priority = 45, blocking = false,
-    bump = "LootLow", durationMs = 1450, interrupts = interrupts(),
+    bump = "LootLow", durationMs = 650, interrupts = interrupts(),
+    pool = "scavenge.loot", weight = 1,
 })
 
 return true

@@ -402,11 +402,12 @@ function Client.ExecuteCompanionCommand(commandID, npcId, scope, context)
     if not definition then return false end
     if definition.clientOnly == true then
         if commandID == "scavenge_nearby" then
-            if not PNC.ScavengeUI then
-                require "PNC/UI/Scavenge/PNC_ScavengeWindow"
+            if not PNC.ScavengeController then
+                require "PNC/Scavenge/PNC_ScavengeController"
             end
-            return PNC.ScavengeUI and PNC.ScavengeUI.OpenSetup
-                and PNC.ScavengeUI.OpenSetup(npcId, context) or false
+            return PNC.ScavengeController
+                and PNC.ScavengeController.Open
+                and PNC.ScavengeController.Open(npcId, context) or false
         end
         return false
     end

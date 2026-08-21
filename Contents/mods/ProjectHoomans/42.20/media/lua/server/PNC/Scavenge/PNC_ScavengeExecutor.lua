@@ -43,18 +43,19 @@ local function laneBlocked(record)
         lane and (lane.blockReason or lane.cancelReason) or nil
 end
 
-local function setState(session, state, phase, leasePhase)
-    session.state = state
-    session.phase = phase or state
-    if leasePhase then
-        PNC.Tasking.Commands.SetPhase(session.npcId, leasePhase)
-    end
+local function approachKey(value)
+    return string.format("%.2f:%.2f:%d", tonumber(value.x) or 0,
+        tonumber(value.y) or 0, math.floor(tonumber(value.z) or 0))
 end
 
-local function approachLocation(session, source, location, record)
+local function approachLocation(session, source, location, record, excluded)
     session.approachBySource = session.approachBySource or {}
-    local cached = session.approachBySource[source.sourceToken]
-    if cached then return cached end
+    local cacheKey = tostring(source.sourceToken) .. "\31"
+        .. tostring(record and record.id or "npc")
+    local cached = session.approachBySource[cacheKey]
+    if cached and not (excluded and excluded[approachKey(cached)]) then
+        return cached
+    end
     local baseX, baseY = tonumber(location.x), tonumber(location.y)
     local baseZ = tonumber(location.z) or 0
     if not baseX or not baseY then return nil, "source_location_invalid" end
@@ -72,149 +73,42 @@ local function approachLocation(session, source, location, record)
     for _, offset in ipairs(offsets) do
         local x, y = baseX + offset[1], baseY + offset[2]
         local walkable = not checker or checker(x, y, baseZ) == true
-        if walkable then
+        local candidate = { x = x + 0.5, y = y + 0.5, z = baseZ }
+        if walkable and not (excluded and excluded[approachKey(candidate)]) then
             local dx = x - (tonumber(record.x) or x)
             local dy = y - (tonumber(record.y) or y)
             local distance = dx * dx + dy * dy
             if not best or distance < bestDistance then
-                best = { x = x + 0.5, y = y + 0.5, z = baseZ }
+                best = candidate
                 bestDistance = distance
             end
         end
     end
     if not best then return nil, "source_interaction_unreachable" end
-    session.approachBySource[source.sourceToken] = best
+    session.approachBySource[cacheKey] = best
     return best
 end
 
-local function arriveAtSource(session, source, record, body, travelState)
-    if not WorldLoot.IsSourceValid(source.sourceToken) then
-        return false, "source_invalid"
-    end
-    local location, reason = WorldLoot.GetSourceLocation(source.sourceToken)
-    if not location then return false, reason or "source_location_unavailable" end
-    local approach
-    approach, reason = approachLocation(session, source, location, record)
-    if not approach then return false, reason end
-    local blocked, blockReason = laneBlocked(record)
-    if blocked then
-        resetPath(record, body, "scavenge_source_unreachable")
-        return false, blockReason or "path_blocked"
-    end
-    setState(session, travelState, "TRAVEL", "TRAVEL")
-    if session.currentSourceToken ~= source.sourceToken then
-        session.currentSourceToken = source.sourceToken
-        Service.Internal.Increment("PathRequests")
-        Service.Internal.Activity(session, "TRAVELING", {
-            entryId = source.sourceToken,
-            sourceType = source.sourceType,
-        })
-        Service.Internal.Touch(session, nil, nil, true)
-    end
-    local stopDistance = source.sourceType == "container" and 0.65 or 0.45
-    local ok, movement = Common.MoveRecord(record, body,
-        approach.x, approach.y, approach.z, "walk", stopDistance,
-        "scavenge_source", nil)
-    if not ok then return false, movement or "path_request_failed" end
-    if movement == "arrived" then
-        resetPath(record, body, "scavenge_arrived")
-        session.currentSourceToken = nil
-        return true
-    end
-    return nil, movement
+local function withinInteractionRadius(record, body, location, sourceType)
+    local x = body and body.getX and body:getX() or tonumber(record.x)
+    local y = body and body.getY and body:getY() or tonumber(record.y)
+    local z = body and body.getZ and body:getZ() or tonumber(record.z)
+    local targetX = tonumber(location.x)
+    local targetY = tonumber(location.y)
+    local targetZ = tonumber(location.z) or 0
+    if not x or not y or not z or not targetX or not targetY
+        or math.floor(z) ~= math.floor(targetZ)
+    then return false end
+    local dx = x - (targetX + 0.5)
+    local dy = y - (targetY + 0.5)
+    local radius = sourceType == "container" and 1.85 or 1.35
+    return dx * dx + dy * dy <= radius * radius
 end
 
 local function completeLease(lease, reason)
     if lease and PNC.TaskLeaseService.Get(lease.leaseId) then
         PNC.Tasking.Commands.Complete(lease.leaseId, reason)
     end
-end
-
-local function finishSearch(session, lease)
-    setState(session, "WAITING_FOR_SELECTION", "WAITING_FOR_SELECTION",
-        "COMPLETING")
-    Service.Internal.Activity(session, "SEARCH_COMPLETE", nil,
-        session.truncated and "results_truncated" or nil)
-    Service.Internal.Touch(session, "SearchCompleted", {
-        count = #session.manifest,
-        truncated = session.truncated == true,
-    }, true)
-    Service.Internal.Increment("SearchCompleted")
-    local grouped = {}
-    for _, entry in ipairs(session.manifest) do grouped[entry.fullType] = true end
-    local groupedCount = 0
-    for _, _ in pairs(grouped) do groupedCount = groupedCount + 1 end
-    Service.Internal.Increment("GroupedManifestRows", groupedCount)
-    Service.Diagnostics.timings.lastSearchDurationMs = math.max(0,
-        PNC.Core.Now() - (tonumber(session.createdAt) or PNC.Core.Now()))
-    Service.Diagnostics.timings.totalSearchDurationMs =
-        (tonumber(Service.Diagnostics.timings.totalSearchDurationMs) or 0)
-        + Service.Diagnostics.timings.lastSearchDurationMs
-    completeLease(lease, "SCAVENGE_SEARCH_COMPLETE")
-end
-
-local function skipSearchSource(session, source, reason)
-    session.processedCount = session.processedCount + 1
-    session.unreachableCount = session.unreachableCount + 1
-    Service.Internal.Activity(session, "SOURCE_SKIPPED", {
-        entryId = source.sourceToken,
-        sourceType = source.sourceType,
-    }, reason)
-    Service.Internal.Increment("UnreachableSources")
-    session.nextCandidateIndex = session.nextCandidateIndex + 1
-    session.currentSourceToken = nil
-    Service.Internal.Touch(session, "SourceSkipped", {
-        sourceToken = source.sourceToken, reason = reason,
-    }, true)
-    Service.Internal.Emit("SearchProgressChanged", session, {
-        processedCount = session.processedCount,
-        candidateCount = session.candidateCount,
-    })
-end
-
-local function tickSearch(session, lease, record, body)
-    local source = session.candidates[session.nextCandidateIndex]
-    if not source then finishSearch(session, lease); return true end
-    local arrived, reason = arriveAtSource(session, source, record, body,
-        "TRAVELING_TO_SEARCH_SOURCE")
-    if arrived == nil then return true end
-    if arrived ~= true then
-        skipSearchSource(session, source, reason)
-        return true
-    end
-    setState(session, "SEARCHING_SOURCE", "SEARCHING_SOURCE", "WORKING")
-    local ok, countOrReason = Service.AppendSourceItems(
-        session, source, worker.npcId)
-    session.processedCount = session.processedCount + 1
-    session.nextCandidateIndex = session.nextCandidateIndex + 1
-    if ok then
-        session.searchedCount = session.searchedCount + 1
-        Service.Internal.Activity(session, "SOURCE_SEARCHED", {
-            entryId = source.sourceToken,
-            sourceType = source.sourceType,
-        }, tostring(countOrReason or 0))
-        Service.Internal.Increment("SourcesSearched")
-    else
-        session.invalidCount = session.invalidCount + 1
-        Service.Internal.Activity(session, "SOURCE_INVALID", {
-            entryId = source.sourceToken,
-            sourceType = source.sourceType,
-        }, countOrReason)
-        Service.Internal.Increment("InvalidSources")
-    end
-    Service.Internal.Touch(session, "SourceSearched", {
-        sourceToken = source.sourceToken,
-        itemCount = ok and countOrReason or 0,
-        reason = ok and nil or countOrReason,
-    }, true)
-    Service.Internal.Emit("SearchProgressChanged", session, {
-        processedCount = session.processedCount,
-        candidateCount = session.candidateCount,
-    })
-    if session.nextCandidateIndex > session.candidateCount then
-        finishSearch(session, lease)
-    end
-    return true
 end
 
 local function destinationStore(record, body)
@@ -258,155 +152,7 @@ local function destinationStore(record, body)
     return destination
 end
 
-local function markGroupUnavailable(session, group, reason)
-    for _, entry in ipairs(group.entries or {}) do
-        if entry.status == "QUEUED" then
-            if entry.reservationToken then
-                WorldLoot.ReleaseReservation(entry.reservationToken, reason)
-                entry.reservationToken = nil
-            end
-            entry.status = "UNAVAILABLE"
-            entry.failureReason = reason
-            session.unavailableCount = session.unavailableCount + 1
-            Service.Internal.Increment("UnavailablePickups")
-            Service.Internal.Activity(session, "UNAVAILABLE", entry, reason)
-        end
-    end
-end
-
-local function finishCollection(session, lease)
-    setState(session, "COMPLETED", "COMPLETED", "COMPLETING")
-    Service.Internal.ReleaseReservations(session, "collection_complete")
-    WorldLoot.ReleaseSession(session.worldLootSessionId)
-    session.worldLootReleased = true
-    Service.Internal.Activity(session, "COLLECTION_COMPLETE")
-    Service.Internal.Touch(session, "CollectionCompleted", {
-        collectedCount = session.collectedCount,
-        unavailableCount = session.unavailableCount,
-    }, true)
-    Service.Internal.Increment("CollectionsCompleted")
-    completeLease(lease, "SCAVENGE_COLLECTION_COMPLETE")
-end
-
-local function pauseForCapacity(session, lease)
-    setState(session, "PAUSED_CAPACITY", "PAUSED_CAPACITY", "COMPLETING")
-    Service.Internal.ReleaseReservations(session, "capacity_pause")
-    Service.Internal.Activity(session, "PAUSED_CAPACITY", nil,
-        "carry_capacity_reached")
-    Service.Internal.Touch(session, "CollectionPaused", {
-        reason = "carry_capacity_reached",
-    }, true)
-    Service.Internal.Increment("CapacityPauses")
-    completeLease(lease, "SCAVENGE_CAPACITY_PAUSE")
-end
-
-local function collectEntry(session, group, entry, lease, record, body)
-    local encumbrance = PNC.Inventory.GetEncumbranceState(record)
-    if encumbrance and tonumber(encumbrance.ratio) >=
-        Const.SCAVENGE_CAPACITY_STOP_RATIO
-    then
-        pauseForCapacity(session, lease)
-        return false
-    end
-    local destination, reason = destinationStore(record, body)
-    if not destination then
-        entry.status, entry.failureReason = "UNAVAILABLE", reason
-        session.unavailableCount = session.unavailableCount + 1
-        Service.Internal.Increment("UnavailablePickups")
-        Service.Internal.Activity(session, "UNAVAILABLE", entry, reason)
-        return true
-    end
-    setState(session, "ATOMIC_TRANSFER", "ATOMIC_TRANSFER", "ATOMIC_COMMIT")
-    local ok, result = WorldLoot.Transfer({
-        sourceToken = group.sourceToken,
-        itemToken = entry.itemToken,
-        reservationToken = entry.reservationToken,
-        destination = destination,
-        owner = session.npcId,
-    })
-    entry.reservationToken = nil
-    if ok then
-        entry.status = "COLLECTED"
-        entry.failureReason = nil
-        session.collectedCount = session.collectedCount + 1
-        Service.Internal.Activity(session, "COLLECTED", entry)
-        Service.Internal.Increment("ItemsCollected")
-        if PNC.Registry and PNC.Registry.MarkDirty then
-            PNC.Registry.MarkDirty(record, "inventory")
-        end
-        if PNC.Network and PNC.Network.BroadcastRecord then
-            PNC.Network.BroadcastRecord(record, "scavenge_collect")
-        end
-    else
-        entry.status = "UNAVAILABLE"
-        entry.failureReason = tostring(result or "transfer_failed")
-        session.unavailableCount = session.unavailableCount + 1
-        Service.Internal.Increment("UnavailablePickups")
-        Service.Internal.Activity(session, "UNAVAILABLE", entry,
-            entry.failureReason)
-        Service.Internal.Increment("TransferFailures")
-    end
-    Service.Internal.Touch(session, ok and "ItemCollected" or "ItemUnavailable", {
-        entryId = entry.entryId, reason = ok and nil or entry.failureReason,
-    }, true)
-    if session.cancelAfterAtomic then
-        session.cancelAfterAtomic = nil
-        session.state, session.phase = "CANCELLED", "CANCELLED"
-        Service.Internal.ReleaseReservations(session, "cancelled")
-        Service.Internal.Activity(session, "CANCELLED", nil,
-            "cancel_after_atomic")
-        Service.Internal.Touch(session, "CollectionCancelled", nil, true)
-        completeLease(lease, "SCAVENGE_CANCEL_AFTER_ATOMIC")
-        return false
-    end
-    setState(session, "COLLECTING", "COLLECTING", "WORKING")
-    return true
-end
-
-local function tickCollection(session, lease, record, body)
-    local group = session.queue and session.queue[session.queueIndex or 1] or nil
-    if not group then finishCollection(session, lease); return true end
-    if not WorldLoot.IsSourceValid(group.sourceToken) then
-        markGroupUnavailable(session, group, "source_invalid")
-        session.queueIndex = (session.queueIndex or 1) + 1
-        session.queueEntryIndex = 1
-        Service.Internal.Touch(session, "SourceUnavailable", {
-            sourceToken = group.sourceToken, reason = "source_invalid",
-        }, true)
-        return true
-    end
-    local source = { sourceToken = group.sourceToken,
-        sourceType = group.sourceType }
-    local arrived, reason = arriveAtSource(session, source, record, body,
-        "TRAVELING_TO_LOOT_SOURCE")
-    if arrived == nil then return true end
-    if arrived ~= true then
-        markGroupUnavailable(session, group, reason)
-        session.queueIndex = (session.queueIndex or 1) + 1
-        session.queueEntryIndex = 1
-        Service.Internal.Touch(session, "SourceUnavailable", {
-            sourceToken = group.sourceToken, reason = reason,
-        }, true)
-        return true
-    end
-    setState(session, "COLLECTING", "COLLECTING", "WORKING")
-    local entry = group.entries[session.queueEntryIndex or 1]
-    while entry and entry.status ~= "QUEUED" do
-        session.queueEntryIndex = (session.queueEntryIndex or 1) + 1
-        entry = group.entries[session.queueEntryIndex]
-    end
-    if not entry then
-        session.queueIndex = (session.queueIndex or 1) + 1
-        session.queueEntryIndex = 1
-        return true
-    end
-    if collectEntry(session, group, entry, lease, record, body) then
-        session.queueEntryIndex = (session.queueEntryIndex or 1) + 1
-    end
-    return true
-end
-
-local LOOT_SCENE_DURATION_MS = 1450
+local LOOT_SCENE_DURATION_MS = 650
 
 local function workerFor(session, npcId)
     npcId = tostring(npcId or "")
@@ -511,22 +257,21 @@ local function claimSearchSource(session, worker)
     return true
 end
 
-local function lootScene(source)
-    if source.sourceType == "floor" or source.sourceType == "corpse" then
-        return "scavenge.loot_low"
-    end
-    local label = string.lower(tostring(source.sourceLabel or ""))
-    if string.find(label, "upper", 1, true)
-        or string.find(label, "shelf", 1, true)
-        or string.find(label, "cabinet", 1, true)
-    then return "scavenge.loot_high" end
-    return "scavenge.loot"
-end
-
 local function beginLootScene(session, worker, record, body)
-    local sceneId = lootScene(worker.currentSource)
-    if PNC.AnimationScenes and PNC.AnimationScenes.Request then
-        PNC.AnimationScenes.Request(record, body, sceneId, {
+    local sceneId = "scavenge.loot"
+    local scenes = PNC.AnimationScenes
+    local requested, result
+    if scenes and scenes.RequestFromPool then
+        requested, result = scenes.RequestFromPool(
+            record, body, "scavenge.loot", {
+                reason = worker.currentKind == "search"
+                    and "scavenge_search" or "scavenge_take",
+            })
+        if requested and type(result) == "table" and result.id then
+            sceneId = tostring(result.id)
+        end
+    elseif scenes and scenes.Request then
+        scenes.Request(record, body, sceneId, {
             reason = worker.currentKind == "search"
                 and "scavenge_search" or "scavenge_take",
         })
@@ -761,6 +506,20 @@ local function failWorkerSource(session, worker, reason)
     }, true)
 end
 
+local function retryWorkerApproach(session, worker, record, body,
+    source, approach, reason)
+    local excluded = worker.failedApproaches[source.sourceToken] or {}
+    worker.failedApproaches[source.sourceToken] = excluded
+    excluded[approachKey(approach)] = true
+    local cacheKey = tostring(source.sourceToken) .. "\31"
+        .. tostring(record.id or "npc")
+    session.approachBySource[cacheKey] = nil
+    worker.approachFailures = (tonumber(worker.approachFailures) or 0) + 1
+    resetPath(record, body, "scavenge_retry_interaction_tile")
+    if worker.approachFailures < 4 then return nil, "approach_retry" end
+    return false, reason or "path_blocked"
+end
+
 local function arriveWorker(session, worker, record, body)
     local source = worker.currentSource
     if not source or not WorldLoot.IsSourceValid(source.sourceToken) then
@@ -768,13 +527,21 @@ local function arriveWorker(session, worker, record, body)
     end
     local location, reason = WorldLoot.GetSourceLocation(source.sourceToken)
     if not location then return false, reason or "source_location_unavailable" end
+    if withinInteractionRadius(record, body, location, source.sourceType) then
+        resetPath(record, body, "scavenge_interaction_radius")
+        worker.approachFailures = nil
+        return true
+    end
+    worker.failedApproaches = worker.failedApproaches or {}
+    local excluded = worker.failedApproaches[source.sourceToken]
     local approach
-    approach, reason = approachLocation(session, source, location, record)
+    approach, reason = approachLocation(
+        session, source, location, record, excluded)
     if not approach then return false, reason end
     local blocked, blockReason = laneBlocked(record)
     if blocked then
-        resetPath(record, body, "scavenge_source_unreachable")
-        return false, blockReason or "path_blocked"
+        return retryWorkerApproach(session, worker, record, body,
+            source, approach, blockReason)
     end
     setWorkerPhase(session, worker,
         worker.currentKind == "loot" and "TRAVELING_TO_LOOT_SOURCE"
@@ -784,9 +551,20 @@ local function arriveWorker(session, worker, record, body)
         approach.x, approach.y, approach.z, "walk", stopDistance,
         worker.currentKind == "loot" and "scavenge_loot"
             or "scavenge_search", nil)
-    if not ok then return false, movement or "path_request_failed" end
+    if not ok then
+        local failure = tostring(movement or "path_request_failed")
+        if failure == "native_progress_timeout"
+            or failure == "native_path_unreachable"
+            or failure == "native_no_goal_progress"
+        then
+            return retryWorkerApproach(session, worker, record, body,
+                source, approach, failure)
+        end
+        return false, failure
+    end
     if movement == "arrived" then
         resetPath(record, body, "scavenge_arrived")
+        worker.approachFailures = nil
         return true
     end
     return nil, movement

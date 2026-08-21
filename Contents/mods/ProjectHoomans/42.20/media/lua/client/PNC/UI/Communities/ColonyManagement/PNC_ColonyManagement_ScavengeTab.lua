@@ -1,5 +1,6 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 
+local Controller = require "PNC/Scavenge/PNC_ScavengeController"
 local Components = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
 local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
@@ -18,13 +19,10 @@ local function cachedSnapshot()
 end
 
 local function ensureTeam(window)
-    if window.scavengeTeam then return window.scavengeTeam end
-    window.scavengeTeam = {}
     local snapshot = cachedSnapshot()
-    for _, npcId in ipairs(snapshot and snapshot.npcIds or {}) do
-        window.scavengeTeam[tostring(npcId)] = true
-    end
-    return window.scavengeTeam
+    Controller.SeedTeam(snapshot and snapshot.npcIds or {})
+    window.scavengeTeam = Controller.Team
+    return Controller.Team
 end
 
 local function followerRoster(window)
@@ -78,12 +76,8 @@ local function bindRoster(window)
 end
 
 local function teamIDs(window)
-    local output = {}
-    for npcId, assigned in pairs(ensureTeam(window)) do
-        if assigned == true then output[#output + 1] = tostring(npcId) end
-    end
-    table.sort(output)
-    return output
+    ensureTeam(window)
+    return Controller.TeamIDs()
 end
 
 function Tab.Create(window)
@@ -102,7 +96,7 @@ function Tab.Create(window)
         title = Shared.Tr("UI_PNC_Scavenge_Open", "OPEN SCAVENGING UI"),
         target = window,
         onclick = ISPNCColonyManagementWindow.onScavengeControl,
-        variant = "accent",
+        variant = "primary",
     })
 end
 
@@ -175,23 +169,16 @@ function Tab.OnControl(window, button)
         if team[id] ~= true and person.followingCurrentPlayer ~= true then
             return false
         end
-        team[id] = team[id] ~= true or nil
-        bindRoster(window)
-        window:rebuildDetails()
-        return true
+        return Controller.SetAssigned(id, team[id] ~= true)
     end
     if action == "open_scavenge" then
         local ids = teamIDs(window)
         if #ids < 1 then return false end
-        if not PNC.ScavengeUI then
-            require "PNC/UI/Scavenge/PNC_ScavengeWindow"
-        end
         local leadId = ids[1]
-        return PNC.ScavengeUI and PNC.ScavengeUI.OpenSetup
-            and PNC.ScavengeUI.OpenSetup(leadId, {
+        return Controller.Open(leadId, {
                 npcIds = ids,
                 name = tostring(#ids) .. " scavengers",
-            }) or false
+            })
     end
     return false
 end
@@ -203,17 +190,23 @@ function Tab.ReceiveSnapshot(payload)
     if not window or not payload or payload.requestFailed == true then
         return false
     end
-    if type(payload.npcIds) == "table" then
-        window.scavengeTeam = {}
-        for _, npcId in ipairs(payload.npcIds) do
-            window.scavengeTeam[tostring(npcId)] = true
-        end
-    end
+    window.scavengeTeam = Controller.Team
     if window.tab == "scavenge" then
         bindRoster(window)
         window:rebuildDetails()
     end
     return true
+end
+
+if not Tab.teamListenerInstalled then
+    Tab.teamListenerInstalled = Controller.OnTeamChanged(function()
+        local window = PNC.ColonyManagementUI
+            and PNC.ColonyManagementUI.instance or nil
+        if not window or window.tab ~= "scavenge" then return end
+        window.scavengeTeam = Controller.Team
+        bindRoster(window)
+        window:rebuildDetails()
+    end)
 end
 
 return Tab

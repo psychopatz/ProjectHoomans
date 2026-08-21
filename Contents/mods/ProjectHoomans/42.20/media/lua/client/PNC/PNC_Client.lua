@@ -100,6 +100,9 @@ local function onResetLua()
     ClientState.scavengeSessions = {}
     ClientState.activeScavengeSessionId = nil
     ClientState.lastScavengeFailure = nil
+    if PNC.ScavengeController and PNC.ScavengeController.Reset then
+        PNC.ScavengeController.Reset()
+    end
     if PNC.ScavengeNotifications and PNC.ScavengeNotifications.Reset then
         PNC.ScavengeNotifications.Reset()
     end

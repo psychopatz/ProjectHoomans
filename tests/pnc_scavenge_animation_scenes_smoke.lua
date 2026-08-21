@@ -19,8 +19,13 @@ T.equal(registered["scavenge.loot_high"].bump, "LootHigh",
     "high container scene")
 T.equal(registered["scavenge.loot_low"].bump, "LootLow",
     "floor and corpse scene")
-T.equal(registered["scavenge.loot"].durationMs, 1450,
-    "loot transfer waits for scene duration")
+T.equal(registered["scavenge.loot"].durationMs, 650,
+    "loot presentation stays brief")
+for _, id in ipairs({ "scavenge.loot", "scavenge.loot_high",
+    "scavenge.loot_low" }) do
+    T.equal(registered[id].pool, "scavenge.loot",
+        "loot variants share one randomized pool")
+end
 T.truthy(registered["scavenge.loot"].interrupts.movement,
     "movement interrupts stale loot scenes")
 

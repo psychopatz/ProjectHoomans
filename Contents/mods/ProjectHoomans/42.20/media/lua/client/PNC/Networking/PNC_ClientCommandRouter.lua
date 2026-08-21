@@ -178,6 +178,9 @@ function Internal.ApplyScavengeSnapshot(payload)
     ClientState.activeScavengeSessionId = sessionId
         or ClientState.activeScavengeSessionId
     ClientState.lastScavengeFailure = nil
+    if PNC.ScavengeController and PNC.ScavengeController.ReceiveSnapshot then
+        PNC.ScavengeController.ReceiveSnapshot(payload)
+    end
     if PNC.ScavengeNotifications and PNC.ScavengeNotifications.Receive then
         PNC.ScavengeNotifications.Receive(current, payload)
     end

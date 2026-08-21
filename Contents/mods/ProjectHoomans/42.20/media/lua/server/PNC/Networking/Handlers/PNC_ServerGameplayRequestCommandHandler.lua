@@ -83,6 +83,7 @@ Router.Register(Const.CMD_SCAVENGE_REQUEST, function(player, args)
     elseif ok ~= true and sendServerCommand then
         sendServerCommand(player, Const.MODULE, Const.CMD_SCAVENGE_STATE, {
             requestFailed = true,
+            requestAction = tostring(args.action or ""),
             reason = tostring(reason or "scavenge_request_failed"),
             sessionId = args.sessionId,
             npcId = args.npcId,

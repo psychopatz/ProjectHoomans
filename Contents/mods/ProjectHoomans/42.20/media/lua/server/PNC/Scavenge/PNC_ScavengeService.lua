@@ -303,6 +303,7 @@ function Service.BuildSnapshot(session)
         scavengers = scavengers,
         state = session.state,
         phase = session.phase,
+        runActive = session.runActive == true,
         progress = progress,
         candidateCount = session.candidateCount,
         searchedCount = session.searchedCount,

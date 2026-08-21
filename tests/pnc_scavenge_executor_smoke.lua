@@ -63,6 +63,7 @@ local provider
 local lastMove, sceneRequests = {}, {}
 local restored, captured, broadcasts, pathResets = 0, 0, 0, 0
 local behaviorHandler, threatResponses, sceneInterrupts = nil, 0, 0
+local poolRequests = 0
 
 PNC = {
     Const = { ORDER_SCAVENGE = "scavenge", PRESENCE_LIVE = "live" },
@@ -100,6 +101,14 @@ PNC = {
         end,
     },
     AnimationScenes = {
+        RequestFromPool = function(record, _, poolName)
+            poolRequests = poolRequests + 1
+            local variants = { "scavenge.loot_high", "scavenge.loot_low" }
+            local sceneId = variants[(poolRequests - 1) % #variants + 1]
+            sceneRequests[#sceneRequests + 1] = {
+                npcId = record.id, sceneId = sceneId, poolName = poolName }
+            return true, { id = sceneId }
+        end,
         Request = function(record, _, sceneId)
             sceneRequests[#sceneRequests + 1] = {
                 npcId = record.id, sceneId = sceneId }
@@ -243,8 +252,8 @@ T.equal(lastMove.bob.reason, "scavenge_search",
     "scavenging uses routed behavior movement")
 T.equal(lastMove.bob.x, 1.5,
     "container target is an adjacent interaction tile")
-T.equal(sceneRequests[1].sceneId, "scavenge.loot",
-    "container search plays mid-height loot scene")
+T.equal(sceneRequests[1].poolName, "scavenge.loot",
+    "search requests one randomized loot animation")
 local interruptsBeforeCombat = sceneInterrupts
 records.bob.runtime.target = { kind = "zombie" }
 T.truthy(Executor.Tick(lease), "combat temporarily owns scavenger")
@@ -256,7 +265,7 @@ T.equal(sceneInterrupts, interruptsBeforeCombat + 1,
     "combat interrupts loot presentation")
 records.bob.runtime.target = nil
 T.truthy(Executor.Tick(lease), "search resumes at source after combat")
-clock = clock + 1500
+clock = clock + 700
 T.truthy(Executor.Tick(lease), "scene completes before source inspection")
 T.equal(search.processedCount, 1, "source processed once")
 T.equal(search.searchedCount, 1, "source searched once")
@@ -267,6 +276,60 @@ T.equal(search.state, "WAITING_FOR_SELECTION",
 T.falsy(search.runActive, "fully explored run releases workers")
 
 sessions.search = nil
+local retry = {
+    id = "retry", npcId = "bob", npcIds = { "bob" },
+    workers = { bob = { npcId = "bob", phase = "READY" } },
+    runActive = true, state = "DISCOVERING", revision = 1,
+    candidates = { { sourceToken = "source:retry_fridge",
+        sourceType = "container", sourceLabel = "Fridge" } },
+    candidateCount = 1, nextCandidateIndex = 1,
+    processedCount = 0, searchedCount = 0, unreachableCount = 0,
+    invalidCount = 0, manifest = {}, activity = {}, createdAt = clock,
+    previousOrders = { bob = { kind = "follow" } },
+}
+sessions.retry = retry
+local retryLease = leaseFor(retry, "bob")
+Executor.Tick(retryLease)
+records.bob.runtime.pathing = {
+    phase = "blocked", blockReason = "native_progress_timeout" }
+Executor.Tick(retryLease)
+T.equal(retry.processedCount, 0,
+    "first native timeout does not discard the source")
+T.truthy(retry.workers.bob.currentSource,
+    "worker retains source while selecting another interaction tile")
+Executor.Tick(retryLease)
+T.truthy(retry.workers.bob.actionUntil,
+    "worker resumes search after alternate interaction path")
+Executor.Cancel(retryLease, "test_cleanup")
+leases[retryLease.leaseId] = nil
+sessions.retry = nil
+
+records.bob.x, records.bob.y = 1.0, 0
+lastMove.bob = nil
+local near = {
+    id = "near", npcId = "bob", npcIds = { "bob" },
+    workers = { bob = { npcId = "bob", phase = "READY" } },
+    runActive = true, state = "DISCOVERING", revision = 1,
+    candidates = { { sourceToken = "source:near_fridge",
+        sourceType = "container", sourceLabel = "Fridge" } },
+    candidateCount = 1, nextCandidateIndex = 1,
+    processedCount = 0, searchedCount = 0, unreachableCount = 0,
+    invalidCount = 0, manifest = {}, activity = {}, createdAt = clock,
+    previousOrders = { bob = { kind = "follow" } },
+}
+sessions.near = near
+local nearLease = leaseFor(near, "bob")
+Executor.Tick(nearLease)
+Executor.Tick(nearLease)
+T.equal(lastMove.bob, nil,
+    "interaction radius starts looting without an unreachable exact-tile path")
+T.truthy(near.workers.bob.actionUntil,
+    "nearby source immediately starts its brief loot action")
+Executor.Cancel(nearLease, "test_cleanup")
+leases[nearLease.leaseId] = nil
+sessions.near = nil
+records.bob.x, records.bob.y = 0, 0
+
 local entry = { entryId = "entry:beans", itemToken = "item:1",
     sourceToken = "source:floor", sourceType = "floor",
     status = "QUEUED", reservationToken = "r:1",
@@ -299,11 +362,14 @@ T.equal(entry.assignedNpcId, nil,
 Executor.Tick(sueLease)
 T.equal(entry.assignedNpcId, "sue",
     "free-capacity scavenger claims queued item")
+local sceneBeforePickup = sceneRequests[#sceneRequests].sceneId
 Executor.Tick(sueLease)
-T.equal(sceneRequests[#sceneRequests].sceneId, "scavenge.loot_low",
-    "floor pickup plays low loot scene before transfer")
+T.equal(sceneRequests[#sceneRequests].poolName, "scavenge.loot",
+    "pickup uses the same randomized loot animation pipeline")
+T.truthy(sceneRequests[#sceneRequests].sceneId ~= sceneBeforePickup,
+    "consecutive loot actions can select different variants")
 T.equal(transfers, 0, "item remains in world during loot scene")
-clock = clock + 1500
+clock = clock + 700
 Executor.Tick(sueLease)
 T.equal(entry.status, "COLLECTED", "item transfers after scene")
 T.equal(transfers, 1, "queued item transferred exactly once")
