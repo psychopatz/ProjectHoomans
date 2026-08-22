@@ -66,7 +66,7 @@ PNC = {
         COMBAT_PRESSURE_RADIUS = 3,
         COMBAT_PRESSURE_COUNT = 4,
         COMBAT_HORDE_RADIUS = 5.5,
-        COMBAT_HORDE_COUNT = 6,
+        COMBAT_HORDE_COUNT = 4,
         COMBAT_TARGET_CROWD_RADIUS = 2.2,
         COMBAT_TARGET_CROWD_COUNT = 3,
         COMBAT_KITE_MELEE_ENTER_BUFFER = 0.25,
@@ -116,6 +116,15 @@ PNC = {
                 reason = reason,
             }
             return true
+        end,
+    },
+    BehaviorCommon = {
+        GetOwner = function()
+            return {
+                getX = function() return 10 end,
+                getY = function() return 0 end,
+                getZ = function() return 0 end,
+            }
         end,
     },
     Perception = {
@@ -348,6 +357,57 @@ assert(
     moves[#moves].x < record.x,
     "fixed retreat leg must continue away from danger"
 )
+
+-- A successful zombie hit uses the same horde gate as an avoided hit, then
+-- keeps a low-stamina fighter safe until the re-engagement threshold is met.
+now = now + 250
+record = makeRecord("damage_retreat")
+record.stamina.current = 20
+record.orderSpec = { kind = "follow" }
+PNC.CombatTactics.MarkZombieDamage(record, 1, 0, 0, now)
+moved, reason = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, true, "zombie damage triggers horde retreat")
+assertEqual(reason, "zombie_damage_retreat", "damage retreat reason")
+local retreatState = record.runtime.combatRetreat
+local retreatGoalX = retreatState.goalX
+record.x = retreatGoalX
+now = now + 250
+moved, reason = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, true, "damaged fighter does not attack below stamina threshold")
+assertEqual(reason, "recovering_stamina_safe", "damage retreat recovery reason")
+record.stamina.current = 35
+now = now + 250
+moved = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, false, "fighter re-engages at stamina threshold")
+
+-- Follow-mode retreat destinations stay inside the owner leash even when the
+-- raw retreat vector points away from the owner.
+record = makeRecord("follow_clamp")
+record.orderSpec = { kind = "follow" }
+local clamped = PNC.CombatTactics.Internal.BuildRetreatFromSource(
+    record, target, 20, 1, 0, 0,
+    PNC.CombatTactics.Internal.EnsureRetreatState(record)
+)
+local ownerDistance = math.sqrt((clamped.x - 10) ^ 2 + clamped.y ^ 2)
+assert(ownerDistance <= 5.5 + 0.0001, "follow retreat exceeded owner leash")
 
 -- A native route that makes no physical progress releases combat ownership
 -- instead of rebuilding the same retreat forever while the NPC is mauled.

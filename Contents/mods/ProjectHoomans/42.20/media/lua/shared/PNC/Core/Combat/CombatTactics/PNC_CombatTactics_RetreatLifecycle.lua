@@ -22,6 +22,7 @@ function Internal.ContinueLockedRetreat(record, zombie, target, state, now)
     local retryMs
     local safetyRadius
     local recoveryRetreat
+    local reengagePending
     local targetDistance
     if not state or state.phase ~= "retreat" then return false, nil end
     if state.goalX == nil or state.goalY == nil then return false, nil end
@@ -34,12 +35,18 @@ function Internal.ContinueLockedRetreat(record, zombie, target, state, now)
     stopDistance = tonumber(state.goalStopDistance) or 0.8
     safetyRadius = tonumber(state.safetyRadius)
     recoveryRetreat = state.lowStaminaPhase == "retreat"
+    reengagePending = state.reengagePending == true
     if safetyRadius and target and target.x ~= nil and target.y ~= nil then
         targetDistance = math.sqrt(Core.DistanceSq(
             currentX, currentY, target.x, target.y
         ))
         if targetDistance >= safetyRadius then
             Internal.ClearActiveRetreat(record, state)
+            if reengagePending and not Tactics.CanReengage(record) then
+                state.lowStaminaPhase = "recover"
+                Internal.RequestHold(record, zombie, "recovering_stamina_safe")
+                return true, "recovering_stamina_safe"
+            end
             Internal.RequestHold(record, zombie, "recovering_stamina_safe")
             if recoveryRetreat then
                 state.lowStaminaPhase = "recover"
@@ -53,6 +60,11 @@ function Internal.ContinueLockedRetreat(record, zombie, target, state, now)
     then
         Internal.ClearActiveRetreat(record, state)
         state.retryAt = 0
+        if reengagePending and not Tactics.CanReengage(record) then
+            state.lowStaminaPhase = "recover"
+            Internal.RequestHold(record, zombie, "recovering_stamina_safe")
+            return true, "recovering_stamina_safe"
+        end
         if recoveryRetreat then
             state.lowStaminaPhase = "counter"
             state.lowStaminaAttackUntil = now
@@ -95,7 +107,7 @@ function Internal.ContinueLockedRetreat(record, zombie, target, state, now)
     return true, state.reason or "combat_retreat"
 end
 
-function Internal.StartRetreat(record, zombie, target, distance, mode, stopDistance, lockMs, reason, recoveryMode, sourceX, sourceY, sourceZ, safetyRadius)
+function Internal.StartRetreat(record, zombie, target, distance, mode, stopDistance, lockMs, reason, recoveryMode, sourceX, sourceY, sourceZ, safetyRadius, reengagePending)
     local state = Internal.EnsureRetreatState(record)
     local retreat
     local now = Core.Now()
@@ -119,6 +131,7 @@ function Internal.StartRetreat(record, zombie, target, distance, mode, stopDista
     state.recoveryMode = recoveryMode
     state.retreatDistance = distance
     state.safetyRadius = tonumber(safetyRadius)
+    state.reengagePending = reengagePending == true
     state.refreshAt = now + 220
     state.startedAt = now
     state.lastProgressAt = now
@@ -140,32 +153,51 @@ function Internal.StartRetreat(record, zombie, target, distance, mode, stopDista
 end
 
 function Internal.TryNearMissRetreat(record, zombie, target, state, now, report)
+    local reason
+    local sourceX
+    local sourceY
+    local sourceZ
+    local started
+    local startReason
     if not state
         or not target
         or target.kind ~= "zombie"
-        or now > (tonumber(state.nearMissUntil) or 0)
     then
         return false, nil
     end
-    if report and report.pressureCount
-        < (tonumber(Const.COMBAT_TACTICAL_RETREAT_MIN_PRESSURE) or 2)
-    then
-        state.nearMissUntil = 0
-        return false, "lone_threat_counter"
+    if not Tactics.IsHordeAttackRetreatTriggered(state, report, now) then
+        if now <= (tonumber(state.nearMissUntil) or 0)
+            and report and report.pressureCount
+                < (tonumber(Const.COMBAT_TACTICAL_RETREAT_MIN_PRESSURE) or 2)
+        then
+            state.nearMissUntil = 0
+            return false, "lone_threat_counter"
+        end
+        return false, nil
     end
     state.nearMissUntil = 0
+    reason = state.lastZombieAttackOutcome == "damaged"
+        and "zombie_damage_retreat" or "near_miss_kite"
+    sourceX = state.lastZombieAttackX or state.lastNearMissX
+    sourceY = state.lastZombieAttackY or state.lastNearMissY
+    sourceZ = state.lastZombieAttackZ or state.lastNearMissZ
     if record.runtime and record.runtime.combatTactical then
-        record.runtime.combatTactical.decision = "near_miss_kite"
+        record.runtime.combatTactical.decision = reason
     end
-    return Internal.StartRetreat(
+    started, startReason = Internal.StartRetreat(
         record, zombie, target,
         tonumber(Const.COMBAT_KITE_DAMAGE_DISTANCE) or 2.4,
         report and report.surroundedCount >= 2 and "run" or "walk",
         0.7,
         tonumber(Const.COMBAT_KITE_DAMAGE_LOCK_MS) or 700,
-        "near_miss_kite", nil,
-        state.lastNearMissX, state.lastNearMissY, state.lastNearMissZ
+        reason, nil, sourceX, sourceY, sourceZ,
+        tonumber(Const.NPC_ZOMBIE_DEFENSE_RADIUS) or 2.2, true
     )
+    if started then
+        state.attackPressureUntil = 0
+        state.damagePressureUntil = 0
+    end
+    return started, startReason or reason
 end
 
 return Tactics

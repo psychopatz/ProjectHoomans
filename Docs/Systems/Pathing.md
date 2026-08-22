@@ -100,6 +100,15 @@
   before locomotion can overwrite the attack action graph
 - path debug logs report recovery, repath, timeout, and blocked states with the active goal only for NPCs explicitly marked `Record Debug`; global debug presentation does not opt the whole roster into movement logging
 
+## Engine pathing research
+
+The vanilla zombie, animal, and off-screen pathing investigation is kept
+separately to avoid mixing research conclusions with the operational design:
+
+[Vanilla and animal pathing research](../Research/VanillaAndAnimalPathing.md)
+
+The research document also records the door/window traversal boundary and
+the recommended abstract-route handoff.
 ## Composition and performance boundary
 
 `PNC_PathService.lua` is the canonical movement-lane entry and loads its seven

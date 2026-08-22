@@ -31,6 +31,15 @@ function Internal.EnsureRetreatState(record)
     state.vectorX = state.vectorX ~= nil and tonumber(state.vectorX) or nil
     state.vectorY = state.vectorY ~= nil and tonumber(state.vectorY) or nil
     state.damagePressureUntil = tonumber(state.damagePressureUntil) or 0
+    state.attackPressureUntil = tonumber(state.attackPressureUntil) or 0
+    state.lastZombieAttackAt = tonumber(state.lastZombieAttackAt) or 0
+    state.lastZombieAttackX = state.lastZombieAttackX ~= nil
+        and tonumber(state.lastZombieAttackX) or nil
+    state.lastZombieAttackY = state.lastZombieAttackY ~= nil
+        and tonumber(state.lastZombieAttackY) or nil
+    state.lastZombieAttackZ = state.lastZombieAttackZ ~= nil
+        and tonumber(state.lastZombieAttackZ) or nil
+    state.lastZombieAttackOutcome = state.lastZombieAttackOutcome or nil
     state.lastZombieDamageAt = tonumber(state.lastZombieDamageAt) or 0
     state.lastZombieDamageX = state.lastZombieDamageX ~= nil and tonumber(state.lastZombieDamageX) or nil
     state.lastZombieDamageY = state.lastZombieDamageY ~= nil and tonumber(state.lastZombieDamageY) or nil
@@ -47,6 +56,7 @@ function Internal.EnsureRetreatState(record)
     state.recoveryMode = state.recoveryMode or nil
     state.retreatDistance = tonumber(state.retreatDistance) or nil
     state.safetyRadius = tonumber(state.safetyRadius) or nil
+    state.reengagePending = state.reengagePending == true
     state.lowStaminaPhase = state.lowStaminaPhase or nil
     state.lowStaminaAttackUntil = tonumber(state.lowStaminaAttackUntil) or 0
     state.refreshAt = tonumber(state.refreshAt) or 0
@@ -73,6 +83,7 @@ function Internal.ClearActiveRetreat(record, state)
         state.recoveryMode = nil
         state.retreatDistance = nil
         state.safetyRadius = nil
+        state.reengagePending = false
         state.refreshAt = 0
         state.startedAt = 0
         state.lastProgressAt = 0
@@ -115,7 +126,36 @@ function Tactics.ClearRetreatState(record)
         state.retryAt = 0
         state.lowStaminaPhase = nil
         state.lowStaminaAttackUntil = 0
+        state.attackPressureUntil = 0
+        state.lastZombieAttackAt = 0
+        state.lastZombieAttackX = nil
+        state.lastZombieAttackY = nil
+        state.lastZombieAttackZ = nil
+        state.lastZombieAttackOutcome = nil
+        state.damagePressureUntil = 0
+        state.nearMissUntil = 0
     end
+end
+
+function Tactics.CanReengage(record)
+    local current = Internal.StaminaCurrent(record)
+    local stamina = record and record.stamina
+    local maximum = tonumber(stamina and stamina.max) or 0
+    local currentThreshold = tonumber(Const.COMBAT_EXHAUSTED_REENGAGE_CURRENT) or 35
+    local ratioThreshold = tonumber(Const.COMBAT_REENGAGE_STAMINA_RATIO) or 0.28
+    local threshold = currentThreshold
+    if maximum > 0 then
+        threshold = math.max(threshold, maximum * ratioThreshold)
+    end
+    return current >= threshold
+end
+
+function Tactics.IsHordeAttackRetreatTriggered(state, report, now)
+    local hordeCount = tonumber(report and report.hordeCount) or 0
+    local hordeThreshold = tonumber(Const.COMBAT_HORDE_COUNT) or 4
+    return state ~= nil
+        and hordeCount >= hordeThreshold
+        and tonumber(state.attackPressureUntil) >= (tonumber(now) or Core.Now())
 end
 
 function Tactics.MarkZombieDamage(record, sourceX, sourceY, sourceZ, now)
@@ -128,9 +168,14 @@ function Tactics.MarkZombieDamage(record, sourceX, sourceY, sourceZ, now)
     state.lastZombieDamageX = sourceX ~= nil and tonumber(sourceX) or nil
     state.lastZombieDamageY = sourceY ~= nil and tonumber(sourceY) or nil
     state.lastZombieDamageZ = sourceZ ~= nil and tonumber(sourceZ) or nil
-    -- Damage remains diagnostic only. Kiting is armed exclusively by a
-    -- resolved near miss, not by every wound/bleed update.
-    state.damagePressureUntil = 0
+    state.lastZombieAttackAt = now
+    state.lastZombieAttackX = state.lastZombieDamageX
+    state.lastZombieAttackY = state.lastZombieDamageY
+    state.lastZombieAttackZ = state.lastZombieDamageZ
+    state.lastZombieAttackOutcome = "damaged"
+    state.attackPressureUntil = now
+        + (tonumber(Const.COMBAT_KITE_DAMAGE_PRESSURE_MS) or 2500)
+    state.damagePressureUntil = state.attackPressureUntil
 end
 
 function Tactics.MarkZombieNearMiss(record, sourceX, sourceY, sourceZ, now)
@@ -141,6 +186,14 @@ function Tactics.MarkZombieNearMiss(record, sourceX, sourceY, sourceZ, now)
     state.lastNearMissX = sourceX ~= nil and tonumber(sourceX) or nil
     state.lastNearMissY = sourceY ~= nil and tonumber(sourceY) or nil
     state.lastNearMissZ = sourceZ ~= nil and tonumber(sourceZ) or nil
+    state.lastZombieAttackAt = now
+    state.lastZombieAttackX = state.lastNearMissX
+    state.lastZombieAttackY = state.lastNearMissY
+    state.lastZombieAttackZ = state.lastNearMissZ
+    state.lastZombieAttackOutcome = "near_miss"
+    state.attackPressureUntil = now
+        + (tonumber(Const.COMBAT_KITE_DAMAGE_PRESSURE_MS) or 2500)
+    state.damagePressureUntil = state.attackPressureUntil
     state.nearMissUntil = now
         + (tonumber(Const.COMBAT_KITE_NEAR_MISS_WINDOW_MS) or 1400)
 end

@@ -15,6 +15,49 @@ local COMBAT_NAVIGATION = {
     navigationProvider = "engine_path",
 }
 
+local function GetFollowOwnerAnchor(record)
+    local orderSpec = record and record.orderSpec
+    local Common = PNC.BehaviorCommon
+    local owner
+    local ownerX
+    local ownerY
+    local ownerZ
+    if type(orderSpec) ~= "table"
+        or orderSpec.kind ~= (Const.ORDER_FOLLOW or "follow")
+        or not Common
+        or not Common.GetOwner
+    then
+        return nil
+    end
+    owner = Common.GetOwner(record)
+    if not owner or not owner.getX or not owner.getY then
+        return nil
+    end
+    ownerX = tonumber(owner:getX())
+    ownerY = tonumber(owner:getY())
+    ownerZ = owner.getZ and tonumber(owner:getZ()) or nil
+    if not ownerX or not ownerY then
+        return nil
+    end
+    if ownerZ and record.z ~= nil and math.abs(ownerZ - record.z) > 0.5 then
+        return nil
+    end
+    return ownerX, ownerY, ownerZ,
+        tonumber(Const.FOLLOW_RETREAT_MAX_DISTANCE)
+            or tonumber(Const.FOLLOW_COMBAT_LEASH_DISTANCE) or 5.5
+end
+
+local function ClampToFollowOwner(x, y, ownerX, ownerY, maxDistance)
+    local dx = x - ownerX
+    local dy = y - ownerY
+    local distance = math.sqrt((dx * dx) + (dy * dy))
+    if distance <= maxDistance or distance <= 0.001 then
+        return x, y
+    end
+    return ownerX + (dx / distance) * maxDistance,
+        ownerY + (dy / distance) * maxDistance
+end
+
 function Internal.RequestMove(record, zombie, x, y, z, mode, stopDistance, reason)
     local MoveIntent = PNC.BehaviorMoveIntent
     if MoveIntent and MoveIntent.RequestMove and record and record.presenceState == Const.PRESENCE_LIVE then
@@ -64,7 +107,14 @@ function Internal.BuildRetreatFromSource(record, target, distance, sourceX, sour
     local candidateY
     local retreatZ
     local i
+    local ownerX
+    local ownerY
+    local ownerZ
+    local ownerMaxDistance
+    local stepX
+    local stepY
     if not record then return nil end
+    ownerX, ownerY, ownerZ, ownerMaxDistance = GetFollowOwnerAnchor(record)
     if sourceX ~= nil and sourceY ~= nil then
         dx = record.x - tonumber(sourceX)
         dy = record.y - tonumber(sourceY)
@@ -97,9 +147,16 @@ function Internal.BuildRetreatFromSource(record, target, distance, sourceX, sour
             dy = (baseX * sinAngle) + (baseY * cosAngle)
             candidateX = record.x + (dx * distance)
             candidateY = record.y + (dy * distance)
+            if ownerX then
+                candidateX, candidateY = ClampToFollowOwner(
+                    candidateX, candidateY, ownerX, ownerY, ownerMaxDistance
+                )
+            end
+            stepX = record.x + ((candidateX - record.x) * 0.8)
+            stepY = record.y + ((candidateY - record.y) * 0.8)
             if TraversalQuery.CanStep(
                 record.x, record.y, record.z,
-                record.x + (dx * 0.8), record.y + (dy * 0.8), retreatZ
+                stepX, stepY, retreatZ
             ) and TraversalQuery.CanOccupy(candidateX, candidateY, retreatZ) then
                 baseX = dx
                 baseY = dy
@@ -111,9 +168,16 @@ function Internal.BuildRetreatFromSource(record, target, distance, sourceX, sour
         state.vectorX = baseX
         state.vectorY = baseY
     end
+    candidateX = record.x + (baseX * distance)
+    candidateY = record.y + (baseY * distance)
+    if ownerX then
+        candidateX, candidateY = ClampToFollowOwner(
+            candidateX, candidateY, ownerX, ownerY, ownerMaxDistance
+        )
+    end
     return {
-        x = record.x + (baseX * distance),
-        y = record.y + (baseY * distance),
+        x = candidateX,
+        y = candidateY,
         z = retreatZ,
     }
 end

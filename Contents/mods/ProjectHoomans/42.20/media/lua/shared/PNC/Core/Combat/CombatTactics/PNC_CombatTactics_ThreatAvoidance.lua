@@ -21,6 +21,9 @@ function Tactics.AvoidThreat(record, zombie, target, options)
     local continued
     local continueReason
     local radius
+    local report
+    local started
+    local startReason
     if not record or not target then return false, "avoid_target_missing" end
     options = type(options) == "table" and options or {}
     now = Core.Now()
@@ -34,6 +37,12 @@ function Tactics.AvoidThreat(record, zombie, target, options)
         or now < (tonumber(state and state.retryAt) or 0)
     then
         return false, "retreat_stalled"
+    end
+    report = Internal.AssessThreat(record, target)
+    if not Tactics.IsHordeAttackRetreatTriggered(state, report, now) then
+        Internal.ClearActiveRetreat(record, state)
+        state.retryAt = 0
+        return false, "retreat_trigger_not_met"
     end
     staminaRatio = Stamina and Stamina.GetRatio
         and Stamina.GetRatio(record) or 1
@@ -50,7 +59,7 @@ function Tactics.AvoidThreat(record, zombie, target, options)
     end
     mode = staminaRatio > (tonumber(Const.COMBAT_RETREAT_STAMINA_RATIO) or 0.1)
         and "run" or "walk"
-    return Internal.StartRetreat(
+    started, startReason = Internal.StartRetreat(
         record, zombie, target,
         tonumber(options.distance)
             or tonumber(Const.COMPANION_AVOID_THREAT_DISTANCE) or 5,
@@ -66,6 +75,11 @@ function Tactics.AvoidThreat(record, zombie, target, options)
                 and "retreat" or nil
             )
     )
+    if started then
+        state.attackPressureUntil = 0
+        state.damagePressureUntil = 0
+    end
+    return started, startReason
 end
 
 function Tactics.TryReposition(record, zombie, target, effectiveMode, reason, equipmentInfo)
@@ -86,7 +100,7 @@ function Tactics.TryReposition(record, zombie, target, effectiveMode, reason, eq
         return true, state.reason or "combat_retreat"
     end
     if Internal.TryNearMissRetreat(record, zombie, target, state, now, report) then
-        return true, "near_miss_kite"
+        return true, state.reason or "near_miss_kite"
     end
     if Tactics.NeedsRecoveryRetreat(record)
         and report.pressureCount

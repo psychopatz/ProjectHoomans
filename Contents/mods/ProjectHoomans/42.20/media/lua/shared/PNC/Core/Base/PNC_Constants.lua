@@ -269,6 +269,9 @@ Const.FOLLOW_HORDE_NEAR_DISTANCE = 2.4
 Const.FOLLOW_HORDE_STEER_DISTANCE = 1.8
 Const.FOLLOW_HORDE_SCAN_MS = 150
 Const.FOLLOW_HORDE_STEER_MS = 700
+-- Combat retreats for followers may create space, but must remain inside the
+-- same owner leash used by follow combat arbitration.
+Const.FOLLOW_RETREAT_MAX_DISTANCE = Const.FOLLOW_COMBAT_LEASH_DISTANCE
 Const.FOLLOW_SLOT_DISTANCE = 2.25
 Const.FOLLOW_SLOT_LATERAL = 1.15
 Const.FOLLOW_SLOT_ROW_DISTANCE = 0.85
@@ -482,7 +485,8 @@ Const.COMBAT_SURROUND_COUNT = 3
 Const.COMBAT_PRESSURE_RADIUS = 3.0
 Const.COMBAT_PRESSURE_COUNT = 4
 Const.COMBAT_HORDE_RADIUS = 5.5
-Const.COMBAT_HORDE_COUNT = 6
+-- A reactive retreat needs a real horde, not merely a crowded melee bubble.
+Const.COMBAT_HORDE_COUNT = 4
 Const.COMBAT_TARGET_CROWD_RADIUS = 2.2
 Const.COMBAT_TARGET_CROWD_COUNT = 3
 Const.COMBAT_KITE_MELEE_ENTER_BUFFER = 0.25

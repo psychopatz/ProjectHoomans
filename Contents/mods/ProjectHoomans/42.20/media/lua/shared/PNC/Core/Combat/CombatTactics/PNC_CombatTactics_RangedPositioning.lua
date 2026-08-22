@@ -76,6 +76,7 @@ function Tactics.MaintainRangedSpacing(record, zombie, target)
     local retreatDistance
     local mode
     local reason
+    local attackRetreatTriggered
     if not record or not zombie or not target then return false, nil end
     now = Core.Now()
     state = Internal.EnsureRetreatState(record)
@@ -85,9 +86,15 @@ function Tactics.MaintainRangedSpacing(record, zombie, target)
     dist = math.sqrt(tonumber(target.distSq or 0) or 0)
     preferredMin = tonumber(Const.RANGED_PREFERRED_MIN_DISTANCE) or 5.0
     report = Internal.AssessThreat(record, target)
+    attackRetreatTriggered = Tactics.IsHordeAttackRetreatTriggered(
+        state, report, now
+    )
     pressure = target.kind == "zombie" and (
         report.pressureCount >= (tonumber(Const.RANGED_PRESSURE_COUNT) or 2)
-        or report.hordeCount >= Const.COMBAT_HORDE_COUNT
+        or (
+            report.hordeCount >= (tonumber(Const.COMBAT_HORDE_COUNT) or 4)
+            and attackRetreatTriggered
+        )
         or (
             dist < preferredMin
             and report.targetCrowdCount >= Const.COMBAT_TARGET_CROWD_COUNT

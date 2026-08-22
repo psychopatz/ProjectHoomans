@@ -32,7 +32,6 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
     local continueReason
     local safetyRadius
     local safetyBuffer
-    local recoveryThreshold
     local retreatDistance
     if not record or not zombie or not target or target.kind ~= "zombie" then
         return false, nil, nil
@@ -43,7 +42,6 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
         or Core.DistanceSq(record.x, record.y, target.x, target.y))
     safetyRadius = tonumber(Const.NPC_ZOMBIE_DEFENSE_RADIUS) or 2.2
     safetyBuffer = tonumber(Const.COMBAT_RETREAT_SAFETY_BUFFER) or 0.25
-    recoveryThreshold = tonumber(Const.COMBAT_EXHAUSTED_REENGAGE_CURRENT) or 35
     meleeLane = effectiveMode == "melee"
         or (
             effectiveMode == "mixed"
@@ -64,7 +62,7 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
     grounded = Tactics.IsGroundTarget(target)
     retreatMinPressure = tonumber(Const.COMBAT_TACTICAL_RETREAT_MIN_PRESSURE) or 2
     if state.lowStaminaPhase == "recover" then
-        if Internal.StaminaCurrent(record) >= recoveryThreshold then
+        if Tactics.CanReengage(record) then
             state.lowStaminaPhase = nil
             state.lowStaminaAttackUntil = 0
         elseif dist < safetyRadius then
@@ -94,7 +92,7 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
         return false, "lone_threat_counter", "shove"
     end
     if Internal.TryNearMissRetreat(record, zombie, target, state, now, report) then
-        return true, "near_miss_kite", nil
+        return true, state.reason or "near_miss_kite", nil
     end
     skillID = Skills and Skills.ResolveWeaponSkill
         and Skills.ResolveWeaponSkill(
