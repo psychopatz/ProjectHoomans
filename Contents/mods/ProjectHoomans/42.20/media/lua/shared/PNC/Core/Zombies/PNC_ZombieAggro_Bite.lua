@@ -133,6 +133,17 @@ local function setBiteDiagnostic(record, entry, reason)
         woundType = entry.woundType,
         protection = entry.protection,
         woundChance = entry.woundChance,
+        damageModel = entry.damageModel,
+        staminaRatio = entry.staminaRatio,
+        safeStaminaRatio = entry.safeStaminaRatio,
+        fatigueExposure = entry.fatigueExposure,
+        crowdChance = entry.crowdChance,
+        skillMitigation = entry.skillMitigation,
+        damageChance = entry.damageChance,
+        damageRoll = entry.damageRoll,
+        clothingBlockChance = entry.clothingBlockChance,
+        clothingRoll = entry.clothingRoll,
+        durabilityLoss = entry.durabilityLoss,
         defenseRadius = entry.defenseRadius,
         nearbyCount = entry.nearbyCount,
         fitness = entry.fitness,
@@ -172,6 +183,9 @@ local function finalizeRelease(zombieId, entry, now, reason)
     end
     if zombie and zombie.setVariable then
         zombie:setVariable("PNCZombieBitingNPC", false)
+    end
+    if zombie and zombie.setNoTeeth then
+        zombie:setNoTeeth(entry and entry.previousNoTeeth == true or false)
     end
     if entry then
         entry.phase = "finished"
@@ -237,6 +251,7 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
     local entry
     local laneClear
     local laneReason
+    local previousNoTeeth
 
     if not zombie or not npcBody or not record
         or shouldPreventZombieAttack(record)
@@ -296,6 +311,12 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
     if zombie.setBumpType then
         zombie:setBumpType(bumpType)
     end
+    previousNoTeeth = zombie.isNoTeeth and zombie:isNoTeeth() or false
+    if zombie.setNoTeeth then
+        -- The scripted PNC bite owns the only damage roll. Native AttackState
+        -- collision must not create a second BodyDamage wound on this frame.
+        zombie:setNoTeeth(true)
+    end
 
     entry = {
         zombieId = zombieId,
@@ -309,6 +330,7 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
         clearAt = now + Const.ZOMBIE_BITE_CLEAR_DELAY_MS,
         appliedDamage = false,
         broadcastClear = false,
+        previousNoTeeth = previousNoTeeth,
     }
     State.bites[zombieId] = entry
     setBiteDiagnostic(record, entry, "started")
@@ -367,7 +389,23 @@ local function applyBiteDamage(entry, record, zombie, npcBody, now)
             defenseResult
         )
     elseif wounds and wounds.ResolveZombieAttack then
-        applied, result = wounds.ResolveZombieAttack(record, npcBody, zombie, entry.zombieId)
+        if Settings
+            and Settings.NPCZombieDamageModelEnabled
+            and Settings.NPCZombieDamageModelEnabled()
+        then
+            applied = false
+            result = {
+                outcome = "damage_resolver_unavailable",
+                partId = nil,
+            }
+        else
+            applied, result = wounds.ResolveZombieAttack(
+                record,
+                npcBody,
+                zombie,
+                entry.zombieId
+            )
+        end
     else
         applied = Health.ApplyDamage(record, npcBody, {
             amount = Const.ZOMBIE_ATTACK_DAMAGE,
@@ -383,6 +421,25 @@ local function applyBiteDamage(entry, record, zombie, npcBody, now)
     entry.woundType = result and result.woundType or nil
     entry.protection = result and result.protection or 0
     entry.woundChance = result and result.chance or 0
+    entry.damageModel = defenseResult
+        and defenseResult.damageModel == true or false
+    entry.staminaRatio = defenseResult
+        and defenseResult.staminaRatio or nil
+    entry.safeStaminaRatio = defenseResult
+        and defenseResult.safeStaminaRatio or nil
+    entry.fatigueExposure = defenseResult
+        and defenseResult.fatigueExposure or nil
+    entry.crowdChance = defenseResult
+        and defenseResult.crowdChance or nil
+    entry.skillMitigation = defenseResult
+        and defenseResult.skillMitigation or nil
+    entry.damageChance = result and result.damageChance
+        or defenseResult and defenseResult.damageChance or nil
+    entry.damageRoll = result and result.damageRoll
+        or defenseResult and defenseResult.damageRoll or nil
+    entry.clothingBlockChance = result and result.blockChance or nil
+    entry.clothingRoll = result and result.clothingRoll or nil
+    entry.durabilityLoss = result and result.durabilityLoss or 0
     entry.defenseRadius = defenseResult
         and defenseResult.radius or nil
     entry.nearbyCount = defenseResult

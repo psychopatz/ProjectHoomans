@@ -159,3 +159,301 @@
 - combat debug state exposes target kind, resolved mode, weapon status, and block reason
 - repeated identical combat-block diagnostics are rate-limited per NPC and
   combat lane so the 75 ms combat cadence cannot flood the Lua log
+
+## Zombie-to-NPC Damage Model (Design Before Implementation)
+
+This section is the design target for the next zombie damage implementation. It
+is intentionally separate from the current `PNC_Combat_Defense` behavior above;
+the implementation must not be started until this model and its sandbox
+surface are accepted.
+
+The model treats stamina as a temporary defensive resource. While the NPC is
+above the configured stamina-safe ratio, zombie damage rolls are impossible.
+When stamina falls below that ratio, each valid zombie attack gets one
+authoritative damage roll. Fitness and related defensive skills reduce the
+resulting exposure, but do not make an exhausted NPC invulnerable.
+
+### Resolution order
+
+Every live zombie attack must use this order on the authority. In multiplayer,
+the server owns the roll; in single-player, the host/authority owns it. Clients
+only receive the resolved result for presentation.
+
+```text
+valid zombie attack
+    -> obtain cached hit-zone pressure
+    -> stamina-safe gate and fatigue exposure
+    -> crowd chance calculation
+    -> Fitness/skill mitigation
+    -> one damage-exposure roll for this bite lease
+    -> choose body part and roll initial wound type
+    -> clothing protection roll
+    -> sacrifice clothing durability
+    -> block the wound, or downgrade/apply the wound
+    -> publish the authoritative result and mark zombie pressure
+```
+
+The native Java `BodyDamage.AddRandomDamageFromZombie(...)` lane must not be
+allowed to apply a second independent wound. The `NoTeeth` safeguard remains a
+visual/engine safety measure, but it is not a substitute for routing every
+damage result through this resolver.
+
+### Stamina gate
+
+Normalize stamina once for the attack:
+
+```lua
+s = clamp(currentStamina / maxStamina, 0, 1)
+safe = Sandbox.NPCZombieDamageStaminaStartRatio()
+
+if safe <= 0 then
+    fatigueExposure = 1
+elseif s >= safe then
+    fatigueExposure = 0
+else
+    t = clamp((safe - s) / safe, 0, 1)
+    fatigueExposure = t * t * (3 - 2 * t) -- smoothstep
+end
+```
+
+With the proposed default `safe = 0.30`, an NPC above 30% stamina cannot take
+zombie damage through this lane. Below 30%, exposure rises smoothly instead of
+turning on at one exact frame. Setting the sandbox value to `1.0` makes only
+full stamina safe; setting it to `0.0` disables stamina immunity and restores a
+normal damage-roll model.
+
+This protection applies only to incoming zombie damage. Attack stamina costs,
+movement exhaustion, retreat decisions, wounds, infection, and native damage
+suppression remain separate systems.
+
+### Crowd chance
+
+`N` is the number of valid, living zombies inside the configured hit zone on
+the same floor. The primary attacker counts as one. The query does not depend
+on rendering; it may use the existing spatial/perception result for abstract
+or unrendered threats that are still represented as valid attackers.
+
+The crowd component is:
+
+```lua
+extra = math.max(0, N - 1)
+crowdChance =
+    (extra * Sandbox.NPCZombieDamageCrowdChancePerExtra())
+    + (
+        math.max(0, extra - 2) ^ 2
+        * Sandbox.NPCZombieDamageCrowdEscalation()
+    )
+crowdChance = math.min(crowdChance, Sandbox.NPCZombieDamageCrowdChanceCap())
+```
+
+With the proposed defaults (`5` percentage points per extra zombie and `2`
+percentage points of escalation), the crowd component is:
+
+| Zombies in hit zone | Crowd chance |
+| ---: | ---: |
+| 1 | 0% |
+| 2 | 5% |
+| 3 | 10% |
+| 4 | 17% |
+| 5 | 26% |
+| 6 | 37% |
+
+The first three values match the requested mapping exactly. Setting escalation
+to `0` produces a purely linear sequence (`0, 5, 10, 15, ...`), while a
+positive escalation makes being genuinely surrounded increasingly dangerous.
+
+The hit-zone count should remain a bounded same-floor spatial query. It should
+not perform a fresh global zombie scan for every attack or every zombie update.
+
+### Skill mitigation and final damage chance
+
+Fitness is the first verified skill available to this resolver. Normalize it
+from the current `0..10` range:
+
+```lua
+fitness = clamp(Fitness / 10, 0, 1)
+skillMitigation = clamp(
+    (
+        Sandbox.NPCZombieDamageMinimumSkillMitigation()
+        + fitness * Sandbox.NPCZombieDamageFitnessMitigationScale()
+    ) / 100,
+    0,
+    Sandbox.NPCZombieDamageMaximumSkillMitigation() / 100
+)
+```
+
+The final roll chance is:
+
+```lua
+rawChance = Sandbox.NPCZombieDamageBaseChance() + crowdChance
+damageChance = clamp(rawChance / 100, 0, 1)
+damageChance = damageChance * fatigueExposure
+damageChance = damageChance * (1 - skillMitigation)
+```
+
+The proposed starting values are:
+
+- base chance: `0%`; therefore one zombie contributes `0%` by default;
+- minimum skill mitigation: `15%`;
+- Fitness mitigation scale: `45%`, giving Fitness 10 a total `60%`
+  mitigation before the configured cap;
+- maximum skill mitigation: `60%`.
+
+The old `NPCZombieWoundChance` option must not silently remain as an additional
+roll, because that would break the requested one-zombie result. It can remain
+readable for save compatibility, but the new resolver should use the new
+options when the new model is enabled. `NPCZombieBiteChance` and
+`NPCZombieLacerationChance` remain wound-severity weights for the separate
+wound-type roll; they are not part of the damage-exposure roll.
+
+### Independent wound-type roll (preserved bite mechanics)
+
+Passing the stamina/crowd/skill damage-exposure roll does not automatically
+create a bite. The wound type remains a separate RNG layer, preserving the
+existing bite gate:
+
+```lua
+woundTypeRoll = randomPercent()
+biteChance = Sandbox.NPCZombieBiteChance()
+lacerationChance = Sandbox.NPCZombieLacerationChance()
+
+if woundTypeRoll < biteChance then
+    initialWoundType = "bite"
+elseif woundTypeRoll < math.min(100, biteChance + lacerationChance) then
+    initialWoundType = "laceration"
+else
+    initialWoundType = "scratch"
+end
+```
+
+With the existing defaults, a damage-exposure event has a `20%` chance to be
+an initial bite, a `30%` chance to be an initial laceration, and a `50%`
+remaining chance to be an initial scratch. The bite chance is therefore not
+merged into the crowd chance, skill mitigation, or clothing block chance. An
+attack that passes the first roll but fails this type roll is not a bite and
+must not start bite-specific infection handling.
+
+The initial wound type selects the clothing defense to test. Clothing may then
+block the wound or downgrade its final type, but it must not reroll the bite
+chance. Infection and any bite-specific consequence must inspect the final
+applied wound type: a blocked bite, or a bite downgraded to laceration or
+scratch, is not a final bite wound.
+
+### Clothing interception
+
+Clothing is a second defensive layer after the damage roll. It does not make an
+NPC dodge; it either absorbs the attack, loses durability while doing so, or
+fails and allows a dampened wound through.
+
+The body part and initial severity are selected by the independent wound-type
+roll above. For every worn item covering that part, use the defense matching
+the initial attack:
+
+- bites use `getBiteDefense()`;
+- scratches and lacerations use `getScratchDefense()`;
+- unrelated item defenses do not participate.
+
+For each layer:
+
+```lua
+conditionRatio = itemCondition / itemConditionMax
+effectiveDefense =
+    clamp(itemDefense / 100, 0, 1)
+    * conditionRatio ^ Sandbox.NPCZombieClothingConditionExponent()
+```
+
+Combine layers without allowing protection to exceed 100%:
+
+```lua
+blockChance = 1
+for each effectiveDefense do
+    blockChance = blockChance * (1 - effectiveDefense)
+end
+blockChance = 1 - blockChance
+blockChance = clamp(
+    blockChance * Sandbox.NPCZombieClothingBlockMultiplier(),
+    0,
+    1
+)
+```
+
+Roll the clothing result once:
+
+- if the roll is protected, consume durability from one sacrificial layer and
+  apply no wound;
+- if the roll penetrates, consume more durability and apply a wound;
+- if the protection is strong enough but the roll still penetrates, downgrade
+  the wound rather than pretending the clothing had no effect.
+
+Use the layer with the greatest effective contribution as the sacrificial item.
+This avoids iterating or mutating every worn item and makes heavy outer clothing
+protect the body part that was actually struck.
+
+Recommended failed-roll downgrade thresholds:
+
+| Combined protection | Penetrating result |
+| ---: | --- |
+| below laceration threshold | original severity |
+| laceration threshold or higher | bite becomes laceration; laceration becomes scratch |
+| scratch threshold or higher | bite or laceration becomes scratch |
+
+A scratch cannot be downgraded into no wound by this table; only a successful
+clothing block prevents the wound. Durability wear must be applied on both
+blocked and penetrated results, with the penetrated result using the larger
+wear amount.
+
+### Proposed sandbox surface
+
+The following options should be added to `media/sandbox-options.txt` and read
+through `PNC_Sandbox`. Percent values are displayed as `0..100`; ratios are
+displayed as `0..1` or exposed as percentages in the UI.
+
+| Option | Proposed default | Purpose |
+| --- | ---: | --- |
+| `NPCZombieDamageModel` | enabled | Selects the stamina/crowd/clothing resolver |
+| `NPCZombieDamageStaminaStartRatio` | `0.30` | Below this ratio, damage exposure begins |
+| `NPCZombieDamageBaseChance` | `0` | Low-stamina chance before crowd pressure |
+| `NPCZombieDamageHitRadius` | `2.2` | Same-floor zombie hit-zone radius |
+| `NPCZombieDamageCrowdChancePerExtra` | `5` | Added chance for each zombie after the first |
+| `NPCZombieDamageCrowdEscalation` | `2` | Quadratic escalation after three zombies |
+| `NPCZombieDamageCrowdChanceCap` | `100` | Maximum crowd contribution |
+| `NPCZombieDamageMinimumSkillMitigation` | `15` | Mitigation at Fitness 0 |
+| `NPCZombieDamageFitnessMitigationScale` | `45` | Additional Fitness-based mitigation |
+| `NPCZombieDamageMaximumSkillMitigation` | `60` | Skill mitigation cap |
+| `NPCZombieBiteChance` | `20` | Independent bite roll after exposure succeeds |
+| `NPCZombieLacerationChance` | `30` | Independent laceration roll after the bite check |
+| `NPCZombieClothingConditionExponent` | `1.15` | How worn condition reduces defense |
+| `NPCZombieClothingBlockMultiplier` | `1.0` | Global clothing protection tuning |
+| `NPCZombieClothingDowngradeLaceration` | `25` | Protection needed to downgrade one severity step |
+| `NPCZombieClothingDowngradeScratch` | `60` | Protection needed to force a penetrating scratch |
+| `NPCZombieClothingSafeDurabilityLoss` | `1` | Wear when clothing blocks the attack |
+| `NPCZombieClothingPenetratingDurabilityLoss` | `2` | Wear when clothing fails and a wound enters |
+
+The exact item-condition mutation must be verified against the current Java
+item API through the Java harness before implementation. The documentation
+defines the gameplay contract, not an assumed Lua setter or Java overload.
+
+### Performance and authority constraints
+
+- Reuse the existing bounded per-NPC perception/spatial frame to obtain `N`;
+  do not scan the global zombie list per attack.
+- Compute one hit-zone count per cached frame and reuse it for all bite events
+  in that frame.
+- Cache a clothing protection profile by worn-item identity, body-part
+  coverage, damage type, and condition signature. Rebuild it only after an
+  equipment or durability change.
+- Mutate durability only for the selected sacrificial item.
+- Roll once per committed bite lease, guarded by the bite identifier; never
+  roll from both the animation callback and the server damage callback.
+- Apply the result only through the authority-gated PNC health path. Native
+  Java attack collision must be suppressed or converted into a presentation
+  event, never allowed to create a second wound.
+- Emit compact diagnostics containing stamina ratio, hit-zone count, crowd
+  chance, skill mitigation, damage roll, block roll, selected item, durability
+  loss, and final wound severity. These values are needed to tune sandbox
+  defaults without flooding the 75 ms combat loop.
+
+Abstract combat should use the same expected-value contract rather than making
+one random clothing and durability roll for every virtual zombie. Live combat
+uses the individual attack roll described above; abstract combat may aggregate
+the expected result over its bounded round.

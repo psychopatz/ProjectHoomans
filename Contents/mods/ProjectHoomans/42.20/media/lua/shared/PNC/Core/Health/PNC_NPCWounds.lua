@@ -57,6 +57,15 @@ local COVERAGE_PART_ALIASES = {
     LowerBody = "Torso_Lower",
 }
 
+local function settingNumber(name, fallback, minimum, maximum)
+    local getter = Settings and Settings[name]
+    local value = getter and getter() or fallback
+    value = tonumber(value) or tonumber(fallback) or 0
+    if minimum ~= nil then value = math.max(value, minimum) end
+    if maximum ~= nil then value = math.min(value, maximum) end
+    return value
+end
+
 local function worldHour()
     local gameTime = getGameTime and getGameTime() or nil
     if gameTime and gameTime.getWorldAgeHours then
@@ -152,10 +161,42 @@ local function itemCoversPart(item, entry, partId)
         or string.find(name, "suit", 1, true) ~= nil
 end
 
-function Wounds.GetProtection(npcBody, part, damageType)
+local function readDefense(item, damageType)
+    if not item then return nil end
+    if damageType == "bullet" then
+        return item.getBulletDefense and tonumber(item:getBulletDefense()) or nil
+    end
+    if damageType == "scratch" or damageType == "laceration" then
+        return item.getScratchDefense
+            and tonumber(item:getScratchDefense()) or nil
+    end
+    return item.getBiteDefense and tonumber(item:getBiteDefense()) or nil
+end
+
+local function conditionRatio(item)
+    local condition
+    local maximum
+    if not item or not item.getCondition or not item.getConditionMax then
+        return 1
+    end
+    condition = tonumber(item:getCondition()) or 0
+    maximum = math.max(1, tonumber(item:getConditionMax()) or 1)
+    return Core.Clamp(condition / maximum, 0, 1)
+end
+
+function Wounds.GetClothingProfile(npcBody, part, damageType)
     local remainingRisk = 1
     local partId = part and tostring(part.id or part) or nil
-    if not npcBody or not partId then return 0 end
+    local layers = {}
+    local bestLayer
+    local bestContribution = 0
+    if not npcBody or not partId then
+        return {
+            protection = 0,
+            blockChance = 0,
+            layers = layers,
+        }
+    end
     damageType = string.lower(tostring(damageType or "bite"))
     -- Fake-human IsoZombie bodies do not consistently expose
     -- getBodyPartClothingDefense (and calling the wrong Java overload can
@@ -168,58 +209,60 @@ function Wounds.GetProtection(npcBody, part, damageType)
     local entry
     local item
     local defense
-    local conditionRatio
+    local ratio
+    local effectiveDefense
+    local exponent = settingNumber(
+        "NPCZombieClothingConditionExponent",
+        1.15,
+        0.1,
+        3
+    )
     if worn and worn.size and worn.get then
         for i = 0, worn:size() - 1 do
             entry = worn:get(i)
             item = entry and entry.getItem and entry:getItem() or entry
-            if not itemCoversPart(item, entry, partId) then
-                defense = nil
-            elseif damageType == "bullet" then
-                defense = item
-                    and item.getBulletDefense
-                    and tonumber(item:getBulletDefense())
-                    or nil
-            elseif damageType == "scratch"
-                or damageType == "laceration"
-            then
-                defense = item
-                    and item.getScratchDefense
-                    and tonumber(item:getScratchDefense())
-                    or nil
+            if itemCoversPart(item, entry, partId) then
+                defense = readDefense(item, damageType)
             else
-                defense = item
-                    and item.getBiteDefense
-                    and tonumber(item:getBiteDefense())
-                    or nil
+                defense = nil
             end
             if defense then
-                conditionRatio = 1
-                if item.getCondition and item.getConditionMax then
-                    conditionRatio = Core.Clamp(
-                        (tonumber(item:getCondition()) or 0)
-                            / math.max(
-                                1,
-                                tonumber(item:getConditionMax()) or 1
-                            ),
-                        0,
-                        1
-                    )
-                end
-                defense = Core.Clamp(
-                    defense * conditionRatio,
-                    0,
-                    100
-                )
-                remainingRisk = remainingRisk * (1 - defense / 100)
+                ratio = conditionRatio(item)
+                effectiveDefense = Core.Clamp(defense, 0, 100) / 100
+                    * (ratio ^ exponent)
+                effectiveDefense = Core.Clamp(effectiveDefense, 0, 1)
+                remainingRisk = remainingRisk * (1 - effectiveDefense)
                 count = count + 1
+                layers[#layers + 1] = {
+                    item = item,
+                    entry = entry,
+                    defense = Core.Clamp(defense, 0, 100),
+                    conditionRatio = ratio,
+                    contribution = effectiveDefense,
+                }
+                if effectiveDefense > bestContribution then
+                    bestContribution = effectiveDefense
+                    bestLayer = layers[#layers]
+                end
             end
         end
     end
-    if count > 0 then
-        return Core.Clamp((1 - remainingRisk) * 100, 0, 100)
-    end
-    return 0
+    local protection = count > 0
+        and Core.Clamp((1 - remainingRisk) * 100, 0, 100)
+        or 0
+    local blockChance = protection / 100
+        * settingNumber("NPCZombieClothingBlockMultiplier", 1, 0, 2)
+    return {
+        protection = protection,
+        blockChance = Core.Clamp(blockChance, 0, 1),
+        layers = layers,
+        bestLayer = bestLayer,
+    }
+end
+
+function Wounds.GetProtection(npcBody, part, damageType)
+    local profile = Wounds.GetClothingProfile(npcBody, part, damageType)
+    return profile and tonumber(profile.protection) or 0
 end
 
 function Wounds.Ensure(record)
@@ -503,6 +546,88 @@ function Wounds.RollZombieAttackType()
     return chooseWoundType()
 end
 
+local function woundAfterProtection(woundType, protection)
+    local lacerationThreshold = settingNumber(
+        "NPCZombieClothingDowngradeLaceration",
+        25,
+        0,
+        100
+    )
+    local scratchThreshold = math.max(
+        lacerationThreshold,
+        settingNumber("NPCZombieClothingDowngradeScratch", 60, 0, 100)
+    )
+    protection = tonumber(protection) or 0
+    if protection >= scratchThreshold
+        and (woundType == "bite" or woundType == "laceration")
+    then
+        return "scratch"
+    end
+    if protection >= lacerationThreshold then
+        if woundType == "bite" then return "laceration" end
+        if woundType == "laceration" then return "scratch" end
+    end
+    return woundType
+end
+
+local function sacrificeClothing(layer, amount)
+    local item = layer and layer.item or nil
+    local before
+    local maximum
+    local after
+    if not item or amount <= 0
+        or not item.getCondition
+        or not item.setCondition
+    then
+        return 0, nil, nil
+    end
+    before = tonumber(item:getCondition()) or 0
+    maximum = math.max(0, tonumber(item.getConditionMax
+        and item:getConditionMax() or before) or before)
+    after = math.max(0, math.min(maximum, before - amount))
+    if after ~= before then
+        item:setCondition(math.floor(after))
+    end
+    return before - after, before, after
+end
+
+function Wounds.ResolveZombieClothing(npcBody, part, woundType)
+    local profile = Wounds.GetClothingProfile(npcBody, part, woundType)
+    local roll = randomPercent() / 100
+    local blocked = roll < (tonumber(profile.blockChance) or 0)
+    local finalWoundType
+    local loss = blocked
+        and settingNumber("NPCZombieClothingSafeDurabilityLoss", 1, 0, 100)
+        or settingNumber("NPCZombieClothingPenetratingDurabilityLoss", 2, 0, 100)
+    local durabilityLoss
+    local conditionBefore
+    local conditionAfter
+    if profile.bestLayer then
+        durabilityLoss, conditionBefore, conditionAfter = sacrificeClothing(
+            profile.bestLayer,
+            loss
+        )
+    else
+        durabilityLoss = 0
+    end
+    if not blocked then
+        finalWoundType = woundAfterProtection(woundType, profile.protection)
+    end
+    return {
+        outcome = blocked and "clothing_blocked" or "clothing_penetrated",
+        blocked = blocked,
+        initialWoundType = woundType,
+        finalWoundType = finalWoundType,
+        protection = profile.protection,
+        blockChance = profile.blockChance,
+        roll = roll,
+        durabilityLoss = durabilityLoss,
+        conditionBefore = conditionBefore,
+        conditionAfter = conditionAfter,
+        item = profile.bestLayer and profile.bestLayer.item or nil,
+    }
+end
+
 local function addWound(record, part, woundType, now, woundDamage)
     local body = Wounds.Ensure(record)
     local stats = WOUND_STATS[woundType] or WOUND_STATS.scratch
@@ -753,28 +878,68 @@ function Wounds.ApplyResolvedZombieAttack(
     attackerZombieId,
     defenseResult
 )
+    if Core and Core.IsAuthority and not Core.IsAuthority() then
+        return false, { outcome = "not_authority" }
+    end
     local part = defenseResult and defenseResult.part or nil
-    local woundType = tostring(
+    local initialWoundType = tostring(
         defenseResult and defenseResult.damageType or "scratch"
     )
-    local protection = tonumber(
-        defenseResult and defenseResult.protection
-    ) or 0
+    local woundType = initialWoundType
+    local protection = 0
+    local clothingResult
     local wound
     local damage
+    local applied
+    local body
+    local previousWound
+    local previousInfection
     if not part or not WOUND_STATS[woundType] then
         return false, {
             outcome = "invalid_resolved_attack",
             partId = defenseResult and defenseResult.partId or nil,
         }
     end
+    if defenseResult and defenseResult.damageModel == true then
+        clothingResult = Wounds.ResolveZombieClothing(
+            npcBody,
+            part,
+            initialWoundType
+        )
+        protection = tonumber(clothingResult.protection) or 0
+        if clothingResult.blocked then
+            return false, {
+                outcome = clothingResult.outcome,
+                partId = part.id,
+                initialWoundType = initialWoundType,
+                protection = protection,
+                blockChance = clothingResult.blockChance,
+                clothingRoll = clothingResult.roll,
+                durabilityLoss = clothingResult.durabilityLoss,
+                conditionBefore = clothingResult.conditionBefore,
+                conditionAfter = clothingResult.conditionAfter,
+                damageChance = defenseResult.damageChance,
+                damageRoll = defenseResult.damageRoll,
+            }
+        end
+        woundType = clothingResult.finalWoundType or initialWoundType
+    else
+        protection = tonumber(
+            defenseResult and defenseResult.protection
+        ) or 0
+    end
+    body = Wounds.Ensure(record)
+    previousWound = body.wounds[part.id]
+        and Core.DeepCopy(body.wounds[part.id]) or nil
+    previousInfection = body.infection
+        and Core.DeepCopy(body.infection) or nil
     wound, damage = addWound(
         record,
         part,
         woundType,
         Core.Now()
     )
-    PNC.Health.ApplyDamage(record, npcBody, {
+    applied = PNC.Health.ApplyDamage(record, npcBody, {
         amount = damage,
         partId = part.id,
         type = "zombie_" .. woundType,
@@ -787,6 +952,20 @@ function Wounds.ApplyResolvedZombieAttack(
         z = attacker and attacker.getZ
             and attacker:getZ() or record.z,
     })
+    if not applied then
+        body.wounds[part.id] = previousWound
+        body.infection = previousInfection
+        Wounds.Recalculate(record)
+        return false, {
+            outcome = "damage_rejected",
+            partId = part.id,
+            initialWoundType = initialWoundType,
+            woundType = woundType,
+            protection = protection,
+            damageChance = defenseResult and defenseResult.damageChance or nil,
+            damageRoll = defenseResult and defenseResult.damageRoll or nil,
+        }
+    end
     if PNC.SocialEncounterTracker
         and PNC.SocialEncounterTracker.RecordNPCDamaged
         and PNC.SocialEventHooks
@@ -814,9 +993,19 @@ function Wounds.ApplyResolvedZombieAttack(
         outcome = "wounded",
         partId = part.id,
         woundType = wound.type,
+        initialWoundType = initialWoundType,
         protection = protection,
-        chance = defenseResult and defenseResult.avoidChance or nil,
-        roll = defenseResult and defenseResult.roll or nil,
+        blockChance = clothingResult and clothingResult.blockChance or nil,
+        clothingRoll = clothingResult and clothingResult.roll or nil,
+        durabilityLoss = clothingResult and clothingResult.durabilityLoss or 0,
+        conditionBefore = clothingResult and clothingResult.conditionBefore or nil,
+        conditionAfter = clothingResult and clothingResult.conditionAfter or nil,
+        chance = defenseResult and (defenseResult.damageChance
+            or defenseResult.avoidChance) or nil,
+        roll = defenseResult and (defenseResult.damageRoll
+            or defenseResult.roll) or nil,
+        damageChance = defenseResult and defenseResult.damageChance or nil,
+        damageRoll = defenseResult and defenseResult.damageRoll or nil,
         infected = Wounds.HasActiveInfection(record),
     }
 end

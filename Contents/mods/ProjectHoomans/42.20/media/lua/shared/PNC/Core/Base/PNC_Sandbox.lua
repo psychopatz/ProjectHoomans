@@ -46,6 +46,70 @@ function Settings.NPCZombieLacerationChance()
     return Settings.GetNumber("NPCZombieLacerationChance", 30, 0, 100)
 end
 
+function Settings.NPCZombieDamageModelEnabled()
+    return Settings.GetBoolean("NPCZombieDamageModel", true)
+end
+
+function Settings.NPCZombieDamageStaminaStartRatio()
+    return Settings.GetNumber("NPCZombieDamageStaminaStartRatio", 0.30, 0, 1)
+end
+
+function Settings.NPCZombieDamageBaseChance()
+    return Settings.GetNumber("NPCZombieDamageBaseChance", 0, 0, 100)
+end
+
+function Settings.NPCZombieDamageHitRadius()
+    return Settings.GetNumber("NPCZombieDamageHitRadius", 2.2, 0.1, 6)
+end
+
+function Settings.NPCZombieDamageCrowdChancePerExtra()
+    return Settings.GetNumber("NPCZombieDamageCrowdChancePerExtra", 5, 0, 100)
+end
+
+function Settings.NPCZombieDamageCrowdEscalation()
+    return Settings.GetNumber("NPCZombieDamageCrowdEscalation", 2, 0, 100)
+end
+
+function Settings.NPCZombieDamageCrowdChanceCap()
+    return Settings.GetNumber("NPCZombieDamageCrowdChanceCap", 100, 0, 100)
+end
+
+function Settings.NPCZombieDamageMinimumSkillMitigation()
+    return Settings.GetNumber("NPCZombieDamageMinimumSkillMitigation", 15, 0, 100)
+end
+
+function Settings.NPCZombieDamageFitnessMitigationScale()
+    return Settings.GetNumber("NPCZombieDamageFitnessMitigationScale", 45, 0, 100)
+end
+
+function Settings.NPCZombieDamageMaximumSkillMitigation()
+    return Settings.GetNumber("NPCZombieDamageMaximumSkillMitigation", 60, 0, 100)
+end
+
+function Settings.NPCZombieClothingConditionExponent()
+    return Settings.GetNumber("NPCZombieClothingConditionExponent", 1.15, 0.1, 3)
+end
+
+function Settings.NPCZombieClothingBlockMultiplier()
+    return Settings.GetNumber("NPCZombieClothingBlockMultiplier", 1, 0, 2)
+end
+
+function Settings.NPCZombieClothingDowngradeLaceration()
+    return Settings.GetNumber("NPCZombieClothingDowngradeLaceration", 25, 0, 100)
+end
+
+function Settings.NPCZombieClothingDowngradeScratch()
+    return Settings.GetNumber("NPCZombieClothingDowngradeScratch", 60, 0, 100)
+end
+
+function Settings.NPCZombieClothingSafeDurabilityLoss()
+    return Settings.GetNumber("NPCZombieClothingSafeDurabilityLoss", 1, 0, 100)
+end
+
+function Settings.NPCZombieClothingPenetratingDurabilityLoss()
+    return Settings.GetNumber("NPCZombieClothingPenetratingDurabilityLoss", 2, 0, 100)
+end
+
 function Settings.NPCZombieInfectionChance()
     local vars = projectVars()
     if vars and vars.NPCZombieInfectionChance ~= nil then

@@ -1,10 +1,11 @@
 --[[
     PNC NPC Combat Defense
 
-    Owns the authoritative zombie-attack avoidance roll.  Movement tactics
+    Owns the authoritative zombie-attack exposure roll.  Movement tactics
     consume only the resulting near-miss signal; they do not independently
     guess that an attack might happen.  This keeps SP and MP on one combat
-    calculation and gives the debug overlay a single source of truth.
+    calculation and gives the debug overlay a single source of truth.  The
+    legacy avoidance resolver remains available behind the sandbox switch.
 ]]
 
 PNC = PNC or {}
@@ -16,6 +17,23 @@ local Const = PNC.Const
 local Skills = PNC.Skills
 local Spatial = PNC.SpatialIndex
 local Wounds = PNC.NPCWounds
+
+local function settingNumber(name, fallback, minimum, maximum)
+    local settings = PNC.Sandbox
+    local getter = settings and settings[name]
+    local value = getter and getter() or fallback
+    value = tonumber(value) or tonumber(fallback) or 0
+    if minimum ~= nil then value = math.max(value, minimum) end
+    if maximum ~= nil then value = math.min(value, maximum) end
+    return value
+end
+
+local function damageModelEnabled()
+    local settings = PNC.Sandbox
+    local getter = settings and settings.NPCZombieDamageModelEnabled
+    if not getter then return false end
+    return getter() == true
+end
 
 local function clamp(value, minimum, maximum)
     value = tonumber(value) or minimum
@@ -92,18 +110,265 @@ end
 function Defense.Refresh(record, npcBody, now)
     local state = ensureState(record)
     local radius
+    local x
+    local y
+    local z
     if not state then return nil end
-    radius = tonumber(Const.NPC_ZOMBIE_DEFENSE_RADIUS) or 2.2
+    radius = damageModelEnabled()
+        and settingNumber("NPCZombieDamageHitRadius", 2.2, 0.1, 6)
+        or (tonumber(Const.NPC_ZOMBIE_DEFENSE_RADIUS) or 2.2)
+    now = tonumber(now) or Core.Now()
+    x, y, z = bodyPosition(record, npcBody)
+    if damageModelEnabled()
+        and state.updatedAt
+        and now - state.updatedAt
+            < (tonumber(Const.NPC_ZOMBIE_DEFENSE_REFRESH_MS) or 200)
+        and state.radius == radius
+        and Core.DistanceSq(x, y, state.x or x, state.y or y) <= 0.25
+        and math.abs(z - (state.z or z)) < 1
+    then
+        return state
+    end
     state.radius = radius
     state.nearbyCount = Defense.CountNearbyZombies(
         record,
         npcBody,
         radius
     )
-    state.updatedAt = tonumber(now)
-        or Core and Core.Now and Core.Now()
-        or 0
+    state.x = x
+    state.y = y
+    state.z = z
+    state.updatedAt = now
     return state
+end
+
+local function staminaRatio(record)
+    local stamina = PNC.Stamina
+    if stamina and stamina.GetRatio then
+        return clamp(stamina.GetRatio(record), 0, 1)
+    end
+    return 1
+end
+
+local function fatigueExposure(ratio, safeRatio)
+    ratio = clamp(ratio, 0, 1)
+    safeRatio = clamp(safeRatio, 0, 1)
+    if safeRatio <= 0 then return 1 end
+    if ratio >= safeRatio then return 0 end
+    local t = clamp((safeRatio - ratio) / safeRatio, 0, 1)
+    return t * t * (3 - (2 * t))
+end
+
+function Defense.CalculateDamageChance(record, nearbyCount)
+    local fitness = Skills and Skills.GetLevel
+        and Skills.GetLevel(record, "Fitness")
+        or 0
+    local stamina = staminaRatio(record)
+    local safeRatio = settingNumber(
+        "NPCZombieDamageStaminaStartRatio",
+        0.30,
+        0,
+        1
+    )
+    local exposure = fatigueExposure(stamina, safeRatio)
+    local extra
+    local escalation
+    local crowdChance
+    local baseChance
+    local minimumSkill
+    local fitnessScale
+    local maximumSkill
+    local skillMitigation
+    local chance
+    fitness = clamp(fitness, 0, 10)
+    nearbyCount = math.max(1, math.floor(tonumber(nearbyCount) or 1))
+    extra = math.max(0, nearbyCount - 1)
+    escalation = math.max(0, extra - 2)
+    crowdChance = extra * settingNumber(
+        "NPCZombieDamageCrowdChancePerExtra",
+        5,
+        0,
+        100
+    )
+    crowdChance = crowdChance + (escalation * escalation
+        * settingNumber("NPCZombieDamageCrowdEscalation", 2, 0, 100))
+    crowdChance = math.min(
+        crowdChance,
+        settingNumber("NPCZombieDamageCrowdChanceCap", 100, 0, 100)
+    )
+    baseChance = settingNumber(
+        "NPCZombieDamageBaseChance",
+        0,
+        0,
+        100
+    )
+    minimumSkill = settingNumber(
+        "NPCZombieDamageMinimumSkillMitigation",
+        15,
+        0,
+        100
+    ) / 100
+    fitnessScale = settingNumber(
+        "NPCZombieDamageFitnessMitigationScale",
+        45,
+        0,
+        100
+    ) / 100
+    maximumSkill = settingNumber(
+        "NPCZombieDamageMaximumSkillMitigation",
+        60,
+        0,
+        100
+    ) / 100
+    skillMitigation = clamp(
+        minimumSkill + (fitness / 10) * fitnessScale,
+        0,
+        maximumSkill
+    )
+    chance = clamp((baseChance + crowdChance) / 100, 0, 1)
+        * exposure
+        * (1 - skillMitigation)
+    return clamp(chance, 0, 1), {
+        fitness = fitness,
+        staminaRatio = stamina,
+        safeStaminaRatio = safeRatio,
+        fatigueExposure = exposure,
+        nearbyCount = nearbyCount,
+        crowdChance = crowdChance,
+        skillMitigation = skillMitigation,
+        baseChance = baseChance,
+    }
+end
+
+local function resolveNearMiss(record, npcBody, zombie, now)
+    local pushRoll = randomUnit()
+    local pushed = false
+    local reactionOptions
+    if pushRoll
+        < settingNumber(
+            "NPC_ZOMBIE_DEFENSE_PUSH_CHANCE",
+            tonumber(Const.NPC_ZOMBIE_DEFENSE_PUSH_CHANCE) or 0.50,
+            0,
+            1
+        )
+        and PNC.CombatZombieReaction
+        and PNC.CombatZombieReaction.Start
+    then
+        reactionOptions = {
+            kind = "npc_zombie_parry",
+            stagger = true,
+            hitForce = 0.92,
+            durationMs = 280,
+            pushDurationMs = 190,
+            pushDistance = 0.42,
+            stepDistance = 0.07,
+        }
+        pushed = PNC.CombatZombieReaction.Start(
+            npcBody,
+            zombie,
+            reactionOptions
+        ) == true
+        if pushed
+            and PNC.Network
+            and PNC.Network.BroadcastZombieReaction
+        then
+            PNC.Network.BroadcastZombieReaction(
+                zombie,
+                npcBody,
+                reactionOptions
+            )
+        end
+    end
+    if PNC.CombatTactics
+        and PNC.CombatTactics.MarkZombieNearMiss
+    then
+        PNC.CombatTactics.MarkZombieNearMiss(
+            record,
+            zombie and zombie.getX and zombie:getX() or record.x,
+            zombie and zombie.getY and zombie:getY() or record.y,
+            zombie and zombie.getZ and zombie:getZ() or record.z,
+            now
+        )
+    end
+    return pushRoll, pushed
+end
+
+local function resolveDamageModelAttack(record, npcBody, zombie, now)
+    local state = Defense.Refresh(record, npcBody, now)
+    local nearbyCount
+    local chance
+    local details
+    local roll
+    local avoided
+    local pushRoll
+    local pushed = false
+    local part
+    local damageType
+    if not state then return false, nil end
+    nearbyCount = math.max(1, tonumber(state.nearbyCount) or 0)
+    chance, details = Defense.CalculateDamageChance(record, nearbyCount)
+    roll = randomUnit()
+    avoided = roll >= chance
+    if avoided then
+        pushRoll, pushed = resolveNearMiss(record, npcBody, zombie, now)
+    else
+        -- The bite/laceration/scratch roll is deliberately deferred until the
+        -- stamina/crowd exposure roll has succeeded. A safe attack therefore
+        -- cannot consume or accidentally create a bite-type result.
+        part = Wounds and Wounds.ChooseZombieAttackPart
+            and Wounds.ChooseZombieAttackPart()
+            or nil
+        damageType = Wounds and Wounds.RollZombieAttackType
+            and Wounds.RollZombieAttackType()
+            or "scratch"
+    end
+    state.damageModel = true
+    state.damageType = damageType
+    state.partId = part and part.id or nil
+    state.fitness = details.fitness
+    state.staminaRatio = details.staminaRatio
+    state.safeStaminaRatio = details.safeStaminaRatio
+    state.fatigueExposure = details.fatigueExposure
+    state.crowdChance = details.crowdChance
+    state.skillMitigation = details.skillMitigation
+    state.baseChance = details.baseChance
+    state.protection = 0
+    state.mobilityChance = 1 - chance
+    state.damageChance = chance
+    state.avoidChance = 1 - chance
+    state.roll = roll
+    state.damageRoll = roll
+    state.avoided = avoided
+    state.pushRoll = pushRoll
+    state.pushed = pushed
+    state.lastResolvedAt = now
+    state.outcome = avoided
+        and (details.fatigueExposure <= 0 and "stamina_safe" or "avoided")
+        or "hit"
+    return avoided, {
+        outcome = state.outcome,
+        damageModel = true,
+        part = part,
+        partId = state.partId,
+        damageType = damageType,
+        nearbyCount = nearbyCount,
+        radius = state.radius,
+        fitness = details.fitness,
+        staminaRatio = details.staminaRatio,
+        safeStaminaRatio = details.safeStaminaRatio,
+        fatigueExposure = details.fatigueExposure,
+        crowdChance = details.crowdChance,
+        skillMitigation = details.skillMitigation,
+        baseChance = details.baseChance,
+        protection = 0,
+        mobilityChance = 1 - chance,
+        damageChance = chance,
+        avoidChance = 1 - chance,
+        roll = roll,
+        damageRoll = roll,
+        pushRoll = pushRoll,
+        pushed = pushed,
+    }
 end
 
 function Defense.CalculateAvoidChance(
@@ -175,6 +440,15 @@ function Defense.CalculateAvoidChance(
 end
 
 function Defense.ResolveZombieAttack(record, npcBody, zombie, now)
+    if Core and Core.IsAuthority and not Core.IsAuthority() then
+        return true, {
+            outcome = "not_authority",
+            damageModel = damageModelEnabled(),
+        }
+    end
+    if damageModelEnabled() then
+        return resolveDamageModelAttack(record, npcBody, zombie, now)
+    end
     local state
     local nearbyCount
     local part

@@ -129,6 +129,164 @@ option ProjectHoomans.ZombiesTargetDownedNPC
     translation = ProjectHoomans.ZombiesTargetDownedNPC,
 }
 
+option ProjectHoomans.NPCZombieDamageModel
+{
+    type = boolean,
+    default = true,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieDamageModel,
+}
+
+option ProjectHoomans.NPCZombieDamageStaminaStartRatio
+{
+    type = double,
+    default = 0.30,
+    min = 0.0,
+    max = 1.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieDamageStaminaStartRatio,
+}
+
+option ProjectHoomans.NPCZombieDamageBaseChance
+{
+    type = double,
+    default = 0.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieDamageBaseChance,
+}
+
+option ProjectHoomans.NPCZombieDamageHitRadius
+{
+    type = double,
+    default = 2.2,
+    min = 0.1,
+    max = 6.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieDamageHitRadius,
+}
+
+option ProjectHoomans.NPCZombieDamageCrowdChancePerExtra
+{
+    type = double,
+    default = 5.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieDamageCrowdChancePerExtra,
+}
+
+option ProjectHoomans.NPCZombieDamageCrowdEscalation
+{
+    type = double,
+    default = 2.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieDamageCrowdEscalation,
+}
+
+option ProjectHoomans.NPCZombieDamageCrowdChanceCap
+{
+    type = double,
+    default = 100.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieDamageCrowdChanceCap,
+}
+
+option ProjectHoomans.NPCZombieDamageMinimumSkillMitigation
+{
+    type = double,
+    default = 15.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieDamageMinimumSkillMitigation,
+}
+
+option ProjectHoomans.NPCZombieDamageFitnessMitigationScale
+{
+    type = double,
+    default = 45.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieDamageFitnessMitigationScale,
+}
+
+option ProjectHoomans.NPCZombieDamageMaximumSkillMitigation
+{
+    type = double,
+    default = 60.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieDamageMaximumSkillMitigation,
+}
+
+option ProjectHoomans.NPCZombieClothingConditionExponent
+{
+    type = double,
+    default = 1.15,
+    min = 0.1,
+    max = 3.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieClothingConditionExponent,
+}
+
+option ProjectHoomans.NPCZombieClothingBlockMultiplier
+{
+    type = double,
+    default = 1.0,
+    min = 0.0,
+    max = 2.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieClothingBlockMultiplier,
+}
+
+option ProjectHoomans.NPCZombieClothingDowngradeLaceration
+{
+    type = double,
+    default = 25.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieClothingDowngradeLaceration,
+}
+
+option ProjectHoomans.NPCZombieClothingDowngradeScratch
+{
+    type = double,
+    default = 60.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieClothingDowngradeScratch,
+}
+
+option ProjectHoomans.NPCZombieClothingSafeDurabilityLoss
+{
+    type = double,
+    default = 1.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieClothingSafeDurabilityLoss,
+}
+
+option ProjectHoomans.NPCZombieClothingPenetratingDurabilityLoss
+{
+    type = double,
+    default = 2.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCZombieClothingPenetratingDurabilityLoss,
+}
+
 option ProjectHoomans.NPCZombieWoundChance
 {
     type = double,
