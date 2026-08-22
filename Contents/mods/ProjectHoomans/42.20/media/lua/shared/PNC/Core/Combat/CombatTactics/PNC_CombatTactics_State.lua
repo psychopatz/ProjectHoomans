@@ -9,6 +9,28 @@ Tactics.Internal = Tactics.Internal or {}
 local Internal = Tactics.Internal
 local Core = PNC.Core
 local Const = PNC.Const
+local Perception = PNC.Perception
+
+local function resolveImmediateZombieThreat(record)
+    local threat
+    if not record or not Perception then return nil end
+    if Perception.ResolveRecentAttacker then
+        threat = Perception.ResolveRecentAttacker(
+            record,
+            Core.Now and Core.Now() or 0
+        )
+        if threat and threat.kind == "zombie" then
+            return threat
+        end
+    end
+    if Perception.FindImmediateZombieThreat then
+        threat = Perception.FindImmediateZombieThreat(record)
+        if threat and threat.kind == "zombie" then
+            return threat
+        end
+    end
+    return nil
+end
 
 function Internal.EnsureRetreatState(record)
     local runtime
@@ -143,7 +165,11 @@ function Tactics.CanReengage(record)
 end
 
 function Tactics.IsHordeAttackRetreatTriggered(state, report, now)
-    local hordeCount = tonumber(report and report.hordeCount) or 0
+    local hordeCount = math.max(
+        tonumber(report and report.worldHordeCount) or 0,
+        tonumber(report and report.hordeCount) or 0,
+        tonumber(report and report.visibleHordeCount) or 0
+    )
     local hordeThreshold = tonumber(Const.COMBAT_HORDE_COUNT) or 4
     return state ~= nil
         and hordeCount >= hordeThreshold
@@ -153,13 +179,21 @@ end
 function Tactics.ShouldInterruptAttackForRetreat(record)
     local runtime = record and record.runtime or nil
     local state = Internal.EnsureRetreatState(record)
-    local target = runtime and runtime.target or nil
+    local target
+    local zombieThreat
     local report
     if not state then
         return false, nil
     end
     if state.phase == "retreat" then
         return true, state.reason or "combat_retreat"
+    end
+    runtime = record.runtime or {}
+    target = runtime.target
+    zombieThreat = resolveImmediateZombieThreat(record)
+    if zombieThreat then
+        target = zombieThreat
+        runtime.target = zombieThreat
     end
     if not target or target.kind ~= "zombie"
         or not Internal.AssessThreat

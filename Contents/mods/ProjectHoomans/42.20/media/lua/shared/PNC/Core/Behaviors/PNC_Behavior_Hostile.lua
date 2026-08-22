@@ -14,6 +14,7 @@ local BehaviorCombat = PNC.BehaviorCombat
 
 function Hostile.Tick(record, zombie, job)
     local target
+    local zombieThreat
     local order = record.orderSpec or {}
 
     if job == "HuntNearestPlayer" then
@@ -38,7 +39,10 @@ function Hostile.Tick(record, zombie, job)
     end
 
     if job == "EngageTarget" then
-        target = Targeting.UpdateTargetFromWorld(record, record.runtime.target)
+        zombieThreat = Targeting.ResolveImmediateZombieThreat
+            and Targeting.ResolveImmediateZombieThreat(record) or nil
+        target = zombieThreat
+            or Targeting.UpdateTargetFromWorld(record, record.runtime.target)
         if target then
             record.runtime.target = target
             BehaviorCombat.TickEngage(record, zombie, target)

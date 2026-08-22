@@ -92,6 +92,23 @@ assertEqual(
 dofile(ROOT .. "Behaviors/PNC_Behavior_Targeting.lua")
 
 local Targeting = PNC.BehaviorTargeting
+local zombieThreat = {
+    kind = "zombie",
+    zombieId = "zed_attacker",
+    x = 2,
+    y = 0,
+    distSq = 4,
+    visible = true,
+    threatening = true,
+}
+PNC.Perception.FindImmediateZombieThreat = function()
+    return zombieThreat
+end
+assertEqual(
+    Targeting.ResolveImmediateZombieThreat(source),
+    zombieThreat,
+    "immediate zombie threat is available to hostile arbitration"
+)
 local current = {
     kind = "player",
     onlineID = 1,

@@ -14,6 +14,8 @@ local pressureCount = 0
 local visiblePressureCount = 0
 local hordeCount = 0
 local visibleHordeCount = 0
+local worldPressureCount = 0
+local worldHordeCount = 0
 local targetCrowd = {}
 local nearbyNPCs = {}
 local nearbyPlayers = {}
@@ -135,12 +137,25 @@ PNC = {
             if radius == 2.6 then return pressureCount end
             return 0
         end,
+        CountZombiesInFrame = function(_, radius)
+            local physicalPressure = worldPressureCount > 0
+                and worldPressureCount or pressureCount
+            local physicalHorde = worldHordeCount > 0
+                and worldHordeCount or hordeCount
+            if radius == 3 then return physicalPressure end
+            if radius == 5.5 then return physicalHorde end
+            if radius == 1.8 then return math.min(physicalPressure, 2) end
+            return physicalPressure
+        end,
         GetVisibleZombieEntries = function(_, radius)
             local count = radius == 3
                 and visiblePressureCount or visibleHordeCount
             local result = {}
             for i = 1, count do result[i] = {} end
             return result
+        end,
+        FindImmediateZombieThreat = function(record)
+            return record.runtime and record.runtime.forcedZombieThreat or nil
         end,
         FindZombieByID = function() return targetZombie end,
     },
@@ -419,6 +434,51 @@ local interruptAttack, interruptReason =
 assertEqual(interruptAttack, true, "active attack yields to retreat")
 assertEqual(interruptReason, "zombie_damage_retreat",
     "active attack retreat handoff reason")
+
+-- Neutral records do not initiate against zombies, so CountEnemyZombies is
+-- intentionally zero for them. A recent zombie attack must still use the
+-- physical world horde count and hand the actor to retreat.
+now = now + 250
+pressureCount = 0
+hordeCount = 0
+visiblePressureCount = 6
+visibleHordeCount = 6
+worldPressureCount = 6
+worldHordeCount = 6
+record = makeRecord("neutral_damage_retreat")
+record.hostility = { attackZombies = false }
+PNC.CombatTactics.MarkZombieDamage(record, 1, 0, 0, now)
+moved, reason = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "melee",
+    { hasWeapon = true }
+)
+assertEqual(moved, true,
+    "neutral zombie attack uses physical horde retreat gate")
+assertEqual(reason, "zombie_damage_retreat",
+    "neutral physical horde retreat reason")
+assertEqual(record.runtime.combatThreatAssessment.hordeCount, 6,
+    "neutral threat assessment counts physical horde")
+
+-- A hostile NPC may still have a player target when the zombie attack lands.
+-- The committed-action handoff must promote the immediate zombie threat
+-- before checking the horde retreat gate.
+now = now + 250
+record = makeRecord("hostile_target_switch")
+record.faction = "hostile"
+record.runtime.target = { kind = "player", id = "player-1" }
+record.runtime.forcedZombieThreat = target
+PNC.CombatTactics.MarkZombieDamage(record, 1, 0, 0, now)
+interruptAttack, interruptReason =
+    PNC.CombatTactics.ShouldInterruptAttackForRetreat(record)
+assertEqual(interruptAttack, true,
+    "hostile active target yields to zombie retreat")
+assertEqual(interruptReason, "zombie_damage_retreat",
+    "hostile target-switch retreat reason")
+assertEqual(record.runtime.target.kind, "zombie",
+    "hostile zombie threat became the tactical target")
 
 -- Follow-mode retreat destinations stay inside the owner leash even when the
 -- raw retreat vector points away from the owner.

@@ -180,7 +180,10 @@ function Internal.TryNearMissRetreat(record, zombie, target, state, now, report)
     started, startReason = Internal.StartRetreat(
         record, zombie, target,
         tonumber(Const.COMBAT_KITE_DAMAGE_DISTANCE) or 2.4,
-        report and report.surroundedCount >= 2 and "run" or "walk",
+        report and math.max(
+            tonumber(report.worldSurroundedCount) or 0,
+            tonumber(report.surroundedCount) or 0
+        ) >= 2 and "run" or "walk",
         0.7,
         tonumber(Const.COMBAT_KITE_DAMAGE_LOCK_MS) or 700,
         reason, nil, sourceX, sourceY, sourceZ,

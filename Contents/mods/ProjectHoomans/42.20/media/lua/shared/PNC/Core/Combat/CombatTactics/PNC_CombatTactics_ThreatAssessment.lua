@@ -47,6 +47,26 @@ function Internal.CountVisibleZombies(record, radius)
         and Perception.CountEnemyZombies(record, radius) or 0
 end
 
+-- Threat is a survival concern even when the NPC is configured not to
+-- initiate attacks against zombies. Count the physical frame entries here,
+-- rather than Perception.CountEnemyZombies, whose contract intentionally
+-- returns zero for attackZombies=false records.
+function Internal.CountWorldZombies(record, radius)
+    if Perception and Perception.CountZombiesInFrame then
+        return Perception.CountZombiesInFrame(record, radius)
+    end
+    if Spatial and Spatial.QueryZombies then
+        return Internal.CountZombiesNearPoint(
+            record.x,
+            record.y,
+            record.z,
+            radius
+        )
+    end
+    return Perception and Perception.CountEnemyZombies
+        and Perception.CountEnemyZombies(record, radius) or 0
+end
+
 function Internal.AssessThreat(record, target)
     local now = Core.Now()
     local staminaRatio = Stamina and Stamina.GetRatio and Stamina.GetRatio(record) or 1
@@ -60,6 +80,9 @@ function Internal.AssessThreat(record, target)
         .. tostring(target.id or target.zombieId or target.onlineID or "")
     ) or "none"
     local targetCrowdCount = 0
+    local worldSurroundedCount
+    local worldPressureCount
+    local worldHordeCount
     local report
     if cached
         and cached.targetKey == targetKey
@@ -93,6 +116,18 @@ function Internal.AssessThreat(record, target)
             Const.COMBAT_TARGET_CROWD_RADIUS
         )
     end
+    worldSurroundedCount = Internal.CountWorldZombies(
+        record,
+        Const.COMBAT_SURROUND_RADIUS
+    )
+    worldPressureCount = Internal.CountWorldZombies(
+        record,
+        Const.COMBAT_PRESSURE_RADIUS
+    )
+    worldHordeCount = Internal.CountWorldZombies(
+        record,
+        Const.COMBAT_HORDE_RADIUS
+    )
     report = {
         targetKey = targetKey,
         x = record.x,
@@ -102,9 +137,9 @@ function Internal.AssessThreat(record, target)
         staminaRatio = staminaRatio,
         staminaCurrent = staminaCurrent,
         retreating = runtime.retreatMode == true,
-        surroundedCount = Perception and Perception.CountEnemyZombies and Perception.CountEnemyZombies(record, Const.COMBAT_SURROUND_RADIUS) or 0,
-        pressureCount = Perception and Perception.CountEnemyZombies and Perception.CountEnemyZombies(record, Const.COMBAT_PRESSURE_RADIUS) or 0,
-        hordeCount = Perception and Perception.CountEnemyZombies and Perception.CountEnemyZombies(record, Const.COMBAT_HORDE_RADIUS) or 0,
+        surroundedCount = worldSurroundedCount,
+        pressureCount = worldPressureCount,
+        hordeCount = worldHordeCount,
         visiblePressureCount = Internal.CountVisibleZombies(record, Const.COMBAT_PRESSURE_RADIUS),
         visibleHordeCount = Internal.CountVisibleZombies(record, Const.COMBAT_HORDE_RADIUS),
         targetCrowdCount = targetCrowdCount,

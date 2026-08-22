@@ -188,6 +188,30 @@ function Targeting.SelectReassessedTarget(record, current, candidate)
     return current
 end
 
+-- A zombie attack can arrive while a hostile NPC is still committed to a
+-- player/NPC target. Keep that survival threat available to the behavior
+-- owner so combat arbitration can temporarily yield to zombie retreat.
+function Targeting.ResolveImmediateZombieThreat(record)
+    local threat
+    if not record then return nil end
+    if Perception.ResolveRecentAttacker then
+        threat = Perception.ResolveRecentAttacker(
+            record,
+            Core.Now and Core.Now() or 0
+        )
+        if threat and threat.kind == "zombie" then
+            return threat
+        end
+    end
+    if Perception.FindImmediateZombieThreat then
+        threat = Perception.FindImmediateZombieThreat(record)
+        if threat and threat.kind == "zombie" then
+            return threat
+        end
+    end
+    return nil
+end
+
 function Targeting.ResolveEngageTarget(record, resolver)
     local runtime
     local now
