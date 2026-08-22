@@ -88,4 +88,39 @@ assert(rows[3].key == "bed:2"
     and rows[3].secondaryAction.remove == true,
     "second bed does not have individual manage and deconstruct actions")
 
+rows = Browser.BuildComponentRows({
+    definitionId = "stockpile", level = 1,
+    components = {{
+        id = "stockpile:1", kind = "region", role = "storage.stockpile",
+        width = 2, height = 2, tileCount = 4,
+    }},
+}, {
+    storageId = "storage:1", capacity = 200,
+    usedWeight = 25, freeWeight = 175,
+    access = { hasStockpile = true, insideBase = true },
+})
+assert(#rows == 2, "stockpile inspector should show capacity and area")
+assert(rows[1].componentAction.kind == "open_stockpile"
+    and rows[1].actionLabel == "OPEN STORAGE",
+    "built in-base stockpile does not expose storage management")
+assert(rows[2].componentAction.kind == "stockpile_move"
+    and rows[2].actionLabel == "MOVE"
+    and rows[2].secondaryAction == nil,
+    "stockpile area must only expose move")
+
+rows = Browser.BuildComponentRows({
+    definitionId = "stockpile", level = 1,
+    components = {{ id = "stockpile:1", kind = "region",
+        role = "storage.stockpile", tileCount = 1 }},
+}, {
+    storageId = "storage:1", capacity = 200,
+    usedWeight = 0.9899999778717756,
+    freeWeight = 199.01000002212822,
+    access = { hasStockpile = true, insideBase = false, writable = false },
+})
+assert(rows[1].componentAction.kind == "open_stockpile",
+    "remote walkie-talkie view must remain accessible")
+assert(rows[1].detail == "1.0 / 200.0 | 199.0 FREE | REMOTE VIEW",
+    "stockpile summary is not rounded or remote state is unclear")
+
 print("pnc_facility_component_rows_smoke: ok")

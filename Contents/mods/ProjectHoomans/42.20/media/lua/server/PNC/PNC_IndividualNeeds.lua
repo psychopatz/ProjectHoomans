@@ -259,6 +259,9 @@ function Needs.Update(record, elapsedHours, reason)
         end
     end
     if PNC.NeedsRepository then PNC.NeedsRepository.MarkDirty() end
+    if PNC.NeedsEvaluator and PNC.NeedsEvaluator.Commands then
+        PNC.NeedsEvaluator.Commands.Reconcile(record, Utils.WorldAgeHours())
+    end
     return true
 end
 

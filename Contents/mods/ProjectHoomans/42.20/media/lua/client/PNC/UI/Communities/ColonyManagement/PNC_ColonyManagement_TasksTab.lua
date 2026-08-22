@@ -21,45 +21,6 @@ local OPERATION_KEYS = {
     RESEARCH = { "UI_PNC_Task_Research", "RESEARCH" },
 }
 
-local NEED_TASKS = {
-    hunger = { labelKey = "UI_PNC_Task_Eat", operation = "EAT",
-        active = "eating", trigger = 0.25 },
-    thirst = { labelKey = "UI_PNC_Task_Drink", operation = "DRINK",
-        active = "drinking", trigger = 0.25 },
-    fatigue = { labelKey = "UI_PNC_Task_Sleep", operation = "SLEEP",
-        active = "sleeping", trigger = 0.70 },
-}
-
-local function needRows(context)
-    local rows = {}
-    for _, person in ipairs(context.snapshot and context.snapshot.people or {}) do
-        for needType, definition in pairs(NEED_TASKS) do
-            local value = tonumber(person.needs and person.needs[needType]) or 0
-            local active = tostring(person.activity or "") == definition.active
-            if active or value >= definition.trigger then
-                local kind = needType == "thirst" and "HYDRATION"
-                    or needType == "hunger" and "FOOD" or nil
-                local lane = kind and person.supply and person.supply.byKind
-                    and person.supply.byKind[kind] or nil
-                local status = active and "WORKING"
-                    or lane and tostring(lane.phase or "QUEUED") or "QUEUED"
-                rows[#rows + 1] = {
-                    key = "need:" .. tostring(person.id) .. ":" .. needType,
-                    label = Shared.Tr(definition.labelKey,
-                        definition.operation) .. "  "
-                        .. tostring(person.name or person.id),
-                    detail = status .. "  |  NEED "
-                        .. tostring(math.floor(value * 100 + 0.5)) .. "%",
-                    colorName = status == "FAILED" and "warning"
-                        or active and "success" or "accent",
-                }
-            end
-        end
-    end
-    table.sort(rows, function(a, b) return a.key < b.key end)
-    return rows
-end
-
 local function facilityName(task)
     local definition = task.facilityDefinitionId
         and PNC.FacilityDefinitions
@@ -116,7 +77,7 @@ end
 local function taskDetail(task)
     local worker = task.workerName
         or Shared.Tr("UI_PNC_Task_Unassigned", "UNASSIGNED")
-    local status = tostring(task.status or "QUEUED")
+    local status = tostring(task.lifecycleState or task.status or "QUEUED")
     local mode = tostring(task.executionMode or "")
     local area = facilityName(task)
         or task.stationId and tostring(task.stationId)
@@ -132,7 +93,7 @@ end
 
 function Tasks.BuildRows(context)
     local tasks = context.snapshot and context.snapshot.tasks or {}
-    local rows = needRows(context)
+    local rows = {}
     if #tasks <= 0 and #rows <= 0 then
         return {{
             key = "tasks_empty",
@@ -143,14 +104,14 @@ function Tasks.BuildRows(context)
         }}
     end
     for index, task in ipairs(tasks) do
-        local status = tostring(task.status or "")
+        local status = tostring(task.lifecycleState or task.status or "")
         rows[#rows + 1] = {
             key = tostring(task.id or index),
             label = taskLabel(task),
             detail = taskDetail(task),
             colorName = status == "BLOCKED" and "warning"
                 or task.workerId and "success" or "muted",
-            action = "cancel_work",
+            action = task.cancellable ~= false and "cancel_work" or nil,
             actionLabel = Shared.Tr("UI_PNC_Work_Cancel", "CANCEL"),
             actionColorName = "warning",
             workOrder = task,
@@ -172,10 +133,11 @@ function Tasks.OnRow(window, row)
         detail = cancelDetail(task),
         confirmLabel = Shared.Tr("UI_PNC_Work_Cancel", "CANCEL"),
         danger = true,
-        context = { workOrderId = task.id },
+        context = { requestId = task.requestId or task.id },
         onConfirm = function(context)
             PNC.Client.RequestColonyAction("work_cancel", {
-                workOrderId = context.workOrderId,
+                requestId = context.requestId,
+                workOrderId = context.requestId,
             })
         end,
     })

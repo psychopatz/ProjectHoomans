@@ -1,0 +1,93 @@
+local T = require "tests/support/test"
+
+local tabs = T.read("ProjectHoomans", "client",
+    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Tabs.lua")
+local actions = T.read("ProjectHoomans", "client",
+    "PNC/UI/Communities/ColonyManagement/SettlementManagement/"
+    .. "PNC_SettlementManagement_Actions.lua")
+local tab = T.read("ProjectHoomans", "client",
+    "PNC/UI/Communities/ColonyManagement/SettlementManagement/"
+    .. "PNC_SettlementManagement_Tab.lua")
+local storageWindow = T.read("ProjectHoomans", "client",
+    "PNC/UI/Communities/PNC_ColonyStorageWindow.lua")
+local storageSurface = T.read("ProjectHoomans", "client",
+    "PNC/UI/Communities/PNC_ColonyManagementStorageTabs.lua")
+local context = T.read("ProjectHoomans", "client",
+    "PNC/UI/Context/PNC_StockpileAccessContext.lua")
+local definitions = T.read("ProjectHoomans", "shared",
+    "PNC/Core/Settlement/PNC_FacilityDefinitions.lua")
+
+T.falsy(string.find(tabs, 'id = "storage"', 1, true),
+    "colony management no longer registers a storage tab")
+T.falsy(string.find(tabs, "PNC_ColonyManagementStorageTabs", 1, true),
+    "colony management no longer loads the legacy storage panel")
+T.contains(actions, 'action.kind == "open_stockpile"',
+    "stockpile inspector owns standalone inventory access")
+T.contains(actions, "PNC_ColonyStorageWindow",
+    "stockpile inspector opens the full standalone storage surface")
+T.falsy(string.find(actions, "access.insideBase ~= true", 1, true),
+    "remote storage browsing must not be base-gated")
+T.contains(actions, "window:close()",
+    "opening standalone storage closes overlapping colony management")
+T.contains(tab, 'facility.definitionId == "stockpile"',
+    "stockpile deconstruction control has a special visibility rule")
+T.contains(storageWindow, "StorageTabs.Create",
+    "standalone storage window preserves the former storage surface")
+T.contains(storageWindow, "StorageTabs.RenderSummary",
+    "standalone storage window preserves capacity summary")
+T.contains(storageSurface, "storageActivityPane",
+    "standalone storage window preserves activity logs")
+T.contains(storageSurface, "storageDebugToggle",
+    "standalone storage window preserves authorized debug tools")
+T.contains(storageSurface, "access.writable == true",
+    "inventory mover is writable only with authoritative base access")
+T.contains(storageSurface, "setVisible(transferVisible == true)",
+    "storage layout never passes nil to Java visibility methods")
+T.contains(context, "findStockpileAtSquare",
+    "right-click access resolves the built stockpile facility region")
+T.contains(definitions,
+    "media/ui/Facilities/Components/storage/stockpile.png",
+    "stockpile component uses its dedicated icon")
+
+local opened = 0
+package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
+    return { containsPoint = function(_, x, y, z)
+        return x == 4 and y == 5 and z == 0
+    end }
+end
+PNC = {
+    Network = { ClientState = { colonyManagement = {
+        storage = { storageId = "storage:1", access = {
+            hasStockpile = true, insideBase = false, writable = false,
+        } },
+        settlement = { facilities = {{
+            id = "stockpile:1", definitionId = "stockpile",
+            constructionState = "BUILT", components = {{
+                role = "storage.stockpile", region = { levels = {} },
+            }},
+        }} },
+    } } },
+    NPCSelection = { GetWorldSquare = function()
+        return { getX = function() return 4 end,
+            getY = function() return 5 end,
+            getZ = function() return 0 end }
+    end },
+    ColonyStorageUI = { Open = function() opened = opened + 1; return {} end },
+}
+Events = { OnFillWorldObjectContextMenu = { Add = function() end } }
+getText = function(key) return key end
+local Context = T.load("ProjectHoomans", "client",
+    "PNC/UI/Context/PNC_StockpileAccessContext.lua")
+local option
+Context.OnFillWorldObjectContextMenu(0, {
+    addOption = function(_, label, target, action)
+        option = { label = label, target = target, action = action }
+    end,
+}, {}, false)
+T.truthy(option, "right-clicking the built stockpile region adds access")
+T.equal(option.label, "Open Colony Storage",
+    "stockpile context advertises the standalone storage surface")
+option.action(option.target)
+T.equal(opened, 1, "remote stockpile context opens standalone storage")
+
+T.finish("pnc_stockpile_management_ui_contract_smoke")

@@ -135,7 +135,6 @@ end
 function Controller.RebuildDetails(window)
     local snapshot = window.snapshot or {}
     Components.SetRows(window.details, {})
-    if window.storageList then Components.SetRows(window.storageList, {}) end
     local definition = Registry.Get(window.tab) or Registry.Get("overview")
     local context = {
         snapshot = snapshot,

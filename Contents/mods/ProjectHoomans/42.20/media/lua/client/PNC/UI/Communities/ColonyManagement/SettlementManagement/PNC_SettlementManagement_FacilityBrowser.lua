@@ -230,7 +230,8 @@ function Browser.RebuildComponents(window)
                 .. (task and "  •  " .. progressText(task) or ""))
         return
     end
-    Components.SetRows(list, Browser.BuildComponentRows(facility))
+    Components.SetRows(list, Browser.BuildComponentRows(
+        facility, window.snapshot and window.snapshot.storage))
     window.baseComponentPane:setHeader(
         string.upper(facility.displayName or facility.definitionId),
         stateText(facility.cachedState))

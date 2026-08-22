@@ -15,8 +15,6 @@ local TOOLBAR = {
     { "shrink", "UI_PNC_Base_ShrinkAction", "SHRINK", "warning" },
     { "barricade", "UI_PNC_Base_BarricadeAction", "REINFORCE", "primary" },
     { "hq", "UI_PNC_Base_UpgradeAction", "UPGRADE HQ", "primary" },
-    { "storage", "UI_PNC_Base_UpgradeStorage", "UPGRADE STORAGE", "primary" },
-    { "stockpile", "UI_PNC_Stockpile_PlaceNode", "PLACE STOCKPILE", "success" },
 }
 
 local CONTEXT = {
@@ -72,6 +70,11 @@ function Tab.UpdateContextControls(window)
             or (not built
                 and button.internal == "facility_cancel_construction"
                 and facility.constructionWorkOrderId ~= nil))
+        if active and facility.definitionId == "stockpile"
+            and button.internal == "facility_destroy"
+        then
+            visible = false
+        end
         if button.internal == "facility_anchor" then
             local role = active and Actions.NextAnchorRole
                 and Actions.NextAnchorRole(facility) or nil
@@ -145,17 +148,12 @@ function Tab.Apply(window, active)
         button:setVisible(active and (
             button.internal == "claim" and not established
             or button.internal ~= "claim" and established))
-        if active and established and (button.internal == "hq"
-            or button.internal == "storage")
+        if active and established and button.internal == "hq"
         then
-            local current = button.internal == "hq"
-                and math.max(1, tonumber(window.snapshot.settlement.hqLevel) or 1)
-                or math.max(1, tonumber(window.snapshot.storage
-                    and window.snapshot.storage.tier) or 1)
-            local maximum = button.internal == "hq"
-                and math.max(current, tonumber(
-                    window.snapshot.settlement.maxHQLevel) or current)
-                or 10
+            local current = math.max(1,
+                tonumber(window.snapshot.settlement.hqLevel) or 1)
+            local maximum = math.max(current, tonumber(
+                window.snapshot.settlement.maxHQLevel) or current)
             local technologyId = button.internal .. ":" .. tostring(current + 1)
             local learned = false
             for _, entry in ipairs(window.snapshot.research

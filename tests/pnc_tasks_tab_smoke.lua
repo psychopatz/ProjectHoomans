@@ -77,12 +77,8 @@ local needs = Tasks.BuildRows({ snapshot = { tasks = {}, people = {
             HYDRATION = { phase = "FAILED" },
         } } },
 } } })
-T.equal(#needs, 3, "needs tasks include eating, drinking, and sleeping")
-T.truthy(needs[1].action == nil and needs[2].action == nil
-    and needs[3].action == nil, "need rows remain non-cancellable")
-local joined = needs[1].label .. " " .. needs[2].label .. " " .. needs[3].label
-T.contains(joined, "EAT", "hunger task")
-T.contains(joined, "DRINK", "thirst task")
-T.contains(joined, "SLEEP", "active sleep task")
+T.equal(#needs, 1, "UI does not synthesize task state from raw needs")
+T.contains(needs[1].label, "NO AVAILABLE TASKS",
+    "transient tasks must arrive in the server snapshot")
 
 T.finish("pnc_tasks_tab_smoke")

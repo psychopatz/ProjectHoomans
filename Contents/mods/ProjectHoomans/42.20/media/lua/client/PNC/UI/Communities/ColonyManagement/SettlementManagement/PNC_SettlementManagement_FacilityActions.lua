@@ -67,8 +67,11 @@ local function areaOptions(window, facility, existing, onConfirm)
     local level = PNC.FacilityDefinitions.GetLevel(
         facility.definitionId, facility.level or 1)
     local limit = level and level.componentLimits[role] or {}
-    local boundary = isDraft and Support.BaseRegion(window)
-        or Support.FacilityRegion(facility)
+    local movingStockpile = not isDraft
+        and facility.definitionId == "stockpile"
+        and role == "storage.stockpile"
+    local boundary = (isDraft or movingStockpile)
+        and Support.BaseRegion(window) or Support.FacilityRegion(facility)
     return {
         title = Support.Tr("UI_PNC_Facility_SelectArea", "SELECT FACILITY AREA"),
         instruction = role == "facility.footprint"
@@ -88,7 +91,7 @@ local function areaOptions(window, facility, existing, onConfirm)
         validate = function(region, stats)
             local ok, reason = Support.ValidateConnected(region)
             if ok and not GridRegion.containsRegion(boundary, region) then
-                ok, reason = false, isDraft and "OUTSIDE_BASE"
+                ok, reason = false, (isDraft or movingStockpile) and "OUTSIDE_BASE"
                     or "OUTSIDE_FACILITY"
             end
             if ok and limit.maxTotalTiles and stats.tileCount > limit.maxTotalTiles then
@@ -222,27 +225,22 @@ function Facility.AnchorAssignLabel(role)
     return key and getText(key) or Facility.AnchorLabel(role)
 end
 
-function Facility.BeginPoint(window, kind, facility, requestedRole, componentId)
+function Facility.BeginPoint(window, _, facility, requestedRole, componentId)
     local role = requestedRole
-        or kind == "facility_anchor" and Facility.NextAnchorRole(facility)
-        or kind == "bed" and "sleep.bed" or nil
-    local anchor = role ~= nil
-    local existing = anchor and componentId
+        or Facility.NextAnchorRole(facility)
+    local existing = componentId
         and Support.ComponentById(facility, componentId)
-        or anchor and requestedRole == nil
+        or requestedRole == nil
             and Support.ComponentForRole(facility, role) or nil
-    local selectTitleKey = anchor and ANCHOR_SELECT_TITLES[role] or nil
-    local boundary = anchor and Support.FacilityRegion(facility)
-        or Support.BaseRegion(window)
+    local selectTitleKey = ANCHOR_SELECT_TITLES[role]
+    local boundary = Support.FacilityRegion(facility)
     Support.OpenSelector(window, {
         title = selectTitleKey and getText(selectTitleKey)
-            or anchor and Support.Tr("UI_PNC_Facility_SelectStation",
-                "SELECT FACILITY COMPONENT")
-            or Support.Tr("UI_PNC_Stockpile_SelectNode", "SELECT STOCKPILE ACCESS TILE"),
+            or Support.Tr("UI_PNC_Facility_SelectStation",
+                "SELECT FACILITY COMPONENT"),
         instruction = role == "sleep.bed" and Support.Tr("UI_PNC_Facility_SelectBedHelp",
             "Choose a sleeping spot. A bed is used automatically when present; otherwise the colonist sleeps on the floor.")
-            or anchor and getText("UI_PNC_Facility_SelectStationHelp")
-            or Support.Tr("UI_PNC_Point_SelectHelp", "Click one tile, then confirm."),
+            or getText("UI_PNC_Facility_SelectStationHelp"),
         selectionKind = "point",
         guideRegion = boundary,
         guideLayers = Support.UsedGuideLayers(window,
@@ -253,26 +251,17 @@ function Facility.BeginPoint(window, kind, facility, requestedRole, componentId)
             if not bounds or not GridRegion.containsPoint(boundary,
                 bounds.minX, bounds.minY, bounds.minZ)
             then return false, Shared.SettlementReason(
-                anchor and "OUTSIDE_FACILITY" or "OUTSIDE_BASE") end
+                "OUTSIDE_FACILITY") end
             return true
         end,
         onConfirm = function(region)
             local bounds = GridRegion.bounds(region)
-            if anchor then
-                PNC.Client.RequestSetFacilityComponent({ facilityId = facility.id,
-                    expectedRevision = facility.revision,
-                    component = { id = existing and existing.id or nil,
-                        kind = "anchor", role = role,
-                        x = bounds.minX, y = bounds.minY, z = bounds.minZ,
-                        targetResolver = role == "sleep.bed" and "sleepSpot" or nil } })
-            else
-                local settlement = window.snapshot.settlement
-                local storage = window.snapshot.storage or {}
-                PNC.Client.RequestCreateStockpileAccessNode({ baseId = settlement.id,
-                    expectedRevision = settlement.revision,
-                    storageId = storage.storageId, x = bounds.minX,
-                    y = bounds.minY, z = bounds.minZ })
-            end
+            PNC.Client.RequestSetFacilityComponent({ facilityId = facility.id,
+                expectedRevision = facility.revision,
+                component = { id = existing and existing.id or nil,
+                    kind = "anchor", role = role,
+                    x = bounds.minX, y = bounds.minY, z = bounds.minZ,
+                    targetResolver = role == "sleep.bed" and "sleepSpot" or nil } })
             Support.ApplyLocalResult(window)
         end,
     })

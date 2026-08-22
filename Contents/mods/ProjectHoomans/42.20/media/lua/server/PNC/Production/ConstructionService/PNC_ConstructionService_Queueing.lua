@@ -12,22 +12,35 @@ local function activeOrder(id)
     return order
 end
 
-local function fundOrder(order, reservation, reason)
-    local durable = PNC.WorkRepository.Get(order.id)
-    local funded, fundingReason = PNC.WorkInputService.Fund(durable, nil, reason)
-    if not funded then
-        PNC.WorkRepository.Remove(order.id)
-        PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
-        return nil, fundingReason or "CONSTRUCTION_FUNDING_FAILED"
-    end
-    durable.funded, durable.projectLifecycle = true, "ACTIVE"
-    PNC.WorkRepository.MarkDirty()
-    return PNC.Core.DeepCopy(durable)
-end
-
 function Service.QueueBuild(player, facility, definition)
     local context, reason = Internal.ContextFor(player, facility)
     if not context then return nil, reason end
+    if definition.bootstrapFromPlayer == true then
+        local consumed, quote = PNC.FacilityCostService.ConsumePlayer(
+            player, definition)
+        if not consumed then
+            return nil, quote and quote.reason or "MISSING_MATERIALS"
+        end
+        local payload = {
+            mode = "build", facilityId = facility.id, materialKind = "bootstrap",
+            requirements = {}, recipeRevision =
+                Internal.RecipeRevisionFor(definition, facility, "build"),
+            input = { consume = false, funded = true, committed = true,
+                bootstrap = true },
+        }
+        local order
+        order, reason = PNC.WorkService.Commands.Queue({ operation = "CONSTRUCT",
+            colonyId = context.colony.id, factionId = context.faction.id,
+            baseId = context.base.id,
+            requiredWork = math.max(1, tonumber(definition.buildWork) or 100),
+            requiredSkills = definition.buildSkills or {}, payload = payload,
+            funded = true, recipeRevision = payload.recipeRevision })
+        if not order then return nil, reason end
+        facility.constructionState = "UNDER_CONSTRUCTION"
+        facility.constructionWorkOrderId = order.id
+        PNC.FacilityService.RefreshState(facility)
+        return order
+    end
     local requirements = Internal.BuildRequirements(definition)
     local reservation
     reservation, reason = PNC.ColonyStorageService.ReserveProductionMaterials(
@@ -44,13 +57,11 @@ function Service.QueueBuild(player, facility, definition)
         baseId = context.base.id,
         requiredWork = math.max(1, tonumber(definition.buildWork) or 100),
         requiredSkills = definition.buildSkills or {}, payload = payload,
-        funded = true, recipeRevision = payload.recipeRevision })
+        funded = false, recipeRevision = payload.recipeRevision })
     if not order then
         PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
         return nil, reason
     end
-    order, reason = fundOrder(order, reservation, "construction_project_funding")
-    if not order then return nil, reason end
     facility.constructionState = "UNDER_CONSTRUCTION"
     facility.constructionWorkOrderId = order.id
     PNC.FacilityService.RefreshState(facility)
@@ -166,17 +177,13 @@ function Service.QueueReconstruct(player, facility, change)
         baseId = context.base.id,
         requiredWork = math.max(1, tonumber(requiredWork) or 60),
         requiredSkills = definition and definition.buildSkills or {},
-        payload = payload, funded = reservation ~= nil,
+        payload = payload, funded = false,
         recipeRevision = payload.recipeRevision })
     if not order then
         if reservation then
             PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
         end
         return nil, reason
-    end
-    if reservation then
-        order, reason = fundOrder(order, reservation, "component_project_funding")
-        if not order then return nil, reason end
     end
     facility.constructionState = "RECONSTRUCTING"
     facility.constructionWorkOrderId = order.id

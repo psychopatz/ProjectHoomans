@@ -46,21 +46,21 @@ function StorageTabs.Create(window, UI, tr)
         id = "sort",
         title = tr("UI_PNC_Storage_SortName", "Sort: Name"),
         target = window,
-        onclick = ISPNCColonyManagementWindow.onStorageControl,
+        onclick = window.onStorageControl,
         variant = "quiet",
     })
     window.storageTransferButton = UI.CreateButton(window, {
         id = "transfer",
         title = tr("UI_PNC_Storage_Manage", "Manage Inventory"),
         target = window,
-        onclick = ISPNCColonyManagementWindow.onStorageControl,
+        onclick = window.onStorageControl,
         variant = "primary",
     })
     window.storageDebugToggle = UI.CreateButton(window, {
         id = "debug_toggle",
         title = tr("UI_PNC_Storage_DebugTools", "Debug Tools") .. "  >",
         target = window,
-        onclick = ISPNCColonyManagementWindow.onStorageControl,
+        onclick = window.onStorageControl,
         variant = "quiet",
     })
     window.storageControls = {}
@@ -80,7 +80,7 @@ function StorageTabs.Create(window, UI, tr)
                 id = definition[1],
                 title = tr(definition[2], definition[3]),
                 target = window,
-                onclick = ISPNCColonyManagementWindow.onStorageControl,
+                onclick = window.onStorageControl,
                 variant = "quiet",
             }
         )
@@ -133,34 +133,38 @@ end
 
 function StorageTabs.ApplyLayout(window, Layout, active)
     if not window.layout then return end
+    active = active == true
     window.storageSearch:setVisible(active)
     window.storageList:setVisible(active)
     window.storageActivityPane:setVisible(active)
     window.storageSortButton:setVisible(active)
-    window.storageTransferButton:setVisible(active
-        and window.snapshot and window.snapshot.storage ~= nil)
+    local transferVisible = active and window.snapshot ~= nil
+        and window.snapshot.storage ~= nil
+    window.storageTransferButton:setVisible(transferVisible == true)
     if window.storageTransferButton.setEnable then
         local access = window.snapshot and window.snapshot.storage
             and window.snapshot.storage.access or nil
         window.storageTransferButton:setEnable(access
-            and access.hasStockpile == true or false)
+            and access.writable == true or false)
     end
-    local debugVisible = active and window.snapshot
-        and window.snapshot.storage
+    local debugVisible = active and window.snapshot ~= nil
+        and window.snapshot.storage ~= nil
         and window.snapshot.storage.debugAuthorized == true
+    debugVisible = debugVisible == true
     window.storageDebugToggle:setVisible(debugVisible)
     if not debugVisible then window.storageDebugExpanded = false end
-    local drawerVisible = debugVisible and window.storageDebugExpanded == true
+    local drawerVisible = debugVisible == true
+        and window.storageDebugExpanded == true
     for _, button in ipairs(window.storageControls or {}) do
-        button:setVisible(drawerVisible)
+        button:setVisible(drawerVisible == true)
     end
     if not active then return end
     local content = window.layout.content
     local scale = window.uiScale
     local gap = Layout.Pixels(12, scale)
     local bottom = content.y + content.height
-    local compactDrawer = drawerVisible and Layout.IsCompact(
-        content.width, Layout.Pixels(820, scale))
+    local compactDrawer = drawerVisible == true and Layout.IsCompact(
+        content.width, Layout.Pixels(820, scale)) or false
     local listWidth = content.width
     if drawerVisible and not compactDrawer then
         local drawerWidth = math.max(Layout.Pixels(300, scale),
@@ -169,7 +173,7 @@ function StorageTabs.ApplyLayout(window, Layout, active)
     end
     local availableHeight = bottom - window.layout.storageListY
     local showActivity = not compactDrawer
-    window.storageActivityPane:setVisible(showActivity)
+    window.storageActivityPane:setVisible(showActivity == true)
     local activityHeight = showActivity and math.min(
         Layout.Pixels(265, scale),
         math.max(Layout.Pixels(105, scale),
@@ -189,7 +193,7 @@ function StorageTabs.ApplyLayout(window, Layout, active)
             window.layout.storageListY + listHeight + gap,
             listWidth, activityHeight)
     end
-    window.detailsPane:setVisible(drawerVisible)
+    window.detailsPane:setVisible(drawerVisible == true)
     if drawerVisible then
         local drawerX = compactDrawer and content.x
             or content.x + listWidth + gap

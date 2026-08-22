@@ -9,6 +9,41 @@ local EventsBus = PsychopatzCore and PsychopatzCore.Events
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 
+local function pointFromRegion(region)
+    local best
+    for z, level in pairs(region and region.levels or {}) do
+        for y, spans in pairs(level.rows or {}) do
+            local x = spans and spans[1]
+            if x ~= nil and (not best or tonumber(z) < best.z
+                or tonumber(z) == best.z and tonumber(y) < best.y)
+            then
+                best = { x = tonumber(x), y = tonumber(y), z = tonumber(z) }
+            end
+        end
+    end
+    return best
+end
+
+local function facilityNode(base, facility)
+    if not facility or facility.definitionId ~= "stockpile"
+        or facility.constructionState ~= "BUILT"
+    then return nil end
+    local region
+    for componentId, present in pairs(facility.componentIds or {}) do
+        local component = present == true and Repository.GetComponent(componentId)
+            or nil
+        if component and component.role == "storage.stockpile" then
+            region = component.region
+            break
+        end
+    end
+    local point = pointFromRegion(region or facility.constructionRegion)
+    if not point then return nil end
+    return { schemaVersion = 1, id = "facility:" .. tostring(facility.id),
+        facilityId = facility.id, baseId = base.id,
+        x = point.x, y = point.y, z = point.z, radius = 2, revision = 0 }
+end
+
 function Service.Create(player, args)
     args = type(args) == "table" and args or {}
     local base = PNC.BaseService.Get(args.baseId)
@@ -76,6 +111,17 @@ function Service.FindNearest(baseId, x, y, z)
             local dx, dy, dz = node.x - x, node.y - y, node.z - z
             local distance = dx * dx + dy * dy + dz * dz
             if not bestDistance or distance < bestDistance then best, bestDistance = node, distance end
+        end
+    end
+    for facilityId, present in pairs(base and base.facilityIds or {}) do
+        local node = present == true and facilityNode(
+            base, Repository.GetFacility(facilityId)) or nil
+        if node then
+            local dx, dy, dz = node.x - x, node.y - y, node.z - z
+            local distance = dx * dx + dy * dy + dz * dz
+            if not bestDistance or distance < bestDistance then
+                best, bestDistance = node, distance
+            end
         end
     end
     return best

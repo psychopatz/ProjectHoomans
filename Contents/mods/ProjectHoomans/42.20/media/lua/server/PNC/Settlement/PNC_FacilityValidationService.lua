@@ -50,10 +50,33 @@ local function facilityContainsRegion(facility, region)
         and GridRegion.containsRegion(facility.constructionRegion, region)
 end
 
+local function existingStockpile(base, builtOnly)
+    for facilityId, present in pairs(base and base.facilityIds or {}) do
+        local facility = present == true and Repository.GetFacility(facilityId)
+            or nil
+        if facility and facility.definitionId == "stockpile"
+            and (not builtOnly or facility.constructionState == "BUILT")
+        then
+            return facility
+        end
+    end
+    return nil
+end
+
+function Validation.GetStockpile(base, builtOnly)
+    return existingStockpile(base, builtOnly == true)
+end
+
 function Validation.CanCreate(base, definitionId, level)
     local definition = Definitions.Get(definitionId)
     local levelData = definition and Definitions.GetLevel(definitionId, level or 1)
     if not definition or not levelData then return result(false, "UNKNOWN_FACILITY") end
+    if definition.singleton == true and existingStockpile(base, false) then
+        return result(false, "STOCKPILE_ALREADY_EXISTS")
+    end
+    if definitionId ~= "stockpile" and not existingStockpile(base, true) then
+        return result(false, "STOCKPILE_REQUIRED")
+    end
     if (tonumber(base and base.hqLevel) or 0) < levelData.requiredHQLevel then
         return result(false, "HQ_LEVEL_TOO_LOW")
     end
@@ -195,7 +218,9 @@ function Validation.NormalizeComponent(base, facility, input)
             return result(false, "FACILITY_REGION_DISCONNECTED")
         end
         if not baseContainsRegion(base, region) then return result(false, "OUTSIDE_BASE") end
-        if facility.constructionRegion
+        local movingStockpile = facility.definitionId == "stockpile"
+            and input.role == "storage.stockpile"
+        if facility.constructionRegion and not movingStockpile
             and not facilityContainsRegion(facility, region)
         then
             return result(false, "OUTSIDE_FACILITY")
@@ -203,6 +228,15 @@ function Validation.NormalizeComponent(base, facility, input)
         if input.role ~= "growing.plot" then
             component.region = region
             component.tileCount = GridRegion.countTiles(region)
+        end
+        if movingStockpile then
+            for facilityId, other in pairs(Repository.State.facilities or {}) do
+                if facilityId ~= facility.id and other.constructionRegion
+                    and GridRegion.intersects(region, other.constructionRegion)
+                then
+                    return result(false, "OVERLAP_NOT_ALLOWED")
+                end
+            end
         end
         if PNC.FacilityWorldValidation
             and PNC.FacilityWorldValidation.ValidateRegion

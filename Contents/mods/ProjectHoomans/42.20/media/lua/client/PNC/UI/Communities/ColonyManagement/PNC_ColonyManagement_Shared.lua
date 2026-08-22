@@ -50,6 +50,8 @@ Shared.SETTLEMENT_REASON_KEYS = {
     FACILITY_WORK_IN_PROGRESS = "UI_PNC_SettlementReason_WorkInProgress",
     FACILITY_IN_USE = "UI_PNC_SettlementReason_FacilityInUse",
     FACILITY_NOT_BUILT = "UI_PNC_SettlementReason_FacilityNotBuilt",
+    STOCKPILE_CANNOT_DECONSTRUCT =
+        "UI_PNC_SettlementReason_StockpileCannotDeconstruct",
     FACILITY_FOOTPRINT_REQUIRED = "UI_PNC_SettlementReason_FootprintRequired",
     BED_REQUIRED = "UI_PNC_SettlementReason_BedRequired",
     FARMLAND_REQUIRED = "UI_PNC_SettlementReason_FarmlandRequired",

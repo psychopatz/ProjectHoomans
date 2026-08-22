@@ -36,6 +36,13 @@ function Common.ClearCombatTarget(record, reason, zombie)
     committedAttack = Combat and Combat.HasActiveAttack
         and Combat.HasActiveAttack(record, Core.Now())
         or false
+    if not committedAttack then
+        -- A combat hold is useful while a target is being reassessed, but an
+        -- explicit disengage is authoritative. Leaving the old lease alive
+        -- kept both the activity label and weapon presentation in Fighting
+        -- after ordinary movement had already resumed.
+        record.runtime.inCombatUntil = 0
+    end
     if not zombie and PNC.Registry and PNC.Registry.GetLiveZombie then
         zombie = PNC.Registry.GetLiveZombie(record.id)
     end

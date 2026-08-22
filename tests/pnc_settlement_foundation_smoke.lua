@@ -256,6 +256,63 @@ equal(PNC.BaseService.Expand({}, { baseId = base.id,
     regionDelta = rectangle(11, 5, 11, 5) }).reason,
     "BASE_DISCONNECTED", "diagonal-only expansion")
 
+equal(PNC.FacilityService.Create(player, { baseId = base.id,
+    definitionId = "barracks", expectedRevision = base.revision,
+    component = { kind = "region", role = "facility.footprint",
+        region = rectangle(0, 0, 3, 3, 0) },
+}).reason, "STOCKPILE_REQUIRED", "stockpile gates every other facility")
+
+local stockpileResult = PNC.FacilityService.Create(player, {
+    baseId = base.id, definitionId = "stockpile",
+    expectedRevision = base.revision,
+    component = { kind = "region", role = "storage.stockpile",
+        region = rectangle(9, 9, 9, 9, 0) },
+})
+truthy(stockpileResult.ok, "bootstrap stockpile creation")
+local stockpileFacility = stockpileResult.facility
+equal(#stockpileFacility.componentIds, 0,
+    "component ids remain a keyed collection")
+stockpileFacility.constructionState = "BUILT"
+PNC.FacilityService.RefreshState(stockpileFacility)
+equal(stockpileFacility.cachedState, "OPERATIONAL",
+    "built stockpile is operational")
+local stockpileComponentId
+for componentId, _ in pairs(stockpileFacility.componentIds) do
+    stockpileComponentId = componentId
+end
+local stockpileEdit = PNC.FacilityService.SetComponent(player, {
+    facilityId = stockpileFacility.id,
+    expectedRevision = stockpileFacility.revision,
+    component = { id = stockpileComponentId, kind = "region",
+        role = "storage.stockpile", region = rectangle(9, 8, 9, 8, 0) },
+})
+truthy(stockpileEdit.ok and stockpileEdit.pendingComponent,
+    "stockpile can move outside its old footprint through reconstruction")
+truthy(PNC.FacilityService.FinalizeSetComponent(stockpileFacility.id,
+    stockpileEdit.pendingComponent), "stockpile edit completes")
+equal(stockpileFacility.constructionRegion.levels[0].rows[8][1], 9,
+    "completed stockpile move replaces its construction footprint")
+equal(PNC.FacilityService.RemoveComponent(player, {
+    facilityId = stockpileFacility.id,
+    expectedRevision = stockpileFacility.revision,
+    componentId = stockpileComponentId,
+}).reason, "STOCKPILE_CANNOT_DECONSTRUCT",
+    "stockpile component cannot be deconstructed")
+equal(PNC.FacilityService.Destroy(player, {
+    facilityId = stockpileFacility.id,
+    expectedRevision = stockpileFacility.revision,
+}).reason, "STOCKPILE_CANNOT_DECONSTRUCT",
+    "stockpile facility cannot be deconstructed")
+local access = PNC.StockpileAccessService.FindNearest(base.id, 0, 0, 0)
+equal(access.facilityId, stockpileFacility.id,
+    "stockpile facility supplies the collection access target")
+equal(PNC.FacilityService.Create(player, {
+    baseId = base.id, definitionId = "stockpile",
+    expectedRevision = base.revision,
+    component = { kind = "region", role = "storage.stockpile",
+        region = rectangle(8, 9, 8, 9, 0) },
+}).reason, "STOCKPILE_ALREADY_EXISTS", "stockpile is singleton")
+
 local barracksResult = PNC.FacilityService.Create(player, { baseId = base.id,
     definitionId = "barracks", expectedRevision = base.revision,
     component = { kind = "region", role = "facility.footprint",

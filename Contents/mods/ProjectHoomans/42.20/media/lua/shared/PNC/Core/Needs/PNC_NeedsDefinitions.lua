@@ -8,9 +8,18 @@ local Definitions = PNC.NeedsDefinitions
 Definitions.VERSION = 1
 Definitions.TYPES = { "hunger", "thirst", "fatigue" }
 Definitions.BY_ID = {
-    hunger = { id = "hunger", minimum = 0, maximum = 1, default = 0 },
-    thirst = { id = "thirst", minimum = 0, maximum = 1, default = 0 },
-    fatigue = { id = "fatigue", minimum = 0, maximum = 1, default = 0 },
+    hunger = { id = "hunger", translationKey = "UI_PNC_Need_Hunger",
+        iconKey = "need.hunger", highIsBad = true, format = "percent",
+        minimum = 0, maximum = 1, default = 0,
+        task = { kind = "EAT", capability = "food.access" } },
+    thirst = { id = "thirst", translationKey = "UI_PNC_Need_Thirst",
+        iconKey = "need.thirst", highIsBad = true, format = "percent",
+        minimum = 0, maximum = 1, default = 0,
+        task = { kind = "DRINK", capability = "water.access" } },
+    fatigue = { id = "fatigue", translationKey = "UI_PNC_Need_Fatigue",
+        iconKey = "need.fatigue", highIsBad = true, format = "percent",
+        minimum = 0, maximum = 1, default = 0,
+        task = { kind = "SLEEP", capability = "sleep.bed" } },
 }
 
 -- Installed Build 42 MoodleStat thresholds. Hydration maps to THIRST.
@@ -20,6 +29,26 @@ Definitions.MOODLE_THRESHOLDS = {
     fatigue = { 0.60, 0.70, 0.80, 0.90 },
 }
 Definitions.LEVELS = { "NORMAL", "MINOR", "MODERATE", "SEVERE", "CRITICAL" }
+
+function Definitions.Register(definition)
+    if type(definition) ~= "table" then return false, "INVALID_NEED_DEFINITION" end
+    local id = tostring(definition.id or "")
+    if id == "" then return false, "NEED_ID_REQUIRED" end
+    if Definitions.BY_ID[id] then return false, "NEED_ALREADY_REGISTERED" end
+    definition.id = id
+    definition.minimum = tonumber(definition.minimum) or 0
+    definition.maximum = tonumber(definition.maximum) or 1
+    definition.default = tonumber(definition.default) or definition.minimum
+    Definitions.BY_ID[id] = definition
+    Definitions.TYPES[#Definitions.TYPES + 1] = id
+    return true, definition
+end
+
+function Definitions.List()
+    local output = {}
+    for _, id in ipairs(Definitions.TYPES) do output[#output + 1] = Definitions.BY_ID[id] end
+    return output
+end
 
 Definitions.INDIVIDUAL_INITIAL_MIN = 0
 Definitions.INDIVIDUAL_INITIAL_MAX = 0
@@ -115,7 +144,9 @@ function Definitions.GetLevel(needType, value)
         needType = "hunger"
     end
     value = tonumber(value) or 0
-    local thresholds = Definitions.MOODLE_THRESHOLDS[needType]
+    local definition = Definitions.Get(needType)
+    local thresholds = definition and definition.thresholds
+        or Definitions.MOODLE_THRESHOLDS[needType]
         or Definitions.MOODLE_THRESHOLDS.hunger
     for index = 1, #thresholds do
         if value < thresholds[index] then return Definitions.LEVELS[index] end

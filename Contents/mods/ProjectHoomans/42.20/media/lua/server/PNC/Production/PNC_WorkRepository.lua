@@ -28,7 +28,8 @@ local function compactConstruction(order)
     order.collectionTarget, order.executionMode = nil, nil
     order.facilityReservationId, order.previousOrder = nil, nil
     order.lastAbstractAt, order.blockedReason = nil, nil
-    if order.status ~= "PAUSED" and order.status ~= "COMPLETED"
+    if order.status ~= "PAUSED" and order.status ~= "CANCELLING"
+        and order.status ~= "COMPLETED"
         and order.status ~= "CANCELLED"
     then
         order.status = "WAITING_FOR_WORKER"
@@ -63,7 +64,8 @@ local function recover(order)
         order.collectionTarget, order.executionMode = nil, nil
         order.facilityReservationId, order.previousOrder = nil, nil
         order.lastAbstractAt, order.blockedReason = nil, nil
-        if order.status ~= "PAUSED" and order.status ~= "COMPLETED"
+        if order.status ~= "PAUSED" and order.status ~= "CANCELLING"
+            and order.status ~= "COMPLETED"
             and order.status ~= "CANCELLED"
         then order.status = "WAITING_FOR_WORKER" end
         if order.payload and order.payload.input then

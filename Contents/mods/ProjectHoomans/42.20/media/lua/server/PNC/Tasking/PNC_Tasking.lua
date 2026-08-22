@@ -81,14 +81,12 @@ local function collect(record)
         ScalingDiagnostics.Increment("NPCDecisions.CandidateBuilds")
     end
     for domain, provider in pairs(Tasking.Providers) do
-        local ok, values = pcall(provider.GetCandidates, record.id)
-        if ok then
-            for _, value in ipairs(type(values) == "table" and values or {}) do
-                local intent = PNC.TaskIntent.Normalize(value)
-                if intent then
-                    local valid = provider.Validate(intent)
-                    if valid == true then candidates[#candidates + 1] = intent end
-                end
+        local values = provider.GetCandidates(record.id)
+        for _, value in ipairs(type(values) == "table" and values or {}) do
+            local intent = PNC.TaskIntent.Normalize(value)
+            if intent then
+                local valid = provider.Validate(intent)
+                if valid == true then candidates[#candidates + 1] = intent end
             end
         end
     end
@@ -97,9 +95,13 @@ local function collect(record)
 end
 
 local function stopLease(lease, reason)
+    local requested, state = Leases.RequestCancellation(lease.leaseId, reason)
+    if not requested or state == "CANCELLATION_DEFERRED" then
+        return requested, state
+    end
     local provider = Tasking.Providers[lease.sourceDomain]
     if provider and provider.Cancel then provider.Cancel(lease, reason) end
-    Leases.Release(lease.leaseId, reason)
+    return Leases.Release(lease.leaseId, reason)
 end
 
 local function externalCurrent(record)
@@ -191,7 +193,10 @@ function Tasking.Commands.Reevaluate(npcId, cause)
     if not assignment then diagnostics.lastReason = reason or "ASSIGN_FAILED"; return false, diagnostics.lastReason end
     local lease, leaseReason = Leases.Create(winner, assignment)
     if not lease then
-        if assignment.reservationId and PNC.FacilityReservations then
+        if provider.RollbackAssignment then
+            provider.RollbackAssignment(winner, assignment,
+                "lease_creation_failed")
+        elseif assignment.reservationId and PNC.FacilityReservations then
             PNC.FacilityReservations.Release(assignment.reservationId,
                 "lease_creation_failed")
         end
@@ -199,6 +204,10 @@ function Tasking.Commands.Reevaluate(npcId, cause)
     end
     local started, startReason = provider.Start(lease, assignment)
     if started ~= true then
+        if provider.RollbackAssignment then
+            provider.RollbackAssignment(winner, assignment, "start_failed")
+            lease.reservationId = nil
+        end
         Leases.Release(lease.leaseId, "start_failed")
         diagnostics.lastReason = startReason or "START_FAILED"
         return false, diagnostics.lastReason
@@ -224,8 +233,7 @@ end
 function Tasking.Commands.CancelForNPC(npcId, reason)
     local lease = Leases.ForNPC(npcId)
     if not lease then return false, "LEASE_NOT_FOUND" end
-    stopLease(lease, reason or "cancelled")
-    return true
+    return stopLease(lease, reason or "cancelled")
 end
 
 function Tasking.Commands.SetPhase(npcId, phase)
@@ -269,7 +277,16 @@ function Tasking.Commands.Pump(at, budget)
         local provider = lease and Tasking.Providers[lease.sourceDomain]
         local executor = provider and type(provider.Tick) == "function"
             and provider or lease and Tasking.Executors[lease.executionMode]
-        if executor then executor.Tick(lease); Tasking.Diagnostics.counters.executorTicks = Tasking.Diagnostics.counters.executorTicks + 1 end
+        if lease and lease.cancellationRequested == true
+            and not (PNC.TaskRequestDefinitions
+                and PNC.TaskRequestDefinitions.NON_INTERRUPTIBLE_PHASE[lease.phase])
+        then
+            stopLease(lease, lease.cancellationReason)
+        elseif executor then
+            executor.Tick(lease)
+            Tasking.Diagnostics.counters.executorTicks =
+                Tasking.Diagnostics.counters.executorTicks + 1
+        end
     end
     return processed
 end

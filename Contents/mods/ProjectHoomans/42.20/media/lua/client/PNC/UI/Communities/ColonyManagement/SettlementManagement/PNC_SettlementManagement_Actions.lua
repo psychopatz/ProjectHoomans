@@ -13,6 +13,21 @@ Actions.AreaRole = Facility.AreaRole
 
 function Actions.HandleComponent(window, action, facility)
     if not facility or type(action) ~= "table" then return false end
+    if action.kind == "open_stockpile" then
+        local storage = window.snapshot and window.snapshot.storage
+        local access = storage and storage.access or nil
+        if not storage or not storage.storageId or not access
+            or access.hasStockpile ~= true
+        then return false end
+        local StorageUI = require "PNC/UI/Communities/PNC_ColonyStorageWindow"
+        local storageWindow = StorageUI.Open()
+        if storageWindow and window.close then window:close() end
+        return storageWindow ~= nil
+    end
+    if action.kind == "stockpile_move" and action.componentId then
+        return Facility.BeginArea(window, facility, "storage.stockpile",
+            action.componentId)
+    end
     if action.kind == "resume_work" and action.workOrderId then
         PNC.Client.RequestColonyAction("work_resume", {
             workOrderId = action.workOrderId,
@@ -99,13 +114,6 @@ function Actions.Handle(window, action, facility)
     elseif action == "hq" then
         PNC.Client.RequestUpgradeHQ({ baseId = settlement.id,
             expectedRevision = settlement.revision })
-    elseif action == "storage" then
-        PNC.Client.RequestColonyAction("storage_upgrade", {
-            storageId = window.snapshot and window.snapshot.storage
-                and window.snapshot.storage.storageId,
-        })
-    elseif action == "stockpile" then
-        Facility.BeginPoint(window, "stockpile"); return true
     elseif not facility then
         return false
     elseif action == "facility_area" then

@@ -53,15 +53,6 @@ function ISPNCColonyManagementWindow:onTab(button)
     Controller.SelectTab(self, button)
 end
 
-function ISPNCColonyManagementWindow:onStorageControl(button)
-    local definition = Registry.Get("storage")
-    if definition and definition.onControl then
-        return definition.onControl(self, button)
-    end
-    local Storage = require "PNC/UI/Communities/PNC_ColonyManagementStorageTabs"
-    return Storage.OnControl(self, button, Shared.Tr)
-end
-
 function ISPNCColonyManagementWindow:onResearchControl(button)
     local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
     return Research.OnControl(self, button)
@@ -137,14 +128,6 @@ function ISPNCColonyManagementWindow:rebuildDetails()
     Controller.RebuildDetails(self)
 end
 
-function ISPNCColonyManagementWindow:toggleInventoryGroup(role, groupKey)
-    if role ~= "storage" or not groupKey then return end
-    self.storageCollapsedGroups = self.storageCollapsedGroups or {}
-    self.storageCollapsedGroups[groupKey] =
-        self.storageCollapsedGroups[groupKey] ~= true
-    self:rebuildDetails()
-end
-
 function ISPNCColonyManagementWindow:onPersonSelected()
     Controller.OnPersonSelected(self)
 end
@@ -156,7 +139,7 @@ end
 function ISPNCColonyManagementWindow:prerender()
     local currentTime = PNC.Core.Now()
     if (self.tab == "tasks" or self.tab == "base"
-        or self.tab == "research" or self.tab == "storage")
+        or self.tab == "research")
         and currentTime - (tonumber(self.lastWorkPollAt) or 0) >= 2000
     then
         self.lastWorkPollAt = currentTime

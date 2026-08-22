@@ -153,11 +153,10 @@ end
 function Service.BuildPlayerAccess(player, storage)
     local base = storage and storage.settlementId and PNC.BaseService
         and PNC.BaseService.GetForColony(storage.settlementId) or nil
-    local hasStockpile = false
-    for _, _ in pairs(base and base.stockpileNodeIds or {}) do
-        hasStockpile = true
-        break
-    end
+    local stockpile = base and PNC.FacilityValidationService
+        and PNC.FacilityValidationService.GetStockpile
+        and PNC.FacilityValidationService.GetStockpile(base, true) or nil
+    local hasStockpile = stockpile ~= nil
     local zone = base and Zones.get(base.baseZoneId) or nil
     local x = player and player.getX and tonumber(player:getX()) or nil
     local y = player and player.getY and tonumber(player:getY()) or nil

@@ -34,6 +34,7 @@ local function now() return PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0 en
 
 local function terminal(order)
     return order.status == Status.CANCELLED or order.status == Status.COMPLETED
+        or order.status == Status.FAILED
 end
 
 local function copy(value)
@@ -58,6 +59,23 @@ local function belongsToOrder(record, order)
     end
     return (order.factionId == "" or factionId == order.factionId)
         and (order.colonyId == "" or colonyId == order.colonyId)
+end
+
+local function markAssignmentDirty(order, cause)
+    if not order or not PNC.Tasking or not PNC.Tasking.Commands
+        or not PNC.Tasking.Commands.MarkDirty or not PNC.Registry
+    then return 0 end
+    local marked = 0
+    local function consider(record)
+        if record and record.alive ~= false and belongsToOrder(record, order) then
+            PNC.Tasking.Commands.MarkDirty(record.id,
+                cause or "WORK_REQUEST_CHANGED")
+            marked = marked + 1
+        end
+    end
+    if PNC.Registry.ForEach then PNC.Registry.ForEach(consider)
+    else for _, record in pairs(PNC.Registry.Data or {}) do consider(record) end end
+    return marked
 end
 
 local function workerAvailable(record, order)
@@ -174,8 +192,10 @@ function Service.Commands.Queue(spec)
         payload = copy(spec.payload or {}),
         status = Status.QUEUED, priority = tonumber(spec.priority) or 0,
         revision = 0, createdAt = now(), updatedAt = now(),
+        lastProgressAt = now(),
     }
     Repository.Put(order)
+    markAssignmentDirty(order, "WORK_REQUEST_QUEUED")
     emit(EventTypes.WORK_ORDER_QUEUED, { workOrderId = order.id,
         colonyId = order.colonyId, operation = order.operation })
     return copy(order)
@@ -292,7 +312,8 @@ local function claimStation(order, worker)
     order.status = collectTarget and Status.TRAVEL_TO_STOCKPILE
         or live and Status.TRAVEL_TO_STATION or Status.WORKING
     order.blockedReason = nil
-    order.updatedAt, order.revision = now(), order.revision + 1
+    order.updatedAt, order.lastProgressAt = now(), now()
+    order.revision = order.revision + 1
     worker.runtime = worker.runtime or {}
     worker.runtime.workOrderId = order.id
     worker.runtime.lastProductionWorkAt = nil
@@ -330,7 +351,8 @@ function Service.Commands.CollectInputs(orderId, workerId)
     end
     order.collectionTarget = nil
     order.status, order.blockedReason = Status.TRAVEL_TO_STATION, nil
-    order.updatedAt, order.revision = now(), order.revision + 1
+    order.updatedAt, order.lastProgressAt = now(), now()
+    order.revision = order.revision + 1
     setLiveOrder(worker, order, order.stationTarget, "WORK_AT_STATION")
     Repository.MarkDirty()
     return true, copy(order)
@@ -355,6 +377,15 @@ local function complete(order)
     Repository.MarkDirty()
     local ok, reason = handler(order)
     if ok ~= true then
+        if order.cancellationRequested == true then
+            releaseClaim(order, order.cancellationReason or "cancelled", true)
+            order.status, order.cancelledAt = Status.CANCELLED, now()
+            order.completionStarted, order.blockedReason = nil, nil
+            order.terminalPersisted = false
+            order.revision = order.revision + 1
+            Repository.MarkDirty()
+            return true, "CANCELLED_AFTER_ATOMIC_FAILURE"
+        end
         order.status, order.blockedReason = Status.BLOCKED,
             tostring(reason or "COMPLETION_FAILED")
         Repository.MarkDirty(); return false, order.blockedReason
@@ -362,6 +393,10 @@ local function complete(order)
     order.completionCommitted = true
     order.terminalPersisted = false
     order.status, order.progress = Status.COMPLETED, order.requiredWork
+    if order.cancellationRequested == true then
+        order.cancellationOutcome = "COMPLETED_DURING_CANCELLATION"
+    end
+    order.cancellationRequested, order.cancellationReason = nil, nil
     order.completedAt, order.updatedAt = now(), now()
     order.revision = order.revision + 1
     releaseClaim(order, "complete")
@@ -385,8 +420,10 @@ function Service.Commands.AddProgress(orderId, workerId, amount)
         Repository.MarkDirty(); return false, reason
     end
     order.status = Status.WORKING
+    local before = order.progress
     order.progress = math.min(order.requiredWork,
         order.progress + math.max(0, tonumber(amount) or 0))
+    if order.progress > before then order.lastProgressAt = now() end
     order.updatedAt, order.revision = now(), order.revision + 1
     Repository.MarkDirty()
     if order.progress >= order.requiredWork then return complete(order) end
@@ -406,9 +443,22 @@ end
 
 function Service.Commands.Cancel(orderId, reason)
     local order = Repository.Get(orderId)
-    if not order or terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
+    if not order then return false, "WORK_ORDER_UNAVAILABLE" end
+    if order.status == Status.CANCELLED then return true, copy(order) end
+    if terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
     if order.completionStarted == true then
-        return false, "WORK_ORDER_COMPLETION_IN_PROGRESS"
+        order.cancellationRequested = true
+        order.cancellationReason = tostring(reason or "cancelled")
+        order.status, order.updatedAt = Status.CANCELLING, now()
+        order.revision = order.revision + 1
+        Repository.MarkDirty()
+        return true, "CANCELLATION_DEFERRED"
+    end
+    if order.status ~= Status.CANCELLING then
+        order.status, order.cancellationRequested = Status.CANCELLING, true
+        order.cancellationReason = tostring(reason or "cancelled")
+        order.updatedAt, order.revision = now(), order.revision + 1
+        Repository.MarkDirty()
     end
     local cancellation = Service.CancellationHandlers
         and Service.CancellationHandlers[order.operation]
@@ -418,7 +468,7 @@ function Service.Commands.Cancel(orderId, reason)
             return false, cancellationReason or "CANCELLATION_FAILED"
         end
     end
-    releaseClaim(order, reason or "cancelled", true)
+    releaseClaim(order, order.cancellationReason, true)
     order.status, order.cancelledAt = Status.CANCELLED, now()
     order.terminalPersisted = false
     order.blockedReason, order.revision = nil, order.revision + 1
@@ -442,12 +492,16 @@ function Service.Commands.ReleaseWorker(workerId, reason)
     order.blockedReason = nil
     order.updatedAt, order.revision = now(), order.revision + 1
     Repository.MarkDirty()
+    markAssignmentDirty(order, "WORKER_RELEASED")
     return true, copy(order)
 end
 
 function Service.Commands.Pause(orderId, paused)
     local order = Repository.Get(orderId)
     if not order or terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
+    if paused ~= false and order.status == Status.PAUSED then
+        return true, copy(order)
+    end
     order.status = paused == false and Status.WAITING_FOR_WORKER or Status.PAUSED
     if paused ~= false then releaseClaim(order, "paused") end
     order.revision = order.revision + 1; Repository.MarkDirty()
@@ -468,6 +522,7 @@ function Service.Commands.Resume(orderId)
     order.blockedReason = nil
     order.updatedAt, order.revision = now(), order.revision + 1
     Repository.MarkDirty()
+    markAssignmentDirty(order, "WORK_REQUEST_RESUMED")
     return true, copy(order)
 end
 
@@ -478,6 +533,7 @@ function Service.Commands.SetPriority(orderId, priority)
         math.floor(tonumber(priority) or 0)))
     order.revision, order.updatedAt = order.revision + 1, now()
     Repository.MarkDirty()
+    markAssignmentDirty(order, "WORK_PRIORITY_CHANGED")
     return true, copy(order)
 end
 
@@ -517,6 +573,17 @@ function Service.Commands.SetPriorityForPlayer(player, orderId, priority)
 end
 
 function Service.Queries.Get(id) return copy(Repository.Get(id)) end
+function Service.Queries.CanAssign(orderId, workerId)
+    local order = Repository.Get(orderId)
+    local worker = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(workerId)
+    if not order or terminal(order) or order.workerId
+        or order.status == Status.PAUSED or order.status == Status.CANCELLING
+    then return false, "WORK_ORDER_UNAVAILABLE" end
+    if not workerAvailable(worker, order) then
+        return false, "NO_QUALIFIED_WORKER"
+    end
+    return true
+end
 function Service.Queries.List(colonyId)
     local output = {}
     Repository.Load()
@@ -582,6 +649,12 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
                 recipeRevision = order.recipeRevision
                     or payload.recipeRevision,
                 refundPercent = refundPercent,
+                createdAt = order.createdAt,
+                updatedAt = order.updatedAt,
+                lastProgressAt = order.lastProgressAt,
+                retryAt = order.retryAt,
+                phase = order.completionStarted == true and "ATOMIC_COMMIT"
+                    or order.status,
             }
         end
     end
@@ -655,6 +728,13 @@ end
 
 local function processOrder(order, at)
     if terminal(order) or order.status == Status.PAUSED then return end
+    if order.status == Status.CANCELLING
+        or order.cancellationRequested == true
+    then
+        Service.Commands.Cancel(order.id,
+            order.cancellationReason or "recovered_cancellation")
+        return
+    end
     local prepare = Service.PreparationHandlers[order.operation]
     if prepare then
         local ready, preparationReason = prepare(order)
@@ -676,6 +756,19 @@ local function processOrder(order, at)
         Repository.MarkDirty(); return
     end
     if not worker then
+        if PNC.Tasking and PNC.Tasking.Providers
+            and PNC.Tasking.Providers.work
+        then
+            order.status = Status.WAITING_FOR_WORKER
+            local retryAt = tonumber(Service.AssignmentRetryAt
+                and Service.AssignmentRetryAt[order.id]) or 0
+            if at >= retryAt then
+                Service.AssignmentRetryAt = Service.AssignmentRetryAt or {}
+                Service.AssignmentRetryAt[order.id] = at + 5000
+                markAssignmentDirty(order, "WORK_REQUEST_WAITING")
+            end
+            return
+        end
         local waitingReason
         worker, waitingReason = findWorker(order)
         if not worker then

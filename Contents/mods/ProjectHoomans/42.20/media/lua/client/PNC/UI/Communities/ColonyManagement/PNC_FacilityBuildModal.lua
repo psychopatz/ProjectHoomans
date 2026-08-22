@@ -288,11 +288,25 @@ local function technologyKnown(research, technologyId)
     return false
 end
 
+local function stockpileState(settlement)
+    local exists, built = false, false
+    for _, facility in ipairs(settlement and settlement.facilities or {}) do
+        if facility.definitionId == "stockpile" then
+            exists = true
+            built = facility.constructionState == nil
+                or facility.constructionState == "BUILT"
+            break
+        end
+    end
+    return exists, built
+end
+
 local function buildOptions(settlement, storage, research)
     local values = {}
     local ids = {}
     for id, _ in pairs(PNC.FacilityDefinitions.ByID or {}) do ids[#ids + 1] = id end
     table.sort(ids)
+    local stockpileExists, stockpileBuilt = stockpileState(settlement)
     for _, id in ipairs(ids) do
         local definition = PNC.FacilityDefinitions.Get(id)
         local level = PNC.FacilityDefinitions.GetLevel(id, 1)
@@ -302,19 +316,30 @@ local function buildOptions(settlement, storage, research)
             local required = math.max(0, math.floor(tonumber(
                 cost.amount or cost.quantity) or 0))
             local stored = stockpileCount(storage, cost.fullType)
-            local available = stored
+            local fromPlayer = definition.bootstrapFromPlayer == true
+                and playerCount(cost.fullType) or 0
+            local available = definition.bootstrapFromPlayer == true
+                and fromPlayer or stored
             if available < required then affordable = false end
             costParts[#costParts + 1] = tostring(required) .. " "
                 .. tostring(cost.fullType) .. " (" .. tostring(available)
                 .. " " .. tr("UI_PNC_Facility_MaterialTotal", "total") .. ")"
-            sourceParts[#sourceParts + 1] = tostring(stored) .. " "
-                .. tr("UI_PNC_Facility_MaterialStockpile", "stockpile")
+            sourceParts[#sourceParts + 1] = tostring(available) .. " "
+                .. (definition.bootstrapFromPlayer == true
+                    and tr("UI_PNC_Facility_MaterialPlayer", "player")
+                    or tr("UI_PNC_Facility_MaterialStockpile", "stockpile"))
         end
         local hqReady = (tonumber(settlement.hqLevel) or 0)
             >= (tonumber(level and level.requiredHQLevel) or 1)
         local technologyReady = technologyKnown(research,
             definition.requiredTechnology)
-        local status = hqReady and affordable and technologyReady
+        local prerequisiteReady = id == "stockpile" or stockpileBuilt
+        local singletonReady = id ~= "stockpile" or not stockpileExists
+        local status = not singletonReady and tr(
+                "UI_PNC_Facility_StockpileExists", "ALREADY BUILT OR PLANNED")
+            or not prerequisiteReady and tr(
+                "UI_PNC_Facility_StockpileRequired", "BUILD STOCKPILE FIRST")
+            or hqReady and affordable and technologyReady
             and tr("UI_PNC_Facility_Available", "AVAILABLE")
             or not hqReady and tr("UI_PNC_Facility_RequiresHQ", "HQ LEVEL TOO LOW")
             or not technologyReady and tr("UI_PNC_Facility_RequiresTechnology",
@@ -328,7 +353,8 @@ local function buildOptions(settlement, storage, research)
             texture = getTexture and getTexture(definition.iconPath) or nil,
             costText = table.concat(costParts, " | "),
             sourceText = table.concat(sourceParts, " | "),
-            enabled = hqReady and affordable and technologyReady,
+            enabled = hqReady and affordable and technologyReady
+                and prerequisiteReady and singletonReady,
             status = status,
         }
     end

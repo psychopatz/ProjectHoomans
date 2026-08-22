@@ -100,4 +100,16 @@ function Costs.Consume(player, definition)
     return ok, quote
 end
 
+function Costs.ConsumePlayer(player, definition)
+    local source = playerSource(player)
+    if not source then return false, { affordable = false,
+        reason = "PLAYER_INVENTORY_UNAVAILABLE" } end
+    local ok, reason, quote = MaterialTransaction.Consume(
+        recipeFor(definition), { source })
+    quote = quote or { affordable = false }
+    quote.reason = reason
+    quote.receipts = nil
+    return ok, quote
+end
+
 return Costs

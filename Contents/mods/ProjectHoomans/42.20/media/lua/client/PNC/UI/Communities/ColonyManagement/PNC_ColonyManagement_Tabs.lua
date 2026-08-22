@@ -1,6 +1,5 @@
 local Registry = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Registry"
 local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
-local Storage = require "PNC/UI/Communities/PNC_ColonyManagementStorageTabs"
 local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
 local Workshop = require "PNC/UI/Communities/PNC_ColonyManagementWorkshopTab"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
@@ -146,31 +145,6 @@ Registry.Register({
     end,
     onControl = function(window, button)
         return SettingsTab.OnControl(window, button)
-    end,
-})
-
-Registry.Register({
-    id = "storage",
-    title = "STORAGE",
-    detailTitle = "DEBUG DETAILS",
-    showRoster = false,
-    showDetails = false,
-    create = function(window, UI)
-        Storage.Create(window, UI, Shared.Tr)
-    end,
-    layout = function(window, Layout, content)
-        Storage.Layout(window, Layout, content)
-    end,
-    apply = function(window, active, Layout)
-        Storage.ApplyLayout(window, Layout, active)
-    end,
-    rebuild = function(window, snapshot)
-        return Storage.Rebuild(window, snapshot, Shared.Tr)
-    end,
-    render = function(window, Theme)
-        if not window.layout then return end
-        window:drawSectionTitle("GENERAL STOCKPILE", window.storageList)
-        Storage.RenderSummary(window, Theme)
     end,
 })
 

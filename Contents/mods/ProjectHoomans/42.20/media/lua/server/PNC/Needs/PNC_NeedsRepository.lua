@@ -33,6 +33,13 @@ local function normalize(state)
                     tonumber(nutrition.weight)
                         or Definitions.NUTRITION.defaultWeight)),
         },
+        morale = {
+            conditions = type(state.morale) == "table"
+                and type(state.morale.conditions) == "table"
+                and state.morale.conditions or {},
+            lastDay = type(state.morale) == "table"
+                and tonumber(state.morale.lastDay) or nil,
+        },
     }
 end
 

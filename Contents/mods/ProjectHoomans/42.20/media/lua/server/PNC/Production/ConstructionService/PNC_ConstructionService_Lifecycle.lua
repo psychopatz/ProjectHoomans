@@ -71,11 +71,9 @@ function Internal.Prepare(order)
     if order.funded == true or input and (input.funded == true
         or input.committed == true)
     then order.funded = true; return true end
-    if input and PNC.WorkInputService.IsReady(order) then
-        local funded, reason = PNC.WorkInputService.Fund(order, nil,
-            "legacy_construction_funding")
-        if funded then order.funded = true; return true end
-        return false, reason
+    if input then
+        if PNC.WorkInputService.IsReady(order) then return true end
+        return false, "CONSTRUCTION_INPUTS_UNAVAILABLE"
     end
     if order.progress > 0 or order.createdAt then
         order.funded = true
@@ -121,6 +119,15 @@ function Internal.CancellationRefund(order)
         and order.operation ~= "RECONSTRUCT")
     then return { percent = 0, products = {} } end
     local payload = order.payload or {}
+    local input = payload.input or {}
+    -- Reserved or worker-staged inputs have not been consumed. Cancelling the
+    -- input transaction releases/returns them directly, so depositing a
+    -- percentage here would duplicate materials.
+    if input.consume == true and input.committed ~= true then
+        return { percent = 100, products = {},
+            recipeRevision = tonumber(order.recipeRevision)
+                or tonumber(payload.recipeRevision) or 1 }
+    end
     if order.operation == "RECONSTRUCT"
         and (payload.change and payload.change.action) == "remove"
     then return { percent = 0, products = {} } end
@@ -229,8 +236,19 @@ local function completeReconstruct(order)
             payload.facilityId, change.role, change.anchors)
     end
     if change.action == "upgrade" then
-        return PNC.FacilityService.FinalizeUpgrade(
+        local facility = PNC.SettlementRepository.GetFacility(payload.facilityId)
+        local ok, reason = PNC.FacilityService.FinalizeUpgrade(
             payload.facilityId, change.targetLevel)
+        if not ok then return false, reason end
+        if facility and facility.definitionId == "stockpile"
+            and PNC.ColonyStorageService.SetTierForSettlement
+        then
+            local upgraded, storageReason =
+                PNC.ColonyStorageService.SetTierForSettlement(
+                    order.colonyId, change.targetLevel)
+            if not upgraded then return false, storageReason end
+        end
+        return true, reason
     end
     return PNC.FacilityService.FinalizeSetComponent(
         payload.facilityId, change.component)

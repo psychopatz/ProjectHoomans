@@ -1,12 +1,8 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
-package.path = ROOT .. "client/?.lua;" .. ROOT .. "shared/?.lua;" .. package.path
-
-local function equal(actual, expected, message)
-    if actual ~= expected then
-        error((message or "assertion failed") .. ": expected "
-            .. tostring(expected) .. ", got " .. tostring(actual))
-    end
-end
+local T = require "tests/support/test"
+T.addPackagePaths({
+    { "ProjectHoomans", "client" },
+    { "ProjectHoomans", "shared" },
+})
 
 local function derive(self)
     local child = {}; child.__index = child
@@ -32,11 +28,14 @@ getSpecificPlayer = function()
     end }
 end
 
-PNC = { FacilityDefinitions = { ByID = { barracks = true, workshop = true } } }
+PNC = { FacilityDefinitions = { ByID = {
+    barracks = true, stockpile = true, workshop = true,
+} } }
 function PNC.FacilityDefinitions.Get(id)
     return { id = id, displayNameKey = id,
-        category = id == "workshop" and "production" or "housing",
-        descriptionKey = "Barracks description",
+        category = id == "barracks" and "housing" or "production",
+        descriptionKey = id .. " description",
+        bootstrapFromPlayer = id == "stockpile",
         requiredTechnology = id == "workshop" and "facility:workshop" or nil,
         buildCosts = {{ fullType = "Base.Money", amount = 1 }} }
 end
@@ -45,28 +44,36 @@ function PNC.FacilityDefinitions.GetLevel()
 end
 
 local BuildUI = require(
-    "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal"
-)
-local options = BuildUI.BuildOptions({ hqLevel = 1 }, {
+    "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal")
+local settlement = { hqLevel = 1, facilities = {{
+    definitionId = "stockpile", constructionState = "BUILT",
+}} }
+local options = BuildUI.BuildOptions(settlement, {
     rows = {{ fullType = "Base.Money", quantity = 1 }},
 })
-equal(options[1].enabled, true, "stockpile satisfies material cost")
-equal(options[1].category, "housing", "building category reaches catalog")
-equal(options[1].costText, "1 Base.Money (1 total)", "combined total")
-equal(options[1].sourceText, "1 stockpile", "stockpile-only source breakdown")
-equal(options[2].enabled, false, "locked workshop is not advertised available")
-options = BuildUI.BuildOptions({ hqLevel = 1 }, {
+T.truthy(options[1].enabled, "built stockpile unlocks barracks")
+T.equal(options[1].category, "housing", "building category reaches catalog")
+T.equal(options[1].costText, "1 Base.Money (1 total)", "stockpile total")
+T.equal(options[1].sourceText, "1 stockpile", "stockpile source")
+T.falsy(options[2].enabled, "second stockpile is disabled")
+T.falsy(options[3].enabled, "locked workshop is unavailable")
+
+options = BuildUI.BuildOptions({ hqLevel = 1, facilities = {} }, {
+    rows = {{ fullType = "Base.Money", quantity = 9 }},
+})
+T.falsy(options[1].enabled, "ordinary building requires built stockpile")
+T.equal(options[1].status, "BUILD STOCKPILE FIRST",
+    "stockpile prerequisite is visible")
+T.falsy(options[2].enabled, "bootstrap stockpile requires player money")
+carried = 1
+options = BuildUI.BuildOptions({ hqLevel = 1, facilities = {} }, {
+    rows = {{ fullType = "Base.Money", quantity = 9 }},
+})
+T.truthy(options[2].enabled, "player money funds the first stockpile")
+T.equal(options[2].sourceText, "1 player", "bootstrap source is player")
+
+options = BuildUI.BuildOptions(settlement, {
     rows = {{ fullType = "Base.Money", quantity = 1 }},
 }, { learnedTechnologyIds = { "facility:workshop" } })
-equal(options[2].enabled, true, "researched workshop becomes available")
-
-carried = 1
-options = BuildUI.BuildOptions({ hqLevel = 1 }, {
-    rows = {{ fullType = "Base.Money", quantity = 2 }},
-})
-equal(options[1].costText, "1 Base.Money (2 total)",
-    "stockpile remains authoritative")
-equal(options[1].sourceText, "2 stockpile",
-    "player inventory excluded from construction")
-
-print("pnc_facility_build_materials_ui_smoke: ok")
+T.truthy(options[3].enabled, "researched workshop becomes available")
+T.finish("pnc_facility_build_materials_ui_smoke")

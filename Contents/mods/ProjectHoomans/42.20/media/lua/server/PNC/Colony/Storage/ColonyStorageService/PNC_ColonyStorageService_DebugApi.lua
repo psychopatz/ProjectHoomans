@@ -8,6 +8,20 @@ local CoreInventory = Internal.CoreInventory
 local C = Internal.Constants
 local Query = require "PNC/Core/Colony/Storage/PNC_ColonyStorageQuery"
 
+function Service.SetTierForSettlement(colonyId, targetTier)
+    local storage = Repository.GetForSettlement(colonyId)
+    if not storage then return false, "storage_not_found" end
+    targetTier = Definitions.NormalizeTier(targetTier)
+    local current = Definitions.NormalizeTier(storage.tier)
+    if current == targetTier then return true, "already_upgraded", storage end
+    if Definitions.GetNextTier(current) ~= targetTier then
+        return false, "invalid_storage_tier_transition", storage
+    end
+    storage.tier = targetTier
+    Internal.CommitStorage(storage)
+    return true, "upgraded", storage
+end
+
 function Service.Upgrade(player, args)
     local storage, reason, faction, colony = Service.ResolveForPlayer(
         player, args and args.storageId)

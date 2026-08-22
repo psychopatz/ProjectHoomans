@@ -40,6 +40,12 @@ local function summary(record, player)
     local nutrition = PNC.IndividualNeeds.GetNutrition
         and PNC.IndividualNeeds.GetNutrition(record) or nil
     local priorityType, priority = PNC.IndividualNeeds.GetHighestPriority(record)
+    local needsView = PNC.NeedsEvaluator
+        and PNC.NeedsEvaluator.Queries.BuildNeedsView(record) or {}
+    local moraleView = PNC.NeedsEvaluator
+        and PNC.NeedsEvaluator.Queries.BuildView(record)
+        or { score = record.social and record.social.morale or 0,
+            modifiers = {} }
     local journal = PNC.Journals and PNC.Journals.GetNPC
         and PNC.Journals.GetNPC(record.id,
             PNC.Journals.NPC_CAPACITY or 32, true)
@@ -66,7 +72,8 @@ local function summary(record, player)
         conditionStats=PNC.ConditionStats
             and PNC.ConditionStats.Ensure(record,
                 PNC.NeedsUtils.WorldAgeHours()) or {},
-        morale=record.social and record.social.morale or 0,
+        needsView=needsView, morale=moraleView.score,
+        moraleModifiers=moraleView.modifiers,
         provision=PNC.ProvisionEvaluator
             and PNC.ProvisionEvaluator.GetDebugState
             and PNC.ProvisionEvaluator.GetDebugState(record) or {},
@@ -377,10 +384,11 @@ function Management.BuildSnapshot(player, options)
     local workshop = colony and PNC.CraftingService
         and PNC.CraftingService.Queries.BuildSnapshot(colony.id)
         or { knownRecipes = {}, orders = {} }
-    local tasks = colony and PNC.WorkService
-        and PNC.WorkService.Queries
-        and PNC.WorkService.Queries.BuildTaskSnapshot
-        and PNC.WorkService.Queries.BuildTaskSnapshot(colony.id) or {}
+    local tasks = colony and PNC.TaskRequestService
+        and PNC.TaskRequestService.Queries.BuildSnapshot(colony.id)
+        or colony and PNC.WorkService and PNC.WorkService.Queries
+            and PNC.WorkService.Queries.BuildTaskSnapshot
+            and PNC.WorkService.Queries.BuildTaskSnapshot(colony.id) or {}
     local provisionSettings = PNC.ProvisionPolicyService
         and PNC.ProvisionPolicyService.BuildSnapshot
         and PNC.ProvisionPolicyService.BuildSnapshot(player) or nil
@@ -629,19 +637,23 @@ function Management.HandleAction(player, args)
             player, args.recordIndex)
         ok = details ~= nil
     elseif action == "work_cancel" then
-        ok, details = PNC.WorkService.Commands.CancelForPlayer(player,
-            args.workOrderId,
+        ok, details = PNC.TaskRequestService.Commands.CancelForPlayer(player,
+            args.requestId or args.workOrderId,
             "player_cancelled")
         reason = ok and "CANCELLED" or details
     elseif action == "work_pause" then
-        ok, details = PNC.WorkService.Commands.PauseForPlayer(player,
-            args.workOrderId,
+        ok, details = PNC.TaskRequestService.Commands.PauseForPlayer(player,
+            args.requestId or args.workOrderId,
             args.paused ~= false)
         reason = ok and "PAUSED" or details
     elseif action == "work_resume" then
-        ok, details = PNC.WorkService.Commands.ResumeForPlayer(player,
-            args.workOrderId)
+        ok, details = PNC.TaskRequestService.Commands.ResumeForPlayer(player,
+            args.requestId or args.workOrderId)
         reason = ok and "RESUMED" or details
+    elseif action == "work_retry" then
+        ok, details = PNC.TaskRequestService.Commands.RetryForPlayer(player,
+            args.requestId or args.workOrderId)
+        reason = ok and "RETRYING" or details
     elseif action == "work_priority" then
         ok, details = PNC.WorkService.Commands.SetPriorityForPlayer(player,
             args.workOrderId, args.priority)

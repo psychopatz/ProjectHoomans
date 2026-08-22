@@ -9,7 +9,8 @@ Leases.ByID = Leases.ByID or {}
 Leases.ByNPC = Leases.ByNPC or {}
 Leases.Active = Leases.Active or {}
 Leases.PHASES = { ASSIGNED = true, TRAVEL = true, WAITING = true,
-    WORKING = true, ATOMIC_COMMIT = true, COMPLETING = true, DONE = true }
+    WORKING = true, CANCELLING = true, ATOMIC_COMMIT = true,
+    COMPLETING = true, DONE = true }
 
 function Leases.Create(intent, assignment)
     if Leases.ByNPC[intent.npcId] then return nil, "NPC_ALREADY_LEASED" end
@@ -25,11 +26,29 @@ function Leases.Create(intent, assignment)
         resourceKey = assignment and assignment.resourceKey or nil,
         resourceKind = assignment and assignment.resourceKind or nil,
         phase = "ASSIGNED", startedAt = PNC.Core.Now(), revision = 1,
+        lastProgressAt = PNC.Core.Now(), cancellationRequested = false,
         executionMode = assignment and assignment.executionMode or nil,
     }
     Leases.ByID[lease.leaseId], Leases.ByNPC[lease.npcId] = lease, lease.leaseId
     Leases.Active[#Leases.Active + 1] = lease.leaseId
     return lease
+end
+
+function Leases.RequestCancellation(id, reason)
+    local lease = Leases.Get(id)
+    if not lease then return false, "LEASE_NOT_FOUND" end
+    if lease.cancellationRequested == true then
+        return true, lease.cancellationDeferred == true
+            and "CANCELLATION_DEFERRED" or "CANCELLING"
+    end
+    lease.cancellationRequested = true
+    lease.cancellationReason = tostring(reason or "cancelled")
+    lease.revision = lease.revision + 1
+    local atomic = PNC.TaskRequestDefinitions
+        and PNC.TaskRequestDefinitions.NON_INTERRUPTIBLE_PHASE[lease.phase]
+    lease.cancellationDeferred = atomic == true
+    if not atomic then lease.phase = "CANCELLING" end
+    return true, atomic and "CANCELLATION_DEFERRED" or "CANCELLING"
 end
 
 function Leases.Get(id) return Leases.ByID[tostring(id or "")] end

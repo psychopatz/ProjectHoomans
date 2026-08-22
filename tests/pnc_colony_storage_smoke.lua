@@ -65,10 +65,17 @@ PNC = {
     Equipment = {},
     BaseService = { GetForColony = function(id)
         if id == "colony_faction_a" or id == "colony_faction_b" then
-            return { id = "base_" .. id, baseZoneId = "zone_a",
-                stockpileNodeIds = { stockpile = true } }
+            return { id = "base_" .. id, baseZoneId = "zone_a" }
         end
     end },
+}
+local stockpileBuilt = true
+PNC.FacilityValidationService = {
+    GetStockpile = function(_, builtOnly)
+        return stockpileBuilt and builtOnly == true and {
+            id = "facility:stockpile", constructionState = "BUILT",
+        } or nil
+    end,
 }
 PNC.Inventory.Internal.getItemWeight = function() return 0.1 end
 PNC.Inventory.Internal.countMapEntries = function(value)
@@ -181,6 +188,14 @@ local storageB = Repository.GetPrimary("faction_b", "colony_faction_b")
 truthy(storageA and storageB and storageA ~= storageB, "faction isolation")
 equal(storageA.tier, 1, "initial tier")
 equal(storageA.inventory:getLogicalItemCount(), 0, "initial empty storage")
+local access = Service.BuildPlayerAccess(playerA, storageA)
+equal(access.hasStockpile, true,
+    "built stockpile facility grants storage access")
+stockpileBuilt = false
+access = Service.BuildPlayerAccess(playerA, storageA)
+equal(access.hasStockpile, false,
+    "reconstructing stockpile disables storage access")
+stockpileBuilt = true
 
 local awayItem = item("Base.Bandage", 0.1)
 local awayContainer = container({ awayItem })

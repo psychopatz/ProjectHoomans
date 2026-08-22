@@ -19,6 +19,8 @@ local function roleLabel(role)
         ["water.spigot"] = "SPIGOT",
         ["water.tank"] = "WATER TANKS",
         ["water.catcher"] = "RAIN CATCHERS",
+        ["storage.stockpile"] = text(
+            "UI_PNC_Stockpile_Area", "STOCKPILE AREA"),
     }
     return labels[role] or string.upper(string.gsub(role, "[%.]", " "))
 end
@@ -49,30 +51,79 @@ end
 local function componentDetail(facility, component)
     local detail
     if component.kind == "anchor" then
-        detail = roleLabel(component.role) .. "  •  "
+        detail = roleLabel(component.role) .. " | "
             .. tostring(component.x) .. ", " .. tostring(component.y)
-            .. "  FLOOR " .. tostring(component.z)
+            .. " | FLOOR " .. tostring(component.z)
     elseif component.kind == "abstract" then
         detail = "ABSTRACT UTILITY MODULE"
     else
         detail = tostring(component.width or "?") .. " x "
-            .. tostring(component.height or "?") .. "  •  "
+            .. tostring(component.height or "?") .. " | "
             .. tostring(component.tileCount or 0) .. " TILES"
-        if component.desiredCrop then
+        if component.role == "growing.plot" and component.desiredCrop then
             local crop = PNC.FarmingCatalog and PNC.FarmingCatalog.Get
                 and PNC.FarmingCatalog.Get(component.desiredCrop) or nil
-            detail = detail .. "  •  CROP " .. tostring(crop
+            detail = detail .. " | CROP " .. tostring(crop
                 and crop.displayName or component.desiredCrop)
-        else
-            detail = detail .. "  •  NO CROP ASSIGNED"
+        elseif component.role == "growing.plot" then
+            detail = detail .. " | NO CROP ASSIGNED"
         end
-        if component.status then detail = detail .. "  •  " .. component.status end
+        if component.status then detail = detail .. " | " .. component.status end
     end
     local recipe = costText(facility, component.role)
-    return recipe and recipe ~= "" and detail .. "  •  " .. recipe or detail
+    return recipe and recipe ~= "" and detail .. " | " .. recipe or detail
 end
 
-function Rows.Build(facility)
+local function stockpileRows(facility, storage)
+    local rows = {}
+    local access = storage and storage.access or {}
+    local capacity = tonumber(storage and storage.capacity) or 0
+    local used = tonumber(storage and storage.usedWeight) or 0
+    local free = tonumber(storage and storage.freeWeight)
+        or math.max(0, capacity - used)
+    local available = storage and storage.storageId
+        and access.hasStockpile == true
+    local writable = available and access.writable == true
+    rows[#rows + 1] = {
+        key = "stockpile_capacity",
+        label = text("UI_PNC_Storage_Capacity", "TOTAL CAPACITY"),
+        iconPath = componentIconPath("storage.stockpile"),
+        detail = string.format("%.1f / %.1f | %.1f ", used, capacity, free)
+            .. text("UI_PNC_Storage_Free", "FREE")
+            .. (writable and " | "
+                .. text("UI_PNC_Storage_ManageReady", "MANAGE READY")
+                or " | " .. text("UI_PNC_Storage_RemoteView",
+                    "REMOTE VIEW")),
+        complete = available,
+        componentAction = available and { kind = "open_stockpile" } or nil,
+        actionLabel = text("UI_PNC_Stockpile_OpenStorage", "OPEN STORAGE"),
+    }
+    for index = 1, #(facility.components or {}) do
+        local component = facility.components[index]
+        if component.role == "storage.stockpile" then
+            rows[#rows + 1] = {
+                key = component.id,
+                label = "- " .. roleLabel(component.role),
+                iconPath = componentIconPath(component.role),
+                detail = componentDetail(facility, component),
+                child = true,
+                complete = true,
+                componentAction = {
+                    kind = "stockpile_move",
+                    role = component.role,
+                    componentId = component.id,
+                },
+                actionLabel = text("UI_PNC_Facility_Move", "MOVE"),
+            }
+        end
+    end
+    return rows
+end
+
+function Rows.Build(facility, storage)
+    if facility.definitionId == "stockpile" then
+        return stockpileRows(facility, storage)
+    end
     local rows = {}
     local level = PNC.FacilityDefinitions.GetLevel(
         facility.definitionId, facility.level)
@@ -100,7 +151,7 @@ function Rows.Build(facility)
         } or nil
         local recipe = costText(facility, role)
         local detail = tostring(#assigned) .. " / " .. tostring(maximum)
-        if recipe then detail = detail .. "  •  " .. recipe end
+        if recipe then detail = detail .. " | " .. recipe end
         rows[#rows + 1] = {
             key = role,
             label = roleLabel(role),

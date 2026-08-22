@@ -145,11 +145,24 @@ PNC.ColonyStorageService = {
     end,
     GetProductionDiagnostics = function() return { total = 0 } end,
 }
+local storageTier = 1
+function PNC.ColonyStorageService.SetTierForSettlement(_, targetTier)
+    if targetTier ~= storageTier + 1 then
+        return false, "invalid_storage_tier_transition"
+    end
+    storageTier = targetTier
+    return true, "upgraded", { tier = storageTier }
+end
 PNC.ColonyStorageRepository = {
     GetForSettlement = function()
         return { id = "s1", inventory = { records = { {}, {} } } }
     end,
 }
+local bootstrapConsumes = 0
+PNC.FacilityCostService = { ConsumePlayer = function()
+    bootstrapConsumes = bootstrapConsumes + 1
+    return true, { affordable = true }
+end }
 
 local occupied = {}
 local acquiredCapabilities = {}
@@ -163,13 +176,17 @@ PNC.FacilityService = { AcquireActivity = function(_, npcId, capability)
 end }
 local constructionFacility = { id = "construction_facility", baseId = "b1",
     definitionId = "barracks", constructionState = "PLANNED" }
+local bootstrapFacility = { id = "bootstrap_stockpile", baseId = "b1",
+    definitionId = "stockpile", level = 1, constructionState = "PLANNED" }
 local constructionDestroyed = false
 local reconstructedComponent
 PNC.SettlementRepository = { GetFacility = function(id)
-    return id == constructionFacility.id and constructionFacility or nil
+    return id == constructionFacility.id and constructionFacility
+        or id == bootstrapFacility.id and bootstrapFacility or nil
 end }
 PNC.FacilityDefinitions = { Get = function()
     return { buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+        upgradeCosts = {{ fullType = "Base.Money", amount = 1 }},
         buildWork = 10, reconstructWork = 6, deconstructWork = 8 }
 end }
 function PNC.FacilityService.ResolveWorkTarget(facility)
@@ -191,6 +208,14 @@ function PNC.FacilityService.FinalizeSetComponent(id, component)
     constructionFacility.constructionState = "BUILT"
     constructionFacility.constructionWorkOrderId = nil
     return true
+end
+function PNC.FacilityService.FinalizeUpgrade(id, targetLevel)
+    local facility = PNC.SettlementRepository.GetFacility(id)
+    if not facility then return false, "FACILITY_NOT_FOUND" end
+    facility.level = targetLevel
+    facility.constructionState = "BUILT"
+    facility.constructionWorkOrderId = nil
+    return true, "FacilityUpgraded"
 end
 PNC.FacilityReservations = {
     Release = function(id) occupied[id] = nil; return true end,
@@ -336,6 +361,31 @@ truthy(inventory["Base.Plank"] >= 8, "spear kit adds crafting materials")
 truthy(inventory["Base.SpearCrafted"] >= 2,
     "spear kit adds reverse-engineering and deconstruction specimens")
 
+local bootstrap = assert(Construction.QueueBuild({}, bootstrapFacility, {
+    bootstrapFromPlayer = true, buildWork = 5, buildCosts = {
+        { fullType = "Base.Money", amount = 1 },
+    },
+}))
+equal(bootstrap.funded, true, "bootstrap stockpile starts funded")
+equal(bootstrap.payload.input.bootstrap, true,
+    "bootstrap stockpile skips stockpile collection")
+equal(bootstrapConsumes, 1, "bootstrap cost comes from player inventory")
+truthy(Work.Commands.Assign(bootstrap.id, "worker"),
+    "bootstrap constructor assignment")
+truthy(Work.Commands.AddProgress(bootstrap.id, "worker", 100),
+    "bootstrap construction completion")
+local stockpileUpgrade = assert(Construction.QueueReconstruct({},
+    bootstrapFacility, { action = "upgrade", targetLevel = 2 }))
+equal(stockpileUpgrade.funded, false,
+    "stockpile tier upgrade collects its material")
+truthy(Work.Commands.Assign(stockpileUpgrade.id, "worker"),
+    "stockpile upgrade assignment")
+truthy(Work.Commands.AddProgress(stockpileUpgrade.id, "worker", 100),
+    "stockpile upgrade completion")
+equal(bootstrapFacility.level, 2, "stockpile facility reaches tier two")
+equal(storageTier, 2, "stockpile facility tier updates storage capacity tier")
+inventory["Base.Money"] = 1
+
 local abandonedBuild = assert(Construction.QueueBuild({}, constructionFacility,
     PNC.FacilityDefinitions.Get()))
 local replacement = assert(Construction.QueueDeconstruct({},
@@ -351,11 +401,11 @@ equal(constructionFacility.constructionState, "PLANNED",
 
 local build = assert(Construction.QueueBuild({}, constructionFacility,
     PNC.FacilityDefinitions.Get()))
-equal(build.funded, true, "construction is funded before it enters work")
-equal(inventory["Base.Money"], 0,
-    "construction removes materials at project funding")
-equal(reserved["Base.Money"], 0,
-    "funded construction does not retain a live reservation")
+equal(build.funded, false, "construction waits for material collection")
+equal(inventory["Base.Money"], 1,
+    "queued construction leaves reserved stock in storage")
+equal(reserved["Base.Money"], 1,
+    "queued construction retains its material reservation")
 equal(constructionFacility.constructionState, "UNDER_CONSTRUCTION",
     "build enters construction state")
 truthy(Work.Commands.Assign(build.id, "worker"), "constructor assignment")
@@ -372,8 +422,8 @@ clock = clock + 1001
 Work.Tick(clock)
 equal(Work.Queries.Get(build.id).progress, 4,
     "worker interruption preserves construction progress")
-equal(inventory["Base.Money"], 0,
-    "worker interruption does not reacquire or return funded material")
+equal(inventory["Base.Money"], 1,
+    "worker interruption preserves unconsumed construction material")
 equal(constructionFacility.constructionState, "UNDER_CONSTRUCTION",
     "active order repairs stale planned facility state")
 clock = clock + 1001
@@ -385,7 +435,7 @@ equal(Work.BuildActionInformation(PNC.Registry.Data.backup).percent, 40,
 truthy(Work.Commands.AddProgress(build.id, "backup", 100),
     "replacement constructor completes shared work points")
 equal(inventory["Base.Money"], 0,
-    "construction completion does not consume funded material again")
+    "construction completion consumes reserved material once")
 equal(constructionFacility.constructionState, "BUILT",
     "construction completion activates facility")
 inventory["Base.Money"] = 1
@@ -410,18 +460,18 @@ truthy(Work.Commands.AddProgress(deconstruct.id, "backup", 100),
     "abstract deconstruction completes by work points")
 equal(constructionDestroyed, true, "deconstruction removes facility parts")
 
--- A funded project refunds its remaining materials transactionally when the
--- player cancels it; the next project can use the returned stock immediately.
+-- An untouched project releases its reservation when cancelled, so the next
+-- project can use the stock immediately without a duplicate refund deposit.
 inventory["Base.Money"] = 1
 constructionFacility.constructionState = "PLANNED"
 local cancelledBuild = assert(Construction.QueueBuild({}, constructionFacility,
     PNC.FacilityDefinitions.Get()))
-equal(inventory["Base.Money"], 0,
-    "cancel test project is funded before work begins")
-truthy(Work.Commands.Cancel(cancelledBuild.id),
-    "funded construction can be cancelled")
 equal(inventory["Base.Money"], 1,
-    "cancelling an untouched project refunds its funded materials")
+    "cancel test project leaves reserved stock unconsumed")
+truthy(Work.Commands.Cancel(cancelledBuild.id),
+    "reserved construction can be cancelled")
+equal(inventory["Base.Money"], 1,
+    "cancelling an untouched project releases its materials")
 equal(constructionFacility.constructionState, "PLANNED",
     "cancelled construction returns to planned state")
 

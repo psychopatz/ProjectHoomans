@@ -139,6 +139,8 @@ function Service.Create(player, args)
     end
     if not footprintCheck.ok then return footprintCheck end
     local constructionRegion = footprintCheck.details.component.region
+    local initialComponent = definition.providesStockpileAccess == true
+        and footprintCheck.details.component or nil
     for _, other in pairs(Repository.State.facilities or {}) do
         if other.constructionRegion and GridRegion.intersects(
             constructionRegion, other.constructionRegion)
@@ -147,6 +149,10 @@ function Service.Create(player, args)
     facility.constructionRegion = constructionRegion
     Repository.State.facilities[id] = facility
     base.facilityIds[id] = true
+    if initialComponent then
+        Repository.State.components[initialComponent.id] = initialComponent
+        facility.componentIds[initialComponent.id] = true
+    end
     local workOrder, workReason
     if PNC.ConstructionService then
         workOrder, workReason = PNC.ConstructionService.QueueBuild(
@@ -155,6 +161,9 @@ function Service.Create(player, args)
         workReason = "CONSTRUCTION_SERVICE_UNAVAILABLE"
     end
     if not workOrder then
+        if initialComponent then
+            Repository.State.components[initialComponent.id] = nil
+        end
         Repository.State.facilities[id] = nil
         base.facilityIds[id] = nil
         Service.RebuildIndexes()
@@ -325,6 +334,12 @@ function Service.FinalizeSetComponent(facilityId, input)
     if not base then return false, "FACILITY_NOT_FOUND" end
     local result = applyComponent(base, facility, input)
     if result.ok ~= true then return false, result.reason end
+    if facility.definitionId == "stockpile" and result.component
+        and result.component.role == "storage.stockpile"
+        and result.component.region
+    then
+        facility.constructionRegion = PNC.Core.DeepCopy(result.component.region)
+    end
     facility.constructionState, facility.constructionWorkOrderId = "BUILT", nil
     Service.RefreshState(facility)
     return true, result.event
@@ -336,6 +351,11 @@ function Service.FinalizeRemoveComponent(facilityId, componentId)
     local component = Repository.GetComponent(componentId)
     if not base or not component or component.facilityId ~= facility.id then
         return false, "COMPONENT_NOT_FOUND"
+    end
+    if facility.definitionId == "stockpile"
+        or component.role == "storage.stockpile"
+    then
+        return false, "STOCKPILE_CANNOT_DECONSTRUCT"
     end
     local result = removeComponent(base, facility, component)
     facility.constructionState, facility.constructionWorkOrderId = "BUILT", nil
@@ -538,6 +558,11 @@ function Service.RemoveComponent(player, args)
     if not component or component.facilityId ~= facility.id then
         return { ok = false, reason = "COMPONENT_NOT_FOUND" }
     end
+    if facility.definitionId == "stockpile"
+        or component.role == "storage.stockpile"
+    then
+        return { ok = false, reason = "STOCKPILE_CANNOT_DECONSTRUCT" }
+    end
     if not PNC.ConstructionService
         or not PNC.ConstructionService.QueueReconstruct
     then return { ok = false,
@@ -568,6 +593,9 @@ function Service.Destroy(player, args)
     local base = facility and PNC.BaseService.Get(facility.baseId) or nil
     if not base then return { ok = false, reason = "FACILITY_NOT_FOUND" } end
     if not PNC.BaseValidationService.CanUse(player, base) then return { ok = false, reason = "NO_PERMISSION" } end
+    if facility.definitionId == "stockpile" then
+        return { ok = false, reason = "STOCKPILE_CANNOT_DECONSTRUCT" }
+    end
     if args.expectedRevision ~= nil and tonumber(args.expectedRevision) ~= facility.revision then
         return { ok = false, reason = "REVISION_CONFLICT", revision = facility.revision }
     end
@@ -587,6 +615,9 @@ function Service.FinalizeDestroy(facilityOrId)
         or Repository.GetFacility(facilityOrId)
     local base = facility and PNC.BaseService.Get(facility.baseId) or nil
     if not base then return false, "FACILITY_NOT_FOUND" end
+    if facility.definitionId == "stockpile" then
+        return false, "STOCKPILE_CANNOT_DECONSTRUCT"
+    end
     for componentId, _ in pairs(facility.componentIds) do
         Repository.State.components[componentId] = nil
         if PNC.FacilityReservations then PNC.FacilityReservations.ReleaseComponent(componentId) end
