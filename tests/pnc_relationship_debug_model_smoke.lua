@@ -1,8 +1,10 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+    T.path("ProjectHoomans", "client", "PNC/")
     .. "UI/Relationships/PNC_RelationshipDebugModel.lua"
 
-local function assertContains(rows, label, fragment)
+local function expectRowContaining(rows, label, fragment)
     for _, row in ipairs(rows) do
         if row.label == label
             and string.find(row.value, fragment, 1, true)
@@ -14,17 +16,17 @@ local function assertContains(rows, label, fragment)
 end
 
 PNC = {}
-dofile(FILE)
+T.load(FILE)
 
 local targets = PNC.RelationshipDebugModel.BuildTargets({
     { id = "alice", name = "Alice", alive = true },
     { id = "bob", name = "Bob", alive = true },
     { id = "dead", name = "Dead", deathMarker = true },
 }, "alice")
-assert(#targets == 2, "current player plus one NPC target")
-assert(targets[1].kind == "current_player",
+T.truthy(#targets == 2, "current player plus one NPC target")
+T.truthy(targets[1].kind == "current_player",
     "current player target comes first")
-assert(targets[2].id == "bob", "observer excluded from targets")
+T.truthy(targets[2].id == "bob", "observer excluded from targets")
 
 local rows = PNC.RelationshipDebugModel.BuildRows({
     observer = {
@@ -170,47 +172,48 @@ local rows = PNC.RelationshipDebugModel.BuildRows({
     effects = { { type = "pnc:relationship" } },
 })
 
-assertContains(rows, "Approval", "12.00")
-assertContains(rows, "Revisions", "presence 2")
-assertContains(rows, "Observer faction", "Riverside Cooperative")
-assertContains(rows, "  faction ID", "faction_riverside")
-assertContains(rows, "  membership", "member")
-assertContains(rows, "Target faction", "No organizational faction")
-assertContains(rows, "Reverse direction", "stored")
-assertContains(rows, "Saturation treated_wound", "approval=4")
-assertContains(rows, "Observer conduct", "revision 2")
-assertContains(rows, "Target conduct", "revision 4")
-assertContains(rows, "  compassion", "8.00")
-assertContains(rows, "    visibility", "direct / shareable")
-assertContains(rows, "    event", "social:test")
-assertContains(rows, "1. treated_wound", "memory:1")
-assertContains(rows, "  strength", "0.9500 current")
-assertContains(rows, "Last trigger", "treated_wound")
-assertContains(rows, "  approval effect", "+4.00 -> +5.00")
-assertContains(rows, "  modifier compassion", "1.25")
-assertContains(rows, "  changed", "Approval +2.00")
-assertContains(rows, "Last conversation", "whats_up_local_activity")
+expectRowContaining(rows, "Approval", "12.00")
+expectRowContaining(rows, "Revisions", "presence 2")
+expectRowContaining(rows, "Observer faction", "Riverside Cooperative")
+expectRowContaining(rows, "  faction ID", "faction_riverside")
+expectRowContaining(rows, "  membership", "member")
+expectRowContaining(rows, "Target faction", "No organizational faction")
+expectRowContaining(rows, "Reverse direction", "stored")
+expectRowContaining(rows, "Saturation treated_wound", "approval=4")
+expectRowContaining(rows, "Observer conduct", "revision 2")
+expectRowContaining(rows, "Target conduct", "revision 4")
+expectRowContaining(rows, "  compassion", "8.00")
+expectRowContaining(rows, "    visibility", "direct / shareable")
+expectRowContaining(rows, "    event", "social:test")
+expectRowContaining(rows, "1. treated_wound", "memory:1")
+expectRowContaining(rows, "  strength", "0.9500 current")
+expectRowContaining(rows, "Last trigger", "treated_wound")
+expectRowContaining(rows, "  approval effect", "+4.00 -> +5.00")
+expectRowContaining(rows, "  modifier compassion", "1.25")
+expectRowContaining(rows, "  changed", "Approval +2.00")
+expectRowContaining(rows, "Last conversation", "whats_up_local_activity")
 
 local relationshipRows = PNC.RelationshipDebugModel.FilterRows(
     rows,
     "relationship"
 )
-assertContains(relationshipRows, "Approval", "12.00")
-assertContains(relationshipRows, "Baseline approval", "0.00")
+expectRowContaining(relationshipRows, "Approval", "12.00")
+expectRowContaining(relationshipRows, "Baseline approval", "0.00")
 
 local personalityRows = PNC.RelationshipDebugModel.FilterRows(
     rows,
     "personality"
 )
-assertContains(personalityRows, "Personality", "outgoing")
-assertContains(personalityRows, "  compassion", "0.70")
+expectRowContaining(personalityRows, "Personality", "outgoing")
+expectRowContaining(personalityRows, "  compassion", "0.70")
 
 local memoryRows = PNC.RelationshipDebugModel.FilterRows(rows, "memories")
-assertContains(memoryRows, "Memories", "1")
-assertContains(memoryRows, "1. treated_wound", "memory:1")
+expectRowContaining(memoryRows, "Memories", "1")
+expectRowContaining(memoryRows, "1. treated_wound", "memory:1")
 
 local unauthorized =
     PNC.RelationshipDebugModel.BuildRows(nil, false)
-assertContains(unauthorized, "Access", "Admin/debug mode required")
+expectRowContaining(unauthorized, "Access", "Admin/debug mode required")
+T.finish("pnc_relationship_debug_model_smoke")
 
-print("pnc_relationship_debug_model_smoke: ok")
+T.finish("pnc_relationship_debug_model_smoke")

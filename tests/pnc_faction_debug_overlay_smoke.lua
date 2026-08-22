@@ -1,15 +1,9 @@
+local T = require "tests/support/test"
+
 local ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+    T.path("ProjectHoomans", "client", "PNC/")
 local MODEL = ROOT .. "UI/Factions/PNC_FactionDebugModel.lua"
 local OVERLAY = ROOT .. "UI/Factions/PNC_FactionDebugOverlay.lua"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual")
-            .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
 
 ISUIElement = {}
 function ISUIElement:derive()
@@ -235,31 +229,31 @@ getCore = function()
 end
 getText = function(key) return key end
 
-dofile(MODEL)
+T.load(MODEL)
 package.preload["PNC/UI/Factions/PNC_FactionDebugModel"] =
     function() return PNC.FactionDebugModel end
-dofile(OVERLAY)
+T.load(OVERLAY)
 
-assertEqual(
+T.equal(
     PNC.FactionDebugOverlay.IsVisible(),
     false,
     "overlay defaults closed"
 )
-assertEqual(
+T.equal(
     PNC.FactionDebugOverlay.Toggle(),
     true,
     "overlay opens"
 )
-assertEqual(
+T.equal(
     PNC.FactionDebugOverlay.IsVisible(),
     true,
     "overlay visible"
 )
-assertEqual(requests[1].sourceID, "faction_source",
+T.equal(requests[1].sourceID, "faction_source",
     "selected source requested")
-assertEqual(requests[1].targetID, "faction_target",
+T.equal(requests[1].targetID, "faction_target",
     "selected target requested")
-assertEqual(requests[1].npcID, "npc_one",
+T.equal(requests[1].npcID, "npc_one",
     "selected NPC requested")
 
 local dashboard = PNC.FactionDebugOverlay.NewDashboard(
@@ -267,9 +261,9 @@ local dashboard = PNC.FactionDebugOverlay.NewDashboard(
 )
 dashboard:prerender()
 dashboard:render()
-assertEqual(dashboard.embedded, true,
+T.equal(dashboard.embedded, true,
     "dashboard is embedded inspector presentation")
-assertEqual(
+T.equal(
     PNC.FactionDebugOverlay.GetNPCDiagnostic("npc_one")
         .attackAllowed,
     true,
@@ -280,11 +274,11 @@ local relationshipChangeCount
 relationshipChange,
 relationshipChangeCount =
     PNC.FactionDebugOverlay.GetRelationshipChange("npc_one")
-assertEqual(relationshipChange.memoryType, "treated_wound",
+T.equal(relationshipChange.memoryType, "treated_wound",
     "world overlay exposes social change type")
-assertEqual(relationshipChange.approvalDelta, 4,
+T.equal(relationshipChange.approvalDelta, 4,
     "world overlay exposes social score delta")
-assertEqual(relationshipChangeCount, 1,
+T.equal(relationshipChangeCount, 1,
     "world overlay counts unseen social changes")
 
 PNC.FactionDebugOverlay.SetSelection(
@@ -293,17 +287,18 @@ PNC.FactionDebugOverlay.SetSelection(
     "npc_one"
 )
 PNC.FactionDebugOverlay.Update()
-assertEqual(#requests >= 2, true, "selection refresh requested")
+T.equal(#requests >= 2, true, "selection refresh requested")
 
-assertEqual(
+T.equal(
     PNC.FactionDebugOverlay.Toggle(),
     false,
     "overlay closes"
 )
-assertEqual(
+T.equal(
     PNC.FactionDebugOverlay.IsVisible(),
     false,
     "overlay no longer visible"
 )
+T.finish("pnc_faction_debug_overlay_smoke")
 
-print("pnc_faction_debug_overlay_smoke: ok")
+T.finish("pnc_faction_debug_overlay_smoke")

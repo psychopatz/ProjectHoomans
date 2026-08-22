@@ -1,13 +1,8 @@
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
-local ROOT = SHARED_ROOT .. "PNC/Core/"
-package.path = SHARED_ROOT .. "?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
+local ROOT = SHARED_ROOT .. "PNC/Core/"
+T.addPackagePaths()
 
 local function countValue(values, expected)
     local count = 0
@@ -111,8 +106,8 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Combat/PNC_Combat_Engagement.lua")
-dofile(ROOT .. "Behaviors/PNC_Behavior_Combat.lua")
+T.load(ROOT .. "Combat/PNC_Combat_Engagement.lua")
+T.load(ROOT .. "Behaviors/PNC_Behavior_Combat.lua")
 
 local record = {
     id = "ranged_test",
@@ -132,39 +127,39 @@ local target = {
 }
 
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assertEqual(calls[1], "hold", "ranged aim stops stale movement first")
-assertEqual(calls[2], "face", "ranged aim faces after stopping")
-assertEqual(calls[3], "try_ranged", "ranged attack evaluates before spacing")
-assertEqual(calls[4], "spacing", "cooldown spacing follows the fire attempt")
+T.equal(calls[1], "hold", "ranged aim stops stale movement first")
+T.equal(calls[2], "face", "ranged aim faces after stopping")
+T.equal(calls[3], "try_ranged", "ranged attack evaluates before spacing")
+T.equal(calls[4], "spacing", "cooldown spacing follows the fire attempt")
 
 for _ = 1, 39 do
     now = now + 75
     PNC.BehaviorCombat.TickEngage(record, {}, target)
 end
-assertEqual(rangedAttempts, 40, "cooldown does not starve ranged attack checks")
-assertEqual(#logs, 1, "identical cooldown log is rate limited")
+T.equal(rangedAttempts, 40, "cooldown does not starve ranged attack checks")
+T.equal(#logs, 1, "identical cooldown log is rate limited")
 
 now = now + 5000
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assertEqual(#logs, 2, "cooldown diagnostic can repeat after throttle window")
+T.equal(#logs, 2, "cooldown diagnostic can repeat after throttle window")
 
 calls = {}
 target.distSq = 100
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assertEqual(countValue(calls, "hold"), 0, "out-of-range travel is not held")
-assertEqual(countValue(calls, "face"), 0, "travel facing is not leased out of range")
-assertEqual(countValue(calls, "move"), 1, "out-of-range shooter closes distance")
+T.equal(countValue(calls, "hold"), 0, "out-of-range travel is not held")
+T.equal(countValue(calls, "face"), 0, "travel facing is not leased out of range")
+T.equal(countValue(calls, "move"), 1, "out-of-range shooter closes distance")
 
 calls = {}
 target.distSq = 1
 repositionClose = true
 local attemptsBeforeClose = rangedAttempts
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assertEqual(rangedAttempts, attemptsBeforeClose + 1,
+T.equal(rangedAttempts, attemptsBeforeClose + 1,
     "point-blank spacing starved the ranged attack check")
-assertEqual(calls[1], "hold", "point-blank shooter acquires an attack hold first")
-assertEqual(calls[3], "try_ranged", "point-blank shooter checks fire before retreat")
-assertEqual(calls[4], "spacing", "point-blank cooldown then creates space")
+T.equal(calls[1], "hold", "point-blank shooter acquires an attack hold first")
+T.equal(calls[3], "try_ranged", "point-blank shooter checks fire before retreat")
+T.equal(calls[4], "spacing", "point-blank cooldown then creates space")
 
 -- Tactics: a normal cooldown with only one enemy in safe firing range must not
 -- generate a retreat intent.
@@ -226,7 +221,7 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Combat/CombatTactics/PNC_Combat_Tactics.lua")
+T.load(ROOT .. "Combat/CombatTactics/PNC_Combat_Tactics.lua")
 
 record = {
     id = "tactics_test",
@@ -251,12 +246,12 @@ local repositioned = PNC.CombatTactics.TryReposition(
     "cooldown_active",
     {}
 )
-assertEqual(repositioned, false, "safe cooldown does not trigger ranged retreat")
-assertEqual(retreatMoves, 0, "safe cooldown does not author movement")
+T.equal(repositioned, false, "safe cooldown does not trigger ranged retreat")
+T.equal(retreatMoves, 0, "safe cooldown does not author movement")
 
 repositioned = PNC.CombatTactics.MaintainRangedSpacing(record, {}, target)
-assertEqual(repositioned, true, "ranged spacing retreats from a nearby enemy")
-assertEqual(retreatMoves, 1, "ranged spacing authors retreat movement")
+T.equal(repositioned, true, "ranged spacing retreats from a nearby enemy")
+T.equal(retreatMoves, 1, "ranged spacing authors retreat movement")
 local preMoved = PNC.CombatTactics.PreAttackDecision(
     record,
     {},
@@ -264,9 +259,9 @@ local preMoved = PNC.CombatTactics.PreAttackDecision(
     "ranged",
     {}
 )
-assertEqual(preMoved, false,
+T.equal(preMoved, false,
     "active ranged spacing preempted the next fire attempt")
-assertEqual(retreatMoves, 1,
+T.equal(retreatMoves, 1,
     "ranged precheck refreshed movement before attack arbitration")
 PNC.CombatTactics.ClearRetreatState(record)
 target.x = 6
@@ -292,8 +287,8 @@ spatialZombies = {
     },
 }
 repositioned = PNC.CombatTactics.MaintainRangedSpacing(record, {}, target)
-assertEqual(repositioned, false, "safe ranged distance holds even when the target has a crowd")
-assertEqual(retreatMoves, 1, "safe ranged distance authors no movement")
+T.equal(repositioned, false, "safe ranged distance holds even when the target has a crowd")
+T.equal(retreatMoves, 1, "safe ranged distance authors no movement")
 
 spatialZombies = {}
 target.x = 1
@@ -306,8 +301,8 @@ repositioned = PNC.CombatTactics.TryReposition(
     "target_too_close",
     {}
 )
-assertEqual(repositioned, true, "point-blank target still triggers ranged retreat")
-assertEqual(retreatMoves, 2, "point-blank retreat authors one movement intent")
+T.equal(repositioned, true, "point-blank target still triggers ranged retreat")
+T.equal(retreatMoves, 2, "point-blank retreat authors one movement intent")
 
 -- Facing: the server immediately faces the live object and also records the
 -- PathService lease used by multiplayer snapshots.
@@ -341,7 +336,7 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Combat/PNC_Combat.lua")
+T.load(ROOT .. "Combat/PNC_Combat.lua")
 
 local faced = PNC.Combat.FaceTarget(
     { runtime = {} },
@@ -350,9 +345,10 @@ local faced = PNC.Combat.FaceTarget(
     620,
     "ranged_windup"
 )
-assertEqual(faced, true, "combat facing succeeds")
-assertEqual(directTarget, liveTarget, "engine faces the live target object")
-assertEqual(leasedTarget.x, 4, "network-facing lease uses live target x")
-assertEqual(leasedTarget.y, 5, "network-facing lease uses live target y")
+T.equal(faced, true, "combat facing succeeds")
+T.equal(directTarget, liveTarget, "engine faces the live target object")
+T.equal(leasedTarget.x, 4, "network-facing lease uses live target x")
+T.equal(leasedTarget.y, 5, "network-facing lease uses live target y")
+T.finish("pnc_ranged_engagement_smoke")
 
-print("pnc_ranged_engagement_smoke: ok")
+T.finish("pnc_ranged_engagement_smoke")

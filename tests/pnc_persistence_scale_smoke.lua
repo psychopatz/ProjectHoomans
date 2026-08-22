@@ -1,14 +1,9 @@
+local T = require "tests/support/test"
+
 -- Reuse the real deterministic inventory bootstrap and its Kahlua checks.
-dofile("tests/pnc_seed_delta_smoke.lua")
+T.load("tests/pnc_seed_delta_smoke.lua")
 
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local function approximateBytes(value, seen)
     local kind = type(value)
@@ -62,9 +57,9 @@ PNC.Identity.ApplyRecordIdentity = function(record, definition)
     record.archetypeID = definition.archetypeID or record.archetypeID
     record.name = definition.displayName or definition.name or record.name
 end
-dofile(ROOT .. "Needs/PNC_NeedsDefinitions.lua")
-dofile(ROOT .. "Needs/PNC_ConditionStats.lua")
-dofile(ROOT .. "Needs/PNC_PlayerNeedsModel.lua")
+T.load(ROOT .. "Needs/PNC_NeedsDefinitions.lua")
+T.load(ROOT .. "Needs/PNC_ConditionStats.lua")
+T.load(ROOT .. "Needs/PNC_PlayerNeedsModel.lua")
 PNC.Types = {
     NewRecord = function(definition)
         local record = {
@@ -114,12 +109,12 @@ PNC.Types = {
     end,
 }
 
-dofile(ROOT .. "Map/PNC_MapPresentation.lua")
-dofile(ROOT .. "Travel/PNC_Travel_Route.lua")
-dofile(ROOT .. "Travel/PNC_Travel_Providers.lua")
-dofile(ROOT .. "Travel/PNC_Travel_Model.lua")
+T.load(ROOT .. "Map/PNC_MapPresentation.lua")
+T.load(ROOT .. "Travel/PNC_Travel_Route.lua")
+T.load(ROOT .. "Travel/PNC_Travel_Providers.lua")
+T.load(ROOT .. "Travel/PNC_Travel_Model.lua")
 
-dofile(ROOT .. "Persistence/PNC_Persistence.lua")
+T.load(ROOT .. "Persistence/PNC_Persistence.lua")
 
 local records = {}
 local payloads = {}
@@ -222,7 +217,7 @@ for npcIndex = 1, 100 do
             },
         }
     end
-    assert(PNC.Inventory.AddItems(
+    T.truthy(PNC.Inventory.AddItems(
         record,
         acquired,
         "root",
@@ -233,56 +228,56 @@ for npcIndex = 1, 100 do
     totalBytes = totalBytes + approximateBytes(payloads[id])
 end
 
-assertEqual(PNC.Core.TableSize and PNC.Core.TableSize(payloads) or 100, 100,
+T.equal(PNC.Core.TableSize and PNC.Core.TableSize(payloads) or 100, 100,
     "scale payload count")
 local sample = payloads.scale_npc_1
-assertEqual(sample.schemaVersion, 10, "scale schema version")
-assertEqual(sample.vanillaTraitsAuthored, false,
+T.equal(sample.schemaVersion, 10, "scale schema version")
+T.equal(sample.vanillaTraitsAuthored, false,
     "generated NPC traits marked as authored")
-assertEqual(sample.vanillaTraitsGenerationVersion,
+T.equal(sample.vanillaTraitsGenerationVersion,
     PNC.PlayerNeedsModel.GENERATION_VERSION,
     "generated NPC trait version")
-assertEqual(sample.dynamicTraitsAuthored, false,
+T.equal(sample.dynamicTraitsAuthored, false,
     "generated custom traits marked as authored")
-assertEqual(sample.dynamicTraitsGenerationVersion,
+T.equal(sample.dynamicTraitsGenerationVersion,
     PNC.ConditionStats.TRAIT_GENERATION_VERSION,
     "generated custom trait version")
-assertEqual(sample.inventory[1], 2, "NPC inventory schema")
-assertEqual(sample.inventory[2], "BASELINE_DELTA", "NPC inventory mode")
-assertEqual(sample.inventory[5][1], 1, "core delta schema")
-assertEqual(sample.inventory.cachedWeight, nil, "derived used weight persisted")
+T.equal(sample.inventory[1], 2, "NPC inventory schema")
+T.equal(sample.inventory[2], "BASELINE_DELTA", "NPC inventory mode")
+T.equal(sample.inventory[5][1], 1, "core delta schema")
+T.equal(sample.inventory.cachedWeight, nil, "derived used weight persisted")
 local logicalItems = 0
 for _, upsert in ipairs(sample.inventory[5][3] or {}) do
     local coreRecord = upsert[2]
     logicalItems = logicalItems + (tonumber(coreRecord[2]) or 0)
 end
-assert(logicalItems >= 40, "acquired logical item count")
-assertEqual(sample.health.body.partBase, 92, "body-part baseline")
-assertEqual(sample.health.body.parts.Head, 70, "body-part override")
-assertEqual(sample.runtime, nil, "runtime state leaked into save")
-assertEqual(sample.travel.ownerMod, "ScaleFixture", "travel owner persisted")
-assertEqual(sample.travel.route.points[2].x, 301, "travel route persisted")
-assert(totalBytes < 5 * 1024 * 1024,
+T.truthy(logicalItems >= 40, "acquired logical item count")
+T.equal(sample.health.body.partBase, 92, "body-part baseline")
+T.equal(sample.health.body.parts.Head, 70, "body-part override")
+T.equal(sample.runtime, nil, "runtime state leaked into save")
+T.equal(sample.travel.ownerMod, "ScaleFixture", "travel owner persisted")
+T.equal(sample.travel.route.points[2].x, 301, "travel route persisted")
+T.truthy(totalBytes < 5 * 1024 * 1024,
     "100-NPC fixture exceeded the 5 MiB compact-save budget: "
         .. tostring(totalBytes))
 
 local restored = PNC.Persistence.DeserializeRecord(sample, "scale_npc_1")
-assertEqual(restored.health.body.parts.Head.current, 70,
+T.equal(restored.health.body.parts.Head.current, 70,
     "compact health override round trip")
-assertEqual(restored.health.body.parts.Neck.current, 92,
+T.equal(restored.health.body.parts.Neck.current, 92,
     "compact health baseline round trip")
-assertEqual(restored.travel.journeyId, "journey:scale:1",
+T.equal(restored.travel.journeyId, "journey:scale:1",
     "journey id round trip")
-assertEqual(restored.orderSpec.kind, "travel",
+T.equal(restored.orderSpec.kind, "travel",
     "active journey order round trip")
-assertEqual(restored.mapPresentation.roleTag, "trader",
+T.equal(restored.mapPresentation.roleTag, "trader",
     "map role round trip")
-assertEqual(restored.mapPresentation.knownBy.scale_player, true,
+T.equal(restored.mapPresentation.knownBy.scale_player, true,
     "map knowledge round trip")
-assertEqual(table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(restored), "|"),
+T.equal(table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(restored), "|"),
     table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(sample.vanillaTraits), "|"),
     "generated vanilla traits round trip")
-assertEqual(table.concat(PNC.ConditionStats.GetActiveTraitIDs(restored), "|"),
+T.equal(table.concat(PNC.ConditionStats.GetActiveTraitIDs(restored), "|"),
     table.concat(PNC.ConditionStats.GetActiveTraitIDs(sample.dynamicTraits), "|"),
     "generated custom traits round trip")
 
@@ -297,15 +292,16 @@ local legacyRecord = PNC.Persistence.DeserializeRecord(
     legacyPayload,
     "scale_npc_1"
 )
-assertEqual(legacyRecord.inventory, nil, "legacy inventory hydrated during load")
-assertEqual(legacyRecord.vanillaTraitsGenerationVersion,
+T.equal(legacyRecord.inventory, nil, "legacy inventory hydrated during load")
+T.equal(legacyRecord.vanillaTraitsGenerationVersion,
     PNC.PlayerNeedsModel.GENERATION_VERSION,
     "legacy NPC received deterministic vanilla traits")
 local migratedPayload = PNC.Persistence.SerializeRecord(legacyRecord)
-assertEqual(migratedPayload.schemaVersion, 10, "lazy migration schema")
-assertEqual(migratedPayload.inventory.maxWeight, nil,
+T.equal(migratedPayload.schemaVersion, 10, "lazy migration schema")
+T.equal(migratedPayload.inventory.maxWeight, nil,
     "legacy derived max weight survived migration")
-assertEqual(migratedPayload.inventory.cachedWeight, nil,
+T.equal(migratedPayload.inventory.cachedWeight, nil,
     "legacy derived used weight survived migration")
+T.finish("pnc_persistence_scale_smoke")
 
-print("pnc_persistence_scale_smoke: ok bytes=" .. tostring(totalBytes))
+T.finish("pnc_persistence_scale_smoke")

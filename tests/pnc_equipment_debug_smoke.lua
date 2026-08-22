@@ -1,69 +1,58 @@
+local T = require "tests/support/test"
+
 local ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/"
+    T.path("ProjectHoomans", "root", "")
 
-local function readAll(path)
-    local file = assert(io.open(path, "rb"))
-    local value = assert(file:read("*a"))
-    file:close()
-    return value
-end
-
-local function assertContains(value, needle, label)
-    assert(
-        string.find(value, needle, 1, true),
-        (label or "assertContains") .. ": missing " .. needle
-    )
-end
-
-local api = readAll(ROOT .. "shared/PNC/Core/API/PNC_API.lua")
-local serverRoute = readAll(
+local api = T.read(ROOT .. "shared/PNC/Core/API/PNC_API.lua")
+local serverRoute = T.read(
     ROOT .. "server/PNC/Networking/Handlers/"
         .. "PNC_ServerLegacyDebugCommandHandler.lua"
 )
-local monitor = readAll(ROOT .. "client/PNC/UI/PNC_NPCMonitor.lua")
-local view = readAll(
+local monitor = T.read(ROOT .. "client/PNC/UI/PNC_NPCMonitor.lua")
+local view = T.read(
     ROOT .. "client/PNC/UI/NPCMonitor/PNC_NPCMonitorView.lua"
 )
-local diagnostics = readAll(
+local diagnostics = T.read(
     ROOT
         .. "shared/PNC/Core/Presence/PNC_BodyLifecycle/"
         .. "PNC_BodyLifecycle_Diagnostics.lua"
 )
 
-assertContains(
+T.contains(
     api,
     'command == "set_equipment_slot"',
     "server-authoritative slot mutation"
 )
-assertContains(
+T.contains(
     api,
     "Inventory.SyncFromEquipment(record, \"debug_equipment_slot\")",
     "inventory/equipment reconciliation"
 )
-assertContains(
+T.contains(
     serverRoute,
     'set_equipment_slot = true',
     "MP debug routing"
 )
-assertContains(
+T.contains(
     monitor,
     "function ISPNCNPCMonitor:onEquipment(button)",
     "equipment manager action"
 )
-assertContains(
+T.contains(
     monitor,
     '"Back / bag"',
     "bag and back slot controls"
 )
-assertContains(
+T.contains(
     view,
     '"equipment", "UI_PNC_MonitorEquipment"',
     "monitor equipment button"
 )
-assertContains(
+T.contains(
     diagnostics,
     "equipment = Core.DeepCopy(record.equipment or {})",
     "equipment diagnostics snapshot"
 )
+T.finish("pnc_equipment_debug_smoke")
 
-print("pnc_equipment_debug_smoke: ok")
+T.finish("pnc_equipment_debug_smoke")

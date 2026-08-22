@@ -1,13 +1,9 @@
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
-package.path = SHARED_ROOT .. "?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Networking/PNC_Network.lua"
+local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
+T.addPackagePaths()
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/Networking/PNC_Network.lua")
 
 local players = {}
 for i = 1, 16 do
@@ -122,13 +118,13 @@ PNC = {
     },
     Skills = {
         BuildSnapshot = function(record)
-            assertEqual(type(record), "table", "skills snapshot received non-record")
+            T.equal(type(record), "table", "skills snapshot received non-record")
             return {}
         end,
     },
     Stamina = {
         BuildSnapshot = function(record)
-            assertEqual(type(record), "table", "stamina snapshot received non-record")
+            T.equal(type(record), "table", "stamina snapshot received non-record")
             return { current = 100, max = 100, state = "fresh" }
         end,
     },
@@ -258,73 +254,73 @@ PNC.Registry = {
     end,
 }
 
-dofile(FILE)
+T.load(FILE)
 
 nearbyRecord.ownerUsername = "player_1"
-assertEqual(
+T.equal(
     PNC.Network.BuildRosterSnapshot(nearbyRecord).zombieTargetable,
     true,
     "roster omitted zombie targetability"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildSnapshot(nearbyRecord).zombieTargetable,
     true,
     "detailed snapshot omitted zombie targetability"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildPresenceDelta(nearbyRecord).zombieTargetable,
     true,
     "presence delta omitted zombie targetability"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildRosterSnapshot(nearbyRecord).ownerUsername,
     "player_1",
     "roster snapshot owner identity"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildSnapshot(nearbyRecord).ownerUsername,
     "player_1",
     "detailed snapshot owner identity"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildSnapshot(nearbyRecord).hostility.attackPlayers,
     false,
     "detailed snapshot omitted explicit player hostility"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildRosterSnapshot(nearbyRecord)
         .organizationalFaction.name,
     "Crossroads Exchange",
     "roster faction presentation"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildSnapshot(nearbyRecord)
         .organizationalFaction.role,
     "trader",
     "detailed faction role"
 )
-assertEqual(
+T.equal(
     #PNC.Network.BuildRosterSnapshot(nearbyRecord).travel.route.points,
     2,
     "initial roster omitted travel route"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildPresenceDelta(nearbyRecord).travel.route,
     nil,
     "high-frequency presence delta repeated travel route"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildRosterSnapshot(nearbyRecord).mapPresentation.roleTag,
     "trader",
     "roster omitted map presentation"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildRosterSnapshot(nearbyRecord)
         .portrait.equipment.worn.Hat,
     "Base.Hat_HardHat",
     "roster omitted compact portrait metadata"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildPresenceDelta(nearbyRecord).mapPresentation,
     nil,
     "high-frequency presence delta repeated map presentation"
@@ -347,16 +343,16 @@ local deathSnapshot = PNC.Network.BuildDeathMarkerSnapshot({
         equipment = { worn = {} },
     },
 })
-assertEqual(deathSnapshot.deathMarker, true, "death marker roster flag")
-assertEqual(deathSnapshot.colonist, true, "death marker colonist flag")
-assertEqual(deathSnapshot.presenceState, "corpse",
+T.equal(deathSnapshot.deathMarker, true, "death marker roster flag")
+T.equal(deathSnapshot.colonist, true, "death marker colonist flag")
+T.equal(deathSnapshot.presenceState, "corpse",
     "death marker roster presence")
-assertEqual(deathSnapshot.inventory, nil,
+T.equal(deathSnapshot.inventory, nil,
     "death marker snapshot leaked heavyweight inventory")
-assertEqual(deathSnapshot.portrait.identitySeed, 88,
+T.equal(deathSnapshot.portrait.identitySeed, 88,
     "death marker snapshot omitted compact portrait")
 
-assertEqual(PNC.Network.BuildSnapshot(nearbyRecord).attackMode, false, "idle snapshot attack mode")
+T.equal(PNC.Network.BuildSnapshot(nearbyRecord).attackMode, false, "idle snapshot attack mode")
 nearbyRecord.runtime.animationScene = {
     id = "social.surrender",
     bump = "Surrender",
@@ -375,19 +371,19 @@ nearbyRecord.runtime.animationScene = {
     priority = 80,
 }
 local sceneSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
-assertEqual(sceneSnapshot.visualState.sceneActive, true,
+T.equal(sceneSnapshot.visualState.sceneActive, true,
     "animation scene omitted from visual snapshot")
-assertEqual(sceneSnapshot.visualState.sceneId, "social.surrender",
+T.equal(sceneSnapshot.visualState.sceneId, "social.surrender",
     "animation scene ID snapshot")
-assertEqual(sceneSnapshot.visualState.sceneBump, "Surrender",
+T.equal(sceneSnapshot.visualState.sceneBump, "Surrender",
     "animation scene selector snapshot")
-assertEqual(sceneSnapshot.visualState.scenePlaybackRevision, 2,
+T.equal(sceneSnapshot.visualState.scenePlaybackRevision, 2,
     "animation primitive revision snapshot")
-assertEqual(sceneSnapshot.visualState.sceneStepPosition, 1,
+T.equal(sceneSnapshot.visualState.sceneStepPosition, 1,
     "animation scene step position snapshot")
-assertEqual(sceneSnapshot.visualState.sceneRepeatMode, "loop",
+T.equal(sceneSnapshot.visualState.sceneRepeatMode, "loop",
     "animation scene repeat policy snapshot")
-assertEqual(sceneSnapshot.visualState.sceneLoop, true,
+T.equal(sceneSnapshot.visualState.sceneLoop, true,
     "animation scene loop policy snapshot")
 nearbyRecord.runtime.animationScene = nil
 nearbyRecord.runtime.target = {
@@ -445,28 +441,28 @@ nearbyRecord.runtime.zombieAttacker = {
     distSq = 9,
 }
 local combatSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
-assertEqual(combatSnapshot.attackMode, true, "combat snapshot attack mode")
-assertEqual(
+T.equal(combatSnapshot.attackMode, true, "combat snapshot attack mode")
+T.equal(
     combatSnapshot.equipmentSummary.wornVisuals.Shirt.textureChoice,
     3,
     "worn inventory visual metadata snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.decision,
     "melee_pressure_retreat",
     "combat tactical decision snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.visiblePressureCount,
     3,
     "combat visible pressure snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.target.x,
     4,
     "combat target position snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.tacticalMove.x,
     -2,
     "combat movement goal snapshot"
@@ -476,53 +472,53 @@ nearbyRecord.runtime.localNavigation = {
 }
 local traversalCombatSnapshot =
     PNC.Network.BuildSnapshot(nearbyRecord)
-assertEqual(
+T.equal(
     traversalCombatSnapshot.visualState.attackActive,
     false,
     "native traversal published an overlapping attack"
 )
 nearbyRecord.runtime.localNavigation = nil
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.coneHalfAngleDegrees,
     55,
     "combat cone snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.visibleZombieCount,
     1,
     "combat visible zombie count snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.nearbyZombieCount,
     1,
     "combat nearby zombie count snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.viewZombies[1].intent,
     "selected",
     "combat visible zombie intent snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.viewZombies[1].targetKind,
     "npc",
     "combat zombie target kind snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.viewZombies[1].targetId,
     "npc_near",
     "combat zombie target ID snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.viewZombies[1].targetName,
     "Nearby",
     "combat zombie target name snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.zombieAttacker.targetName,
     "Nearby",
     "zombie attacker NPC display name snapshot"
 )
-assertEqual(
+T.equal(
     combatSnapshot.combatDebugState.zombieAttacker.targetId,
     "npc_near",
     "zombie attacker NPC ID snapshot"
@@ -537,22 +533,22 @@ nearbyRecord.runtime.pathing = {
     visualMovingUntil = 0,
 }
 local stalledMotionSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
-assertEqual(stalledMotionSnapshot.visualState.moving, false,
+T.equal(stalledMotionSnapshot.visualState.moving, false,
     "fake movement intent was published as physical movement")
 nearbyRecord.runtime.pathing.visualMovingUntil = 2100
 local progressedMotionSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
-assertEqual(progressedMotionSnapshot.visualState.moving, true,
+T.equal(progressedMotionSnapshot.visualState.moving, true,
     "recent fake physical movement lost its visual continuity lease")
 nearbyRecord.runtime.pathing = nil
 nearbyRecord.runtime.combatDebugReplicatedAt = nil
 local combatDelta = PNC.Network.BuildPresenceDelta(nearbyRecord)
-assertEqual(combatDelta.attackMode, true, "combat delta attack mode")
-assertEqual(
+T.equal(combatDelta.attackMode, true, "combat delta attack mode")
+T.equal(
     combatDelta.combatDebugState.decision,
     "melee_pressure_retreat",
     "combat decision presence delta"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildPresenceDelta(nearbyRecord).combatDebugState,
     nil,
     "combat debug presence delta throttle"
@@ -562,12 +558,12 @@ debugVisibleZombieEntries[1] = nil
 nearbyRecord.runtime.combatTactical = nil
 nearbyRecord.runtime.combatRetreat = nil
 local idleCombatDelta = PNC.Network.BuildPresenceDelta(nearbyRecord)
-assertEqual(
+T.equal(
     idleCombatDelta.combatDebugState.target,
     nil,
     "combat debug sends terminal idle transition"
 )
-assertEqual(
+T.equal(
     PNC.Network.BuildPresenceDelta(nearbyRecord).combatDebugState,
     nil,
     "idle combat debug does not repeat"
@@ -577,13 +573,13 @@ nearbyRecord.runtime.bandageCompletionRevision = 3
 nearbyRecord.runtime.bandageCompletionAt = 1999
 nearbyRecord.runtime.bandageCompletionPartId = "ForeArm_L"
 local bandageSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
-assertEqual(bandageSnapshot.bandageFeedback.revision, 3,
+T.equal(bandageSnapshot.bandageFeedback.revision, 3,
     "bandage completion revision snapshot")
-assertEqual(bandageSnapshot.bandageFeedback.partId, "ForeArm_L",
+T.equal(bandageSnapshot.bandageFeedback.partId, "ForeArm_L",
     "bandage completion part snapshot")
-assertEqual(bandageSnapshot.bandageFeedback.sound, "PNC_BandageComplete",
+T.equal(bandageSnapshot.bandageFeedback.sound, "PNC_BandageComplete",
     "bandage completion sound snapshot")
-assertEqual(
+T.equal(
     PNC.Network.BuildPresenceDelta(nearbyRecord).bandageFeedback.revision,
     3,
     "bandage completion presence delta"
@@ -600,9 +596,9 @@ nearbyRecord.runtime.vehiclePassenger = {
     boardedAt = 1500,
 }
 local passengerSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
-assertEqual(passengerSnapshot.aiState, "VehiclePassenger", "vehicle passenger AI state")
-assertEqual(passengerSnapshot.vehiclePassenger.seat, 1, "vehicle seat snapshot")
-assertEqual(
+T.equal(passengerSnapshot.aiState, "VehiclePassenger", "vehicle passenger AI state")
+T.equal(passengerSnapshot.vehiclePassenger.seat, 1, "vehicle seat snapshot")
+T.equal(
     PNC.Network.BuildPresenceDelta(nearbyRecord).vehiclePassenger.vehicleId,
     "vehicle:7",
     "vehicle passenger delta"
@@ -614,29 +610,29 @@ for i = 1, 500 do
     roster[i] = { id = "npc_" .. tostring(i), displayName = "NPC " .. tostring(i) }
 end
 PNC.Network.BroadcastFullSync(players[1], roster)
-assertEqual(#sent, 12, "500-record roster packet count")
-assertEqual(sent[1].command, "RosterSyncBegin", "roster begin")
-assertEqual(sent[12].command, "RosterSyncEnd", "roster end")
+T.equal(#sent, 12, "500-record roster packet count")
+T.equal(sent[1].command, "RosterSyncBegin", "roster begin")
+T.equal(sent[12].command, "RosterSyncEnd", "roster end")
 for i = 2, 11 do
-    assertEqual(#sent[i].payload.snapshots, 50, "roster chunk size")
-    assertEqual(sent[i].payload.snapshots[1].inventory, nil, "roster leaked inventory")
+    T.equal(#sent[i].payload.snapshots, 50, "roster chunk size")
+    T.equal(sent[i].payload.snapshots[1].inventory, nil, "roster leaked inventory")
 end
 
 sent = {}
 PNC.Network.RefreshInterestSets(2000)
-assertEqual(#sent, 8, "interest-enter recipient count")
+T.equal(#sent, 8, "interest-enter recipient count")
 sent = {}
 PNC.Network.BroadcastRecord(nearbyRecord, "tick")
-assertEqual(#sent, 8, "targeted live snapshot recipient count")
-assertEqual(sent[1].payload.snapshot.skillLevels, nil, "tick snapshot leaked detailed skills")
+T.equal(#sent, 8, "targeted live snapshot recipient count")
+T.equal(sent[1].payload.snapshot.skillLevels, nil, "tick snapshot leaked detailed skills")
 
 nearbyRecord.x = 100
 sent = {}
 PNC.Network.RefreshInterestSets(4000)
-assertEqual(#sent, 16, "interest enter/exit transition count")
+T.equal(#sent, 16, "interest enter/exit transition count")
 sent = {}
 PNC.Network.BroadcastRecord(nearbyRecord, "tick")
-assertEqual(#sent, 8, "interest recipients did not switch")
+T.equal(#sent, 8, "interest recipients did not switch")
 
 local loopbackEvents = 0
 triggerEvent = function()
@@ -644,31 +640,31 @@ triggerEvent = function()
 end
 isServer = function() return false end
 PNC.Network.BroadcastRecord(nearbyRecord, "tick")
-assertEqual(loopbackEvents, 0,
+T.equal(loopbackEvents, 0,
     "single-player rebuilt a periodic network tick payload")
 PNC.Network.BroadcastRecord(nearbyRecord, "materialize")
-assertEqual(loopbackEvents, 1,
+T.equal(loopbackEvents, 1,
     "single-player explicit mutation event lost its local notification")
 isServer = function() return true end
 
 nearbyRecord.ownerUsername = "player_16"
 nearbyRecord.x = 1
-assertEqual(PNC.Network.CanViewCharacter(players[1], nearbyRecord), true, "nearby detail access")
-assertEqual(PNC.Network.CanViewCharacter(players[16], nearbyRecord), true, "owner detail access")
+T.equal(PNC.Network.CanViewCharacter(players[1], nearbyRecord), true, "nearby detail access")
+T.equal(PNC.Network.CanViewCharacter(players[16], nearbyRecord), true, "owner detail access")
 nearbyRecord.ownerUsername = nil
-assertEqual(PNC.Network.CanViewCharacter(players[16], nearbyRecord), false, "remote detail rejection")
+T.equal(PNC.Network.CanViewCharacter(players[16], nearbyRecord), false, "remote detail rejection")
 
 -- Removal deltas carry only an id. The old `true and nil or snapshot()` idiom
 -- evaluated snapshot() anyway and sent that id string through stamina/skills.
 sent = {}
 PNC.Network.BroadcastRemoval("npc_removed", "range_exit")
-assertEqual(PNC.Network.FlushRosterDeltas(6000, true), 1, "removal roster delta count")
-assertEqual(#sent, 16, "removal roster delta recipients")
-assertEqual(sent[1].command, "RosterDelta", "removal roster delta command")
-assertEqual(sent[1].payload.entries[1].id, "npc_removed", "removal roster id")
-assertEqual(sent[1].payload.entries[1].removed, true, "removal roster marker")
-assertEqual(sent[1].payload.entries[1].snapshot, nil, "removal roster leaked snapshot")
-assertEqual(PNC.Network.QueueRosterDelta("npc_invalid", false, "invalid"), false, "non-removal accepted id-only record")
+T.equal(PNC.Network.FlushRosterDeltas(6000, true), 1, "removal roster delta count")
+T.equal(#sent, 16, "removal roster delta recipients")
+T.equal(sent[1].command, "RosterDelta", "removal roster delta command")
+T.equal(sent[1].payload.entries[1].id, "npc_removed", "removal roster id")
+T.equal(sent[1].payload.entries[1].removed, true, "removal roster marker")
+T.equal(sent[1].payload.entries[1].snapshot, nil, "removal roster leaked snapshot")
+T.equal(PNC.Network.QueueRosterDelta("npc_invalid", false, "invalid"), false, "non-removal accepted id-only record")
 
 activeDeathMarker = {
     id = nearbyRecord.id,
@@ -682,24 +678,24 @@ activeDeathMarker = {
 }
 sent = {}
 PNC.Network.BroadcastRemoval(nearbyRecord.id, "death")
-assertEqual(#sent, 8, "death snapshot interest recipient count")
-assertEqual(sent[1].command, "SyncRecord", "death snapshot command")
-assertEqual(sent[1].payload.snapshot.deathMarker, true,
+T.equal(#sent, 8, "death snapshot interest recipient count")
+T.equal(sent[1].command, "SyncRecord", "death snapshot command")
+T.equal(sent[1].payload.snapshot.deathMarker, true,
     "death event did not use compact marker snapshot")
-assertEqual(sent[1].payload.snapshot.inventory, nil,
+T.equal(sent[1].payload.snapshot.inventory, nil,
     "death event leaked heavyweight record data")
 sent = {}
-assertEqual(PNC.Network.FlushRosterDeltas(7000, true), 1,
+T.equal(PNC.Network.FlushRosterDeltas(7000, true), 1,
     "death marker roster delta count")
-assertEqual(#sent, 16, "death marker roster delta recipients")
-assertEqual(sent[1].payload.entries[1].removed, false,
+T.equal(#sent, 16, "death marker roster delta recipients")
+T.equal(sent[1].payload.entries[1].removed, false,
     "death marker was sent as a removal")
-assertEqual(sent[1].payload.entries[1].snapshot.deathMarker, true,
+T.equal(sent[1].payload.entries[1].snapshot.deathMarker, true,
     "death marker roster delta lost marker metadata")
 activeDeathMarker = nil
 
 sent = {}
-assertEqual(
+T.equal(
     PNC.Network.BroadcastDeathMarkerRemoval(
         nearbyRecord.id,
         "corpse_collected"
@@ -707,32 +703,32 @@ assertEqual(
     true,
     "death marker removal broadcast"
 )
-assertEqual(#sent, 16, "death marker removal was not immediate for all players")
-assertEqual(sent[1].command, "RemoveRecord",
+T.equal(#sent, 16, "death marker removal was not immediate for all players")
+T.equal(sent[1].command, "RemoveRecord",
     "death marker removal command")
-assertEqual(sent[1].payload.reason, "corpse_collected",
+T.equal(sent[1].payload.reason, "corpse_collected",
     "death marker removal reason")
 sent = {}
-assertEqual(PNC.Network.FlushRosterDeltas(8000, true), 1,
+T.equal(PNC.Network.FlushRosterDeltas(8000, true), 1,
     "death marker removal roster delta count")
-assertEqual(#sent, 16, "death marker removal delta recipients")
-assertEqual(sent[1].payload.entries[1].removed, true,
+T.equal(#sent, 16, "death marker removal delta recipients")
+T.equal(sent[1].payload.entries[1].removed, true,
     "death marker removal delta was not terminal")
 
 sent = {}
-assertEqual(
+T.equal(
     PNC.Network.BroadcastBodyRemoval("npc_near", 707, 77, "startup_uuid"),
     true,
     "body-instance removal broadcast"
 )
-assertEqual(#sent, 16, "body-instance removal reaches all players")
-assertEqual(sent[1].command, "RemoveBody", "body-instance removal command")
-assertEqual(sent[1].payload.id, "npc_near", "body-instance removal NPC id")
-assertEqual(sent[1].payload.bodyInstanceID, "707", "body-instance removal outfit id")
-assertEqual(sent[1].payload.bodyOnlineID, 77, "body-instance removal online id")
+T.equal(#sent, 16, "body-instance removal reaches all players")
+T.equal(sent[1].command, "RemoveBody", "body-instance removal command")
+T.equal(sent[1].payload.id, "npc_near", "body-instance removal NPC id")
+T.equal(sent[1].payload.bodyInstanceID, "707", "body-instance removal outfit id")
+T.equal(sent[1].payload.bodyOnlineID, 77, "body-instance removal online id")
 
 sent = {}
-assertEqual(PNC.Network.BroadcastFirearmShot({
+T.equal(PNC.Network.BroadcastFirearmShot({
     shotId = "npc_near:1",
     npcId = "npc_near",
     sx = 0,
@@ -740,8 +736,9 @@ assertEqual(PNC.Network.BroadcastFirearmShot({
     sz = 0,
     soundRadius = 60,
 }), true, "firearm shot event broadcast")
-assertEqual(#sent, 8, "firearm shot distance recipient count")
-assertEqual(sent[1].command, "FirearmShot", "firearm shot command")
-assertEqual(sent[1].payload.shotId, "npc_near:1", "firearm shot id")
+T.equal(#sent, 8, "firearm shot distance recipient count")
+T.equal(sent[1].command, "FirearmShot", "firearm shot command")
+T.equal(sent[1].payload.shotId, "npc_near:1", "firearm shot id")
+T.finish("pnc_network_scale_smoke")
 
-print("pnc_network_scale_smoke: ok")
+T.finish("pnc_network_scale_smoke")

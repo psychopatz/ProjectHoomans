@@ -1,15 +1,6 @@
-local function equal(actual, expected, message)
-    if actual ~= expected then
-        error((message or "assertion failed") .. ": expected "
-            .. tostring(expected) .. ", got " .. tostring(actual))
-    end
-end
+local T = require "tests/support/test"
 
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/?.lua",
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/?.lua",
-    package.path,
-}, ";")
+T.addPackagePaths()
 
 local normalizer, jobName, handler
 local move
@@ -72,8 +63,8 @@ IsoDirections = { E = "east", S = "south" }
 require "PNC/Core/Facilities/PNC_FacilityJobs_Definitions"
 require "PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityEffects"
 require "PNC/Core/Facilities/PNC_FacilityJobs_Behavior"
-equal(jobName, "FacilityActivity", "facility activity job registration")
-equal(type(handler), "function", "facility behavior registration")
+T.equal(jobName, "FacilityActivity", "facility activity job registration")
+T.equal(type(handler), "function", "facility behavior registration")
 
 local order = normalizer({}, {
     capability = "sleep", facilityId = "barracks_a",
@@ -88,29 +79,29 @@ local record = {
         localNavigation = { nativeActive = true },
     },
 }
-equal(handler(record, nil, jobName, 0), true, "travelling handler")
-equal(record.runtime.facilityActivity.phase, "TRAVELLING", "travel phase")
-equal(move.reason, "facility_activity", "production movement request")
+T.equal(handler(record, nil, jobName, 0), true, "travelling handler")
+T.equal(record.runtime.facilityActivity.phase, "TRAVELLING", "travel phase")
+T.equal(move.reason, "facility_activity", "production movement request")
 
 record.x, record.y = 10, 5
-equal(handler(record, {}, jobName, 0), true, "working handler")
-equal(record.runtime.facilityActivity.phase, "STARTING", "scene start phase")
-equal(move, "facility_working", "arrival movement hold")
-equal(pathResets, 1, "arrival releases native path ownership")
-equal(record.runtime.pathing, nil, "stale movement lane cleared before sleep")
-equal(requestedScene, "facility.sleep.floor", "floor sleep is the fallback scene")
-equal(record.activeJob, "Sleep", "sleep activity drives needs model")
+T.equal(handler(record, {}, jobName, 0), true, "working handler")
+T.equal(record.runtime.facilityActivity.phase, "STARTING", "scene start phase")
+T.equal(move, "facility_working", "arrival movement hold")
+T.equal(pathResets, 1, "arrival releases native path ownership")
+T.equal(record.runtime.pathing, nil, "stale movement lane cleared before sleep")
+T.equal(requestedScene, "facility.sleep.floor", "floor sleep is the fallback scene")
+T.equal(record.activeJob, "Sleep", "sleep activity drives needs model")
 
 worldHour = 11
-equal(PNC.FacilityJobs.OnSceneTick(record, {},
+T.equal(PNC.FacilityJobs.OnSceneTick(record, {},
     record.runtime.animationScene, 1000), true, "sleep scene remains active")
-equal(record.needs.fatigue < 0.8, true, "sleep scene cures fatigue")
+T.equal(record.needs.fatigue < 0.8, true, "sleep scene cures fatigue")
 
 record.needs.fatigue = 0.1
 worldHour = 12
-equal(PNC.FacilityJobs.OnSceneTick(record, {},
+T.equal(PNC.FacilityJobs.OnSceneTick(record, {},
     record.runtime.animationScene, 2000), false, "rested NPC completes sleep")
-equal(record.runtime.facilityActivity.completionRequested, true,
+T.equal(record.runtime.facilityActivity.completionRequested, true,
     "sleep completion is recorded")
 
 requestedScene, positioned = nil, nil
@@ -132,13 +123,14 @@ local bedRecord = {
     needs = { fatigue = 0.8 },
     runtime = { facilityActivity = { capability = "sleep" } },
 }
-equal(handler(bedRecord, bedZombie, jobName, 0), true,
+T.equal(handler(bedRecord, bedZombie, jobName, 0), true,
     "bed sleep handler starts from approach tile")
-equal(positioned.x, 12, "bed sleeper is moved to furniture center")
-equal(positioned.y, 5.5, "bed sleeper center y")
-equal(facing, "east", "bed sleeper follows furniture axis")
-equal(requestedScene, "facility.sleep.bed", "bed XML scene selected")
-equal(bedRecord.runtime.facilityActivity.sleepSurface, "bed",
+T.equal(positioned.x, 12, "bed sleeper is moved to furniture center")
+T.equal(positioned.y, 5.5, "bed sleeper center y")
+T.equal(facing, "east", "bed sleeper follows furniture axis")
+T.equal(requestedScene, "facility.sleep.bed", "bed XML scene selected")
+T.equal(bedRecord.runtime.facilityActivity.sleepSurface, "bed",
     "runtime exposes selected sleep surface")
+T.finish("pnc_facility_debug_work_smoke")
 
-print("pnc_facility_debug_work_smoke: ok")
+T.finish("pnc_facility_debug_work_smoke")

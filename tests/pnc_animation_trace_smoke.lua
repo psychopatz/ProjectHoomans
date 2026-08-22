@@ -1,27 +1,8 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/"
+    T.path("ProjectHoomans", "shared", "PNC/")
     .. "Core/Visuals/PNC_AnimationTrace.lua"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual")
-            .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertContains(actual, expected, label)
-    if not string.find(
-        tostring(actual),
-        tostring(expected),
-        1,
-        true
-    ) then
-        error((label or "assertContains")
-            .. ": missing=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
 
 local now = 1000
 local logs = {}
@@ -35,7 +16,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local function makeBody()
     local state = {
@@ -122,8 +103,8 @@ PNC.AnimationTrace.Sample(
     "client_pre_maintain",
     now
 )
-assertEqual(trace.failure, nil, "valid action handoff")
-assertEqual(
+T.equal(trace.failure, nil, "valid action handoff")
+T.equal(
     trace.acceptedEvent,
     "setter_after",
     "setter acceptance retained"
@@ -156,17 +137,17 @@ PNC.AnimationTrace.Sample(
     "humanize_after",
     now
 )
-assertEqual(
+T.equal(
     trace.failure,
     "bump_cleared_after_set",
     "cleared bump classified"
 )
-assertEqual(
+T.equal(
     trace.failureEvent,
     "humanize_after",
     "first clearing stage retained"
 )
-assertEqual(
+T.equal(
     #logs > 0,
     true,
     "debug failure auto-dumped once"
@@ -197,27 +178,28 @@ PNC.AnimationTrace.Sample(
     "client_attack_observe",
     now
 )
-assertEqual(
+T.equal(
     trace.failure,
     "action_handoff_missing",
     "unchanged action handoff classified"
 )
 local overlay = PNC.AnimationTrace.GetOverlayLine(body)
-assertContains(
+T.contains(
     overlay,
     "fail=action_handoff_missing@client_attack_observe",
     "overlay failure stage"
 )
 local dump = PNC.AnimationTrace.DumpNPC("stuck")
-assertContains(
+T.contains(
     dump[1],
     "npc=stuck",
     "manual NPC dump"
 )
-assertContains(
+T.contains(
     dump[#dump],
     "event=client_attack_observe",
     "manual transition timeline"
 )
+T.finish("pnc_animation_trace_smoke")
 
-print("pnc_animation_trace_smoke: ok")
+T.finish("pnc_animation_trace_smoke")

@@ -1,18 +1,10 @@
+local T = require "tests/support/test"
+
 local CLIENT_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
-package.path = CLIENT_ROOT .. "?.lua;" .. package.path
+    T.path("ProjectHoomans", "client", "")
+T.addPackagePaths()
 
 local FILE = CLIENT_ROOT .. "PNC/PNC_Client.lua"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error(
-            (label or "assertEqual")
-                .. ": expected=" .. tostring(expected)
-                .. " actual=" .. tostring(actual)
-        )
-    end
-end
 
 local firearmShot
 local inventoryResult
@@ -104,7 +96,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local Client = PNC.Client
 local State = PNC.Network.ClientState
@@ -112,9 +104,9 @@ local State = PNC.Network.ClientState
 Client.HandleServerCommand("NPCKnowledge", {
     snapshot = { npcID = "npc_known", categories = {} },
 })
-assertEqual(State.npcKnowledge.npc_known.npcID, "npc_known",
+T.equal(State.npcKnowledge.npc_known.npcID, "npc_known",
     "multiplayer knowledge reply updates client cache")
-assertEqual(knowledgeRefreshes, 1,
+T.equal(knowledgeRefreshes, 1,
     "multiplayer knowledge reply refreshes active conversation")
 
 PNC.NPCKnowledge = {
@@ -149,12 +141,12 @@ PNC.PlayerKnowledgeCommands = {
         })
     end,
 }
-assertEqual(Client.RequestNPCKnowledgeTopic(
+T.equal(Client.RequestNPCKnowledgeTopic(
     "npc_direct", "identity_name"
 ), true, "single-player disclosure succeeds in process")
-assertEqual(State.npcKnowledge.npc_direct.categories[1].descriptors[1].value,
+T.equal(State.npcKnowledge.npc_direct.categories[1].descriptors[1].value,
     "Burton Gilmore", "single-player disclosure uses shared cache receiver")
-assertEqual(knowledgeRefreshes, 2,
+T.equal(knowledgeRefreshes, 2,
     "single-player disclosure refreshes active conversation")
 
 PNC.Core.IsClientOnly = function() return true end
@@ -162,12 +154,12 @@ getSpecificPlayer = function() return {} end
 sendClientCommand = function(_, module, command, args)
     sentCommand = { module = module, command = command, args = args }
 end
-assertEqual(Client.RequestNPCKnowledgeTopic(
+T.equal(Client.RequestNPCKnowledgeTopic(
     "npc_remote", "identity_name"
 ), true, "multiplayer disclosure request is sent")
-assertEqual(sentCommand.command, "KnowledgeDisclosureRequest",
+T.equal(sentCommand.command, "KnowledgeDisclosureRequest",
     "multiplayer disclosure uses authoritative server command")
-assertEqual(sentCommand.args.topicID, "identity_name",
+T.equal(sentCommand.args.topicID, "identity_name",
     "multiplayer disclosure retains topic")
 PNC.Core.IsClientOnly = function() return false end
 
@@ -190,17 +182,17 @@ State.snapshots = {
 sentCommand = nil
 local bootstrapRequested, bootstrapReason =
     Client.EnsurePlayerBootstrap(5000, false)
-assertEqual(bootstrapRequested, true,
+T.equal(bootstrapRequested, true,
     "failed startup bootstrap retries independently of roster state")
-assertEqual(sentCommand.command, "PlayerBootstrapRequest",
+T.equal(sentCommand.command, "PlayerBootstrapRequest",
     "bootstrap retry uses authoritative MP command")
-assertEqual(#sentCommand.args.npcIDs, 1,
+T.equal(#sentCommand.args.npcIDs, 1,
     "bootstrap requests only live interested NPCs")
-assertEqual(sentCommand.args.npcIDs[1], "npc_live",
+T.equal(sentCommand.args.npcIDs[1], "npc_live",
     "abstract NPC is excluded from bootstrap request")
-assertEqual(sentCommand.args.scope, "interest",
+T.equal(sentCommand.args.scope, "interest",
     "bootstrap uses centralized knowledge-interest scope")
-assertEqual(State.bootstrapState, "loading",
+T.equal(State.bootstrapState, "loading",
     "bootstrap retry records loading state")
 local requestBeforeKnown = sentCommand.args.requestID
 Client.HandleServerCommand("PlayerBootstrap", {
@@ -221,11 +213,11 @@ Client.HandleServerCommand("PlayerBootstrap", {
 sentCommand = nil
 local bootstrapCurrent, currentReason =
     Client.EnsurePlayerBootstrap(10000, false)
-assertEqual(bootstrapCurrent, true,
+T.equal(bootstrapCurrent, true,
     "character-bound bootstrap stops retries")
-assertEqual(currentReason, "current",
+T.equal(currentReason, "current",
     "completed bootstrap reports current")
-assertEqual(sentCommand, nil,
+T.equal(sentCommand, nil,
     "completed bootstrap does not send another request")
 
 -- A visible map consumer may demand an abstract NPC without widening the
@@ -233,18 +225,18 @@ assertEqual(sentCommand, nil,
 -- hover changes, and hydration removes the ID from the demand set.
 local queued, queueReason = PNC.KnowledgeInterest.Require(
     "npc_abstract", "map_hover")
-assertEqual(queued, true, "map hover queues distant NPC knowledge")
-assertEqual(queueReason, "queued", "new map demand reports queued")
-assertEqual(PNC.KnowledgeInterest.ConsumeFlush(5099), false,
+T.equal(queued, true, "map hover queues distant NPC knowledge")
+T.equal(queueReason, "queued", "new map demand reports queued")
+T.equal(PNC.KnowledgeInterest.ConsumeFlush(5099), false,
     "map knowledge demand observes batching debounce")
-assertEqual(PNC.KnowledgeInterest.ConsumeFlush(5100), true,
+T.equal(PNC.KnowledgeInterest.ConsumeFlush(5100), true,
     "map knowledge demand becomes ready as one batch")
 sentCommand = nil
 local mapRequested = Client.EnsurePlayerBootstrap(5100, true)
-assertEqual(mapRequested, true, "map demand forces a scoped bootstrap")
-assertEqual(#sentCommand.args.npcIDs, 1,
+T.equal(mapRequested, true, "map demand forces a scoped bootstrap")
+T.equal(#sentCommand.args.npcIDs, 1,
     "map demand does not resend hydrated live NPCs")
-assertEqual(sentCommand.args.npcIDs[1], "npc_abstract",
+T.equal(sentCommand.args.npcIDs[1], "npc_abstract",
     "map demand requests only the hovered abstract NPC")
 Client.HandleServerCommand("PlayerBootstrap", {
     requestID = sentCommand.args.requestID,
@@ -261,7 +253,7 @@ Client.HandleServerCommand("PlayerBootstrap", {
         { npcID = "npc_abstract", revision = 0, categories = {} },
     },
 })
-assertEqual(PNC.KnowledgeInterest.CollectNPCIDs(true)[1], nil,
+T.equal(PNC.KnowledgeInterest.CollectNPCIDs(true)[1], nil,
     "hydrated map demand leaves no retry work")
 State.activeBootstrapRequestID = nil
 PNC.Core.IsClientOnly = function() return false end
@@ -272,7 +264,7 @@ Client.Internal.RegisterServerCommand(
     function(args) customPayload = args end
 )
 Client.HandleServerCommand("CustomCommand", { value = 7 })
-assertEqual(customPayload.value, 7, "extensible command registry")
+T.equal(customPayload.value, 7, "extensible command registry")
 
 Client.HandleServerCommand("PlayerBootstrap", {
     requestID = "bootstrap:restart",
@@ -300,11 +292,11 @@ Client.HandleServerCommand("PlayerBootstrap", {
         },
     },
 })
-assertEqual(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
+T.equal(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
     "restart bootstrap hydrates NPC knowledge")
-assertEqual(State.npcPresentations.npc_bootstrap.state, "known",
+T.equal(State.npcPresentations.npc_bootstrap.state, "known",
     "restart bootstrap hydrates known identity presentation")
-assertEqual(State.npcPresentations.npc_bootstrap.displayName, "Persisted Name",
+T.equal(State.npcPresentations.npc_bootstrap.displayName, "Persisted Name",
     "restart bootstrap restores the learned NPC name")
 
 Client.HandleServerCommand("FullSync", {
@@ -312,15 +304,15 @@ Client.HandleServerCommand("FullSync", {
         { id = "npc_full", x = 1 },
     },
 })
-assertEqual(State.snapshots.npc_full.x, 1, "legacy full sync")
-assertEqual(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
+T.equal(State.snapshots.npc_full.x, 1, "legacy full sync")
+T.equal(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
     "legacy full sync cannot erase bootstrapped NPC knowledge")
 
 Client.HandleServerCommand("RosterSyncBegin", {
     directoryRevision = 4,
     chunkCount = 1,
 })
-assertEqual(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
+T.equal(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
     "roster sync begin cannot erase bootstrapped NPC knowledge")
 Client.HandleServerCommand("RosterSyncChunk", {
     chunkIndex = 1,
@@ -336,8 +328,8 @@ Client.HandleServerCommand("RosterSyncChunk", {
 Client.HandleServerCommand("RosterSyncEnd", {
     directoryRevision = 4,
 })
-assertEqual(State.rosterRevision, 4, "roster revision")
-assertEqual(
+T.equal(State.rosterRevision, 4, "roster revision")
+T.equal(
     State.snapshots.npc_roster.travel.route.points[1].y,
     2,
     "roster chunk applied"
@@ -351,8 +343,8 @@ Client.HandleServerCommand("SyncRecord", {
         travel = { state = "en_route" },
     },
 })
-assertEqual(State.snapshots.npc_roster.x, 9, "record delta merged")
-assertEqual(
+T.equal(State.snapshots.npc_roster.x, 9, "record delta merged")
+T.equal(
     State.snapshots.npc_roster.travel.route.points[1].x,
     1,
     "record delta retained route"
@@ -381,12 +373,12 @@ Client.HandleServerCommand("InventoryDelta", {
     },
     summary = { revision = 2 },
 })
-assertEqual(
+T.equal(
     State.characterPayloads.npc_roster.inventory.items.item_1.stack,
     3,
     "inventory delta applied"
 )
-assertEqual(
+T.equal(
     State.characterPayloads.npc_roster.inventory.revision,
     2,
     "inventory revision applied"
@@ -407,22 +399,22 @@ Client.HandleServerCommand("SyncRecord", {
         z = 0,
     },
 })
-assertEqual(State.snapshots.npc_roster.deathMarker, true,
+T.equal(State.snapshots.npc_roster.deathMarker, true,
     "death marker snapshot was not applied")
-assertEqual(State.snapshots.npc_roster.inventory, nil,
+T.equal(State.snapshots.npc_roster.inventory, nil,
     "thin death marker retained heavyweight live snapshot fields")
-assertEqual(State.characterPayloads.npc_roster, nil,
+T.equal(State.characterPayloads.npc_roster, nil,
     "death marker retained stale character payload")
 
 Client.HandleServerCommand("InventoryResult", { success = true })
-assertEqual(inventoryResult.success, true, "inventory result dispatched")
+T.equal(inventoryResult.success, true, "inventory result dispatched")
 Client.HandleServerCommand("MapCommandResult", { ok = true })
-assertEqual(mapResult.ok, true, "map result dispatched")
+T.equal(mapResult.ok, true, "map result dispatched")
 Client.HandleServerCommand("FactionToll", {
     kind = "demand",
     amount = 12,
 })
-assertEqual(tollMessage.amount, 12,
+T.equal(tollMessage.amount, 12,
     "faction toll dispatched")
 Client.HandleServerCommand("FactionDebug", {
     authorized = true,
@@ -431,22 +423,23 @@ Client.HandleServerCommand("FactionDebug", {
         factions = {},
     },
 })
-assertEqual(State.factionDebugAuthorized, true,
+T.equal(State.factionDebugAuthorized, true,
     "faction debug authorization")
-assertEqual(State.factionDebug.registryRevision, 3,
+T.equal(State.factionDebug.registryRevision, 3,
     "faction debug snapshot dispatched")
 Client.HandleServerCommand("FirearmShot", { shotId = "shot:1" })
-assertEqual(firearmShot.shotId, "shot:1", "firearm event dispatched")
+T.equal(firearmShot.shotId, "shot:1", "firearm event dispatched")
 Client.HandleServerCommand("RemoveBody", { bodyInstanceID = "17" })
-assertEqual(removedBody.bodyInstanceID, "17", "body removal dispatched")
+T.equal(removedBody.bodyInstanceID, "17", "body removal dispatched")
 
 Client.HandleServerCommand("RemoveRecord", { id = "npc_roster" })
-assertEqual(State.snapshots.npc_roster, nil, "record removal applied")
-assertEqual(
+T.equal(State.snapshots.npc_roster, nil, "record removal applied")
+T.equal(
     State.characterPayloads.npc_roster,
     nil,
     "character payload removal applied"
 )
-assertEqual(State.lastSyncReceiveAt, 5000, "command receive timestamp")
+T.equal(State.lastSyncReceiveAt, 5000, "command receive timestamp")
+T.finish("pnc_client_commands_smoke")
 
-print("pnc_client_commands_smoke: ok")
+T.finish("pnc_client_commands_smoke")

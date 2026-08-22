@@ -1,13 +1,9 @@
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
-package.path = CLIENT_ROOT .. "?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
+T.addPackagePaths()
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local variables = {}
 local crawler = false
@@ -39,11 +35,11 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Pathing/PNC_LiveBodyControl.lua")
+T.load(ROOT .. "Pathing/PNC_LiveBodyControl.lua")
 PNC.LiveBodyControl.SyncLocomotionState = function()
     error("generic locomotion sync ran for an incapacitated body")
 end
-dofile(ROOT .. "Visuals/PNC_Animation.lua")
+T.load(ROOT .. "Visuals/PNC_Animation.lua")
 
 local function advanceActionContext()
     if string.find(actionState, "staggerback", 1, true) == 1
@@ -58,7 +54,7 @@ local zombie = {
     getActionStateName = function() return actionState end,
     getModData = function() return {} end,
     changeState = function(_, state)
-        assertEqual(state, "idle_state", "downed idle transition state")
+        T.equal(state, "idle_state", "downed idle transition state")
         -- This is the legacy AI state machine, not animation ActionContext.
         -- ZombieIdleState.enter() installs a new random state-event delay.
         stateEventDelay = 600
@@ -99,19 +95,19 @@ local stationary = {
 }
 
 PNC.Animation.SyncLocomotion(zombie, stationary)
-assertEqual(staggerBack, false, "incapacitation clears stagger latch")
-assertEqual(stateEventDelay, 0, "incapacitation expires stagger action timer")
-assertEqual(legacyIdleResets, 0, "incapacitation avoids legacy idle timer reset")
+T.equal(staggerBack, false, "incapacitation clears stagger latch")
+T.equal(stateEventDelay, 0, "incapacitation expires stagger action timer")
+T.equal(legacyIdleResets, 0, "incapacitation avoids legacy idle timer reset")
 advanceActionContext()
-assertEqual(actionState, "idle", "stale stagger exits on next ActionContext update")
-assertEqual(crawler, false, "stationary incapacitated avoids vanilla crawler state")
-assertEqual(onFloor, false, "stationary incapacitated avoids vanilla floor state")
-assertEqual(fallOnFront, false, "stationary incapacitated avoids vanilla front state")
-assertEqual(variables.bCrawling, false, "stationary incapacitated vanilla crawler variable")
-assertEqual(variables.PNCActor, true, "stationary incapacitated custom animation actor")
-assertEqual(variables.PNCWalkType, "Crawl", "stationary incapacitated idle crawl selector")
-assertEqual(variables.PNCAnim, "Downed", "stationary incapacitated animation")
-assertEqual(variables.bMoving, false, "stationary incapacitated movement variable")
+T.equal(actionState, "idle", "stale stagger exits on next ActionContext update")
+T.equal(crawler, false, "stationary incapacitated avoids vanilla crawler state")
+T.equal(onFloor, false, "stationary incapacitated avoids vanilla floor state")
+T.equal(fallOnFront, false, "stationary incapacitated avoids vanilla front state")
+T.equal(variables.bCrawling, false, "stationary incapacitated vanilla crawler variable")
+T.equal(variables.PNCActor, true, "stationary incapacitated custom animation actor")
+T.equal(variables.PNCWalkType, "Crawl", "stationary incapacitated idle crawl selector")
+T.equal(variables.PNCAnim, "Downed", "stationary incapacitated animation")
+T.equal(variables.bMoving, false, "stationary incapacitated movement variable")
 
 variables = {}
 crawler = false
@@ -138,18 +134,18 @@ local moving = {
 }
 
 PNC.Animation.SyncLocomotion(zombie, moving)
-assertEqual(actionState, "idle", "moving crawl releases repeated hit reaction")
-assertEqual(finishingEvents, 1, "moving crawl reports hit-reaction completion")
-assertEqual(staggerBack, false, "moving crawl clears pending stagger latch")
-assertEqual(legacyIdleResets, 0, "moving crawl avoids legacy idle timer reset")
-assertEqual(crawler, false, "moving incapacitated avoids vanilla crawler state")
-assertEqual(onFloor, false, "moving incapacitated avoids vanilla floor state")
-assertEqual(fallOnFront, false, "moving incapacitated avoids vanilla front state")
-assertEqual(variables.PNCActor, true, "moving incapacitated custom animation actor")
-assertEqual(variables.PNCAnim, "Crawl", "moving incapacitated animation")
-assertEqual(variables.PNCMoveAnim, "Crawl", "moving incapacitated crawl-cycle selector")
-assertEqual(variables.PNCWalkType, "Crawl", "moving incapacitated crawl family selector")
-assertEqual(variables.bMoving, true, "moving incapacitated movement variable")
+T.equal(actionState, "idle", "moving crawl releases repeated hit reaction")
+T.equal(finishingEvents, 1, "moving crawl reports hit-reaction completion")
+T.equal(staggerBack, false, "moving crawl clears pending stagger latch")
+T.equal(legacyIdleResets, 0, "moving crawl avoids legacy idle timer reset")
+T.equal(crawler, false, "moving incapacitated avoids vanilla crawler state")
+T.equal(onFloor, false, "moving incapacitated avoids vanilla floor state")
+T.equal(fallOnFront, false, "moving incapacitated avoids vanilla front state")
+T.equal(variables.PNCActor, true, "moving incapacitated custom animation actor")
+T.equal(variables.PNCAnim, "Crawl", "moving incapacitated animation")
+T.equal(variables.PNCMoveAnim, "Crawl", "moving incapacitated crawl-cycle selector")
+T.equal(variables.PNCWalkType, "Crawl", "moving incapacitated crawl family selector")
+T.equal(variables.bMoving, true, "moving incapacitated movement variable")
 
 -- Remote clients receive the same snapshot many times while the engine may
 -- independently reconcile zombie animation flags. The client tick must
@@ -187,7 +183,7 @@ PNC.Network = {
     },
 }
 
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_ClientPresenceSync.lua")
+T.load(T.path("ProjectHoomans", "client", "PNC/PNC_ClientPresenceSync.lua"))
 PNC.ClientPresenceSync.BodyByOnlineID["77"] = zombie
 
 local visualKeySnapshot = {
@@ -213,7 +209,7 @@ local handsKey = PNC.ClientPresenceSync.Internal.BuildHandsKey(
 )
 visualKeySnapshot.presenceRevision = 5
 visualKeySnapshot.attackMode = true
-assertEqual(
+T.equal(
     PNC.ClientPresenceSync.Internal.BuildVisualKey(visualKeySnapshot),
     visualKey,
     "combat transition rebuilt immutable clothing presentation"
@@ -225,8 +221,8 @@ then
 end
 
 PNC.ClientPresenceSync.OnTick()
-assertEqual(crawler, false, "remote client avoids vanilla crawler state")
-assertEqual(onFloor, false, "remote client avoids vanilla floor state")
+T.equal(crawler, false, "remote client avoids vanilla crawler state")
+T.equal(onFloor, false, "remote client avoids vanilla floor state")
 
 crawler = false
 onFloor = false
@@ -239,17 +235,17 @@ variables.PNCWalkType = ""
 local legacyResetsBeforeRemoteRepair = legacyIdleResets
 
 PNC.ClientPresenceSync.OnTick()
-assertEqual(staggerBack, false, "remote client clears repeated stagger latch")
-assertEqual(stateEventDelay, 0, "remote client expires repeated stagger timer")
-assertEqual(legacyIdleResets, legacyResetsBeforeRemoteRepair, "remote client avoids legacy idle timer reset")
+T.equal(staggerBack, false, "remote client clears repeated stagger latch")
+T.equal(stateEventDelay, 0, "remote client expires repeated stagger timer")
+T.equal(legacyIdleResets, legacyResetsBeforeRemoteRepair, "remote client avoids legacy idle timer reset")
 advanceActionContext()
-assertEqual(actionState, "idle", "remote client releases stale hit reaction")
-assertEqual(crawler, false, "remote client repeated vanilla crawler state")
-assertEqual(onFloor, false, "remote client repeated vanilla floor state")
-assertEqual(fallOnFront, false, "remote client repeated vanilla front state")
-assertEqual(variables.bCrawling, false, "remote client repeated vanilla crawler variable")
-assertEqual(variables.PNCActor, true, "remote client restores custom animation actor")
-assertEqual(variables.PNCWalkType, "Crawl", "remote client restores idle crawl selector")
+T.equal(actionState, "idle", "remote client releases stale hit reaction")
+T.equal(crawler, false, "remote client repeated vanilla crawler state")
+T.equal(onFloor, false, "remote client repeated vanilla floor state")
+T.equal(fallOnFront, false, "remote client repeated vanilla front state")
+T.equal(variables.bCrawling, false, "remote client repeated vanilla crawler variable")
+T.equal(variables.PNCActor, true, "remote client restores custom animation actor")
+T.equal(variables.PNCWalkType, "Crawl", "remote client restores idle crawl selector")
 
 -- The authoritative path tick sees the same state after late damage callbacks.
 -- Its suppression path must use the ActionContext exit condition as well.
@@ -257,12 +253,13 @@ actionState = "staggerback"
 staggerBack = true
 stateEventDelay = 900
 local suppressed, suppressedState = PNC.LiveBodyControl.SuppressZombieState(zombie, {}, 2000)
-assertEqual(suppressed, true, "path suppression recognizes staggerback")
-assertEqual(suppressedState, "staggerback", "path suppression reports staggerback")
-assertEqual(staggerBack, false, "path suppression clears stagger latch")
-assertEqual(stateEventDelay, 0, "path suppression expires stagger timer")
-assertEqual(legacyIdleResets, legacyResetsBeforeRemoteRepair, "path suppression avoids legacy idle timer reset")
+T.equal(suppressed, true, "path suppression recognizes staggerback")
+T.equal(suppressedState, "staggerback", "path suppression reports staggerback")
+T.equal(staggerBack, false, "path suppression clears stagger latch")
+T.equal(stateEventDelay, 0, "path suppression expires stagger timer")
+T.equal(legacyIdleResets, legacyResetsBeforeRemoteRepair, "path suppression avoids legacy idle timer reset")
 advanceActionContext()
-assertEqual(actionState, "idle", "path-suppressed stagger exits next ActionContext update")
+T.equal(actionState, "idle", "path-suppressed stagger exits next ActionContext update")
+T.finish("pnc_incapacitated_pose_smoke")
 
-print("pnc_incapacitated_pose_smoke: ok")
+T.finish("pnc_incapacitated_pose_smoke")

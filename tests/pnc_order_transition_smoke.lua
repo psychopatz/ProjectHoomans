@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local LUA_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local resetCount = 0
 local liveBody = {}
@@ -23,7 +25,7 @@ PNC = {
     },
     PathService = {
         Reset = function(zombie, record)
-            assert(zombie == liveBody, "wrong live body reset")
+            T.truthy(zombie == liveBody, "wrong live body reset")
             resetCount = resetCount + 1
             record.runtime.pathing = nil
             record.runtime.moveIntent = nil
@@ -31,7 +33,7 @@ PNC = {
     },
 }
 
-dofile(LUA_ROOT .. "Orders/PNC_OrderSystem.lua")
+T.load(LUA_ROOT .. "Orders/PNC_OrderSystem.lua")
 
 local record = {
     id = "companion",
@@ -56,15 +58,16 @@ PNC.OrderSystem.SetOrder(record, {
     z = 0,
 })
 
-assert(record.orderSpec.kind == "guard", "guard order not installed")
-assert(record.orderSpec.x == 4 and record.orderSpec.y == 5,
+T.truthy(record.orderSpec.kind == "guard", "guard order not installed")
+T.truthy(record.orderSpec.x == 4 and record.orderSpec.y == 5,
     "guard anchor changed")
-assert(resetCount == 1, "live movement lane was not reset")
-assert(record.runtime.moveIntent == nil and record.runtime.pathing == nil,
+T.truthy(resetCount == 1, "live movement lane was not reset")
+T.truthy(record.runtime.moveIntent == nil and record.runtime.pathing == nil,
     "stale follow movement survived order change")
-assert(record.runtime.target == nil and record.runtime.followState == nil,
+T.truthy(record.runtime.target == nil and record.runtime.followState == nil,
     "stale follow/combat runtime survived order change")
-assert(record.activeJob == nil and record.activeBehavior == nil,
+T.truthy(record.activeJob == nil and record.activeBehavior == nil,
     "old behavior remained active after order change")
+T.finish("pnc_order_transition_smoke")
 
-print("pnc_order_transition_smoke: ok")
+T.finish("pnc_order_transition_smoke")

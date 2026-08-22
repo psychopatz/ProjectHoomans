@@ -1,11 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Vehicles/PNC_CompanionVehicle.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/Vehicles/PNC_CompanionVehicle.lua")
 
 local now = 1000
 local records = {}
@@ -170,7 +165,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local first = {
     id = "companion_1",
@@ -202,71 +197,71 @@ local third = {
 records = { first, second, third }
 
 local handled, reason = PNC.CompanionVehicle.Tick(first, {}, owner)
-assertEqual(handled, true, "first companion boards")
-assertEqual(reason, "boarded", "first board reason")
-assertEqual(first.runtime.vehiclePassenger.seat, 1, "first free seat")
-assertEqual(first.presenceState, "abstract", "first body abstracted")
-assertEqual(vehicle:isSeatOccupied(1), true, "first reservation occupies vanilla seat")
+T.equal(handled, true, "first companion boards")
+T.equal(reason, "boarded", "first board reason")
+T.equal(first.runtime.vehiclePassenger.seat, 1, "first free seat")
+T.equal(first.presenceState, "abstract", "first body abstracted")
+T.equal(vehicle:isSeatOccupied(1), true, "first reservation occupies vanilla seat")
 local reserved, reservedName = PNC.CompanionVehicle.GetSeatReservation(vehicle, 1)
-assertEqual(reserved, true, "first reservation is visible")
-assertEqual(reservedName, first.id, "first reservation identifies npc")
-assertEqual(abstracted[first.id], "vehicle_board", "first abstract reason")
-assertEqual(first.x, 10.5, "passenger follows vehicle x")
-assertEqual(first.activeBehavior, "FollowOwner:vehicle_passenger", "passenger behavior")
+T.equal(reserved, true, "first reservation is visible")
+T.equal(reservedName, first.id, "first reservation identifies npc")
+T.equal(abstracted[first.id], "vehicle_board", "first abstract reason")
+T.equal(first.x, 10.5, "passenger follows vehicle x")
+T.equal(first.activeBehavior, "FollowOwner:vehicle_passenger", "passenger behavior")
 
 handled, reason = PNC.CompanionVehicle.Tick(second, {}, owner)
-assertEqual(handled, true, "second companion boards")
-assertEqual(second.runtime.vehiclePassenger.seat, 2, "second reservation avoids first")
-assertEqual(vehicle:isSeatOccupied(2), true, "second reservation occupies vanilla seat")
+T.equal(handled, true, "second companion boards")
+T.equal(second.runtime.vehiclePassenger.seat, 2, "second reservation avoids first")
+T.equal(vehicle:isSeatOccupied(2), true, "second reservation occupies vanilla seat")
 
 handled, reason = PNC.CompanionVehicle.Tick(third, {}, owner)
-assertEqual(handled, false, "full vehicle rejects third companion")
-assertEqual(reason, "vehicle_full", "full vehicle reason")
-assertEqual(third.runtime.vehiclePassenger, nil, "full vehicle did not abstract third")
+T.equal(handled, false, "full vehicle rejects third companion")
+T.equal(reason, "vehicle_full", "full vehicle reason")
+T.equal(third.runtime.vehiclePassenger, nil, "full vehicle did not abstract third")
 
 occupied[1] = { id = "real_player" }
 handled, reason = PNC.CompanionVehicle.Tick(first, nil, owner)
-assertEqual(handled, true, "lost reserved seat remains safe")
-assertEqual(reason, "vehicle_passenger_waiting_seat", "lost seat wait reason")
-assertEqual(first.runtime.vehiclePassenger.seat, nil, "lost seat reservation cleared")
-assertEqual(first.presenceState, "abstract", "lost seat did not materialize by moving car")
-assertEqual(PNC.CompanionVehicle.GetSeatReservation(vehicle, 1), false,
+T.equal(handled, true, "lost reserved seat remains safe")
+T.equal(reason, "vehicle_passenger_waiting_seat", "lost seat wait reason")
+T.equal(first.runtime.vehiclePassenger.seat, nil, "lost seat reservation cleared")
+T.equal(first.presenceState, "abstract", "lost seat did not materialize by moving car")
+T.equal(PNC.CompanionVehicle.GetSeatReservation(vehicle, 1), false,
     "lost reservation token removed")
 
 occupied[1] = nil
 now = 1200
 handled, reason = PNC.CompanionVehicle.Tick(first, nil, owner)
-assertEqual(handled, true, "passenger reacquires seat")
-assertEqual(reason, "vehicle_passenger", "reacquired passenger reason")
-assertEqual(first.runtime.vehiclePassenger.seat, 1, "seat reacquired")
+T.equal(handled, true, "passenger reacquires seat")
+T.equal(reason, "vehicle_passenger", "reacquired passenger reason")
+T.equal(first.runtime.vehiclePassenger.seat, 1, "seat reacquired")
 
 local secondOccupied = {}
 local secondVehicle, secondVehicleParts = makeVehicle(8, 2, secondOccupied, 30.5, 40.5)
 loadedVehicles[#loadedVehicles + 1] = secondVehicle
 ownerVehicle = secondVehicle
 handled, reason = PNC.CompanionVehicle.Tick(first, nil, owner)
-assertEqual(handled, true, "vehicle change stays abstract")
-assertEqual(reason, "vehicle_passenger", "vehicle change passenger reason")
-assertEqual(first.runtime.vehiclePassenger.vehicleId, "vehicle:8", "vehicle reservation transferred")
-assertEqual(first.runtime.vehiclePassenger.seat, 1, "new vehicle seat reserved")
-assertEqual(first.presenceState, "abstract", "vehicle change did not materialize")
-assertEqual(PNC.CompanionVehicle.GetSeatReservation(vehicle, 1), false,
+T.equal(handled, true, "vehicle change stays abstract")
+T.equal(reason, "vehicle_passenger", "vehicle change passenger reason")
+T.equal(first.runtime.vehiclePassenger.vehicleId, "vehicle:8", "vehicle reservation transferred")
+T.equal(first.runtime.vehiclePassenger.seat, 1, "new vehicle seat reserved")
+T.equal(first.presenceState, "abstract", "vehicle change did not materialize")
+T.equal(PNC.CompanionVehicle.GetSeatReservation(vehicle, 1), false,
     "old vehicle token removed")
-assertEqual(PNC.CompanionVehicle.GetSeatReservation(secondVehicle, 1), true,
+T.equal(PNC.CompanionVehicle.GetSeatReservation(secondVehicle, 1), true,
     "new vehicle token installed")
 
 ownerVehicle = nil
 handled, reason = PNC.CompanionVehicle.Tick(first, nil, owner)
-assertEqual(handled, true, "owner exit handled")
-assertEqual(reason, "disembarked_live", "owner exit materializes companion")
-assertEqual(first.runtime.vehiclePassenger, nil, "passenger state cleared")
-assertEqual(first.presenceState, "live", "companion rematerialized")
-assertEqual(materialized[first.id], "owner_exited_vehicle", "disembark materialize reason")
-assertEqual(dirty[first.id], "vehicle_disembark", "disembark marked dirty")
-assertEqual(PNC.CompanionVehicle.GetSeatReservation(secondVehicle, 1), false,
+T.equal(handled, true, "owner exit handled")
+T.equal(reason, "disembarked_live", "owner exit materializes companion")
+T.equal(first.runtime.vehiclePassenger, nil, "passenger state cleared")
+T.equal(first.presenceState, "live", "companion rematerialized")
+T.equal(materialized[first.id], "owner_exited_vehicle", "disembark materialize reason")
+T.equal(dirty[first.id], "vehicle_disembark", "disembark marked dirty")
+T.equal(PNC.CompanionVehicle.GetSeatReservation(secondVehicle, 1), false,
     "disembark releases vanilla seat")
-assertEqual(syncedAdds >= 4, true, "reservation additions synchronized")
-assertEqual(syncedRemoves >= 3, true, "reservation removals synchronized")
+T.equal(syncedAdds >= 4, true, "reservation additions synchronized")
+T.equal(syncedRemoves >= 3, true, "reservation removals synchronized")
 
 local stale = makeItem("PNC.VehicleSeatReservation")
 local staleData = stale:getModData()
@@ -277,8 +272,9 @@ staleData.PNC_VEHICLE_ID = "vehicle:8"
 staleData.PNC_SEAT = 1
 secondVehicleParts[2]:getItemContainer():AddItem(stale)
 local removed = PNC.CompanionVehicle.AuditLoadedReservations(now, true)
-assertEqual(removed, 1, "audit removes stale persisted token")
-assertEqual(PNC.CompanionVehicle.GetSeatReservation(secondVehicle, 1), false,
+T.equal(removed, 1, "audit removes stale persisted token")
+T.equal(PNC.CompanionVehicle.GetSeatReservation(secondVehicle, 1), false,
     "stale persisted token no longer occupies seat")
+T.finish("pnc_companion_vehicle_smoke")
 
-print("pnc_companion_vehicle_smoke: ok")
+T.finish("pnc_companion_vehicle_smoke")

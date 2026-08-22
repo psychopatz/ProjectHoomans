@@ -1,6 +1,8 @@
+local T = require "tests/support/test"
+
 local LUA_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
-package.path = LUA_ROOT .. "?.lua;" .. package.path
+    T.path("ProjectHoomans", "shared", "")
+T.addPackagePaths()
 
 local FILE =
     LUA_ROOT .. "PNC/Core/"
@@ -173,22 +175,22 @@ PNC = {
     },
 }
 
-dofile(FILE)
-assert(PNC.BehaviorCompanion.Tick(record, {
+T.load(FILE)
+T.truthy(PNC.BehaviorCompanion.Tick(record, {
     getX = function() return record.x end,
     getY = function() return record.y end,
     getZ = function() return record.z end,
 }, "FollowOwner"))
 
-assert(engageTicks == 0,
+T.truthy(engageTicks == 0,
     "moving owner lost its follower to opportunistic horde combat")
-assert(lastMove and lastMove.reason == "follow_owner_horde_avoidance",
+T.truthy(lastMove and lastMove.reason == "follow_owner_horde_avoidance",
     "horde-aware follow steering was not selected")
-assert(math.abs(lastMove.y) > 0.5,
+T.truthy(math.abs(lastMove.y) > 0.5,
     "horde steering ran directly through the zombie centroid")
-assert(lastMove.x > record.x,
+T.truthy(lastMove.x > record.x,
     "horde steering stopped making progress toward the owner")
-assert(lastMove.mode == "run",
+T.truthy(lastMove.mode == "run",
     "severely separated follower did not use catch-up locomotion")
 
 -- Sub-tile owner movement keeps the existing path intent. The path pump still
@@ -196,12 +198,12 @@ assert(lastMove.mode == "run",
 local movesBeforeSmallStep = moveCalls
 now = now + 100
 ownerX = ownerX + 0.2
-assert(PNC.BehaviorCompanion.Tick(record, {
+T.truthy(PNC.BehaviorCompanion.Tick(record, {
     getX = function() return record.x end,
     getY = function() return record.y end,
     getZ = function() return record.z end,
 }, "FollowOwner"))
-assert(moveCalls == movesBeforeSmallStep,
+T.truthy(moveCalls == movesBeforeSmallStep,
     "sub-tile owner movement rebuilt the follow intent")
 
 -- A nearby follower holds where it is when the owner stops. Facing changes
@@ -213,15 +215,15 @@ nearbyZombies = {}
 record.runtime.followHazard = nil
 lastMove = nil
 local haltsBeforeStandstill = haltCalls
-assert(PNC.BehaviorCompanion.Tick(record, {
+T.truthy(PNC.BehaviorCompanion.Tick(record, {
     getX = function() return record.x end,
     getY = function() return record.y end,
     getZ = function() return record.z end,
 }, "FollowOwner"))
-assert(lastMove == nil, "stationary owner caused formation roaming")
-assert(haltCalls == haltsBeforeStandstill + 1,
+T.truthy(lastMove == nil, "stationary owner caused formation roaming")
+T.truthy(haltCalls == haltsBeforeStandstill + 1,
     "stationary owner did not cancel the active follow path")
-assert(record.runtime.followState.mode == "idle_near_owner",
+T.truthy(record.runtime.followState.mode == "idle_near_owner",
     "stationary follower did not enter idle cadence")
 
 -- Local hazard steering must never turn a close formation correction into a
@@ -235,8 +237,8 @@ local closeSteer = PNC.BehaviorCompanion.Internal
         { active = true, count = 3, repelX = 0, repelY = 1 },
         now
     )
-assert(closeSteer ~= nil, "close hazard steering was not resolved")
-assert(PNC.Core.Distance(record.x, record.y, closeSteer.x, closeSteer.y)
+T.truthy(closeSteer ~= nil, "close hazard steering was not resolved")
+T.truthy(PNC.Core.Distance(record.x, record.y, closeSteer.x, closeSteer.y)
     <= 0.651, "hazard steering overshot a close follow anchor")
 
 -- One close zombie still sets the steering hazard active flag, but it is not
@@ -251,14 +253,14 @@ nearbyZombies = {
     zombie(6.8, 0),
 }
 lastMove = nil
-assert(PNC.BehaviorCompanion.Tick(record, {
+T.truthy(PNC.BehaviorCompanion.Tick(record, {
     getX = function() return record.x end,
     getY = function() return record.y end,
     getZ = function() return record.z end,
 }, "FollowOwner"))
-assert(engageTicks == 1,
+T.truthy(engageTicks == 1,
     "a single nearby zombie was mistaken for a horde and delayed combat")
-assert(lastMove == nil,
+T.truthy(lastMove == nil,
     "single-zombie combat response was overwritten by follow movement")
 
 -- Once the owner's short combat intent expires, a passive nearby zombie must
@@ -270,14 +272,14 @@ record.runtime.target = nil
 record.runtime.nextTargetReassessAt = 0
 lastMove = nil
 local engagesBeforePassive = engageTicks
-assert(PNC.BehaviorCompanion.Tick(record, {
+T.truthy(PNC.BehaviorCompanion.Tick(record, {
     getX = function() return record.x end,
     getY = function() return record.y end,
     getZ = function() return record.z end,
 }, "FollowOwner"))
-assert(engageTicks == engagesBeforePassive,
+T.truthy(engageTicks == engagesBeforePassive,
     "passive nearby zombie pulled follower out of formation")
-assert(lastMove ~= nil,
+T.truthy(lastMove ~= nil,
     "passive follower did not resume formation movement")
 
 -- A stationary owner is still the follower's priority once the companion
@@ -293,14 +295,14 @@ record.runtime.target = { kind = "zombie", zombieId = "zed" }
 nearbyZombies = { zombie(0.8, 0) }
 lastMove = nil
 local engagesBeforeLeash = engageTicks
-assert(PNC.BehaviorCompanion.Tick(record, {
+T.truthy(PNC.BehaviorCompanion.Tick(record, {
     getX = function() return record.x end,
     getY = function() return record.y end,
     getZ = function() return record.z end,
 }, "FollowOwner"))
-assert(engageTicks == engagesBeforeLeash,
+T.truthy(engageTicks == engagesBeforeLeash,
     "far follower chased combat while its owner was stationary")
-assert(lastMove ~= nil and string.find(
+T.truthy(lastMove ~= nil and string.find(
     tostring(lastMove.reason),
     "follow_owner",
     1,
@@ -319,14 +321,15 @@ urgentThreat = {
     threatening = true,
 }
 local engagesBeforeDefense = engageTicks
-assert(PNC.BehaviorCompanion.Tick(record, {
+T.truthy(PNC.BehaviorCompanion.Tick(record, {
     getX = function() return record.x end,
     getY = function() return record.y end,
     getZ = function() return record.z end,
 }, "FollowOwner"))
-assert(engageTicks == engagesBeforeDefense + 1,
+T.truthy(engageTicks == engagesBeforeDefense + 1,
     "direct self-defense was blocked by the owner leash")
-assert(record.runtime.followState.mode == "combat_self_defense",
+T.truthy(record.runtime.followState.mode == "combat_self_defense",
     "direct attacker did not short-circuit follow movement")
+T.finish("pnc_follow_horde_steering_smoke")
 
-print("pnc_follow_horde_steering_smoke: ok")
+T.finish("pnc_follow_horde_steering_smoke")

@@ -1,12 +1,7 @@
-local SERVER_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
-package.path = SERVER_ROOT .. "?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local SERVER_ROOT = T.path("ProjectHoomans", "server", "")
+T.addPackagePaths()
 
 local player = {}
 local received = {}
@@ -48,44 +43,45 @@ local Router = require "PNC/Networking/PNC_ServerCommandRouter"
 require "PNC/Networking/Handlers/PNC_ServerConversationCommandHandler"
 
 local sceneArgs = { npcID = "npc-1", token = "lease-1" }
-assertEqual(Router.Handle("conversationBegin", player, sceneArgs), true,
+T.equal(Router.Handle("conversationBegin", player, sceneArgs), true,
     "scene begin handled")
-assertEqual(received.scene.command, "conversationBegin", "scene command")
-assertEqual(received.scene.args, sceneArgs, "scene payload")
+T.equal(received.scene.command, "conversationBegin", "scene command")
+T.equal(received.scene.args, sceneArgs, "scene payload")
 
-assertEqual(Router.Handle("conversationEnd", player, nil), true,
+T.equal(Router.Handle("conversationEnd", player, nil), true,
     "scene end handled")
-assertEqual(type(received.scene.args), "table", "scene nil payload normalized")
+T.equal(type(received.scene.args), "table", "scene nil payload normalized")
 
 local categoryArgs = { categoryID = "projecthoomans:whats_up" }
-assertEqual(Router.Handle(
+T.equal(Router.Handle(
     "ConversationCategoryRequest",
     player,
     categoryArgs
 ), true, "category handled")
-assertEqual(received.category.args, categoryArgs, "category payload")
+T.equal(received.category.args, categoryArgs, "category payload")
 
 local choiceArgs = { choiceID = "detail" }
-assertEqual(Router.Handle(
+T.equal(Router.Handle(
     "ConversationChoiceRequest",
     player,
     choiceArgs
 ), true, "choice handled")
-assertEqual(received.choice.args, choiceArgs, "choice payload")
+T.equal(received.choice.args, choiceArgs, "choice payload")
 
 local recruitArgs = { npcID = "npc-1" }
-assertEqual(Router.Handle(
+T.equal(Router.Handle(
     "ConversationRecruitRequest",
     player,
     recruitArgs
 ), true, "recruit handled")
-assertEqual(received.recruit.args, recruitArgs, "recruit payload")
+T.equal(received.recruit.args, recruitArgs, "recruit payload")
 
 PNC.Conversation = nil
-assertEqual(Router.Handle(
+T.equal(Router.Handle(
     "ConversationCategoryRequest",
     player,
     {}
 ), true, "missing optional Authority still consumes command")
+T.finish("pnc_server_conversation_command_handler_smoke")
 
-print("pnc_server_conversation_command_handler_smoke: ok")
+T.finish("pnc_server_conversation_command_handler_smoke")

@@ -1,4 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/"
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "server", "PNC/Director/")
 
 local groups = {
     { id = "refugees", factionId = "f_refugee", groupType = "REFUGEE",
@@ -40,15 +42,16 @@ PNC = {
     Registry = { Get = function(id) return { id = id, alive = true } end },
 }
 
-dofile(ROOT .. "PNC_AbstractMobileAccidents.lua")
-assert(PNC.AbstractMobileAccidents.Process(2) == 1,
+T.load(ROOT .. "PNC_AbstractMobileAccidents.lua")
+T.truthy(PNC.AbstractMobileAccidents.Process(2) == 1,
     "accident pass did not isolate eligible abstract AI groups")
-assert(#killed == 2 and killed[1] == "r1" and killed[2] == "r2",
+T.truthy(#killed == 2 and killed[1] == "r1" and killed[2] == "r2",
     "per-member accident rolls did not select the eligible members")
-assert(destroyed[1] == "group:refugees"
+T.truthy(destroyed[1] == "group:refugees"
     and destroyed[2] == "faction:f_refugee",
     "empty mobile group and faction were not retired")
-assert(PNC.AbstractMobileAccidents.Process(2) == 0,
+T.truthy(PNC.AbstractMobileAccidents.Process(2) == 0,
     "same two-hour bucket was processed more than once")
+T.finish("pnc_abstract_mobile_accidents_smoke")
 
-print("pnc_abstract_mobile_accidents_smoke: ok")
+T.finish("pnc_abstract_mobile_accidents_smoke")

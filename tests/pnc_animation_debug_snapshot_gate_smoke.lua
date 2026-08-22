@@ -1,9 +1,11 @@
+local T = require "tests/support/test"
+
 local LUA_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+    T.path("ProjectHoomans", "client", "")
 local FILE = LUA_ROOT .. "PNC/PresenceSync/PresenceVisuals/"
     .. "PNC_ClientPresenceVisuals.lua"
 
-package.path = LUA_ROOT .. "?.lua;" .. package.path
+T.addPackagePaths()
 
 local maintained = 0
 local locomotionWrites = 0
@@ -48,14 +50,14 @@ PNC = {
             return candidate == body
         end,
         Maintain = function(candidate, now)
-            assert(candidate == body, "wrong preview body")
-            assert(now == 5000, "wrong preview time")
+            T.truthy(candidate == body, "wrong preview body")
+            T.truthy(now == 5000, "wrong preview time")
             maintained = maintained + 1
         end,
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 PNC.ClientPresenceSync.Internal.ApplySnapshotToBody({
     id = "debug-npc",
     presenceState = "live",
@@ -67,12 +69,13 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody({
     },
 }, body, true)
 
-assert(maintained == 1, "debug player did not retain snapshot ownership")
-assert(humanizedWrites == 0, "normal body maintenance raced debug playback")
-assert(locomotionWrites == 0, "snapshot locomotion overwrote debug playback")
-assert(variables.PNCActor == true, "NPC identity variable was not maintained")
-assert(variables.PNCLive == true, "live identity variable was not maintained")
-assert(modData.PNC_UUID == "debug-npc", "body identity tag was not maintained")
-assert(modData.PNC_NPC == true, "NPC body tag was not maintained")
+T.truthy(maintained == 1, "debug player did not retain snapshot ownership")
+T.truthy(humanizedWrites == 0, "normal body maintenance raced debug playback")
+T.truthy(locomotionWrites == 0, "snapshot locomotion overwrote debug playback")
+T.truthy(variables.PNCActor == true, "NPC identity variable was not maintained")
+T.truthy(variables.PNCLive == true, "live identity variable was not maintained")
+T.truthy(modData.PNC_UUID == "debug-npc", "body identity tag was not maintained")
+T.truthy(modData.PNC_NPC == true, "NPC body tag was not maintained")
+T.finish("pnc_animation_debug_snapshot_gate_smoke")
 
-print("pnc_animation_debug_snapshot_gate_smoke: ok")
+T.finish("pnc_animation_debug_snapshot_gate_smoke")

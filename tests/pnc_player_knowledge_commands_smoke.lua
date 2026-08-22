@@ -1,12 +1,7 @@
-local SERVER = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. " expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
-local function truth(value, label) equal(value == true, true, label) end
+local SERVER = T.path("ProjectHoomans", "server", "PNC/")
+
 local function copy(value)
     if type(value) ~= "table" then return value end
     local result = {}
@@ -103,56 +98,56 @@ PNC = {
     },
 }
 
-dofile(SERVER .. "PNC_PlayerKnowledgeCommands.lua")
+T.load(SERVER .. "PNC_PlayerKnowledgeCommands.lua")
 local Commands = PNC.PlayerKnowledgeCommands
 
 local unknown = Commands.HandlePresentation({}, {
     requestID = "present:1", npcID = "npc_doyle",
 })
-equal(unknown.state, "unknown", "unknown projection is authoritative")
-equal(unknown.canAskName, true, "unknown projection allows name question")
-equal(unknown.snapshot.identity.displayName, nil,
+T.equal(unknown.state, "unknown", "unknown projection is authoritative")
+T.equal(unknown.canAskName, true, "unknown projection allows name question")
+T.equal(unknown.snapshot.identity.displayName, nil,
     "unknown projection does not leak raw NPC name")
 
 local failed = Commands.HandleDisclosure({}, {
     requestID = "disclose:1", npcID = "npc_doyle", topicID = "identity_name",
 })
-equal(failed.success, false, "failed commit rejects disclosure")
-equal(failed.responseText, nil, "failed commit cannot display introduction")
-equal(disclosureCalls, 1, "failed attempt records fact once")
+T.equal(failed.success, false, "failed commit rejects disclosure")
+T.equal(failed.responseText, nil, "failed commit cannot display introduction")
+T.equal(disclosureCalls, 1, "failed attempt records fact once")
 local pending = Commands.HandlePresentation({}, {
     requestID = "present:2", npcID = "npc_doyle",
 })
-equal(pending.state, "error", "dirty disclosure stays gated")
-equal(pending.reason, "knowledge_commit_pending", "pending commit is diagnosable")
+T.equal(pending.state, "error", "dirty disclosure stays gated")
+T.equal(pending.reason, "knowledge_commit_pending", "pending commit is diagnosable")
 
 commitSucceeds = true
 local retried = Commands.HandleDisclosure({}, {
     requestID = "disclose:1", npcID = "npc_doyle", topicID = "identity_name",
 })
-truth(retried.success, "retry succeeds after durable commit")
-equal(disclosureCalls, 1, "retry does not duplicate learned evidence")
-equal(retried.responseText,
+T.truthy(retried.success, "retry succeeds after durable commit")
+T.equal(disclosureCalls, 1, "retry does not duplicate learned evidence")
+T.equal(retried.responseText,
     "I'm Doyle Wild. I'm with Pinecrest Settlement.",
     "response text is supplied by authority after commit")
-equal(retried.presentation.state, "known", "committed projection is known")
+T.equal(retried.presentation.state, "known", "committed projection is known")
 
 local replay = Commands.HandleDisclosure({}, {
     requestID = "disclose:1", npcID = "npc_doyle", topicID = "identity_name",
 })
-truth(replay.success and replay.replayed == true,
+T.truthy(replay.success and replay.replayed == true,
     "successful request ID is idempotently replayed")
-equal(commits, 2, "replay does not perform a third commit")
+T.equal(commits, 2, "replay does not perform a third commit")
 
 sent.bootstrap = {}
 local bootstrap = Commands.HandleBootstrap({}, { requestID = "bootstrap:1" })
-equal(#sent.bootstrap, 3, "large bootstrap is chunked")
-equal(sent.bootstrap[1].chunkIndex, 1, "first bootstrap chunk index")
-equal(sent.bootstrap[3].chunkCount, 3, "bootstrap chunk count")
-equal(sent.bootstrap[3].state, "known", "last bootstrap chunk completes")
-equal(sent.bootstrap[1].snapshots[1].identity.displayName, nil,
+T.equal(#sent.bootstrap, 3, "large bootstrap is chunked")
+T.equal(sent.bootstrap[1].chunkIndex, 1, "first bootstrap chunk index")
+T.equal(sent.bootstrap[3].chunkCount, 3, "bootstrap chunk count")
+T.equal(sent.bootstrap[3].state, "known", "last bootstrap chunk completes")
+T.equal(sent.bootstrap[1].snapshots[1].identity.displayName, nil,
     "bootstrap also strips undisclosed raw names")
-equal(bootstrap.context.characterUUID, "char_one", "bootstrap binds context")
+T.equal(bootstrap.context.characterUUID, "char_one", "bootstrap binds context")
 
 sent.bootstrap = {}
 local scoped = Commands.HandleBootstrap({}, {
@@ -160,11 +155,11 @@ local scoped = Commands.HandleBootstrap({}, {
     scope = "live",
     npcIDs = { "npc_live_1", "npc_live_2" },
 })
-equal(#sent.bootstrap, 1, "live bootstrap remains one batched response")
-equal(#scoped.snapshots, 2, "live bootstrap returns only requested NPCs")
-equal(scoped.snapshots[1].npcID, "npc_live_1",
+T.equal(#sent.bootstrap, 1, "live bootstrap remains one batched response")
+T.equal(#scoped.snapshots, 2, "live bootstrap returns only requested NPCs")
+T.equal(scoped.snapshots[1].npcID, "npc_live_1",
     "live bootstrap preserves requested identity")
-equal(scoped.scope, "live", "live bootstrap echoes merge scope")
+T.equal(scoped.scope, "live", "live bootstrap echoes merge scope")
 
 sent.bootstrap = {}
 local interested = Commands.HandleBootstrap({}, {
@@ -172,10 +167,10 @@ local interested = Commands.HandleBootstrap({}, {
     scope = "interest",
     npcIDs = { "npc_live_2" },
 })
-equal(#sent.bootstrap, 1, "interest bootstrap remains batched")
-equal(#interested.snapshots, 1,
+T.equal(#sent.bootstrap, 1, "interest bootstrap remains batched")
+T.equal(#interested.snapshots, 1,
     "interest bootstrap returns only consumer-requested NPCs")
-equal(interested.scope, "interest",
+T.equal(interested.scope, "interest",
     "interest bootstrap echoes non-destructive merge scope")
 
 sent.bootstrap = {}
@@ -183,7 +178,8 @@ local malformedInterest = Commands.HandleBootstrap({}, {
     requestID = "bootstrap:interest:malformed",
     scope = "interest",
 })
-equal(#malformedInterest.snapshots, 0,
+T.equal(#malformedInterest.snapshots, 0,
     "malformed scoped request cannot fall back to every known NPC")
+T.finish("pnc_player_knowledge_commands_smoke")
 
-print("pnc_player_knowledge_commands_smoke: ok")
+T.finish("pnc_player_knowledge_commands_smoke")

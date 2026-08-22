@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Perception/PNC_Perception.lua"
 
 PNC = {
@@ -23,7 +25,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local calls = 0
 local playerTarget = {
@@ -48,20 +50,20 @@ local affiliated = {
     },
 }
 
-assert(
+T.truthy(
     PNC.Perception.ResolveHostileTarget(affiliated)
         == playerTarget,
     "affiliated hostile target skipped authoritative player check"
 )
-assert(calls == 1,
+T.truthy(calls == 1,
     "affiliated hostile target did not evaluate players")
 
-assert(
+T.truthy(
     PNC.Perception.ResolveRoamingTarget(affiliated, 12)
         == playerTarget,
     "affiliated roaming target skipped authoritative player check"
 )
-assert(calls == 2,
+T.truthy(calls == 2,
     "affiliated roaming target did not evaluate players")
 
 local unaffiliated = {
@@ -71,11 +73,12 @@ local unaffiliated = {
         attackZombies = false,
     },
 }
-assert(
+T.truthy(
     PNC.Perception.ResolveHostileTarget(unaffiliated) == nil,
     "unaffiliated cached-neutral NPC evaluated players"
 )
-assert(calls == 2,
+T.truthy(calls == 2,
     "legacy player hostility gate changed for unaffiliated NPC")
+T.finish("pnc_faction_target_gate_smoke")
 
-print("pnc_faction_target_gate_smoke: ok")
+T.finish("pnc_faction_target_gate_smoke")

@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
 
-local function assertNear(actual, expected, tolerance, label)
-    if math.abs((tonumber(actual) or 0) - expected) > tolerance then
-        error((label or "assertNear") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local worldHour = 0
 local nowMs = 1000
@@ -77,12 +72,12 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Travel/PNC_Travel_Route.lua")
-dofile(ROOT .. "Travel/PNC_Travel_Providers.lua")
-dofile(ROOT .. "Travel/PNC_Travel_Arrivals.lua")
-dofile(ROOT .. "Travel/PNC_Travel_Model.lua")
-dofile(ROOT .. "Travel/PNC_Travel_Projection.lua")
-dofile(ROOT .. "Travel/PNC_Travel_Service.lua")
+T.load(ROOT .. "Travel/PNC_Travel_Route.lua")
+T.load(ROOT .. "Travel/PNC_Travel_Providers.lua")
+T.load(ROOT .. "Travel/PNC_Travel_Arrivals.lua")
+T.load(ROOT .. "Travel/PNC_Travel_Model.lua")
+T.load(ROOT .. "Travel/PNC_Travel_Projection.lua")
+T.load(ROOT .. "Travel/PNC_Travel_Service.lua")
 
 PNC.Travel.Service.RegisterListener("arrived", function()
     arrivalCount = arrivalCount + 1
@@ -100,7 +95,7 @@ local waypointRecord = {
 }
 records[waypointRecord.id] = waypointRecord
 
-local journey = assert(PNC.Travel.Service.Start(waypointRecord, {
+local journey = T.truthy(PNC.Travel.Service.Start(waypointRecord, {
     journeyId = "journey:waypoint",
     destination = { x = 200, y = 0, z = 0 },
     route = {
@@ -112,45 +107,43 @@ local journey = assert(PNC.Travel.Service.Start(waypointRecord, {
     ownerRef = "mission:42",
     metadata = { purpose = "trade", nested = { safe = true } },
 }))
-assertNear(journey.etaWorldHour, 2.5, 0.0001, "initial ETA includes wait")
-assert(waypointRecord.orderSpec.kind == "travel", "travel order was not installed")
+T.near(journey.etaWorldHour, 2.5, 0.0001, "initial ETA includes wait")
+T.truthy(waypointRecord.orderSpec.kind == "travel", "travel order was not installed")
 
 worldHour = 1.25
 PNC.Travel.Service.Advance(waypointRecord, worldHour)
-assert(journey.state == "waiting", "waypoint wait state was not entered")
-assertNear(waypointRecord.x, 100, 0.001, "wait waypoint x")
-assertNear(journey.waitRemainingWorldHours, 0.25, 0.001,
-    "wait time did not consume elapsed world time")
+T.truthy(journey.state == "waiting", "waypoint wait state was not entered")
+T.near(waypointRecord.x, 100, 0.001, "wait waypoint x")
+T.near(journey.waitRemainingWorldHours, 0.25, 0.001, "wait time did not consume elapsed world time")
 
 worldHour = 1.75
 PNC.Travel.Service.Advance(waypointRecord, worldHour)
-assert(journey.state == "en_route", "journey did not leave waypoint wait")
-assertNear(waypointRecord.x, 125, 0.001, "post-wait travel position")
+T.truthy(journey.state == "en_route", "journey did not leave waypoint wait")
+T.near(waypointRecord.x, 125, 0.001, "post-wait travel position")
 
-assert(PNC.Travel.Service.Pause(waypointRecord, "fixture_pause"))
+T.truthy(PNC.Travel.Service.Pause(waypointRecord, "fixture_pause"))
 worldHour = 9
 local paused = PNC.Travel.Service.GetProgress(waypointRecord, worldHour)
-assertNear(paused.x, 125, 0.001, "paused journey moved")
-assert(paused.state == "paused", "paused projection changed state")
-assert(PNC.Travel.Service.Resume(waypointRecord, "fixture_resume"))
+T.near(paused.x, 125, 0.001, "paused journey moved")
+T.truthy(paused.state == "paused", "paused projection changed state")
+T.truthy(PNC.Travel.Service.Resume(waypointRecord, "fixture_resume"))
 worldHour = 9.5
 PNC.Travel.Service.Advance(waypointRecord, worldHour)
-assertNear(waypointRecord.x, 175, 0.001, "resumed journey progress")
+T.near(waypointRecord.x, 175, 0.001, "resumed journey progress")
 
-local retargeted = assert(PNC.Travel.Service.Retarget(waypointRecord, {
+local retargeted = T.truthy(PNC.Travel.Service.Retarget(waypointRecord, {
     destination = { x = 275, y = 0, z = 0 },
     durationWorldHours = 1,
 }))
-assert(retargeted.journeyId == "journey:waypoint",
+T.truthy(retargeted.journeyId == "journey:waypoint",
     "retarget changed the stable journey id")
-assert(retargeted.routeVersion == 2, "retarget did not revise route geometry")
-assertNear(retargeted.origin.x, 175, 0.001, "retarget origin")
-assertNear(retargeted.speedTilesPerWorldHour, 100, 0.001,
-    "duration-derived speed")
+T.truthy(retargeted.routeVersion == 2, "retarget did not revise route geometry")
+T.near(retargeted.origin.x, 175, 0.001, "retarget origin")
+T.near(retargeted.speedTilesPerWorldHour, 100, 0.001, "duration-derived speed")
 
 -- A route provider is the extension seam for roads, threat avoidance, jobs,
 -- trading routes, and other future planners.
-assert(PNC.Travel.Providers.RegisterRouteProvider("fixture_detour",
+T.truthy(PNC.Travel.Providers.RegisterRouteProvider("fixture_detour",
     function(_, _, origin, destination)
         return {
             origin,
@@ -170,17 +163,17 @@ local providerRecord = {
     runtime = {},
 }
 records[providerRecord.id] = providerRecord
-local providerJourney = assert(PNC.Travel.Service.Start(providerRecord, {
+local providerJourney = T.truthy(PNC.Travel.Service.Start(providerRecord, {
     journeyId = "journey:provider",
     destination = { x = 100, y = 0, z = 0 },
     routeProvider = "fixture_detour",
     speedProfile = "walk",
 }))
-assert(#providerJourney.route.points == 3,
+T.truthy(#providerJourney.route.points == 3,
     "custom route provider geometry was not retained")
-assert(providerJourney.routeProvider == "fixture_detour",
+T.truthy(providerJourney.routeProvider == "fixture_detour",
     "custom route provider id was lost")
-assert(PNC.Travel.Providers.RegisterRouteProvider("fixture_broken",
+T.truthy(PNC.Travel.Providers.RegisterRouteProvider("fixture_broken",
     function()
         error("fixture provider failure")
     end
@@ -193,7 +186,7 @@ local fallbackRoute, fallbackProvider = PNC.Travel.Providers.ResolveRoute(
         routeProvider = "fixture_broken",
     }
 )
-assert(fallbackProvider == "direct" and #fallbackRoute.points == 2,
+T.truthy(fallbackProvider == "direct" and #fallbackRoute.points == 2,
     "failed route provider did not degrade to a direct route")
 
 local handoffRecord = {
@@ -208,7 +201,7 @@ local handoffRecord = {
 }
 records[handoffRecord.id] = handoffRecord
 worldHour = 0
-local handoffJourney = assert(PNC.Travel.Service.Start(handoffRecord, {
+local handoffJourney = T.truthy(PNC.Travel.Service.Start(handoffRecord, {
     journeyId = "journey:handoff",
     destination = { x = 100, y = 0, z = 0 },
     speedTilesPerWorldHour = 100,
@@ -224,20 +217,17 @@ PNC.Travel.Service.SyncLivePosition(
     body,
     worldHour
 )
-assertNear(handoffJourney.distanceTravelled, 25, 0.001,
-    "live body progress did not project onto the route")
+T.near(handoffJourney.distanceTravelled, 25, 0.001, "live body progress did not project onto the route")
 PNC.Travel.Service.OnAbstracted(handoffRecord, body)
 handoffRecord.presenceState = "abstract"
 worldHour = 0.75
 PNC.Travel.Service.Advance(handoffRecord, worldHour)
-assertNear(handoffRecord.x, 75, 0.001,
-    "abstract handoff did not continue from the live position")
+T.near(handoffRecord.x, 75, 0.001, "abstract handoff did not continue from the live position")
 handoffRecord.presenceState = "live"
 PNC.Travel.Service.OnMaterialized(handoffRecord)
-assert(handoffJourney.controller == "live",
+T.truthy(handoffJourney.controller == "live",
     "materialization did not return journey control to the live body")
-assertNear(handoffRecord.x, 75, 0.001,
-    "materialization handoff changed the canonical position")
+T.near(handoffRecord.x, 75, 0.001, "materialization handoff changed the canonical position")
 
 local liveArrivalRecord = {
     id = "live-arrival",
@@ -251,7 +241,7 @@ local liveArrivalRecord = {
 }
 records[liveArrivalRecord.id] = liveArrivalRecord
 worldHour = 0
-local liveArrivalJourney = assert(PNC.Travel.Service.Start(
+local liveArrivalJourney = T.truthy(PNC.Travel.Service.Start(
     liveArrivalRecord,
     {
         journeyId = "journey:live-arrival",
@@ -268,23 +258,20 @@ local arrivedBody = {
     getZ = function() return 0 end,
 }
 PNC.Travel.Service.TickLive(liveArrivalRecord, arrivedBody, worldHour)
-assert(liveArrivalJourney.state == "arrived",
+T.truthy(liveArrivalJourney.state == "arrived",
     "live journey did not reach arrival state")
-assert(liveArrivalJourney.arrivalHandled == true
+T.truthy(liveArrivalJourney.arrivalHandled == true
     and liveArrivalJourney.arrivalHandledBy == "roam",
     "live journey arrival action was not handled")
-assert(liveArrivalRecord.orderSpec.kind == "roam",
+T.truthy(liveArrivalRecord.orderSpec.kind == "roam",
     "live arrival did not switch to roaming")
-assertNear(liveArrivalRecord.orderSpec.x, 10, 0.001,
-    "live arrival roam center x")
-assertNear(liveArrivalRecord.orderSpec.y, 5, 0.001,
-    "live arrival roam center y")
-assertNear(liveArrivalRecord.orderSpec.radius, 9, 0.001,
-    "live arrival roam radius")
+T.near(liveArrivalRecord.orderSpec.x, 10, 0.001, "live arrival roam center x")
+T.near(liveArrivalRecord.orderSpec.y, 5, 0.001, "live arrival roam center y")
+T.near(liveArrivalRecord.orderSpec.radius, 9, 0.001, "live arrival roam radius")
 
 local customArrivalCalls = 0
 local customAction
-assert(PNC.Travel.Arrivals.RegisterHandler("trading",
+T.truthy(PNC.Travel.Arrivals.RegisterHandler("trading",
     function(record, _, action)
         customArrivalCalls = customArrivalCalls + 1
         customAction = action
@@ -307,7 +294,7 @@ local tradingRecord = {
 }
 records[tradingRecord.id] = tradingRecord
 worldHour = 0
-local tradingJourney = assert(PNC.Travel.Service.Start(tradingRecord, {
+local tradingJourney = T.truthy(PNC.Travel.Service.Start(tradingRecord, {
     journeyId = "journey:trading-arrival",
     destination = { x = 10, y = 0, z = 0 },
     speedTilesPerWorldHour = 10,
@@ -318,15 +305,15 @@ local tradingJourney = assert(PNC.Travel.Service.Start(tradingRecord, {
 }))
 worldHour = 1
 PNC.Travel.Service.Advance(tradingRecord, worldHour)
-assert(customArrivalCalls == 1,
+T.truthy(customArrivalCalls == 1,
     "custom arrival handler was not called exactly once")
-assert(customAction.marketID == "market:west-point",
+T.truthy(customAction.marketID == "market:west-point",
     "custom arrival action lost its parameters")
-assert(tradingRecord.orderSpec.kind == "trading"
+T.truthy(tradingRecord.orderSpec.kind == "trading"
     and tradingRecord.orderSpec.marketID == "market:west-point",
     "custom arrival handler could not install its behavior")
 PNC.Travel.Service.Advance(tradingRecord, worldHour + 1)
-assert(customArrivalCalls == 1,
+T.truthy(customArrivalCalls == 1,
     "completed arrival action was dispatched twice")
 local tradingSummary = PNC.Travel.Model.BuildSummary(
     tradingJourney,
@@ -337,7 +324,7 @@ local restoredTrading = PNC.Travel.Model.Normalize(
     tradingRecord,
     worldHour
 )
-assert(restoredTrading.arrivalAction.type == "trading"
+T.truthy(restoredTrading.arrivalAction.type == "trading"
     and restoredTrading.arrivalAction.marketID == "market:west-point"
     and restoredTrading.arrivalHandled == true,
     "arrival action did not survive journey persistence")
@@ -357,7 +344,7 @@ for i = 1, 100 do
         runtime = {},
     }
     records[record.id] = record
-    assert(PNC.Travel.Service.Start(record, {
+    T.truthy(PNC.Travel.Service.Start(record, {
         journeyId = "journey:scale:" .. tostring(i),
         destination = { x = i + 300, y = i * 2, z = 0 },
         durationWorldHours = 1,
@@ -371,31 +358,30 @@ for _, record in pairs(records) do
 end
 nowMs = 2000
 worldHour = 10.5
-assert(PNC.Travel.Service.RefreshAbstractPositions(nowMs, true) == 100,
+T.truthy(PNC.Travel.Service.RefreshAbstractPositions(nowMs, true) == 100,
     "100-NPC abstract refresh count")
-assert(rosterCount == 0,
+T.truthy(rosterCount == 0,
     "abstract interpolation emitted per-step roster traffic")
 for _, record in pairs(records) do
-    assertNear(record.travel.distanceTravelled, 150, 0.001,
-        "100-NPC half-route projection")
+    T.near(record.travel.distanceTravelled, 150, 0.001, "100-NPC half-route projection")
 end
 nowMs = 3000
 worldHour = 11
-assert(PNC.Travel.Service.RefreshAbstractPositions(nowMs, true) == 100,
+T.truthy(PNC.Travel.Service.RefreshAbstractPositions(nowMs, true) == 100,
     "100-NPC arrival refresh count")
-assert(rosterCount == 100,
+T.truthy(rosterCount == 100,
     "arrival state changes were not replicated once per traveller")
 for _, record in pairs(records) do
-    assert(record.travel.state == "arrived",
+    T.truthy(record.travel.state == "arrived",
         "abstract traveller did not arrive coherently")
-    assert(record.orderSpec.kind == "roam",
+    T.truthy(record.orderSpec.kind == "roam",
         "abstract arrival did not switch to default roaming")
-    assertNear(record.orderSpec.radius, 6, 0.001,
-        "abstract default roam radius")
+    T.near(record.orderSpec.radius, 6, 0.001, "abstract default roam radius")
 end
 
-assert(dirtyCount > 0 and rosterCount > 0,
+T.truthy(dirtyCount > 0 and rosterCount > 0,
     "travel changes were not connected to persistence/network dirtiness")
-assert(arrivalCount >= 100, "arrival events were not emitted")
+T.truthy(arrivalCount >= 100, "arrival events were not emitted")
+T.finish("pnc_travel_service_smoke")
 
-print("pnc_travel_service_smoke: ok")
+T.finish("pnc_travel_service_smoke")

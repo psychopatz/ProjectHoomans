@@ -1,14 +1,9 @@
-local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Behaviors/PNC_Behavior_Combat.lua"
-local ENGAGEMENT_FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Engagement.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local FILE =
+    T.path("ProjectHoomans", "shared", "PNC/Core/Behaviors/PNC_Behavior_Combat.lua")
+local ENGAGEMENT_FILE =
+    T.path("ProjectHoomans", "shared", "PNC/Core/Combat/PNC_Combat_Engagement.lua")
 
 local calls = {}
 local mode = "melee"
@@ -97,8 +92,8 @@ PNC = {
     },
 }
 
-dofile(ENGAGEMENT_FILE)
-dofile(FILE)
+T.load(ENGAGEMENT_FILE)
+T.load(FILE)
 
 local record = {
     id = "fighter",
@@ -115,28 +110,28 @@ local target = {
 }
 
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assertEqual(calls[1], "pre", "tactical decision runs before attacks")
-assertEqual(calls[2], "shove", "pressure shove runs before melee strike")
-assertEqual(calls[3], "hold", "shove owns movement")
+T.equal(calls[1], "pre", "tactical decision runs before attacks")
+T.equal(calls[2], "shove", "pressure shove runs before melee strike")
+T.equal(calls[3], "hold", "shove owns movement")
 for i = 1, #calls do
-    assert(calls[i] ~= "melee", "normal melee bypassed tactical shove")
+    T.truthy(calls[i] ~= "melee", "normal melee bypassed tactical shove")
 end
 
 calls = {}
 preMoved = true
 preAction = nil
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assertEqual(calls[1], "pre", "retreat decision evaluated")
-assertEqual(#calls, 1, "retreat prevents attack commitment")
+T.equal(calls[1], "pre", "retreat decision evaluated")
+T.equal(#calls, 1, "retreat prevents attack commitment")
 
 calls = {}
 preMoved = false
 mode = "ranged"
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assertEqual(calls[1], "pre", "ranged precheck runs")
-assertEqual(calls[2], "hold", "ranged attack holds before spacing")
-assertEqual(calls[#calls - 1], "ranged", "ranged attack checks fire lane")
-assertEqual(
+T.equal(calls[1], "pre", "ranged precheck runs")
+T.equal(calls[2], "hold", "ranged attack holds before spacing")
+T.equal(calls[#calls - 1], "ranged", "ranged attack checks fire lane")
+T.equal(
     calls[#calls],
     "reposition:friendly_fire_risk",
     "blocked fire lane causes strafe request"
@@ -146,37 +141,38 @@ calls = {}
 mode = "mixed"
 target.distSq = 2.25
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assertEqual(calls[1], "pre", "mixed close-range precheck runs")
-assertEqual(calls[2], "melee",
+T.equal(calls[1], "pre", "mixed close-range precheck runs")
+T.equal(calls[2], "melee",
     "mixed close-range combat commits melee before ranged spacing")
 for i = 1, #calls do
-    assert(calls[i] ~= "spacing",
+    T.truthy(calls[i] ~= "spacing",
         "mixed melee switch backed away through ranged spacing")
 end
 
 calls = {}
 target.distSq = 9
 PNC.BehaviorCombat.TickEngage(record, {}, target)
-assert(calls[#calls] == "hold",
+T.truthy(calls[#calls] == "hold",
     "blocked mixed firearm lane did not commit melee fallback")
 local sawMeleeFallback = false
 for i = 1, #calls do
     if calls[i] == "melee" then sawMeleeFallback = true end
-    assert(calls[i] ~= "reposition:friendly_fire_risk",
+    T.truthy(calls[i] ~= "reposition:friendly_fire_risk",
         "mixed friendly-fire block strafed instead of melee fallback")
 end
-assert(sawMeleeFallback,
+T.truthy(sawMeleeFallback,
     "mixed friendly-fire block never attempted melee fallback")
 
 calls = {}
 reloadPressure = true
 record.runtime.attackAction = { attackType = "reload" }
-assertEqual(
+T.equal(
     PNC.BehaviorCombat.TickCommittedAction(record, {}),
     false,
     "unsafe reload releases committed behavior"
 )
-assertEqual(calls[1], "cancel_reload", "unsafe reload is cancelled")
-assertEqual(record.runtime.attackAction, nil, "cancelled reload state cleared")
+T.equal(calls[1], "cancel_reload", "unsafe reload is cancelled")
+T.equal(record.runtime.attackAction, nil, "cancelled reload state cleared")
+T.finish("pnc_combat_behavior_tactics_smoke")
 
-print("pnc_combat_behavior_tactics_smoke: ok")
+T.finish("pnc_combat_behavior_tactics_smoke")

@@ -1,10 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Presence/PNC_BodyLifecycle/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/Presence/PNC_BodyLifecycle/")
 
 local removedId
 local broadcastId
@@ -37,12 +33,12 @@ getGameTime = function()
     return { getWorldAgeHours = function() return 25 end }
 end
 
-dofile(ROOT .. "PNC_BodyLifecycle_State.lua")
-dofile(ROOT .. "PNC_BodyLifecycle_World.lua")
-dofile(ROOT .. "PNC_BodyLifecycle_LiveBodies.lua")
-dofile(ROOT .. "PNC_BodyLifecycle_Corpses.lua")
-dofile(ROOT .. "PNC_BodyLifecycle_Reanimation.lua")
-dofile(ROOT .. "PNC_BodyLifecycle_CorpseAudit.lua")
+T.load(ROOT .. "PNC_BodyLifecycle_State.lua")
+T.load(ROOT .. "PNC_BodyLifecycle_World.lua")
+T.load(ROOT .. "PNC_BodyLifecycle_LiveBodies.lua")
+T.load(ROOT .. "PNC_BodyLifecycle_Corpses.lua")
+T.load(ROOT .. "PNC_BodyLifecycle_Reanimation.lua")
+T.load(ROOT .. "PNC_BodyLifecycle_CorpseAudit.lua")
 
 local reanimateAt
 local corpseModData = {}
@@ -68,11 +64,11 @@ local record = {
     },
 }
 
-assert(PNC.BodyLifecycle.Internal.stampCorpse(record, corpse, "corpse_token"), "corpse stamp failed")
-assert(reanimateAt > 25, "managed corpse was not kept inert for authority handoff")
-assertEqual(corpseModData.PNC_NPC, nil, "corpse released from managed NPC tag")
-assertEqual(corpseModData.PNC_UUID, nil, "corpse released from managed UUID")
-assertEqual(corpseModData.PNC_DeathMarkerID, "infected_npc", "death marker corpse tag")
+T.truthy(PNC.BodyLifecycle.Internal.stampCorpse(record, corpse, "corpse_token"), "corpse stamp failed")
+T.truthy(reanimateAt > 25, "managed corpse was not kept inert for authority handoff")
+T.equal(corpseModData.PNC_NPC, nil, "corpse released from managed NPC tag")
+T.equal(corpseModData.PNC_UUID, nil, "corpse released from managed UUID")
+T.equal(corpseModData.PNC_DeathMarkerID, "infected_npc", "death marker corpse tag")
 
 local clearedVariables = {}
 local released = {}
@@ -83,17 +79,17 @@ released.setNoTeeth = function(_, value) released.noTeeth = value end
 released.setZombiesDontAttack = function(_, value) released.zombiesDontAttack = value end
 released.setInvincible = function(_, value) released.invincible = value end
 
-assert(PNC.BodyLifecycle.ReleaseReanimatedNPC(record, released), "reanimated release failed")
-assertEqual(corpseModData.PNC_NPC, nil, "managed NPC tag cleared")
-assertEqual(corpseModData.PNC_UUID, nil, "managed UUID cleared")
-assertEqual(corpseModData.PNC_ReanimatedFrom, "infected_npc", "reanimation provenance")
-assertEqual(released.useless, false, "ordinary zombie AI restored")
-assertEqual(released.noTeeth, false, "ordinary zombie bite restored")
-assertEqual(released.zombiesDontAttack, false, "ordinary zombie is attackable")
-assertEqual(released.invincible, false, "ordinary zombie is vulnerable")
-assertEqual(clearedVariables.PNCLive, true, "humanized variables cleared")
-assertEqual(broadcastId, "infected_npc", "client removal broadcast")
-assertEqual(removedId, "infected_npc", "registry removal")
+T.truthy(PNC.BodyLifecycle.ReleaseReanimatedNPC(record, released), "reanimated release failed")
+T.equal(corpseModData.PNC_NPC, nil, "managed NPC tag cleared")
+T.equal(corpseModData.PNC_UUID, nil, "managed UUID cleared")
+T.equal(corpseModData.PNC_ReanimatedFrom, "infected_npc", "reanimation provenance")
+T.equal(released.useless, false, "ordinary zombie AI restored")
+T.equal(released.noTeeth, false, "ordinary zombie bite restored")
+T.equal(released.zombiesDontAttack, false, "ordinary zombie is attackable")
+T.equal(released.invincible, false, "ordinary zombie is vulnerable")
+T.equal(clearedVariables.PNCLive, true, "humanized variables cleared")
+T.equal(broadcastId, "infected_npc", "client removal broadcast")
+T.equal(removedId, "infected_npc", "registry removal")
 
 local spawnedFlags = {}
 local spawnedModData = {
@@ -192,49 +188,49 @@ removedId = nil
 broadcastId = nil
 local identityEnsureCount = 0
 PNC.BodyLifecycle.Internal.ensureCorpseIdentityCard = function(_, target)
-    assertEqual(target, spawnCorpse, "identity card target before reanimation")
+    T.equal(target, spawnCorpse, "identity card target before reanimation")
     identityEnsureCount = identityEnsureCount + 1
     spawnCorpseModData.IdentityCardReady = true
     return {}, true
 end
 local originalReanimate = spawnCorpse.reanimate
 spawnCorpse.reanimate = function(self)
-    assertEqual(spawnCorpseModData.IdentityCardReady, true,
+    T.equal(spawnCorpseModData.IdentityCardReady, true,
         "identity card ensured before reanimation")
     return originalReanimate(self)
 end
 PNC.BodyLifecycle.Internal.auditCorpseRecord(spawnRecord)
-assertEqual(identityEnsureCount, 1, "infected corpse identity ensure count")
-assertEqual(spawnCalls, 0, "fallback used despite vanilla corpse reanimation")
-assertEqual(corpseReanimateCalls, 1, "vanilla corpse reanimation count")
-assertEqual(corpseRemoved, true, "vanilla reanimation consumed corpse")
-assertEqual(spawnedFlags.useless, false, "spawned zombie AI enabled")
-assertEqual(spawnedFlags.noTeeth, false, "spawned zombie teeth enabled")
-assertEqual(spawnedFlags.zombiesDontAttack, false, "spawned zombie is attackable")
-assertEqual(spawnedFlags.invincible, false, "spawned zombie vulnerability enabled")
-assertEqual(spawnedFlags.canWalk, nil, "vanilla locomotion state was overwritten")
-assertEqual(spawnedFlags.crawler, nil, "vanilla crawler state was overwritten")
-assertEqual(spawnedFlags.onFloor, nil, "vanilla reanimation pose was overwritten")
-assertEqual(spawnedFlags.health, nil, "vanilla toughness health was overwritten")
-assertEqual(spawnedModData.PNC_NPC, nil, "spawned zombie managed tag cleared")
-assertEqual(spawnedModData.PNC_UUID, nil, "spawned zombie managed UUID cleared")
-assertEqual(spawnedModData.PNC_PersistedShell, nil,
+T.equal(identityEnsureCount, 1, "infected corpse identity ensure count")
+T.equal(spawnCalls, 0, "fallback used despite vanilla corpse reanimation")
+T.equal(corpseReanimateCalls, 1, "vanilla corpse reanimation count")
+T.equal(corpseRemoved, true, "vanilla reanimation consumed corpse")
+T.equal(spawnedFlags.useless, false, "spawned zombie AI enabled")
+T.equal(spawnedFlags.noTeeth, false, "spawned zombie teeth enabled")
+T.equal(spawnedFlags.zombiesDontAttack, false, "spawned zombie is attackable")
+T.equal(spawnedFlags.invincible, false, "spawned zombie vulnerability enabled")
+T.equal(spawnedFlags.canWalk, nil, "vanilla locomotion state was overwritten")
+T.equal(spawnedFlags.crawler, nil, "vanilla crawler state was overwritten")
+T.equal(spawnedFlags.onFloor, nil, "vanilla reanimation pose was overwritten")
+T.equal(spawnedFlags.health, nil, "vanilla toughness health was overwritten")
+T.equal(spawnedModData.PNC_NPC, nil, "spawned zombie managed tag cleared")
+T.equal(spawnedModData.PNC_UUID, nil, "spawned zombie managed UUID cleared")
+T.equal(spawnedModData.PNC_PersistedShell, nil,
     "spawned zombie persisted-shell marker cleared")
-assertEqual(spawnedModData.PNC_ShellVersion, nil,
+T.equal(spawnedModData.PNC_ShellVersion, nil,
     "spawned zombie shell version cleared")
-assertEqual(spawnedModData.PNC_BaseOutfit, nil,
+T.equal(spawnedModData.PNC_BaseOutfit, nil,
     "spawned zombie shell outfit marker cleared")
-assertEqual(spawnedModData.PNC_ReanimatedFrom, "spawn_infected_npc",
+T.equal(spawnedModData.PNC_ReanimatedFrom, "spawn_infected_npc",
     "spawned zombie provenance")
-assertEqual(broadcastId, "spawn_infected_npc", "spawned NPC client removal")
-assertEqual(removedId, "spawn_infected_npc", "spawned NPC registry removal")
+T.equal(broadcastId, "spawn_infected_npc", "spawned NPC client removal")
+T.equal(removedId, "spawn_infected_npc", "spawned NPC registry removal")
 
 local spawnedAgain, duplicateReason =
     PNC.BodyLifecycle.SpawnReanimatedZombie(spawnRecord, spawnCorpse)
-assertEqual(spawnedAgain, false, "duplicate zombie spawn")
-assertEqual(duplicateReason, "already_spawned", "duplicate spawn guard")
-assertEqual(spawnCalls, 0, "reanimated zombie fallback unexpectedly ran")
-assertEqual(corpseReanimateCalls, 1, "duplicate vanilla corpse reanimation")
+T.equal(spawnedAgain, false, "duplicate zombie spawn")
+T.equal(duplicateReason, "already_spawned", "duplicate spawn guard")
+T.equal(spawnCalls, 0, "reanimated zombie fallback unexpectedly ran")
+T.equal(corpseReanimateCalls, 1, "duplicate vanilla corpse reanimation")
 
 local fallbackRecord = {
     id = "fallback_infected_npc",
@@ -259,15 +255,15 @@ local fallbackCorpse = {
 }
 local fallbackSpawned =
     PNC.BodyLifecycle.SpawnReanimatedZombie(fallbackRecord, fallbackCorpse)
-assertEqual(fallbackSpawned, true, "authority fallback spawn failed")
-assertEqual(spawnCalls, 1, "authority fallback spawn count")
-assertEqual(spawnArgs[1], 4, "fallback spawn x")
-assertEqual(spawnArgs[2], 5, "fallback spawn y")
-assertEqual(spawnArgs[4], 1, "single fallback zombie")
-assertEqual(spawnArgs[5], "Survivalist", "fallback outfit")
-assertEqual(spawnArgs[6], 100, "fallback sex")
-assertEqual(spawnArgs[11], false, "fallback zombie is not invulnerable")
-assertEqual(spawnedFlags.stats, true, "fallback vanilla stats initialized")
+T.equal(fallbackSpawned, true, "authority fallback spawn failed")
+T.equal(spawnCalls, 1, "authority fallback spawn count")
+T.equal(spawnArgs[1], 4, "fallback spawn x")
+T.equal(spawnArgs[2], 5, "fallback spawn y")
+T.equal(spawnArgs[4], 1, "single fallback zombie")
+T.equal(spawnArgs[5], "Survivalist", "fallback outfit")
+T.equal(spawnArgs[6], 100, "fallback sex")
+T.equal(spawnArgs[11], false, "fallback zombie is not invulnerable")
+T.equal(spawnedFlags.stats, true, "fallback vanilla stats initialized")
 
 authority = false
 local clientSpawned, clientReason =
@@ -281,9 +277,10 @@ local clientSpawned, clientReason =
             },
         },
     }, spawnCorpse)
-assertEqual(clientSpawned, false, "client created a reanimated zombie")
-assertEqual(clientReason, "not_authority_or_missing", "client authority guard")
-assertEqual(spawnCalls, 1, "client invoked vanilla zombie spawn API")
-assertEqual(corpseReanimateCalls, 1, "client invoked vanilla corpse reanimation")
+T.equal(clientSpawned, false, "client created a reanimated zombie")
+T.equal(clientReason, "not_authority_or_missing", "client authority guard")
+T.equal(spawnCalls, 1, "client invoked vanilla zombie spawn API")
+T.equal(corpseReanimateCalls, 1, "client invoked vanilla corpse reanimation")
+T.finish("pnc_infected_reanimation_smoke")
 
-print("pnc_infected_reanimation_smoke: ok")
+T.finish("pnc_infected_reanimation_smoke")

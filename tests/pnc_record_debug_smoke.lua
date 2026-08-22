@@ -1,17 +1,7 @@
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertContains(value, fragment, label)
-    if not string.find(tostring(value), tostring(fragment), 1, true) then
-        error((label or "assertContains") .. ": missing=" .. tostring(fragment) .. " value=" .. tostring(value))
-    end
-end
+local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
+local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
 
 local originalPrint = print
 local output = {}
@@ -20,7 +10,7 @@ print = function(message)
 end
 
 PNC = { Runtime = { debugEnabled = true } }
-dofile(SHARED_ROOT .. "PNC/Core/Base/PNC_Core.lua")
+T.load(SHARED_ROOT .. "PNC/Core/Base/PNC_Core.lua")
 
 local legacyManagedBody = {
     getModData = function()
@@ -34,26 +24,26 @@ local releasedZombie = {
     getModData = function() return {} end,
     getVariableBoolean = function() return false end,
 }
-assertEqual(PNC.Core.IsManagedNPCBody(legacyManagedBody), true,
+T.equal(PNC.Core.IsManagedNPCBody(legacyManagedBody), true,
     "legacy live body remains recognizable during relog")
-assertEqual(PNC.Core.IsManagedNPCBody(releasedZombie), false,
+T.equal(PNC.Core.IsManagedNPCBody(releasedZombie), false,
     "released reanimation remains an ordinary zombie")
 
 local quietRecord = { id = "npc_quiet", runtime = {} }
 local recordedRecord = { id = "npc_recorded", runtime = { debug = true } }
 PNC.Core.LogRecordDebug(quietRecord, "quiet record")
-assertEqual(#output, 0, "global debug does not enable record logs")
+T.equal(#output, 0, "global debug does not enable record logs")
 PNC.Core.LogRecordDebug(recordedRecord, "recorded record")
-assertEqual(#output, 1, "selected record emits debug log")
-assertContains(output[1], "recorded record", "selected record log message")
+T.equal(#output, 1, "selected record emits debug log")
+T.contains(output[1], "recorded record", "selected record log message")
 PNC.Core.LogDebug("global diagnostic")
-assertEqual(#output, 2, "global diagnostics remain available")
+T.equal(#output, 2, "global diagnostics remain available")
 
 quietRecord.runtime.debugMovement = true
-dofile(SHARED_ROOT .. "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Context.lua")
-assertEqual(PNC.PathService.Internal.isMovementDebugEnabled(quietRecord), false,
+T.load(SHARED_ROOT .. "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Context.lua")
+T.equal(PNC.PathService.Internal.isMovementDebugEnabled(quietRecord), false,
     "legacy movement flag cannot bypass recording toggle")
-assertEqual(PNC.PathService.Internal.isMovementDebugEnabled(recordedRecord), true,
+T.equal(PNC.PathService.Internal.isMovementDebugEnabled(recordedRecord), true,
     "recording toggle enables movement logs")
 
 PNC.Core.IsClientOnly = function() return true end
@@ -62,7 +52,7 @@ PNC.ClientPresenceSync = {
     MotionLogByID = {},
     Internal = {},
 }
-dofile(
+T.load(
     CLIENT_ROOT
         .. "PNC/PresenceSync/PNC_ClientPresenceRuntime.lua"
 )
@@ -70,18 +60,18 @@ PNC.ClientPresenceSync.Internal.LogClientMotionDebug({
     id = "npc_client_quiet",
     debugState = { debugEnabled = false },
 }, "npc_client_quiet", "native_controller_start", "goal=1,0,0")
-assertEqual(#output, 2, "global debug does not enable client NPC logs")
+T.equal(#output, 2, "global debug does not enable client NPC logs")
 PNC.ClientPresenceSync.Internal.LogClientMotionDebug({
     id = "npc_client_recorded",
     debugState = { debugEnabled = true },
 }, "npc_client_recorded", "native_controller_start", "goal=1,0,0")
-assertEqual(#output, 3, "recorded client NPC emits native-controller log")
-assertContains(output[3], "npc=npc_client_recorded", "recorded client NPC identity")
+T.equal(#output, 3, "recorded client NPC emits native-controller log")
+T.contains(output[3], "npc=npc_client_recorded", "recorded client NPC identity")
 PNC.ClientPresenceSync.Internal.LogClientMotionDebug({
     id = "npc_client_recorded",
     debugState = { debugEnabled = true },
 }, "npc_client_recorded", "native_controller_start", "goal=1,0,0")
-assertEqual(#output, 3, "duplicate native-controller diagnostic is throttled")
+T.equal(#output, 3, "duplicate native-controller diagnostic is throttled")
 
 print = originalPrint
 
@@ -118,10 +108,10 @@ ISContextMenu = {
     end,
 }
 
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
-dofile(CLIENT_ROOT .. "PNC/UI/Context/PNC_ContextHub.lua")
+T.load(CLIENT_ROOT .. "PNC/UI/Context/PNC_ContextHub.lua")
 PNC.ContextHub.RegisterProvider({
     id = "smoke",
     addOptions = function(menu)
@@ -135,25 +125,26 @@ entries = {
 }
 local menu = newMenu()
 PNC.ContextHub.BuildWorldContext(0, menu, {}, false)
-assertEqual(#menu.options, 2, "NPC entries are listed at context root")
-assertEqual(menu.options[1].name, "Nigel Hidalgo", "normal label hides debug metadata")
-assertEqual(menu.options[2].name, "Dario Hanna", "second normal label hides debug metadata")
-assertEqual(menu.options[1].iconTexture, "media/ui/emotes/insult.png", "Talk provider icon")
-assertEqual(menu.options[2].iconTexture, "media/ui/emotes/insult.png", "shared Talk provider icon")
-assertEqual(menu.options[1].submenu.options[1].name, "Action", "provider options remain nested under NPC")
+T.equal(#menu.options, 2, "NPC entries are listed at context root")
+T.equal(menu.options[1].name, "Nigel Hidalgo", "normal label hides debug metadata")
+T.equal(menu.options[2].name, "Dario Hanna", "second normal label hides debug metadata")
+T.equal(menu.options[1].iconTexture, "media/ui/emotes/insult.png", "Talk provider icon")
+T.equal(menu.options[2].iconTexture, "media/ui/emotes/insult.png", "shared Talk provider icon")
+T.equal(menu.options[1].submenu.options[1].name, "Action", "provider options remain nested under NPC")
 
 PNC.Runtime.debugEnabled = true
 menu = newMenu()
 PNC.ContextHub.BuildWorldContext(0, menu, {}, false)
-assertContains(menu.options[1].name, "[Foreman]", "debug label archetype")
-assertContains(menu.options[1].name, "(1.0)", "debug label distance")
+T.contains(menu.options[1].name, "[Foreman]", "debug label archetype")
+T.contains(menu.options[1].name, "(1.0)", "debug label distance")
 
 PNC.Runtime.debugEnabled = false
 entries[1].debugRecording = true
 menu = newMenu()
 PNC.ContextHub.BuildWorldContext(0, menu, {}, false)
-assertContains(menu.options[1].name, "[REC]", "recorded context indicator")
-assertContains(menu.options[1].name, "[Foreman]", "recorded NPC exposes debug metadata")
-assertEqual(menu.options[2].name, "Dario Hanna", "unrecorded NPC remains uncluttered")
+T.contains(menu.options[1].name, "[REC]", "recorded context indicator")
+T.contains(menu.options[1].name, "[Foreman]", "recorded NPC exposes debug metadata")
+T.equal(menu.options[2].name, "Dario Hanna", "unrecorded NPC remains uncluttered")
+T.finish("pnc_record_debug_smoke")
 
-print("pnc_record_debug_smoke: ok")
+T.finish("pnc_record_debug_smoke")

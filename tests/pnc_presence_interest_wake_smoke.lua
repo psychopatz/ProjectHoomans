@@ -1,4 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Presence/PNC_Presence.lua"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/Presence/PNC_Presence.lua")
 local now = 1000
 local scheduled = 0
 local woken = 0
@@ -43,7 +45,7 @@ PNC = {
     },
     SimulationClock = {
         Wake = function(candidate, key, wakeAt)
-            assert(candidate == record and key == "presence"
+            T.truthy(candidate == record and key == "presence"
                 and wakeAt == now, "incorrect presence wake")
             woken = woken + 1
         end,
@@ -51,25 +53,26 @@ PNC = {
     Scheduler = {
         SLOT_MS = 50,
         Schedule = function(candidate, dueAt)
-            assert(candidate == record and dueAt == now + 50,
+            T.truthy(candidate == record and dueAt == now + 50,
                 "incorrect materialization schedule")
             scheduled = scheduled + 1
         end,
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
-assert(PNC.Presence.RefreshMaterializationCandidates(now, false) == 1,
+T.truthy(PNC.Presence.RefreshMaterializationCandidates(now, false) == 1,
     "nearby abstract NPC was not discovered")
-assert(woken == 1 and scheduled == 1,
+T.truthy(woken == 1 and scheduled == 1,
     "multiplayer player queries did not deduplicate the NPC wake")
-assert(record.runtime.forcePresenceCheck == true,
+T.truthy(record.runtime.forcePresenceCheck == true,
     "presence force flag was not set")
 
 now = 1100
-assert(PNC.Presence.RefreshMaterializationCandidates(now, false) == 0,
+T.truthy(PNC.Presence.RefreshMaterializationCandidates(now, false) == 0,
     "interest wake throttle failed")
-assert(scheduled == 1, "throttled wake scheduled duplicate work")
+T.truthy(scheduled == 1, "throttled wake scheduled duplicate work")
+T.finish("pnc_presence_interest_wake_smoke")
 
-print("pnc_presence_interest_wake_smoke: ok")
+T.finish("pnc_presence_interest_wake_smoke")

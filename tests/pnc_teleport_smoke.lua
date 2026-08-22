@@ -1,16 +1,11 @@
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
-local SERVER_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
-package.path = CLIENT_ROOT .. "?.lua;" .. SERVER_ROOT .. "?.lua;"
-    .. package.path
+local T = require "tests/support/test"
 
-local CLIENT_FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_Client.lua"
-local SERVER_FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/PNC_Server.lua"
+local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
+local SERVER_ROOT = T.path("ProjectHoomans", "server", "")
+T.addPackagePaths()
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local CLIENT_FILE = T.path("ProjectHoomans", "client", "PNC/PNC_Client.lua")
+local SERVER_FILE = T.path("ProjectHoomans", "server", "PNC/PNC_Server.lua")
 
 local nativeTeleports = {}
 local clientCommands = {}
@@ -60,20 +55,20 @@ PNC = {
     ClientInterpolation = {},
 }
 
-dofile(CLIENT_FILE)
+T.load(CLIENT_FILE)
 
-assertEqual(PNC.Client.SendDebug("teleport_to_npc", { id = "far_npc" }), true,
+T.equal(PNC.Client.SendDebug("teleport_to_npc", { id = "far_npc" }), true,
     "single-player teleport accepted")
-assertEqual(#nativeTeleports, 1, "single-player used native teleportTo")
-assertEqual(nativeTeleports[1].x, 12001.5, "single-player destination x")
-assertEqual(nativeTeleports[1].y, 13501.5, "single-player destination y")
-assertEqual(coreTeleportCalls[1].x, 12001.5, "client delegated destination to Core")
+T.equal(#nativeTeleports, 1, "single-player used native teleportTo")
+T.equal(nativeTeleports[1].x, 12001.5, "single-player destination x")
+T.equal(nativeTeleports[1].y, 13501.5, "single-player destination y")
+T.equal(coreTeleportCalls[1].x, 12001.5, "client delegated destination to Core")
 
 clientOnly = true
-assertEqual(PNC.Client.SendDebug("teleport_to_npc", { id = "far_npc" }), true,
+T.equal(PNC.Client.SendDebug("teleport_to_npc", { id = "far_npc" }), true,
     "multiplayer request accepted")
-assertEqual(clientCommands[1].command, "DebugCommand", "multiplayer request reached PNC server")
-assertEqual(clientCommands[1].payload.id, "far_npc", "multiplayer request kept NPC id")
+T.equal(clientCommands[1].command, "DebugCommand", "multiplayer request reached PNC server")
+T.equal(clientCommands[1].payload.id, "far_npc", "multiplayer request kept NPC id")
 
 local onClientCommand
 isClient = function() return false end
@@ -111,11 +106,12 @@ PNC = {
 
 require "PNC/Networking/PNC_ServerCommandRouter"
 require "PNC/Networking/Handlers/PNC_ServerLegacyDebugCommandHandler"
-dofile(SERVER_FILE)
+T.load(SERVER_FILE)
 onClientCommand("PNC", "DebugCommand", serverPlayer, { action = "teleport_to_npc", id = "far_npc" })
 local serverCall = coreTeleportCalls[#coreTeleportCalls]
-assertEqual(serverCall.target, serverPlayer, "server approved requesting player")
-assertEqual(serverCall.x, 12001.5, "server delegated destination x")
-assertEqual(serverCall.y, 13501.5, "server delegated destination y")
+T.equal(serverCall.target, serverPlayer, "server approved requesting player")
+T.equal(serverCall.x, 12001.5, "server delegated destination x")
+T.equal(serverCall.y, 13501.5, "server delegated destination y")
+T.finish("pnc_teleport_smoke")
 
-print("pnc_teleport_smoke: ok")
+T.finish("pnc_teleport_smoke")

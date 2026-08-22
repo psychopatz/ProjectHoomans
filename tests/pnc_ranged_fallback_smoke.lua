@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local equipCalls = {}
 PNC = {
@@ -54,9 +49,9 @@ WeaponType.getWeaponType = function(item)
     return item.weaponType
 end
 
-dofile(ROOT .. "Equipment/PNC_Equipment_Items.lua")
-dofile(ROOT .. "Equipment/PNC_Equipment_Slots.lua")
-dofile(ROOT .. "Equipment/PNC_Equipment.lua")
+T.load(ROOT .. "Equipment/PNC_Equipment_Items.lua")
+T.load(ROOT .. "Equipment/PNC_Equipment_Slots.lua")
+T.load(ROOT .. "Equipment/PNC_Equipment.lua")
 
 PNC.Equipment.CreateItem = function(fullType)
     local weaponType = string.find(fullType, "Pistol", 1, true)
@@ -99,15 +94,15 @@ local record = {
 }
 
 local switched, reason = PNC.Equipment.ActivateMeleeFallback(record, nil)
-assertEqual(switched, true, "melee fallback switch")
-assertEqual(reason, "switched_to_melee", "melee fallback reason")
-assertEqual(record.inventory.equipped.primary, "reserve", "reserved melee weapon priority")
-assertEqual(record.inventory.items.gun.equipSlot, nil, "empty firearm unequipped")
-assertEqual(record.inventory.items.reserve.equipSlot, "primary", "melee weapon equipped")
-assertEqual(record.equipment.primaryFullType, "Base.HuntingKnife", "legacy equipment synchronized")
-assertEqual(record.weaponMode, "melee", "combat mode switched")
-assertEqual(record.runtime.forceSyncEvent, "weapon_fallback_melee", "multiplayer sync requested")
-assertEqual(equipCalls[1].reason, "combat_melee_fallback", "melee mutation reason")
+T.equal(switched, true, "melee fallback switch")
+T.equal(reason, "switched_to_melee", "melee fallback reason")
+T.equal(record.inventory.equipped.primary, "reserve", "reserved melee weapon priority")
+T.equal(record.inventory.items.gun.equipSlot, nil, "empty firearm unequipped")
+T.equal(record.inventory.items.reserve.equipSlot, "primary", "melee weapon equipped")
+T.equal(record.equipment.primaryFullType, "Base.HuntingKnife", "legacy equipment synchronized")
+T.equal(record.weaponMode, "melee", "combat mode switched")
+T.equal(record.runtime.forceSyncEvent, "weapon_fallback_melee", "multiplayer sync requested")
+T.equal(equipCalls[1].reason, "combat_melee_fallback", "melee mutation reason")
 
 local shoveRecord = {
     weaponMode = "ranged",
@@ -131,12 +126,13 @@ local shoveRecord = {
 }
 
 switched, reason = PNC.Equipment.ActivateMeleeFallback(shoveRecord, nil)
-assertEqual(switched, true, "shove fallback switch")
-assertEqual(reason, "switched_to_shove", "shove fallback reason")
-assertEqual(shoveRecord.inventory.equipped.primary, nil, "firearm cleared for shove")
-assertEqual(shoveRecord.equipment.primaryFullType, nil, "barehand equipment synchronized")
-assertEqual(shoveRecord.weaponMode, "melee", "shove mode is melee")
-assertEqual(shoveRecord.runtime.forceSyncEvent, "weapon_fallback_shove", "shove sync requested")
-assertEqual(equipCalls[2].reason, "combat_shove_fallback", "shove mutation reason")
+T.equal(switched, true, "shove fallback switch")
+T.equal(reason, "switched_to_shove", "shove fallback reason")
+T.equal(shoveRecord.inventory.equipped.primary, nil, "firearm cleared for shove")
+T.equal(shoveRecord.equipment.primaryFullType, nil, "barehand equipment synchronized")
+T.equal(shoveRecord.weaponMode, "melee", "shove mode is melee")
+T.equal(shoveRecord.runtime.forceSyncEvent, "weapon_fallback_shove", "shove sync requested")
+T.equal(equipCalls[2].reason, "combat_shove_fallback", "shove mutation reason")
+T.finish("pnc_ranged_fallback_smoke")
 
-print("pnc_ranged_fallback_smoke: ok")
+T.finish("pnc_ranged_fallback_smoke")

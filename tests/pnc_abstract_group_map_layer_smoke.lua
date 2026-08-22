@@ -1,4 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "client", "PNC/UI/Map/")
     .. "Layers/PNC_MapLayer_AbstractGroups.lua"
 
 package.preload["ISUI/Maps/ISWorldMap"] = function() return true end
@@ -35,12 +37,12 @@ PNC = {
     } },
 }
 
-dofile(FILE)
-assert(registered and registered.id == "pnc_abstract_groups",
+T.load(FILE)
+T.truthy(registered and registered.id == "pnc_abstract_groups",
     "abstract group layer was not registered")
-assert(registered.definition.order > 90,
+T.truthy(registered.definition.order > 90,
     "group markers should render above community geometry")
-assert(registered.definition.isVisible() == false,
+T.truthy(registered.definition.isVisible() == false,
     "raw group overlay must be hidden by default")
 PNC.WorldDiscoveryDebugMap.ShowRawEntities = true
 
@@ -59,11 +61,12 @@ local map = {
     drawText = function(_, value) hover[#hover + 1] = value end,
 }
 registered.definition.render(map)
-assert(requests == 1, "map layer did not refresh Director data")
-assert(#rectangles >= 2, "group marker and hover card were not rendered")
-assert(labels[1] == "LOOTER", "group archetype label was not rendered")
-assert(hover[2] == "Members: 3", "group hover population was not rendered")
-assert(rectangles[1][6] == 1 and rectangles[1][7] == 0.22,
+T.truthy(requests == 1, "map layer did not refresh Director data")
+T.truthy(#rectangles >= 2, "group marker and hover card were not rendered")
+T.truthy(labels[1] == "LOOTER", "group archetype label was not rendered")
+T.truthy(hover[2] == "Members: 3", "group hover population was not rendered")
+T.truthy(rectangles[1][6] == 1 and rectangles[1][7] == 0.22,
     "looter group did not use hostile map color")
+T.finish("pnc_abstract_group_map_layer_smoke")
 
-print("pnc_abstract_group_map_layer_smoke: ok")
+T.finish("pnc_abstract_group_map_layer_smoke")

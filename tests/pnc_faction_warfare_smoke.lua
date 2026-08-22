@@ -1,18 +1,9 @@
+local T = require "tests/support/test"
+
 local SHARED =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 local SERVER =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
-
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. ": expected="
-            .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
-
-local function truthy(value, label)
-    equal(value == true, true, label)
-end
+    T.path("ProjectHoomans", "server", "PNC/")
 
 local function saveSafe(value, seen)
     local kind = type(value)
@@ -64,17 +55,17 @@ ModData = {
 }
 
 PNC = {}
-dofile(SHARED .. "Base/PNC_Core.lua")
-dofile(SHARED .. "Base/PNC_Constants.lua")
-dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
-dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
-dofile(SHARED .. "Factions/PNC_FactionBalance.lua")
-dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
-dofile(SHARED .. "Factions/PNC_FactionEmblems.lua")
-dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
-dofile(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
-dofile(SHARED .. "Factions/PNC_FactionIntent.lua")
-dofile(SHARED .. "Factions/PNC_FactionTypes.lua")
+T.load(SHARED .. "Base/PNC_Core.lua")
+T.load(SHARED .. "Base/PNC_Constants.lua")
+T.load(SHARED .. "Relationships/PNC_EntityRef.lua")
+T.load(SHARED .. "Factions/PNC_FactionConstants.lua")
+T.load(SHARED .. "Factions/PNC_FactionBalance.lua")
+T.load(SHARED .. "Factions/PNC_FactionArchetypes.lua")
+T.load(SHARED .. "Factions/PNC_FactionEmblems.lua")
+T.load(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
+T.load(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
+T.load(SHARED .. "Factions/PNC_FactionIntent.lua")
+T.load(SHARED .. "Factions/PNC_FactionTypes.lua")
 
 PNC.Types = {
     NormalizeFaction = function(value)
@@ -221,12 +212,12 @@ local traderNPC = npc("npc_trader")
 local tollLooterNPC = npc("npc_toll_looter")
 local settlerNPC = npc("npc_settler")
 
-dofile(SERVER .. "PNC_FactionService.lua")
-dofile(SERVER .. "PNC_FactionIncidentService.lua")
-dofile(SERVER .. "PNC_FactionBehavior.lua")
-dofile(SERVER .. "PNC_FactionMembershipService.lua")
-dofile(SHARED .. "Relationships/PNC_Relationships.lua")
-dofile(SHARED .. "Commands/PNC_CompanionCommandRegistry.lua")
+T.load(SERVER .. "PNC_FactionService.lua")
+T.load(SERVER .. "PNC_FactionIncidentService.lua")
+T.load(SERVER .. "PNC_FactionBehavior.lua")
+T.load(SERVER .. "PNC_FactionMembershipService.lua")
+T.load(SHARED .. "Relationships/PNC_Relationships.lua")
+T.load(SHARED .. "Commands/PNC_CompanionCommandRegistry.lua")
 
 local Factions = PNC.Factions
 Factions.Load()
@@ -252,26 +243,26 @@ local ok, reason, playerFaction =
         name = "Patrick Survivors",
         createdAt = hour,
     })
-truthy(ok, "player faction created")
-equal(playerFaction.ownerPlayerKey, playerKey,
+T.truthy(ok, "player faction created")
+T.equal(playerFaction.ownerPlayerKey, playerKey,
     "stable player owner key")
-equal(Factions.GetPlayerFaction(player).id,
+T.equal(Factions.GetPlayerFaction(player).id,
     playerFaction.id, "player faction lookup")
-truthy(Factions.AddPlayerMember(
+T.truthy(Factions.AddPlayerMember(
     playerFaction.id,
     memberKey,
     { actorKey = playerKey }
 ), "owner adds second player member")
-equal(Factions.Registry.byPlayerKey[memberKey],
+T.equal(Factions.Registry.byPlayerKey[memberKey],
     playerFaction.id, "second player indexed")
-truthy(Factions.TransferPlayerLeadership(
+T.truthy(Factions.TransferPlayerLeadership(
     playerFaction.id,
     memberKey,
     { actorKey = playerKey }
 ), "leadership transfers to player member")
-equal(Factions.Get(playerFaction.id).ownerPlayerKey,
+T.equal(Factions.Get(playerFaction.id).ownerPlayerKey,
     memberKey, "one transferred player leader")
-truthy(Factions.TransferPlayerLeadership(
+T.truthy(Factions.TransferPlayerLeadership(
     playerFaction.id,
     playerKey,
     { actorKey = memberKey }
@@ -304,19 +295,19 @@ local _, _, settlerFaction = Factions.Create({
 
 -- Looter assignment strips companion ownership and immediately applies
 -- its default outsider hostility.
-truthy(Factions.AddNPC(
+T.truthy(Factions.AddNPC(
     looterFaction.id,
     looterNPC.id,
     { joinedAt = hour }
 ), "assign looter")
-equal(looterNPC.faction, "hostile", "looter tactical class")
-equal(looterNPC.recruited, false, "looter not companion")
-equal(looterNPC.ownerUsername, nil, "looter owner cleared")
-equal(looterNPC.hostility.attackPlayers, true,
+T.equal(looterNPC.faction, "hostile", "looter tactical class")
+T.equal(looterNPC.recruited, false, "looter not companion")
+T.equal(looterNPC.ownerUsername, nil, "looter owner cleared")
+T.equal(looterNPC.hostility.attackPlayers, true,
     "looter attacks outsiders by default")
-equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_HUNT,
+T.equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_HUNT,
     "looter follows hostile hunt policy")
-truthy(Factions.CanNPCTargetPlayer(looterNPC, player),
+T.truthy(Factions.CanNPCTargetPlayer(looterNPC, player),
     "looter can target player by default")
 
 -- Mobile-group state changes only path/order selection. It must preserve the
@@ -327,27 +318,27 @@ Factions.Registry.byID[looterFaction.id].mobile = {
     site = { home = { x = 300, y = 400, z = 0, radius = 12 } },
 }
 PNC.FactionBehavior.ApplyNPC(looterNPC, "mobile_random_test")
-equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_ROAM,
+T.equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_ROAM,
     "mobile random looters roam locally")
-equal(looterNPC.hostility.attackPlayers, true,
+T.equal(looterNPC.hostility.attackPlayers, true,
     "mobile random looters remain aggressive")
 Factions.Registry.byID[looterFaction.id].mobile.pathMode = "player"
 PNC.FactionBehavior.ApplyNPC(looterNPC, "mobile_player_test")
-equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_HUNT,
+T.equal(looterNPC.orderSpec.kind, PNC.Const.ORDER_HOSTILE_HUNT,
     "mobile player looters use hostile hunt")
 Factions.Registry.byID[looterFaction.id].mobile = nil
 PNC.FactionBehavior.ApplyNPC(looterNPC, "mobile_reset_test")
 
 -- A base-owning looter settlement starts in a toll posture. It remains
 -- distinct from roaming looter gangs, which retain proactive hostility.
-truthy(Factions.AddNPC(
+T.truthy(Factions.AddNPC(
     tollLooterFaction.id,
     tollLooterNPC.id,
     { joinedAt = hour }
 ), "assign territorial toll looter")
-equal(tollLooterNPC.faction, "neutral",
+T.equal(tollLooterNPC.faction, "neutral",
     "toll settlement does not start shoot-on-sight")
-equal(Factions.CanNPCTargetPlayer(tollLooterNPC, player),
+T.equal(Factions.CanNPCTargetPlayer(tollLooterNPC, player),
     false, "toll settlement awaits escalation")
 local tollIntent = PNC.FactionIntent.Resolve({
     archetypeID = "looter",
@@ -355,15 +346,15 @@ local tollIntent = PNC.FactionIntent.Resolve({
     territorialToll = true,
     targetInsideTerritory = true,
 })
-equal(tollIntent.intent, "threaten",
+T.equal(tollIntent.intent, "threaten",
     "territorial looter requests toll inside base")
-equal(tollIntent.attackAllowed, false,
+T.equal(tollIntent.attackAllowed, false,
     "unrefused toll is nonlethal")
 looterNPC.runtime.target = {
     kind = "player",
     player = player,
 }
-truthy(Factions.PacifyForPlayer(
+T.truthy(Factions.PacifyForPlayer(
     looterFaction.id,
     playerKey,
     {
@@ -373,9 +364,9 @@ truthy(Factions.PacifyForPlayer(
         sourceNPCID = looterNPC.id,
     }
 ), "specific player pacified")
-equal(looterNPC.runtime.target, nil,
+T.equal(looterNPC.runtime.target, nil,
     "pacification clears current player target")
-equal(Factions.CanNPCTargetPlayer(looterNPC, player),
+T.equal(Factions.CanNPCTargetPlayer(looterNPC, player),
     false, "pacified player is ignored")
 local sameAccountOtherCharacter = {
     uuid = "char_other",
@@ -383,85 +374,85 @@ local sameAccountOtherCharacter = {
     getDisplayName = function() return "Patrick II" end,
     getOnlineID = function() return 8 end,
 }
-truthy(Factions.CanNPCTargetPlayer(
+T.truthy(Factions.CanNPCTargetPlayer(
     looterNPC,
     sameAccountOtherCharacter
 ), "pacification does not transfer to another character UUID")
-truthy(PNC.FactionBehavior.ResolveIntent(
+T.truthy(PNC.FactionBehavior.ResolveIntent(
     looterNPC,
     player,
     { immediateSelfDefense = true }
 ).attackAllowed, "self-defense remains available")
 hour = hour + 25
-truthy(Factions.CanNPCTargetPlayer(looterNPC, player),
+T.truthy(Factions.CanNPCTargetPlayer(looterNPC, player),
     "expired pacification restores hostility")
 hour = hour - 25
 
 -- Player-owned faction membership derives companion ownership.
-truthy(Factions.AddNPC(
+T.truthy(Factions.AddNPC(
     playerFaction.id,
     playerNPC.id,
     { joinedAt = hour }
 ), "assign player faction NPC")
-equal(playerNPC.faction, "colonist",
+T.equal(playerNPC.faction, "colonist",
     "player member tactical class")
-equal(playerNPC.recruited, true,
+T.equal(playerNPC.recruited, true,
     "player member companion")
-equal(playerNPC.ownerUsername, "Patrick",
+T.equal(playerNPC.ownerUsername, "Patrick",
     "player member stable owner")
-equal(playerNPC.orderSpec.kind, PNC.Const.ORDER_FOLLOW,
+T.equal(playerNPC.orderSpec.kind, PNC.Const.ORDER_FOLLOW,
     "player member follows owner")
-truthy(PNC.CompanionCommands.IsOwnedByPlayer(
+T.truthy(PNC.CompanionCommands.IsOwnedByPlayer(
     playerNPC,
     player
 ), "owner character can command member")
-truthy(Factions.AddNPC(
+T.truthy(Factions.AddNPC(
     playerFaction.id,
     transferredNPC.id,
     { joinedAt = hour }
 ), "assign transfer test companion")
-equal(transferredNPC.recruited, true,
+T.equal(transferredNPC.recruited, true,
     "transfer test starts as companion")
 local replacementSurvivor = {
     uuid = "char_replacement",
     getUsername = function() return "Patrick" end,
     getOnlineID = function() return 8 end,
 }
-equal(PNC.CompanionCommands.IsOwnedByPlayer(
+T.equal(PNC.CompanionCommands.IsOwnedByPlayer(
     playerNPC,
     replacementSurvivor
 ), false, "same account replacement cannot inherit faction")
 
 -- Non-hostile external factions are neutral until war.
-truthy(Factions.AddNPC(
+T.truthy(Factions.AddNPC(
     traderFaction.id,
     traderNPC.id,
     { joinedAt = hour }
 ), "assign trader")
-equal(traderNPC.faction, "neutral",
+T.equal(traderNPC.faction, "neutral",
     "trader initially neutral")
-equal(traderNPC.recruited, false,
+T.equal(traderNPC.recruited, false,
     "trader not companion")
-equal(Factions.CanNPCTargetPlayer(traderNPC, player),
+T.equal(Factions.CanNPCTargetPlayer(traderNPC, player),
     false, "neutral trader ignores player")
 
 -- Settlements use neutral outsider policy unless diplomacy or immediate
 -- self-defense explicitly escalates them.
-truthy(Factions.AddNPC(
+T.truthy(Factions.AddNPC(
     settlerFaction.id,
     settlerNPC.id,
     { joinedAt = hour }
 ), "assign peaceful settler")
-equal(settlerNPC.faction, "neutral",
+T.equal(settlerNPC.faction, "neutral",
     "settler is not colored hostile without war")
-equal(settlerNPC.hostility.attackPlayers, false,
+T.equal(settlerNPC.hostility.attackPlayers, false,
     "settler does not attack neutral outsider")
-equal(settlerNPC.orderSpec.kind, PNC.Const.ORDER_ROAM,
+T.equal(settlerNPC.orderSpec.kind, PNC.Const.ORDER_ROAM,
     "settler receives neutral roam order")
 
 -- War is symmetric, revisioned once, and updates every member's behavior.
 local beforeWarRevision = Factions.Registry.revision
-truthy(Factions.DeclareWar(
+T.truthy(Factions.DeclareWar(
     playerFaction.id,
     traderFaction.id,
     {
@@ -470,56 +461,56 @@ truthy(Factions.DeclareWar(
         instigatorFactionID = playerFaction.id,
     }
 ), "declare war")
-truthy(Factions.AreAtWar(
+T.truthy(Factions.AreAtWar(
     playerFaction.id,
     traderFaction.id
 ), "forward war")
-truthy(Factions.AreAtWar(
+T.truthy(Factions.AreAtWar(
     traderFaction.id,
     playerFaction.id
 ), "reverse war")
-equal(traderNPC.faction, "hostile",
+T.equal(traderNPC.faction, "hostile",
     "war activates aggressive behavior")
-equal(traderNPC.hostility.attackPlayers, true,
+T.equal(traderNPC.hostility.attackPlayers, true,
     "war attacks enemy player faction")
-truthy(PNC.Relationships.AreNPCsEnemies(
+T.truthy(PNC.Relationships.AreNPCsEnemies(
     traderNPC,
     playerNPC
 ), "war NPC targeting")
-truthy(Factions.CanNPCTargetPlayer(traderNPC, player),
+T.truthy(Factions.CanNPCTargetPlayer(traderNPC, player),
     "war player targeting")
-equal(Factions.DeclareWar(
+T.equal(Factions.DeclareWar(
     playerFaction.id,
     traderFaction.id,
     { worldAgeHours = hour }
 ), false, "duplicate war unchanged")
-equal(Factions.Registry.revision,
+T.equal(Factions.Registry.revision,
     beforeWarRevision + 1, "duplicate war no revision")
 
 -- Moving an existing companion into a faction whose war is already active
 -- must immediately replace companion behavior with faction-war behavior.
 local broadcastsBeforeTransfer = #broadcasts
-truthy(Factions.TransferNPC(
+T.truthy(Factions.TransferNPC(
     transferredNPC.id,
     traderFaction.id,
     { worldAgeHours = hour }
 ), "transfer companion into active enemy faction")
-equal(transferredNPC.faction, "hostile",
+T.equal(transferredNPC.faction, "hostile",
     "transferred member tactical class")
-equal(transferredNPC.recruited, false,
+T.equal(transferredNPC.recruited, false,
     "transferred member no longer companion")
-equal(transferredNPC.ownerUsername, nil,
+T.equal(transferredNPC.ownerUsername, nil,
     "transferred member owner cleared")
-equal(transferredNPC.hostility.attackPlayers, true,
+T.equal(transferredNPC.hostility.attackPlayers, true,
     "transferred member attacks enemy player faction")
-equal(transferredNPC.orderSpec.kind,
+T.equal(transferredNPC.orderSpec.kind,
     PNC.Const.ORDER_HOSTILE_HUNT,
     "transferred member receives hostile hunt order")
-truthy(Factions.CanNPCTargetPlayer(transferredNPC, player),
+T.truthy(Factions.CanNPCTargetPlayer(transferredNPC, player),
     "transferred member can target player immediately")
-equal(#broadcasts, broadcastsBeforeTransfer + 1,
+T.equal(#broadcasts, broadcastsBeforeTransfer + 1,
     "transfer broadcasts live behavior immediately")
-equal(broadcasts[#broadcasts].reason,
+T.equal(broadcasts[#broadcasts].reason,
     "faction_transferred",
     "transfer broadcast reason")
 traderNPC.runtime.target = {
@@ -529,7 +520,7 @@ traderNPC.runtime.target = {
 traderNPC.runtime.attackAction = { active = true }
 
 -- Peace restores external factions to nonlethal policy.
-truthy(Factions.MakePeace(
+T.truthy(Factions.MakePeace(
     playerFaction.id,
     traderFaction.id,
     {
@@ -537,19 +528,19 @@ truthy(Factions.MakePeace(
         reason = "manual_debug",
     }
 ), "make peace")
-equal(traderNPC.faction, "neutral",
+T.equal(traderNPC.faction, "neutral",
     "peace restores neutral behavior")
-equal(Factions.CanNPCTargetPlayer(traderNPC, player),
+T.equal(Factions.CanNPCTargetPlayer(traderNPC, player),
     false, "peace stops player targeting")
-equal(traderNPC.runtime.target, nil,
+T.equal(traderNPC.runtime.target, nil,
     "peace clears stale faction-war player target")
-equal(PNC.Relationships.AreNPCsEnemies(
+T.equal(PNC.Relationships.AreNPCsEnemies(
     looterNPC,
     playerNPC
 ), true, "looter policy is hostile to outsider NPCs")
 
 -- Treaty behavior changes preserve unrelated higher-priority zombie combat.
-truthy(Factions.DeclareWar(
+T.truthy(Factions.DeclareWar(
     playerFaction.id,
     traderFaction.id,
     {
@@ -563,7 +554,7 @@ local zombieTarget = {
     zombieId = 99,
 }
 traderNPC.runtime.target = zombieTarget
-truthy(Factions.MakePeace(
+T.truthy(Factions.MakePeace(
     playerFaction.id,
     traderFaction.id,
     {
@@ -571,12 +562,12 @@ truthy(Factions.MakePeace(
         reason = "manual_debug",
     }
 ), "second peace")
-equal(traderNPC.runtime.target, zombieTarget,
+T.equal(traderNPC.runtime.target, zombieTarget,
     "peace preserves unrelated zombie target")
-equal(#PNC.FactionBehavior.ReconciliationQueue, 0,
+T.equal(#PNC.FactionBehavior.ReconciliationQueue, 0,
     "small treaty reconciliation completes immediately")
 
-truthy(Factions.DeclareWar(
+T.truthy(Factions.DeclareWar(
     playerFaction.id,
     traderFaction.id,
     {
@@ -591,7 +582,7 @@ local activeAttackerTarget = {
     targetAggression = true,
 }
 traderNPC.runtime.target = activeAttackerTarget
-truthy(Factions.MakePeace(
+T.truthy(Factions.MakePeace(
     playerFaction.id,
     traderFaction.id,
     {
@@ -599,13 +590,13 @@ truthy(Factions.MakePeace(
         reason = "manual_debug",
     }
 ), "self-defense test peace")
-equal(traderNPC.runtime.target, activeAttackerTarget,
+T.equal(traderNPC.runtime.target, activeAttackerTarget,
     "peace preserves immediate self-defense target")
 traderNPC.runtime.target = {
     kind = "player",
     player = player,
 }
-truthy(Factions.FormAlliance(
+T.truthy(Factions.FormAlliance(
     playerFaction.id,
     traderFaction.id,
     {
@@ -614,9 +605,9 @@ truthy(Factions.FormAlliance(
         override = true,
     }
 ), "form alliance for stale target test")
-equal(traderNPC.runtime.target, nil,
+T.equal(traderNPC.runtime.target, nil,
     "alliance clears stale allied target")
-truthy(Factions.BreakAlliance(
+T.truthy(Factions.BreakAlliance(
     playerFaction.id,
     traderFaction.id,
     {
@@ -624,19 +615,19 @@ truthy(Factions.BreakAlliance(
         instigatorFactionID = playerFaction.id,
     }
 ), "break alliance after target test")
-equal(Factions.AreAtWar(
+T.equal(Factions.AreAtWar(
     playerFaction.id,
     traderFaction.id
 ), false, "breaking alliance does not declare war")
 
 -- Personal enemy state is reported only by faction authority and does not
 -- immediately declare war under the safe default.
-truthy(Factions.SetLeader(
+T.truthy(Factions.SetLeader(
     traderFaction.id,
     traderNPC.id,
     hour + 1
 ), "set faction leader")
-truthy(Factions.OnRelationshipChanged(
+T.truthy(Factions.OnRelationshipChanged(
     traderNPC,
     playerKey,
     {
@@ -645,82 +636,82 @@ truthy(Factions.OnRelationshipChanged(
         revision = 1,
     }
 ), "leader reports personal grievance")
-equal(Factions.AreAtWar(
+T.equal(Factions.AreAtWar(
     playerFaction.id,
     traderFaction.id
 ), false, "personal enemy does not force war")
 
 hour = hour + 2
-truthy(Factions.OnPlayerAggression(
+T.truthy(Factions.OnPlayerAggression(
     player,
     traderNPC,
     hour
 ), "first attack records incident")
-equal(Factions.AreAtWar(
+T.equal(Factions.AreAtWar(
     playerFaction.id,
     traderFaction.id
 ), false, "minor attack does not force war")
-truthy(Factions.OnPlayerAggression(
+T.truthy(Factions.OnPlayerAggression(
     player,
     traderNPC,
     hour + 0.001,
     { killed = true }
 ), "death upgrades attack episode")
-truthy(Factions.AreAtWar(
+T.truthy(Factions.AreAtWar(
     playerFaction.id,
     traderFaction.id
 ), "member death escalates to war")
-truthy(Factions.Archive(
+T.truthy(Factions.Archive(
     traderFaction.id,
     "test_archive",
     hour + 1
 ), "archive warring faction")
-equal(Factions.AreAtWar(
+T.equal(Factions.AreAtWar(
     playerFaction.id,
     traderFaction.id
 ), false, "archive ends active war")
-equal(traderNPC.affiliation.factionID, nil,
+T.equal(traderNPC.affiliation.factionID, nil,
     "archive removes membership")
-equal(traderNPC.faction, "neutral",
+T.equal(traderNPC.faction, "neutral",
     "archived member becomes neutral")
-equal(looterNPC.presenceRevision, 9,
+T.equal(looterNPC.presenceRevision, 9,
     "looter behavior leaves presence revision")
-equal(playerNPC.presenceRevision, 9,
+T.equal(playerNPC.presenceRevision, 9,
     "player faction behavior leaves presence revision")
-equal(traderNPC.presenceRevision, 9,
+T.equal(traderNPC.presenceRevision, 9,
     "war behavior leaves presence revision")
 
 -- Large-pair reconciliation is runtime-only, bounded, and deduplicated.
 for index = 1, 20 do
     local record = npc("npc_queue_" .. tostring(index))
-    truthy(Factions.AddNPC(
+    T.truthy(Factions.AddNPC(
         looterFaction.id,
         record.id,
         { joinedAt = hour + 2 }
     ), "queue test member")
 end
-truthy(PNC.FactionBehavior.QueueTreatyReconciliation(
+T.truthy(PNC.FactionBehavior.QueueTreatyReconciliation(
     playerFaction.id,
     looterFaction.id,
     "queue_test",
     hour + 2
 ), "reconciliation queued")
-equal(PNC.FactionBehavior.QueueTreatyReconciliation(
+T.equal(PNC.FactionBehavior.QueueTreatyReconciliation(
     playerFaction.id,
     looterFaction.id,
     "queue_test_duplicate",
     hour + 2
 ), false, "reconciliation request deduplicated")
-equal(#PNC.FactionBehavior.ReconciliationQueue, 1,
+T.equal(#PNC.FactionBehavior.ReconciliationQueue, 1,
     "one runtime reconciliation job")
-equal(PNC.FactionBehavior.PumpReconciliation(5), 5,
+T.equal(PNC.FactionBehavior.PumpReconciliation(5), 5,
     "reconciliation bounded per pump")
-equal(PNC.FactionBehavior.ReconciliationQueue[1]
+T.equal(PNC.FactionBehavior.ReconciliationQueue[1]
     .processedCount, 5, "reconciliation cursor retained")
 while #PNC.FactionBehavior.ReconciliationQueue > 0 do
     PNC.FactionBehavior.PumpReconciliation(5)
 end
-equal(#PNC.FactionBehavior.ReconciliationQueue, 0,
+T.equal(#PNC.FactionBehavior.ReconciliationQueue, 0,
     "reconciliation completes")
 
 -- Existing looter factions that already own a settled community are
@@ -739,12 +730,12 @@ PNC.Communities = {
         return {}
     end,
 }
-equal(Factions.ReconcileTerritorialLooterFactions(), 1,
+T.equal(Factions.ReconcileTerritorialLooterFactions(), 1,
     "legacy looter settlement reconciled")
-truthy(Factions.IsTerritorialTollFaction(
+T.truthy(Factions.IsTerritorialTollFaction(
     looterFaction.id
 ), "legacy looter settlement receives toll tag")
-equal(looterNPC.faction, "neutral",
+T.equal(looterNPC.faction, "neutral",
     "legacy looter base stops shoot-on-sight behavior")
 
 -- V2 diplomacy migrates to directed relations, emblems, and V6
@@ -774,51 +765,51 @@ local migrated = PNC.FactionTypes.NormalizeFactionRegistry({
         },
     },
 })
-equal(migrated.schemaVersion, 6, "registry migrated to V6")
-truthy(type(migrated.byPlayerKey) == "table",
+T.equal(migrated.schemaVersion, 6, "registry migrated to V6")
+T.truthy(type(migrated.byPlayerKey) == "table",
     "player index added")
-equal(migrated.diplomacy, nil,
+T.equal(migrated.diplomacy, nil,
     "legacy pair table removed")
-truthy(migrated.byID.faction_old_a
+T.truthy(migrated.byID.faction_old_a
     .relations.faction_old_b.atWar,
     "forward war migrated")
-truthy(migrated.byID.faction_old_b
+T.truthy(migrated.byID.faction_old_b
     .relations.faction_old_a.atWar,
     "reverse war migrated")
-truthy(#migrated.byID.faction_old_a.emblem.layers > 0,
+T.truthy(#migrated.byID.faction_old_a.emblem.layers > 0,
     "old faction receives deterministic emblem")
-truthy(type(migrated.byID.faction_old_a
+T.truthy(type(migrated.byID.faction_old_a
     .playerPacifications) == "table",
     "old faction receives pacification table")
-truthy(PNC.FactionTypes.AreEqual(
+T.truthy(PNC.FactionTypes.AreEqual(
     migrated,
     PNC.FactionTypes.NormalizeFactionRegistry(migrated)
 ), "V6 faction migration idempotent")
 
 local memberSnapshot = PNC.FactionMembership.BuildSnapshot(player)
-equal(memberSnapshot.faction.id, playerFaction.id,
+T.equal(memberSnapshot.faction.id, playerFaction.id,
     "membership snapshot is scoped to actor faction")
-equal(memberSnapshot.canManage, true,
+T.equal(memberSnapshot.canManage, true,
     "faction owner can manage players")
-equal(#memberSnapshot.playerMembers, 2,
+T.equal(#memberSnapshot.playerMembers, 2,
     "membership snapshot lists player members")
-equal(#memberSnapshot.availablePlayers, 1,
+T.equal(#memberSnapshot.availablePlayers, 1,
     "membership snapshot lists eligible online player")
 memberSnapshot = PNC.FactionMembership.PerformAction(player, {
     memberAction = "add_player",
     playerKey = "player:Morgan:char_join",
 })
-equal(memberSnapshot.actionResult.ok, true,
+T.equal(memberSnapshot.actionResult.ok, true,
     "membership channel adds selected player")
-equal(#memberSnapshot.playerMembers, 3,
+T.equal(#memberSnapshot.playerMembers, 3,
     "added player appears in snapshot")
 memberSnapshot = PNC.FactionMembership.PerformAction(player, {
     memberAction = "banish_player",
     playerKey = "player:Morgan:char_join",
 })
-equal(memberSnapshot.actionResult.ok, true,
+T.equal(memberSnapshot.actionResult.ok, true,
     "membership channel banishes selected player")
-equal(Factions.Registry.byPlayerKey[
+T.equal(Factions.Registry.byPlayerKey[
     "player:Morgan:char_join"
 ], nil, "banished player index removed")
 saveSafe(memberSnapshot)
@@ -828,40 +819,40 @@ saveSafe(memberSnapshot)
 -- a neutral refugee faction instead of lingering as a duplicate player
 -- faction.
 PNC.PlayerCharacters.Registry.byUUID.char_player.status = "dead"
-truthy(Factions.HandlePlayerCharacterDeath(
+T.truthy(Factions.HandlePlayerCharacterDeath(
     playerKey,
     hour + 3
 ), "dead owner reconciled")
-equal(Factions.Get(playerFaction.id).ownerPlayerKey,
+T.equal(Factions.Get(playerFaction.id).ownerPlayerKey,
     memberKey, "living player member succeeds")
-equal(Factions.Registry.byPlayerKey[playerKey], nil,
+T.equal(Factions.Registry.byPlayerKey[playerKey], nil,
     "dead player faction index removed")
 PNC.PlayerCharacters.Registry.byUUID.char_member.status = "dead"
-truthy(Factions.HandlePlayerCharacterDeath(
+T.truthy(Factions.HandlePlayerCharacterDeath(
     memberKey,
     hour + 4
 ), "last player leader reconciled")
 local refugeeFaction = Factions.Get(playerFaction.id)
-equal(refugeeFaction.ownerPlayerKey, nil,
+T.equal(refugeeFaction.ownerPlayerKey, nil,
     "refugee faction has no player owner")
-equal(refugeeFaction.archetypeID, "refugee",
+T.equal(refugeeFaction.archetypeID, "refugee",
     "orphaned player faction becomes refugees")
-equal(refugeeFaction.name, "Patrick Refugees",
+T.equal(refugeeFaction.name, "Patrick Refugees",
     "orphaned faction receives distinct refugee name")
-equal(Factions.Registry.byPlayerKey[memberKey], nil,
+T.equal(Factions.Registry.byPlayerKey[memberKey], nil,
     "last dead player faction index removed")
-equal(playerNPC.affiliation.factionID, playerFaction.id,
+T.equal(playerNPC.affiliation.factionID, playerFaction.id,
     "surviving NPC remains with refugee faction")
-equal(playerNPC.faction, "neutral",
+T.equal(playerNPC.faction, "neutral",
     "former companion becomes neutral refugee")
-equal(playerNPC.recruited, false,
+T.equal(playerNPC.recruited, false,
     "former companion is no longer recruited")
-equal(playerNPC.presenceRevision, 9,
+T.equal(playerNPC.presenceRevision, 9,
     "player death reconciliation leaves presence revision")
 local reconciledRevision = Factions.Registry.revision
-equal(Factions.ReconcilePlayerMemberships(hour + 5), 0,
+T.equal(Factions.ReconcilePlayerMemberships(hour + 5), 0,
     "repeat player membership reconciliation is idempotent")
-equal(Factions.Registry.revision, reconciledRevision,
+T.equal(Factions.Registry.revision, reconciledRevision,
     "idempotent reconciliation leaves registry revision")
 
 -- Every active character can own a hidden diplomacy container without
@@ -878,7 +869,7 @@ PNC.PlayerCharacters.Registry.byUUID.char_provisional = {
     displayName = "Taylor",
     status = "active",
 }
-truthy(Factions.EnsurePlayerDiplomacyFaction(
+T.truthy(Factions.EnsurePlayerDiplomacyFaction(
     provisionalPlayer,
     { worldAgeHours = hour + 6 }
 ), "provisional diplomacy faction created")
@@ -886,9 +877,9 @@ local provisionalKey =
     "player:Taylor:char_provisional"
 local provisional =
     Factions.GetDiplomacyFactionForPlayerKey(provisionalKey)
-truthy(Factions.IsProvisionalPlayerFaction(provisional),
+T.truthy(Factions.IsProvisionalPlayerFaction(provisional),
     "diplomacy container is provisional")
-equal(Factions.GetFactionForPlayerKey(provisionalKey), nil,
+T.equal(Factions.GetFactionForPlayerKey(provisionalKey), nil,
     "provisional container is not a playable faction")
 local visibleBeforePromotion = #Factions.List()
 local promotedOK, promotedReason, promoted =
@@ -896,12 +887,12 @@ local promotedOK, promotedReason, promoted =
         name = "Taylor Union",
         createdAt = hour + 7,
     })
-truthy(promotedOK, "provisional faction promoted")
-equal(promotedReason, "promoted_provisional",
+T.truthy(promotedOK, "provisional faction promoted")
+T.equal(promotedReason, "promoted_provisional",
     "promotion result is explicit")
-equal(promoted.id, provisional.id,
+T.equal(promoted.id, provisional.id,
     "promotion preserves diplomacy faction identity")
-equal(#Factions.List(), visibleBeforePromotion + 1,
+T.equal(#Factions.List(), visibleBeforePromotion + 1,
     "promoted faction becomes visible")
 
 local joiningPlayer = {
@@ -915,14 +906,14 @@ PNC.PlayerCharacters.Registry.byUUID.char_provisional_join = {
     displayName = "Casey",
     status = "active",
 }
-truthy(Factions.EnsurePlayerDiplomacyFaction(
+T.truthy(Factions.EnsurePlayerDiplomacyFaction(
     joiningPlayer,
     { worldAgeHours = hour + 7.2 }
 ), "joining player provisional container created")
 local joiningKey = "player:Casey:char_provisional_join"
 local joiningProvisional =
     Factions.GetDiplomacyFactionForPlayerKey(joiningKey)
-truthy(Factions.AddPlayerMember(
+T.truthy(Factions.AddPlayerMember(
     promoted.id,
     joiningKey,
     {
@@ -930,9 +921,9 @@ truthy(Factions.AddPlayerMember(
         worldAgeHours = hour + 7.3,
     }
 ), "provisional player joins founded faction")
-equal(Factions.GetFactionForPlayerKey(joiningKey).id,
+T.equal(Factions.GetFactionForPlayerKey(joiningKey).id,
     promoted.id, "joining player receives actual membership")
-equal(Factions.Get(joiningProvisional.id).status,
+T.equal(Factions.Get(joiningProvisional.id).status,
     "archived", "joining retires provisional container")
 
 local doomedPlayer = {
@@ -946,7 +937,7 @@ PNC.PlayerCharacters.Registry.byUUID.char_provisional_dead = {
     displayName = "Robin",
     status = "active",
 }
-truthy(Factions.EnsurePlayerDiplomacyFaction(
+T.truthy(Factions.EnsurePlayerDiplomacyFaction(
     doomedPlayer,
     { worldAgeHours = hour + 8 }
 ), "second provisional container created")
@@ -961,13 +952,14 @@ local retiredOK, retiredReason =
         doomedKey,
         hour + 9
     )
-truthy(retiredOK, "dead provisional player reconciled")
-equal(retiredReason, "provisional_retired",
+T.truthy(retiredOK, "dead provisional player reconciled")
+T.equal(retiredReason, "provisional_retired",
     "provisional death does not create refugees")
-equal(Factions.Registry.byPlayerKey[doomedKey], nil,
+T.equal(Factions.Registry.byPlayerKey[doomedKey], nil,
     "dead provisional identity index removed")
-equal(Factions.Get(doomed.id).status, "archived",
+T.equal(Factions.Get(doomed.id).status, "archived",
     "dead provisional container archived")
 saveSafe(Factions.Registry)
+T.finish("pnc_faction_warfare_smoke")
 
-print("pnc_faction_warfare_smoke: ok")
+T.finish("pnc_faction_warfare_smoke")

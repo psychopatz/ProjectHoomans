@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local PLAYER_FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Debug/"
+    T.path("ProjectHoomans", "client", "PNC/Debug/")
         .. "PNC_AnimationDebugPlayer.lua"
 
 local now = 1000
@@ -72,7 +74,7 @@ local body = {
         return tonumber(state.variables[name]) or 0
     end,
     setVariable = function(_, name, value)
-        assert(
+        T.truthy(
             name ~= "targetSeenTime" and name ~= "hitforce",
             "callback-backed selector was written through setVariable"
         )
@@ -106,7 +108,7 @@ local body = {
 }
 
 function require() return true end
-dofile(PLAYER_FILE)
+T.load(PLAYER_FILE)
 
 local player = PNC.AnimationDebugPlayer
 local xmlEntry = {
@@ -147,66 +149,67 @@ local entry = {
 }
 
 local ok, reason = player.PlayXML(xmlEntry, "npc-1", body)
-assert(
+T.truthy(
     ok and reason == "xml_selectors_clip_started",
     "XML preview did not start"
 )
-assert(state.raw == "Bob_Idle", "XML clip was not started")
-assert(state.variables.DebugSelector == "chosen", "XML selector was not applied")
-assert(state.hitForce == 1.01, "GTR selector value was not satisfied")
-assert(
+T.truthy(state.raw == "Bob_Idle", "XML clip was not started")
+T.truthy(state.variables.DebugSelector == "chosen", "XML selector was not applied")
+T.truthy(state.hitForce == 1.01, "GTR selector value was not satisfied")
+T.truthy(
     state.targetSeenTime == 0.49,
     "targetSeenTime adapter did not satisfy LESS selector"
 )
-assert(
+T.truthy(
     state.variables.bHasTarget == nil,
     "read-only derived selector was written"
 )
-assert(
+T.truthy(
     player.active.skippedSelectors[1] == "bHasTarget",
     "read-only selector was not reported"
 )
-assert(state.useless == false, "preview body must be engine-active")
-assert(player.IsPreviewing(body), "preview body ownership missing")
-assert(traceEvents[#traceEvents] == "debug_xml_play", "XML trace stage missing")
+T.truthy(state.useless == false, "preview body must be engine-active")
+T.truthy(player.IsPreviewing(body), "preview body ownership missing")
+T.truthy(traceEvents[#traceEvents] == "debug_xml_play", "XML trace stage missing")
 
 player.Stop("test_xml_stop")
-assert(state.variables.DebugSelector == "", "selector was not restored")
-assert(state.hitForce == 0, "numeric selector was not restored")
-assert(state.targetSeenTime == 3.0, "callback selector was not restored")
-assert(state.useless == true, "managed useless state was not restored")
-assert(not player.IsPreviewing(body), "preview ownership survived stop")
+T.truthy(state.variables.DebugSelector == "", "selector was not restored")
+T.truthy(state.hitForce == 0, "numeric selector was not restored")
+T.truthy(state.targetSeenTime == 3.0, "callback selector was not restored")
+T.truthy(state.useless == true, "managed useless state was not restored")
+T.truthy(not player.IsPreviewing(body), "preview ownership survived stop")
 
 ok, reason = player.PlayPipeline(entry, "npc-1", body)
-assert(ok and reason == "bump_type_setter", "pipeline preview failed")
-assert(#pipelineCalls == 1, "PNC bump pipeline was not called")
-assert(
+T.truthy(ok and reason == "bump_type_setter", "pipeline preview failed")
+T.truthy(#pipelineCalls == 1, "PNC bump pipeline was not called")
+T.truthy(
     pipelineCalls[1].bumpType == "PNC_Legacy_Attack2H2",
     "wrong pipeline BumpType"
 )
-assert(
+T.truthy(
     pipelineCalls[1].keepManagedUseless == nil,
     "debug pipeline must preserve the SP/MP body-mode contract"
 )
 player.Finish()
-assert(finishCalls == 1, "pipeline finish was not signalled")
+T.truthy(finishCalls == 1, "pipeline finish was not signalled")
 player.Stop("test_pipeline_stop")
-assert(finishCalls == 2, "stop did not finish active pipeline")
+T.truthy(finishCalls == 2, "stop did not finish active pipeline")
 
 ok, reason = player.PlayRaw(entry, "npc-1", body)
-assert(ok and reason == "raw_clip_started", "raw preview failed")
-assert(state.raw == entry.anim, "wrong raw animation clip")
-assert(
+T.truthy(ok and reason == "raw_clip_started", "raw preview failed")
+T.truthy(state.raw == entry.anim, "wrong raw animation clip")
+T.truthy(
     state.variables.BumpType == "before",
     "raw clip mode unexpectedly applied XML selectors"
 )
 local runtime = player.Runtime()
-assert(runtime.track == "Bob_TestTrack", "runtime track inspection failed")
-assert(runtime.trackTime == 0.25, "runtime track time inspection failed")
-assert(
+T.truthy(runtime.track == "Bob_TestTrack", "runtime track inspection failed")
+T.truthy(runtime.trackTime == 0.25, "runtime track time inspection failed")
+T.truthy(
     runtime.advancedState == "not Lua-exposed",
     "runtime must not index strict AdvancedAnimator userdata"
 )
 player.Stop("done")
+T.finish("pnc_animation_debug_player_smoke")
 
-print("pnc_animation_debug_player_smoke: ok")
+T.finish("pnc_animation_debug_player_smoke")

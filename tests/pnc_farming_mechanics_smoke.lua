@@ -5,10 +5,6 @@ T.addPackagePaths({
     { "ProjectHoomans", "server" },
 })
 
-local function equal(actual, expected, label)
-    T.equal(actual, expected, label)
-end
-
 local function list(items)
     return {
         size = function() return #items end,
@@ -136,46 +132,46 @@ local component = { region = {} }
 local tile = { x = 10, y = 20, z = 0 }
 
 local planted, plantReason = Adapter.Plant(record, body, component, tile, "cabbages")
-equal(planted, true, "planting succeeds")
-equal(plantReason, "PLANTED", "planting reason")
-equal(plant.seededType, "Cabbages", "vanilla receives crop key")
-equal(record.inventory.items.seed_1.stack, 0, "seed item is consumed")
+T.equal(planted, true, "planting succeeds")
+T.equal(plantReason, "PLANTED", "planting reason")
+T.equal(plant.seededType, "Cabbages", "vanilla receives crop key")
+T.equal(record.inventory.items.seed_1.stack, 0, "seed item is consumed")
 
 local watered, waterReason = Adapter.Water(record, body, tile)
-equal(watered, true, "watering succeeds")
-equal(waterReason, "WATERED", "watering reason")
-equal(plant.waterLvl, 10, "plant receives one water use")
-equal(fluid.amount, 0.75, "fluid amount is reduced")
-equal(waterItem.synced, true, "fluid item is synchronized")
+T.equal(watered, true, "watering succeeds")
+T.equal(waterReason, "WATERED", "watering reason")
+T.equal(plant.waterLvl, 10, "plant receives one water use")
+T.equal(fluid.amount, 0.75, "fluid amount is reduced")
+T.equal(waterItem.synced, true, "fluid item is synchronized")
 
 local growth, growthReason = Adapter.ApplyResearchEffect(
     component, "fast_growth", body)
-equal(growth, true, "fast growth succeeds")
-equal(growthReason, "PLOT_GROWN", "fast growth uses vanilla grow result")
+T.equal(growth, true, "fast growth succeeds")
+T.equal(growthReason, "PLOT_GROWN", "fast growth uses vanilla grow result")
 T.truthy(plant.nbOfGrow > 5, "fast growth reaches harvest level")
 
 local boosted, boostReason = Adapter.ApplyResearchEffect(
     component, "boost_yield", body)
-equal(boosted, true, "yield boost succeeds")
-equal(boostReason, "YIELD_BOOSTED", "yield boost reason")
-equal(plant.bonusYield, true, "vanilla bonus-yield flag is enabled")
+T.equal(boosted, true, "yield boost succeeds")
+T.equal(boostReason, "YIELD_BOOSTED", "yield boost reason")
+T.equal(plant.bonusYield, true, "vanilla bonus-yield flag is enabled")
 
 local fertilized, fertilizerReason = Adapter.ApplyResearchEffect(
     component, "fertilize", body)
-equal(fertilized, true, "fertilizer effect succeeds")
-equal(fertilizerReason, "FERTILIZER_APPLIED", "fertilizer reason")
-equal(plant.compost, true, "vanilla compost path is used")
+T.equal(fertilized, true, "fertilizer effect succeeds")
+T.equal(fertilizerReason, "FERTILIZER_APPLIED", "fertilizer reason")
+T.equal(plant.compost, true, "vanilla compost path is used")
 
 local gmo, gmoReason = Adapter.ApplyResearchEffect(
     component, "gmo_upgrade", body)
-equal(gmo, true, "GMO effect succeeds")
-equal(gmoReason, "GMO_UPGRADE_APPLIED", "GMO reason")
-equal(plant.health, 100, "GMO raises plant health")
-equal(plant.cursed, false, "GMO clears cursed state")
+T.equal(gmo, true, "GMO effect succeeds")
+T.equal(gmoReason, "GMO_UPGRADE_APPLIED", "GMO reason")
+T.equal(plant.health, 100, "GMO raises plant health")
+T.equal(plant.cursed, false, "GMO clears cursed state")
 
 local harvested, harvestReason = Adapter.Harvest(record, body, tile)
-equal(harvested, true, "harvesting succeeds")
-equal(harvestReason, "HARVESTED", "harvesting reason")
-equal(plant.harvestedBy, body, "vanilla receives the live farmer body")
+T.equal(harvested, true, "harvesting succeeds")
+T.equal(harvestReason, "HARVESTED", "harvesting reason")
+T.equal(plant.harvestedBy, body, "vanilla receives the live farmer body")
 
 T.finish("pnc_farming_mechanics_smoke")

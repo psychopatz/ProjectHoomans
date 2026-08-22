@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Behaviors/PNC_Behavior_Roaming.lua"
 
 local now = 1000
@@ -89,8 +91,8 @@ ZombRandFloat = function()
     return 0
 end
 
-dofile(FILE)
-assert(type(registeredTick) == "function",
+T.load(FILE)
+T.truthy(type(registeredTick) == "function",
     "roaming behavior did not register")
 
 local record = {
@@ -119,41 +121,42 @@ local record = {
     },
 }
 
-assert(registeredTick(record, {}))
-assert(record.runtime.roaming.phase == "idle",
+T.truthy(registeredTick(record, {}))
+T.truthy(record.runtime.roaming.phase == "idle",
     "new roaming order immediately started walking")
-assert(record.runtime.roaming.waitUntil == 6000,
+T.truthy(record.runtime.roaming.waitUntil == 6000,
     "legacy default roaming order did not adopt the new dwell minimum")
-assert(record.activeBehavior == "Roam:area:idle",
+T.truthy(record.activeBehavior == "Roam:area:idle",
     "idle roam phase was not exposed to scene eligibility/debugging")
-assert(haltCount == 1 and moveCount == 0,
+T.truthy(haltCount == 1 and moveCount == 0,
     "initial roam dwell did not halt movement")
-assert(threatScans == 1,
+T.truthy(threatScans == 1,
     "initial safety scan did not run")
 
 now = 1100
-assert(registeredTick(record, {}))
-assert(moveCount == 0,
+T.truthy(registeredTick(record, {}))
+T.truthy(moveCount == 0,
     "roamer moved during its dwell window")
-assert(threatScans == 1,
+T.truthy(threatScans == 1,
     "idle threat query ignored its negative-result cache")
 now = 1500
 record.runtime.target = { id = "stale_target" }
-assert(registeredTick(record, {}))
-assert(threatScans == 2,
+T.truthy(registeredTick(record, {}))
+T.truthy(threatScans == 2,
     "idle threat scan did not refresh at its bounded interval")
-assert(moveCount == 0,
+T.truthy(moveCount == 0,
     "threat refresh broke the dwell phase")
-assert(record.runtime.target == nil,
+T.truthy(record.runtime.target == nil,
     "invalid roam target kept an idle NPC in combat LOD")
 
 now = 6000
-assert(registeredTick(record, {}))
-assert(record.runtime.roaming.phase == "moving",
+T.truthy(registeredTick(record, {}))
+T.truthy(record.runtime.roaming.phase == "moving",
     "expired dwell did not transition to a movement phase")
-assert(moveCount == 1,
+T.truthy(moveCount == 1,
     "expired dwell did not issue a roaming move")
-assert(record.lastMove.reason == "roam_area",
+T.truthy(record.lastMove.reason == "roam_area",
     "roaming move lost its navigation reason")
+T.finish("pnc_roaming_dwell_smoke")
 
-print("pnc_roaming_dwell_smoke: ok")
+T.finish("pnc_roaming_dwell_smoke")

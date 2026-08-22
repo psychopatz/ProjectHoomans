@@ -1,14 +1,6 @@
-local function equal(actual, expected, message)
-    if actual ~= expected then error((message or "mismatch") .. ": expected="
-        .. tostring(expected) .. " actual=" .. tostring(actual)) end
-end
+local T = require "tests/support/test"
 
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/?.lua",
-    "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/?.lua",
-    "../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/?.lua",
-    package.path,
-}, ";")
+T.addPackagePaths()
 
 local sampleCallback
 Events = { EveryOneSecond = { Add = function(callback) sampleCallback = callback end,
@@ -28,14 +20,15 @@ PNC = { SpatialIndex = { Rebuild = original }, Registry = { Data = {}, LiveByID 
     WorldCensus = { OrdinaryZombies = {}, ManagedBodies = {} }, Scheduler = { Buckets = {} } }
 
 require "PNC/Integrations/PNC_PsychopatzProfiler"
-equal(PNC.SpatialIndex.Rebuild, original, "lazy controller changed OFF hot path")
-equal(PsychopatzCore.Profiler, nil, "lazy controller loaded profiler backend")
-assert(Bootstrap.captureControllers.ProjectHoomans, "bridge controller was not registered")
+T.equal(PNC.SpatialIndex.Rebuild, original, "lazy controller changed OFF hot path")
+T.equal(PsychopatzCore.Profiler, nil, "lazy controller loaded profiler backend")
+T.truthy(Bootstrap.captureControllers.ProjectHoomans, "bridge controller was not registered")
 
 local result = Bootstrap.ApplyCaptureConfig({ mode = "DETAILED", capture = { "performance" } })
-equal(result.applied, true, "bridge could not activate Project Hoomans profiler")
-assert(PNC.SpatialIndex.Rebuild ~= original, "live activation did not install wrapper")
+T.equal(result.applied, true, "bridge could not activate Project Hoomans profiler")
+T.truthy(PNC.SpatialIndex.Rebuild ~= original, "live activation did not install wrapper")
 PsychopatzCore.Profiler.Stop()
-equal(PNC.SpatialIndex.Rebuild, original, "live activation wrapper did not restore")
+T.equal(PNC.SpatialIndex.Rebuild, original, "live activation wrapper did not restore")
+T.finish("pnc_profiler_bridge_lazy_activation_smoke")
 
-print("pnc profiler bridge lazy activation: ok")
+T.finish("pnc_profiler_bridge_lazy_activation_smoke")

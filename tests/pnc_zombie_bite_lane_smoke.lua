@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Zombies/PNC_ZombieAggro_Bite.lua"
 
 local now = 1000
@@ -110,34 +112,35 @@ PNC = {
 
 getCell = function() return {} end
 
-dofile(FILE)
+T.load(FILE)
 
-assert(
+T.truthy(
     PNC.ZombieAggro.TryStartBite(zombie, npcBody, record) == false,
     "wall-separated zombie started a bite"
 )
-assert(bumpType == "", "blocked bite entered the bump graph")
-assert(record.runtime.zombieAttackLane.reason == "bite_lane_wall",
+T.truthy(bumpType == "", "blocked bite entered the bump graph")
+T.truthy(record.runtime.zombieAttackLane.reason == "bite_lane_wall",
     "blocked wall lane was not diagnosed")
 
 laneClear = true
 laneReason = "clear"
 visibilityKind = "clear"
-assert(PNC.ZombieAggro.TryStartBite(zombie, npcBody, record) == true,
+T.truthy(PNC.ZombieAggro.TryStartBite(zombie, npcBody, record) == true,
     "clear adjacent lane did not start a bite")
-assert(bumpType == "Bite", "clear bite did not enter windup")
+T.truthy(bumpType == "Bite", "clear bite did not enter windup")
 
 laneClear = false
 laneReason = "wall"
 visibilityKind = "blocked"
 now = 1250
-assert(PNC.ZombieAggro.UpdateBiteState(zombie, now) == true,
+T.truthy(PNC.ZombieAggro.UpdateBiteState(zombie, now) == true,
     "blocked in-flight bite was not handled")
-assert(damageCount == 0,
+T.truthy(damageCount == 0,
     "bite applied damage after a wall closed the attack lane")
-assert(PNC.ZombieAggro.State.bites.z44.phase == "release",
+T.truthy(PNC.ZombieAggro.State.bites.z44.phase == "release",
     "blocked in-flight bite did not enter release")
-assert(PNC.ZombieAggro.State.bites.z44.releaseReason == "bite_lane_wall",
+T.truthy(PNC.ZombieAggro.State.bites.z44.releaseReason == "bite_lane_wall",
     "blocked in-flight bite lost its wall reason")
+T.finish("pnc_zombie_bite_lane_smoke")
 
-print("pnc_zombie_bite_lane_smoke: ok")
+T.finish("pnc_zombie_bite_lane_smoke")

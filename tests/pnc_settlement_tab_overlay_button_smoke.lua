@@ -1,14 +1,6 @@
-local function equal(actual, expected, message)
-    if actual ~= expected then
-        error((message or "assertion failed") .. ": expected "
-            .. tostring(expected) .. ", got " .. tostring(actual))
-    end
-end
+local T = require "tests/support/test"
 
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/?.lua",
-    package.path,
-}, ";")
+T.addPackagePaths()
 
 getText = function(key) return key end
 
@@ -57,12 +49,12 @@ local window = {
     baseContextControls = {},
 }
 
-equal(BaseTab.Rebuild(window, { settlement = { facilities = {} } }), true,
+T.equal(BaseTab.Rebuild(window, { settlement = { facilities = {} } }), true,
     "base tab rebuild")
-equal(title, "HIDE BASE LAYOUT", "enabled overlay title")
-equal(styled.button, overlayButton, "overlay button styling target")
-equal(styled.variant, "warning", "enabled overlay style")
-equal(browserRebuilt, true, "facility browser rebuild")
+T.equal(title, "HIDE BASE LAYOUT", "enabled overlay title")
+T.equal(styled.button, overlayButton, "overlay button styling target")
+T.equal(styled.variant, "warning", "enabled overlay style")
+T.equal(browserRebuilt, true, "facility browser rebuild")
 
 local function control(id)
     return { internal = id, setVisible = function(self, visible)
@@ -76,11 +68,12 @@ window.baseContextControls = { upgrade, cancel, destroy }
 selectedFacility = { constructionState = "UNDER_CONSTRUCTION",
     constructionWorkOrderId = "work:1" }
 BaseTab.UpdateContextControls(window)
-equal(upgrade.visible, false, "upgrade hidden before building completes")
-equal(cancel.visible, true, "cancel construction is available before completion")
-equal(destroy.visible, false, "deconstruction is hidden before completion")
+T.equal(upgrade.visible, false, "upgrade hidden before building completes")
+T.equal(cancel.visible, true, "cancel construction is available before completion")
+T.equal(destroy.visible, false, "deconstruction is hidden before completion")
 selectedFacility.constructionState = "BUILT"
 BaseTab.UpdateContextControls(window)
-equal(upgrade.visible, true, "upgrade unlocks after construction")
+T.equal(upgrade.visible, true, "upgrade unlocks after construction")
+T.finish("pnc_settlement_tab_overlay_button_smoke")
 
-print("pnc_settlement_tab_overlay_button_smoke: ok")
+T.finish("pnc_settlement_tab_overlay_button_smoke")

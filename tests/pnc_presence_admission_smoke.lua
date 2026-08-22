@@ -1,4 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Presence/PNC_PresenceAdmission.lua"
 
 local live = {}
@@ -28,30 +30,30 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local candidate = { id = "candidate", x = 1, y = 1 }
 local nearest = { player = player, distSq = 2 }
-assert(PNC.PresenceAdmission.Evaluate(candidate, nearest),
+T.truthy(PNC.PresenceAdmission.Evaluate(candidate, nearest),
     "empty live-body budget rejected a candidate")
 
 live[1] = { id = "near:1", x = 1, y = 0 }
 live[2] = { id = "near:2", x = 2, y = 0 }
 local allowed, reason = PNC.PresenceAdmission.Evaluate(candidate, nearest)
-assert(allowed == false and reason == "player_live_body_cap",
+T.truthy(allowed == false and reason == "player_live_body_cap",
     "per-player live-body cap was not enforced")
 
 live[2] = { id = "far:2", x = 100, y = 100 }
-assert(PNC.PresenceAdmission.Evaluate(candidate, nearest),
+T.truthy(PNC.PresenceAdmission.Evaluate(candidate, nearest),
     "far live bodies incorrectly consumed the per-player cap")
 live[3] = { id = "far:3", x = 110, y = 100 }
 live[4] = { id = "far:4", x = 120, y = 100 }
 allowed, reason = PNC.PresenceAdmission.Evaluate(candidate, nearest)
-assert(allowed == false and reason == "global_live_body_cap",
+T.truthy(allowed == false and reason == "global_live_body_cap",
     "global live-body cap was not enforced")
 
 live = {}
-assert(PNC.PresenceAdmission.RegisterRule("threat_fixture",
+T.truthy(PNC.PresenceAdmission.RegisterRule("threat_fixture",
     function(record)
         if record.blockedByThreat then
             return false, "threat_blocked"
@@ -61,9 +63,10 @@ assert(PNC.PresenceAdmission.RegisterRule("threat_fixture",
 ))
 candidate.blockedByThreat = true
 allowed, reason = PNC.PresenceAdmission.Evaluate(candidate, nearest)
-assert(allowed == false and reason == "threat_blocked",
+T.truthy(allowed == false and reason == "threat_blocked",
     "custom admission rule was not applied")
-assert(PNC.PresenceAdmission.UnregisterRule("threat_fixture"),
+T.truthy(PNC.PresenceAdmission.UnregisterRule("threat_fixture"),
     "custom admission rule was not removable")
+T.finish("pnc_presence_admission_smoke")
 
-print("pnc_presence_admission_smoke: ok")
+T.finish("pnc_presence_admission_smoke")

@@ -1,13 +1,8 @@
-local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/"
-    .. "PNC_Settings.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
+local FILE =
+    T.path("ProjectHoomans", "client", "PNC/UI/")
+    .. "PNC_Settings.lua"
 
 local createdID
 local createdName
@@ -61,32 +56,33 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
-assertEqual(createdID, "ProjectHoomans",
+T.equal(createdID, "ProjectHoomans",
     "native mod-options registration id")
-assertEqual(createdName, "UI_PNC_Settings_Title",
+T.equal(createdName, "UI_PNC_Settings_Title",
     "native mod-options translated title")
-assert(options:getOption("showAIDebug"),
+T.truthy(options:getOption("showAIDebug"),
     "AI overlay missing from native options")
-assert(options:getOption("debugShowAnimation"),
+T.truthy(options:getOption("debugShowAnimation"),
     "animation detail missing from native options")
-assert(options:getOption("storageTransactionLogging"),
+T.truthy(options:getOption("storageTransactionLogging"),
     "storage transaction logging missing from native options")
 
 options:getOption("showAIDebug").value = true
 options:apply()
-assertEqual(PNC.Nameplates.Settings.showAIDebug, true,
+T.equal(PNC.Nameplates.Settings.showAIDebug, true,
     "native settings did not apply AI overlay")
-assertEqual(writes.showAIDebug, true,
+T.equal(writes.showAIDebug, true,
     "native settings did not persist AI overlay")
 options:getOption("storageTransactionLogging").value = true
 options:apply()
-assertEqual(PNC.Nameplates.Settings.storageTransactionLogging, true,
+T.equal(PNC.Nameplates.Settings.storageTransactionLogging, true,
     "storage transaction logging setting did not apply")
-assertEqual(writes.storageTransactionLogging, true,
+T.equal(writes.storageTransactionLogging, true,
     "storage transaction logging setting did not persist")
-assertEqual(PNC.Settings.Open(), options,
+T.equal(PNC.Settings.Open(), options,
     "compatibility settings surface")
+T.finish("pnc_ingame_settings_location_smoke")
 
-print("pnc_ingame_settings_location_smoke: ok")
+T.finish("pnc_ingame_settings_location_smoke")

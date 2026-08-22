@@ -1,7 +1,9 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "client", "PNC/UI/Map/")
     .. "Layers/PNC_MapLayer_Travel.lua"
 local PALETTE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/"
+    T.path("ProjectHoomans", "client", "PNC/UI/")
     .. "PNC_NPCTypePalette.lua"
 
 local layer
@@ -132,12 +134,12 @@ PNC = {
     },
 }
 
-dofile(PALETTE)
+T.load(PALETTE)
 package.preload["PNC/UI/PNC_NPCTypePalette"] =
     function() return PNC.NPCTypePalette end
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
-dofile(FILE)
+T.load(FILE)
 
 local map = {
     width = 500,
@@ -167,35 +169,35 @@ local map = {
     end,
 }
 
-assert(layer and layer.render, "travel map layer did not register")
+T.truthy(layer and layer.render, "travel map layer did not register")
 layer.render(map)
-assert(listProjectedCount == 1,
+T.truthy(listProjectedCount == 1,
     "travel map entries were not loaded for the first frame")
-assert(dots == 5, "live and deceased NPC dots were not all rendered")
-assert(colors[1].r == 0.95 and colors[1].g == 0.75,
+T.truthy(dots == 5, "live and deceased NPC dots were not all rendered")
+T.truthy(colors[1].r == 0.95 and colors[1].g == 0.75,
     "neutral NPC marker was not yellow")
-assert(colors[2].r == 0.08 and colors[2].g == 0.42,
+T.truthy(colors[2].r == 0.08 and colors[2].g == 0.42,
     "working colonist marker was not dark green")
-assert(colors[3].r == 0.15 and colors[3].g == 0.90,
+T.truthy(colors[3].r == 0.15 and colors[3].g == 0.90,
     "following colonist marker was not green")
-assert(colors[4].r == 0.55 and colors[4].g == 0.55,
+T.truthy(colors[4].r == 0.55 and colors[4].g == 0.55,
     "dead NPC marker was not grey")
-assert(colors[5].r == 0.55 and colors[5].g == 0.55,
+T.truthy(colors[5].r == 0.55 and colors[5].g == 0.55,
     "dead colonist marker was not grey")
-assert(iconColors[1].r == 0.55 and iconColors[1].g == 0.55,
+T.truthy(iconColors[1].r == 0.55 and iconColors[1].g == 0.55,
     "dead NPC icon was not greyed out")
-assert(labels[1] == "Moving Follower [trader]",
+T.truthy(labels[1] == "Moving Follower [trader]",
     "selected NPC label or role postfix was not preserved")
 
 labels = {}
 mouseX = 10
 mouseY = 20
 layer.render(map)
-assert(listProjectedCount == 1,
+T.truthy(listProjectedCount == 1,
     "travel map rebuilt all projected NPC entries inside the refresh window")
-assert(labels[1] == "Moving Follower [trader]" and labels[2] == nil,
+T.truthy(labels[1] == "Moving Follower [trader]" and labels[2] == nil,
     "map layer duplicated the name owned by the visible portrait card")
-assert(hoveredPortrait and hoveredPortrait.id == "idle",
+T.truthy(hoveredPortrait and hoveredPortrait.id == "idle",
     "hovered map marker was not sent to the portrait presenter")
 
 labels = {}
@@ -203,9 +205,9 @@ mouseX = -100
 mouseY = -100
 namesVisible = true
 layer.render(map)
-assert(portraitHidden > 0,
+T.truthy(portraitHidden > 0,
     "map hover portrait was not hidden after leaving NPC dots")
-assert(labels[1] == "Idle NPC"
+T.truthy(labels[1] == "Idle NPC"
     and labels[2] == "Working Colonist"
     and labels[3] == "Moving Follower [trader]"
     and labels[4] == "Dead NPC"
@@ -213,7 +215,8 @@ assert(labels[1] == "Idle NPC"
     "NPC name toggle did not reveal ordinary labels")
 clock = 1500
 layer.render(map)
-assert(listProjectedCount == 2,
+T.truthy(listProjectedCount == 2,
     "travel map did not refresh projected NPC entries after its throttle")
+T.finish("pnc_map_travel_layer_smoke")
 
-print("pnc_map_travel_layer_smoke: ok")
+T.finish("pnc_map_travel_layer_smoke")

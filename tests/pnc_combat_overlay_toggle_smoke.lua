@@ -1,12 +1,7 @@
-local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/PNC_Nameplates.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local FILE =
+    T.path("ProjectHoomans", "client", "PNC/UI/PNC_Nameplates.lua")
 
 local writes = {}
 local halos = {}
@@ -78,137 +73,138 @@ HaloTextHelper = {
     addText = function(_, text) halos[#halos + 1] = text end,
 }
 
-dofile(FILE)
+T.load(FILE)
 
-assertEqual(
+T.equal(
     PNC.Nameplates.IsCombatDebugEnabled(),
     false,
     "combat overlay defaults off"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.ToggleCombatDebug(),
     true,
     "combat overlay toggles on"
 )
-assertEqual(writes[1].key, "showCombatDebug", "combat setting persisted")
-assertEqual(writes[1].value, true, "combat enabled persisted")
-assertEqual(
+T.equal(writes[1].key, "showCombatDebug", "combat setting persisted")
+T.equal(writes[1].value, true, "combat enabled persisted")
+T.equal(
     halos[1],
     "UI_PNC_CombatOverlayEnabled",
     "combat enabled feedback"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.ToggleCombatDebug(),
     false,
     "combat overlay toggles off"
 )
-assertEqual(writes[2].value, false, "combat disabled persisted")
-assertEqual(
+T.equal(writes[2].value, false, "combat disabled persisted")
+T.equal(
     halos[2],
     "UI_PNC_CombatOverlayDisabled",
     "combat disabled feedback"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.IsAnimationDebugEnabled(),
     false,
     "animation overlay defaults off"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.ToggleAnimationDebug(),
     true,
     "animation overlay toggles on"
 )
-assertEqual(
+T.equal(
     writes[3].key,
     "showAnimationDebug",
     "animation setting persisted"
 )
-assertEqual(writes[3].value, true, "animation enabled persisted")
-assertEqual(
+T.equal(writes[3].value, true, "animation enabled persisted")
+T.equal(
     halos[3],
     "PNC animation tracks enabled",
     "animation enabled feedback"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.ToggleAnimationDebug(),
     false,
     "animation overlay toggles off"
 )
-assertEqual(writes[4].value, false, "animation disabled persisted")
-assertEqual(
+T.equal(writes[4].value, false, "animation disabled persisted")
+T.equal(
     PNC.Nameplates.IsAnimationSceneDebugEnabled(),
     false,
     "scene overlay defaults off"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.ToggleAnimationSceneDebug(),
     true,
     "scene overlay toggles on"
 )
-assertEqual(
+T.equal(
     writes[5].key,
     "showAnimationSceneDebug",
     "scene overlay setting persisted"
 )
-assertEqual(
+T.equal(
     halos[5],
     "PNC scene overlay enabled",
     "scene overlay enabled feedback"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.ToggleAnimationSceneDebug(),
     false,
     "scene overlay toggles off"
 )
-assertEqual(writes[6].value, false,
+T.equal(writes[6].value, false,
     "scene overlay disabled persisted")
 
-assertEqual(
+T.equal(
     PNC.Nameplates.IsFactionDebugEnabled(),
     false,
     "faction world overlay defaults off"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.ToggleFactionDebug(),
     true,
     "faction world overlay toggles on"
 )
-assertEqual(writes[7].key, "showFactionDebug",
+T.equal(writes[7].key, "showFactionDebug",
     "faction overlay setting persisted")
-assertEqual(halos[7], "UI_PNC_FactionOverlayEnabled",
+T.equal(halos[7], "UI_PNC_FactionOverlayEnabled",
     "faction overlay enabled feedback")
-assertEqual(
+T.equal(
     PNC.Nameplates.ToggleFactionDebug(),
     false,
     "faction world overlay toggles off"
 )
-assertEqual(writes[8].value, false,
+T.equal(writes[8].value, false,
     "faction overlay disabled persisted")
 
-assertEqual(
+T.equal(
     #PNC.Nameplates.GetOverlayDefinitions(),
     7,
     "all overlay types share one registry"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.GetOverlaySummary(),
     "ON: none",
     "central overlay summary reports inactive state"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.ToggleOverlay("path"),
     true,
     "central dispatcher toggles path overlay"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.IsOverlayEnabled("path"),
     true,
     "central registry reports path overlay state"
 )
-assertEqual(
+T.equal(
     PNC.Nameplates.GetOverlaySummary(),
     "ON: Paths",
     "central overlay summary lists active type"
 )
+T.finish("pnc_combat_overlay_toggle_smoke")
 
-print("pnc_combat_overlay_toggle_smoke: ok")
+T.finish("pnc_combat_overlay_toggle_smoke")

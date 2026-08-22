@@ -114,8 +114,8 @@ PNC = {
     },
     CombatZombieReaction = {
         Start = function(_, attacker, options)
-            assert(attacker == hostileZombie, "wrong counter-stagger target")
-            assert(options.knockdown == false,
+            T.truthy(attacker == hostileZombie, "wrong counter-stagger target")
+            T.truthy(options.knockdown == false,
                 "ground defense was allowed to knock down its attacker")
             reactions = reactions + 1
             return true

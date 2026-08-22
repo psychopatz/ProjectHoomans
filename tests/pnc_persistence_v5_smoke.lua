@@ -1,10 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local tables = {}
 ModData = {
@@ -76,7 +72,7 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Registry/PNC_Registry.lua")
+T.load(ROOT .. "Registry/PNC_Registry.lua")
 
 PNC.Registry.Load()
 for i = 1, 500 do
@@ -93,10 +89,10 @@ for i = 1, 500 do
     })
 end
 
-assertEqual(PNC.Registry.FlushDirty(), 500, "initial dirty flush")
-assertEqual(PNC.Core.TableSize(tables.PNC_Core_Global.records), 500, "directory pointer count")
-assertEqual(tables.PNC_Core_Global.NPCs, nil, "directory contains no record bodies")
-assert(tables.PNC_NPC_npc_1 and tables.PNC_NPC_npc_500, "per-NPC tables missing")
+T.equal(PNC.Registry.FlushDirty(), 500, "initial dirty flush")
+T.equal(PNC.Core.TableSize(tables.PNC_Core_Global.records), 500, "directory pointer count")
+T.equal(tables.PNC_Core_Global.NPCs, nil, "directory contains no record bodies")
+T.truthy(tables.PNC_NPC_npc_1 and tables.PNC_NPC_npc_500, "per-NPC tables missing")
 
 PNC.Registry.LiveByID.npc_1 = {
     isDead = function() return false end,
@@ -105,33 +101,33 @@ PNC.Registry.LiveByID.npc_1 = {
     getZ = function() return 0 end,
 }
 PNC.Registry.RefreshLivePositions(false)
-assertEqual(PNC.Registry.DirtyByID.npc_1, nil,
+T.equal(PNC.Registry.DirtyByID.npc_1, nil,
     "continuous movement dirtied the record")
-assertEqual(PNC.Registry.FlushDirty(), 1,
+T.equal(PNC.Registry.FlushDirty(), 1,
     "save-time position snapshot was not persisted")
-assertEqual(PNC.Registry.DirtyByID.npc_1, nil,
+T.equal(PNC.Registry.DirtyByID.npc_1, nil,
     "position snapshot remained dirty after save")
 PNC.Registry.LiveByID.npc_1 = nil
 
 tables.PNC_NPC_npc_2.schemaVersion = 4
 PNC.Registry.Loaded = false
 PNC.Registry.Load()
-assert(PNC.Registry.DirtyByID.npc_2,
+T.truthy(PNC.Registry.DirtyByID.npc_2,
     "older per-NPC schema was not scheduled for migration")
-assertEqual(PNC.Registry.FlushDirty(), 1,
+T.equal(PNC.Registry.FlushDirty(), 1,
     "per-NPC schema migration flush count")
-assertEqual(tables.PNC_NPC_npc_2.schemaVersion, 5,
+T.equal(tables.PNC_NPC_npc_2.schemaVersion, 5,
     "per-NPC schema migration version")
 
 PNC.Registry.MarkDirty("npc_10", "health")
 PNC.Registry.MarkDirty("npc_20", "inventory")
 PNC.Registry.MarkDirty("npc_30", "position")
-assertEqual(PNC.Registry.FlushDirty(), 3, "incremental dirty flush")
-assertEqual(PNC.Registry.Get("npc_10").inventory, nil, "inventory hydrated unexpectedly")
+T.equal(PNC.Registry.FlushDirty(), 3, "incremental dirty flush")
+T.equal(PNC.Registry.Get("npc_10").inventory, nil, "inventory hydrated unexpectedly")
 
 PNC.Registry.RemoveRecord("npc_20")
-assertEqual(tables.PNC_Core_Global.records.npc_20, nil, "pointer not removed")
-assertEqual(tables.PNC_NPC_npc_20, nil, "per-NPC table not removed")
+T.equal(tables.PNC_Core_Global.records.npc_20, nil, "pointer not removed")
+T.equal(tables.PNC_NPC_npc_20, nil, "per-NPC table not removed")
 
 tables = {
     PNC_Core_Global = {
@@ -144,11 +140,11 @@ tables = {
 }
 PNC.Registry.Loaded = false
 PNC.Registry.Load()
-assertEqual(PNC.Core.TableSize(PNC.Registry.Data), 2, "legacy migration record count")
-assert(tables.PNC_Core_Global.NPCs, "legacy bodies removed before per-NPC records were written")
-assertEqual(PNC.Registry.FlushDirty(), 2, "legacy migration flush count")
-assertEqual(tables.PNC_Core_Global.NPCs, nil, "legacy bodies retained after migration commit")
-assert(tables.PNC_NPC_old_a and tables.PNC_NPC_old_b, "legacy per-NPC tables missing")
+T.equal(PNC.Core.TableSize(PNC.Registry.Data), 2, "legacy migration record count")
+T.truthy(tables.PNC_Core_Global.NPCs, "legacy bodies removed before per-NPC records were written")
+T.equal(PNC.Registry.FlushDirty(), 2, "legacy migration flush count")
+T.equal(tables.PNC_Core_Global.NPCs, nil, "legacy bodies retained after migration commit")
+T.truthy(tables.PNC_NPC_old_a and tables.PNC_NPC_old_b, "legacy per-NPC tables missing")
 
 tables = {
     PNC_Core_Global = {
@@ -162,15 +158,15 @@ tables = {
 }
 PNC.Registry.Loaded = false
 PNC.Registry.Load()
-assertEqual(PNC.Core.TableSize(PNC.Registry.Data), 1, "partial migration valid record count")
-assertEqual(PNC.Registry.FlushDirty(), 1, "partial migration flush count")
-assert(tables.PNC_Core_Global.NPCs, "partial migration removed legacy fallback")
+T.equal(PNC.Core.TableSize(PNC.Registry.Data), 1, "partial migration valid record count")
+T.equal(PNC.Registry.FlushDirty(), 1, "partial migration flush count")
+T.truthy(tables.PNC_Core_Global.NPCs, "partial migration removed legacy fallback")
 tables.PNC_Core_Global.NPCs.retry_b.invalid = nil
 PNC.Registry.Loaded = false
 PNC.Registry.Load()
-assertEqual(PNC.Core.TableSize(PNC.Registry.Data), 2, "partial migration retry record count")
-assertEqual(PNC.Registry.FlushDirty(), 2, "partial migration retry flush count")
-assertEqual(tables.PNC_Core_Global.NPCs, nil, "retried migration did not commit")
+T.equal(PNC.Core.TableSize(PNC.Registry.Data), 2, "partial migration retry record count")
+T.equal(PNC.Registry.FlushDirty(), 2, "partial migration retry flush count")
+T.equal(tables.PNC_Core_Global.NPCs, nil, "retried migration did not commit")
 
 local retryRecord = PNC.Registry.Get("retry_a")
 local originalSerialize = PNC.Persistence.SerializeRecord
@@ -179,15 +175,16 @@ PNC.Persistence.SerializeRecord = function(record)
     return originalSerialize(record)
 end
 PNC.Registry.MarkDirty(retryRecord, "failure_test")
-assertEqual(PNC.Registry.FlushDirty(), 0, "failed serialization counted as flushed")
-assert(PNC.Registry.DirtyByID.retry_a, "failed serialization was removed from dirty set")
+T.equal(PNC.Registry.FlushDirty(), 0, "failed serialization counted as flushed")
+T.truthy(PNC.Registry.DirtyByID.retry_a, "failed serialization was removed from dirty set")
 PNC.Persistence.SerializeRecord = originalSerialize
-assertEqual(PNC.Registry.FlushDirty(), 1, "retained dirty record did not retry")
+T.equal(PNC.Registry.FlushDirty(), 1, "retained dirty record did not retry")
 
 tables.PNC_NPC_orphan = { id = "orphan", recordRevision = 7 }
 PNC.Registry.Loaded = false
 PNC.Registry.Load()
-assert(PNC.Registry.Get("orphan"), "valid orphan was not recovered")
-assertEqual(tables.PNC_Core_Global.records.orphan.storageKey, "PNC_NPC_orphan", "orphan pointer")
+T.truthy(PNC.Registry.Get("orphan"), "valid orphan was not recovered")
+T.equal(tables.PNC_Core_Global.records.orphan.storageKey, "PNC_NPC_orphan", "orphan pointer")
+T.finish("pnc_persistence_v5_smoke")
 
-print("pnc_persistence_v5_smoke: ok")
+T.finish("pnc_persistence_v5_smoke")

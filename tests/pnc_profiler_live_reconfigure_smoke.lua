@@ -28,18 +28,18 @@ local original = function() return "original" end
 PNC = { SpatialIndex = { Rebuild = original }, Registry = { Data = {}, LiveByID = {} },
     WorldCensus = { OrdinaryZombies = {}, ManagedBodies = {} }, Scheduler = { Buckets = {} } }
 local Integration = require "PNC/Integrations/PNC_PsychopatzProfiler"
-assert(PNC.SpatialIndex.Rebuild ~= original, "performance was not initially wrapped")
+T.truthy(PNC.SpatialIndex.Rebuild ~= original, "performance was not initially wrapped")
 
 local result = Bootstrap.ApplyCaptureConfig({ mode = "DETAILED", capture = { "moddata" } })
 T.equal(result.applied, true, "ModData live configuration")
 T.equal(result.restart_required, false, "live controller requested restart")
 T.equal(PNC.SpatialIndex.Rebuild, original, "disabled performance wrapper survived")
 T.equal(Profiler.IsSectionEnabled("moddata"), true, "ModData capture not enabled")
-assert(Profiler.GetState().snapshotProviders["ProjectHoomans.modData"], "ModData provider missing")
+T.truthy(Profiler.GetState().snapshotProviders["ProjectHoomans.modData"], "ModData provider missing")
 
 result = Bootstrap.ApplyCaptureConfig({ mode = "DETAILED", capture = { "performance" } })
 T.equal(result.applied, true, "performance live configuration")
-assert(PNC.SpatialIndex.Rebuild ~= original, "performance wrapper not restored live")
+T.truthy(PNC.SpatialIndex.Rebuild ~= original, "performance wrapper not restored live")
 Profiler.Stop()
 T.equal(PNC.SpatialIndex.Rebuild, original, "live wrapper did not restore")
 

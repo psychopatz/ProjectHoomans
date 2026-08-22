@@ -1,9 +1,11 @@
+local T = require "tests/support/test"
+
 local LUA_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+    T.path("ProjectHoomans", "client", "")
 local FILE = LUA_ROOT .. "PNC/PresenceSync/PresenceVisuals/"
     .. "PNC_ClientPresenceVisuals.lua"
 
-package.path = LUA_ROOT .. "?.lua;" .. package.path
+T.addPackagePaths()
 
 local calls = {
     apply = 0,
@@ -76,7 +78,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local function body()
     local modData = {}
@@ -109,8 +111,8 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     body(),
     false
 )
-assert(calls.play == 1, "single-player client did not render its attack snapshot")
-assert(calls.pump == 0, "fresh local attack pumped before entering bump state")
+T.truthy(calls.play == 1, "single-player client did not render its attack snapshot")
+T.truthy(calls.pump == 0, "fresh local attack pumped before entering bump state")
 
 local sustainedLocalBody = body()
 PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
@@ -123,17 +125,17 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     sustainedLocalBody,
     false
 )
-assert(calls.play == 2, "local attack snapshot replayed more than once")
-assert(calls.pump == 1, "local client did not maintain its attack bump")
+T.truthy(calls.play == 2, "local attack snapshot replayed more than once")
+T.truthy(calls.pump == 1, "local client did not maintain its attack bump")
 
 PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     attackSnapshot,
     body(),
     true
 )
-assert(calls.play == 3, "remote replica did not replay the attack snapshot")
-assert(calls.pump == 2, "remote replica did not maintain bump release")
-assert(engineMovementActive == true,
+T.truthy(calls.play == 3, "remote replica did not replay the attack snapshot")
+T.truthy(calls.pump == 2, "remote replica did not maintain bump release")
+T.truthy(engineMovementActive == true,
     "remote attack did not retain its action-context update lease")
 
 local traversalAttackSnapshot = {
@@ -159,7 +161,7 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     body(),
     true
 )
-assert(calls.play == playsBeforeTraversal,
+T.truthy(calls.play == playsBeforeTraversal,
     "remote attack overwrote native traversal")
 
 local retryModData = {}
@@ -190,11 +192,11 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     retryBody,
     true
 )
-assert(calls.play == 5,
+T.truthy(calls.play == 5,
     "dropped MP attack bump was not re-armed once")
-assert(clearedBeforeRetry,
+T.truthy(clearedBeforeRetry,
     "idle MP selector did not receive a fresh transition edge")
-assert(retryModData.PNC_ClientAttackRetries == 1,
+T.truthy(retryModData.PNC_ClientAttackRetries == 1,
     "MP attack bump re-arm was not bounded")
 now = now + 100
 PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
@@ -202,7 +204,7 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     retryBody,
     true
 )
-assert(calls.play == 5,
+T.truthy(calls.play == 5,
     "dropped MP attack bump re-armed more than once")
 
 local finishedLocalSnapshot = {
@@ -224,13 +226,13 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     sustainedLocalBody,
     false
 )
-assert(calls.finish == 1, "single-player client did not finish its attack bump")
+T.truthy(calls.finish == 1, "single-player client did not finish its attack bump")
 PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     finishedLocalSnapshot,
     sustainedLocalBody,
     false
 )
-assert(calls.pump == pumpsBeforeFinish + 2,
+T.truthy(calls.pump == pumpsBeforeFinish + 2,
     "single-player client did not pump pending bump release")
 
 local movingSnapshot = {
@@ -252,8 +254,8 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     body(),
     false
 )
-assert(calls.apply == 0, "local authority gained a second locomotion owner")
-assert(calls.sync == 0, "local authority resynchronized locomotion twice")
+T.truthy(calls.apply == 0, "local authority gained a second locomotion owner")
+T.truthy(calls.sync == 0, "local authority resynchronized locomotion twice")
 
 local nativeReplica = body()
 local nativeSnapshot = {
@@ -280,13 +282,13 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     nativeReplica,
     true
 )
-assert(engineMovementActive == true,
+T.truthy(engineMovementActive == true,
     "native MP movement did not retain engine body mode")
-assert(calls.nativeStyle == 1,
+T.truthy(calls.nativeStyle == 1,
     "native MP route did not receive presentation-only locomotion style")
-assert(calls.apply == appliesBeforeNative and calls.sync == syncsBeforeNative,
+T.truthy(calls.apply == appliesBeforeNative and calls.sync == syncsBeforeNative,
     "native MP route invoked fake locomotion")
-assert(calls.clear == clearsBeforeNative,
+T.truthy(calls.clear == clearsBeforeNative,
     "healthy native MP route was reset through ClearDowned")
 
 local releaseBody = body()
@@ -299,7 +301,7 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     true
 )
 pumpReturnsActive = false
-assert(calls.nativeStyle == nativeStylesBeforeRelease,
+T.truthy(calls.nativeStyle == nativeStylesBeforeRelease,
     "new MP locomotion snapshot overwrote the pending bump exit")
 
 local specialBody = body()
@@ -334,7 +336,7 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     specialBody,
     false
 )
-assert(
+T.truthy(
     calls.finish == finishesBeforeSpecial,
     "local authority finished its server-owned special bump"
 )
@@ -365,12 +367,12 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     treatmentBody,
     true
 )
-assert(calls.play == playsBeforeTreatment + 1,
+T.truthy(calls.play == playsBeforeTreatment + 1,
     "MP treatment snapshot did not start its bandage animation")
-assert(treatmentBody:getModData().PNC_ClientTreatmentAnimKey
+T.truthy(treatmentBody:getModData().PNC_ClientTreatmentAnimKey
         == "Hand_L:2000",
     "MP treatment animation key was not retained")
-assert(engineMovementActive == true,
+T.truthy(engineMovementActive == true,
     "MP treatment animation did not retain engine action updates")
 
 PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
@@ -378,9 +380,9 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     treatmentBody,
     true
 )
-assert(calls.play == playsBeforeTreatment + 1,
+T.truthy(calls.play == playsBeforeTreatment + 1,
     "MP treatment animation was restarted on an unchanged snapshot")
-assert(calls.maintain == 1,
+T.truthy(calls.maintain == 1,
     "MP treatment animation lease was not maintained")
 
 treatmentSnapshot.treatmentState = {
@@ -391,7 +393,7 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     treatmentBody,
     true
 )
-assert(calls.finish == finishesBeforeTreatment + 1,
+T.truthy(calls.finish == finishesBeforeTreatment + 1,
     "MP treatment completion did not release its bandage animation")
 
 local sceneBody = body()
@@ -424,12 +426,12 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     sceneBody,
     true
 )
-assert(calls.play == playsBeforeScene + 1,
+T.truthy(calls.play == playsBeforeScene + 1,
     "MP animation scene did not start its registered bump")
-assert(sceneBody:getModData().PNC_ClientAnimationSceneKey
+T.truthy(sceneBody:getModData().PNC_ClientAnimationSceneKey
         == "social.surrender:4:1",
     "MP animation scene key was not retained")
-assert(engineMovementActive == true,
+T.truthy(engineMovementActive == true,
     "MP animation scene did not retain engine action updates")
 
 PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
@@ -437,9 +439,9 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     sceneBody,
     true
 )
-assert(calls.play == playsBeforeScene + 1,
+T.truthy(calls.play == playsBeforeScene + 1,
     "unchanged MP animation scene restarted")
-assert(calls.maintain == maintainsBeforeScene + 1,
+T.truthy(calls.maintain == maintainsBeforeScene + 1,
     "looping MP animation scene was not maintained")
 
 sceneSnapshot.visualState.sceneBump = "Sneeze"
@@ -451,9 +453,9 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     sceneBody,
     true
 )
-assert(calls.play == playsBeforeScene + 2,
+T.truthy(calls.play == playsBeforeScene + 2,
     "next primitive in an unchanged scene did not replay")
-assert(sceneBody:getModData().PNC_ClientAnimationSceneKey
+T.truthy(sceneBody:getModData().PNC_ClientAnimationSceneKey
         == "social.surrender:4:2",
     "primitive playback revision was not retained")
 
@@ -467,7 +469,8 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     sceneBody,
     true
 )
-assert(calls.finish == finishesBeforeScene + 1,
+T.truthy(calls.finish == finishesBeforeScene + 1,
     "MP animation scene did not release on stop")
+T.finish("pnc_client_animation_authority_smoke")
 
-print("pnc_client_animation_authority_smoke: ok")
+T.finish("pnc_client_animation_authority_smoke")

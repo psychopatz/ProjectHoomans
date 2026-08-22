@@ -1,11 +1,6 @@
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
 
 local function findOption(menu, name)
     for index = 1, #menu.options do
@@ -66,7 +61,7 @@ PNC = {
 
 getText = function(key) return key end
 
-dofile(CLIENT_ROOT
+T.load(CLIENT_ROOT
     .. "PNC/UI/Context/Providers/PNC_ContextProvider_Inventory.lua")
 
 local owned = {
@@ -84,33 +79,34 @@ local neutral = {
     },
 }
 
-assertEqual(registeredProvider.isEnabled(owned, player), true,
+T.equal(registeredProvider.isEnabled(owned, player), true,
     "owned companion access hidden outside debug")
 local menu = newMenu()
 registeredProvider.addOptions(menu, owned, player)
 local viewOption = findOption(menu, "View Character")
 local inventoryOption = findOption(menu, "Inventory")
-assertEqual(viewOption ~= nil, true, "owned companion character option")
-assertEqual(inventoryOption ~= nil, true, "owned companion inventory option")
+T.equal(viewOption ~= nil, true, "owned companion character option")
+T.equal(inventoryOption ~= nil, true, "owned companion inventory option")
 viewOption.callback()
 inventoryOption.callback()
-assertEqual(openedCharacter, "owned", "owned character target")
-assertEqual(openedInventory, "owned", "owned inventory target")
+T.equal(openedCharacter, "owned", "owned character target")
+T.equal(openedInventory, "owned", "owned inventory target")
 
-assertEqual(registeredProvider.isEnabled(neutral, player), false,
+T.equal(registeredProvider.isEnabled(neutral, player), false,
     "neutral inventory exposed without debug")
 debugAuthorized = true
-assertEqual(registeredProvider.isEnabled(neutral, player), true,
+T.equal(registeredProvider.isEnabled(neutral, player), true,
     "debug neutral inventory access hidden")
 menu = newMenu()
 registeredProvider.addOptions(menu, neutral, player)
 viewOption = findOption(menu, "View Character")
 inventoryOption = findOption(menu, "Inventory")
-assertEqual(viewOption ~= nil, true, "debug neutral character option")
-assertEqual(inventoryOption ~= nil, true, "debug neutral inventory option")
+T.equal(viewOption ~= nil, true, "debug neutral character option")
+T.equal(inventoryOption ~= nil, true, "debug neutral inventory option")
 viewOption.callback()
 inventoryOption.callback()
-assertEqual(openedCharacter, "neutral", "debug character target")
-assertEqual(openedInventory, "neutral", "debug inventory target")
+T.equal(openedCharacter, "neutral", "debug character target")
+T.equal(openedInventory, "neutral", "debug inventory target")
+T.finish("pnc_context_inventory_access_smoke")
 
-print("pnc_context_inventory_access_smoke: ok")
+T.finish("pnc_context_inventory_access_smoke")

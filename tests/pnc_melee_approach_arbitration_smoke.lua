@@ -1,13 +1,7 @@
-local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Engagement.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual")
-            .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local FILE =
+    T.path("ProjectHoomans", "shared", "PNC/Core/Combat/PNC_Combat_Engagement.lua")
 
 local move
 local tryReason = "cooldown_active"
@@ -89,7 +83,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local record = {
     id = "proactive_fighter",
@@ -105,21 +99,21 @@ local target = {
     visible = true,
 }
 
-assertEqual(
+T.equal(
     PNC.CombatEngagement.Tick(record, {}, target),
     true,
     "engagement did not own melee tick"
 )
-assertEqual(move and move.reason, "closing_to_melee",
+T.equal(move and move.reason, "closing_to_melee",
     "cooldown blocked proactive melee approach")
-assertEqual(move and move.stopDistance, 0.92,
+T.equal(move and move.stopDistance, 0.92,
     "melee approach used the wrong strike stop distance")
-assertEqual(
+T.equal(
     record.runtime.combatTactical.decision,
     "closing_to_melee",
     "overlay concealed the active melee approach"
 )
-assertEqual(
+T.equal(
     record.runtime.combatTactical.approachAccepted,
     true,
     "accepted approach was not exposed to diagnostics"
@@ -129,7 +123,8 @@ move = nil
 target.distSq = 1.1 * 1.1
 tryReason = "cooldown_active"
 PNC.CombatEngagement.Tick(record, {}, target)
-assertEqual(move, nil,
+T.equal(move, nil,
     "formation-slot distance remained outside the melee commit window")
+T.finish("pnc_melee_approach_arbitration_smoke")
 
-print("pnc_melee_approach_arbitration_smoke: ok")
+T.finish("pnc_melee_approach_arbitration_smoke")

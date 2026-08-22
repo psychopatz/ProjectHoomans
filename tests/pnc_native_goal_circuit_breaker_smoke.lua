@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_PathService/PNC_PathService_Lane.lua"
 
 local now = 1000
@@ -14,25 +16,26 @@ PNC = {
 }
 PNC.PathService.Internal.Core = PNC.Core
 
-dofile(FILE)
+T.load(FILE)
 
 local Internal = PNC.PathService.Internal
 local lane = {}
 local goal = { x = 10, y = 20, z = 0 }
 
-assert(not Internal.noteNativeGoalFailure(lane, goal, now),
+T.truthy(not Internal.noteNativeGoalFailure(lane, goal, now),
     "first native failure opened the circuit")
-assert(Internal.noteNativeGoalFailure(lane, goal, now + 100),
+T.truthy(Internal.noteNativeGoalFailure(lane, goal, now + 100),
     "second native failure did not open the circuit")
-assert(Internal.isNativeGoalBlocked(lane, goal, now + 200),
+T.truthy(Internal.isNativeGoalBlocked(lane, goal, now + 200),
     "same unreachable goal was not suppressed")
-assert(not Internal.isNativeGoalBlocked(
+T.truthy(not Internal.isNativeGoalBlocked(
         lane,
         { x = 12, y = 20, z = 0 },
         now + 200
     ),
     "meaningfully changed goal remained suppressed")
-assert(lane.nativeFailureCount == 0,
+T.truthy(lane.nativeFailureCount == 0,
     "changed goal did not reset native failure history")
+T.finish("pnc_native_goal_circuit_breaker_smoke")
 
-print("pnc_native_goal_circuit_breaker_smoke: ok")
+T.finish("pnc_native_goal_circuit_breaker_smoke")

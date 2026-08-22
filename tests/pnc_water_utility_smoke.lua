@@ -1,5 +1,7 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
-package.path = ROOT .. "server/?.lua;" .. ROOT .. "shared/?.lua;" .. package.path
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "root", "")
+T.addPackagePaths()
 
 PsychopatzCore = { RuntimeRole = { AllowsServerCode = function() return true end } }
 local dirty = false
@@ -26,15 +28,16 @@ getGameTime = function()
     return { getWorldAgeHours = function() return 10 end }
 end
 
-local Service = dofile(ROOT .. "server/PNC/Settlement/PNC_WaterUtilityService.lua")
+local Service = T.load(ROOT .. "server/PNC/Settlement/PNC_WaterUtilityService.lua")
 Service.Tick(10, false)
 Service.Tick(10 + 1 / 6, true)
 local snapshot = Service.BuildSnapshot("base")
-assert(snapshot.waterLiters == 2, "two catchers should add two liters per ten minutes")
-assert(snapshot.capacityLiters == 25, "one tank should hold 25 liters")
-assert(snapshot.litersPerTenMinutes == 2, "catcher rate missing from snapshot")
-assert(dirty, "water changes should mark settlement persistence dirty")
+T.truthy(snapshot.waterLiters == 2, "two catchers should add two liters per ten minutes")
+T.truthy(snapshot.capacityLiters == 25, "one tank should hold 25 liters")
+T.truthy(snapshot.litersPerTenMinutes == 2, "catcher rate missing from snapshot")
+T.truthy(dirty, "water changes should mark settlement persistence dirty")
 local ok, remaining = Service.Consume("water", 1)
-assert(ok and remaining == 1, "stored water should be consumable")
+T.truthy(ok and remaining == 1, "stored water should be consumable")
+T.finish("pnc_water_utility_smoke")
 
-print("pnc_water_utility_smoke: ok")
+T.finish("pnc_water_utility_smoke")

@@ -1,4 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "client", "PNC/UI/Map/")
     .. "PNC_MapDisplaySettings.lua"
 
 package.preload["ISUI/Maps/ISWorldMap"] = function() return true end
@@ -36,7 +38,7 @@ function ISButton:new(x, y, width, height, title, target, onclick)
 end
 
 PNC = {}
-dofile(FILE)
+T.load(FILE)
 
 local map = {
     width = 500,
@@ -49,30 +51,31 @@ local map = {
 setmetatable(map, { __index = ISWorldMap })
 map:createChildren()
 
-assert(map.pncNamesButton ~= nil, "NPC names button was not attached")
-assert(map.pncBasesButton ~= nil, "community bases button was not attached")
-assert(map.pncNamesButton.x == 176,
+T.truthy(map.pncNamesButton ~= nil, "NPC names button was not attached")
+T.truthy(map.pncBasesButton ~= nil, "community bases button was not attached")
+T.truthy(map.pncNamesButton.x == 176,
     "NPC names button was not placed left of vanilla controls")
-assert(map.pncBasesButton.x == 52,
+T.truthy(map.pncBasesButton.x == 52,
     "community bases button was not placed beside names")
-assert(map.pncNamesButton.title == "NPC NAMES: OFF",
+T.truthy(map.pncNamesButton.title == "NPC NAMES: OFF",
     "NPC names default was not off")
-assert(map.pncBasesButton.title == "NPC WORLD: ON",
+T.truthy(map.pncBasesButton.title == "NPC WORLD: ON",
     "authorized NPC-world map presentation was not enabled by default")
 map.pncNamesButton.onclick()
-assert(PNC.MapDisplay.AreNamesVisible(),
+T.truthy(PNC.MapDisplay.AreNamesVisible(),
     "NPC names button did not enable labels")
-assert(map.pncNamesButton.title == "NPC NAMES: ON",
+T.truthy(map.pncNamesButton.title == "NPC NAMES: ON",
     "NPC names button title did not update")
 map.pncBasesButton.onclick()
-assert(not PNC.MapDisplay.AreBasesVisible(),
+T.truthy(not PNC.MapDisplay.AreBasesVisible(),
     "NPC-world button did not disable strategic markers")
-assert(map.pncBasesButton.title == "NPC WORLD: OFF",
+T.truthy(map.pncBasesButton.title == "NPC WORLD: OFF",
     "NPC-world disabled title did not update")
 map.pncBasesButton.onclick()
-assert(PNC.MapDisplay.AreBasesVisible(),
+T.truthy(PNC.MapDisplay.AreBasesVisible(),
     "NPC-world button did not enable strategic markers")
-assert(map.pncBasesButton.title == "NPC WORLD: ON",
+T.truthy(map.pncBasesButton.title == "NPC WORLD: ON",
     "NPC-world enabled title did not update")
+T.finish("pnc_map_display_settings_smoke")
 
-print("pnc_map_display_settings_smoke: ok")
+T.finish("pnc_map_display_settings_smoke")

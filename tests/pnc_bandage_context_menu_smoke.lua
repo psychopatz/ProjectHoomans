@@ -1,11 +1,6 @@
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
 
 local function newMenu()
     local menu = { options = {} }
@@ -89,8 +84,8 @@ ISContextMenu = {
     end,
 }
 
-dofile(CLIENT_ROOT .. "PNC/UI/Context/PNC_BandageMenu.lua")
-dofile(CLIENT_ROOT
+T.load(CLIENT_ROOT .. "PNC/UI/Context/PNC_BandageMenu.lua")
+T.load(CLIENT_ROOT
     .. "PNC/UI/Context/Providers/PNC_ContextProvider_Bandage.lua")
 
 local entry = {
@@ -111,33 +106,34 @@ local entry = {
 }
 local menu = newMenu()
 
-assertEqual(registeredProvider.id, "bandage", "bandage provider registered")
-assertEqual(registeredProvider.isEnabled(entry), true, "open wound enables provider")
+T.equal(registeredProvider.id, "bandage", "bandage provider registered")
+T.equal(registeredProvider.isEnabled(entry), true, "open wound enables provider")
 registeredProvider.addOptions(menu, entry, player)
 
 local woundOption = menu.options[1]
-assertEqual(woundOption.name, "Bandage Right Hand (laceration)",
+T.equal(woundOption.name, "Bandage Right Hand (laceration)",
     "world context keeps wound-specific root")
-assertEqual(woundOption.subMenu.options[1].name, "Bandage (2)",
+T.equal(woundOption.subMenu.options[1].name, "Bandage (2)",
     "world context groups bandage count")
-assertEqual(woundOption.subMenu.options[2].name, "Rag (3)",
+T.equal(woundOption.subMenu.options[2].name, "Rag (3)",
     "world context groups rag count")
-assertEqual(woundOption.subMenu.options[2].itemForTexture, ragItem,
+T.equal(woundOption.subMenu.options[2].itemForTexture, ragItem,
     "world context uses representative material icon")
 
 woundOption.subMenu.options[2].callback()
-assertEqual(selected[1].npcId, "npc_bandage_menu", "selected npc")
-assertEqual(selected[1].partId, "Hand_R", "selected wound")
-assertEqual(selected[1].debugFree, false, "selected material is consumed")
-assertEqual(selected[1].bandageType, "Base.RippedSheets",
+T.equal(selected[1].npcId, "npc_bandage_menu", "selected npc")
+T.equal(selected[1].partId, "Hand_R", "selected wound")
+T.equal(selected[1].debugFree, false, "selected material is consumed")
+T.equal(selected[1].bandageType, "Base.RippedSheets",
     "selected material type reaches timed action")
 
 entry.x = 20
 menu = newMenu()
 registeredProvider.addOptions(menu, entry, player)
-assertEqual(menu.options[1].notAvailable, true,
+T.equal(menu.options[1].notAvailable, true,
     "out-of-range wound action unavailable")
-assertEqual(menu.options[1].subMenu.options[1].notAvailable, true,
+T.equal(menu.options[1].subMenu.options[1].notAvailable, true,
     "out-of-range material unavailable")
+T.finish("pnc_bandage_context_menu_smoke")
 
-print("pnc_bandage_context_menu_smoke: ok")
+T.finish("pnc_bandage_context_menu_smoke")

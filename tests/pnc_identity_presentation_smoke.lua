@@ -1,9 +1,4 @@
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
+local T = require "tests/support/test"
 
 PNC = {
     Network = {
@@ -14,18 +9,18 @@ PNC = {
     },
 }
 
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 
 local Identity = PNC.NPCIdentityPresentation
 local stranger = { id = "npc-stranger", displayName = "Morgan Reed" }
 
-assertEqual(Identity.GetName(stranger), "Unknown survivor",
+T.equal(Identity.GetName(stranger), "Unknown survivor",
     "raw transport name is hidden until learned")
-assertEqual(Identity.GetContextLabel(stranger), "Talk to stranger",
+T.equal(Identity.GetContextLabel(stranger), "Talk to stranger",
     "unknown NPC context label")
-assertEqual(Identity.GetArchetype(stranger), "Unknown background",
+T.equal(Identity.GetArchetype(stranger), "Unknown background",
     "raw archetype is hidden until learned")
-assertEqual(Identity.GetFactionName(stranger), "Unknown",
+T.equal(Identity.GetFactionName(stranger), "Unknown",
     "raw faction is hidden until learned")
 
 PNC.Network.ClientState.npcKnowledge["npc-stranger"] = {
@@ -40,16 +35,16 @@ PNC.Network.ClientState.npcKnowledge["npc-stranger"] = {
     },
 }
 
-assertEqual(Identity.GetName(stranger), "Morgan Reed",
+T.equal(Identity.GetName(stranger), "Morgan Reed",
     "learned identity name")
-assertEqual(Identity.GetContextLabel(stranger), "Morgan Reed",
+T.equal(Identity.GetContextLabel(stranger), "Morgan Reed",
     "learned NPC context label")
-assertEqual(Identity.GetArchetype(stranger), "doctor",
+T.equal(Identity.GetArchetype(stranger), "doctor",
     "learned archetype")
-assertEqual(Identity.GetFactionName(stranger), "Ashwood Haven",
+T.equal(Identity.GetFactionName(stranger), "Ashwood Haven",
     "learned faction")
 
-assertEqual(Identity.GetName({
+T.equal(Identity.GetName({
     id = "npc-companion", displayName = "Riley", recruited = true,
 }), "Riley", "player companion name remains usable")
 PNC.Network.ClientState.snapshots["npc-starting-family"] = {
@@ -57,7 +52,8 @@ PNC.Network.ClientState.snapshots["npc-starting-family"] = {
     displayName = "Casey Survivor",
     recruited = true,
 }
-assertEqual(Identity.GetName("npc-starting-family"), "Casey Survivor",
+T.equal(Identity.GetName("npc-starting-family"), "Casey Survivor",
     "companion lookup by ID uses its replicated identity immediately")
+T.finish("pnc_identity_presentation_smoke")
 
-print("pnc_identity_presentation_smoke: ok")
+T.finish("pnc_identity_presentation_smoke")

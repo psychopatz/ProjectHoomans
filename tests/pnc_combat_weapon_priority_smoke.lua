@@ -1,10 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local now = 1000
 local mode = "armed"
@@ -81,7 +77,7 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Combat/PNC_Combat_Melee.lua")
+T.load(ROOT .. "Combat/PNC_Combat_Melee.lua")
 
 local function record()
     return {
@@ -93,23 +89,23 @@ end
 
 local target = { kind = "zombie", zombieId = 12, distSq = 1 }
 local started, reason = PNC.Combat.TryMelee(record(), {}, target)
-assertEqual(started, true, "armed attack starts")
-assertEqual(reason, "melee_attack_started", "armed attack reason")
-assertEqual(action.attackKind, "melee", "armed attack kind")
-assertEqual(action.anim, "PNC_Attack1H1", "weapon animation retained")
-assertEqual(weaponAnimationCount, 1, "weapon animation count")
-assertEqual(shoveCount, 0, "armed attack never shoves")
+T.equal(started, true, "armed attack starts")
+T.equal(reason, "melee_attack_started", "armed attack reason")
+T.equal(action.attackKind, "melee", "armed attack kind")
+T.equal(action.anim, "PNC_Attack1H1", "weapon animation retained")
+T.equal(weaponAnimationCount, 1, "weapon animation count")
+T.equal(shoveCount, 0, "armed attack never shoves")
 
 mode = "barehand"
 action = nil
 started, reason = PNC.Combat.TryMelee(record(), {}, target)
-assertEqual(started, true, "barehand attack starts")
-assertEqual(reason, "unarmed_attack_started", "barehand attack reason")
-assertEqual(action.attackKind, "melee", "barehand attack kind")
-assertEqual(action.anim, "PNC_AttackBareHands1",
+T.equal(started, true, "barehand attack starts")
+T.equal(reason, "unarmed_attack_started", "barehand attack reason")
+T.equal(action.attackKind, "melee", "barehand attack kind")
+T.equal(action.anim, "PNC_AttackBareHands1",
     "barehand attack animation retained")
-assertEqual(unarmedAnimationCount, 1, "barehand animation count")
-assertEqual(shoveCount, 0, "ordinary barehand attack became a shove")
+T.equal(unarmedAnimationCount, 1, "barehand animation count")
+T.equal(shoveCount, 0, "ordinary barehand attack became a shove")
 
 now = now + 1000
 canSpendAttack = false
@@ -121,12 +117,12 @@ started, reason = PNC.Combat.TryMelee(
     {},
     target
 )
-assertEqual(started, true, "exhausted lone emergency attack starts")
-assertEqual(reason, "unarmed_attack_started",
+T.equal(started, true, "exhausted lone emergency attack starts")
+T.equal(reason, "unarmed_attack_started",
     "exhausted lone emergency attack reason")
-assertEqual(action.attackKind, "melee",
+T.equal(action.attackKind, "melee",
     "exhausted lone emergency attack kind")
-assertEqual(exhaustedRecord.runtime.emergencyMeleeUntil, nil,
+T.equal(exhaustedRecord.runtime.emergencyMeleeUntil, nil,
     "emergency melee lease was not consumed")
 canSpendAttack = true
 
@@ -135,11 +131,11 @@ mode = "armed"
 grounded = true
 action = nil
 started, reason = PNC.Combat.TryMelee(record(), {}, target)
-assertEqual(started, true, "armed ground finisher starts")
-assertEqual(reason, "ground_attack_started", "armed ground finisher reason")
-assertEqual(action.attackKind, "ground", "armed crawler uses ground attack")
-assertEqual(action.anim, "PNC_Attack2HStamp", "ground finisher animation retained")
-assertEqual(groundAnimationCount, 1, "ground finisher animation count")
+T.equal(started, true, "armed ground finisher starts")
+T.equal(reason, "ground_attack_started", "armed ground finisher reason")
+T.equal(action.attackKind, "ground", "armed crawler uses ground attack")
+T.equal(action.anim, "PNC_Attack2HStamp", "ground finisher animation retained")
+T.equal(groundAnimationCount, 1, "ground finisher animation count")
 
 now = now + 1000
 grounded = false
@@ -151,10 +147,10 @@ started, reason = PNC.Combat.TryShove(
     target,
     "pressure_shove"
 )
-assertEqual(started, true, "armed tactical shove starts")
-assertEqual(reason, "pressure_shove", "tactical shove reason")
-assertEqual(action.attackKind, "shove", "tactical shove action kind")
-assertEqual(shoveCount, 1, "tactical shove animation count")
+T.equal(started, true, "armed tactical shove starts")
+T.equal(reason, "pressure_shove", "tactical shove reason")
+T.equal(action.attackKind, "shove", "tactical shove action kind")
+T.equal(shoveCount, 1, "tactical shove animation count")
 
 now = now + 1000
 action = nil
@@ -165,23 +161,22 @@ started, reason = PNC.Combat.TryShove(
     target,
     "exhausted_defensive_shove"
 )
-assertEqual(started, true, "exhausted defensive shove was stamina-blocked")
-assertEqual(reason, "exhausted_defensive_shove",
+T.equal(started, true, "exhausted defensive shove was stamina-blocked")
+T.equal(reason, "exhausted_defensive_shove",
     "exhausted defensive shove reason")
-assertEqual(action.attackKind, "shove",
+T.equal(action.attackKind, "shove",
     "exhausted defense did not build a shove action")
 
-local biteFile = assert(io.open(ROOT .. "Zombies/PNC_ZombieAggro_Bite.lua", "r"))
-local biteSource = biteFile:read("*a")
-biteFile:close()
-assert(not string.find(biteSource, "npc_parry", 1, true), "wound-roll rejection must not force a parry shove")
+local biteSource = T.read(
+    "ProjectHoomans", "shared", "PNC/Core/Zombies/PNC_ZombieAggro_Bite.lua"
+)
+T.truthy(not string.find(biteSource, "npc_parry", 1, true), "wound-roll rejection must not force a parry shove")
 
-local actionFile = assert(io.open(
-    ROOT .. "Combat/AttackExecution/PNC_AttackExecution_HitResolution.lua",
-    "r"
-))
-local actionSource = actionFile:read("*a")
-actionFile:close()
-assert(not string.find(actionSource, "pressure_shove", 1, true), "armed hits must not be replaced by pressure shoves")
+local actionSource = T.read(
+    "ProjectHoomans", "shared",
+    "PNC/Core/Combat/AttackExecution/PNC_AttackExecution_HitResolution.lua"
+)
+T.truthy(not string.find(actionSource, "pressure_shove", 1, true), "armed hits must not be replaced by pressure shoves")
+T.finish("pnc_combat_weapon_priority_smoke")
 
-print("pnc_combat_weapon_priority_smoke: ok")
+T.finish("pnc_combat_weapon_priority_smoke")

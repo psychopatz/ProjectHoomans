@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "root", "")
 
 local function capture(path)
     local calls = {}
@@ -14,7 +9,7 @@ local function capture(path)
         calls[#calls + 1] = name
         return true
     end
-    dofile(path)
+    T.load(path)
     require = originalRequire
     return calls
 end
@@ -55,10 +50,10 @@ local expectedPathServiceCalls = {
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Motion",
 }
 for index = 1, #expectedPathServiceCalls do
-    assertEqual(pathServiceCalls[index], expectedPathServiceCalls[index],
+    T.equal(pathServiceCalls[index], expectedPathServiceCalls[index],
         "PathService dependency " .. tostring(index))
 end
-assertEqual(#pathServiceCalls, #expectedPathServiceCalls,
+T.equal(#pathServiceCalls, #expectedPathServiceCalls,
     "PathService dependency count")
 
 local record = { id = "npc_boundary" }
@@ -68,14 +63,14 @@ local ok, reason = PNC.PathService.Commands.Reset(
     body,
     "boundary_test"
 )
-assertEqual(ok, true, "record-first reset result")
-assertEqual(reason, "reset", "record-first reset reason")
-assertEqual(resetRecord, record, "record-first reset record")
-assertEqual(resetBody, body, "record-first reset body")
-assertEqual(resetReason, "boundary_test", "record-first reset context")
-assertEqual(PNC.PathService.Reset ~= nil, true,
+T.equal(ok, true, "record-first reset result")
+T.equal(reason, "reset", "record-first reset reason")
+T.equal(resetRecord, record, "record-first reset record")
+T.equal(resetBody, body, "record-first reset body")
+T.equal(resetReason, "boundary_test", "record-first reset context")
+T.equal(PNC.PathService.Reset ~= nil, true,
     "legacy reset remains available")
-assertEqual(PNC.PathService.Queries.IsTraversalActive, traversalQuery,
+T.equal(PNC.PathService.Queries.IsTraversalActive, traversalQuery,
     "PathService traversal query compatibility")
 
 local combatResetRecord
@@ -96,38 +91,38 @@ PNC = {
         end,
     },
 }
-dofile(
+T.load(
     ROOT
         .. "shared/PNC/Core/Combat/CombatTactics/"
         .. "PNC_CombatTactics_Movement.lua"
 )
 local combatRecord = { id = "npc_combat", presenceState = "abstract" }
 local combatBody = { id = "body_combat" }
-assertEqual(PNC.CombatTactics.Internal.RequestHold(
+T.equal(PNC.CombatTactics.Internal.RequestHold(
     combatRecord,
     combatBody,
     "combat_hold"
 ), true, "combat reset boundary result")
-assertEqual(combatResetRecord, combatRecord,
+T.equal(combatResetRecord, combatRecord,
     "combat reset boundary record")
-assertEqual(combatResetBody, combatBody,
+T.equal(combatResetBody, combatBody,
     "combat reset boundary body")
-assertEqual(combatResetReason, "combat_hold",
+T.equal(combatResetReason, "combat_hold",
     "combat reset boundary reason")
 
 PNC = { Presence = {} }
 local presenceCalls = capture(
     ROOT .. "shared/PNC/Core/Presence/PNC_PresenceRuntime.lua"
 )
-assertEqual(presenceCalls[1],
+T.equal(presenceCalls[1],
     "PNC/Core/Presence/PNC_PresenceAdmission",
     "Presence runtime admission dependency")
-assertEqual(presenceCalls[2],
+T.equal(presenceCalls[2],
     "PNC/Core/Presence/PNC_MaterializationSafety",
     "Presence runtime safety dependency")
-assertEqual(presenceCalls[3], "PNC/Core/Presence/PNC_Presence",
+T.equal(presenceCalls[3], "PNC/Core/Presence/PNC_Presence",
     "Presence runtime coordinator dependency")
-assertEqual(#presenceCalls, 3, "Presence runtime dependency count")
+T.equal(#presenceCalls, 3, "Presence runtime dependency count")
 
 PNC = {}
 local sharedCalls = capture(
@@ -137,20 +132,21 @@ local presenceIndex = indexOf(
     sharedCalls,
     "PNC/Core/Presence/PNC_PresenceRuntime"
 )
-assertEqual(sharedCalls[presenceIndex - 1],
+T.equal(sharedCalls[presenceIndex - 1],
     "PNC/Core/Production/PNC_WorkBehavior",
     "Presence runtime initialization predecessor")
-assertEqual(sharedCalls[presenceIndex - 2],
+T.equal(sharedCalls[presenceIndex - 2],
     "PNC/Core/Scavenge/PNC_ScavengeAnimationScenes",
     "Scavenge animation scene dependency")
-assertEqual(sharedCalls[presenceIndex - 3],
+T.equal(sharedCalls[presenceIndex - 3],
     "PNC/Core/Production/PNC_WorkAnimationScenes",
     "Production animation scene dependency")
-assertEqual(sharedCalls[presenceIndex - 4],
+T.equal(sharedCalls[presenceIndex - 4],
     "PNC/Core/Facilities/PNC_FacilityJobs_Behavior",
     "Production work follows facility job behavior")
-assertEqual(sharedCalls[presenceIndex + 1],
+T.equal(sharedCalls[presenceIndex + 1],
     "PNC/Core/Scheduling/PNC_SimulationClock",
     "Presence runtime initialization successor")
+T.finish("pnc_pathing_presence_boundary_smoke")
 
-print("pnc_pathing_presence_boundary_smoke: OK")
+T.finish("pnc_pathing_presence_boundary_smoke")

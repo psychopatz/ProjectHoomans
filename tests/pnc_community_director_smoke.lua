@@ -1,19 +1,9 @@
+local T = require "tests/support/test"
+
 local SHARED =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 local SERVER =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected="
-            .. tostring(expected) .. " actual="
-            .. tostring(actual))
-    end
-end
-
-local function assertTrue(value, label)
-    assertEqual(value == true, true, label)
-end
+    T.path("ProjectHoomans", "server", "PNC/")
 
 local function tableSize(value)
     local count = 0
@@ -47,25 +37,25 @@ ModData = {
 }
 
 PNC = {}
-dofile(SHARED .. "Base/PNC_Core.lua")
+T.load(SHARED .. "Base/PNC_Core.lua")
 PNC.Const = {
     PRESENCE_ABSTRACT = "abstract",
     PRESENCE_LIVE = "live",
     ORDER_ROAM = "roam",
     ROAM_MODE_AREA = "area",
 }
-dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
-dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
-dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
-dofile(SHARED .. "Factions/PNC_FactionNameGenerator.lua")
-dofile(SHARED .. "Factions/PNC_FactionEmblems.lua")
-dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
-dofile(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
-dofile(SHARED .. "Communities/PNC_CommunityConstants.lua")
-dofile(SHARED .. "Communities/PNC_CommunityProfiles.lua")
-dofile(SHARED .. "Communities/PNC_CommunityMath.lua")
-dofile(SHARED .. "Communities/PNC_CommunityTypes.lua")
-dofile(SHARED .. "Factions/PNC_FactionTypes.lua")
+T.load(SHARED .. "Relationships/PNC_EntityRef.lua")
+T.load(SHARED .. "Factions/PNC_FactionConstants.lua")
+T.load(SHARED .. "Factions/PNC_FactionArchetypes.lua")
+T.load(SHARED .. "Factions/PNC_FactionNameGenerator.lua")
+T.load(SHARED .. "Factions/PNC_FactionEmblems.lua")
+T.load(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
+T.load(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
+T.load(SHARED .. "Communities/PNC_CommunityConstants.lua")
+T.load(SHARED .. "Communities/PNC_CommunityProfiles.lua")
+T.load(SHARED .. "Communities/PNC_CommunityMath.lua")
+T.load(SHARED .. "Communities/PNC_CommunityTypes.lua")
+T.load(SHARED .. "Factions/PNC_FactionTypes.lua")
 
 PNC.Registry = { Data = {} }
 function PNC.Registry.Get(id)
@@ -78,9 +68,9 @@ function PNC.Registry.MarkDirty(record)
     return true
 end
 
-dofile(SERVER .. "PNC_FactionService.lua")
-dofile(SERVER .. "PNC_CommunityService.lua")
-dofile(SERVER .. "PNC_CommunitySiteResolver.lua")
+T.load(SERVER .. "PNC_FactionService.lua")
+T.load(SERVER .. "PNC_CommunityService.lua")
+T.load(SERVER .. "PNC_CommunitySiteResolver.lua")
 
 local npcSequence = 0
 PNC.Presence = {
@@ -132,7 +122,7 @@ function PNC.API.Despawn(id)
     return true
 end
 
-dofile(SERVER .. "PNC_CommunityDirector.lua")
+T.load(SERVER .. "PNC_CommunityDirector.lua")
 PNC.Factions.Load()
 PNC.Communities.Load()
 
@@ -146,7 +136,7 @@ local ok, _, faction = PNC.Factions.Create({
     archetypeID = "looter",
     createdAt = worldHour,
 })
-assertTrue(ok, "faction created")
+T.truthy(ok, "faction created")
 
 local primitiveSite = {
     kind = "building",
@@ -178,55 +168,55 @@ ok, _, result =
             debug = true,
         }
     )
-assertTrue(ok, "unloaded group generated")
-assertEqual(result.createdCount, 4, "four generated")
-assertEqual(result.liveCount, 0, "unloaded live defers")
-assertEqual(result.abstractCount, 4,
+T.truthy(ok, "unloaded group generated")
+T.equal(result.createdCount, 4, "four generated")
+T.equal(result.liveCount, 0, "unloaded live defers")
+T.equal(result.abstractCount, 4,
     "unloaded group remains abstract")
-assertEqual(result.siteLoaded, false, "site unloaded")
-assertTrue(PNC.CommunityTypes.IsValidSiteID(
+T.equal(result.siteLoaded, false, "site unloaded")
+T.truthy(PNC.CommunityTypes.IsValidSiteID(
     result.siteID
 ), "site ID generated from primitives")
 
 local community = PNC.Communities.Get(
     result.communityID
 )
-assertEqual(community.currentPopulation, 4,
+T.equal(community.currentPopulation, 4,
     "community population")
-assertEqual(community.site.status, "occupied",
+T.equal(community.site.status, "occupied",
     "site occupied")
-assert(string.find(
+T.truthy(string.find(
     community.name,
     faction.name,
     1,
     true
 ), "community name retains faction identity")
-assertEqual(community.leaderNPCID, result.npcIDs[1],
+T.equal(community.leaderNPCID, result.npcIDs[1],
     "community leader generated")
-assertEqual(PNC.Factions.Get(
+T.equal(PNC.Factions.Get(
     faction.id
 ).leaderNPCID, result.npcIDs[1],
     "faction leader generated")
 
 for _, npcID in ipairs(result.npcIDs) do
     local record = PNC.Registry.Get(npcID)
-    assertEqual(record.presenceState, "abstract",
+    T.equal(record.presenceState, "abstract",
         "persistent abstract record")
-    assertEqual(record.spawnRequestedLive, false,
+    T.equal(record.spawnRequestedLive, false,
         "unloaded site never force-materializes")
-    assertEqual(record.affiliation.factionID, faction.id,
+    T.equal(record.affiliation.factionID, faction.id,
         "faction membership")
-    assertEqual(record.affiliation.communityID,
+    T.equal(record.affiliation.communityID,
         community.id, "community membership")
-    assertEqual(record.faction, "neutral",
+    T.equal(record.faction, "neutral",
         "legacy combat classification preserved")
 end
-assertEqual(
+T.equal(
     PNC.Registry.Get(result.npcIDs[2]).affiliation.role,
     "raider",
     "looter group receives archetype role"
 )
-assertEqual(
+T.equal(
     PNC.Registry.Get(result.npcIDs[3]).affiliation.role,
     "enforcer",
     "looter group receives second archetype role"
@@ -244,12 +234,12 @@ ok, _, second =
             worldAgeHours = worldHour + 1,
         }
     )
-assertTrue(ok, "existing community group generated")
-assertEqual(second.communityID, community.id,
+T.truthy(ok, "existing community group generated")
+T.equal(second.communityID, community.id,
     "existing community reused")
-assertEqual(second.siteID, result.siteID,
+T.equal(second.siteID, result.siteID,
     "existing site reused")
-assertEqual(PNC.Communities.Get(
+T.equal(PNC.Communities.Get(
     community.id
 ).currentPopulation, 6,
     "population expands")
@@ -263,17 +253,18 @@ table.sort(allIDs)
 for _, npcID in ipairs(allIDs) do
     local record = PNC.Registry.Get(npcID)
     record.alive = false
-    assertTrue(PNC.Communities.OnNPCDeath(npcID),
+    T.truthy(PNC.Communities.OnNPCDeath(npcID),
         "death reconciles")
 end
-assertEqual(PNC.Communities.Get(
+T.equal(PNC.Communities.Get(
     community.id
 ).status, "destroyed", "group wiped")
-assertEqual(PNC.Communities.GetSite(
+T.equal(PNC.Communities.GetSite(
     result.siteID
 ).status, "vacant", "site released")
-assertEqual(tableSize(
+T.equal(tableSize(
     PNC.Communities.Get(community.id).memberIDs
 ), 0, "retired membership cleared")
+T.finish("pnc_community_director_smoke")
 
-print("pnc_community_director_smoke: PASS")
+T.finish("pnc_community_director_smoke")

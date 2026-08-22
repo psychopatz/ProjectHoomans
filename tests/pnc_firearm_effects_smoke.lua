@@ -1,12 +1,7 @@
-local SHARED_FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_FirearmEffects.lua"
-local CLIENT_FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_ClientFirearmEffects.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local SHARED_FILE = T.path("ProjectHoomans", "shared", "PNC/Core/Combat/PNC_Combat_FirearmEffects.lua")
+local CLIENT_FILE = T.path("ProjectHoomans", "client", "PNC/PNC_ClientFirearmEffects.lua")
 
 local now = 1000
 local published
@@ -69,8 +64,8 @@ PNC = {
     },
 }
 
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Firearms.lua")
-dofile(SHARED_FILE)
+T.load(T.path("ProjectHoomans", "shared", "PNC/Core/Combat/PNC_Combat_Firearms.lua"))
+T.load(SHARED_FILE)
 
 local record = {
     id = "npc_modded_rifle",
@@ -86,18 +81,18 @@ local emitted, payload = PNC.FirearmEffects.Emit(record, shooter, {
     y = 22,
     z = 0,
 }, weapon)
-assertEqual(emitted, true, "authoritative shot emitted")
-assertEqual(payload, published, "published payload identity")
-assertEqual(payload.shotId, "npc_modded_rifle:body:1:1000", "shot sequence")
-assertEqual(payload.weaponFullType, "ModdedGuns.TestRifle", "modded weapon type")
-assertEqual(payload.ammoType, "ModdedAmmo.556Tracer", "ItemKey ammo type")
-assertEqual(payload.ammoPerShot, 2, "modded ammo consumption metadata")
-assertEqual(payload.shotSound, "ModdedRifleShot", "modded weapon sound")
-assertEqual(payload.projectileCount, 3, "modded projectile count")
-assertEqual(payload.projectileSpread, 1.5, "modded projectile spread")
-assertEqual(payload.shellFallSound, "ModdedShellFall", "modded shell sound")
-assertEqual(worldNoise.radius, 95, "weapon-driven world noise radius")
-assertEqual(worldNoise.volume, 48, "weapon-driven world noise volume")
+T.equal(emitted, true, "authoritative shot emitted")
+T.equal(payload, published, "published payload identity")
+T.equal(payload.shotId, "npc_modded_rifle:body:1:1000", "shot sequence")
+T.equal(payload.weaponFullType, "ModdedGuns.TestRifle", "modded weapon type")
+T.equal(payload.ammoType, "ModdedAmmo.556Tracer", "ItemKey ammo type")
+T.equal(payload.ammoPerShot, 2, "modded ammo consumption metadata")
+T.equal(payload.shotSound, "ModdedRifleShot", "modded weapon sound")
+T.equal(payload.projectileCount, 3, "modded projectile count")
+T.equal(payload.projectileSpread, 1.5, "modded projectile spread")
+T.equal(payload.shellFallSound, "ModdedShellFall", "modded shell sound")
+T.equal(worldNoise.radius, 95, "weapon-driven world noise radius")
+T.equal(worldNoise.volume, 48, "weapon-driven world noise volume")
 
 local played = {}
 local rendered = 0
@@ -186,43 +181,44 @@ Events = {
     OnResetLua = { Add = function() end },
 }
 
-dofile(CLIENT_FILE)
+T.load(CLIENT_FILE)
 
-assertEqual(PNC.ClientFirearmEffects.Play(payload), true, "client shot rendered")
-assertEqual(played[1], "LiveModdedRifleShot", "live equipped gun sound preferred")
-assertEqual(played[2], "LiveModdedShellFall", "live equipped shell sound preferred")
-assertEqual(muzzleFlash, 1, "native muzzle hook attempted")
-assertEqual(#PNC.ClientFirearmEffects.ActiveLights, 1, "temporary muzzle light added")
-assertEqual(#PNC.ClientFirearmEffects.ActiveTracers, 3, "weapon projectile count rendered")
-assertEqual(impactSound, "ModdedBulletImpact", "weapon impact sound")
-assertEqual(PNC.ClientFirearmEffects.Play(payload), false, "duplicate shot ignored")
+T.equal(PNC.ClientFirearmEffects.Play(payload), true, "client shot rendered")
+T.equal(played[1], "LiveModdedRifleShot", "live equipped gun sound preferred")
+T.equal(played[2], "LiveModdedShellFall", "live equipped shell sound preferred")
+T.equal(muzzleFlash, 1, "native muzzle hook attempted")
+T.equal(#PNC.ClientFirearmEffects.ActiveLights, 1, "temporary muzzle light added")
+T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 3, "weapon projectile count rendered")
+T.equal(impactSound, "ModdedBulletImpact", "weapon impact sound")
+T.equal(PNC.ClientFirearmEffects.Play(payload), false, "duplicate shot ignored")
 PNC.ClientFirearmEffects.OnPreUIDraw()
-assertEqual(rendered, 3, "each projectile tracer drawn")
-assert(
+T.equal(rendered, 3, "each projectile tracer drawn")
+T.truthy(
     renderLines[1].x1 ~= renderLines[1].x2 or renderLines[1].y1 ~= renderLines[1].y2,
     "tracer line has no visible length"
 )
 local firstTracerX = renderLines[1].x1
 PNC.ClientFirearmEffects.OnPreUIDraw()
-assert(
+T.truthy(
     renderLines[4].x1 ~= firstTracerX,
     "tracer did not advance between draw frames"
 )
 for _ = 1, 10 do
     PNC.ClientFirearmEffects.OnPreUIDraw()
 end
-assertEqual(#PNC.ClientFirearmEffects.ActiveTracers, 0, "tracers expire after flight")
+T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 0, "tracers expire after flight")
 PNC.ClientFirearmEffects.OnTick()
 PNC.ClientFirearmEffects.OnTick()
-assertEqual(#PNC.ClientFirearmEffects.ActiveLights, 0, "muzzle light cleaned")
-assertEqual(removedLights, 1, "muzzle light removed from cell")
+T.equal(#PNC.ClientFirearmEffects.ActiveLights, 0, "muzzle light cleaned")
+T.equal(removedLights, 1, "muzzle light removed from cell")
 
 PNC.Network.FindZombieByOnlineID = function() return nil end
 local remotePayload = {}
 for key, value in pairs(payload) do remotePayload[key] = value end
 remotePayload.shotId = "npc_modded_rifle:remote:2:1100"
 remotePayload.shellFallSound = nil
-assertEqual(PNC.ClientFirearmEffects.Play(remotePayload), true, "unresolved remote shot rendered")
-assertEqual(freeEmitterSound, "ModdedRifleShot", "remote positional emitter uses packet weapon sound")
+T.equal(PNC.ClientFirearmEffects.Play(remotePayload), true, "unresolved remote shot rendered")
+T.equal(freeEmitterSound, "ModdedRifleShot", "remote positional emitter uses packet weapon sound")
+T.finish("pnc_firearm_effects_smoke")
 
-print("pnc_firearm_effects_smoke: ok")
+T.finish("pnc_firearm_effects_smoke")

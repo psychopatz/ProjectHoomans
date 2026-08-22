@@ -1,7 +1,6 @@
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/?.lua",
-    package.path,
-}, ";")
+local T = require "tests/support/test"
+
+T.addPackagePaths()
 
 getText = function(key) return key end
 PsychopatzCore = { UI = {
@@ -38,11 +37,11 @@ local Browser = require(
 local rows = Browser.BuildComponentRows({
     definitionId = "workshop", level = 1, components = {},
 })
-assert(#rows == 2, "workshop should expose two component roles")
-assert(rows[1].key == "work.craft"
+T.truthy(#rows == 2, "workshop should expose two component roles")
+T.truthy(rows[1].key == "work.craft"
     and rows[1].componentAction.role == "work.craft",
     "craft station does not have its own assign action")
-assert(rows[2].key == "work.disassemble"
+T.truthy(rows[2].key == "work.disassemble"
     and rows[2].componentAction.role == "work.disassemble",
     "disassembly station does not have its own assign action")
 
@@ -53,14 +52,14 @@ rows = Browser.BuildComponentRows({
         x = 10, y = 11, z = 0,
     }},
 })
-assert(#rows == 3, "placed component should add an editable child row")
-assert(rows[1].componentAction == nil,
+T.truthy(#rows == 3, "placed component should add an editable child row")
+T.truthy(rows[1].componentAction == nil,
     "full craft role still offered an extra assignment")
-assert(rows[2].componentAction.componentId == "craft:1"
+T.truthy(rows[2].componentAction.componentId == "craft:1"
     and rows[2].actionLabel == "MANAGE"
     and rows[2].secondaryAction.remove == true,
     "placed craft station does not have its own edit action")
-assert(rows[3].componentAction.role == "work.disassemble",
+T.truthy(rows[3].componentAction.role == "work.disassemble",
     "unplaced disassembly action disappeared after craft assignment")
 
 PNC.FacilityDefinitions.GetLevel = function()
@@ -77,13 +76,13 @@ rows = Browser.BuildComponentRows({
             x = 12, y = 11, z = 0 },
     },
 })
-assert(#rows == 3,
+T.truthy(#rows == 3,
     "barracks should expose each bed as an individual component")
-assert(rows[2].key == "bed:1"
+T.truthy(rows[2].key == "bed:1"
     and rows[2].componentAction.componentId == "bed:1"
     and rows[2].secondaryAction.remove == true,
     "first bed does not have individual manage and deconstruct actions")
-assert(rows[3].key == "bed:2"
+T.truthy(rows[3].key == "bed:2"
     and rows[3].componentAction.componentId == "bed:2"
     and rows[3].secondaryAction.remove == true,
     "second bed does not have individual manage and deconstruct actions")
@@ -99,11 +98,11 @@ rows = Browser.BuildComponentRows({
     usedWeight = 25, freeWeight = 175,
     access = { hasStockpile = true, insideBase = true },
 })
-assert(#rows == 2, "stockpile inspector should show capacity and area")
-assert(rows[1].componentAction.kind == "open_stockpile"
+T.truthy(#rows == 2, "stockpile inspector should show capacity and area")
+T.truthy(rows[1].componentAction.kind == "open_stockpile"
     and rows[1].actionLabel == "OPEN STORAGE",
     "built in-base stockpile does not expose storage management")
-assert(rows[2].componentAction.kind == "stockpile_move"
+T.truthy(rows[2].componentAction.kind == "stockpile_move"
     and rows[2].actionLabel == "MOVE"
     and rows[2].secondaryAction == nil,
     "stockpile area must only expose move")
@@ -118,9 +117,10 @@ rows = Browser.BuildComponentRows({
     freeWeight = 199.01000002212822,
     access = { hasStockpile = true, insideBase = false, writable = false },
 })
-assert(rows[1].componentAction.kind == "open_stockpile",
+T.truthy(rows[1].componentAction.kind == "open_stockpile",
     "remote walkie-talkie view must remain accessible")
-assert(rows[1].detail == "1.0 / 200.0 | 199.0 FREE | REMOTE VIEW",
+T.truthy(rows[1].detail == "1.0 / 200.0 | 199.0 FREE | REMOTE VIEW",
     "stockpile summary is not rounded or remote state is unclear")
+T.finish("pnc_facility_component_rows_smoke")
 
-print("pnc_facility_component_rows_smoke: ok")
+T.finish("pnc_facility_component_rows_smoke")

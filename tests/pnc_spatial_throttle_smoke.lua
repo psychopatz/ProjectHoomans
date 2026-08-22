@@ -1,11 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Spatial/PNC_SpatialIndex.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/Spatial/PNC_SpatialIndex.lua")
 
 local scans = 0
 local now = 1000
@@ -49,16 +44,17 @@ getCell = function()
     }
 end
 
-dofile(FILE)
+T.load(FILE)
 
-assertEqual(PNC.SpatialIndex.Rebuild(now, false), true, "initial rebuild")
-assertEqual(scans, 1, "initial zombie scan")
+T.equal(PNC.SpatialIndex.Rebuild(now, false), true, "initial rebuild")
+T.equal(scans, 1, "initial zombie scan")
 now = 1050
-assertEqual(PNC.SpatialIndex.Rebuild(now, false), false, "throttled rebuild")
-assertEqual(scans, 1, "throttled scan count")
-assertEqual(PNC.SpatialIndex.Rebuild(now, true), true, "forced rebuild")
-assertEqual(scans, 2, "forced scan count")
-assertEqual(#PNC.SpatialIndex.QueryZombies(2, 2, 4), 1,
+T.equal(PNC.SpatialIndex.Rebuild(now, false), false, "throttled rebuild")
+T.equal(scans, 1, "throttled scan count")
+T.equal(PNC.SpatialIndex.Rebuild(now, true), true, "forced rebuild")
+T.equal(scans, 2, "forced scan count")
+T.equal(#PNC.SpatialIndex.QueryZombies(2, 2, 4), 1,
     "indexed zombie query")
+T.finish("pnc_spatial_throttle_smoke")
 
-print("pnc_spatial_throttle_smoke: ok")
+T.finish("pnc_spatial_throttle_smoke")

@@ -1,25 +1,20 @@
-local function readAll(path)
-    local file = assert(io.open(path, "r"))
-    local contents = file:read("*a")
-    file:close()
-    return contents
-end
+local T = require "tests/support/test"
 
 local ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/"
-local api = readAll(
+    T.path("ProjectHoomans", "root", "")
+local api = T.read(
     ROOT .. "shared/PNC/Core/API/PNC_API.lua"
 )
-local serverRoute = readAll(
+local serverRoute = T.read(
     ROOT .. "server/PNC/Networking/Handlers/"
         .. "PNC_ServerLegacyDebugCommandHandler.lua"
 )
-local context = readAll(
+local context = T.read(
     ROOT
         .. "client/PNC/UI/Context/Providers/"
         .. "PNC_ContextProvider_Debug.lua"
 )
-local window = readAll(
+local window = T.read(
     ROOT
         .. "client/PNC/UI/"
         .. "PNC_AnimationSceneDebugWindow.lua"
@@ -33,25 +28,26 @@ local actions = {
 }
 
 for _, action in ipairs(actions) do
-    assert(string.find(api, action, 1, true),
+    T.truthy(string.find(api, action, 1, true),
         "API route missing " .. action)
-    assert(string.find(serverRoute, action, 1, true),
+    T.truthy(string.find(serverRoute, action, 1, true),
         "server route missing " .. action)
-    assert(string.find(window, action, 1, true),
+    T.truthy(string.find(window, action, 1, true),
         "scene lab route missing " .. action)
 end
 
-assert(string.find(
+T.truthy(string.find(
     context,
     "Animation Scene Lab",
     1,
     true
 ), "NPC context menu does not expose scene lab")
-assert(string.find(
+T.truthy(string.find(
     window,
     "PNC.AnimationScenes.List()",
     1,
     true
 ), "scene lab is not driven by the live registry")
+T.finish("pnc_animation_scene_debug_routes_smoke")
 
-print("pnc_animation_scene_debug_routes_smoke: ok")
+T.finish("pnc_animation_scene_debug_routes_smoke")

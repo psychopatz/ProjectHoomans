@@ -1,12 +1,7 @@
-local PATCH_FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Patches/PNC_WashMedicalMaterialPatch.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local PATCH_FILE =
+    T.path("ProjectHoomans", "client", "PNC/Patches/PNC_WashMedicalMaterialPatch.lua")
 
 local basePerformCount = 0
 local originalPerformCount = 0
@@ -36,7 +31,7 @@ instanceof = function()
     return false
 end
 
-dofile(PATCH_FILE)
+T.load(PATCH_FILE)
 
 local character = {
     resetModel = function()
@@ -68,17 +63,18 @@ local action = {
 setmetatable(action, { __index = ISWashClothing })
 action:perform()
 
-assertEqual(originalPerformCount, 0,
+T.equal(originalPerformCount, 0,
     "replace-after-cleaning material bypasses vanilla clothing event")
-assertEqual(basePerformCount, 1,
+T.equal(basePerformCount, 1,
     "replace-after-cleaning material still leaves timed-action queue")
-assertEqual(resetModelCount, 1, "medical material wash resets player model")
-assertEqual(stoppedSoundCount, 1, "medical material wash stops sound")
-assertEqual(jobDelta, 0, "medical material wash clears progress")
+T.equal(resetModelCount, 1, "medical material wash resets player model")
+T.equal(stoppedSoundCount, 1, "medical material wash stops sound")
+T.equal(jobDelta, 0, "medical material wash clears progress")
 
 action.item = clothing
 action:perform()
-assertEqual(originalPerformCount, 1,
+T.equal(originalPerformCount, 1,
     "ordinary clothing wash retains vanilla clothing update path")
+T.finish("pnc_wash_medical_material_patch_smoke")
 
-print("pnc_wash_medical_material_patch_smoke: ok")
+T.finish("pnc_wash_medical_material_patch_smoke")

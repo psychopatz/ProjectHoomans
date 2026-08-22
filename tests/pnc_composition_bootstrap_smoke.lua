@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "root", "")
 
 local function capture(path, setup)
     local calls = {}
@@ -15,7 +10,7 @@ local function capture(path, setup)
         return true
     end
     if setup then setup(calls) end
-    dofile(path)
+    T.load(path)
     require = originalRequire
     return calls
 end
@@ -54,8 +49,8 @@ local anchorCases = {
 
 for _, case in ipairs(anchorCases) do
     local calls = capture(case.path)
-    assertEqual(#calls, 1, case.path .. " must remain thin")
-    assertEqual(calls[1], case.composition,
+    T.equal(#calls, 1, case.path .. " must remain thin")
+    T.equal(calls[1], case.composition,
         case.path .. " composition delegation")
 end
 
@@ -63,14 +58,14 @@ PNC = {}
 local sharedCalls = capture(
     ROOT .. "shared/PNC/Composition/PNC_SharedComposition.lua"
 )
-assertEqual(sharedCalls[1], "PNC/Core/Base/PNC_Core",
+T.equal(sharedCalls[1], "PNC/Core/Base/PNC_Core",
     "shared composition first dependency")
-assertEqual(sharedCalls[#sharedCalls], "PNC/Integrations/PNC_PsychopatzProfiler",
+T.equal(sharedCalls[#sharedCalls], "PNC/Integrations/PNC_PsychopatzProfiler",
     "shared composition final dependency")
 local travelIndex = indexOf(sharedCalls, "PNC/Core/Travel/PNC_Travel")
-assertEqual(sharedCalls[travelIndex - 1], "PNC/Core/Pathing/PNC_PathService",
+T.equal(sharedCalls[travelIndex - 1], "PNC/Core/Pathing/PNC_PathService",
     "shared Travel initialization predecessor")
-assertEqual(sharedCalls[travelIndex + 1],
+T.equal(sharedCalls[travelIndex + 1],
     "PNC/Core/MapCommands/PNC_MapCommandService",
     "shared Travel initialization successor")
 
@@ -85,45 +80,45 @@ local serverCalls = capture(
         }
     end
 )
-assertEqual(serverCalls[1], "PNC/00_PNC_Init",
+T.equal(serverCalls[1], "PNC/00_PNC_Init",
     "server composition begins with shared anchor")
 local factionCoreIndex = indexOf(
     serverCalls,
     "PNC/Factions/PNC_FactionCore"
 )
-assertEqual(serverCalls[factionCoreIndex - 1], "PNC/PNC_ConductDebug",
+T.equal(serverCalls[factionCoreIndex - 1], "PNC/PNC_ConductDebug",
     "server Faction core initialization predecessor")
-assertEqual(serverCalls[factionCoreIndex + 1], "PNC/PNC_CommunityService",
+T.equal(serverCalls[factionCoreIndex + 1], "PNC/PNC_CommunityService",
     "server Faction core initialization successor")
 local settlementIndex = indexOf(serverCalls, "PNC/Settlement/PNC_Settlement")
-assertEqual(serverCalls[settlementIndex - 1], "PNC/PNC_CommunityService",
+T.equal(serverCalls[settlementIndex - 1], "PNC/PNC_CommunityService",
     "server Settlement initialization predecessor")
 local facilityJobsIndex = indexOf(serverCalls,
     "PNC/Settlement/FacilityJobs/PNC_FacilityJobs_Service")
-assertEqual(serverCalls[facilityJobsIndex + 1],
+T.equal(serverCalls[facilityJobsIndex + 1],
     "PNC/World/PNC_NearbyResourceLocator",
     "nearby resource services load before Tasking")
-assertEqual(serverCalls[facilityJobsIndex + 3], "PNC/Tasking/PNC_Tasking",
+T.equal(serverCalls[facilityJobsIndex + 3], "PNC/Tasking/PNC_Tasking",
     "Tasking loads after nearby resource services")
-assertEqual(serverCalls[settlementIndex + 1], "PNC/Journals/PNC_JournalRoutes",
+T.equal(serverCalls[settlementIndex + 1], "PNC/Journals/PNC_JournalRoutes",
     "server Settlement initialization successor")
 local directorIndex = indexOf(serverCalls, "PNC/Director/PNC_Director")
-assertEqual(serverCalls[directorIndex - 1], "PNC/Needs/PNC_NeedSupplyBridge",
+T.equal(serverCalls[directorIndex - 1], "PNC/Needs/PNC_NeedSupplyBridge",
     "server Director initialization predecessor")
-assertEqual(serverCalls[directorIndex + 1], "PNC/PNC_NeedsScheduler",
+T.equal(serverCalls[directorIndex + 1], "PNC/PNC_NeedsScheduler",
     "server Director initialization successor")
-assertEqual(serverCalls[#serverCalls - 1], "<install-server-profiler>",
+T.equal(serverCalls[#serverCalls - 1], "<install-server-profiler>",
     "server profiler installation timing")
-assertEqual(serverCalls[#serverCalls], "PNC/PNC_Server",
+T.equal(serverCalls[#serverCalls], "PNC/PNC_Server",
     "server runtime starts after dependencies")
 local conversationServerIndex = indexOf(
     serverCalls,
     "PNC/Conversation/PNC_ConversationServer"
 )
-assertEqual(serverCalls[conversationServerIndex - 1],
+T.equal(serverCalls[conversationServerIndex - 1],
     "PNC/PNC_SocialEventHooks",
     "server Conversation initialization predecessor")
-assertEqual(serverCalls[conversationServerIndex + 1],
+T.equal(serverCalls[conversationServerIndex + 1],
     "PNC/PNC_ServerInventory",
     "server Conversation initialization successor")
 
@@ -133,11 +128,11 @@ PsychopatzCore = { EventMarkers = eventMarkers }
 local clientCalls = capture(
     ROOT .. "client/PNC/Composition/PNC_ClientComposition.lua"
 )
-assertEqual(clientCalls[1], "PNC/00_PNC_Init",
+T.equal(clientCalls[1], "PNC/00_PNC_Init",
     "client composition begins with shared anchor")
-assertEqual(clientCalls[#clientCalls], "PNC/Integrations/PNC_PsychopatzCoreDebug",
+T.equal(clientCalls[#clientCalls], "PNC/Integrations/PNC_PsychopatzCoreDebug",
     "client composition final dependency")
-assertEqual(PNC.EventMarkers, eventMarkers,
+T.equal(PNC.EventMarkers, eventMarkers,
     "client EventMarkers assignment timing")
 
 PNC = { Conversation = {} }
@@ -154,13 +149,13 @@ local expectedConversationShared = {
     "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions",
 }
 for index = 1, #expectedConversationShared do
-    assertEqual(
+    T.equal(
         conversationSharedCalls[index],
         expectedConversationShared[index],
         "shared Conversation dependency " .. tostring(index)
     )
 end
-assertEqual(#conversationSharedCalls, #expectedConversationShared,
+T.equal(#conversationSharedCalls, #expectedConversationShared,
     "shared Conversation dependency count")
 
 local pumpRegistrations = 0
@@ -175,7 +170,7 @@ PNC = {
 Events = {
     OnTick = {
         Add = function(callback)
-            assertEqual(callback, PNC.Conversation.Composer.PumpLocalRequests,
+            T.equal(callback, PNC.Conversation.Composer.PumpLocalRequests,
                 "client Conversation pump callback")
             pumpRegistrations = pumpRegistrations + 1
         end,
@@ -186,36 +181,36 @@ local conversationClientCalls = capture(
         .. "client/PNC/Conversation/Composition/"
         .. "PNC_ConversationClientComposition.lua"
 )
-assertEqual(conversationClientCalls[1], "PNC/Conversation/PNC_Conversation",
+T.equal(conversationClientCalls[1], "PNC/Conversation/PNC_Conversation",
     "client Conversation first dependency")
-assertEqual(conversationClientCalls[2],
+T.equal(conversationClientCalls[2],
     "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation",
     "client Conversation final dependency")
-assertEqual(#conversationClientCalls, 2,
+T.equal(#conversationClientCalls, 2,
     "client Conversation dependency count")
-assertEqual(pumpRegistrations, 1,
+T.equal(pumpRegistrations, 1,
     "client Conversation pump registration timing")
-assertEqual(PNC.Conversation.Composer.LocalPumpRegistered, true,
+T.equal(PNC.Conversation.Composer.LocalPumpRegistered, true,
     "client Conversation pump registration guard")
 capture(
     ROOT
         .. "client/PNC/Conversation/Composition/"
         .. "PNC_ConversationClientComposition.lua"
 )
-assertEqual(pumpRegistrations, 1,
+T.equal(pumpRegistrations, 1,
     "client Conversation pump registers once")
 
 PNC = { Conversation = {} }
 local conversationServerCalls = capture(
     ROOT .. "server/PNC/Conversation/PNC_ConversationServer.lua"
 )
-assertEqual(conversationServerCalls[1],
+T.equal(conversationServerCalls[1],
     "PNC/Conversation/PNC_ConversationHistory",
     "server Conversation history dependency")
-assertEqual(conversationServerCalls[2],
+T.equal(conversationServerCalls[2],
     "PNC/Conversation/PNC_ConversationAuthority",
     "server Conversation authority dependency")
-assertEqual(#conversationServerCalls, 2,
+T.equal(#conversationServerCalls, 2,
     "server Conversation dependency count")
 
 PNC = { Factions = {} }
@@ -229,10 +224,10 @@ local expectedFactionCore = {
     "PNC/PNC_FactionMembershipService",
 }
 for index = 1, #expectedFactionCore do
-    assertEqual(factionCoreCalls[index], expectedFactionCore[index],
+    T.equal(factionCoreCalls[index], expectedFactionCore[index],
         "server Faction core dependency " .. tostring(index))
 end
-assertEqual(#factionCoreCalls, #expectedFactionCore,
+T.equal(#factionCoreCalls, #expectedFactionCore,
     "server Faction core dependency count")
 
 PNC = {}
@@ -254,10 +249,10 @@ local expectedSettlement = {
     "PNC/Settlement/PNC_WaterUtilityService",
 }
 for index = 1, #expectedSettlement do
-    assertEqual(settlementCalls[index], expectedSettlement[index],
+    T.equal(settlementCalls[index], expectedSettlement[index],
         "server Settlement dependency " .. tostring(index))
 end
-assertEqual(#settlementCalls, #expectedSettlement,
+T.equal(#settlementCalls, #expectedSettlement,
     "server Settlement dependency count")
 
 PNC = {}
@@ -301,10 +296,10 @@ local expectedDirector = {
     "PNC/Director/PNC_AbstractDirectorDebug",
 }
 for index = 1, #expectedDirector do
-    assertEqual(directorCalls[index], expectedDirector[index],
+    T.equal(directorCalls[index], expectedDirector[index],
         "server Director dependency " .. tostring(index))
 end
-assertEqual(#directorCalls, #expectedDirector,
+T.equal(#directorCalls, #expectedDirector,
     "server Director dependency count")
 
 PNC = { Travel = {} }
@@ -320,10 +315,11 @@ local expectedTravel = {
     "PNC/Core/Travel/PNC_Travel_Service",
 }
 for index = 1, #expectedTravel do
-    assertEqual(travelCalls[index], expectedTravel[index],
+    T.equal(travelCalls[index], expectedTravel[index],
         "shared Travel dependency " .. tostring(index))
 end
-assertEqual(#travelCalls, #expectedTravel,
+T.equal(#travelCalls, #expectedTravel,
     "shared Travel dependency count")
+T.finish("pnc_composition_bootstrap_smoke")
 
-print("pnc_composition_bootstrap_smoke: OK")
+T.finish("pnc_composition_bootstrap_smoke")

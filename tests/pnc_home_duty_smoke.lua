@@ -1,9 +1,4 @@
-local function equal(actual, expected, message)
-    if actual ~= expected then
-        error((message or "values differ") .. ": expected="
-            .. tostring(expected) .. " actual=" .. tostring(actual), 2)
-    end
-end
+local T = require "tests/support/test"
 
 local arrivals = {}
 local startedRequest
@@ -100,7 +95,7 @@ PNC = {
     Network = { BroadcastRecord = function(_, reason) broadcast = reason end },
 }
 
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Production/PNC_HomeDutyService.lua")
+T.load(T.path("ProjectHoomans", "server", "PNC/Production/PNC_HomeDutyService.lua"))
 
 local npc = {
     id = "npc-1", alive = true, x = 1, y = 2, z = 0,
@@ -108,30 +103,30 @@ local npc = {
     affiliation = { communityID = "colony-1" },
 }
 
-equal(PNC.HomeDutyService.IsAtHome(npc, "base-1"), false,
+T.equal(PNC.HomeDutyService.IsAtHome(npc, "base-1"), false,
     "away colonist not at home")
 local sent, reason = PNC.HomeDutyService.SendHome(npc, "base-1", "test")
-equal(sent, true, "return-home journey accepted")
-equal(reason, "RETURNING_HOME", "return-home state")
-equal(startedRequest.destination.x, 15, "journey targets stockpile x")
-equal(startedRequest.arrivalAction.type, "colony_home",
+T.equal(sent, true, "return-home journey accepted")
+T.equal(reason, "RETURNING_HOME", "return-home state")
+T.equal(startedRequest.destination.x, 15, "journey targets stockpile x")
+T.equal(startedRequest.arrivalAction.type, "colony_home",
     "journey uses durable home arrival")
-equal(startedRequest.metadata.purpose, "return_home",
+T.equal(startedRequest.metadata.purpose, "return_home",
     "journey metadata identifies home travel")
-equal(PNC.HomeDutyService.BuildState(npc).state, "RETURNING_HOME",
+T.equal(PNC.HomeDutyService.BuildState(npc).state, "RETURNING_HOME",
     "home state exposes travel")
 
 npc.x, npc.y, npc.travel.state = 15, 16, "arrived"
 local arrived = arrivals.colony_home(npc, npc.travel,
     startedRequest.arrivalAction)
-equal(arrived, true, "arrival handled")
-equal(npc.orderSpec.kind, "colony_home", "arrival installs At Home order")
-equal(PNC.HomeDutyService.BuildState(npc).state, "AT_HOME",
+T.equal(arrived, true, "arrival handled")
+T.equal(npc.orderSpec.kind, "colony_home", "arrival installs At Home order")
+T.equal(PNC.HomeDutyService.BuildState(npc).state, "AT_HOME",
     "home state after arrival")
 npc.affiliation.communityID = nil
-equal(PNC.HomeDutyService.BuildState(npc).state, "AT_HOME",
+T.equal(PNC.HomeDutyService.BuildState(npc).state, "AT_HOME",
     "remembered home base survives missing legacy affiliation")
-equal(PNC.HomeDutyService.GetColonyId(npc), "colony-1",
+T.equal(PNC.HomeDutyService.GetColonyId(npc), "colony-1",
     "remembered home base resolves colony eligibility")
 
 npc.x, npc.y = 2, 3
@@ -140,16 +135,16 @@ npc.runtime.workOrderId = "work-1"
 npc.travel = nil
 local recovered, recoverReason, details =
     PNC.HomeDutyService.Recover(npc, "base-1")
-equal(recovered, true, "recovery accepted")
-equal(recoverReason, "COLONIST_RECOVERED", "recovery reason")
-equal(released, "npc-1:colonist_recovered", "work claim released")
-equal(abstracted, "colonist_recovery", "live body safely abstracted")
-equal(npc.x, 15, "recovered beside stockpile x")
-equal(npc.y, 16, "recovered beside stockpile y")
-equal(npc.orderSpec.kind, "colony_home", "recovered colonist is At Home")
-equal(details.stockpileNodeId, "stockpile-1", "recovery reports stockpile")
-equal(reconciled, true, "presence reconciled at destination")
-equal(broadcast, "colonist_recovered", "recovery replicated")
+T.equal(recovered, true, "recovery accepted")
+T.equal(recoverReason, "COLONIST_RECOVERED", "recovery reason")
+T.equal(released, "npc-1:colonist_recovered", "work claim released")
+T.equal(abstracted, "colonist_recovery", "live body safely abstracted")
+T.equal(npc.x, 15, "recovered beside stockpile x")
+T.equal(npc.y, 16, "recovered beside stockpile y")
+T.equal(npc.orderSpec.kind, "colony_home", "recovered colonist is At Home")
+T.equal(details.stockpileNodeId, "stockpile-1", "recovery reports stockpile")
+T.equal(reconciled, true, "presence reconciled at destination")
+T.equal(broadcast, "colonist_recovered", "recovery replicated")
 
 local traveler = {
     id = "npc-2", alive = true, x = 15, y = 16, z = 0,
@@ -165,16 +160,16 @@ local player = {
 }
 local following, followReason = PNC.HomeDutyService.SendToPlayer(
     traveler, player, "test")
-equal(following, true, "map-scale follow journey accepted")
-equal(followReason, "TRAVELING_TO_PLAYER", "follow journey state")
-equal(startedRequest.destination.x, 200, "follow journey targets player x")
-equal(startedRequest.arrivalAction.type, "colony_follow_player",
+T.equal(following, true, "map-scale follow journey accepted")
+T.equal(followReason, "TRAVELING_TO_PLAYER", "follow journey state")
+T.equal(startedRequest.destination.x, 200, "follow journey targets player x")
+T.equal(startedRequest.arrivalAction.type, "colony_follow_player",
     "follow journey uses durable arrival")
 local followArrived = arrivals.colony_follow_player(traveler,
     traveler.travel, startedRequest.arrivalAction)
-equal(followArrived, true, "follow arrival handled")
-equal(traveler.orderSpec.kind, "follow", "arrival installs follow order")
-equal(traveler.orderSpec.ownerUsername, "owner", "follow owner is preserved")
+T.equal(followArrived, true, "follow arrival handled")
+T.equal(traveler.orderSpec.kind, "follow", "arrival installs follow order")
+T.equal(traveler.orderSpec.ownerUsername, "owner", "follow owner is preserved")
 
 local buildingWorker = {
     id = "npc-builder", alive = true, x = 15, y = 16, z = 0,
@@ -183,10 +178,10 @@ local buildingWorker = {
 }
 local keptHome, keptReason = PNC.HomeDutyService.SendToPlayer(
     buildingWorker, player, "player_requested")
-equal(keptHome, false, "building worker must not follow the player")
-equal(keptReason, "WORK_ORDER_IN_PROGRESS",
+T.equal(keptHome, false, "building worker must not follow the player")
+T.equal(keptReason, "WORK_ORDER_IN_PROGRESS",
     "building worker follow refusal is explicit")
-equal(buildingWorker.runtime.workOrderId, "build-1",
+T.equal(buildingWorker.runtime.workOrderId, "build-1",
     "follow refusal preserves the construction claim")
 
 local courierCompleted
@@ -205,14 +200,15 @@ local courier = {
     } },
     affiliation = { communityID = "colony-1" },
 }
-equal(PNC.HomeDutyService.SendHome(courier, "base-1", "storage_courier"),
+T.equal(PNC.HomeDutyService.SendHome(courier, "base-1", "storage_courier"),
     true, "courier uses home journey")
 courier.x, courier.y, courier.travel.state = 15, 16, "arrived"
-equal(arrivals.colony_home(courier, courier.travel,
+T.equal(arrivals.colony_home(courier, courier.travel,
     startedRequest.arrivalAction), true, "courier arrival handled")
-equal(courierCompleted, "npc-courier",
+T.equal(courierCompleted, "npc-courier",
     "home arrival completes the pending courier job")
-equal(courier.runtime.storageCourier.state, "COMPLETED",
+T.equal(courier.runtime.storageCourier.state, "COMPLETED",
     "courier completion remains visible")
+T.finish("pnc_home_duty_smoke")
 
-print("pnc_home_duty_smoke: ok")
+T.finish("pnc_home_duty_smoke")

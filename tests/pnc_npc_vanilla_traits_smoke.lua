@@ -1,15 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assert") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
-
-local function truthy(value, label)
-    if not value then error(label or "expected truthy", 2) end
-end
+local ROOT = T.path("ProjectHoomans", "root", "")
 
 local function deepCopy(value)
     if type(value) ~= "table" then return value end
@@ -44,11 +35,11 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "shared/PNC/Core/Identity/PNC_Identity.lua")
-dofile(ROOT .. "shared/PNC/Core/Needs/PNC_NeedsDefinitions.lua")
-dofile(ROOT .. "shared/PNC/Core/Needs/PNC_ConditionStats.lua")
-dofile(ROOT .. "shared/PNC/Core/Needs/PNC_PlayerNeedsModel.lua")
-dofile(ROOT .. "shared/PNC/Core/Base/PNC_Types.lua")
+T.load(ROOT .. "shared/PNC/Core/Identity/PNC_Identity.lua")
+T.load(ROOT .. "shared/PNC/Core/Needs/PNC_NeedsDefinitions.lua")
+T.load(ROOT .. "shared/PNC/Core/Needs/PNC_ConditionStats.lua")
+T.load(ROOT .. "shared/PNC/Core/Needs/PNC_PlayerNeedsModel.lua")
+T.load(ROOT .. "shared/PNC/Core/Base/PNC_Types.lua")
 
 local generatedA = PNC.Types.NewRecord({
     id = "npc_generated_a", identitySeed = 321, archetypeID = "General",
@@ -56,11 +47,11 @@ local generatedA = PNC.Types.NewRecord({
 local generatedB = PNC.Types.NewRecord({
     id = "npc_generated_b", identitySeed = 321, archetypeID = "General",
 })
-equal(generatedA.vanillaTraitsAuthored, false,
+T.equal(generatedA.vanillaTraitsAuthored, false,
     "generated traits are not marked authored")
-equal(generatedA.vanillaTraitsGenerationVersion,
+T.equal(generatedA.vanillaTraitsGenerationVersion,
     PNC.PlayerNeedsModel.GENERATION_VERSION, "generation version")
-equal(table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(generatedA), "|"),
+T.equal(table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(generatedA), "|"),
     table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(generatedB), "|"),
     "same permanent identity seed produces the same traits")
 
@@ -68,17 +59,17 @@ local authored = PNC.Types.NewRecord({
     id = "npc_authored", identitySeed = 321,
     vanillaTraits = { "Base.HighThirst", "Overweight" },
 })
-equal(authored.vanillaTraitsAuthored, true, "authored trait source")
-equal(authored.vanillaTraitsGenerationVersion, 0, "authored generation version")
-equal(authored.vanillaTraits.highthirst, true, "authored high thirst")
-equal(authored.vanillaTraits.overweight, true, "authored overweight")
+T.equal(authored.vanillaTraitsAuthored, true, "authored trait source")
+T.equal(authored.vanillaTraitsGenerationVersion, 0, "authored generation version")
+T.equal(authored.vanillaTraits.highthirst, true, "authored high thirst")
+T.equal(authored.vanillaTraits.overweight, true, "authored overweight")
 
 local explicitlyTraitless = PNC.Types.NewRecord({
     id = "npc_traitless", identitySeed = 321, vanillaTraits = {},
 })
-equal(explicitlyTraitless.vanillaTraitsAuthored, true,
+T.equal(explicitlyTraitless.vanillaTraitsAuthored, true,
     "explicit empty traits are authoritative")
-equal(#PNC.PlayerNeedsModel.GetActiveTraitIDs(explicitlyTraitless), 0,
+T.equal(#PNC.PlayerNeedsModel.GetActiveTraitIDs(explicitlyTraitless), 0,
     "explicit empty traits suppress generation")
 
 local fingerprints = {}
@@ -86,26 +77,26 @@ for seed = 1, 200 do
     local traits = PNC.PlayerNeedsModel.GenerateTraits(seed, "General")
     local ids = PNC.PlayerNeedsModel.GetActiveTraitIDs(traits)
     fingerprints[table.concat(ids, "|")] = true
-    truthy(not (traits.highthirst and traits.lowthirst),
+    T.truthy(not (traits.highthirst and traits.lowthirst),
         "thirst traits are mutually exclusive")
-    truthy(not (traits.heartyappetite and traits.lighteater),
+    T.truthy(not (traits.heartyappetite and traits.lighteater),
         "appetite traits are mutually exclusive")
-    truthy(not (traits.needslesssleep and traits.needsmoresleep),
+    T.truthy(not (traits.needslesssleep and traits.needsmoresleep),
         "sleep traits are mutually exclusive")
-    truthy(not (traits.veryunderweight and traits.heartyappetite),
+    T.truthy(not (traits.veryunderweight and traits.heartyappetite),
         "vanilla very-underweight exclusion")
-    truthy(not (traits.obese and traits.lighteater),
+    T.truthy(not (traits.obese and traits.lighteater),
         "vanilla obese exclusion")
 end
 local variety = 0
 for _ in pairs(fingerprints) do variety = variety + 1 end
-truthy(variety > 10, "generated population has physiological variety")
+T.truthy(variety > 10, "generated population has physiological variety")
 
 local dynamicA = PNC.ConditionStats.GetActiveTraitIDs(generatedA)
 local dynamicB = PNC.ConditionStats.GetActiveTraitIDs(generatedB)
-equal(table.concat(dynamicA, "|"), table.concat(dynamicB, "|"),
+T.equal(table.concat(dynamicA, "|"), table.concat(dynamicB, "|"),
     "custom traits are deterministic")
-equal(generatedA.dynamicTraitsGenerationVersion,
+T.equal(generatedA.dynamicTraitsGenerationVersion,
     PNC.ConditionStats.TRAIT_GENERATION_VERSION,
     "custom trait generation version")
 
@@ -121,14 +112,14 @@ local normalCondition = PNC.Types.NewRecord({
 normalCondition.needs = deepCopy(iron.needs)
 local ironRates = PNC.ConditionStats.GetRates(iron, "fighting")
 local normalRates = PNC.ConditionStats.GetRates(normalCondition, "fighting")
-truthy(ironRates.stress < normalRates.stress,
+T.truthy(ironRates.stress < normalRates.stress,
     "Iron Nerves reduces stress gain")
-truthy(ironRates.panic < normalRates.panic,
+T.truthy(ironRates.panic < normalRates.panic,
     "Iron Nerves reduces panic gain")
 PNC.ConditionStats.Update(iron, 1, "fighting", 1)
-truthy(iron.conditionStats.panic > 0, "fighting raises panic")
+T.truthy(iron.conditionStats.panic > 0, "fighting raises panic")
 PNC.ConditionStats.Update(iron, 1, "idle", 2)
-truthy(iron.conditionStats.boredom > 0, "idle time raises boredom")
+T.truthy(iron.conditionStats.boredom > 0, "idle time raises boredom")
 
 local hardy = PNC.Types.NewRecord({
     id = "npc_hardy", identitySeed = 4, vanillaTraits = {},
@@ -139,8 +130,9 @@ local plain = PNC.Types.NewRecord({
     dynamicTraits = {},
 })
 local state = { hunger = 0, hydration = 0, fatigue = 0 }
-truthy(PNC.PlayerNeedsModel.GetRates(hardy, state, "idle").hunger
+T.truthy(PNC.PlayerNeedsModel.GetRates(hardy, state, "idle").hunger
     < PNC.PlayerNeedsModel.GetRates(plain, state, "idle").hunger,
     "Hardy Constitution changes primary need rates")
+T.finish("pnc_npc_vanilla_traits_smoke")
 
-print("pnc_npc_vanilla_traits_smoke: ok")
+T.finish("pnc_npc_vanilla_traits_smoke")

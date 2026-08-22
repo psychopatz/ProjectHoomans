@@ -1,10 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local refreshCount = 0
 local clothingVisuals = {}
@@ -53,9 +49,9 @@ ISHotbarAttachDefinition = {
     },
 }
 
-dofile(ROOT .. "Equipment/PNC_Equipment_Items.lua")
-dofile(ROOT .. "Equipment/PNC_Equipment_Slots.lua")
-dofile(ROOT .. "Equipment/PNC_Equipment.lua")
+T.load(ROOT .. "Equipment/PNC_Equipment_Items.lua")
+T.load(ROOT .. "Equipment/PNC_Equipment_Slots.lua")
+T.load(ROOT .. "Equipment/PNC_Equipment.lua")
 
 local capturedColor = {
     getRedFloat = function() return 0.15 end,
@@ -101,15 +97,15 @@ local visualRecord = {
 }
 local capturedSummary =
     PNC.Equipment.BuildWornVisualSummary(visualRecord)
-assertEqual(capturedSummary.Shirt.baseTexture, 2,
+T.equal(capturedSummary.Shirt.baseTexture, 2,
     "server inventory base texture capture")
-assertEqual(capturedSummary.Shirt.textureChoice, 5,
+T.equal(capturedSummary.Shirt.textureChoice, 5,
     "server inventory texture choice capture")
-assertEqual(capturedSummary.Shirt.decal, "SpiffoLogo",
+T.equal(capturedSummary.Shirt.decal, "SpiffoLogo",
     "server inventory decal capture")
-assertEqual(capturedSummary.Shirt.tint.b, 0.35,
+T.equal(capturedSummary.Shirt.tint.b, 0.35,
     "server inventory tint capture")
-assertEqual(
+T.equal(
     visualRecord.equipment.wornVisuals.Shirt.textureChoice,
     5,
     "captured visual was not retained by equipment"
@@ -124,7 +120,7 @@ local normalizedVisualEquipment =
             Shirt = capturedSummary.Shirt,
         },
     })
-assertEqual(
+T.equal(
     normalizedVisualEquipment.wornVisuals.Shirt.baseTexture,
     2,
     "equipment normalization discarded visual state"
@@ -135,7 +131,7 @@ PNC.Inventory = {
         normalizeLegacyBagSlot = function() end,
     },
 }
-dofile(ROOT
+T.load(ROOT
     .. "Inventory/PNC_Inventory/Equipment/"
     .. "PNC_Inventory_EquipmentSync.lua")
 local syncRecord = {
@@ -152,17 +148,17 @@ local syncRecord = {
     },
 }
 PNC.Inventory.SyncEquipmentFromInventory(syncRecord)
-assertEqual(
+T.equal(
     syncRecord.equipment.wornVisuals.Shirt.textureChoice,
     5,
     "inventory synchronization discarded matching visual state"
 )
-assertEqual(
+T.equal(
     syncRecord.inventory.items.shirt_visual.itemState.visualTextureChoice,
     5,
     "slot visual was not migrated onto its inventory item"
 )
-assertEqual(
+T.equal(
     syncRecord.inventory.items.shirt_visual.itemState.visualDecal,
     "SpiffoLogo",
     "shirt decal was not migrated onto its inventory item"
@@ -170,7 +166,7 @@ assertEqual(
 syncRecord.inventory.items.shirt_visual.type =
     "Base.Tshirt_DefaultTEXTURE_TINT"
 PNC.Inventory.SyncEquipmentFromInventory(syncRecord)
-assertEqual(
+T.equal(
     syncRecord.equipment.wornVisuals.Shirt,
     nil,
     "inventory synchronization retained visual state for a new item"
@@ -225,35 +221,35 @@ local record = {
 }
 
 local applied = PNC.Equipment.ApplyHands(zombie, record)
-assertEqual(applied, true, "idle equipment apply")
-assertEqual(zombie.primary, nil, "idle primary hand cleared")
-assertEqual(zombie.attached.Back, weapon, "idle primary implicitly holstered")
-assertEqual(record.equipment.primaryVisual.modelIndex, 1,
+T.equal(applied, true, "idle equipment apply")
+T.equal(zombie.primary, nil, "idle primary hand cleared")
+T.equal(zombie.attached.Back, weapon, "idle primary implicitly holstered")
+T.equal(record.equipment.primaryVisual.modelIndex, 1,
     "primary weapon model variant was not captured")
 
 record.runtime = { target = { kind = "zombie" } }
 weapon.modelIndex = 0
 applied = PNC.Equipment.ApplyCombatState(zombie, record, true)
-assertEqual(applied, true, "combat equipment apply")
-assertEqual(zombie.primary, weapon, "combat primary hand")
-assertEqual(weapon.modelIndex, 1,
+T.equal(applied, true, "combat equipment apply")
+T.equal(zombie.primary, weapon, "combat primary hand")
+T.equal(weapon.modelIndex, 1,
     "new primary weapon ignored its persisted model variant")
-assertEqual(zombie.attached.Back, nil, "combat holster cleared")
+T.equal(zombie.attached.Back, nil, "combat holster cleared")
 
 zombie.primary = nil
 applied = PNC.Equipment.ApplyCombatState(zombie, record, true)
-assertEqual(applied, true, "combat hand repair")
-assertEqual(zombie.primary, weapon,
+T.equal(applied, true, "combat hand repair")
+T.equal(zombie.primary, weapon,
     "cached combat presentation did not restore a discarded weapon")
 
 record.runtime.target = nil
 applied = PNC.Equipment.ApplyCombatState(zombie, record, false)
-assertEqual(applied, true, "idle combat-state equipment apply")
-assertEqual(zombie.primary, nil, "idle primary leaves hand")
-assertEqual(zombie.attached.Back, weapon, "idle primary returns to holster")
-assert(primarySet >= 3, "primary hand state was not refreshed")
-assert(handModelsReset > 0, "hand models were not refreshed")
-assert(refreshCount > 0, "equipment presentation did not refresh the model")
+T.equal(applied, true, "idle combat-state equipment apply")
+T.equal(zombie.primary, nil, "idle primary leaves hand")
+T.equal(zombie.attached.Back, weapon, "idle primary returns to holster")
+T.truthy(primarySet >= 3, "primary hand state was not refreshed")
+T.truthy(handModelsReset > 0, "hand models were not refreshed")
+T.truthy(refreshCount > 0, "equipment presentation did not refresh the model")
 
 local appliedCondition
 local shirtBodyLocation = {}
@@ -298,8 +294,8 @@ local dressedZombie = {
     getWornItems = function() return worn end,
     getItemVisuals = function() return visuals end,
     setWornItem = function(_, location, item)
-        assertEqual(location, shirtBodyLocation, "typed worn item location")
-        assertEqual(item, clothing, "worn item instance")
+        T.equal(location, shirtBodyLocation, "typed worn item location")
+        T.equal(item, clothing, "worn item instance")
     end,
     getAttachedItems = function()
         return { size = function() return 0 end }
@@ -332,17 +328,17 @@ local dressedRecord = {
 }
 local visualCountBeforeWear = #clothingVisuals
 applied = PNC.Equipment.Apply(dressedZombie, dressedRecord)
-assertEqual(applied, true, "full clothing apply")
-assertEqual(appliedCondition, 3, "virtual condition copied to live worn item")
-assertEqual(liveBaseTexture, 6, "inventory item base texture was not restored")
-assertEqual(liveTextureChoice, 8, "inventory item texture choice was not restored")
-assertEqual(liveDecal, "PizzaWhirled",
+T.equal(applied, true, "full clothing apply")
+T.equal(appliedCondition, 3, "virtual condition copied to live worn item")
+T.equal(liveBaseTexture, 6, "inventory item base texture was not restored")
+T.equal(liveTextureChoice, 8, "inventory item texture choice was not restored")
+T.equal(liveDecal, "PizzaWhirled",
     "inventory item shirt decal was not restored")
-assertEqual(liveTint:getGreenFloat(), 0.8,
+T.equal(liveTint:getGreenFloat(), 0.8,
     "inventory item tint was not restored")
-assertEqual(#clothingVisuals, visualCountBeforeWear + 1,
+T.equal(#clothingVisuals, visualCountBeforeWear + 1,
     "single-player clothing did not create its required item visual")
-assertEqual(clothingVisualStates[#clothingVisualStates].tint.r, 0.9,
+T.equal(clothingVisualStates[#clothingVisualStates].tint.r, 0.9,
     "single-player synthetic visual lost inventory tint")
 
 local bagLocation = {}
@@ -358,8 +354,8 @@ local bagZombie = {
     getWornItems = function() return worn end,
     getItemVisuals = function() return visuals end,
     setWornItem = function(_, location, item)
-        assertEqual(location, bagLocation, "container canBeEquipped location")
-        assertEqual(item, bag, "worn container instance")
+        T.equal(location, bagLocation, "container canBeEquipped location")
+        T.equal(item, bag, "worn container instance")
     end,
     getAttachedItems = function()
         return { size = function() return 0 end }
@@ -377,7 +373,7 @@ local bagRecord = {
     },
     runtime = {},
 }
-assertEqual(PNC.Equipment.Apply(bagZombie, bagRecord), true,
+T.equal(PNC.Equipment.Apply(bagZombie, bagRecord), true,
     "container equipment apply")
 
 local replicaVariables = {}
@@ -459,7 +455,7 @@ local replicaRecord = {
     },
     runtime = { attackMode = true },
 }
-assertEqual(
+T.equal(
     PNC.Equipment.ApplyReplicaVisuals(
         replicaZombie,
         replicaRecord
@@ -467,7 +463,7 @@ assertEqual(
     true,
     "replica visual equipment apply"
 )
-assertEqual(
+T.equal(
     PNC.Equipment.ApplyReplicaVisuals(
         replicaZombie,
         replicaRecord
@@ -475,7 +471,7 @@ assertEqual(
     true,
     "matching replica visual integrity check"
 )
-assertEqual(
+T.equal(
     PNC.Equipment.ApplyReplicaHands(
         replicaZombie,
         replicaRecord
@@ -483,26 +479,26 @@ assertEqual(
     true,
     "replica hand variables apply"
 )
-assertEqual(
+T.equal(
     replicaVariables.PNCPrimary,
     "Base.Axe",
     "replica primary animation variable"
 )
-assertEqual(
+T.equal(
     replicaVariables.PNCSecondary,
     "Base.Torch",
     "replica secondary animation variable"
 )
-assertEqual(replicaZombie.primary, weapon,
+T.equal(replicaZombie.primary, weapon,
     "client replica did not materialize its primary hand model")
-assertEqual(replicaZombie.secondary, weapon,
+T.equal(replicaZombie.secondary, weapon,
     "client replica did not materialize its secondary hand model")
-assertEqual(replicaPrimarySets, 2,
+T.equal(replicaPrimarySets, 2,
     "unchanged replica primary hand was rebuilt per update")
-assertEqual(replicaSecondarySets, 2,
+T.equal(replicaSecondarySets, 2,
     "unchanged replica secondary hand was rebuilt per update")
 replicaZombie.primary = nil
-assertEqual(
+T.equal(
     PNC.Equipment.ApplyReplicaHands(
         replicaZombie,
         replicaRecord
@@ -510,52 +506,52 @@ assertEqual(
     true,
     "discarded replica hand model repair"
 )
-assertEqual(replicaZombie.primary, weapon,
+T.equal(replicaZombie.primary, weapon,
     "replica hand latch did not repair an engine-discarded model")
-assertEqual(replicaPrimarySets, 4,
+T.equal(replicaPrimarySets, 4,
     "replica hand repair did not perform exactly one rebuild")
-assertEqual(replicaVisualClears, 1,
+T.equal(replicaVisualClears, 1,
     "replica did not repair exactly one missing visual set")
-assertEqual(replicaWornClears, 0,
+T.equal(replicaWornClears, 0,
     "replica cleared server-owned worn items")
 local appliedReplicaVisual =
     clothingVisualStates[#clothingVisualStates]
-assertEqual(appliedReplicaVisual.baseTexture, 2,
+T.equal(appliedReplicaVisual.baseTexture, 2,
     "replica lost persisted inventory base texture")
-assertEqual(appliedReplicaVisual.textureChoice, 4,
+T.equal(appliedReplicaVisual.textureChoice, 4,
     "replica lost persisted inventory texture choice")
-assertEqual(appliedReplicaVisual.decal, "SpiffoLogo",
+T.equal(appliedReplicaVisual.decal, "SpiffoLogo",
     "replica lost persisted shirt decal")
-assertEqual(appliedReplicaVisual.tint.g, 0.3,
+T.equal(appliedReplicaVisual.tint.g, 0.3,
     "replica lost persisted inventory tint")
 replicaRecord.equipment.wornVisuals.Shirt.tint.g = 0.8
-assertEqual(PNC.Equipment.ApplyReplicaVisuals(
+T.equal(PNC.Equipment.ApplyReplicaVisuals(
     replicaZombie,
     replicaRecord
 ), true, "tint-only replica refresh")
-assertEqual(replicaVisualClears, 2,
+T.equal(replicaVisualClears, 2,
     "tint-only change did not invalidate replica visuals")
-assertEqual(clothingVisualStates[#clothingVisualStates].tint.g, 0.8,
+T.equal(clothingVisualStates[#clothingVisualStates].tint.g, 0.8,
     "tint-only replica refresh used stale color")
 replicaRecord.equipment.wornVisuals.Shirt.decal = "PizzaWhirled"
-assertEqual(PNC.Equipment.ApplyReplicaVisuals(
+T.equal(PNC.Equipment.ApplyReplicaVisuals(
     replicaZombie,
     replicaRecord
 ), true, "decal-only replica refresh")
-assertEqual(replicaVisualClears, 3,
+T.equal(replicaVisualClears, 3,
     "decal-only change did not invalidate replica visuals")
-assertEqual(clothingVisualStates[#clothingVisualStates].decal,
+T.equal(clothingVisualStates[#clothingVisualStates].decal,
     "PizzaWhirled",
     "decal-only replica refresh used stale shirt design")
 replicaRecord.equipment.worn = {}
 replicaRecord.equipment.wornVisuals = {}
-assertEqual(PNC.Equipment.ApplyReplicaVisuals(
+T.equal(PNC.Equipment.ApplyReplicaVisuals(
     replicaZombie,
     replicaRecord
 ), true, "removed replica clothing refresh")
-assertEqual(replicaVisualClears, 4,
+T.equal(replicaVisualClears, 4,
     "removed garment left a stale replica visual")
-assertEqual(#replicaVisualTypes, 0,
+T.equal(#replicaVisualTypes, 0,
     "removed garment remained visible on replica")
 replicaRecord.equipment.worn = {
     Shirt = "Base.Shirt_FormalWhite",
@@ -586,14 +582,14 @@ local serverBody = {
         error("network server equipped a secondary item")
     end,
 }
-assertEqual(
+T.equal(
     PNC.Equipment.Apply(serverBody, replicaRecord),
     true,
     "network authority routed through packet-safe equipment"
 )
-assertEqual(serverWornSets, 1,
+T.equal(serverWornSets, 1,
     "network authority lost mechanical worn clothing")
-assertEqual(
+T.equal(
     PNC.Equipment.ApplyCombatState(
         serverBody,
         replicaRecord,
@@ -661,13 +657,14 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "API/PNC_API.lua")
-assert(PNC.API.DebugCommand("npc_visual", "copy_held_weapon", {
+T.load(ROOT .. "API/PNC_API.lua")
+T.truthy(PNC.API.DebugCommand("npc_visual", "copy_held_weapon", {
     weaponFullType = "Base.Axe",
 }), "copy held weapon failed")
-assertEqual(calls.hands, 1, "API hands-only apply count")
-assertEqual(calls.appearance, 0, "API rebuilt appearance")
-assertEqual(calls.fullEquipment, 0, "API rebuilt full equipment")
-assertEqual(calls.broadcast, 1, "API equipment broadcast count")
+T.equal(calls.hands, 1, "API hands-only apply count")
+T.equal(calls.appearance, 0, "API rebuilt appearance")
+T.equal(calls.fullEquipment, 0, "API rebuilt full equipment")
+T.equal(calls.broadcast, 1, "API equipment broadcast count")
+T.finish("pnc_equipment_visual_smoke")
 
-print("pnc_equipment_visual_smoke: ok")
+T.finish("pnc_equipment_visual_smoke")

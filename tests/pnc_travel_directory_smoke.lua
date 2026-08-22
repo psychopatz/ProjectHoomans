@@ -1,5 +1,7 @@
-local SHARED = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-local CLIENT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+local T = require "tests/support/test"
+
+local SHARED = T.path("ProjectHoomans", "shared", "PNC/Core/")
+local CLIENT = T.path("ProjectHoomans", "client", "PNC/")
 
 local worldHour = 0.5
 getGameTime = function()
@@ -68,15 +70,15 @@ PNC = {
     },
 }
 
-dofile(SHARED .. "Map/PNC_MapPresentation.lua")
-dofile(SHARED .. "Travel/PNC_Travel_Route.lua")
-dofile(SHARED .. "Travel/PNC_Travel_Providers.lua")
-dofile(SHARED .. "Travel/PNC_Travel_Model.lua")
-dofile(SHARED .. "Travel/PNC_Travel_Projection.lua")
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+T.load(SHARED .. "Map/PNC_MapPresentation.lua")
+T.load(SHARED .. "Travel/PNC_Travel_Route.lua")
+T.load(SHARED .. "Travel/PNC_Travel_Providers.lua")
+T.load(SHARED .. "Travel/PNC_Travel_Model.lua")
+T.load(SHARED .. "Travel/PNC_Travel_Projection.lua")
+T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
-dofile(CLIENT .. "Travel/PNC_TravelDirectory.lua")
+T.load(CLIENT .. "Travel/PNC_TravelDirectory.lua")
 
 local record = {
     id = "directory:1",
@@ -91,7 +93,7 @@ local journey = PNC.Travel.Model.New(record, {
     speedTilesPerWorldHour = 100,
 }, 0)
 local summary = PNC.Travel.Model.BuildSummary(journey, true)
-assert(summary.route.segments == nil,
+T.truthy(summary.route.segments == nil,
     "network summary leaked derived route segments")
 
 PNC.Network.ClientState.snapshots[record.id] = {
@@ -105,24 +107,24 @@ PNC.Network.ClientState.snapshots[record.id] = {
     travel = summary,
 }
 
-local projected = assert(PNC.TravelDirectory.GetProjected(record.id))
-assert(math.abs(projected.x - 50) < 0.001,
+local projected = T.truthy(PNC.TravelDirectory.GetProjected(record.id))
+T.truthy(math.abs(projected.x - 50) < 0.001,
     "client directory did not extrapolate abstract movement")
-assert(math.abs(projected.percent - 0.5) < 0.001,
+T.truthy(math.abs(projected.percent - 0.5) < 0.001,
     "client directory progress is incorrect")
-assert(type(summary.route.segments) == "table",
+T.truthy(type(summary.route.segments) == "table",
     "client route geometry was not compiled into the cache")
 local cachedRoute = summary.route
 PNC.TravelDirectory.GetProjected(record.id)
-assert(summary.route == cachedRoute,
+T.truthy(summary.route == cachedRoute,
     "client route geometry was rebuilt on a subsequent frame")
 
 summary.state = "cancelled"
-assert(PNC.TravelDirectory.GetProjected(record.id) ~= nil,
+T.truthy(PNC.TravelDirectory.GetProjected(record.id) ~= nil,
     "cancelled journey hid the NPC's current location")
 summary.state = "en_route"
 summary.visibility = "hidden"
-assert(PNC.TravelDirectory.GetProjected(record.id) == nil,
+T.truthy(PNC.TravelDirectory.GetProjected(record.id) == nil,
     "hidden journey remained visible")
 summary.visibility = "all"
 
@@ -160,12 +162,12 @@ PNC.Network.ClientState.snapshots["idle:1"] = {
         },
     },
 }
-local idle = assert(PNC.TravelDirectory.GetProjected("idle:1"))
-assert(idle.name == "Idle NPC" and idle.x == 25 and idle.state == "idle",
+local idle = T.truthy(PNC.TravelDirectory.GetProjected("idle:1"))
+T.truthy(idle.name == "Idle NPC" and idle.x == 25 and idle.state == "idle",
     "non-travelling NPC was missing from the map directory")
-assert(idle.portrait and idle.portrait.appearance.hairModel == "Short",
+T.truthy(idle.portrait and idle.portrait.appearance.hairModel == "Short",
     "map projection dropped compact portrait metadata")
-assert(idle.organizationalFaction
+T.truthy(idle.organizationalFaction
     and idle.organizationalFaction.emblem
     and idle.organizationalFaction.emblem.revision == 2,
     "map projection dropped layered faction emblem")
@@ -183,8 +185,8 @@ PNC.Network.ClientState.snapshots["dead:neutral"] = {
     z = 0,
 }
 local deadNeutral =
-    assert(PNC.TravelDirectory.GetProjected("dead:neutral"))
-assert(deadNeutral.deathMarker == true
+    T.truthy(PNC.TravelDirectory.GetProjected("dead:neutral"))
+T.truthy(deadNeutral.deathMarker == true
     and deadNeutral.colonist == false
     and deadNeutral.x == 45,
     "compact dead NPC marker was hidden or misclassified")
@@ -202,8 +204,8 @@ PNC.Network.ClientState.snapshots["dead:colonist"] = {
     z = 0,
 }
 local deadColonist =
-    assert(PNC.TravelDirectory.GetProjected("dead:colonist"))
-assert(deadColonist.deathMarker == true and deadColonist.colonist == true,
+    T.truthy(PNC.TravelDirectory.GetProjected("dead:colonist"))
+T.truthy(deadColonist.deathMarker == true and deadColonist.colonist == true,
     "compact dead colonist marker lost its classification")
 
 PNC.Network.ClientState.snapshots["dead:legacy"] = {
@@ -215,7 +217,7 @@ PNC.Network.ClientState.snapshots["dead:legacy"] = {
     y = 95,
     z = 0,
 }
-assert(PNC.TravelDirectory.GetProjected("dead:legacy") == nil,
+T.truthy(PNC.TravelDirectory.GetProjected("dead:legacy") == nil,
     "non-marker dead record leaked onto the map")
 
 PNC.Network.ClientState.snapshots["known:alice"] = {
@@ -233,8 +235,8 @@ PNC.Network.ClientState.snapshots["known:alice"] = {
         iconID = "trader",
     },
 }
-local known = assert(PNC.TravelDirectory.GetProjected("known:alice"))
-assert(known.roleTag == "trader" and known.iconID == "trader",
+local known = T.truthy(PNC.TravelDirectory.GetProjected("known:alice"))
+T.truthy(known.roleTag == "trader" and known.iconID == "trader",
     "map presentation metadata was not exposed by the directory")
 
 PNC.Network.ClientState.snapshots["known:bob"] = {
@@ -250,7 +252,7 @@ PNC.Network.ClientState.snapshots["known:bob"] = {
         knownBy = { Bob = true },
     },
 }
-assert(PNC.TravelDirectory.GetProjected("known:bob") == nil,
+T.truthy(PNC.TravelDirectory.GetProjected("known:bob") == nil,
     "another player's known NPC leaked onto this player's map")
 
 PNC.Network.ClientState.snapshots["selected:hidden"] = {
@@ -263,7 +265,8 @@ PNC.Network.ClientState.snapshots["selected:hidden"] = {
     z = 0,
     mapPresentation = { visibility = "hidden" },
 }
-assert(PNC.TravelDirectory.GetProjected("selected:hidden") ~= nil,
+T.truthy(PNC.TravelDirectory.GetProjected("selected:hidden") ~= nil,
     "local selection did not override marker visibility")
+T.finish("pnc_travel_directory_smoke")
 
-print("pnc_travel_directory_smoke: ok")
+T.finish("pnc_travel_directory_smoke")

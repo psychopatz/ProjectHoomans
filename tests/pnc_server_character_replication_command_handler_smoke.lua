@@ -1,12 +1,7 @@
-local SERVER_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
-package.path = SERVER_ROOT .. "?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local SERVER_ROOT = T.path("ProjectHoomans", "server", "")
+T.addPackagePaths()
 
 local records = {
     { id = "npc-1" },
@@ -67,35 +62,36 @@ PNC = {
 local Router = require "PNC/Networking/PNC_ServerCommandRouter"
 require "PNC/Networking/Handlers/PNC_ServerCharacterReplicationCommandHandler"
 
-assertEqual(Router.Handle("FullSyncRequest", player, nil), true,
+T.equal(Router.Handle("FullSyncRequest", player, nil), true,
     "full sync handled")
-assertEqual(fullSync.player, player, "full-sync player")
-assertEqual(#fullSync.snapshots, 3, "full-sync snapshot count")
-assertEqual(fullSync.snapshots[1].id, "npc-1", "first roster snapshot")
-assertEqual(fullSync.snapshots[3].kind, "death", "death marker appended")
+T.equal(fullSync.player, player, "full-sync player")
+T.equal(#fullSync.snapshots, 3, "full-sync snapshot count")
+T.equal(fullSync.snapshots[1].id, "npc-1", "first roster snapshot")
+T.equal(fullSync.snapshots[3].kind, "death", "death marker appended")
 
 local detailArgs = { id = "npc-1" }
-assertEqual(Router.Handle("RequestCharacter", player, detailArgs), true,
+T.equal(Router.Handle("RequestCharacter", player, detailArgs), true,
     "character detail handled")
-assertEqual(detail.record, records[1], "character detail record")
+T.equal(detail.record, records[1], "character detail record")
 
 local deltaArgs = { id = "npc-2", inventoryRevision = "5" }
-assertEqual(Router.Handle("RequestCharacter", player, deltaArgs), true,
+T.equal(Router.Handle("RequestCharacter", player, deltaArgs), true,
     "inventory detail handled")
-assertEqual(delta.record, records[2], "inventory delta record")
-assertEqual(delta.revision, "5", "original inventory revision preserved")
+T.equal(delta.record, records[2], "inventory delta record")
+T.equal(delta.revision, "5", "original inventory revision preserved")
 
 canView = false
-assertEqual(Router.Handle("RequestCharacter", player, detailArgs), true,
+T.equal(Router.Handle("RequestCharacter", player, detailArgs), true,
     "unauthorized detail consumed")
-assert(string.find(warning, "player=Tester", 1, true),
+T.truthy(string.find(warning, "player=Tester", 1, true),
     "unauthorized warning omitted player")
-assert(string.find(warning, "npc=npc-1", 1, true),
+T.truthy(string.find(warning, "npc=npc-1", 1, true),
     "unauthorized warning omitted NPC")
 
 warning = nil
-assertEqual(Router.Handle("RequestCharacter", player, nil), true,
+T.equal(Router.Handle("RequestCharacter", player, nil), true,
     "malformed detail consumed")
-assertEqual(warning, nil, "malformed detail unexpectedly warned")
+T.equal(warning, nil, "malformed detail unexpectedly warned")
+T.finish("pnc_server_character_replication_command_handler_smoke")
 
-print("pnc_server_character_replication_command_handler_smoke: ok")
+T.finish("pnc_server_character_replication_command_handler_smoke")

@@ -1,22 +1,10 @@
+local T = require "tests/support/test"
+
 local ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 local CLIENT_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
-local EN_UI_CATALOG =
-    "Contents/mods/ProjectHoomans/common/media/lua/shared/Translate/EN/UI.json"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected="
-            .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertTrue(value, label)
-    assertEqual(value == true, true, label)
-end
-
-local function assertSaveSafe(value, seen)
+    T.path("ProjectHoomans", "client", "PNC/")
+local function validatePersistedValue(value, seen)
     local valueType = type(value)
     local key
     local item
@@ -34,8 +22,8 @@ local function assertSaveSafe(value, seen)
     if seen[value] then error("profile cycle") end
     seen[value] = true
     for key, item in pairs(value) do
-        assertSaveSafe(key, seen)
-        assertSaveSafe(item, seen)
+        validatePersistedValue(key, seen)
+        validatePersistedValue(item, seen)
     end
     seen[value] = nil
 end
@@ -123,45 +111,45 @@ CharacterTraitDefinition = {
     end,
 }
 
-dofile("../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/PsychopatzCore/Traits/PsychopatzTraitRegistry.lua")
+T.load(T.path("PsychopatzCore", "shared", "PsychopatzCore/Traits/PsychopatzTraitRegistry.lua"))
 PNC = {}
-dofile(ROOT .. "Identity/PNC_Identity.lua")
-dofile(ROOT .. "Relationships/PNC_SocialProfileConstants.lua")
-dofile(ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
-dofile(ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
-dofile(ROOT .. "Relationships/PNC_SocialTraits.lua")
-dofile(ROOT .. "Relationships/PNC_SocialProfileMath.lua")
+T.load(ROOT .. "Identity/PNC_Identity.lua")
+T.load(ROOT .. "Relationships/PNC_SocialProfileConstants.lua")
+T.load(ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
+T.load(ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
+T.load(ROOT .. "Relationships/PNC_SocialTraits.lua")
+T.load(ROOT .. "Relationships/PNC_SocialProfileMath.lua")
 
 local Constants = PNC.SocialProfileConstants
 local Traits = PNC.SocialTraits
 local Math = PNC.SocialProfileMath
-local T = Constants.TRAIT_IDS
+local TraitIds = Constants.TRAIT_IDS
 
--- Build 42 registration, point values, and engine-level exclusions.
-assertTrue(Traits.Registered, "traits registered")
-assertEqual(#gameBootCallbacks, 1, "game boot registration fallback")
-assertEqual(#Traits.GetDefinitions(), 10, "ten trait definitions")
+-- Registration, point values, and engine-level exclusions.
+T.truthy(Traits.Registered, "traits registered")
+T.equal(#gameBootCallbacks, 1, "game boot registration fallback")
+T.equal(#Traits.GetDefinitions(), 10, "ten trait definitions")
 for _, spec in ipairs(Constants.TRAIT_DEFINITIONS) do
     local trait = Traits.EngineTraits[spec.id]
     local definition = engineDefinitions[trait]
-    assertTrue(trait ~= nil, spec.id .. " engine trait")
-    assertTrue(definition ~= nil, spec.id .. " engine definition")
-    assertEqual(definition.cost, spec.cost, spec.id .. " cost")
-    assertEqual(definition.isProfession, false,
+    T.truthy(trait ~= nil, spec.id .. " engine trait")
+    T.truthy(definition ~= nil, spec.id .. " engine definition")
+    T.equal(definition.cost, spec.cost, spec.id .. " cost")
+    T.equal(definition.isProfession, false,
         spec.id .. " normal trait")
-    assertEqual(definition.disabledInMP, false,
+    T.equal(definition.disabledInMP, false,
         spec.id .. " multiplayer enabled")
 end
-assertEqual(Traits.GetDefinition(T.FRIENDLY).cost, 2,
+T.equal(Traits.GetDefinition(TraitIds.FRIENDLY).cost, 2,
     "Friendly costs two points")
-assertEqual(Traits.GetDefinition(T.WITHDRAWN).cost, -2,
+T.equal(Traits.GetDefinition(TraitIds.WITHDRAWN).cost, -2,
     "Withdrawn grants two points")
 for _, group in ipairs(Constants.EXCLUSION_GROUPS) do
     local left = Traits.EngineTraits[group[1]]
     local right = Traits.EngineTraits[group[2]]
-    assertTrue(engineDefinitions[left].exclusions[right],
+    T.truthy(engineDefinitions[left].exclusions[right],
         group[1] .. " excludes " .. group[2])
-    assertTrue(engineDefinitions[right].exclusions[left],
+    T.truthy(engineDefinitions[right].exclusions[left],
         group[2] .. " excludes " .. group[1])
 end
 local definitionCount = 0
@@ -172,43 +160,43 @@ Traits.Register()
 gameBootCallbacks[1]()
 local repeatCount = 0
 for _, _ in pairs(engineDefinitions) do repeatCount = repeatCount + 1 end
-assertEqual(repeatCount, definitionCount, "registration idempotent")
+T.equal(repeatCount, definitionCount, "registration idempotent")
 
 -- Starting relationships are independent two-point traits backed by the same
 -- Core registry, allowing any combination of family, lover, and friend.
-dofile(ROOT .. "Traits/PNC_StartingCompanionTraits.lua")
+T.load(ROOT .. "Traits/PNC_StartingCompanionTraits.lua")
 local StartingTraits = PNC.StartingCompanionTraits
-assertEqual(#StartingTraits.DEFINITIONS, 6, "six starting companion traits")
-assertEqual(#StartingTraits.EXCLUSIONS, 0,
+T.equal(#StartingTraits.DEFINITIONS, 6, "six starting companion traits")
+T.equal(#StartingTraits.EXCLUSIONS, 0,
     "starting companion traits are not mutually exclusive")
-local catalogFile = assert(io.open(EN_UI_CATALOG, "r"))
-local englishCatalog = catalogFile:read("*a")
-catalogFile:close()
+local englishCatalog = T.read(
+    "ProjectHoomans", "common_lua", "Translate/EN/UI.json"
+)
 for _, spec in ipairs(StartingTraits.DEFINITIONS) do
     local trait = PsychopatzCore.Traits.EngineTraits[spec.id]
-    assertEqual(engineDefinitions[trait].cost, 2,
+    T.equal(engineDefinitions[trait].cost, 2,
         spec.id .. " costs two points")
-    assertEqual(engineDefinitions[trait].disabledInMP, false,
+    T.equal(engineDefinitions[trait].disabledInMP, false,
         spec.id .. " multiplayer enabled")
-    assertTrue(string.find(
+    T.truthy(string.find(
         englishCatalog, '"' .. spec.uiName .. '"', 1, true
     ) ~= nil, spec.id .. " has translated name")
-    assertTrue(string.find(
+    T.truthy(string.find(
         englishCatalog, '"' .. spec.uiDescription .. '"', 1, true
     ) ~= nil, spec.id .. " has translated description")
 end
 local loverSpec = StartingTraits.GetDefinition(StartingTraits.IDS.LOVER)
-assertTrue(StartingTraits.ResolveCompanionFemale(
+T.truthy(StartingTraits.ResolveCompanionFemale(
     loverSpec, true, "gay", false
 ), "gay female survivor receives female lover")
-assertEqual(StartingTraits.ResolveCompanionFemale(
+T.equal(StartingTraits.ResolveCompanionFemale(
     loverSpec, false, "straight", false
 ), true, "straight male survivor receives female lover")
-assertEqual(StartingTraits.ResolveCompanionFemale(
+T.equal(StartingTraits.ResolveCompanionFemale(
     loverSpec, false, "bisexual", false
 ), false, "bisexual lover follows deterministic roll")
 
--- Build 42.20's vanilla trait lists exclude cost-zero definitions. The
+-- The vanilla trait lists exclude cost-zero definitions. The
 -- client adapter keeps the standard screen and adds only PNC's eight
 -- zero-point definitions to its normal positive-trait list.
 local populateCalls = 0
@@ -245,8 +233,8 @@ package.preload["OptionScreens/CharacterCreationProfession"] =
     function()
         return CharacterCreationProfession
     end
-dofile("../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/client/PsychopatzCore/Traits/PsychopatzTraitCharacterCreation.lua")
-dofile(
+T.load(T.path("PsychopatzCore", "client", "PsychopatzCore/Traits/PsychopatzTraitCharacterCreation.lua"))
+T.load(
     CLIENT_ROOT
         .. "Patches/PNC_SocialTraitCharacterCreationPatch.lua"
 )
@@ -255,73 +243,73 @@ local screen = setmetatable(
     { __index = CharacterCreationProfession }
 )
 screen:populateTraitList(list)
-assertEqual(populateCalls, 1, "vanilla population preserved")
-assertEqual(#list.items, 8, "all zero-point traits visible")
+T.equal(populateCalls, 1, "vanilla population preserved")
+T.equal(#list.items, 8, "all zero-point traits visible")
 for _, entry in ipairs(list.items) do
-    assertEqual(entry.item:getCost(), 0,
+    T.equal(entry.item:getCost(), 0,
         "UI adapter adds zero-cost traits only")
 end
-dofile(
+T.load(
     CLIENT_ROOT
         .. "Patches/PNC_SocialTraitCharacterCreationPatch.lua"
 )
 screen:populateTraitList(list)
-assertEqual(populateCalls, 2, "UI adapter idempotent")
-assertEqual(#list.items, 8, "UI adapter avoids duplicates")
+T.equal(populateCalls, 2, "UI adapter idempotent")
+T.equal(#list.items, 8, "UI adapter avoids duplicates")
 
 -- Default and each individual trait resolve to canonical primitive profile.
 local defaults = Traits.ResolveTraits({})
-assertEqual(defaults.orientation, "straight", "default orientation")
-assertEqual(defaults.foodPreference, "neutral", "default food")
-assertEqual(defaults.romanceStyle, "neutral", "default romance")
-assertEqual(defaults.jealousyStyle, "normal", "default jealousy")
-assertEqual(defaults.socialStyle, "neutral", "default social")
+T.equal(defaults.orientation, "straight", "default orientation")
+T.equal(defaults.foodPreference, "neutral", "default food")
+T.equal(defaults.romanceStyle, "neutral", "default romance")
+T.equal(defaults.jealousyStyle, "normal", "default jealousy")
+T.equal(defaults.socialStyle, "neutral", "default social")
 
-assertEqual(Traits.ResolveTraits({ [T.GAY] = true }).orientation,
+T.equal(Traits.ResolveTraits({ [TraitIds.GAY] = true }).orientation,
     "gay", "Gay resolution")
-assertEqual(Traits.ResolveTraits({ [T.BISEXUAL] = true }).orientation,
+T.equal(Traits.ResolveTraits({ [TraitIds.BISEXUAL] = true }).orientation,
     "bisexual", "Bisexual resolution")
-assertEqual(Traits.ResolveTraits({ [T.BLAND_PALATE] = true })
+T.equal(Traits.ResolveTraits({ [TraitIds.BLAND_PALATE] = true })
     .foodPreference, "bland", "Bland Palate resolution")
-assertEqual(Traits.ResolveTraits({ [T.SPICE_LOVER] = true })
+T.equal(Traits.ResolveTraits({ [TraitIds.SPICE_LOVER] = true })
     .foodPreference, "spicy", "Spice Lover resolution")
-assertEqual(Traits.ResolveTraits({ [T.FLIRTY] = true })
+T.equal(Traits.ResolveTraits({ [TraitIds.FLIRTY] = true })
     .romanceStyle, "flirty", "Flirty resolution")
-assertEqual(Traits.ResolveTraits({ [T.RESERVED] = true })
+T.equal(Traits.ResolveTraits({ [TraitIds.RESERVED] = true })
     .romanceStyle, "reserved", "Reserved resolution")
-assertEqual(Traits.ResolveTraits({ [T.JEALOUS] = true })
+T.equal(Traits.ResolveTraits({ [TraitIds.JEALOUS] = true })
     .jealousyStyle, "jealous", "Jealous resolution")
-assertEqual(Traits.ResolveTraits({ [T.UNPOSSESSIVE] = true })
+T.equal(Traits.ResolveTraits({ [TraitIds.UNPOSSESSIVE] = true })
     .jealousyStyle, "unpossessive", "Unpossessive resolution")
-assertEqual(Traits.ResolveTraits({ [T.FRIENDLY] = true })
+T.equal(Traits.ResolveTraits({ [TraitIds.FRIENDLY] = true })
     .socialStyle, "friendly", "Friendly resolution")
-assertEqual(Traits.ResolveTraits({ [T.WITHDRAWN] = true })
+T.equal(Traits.ResolveTraits({ [TraitIds.WITHDRAWN] = true })
     .socialStyle, "withdrawn", "Withdrawn resolution")
 
 local conflictProfile, conflicts = Traits.ResolveTraits({
-    [T.GAY] = true,
-    [T.BISEXUAL] = true,
-    [T.BLAND_PALATE] = true,
-    [T.SPICE_LOVER] = true,
-    [T.FLIRTY] = true,
-    [T.RESERVED] = true,
-    [T.JEALOUS] = true,
-    [T.UNPOSSESSIVE] = true,
-    [T.FRIENDLY] = true,
-    [T.WITHDRAWN] = true,
+    [TraitIds.GAY] = true,
+    [TraitIds.BISEXUAL] = true,
+    [TraitIds.BLAND_PALATE] = true,
+    [TraitIds.SPICE_LOVER] = true,
+    [TraitIds.FLIRTY] = true,
+    [TraitIds.RESERVED] = true,
+    [TraitIds.JEALOUS] = true,
+    [TraitIds.UNPOSSESSIVE] = true,
+    [TraitIds.FRIENDLY] = true,
+    [TraitIds.WITHDRAWN] = true,
 })
-assertEqual(conflictProfile.orientation, "bisexual",
+T.equal(conflictProfile.orientation, "bisexual",
     "orientation precedence")
-assertEqual(conflictProfile.foodPreference, "spicy",
+T.equal(conflictProfile.foodPreference, "spicy",
     "food precedence")
-assertEqual(conflictProfile.romanceStyle, "reserved",
+T.equal(conflictProfile.romanceStyle, "reserved",
     "romance precedence")
-assertEqual(conflictProfile.jealousyStyle, "jealous",
+T.equal(conflictProfile.jealousyStyle, "jealous",
     "jealousy precedence")
-assertEqual(conflictProfile.socialStyle, "friendly",
+T.equal(conflictProfile.socialStyle, "friendly",
     "social precedence")
-assertEqual(#conflicts, 5, "all conflicts reported")
-assertEqual(conflictProfile.sourceTraits[T.GAY], nil,
+T.equal(#conflicts, 5, "all conflicts reported")
+T.equal(conflictProfile.sourceTraits[TraitIds.GAY], nil,
     "discarded contradiction not persisted")
 
 local mixed = Traits.ResolveTraits({
@@ -331,40 +319,41 @@ local mixed = Traits.ResolveTraits({
     "PNC_Unpossessive",
     "PNC_Friendly",
 })
-assertEqual(mixed.orientation, "gay", "resource alias accepted")
-assertEqual(mixed.foodPreference, "spicy",
+T.equal(mixed.orientation, "gay", "resource alias accepted")
+T.equal(mixed.foodPreference, "spicy",
     "separate groups coexist")
-assertEqual(mixed.romanceStyle, "reserved",
+T.equal(mixed.romanceStyle, "reserved",
     "separate romance group")
-assertEqual(mixed.jealousyStyle, "unpossessive",
+T.equal(mixed.jealousyStyle, "unpossessive",
     "separate jealousy group")
-assertEqual(mixed.socialStyle, "friendly",
+T.equal(mixed.socialStyle, "friendly",
     "separate social group")
-assertSaveSafe(mixed)
+validatePersistedValue(mixed)
 
 -- Orientation compatibility is pure and requires both sides for mutual use.
 local straight = { orientation = "straight" }
 local gay = { orientation = "gay" }
 local bisexual = { orientation = "bisexual" }
-assertTrue(Math.IsGenderCompatible(straight, "male", "female"),
+T.truthy(Math.IsGenderCompatible(straight, "male", "female"),
     "straight other gender")
-assertEqual(Math.IsGenderCompatible(straight, "male", "male"),
+T.equal(Math.IsGenderCompatible(straight, "male", "male"),
     false, "straight same gender")
-assertTrue(Math.IsGenderCompatible(gay, "female", "female"),
+T.truthy(Math.IsGenderCompatible(gay, "female", "female"),
     "gay same gender")
-assertEqual(Math.IsGenderCompatible(gay, "female", "male"),
+T.equal(Math.IsGenderCompatible(gay, "female", "male"),
     false, "gay other gender")
-assertTrue(Math.IsGenderCompatible(bisexual, "male", "male"),
+T.truthy(Math.IsGenderCompatible(bisexual, "male", "male"),
     "bisexual same gender")
-assertTrue(Math.IsGenderCompatible(bisexual, "male", "female"),
+T.truthy(Math.IsGenderCompatible(bisexual, "male", "female"),
     "bisexual other gender")
-assertEqual(Math.AreMutuallyOrientationCompatible(
+T.equal(Math.AreMutuallyOrientationCompatible(
     straight, "male", gay, "female"
 ), false, "mutual compatibility requires both")
-assertTrue(Math.AreMutuallyOrientationCompatible(
+T.truthy(Math.AreMutuallyOrientationCompatible(
     bisexual, "male", bisexual, "female"
 ), "mutual bisexual compatibility")
-assertEqual(Math.IsGenderCompatible(straight, "unknown", "female"),
+T.equal(Math.IsGenderCompatible(straight, "unknown", "female"),
     false, "invalid gender safe")
+T.finish("pnc_social_traits_smoke")
 
-print("pnc_social_traits_smoke: ok")
+T.finish("pnc_social_traits_smoke")

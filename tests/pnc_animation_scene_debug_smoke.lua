@@ -1,7 +1,9 @@
+local T = require "tests/support/test"
+
 local SHARED_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+    T.path("ProjectHoomans", "shared", "")
 local CLIENT_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+    T.path("ProjectHoomans", "client", "")
 local SCENES = SHARED_ROOT
     .. "PNC/Core/Visuals/PNC_AnimationScenes.lua"
 local DEFINITIONS = SHARED_ROOT
@@ -50,10 +52,10 @@ PNC = {
     },
 }
 
-dofile(SCENES)
-dofile(DEFINITIONS)
-dofile(DEBUG_CONTROLLER)
-dofile(DEBUG_MODEL)
+T.load(SCENES)
+T.load(DEFINITIONS)
+T.load(DEBUG_CONTROLLER)
+T.load(DEBUG_MODEL)
 
 local body = {
     getModData = function()
@@ -78,9 +80,9 @@ local started, state =
             gapMs = 500,
         }
     )
-assert(started == true, "idle debug cycle did not start")
-assert(state.pool == "idle", "debug cycle lost pool")
-assert(record.runtime.animationScene
+T.truthy(started == true, "idle debug cycle did not start")
+T.truthy(state.pool == "idle", "debug cycle lost pool")
+T.truthy(record.runtime.animationScene
         and record.runtime.animationScene.id
             == "idle.ambient",
     "debug cycle did not immediately play the composite idle scene")
@@ -88,18 +90,18 @@ local idleSequence = record.runtime.animationScene
 local firstPlaybackRevision = idleSequence.playbackRevision
 now = idleSequence.finishAt
 PNC.AnimationScenes.Tick(record, body, now)
-assert(record.runtime.animationScene == idleSequence
+T.truthy(record.runtime.animationScene == idleSequence
         and idleSequence.bump == nil,
     "scene lab cycle did not preserve the sequence during its gap")
 now = idleSequence.nextStepAt
 PNC.AnimationScenes.Tick(record, body, now)
-assert(idleSequence.playbackRevision
+T.truthy(idleSequence.playbackRevision
         == firstPlaybackRevision + 1,
     "scene lab cycle did not advance the primitive queue")
 
 local snapshot =
     PNC.AnimationSceneDebug.BuildSnapshot(record)
-assert(snapshot.active == true
+T.truthy(snapshot.active == true
         and snapshot.completedCount == 0,
     "debug controller snapshot omitted live cycle state")
 
@@ -108,12 +110,12 @@ local stopped = PNC.AnimationSceneDebug.Stop(
     body,
     "smoke_stop"
 )
-assert(stopped == true, "debug cycle did not stop")
-assert(record.runtime.animationSceneDebug == nil,
+T.truthy(stopped == true, "debug cycle did not stop")
+T.truthy(record.runtime.animationSceneDebug == nil,
     "debug cycle state survived stop")
-assert(record.runtime.animationScene == nil,
+T.truthy(record.runtime.animationScene == nil,
     "debug scene survived stop")
-assert(finished >= 2,
+T.truthy(finished >= 2,
     "debug stop did not release active animation")
 
 started = PNC.AnimationSceneDebug.Play(
@@ -122,8 +124,8 @@ started = PNC.AnimationSceneDebug.Play(
     "social.surrender",
     { now = now }
 )
-assert(started == true, "manual surrender test did not start")
-assert(record.runtime.animationScene.id
+T.truthy(started == true, "manual surrender test did not start")
+T.truthy(record.runtime.animationScene.id
         == "social.surrender",
     "manual scene debug selected wrong scene")
 
@@ -145,7 +147,7 @@ for _, group in ipairs(groups) do
         greetingPool = true
     end
 end
-assert(greetingPool,
+T.truthy(greetingPool,
     "debug model did not discover a newly registered pool")
 
 local addonScenes =
@@ -156,7 +158,7 @@ local addonScenes =
             value = "greeting",
         }
     )
-assert(#addonScenes == 1
+T.truthy(#addonScenes == 1
         and addonScenes[1].id == "addon.wave",
     "registry-driven scene filtering failed")
 
@@ -178,12 +180,12 @@ local clientRuntime =
     PNC.AnimationSceneDebugModel.GetRuntime(
         "scene_debug_npc"
     )
-assert(clientRuntime.sceneId == "social.surrender"
+T.truthy(clientRuntime.sceneId == "social.surrender"
         and clientRuntime.sceneRevision == 7,
     "scene lab did not prefer replicated authority state")
-assert(clientRuntime.sceneRepeatMode == "loop",
+T.truthy(clientRuntime.sceneRepeatMode == "loop",
     "scene lab omitted replicated repeat policy")
-assert(clientRuntime.cycleActive == true
+T.truthy(clientRuntime.cycleActive == true
         and clientRuntime.cycleCompletedCount == 3,
     "scene lab omitted replicated cycle diagnostics")
 
@@ -213,13 +215,14 @@ local bodyRuntime =
             return 0.5
         end,
     })
-assert(nestedActionContextRead == false,
+T.truthy(nestedActionContextRead == false,
     "scene lab touched unsupported ActionContext userdata")
-assert(bodyRuntime.actionState == "bumped"
+T.truthy(bodyRuntime.actionState == "bumped"
         and bodyRuntime.animationState == "bumped",
     "scene lab did not use exposed body state methods")
-assert(bodyRuntime.bumpType == "PNC_Surrender"
+T.truthy(bodyRuntime.bumpType == "PNC_Surrender"
         and bodyRuntime.trackFrame == 15,
     "scene lab body diagnostics were incomplete")
+T.finish("pnc_animation_scene_debug_smoke")
 
-print("pnc_animation_scene_debug_smoke: ok")
+T.finish("pnc_animation_scene_debug_smoke")

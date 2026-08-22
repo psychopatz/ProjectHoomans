@@ -1,24 +1,7 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
-package.path = ROOT .. "shared/?.lua;" .. ROOT .. "server/?.lua;"
-    .. ROOT .. "client/?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assert") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
-
-local function truthy(value, label)
-    if not value then error(label or "expected truthy", 2) end
-end
-
-local function near(actual, expected, label)
-    if math.abs((tonumber(actual) or 0) - expected) > 0.000001 then
-        error((label or "assert near") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
+local ROOT = T.path("ProjectHoomans", "root", "")
+T.addPackagePaths()
 
 local function deepCopy(value)
     if type(value) ~= "table" then return value end
@@ -36,20 +19,20 @@ PNC = {
     NeedsUtils = { WorldAgeHours = function() return worldHour end },
 }
 
-dofile(ROOT .. "shared/PNC/Core/Provision/PNC_ProvisionRuleRegistry.lua")
-dofile(ROOT .. "shared/PNC/Core/Provision/Rules/PNC_FoodProvisionRule.lua")
-dofile(ROOT .. "shared/PNC/Core/Provision/Rules/PNC_HydrationProvisionRule.lua")
-dofile(ROOT .. "shared/PNC/Core/Provision/Rules/PNC_BandageProvisionRule.lua")
-dofile(ROOT .. "shared/PNC/Core/Provision/PNC_ProvisionPolicy.lua")
-dofile(ROOT .. "server/PNC/Supply/PNC_SupplyMetrics.lua")
+T.load(ROOT .. "shared/PNC/Core/Provision/PNC_ProvisionRuleRegistry.lua")
+T.load(ROOT .. "shared/PNC/Core/Provision/Rules/PNC_FoodProvisionRule.lua")
+T.load(ROOT .. "shared/PNC/Core/Provision/Rules/PNC_HydrationProvisionRule.lua")
+T.load(ROOT .. "shared/PNC/Core/Provision/Rules/PNC_BandageProvisionRule.lua")
+T.load(ROOT .. "shared/PNC/Core/Provision/PNC_ProvisionPolicy.lua")
+T.load(ROOT .. "server/PNC/Supply/PNC_SupplyMetrics.lua")
 
-equal(#PNC.ProvisionRuleRegistry.List(), 3, "proof rules registered")
+T.equal(#PNC.ProvisionRuleRegistry.List(), 3, "proof rules registered")
 local defaults = PNC.ProvisionPolicy.Defaults()
-equal(defaults.schemaVersion, 2, "policy schema")
-equal(defaults.revision, 1, "initial revision")
-equal(defaults.policies.default.food.target, 0.80, "food default")
-equal(defaults.policies.default.hydration.target, 0.70, "hydration default")
-equal(defaults.policies.default.bandage.target, 3, "bandage default")
+T.equal(defaults.schemaVersion, 2, "policy schema")
+T.equal(defaults.revision, 1, "initial revision")
+T.equal(defaults.policies.default.food.target, 0.80, "food default")
+T.equal(defaults.policies.default.hydration.target, 0.70, "hydration default")
+T.equal(defaults.policies.default.bandage.target, 3, "bandage default")
 
 local migrated = PNC.ProvisionPolicy.Normalize({
     schemaVersion = 1,
@@ -62,31 +45,28 @@ local migrated = PNC.ProvisionPolicy.Normalize({
         },
     },
 })
-equal(migrated.schemaVersion, 2, "legacy policy migrated to schema two")
-near(migrated.policies.default.food.refillBelow, 0.30,
-    "legacy food threshold migrated")
-near(migrated.policies.default.food.target, 0.80,
-    "legacy food target migrated")
-near(migrated.policies.default.hydration.target, 0.70,
-    "legacy hydration target migrated")
+T.equal(migrated.schemaVersion, 2, "legacy policy migrated to schema two")
+T.near(migrated.policies.default.food.refillBelow, 0.30, 0.000001, "legacy food threshold migrated")
+T.near(migrated.policies.default.food.target, 0.80, 0.000001, "legacy food target migrated")
+T.near(migrated.policies.default.hydration.target, 0.70, 0.000001, "legacy hydration target migrated")
 
 local invalid, reason = PNC.ProvisionPolicy.ValidateRule("food", {
     enabled = true, refillBelow = 0.90, target = 0.80,
 }, true)
-equal(invalid, nil, "threshold above target rejected")
-equal(reason, "target_below_refill", "threshold validation reason")
+T.equal(invalid, nil, "threshold above target rejected")
+T.equal(reason, "target_below_refill", "threshold validation reason")
 invalid, reason = PNC.ProvisionPolicy.ValidateRule("food", {
     enabled = true, refillBelow = -1, target = 0.80,
 }, true)
-equal(reason, "field_out_of_range", "negative rejected")
+T.equal(reason, "field_out_of_range", "negative rejected")
 invalid, reason = PNC.ProvisionPolicy.ValidateRule("food", {
     enabled = true, refillBelow = 0.30, target = 0.80, surprise = 1,
 }, true)
-equal(reason, "unknown_field", "unknown field rejected")
+T.equal(reason, "unknown_field", "unknown field rejected")
 invalid, reason = PNC.ProvisionPolicy.ValidateSubmission({
     schemaVersion = 2, policyId = "default", rules = { unknown = {} },
 })
-equal(reason, "unknown_rule", "unknown rule rejected")
+T.equal(reason, "unknown_rule", "unknown rule rejected")
 
 local faction = {
     id = "faction_player", ownerPlayerKey = "player:owner",
@@ -101,7 +81,7 @@ PNC.Factions = {
         return records[id] and faction or nil, "unaffiliated"
     end,
 }
-dofile(ROOT .. "server/PNC/Provision/PNC_ProvisionResolver.lua")
+T.load(ROOT .. "server/PNC/Provision/PNC_ProvisionResolver.lua")
 
 local npc = {
     id = "npc_one", alive = true,
@@ -109,8 +89,8 @@ local npc = {
 }
 records[npc.id] = npc
 local effective = PNC.ProvisionResolver.GetEffectivePolicy(npc)
-equal(effective.rules.food.target, 0.80, "faction default resolved")
-equal(npc.provision, nil, "policy not copied to npc")
+T.equal(effective.rules.food.target, 0.80, "faction default resolved")
+T.equal(npc.provision, nil, "policy not copied to npc")
 
 local candidates = {}
 PNC.SupplyInventory = {
@@ -149,7 +129,7 @@ PNC.SupplyIndex = {
 PNC.Inventory = {
     GetPersistenceMode = function() return "SEED_ONLY" end,
 }
-dofile(ROOT .. "server/PNC/Provision/PNC_ProvisionEvaluator.lua")
+T.load(ROOT .. "server/PNC/Provision/PNC_ProvisionEvaluator.lua")
 
 local function candidate(descriptor)
     return { descriptor = descriptor, item = { id = tostring(descriptor) } }
@@ -162,62 +142,58 @@ candidates[npc.id] = {
     MEDICAL = { candidate({ quantity = 2 }) },
 }
 local food = PNC.ProvisionEvaluator.Evaluate(npc, "food")
-near(food.onHand, 0.20, "food measured by vanilla utility and stack")
-near(food.deficit, 0.60, "food deficit targets vanilla utility")
+T.near(food.onHand, 0.20, 0.000001, "food measured by vanilla utility and stack")
+T.near(food.deficit, 0.60, 0.000001, "food deficit targets vanilla utility")
 local hydration = PNC.ProvisionEvaluator.Evaluate(npc, "hydration")
-near(hydration.onHand, 0.30, "hydration remaining uses measured")
+T.near(hydration.onHand, 0.30, 0.000001, "hydration remaining uses measured")
 local bandage = PNC.ProvisionEvaluator.Evaluate(npc, "bandage")
-equal(bandage.onHand, 2, "usable bandages counted")
-equal(bandage.satisfied, true, "bandage above strict threshold")
+T.equal(bandage.onHand, 2, "usable bandages counted")
+T.equal(bandage.satisfied, true, "bandage above strict threshold")
 local inspected = PNC.ProvisionEvaluator.Inspect(npc)
-equal(inspected.storageAccess, false, "diagnostics storage access state")
-equal(inspected.storageAccessReason, "storage_not_at_base",
+T.equal(inspected.storageAccess, false, "diagnostics storage access state")
+T.equal(inspected.storageAccessReason, "storage_not_at_base",
     "diagnostics exposes provision access blocker")
-equal(#inspected.rules, 3, "diagnostics includes every provision rule")
-near(inspected.rules[1].onHand, 0.20,
-    "diagnostics exposes measured carried food")
+T.equal(#inspected.rules, 3, "diagnostics includes every provision rule")
+T.near(inspected.rules[1].onHand, 0.20, 0.000001, "diagnostics exposes measured carried food")
 local storageMeasurement = PNC.ProvisionEvaluator.MeasureStorage({
     inventory = {},
 })
-near(storageMeasurement.food.amount, 0.20,
-    "diagnostics exposes colony storage hunger utility")
-near(storageMeasurement.food.calories, 190,
-    "diagnostics exposes colony storage calories")
-near(storageMeasurement.hydration.amount, 0.30,
-    "diagnostics exposes colony storage hydration utility")
-equal(storageMeasurement.bandage.amount, 2,
+T.near(storageMeasurement.food.amount, 0.20, 0.000001, "diagnostics exposes colony storage hunger utility")
+T.near(storageMeasurement.food.calories, 190, 0.000001, "diagnostics exposes colony storage calories")
+T.near(storageMeasurement.hydration.amount, 0.30, 0.000001, "diagnostics exposes colony storage hydration utility")
+T.equal(storageMeasurement.bandage.amount, 2,
     "diagnostics exposes usable medicine count")
 
 candidates[npc.id].FOOD = {
     candidate({ hunger = 0.10, thirst = 0, quantity = 4 }),
 }
 food = PNC.ProvisionEvaluator.Evaluate(npc, "food")
-near(food.deficit, 0.40, "refill latch continues above threshold")
+T.near(food.deficit, 0.40, 0.000001, "refill latch continues above threshold")
 candidates[npc.id].FOOD = {
     candidate({ hunger = 0.10, thirst = 0, quantity = 8 }),
 }
 food = PNC.ProvisionEvaluator.Evaluate(npc, "food")
-equal(food.satisfied, true, "target clears refill latch")
+T.equal(food.satisfied, true, "target clears refill latch")
 candidates[npc.id].FOOD = {
     candidate({ hunger = 0.10, thirst = 0, quantity = 3 }),
 }
 food = PNC.ProvisionEvaluator.Evaluate(npc, "food")
-equal(food.satisfied, true, "equal threshold does not trigger")
+T.equal(food.satisfied, true, "equal threshold does not trigger")
 candidates[npc.id].FOOD = {
     candidate({ hunger = 0.29, thirst = 0, quantity = 1 }),
 }
 food = PNC.ProvisionEvaluator.Evaluate(npc, "food")
-near(food.deficit, 0.51, "strictly below threshold triggers")
+T.near(food.deficit, 0.51, 0.000001, "strictly below threshold triggers")
 local request = PNC.ProvisionEvaluator.BuildRequest(
     npc, PNC.ProvisionRuleRegistry.Get("food"), food)
-equal(request.purpose, "PROVISION", "provision request purpose")
-near(request.required.hunger, 0.51, "request carries utility deficit")
+T.equal(request.purpose, "PROVISION", "provision request purpose")
+T.near(request.required.hunger, 0.51, 0.000001, "request carries utility deficit")
 
 PNC.NPCSupplyService = {
     Process = function(raw, options)
-        truthy(options.acquireOnly, "provision acquires only")
-        truthy(options.ignorePersonal, "measured personal inventory skipped")
-        truthy(options.force, "provision bypasses need-consumption cooldown")
+        T.truthy(options.acquireOnly, "provision acquires only")
+        T.truthy(options.ignorePersonal, "measured personal inventory skipped")
+        T.truthy(options.force, "provision bypasses need-consumption cooldown")
         local record = records[raw.requesterId]
         record.processed = (record.processed or 0) + 1
         if record.shortage then
@@ -230,7 +206,7 @@ PNC.NPCSupplyService = {
     end,
     HasRecentNeedRequest = function(record) return record.recentNeed == true end,
 }
-dofile(ROOT .. "server/PNC/Provision/PNC_ProvisionScheduler.lua")
+T.load(ROOT .. "server/PNC/Provision/PNC_ProvisionScheduler.lua")
 
 local bootstrapRecord = {
     id = "npc_bootstrap", alive = true,
@@ -249,9 +225,9 @@ PNC.ProvisionScheduler.Queued = {}
 PNC.ProvisionScheduler.Bootstrapped = false
 PNC.ProvisionScheduler.LastPumpAt = 0
 nowMs = 1001
-equal(PNC.ProvisionScheduler.Pump(nowMs), 2,
+T.equal(PNC.ProvisionScheduler.Pump(nowMs), 2,
     "bootstrap schedules existing faction members")
-equal(bootstrapRecord.processed, 2,
+T.equal(bootstrapRecord.processed, 2,
     "bootstrap provisions an existing saved colonist")
 PNC.Factions.List = function() return {} end
 PNC.ProvisionScheduler.Queue = {}
@@ -268,8 +244,8 @@ for index = 1, 5 do
     PNC.ProvisionScheduler.MarkDirty(record, "bandage")
 end
 nowMs = 2002
-equal(PNC.ProvisionScheduler.Pump(nowMs), 2, "bounded scheduler slice")
-equal(PNC.SupplyMetrics.provisionSchedulerQueueSize, 5,
+T.equal(PNC.ProvisionScheduler.Pump(nowMs), 2, "bounded scheduler slice")
+T.equal(PNC.SupplyMetrics.provisionSchedulerQueueSize, 5,
     "successful deficits requeued for target verification")
 
 PNC.ProvisionScheduler.Queue = {}
@@ -283,7 +259,7 @@ candidates[blocked.id] = { FOOD = {}, HYDRATION = {}, MEDICAL = {} }
 PNC.ProvisionScheduler.MarkDirty(blocked, "food")
 nowMs = 3003
 PNC.ProvisionScheduler.Pump(nowMs)
-equal(blocked.processed, 1,
+T.equal(blocked.processed, 1,
     "recent hunger check does not suppress reserve provisioning")
 
 PNC.ProvisionScheduler.Queue = {}
@@ -296,12 +272,12 @@ records[forced.id] = forced
 candidates[forced.id] = { FOOD = {}, HYDRATION = {}, MEDICAL = {} }
 local forcedCount, forcedResults =
     PNC.ProvisionScheduler.ReconcileRecord(forced)
-equal(forcedCount, 3, "forced provision evaluates every configured rule")
-equal(#forcedResults, 3, "forced provision returns one result per rule")
-equal(forcedResults[1].ruleId, "food", "forced result identifies food rule")
-equal(forcedResults[1].attempted, true,
+T.equal(forcedCount, 3, "forced provision evaluates every configured rule")
+T.equal(#forcedResults, 3, "forced provision returns one result per rule")
+T.equal(forcedResults[1].ruleId, "food", "forced result identifies food rule")
+T.equal(forcedResults[1].attempted, true,
     "forced result distinguishes an actual storage acquisition attempt")
-equal(forcedResults[1].reason, "acquired",
+T.equal(forcedResults[1].reason, "acquired",
     "forced result exposes the acquisition outcome")
 
 PNC.ProvisionScheduler.Queue = {}
@@ -315,12 +291,12 @@ candidates[shortage.id] = { FOOD = {}, HYDRATION = {}, MEDICAL = {} }
 PNC.ProvisionScheduler.MarkDirty(shortage, "bandage")
 nowMs = 4004
 PNC.ProvisionScheduler.Pump(nowMs)
-equal(shortage.processed, 1, "storage shortage attempted once")
-equal(PNC.ProvisionScheduler.Queue[1].readyAt, worldHour + 0.25,
+T.equal(shortage.processed, 1, "storage shortage attempted once")
+T.equal(PNC.ProvisionScheduler.Queue[1].readyAt, worldHour + 0.25,
     "storage shortage waits for supply retry deadline")
 nowMs = 5005
 PNC.ProvisionScheduler.Pump(nowMs)
-equal(shortage.processed, 1, "retry deadline prevents query spam")
+T.equal(shortage.processed, 1, "retry deadline prevents query spam")
 
 local saved = 0
 PNC.PlayerCharacters = {
@@ -338,7 +314,7 @@ end
 PNC.Factions.Save = function() saved = saved + 1 return true end
 PNC.ProvisionScheduler.MarkFactionDirty = function() return 0 end
 GlobalModData = { save = function() end }
-dofile(ROOT .. "server/PNC/Provision/PNC_ProvisionPolicyService.lua")
+T.load(ROOT .. "server/PNC/Provision/PNC_ProvisionPolicyService.lua")
 
 local submission = {
     schemaVersion = 2, policyId = "default", expectedRevision = 1,
@@ -350,16 +326,16 @@ local ok
 ok, reason = PNC.ProvisionPolicyService.Apply({
     key = "player:intruder", factionID = faction.id,
 }, submission)
-equal(ok, false, "other faction member cannot modify owner policy")
-equal(reason, "not_faction_owner", "ownership rejection")
+T.equal(ok, false, "other faction member cannot modify owner policy")
+T.equal(reason, "not_faction_owner", "ownership rejection")
 ok, reason = PNC.ProvisionPolicyService.Apply({
     key = "player:owner", factionID = faction.id,
 }, submission)
-equal(ok, true, "owner applies policy")
-equal(faction.provision.revision, 2, "revision increments once")
-equal(faction.provision.policies.default.bandage.target, 5,
+T.equal(ok, true, "owner applies policy")
+T.equal(faction.provision.revision, 2, "revision increments once")
+T.equal(faction.provision.policies.default.bandage.target, 5,
     "authoritative policy persisted")
-equal(saved, 1, "faction registry saved")
+T.equal(saved, 1, "faction registry saved")
 
 PNC.ProvisionRuleRegistry.Register({
     id = "dummy_radio", category = "utility", mode = "EXACT",
@@ -375,24 +351,24 @@ PNC.Client = {
         return true, "snapshot_requested"
     end,
     RequestColonyAction = function(action, args)
-        equal(action, "provision_set", "model submits colony action")
-        truthy(args.submission.rules.dummy_radio,
+        T.equal(action, "provision_set", "model submits colony action")
+        T.truthy(args.submission.rules.dummy_radio,
             "dummy registry rule submitted without UI special case")
         return true, "sent"
     end,
 }
-local UIModel = dofile(ROOT
+local UIModel = T.load(ROOT
     .. "client/PNC/UI/Provision/PNC_ProvisionSettingsModel.lua")
 local model = UIModel.New({ provision = faction.provision,
     policyId = "default", canEdit = true })
-truthy(model:Get("dummy_radio"), "new registry rule appears in model")
+T.truthy(model:Get("dummy_radio"), "new registry rule appears in model")
 model:Set("bandage", "target", 7)
-equal(faction.provision.policies.default.bandage.target, 5,
+T.equal(faction.provision.policies.default.bandage.target, 5,
     "working copy does not mutate authoritative policy")
 model:ResetDefaults()
-equal(model:Get("bandage").target, 3, "reset uses registry defaults")
+T.equal(model:Get("bandage").target, 3, "reset uses registry defaults")
 ok = model:Submit()
-equal(ok, true, "valid working copy submits")
+T.equal(ok, true, "valid working copy submits")
 
 local injectedSubmission
 local injectedClient = {
@@ -405,9 +381,9 @@ local injectedModel = UIModel.New({ provision = faction.provision,
     policyId = "default", canEdit = true }, injectedClient)
 injectedModel:Set("bandage", "target", 6)
 ok, reason = injectedModel:Submit()
-equal(ok, true, "injected client submits")
-equal(reason, "injected", "injected client reason")
-equal(injectedSubmission.rules.bandage.target, 6,
+T.equal(ok, true, "injected client submits")
+T.equal(reason, "injected", "injected client reason")
+T.equal(injectedSubmission.rules.bandage.target, 6,
     "model passes validated submission to client boundary")
 
 PNC.Network = { ClientState = {
@@ -417,27 +393,26 @@ PNC.Network = { ClientState = {
         actionResult = { action = "provision_set", ok = true },
     },
 } }
-equal(PNC.ProvisionSettingsClient.CurrentSnapshot().marker, "snapshot",
+T.equal(PNC.ProvisionSettingsClient.CurrentSnapshot().marker, "snapshot",
     "client boundary current snapshot")
 local update = PNC.ProvisionSettingsClient.ReadUpdate(11)
-equal(update.receivedAt, 12, "client boundary receive time")
-equal(update.result.action, "provision_set", "client boundary result")
-equal(PNC.ProvisionSettingsClient.ReadUpdate(12), nil,
+T.equal(update.receivedAt, 12, "client boundary receive time")
+T.equal(update.result.action, "provision_set", "client boundary result")
+T.equal(PNC.ProvisionSettingsClient.ReadUpdate(12), nil,
     "client boundary ignores stale state")
 ok, reason = PNC.ProvisionSettingsClient.RequestSnapshot()
-equal(ok, true, "client boundary requests snapshot")
-equal(reason, "snapshot_requested", "client boundary snapshot reason")
+T.equal(ok, true, "client boundary requests snapshot")
+T.equal(reason, "snapshot_requested", "client boundary snapshot reason")
 
-local windowPath = ROOT
-    .. "client/PNC/UI/Provision/PNC_ProvisionSettingsWindow.lua"
-local windowFile = assert(io.open(windowPath, "r"))
-local windowSource = windowFile:read("*a")
-windowFile:close()
-equal(windowSource:find("PNC.Client.", 1, true), nil,
+local windowSource = T.read(
+    "ProjectHoomans", "client", "PNC/UI/Provision/PNC_ProvisionSettingsWindow.lua"
+)
+T.equal(windowSource:find("PNC.Client.", 1, true), nil,
     "Provision window bypasses client boundary")
-equal(windowSource:find("PNC.Network.ClientState", 1, true), nil,
+T.equal(windowSource:find("PNC.Network.ClientState", 1, true), nil,
     "Provision window reads raw network state")
-truthy(windowSource:find("Client.ReadUpdate", 1, true),
+T.truthy(windowSource:find("Client.ReadUpdate", 1, true),
     "Provision window consumes client update boundary")
+T.finish("pnc_provision_smoke")
 
-print("pnc_provision_smoke: ok")
+T.finish("pnc_provision_smoke")

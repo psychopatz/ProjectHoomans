@@ -1,4 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "client", "PNC/UI/Map/")
     .. "PNC_MapLayerRegistry.lua"
 
 local calls = {}
@@ -19,18 +21,18 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 local patchedRender = ISWorldMap.render
 
-assert(PNC.MapLayers.Register("late", {
+T.truthy(PNC.MapLayers.Register("late", {
     order = 200,
     render = function() calls[#calls + 1] = "late" end,
 }))
-assert(PNC.MapLayers.Register("early", {
+T.truthy(PNC.MapLayers.Register("early", {
     order = 10,
     render = function() calls[#calls + 1] = "early" end,
 }))
-assert(PNC.MapLayers.Register("broken", {
+T.truthy(PNC.MapLayers.Register("broken", {
     order = 100,
     render = function() error("fixture failure") end,
 }))
@@ -39,15 +41,16 @@ local map = {}
 setmetatable(map, { __index = ISWorldMap })
 map:render()
 
-assert(calls[1] == "vanilla", "map layers rendered before vanilla map content")
-assert(calls[2] == "early" and calls[3] == "late",
+T.truthy(calls[1] == "vanilla", "map layers rendered before vanilla map content")
+T.truthy(calls[2] == "early" and calls[3] == "late",
     "map layers did not use stable order or isolate a failed layer")
-assert(warnings == 1, "failed map layer was not reported exactly once")
+T.truthy(warnings == 1, "failed map layer was not reported exactly once")
 
 -- Re-loading the registry must not stack another monkey patch.
-dofile(FILE)
-assert(ISWorldMap.render == patchedRender,
+T.load(FILE)
+T.truthy(ISWorldMap.render == patchedRender,
     "map layer registry patched ISWorldMap more than once")
-assert(PNC.MapLayers.Unregister("broken"), "map layer unregister failed")
+T.truthy(PNC.MapLayers.Unregister("broken"), "map layer unregister failed")
+T.finish("pnc_map_layer_registry_smoke")
 
-print("pnc_map_layer_registry_smoke: ok")
+T.finish("pnc_map_layer_registry_smoke")

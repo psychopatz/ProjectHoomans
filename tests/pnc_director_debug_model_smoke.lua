@@ -1,16 +1,9 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+local T = require "tests/support/test"
 
-local function truthy(value, label)
-    if value ~= true then error(label or "expected true") end
-end
-
-local function contains(value, expected, label)
-    truthy(string.find(tostring(value), expected, 1, true) ~= nil,
-        (label or "contains") .. ": " .. tostring(expected))
-end
+local FILE = T.path("ProjectHoomans", "client", "PNC/")
 
 PNC = {}
-dofile(FILE .. "UI/Director/PNC_DirectorDebugModel.lua")
+T.load(FILE .. "UI/Director/PNC_DirectorDebugModel.lua")
 
 local sector = { id = "psector_7_11", active = true, relevant = true,
     discovered = true, nearbyPlayers = 1, survivorCount = 0,
@@ -47,8 +40,8 @@ local snapshot = {
 }
 
 local sectors = PNC.DirectorDebugModel.SectorItems(snapshot)
-truthy(#sectors == 1, "sector list count")
-contains(sectors[1].detail, "sites 8", "sector candidate detail")
+T.truthy(#sectors == 1, "sector list count")
+T.contains(sectors[1].detail, "sites 8", "sector candidate detail")
 local rows = PNC.DirectorDebugModel.DetailRows(snapshot, nil, nil, sector,
     true, nil)
 local output = {}
@@ -56,9 +49,10 @@ for _, item in ipairs(rows) do
     output[#output + 1] = item.label .. "=" .. item.value
 end
 local formatted = table.concat(output, "\n")
-contains(formatted, "WORLD-SEED / 12345", "world seed row")
-contains(formatted, "META_BUILDINGS_REGISTERED", "discovery row")
-contains(formatted, "priority=100.00", "starter queue row")
-contains(formatted, "population_starter_attempt", "persistence row")
+T.contains(formatted, "WORLD-SEED / 12345", "world seed row")
+T.contains(formatted, "META_BUILDINGS_REGISTERED", "discovery row")
+T.contains(formatted, "priority=100.00", "starter queue row")
+T.contains(formatted, "population_starter_attempt", "persistence row")
+T.finish("pnc_director_debug_model_smoke")
 
-print("pnc_director_debug_model_smoke: ok")
+T.finish("pnc_director_debug_model_smoke")

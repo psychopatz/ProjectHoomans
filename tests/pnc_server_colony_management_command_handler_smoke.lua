@@ -1,12 +1,7 @@
-local SERVER_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
-package.path = SERVER_ROOT .. "?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local SERVER_ROOT = T.path("ProjectHoomans", "server", "")
+T.addPackagePaths()
 
 local player = {}
 local buildCount = 0
@@ -44,11 +39,11 @@ PNC = {
     },
     ColonyManagement = {
         BuildSnapshot = function(receivedPlayer)
-            assertEqual(receivedPlayer, player, "snapshot player")
+            T.equal(receivedPlayer, player, "snapshot player")
             return buildSnapshot()
         end,
         HandleAction = function(receivedPlayer, args)
-            assertEqual(receivedPlayer, player, "action player")
+            T.equal(receivedPlayer, player, "action player")
             actionArgs = args
             return buildSnapshot(), { ok = true, action = args and args.action }
         end,
@@ -58,23 +53,23 @@ PNC = {
 local Router = require "PNC/Networking/PNC_ServerCommandRouter"
 require "PNC/Networking/Handlers/PNC_ServerColonyManagementCommandHandler"
 
-assertEqual(Router.Handle("ColonyManagementRequest", player, nil), true,
+T.equal(Router.Handle("ColonyManagementRequest", player, nil), true,
     "colony snapshot request handled")
-assertEqual(colonyCall.player, player, "colony snapshot response player")
-assertEqual(colonyCall.snapshot.marker, "snapshot-1",
+T.equal(colonyCall.player, player, "colony snapshot response player")
+T.equal(colonyCall.snapshot.marker, "snapshot-1",
     "colony snapshot response")
 
 colonyCall = nil
 local ordinaryArgs = { action = "assign_work", npcID = "npc-1" }
 Router.Handle("ColonyManagementAction", player, ordinaryArgs)
-assertEqual(actionArgs, ordinaryArgs, "colony action payload identity")
-assertEqual(colonyCall.snapshot.actionResult.ok, true,
+T.equal(actionArgs, ordinaryArgs, "colony action payload identity")
+T.equal(colonyCall.snapshot.actionResult.ok, true,
     "colony action result not attached")
-assertEqual(deltaCall, nil, "ordinary colony action sent settlement delta")
+T.equal(deltaCall, nil, "ordinary colony action sent settlement delta")
 
 Router.Handle("ColonyManagementAction", player, nil)
-assertEqual(actionArgs, nil, "nil colony action payload normalized")
-assertEqual(colonyCall.snapshot.actionResult.ok, true,
+T.equal(actionArgs, nil, "nil colony action payload normalized")
+T.equal(colonyCall.snapshot.actionResult.ok, true,
     "nil colony action result not attached")
 
 local settlementActions = {
@@ -87,27 +82,28 @@ for _, action in ipairs(settlementActions) do
     colonyCall = nil
     deltaCall = nil
     Router.Handle("ColonyManagementAction", player, { action = action })
-    assertEqual(deltaCall.player, player, action .. " delta player")
-    assertEqual(deltaCall.settlement.id, "settlement-1",
+    T.equal(deltaCall.player, player, action .. " delta player")
+    T.equal(deltaCall.settlement.id, "settlement-1",
         action .. " settlement")
-    assertEqual(deltaCall.result.action, action, action .. " result")
-    assertEqual(type(deltaCall.storage.revision), "number",
+    T.equal(deltaCall.result.action, action, action .. " result")
+    T.equal(type(deltaCall.storage.revision), "number",
         action .. " storage")
-    assertEqual(colonyCall, nil, action .. " sent full snapshot")
+    T.equal(colonyCall, nil, action .. " sent full snapshot")
 end
 
 local sendDelta = PNC.Network.SendSettlementDelta
 PNC.Network.SendSettlementDelta = nil
 Router.Handle("ColonyManagementAction", player, { action = "base_create" })
-assertEqual(colonyCall.snapshot.actionResult.action, "base_create",
+T.equal(colonyCall.snapshot.actionResult.action, "base_create",
     "missing delta transport did not send full snapshot")
 PNC.Network.SendSettlementDelta = sendDelta
 
 PNC.ColonyManagement.HandleAction = nil
 Router.Handle("ColonyManagementAction", player, { action = "unknown" })
-assertEqual(colonyCall.snapshot.actionResult.ok, false,
+T.equal(colonyCall.snapshot.actionResult.ok, false,
     "unavailable action handler fallback succeeded")
-assertEqual(colonyCall.snapshot.actionResult.reason, "unknown_colony_action",
+T.equal(colonyCall.snapshot.actionResult.reason, "unknown_colony_action",
     "unavailable action handler fallback reason")
+T.finish("pnc_server_colony_management_command_handler_smoke")
 
-print("pnc_server_colony_management_command_handler_smoke: ok")
+T.finish("pnc_server_colony_management_command_handler_smoke")

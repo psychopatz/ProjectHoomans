@@ -1,21 +1,15 @@
+local T = require "tests/support/test"
+
 local VISUALS =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Visuals/PNC_Visuals.lua"
 local LUA_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+    T.path("ProjectHoomans", "client", "")
 local CLIENT_VISUALS = LUA_ROOT
     .. "PNC/PresenceSync/PresenceVisuals/"
     .. "PNC_ClientPresenceVisuals.lua"
 
-package.path = LUA_ROOT .. "?.lua;" .. package.path
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual")
-            .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+T.addPackagePaths()
 
 local visualEntries = { { fullType = "Base.ServerOwnedShirt" } }
 ItemVisual = {
@@ -34,7 +28,7 @@ ItemVisual = {
 PNC = {
     VisualProfiles = {},
 }
-dofile(VISUALS)
+T.load(VISUALS)
 
 local replicaBody = {
     getItemVisuals = function()
@@ -63,7 +57,7 @@ local replicaBody = {
         error("replica appearance dressed a real outfit")
     end,
 }
-assertEqual(
+T.equal(
     PNC.Visuals.ApplyReplicaAppearance(
         replicaBody,
         {
@@ -78,21 +72,21 @@ assertEqual(
     true,
     "safe replica appearance"
 )
-assertEqual(#visualEntries, 1,
+T.equal(#visualEntries, 1,
     "replica appearance replaced server-owned clothing")
-assertEqual(visualEntries[1].fullType, "Base.ServerOwnedShirt",
+T.equal(visualEntries[1].fullType, "Base.ServerOwnedShirt",
     "replica appearance changed server-owned clothing")
-assertEqual(
+T.equal(
     PNC.Visuals.HasClothingVisuals(replicaBody),
     true,
     "replica clothing visual detection"
 )
-assertEqual(PNC.Visuals.AddClothingVisual(
+T.equal(PNC.Visuals.AddClothingVisual(
     replicaBody,
     "Base.Tshirt_IndieStoneDECAL",
     { decal = "SpiffoLogo" }
 ), true, "decal clothing visual creation")
-assertEqual(visualEntries[2].decal, "SpiffoLogo",
+T.equal(visualEntries[2].decal, "SpiffoLogo",
     "clothing visual discarded its printed decal")
 
 local now = 1000
@@ -158,7 +152,7 @@ PNC = {
         end,
     },
 }
-dofile(CLIENT_VISUALS)
+T.load(CLIENT_VISUALS)
 
 local function makeBody()
     local modData = {}
@@ -195,18 +189,18 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     remoteBody,
     true
 )
-assertEqual(calls.replicaAppearance, 1,
+T.equal(calls.replicaAppearance, 1,
     "remote replica appearance lane")
-assertEqual(calls.replicaEquipment, 1,
+T.equal(calls.replicaEquipment, 1,
     "remote replica equipment lane")
-assertEqual(calls.authoritativeAppearance, 0,
+T.equal(calls.authoritativeAppearance, 0,
     "remote replica used authoritative appearance")
-assertEqual(calls.authoritativeEquipment, 0,
+T.equal(calls.authoritativeEquipment, 0,
     "remote replica used authoritative equipment")
-assertEqual(calls.liveSetup, 0,
+T.equal(calls.liveSetup, 0,
     "remote replica used packet-owning live setup")
 
-assertEqual(
+T.equal(
     PNC.ClientPresenceSync.Internal.EnsureReplicaClothingSnapshot(
         snapshot,
         remoteBody
@@ -214,7 +208,7 @@ assertEqual(
     true,
     "replica clothing integrity check"
 )
-assertEqual(calls.replicaIntegrityChecks, 1,
+T.equal(calls.replicaIntegrityChecks, 1,
     "replica integrity check did not reach equipment")
 
 snapshot.equipmentSummary.primaryFullType = "Base.Hammer"
@@ -223,7 +217,7 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     remoteBody,
     true
 )
-assertEqual(calls.replicaHands, 1,
+T.equal(calls.replicaHands, 1,
     "remote hands update did not stay visual-only")
 
 now = 2100
@@ -232,9 +226,9 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     remoteBody,
     true
 )
-assertEqual(calls.replicaAppearance, 1,
+T.equal(calls.replicaAppearance, 1,
     "unchanged snapshot rebuilt replica appearance")
-assertEqual(calls.replicaEquipment, 1,
+T.equal(calls.replicaEquipment, 1,
     "unchanged snapshot rebuilt server-owned equipment")
 
 local localBody = makeBody()
@@ -243,11 +237,11 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     localBody,
     false
 )
-assertEqual(calls.authoritativeAppearance, 1,
+T.equal(calls.authoritativeAppearance, 1,
     "authoritative appearance lane changed")
-assertEqual(calls.authoritativeEquipment, 1,
+T.equal(calls.authoritativeEquipment, 1,
     "authoritative equipment lane changed")
-assertEqual(calls.liveSetup, 1,
+T.equal(calls.liveSetup, 1,
     "authoritative live setup changed")
 
 local firstNestedVisualSnapshot = {
@@ -282,7 +276,7 @@ local firstNestedVisualKey =
     PNC.ClientPresenceSync.Internal.BuildVisualKey(
         firstNestedVisualSnapshot
     )
-assertEqual(
+T.equal(
     PNC.ClientPresenceSync.Internal.BuildVisualKey(
         secondNestedVisualSnapshot
     ),
@@ -296,7 +290,7 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     localBody,
     false
 )
-assertEqual(calls.authoritativeEquipment, 2,
+T.equal(calls.authoritativeEquipment, 2,
     "first persisted worn visual was not applied")
 snapshot.equipmentSummary.wornVisuals =
     secondNestedVisualSnapshot.equipmentSummary.wornVisuals
@@ -305,7 +299,7 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     localBody,
     false
 )
-assertEqual(calls.authoritativeEquipment, 2,
+T.equal(calls.authoritativeEquipment, 2,
     "single-player rebuilt equivalent decoded item visuals")
 secondNestedVisualSnapshot.equipmentSummary
     .wornVisuals.Hat.tint.g = 0.8
@@ -314,5 +308,6 @@ if PNC.ClientPresenceSync.Internal.BuildVisualKey(
 ) == firstNestedVisualKey then
     error("real nested tint change did not invalidate presentation")
 end
+T.finish("pnc_mp_replica_visual_ownership_smoke")
 
-print("pnc_mp_replica_visual_ownership_smoke: ok")
+T.finish("pnc_mp_replica_visual_ownership_smoke")

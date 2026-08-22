@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "root", "")
 
 local function capture(path)
     local calls = {}
@@ -42,7 +37,7 @@ local function capture(path)
         },
         ProvisionPolicyService = {},
     }
-    local loaded = dofile(path)
+    local loaded = T.load(path)
     require = originalRequire
     return calls, loaded, subscriptions, function() return dirtyRecord end
 end
@@ -60,14 +55,14 @@ local expectedSupply = {
     "PNC/Supply/PNC_SupplyInventory",
     "PNC/Supply/PNC_NPCSupplyService",
 }
-assertEqual(#supplyCalls, #expectedSupply, "Supply require count")
+T.equal(#supplyCalls, #expectedSupply, "Supply require count")
 for index = 1, #expectedSupply do
-    assertEqual(supplyCalls[index], expectedSupply[index],
+    T.equal(supplyCalls[index], expectedSupply[index],
         "Supply require order " .. tostring(index))
 end
-assertEqual(supply.Commands, PNC.SupplyInventory.Commands,
+T.equal(supply.Commands, PNC.SupplyInventory.Commands,
     "Supply command facade")
-assertEqual(supply.Queries, PNC.SupplyInventory.Queries,
+T.equal(supply.Queries, PNC.SupplyInventory.Queries,
     "Supply query facade")
 
 local provisionCalls, provision, subscriptions, getDirtyRecord = capture(
@@ -81,29 +76,28 @@ local expectedProvision = {
     "PsychopatzCore/Events/PC_EventBus",
     "PNC/Core/Events/PNC_EventDefinitions",
 }
-assertEqual(#provisionCalls, #expectedProvision, "Provision require count")
+T.equal(#provisionCalls, #expectedProvision, "Provision require count")
 for index = 1, #expectedProvision do
-    assertEqual(provisionCalls[index], expectedProvision[index],
+    T.equal(provisionCalls[index], expectedProvision[index],
         "Provision require order " .. tostring(index))
 end
-assertEqual(provision.Evaluator, PNC.ProvisionEvaluator,
+T.equal(provision.Evaluator, PNC.ProvisionEvaluator,
     "Provision evaluator facade")
-assertEqual(provision.Scheduler, PNC.ProvisionScheduler,
+T.equal(provision.Scheduler, PNC.ProvisionScheduler,
     "Provision scheduler facade")
-assertEqual(#subscriptions, 1, "Provision inventory subscription count")
-assertEqual(subscriptions[1].eventType, "inventory_changed",
+T.equal(#subscriptions, 1, "Provision inventory subscription count")
+T.equal(subscriptions[1].eventType, "inventory_changed",
     "Provision inventory subscription event")
 local changedRecord = { id = "event-npc" }
 subscriptions[1].listener(changedRecord)
-assertEqual(getDirtyRecord(), changedRecord,
+T.equal(getDirtyRecord(), changedRecord,
     "Provision inventory invalidation listener")
 
-local mutationPath = ROOT
-    .. "shared/PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Mutations.lua"
-local mutationFile = assert(io.open(mutationPath, "r"))
-local mutationSource = mutationFile:read("*a")
-mutationFile:close()
-assertEqual(mutationSource:find("PNC.ProvisionScheduler", 1, true), nil,
+local mutationSource = T.read(
+    "ProjectHoomans", "shared",
+    "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Mutations.lua"
+)
+T.equal(mutationSource:find("PNC.ProvisionScheduler", 1, true), nil,
     "Inventory must not depend directly on Provision")
 if not mutationSource:find(
     "Events.emit(EventTypes.NPC_INVENTORY_CHANGED", 1, true
@@ -125,11 +119,12 @@ require = function(name)
     PNC.Inventory.GetPersistenceMode = function() end
     return true
 end
-dofile(ROOT .. "shared/PNC/Core/Inventory/PNC_Inventory.lua")
+T.load(ROOT .. "shared/PNC/Core/Inventory/PNC_Inventory.lua")
 require = originalRequire
-assertEqual(PNC.Inventory.Commands.ApplyDelta, PNC.Inventory.ApplyDelta,
+T.equal(PNC.Inventory.Commands.ApplyDelta, PNC.Inventory.ApplyDelta,
     "Inventory command compatibility")
-assertEqual(PNC.Inventory.Commands.EnsureRecordInventory,
+T.equal(PNC.Inventory.Commands.EnsureRecordInventory,
     PNC.Inventory.EnsureRecordInventory, "Inventory initialization command")
+T.finish("pnc_pilot_domain_boundaries_smoke")
 
-print("pnc_pilot_domain_boundaries_smoke: ok")
+T.finish("pnc_pilot_domain_boundaries_smoke")

@@ -1,14 +1,6 @@
-local function equal(actual, expected, message)
-    if actual ~= expected then error((message or "mismatch") .. ": expected="
-        .. tostring(expected) .. " actual=" .. tostring(actual)) end
-end
+local T = require "tests/support/test"
 
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/?.lua",
-    "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/?.lua",
-    "../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/?.lua",
-    package.path,
-}, ";")
+T.addPackagePaths()
 
 PsychopatzCore = nil
 local Bootstrap = require "PsychopatzCore/Profiler/PsychopatzProfilerBootstrap"
@@ -26,12 +18,13 @@ PNC = {
 }
 package.loaded["PNC/Integrations/PNC_PsychopatzProfiler"] = nil
 require "PNC/Integrations/PNC_PsychopatzProfiler"
-equal(PNC.SpatialIndex.Rebuild, original, "disabled performance changed hot function")
-equal(#Profiler.GetMetrics(), 0, "disabled performance allocated metrics")
-equal(package.loaded["PNC/Integrations/PNC_PsychopatzModDataProfiler"], nil,
+T.equal(PNC.SpatialIndex.Rebuild, original, "disabled performance changed hot function")
+T.equal(#Profiler.GetMetrics(), 0, "disabled performance allocated metrics")
+T.equal(package.loaded["PNC/Integrations/PNC_PsychopatzModDataProfiler"], nil,
     "disabled ModData loaded analyzer")
-equal(package.loaded["PNC/Integrations/PNC_PsychopatzNPCProfiler"], nil,
+T.equal(package.loaded["PNC/Integrations/PNC_PsychopatzNPCProfiler"], nil,
     "disabled NPC capture loaded analyzer")
 Profiler.Stop()
+T.finish("pnc_profiler_capture_gates_smoke")
 
-print("pnc profiler capture gates: ok")
+T.finish("pnc_profiler_capture_gates_smoke")

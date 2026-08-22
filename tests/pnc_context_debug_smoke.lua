@@ -1,8 +1,4 @@
-local function assertEqual(actual, expected, message)
-    if actual ~= expected then
-        error((message or "assertEqual failed") .. ": expected " .. tostring(expected) .. ", got " .. tostring(actual), 2)
-    end
-end
+local T = require "tests/support/test"
 
 local function findOption(menu, name)
     local i
@@ -28,7 +24,7 @@ local function newMenu()
     return menu
 end
 
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
 local debugAuthorized = false
 local registeredProvider
 local sent = {}
@@ -85,48 +81,49 @@ PNC = {
 getText = function(key) return key end
 ISContextMenu = { getNew = function() return newMenu() end }
 
-dofile(CLIENT_ROOT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Debug.lua")
+T.load(CLIENT_ROOT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Debug.lua")
 
-assertEqual(registeredProvider.id, "debug", "debug provider registered")
-assertEqual(registeredProvider.isEnabled(), false, "provider hidden without debug authorization")
+T.equal(registeredProvider.id, "debug", "debug provider registered")
+T.equal(registeredProvider.isEnabled(), false, "provider hidden without debug authorization")
 debugAuthorized = true
-assertEqual(registeredProvider.isEnabled(), true, "provider enabled with debug authorization")
+T.equal(registeredProvider.isEnabled(), true, "provider enabled with debug authorization")
 
 local menu = newMenu()
 registeredProvider.addOptions(menu, { id = "npc_one" }, {}, {})
 
-assertEqual(#menu.options, 1, "debug commands are grouped under one NPC submenu entry")
-assertEqual(menu.options[1].name, "Debug", "debug submenu uses a readable fallback label")
+T.equal(#menu.options, 1, "debug commands are grouped under one NPC submenu entry")
+T.equal(menu.options[1].name, "Debug", "debug submenu uses a readable fallback label")
 local debugMenu = menu.options[1].submenu
-assertEqual(debugMenu ~= nil, true, "debug submenu attached")
-assertEqual(findOption(debugMenu, "Force Live") ~= nil, true, "debug action moved into debug submenu")
-assertEqual(findOption(debugMenu, "Debug Bandage All (Free)") ~= nil, true,
+T.equal(debugMenu ~= nil, true, "debug submenu attached")
+T.equal(findOption(debugMenu, "Force Live") ~= nil, true, "debug action moved into debug submenu")
+T.equal(findOption(debugMenu, "Debug Bandage All (Free)") ~= nil, true,
     "missing translation falls back to readable bandage-all label")
-assertEqual(findOption(debugMenu, "Orders") ~= nil, true, "debug orders remain available")
-assertEqual(findOption(debugMenu, "Combat") ~= nil, true, "debug combat controls remain available")
-assertEqual(
+T.equal(findOption(debugMenu, "Orders") ~= nil, true, "debug orders remain available")
+T.equal(findOption(debugMenu, "Combat") ~= nil, true, "debug combat controls remain available")
+T.equal(
     findOption(debugMenu, "Animation Scene Lab") ~= nil,
     true,
     "scene lab is available from the NPC debug submenu"
 )
 local infectionOption = findOption(debugMenu, "Infection")
-assertEqual(infectionOption ~= nil, true, "infection debug submenu missing")
+T.equal(infectionOption ~= nil, true, "infection debug submenu missing")
 local clearOption = findOption(infectionOption.submenu, "Clear Knox Infection")
-assertEqual(clearOption ~= nil, true, "infection clear action missing")
-assertEqual(clearOption.notAvailable, false, "infection clear disabled for infected NPC")
+T.equal(clearOption ~= nil, true, "infection clear action missing")
+T.equal(clearOption.notAvailable, false, "infection clear disabled for infected NPC")
 clearOption.callback()
-assertEqual(sent[1].action, "clear_infection", "world menu infection clear action")
-assertEqual(sent[1].payload.id, "npc_one", "world menu infection clear NPC")
+T.equal(sent[1].action, "clear_infection", "world menu infection clear action")
+T.equal(sent[1].payload.id, "npc_one", "world menu infection clear NPC")
 
 local bandageOption = findOption(debugMenu, "Bandage State")
-assertEqual(bandageOption ~= nil, true, "bandage debug submenu missing")
+T.equal(bandageOption ~= nil, true, "bandage debug submenu missing")
 local almostDirty = findOption(
     bandageOption.submenu,
     "Make Almost Dirty: Left Hand"
 )
-assertEqual(almostDirty ~= nil, true, "almost-dirty bandage action missing")
+T.equal(almostDirty ~= nil, true, "almost-dirty bandage action missing")
 almostDirty.callback()
-assertEqual(sent[2].action, "bandage_almost_dirty", "world menu almost-dirty action")
-assertEqual(sent[2].payload.partId, "Hand_L", "world menu almost-dirty part")
+T.equal(sent[2].action, "bandage_almost_dirty", "world menu almost-dirty action")
+T.equal(sent[2].payload.partId, "Hand_L", "world menu almost-dirty part")
+T.finish("pnc_context_debug_smoke")
 
-print("pnc_context_debug_smoke: ok")
+T.finish("pnc_context_debug_smoke")

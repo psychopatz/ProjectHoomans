@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Behaviors/PNC_Behavior_Combat.lua"
+    T.path("ProjectHoomans", "shared", "PNC/Core/Behaviors/PNC_Behavior_Combat.lua")
 
 local handApplications = 0
 local attackPumps = 0
@@ -38,7 +40,7 @@ PNC = {
             }
         end,
         ApplyCombatState = function(_, _, attackMode)
-            assert(attackMode == true,
+            T.truthy(attackMode == true,
                 "committed attack attempted to holster its weapon")
             handApplications = handApplications + 1
             return true
@@ -54,7 +56,7 @@ PNC = {
     PathService = {},
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local record = {
     weaponMode = "melee",
@@ -68,46 +70,43 @@ local record = {
     },
 }
 
-assert(PNC.BehaviorCombat.TickCommittedAction(record, {}) == true,
+T.truthy(PNC.BehaviorCombat.TickCommittedAction(record, {}) == true,
     "committed attack did not retain behavior ownership")
-assert(handApplications == 1,
+T.truthy(handApplications == 1,
     "committed attack did not maintain combat hands")
-assert(attackPumps == 1,
+T.truthy(attackPumps == 1,
     "committed attack was not pumped without a fresh target")
-assert(movementHolds == 1,
+T.truthy(movementHolds == 1,
     "committed attack did not retain its movement hold")
 
 keepActionActive = false
 record.runtime.attackAction = {
     finishAt = 900,
 }
-assert(PNC.BehaviorCombat.TickCommittedAction(record, {}) == false,
+T.truthy(PNC.BehaviorCombat.TickCommittedAction(record, {}) == false,
     "finished attack retained behavior ownership")
-assert(record.runtime.attackAction == nil,
+T.truthy(record.runtime.attackAction == nil,
     "finished attack was not cleared without a fresh target")
-assert(attackPumps == 2,
+T.truthy(attackPumps == 2,
     "expired committed attack skipped its finish pump")
 
-local behaviorFile = assert(io.open(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-        .. "Behaviors/PNC_BehaviorSystem.lua",
-    "rb"
-))
-local behaviorSource = behaviorFile:read("*a")
-behaviorFile:close()
-local committedAt = assert(string.find(
+local behaviorSource = T.read(
+    "ProjectHoomans", "shared", "PNC/Core/Behaviors/PNC_BehaviorSystem.lua"
+)
+local committedAt = T.truthy(string.find(
     behaviorSource,
     "Combat.TickCommittedAction(record, zombie)",
     1,
     true
 ))
-local treatmentAt = assert(string.find(
+local treatmentAt = T.truthy(string.find(
     behaviorSource,
     "Treatment.Tick(record, zombie, now)",
     1,
     true
 ))
-assert(committedAt < treatmentAt,
+T.truthy(committedAt < treatmentAt,
     "self-treatment can preempt a committed attack")
+T.finish("pnc_combat_commitment_smoke")
 
-print("pnc_combat_commitment_smoke: ok")
+T.finish("pnc_combat_commitment_smoke")

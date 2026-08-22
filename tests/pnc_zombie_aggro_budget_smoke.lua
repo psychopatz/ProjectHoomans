@@ -1,4 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 local now = 1000
 
 PNC = {
@@ -36,8 +38,8 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Zombies/PNC_ZombieAggro_State.lua")
-dofile(ROOT .. "Zombies/PNC_ZombieAggro_ActiveSet.lua")
+T.load(ROOT .. "Zombies/PNC_ZombieAggro_State.lua")
+T.load(ROOT .. "Zombies/PNC_ZombieAggro_ActiveSet.lua")
 
 local zombies = {}
 for i = 1, 100 do
@@ -52,7 +54,7 @@ for i = 1, 100 do
             return self.data
         end,
     }
-    assert(PNC.ZombieAggro.Activate(zombies[i], now, "test"),
+    T.truthy(PNC.ZombieAggro.Activate(zombies[i], now, "test"),
         "failed to activate zombie")
 end
 
@@ -64,21 +66,22 @@ local first = PNC.ZombieAggro.PumpActiveSet(now, function()
         pathRequests = pathRequests + 1
     end
 end)
-assert(first == 10 and processed == 10,
+T.truthy(first == 10 and processed == 10,
     "active aggro processing exceeded its per-tick budget")
-assert(pathRequests == 3,
+T.truthy(pathRequests == 3,
     "zombie pursuit path budget was not enforced")
 
 local second = PNC.ZombieAggro.PumpActiveSet(now, function()
     processed = processed + 1
 end)
-assert(second == 10 and processed == 20,
+T.truthy(second == 10 and processed == 20,
     "active aggro cursor did not continue through the bounded set")
 
 now = 3000
 local expired = PNC.ZombieAggro.PumpActiveSet(now, function()
     error("expired zombie was processed")
 end)
-assert(expired == 0, "expired active zombies were retained")
+T.truthy(expired == 0, "expired active zombies were retained")
+T.finish("pnc_zombie_aggro_budget_smoke")
 
-print("pnc_zombie_aggro_budget_smoke: ok")
+T.finish("pnc_zombie_aggro_budget_smoke")

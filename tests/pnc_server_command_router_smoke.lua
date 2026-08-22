@@ -36,14 +36,14 @@ T.equal(Router.Handle("UnknownCommand", player, {}), false,
     "unknown command fallthrough")
 
 local source = T.read("ProjectHoomans", "server", "PNC/PNC_Server.lua")
-local moduleGate = assert(string.find(source, "module ~= Const.MODULE", 1, true))
-local routerCall = assert(string.find(
+local moduleGate = T.truthy(string.find(source, "module ~= Const.MODULE", 1, true))
+local routerCall = T.truthy(string.find(
     source,
     "CommandRouter.Handle(command, player, args)",
     1,
     true
 ))
-assert(moduleGate < routerCall,
+T.truthy(moduleGate < routerCall,
     "module namespace must be validated before domain routing")
 
 T.finish("pnc_server_command_router_smoke")

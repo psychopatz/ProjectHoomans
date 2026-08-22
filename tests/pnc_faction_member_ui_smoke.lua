@@ -1,13 +1,7 @@
-local CLIENT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal")
-            .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local CLIENT =
+    T.path("ProjectHoomans", "client", "PNC/")
 
 local function derive(base)
     local child = {}
@@ -78,10 +72,10 @@ package.preload[
     "PNC/UI/Factions/PNC_FactionMemberModal"
 ] = function() return PNC.FactionMemberModal end
 
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
-dofile(
+T.load(
     CLIENT
         .. "UI/Factions/PNC_FactionMemberWindow.lua"
 )
@@ -136,31 +130,32 @@ setmetatable(
 )
 
 window:onAction({ internal = "add_player" })
-equal(modalOptions ~= nil, true, "add opens confirmation modal")
-equal(
+T.equal(modalOptions ~= nil, true, "add opens confirmation modal")
+T.equal(
     modalOptions.context.playerKey,
     "player:Alex:char_alex",
     "modal keeps stable player key"
 )
 modalOptions.onConfirm(modalOptions.context)
-equal(memberAction.action, "add_player",
+T.equal(memberAction.action, "add_player",
     "confirmed add uses membership channel")
-equal(memberAction.playerKey,
+T.equal(memberAction.playerKey,
     "player:Alex:char_alex",
     "confirmed add target")
 
 window:onAction({ internal = "follow" })
-equal(companionCommand.command, "follow",
+T.equal(companionCommand.command, "follow",
     "selected NPC quick follow")
-equal(companionCommand.npcID, "npc_1",
+T.equal(companionCommand.npcID, "npc_1",
     "selected NPC command target")
 
 window:onAction({ internal = "all_stay" })
-equal(companionCommand.command, "stay",
+T.equal(companionCommand.command, "stay",
     "group quick stay")
-equal(companionCommand.npcID, nil,
+T.equal(companionCommand.npcID, nil,
     "group command has no single target")
-equal(companionCommand.scope, "group",
+T.equal(companionCommand.scope, "group",
     "group command scope")
+T.finish("pnc_faction_member_ui_smoke")
 
-print("pnc_faction_member_ui_smoke: ok")
+T.finish("pnc_faction_member_ui_smoke")

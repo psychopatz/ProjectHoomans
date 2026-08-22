@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local function makeList(values)
     return {
@@ -103,10 +98,10 @@ getCell = function()
     }
 end
 
-dofile(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_State.lua")
-dofile(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_World.lua")
-dofile(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_LiveBodies.lua")
-dofile(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Startup.lua")
+T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_State.lua")
+T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_World.lua")
+T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_LiveBodies.lua")
+T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Startup.lua")
 
 records.marked = {
     id = "marked",
@@ -182,19 +177,19 @@ PNC.Registry.LiveByID.canonical = canonical
 
 PNC.BodyLifecycle.BeginStartupBodyCleanup(now)
 local first = PNC.BodyLifecycle.PumpStartupBodyCleanup(now, true)
-assertEqual(first.removed, 2, "stale startup shells removed")
-assertEqual(marked.wasRemoved(), true, "marked persisted shell removed")
-assertEqual(legacyNaked.wasRemoved(), true, "naked body-hint shell removed")
-assertEqual(unrelatedNaked.wasRemoved(), false, "unrelated naked zombie preserved")
-assertEqual(canonical.wasRemoved(), false, "canonical body preserved")
-assertEqual(#removals, 2, "instance removal packets sent")
-assertEqual(#warnings, 2, "repair logs emitted")
+T.equal(first.removed, 2, "stale startup shells removed")
+T.equal(marked.wasRemoved(), true, "marked persisted shell removed")
+T.equal(legacyNaked.wasRemoved(), true, "naked body-hint shell removed")
+T.equal(unrelatedNaked.wasRemoved(), false, "unrelated naked zombie preserved")
+T.equal(canonical.wasRemoved(), false, "canonical body preserved")
+T.equal(#removals, 2, "instance removal packets sent")
+T.equal(#warnings, 2, "repair logs emitted")
 
 now = now + 16
 PNC.BodyLifecycle.PumpStartupBodyCleanup(now, false)
 now = now + 16
 PNC.BodyLifecycle.PumpStartupBodyCleanup(now, false)
-assertEqual(
+T.equal(
     PNC.BodyLifecycle.IsStartupBodyCleanupComplete(),
     true,
     "startup gate released after quiet passes"
@@ -217,7 +212,7 @@ local earlyNaked = makeBody({
     naked = true,
 })
 PNC.BodyLifecycle.BeginStartupBodyCleanup(now, true)
-assertEqual(
+T.equal(
     PNC.BodyLifecycle.InterceptLoadedShell(
         earlyNaked,
         "test_early_zombie_update"
@@ -225,15 +220,16 @@ assertEqual(
     true,
     "early zombie lane removed naked shell"
 )
-assertEqual(earlyNaked.wasRemoved(), true, "early naked shell removed immediately")
-assertEqual(directSafetyApplications, 3,
+T.equal(earlyNaked.wasRemoved(), true, "early naked shell removed immediately")
+T.equal(directSafetyApplications, 3,
     "matched shells made harmless before removal")
 local synchronous = PNC.BodyLifecycle.RunStartupBodyCleanupNow(
     now,
     "test_world_ready",
     true
 )
-assertEqual(synchronous.complete, true,
+T.equal(synchronous.complete, true,
     "world-ready cleanup completed synchronously")
+T.finish("pnc_persisted_shell_cleanup_smoke")
 
-print("pnc_persisted_shell_cleanup_smoke: ok")
+T.finish("pnc_persisted_shell_cleanup_smoke")

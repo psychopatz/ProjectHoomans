@@ -1,12 +1,7 @@
-local SERVER_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected="
-            .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local SERVER_ROOT =
+    T.path("ProjectHoomans", "server", "PNC/")
 
 local record = {
     uuid = "char_online_survivor",
@@ -122,7 +117,7 @@ PNC = {
     Relationships = {
         SetInitialBaseline = function(_, _, standing)
             relationshipCount = relationshipCount + 1
-            assertEqual(standing.familiarity >= 90, true,
+            T.equal(standing.familiarity >= 90, true,
                 "lifelong familiarity baseline")
             return {}
         end,
@@ -167,39 +162,39 @@ local player = {
     end,
 }
 
-dofile(SERVER_ROOT .. "PNC_StartingCompanionService.lua")
+T.load(SERVER_ROOT .. "PNC_StartingCompanionService.lua")
 
 local granted, reason, result = PNC.StartingCompanions.Ensure(
     player, record.uuid, 12
 )
-assertEqual(granted, true, "first ensure grants all companions")
-assertEqual(reason, "granted", "first ensure result")
-assertEqual(#result.npcIDs, 3, "three selected companions returned")
-assertEqual(spawnCount, 3, "one NPC per selected trait")
-assertEqual(assignCount, 3, "all companions assigned")
-assertEqual(relationshipCount, 3, "all relationships initialized")
-assertEqual(knowledgeCount, 3, "all dossiers initialized")
-assertEqual(commitCount, 4, "selection plus each grant committed")
+T.equal(granted, true, "first ensure grants all companions")
+T.equal(reason, "granted", "first ensure result")
+T.equal(#result.npcIDs, 3, "three selected companions returned")
+T.equal(spawnCount, 3, "one NPC per selected trait")
+T.equal(assignCount, 3, "all companions assigned")
+T.equal(relationshipCount, 3, "all relationships initialized")
+T.equal(knowledgeCount, 3, "all dossiers initialized")
+T.equal(commitCount, 4, "selection plus each grant committed")
 
 local brother = npcs[record.startingCompanions.grants.PNC_HasBrother.npcID]
 local lover = npcs[record.startingCompanions.grants.PNC_HasLover.npcID]
 local friend = npcs[record.startingCompanions.grants.PNC_HasFriend.npcID]
-assertEqual(brother.identity.survivor.surname, "SurvivorFamily",
+T.equal(brother.identity.survivor.surname, "SurvivorFamily",
     "family companion shares player surname")
-assertEqual(lover.identity.survivor.surname, "SurvivorFamily",
+T.equal(lover.identity.survivor.surname, "SurvivorFamily",
     "married lover shares player surname")
-assertEqual(friend.identity.survivor.surname, "Random",
+T.equal(friend.identity.survivor.surname, "Random",
     "friend keeps independently generated surname")
-assertEqual(lover.isFemale, true,
+T.equal(lover.isFemale, true,
     "gay female survivor receives female lover")
 
 granted, reason = PNC.StartingCompanions.Ensure(
     player, record.uuid, 13
 )
-assertEqual(granted, false, "reconnect does not grant again")
-assertEqual(reason, "granted", "reconnect sees persisted grants")
-assertEqual(spawnCount, 3, "reconnect creates no duplicates")
-assertEqual(assignCount, 3, "reconnect performs no reassignment")
+T.equal(granted, false, "reconnect does not grant again")
+T.equal(reason, "granted", "reconnect sees persisted grants")
+T.equal(spawnCount, 3, "reconnect creates no duplicates")
+T.equal(assignCount, 3, "reconnect performs no reassignment")
 
 -- Existing grants repair a stale faction/community link exactly once.
 lover.affiliation = nil
@@ -207,22 +202,23 @@ record.startingCompanions.grants.PNC_HasLover.enrichmentVersion = 2
 granted, reason = PNC.StartingCompanions.Ensure(
     player, record.uuid, 14
 )
-assertEqual(granted, true, "stale enrollment is repaired")
-assertEqual(reason, "granted", "repair completes grant")
-assertEqual(assignCount, 4, "only stale companion is reassigned")
+T.equal(granted, true, "stale enrollment is repaired")
+T.equal(reason, "granted", "repair completes grant")
+T.equal(assignCount, 4, "only stale companion is reassigned")
 granted, reason = PNC.StartingCompanions.Ensure(
     player, record.uuid, 15
 )
-assertEqual(granted, false, "completed repair is not repeated")
-assertEqual(reason, "granted", "completed repair remains resolved")
-assertEqual(assignCount, 4, "repair performs no per-frame reassignment")
+T.equal(granted, false, "completed repair is not repeated")
+T.equal(reason, "granted", "completed repair remains resolved")
+T.equal(assignCount, 4, "repair performs no per-frame reassignment")
 local stableCommitCount = commitCount
 for frame = 1, 120 do
     PNC.StartingCompanions.Ensure(player, record.uuid, 15 + frame)
 end
-assertEqual(assignCount, 4,
+T.equal(assignCount, 4,
     "steady lifecycle checks never repeat companion assignment")
-assertEqual(commitCount, stableCommitCount,
+T.equal(commitCount, stableCommitCount,
     "steady lifecycle checks never save companion state per frame")
+T.finish("pnc_starting_companion_smoke")
 
-print("pnc_starting_companion_smoke: ok")
+T.finish("pnc_starting_companion_smoke")

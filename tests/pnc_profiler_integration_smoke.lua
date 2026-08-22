@@ -1,13 +1,6 @@
-local function equal(actual, expected, message)
-    if actual ~= expected then error((message or "mismatch") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual)) end
-end
+local T = require "tests/support/test"
 
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/?.lua",
-    "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/?.lua",
-    "../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/?.lua",
-    package.path,
-}, ";")
+T.addPackagePaths()
 
 PsychopatzCore = nil
 local Bootstrap = require "PsychopatzCore/Profiler/PsychopatzProfilerBootstrap"
@@ -38,27 +31,28 @@ PNC = {
 
 local Integration = require "PNC/Integrations/PNC_PsychopatzProfiler"
 if PNC.SpatialIndex.Rebuild == originalSpatial then error("active integration did not wrap") end
-equal(PNC.SpatialIndex.Rebuild(), "spatial", "wrapper changed return")
+T.equal(PNC.SpatialIndex.Rebuild(), "spatial", "wrapper changed return")
 Integration.InstallServer()
 if PNC.Network.Internal.BuildRecordPayload == originalBuildPayload then
     error("server network phase was not wrapped")
 end
-equal(PNC.Network.Internal.BuildRecordPayload(), "payload", "network phase wrapper changed return")
+T.equal(PNC.Network.Internal.BuildRecordPayload(), "payload", "network phase wrapper changed return")
 now = 1000
 Profiler.Sample(1000)
 local gauges = Profiler.GetMetrics("gauge", "ProjectHoomans")
 if #gauges < 6 then error("Project Hoomans samplers were not registered") end
 Profiler.Stop()
-equal(PNC.SpatialIndex.Rebuild, originalSpatial, "stop did not restore original hot function")
-equal(PNC.Network.Internal.BuildRecordPayload, originalBuildPayload, "network phase did not restore")
-equal(callback, nil, "profiler callback survived stop")
+T.equal(PNC.SpatialIndex.Rebuild, originalSpatial, "stop did not restore original hot function")
+T.equal(PNC.Network.Internal.BuildRecordPayload, originalBuildPayload, "network phase did not restore")
+T.equal(callback, nil, "profiler callback survived stop")
 
 Bootstrap.mode = "OFF"
 package.loaded["PNC/Integrations/PNC_PsychopatzProfiler"] = nil
 local offOriginal = function() return "off" end
 PNC = { SpatialIndex = { Rebuild = offOriginal } }
 require "PNC/Integrations/PNC_PsychopatzProfiler"
-equal(PNC.SpatialIndex.Rebuild, offOriginal, "OFF integration changed the hot path")
-equal(Profiler.GetState(), nil, "OFF integration created profiler state")
+T.equal(PNC.SpatialIndex.Rebuild, offOriginal, "OFF integration changed the hot path")
+T.equal(Profiler.GetState(), nil, "OFF integration created profiler state")
+T.finish("pnc_profiler_integration_smoke")
 
-print("pnc_profiler_integration_smoke: ok")
+T.finish("pnc_profiler_integration_smoke")

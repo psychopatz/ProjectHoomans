@@ -1,15 +1,17 @@
+local T = require "tests/support/test"
+
 local CATALOG_FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Debug/"
+    T.path("ProjectHoomans", "client", "PNC/Debug/")
         .. "PNC_AnimationDebugCatalog.lua"
 
 PNC = {}
-dofile(CATALOG_FILE)
+T.load(CATALOG_FILE)
 
 local catalog = PNC.AnimationDebugCatalog
-assert(catalog.generatedCount == 544, "catalog must include every zombie XML node")
-assert(#catalog.entries == 544, "catalog entry count mismatch")
-assert(catalog.stateCounts.hitreaction == 41, "nested hitreaction nodes missing")
-assert(catalog.stateCounts.bumped == 236, "bumped node inventory mismatch")
+T.truthy(catalog.generatedCount == 544, "catalog must include every zombie XML node")
+T.truthy(#catalog.entries == 544, "catalog entry count mismatch")
+T.truthy(catalog.stateCounts.hitreaction == 41, "nested hitreaction nodes missing")
+T.truthy(catalog.stateCounts.bumped == 236, "bumped node inventory mismatch")
 
 local attack
 local inheritedStagger
@@ -18,7 +20,7 @@ local fenceEnd
 local keys = {}
 for _, entry in ipairs(catalog.entries) do
     local key = entry.folder .. "/" .. entry.file
-    assert(not keys[key], "duplicate catalog entry: " .. key)
+    T.truthy(not keys[key], "duplicate catalog entry: " .. key)
     keys[key] = true
     if entry.state == "bumped"
         and entry.file == "PNC_Anim_Attack2H2.xml"
@@ -39,41 +41,42 @@ for _, entry in ipairs(catalog.entries) do
     end
 end
 
-assert(attack, "Attack2H2 XML node missing")
-assert(attack.node == "PNC_Anim_Attack2H2", "Attack2H2 node name mismatch")
-assert(attack.anim == "Bob_AttackBat01_HitB", "Attack2H2 clip mismatch")
-assert(attack.playable == true, "Attack2H2 must be playable")
-assert(attack.conditions[2].name == "BumpType", "Attack2H2 selector missing")
-assert(
+T.truthy(attack, "Attack2H2 XML node missing")
+T.truthy(attack.node == "PNC_Anim_Attack2H2", "Attack2H2 node name mismatch")
+T.truthy(attack.anim == "Bob_AttackBat01_HitB", "Attack2H2 clip mismatch")
+T.truthy(attack.playable == true, "Attack2H2 must be playable")
+T.truthy(attack.conditions[2].name == "BumpType", "Attack2H2 selector missing")
+T.truthy(
     attack.conditions[2].value == "PNC_Legacy_Attack2H2",
     "Attack2H2 selector is not isolated from the canonical PNC graph"
 )
 
-assert(inheritedStagger, "derived stagger node missing")
-assert(
+T.truthy(inheritedStagger, "derived stagger node missing")
+T.truthy(
     inheritedStagger.conditions[2].name == "hitforce",
     "x_extends condition name was not inherited by array index"
 )
-assert(
+T.truthy(
     inheritedStagger.conditions[2].kind == "LESS",
     "derived condition type did not override its parent"
 )
-assert(
+T.truthy(
     inheritedStagger.conditions[2].value == "0.0",
     "x_extends numeric condition value was not inherited"
 )
-assert(fenceStart and fenceEnd, "split fence animation nodes missing")
-assert(
+T.truthy(fenceStart and fenceEnd, "split fence animation nodes missing")
+T.truthy(
     fenceStart.anim == "Bob_VaultOver_Start",
     "fence raise clip mismatch"
 )
-assert(
+T.truthy(
     fenceStart.events[1].parameter == "PNCTraversalPhase=transfer",
     "fence raise does not hand off to crossing phase"
 )
-assert(
+T.truthy(
     fenceEnd.anim == "Bob_VaultOver_End",
     "fence landing clip mismatch"
 )
+T.finish("pnc_animation_debug_catalog_smoke")
 
-print("pnc_animation_debug_catalog_smoke: ok")
+T.finish("pnc_animation_debug_catalog_smoke")

@@ -1,4 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "client", "PNC/")
     .. "UI/Communities/PNC_ColonyManagementWorkshopTab.lua"
 
 getText = function(key) return key end
@@ -49,28 +51,29 @@ local snapshot = {
     } },
 }
 
-assert(dofile(FILE).Rebuild(window, snapshot,
+T.truthy(T.load(FILE).Rebuild(window, snapshot,
     function(_, fallback) return fallback end) == true)
-assert(#window.workshopRecipeList.items == 2,
+T.truthy(#window.workshopRecipeList.items == 2,
     "workshop must show one header and one recipe row")
 local recipe = window.workshopRecipeList.items[2]
-assert(recipe.name == "Crafted Spear"
+T.truthy(recipe.name == "Crafted Spear"
     and recipe.catalogCells.quantity == "-  1  +"
     and recipe.catalogCells.availability == "AVAILABLE",
     "recipe row is missing quantity or stock availability")
-assert(#window.workshopSalvageList.items == 2
+T.truthy(#window.workshopSalvageList.items == 2
     and window.workshopSalvageList.items[2].fullType == "Base.SpearCrafted",
     "salvage list should only contain supported grouped specimens")
-assert(window.workshopSalvageList.items[2].catalogCells.availability
+T.truthy(window.workshopSalvageList.items[2].catalogCells.availability
     == "1x Base.Plank", "salvage row should expose its potential yield")
-assert(dofile(FILE).Rebuild(window, snapshot,
+T.truthy(T.load(FILE).Rebuild(window, snapshot,
     function(_, fallback) return fallback end) == true)
-assert(#window.workshopQueueList.items == 1,
+T.truthy(#window.workshopQueueList.items == 1,
     "workshop queue refresh must not accumulate headers")
-assert(#details == 0,
+T.truthy(#details == 0,
     "completed construction history leaked into production queue")
-assert(window.workshopLaneAvailability.craft
+T.truthy(window.workshopLaneAvailability.craft
     and window.workshopLaneAvailability.salvage,
     "workshop subtabs did not discover their assigned components")
+T.finish("pnc_colony_management_workshop_catalog_smoke")
 
-print("pnc_colony_management_workshop_catalog_smoke: ok")
+T.finish("pnc_colony_management_workshop_catalog_smoke")

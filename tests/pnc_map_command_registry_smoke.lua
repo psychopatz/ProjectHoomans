@@ -1,4 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "client", "PNC/UI/Map/")
 local sent
 local registeredLayer
 local gameSpeed = 0
@@ -95,46 +97,47 @@ PNC = {
     },
 }
 
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
-dofile(FILE .. "PNC_MapCommandRegistry.lua")
-dofile(FILE .. "Commands/PNC_MapCommand_Travel.lua")
+T.load(FILE .. "PNC_MapCommandRegistry.lua")
+T.load(FILE .. "Commands/PNC_MapCommand_Travel.lua")
 
-assert(PNC.MapCommands.OpenForNPC({
+T.truthy(PNC.MapCommands.OpenForNPC({
     id = "npc:1",
     name = "Map Tester",
     x = 50,
     y = 60,
     z = 0,
 }), "command map did not open")
-assert(gameSpeed == 1, "command map left single-player simulation paused")
-assert(PNC.MapCommands.IsSelected("npc:1"),
+T.truthy(gameSpeed == 1, "command map left single-player simulation paused")
+T.truthy(PNC.MapCommands.IsSelected("npc:1"),
     "command map lost the selected NPC")
-assert(registeredLayer and registeredLayer.order == 1000,
+T.truthy(registeredLayer and registeredLayer.order == 1000,
     "command status did not register as an independent map layer")
 
 setmetatable(map, { __index = ISWorldMap })
-assert(map:onRightMouseUp(25, 35) == true,
+T.truthy(map:onRightMouseUp(25, 35) == true,
     "command mode did not consume right click")
-assert(originalRightClicks == 0,
+T.truthy(originalRightClicks == 0,
     "vanilla debug map context replaced the NPC command context")
-assert(submenu and #submenu.options == 1,
+T.truthy(submenu and #submenu.options == 1,
     "travel provider did not populate the map context menu")
-assert(submenu.options[1].name == "Move Map Tester here",
+T.truthy(submenu.options[1].name == "Move Map Tester here",
     "travel context label lost the NPC name")
 submenu.options[1].callback()
-assert(sent and sent.commandID == "travel"
+T.truthy(sent and sent.commandID == "travel"
     and sent.npcIds[1] == "npc:1"
     and sent.target.x == 1025
     and sent.target.y == 2035,
     "map travel provider dispatched the wrong command payload")
 
 map:close()
-assert(not PNC.MapCommands.IsSelected("npc:1"),
+T.truthy(not PNC.MapCommands.IsSelected("npc:1"),
     "closing the command map retained stale selection")
 map:onRightMouseUp(1, 1)
-assert(originalRightClicks == 1,
+T.truthy(originalRightClicks == 1,
     "normal map right click was not restored after command mode")
+T.finish("pnc_map_command_registry_smoke")
 
-print("pnc_map_command_registry_smoke: ok")
+T.finish("pnc_map_command_registry_smoke")

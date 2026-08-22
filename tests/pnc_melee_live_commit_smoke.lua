@@ -1,13 +1,7 @@
-local ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual")
-            .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT =
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local now = 1000
 local animation
@@ -128,8 +122,8 @@ PNC = {
 }
 
 ZombRand = function() return 0 end
-dofile(ROOT .. "Visuals/PNC_Animation.lua")
-dofile(ROOT .. "Combat/PNC_Combat.lua")
+T.load(ROOT .. "Visuals/PNC_Animation.lua")
+T.load(ROOT .. "Combat/PNC_Combat.lua")
 
 PNC.Combat.HasActiveAttack = function() return false end
 PNC.Combat.Internal.buildAttackAction = function(
@@ -147,7 +141,7 @@ PNC.Combat.Internal.buildAttackAction = function(
     }
 end
 
-dofile(ROOT .. "Combat/PNC_Combat_Melee.lua")
+T.load(ROOT .. "Combat/PNC_Combat_Melee.lua")
 
 local record = {
     x = 0,
@@ -177,9 +171,9 @@ local started, reason = PNC.Combat.TryMelee(
     body,
     target
 )
-assertEqual(started, false, "outer hit radius started melee windup")
-assertEqual(reason, "target_out_of_range", "outer hit radius reason")
-assertEqual(action, nil, "outer hit radius committed an attack")
+T.equal(started, false, "outer hit radius started melee windup")
+T.equal(reason, "target_out_of_range", "outer hit radius reason")
+T.equal(action, nil, "outer hit radius committed an attack")
 
 record.runtime.lastAttackAt = 0
 record.runtime.stealthActive = true
@@ -190,61 +184,62 @@ started, reason = PNC.Combat.TryMelee(
     body,
     target
 )
-assertEqual(started, true, "live distance opens melee commit")
-assertEqual(reason, "melee_attack_started", "melee commit reason")
-assert(
+T.equal(started, true, "live distance opens melee commit")
+T.equal(reason, "melee_attack_started", "melee commit reason")
+T.truthy(
     math.abs(target.distSq - (0.95 * 0.95)) < 0.0001,
     "stale target distance was not refreshed from live body"
 )
-assertEqual(heldReason, "melee_windup", "movement held before attack")
-assertEqual(handoffEvents[1], "path_reset",
+T.equal(heldReason, "melee_windup", "movement held before attack")
+T.equal(handoffEvents[1], "path_reset",
     "native movement was not released before melee")
-assertEqual(handoffEvents[2], "stealth_suspended",
+T.equal(handoffEvents[2], "stealth_suspended",
     "follow stealth was not released before melee")
-assertEqual(handoffEvents[3], "action_built",
+T.equal(handoffEvents[3], "action_built",
     "attack action was published before movement released")
-assertEqual(record.runtime.stealthActive, false,
+T.equal(record.runtime.stealthActive, false,
     "melee retained the sneak locomotion branch")
-assertEqual(animation, nil, "server directly rendered the melee bump")
-assertEqual(
+T.equal(animation, nil, "server directly rendered the melee bump")
+T.equal(
     variables.BumpDone,
     nil,
     "server wrote client-owned BumpDone variable"
 )
-assertEqual(variables.BumpFall, nil, "server wrote client-owned BumpFall")
-assertEqual(
+T.equal(variables.BumpFall, nil, "server wrote client-owned BumpFall")
+T.equal(
     variables.BumpFallType,
     nil,
     "server wrote client-owned BumpFallType"
 )
-assertEqual(actionState, "pathfind", "state is not forced from Lua")
-assertEqual(
+T.equal(actionState, "pathfind", "state is not forced from Lua")
+T.equal(
     record.runtime.lastAnimationTrigger,
     nil,
     "server recorded a client-owned animation trigger"
 )
-assertEqual(
+T.equal(
     animationTarget,
     nil,
     "setter-driven bump does not bind BumpedChr"
 )
-assertEqual(action.attackKind, "melee", "melee action committed")
-assertEqual(
+T.equal(action.attackKind, "melee", "melee action committed")
+T.equal(
     action.anim,
     "PNC_Attack1H1",
     "selected animation was not snapshotted"
 )
 
 record.runtime.lastAttackAt = now + 60000
-assertEqual(
+T.equal(
     PNC.Combat.Internal.canAttack(record, now, 900),
     true,
     "future session timestamp suppressed melee"
 )
-assertEqual(
+T.equal(
     record.runtime.lastAttackAt,
     0,
     "future session timestamp was not normalized"
 )
+T.finish("pnc_melee_live_commit_smoke")
 
-print("pnc_melee_live_commit_smoke: ok")
+T.finish("pnc_melee_live_commit_smoke")

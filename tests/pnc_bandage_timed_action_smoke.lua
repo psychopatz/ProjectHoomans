@@ -1,12 +1,7 @@
-local ACTION_PATH =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Actions/PNC_BandageAction.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ACTION_PATH =
+    T.path("ProjectHoomans", "client", "PNC/Actions/PNC_BandageAction.lua")
 
 local Base = {}
 function Base:derive()
@@ -106,41 +101,41 @@ PNC = {
     },
 }
 
-dofile(ACTION_PATH)
+T.load(ACTION_PATH)
 
 local ok, reason = PNCBandageAction.Queue(
     player, "npc_timed", "Hand_R", false, "Base.Bandage"
 )
-assertEqual(ok, true, "queue action")
-assertEqual(reason, "queued", "queue reason")
-assert(queued, "timed action was not queued")
-assertEqual(#completed, 0, "bandage completed before timed action")
-assertEqual(queued.maxTime, 104, "First Aid duration")
-assertEqual(queued:isValid(), true, "queued action validity")
+T.equal(ok, true, "queue action")
+T.equal(reason, "queued", "queue reason")
+T.truthy(queued, "timed action was not queued")
+T.equal(#completed, 0, "bandage completed before timed action")
+T.equal(queued.maxTime, 104, "First Aid duration")
+T.equal(queued:isValid(), true, "queued action validity")
 
 queued:start()
-assertEqual(queued.startedAnimation, "Loot", "other-character treatment animation")
-assertEqual(player.animationVariable, "LootPosition=Mid", "mid treatment pose")
-assertEqual(player.reportedEvent, "EventLootItem", "treatment interaction event")
-assertEqual(playedSound, "FirstAidApplyBandage", "vanilla bandage SFX")
-assertEqual(queued.useProgressBar, true, "vanilla loading bar enabled")
-assertEqual(item.jobType, "Bandage", "item progress label")
+T.equal(queued.startedAnimation, "Loot", "other-character treatment animation")
+T.equal(player.animationVariable, "LootPosition=Mid", "mid treatment pose")
+T.equal(player.reportedEvent, "EventLootItem", "treatment interaction event")
+T.equal(playedSound, "FirstAidApplyBandage", "vanilla bandage SFX")
+T.equal(queued.useProgressBar, true, "vanilla loading bar enabled")
+T.equal(item.jobType, "Bandage", "item progress label")
 
 queued:update()
-assertEqual(item.jobDelta, 0.5, "item loading progress")
+T.equal(item.jobDelta, 0.5, "item loading progress")
 queued:perform()
-assertEqual(completed[1], "npc_timed", "authoritative completion npc")
-assertEqual(completed[2], "Hand_R", "authoritative completion body part")
-assertEqual(completed[4], "Base.Bandage", "authoritative completion item type")
-assertEqual(item.jobDelta, 0, "item progress reset")
-assertEqual(queued.basePerformed, true, "timed action completion")
+T.equal(completed[1], "npc_timed", "authoritative completion npc")
+T.equal(completed[2], "Hand_R", "authoritative completion body part")
+T.equal(completed[4], "Base.Bandage", "authoritative completion item type")
+T.equal(item.jobDelta, 0, "item progress reset")
+T.equal(queued.basePerformed, true, "timed action completion")
 
 rangeAllowed = false
 ok, reason = PNCBandageAction.Queue(
     player, "npc_timed", "Hand_R", false, "Base.Bandage"
 )
-assertEqual(ok, false, "out-of-range action rejected before queue")
-assertEqual(reason, "out_of_range", "out-of-range queue reason")
+T.equal(ok, false, "out-of-range action rejected before queue")
+T.equal(reason, "out_of_range", "out-of-range queue reason")
 
 local completionBeforeBlocked = completed
 local blockedAction = PNCBandageAction:new(
@@ -152,22 +147,22 @@ local blockedAction = PNCBandageAction:new(
     "Base.Bandage"
 )
 blockedAction:perform()
-assertEqual(completed, completionBeforeBlocked,
+T.equal(completed, completionBeforeBlocked,
     "out-of-range completion reached authority")
-assertEqual(blockedAction.basePerformed, true,
+T.equal(blockedAction.basePerformed, true,
     "blocked timed action did not leave the queue")
 
-assertEqual(
+T.equal(
     PNCBandageAction.ResolveLootPosition("npc_timed", "Head"),
     "High",
     "head treatment pose"
 )
-assertEqual(
+T.equal(
     PNCBandageAction.ResolveLootPosition("npc_timed", "LowerLeg_R"),
     "Low",
     "lower-leg treatment pose"
 )
-assertEqual(
+T.equal(
     PNCBandageAction.ResolveLootPosition("npc_timed", "Torso_Upper"),
     "Mid",
     "torso treatment pose"
@@ -183,10 +178,11 @@ PNC.Registry.Get = function()
         z = 0,
     }
 end
-assertEqual(
+T.equal(
     PNCBandageAction.ResolveLootPosition("npc_timed", "Head"),
     "Low",
     "downed patient overrides wound height"
 )
+T.finish("pnc_bandage_timed_action_smoke")
 
-print("pnc_bandage_timed_action_smoke: ok")
+T.finish("pnc_bandage_timed_action_smoke")

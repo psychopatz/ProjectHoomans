@@ -1,15 +1,7 @@
-local SHARED = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-local SERVER = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Director/"
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then error((label or "equal") .. ": expected="
-        .. tostring(expected) .. " actual=" .. tostring(actual)) end
-end
-local function truthy(value, label) equal(value == true, true, label) end
-local function near(actual, expected, epsilon, label)
-    if math.abs(actual - expected) > epsilon then error((label or "near")
-        .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual)) end
-end
+local SHARED = T.path("ProjectHoomans", "shared", "PNC/Core/")
+local SERVER = T.path("ProjectHoomans", "server", "PNC/Director/")
 
 local worldHour = 100
 local modData = {}
@@ -50,9 +42,9 @@ function PNC.Registry.MarkDirty(record, reason)
     PNC.Registry.Dirty[record.id] = reason
 end
 
-dofile(SHARED .. "Director/PNC_DirectorConfig.lua")
-dofile(SHARED .. "Director/PNC_AbstractWorldTypes.lua")
-dofile(SHARED .. "Scheduling/PNC_Scheduler.lua")
+T.load(SHARED .. "Director/PNC_DirectorConfig.lua")
+T.load(SHARED .. "Director/PNC_AbstractWorldTypes.lua")
+T.load(SHARED .. "Scheduling/PNC_Scheduler.lua")
 
 local faction = { id = "faction_test", archetypeID = "looter",
     leaderNPCID = "npc_1", status = "active",
@@ -86,119 +78,119 @@ PNC.Registry.Data.npc_2 = { id = "npc_2", alive = true,
     equipment = { primaryFullType = "Base.Axe" },
     affiliation = { role = "raider" } }
 
-dofile(SERVER .. "PNC_AbstractWorldStore.lua")
-dofile(SERVER .. "PNC_AbstractLocationManager.lua")
-dofile(SERVER .. "PNC_AbstractGroupManager.lua")
-dofile(SERVER .. "PNC_AbstractCombatProfile.lua")
-dofile(SERVER .. "PNC_AbstractResourceNeeds.lua")
-dofile(SERVER .. "PNC_AbstractBehaviorProfile.lua")
-dofile(SERVER .. "PNC_AbstractScavengeResolver.lua")
-dofile(SERVER .. "PNC_AbstractActionResolver.lua")
-dofile(SERVER .. "PNC_AbstractEncounterEvaluator.lua")
-dofile(SERVER .. "PNC_AbstractCasualtyResolver.lua")
-dofile(SERVER .. "PNC_AbstractRetreatResolver.lua")
-dofile(SERVER .. "PNC_AbstractCombatResolver.lua")
-dofile(SERVER .. "PNC_AbstractEncounterResolver.lua")
-dofile(SERVER .. "PNC_AbstractEncounterDetector.lua")
-dofile(SERVER .. "PNC_AbstractTraversal.lua")
-dofile(SERVER .. "PNC_WorldDirector.lua")
+T.load(SERVER .. "PNC_AbstractWorldStore.lua")
+T.load(SERVER .. "PNC_AbstractLocationManager.lua")
+T.load(SERVER .. "PNC_AbstractGroupManager.lua")
+T.load(SERVER .. "PNC_AbstractCombatProfile.lua")
+T.load(SERVER .. "PNC_AbstractResourceNeeds.lua")
+T.load(SERVER .. "PNC_AbstractBehaviorProfile.lua")
+T.load(SERVER .. "PNC_AbstractScavengeResolver.lua")
+T.load(SERVER .. "PNC_AbstractActionResolver.lua")
+T.load(SERVER .. "PNC_AbstractEncounterEvaluator.lua")
+T.load(SERVER .. "PNC_AbstractCasualtyResolver.lua")
+T.load(SERVER .. "PNC_AbstractRetreatResolver.lua")
+T.load(SERVER .. "PNC_AbstractCombatResolver.lua")
+T.load(SERVER .. "PNC_AbstractEncounterResolver.lua")
+T.load(SERVER .. "PNC_AbstractEncounterDetector.lua")
+T.load(SERVER .. "PNC_AbstractTraversal.lua")
+T.load(SERVER .. "PNC_WorldDirector.lua")
 
 PNC.AbstractWorldStore.Load()
-local origin = assert(PNC.AbstractLocations.RegisterSite(faction.mobile.site))
-local store = assert(PNC.AbstractLocations.Register({ id = "aloc_store",
+local origin = T.truthy(PNC.AbstractLocations.RegisterSite(faction.mobile.site))
+local store = T.truthy(PNC.AbstractLocations.Register({ id = "aloc_store",
     type = "BUILDING", x = 120, y = 0, z = 0,
     tags = { COMMERCIAL = true, FOOD = true },
     resourcePotential = { food = 90, water = 20 }, danger = 5 }))
-local danger = assert(PNC.AbstractLocations.Register({ id = "aloc_danger",
+local danger = T.truthy(PNC.AbstractLocations.Register({ id = "aloc_danger",
     type = "BUILDING", x = 80, y = 0, z = 0,
     tags = { DANGEROUS = true }, resourcePotential = { food = 5 },
     danger = 90 }))
 
-local group = assert(PNC.AbstractGroups.Create({ id = "agroup_test",
+local group = T.truthy(PNC.AbstractGroups.Create({ id = "agroup_test",
     factionId = faction.id, groupType = "LOOTER",
     memberIds = { "npc_1", "npc_2" }, mission = "SCAVENGE",
     state = "IDLE", location = PNC.AbstractLocations.Ref(origin),
     resources = { ammo = 100, food = 20, water = 40 } }))
 
-local chosen = assert(PNC.AbstractTraversal.ChooseDestination(group))
-equal(chosen.id, store.id, "food-rich destination selected")
-truthy(PNC.AbstractTraversal.Begin(group, chosen, worldHour))
-equal(group.state, "TRAVELING", "mission and state stay separate")
-equal(group.mission, "SCAVENGE", "mission preserved during travel")
-truthy(group.stateEndsAt > worldHour, "travel timer assigned")
+local chosen = T.truthy(PNC.AbstractTraversal.ChooseDestination(group))
+T.equal(chosen.id, store.id, "food-rich destination selected")
+T.truthy(PNC.AbstractTraversal.Begin(group, chosen, worldHour))
+T.equal(group.state, "TRAVELING", "mission and state stay separate")
+T.equal(group.mission, "SCAVENGE", "mission preserved during travel")
+T.truthy(group.stateEndsAt > worldHour, "travel timer assigned")
 
-local refugee = assert(PNC.AbstractGroups.Create({ id = "agroup_refugee",
+local refugee = T.truthy(PNC.AbstractGroups.Create({ id = "agroup_refugee",
     groupType = "REFUGEE", memberIds = {}, mission = "IDLE", state = "IDLE",
     location = PNC.AbstractLocations.Ref(store), resources = {} }))
-equal(#PNC.AbstractLocations.GetGroupOccupants(store), 1,
+T.equal(#PNC.AbstractLocations.GetGroupOccupants(store), 1,
     "occupancy registered")
 worldHour = group.stateEndsAt
-truthy(PNC.AbstractTraversal.Arrive(group, worldHour))
-equal(group.location.id, store.id, "logical arrival")
-equal(group.state, "PERFORMING_ACTION", "arrival starts mission action")
-equal(PNC.Registry.Data.npc_1.x, store.x - 1,
+T.truthy(PNC.AbstractTraversal.Arrive(group, worldHour))
+T.equal(group.location.id, store.id, "logical arrival")
+T.equal(group.state, "PERFORMING_ACTION", "arrival starts mission action")
+T.equal(PNC.Registry.Data.npc_1.x, store.x - 1,
     "abstract member moved without body")
-equal(#PNC.AbstractWorldStore.Registry.encounters, 1,
+T.equal(#PNC.AbstractWorldStore.Registry.encounters, 1,
     "shared-location encounter detected")
-equal(PNC.AbstractWorldStore.Registry.encounters[1].outcome, "QUEUED",
+T.equal(PNC.AbstractWorldStore.Registry.encounters[1].outcome, "QUEUED",
     "collision queues bounded resolution")
 
 PNC.SpatialIndex.QueryPlayers = function()
     return { { getX = function() return store.x end,
         getY = function() return store.y end } }
 end
-local observed = assert(PNC.AbstractEncounters.Create(
+local observed = T.truthy(PNC.AbstractEncounters.Create(
     store, group, refugee, worldHour))
-equal(observed.outcome, "MATERIALIZATION_REQUIRED",
+T.equal(observed.outcome, "MATERIALIZATION_REQUIRED",
     "nearby player blocks abstract resolution")
-equal(observed.abstractResolutionAllowed, false,
+T.equal(observed.abstractResolutionAllowed, false,
     "observation safety is explicit in report")
 PNC.SpatialIndex.QueryPlayers = function() return {} end
 
-local highAmmo = assert(PNC.AbstractCombatProfile.Get(group, true))
-truthy(highAmmo.combatantCount < highAmmo.memberCount,
+local highAmmo = T.truthy(PNC.AbstractCombatProfile.Get(group, true))
+T.truthy(highAmmo.combatantCount < highAmmo.memberCount,
     "role-weighted combatants differ from population")
 local cached, cacheState = PNC.AbstractCombatProfile.Get(group, false)
-equal(cacheState, "cached", "unchanged profile reused")
-near(cached.rangedPower, highAmmo.rangedPower, 0.0001, "cached power stable")
+T.equal(cacheState, "cached", "unchanged profile reused")
+T.near(cached.rangedPower, highAmmo.rangedPower, 0.0001, "cached power stable")
 group.resources.ammo = 1
 local lowAmmo, rebuildState = PNC.AbstractCombatProfile.Get(group, false)
-equal(rebuildState, "rebuilt", "ammo change invalidates signature")
-truthy(lowAmmo.rangedPower < highAmmo.rangedPower,
+T.equal(rebuildState, "rebuilt", "ammo change invalidates signature")
+T.truthy(lowAmmo.rangedPower < highAmmo.rangedPower,
     "low ammo reduces effective ranged power")
 
 PNC.Registry.GetLiveZombie = function(id)
     return id == "npc_1" and {} or nil
 end
-equal(PNC.AbstractGroups.RefreshLOD(group, worldHour), "ACTIVE",
+T.equal(PNC.AbstractGroups.RefreshLOD(group, worldHour), "ACTIVE",
     "live member promotes group LOD")
-equal(group.state, "ACTIVE", "active group leaves strategic state machine")
+T.equal(group.state, "ACTIVE", "active group leaves strategic state machine")
 local advanced, activeReason = PNC.AbstractTraversal.Advance(group, worldHour)
-equal(advanced, false, "active group does not traverse abstractly")
-equal(activeReason, "active_simulation", "active traversal gate reason")
+T.equal(advanced, false, "active group does not traverse abstractly")
+T.equal(activeReason, "active_simulation", "active traversal gate reason")
 PNC.Registry.GetLiveZombie = function() return nil end
-equal(PNC.AbstractGroups.RefreshLOD(group, worldHour), "ABSTRACT",
+T.equal(PNC.AbstractGroups.RefreshLOD(group, worldHour), "ABSTRACT",
     "group returns to abstraction")
-equal(group.state, "ARRIVED", "abstract occupancy restored")
+T.equal(group.state, "ARRIVED", "abstract occupancy restored")
 
 local jobRuns = 0
-truthy(PNC.Scheduler.RegisterJob("test", 1, function(_, budget)
+T.truthy(PNC.Scheduler.RegisterJob("test", 1, function(_, budget)
     jobRuns = jobRuns + budget return budget
 end, { budget = 3, startAt = 200 }))
-equal(PNC.Scheduler.PumpJobs(199), 0, "job not early")
-equal(PNC.Scheduler.PumpJobs(200), 1, "due job runs")
-equal(jobRuns, 3, "job receives work budget")
-equal(PNC.Scheduler.PumpJobs(200.5), 0, "interval enforced")
+T.equal(PNC.Scheduler.PumpJobs(199), 0, "job not early")
+T.equal(PNC.Scheduler.PumpJobs(200), 1, "due job runs")
+T.equal(jobRuns, 3, "job receives work budget")
+T.equal(PNC.Scheduler.PumpJobs(200.5), 0, "interval enforced")
 
-truthy(PNC.AbstractWorldStore.Save())
+T.truthy(PNC.AbstractWorldStore.Save())
 PNC.AbstractWorldStore.Registry = {}
 PNC.AbstractWorldStore.Loaded = false
-truthy(PNC.AbstractWorldStore.Load())
-equal(PNC.AbstractGroups.Get("agroup_test").location.id, "aloc_store",
+T.truthy(PNC.AbstractWorldStore.Load())
+T.equal(PNC.AbstractGroups.Get("agroup_test").location.id, "aloc_store",
     "group persistence round-trip")
-truthy(PNC.AbstractGroups.Get("agroup_test").combatProfile ~= nil,
+T.truthy(PNC.AbstractGroups.Get("agroup_test").combatProfile ~= nil,
     "combat cache persistence round-trip")
-equal(PNC.AbstractGroups.Get("agroup_test").simulation.lod, "ABSTRACT",
+T.equal(PNC.AbstractGroups.Get("agroup_test").simulation.lod, "ABSTRACT",
     "safe simulation default")
 
 -- Ensure the dangerous option really participated but scored lower.
@@ -206,6 +198,7 @@ local foundDanger = false
 for _, evaluation in ipairs(group.diagnostics.destinationEvaluations or {}) do
     if evaluation.locationId == danger.id then foundDanger = true end
 end
-truthy(foundDanger, "bounded candidate scoring exposed for debug")
+T.truthy(foundDanger, "bounded candidate scoring exposed for debug")
+T.finish("pnc_abstract_world_foundation_smoke")
 
-print("pnc_abstract_world_foundation_smoke: ok")
+T.finish("pnc_abstract_world_foundation_smoke")

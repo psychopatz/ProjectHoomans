@@ -1,24 +1,19 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_EnginePathPlanner.lua"
 local CONTEXT_FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_EnginePathPlanner_Context.lua"
 local MOTION_FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_PathService/PNC_PathService_Motion.lua"
 local BODY_CONTROL_FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_LiveBodyControl.lua"
 local SERVER_FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
+    T.path("ProjectHoomans", "server", "PNC/")
     .. "PNC_Server.lua"
-
-local function readAll(path)
-    local handle = assert(io.open(path, "rb"))
-    local value = handle:read("*a")
-    handle:close()
-    return value
-end
 
 local now = 5000
 local outside = {}
@@ -70,8 +65,8 @@ BehaviorResult = {
     Succeeded = "Succeeded",
 }
 
-dofile(CONTEXT_FILE)
-dofile(FILE)
+T.load(CONTEXT_FILE)
+T.load(FILE)
 
 local requestCount = 0
 local wrapperRequestCount = 0
@@ -181,16 +176,16 @@ local upcomingPassage =
         pathBody,
         passageNavigation
     )
-assert(upcomingPassage and upcomingPassage.object == pathFence,
+T.truthy(upcomingPassage and upcomingPassage.object == pathFence,
     "native approach did not expose its immediate fence edge")
 local passageRecord = { runtime = { pathing = {} } }
-assert(PNC.EnginePathPlanner.Internal.StageUpcomingPathPassage(
+T.truthy(PNC.EnginePathPlanner.Internal.StageUpcomingPathPassage(
         passageRecord,
         pathBody,
         passageNavigation
     ),
     "nearby native fence edge did not transfer to scripted ownership")
-assert(passageRecord.runtime.pathing.blockedStepReason
+T.truthy(passageRecord.runtime.pathing.blockedStepReason
         == "native_path_fence",
     "native fence handoff lost its exact blocked edge")
 PNC.TraversalQuery = nil
@@ -255,9 +250,9 @@ PNC.EnginePathPlanner.GetSteeringTarget(preRecord, preBody, {
     z = 0,
     stopDistance = 0.5,
 })
-assert(preHandoffCount == 1,
+T.truthy(preHandoffCount == 1,
     "upcoming native fence was not handed off before Behavior2 update")
-assert(preUpdateCount == 0,
+T.truthy(preUpdateCount == 0,
     "Behavior2 entered an obstacle before scripted traversal handoff")
 PNC.PathService = nil
 PNC.TraversalQuery = nil
@@ -268,32 +263,32 @@ local steering = PNC.EnginePathPlanner.GetSteeringTarget(
     body,
     target
 )
-assert(steering == target, "waiting move lane changed the target")
-assert(requestCount == 0, "path was requested before move lane startup")
+T.truthy(steering == target, "waiting move lane changed the target")
+T.truthy(requestCount == 0, "path was requested before move lane startup")
 
 record.runtime.pathing.phase = "active"
 steering = PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
-assert(steering == target, "pending native request changed the target")
-assert(requestCount == 1, "building transition did not request native path")
-assert(updateCount == 0,
+T.truthy(steering == target, "pending native request changed the target")
+T.truthy(requestCount == 1, "building transition did not request native path")
+T.truthy(updateCount == 0,
     "Bandits-style request advanced PathFindBehavior2 during startup")
-assert(wrapperRequestCount == 0,
+T.truthy(wrapperRequestCount == 0,
     "single-player request entered the character PathFindState wrapper")
 
 PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
-assert(requestCount == 1, "pending request was submitted twice")
+T.truthy(requestCount == 1, "pending request was submitted twice")
 local handled
 local state
 local cancelsAfterStart = cancelCount
 local resetsAfterStart = resetCount
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
-assert(handled and state == "native_behavior_pending",
+T.truthy(handled and state == "native_behavior_pending",
     "native path did not remain active while working")
-assert(updateCount == 0,
+T.truthy(updateCount == 0,
     "scheduled observer double-pumped PathFindBehavior2")
-assert(body.useless == true,
+T.truthy(body.useless == true,
     "single-player Behavior2 route exposed the body to IsoZombie.update")
-assert(cancelCount == cancelsAfterStart
+T.truthy(cancelCount == cancelsAfterStart
     and resetCount == resetsAfterStart,
     "working native path was cancelled or reset")
 
@@ -311,17 +306,17 @@ PNC.EnginePathPlanner.GetSteeringTarget(
     body,
     movedTarget
 )
-assert(requestCount == requestsBeforeMovingReplan + 1,
+T.truthy(requestCount == requestsBeforeMovingReplan + 1,
     "moving target did not trigger a bounded native replan")
 
 body.x = movedTarget.x
 body.y = movedTarget.y
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
-assert(handled and state == "engine_path_succeeded",
+T.truthy(handled and state == "engine_path_succeeded",
     "native path success was not consumed")
-assert(cancelCount >= 2 and resetCount >= 2,
+T.truthy(cancelCount >= 2 and resetCount >= 2,
     "native behavior was not released after success")
-assert(not record.runtime.localNavigation.nativeActive,
+T.truthy(not record.runtime.localNavigation.nativeActive,
     "native movement ownership was not released")
 body.x = 0.5
 body.y = 0.5
@@ -333,7 +328,7 @@ PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 body.actionState = "idle"
 now = now + 2500
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
-assert(handled and state == "engine_path_timeout",
+T.truthy(handled and state == "engine_path_timeout",
     "engine path-state exit did not release movement ownership")
 
 now = now + 2000
@@ -342,9 +337,9 @@ PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 local updatesBeforeTimeout = updateCount
 now = now + 15000
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
-assert(handled and state == "engine_path_timeout",
+T.truthy(handled and state == "engine_path_timeout",
     "non-progressing native route did not time out")
-assert(updateCount == updatesBeforeTimeout,
+T.truthy(updateCount == updatesBeforeTimeout,
     "timed-out native path was updated again")
 
 local directRecord = { runtime = {} }
@@ -370,8 +365,8 @@ steering = PNC.EnginePathPlanner.GetSteeringTarget(
     directBody,
     directTarget
 )
-assert(steering == directTarget, "open-ground target changed")
-assert(
+T.truthy(steering == directTarget, "open-ground target changed")
+T.truthy(
     directRecord.runtime.localNavigation.lastPlanReason
         == "native_waiting_for_move_lane",
     "open-ground native route did not wait for lane startup"
@@ -383,7 +378,7 @@ PNC.EnginePathPlanner.GetSteeringTarget(
     directBody,
     directTarget
 )
-assert(requestCount == requestsBeforeOpenRoute + 1,
+T.truthy(requestCount == requestsBeforeOpenRoute + 1,
     "meaningful open-ground movement did not use native pathing")
 
 local unsafeRequestCount = requestCount
@@ -412,9 +407,9 @@ PNC.EnginePathPlanner.GetSteeringTarget(
     unsafeBody,
     directTarget
 )
-assert(requestCount == unsafeRequestCount + 1,
+T.truthy(requestCount == unsafeRequestCount + 1,
     "body without BodyDamage did not enter native pathing")
-assert(unsafeRecord.runtime.localNavigation.controllerMode
+T.truthy(unsafeRecord.runtime.localNavigation.controllerMode
         == "behavior2_move",
     "single-player body did not select Bandits Move ownership")
 
@@ -436,60 +431,60 @@ PNC.EnginePathPlanner.GetSteeringTarget(
     directBody,
     closeTarget
 )
-assert(requestCount == requestsBeforeCloseAdjustment + 1,
+T.truthy(requestCount == requestsBeforeCloseAdjustment + 1,
     "sub-tile adjustment did not stay on native movement")
 
-local plannerSource = readAll(FILE) .. readAll(CONTEXT_FILE)
-assert(not string.find(plannerSource, "pcall", 1, true),
+local plannerSource = T.read(FILE) .. T.read(CONTEXT_FILE)
+T.truthy(not string.find(plannerSource, "pcall", 1, true),
     "native planner must not hide path errors with pcall")
-assert(not string.find(plannerSource, "getClassField", 1, true),
+T.truthy(not string.find(plannerSource, "getClassField", 1, true),
     "native planner depends on debug-only Java reflection")
-assert(not string.find(plannerSource, "not path.size", 1, true)
+T.truthy(not string.find(plannerSource, "not path.size", 1, true)
         and not string.find(plannerSource, "not path.getNode", 1, true),
     "native planner probes Java Path methods as Lua table fields")
-assert(not string.find(plannerSource, "path:size", 1, true)
+T.truthy(not string.find(plannerSource, "path:size", 1, true)
         and not string.find(plannerSource, "path:crossesSquare", 1, true)
         and not string.find(plannerSource, "path:getNode", 1, true),
     "native planner calls opaque zombie.pathfind.Path userdata")
-assert(string.find(plannerSource, "behavior:update(", 1, true),
+T.truthy(string.find(plannerSource, "behavior:update(", 1, true),
     "single-player planner does not use Bandits PathFindBehavior2 Move")
-local motionSource = readAll(MOTION_FILE)
-assert(string.find(motionSource, "combat_attack_lease", 1, true),
+local motionSource = T.read(MOTION_FILE)
+T.truthy(string.find(motionSource, "combat_attack_lease", 1, true),
     "combat attack lease does not cancel native movement")
-local pumpSource = assert(string.match(
+local pumpSource = T.truthy(string.match(
     motionSource,
     "function PathService%.Pump.-\nend\n\nfunction PathService%.AdvanceAbstract"
 ))
-local nativePumpAt = assert(string.find(
+local nativePumpAt = T.truthy(string.find(
     pumpSource,
     "enginePlanner.Pump",
     1,
     true
 ))
-local scriptedPassageAt = assert(string.find(
+local scriptedPassageAt = T.truthy(string.find(
     pumpSource,
     "scriptedPassageOwner",
     1,
     true
 ))
-local fakePumpAt = assert(string.find(
+local fakePumpAt = T.truthy(string.find(
     pumpSource,
     "Internal.updateActiveMove",
     nativePumpAt + 1,
     true
 ))
-assert(scriptedPassageAt < nativePumpAt,
+T.truthy(scriptedPassageAt < nativePumpAt,
     "native path can reacquire ownership before scripted traversal")
-assert(nativePumpAt < fakePumpAt,
+T.truthy(nativePumpAt < fakePumpAt,
     "ordinary fake locomotion runs before native path ownership")
-assert(string.find(pumpSource, "engine_path_waiting", 1, true),
+T.truthy(string.find(pumpSource, "engine_path_waiting", 1, true),
     "deferred native lane can still fall through to fake locomotion")
-assert(string.find(pumpSource, "Internal.MotionHints.Remember", 1, true),
+T.truthy(string.find(pumpSource, "Internal.MotionHints.Remember", 1, true),
     "native movement does not publish interpolation hints")
-assert(string.find(pumpSource, "Internal.refreshResolvedLocomotion", 1, true),
+T.truthy(string.find(pumpSource, "Internal.refreshResolvedLocomotion", 1, true),
     "native movement does not refresh locomotion animation")
-local bodyControlSource = readAll(BODY_CONTROL_FILE)
-assert(string.find(
+local bodyControlSource = T.read(BODY_CONTROL_FILE)
+T.truthy(string.find(
         bodyControlSource,
         "PNC.EnginePathPlanner.PumpFrame(record, zombie)",
         1,
@@ -500,9 +495,9 @@ assert(string.find(
 PNC.Core.IsAuthority = function() return false end
 local updatesBeforeClientFrame = updateCount
 handled, state = PNC.EnginePathPlanner.PumpFrame(record, body)
-assert(not handled and state == "client_replica",
+T.truthy(not handled and state == "client_replica",
     "client replica was allowed to own native path movement")
-assert(updateCount == updatesBeforeClientFrame,
+T.truthy(updateCount == updatesBeforeClientFrame,
     "client replica advanced the authoritative native path")
 
 PNC.Core.IsAuthority = function() return true end
@@ -513,9 +508,9 @@ PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 local updatesBeforeFrame = updateCount
 now = now + 16
 handled, state = PNC.EnginePathPlanner.PumpFrame(record, body)
-assert(handled and state == "native_behavior_pending",
+T.truthy(handled and state == "native_behavior_pending",
     "authoritative frame lost Bandits-style native movement")
-assert(updateCount == updatesBeforeFrame + 1,
+T.truthy(updateCount == updatesBeforeFrame + 1,
     "zombie frame did not advance PathFindBehavior2 exactly once")
 local collisionHandoffCount = 0
 PNC.PathService = {
@@ -527,29 +522,29 @@ PNC.PathService = {
 body.collidedThisFrame = true
 local updatesBeforeCollision = updateCount
 handled, state = PNC.EnginePathPlanner.PumpFrame(record, body)
-assert(handled and state == "fence_climb",
+T.truthy(handled and state == "fence_climb",
     "native collision was not handed to scripted traversal")
-assert(collisionHandoffCount == 1,
+T.truthy(collisionHandoffCount == 1,
     "native collision did not pump the path service exactly once")
-assert(updateCount == updatesBeforeCollision,
+T.truthy(updateCount == updatesBeforeCollision,
     "Behavior2 advanced after collision instead of yielding traversal")
 body.collidedThisFrame = false
 PNC.PathService = nil
 local updatesAfterFrame = updateCount
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
-assert(handled and state == "native_behavior_pending",
+T.truthy(handled and state == "native_behavior_pending",
     "scheduled fallback lost native ownership after frame pump")
-assert(updateCount == updatesAfterFrame,
+T.truthy(updateCount == updatesAfterFrame,
     "observer pump manually advanced PathFindBehavior2")
 
 nextResult = BehaviorResult.Failed
 now = now + 16
 handled, state = PNC.EnginePathPlanner.PumpFrame(record, body)
-assert(handled and state == "engine_path_failed",
+T.truthy(handled and state == "engine_path_failed",
     "Bandits-style behavior failure did not release native ownership")
-assert(not record.runtime.localNavigation.nativeActive,
+T.truthy(not record.runtime.localNavigation.nativeActive,
     "failed PathFindBehavior2 retained movement ownership")
-assert(body.useless == true,
+T.truthy(body.useless == true,
     "failed native route did not restore managed-body safety")
 
 serverMode = true
@@ -593,49 +588,50 @@ PNC.EnginePathPlanner.GetSteeringTarget(
     serverBody,
     target
 )
-assert(characterRequestCount == 0,
+T.truthy(characterRequestCount == 0,
     "dedicated server started a competing native path controller")
-assert(serverBody.useless == false,
+T.truthy(serverBody.useless == false,
     "multiplayer native route did not retain its movement lease")
-assert(serverRecord.runtime.localNavigation.serverMovementLease == true,
+T.truthy(serverRecord.runtime.localNavigation.serverMovementLease == true,
     "multiplayer native movement lease was not recorded")
-assert(serverRecord.runtime.localNavigation.clientDelegated == true,
+T.truthy(serverRecord.runtime.localNavigation.clientDelegated == true,
     "multiplayer path goal was deferred by the SP request budget")
-assert(serverRecord.runtime.localNavigation.requestX == target.x
+T.truthy(serverRecord.runtime.localNavigation.requestX == target.x
         and serverRecord.runtime.localNavigation.requestY == target.y,
     "delegated multiplayer path lost its target")
 local updatesBeforeServerFrame = updateCount
-assert(PNC.EnginePathPlanner.PumpServerFrame() == 1,
+T.truthy(PNC.EnginePathPlanner.PumpServerFrame() == 1,
     "server tick did not find the active native route")
-assert(updateCount == updatesBeforeServerFrame,
+T.truthy(updateCount == updatesBeforeServerFrame,
     "server tick advanced the client-owned PathFindBehavior2")
 PNC.EnginePathPlanner.PumpFrame(serverRecord, serverBody)
-assert(serverBody.useless == false,
+T.truthy(serverBody.useless == false,
     "multiplayer frame pump dropped the active movement lease")
 now = now + 16
 nextResult = BehaviorResult.Succeeded
 handled, state =
     PNC.EnginePathPlanner.PumpFrame(serverRecord, serverBody)
-assert(handled and state == "client_native_moving",
+T.truthy(handled and state == "client_native_moving",
     "server did not remain an observer of delegated movement")
-assert(serverBody.useless == false,
+T.truthy(serverBody.useless == false,
     "multiplayer body became useless during delegated movement")
 PNC.EnginePathPlanner.Clear(serverRecord, serverBody)
-assert(
+T.truthy(
     serverRecord.runtime.localNavigation == nil,
     "cleared multiplayer route retained navigation state"
 )
-assert(PNC.EnginePathPlanner.PumpServerFrame() == 0,
+T.truthy(PNC.EnginePathPlanner.PumpServerFrame() == 0,
     "cleared delegated route remained in the active server set")
 serverMode = false
 
-local serverSource = readAll(SERVER_FILE)
-assert(string.find(
+local serverSource = T.read(SERVER_FILE)
+T.truthy(string.find(
         serverSource,
         "PNC.EnginePathPlanner.PumpServerFrame()",
         1,
         true
     ),
     "server tick does not advance native routes when OnZombieUpdate is absent")
+T.finish("pnc_engine_path_planner_smoke")
 
-print("pnc_engine_path_planner_smoke: ok")
+T.finish("pnc_engine_path_planner_smoke")

@@ -1,19 +1,6 @@
-local function equal(actual, expected, message)
-    if actual ~= expected then
-        error((message or "mismatch") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local T = require "tests/support/test"
 
-local function truthy(value, message)
-    if not value then error(message or "expected truthy value") end
-end
-
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/?.lua",
-    "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/?.lua",
-    "../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/?.lua",
-    package.path,
-}, ";")
+T.addPackagePaths()
 
 local now = 1000
 getTimeInMillis = function() return now end
@@ -64,23 +51,23 @@ local Analyzer = require "PNC/Integrations/PNC_PsychopatzModDataProfiler"
 local report = Analyzer.Scan(true)
 local Content = require "PNC/Integrations/PNC_PsychopatzModDataContent"
 local npcReport = Content.Scan()
-equal(report.persisted.modDataTables, 2, "only PNC ModData stores counted")
-equal(report.runtimeRecords.recordCount, 1, "runtime record count")
-equal(report.inventories.itemCount, 1, "inventory item count")
-equal(report.inventories.operationLogEntries, 1, "inventory op-log count")
-equal(npcReport.records[1].name, "Alex Morgan", "NPC display name")
-equal(npcReport.records[1].wornItems, 1, "NPC worn item count")
-equal(npcReport.records[1].equippedItems, 1, "NPC equipped item count")
-equal(npcReport.records[1].attachedItems, 1, "NPC attached item count")
-equal(npcReport.records[1].inventoryContainers, 1, "NPC container count")
-truthy(npcReport.records[1].runtimeContent.inventory, "runtime content missing")
-truthy(npcReport.records[1].persistedContent.inventory, "persisted content missing")
-truthy(report.persisted.estimatedBytes > 0, "persisted estimate missing")
-truthy(report.inventories.estimatedBytes > 0, "inventory estimate missing")
-equal(report.valuesRedacted, true, "report must redact values")
-equal(npcReport.limits.maxNPCs, 12,
+T.equal(report.persisted.modDataTables, 2, "only PNC ModData stores counted")
+T.equal(report.runtimeRecords.recordCount, 1, "runtime record count")
+T.equal(report.inventories.itemCount, 1, "inventory item count")
+T.equal(report.inventories.operationLogEntries, 1, "inventory op-log count")
+T.equal(npcReport.records[1].name, "Alex Morgan", "NPC display name")
+T.equal(npcReport.records[1].wornItems, 1, "NPC worn item count")
+T.equal(npcReport.records[1].equippedItems, 1, "NPC equipped item count")
+T.equal(npcReport.records[1].attachedItems, 1, "NPC attached item count")
+T.equal(npcReport.records[1].inventoryContainers, 1, "NPC container count")
+T.truthy(npcReport.records[1].runtimeContent.inventory, "runtime content missing")
+T.truthy(npcReport.records[1].persistedContent.inventory, "persisted content missing")
+T.truthy(report.persisted.estimatedBytes > 0, "persisted estimate missing")
+T.truthy(report.inventories.estimatedBytes > 0, "inventory estimate missing")
+T.equal(report.valuesRedacted, true, "report must redact values")
+T.equal(npcReport.limits.maxNPCs, 12,
     "periodic profiler NPC content limit")
-equal(npcReport.limits.maxNodesPerView, 120,
+T.equal(npcReport.limits.maxNodesPerView, 120,
     "periodic profiler record node limit")
 Bootstrap.captureConfig = {
     mode = "DETAILED", enabled = { moddata = true, npc = true },
@@ -89,8 +76,8 @@ Bootstrap.captureConfig = {
 }
 require "PNC/Integrations/PNC_PsychopatzNPCProfiler"
 local snapshot = Profiler.BuildSnapshot()
-truthy(snapshot.diagnostics["ProjectHoomans.modData"], "diagnostic missing from snapshot")
-equal(snapshot.diagnostics["ProjectHoomans.npcData"].records[1].id, "npc_one",
+T.truthy(snapshot.diagnostics["ProjectHoomans.modData"], "diagnostic missing from snapshot")
+T.equal(snapshot.diagnostics["ProjectHoomans.npcData"].records[1].id, "npc_one",
     "targeted NPC diagnostic missing")
 for _, item in ipairs(report.persisted.topPaths) do
     if string.find(item.path, "secret_dynamic_identifier", 1, true) then
@@ -99,4 +86,6 @@ for _, item in ipairs(report.persisted.topPaths) do
 end
 
 Profiler.Stop()
-print("pnc profiler ModData smoke: ok")
+T.finish("pnc_profiler_moddata_smoke")
+
+T.finish("pnc_profiler_moddata_smoke")

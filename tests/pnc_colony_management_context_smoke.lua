@@ -1,7 +1,6 @@
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/?.lua",
-    package.path,
-}, ";")
+local T = require "tests/support/test"
+
+T.addPackagePaths()
 
 getText = function(key) return key end
 
@@ -88,39 +87,40 @@ local function menu()
 end
 
 local context = menu()
-assert(Context.Add(context, square(10, 11, 0)) == true,
+T.truthy(Context.Add(context, square(10, 11, 0)) == true,
     "owned colony tile did not expose management context")
-assert(context.options[1].label == "Manage Colony",
+T.truthy(context.options[1].label == "Manage Colony",
     "management submenu label")
 local submenu = context.options[1].submenu
-assert(submenu.options[1].label == "Open Colony Management",
+T.truthy(submenu.options[1].label == "Open Colony Management",
     "open management option label")
-assert(submenu.options[2].label == "Turn On Base Overlay",
+T.truthy(submenu.options[2].label == "Turn On Base Overlay",
     "hidden overlay option label")
 submenu.options[1].callback()
-assert(opened == 1, "context option did not open colony management")
+T.truthy(opened == 1, "context option did not open colony management")
 submenu.options[2].callback(submenu.options[2].target)
-assert(toggledSettlement == owned and overlayEnabled == true,
+T.truthy(toggledSettlement == owned and overlayEnabled == true,
     "context option did not enable the owned settlement overlay")
 
 context = menu()
 Context.Add(context, square(10, 11, 0))
-assert(context.options[1].submenu.options[2].label == "Turn Off Base Overlay",
+T.truthy(context.options[1].submenu.options[2].label == "Turn Off Base Overlay",
     "enabled overlay option label")
 
 context = menu()
-assert(Context.Add(context, square(99, 99, 0)) == false
+T.truthy(Context.Add(context, square(99, 99, 0)) == false
     and #context.options == 0,
     "outside tile exposed colony management")
 
 PNC.Network.ClientState.colonyManagement.faction.id = "faction:other"
 context = menu()
-assert(Context.Add(context, square(10, 11, 0)) == false
+T.truthy(Context.Add(context, square(10, 11, 0)) == false
     and #context.options == 0,
     "foreign colony exposed management context")
 
 registered.start()
 registered.create()
-assert(requested == 2, "owned settlement snapshot was not prefetched")
+T.truthy(requested == 2, "owned settlement snapshot was not prefetched")
+T.finish("pnc_colony_management_context_smoke")
 
-print("pnc_colony_management_context_smoke: ok")
+T.finish("pnc_colony_management_context_smoke")

@@ -1,4 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 local now = 1000
 local spatialQueries = 0
 local losChecks = 0
@@ -45,7 +47,7 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Perception/PNC_Perception_Frame.lua")
+T.load(ROOT .. "Perception/PNC_Perception_Frame.lua")
 
 local record = {
     x = 0,
@@ -55,21 +57,21 @@ local record = {
 }
 
 local visible = PNC.Perception.GetVisibleZombieEntries(record, 12)
-assert(#visible == 6, "LOS candidate budget was not enforced")
-assert(losChecks == 6, "unexpected LOS check count")
-assert(PNC.Perception.CountZombiesInFrame(record, 3) == 6,
+T.truthy(#visible == 6, "LOS candidate budget was not enforced")
+T.truthy(losChecks == 6, "unexpected LOS check count")
+T.truthy(PNC.Perception.CountZombiesInFrame(record, 3) == 6,
     "multi-radius count did not reuse the frame")
-assert(spatialQueries == 1,
+T.truthy(spatialQueries == 1,
     "perception count rebuilt an already-valid frame")
 
 record.x = 0.2
 PNC.Perception.GetVisibleZombieEntries(record, 12)
-assert(spatialQueries == 1 and losChecks == 6,
+T.truthy(spatialQueries == 1 and losChecks == 6,
     "small observer movement invalidated the reusable frame")
 
 now = 1300
 PNC.Perception.GetVisibleZombieEntries(record, 12)
-assert(spatialQueries == 2 and losChecks == 12,
+T.truthy(spatialQueries == 2 and losChecks == 12,
     "expired perception frame was not rebuilt")
 
 local blockedRecord = {
@@ -83,10 +85,11 @@ PNC.Perception.CanSeeWorldObject = function(_, zombie)
     return zombie:getX() > 3, "blocked_test"
 end
 now = 2000
-assert(#PNC.Perception.GetVisibleZombieEntries(blockedRecord, 12) == 0,
+T.truthy(#PNC.Perception.GetVisibleZombieEntries(blockedRecord, 12) == 0,
     "blocked first LOS window unexpectedly found a target")
 now = 2300
-assert(#PNC.Perception.GetVisibleZombieEntries(blockedRecord, 12) > 0,
+T.truthy(#PNC.Perception.GetVisibleZombieEntries(blockedRecord, 12) > 0,
     "blocked LOS window did not rotate to farther candidates")
+T.finish("pnc_perception_frame_smoke")
 
-print("pnc_perception_frame_smoke: ok")
+T.finish("pnc_perception_frame_smoke")

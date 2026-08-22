@@ -1,12 +1,4 @@
-local function assertTrue(value, message)
-    if not value then error(message or "expected true", 2) end
-end
-local function assertEqual(actual, expected, message)
-    if actual ~= expected then
-        error((message or "values differ") .. ": " .. tostring(actual)
-            .. " ~= " .. tostring(expected), 2)
-    end
-end
+local T = require "tests/support/test"
 
 PNC = {
     Core = { Now = function() return 0 end },
@@ -26,19 +18,19 @@ ModData = { values = {}, getOrCreate = function(key)
 end }
 SandboxVars = { ProjectHoomans = {} }
 
-local root = "Contents/mods/ProjectHoomans/42.20/media/lua/"
-dofile(root .. "shared/PNC/Core/Events/PNC_EventDefinitions.lua")
-dofile(root .. "shared/PNC/Core/Needs/PNC_NeedsDefinitions.lua")
-dofile(root .. "shared/PNC/Core/Needs/PNC_NeedsStateCodec.lua")
-dofile(root .. "shared/PNC/Core/Needs/PNC_PlayerNeedsModel.lua")
-dofile(root .. "shared/PNC/Core/Needs/PNC_NeedsUtils.lua")
-dofile(root .. "shared/PNC/Core/Base/PNC_Sandbox.lua")
-dofile(root .. "server/PNC/Needs/PNC_NeedsRepository.lua")
-dofile(root .. "server/PNC/PNC_IndividualNeeds.lua")
-dofile(root .. "server/PNC/Needs/PNC_NeedHealthConsequences.lua")
+local root = T.path("ProjectHoomans", "root", "")
+T.load(root .. "shared/PNC/Core/Events/PNC_EventDefinitions.lua")
+T.load(root .. "shared/PNC/Core/Needs/PNC_NeedsDefinitions.lua")
+T.load(root .. "shared/PNC/Core/Needs/PNC_NeedsStateCodec.lua")
+T.load(root .. "shared/PNC/Core/Needs/PNC_PlayerNeedsModel.lua")
+T.load(root .. "shared/PNC/Core/Needs/PNC_NeedsUtils.lua")
+T.load(root .. "shared/PNC/Core/Base/PNC_Sandbox.lua")
+T.load(root .. "server/PNC/Needs/PNC_NeedsRepository.lua")
+T.load(root .. "server/PNC/PNC_IndividualNeeds.lua")
+T.load(root .. "server/PNC/Needs/PNC_NeedHealthConsequences.lua")
 
 local outsider = { id = "outsider", alive = true }
-assertEqual(PNC.IndividualNeeds.Ensure(outsider), nil,
+T.equal(PNC.IndividualNeeds.Ensure(outsider), nil,
     "non-owned NPC has no detailed needs")
 
 local npc = { id = "owned", recruited = true, alive = true,
@@ -49,23 +41,23 @@ local state = PNC.IndividualNeeds.Ensure(npc)
 PNC.IndividualNeeds.Set(npc, "hunger", 1, "test")
 PNC.IndividualNeeds.Commands.ApplyFood(npc,
     { hunger = 0, calories = 600 }, "test_food")
-assertEqual(PNC.IndividualNeeds.Get(npc, "hunger"), 1,
+T.equal(PNC.IndividualNeeds.Get(npc, "hunger"), 1,
     "nutrition is independent from fullness")
-assertEqual(PNC.IndividualNeeds.GetNutrition(npc).calories, 600,
+T.equal(PNC.IndividualNeeds.GetNutrition(npc).calories, 600,
     "food calories are recorded")
-assertEqual(npc.needs, nil, "needs are not stored in the NPC registry record")
+T.equal(npc.needs, nil, "needs are not stored in the NPC registry record")
 
 local packed = PNC.NeedsStateCodec.Encode(PNC.NeedsRepository.Records, age)
-assertEqual(packed.v, 1, "compact codec version")
-assertEqual(packed.at, age, "one shared timestamp")
-assertEqual(#packed.n.owned, 5, "compact NPC tuple")
-assertEqual(packed.n.owned[1], 1000, "pressure stored as permille")
-assertEqual(packed.n.owned[4], 600, "calories stored as integer")
+T.equal(packed.v, 1, "compact codec version")
+T.equal(packed.at, age, "one shared timestamp")
+T.equal(#packed.n.owned, 5, "compact NPC tuple")
+T.equal(packed.n.owned[1], 1000, "pressure stored as permille")
+T.equal(packed.n.owned[4], 600, "calories stored as integer")
 local decoded, decodedAt = PNC.NeedsStateCodec.Decode(packed)
-assertEqual(decodedAt, age, "shared timestamp round trip")
-assertEqual(decoded.owned.needs.hunger, 1, "need round trip")
+T.equal(decodedAt, age, "shared timestamp round trip")
+T.equal(decoded.owned.needs.hunger, 1, "need round trip")
 local rejected = PNC.NeedsStateCodec.Decode({ v = 2, at = age, n = {} })
-assertEqual(rejected.owned, nil, "non-v1 payload is not migrated")
+T.equal(rejected.owned, nil, "non-v1 payload is not migrated")
 
 for _, population in ipairs({ 100, 500, 1000 }) do
     local many = {}
@@ -80,15 +72,15 @@ for _, population in ipairs({ 100, 500, 1000 }) do
     local scaleDecoded = PNC.NeedsStateCodec.Decode(scalePacked)
     local count = 0
     for _, _ in pairs(scaleDecoded) do count = count + 1 end
-    assertEqual(count, population,
+    T.equal(count, population,
         tostring(population) .. " owned-need records round trip")
 end
 
-assertEqual(PNC.NeedsRepository.Save(), true, "dirty compact state saves")
+T.equal(PNC.NeedsRepository.Save(), true, "dirty compact state saves")
 local persisted = ModData.values[PNC.NeedsRepository.MODDATA_KEY]
-assertEqual(persisted.v, 1, "repository writes only v1")
-assertEqual(persisted.at, age, "repository writes one timestamp")
-assertEqual(persisted.n.owned[4], 600, "repository persists nutrition")
+T.equal(persisted.v, 1, "repository writes only v1")
+T.equal(persisted.at, age, "repository writes one timestamp")
+T.equal(persisted.n.owned[4], 600, "repository persists nutrition")
 
 PNC.Health = { ApplyDamage = function(record, _, event)
     record.health.current = record.health.current - event.amount
@@ -97,18 +89,19 @@ end }
 state.hunger, state.thirst = 1, 1
 local beforeZeroElapsed = npc.health.current
 PNC.IndividualNeeds.Update(npc, 0, "maximum_pressure_no_elapsed")
-assertEqual(npc.health.current, beforeZeroElapsed,
+T.equal(npc.health.current, beforeZeroElapsed,
     "maximum pressure is not instant death")
 PNC.IndividualNeeds.Update(npc, 168, "nonlethal_catchup")
-assertTrue(npc.health.current >= PNC.NeedsDefinitions.CONSEQUENCES.nonlethalHealthFloor,
+T.truthy(npc.health.current >= PNC.NeedsDefinitions.CONSEQUENCES.nonlethalHealthFloor,
     "default mortality OFF preserves safe floor")
 SandboxVars.ProjectHoomans.PlayerOwnedNPCNeedMortality = true
 PNC.IndividualNeeds.Update(npc, 168, "lethal_catchup")
-assertTrue(npc.health.current < PNC.NeedsDefinitions.CONSEQUENCES.nonlethalHealthFloor,
+T.truthy(npc.health.current < PNC.NeedsDefinitions.CONSEQUENCES.nonlethalHealthFloor,
     "mortality ON permits eventual lethal damage")
 
 PNC.NeedsRepository.Remove(npc.id)
-assertEqual(PNC.NeedsRepository.Records[npc.id], nil,
+T.equal(PNC.NeedsRepository.Records[npc.id], nil,
     "permanent deletion removes compact need state")
+T.finish("pnc_owned_needs_nutrition_persistence_smoke")
 
-print("pnc_owned_needs_nutrition_persistence_smoke: OK")
+T.finish("pnc_owned_needs_nutrition_persistence_smoke")

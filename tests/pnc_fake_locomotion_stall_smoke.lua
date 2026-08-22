@@ -1,4 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_FakeLocomotion.lua"
 
 PNC = {
@@ -38,7 +40,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local body = {
     x = 0,
@@ -75,16 +77,16 @@ for index = 1, 40 do
     end
 end
 
-assert(stalled, "non-progress oscillation never became stalled")
-assert(
+T.truthy(stalled, "non-progress oscillation never became stalled")
+T.truthy(
     lane.lastProgressAt == 100,
     "lateral/return steps incorrectly refreshed goal progress"
 )
-assert(
+T.truthy(
     (tonumber(lane.nonProgressStepCount) or 0) >= 24,
     "non-progress steps were not accumulated"
 )
-assert(lane.lastStepLabel == "stalled", "stall was not exposed on lane")
+T.truthy(lane.lastStepLabel == "stalled", "stall was not exposed on lane")
 
 PNC.TraversalQuery.CanStep = function()
     return true, "clear"
@@ -115,12 +117,12 @@ local curvedMove = PNC.FakeLocomotion.StepTowardGoal(
     { x = 0, y = 1, z = 0, mode = "walk" },
     1050
 )
-assert(curvedMove, "smoothed turn did not move")
-assert(
+T.truthy(curvedMove, "smoothed turn did not move")
+T.truthy(
     body.x > 0 and body.y > 0,
     "sharp waypoint turn snapped instead of blending its heading"
 )
-assert(
+T.truthy(
     math.sqrt((facedX * facedX) + (facedY * facedY)) >= 0.99,
     "locomotion facing still used the sub-threshold tiny step"
 )
@@ -138,9 +140,10 @@ mpMoved, result = PNC.FakeLocomotion.StepTowardGoal(
     { x = 5, y = 5, z = 0, mode = "run" },
     1100
 )
-assert(not mpMoved and result == "native_mp_required",
+T.truthy(not mpMoved and result == "native_mp_required",
     "legacy fake locomotion remained reachable in multiplayer")
-assert(body.x == beforeX and body.y == beforeY,
+T.truthy(body.x == beforeX and body.y == beforeY,
     "multiplayer fake-locomotion gate changed body position")
+T.finish("pnc_fake_locomotion_stall_smoke")
 
-print("pnc_fake_locomotion_stall_smoke: ok")
+T.finish("pnc_fake_locomotion_stall_smoke")

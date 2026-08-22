@@ -1,20 +1,6 @@
-local function equal(actual, expected, message)
-    if actual ~= expected then
-        error((message or "assertion failed") .. ": expected "
-            .. tostring(expected) .. ", got " .. tostring(actual))
-    end
-end
+local T = require "tests/support/test"
 
-local function truthy(value, message)
-    if not value then error(message or "expected truthy value") end
-end
-
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/?.lua",
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/?.lua",
-    "/home/psychopatz/Zomboid/Workshop/psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/?.lua",
-    package.path,
-}, ";")
+T.addPackagePaths()
 
 local sequence = 0
 function ZombRand() sequence = sequence + 1; return sequence end
@@ -109,7 +95,7 @@ local player = { getInventory = function() return inventory end }
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 CoreInventory.getItemTypeId("Base.Money", true)
 local stockpileInventory = CoreInventory.createVirtualInventory()
-truthy(stockpileInventory:add(moneyItem()), "stockpile placeholder money")
+T.truthy(stockpileInventory:add(moneyItem()), "stockpile placeholder money")
 local stockpile = { id = "storage_test", ownerFactionId = "faction_test",
     inventory = stockpileInventory, revision = 0 }
 local stockpileCommits = 0
@@ -134,49 +120,49 @@ local created = PNC.BaseService.Create({}, {
     colonyId = "community_test", factionId = "faction_test",
     region = rectangle(0, 0, 9, 9), requestId = "create_base",
 })
-truthy(created.ok, "base creation")
+T.truthy(created.ok, "base creation")
 local base = created.base
 PNC.ResearchService = { Queries = { HasTechnology = function(_, id)
     return id == "hq:2"
 end } }
-equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 270,
+T.equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 270,
     "starting territory")
 local baseSnapshot = PNC.BaseService.BuildSnapshot(base)
-equal(baseSnapshot.geometry.region.levels[0].rows[0][1], 0,
+T.equal(baseSnapshot.geometry.region.levels[0].rows[0][1], 0,
     "authoring snapshot includes canonical footprint")
 local researchLevel = PNC.FacilityDefinitions.GetLevel(
     "research_facility", 1)
-equal(researchLevel.componentLimits["research.room"], nil,
+T.equal(researchLevel.componentLimits["research.room"], nil,
     "research room is not a functional component")
-equal(researchLevel.componentLimits["work.research"].minCount, 1,
+T.equal(researchLevel.componentLimits["work.research"].minCount, 1,
     "research station remains a research component")
-equal(researchLevel.componentLimits["work.blueprint"].minCount, 1,
+T.equal(researchLevel.componentLimits["work.blueprint"].minCount, 1,
     "architect bench is required for blueprint study")
-equal(researchLevel.componentLimits["work.reverse"].minCount, 1,
+T.equal(researchLevel.componentLimits["work.reverse"].minCount, 1,
     "lab is required for reverse engineering")
 local workshopLevel = PNC.FacilityDefinitions.GetLevel("workshop", 1)
-equal(workshopLevel.componentLimits["workshop.room"], nil,
+T.equal(workshopLevel.componentLimits["workshop.room"], nil,
     "workshop room is not a functional component")
-equal(workshopLevel.componentLimits["work.craft"].minCount, 1,
+T.equal(workshopLevel.componentLimits["work.craft"].minCount, 1,
     "craft station remains a workshop component")
-equal(workshopLevel.componentLimits["work.disassemble"].minCount, 1,
+T.equal(workshopLevel.componentLimits["work.disassemble"].minCount, 1,
     "disassembly station remains a workshop component")
 local waterLevel = PNC.FacilityDefinitions.GetLevel("water_collector", 1)
-equal(waterLevel.componentLimits["water.spigot"].kind, "anchor",
+T.equal(waterLevel.componentLimits["water.spigot"].kind, "anchor",
     "water spigot is a physical interaction component")
-equal(waterLevel.componentLimits["water.tank"].kind, "abstract",
+T.equal(waterLevel.componentLimits["water.tank"].kind, "abstract",
     "water tanks use reusable abstract components")
-equal(waterLevel.componentLimits["water.tank"].maxCount, 4,
+T.equal(waterLevel.componentLimits["water.tank"].maxCount, 4,
     "water level one permits four tanks")
 local waterLevelTen = PNC.FacilityDefinitions.GetLevel("water_collector", 10)
-equal(waterLevelTen.componentLimits["water.catcher"].maxCount, 40,
+T.equal(waterLevelTen.componentLimits["water.catcher"].maxCount, 40,
     "water module limits scale through level ten")
 
 local playerZoneConflict = PNC.BaseService.Create({}, {
     colonyId = "community_other", factionId = "faction_test",
     region = rectangle(5, 5, 7, 7), requestId = "player_zone_conflict",
 })
-equal(playerZoneConflict.reason, "PLAYER_ZONE_OCCUPIED",
+T.equal(playerZoneConflict.reason, "PLAYER_ZONE_OCCUPIED",
     "new base cannot overlap an existing player zone")
 
 PNC.Communities = {
@@ -192,7 +178,7 @@ local npcBaseConflict = PNC.BaseService.Create({}, {
     colonyId = "community_third", factionId = "faction_test",
     region = rectangle(29, 29, 31, 31), requestId = "npc_base_conflict",
 })
-equal(npcBaseConflict.reason, "NPC_BASE_OCCUPIED",
+T.equal(npcBaseConflict.reason, "NPC_BASE_OCCUPIED",
     "new base cannot overlap an NPC community")
 PNC.Communities = nil
 
@@ -212,7 +198,7 @@ local safehouseConflict = PNC.BaseService.Create({}, {
     colonyId = "community_fourth", factionId = "faction_test",
     region = rectangle(41, 41, 42, 42), requestId = "safehouse_conflict",
 })
-equal(safehouseConflict.reason, "PLAYER_ZONE_OCCUPIED",
+T.equal(safehouseConflict.reason, "PLAYER_ZONE_OCCUPIED",
     "new base cannot overlap a vanilla safehouse")
 SafeHouse = nil
 
@@ -221,42 +207,42 @@ for index = 1, 13 do
         baseId = base.id, expectedRevision = base.revision,
         requestId = "barricade_" .. tostring(index),
     })
-    truthy(built.ok, "barricade " .. tostring(index))
+    T.truthy(built.ok, "barricade " .. tostring(index))
 end
-equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 400,
+T.equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 400,
     "HQ1 capped territory")
-equal(PNC.BaseService.BuildBarricade({}, { baseId = base.id,
+T.equal(PNC.BaseService.BuildBarricade({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "barricade_rejected" }).reason,
     "HQ_TERRITORY_LIMIT", "barricade hard limit")
 
 local upgradedHQ = PNC.BaseService.UpgradeHQ({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "hq2" })
-truthy(upgradedHQ.ok, "HQ upgrade")
-equal(PNC.BaseService.UpgradeHQ({}, { baseId = base.id,
+T.truthy(upgradedHQ.ok, "HQ upgrade")
+T.equal(PNC.BaseService.UpgradeHQ({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "hq3_locked" }).reason,
     "TECHNOLOGY_REQUIRED", "HQ upgrade requires its researched capability")
-equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 400,
+T.equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 400,
     "HQ upgrade grants no territory")
-truthy(PNC.BaseService.BuildBarricade({}, { baseId = base.id,
+T.truthy(PNC.BaseService.BuildBarricade({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "barricade_14" }).ok,
     "post-upgrade barricade")
-equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 410,
+T.equal(PNC.BaseService.GetTerritorySummary(base).territoryCapacity, 410,
     "post-upgrade territory")
 
 local expanded = PNC.BaseService.Expand({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "expand",
     regionDelta = rectangle(10, 0, 10, 4) })
-truthy(expanded.ok, "connected expansion")
-equal(PNC.BaseService.Expand({}, { baseId = base.id,
+T.truthy(expanded.ok, "connected expansion")
+T.equal(PNC.BaseService.Expand({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "remote",
     regionDelta = rectangle(20, 20, 21, 21) }).reason,
     "BASE_DISCONNECTED", "remote island")
-equal(PNC.BaseService.Expand({}, { baseId = base.id,
+T.equal(PNC.BaseService.Expand({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "diagonal",
     regionDelta = rectangle(11, 5, 11, 5) }).reason,
     "BASE_DISCONNECTED", "diagonal-only expansion")
 
-equal(PNC.FacilityService.Create(player, { baseId = base.id,
+T.equal(PNC.FacilityService.Create(player, { baseId = base.id,
     definitionId = "barracks", expectedRevision = base.revision,
     component = { kind = "region", role = "facility.footprint",
         region = rectangle(0, 0, 3, 3, 0) },
@@ -268,13 +254,13 @@ local stockpileResult = PNC.FacilityService.Create(player, {
     component = { kind = "region", role = "storage.stockpile",
         region = rectangle(9, 9, 9, 9, 0) },
 })
-truthy(stockpileResult.ok, "bootstrap stockpile creation")
+T.truthy(stockpileResult.ok, "bootstrap stockpile creation")
 local stockpileFacility = stockpileResult.facility
-equal(#stockpileFacility.componentIds, 0,
+T.equal(#stockpileFacility.componentIds, 0,
     "component ids remain a keyed collection")
 stockpileFacility.constructionState = "BUILT"
 PNC.FacilityService.RefreshState(stockpileFacility)
-equal(stockpileFacility.cachedState, "OPERATIONAL",
+T.equal(stockpileFacility.cachedState, "OPERATIONAL",
     "built stockpile is operational")
 local stockpileComponentId
 for componentId, _ in pairs(stockpileFacility.componentIds) do
@@ -286,27 +272,27 @@ local stockpileEdit = PNC.FacilityService.SetComponent(player, {
     component = { id = stockpileComponentId, kind = "region",
         role = "storage.stockpile", region = rectangle(9, 8, 9, 8, 0) },
 })
-truthy(stockpileEdit.ok and stockpileEdit.pendingComponent,
+T.truthy(stockpileEdit.ok and stockpileEdit.pendingComponent,
     "stockpile can move outside its old footprint through reconstruction")
-truthy(PNC.FacilityService.FinalizeSetComponent(stockpileFacility.id,
+T.truthy(PNC.FacilityService.FinalizeSetComponent(stockpileFacility.id,
     stockpileEdit.pendingComponent), "stockpile edit completes")
-equal(stockpileFacility.constructionRegion.levels[0].rows[8][1], 9,
+T.equal(stockpileFacility.constructionRegion.levels[0].rows[8][1], 9,
     "completed stockpile move replaces its construction footprint")
-equal(PNC.FacilityService.RemoveComponent(player, {
+T.equal(PNC.FacilityService.RemoveComponent(player, {
     facilityId = stockpileFacility.id,
     expectedRevision = stockpileFacility.revision,
     componentId = stockpileComponentId,
 }).reason, "STOCKPILE_CANNOT_DECONSTRUCT",
     "stockpile component cannot be deconstructed")
-equal(PNC.FacilityService.Destroy(player, {
+T.equal(PNC.FacilityService.Destroy(player, {
     facilityId = stockpileFacility.id,
     expectedRevision = stockpileFacility.revision,
 }).reason, "STOCKPILE_CANNOT_DECONSTRUCT",
     "stockpile facility cannot be deconstructed")
 local access = PNC.StockpileAccessService.FindNearest(base.id, 0, 0, 0)
-equal(access.facilityId, stockpileFacility.id,
+T.equal(access.facilityId, stockpileFacility.id,
     "stockpile facility supplies the collection access target")
-equal(PNC.FacilityService.Create(player, {
+T.equal(PNC.FacilityService.Create(player, {
     baseId = base.id, definitionId = "stockpile",
     expectedRevision = base.revision,
     component = { kind = "region", role = "storage.stockpile",
@@ -317,15 +303,15 @@ local barracksResult = PNC.FacilityService.Create(player, { baseId = base.id,
     definitionId = "barracks", expectedRevision = base.revision,
     component = { kind = "region", role = "facility.footprint",
         region = rectangle(0, 0, 3, 3, 0) } })
-truthy(barracksResult.ok, "barracks creation")
-equal(barracksResult.workOrder.operation, "CONSTRUCT",
+T.truthy(barracksResult.ok, "barracks creation")
+T.equal(barracksResult.workOrder.operation, "CONSTRUCT",
     "facility creation queues construction")
-equal(barracksResult.facility.cachedState, "UNDER_CONSTRUCTION",
+T.equal(barracksResult.facility.cachedState, "UNDER_CONSTRUCTION",
     "facility remains unusable during construction")
 local barracks = barracksResult.facility
-equal(barracksResult.component, nil,
+T.equal(barracksResult.component, nil,
     "construction does not create functional components")
-equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
+T.equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision,
     component = { kind = "anchor", role = "sleep.bed",
         x = 0, y = 0, z = 0 } }).reason,
@@ -340,30 +326,30 @@ for index = 1, 4 do
             x = index - 1, y = 0, z = 0,
             targetResolver = "worldObject", objectTag = "bed" },
     })
-    truthy(bed.ok, "bed assignment " .. tostring(index))
-    truthy(PNC.FacilityService.FinalizeSetComponent(
+    T.truthy(bed.ok, "bed assignment " .. tostring(index))
+    T.truthy(PNC.FacilityService.FinalizeSetComponent(
         barracks.id, bed.pendingComponent),
         "bed assignment completes construction " .. tostring(index))
 end
-equal(barracks.cachedState, "OPERATIONAL", "barracks state")
+T.equal(barracks.cachedState, "OPERATIONAL", "barracks state")
 local workTarget = PNC.FacilityService.ResolveWorkTarget(barracks)
-equal(workTarget.role, "sleep.bed", "facility work prefers an anchor target")
-equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
+T.equal(workTarget.role, "sleep.bed", "facility work prefers an anchor target")
+T.equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision, component = {
         kind = "anchor", role = "sleep.bed", x = 3, y = 1, z = 0,
     } }).reason, "FACILITY_COMPONENT_LIMIT", "level one bed limit")
 local upgrade = PNC.FacilityService.Upgrade({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision })
-truthy(upgrade.ok, "barracks level two queued")
-equal(barracks.level, 1, "upgrade waits for construction work")
-truthy(PNC.FacilityService.FinalizeUpgrade(barracks.id, 2),
+T.truthy(upgrade.ok, "barracks level two queued")
+T.equal(barracks.level, 1, "upgrade waits for construction work")
+T.truthy(PNC.FacilityService.FinalizeUpgrade(barracks.id, 2),
     "barracks level two completed")
 local fifthBedOrder = PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision, component = {
         kind = "anchor", role = "sleep.bed", x = 3, y = 1, z = 0,
     } })
-truthy(fifthBedOrder.ok, "fifth bed after upgrade")
-truthy(PNC.FacilityService.FinalizeSetComponent(
+T.truthy(fifthBedOrder.ok, "fifth bed after upgrade")
+T.truthy(PNC.FacilityService.FinalizeSetComponent(
     barracks.id, fifthBedOrder.pendingComponent),
     "fifth bed construction completes")
 
@@ -373,7 +359,7 @@ local researchResult = PNC.FacilityService.Create(player, {
     component = { kind = "region", role = "facility.footprint",
         region = rectangle(7, 7, 8, 8) },
 })
-truthy(researchResult.ok,
+T.truthy(researchResult.ok,
     "research facility accepts a non-component construction footprint")
 local researchFacility = researchResult.facility
 researchFacility.constructionState = "BUILT"
@@ -384,11 +370,11 @@ local stationOrder = PNC.FacilityService.SetComponent({}, {
     component = { kind = "anchor", role = "work.research",
         x = 7, y = 7, z = 0 },
 })
-truthy(stationOrder.ok, "research station assignment")
-truthy(PNC.FacilityService.FinalizeSetComponent(
+T.truthy(stationOrder.ok, "research station assignment")
+T.truthy(PNC.FacilityService.FinalizeSetComponent(
     researchFacility.id, stationOrder.pendingComponent),
     "research station construction completes")
-equal(PNC.FacilityService.SetComponent({}, {
+T.equal(PNC.FacilityService.SetComponent({}, {
     facilityId = researchFacility.id,
     expectedRevision = researchFacility.revision,
     component = { kind = "anchor", role = "work.research",
@@ -402,9 +388,9 @@ for componentId, _ in pairs(researchFacility.componentIds) do
         researchStation = component
     end
 end
-equal(researchStation and researchStation.tileCount, 1,
+T.equal(researchStation and researchStation.tileCount, 1,
     "ordinary facility anchors occupy one fixed tile")
-equal(researchFacility.cachedState, "NEEDS_ASSIGNMENT",
+T.equal(researchFacility.cachedState, "NEEDS_ASSIGNMENT",
     "research facility remains incomplete without architect bench and lab")
 local architectOrder = PNC.FacilityService.SetComponent({}, {
     facilityId = researchFacility.id,
@@ -412,8 +398,8 @@ local architectOrder = PNC.FacilityService.SetComponent({}, {
     component = { kind = "anchor", role = "work.blueprint",
         x = 8, y = 7, z = 0 },
 })
-truthy(architectOrder.ok, "architect bench assignment")
-truthy(PNC.FacilityService.FinalizeSetComponent(
+T.truthy(architectOrder.ok, "architect bench assignment")
+T.truthy(PNC.FacilityService.FinalizeSetComponent(
     researchFacility.id, architectOrder.pendingComponent),
     "architect bench construction completes")
 local laboratoryOrder = PNC.FacilityService.SetComponent({}, {
@@ -422,21 +408,21 @@ local laboratoryOrder = PNC.FacilityService.SetComponent({}, {
     component = { kind = "anchor", role = "work.reverse",
         x = 7, y = 8, z = 0 },
 })
-truthy(laboratoryOrder.ok, "laboratory assignment")
-truthy(PNC.FacilityService.FinalizeSetComponent(
+T.truthy(laboratoryOrder.ok, "laboratory assignment")
+T.truthy(PNC.FacilityService.FinalizeSetComponent(
     researchFacility.id, laboratoryOrder.pendingComponent),
     "laboratory construction completes")
-equal(researchFacility.cachedState, "OPERATIONAL",
+T.equal(researchFacility.cachedState, "OPERATIONAL",
     "all three research lanes complete the facility")
-equal(#PNC.FacilityService.ListByCapability(base.id, "work.blueprint"), 1,
+T.equal(#PNC.FacilityService.ListByCapability(base.id, "work.blueprint"), 1,
     "architect bench exposes blueprint activity")
-equal(#PNC.FacilityService.ListByCapability(base.id, "work.reverse"), 1,
+T.equal(#PNC.FacilityService.ListByCapability(base.id, "work.reverse"), 1,
     "laboratory exposes reverse-engineering activity")
 local refreshedResearch = PNC.FacilityService.ListByCapability(
     base.id, "work.research")
-equal(#refreshedResearch, 1,
+T.equal(#refreshedResearch, 1,
     "assigned research station is independently usable")
-equal(researchFacility.cachedState, "OPERATIONAL",
+T.equal(researchFacility.cachedState, "OPERATIONAL",
     "completed research facility remains operational")
 local retiredRoomId = "legacy:workshop.room"
 researchFacility.componentIds[retiredRoomId] = true
@@ -446,24 +432,24 @@ PNC.SettlementRepository.State.components[retiredRoomId] = {
     region = rectangle(7, 7, 8, 8),
 }
 PNC.FacilityService.RebuildIndexes()
-equal(PNC.SettlementRepository.State.components[retiredRoomId], nil,
+T.equal(PNC.SettlementRepository.State.components[retiredRoomId], nil,
     "retired room component is removed from saved settlement state")
-equal(researchFacility.componentIds[retiredRoomId], nil,
+T.equal(researchFacility.componentIds[retiredRoomId], nil,
     "retired room component is removed from its facility")
 
 local farmResult = PNC.FacilityService.Create(player, { baseId = base.id,
     definitionId = "farm", expectedRevision = base.revision,
     component = { kind = "region", role = "facility.footprint",
         region = rectangle(5, 5, 6, 6) } })
-truthy(farmResult.ok, "farm creation")
+T.truthy(farmResult.ok, "farm creation")
 local farm = farmResult.facility
 farm.constructionState = "BUILT"
 PNC.FacilityService.RefreshState(farm)
-equal(#money, 1, "construction no longer consumes player inventory")
-equal(stockpileInventory:count("Base.Money"), 1,
+T.equal(#money, 1, "construction no longer consumes player inventory")
+T.equal(stockpileInventory:count("Base.Money"), 1,
     "construction materials remain reserved until work completes")
-equal(stockpileCommits, 0, "facility creation does not commit materials")
-truthy(PNC.BaseService.Expand({}, { baseId = base.id,
+T.equal(stockpileCommits, 0, "facility creation does not commit materials")
+T.truthy(PNC.BaseService.Expand({}, { baseId = base.id,
     expectedRevision = base.revision, requestId = "farm_land",
     regionDelta = rectangle(10, 0, 11, 9) }).ok, "farm territory expansion")
 farm.constructionRegion = rectangle(0, 0, 11, 9, 0)
@@ -472,7 +458,7 @@ local plotOrder = PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
         kind = "region", role = "growing.plot", region = plotOne,
     } })
-truthy(plotOrder.ok and plotOrder.component, "growing plot assigns immediately")
+T.truthy(plotOrder.ok and plotOrder.component, "growing plot assigns immediately")
 
 local farmComponentId
 for id, _ in pairs(farm.componentIds) do farmComponentId = id end
@@ -480,71 +466,72 @@ local plotTwo = PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
         kind = "region", role = "growing.plot", region = rectangle(4, 0, 7, 3, 0),
     } })
-truthy(plotTwo.ok, "second growing plot fits level one slots")
-equal(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
+T.truthy(plotTwo.ok, "second growing plot fits level one slots")
+T.equal(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
         kind = "region", role = "growing.plot", region = rectangle(8, 0, 11, 3, 0),
     } }).reason, "FACILITY_COMPONENT_LIMIT", "farm level plot slots")
-equal(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
+T.equal(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
         id = farmComponentId, kind = "region", role = "growing.plot",
         region = rectangle(0, 0, 4, 3, 0),
     } }).reason, "GROWING_PLOT_WIDTH_LIMIT", "plot width limit")
-truthy(PNC.FacilityService.Upgrade({}, { facilityId = farm.id,
+T.truthy(PNC.FacilityService.Upgrade({}, { facilityId = farm.id,
     expectedRevision = farm.revision }).ok, "farm level two queued")
-truthy(PNC.FacilityService.FinalizeUpgrade(farm.id, 2),
+T.truthy(PNC.FacilityService.FinalizeUpgrade(farm.id, 2),
     "farm level two completed")
-truthy(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
+T.truthy(PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
         id = farmComponentId, kind = "region", role = "growing.plot",
         region = rectangle(0, 0, 3, 3, 0),
     } }).ok, "growing plot edits without reconstruction")
-equal(farm.constructionState, "BUILT",
+T.equal(farm.constructionState, "BUILT",
     "growing plot edits do not create construction work")
-equal(PNC.SettlementRepository.GetComponent(farmComponentId).tileCount, 16,
+T.equal(PNC.SettlementRepository.GetComponent(farmComponentId).tileCount, 16,
     "growing plot edit commits immediately")
-equal(farm.constructionState, "BUILT",
+T.equal(farm.constructionState, "BUILT",
     "completed zone reconstruction unlocks facility")
 
 local activity = PNC.FacilityService.AcquireActivity(base.id, "npc_test", "sleep")
-truthy(activity.ok and activity.target, "activity reservation")
-truthy(PNC.FacilityReservations.Complete(activity.reservationId),
+T.truthy(activity.ok and activity.target, "activity reservation")
+T.truthy(PNC.FacilityReservations.Complete(activity.reservationId),
     "reservation completion")
 
 local stockpile = PNC.StockpileAccessService.Create({}, { baseId = base.id,
     expectedRevision = base.revision, x = 1, y = 1, z = 0, storageId = "storage_test" })
-truthy(stockpile.ok, "stockpile access node")
-equal(PNC.StockpileAccessService.HasArrived(stockpile.node, 2, 1, 0), true,
+T.truthy(stockpile.ok, "stockpile access node")
+T.equal(PNC.StockpileAccessService.HasArrived(stockpile.node, 2, 1, 0), true,
     "radius arrival")
 
 local before = base.revision
-equal(PNC.BaseService.Expand({}, { baseId = base.id,
+T.equal(PNC.BaseService.Expand({}, { baseId = base.id,
     expectedRevision = before - 1, requestId = "stale",
     regionDelta = rectangle(10, 5, 10, 5) }).reason,
     "REVISION_CONFLICT", "optimistic revision")
-equal(base.revision, before, "rejected edit is atomic")
+T.equal(base.revision, before, "rejected edit is atomic")
 
 local persisted = PNC.SettlementRepository.Export()
-equal(persisted.schemaVersion, 1, "persistence schema")
-equal(persisted.facilities[barracks.id].cachedState, nil,
+T.equal(persisted.schemaVersion, 1, "persistence schema")
+T.equal(persisted.facilities[barracks.id].cachedState, nil,
     "derived facility state is not persisted")
-equal(persisted.components[farmComponentId].tileCount, nil,
+T.equal(persisted.components[farmComponentId].tileCount, nil,
     "derived tile count is not persisted")
-equal(persisted.reservations, nil, "reservations are runtime only")
-truthy(PNC.SettlementRepository.Save(), "settlement state saves to ModData")
-truthy(persistedModData[PNC.SettlementRepository.MODDATA_KEY]
+T.equal(persisted.reservations, nil, "reservations are runtime only")
+T.truthy(PNC.SettlementRepository.Save(), "settlement state saves to ModData")
+T.truthy(persistedModData[PNC.SettlementRepository.MODDATA_KEY]
     .bases[base.id], "saved ModData contains base")
 PNC.SettlementRepository.State = {
     schemaVersion = 1, bases = {}, facilities = {}, components = {},
     stockpileNodes = {}, zones = {},
 }
 PNC.SettlementRepository.Loaded = false
-truthy(PNC.SettlementRepository.Load(true), "settlement state reloads")
-truthy(PNC.SettlementRepository.GetBase(base.id),
+T.truthy(PNC.SettlementRepository.Load(true), "settlement state reloads")
+T.truthy(PNC.SettlementRepository.GetBase(base.id),
     "base survives a simulated restart")
-truthy(PNC.SettlementRepository.Import(persisted), "persistence reload")
+T.truthy(PNC.SettlementRepository.Import(persisted), "persistence reload")
 PNC.FacilityService.RebuildIndexes()
-equal(PNC.SettlementRepository.GetFacility(barracks.id).cachedState,
+T.equal(PNC.SettlementRepository.GetFacility(barracks.id).cachedState,
     "OPERATIONAL", "derived state rebuilt after load")
+T.finish("pnc_settlement_foundation_smoke")
 
-print("pnc_settlement_foundation_smoke: ok")
+T.finish("pnc_settlement_foundation_smoke")

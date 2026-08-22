@@ -1,13 +1,8 @@
-local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
-    .. "Integrations/PNC_PsychopatzCoreDebug.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
+local FILE =
+    T.path("ProjectHoomans", "client", "PNC/")
+    .. "Integrations/PNC_PsychopatzCoreDebug.lua"
 
 local tools = {
     ["pnc.settings"] = { id = "pnc.settings" },
@@ -36,16 +31,17 @@ PNC = {
 package.preload["PsychopatzCore/UI/PsychopatzDebugHubWindow"] =
     function() return PsychopatzCore.DebugHub end
 
-dofile(FILE)
+T.load(FILE)
 
-assert(tools["pnc.npcMonitor"], "NPC monitor debug tool missing")
-assert(tools["pnc.relationships"],
+T.truthy(tools["pnc.npcMonitor"], "NPC monitor debug tool missing")
+T.truthy(tools["pnc.relationships"],
     "relationship inspector debug tool missing")
-assert(tools["pnc.factions"],
+T.truthy(tools["pnc.factions"],
     "faction inspector debug tool missing")
-assert(tools["pnc.factionOverlay"],
+T.truthy(tools["pnc.factionOverlay"],
     "faction diplomacy overlay debug tool missing")
-assertEqual(tools["pnc.settings"], nil,
+T.equal(tools["pnc.settings"], nil,
     "Project Hoomans settings remained in debug hub")
+T.finish("pnc_debug_hub_settings_location_smoke")
 
-print("pnc_debug_hub_settings_location_smoke: ok")
+T.finish("pnc_debug_hub_settings_location_smoke")

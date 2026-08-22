@@ -1,10 +1,6 @@
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
 
 package.preload["PsychopatzCore/UI/PsychopatzUI"] = function() return true end
 package.preload["PsychopatzCore/EventMarkers/PsychopatzEventMarkerHandler"] = function() return true end
@@ -89,7 +85,7 @@ PNC = {
     },
 }
 
-dofile(CLIENT_ROOT .. "PNC/UI/PNC_NPCMonitor.lua")
+T.load(CLIENT_ROOT .. "PNC/UI/PNC_NPCMonitor.lua")
 
 local window = setmetatable({
     list = {
@@ -101,12 +97,12 @@ local window = setmetatable({
 }, { __index = ISPNCNPCMonitor })
 
 window:onTrack()
-assertEqual(PNC.NPCMonitor.trackedId, "npc_anton", "selected NPC tracked")
-assertEqual(markerCalls[1].id, "pnc_npc_track:npc_anton", "marker namespace")
-assertEqual(markerCalls[1].icon, "friend.png", "colonist marker icon")
-assertEqual(markerCalls[1].x, 100, "abstract marker x")
-assertEqual(markerCalls[1].y, 200, "abstract marker y")
-assertEqual(markerCalls[1].description, "Anton", "marker description")
+T.equal(PNC.NPCMonitor.trackedId, "npc_anton", "selected NPC tracked")
+T.equal(markerCalls[1].id, "pnc_npc_track:npc_anton", "marker namespace")
+T.equal(markerCalls[1].icon, "friend.png", "colonist marker icon")
+T.equal(markerCalls[1].x, 100, "abstract marker x")
+T.equal(markerCalls[1].y, 200, "abstract marker y")
+T.equal(markerCalls[1].description, "Anton", "marker description")
 
 selected.body = {
     getX = function() return 111 end,
@@ -114,22 +110,23 @@ selected.body = {
 }
 now = 2200
 onTick()
-assertEqual(rosterRequests, 1, "tracking refreshes roster while monitor is closed")
-assertEqual(markerCalls[2].x, 111, "live body marker x")
-assertEqual(markerCalls[2].y, 222, "live body marker y")
+T.equal(rosterRequests, 1, "tracking refreshes roster while monitor is closed")
+T.equal(markerCalls[2].x, 111, "live body marker x")
+T.equal(markerCalls[2].y, 222, "live body marker y")
 
 window:onTrack()
-assertEqual(PNC.NPCMonitor.trackedId, nil, "second click clears tracking")
-assertEqual(removals[1], "pnc_npc_track:npc_anton", "tracked marker removed")
+T.equal(PNC.NPCMonitor.trackedId, nil, "second click clears tracking")
+T.equal(removals[1], "pnc_npc_track:npc_anton", "tracked marker removed")
 
 window:onTrack()
-assertEqual(PNC.NPCMonitor.trackedId, "npc_anton", "NPC can be tracked again")
+T.equal(PNC.NPCMonitor.trackedId, "npc_anton", "NPC can be tracked again")
 PNC.Network.ClientState.debugRoster = {}
 now = 3400
 onTick()
-assertEqual(PNC.NPCMonitor.trackedId, nil,
+T.equal(PNC.NPCMonitor.trackedId, nil,
     "tracking clears when authoritative metadata disappears")
-assertEqual(removals[2], "pnc_npc_track:npc_anton",
+T.equal(removals[2], "pnc_npc_track:npc_anton",
     "stale direction marker removed with metadata")
+T.finish("pnc_npc_monitor_track_smoke")
 
-print("pnc_npc_monitor_track_smoke: ok")
+T.finish("pnc_npc_monitor_track_smoke")

@@ -1,24 +1,11 @@
+local T = require "tests/support/test"
+
 local SHARED =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 local SERVER =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
+    T.path("ProjectHoomans", "server", "PNC/")
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected="
-            .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertTrue(value, label)
-    assertEqual(value == true, true, label)
-end
-
-local function assertFalse(value, label)
-    assertEqual(value == false, true, label)
-end
-
-local function assertSaveSafe(value, seen)
+local function validatePersistedValue(value, seen)
     local kind = type(value)
     if kind == "nil" or kind == "string"
         or kind == "number" or kind == "boolean"
@@ -35,7 +22,7 @@ local function assertSaveSafe(value, seen)
         if type(key) ~= "string" and type(key) ~= "number" then
             error("unsafe faction key")
         end
-        assertSaveSafe(item, seen)
+        validatePersistedValue(item, seen)
     end
     seen[value] = nil
 end
@@ -66,14 +53,14 @@ ModData = {
 }
 
 PNC = {}
-dofile(SHARED .. "Base/PNC_Core.lua")
-dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
-dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
-dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
-dofile(SHARED .. "Factions/PNC_FactionEmblems.lua")
-dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
-dofile(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
-dofile(SHARED .. "Factions/PNC_FactionTypes.lua")
+T.load(SHARED .. "Base/PNC_Core.lua")
+T.load(SHARED .. "Relationships/PNC_EntityRef.lua")
+T.load(SHARED .. "Factions/PNC_FactionConstants.lua")
+T.load(SHARED .. "Factions/PNC_FactionArchetypes.lua")
+T.load(SHARED .. "Factions/PNC_FactionEmblems.lua")
+T.load(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
+T.load(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
+T.load(SHARED .. "Factions/PNC_FactionTypes.lua")
 
 local Types = PNC.FactionTypes
 local Archetypes = PNC.FactionArchetypes
@@ -131,26 +118,26 @@ end
 
 -- 1-4. Pure defaults and all four data-only archetypes.
 local registryDefault = Types.NewFactionRegistry()
-assertEqual(registryDefault.schemaVersion, 6, "registry schema")
-assertEqual(registryDefault.revision, 0, "registry revision")
-assertEqual(next(registryDefault.byID), nil, "registry starts empty")
+T.equal(registryDefault.schemaVersion, 6, "registry schema")
+T.equal(registryDefault.revision, 0, "registry revision")
+T.equal(next(registryDefault.byID), nil, "registry starts empty")
 local affiliationDefault = Types.NewAffiliation()
-assertEqual(affiliationDefault.schemaVersion, 2, "affiliation schema")
-assertEqual(affiliationDefault.membershipStatus,
+T.equal(affiliationDefault.schemaVersion, 2, "affiliation schema")
+T.equal(affiliationDefault.membershipStatus,
     "unaffiliated", "default status")
-assertEqual(affiliationDefault.role, "civilian", "default role")
-assertEqual(affiliationDefault.rank, "member", "default rank")
+T.equal(affiliationDefault.role, "civilian", "default role")
+T.equal(affiliationDefault.rank, "member", "default rank")
 for _, id in ipairs({ "settler", "looter", "trader", "refugee" }) do
     local definition = Archetypes.Get(id)
-    assertTrue(definition ~= nil, "archetype " .. id)
-    assertTrue(definition.allowedRoles[definition.defaultRole],
+    T.truthy(definition ~= nil, "archetype " .. id)
+    T.truthy(definition.allowedRoles[definition.defaultRole],
         "valid default role " .. id)
-    assertEqual(definition.attackPlayers, nil,
+    T.equal(definition.attackPlayers, nil,
         "archetype has no hostility " .. id)
 end
 
-dofile(SERVER .. "PNC_FactionService.lua")
-dofile(SERVER .. "PNC_FactionLeadership.lua")
+T.load(SERVER .. "PNC_FactionService.lua")
+T.load(SERVER .. "PNC_FactionLeadership.lua")
 local Factions = PNC.Factions
 Factions.Load()
 
@@ -174,15 +161,15 @@ local ok, reason, settlement = Factions.Create({
     archetypeID = "settler",
     createdAt = 100,
 })
-assertTrue(ok, "settlement creation")
-assertEqual(settlement.id, "faction_collision", "first generated ID")
+T.truthy(ok, "settlement creation")
+T.equal(settlement.id, "faction_collision", "first generated ID")
 ok, reason, settlement = Factions.Create({
     name = "Second Settlement",
     archetypeID = "settler",
     createdAt = 100,
 })
-assertTrue(ok, "collision retry creation")
-assertEqual(settlement.id, "faction_settlement",
+T.truthy(ok, "collision retry creation")
+T.equal(settlement.id, "faction_settlement",
     "collision skipped")
 local settlementID = settlement.id
 local _, _, looters = Factions.Create({
@@ -203,35 +190,35 @@ local _, _, refugees = Factions.Create({
     createdAt = 100,
 })
 local refugeeID = refugees.id
-assertTrue(Factions.Registry.byArchetype.settler[settlementID],
+T.truthy(Factions.Registry.byArchetype.settler[settlementID],
     "settler secondary index")
 local beforeBadCreate = Factions.Registry.revision
-assertFalse(Factions.Create({
+T.falsy(Factions.Create({
     name = "",
     archetypeID = "settler",
 }), "empty name rejected")
-assertFalse(Factions.Create({
+T.falsy(Factions.Create({
     name = "Unknown",
     archetypeID = "military",
 }), "unknown archetype rejected")
-assertEqual(Factions.Registry.revision, beforeBadCreate,
+T.equal(Factions.Registry.revision, beforeBadCreate,
     "rejected creates do not revise")
 
 -- Bounded collision failure.
 local originalGenerator = Factions.IDGenerator
 Factions.IDGenerator = function() return settlementID end
-assertEqual(Factions.GenerateID(), nil, "bounded collisions fail")
+T.equal(Factions.GenerateID(), nil, "bounded collisions fail")
 Factions.IDGenerator = originalGenerator
 
 -- 11-12. Reads are copies and revision-neutral.
 local readRevision = Factions.Registry.revision
 local copiedFaction = Factions.Get(settlementID)
 copiedFaction.name = "mutated copy"
-assertEqual(Factions.Get(settlementID).name,
+T.equal(Factions.Get(settlementID).name,
     "Second Settlement", "faction read copy")
 Factions.List()
 Factions.GetByArchetype("settler")
-assertEqual(Factions.Registry.revision, readRevision,
+T.equal(Factions.Registry.revision, readRevision,
     "pure faction reads")
 
 -- Persistent emblem edits are normalized and revision-aware.
@@ -247,14 +234,14 @@ ok, reason = Factions.SetEmblem(settlementID, {
         },
     },
 })
-assertTrue(ok, "emblem mutation")
+T.truthy(ok, "emblem mutation")
 local emblemFactionAfter = Factions.Get(settlementID)
-assertEqual(emblemFactionAfter.emblem.backgroundColorID,
+T.equal(emblemFactionAfter.emblem.backgroundColorID,
     "red", "emblem persisted")
-assertEqual(emblemFactionAfter.revision,
+T.equal(emblemFactionAfter.revision,
     emblemFactionBefore.revision + 1,
     "emblem touches faction")
-assertEqual(Factions.Registry.revision,
+T.equal(Factions.Registry.revision,
     emblemRegistryBefore + 1,
     "emblem touches registry")
 local unchangedRegistry = Factions.Registry.revision
@@ -262,10 +249,10 @@ ok, reason = Factions.SetEmblem(
     settlementID,
     emblemFactionAfter.emblem
 )
-assertTrue(ok, "identical emblem accepted")
-assertEqual(reason, "unchanged",
+T.truthy(ok, "identical emblem accepted")
+T.equal(reason, "unchanged",
     "identical emblem is revision-neutral")
-assertEqual(Factions.Registry.revision,
+T.equal(Factions.Registry.revision,
     unchangedRegistry,
     "identical emblem does not touch registry")
 
@@ -292,39 +279,39 @@ ok, reason = Factions.AddNPC(settlementID, alice.id, {
     rank = "officer",
     joinedAt = 101,
 })
-assertTrue(ok, "add NPC")
-assertEqual(alice.affiliation.factionID, settlementID,
+T.truthy(ok, "add NPC")
+T.equal(alice.affiliation.factionID, settlementID,
     "assigned faction")
-assertEqual(alice.affiliation.membershipStatus, "member",
+T.equal(alice.affiliation.membershipStatus, "member",
     "assigned status")
-assertEqual(alice.affiliation.role, "guard", "assigned role")
-assertEqual(alice.affiliation.rank, "officer", "assigned rank")
-assertTrue(Factions.Registry.byID[settlementID]
+T.equal(alice.affiliation.role, "guard", "assigned role")
+T.equal(alice.affiliation.rank, "officer", "assigned rank")
+T.truthy(Factions.Registry.byID[settlementID]
     .memberIDs[alice.id], "member index")
-assertEqual(alice.faction, aliceLegacy.faction,
+T.equal(alice.faction, aliceLegacy.faction,
     "legacy faction unchanged")
-assertEqual(alice.hostility.attackPlayers,
+T.equal(alice.hostility.attackPlayers,
     aliceLegacy.attackPlayers, "attackPlayers unchanged")
-assertEqual(alice.hostility.attackNPCs,
+T.equal(alice.hostility.attackNPCs,
     aliceLegacy.attackNPCs, "attackNPCs unchanged")
-assertEqual(alice.recruited, aliceLegacy.recruited,
+T.equal(alice.recruited, aliceLegacy.recruited,
     "recruitment unchanged")
-assertEqual(alice.presenceRevision,
+T.equal(alice.presenceRevision,
     aliceLegacy.presenceRevision, "presence unchanged")
-assertEqual(alice.social.revision,
+T.equal(alice.social.revision,
     aliceLegacy.socialRevision, "social unchanged")
-assertEqual(alice.social.relationships["npc:history"].revision,
+T.equal(alice.social.relationships["npc:history"].revision,
     aliceLegacy.relationshipRevision, "relationship unchanged")
-assertEqual(alice.social.conduct.revision,
+T.equal(alice.social.conduct.revision,
     aliceLegacy.conductRevision, "conduct unchanged")
 
 local rejectedRevision = Factions.Registry.revision
 local rejectedRecordRevision = alice.recordRevision
-assertFalse(Factions.AddNPC(looterID, alice.id, {}),
+T.falsy(Factions.AddNPC(looterID, alice.id, {}),
     "dual membership rejected")
-assertEqual(Factions.Registry.revision, rejectedRevision,
+T.equal(Factions.Registry.revision, rejectedRevision,
     "dual membership registry revision")
-assertEqual(alice.recordRevision, rejectedRecordRevision,
+T.equal(alice.recordRevision, rejectedRecordRevision,
     "dual membership record revision")
 
 -- 19-25. Transfer is atomic, historical, and role-aware.
@@ -338,25 +325,25 @@ ok, reason = Factions.TransferNPC(
         worldAgeHours = 120,
     }
 )
-assertTrue(ok, "transfer")
-assertEqual(alice.affiliation.factionID, traderID,
+T.truthy(ok, "transfer")
+T.equal(alice.affiliation.factionID, traderID,
     "transfer destination")
-assertEqual(alice.affiliation.role, "guard",
+T.equal(alice.affiliation.role, "guard",
     "trader permits guard")
-assertEqual(#alice.affiliation.formerFactionIDs, 1,
+T.equal(#alice.affiliation.formerFactionIDs, 1,
     "transfer history")
-assertEqual(alice.affiliation.formerFactionIDs[1].factionID,
+T.equal(alice.affiliation.formerFactionIDs[1].factionID,
     settlementID, "former faction")
-assertEqual(alice.affiliation.formerFactionIDs[1].reason,
+T.equal(alice.affiliation.formerFactionIDs[1].reason,
     "transferred", "transfer reason")
-assertFalse(Factions.Registry.byID[settlementID]
+T.falsy(Factions.Registry.byID[settlementID]
     .memberIDs[alice.id] == true, "source index removed")
-assertTrue(Factions.Registry.byID[traderID]
+T.truthy(Factions.Registry.byID[traderID]
     .memberIDs[alice.id], "destination index added")
-assertTrue(Factions.AddNPC(refugeeID, cara.id, {
+T.truthy(Factions.AddNPC(refugeeID, cara.id, {
     role = "medic",
 }), "refugee permits medic")
-assertFalse(Factions.SetNPCRole(cara.id, "raider"),
+T.falsy(Factions.SetNPCRole(cara.id, "raider"),
     "invalid archetype role rejected")
 
 -- Bounded former history keeps the newest deterministic entries.
@@ -372,81 +359,81 @@ end
 local bounded = Types.NormalizeAffiliation({
     formerFactionIDs = history,
 })
-assertEqual(#bounded.formerFactionIDs,
+T.equal(#bounded.formerFactionIDs,
     Constants.FORMER_FACTION_LIMIT, "history bound")
-assertEqual(bounded.formerFactionIDs[1].factionID,
+T.equal(bounded.formerFactionIDs[1].factionID,
     "faction_history_5", "oldest history removed")
 
 -- 32-37. Leadership requires membership and demotes/reconciles safely.
-assertFalse(Factions.SetLeader(traderID, bob.id, 121),
+T.falsy(Factions.SetLeader(traderID, bob.id, 121),
     "leader must be member")
-assertTrue(Factions.AddNPC(traderID, bob.id, {
+T.truthy(Factions.AddNPC(traderID, bob.id, {
     role = "trader",
 }), "add first leader candidate")
-assertTrue(Factions.SetLeader(traderID, bob.id, 121),
+T.truthy(Factions.SetLeader(traderID, bob.id, 121),
     "set leader")
-assertEqual(Factions.Get(traderID).leaderNPCID,
+T.equal(Factions.Get(traderID).leaderNPCID,
     bob.id, "leader ID")
-assertEqual(bob.affiliation.role, "leader", "leader role")
-assertEqual(bob.affiliation.rank, "leader", "leader rank")
-assertTrue(Factions.AddNPC(traderID, dana.id, {
+T.equal(bob.affiliation.role, "leader", "leader role")
+T.equal(bob.affiliation.rank, "leader", "leader rank")
+T.truthy(Factions.AddNPC(traderID, dana.id, {
     role = "mechanic",
 }), "add second leader candidate")
-assertTrue(Factions.SetLeader(traderID, dana.id, 122),
+T.truthy(Factions.SetLeader(traderID, dana.id, 122),
     "replace leader")
-assertEqual(bob.affiliation.rank, "member",
+T.equal(bob.affiliation.rank, "member",
     "old leader demoted")
-assertEqual(bob.affiliation.role, "civilian",
+T.equal(bob.affiliation.role, "civilian",
     "old leader safe role")
-assertTrue(Factions.RemoveNPC(
+T.truthy(Factions.RemoveNPC(
     traderID,
     dana.id,
     "removed",
     123
 ), "remove leader")
-assertEqual(Factions.Get(traderID).leaderNPCID,
+T.equal(Factions.Get(traderID).leaderNPCID,
     alice.id, "AI factions select the highest-ranked successor")
 alice.alive = false
-assertTrue(Factions.OnNPCDeath(alice.id),
+T.truthy(Factions.OnNPCDeath(alice.id),
     "death reconciliation")
-assertEqual(Factions.Get(traderID).leaderNPCID,
+T.equal(Factions.Get(traderID).leaderNPCID,
     bob.id, "death promotes the next eligible AI leader")
-assertTrue(Factions.Get(traderID).memberIDs[alice.id],
+T.truthy(Factions.Get(traderID).memberIDs[alice.id],
     "death hook only changes leadership")
-assertEqual(Factions.Get(traderID).status,
+T.equal(Factions.Get(traderID).status,
     "active", "death does not archive")
 alice.alive = true
-assertTrue(Factions.TransferNPC(bob.id, refugeeID, {
+T.truthy(Factions.TransferNPC(bob.id, refugeeID, {
     role = "guard",
     membershipStatus = "member",
     worldAgeHours = 124,
 }), "recruitment-style transfer succeeds")
-assertEqual(Factions.Get(traderID).leaderNPCID,
+T.equal(Factions.Get(traderID).leaderNPCID,
     alice.id, "transferred AI leader is replaced")
 
 -- 38-40. Archive preserves identity and removes affiliations.
-assertTrue(Factions.SetLeader(
+T.truthy(Factions.SetLeader(
     refugeeID,
     cara.id,
     125
 ), "refugee leader")
 local archivedID = refugeeID
-assertTrue(Factions.Archive(
+T.truthy(Factions.Archive(
     archivedID,
     "test_archive",
     130
 ), "archive")
 local archived = Factions.Get(archivedID)
-assertEqual(archived.status, "archived", "archived status")
-assertEqual(archived.leaderNPCID, nil, "archived leader")
-assertEqual(next(archived.memberIDs), nil, "archived members")
-assertEqual(cara.affiliation.factionID, nil,
+T.equal(archived.status, "archived", "archived status")
+T.equal(archived.leaderNPCID, nil, "archived leader")
+T.equal(next(archived.memberIDs), nil, "archived members")
+T.equal(cara.affiliation.factionID, nil,
     "archival removes affiliation")
-assertEqual(cara.affiliation.formerFactionIDs[
+T.equal(cara.affiliation.formerFactionIDs[
     #cara.affiliation.formerFactionIDs
 ].reason, "faction_archived", "archive history")
 Factions.IDGenerator = function() return archivedID end
-assertEqual(Factions.GenerateID(), nil,
+T.equal(Factions.GenerateID(), nil,
     "archived ID never reused")
 Factions.IDGenerator = originalGenerator
 
@@ -458,9 +445,9 @@ local malformedAffiliation = Types.NormalizeAffiliation({
     rank = "chief",
     joinedAt = 0 / 0,
 })
-assertEqual(malformedAffiliation.factionID, nil,
+T.equal(malformedAffiliation.factionID, nil,
     "invalid affiliation reference")
-assertEqual(malformedAffiliation.membershipStatus,
+T.equal(malformedAffiliation.membershipStatus,
     "unaffiliated", "invalid affiliation status")
 local normalizedOnce = Types.NormalizeFactionRegistry({
     schemaVersion = 99,
@@ -478,9 +465,9 @@ local normalizedOnce = Types.NormalizeFactionRegistry({
 })
 local normalizedTwice =
     Types.NormalizeFactionRegistry(normalizedOnce)
-assertTrue(Types.AreEqual(normalizedOnce, normalizedTwice),
+T.truthy(Types.AreEqual(normalizedOnce, normalizedTwice),
     "registry normalization idempotent")
-assertTrue(normalizedOnce.byArchetype.settler[settlementID],
+T.truthy(normalizedOnce.byArchetype.settler[settlementID],
     "archetype rebuilt")
 
 Factions.Registry.byID[settlementID].memberIDs = {
@@ -496,18 +483,18 @@ orphan.affiliation = Types.NormalizeAffiliation({
     joinedAt = 90,
 })
 local rebuildRevision = Factions.Registry.revision
-assertTrue(Factions.RebuildIndexes(), "index repair")
-assertEqual(Factions.Registry.byID[settlementID]
+T.truthy(Factions.RebuildIndexes(), "index repair")
+T.equal(Factions.Registry.byID[settlementID]
     .memberIDs.ghost, nil, "ghost member removed")
-assertTrue(Factions.Registry.byArchetype.settler[
+T.truthy(Factions.Registry.byArchetype.settler[
     settlementID], "archetype index repaired")
-assertEqual(orphan.affiliation.factionID, nil,
+T.equal(orphan.affiliation.factionID, nil,
     "missing faction reference cleared")
-assertEqual(#orphan.affiliation.formerFactionIDs, 1,
+T.equal(#orphan.affiliation.formerFactionIDs, 1,
     "missing faction reference quarantined in history")
-assertEqual(Factions.Registry.revision, rebuildRevision,
+T.equal(Factions.Registry.revision, rebuildRevision,
     "repair does not revise")
-assertFalse(Factions.RebuildIndexes(),
+T.falsy(Factions.RebuildIndexes(),
     "correct index rebuild unchanged")
 
 -- 51-55. Mutations advance only faction/affiliation record domains.
@@ -515,24 +502,24 @@ local beforeAffiliation = alice.affiliation.revision
 local beforePresence = alice.presenceRevision
 local beforeSocial = alice.social.revision
 resetDirty()
-assertTrue(Factions.SetNPCRank(alice.id, "officer"),
+T.truthy(Factions.SetNPCRank(alice.id, "officer"),
     "rank mutation")
-assertEqual(alice.affiliation.revision,
+T.equal(alice.affiliation.revision,
     beforeAffiliation + 1, "affiliation revision")
-assertEqual(alice.recordRevision,
+T.equal(alice.recordRevision,
     rejectedRecordRevision + 2,
     "record revision logical mutation")
-assertEqual(alice.presenceRevision, beforePresence,
+T.equal(alice.presenceRevision, beforePresence,
     "rank presence unchanged")
-assertEqual(alice.social.revision, beforeSocial,
+T.equal(alice.social.revision, beforeSocial,
     "rank social unchanged")
 local unchangedRegistry = Factions.Registry.revision
 local unchangedRecord = alice.recordRevision
-assertFalse(Factions.SetNPCRank(alice.id, "officer"),
+T.falsy(Factions.SetNPCRank(alice.id, "officer"),
     "identical rank unchanged")
-assertEqual(Factions.Registry.revision, unchangedRegistry,
+T.equal(Factions.Registry.revision, unchangedRegistry,
     "identical rank registry revision")
-assertEqual(alice.recordRevision, unchangedRecord,
+T.equal(alice.recordRevision, unchangedRecord,
     "identical rank record revision")
 
 -- Automatically founded player factions use the character surname, retain a
@@ -550,25 +537,25 @@ PNC.PlayerCharacters = {
 local automaticOK, _, automaticFaction = Factions.EnsurePlayerFaction(
     automaticPlayer, { worldAgeHours = worldHour }
 )
-assertTrue(automaticOK, "automatic player faction creation")
-assertEqual(automaticFaction.name, "Morgan Kin",
+T.truthy(automaticOK, "automatic player faction creation")
+T.equal(automaticFaction.name, "Morgan Kin",
     "automatic faction surname and flavor")
-assertEqual(automaticFaction.tags.factionNamePending, true,
+T.equal(automaticFaction.tags.factionNamePending, true,
     "automatic faction name pending")
 local renameOK, _, renamedFaction = Factions.SetPlayerFactionName(
     automaticPlayer, "Morgan Wardens"
 )
-assertTrue(renameOK, "player faction rename")
-assertEqual(renamedFaction.name, "Morgan Wardens", "renamed faction")
-assertEqual(renamedFaction.tags.factionNamePending, nil,
+T.truthy(renameOK, "player faction rename")
+T.equal(renamedFaction.name, "Morgan Wardens", "renamed faction")
+T.equal(renamedFaction.tags.factionNamePending, nil,
     "rename clears faction prompt")
-assertEqual(renamedFaction.tags.factionNameConfirmed, true,
+T.equal(renamedFaction.tags.factionNameConfirmed, true,
     "rename records faction name confirmation")
 local existingOK, _, existingFaction = Factions.EnsurePlayerFaction(
     automaticPlayer, { worldAgeHours = worldHour }
 )
-assertTrue(existingOK, "confirmed player faction remains available")
-assertEqual(existingFaction.tags.factionNamePending, nil,
+T.truthy(existingOK, "confirmed player faction remains available")
+T.equal(existingFaction.tags.factionNamePending, nil,
     "confirmed faction does not prompt again")
 
 -- 56-60. Debug formatting/snapshots are primitive-only.
@@ -614,18 +601,18 @@ alice.runtime.relationshipDebugChanges = {
         stateAfter = "unknown",
     },
 }
-dofile(SERVER .. "PNC_FactionDebug.lua")
-assertTrue(string.find(
+T.load(SERVER .. "PNC_FactionDebug.lua")
+T.truthy(string.find(
     PNC.FactionDebug.FormatList(),
     "Second Settlement",
     1, true
 ) ~= nil, "debug list formatting")
-assertTrue(string.find(
+T.truthy(string.find(
     PNC.FactionDebug.FormatFaction(traderID),
     "Knox Exchange",
     1, true
 ) ~= nil, "debug detail formatting")
-assertTrue(string.find(
+T.truthy(string.find(
     PNC.FactionDebug.FormatMembers(traderID),
     "npc_alice",
     1, true
@@ -637,15 +624,15 @@ local debugSnapshot =
         nil,
         {}
     )
-assertSaveSafe(debugSnapshot)
-assertEqual(debugSnapshot.roster[1].inventory,
+validatePersistedValue(debugSnapshot)
+T.equal(debugSnapshot.roster[1].inventory,
     nil, "debug excludes inventory")
-assertEqual(
+T.equal(
     #debugSnapshot.npcDiagnostics,
     #debugSnapshot.roster,
     "debug includes one primitive diagnostic per living NPC"
 )
-assertEqual(
+T.equal(
     debugSnapshot.npcDiagnostics[1].presenceRevision
         ~= nil,
     true,
@@ -660,9 +647,9 @@ for _, diagnostic in ipairs(
         break
     end
 end
-assertEqual(aliceDiagnostic.relationship.approval, 9,
+T.equal(aliceDiagnostic.relationship.approval, 9,
     "debug diagnostic includes player relationship")
-assertEqual(
+T.equal(
     aliceDiagnostic.relationshipChanges[1].memoryType,
     "treated_wound",
     "debug diagnostic includes relationship change type"
@@ -687,11 +674,11 @@ local enabledDiagnostics =
         factionID = traderID,
         npcID = alice.id,
     })
-assertTrue(
+T.truthy(
     PNC.Config.Factions.EnableValidationTelemetry,
     "debug GUI enables runtime telemetry"
 )
-assertTrue(
+T.truthy(
     enabledDiagnostics.actionResult.ok,
     "enable telemetry action succeeds"
 )
@@ -701,24 +688,25 @@ local disabledDiagnostics =
         factionID = traderID,
         npcID = alice.id,
     })
-assertFalse(
+T.falsy(
     PNC.Config.Factions.EnableValidationTelemetry,
     "debug GUI disables runtime telemetry"
 )
-assertEqual(
+T.equal(
     disabledDiagnostics.actionResult.reason,
     "telemetry_disabled",
     "disable telemetry result"
 )
 
 -- Save/load registry remains primitive-only and copy-safe.
-assertTrue(Factions.Save(), "faction save")
-assertSaveSafe(globalData.PNC_Factions)
+T.truthy(Factions.Save(), "faction save")
+validatePersistedValue(globalData.PNC_Factions)
 Factions.Loaded = false
-assertTrue(Factions.Load(), "faction reload")
-assertTrue(Factions.Get(traderID) ~= nil,
+T.truthy(Factions.Load(), "faction reload")
+T.truthy(Factions.Get(traderID) ~= nil,
     "faction persists")
-assertEqual(Factions.GetNPCAffiliation(alice.id).factionID,
+T.equal(Factions.GetNPCAffiliation(alice.id).factionID,
     traderID, "membership persists")
+T.finish("pnc_factions_foundation_smoke")
 
-print("pnc_factions_foundation_smoke: ok")
+T.finish("pnc_factions_foundation_smoke")

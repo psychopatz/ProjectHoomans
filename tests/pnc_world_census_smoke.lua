@@ -1,4 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local now = 1000
 local scans = 0
@@ -49,47 +51,48 @@ getCell = function()
     }
 end
 
-dofile(ROOT .. "World/PNC_WorldCensus.lua")
-dofile(ROOT .. "Spatial/PNC_SpatialIndex.lua")
+T.load(ROOT .. "World/PNC_WorldCensus.lua")
+T.load(ROOT .. "Spatial/PNC_SpatialIndex.lua")
 
-assert(PNC.SpatialIndex.Rebuild(now, false) == true,
+T.truthy(PNC.SpatialIndex.Rebuild(now, false) == true,
     "initial spatial rebuild failed")
-assert(scans == 1, "spatial rebuild did not use exactly one census scan")
-assert(#PNC.WorldCensus.GetAll(now, false) == 25,
+T.truthy(scans == 1, "spatial rebuild did not use exactly one census scan")
+T.truthy(#PNC.WorldCensus.GetAll(now, false) == 25,
     "census did not retain loaded zombies")
-assert(scans == 1,
+T.truthy(scans == 1,
     "second census consumer rescanned inside the refresh window")
-assert(#PNC.SpatialIndex.QueryZombies(8, 0, 16) == 25,
+T.truthy(#PNC.SpatialIndex.QueryZombies(8, 0, 16) == 25,
     "census zombies were not indexed")
 
 now = 1050
-assert(PNC.WorldCensus.Refresh(now, false) == false,
+T.truthy(PNC.WorldCensus.Refresh(now, false) == false,
     "census throttle did not hold")
-assert(scans == 1, "throttled census still scanned")
+T.truthy(scans == 1, "throttled census still scanned")
 
 now = 1499
-assert(PNC.WorldCensus.Refresh(now, false) == false,
+T.truthy(PNC.WorldCensus.Refresh(now, false) == false,
     "idle census refreshed before its relaxed interval")
-assert(scans == 1, "idle census performed an early scan")
+T.truthy(scans == 1, "idle census performed an early scan")
 
 now = 1500
-assert(PNC.WorldCensus.Refresh(now, false) == true,
+T.truthy(PNC.WorldCensus.Refresh(now, false) == true,
     "census did not refresh after its interval")
-assert(scans == 2, "census refresh scan count is incorrect")
-assert(PNC.SpatialIndex.Rebuild(now, false) == true,
+T.truthy(scans == 2, "census refresh scan count is incorrect")
+T.truthy(PNC.SpatialIndex.Rebuild(now, false) == true,
     "spatial index did not consume a newer census generation")
-assert(scans == 2,
+T.truthy(scans == 2,
     "spatial consumer rescanned an already-fresh census")
 
 -- Spatial refreshes may run after another census consumer in the same census
 -- generation. Rebuilding player cells must not erase the retained zombie
 -- grid merely because there is no newer zombie snapshot to consume.
 now = 1600
-assert(PNC.SpatialIndex.Rebuild(now, false) == true,
+T.truthy(PNC.SpatialIndex.Rebuild(now, false) == true,
     "spatial refresh with unchanged census generation failed")
-assert(scans == 2,
+T.truthy(scans == 2,
     "unchanged census generation triggered another engine scan")
-assert(#PNC.SpatialIndex.QueryZombies(8, 0, 16) == 25,
+T.truthy(#PNC.SpatialIndex.QueryZombies(8, 0, 16) == 25,
     "unchanged census generation erased the zombie index")
+T.finish("pnc_world_census_smoke")
 
-print("pnc_world_census_smoke: ok")
+T.finish("pnc_world_census_smoke")

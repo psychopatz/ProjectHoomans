@@ -12,7 +12,7 @@ T.load("ProjectHoomans", "shared",
 local Leases = T.load("ProjectHoomans", "server",
     "PNC/Tasking/PNC_TaskLeaseService.lua")
 
-local lease = assert(Leases.Create({ npcId = "npc", taskId = "task",
+local lease = T.truthy(Leases.Create({ npcId = "npc", taskId = "task",
     kind = "SLEEP", sourceDomain = "needs", sourceRef = "fatigue",
     precedence = "NORMAL_NEED", urgency = 0.8, capability = "sleep.bed",
     interruptPolicy = "NORMAL" }, {}))

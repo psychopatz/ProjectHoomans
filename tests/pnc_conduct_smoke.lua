@@ -1,26 +1,14 @@
+local T = require "tests/support/test"
+
 local ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
-
-local function near(actual, expected, epsilon, label)
-    if math.abs(actual - expected) > epsilon then
-        error((label or "near") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 PNC = {}
-dofile(ROOT .. "Relationships/PNC_EntityRef.lua")
-dofile(ROOT .. "Conduct/PNC_ConductConstants.lua")
-dofile(ROOT .. "Conduct/PNC_ConductTypes.lua")
-dofile(ROOT .. "Conduct/PNC_ConductMath.lua")
-dofile(ROOT .. "Conduct/PNC_ConductDefinitions.lua")
+T.load(ROOT .. "Relationships/PNC_EntityRef.lua")
+T.load(ROOT .. "Conduct/PNC_ConductConstants.lua")
+T.load(ROOT .. "Conduct/PNC_ConductTypes.lua")
+T.load(ROOT .. "Conduct/PNC_ConductMath.lua")
+T.load(ROOT .. "Conduct/PNC_ConductDefinitions.lua")
 
 local Types = PNC.ConductTypes
 local Math = PNC.ConductMath
@@ -29,9 +17,9 @@ local actor = "player:Patrick:char_test"
 local subject = "npc:npc_test"
 
 local neutral = Types.NewConductRecord()
-equal(neutral.schemaVersion, 1, "conduct schema")
+T.equal(neutral.schemaVersion, 1, "conduct schema")
 for _, dimension in ipairs(Constants.DIMENSIONS) do
-    equal(neutral.scores[dimension], 0, "neutral " .. dimension)
+    T.equal(neutral.scores[dimension], 0, "neutral " .. dimension)
 end
 
 local repaired = Types.NormalizeConductRecord({
@@ -48,10 +36,10 @@ local repaired = Types.NormalizeConductRecord({
         courage = math.huge,
     },
 })
-equal(repaired.scores.reliability, 100, "upper clamp")
-equal(repaired.scores.generosity, -100, "lower clamp")
-equal(repaired.scores.compassion, 0, "NaN repair")
-equal(repaired.scores.courage, 0, "infinity repair")
+T.equal(repaired.scores.reliability, 100, "upper clamp")
+T.equal(repaired.scores.generosity, -100, "lower clamp")
+T.equal(repaired.scores.compassion, 0, "NaN repair")
+T.equal(repaired.scores.courage, 0, "infinity repair")
 
 local evidence = Types.NewConductEvidence({
     id = "conduct:social:test:" .. actor,
@@ -67,21 +55,19 @@ local evidence = Types.NewConductEvidence({
     shareable = true,
     tags = { rescue = true, invalid = false },
 })
-assert(evidence, "valid evidence")
-equal(evidence.effects.ignored, nil, "unknown effect ignored")
-equal(evidence.tags.rescue, true, "map tag")
-equal(Types.NewConductEvidence({
+T.truthy(evidence, "valid evidence")
+T.equal(evidence.effects.ignored, nil, "unknown effect ignored")
+T.equal(evidence.tags.rescue, true, "map tag")
+T.equal(Types.NewConductEvidence({
     id = "bad",
     eventID = "not_social",
     actorKey = actor,
     subjectKey = subject,
     effects = { courage = 1 },
 }), nil, "invalid evidence rejected")
-near(Math.CalculateEvidenceStrengthAtTime(evidence, 48),
-    0.5, 0.00001, "deterministic decay")
+T.near(Math.CalculateEvidenceStrengthAtTime(evidence, 48), 0.5, 0.00001, "deterministic decay")
 evidence.permanent = true
-near(Math.CalculateEvidenceStrengthAtTime(evidence, 480),
-    1, 0.00001, "permanent evidence")
+T.near(Math.CalculateEvidenceStrengthAtTime(evidence, 480), 1, 0.00001, "permanent evidence")
 
 local many = Types.NewConductRecord()
 for index = 1, 66 do
@@ -101,8 +87,8 @@ for index = 1, 66 do
         })
 end
 many, _, within = Math.PruneEvidence(many, 66, 64)
-equal(within, true, "evidence limit")
-equal(#many.evidence, 64, "evidence count")
+T.equal(within, true, "evidence limit")
+T.equal(#many.evidence, 64, "evidence count")
 local permanentFound = false
 local weakestFound = false
 for _, item in ipairs(many.evidence) do
@@ -110,8 +96,8 @@ for _, item in ipairs(many.evidence) do
     weakestFound = weakestFound
         or item.id == "conduct:social:limit:2:" .. actor
 end
-equal(permanentFound, true, "permanent preserved")
-equal(weakestFound, false, "weakest temporary removed")
+T.equal(permanentFound, true, "permanent preserved")
+T.equal(weakestFound, false, "weakest temporary removed")
 
 local calculated = Types.NewConductRecord({
     evidence = {
@@ -130,12 +116,12 @@ local calculated = Types.NewConductRecord({
     },
 })
 calculated = Math.Recalculate(calculated, 48)
-near(calculated.scores.compassion, 4, 0.00001,
-    "derived score")
+T.near(calculated.scores.compassion, 4, 0.00001, "derived score")
 
-equal(PNC.ConductDefinitions.treated_wound.effects.compassion,
+T.equal(PNC.ConductDefinitions.treated_wound.effects.compassion,
     2, "treatment mapping")
-equal(PNC.ConductDefinitions.abandoned_in_combat
+T.equal(PNC.ConductDefinitions.abandoned_in_combat
     .effects.groupLoyalty, -8, "abandonment mapping")
+T.finish("pnc_conduct_smoke")
 
-print("pnc_conduct_smoke: ok")
+T.finish("pnc_conduct_smoke")

@@ -1,12 +1,8 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/"
-local BANDAGE_MENU_FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/PNC_BandageMenu.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "client", "PNC/UI/CharacterWindow/")
+local BANDAGE_MENU_FILE =
+    T.path("ProjectHoomans", "client", "PNC/UI/Context/PNC_BandageMenu.lua")
 
 package.preload["ISUI/ISContextMenu"] = function() return {} end
 
@@ -73,8 +69,8 @@ getGameTime = function()
     return { getWorldAgeHours = function() return 100 end }
 end
 
-dofile(BANDAGE_MENU_FILE)
-dofile(ROOT .. "PNC_CharacterWindow_Health.lua")
+T.load(BANDAGE_MENU_FILE)
+T.load(ROOT .. "PNC_CharacterWindow_Health.lua")
 
 local view = {
     npcId = "npc_health_menu",
@@ -85,56 +81,56 @@ local view = {
     getAbsoluteY = function() return 200 end,
 }
 
-assertEqual(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 20, 15), true, "health right-click handled")
-assertEqual(rootMenu.x, 120, "context absolute x")
-assertEqual(rootMenu.y, 215, "context absolute y")
-assertEqual(rootMenu.options[1].name, "Bandage", "vanilla bandage option")
-assertEqual(rootMenu.options[1].subMenu.options[1].name, "Bandage (2)",
+T.equal(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 20, 15), true, "health right-click handled")
+T.equal(rootMenu.x, 120, "context absolute x")
+T.equal(rootMenu.y, 215, "context absolute y")
+T.equal(rootMenu.options[1].name, "Bandage", "vanilla bandage option")
+T.equal(rootMenu.options[1].subMenu.options[1].name, "Bandage (2)",
     "character menu groups bandages by type and count")
-assertEqual(rootMenu.options[1].subMenu.options[1].itemForTexture, bandageItem, "actual item icon")
+T.equal(rootMenu.options[1].subMenu.options[1].itemForTexture, bandageItem, "actual item icon")
 
 rootMenu.options[1].subMenu.options[1].callback()
-assertEqual(sent[1][1], "npc_health_menu", "standard bandage npc")
-assertEqual(sent[1][2], "Head", "standard bandage part")
-assertEqual(sent[1][3], false, "standard bandage consumes")
-assertEqual(sent[1][4], "Base.Bandage", "selected bandage type")
+T.equal(sent[1][1], "npc_health_menu", "standard bandage npc")
+T.equal(sent[1][2], "Head", "standard bandage part")
+T.equal(sent[1][3], false, "standard bandage consumes")
+T.equal(sent[1][4], "Base.Bandage", "selected bandage type")
 
 rootMenu.options[2].callback()
-assertEqual(sent[2][3], true, "debug bandage no-consume flag")
+T.equal(sent[2][3], true, "debug bandage no-consume flag")
 
-assertEqual(rootMenu.options[3].name, "Debug Injury", "debug injury option")
+T.equal(rootMenu.options[3].name, "Debug Injury", "debug injury option")
 local damageMenu = rootMenu.options[3].subMenu
-assertEqual(damageMenu.options[1].name, "Random Body Part", "random injury option")
-assertEqual(damageMenu.options[2].name, "Injure Head", "clicked body-part injury")
-assertEqual(damageMenu.options[3].name, "Choose Body Part", "specific body-part submenu")
+T.equal(damageMenu.options[1].name, "Random Body Part", "random injury option")
+T.equal(damageMenu.options[2].name, "Injure Head", "clicked body-part injury")
+T.equal(damageMenu.options[3].name, "Choose Body Part", "specific body-part submenu")
 damageMenu.options[1].callback()
-assertEqual(debugSent[1].action, "damage_part", "random injury action")
-assertEqual(debugSent[1].payload.partId, nil, "random injury omits body part")
+T.equal(debugSent[1].action, "damage_part", "random injury action")
+T.equal(debugSent[1].payload.partId, nil, "random injury omits body part")
 damageMenu.options[2].callback()
-assertEqual(debugSent[2].payload.partId, "Head", "clicked injury part")
+T.equal(debugSent[2].payload.partId, "Head", "clicked injury part")
 damageMenu.options[3].subMenu.options[2].callback()
-assertEqual(debugSent[3].payload.partId, "Hand_R", "chosen injury part")
+T.equal(debugSent[3].payload.partId, "Hand_R", "chosen injury part")
 
-assertEqual(rootMenu.options[4].name, "Debug Infection", "debug infection option")
+T.equal(rootMenu.options[4].name, "Debug Infection", "debug infection option")
 local infectionMenu = rootMenu.options[4].subMenu
-assertEqual(infectionMenu.options[1].name, "Status: NOT INFECTED", "infection status")
+T.equal(infectionMenu.options[1].name, "Status: NOT INFECTED", "infection status")
 infectionMenu.options[2].callback()
-assertEqual(debugSent[4].action, "infection", "force infection action")
-assertEqual(debugSent[4].payload.partId, "Head", "force infection selected part")
-assertEqual(debugSent[4].payload.stage, "incubating", "force infection initial stage")
+T.equal(debugSent[4].action, "infection", "force infection action")
+T.equal(debugSent[4].payload.partId, "Head", "force infection selected part")
+T.equal(debugSent[4].payload.stage, "incubating", "force infection initial stage")
 infectionMenu.options[3].callback()
-assertEqual(debugSent[5].payload.stage, "fever", "advance infection fever")
-assertEqual(infectionMenu.options[6].name, "Clear Knox Infection", "infection clear option")
-assertEqual(infectionMenu.options[6].notAvailable, true, "healthy infection clear disabled")
+T.equal(debugSent[5].payload.stage, "fever", "advance infection fever")
+T.equal(infectionMenu.options[6].name, "Clear Knox Infection", "infection clear option")
+T.equal(infectionMenu.options[6].notAvailable, true, "healthy infection clear disabled")
 
 view.snapshot.bodyHealth.infection = { active = true, stage = "incubating" }
-assertEqual(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 20, 15), true,
+T.equal(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 20, 15), true,
     "infected health debug menu")
 infectionMenu = rootMenu.options[4].subMenu
-assertEqual(infectionMenu.options[6].notAvailable, false, "infected clear enabled")
+T.equal(infectionMenu.options[6].notAvailable, false, "infected clear enabled")
 infectionMenu.options[6].callback()
-assertEqual(debugSent[6].action, "clear_infection", "clear infection action")
-assertEqual(debugSent[6].payload.id, "npc_health_menu", "clear infection npc")
+T.equal(debugSent[6].action, "clear_infection", "clear infection action")
+T.equal(debugSent[6].payload.id, "npc_health_menu", "clear infection npc")
 
 view.snapshot.bodyHealth.wounds.Head = {
     type = "bite",
@@ -146,34 +142,34 @@ view.snapshot.bodyHealth.wounds.Head = {
     bandageHealedPoints = 4,
     healRatePerWorldHour = 2,
 }
-assertEqual(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 20, 15), true,
+T.equal(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 20, 15), true,
     "bandaged health debug menu")
-assertEqual(rootMenu.options[1].name, "Debug Bandage State", "bandage debug submenu")
-assertEqual(rootMenu.options[1].subMenu.options[1].name,
+T.equal(rootMenu.options[1].name, "Debug Bandage State", "bandage debug submenu")
+T.equal(rootMenu.options[1].subMenu.options[1].name,
     "Status: clean, 0.020 world h remaining", "bandage dirty timer status")
 rootMenu.options[1].subMenu.options[2].callback()
-assertEqual(debugSent[7].action, "bandage_almost_dirty", "almost-dirty action")
-assertEqual(debugSent[7].payload.partId, "Head", "almost-dirty selected part")
+T.equal(debugSent[7].action, "bandage_almost_dirty", "almost-dirty action")
+T.equal(debugSent[7].payload.partId, "Head", "almost-dirty selected part")
 
 view.snapshot.bodyHealth.wounds = {}
 view.healthHitRegions = {}
-assertEqual(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 70, 70), true, "blank health debug menu")
-assertEqual(rootMenu.options[1].name, "Debug Injury", "blank health menu only offers debug injury")
-assertEqual(rootMenu.options[2].name, "Debug Infection", "blank health menu offers infection debug")
+T.equal(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view, 70, 70), true, "blank health debug menu")
+T.equal(rootMenu.options[1].name, "Debug Injury", "blank health menu only offers debug injury")
+T.equal(rootMenu.options[2].name, "Debug Infection", "blank health menu offers infection debug")
 
-local healthUIPath = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/PNC_CharacterWindow_Health.lua"
-local healthUIFile = assert(io.open(healthUIPath, "r"))
-local healthUISource = healthUIFile:read("*a")
-healthUIFile:close()
-assert(string.find(healthUISource, "media/ui/BodyDamage/", 1, true), "vanilla body-damage textures are not used")
-assert(string.find(healthUISource, '"_bandage_"', 1, true), "vanilla bandage overlays are not used")
-assert(string.find(healthUISource, '"_bite_"', 1, true), "vanilla bite overlays are not used")
-assert(not string.find(healthUISource, "bps_node_diamond", 1, true), "generic wound diamonds returned")
-assert(not string.find(healthUISource, "HP %.1f / %.1f", 1, true),
+local healthUISource = T.read(
+    "ProjectHoomans", "client", "PNC/UI/CharacterWindow/PNC_CharacterWindow_Health.lua"
+)
+T.truthy(string.find(healthUISource, "media/ui/BodyDamage/", 1, true), "vanilla body-damage textures are not used")
+T.truthy(string.find(healthUISource, '"_bandage_"', 1, true), "vanilla bandage overlays are not used")
+T.truthy(string.find(healthUISource, '"_bite_"', 1, true), "vanilla bite overlays are not used")
+T.truthy(not string.find(healthUISource, "bps_node_diamond", 1, true), "generic wound diamonds returned")
+T.truthy(not string.find(healthUISource, "HP %.1f / %.1f", 1, true),
     "numeric HP returned to the health panel")
-assert(string.find(healthUISource, "DEBUG Dirty in:", 1, true),
+T.truthy(string.find(healthUISource, "DEBUG Dirty in:", 1, true),
     "bandage dirty timer diagnostics missing")
-assert(string.find(healthUISource, "DEBUG Healed:", 1, true),
+T.truthy(string.find(healthUISource, "DEBUG Healed:", 1, true),
     "bandage healing-point diagnostics missing")
+T.finish("pnc_character_health_context_smoke")
 
-print("pnc_character_health_context_smoke: ok")
+T.finish("pnc_character_health_context_smoke")

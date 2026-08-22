@@ -1,8 +1,10 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+    T.path("ProjectHoomans", "client", "PNC/")
     .. "UI/Factions/PNC_FactionDebugModel.lua"
 
-local function assertContains(rows, label, fragment)
+local function expectRowContaining(rows, label, fragment)
     for _, item in ipairs(rows) do
         if item.label == label
             and string.find(item.value, fragment, 1, true)
@@ -14,7 +16,7 @@ local function assertContains(rows, label, fragment)
 end
 
 PNC = {}
-dofile(FILE)
+T.load(FILE)
 
 local snapshot = {
     registrySchemaVersion = 3,
@@ -167,11 +169,11 @@ local snapshot = {
 local factionItems =
     PNC.FactionDebugModel.BuildFactionItems(snapshot)
 local npcItems = PNC.FactionDebugModel.BuildNPCItems(snapshot)
-assert(#factionItems == 1, "one faction item")
-assert(factionItems[1].detail == "Settlement / active",
+T.truthy(#factionItems == 1, "one faction item")
+T.truthy(factionItems[1].detail == "Settlement / active",
     "faction list formatting")
-assert(#npcItems == 1, "one NPC item")
-assert(npcItems[1].detail == "faction_test",
+T.truthy(#npcItems == 1, "one NPC item")
+T.truthy(npcItems[1].detail == "faction_test",
     "NPC affiliation formatting")
 
 local provisionalSnapshot = {
@@ -188,75 +190,75 @@ local targetItems =
     PNC.FactionDebugModel.BuildTargetFactionItems(
         provisionalSnapshot
     )
-assert(#targetItems == 2,
+T.truthy(#targetItems == 2,
     "provisional diplomacy identity is target-selectable")
-assert(targetItems[2].id == "faction_provisional",
+T.truthy(targetItems[2].id == "faction_provisional",
     "provisional identity remains hidden from source list")
 
 local rows =
     PNC.FactionDebugModel.BuildRows(snapshot, true)
-assertContains(rows, "Registry", "revision 4")
-assertContains(rows, "Your faction", "faction_player")
-assertContains(rows, "Faction", "Test Cooperative")
-assertContains(rows, "Archetype", "Settlement")
-assertContains(rows, "Leader", "npc_one")
-assertContains(rows, "Member Alice", "npc_one")
-assertContains(rows, "  affiliation", "member / medic / senior")
-assertContains(rows, "Diplomacy faction_player", "war / standing")
-assertContains(rows, "Source -> target", "war / standing")
-assertContains(rows, "Last action", "leader")
-assertContains(rows, "    full episode key",
+expectRowContaining(rows, "Registry", "revision 4")
+expectRowContaining(rows, "Your faction", "faction_player")
+expectRowContaining(rows, "Faction", "Test Cooperative")
+expectRowContaining(rows, "Archetype", "Settlement")
+expectRowContaining(rows, "Leader", "npc_one")
+expectRowContaining(rows, "Member Alice", "npc_one")
+expectRowContaining(rows, "  affiliation", "member / medic / senior")
+expectRowContaining(rows, "Diplomacy faction_player", "war / standing")
+expectRowContaining(rows, "Source -> target", "war / standing")
+expectRowContaining(rows, "Last action", "leader")
+expectRowContaining(rows, "    full episode key",
     "faction_source|faction_target|npc:attacker|npc:victim")
-assertContains(rows, "#7 aggregation", "record_attack")
+expectRowContaining(rows, "#7 aggregation", "record_attack")
 local shortened = PNC.FactionDebugModel.ShortenID(
     "faction_source|faction_target|npc:attacker|npc:victim",
     24
 )
-assert(#shortened <= 24, "long ID shortened visually")
-assert(shortened ~=
+T.truthy(#shortened <= 24, "long ID shortened visually")
+T.truthy(shortened ~=
     "faction_source|faction_target|npc:attacker|npc:victim",
     "short ID presentation differs")
 
 local dashboard =
     PNC.FactionDebugModel.BuildDashboard(snapshot, true)
-assert(dashboard.status == "ready", "dashboard ready")
-assert(dashboard.source.name == "Test Cooperative",
+T.truthy(dashboard.status == "ready", "dashboard ready")
+T.truthy(dashboard.source.name == "Test Cooperative",
     "dashboard source")
-assert(dashboard.forward.atWar == true, "dashboard war state")
-assert(dashboard.reverse.revision == 4,
+T.truthy(dashboard.forward.atWar == true, "dashboard war state")
+T.truthy(dashboard.reverse.revision == 4,
     "dashboard preserves directed reverse relation")
-assert(dashboard.intent.attackAllowed == true,
+T.truthy(dashboard.intent.attackAllowed == true,
     "dashboard intent")
-assert(dashboard.activeEpisodeCount == 1,
+T.truthy(dashboard.activeEpisodeCount == 1,
     "dashboard episode count")
-assert(dashboard.validation.ok == true,
+T.truthy(dashboard.validation.ok == true,
     "dashboard invariant status")
 
 local overview = PNC.FactionDebugModel.BuildGUIRows(
     snapshot, true, nil, "overview"
 )
-assertContains(overview, "Source faction", "Test Cooperative")
-assertContains(overview, "Diplomatic state", "war")
-assertContains(overview, "Invariant check", "PASS")
+expectRowContaining(overview, "Source faction", "Test Cooperative")
+expectRowContaining(overview, "Diplomatic state", "war")
+expectRowContaining(overview, "Invariant check", "PASS")
 
 local diplomacy = PNC.FactionDebugModel.BuildGUIRows(
     snapshot, true, nil, "diplomacy"
 )
-assertContains(diplomacy, "Source -> target state", "war")
-assertContains(diplomacy, "Target -> source state", "hostile")
-assertContains(diplomacy, "Intent rule", "at_war")
+expectRowContaining(diplomacy, "Source -> target state", "war")
+expectRowContaining(diplomacy, "Target -> source state", "hostile")
+expectRowContaining(diplomacy, "Intent rule", "at_war")
 
 local members = PNC.FactionDebugModel.BuildGUIRows(
     snapshot, true, nil, "members"
 )
-assertContains(members, "Alice", "npc_one")
-assertContains(members, "Selected presence revision", "0")
+expectRowContaining(members, "Alice", "npc_one")
+expectRowContaining(members, "Selected presence revision", "0")
 
 local diagnostics = PNC.FactionDebugModel.BuildGUIRows(
     snapshot, true, nil, "diagnostics"
 )
-assertContains(diagnostics, "Invariant validation", "PASS")
-assertContains(diagnostics, "#7 aggregation", "record_attack")
+expectRowContaining(diagnostics, "Invariant validation", "PASS")
+expectRowContaining(diagnostics, "#7 aggregation", "record_attack")
 
 local populationPending = PNC.FactionDebugModel.BuildGUIRows({
     factions = {}, roster = {}, populationDirector = {
@@ -266,15 +268,16 @@ local populationPending = PNC.FactionDebugModel.BuildGUIRows({
         starter = { completed = false },
     },
 }, true, nil, "overview")
-assertContains(populationPending, "Population starter", "PENDING")
-assertContains(populationPending, "Generated population", "pending=1/1")
+expectRowContaining(populationPending, "Population starter", "PENDING")
+expectRowContaining(populationPending, "Generated population", "pending=1/1")
 
 local unauthorized =
     PNC.FactionDebugModel.BuildRows(nil, false)
-assertContains(
+expectRowContaining(
     unauthorized,
     "Access",
     "Admin/debug mode required"
 )
+T.finish("pnc_faction_debug_model_smoke")
 
-print("pnc_faction_debug_model_smoke: ok")
+T.finish("pnc_faction_debug_model_smoke")

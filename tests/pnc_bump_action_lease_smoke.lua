@@ -1,17 +1,11 @@
+local T = require "tests/support/test"
+
 local LIVE_BODY =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/Pathing/")
     .. "PNC_LiveBodyControl.lua"
 local ANIMATION =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/Visuals/")
     .. "PNC_Animation.lua"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual")
-            .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
 
 local now = 1000
 local authority = true
@@ -30,8 +24,8 @@ PNC = {
     },
 }
 
-dofile(LIVE_BODY)
-dofile(ANIMATION)
+T.load(LIVE_BODY)
+T.load(ANIMATION)
 
 local modData = {}
 local variables = {}
@@ -68,7 +62,7 @@ local body = {
     end,
     setBumpFall = function() end,
     changeState = function(_, value)
-        assertEqual(value, "idle_state", "forced bump recovery state")
+        T.equal(value, "idle_state", "forced bump recovery state")
         actionState = "idle"
     end,
     setRunning = function() end,
@@ -92,27 +86,27 @@ local record = {
     },
 }
 
-assertEqual(
+T.equal(
     PNC.Animation.ResolveBumpType("PNC_Attack1H1"),
     "PNC_Attack1H1",
     "one-handed engine contract"
 )
-assertEqual(
+T.equal(
     PNC.Animation.ResolveBumpType("PNC_Attack2HStamp"),
     "PNC_Attack2HStamp",
     "ground-stomp engine contract"
 )
-assertEqual(
+T.equal(
     PNC.Animation.ResolveBumpType("PNC_AttackRifle"),
     "PNC_AttackRifle",
     "firearm engine contract"
 )
-assertEqual(
+T.equal(
     PNC.Animation.ResolveBumpType("PNC_ClimbWindow"),
     "PNC_ClimbWindow",
     "non-combat bump remains namespaced"
 )
-assertEqual(
+T.equal(
     PNC.Animation.ResolveBumpType("BandageUpperBody"),
     "PNC_BandageUpperBody",
     "unnamespaced action is isolated for PNC"
@@ -120,87 +114,87 @@ assertEqual(
 
 local started, reason =
     PNC.Animation.PlayBump(body, record, "PNC_Attack1H1")
-assertEqual(started, true, "bump started")
-assertEqual(reason, "bump_type_setter", "bump start mode")
-assertEqual(bumpType, "PNC_Attack1H1", "engine bump type written")
-assertEqual(bumpDone, false, "stale Java bump completion latch reset")
-assertEqual(
+T.equal(started, true, "bump started")
+T.equal(reason, "bump_type_setter", "bump start mode")
+T.equal(bumpType, "PNC_Attack1H1", "engine bump type written")
+T.equal(bumpDone, false, "stale Java bump completion latch reset")
+T.equal(
     variables.BumpAnimFinished,
     false,
     "stale XML completion latch reset"
 )
-assertEqual(
+T.equal(
     variables.PNCAttackVariationX,
     "1.0",
     "private melee blend scalar initialized"
 )
-assertEqual(
+T.equal(
     variables.PNCAttackVariationY,
     "0.0",
     "private melee blend scalar direction initialized"
 )
-assertEqual(
+T.equal(
     variables.AttackVariationX,
     nil,
     "stale melee X blend scalar cleared"
 )
-assertEqual(
+T.equal(
     variables.AttackVariationY,
     nil,
     "stale melee Y blend scalar cleared"
 )
-assertEqual(
+T.equal(
     useless,
     true,
     "SP combat bump preserves Bandits-style useless shell"
 )
-assertEqual(
+T.equal(
     modData.PNC_BumpActionLease,
     true,
     "body action lease recorded"
 )
-assertEqual(
+T.equal(
     PNC.Animation.IsBumpActionActive(body, now),
     true,
     "animation adapter exposes active body lease"
 )
 local attackAnimState = variables.PNCAnim
-assertEqual(
+T.equal(
     PNC.Animation.Apply(body, record, "Run"),
     false,
     "generic locomotion rejected during bump action"
 )
-assertEqual(
+T.equal(
     variables.PNCAnim,
     attackAnimState,
     "generic locomotion overwrote active attack variables"
 )
-assertEqual(
+T.equal(
     PNC.LiveBodyControl.ShouldKeepEngineMovementActive(record, body),
     false,
     "SP attack does not reactivate the engine zombie controller"
 )
 authority = false
-assertEqual(
+T.equal(
     PNC.LiveBodyControl.ShouldKeepEngineMovementActive(record, body),
     false,
     "SP local action lease retains useless shell"
 )
 
 PNC.Animation.FinishBump(body, true)
-assertEqual(
+T.equal(
     modData.PNC_BumpReleasePending,
     true,
     "bump release scheduled"
 )
 now = 1100
-assertEqual(
+T.equal(
     PNC.Animation.PumpBumpRelease(body, now),
     false,
     "idle action releases completed bump"
 )
-assertEqual(bumpType, "", "completed bump type cleared")
-assertEqual(
+T.equal(bumpType, "", "completed bump type cleared")
+T.equal(
     modData.PNC_BumpActionLease,
     nil,
     "completed action lease cleared"
@@ -212,8 +206,8 @@ started = PNC.Animation.PlayBump(
     record,
     "PNC_Attack1H1"
 )
-assertEqual(started, true, "MP combat bump started")
-assertEqual(
+T.equal(started, true, "MP combat bump started")
+T.equal(
     useless,
     false,
     "MP combat bump keeps replicated ActionContext useful"
@@ -228,26 +222,26 @@ started = PNC.Animation.PlayBump(
     "PNC_ClimbFence",
     { keepManagedUseless = true }
 )
-assertEqual(started, true, "scripted traversal bump started")
-assertEqual(useless, true, "scripted traversal retained safe fake-body mode")
-assertEqual(
+T.equal(started, true, "scripted traversal bump started")
+T.equal(useless, true, "scripted traversal retained safe fake-body mode")
+T.equal(
     modData.PNC_BumpKeepUseless,
     true,
     "scripted traversal body-mode lease"
 )
-assertEqual(
+T.equal(
     PNC.LiveBodyControl.ShouldKeepEngineMovementActive(record, body),
     false,
     "safety audit does not reactivate unsafe native traversal"
 )
 PNC.Animation.FinishBump(body, true)
 now = 1200
-assertEqual(
+T.equal(
     PNC.Animation.PumpBumpRelease(body, now),
     false,
     "scripted traversal bump released"
 )
-assertEqual(
+T.equal(
     modData.PNC_BumpKeepUseless,
     nil,
     "scripted traversal body-mode lease cleared"
@@ -259,26 +253,26 @@ started = PNC.Animation.PlayBump(
     record,
     "PNC_Attack1H1"
 )
-assertEqual(started, true, "stale-lease scenario started")
+T.equal(started, true, "stale-lease scenario started")
 bumpType = ""
 actionState = "idle"
 now = 1651
-assertEqual(
+T.equal(
     PNC.Animation.IsBumpActionActive(body, now),
     false,
     "cleared engine action retained a sliding idle lease"
 )
-assertEqual(
+T.equal(
     modData.PNC_BumpActionLease,
     nil,
     "stale action lease was not removed"
 )
-assertEqual(
+T.equal(
     PNC.Animation.Apply(body, record, "Walk"),
     true,
     "locomotion did not recover after a cancelled bump"
 )
-assertEqual(variables.bMoving, true, "recovered body did not animate its legs")
+T.equal(variables.bMoving, true, "recovered body did not animate its legs")
 
 now = 2000
 actionState = "bumped"
@@ -287,26 +281,27 @@ started = PNC.Animation.PlayBump(
     record,
     "PNC_Attack1H1"
 )
-assertEqual(started, true, "stuck bump scenario started")
+T.equal(started, true, "stuck bump scenario started")
 PNC.Animation.FinishBump(body, true)
 now = 2400
-assertEqual(
+T.equal(
     PNC.Animation.PumpBumpRelease(body, now),
     true,
     "bumped state was force-cleared before its recovery grace"
 )
 now = 2800
-assertEqual(
+T.equal(
     PNC.Animation.PumpBumpRelease(body, now),
     false,
     "stuck bumped state survived the hard recovery timeout"
 )
-assertEqual(bumpType, "", "stuck bump selector was not cleared")
-assertEqual(actionState, "idle", "stuck bump did not return to idle")
-assertEqual(
+T.equal(bumpType, "", "stuck bump selector was not cleared")
+T.equal(actionState, "idle", "stuck bump did not return to idle")
+T.equal(
     modData.PNC_BumpActionLease,
     nil,
     "stuck bump retained its body action lease"
 )
+T.finish("pnc_bump_action_lease_smoke")
 
-print("pnc_bump_action_lease_smoke: ok")
+T.finish("pnc_bump_action_lease_smoke")

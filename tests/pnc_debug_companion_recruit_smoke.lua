@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
+local ROOT = T.path("ProjectHoomans", "server", "PNC/")
 
 local records = {
     hostile = { id = "hostile", faction = "hostile", alive = true },
@@ -126,57 +121,57 @@ PNC = {
     },
 }
 
-local Recruit = dofile(ROOT .. "PNC_DebugCompanionRecruit.lua")
+local Recruit = T.load(ROOT .. "PNC_DebugCompanionRecruit.lua")
 local player = { getUsername = function() return "Tester" end }
 
-assertEqual(Recruit.IsEligible(records.hostile), true, "hostile eligible")
-assertEqual(Recruit.IsEligible(records.neutral), true, "neutral eligible")
-assertEqual(Recruit.IsEligible(records.companion), false, "companion not eligible")
+T.equal(Recruit.IsEligible(records.hostile), true, "hostile eligible")
+T.equal(Recruit.IsEligible(records.neutral), true, "neutral eligible")
+T.equal(Recruit.IsEligible(records.companion), false, "companion not eligible")
 
 local ok, reason = Recruit.Try(player, { npcID = "hostile" })
-assertEqual(ok, true, "hostile recruit succeeds")
-assertEqual(reason, "recruited", "hostile recruit result")
-assertEqual(transferCalls, 1, "hostile uses canonical transfer")
-assertEqual(records.hostile.recruited, true, "hostile becomes companion")
-assertEqual(records.hostile.orderSpec.kind, "follow", "hostile follows recruiter")
+T.equal(ok, true, "hostile recruit succeeds")
+T.equal(reason, "recruited", "hostile recruit result")
+T.equal(transferCalls, 1, "hostile uses canonical transfer")
+T.equal(records.hostile.recruited, true, "hostile becomes companion")
+T.equal(records.hostile.orderSpec.kind, "follow", "hostile follows recruiter")
 
 ok, reason = Recruit.Try(player, { npcID = "neutral" })
-assertEqual(ok, true, "neutral recruit succeeds")
-assertEqual(addCalls, 1, "unaffiliated neutral uses canonical add")
-assertEqual(records.neutral.recruited, true, "neutral becomes companion")
-assertEqual(needsCalls, 2, "companion needs initialized")
-assertEqual(endedCalls, 2, "conversation lease ended after recruitment")
-assertEqual(orderCalls, 2, "every recruit receives a follow order")
-assertEqual(communityCreates, 1, "first companion creates a player community")
-assertEqual(communityAdds, 2, "recruits populate the player community")
-assertEqual(registrySaves, 2, "each recruit commits its NPC record")
-assertEqual(factionSaves, 2, "each recruit commits faction membership")
-assertEqual(communitySaves, 2, "each recruit commits community membership")
+T.equal(ok, true, "neutral recruit succeeds")
+T.equal(addCalls, 1, "unaffiliated neutral uses canonical add")
+T.equal(records.neutral.recruited, true, "neutral becomes companion")
+T.equal(needsCalls, 2, "companion needs initialized")
+T.equal(endedCalls, 2, "conversation lease ended after recruitment")
+T.equal(orderCalls, 2, "every recruit receives a follow order")
+T.equal(communityCreates, 1, "first companion creates a player community")
+T.equal(communityAdds, 2, "recruits populate the player community")
+T.equal(registrySaves, 2, "each recruit commits its NPC record")
+T.equal(factionSaves, 2, "each recruit commits faction membership")
+T.equal(communitySaves, 2, "each recruit commits community membership")
 
 ok, reason = Recruit.Try(player, { npcID = "companion" })
-assertEqual(ok, false, "existing companion rejected")
-assertEqual(reason, "npc_not_debug_recruitable", "existing companion reason")
+T.equal(ok, false, "existing companion rejected")
+T.equal(reason, "npc_not_debug_recruitable", "existing companion reason")
 
 ok, reason = Recruit.Assign(player, records.stale, {
     source = "starting_companion_repair",
     endConversation = false,
 })
-assertEqual(ok, true, "existing faction member can repair enrollment")
-assertEqual(reason, "recruited", "existing membership repair result")
-assertEqual(transferCalls, 1,
+T.equal(ok, true, "existing faction member can repair enrollment")
+T.equal(reason, "recruited", "existing membership repair result")
+T.equal(transferCalls, 1,
     "same-faction repair does not attempt an invalid transfer")
-assertEqual(addCalls, 2,
+T.equal(addCalls, 2,
     "same-faction repair uses idempotent faction add")
 
 local ordersBeforeRepair = orderCalls
 ok, reason = Recruit.ReconcileOwned(player, records.orphaned)
-assertEqual(ok, true, "owned orphan membership repaired")
-assertEqual(reason, "recruited", "owned orphan repair result")
-assertEqual(affiliations.orphaned.factionID, "player-faction",
+T.equal(ok, true, "owned orphan membership repaired")
+T.equal(reason, "recruited", "owned orphan repair result")
+T.equal(affiliations.orphaned.factionID, "player-faction",
     "owned orphan joined player faction")
-assertEqual(records.orphaned.orderSpec.kind, "guard",
+T.equal(records.orphaned.orderSpec.kind, "guard",
     "membership repair preserves current companion order")
-assertEqual(orderCalls, ordersBeforeRepair,
+T.equal(orderCalls, ordersBeforeRepair,
     "membership repair did not force follow")
 
 records.canonical = {
@@ -186,11 +181,12 @@ records.canonical = {
 affiliations.canonical = { factionID = "player-faction" }
 communityByNPC.canonical = playerCommunities[1]
 ok, reason = Recruit.ReconcileOwned(player, records.canonical)
-assertEqual(ok, true, "canonical membership remains valid")
-assertEqual(reason, "unchanged", "canonical membership is not rebuilt")
-assertEqual(records.canonical.affiliation.communityID, "community_player",
+T.equal(ok, true, "canonical membership remains valid")
+T.equal(reason, "unchanged", "canonical membership is not rebuilt")
+T.equal(records.canonical.affiliation.communityID, "community_player",
     "canonical community is mirrored onto the NPC record")
-assertEqual(records.canonical.communityId, "community_player",
+T.equal(records.canonical.communityId, "community_player",
     "legacy scheduler community field is repaired")
+T.finish("pnc_debug_companion_recruit_smoke")
 
-print("pnc_debug_companion_recruit_smoke: ok")
+T.finish("pnc_debug_companion_recruit_smoke")

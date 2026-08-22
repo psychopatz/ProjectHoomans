@@ -1,25 +1,9 @@
+local T = require "tests/support/test"
+
 local ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 local SERVER =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected="
-            .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertTrue(value, label)
-    assertEqual(value == true, true, label)
-end
-
-local function assertNear(actual, expected, epsilon, label)
-    if math.abs(actual - expected) > epsilon then
-        error((label or "assertNear") .. ": expected="
-            .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+    T.path("ProjectHoomans", "server", "PNC/")
 
 local function deepEqual(left, right, seen)
     local key
@@ -39,7 +23,7 @@ local function deepEqual(left, right, seen)
     return true
 end
 
-local function assertSaveSafe(value, seen)
+local function validatePersistedValue(value, seen)
     local valueType = type(value)
     local key
     local item
@@ -60,7 +44,7 @@ local function assertSaveSafe(value, seen)
         if type(key) ~= "string" and type(key) ~= "number" then
             error("unsafe persisted profile key")
         end
-        assertSaveSafe(item, seen)
+        validatePersistedValue(item, seen)
     end
     seen[value] = nil
 end
@@ -156,32 +140,32 @@ local function makePlayer(account, selected, modData)
     return player
 end
 
-dofile("../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/PsychopatzCore/Traits/PsychopatzTraitRegistry.lua")
+T.load(T.path("PsychopatzCore", "shared", "PsychopatzCore/Traits/PsychopatzTraitRegistry.lua"))
 PNC = {}
-dofile(ROOT .. "Base/PNC_Core.lua")
-dofile(ROOT .. "Base/PNC_Constants.lua")
-dofile(ROOT .. "Identity/PNC_PlayerCharacterConstants.lua")
-dofile(ROOT .. "Identity/PNC_Identity.lua")
-dofile(ROOT .. "Relationships/PNC_EntityRef.lua")
-dofile(ROOT .. "Relationships/PNC_SocialProfileConstants.lua")
-dofile(ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
-dofile(ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
-dofile(ROOT .. "Relationships/PNC_SocialTraits.lua")
-dofile(ROOT .. "Relationships/PNC_SocialProfileMath.lua")
-dofile(ROOT .. "Conduct/PNC_ConductConstants.lua")
-dofile(ROOT .. "Conduct/PNC_ConductTypes.lua")
-dofile(ROOT .. "Conduct/PNC_ConductMath.lua")
-dofile(ROOT .. "Conduct/PNC_ConductDefinitions.lua")
-dofile(ROOT .. "Factions/PNC_FactionConstants.lua")
-dofile(ROOT .. "Factions/PNC_FactionArchetypes.lua")
-dofile(ROOT .. "Factions/PNC_FactionEmblems.lua")
-dofile(ROOT .. "Factions/PNC_FactionTypes.lua")
-dofile(ROOT .. "Identity/PNC_PlayerCharacterTypes.lua")
-dofile(ROOT .. "Relationships/PNC_RelationshipConstants.lua")
-dofile(ROOT .. "Relationships/PNC_RelationshipStates.lua")
-dofile(ROOT .. "Relationships/PNC_RelationshipTypes.lua")
-dofile(ROOT .. "Relationships/PNC_RelationshipMath.lua")
-dofile(ROOT .. "Relationships/PNC_SocialEventDefinitions.lua")
+T.load(ROOT .. "Base/PNC_Core.lua")
+T.load(ROOT .. "Base/PNC_Constants.lua")
+T.load(ROOT .. "Identity/PNC_PlayerCharacterConstants.lua")
+T.load(ROOT .. "Identity/PNC_Identity.lua")
+T.load(ROOT .. "Relationships/PNC_EntityRef.lua")
+T.load(ROOT .. "Relationships/PNC_SocialProfileConstants.lua")
+T.load(ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
+T.load(ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
+T.load(ROOT .. "Relationships/PNC_SocialTraits.lua")
+T.load(ROOT .. "Relationships/PNC_SocialProfileMath.lua")
+T.load(ROOT .. "Conduct/PNC_ConductConstants.lua")
+T.load(ROOT .. "Conduct/PNC_ConductTypes.lua")
+T.load(ROOT .. "Conduct/PNC_ConductMath.lua")
+T.load(ROOT .. "Conduct/PNC_ConductDefinitions.lua")
+T.load(ROOT .. "Factions/PNC_FactionConstants.lua")
+T.load(ROOT .. "Factions/PNC_FactionArchetypes.lua")
+T.load(ROOT .. "Factions/PNC_FactionEmblems.lua")
+T.load(ROOT .. "Factions/PNC_FactionTypes.lua")
+T.load(ROOT .. "Identity/PNC_PlayerCharacterTypes.lua")
+T.load(ROOT .. "Relationships/PNC_RelationshipConstants.lua")
+T.load(ROOT .. "Relationships/PNC_RelationshipStates.lua")
+T.load(ROOT .. "Relationships/PNC_RelationshipTypes.lua")
+T.load(ROOT .. "Relationships/PNC_RelationshipMath.lua")
+T.load(ROOT .. "Relationships/PNC_SocialEventDefinitions.lua")
 
 PNC.Archetypes = {
     Get = function(id)
@@ -215,9 +199,9 @@ PNC.Identity.ApplyRecordIdentity = function(record, definition)
     record.isFemale = definition.isFemale == true
     return record
 end
-dofile(ROOT .. "Base/PNC_Types.lua")
-dofile(ROOT .. "Relationships/PNC_Relationships.lua")
-dofile(ROOT .. "Persistence/PNC_Persistence.lua")
+T.load(ROOT .. "Base/PNC_Types.lua")
+T.load(ROOT .. "Relationships/PNC_Relationships.lua")
+T.load(ROOT .. "Persistence/PNC_Persistence.lua")
 
 PNC.Registry = {
     Data = {},
@@ -240,14 +224,14 @@ function PNC.Registry.MarkDirty(record, domain)
     return true
 end
 
-dofile(SERVER .. "PNC_PlayerCharacterDebug.lua")
-dofile(SERVER .. "PNC_PlayerCharacterService.lua")
-dofile(SERVER .. "PNC_SocialProfileDebug.lua")
-dofile(SERVER .. "PNC_SocialProfileService.lua")
-dofile(SERVER .. "PNC_ConductService.lua")
-dofile(SERVER .. "PNC_RelationshipService.lua")
-dofile(SERVER .. "PNC_SocialEventDebug.lua")
-dofile(SERVER .. "PNC_SocialEventService.lua")
+T.load(SERVER .. "PNC_PlayerCharacterDebug.lua")
+T.load(SERVER .. "PNC_PlayerCharacterService.lua")
+T.load(SERVER .. "PNC_SocialProfileDebug.lua")
+T.load(SERVER .. "PNC_SocialProfileService.lua")
+T.load(SERVER .. "PNC_ConductService.lua")
+T.load(SERVER .. "PNC_RelationshipService.lua")
+T.load(SERVER .. "PNC_SocialEventDebug.lua")
+T.load(SERVER .. "PNC_SocialEventService.lua")
 
 local Constants = PNC.SocialProfileConstants
 local Types = PNC.SocialProfileTypes
@@ -256,40 +240,40 @@ local Math = PNC.SocialProfileMath
 
 -- Pure defaults, enums, numeric repair, and deterministic generation.
 local playerDefaults = Types.NewPlayerSocialProfile()
-assertEqual(playerDefaults.orientation, "straight",
+T.equal(playerDefaults.orientation, "straight",
     "player default orientation")
-assertEqual(playerDefaults.foodPreference, "neutral",
+T.equal(playerDefaults.foodPreference, "neutral",
     "player default food")
-assertEqual(playerDefaults.romanceStyle, "neutral",
+T.equal(playerDefaults.romanceStyle, "neutral",
     "player default romance")
-assertEqual(playerDefaults.jealousyStyle, "normal",
+T.equal(playerDefaults.jealousyStyle, "normal",
     "player default jealousy")
-assertEqual(playerDefaults.socialStyle, "neutral",
+T.equal(playerDefaults.socialStyle, "neutral",
     "player default social")
-assertEqual(playerDefaults.schemaVersion, 1,
+T.equal(playerDefaults.schemaVersion, 1,
     "player profile schema")
 
 for _, orientation in ipairs({ "straight", "gay", "bisexual" }) do
-    assertEqual(Types.NormalizePlayerSocialProfile({
+    T.equal(Types.NormalizePlayerSocialProfile({
         orientation = orientation,
     }).orientation, orientation, orientation .. " enum")
 end
-assertEqual(Types.NormalizePlayerSocialProfile({
+T.equal(Types.NormalizePlayerSocialProfile({
     orientation = "future",
 }).orientation, "straight", "invalid orientation")
-assertEqual(Types.NormalizePlayerSocialProfile({
+T.equal(Types.NormalizePlayerSocialProfile({
     foodPreference = "spicy",
     romanceStyle = "reserved",
     jealousyStyle = "unpossessive",
     socialStyle = "withdrawn",
 }).foodPreference, "spicy", "food enum")
-assertEqual(Types.NormalizePlayerSocialProfile({
+T.equal(Types.NormalizePlayerSocialProfile({
     romanceStyle = "reserved",
 }).romanceStyle, "reserved", "romance enum")
-assertEqual(Types.NormalizePlayerSocialProfile({
+T.equal(Types.NormalizePlayerSocialProfile({
     jealousyStyle = "unpossessive",
 }).jealousyStyle, "unpossessive", "jealousy enum")
-assertEqual(Types.NormalizePlayerSocialProfile({
+T.equal(Types.NormalizePlayerSocialProfile({
     socialStyle = "withdrawn",
 }).socialStyle, "withdrawn", "social enum")
 
@@ -303,27 +287,27 @@ local repaired = Types.NormalizeNPCPersonality({
     loyalty = 0.75,
     orientation = "invalid",
 }, 101, "General")
-assertEqual(repaired.compassion, 0, "unit lower clamp")
-assertEqual(repaired.sociability, 1, "unit upper clamp")
-assertTrue(repaired.forgiveness >= 0
+T.equal(repaired.compassion, 0, "unit lower clamp")
+T.equal(repaired.sociability, 1, "unit upper clamp")
+T.truthy(repaired.forgiveness >= 0
     and repaired.forgiveness <= 1, "NaN repaired")
-assertTrue(repaired.bravery >= 0 and repaired.bravery <= 1,
+T.truthy(repaired.bravery >= 0 and repaired.bravery <= 1,
     "infinity repaired")
-assertTrue(repaired.materialism >= 0
+T.truthy(repaired.materialism >= 0
     and repaired.materialism <= 1, "negative infinity repaired")
-assertTrue(Constants.VALID_ORIENTATIONS[repaired.orientation],
+T.truthy(Constants.VALID_ORIENTATIONS[repaired.orientation],
     "invalid NPC enum repaired")
 
 local generatedA = Profiles.GenerateNPCProfile(3819401, "General")
 local generatedA2 = Profiles.GenerateNPCProfile(3819401, "General")
 local generatedB = Profiles.GenerateNPCProfile(3819402, "General")
-assertTrue(deepEqual(generatedA, generatedA2),
+T.truthy(deepEqual(generatedA, generatedA2),
     "same seed deterministic")
-assertTrue(not deepEqual(generatedA, generatedB),
+T.truthy(not deepEqual(generatedA, generatedB),
     "different seeds can differ")
-assertTrue(Constants.VALID_ORIENTATIONS[generatedA.orientation],
+T.truthy(Constants.VALID_ORIENTATIONS[generatedA.orientation],
     "generated orientation valid")
-assertEqual(
+T.equal(
     Types.NormalizeNPCPersonality(generatedA, 999, "Doctor")
         .compassion,
     generatedA.compassion,
@@ -334,7 +318,7 @@ local normalizedTwice = Types.NormalizeNPCPersonality(
     42,
     "Mechanic"
 )
-assertTrue(deepEqual(
+T.truthy(deepEqual(
     normalizedTwice,
     Types.NormalizeNPCPersonality(normalizedTwice, 42, "Mechanic")
 ), "NPC normalization idempotent")
@@ -342,33 +326,30 @@ assertTrue(deepEqual(
 local general = Profiles.GenerateNPCProfile(222, "General")
 local doctor = Profiles.GenerateNPCProfile(222, "Doctor")
 local mechanic = Profiles.GenerateNPCProfile(222, "Mechanic")
-assertNear(doctor.compassion - general.compassion, 0.10, 0.0001,
-    "Doctor compassion modifier")
-assertNear(doctor.aggression - general.aggression, -0.05, 0.0001,
-    "Doctor aggression modifier")
-assertNear(mechanic.materialism - general.materialism, 0.05,
-    0.0001, "Mechanic materialism modifier")
+T.near(doctor.compassion - general.compassion, 0.10, 0.0001, "Doctor compassion modifier")
+T.near(doctor.aggression - general.aggression, -0.05, 0.0001, "Doctor aggression modifier")
+T.near(mechanic.materialism - general.materialism, 0.05, 0.0001, "Mechanic materialism modifier")
 local overridden = Profiles.GenerateNPCProfile(222, "Doctor", {
     orientation = "gay",
     compassion = 0.99,
     foodPreference = "bland",
     aggression = 9,
 })
-assertEqual(overridden.orientation, "gay",
+T.equal(overridden.orientation, "gay",
     "authored orientation override")
-assertEqual(overridden.foodPreference, "bland",
+T.equal(overridden.foodPreference, "bland",
     "authored food override")
-assertEqual(overridden.compassion, 0.99,
+T.equal(overridden.compassion, 0.99,
     "authored numeric override")
-assertEqual(overridden.aggression, 1,
+T.equal(overridden.aggression, 1,
     "authored override clamp")
 local badOverride = Profiles.GenerateNPCProfile(222, "General", {
     orientation = "invalid",
     compassion = 0 / 0,
 })
-assertTrue(Constants.VALID_ORIENTATIONS[badOverride.orientation],
+T.truthy(Constants.VALID_ORIENTATIONS[badOverride.orientation],
     "invalid enum override ignored")
-assertTrue(badOverride.compassion == badOverride.compassion,
+T.truthy(badOverride.compassion == badOverride.compassion,
     "invalid numeric override ignored")
 
 -- NPC constructor/migration persistence and copy/revision safety.
@@ -384,19 +365,19 @@ local authoredNPC = PNC.Types.NewRecord({
         },
     },
 })
-assertEqual(authoredNPC.social.schemaVersion, 3, "NPC social V3")
-assertEqual(authoredNPC.social.personality.orientation, "gay",
+T.equal(authoredNPC.social.schemaVersion, 3, "NPC social V3")
+T.equal(authoredNPC.social.personality.orientation, "gay",
     "constructor applies authored enum")
-assertEqual(authoredNPC.social.personality.compassion, 0.88,
+T.equal(authoredNPC.social.personality.compassion, 0.88,
     "constructor applies authored number")
 local serialized = PNC.Persistence.SerializeRecord(authoredNPC)
 local loaded = PNC.Persistence.DeserializeRecord(serialized)
-assertTrue(deepEqual(
+T.truthy(deepEqual(
     authoredNPC.social.personality,
     loaded.social.personality
 ), "save/load does not reroll")
-assertEqual(serialized.schemaVersion, 15, "NPC schema V15")
-assertSaveSafe(serialized.social)
+T.equal(serialized.schemaVersion, 15, "NPC schema V15")
+validatePersistedValue(serialized.social)
 
 local oldNPC = PNC.Persistence.DeserializeRecord({
     schemaVersion = 11,
@@ -416,20 +397,20 @@ local oldNPC = PNC.Persistence.DeserializeRecord({
         recentEventIDs = { "social:old" },
     },
 })
-assertEqual(oldNPC.social.schemaVersion, 3, "old NPC social migrated")
-assertEqual(oldNPC.social.revision, 3,
+T.equal(oldNPC.social.schemaVersion, 3, "old NPC social migrated")
+T.equal(oldNPC.social.revision, 3,
     "social migration preserves revision")
-assertEqual(oldNPC.social.recentEventIDs[1], "social:old",
+T.equal(oldNPC.social.recentEventIDs[1], "social:old",
     "social cache preserved")
-assertEqual(oldNPC.social.conduct.scores.courage, 0,
+T.equal(oldNPC.social.conduct.scores.courage, 0,
     "old NPC receives neutral conduct")
-assertEqual(#oldNPC.social.conduct.evidence, 0,
+T.equal(#oldNPC.social.conduct.evidence, 0,
     "old relationship history not inferred as conduct")
 local oldProfileFirst = oldNPC.social.personality
 local oldNPCSecond = PNC.Persistence.DeserializeRecord(
     PNC.Persistence.SerializeRecord(oldNPC)
 )
-assertTrue(deepEqual(
+T.truthy(deepEqual(
     oldProfileFirst,
     oldNPCSecond.social.personality
 ), "NPC migration idempotent")
@@ -437,7 +418,7 @@ assertTrue(deepEqual(
 PNC.Registry.Data[authoredNPC.id] = authoredNPC
 local readNPC = Profiles.GetNPCProfile(authoredNPC.id)
 readNPC.compassion = 0
-assertEqual(authoredNPC.social.personality.compassion, 0.88,
+T.equal(authoredNPC.social.personality.compassion, 0.88,
     "NPC read returns copy")
 local malformedNPC = PNC.Types.NewRecord({
     id = "npc_profile_repair",
@@ -449,11 +430,11 @@ local beforePresence = malformedNPC.presenceRevision
 local beforeRecordRevision = malformedNPC.recordRevision
 local beforeSocialRevision = malformedNPC.social.revision
 Profiles.EnsureNPCProfile(malformedNPC)
-assertEqual(malformedNPC.presenceRevision, beforePresence,
+T.equal(malformedNPC.presenceRevision, beforePresence,
     "NPC profile repair leaves presence revision")
-assertEqual(malformedNPC.recordRevision, beforeRecordRevision + 1,
+T.equal(malformedNPC.recordRevision, beforeRecordRevision + 1,
     "NPC profile repair record revision")
-assertEqual(malformedNPC.social.revision,
+T.equal(malformedNPC.social.revision,
     beforeSocialRevision + 1, "NPC profile repair social revision")
 
 -- Player-registry V2 migration gives historical identities neutral profiles.
@@ -461,20 +442,20 @@ PNC.PlayerCharacters.Load()
 local historical = PNC.PlayerCharacters.GetRegistryRecord(
     "char_historical"
 )
-assertEqual(PNC.PlayerCharacters.GetRegistrySnapshot().schemaVersion, 6,
+T.equal(PNC.PlayerCharacters.GetRegistrySnapshot().schemaVersion, 6,
     "player registry V2 migration")
-assertEqual(historical.socialProfile.orientation, "straight",
+T.equal(historical.socialProfile.orientation, "straight",
     "historical profile neutral orientation")
-assertEqual(historical.socialProfile.resolvedAt, 0,
+T.equal(historical.socialProfile.resolvedAt, 0,
     "historical profile not guessed")
-assertEqual(historical.conduct.scores.reliability, 0,
+T.equal(historical.conduct.scores.reliability, 0,
     "dead historical character receives neutral conduct")
-assertEqual(#historical.conduct.evidence, 0,
+T.equal(#historical.conduct.evidence, 0,
     "historical conduct not inferred")
 local normalizedRegistry = PNC.PlayerCharacterTypes.NormalizeRegistry(
     PNC.PlayerCharacters.GetRegistrySnapshot()
 )
-assertTrue(deepEqual(
+T.truthy(deepEqual(
     normalizedRegistry,
     PNC.PlayerCharacterTypes.NormalizeRegistry(normalizedRegistry)
 ), "player migration idempotent")
@@ -494,14 +475,14 @@ local player = makePlayer("Patrick", {
 })
 local profile = Profiles.ResolvePlayerProfile(player, 20)
 local playerUUID = PNC.PlayerCharacters.GetCharacterUUID(player)
-assertEqual(profile.orientation, "gay", "live Gay trait")
-assertEqual(profile.foodPreference, "spicy", "live Spice trait")
-assertEqual(profile.romanceStyle, "reserved", "live Reserved trait")
-assertEqual(profile.jealousyStyle, "jealous", "live Jealous trait")
-assertEqual(profile.socialStyle, "friendly", "live Friendly trait")
-assertEqual(profile.sourceTraits.PNC_Gay, true,
+T.equal(profile.orientation, "gay", "live Gay trait")
+T.equal(profile.foodPreference, "spicy", "live Spice trait")
+T.equal(profile.romanceStyle, "reserved", "live Reserved trait")
+T.equal(profile.jealousyStyle, "jealous", "live Jealous trait")
+T.equal(profile.socialStyle, "friendly", "live Friendly trait")
+T.equal(profile.sourceTraits.PNC_Gay, true,
     "canonical primitive source trait")
-assertSaveSafe(profile)
+validatePersistedValue(profile)
 
 local recordBefore = PNC.PlayerCharacters.GetRegistryRecord(playerUUID)
 local registryBefore =
@@ -510,34 +491,34 @@ local repeated, repeatReason =
     Profiles.ResolvePlayerProfile(player, 21)
 local recordRepeated =
     PNC.PlayerCharacters.GetRegistryRecord(playerUUID)
-assertEqual(repeatReason, "unchanged", "same survivor profile reused")
-assertEqual(recordRepeated.revision, recordBefore.revision,
+T.equal(repeatReason, "unchanged", "same survivor profile reused")
+T.equal(recordRepeated.revision, recordBefore.revision,
     "repeat character revision unchanged")
-assertEqual(recordRepeated.socialProfile.revision,
+T.equal(recordRepeated.socialProfile.revision,
     recordBefore.socialProfile.revision,
     "repeat profile revision unchanged")
-assertEqual(PNC.PlayerCharacters.GetRegistrySnapshot().revision,
+T.equal(PNC.PlayerCharacters.GetRegistrySnapshot().revision,
     registryBefore, "repeat registry revision unchanged")
 
 player.selected = { "pnc:pnc_bisexual", "pnc:pnc_withdrawn" }
 local changed = Profiles.RefreshPlayerProfile(player, 22)
 local recordChanged =
     PNC.PlayerCharacters.GetRegistryRecord(playerUUID)
-assertEqual(changed.orientation, "bisexual",
+T.equal(changed.orientation, "bisexual",
     "changed trait orientation")
-assertEqual(changed.socialStyle, "withdrawn",
+T.equal(changed.socialStyle, "withdrawn",
     "changed trait social style")
-assertEqual(recordChanged.socialProfile.revision,
+T.equal(recordChanged.socialProfile.revision,
     recordBefore.socialProfile.revision + 1,
     "exactly one profile revision")
-assertEqual(recordChanged.revision, recordBefore.revision + 1,
+T.equal(recordChanged.revision, recordBefore.revision + 1,
     "exactly one character revision")
-assertEqual(PNC.PlayerCharacters.GetRegistrySnapshot().revision,
+T.equal(PNC.PlayerCharacters.GetRegistrySnapshot().revision,
     registryBefore + 1, "exactly one registry revision")
 
 local playerRead = Profiles.GetPlayerProfile(playerUUID)
 playerRead.orientation = "gay"
-assertEqual(Profiles.GetPlayerProfile(playerUUID).orientation,
+T.equal(Profiles.GetPlayerProfile(playerUUID).orientation,
     "bisexual", "player read returns copy")
 local oldProfileSnapshot = Profiles.GetPlayerProfile(playerUUID)
 PNC.PlayerCharacters.MarkDead(player, 23, "test")
@@ -549,13 +530,13 @@ local successor = makePlayer(
 local successorProfile = Profiles.ResolvePlayerProfile(successor, 24)
 local successorUUID =
     PNC.PlayerCharacters.GetCharacterUUID(successor)
-assertTrue(successorUUID ~= playerUUID,
+T.truthy(successorUUID ~= playerUUID,
     "new survivor receives new UUID")
-assertEqual(successorProfile.orientation, "gay",
+T.equal(successorProfile.orientation, "gay",
     "new survivor resolves own profile")
-assertEqual(successorProfile.socialStyle, "friendly",
+T.equal(successorProfile.socialStyle, "friendly",
     "new survivor does not inherit")
-assertTrue(deepEqual(
+T.truthy(deepEqual(
     Profiles.GetPlayerProfile(playerUUID),
     oldProfileSnapshot
 ), "dead character profile unchanged")
@@ -586,15 +567,15 @@ local lowTreatment = Math.ModifySocialEvent(
     { type = "treated_wound" },
     treatedDefinition.targetMemory
 )
-assertTrue(highTreatment.approvalEffect
+T.truthy(highTreatment.approvalEffect
     > lowTreatment.approvalEffect,
     "compassion changes treatment interpretation")
-assertTrue(highTreatment.moraleEffect
+T.truthy(highTreatment.moraleEffect
     >= lowTreatment.moraleEffect,
     "compassion changes treatment morale")
-assertTrue(deepEqual(treatedDefinition, treatedCopy),
+T.truthy(deepEqual(treatedDefinition, treatedCopy),
     "modifier does not mutate definition")
-assertTrue(deepEqual(highCompassion, profileCopy),
+T.truthy(deepEqual(highCompassion, profileCopy),
     "modifier does not mutate profile")
 
 local loyal = Profiles.GenerateNPCProfile(2, "General", {
@@ -637,10 +618,10 @@ local unforgivingAbandon = Math.ModifySocialEvent(
     { type = "abandoned_in_combat" },
     abandonedDefinition.targetMemory
 )
-assertTrue(loyalAbandon.approvalEffect
+T.truthy(loyalAbandon.approvalEffect
     < disloyalAbandon.approvalEffect,
     "loyalty strengthens abandonment")
-assertTrue(forgivingAbandon.approvalEffect
+T.truthy(forgivingAbandon.approvalEffect
     > unforgivingAbandon.approvalEffect,
     "forgiveness softens abandonment")
 
@@ -664,7 +645,7 @@ local withdrawnEffects = Math.ModifySocialEvent(
     { type = "treated_wound" },
     treatedDefinition.targetMemory
 )
-assertTrue(friendlyEffects.familiarityGain
+T.truthy(friendlyEffects.familiarityGain
     > withdrawnEffects.familiarityGain,
     "social style familiarity")
 local negativeFamiliarity = Math.ModifySocialEvent(
@@ -673,7 +654,7 @@ local negativeFamiliarity = Math.ModifySocialEvent(
     { type = "abandoned_in_combat" },
     { familiarityGain = -20 }
 )
-assertEqual(negativeFamiliarity.familiarityGain, 0,
+T.equal(negativeFamiliarity.familiarityGain, 0,
     "negative familiarity clamped")
 local clamped = Math.ModifySocialEvent(
     friendly,
@@ -686,13 +667,13 @@ local clamped = Math.ModifySocialEvent(
         familiarityGain = 1000,
     }
 )
-assertEqual(clamped.approvalEffect, 100,
+T.equal(clamped.approvalEffect, 100,
     "modified approval clamp")
-assertEqual(clamped.respectEffect, -100,
+T.equal(clamped.respectEffect, -100,
     "modified respect clamp")
-assertEqual(clamped.moraleEffect, 100,
+T.equal(clamped.moraleEffect, 100,
     "modified morale clamp")
-assertEqual(clamped.familiarityGain, 100,
+T.equal(clamped.familiarityGain, 100,
     "modified familiarity clamp")
 
 local straightObserver = PNC.Core.DeepCopy(friendly)
@@ -713,7 +694,7 @@ gayEffects = Math.ModifySocialEvent(
     { type = "treated_wound" },
     treatedDefinition.targetMemory
 )
-assertTrue(
+T.truthy(
     deepEqual(straightEffects, gayEffects),
     "orientation has no event effect"
 )
@@ -742,30 +723,31 @@ local event = {
     context = {},
 }
 local eventResult = PNC.SocialEvents.Emit(event)
-assertTrue(eventResult.ok, "profile-modified event accepted")
+T.truthy(eventResult.ok, "profile-modified event accepted")
 local relationship = PNC.Relationships.Get(observer.id, actorKey)
 local originalMemoryEffect =
     relationship.memories[1].approvalEffect
-assertEqual(originalMemoryEffect, highTreatment.approvalEffect,
+T.equal(originalMemoryEffect, highTreatment.approvalEffect,
     "observer profile modifies new memory")
 local objectiveConduct = PNC.Conduct.GetForEntity(actorKey)
 local objectiveEvidence =
     objectiveConduct.evidence[#objectiveConduct.evidence]
-assertEqual(objectiveEvidence.effects.compassion, 2,
+T.equal(objectiveEvidence.effects.compassion, 2,
     "personality does not modify conduct compassion")
-assertEqual(objectiveEvidence.effects.generosity, 1,
+T.equal(objectiveEvidence.effects.generosity, 1,
     "personality does not modify conduct generosity")
-assertEqual(PNC.SocialEvents.Emit(event).reason, "duplicate_event",
+T.equal(PNC.SocialEvents.Emit(event).reason, "duplicate_event",
     "profile event deduplication")
 local cooldownEvent = PNC.Core.DeepCopy(event)
 cooldownEvent.id = "social:profile:treatment:2"
 cooldownEvent.occurredAt = 31
-assertEqual(PNC.SocialEvents.Emit(cooldownEvent).reason,
+T.equal(PNC.SocialEvents.Emit(cooldownEvent).reason,
     "cooldown_active", "profile event cooldown")
 observer.social.personality.compassion = 0
 relationship = PNC.Relationships.Get(observer.id, actorKey)
-assertEqual(relationship.memories[1].approvalEffect,
+T.equal(relationship.memories[1].approvalEffect,
     originalMemoryEffect, "existing memory not rewritten")
-assertSaveSafe(PNC.Persistence.SerializeRecord(observer).social)
+validatePersistedValue(PNC.Persistence.SerializeRecord(observer).social)
+T.finish("pnc_social_profiles_smoke")
 
-print("pnc_social_profiles_smoke: ok")
+T.finish("pnc_social_profiles_smoke")

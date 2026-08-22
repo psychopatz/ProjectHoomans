@@ -1,4 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local function deepCopy(value)
     local output
@@ -74,11 +76,11 @@ PNC = {
 }
 
 PNC.NeedsDefinitions = {}
-dofile(ROOT .. "Needs/PNC_PlayerNeedsModel.lua")
+T.load(ROOT .. "Needs/PNC_PlayerNeedsModel.lua")
 
 local originalNext = next
 next = nil
-dofile(ROOT .. "Persistence/PNC_Persistence.lua")
+T.load(ROOT .. "Persistence/PNC_Persistence.lua")
 
 local record = {
     id = "npc_kahlua",
@@ -151,52 +153,54 @@ local record = {
 }
 
 local payload = PNC.Persistence.SerializeRecord(record)
-assert(payload, "serialization failed without next()")
-assert(payload.progression.skillLevelDeltas.Strength == 3, "legacy skill delta conversion failed")
-assert(payload.health.body.wounds.ForeArm_L, "body wound was not serialized")
-assert(payload.health.body.infection.active == true, "infection was not serialized")
-assert(payload.health.body.infection.stage == "nauseous", "infection stage was not serialized")
-assert(payload.health.body.parts.ForeArm_L == 76,
+T.truthy(payload, "serialization failed without next()")
+T.truthy(payload.progression.skillLevelDeltas.Strength == 3, "legacy skill delta conversion failed")
+T.truthy(payload.health.body.wounds.ForeArm_L, "body wound was not serialized")
+T.truthy(payload.health.body.infection.active == true, "infection was not serialized")
+T.truthy(payload.health.body.infection.stage == "nauseous", "infection stage was not serialized")
+T.truthy(payload.health.body.parts.ForeArm_L == 76,
     "body-part health was not compacted")
-assert(payload.health.lastDamageAt == nil,
+T.truthy(payload.health.lastDamageAt == nil,
     "transient damage timestamp was persisted")
-assert(payload.equipmentSpawnMode == "ranged", "equipment spawn override was not serialized")
-assert(payload.equipmentPoolID == "Default", "equipment pool was not serialized")
-assert(payload.bodyHint.instanceID == 9191, "live body instance hint was not serialized")
-assert(payload.bodyHint.lease == "lease-persisted", "live body lease hint was not serialized")
-assert(payload.generation.generationId == "POP_GROUP_0000042",
+T.truthy(payload.equipmentSpawnMode == "ranged", "equipment spawn override was not serialized")
+T.truthy(payload.equipmentPoolID == "Default", "equipment pool was not serialized")
+T.truthy(payload.bodyHint.instanceID == 9191, "live body instance hint was not serialized")
+T.truthy(payload.bodyHint.lease == "lease-persisted", "live body lease hint was not serialized")
+T.truthy(payload.generation.generationId == "POP_GROUP_0000042",
     "population provenance was not serialized")
-assert(payload.vanillaTraits.highthirst == true,
+T.truthy(payload.vanillaTraits.highthirst == true,
     "vanilla physiological trait was not serialized")
-assert(payload.vanillaTraits.overweight == true,
+T.truthy(payload.vanillaTraits.overweight == true,
     "vanilla weight trait was not serialized")
-assert(payload.vanillaTraitsAuthored == true,
+T.truthy(payload.vanillaTraitsAuthored == true,
     "authored trait source was not serialized")
 
 local restored = PNC.Persistence.DeserializeRecord(payload, record.id)
-assert(restored, "deserialization failed without next()")
-assert(restored.progression.skillLevelDeltas.Strength == 3, "deserialized skill delta changed")
-assert(restored.health.body.wounds.ForeArm_L.type == "bite", "body wound did not round trip")
-assert(restored.health.body.infection.sourcePart == "ForeArm_L", "infection did not round trip")
-assert(restored.health.body.infection.progress == 0.5, "infection progress did not round trip")
-assert(restored.health.body.infection.stage == "nauseous", "infection stage did not round trip")
-assert(restored.health.body.infection.temperatureC == 37.4, "infection fever did not round trip")
-assert(restored.health.body.parts.ForeArm_L.current == 76, "body-part health did not round trip")
-assert(restored.health.body.lastBleedAt == 0, "wall clock bleed timestamp was persisted")
-assert(restored.equipmentSpawnMode == "ranged", "equipment spawn override did not round trip")
-assert(restored.equipmentPoolID == "Default", "equipment pool did not round trip")
-assert(restored.runtime.startupBodyHint.instanceID == "9191",
+T.truthy(restored, "deserialization failed without next()")
+T.truthy(restored.progression.skillLevelDeltas.Strength == 3, "deserialized skill delta changed")
+T.truthy(restored.health.body.wounds.ForeArm_L.type == "bite", "body wound did not round trip")
+T.truthy(restored.health.body.infection.sourcePart == "ForeArm_L", "infection did not round trip")
+T.truthy(restored.health.body.infection.progress == 0.5, "infection progress did not round trip")
+T.truthy(restored.health.body.infection.stage == "nauseous", "infection stage did not round trip")
+T.truthy(restored.health.body.infection.temperatureC == 37.4, "infection fever did not round trip")
+T.truthy(restored.health.body.parts.ForeArm_L.current == 76, "body-part health did not round trip")
+T.truthy(restored.health.body.lastBleedAt == 0, "wall clock bleed timestamp was persisted")
+T.truthy(restored.equipmentSpawnMode == "ranged", "equipment spawn override did not round trip")
+T.truthy(restored.equipmentPoolID == "Default", "equipment pool did not round trip")
+T.truthy(restored.runtime.startupBodyHint.instanceID == "9191",
     "startup body instance hint did not round trip")
-assert(restored.runtime.startupBodyHint.lease == "lease-persisted",
+T.truthy(restored.runtime.startupBodyHint.lease == "lease-persisted",
     "startup body lease hint did not round trip")
-assert(restored.generation.generationId == "POP_GROUP_0000042",
+T.truthy(restored.generation.generationId == "POP_GROUP_0000042",
     "population provenance did not round trip")
-assert(restored.vanillaTraits.highthirst == true,
+T.truthy(restored.vanillaTraits.highthirst == true,
     "vanilla physiological trait did not round trip")
-assert(restored.vanillaTraits.overweight == true,
+T.truthy(restored.vanillaTraits.overweight == true,
     "vanilla weight trait did not round trip")
-assert(restored.vanillaTraitsAuthored == true,
+T.truthy(restored.vanillaTraitsAuthored == true,
     "authored trait source did not round trip")
 
 next = originalNext
-print("pnc_kahlua_persistence_smoke: ok")
+T.finish("pnc_kahlua_persistence_smoke")
+
+T.finish("pnc_kahlua_persistence_smoke")

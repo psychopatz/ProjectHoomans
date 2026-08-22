@@ -2,7 +2,7 @@ local T = require "tests/support/test"
 local ROOT = T.path("ProjectHoomans", "server", "PNC/")
 
 local serverOnlyFiles = {}
-local listing = assert(io.popen(
+local listing = T.truthy(io.popen(
     "find " .. ROOT
         .. " -type f -name '*.lua' ! -name '00_PNC_Server_Init.lua' | sort"
 ))
@@ -31,7 +31,7 @@ require = function(name)
     error("pure client required server module: " .. tostring(name))
 end
 for _, path in ipairs(serverOnlyFiles) do
-    dofile(path)
+    T.load(path)
 end
 require = originalRequire
 
@@ -55,7 +55,7 @@ PNC = {
     SupplyInventory = { Commands = {}, Queries = {} },
     NPCSupplyService = { Process = function() end },
 }
-local supply = dofile(ROOT .. "Supply/PNC_Supply.lua")
+local supply = T.load(ROOT .. "Supply/PNC_Supply.lua")
 require = originalRequire
 
 T.equal(#calls, 8, "hosted server skipped Supply composition")

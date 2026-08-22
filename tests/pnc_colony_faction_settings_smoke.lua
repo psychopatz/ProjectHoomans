@@ -1,12 +1,7 @@
-local LUA_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
-package.path = LUA_ROOT .. "client/?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local LUA_ROOT = T.path("ProjectHoomans", "root", "")
+T.addPackagePaths()
 
 local promptCalls = 0
 local snapshot = {
@@ -30,17 +25,17 @@ PNC = {
     ColonyManagement = { BuildSnapshot = function() return snapshot end },
     ColonyNamePrompt = {
         OpenIfNeeded = function(value)
-            equal(value, snapshot, "prompt receives local snapshot")
+            T.equal(value, snapshot, "prompt receives local snapshot")
             promptCalls = promptCalls + 1
         end,
     },
 }
 getSpecificPlayer = function() return {} end
 
-dofile(LUA_ROOT .. "client/PNC/Networking/PNC_ClientRequests.lua")
-equal(PNC.Client.RequestColonyManagement(), true,
+T.load(LUA_ROOT .. "client/PNC/Networking/PNC_ClientRequests.lua")
+T.equal(PNC.Client.RequestColonyManagement(), true,
     "single-player colony snapshot request")
-equal(promptCalls, 1, "single-player request checks faction prompt")
+T.equal(promptCalls, 1, "single-player request checks faction prompt")
 
 local function entry()
     local value = ""
@@ -105,16 +100,17 @@ local window = {
 }
 Settings.Create(window)
 Settings.Rebuild(window, snapshot)
-equal(window.factionNameEntry:getText(), "Morgan Clan",
+T.equal(window.factionNameEntry:getText(), "Morgan Clan",
     "settings binds current faction name")
 window.factionNameEntry:setText("Morgan Wardens")
-equal(Settings.OnControl(window, window.factionRenameButton), true,
+T.equal(Settings.OnControl(window, window.factionRenameButton), true,
     "settings submits faction rename")
-equal(renamed, "Morgan Wardens", "settings submits edited name")
-equal(window.refreshed, true, "settings refreshes after local rename")
-equal(Settings.OnControl(window, window.factionEmblemButton), true,
+T.equal(renamed, "Morgan Wardens", "settings submits edited name")
+T.equal(window.refreshed, true, "settings refreshes after local rename")
+T.equal(Settings.OnControl(window, window.factionEmblemButton), true,
     "settings opens the faction emblem editor")
-equal(savedEmblem.backgroundColorID, "blue",
+T.equal(savedEmblem.backgroundColorID, "blue",
     "settings saves the edited player faction emblem")
+T.finish("pnc_colony_faction_settings_smoke")
 
-print("pnc_colony_faction_settings_smoke: ok")
+T.finish("pnc_colony_faction_settings_smoke")

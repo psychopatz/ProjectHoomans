@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local now = 1000
 local authority = true
@@ -76,7 +71,7 @@ PNC = {
     } },
 }
 
-dofile(ROOT .. "Registry/PNC_DeathMarkers.lua")
+T.load(ROOT .. "Registry/PNC_DeathMarkers.lua")
 
 local record = {
     id = "dead_npc",
@@ -111,18 +106,18 @@ local record = {
 }
 PNC.Registry.Data[record.id] = record
 local marker = PNC.Registry.AddDeathMarker(record)
-assert(marker, "death marker was not created")
-assertEqual(marker.name, "Morgan Reed", "death marker name")
-assertEqual(marker.x, 11, "death marker corpse x")
-assertEqual(marker.corpseToken, "corpse_dead_npc", "death marker token")
-assertEqual(marker.infected, true, "death marker infection")
-assertEqual(marker.colonist, true, "death marker colonist classification")
-assertEqual(marker.portrait.appearance.hairModel, "Short",
+T.truthy(marker, "death marker was not created")
+T.equal(marker.name, "Morgan Reed", "death marker name")
+T.equal(marker.x, 11, "death marker corpse x")
+T.equal(marker.corpseToken, "corpse_dead_npc", "death marker token")
+T.equal(marker.infected, true, "death marker infection")
+T.equal(marker.colonist, true, "death marker colonist classification")
+T.equal(marker.portrait.appearance.hairModel, "Short",
     "death marker compact portrait")
-assertEqual(marker.inventory, nil, "death marker retained inventory")
-assertEqual(marker.equipment, nil, "death marker retained equipment")
-assertEqual(marker.health, nil, "death marker retained health")
-assertEqual(PNC.Registry.GetDeathMarkerRuntime(record.id).reanimateAt, 4000,
+T.equal(marker.inventory, nil, "death marker retained inventory")
+T.equal(marker.equipment, nil, "death marker retained equipment")
+T.equal(marker.health, nil, "death marker retained health")
+T.equal(PNC.Registry.GetDeathMarkerRuntime(record.id).reanimateAt, 4000,
     "three-second wall-clock reanimation")
 
 PNC.BodyLifecycle.CreateInertCorpse = function(killedRecord)
@@ -135,7 +130,7 @@ PNC.BodyLifecycle.CreateInertCorpse = function(killedRecord)
     }
     return true, {}
 end
-dofile(ROOT .. "Health/PNC_Health.lua")
+T.load(ROOT .. "Health/PNC_Health.lua")
 
 local normalRecord = {
     id = "ordinary_dead_npc",
@@ -155,31 +150,31 @@ PNC.Registry.Data[normalRecord.id] = normalRecord
 local sourceBody = { setHealth = function() end }
 local retired, normalMarker =
     PNC.Health.Kill(normalRecord, sourceBody, "weapon_damage")
-assertEqual(retired, true, "ordinary dead NPC was not retired")
-assertEqual(releasedWorker.id, normalRecord.id,
+T.equal(retired, true, "ordinary dead NPC was not retired")
+T.equal(releasedWorker.id, normalRecord.id,
     "death did not release the active worker")
-assertEqual(releasedWorker.reason, "worker_died",
+T.equal(releasedWorker.reason, "worker_died",
     "death worker release reason")
-assert(normalMarker, "ordinary death marker missing")
-assertEqual(normalMarker.infected, false, "ordinary death marked infected")
-assertEqual(normalMarker.colonist, false, "ordinary death marked colonist")
-assertEqual(removedRecords[normalRecord.id], true, "full NPC record was retained")
-assertEqual(PNC.Registry.Data[normalRecord.id], nil, "retired NPC still registered")
-assertEqual(removalBroadcasts[#removalBroadcasts].id, normalRecord.id,
+T.truthy(normalMarker, "ordinary death marker missing")
+T.equal(normalMarker.infected, false, "ordinary death marked infected")
+T.equal(normalMarker.colonist, false, "ordinary death marked colonist")
+T.equal(removedRecords[normalRecord.id], true, "full NPC record was retained")
+T.equal(PNC.Registry.Data[normalRecord.id], nil, "retired NPC still registered")
+T.equal(removalBroadcasts[#removalBroadcasts].id, normalRecord.id,
     "retired NPC removal was not broadcast")
-assertEqual(deathRetirementOrder[#deathRetirementOrder - 1], "broadcast",
+T.equal(deathRetirementOrder[#deathRetirementOrder - 1], "broadcast",
     "death snapshot was broadcast after registry retirement")
-assertEqual(deathRetirementOrder[#deathRetirementOrder], "remove",
+T.equal(deathRetirementOrder[#deathRetirementOrder], "remove",
     "death record was not retired after its final snapshot")
 
 getGameTime = function()
     return { getWorldAgeHours = function() return 50 end }
 end
-dofile(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_State.lua")
-dofile(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_World.lua")
-dofile(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Corpses.lua")
-dofile(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Reanimation.lua")
-dofile(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_CorpseAudit.lua")
+T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_State.lua")
+T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_World.lua")
+T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Corpses.lua")
+T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Reanimation.lua")
+T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_CorpseAudit.lua")
 
 local zombieFlags = {}
 local zombieModData = {
@@ -224,31 +219,31 @@ end
 
 now = 3999
 PNC.BodyLifecycle.Internal.auditCorpseRecord(marker)
-assertEqual(reanimateCalls, 0, "infected corpse reanimated before three seconds")
-assert(PNC.Registry.GetDeathMarker(marker.id), "early audit removed death marker")
+T.equal(reanimateCalls, 0, "infected corpse reanimated before three seconds")
+T.truthy(PNC.Registry.GetDeathMarker(marker.id), "early audit removed death marker")
 
 now = 4000
 PNC.BodyLifecycle.Internal.auditCorpseRecord(marker)
-assertEqual(reanimateCalls, 1, "infected corpse did not reanimate at three seconds")
-assertEqual(PNC.Registry.GetDeathMarker(marker.id), nil,
+T.equal(reanimateCalls, 1, "infected corpse did not reanimate at three seconds")
+T.equal(PNC.Registry.GetDeathMarker(marker.id), nil,
     "reanimated corpse marker was retained")
-assertEqual(zombieFlags.useless, false, "reanimated zombie remained useless")
-assertEqual(zombieFlags.noTeeth, false, "reanimated zombie remained toothless")
-assertEqual(zombieFlags.zombiesDontAttack, false,
+T.equal(zombieFlags.useless, false, "reanimated zombie remained useless")
+T.equal(zombieFlags.noTeeth, false, "reanimated zombie remained toothless")
+T.equal(zombieFlags.zombiesDontAttack, false,
     "reanimated zombie retained NPC targeting safeguard")
-assertEqual(zombieFlags.invincible, false,
+T.equal(zombieFlags.invincible, false,
     "reanimated zombie remained invincible")
-assertEqual(zombieModData.PNC_DeathMarkerID, nil,
+T.equal(zombieModData.PNC_DeathMarkerID, nil,
     "reanimated zombie retained death-marker ownership")
 
 authority = false
-assertEqual(PNC.Registry.AddDeathMarker({
+T.equal(PNC.Registry.AddDeathMarker({
     id = "client_marker",
     name = "Client Marker",
 }), nil, "client created an authoritative death marker")
-assertEqual(PNC.Registry.RemoveDeathMarker(normalMarker.id), false,
+T.equal(PNC.Registry.RemoveDeathMarker(normalMarker.id), false,
     "client removed an authoritative death marker")
-assert(PNC.Registry.GetDeathMarker(normalMarker.id),
+T.truthy(PNC.Registry.GetDeathMarker(normalMarker.id),
     "client authority guard lost an existing death marker")
 authority = true
 
@@ -278,13 +273,13 @@ getCell = function()
 end
 now = 5000
 PNC.BodyLifecycle.Internal.auditCorpseRecord(missingMarker)
-assert(PNC.Registry.GetDeathMarker(missingMarker.id),
+T.truthy(PNC.Registry.GetDeathMarker(missingMarker.id),
     "missing corpse marker ignored cleanup grace")
 now = 10001
 PNC.BodyLifecycle.Internal.auditCorpseRecord(missingMarker)
-assertEqual(PNC.Registry.GetDeathMarker(missingMarker.id), nil,
+T.equal(PNC.Registry.GetDeathMarker(missingMarker.id), nil,
     "missing loaded corpse marker was not cleared")
-assertEqual(removalBroadcasts[#removalBroadcasts].reason, "corpse_collected",
+T.equal(removalBroadcasts[#removalBroadcasts].reason, "corpse_collected",
     "garbage-collected corpse did not broadcast marker removal")
 
 local collectedRecord = {
@@ -307,11 +302,12 @@ PNC.Registry.GetDeathMarkerRuntime(collectedMarker.id).corpseState =
     "inert_loaded"
 now = 11000
 PNC.BodyLifecycle.Internal.auditCorpseRecord(collectedMarker)
-assertEqual(PNC.Registry.GetDeathMarker(collectedMarker.id), nil,
+T.equal(PNC.Registry.GetDeathMarker(collectedMarker.id), nil,
     "known loaded corpse marker survived corpse garbage collection")
-assertEqual(removalBroadcasts[#removalBroadcasts].id, collectedMarker.id,
+T.equal(removalBroadcasts[#removalBroadcasts].id, collectedMarker.id,
     "garbage-collected corpse broadcast the wrong marker removal")
-assertEqual(removalBroadcasts[#removalBroadcasts].reason, "corpse_collected",
+T.equal(removalBroadcasts[#removalBroadcasts].reason, "corpse_collected",
     "garbage-collected corpse removal reason")
+T.finish("pnc_death_marker_smoke")
 
-print("pnc_death_marker_smoke: ok")
+T.finish("pnc_death_marker_smoke")

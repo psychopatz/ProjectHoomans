@@ -1,12 +1,7 @@
-local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Behaviors/PNC_Behavior_Treatment.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local FILE =
+    T.path("ProjectHoomans", "shared", "PNC/Core/Behaviors/PNC_Behavior_Treatment.lua")
 
 local now = 1000
 local threat
@@ -100,7 +95,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local record = {
     id = "live_treatment",
@@ -118,7 +113,7 @@ local zombie = {
     getEmitter = function()
         return {
             playSound = function(_, sound)
-                assertEqual(sound, "FirstAidApplyBandage", "vanilla bandage SFX")
+                T.equal(sound, "FirstAidApplyBandage", "vanilla bandage SFX")
                 treatmentSounds = treatmentSounds + 1
             end,
         }
@@ -126,55 +121,55 @@ local zombie = {
 }
 
 threat = { kind = "zombie", x = 1, y = 0, z = 0, distSq = 1 }
-assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), false,
+T.equal(PNC.BehaviorTreatment.Tick(record, zombie, now), false,
     "injured NPC yields the tick to combat")
-assertEqual(moveRequest, nil, "treatment did not replace combat with retreat")
-assertEqual(record.runtime.target, threat, "threat handed directly to combat")
-assertEqual(record.runtime.selfTreatment.interruptedReason, "threat_nearby",
+T.equal(moveRequest, nil, "treatment did not replace combat with retreat")
+T.equal(record.runtime.target, threat, "threat handed directly to combat")
+T.equal(record.runtime.selfTreatment.interruptedReason, "threat_nearby",
     "unsafe treatment reason")
-assertEqual(retreatClears, 1, "stale treatment retreat released")
-assertEqual(consumed, 0, "unsafe treatment consumed no bandage")
+T.equal(retreatClears, 1, "stale treatment retreat released")
+T.equal(consumed, 0, "unsafe treatment consumed no bandage")
 
 threat = nil
 now = now + 5100
 record.stamina.current = 100
-assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
+T.equal(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
     "safe NPC starts treatment")
-assertEqual(bumpType, "BandageLeftArm", "body-part-specific animation")
-assertEqual(record.runtime.selfTreatment.phase, "bandaging", "bandage phase")
-assertEqual(treatmentSounds, 1, "self-bandage SFX")
-assertEqual(bumpLeaseUntil, 7100, "bandage action lease covers treatment")
-assertEqual(zombieModData.PNC_ClientTreatmentSoundKey, "Hand_L:6100",
+T.equal(bumpType, "BandageLeftArm", "body-part-specific animation")
+T.equal(record.runtime.selfTreatment.phase, "bandaging", "bandage phase")
+T.equal(treatmentSounds, 1, "self-bandage SFX")
+T.equal(bumpLeaseUntil, 7100, "bandage action lease covers treatment")
+T.equal(zombieModData.PNC_ClientTreatmentSoundKey, "Hand_L:6100",
     "local replicated SFX dedupe key")
-assertEqual(zombieModData.PNC_ClientTreatmentAnimKey, "Hand_L:6100",
+T.equal(zombieModData.PNC_ClientTreatmentAnimKey, "Hand_L:6100",
     "local replicated animation dedupe key")
 
 now = now + 100
-assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
+T.equal(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
     "safe treatment remains active")
-assertEqual(maintainedBumps, 1,
+T.equal(maintainedBumps, 1,
     "authority did not maintain the bandage selector")
 
 threat = { kind = "zombie", x = 2.3, y = 0, z = 0, distSq = 5.29 }
 now = now + 100
-assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
+T.equal(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
     "enemy outside red safety radius does not cancel treatment")
 
 threat = { kind = "zombie", x = 2, y = 0, z = 0, distSq = 4 }
 now = now + 100
-assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), false,
+T.equal(PNC.BehaviorTreatment.Tick(record, zombie, now), false,
     "fit NPC interrupts treatment and returns to combat")
-assertEqual(consumed, 0, "interrupted treatment consumed no item")
-assertEqual(bumpFinished, 1, "interrupted animation released")
+T.equal(consumed, 0, "interrupted treatment consumed no item")
+T.equal(bumpFinished, 1, "interrupted animation released")
 
 threat = nil
 now = now + 5100
 PNC.BehaviorTreatment.Tick(record, zombie, now)
 now = now + 1000
-assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
+T.equal(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
     "completed treatment tick")
-assertEqual(consumed, 1, "completed treatment consumes one item")
-assertEqual(bumpFinished, 2, "completed animation released")
+T.equal(consumed, 1, "completed treatment consumes one item")
+T.equal(bumpFinished, 2, "completed animation released")
 
 treatable = true
 local abstractRecord = {
@@ -188,25 +183,26 @@ local abstractRecord = {
     health = { state = "normal" },
 }
 local beforeAbstract = consumed
-assertEqual(PNC.BehaviorTreatment.Tick(abstractRecord, nil, now), true,
+T.equal(PNC.BehaviorTreatment.Tick(abstractRecord, nil, now), true,
     "abstract NPC simplifies treatment")
-assertEqual(consumed, beforeAbstract + 1, "abstract treatment consumes once")
-assertEqual(PNC.BehaviorTreatment.Tick(abstractRecord, nil, now + 1000), false,
+T.equal(consumed, beforeAbstract + 1, "abstract treatment consumes once")
+T.equal(PNC.BehaviorTreatment.Tick(abstractRecord, nil, now + 1000), false,
     "abstract treatment cadence bounded")
 
 treatable = true
 threat = { kind = "zombie", x = 1, y = 0, z = 0, distSq = 1 }
 record.runtime.selfTreatment.phase = "idle"
 record.stamina.current = 10
-assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now + 2000), false,
+T.equal(PNC.BehaviorTreatment.Tick(record, zombie, now + 2000), false,
     "low stamina does not let treatment starve defensive combat")
-assertEqual(record.runtime.selfTreatment.interruptedReason, "threat_nearby",
+T.equal(record.runtime.selfTreatment.interruptedReason, "threat_nearby",
     "low stamina still reports combat interruption")
 
 record.hostility.attackZombies = false
-assertEqual(PNC.BehaviorTreatment.Tick(record, zombie, now + 2100), false,
+T.equal(PNC.BehaviorTreatment.Tick(record, zombie, now + 2100), false,
     "non-aggressive NPC still treats a targeting zombie as danger")
-assertEqual(record.runtime.target, threat,
+T.equal(record.runtime.target, threat,
     "defensive zombie bypasses no-initiation policy")
+T.finish("pnc_self_treatment_smoke")
 
-print("pnc_self_treatment_smoke: ok")
+T.finish("pnc_self_treatment_smoke")

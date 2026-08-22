@@ -1,12 +1,7 @@
-local ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT =
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local function deepCopy(value)
     local output
@@ -52,9 +47,9 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Identity/PNC_Identity.lua")
-dofile(ROOT .. "Identity/PNC_Identity_Profile.lua")
-dofile(ROOT .. "Identity/PNC_Identity_Portrait.lua")
+T.load(ROOT .. "Identity/PNC_Identity.lua")
+T.load(ROOT .. "Identity/PNC_Identity_Profile.lua")
+T.load(ROOT .. "Identity/PNC_Identity_Portrait.lua")
 
 local record = {
     id = "npc_portrait_summary",
@@ -87,22 +82,22 @@ local record = {
     runtime = {},
 }
 
-local portrait = assert(PNC.Identity.BuildPortraitSummary(record))
-assert(PNC.Identity.BuildPortraitSummary(record) == portrait,
+local portrait = T.truthy(PNC.Identity.BuildPortraitSummary(record))
+T.truthy(PNC.Identity.BuildPortraitSummary(record) == portrait,
     "unchanged portrait summary was rebuilt instead of cached")
-assertEqual(portrait.faceOnly, true, "portrait summary face-only flag")
-assertEqual(portrait.identitySeed, 44, "portrait identity seed")
-assert((tonumber(portrait.revision) or 0) > 0,
+T.equal(portrait.faceOnly, true, "portrait summary face-only flag")
+T.equal(portrait.identitySeed, 44, "portrait identity seed")
+T.truthy((tonumber(portrait.revision) or 0) > 0,
     "portrait summary revision was not generated")
-assertEqual(portrait.appearance.hairModel, "Short",
+T.equal(portrait.appearance.hairModel, "Short",
     "portrait hair model")
-assertEqual(portrait.equipment, nil,
+T.equal(portrait.equipment, nil,
     "portrait retained clothing metadata")
-assertEqual(portrait.appearance.outfitItems, nil,
+T.equal(portrait.appearance.outfitItems, nil,
     "portrait leaked the full outfit list")
 
 record.equipment.worn.Hat = "Base.Hat_Beret"
-assert(PNC.Identity.BuildPortraitSummary(record) == portrait,
+T.truthy(PNC.Identity.BuildPortraitSummary(record) == portrait,
     "equipment-only change rebuilt the clothing-free portrait")
 
 local normalized = PNC.Identity.NormalizePortraitSummary({
@@ -118,9 +113,10 @@ local normalized = PNC.Identity.NormalizePortraitSummary({
         },
     },
 })
-assertEqual(normalized.equipment, nil,
+T.equal(normalized.equipment, nil,
     "normalized portrait accepted clothing metadata")
-assert(#normalized.appearance.hairModel <= 128,
+T.truthy(#normalized.appearance.hairModel <= 128,
     "portrait appearance string was not bounded")
+T.finish("pnc_portrait_summary_smoke")
 
-print("pnc_portrait_summary_smoke: ok")
+T.finish("pnc_portrait_summary_smoke")

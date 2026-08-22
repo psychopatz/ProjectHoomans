@@ -1,13 +1,8 @@
-local SERVER_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
-package.path = SERVER_ROOT .. "?.lua;" .. SHARED_ROOT .. "?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local SERVER_ROOT = T.path("ProjectHoomans", "server", "")
+local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
+T.addPackagePaths()
 
 local function javaList(values)
     return {
@@ -131,7 +126,7 @@ package.preload["PNC/00_PNC_Init"] = function() return PNC end
 package.preload["PsychopatzCore/Inventory/PsychopatzItemTransfer"] = function()
     return {
         ResolvePlayerItems = function(_, itemIDs)
-            assertEqual(itemIDs[1], "55", "authoritative player ID")
+            T.equal(itemIDs[1], "55", "authoritative player ID")
             return { nativeItem }
         end,
         DescribeItem = function()
@@ -169,13 +164,13 @@ local ok, reason = Service.Transfer(player, {
     inventoryRevision = 3,
     requestId = "a",
 })
-assertEqual(ok, true, "player-to-NPC success")
-assertEqual(reason, "transferred_to_npc", "player-to-NPC reason")
-assertEqual(addedSpecs[1].type, "Base.Bandage", "compact item type")
-assertEqual(addedSpecs[1].cond, 4, "compact condition")
-assertEqual(addedSpecs[1].fav, true, "compact favorite state")
-assertEqual(takenIDs[1], "55", "native source removed")
-assertEqual(deltaSince, 3, "delta starts at client revision")
+T.equal(ok, true, "player-to-NPC success")
+T.equal(reason, "transferred_to_npc", "player-to-NPC reason")
+T.equal(addedSpecs[1].type, "Base.Bandage", "compact item type")
+T.equal(addedSpecs[1].cond, 4, "compact condition")
+T.equal(addedSpecs[1].fav, true, "compact favorite state")
+T.equal(takenIDs[1], "55", "native source removed")
+T.equal(deltaSince, 3, "delta starts at client revision")
 
 record.inventory.revision = 8
 record.inventory.items["npc-item"].fav = true
@@ -199,22 +194,22 @@ ok, reason = Service.Transfer(player, {
     inventoryRevision = 8,
     requestId = "b",
 })
-assertEqual(ok, true, "NPC-to-player success")
-assertEqual(reason, "transferred_to_player", "NPC-to-player reason")
-assertEqual(granted.destination, "bag-9", "player bag destination")
-assertEqual(granted.fullType, "Base.Axe", "native recreation type")
-assertEqual(granted.state.condition, 7, "native recreation condition")
-assertEqual(granted.state.customName, "Trusted Axe", "native recreation custom name")
-assertEqual(granted.state.favorite, true, "explicit favorite transfer allowed")
-assertEqual(granted.state.visualFullType, "Base.Axe",
+T.equal(ok, true, "NPC-to-player success")
+T.equal(reason, "transferred_to_player", "NPC-to-player reason")
+T.equal(granted.destination, "bag-9", "player bag destination")
+T.equal(granted.fullType, "Base.Axe", "native recreation type")
+T.equal(granted.state.condition, 7, "native recreation condition")
+T.equal(granted.state.customName, "Trusted Axe", "native recreation custom name")
+T.equal(granted.state.favorite, true, "explicit favorite transfer allowed")
+T.equal(granted.state.visualFullType, "Base.Axe",
     "native recreation lost visual item identity")
-assertEqual(granted.state.visualTextureChoice, 7,
+T.equal(granted.state.visualTextureChoice, 7,
     "native recreation lost visual texture")
-assertEqual(granted.state.visualDecal, "SpiffoLogo",
+T.equal(granted.state.visualDecal, "SpiffoLogo",
     "native recreation lost shirt decal")
-assertEqual(granted.state.visualTintG, 0.8,
+T.equal(granted.state.visualTintG, 0.8,
     "native recreation lost visual tint")
-assertEqual(removedIDs[1], "npc-item", "compact source removed")
+T.equal(removedIDs[1], "npc-item", "compact source removed")
 record.inventory.items["npc-item"].wornSlot = nil
 
 record.inventory.revision = 10
@@ -229,10 +224,10 @@ ok, reason = Service.Transfer(player, {
     inventoryRevision = 10,
     requestId = "partial",
 })
-assertEqual(ok, true, "partial NPC stack transfer success")
-assertEqual(reason, "transferred_to_player", "partial NPC stack reason")
-assertEqual(granted.count, 2, "partial native quantity")
-assertEqual(record.inventory.items["npc-item"].stack, 3,
+T.equal(ok, true, "partial NPC stack transfer success")
+T.equal(reason, "transferred_to_player", "partial NPC stack reason")
+T.equal(granted.count, 2, "partial native quantity")
+T.equal(record.inventory.items["npc-item"].stack, 3,
     "partial compact stack remainder")
 
 record.inventory.revision = 11
@@ -246,16 +241,16 @@ ok, reason = Service.Transfer(player, {
     quantity = 1,
     inventoryRevision = 11,
 })
-assertEqual(ok, false, "off-limits NPC transfer rejected")
-assertEqual(reason, "item_off_limits", "off-limits transfer reason")
+T.equal(ok, false, "off-limits NPC transfer rejected")
+T.equal(reason, "item_off_limits", "off-limits transfer reason")
 ok, reason = Service.Action(player, {
     id = record.id,
     actionID = "drop",
     itemID = "npc-item",
     inventoryRevision = 11,
 })
-assertEqual(ok, false, "off-limits NPC action rejected")
-assertEqual(reason, "item_off_limits", "off-limits action reason")
+T.equal(ok, false, "off-limits NPC action rejected")
+T.equal(reason, "item_off_limits", "off-limits action reason")
 ok, reason = Service.Transfer(player, {
     id = record.id,
     direction = "npc_to_player",
@@ -264,8 +259,8 @@ ok, reason = Service.Transfer(player, {
     inventoryRevision = 11,
     bulk = true,
 })
-assertEqual(ok, false, "off-limits NPC bulk transfer skipped")
-assertEqual(reason, "no_transferable_items", "off-limits NPC bulk reason")
+T.equal(ok, false, "off-limits NPC bulk transfer skipped")
+T.equal(reason, "no_transferable_items", "off-limits NPC bulk reason")
 record.inventory.items["npc-item"].interactionLocked = false
 record.inventory.items["npc-item"].interactionLockReason = nil
 
@@ -277,10 +272,10 @@ ok, reason = Service.Action(player, {
     inventoryRevision = 12,
     requestId = "c",
 })
-assertEqual(ok, true, "item action success")
-assertEqual(reason, "equipped_primary", "item action reason")
-assertEqual(actionExecuted, "equip_primary", "modular action routed")
-assertEqual(equipmentRefreshes > 0, true, "live equipment refreshed")
+T.equal(ok, true, "item action success")
+T.equal(reason, "equipped_primary", "item action reason")
+T.equal(actionExecuted, "equip_primary", "modular action routed")
+T.equal(equipmentRefreshes > 0, true, "live equipment refreshed")
 
 record.inventory.revision = 20
 ok, reason = Service.Transfer(player, {
@@ -289,9 +284,9 @@ ok, reason = Service.Transfer(player, {
     itemIDs = { "npc-item" },
     inventoryRevision = 19,
 })
-assertEqual(ok, false, "revision conflict rejected")
-assertEqual(reason, "revision_conflict", "revision conflict reason")
-assertEqual(fullSyncs, 1, "conflict sends full payload")
+T.equal(ok, false, "revision conflict rejected")
+T.equal(reason, "revision_conflict", "revision conflict reason")
+T.equal(fullSyncs, 1, "conflict sends full payload")
 
 canManage = true
 nativeFavorite = true
@@ -304,8 +299,8 @@ ok, reason = Service.Transfer(player, {
     inventoryRevision = 30,
     bulk = true,
 })
-assertEqual(ok, false, "favorite player bulk transfer skipped")
-assertEqual(reason, "no_transferable_items", "favorite player bulk reason")
+T.equal(ok, false, "favorite player bulk transfer skipped")
+T.equal(reason, "no_transferable_items", "favorite player bulk reason")
 
 nativeFavorite = false
 nativeEquipped = false
@@ -323,8 +318,8 @@ ok, reason = Service.Transfer(player, {
     inventoryRevision = 30,
     bulk = true,
 })
-assertEqual(ok, false, "worn player bulk transfer skipped")
-assertEqual(reason, "no_transferable_items", "worn player bulk reason")
+T.equal(ok, false, "worn player bulk transfer skipped")
+T.equal(reason, "no_transferable_items", "worn player bulk reason")
 player.getWornItems = nil
 
 record.inventory.revision = 31
@@ -338,8 +333,8 @@ ok, reason = Service.Transfer(player, {
     inventoryRevision = 31,
     bulk = true,
 })
-assertEqual(ok, false, "equipped NPC bulk transfer skipped")
-assertEqual(reason, "no_transferable_items", "equipped NPC bulk reason")
+T.equal(ok, false, "equipped NPC bulk transfer skipped")
+T.equal(reason, "no_transferable_items", "equipped NPC bulk reason")
 
 canManage = false
 isServer = function() return true end
@@ -351,8 +346,8 @@ ok, reason = Service.Action(player, {
     itemID = "npc-item",
     inventoryRevision = 40,
 })
-assertEqual(ok, true, "admin debug inventory edit rejected")
-assertEqual(reason, "equipped_primary", "admin debug inventory action reason")
+T.equal(ok, true, "admin debug inventory edit rejected")
+T.equal(reason, "equipped_primary", "admin debug inventory action reason")
 
 player.getAccessLevel = function() return "" end
 ok, reason = Service.Action(player, {
@@ -361,7 +356,8 @@ ok, reason = Service.Action(player, {
     itemID = "npc-item",
     inventoryRevision = record.inventory.revision,
 })
-assertEqual(ok, false, "non-owner rejected")
-assertEqual(reason, "not_owner", "non-owner reason")
+T.equal(ok, false, "non-owner rejected")
+T.equal(reason, "not_owner", "non-owner reason")
+T.finish("pnc_inventory_transactions_smoke")
 
-print("pnc_inventory_transactions_smoke: ok")
+T.finish("pnc_inventory_transactions_smoke")

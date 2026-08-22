@@ -1,14 +1,7 @@
-local SHARED = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-local SERVER = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. " expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
-
-local function truth(value, label) equal(value == true, true, label) end
+local SHARED = T.path("ProjectHoomans", "shared", "PNC/Core/")
+local SERVER = T.path("ProjectHoomans", "server", "PNC/")
 
 local function deepCopy(value)
     if type(value) ~= "table" then return value end
@@ -38,9 +31,9 @@ PNC = { Core = {
     Now = function() return 500000 end,
     IsAuthority = function() return true end,
 } }
-dofile(SHARED .. "Identity/PNC_PlayerCharacterConstants.lua")
-dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
-dofile(SHARED .. "Identity/PNC_PlayerCharacterTypes.lua")
+T.load(SHARED .. "Identity/PNC_PlayerCharacterConstants.lua")
+T.load(SHARED .. "Relationships/PNC_EntityRef.lua")
+T.load(SHARED .. "Identity/PNC_PlayerCharacterTypes.lua")
 
 local records = {}
 for index = 1, 6 do
@@ -149,10 +142,10 @@ PNC.Factions = {
     end,
 }
 
-dofile(SERVER .. "PNC_PlayerCharacterService.lua")
+T.load(SERVER .. "PNC_PlayerCharacterService.lua")
 PNC.PlayerCharacters.Load()
-dofile(SERVER .. "PNC_PersistenceCoordinator.lua")
-dofile(SERVER .. "PNC_PlayerIdentityMigration.lua")
+T.load(SERVER .. "PNC_PersistenceCoordinator.lua")
+T.load(SERVER .. "PNC_PlayerIdentityMigration.lua")
 
 local username = "Bob"
 local mirror = { PNC_CharacterUUID = "char_legacy_6" }
@@ -174,47 +167,47 @@ local player = {
 }
 
 local context, reason = PNC.PlayerContext.Resolve(player, "fixture_bootstrap")
-equal(reason, "reused", "migration binds canonical mirror")
-equal(context.accountKey, "sp_slot_0", "SP account key ignores username")
-equal(context.characterUUID, "char_legacy_6", "valid mirror wins canonical choice")
-equal(PNC.PlayerCharacters.Registry.migration.status, "complete",
+T.equal(reason, "reused", "migration binds canonical mirror")
+T.equal(context.accountKey, "sp_slot_0", "SP account key ignores username")
+T.equal(context.characterUUID, "char_legacy_6", "valid mirror wins canonical choice")
+T.equal(PNC.PlayerCharacters.Registry.migration.status, "complete",
     "migration completes")
-truth(store.PNC_PlayerCharacters_v3_Backup.created,
+T.truthy(store.PNC_PlayerCharacters_v3_Backup.created,
     "v3 registry backup retained")
-equal(globalSaves, 1, "migration flushes GlobalModData once")
+T.equal(globalSaves, 1, "migration flushes GlobalModData once")
 
 local active = 0
 for uuid, record in pairs(PNC.PlayerCharacters.Registry.byUUID) do
     if record.status == "active" then active = active + 1 end
     if uuid ~= "char_legacy_6" then
-        equal(record.supersededBy, "char_legacy_6", "duplicate tombstone alias")
-        equal(PNC.PlayerCharacters.Registry.uuidAliases[uuid],
+        T.equal(record.supersededBy, "char_legacy_6", "duplicate tombstone alias")
+        T.equal(PNC.PlayerCharacters.Registry.uuidAliases[uuid],
             "char_legacy_6", "UUID alias retained")
     end
 end
-equal(active, 1, "one active SP survivor remains")
-equal(PNC.NPCKnowledge.Registry.byCharacter.char_legacy_6.byNPC
+T.equal(active, 1, "one active SP survivor remains")
+T.equal(PNC.NPCKnowledge.Registry.byCharacter.char_legacy_6.byNPC
     .npc_doyle.discovered["identity.name"].value,
     "Doyle Wild", "Doyle knowledge merged into canonical survivor")
 local canonicalKey = "player:sp_slot_0:char_legacy_6"
-truth(npc.social.relationships[canonicalKey] ~= nil,
+T.truthy(npc.social.relationships[canonicalKey] ~= nil,
     "relationship rekeyed to canonical entity")
-equal(npc.social.relationships[oldRelationshipKey], nil,
+T.equal(npc.social.relationships[oldRelationshipKey], nil,
     "legacy relationship key removed")
-equal(PNC.Factions.Registry.byPlayerKey[canonicalKey], "faction_two",
+T.equal(PNC.Factions.Registry.byPlayerKey[canonicalKey], "faction_two",
     "canonical player faction retained")
-equal(PNC.Factions.Registry.byID.faction_one.status, "archived",
+T.equal(PNC.Factions.Registry.byID.faction_one.status, "archived",
     "duplicate player faction archived")
 
 username = "Psychopatz"
 local second = PNC.PlayerContext.Resolve(player, "username_changed")
-equal(second.characterUUID, context.characterUUID,
+T.equal(second.characterUUID, context.characterUUID,
     "username change cannot invalidate runtime binding")
 local again, againReason = PNC.PlayerIdentityMigration.RunForPlayer(
     player, "sp_slot_0", 501
 )
-equal(again, "char_legacy_6", "idempotent migration canonical UUID")
-equal(againReason, "already_migrated", "migration is idempotent")
+T.equal(again, "char_legacy_6", "idempotent migration canonical UUID")
+T.equal(againReason, "already_migrated", "migration is idempotent")
 
 PNC.PlayerCharacters.Unbind(player, "fixture_restart", 502, true)
 local restarted = setmetatable({
@@ -224,19 +217,20 @@ local restarted = setmetatable({
 local restartContext = PNC.PlayerContext.Resolve(
     restarted, "restart_without_mirror"
 )
-equal(restartContext.characterUUID, "char_legacy_6",
+T.equal(restartContext.characterUUID, "char_legacy_6",
     "restart without player mirror recovers canonical SP survivor")
 
-truth(PNC.PlayerCharacters.MarkDead(restarted, 503, "fixture_death"),
+T.truthy(PNC.PlayerCharacters.MarkDead(restarted, 503, "fixture_death"),
     "genuine death retires canonical survivor")
 local successor = setmetatable({
     getModData = function() return {} end,
     getUsername = function() return "Psychopatz" end,
 }, { __index = player })
 local successorContext = PNC.PlayerContext.Resolve(successor, "post_death_survivor")
-equal(successorContext.characterUUID, "char_new",
+T.equal(successorContext.characterUUID, "char_new",
     "genuine post-death survivor receives new UUID")
-equal(PNC.NPCKnowledge.Registry.byCharacter[successorContext.characterUUID], nil,
+T.equal(PNC.NPCKnowledge.Registry.byCharacter[successorContext.characterUUID], nil,
     "new survivor does not inherit canonical knowledge")
+T.finish("pnc_identity_v4_migration_smoke")
 
-print("pnc_identity_v4_migration_smoke: ok")
+T.finish("pnc_identity_v4_migration_smoke")

@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/Pathing/")
 
 PNC = {
     Const = {
@@ -27,9 +22,9 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "PNC_LiveBodyControl.lua")
-dofile(ROOT .. "PNC_VehicleAvoidance.lua")
-dofile(ROOT .. "PNC_TraversalQuery.lua")
+T.load(ROOT .. "PNC_LiveBodyControl.lua")
+T.load(ROOT .. "PNC_VehicleAvoidance.lua")
+T.load(ROOT .. "PNC_TraversalQuery.lua")
 
 local position = {}
 local lastPosition = {}
@@ -42,17 +37,17 @@ local body = {
     setLastZ = function(_, value) lastPosition.z = value end,
 }
 
-assertEqual(
+T.equal(
     PNC.LiveBodyControl.SetAuthoritativePosition(body, 10.25, 11.5, 0),
     true,
     "authoritative position accepted"
 )
-assertEqual(position.x, 10.25, "body x")
-assertEqual(position.y, 11.5, "body y")
-assertEqual(position.z, 0, "body z")
-assertEqual(lastPosition.x, position.x, "last x synchronized")
-assertEqual(lastPosition.y, position.y, "last y synchronized")
-assertEqual(lastPosition.z, position.z, "last z synchronized")
+T.equal(position.x, 10.25, "body x")
+T.equal(position.y, 11.5, "body y")
+T.equal(position.z, 0, "body z")
+T.equal(lastPosition.x, position.x, "last x synchronized")
+T.equal(lastPosition.y, position.y, "last y synchronized")
+T.equal(lastPosition.z, position.z, "last z synchronized")
 
 local function makeSquare(vehicleIntersecting)
     return {
@@ -109,28 +104,28 @@ local cell = {
 }
 getCell = function() return cell end
 
-assertEqual(
+T.equal(
     PNC.TraversalQuery.CanOccupy(0.5, 0.5, 0, cell),
     true,
     "clear square remains walkable"
 )
-assertEqual(
+T.equal(
     PNC.TraversalQuery.CanOccupy(1.5, 0.5, 0, cell),
     false,
     "vehicle footprint blocks NPC occupancy"
 )
-assertEqual(
+T.equal(
     PNC.TraversalQuery.GetOccupancyReason(1.5, 0.5, 0, cell),
     "vehicle",
     "vehicle occupancy reason"
 )
 local safeX, safeY, safeZ, recoveryReason =
     PNC.TraversalQuery.FindNearestOccupable(1.5, 0.5, 0, 4, cell)
-assertEqual(safeX, 0.5, "nearest safe recovery x")
-assertEqual(safeY, 0.5, "nearest safe recovery y")
-assertEqual(safeZ, 0, "nearest safe recovery z")
-assertEqual(recoveryReason, "vehicle", "nearest safe recovery reason")
-assertEqual(
+T.equal(safeX, 0.5, "nearest safe recovery x")
+T.equal(safeY, 0.5, "nearest safe recovery y")
+T.equal(safeZ, 0, "nearest safe recovery z")
+T.equal(recoveryReason, "vehicle", "nearest safe recovery reason")
+T.equal(
     PNC.TraversalQuery.GetOccupancyReason(4.5, 0.5, 0, cell),
     "vehicle",
     "vehicle registry supplements stale square cache"
@@ -144,8 +139,8 @@ local canStep, stepReason = PNC.TraversalQuery.CanStep(
     0,
     cell
 )
-assertEqual(canStep, false, "route does not enter vehicle clearance")
-assertEqual(stepReason, "vehicle_clearance", "vehicle clearance reason")
+T.equal(canStep, false, "route does not enter vehicle clearance")
+T.equal(stepReason, "vehicle_clearance", "vehicle clearance reason")
 canStep = PNC.TraversalQuery.CanStep(
     3.5,
     0.5,
@@ -155,7 +150,7 @@ canStep = PNC.TraversalQuery.CanStep(
     0,
     cell
 )
-assertEqual(canStep, true, "route may escape vehicle clearance")
+T.equal(canStep, true, "route may escape vehicle clearance")
 
 local windowObject = {
     isDestroyed = function() return false end,
@@ -180,8 +175,8 @@ canStep, stepReason = PNC.TraversalQuery.CanStep(
     0,
     windowCell
 )
-assertEqual(canStep, false, "vehicle landing blocks window traversal")
-assertEqual(stepReason, "vehicle", "vehicle wins over window interaction")
+T.equal(canStep, false, "vehicle landing blocks window traversal")
+T.equal(stepReason, "vehicle", "vehicle wins over window interaction")
 
 local nonTablePoly = coroutine.create(function() end)
 local javaLikeVehicle = {
@@ -223,7 +218,7 @@ local javaLikeCell = {
     getVehicles = function() return javaLikeVehicles end,
 }
 PNC.VehicleAvoidance.Invalidate()
-assertEqual(
+T.equal(
     PNC.VehicleAvoidance.GetReason(
         7.5,
         8.5,
@@ -240,7 +235,7 @@ PNC.LocomotionProfiles = {
         return { speed = 1, moveAnim = "Walk" }
     end,
 }
-dofile(ROOT .. "PNC_FakeLocomotion.lua")
+T.load(ROOT .. "PNC_FakeLocomotion.lua")
 
 local authoritativeWrites = 0
 local setAuthoritativePosition = PNC.LiveBodyControl.SetAuthoritativePosition
@@ -268,9 +263,9 @@ local moved = PNC.FakeLocomotion.StepTowardGoal(
     { x = 0.8, y = 0.5, z = 0, mode = "walk" },
     1000
 )
-assertEqual(moved, true, "clear fake-locomotion step")
-assertEqual(authoritativeWrites, 1, "fake locomotion uses safe authoritative writer")
-assertEqual(lastPosition.x, position.x, "fake locomotion synchronizes last x")
+T.equal(moved, true, "clear fake-locomotion step")
+T.equal(authoritativeWrites, 1, "fake locomotion uses safe authoritative writer")
+T.equal(lastPosition.x, position.x, "fake locomotion synchronizes last x")
 
 PNC.PathService = { Internal = {} }
 PNC.Registry = {
@@ -278,7 +273,7 @@ PNC.Registry = {
         PNC._dirtyDomain = domain
     end,
 }
-dofile(ROOT .. "PNC_PathService/PNC_PathService_Context.lua")
+T.load(ROOT .. "PNC_PathService/PNC_PathService_Context.lua")
 position.x = 1.5
 position.y = 0.5
 position.z = 0
@@ -312,16 +307,16 @@ lane = {
 }
 local repaired, repairedReason =
     PNC.PathService.Internal.repairInvalidBodyPosition(record, body, lane, 2000)
-assertEqual(repaired, true, "live vehicle position repaired")
-assertEqual(repairedReason, "vehicle", "live repair reason")
-assertEqual(position.x, 0.5, "live repair destination x")
-assertEqual(record.x, position.x, "live repair record x")
-assertEqual(record.runtime.forceSyncEvent, "position_recovery", "live repair multiplayer sync")
-assertEqual(record.runtime.positionRecovery.lastEvent, "live_unstuck", "live repair metadata")
-assertEqual(PNC._dirtyDomain, "position_recovery", "live repair persisted")
-assertEqual(lane.phase, "cancel_pending", "vehicle path lane invalidated")
-assertEqual(lane.vehicleBlockedGoalX, 8.5, "vehicle-blocked goal quarantined")
-assert(
+T.equal(repaired, true, "live vehicle position repaired")
+T.equal(repairedReason, "vehicle", "live repair reason")
+T.equal(position.x, 0.5, "live repair destination x")
+T.equal(record.x, position.x, "live repair record x")
+T.equal(record.runtime.forceSyncEvent, "position_recovery", "live repair multiplayer sync")
+T.equal(record.runtime.positionRecovery.lastEvent, "live_unstuck", "live repair metadata")
+T.equal(PNC._dirtyDomain, "position_recovery", "live repair persisted")
+T.equal(lane.phase, "cancel_pending", "vehicle path lane invalidated")
+T.equal(lane.vehicleBlockedGoalX, 8.5, "vehicle-blocked goal quarantined")
+T.truthy(
     string.find(PNC._lastWarning or "", "event=live_unstuck", 1, true),
     "live repair warning was not logged"
 )
@@ -334,22 +329,22 @@ repaired = PNC.PathService.Internal.repairInvalidBodyPosition(
     lane,
     2500
 )
-assertEqual(repaired, true, "repeated vehicle position repaired")
-assertEqual(PNC._warningCount, 1, "repeated recovery warning throttled")
-assertEqual(record.runtime.positionRecovery.suppressedLogs, 1,
+T.equal(repaired, true, "repeated vehicle position repaired")
+T.equal(PNC._warningCount, 1, "repeated recovery warning throttled")
+T.equal(record.runtime.positionRecovery.suppressedLogs, 1,
     "suppressed recovery warning counted")
 
 PNC.PathService.Internal.logMoveTransition = function() end
-dofile(ROOT .. "PNC_PathService/PNC_PathService_Lane.lua")
+T.load(ROOT .. "PNC_PathService/PNC_PathService_Lane.lua")
 lane.phase = "idle"
 local intentState = PNC.PathService.Internal.consumeMoveIntent(
     record,
     lane,
     body
 )
-assertEqual(intentState, "vehicle_blocked",
+T.equal(intentState, "vehicle_blocked",
     "same vehicle-blocked goal remains quarantined")
-assertEqual(lane.phase, "idle", "quarantined goal does not restart lane")
+T.equal(lane.phase, "idle", "quarantined goal does not restart lane")
 
 vehicleBlocking = false
 intentState = PNC.PathService.Internal.consumeMoveIntent(
@@ -357,9 +352,9 @@ intentState = PNC.PathService.Internal.consumeMoveIntent(
     lane,
     body
 )
-assertEqual(intentState, "requested", "goal released after vehicle moved")
-assertEqual(lane.phase, "requested", "released goal restarts lane")
-assertEqual(lane.vehicleBlockedGoalX, nil, "vehicle quarantine cleared")
+T.equal(intentState, "requested", "goal released after vehicle moved")
+T.equal(lane.phase, "requested", "released goal restarts lane")
+T.equal(lane.vehicleBlockedGoalX, nil, "vehicle quarantine cleared")
 
 lane.phase = "active"
 lane.lastStepAt = 777
@@ -373,17 +368,18 @@ intentState = PNC.PathService.Internal.consumeMoveIntent(
     lane,
     body
 )
-assertEqual(
+T.equal(
     intentState,
     "retargeted",
     "adjacent local waypoint retarget"
 )
-assertEqual(lane.goal.x, 9.5, "active lane adopted new waypoint")
-assertEqual(
+T.equal(lane.goal.x, 9.5, "active lane adopted new waypoint")
+T.equal(
     lane.lastStepAt,
     777,
     "continuous retarget reset movement cadence"
 )
-assertEqual(lane.steeringIndex, 3, "look-ahead index captured")
+T.equal(lane.steeringIndex, 3, "look-ahead index captured")
+T.finish("pnc_vehicle_pathing_smoke")
 
-print("pnc_vehicle_pathing_smoke: ok")
+T.finish("pnc_vehicle_pathing_smoke")

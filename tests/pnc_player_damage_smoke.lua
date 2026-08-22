@@ -1,13 +1,9 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
-local CORE_ROOT = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
-package.path = SHARED_ROOT .. "?.lua;" .. CORE_ROOT .. "?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
+local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
+local CORE_ROOT = T.path("PsychopatzCore", "common", "")
+T.addPackagePaths()
 
 local now = 1000
 local records = {}
@@ -73,18 +69,18 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Base/PNC_Types.lua")
-dofile(ROOT .. "Health/PNC_Health.lua")
-dofile(ROOT .. "Health/PNC_NPCWounds.lua")
+T.load(ROOT .. "Base/PNC_Types.lua")
+T.load(ROOT .. "Health/PNC_Health.lua")
+T.load(ROOT .. "Health/PNC_NPCWounds.lua")
 require "PNC/Core/Combat/CombatResolution/PNC_CombatResolution"
-dofile(ROOT .. "Health/PNC_PlayerDamage.lua")
+T.load(ROOT .. "Health/PNC_PlayerDamage.lua")
 
-assertEqual(PNC.Types.NormalizeFaction("colonist"), "colonist", "colonist faction")
-assertEqual(PNC.Types.NormalizeFaction("companion"), "colonist", "legacy companion migration")
-assertEqual(PNC.Types.NormalizeFaction("friendly"), "colonist", "legacy friendly migration")
-assertEqual(PNC.Types.NormalizeFaction("neutral"), "neutral", "neutral faction")
-assertEqual(PNC.Types.NormalizeFaction("bandit"), "hostile", "hostile alias")
-assertEqual(PNC.Types.NormalizeDefinition({ faction = "companion" }).faction, "colonist", "legacy definition migration")
+T.equal(PNC.Types.NormalizeFaction("colonist"), "colonist", "colonist faction")
+T.equal(PNC.Types.NormalizeFaction("companion"), "colonist", "legacy companion migration")
+T.equal(PNC.Types.NormalizeFaction("friendly"), "colonist", "legacy friendly migration")
+T.equal(PNC.Types.NormalizeFaction("neutral"), "neutral", "neutral faction")
+T.equal(PNC.Types.NormalizeFaction("bandit"), "hostile", "hostile alias")
+T.equal(PNC.Types.NormalizeDefinition({ faction = "companion" }).faction, "colonist", "legacy definition migration")
 
 local function makeRecord(id, faction)
     return {
@@ -144,30 +140,30 @@ local applied, reason = PNC.PlayerDamage.HandleClientReport(player, {
     weaponFullType = "Base.Axe",
     damage = 1.5,
 })
-assertEqual(applied, true, "neutral damage applied")
-assertEqual(reason, "damaged", "neutral damage reason")
-assertEqual(records.neutral_1.health.current, 85, "scaled neutral custom HP")
-assertEqual(records.neutral_1.health.body.openWoundCount, 1, "player hit creates NPC body-part wound")
-assertEqual(records.neutral_1.health.body.wounds.Head.type, "laceration", "player melee wound type")
-assertEqual(engineHealth, 1000, "engine buffer restored")
-assertEqual(broadcasts, 1, "damage broadcast")
+T.equal(applied, true, "neutral damage applied")
+T.equal(reason, "damaged", "neutral damage reason")
+T.equal(records.neutral_1.health.current, 85, "scaled neutral custom HP")
+T.equal(records.neutral_1.health.body.openWoundCount, 1, "player hit creates NPC body-part wound")
+T.equal(records.neutral_1.health.body.wounds.Head.type, "laceration", "player melee wound type")
+T.equal(engineHealth, 1000, "engine buffer restored")
+T.equal(broadcasts, 1, "damage broadcast")
 
 local colonist = makeRecord("colonist_1", "colonist")
 local legacyCompanion = makeRecord("legacy_1", "companion")
 local hostile = makeRecord("hostile_1", "hostile")
 records.hostile_1 = hostile
 bodies.hostile_1 = body
-assertEqual(PNC.PlayerDamage.CanDamageRecord(colonist), false, "colonist protection")
-assertEqual(PNC.PlayerDamage.CanDamageRecord(legacyCompanion), false, "legacy colonist protection")
-assertEqual(PNC.PlayerDamage.CanDamageRecord(hostile), true, "hostile damage enabled")
+T.equal(PNC.PlayerDamage.CanDamageRecord(colonist), false, "colonist protection")
+T.equal(PNC.PlayerDamage.CanDamageRecord(legacyCompanion), false, "legacy colonist protection")
+T.equal(PNC.PlayerDamage.CanDamageRecord(hostile), true, "hostile damage enabled")
 
 bodyModData.PNC_UUID = "hostile_1"
-assertEqual(PNC.PlayerDamage.Apply(hostile, body, player, weapon, 1, "test"), true, "hostile hit applied")
-assertEqual(hostile.health.current, 90, "hostile custom HP")
+T.equal(PNC.PlayerDamage.Apply(hostile, body, player, weapon, 1, "test"), true, "hostile hit applied")
+T.equal(hostile.health.current, 90, "hostile custom HP")
 
 bodyModData.PNC_UUID = "colonist_1"
-assertEqual(PNC.PlayerDamage.Apply(colonist, body, player, weapon, 2, "test"), false, "colonist hit rejected")
-assertEqual(colonist.health.current, 100, "colonist HP unchanged")
+T.equal(PNC.PlayerDamage.Apply(colonist, body, player, weapon, 2, "test"), false, "colonist hit rejected")
+T.equal(colonist.health.current, 100, "colonist HP unchanged")
 
 now = 1200
 bodyModData.PNC_UUID = "neutral_1"
@@ -177,7 +173,8 @@ local rejected, rejectedReason = PNC.PlayerDamage.HandleClientReport(player, {
     weaponFullType = "Base.Axe",
     damage = 2,
 })
-assertEqual(rejected, false, "spoofed attacker rejected")
-assertEqual(rejectedReason, "attacker_mismatch", "spoofed attacker reason")
+T.equal(rejected, false, "spoofed attacker rejected")
+T.equal(rejectedReason, "attacker_mismatch", "spoofed attacker reason")
+T.finish("pnc_player_damage_smoke")
 
-print("pnc_player_damage_smoke: ok")
+T.finish("pnc_player_damage_smoke")

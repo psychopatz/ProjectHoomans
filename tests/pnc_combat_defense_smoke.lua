@@ -1,22 +1,8 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Combat/PNC_Combat_Defense.lua"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual")
-            .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertNear(actual, expected, tolerance, label)
-    if math.abs((tonumber(actual) or 0) - expected) > tolerance then
-        error((label or "assertNear")
-            .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
 
 local now = 1000
 local fitness = 2
@@ -72,7 +58,7 @@ PNC = {
     },
     Skills = {
         GetLevel = function(_, skill)
-            assertEqual(skill, "Fitness", "defense skill")
+            T.equal(skill, "Fitness", "defense skill")
             return fitness
         end,
     },
@@ -84,7 +70,7 @@ PNC = {
     },
     NPCWounds = {
         GetProtection = function(_, _, damageType)
-            assertEqual(damageType, "scratch", "damage-specific armor")
+            T.equal(damageType, "scratch", "damage-specific armor")
             return protection
         end,
         ChooseZombieAttackPart = function()
@@ -96,8 +82,8 @@ PNC = {
     },
     CombatZombieReaction = {
         Start = function(_, target, options)
-            assert(target ~= nil, "stagger target missing")
-            assertEqual(options.stagger, true, "stagger option")
+            T.truthy(target ~= nil, "stagger target missing")
+            T.equal(options.stagger, true, "stagger option")
             staggerCount = staggerCount + 1
             return true
         end,
@@ -109,15 +95,15 @@ PNC = {
     },
     Network = {
         BroadcastZombieReaction = function(target, attacker, options)
-            assert(target ~= nil and attacker ~= nil, "reaction replication target")
-            assertEqual(options.kind, "npc_zombie_parry", "reaction replication kind")
+            T.truthy(target ~= nil and attacker ~= nil, "reaction replication target")
+            T.equal(options.kind, "npc_zombie_parry", "reaction replication kind")
             broadcastCount = broadcastCount + 1
             return true
         end,
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local record = {
     id = "defender",
@@ -139,7 +125,7 @@ local chance = PNC.CombatDefense.CalculateAvoidChance(
     1,
     { id = "Torso_Upper" }
 )
-assertNear(chance, 0.98, 0.00001, "fitness two single-zombie dodge")
+T.near(chance, 0.98, 0.00001, "fitness two single-zombie dodge")
 
 local crowdedChance = PNC.CombatDefense.CalculateAvoidChance(
     record,
@@ -148,7 +134,7 @@ local crowdedChance = PNC.CombatDefense.CalculateAvoidChance(
     4,
     { id = "Torso_Upper" }
 )
-assert(crowdedChance < chance, "four-zombie crowd did not lower dodge")
+T.truthy(crowdedChance < chance, "four-zombie crowd did not lower dodge")
 
 protection = 50
 local armoredChance = PNC.CombatDefense.CalculateAvoidChance(
@@ -158,7 +144,7 @@ local armoredChance = PNC.CombatDefense.CalculateAvoidChance(
     4,
     { id = "Torso_Upper" }
 )
-assert(armoredChance > crowdedChance, "matching armor did not reduce harm")
+T.truthy(armoredChance > crowdedChance, "matching armor did not reduce harm")
 
 protection = 0
 nearby = 1
@@ -169,12 +155,12 @@ local avoided, result = PNC.CombatDefense.ResolveZombieAttack(
     makeZombie(0.5),
     now
 )
-assertEqual(avoided, true, "successful defense roll")
-assertEqual(result.nearbyCount, 1, "live nearby count")
-assertEqual(result.pushed, true, "failed zombie attack stagger roll")
-assertEqual(staggerCount, 1, "stagger dispatched")
-assertEqual(broadcastCount, 1, "stagger replicated")
-assertEqual(nearMissCount, 1, "reactive kite armed")
+T.equal(avoided, true, "successful defense roll")
+T.equal(result.nearbyCount, 1, "live nearby count")
+T.equal(result.pushed, true, "failed zombie attack stagger roll")
+T.equal(staggerCount, 1, "stagger dispatched")
+T.equal(broadcastCount, 1, "stagger replicated")
+T.equal(nearMissCount, 1, "reactive kite armed")
 
 fitness = 0
 nearby = 4
@@ -185,9 +171,10 @@ avoided = PNC.CombatDefense.ResolveZombieAttack(
     makeZombie(0.5),
     now + 1
 )
-assertEqual(avoided, false, "failed defense roll")
-assertEqual(staggerCount, 1, "hit incorrectly staggered attacker")
-assertEqual(broadcastCount, 1, "hit incorrectly replicated stagger")
-assertEqual(nearMissCount, 1, "hit incorrectly armed near-miss kite")
+T.equal(avoided, false, "failed defense roll")
+T.equal(staggerCount, 1, "hit incorrectly staggered attacker")
+T.equal(broadcastCount, 1, "hit incorrectly replicated stagger")
+T.equal(nearMissCount, 1, "hit incorrectly armed near-miss kite")
+T.finish("pnc_combat_defense_smoke")
 
-print("pnc_combat_defense_smoke: ok")
+T.finish("pnc_combat_defense_smoke")

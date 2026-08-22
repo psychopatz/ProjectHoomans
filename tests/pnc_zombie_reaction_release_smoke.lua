@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Combat/PNC_Combat_ZombieReaction.lua"
 
 local now = 1000
@@ -41,9 +43,9 @@ local target = {
     setStateEventDelayTimer = function(_, value) delayTimer = value end,
 }
 
-dofile(FILE)
+T.load(FILE)
 
-assert(PNC.CombatZombieReaction.ApplyReplicatedHit(
+T.truthy(PNC.CombatZombieReaction.ApplyReplicatedHit(
     attacker,
     target,
     {
@@ -53,21 +55,21 @@ assert(PNC.CombatZombieReaction.ApplyReplicatedHit(
         settleMs = 520,
     }
 ))
-assert(staggerBack and not bumpDone and bumpType == "stagger",
+T.truthy(staggerBack and not bumpDone and bumpType == "stagger",
     "replicated reaction did not enter its transient stagger")
-assert(modData.PNC_CombatReaction ~= nil,
+T.truthy(modData.PNC_CombatReaction ~= nil,
     "replicated reaction did not register a release lease")
-assert(PNC.CombatZombieReaction.Pump(target, 1050),
+T.truthy(PNC.CombatZombieReaction.Pump(target, 1050),
     "reaction ended before its minimum engine ownership window")
 
 actionState = "walktoward"
-assert(not PNC.CombatZombieReaction.Pump(target, 1120),
+T.truthy(not PNC.CombatZombieReaction.Pump(target, 1120),
     "reaction retained AI ownership after the engine returned to walking")
-assert(not staggerBack and bumpDone and bumpType == "",
+T.truthy(not staggerBack and bumpDone and bumpType == "",
     "reaction release left zombie stagger/bump flags active")
-assert(hitReaction == "" and delayTimer == 0,
+T.truthy(hitReaction == "" and delayTimer == 0,
     "reaction release left engine hit state inputs latched")
-assert(modData.PNC_CombatReaction == nil,
+T.truthy(modData.PNC_CombatReaction == nil,
     "reaction lease survived its engine-state exit")
 
 now = 2000
@@ -82,9 +84,10 @@ PNC.CombatZombieReaction.ApplyReplicatedHit(
         settleMs = 200,
     }
 )
-assert(not PNC.CombatZombieReaction.Pump(target, 2201),
+T.truthy(not PNC.CombatZombieReaction.Pump(target, 2201),
     "stuck reaction survived its hard timeout")
-assert(not staggerBack and bumpDone and bumpType == "",
+T.truthy(not staggerBack and bumpDone and bumpType == "",
     "hard timeout did not restore zombie AI inputs")
+T.finish("pnc_zombie_reaction_release_smoke")
 
-print("pnc_zombie_reaction_release_smoke: ok")
+T.finish("pnc_zombie_reaction_release_smoke")

@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Stamina/PNC_Stamina_Movement.lua"
 
 local now = 1000
@@ -28,7 +30,7 @@ PNC = {
     Stamina = {},
 }
 
-dofile(FILE)
+T.load(FILE)
 
 PNC.Stamina.GetRatio = function(recordValue)
     return recordValue.stamina.current
@@ -52,17 +54,17 @@ local record = {
 }
 
 local drain = PNC.Stamina.ApplyMovementDrain(record, 1)
-assert(drain == 0 and record.stamina.current == 100,
+T.truthy(drain == 0 and record.stamina.current == 100,
     "movement intent drained stamina without physical progress")
 
 record.runtime.pathing.lastPhysicalMoveAt = now
 drain = PNC.Stamina.ApplyMovementDrain(record, 1)
-assert(drain == 10 and record.stamina.current == 90,
+T.truthy(drain == 10 and record.stamina.current == 90,
     "recent physical running progress did not drain stamina")
 
 now = now + 751
 drain = PNC.Stamina.ApplyMovementDrain(record, 1)
-assert(drain == 0 and record.stamina.current == 90,
+T.truthy(drain == 0 and record.stamina.current == 90,
     "stalled delegated movement continued draining stamina")
 
 record.stamina.current = 10
@@ -77,7 +79,7 @@ local profile = PNC.Stamina.BuildMovementProfile(
         staminaMode = "travel",
     }
 )
-assert(profile.profileKey == "recovery_walk",
+T.truthy(profile.profileKey == "recovery_walk",
     "ordinary exhausted travel invented a crouch posture")
 
 record.runtime.sprintSlowUntil = 0
@@ -90,7 +92,8 @@ profile = PNC.Stamina.BuildMovementProfile(
         staminaMode = "sneak",
     }
 )
-assert(profile.profileKey == "recovery_sneak",
+T.truthy(profile.profileKey == "recovery_sneak",
     "explicit stealth recovery lost its crouch posture")
+T.finish("pnc_stamina_physical_movement_smoke")
 
-print("pnc_stamina_physical_movement_smoke: ok")
+T.finish("pnc_stamina_physical_movement_smoke")

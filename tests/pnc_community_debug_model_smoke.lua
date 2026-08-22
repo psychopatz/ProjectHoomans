@@ -1,30 +1,12 @@
+local T = require "tests/support/test"
+
 local CLIENT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected="
-            .. tostring(expected) .. " actual="
-            .. tostring(actual))
-    end
-end
-
-local function assertContains(value, expected, label)
-    if not string.find(
-        tostring(value),
-        tostring(expected),
-        1,
-        true
-    ) then
-        error((label or "assertContains") .. ": missing "
-            .. tostring(expected) .. " in " .. tostring(value))
-    end
-end
+    T.path("ProjectHoomans", "client", "PNC/")
 
 function getText(key) return key end
 
 PNC = {}
-dofile(
+T.load(
     CLIENT
         .. "UI/Communities/PNC_CommunityDebugModel.lua"
 )
@@ -100,14 +82,14 @@ snapshot.selectedCommunity = snapshot.communities[1]
 
 local communities =
     PNC.CommunityDebugModel.BuildCommunityItems(snapshot)
-assertEqual(#communities, 1, "community item count")
-assertContains(communities[1].detail, "settled/active",
+T.equal(#communities, 1, "community item count")
+T.contains(communities[1].detail, "settled/active",
     "community list detail")
 local factions =
     PNC.CommunityDebugModel.BuildFactionItems(snapshot)
-assertEqual(#factions, 1, "faction item count")
+T.equal(#factions, 1, "faction item count")
 local npcs = PNC.CommunityDebugModel.BuildNPCItems(snapshot)
-assertContains(npcs[1].detail, "guard", "NPC role detail")
+T.contains(npcs[1].detail, "guard", "NPC role detail")
 local rows = PNC.CommunityDebugModel.BuildRows(
     snapshot,
     true,
@@ -118,17 +100,17 @@ for _, item in ipairs(rows) do
     values[#values + 1] = item.label .. "=" .. item.value
 end
 local formatted = table.concat(values, "\n")
-assertContains(formatted, "Test Farm", "selected community")
-assertContains(formatted, "1/12", "population capacity")
-assertContains(formatted, "distance 1.0", "containment distance")
-assertContains(formatted, "presence=7", "presence revision")
+T.contains(formatted, "Test Farm", "selected community")
+T.contains(formatted, "1/12", "population capacity")
+T.contains(formatted, "distance 1.0", "containment distance")
+T.contains(formatted, "presence=7", "presence revision")
 local denied = PNC.CommunityDebugModel.BuildRows(
     snapshot,
     false,
     "not_authorized"
 )
-assertEqual(#denied, 1, "unauthorized model row")
-assertContains(denied[1].value, "not_authorized",
+T.equal(#denied, 1, "unauthorized model row")
+T.contains(denied[1].value, "not_authorized",
     "authorization reason")
 
 -- The overlay controller requests snapshots and toggles settings only; it has
@@ -162,28 +144,29 @@ PNC.Nameplates = {
         return visible
     end,
 }
-dofile(
+T.load(
     CLIENT
         .. "UI/Communities/PNC_CommunityDebugOverlay.lua"
 )
-assertEqual(PNC.CommunityDebugOverlay.Toggle(), true,
+T.equal(PNC.CommunityDebugOverlay.Toggle(), true,
     "overlay toggles on")
-assertEqual(requested, 1, "overlay requests diagnostic")
-assertEqual(
+T.equal(requested, 1, "overlay requests diagnostic")
+T.equal(
     PNC.CommunityDebugOverlay.GetNPCDiagnostic(
         "npc_test"
     ).communityID,
     "community_test",
     "overlay diagnostic lookup"
 )
-assertEqual(PNC.CommunityDebugOverlay.Toggle(), false,
+T.equal(PNC.CommunityDebugOverlay.Toggle(), false,
     "overlay toggles off")
 PNC.MapDisplay = {
     AreBasesVisible = function() return true end,
 }
-assertEqual(PNC.CommunityDebugOverlay.Update(true), true,
+T.equal(PNC.CommunityDebugOverlay.Update(true), true,
     "map bases request diagnostics independently")
-assertEqual(requested, 2,
+T.equal(requested, 2,
     "map bases generated a sanitized request")
+T.finish("pnc_community_debug_model_smoke")
 
-print("pnc_community_debug_model_smoke: PASS")
+T.finish("pnc_community_debug_model_smoke")

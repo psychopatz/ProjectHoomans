@@ -1,4 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local now = 1000
 local nearbyZombieCount = 1
@@ -61,7 +63,7 @@ PNC = {
     BehaviorCombat = {
         TickEngage = function(_, _, target)
             combatCalls = combatCalls + 1
-            assert(target == recentAttacker, "travel combat changed attacker")
+            T.truthy(target == recentAttacker, "travel combat changed attacker")
         end,
     },
     Animation = {
@@ -96,8 +98,8 @@ PNC.Travel = {
     },
 }
 
-dofile(ROOT .. "Stealth/PNC_Stealth.lua")
-dofile(ROOT .. "Behaviors/PNC_Behavior_Travel.lua")
+T.load(ROOT .. "Stealth/PNC_Stealth.lua")
+T.load(ROOT .. "Behaviors/PNC_Behavior_Travel.lua")
 
 local zombie = {
     zombiesDontAttack = false,
@@ -118,10 +120,10 @@ local record = {
     },
 }
 
-assert(PNC.BehaviorTravel.Tick(record, zombie), "live travel was not handled")
-assert(#moveCalls == 1 and moveCalls[1].mode == "sneak", "nearby zombie did not switch live travel to sneak")
-assert(zombie.zombiesDontAttack == true, "travel stealth did not protect the live body")
-assert(clearAggroCalls == 1, "travel stealth did not clear existing zombie aggro")
+T.truthy(PNC.BehaviorTravel.Tick(record, zombie), "live travel was not handled")
+T.truthy(#moveCalls == 1 and moveCalls[1].mode == "sneak", "nearby zombie did not switch live travel to sneak")
+T.truthy(zombie.zombiesDontAttack == true, "travel stealth did not protect the live body")
+T.truthy(clearAggroCalls == 1, "travel stealth did not clear existing zombie aggro")
 
 now = 1100
 recentAttacker = {
@@ -135,37 +137,38 @@ recentAttacker = {
 }
 local movesBeforeCombat = #moveCalls
 local travelTicksBeforeCombat = tickLiveCalls
-assert(PNC.BehaviorTravel.Tick(record, zombie), "travel combat was not handled")
-assert(combatCalls == 1, "recent attacker did not preempt live travel")
-assert(#moveCalls == movesBeforeCombat, "journey movement continued during combat")
-assert(tickLiveCalls == travelTicksBeforeCombat, "journey advanced during combat")
-assert(record.runtime.target == recentAttacker, "recent attacker was not bound as combat target")
-assert(zombie.zombiesDontAttack == false, "combat did not restore zombie attack eligibility")
+T.truthy(PNC.BehaviorTravel.Tick(record, zombie), "travel combat was not handled")
+T.truthy(combatCalls == 1, "recent attacker did not preempt live travel")
+T.truthy(#moveCalls == movesBeforeCombat, "journey movement continued during combat")
+T.truthy(tickLiveCalls == travelTicksBeforeCombat, "journey advanced during combat")
+T.truthy(record.runtime.target == recentAttacker, "recent attacker was not bound as combat target")
+T.truthy(zombie.zombiesDontAttack == false, "combat did not restore zombie attack eligibility")
 
 now = 7000
 nearbyZombieCount = 0
 recentAttacker = nil
-assert(PNC.BehaviorTravel.Tick(record, zombie), "travel did not resume")
-assert(#moveCalls == movesBeforeCombat + 1, "journey movement did not resume after combat")
-assert(moveCalls[#moveCalls].mode == "walk", "cleared threat left travel stuck in sneak")
-assert(record.runtime.target == nil, "combat target survived travel resume")
+T.truthy(PNC.BehaviorTravel.Tick(record, zombie), "travel did not resume")
+T.truthy(#moveCalls == movesBeforeCombat + 1, "journey movement did not resume after combat")
+T.truthy(moveCalls[#moveCalls].mode == "walk", "cleared threat left travel stuck in sneak")
+T.truthy(record.runtime.target == nil, "combat target survived travel resume")
 
 nearbyZombieCount = 1
 now = 8000
-assert(PNC.BehaviorTravel.Tick(record, zombie), "second stealth travel tick failed")
-assert(zombie.zombiesDontAttack == true, "travel stealth was not re-entered")
+T.truthy(PNC.BehaviorTravel.Tick(record, zombie), "second stealth travel tick failed")
+T.truthy(zombie.zombiesDontAttack == true, "travel stealth was not re-entered")
 liveState = "arrived"
 now = 8400
-assert(PNC.BehaviorTravel.Tick(record, zombie), "arrival tick failed")
-assert(zombie.zombiesDontAttack == false, "arrival left temporary zombie protection enabled")
+T.truthy(PNC.BehaviorTravel.Tick(record, zombie), "arrival tick failed")
+T.truthy(zombie.zombiesDontAttack == false, "arrival left temporary zombie protection enabled")
 
 record.presenceState = "abstract"
 now = 9000
 local combatBeforeAbstract = combatCalls
 local scansBeforeAbstract = clearAggroCalls
-assert(PNC.BehaviorTravel.Tick(record, zombie), "abstract travel was not handled")
-assert(advanceCalls == 1, "abstract travel did not use the abstract service")
-assert(combatCalls == combatBeforeAbstract, "abstract travel entered live combat")
-assert(clearAggroCalls == scansBeforeAbstract, "abstract travel ran live stealth logic")
+T.truthy(PNC.BehaviorTravel.Tick(record, zombie), "abstract travel was not handled")
+T.truthy(advanceCalls == 1, "abstract travel did not use the abstract service")
+T.truthy(combatCalls == combatBeforeAbstract, "abstract travel entered live combat")
+T.truthy(clearAggroCalls == scansBeforeAbstract, "abstract travel ran live stealth logic")
+T.finish("pnc_live_travel_threat_smoke")
 
-print("pnc_live_travel_threat_smoke: ok")
+T.finish("pnc_live_travel_threat_smoke")

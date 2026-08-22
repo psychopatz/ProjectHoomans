@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/"
+    T.path("ProjectHoomans", "client", "PNC/PresenceSync/")
     .. "PNC_ClientPresenceTick.lua"
 
 local now = 100
@@ -57,7 +59,7 @@ PNC = {
         Internal = {
             ApplySnapshotFacing = function() end,
             ApplySnapshotToBody = function(_, resolvedBody, remoteReplica)
-                assert(resolvedBody == body, "single-player body was not resolved")
+                T.truthy(resolvedBody == body, "single-player body was not resolved")
                 renders = renders + 1
                 renderedAsRemote = remoteReplica
             end,
@@ -92,14 +94,15 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 PNC.ClientPresenceSync.OnTick()
 
-assert(builds == 1, "single-player attack snapshot was not built")
-assert(renders == 1, "single-player attack snapshot was not rendered")
-assert(
+T.truthy(builds == 1, "single-player attack snapshot was not built")
+T.truthy(renders == 1, "single-player attack snapshot was not rendered")
+T.truthy(
     renderedAsRemote == false,
     "single-player attack was routed through remote interpolation"
 )
+T.finish("pnc_sp_attack_snapshot_render_smoke")
 
-print("pnc_sp_attack_snapshot_render_smoke: ok")
+T.finish("pnc_sp_attack_snapshot_render_smoke")

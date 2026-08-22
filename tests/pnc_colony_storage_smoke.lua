@@ -1,20 +1,10 @@
-local SHARED = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
-local SERVER = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
-local CLIENT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
-local CORE = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
-package.path = SHARED .. "?.lua;" .. SERVER .. "?.lua;" .. CLIENT
-    .. "?.lua;" .. CORE .. "?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
-
-local function truthy(value, label)
-    if not value then error(label or "expected truthy value") end
-end
+local SHARED = T.path("ProjectHoomans", "shared", "")
+local SERVER = T.path("ProjectHoomans", "server", "")
+local CLIENT = T.path("ProjectHoomans", "client", "")
+local CORE = T.path("PsychopatzCore", "common", "")
+T.addPackagePaths()
 
 local modData = {}
 ModData = {
@@ -159,8 +149,8 @@ local Journal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
 local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local function activity(storage) return Journal.Snapshot(storage) end
 
-equal(Definitions.GetCapacity(1), 200, "tier one capacity")
-equal(Definitions.GetCapacity(2), 250, "tier two capacity")
+T.equal(Definitions.GetCapacity(1), 200, "tier one capacity")
+T.equal(Definitions.GetCapacity(2), 250, "tier two capacity")
 
 local playerItem = item("Base.Bandage", 0.1)
 local playerContainer = container({ playerItem })
@@ -185,15 +175,15 @@ local playerB = {
 
 local storageA = Repository.GetPrimary("faction_a", "colony_faction_a")
 local storageB = Repository.GetPrimary("faction_b", "colony_faction_b")
-truthy(storageA and storageB and storageA ~= storageB, "faction isolation")
-equal(storageA.tier, 1, "initial tier")
-equal(storageA.inventory:getLogicalItemCount(), 0, "initial empty storage")
+T.truthy(storageA and storageB and storageA ~= storageB, "faction isolation")
+T.equal(storageA.tier, 1, "initial tier")
+T.equal(storageA.inventory:getLogicalItemCount(), 0, "initial empty storage")
 local access = Service.BuildPlayerAccess(playerA, storageA)
-equal(access.hasStockpile, true,
+T.equal(access.hasStockpile, true,
     "built stockpile facility grants storage access")
 stockpileBuilt = false
 access = Service.BuildPlayerAccess(playerA, storageA)
-equal(access.hasStockpile, false,
+T.equal(access.hasStockpile, false,
     "reconstructing stockpile disables storage access")
 stockpileBuilt = true
 
@@ -212,47 +202,47 @@ local awayOK, awayReason = Service.RequestPlayerDeposit(awayPlayer, {
     requestId = "deposit:away",
     itemIDs = { tostring(awayItem:getID()) },
 })
-equal(awayOK, false, "away player storage remains read only")
-equal(awayReason, "outside_base", "away player rejection reason")
-equal(#awayContainer.values, 1, "read-only rejection preserves inventory")
+T.equal(awayOK, false, "away player storage remains read only")
+T.equal(awayReason, "outside_base", "away player rejection reason")
+T.equal(#awayContainer.values, 1, "read-only rejection preserves inventory")
 
 PNC.ResearchService = { Queries = { HasTechnology = function() return false end } }
 local upgraded, upgradeReason = Service.Upgrade(playerB, {
     storageId = storageB.id,
 })
-equal(upgraded, false, "storage upgrade is research gated")
-equal(upgradeReason, "TECHNOLOGY_REQUIRED", "storage research gate reason")
+T.equal(upgraded, false, "storage upgrade is research gated")
+T.equal(upgradeReason, "TECHNOLOGY_REQUIRED", "storage research gate reason")
 PNC.ResearchService.Queries.HasTechnology = function(_, technologyId)
     return technologyId == "storage:2"
 end
 upgraded = Service.Upgrade(playerB, { storageId = storageB.id })
-equal(upgraded, true, "researched storage capability permits Base upgrade")
-equal(storageB.tier, 2, "Base storage action applies researched tier")
+T.equal(upgraded, true, "researched storage capability permits Base upgrade")
+T.equal(storageB.tier, 2, "Base storage action applies researched tier")
 
 local ok, reason = Service.RequestPlayerDeposit(playerA, {
     requestId = "deposit:1",
     itemIDs = { tostring(playerItem:getID()) },
 })
-equal(ok, true, "player deposit")
-equal(reason, "deposited", "player deposit reason")
-equal(#playerContainer.values, 0, "player source removal")
-equal(storageA.inventory:getLogicalItemCount(), 1, "storage destination add")
-equal(storageB.inventory:getLogicalItemCount(), 0, "other faction unchanged")
-equal(provisionWakeups[#provisionWakeups], "faction_a",
+T.equal(ok, true, "player deposit")
+T.equal(reason, "deposited", "player deposit reason")
+T.equal(#playerContainer.values, 0, "player source removal")
+T.equal(storageA.inventory:getLogicalItemCount(), 1, "storage destination add")
+T.equal(storageB.inventory:getLogicalItemCount(), 0, "other faction unchanged")
+T.equal(provisionWakeups[#provisionWakeups], "faction_a",
     "storage deposit immediately wakes provision scheduler")
-equal(#activity(storageA), 1, "successful deposit journal entry")
-equal(activity(storageA)[1][Journal.FIELD.OPERATION],
+T.equal(#activity(storageA), 1, "successful deposit journal entry")
+T.equal(activity(storageA)[1][Journal.FIELD.OPERATION],
     Journal.OPERATION.STORE, "deposit journal operation")
-equal(activity(storageA)[1][Journal.FIELD.ACTOR], "player_a",
+T.equal(activity(storageA)[1][Journal.FIELD.ACTOR], "player_a",
     "deposit journal actor")
 
 ok, reason = Service.RequestPlayerDeposit(playerA, {
     requestId = "deposit:1",
     itemIDs = { tostring(playerItem:getID()) },
 })
-equal(ok, false, "duplicate request rejected")
-equal(reason, "duplicate_request", "duplicate request reason")
-equal(#activity(storageA), 1,
+T.equal(ok, false, "duplicate request rejected")
+T.equal(reason, "duplicate_request", "duplicate request reason")
+T.equal(#activity(storageA), 1,
     "rejected transaction entered activity journal")
 
 local foreignItem = item("Base.Hammer", 1)
@@ -262,9 +252,9 @@ ok, reason = Service.RequestPlayerDeposit(playerA, {
     storageId = storageB.id,
     itemIDs = { tostring(foreignItem:getID()) },
 })
-equal(ok, false, "foreign storage rejected")
-equal(reason, "storage_not_owned", "foreign storage reason")
-equal(#playerContainer.values, 1, "foreign rejection preserved source")
+T.equal(ok, false, "foreign storage rejected")
+T.equal(reason, "storage_not_owned", "foreign storage reason")
+T.equal(#playerContainer.values, 1, "foreign rejection preserved source")
 
 storageA.inventory:clear()
 local heavy = item("Base.HeavyTest", 201)
@@ -273,41 +263,41 @@ ok, reason = Service.RequestPlayerDeposit(playerA, {
     requestId = "deposit:heavy",
     itemIDs = { tostring(heavy:getID()) },
 })
-equal(ok, false, "capacity rejection")
-equal(reason, "storage_full", "capacity rejection reason")
-equal(#playerContainer.values, 2, "capacity rollback preserved source")
-equal(storageA.inventory:getLogicalItemCount(), 0, "capacity rollback preserved destination")
+T.equal(ok, false, "capacity rejection")
+T.equal(reason, "storage_full", "capacity rejection reason")
+T.equal(#playerContainer.values, 2, "capacity rollback preserved source")
+T.equal(storageA.inventory:getLogicalItemCount(), 0, "capacity rollback preserved destination")
 
 local nails = item("Base.Nails", 0.01)
-truthy(Inventory.deposit(storageA.inventory, nails, 100), "nails batch deposit")
-equal(storageA.inventory:getLogicalItemCount(), 100, "nails logical quantity")
-equal(storageA.inventory:getRecordCount(), 1, "nails batched record")
+T.truthy(Inventory.deposit(storageA.inventory, nails, 100), "nails batch deposit")
+T.equal(storageA.inventory:getLogicalItemCount(), 100, "nails logical quantity")
+T.equal(storageA.inventory:getRecordCount(), 1, "nails batched record")
 local beforeWeight = storageA.inventory:getWeight()
 local beforeRecords = storageA.inventory:getRecordCount()
 ok = Service.DebugUpgrade(playerA, { storageId = storageA.id })
-equal(ok, true, "debug tier upgrade")
-equal(storageA.tier, 2, "upgraded tier")
-equal(storageA.inventory.maxWeight, 250, "upgraded capacity")
-equal(storageA.inventory:getWeight(), beforeWeight, "upgrade retained contents")
-equal(storageA.inventory:getRecordCount(), beforeRecords, "upgrade retained records")
+T.equal(ok, true, "debug tier upgrade")
+T.equal(storageA.tier, 2, "upgraded tier")
+T.equal(storageA.inventory.maxWeight, 250, "upgraded capacity")
+T.equal(storageA.inventory:getWeight(), beforeWeight, "upgrade retained contents")
+T.equal(storageA.inventory:getRecordCount(), beforeRecords, "upgrade retained records")
 
 Repository.MarkDirty()
-truthy(Repository.Save(), "storage save")
+T.truthy(Repository.Save(), "storage save")
 Repository.ByID = {}
 Repository.PrimaryByFaction = {}
 Repository.Loaded = false
-truthy(Repository.Load(), "storage load")
+T.truthy(Repository.Load(), "storage load")
 local loaded = Repository.Get(storageA.id)
-truthy(loaded, "storage persisted")
-equal(loaded.tier, 2, "persisted tier")
-equal(loaded.inventory:getLogicalItemCount(), 100, "persisted contents")
-equal(loaded.inventory.maxWeight, 250, "capacity rederived from tier")
-equal(#activity(loaded), 1, "activity journal persisted")
+T.truthy(loaded, "storage persisted")
+T.equal(loaded.tier, 2, "persisted tier")
+T.equal(loaded.inventory:getLogicalItemCount(), 100, "persisted contents")
+T.equal(loaded.inventory.maxWeight, 250, "capacity rederived from tier")
+T.equal(#activity(loaded), 1, "activity journal persisted")
 
 local snapshot = Service.BuildSnapshot(playerA)
-equal(snapshot.logicalItemCount, 100, "snapshot logical quantity")
-equal(#snapshot.rows, 1, "snapshot batched row")
-equal(snapshot.rows[1].quantity, 100, "snapshot row quantity")
+T.equal(snapshot.logicalItemCount, 100, "snapshot logical quantity")
+T.equal(#snapshot.rows, 1, "snapshot batched row")
+T.equal(snapshot.rows[1].quantity, 100, "snapshot row quantity")
 
 InventoryItemFactory = {
     CreateItem = function(fullType)
@@ -321,16 +311,16 @@ ok, reason = Service.RequestPlayerWithdrawal(playerA, {
     playerContainer = "root",
     records = {{ recordIndex = 1, quantity = 5 }},
 })
-equal(ok, true, "player withdrawal: " .. tostring(reason))
-equal(reason, "withdrawn", "player withdrawal reason")
-equal(loaded.inventory:getLogicalItemCount(), 95,
+T.equal(ok, true, "player withdrawal: " .. tostring(reason))
+T.equal(reason, "withdrawn", "player withdrawal reason")
+T.equal(loaded.inventory:getLogicalItemCount(), 95,
     "withdrawal removes storage quantity once")
-equal(#playerContainer.values, 7,
+T.equal(#playerContainer.values, 7,
     "withdrawal materializes items in player inventory")
-equal(#activity(loaded), 2, "withdrawal journal entry")
-equal(activity(loaded)[2][Journal.FIELD.OPERATION],
+T.equal(#activity(loaded), 2, "withdrawal journal entry")
+T.equal(activity(loaded)[2][Journal.FIELD.OPERATION],
     Journal.OPERATION.TAKE, "withdrawal journal operation")
-equal(activity(loaded)[2][Journal.FIELD.QUANTITY], 5,
+T.equal(activity(loaded)[2][Journal.FIELD.QUANTITY], 5,
     "withdrawal journal quantity")
 
 ok, reason = Service.RequestPlayerWithdrawal(playerA, {
@@ -339,8 +329,8 @@ ok, reason = Service.RequestPlayerWithdrawal(playerA, {
     inventoryRevision = loaded.inventory.revision - 1,
     records = {{ recordIndex = 1, quantity = 1 }},
 })
-equal(ok, false, "stale withdrawal rejected")
-equal(reason, "revision_conflict", "stale withdrawal reason")
+T.equal(ok, false, "stale withdrawal rejected")
+T.equal(reason, "revision_conflict", "stale withdrawal reason")
 
 local failingContainer = container({})
 failingContainer.AddItem = function() return nil end
@@ -362,10 +352,10 @@ ok, reason = Service.RequestPlayerWithdrawal(failingPlayer, {
     records = {{ recordIndex = 1, quantity = 2 }},
 })
 InventoryItemFactory.CreateItem = workingFactory
-equal(ok, false, "failed player destination rejects withdrawal")
-equal(loaded.inventory:getLogicalItemCount(), beforeRollback,
+T.equal(ok, false, "failed player destination rejects withdrawal")
+T.equal(loaded.inventory:getLogicalItemCount(), beforeRollback,
     "failed withdrawal restores storage")
-equal(next(loaded.inventory.reservations), nil,
+T.equal(next(loaded.inventory.reservations), nil,
     "failed withdrawal releases reservations")
 
 PNC.Equipment.CreateItem = function(fullType)
@@ -377,12 +367,12 @@ ok, reason = Service.DebugAction(playerA, {
     fullType = "Base.Nails",
     quantity = 5,
 })
-equal(ok, true, "debug add test item")
-equal(loaded.inventory:count("Base.Nails"), 100,
+T.equal(ok, true, "debug add test item")
+T.equal(loaded.inventory:count("Base.Nails"), 100,
     "debug add item did not reach storage")
 
 for index = 1, 12 do
-    truthy(Service.RecordActivity(loaded, {
+    T.truthy(Service.RecordActivity(loaded, {
         operation = "STORE",
         actor = "worker_" .. tostring(index),
         fullType = "Base.Nails",
@@ -390,28 +380,28 @@ for index = 1, 12 do
         reason = index == 12 and "fishing" or nil,
     }), "public journal API")
 end
-equal(#activity(loaded), 10, "journal hard cap")
-equal(activity(loaded)[1][Journal.FIELD.ACTOR], "worker_3",
+T.equal(#activity(loaded), 10, "journal hard cap")
+T.equal(activity(loaded)[1][Journal.FIELD.ACTOR], "worker_3",
     "journal discarded oldest entry")
-equal(activity(loaded)[10][Journal.FIELD.REASON], "fishing",
+T.equal(activity(loaded)[10][Journal.FIELD.REASON], "fishing",
     "optional extensible reason token")
 local serialized = Repository.SerializeStorage(loaded)
-equal(serialized.activityJournal[1], Journal.VERSION,
+T.equal(serialized.activityJournal[1], Journal.VERSION,
     "journal serialization version")
-equal(#serialized.activityJournal[2].entries, 10,
+T.equal(#serialized.activityJournal[2].entries, 10,
     "serialized journal hard cap")
-equal(#serialized.activityJournal[2].entries[1], 6,
+T.equal(#serialized.activityJournal[2].entries[1], 6,
     "compact semantic journal entry")
 local legacyID = "legacy_storage"
-truthy(Journal.Deserialize({ 1, {{
+T.truthy(Journal.Deserialize({ 1, {{
     Journal.OPERATION.STORE, 123, "legacy_actor",
     serialized.activityJournal[2].entries[1][4], 2, "scavenging",
 }} }, legacyID), "legacy journal migration")
-equal(Journal.Snapshot(legacyID)[1][Journal.FIELD.ACTOR], "legacy_actor",
+T.equal(Journal.Snapshot(legacyID)[1][Journal.FIELD.ACTOR], "legacy_actor",
     "legacy journal actor retained")
 snapshot = Service.BuildSnapshot(playerA)
-equal(#snapshot.activity, 10, "snapshot activity cap")
-equal(snapshot.access.writable, true, "snapshot exposes writable base access")
+T.equal(#snapshot.activity, 10, "snapshot activity cap")
+T.equal(snapshot.access.writable, true, "snapshot exposes writable base access")
 getText = function(key) return key end
 getItemNameFromFullType = function(fullType)
     return fullType == "Base.Nails" and "Nails" or fullType
@@ -419,11 +409,11 @@ end
 local ActivityPresentation = require
     "PNC/UI/Communities/PNC_ColonyStorageActivityPresentation"
 local activityRows = ActivityPresentation.Rows(snapshot.activity)
-equal(#activityRows, 10, "activity presentation row count")
-truthy(string.find(activityRows[1].message,
+T.equal(#activityRows, 10, "activity presentation row count")
+T.truthy(string.find(activityRows[1].message,
     "worker_12 stored 12 x Nails", 1, true),
     "structured activity translated at render time")
-truthy(string.find(activityRows[1].message, "(fishing)", 1, true),
+T.truthy(string.find(activityRows[1].message, "(fishing)", 1, true),
     "activity reason presentation")
 
 PNC.Inventory.EnsureRecordInventory = function(record)
@@ -487,19 +477,19 @@ local courierOK, courierReason = Service.RequestNPCCourierDeposit(playerA, {
     requestId = "courier:1", npcId = courierNPC.id,
     storageId = loaded.id,
 })
-equal(courierOK, true, "courier job accepted away from home")
-equal(courierReason, "courier_returning_home", "courier return status")
-equal(courierNPC.runtime.storageCourier.state, "RETURNING_HOME",
+T.equal(courierOK, true, "courier job accepted away from home")
+T.equal(courierReason, "courier_returning_home", "courier return status")
+T.equal(courierNPC.runtime.storageCourier.state, "RETURNING_HOME",
     "courier exposes in-progress state")
 courierAtHome = true
 local completed, completionReason = Service.CompleteNPCCourier(courierNPC)
-equal(completed, true, "courier deposits after reaching home")
-equal(completionReason, "deposited", "courier completion reason")
-equal(courierNPC.runtime.storageCourier.state, "COMPLETED",
+T.equal(completed, true, "courier deposits after reaching home")
+T.equal(completionReason, "deposited", "courier completion reason")
+T.equal(courierNPC.runtime.storageCourier.state, "COMPLETED",
     "courier exposes completion state")
-equal(courierNPC.inventory.items.cargo, nil,
+T.equal(courierNPC.inventory.items.cargo, nil,
     "courier removes deposited compact cargo")
-truthy(courierNPC.inventory.items.favorite,
+T.truthy(courierNPC.inventory.items.favorite,
     "courier preserves favorite items")
 
 ok, reason = Service.DebugAction(playerA, {
@@ -508,7 +498,7 @@ ok, reason = Service.DebugAction(playerA, {
     fullType = "Base.Money",
     quantity = 2,
 })
-equal(ok, true, "production activity test money")
+T.equal(ok, true, "production activity test money")
 PNC.SupplyInventory = { Commands = {
     AddCoreRecords = function(_, records)
         local ids = {}
@@ -516,23 +506,24 @@ PNC.SupplyInventory = { Commands = {
         return true, nil, { itemIDs = ids }
     end,
 } }
-local productionReservation = assert(Service.ReserveProductionMaterials(
+local productionReservation = T.truthy(Service.ReserveProductionMaterials(
     loaded.id, {{ itemTypes = { "Base.Money" }, amount = 2 }},
     "construction:test"))
 local collected, collection = Service.CollectProductionReservation(
     productionReservation.id, "work:test", "construction_materials",
     loaded.id, { id = "npc:builder", name = "Ahmad Stahl" })
-equal(collected, true, "NPC collected construction money")
-equal(#collection.itemIds, 1, "collected stack projected to NPC inventory")
+T.equal(collected, true, "NPC collected construction money")
+T.equal(#collection.itemIds, 1, "collected stack projected to NPC inventory")
 local productionActivity = activity(loaded)
 local latestProductionActivity = productionActivity[#productionActivity]
-equal(latestProductionActivity[Journal.FIELD.OPERATION],
+T.equal(latestProductionActivity[Journal.FIELD.OPERATION],
     Journal.OPERATION.TAKE, "production collection journal operation")
-equal(latestProductionActivity[Journal.FIELD.ACTOR], "Ahmad Stahl",
+T.equal(latestProductionActivity[Journal.FIELD.ACTOR], "Ahmad Stahl",
     "production collection journal actor")
-equal(latestProductionActivity[Journal.FIELD.QUANTITY], 2,
+T.equal(latestProductionActivity[Journal.FIELD.QUANTITY], 2,
     "production collection journal quantity")
-equal(latestProductionActivity[Journal.FIELD.REASON], "construction",
+T.equal(latestProductionActivity[Journal.FIELD.REASON], "construction",
     "production collection journal reason")
+T.finish("pnc_colony_storage_smoke")
 
-print("pnc_colony_storage_smoke: ok")
+T.finish("pnc_colony_storage_smoke")

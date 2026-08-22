@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/PNC_FactionBehavior.lua"
+    T.path("ProjectHoomans", "server", "PNC/PNC_FactionBehavior.lua")
 
 local function copy(value)
     if type(value) ~= "table" then return value end
@@ -100,7 +102,7 @@ PNC = {
     } },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local waiting = {
     id = "waiting",
@@ -120,9 +122,9 @@ local waiting = {
 records.waiting = waiting
 
 PNC.FactionBehavior.ApplyNPC(waiting, "periodic_reconciliation")
-assert(waiting.orderSpec.kind == "guard",
+T.truthy(waiting.orderSpec.kind == "guard",
     "faction reconciliation overwrote Stay with Follow")
-assert(waiting.orderSpec.x == 12 and waiting.orderSpec.y == 8,
+T.truthy(waiting.orderSpec.x == 12 and waiting.orderSpec.y == 8,
     "faction reconciliation changed the Stay anchor")
 
 local onlineOwned = copy(waiting)
@@ -134,9 +136,9 @@ onlineOwned.runtime = {}
 records.online_owned = onlineOwned
 
 PNC.FactionBehavior.ApplyNPC(onlineOwned, "periodic_reconciliation")
-assert(onlineOwned.orderSpec.kind == "guard",
+T.truthy(onlineOwned.orderSpec.kind == "guard",
     "online-ID ownership reconciliation overwrote Stay with Follow")
-assert(onlineOwned.orderSpec.x == 14 and onlineOwned.orderSpec.y == 9,
+T.truthy(onlineOwned.orderSpec.x == 14 and onlineOwned.orderSpec.y == 9,
     "online-ID ownership reconciliation changed the Stay anchor")
 
 local working = copy(waiting)
@@ -146,7 +148,7 @@ working.orderSpec = { kind = "production_work",
 working.runtime = { workOrderId = "work:42" }
 records.working = working
 PNC.FactionBehavior.ApplyNPC(working, "periodic_reconciliation")
-assert(working.orderSpec.kind == "production_work"
+T.truthy(working.orderSpec.kind == "production_work"
         and working.orderSpec.workOrderId == "work:42",
     "faction reconciliation interrupted a registered job order")
 
@@ -168,11 +170,11 @@ records.at_home_after_restart = atHomeAfterRestart
 -- The durable owner key must still protect the persisted At Home order.
 PNC.PlayerCharacters.RuntimeByUUID.character_alice = nil
 PNC.FactionBehavior.ApplyNPC(atHomeAfterRestart, "registry_load")
-assert(atHomeAfterRestart.orderSpec.kind == "colony_home",
+T.truthy(atHomeAfterRestart.orderSpec.kind == "colony_home",
     "offline startup reconciliation replaced At Home with Follow")
-assert(atHomeAfterRestart.orderSpec.baseId == "base-1",
+T.truthy(atHomeAfterRestart.orderSpec.baseId == "base-1",
     "offline startup reconciliation lost the remembered home base")
-assert(atHomeAfterRestart.ownerUsername == "alice",
+T.truthy(atHomeAfterRestart.ownerUsername == "alice",
     "offline startup reconciliation lost the durable owner identity")
 PNC.PlayerCharacters.RuntimeByUUID.character_alice = player
 
@@ -187,9 +189,10 @@ joining.runtime = {}
 records.joining = joining
 
 PNC.FactionBehavior.ApplyNPC(joining, "faction_joined")
-assert(joining.orderSpec.kind == "follow",
+T.truthy(joining.orderSpec.kind == "follow",
     "new player-faction member did not receive its initial Follow order")
-assert(joining.orderSpec.ownerUsername == "alice",
+T.truthy(joining.orderSpec.ownerUsername == "alice",
     "initial Follow order did not bind the faction owner")
+T.finish("pnc_faction_companion_order_smoke")
 
-print("pnc_faction_companion_order_smoke: ok")
+T.finish("pnc_faction_companion_order_smoke")

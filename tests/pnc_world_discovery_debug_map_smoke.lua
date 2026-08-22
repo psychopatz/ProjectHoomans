@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "root", "")
 
 ISPanel = {}
 function ISPanel:derive()
@@ -81,35 +76,36 @@ getCore = function()
         getScreenHeight = function() return 720 end }
 end
 
-dofile(ROOT .. "client/PNC/UI/Map/PNC_WorldDiscoveryDebugMap.lua")
+T.load(ROOT .. "client/PNC/UI/Map/PNC_WorldDiscoveryDebugMap.lua")
 local map = { children = {}, addChild = ISPanel.addChild }
 setmetatable(map, { __index = ISWorldMap })
 map:createChildren()
 
-equal(map:onRightMouseUp(10, 20), "vanilla",
+T.equal(map:onRightMouseUp(10, 20), "vanilla",
     "PNC discovery debug leaves the vanilla teleport menu untouched")
-equal(originalCalls, 1, "vanilla right-click handler runs exactly once")
-assert(map.pncDebugButton, "authorized map did not receive a debug button")
-equal(map.pncDebugButton.x, -44,
+T.equal(originalCalls, 1, "vanilla right-click handler runs exactly once")
+T.truthy(map.pncDebugButton, "authorized map did not receive a debug button")
+T.equal(map.pncDebugButton.x, -44,
     "debug button is laid out beside the NPC world controls")
 
 map.pncDebugButton.onclick()
 local modal = PNC.WorldDiscoveryDebugMap.instance
-assert(modal and modal.allButton and modal.resetButton,
+T.truthy(modal and modal.allButton and modal.resetButton,
     "debug button did not open the scalable settings modal")
 modal:onButton(modal.allButton)
-equal(requests[#requests].action, "debug_discover_all",
+T.equal(requests[#requests].action, "debug_discover_all",
     "modal discover-all uses the authoritative action")
-equal(requests[#requests].args.scope, "all",
+T.equal(requests[#requests].args.scope, "all",
     "modal discover-all sends an explicit scope")
 modal:onButton(modal.resetButton)
-equal(requests[#requests].action, "debug_reset",
+T.equal(requests[#requests].action, "debug_reset",
     "modal exposes recovery from an accidental discover-all")
 
-equal(PNC.WorldDiscoveryDebugMap.ShowRawEntities, false,
+T.equal(PNC.WorldDiscoveryDebugMap.ShowRawEntities, false,
     "undiscovered debug overlays start hidden")
 modal:onButton(modal.rawButton)
-equal(PNC.WorldDiscoveryDebugMap.ShowRawEntities, true,
+T.equal(PNC.WorldDiscoveryDebugMap.ShowRawEntities, true,
     "raw overlays require an explicit modal toggle")
+T.finish("pnc_world_discovery_debug_map_smoke")
 
-print("pnc_world_discovery_debug_map_smoke: ok")
+T.finish("pnc_world_discovery_debug_map_smoke")

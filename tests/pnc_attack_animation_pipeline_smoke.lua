@@ -1,96 +1,85 @@
+local T = require "tests/support/test"
+
 local ANIMATION =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Visuals/PNC_Animation.lua"
+    T.path("ProjectHoomans", "shared", "PNC/Core/Visuals/PNC_Animation.lua")
 local CLIENT_ATTACK =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/"
+    T.path("ProjectHoomans", "client", "PNC/PresenceSync/")
     .. "PresenceVisuals/PNC_ClientPresenceVisuals_Attack.lua"
 local CLIENT_MOTION =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PresenceSync/"
+    T.path("ProjectHoomans", "client", "PNC/PresenceSync/")
     .. "PresenceVisuals/PNC_ClientPresenceVisuals_ActionMotion.lua"
 local PATH_MOTION =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/Pathing/")
     .. "PNC_PathService/PNC_PathService_Motion.lua"
 local ATTACK_XML =
-    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Attack1H1.xml"
+    T.path("ProjectHoomans", "common", "AnimSets/zombie/bumped/PNC_Attack1H1.xml")
 local ATTACK_VARIANT_XML =
-    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_Attack1H2.xml"
+    T.path("ProjectHoomans", "common", "AnimSets/zombie/bumped/PNC_Attack1H2.xml")
 local SHOVE_VARIANT_XML =
-    "Contents/mods/ProjectHoomans/common/media/AnimSets/zombie/bumped/PNC_ShoveBat.xml"
+    T.path("ProjectHoomans", "common", "AnimSets/zombie/bumped/PNC_ShoveBat.xml")
 
-local function readAll(path)
-    local file = assert(io.open(path, "rb"))
-    local value = file:read("*a")
-    file:close()
-    return value
-end
-
-local function assertContains(value, needle, label)
-    if not string.find(value, needle, 1, true) then
-        error((label or "assertContains") .. ": missing " .. needle)
-    end
-end
-
-local animation = readAll(ANIMATION)
-local clientSync = readAll(CLIENT_ATTACK) .. readAll(CLIENT_MOTION)
-local pathMotion = readAll(PATH_MOTION)
-local attackXML = readAll(ATTACK_XML)
-local attackVariantXML = readAll(ATTACK_VARIANT_XML)
-local shoveVariantXML = readAll(SHOVE_VARIANT_XML)
-local combat = readAll(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
+local animation = T.read(ANIMATION)
+local clientSync = T.read(CLIENT_ATTACK) .. T.read(CLIENT_MOTION)
+local pathMotion = T.read(PATH_MOTION)
+local attackXML = T.read(ATTACK_XML)
+local attackVariantXML = T.read(ATTACK_VARIANT_XML)
+local shoveVariantXML = T.read(SHOVE_VARIANT_XML)
+local combat = T.read(
+    T.path("ProjectHoomans", "shared", "PNC/Core/Combat/")
         .. "PNC_Combat.lua"
 )
-local melee = readAll(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
+local melee = T.read(
+    T.path("ProjectHoomans", "shared", "PNC/Core/Combat/")
         .. "PNC_Combat_Melee.lua"
 )
-local attackActions = readAll(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/AttackExecution/"
+local attackActions = T.read(
+    T.path("ProjectHoomans", "shared", "PNC/Core/Combat/AttackExecution/")
         .. "PNC_AttackExecution_Pump.lua"
 )
-local unarmed = readAll(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
+local unarmed = T.read(
+    T.path("ProjectHoomans", "shared", "PNC/Core/Combat/")
         .. "PNC_Combat_Unarmed.lua"
 )
-local firearms = readAll(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/"
+local firearms = T.read(
+    T.path("ProjectHoomans", "shared", "PNC/Core/Combat/")
         .. "PNC_Combat_Firearms.lua"
 )
-local playBump = assert(string.match(
+local playBump = T.truthy(string.match(
     animation,
     "function Animation%.PlayBump.-\nend\n\nfunction Animation%.FinishBump"
 ))
 
-assertContains(
+T.contains(
     playBump,
     'zombie:setVariable("BumpDone", false)',
     "known-good bump completion mirror"
 )
-assertContains(
+T.contains(
     playBump,
     'zombie:setVariable("BumpFall", false)',
     "known-good bump fall mirror"
 )
-assertContains(
+T.contains(
     playBump,
     'zombie:setVariable("BumpFallType", "")',
     "known-good bump fall type"
 )
-assertContains(
+T.contains(
     playBump,
     'zombie:setVariable("PNCAttackVariationX", "1.0")',
     "private melee X blend scalar"
 )
-assertContains(
+T.contains(
     playBump,
     'zombie:setVariable("PNCAttackVariationY", "0.0")',
     "private melee Y blend scalar"
 )
-assertContains(
+T.contains(
     playBump,
     'zombie:setVariable("BumpAnimFinished", false)',
     "stale bump completion latch reset"
 )
-assert(
+T.truthy(
     not string.find(
         playBump,
         'zombie.reportEvent',
@@ -99,7 +88,7 @@ assert(
     ),
     "manual reportEvent must not replace the setter-driven transition"
 )
-assert(
+T.truthy(
     not string.find(
         playBump,
         'zombie.changeState',
@@ -108,22 +97,22 @@ assert(
     ),
     "PlayBump must not force the legacy state machine"
 )
-assertContains(
+T.contains(
     playBump,
     "zombie:setBumpType(resolvedBumpType)",
     "setter-driven action-group handoff"
 )
-assertContains(
+T.contains(
     playBump,
     "applyBumpLeaseBodyMode(zombie)",
     "bumped action-context lease"
 )
-assertContains(
+T.contains(
     clientSync,
     "Animation.PlayBump(zombie, recordView, anim)",
     "client attack presentation uses shared trigger"
 )
-assert(
+T.truthy(
     not string.find(
         clientSync,
         "attack_anim_retry",
@@ -132,103 +121,104 @@ assert(
     ),
     "client attack presentation must not restart Bandits-style bumps"
 )
-assertContains(
+T.contains(
     clientSync,
     "observeClientAttackBump(zombie, modData)",
     "client records the live action graph without replaying it"
 )
-assertContains(
+T.contains(
     attackXML,
     "<m_StringValue>PNC_Attack1H1</m_StringValue>",
     "PNC-namespaced Bandits attack node bump type"
 )
-assertContains(
+T.contains(
     attackXML,
     "<m_Scalar>PNCAttackVariationX</m_Scalar>",
     "PNC-private attack blend scalar"
 )
-assertContains(
+T.contains(
     attackXML,
     "<m_Scalar2>PNCAttackVariationY</m_Scalar2>",
     "PNC-private secondary attack blend scalar"
 )
-assert(
+T.truthy(
     not string.find(attackXML, "Bandit", 1, true),
     "Bandits identifier leaked into canonical PNC combat XML"
 )
-assertContains(
+T.contains(
     attackXML,
     "<m_ParameterValue>BumpAnimFinished=true</m_ParameterValue>",
     "attack node completion"
 )
-assertContains(
+T.contains(
     attackVariantXML,
     "<m_AnimName>Bob_Attack1Hand01_HitB</m_AnimName>",
     "Bandits-compatible second one-handed melee animation"
 )
-assertContains(
+T.contains(
     shoveVariantXML,
     "<m_Name>PNCPrimaryType</m_Name>",
     "Bandits shove weapon selector renamed for PNC"
 )
-assert(
+T.truthy(
     not string.find(shoveVariantXML, "BanditPrimaryType", 1, true),
     "Bandits-only shove selector leaked into PNC XML"
 )
-assertContains(
+T.contains(
     combat,
     'onehanded = { "PNC_Attack1H1", "PNC_Attack1H2" }',
     "namespaced network melee vocabulary"
 )
-assertContains(
+T.contains(
     animation,
     "PNC_Attack1H1 = true",
     "namespaced combat bump ownership"
 )
-assert(
+T.truthy(
     not string.find(combat, "Animation.PlayBump", 1, true),
     "server animation selector still renders attack bumps"
 )
-assert(
+T.truthy(
     not string.find(melee, "Animation.PlayBump", 1, true),
     "server melee commit still renders attack bumps"
 )
-assert(
+T.truthy(
     not string.find(attackActions, "Animation.FinishBump", 1, true),
     "server attack completion still owns the client bump"
 )
-assert(
+T.truthy(
     not string.find(unarmed, "Animation.PlayBump", 1, true),
     "server unarmed combat still renders attack bumps"
 )
-assert(
+T.truthy(
     not string.find(firearms, "Animation.PlayBump", 1, true),
     "server reload action still renders attack bumps"
 )
-assertContains(
+T.contains(
     pathMotion,
     "if Internal.hasActiveAttack(record, now, zombie) then",
     "path service attack animation lease"
 )
-local pathPump = assert(string.match(
+local pathPump = T.truthy(string.match(
     pathMotion,
     "function PathService%.Pump.-\nend\n\nfunction PathService%.AdvanceAbstract"
 ))
-local actionLockAt = assert(string.find(
+local actionLockAt = T.truthy(string.find(
     pathPump,
     "Internal.hasActiveAttack(record, now, zombie)",
     1,
     true
 ))
-local consumeIntentAt = assert(string.find(
+local consumeIntentAt = T.truthy(string.find(
     pathPump,
     "Internal.consumeMoveIntent(record, lane, zombie)",
     1,
     true
 ))
-assert(
+T.truthy(
     actionLockAt < consumeIntentAt,
     "movement intent mutates locomotion before the body action lease"
 )
+T.finish("pnc_attack_animation_pipeline_smoke")
 
-print("pnc_attack_animation_pipeline_smoke: ok")
+T.finish("pnc_attack_animation_pipeline_smoke")

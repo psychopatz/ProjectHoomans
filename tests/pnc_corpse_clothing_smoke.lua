@@ -1,18 +1,13 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
+local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
 local CORE_SHARED_ROOT =
-    "../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/"
+    T.path("PsychopatzCore", "shared", "")
 local CORE_COMMON_ROOT =
-    "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
+    T.path("PsychopatzCore", "common", "")
 
-package.path = CORE_COMMON_ROOT .. "?.lua;" .. CORE_SHARED_ROOT .. "?.lua;"
-    .. SHARED_ROOT .. "?.lua;" .. package.path
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+T.addPackagePaths()
 
 local function makeList(values)
     return {
@@ -47,8 +42,8 @@ local function makeWornItems()
     function worn:clear() entries = {} end
     function worn:setItem(location, item)
         local i
-        assert(type(location) ~= "string", "Build 42 requires typed ItemBodyLocation")
-        assertEqual(item:getContainer(), container, "worn item container ordering")
+        T.truthy(type(location) ~= "string", "Build 42 requires typed ItemBodyLocation")
+        T.equal(item:getContainer(), container, "worn item container ordering")
         for i = #entries, 1, -1 do
             if entries[i]:getLocation() == location then
                 table.remove(entries, i)
@@ -80,7 +75,7 @@ local shirtBodyLocation = setmetatable({}, {
 })
 local itemVisual = {
     copyFrom = function(_, source)
-        assert(source, "missing source clothing visual")
+        T.truthy(source, "missing source clothing visual")
         visualCopies = visualCopies + 1
     end,
 }
@@ -117,8 +112,8 @@ local corpse = {
     setFakeDead = function() end,
     setReanimateTime = function() end,
     transmitCompleteItemToClients = function()
-        assertEqual(corpseWorn:getItem(shirtBodyLocation), shirt, "transmitted corpse worn shirt")
-        assertEqual(corpseModData.PNC_DeathMarkerID, "npc_corpse_clothes",
+        T.equal(corpseWorn:getItem(shirtBodyLocation), shirt, "transmitted corpse worn shirt")
+        T.equal(corpseModData.PNC_DeathMarkerID, "npc_corpse_clothes",
             "transmitted death marker identity")
         transmitCount = transmitCount + 1
     end,
@@ -226,26 +221,26 @@ getGameTime = function()
     return { getWorldAgeHours = function() return 5 end }
 end
 
-dofile(ROOT .. "Presence/PNC_BodyLifecycle.lua")
+T.load(ROOT .. "Presence/PNC_BodyLifecycle.lua")
 
 local created, result = PNC.BodyLifecycle.CreateInertCorpse(record, zombie, "test_death")
-assertEqual(created, true, "corpse creation")
-assertEqual(result, corpse, "created corpse instance")
-assertEqual(engineDeathCount, 1, "engine-networked death conversion count")
-assertEqual(directCorpseCount, 0, "direct corpse fallback bypassed engine death")
-assertEqual(#inventoryValues, 2, "corpse inventory count")
-assertEqual(identityCard.customName, "ID Card: Corpse Clothes", "physical ID card name")
-assertEqual(cardModData.PNC_IDCard, true, "physical ID card marker")
-assertEqual(cardModData.PNC_IDCardNPCId, record.id, "physical ID card NPC UUID")
-assertEqual(identityCardCreateCount, 2, "lost ID card recreated after corpse conversion")
-assertEqual(sourceWorn:getItem(shirtBodyLocation), shirt, "source worn shirt")
-assertEqual(corpseWorn:getItem(shirtBodyLocation), shirt, "corpse worn shirt")
-assertEqual(visualCopies, 1, "live clothing visual copy count")
-assertEqual(transmitCount, 1, "multiplayer corpse transmission count")
-assertEqual(corpseModData.PNC_NPC, nil, "corpse released from NPC ownership")
-assertEqual(corpseModData.PNC_UUID, nil, "corpse released from NPC UUID")
-assertEqual(corpseModData.PNC_DeathMarkerID, record.id, "corpse death marker id")
-assertEqual(record.runtime.lifecycle.corpseState, "inert_loaded", "corpse lifecycle state")
+T.equal(created, true, "corpse creation")
+T.equal(result, corpse, "created corpse instance")
+T.equal(engineDeathCount, 1, "engine-networked death conversion count")
+T.equal(directCorpseCount, 0, "direct corpse fallback bypassed engine death")
+T.equal(#inventoryValues, 2, "corpse inventory count")
+T.equal(identityCard.customName, "ID Card: Corpse Clothes", "physical ID card name")
+T.equal(cardModData.PNC_IDCard, true, "physical ID card marker")
+T.equal(cardModData.PNC_IDCardNPCId, record.id, "physical ID card NPC UUID")
+T.equal(identityCardCreateCount, 2, "lost ID card recreated after corpse conversion")
+T.equal(sourceWorn:getItem(shirtBodyLocation), shirt, "source worn shirt")
+T.equal(corpseWorn:getItem(shirtBodyLocation), shirt, "corpse worn shirt")
+T.equal(visualCopies, 1, "live clothing visual copy count")
+T.equal(transmitCount, 1, "multiplayer corpse transmission count")
+T.equal(corpseModData.PNC_NPC, nil, "corpse released from NPC ownership")
+T.equal(corpseModData.PNC_UUID, nil, "corpse released from NPC UUID")
+T.equal(corpseModData.PNC_DeathMarkerID, record.id, "corpse death marker id")
+T.equal(record.runtime.lifecycle.corpseState, "inert_loaded", "corpse lifecycle state")
 
 -- Delayed becomeCorpseSilently finalization must apply the same guarantee using
 -- only the compact death marker after the full live record is retired.
@@ -276,9 +271,10 @@ PNC.BodyLifecycle.PendingCorpses = {
     },
 }
 PNC.BodyLifecycle.Internal.pumpPendingCorpses()
-assertEqual(#PNC.BodyLifecycle.PendingCorpses, 0, "delayed corpse finalized")
-assertEqual(#inventoryValues, 2, "delayed corpse restored identity card")
-assertEqual(identityCardCreateCount, 3, "delayed corpse recreated identity card")
-assertEqual(transmitCount, 2, "delayed corpse single completed-state transmission")
+T.equal(#PNC.BodyLifecycle.PendingCorpses, 0, "delayed corpse finalized")
+T.equal(#inventoryValues, 2, "delayed corpse restored identity card")
+T.equal(identityCardCreateCount, 3, "delayed corpse recreated identity card")
+T.equal(transmitCount, 2, "delayed corpse single completed-state transmission")
+T.finish("pnc_corpse_clothing_smoke")
 
-print("pnc_corpse_clothing_smoke: ok")
+T.finish("pnc_corpse_clothing_smoke")

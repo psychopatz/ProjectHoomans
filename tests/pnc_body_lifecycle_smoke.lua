@@ -1,18 +1,13 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
+local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
 local CORE_SHARED_ROOT =
-    "../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/"
+    T.path("PsychopatzCore", "shared", "")
 local CORE_COMMON_ROOT =
-    "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
+    T.path("PsychopatzCore", "common", "")
 
-package.path = CORE_COMMON_ROOT .. "?.lua;" .. CORE_SHARED_ROOT .. "?.lua;"
-    .. SHARED_ROOT .. "?.lua;" .. package.path
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+T.addPackagePaths()
 
 local function makeList(values)
     return {
@@ -93,12 +88,12 @@ getCell = function()
     }
 end
 
-dofile(ROOT .. "Presence/PNC_BodyLifecycle.lua")
+T.load(ROOT .. "Presence/PNC_BodyLifecycle.lua")
 
 local first = makeBody(101, 11)
-assertEqual(PNC.BodyLifecycle.StampLiveBody(record, first), "body_1", "generated body lease")
-assertEqual(first:getModData().PNC_UUID, record.id, "stamped NPC id")
-assertEqual(first:getModData().PNC_BodyKind, "live", "stamped body kind")
+T.equal(PNC.BodyLifecycle.StampLiveBody(record, first), "body_1", "generated body lease")
+T.equal(first:getModData().PNC_UUID, record.id, "stamped NPC id")
+T.equal(first:getModData().PNC_BodyKind, "live", "stamped body kind")
 PNC.Registry.LiveByID[record.id] = first
 
 local second = makeBody(202, 22)
@@ -110,27 +105,28 @@ second:getModData().PNC_BodyLease = "body_1"
 second:getModData().PNC_TagVersion = 1
 
 local audit = PNC.BodyLifecycle.AuditLoadedBodies(now, true)
-assertEqual(audit.scanned, 2, "audited body count")
-assertEqual(audit.duplicates, 1, "duplicate body count")
-assertEqual(audit.removed, 1, "removed duplicate count")
-assertEqual(audit.rebound, 1, "rebound body count")
-assertEqual(safetyRepairs, 2, "audit neutralizes bodies before lease decision")
-assertEqual(PNC.Registry.LiveByID[record.id], second, "accepted live body")
-assertEqual(first.removedFromWorld, true, "duplicate removed from world")
+T.equal(audit.scanned, 2, "audited body count")
+T.equal(audit.duplicates, 1, "duplicate body count")
+T.equal(audit.removed, 1, "removed duplicate count")
+T.equal(audit.rebound, 1, "rebound body count")
+T.equal(safetyRepairs, 2, "audit neutralizes bodies before lease decision")
+T.equal(PNC.Registry.LiveByID[record.id], second, "accepted live body")
+T.equal(first.removedFromWorld, true, "duplicate removed from world")
 
 local diagnostics = PNC.BodyLifecycle.BuildDiagnostics(record)
-assertEqual(diagnostics.bodyState, "bound", "diagnostic body state")
-assertEqual(diagnostics.liveBodyOnlineID, 22, "diagnostic online ID")
-assertEqual(diagnostics.bodyActionState, "idle", "diagnostic action state")
-assertEqual(diagnostics.debugRecording, false, "diagnostic recording defaults off")
+T.equal(diagnostics.bodyState, "bound", "diagnostic body state")
+T.equal(diagnostics.liveBodyOnlineID, 22, "diagnostic online ID")
+T.equal(diagnostics.bodyActionState, "idle", "diagnostic action state")
+T.equal(diagnostics.debugRecording, false, "diagnostic recording defaults off")
 record.runtime.debug = true
 diagnostics = PNC.BodyLifecycle.BuildDiagnostics(record)
-assertEqual(diagnostics.debugRecording, true, "diagnostic recording state")
+T.equal(diagnostics.debugRecording, true, "diagnostic recording state")
 
 PNC.BodyLifecycle.RemoveLiveBody(record, second, "test_abstract")
-assertEqual(record.presenceState, "abstract", "detached presence state")
-assertEqual(record.runtime.bodyLease, nil, "cleared body lease")
-assertEqual(PNC.Registry.LiveByID[record.id], nil, "cleared live registry")
-assertEqual(second.removedFromWorld, true, "live body removed from world")
+T.equal(record.presenceState, "abstract", "detached presence state")
+T.equal(record.runtime.bodyLease, nil, "cleared body lease")
+T.equal(PNC.Registry.LiveByID[record.id], nil, "cleared live registry")
+T.equal(second.removedFromWorld, true, "live body removed from world")
+T.finish("pnc_body_lifecycle_smoke")
 
-print("pnc_body_lifecycle_smoke: ok")
+T.finish("pnc_body_lifecycle_smoke")

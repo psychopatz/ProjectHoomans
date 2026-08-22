@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_PathService/PNC_PathService_TraversalRuntime.lua"
 
 local now = 1000
@@ -46,7 +48,7 @@ PNC = {
                 record.z = body:getZ()
             end,
             smashWindowForNPC = function(_, object)
-                assert(object == obstacle,
+                T.truthy(object == obstacle,
                     "window traversal lost its obstacle")
                 smashed = true
                 return true
@@ -55,7 +57,7 @@ PNC = {
     },
     Animation = {
         PlayBump = function(_, _, bumpType)
-            assert(bumpType == "PNC_WindowSmash",
+            T.truthy(bumpType == "PNC_WindowSmash",
                 "wrong window breach selector")
         end,
         FinishBump = function()
@@ -74,11 +76,11 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local lane = {}
 local record = { id = "window_breaker" }
-assert(PNC.PathService.Internal.beginTraversalAction(
+T.truthy(PNC.PathService.Internal.beginTraversalAction(
     zombie,
     record,
     lane,
@@ -104,8 +106,8 @@ local active = PNC.PathService.Internal.updateTraversalAction(
     lane,
     now
 )
-assert(active == true, "window breach released before animation tail")
-assert(smashed == true, "window was not smashed at breach impact")
+T.truthy(active == true, "window breach released before animation tail")
+T.truthy(smashed == true, "window was not smashed at breach impact")
 
 now = 1850
 active = PNC.PathService.Internal.updateTraversalAction(
@@ -114,9 +116,10 @@ active = PNC.PathService.Internal.updateTraversalAction(
     lane,
     now
 )
-assert(active == false, "window breach ignored its hard timeout")
-assert(lane.traversalAction == nil,
+T.truthy(active == false, "window breach ignored its hard timeout")
+T.truthy(lane.traversalAction == nil,
     "window breach retained a stale traversal action")
-assert(finished == true, "window breach did not release its bump")
+T.truthy(finished == true, "window breach did not release its bump")
+T.finish("pnc_window_break_traversal_smoke")
 
-print("pnc_window_break_traversal_smoke: ok")
+T.finish("pnc_window_break_traversal_smoke")

@@ -1,17 +1,11 @@
+local T = require "tests/support/test"
+
 local SHARED_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+    T.path("ProjectHoomans", "shared", "")
 local FILE = SHARED_ROOT
     .. "PNC/Core/Combat/AttackExecution/PNC_AttackExecution.lua"
 
-package.path = SHARED_ROOT .. "?.lua;" .. package.path
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual")
-            .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+T.addPackagePaths()
 
 local now = 1000
 local replayCount = 0
@@ -72,7 +66,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local record = {
     id = "animation_retry",
@@ -97,18 +91,19 @@ local record = {
 }
 
 local active, reason = PNC.Combat.PumpAttackAction(record, body)
-assertEqual(active, true, "attack remains active during retry")
-assertEqual(reason, "attack_anim_melee", "attack retry reason")
-assertEqual(
+T.equal(active, true, "attack remains active during retry")
+T.equal(reason, "attack_anim_melee", "attack retry reason")
+T.equal(
     bumpTypeWritten,
     false,
     "attack pump does not rewrite BumpType"
 )
-assertEqual(replayCount, 0, "attack pump does not replay the bump trigger")
-assertEqual(
+T.equal(replayCount, 0, "attack pump does not replay the bump trigger")
+T.equal(
     record.runtime.attackAction.animationRetries,
     0,
     "animation retry remains disabled"
 )
+T.finish("pnc_attack_animation_retry_smoke")
 
-print("pnc_attack_animation_retry_smoke: ok")
+T.finish("pnc_attack_animation_retry_smoke")

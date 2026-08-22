@@ -1,39 +1,34 @@
+local T = require "tests/support/test"
+
 local BODY_CONTROL =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_LiveBodyControl.lua"
 local CLIENT_TICK =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+    T.path("ProjectHoomans", "client", "PNC/")
     .. "PresenceSync/PNC_ClientPresenceTick.lua"
 local CLIENT_INIT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+    T.path("ProjectHoomans", "client", "PNC/")
     .. "00_PNC_Client_Init.lua"
 local CLIENT_LUA_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+    T.path("ProjectHoomans", "client", "")
 local CLIENT_CONTROLLER_ROOT = CLIENT_LUA_ROOT
     .. "PNC/PresenceSync/ClientNativePathController/"
 local CLIENT_CONTROLLER = CLIENT_CONTROLLER_ROOT
     .. "PNC_ClientNativePathController.lua"
 
-package.path = CLIENT_LUA_ROOT .. "?.lua;" .. package.path
+T.addPackagePaths()
 local CLIENT_VISUALS =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+    T.path("ProjectHoomans", "client", "PNC/")
     .. "PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals_Locomotion.lua"
 local ANIMATION =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Visuals/PNC_Animation.lua"
 local PATH_CONTEXT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_PathService/PNC_PathService_Context.lua"
 local TRAVERSAL_RUNTIME =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_PathService/PNC_PathService_TraversalRuntime.lua"
-
-local function readAll(path)
-    local handle = assert(io.open(path, "rb"))
-    local value = handle:read("*a")
-    handle:close()
-    return value
-end
 
 local useless = true
 local clientNow = 1000
@@ -80,7 +75,7 @@ local body = {
     end,
     pathToLocationF = function(self, x, y, z)
         requestCount = requestCount + 1
-        assert(x == 8 and y == 4 and z == 0,
+        T.truthy(x == 8 and y == 4 and z == 0,
             "delegated goal was altered")
         self.actionState = "pathfind"
     end,
@@ -163,16 +158,16 @@ Events = {
     },
 }
 
-dofile(BODY_CONTROL)
+T.load(BODY_CONTROL)
 
-assert(
+T.truthy(
     PNC.LiveBodyControl.EnforceManagedSafety(
         body,
         "mp_replica_test"
     ) == true,
     "managed MP replica was not maintained"
 )
-assert(
+T.truthy(
     useless == true,
     "idle MP replica did not retain scripted/manual body mode"
 )
@@ -215,7 +210,7 @@ PNC.PathService = {
 }
 PNC.Animation = {
     PlayBump = function(_, _, bumpType)
-        assert(bumpType == "PNC_WindowSmash",
+        T.truthy(bumpType == "PNC_WindowSmash",
             "native breach selected the wrong animation")
         windowSmashStarted = windowSmashStarted + 1
         return true
@@ -268,7 +263,7 @@ BehaviorResult = {
     Succeeded = "Succeeded",
 }
 
-dofile(CLIENT_CONTROLLER)
+T.load(CLIENT_CONTROLLER)
 
 local snapshot = {
     id = "remote_replica",
@@ -285,7 +280,7 @@ local snapshot = {
 }
 local handled
 local state
-assert(
+T.truthy(
     PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
         snapshot,
         body,
@@ -293,14 +288,14 @@ assert(
     ),
     "presence tick did not bind the delegated native goal"
 )
-assert(#zombieUpdateHandlers == 2,
+T.truthy(#zombieUpdateHandlers == 2,
     "native path controller was not registered on OnZombieUpdate")
 body.target = localPlayer
 body.targetSeenTime = 12
 body.eatBodyTarget = localPlayer
 body.aggroCleared = false
 runZombieUpdates(body)
-assert(requestCount == 1 and updateCount == 0,
+T.truthy(requestCount == 1 and updateCount == 0,
     "nearest MP client did not start movement in zombie update context")
 PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
     snapshot,
@@ -308,19 +303,19 @@ PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
     clientNow + 16
 )
 runZombieUpdates(body)
-assert(requestCount == 1,
+T.truthy(requestCount == 1,
     "unchanged delegated goal was submitted more than once")
-assert(updateCount == 0,
+T.truthy(updateCount == 0,
     "client manually advanced engine-owned PathFindBehavior2")
-assert(useless == false,
+T.truthy(useless == false,
     "client controller disabled the body during movement")
-assert(body.target == nil,
+T.truthy(body.target == nil,
     "zombie target was not suppressed in the movement-owner frame")
-assert(body.targetSeenTime == 0,
+T.truthy(body.targetSeenTime == 0,
     "zombie target memory was not reset in the movement-owner frame")
-assert(body.eatBodyTarget == nil,
+T.truthy(body.eatBodyTarget == nil,
     "zombie eating target was not suppressed in the movement-owner frame")
-assert(body.aggroCleared == true,
+T.truthy(body.aggroCleared == true,
     "zombie aggro was not suppressed in the movement-owner frame")
 
 localPlayer.x = 200
@@ -329,7 +324,7 @@ remotePlayer.x = 1
 remotePlayer.y = 1
 clientNow = 1300
 runZombieUpdates(body)
-assert(cancelCount == 1 and resetCount == 1,
+T.truthy(cancelCount == 1 and resetCount == 1,
     "controller handoff did not release the previous local path")
 
 useless = true
@@ -349,7 +344,7 @@ local attackSnapshot = {
         nativeMoveRevision = 3,
     },
 }
-assert(
+T.truthy(
     not PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
         attackSnapshot,
         body,
@@ -357,15 +352,15 @@ assert(
     ),
     "attack snapshot retained a native path goal"
 )
-assert(cancelCount == 2 and resetCount == 2,
+T.truthy(cancelCount == 2 and resetCount == 2,
     "attack snapshot did not release delegated movement before PlayBump")
-assert(useless == false,
+T.truthy(useless == false,
     "attack action lease did not keep the MP action context active")
 local requestsBeforeAttackUpdate = requestCount
 runZombieUpdates(body)
-assert(requestCount == requestsBeforeAttackUpdate,
+T.truthy(requestCount == requestsBeforeAttackUpdate,
     "MP zombie update started movement during the attack action lease")
-assert(useless == false,
+T.truthy(useless == false,
     "MP zombie update disabled the body during the attack action lease")
 
 local postAttackMoveSnapshot = {
@@ -380,7 +375,7 @@ local postAttackMoveSnapshot = {
         nativeMoveRevision = 4,
     },
 }
-assert(
+T.truthy(
     not PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
         postAttackMoveSnapshot,
         body,
@@ -389,7 +384,7 @@ assert(
     "post-attack movement bypassed the body-local bump tail"
 )
 runZombieUpdates(body)
-assert(requestCount == requestsBeforeAttackUpdate,
+T.truthy(requestCount == requestsBeforeAttackUpdate,
     "native path started before the local bump lifecycle exited")
 
 bodyModData.PNC_BumpActionLease = nil
@@ -411,7 +406,7 @@ local retrySnapshot = {
         nativeMoveRevision = 5,
     },
 }
-assert(PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
+T.truthy(PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
     retrySnapshot,
     body,
     clientNow
@@ -427,9 +422,9 @@ for attempt = 1, 5 do
     clientNow = clientNow + 5000
     runZombieUpdates(body)
 end
-assert(requestCount == requestsBeforeRetries + 5,
+T.truthy(requestCount == requestsBeforeRetries + 5,
     "same native goal stopped retrying after repeated engine drops")
-assert(useless == false,
+T.truthy(useless == false,
     "retrying native movement lost its multiplayer movement lease")
 
 PNC.ClientPresenceSync.Internal.ClearNativePathControllers()
@@ -463,15 +458,15 @@ PNC.ClientPresenceSync.Internal.BindNativePathSnapshot(
     clientNow
 )
 runZombieUpdates(body)
-assert(windowSmashStarted == 1,
+T.truthy(windowSmashStarted == 1,
     "locked native-route window did not start a breach")
 clientNow = clientNow + 700
 runZombieUpdates(body)
-assert(breachWindow.smashed == true,
+T.truthy(breachWindow.smashed == true,
     "native-route window was not broken at impact")
 clientNow = clientNow + 400
 runZombieUpdates(body)
-assert(windowSmashFinished == 1,
+T.truthy(windowSmashFinished == 1,
     "window breach animation did not release")
 -- A climbable window must be intercepted immediately. Waiting for the normal
 -- stall-recovery interval lets PathFindBehavior2 call
@@ -480,20 +475,20 @@ assert(windowSmashFinished == 1,
 clientNow = clientNow + 100
 body.actionState = "idle"
 runZombieUpdates(body)
-assert(body.actionState == "climbwindow",
+T.truthy(body.actionState == "climbwindow",
     "smashed native-route window was returned to unsafe engine pathing")
-assert(body.bumpType == "ClimbWindow",
+T.truthy(body.bumpType == "ClimbWindow",
     "forced window climb did not use the engine traversal selector")
 
-local tickSource = readAll(CLIENT_TICK)
-assert(not string.find(
+local tickSource = T.read(CLIENT_TICK)
+T.truthy(not string.find(
         tickSource,
         "UpdateNativePathController",
         1,
         true
     ),
     "generic client tick still pumps PathFindBehavior2")
-assert(
+T.truthy(
     not string.find(
         tickSource,
         "Interpolation.RecordSnapshot",
@@ -502,7 +497,7 @@ assert(
     ),
     "roster snapshots still install a second MP position mover"
 )
-assert(
+T.truthy(
     not string.find(
         tickSource,
         "Interpolation.ApplyToZombie",
@@ -511,8 +506,8 @@ assert(
     ),
     "roster snapshots still overwrite engine-network positions"
 )
-local initSource = readAll(CLIENT_INIT)
-assert(
+local initSource = T.read(CLIENT_INIT)
+T.truthy(
     not string.find(
         initSource,
         "PNC_ClientInterpolation",
@@ -522,11 +517,11 @@ assert(
     "removed interpolation transport is still loaded"
 )
 local interpolationFile = io.open(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+    T.path("ProjectHoomans", "client", "PNC/")
         .. "PNC_ClientInterpolation.lua",
     "rb"
 )
-assert(interpolationFile == nil,
+T.truthy(interpolationFile == nil,
     "legacy position interpolation module still exists")
 
 local controllerSource = ""
@@ -544,35 +539,35 @@ local controllerModules = {
 local controllerModuleIndex
 for controllerModuleIndex = 1, #controllerModules do
     controllerSource = controllerSource
-        .. readAll(
+        .. T.read(
             CLIENT_CONTROLLER_ROOT
                 .. controllerModules[controllerModuleIndex]
         )
 end
-assert(string.find(
+T.truthy(string.find(
         controllerSource,
         "Events.OnZombieUpdate.Add",
         1,
         true
     ),
     "client pathing does not use Bandits' zombie-update context")
-assert(not string.find(controllerSource, "setX(", 1, true)
+T.truthy(not string.find(controllerSource, "setX(", 1, true)
         and not string.find(controllerSource, "setY(", 1, true)
         and not string.find(controllerSource, "setZ(", 1, true),
     "client native controller contains teleport movement")
-assert(not string.find(controllerSource, "pcall", 1, true),
+T.truthy(not string.find(controllerSource, "pcall", 1, true),
     "client native controller hides failures with pcall")
-assert(not string.find(controllerSource, "behavior:update(", 1, true),
+T.truthy(not string.find(controllerSource, "behavior:update(", 1, true),
     "client manually pumps PathFindBehavior2 instead of PathFindState")
-assert(string.find(
+T.truthy(string.find(
     controllerSource,
     "body:pathToLocationF",
     1,
     true
 ), "client does not enter the engine PathFindState wrapper")
 
-local visualSource = readAll(CLIENT_VISUALS)
-assert(string.find(
+local visualSource = T.read(CLIENT_VISUALS)
+T.truthy(string.find(
         visualSource,
         "visualState.nativeMoveActive == true",
         1,
@@ -580,14 +575,14 @@ assert(string.find(
     ),
     "native replica visuals have no exclusive path-owner gate")
 
-local animationSource = readAll(ANIMATION)
-local nativeStyleStart = assert(string.find(
+local animationSource = T.read(ANIMATION)
+local nativeStyleStart = T.truthy(string.find(
     animationSource,
     "function Animation.SyncNativeLocomotionStyle",
     1,
     true
 ))
-local liveSetupStart = assert(string.find(
+local liveSetupStart = T.truthy(string.find(
     animationSource,
     "function Animation.ApplyLiveSetup",
     nativeStyleStart,
@@ -598,7 +593,7 @@ local nativeStyleSource = string.sub(
     nativeStyleStart,
     liveSetupStart - 1
 )
-assert(
+T.truthy(
     not string.find(nativeStyleSource, "setMoving(", 1, true)
         and not string.find(nativeStyleSource, "\"bMoving\"", 1, true)
         and not string.find(nativeStyleSource, "\"isMoving\"", 1, true)
@@ -612,14 +607,14 @@ assert(
     "native path style still mutates engine movement/action state"
 )
 
-local pathContextSource = readAll(PATH_CONTEXT)
-local walkAnimStart = assert(string.find(
+local pathContextSource = T.read(PATH_CONTEXT)
+local walkAnimStart = T.truthy(string.find(
     pathContextSource,
     "function Internal.setWalkAnim",
     1,
     true
 ))
-local resetControllerStart = assert(string.find(
+local resetControllerStart = T.truthy(string.find(
     pathContextSource,
     "function Internal.resetPathController",
     walkAnimStart,
@@ -630,28 +625,29 @@ local walkAnimSource = string.sub(
     walkAnimStart,
     resetControllerStart - 1
 )
-local nativeGateAt = assert(string.find(
+local nativeGateAt = T.truthy(string.find(
     walkAnimSource,
     "lane.navigationProvider == \"engine_path\"",
     1,
     true
 ))
-local fakeApplyAt = assert(string.find(
+local fakeApplyAt = T.truthy(string.find(
     walkAnimSource,
     "Animation.Apply(zombie",
     1,
     true
 ))
-assert(nativeGateAt < fakeApplyAt,
+T.truthy(nativeGateAt < fakeApplyAt,
     "engine-path locomotion reaches fake Animation.Apply before its gate")
 
-local traversalSource = readAll(TRAVERSAL_RUNTIME)
-assert(string.find(
+local traversalSource = T.read(TRAVERSAL_RUNTIME)
+T.truthy(string.find(
         traversalSource,
         "native_mp_owner",
         1,
         true
     ),
     "scripted setX/setY traversal has no multiplayer ownership gate")
+T.finish("pnc_mp_replica_transport_smoke")
 
-print("pnc_mp_replica_transport_smoke: ok")
+T.finish("pnc_mp_replica_transport_smoke")

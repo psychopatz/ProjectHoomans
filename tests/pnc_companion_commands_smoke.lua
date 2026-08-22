@@ -1,14 +1,9 @@
-local SHARED_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Commands/"
-local CLIENT_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local SHARED_ROOT =
+    T.path("ProjectHoomans", "shared", "PNC/Core/Commands/")
+local CLIENT_ROOT =
+    T.path("ProjectHoomans", "client", "PNC/")
 
 local records = {}
 local broadcasts = {}
@@ -120,21 +115,21 @@ PNC = {
     },
 }
 
-dofile(SHARED_ROOT .. "PNC_CompanionCommandRegistry.lua")
-dofile(SHARED_ROOT .. "PNC_CompanionCommandDefinitions.lua")
-dofile(SHARED_ROOT .. "PNC_CompanionCommandFlavor.lua")
-dofile(SHARED_ROOT .. "PNC_CompanionCommandFlavorDefinitions.lua")
+T.load(SHARED_ROOT .. "PNC_CompanionCommandRegistry.lua")
+T.load(SHARED_ROOT .. "PNC_CompanionCommandDefinitions.lua")
+T.load(SHARED_ROOT .. "PNC_CompanionCommandFlavor.lua")
+T.load(SHARED_ROOT .. "PNC_CompanionCommandFlavorDefinitions.lua")
 
-assert(PNC.CompanionCommandFlavor.Resolve("follow", "player", "seed"),
+T.truthy(PNC.CompanionCommandFlavor.Resolve("follow", "player", "seed"),
     "built-in player flavor missing")
-assert(PNC.CompanionCommandFlavor.Resolve("follow", "npc", "seed"),
+T.truthy(PNC.CompanionCommandFlavor.Resolve("follow", "npc", "seed"),
     "built-in NPC flavor missing")
-assertEqual(PNC.CompanionCommandFlavor.Register("extension_command", {
+T.equal(PNC.CompanionCommandFlavor.Register("extension_command", {
     player = {
         { key = "UI_Extension_Command", fallback = "Extension fallback." },
     },
 }), true, "extension flavor registration")
-assertEqual(PNC.CompanionCommandFlavor.Resolve(
+T.equal(PNC.CompanionCommandFlavor.Resolve(
     "extension_command",
     "player",
     "seed"
@@ -145,7 +140,7 @@ local namedFlavor = PNC.CompanionCommandFlavor.Resolve(
     "named_seed",
     { name = "Walker Sage", names = "Walker Sage", count = 1 }
 )
-assert(string.find(namedFlavor, "Walker Sage", 1, true),
+T.truthy(string.find(namedFlavor, "Walker Sage", 1, true),
     "player flavor omitted companion name")
 local flavorVariants = {}
 for i = 1, 20 do
@@ -160,7 +155,7 @@ local flavorVariantCount = 0
 for _ in pairs(flavorVariants) do
     flavorVariantCount = flavorVariantCount + 1
 end
-assert(flavorVariantCount >= 2, "player flavor did not vary by seed")
+T.truthy(flavorVariantCount >= 2, "player flavor did not vary by seed")
 
 local player = {
     getUsername = function() return "alice" end,
@@ -208,25 +203,25 @@ PNC.Factions = {
     },
 }
 records.owned.affiliation = { factionID = "faction_alice" }
-assertEqual(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
+T.equal(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
     true, "single-player faction ownership uses canonical account key")
 
-assertEqual(#PNC.CompanionCommands.List(), 9, "registered command count")
-assertEqual(PNC.CompanionCommands.Get("scavenge_nearby").clientOnly, true,
+T.equal(#PNC.CompanionCommands.List(), 9, "registered command count")
+T.equal(PNC.CompanionCommands.Get("scavenge_nearby").clientOnly, true,
     "scavenge command opens its client setup UI")
-assertEqual(#PNC.CompanionCommands.ListGroups(), 2,
+T.equal(#PNC.CompanionCommands.ListGroups(), 2,
     "registered command group count")
-assertEqual(
+T.equal(
     PNC.CompanionCommands.GetAttackTypeDefinition("auto").icon,
     "media/ui/emotes/yes.png",
     "auto attack icon"
 )
-assertEqual(
+T.equal(
     PNC.CompanionCommands.GetAttackTypeDefinition("melee").icon,
     "media/ui/emotes/comefromfront.png",
     "melee attack icon"
 )
-assertEqual(
+T.equal(
     PNC.CompanionCommands.GetAttackTypeDefinition("ranged").icon,
     "media/ui/emotes/fire.png",
     "ranged attack icon"
@@ -235,96 +230,96 @@ local affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
     commandID = "stay",
 })
-assertEqual(affected, 1, "targeted companion command")
-assertEqual(reason, "commanded", "targeted companion result")
-assertEqual(records.owned.orderSpec.kind, "guard", "stay order")
-assertEqual(records.owned.orderSpec.x, 3.5, "stay live-body anchor x")
-assertEqual(records.owned.orderSpec.y, 1.5, "stay live-body anchor y")
+T.equal(affected, 1, "targeted companion command")
+T.equal(reason, "commanded", "targeted companion result")
+T.equal(records.owned.orderSpec.kind, "guard", "stay order")
+T.equal(records.owned.orderSpec.x, 3.5, "stay live-body anchor x")
+T.equal(records.owned.orderSpec.y, 1.5, "stay live-body anchor y")
 
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "neutral",
     commandID = "follow",
 })
-assertEqual(affected, 0, "neutral NPC command rejected")
-assertEqual(reason, "not_companion", "neutral rejection reason")
+T.equal(affected, 0, "neutral NPC command rejected")
+T.equal(reason, "not_companion", "neutral rejection reason")
 
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "other_owner",
     commandID = "follow",
 })
-assertEqual(affected, 0, "other player's companion rejected")
-assertEqual(reason, "not_owner", "ownership rejection reason")
+T.equal(affected, 0, "other player's companion rejected")
+T.equal(reason, "not_owner", "ownership rejection reason")
 
 affected, reason = PNC.CompanionCommands.Execute(player, {
     commandID = "attack_ranged",
     scope = "closest",
     radius = 200,
 })
-assertEqual(affected, 1, "closest command affects one nearby companion")
-assertEqual(records.owned.orderSpec.kind, "guard",
+T.equal(affected, 1, "closest command affects one nearby companion")
+T.equal(records.owned.orderSpec.kind, "guard",
     "attack type changed movement order")
-assertEqual(records.owned.weaponMode, "ranged", "ranged attack mode")
-assertEqual(records.owned.attackType, "ranged", "ranged attack type")
-assertEqual(records.owned_second.attackType, nil,
+T.equal(records.owned.weaponMode, "ranged", "ranged attack mode")
+T.equal(records.owned.attackType, "ranged", "ranged attack type")
+T.equal(records.owned_second.attackType, nil,
     "closest attack type changed a second companion")
-assertEqual(records.owned.runtime.combatModeResolved, "ranged",
+T.equal(records.owned.runtime.combatModeResolved, "ranged",
     "attack type equipment state refresh")
-assertEqual(records.far.attackType, nil, "bulk radius bypassed server maximum")
-assertEqual(records.abstract.attackType, nil, "abstract companion was commanded")
+T.equal(records.far.attackType, nil, "bulk radius bypassed server maximum")
+T.equal(records.abstract.attackType, nil, "abstract companion was commanded")
 affected, reason = PNC.CompanionCommands.Execute(player, {
     commandID = "attack_auto",
     scope = "group",
 })
-assertEqual(affected, 0, "group attack type was accepted")
-assertEqual(reason, "personalized_command",
+T.equal(affected, 0, "group attack type was accepted")
+T.equal(reason, "personalized_command",
     "group attack type rejection reason")
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
     commandID = "scavenge_nearby",
 })
-assertEqual(affected, 0, "server executed client-only scavenge command")
-assertEqual(reason, "client_action_required",
+T.equal(affected, 0, "server executed client-only scavenge command")
+T.equal(reason, "client_action_required",
     "client-only scavenge rejection reason")
 affected, reason = PNC.CompanionCommands.Execute(player, {
     commandID = "follow",
     scope = "group",
 })
-assertEqual(affected, 2, "group movement command target count")
-assertEqual(records.owned.orderSpec.kind, "follow",
+T.equal(affected, 2, "group movement command target count")
+T.equal(records.owned.orderSpec.kind, "follow",
     "group follow did not update closest companion")
-assertEqual(records.owned_second.orderSpec.kind, "follow",
+T.equal(records.owned_second.orderSpec.kind, "follow",
     "group follow did not update second companion")
 records.owned.runtime.workOrderId = "work-1"
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
     commandID = "return_home",
 })
-assertEqual(affected, 1, "single go-home command target count")
-assertEqual(sentHome[#sentHome].id, "owned", "single go-home target")
-assertEqual(sentHome[#sentHome].reason, "companion_command",
+T.equal(affected, 1, "single go-home command target count")
+T.equal(sentHome[#sentHome].id, "owned", "single go-home target")
+T.equal(sentHome[#sentHome].reason, "companion_command",
     "single go-home source")
-assertEqual(releasedWorkers[#releasedWorkers].id, "owned",
+T.equal(releasedWorkers[#releasedWorkers].id, "owned",
     "go-home command released active work")
 affected, reason = PNC.CompanionCommands.Execute(player, {
     commandID = "return_home",
     scope = "group",
 })
-assertEqual(affected, 2, "all-nearby go-home target count")
-assertEqual(reason, "commanded", "all-nearby go-home result")
+T.equal(affected, 2, "all-nearby go-home target count")
+T.equal(reason, "commanded", "all-nearby go-home result")
 records.owned.runtime.attackAction = { finishAt = 9999 }
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
     commandID = "attack_none",
 })
-assertEqual(affected, 1, "don't attack command")
-assertEqual(records.owned.attackType, "none", "don't attack preference")
-assertEqual(records.owned.orderSpec.kind, "follow",
+T.equal(affected, 1, "don't attack command")
+T.equal(records.owned.attackType, "none", "don't attack preference")
+T.equal(records.owned.orderSpec.kind, "follow",
     "don't attack preserved movement order")
-assertEqual(records.owned.runtime.attackAction, nil,
+T.equal(records.owned.runtime.attackAction, nil,
     "don't attack cancelled committed attack")
-assertEqual(PNC.CompanionCommands.IsCurrent(records.owned, "attack_none"),
+T.equal(PNC.CompanionCommands.IsCurrent(records.owned, "attack_none"),
     true, "current attack type")
-assert(#broadcasts >= 2, "companion changes were not broadcast")
+T.truthy(#broadcasts >= 2, "companion changes were not broadcast")
 
 local spoken = {}
 player.Say = function(_, text)
@@ -332,10 +327,10 @@ player.Say = function(_, text)
 end
 player.playEmote = function() end
 PNC.CompanionCommandPresentation = nil
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
-dofile(CLIENT_ROOT .. "Commands/PNC_CompanionCommandPresentation.lua")
+T.load(CLIENT_ROOT .. "Commands/PNC_CompanionCommandPresentation.lua")
 for i = 1, 8 do
     PNC.CompanionCommandPresentation.ShowPlayerFlavor(
         player,
@@ -345,7 +340,7 @@ for i = 1, 8 do
 end
 local spokenVariants = {}
 for i = 1, #spoken do
-    assert(string.find(spoken[i], "Walker Sage", 1, true),
+    T.truthy(string.find(spoken[i], "Walker Sage", 1, true),
         "presented player flavor omitted target name")
     spokenVariants[spoken[i]] = true
 end
@@ -353,7 +348,7 @@ local spokenVariantCount = 0
 for _ in pairs(spokenVariants) do
     spokenVariantCount = spokenVariantCount + 1
 end
-assert(spokenVariantCount >= 2,
+T.truthy(spokenVariantCount >= 2,
     "presented player flavor remained repetitive")
 
 local registeredProvider
@@ -400,7 +395,7 @@ ISContextMenu = { getNew = function() return newMenu() end }
 getText = function(key) return key end
 getTexture = function(path) return path end
 
-dofile(CLIENT_ROOT
+T.load(CLIENT_ROOT
     .. "UI/Context/Providers/PNC_ContextProvider_Commands.lua")
 
 local ownedSnapshot = {
@@ -441,21 +436,21 @@ instanceof = function() return true end
 getCell = function()
     return { getGridSquare = function() return nil end }
 end
-dofile(CLIENT_ROOT .. "UI/Context/PNC_NPCSelection.lua")
+T.load(CLIENT_ROOT .. "UI/Context/PNC_NPCSelection.lua")
 local selectedEntries = PNC.NPCSelection.CollectNearbyNPCs(
     player,
     { { getSquare = function() return selectedSquare end } },
     3
 )
-assertEqual(#selectedEntries, 1, "multiplayer snapshot NPC selection")
-assertEqual(selectedEntries[1].snapshot, ownedSnapshot,
+T.equal(#selectedEntries, 1, "multiplayer snapshot NPC selection")
+T.equal(selectedEntries[1].snapshot, ownedSnapshot,
     "live body selection discarded authoritative client snapshot")
 
-assertEqual(registeredProvider.isEnabled(
+T.equal(registeredProvider.isEnabled(
     selectedEntries[1],
     player
 ), true, "owned companion context provider")
-assertEqual(registeredProvider.isEnabled(
+T.equal(registeredProvider.isEnabled(
     { id = "neutral", snapshot = records.neutral },
     player
 ), false, "neutral context provider hidden")
@@ -466,33 +461,33 @@ registeredProvider.addOptions(
     selectedEntries[1],
     player
 )
-assertEqual(context.options[1].name, "Companion Commands",
+T.equal(context.options[1].name, "Companion Commands",
     "context command root")
-assertEqual(#context.options[1].submenu.options, 5,
+T.equal(#context.options[1].submenu.options, 5,
     "movement commands and nested attack root")
-assertEqual(context.options[1].submenu.options[3].name, "Go Home",
+T.equal(context.options[1].submenu.options[3].name, "Go Home",
     "context go-home command")
-assertEqual(context.options[1].submenu.options[4].name, "Scavenge Nearby",
+T.equal(context.options[1].submenu.options[4].name, "Scavenge Nearby",
     "context scavenge command")
-assertEqual(context.options[1].submenu.options[5].name, "Attack Type",
+T.equal(context.options[1].submenu.options[5].name, "Attack Type",
     "nested attack type root")
 local attackOptions = context.options[1].submenu.options[5].submenu.options
-assertEqual(#attackOptions, 4, "attack type definitions")
-assertEqual(attackOptions[4].notAvailable, true,
+T.equal(#attackOptions, 4, "attack type definitions")
+T.equal(attackOptions[4].notAvailable, true,
     "current attack type is disabled and red")
-assertEqual(
+T.equal(
     context.options[1].submenu.options[5].iconTexture,
     "media/ui/emotes/no.png",
     "context attack type icon did not reflect current setting"
 )
 attackOptions[3].callback()
-assertEqual(sent[1].commandID, "attack_ranged",
+T.equal(sent[1].commandID, "attack_ranged",
     "context command dispatch")
-assertEqual(sent[1].npcId, "client_owned",
+T.equal(sent[1].npcId, "client_owned",
     "context targeted companion")
-assertEqual(played[1].commandID, "attack_ranged",
+T.equal(played[1].commandID, "attack_ranged",
     "context command visual emote")
-assertEqual(played[1].target.id, "client_owned",
+T.equal(played[1].target.id, "client_owned",
     "context flavor target")
 
 local radialSent = {}
@@ -578,7 +573,7 @@ PNC.CompanionCommandPresentation.ShowPlayerFlavor =
         return true
     end
 
-dofile(CLIENT_ROOT .. "Commands/PNC_CompanionCommandEmotes.lua")
+T.load(CLIENT_ROOT .. "Commands/PNC_CompanionCommandEmotes.lua")
 
 PNC.Network.ClientState.snapshots.roster_owned = {
     id = "roster_owned",
@@ -600,75 +595,75 @@ for i = 1, #rosterCandidates do
         foundRosterCandidate = true
     end
 end
-assertEqual(foundRosterCandidate, true,
+T.equal(foundRosterCandidate, true,
     "roster snapshot without owner detail hid closest commands")
 PNC.Network.ClientState.snapshots.roster_owned = nil
 
 local radial = {}
 setmetatable(radial, { __index = ISEmoteRadialMenu })
 radial:init()
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.menu.PNC_ClosestCompanionCommands.name,
     "Closest Companion: Walker Sage",
     "closest radial command root"
 )
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.menu.PNC_ClosestCompanionCommands
         .subMenu.PNC_ClosestCommand_follow,
     "Follow Me",
     "closest radial follow slice"
 )
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.menu.PNC_ClosestCompanionCommands
         .subMenu.PNC_ClosestCommand_return_home,
     "Go Home",
     "closest radial go-home slice"
 )
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.menu.PNC_GroupCompanionCommands
         .subMenu.PNC_GroupCommand_return_home,
     "Go Home",
     "all-nearby radial go-home slice"
 )
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.menu.PNC_ClosestCompanionCommands
         .subMenu.PNC_ClosestCommandGroup_attack_type,
     "Attack Type",
     "radial nested attack type slice"
 )
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.menu.PNC_GroupCompanionCommands
         .subMenu.PNC_GroupCommand_attack_auto,
     nil,
     "attack type leaked into group wheel"
 )
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.menu.PNC_ClosestCommandGroup_attack_type,
     nil,
     "private attack subgroup leaked into vanilla radial roots"
 )
-assertEqual(
+T.equal(
     radial.PNCCommandNestedMenus.PNC_ClosestCommandGroup_attack_type
         .subMenu.PNC_ClosestCommand_attack_none,
     "Don't Attack",
     "radial nested don't attack slice"
 )
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.icons.PNC_GroupCompanionCommands,
     "media/ui/Emotes/PNC_EmoteMenu.png",
     "framework group radial icon"
 )
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.icons.PNC_ClosestCompanionCommands,
     "media/ui/emotes/no.png",
     "closest root icon did not reflect target attack type"
 )
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.icons.PNC_ClosestCommandGroup_attack_type,
     "media/ui/emotes/no.png",
     "attack subgroup icon did not reflect target attack type"
 )
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.icons.PNC_GroupCommand_follow,
     "media/ui/Emotes/PNC_EmoteFollow.png",
     "framework group follow radial icon"
@@ -682,44 +677,44 @@ for i = 1, #radialSlices do
         foundAttackTypeSlice = true
     end
 end
-assertEqual(foundAttackTypeSlice, true,
+T.equal(foundAttackTypeSlice, true,
     "vanilla closest submenu omitted attack type slice")
 radial:emote("PNC_ClosestCommandGroup_attack_type")
-assertEqual(#radialSlices, 5,
+T.equal(#radialSlices, 5,
     "nested radial attack commands plus back")
-assertEqual(radialSlices[1].value, "PNC_ClosestCommand_attack_auto",
+T.equal(radialSlices[1].value, "PNC_ClosestCommand_attack_auto",
     "nested radial stable auto order")
-assertEqual(radialSlices[4].value, "PNC_ClosestCommand_attack_none",
+T.equal(radialSlices[4].value, "PNC_ClosestCommand_attack_none",
     "nested radial stable don't-attack order")
-assertEqual(radialSlices[5].value, "PNC_ClosestCompanionCommands",
+T.equal(radialSlices[5].value, "PNC_ClosestCompanionCommands",
     "nested radial back target")
-assertEqual(displayed, 1, "nested radial displayed")
+T.equal(displayed, 1, "nested radial displayed")
 radial:emote("PNC_ClosestCommand_attack_ranged")
-assertEqual(radialSent[1].commandID, "attack_ranged",
+T.equal(radialSent[1].commandID, "attack_ranged",
     "closest radial command dispatch")
-assertEqual(radialSent[1].npcId, "client_owned",
+T.equal(radialSent[1].npcId, "client_owned",
     "closest radial target")
-assertEqual(radialSent[1].scope, "closest",
+T.equal(radialSent[1].scope, "closest",
     "closest radial scope")
-assertEqual(radialFlavor.context.targets[1].name, "Walker Sage",
+T.equal(radialFlavor.context.targets[1].name, "Walker Sage",
     "closest radial flavor target name")
 radial:emote("PNC_GroupCommand_follow")
-assertEqual(radialSent[2].commandID, "follow",
+T.equal(radialSent[2].commandID, "follow",
     "group radial command dispatch")
-assertEqual(radialSent[2].npcId, nil, "group radial target should be nil")
-assertEqual(radialSent[2].scope, "group", "group radial scope")
-assert(#radialFlavor.context.targets >= 1,
+T.equal(radialSent[2].npcId, nil, "group radial target should be nil")
+T.equal(radialSent[2].scope, "group", "group radial scope")
+T.truthy(#radialFlavor.context.targets >= 1,
     "group radial flavor omitted nearby companions")
-assertEqual(originalVisual, "followme", "radial visual emote")
+T.equal(originalVisual, "followme", "radial visual emote")
 radial:emote("PNC_GroupCommand_return_home")
-assertEqual(radialSent[3].commandID, "return_home",
+T.equal(radialSent[3].commandID, "return_home",
     "group radial go-home dispatch")
-assertEqual(radialSent[3].npcId, nil,
+T.equal(radialSent[3].npcId, nil,
     "group radial go-home target should be nil")
-assertEqual(radialSent[3].scope, "group",
+T.equal(radialSent[3].scope, "group",
     "group radial go-home scope")
 radial:emote("wavehi")
-assertEqual(originalVisual, "wavehi", "ordinary emote delegation")
+T.equal(originalVisual, "wavehi", "ordinary emote delegation")
 
 local savedForEach = PNC.Registry.ForEach
 local savedSnapshots = PNC.Network.ClientState.snapshots
@@ -728,18 +723,19 @@ PNC.Network.ClientState.snapshots = {}
 local syncingRadial = {}
 setmetatable(syncingRadial, { __index = ISEmoteRadialMenu })
 syncingRadial:init()
-assertEqual(
+T.equal(
     ISEmoteRadialMenu.menu.PNC_ClosestCompanionCommands
         .subMenu.PNC_ClosestCommandGroup_attack_type,
     "Attack Type",
     "sync gap hid personalized attack type"
 )
 syncingRadial:emote("PNC_ClosestCommand_attack_auto")
-assertEqual(radialSent[#radialSent].scope, "closest",
+T.equal(radialSent[#radialSent].scope, "closest",
     "sync-gap closest command scope")
-assertEqual(radialSent[#radialSent].npcId, nil,
+T.equal(radialSent[#radialSent].npcId, nil,
     "sync-gap closest command trusted a stale target")
 PNC.Registry.ForEach = savedForEach
 PNC.Network.ClientState.snapshots = savedSnapshots
+T.finish("pnc_companion_commands_smoke")
 
-print("pnc_companion_commands_smoke: ok")
+T.finish("pnc_companion_commands_smoke")

@@ -1,30 +1,20 @@
+local T = require "tests/support/test"
+
 local ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 local SERVER =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected="
-            .. tostring(expected) .. " actual="
-            .. tostring(actual))
-    end
-end
-
-local function assertTrue(value, label)
-    assertEqual(value == true, true, label)
-end
+    T.path("ProjectHoomans", "server", "PNC/")
 
 function isClient() return false end
 function isServer() return true end
 
 PNC = {}
-dofile(ROOT .. "Base/PNC_Core.lua")
-dofile(ROOT .. "Relationships/PNC_EntityRef.lua")
-dofile(ROOT .. "Communities/PNC_CommunityConstants.lua")
-dofile(ROOT .. "Communities/PNC_CommunityProfiles.lua")
-dofile(ROOT .. "Communities/PNC_CommunityMath.lua")
-dofile(ROOT .. "Communities/PNC_CommunityTypes.lua")
+T.load(ROOT .. "Base/PNC_Core.lua")
+T.load(ROOT .. "Relationships/PNC_EntityRef.lua")
+T.load(ROOT .. "Communities/PNC_CommunityConstants.lua")
+T.load(ROOT .. "Communities/PNC_CommunityProfiles.lua")
+T.load(ROOT .. "Communities/PNC_CommunityMath.lua")
+T.load(ROOT .. "Communities/PNC_CommunityTypes.lua")
 
 local function definition(minX, minY, maxX, maxY)
     return {
@@ -114,7 +104,7 @@ PNC.Communities = {
     end,
 }
 
-dofile(SERVER .. "PNC_CommunitySiteResolver.lua")
+T.load(SERVER .. "PNC_CommunitySiteResolver.lua")
 
 local first = PNC.CommunitySiteResolver.DescribeAt(
     2,
@@ -122,11 +112,11 @@ local first = PNC.CommunitySiteResolver.DescribeAt(
     0,
     { createdAt = 10 }
 )
-assertEqual(first.kind, "building", "building detected")
-assertEqual(first.bounds.minX, 0, "first min x")
-assertEqual(first.bounds.maxX, 4, "first max x")
-assertEqual(first.home.x, 2, "building center x")
-assertEqual(first.building, nil,
+T.equal(first.kind, "building", "building detected")
+T.equal(first.bounds.minX, 0, "first min x")
+T.equal(first.bounds.maxX, 4, "first max x")
+T.equal(first.home.x, 2, "building center x")
+T.equal(first.building, nil,
     "engine building is not retained")
 occupiedID = first.id
 
@@ -141,15 +131,15 @@ local available, reason =
             searchStep = 1,
         }
     )
-assertEqual(reason, "nearby_building_found",
+T.equal(reason, "nearby_building_found",
     "nearby allocation reason")
-assertEqual(available.kind, "building",
+T.equal(available.kind, "building",
     "nearby building selected")
-assertEqual(available.bounds.minX, 9,
+T.equal(available.bounds.minX, 9,
     "occupied building skipped")
-assertEqual(available.bounds.maxX, 13,
+T.equal(available.bounds.maxX, 13,
     "second building bounds")
-assertTrue(available.id ~= occupiedID,
+T.truthy(available.id ~= occupiedID,
     "distinct stable site ID")
 
 local randomHouse, randomReason =
@@ -157,11 +147,11 @@ local randomHouse, randomReason =
         createdAt = 11,
         randomIndex = 1,
     })
-assertEqual(randomReason, "random_house_found",
+T.equal(randomReason, "random_house_found",
     "random house allocation reason")
-assertEqual(randomHouse.bounds.minX, 1000,
+T.equal(randomHouse.bounds.minX, 1000,
     "occupied house skipped during world scan")
-assertEqual(
+T.equal(
     PNC.CommunitySiteResolver.IsSiteLoaded(randomHouse),
     false,
     "unloaded meta-grid house remains primitive"
@@ -172,13 +162,14 @@ local points =
         available,
         4
     )
-assertEqual(#points, 4, "four spawn points")
+T.equal(#points, 4, "four spawn points")
 for _, point in ipairs(points) do
-    assertTrue(
+    T.truthy(
         point.x >= 9 and point.x <= 14
             and point.y >= 0 and point.y <= 5,
         "spawn point inside loaded building"
     )
 end
+T.finish("pnc_community_site_resolver_smoke")
 
-print("pnc_community_site_resolver_smoke: PASS")
+T.finish("pnc_community_site_resolver_smoke")

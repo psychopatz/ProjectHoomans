@@ -1,25 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertContains(actual, expected, label)
-    if not string.find(tostring(actual), tostring(expected), 1, true) then
-        error((label or "assertContains") .. ": missing=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertNotContains(actual, expected, label)
-    if string.find(tostring(actual), tostring(expected), 1, true) then
-        error((label or "assertNotContains") .. ": unexpected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "client", "")
 
 PNC = {
     Const = { PRESENCE_LIVE = "LIVE" },
@@ -32,8 +13,8 @@ PNC = {
 }
 UIFont = { Small = "Small", Medium = "Medium" }
 
-dofile(ROOT .. "PNC/UI/Nameplates/PNC_NameplateDebug.lua")
-dofile(ROOT .. "PNC/UI/Nameplates/PNC_NameplatePresentation.lua")
+T.load(ROOT .. "PNC/UI/Nameplates/PNC_NameplateDebug.lua")
+T.load(ROOT .. "PNC/UI/Nameplates/PNC_NameplatePresentation.lua")
 
 local snapshot = {
     id = "npc_debug",
@@ -71,9 +52,9 @@ local onlyTarget = {
     debugShowBlock = false,
 }
 local filtered = PNC.NameplateDebug.BuildText(snapshot, true, onlyTarget)
-assertEqual(filtered, "Target: zombie", "component filtering")
-assertNotContains(filtered, "AI:", "hidden AI component")
-assertNotContains(filtered, "Weapon:", "hidden combat component")
+T.equal(filtered, "Target: zombie", "component filtering")
+T.falsy(string.find(tostring(filtered), tostring("AI:"), 1, true), "hidden AI component")
+T.falsy(string.find(tostring(filtered), tostring("Weapon:"), 1, true), "hidden combat component")
 
 snapshot.combatDebugState = {
     attackType = "auto",
@@ -93,28 +74,28 @@ local combatSummary = PNC.NameplateDebug.BuildText(snapshot, true, {
     debugShowStamina = false,
     debugShowBlock = false,
 })
-assertContains(combatSummary, "Intent: auto/melee",
+T.contains(combatSummary, "Intent: auto/melee",
     "combat intent summary")
-assertContains(combatSummary, "Tactic: lone_threat_counter",
+T.contains(combatSummary, "Tactic: lone_threat_counter",
     "combat tactic summary")
-assertContains(combatSummary, "ViewZ: 1/2",
+T.contains(combatSummary, "ViewZ: 1/2",
     "visible zombie summary")
 
 local infected = PNC.NameplateDebug.InfectionText(snapshot, {
     debugShowInfection = true,
 })
-assertContains(infected, "INFECTED: YES", "infection marker")
-assertContains(infected, "Stage: fever", "infection stage")
-assertContains(infected, "Fever: 72%", "infection fever")
-assertContains(infected, "Temp: 39.6 C", "infection temperature")
-assertEqual(PNC.NameplateDebug.InfectionText(snapshot, {
+T.contains(infected, "INFECTED: YES", "infection marker")
+T.contains(infected, "Stage: fever", "infection stage")
+T.contains(infected, "Fever: 72%", "infection fever")
+T.contains(infected, "Temp: 39.6 C", "infection temperature")
+T.equal(PNC.NameplateDebug.InfectionText(snapshot, {
     debugShowInfection = false,
 }), "", "infection component disabled")
 
 snapshot.bodyHealth.infection.active = false
 snapshot.bodyHealth.infection.fatal = false
 snapshot.bodyHealth.infection.pendingFatal = false
-assertEqual(PNC.NameplateDebug.InfectionText(snapshot, {
+T.equal(PNC.NameplateDebug.InfectionText(snapshot, {
     debugShowInfection = true,
 }), "", "healthy NPC has no infection warning")
 
@@ -163,14 +144,14 @@ sceneLine, sceneTrackLine =
         sceneBody,
         snapshot
     )
-assertContains(sceneLine, "SCENE idle.ambient", "scene overlay ID")
-assertContains(sceneLine, "policy=loop", "scene overlay repeat policy")
-assertContains(sceneLine, "step=2/4:smell_gag", "scene overlay queue")
-assertContains(sceneLine, "rev=4:2", "scene overlay playback revision")
-assertContains(sceneTrackLine, "req=SmellGag", "scene requested bump")
-assertContains(sceneTrackLine, "actual=PNC_SmellGag", "scene actual bump")
-assertContains(sceneTrackLine, "clip=Bob_EmoteSmellGag", "scene clip")
-assertContains(sceneTrackLine, "frame@30=15", "scene frame")
+T.contains(sceneLine, "SCENE idle.ambient", "scene overlay ID")
+T.contains(sceneLine, "policy=loop", "scene overlay repeat policy")
+T.contains(sceneLine, "step=2/4:smell_gag", "scene overlay queue")
+T.contains(sceneLine, "rev=4:2", "scene overlay playback revision")
+T.contains(sceneTrackLine, "req=SmellGag", "scene requested bump")
+T.contains(sceneTrackLine, "actual=PNC_SmellGag", "scene actual bump")
+T.contains(sceneTrackLine, "clip=Bob_EmoteSmellGag", "scene clip")
+T.contains(sceneTrackLine, "frame@30=15", "scene frame")
 
 snapshot.treatmentState = {
     phase = "bandaging",
@@ -179,8 +160,8 @@ snapshot.treatmentState = {
     bandageName = "Ripped Sheets",
 }
 local treatmentText = PNC.NameplatePresentation.TreatmentStatus(snapshot)
-assertContains(treatmentText, "Bandaging Left Hand", "active treatment body part")
-assertContains(treatmentText, "Ripped Sheets", "active treatment material")
+T.contains(treatmentText, "Bandaging Left Hand", "active treatment body part")
+T.contains(treatmentText, "Ripped Sheets", "active treatment material")
 snapshot.treatmentState.phase = "idle"
 snapshot.bodyHealth.wounds = {
     Hand_L = {
@@ -190,8 +171,8 @@ snapshot.bodyHealth.wounds = {
     },
 }
 treatmentText = PNC.NameplatePresentation.TreatmentStatus(snapshot)
-assertContains(treatmentText, "Dirty bandage", "dirty treatment marker")
-assertContains(treatmentText, "Bandage", "dirty treatment material")
+T.contains(treatmentText, "Dirty bandage", "dirty treatment marker")
+T.contains(treatmentText, "Bandage", "dirty treatment material")
 
 PNC.FacilityDefinitions = { Get = function(id)
     return id == "barracks" and {
@@ -202,16 +183,16 @@ snapshot.actionInformation = { kind = "work_order",
     operation = "CONSTRUCT", status = "WORKING", percent = 10,
     facilityDefinitionId = "barracks" }
 local actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
-assertContains(actionText, "Building", "work action verb")
-assertContains(actionText, "barracks", "work action target")
-assertContains(actionText, "10%", "work action progress")
+T.contains(actionText, "Building", "work action verb")
+T.contains(actionText, "barracks", "work action target")
+T.contains(actionText, "10%", "work action progress")
 snapshot.actionInformation = { kind = "return_home", percent = 35 }
 actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
-assertContains(actionText, "Returning Home", "home travel action")
-assertContains(actionText, "35%", "home travel progress")
+T.contains(actionText, "Returning Home", "home travel action")
+T.contains(actionText, "35%", "home travel progress")
 snapshot.actionInformation = { kind = "at_home" }
 actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
-assertContains(actionText, "Idle", "idle-at-home action")
+T.contains(actionText, "Idle", "idle-at-home action")
 snapshot.actionInformation = {
     kind = "activity",
     activityId = "facility:sleep",
@@ -221,22 +202,21 @@ snapshot.actionInformation = {
     facilityDefinitionId = "barracks",
 }
 actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
-assertContains(actionText, "Sleeping", "facility activity label")
-assertContains(actionText, "barracks", "facility activity target")
+T.contains(actionText, "Sleeping", "facility activity label")
+T.contains(actionText, "barracks", "facility activity target")
 snapshot.actionInformation = {
     kind = "activity",
     activityId = "job:GuardAnchor",
     fallback = "Guard Anchor",
 }
 actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
-assertContains(actionText, "Guard Anchor", "generic job activity fallback")
+T.contains(actionText, "Guard Anchor", "generic job activity fallback")
 snapshot.actionInformation = nil
 
-local entriesPath = ROOT .. "PNC/UI/Nameplates/PNC_NameplateEntries.lua"
-local entriesFile = assert(io.open(entriesPath, "r"))
-local entriesSource = entriesFile:read("*a")
-entriesFile:close()
-assertNotContains(entriesSource, "hpText", "numeric HP cache returned")
+local entriesSource = T.read(
+    "ProjectHoomans", "client", "PNC/UI/Nameplates/PNC_NameplateEntries.lua"
+)
+T.falsy(string.find(tostring(entriesSource), tostring("hpText"), 1, true), "numeric HP cache returned")
 
 PNC.NameplateBodies = {}
 PNC.Network = { ClientState = { snapshots = {} } }
@@ -282,10 +262,10 @@ PNC.FactionDebugOverlay = {
         }, 1
     end,
 }
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
-dofile(entriesPath)
+T.load("ProjectHoomans", "client", "PNC/UI/Nameplates/PNC_NameplateEntries.lua")
 local factionLine1
 local factionLine2
 local factionLine3
@@ -306,40 +286,39 @@ relationshipChangeTone =
         { id = "npc_debug" },
         { showFactionDebug = true }
     )
-assertContains(factionLine1, "Mill Looters",
+T.contains(factionLine1, "Mill Looters",
     "faction nameplate organization")
-assertContains(factionLine2, "war=true",
+T.contains(factionLine2, "war=true",
     "faction nameplate war state")
-assertContains(factionLine2, "attack=true",
+T.contains(factionLine2, "attack=true",
     "faction nameplate resolved attack")
-assertContains(factionLine3, "order=hostile_hunt",
+T.contains(factionLine3, "order=hostile_hunt",
     "faction nameplate tactical order")
-assertEqual(factionTone, "danger",
+T.equal(factionTone, "danger",
     "faction nameplate hostile tone")
-assertContains(relationshipLine, "A=+12.0",
+T.contains(relationshipLine, "A=+12.0",
     "relationship nameplate approval")
-assertContains(relationshipLine, "state=neutral",
+T.contains(relationshipLine, "state=neutral",
     "relationship nameplate state")
-assertContains(relationshipChangeLine,
+T.contains(relationshipChangeLine,
     "CHANGE treated_wound [social_event]",
     "relationship nameplate change type")
-assertContains(relationshipChangeLine, "dA=+4.0",
+T.contains(relationshipChangeLine, "dA=+4.0",
     "relationship nameplate approval delta")
-assertContains(relationshipChangeLine,
+T.contains(relationshipChangeLine,
     "unknown>neutral",
     "relationship nameplate state transition")
-assertEqual(relationshipTone, "neutral",
+T.equal(relationshipTone, "neutral",
     "relationship nameplate current tone")
-assertEqual(relationshipChangeTone, "success",
+T.equal(relationshipChangeTone, "success",
     "relationship nameplate positive change tone")
 
-local rendererPath = ROOT .. "PNC/UI/Nameplates/PNC_NameplateRenderer.lua"
-local rendererFile = assert(io.open(rendererPath, "r"))
-local rendererSource = rendererFile:read("*a")
-rendererFile:close()
-assertNotContains(rendererSource, "entry.hpText", "numeric HP rendering returned")
+local rendererSource = T.read(
+    "ProjectHoomans", "client", "PNC/UI/Nameplates/PNC_NameplateRenderer.lua"
+)
+T.falsy(string.find(tostring(rendererSource), tostring("entry.hpText"), 1, true), "numeric HP rendering returned")
 
-dofile(rendererPath)
+T.load("ProjectHoomans", "client", "PNC/UI/Nameplates/PNC_NameplateRenderer.lua")
 local pathLines = PNC.NameplateRenderer.BuildPathDebugLines({
     navigationPolicy = "local",
     navigationProvider = "engine_path",
@@ -356,15 +335,15 @@ local pathLines = PNC.NameplateRenderer.BuildPathDebugLines({
     moveBlockReason = "no_goal_progress",
     navigationInvalidationReason = "fake_locomotion_stalled",
 })
-assertContains(pathLines[1], "NAV local/engine_path", "path algorithm")
-assertContains(pathLines[1], "native_path_moving", "native path state")
-assertContains(pathLines[1], "engine_native", "native movement owner")
-assertContains(pathLines[1], "window_climb", "path action edge")
-assertContains(pathLines[2], "np=4", "path non-progress counter")
-assertContains(pathLines[2], "rt=3", "path retarget counter")
-assertContains(pathLines[2], "turn=90", "path turn angle")
-assertContains(pathLines[3], "no_goal_progress", "path block reason")
-assertContains(
+T.contains(pathLines[1], "NAV local/engine_path", "path algorithm")
+T.contains(pathLines[1], "native_path_moving", "native path state")
+T.contains(pathLines[1], "engine_native", "native movement owner")
+T.contains(pathLines[1], "window_climb", "path action edge")
+T.contains(pathLines[2], "np=4", "path non-progress counter")
+T.contains(pathLines[2], "rt=3", "path retarget counter")
+T.contains(pathLines[2], "turn=90", "path turn angle")
+T.contains(pathLines[3], "no_goal_progress", "path block reason")
+T.contains(
     pathLines[3],
     "fake_locomotion_stalled",
     "path replan reason"
@@ -410,24 +389,24 @@ local combatLines = PNC.NameplateRenderer.BuildCombatDebugLines({
         lockRemainingMs = 300,
     },
 }, 3.5)
-assertContains(combatLines[1], "COMBAT ranged", "combat mode")
-assertContains(combatLines[1], "clearing_fire_lane", "combat decision")
-assertContains(combatLines[2], "pressure=3/4", "visible pressure")
-assertContains(combatLines[2], "tol=2", "pressure tolerance")
-assertContains(combatLines[2], "horde=5/7", "visible horde")
-assertContains(combatLines[3], "d=3.5", "live target distance")
-assertContains(combatLines[3], "ACTIVE", "active threat")
-assertContains(combatLines[4], "aim=72%", "aim confidence")
-assertContains(combatLines[4], "lane=BLOCKED:npc", "friendly fire blocker")
-assertContains(combatLines[4], "ammo=5/15", "combat ammo")
-assertContains(combatLines[5], "ACTION ranged/ranged", "attack timing")
-assertContains(
+T.contains(combatLines[1], "COMBAT ranged", "combat mode")
+T.contains(combatLines[1], "clearing_fire_lane", "combat decision")
+T.contains(combatLines[2], "pressure=3/4", "visible pressure")
+T.contains(combatLines[2], "tol=2", "pressure tolerance")
+T.contains(combatLines[2], "horde=5/7", "visible horde")
+T.contains(combatLines[3], "d=3.5", "live target distance")
+T.contains(combatLines[3], "ACTIVE", "active threat")
+T.contains(combatLines[4], "aim=72%", "aim confidence")
+T.contains(combatLines[4], "lane=BLOCKED:npc", "friendly fire blocker")
+T.contains(combatLines[4], "ammo=5/15", "combat ammo")
+T.contains(combatLines[5], "ACTION ranged/ranged", "attack timing")
+T.contains(
     combatLines[5],
     "via=wasBumped+bumped_state",
     "attack animation trigger"
 )
-assertContains(combatLines[5], "state=bumped", "attack action state")
-assertContains(combatLines[6], "MOVE strafe/walk", "tactical movement")
+T.contains(combatLines[5], "state=bumped", "attack action state")
+T.contains(combatLines[6], "MOVE strafe/walk", "tactical movement")
 
 local viewLines = PNC.NameplateRenderer.BuildCombatDebugLines({
     mode = "melee",
@@ -462,19 +441,19 @@ local viewLines = PNC.NameplateRenderer.BuildCombatDebugLines({
         },
     },
 })
-assertContains(viewLines[3], "VIEW zombies=2/3",
+T.contains(viewLines[3], "VIEW zombies=2/3",
     "combat view counts")
-assertContains(viewLines[3], "intent=auto",
+T.contains(viewLines[3], "intent=auto",
     "combat attack intent")
-assertContains(viewLines[4], "target=npc[Alex] via=aggro_lease",
+T.contains(viewLines[4], "target=npc[Alex] via=aggro_lease",
     "zombie NPC target identity")
-assertContains(viewLines[5], "target=none",
+T.contains(viewLines[5], "target=none",
     "zombie without target identity")
-assertContains(viewLines[3], "biteLane=bite_lane_wall",
+T.contains(viewLines[3], "biteLane=bite_lane_wall",
     "blocked zombie attack lane")
-assertContains(viewLines[4], "id=z1 d=1.2 mode=selected",
+T.contains(viewLines[4], "id=z1 d=1.2 mode=selected",
     "selected visible zombie detail")
-assertContains(viewLines[5], "id=z2 d=2.0 mode=biting",
+T.contains(viewLines[5], "id=z2 d=2.0 mode=biting",
     "biting visible zombie detail")
 
 local animationLine =
@@ -495,22 +474,22 @@ local animationLine =
     }, {
         anim = "PNC_Attack1H1",
     })
-assertContains(
+T.contains(
     animationLine,
     "req=PNC_Attack1H1",
     "live animation request"
 )
-assertContains(
+T.contains(
     animationLine,
     "bump=Attack1H1",
     "live engine bump"
 )
-assertContains(
+T.contains(
     animationLine,
     "state=bumped",
     "live action state"
 )
-assertContains(
+T.contains(
     animationLine,
     "useless=true",
     "live body mode"
@@ -542,22 +521,22 @@ local animationTrackLine =
             return track == 1 and 1.0 or 0.0
         end,
     })
-assertContains(
+T.contains(
     animationTrackLine,
     "clip=Bob_Attack1Hand01_Hit",
     "visible animation track"
 )
-assertContains(
+T.contains(
     animationTrackLine,
     "slot=0:1",
     "visible animation slot"
 )
-assertContains(
+T.contains(
     animationTrackLine,
     "frame@30=12",
     "live animation frame"
 )
-assertContains(
+T.contains(
     animationTrackLine,
     "weight=1.000",
     "visible animation blend weight"
@@ -567,7 +546,7 @@ PNC.AnimationTrace = {
         return "TRACE #7 fail=action_handoff_missing"
     end,
 }
-assertContains(
+T.contains(
     PNC.NameplateRenderer.BuildAnimationTraceDebugLine({}),
     "fail=action_handoff_missing",
     "retained animation trace overlay"
@@ -680,19 +659,19 @@ PNC.NameplateRenderer.RenderCombatDebug(manager, {
         },
     },
 })
-assert(renderedLines > 80, "combat geometry was not rendered")
+T.truthy(renderedLines > 80, "combat geometry was not rendered")
 local renderedTextJoined = table.concat(renderedText, "\n")
-assertContains(
+T.contains(
     renderedTextJoined,
     "COMBAT ranged",
     "combat label rendered"
 )
-assertContains(
+T.contains(
     renderedTextJoined,
     "ZED -> Alex Mercer | zed=attacker-zed",
     "zombie attacker target name rendered"
 )
-assertContains(
+T.contains(
     renderedTextJoined,
     "state=bumped bump=Bite",
     "zombie attacker action graph rendered"
@@ -754,10 +733,11 @@ PNC.NameplateEntries.Refresh(overlayManager, {
     showAIDebug = true,
     debugShowAnimation = false,
 })
-assert(overlayManager.entries["unknown-npc"] ~= nil,
+T.truthy(overlayManager.entries["unknown-npc"] ~= nil,
     "debug overlay stayed hidden until the name introduction")
-assertEqual(overlayManager.entries["unknown-npc"].name,
+T.equal(overlayManager.entries["unknown-npc"].name,
     "Unknown survivor",
     "debug overlay leaked an undisclosed NPC name")
+T.finish("pnc_nameplate_debug_smoke")
 
-print("pnc_nameplate_debug_smoke: ok")
+T.finish("pnc_nameplate_debug_smoke")

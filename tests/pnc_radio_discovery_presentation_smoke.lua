@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/"
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "root", "")
 
 package.preload["PsychopatzCore/UI/Radio/PsychopatzRadioSignalHost"] =
     function() return {} end
@@ -48,20 +43,21 @@ HaloTextHelper = {
     end,
 }
 
-dofile(ROOT .. "client/PNC/Integrations/PNC_PsychopatzCoreRadio.lua")
-equal(type(listener), "function", "scan listener registers")
-equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
+T.load(ROOT .. "client/PNC/Integrations/PNC_PsychopatzCoreRadio.lua")
+T.equal(type(listener), "function", "scan listener registers")
+T.equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
     ok = true, notificationID = "settlement:1:1",
     kind = "settlement", phase = 1, identityRevealed = true,
 } }), true, "successful discovery displays feedback")
-equal(halos[1].value, "Found an enclave",
+T.equal(halos[1].value, "Found an enclave",
     "discovery uses a native-style positive arrow notification")
-equal(halos[2].value, "Radio contact identified",
+T.equal(halos[2].value, "Radio contact identified",
     "identity introduction displays separate feedback")
-equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
+T.equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
     ok = true, notificationID = "settlement:1:1",
     kind = "settlement", phase = 1,
 } }), false, "replayed snapshots do not duplicate feedback")
-equal(#halos, 2, "duplicate notification produces no extra halo")
+T.equal(#halos, 2, "duplicate notification produces no extra halo")
+T.finish("pnc_radio_discovery_presentation_smoke")
 
-print("pnc_radio_discovery_presentation_smoke: ok")
+T.finish("pnc_radio_discovery_presentation_smoke")

@@ -1,14 +1,9 @@
-local SHARED =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Conversation/"
-local CLIENT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Conversation/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
+local SHARED =
+    T.path("ProjectHoomans", "shared", "PNC/Conversation/")
+local CLIENT =
+    T.path("ProjectHoomans", "client", "PNC/Conversation/")
 
 local now = 1000
 local candidates = {}
@@ -152,11 +147,11 @@ getCell = function()
     }
 end
 
-dofile(SHARED .. "PNC_ConversationScene.lua")
-dofile(CLIENT .. "PNC_ConversationSafety.lua")
+T.load(SHARED .. "PNC_ConversationScene.lua")
+T.load(CLIENT .. "PNC_ConversationSafety.lua")
 package.preload["PNC/Conversation/PNC_ConversationSafety"] =
     function() return PNC.Conversation.Safety end
-dofile(CLIENT .. "PNC_ConversationLifecycle.lua")
+T.load(CLIENT .. "PNC_ConversationLifecycle.lua")
 
 local Scene = PNC.ConversationScene
 local Safety = PNC.Conversation.Safety
@@ -174,14 +169,14 @@ local started = Scene.Begin(record, npc, player, "lease-1", {
     maximumDistance = 5.5,
     dangerRadius = 8,
 })
-assertEqual(started, true, "conversation scene begins")
-assertEqual(record.activeJob, "FollowOwner", "job is preserved")
-assertEqual(record.activeBehavior, "FollowOwner", "behavior is preserved")
-assertEqual(held, 1, "blocking idle requests movement hold")
+T.equal(started, true, "conversation scene begins")
+T.equal(record.activeJob, "FollowOwner", "job is preserved")
+T.equal(record.activeBehavior, "FollowOwner", "behavior is preserved")
+T.equal(held, 1, "blocking idle requests movement hold")
 staleAttacker = deadEnemy
-assertEqual(Scene.HasThreat(record, npc, player, 8), false,
+T.equal(Scene.HasThreat(record, npc, player, 8), false,
     "stale attacker and managed-body engine target are ignored")
-assertEqual(Safety.Check(spec), nil,
+T.equal(Safety.Check(spec), nil,
     "stale engine combat references do not close the UI")
 
 now = 1800
@@ -189,20 +184,20 @@ started = Scene.Begin(record, npc, player, "lease-1", {
     maximumDistance = 5.5,
     dangerRadius = 8,
 })
-assertEqual(started, true, "same lease heartbeat")
-assertEqual(held, 1, "heartbeat does not restart the idle scene")
+T.equal(started, true, "same lease heartbeat")
+T.equal(held, 1, "heartbeat does not restart the idle scene")
 
 player.x = 12
-assertEqual(Scene.Pump(record, npc, now), true,
+T.equal(Scene.Pump(record, npc, now), true,
     "server ends out-of-range conversation")
-assertEqual(record.runtime.conversationLease, nil, "lease cleared")
-assertEqual(stoppedReason, "conversation_distance",
+T.equal(record.runtime.conversationLease, nil, "lease cleared")
+T.equal(stoppedReason, "conversation_distance",
     "distance stop reason")
-assertEqual(record.nextThinkAt, now, "AI is scheduled to resume immediately")
+T.equal(record.nextThinkAt, now, "AI is scheduled to resume immediately")
 
 player.x = 0
 candidates = { npc }
-assertEqual(Scene.HasThreat(record, npc, player, 8), false,
+T.equal(Scene.HasThreat(record, npc, player, 8), false,
     "talking NPC is not its own threat")
 candidates = { enemy }
 local idleStarted = Scene.Begin(
@@ -212,10 +207,10 @@ local idleStarted = Scene.Begin(
     "lease-idle-enemy",
     { maximumDistance = 5.5, dangerRadius = 8 }
 )
-assertEqual(idleStarted, true,
+T.equal(idleStarted, true,
     "idle nearby enemy does not reject conversation")
 Scene.End(record, npc, "lease-idle-enemy", "test")
-assertEqual(Safety.Check(spec), nil,
+T.equal(Safety.Check(spec), nil,
     "idle nearby enemy does not close client conversation")
 enemyTarget = player
 local dangerStarted, dangerReason = Scene.Begin(
@@ -225,31 +220,31 @@ local dangerStarted, dangerReason = Scene.Begin(
     "lease-danger",
     { maximumDistance = 5.5, dangerRadius = 8 }
 )
-assertEqual(dangerStarted, false,
+T.equal(dangerStarted, false,
     "nearby enemy in combat rejects conversation")
-assertEqual(dangerReason, "danger", "server danger reason")
-assertEqual(Safety.Check(spec), "danger",
+T.equal(dangerReason, "danger", "server danger reason")
+T.equal(Safety.Check(spec), "danger",
     "client detects nearby enemy in combat")
 
 candidates = {}
 enemyTarget = nil
 player.x = 8
-assertEqual(Safety.Check(spec), "distance", "client distance reason")
+T.equal(Safety.Check(spec), "distance", "client distance reason")
 player.x = 0
 
 local state, reason = lifecycle.begin({}, spec)
-assert(type(state) == "table" and reason == nil,
+T.truthy(type(state) == "table" and reason == nil,
     "project lifecycle starts and leases NPC")
 now = now + 1200
-assertEqual(lifecycle.update({}, spec, state), nil,
+T.equal(lifecycle.update({}, spec, state), nil,
     "safe heartbeat keeps conversation active")
 record.runtime.target = enemy
 now = now + 200
-assertEqual(lifecycle.update({}, spec, state), "danger",
+T.equal(lifecycle.update({}, spec, state), "danger",
     "combat snaps dialogue out")
 record.runtime.target = nil
 lifecycle.finish({}, spec, state, "danger")
-assertEqual(record.runtime.conversationLease, nil,
+T.equal(record.runtime.conversationLease, nil,
     "finish releases idle scene")
 
 -- The talking NPC can offer a short parley while it is targeting this
@@ -262,7 +257,7 @@ record.runtime = {
     inCombatUntil = now + 1000,
 }
 spec.context.allowHostileParley = true
-assertEqual(Safety.Check(spec), nil,
+T.equal(Safety.Check(spec), nil,
     "client allows direct hostile parley")
 local parleyStarted, parleyLease = Scene.Begin(
     record,
@@ -275,12 +270,12 @@ local parleyStarted, parleyLease = Scene.Begin(
         allowHostileParley = true,
     }
 )
-assertEqual(parleyStarted, true, "server accepts hostile parley")
-assertEqual(parleyLease.hostileParley, true,
+T.equal(parleyStarted, true, "server accepts hostile parley")
+T.equal(parleyLease.hostileParley, true,
     "lease records hostile parley")
-assertEqual(record.runtime.conversationParley.playerKey,
+T.equal(record.runtime.conversationParley.playerKey,
     "player:Tester:char_tester", "parley ties to stable player key")
-assertEqual(record.runtime.target, nil,
+T.equal(record.runtime.target, nil,
     "parley clears only the speaking NPC's current attack")
 now = now + 1000
 Scene.Begin(record, npc, player, "lease-parley", {
@@ -288,7 +283,7 @@ Scene.Begin(record, npc, player, "lease-parley", {
     dangerRadius = 8,
     allowHostileParley = true,
 })
-assertEqual(record.runtime.conversationParley.untilAt,
+T.equal(record.runtime.conversationParley.untilAt,
     now + Scene.LEASE_MS,
     "parley lease extends with conversation heartbeat")
 local ceasefireOK = Scene.HandleClientCommand(
@@ -296,15 +291,16 @@ local ceasefireOK = Scene.HandleClientCommand(
     Scene.CMD_CEASEFIRE,
     { id = "npc-1", token = "lease-parley" }
 )
-assertEqual(ceasefireOK, true, "ceasefire request accepted")
-assertEqual(#pacifications, 1,
+T.equal(ceasefireOK, true, "ceasefire request accepted")
+T.equal(#pacifications, 1,
     "ceasefire creates player-scoped faction pacification")
-assertEqual(pacifications[1].factionID, "faction_hostile",
+T.equal(pacifications[1].factionID, "faction_hostile",
     "ceasefire uses observer faction")
-assertEqual(pacifications[1].options.durationHours,
+T.equal(pacifications[1].options.durationHours,
     Scene.CEASEFIRE_HOURS, "ceasefire duration is explicit")
 Scene.End(record, npc, "lease-parley", "test")
-assertEqual(record.runtime.conversationParley, nil,
+T.equal(record.runtime.conversationParley, nil,
     "ending conversation restores normal hostile policy")
+T.finish("pnc_conversation_safety_smoke")
 
-print("pnc_conversation_safety_smoke: ok")
+T.finish("pnc_conversation_safety_smoke")

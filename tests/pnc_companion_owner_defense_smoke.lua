@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Perception/PNC_Perception.lua"
+    T.path("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception.lua")
 local spatialQueries = 0
 
 local owner = {
@@ -67,7 +69,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local record = {
     id = "companion",
@@ -84,11 +86,11 @@ local record = {
 }
 
 local target = PNC.Perception.ResolveCompanionTarget(record)
-assert(target ~= nil, "owner attacker was suppressed by follow stealth")
-assert(target.kind == "zombie", "owner attacker target kind")
-assert(target.zombieId == "owner_attacker", "wrong owner-defense zombie")
-assert(target.threatening == true, "owner attacker was not prioritized")
-assert(target.defendingOwner == true, "owner-defense marker missing")
+T.truthy(target ~= nil, "owner attacker was suppressed by follow stealth")
+T.truthy(target.kind == "zombie", "owner attacker target kind")
+T.truthy(target.zombieId == "owner_attacker", "wrong owner-defense zombie")
+T.truthy(target.threatening == true, "owner attacker was not prioritized")
+T.truthy(target.defendingOwner == true, "owner-defense marker missing")
 
 local secondRecord = {
     id = "companion_2",
@@ -101,9 +103,10 @@ local secondRecord = {
     },
     runtime = {},
 }
-assert(PNC.Perception.ResolveCompanionTarget(secondRecord).zombieId
+T.truthy(PNC.Perception.ResolveCompanionTarget(secondRecord).zombieId
     == "owner_attacker", "shared owner threat cache lost its target")
-assert(spatialQueries == 1,
+T.truthy(spatialQueries == 1,
     "companions with one owner repeated the same spatial threat query")
+T.finish("pnc_companion_owner_defense_smoke")
 
-print("pnc_companion_owner_defense_smoke: ok")
+T.finish("pnc_companion_owner_defense_smoke")

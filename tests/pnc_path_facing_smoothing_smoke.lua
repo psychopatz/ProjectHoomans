@@ -1,4 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/"
 
 PNC = {
@@ -15,8 +17,8 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "PNC_PathService/PNC_PathService_Context.lua")
-dofile(ROOT .. "PNC_PathService/PNC_PathService_Facing.lua")
+T.load(ROOT .. "PNC_PathService/PNC_PathService_Context.lua")
+T.load(ROOT .. "PNC_PathService/PNC_PathService_Facing.lua")
 
 local faceCalls = 0
 local body = {
@@ -28,12 +30,12 @@ local body = {
 }
 local lane = {}
 
-assert(
+T.truthy(
     PNC.PathService.ApplyTravelFacing(body, lane, 1, 0, 100),
     "initial locomotion facing was not applied"
 )
 local angle = math.rad(2)
-assert(
+T.truthy(
     PNC.PathService.ApplyTravelFacing(
         body,
         lane,
@@ -43,7 +45,7 @@ assert(
     ),
     "small continuous heading change was suppressed"
 )
-assert(faceCalls == 2, "locomotion heading was not refreshed dynamically")
+T.truthy(faceCalls == 2, "locomotion heading was not refreshed dynamically")
 
 local traversalLane = {}
 PNC.PathService.Internal.noteTraversalAttempt(
@@ -59,7 +61,7 @@ PNC.PathService.Internal.noteTraversalAttempt(
     1000,
     1
 )
-assert(PNC.PathService.Internal.isRepeatedTraversalAttempt(
+T.truthy(PNC.PathService.Internal.isRepeatedTraversalAttempt(
     traversalLane,
     "fence:10:10:0",
     10.5,
@@ -68,5 +70,6 @@ assert(PNC.PathService.Internal.isRepeatedTraversalAttempt(
     99,
     1200
 ), "moving goal allowed an immediate reverse fence crossing")
+T.finish("pnc_path_facing_smoothing_smoke")
 
-print("pnc_path_facing_smoothing_smoke: ok")
+T.finish("pnc_path_facing_smoothing_smoke")

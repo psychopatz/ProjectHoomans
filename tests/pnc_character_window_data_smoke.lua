@@ -1,16 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/CharacterWindow/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertNear(actual, expected, label)
-    if math.abs((tonumber(actual) or 0) - expected) > 0.000001 then
-        error((label or "assertNear") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "client", "PNC/UI/CharacterWindow/")
 
 local itemData = {
     ["Base.Jacket"] = { name = "Leather Jacket", bite = 30, scratch = 50, insulation = 0.8, wind = 0.7, covered = { "Torso_Upper", "Torso_Lower" } },
@@ -44,7 +34,7 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "PNC_CharacterWindow_Shared.lua")
+T.load(ROOT .. "PNC_CharacterWindow_Shared.lua")
 
 local snapshot = {
     id = "npc_ui",
@@ -70,15 +60,15 @@ local savedNext = next
 next = nil
 local rows = PNC.CharacterWindowShared.BuildClothingRows(snapshot, nil)
 next = savedNext
-assertEqual(#rows, 2, "clothing row count")
-assertEqual(rows[1].location, "Jacket", "stable clothing sort")
-assertEqual(rows[1].name, "Leather Jacket", "display name")
+T.equal(#rows, 2, "clothing row count")
+T.equal(rows[1].location, "Jacket", "stable clothing sort")
+T.equal(rows[1].name, "Leather Jacket", "display name")
 
 local summary = PNC.CharacterWindowShared.SummarizeClothing(rows)
-assertEqual(summary.biteAverage, 20, "average bite defense")
-assertEqual(summary.scratchAverage, 35, "average scratch defense")
-assertNear(summary.insulationAverage, 0.6, "average insulation")
-assertNear(summary.windAverage, 0.5, "average wind resistance")
+T.equal(summary.biteAverage, 20, "average bite defense")
+T.equal(summary.scratchAverage, 35, "average scratch defense")
+T.near(summary.insulationAverage, 0.6, 0.000001, "average insulation")
+T.near(summary.windAverage, 0.5, 0.000001, "average wind resistance")
 
 local payload = {
     snapshot = snapshot,
@@ -97,15 +87,15 @@ local payload = {
     },
 }
 local stateRows = PNC.CharacterWindowShared.BuildClothingRows(snapshot, payload, "npc_ui")
-assertEqual(stateRows[1].condition, 4, "virtual clothing condition")
-assertNear(stateRows[1].conditionRatio, 0.4, "virtual condition ratio")
-assertEqual(stateRows[1].fullType, "Base.Jacket",
+T.equal(stateRows[1].condition, 4, "virtual clothing condition")
+T.near(stateRows[1].conditionRatio, 0.4, 0.000001, "virtual condition ratio")
+T.equal(stateRows[1].fullType, "Base.Jacket",
     "inventory worn map overrides stale equipment summary")
 local protection = PNC.CharacterWindowShared.BuildBodyProtection("npc_ui", snapshot, payload, stateRows)
-assertNear(protection.Torso_Upper.bite, 12, "condition-adjusted covered bite defense")
-assertNear(protection.Torso_Upper.scratch, 20, "condition-adjusted covered scratch defense")
+T.near(protection.Torso_Upper.bite, 12, 0.000001, "condition-adjusted covered bite defense")
+T.near(protection.Torso_Upper.scratch, 20, 0.000001, "condition-adjusted covered scratch defense")
 local insulation = PNC.CharacterWindowShared.BuildBodyInsulation("npc_ui", snapshot, payload, stateRows)
-assertNear(insulation.Torso_Upper.insulation, 0.32, "condition-adjusted covered insulation")
+T.near(insulation.Torso_Upper.insulation, 0.32, 0.000001, "condition-adjusted covered insulation")
 
 PNC.ClientPresenceSync = {
     BodyByID = {
@@ -117,8 +107,8 @@ PNC.ClientPresenceSync = {
     },
 }
 protection = PNC.CharacterWindowShared.BuildBodyProtection("npc_ui", snapshot, nil, stateRows)
-assertEqual(protection.Head.bite, 28, "live per-part bite defense")
-assertEqual(protection.Head.scratch, 18, "live per-part scratch defense")
+T.equal(protection.Head.bite, 28, "live per-part bite defense")
+T.equal(protection.Head.scratch, 18, "live per-part scratch defense")
 
 local liveJacket = itemData["Base.Jacket"]
 local wornEntry = {
@@ -137,12 +127,13 @@ PNC.ClientPresenceSync.BodyByID.npc_ui = {
     end,
 }
 local liveRows = PNC.CharacterWindowShared.BuildClothingRows(snapshot, payload, "npc_ui")
-assertEqual(liveRows[1].item, liveJacket, "Build 42 worn-item lookup uses typed-safe iteration")
+T.equal(liveRows[1].item, liveJacket, "Build 42 worn-item lookup uses typed-safe iteration")
 
 local spec = PNC.CharacterWindowShared.BuildPortraitSpec("npc_ui", snapshot, nil)
-assertEqual(spec.id, "npc_ui", "portrait id")
-assertEqual(spec.identitySeed, 42, "portrait seed")
-assertEqual(spec.isFemale, true, "portrait gender")
-assertEqual(spec.equipment.worn.Jacket, "Base.Jacket", "portrait equipment")
+T.equal(spec.id, "npc_ui", "portrait id")
+T.equal(spec.identitySeed, 42, "portrait seed")
+T.equal(spec.isFemale, true, "portrait gender")
+T.equal(spec.equipment.worn.Jacket, "Base.Jacket", "portrait equipment")
+T.finish("pnc_character_window_data_smoke")
 
-print("pnc_character_window_data_smoke: ok")
+T.finish("pnc_character_window_data_smoke")

@@ -1,14 +1,7 @@
-local Paths = dofile("tests/pnc_test_paths.lua")
-local ROOT = Paths.modRoot("ProjectHoomans") .. "media/lua/"
-package.path = ROOT .. "shared/?.lua;" .. ROOT .. "server/?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then error((label or "value") .. " expected="
-        .. tostring(expected) .. " actual=" .. tostring(actual), 2) end
-end
-local function truthy(value, label)
-    if not value then error((label or "value") .. " expected truthy", 2) end
-end
+T.addPackagePaths()
+
 local function copy(value)
     if type(value) ~= "table" then return value end
     local output = {}; for key, entry in pairs(value) do output[key] = copy(entry) end
@@ -239,15 +232,15 @@ local Research = require "PNC/Production/PNC_ResearchService"
 local Crafting = require "PNC/Production/PNC_CraftingService"
 local Construction = require
     "PNC/Production/ConstructionService/PNC_ConstructionService"
-truthy(Research.Commands.UnlockRecipe("c1", 1, "f1"), "seed known recipe")
+T.truthy(Research.Commands.UnlockRecipe("c1", 1, "f1"), "seed known recipe")
 
-local technology = assert(Research.Commands.QueueTechnology({},
+local technology = T.truthy(Research.Commands.QueueTechnology({},
     "facility:workshop"))
 local sameTechnology, duplicateReason = Research.Commands.QueueTechnology({},
     "facility:workshop")
-equal(sameTechnology.id, technology.id,
+T.equal(sameTechnology.id, technology.id,
     "duplicate technology request reuses resumable work")
-equal(duplicateReason, "ALREADY_QUEUED",
+T.equal(duplicateReason, "ALREADY_QUEUED",
     "duplicate technology request reports existing queue entry")
 local activeTechnologyCount = 0
 for _, order in ipairs(Work.Queries.List("c1")) do
@@ -255,163 +248,163 @@ for _, order in ipairs(Work.Queries.List("c1")) do
         and order.payload and order.payload.mode == "technology"
     then activeTechnologyCount = activeTechnologyCount + 1 end
 end
-equal(activeTechnologyCount, 1,
+T.equal(activeTechnologyCount, 1,
     "technology queue contains one authoritative task")
-truthy(Work.Commands.Cancel(technology.id),
+T.truthy(Work.Commands.Cancel(technology.id),
     "technology dedupe fixture cancellation")
 local lockedHQ, lockedHQReason = Research.Commands.QueueTechnology({}, "hq:3")
-equal(lockedHQ, nil, "later HQ research remains prerequisite gated")
-equal(lockedHQReason, "PREREQUISITE_REQUIRED", "HQ prerequisite reason")
-local hqTwo = assert(Research.Commands.QueueTechnology({}, "hq:2"))
-truthy(Work.Commands.Assign(hqTwo.id, "worker"), "HQ research assignment")
-equal(acquiredCapabilities[#acquiredCapabilities], "work.research",
+T.equal(lockedHQ, nil, "later HQ research remains prerequisite gated")
+T.equal(lockedHQReason, "PREREQUISITE_REQUIRED", "HQ prerequisite reason")
+local hqTwo = T.truthy(Research.Commands.QueueTechnology({}, "hq:2"))
+T.truthy(Work.Commands.Assign(hqTwo.id, "worker"), "HQ research assignment")
+T.equal(acquiredCapabilities[#acquiredCapabilities], "work.research",
     "HQ capability research routes to the Research Station")
-truthy(Work.Commands.AddProgress(hqTwo.id, "worker", 100),
+T.truthy(Work.Commands.AddProgress(hqTwo.id, "worker", 100),
     "HQ research completion")
-truthy(Research.Queries.HasTechnology("c1", "hq:2"),
+T.truthy(Research.Queries.HasTechnology("c1", "hq:2"),
     "HQ upgrade capability unlocks only after Work Points complete")
-local legacyLow = assert(Work.Commands.Queue({
+local legacyLow = T.truthy(Work.Commands.Queue({
     operation = "RESEARCH", colonyId = "c1", factionId = "f1",
     baseId = "b1", requiredWork = 60, progress = 5,
     payload = { mode = "technology", technologyId = "facility:workshop" },
 }))
-local legacyHigh = assert(Work.Commands.Queue({
+local legacyHigh = T.truthy(Work.Commands.Queue({
     operation = "RESEARCH", colonyId = "c1", factionId = "f1",
     baseId = "b1", requiredWork = 60, progress = 25,
     payload = { mode = "technology", technologyId = "facility:workshop" },
 }))
-equal(Research.Commands.ReconcileDuplicates(), 1,
+T.equal(Research.Commands.ReconcileDuplicates(), 1,
     "saved duplicate technology work is reconciled")
-equal(Work.Queries.Get(legacyLow.id).status, "CANCELLED",
+T.equal(Work.Queries.Get(legacyLow.id).status, "CANCELLED",
     "lower-progress duplicate is retired")
-equal(Work.Queries.Get(legacyHigh.id).progress, 25,
+T.equal(Work.Queries.Get(legacyHigh.id).progress, 25,
     "most-progressed resumable research is preserved")
-truthy(Work.Commands.Cancel(legacyHigh.id),
+T.truthy(Work.Commands.Cancel(legacyHigh.id),
     "legacy research reconciliation fixture cancellation")
 
-local first = assert(Crafting.Commands.QueueCraft({}, 1, 1))
+local first = T.truthy(Crafting.Commands.QueueCraft({}, 1, 1))
 local blocked, reason = Crafting.Commands.QueueCraft({}, 1, 1)
-equal(blocked, nil, "reservation blocks double spend")
-equal(reason, "MISSING_MATERIALS", "material blocker")
-truthy(Work.Commands.Cancel(first.id), "craft cancellation")
-equal(inventory["Base.Plank"], 2, "cancel preserves inputs")
+T.equal(blocked, nil, "reservation blocks double spend")
+T.equal(reason, "MISSING_MATERIALS", "material blocker")
+T.truthy(Work.Commands.Cancel(first.id), "craft cancellation")
+T.equal(inventory["Base.Plank"], 2, "cancel preserves inputs")
 
-local craft = assert(Crafting.Commands.QueueCraft({}, 1, 1))
-truthy(Work.Commands.Assign(craft.id, "worker"), "craft assignment")
-truthy(Work.Commands.AddProgress(craft.id, "worker", 100), "craft completion")
-equal(inventory["Base.Plank"], 0, "inputs consumed once")
-equal(inventory["Base.SpearCrafted"], 1, "output created once")
+local craft = T.truthy(Crafting.Commands.QueueCraft({}, 1, 1))
+T.truthy(Work.Commands.Assign(craft.id, "worker"), "craft assignment")
+T.truthy(Work.Commands.AddProgress(craft.id, "worker", 100), "craft completion")
+T.equal(inventory["Base.Plank"], 0, "inputs consumed once")
+T.equal(inventory["Base.SpearCrafted"], 1, "output created once")
 local persisted = WorkRepository.Get(craft.id)
 persisted.completionCommitted = false
 persisted.payload.inputsCommitted, persisted.payload.outputCommitted = false, false
 persisted.status, persisted.progress = "WAITING_FOR_WORKER", 0
-truthy(Work.Commands.Assign(craft.id, "worker"), "recovered craft assignment")
-truthy(Work.Commands.AddProgress(craft.id, "worker", 100), "recovered completion")
-equal(inventory["Base.Plank"], 0, "recovery does not reconsume")
-equal(inventory["Base.SpearCrafted"], 1, "recovery does not duplicate output")
+T.truthy(Work.Commands.Assign(craft.id, "worker"), "recovered craft assignment")
+T.truthy(Work.Commands.AddProgress(craft.id, "worker", 100), "recovered completion")
+T.equal(inventory["Base.Plank"], 0, "recovery does not reconsume")
+T.equal(inventory["Base.SpearCrafted"], 1, "recovery does not duplicate output")
 
 ResearchRepository.ByColony, ResearchRepository.Runtime = {}, {}
 local workshopCatalog = Crafting.Queries.BuildSnapshot("c1")
-equal(#workshopCatalog.disassemblyCandidates, 1,
+T.equal(#workshopCatalog.disassemblyCandidates, 1,
     "workshop snapshot exposes only server-supported salvage items")
-equal(workshopCatalog.disassemblyCandidates[1].fullType, "Base.Axe",
+T.equal(workshopCatalog.disassemblyCandidates[1].fullType, "Base.Axe",
     "blueprints and currency do not leak into the salvage catalog")
-equal(workshopCatalog.disassemblyCandidates[1].potentialYield[1].fullType,
+T.equal(workshopCatalog.disassemblyCandidates[1].potentialYield[1].fullType,
     "Base.Plank", "salvage catalog exposes its potential material yield")
-equal(#Crafting.Queries.DisassemblyCandidates({ id = "money-test",
+T.equal(#Crafting.Queries.DisassemblyCandidates({ id = "money-test",
     inventory = { records = {{}} } }), 0,
     "currency is never offered as salvage input")
 local researchCatalog = Research.Queries.BuildSnapshot("c1")
-equal(#researchCatalog.candidates, 2,
+T.equal(#researchCatalog.candidates, 2,
     "research snapshot exposes blueprint and reverse-engineering choices")
-equal(researchCatalog.candidates[1].mode, "blueprint",
+T.equal(researchCatalog.candidates[1].mode, "blueprint",
     "blueprint research choice is categorized")
-equal(researchCatalog.candidates[2].mode, "reverse",
+T.equal(researchCatalog.candidates[2].mode, "reverse",
     "specimen research choice is categorized")
-local reverse = assert(Research.Commands.ReverseEngineer({}, 2))
-truthy(Work.Commands.Assign(reverse.id, "worker"),
+local reverse = T.truthy(Research.Commands.ReverseEngineer({}, 2))
+T.truthy(Work.Commands.Assign(reverse.id, "worker"),
     "reverse routing assignment")
-equal(acquiredCapabilities[#acquiredCapabilities], "work.reverse",
+T.equal(acquiredCapabilities[#acquiredCapabilities], "work.reverse",
     "reverse engineering routes to the laboratory")
-truthy(Work.Commands.Cancel(reverse.id), "reverse routing cleanup")
+T.truthy(Work.Commands.Cancel(reverse.id), "reverse routing cleanup")
 occupied["work.reverse"] = nil
-reverse = assert(Research.Commands.ReverseEngineer({}, 2))
-truthy(Work.Commands.Cancel(reverse.id), "reverse cancellation")
-equal(inventory["Base.Axe"], 1, "cancel preserves specimen")
-reverse = assert(Research.Commands.ReverseEngineer({}, 2))
-truthy(Work.Commands.Assign(reverse.id, "worker"), "reverse assignment")
-truthy(Work.Commands.AddProgress(reverse.id, "worker", 100), "reverse completion")
-equal(inventory["Base.Axe"], 0, "reverse consumes specimen once")
-truthy(Research.Queries.HasRecipe("c1", 1), "reverse unlocks recipe")
+reverse = T.truthy(Research.Commands.ReverseEngineer({}, 2))
+T.truthy(Work.Commands.Cancel(reverse.id), "reverse cancellation")
+T.equal(inventory["Base.Axe"], 1, "cancel preserves specimen")
+reverse = T.truthy(Research.Commands.ReverseEngineer({}, 2))
+T.truthy(Work.Commands.Assign(reverse.id, "worker"), "reverse assignment")
+T.truthy(Work.Commands.AddProgress(reverse.id, "worker", 100), "reverse completion")
+T.equal(inventory["Base.Axe"], 0, "reverse consumes specimen once")
+T.truthy(Research.Queries.HasRecipe("c1", 1), "reverse unlocks recipe")
 
 ResearchRepository.ByColony, ResearchRepository.Runtime = {}, {}
-local blueprint = assert(Research.Commands.StudyBlueprint({}, 1))
-truthy(Work.Commands.Assign(blueprint.id, "worker"), "blueprint assignment")
-equal(acquiredCapabilities[#acquiredCapabilities], "work.blueprint",
+local blueprint = T.truthy(Research.Commands.StudyBlueprint({}, 1))
+T.truthy(Work.Commands.Assign(blueprint.id, "worker"), "blueprint assignment")
+T.equal(acquiredCapabilities[#acquiredCapabilities], "work.blueprint",
     "blueprint study routes to the architect bench")
-truthy(Work.Commands.AddProgress(blueprint.id, "worker", 100),
+T.truthy(Work.Commands.AddProgress(blueprint.id, "worker", 100),
     "blueprint completion")
-equal(inventory["PNC.RecipeBlueprint"], 1, "blueprint returned by policy")
-truthy(Research.Queries.HasRecipe("c1", 1), "blueprint unlocks recipe")
+T.equal(inventory["PNC.RecipeBlueprint"], 1, "blueprint returned by policy")
+T.truthy(Research.Queries.HasRecipe("c1", 1), "blueprint unlocks recipe")
 
 local kitOK, kit = Research.Commands.CreateSpearTestKit({})
-truthy(kitOK, "spear debug kit")
-equal(kit.recipeId, 1, "spear kit targets deterministic recipe")
-truthy(inventory["Base.Plank"] >= 8, "spear kit adds crafting materials")
-truthy(inventory["Base.SpearCrafted"] >= 2,
+T.truthy(kitOK, "spear debug kit")
+T.equal(kit.recipeId, 1, "spear kit targets deterministic recipe")
+T.truthy(inventory["Base.Plank"] >= 8, "spear kit adds crafting materials")
+T.truthy(inventory["Base.SpearCrafted"] >= 2,
     "spear kit adds reverse-engineering and deconstruction specimens")
 
-local bootstrap = assert(Construction.QueueBuild({}, bootstrapFacility, {
+local bootstrap = T.truthy(Construction.QueueBuild({}, bootstrapFacility, {
     bootstrapFromPlayer = true, buildWork = 5, buildCosts = {
         { fullType = "Base.Money", amount = 1 },
     },
 }))
-equal(bootstrap.funded, true, "bootstrap stockpile starts funded")
-equal(bootstrap.payload.input.bootstrap, true,
+T.equal(bootstrap.funded, true, "bootstrap stockpile starts funded")
+T.equal(bootstrap.payload.input.bootstrap, true,
     "bootstrap stockpile skips stockpile collection")
-equal(bootstrapConsumes, 1, "bootstrap cost comes from player inventory")
-truthy(Work.Commands.Assign(bootstrap.id, "worker"),
+T.equal(bootstrapConsumes, 1, "bootstrap cost comes from player inventory")
+T.truthy(Work.Commands.Assign(bootstrap.id, "worker"),
     "bootstrap constructor assignment")
-truthy(Work.Commands.AddProgress(bootstrap.id, "worker", 100),
+T.truthy(Work.Commands.AddProgress(bootstrap.id, "worker", 100),
     "bootstrap construction completion")
-local stockpileUpgrade = assert(Construction.QueueReconstruct({},
+local stockpileUpgrade = T.truthy(Construction.QueueReconstruct({},
     bootstrapFacility, { action = "upgrade", targetLevel = 2 }))
-equal(stockpileUpgrade.funded, false,
+T.equal(stockpileUpgrade.funded, false,
     "stockpile tier upgrade collects its material")
-truthy(Work.Commands.Assign(stockpileUpgrade.id, "worker"),
+T.truthy(Work.Commands.Assign(stockpileUpgrade.id, "worker"),
     "stockpile upgrade assignment")
-truthy(Work.Commands.AddProgress(stockpileUpgrade.id, "worker", 100),
+T.truthy(Work.Commands.AddProgress(stockpileUpgrade.id, "worker", 100),
     "stockpile upgrade completion")
-equal(bootstrapFacility.level, 2, "stockpile facility reaches tier two")
-equal(storageTier, 2, "stockpile facility tier updates storage capacity tier")
+T.equal(bootstrapFacility.level, 2, "stockpile facility reaches tier two")
+T.equal(storageTier, 2, "stockpile facility tier updates storage capacity tier")
 inventory["Base.Money"] = 1
 
-local abandonedBuild = assert(Construction.QueueBuild({}, constructionFacility,
+local abandonedBuild = T.truthy(Construction.QueueBuild({}, constructionFacility,
     PNC.FacilityDefinitions.Get()))
-local replacement = assert(Construction.QueueDeconstruct({},
+local replacement = T.truthy(Construction.QueueDeconstruct({},
     constructionFacility))
-equal(Work.Queries.Get(abandonedBuild.id).status, "CANCELLED",
+T.equal(Work.Queries.Get(abandonedBuild.id).status, "CANCELLED",
     "deconstruct replaces unfinished build")
-equal(reserved["Base.Money"], 0,
+T.equal(reserved["Base.Money"], 0,
     "replacing unfinished build releases its materials")
-truthy(Work.Commands.Cancel(replacement.id),
+T.truthy(Work.Commands.Cancel(replacement.id),
     "cancel replacement deconstruction")
-equal(constructionFacility.constructionState, "PLANNED",
+T.equal(constructionFacility.constructionState, "PLANNED",
     "cancelled replacement leaves the plan intact")
 
-local build = assert(Construction.QueueBuild({}, constructionFacility,
+local build = T.truthy(Construction.QueueBuild({}, constructionFacility,
     PNC.FacilityDefinitions.Get()))
-equal(build.funded, false, "construction waits for material collection")
-equal(inventory["Base.Money"], 1,
+T.equal(build.funded, false, "construction waits for material collection")
+T.equal(inventory["Base.Money"], 1,
     "queued construction leaves reserved stock in storage")
-equal(reserved["Base.Money"], 1,
+T.equal(reserved["Base.Money"], 1,
     "queued construction retains its material reservation")
-equal(constructionFacility.constructionState, "UNDER_CONSTRUCTION",
+T.equal(constructionFacility.constructionState, "UNDER_CONSTRUCTION",
     "build enters construction state")
-truthy(Work.Commands.Assign(build.id, "worker"), "constructor assignment")
-truthy(Work.Commands.AddProgress(build.id, "worker", 4),
+T.truthy(Work.Commands.Assign(build.id, "worker"), "constructor assignment")
+T.truthy(Work.Commands.AddProgress(build.id, "worker", 4),
     "first constructor contributes work points")
-equal(Work.BuildActionInformation(PNC.Registry.Data.worker).percent, 40,
+T.equal(Work.BuildActionInformation(PNC.Registry.Data.worker).percent, 40,
     "action information reports shared order progress")
 PNC.Registry.Data.worker.alive = false
 constructionFacility.constructionState = "PLANNED"
@@ -420,59 +413,59 @@ PNC.Registry.Data.backup = { id = "backup", alive = true, factionId = "f1",
     allowedJobs = { Constructor = true } }
 clock = clock + 1001
 Work.Tick(clock)
-equal(Work.Queries.Get(build.id).progress, 4,
+T.equal(Work.Queries.Get(build.id).progress, 4,
     "worker interruption preserves construction progress")
-equal(inventory["Base.Money"], 1,
+T.equal(inventory["Base.Money"], 1,
     "worker interruption preserves unconsumed construction material")
-equal(constructionFacility.constructionState, "UNDER_CONSTRUCTION",
+T.equal(constructionFacility.constructionState, "UNDER_CONSTRUCTION",
     "active order repairs stale planned facility state")
 clock = clock + 1001
 Work.Tick(clock)
-equal(Work.Queries.Get(build.id).workerId, "backup",
+T.equal(Work.Queries.Get(build.id).workerId, "backup",
     "another constructor continues the interrupted order")
-equal(Work.BuildActionInformation(PNC.Registry.Data.backup).percent, 40,
+T.equal(Work.BuildActionInformation(PNC.Registry.Data.backup).percent, 40,
     "replacement worker sees existing progress")
-truthy(Work.Commands.AddProgress(build.id, "backup", 100),
+T.truthy(Work.Commands.AddProgress(build.id, "backup", 100),
     "replacement constructor completes shared work points")
-equal(inventory["Base.Money"], 0,
+T.equal(inventory["Base.Money"], 0,
     "construction completion consumes reserved material once")
-equal(constructionFacility.constructionState, "BUILT",
+T.equal(constructionFacility.constructionState, "BUILT",
     "construction completion activates facility")
 inventory["Base.Money"] = 1
-local reconstruct = assert(Construction.QueueReconstruct({},
+local reconstruct = T.truthy(Construction.QueueReconstruct({},
     constructionFacility, { action = "set", component = {
         id = "room:1", kind = "region", role = "sleep.area" } }))
-equal(constructionFacility.constructionState, "RECONSTRUCTING",
+T.equal(constructionFacility.constructionState, "RECONSTRUCTING",
     "zone edit enters reconstruction state")
-truthy(Work.Commands.Assign(reconstruct.id, "backup"),
+T.truthy(Work.Commands.Assign(reconstruct.id, "backup"),
     "reconstruction assignment")
-truthy(Work.Commands.AddProgress(reconstruct.id, "backup", 100),
+T.truthy(Work.Commands.AddProgress(reconstruct.id, "backup", 100),
     "abstract reconstruction completes by work points")
-equal(reconstructedComponent.id, "room:1",
+T.equal(reconstructedComponent.id, "room:1",
     "zone mutation commits only after reconstruction")
-equal(constructionFacility.constructionState, "BUILT",
+T.equal(constructionFacility.constructionState, "BUILT",
     "reconstruction restores built state")
-local deconstruct = assert(Construction.QueueDeconstruct({},
+local deconstruct = T.truthy(Construction.QueueDeconstruct({},
     constructionFacility))
-truthy(Work.Commands.Assign(deconstruct.id, "backup"),
+T.truthy(Work.Commands.Assign(deconstruct.id, "backup"),
     "deconstruction assignment")
-truthy(Work.Commands.AddProgress(deconstruct.id, "backup", 100),
+T.truthy(Work.Commands.AddProgress(deconstruct.id, "backup", 100),
     "abstract deconstruction completes by work points")
-equal(constructionDestroyed, true, "deconstruction removes facility parts")
+T.equal(constructionDestroyed, true, "deconstruction removes facility parts")
 
 -- An untouched project releases its reservation when cancelled, so the next
 -- project can use the stock immediately without a duplicate refund deposit.
 inventory["Base.Money"] = 1
 constructionFacility.constructionState = "PLANNED"
-local cancelledBuild = assert(Construction.QueueBuild({}, constructionFacility,
+local cancelledBuild = T.truthy(Construction.QueueBuild({}, constructionFacility,
     PNC.FacilityDefinitions.Get()))
-equal(inventory["Base.Money"], 1,
+T.equal(inventory["Base.Money"], 1,
     "cancel test project leaves reserved stock unconsumed")
-truthy(Work.Commands.Cancel(cancelledBuild.id),
+T.truthy(Work.Commands.Cancel(cancelledBuild.id),
     "reserved construction can be cancelled")
-equal(inventory["Base.Money"], 1,
+T.equal(inventory["Base.Money"], 1,
     "cancelling an untouched project releases its materials")
-equal(constructionFacility.constructionState, "PLANNED",
+T.equal(constructionFacility.constructionState, "PLANNED",
     "cancelled construction returns to planned state")
 
 -- A colonist whose legacy affiliation omitted communityID still cycles from
@@ -489,47 +482,47 @@ PNC.HomeDutyService = {
     end,
 }
 constructionFacility.constructionState = "BUILT"
-local homeTask = assert(Work.Commands.Queue({
+local homeTask = T.truthy(Work.Commands.Queue({
     operation = "RECONSTRUCT", colonyId = "c1", factionId = "f1",
     baseId = "b1", requiredWork = 5,
     payload = { facilityId = constructionFacility.id, change = {} },
 }))
 clock = clock + 1001
 Work.Tick(clock)
-equal(Work.Queries.Get(homeTask.id).workerId, "backup",
+T.equal(Work.Queries.Get(homeTask.id).workerId, "backup",
     "At Home colonist claims the next queued task")
-equal(PNC.Registry.Data.backup.runtime.workOrderId, homeTask.id,
+T.equal(PNC.Registry.Data.backup.runtime.workOrderId, homeTask.id,
     "At Home yields to emulated production work")
 local taskRows = Work.Queries.BuildTaskSnapshot("c1")
 local foundHomeTask
 for _, task in ipairs(taskRows) do
     if task.id == homeTask.id then foundHomeTask = task end
 end
-truthy(foundHomeTask, "task snapshot contains active home task")
-equal(foundHomeTask.workerName, "backup", "task snapshot worker name")
-equal(foundHomeTask.executionMode, "ABSTRACT",
+T.truthy(foundHomeTask, "task snapshot contains active home task")
+T.equal(foundHomeTask.workerName, "backup", "task snapshot worker name")
+T.equal(foundHomeTask.executionMode, "ABSTRACT",
     "task snapshot exposes emulated execution mode")
-truthy(Work.Commands.Cancel(homeTask.id), "cancel first cycled task")
-equal(PNC.Registry.Data.backup.orderSpec.kind, "colony_home",
+T.truthy(Work.Commands.Cancel(homeTask.id), "cancel first cycled task")
+T.equal(PNC.Registry.Data.backup.orderSpec.kind, "colony_home",
     "colonist returns to At Home between tasks")
-local nextHomeTask = assert(Work.Commands.Queue({
+local nextHomeTask = T.truthy(Work.Commands.Queue({
     operation = "RECONSTRUCT", colonyId = "c1", factionId = "f1",
     baseId = "b1", requiredWork = 5,
     payload = { facilityId = constructionFacility.id, change = {} },
 }))
 clock = clock + 1001
 Work.Tick(clock)
-equal(Work.Queries.Get(nextHomeTask.id).workerId, "backup",
+T.equal(Work.Queries.Get(nextHomeTask.id).workerId, "backup",
     "At Home colonist cycles into another queued task")
 local resumed, resumedOrder = Work.Commands.Resume(nextHomeTask.id)
-truthy(resumed, "interrupted construction can be resumed")
-equal(resumedOrder.status, "WAITING_FOR_WORKER",
+T.truthy(resumed, "interrupted construction can be resumed")
+T.equal(resumedOrder.status, "WAITING_FOR_WORKER",
     "resume returns the durable order to the scheduler")
-equal(resumedOrder.blockedReason, nil,
+T.equal(resumedOrder.blockedReason, nil,
     "resume clears the stale blocked reason")
-equal(PNC.Registry.Data.backup.runtime.workOrderId, nil,
+T.equal(PNC.Registry.Data.backup.runtime.workOrderId, nil,
     "resume releases the old worker claim safely")
-truthy(Work.Commands.Cancel(nextHomeTask.id), "cancel second cycled task")
+T.truthy(Work.Commands.Cancel(nextHomeTask.id), "cancel second cycled task")
 
 -- Save/load keeps the project contract but drops worker and reservation state.
 WorkRepository.Import({ schemaVersion = 1, nextId = 2, byId = {
@@ -543,18 +536,19 @@ WorkRepository.Import({ schemaVersion = 1, nextId = 2, byId = {
                 staged = true, itemIds = { "item:1" }, funded = true } } },
 } })
 local recoveredProject = WorkRepository.Get("work:1")
-equal(recoveredProject.status, "WAITING_FOR_WORKER",
+T.equal(recoveredProject.status, "WAITING_FOR_WORKER",
     "recovery clears runtime blocked state for construction")
-equal(recoveredProject.workerId, nil,
+T.equal(recoveredProject.workerId, nil,
     "recovery drops construction worker assignment")
-equal(recoveredProject.payload.requirements, nil,
+T.equal(recoveredProject.payload.requirements, nil,
     "recovery drops the duplicated construction recipe")
-equal(recoveredProject.payload.input.reservationId, nil,
+T.equal(recoveredProject.payload.input.reservationId, nil,
     "recovery drops the old reservation handle")
 local beforeLegacyCancel = inventory["Base.Money"]
-truthy(Work.Commands.Cancel(recoveredProject.id),
+T.truthy(Work.Commands.Cancel(recoveredProject.id),
     "recovered construction can be cancelled without its old reservation")
-equal(inventory["Base.Money"], beforeLegacyCancel + 1,
+T.equal(inventory["Base.Money"], beforeLegacyCancel + 1,
     "recovered cancellation resolves storage and refunds remaining material")
+T.finish("pnc_production_lifecycle_smoke")
 
-print("pnc_production_lifecycle_smoke: OK")
+T.finish("pnc_production_lifecycle_smoke")

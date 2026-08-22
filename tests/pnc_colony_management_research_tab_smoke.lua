@@ -1,4 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "client", "PNC/")
     .. "UI/Communities/PNC_ColonyManagementResearchTab.lua"
 
 getText = function(key) return key end
@@ -15,7 +17,7 @@ package.preload["PNC/UI/Inventory/PNC_InventoryUI_Model"] = function()
     return PNC.InventoryUIModel
 end
 
-local ResearchTab = dofile(FILE)
+local ResearchTab = T.load(FILE)
 local rows = {}
 local window = {
     tab = "research",
@@ -60,15 +62,16 @@ local snapshot = {
 
 local rebuilt = ResearchTab.Rebuild(window, snapshot,
     function(_, fallback) return fallback end)
-assert(rebuilt == true, "research tab did not rebuild")
-assert(window.researchCatalog.items[2].catalogCells.state == "RESEARCHING 25%",
+T.truthy(rebuilt == true, "research tab did not rebuild")
+T.truthy(window.researchCatalog.items[2].catalogCells.state == "RESEARCHING 25%",
     "technology catalog row does not expose progress percentage")
-assert(window.researchCatalog.items[2].catalogCells.state == "RESEARCHING 25%",
+T.truthy(window.researchCatalog.items[2].catalogCells.state == "RESEARCHING 25%",
     "active research row does not expose resumable progress")
-assert(window.researchCatalog.items[3].catalogCells.state == "NOT LEARNED",
+T.truthy(window.researchCatalog.items[3].catalogCells.state == "NOT LEARNED",
     "water technology should be researchable through the lab lane")
 ResearchTab.Rebuild(window, snapshot, function(_, fallback) return fallback end)
-assert(#window.researchQueueList.items == 2,
+T.truthy(#window.researchQueueList.items == 2,
     "research queue refresh must not accumulate headers")
+T.finish("pnc_colony_management_research_tab_smoke")
 
-print("pnc_colony_management_research_tab_smoke: ok")
+T.finish("pnc_colony_management_research_tab_smoke")

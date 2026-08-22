@@ -1,4 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Perception/PNC_Perception.lua"
 
 local now = 1000
@@ -67,7 +69,7 @@ PNC = {
     Perception = {},
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local record = {
     id = "traveler",
@@ -77,47 +79,47 @@ local record = {
     runtime = {},
 }
 
-assert(PNC.Perception.RememberAttacker(record, {
+T.truthy(PNC.Perception.RememberAttacker(record, {
     attackerKind = "npc",
     attackerID = "enemy-npc",
 }, now), "NPC attacker was not remembered")
 local target = PNC.Perception.ResolveRecentAttacker(record, now)
-assert(target and target.kind == "npc" and target.id == "enemy-npc", "hostile NPC attacker was not resolved")
-assert(target.distSq == 4 and target.threatening == true, "NPC attacker target metadata was incomplete")
+T.truthy(target and target.kind == "npc" and target.id == "enemy-npc", "hostile NPC attacker was not resolved")
+T.truthy(target.distSq == 4 and target.threatening == true, "NPC attacker target metadata was incomplete")
 
 enemy = false
-assert(PNC.Perception.ResolveRecentAttacker(record, now) == nil, "friendly NPC damage became a combat target")
+T.truthy(PNC.Perception.ResolveRecentAttacker(record, now) == nil, "friendly NPC damage became a combat target")
 enemy = true
 
-assert(PNC.Perception.RememberAttacker(record, {
+T.truthy(PNC.Perception.RememberAttacker(record, {
     attackerKind = "player",
     attackerOnlineID = 42,
     attackerUsername = "attacker",
 }, now), "player attacker was not remembered")
 target = PNC.Perception.ResolveRecentAttacker(record, now)
-assert(target and target.kind == "player" and target.player == playerBody, "player attacker was not resolved")
+T.truthy(target and target.kind == "player" and target.player == playerBody, "player attacker was not resolved")
 
-assert(PNC.Perception.RememberAttacker(record, {
+T.truthy(PNC.Perception.RememberAttacker(record, {
     attackerKind = "zombie",
     attackerZombieId = "zed-1",
 }, now), "zombie attacker was not remembered")
 target = PNC.Perception.ResolveRecentAttacker(record, now)
-assert(target and target.kind == "zombie" and target.zombieId == "zed-1", "zombie attacker was not resolved")
+T.truthy(target and target.kind == "zombie" and target.zombieId == "zed-1", "zombie attacker was not resolved")
 
 record.hostility = { attackZombies = false, attackNPCs = false }
 target = PNC.Perception.ResolveRoamingTarget(record, 12)
-assert(target and target.zombieId == "zed-1",
+T.truthy(target and target.zombieId == "zed-1",
     "roaming self-defense ignored a recent zombie attacker")
 target = PNC.Perception.ResolveCompanionTarget(record)
-assert(target and target.zombieId == "zed-1",
+T.truthy(target and target.zombieId == "zed-1",
     "companion self-defense ignored a recent zombie attacker")
 target = PNC.Perception.ResolveHostileTarget(record)
-assert(target and target.zombieId == "zed-1",
+T.truthy(target and target.zombieId == "zed-1",
     "hostile resolver ignored a recent zombie attacker")
 
 now = 7000
-assert(PNC.Perception.ResolveRecentAttacker(record, now) == nil, "expired attacker remained active")
-assert(record.runtime.recentThreat == nil, "expired attacker state was not cleared")
+T.truthy(PNC.Perception.ResolveRecentAttacker(record, now) == nil, "expired attacker remained active")
+T.truthy(record.runtime.recentThreat == nil, "expired attacker state was not cleared")
 
 -- MP coordinate pursuit intentionally leaves zombie:getTarget() unset. The
 -- server-side ZombieAggro observation must still trigger visible self-defense.
@@ -131,16 +133,17 @@ PNC.Perception.CanSeeWorldObject = function(_, candidate)
     return candidate == zombieBody, "clear"
 end
 target = PNC.Perception.FindImmediateZombieThreat(record, 6)
-assert(target and target.zombieId == "zed-1",
+T.truthy(target and target.zombieId == "zed-1",
     "fresh MP zombie pursuit observation was not acquired")
-assert(target.threatening == true,
+T.truthy(target.threatening == true,
     "observed MP pursuer was not marked as an active threat")
 target = PNC.Perception.ResolveRoamingTarget(record, 12)
-assert(target and target.zombieId == "zed-1",
+T.truthy(target and target.zombieId == "zed-1",
     "neutral roamer ignored an authoritative MP zombie pursuer")
 
 now = now + 1501
-assert(PNC.Perception.FindImmediateZombieThreat(record, 6) == nil,
+T.truthy(PNC.Perception.FindImmediateZombieThreat(record, 6) == nil,
     "stale MP zombie pursuit observation remained actionable")
+T.finish("pnc_recent_attacker_resolution_smoke")
 
-print("pnc_recent_attacker_resolution_smoke: ok")
+T.finish("pnc_recent_attacker_resolution_smoke")

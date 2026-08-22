@@ -1,23 +1,9 @@
+local T = require "tests/support/test"
+
 local SHARED =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 local SERVER =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected="
-            .. tostring(expected) .. " actual="
-            .. tostring(actual))
-    end
-end
-
-local function assertTrue(value, label)
-    assertEqual(value == true, true, label)
-end
-
-local function assertFalse(value, label)
-    assertEqual(value == false, true, label)
-end
+    T.path("ProjectHoomans", "server", "PNC/")
 
 local function tableSize(value)
     local count = 0
@@ -27,7 +13,7 @@ local function tableSize(value)
     return count
 end
 
-local function assertSaveSafe(value, seen)
+local function validatePersistedValue(value, seen)
     local kind = type(value)
     if kind == "nil" or kind == "string"
         or kind == "number" or kind == "boolean"
@@ -53,7 +39,7 @@ local function assertSaveSafe(value, seen)
         if type(key) ~= "string" and type(key) ~= "number" then
             error("unsafe community key")
         end
-        assertSaveSafe(child, seen)
+        validatePersistedValue(child, seen)
     end
     seen[value] = nil
 end
@@ -83,18 +69,18 @@ ModData = {
 }
 
 PNC = {}
-dofile(SHARED .. "Base/PNC_Core.lua")
-dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
-dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
-dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
-dofile(SHARED .. "Factions/PNC_FactionEmblems.lua")
-dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
-dofile(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
-dofile(SHARED .. "Communities/PNC_CommunityConstants.lua")
-dofile(SHARED .. "Communities/PNC_CommunityProfiles.lua")
-dofile(SHARED .. "Communities/PNC_CommunityMath.lua")
-dofile(SHARED .. "Communities/PNC_CommunityTypes.lua")
-dofile(SHARED .. "Factions/PNC_FactionTypes.lua")
+T.load(SHARED .. "Base/PNC_Core.lua")
+T.load(SHARED .. "Relationships/PNC_EntityRef.lua")
+T.load(SHARED .. "Factions/PNC_FactionConstants.lua")
+T.load(SHARED .. "Factions/PNC_FactionArchetypes.lua")
+T.load(SHARED .. "Factions/PNC_FactionEmblems.lua")
+T.load(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
+T.load(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
+T.load(SHARED .. "Communities/PNC_CommunityConstants.lua")
+T.load(SHARED .. "Communities/PNC_CommunityProfiles.lua")
+T.load(SHARED .. "Communities/PNC_CommunityMath.lua")
+T.load(SHARED .. "Communities/PNC_CommunityTypes.lua")
+T.load(SHARED .. "Factions/PNC_FactionTypes.lua")
 
 local FactionTypes = PNC.FactionTypes
 local CommunityTypes = PNC.CommunityTypes
@@ -139,26 +125,26 @@ end
 
 -- Pure defaults, normalization, bounds, and geometry.
 local empty = CommunityTypes.NewRegistry()
-assertEqual(empty.schemaVersion, 2, "community registry schema")
-assertEqual(empty.revision, 0, "community registry revision")
-assertEqual(tableSize(empty.byID), 0, "community registry empty")
-assertEqual(tableSize(empty.sitesByID), 0,
+T.equal(empty.schemaVersion, 2, "community registry schema")
+T.equal(empty.revision, 0, "community registry revision")
+T.equal(tableSize(empty.byID), 0, "community registry empty")
+T.equal(tableSize(empty.sitesByID), 0,
     "community site registry empty")
 local settledDefaults =
     CommunityTypes.BuildCreationDefaults("settled", "settler")
-assertEqual(settledDefaults.radius, 35, "settled radius")
-assertEqual(settledDefaults.capacity.population, 12,
+T.equal(settledDefaults.radius, 35, "settled radius")
+T.equal(settledDefaults.capacity.population, 12,
     "settled population capacity")
-assertEqual(settledDefaults.security, 35,
+T.equal(settledDefaults.security, 35,
     "settler security adjustment")
-assertEqual(settledDefaults.capacity.storage, 120,
+T.equal(settledDefaults.capacity.storage, 120,
     "settler storage adjustment")
 local campedDefaults =
     CommunityTypes.BuildCreationDefaults("camped", "refugee")
-assertEqual(campedDefaults.radius, 15, "camp radius")
-assertEqual(campedDefaults.capacity.population, 8,
+T.equal(campedDefaults.radius, 15, "camp radius")
+T.equal(campedDefaults.capacity.population, 8,
     "camp population capacity")
-assertEqual(campedDefaults.morale, -10,
+T.equal(campedDefaults.morale, -10,
     "refugee camp morale adjustment")
 
 local normalized = CommunityTypes.NewCommunity({
@@ -182,20 +168,20 @@ local normalized = CommunityTypes.NewCommunity({
     morale = -999,
     supplies = { food = 99999999, tools = -1 },
 })
-assertEqual(normalized.status, "inactive",
+T.equal(normalized.status, "inactive",
     "invalid status normalized")
-assertEqual(normalized.home.z, 32, "z clamps")
-assertEqual(normalized.home.radius, 200, "radius clamps")
-assertEqual(normalized.capacity.population, 500,
+T.equal(normalized.home.z, 32, "z clamps")
+T.equal(normalized.home.radius, 200, "radius clamps")
+T.equal(normalized.capacity.population, 500,
     "population capacity clamps")
-assertEqual(normalized.capacity.beds, 0, "beds clamp")
-assertEqual(normalized.capacity.storage, 100000,
+T.equal(normalized.capacity.beds, 0, "beds clamp")
+T.equal(normalized.capacity.storage, 100000,
     "storage clamps")
-assertEqual(normalized.security, 100, "security clamps")
-assertEqual(normalized.morale, -100, "morale clamps")
-assertEqual(normalized.supplies.food, 1000000,
+T.equal(normalized.security, 100, "security clamps")
+T.equal(normalized.morale, -100, "morale clamps")
+T.equal(normalized.supplies.food, 1000000,
     "supply upper clamp")
-assertEqual(normalized.supplies.tools, 0,
+T.equal(normalized.supplies.tools, 0,
     "supply lower clamp")
 local area = CommunityTypes.NewCommunity({
     id = "community_area",
@@ -205,29 +191,29 @@ local area = CommunityTypes.NewCommunity({
     status = "active",
     home = { x = 0, y = 0, z = 0, radius = 10 },
 })
-assertEqual(
+T.equal(
     CommunityMath.GetDistanceFromHome(area, 6, 8, 0),
     10,
     "distance helper"
 )
-assertTrue(
+T.truthy(
     CommunityMath.IsInsideHomeArea(area, 6, 8, 0),
     "inside home"
 )
-assertFalse(
+T.falsy(
     CommunityMath.IsInsideHomeArea(area, 0, 0, 1),
     "different floor outside"
 )
-assertTrue(CommunityTypes.AreEqual(
+T.truthy(CommunityTypes.AreEqual(
     CommunityTypes.NormalizeRegistry(
         CommunityTypes.NormalizeRegistry({ byID = {} })
     ),
     CommunityTypes.NormalizeRegistry({ byID = {} })
 ), "normalization idempotent")
 
-dofile(SERVER .. "PNC_FactionService.lua")
-dofile(SERVER .. "PNC_CommunityService.lua")
-dofile(SERVER .. "PNC_CommunityValidation.lua")
+T.load(SERVER .. "PNC_FactionService.lua")
+T.load(SERVER .. "PNC_CommunityService.lua")
+T.load(SERVER .. "PNC_CommunityValidation.lua")
 PNC.Factions.Load()
 PNC.Communities.Load()
 
@@ -245,7 +231,7 @@ local ok, _, settlers = PNC.Factions.Create({
     archetypeID = "settler",
     createdAt = worldHour,
 })
-assertTrue(ok, "create settler faction")
+T.truthy(ok, "create settler faction")
 local _, _, refugees = PNC.Factions.Create({
     name = "Refugees",
     archetypeID = "refugee",
@@ -272,8 +258,8 @@ ok, _, area = PNC.Communities.Create({
     home = { x = 100, y = 100, z = 0 },
     createdAt = worldHour,
 })
-assertTrue(ok, "create settlement")
-assertEqual(area.id, "community_collision",
+T.truthy(ok, "create settlement")
+T.equal(area.id, "community_collision",
     "first community ID")
 ok, _, area = PNC.Communities.Create({
     factionID = settlers.id,
@@ -281,8 +267,8 @@ ok, _, area = PNC.Communities.Create({
     mode = "settled",
     home = { x = 140, y = 100, z = 0 },
 })
-assertTrue(ok, "same faction second community")
-assertEqual(area.id, "community_farm",
+T.truthy(ok, "same faction second community")
+T.equal(area.id, "community_farm",
     "community collision skipped")
 local farmID = area.id
 local _, _, camp = PNC.Communities.Create({
@@ -302,10 +288,10 @@ local farmSite = {
     },
 }
 farmSite.id = PNC.Communities.BuildSiteID(farmSite)
-assertTrue(PNC.Communities.ReserveSite(
+T.truthy(PNC.Communities.ReserveSite(
     farmID, farmSite, worldHour
 ), "reserve building site")
-assertEqual(PNC.Communities.GetSite(
+T.equal(PNC.Communities.GetSite(
     farmSite.id
 ).occupantCommunityID, farmID,
     "site occupancy stored")
@@ -319,20 +305,20 @@ local campSite = {
     },
 }
 campSite.id = PNC.Communities.BuildSiteID(campSite)
-assertTrue(PNC.Communities.ReserveSite(
+T.truthy(PNC.Communities.ReserveSite(
     campID, campSite, worldHour
 ), "reserve camp site")
-assertEqual(#PNC.Communities.GetForFaction(settlers.id), 2,
+T.equal(#PNC.Communities.GetForFaction(settlers.id), 2,
     "multiple communities per faction")
-assertEqual(#PNC.Communities.GetForFaction(refugees.id), 1,
+T.equal(#PNC.Communities.GetForFaction(refugees.id), 1,
     "refugee camp indexed")
-assertFalse(PNC.Communities.Create({
+T.falsy(PNC.Communities.Create({
     factionID = "faction_missing",
     name = "Invalid",
     mode = "settled",
     home = { x = 0, y = 0, z = 0 },
 }), "valid faction required")
-assertFalse(PNC.Communities.Create({
+T.falsy(PNC.Communities.Create({
     factionID = settlers.id,
     name = "Invalid",
     mode = "mobile",
@@ -344,13 +330,13 @@ local alice = newNPC("npc_alice")
 local bob = newNPC("npc_bob")
 local outsider = newNPC("npc_outsider")
 local firstCommunityID = "community_collision"
-assertTrue(PNC.Factions.AddNPC(settlers.id, alice.id, {}),
+T.truthy(PNC.Factions.AddNPC(settlers.id, alice.id, {}),
     "alice joins settlers")
-assertTrue(PNC.Factions.AddNPC(settlers.id, bob.id, {}),
+T.truthy(PNC.Factions.AddNPC(settlers.id, bob.id, {}),
     "bob joins settlers")
-assertTrue(PNC.Factions.AddNPC(refugees.id, outsider.id, {}),
+T.truthy(PNC.Factions.AddNPC(refugees.id, outsider.id, {}),
     "outsider joins refugees")
-assertTrue(PNC.Communities.AddNPC(
+T.truthy(PNC.Communities.AddNPC(
     firstCommunityID,
     bob.id,
     { communityRole = "resident", joinedAt = 200 }
@@ -367,27 +353,27 @@ ok = PNC.Communities.AddNPC(farmID, alice.id, {
     communityRole = "guard",
     joinedAt = 201,
 })
-assertTrue(ok, "community assignment")
-assertEqual(alice.affiliation.communityID, farmID,
+T.truthy(ok, "community assignment")
+T.equal(alice.affiliation.communityID, farmID,
     "community affiliation stored")
-assertEqual(alice.affiliation.communityRole, "guard",
+T.equal(alice.affiliation.communityRole, "guard",
     "community role")
-assertEqual(alice.recordRevision, beforeRecord + 1,
+T.equal(alice.recordRevision, beforeRecord + 1,
     "membership record revision")
-assertEqual(alice.presenceRevision, alicePresence,
+T.equal(alice.presenceRevision, alicePresence,
     "membership presence unchanged")
-assertEqual(alice.social.revision, aliceSocial,
+T.equal(alice.social.revision, aliceSocial,
     "membership social unchanged")
-assertEqual(alice.social.relationships.keep.revision,
+T.equal(alice.social.relationships.keep.revision,
     aliceRelationship, "relationship unchanged")
-assertEqual(alice.social.conduct.revision, aliceConduct,
+T.equal(alice.social.conduct.revision, aliceConduct,
     "conduct unchanged")
-assertEqual(PNC.Factions.Get(settlers.id).revision,
+T.equal(PNC.Factions.Get(settlers.id).revision,
     factionRelationRevision, "faction revision unchanged")
-assertFalse(PNC.Communities.AddNPC(
+T.falsy(PNC.Communities.AddNPC(
     farmID, outsider.id, {}
 ), "owning faction required")
-assertFalse(PNC.Communities.AddNPC(
+T.falsy(PNC.Communities.AddNPC(
     firstCommunityID, alice.id, {}
 ), "one current community")
 
@@ -399,47 +385,47 @@ ok = PNC.Communities.TransferNPC(
     firstCommunityID,
     { worldAgeHours = 202 }
 )
-assertTrue(ok, "same-faction community transfer")
-assertEqual(alice.affiliation.communityID,
+T.truthy(ok, "same-faction community transfer")
+T.equal(alice.affiliation.communityID,
     firstCommunityID, "transfer destination")
-assertEqual(PNC.Communities.Registry.revision,
+T.equal(PNC.Communities.Registry.revision,
     beforeRegistry + 1, "one registry transfer revision")
-assertFalse(PNC.Communities.TransferNPC(
+T.falsy(PNC.Communities.TransferNPC(
     alice.id,
     campID,
     {}
 ), "cross-faction community transfer rejected")
 
 -- Leadership, removal, death, and abstract presence.
-assertFalse(PNC.Communities.SetLeader(
+T.falsy(PNC.Communities.SetLeader(
     firstCommunityID,
     outsider.id,
     203
 ), "leader must be member")
-assertTrue(PNC.Communities.SetLeader(
+T.truthy(PNC.Communities.SetLeader(
     firstCommunityID,
     alice.id,
     203
 ), "set community leader")
-assertEqual(PNC.Communities.Get(
+T.equal(PNC.Communities.Get(
     firstCommunityID
 ).leaderNPCID, alice.id, "leader persisted")
 alice.presenceState = "abstract"
-assertEqual(alice.affiliation.communityID,
+T.equal(alice.affiliation.communityID,
     firstCommunityID, "abstract membership retained")
 alice.alive = false
-assertTrue(PNC.Communities.OnNPCDeath(alice.id),
+T.truthy(PNC.Communities.OnNPCDeath(alice.id),
     "community death reconciliation")
-assertEqual(alice.affiliation.communityID, nil,
+T.equal(alice.affiliation.communityID, nil,
     "death clears active membership")
-assertEqual(PNC.Communities.Get(
+T.equal(PNC.Communities.Get(
     firstCommunityID
 ).leaderNPCID, nil, "death clears leadership")
-assertEqual(PNC.Communities.Get(
+T.equal(PNC.Communities.Get(
     firstCommunityID
 ).currentPopulation, 1, "death updates population")
 alice.alive = true
-assertTrue(PNC.Communities.AddNPC(
+T.truthy(PNC.Communities.AddNPC(
     firstCommunityID,
     alice.id,
     { communityRole = "resident" }
@@ -448,76 +434,76 @@ assertTrue(PNC.Communities.AddNPC(
 -- Supplies are atomic and bounded; insufficient removal fails.
 local communityRevision =
     PNC.Communities.Get(firstCommunityID).revision
-assertTrue(PNC.Communities.AddSupply(
+T.truthy(PNC.Communities.AddSupply(
     firstCommunityID, "food", 10
 ), "add supply")
-assertEqual(PNC.Communities.GetSupply(
+T.equal(PNC.Communities.GetSupply(
     firstCommunityID, "food"
 ), 10, "supply read")
-assertFalse(PNC.Communities.RemoveSupply(
+T.falsy(PNC.Communities.RemoveSupply(
     firstCommunityID, "food", 11
 ), "insufficient supply rejects")
-assertEqual(PNC.Communities.GetSupply(
+T.equal(PNC.Communities.GetSupply(
     firstCommunityID, "food"
 ), 10, "failed removal atomic")
-assertTrue(PNC.Communities.RemoveSupply(
+T.truthy(PNC.Communities.RemoveSupply(
     firstCommunityID, "food", 4
 ), "remove supply")
-assertEqual(PNC.Communities.GetSupply(
+T.equal(PNC.Communities.GetSupply(
     firstCommunityID, "food"
 ), 6, "supply removal")
-assertTrue(PNC.Communities.SetSupply(
+T.truthy(PNC.Communities.SetSupply(
     firstCommunityID, "food", 99999999
 ), "supply setter clamps")
-assertEqual(PNC.Communities.GetSupply(
+T.equal(PNC.Communities.GetSupply(
     firstCommunityID, "food"
 ), 1000000, "supply setter upper bound")
-assertTrue(PNC.Communities.Get(
+T.truthy(PNC.Communities.Get(
     firstCommunityID
 ).revision > communityRevision, "supply revises community")
 
 -- Reads and identical setters are revision-neutral copies.
 local readCopy = PNC.Communities.Get(firstCommunityID)
 readCopy.name = "mutated"
-assertEqual(PNC.Communities.Get(
+T.equal(PNC.Communities.Get(
     firstCommunityID
 ).name, "Riverside Farm", "read returns copy")
 local readRevision = PNC.Communities.Registry.revision
 PNC.Communities.List()
 PNC.Communities.GetForFaction(settlers.id)
-assertEqual(PNC.Communities.Registry.revision,
+T.equal(PNC.Communities.Registry.revision,
     readRevision, "pure reads unchanged")
 local currentSecurity =
     PNC.Communities.Get(firstCommunityID).security
-assertFalse(PNC.Communities.SetSecurity(
+T.falsy(PNC.Communities.SetSecurity(
     firstCommunityID,
     currentSecurity
 ), "identical setter unchanged")
-assertEqual(PNC.Communities.Registry.revision,
+T.equal(PNC.Communities.Registry.revision,
     readRevision, "identical setter revision")
 
 -- Faction removal clears placement without changing unrelated revisions.
 local socialBeforeRemoval = alice.social.revision
 local presenceBeforeRemoval = alice.presenceRevision
-assertTrue(PNC.Factions.RemoveNPC(
+T.truthy(PNC.Factions.RemoveNPC(
     settlers.id,
     alice.id,
     "removed",
     210
 ), "faction removal")
-assertEqual(alice.affiliation.communityID, nil,
+T.equal(alice.affiliation.communityID, nil,
     "faction removal clears community")
-assertEqual(PNC.Communities.Get(
+T.equal(PNC.Communities.Get(
     firstCommunityID
 ).memberIDs[alice.id], nil,
     "faction removal clears member index")
-assertEqual(alice.social.revision, socialBeforeRemoval,
+T.equal(alice.social.revision, socialBeforeRemoval,
     "faction removal social unchanged")
-assertEqual(alice.presenceRevision, presenceBeforeRemoval,
+T.equal(alice.presenceRevision, presenceBeforeRemoval,
     "faction removal presence unchanged")
 
 -- Faction archive and destroy retire owned community records.
-assertTrue(PNC.Communities.TransferNPC(
+T.truthy(PNC.Communities.TransferNPC(
     bob.id,
     farmID,
     {
@@ -525,7 +511,7 @@ assertTrue(PNC.Communities.TransferNPC(
         worldAgeHours = 219,
     }
 ), "bob community assignment")
-assertTrue(PNC.Factions.Archive(
+T.truthy(PNC.Factions.Archive(
     settlers.id,
     "community_test",
     220
@@ -533,17 +519,17 @@ assertTrue(PNC.Factions.Archive(
 for _, community in ipairs(
     PNC.Communities.GetForFaction(settlers.id)
 ) do
-    assertEqual(community.status, "archived",
+    T.equal(community.status, "archived",
         "owned community archived")
-    assertEqual(community.leaderNPCID, nil,
+    T.equal(community.leaderNPCID, nil,
         "archived community leader clear")
-    assertEqual(tableSize(community.memberIDs), 0,
+    T.equal(tableSize(community.memberIDs), 0,
         "archived community members clear")
 end
 
 -- Wiped communities release their sites for reuse; a stable player-character
 -- claim prevents later occupation without persisting an IsoPlayer.
-assertTrue(PNC.Communities.AddNPC(
+T.truthy(PNC.Communities.AddNPC(
     campID,
     outsider.id,
     { communityRole = "resident" }
@@ -551,12 +537,12 @@ assertTrue(PNC.Communities.AddNPC(
 outsider.alive = false
 local wiped, wipedReason =
     PNC.Communities.OnNPCDeath(outsider.id)
-assertTrue(wiped, "wipeout reconciles")
-assertEqual(wipedReason, "community_wiped_out",
+T.truthy(wiped, "wipeout reconciles")
+T.equal(wipedReason, "community_wiped_out",
     "last death destroys community")
-assertEqual(PNC.Communities.Get(campID).status,
+T.equal(PNC.Communities.Get(campID).status,
     "destroyed", "wiped community destroyed")
-assertEqual(PNC.Communities.GetSite(campSite.id).status,
+T.equal(PNC.Communities.GetSite(campSite.id).status,
     "vacant", "wiped site released")
 local _, _, replacement = PNC.Communities.Create({
     factionID = refugees.id,
@@ -565,12 +551,12 @@ local _, _, replacement = PNC.Communities.Create({
     home = campSite.home,
     createdAt = 222,
 })
-assertTrue(PNC.Communities.ReserveSite(
+T.truthy(PNC.Communities.ReserveSite(
     replacement.id,
     campSite,
     222
 ), "vacant site reoccupied")
-assertTrue(PNC.Communities.Destroy(
+T.truthy(PNC.Communities.Destroy(
     replacement.id,
     "claim_test",
     223
@@ -579,12 +565,12 @@ local playerKey = PNC.EntityRef.ForPlayerIdentity(
     "Patrick",
     "char_site_test"
 )
-assertTrue(PNC.Communities.ClaimSite(
+T.truthy(PNC.Communities.ClaimSite(
     campSite.id,
     playerKey,
     224
 ), "player character claims site")
-assertEqual(PNC.Communities.GetSite(
+T.equal(PNC.Communities.GetSite(
     campSite.id
 ).claimantKey, playerKey,
     "stable claimant stored")
@@ -601,13 +587,13 @@ local reserved, reserveReason =
         campSite,
         225
     )
-assertFalse(reserved, "claimed site cannot be occupied")
-assertEqual(reserveReason, "site_claimed",
+T.falsy(reserved, "claimed site cannot be occupied")
+T.equal(reserveReason, "site_claimed",
     "claim blocks occupation specifically")
 outsider.alive = true
-assertEqual(bob.affiliation.communityID, nil,
+T.equal(bob.affiliation.communityID, nil,
     "faction archive clears community affiliation")
-assertTrue(PNC.Factions.Destroy(
+T.truthy(PNC.Factions.Destroy(
     settlers.id,
     "community_test_destroy",
     221
@@ -615,7 +601,7 @@ assertTrue(PNC.Factions.Destroy(
 for _, community in ipairs(
     PNC.Communities.GetForFaction(settlers.id)
 ) do
-    assertEqual(community.status, "destroyed",
+    T.equal(community.status, "destroyed",
         "owned community destroyed")
 end
 
@@ -627,22 +613,22 @@ local oldAffiliation = FactionTypes.NormalizeAffiliation({
     role = "civilian",
     rank = "member",
 })
-assertEqual(oldAffiliation.schemaVersion, 2,
+T.equal(oldAffiliation.schemaVersion, 2,
     "affiliation migrates to V2")
-assertEqual(oldAffiliation.communityID, nil,
+T.equal(oldAffiliation.communityID, nil,
     "old affiliation gets no invented community")
-assertEqual(oldAffiliation.communityRole, "resident",
+T.equal(oldAffiliation.communityRole, "resident",
     "old affiliation default community role")
 local migratedRegistry =
     CommunityTypes.NormalizeRegistry({})
-assertEqual(tableSize(migratedRegistry.byID), 0,
+T.equal(tableSize(migratedRegistry.byID), 0,
     "migration creates empty community registry")
-assertTrue(CommunityTypes.AreEqual(
+T.truthy(CommunityTypes.AreEqual(
     migratedRegistry,
     CommunityTypes.NormalizeRegistry(migratedRegistry)
 ), "community migration idempotent")
 
-assertTrue(PNC.Communities.Save(),
+T.truthy(PNC.Communities.Save(),
     "community registry saves")
 local partial = newNPC("npc_partial_reference")
 partial.affiliation = FactionTypes.NormalizeAffiliation({
@@ -655,13 +641,13 @@ partial.affiliation = FactionTypes.NormalizeAffiliation({
     communityJoinedAt = 190,
 })
 local partialPresence = partial.presenceRevision
-assertTrue(PNC.Communities.Load(),
+T.truthy(PNC.Communities.Load(),
     "community registry reloads")
-assertEqual(partial.affiliation.communityID, nil,
+T.equal(partial.affiliation.communityID, nil,
     "missing partial community reference clears")
-assertEqual(partial.presenceRevision, partialPresence,
+T.equal(partial.presenceRevision, partialPresence,
     "migration leaves presence revision")
-assertEqual(PNC.Communities.Get(campID).name,
+T.equal(PNC.Communities.Get(campID).name,
     "Highway Camp", "community registry persists on reload")
 
 -- Deterministic index rebuild and invariant detection/repair.
@@ -669,26 +655,27 @@ local campRecord = PNC.Communities.Registry.byID[campID]
 campRecord.memberIDs.ghost = true
 PNC.Communities.Registry.byFaction = {}
 local invalid = PNC.CommunityValidation.ValidateRegistry()
-assertFalse(invalid.ok, "validator detects invalid indexes")
-assertTrue(PNC.CommunityValidation.RepairIndexes(),
+T.falsy(invalid.ok, "validator detects invalid indexes")
+T.truthy(PNC.CommunityValidation.RepairIndexes(),
     "index repair changes invalid indexes")
 local repaired = PNC.CommunityValidation.ValidateRegistry()
-assertTrue(repaired.ok, "index repair restores invariants")
-assertFalse(PNC.CommunityValidation.RepairIndexes(),
+T.truthy(repaired.ok, "index repair restores invariants")
+T.falsy(PNC.CommunityValidation.RepairIndexes(),
     "correct rebuild unchanged")
 
 -- Debug data is primitive-only and does not expose complete NPC records.
-dofile(SERVER .. "PNC_CommunityDebug.lua")
+T.load(SERVER .. "PNC_CommunityDebug.lua")
 local snapshot = PNC.CommunityDebug.BuildSnapshot(
     campID,
     refugees.id,
     outsider.id
 )
-assertSaveSafe(snapshot)
-assertEqual(snapshot.selectedNPC.inventory, nil,
+validatePersistedValue(snapshot)
+T.equal(snapshot.selectedNPC.inventory, nil,
     "debug excludes inventory")
-assertTrue(snapshot.selectedNPC.presenceRevision ~= nil,
+T.truthy(snapshot.selectedNPC.presenceRevision ~= nil,
     "debug includes presence evidence")
-assertSaveSafe(PNC.Communities.Registry)
+validatePersistedValue(PNC.Communities.Registry)
+T.finish("pnc_communities_foundation_smoke")
 
-print("pnc_communities_foundation_smoke: PASS")
+T.finish("pnc_communities_foundation_smoke")

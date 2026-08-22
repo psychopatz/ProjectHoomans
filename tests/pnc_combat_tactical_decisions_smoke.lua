@@ -1,13 +1,8 @@
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
-local ROOT = SHARED_ROOT .. "PNC/Core/"
-package.path = SHARED_ROOT .. "?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
+local ROOT = SHARED_ROOT .. "PNC/Core/"
+T.addPackagePaths()
 
 local now = 1000
 local pressureCount = 0
@@ -184,7 +179,7 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Combat/CombatTactics/PNC_Combat_Tactics.lua")
+T.load(ROOT .. "Combat/CombatTactics/PNC_Combat_Tactics.lua")
 
 local function makeRecord(id)
     return {
@@ -224,9 +219,9 @@ local moved, reason, action = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = false }
 )
-assertEqual(moved, false, "pressure shove does not move before committing")
-assertEqual(reason, "pressure_shove", "pressure shove reason")
-assertEqual(action, "shove", "pressure shove directive")
+T.equal(moved, false, "pressure shove does not move before committing")
+T.equal(reason, "pressure_shove", "pressure shove reason")
+T.equal(action, "shove", "pressure shove directive")
 
 -- Skill and a weapon raise pressure tolerance, preserving an attack window.
 now = now + 250
@@ -239,9 +234,9 @@ moved, reason, action = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, false, "skilled equipped melee does not panic")
-assertEqual(action, nil, "skilled equipped melee keeps strike choice")
-assertEqual(
+T.equal(moved, false, "skilled equipped melee does not panic")
+T.equal(action, nil, "skilled equipped melee keeps strike choice")
+T.equal(
     record.runtime.combatTactical.pressureTolerance,
     4,
     "skill and equipment influence pressure tolerance"
@@ -263,9 +258,9 @@ moved, reason, action = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, false, "lone near miss incorrectly triggered retreat")
-assertEqual(reason, "lone_threat_counter", "lone counter reason")
-assertEqual(action, "shove", "lone near miss did not counter-shove")
+T.equal(moved, false, "lone near miss incorrectly triggered retreat")
+T.equal(reason, "lone_threat_counter", "lone counter reason")
+T.equal(action, "shove", "lone near miss did not counter-shove")
 
 -- An exhausted fighter commits a weakened emergency strike against one
 -- adjacent zombie instead of entering a stamina-draining shove loop.
@@ -280,11 +275,11 @@ moved, reason, action = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, false, "exhausted lone fighter entered retreat first")
-assertEqual(reason, "exhausted_lone_counter",
+T.equal(moved, false, "exhausted lone fighter entered retreat first")
+T.equal(reason, "exhausted_lone_counter",
     "exhausted lone counter reason")
-assertEqual(action, nil, "exhausted lone fighter did not commit melee")
-assertEqual(record.runtime.emergencyMeleeUntil, now + 300,
+T.equal(action, nil, "exhausted lone fighter did not commit melee")
+T.equal(record.runtime.emergencyMeleeUntil, now + 300,
     "emergency melee lease was not armed")
 
 -- The counter window is finite. Afterwards the NPC takes one bounded step
@@ -297,8 +292,8 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, true, "exhausted counter never yielded to retreat")
-assertEqual(reason, "exhausted_recovery_retreat",
+T.equal(moved, true, "exhausted counter never yielded to retreat")
+T.equal(reason, "exhausted_recovery_retreat",
     "exhausted recovery retreat reason")
 record.x = -1.3
 target.distSq = 5.29
@@ -310,10 +305,10 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, true, "safe exhausted fighter did not hold to recover")
-assertEqual(reason, "recovering_stamina_safe",
+T.equal(moved, true, "safe exhausted fighter did not hold to recover")
+T.equal(reason, "recovering_stamina_safe",
     "safe recovery hold reason")
-assertEqual(holds > 0, true, "safe recovery did not stop locomotion")
+T.equal(holds > 0, true, "safe recovery did not stop locomotion")
 record.stamina.current = 35
 record.x = 0
 target.distSq = 1
@@ -325,7 +320,7 @@ moved = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, false, "recovered fighter did not re-engage")
+T.equal(moved, false, "recovered fighter did not re-engage")
 canSpendAttack = true
 
 -- Crowd pressure alone must not make a healthy follower abandon the player.
@@ -343,7 +338,7 @@ moved, reason, action = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, false, "pressure boundary does not trigger proactive retreat")
+T.equal(moved, false, "pressure boundary does not trigger proactive retreat")
 PNC.CombatTactics.MarkZombieNearMiss(record, 1, 0, 0, now)
 moved, reason = PNC.CombatTactics.PreAttackDecision(
     record,
@@ -352,9 +347,9 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, true, "near miss triggers reactive kite")
-assertEqual(reason, "near_miss_kite", "reactive kite reason")
-assert(
+T.equal(moved, true, "near miss triggers reactive kite")
+T.equal(reason, "near_miss_kite", "reactive kite reason")
+T.truthy(
     moves[#moves].x < record.x,
     "retreat goal must increase distance from the threat"
 )
@@ -367,8 +362,8 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, true, "locked retreat remains authoritative")
-assert(
+T.equal(moved, true, "locked retreat remains authoritative")
+T.truthy(
     moves[#moves].x < record.x,
     "fixed retreat leg must continue away from danger"
 )
@@ -387,8 +382,8 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, true, "zombie damage triggers horde retreat")
-assertEqual(reason, "zombie_damage_retreat", "damage retreat reason")
+T.equal(moved, true, "zombie damage triggers horde retreat")
+T.equal(reason, "zombie_damage_retreat", "damage retreat reason")
 local retreatState = record.runtime.combatRetreat
 local retreatGoalX = retreatState.goalX
 record.x = retreatGoalX
@@ -400,8 +395,8 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, true, "damaged fighter does not attack below stamina threshold")
-assertEqual(reason, "recovering_stamina_safe", "damage retreat recovery reason")
+T.equal(moved, true, "damaged fighter does not attack below stamina threshold")
+T.equal(reason, "recovering_stamina_safe", "damage retreat recovery reason")
 record.stamina.current = 35
 now = now + 250
 moved = PNC.CombatTactics.PreAttackDecision(
@@ -411,7 +406,7 @@ moved = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, false, "fighter re-engages at stamina threshold")
+T.equal(moved, false, "fighter re-engages at stamina threshold")
 
 -- A ranged attack arbitration pass must not erase the zombie-attack marker
 -- before the ranged tactical precheck gets a chance to retreat.
@@ -426,13 +421,13 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
     "ranged",
     { hasWeapon = true }
 )
-assertEqual(moved, true, "ranged damage marker reaches retreat arbitration")
-assertEqual(reason, "zombie_damage_retreat", "ranged damage retreat reason")
+T.equal(moved, true, "ranged damage marker reaches retreat arbitration")
+T.equal(reason, "zombie_damage_retreat", "ranged damage retreat reason")
 record.runtime.target = target
 local interruptAttack, interruptReason =
     PNC.CombatTactics.ShouldInterruptAttackForRetreat(record)
-assertEqual(interruptAttack, true, "active attack yields to retreat")
-assertEqual(interruptReason, "zombie_damage_retreat",
+T.equal(interruptAttack, true, "active attack yields to retreat")
+T.equal(interruptReason, "zombie_damage_retreat",
     "active attack retreat handoff reason")
 
 -- Neutral records do not initiate against zombies, so CountEnemyZombies is
@@ -455,11 +450,11 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, true,
+T.equal(moved, true,
     "neutral zombie attack uses physical horde retreat gate")
-assertEqual(reason, "zombie_damage_retreat",
+T.equal(reason, "zombie_damage_retreat",
     "neutral physical horde retreat reason")
-assertEqual(record.runtime.combatThreatAssessment.hordeCount, 6,
+T.equal(record.runtime.combatThreatAssessment.hordeCount, 6,
     "neutral threat assessment counts physical horde")
 
 -- A hostile NPC may still have a player target when the zombie attack lands.
@@ -473,11 +468,11 @@ record.runtime.forcedZombieThreat = target
 PNC.CombatTactics.MarkZombieDamage(record, 1, 0, 0, now)
 interruptAttack, interruptReason =
     PNC.CombatTactics.ShouldInterruptAttackForRetreat(record)
-assertEqual(interruptAttack, true,
+T.equal(interruptAttack, true,
     "hostile active target yields to zombie retreat")
-assertEqual(interruptReason, "zombie_damage_retreat",
+T.equal(interruptReason, "zombie_damage_retreat",
     "hostile target-switch retreat reason")
-assertEqual(record.runtime.target.kind, "zombie",
+T.equal(record.runtime.target.kind, "zombie",
     "hostile zombie threat became the tactical target")
 
 -- Follow-mode retreat destinations stay inside the owner leash even when the
@@ -489,7 +484,7 @@ local clamped = PNC.CombatTactics.Internal.BuildRetreatFromSource(
     PNC.CombatTactics.Internal.EnsureRetreatState(record)
 )
 local ownerDistance = math.sqrt((clamped.x - 10) ^ 2 + clamped.y ^ 2)
-assert(ownerDistance <= 5.5 + 0.0001, "follow retreat exceeded owner leash")
+T.truthy(ownerDistance <= 5.5 + 0.0001, "follow retreat exceeded owner leash")
 
 -- A native route that makes no physical progress releases combat ownership
 -- instead of rebuilding the same retreat forever while the NPC is mauled.
@@ -503,7 +498,7 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, true, "stalled-retreat fixture starts movement")
+T.equal(moved, true, "stalled-retreat fixture starts movement")
 now = now + 1000
 moved, reason = PNC.CombatTactics.PreAttackDecision(
     record,
@@ -512,9 +507,9 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, false, "stalled retreat did not release combat")
-assertEqual(reason, "retreat_stalled", "stalled retreat reason")
-assertEqual(record.runtime.retreatMode, false,
+T.equal(moved, false, "stalled retreat did not release combat")
+T.equal(reason, "retreat_stalled", "stalled retreat reason")
+T.equal(record.runtime.retreatMode, false,
     "stalled retreat retained movement ownership")
 
 -- A crawler is only finished when the immediate area is safe.
@@ -530,8 +525,8 @@ moved, _, action = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, false, "safe crawler does not trigger retreat")
-assertEqual(action, "ground", "safe crawler opens ground finisher")
+T.equal(moved, false, "safe crawler does not trigger retreat")
+T.equal(action, "ground", "safe crawler opens ground finisher")
 
 now = now + 250
 pressureCount = 3
@@ -546,8 +541,8 @@ moved, reason, action = PNC.CombatTactics.PreAttackDecision(
     "melee",
     { hasWeapon = true }
 )
-assertEqual(moved, false, "crawler pressure alone does not trigger retreat")
-assertEqual(action, "ground", "crawler pressure leaves attack arbitration active")
+T.equal(moved, false, "crawler pressure alone does not trigger retreat")
+T.equal(action, "ground", "crawler pressure leaves attack arbitration active")
 
 -- Friendly humans crossing the shot corridor block fire.
 grounded = false
@@ -570,23 +565,23 @@ target.distSq = 36
 record = makeRecord("shooter")
 local safe
 safe, reason = PNC.CombatTactics.IsFriendlyFireSafe(record, target)
-assertEqual(safe, false, "ally blocks firearm lane")
-assertEqual(reason, "friendly_fire_risk", "friendly fire reason")
+T.equal(safe, false, "ally blocks firearm lane")
+T.equal(reason, "friendly_fire_risk", "friendly fire reason")
 
 nearbyNPCs = {}
 now = now + 121
 safe = PNC.CombatTactics.IsFriendlyFireSafe(record, target)
-assertEqual(safe, true, "clear firearm lane")
+T.equal(safe, true, "clear firearm lane")
 
 -- Ranged fire waits for skill/distance-based aim confidence.
 skillLevel = 0
 local ready
 ready, reason = PNC.CombatTactics.CanTakeRangedShot(record, target)
-assertEqual(ready, false, "new target requires aim settle")
-assertEqual(reason, "aiming", "aim settle reason")
+T.equal(ready, false, "new target requires aim settle")
+T.equal(reason, "aiming", "aim settle reason")
 now = now + 1000
 ready = PNC.CombatTactics.CanTakeRangedShot(record, target)
-assertEqual(ready, true, "settled clear shot becomes available")
+T.equal(ready, true, "settled clear shot becomes available")
 
 -- Reload is abandoned when the threat reaches point-blank range.
 record.runtime.attackAction = { attackType = "reload" }
@@ -594,8 +589,8 @@ target.x = 1
 target.distSq = 1
 local interrupt
 interrupt, reason = PNC.CombatTactics.ShouldInterruptReload(record, target)
-assertEqual(interrupt, true, "point-blank threat interrupts reload")
-assertEqual(reason, "reload_interrupted_by_pressure", "reload interruption reason")
+T.equal(interrupt, true, "point-blank threat interrupts reload")
+T.equal(reason, "reload_interrupted_by_pressure", "reload interruption reason")
 
 -- Multiple allies receive a stable offset approach slot instead of stacking.
 nearbyNPCs = {
@@ -613,11 +608,12 @@ local approachY
 local formation
 approachX, approachY, formation =
     PNC.CombatTactics.GetMeleeApproachPoint(record, target)
-assertEqual(formation, true, "nearby ally enables melee formation slot")
-assert(
+T.equal(formation, true, "nearby ally enables melee formation slot")
+T.truthy(
     math.abs(approachX - target.x) > 0.01
         or math.abs(approachY - target.y) > 0.01,
     "formation slot differs from target center"
 )
+T.finish("pnc_combat_tactical_decisions_smoke")
 
-print("pnc_combat_tactical_decisions_smoke: ok")
+T.finish("pnc_combat_tactical_decisions_smoke")

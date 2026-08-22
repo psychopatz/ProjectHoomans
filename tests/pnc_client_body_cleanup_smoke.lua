@@ -1,15 +1,10 @@
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
-package.path = CLIENT_ROOT .. "?.lua;" .. package.path
+local T = require "tests/support/test"
+
+local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
+T.addPackagePaths()
 
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/PNC_ClientPresenceSync.lua"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+    T.path("ProjectHoomans", "client", "PNC/PNC_ClientPresenceSync.lua")
 
 local function makeList(values)
     return {
@@ -134,13 +129,13 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 PNC.ClientPresenceSync.OnTick()
-assertEqual(canonical.wasRemoved(), false, "canonical client body preserved")
-assertEqual(duplicate.wasRemoved(), true, "old UUID body pruned")
-assertEqual(nakedLegacy.wasRemoved(), true, "nearby naked legacy body pruned")
-assertEqual(unrelatedNaked.wasRemoved(), false, "unrelated naked body preserved")
+T.equal(canonical.wasRemoved(), false, "canonical client body preserved")
+T.equal(duplicate.wasRemoved(), true, "old UUID body pruned")
+T.equal(nakedLegacy.wasRemoved(), true, "nearby naked legacy body pruned")
+T.equal(unrelatedNaked.wasRemoved(), false, "unrelated naked body preserved")
 
 local exact = makeBody({
     instanceID = 2001,
@@ -149,12 +144,13 @@ local exact = makeBody({
     y = 5,
     modData = { PNC_NPC = true, PNC_UUID = "other" },
 })
-assertEqual(PNC.ClientPresenceSync.RemoveBodyInstance({
+T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({
     id = "other",
     bodyInstanceID = "2001",
     bodyOnlineID = 21,
     reason = "server_startup_cleanup",
 }), 1, "exact client body removal count")
-assertEqual(exact.wasRemoved(), true, "exact server-directed body removed")
+T.equal(exact.wasRemoved(), true, "exact server-directed body removed")
+T.finish("pnc_client_body_cleanup_smoke")
 
-print("pnc_client_body_cleanup_smoke: ok")
+T.finish("pnc_client_body_cleanup_smoke")

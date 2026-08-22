@@ -1,17 +1,6 @@
-local Paths = dofile("tests/pnc_test_paths.lua")
-local ROOT = Paths.modRoot("ProjectHoomans") .. "media/lua/"
-package.path = ROOT .. "shared/?.lua;" .. ROOT .. "server/?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "value") .. " expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
-
-local function truthy(value, label)
-    if not value then error((label or "value") .. " expected truthy", 2) end
-end
+T.addPackagePaths()
 
 local function list(values)
     return { size = function() return #values end,
@@ -78,43 +67,44 @@ local malformed = { getScriptObjectFullType = function() error("bad addon recipe
 
 local ok, diagnostics = Catalog.Commands.Rebuild(list({ base, malformed, modded,
     installed }))
-truthy(ok, "catalog rebuild")
-equal(diagnostics.inspected, 4, "inspected")
-equal(diagnostics.normalized, 3, "normalized")
-equal(diagnostics.unsupported, 1, "unsupported")
-equal(Catalog.Queries.GetProducerKeys("SomeMod.SuperAxe")[1],
+T.truthy(ok, "catalog rebuild")
+T.equal(diagnostics.inspected, 4, "inspected")
+T.equal(diagnostics.normalized, 3, "normalized")
+T.equal(diagnostics.unsupported, 1, "unsupported")
+T.equal(Catalog.Queries.GetProducerKeys("SomeMod.SuperAxe")[1],
     "SomeMod.MakeSuperAxe", "mod producer")
-equal(Catalog.Queries.GetProducerKeys("Base.Firewood")[1],
+T.equal(Catalog.Queries.GetProducerKeys("Base.Firewood")[1],
     "Base.JB_ChopLog", "installed mod producer")
-equal(Catalog.Queries.Get("Base.MakeWoodenSpear").inputs[2].consumed,
+T.equal(Catalog.Queries.Get("Base.MakeWoodenSpear").inputs[2].consumed,
     false, "kept tool")
 
 local Registry = require "PNC/Core/Production/PNC_RecipeKnowledgeRegistry"
 Registry.Commands.Import(nil)
-equal(Registry.Queries.Diagnostics().persistentRecipeIdCount, 0, "lazy empty")
+T.equal(Registry.Queries.Diagnostics().persistentRecipeIdCount, 0, "lazy empty")
 local spearId = Registry.Commands.GetOrCreateId("Base.MakeWoodenSpear")
 local axeId = Registry.Commands.GetOrCreateId("SomeMod.MakeSuperAxe")
-equal(spearId, 1, "first stable id")
-equal(axeId, 2, "second stable id")
+T.equal(spearId, 1, "first stable id")
+T.equal(axeId, 2, "second stable id")
 
 Catalog.Commands.Rebuild(list({ installed, modded, base }))
-equal(Registry.Queries.GetId("Base.MakeWoodenSpear"), spearId,
+T.equal(Registry.Queries.GetId("Base.MakeWoodenSpear"), spearId,
     "enumeration reorder stable")
 local saved = Registry.Queries.Export()
 Registry.Commands.Import(saved)
-equal(Registry.Queries.GetId("SomeMod.MakeSuperAxe"), axeId,
+T.equal(Registry.Queries.GetId("SomeMod.MakeSuperAxe"), axeId,
     "reverse index rebuilt")
 
 Catalog.Commands.Rebuild(list({ installed, base }))
-equal(Registry.Queries.Resolve(axeId).status, "KNOWN_BUT_UNAVAILABLE",
+T.equal(Registry.Queries.Resolve(axeId).status, "KNOWN_BUT_UNAVAILABLE",
     "removed mod unavailable")
 Catalog.Commands.Rebuild(list({ installed, modded, base }))
-equal(Registry.Queries.Resolve(axeId).status, "AVAILABLE",
+T.equal(Registry.Queries.Resolve(axeId).status, "AVAILABLE",
     "restored mod available")
 
 local ResearchRepository = {}
 package.preload["PNC/Production/PNC_ResearchRepository"] = function()
     return ResearchRepository
 end
+T.finish("pnc_production_foundation_smoke")
 
-print("pnc_production_foundation_smoke: OK")
+T.finish("pnc_production_foundation_smoke")

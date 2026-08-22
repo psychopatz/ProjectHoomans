@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local warnings = {}
 local registeredBody
@@ -131,9 +126,9 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Pathing/PNC_TraversalQuery.lua")
-dofile(ROOT .. "Presence/PNC_MaterializationSafety.lua")
-dofile(ROOT .. "Presence/PNC_Presence.lua")
+T.load(ROOT .. "Pathing/PNC_TraversalQuery.lua")
+T.load(ROOT .. "Presence/PNC_MaterializationSafety.lua")
+T.load(ROOT .. "Presence/PNC_Presence.lua")
 
 local passengerRecord = {
     alive = true,
@@ -145,7 +140,7 @@ local passengerRecord = {
         vehiclePassenger = { active = true, vehicleId = "vehicle:7", seat = 1 },
     },
 }
-assertEqual(
+T.equal(
     PNC.Presence.ShouldMaterialize(passengerRecord),
     false,
     "abstract vehicle passenger stays bodyless"
@@ -163,20 +158,20 @@ local record = {
 }
 
 local materialized = PNC.Presence.Materialize(record, "range_enter")
-assertEqual(materialized, body, "saved NPC materialized")
-assertEqual(registeredBody, body, "repaired body registered")
-assertEqual(spawn.x, 0.5, "vehicle-stuck spawn repaired x")
-assertEqual(spawn.y, 0.5, "vehicle-stuck spawn repaired y")
-assertEqual(spawn.outfit, "Naked", "PNC engine shell uses naked base outfit")
-assertEqual(record.x, spawn.x, "repaired record x")
-assertEqual(record.presenceState, "live", "repaired record live")
-assertEqual(record.runtime.positionRecovery.lastEvent, "materialize_relocate",
+T.equal(materialized, body, "saved NPC materialized")
+T.equal(registeredBody, body, "repaired body registered")
+T.equal(spawn.x, 0.5, "vehicle-stuck spawn repaired x")
+T.equal(spawn.y, 0.5, "vehicle-stuck spawn repaired y")
+T.equal(spawn.outfit, "Naked", "PNC engine shell uses naked base outfit")
+T.equal(record.x, spawn.x, "repaired record x")
+T.equal(record.presenceState, "live", "repaired record live")
+T.equal(record.runtime.positionRecovery.lastEvent, "materialize_relocate",
     "materialize recovery metadata")
-assertEqual(record.runtime.positionRecovery.lastReason, "vehicle",
+T.equal(record.runtime.positionRecovery.lastReason, "vehicle",
     "materialize recovery reason")
-assertEqual(dirtyDomain, "position_recovery", "materialize recovery persisted")
-assertEqual(#warnings, 1, "materialize recovery log count")
-assert(
+T.equal(dirtyDomain, "position_recovery", "materialize recovery persisted")
+T.equal(#warnings, 1, "materialize recovery log count")
+T.truthy(
     string.find(warnings[1], "event=materialize_relocate", 1, true),
     "materialize recovery warning missing event"
 )
@@ -192,11 +187,11 @@ local clearRecord = {
     runtime = {},
 }
 materialized = PNC.Presence.Materialize(clearRecord, "range_enter")
-assertEqual(materialized, body, "clear saved NPC materialized")
-assertEqual(spawn.x, 0.75, "clear saved x preserved")
-assertEqual(spawn.y, 0.75, "clear saved y preserved")
-assertEqual(clearRecord.runtime.positionRecovery, nil, "clear saved NPC not repaired")
-assertEqual(#warnings, 1, "clear materialization emitted no recovery log")
+T.equal(materialized, body, "clear saved NPC materialized")
+T.equal(spawn.x, 0.75, "clear saved x preserved")
+T.equal(spawn.y, 0.75, "clear saved y preserved")
+T.equal(clearRecord.runtime.positionRecovery, nil, "clear saved NPC not repaired")
+T.equal(#warnings, 1, "clear materialization emitted no recovery log")
 
 local barnRecord = {
     id = "saved_barn_fixture",
@@ -209,15 +204,15 @@ local barnRecord = {
     runtime = {},
 }
 materialized = PNC.Presence.Materialize(barnRecord, "range_enter")
-assertEqual(materialized, body, "barn-fixture NPC materialized")
-assertEqual(spawn.x, 3.5, "barn-fixture spawn relocated x")
-assertEqual(spawn.y, 0.5, "barn-fixture spawn relocated y")
-assertEqual(
+T.equal(materialized, body, "barn-fixture NPC materialized")
+T.equal(spawn.x, 3.5, "barn-fixture spawn relocated x")
+T.equal(spawn.y, 0.5, "barn-fixture spawn relocated y")
+T.equal(
     barnRecord.runtime.positionRecovery.lastReason,
     "container_object",
     "barn-fixture recovery reason"
 )
-assertEqual(#warnings, 2, "barn-fixture recovery logged once")
+T.equal(#warnings, 2, "barn-fixture recovery logged once")
 
 PNC.Const.MATERIALIZE_CHUNK_SETTLE_MS = 1000
 now = 2000
@@ -234,22 +229,22 @@ local streamingRecord = {
 }
 local previousSpawnCount = spawnCount
 materialized = PNC.Presence.Materialize(streamingRecord, "range_enter")
-assertEqual(materialized, nil, "first streaming attempt deferred")
-assertEqual(spawnCount, previousSpawnCount, "deferred attempt created no body")
-assertEqual(
+T.equal(materialized, nil, "first streaming attempt deferred")
+T.equal(spawnCount, previousSpawnCount, "deferred attempt created no body")
+T.equal(
     streamingRecord.runtime.materializationDeferredReason,
     "target_chunk_loading",
     "streaming defer reason"
 )
-assertEqual(streamingRecord.runtime.materializeRetryAt, 2250, "streaming retry scheduled")
-assertEqual(presenceWakeAt, 2250, "streaming presence lane wake scheduled")
-assertEqual(scheduledAt, 2250, "streaming record retry scheduled")
+T.equal(streamingRecord.runtime.materializeRetryAt, 2250, "streaming retry scheduled")
+T.equal(presenceWakeAt, 2250, "streaming presence lane wake scheduled")
+T.equal(scheduledAt, 2250, "streaming record retry scheduled")
 
 chunk.loaded = true
 now = 2250
 materialized = PNC.Presence.Materialize(streamingRecord, "range_enter")
-assertEqual(materialized, nil, "newly loaded chunk begins settling")
-assertEqual(
+T.equal(materialized, nil, "newly loaded chunk begins settling")
+T.equal(
     streamingRecord.runtime.materializationDeferredReason,
     "target_chunk_settling",
     "newly loaded chunk settle reason"
@@ -257,19 +252,19 @@ assertEqual(
 
 now = 2750
 materialized = PNC.Presence.Materialize(streamingRecord, "range_enter")
-assertEqual(materialized, nil, "partially settled chunk remains abstract")
-assertEqual(spawnCount, previousSpawnCount, "settling attempts created no body")
+T.equal(materialized, nil, "partially settled chunk remains abstract")
+T.equal(spawnCount, previousSpawnCount, "settling attempts created no body")
 
 now = 3251
 materialized = PNC.Presence.Materialize(streamingRecord, "range_enter")
-assertEqual(materialized, body, "settled chunk materialized")
-assertEqual(spawnCount, previousSpawnCount + 1, "settled chunk created one body")
-assertEqual(
+T.equal(materialized, body, "settled chunk materialized")
+T.equal(spawnCount, previousSpawnCount + 1, "settled chunk created one body")
+T.equal(
     streamingRecord.runtime.materializationSafety,
     nil,
     "settled materialization state cleared"
 )
-assertEqual(
+T.equal(
     streamingRecord.runtime.materializationDeferredReason,
     nil,
     "settled defer reason cleared"
@@ -288,8 +283,8 @@ local explicitRecord = {
 }
 previousSpawnCount = spawnCount
 materialized = PNC.Presence.Materialize(explicitRecord, "force_live_spawn")
-assertEqual(materialized, body, "explicit live spawn bypasses range settle delay")
-assertEqual(spawnCount, previousSpawnCount + 1, "explicit live spawn created one body")
+T.equal(materialized, body, "explicit live spawn bypasses range settle delay")
+T.equal(spawnCount, previousSpawnCount + 1, "explicit live spawn created one body")
 
 now = 5000
 local movingRecord = {
@@ -304,8 +299,8 @@ local movingRecord = {
 }
 previousSpawnCount = spawnCount
 materialized = PNC.Presence.Materialize(movingRecord, "range_enter")
-assertEqual(materialized, nil, "moving NPC begins chunk settle")
-assertEqual(
+T.equal(materialized, nil, "moving NPC begins chunk settle")
+T.equal(
     movingRecord.runtime.materializationSafety.readySince,
     5000,
     "moving NPC settle start recorded"
@@ -314,8 +309,8 @@ assertEqual(
 now = 5500
 movingRecord.x = 3.5
 materialized = PNC.Presence.Materialize(movingRecord, "range_enter")
-assertEqual(materialized, nil, "same-chunk movement remains settling")
-assertEqual(
+T.equal(materialized, nil, "same-chunk movement remains settling")
+T.equal(
     movingRecord.runtime.materializationSafety.readySince,
     5000,
     "same-chunk movement preserves settle start"
@@ -324,8 +319,9 @@ assertEqual(
 now = 6001
 movingRecord.x = 8.5
 materialized = PNC.Presence.Materialize(movingRecord, "range_enter")
-assertEqual(materialized, body, "moving abstract NPC materialized after settle")
-assertEqual(spawnCount, previousSpawnCount + 1, "moving NPC created one body")
-assertEqual(spawn.x, 8.5, "moving NPC uses latest abstract position")
+T.equal(materialized, body, "moving abstract NPC materialized after settle")
+T.equal(spawnCount, previousSpawnCount + 1, "moving NPC created one body")
+T.equal(spawn.x, 8.5, "moving NPC uses latest abstract position")
+T.finish("pnc_presence_position_recovery_smoke")
 
-print("pnc_presence_position_recovery_smoke: ok")
+T.finish("pnc_presence_position_recovery_smoke")

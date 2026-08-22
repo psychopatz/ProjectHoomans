@@ -1,7 +1,9 @@
-local root = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-local sharedRoot = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
-local coreRoot = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
-package.path = sharedRoot .. "?.lua;" .. coreRoot .. "?.lua;" .. package.path
+local T = require "tests/support/test"
+
+local root = T.path("ProjectHoomans", "shared", "PNC/Core/")
+local sharedRoot = T.path("ProjectHoomans", "shared", "")
+local coreRoot = T.path("PsychopatzCore", "common", "")
+T.addPackagePaths()
 local now = 10000
 local records = {}
 local bodies = {}
@@ -80,17 +82,11 @@ PNC = {
     },
 }
 
-dofile(root .. "Base/PNC_Sandbox.lua")
-dofile(root .. "Health/PNC_Health.lua")
-dofile(root .. "Health/PNC_NPCWounds.lua")
-dofile(root .. "Health/PNC_Treatment.lua")
-dofile(root .. "Health/PNC_Revive.lua")
-
-local function assertEqual(actual, expected, message)
-    if actual ~= expected then
-        error((message or "values differ") .. ": expected " .. tostring(expected) .. ", got " .. tostring(actual))
-    end
-end
+T.load(root .. "Base/PNC_Sandbox.lua")
+T.load(root .. "Health/PNC_Health.lua")
+T.load(root .. "Health/PNC_NPCWounds.lua")
+T.load(root .. "Health/PNC_Treatment.lua")
+T.load(root .. "Health/PNC_Revive.lua")
 
 local function makeBody(x, y, z)
     return {
@@ -167,70 +163,70 @@ records[downed.id] = downed
 bodies[downed.id] = makeBody(0, 0, 0)
 
 SandboxVars = nil
-assertEqual(PNC.Sandbox.ZombiesTargetDownedNPC(), false, "sandbox default")
-assertEqual(PNC.Sandbox.CanZombieTargetRecord(downed), false, "downed targeting default")
-assertEqual(PNC.Health.ApplyDamage(downed, bodies[downed.id], {
+T.equal(PNC.Sandbox.ZombiesTargetDownedNPC(), false, "sandbox default")
+T.equal(PNC.Sandbox.CanZombieTargetRecord(downed), false, "downed targeting default")
+T.equal(PNC.Health.ApplyDamage(downed, bodies[downed.id], {
     amount = 12,
     attackerKind = "zombie",
 }), false, "protected zombie damage")
-assertEqual(downed.health.state, "incapacitated", "protected state")
+T.equal(downed.health.state, "incapacitated", "protected state")
 
 downed.health.reviveUntil = now - 1
 PNC.Health.Update(downed, bodies[downed.id], now)
-assertEqual(downed.health.state, "incapacitated", "downed NPC does not bleed out")
-assertEqual(PNC.Health.CanRevive(downed), true, "expired legacy timer does not block revive")
+T.equal(downed.health.state, "incapacitated", "downed NPC does not bleed out")
+T.equal(PNC.Health.CanRevive(downed), true, "expired legacy timer does not block revive")
 
 SandboxVars = { ProjectHoomans = { ZombiesTargetDownedNPC = true } }
-assertEqual(PNC.Sandbox.CanZombieTargetRecord(downed), true, "enabled downed targeting")
+T.equal(PNC.Sandbox.CanZombieTargetRecord(downed), true, "enabled downed targeting")
 PNC.Health.ApplyDamage(downed, bodies[downed.id], {
     amount = 12,
     attackerKind = "zombie",
 })
-assertEqual(downed.health.state, "dead", "enabled final blow")
+T.equal(downed.health.state, "dead", "enabled final blow")
 
 local reviveRecord = makeRecord("revive")
 records[reviveRecord.id] = reviveRecord
 bodies[reviveRecord.id] = makeBody(0, 0, 0)
 local shortPlayer = makePlayer(0, 0)
 local success, reason = PNC.Revive.Try(shortPlayer, reviveRecord.id)
-assertEqual(success, false, "missing bandage rejected")
-assertEqual(reason, "missing_bandages", "missing bandage reason")
-assertEqual(shortPlayer.removedCount(), 0, "failed revive consumes nothing")
+T.equal(success, false, "missing bandage rejected")
+T.equal(reason, "missing_bandages", "missing bandage reason")
+T.equal(shortPlayer.removedCount(), 0, "failed revive consumes nothing")
 
 local farPlayer = makePlayer(1, 4)
 success, reason = PNC.Revive.Try(farPlayer, reviveRecord.id)
-assertEqual(success, false, "distant revive rejected")
-assertEqual(reason, "too_far", "distance reason")
-assertEqual(farPlayer.removedCount(), 0, "distant revive consumes nothing")
+T.equal(success, false, "distant revive rejected")
+T.equal(reason, "too_far", "distance reason")
+T.equal(farPlayer.removedCount(), 0, "distant revive consumes nothing")
 
 local player = makePlayer(1, 0)
 success, reason = PNC.Revive.Try(player, reviveRecord.id)
-assertEqual(success, true, "valid bulk bandage compatibility")
-assertEqual(reason, "wounds_bandaged", "bulk bandage reason")
-assertEqual(player.removedCount(), 1, "one material per wound")
-assertEqual(reviveRecord.health.state, "incapacitated", "bandage does not instantly revive")
-assertEqual(reviveRecord.health.current, 1, "bandage grants no instant health")
-assertEqual(reviveRecord.health.body.bandagedWoundCount, 1, "wound was bandaged")
-assertEqual(broadcasts, 1, "revive broadcast")
-assertEqual(clearedAggro, 0, "bandaging does not fake recovery")
+T.equal(success, true, "valid bulk bandage compatibility")
+T.equal(reason, "wounds_bandaged", "bulk bandage reason")
+T.equal(player.removedCount(), 1, "one material per wound")
+T.equal(reviveRecord.health.state, "incapacitated", "bandage does not instantly revive")
+T.equal(reviveRecord.health.current, 1, "bandage grants no instant health")
+T.equal(reviveRecord.health.body.bandagedWoundCount, 1, "wound was bandaged")
+T.equal(broadcasts, 1, "revive broadcast")
+T.equal(clearedAggro, 0, "bandaging does not fake recovery")
 
 currentWorldHour = currentWorldHour + 3
 now = now + 1000
 PNC.Health.Update(reviveRecord, bodies[reviveRecord.id], now)
-assertEqual(reviveRecord.health.state, "normal", "healing threshold resumes walking")
-assert(reviveRecord.health.current >= 5, "gradual healing did not reach recovery threshold")
-assertEqual(clearedAggro, 1, "actual recovery clears zombie pressure")
-assertEqual(PNC.Sandbox.CanZombieTargetRecord(reviveRecord), false, "recovery protection")
+T.equal(reviveRecord.health.state, "normal", "healing threshold resumes walking")
+T.truthy(reviveRecord.health.current >= 5, "gradual healing did not reach recovery threshold")
+T.equal(clearedAggro, 1, "actual recovery clears zombie pressure")
+T.equal(PNC.Sandbox.CanZombieTargetRecord(reviveRecord), false, "recovery protection")
 local protectedHealth = reviveRecord.health.current
-assertEqual(PNC.Health.ApplyDamage(reviveRecord, bodies[reviveRecord.id], {
+T.equal(PNC.Health.ApplyDamage(reviveRecord, bodies[reviveRecord.id], {
     amount = 12,
     attackerKind = "zombie",
 }), false, "recovery protection blocks zombie damage")
-assertEqual(reviveRecord.health.current, protectedHealth, "protected recovery health")
+T.equal(reviveRecord.health.current, protectedHealth, "protected recovery health")
 
 now = now + PNC.Const.REVIVE_PROTECTION_MS + 1
 PNC.Health.Update(reviveRecord, bodies[reviveRecord.id], now)
-assertEqual(PNC.Sandbox.CanZombieTargetRecord(reviveRecord), true, "recovery protection expires")
+T.equal(PNC.Sandbox.CanZombieTargetRecord(reviveRecord), true, "recovery protection expires")
 
 local transitionAnimations = 0
 local transitionResets = 0
@@ -253,15 +249,15 @@ PNC.PathService = {
 PNC.Animation = {
     ApplyDowned = function() transitionAnimations = transitionAnimations + 1 end,
 }
-assertEqual(PNC.Health.ApplyDamage(transitionRecord, makeBody(0, 0, 0), {
+T.equal(PNC.Health.ApplyDamage(transitionRecord, makeBody(0, 0, 0), {
     amount = 10,
     attackerKind = "player",
     type = "transition_test",
 }), true, "damage enters incapacitation")
-assertEqual(transitionRecord.health.state, "incapacitated", "transition health state")
-assertEqual(transitionResets, 1, "transition resets path ownership")
-assertEqual(transitionAnimations, 1, "transition applies downed state immediately")
-assertEqual(scheduledAt, now + 50, "transition schedules downed reassertion")
+T.equal(transitionRecord.health.state, "incapacitated", "transition health state")
+T.equal(transitionResets, 1, "transition resets path ownership")
+T.equal(transitionAnimations, 1, "transition applies downed state immediately")
+T.equal(scheduledAt, now + 50, "transition schedules downed reassertion")
 
 local halted = 0
 local downedAnimations = 0
@@ -277,15 +273,16 @@ PNC.BehaviorCommon = {
 PNC.Animation = {
     ApplyDowned = function() downedAnimations = downedAnimations + 1 end,
 }
-dofile(root .. "Behaviors/PNC_Behavior_Incapacitated.lua")
+T.load(root .. "Behaviors/PNC_Behavior_Incapacitated.lua")
 local behaviorRecord = makeRecord("behavior")
 behaviorRecord.runtime.target = { kind = "zombie" }
 behaviorRecord.runtime.attackAction = { kind = "shove" }
 PNC.BehaviorIncapacitated.Tick(behaviorRecord, {})
-assertEqual(behaviorRecord.runtime.target, nil, "incapacitated target cleared")
-assertEqual(behaviorRecord.runtime.attackAction, nil, "incapacitated attack cleared")
-assertEqual(behaviorRecord.runtime.combatBlockReason, "incapacitated", "incapacitated combat blocked")
-assertEqual(halted, 1, "incapacitated NPC held still")
-assertEqual(downedAnimations, 1, "incapacitated pose maintained")
+T.equal(behaviorRecord.runtime.target, nil, "incapacitated target cleared")
+T.equal(behaviorRecord.runtime.attackAction, nil, "incapacitated attack cleared")
+T.equal(behaviorRecord.runtime.combatBlockReason, "incapacitated", "incapacitated combat blocked")
+T.equal(halted, 1, "incapacitated NPC held still")
+T.equal(downedAnimations, 1, "incapacitated pose maintained")
+T.finish("pnc_revive_smoke")
 
-print("PNC revive smoke test passed")
+T.finish("pnc_revive_smoke")

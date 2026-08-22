@@ -1,4 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_NavigationRouter.lua"
 
 local plannerCalls = 0
@@ -27,14 +29,14 @@ PNC = {
             plannerClears = plannerClears + 1
         end,
         Invalidate = function(_, reason)
-            assert(reason == "test_stall")
+            T.truthy(reason == "test_stall")
             plannerInvalidations = plannerInvalidations + 1
             return true
         end,
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local combatRecord = {
     activeBehavior = "FollowOwner:moving",
@@ -47,10 +49,10 @@ local policy, provider = PNC.NavigationRouter.Resolve(
     combatRecord,
     "investigating_last_seen"
 )
-assert(policy == "combat", "active combat did not select combat policy")
-assert(provider == "engine_path",
+T.truthy(policy == "combat", "active combat did not select combat policy")
+T.truthy(provider == "engine_path",
     "combat policy did not select native engine pathing")
-assert(plannerCalls == 0, "policy resolution invoked native planning")
+T.truthy(plannerCalls == 0, "policy resolution invoked native planning")
 
 local unsafeRecord = { runtime = {} }
 local unsafePolicy, unsafeProvider = PNC.NavigationRouter.Resolve(
@@ -59,9 +61,9 @@ local unsafePolicy, unsafeProvider = PNC.NavigationRouter.Resolve(
     nil,
     { nativeUnsafe = true }
 )
-assert(unsafePolicy == "local" and unsafeProvider == "engine_path",
+T.truthy(unsafePolicy == "local" and unsafeProvider == "engine_path",
     "body without a native behavior escaped unified native ownership")
-assert(unsafeRecord.runtime.navigationRouter.lastFallbackReason
+T.truthy(unsafeRecord.runtime.navigationRouter.lastFallbackReason
         == "native_behavior_unavailable",
     "router did not retain native fallback reason")
 
@@ -76,8 +78,8 @@ travelPolicy, travelProvider, travelSpec = PNC.NavigationRouter.Resolve(
     travelRecord,
     "journey:test"
 )
-assert(travelPolicy == "travel", "journey did not select travel policy")
-assert(
+T.truthy(travelPolicy == "travel", "journey did not select travel policy")
+T.truthy(
     travelProvider == "engine_path",
     "travel policy did not select native engine planner"
 )
@@ -90,31 +92,31 @@ local steering = PNC.NavigationRouter.GetSteeringTarget(
     travelProvider,
     travelSpec
 )
-assert(plannerCalls == 1, "travel did not invoke native engine planner")
-assert(steering.x == 9, "travel provider result was not returned")
-assert(
+T.truthy(plannerCalls == 1, "travel did not invoke native engine planner")
+T.truthy(steering.x == 9, "travel provider result was not returned")
+T.truthy(
     PNC.NavigationRouter.Invalidate(travelRecord, "test_stall"),
     "active route provider was not invalidated"
 )
-assert(plannerInvalidations == 1, "planner invalidation was not forwarded")
+T.truthy(plannerInvalidations == 1, "planner invalidation was not forwarded")
 
 policy, provider = PNC.NavigationRouter.Resolve(
     travelRecord,
     "melee_kiting",
     { navigationPolicy = "combat" }
 )
-assert(policy == "combat" and provider == "engine_path")
-assert(plannerClears == 1,
+T.truthy(policy == "combat" and provider == "engine_path")
+T.truthy(plannerClears == 1,
     "switching navigation policy did not clear the previous route")
 
 local tacticalCalls = 0
-assert(PNC.NavigationRouter.RegisterProvider("kite_test", {
+T.truthy(PNC.NavigationRouter.RegisterProvider("kite_test", {
     GetSteeringTarget = function(_, _, finalTarget)
         tacticalCalls = tacticalCalls + 1
         return finalTarget
     end,
 }))
-assert(PNC.NavigationRouter.RegisterPolicy("kite_test", {
+T.truthy(PNC.NavigationRouter.RegisterPolicy("kite_test", {
     provider = "kite_test",
 }))
 local kiteSpec
@@ -131,6 +133,7 @@ PNC.NavigationRouter.GetSteeringTarget(
     provider,
     kiteSpec
 )
-assert(tacticalCalls == 1, "registered tactical provider was not routed")
+T.truthy(tacticalCalls == 1, "registered tactical provider was not routed")
+T.finish("pnc_navigation_router_smoke")
 
-print("pnc_navigation_router_smoke: ok")
+T.finish("pnc_navigation_router_smoke")

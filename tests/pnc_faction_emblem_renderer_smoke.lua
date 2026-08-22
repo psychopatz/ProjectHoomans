@@ -1,10 +1,12 @@
+local T = require "tests/support/test"
+
 local SHARED =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 local CLIENT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+    T.path("ProjectHoomans", "client", "PNC/")
 
 PNC = {}
-dofile(SHARED .. "Factions/PNC_FactionEmblems.lua")
+T.load(SHARED .. "Factions/PNC_FactionEmblems.lua")
 
 local textureLoads = 0
 function getTexture(path)
@@ -12,7 +14,7 @@ function getTexture(path)
     return path
 end
 
-dofile(
+T.load(
     CLIENT
         .. "UI/Factions/PNC_FactionEmblemRenderer.lua"
 )
@@ -69,18 +71,18 @@ local emblem = PNC.FactionEmblems.Normalize({
     },
 }, "settler", "renderer")
 
-assert(PNC.FactionEmblemRenderer.Draw(
+T.truthy(PNC.FactionEmblemRenderer.Draw(
     target,
     emblem,
     10,
     20,
     40
 ), "renderer rejected valid emblem")
-assert(rectangles == 1 and borders == 1,
+T.truthy(rectangles == 1 and borders == 1,
     "renderer did not draw bounded background")
-assert(#layers == 2,
+T.truthy(#layers == 2,
     "renderer did not overlap all emblem layers")
-assert(layers[1].texture
+T.truthy(layers[1].texture
     == "media/ui/LootableMaps/map_house.png",
     "renderer did not resolve vanilla symbol texture")
 
@@ -91,7 +93,8 @@ PNC.FactionEmblemRenderer.Draw(
     20,
     40
 )
-assert(textureLoads == 2,
+T.truthy(textureLoads == 2,
     "symbol textures were not cached by stable ID")
+T.finish("pnc_faction_emblem_renderer_smoke")
 
-print("pnc_faction_emblem_renderer_smoke: PASS")
+T.finish("pnc_faction_emblem_renderer_smoke")

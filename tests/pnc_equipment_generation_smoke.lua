@@ -1,26 +1,11 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
-local COMMON_ROOT = "Contents/mods/ProjectHoomans/common/media/lua/shared/"
-local CORE_ROOT = "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/"
+local T = require "tests/support/test"
 
-package.path = SHARED_ROOT .. "?.lua;" .. COMMON_ROOT .. "?.lua;"
-    .. CORE_ROOT .. "?.lua;" .. package.path
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
+local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
+local COMMON_ROOT = T.path("ProjectHoomans", "common_lua", "")
+local CORE_ROOT = T.path("PsychopatzCore", "common", "")
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertNear(actual, expected, tolerance, label)
-    if math.abs((tonumber(actual) or 0) - (tonumber(expected) or 0))
-        > (tonumber(tolerance) or 0.0001)
-    then
-        error((label or "assertNear") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+T.addPackagePaths()
 
 local function deepCopy(value)
     local output
@@ -146,22 +131,22 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Base/PNC_Sandbox.lua")
-dofile(ROOT .. "Inventory/PNC_Inventory.lua")
+T.load(ROOT .. "Base/PNC_Sandbox.lua")
+T.load(ROOT .. "Inventory/PNC_Inventory.lua")
 
-assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("hostile_melee"), "melee",
+T.equal(PNC.Inventory.GetDebugEquipmentSpawnMode("hostile_melee"), "melee",
     "debug melee override")
-assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("hostile_ranged"), "ranged",
+T.equal(PNC.Inventory.GetDebugEquipmentSpawnMode("hostile_ranged"), "ranged",
     "debug ranged override")
-assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("neutral", "melee"), "melee",
+T.equal(PNC.Inventory.GetDebugEquipmentSpawnMode("neutral", "melee"), "melee",
     "neutral debug melee override")
-assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("colonist", "ranged"), "ranged",
+T.equal(PNC.Inventory.GetDebugEquipmentSpawnMode("colonist", "ranged"), "ranged",
     "companion debug ranged override")
-assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("neutral", "both"), "both",
+T.equal(PNC.Inventory.GetDebugEquipmentSpawnMode("neutral", "both"), "both",
     "neutral debug both override")
-assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("hostile"), nil,
+T.equal(PNC.Inventory.GetDebugEquipmentSpawnMode("hostile"), nil,
     "generic debug hostile uses chances")
-assertEqual(PNC.Inventory.GetDebugEquipmentSpawnMode("colonist"), nil,
+T.equal(PNC.Inventory.GetDebugEquipmentSpawnMode("colonist"), nil,
     "generic debug colonist uses chances")
 
 local function makeRecord(id, seed, archetypeID, override)
@@ -192,20 +177,20 @@ local bothInventory = PNC.Inventory.CreateFromTemplate(bothRecord)
 local primary = bothInventory.items[bothInventory.equipped.primary]
 local reserve = itemByTemplateKey(bothInventory, "tmpl:weapon:reserve")
 local identityCard = itemByTemplateKey(bothInventory, "tmpl:identity_card:0")
-assert(primary, "both-weapon spawn has no primary")
-assert(reserve, "both-weapon spawn has no reserve")
-assert(identityCard, "NPC identity card was not generated")
-assertEqual(identityCard.type, "Base.IDcard", "NPC identity card type")
-assertEqual(identityCard.customName, "ID Card: Unknown NPC", "NPC identity card name")
-assertEqual(identityCard.identityNPCId, bothRecord.id, "NPC identity card UUID")
-assertEqual(identityCard.interactionLocked, true,
+T.truthy(primary, "both-weapon spawn has no primary")
+T.truthy(reserve, "both-weapon spawn has no reserve")
+T.truthy(identityCard, "NPC identity card was not generated")
+T.equal(identityCard.type, "Base.IDcard", "NPC identity card type")
+T.equal(identityCard.customName, "ID Card: Unknown NPC", "NPC identity card name")
+T.equal(identityCard.identityNPCId, bothRecord.id, "NPC identity card UUID")
+T.equal(identityCard.interactionLocked, true,
     "NPC identity card is interaction locked")
-assertEqual(identityCard.interactionLockReason, "identity_card",
+T.equal(identityCard.interactionLockReason, "identity_card",
     "NPC identity card lock reason")
-assertEqual(rangedTypes[primary.type], true, "ranged weapon is active when both spawn")
-assertEqual(rangedTypes[reserve.type] == true, false, "melee weapon is reserve when both spawn")
-assertEqual(bothRecord.weaponMode, "mixed", "both-weapon combat mode")
-assertEqual(bothRecord.runtime.spawnEquipmentPool, "Default", "equipment pool runtime state")
+T.equal(rangedTypes[primary.type], true, "ranged weapon is active when both spawn")
+T.equal(rangedTypes[reserve.type] == true, false, "melee weapon is reserve when both spawn")
+T.equal(bothRecord.weaponMode, "mixed", "both-weapon combat mode")
+T.equal(bothRecord.runtime.spawnEquipmentPool, "Default", "equipment pool runtime state")
 
 local ammoFound = false
 for _, item in pairs(bothInventory.items) do
@@ -215,50 +200,50 @@ for _, item in pairs(bothInventory.items) do
         ammoFound = true
     end
 end
-assertEqual(ammoFound, true, "ranged equipment grant ammunition")
+T.equal(ammoFound, true, "ranged equipment grant ammunition")
 
 local saved = PNC.Inventory.Serialize(bothRecord)
-assertEqual(saved[4].equipmentPoolID, "Default", "persisted equipment pool")
-assertEqual(saved[4].weaponMode, "mixed", "persisted generated weapon mode")
+T.equal(saved[4].equipmentPoolID, "Default", "persisted equipment pool")
+T.equal(saved[4].weaponMode, "mixed", "persisted generated weapon mode")
 
 local repeated = makeRecord("natural_both_2", 8142, "Doctor")
 local repeatedInventory = PNC.Inventory.CreateFromTemplate(repeated)
 local repeatedPrimary = repeatedInventory.items[repeatedInventory.equipped.primary]
 local repeatedReserve = itemByTemplateKey(repeatedInventory, "tmpl:weapon:reserve")
-assertEqual(repeatedPrimary.type, primary.type, "same seed primary ignores NPC archetype")
-assertEqual(repeatedReserve.type, reserve.type, "same seed reserve ignores NPC archetype")
+T.equal(repeatedPrimary.type, primary.type, "same seed primary ignores NPC archetype")
+T.equal(repeatedReserve.type, reserve.type, "same seed reserve ignores NPC archetype")
 
 SandboxVars.ProjectHoomans.NPCMeleeWeaponSpawnChance = 0
 SandboxVars.ProjectHoomans.NPCRangedWeaponSpawnChance = 0
 local unarmedRecord = makeRecord("natural_unarmed", 42)
 local unarmedInventory = PNC.Inventory.CreateFromTemplate(unarmedRecord)
-assertEqual(unarmedInventory.equipped.primary, nil, "zero chances remain unarmed")
-assertEqual(itemByTemplateKey(unarmedInventory, "tmpl:weapon:reserve"), nil, "unarmed reserve")
+T.equal(unarmedInventory.equipped.primary, nil, "zero chances remain unarmed")
+T.equal(itemByTemplateKey(unarmedInventory, "tmpl:weapon:reserve"), nil, "unarmed reserve")
 
 SandboxVars.ProjectHoomans.NPCMeleeWeaponSpawnChance = 0
 SandboxVars.ProjectHoomans.NPCRangedWeaponSpawnChance = 100
 local forcedMelee = makeRecord("debug_melee", 42, "Scavenger", "melee")
 local forcedMeleeInventory = PNC.Inventory.CreateFromTemplate(forcedMelee)
 local forcedMeleePrimary = forcedMeleeInventory.items[forcedMeleeInventory.equipped.primary]
-assert(forcedMeleePrimary, "forced debug melee weapon")
-assertEqual(rangedTypes[forcedMeleePrimary.type] == true, false, "forced debug melee bypass")
-assertEqual(forcedMelee.weaponMode, "melee", "forced debug melee mode")
+T.truthy(forcedMeleePrimary, "forced debug melee weapon")
+T.equal(rangedTypes[forcedMeleePrimary.type] == true, false, "forced debug melee bypass")
+T.equal(forcedMelee.weaponMode, "melee", "forced debug melee mode")
 
 SandboxVars.ProjectHoomans.NPCMeleeWeaponSpawnChance = 100
 SandboxVars.ProjectHoomans.NPCRangedWeaponSpawnChance = 0
 local forcedRanged = makeRecord("debug_ranged", 42, "Scavenger", "ranged")
 local forcedRangedInventory = PNC.Inventory.CreateFromTemplate(forcedRanged)
 local forcedRangedPrimary = forcedRangedInventory.items[forcedRangedInventory.equipped.primary]
-assert(forcedRangedPrimary, "forced debug ranged weapon")
-assertEqual(rangedTypes[forcedRangedPrimary.type], true, "forced debug ranged bypass")
-assertEqual(forcedRanged.weaponMode, "ranged", "forced debug ranged mode")
+T.truthy(forcedRangedPrimary, "forced debug ranged weapon")
+T.equal(rangedTypes[forcedRangedPrimary.type], true, "forced debug ranged bypass")
+T.equal(forcedRanged.weaponMode, "ranged", "forced debug ranged mode")
 
-assert(PNC.Inventory.RegisterEquipmentSpawnPool("MedicalTest", {
+T.truthy(PNC.Inventory.RegisterEquipmentSpawnPool("MedicalTest", {
     categories = {
         medical = { "Base.Bandage" },
     },
 }), "generic equipment pool registration")
-assert(PNC.Inventory.AddEquipmentSpawnEntry("MedicalTest", "medical", {
+T.truthy(PNC.Inventory.AddEquipmentSpawnEntry("MedicalTest", "medical", {
     type = "Base.AlcoholBandage",
     weight = 2,
 }), "generic equipment pool extension")
@@ -268,12 +253,12 @@ local medical = PNC.Inventory.ChooseEquipmentSpawnEntry(
     99,
     "test:medical"
 )
-assert(medical and (
+T.truthy(medical and (
     medical.type == "Base.Bandage"
     or medical.type == "Base.AlcoholBandage"
 ), "generic equipment category selection")
 
-dofile(ROOT .. "Inventory/PNC_Inventory_Actions.lua")
+T.load(ROOT .. "Inventory/PNC_Inventory_Actions.lua")
 local interactionRecord = makeRecord("inventory_interaction", 5150)
 interactionRecord.faction = "colonist"
 local interactionInventory = PNC.Inventory.CreateFromTemplate(interactionRecord)
@@ -284,91 +269,89 @@ local added, addReason, addedIDs = PNC.Inventory.AddItems(interactionRecord, {
         itemState = { condition = 8, customName = "Travel Shirt" },
     },
 }, "root", "smoke_add")
-assertEqual(added, true, "public inventory add")
-assertEqual(addReason, "added", "public inventory add reason")
-assertEqual(#addedIDs, 1, "public inventory add ID")
+T.equal(added, true, "public inventory add")
+T.equal(addReason, "added", "public inventory add reason")
+T.equal(#addedIDs, 1, "public inventory add ID")
 local addedItem = interactionInventory.items[addedIDs[1]]
-assertEqual(addedItem.itemState.condition, 8, "portable state retained")
+T.equal(addedItem.itemState.condition, 8, "portable state retained")
 
 local worn, wornReason = PNC.InventoryActions.Execute(
     "wear", nil, interactionRecord, addedItem.id, {}
 )
-assertEqual(worn, true, "modular wear action")
-assertEqual(wornReason, "worn", "modular wear reason")
-assertEqual(addedItem.wornSlot, "Torso1", "worn slot applied")
+T.equal(worn, true, "modular wear action")
+T.equal(wornReason, "worn", "modular wear reason")
+T.equal(addedItem.wornSlot, "Torso1", "worn slot applied")
 
 local removedWorn = PNC.InventoryActions.Execute(
     "remove_worn", nil, interactionRecord, addedItem.id, {}
 )
-assertEqual(removedWorn, true, "modular remove-worn action")
-assertEqual(addedItem.wornSlot, nil, "worn slot cleared")
+T.equal(removedWorn, true, "modular remove-worn action")
+T.equal(addedItem.wornSlot, nil, "worn slot cleared")
 
 local equipped = PNC.InventoryActions.Execute(
     "equip_primary", nil, interactionRecord, addedItem.id, {}
 )
-assertEqual(equipped, true, "modular equip action")
-assertEqual(interactionInventory.equipped.primary, addedItem.id, "primary equipped")
-assertEqual(PNC.Inventory.SetEquipped(
+T.equal(equipped, true, "modular equip action")
+T.equal(interactionInventory.equipped.primary, addedItem.id, "primary equipped")
+T.equal(PNC.Inventory.SetEquipped(
     interactionRecord, "secondary", addedItem.id, "smoke_secondary"
 ), true, "move item to secondary")
-assertEqual(interactionInventory.equipped.primary, nil, "old equip slot cleared")
-assertEqual(interactionInventory.equipped.secondary, addedItem.id, "secondary equipped")
-assertEqual(PNC.Inventory.SetEquipped(
+T.equal(interactionInventory.equipped.primary, nil, "old equip slot cleared")
+T.equal(interactionInventory.equipped.secondary, addedItem.id, "secondary equipped")
+T.equal(PNC.Inventory.SetEquipped(
     interactionRecord, "primary", addedItem.id, "smoke_primary"
 ), true, "move item back to primary")
-assertEqual(interactionInventory.equipped.secondary, nil, "secondary slot cleared")
-assertEqual(interactionInventory.equipped.primary, addedItem.id, "primary restored")
-assertEqual(PNC.InventoryActions.Execute(
+T.equal(interactionInventory.equipped.secondary, nil, "secondary slot cleared")
+T.equal(interactionInventory.equipped.primary, addedItem.id, "primary restored")
+T.equal(PNC.InventoryActions.Execute(
     "unequip", nil, interactionRecord, addedItem.id, {}
 ), true, "modular unequip action")
-assertEqual(interactionInventory.equipped.primary, nil, "primary cleared")
+T.equal(interactionInventory.equipped.primary, nil, "primary cleared")
 
 local favorited, favoriteReason = PNC.InventoryActions.Execute(
     "favorite", nil, interactionRecord, addedItem.id, {}
 )
-assertEqual(favorited, true, "modular favorite action")
-assertEqual(favoriteReason, "favorited", "modular favorite reason")
-assertEqual(addedItem.fav, true, "favorite state applied")
+T.equal(favorited, true, "modular favorite action")
+T.equal(favoriteReason, "favorited", "modular favorite reason")
+T.equal(addedItem.fav, true, "favorite state applied")
 local payload = PNC.Inventory.BuildFullPayload(interactionRecord)
-assertEqual(payload.items[addedItem.id].itemState.customName, "Travel Shirt",
+T.equal(payload.items[addedItem.id].itemState.customName, "Travel Shirt",
     "portable state replicated")
-assertEqual(payload.items[addedItem.id].fav, true, "favorite state replicated")
-assertEqual(PNC.InventoryActions.Execute(
+T.equal(payload.items[addedItem.id].fav, true, "favorite state replicated")
+T.equal(PNC.InventoryActions.Execute(
     "unfavorite", nil, interactionRecord, addedItem.id, {}
 ), true, "modular unfavorite action")
-assertEqual(addedItem.fav, false, "favorite state cleared")
-assertEqual(PNC.Inventory.RemoveItems(
+T.equal(addedItem.fav, false, "favorite state cleared")
+T.equal(PNC.Inventory.RemoveItems(
     interactionRecord, { addedItem.id }, "smoke_remove"
 ), true, "public inventory remove")
-assertEqual(interactionInventory.items[addedItem.id], nil, "item removed")
+T.equal(interactionInventory.items[addedItem.id], nil, "item removed")
 
 local bagAdded, _, bagIDs = PNC.Inventory.AddItems(interactionRecord, {
     { type = "Base.Bag_Test", stack = 1 },
 }, "root", "smoke_bag_add")
-assertEqual(bagAdded, true, "wearable container add")
+T.equal(bagAdded, true, "wearable container add")
 local bagItem = interactionInventory.items[bagIDs[1]]
-assertEqual(bagItem.wearableSlot, "base:back", "container equipment slot")
-assertEqual(bagItem.weightReduction, 0.8, "container weight reduction")
-assertEqual(bagItem.maxWeight, 10, "container capacity")
+T.equal(bagItem.wearableSlot, "base:back", "container equipment slot")
+T.equal(bagItem.weightReduction, 0.8, "container weight reduction")
+T.equal(bagItem.maxWeight, 10, "container capacity")
 
-assertEqual(PNC.Inventory.AddItems(interactionRecord, {
+T.equal(PNC.Inventory.AddItems(interactionRecord, {
     { type = "Base.Bandage", stack = 5 },
 }, bagItem.bagContainer, "smoke_bag_contents"), true, "bag contents add")
 local weightBeforeBagEquip = interactionInventory.cachedWeight
-assertEqual(PNC.InventoryActions.Execute(
+T.equal(PNC.InventoryActions.Execute(
     "equip_container", nil, interactionRecord, bagItem.id, {}
 ), true, "modular bag equip action")
-assertEqual(bagItem.wornSlot, "base:back", "bag worn slot")
-assertEqual(interactionInventory.worn["base:back"], bagItem.id, "bag worn reference")
+T.equal(bagItem.wornSlot, "base:back", "bag worn slot")
+T.equal(interactionInventory.worn["base:back"], bagItem.id, "bag worn reference")
 local reducedContentsWeight =
     PNC.Inventory.Internal.getItemWeight("Base.Bandage") * 5 * 0.8
-assertNear(interactionInventory.cachedWeight,
-    weightBeforeBagEquip - reducedContentsWeight, 0.0001,
-    "equipped bag reduces contents weight")
+T.near(interactionInventory.cachedWeight, weightBeforeBagEquip - reducedContentsWeight, 0.0001, "equipped bag reduces contents weight")
 local bagPayload = PNC.Inventory.BuildFullPayload(interactionRecord)
-assertEqual(bagPayload.items[bagItem.id].weightReduction, 0.8,
+T.equal(bagPayload.items[bagItem.id].weightReduction, 0.8,
     "bag reduction replicated")
-assertEqual(bagPayload.items[bagItem.id].wearableSlot, "base:back",
+T.equal(bagPayload.items[bagItem.id].wearableSlot, "base:back",
     "bag equipment slot replicated")
 
 local baseCarry = interactionInventory.maxWeight
@@ -376,19 +359,19 @@ local heavyUnitWeight = PNC.Inventory.Internal.getItemWeight("Base.HeavyLoad")
 local severeStack = math.ceil(
     ((baseCarry * 1.8) - interactionInventory.cachedWeight) / heavyUnitWeight
 )
-assertEqual(PNC.Inventory.AddItems(interactionRecord, {
+T.equal(PNC.Inventory.AddItems(interactionRecord, {
     { type = "Base.HeavyLoad", stack = severeStack },
 }, "root", "smoke_severe_load"), true, "severe load accepted below hard cap")
 local encumbrance = PNC.Inventory.GetEncumbranceState(interactionRecord)
-assertEqual(encumbrance.level, "severe", "severe encumbrance threshold")
+T.equal(encumbrance.level, "severe", "severe encumbrance threshold")
 
 local strainDamageCalls = 0
 PNC.Health = {
     ApplyStrainDamage = function(_, _, amount, floorRatio, reason)
         strainDamageCalls = strainDamageCalls + 1
-        assertEqual(amount, 1, "strain damage amount")
-        assertEqual(floorRatio, 0.75, "strain damage floor")
-        assertEqual(reason, "severe_encumbrance", "strain damage reason")
+        T.equal(amount, 1, "strain damage amount")
+        T.equal(floorRatio, 0.75, "strain damage floor")
+        T.equal(reason, "severe_encumbrance", "strain damage reason")
         return true
     end,
 }
@@ -411,35 +394,36 @@ PNC.Skills = {
         return 2
     end,
 }
-dofile(ROOT .. "Stamina/PNC_Stamina.lua")
+T.load(ROOT .. "Stamina/PNC_Stamina.lua")
 local staminaSnapshot = PNC.Stamina.BuildSnapshot(interactionRecord)
-assert(staminaSnapshot.max < staminaSnapshot.baseMax,
+T.truthy(staminaSnapshot.max < staminaSnapshot.baseMax,
     "encumbrance lowers maximum stamina")
-assertEqual(staminaSnapshot.encumbranceLevel, "severe",
+T.equal(staminaSnapshot.encumbranceLevel, "severe",
     "stamina snapshot carries encumbrance")
 local snapshotAverageReads = staminaAverageReads
 local snapshotLevelReads = staminaLevelReads
 local snapshotEncumbranceReads = staminaEncumbranceReads
 PNC.Stamina.BuildSnapshot(interactionRecord)
-assertEqual(staminaAverageReads, snapshotAverageReads,
+T.equal(staminaAverageReads, snapshotAverageReads,
     "stamina replication recalculated skills")
-assertEqual(staminaLevelReads, snapshotLevelReads,
+T.equal(staminaLevelReads, snapshotLevelReads,
     "stamina replication recalculated skill levels")
-assertEqual(staminaEncumbranceReads, snapshotEncumbranceReads,
+T.equal(staminaEncumbranceReads, snapshotEncumbranceReads,
     "stamina replication recalculated encumbrance")
 local averagesBeforeUpdate = staminaAverageReads
 local encumbranceBeforeUpdate = staminaEncumbranceReads
 PNC.Stamina.Update(interactionRecord, nil, 10000)
-assertEqual(staminaAverageReads - averagesBeforeUpdate, 1,
+T.equal(staminaAverageReads - averagesBeforeUpdate, 1,
     "stamina update recalculated its skill average more than once")
-assertEqual(staminaEncumbranceReads - encumbranceBeforeUpdate, 1,
+T.equal(staminaEncumbranceReads - encumbranceBeforeUpdate, 1,
     "stamina update recalculated encumbrance more than once")
 PNC.Stamina.Update(interactionRecord, nil, 16000)
-assertEqual(strainDamageCalls, 1, "severe load periodic strain damage")
+T.equal(strainDamageCalls, 1, "severe load periodic strain damage")
 
-assertEqual(PNC.InventoryActions.Execute(
+T.equal(PNC.InventoryActions.Execute(
     "unequip_container", nil, interactionRecord, bagItem.id, {}
 ), true, "modular bag unequip action")
-assertEqual(bagItem.wornSlot, nil, "bag worn slot cleared")
+T.equal(bagItem.wornSlot, nil, "bag worn slot cleared")
+T.finish("pnc_equipment_generation_smoke")
 
-print("pnc_equipment_generation_smoke: ok")
+T.finish("pnc_equipment_generation_smoke")

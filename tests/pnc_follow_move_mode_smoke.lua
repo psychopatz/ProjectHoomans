@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Stealth/PNC_Stealth.lua"
 
 local sneaking = false
@@ -22,7 +24,7 @@ PNC = {
     Core = {},
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local record = {
     runtime = {
@@ -35,27 +37,27 @@ local record = {
     },
 }
 
-assert(
+T.truthy(
     PNC.Stealth.ResolveFollowMoveMode(record, owner, 2, 2, 0)
         == "walk",
     "shared stealth flag forced a normal follower to sneak"
 )
-assert(
+T.truthy(
     PNC.Stealth.ResolveFollowMoveMode(record, owner, 5, 5, 0)
         == "walk",
     "follower ran for an ordinary formation gap"
 )
-assert(
+T.truthy(
     PNC.Stealth.ResolveFollowMoveMode(record, owner, 11, 11, 0)
         == "run",
     "follower did not run for severe separation"
 )
-assert(
+T.truthy(
     PNC.Stealth.ResolveFollowMoveMode(record, owner, 7, 7, 0)
         == "run",
     "catch-up hysteresis released too early"
 )
-assert(
+T.truthy(
     PNC.Stealth.ResolveFollowMoveMode(record, owner, 5, 5, 0)
         == "walk",
     "catch-up mode did not exit near the owner"
@@ -63,7 +65,7 @@ assert(
 
 sneaking = true
 record.runtime.stealthActive = false
-assert(
+T.truthy(
     PNC.Stealth.ResolveFollowMoveMode(record, owner, 2, 2, 0)
         == "sneak",
     "follower did not mirror a sneaking owner"
@@ -71,15 +73,16 @@ assert(
 
 sneaking = false
 running = true
-assert(
+T.truthy(
     PNC.Stealth.ResolveFollowMoveMode(record, owner, 2, 2, 0)
         == "walk",
     "nearby follower mirrored running and created locomotion churn"
 )
-assert(
+T.truthy(
     PNC.Stealth.ResolveFollowMoveMode(record, owner, 5, 5, 0)
         == "run",
     "trailing follower did not catch a running owner"
 )
+T.finish("pnc_follow_move_mode_smoke")
 
-print("pnc_follow_move_mode_smoke: ok")
+T.finish("pnc_follow_move_mode_smoke")

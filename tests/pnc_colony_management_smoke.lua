@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assert") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
+local ROOT = T.path("ProjectHoomans", "server", "PNC/")
 
 local communitySaves = 0
 local factionSaves = 0
@@ -97,9 +92,9 @@ PNC = {
     Journals = {
         NPC_CAPACITY = 32,
         GetNPC = function(id, limit, newestFirst)
-            equal(id, companion.id, "journal request uses companion id")
-            equal(limit, 32, "journal request stays bounded")
-            equal(newestFirst, true, "journal request is newest first")
+            T.equal(id, companion.id, "journal request uses companion id")
+            T.equal(limit, 32, "journal request stays bounded")
+            T.equal(newestFirst, true, "journal request is newest first")
             return {
                 { "projecthoomans.npc.needs.foodConsumed", 120,
                     "Base.Apple", 0.2 },
@@ -190,7 +185,7 @@ PNC = {
     WorkRepository = { Get = function() return nil end },
     WorkService = { Queries = {
         BuildTaskSnapshot = function(colonyId)
-            equal(colonyId, community.id, "task snapshot colony")
+            T.equal(colonyId, community.id, "task snapshot colony")
             return {{ id = "task-1", operation = "CONSTRUCT",
                 status = "WORKING", workerId = companion.id, percent = 25,
                 facilityId = "facility_farm" }}
@@ -198,87 +193,88 @@ PNC = {
     } },
 }
 
-local Management = dofile(ROOT .. "PNC_ColonyManagement.lua")
+local Management = T.load(ROOT .. "PNC_ColonyManagement.lua")
 local player = { getUsername = function() return "Tester" end }
 local snapshot = Management.BuildSnapshot(player)
 
-equal(#snapshot.people, 1, "owned companion appears")
-equal(snapshot.people[1].name, "Alex Rivera", "companion identity presented")
-equal(snapshot.people[1].followingCurrentPlayer, true,
+T.equal(#snapshot.people, 1, "owned companion appears")
+T.equal(snapshot.people[1].name, "Alex Rivera", "companion identity presented")
+T.equal(snapshot.people[1].followingCurrentPlayer, true,
     "snapshot marks the current player's follower")
-equal(#snapshot.people[1].journal, 1, "companion journal included")
-equal(#snapshot.attention, 1, "critical need appears in attention")
-equal(snapshot.attention[1].needType, "hunger", "critical need type")
-equal(snapshot.faction.name, "Rivera Enclave", "faction is in snapshot")
-equal(snapshot.faction.renamePending, true, "initial faction prompt is pending")
-equal(snapshot.people[1].allowedJobs.Constructor, true,
+T.equal(#snapshot.people[1].journal, 1, "companion journal included")
+T.equal(#snapshot.attention, 1, "critical need appears in attention")
+T.equal(snapshot.attention[1].needType, "hunger", "critical need type")
+T.equal(snapshot.faction.name, "Rivera Enclave", "faction is in snapshot")
+T.equal(snapshot.faction.renamePending, true, "initial faction prompt is pending")
+T.equal(snapshot.people[1].allowedJobs.Constructor, true,
     "every NPC may construct by default")
-equal(snapshot.people[1].allowedJobs.Researcher, true,
+T.equal(snapshot.people[1].allowedJobs.Researcher, true,
     "missing legacy permissions render as allowed")
-equal(#snapshot.tasks, 1, "active tasks included in colony snapshot")
-equal(snapshot.tasks[1].workerId, companion.id,
+T.equal(#snapshot.tasks, 1, "active tasks included in colony snapshot")
+T.equal(snapshot.tasks[1].workerId, companion.id,
     "task snapshot includes assigned colonist")
-equal(snapshot.settlement.facilities[1].activeTask.percent, 25,
+T.equal(snapshot.settlement.facilities[1].activeTask.percent, 25,
     "base facility exposes its active construction progress")
 
 local factionSnapshot, factionResult = Management.HandleAction(player, {
     action = "faction_rename", name = "River Wardens",
 })
-equal(factionResult.ok, true, "owned faction rename succeeds")
-equal(factionSnapshot.faction.name, "River Wardens",
+T.equal(factionResult.ok, true, "owned faction rename succeeds")
+T.equal(factionSnapshot.faction.name, "River Wardens",
     "faction rename returns updated snapshot")
-equal(factionSnapshot.faction.renamePending, false,
+T.equal(factionSnapshot.faction.renamePending, false,
     "faction prompt clears after rename")
-equal(factionSaves, 1, "faction rename commits immediately")
+T.equal(factionSaves, 1, "faction rename commits immediately")
 
 local jobsSnapshot, jobsResult = Management.HandleAction(player, {
     action = "job_permission_set", npcID = companion.id,
     job = "Constructor", enabled = false,
 })
-equal(jobsResult.ok, true, "constructor permission can be disabled")
-equal(jobsSnapshot.people[1].allowedJobs.Constructor, false,
+T.equal(jobsResult.ok, true, "constructor permission can be disabled")
+T.equal(jobsSnapshot.people[1].allowedJobs.Constructor, false,
     "explicit opt-out returns in the colony snapshot")
 jobsSnapshot, jobsResult = Management.HandleAction(player, {
     action = "job_permission_set", npcID = companion.id,
     job = "Constructor", enabled = true,
 })
-equal(jobsResult.ok, true, "constructor permission can be restored")
-equal(jobsSnapshot.people[1].allowedJobs.Constructor, true,
+T.equal(jobsResult.ok, true, "constructor permission can be restored")
+T.equal(jobsSnapshot.people[1].allowedJobs.Constructor, true,
     "restored permission returns in the colony snapshot")
-equal(companion.lastDirtyReason, "allowed_jobs",
+T.equal(companion.lastDirtyReason, "allowed_jobs",
     "job permission persists through registry dirtiness")
 
 local renamed, result = Management.RenameForPlayer(player, {
     communityID = community.id,
     name = "Riverside Watch",
 })
-equal(result.ok, true, "owned colony rename succeeds")
-equal(renamed.colony.name, "Riverside Watch", "renamed snapshot returned")
-equal(renamed.colony.renamePending, false, "name prompt is cleared")
-equal(communitySaves, 1, "rename commits community state immediately")
+T.equal(result.ok, true, "owned colony rename succeeds")
+T.equal(renamed.colony.name, "Riverside Watch", "renamed snapshot returned")
+T.equal(renamed.colony.renamePending, false, "name prompt is cleared")
+T.equal(communitySaves, 1, "rename commits community state immediately")
 
 local debugSnapshot, debugResult = Management.HandleAction(player, {
     action = "debug_need", npcID = companion.id, operation = "modify",
     needType = "thirst", amount = 0.25,
 })
-equal(debugResult.ok, true, "debug need mutation succeeds")
-equal(debugSnapshot.people[1].needs.thirst, 0.35,
+T.equal(debugResult.ok, true, "debug need mutation succeeds")
+T.equal(debugSnapshot.people[1].needs.thirst, 0.35,
     "debug tab action returns the authoritative updated need")
 
 local workSnapshot, workResult = Management.HandleAction(player, {
     action = "debug_facility_work", npcID = companion.id,
     facilityId = "facility_farm", operation = "start",
 })
-equal(workResult.ok, true, "debug facility work starts")
-equal(companion.orderSpec.kind, "facility_activity",
+T.equal(workResult.ok, true, "debug facility work starts")
+T.equal(companion.orderSpec.kind, "facility_activity",
     "debug facility work installs production order")
-equal(workSnapshot.people[1].facilityDebugWork.phase, "QUEUED",
+T.equal(workSnapshot.people[1].facilityDebugWork.phase, "QUEUED",
     "facility work state is visible in management snapshot")
 
 local _, stopResult = Management.HandleAction(player, {
     action = "debug_facility_work", npcID = companion.id, operation = "stop",
 })
-equal(stopResult.ok, true, "debug facility work stops")
-equal(companion.runtime.facilityDebugWork, nil, "debug work state cleared")
+T.equal(stopResult.ok, true, "debug facility work stops")
+T.equal(companion.runtime.facilityDebugWork, nil, "debug work state cleared")
+T.finish("pnc_colony_management_smoke")
 
-print("pnc_colony_management_smoke: ok")
+T.finish("pnc_colony_management_smoke")

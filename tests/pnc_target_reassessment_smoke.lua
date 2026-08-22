@@ -1,11 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local now = 1000
 PNC = {
@@ -32,17 +27,17 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "Perception/PNC_Perception.lua")
+T.load(ROOT .. "Perception/PNC_Perception.lua")
 
 local player = { kind = "player", onlineID = 1, x = 1, y = 0, distSq = 1, visible = true }
 local attacker = { kind = "npc", id = "attacker", x = 4, y = 0, distSq = 16, visible = true, threatening = true }
-assertEqual(
+T.equal(
     PNC.Perception.SelectPreferredTarget(player, attacker),
     attacker,
     "nearby active threat outranks a closer non-threatening enemy"
 )
 attacker.distSq = 49
-assertEqual(
+T.equal(
     PNC.Perception.SelectPreferredTarget(player, attacker),
     player,
     "distant attacker does not override immediate target"
@@ -55,7 +50,7 @@ PNC.Perception.RememberAttacker(source, {
 }, now)
 attacker.distSq = 16
 attacker.threatening = nil
-assertEqual(
+T.equal(
     PNC.Perception.IsTargetThreatening(source, attacker),
     true,
     "recent NPC attacker is remembered as a threat"
@@ -64,7 +59,7 @@ PNC.Perception.RememberAttacker(source, {
     attackerKind = "zombie",
     attackerZombieId = "zed_attacker",
 }, now)
-assertEqual(
+T.equal(
     PNC.Perception.IsTargetThreatening(source, {
         kind = "zombie",
         zombieId = "zed_attacker",
@@ -83,13 +78,13 @@ PNC.Registry.Get = function(id)
     end
     return nil
 end
-assertEqual(
+T.equal(
     PNC.Perception.IsTargetThreatening(source, attacker),
     true,
     "enemy NPC actively targeting source is an immediate threat"
 )
 
-dofile(ROOT .. "Behaviors/PNC_Behavior_Targeting.lua")
+T.load(ROOT .. "Behaviors/PNC_Behavior_Targeting.lua")
 
 local Targeting = PNC.BehaviorTargeting
 local zombieThreat = {
@@ -104,7 +99,7 @@ local zombieThreat = {
 PNC.Perception.FindImmediateZombieThreat = function()
     return zombieThreat
 end
-assertEqual(
+T.equal(
     Targeting.ResolveImmediateZombieThreat(source),
     zombieThreat,
     "immediate zombie threat is available to hostile arbitration"
@@ -135,19 +130,19 @@ PNC.Perception.ResolveRoamingTarget = function() return freshThreat end
 
 source.runtime.target = current
 source.runtime.nextTargetReassessAt = 0
-assertEqual(Targeting.ResolveHostileEngageTarget(source), freshThreat, "hostile target reassessment")
+T.equal(Targeting.ResolveHostileEngageTarget(source), freshThreat, "hostile target reassessment")
 
 source.runtime.target = current
 source.runtime.nextTargetReassessAt = 0
-assertEqual(Targeting.ResolveCompanionEngageTarget(source), freshThreat, "companion target reassessment")
+T.equal(Targeting.ResolveCompanionEngageTarget(source), freshThreat, "companion target reassessment")
 
 source.runtime.target = current
 source.runtime.nextTargetReassessAt = 0
-assertEqual(Targeting.ResolveRoamingEngageTarget(source, 12), freshThreat, "roaming target reassessment")
+T.equal(Targeting.ResolveRoamingEngageTarget(source, 12), freshThreat, "roaming target reassessment")
 
 source.runtime.target = current
 source.runtime.nextTargetReassessAt = now + 100
-assertEqual(Targeting.ResolveHostileEngageTarget(source), current, "reassessment interval prevents target flicker")
+T.equal(Targeting.ResolveHostileEngageTarget(source), current, "reassessment interval prevents target flicker")
 
 local distantThreat = {
     kind = "npc",
@@ -167,10 +162,11 @@ local nearbyPassive = {
     visible = true,
     threatening = false,
 }
-assertEqual(
+T.equal(
     Targeting.SelectReassessedTarget(source, nearbyPassive, distantThreat),
     nearbyPassive,
     "distant attacker does not force an irrational target switch"
 )
+T.finish("pnc_target_reassessment_smoke")
 
-print("pnc_target_reassessment_smoke: ok")
+T.finish("pnc_target_reassessment_smoke")

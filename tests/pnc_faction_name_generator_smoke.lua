@@ -1,24 +1,18 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+    T.path("ProjectHoomans", "shared", "")
         .. "PNC/Core/Factions/PNC_FactionNameGenerator.lua"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. ": expected="
-            .. tostring(expected) .. " actual="
-            .. tostring(actual))
-    end
-end
-
 PNC = {}
-dofile(FILE)
+T.load(FILE)
 
 local Generator = PNC.FactionNameGenerator
 local settler = Generator.GenerateFactionName(
     "settler",
     "stable-seed"
 )
-equal(
+T.equal(
     Generator.GenerateFactionName("settler", "stable-seed"),
     settler,
     "same seed is deterministic"
@@ -27,11 +21,11 @@ local looter = Generator.GenerateFactionName(
     "looter",
     "stable-seed"
 )
-assert(settler ~= looter,
+T.truthy(settler ~= looter,
     "archetypes should have distinct naming styles")
-assert(string.find(settler, "Debug", 1, true) == nil,
+T.truthy(string.find(settler, "Debug", 1, true) == nil,
     "generated name is not a debug timestamp")
-assert(string.find(looter, "The ", 1, true) == 1,
+T.truthy(string.find(looter, "The ", 1, true) == 1,
     "looter name uses gang-style article")
 
 local siteName = Generator.GenerateCommunityName(
@@ -39,7 +33,8 @@ local siteName = Generator.GenerateCommunityName(
     "Crossroads Exchange",
     "community-seed"
 )
-assert(string.find(siteName, "Crossroads Exchange", 1, true),
+T.truthy(string.find(siteName, "Crossroads Exchange", 1, true),
     "community name retains faction identity")
+T.finish("pnc_faction_name_generator_smoke")
 
-print("pnc_faction_name_generator_smoke: PASS")
+T.finish("pnc_faction_name_generator_smoke")

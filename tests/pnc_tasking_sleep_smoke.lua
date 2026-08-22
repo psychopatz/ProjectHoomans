@@ -1,4 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "server", "")
 PsychopatzCore = { RuntimeRole = { AllowsServerCode = function() return true end } }
 local now, id = 1000, 0
 local records = {
@@ -20,9 +22,9 @@ FacilityReservations = { ByID = {}, Release = function(reservationId)
 end }, }
 Events = { OnTick = { Add = function() end } }
 
-local Priority = dofile(ROOT .. "PNC/Tasking/PNC_TaskPriority.lua")
-local Intent = dofile(ROOT .. "PNC/Tasking/PNC_TaskIntent.lua")
-local Leases = dofile(ROOT .. "PNC/Tasking/PNC_TaskLeaseService.lua")
+local Priority = T.load(ROOT .. "PNC/Tasking/PNC_TaskPriority.lua")
+local Intent = T.load(ROOT .. "PNC/Tasking/PNC_TaskIntent.lua")
+local Leases = T.load(ROOT .. "PNC/Tasking/PNC_TaskLeaseService.lua")
 package.preload["PNC/Tasking/PNC_TaskPriority"] = function() return Priority end
 package.preload["PNC/Tasking/PNC_TaskIntent"] = function() return Intent end
 package.preload["PNC/Tasking/PNC_TaskLeaseService"] = function() return Leases end
@@ -30,7 +32,7 @@ package.preload["PNC/Tasking/PNC_TaskExecutors"] = function() return {} end
 package.preload[
     "PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityTriggers"
 ] = function() return {} end
-local Tasking = dofile(ROOT .. "PNC/Tasking/PNC_Tasking.lua")
+local Tasking = T.load(ROOT .. "PNC/Tasking/PNC_Tasking.lua")
 
 local available, facilityValid = true, true
 Tasking.Commands.RegisterProvider("Needs", {
@@ -53,24 +55,25 @@ Tasking.Commands.RegisterProvider("Needs", {
     end,
     Cancel = function() available = true end,
 })
-assert(Tasking.Commands.Reevaluate("one", "NEED_STATE_CHANGED"))
+T.truthy(Tasking.Commands.Reevaluate("one", "NEED_STATE_CHANGED"))
 local first = Tasking.Queries.GetLease("one")
-assert(first and first.facilitySlotId == "bed", "sleep must lease the bed slot")
+T.truthy(first and first.facilitySlotId == "bed", "sleep must lease the bed slot")
 local second, reason = Tasking.Commands.Reevaluate("two", "NEED_STATE_CHANGED")
-assert(not second and reason == "NO_ACTIVITY_CAPACITY",
+T.truthy(not second and reason == "NO_ACTIVITY_CAPACITY",
     "two NPCs must not own the same bed")
 Tasking.Commands.CancelForNPC("one", "test_cancel")
 available = true
-assert(Tasking.Commands.Reevaluate("two", "FACILITY_SLOT_RELEASED"),
+T.truthy(Tasking.Commands.Reevaluate("two", "FACILITY_SLOT_RELEASED"),
     "released bed should become assignable")
 PNC.FacilityReservations.ByID["bed:1"] = nil
 facilityValid = false
 Tasking.Commands.Reevaluate("two", "FACILITY_DESTROYED")
-assert(Tasking.Queries.GetLease("two") == nil,
+T.truthy(Tasking.Queries.GetLease("two") == nil,
     "destroyed facility must invalidate its lease")
 local diagnostics = Tasking.Queries.GetDiagnostics("two")
-assert(diagnostics.counters.reevaluations == 4
+T.truthy(diagnostics.counters.reevaluations == 4
     and diagnostics.dirtyQueueLength == 0,
     "task diagnostics should remain bounded and read-only")
+T.finish("pnc_tasking_sleep_smoke")
 
-print("pnc_tasking_sleep_smoke: ok")
+T.finish("pnc_tasking_sleep_smoke")

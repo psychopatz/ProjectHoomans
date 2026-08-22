@@ -1,13 +1,7 @@
-local SERVER =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. ": expected="
-            .. tostring(expected) .. " actual="
-            .. tostring(actual), 2)
-    end
-end
+local SERVER =
+    T.path("ProjectHoomans", "server", "PNC/")
 
 local at = 20
 local now = 1000
@@ -201,28 +195,28 @@ PNC = {
     },
 }
 
-dofile(SERVER .. "PNC_FactionTollService.lua")
+T.load(SERVER .. "PNC_FactionTollService.lua")
 
-equal(PNC.FactionTolls.Pump(now), 1,
+T.equal(PNC.FactionTolls.Pump(now), 1,
     "entry creates one territorial demand")
-equal(#sent, 1, "one demand sent")
-equal(sent[1].payload.kind, "demand",
+T.equal(#sent, 1, "one demand sent")
+T.equal(sent[1].payload.kind, "demand",
     "demand payload kind")
-equal(sent[1].payload.amount, 12,
+T.equal(sent[1].payload.amount, 12,
     "population-scaled toll")
 local demandID = sent[1].payload.demandID
-equal(PNC.FactionTolls.HandleResponse(player, {
+T.equal(PNC.FactionTolls.HandleResponse(player, {
     demandID = demandID,
     response = "pay",
 }), true, "server accepts payment")
-equal(#inventory.items, 3, "cash removed on server")
-equal(pacification.factionID, "faction_toll",
+T.equal(#inventory.items, 3, "cash removed on server")
+T.equal(pacification.factionID, "faction_toll",
     "payment pacifies demanding faction")
-equal(pacification.key, playerKey,
+T.equal(pacification.key, playerKey,
     "pacification is character-specific")
-equal(pacification.spec.durationHours, 24,
+T.equal(pacification.spec.durationHours, 24,
     "payment grants one day")
-equal(
+T.equal(
     relationshipEvents[#relationshipEvents]
         .mutation.memory.type,
     "extortion_complied",
@@ -240,14 +234,14 @@ PNC.FactionTolls.PendingByPlayerKey[playerKey] = {
     createdAt = at,
     expiresAt = at + 1,
 }
-equal(PNC.FactionTolls.HandleResponse(player, {
+T.equal(PNC.FactionTolls.HandleResponse(player, {
     demandID = "leave_grace",
     response = "leave",
 }), true, "leave response starts grace period")
 at = at + 0.03
 now = now + 2000
 PNC.FactionTolls.Pump(now)
-equal(war.firstID, "faction_toll",
+T.equal(war.firstID, "faction_toll",
     "remaining inside after grace starts war")
 war = nil
 
@@ -262,19 +256,20 @@ PNC.FactionTolls.PendingByPlayerKey[playerKey] = {
     createdAt = at,
     expiresAt = at + 1,
 }
-equal(PNC.FactionTolls.HandleResponse(player, {
+T.equal(PNC.FactionTolls.HandleResponse(player, {
     demandID = "refusal",
     response = "refuse",
 }), true, "server accepts refusal")
-equal(war.firstID, "faction_toll",
+T.equal(war.firstID, "faction_toll",
     "looter faction starts refusal war")
-equal(war.secondID, "faction_player",
+T.equal(war.secondID, "faction_player",
     "war targets player's diplomacy faction")
-equal(
+T.equal(
     relationshipEvents[#relationshipEvents]
         .mutation.memory.type,
     "defied_extortion",
     "refusal reports directed relationship memory"
 )
+T.finish("pnc_faction_toll_smoke")
 
-print("pnc_faction_toll_smoke: ok")
+T.finish("pnc_faction_toll_smoke")

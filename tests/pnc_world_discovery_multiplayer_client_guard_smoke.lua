@@ -1,4 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/WorldDiscovery/"
+local T = require "tests/support/test"
+
+local ROOT = T.path("ProjectHoomans", "server", "PNC/WorldDiscovery/")
 
 isClient = function() return true end
 isServer = function() return false end
@@ -31,5 +33,6 @@ end
 if PNC ~= nil then
     error("server-only discovery files mutated client PNC state")
 end
+T.finish("pnc_world_discovery_multiplayer_client_guard_smoke")
 
-print("pnc world discovery multiplayer client guards: ok")
+T.finish("pnc_world_discovery_multiplayer_client_guard_smoke")

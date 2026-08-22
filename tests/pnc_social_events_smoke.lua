@@ -1,25 +1,9 @@
+local T = require "tests/support/test"
+
 local SHARED_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 local SERVER_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected="
-            .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertTrue(value, label)
-    assertEqual(value == true, true, label)
-end
-
-local function assertNear(actual, expected, epsilon, label)
-    if math.abs(actual - expected) > epsilon then
-        error((label or "assertNear") .. ": expected="
-            .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+    T.path("ProjectHoomans", "server", "PNC/")
 
 local function memoryCount(relationship, memoryType)
     local count = 0
@@ -42,7 +26,7 @@ local function evidenceCount(conduct, eventType)
     return count
 end
 
-local function assertSaveSafe(value, seen)
+local function validatePersistedValue(value, seen)
     local valueType = type(value)
     local key
     local item
@@ -63,18 +47,18 @@ local function assertSaveSafe(value, seen)
         if type(key) ~= "string" and type(key) ~= "number" then
             error("unsafe persisted key")
         end
-        assertSaveSafe(item, seen)
+        validatePersistedValue(item, seen)
     end
     seen[value] = nil
 end
 
-dofile("../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/PsychopatzCore/Traits/PsychopatzTraitRegistry.lua")
+T.load(T.path("PsychopatzCore", "shared", "PsychopatzCore/Traits/PsychopatzTraitRegistry.lua"))
 PNC = {}
-dofile(SHARED_ROOT .. "Base/PNC_Core.lua")
-dofile(SHARED_ROOT .. "Base/PNC_Constants.lua")
-dofile(SHARED_ROOT
+T.load(SHARED_ROOT .. "Base/PNC_Core.lua")
+T.load(SHARED_ROOT .. "Base/PNC_Constants.lua")
+T.load(SHARED_ROOT
     .. "Identity/PNC_PlayerCharacterConstants.lua")
-dofile(SHARED_ROOT .. "Identity/PNC_Identity.lua")
+T.load(SHARED_ROOT .. "Identity/PNC_Identity.lua")
 PNC.Identity.ApplyRecordIdentity =
     function(record, definition)
         record.identitySeed = 1
@@ -85,26 +69,26 @@ PNC.Identity.ApplyRecordIdentity =
         record.archetypeID = definition.archetypeID or "General"
         record.isFemale = definition.isFemale == true
     end
-dofile(SHARED_ROOT .. "Relationships/PNC_EntityRef.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileConstants.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_SocialTraits.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileMath.lua")
-dofile(SHARED_ROOT .. "Conduct/PNC_ConductConstants.lua")
-dofile(SHARED_ROOT .. "Conduct/PNC_ConductTypes.lua")
-dofile(SHARED_ROOT .. "Conduct/PNC_ConductMath.lua")
-dofile(SHARED_ROOT .. "Conduct/PNC_ConductDefinitions.lua")
-dofile(SHARED_ROOT
+T.load(SHARED_ROOT .. "Relationships/PNC_EntityRef.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_SocialProfileConstants.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_SocialTraits.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_SocialProfileMath.lua")
+T.load(SHARED_ROOT .. "Conduct/PNC_ConductConstants.lua")
+T.load(SHARED_ROOT .. "Conduct/PNC_ConductTypes.lua")
+T.load(SHARED_ROOT .. "Conduct/PNC_ConductMath.lua")
+T.load(SHARED_ROOT .. "Conduct/PNC_ConductDefinitions.lua")
+T.load(SHARED_ROOT
     .. "Identity/PNC_PlayerCharacterTypes.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipConstants.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipStates.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipTypes.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipMath.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_SocialEventDefinitions.lua")
-dofile(SHARED_ROOT .. "Base/PNC_Types.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_Relationships.lua")
-dofile(SHARED_ROOT .. "Persistence/PNC_Persistence.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_RelationshipConstants.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_RelationshipStates.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_RelationshipTypes.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_RelationshipMath.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_SocialEventDefinitions.lua")
+T.load(SHARED_ROOT .. "Base/PNC_Types.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_Relationships.lua")
+T.load(SHARED_ROOT .. "Persistence/PNC_Persistence.lua")
 
 PNC.Registry = {
     Data = {},
@@ -153,19 +137,19 @@ function PNC.Registry.MarkDirty(record, domain)
     return true
 end
 
-dofile(SERVER_ROOT .. "PNC_PlayerCharacterDebug.lua")
-dofile(SERVER_ROOT .. "PNC_PlayerCharacterService.lua")
+T.load(SERVER_ROOT .. "PNC_PlayerCharacterDebug.lua")
+T.load(SERVER_ROOT .. "PNC_PlayerCharacterService.lua")
 PNC.PlayerCharacters.Load()
-dofile(SERVER_ROOT .. "PNC_ConductService.lua")
-dofile(SERVER_ROOT .. "PNC_RelationshipService.lua")
-dofile(SERVER_ROOT .. "PNC_RelationshipDebug.lua")
-dofile(SERVER_ROOT .. "PNC_ConductDebug.lua")
-dofile(SERVER_ROOT .. "PNC_SocialEventDebug.lua")
-dofile(SERVER_ROOT .. "PNC_SocialProfileDebug.lua")
-dofile(SERVER_ROOT .. "PNC_SocialProfileService.lua")
-dofile(SERVER_ROOT .. "PNC_SocialEventService.lua")
-dofile(SERVER_ROOT .. "PNC_SocialEncounterTracker.lua")
-dofile(SERVER_ROOT .. "PNC_SocialEventHooks.lua")
+T.load(SERVER_ROOT .. "PNC_ConductService.lua")
+T.load(SERVER_ROOT .. "PNC_RelationshipService.lua")
+T.load(SERVER_ROOT .. "PNC_RelationshipDebug.lua")
+T.load(SERVER_ROOT .. "PNC_ConductDebug.lua")
+T.load(SERVER_ROOT .. "PNC_SocialEventDebug.lua")
+T.load(SERVER_ROOT .. "PNC_SocialProfileDebug.lua")
+T.load(SERVER_ROOT .. "PNC_SocialProfileService.lua")
+T.load(SERVER_ROOT .. "PNC_SocialEventService.lua")
+T.load(SERVER_ROOT .. "PNC_SocialEncounterTracker.lua")
+T.load(SERVER_ROOT .. "PNC_SocialEventHooks.lua")
 
 local function newRecord(id)
     local record = PNC.Types.NewRecord({
@@ -238,8 +222,8 @@ local definitionCount = 0
 for _, _ in pairs(PNC.SocialEventDefinitions) do
     definitionCount = definitionCount + 1
 end
-assertEqual(definitionCount, 5, "five definitions")
-assertEqual(
+T.equal(definitionCount, 5, "five definitions")
+T.equal(
     PNC.SocialEvents.GetDefinition("treated_wound")
         .targetMemory.approvalEffect,
     4,
@@ -247,7 +231,7 @@ assertEqual(
 )
 
 -- 2-3. Unknown and malformed/unsafe events fail safely.
-assertEqual(PNC.SocialEvents.Emit(event(
+T.equal(PNC.SocialEvents.Emit(event(
     "social:unknown:1",
     "not_registered",
     playerKey,
@@ -262,7 +246,7 @@ local malformed = event(
     1
 )
 malformed.context.unsafe = function() end
-assertEqual(
+T.equal(
     PNC.SocialEvents.Emit(malformed).reason,
     "unsafe_event",
     "unsafe event rejected"
@@ -277,8 +261,8 @@ local treated = event(
     1
 )
 local first = PNC.SocialEvents.Emit(treated)
-assertTrue(first.ok, "treatment event accepted")
-assertTrue(string.find(
+T.truthy(first.ok, "treatment event accepted")
+T.truthy(string.find(
     PNC.SocialEventDebug.FormatProcessed(
         first,
         PNC.SocialEvents.GetDefinition("treated_wound")
@@ -288,21 +272,21 @@ assertTrue(string.find(
     true
 ) ~= nil, "social event debug formatter")
 local bobToPlayer = PNC.Relationships.Get(bob.id, playerKey)
-assertEqual(memoryCount(bobToPlayer, "treated_wound"), 1,
+T.equal(memoryCount(bobToPlayer, "treated_wound"), 1,
     "target memory created")
-assertEqual(bobToPlayer.approval, 4, "treatment approval")
-assertEqual(bobToPlayer.familiarity, 2, "treatment familiarity")
-assertEqual(bob.social.morale, 2, "treatment morale")
+T.equal(bobToPlayer.approval, 4, "treatment approval")
+T.equal(bobToPlayer.familiarity, 2, "treatment familiarity")
+T.equal(bob.social.morale, 2, "treatment morale")
 local playerConduct = PNC.Conduct.GetForEntity(playerKey)
-assertEqual(playerConduct.scores.compassion, 2,
+T.equal(playerConduct.scores.compassion, 2,
     "treatment actor compassion conduct")
-assertEqual(playerConduct.scores.generosity, 1,
+T.equal(playerConduct.scores.generosity, 1,
     "treatment actor generosity conduct")
-assertEqual(evidenceCount(playerConduct, "treated_wound"), 1,
+T.equal(evidenceCount(playerConduct, "treated_wound"), 1,
     "treatment actor evidence")
-assertEqual(PNC.SocialEvents.Emit(treated).reason, "duplicate_event",
+T.equal(PNC.SocialEvents.Emit(treated).reason, "duplicate_event",
     "duplicate event rejected")
-assertEqual(memoryCount(PNC.Relationships.Get(bob.id, playerKey)), 1,
+T.equal(memoryCount(PNC.Relationships.Get(bob.id, playerKey)), 1,
     "duplicate creates no memory")
 local cooldown = PNC.SocialEvents.Emit(event(
     "social:treated_wound:2",
@@ -311,9 +295,9 @@ local cooldown = PNC.SocialEvents.Emit(event(
     bobKey,
     2
 ))
-assertEqual(cooldown.reason, "cooldown_active",
+T.equal(cooldown.reason, "cooldown_active",
     "treatment cooldown blocks farming")
-assertEqual(evidenceCount(
+T.equal(evidenceCount(
     PNC.Conduct.GetForEntity(playerKey),
     "treated_wound"
 ), 1, "cooldown creates no conduct")
@@ -324,11 +308,11 @@ local afterCooldown = PNC.SocialEvents.Emit(event(
     bobKey,
     13
 ))
-assertTrue(afterCooldown.ok, "cooldown expiration")
+T.truthy(afterCooldown.ok, "cooldown expiration")
 
 -- 10. Contribution saturation clips and then rejects repeated gains.
 for index = 1, 6 do
-    assertTrue(PNC.SocialEvents.Emit(event(
+    T.truthy(PNC.SocialEvents.Emit(event(
         "social:treated_wound:cap" .. tostring(index),
         "treated_wound",
         playerKey,
@@ -336,20 +320,20 @@ for index = 1, 6 do
         13 + index * 12
     )).ok, "treatment cap setup " .. tostring(index))
 end
-assertEqual(
+T.equal(
     PNC.Relationships.Get(bob.id, playerKey)
         .saturation.treated_wound.approval,
     20,
     "treatment cumulative approval cap"
 )
-assertEqual(PNC.SocialEvents.Emit(event(
+T.equal(PNC.SocialEvents.Emit(event(
     "social:treated_wound:saturated",
     "treated_wound",
     playerKey,
     bobKey,
     97
 )).reason, "contribution_saturated", "saturation rejection")
-assertEqual(evidenceCount(
+T.equal(evidenceCount(
     PNC.Conduct.GetForEntity(playerKey),
     "treated_wound"
 ), 8, "saturation creates no conduct")
@@ -362,15 +346,15 @@ local rescue = event(
     carolKey,
     70
 )
-assertTrue(PNC.SocialEvents.Emit(rescue).ok, "rescue accepted")
-assertEqual(evidenceCount(
+T.truthy(PNC.SocialEvents.Emit(rescue).ok, "rescue accepted")
+T.equal(evidenceCount(
     PNC.Conduct.GetForEntity(playerKey),
     "saved_from_incapacitation"
 ), 1, "rescue actor evidence")
-assertEqual(PNC.SocialEvents.Emit(rescue).reason, "duplicate_event",
+T.equal(PNC.SocialEvents.Emit(rescue).reason, "duplicate_event",
     "rescue episode idempotent")
 carol.health.state = "normal"
-assertEqual(PNC.SocialEventHooks.OnIncapacitationRecovered(
+T.equal(PNC.SocialEventHooks.OnIncapacitationRecovered(
     carol,
     "downed:untracked",
     71
@@ -384,7 +368,7 @@ local fakePlayer = {
         return { PNC_CharacterUUID = "char_phase2" }
     end,
 }
-assertTrue(PNC.SocialEventHooks.OnTreatmentCompleted(
+T.truthy(PNC.SocialEventHooks.OnTreatmentCompleted(
     fakePlayer,
     hookTarget,
     "Torso_Upper",
@@ -393,12 +377,12 @@ assertTrue(PNC.SocialEventHooks.OnTreatmentCompleted(
 local hookEpisode =
     PNC.SocialEventHooks.GetDownedEpisodeID(hookTarget)
 hookTarget.health.state = "normal"
-assertTrue(PNC.SocialEventHooks.OnIncapacitationRecovered(
+T.truthy(PNC.SocialEventHooks.OnIncapacitationRecovered(
     hookTarget,
     hookEpisode,
     73
 ).ok, "verified treatment contributor receives rescue credit")
-assertEqual(memoryCount(
+T.equal(memoryCount(
     PNC.Relationships.Get(hookTarget.id, playerKey),
     "saved_from_incapacitation"
 ), 1, "recovery hook creates one rescue memory")
@@ -418,7 +402,7 @@ PNC.SocialEncounterTracker.RecordActivity({
     threatWasTargeting = true,
     occurredAt = 80,
 })
-assertTrue(select(1, PNC.SocialEncounterTracker.OnThreatNeutralized({
+T.truthy(select(1, PNC.SocialEncounterTracker.OnThreatNeutralized({
     actorKey = aliceKey,
     targetKey = bobKey,
     threatID = "zombie_1",
@@ -439,11 +423,11 @@ PNC.SocialEncounterTracker.OnThreatNeutralized({
     threatWasTargeting = true,
     occurredAt = 80.03,
 })
-assertEqual(memoryCount(
+T.equal(memoryCount(
     PNC.Relationships.Get(bob.id, aliceKey),
     "protected_from_attacker"
 ), 1, "several kills aggregate to one protection memory")
-assertEqual(evidenceCount(
+T.equal(evidenceCount(
     PNC.Conduct.GetForEntity(aliceKey),
     "protected_from_attacker"
 ), 1, "protection aggregated conduct evidence")
@@ -461,8 +445,8 @@ local unrelatedOK, unrelatedReason =
         threatWasTargeting = false,
         occurredAt = 81.01,
     })
-assertTrue(unrelatedOK, "unrelated kill tracked as combat")
-assertEqual(unrelatedReason, "neutralized_without_protection",
+T.truthy(unrelatedOK, "unrelated kill tracked as combat")
+T.equal(unrelatedReason, "neutralized_without_protection",
     "unrelated kill grants no protection")
 
 -- 16-18. Shared combat is reciprocal for NPCs, one-sided for players, and
@@ -482,23 +466,23 @@ PNC.SocialEncounterTracker.RecordActivity({
     threatID = "shared_2",
     occurredAt = 90.001,
 })
-assertTrue(select(1, PNC.SocialEncounterTracker.EndEncounter(
+T.truthy(select(1, PNC.SocialEncounterTracker.EndEncounter(
     sharedNPC,
     90.002
 )), "NPC shared encounter ended")
-assertEqual(memoryCount(
+T.equal(memoryCount(
     PNC.Relationships.Get(alice.id, carolKey),
     "survived_combat_together"
 ), 1, "Alice reciprocal shared memory")
-assertEqual(memoryCount(
+T.equal(memoryCount(
     PNC.Relationships.Get(carol.id, aliceKey),
     "survived_combat_together"
 ), 1, "Carol reciprocal shared memory")
-assertEqual(evidenceCount(
+T.equal(evidenceCount(
     PNC.Conduct.GetForEntity(aliceKey),
     "survived_combat_together"
 ), 1, "Alice participant conduct")
-assertEqual(evidenceCount(
+T.equal(evidenceCount(
     PNC.Conduct.GetForEntity(carolKey),
     "survived_combat_together"
 ), 1, "Carol participant conduct")
@@ -512,11 +496,11 @@ local sharedPlayer = PNC.SocialEncounterTracker.RecordActivity({
     targetTookDamage = true,
 })
 PNC.SocialEncounterTracker.EndEncounter(sharedPlayer, 91.002)
-assertEqual(memoryCount(
+T.equal(memoryCount(
     PNC.Relationships.Get(alice.id, playerKey),
     "survived_combat_together"
 ), 1, "player NPC shared combat has NPC-owned memory")
-assertEqual(evidenceCount(
+T.equal(evidenceCount(
     PNC.Conduct.GetForEntity(playerKey),
     "survived_combat_together"
 ), 1, "player shared-combat conduct")
@@ -532,7 +516,7 @@ local bobBeforeTrivial = memoryCount(
     PNC.Relationships.Get(bob.id, carolKey)
 )
 PNC.SocialEncounterTracker.EndEncounter(trivial, 92)
-assertEqual(memoryCount(
+T.equal(memoryCount(
     PNC.Relationships.Get(bob.id, carolKey)
 ), bobBeforeTrivial, "trivial combat grants no memory")
 
@@ -547,7 +531,7 @@ local abandonEncounter = PNC.SocialEncounterTracker.RecordActivity({
     targetTookDamage = true,
     occurredAt = 100,
 })
-assertTrue(PNC.SocialEncounterTracker.MarkPotentialAbandonment(
+T.truthy(PNC.SocialEncounterTracker.MarkPotentialAbandonment(
     abandonEncounter,
     aliceKey,
     bobKey,
@@ -565,15 +549,15 @@ PNC.SocialEncounterTracker.UpdateParticipantPosition(
 PNC.SocialEncounterTracker.Pump(
     100 + PNC.SocialEncounterTracker.ABANDON_GRACE_HOURS + 0.001
 )
-assertEqual(memoryCount(
+T.equal(memoryCount(
     PNC.Relationships.Get(bob.id, aliceKey),
     "abandoned_in_combat"
 ), negativeBefore, "return during grace cancels abandonment")
-assertEqual(evidenceCount(
+T.equal(evidenceCount(
     PNC.Conduct.GetForEntity(aliceKey),
     "abandoned_in_combat"
 ), 0, "canceled abandonment creates no conduct")
-assertTrue(PNC.SocialEncounterTracker.MarkPotentialAbandonment(
+T.truthy(PNC.SocialEncounterTracker.MarkPotentialAbandonment(
     abandonEncounter,
     aliceKey,
     bobKey,
@@ -587,13 +571,13 @@ PNC.SocialEncounterTracker.Pump(
         + 0.0001
 )
 local afterAbandon = PNC.Relationships.Get(bob.id, aliceKey)
-assertEqual(memoryCount(
+T.equal(memoryCount(
     afterAbandon,
     "abandoned_in_combat"
 ), negativeBefore + 1, "confirmed abandonment creates one memory")
-assertTrue(afterAbandon.familiarity > beforeAbandon.familiarity,
+T.truthy(afterAbandon.familiarity > beforeAbandon.familiarity,
     "negative experience raises familiarity")
-assertEqual(evidenceCount(
+T.equal(evidenceCount(
     PNC.Conduct.GetForEntity(aliceKey),
     "abandoned_in_combat"
 ), 1, "confirmed abandonment actor conduct")
@@ -618,7 +602,7 @@ PNC.SocialEncounterTracker.Pump(
     101 + PNC.SocialEncounterTracker.ABANDON_GRACE_HOURS
         + 0.0001
 )
-assertEqual(memoryCount(
+T.equal(memoryCount(
     PNC.Relationships.Get(bob.id, aliceKey),
     "abandoned_in_combat"
 ), negativeBefore + 1, "ended danger prevents abandonment")
@@ -631,7 +615,7 @@ clearDirty()
 local recordRevision = revisionTarget.recordRevision
 local socialRevision = revisionTarget.social.revision
 local presenceRevision = revisionTarget.presenceRevision
-assertTrue(PNC.SocialEvents.Emit(event(
+T.truthy(PNC.SocialEvents.Emit(event(
     "social:treated_wound:revision",
     "treated_wound",
     playerKey,
@@ -640,13 +624,13 @@ assertTrue(PNC.SocialEvents.Emit(event(
 )).ok, "revision event accepted")
 local revisionRelationship =
     PNC.Relationships.Get(revisionTarget.id, playerKey)
-assertTrue(revisionRelationship.revision > 0,
+T.truthy(revisionRelationship.revision > 0,
     "relationship revision updated")
-assertTrue(revisionTarget.social.revision > socialRevision,
+T.truthy(revisionTarget.social.revision > socialRevision,
     "social revision updated")
-assertTrue(revisionTarget.recordRevision > recordRevision,
+T.truthy(revisionTarget.recordRevision > recordRevision,
     "record revision updated")
-assertEqual(revisionTarget.presenceRevision, presenceRevision,
+T.equal(revisionTarget.presenceRevision, presenceRevision,
     "presence revision unchanged")
 clearDirty()
 recordRevision = revisionTarget.recordRevision
@@ -658,23 +642,23 @@ local rejected = PNC.SocialEvents.Emit(event(
     revisionKey,
     111
 ))
-assertEqual(rejected.reason, "cooldown_active", "revision rejection")
-assertEqual(revisionTarget.recordRevision, recordRevision,
+T.equal(rejected.reason, "cooldown_active", "revision rejection")
+T.equal(revisionTarget.recordRevision, recordRevision,
     "rejected event record revision unchanged")
-assertEqual(revisionTarget.social.revision, socialRevision,
+T.equal(revisionTarget.social.revision, socialRevision,
     "rejected event social revision unchanged")
 
 -- 27. Feature flag disables the pipeline without changing gameplay state.
 PNC.Config.Relationships.EnableSocialEvents = false
 recordRevision = revisionTarget.recordRevision
-assertEqual(PNC.SocialEvents.Emit(event(
+T.equal(PNC.SocialEvents.Emit(event(
     "social:treated_wound:disabled",
     "treated_wound",
     playerKey,
     revisionKey,
     130
 )).reason, "feature_disabled", "feature flag")
-assertEqual(revisionTarget.recordRevision, recordRevision,
+T.equal(revisionTarget.recordRevision, recordRevision,
     "disabled feature has no mutation")
 PNC.Config.Relationships.EnableSocialEvents = true
 
@@ -682,7 +666,7 @@ PNC.Config.Relationships.EnableSocialEvents = true
 -- owning conduct/social/record revisions.
 local conductCopy = PNC.Conduct.GetForEntity(aliceKey)
 conductCopy.scores.reliability = 99
-assertTrue(PNC.Conduct.GetScore(aliceKey, "reliability") ~= 99,
+T.truthy(PNC.Conduct.GetScore(aliceKey, "reliability") ~= 99,
     "conduct read returns copy")
 local conductOnlyRelationship =
     PNC.Relationships.Get(alice.id, bobKey)
@@ -705,21 +689,21 @@ local conductOnlySpec = {
     visibility = "private",
     tags = { test = true },
 }
-assertTrue(PNC.Conduct.AddEvidence(
+T.truthy(PNC.Conduct.AddEvidence(
     aliceKey, conductOnlySpec
 ), "conduct-only evidence accepted")
-assertEqual(PNC.Conduct.AddEvidence(
+T.equal(PNC.Conduct.AddEvidence(
     aliceKey, conductOnlySpec
 ), false, "duplicate conduct evidence rejected")
-assertTrue(alice.social.revision > conductOnlySocialRevision,
+T.truthy(alice.social.revision > conductOnlySocialRevision,
     "conduct-only social revision")
-assertTrue(alice.recordRevision > conductOnlyRecordRevision,
+T.truthy(alice.recordRevision > conductOnlyRecordRevision,
     "conduct-only record revision")
-assertEqual(alice.presenceRevision, conductOnlyPresenceRevision,
+T.equal(alice.presenceRevision, conductOnlyPresenceRevision,
     "conduct-only presence unchanged")
 local relationshipAfterConductOnly =
     PNC.Relationships.Get(alice.id, bobKey)
-assertEqual(
+T.equal(
     relationshipAfterConductOnly
         and relationshipAfterConductOnly.revision,
     conductOnlyRelationshipRevision,
@@ -729,7 +713,7 @@ assertEqual(
 -- The per-NPC dedupe cache is bounded and evicts oldest successful IDs.
 local cacheRecord = newRecord("npc_event_cache")
 for index = 1, 70 do
-    assertTrue(PNC.Relationships.ApplyEventMutation(
+    T.truthy(PNC.Relationships.ApplyEventMutation(
         cacheRecord.id,
         playerKey,
         {
@@ -755,39 +739,39 @@ for index = 1, 70 do
         }
     ), "cache mutation " .. tostring(index))
 end
-assertEqual(#cacheRecord.social.recentEventIDs, 64,
+T.equal(#cacheRecord.social.recentEventIDs, 64,
     "recent event cache bound")
-assertEqual(cacheRecord.social.recentEventIDs[1], "social:cache:7",
+T.equal(cacheRecord.social.recentEventIDs[1], "social:cache:7",
     "recent event oldest-first eviction")
-assertEqual(cacheRecord.social.recentEventIDs[64], "social:cache:70",
+T.equal(cacheRecord.social.recentEventIDs[64], "social:cache:70",
     "recent event newest retained")
-assertEqual(
+T.equal(
     #cacheRecord.runtime.relationshipDebugChanges,
     16,
     "runtime relationship change feed bounded"
 )
 local latestRelationshipChange =
     cacheRecord.runtime.relationshipDebugChanges[16]
-assertEqual(latestRelationshipChange.kind, "social_event",
+T.equal(latestRelationshipChange.kind, "social_event",
     "social event change type retained")
-assertEqual(latestRelationshipChange.eventID,
+T.equal(latestRelationshipChange.eventID,
     "social:cache:70",
     "social event ID retained")
-assertEqual(latestRelationshipChange.memoryType, "cache_test",
+T.equal(latestRelationshipChange.memoryType, "cache_test",
     "social memory type retained")
 
 -- 28-30. Persisted output is save-safe, round-trips event memories, and a
 -- deterministic authoritative event remains idempotent after the round trip.
-assertSaveSafe(revisionTarget.social)
+validatePersistedValue(revisionTarget.social)
 local serialized = PNC.Persistence.SerializeRecord(revisionTarget)
-assertSaveSafe(serialized)
+validatePersistedValue(serialized)
 local loaded = PNC.Persistence.DeserializeRecord(serialized)
-assertEqual(memoryCount(
+T.equal(memoryCount(
     loaded.social.relationships[playerKey],
     "treated_wound"
 ), 1, "save load preserves event memory")
 PNC.Registry.Data[revisionTarget.id] = loaded
-assertEqual(PNC.SocialEvents.Emit(event(
+T.equal(PNC.SocialEvents.Emit(event(
     "social:treated_wound:revision",
     "treated_wound",
     playerKey,
@@ -808,11 +792,11 @@ local temporary = PNC.RelationshipTypes.NewMemory({
     permanent = false,
     knowledgeSource = "experienced",
 })
-assertNear(PNC.RelationshipMath.CalculateMemoryStrengthAtTime(
+T.near(PNC.RelationshipMath.CalculateMemoryStrengthAtTime(
     temporary, 48
 ), 0.5, 0.00001, "temporary decay regression")
 temporary.permanent = true
-assertNear(PNC.RelationshipMath.CalculateMemoryStrengthAtTime(
+T.near(PNC.RelationshipMath.CalculateMemoryStrengthAtTime(
     temporary, 480
 ), 1, 0.00001, "permanent decay regression")
 
@@ -841,19 +825,19 @@ local debugRead, debugReadReason =
             targetKind = "current_player",
         }
     )
-assertTrue(debugRead ~= nil, "debug read snapshot")
-assertEqual(debugReadReason, nil, "debug read reason")
-assertEqual(debugRead.relationship.exists, false,
+T.truthy(debugRead ~= nil, "debug read snapshot")
+T.equal(debugReadReason, nil, "debug read reason")
+T.equal(debugRead.relationship.exists, false,
     "debug read previews missing relationship")
-assertTrue(debugRead.observerConduct ~= nil,
+T.truthy(debugRead.observerConduct ~= nil,
     "debug read includes observer conduct")
-assertTrue(debugRead.targetConduct ~= nil,
+T.truthy(debugRead.targetConduct ~= nil,
     "debug read includes target conduct")
-assertEqual(debugObserver.recordRevision, debugRecordRevision,
+T.equal(debugObserver.recordRevision, debugRecordRevision,
     "debug read record revision unchanged")
-assertEqual(debugObserver.social.revision, debugSocialRevision,
+T.equal(debugObserver.social.revision, debugSocialRevision,
     "debug read social revision unchanged")
-assertEqual(debugObserver.presenceRevision, debugPresenceRevision,
+T.equal(debugObserver.presenceRevision, debugPresenceRevision,
     "debug read presence revision unchanged")
 
 local debugTriggered, debugTriggerReason =
@@ -865,19 +849,19 @@ local debugTriggered, debugTriggerReason =
             eventType = "treated_wound",
         }
     )
-assertTrue(debugTriggered ~= nil, "debug trigger snapshot")
-assertEqual(debugTriggerReason, nil, "debug trigger reason")
-assertTrue(debugTriggered.actionResult.ok,
+T.truthy(debugTriggered ~= nil, "debug trigger snapshot")
+T.equal(debugTriggerReason, nil, "debug trigger reason")
+T.truthy(debugTriggered.actionResult.ok,
     "debug trigger uses social event service")
-assertEqual(debugTriggered.relationship.exists, true,
+T.equal(debugTriggered.relationship.exists, true,
     "debug trigger stores relationship")
-assertEqual(#debugTriggered.memories, 1,
+T.equal(#debugTriggered.memories, 1,
     "debug trigger returns memory detail")
-assertEqual(debugTriggered.actionResult.conductEvidenceCreated, 1,
+T.equal(debugTriggered.actionResult.conductEvidenceCreated, 1,
     "debug trigger returns conduct result")
-assertTrue(debugTriggered.targetConduct.scores.compassion > 0,
+T.truthy(debugTriggered.targetConduct.scores.compassion > 0,
     "debug trigger refreshes target conduct")
-assertTrue(string.find(
+T.truthy(string.find(
     PNC.ConductDebug.Format(
         debugTriggered.targetConduct.entityKey,
         300
@@ -886,11 +870,11 @@ assertTrue(string.find(
     1,
     true
 ) ~= nil, "conduct debug formatter")
-assertTrue(debugObserver.recordRevision > debugRecordRevision,
+T.truthy(debugObserver.recordRevision > debugRecordRevision,
     "debug trigger record revision")
-assertTrue(debugObserver.social.revision > debugSocialRevision,
+T.truthy(debugObserver.social.revision > debugSocialRevision,
     "debug trigger social revision")
-assertEqual(debugObserver.presenceRevision, debugPresenceRevision,
+T.equal(debugObserver.presenceRevision, debugPresenceRevision,
     "debug trigger leaves presence revision")
 
 local reciprocalSnapshot =
@@ -903,23 +887,23 @@ local reciprocalSnapshot =
             eventType = "survived_combat_together",
         }
     )
-assertTrue(reciprocalSnapshot.actionResult.ok,
+T.truthy(reciprocalSnapshot.actionResult.ok,
     "debug reciprocal event")
-assertTrue(reciprocalSnapshot.relationship.exists,
+T.truthy(reciprocalSnapshot.relationship.exists,
     "debug forward relationship")
-assertTrue(reciprocalSnapshot.reverse.exists,
+T.truthy(reciprocalSnapshot.reverse.exists,
     "debug reverse relationship")
-assertEqual(
+T.equal(
     reciprocalSnapshot.relationship.memoryCount,
     1,
     "debug forward memory"
 )
-assertEqual(
+T.equal(
     reciprocalSnapshot.reverse.memoryCount,
     1,
     "debug reverse memory"
 )
-assertEqual(
+T.equal(
     PNC.RelationshipDebug.TriggerSocialEvent(
         fakePlayer,
         {
@@ -932,5 +916,6 @@ assertEqual(
     nil,
     "unsupported debug event rejected"
 )
+T.finish("pnc_social_events_smoke")
 
-print("PNC social event smoke tests passed")
+T.finish("pnc_social_events_smoke")

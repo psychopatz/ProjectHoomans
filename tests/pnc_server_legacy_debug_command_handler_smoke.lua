@@ -1,12 +1,7 @@
-local SERVER_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/server/"
-package.path = SERVER_ROOT .. "?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local SERVER_ROOT = T.path("ProjectHoomans", "server", "")
+T.addPackagePaths()
 
 local player = {
     access = "",
@@ -180,33 +175,33 @@ PNC.ServerLegacyDebugCommandHandler.ConfigureTeleport({
     end,
 })
 
-assertEqual(Router.Handle("DebugCommand", player, { action = "heal" }), true,
+T.equal(Router.Handle("DebugCommand", player, { action = "heal" }), true,
     "unauthorized debug command consumed")
-assertEqual(#apiCalls, 0, "unauthorized debug command executed")
-assert(string.find(warnings[1], "action=heal", 1, true),
+T.equal(#apiCalls, 0, "unauthorized debug command executed")
+T.truthy(string.find(warnings[1], "action=heal", 1, true),
     "unauthorized action missing from warning")
 
 player.access = "admin"
 Router.Handle("DebugCommand", player, nil)
-assertEqual(#apiCalls, 0, "nil debug payload executed")
+T.equal(#apiCalls, 0, "nil debug payload executed")
 Router.Handle("DebugCommand", player, { action = "unknown_action" })
-assertEqual(#apiCalls, 0, "unknown debug action executed")
+T.equal(#apiCalls, 0, "unknown debug action executed")
 
 Router.Handle("DebugCommand", player, {
     action = "spawn", variant = "hostile_melee", x = 4, y = 5, z = 0,
 })
-assertEqual(spawned.faction, "hostile", "debug spawn faction")
-assertEqual(spawned.archetypeID, "Scavenger", "debug spawn archetype")
-assertEqual(spawned.orderSpec.kind, "hostile_hunt", "debug spawn order")
-assertEqual(spawned.forceLive, true, "debug spawn force-live")
-assertEqual(spawned.debug, true, "debug spawn flag")
+T.equal(spawned.faction, "hostile", "debug spawn faction")
+T.equal(spawned.archetypeID, "Scavenger", "debug spawn archetype")
+T.equal(spawned.orderSpec.kind, "hostile_hunt", "debug spawn order")
+T.equal(spawned.forceLive, true, "debug spawn force-live")
+T.equal(spawned.debug, true, "debug spawn flag")
 
 Router.Handle("DebugCommand", player, {
     action = "teleport_to_npc", id = "npc-teleport",
 })
-assertEqual(teleported.player, player, "teleport player")
-assertEqual(teleported.x, 101.5, "teleport x")
-assertEqual(teleported.y, 201.5, "teleport y")
+T.equal(teleported.player, player, "teleport player")
+T.equal(teleported.x, 101.5, "teleport x")
+T.equal(teleported.y, 201.5, "teleport y")
 
 local relationshipActions = {
     social_trigger_event = "social",
@@ -217,19 +212,19 @@ local relationshipActions = {
 for action, key in pairs(relationshipActions) do
     local args = { action = action, id = "npc-2" }
     Router.Handle("DebugCommand", player, args)
-    assertEqual(relationshipCalls[key], args, action .. " payload")
+    T.equal(relationshipCalls[key], args, action .. " payload")
 end
 
 local knowledgeArgs = { action = "knowledge_debug_action", id = "npc-3" }
 Router.Handle("DebugCommand", player, knowledgeArgs)
-assertEqual(diagnosticCalls.knowledge, knowledgeArgs, "knowledge payload")
-assertEqual(networkCalls.knowledge[2].kind, "knowledge",
+T.equal(diagnosticCalls.knowledge, knowledgeArgs, "knowledge payload")
+T.equal(networkCalls.knowledge[2].kind, "knowledge",
     "knowledge response")
 
 Router.Handle("DebugCommand", player, {
     action = "conversation_debug_recruit", npcID = "npc-4",
 })
-assertEqual(networkCalls.colony[2].kind, "colony", "recruit colony refresh")
+T.equal(networkCalls.colony[2].kind, "colony", "recruit colony refresh")
 
 local diagnosticActions = {
     faction_debug_action = "faction",
@@ -240,8 +235,8 @@ local diagnosticActions = {
 for action, key in pairs(diagnosticActions) do
     local args = { action = action }
     Router.Handle("DebugCommand", player, args)
-    assertEqual(diagnosticCalls[key], args, action .. " payload")
-    assertEqual(networkCalls[key][2].kind, key, action .. " response")
+    T.equal(diagnosticCalls[key], args, action .. " payload")
+    T.equal(networkCalls[key][2].kind, key, action .. " response")
 end
 
 local directActions = {
@@ -256,42 +251,43 @@ for _, action in ipairs(directActions) do
     local args = { action = action, id = "npc-5" }
     Router.Handle("DebugCommand", player, args)
     local call = apiCalls[#apiCalls]
-    assertEqual(call.action, action, action .. " route")
-    assertEqual(call.args, args, action .. " payload identity")
+    T.equal(call.action, action, action .. " route")
+    T.equal(call.args, args, action .. " payload identity")
 end
 
 local mapArgs = { action = "set_map_known", id = "npc-6" }
 Router.Handle("DebugCommand", player, mapArgs)
-assertEqual(mapArgs.playerKey, "DebugAdmin", "map-known player key")
+T.equal(mapArgs.playerKey, "DebugAdmin", "map-known player key")
 
 local weaponArgs = { action = "copy_held_weapon", id = "npc-7" }
 Router.Handle("DebugCommand", player, weaponArgs)
-assertEqual(weaponArgs.weaponFullType, "Base.Axe", "copied weapon type")
-assertEqual(weaponArgs.sourcePlayer, player, "copied weapon source player")
+T.equal(weaponArgs.weaponFullType, "Base.Axe", "copied weapon type")
+T.equal(weaponArgs.sourcePlayer, player, "copied weapon source player")
 
 local loadoutArgs = { action = "copy_player_loadout", id = "npc-8" }
 Router.Handle("DebugCommand", player, loadoutArgs)
-assertEqual(loadoutArgs.sourcePlayer, player, "copied loadout source player")
+T.equal(loadoutArgs.sourcePlayer, player, "copied loadout source player")
 
 local orderSpec = { kind = "guard" }
 Router.Handle("DebugCommand", player, {
     action = "set_order", id = "npc-9", orderSpec = orderSpec,
 })
-assertEqual(apiCalls[#apiCalls].kind, "order", "set-order route")
-assertEqual(apiCalls[#apiCalls].value, orderSpec, "set-order payload")
+T.equal(apiCalls[#apiCalls].kind, "order", "set-order route")
+T.equal(apiCalls[#apiCalls].value, orderSpec, "set-order payload")
 local modeSpec = { mode = "hostile" }
 Router.Handle("DebugCommand", player, {
     action = "set_hostility", id = "npc-9", modeSpec = modeSpec,
 })
-assertEqual(apiCalls[#apiCalls].kind, "hostility", "set-hostility route")
-assertEqual(apiCalls[#apiCalls].value, modeSpec, "set-hostility payload")
+T.equal(apiCalls[#apiCalls].kind, "hostility", "set-hostility route")
+T.equal(apiCalls[#apiCalls].value, modeSpec, "set-hostility payload")
 
 Router.Handle("DebugCommand", player, { action = "audit_bodies" })
-assertEqual(audited.now, 321, "body audit time")
-assertEqual(audited.forced, true, "body audit force")
-assertEqual(networkCalls.roster[2][1].id, "npc-1", "body audit roster")
-assertEqual(networkCalls.roster[3], true, "body audit authorization")
-assertEqual(networkCalls.roster[4], PNC.BodyLifecycle.LastAudit,
+T.equal(audited.now, 321, "body audit time")
+T.equal(audited.forced, true, "body audit force")
+T.equal(networkCalls.roster[2][1].id, "npc-1", "body audit roster")
+T.equal(networkCalls.roster[3], true, "body audit authorization")
+T.equal(networkCalls.roster[4], PNC.BodyLifecycle.LastAudit,
     "body audit metadata")
+T.finish("pnc_server_legacy_debug_command_handler_smoke")
 
-print("pnc_server_legacy_debug_command_handler_smoke: ok")
+T.finish("pnc_server_legacy_debug_command_handler_smoke")

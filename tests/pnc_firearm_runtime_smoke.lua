@@ -1,18 +1,6 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Combat/PNC_Combat_Firearms.lua"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertContains(actual, expected, label)
-    if not string.find(tostring(actual), tostring(expected), 1, true) then
-        error((label or "assertContains") .. ": missing=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/Combat/PNC_Combat_Firearms.lua")
 
 local realismEnabled = true
 local mirroredAmmo
@@ -39,7 +27,7 @@ local scriptItem = {
 getScriptManager = function()
     return {
         getItem = function(_, fullType)
-            assertEqual(fullType, "Base.TestPistol", "script firearm type")
+            T.equal(fullType, "Base.TestPistol", "script firearm type")
             return scriptItem
         end,
     }
@@ -78,7 +66,7 @@ PNC = {
     },
     Animation = {
         PlayBump = function(_, _, anim)
-            assertEqual(anim, "LoadPistol", "pistol reload animation")
+            T.equal(anim, "LoadPistol", "pistol reload animation")
         end,
     },
     Combat = {
@@ -97,7 +85,7 @@ PNC = {
     },
 }
 
-dofile(FILE)
+T.load(FILE)
 
 local record = {
     id = "companion_firearm",
@@ -125,41 +113,41 @@ local fired
 local reason
 local magazine
 local descriptor = PNC.Firearms.Describe(record, weapon)
-assertEqual(descriptor.ammoType, "Base.Bullets9mm", "weapon ammo type")
-assertEqual(descriptor.ammoPerShot, 1, "weapon ammo per shot")
-assertEqual(descriptor.shotSound, "TestPistolShot", "weapon shot sound")
-assertEqual(descriptor.soundRadius, 72, "weapon noise radius")
-assertEqual(descriptor.projectileCount, 1, "weapon projectile count")
-assertEqual(descriptor.projectileSpread, 0.25, "weapon projectile spread")
+T.equal(descriptor.ammoType, "Base.Bullets9mm", "weapon ammo type")
+T.equal(descriptor.ammoPerShot, 1, "weapon ammo per shot")
+T.equal(descriptor.shotSound, "TestPistolShot", "weapon shot sound")
+T.equal(descriptor.soundRadius, 72, "weapon noise radius")
+T.equal(descriptor.projectileCount, 1, "weapon projectile count")
+T.equal(descriptor.projectileSpread, 0.25, "weapon projectile spread")
 fired, reason, magazine = PNC.Firearms.PrepareShot(record, weapon)
-assertEqual(fired, true, "first companion shot")
-assertEqual(reason, "round_consumed", "first companion shot reason")
-assertEqual(record.inventory.items.gun.ammoCount, 2, "weapon-derived magazine decremented")
-assertEqual(magazine.capacity, 3, "weapon script clip capacity")
-assertEqual(mirroredAmmo, 2, "live firearm magazine mirror")
+T.equal(fired, true, "first companion shot")
+T.equal(reason, "round_consumed", "first companion shot reason")
+T.equal(record.inventory.items.gun.ammoCount, 2, "weapon-derived magazine decremented")
+T.equal(magazine.capacity, 3, "weapon script clip capacity")
+T.equal(mirroredAmmo, 2, "live firearm magazine mirror")
 
 PNC.Firearms.PrepareShot(record, weapon)
 PNC.Firearms.PrepareShot(record, weapon)
-assertEqual(record.inventory.items.gun.ammoCount, 0, "magazine exhausted")
+T.equal(record.inventory.items.gun.ammoCount, 0, "magazine exhausted")
 
 fired, reason = PNC.Firearms.PrepareShot(record, weapon)
-assertEqual(fired, false, "empty companion firearm rejected")
-assertEqual(reason, "reload_required", "inventory rounds request reload")
+T.equal(fired, false, "empty companion firearm rejected")
+T.equal(reason, "reload_required", "inventory rounds request reload")
 
 local started
 started, reason = PNC.Firearms.StartReload(record, {}, { kind = "zombie" }, weapon)
-assertEqual(started, true, "reload action started")
-assertEqual(reason, "reload_started", "reload action reason")
-assertEqual(reloadAction.attackType, "reload", "reload action type")
-assertEqual(reloadAction.magazineCapacity, 3, "reload action capacity")
-assertEqual(reloadAction.durationMs, 1000, "weapon reload time")
+T.equal(started, true, "reload action started")
+T.equal(reason, "reload_started", "reload action reason")
+T.equal(reloadAction.attackType, "reload", "reload action type")
+T.equal(reloadAction.magazineCapacity, 3, "reload action capacity")
+T.equal(reloadAction.durationMs, 1000, "weapon reload time")
 
 local completed
 completed, reason = PNC.Firearms.CompleteReload(record, {}, reloadAction)
-assertEqual(completed, true, "reload completed")
-assertEqual(reason, "reload_complete", "full reload reason")
-assertEqual(record.inventory.items.gun.ammoCount, 3, "magazine refilled to capacity")
-assertEqual(record.inventory.items.rounds.stack, 1, "matching loose rounds consumed")
+T.equal(completed, true, "reload completed")
+T.equal(reason, "reload_complete", "full reload reason")
+T.equal(record.inventory.items.gun.ammoCount, 3, "magazine refilled to capacity")
+T.equal(record.inventory.items.rounds.stack, 1, "matching loose rounds consumed")
 
 local autonomous = {
     id = "hostile_firearm",
@@ -180,39 +168,39 @@ local autonomous = {
     },
 }
 fired, reason = PNC.Firearms.PrepareShot(autonomous, weapon)
-assertEqual(fired, false, "empty autonomous magazine does not fire")
-assertEqual(reason, "reload_required", "autonomous infinite reserve still reloads")
+T.equal(fired, false, "empty autonomous magazine does not fire")
+T.equal(reason, "reload_required", "autonomous infinite reserve still reloads")
 started, reason = PNC.Firearms.StartReload(autonomous, {}, { kind = "zombie" }, weapon)
-assertEqual(started, true, "autonomous reload action started")
+T.equal(started, true, "autonomous reload action started")
 completed, reason = PNC.Firearms.CompleteReload(autonomous, {}, reloadAction)
-assertEqual(completed, true, "autonomous reload completed")
-assertEqual(reason, "reload_complete_unlimited_reserve", "autonomous reserve reason")
-assertEqual(autonomous.inventory.items.gun.ammoCount, 3, "autonomous magazine refilled")
-assertEqual(autonomous.inventory.items.rounds, nil, "autonomous reload did not require inventory rounds")
+T.equal(completed, true, "autonomous reload completed")
+T.equal(reason, "reload_complete_unlimited_reserve", "autonomous reserve reason")
+T.equal(autonomous.inventory.items.gun.ammoCount, 3, "autonomous magazine refilled")
+T.equal(autonomous.inventory.items.rounds, nil, "autonomous reload did not require inventory rounds")
 
 realismEnabled = false
 record.runtime.attackAction = nil
 record.inventory.items.gun.ammoCount = 0
 record.inventory.items.rounds = nil
 fired, reason = PNC.Firearms.PrepareShot(record, weapon)
-assertEqual(fired, false, "disabled realism still honors magazine")
-assertEqual(reason, "reload_required", "disabled realism uses infinite reserve reload")
+T.equal(fired, false, "disabled realism still honors magazine")
+T.equal(reason, "reload_required", "disabled realism uses infinite reserve reload")
 started = PNC.Firearms.StartReload(record, {}, { kind = "zombie" }, weapon)
-assertEqual(started, true, "disabled-realism companion reload started")
+T.equal(started, true, "disabled-realism companion reload started")
 completed, reason = PNC.Firearms.CompleteReload(record, {}, reloadAction)
-assertEqual(completed, true, "disabled-realism companion reload completed")
-assertEqual(reason, "reload_complete_unlimited_reserve", "disabled realism reserve reason")
-assertEqual(record.inventory.items.gun.ammoCount, 3, "disabled-realism magazine refilled")
+T.equal(completed, true, "disabled-realism companion reload completed")
+T.equal(reason, "reload_complete_unlimited_reserve", "disabled realism reserve reason")
+T.equal(record.inventory.items.gun.ammoCount, 3, "disabled-realism magazine refilled")
 
 local debugState = PNC.Firearms.BuildDebugState(record)
-assertEqual(debugState.count, 3, "debug magazine count")
-assertEqual(debugState.capacity, 3, "debug magazine capacity")
-assertEqual(debugState.unlimitedReserve, true, "debug infinite reserve")
+T.equal(debugState.count, 3, "debug magazine count")
+T.equal(debugState.capacity, 3, "debug magazine capacity")
+T.equal(debugState.unlimitedReserve, true, "debug infinite reserve")
 
 PNC.Const = { PRESENCE_LIVE = "live" }
 PNC.Core = { Now = function() return 0 end }
-local NameplateDebug = dofile(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Nameplates/PNC_NameplateDebug.lua"
+local NameplateDebug = T.load(
+    T.path("ProjectHoomans", "client", "PNC/UI/Nameplates/PNC_NameplateDebug.lua")
 )
 local overlay = NameplateDebug.BuildText({
     presenceState = "live",
@@ -222,7 +210,8 @@ local overlay = NameplateDebug.BuildText({
         combatModeResolved = "ranged",
     },
 }, true, {})
-assertContains(overlay, "Mag: 3/3", "debug overlay magazine")
-assertContains(overlay, "Reserve: infinite", "debug overlay reserve")
+T.contains(overlay, "Mag: 3/3", "debug overlay magazine")
+T.contains(overlay, "Reserve: infinite", "debug overlay reserve")
+T.finish("pnc_firearm_runtime_smoke")
 
-print("pnc_firearm_runtime_smoke: ok")
+T.finish("pnc_firearm_runtime_smoke")

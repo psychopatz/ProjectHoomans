@@ -1,10 +1,6 @@
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Pathing/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/Pathing/")
 
 local opened = false
 local synced = 0
@@ -105,10 +101,10 @@ PNC = {
     },
 }
 
-dofile(ROOT .. "PNC_TraversalQuery.lua")
-assertEqual(PNC.TraversalQuery.GetPassageBetween(fromSquare, toSquare), door, "reverse-owned door lookup")
+T.load(ROOT .. "PNC_TraversalQuery.lua")
+T.equal(PNC.TraversalQuery.GetPassageBetween(fromSquare, toSquare), door, "reverse-owned door lookup")
 
-dofile(ROOT .. "PNC_PathService/PNC_PathService_Interactions.lua")
+T.load(ROOT .. "PNC_PathService/PNC_PathService_Interactions.lua")
 
 local zombie = {
     getX = function() return 0.75 end,
@@ -133,19 +129,19 @@ local lane = {
 local interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
     zombie, { id = "door_test" }, lane, 2.5, 0.5, 0
 )
-assertEqual(interacted, true, "blocked passage opens")
-assertEqual(interaction, "door_open", "blocked passage interaction")
-assertEqual(opened, true, "blocked door state")
-assertEqual(synced, 1, "blocked door synchronized")
+T.equal(interacted, true, "blocked passage opens")
+T.equal(interaction, "door_open", "blocked passage interaction")
+T.equal(opened, true, "blocked door state")
+T.equal(synced, 1, "blocked door synchronized")
 
 opened = false
 lane = {}
 interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
     zombie, { id = "proactive_door_test" }, lane, 2.5, 0.5, 0
 )
-assertEqual(interacted, true, "goal-directed passage probe opens nearby door")
-assertEqual(interaction, "door_open", "proactive door interaction")
-assertEqual(opened, true, "proactive door state")
+T.equal(interacted, true, "goal-directed passage probe opens nearby door")
+T.equal(interaction, "door_open", "proactive door interaction")
+T.equal(opened, true, "proactive door state")
 
 opened = false
 zombie.isCollidedWithDoor = function() return true end
@@ -153,14 +149,14 @@ lane = {}
 interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
     zombie, { id = "collision_door_test" }, lane, 2.5, 0.5, 0
 )
-assertEqual(interacted, true, "collision opens current-square door")
-assertEqual(interaction, "door_open", "collision interaction")
-assertEqual(opened, true, "collision door state")
+T.equal(interacted, true, "collision opens current-square door")
+T.equal(interaction, "door_open", "collision interaction")
+T.equal(opened, true, "collision door state")
 
 opened = false
 door.isLockedByKey = function() return true end
-assertEqual(PNC.PathService.Internal.openDoorForNPC(zombie, door), false, "key-locked door stays closed")
-assertEqual(opened, false, "key-locked door state")
+T.equal(PNC.PathService.Internal.openDoorForNPC(zombie, door), false, "key-locked door stays closed")
+T.equal(opened, false, "key-locked door state")
 
 door.isLockedByKey = nil
 door.isLocked = function() return true end
@@ -172,12 +168,12 @@ IsoDoor = {
         opened = true
     end,
 }
-assertEqual(
+T.equal(
     PNC.PathService.Internal.openDoorForNPC(zombie, door),
     true,
     "friendly NPC opens a locked garage like Bandits"
 )
-assertEqual(opened, true, "garage door state")
+T.equal(opened, true, "garage door state")
 door.isLocked = nil
 door.isObstructed = nil
 IsoDoor = nil
@@ -214,10 +210,10 @@ lane = {}
 interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
     zombie, { id = "proactive_window_test" }, lane, 2.5, 0.5, 0
 )
-assertEqual(interacted, true, "goal-directed passage probe opens nearby window")
-assertEqual(interaction, "window_climb", "opened window transfers directly to traversal")
-assertEqual(windowOpened, true, "proactive window state")
-assertEqual(lane.testTraversalSpec.kind, "window_climb",
+T.equal(interacted, true, "goal-directed passage probe opens nearby window")
+T.equal(interaction, "window_climb", "opened window transfers directly to traversal")
+T.equal(windowOpened, true, "proactive window state")
+T.equal(lane.testTraversalSpec.kind, "window_climb",
     "opened window did not acquire scripted traversal")
 
 -- IsoWindow:getOppositeSquare() is fixed to the object's storage side, not
@@ -232,9 +228,9 @@ lane = {}
 interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
     zombie, { id = "reverse_window_test" }, lane, -1.5, 0.5, 0
 )
-assertEqual(interacted, true, "reverse-side window traversal starts")
-assertEqual(interaction, "window_climb", "reverse-side window action")
-assertEqual(lane.testTraversalSpec.toX, 0.5,
+T.equal(interacted, true, "reverse-side window traversal starts")
+T.equal(interaction, "window_climb", "reverse-side window action")
+T.equal(lane.testTraversalSpec.toX, 0.5,
     "reverse-side window selected the actor's own square")
 zombie.getX = function() return 0.75 end
 zombie.getForwardDirection = function()
@@ -250,18 +246,18 @@ lane = {}
 interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
     zombie, { id = "window_break_test" }, lane, 2.5, 0.5, 0
 )
-assertEqual(interacted, true, "locked window begins breach")
-assertEqual(interaction, "window_smash", "locked window breach mode")
-assertEqual(lane.testTraversalSpec.anim, "PNC_WindowSmash",
+T.equal(interacted, true, "locked window begins breach")
+T.equal(interaction, "window_smash", "locked window breach mode")
+T.equal(lane.testTraversalSpec.anim, "PNC_WindowSmash",
     "window breach animation")
-assertEqual(lane.testTraversalSpec.obstacle, window,
+T.equal(lane.testTraversalSpec.obstacle, window,
     "window breach retains obstacle")
-assertEqual(
+T.equal(
     PNC.PathService.Internal.smashWindowForNPC(zombie, window),
     true,
     "window breach applies breakage"
 )
-assertEqual(windowSmashed, true, "window glass was broken")
+T.equal(windowSmashed, true, "window glass was broken")
 
 -- A merely adjacent window must not steal a failed native route by rotating
 -- the NPC toward itself. Bandits only acts on the collision-facing object.
@@ -278,6 +274,7 @@ lane = {}
 interacted = PNC.PathService.Internal.tryDoorOrWindowInteraction(
     zombie, { id = "side_window_reject_test" }, lane, 0.75, 2.5, 0
 )
-assertEqual(interacted, false, "non-facing adjacent window was selected")
+T.equal(interacted, false, "non-facing adjacent window was selected")
+T.finish("pnc_door_interaction_smoke")
 
-print("pnc_door_interaction_smoke: ok")
+T.finish("pnc_door_interaction_smoke")

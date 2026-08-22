@@ -1,15 +1,6 @@
-local function equal(actual, expected, message)
-    if actual ~= expected then
-        error((message or "assertion failed") .. ": expected "
-            .. tostring(expected) .. ", got " .. tostring(actual))
-    end
-end
+local T = require "tests/support/test"
 
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/?.lua",
-    "../psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/?.lua",
-    package.path,
-}, ";")
+T.addPackagePaths()
 
 local function javaList(values)
     return {
@@ -54,10 +45,10 @@ local component = {
 }
 
 local target = Targets.Resolve(component)[1]
-equal(target.sceneId, "facility.sleep.floor", "empty spot uses floor XML")
-equal(target.x, 10.5, "floor sleep x")
-equal(target.y, 20.5, "floor sleep y")
-equal(target.interactionX, nil, "floor sleep does not teleport")
+T.equal(target.sceneId, "facility.sleep.floor", "empty spot uses floor XML")
+T.equal(target.x, 10.5, "floor sleep x")
+T.equal(target.y, 20.5, "floor sleep y")
+T.equal(target.interactionX, nil, "floor sleep does not teleport")
 
 local properties = {
     get = function(_, key)
@@ -82,18 +73,19 @@ bedObjects[1] = {
 }
 
 target = Targets.Resolve(component)[1]
-equal(target.sceneId, "facility.sleep.bed", "new bed changes XML without reassignment")
-equal(target.x, 10.5, "bed approach x")
-equal(target.y, 21.5, "bed approach y")
-equal(target.interactionX, 11, "multi-tile bed center x")
-equal(target.interactionY, 20.5, "multi-tile bed center y")
-equal(target.interactionAxis, "x", "bed long axis")
-equal(target.sleepSurface, "bed", "bed surface metadata")
+T.equal(target.sceneId, "facility.sleep.bed", "new bed changes XML without reassignment")
+T.equal(target.x, 10.5, "bed approach x")
+T.equal(target.y, 21.5, "bed approach y")
+T.equal(target.interactionX, 11, "multi-tile bed center x")
+T.equal(target.interactionY, 20.5, "multi-tile bed center y")
+T.equal(target.interactionAxis, "x", "bed long axis")
+T.equal(target.sleepSurface, "bed", "bed surface metadata")
 
 bedObjects[1] = nil
 component.targetResolver = nil
 target = Targets.Resolve(component)[1]
-equal(target.sceneId, "facility.sleep.floor",
+T.equal(target.sceneId, "facility.sleep.floor",
     "legacy resolver-less spot returns to floor XML")
+T.finish("pnc_sleep_spot_resolver_smoke")
 
-print("pnc_sleep_spot_resolver_smoke: ok")
+T.finish("pnc_sleep_spot_resolver_smoke")

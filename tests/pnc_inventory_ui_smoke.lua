@@ -1,12 +1,7 @@
-local CLIENT_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
-local SHARED_ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
+local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
 
 local WindowBase = {}
 function WindowBase:derive()
@@ -56,33 +51,33 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
     return PsychopatzCore.UI
 end
 
-dofile(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryUI_Model.lua")
-dofile(CLIENT_ROOT .. "PNC/UI/Communities/PNC_ColonyStorageViewModel.lua")
+T.load(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryUI_Model.lua")
+T.load(CLIENT_ROOT .. "PNC/UI/Communities/PNC_ColonyStorageViewModel.lua")
 local storageRows = PNC.ColonyStorageViewModel.BuildInventoryRows({ rows = {
     { recordIndex = 1, fullType = "Base.Crisps", name = "Crisps",
         quantity = 3, totalWeight = 0.6 },
     { recordIndex = 2, fullType = "Base.Bandage", name = "Bandage",
         quantity = 2, totalWeight = 0.2 },
 } }, "", "name", {})
-assertEqual(storageRows[1].groupHeader, true,
+T.equal(storageRows[1].groupHeader, true,
     "storage inventory category header missing")
-assertEqual(storageRows[2].texture ~= nil, true,
+T.equal(storageRows[2].texture ~= nil, true,
     "storage inventory row texture missing")
 local collapsedStorageRows = PNC.ColonyStorageViewModel.BuildInventoryRows({ rows = {
     { recordIndex = 1, fullType = "Base.Crisps", name = "Crisps",
         quantity = 3, totalWeight = 0.6 },
 } }, "", "name", { ["storage-category:item"] = true })
-assertEqual(#collapsedStorageRows, 1,
+T.equal(#collapsedStorageRows, 1,
     "collapsed storage category still exposed child rows")
-dofile(SHARED_ROOT .. "PNC/Conversation/PNC_ConversationGifts.lua")
-assertEqual(PNC.Gifts.IsValidItemType("Base.Crisps"), true,
+T.load(SHARED_ROOT .. "PNC/Conversation/PNC_ConversationGifts.lua")
+T.equal(PNC.Gifts.IsValidItemType("Base.Crisps"), true,
     "crisps are valid food gifts")
 local repeatedGiftEffect = PNC.Gifts.EvaluateEffect({
     "Base.Bandage", "Base.Bandage", "Base.Bandage", "Base.Bandage",
 })
-assertEqual(repeatedGiftEffect.approval, 16,
+T.equal(repeatedGiftEffect.approval, 16,
     "repeated gifts are no longer reputation capped")
-assertEqual(repeatedGiftEffect.familiarity, 2,
+T.equal(repeatedGiftEffect.familiarity, 2,
     "repeated gift familiarity remains cumulative")
 
 package.preload["PNC/UI/Inventory/PNC_InventoryUI_Model"] = function()
@@ -191,37 +186,37 @@ local player = {
     end,
 }
 local playerContainers = PNC.InventoryUIModel.BuildPlayerContainers(player)
-assertEqual(#playerContainers, 2, "player root and backpack selectors")
-assertEqual(playerContainers[1].id, "root", "player root selector first")
-assertEqual(playerContainers[2].label, "Duffel Bag", "player backpack selector")
-assertEqual(PNC.InventoryUIModel.FindContainer(playerContainers, "missing"), nil,
+T.equal(#playerContainers, 2, "player root and backpack selectors")
+T.equal(playerContainers[1].id, "root", "player root selector first")
+T.equal(playerContainers[2].label, "Duffel Bag", "player backpack selector")
+T.equal(PNC.InventoryUIModel.FindContainer(playerContainers, "missing"), nil,
     "missing container does not masquerade as root")
 local playerRows = PNC.InventoryUIModel.BuildPlayerRows(playerContainers[1], player)
 local playerRowsByID = {}
 for _, row in ipairs(playerRows) do playerRowsByID[row.id] = row end
-assertEqual(playerRowsByID["42"].favorite, true, "player favorite row state")
-assertEqual(playerRowsByID["42"].equipped, true, "player equipped row state")
-assertEqual(playerRowsByID["43"].equipped, true,
+T.equal(playerRowsByID["42"].favorite, true, "player favorite row state")
+T.equal(playerRowsByID["42"].equipped, true, "player equipped row state")
+T.equal(playerRowsByID["43"].equipped, true,
     "player worn item protected even when InventoryItem:isEquipped is false")
 local giftRows = PNC.InventoryUIModel.BuildPlayerRows(
     playerContainers[1], player, nil, true
 )
-assert(#giftRows > 0, "gift mode retains valid equipment gifts")
-assert(#giftRows < #playerRows, "gift mode removes ordinary non-gifts")
+T.truthy(#giftRows > 0, "gift mode retains valid equipment gifts")
+T.truthy(#giftRows < #playerRows, "gift mode removes ordinary non-gifts")
 for _, row in ipairs(giftRows) do
-    assertEqual(row.giftValid, true, "gift mode filters invalid item rows")
+    T.equal(row.giftValid, true, "gift mode filters invalid item rows")
 end
 local playerAmmoGroup
 for _, row in ipairs(playerRows) do
     if row.fullType == "Base.Bullets9mm" then playerAmmoGroup = row end
 end
-assertEqual(playerAmmoGroup.groupHeader, true, "matching player items collapse")
-assertEqual(playerAmmoGroup.stack, 2, "collapsed player quantity")
+T.equal(playerAmmoGroup.groupHeader, true, "matching player items collapse")
+T.equal(playerAmmoGroup.stack, 2, "collapsed player quantity")
 local playerAmmoSelection = PNC.InventoryUIModel.BuildTransferSelection(
     playerAmmoGroup,
     1
 )
-assertEqual(#playerAmmoSelection.itemIDs, 1, "partial player selection")
+T.equal(#playerAmmoSelection.itemIDs, 1, "partial player selection")
 local expandedPlayerRows = PNC.InventoryUIModel.BuildPlayerRows(
     playerContainers[1],
     player,
@@ -233,7 +228,7 @@ for _, row in ipairs(expandedPlayerRows) do
         expandedAmmoCount = expandedAmmoCount + 1
     end
 end
-assertEqual(expandedAmmoCount, 3, "expanded group has header and members")
+T.equal(expandedAmmoCount, 3, "expanded group has header and members")
 
 local npcContainers = PNC.InventoryUIModel.BuildNPCContainers({
     items = {
@@ -251,8 +246,8 @@ local npcContainers = PNC.InventoryUIModel.BuildNPCContainers({
         bag_npc_bag = { items = {}, maxWeight = 18 },
     },
 })
-assertEqual(#npcContainers, 2, "NPC root and backpack selectors")
-assertEqual(npcContainers[2].label, "Work Bag", "NPC backpack selector")
+T.equal(#npcContainers, 2, "NPC root and backpack selectors")
+T.equal(npcContainers[2].label, "Work Bag", "NPC backpack selector")
 local npcRows = PNC.InventoryUIModel.BuildNPCRows({
     items = {
         npc_bag = {
@@ -294,25 +289,25 @@ for _, row in ipairs(npcRows) do
     npcRowsByID[row.id] = row
     if row.fullType == "Base.Nails" then npcNailsGroup = row end
 end
-assertEqual(npcRowsByID["npc_bag"].favorite, true, "NPC favorite row state")
-assertEqual(npcRowsByID["npc_bag"].equipped, true, "NPC equipped row state")
-assertEqual(npcNailsGroup.stack, 5, "compact NPC stacks combine")
+T.equal(npcRowsByID["npc_bag"].favorite, true, "NPC favorite row state")
+T.equal(npcRowsByID["npc_bag"].equipped, true, "NPC equipped row state")
+T.equal(npcNailsGroup.stack, 5, "compact NPC stacks combine")
 local npcNailsSelection = PNC.InventoryUIModel.BuildTransferSelection(
     npcNailsGroup,
     4
 )
-assertEqual(#npcNailsSelection.itemIDs, 2, "quantity spans compact stacks")
-assertEqual(npcRowsByID["identity_card"].restricted, true,
+T.equal(#npcNailsSelection.itemIDs, 2, "quantity spans compact stacks")
+T.equal(npcRowsByID["identity_card"].restricted, true,
     "off-limits item model state")
 
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
-dofile(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryTransferEndpoint.lua")
+T.load(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryTransferEndpoint.lua")
 package.preload["PNC/UI/Inventory/PNC_InventoryTransferEndpoint"] = function()
     return PNC.InventoryTransferEndpoint
 end
-dofile(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryWindow.lua")
+T.load(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryWindow.lua")
 
 local storageEndpoint = PNC.InventoryTransferEndpoint.Storage("storage_a")
 PNC.Network.ClientState.colonyManagement = { storage = {
@@ -328,23 +323,23 @@ PNC.Network.ClientState.colonyManagement = { storage = {
         totalWeight = 0.25,
     }},
 } }
-assertEqual(storageEndpoint:revision(), 7, "storage endpoint revision")
-assertEqual(#storageEndpoint:rows(), 2,
+T.equal(storageEndpoint:revision(), 7, "storage endpoint revision")
+T.equal(#storageEndpoint:rows(), 2,
     "storage endpoint reuses category inventory rows")
 local storageSelection = PNC.InventoryTransferEndpoint.SelectionForRow(
     storageEndpoint,
     storageEndpoint:rows()[2],
     10
 )
-assertEqual(storageSelection.records[1].recordIndex, 3,
+T.equal(storageSelection.records[1].recordIndex, 3,
     "storage selection retains authoritative record index")
-assertEqual(storageSelection.records[1].quantity, 10,
+T.equal(storageSelection.records[1].quantity, 10,
     "storage selection retains requested quantity")
 storageEndpoint.readOnly = true
 local sent, readOnlyReason = storageEndpoint:send(
     "to_target", { itemIDs = { "1" } }, "root")
-assertEqual(sent, false, "read-only storage endpoint rejects transfer")
-assertEqual(readOnlyReason, "read_only", "read-only transfer reason")
+T.equal(sent, false, "read-only storage endpoint rejects transfer")
+T.equal(readOnlyReason, "read_only", "read-only transfer reason")
 
 local window = setmetatable({}, { __index = ISPNCInventoryWindow })
 local eligibleIDs = PNC.InventoryWindow.CollectBulkTransferIDs({
@@ -356,11 +351,11 @@ local eligibleIDs = PNC.InventoryWindow.CollectBulkTransferIDs({
         { item = playerRowsByID["43"] },
     },
 })
-assertEqual(#eligibleIDs, 1, "bulk transfer protected-item filtering")
-assertEqual(eligibleIDs[1], "ordinary", "bulk transfer eligible item")
+T.equal(#eligibleIDs, 1, "bulk transfer protected-item filtering")
+T.equal(eligibleIDs[1], "ordinary", "bulk transfer eligible item")
 window:showItemContext("player", { id = "player_item_1" })
-assertEqual(contextPlayerID, 0, "context menu receives numeric player ID")
-assertEqual(#context.options, 1, "player transfer context option")
+T.equal(contextPlayerID, 0, "context menu receives numeric player ID")
+T.equal(#context.options, 1, "player transfer context option")
 
 window.npcID = "npc_1"
 window.selectedNPCContainer = "root"
@@ -373,10 +368,10 @@ window.sendTransfer = function(self, direction, row, destination, quantity)
     }
 end
 window:requestTransfer("player_to_npc", playerAmmoGroup, nil)
-assertEqual(quantityRequest.maximum, 2, "group transfer opens quantity modal")
+T.equal(quantityRequest.maximum, 2, "group transfer opens quantity modal")
 quantityRequest.callback(quantityRequest.callbackTarget, 1)
-assertEqual(window.lastTransfer.quantity, 1, "modal quantity reaches transfer")
-assertEqual(window.lastTransfer.direction, "player_to_npc",
+T.equal(window.lastTransfer.quantity, 1, "modal quantity reaches transfer")
+T.equal(window.lastTransfer.direction, "player_to_npc",
     "modal preserves transfer direction")
 
 window.playerContainers = {
@@ -387,40 +382,39 @@ window.selectedPlayerContainer = "root"
 window.refreshInventory = function(self, force)
     self.refreshForced = force
 end
-assertEqual(window:selectContainer("player", "bag_1"), true, "select player bag")
-assertEqual(window.selectedPlayerContainer, "bag_1", "selected player bag retained")
-assertEqual(window.refreshForced, true, "container selection refresh")
+T.equal(window:selectContainer("player", "bag_1"), true, "select player bag")
+T.equal(window.selectedPlayerContainer, "bag_1", "selected player bag retained")
+T.equal(window.refreshForced, true, "container selection refresh")
 window:cycleContainer("player", 1)
-assertEqual(window.selectedPlayerContainer, "root", "container wheel cycles forward")
+T.equal(window.selectedPlayerContainer, "root", "container wheel cycles forward")
 window:cycleContainer("player", -1)
-assertEqual(window.selectedPlayerContainer, "bag_1", "container wheel cycles backward")
+T.equal(window.selectedPlayerContainer, "bag_1", "container wheel cycles backward")
 
-local listSource = assert(io.open(
-    CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryUI_List.lua",
-    "r"
-)):read("*a")
-assert(string.find(listSource, "media/ui/icon.png", 1, true),
+local listSource = T.read(
+    "ProjectHoomans", "client", "PNC/UI/Inventory/PNC_InventoryUI_List.lua"
+)
+T.truthy(string.find(listSource, "media/ui/icon.png", 1, true),
     "vanilla equipped circle texture missing")
-assert(string.find(listSource, "media/ui/FavoriteStar.png", 1, true),
+T.truthy(string.find(listSource, "media/ui/FavoriteStar.png", 1, true),
     "vanilla favorite star texture missing")
-assert(string.find(
+T.truthy(string.find(
     listSource,
     "media/ui/inventoryPanes/Button_TreeCollapsed.png",
     1,
     true
 ), "vanilla collapsed-group texture missing")
-assert(string.find(listSource, "row.restricted", 1, true),
+T.truthy(string.find(listSource, "row.restricted", 1, true),
     "off-limits row dimming missing")
 
-local modalSource = assert(io.open(
-    CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryQuantityModal.lua",
-    "r"
-)):read("*a")
-assert(string.find(
+local modalSource = T.read(
+    "ProjectHoomans", "client", "PNC/UI/Inventory/PNC_InventoryQuantityModal.lua"
+)
+T.truthy(string.find(
     modalSource,
     'require "RadioCom/ISUIRadio/ISSliderPanel"',
     1,
     true
 ), "quantity modal slider missing")
+T.finish("pnc_inventory_ui_smoke")
 
-print("pnc_inventory_ui_smoke: ok")
+T.finish("pnc_inventory_ui_smoke")

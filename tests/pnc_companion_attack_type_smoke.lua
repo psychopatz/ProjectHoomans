@@ -1,13 +1,8 @@
-local ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
-package.path = ROOT .. "../../?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local ROOT =
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
+T.addPackagePaths()
 
 local engaged = 0
 local avoided = 0
@@ -112,7 +107,7 @@ PNC = {
     },
 }
 
-dofile(
+T.load(
     ROOT
         .. "Behaviors/BehaviorCompanion/PNC_BehaviorCompanion.lua"
 )
@@ -134,26 +129,27 @@ local record = {
 }
 PNC.TestRecord = record
 
-assertEqual(PNC.BehaviorCompanion.Tick(record, {}, "FollowOwner"),
+T.equal(PNC.BehaviorCompanion.Tick(record, {}, "FollowOwner"),
     true, "don't attack follow tick handled")
-assertEqual(avoided, 1, "don't attack did not avoid threat")
-assertEqual(engaged, 0, "don't attack engaged a target")
-assertEqual(record.runtime.target, nil, "don't attack retained combat target")
-assertEqual(record.activeBehavior, "AvoidThreat:no_attack",
+T.equal(avoided, 1, "don't attack did not avoid threat")
+T.equal(engaged, 0, "don't attack engaged a target")
+T.equal(record.runtime.target, nil, "don't attack retained combat target")
+T.equal(record.activeBehavior, "AvoidThreat:no_attack",
     "avoid behavior label")
-assertEqual(record.runtime.combatModeResolved, "none",
+T.equal(record.runtime.combatModeResolved, "none",
     "avoid debug combat mode")
 
 record.attackType = "auto"
 record.runtime.stealthActive = true
-assertEqual(PNC.BehaviorCompanion.Tick(record, {}, "FollowOwner"),
+T.equal(PNC.BehaviorCompanion.Tick(record, {}, "FollowOwner"),
     true, "auto attack follow tick handled")
-assertEqual(engaged, 1, "auto attack did not engage")
-assertEqual(avoided, 1, "auto attack used avoid-only branch")
-assert(cleared >= 1, "don't attack did not clear combat state")
-assertEqual(stealthSuspended, 1,
+T.equal(engaged, 1, "auto attack did not engage")
+T.equal(avoided, 1, "auto attack used avoid-only branch")
+T.truthy(cleared >= 1, "don't attack did not clear combat state")
+T.equal(stealthSuspended, 1,
     "combat target did not suspend follow stealth")
-assertEqual(record.runtime.stealthActive, false,
+T.equal(record.runtime.stealthActive, false,
     "combat engagement retained sneak locomotion")
+T.finish("pnc_companion_attack_type_smoke")
 
-print("pnc_companion_attack_type_smoke: ok")
+T.finish("pnc_companion_attack_type_smoke")

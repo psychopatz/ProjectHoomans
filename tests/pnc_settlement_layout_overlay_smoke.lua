@@ -1,15 +1,6 @@
-local function equal(actual, expected, message)
-    if actual ~= expected then
-        error((message or "assertion failed") .. ": expected "
-            .. tostring(expected) .. ", got " .. tostring(actual))
-    end
-end
+local T = require "tests/support/test"
 
-package.path = table.concat({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/?.lua",
-    "/home/psychopatz/Zomboid/Workshop/psychopatzCore/Contents/mods/PsychopatzCore/common/media/lua/shared/?.lua",
-    package.path,
-}, ";")
+T.addPackagePaths()
 
 local Overlay = require "PNC/UI/Communities/ColonyManagement/PNC_SettlementLayoutOverlay"
 local region = { levels = { [0] = { rows = { [4] = { 2, 5 } } } } }
@@ -27,15 +18,15 @@ local layers = Overlay.BuildLayers({
     stockpileNodes = {{ id = "stock_a", x = 4, y = 4, z = 0 }},
 }, true)
 
-equal(#layers, 4, "base, facility, anchor, and stockpile layers")
-equal(layers[2].componentId, "field_a", "component identity retained")
-equal(layers[3].region.levels[0].rows[4][1], 3, "anchor tile region")
-equal(layers[4].kind, "stockpile", "stockpile overlay kind")
-equal(layers[1].color.a < layers[2].color.a, true,
+T.equal(#layers, 4, "base, facility, anchor, and stockpile layers")
+T.equal(layers[2].componentId, "field_a", "component identity retained")
+T.equal(layers[3].region.levels[0].rows[4][1], 3, "anchor tile region")
+T.equal(layers[4].kind, "stockpile", "stockpile overlay kind")
+T.equal(layers[1].color.a < layers[2].color.a, true,
     "base territory is less distracting than built rooms")
-equal(layers[2].color.g < layers[3].color.g, true,
+T.equal(layers[2].color.g < layers[3].color.g, true,
     "built room is darker than its anchor component")
-equal(layers[2].color.a > layers[1].color.a, true,
+T.equal(layers[2].color.a > layers[1].color.a, true,
     "built room remains lightly more opaque than home territory")
 
 local markers = Overlay.BuildMarkers({
@@ -51,21 +42,21 @@ local markers = Overlay.BuildMarkers({
     }},
     stockpileNodes = {{ id = "stock_a", x = 4, y = 4, z = 0 }},
 })
-equal(#markers, 3, "room, anchor, and stockpile markers")
-equal(markers[1].kind, "room", "room marker kind")
-equal(markers[1].x, 4, "room marker dynamic horizontal center")
-equal(markers[1].y, 4.5, "room marker dynamic vertical center")
-equal(markers[2].role, "work.research", "component marker role")
-equal(markers[1].tileScale, 1, "room marker fills one tile")
-equal(markers[2].tileScale, 1, "component marker fills one tile")
+T.equal(#markers, 3, "room, anchor, and stockpile markers")
+T.equal(markers[1].kind, "room", "room marker kind")
+T.equal(markers[1].x, 4, "room marker dynamic horizontal center")
+T.equal(markers[1].y, 4.5, "room marker dynamic vertical center")
+T.equal(markers[2].role, "work.research", "component marker role")
+T.equal(markers[1].tileScale, 1, "room marker fills one tile")
+T.equal(markers[2].tileScale, 1, "component marker fills one tile")
 
 local constructionLayers = Overlay.BuildLayers({ facilities = {{
     id = "facility_building", definitionId = "research_facility",
     constructionState = "UNDER_CONSTRUCTION",
     constructionRegion = region, components = {},
 }} }, false)
-equal(#constructionLayers, 1, "construction footprint layer")
-equal(constructionLayers[1].color.r, 1,
+T.equal(#constructionLayers, 1, "construction footprint layer")
+T.equal(constructionLayers[1].color.r, 1,
     "active construction uses its dynamic state color")
 
 local renderedIcons = 0
@@ -122,17 +113,18 @@ Overlay.SetSettlement({
 })
 Overlay.SetEnabled(true)
 Overlay.Render()
-equal(renderedAreas, 3, "room areas stay hidden until their icon is hovered")
-equal(renderedIcons, 3, "all placeholder overlay icons rendered")
+T.equal(renderedAreas, 3, "room areas stay hidden until their icon is hovered")
+T.equal(renderedIcons, 3, "all placeholder overlay icons rendered")
 for _, size in ipairs(renderedIconSizes) do
-    equal(size.width, 40, "overlay icon tracks full projected tile width")
-    equal(size.height, 40, "overlay icon remains square")
+    T.equal(size.width, 40, "overlay icon tracks full projected tile width")
+    T.equal(size.height, 40, "overlay icon remains square")
 end
 
 getMouseX = function() return 80 end
 getMouseY = function() return 90 end
 Overlay.Render()
-equal(renderedAreas, 7, "hovering a room icon reveals its room area")
-equal(hoverLabel, "Farm", "hovering a room icon shows its facility name")
+T.equal(renderedAreas, 7, "hovering a room icon reveals its room area")
+T.equal(hoverLabel, "Farm", "hovering a room icon shows its facility name")
+T.finish("pnc_settlement_layout_overlay_smoke")
 
-print("pnc_settlement_layout_overlay_smoke: ok")
+T.finish("pnc_settlement_layout_overlay_smoke")

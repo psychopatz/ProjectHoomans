@@ -1,14 +1,4 @@
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected="
-            .. tostring(expected) .. " actual="
-            .. tostring(actual))
-    end
-end
-
-local function assertTrue(value, label)
-    assertEqual(value == true, true, label)
-end
+local T = require "tests/support/test"
 
 local lastContext
 local originalCalls = 0
@@ -169,14 +159,14 @@ function getTextManager()
     }
 end
 
-dofile(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+T.load(
+    T.path("ProjectHoomans", "client", "")
         .. "PNC/UI/Map/Layers/PNC_MapLayer_Communities.lua"
 )
 
-assertEqual(registered.id, "pnc_community_sites",
+T.equal(registered.id, "pnc_community_sites",
     "community layer registered")
-assertEqual(registered.definition.order, 90,
+T.equal(registered.definition.order, 90,
     "community layer remains below NPC dots")
 
 local lineCount = 0
@@ -216,11 +206,11 @@ local map = {
 setmetatable(map, { __index = ISWorldMap })
 
 registered.definition.render(map)
-assertEqual(lineCount, 32, "radius rendered")
-assertEqual(label, "Old Mill Gang [vacant]",
+T.equal(lineCount, 32, "radius rendered")
+T.equal(label, "Old Mill Gang [vacant]",
     "community label rendered")
 local vacantMarker = rectangles[1]
-assertEqual(vacantMarker[6], 0.55,
+T.equal(vacantMarker[6], 0.55,
     "collapsed site uses dead gray palette")
 
 -- Active enemy communities use the same hostile red as NPC map markers.
@@ -246,43 +236,44 @@ map.getMouseX = function() return 15 end
 rectangles = {}
 popupLines = {}
 registered.definition.render(map)
-assertEqual(rectangles[1][6], 1,
+T.equal(rectangles[1][6], 1,
     "enemy base uses hostile red palette")
-assertEqual(popupLines[2], "Leader: Mara Vance",
+T.equal(popupLines[2], "Leader: Mara Vance",
     "base hover identifies the faction leader")
-assertEqual(popupLines[4], "At war with your faction",
+T.equal(popupLines[4], "At war with your faction",
     "base edge hover reports faction war status")
-assertTrue(emblemDraw ~= nil,
+T.truthy(emblemDraw ~= nil,
     "base hover renders the faction emblem")
-assertEqual(emblemDraw.target, map,
+T.equal(emblemDraw.target, map,
     "hover emblem renders on the map")
-assertEqual(emblemDraw.size, 52,
+T.equal(emblemDraw.size, 52,
     "hover emblem uses the enlarged left panel")
 
 -- NPC marker hit-testing always wins over the base-outline hover card.
 markerBlocksBase = true
 popupLines = {}
 registered.definition.render(map)
-assertEqual(#popupLines, 0,
+T.equal(#popupLines, 0,
     "base hover card suppressed over NPC marker")
 markerBlocksBase = false
 state.sites[1].status = "vacant"
 
-assertTrue(map:onRightMouseUp(10, 10),
+T.truthy(map:onRightMouseUp(10, 10),
     "vacant site consumes right click")
-assertEqual(#lastContext.options, 1,
+T.equal(#lastContext.options, 1,
     "claim option created")
 local option = lastContext.options[1]
 option.callback(option.target)
-assertEqual(sent.action, "community_debug_action",
+T.equal(sent.action, "community_debug_action",
     "claim uses guarded debug route")
-assertEqual(sent.payload.communityAction, "claim_site",
+T.equal(sent.payload.communityAction, "claim_site",
     "claim action")
-assertEqual(sent.payload.siteID,
+T.equal(sent.payload.siteID,
     "community_site_radius_1", "claim site ID")
 
-assertEqual(map:onRightMouseUp(100, 100), "original",
+T.equal(map:onRightMouseUp(100, 100), "original",
     "outside click delegates")
-assertEqual(originalCalls, 1, "original called once")
+T.equal(originalCalls, 1, "original called once")
+T.finish("pnc_community_map_layer_smoke")
 
-print("pnc_community_map_layer_smoke: PASS")
+T.finish("pnc_community_map_layer_smoke")

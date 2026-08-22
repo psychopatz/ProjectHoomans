@@ -1,13 +1,7 @@
-local ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local T = require "tests/support/test"
 
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual")
-            .. ": expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual), 2)
-    end
-end
+local ROOT =
+    T.path("ProjectHoomans", "client", "")
 
 local emblemDraw
 local originalRenderCount = 0
@@ -57,11 +51,11 @@ package.preload["PNC/UI/Factions/PNC_FactionPresentation"] =
         return PNC.FactionPresentation
     end
 
-dofile(
+T.load(
     ROOT
         .. "PNC/UI/Factions/PNC_FactionPresentation.lua"
 )
-dofile(
+T.load(
     ROOT
         .. "PNC/Conversation/PNC_ConversationFactionEmblem.lua"
 )
@@ -108,23 +102,23 @@ setmetatable(
 )
 
 portrait:render()
-assertEqual(originalRenderCount, 1, "core portrait render preserved")
-assertEqual(emblemDraw.target, portrait, "emblem target")
-assertEqual(emblemDraw.size, 36, "conversation emblem size is larger (36)")
-assertEqual(emblemDraw.x, 10, "emblem x position on far left")
-assertEqual(#drawnTexts, 2, "two text elements drawn (name and faction)")
-assertEqual(drawnTexts[1].text, "DARREL DRISCOLL", "npc name rendered")
-assertEqual(drawnTexts[1].x, 56, "npc name offset to right of emblem")
-assertEqual(
+T.equal(originalRenderCount, 1, "core portrait render preserved")
+T.equal(emblemDraw.target, portrait, "emblem target")
+T.equal(emblemDraw.size, 36, "conversation emblem size is larger (36)")
+T.equal(emblemDraw.x, 10, "emblem x position on far left")
+T.equal(#drawnTexts, 2, "two text elements drawn (name and faction)")
+T.equal(drawnTexts[1].text, "DARREL DRISCOLL", "npc name rendered")
+T.equal(drawnTexts[1].x, 56, "npc name offset to right of emblem")
+T.equal(
     drawnTexts[2].text,
     "THE COLD CROWS  /  SCAVENGER",
     "faction subtitle rendered"
 )
-assertEqual(drawnTexts[2].x, 56, "faction subtitle aligned under name")
+T.equal(drawnTexts[2].x, 56, "faction subtitle aligned under name")
 
 PNC.ConversationFactionEmblem.Install()
 portrait:render()
-assertEqual(
+T.equal(
     originalRenderCount,
     2,
     "idempotent install does not wrap portrait twice"
@@ -134,13 +128,14 @@ emblemDraw = nil
 drawnTexts = {}
 portrait.owner.spec.context.identityState = "unknown"
 portrait:render()
-assertEqual(emblemDraw, nil, "unknown name suppresses emblem rendering")
+T.equal(emblemDraw, nil, "unknown name suppresses emblem rendering")
 
 emblemDraw = nil
 drawnTexts = {}
 portrait.owner.spec.context.identityState = "known"
 portrait.owner.spec.context.factionEmblem = nil
 portrait:render()
-assertEqual(emblemDraw, nil, "missing emblem suppresses faction rendering")
+T.equal(emblemDraw, nil, "missing emblem suppresses faction rendering")
+T.finish("pnc_conversation_faction_emblem_smoke")
 
-print("pnc_conversation_faction_emblem_smoke: ok")
+T.finish("pnc_conversation_faction_emblem_smoke")

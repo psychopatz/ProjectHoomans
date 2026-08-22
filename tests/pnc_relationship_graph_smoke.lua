@@ -1,28 +1,18 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Relationships/PNC_RelationshipGraph.lua"
 local MODEL =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/"
+    T.path("ProjectHoomans", "client", "PNC/")
     .. "UI/Relationships/PNC_RelationshipDebugModel.lua"
 local PRESENTATION =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Relationships/PNC_RelationshipPresentation.lua"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. ": expected="
-            .. tostring(expected) .. " actual="
-            .. tostring(actual))
-    end
-end
-
-local function truthy(value, label)
-    equal(value == true, true, label)
-end
-
 PNC = {}
-dofile(FILE)
-dofile(PRESENTATION)
+T.load(FILE)
+T.load(PRESENTATION)
 
 local Graph = PNC.RelationshipGraph
 local Presentation = PNC.RelationshipPresentation
@@ -34,42 +24,42 @@ local summary = Presentation.Summarize({
     state = "wary",
     revision = 4.9,
 }, true)
-equal(summary.approval, 25, "presentation retains approval")
-equal(summary.respect, -30, "presentation retains respect")
-equal(summary.revision, 4, "presentation normalizes revision")
-equal(
+T.equal(summary.approval, 25, "presentation retains approval")
+T.equal(summary.respect, -30, "presentation retains respect")
+T.equal(summary.revision, 4, "presentation normalizes revision")
+T.equal(
     Presentation.BuildEvaluation(summary, "inspect").attitude,
     "pity",
     "presentation uses shared attitude graph"
 )
 local syntheticFear = Presentation.GetDebugStandingPreset("fear")
-equal(syntheticFear.approval, -65, "fear baseline approval")
-equal(syntheticFear.respect, 65, "fear baseline respect")
+T.equal(syntheticFear.approval, -65, "fear baseline approval")
+T.equal(syntheticFear.respect, 65, "fear baseline respect")
 
-equal(Graph.ResolveAttitude(40, 40), "admire",
+T.equal(Graph.ResolveAttitude(40, 40), "admire",
     "positive approval and respect")
-equal(Graph.ResolveAttitude(40, -40), "pity",
+T.equal(Graph.ResolveAttitude(40, -40), "pity",
     "positive approval and negative respect")
-equal(Graph.ResolveAttitude(-40, 40), "fear",
+T.equal(Graph.ResolveAttitude(-40, 40), "fear",
     "negative approval and positive respect")
-equal(Graph.ResolveAttitude(-40, -40), "despise",
+T.equal(Graph.ResolveAttitude(-40, -40), "despise",
     "negative approval and respect")
-equal(Graph.ResolveAttitude(4, -4), "indifferent",
+T.equal(Graph.ResolveAttitude(4, -4), "indifferent",
     "neutral dead zone")
-equal(Graph.ResolveAttitude(20, 4), "sympathetic",
+T.equal(Graph.ResolveAttitude(20, 4), "sympathetic",
     "positive approval neutral respect")
-equal(Graph.ResolveAttitude(4, 20), "impressed",
+T.equal(Graph.ResolveAttitude(4, 20), "impressed",
     "neutral approval positive respect")
 
 local recruit = Graph.Evaluate(50, 50, "recruit")
-truthy(recruit.insideSuccessRegion,
+T.truthy(recruit.insideSuccessRegion,
     "high approval and respect recruit")
-equal(recruit.attitude, "admire", "evaluation attitude")
+T.equal(recruit.attitude, "admire", "evaluation attitude")
 
 local feared = Graph.Evaluate(-30, 80, "challenge_extorter")
-truthy(feared.insideSuccessRegion,
+T.truthy(feared.insideSuccessRegion,
     "high respect can pass challenge while disliked")
-equal(feared.attitude, "fear",
+T.equal(feared.attitude, "fear",
     "challenge does not turn fear into approval")
 
 local mercyWithoutContext =
@@ -88,11 +78,11 @@ local mercyWithCompassion = Graph.Evaluate(
         },
     }
 )
-equal(mercyWithoutContext.insideSuccessRegion, false,
+T.equal(mercyWithoutContext.insideSuccessRegion, false,
     "mercy initially outside region")
-truthy(mercyWithCompassion.insideSuccessRegion,
+T.truthy(mercyWithCompassion.insideSuccessRegion,
     "context expands mercy region")
-equal(mercyWithCompassion.contextBonus, 20,
+T.equal(mercyWithCompassion.contextBonus, 20,
     "context modifier included")
 
 local x, y = Graph.RelationshipToScreen(
@@ -103,18 +93,18 @@ local x, y = Graph.RelationshipToScreen(
     200,
     200
 )
-equal(x, 10, "minimum respect maps left")
-equal(y, 20, "maximum approval maps top")
+T.equal(x, 10, "minimum respect maps left")
+T.equal(y, 20, "maximum approval maps top")
 
 local first = Graph.Evaluate(25, 30, "recruit")
 local second = Graph.Evaluate(25, 30, "recruit")
-equal(first.finalScore, second.finalScore,
+T.equal(first.finalScore, second.finalScore,
     "evaluation deterministic")
-equal(first.insideSuccessRegion,
+T.equal(first.insideSuccessRegion,
     second.insideSuccessRegion,
     "evaluation result deterministic")
 
-dofile(MODEL)
+T.load(MODEL)
 local mercyDebug = PNC.RelationshipDebugModel.BuildGraph({
     relationship = {
         approval = 20,
@@ -131,11 +121,12 @@ local mercyDebug = PNC.RelationshipDebugModel.BuildGraph({
         },
     },
 }, "request_mercy", { bonus = 5 })
-equal(mercyDebug.attitude, "pity",
+T.equal(mercyDebug.attitude, "pity",
     "debug model retains derived attitude")
-equal(mercyDebug.contextBonus, 25,
+T.equal(mercyDebug.contextBonus, 25,
     "debug model exposes personality and manual context")
-truthy(mercyDebug.insideSuccessRegion,
+T.truthy(mercyDebug.insideSuccessRegion,
     "debug context redraws success region")
+T.finish("pnc_relationship_graph_smoke")
 
-print("pnc_relationship_graph_smoke: ok")
+T.finish("pnc_relationship_graph_smoke")

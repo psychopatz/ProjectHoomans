@@ -77,7 +77,7 @@ def run_one(path: Path, environment: dict[str, str], timeout: float) -> Result:
     started = time.monotonic()
     try:
         completed = subprocess.run(
-            ["lua", "-l", "tests/support/legacy_compat", str(path)],
+            ["lua", str(path)],
             cwd=ROOT, env=environment,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, timeout=timeout, check=False,

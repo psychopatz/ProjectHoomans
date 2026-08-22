@@ -10,8 +10,8 @@ python3 tests/run_tests.py --jobs 4 --verbose
 
 The runner discovers the newest numeric Project Hoomans and PsychopatzCore
 runtime directories, runs each test in a separate process, and prints successful
-output only in verbose mode. Direct execution of migrated tests uses the fallback
-versions in `tests/test_config.lua`; use the runner for unmigrated legacy tests.
+output only in verbose mode. Direct execution uses the fallback versions in
+`tests/test_config.lua`.
 
 New tests use the shared harness:
 
@@ -29,6 +29,6 @@ Generate that shell with:
 python3 tests/new_test.py subject --layer shared --subject PNC/Path/Subject.lua
 ```
 
-Do not add `42.xx` or full `Contents/mods/...` paths to new tests. The legacy
-compatibility preload keeps old tests working across runtime upgrades while they
-are migrated incrementally.
+Do not add `42.xx` or full `Contents/mods/...` paths to tests. Resolve source
+through `T.load`, `T.read`, `T.path`, and `T.addPackagePaths` so runtime upgrades
+require no test edits.

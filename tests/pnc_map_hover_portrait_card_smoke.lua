@@ -1,5 +1,7 @@
+local T = require "tests/support/test"
+
 local FILE =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Map/"
+    T.path("ProjectHoomans", "client", "PNC/UI/Map/")
         .. "PNC_MapHoverPortraitCard.lua"
 
 package.preload["ISUI/ISPanel"] = function() return true end
@@ -77,11 +79,11 @@ IsoDirections = { S = "south" }
 
 package.preload["PNC/UI/Factions/PNC_FactionPresentation"] =
     function() return PNC.FactionPresentation end
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
+T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
-dofile("Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Factions/PNC_FactionPresentation.lua")
-dofile(FILE)
+T.load(T.path("ProjectHoomans", "client", "PNC/UI/Factions/PNC_FactionPresentation.lua"))
+T.load(FILE)
 
 local card = PNC.MapHoverPortraitCard:new(0, 0, 128, {
     nameHeight = 24,
@@ -90,17 +92,17 @@ local card = PNC.MapHoverPortraitCard:new(0, 0, 128, {
 card:initialise()
 card:instantiate()
 
-assert(card.background == false,
+T.truthy(card.background == false,
     "map portrait card retained a stock background or border")
-assert(card.width == 128 and card.height == 152,
+T.truthy(card.width == 128 and card.height == 152,
     "map portrait card dimensions do not include the name plate")
-assert(portraitCreateCount == 1
+T.truthy(portraitCreateCount == 1
     and card.portrait.width == 128
     and card.portrait.height == 128
     and #card.children == 1
     and card.children[1] == card.portrait,
     "portrait renderer was not placed inside the card container")
-assert(portraitOptions.zoom == 18
+T.truthy(portraitOptions.zoom == 18
     and portraitOptions.yOffset == -0.85
     and portraitOptions.animate == false
     and portraitOptions.faceOnly == true
@@ -110,8 +112,8 @@ assert(portraitOptions.zoom == 18
     "map portrait renderer did not use the debug face-preview setup")
 
 local spec = { id = "npc_card", faceOnly = true }
-assert(card:setTarget(spec), "map portrait card did not bind its target")
-assert(portraitTarget == spec, "map portrait card changed its target spec")
+T.truthy(card:setTarget(spec), "map portrait card did not bind its target")
+T.truthy(portraitTarget == spec, "map portrait card changed its target spec")
 
 card:setContext({
     id = "npc_card",
@@ -125,15 +127,15 @@ card:setContext({
     },
 })
 card:render()
-assert(card.texts[1] == "Dion Amaya",
+T.truthy(card.texts[1] == "Dion Amaya",
     "NPC name was not centered beneath the portrait")
-assert(card.texts[2] == "C" and card.texts[3] == "F",
+T.truthy(card.texts[2] == "C" and card.texts[3] == "F",
     "faction and worker badge placeholders were not rendered")
-assert(#card.rects == 6,
+T.truthy(#card.rects == 6,
     "portrait card did not render its name plate and two badge slots")
 card:setFactionIcon("faction_texture")
 card:setWorkerIcon("worker_texture")
-assert(card.factionIcon == "faction_texture"
+T.truthy(card.factionIcon == "faction_texture"
     and card.workerIcon == "worker_texture",
     "portrait badge slots cannot accept future icon textures")
 
@@ -152,11 +154,12 @@ card:setContext({
     },
 })
 card:render()
-assert(emblemDrawCount == 1,
+T.truthy(emblemDrawCount == 1,
     "layered organizational faction emblem did not replace placeholder")
 
 card:setCardPosition(20, 30)
-assert(card.x == 20 and card.y == 30,
+T.truthy(card.x == 20 and card.y == 30,
     "portrait card position did not update without reconstruction")
+T.finish("pnc_map_hover_portrait_card_smoke")
 
-print("pnc_map_hover_portrait_card_smoke: ok")
+T.finish("pnc_map_hover_portrait_card_smoke")

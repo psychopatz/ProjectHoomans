@@ -1,28 +1,9 @@
+local T = require "tests/support/test"
+
 local SHARED_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 local SERVER_ROOT =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
-
-local function assertEqual(actual, expected, label)
-    if actual ~= expected then
-        error((label or "assertEqual") .. ": expected=" ..
-            tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertNear(actual, expected, epsilon, label)
-    if math.abs(actual - expected) > epsilon then
-        error((label or "assertNear") .. ": expected=" ..
-            tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
-
-local function assertContains(value, fragment, label)
-    if not string.find(tostring(value), tostring(fragment), 1, true) then
-        error((label or "assertContains") .. ": missing=" ..
-            tostring(fragment))
-    end
-end
+    T.path("ProjectHoomans", "server", "PNC/")
 
 local function containsMemory(relationship, memoryID)
     local _
@@ -44,7 +25,7 @@ local function countMemories(relationship)
     return count
 end
 
-local function assertSaveSafe(value, path, seen)
+local function validatePersistedValue(value, path, seen)
     local valueType = type(value)
     local key
     local item
@@ -71,17 +52,17 @@ local function assertSaveSafe(value, path, seen)
         if type(key) ~= "string" and type(key) ~= "number" then
             error("unsafe key at " .. path)
         end
-        assertSaveSafe(item, path .. "." .. tostring(key), seen)
+        validatePersistedValue(item, path .. "." .. tostring(key), seen)
     end
     seen[value] = nil
 end
 
-dofile("../psychopatzCore/Contents/mods/PsychopatzCore/42.19/media/lua/shared/PsychopatzCore/Traits/PsychopatzTraitRegistry.lua")
+T.load(T.path("PsychopatzCore", "shared", "PsychopatzCore/Traits/PsychopatzTraitRegistry.lua"))
 PNC = {}
-dofile(SHARED_ROOT .. "Base/PNC_Core.lua")
-dofile(SHARED_ROOT .. "Base/PNC_Constants.lua")
+T.load(SHARED_ROOT .. "Base/PNC_Core.lua")
+T.load(SHARED_ROOT .. "Base/PNC_Constants.lua")
 
-dofile(SHARED_ROOT .. "Identity/PNC_Identity.lua")
+T.load(SHARED_ROOT .. "Identity/PNC_Identity.lua")
 PNC.Identity.ApplyRecordIdentity =
     function(record, definition)
         record.identitySeed = tonumber(definition.identitySeed)
@@ -97,26 +78,26 @@ PNC.Identity.ApplyRecordIdentity =
         record.isFemale = definition.isFemale == true
     end
 
-dofile(SHARED_ROOT .. "Relationships/PNC_EntityRef.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileConstants.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_SocialTraits.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_SocialProfileMath.lua")
-dofile(SHARED_ROOT .. "Conduct/PNC_ConductConstants.lua")
-dofile(SHARED_ROOT .. "Conduct/PNC_ConductTypes.lua")
-dofile(SHARED_ROOT .. "Conduct/PNC_ConductMath.lua")
-dofile(SHARED_ROOT .. "Factions/PNC_FactionConstants.lua")
-dofile(SHARED_ROOT .. "Factions/PNC_FactionArchetypes.lua")
-dofile(SHARED_ROOT .. "Factions/PNC_FactionEmblems.lua")
-dofile(SHARED_ROOT .. "Factions/PNC_FactionTypes.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipConstants.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipStates.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipTypes.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_RelationshipMath.lua")
-dofile(SHARED_ROOT .. "Base/PNC_Types.lua")
-dofile(SHARED_ROOT .. "Relationships/PNC_Relationships.lua")
-dofile(SHARED_ROOT .. "Persistence/PNC_Persistence.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_EntityRef.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_SocialProfileConstants.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_SocialProfileGenerator.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_SocialProfileTypes.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_SocialTraits.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_SocialProfileMath.lua")
+T.load(SHARED_ROOT .. "Conduct/PNC_ConductConstants.lua")
+T.load(SHARED_ROOT .. "Conduct/PNC_ConductTypes.lua")
+T.load(SHARED_ROOT .. "Conduct/PNC_ConductMath.lua")
+T.load(SHARED_ROOT .. "Factions/PNC_FactionConstants.lua")
+T.load(SHARED_ROOT .. "Factions/PNC_FactionArchetypes.lua")
+T.load(SHARED_ROOT .. "Factions/PNC_FactionEmblems.lua")
+T.load(SHARED_ROOT .. "Factions/PNC_FactionTypes.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_RelationshipConstants.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_RelationshipStates.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_RelationshipTypes.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_RelationshipMath.lua")
+T.load(SHARED_ROOT .. "Base/PNC_Types.lua")
+T.load(SHARED_ROOT .. "Relationships/PNC_Relationships.lua")
+T.load(SHARED_ROOT .. "Persistence/PNC_Persistence.lua")
 
 PNC.Registry = {
     Data = {},
@@ -141,17 +122,17 @@ function PNC.Registry.MarkDirty(record, domain)
     return true
 end
 
-dofile(SERVER_ROOT .. "PNC_RelationshipService.lua")
-dofile(SERVER_ROOT .. "PNC_RelationshipDebug.lua")
+T.load(SERVER_ROOT .. "PNC_RelationshipService.lua")
+T.load(SERVER_ROOT .. "PNC_RelationshipDebug.lua")
 
-assertEqual(PNC.Relationships.Personal.Queries.Get,
+T.equal(PNC.Relationships.Personal.Queries.Get,
     PNC.Relationships.Get, "personal relationship query compatibility")
-assertEqual(PNC.Relationships.Personal.Commands.AddMemory,
+T.equal(PNC.Relationships.Personal.Commands.AddMemory,
     PNC.Relationships.AddMemory, "personal relationship command compatibility")
-assertEqual(PNC.Relationships.Personal.Commands.ApplyEventMutation,
+T.equal(PNC.Relationships.Personal.Commands.ApplyEventMutation,
     PNC.Relationships.ApplyEventMutation,
     "personal relationship event command compatibility")
-assertEqual(PNC.Relationships.Personal.Commands.ApplyConversationEffect,
+T.equal(PNC.Relationships.Personal.Commands.ApplyConversationEffect,
     PNC.Relationships.ApplyConversationEffect,
     "personal relationship conversation command compatibility")
 
@@ -196,18 +177,18 @@ end
 
 -- 1. New social state defaults.
 local defaults = PNC.RelationshipTypes.NewSocialState()
-assertEqual(defaults.schemaVersion, 3, "social schema default")
-assertEqual(defaults.revision, 0, "social revision default")
-assertEqual(defaults.morale, 0, "social morale default")
-assertEqual(type(defaults.relationships), "table",
+T.equal(defaults.schemaVersion, 3, "social schema default")
+T.equal(defaults.revision, 0, "social revision default")
+T.equal(defaults.morale, 0, "social morale default")
+T.equal(type(defaults.relationships), "table",
     "social relationships default")
 
 -- 2-5. Directed keys and safe parsing.
 local alice = newRecord("npc_alice")
 local bob = newRecord("npc_bob")
-assertEqual(alice.affiliation.membershipStatus,
+T.equal(alice.affiliation.membershipStatus,
     "unaffiliated", "new NPC affiliation default")
-assertEqual(alice.affiliation.factionID, nil,
+T.equal(alice.affiliation.factionID, nil,
     "new NPC has no invented faction")
 local aliceKey = PNC.EntityRef.ForNPC(alice.id)
 local bobKey = PNC.EntityRef.ForNPC(bob.id)
@@ -215,36 +196,36 @@ local playerKey = PNC.EntityRef.ForPlayerIdentity(
     "Patrick",
     "char_f8d31a"
 )
-assertEqual(PNC.EntityRef.Parse(bobKey).npcID, "npc_bob",
+T.equal(PNC.EntityRef.Parse(bobKey).npcID, "npc_bob",
     "NPC key parsing")
 local parsedPlayer = PNC.EntityRef.Parse(playerKey)
-assertEqual(parsedPlayer.accountIdentity, "Patrick",
+T.equal(parsedPlayer.accountIdentity, "Patrick",
     "player account parsing")
-assertEqual(parsedPlayer.characterUUID, "char_f8d31a",
+T.equal(parsedPlayer.characterUUID, "char_f8d31a",
     "player character parsing")
-assertEqual(PNC.EntityRef.Parse("player:Patrick"), nil,
+T.equal(PNC.EntityRef.Parse("player:Patrick"), nil,
     "malformed player key")
-assertEqual(PNC.EntityRef.Parse("npc:"), nil, "malformed NPC key")
-assertEqual(PNC.EntityRef.ForPlayerIdentity("Patrick", nil), nil,
+T.equal(PNC.EntityRef.Parse("npc:"), nil, "malformed NPC key")
+T.equal(PNC.EntityRef.ForPlayerIdentity("Patrick", nil), nil,
     "username-only identity rejected")
 
-assertEqual(PNC.Relationships.AddMemory(
+T.equal(PNC.Relationships.AddMemory(
     alice.id,
     bobKey,
     memory("alice_likes_bob", bobKey)
 ), true, "Alice memory added")
-assertEqual(PNC.Relationships.AddMemory(
+T.equal(PNC.Relationships.AddMemory(
     bob.id,
     aliceKey,
     memory("bob_dislikes_alice", aliceKey, {
         approvalEffect = -20,
     })
 ), true, "Bob memory added")
-assertEqual(PNC.Relationships.GetApproval(alice.id, bobKey), 10,
+T.equal(PNC.Relationships.GetApproval(alice.id, bobKey), 10,
     "Alice directed approval")
-assertEqual(PNC.Relationships.GetApproval(bob.id, aliceKey), -20,
+T.equal(PNC.Relationships.GetApproval(bob.id, aliceKey), -20,
     "Bob reverse approval")
-assertEqual(PNC.Relationships.AddMemory(
+T.equal(PNC.Relationships.AddMemory(
     alice.id,
     playerKey,
     memory("alice_knows_player_character", playerKey, {
@@ -252,30 +233,30 @@ assertEqual(PNC.Relationships.AddMemory(
         respectEffect = 2,
     })
 ), true, "player-character relationship added")
-assertEqual(PNC.Relationships.GetApproval(alice.id, playerKey), 4,
+T.equal(PNC.Relationships.GetApproval(alice.id, playerKey), 4,
     "player-character relationship stored")
 local playerChange =
     alice.runtime.relationshipDebugChanges[
         #alice.runtime.relationshipDebugChanges
     ]
-assertEqual(playerChange.targetKey, playerKey,
+T.equal(playerChange.targetKey, playerKey,
     "debug change targets exact player character")
-assertEqual(playerChange.kind, "memory_added",
+T.equal(playerChange.kind, "memory_added",
     "debug change records memory mutation type")
-assertEqual(playerChange.memoryType, "test_memory",
+T.equal(playerChange.memoryType, "test_memory",
     "debug change records social cause")
-assertEqual(playerChange.approvalDelta, 4,
+T.equal(playerChange.approvalDelta, 4,
     "debug change records approval delta")
-assertEqual(playerChange.respectDelta, 2,
+T.equal(playerChange.respectDelta, 2,
     "debug change records respect delta")
-assertEqual(playerChange.stateBefore, "unknown",
+T.equal(playerChange.stateBefore, "unknown",
     "debug change records prior state")
-assertSaveSafe(playerChange, "relationshipDebugChange")
+validatePersistedValue(playerChange, "relationshipDebugChange")
 local debugFeedPayload =
     PNC.Persistence.SerializeRecord(alice)
-assertEqual(debugFeedPayload.runtime, nil,
+T.equal(debugFeedPayload.runtime, nil,
     "runtime relationship change feed is not persisted")
-assertEqual(
+T.equal(
     debugFeedPayload.social.relationshipDebugChanges,
     nil,
     "debug change feed does not enter social persistence"
@@ -289,14 +270,14 @@ high.memories = {
     memory("high", clampKey, { approvalEffect = 100 }),
 }
 high = PNC.RelationshipMath.RecalculateRelationship(high, clampKey, 0)
-assertEqual(high.approval, 100, "approval upper clamp")
+T.equal(high.approval, 100, "approval upper clamp")
 local low = PNC.RelationshipTypes.NewRelationship(clampKey)
 low.baselineApproval = -100
 low.memories = {
     memory("low", clampKey, { approvalEffect = -100 }),
 }
 low = PNC.RelationshipMath.RecalculateRelationship(low, clampKey, 0)
-assertEqual(low.approval, -100, "approval lower clamp")
+T.equal(low.approval, -100, "approval lower clamp")
 local respect = PNC.RelationshipTypes.NewRelationship(clampKey)
 respect.baselineRespect = -100
 respect.memories = {
@@ -307,22 +288,22 @@ respect = PNC.RelationshipMath.RecalculateRelationship(
     clampKey,
     0
 )
-assertEqual(respect.respect, -100, "respect clamp")
+T.equal(respect.respect, -100, "respect clamp")
 local familiarity = PNC.RelationshipTypes.NormalizeRelationship({
     familiarity = 1000,
 }, clampKey)
-assertEqual(familiarity.familiarity, 100, "familiarity upper clamp")
+T.equal(familiarity.familiarity, 100, "familiarity upper clamp")
 familiarity = PNC.RelationshipTypes.NormalizeRelationship({
     familiarity = -1000,
 }, clampKey)
-assertEqual(familiarity.familiarity, 0, "familiarity lower clamp")
+T.equal(familiarity.familiarity, 0, "familiarity lower clamp")
 
 -- 10-11. Deterministic temporary decay and permanent memory.
 local temporary = memory("temporary", clampKey, {
     strength = 1,
     decayPerDay = 0.25,
 })
-assertNear(PNC.RelationshipMath.CalculateMemoryStrengthAtTime(
+T.near(PNC.RelationshipMath.CalculateMemoryStrengthAtTime(
     temporary,
     48
 ), 0.5, 0.000001, "temporary decay")
@@ -331,28 +312,28 @@ local permanent = memory("permanent", clampKey, {
     decayPerDay = 1,
     permanent = true,
 })
-assertNear(PNC.RelationshipMath.CalculateMemoryStrengthAtTime(
+T.near(PNC.RelationshipMath.CalculateMemoryStrengthAtTime(
     permanent,
     2400
 ), 0.8, 0.000001, "permanent memory")
 
 -- 12. Duplicate IDs are rejected.
-assertEqual(PNC.Relationships.AddMemory(
+T.equal(PNC.Relationships.AddMemory(
     alice.id,
     bobKey,
     memory("alice_likes_bob", bobKey)
 ), false, "duplicate memory ID")
-assertEqual(PNC.Relationships.AddMemory(
+T.equal(PNC.Relationships.AddMemory(
     {},
     bobKey,
     memory("bad_observer", bobKey)
 ), false, "live/table observer rejected")
-assertEqual(PNC.Relationships.AddMemory(
+T.equal(PNC.Relationships.AddMemory(
     alice.id,
     "player:username-only",
     memory("bad_target", bobKey)
 ), false, "malformed service target rejected")
-assertEqual(PNC.Relationships.AddMemory(
+T.equal(PNC.Relationships.AddMemory(
     alice.id,
     bobKey,
     { type = "missing_id", aboutKey = bobKey }
@@ -377,10 +358,10 @@ limited = PNC.RelationshipMath.PruneMemories(
     0,
     20
 )
-assertEqual(countMemories(limited), 20, "memory limit")
-assertEqual(containsMemory(limited, "permanent_keep"), true,
+T.equal(countMemories(limited), 20, "memory limit")
+T.equal(containsMemory(limited, "permanent_keep"), true,
     "permanent preserved")
-assertEqual(containsMemory(limited, "temporary_01"), false,
+T.equal(containsMemory(limited, "temporary_01"), false,
     "weakest temporary removed")
 
 -- 15-18. Entry thresholds and hysteresis.
@@ -393,7 +374,7 @@ stateRel = PNC.RelationshipMath.RecalculateRelationship(
     clampKey,
     0
 )
-assertEqual(stateRel.state, "friend", "friend entry")
+T.equal(stateRel.state, "friend", "friend entry")
 stateRel.baselineApproval = 25
 stateRel.baselineRespect = 5
 stateRel = PNC.RelationshipMath.RecalculateRelationship(
@@ -401,7 +382,7 @@ stateRel = PNC.RelationshipMath.RecalculateRelationship(
     clampKey,
     0
 )
-assertEqual(stateRel.state, "friend", "friend hysteresis")
+T.equal(stateRel.state, "friend", "friend hysteresis")
 
 stateRel = PNC.RelationshipTypes.NewRelationship(clampKey)
 stateRel.familiarity = 5
@@ -412,7 +393,7 @@ stateRel = PNC.RelationshipMath.RecalculateRelationship(
     clampKey,
     0
 )
-assertEqual(stateRel.state, "rival", "rival entry")
+T.equal(stateRel.state, "rival", "rival entry")
 stateRel.baselineApproval = -15
 stateRel.baselineRespect = 15
 stateRel = PNC.RelationshipMath.RecalculateRelationship(
@@ -420,14 +401,14 @@ stateRel = PNC.RelationshipMath.RecalculateRelationship(
     clampKey,
     0
 )
-assertEqual(stateRel.state, "rival", "rival hysteresis")
+T.equal(stateRel.state, "rival", "rival hysteresis")
 stateRel.baselineApproval = -14
 stateRel = PNC.RelationshipMath.RecalculateRelationship(
     stateRel,
     clampKey,
     0
 )
-assertEqual(stateRel.state ~= "rival", true, "rival exit")
+T.equal(stateRel.state ~= "rival", true, "rival exit")
 
 stateRel = PNC.RelationshipTypes.NewRelationship(clampKey)
 stateRel.familiarity = 5
@@ -438,7 +419,7 @@ stateRel = PNC.RelationshipMath.RecalculateRelationship(
     clampKey,
     0
 )
-assertEqual(stateRel.state, "enemy", "enemy entry")
+T.equal(stateRel.state, "enemy", "enemy entry")
 stateRel.baselineApproval = -45
 stateRel.baselineRespect = 50
 stateRel = PNC.RelationshipMath.RecalculateRelationship(
@@ -446,20 +427,20 @@ stateRel = PNC.RelationshipMath.RecalculateRelationship(
     clampKey,
     0
 )
-assertEqual(stateRel.state, "enemy", "enemy hysteresis")
+T.equal(stateRel.state, "enemy", "enemy hysteresis")
 stateRel.baselineApproval = -44
 stateRel = PNC.RelationshipMath.RecalculateRelationship(
     stateRel,
     clampKey,
     0
 )
-assertEqual(stateRel.state ~= "enemy", true, "enemy exit")
+T.equal(stateRel.state ~= "enemy", true, "enemy exit")
 
 -- 19. Recalculation never touches the reverse direction.
 local reverseBefore = PNC.Relationships.Get(bob.id, aliceKey)
 PNC.Relationships.Recalculate(alice.id, bobKey, 24)
 local reverseAfter = PNC.Relationships.Get(bob.id, aliceKey)
-assertEqual(PNC.RelationshipTypes.AreEqual(
+T.equal(PNC.RelationshipTypes.AreEqual(
     reverseBefore,
     reverseAfter
 ), true, "reverse relationship remains independent")
@@ -469,34 +450,34 @@ local revisionRecord = newRecord("npc_revisions")
 local revisionTarget = PNC.EntityRef.ForNPC("npc_revision_target")
 PNC.Registry.DirtyByID[revisionRecord.id] = nil
 local presenceBefore = revisionRecord.presenceRevision
-assertEqual(PNC.Relationships.AddMemory(
+T.equal(PNC.Relationships.AddMemory(
     revisionRecord.id,
     revisionTarget,
     memory("revision_memory", revisionTarget)
 ), true, "revision mutation")
 local revisionRelationship =
     revisionRecord.social.relationships[revisionTarget]
-assertEqual(revisionRelationship.revision, 1,
+T.equal(revisionRelationship.revision, 1,
     "relationship revision increment")
-assertEqual(revisionRecord.social.revision, 1,
+T.equal(revisionRecord.social.revision, 1,
     "social revision increment")
-assertEqual(revisionRecord.recordRevision, 1,
+T.equal(revisionRecord.recordRevision, 1,
     "record revision increment")
-assertEqual(revisionRecord.presenceRevision, presenceBefore,
+T.equal(revisionRecord.presenceRevision, presenceBefore,
     "presence revision unchanged")
 local relationRevisionBefore = revisionRelationship.revision
 local socialRevisionBefore = revisionRecord.social.revision
 local recordRevisionBefore = revisionRecord.recordRevision
-assertEqual(PNC.Relationships.Recalculate(
+T.equal(PNC.Relationships.Recalculate(
     revisionRecord.id,
     revisionTarget,
     0
 ), false, "no-op recalculation")
-assertEqual(revisionRelationship.revision, relationRevisionBefore,
+T.equal(revisionRelationship.revision, relationRevisionBefore,
     "no-op relationship revision")
-assertEqual(revisionRecord.social.revision, socialRevisionBefore,
+T.equal(revisionRecord.social.revision, socialRevisionBefore,
     "no-op social revision")
-assertEqual(revisionRecord.recordRevision, recordRevisionBefore,
+T.equal(revisionRecord.recordRevision, recordRevisionBefore,
     "no-op record revision")
 
 -- 23. Normalization is idempotent and repairs non-finite values.
@@ -523,18 +504,18 @@ local normalizedOnce =
     PNC.RelationshipTypes.NormalizeSocialState(malformed)
 local normalizedTwice =
     PNC.RelationshipTypes.NormalizeSocialState(normalizedOnce)
-assertEqual(PNC.RelationshipTypes.AreEqual(
+T.equal(PNC.RelationshipTypes.AreEqual(
     normalizedOnce,
     normalizedTwice
 ), true, "normalization idempotence")
-assertEqual(normalizedOnce.morale, 0, "NaN repaired")
-assertEqual(normalizedOnce.moraleBaseline, 0, "infinity repaired")
-assertEqual(countMemories(
+T.equal(normalizedOnce.morale, 0, "NaN repaired")
+T.equal(normalizedOnce.moraleBaseline, 0, "infinity repaired")
+T.equal(countMemories(
     normalizedOnce.relationships[clampKey]
 ), 1, "invalid memory discarded")
 
 -- 24-25. Older records migrate deterministically to V15 and can run again.
-assertEqual(PNC.Const.PERSISTENCE_VERSION, 15,
+T.equal(PNC.Const.PERSISTENCE_VERSION, 15,
     "persistence schema advanced to V15")
 local oldRaw = {
     schemaVersion = 10,
@@ -555,36 +536,36 @@ local migrated = PNC.Persistence.DeserializeRecord(
     oldRaw,
     oldRaw.id
 )
-assertEqual(migrated.social.schemaVersion, 3,
+T.equal(migrated.social.schemaVersion, 3,
     "migration adds social data")
-assertEqual(next(migrated.social.relationships), nil,
+T.equal(next(migrated.social.relationships), nil,
     "migration keeps relationships sparse")
-assertEqual(migrated.social.conduct.scores.reliability, 0,
+T.equal(migrated.social.conduct.scores.reliability, 0,
     "migration adds neutral NPC conduct")
-assertEqual(#migrated.social.conduct.evidence, 0,
+T.equal(#migrated.social.conduct.evidence, 0,
     "migration does not infer conduct evidence")
-assertEqual(migrated.affiliation.membershipStatus,
+T.equal(migrated.affiliation.membershipStatus,
     "unaffiliated", "migration adds neutral affiliation")
-assertEqual(migrated.affiliation.factionID, nil,
+T.equal(migrated.affiliation.factionID, nil,
     "migration invents no faction membership")
 local migratedPayload = PNC.Persistence.SerializeRecord(migrated)
-assertEqual(migratedPayload.schemaVersion, 15,
+T.equal(migratedPayload.schemaVersion, 15,
     "migration writes V15")
 local migratedAgain = PNC.Persistence.DeserializeRecord(
     migratedPayload,
     migrated.id
 )
-assertEqual(PNC.RelationshipTypes.AreEqual(
+T.equal(PNC.RelationshipTypes.AreEqual(
     migrated.social,
     migratedAgain.social
 ), true, "migration rerun is safe")
-assertEqual(PNC.FactionTypes.AreEqual(
+T.equal(PNC.FactionTypes.AreEqual(
     migrated.affiliation,
     migratedAgain.affiliation
 ), true, "affiliation migration rerun is safe")
 
 -- 26. Serialized payload is primitive/table-only and has no metatables.
-assertSaveSafe(migratedPayload)
+validatePersistedValue(migratedPayload)
 
 -- Read-only diagnostics and existing faction behavior remain intact.
 local debugText = PNC.RelationshipDebug.Inspect(
@@ -592,14 +573,15 @@ local debugText = PNC.RelationshipDebug.Inspect(
     bobKey,
     24
 )
-assertContains(debugText, "Relationship Debug", "debug heading")
-assertContains(debugText, "test_memory", "debug memory")
+T.contains(debugText, "Relationship Debug", "debug heading")
+T.contains(debugText, "test_memory", "debug memory")
 local neutralDefaults = PNC.Types.DefaultHostility("neutral")
-assertEqual(neutralDefaults.attackPlayers, false,
+T.equal(neutralDefaults.attackPlayers, false,
     "neutral faction behavior unchanged")
-assertEqual(PNC.Relationships.AreNPCsEnemies(
+T.equal(PNC.Relationships.AreNPCsEnemies(
     { id = "one", faction = "neutral", hostility = neutralDefaults },
     { id = "two", faction = "hostile" }
 ), true, "existing faction enemy API")
+T.finish("pnc_relationship_foundation_smoke")
 
-print("pnc_relationship_foundation_smoke: ok")
+T.finish("pnc_relationship_foundation_smoke")

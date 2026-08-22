@@ -1,11 +1,6 @@
-local SERVER = "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. " expected=" .. tostring(expected)
-            .. " actual=" .. tostring(actual))
-    end
-end
+local SERVER = T.path("ProjectHoomans", "server", "PNC/")
 
 local saveHook
 local globalSaves = 0
@@ -14,7 +9,7 @@ local calls = {}
 Events = {
     OnSave = {
         Add = function(callback)
-            equal(saveHook, nil, "one coordinated save hook")
+            T.equal(saveHook, nil, "one coordinated save hook")
             saveHook = callback
         end,
     },
@@ -27,7 +22,7 @@ local function service(name)
     return {
         Dirty = true,
         Save = function(flushGlobal)
-            equal(flushGlobal, false, name .. " defers global flush")
+            T.equal(flushGlobal, false, name .. " defers global flush")
             calls[name] = (calls[name] or 0) + 1
             PNC[name].Dirty = false
             return true, "saved"
@@ -65,8 +60,8 @@ PNC.Conversation = { History = service("ConversationHistory") }
 -- The generic mock looks services up directly on PNC.
 PNC.ConversationHistory = PNC.Conversation.History
 
-dofile(SERVER .. "PNC_PersistenceCoordinator.lua")
-equal(type(saveHook), "function", "coordinator registers world-save hook")
+T.load(SERVER .. "PNC_PersistenceCoordinator.lua")
+T.equal(type(saveHook), "function", "coordinator registers world-save hook")
 
 saveHook()
 
@@ -75,8 +70,9 @@ for _, name in ipairs({
     "AbstractWorldStore", "WorldDiscovery", "ConversationHistory",
     "Registry",
 }) do
-    equal(calls[name], 1, name .. " saved once")
+    T.equal(calls[name], 1, name .. " saved once")
 end
-equal(globalSaves, 1, "all services share one GlobalModData flush")
+T.equal(globalSaves, 1, "all services share one GlobalModData flush")
+T.finish("pnc_world_save_coordinator_smoke")
 
-print("pnc_world_save_coordinator_smoke: ok")
+T.finish("pnc_world_save_coordinator_smoke")

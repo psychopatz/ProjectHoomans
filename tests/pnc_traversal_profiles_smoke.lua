@@ -1,22 +1,24 @@
-local FILE = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+local T = require "tests/support/test"
+
+local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_TraversalProfiles.lua"
 
 PNC = {}
-dofile(FILE)
+T.load(FILE)
 
 local window = PNC.TraversalProfiles.Get("window_climb")
-assert(window.anim == "PNC_ClimbWindow")
-assert(window.travelDurationMs == 700)
+T.truthy(window.anim == "PNC_ClimbWindow")
+T.truthy(window.travelDurationMs == 700)
 
-assert(PNC.TraversalProfiles.Register("window_climb", "fast", {
+T.truthy(PNC.TraversalProfiles.Register("window_climb", "fast", {
     anim = "PNC_ClimbWindowFast",
     travelDurationMs = 420,
     finishHoldMs = 180,
 }))
 local fast = PNC.TraversalProfiles.Get("window_climb", "fast")
-assert(fast.anim == "PNC_ClimbWindowFast")
-assert(fast.travelDurationMs == 420)
-assert(PNC.TraversalProfiles.RegisterSelector(
+T.truthy(fast.anim == "PNC_ClimbWindowFast")
+T.truthy(fast.travelDurationMs == 420)
+T.truthy(PNC.TraversalProfiles.RegisterSelector(
     "window_climb",
     function(context)
         return context.fast and "fast" or "default"
@@ -26,6 +28,7 @@ local selected, variant = PNC.TraversalProfiles.Resolve(
     "window_climb",
     { fast = true }
 )
-assert(variant == "fast" and selected.anim == "PNC_ClimbWindowFast")
+T.truthy(variant == "fast" and selected.anim == "PNC_ClimbWindowFast")
+T.finish("pnc_traversal_profiles_smoke")
 
-print("pnc_traversal_profiles_smoke: ok")
+T.finish("pnc_traversal_profiles_smoke")

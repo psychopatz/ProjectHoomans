@@ -1,18 +1,9 @@
+local T = require "tests/support/test"
+
 local SHARED =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/"
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
 local SERVER =
-    "Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/"
-
-local function equal(actual, expected, label)
-    if actual ~= expected then
-        error((label or "equal") .. ": expected="
-            .. tostring(expected) .. " actual=" .. tostring(actual))
-    end
-end
-
-local function truthy(value, label)
-    equal(value == true, true, label)
-end
+    T.path("ProjectHoomans", "server", "PNC/")
 
 local function tableCount(value)
     local count = 0
@@ -57,20 +48,20 @@ ModData = {
 }
 
 PNC = {}
-dofile(SHARED .. "Base/PNC_Core.lua")
-dofile(SHARED .. "Base/PNC_Constants.lua")
-dofile(SHARED .. "Relationships/PNC_EntityRef.lua")
-dofile(SHARED .. "Factions/PNC_FactionConstants.lua")
-dofile(SHARED .. "Factions/PNC_FactionArchetypes.lua")
-dofile(SHARED .. "Factions/PNC_FactionNameGenerator.lua")
-dofile(SHARED .. "Factions/PNC_FactionEmblems.lua")
-dofile(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
-dofile(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
-dofile(SHARED .. "Communities/PNC_CommunityConstants.lua")
-dofile(SHARED .. "Communities/PNC_CommunityProfiles.lua")
-dofile(SHARED .. "Communities/PNC_CommunityMath.lua")
-dofile(SHARED .. "Communities/PNC_CommunityTypes.lua")
-dofile(SHARED .. "Factions/PNC_FactionTypes.lua")
+T.load(SHARED .. "Base/PNC_Core.lua")
+T.load(SHARED .. "Base/PNC_Constants.lua")
+T.load(SHARED .. "Relationships/PNC_EntityRef.lua")
+T.load(SHARED .. "Factions/PNC_FactionConstants.lua")
+T.load(SHARED .. "Factions/PNC_FactionArchetypes.lua")
+T.load(SHARED .. "Factions/PNC_FactionNameGenerator.lua")
+T.load(SHARED .. "Factions/PNC_FactionEmblems.lua")
+T.load(SHARED .. "Factions/PNC_FactionDiplomacyMath.lua")
+T.load(SHARED .. "Factions/PNC_FactionIncidentDefinitions.lua")
+T.load(SHARED .. "Communities/PNC_CommunityConstants.lua")
+T.load(SHARED .. "Communities/PNC_CommunityProfiles.lua")
+T.load(SHARED .. "Communities/PNC_CommunityMath.lua")
+T.load(SHARED .. "Communities/PNC_CommunityTypes.lua")
+T.load(SHARED .. "Factions/PNC_FactionTypes.lua")
 
 PNC.Registry = { Data = {} }
 function PNC.Registry.Get(id) return PNC.Registry.Data[tostring(id)] end
@@ -135,10 +126,10 @@ function PNC.API.Despawn(id)
     return true
 end
 
-dofile(SERVER .. "PNC_FactionService.lua")
-dofile(SERVER .. "PNC_CommunitySiteResolver.lua")
+T.load(SERVER .. "PNC_FactionService.lua")
+T.load(SERVER .. "PNC_CommunitySiteResolver.lua")
 
-local siteOne = assert(PNC.CommunityTypes.NormalizeSite({
+local siteOne = T.truthy(PNC.CommunityTypes.NormalizeSite({
     id = "community_site_building_a",
     kind = "building",
     home = { x = 100, y = 200, z = 0, radius = 10 },
@@ -147,7 +138,7 @@ local siteOne = assert(PNC.CommunityTypes.NormalizeSite({
         minZ = 0, maxZ = 0,
     },
 }, "community_site_building_a"))
-local siteTwo = assert(PNC.CommunityTypes.NormalizeSite({
+local siteTwo = T.truthy(PNC.CommunityTypes.NormalizeSite({
     id = "community_site_building_b",
     kind = "building",
     home = { x = 500, y = 700, z = 0, radius = 10 },
@@ -175,8 +166,8 @@ PNC.CommunitySiteResolver.FindSpawnPoints = function(site, count)
 end
 PNC.CommunitySiteResolver.IsSiteLoaded = function() return false end
 
-dofile(SERVER .. "PNC_CommunityDirector.lua")
-dofile(SERVER .. "PNC_MobileGroupDirector.lua")
+T.load(SERVER .. "PNC_CommunityDirector.lua")
+T.load(SERVER .. "PNC_MobileGroupDirector.lua")
 PNC.Factions.Load()
 
 PNC.Factions.IDGenerator = function() return "faction_mobile_looters" end
@@ -185,7 +176,7 @@ local ok, _, faction = PNC.Factions.Create({
     archetypeID = "looter",
     createdAt = worldHour,
 })
-truthy(ok, "mobile looter faction created")
+T.truthy(ok, "mobile looter faction created")
 
 local generated
 ok, _, generated = PNC.MobileGroupDirector.GenerateForFaction(
@@ -197,32 +188,32 @@ ok, _, generated = PNC.MobileGroupDirector.GenerateForFaction(
         mobilePathMode = "random",
     }
 )
-truthy(ok, "mobile looter group generated")
-equal(generated.createdCount, 3, "mobile group population")
-equal(generated.siteID, siteOne.id, "initial random staging house")
-equal(PNC.Factions.Get(faction.id).mobile.pathMode, "random",
+T.truthy(ok, "mobile looter group generated")
+T.equal(generated.createdCount, 3, "mobile group population")
+T.equal(generated.siteID, siteOne.id, "initial random staging house")
+T.equal(PNC.Factions.Get(faction.id).mobile.pathMode, "random",
     "persistent random path mode")
-equal(tableCount(PNC.Factions.Get(faction.id).memberIDs), 3,
+T.equal(tableCount(PNC.Factions.Get(faction.id).memberIDs), 3,
     "members belong to faction only")
 for _, npcID in ipairs(generated.npcIDs) do
     local record = PNC.Registry.Get(npcID)
-    equal(record.affiliation.communityID, nil,
+    T.equal(record.affiliation.communityID, nil,
         "mobile member has no community affiliation")
-    equal(record.orderSpec.kind, PNC.Const.ORDER_HOSTILE_ROAM,
+    T.equal(record.orderSpec.kind, PNC.Const.ORDER_HOSTILE_ROAM,
         "random looter group roams rather than making a settlement")
 end
 
 local communityOK, communityReason =
     PNC.CommunityDirector.GenerateForFaction(faction.id, {})
-equal(communityOK, false, "mobile faction cannot create a community")
-equal(communityReason, "mobile_faction_cannot_create_community",
+T.equal(communityOK, false, "mobile faction cannot create a community")
+T.equal(communityReason, "mobile_faction_cannot_create_community",
     "community rejection is explicit")
 
 local changed = PNC.MobileGroupDirector.SetPathMode(
     faction.id, "player"
 )
-truthy(changed, "debug path mode changes mobile group")
-equal(PNC.Factions.Get(faction.id).mobile.pathMode, "player",
+T.truthy(changed, "debug path mode changes mobile group")
+T.equal(PNC.Factions.Get(faction.id).mobile.pathMode, "player",
     "player path mode is persisted")
 
 local firstMember = PNC.Registry.Get(generated.npcIDs[1])
@@ -230,8 +221,8 @@ firstMember.presenceState = "live"
 local moved, moveReason = PNC.MobileGroupDirector.RelocateFaction(
     faction.id, worldHour + 24, true
 )
-equal(moved, false, "live mobile group does not relocate")
-equal(moveReason, "mobile_group_live",
+T.equal(moved, false, "live mobile group does not relocate")
+T.equal(moveReason, "mobile_group_live",
     "relocation waits for abstract group")
 firstMember.presenceState = "abstract"
 
@@ -239,25 +230,25 @@ worldHour = worldHour + 24
 moved, _, generated = PNC.MobileGroupDirector.RelocateFaction(
     faction.id, worldHour, true
 )
-truthy(moved, "abstract mobile group relocates")
-equal(generated.site.id, siteTwo.id, "group moves to next building")
-equal(generated.relocationCount, 1, "relocation count increments")
-equal(generated.nextMoveAt, worldHour + 24,
+T.truthy(moved, "abstract mobile group relocates")
+T.equal(generated.site.id, siteTwo.id, "group moves to next building")
+T.equal(generated.relocationCount, 1, "relocation count increments")
+T.equal(generated.nextMoveAt, worldHour + 24,
     "relocation schedules next abstract move")
 for npcID, _ in pairs(PNC.Factions.Get(faction.id).memberIDs) do
     local record = PNC.Registry.Get(npcID)
-    equal(record.anchorX, siteTwo.home.x,
+    T.equal(record.anchorX, siteTwo.home.x,
         "member anchor updates with mobile staging site")
-    equal(record.orderSpec.kind, PNC.Const.ORDER_HOSTILE_HUNT,
+    T.equal(record.orderSpec.kind, PNC.Const.ORDER_HOSTILE_HUNT,
         "player mode looters hunt toward players")
 end
 
 local normalized = PNC.FactionTypes.NormalizeFaction(
     PNC.Factions.Get(faction.id), faction.id
 )
-equal(normalized.mobile.site.id, siteTwo.id,
+T.equal(normalized.mobile.site.id, siteTwo.id,
     "mobile persistence normalizes staging site")
-equal(deepEqual(
+T.equal(deepEqual(
     normalized,
     PNC.FactionTypes.NormalizeFaction(normalized, faction.id)
 ), true, "mobile normalization is idempotent")
@@ -268,7 +259,7 @@ local caravanOK, _, caravan = PNC.Factions.Create({
     archetypeID = "trader",
     createdAt = worldHour,
 })
-truthy(caravanOK, "trading caravan faction created")
+T.truthy(caravanOK, "trading caravan faction created")
 local caravanGenerated
 caravanOK, _, caravanGenerated =
     PNC.MobileGroupDirector.GenerateForFaction(
@@ -280,20 +271,20 @@ caravanOK, _, caravanGenerated =
             mobilePathMode = "random",
         }
     )
-truthy(caravanOK, "trading caravan group generated")
-equal(caravanGenerated.createdCount, 3,
+T.truthy(caravanOK, "trading caravan group generated")
+T.equal(caravanGenerated.createdCount, 3,
     "trading caravan population")
-equal(PNC.Factions.Get(caravan.id).mobile.active, true,
+T.equal(PNC.Factions.Get(caravan.id).mobile.active, true,
     "trading caravan is mobile")
 for _, npcID in ipairs(caravanGenerated.npcIDs) do
     local record = PNC.Registry.Get(npcID)
-    equal(record.affiliation.communityID, nil,
+    T.equal(record.affiliation.communityID, nil,
         "trading caravan member has no settlement affiliation")
-    equal(record.orderSpec.kind, PNC.Const.ORDER_ROAM,
+    T.equal(record.orderSpec.kind, PNC.Const.ORDER_ROAM,
         "trading caravan roams across the map")
 end
 
-dofile(SERVER .. "PNC_FactionDebug.lua")
+T.load(SERVER .. "PNC_FactionDebug.lua")
 local debugSnapshot = PNC.FactionDebug.BuildSnapshot(
     caravan.id,
     nil,
@@ -305,9 +296,10 @@ local labels = {}
 for _, summary in ipairs(debugSnapshot.factions) do
     labels[summary.id] = summary.archetypeLabel
 end
-equal(labels[faction.id], "Mobile Looter Group",
+T.equal(labels[faction.id], "Mobile Looter Group",
     "inspector distinguishes mobile looters from settlements")
-equal(labels[caravan.id], "Trading Caravan",
+T.equal(labels[caravan.id], "Trading Caravan",
     "inspector identifies traders as mobile caravans")
+T.finish("pnc_mobile_group_smoke")
 
-print("pnc_mobile_group_smoke: PASS")
+T.finish("pnc_mobile_group_smoke")

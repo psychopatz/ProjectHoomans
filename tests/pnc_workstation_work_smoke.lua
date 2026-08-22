@@ -1,14 +1,7 @@
-local Paths = dofile("tests/pnc_test_paths.lua")
-local ROOT = Paths.modRoot("ProjectHoomans") .. "media/lua/"
-package.path = ROOT .. "shared/?.lua;" .. ROOT .. "server/?.lua;" .. package.path
+local T = require "tests/support/test"
 
-local function equal(actual, expected, label)
-    if actual ~= expected then error((label or "value") .. " expected="
-        .. tostring(expected) .. " actual=" .. tostring(actual), 2) end
-end
-local function truthy(value, label)
-    if not value then error((label or "value") .. " expected truthy", 2) end
-end
+T.addPackagePaths()
+
 local function deepCopy(value)
     if type(value) ~= "table" then return value end
     local output = {}; for key, entry in pairs(value) do output[key] = deepCopy(entry) end
@@ -88,51 +81,51 @@ local function queue(operation, requiredWork, skill)
 end
 
 local craft1 = queue("CRAFT")
-truthy(Work.Commands.Assign(craft1.id, "crafter1"), "first craft claim")
-equal(Work.Queries.Get(craft1.id).stationId, "workshop:1:craft", "craft station")
+T.truthy(Work.Commands.Assign(craft1.id, "crafter1"), "first craft claim")
+T.equal(Work.Queries.Get(craft1.id).stationId, "workshop:1:craft", "craft station")
 
 local craft2 = queue("CRAFT")
 local ok, reason = Work.Commands.Assign(craft2.id, "crafter2")
-equal(ok, false, "second same-workshop craft rejected")
-equal(reason, "NO_ACTIVITY_CAPACITY", "same craft blocker")
+T.equal(ok, false, "second same-workshop craft rejected")
+T.equal(reason, "NO_ACTIVITY_CAPACITY", "same craft blocker")
 
 local disassembly = queue("DISASSEMBLE")
-truthy(Work.Commands.Assign(disassembly.id, "crafter2"),
+T.truthy(Work.Commands.Assign(disassembly.id, "crafter2"),
     "craft and disassemble concurrent")
-equal(Work.Queries.Get(disassembly.id).stationId,
+T.equal(Work.Queries.Get(disassembly.id).stationId,
     "workshop:1:disassemble", "separate disassembly station")
 
 stations["work.craft"][2] = "workshop:2:craft"
-truthy(Work.Commands.Assign(craft2.id, "crafter3"), "second workshop craft")
-equal(Work.Queries.Get(craft2.id).stationId, "workshop:2:craft",
+T.truthy(Work.Commands.Assign(craft2.id, "crafter3"), "second workshop craft")
+T.equal(Work.Queries.Get(craft2.id).stationId, "workshop:2:craft",
     "second workshop station")
 
 local research1 = queue("RESEARCH")
-truthy(Work.Commands.Assign(research1.id, "researcher"), "research claim")
+T.truthy(Work.Commands.Assign(research1.id, "researcher"), "research claim")
 local research2 = queue("RESEARCH")
 ok = Work.Commands.Assign(research2.id, "unskilled")
-equal(ok, false, "research capacity or eligibility blocks second")
+T.equal(ok, false, "research capacity or eligibility blocks second")
 
 local gated = queue("CRAFT", 10, 5)
 ok, reason = Work.Commands.Assign(gated.id, "unskilled")
-equal(ok, false, "skill gate")
-equal(reason, "NO_QUALIFIED_WORKER", "skill blocker")
+T.equal(ok, false, "skill gate")
+T.equal(reason, "NO_QUALIFIED_WORKER", "skill blocker")
 
 clock = clock + 5000
-truthy(Work.Commands.AddElapsed(craft1.id, "crafter1", 5),
+T.truthy(Work.Commands.AddElapsed(craft1.id, "crafter1", 5),
     "abstract work progress")
-truthy(Work.Queries.Get(craft1.id).progress > 5,
+T.truthy(Work.Queries.Get(craft1.id).progress > 5,
     "skill scaled rate")
 clock = clock + 5000
-truthy(Work.Commands.AddElapsed(craft1.id, "crafter1", 5),
+T.truthy(Work.Commands.AddElapsed(craft1.id, "crafter1", 5),
     "abstract completion")
-equal(Work.Queries.Get(craft1.id).status, Definitions.STATUS.COMPLETED,
+T.equal(Work.Queries.Get(craft1.id).status, Definitions.STATUS.COMPLETED,
     "completed once")
-equal(Work.ClaimsByStation["workshop:1:craft"], nil,
+T.equal(Work.ClaimsByStation["workshop:1:craft"], nil,
     "completion releases station")
 
-truthy(Work.Commands.Cancel(disassembly.id), "cancel")
-equal(occupied["workshop:1:disassemble"], nil,
+T.truthy(Work.Commands.Cancel(disassembly.id), "cancel")
+T.equal(occupied["workshop:1:disassemble"], nil,
     "cancel releases facility reservation")
 
 local collected = false
@@ -154,19 +147,19 @@ local liveCraft = queue("CRAFT")
 liveCraft = Work.Queries.Get(liveCraft.id)
 liveCraft.payload = { reservationId = "materials:1" }
 PNC.WorkRepository.Put(liveCraft)
-truthy(Work.Commands.Assign(liveCraft.id, "liveCrafter"),
+T.truthy(Work.Commands.Assign(liveCraft.id, "liveCrafter"),
     "live craft assignment")
-equal(Work.Queries.Get(liveCraft.id).status,
+T.equal(Work.Queries.Get(liveCraft.id).status,
     Definitions.STATUS.TRAVEL_TO_STOCKPILE, "stockpile leg starts first")
-equal(PNC.Registry.Data.liveCrafter.orderSpec.phase, "COLLECT_INPUTS",
+T.equal(PNC.Registry.Data.liveCrafter.orderSpec.phase, "COLLECT_INPUTS",
     "live worker targets stockpile")
-truthy(Work.Commands.CollectInputs(liveCraft.id, "liveCrafter"),
+T.truthy(Work.Commands.CollectInputs(liveCraft.id, "liveCrafter"),
     "stockpile collection")
-equal(collected, true, "collection handler invoked")
-equal(PNC.Registry.Data.liveCrafter.orderSpec.phase, "WORK_AT_STATION",
+T.equal(collected, true, "collection handler invoked")
+T.equal(PNC.Registry.Data.liveCrafter.orderSpec.phase, "WORK_AT_STATION",
     "worker continues to station after collection")
 
-truthy(Work.Commands.Cancel(liveCraft.id), "clear legacy live craft")
+T.truthy(Work.Commands.Cancel(liveCraft.id), "clear legacy live craft")
 local standardizedCollected = false
 PNC.WorkInputService = {
     RequiresCollection = function(order)
@@ -180,20 +173,21 @@ PNC.WorkInputService = {
     end,
     Cancel = function() return true end,
 }
-local standardCraft = assert(Work.Commands.Queue({ operation = "CRAFT",
+local standardCraft = T.truthy(Work.Commands.Queue({ operation = "CRAFT",
     colonyId = "c1", factionId = "f1", baseId = "b1", requiredWork = 10,
     requiredSkills = {{ skillId = "Carpentry", level = 2 }},
     payload = { input = { reservationId = "materials:2" } } }))
-truthy(Work.Commands.Assign(standardCraft.id, "liveCrafter"),
+T.truthy(Work.Commands.Assign(standardCraft.id, "liveCrafter"),
     "standard input craft assignment")
-equal(Work.Queries.Get(standardCraft.id).status,
+T.equal(Work.Queries.Get(standardCraft.id).status,
     Definitions.STATUS.TRAVEL_TO_STOCKPILE,
     "standard input contract starts at stockpile")
-truthy(Work.Commands.CollectInputs(standardCraft.id, "liveCrafter"),
+T.truthy(Work.Commands.CollectInputs(standardCraft.id, "liveCrafter"),
     "standard input collection")
-equal(standardizedCollected, true,
+T.equal(standardizedCollected, true,
     "standard input service takes precedence over legacy handler")
-equal(PNC.Registry.Data.liveCrafter.orderSpec.phase, "WORK_AT_STATION",
+T.equal(PNC.Registry.Data.liveCrafter.orderSpec.phase, "WORK_AT_STATION",
     "standard input flow continues to workstation")
+T.finish("pnc_workstation_work_smoke")
 
-print("pnc_workstation_work_smoke: OK")
+T.finish("pnc_workstation_work_smoke")
