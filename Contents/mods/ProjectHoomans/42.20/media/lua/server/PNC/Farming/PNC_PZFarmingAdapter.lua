@@ -7,12 +7,12 @@ PNC.PZFarmingAdapter = PNC.PZFarmingAdapter or {}
 local Adapter = PNC.PZFarmingAdapter
 local Farming = PNC.Farming
 local Catalog = PNC.FarmingCatalog
+local Research = PNC.FarmingResearch
 
 local function call(object, method, ...)
     local fn = object and object[method]
     if type(fn) ~= "function" then return nil end
-    local ok, value = pcall(fn, object, ...)
-    return ok and value or nil
+    return fn(object, ...)
 end
 
 local function farmingSystem()
@@ -31,10 +31,7 @@ function Adapter.GetPlantAt(x, y, z)
     if not system or type(system.getLuaObjectAt) ~= "function" then
         return nil, "FARMING_SYSTEM_UNAVAILABLE"
     end
-    local ok, plant = pcall(system.getLuaObjectAt, system,
-        math.floor(x), math.floor(y), math.floor(z))
-    if not ok then return nil, "FARMING_LOOKUP_FAILED" end
-    return plant
+    return system:getLuaObjectAt(math.floor(x), math.floor(y), math.floor(z))
 end
 
 local function eachTile(component, visitor)
@@ -163,8 +160,10 @@ function Adapter.ForceWaterPlot(component)
     local ok, failure = eachTile(component, function(x, y, z)
         local plant = Adapter.GetPlantAt(x, y, z)
         if plant and cropState(plant) == "seeded" then
-            local success = pcall(plant.water, plant, nil, 10)
-            if not success then return false, "VANILLA_WATER_FAILED" end
+            if type(plant.water) ~= "function" then
+                return false, "VANILLA_WATER_UNAVAILABLE"
+            end
+            plant:water(nil, 10)
             watered = watered + 1
         end
         return true
@@ -210,8 +209,10 @@ function Adapter.HarvestPlot(component, player)
     local ok, failure = eachTile(component, function(x, y, z)
         local plant = Adapter.GetPlantAt(x, y, z)
         if plant and plant.canHarvest and call(plant, "canHarvest") == true then
-            local success = pcall(system.harvest, system, plant, player)
-            if not success then return false, "VANILLA_HARVEST_FAILED" end
+            if type(system.harvest) ~= "function" then
+                return false, "VANILLA_HARVEST_UNAVAILABLE"
+            end
+            system:harvest(plant, player)
             harvested = harvested + 1
         end
         return true
@@ -294,18 +295,28 @@ function Adapter.Plant(record, body, component, tile, desiredCrop)
     if not plant or cropState(plant) ~= "plow" then return false, "FURROW_NOT_PLANTABLE" end
     local entry, reason = Catalog.Resolve(desiredCrop)
     if not entry then return false, reason end
+    local cropType = tostring(entry.typeOfSeed or "")
+    local props = farming_vegetableconf and farming_vegetableconf.props or nil
+    if cropType == "" or type(props) ~= "table"
+        or type(props[cropType]) ~= "table"
+    then
+        return false, "VANILLA_CROP_DEFINITION_MISSING"
+    end
+    if type(plant.seed) ~= "function" then
+        return false, "VANILLA_PLANT_UNAVAILABLE"
+    end
     if PNC.Inventory and PNC.Inventory.CaptureLooseInventory then
         PNC.Inventory.CaptureLooseInventory(record, body)
     end
     local itemID = Adapter.FindSeed(record, body, entry)
     if not itemID then return false, "SEED_MATERIAL_MISSING" end
-    local seedType = entry.seedTypes[1]
     if not PNC.SupplyInventory or not PNC.SupplyInventory.RemoveCoreItemIds
         or not PNC.SupplyInventory.RemoveCoreItemIds(record, { itemID },
             "farming_seed")
     then return false, "SEED_MATERIAL_REMOVE_FAILED" end
-    local ok = pcall(plant.seed, plant, seedType, farmingSkill(body))
-    if not ok then return false, "VANILLA_PLANT_FAILED" end
+    -- Vanilla expects the farming_vegetableconf key here ("Cabbages"),
+    -- while entry.seedTypes contains the inventory item ("Base.CabbageSeed").
+    plant:seed(cropType, farmingSkill(body))
     if PNC.Inventory and PNC.Inventory.CaptureLooseInventory then
         PNC.Inventory.CaptureLooseInventory(record, body)
     end
@@ -319,6 +330,9 @@ function Adapter.Water(record, body, tile)
     if not plant or cropState(plant) ~= "seeded"
         or (tonumber(plant.waterLvl) or 0) >= 100
     then return false, "PLANT_DOES_NOT_NEED_WATER" end
+    if type(plant.water) ~= "function" then
+        return false, "VANILLA_WATER_UNAVAILABLE"
+    end
     local water = Adapter.FindWater(record, body)
     if not water then return false, "WATER_MATERIAL_MISSING" end
     local item, container = water.item, water.container
@@ -332,20 +346,21 @@ function Adapter.Water(record, body, tile)
             or 250
         local amount = tonumber(call(fluid, "getAmount")) or 0
         if amount >= perUse / 1000 then
-            pcall(fluid.adjustAmount, fluid, amount - perUse / 1000)
+            fluid:adjustAmount(amount - perUse / 1000)
             if type(item.syncItemFields) == "function" then
-                pcall(item.syncItemFields, item)
+                item:syncItemFields()
             end
             used = true
         end
     elseif type(item.UseAndSync) == "function" then
-        used = pcall(item.UseAndSync, item)
+        item:UseAndSync()
+        used = true
     elseif type(item.Use) == "function" then
-        used = pcall(item.Use, item)
+        item:Use()
+        used = true
     end
     if not used then return false, "WATER_MATERIAL_CONSUME_FAILED" end
-    local ok = pcall(plant.water, plant, nil, 1)
-    if not ok then return false, "VANILLA_WATER_FAILED" end
+    plant:water(nil, 1)
     if PNC.Inventory and PNC.Inventory.CaptureLooseInventory then
         PNC.Inventory.CaptureLooseInventory(record, body)
     end
@@ -363,12 +378,90 @@ function Adapter.Harvest(record, body, tile)
     if not system or type(system.harvest) ~= "function" then
         return false, "FARMING_SYSTEM_UNAVAILABLE"
     end
-    local ok = pcall(system.harvest, system, plant, body)
-    if not ok then return false, "VANILLA_HARVEST_FAILED" end
+    system:harvest(plant, body)
     if PNC.Inventory and PNC.Inventory.CaptureLooseInventory then
         PNC.Inventory.CaptureLooseInventory(record, body)
     end
     return true, "HARVESTED"
+end
+
+local function savePlant(plant)
+    if type(plant.saveData) ~= "function" then
+        return false, "VANILLA_PLANT_SAVE_UNAVAILABLE"
+    end
+    plant:saveData()
+    return true
+end
+
+local function alivePlant(plant)
+    return plant and type(plant.isAlive) == "function"
+        and plant:isAlive() ~= false
+end
+
+local function applyPlantEffect(plant, effect, body)
+    if not alivePlant(plant) then return false, "PLANT_NOT_READY" end
+    if effect == "boost_yield" then
+        plant.bonusYield = true
+        return savePlant(plant)
+    elseif effect == "fertilize" then
+        if type(plant.fertilize) ~= "function" then
+            return false, "VANILLA_FERTILIZER_UNAVAILABLE"
+        end
+        -- Compost uses vanilla's safe fertilizer path and is persistent in
+        -- SPlantGlobalObject, making this a good debug stand-in for future
+        -- fertilizer items and research modifiers.
+        plant:fertilize({ skill = farmingSkill(body), compost = true })
+        return true
+    elseif effect == "gmo_upgrade" then
+        -- These are all vanilla persisted fields.  Keeping the debug upgrade
+        -- on vanilla state means later research can replace this with a
+        -- calculated modifier without inventing a second plant authority.
+        plant.bonusYield = true
+        plant.cursed = false
+        plant.hasWeeds = false
+        plant.compost = true
+        plant.health = math.max(tonumber(plant.health) or 0, 100)
+        return savePlant(plant)
+    end
+    return false, "UNKNOWN_FARMING_RESEARCH_EFFECT"
+end
+
+function Adapter.ApplyResearchEffect(component, effect, body)
+    local normalized = Research and Research.NormalizeEffect
+        and Research.NormalizeEffect(effect) or nil
+    if not normalized then return false, "UNKNOWN_FARMING_RESEARCH_EFFECT" end
+    if normalized == "fast_growth" then
+        return Adapter.ForceGrowPlot(component)
+    end
+    local system = farmingSystem()
+    if not system then return false, "FARMING_SYSTEM_UNAVAILABLE" end
+    local ready, reason = validateLoadedPlot(component)
+    if not ready then return false, reason end
+    local applied = 0
+    local ok, failure = eachTile(component, function(x, y, z)
+        local plant = Adapter.GetPlantAt(x, y, z)
+        if plant and cropState(plant) ~= "plow" then
+            local changed, changeReason = applyPlantEffect(plant, normalized, body)
+            if not changed then
+                if changeReason ~= "PLANT_NOT_READY" then
+                    return false, changeReason
+                end
+            else
+                applied = applied + 1
+            end
+        end
+        return true
+    end)
+    if not ok then return false, failure end
+    if applied <= 0 then return false, "NO_PLANTS_AVAILABLE" end
+    local resultReason = {
+        boost_yield = "YIELD_BOOSTED",
+        fertilize = "FERTILIZER_APPLIED",
+        gmo_upgrade = "GMO_UPGRADE_APPLIED",
+    }
+    return true, resultReason[normalized], {
+        applied = applied, effect = normalized,
+    }
 end
 
 return Adapter

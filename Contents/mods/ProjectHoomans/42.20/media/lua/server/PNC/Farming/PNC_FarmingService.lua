@@ -7,6 +7,7 @@ PNC.FarmingService = PNC.FarmingService or {}
 local Service = PNC.FarmingService
 local Farming = PNC.Farming
 local Catalog = PNC.FarmingCatalog
+local Research = PNC.FarmingResearch
 local Adapter = PNC.PZFarmingAdapter
 local Repository = PNC.SettlementRepository
 
@@ -122,7 +123,7 @@ function Service.DebugPlot(player, args)
     if not plot then return { ok = false, reason = "GROWING_PLOT_NOT_FOUND" } end
     local action = tostring(args.debugAction or "")
     local ok, reason, details
-    if action == "grow" then
+    if action == "grow" or action == "fast_growth" then
         ok, reason, details = Adapter.ForceGrowPlot(plot)
     elseif action == "water" then
         ok, reason, details = Adapter.ForceWaterPlot(plot)
@@ -130,6 +131,10 @@ function Service.DebugPlot(player, args)
         ok, reason, details = Adapter.HarvestPlot(plot, player)
     elseif action == "clear" then
         ok, reason, details = Adapter.ClearPlot(plot)
+    elseif Research and Research.NormalizeEffect
+        and Research.NormalizeEffect(action)
+    then
+        ok, reason, details = Adapter.ApplyResearchEffect(plot, action, player)
     else
         return { ok = false, reason = "UNKNOWN_FARMING_DEBUG_ACTION" }
     end

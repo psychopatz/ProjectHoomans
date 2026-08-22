@@ -68,8 +68,8 @@ local function textureFor(crop)
                 candidates[#candidates + 1] = value
             end
             for _, path in ipairs(candidates) do
-                local ok, texture = pcall(getTexture, path)
-                if ok and texture then return texture end
+                local texture = getTexture(path)
+                if texture then return texture end
             end
         end
     end
@@ -189,9 +189,12 @@ function ISPNCFarmingPlantWindow:createChildren()
     self.debugButtons = {}
     if self.debugVisible then
         for _, definition in ipairs({
-            { "debug_grow", "UI_PNC_Farming_DebugGrow", "AUTO GROW" },
+            { "debug_fast_growth", "UI_PNC_Farming_DebugFastGrowth", "FAST GROWTH" },
             { "debug_water", "UI_PNC_Farming_DebugWater", "FORCE WATER" },
             { "debug_harvest", "UI_PNC_Farming_DebugHarvest", "HARVEST" },
+            { "debug_boost_yield", "UI_PNC_Farming_DebugBoostYield", "BOOST YIELD" },
+            { "debug_fertilize", "UI_PNC_Farming_DebugFertilize", "ADD FERTILIZER" },
+            { "debug_gmo_upgrade", "UI_PNC_Farming_DebugGMO", "GMO UPGRADE" },
             { "debug_clear", "UI_PNC_Farming_DebugClear", "CLEAR PLANTS" },
         }) do
             self.debugButtons[#self.debugButtons + 1] = UI.CreateButton(self, {
@@ -212,7 +215,11 @@ function ISPNCFarmingPlantWindow:onResponsiveLayout()
     local buttonHeight = Layout.Pixels(30, self.uiScale)
     local debugRow = #(self.debugButtons or {}) > 0
     local utilityRow = #(self.utilityButtons or {}) > 0
-    local rowCount = 1 + (utilityRow and 1 or 0) + (debugRow and 1 or 0)
+    local debugButtonWidth = Layout.Pixels(132, self.uiScale)
+    local debugColumns = math.max(1, math.floor(
+        (rect.width + gap) / (debugButtonWidth + gap)))
+    local debugRows = debugRow and math.ceil(#self.debugButtons / debugColumns) or 0
+    local rowCount = 1 + (utilityRow and 1 or 0) + debugRows
     local contentHeight = rect.height - buttonHeight * rowCount
         - gap * (rowCount + 1)
     local columns = math.min(3, math.max(1, #self.cards))
@@ -235,17 +242,20 @@ function ISPNCFarmingPlantWindow:onResponsiveLayout()
     local pageCount = math.max(1, math.ceil(#self.cards / PAGE_SIZE))
     local actionY = rect.y + rect.height - buttonHeight
     local utilityY = actionY - buttonHeight - gap
-    local debugY = utilityY
-    if utilityRow then debugY = utilityY - buttonHeight - gap end
+    local debugY = actionY - debugRows * buttonHeight - debugRows * gap
+    if debugRow and utilityRow then
+        debugY = utilityY - debugRows * buttonHeight - debugRows * gap
+    end
     local x = rect.x
     for _, button in ipairs(self.utilityButtons or {}) do
         Layout.SetBounds(button, x, utilityY, 150, buttonHeight)
         x = x + 150 + gap
     end
-    x = rect.x
-    for _, button in ipairs(self.debugButtons or {}) do
-        Layout.SetBounds(button, x, debugY, 118, buttonHeight)
-        x = x + 118 + gap
+    for index, button in ipairs(self.debugButtons or {}) do
+        local column = (index - 1) % debugColumns
+        local row = math.floor((index - 1) / debugColumns)
+        Layout.SetBounds(button, rect.x + column * (debugButtonWidth + gap),
+            debugY + row * (buttonHeight + gap), debugButtonWidth, buttonHeight)
     end
     Layout.SetBounds(self.confirmButton, rect.x, actionY, 120, buttonHeight)
     Layout.SetBounds(self.cancelButton, rect.x + rect.width - 100,
@@ -333,7 +343,11 @@ function PlantUI.Open(storage, plot, onConfirm, onDebug, onTogglePolicy, onEditR
         math.floor((getCore():getScreenWidth() - width) / 2),
         math.floor((getCore():getScreenHeight() - height) / 2),
         width, height, {
-            title = tr("UI_PNC_Farming_SelectPlant", "SELECT PLANT"),
+            title = (PNC.Client and PNC.Client.CanUseDebug
+                and PNC.Client.CanUseDebug() == true)
+                and tr("UI_PNC_Farming_PlantManagementDebug",
+                    "PLANT MANAGEMENT DEBUG")
+                or tr("UI_PNC_Farming_SelectPlant", "SELECT PLANT"),
             options = options, onConfirm = onConfirm, onDebug = onDebug,
             onTogglePolicy = onTogglePolicy, onEditRectangle = onEditRectangle,
             initialSelectedId = plot and plot.desiredCrop,

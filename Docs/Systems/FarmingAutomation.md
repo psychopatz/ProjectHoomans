@@ -24,6 +24,10 @@ The first farming vertical slice treats Project Zomboid Build 42.20 as the farmi
 - `SFarmingSystem.instance:harvest(plant, liveNpc)` for harvesting and yield.
 - The crop catalog is enumerated from `farming_vegetableconf.props`, including modded crops and their `seedTypes`.
 
+The catalog keeps two different identifiers intentionally: `typeOfSeed` is the
+vanilla crop key passed to `seed` (for example `Cabbages`), while `seedTypes`
+contains inventory item types (for example `Base.CabbageSeed`).
+
 The adapter does not dig or create farmland, and it does not replace vanilla
 growth, yield, disease, weed, or season logic. Clearing a live plant uses the
 vanilla remove-and-plow path so the plot remains a usable furrow. The debug
@@ -42,10 +46,14 @@ the same vanilla farming properties; vanilla crops without explicit
 temperature bounds show the Build 42 cold-stress rule instead.
 
 The same modal provides `CHANGE SEEDS`, `TOGGLE AUTOMATION`, and `EDIT
-RECTANGLE`. In a debug-enabled session it also provides `AUTO GROW`, `FORCE
-WATER`, `HARVEST`, and `CLEAR PLANTS` controls. Changing the selected crop
-clears existing vanilla plants in the plot before the new configuration is
-stored.
+RECTANGLE`. In a debug-enabled session it becomes a dedicated plant-management
+window with `FAST GROWTH`, `FORCE WATER`, `HARVEST`, `BOOST YIELD`, `ADD
+FERTILIZER`, `GMO UPGRADE`, and `CLEAR PLANTS` controls. The research-style
+actions are centralized as effect IDs so future research unlocks can reuse the
+same server-side operations. Yield, compost, health, and curse changes use
+vanilla plant fields and persistence; Hoomans does not create a second crop
+simulation. Changing the selected crop clears existing vanilla plants in the
+plot before the new configuration is stored.
 
 ## Work and inventory
 

@@ -6,8 +6,8 @@ local cache
 
 local function safeText(key, fallback)
     if type(getText) ~= "function" then return fallback end
-    local ok, value = pcall(getText, key)
-    if ok and value and value ~= key then return tostring(value) end
+    local value = getText(key)
+    if value and value ~= key then return tostring(value) end
     return fallback
 end
 
