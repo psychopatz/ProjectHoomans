@@ -64,6 +64,10 @@ Profiles.Register("window_climb", {
 })
 Profiles.Register("fence_climb", "low", {
     anim = "PNC_ClimbFence",
+    startAnim = "PNC_LegacyClimbFenceStart",
+    endAnim = "PNC_LegacyClimbFenceEnd",
+    upDurationMs = 420,
+    crossingDurationMs = 560,
     travelDurationMs = 600,
     finishHoldMs = 320,
 })

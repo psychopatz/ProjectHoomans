@@ -13,6 +13,8 @@ assert(catalog.stateCounts.bumped == 236, "bumped node inventory mismatch")
 
 local attack
 local inheritedStagger
+local fenceStart
+local fenceEnd
 local keys = {}
 for _, entry in ipairs(catalog.entries) do
     local key = entry.folder .. "/" .. entry.file
@@ -26,6 +28,14 @@ for _, entry in ipairs(catalog.entries) do
         and entry.file == "PNC_Anim_small.xml"
     then
         inheritedStagger = entry
+    elseif entry.state == "bumped"
+        and entry.file == "PNC_Anim_ClimbFenceStart.xml"
+    then
+        fenceStart = entry
+    elseif entry.state == "bumped"
+        and entry.file == "PNC_Anim_ClimbFenceEnd.xml"
+    then
+        fenceEnd = entry
     end
 end
 
@@ -51,6 +61,19 @@ assert(
 assert(
     inheritedStagger.conditions[2].value == "0.0",
     "x_extends numeric condition value was not inherited"
+)
+assert(fenceStart and fenceEnd, "split fence animation nodes missing")
+assert(
+    fenceStart.anim == "Bob_VaultOver_Start",
+    "fence raise clip mismatch"
+)
+assert(
+    fenceStart.events[1].parameter == "PNCTraversalPhase=transfer",
+    "fence raise does not hand off to crossing phase"
+)
+assert(
+    fenceEnd.anim == "Bob_VaultOver_End",
+    "fence landing clip mismatch"
 )
 
 print("pnc_animation_debug_catalog_smoke: ok")

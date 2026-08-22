@@ -21,7 +21,7 @@
 	<m_Events>
 		<m_EventName>SetVariable</m_EventName>
 		<m_Time>End</m_Time>
-		<m_ParameterValue>BumpAnimFinished=true</m_ParameterValue>
+		<m_ParameterValue>PNCTraversalPhase=transfer</m_ParameterValue>
 	</m_Events>
 	<m_Transitions>
 		<m_Target>Idle</m_Target>

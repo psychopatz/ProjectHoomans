@@ -27,7 +27,10 @@ local WINDOW_SMASH_IMPACT_MS =
     Controller.WINDOW_SMASH_IMPACT_MS
 local WINDOW_SMASH_FINISH_MS =
     Controller.WINDOW_SMASH_FINISH_MS
-local FENCE_CLIMB_FINISH_MS = 900
+local FENCE_CLIMB_UP_MS = 420
+local FENCE_CLIMB_CROSS_MS = 560
+local FENCE_CLIMB_FINISH_MS = 1300
+local FENCE_TALL_CLIMB_FINISH_MS = 900
 local FENCE_RETRY_BACKOFF_MS = 900
 local FENCE_COOLDOWN_MS = 900
 
@@ -88,6 +91,30 @@ local function finishPassageBump(body)
     end
 end
 
+local function traversalPhase(body)
+    if body and body.getVariableString then
+        return string.lower(tostring(
+            body:getVariableString("PNCTraversalPhase") or ""
+        ))
+    end
+    return ""
+end
+
+local function bumpFinished(body)
+    if body and body.getVariableBoolean
+        and body:getVariableBoolean("BumpAnimFinished") == true
+    then
+        return true
+    end
+    if body and body.getVariableString then
+        local value = string.lower(tostring(
+            body:getVariableString("BumpAnimFinished") or ""
+        ))
+        return value == "true" or value == "1"
+    end
+    return false
+end
+
 local function updateWindowSmash(body, state, now)
     local action = state and state.passageAction or nil
     if not action then return false, nil end
@@ -100,9 +127,47 @@ local function updateWindowSmash(body, state, now)
         body:faceThisObject(action.object)
     end
     if action.kind == "fence_climb" then
-        local duration = math.max(1, action.finishAt - action.startedAt)
-        local progress = math.max(0, math.min(1,
-            (now - action.startedAt) / duration))
+        local phase = tostring(action.phase or "single")
+        local progress
+        if action.twoPhase == true and phase == "up"
+            and (
+                traversalPhase(body) == "transfer"
+                or now >= (tonumber(action.upFinishAt) or now)
+            )
+        then
+            phase = "cross"
+            action.phase = phase
+            action.crossingStartedAt = now
+            if Animation and Animation.PlayBump then
+                Animation.PlayBump(
+                    body,
+                    state.snapshot,
+                    action.endAnim,
+                    {
+                        sceneId = "native_fence_climb",
+                        leaseUntil = action.finishAt,
+                        keepManagedUseless = false,
+                    }
+                )
+            elseif body.setBumpType then
+                body:setBumpType(action.endAnim)
+            end
+        end
+        if action.twoPhase == true and phase == "up" then
+            -- Bob_VaultOver_Start raises the body into the fence. Hold the
+            -- authored contact point until its transfer event, matching the
+            -- native ClimbOverFenceState boundary instead of sliding early.
+            progress = 0
+        elseif action.twoPhase == true and phase == "cross" then
+            progress = math.max(0, math.min(1,
+                (now - (tonumber(action.crossingStartedAt) or now))
+                    / math.max(1, tonumber(action.crossingDurationMs)
+                        or FENCE_CLIMB_CROSS_MS)))
+        else
+            local duration = math.max(1, action.finishAt - action.startedAt)
+            progress = math.max(0, math.min(1,
+                (now - action.startedAt) / duration))
+        end
         local x = action.fromX + (action.toX - action.fromX) * progress
         local y = action.fromY + (action.toY - action.fromY) * progress
         if LiveBodyControl and LiveBodyControl.SetAuthoritativePosition then
@@ -110,7 +175,11 @@ local function updateWindowSmash(body, state, now)
         end
         if body.setLx then body:setLx(x) end
         if body.setLy then body:setLy(y) end
-        if now < action.finishAt then
+        if not fenceCrossed(body, action)
+            or (not bumpFinished(body)
+                and traversalPhase(body) ~= "finished"
+                and now < action.finishAt)
+        then
             beginMovementLease(body, state, action.key, now)
             return true, "native_fence_climb"
         end
@@ -190,7 +259,15 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
         .. ":" .. tostring(now)
     state.passageAction = {
         kind = "fence_climb", key = key, object = object,
-        startedAt = now, finishAt = now + FENCE_CLIMB_FINISH_MS,
+        startedAt = now,
+        finishAt = now + (tall and FENCE_TALL_CLIMB_FINISH_MS
+            or FENCE_CLIMB_FINISH_MS),
+        twoPhase = tall ~= true,
+        phase = tall and "single" or "up",
+        upFinishAt = tall and nil or now + FENCE_CLIMB_UP_MS,
+        crossingDurationMs = tall and nil or FENCE_CLIMB_CROSS_MS,
+        startAnim = tall and nil or "PNC_LegacyClimbFenceStart",
+        endAnim = tall and nil or "PNC_LegacyClimbFenceEnd",
         fromX = body:getX(), fromY = body:getY(),
         fromSquare = fromSquare,
         toSquare = toSquare,
@@ -202,9 +279,10 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
     if body.faceThisObject then body:faceThisObject(object) end
     if Animation and Animation.PlayBump then
         Animation.PlayBump(body, snapshot,
-            tall and "PNC_ClimbFenceTall" or "PNC_ClimbFence", {
+            tall and "PNC_ClimbFenceTall"
+                or "PNC_LegacyClimbFenceStart", {
                 sceneId = "native_fence_climb",
-                leaseUntil = now + FENCE_CLIMB_FINISH_MS,
+                leaseUntil = state.passageAction.finishAt,
                 keepManagedUseless = false,
             })
     end

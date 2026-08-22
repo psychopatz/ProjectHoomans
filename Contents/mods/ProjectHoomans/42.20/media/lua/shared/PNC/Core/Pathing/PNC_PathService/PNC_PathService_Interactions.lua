@@ -725,6 +725,14 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
             toY = landingY,
             toZ = landingZ,
             travelDurationMs = travelDuration,
+            startAnim = fence.tall ~= true
+                and traversalProfile.startAnim or nil,
+            endAnim = fence.tall ~= true
+                and traversalProfile.endAnim or nil,
+            upDurationMs = fence.tall ~= true
+                and traversalProfile.upDurationMs or nil,
+            crossingDurationMs = fence.tall ~= true
+                and traversalProfile.crossingDurationMs or nil,
             finishHoldMs = tonumber(traversalProfile.finishHoldMs)
                 or (fence.tall == true and 420 or 320),
         }) then

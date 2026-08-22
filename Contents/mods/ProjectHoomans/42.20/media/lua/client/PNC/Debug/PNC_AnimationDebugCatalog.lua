@@ -1993,7 +1993,7 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_BandageHead",
             anim = "Bob_BandageHead",
-            looped = false,
+            looped = true,
             speed = 0.5,
             playable = true,
             transitionCount = 0,
@@ -2002,7 +2002,6 @@ PNC.AnimationDebugCatalog = {
                 { name = "BumpType", kind = "STRING", value = "PNC_BandageHead" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -2013,7 +2012,7 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_BandageLeftArm",
             anim = "Bob_BandageLeftArm",
-            looped = false,
+            looped = true,
             speed = 0.5,
             playable = true,
             transitionCount = 0,
@@ -2022,7 +2021,6 @@ PNC.AnimationDebugCatalog = {
                 { name = "BumpType", kind = "STRING", value = "PNC_BandageLeftArm" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -2033,7 +2031,7 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_BandageLeftLeg",
             anim = "Bob_BandageLeftLeg",
-            looped = false,
+            looped = true,
             speed = 0.5,
             playable = true,
             transitionCount = 0,
@@ -2042,7 +2040,6 @@ PNC.AnimationDebugCatalog = {
                 { name = "BumpType", kind = "STRING", value = "PNC_BandageLeftLeg" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -2053,7 +2050,7 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_BandageLowerBody",
             anim = "Bob_BandageLowerBody",
-            looped = false,
+            looped = true,
             speed = 0.5,
             playable = true,
             transitionCount = 0,
@@ -2062,7 +2059,6 @@ PNC.AnimationDebugCatalog = {
                 { name = "BumpType", kind = "STRING", value = "PNC_BandageLowerBody" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -2073,7 +2069,7 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_BandageRightArm",
             anim = "Bob_BandageRightArm",
-            looped = false,
+            looped = true,
             speed = 0.5,
             playable = true,
             transitionCount = 0,
@@ -2082,7 +2078,6 @@ PNC.AnimationDebugCatalog = {
                 { name = "BumpType", kind = "STRING", value = "PNC_BandageRightArm" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -2093,7 +2088,7 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_BandageRightLeg",
             anim = "Bob_BandageRightLeg",
-            looped = false,
+            looped = true,
             speed = 0.5,
             playable = true,
             transitionCount = 0,
@@ -2102,7 +2097,6 @@ PNC.AnimationDebugCatalog = {
                 { name = "BumpType", kind = "STRING", value = "PNC_BandageRightLeg" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -2113,7 +2107,7 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_BandageUpperBody",
             anim = "Bob_BandageUpperBody",
-            looped = false,
+            looped = true,
             speed = 0.5,
             playable = true,
             transitionCount = 0,
@@ -2122,7 +2116,6 @@ PNC.AnimationDebugCatalog = {
                 { name = "BumpType", kind = "STRING", value = "PNC_BandageUpperBody" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -2297,7 +2290,7 @@ PNC.AnimationDebugCatalog = {
             path = "media/AnimSets/zombie/bumped/PNC_Anim_ClimbFenceEnd.xml",
             extends = nil,
             node = "PNC_Anim_ClimbFenceEndBump",
-            anim = "Bob_VaultOver",
+            anim = "Bob_VaultOver_End",
             looped = false,
             speed = 1.04,
             playable = true,
@@ -2308,6 +2301,7 @@ PNC.AnimationDebugCatalog = {
             },
             events = {
                 { name = "SetVariable", time = "0.7", parameter = "PNCLegacyClimbFenceFinished=true" },
+                { name = "SetVariable", time = "End", parameter = "PNCTraversalPhase=finished" },
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
                 { name = "PlaySound", time = "0.28", parameter = "LandLight" },
             },
@@ -2329,7 +2323,7 @@ PNC.AnimationDebugCatalog = {
                 { name = "BumpType", kind = "STRING", value = "PNC_LegacyClimbFenceStart" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+                { name = "SetVariable", time = "End", parameter = "PNCTraversalPhase=transfer" },
                 { name = "SetVariable", time = "End", parameter = "PNCLegacyClimbFenceStarted=true" },
                 { name = "PlayFenceSound", time = "Start", parameter = "ClimbOverFenceLow" },
             },
@@ -4139,7 +4133,7 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_Sleep",
             anim = "Bob_SitGround_SleepIdle",
-            looped = false,
+            looped = true,
             speed = 0.8,
             playable = true,
             transitionCount = 0,
@@ -4148,7 +4142,6 @@ PNC.AnimationDebugCatalog = {
                 { name = "BumpType", kind = "STRING", value = "PNC_Sleep" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -4159,7 +4152,7 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_SleepBed",
             anim = "Bob_Asleep",
-            looped = false,
+            looped = true,
             speed = 0.8,
             playable = true,
             transitionCount = 0,
@@ -4168,7 +4161,6 @@ PNC.AnimationDebugCatalog = {
                 { name = "BumpType", kind = "STRING", value = "PNC_SleepBed" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -4309,7 +4301,6 @@ PNC.AnimationDebugCatalog = {
                 { name = "BumpType", kind = "STRING", value = "PNC_Surrender" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
