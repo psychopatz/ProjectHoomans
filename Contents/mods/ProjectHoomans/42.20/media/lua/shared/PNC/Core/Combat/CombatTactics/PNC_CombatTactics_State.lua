@@ -126,14 +126,6 @@ function Tactics.ClearRetreatState(record)
         state.retryAt = 0
         state.lowStaminaPhase = nil
         state.lowStaminaAttackUntil = 0
-        state.attackPressureUntil = 0
-        state.lastZombieAttackAt = 0
-        state.lastZombieAttackX = nil
-        state.lastZombieAttackY = nil
-        state.lastZombieAttackZ = nil
-        state.lastZombieAttackOutcome = nil
-        state.damagePressureUntil = 0
-        state.nearMissUntil = 0
     end
 end
 
@@ -156,6 +148,30 @@ function Tactics.IsHordeAttackRetreatTriggered(state, report, now)
     return state ~= nil
         and hordeCount >= hordeThreshold
         and tonumber(state.attackPressureUntil) >= (tonumber(now) or Core.Now())
+end
+
+function Tactics.ShouldInterruptAttackForRetreat(record)
+    local runtime = record and record.runtime or nil
+    local state = Internal.EnsureRetreatState(record)
+    local target = runtime and runtime.target or nil
+    local report
+    if not state then
+        return false, nil
+    end
+    if state.phase == "retreat" then
+        return true, state.reason or "combat_retreat"
+    end
+    if not target or target.kind ~= "zombie"
+        or not Internal.AssessThreat
+    then
+        return false, nil
+    end
+    report = Internal.AssessThreat(record, target)
+    if Tactics.IsHordeAttackRetreatTriggered(state, report, Core.Now()) then
+        return true, state.lastZombieAttackOutcome == "damaged"
+            and "zombie_damage_retreat" or "near_miss_kite"
+    end
+    return false, nil
 end
 
 function Tactics.MarkZombieDamage(record, sourceX, sourceY, sourceZ, now)

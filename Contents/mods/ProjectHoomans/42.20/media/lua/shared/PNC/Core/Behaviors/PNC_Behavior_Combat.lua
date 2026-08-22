@@ -43,6 +43,29 @@ function BehaviorCombat.TickCommittedAction(record, zombie)
         Equipment.ApplyCombatState(zombie, record, true)
     end
     if Tactics
+        and Tactics.ShouldInterruptAttackForRetreat
+        and Combat.CancelAttackAction
+    then
+        interrupt, reason =
+            Tactics.ShouldInterruptAttackForRetreat(record)
+        if interrupt then
+            Combat.CancelAttackAction(
+                record,
+                zombie,
+                nil,
+                reason or "combat_retreat"
+            )
+            Common.SetCombatDebug(
+                record,
+                target,
+                reason or "combat_retreat",
+                equipmentInfo.combatModeResolved,
+                equipmentInfo.weaponStatus
+            )
+            return false
+        end
+    end
+    if Tactics
         and Tactics.ShouldInterruptReload
         and Combat.CancelAttackAction
     then

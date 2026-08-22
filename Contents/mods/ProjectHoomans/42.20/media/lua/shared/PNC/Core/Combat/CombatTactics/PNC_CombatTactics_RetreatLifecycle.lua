@@ -166,13 +166,6 @@ function Internal.TryNearMissRetreat(record, zombie, target, state, now, report)
         return false, nil
     end
     if not Tactics.IsHordeAttackRetreatTriggered(state, report, now) then
-        if now <= (tonumber(state.nearMissUntil) or 0)
-            and report and report.pressureCount
-                < (tonumber(Const.COMBAT_TACTICAL_RETREAT_MIN_PRESSURE) or 2)
-        then
-            state.nearMissUntil = 0
-            return false, "lone_threat_counter"
-        end
         return false, nil
     end
     state.nearMissUntil = 0

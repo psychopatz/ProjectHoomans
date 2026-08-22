@@ -33,6 +33,7 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
     local safetyRadius
     local safetyBuffer
     local retreatDistance
+    local retreatOwnsAttack
     if not record or not zombie or not target or target.kind ~= "zombie" then
         return false, nil, nil
     end
@@ -47,20 +48,22 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
             effectiveMode == "mixed"
             and dist <= (tonumber(Const.MELEE_RANGE) or 1.3) * 1.1
         )
-    if not meleeLane then return false, nil, nil end
-    continued, continueReason = Internal.ContinueLockedRetreat(
-        record, zombie, target, state, now
-    )
-    if continued then
-        return true, continueReason or state.reason or "combat_retreat", nil
-    end
-    if continueReason == "retreat_stalled" then
-        return false, continueReason, nil
-    end
-
+    retreatOwnsAttack = meleeLane
+        or state.reengagePending == true
+        or state.lowStaminaPhase ~= nil
     report = Internal.AssessThreat(record, target)
-    grounded = Tactics.IsGroundTarget(target)
     retreatMinPressure = tonumber(Const.COMBAT_TACTICAL_RETREAT_MIN_PRESSURE) or 2
+    if retreatOwnsAttack then
+        continued, continueReason = Internal.ContinueLockedRetreat(
+            record, zombie, target, state, now
+        )
+        if continued then
+            return true, continueReason or state.reason or "combat_retreat", nil
+        end
+        if continueReason == "retreat_stalled" then
+            return false, continueReason, nil
+        end
+    end
     if state.lowStaminaPhase == "recover" then
         if Tactics.CanReengage(record) then
             state.lowStaminaPhase = nil
@@ -82,6 +85,14 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
             return true, "recovering_stamina_safe", nil
         end
     end
+    -- This check intentionally runs for ranged and mixed records before their
+    -- weapon-specific attack arbitration. Otherwise a successful shot can
+    -- consume the tick and the next shot can erase the retreat opportunity.
+    if Internal.TryNearMissRetreat(record, zombie, target, state, now, report) then
+        return true, state.reason or "near_miss_kite", nil
+    end
+    if not meleeLane then return false, nil, nil end
+    grounded = Tactics.IsGroundTarget(target)
     if not grounded
         and now <= (tonumber(state.nearMissUntil) or 0)
         and report.pressureCount < retreatMinPressure
@@ -90,9 +101,6 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
         state.nearMissUntil = 0
         record.runtime.combatTactical.decision = "lone_threat_counter"
         return false, "lone_threat_counter", "shove"
-    end
-    if Internal.TryNearMissRetreat(record, zombie, target, state, now, report) then
-        return true, state.reason or "near_miss_kite", nil
     end
     skillID = Skills and Skills.ResolveWeaponSkill
         and Skills.ResolveWeaponSkill(

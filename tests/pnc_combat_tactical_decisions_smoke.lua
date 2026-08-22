@@ -398,6 +398,28 @@ moved = PNC.CombatTactics.PreAttackDecision(
 )
 assertEqual(moved, false, "fighter re-engages at stamina threshold")
 
+-- A ranged attack arbitration pass must not erase the zombie-attack marker
+-- before the ranged tactical precheck gets a chance to retreat.
+now = now + 250
+record = makeRecord("ranged_damage_retreat")
+PNC.CombatTactics.MarkZombieDamage(record, 1, 0, 0, now)
+PNC.CombatTactics.ClearRetreatState(record)
+moved, reason = PNC.CombatTactics.PreAttackDecision(
+    record,
+    {},
+    target,
+    "ranged",
+    { hasWeapon = true }
+)
+assertEqual(moved, true, "ranged damage marker reaches retreat arbitration")
+assertEqual(reason, "zombie_damage_retreat", "ranged damage retreat reason")
+record.runtime.target = target
+local interruptAttack, interruptReason =
+    PNC.CombatTactics.ShouldInterruptAttackForRetreat(record)
+assertEqual(interruptAttack, true, "active attack yields to retreat")
+assertEqual(interruptReason, "zombie_damage_retreat",
+    "active attack retreat handoff reason")
+
 -- Follow-mode retreat destinations stay inside the owner leash even when the
 -- raw retreat vector points away from the owner.
 record = makeRecord("follow_clamp")

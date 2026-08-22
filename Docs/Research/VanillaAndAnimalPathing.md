@@ -261,6 +261,13 @@ reuse: escape-vector selection, bounded candidate probing, and local recovery
 are reusable, while animal zones remain unsuitable for dynamic NPC obstacle
 avoidance.
 
+Combat ownership is explicit at the attack boundary as well. A committed
+attack may finish normally, but the qualifying horde-attack marker can cancel
+that lease and hand movement to retreat. Ordinary ranged spacing is not
+treated as an emergency retreat. Follow formation also yields while a
+reactive retreat is active, preventing a formation slot or horde-steering
+target from replacing the escape goal on the next behavior tick.
+
 At the Java level, `PathFindBehavior2.pathNextX/pathNextY` are public and can
 serve as a next-waypoint snapshot. The complete path list is private inside
 `PathFindBehavior2`; exporting every node would require a small Java bridge or

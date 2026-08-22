@@ -6,6 +6,9 @@ local Const = PNC.Const
 local Stealth = PNC.Stealth
 local Common = PNC.BehaviorCommon
 local CompanionVehicle = PNC.CompanionVehicle
+local CombatTactics = PNC.CombatTactics
+local BehaviorCombat = PNC.BehaviorCombat
+local Perception = PNC.Perception
 
 function Internal.TickFollowOwner(record, zombie)
     local owner = Common.GetOwner(record)
@@ -23,6 +26,13 @@ function Internal.TickFollowOwner(record, zombie)
     local prioritizeOwner
     local hordeCount
     local ownerEngaged
+    local retreatState
+    local retreatWasActive
+    local retreatContinued
+    local retreatReason
+    local combatHordeCount
+    local attackRetreatTriggered
+    local combatTarget
     if Stealth and Stealth.UpdateFollowState then
         Stealth.UpdateFollowState(record, owner)
     end
@@ -116,6 +126,43 @@ function Internal.TickFollowOwner(record, zombie)
         hazard.expiresAt = 0
     end
     hordeCount = tonumber(hazard and hazard.count) or 0
+    -- Combat retreat owns movement once it has started. Without this handoff,
+    -- the follow formation pass can replace the retreat intent with a slot or
+    -- horde-steering target on the very next behavior tick.
+    if CombatTactics and CombatTactics.Internal
+        and CombatTactics.Internal.EnsureRetreatState
+    then
+        retreatState = CombatTactics.Internal.EnsureRetreatState(record)
+        retreatWasActive = retreatState and retreatState.phase == "retreat"
+        if retreatWasActive then
+            combatTarget = record.runtime and record.runtime.target or nil
+            retreatContinued, retreatReason =
+                CombatTactics.Internal.ContinueLockedRetreat(
+                    record,
+                    zombie,
+                    combatTarget,
+                    retreatState,
+                    now
+                )
+            if retreatContinued then
+                Internal.SetFollowMode(record, "combat_retreat")
+                return true
+            end
+            if retreatReason == "retreat_complete"
+                or retreatReason == "retreat_safe_radius"
+            then
+                if combatTarget and combatTarget.kind == "zombie"
+                    and BehaviorCombat and BehaviorCombat.TickEngage
+                    and tostring(record.attackType or Const.ATTACK_TYPE_AUTO)
+                        ~= tostring(Const.ATTACK_TYPE_NONE or "none")
+                then
+                    BehaviorCombat.TickEngage(record, zombie, combatTarget)
+                    Internal.SetFollowMode(record, "combat")
+                    return true
+                end
+            end
+        end
+    end
     prioritizeOwner = ownerDist >= (
             tonumber(Const.FOLLOW_COMBAT_LEASH_DISTANCE) or 5.5
         )
@@ -134,6 +181,38 @@ function Internal.TickFollowOwner(record, zombie)
     then
         if Internal.TryRespondToImmediateThreat(record, zombie) then
             Internal.SetFollowMode(record, "combat_self_defense")
+            return true
+        end
+    end
+    -- A near miss does not necessarily populate recentThreat, but it still
+    -- arms the combat retreat marker. Do not let owner-priority formation
+    -- logic hide that marker while a four-zombie horde is present.
+    combatHordeCount = hordeCount
+    if Perception and Perception.CountEnemyZombies then
+        combatHordeCount = Perception.CountEnemyZombies(
+            record, Const.COMBAT_HORDE_RADIUS
+        )
+    end
+    attackRetreatTriggered = CombatTactics
+        and CombatTactics.IsHordeAttackRetreatTriggered
+        and CombatTactics.IsHordeAttackRetreatTriggered(
+            retreatState,
+            { hordeCount = combatHordeCount },
+            now
+        )
+    if attackRetreatTriggered then
+        if Internal.TryRespondToImmediateThreat(record, zombie) then
+            Internal.SetFollowMode(record, "combat_retreat")
+            return true
+        end
+        combatTarget = record.runtime and record.runtime.target or nil
+        if combatTarget and combatTarget.kind == "zombie"
+            and BehaviorCombat and BehaviorCombat.TickEngage
+            and tostring(record.attackType or Const.ATTACK_TYPE_AUTO)
+                ~= tostring(Const.ATTACK_TYPE_NONE or "none")
+        then
+            BehaviorCombat.TickEngage(record, zombie, combatTarget)
+            Internal.SetFollowMode(record, "combat_retreat")
             return true
         end
     end
