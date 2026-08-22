@@ -13,6 +13,7 @@ Internal.NativePathController =
     Internal.NativePathController or {}
 local Controller = Internal.NativePathController
 local TraversalQuery = PNC.TraversalQuery
+local TraversalProfiles = PNC.TraversalProfiles
 local PathInternal = PNC.PathService
     and PNC.PathService.Internal or nil
 local Animation = PNC.Animation
@@ -27,12 +28,12 @@ local WINDOW_SMASH_IMPACT_MS =
     Controller.WINDOW_SMASH_IMPACT_MS
 local WINDOW_SMASH_FINISH_MS =
     Controller.WINDOW_SMASH_FINISH_MS
-local FENCE_CLIMB_UP_MS = 420
+local FENCE_CLIMB_UP_MS = 700
 local FENCE_CLIMB_CROSS_MS = 560
-local FENCE_CLIMB_FINISH_MS = 1300
 local FENCE_TALL_CLIMB_FINISH_MS = 900
 local FENCE_RETRY_BACKOFF_MS = 900
 local FENCE_COOLDOWN_MS = 900
+local SPLIT_FENCE_TRANSITION_SETTLE_MS = 50
 
 local function objectBool(object, methodName)
     local method = object and object[methodName] or nil
@@ -129,11 +130,22 @@ local function updateWindowSmash(body, state, now)
     if action.kind == "fence_climb" then
         local phase = tostring(action.phase or "single")
         local progress
-        if action.twoPhase == true and phase == "up"
-            and (
-                traversalPhase(body) == "transfer"
+        local transferReady
+        if action.twoPhase == true and phase == "up" then
+            transferReady = traversalPhase(body) == "transfer"
                 or now >= (tonumber(action.upFinishAt) or now)
-            )
+            if transferReady then
+                -- Let the start clip's Idle transition settle before changing
+                -- BumpType. Doing both in one update can leave short fences
+                -- permanently in the bumped action state.
+                phase = "cross_pending"
+                action.phase = phase
+                action.crossPendingAt = now
+            end
+        end
+        if action.twoPhase == true and phase == "cross_pending"
+            and now >= (tonumber(action.crossPendingAt) or now)
+                + SPLIT_FENCE_TRANSITION_SETTLE_MS
         then
             phase = "cross"
             action.phase = phase
@@ -158,13 +170,19 @@ local function updateWindowSmash(body, state, now)
             -- authored contact point until its transfer event, matching the
             -- native ClimbOverFenceState boundary instead of sliding early.
             progress = 0
+        elseif action.twoPhase == true and phase == "cross_pending" then
+            progress = 0
         elseif action.twoPhase == true and phase == "cross" then
             progress = math.max(0, math.min(1,
                 (now - (tonumber(action.crossingStartedAt) or now))
                     / math.max(1, tonumber(action.crossingDurationMs)
                         or FENCE_CLIMB_CROSS_MS)))
         else
-            local duration = math.max(1, action.finishAt - action.startedAt)
+            local duration = math.max(
+                1,
+                tonumber(action.travelDurationMs)
+                    or action.finishAt - action.startedAt
+            )
             progress = math.max(0, math.min(1,
                 (now - action.startedAt) / duration))
         end
@@ -227,6 +245,12 @@ end
 local function startFenceClimb(snapshot, body, state, passage, object, now)
     local toSquare = passage and passage.toSquare or nil
     local fromSquare = passage and passage.fromSquare or nil
+    local profile
+    local tall
+    local upDuration
+    local crossingDuration
+    local finishHold
+    local finishDuration
     if not toSquare then return false, nil end
     if not fromSquare and body.getSquare then
         fromSquare = body:getSquare()
@@ -252,22 +276,58 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
     then
         return false, "native_fence_landing_blocked"
     end
-    local _, tall = TraversalQuery.IsFence(object)
+    _, tall = TraversalQuery.IsFence(object)
+    profile = TraversalProfiles
+        and TraversalProfiles.Resolve
+        and TraversalProfiles.Resolve(
+            "fence_climb",
+            {
+                body = body,
+                snapshot = snapshot,
+                state = state,
+                obstacle = object,
+                tall = tall == true,
+            },
+            tall == true and "tall" or "low"
+        ) or {}
+    upDuration = tonumber(profile.upDurationMs) or FENCE_CLIMB_UP_MS
+    crossingDuration = tonumber(profile.crossingDurationMs)
+        or FENCE_CLIMB_CROSS_MS
+    finishHold = tonumber(profile.finishHoldMs) or 320
+    finishDuration = tall == true
+        and (tonumber(profile.travelDurationMs)
+            or FENCE_TALL_CLIMB_FINISH_MS)
+        or upDuration + crossingDuration + finishHold
     clearOwnedPath(body, state)
+    -- PathFindBehavior2 may have entered vanilla ClimbOverFenceState on the
+    -- collision frame before this controller observed the passage. Reset that
+    -- state before installing the PNC bump scene; NPCs do not own player
+    -- BodyDamage, so allowing the vanilla state to finish can throw in its
+    -- fall-after-vault check.
+    if LiveBodyControl and LiveBodyControl.SuppressZombieState then
+        LiveBodyControl.SuppressZombieState(body, state, now)
+    end
     local key = "fence_climb:"
         .. tostring(snapshot and snapshot.id or "npc")
         .. ":" .. tostring(now)
     state.passageAction = {
         kind = "fence_climb", key = key, object = object,
         startedAt = now,
-        finishAt = now + (tall and FENCE_TALL_CLIMB_FINISH_MS
-            or FENCE_CLIMB_FINISH_MS),
+        finishAt = now + finishDuration,
+        finishHoldMs = finishHold,
         twoPhase = tall ~= true,
         phase = tall and "single" or "up",
-        upFinishAt = tall and nil or now + FENCE_CLIMB_UP_MS,
-        crossingDurationMs = tall and nil or FENCE_CLIMB_CROSS_MS,
-        startAnim = tall and nil or "PNC_LegacyClimbFenceStart",
-        endAnim = tall and nil or "PNC_LegacyClimbFenceEnd",
+        travelDurationMs = tall
+            and (tonumber(profile.travelDurationMs)
+                or FENCE_TALL_CLIMB_FINISH_MS)
+            or nil,
+        upDurationMs = tall and nil or upDuration,
+        upFinishAt = tall and nil or now + upDuration,
+        crossingDurationMs = tall and nil or crossingDuration,
+        startAnim = tall and nil
+            or profile.startAnim or "PNC_LegacyClimbFenceStart",
+        endAnim = tall and nil
+            or profile.endAnim or "PNC_LegacyClimbFenceEnd",
         fromX = body:getX(), fromY = body:getY(),
         fromSquare = fromSquare,
         toSquare = toSquare,

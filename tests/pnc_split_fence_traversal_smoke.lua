@@ -121,9 +121,20 @@ now = 1420
 T.truthy(PNC.PathService.Internal.updateTraversalAction(
     zombie, record, lane, now
 ), "crossing phase did not start")
+T.equal(bumpTypes[2], nil,
+    "split fence changed clips before the transition settled")
+T.equal(lane.traversalAction.phase, "cross_pending",
+    "split fence did not hold the transition boundary")
+T.equal(zombie.x, 0.5, "crossing did not begin at the fence contact")
+
+now = 1480
+T.truthy(PNC.PathService.Internal.updateTraversalAction(
+    zombie, record, lane, now
+), "split fence did not resume after the transition settled")
 T.equal(bumpTypes[2], "PNC_LegacyClimbFenceEnd",
     "split fence did not select the landing clip")
-T.equal(zombie.x, 0.5, "crossing did not begin at the fence contact")
+T.equal(lane.traversalAction.phase, "cross",
+    "split fence did not enter its crossing phase")
 
 now = 1700
 T.truthy(PNC.PathService.Internal.updateTraversalAction(

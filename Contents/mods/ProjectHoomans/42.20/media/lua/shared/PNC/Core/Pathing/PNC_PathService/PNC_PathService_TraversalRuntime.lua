@@ -17,6 +17,7 @@ local TraversalQuery = PNC.TraversalQuery
 local TRAVERSAL_FINISHED_VARIABLE = "PNCTraversalFinished"
 local TRAVERSAL_KIND_VARIABLE = "PNCTraversalKind"
 local TRAVERSAL_PHASE_VARIABLE = "PNCTraversalPhase"
+local SPLIT_FENCE_TRANSITION_SETTLE_MS = 50
 
 local function clamp01(value)
     return math.max(0, math.min(1, tonumber(value) or 0))
@@ -214,8 +215,9 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
         phase = twoPhaseFence and "up" or "single",
         phaseStartedAt = now,
         upDurationMs = twoPhaseFence
-            and math.max(250, tonumber(spec.upDurationMs) or 420)
+            and math.max(250, tonumber(spec.upDurationMs) or 700)
             or 0,
+        finishHoldMs = finishHoldMs,
         startX = tonumber(spec.fromX) or zombie:getX(),
         startY = tonumber(spec.fromY) or zombie:getY(),
         startZ = tonumber(spec.fromZ) or zombie:getZ(),
@@ -311,6 +313,7 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     local crossed
     local phase
     local phaseProgress
+    local transferReady
     if not action then
         return false, nil
     end
@@ -347,9 +350,25 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
         )
         -- The animation event is authoritative when available. The deadline
         -- is deliberately also accepted so a missing XML event cannot leave
-        -- the NPC holding the fence forever.
-        if getTraversalPhase(zombie) == "transfer"
+        -- the NPC holding the fence forever. Do not switch clips in the same
+        -- update: the start node transitions through Idle, and setBumpType()
+        -- called in that transition frame can leave the short-fence handoff
+        -- stuck in the bumped state.
+        transferReady = getTraversalPhase(zombie) == "transfer"
             or phaseProgress >= 1
+        if transferReady
+        then
+            action.phase = "cross_pending"
+            action.crossPendingAt = now
+            phase = "cross_pending"
+        else
+            progress = 0
+        end
+    end
+    if action.twoPhase == true and phase == "cross_pending" then
+        progress = 0
+        if now >= (tonumber(action.crossPendingAt) or now)
+            + SPLIT_FENCE_TRANSITION_SETTLE_MS
         then
             action.phase = "cross"
             action.phaseStartedAt = now
@@ -367,8 +386,6 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
             elseif zombie.setBumpType then
                 zombie:setBumpType(action.endAnim)
             end
-        else
-            progress = 0
         end
     end
     if phase == "cross" then
@@ -376,6 +393,8 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
             (now - (tonumber(action.phaseStartedAt) or now))
                 / math.max(1, tonumber(action.travelDurationMs) or 1)
         )
+    elseif phase == "cross_pending" then
+        progress = 0
     elseif phase == "up" then
         progress = 0
     else

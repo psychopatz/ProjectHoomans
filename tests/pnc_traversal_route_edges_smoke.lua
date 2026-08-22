@@ -80,6 +80,27 @@ canPlan, kind = PNC.TraversalQuery.CanPlanStep(
 assert(canPlan and kind == "window_climb", "usable window was not routable")
 squares["0:0"].getWindowTo = function() return nil end
 
+squares["0:0"].getHoppableTo = function(_, other)
+    return other == squares["1:0"] and window or nil
+end
+assert(
+    PNC.TraversalQuery.GetFenceBetween(squares["0:0"], squares["1:0"]) == nil,
+    "window was incorrectly classified as a fence"
+)
+squares["0:0"].getHoppableTo = nil
+
+local genericHoppable = {
+    isHoppable = function() return true end,
+}
+squares["0:0"].getHoppableTo = function(_, other)
+    return other == squares["1:0"] and genericHoppable or nil
+end
+assert(
+    PNC.TraversalQuery.GetFenceBetween(squares["0:0"], squares["1:0"]) == genericHoppable,
+    "generic hoppable fence was rejected"
+)
+squares["0:0"].getHoppableTo = nil
+
 local fenceProperties = {
     get = function(_, name)
         return name == "FenceTypeLow" and "Wood" or nil

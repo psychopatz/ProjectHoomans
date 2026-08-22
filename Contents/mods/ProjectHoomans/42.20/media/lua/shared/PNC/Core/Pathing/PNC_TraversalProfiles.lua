@@ -13,6 +13,9 @@ local Profiles = PNC.TraversalProfiles
 
 Profiles.Registry = Profiles.Registry or {}
 Profiles.Selectors = Profiles.Selectors or {}
+-- Clear the retired reflective probe when this file is hot-reloaded. The
+-- registry table is intentionally reused across reloads.
+Profiles.GetActiveAnimationTiming = nil
 
 local function key(kind, variant)
     return tostring(kind or "") .. ":" .. tostring(variant or "default")
@@ -46,11 +49,10 @@ end
 function Profiles.Resolve(kind, context, fallbackVariant)
     local selector = Profiles.Selectors[tostring(kind or "")]
     local variant = fallbackVariant or "default"
-    local ok
     local selected
     if selector then
-        ok, selected = pcall(selector, context or {})
-        if ok and selected ~= nil then
+        selected = selector(context or {})
+        if selected ~= nil then
             variant = tostring(selected)
         end
     end
@@ -66,7 +68,9 @@ Profiles.Register("fence_climb", "low", {
     anim = "PNC_ClimbFence",
     startAnim = "PNC_LegacyClimbFenceStart",
     endAnim = "PNC_LegacyClimbFenceEnd",
-    upDurationMs = 420,
+    -- Profile timing is deliberately authoritative. AnimationPlayer is
+    -- engine userdata that is not safely reflectable from Kahlua.
+    upDurationMs = 700,
     crossingDurationMs = 560,
     travelDurationMs = 600,
     finishHoldMs = 320,

@@ -98,18 +98,25 @@ T.truthy(handled, "fence action remains active at midpoint")
 T.equal(reason, "native_fence_climb", "midpoint action reason")
 T.equal(position.x, 0.5, "fence raise holds the contact point")
 
-handled, reason = Controller.UpdateWindowSmash(body, state, 1450)
+handled, reason = Controller.UpdateWindowSmash(body, state, 1700)
 T.truthy(handled, "fence crossing phase remains active")
+T.equal(bumpType, "PNC_LegacyClimbFenceStart",
+    "fence changed clips before the transition settled")
+T.equal(state.passageAction.phase, "cross_pending",
+    "fence did not hold the transition boundary")
+
+handled, reason = Controller.UpdateWindowSmash(body, state, 1760)
+T.truthy(handled, "fence crossing phase did not resume")
 T.equal(bumpType, "PNC_LegacyClimbFenceEnd", "fence landing scene selected")
 T.equal(state.passageAction.phase, "cross", "fence enters crossing phase")
 
-handled, reason = Controller.UpdateWindowSmash(body, state, 1700)
+handled, reason = Controller.UpdateWindowSmash(body, state, 2000)
 T.truthy(handled, "fence action remains active during crossing")
 T.equal(reason, "native_fence_climb", "crossing action reason")
 T.truthy(position.x > 0.5 and position.x < 1.5,
     "owned body advances through the fence scene")
 
-handled, reason = Controller.UpdateWindowSmash(body, state, 2401)
+handled, reason = Controller.UpdateWindowSmash(body, state, 2601)
 T.truthy(handled, "fence completion handled")
 T.equal(reason, "native_fence_crossed", "fence completion reason")
 T.equal(position.x, 1.5, "owned body reaches landing square")

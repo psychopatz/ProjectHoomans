@@ -167,6 +167,11 @@ away/back oscillations from hiding a blocked NPC indefinitely.
   The hop animation plays against a pinned origin, and the server commits the
   landing position only when `PNCTraversalFinished` becomes true at the
   animation's actual `End` event.
+- Short-fence split hops use the low-fence profile timing and wait one update
+  between the raise clip and landing clip so the bumped-to-Idle transition can
+  settle. Tall fences keep their separate single-clip profile and completion
+  event. The profile is authoritative because `AnimationPlayer` is engine
+  userdata that is not safely reflectable from Kahlua.
 - Fake traversal uses only `PNC_ClimbFence`, `PNC_ClimbFenceTall`, and
   `PNC_ClimbWindow`. It never writes the vanilla `ClimbFenceStarted` or
   `ClimbWindowStarted` variables that enter unsafe Java traversal states.

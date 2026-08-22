@@ -215,17 +215,33 @@ end
 
 function TraversalQuery.IsFence(object)
     local properties
+    local low
     local high
+    local hoppable
+    local tallHoppable
+    local isDoor
+    local isWindow
     if not object then
         return false, false
     end
+    -- Hoppable is the engine's broad traversal flag and is required for
+    -- map-authored rail/chain-link fences that do not carry FenceType*. Keep
+    -- it, but exclude passage objects first: getHoppableTo() also returns
+    -- windows, and doors can expose the same sprite flags.
+    isDoor = instanceof and instanceof(object, "IsoDoor") or false
+    isDoor = isDoor or objectBool(object, { "isDoor", "IsDoor" }, false)
+    isWindow = instanceof and instanceof(object, "IsoWindow") or false
+    isWindow = isWindow or objectBool(object, { "isWindow", "IsWindow" }, false)
+    if isDoor or isWindow then
+        return false, false
+    end
     properties = object.getProperties and object:getProperties() or nil
+    low = properties and properties.get
+        and properties:get("FenceTypeLow") ~= nil or false
     high = properties and properties.get and properties:get("FenceTypeHigh") ~= nil or false
-    return high
-        or (properties and properties.get and properties:get("FenceTypeLow") ~= nil or false)
-        or objectBool(object, { "isHoppable" }, false)
-        or objectBool(object, { "isTallHoppable" }, false),
-        high or objectBool(object, { "isTallHoppable" }, false)
+    hoppable = objectBool(object, { "isHoppable" }, false)
+    tallHoppable = objectBool(object, { "isTallHoppable" }, false)
+    return low or high or hoppable or tallHoppable, high or tallHoppable
 end
 
 function TraversalQuery.GetPassageBetween(fromSquare, toSquare)
