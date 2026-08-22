@@ -314,6 +314,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     local travelDuration
     local fenceKey
     local fenceSquare
+    local fenceFromSquare
     local blockedSquare
     local blockedFromSquare
     local blockedFence
@@ -631,6 +632,7 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
             object = blockedFence,
             tall = blockedFenceTall == true,
             square = blockedFence.getSquare and blockedFence:getSquare() or blockedFromSquare,
+            fromSquare = blockedFromSquare,
             landingSquare = blockedSquare,
         }
     else
@@ -638,6 +640,36 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
     end
     if fence and fence.landingSquare then
         landingSquare = fence.landingSquare
+        fenceFromSquare = fence.fromSquare or blockedFromSquare
+        if not fenceFromSquare and TraversalQuery and TraversalQuery.GetSquare then
+            fenceFromSquare = TraversalQuery.GetSquare(
+                fromX,
+                fromY,
+                fromZ,
+                cell
+            )
+        end
+        if TraversalQuery
+            and TraversalQuery.IsFenceApproachReady
+            and not TraversalQuery.IsFenceApproachReady(
+                fromX,
+                fromY,
+                fenceFromSquare,
+                landingSquare,
+                fence.dirX,
+                fence.dirY
+            )
+        then
+            logTraversalReject(
+                record,
+                zombie,
+                lane,
+                "traversal_rejected",
+                "fence_not_ready",
+                "from=" .. tostring(fenceFromSquare and Internal.describeSquare(fenceFromSquare) or "nil")
+            )
+            return false, nil
+        end
         landingX = landingSquare:getX() + 0.5
         landingY = landingSquare:getY() + 0.5
         landingZ = landingSquare:getZ()
@@ -687,6 +719,8 @@ function Internal.tryDoorOrWindowInteraction(zombie, record, lane, goalX, goalY,
             fromX = fromX,
             fromY = fromY,
             fromZ = fromZ,
+            fromSquare = fenceFromSquare,
+            toSquare = landingSquare,
             toX = landingX,
             toY = landingY,
             toZ = landingZ,

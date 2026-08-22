@@ -28,10 +28,56 @@ local WINDOW_SMASH_IMPACT_MS =
 local WINDOW_SMASH_FINISH_MS =
     Controller.WINDOW_SMASH_FINISH_MS
 local FENCE_CLIMB_FINISH_MS = 900
+local FENCE_RETRY_BACKOFF_MS = 900
+local FENCE_COOLDOWN_MS = 900
 
 local function objectBool(object, methodName)
     local method = object and object[methodName] or nil
     return type(method) == "function" and method(object) == true
+end
+
+local function squareKey(square)
+    if not square then return nil end
+    return tostring(square:getX())
+        .. ":" .. tostring(square:getY())
+        .. ":" .. tostring(square:getZ())
+end
+
+local function fenceKey(object, passage)
+    local objectSquare = object and object.getSquare
+        and object:getSquare() or nil
+    local fromSquare = passage and passage.fromSquare or nil
+    local toSquare = passage and passage.toSquare or nil
+    if objectSquare then
+        return "fence:" .. squareKey(objectSquare)
+    end
+    if fromSquare and toSquare then
+        local fromKey = squareKey(fromSquare)
+        local toKey = squareKey(toSquare)
+        if tostring(fromKey) < tostring(toKey) then
+            return "fence:" .. tostring(fromKey) .. ">" .. tostring(toKey)
+        end
+        return "fence:" .. tostring(toKey) .. ">" .. tostring(fromKey)
+    end
+    return "fence:unknown"
+end
+
+local function fenceCrossed(body, action)
+    if TraversalQuery and TraversalQuery.IsFenceCrossed then
+        return TraversalQuery.IsFenceCrossed(
+            body and body:getX() or nil,
+            body and body:getY() or nil,
+            body and body:getZ() or nil,
+            action and action.fromSquare or nil,
+            action and action.toSquare or nil
+        )
+    end
+    return body ~= nil
+        and action ~= nil
+        and action.toSquare ~= nil
+        and math.floor(body:getX()) == action.toSquare:getX()
+        and math.floor(body:getY()) == action.toSquare:getY()
+        and math.floor(body:getZ()) == action.toSquare:getZ()
 end
 
 local function finishPassageBump(body)
@@ -71,9 +117,21 @@ local function updateWindowSmash(body, state, now)
         finishPassageBump(body)
         state.passageAction = nil
         state.requestKey = nil
+        if fenceCrossed(body, action) then
+            state.fenceCooldownKey = action.fenceKey
+            state.fenceCooldownUntil = now + FENCE_COOLDOWN_MS
+            state.failed = true
+            state.retryAt = now
+            return true, "native_fence_crossed"
+        end
+        -- A server correction or a failed local landing must not immediately
+        -- select the same edge again. Hold the route briefly and let the
+        -- authoritative position settle before retrying.
+        state.fenceRetryKey = action.fenceKey
+        state.fenceRetryAt = now + FENCE_RETRY_BACKOFF_MS
         state.failed = true
-        state.retryAt = now + RETRY_BASE_MS
-        return true, "native_fence_crossed"
+        state.retryAt = state.fenceRetryAt
+        return true, "native_fence_same_side"
     end
     if action.applied ~= true
         and now >= (tonumber(action.impactAt) or now)
@@ -99,7 +157,32 @@ end
 
 local function startFenceClimb(snapshot, body, state, passage, object, now)
     local toSquare = passage and passage.toSquare or nil
+    local fromSquare = passage and passage.fromSquare or nil
     if not toSquare then return false, nil end
+    if not fromSquare and body.getSquare then
+        fromSquare = body:getSquare()
+    end
+    if TraversalQuery and TraversalQuery.IsFenceApproachReady
+        and not TraversalQuery.IsFenceApproachReady(
+            body:getX(),
+            body:getY(),
+            fromSquare,
+            toSquare,
+            passage.dirX,
+            passage.dirY
+        )
+    then
+        return false, "native_fence_not_ready"
+    end
+    if TraversalQuery and TraversalQuery.CanTraverseAt
+        and not TraversalQuery.CanTraverseAt(
+            toSquare:getX() + 0.5,
+            toSquare:getY() + 0.5,
+            toSquare:getZ()
+        )
+    then
+        return false, "native_fence_landing_blocked"
+    end
     local _, tall = TraversalQuery.IsFence(object)
     clearOwnedPath(body, state)
     local key = "fence_climb:"
@@ -109,6 +192,9 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
         kind = "fence_climb", key = key, object = object,
         startedAt = now, finishAt = now + FENCE_CLIMB_FINISH_MS,
         fromX = body:getX(), fromY = body:getY(),
+        fromSquare = fromSquare,
+        toSquare = toSquare,
+        fenceKey = fenceKey(object, passage),
         toX = toSquare:getX() + 0.5,
         toY = toSquare:getY() + 0.5,
         toZ = toSquare:getZ(),
@@ -229,6 +315,27 @@ local function tryNativePassage(
     if TraversalQuery.IsFence
         and TraversalQuery.IsFence(object) == true
     then
+        local key = fenceKey(object, passage)
+        if state.fenceRetryKey == key
+            and now < (tonumber(state.fenceRetryAt) or 0)
+        then
+            clearOwnedPath(body, state)
+            return true, "native_fence_retry_wait"
+        end
+        if state.fenceRetryKey == key then
+            state.fenceRetryKey = nil
+            state.fenceRetryAt = nil
+        end
+        if state.fenceCooldownKey == key
+            and now < (tonumber(state.fenceCooldownUntil) or 0)
+        then
+            clearOwnedPath(body, state)
+            return true, "native_fence_cooldown"
+        end
+        if state.fenceCooldownKey == key then
+            state.fenceCooldownKey = nil
+            state.fenceCooldownUntil = nil
+        end
         return startFenceClimb(snapshot, body, state, passage, object, now)
     end
     if TraversalQuery.IsDoor

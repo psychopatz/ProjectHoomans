@@ -26,6 +26,7 @@ local squares = {
     ["0:0"] = makeSquare(0, 0),
     ["1:0"] = makeSquare(1, 0),
     ["2:0"] = makeSquare(2, 0),
+    ["1:1"] = makeSquare(1, 1),
 }
 local cell = {
     getGridSquare = function(_, x, y)
@@ -95,6 +96,28 @@ canPlan, kind = PNC.TraversalQuery.CanPlanStep(
     0.5, 0.5, 0, 1.5, 0.5, 0, cell, {}, {}
 )
 assert(canPlan and kind == "fence_climb", "hoppable fence was not routable")
+assert(
+    PNC.TraversalQuery.GetFenceBetween(squares["0:0"], squares["1:1"]) == nil,
+    "diagonal fence lookup accepted a non-crossing edge"
+)
+local passageBody = {
+    getX = function() return 0.1 end,
+    getY = function() return 0.5 end,
+    getZ = function() return 0 end,
+}
+assert(
+    PNC.TraversalQuery.FindPassageToward(
+        passageBody, 2.5, 0.5, 0, cell
+    ) == nil,
+    "fence was selected before the body reached its edge"
+)
+passageBody.getX = function() return 0.5 end
+assert(
+    PNC.TraversalQuery.FindPassageToward(
+        passageBody, 2.5, 0.5, 0, cell
+    ) ~= nil,
+    "nearby fence edge was not selected"
+)
 
 local tallFenceProperties = {
     get = function(_, name)

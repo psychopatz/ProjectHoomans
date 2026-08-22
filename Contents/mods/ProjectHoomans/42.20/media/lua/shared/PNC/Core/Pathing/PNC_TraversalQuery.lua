@@ -54,6 +54,46 @@ local function listItem(list, index)
     return list:get(index)
 end
 
+local function cardinalDelta(fromSquare, toSquare)
+    local dx
+    local dy
+    if not fromSquare or not toSquare then
+        return nil, nil
+    end
+    if fromSquare:getZ() ~= toSquare:getZ() then
+        return nil, nil
+    end
+    dx = toSquare:getX() - fromSquare:getX()
+    dy = toSquare:getY() - fromSquare:getY()
+    if math.abs(dx) + math.abs(dy) ~= 1 then
+        return nil, nil
+    end
+    return dx, dy
+end
+
+local function goalCrossesEdge(fromSquare, toX, toY, goalX, goalY)
+    local fromX
+    local fromY
+    if not fromSquare then
+        return false
+    end
+    fromX = fromSquare:getX()
+    fromY = fromSquare:getY()
+    if toX ~= fromX then
+        return toX > fromX
+            and (tonumber(goalX) or fromX) >= fromX + 1
+            or toX < fromX
+                and (tonumber(goalX) or fromX) < fromX
+    end
+    if toY ~= fromY then
+        return toY > fromY
+            and (tonumber(goalY) or fromY) >= fromY + 1
+            or toY < fromY
+                and (tonumber(goalY) or fromY) < fromY
+    end
+    return false
+end
+
 local function getMaterializationObstacle(square)
     local objects
     local object
@@ -212,6 +252,75 @@ function TraversalQuery.GetPassageBetween(fromSquare, toSquare)
     return nil
 end
 
+function TraversalQuery.IsFenceApproachReady(
+    x,
+    y,
+    fromSquare,
+    toSquare,
+    dirX,
+    dirY
+)
+    local dx
+    local dy
+    local distanceToEdge
+    local edgeX
+    local edgeY
+    local length
+    if not fromSquare or not toSquare then
+        return false
+    end
+    dx, dy = cardinalDelta(fromSquare, toSquare)
+    if not dx then
+        return false
+    end
+    if math.floor(tonumber(x) or -math.huge) ~= fromSquare:getX()
+        or math.floor(tonumber(y) or -math.huge) ~= fromSquare:getY()
+    then
+        return false
+    end
+    edgeX = math.max(fromSquare:getX(), toSquare:getX())
+    edgeY = math.max(fromSquare:getY(), toSquare:getY())
+    if dx ~= 0 then
+        distanceToEdge = math.abs((tonumber(x) or 0) - edgeX)
+    else
+        distanceToEdge = math.abs((tonumber(y) or 0) - edgeY)
+    end
+    -- The Java fence state is entered from the current square and advances
+    -- over one adjacent edge. Do not select an edge while the actor is still
+    -- deep in that square; this is what caused distant/sideways false hops.
+    if distanceToEdge > 0.72 then
+        return false
+    end
+    if dirX ~= nil or dirY ~= nil then
+        length = math.sqrt(
+            (tonumber(dirX) or 0) * (tonumber(dirX) or 0)
+                + (tonumber(dirY) or 0) * (tonumber(dirY) or 0)
+        )
+        if length <= 0.001
+            or ((dx * (tonumber(dirX) or 0))
+                + (dy * (tonumber(dirY) or 0))) <= 0.05 * length
+        then
+            return false
+        end
+    end
+    return true
+end
+
+function TraversalQuery.IsFenceCrossed(x, y, z, fromSquare, toSquare)
+    local dx
+    local dy
+    if not fromSquare or not toSquare then
+        return false
+    end
+    dx, dy = cardinalDelta(fromSquare, toSquare)
+    if not dx then
+        return false
+    end
+    return math.floor(tonumber(x) or -math.huge) == toSquare:getX()
+        and math.floor(tonumber(y) or -math.huge) == toSquare:getY()
+        and math.floor(tonumber(z) or -math.huge) == toSquare:getZ()
+end
+
 function TraversalQuery.FindPassageToward(zombie, goalX, goalY, goalZ, cell)
     local fromSquare
     local nextSquare
@@ -225,6 +334,8 @@ function TraversalQuery.FindPassageToward(zombie, goalX, goalY, goalZ, cell)
     local stepY
     local candidates
     local candidate
+    local fence
+    local tall
     local i
     if not zombie then return nil end
     cell = cell or (getCell and getCell() or nil)
@@ -257,18 +368,50 @@ function TraversalQuery.FindPassageToward(zombie, goalX, goalY, goalZ, cell)
     end
     for i = 1, #candidates do
         candidate = candidates[i]
-        if candidate.enabled then
+        if candidate.enabled
+            and goalCrossesEdge(
+                fromSquare,
+                candidate.x,
+                candidate.y,
+                goalX,
+                goalY
+            )
+        then
             nextSquare = cell:getGridSquare(candidate.x, candidate.y, originZ)
             passage = TraversalQuery.GetPassageBetween(fromSquare, nextSquare)
             if not passage and TraversalQuery.GetFenceBetween then
-                passage = TraversalQuery.GetFenceBetween(
-                    fromSquare, nextSquare)
+                fence, tall = TraversalQuery.GetFenceBetween(
+                    fromSquare,
+                    nextSquare
+                )
+                if fence
+                    and TraversalQuery.IsFenceApproachReady
+                    and TraversalQuery.IsFenceApproachReady(
+                        originX,
+                        originY,
+                        fromSquare,
+                        nextSquare,
+                        dirX,
+                        dirY
+                    )
+                    and TraversalQuery.CanTraverseAt(
+                        nextSquare:getX() + 0.5,
+                        nextSquare:getY() + 0.5,
+                        nextSquare:getZ(),
+                        cell
+                    )
+                then
+                    passage = fence
+                end
             end
             if passage then
                 return {
                     object = passage,
+                    tall = tall == true,
                     fromSquare = fromSquare,
                     toSquare = nextSquare,
+                    dirX = dirX,
+                    dirY = dirY,
                 }
             end
         end
@@ -289,6 +432,13 @@ function TraversalQuery.GetFenceBetween(fromSquare, toSquare)
     local isTall
     local i
     if not fromSquare or not toSquare or fromSquare == toSquare then
+        return nil, false
+    end
+    -- IsoGridSquare.getHoppableTo() also has a diagonal convenience path,
+    -- but ClimbOverFenceState.isPlayerAbleToHopWallTo() explicitly requires
+    -- adjacent squares. Accepting the convenience path here selected fences
+    -- at corners and made the controller hop on a non-crossing edge.
+    if not cardinalDelta(fromSquare, toSquare) then
         return nil, false
     end
     object = callFirst(
@@ -347,6 +497,31 @@ function TraversalQuery.GetFenceBetween(fromSquare, toSquare)
         end
     end
     return nil, false
+end
+
+function TraversalQuery.GetFenceCrossing(fromSquare, toSquare, cell)
+    local fence
+    local tall
+    if not fromSquare or not toSquare then
+        return nil
+    end
+    fence, tall = TraversalQuery.GetFenceBetween(fromSquare, toSquare)
+    if not fence
+        or not TraversalQuery.CanTraverseAt(
+            toSquare:getX() + 0.5,
+            toSquare:getY() + 0.5,
+            toSquare:getZ(),
+            cell
+        )
+    then
+        return nil
+    end
+    return {
+        object = fence,
+        tall = tall == true,
+        fromSquare = fromSquare,
+        toSquare = toSquare,
+    }
 end
 
 function TraversalQuery.IsClosedPassage(object)
@@ -699,7 +874,15 @@ function TraversalQuery.FindFenceAhead(zombie, goalX, goalY, cell)
         }
     end
     for i = 1, #candidates do
-        if candidates[i].enabled ~= false then
+        if candidates[i].enabled ~= false
+            and goalCrossesEdge(
+                fromSquare,
+                candidates[i].x,
+                candidates[i].y,
+                goalX,
+                goalY
+            )
+        then
             nextSquare = cell:getGridSquare(candidates[i].x, candidates[i].y, originZ)
             fence, tall = TraversalQuery.GetFenceBetween(fromSquare, nextSquare)
             if fence then
@@ -711,6 +894,16 @@ function TraversalQuery.FindFenceAhead(zombie, goalX, goalY, cell)
         return nil
     end
     landingSquare = nextSquare
+    if not TraversalQuery.IsFenceApproachReady(
+        originX,
+        originY,
+        fromSquare,
+        landingSquare,
+        dirX,
+        dirY
+    ) then
+        return nil
+    end
     if not landingSquare or not TraversalQuery.CanTraverseAt(
         landingSquare:getX() + 0.5,
         landingSquare:getY() + 0.5,
@@ -723,6 +916,7 @@ function TraversalQuery.FindFenceAhead(zombie, goalX, goalY, cell)
         object = fence,
         tall = tall == true,
         square = fence.getSquare and fence:getSquare() or fromSquare,
+        fromSquare = fromSquare,
         dirX = dirX,
         dirY = dirY,
         landingSquare = landingSquare,

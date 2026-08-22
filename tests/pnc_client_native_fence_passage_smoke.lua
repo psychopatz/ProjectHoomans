@@ -6,6 +6,11 @@ T.addPackagePaths({
 })
 
 local fence = {}
+local fromSquare = {
+    getX = function() return 0 end,
+    getY = function() return 0 end,
+    getZ = function() return 0 end,
+}
 local toSquare = {
     getX = function() return 1 end,
     getY = function() return 0 end,
@@ -18,7 +23,13 @@ local leases = 0
 PNC = {
     TraversalQuery = {
         FindPassageToward = function()
-            return { object = fence, toSquare = toSquare }
+            return {
+                object = fence,
+                fromSquare = fromSquare,
+                toSquare = toSquare,
+                dirX = 2,
+                dirY = 0,
+            }
         end,
         IsFence = function(object)
             return object == fence, false
@@ -60,6 +71,8 @@ local body = {
     getX = function() return position.x end,
     getY = function() return position.y end,
     getZ = function() return position.z end,
+    getSquare = function() return math.floor(position.x) == 0
+        and fromSquare or toSquare end,
     setLx = function() end,
     setLy = function() end,
     faceThisObject = function() end,
@@ -91,5 +104,12 @@ T.equal(reason, "native_fence_crossed", "fence completion reason")
 T.equal(position.x, 1.5, "owned body reaches landing square")
 T.equal(state.passageAction, nil, "fence action clears after landing")
 T.truthy(leases >= 2, "movement ownership remains leased during crossing")
+
+handled, reason = Controller.TryNativePassage(
+    { id = "fence-npc" }, body, state,
+    { x = -3.5, y = 0.5, z = 0 }, 1950)
+T.truthy(handled, "same fence is held during the landing cooldown")
+T.equal(reason, "native_fence_cooldown", "same fence cooldown reason")
+T.equal(state.passageAction, nil, "cooldown did not start another climb")
 
 T.finish("pnc_client_native_fence_passage_smoke")

@@ -13,6 +13,7 @@ PathService.Internal = PathService.Internal or {}
 local Internal = PathService.Internal
 local Animation = PNC.Animation
 local LiveBodyControl = PNC.LiveBodyControl
+local TraversalQuery = PNC.TraversalQuery
 local TRAVERSAL_FINISHED_VARIABLE = "PNCTraversalFinished"
 local TRAVERSAL_KIND_VARIABLE = "PNCTraversalKind"
 
@@ -60,6 +61,30 @@ local function isTraversalFinished(zombie, action)
         return value == "true" or value == "1"
     end
     return false
+end
+
+local function isFenceCrossed(zombie, action)
+    local query = Internal.TraversalQuery
+        or TraversalQuery
+        or PNC.TraversalQuery
+    if not action or action.kind ~= "fence_climb" then
+        return true
+    end
+    if query and query.IsFenceCrossed then
+        return query.IsFenceCrossed(
+            zombie and zombie:getX() or nil,
+            zombie and zombie:getY() or nil,
+            zombie and zombie:getZ() or nil,
+            action.fromSquare,
+            action.toSquare
+        )
+    end
+    if not zombie or not action.toSquare then
+        return false
+    end
+    return math.floor(zombie:getX()) == action.toSquare:getX()
+        and math.floor(zombie:getY()) == action.toSquare:getY()
+        and math.floor(zombie:getZ()) == action.toSquare:getZ()
 end
 
 local function getActionStateName(zombie)
@@ -157,6 +182,8 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
         hardFinishAt = now + hardTimeoutMs,
         sawBumpState = false,
         obstacle = spec.obstacle,
+        fromSquare = spec.fromSquare,
+        toSquare = spec.toSquare,
         interactionApplied = false,
     }
     lane.specialMoveUntil = now + hardTimeoutMs
@@ -231,6 +258,7 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     local nextX
     local nextY
     local nextZ
+    local crossed
     if not action then
         return false, nil
     end
@@ -311,10 +339,16 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     end
     Internal.syncRecordPosition(record, zombie)
     lane.lastPhysicalMoveAt = now
+    crossed = isFenceCrossed(zombie, action)
+    if not crossed and not timedOut then
+        return true, action.kind .. "_same_side"
+    end
     if not finished and not timedOut then
         return true, action.kind .. "_finish"
     end
-    finishReason = finished and "anim_finished" or "hard_timeout"
+    finishReason = crossed
+        and (finished and "anim_finished" or "hard_timeout")
+        or "same_side"
     if finishReason == "hard_timeout" and Internal.logMoveWarning then
         Internal.logMoveWarning(record, zombie, lane, "traversal_hard_timeout", action.kind, "anim=" .. tostring(action.anim or "nil"))
     end
