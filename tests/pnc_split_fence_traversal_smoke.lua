@@ -79,6 +79,11 @@ PNC = {
 T.load(
     "ProjectHoomans",
     "shared",
+    "PNC/Core/Pathing/PNC_TraversalAction.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "shared",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_TraversalRuntime.lua"
 )
 
@@ -152,5 +157,55 @@ T.falsy(PNC.PathService.Internal.updateTraversalAction(
 T.equal(zombie.x, 1.5, "split fence did not land on the other side")
 T.falsy(lane.traversalAction, "split fence action was not cleared")
 T.truthy(finished, "split fence did not release its bump")
+
+-- Missing XML phase/finish events must still complete on the bounded
+-- profile deadline. This characterizes the fallback before phase policy is
+-- extracted from the scripted executor.
+finished = false
+zombie.variables = {}
+zombie.x = 0.5
+zombie.y = 0.5
+now = 3000
+T.truthy(PNC.PathService.Internal.beginTraversalAction(
+    zombie,
+    record,
+    lane,
+    {
+        kind = "fence_climb",
+        anim = "PNC_ClimbFence",
+        startAnim = "PNC_LegacyClimbFenceStart",
+        endAnim = "PNC_LegacyClimbFenceEnd",
+        upDurationMs = 420,
+        crossingDurationMs = 560,
+        finishHoldMs = 320,
+        fromX = 0.5,
+        fromY = 0.5,
+        fromZ = 0,
+        toX = 1.5,
+        toY = 0.5,
+        toZ = 0,
+        fromSquare = fromSquare,
+        toSquare = toSquare,
+        travelDurationMs = 600,
+    }
+), "timeout traversal did not start")
+now = 3420
+T.truthy(PNC.PathService.Internal.updateTraversalAction(
+    zombie, record, lane, now
+), "deadline did not enter the pending handoff")
+T.equal(lane.traversalAction.phase, "cross_pending",
+    "missing transfer event did not use the profile deadline")
+now = 3480
+T.truthy(PNC.PathService.Internal.updateTraversalAction(
+    zombie, record, lane, now
+), "timeout traversal did not enter crossing")
+now = 4300
+T.falsy(PNC.PathService.Internal.updateTraversalAction(
+    zombie, record, lane, now
+), "missing finish event pinned scripted traversal")
+T.equal(lane.lastTraversalFinishReason, "hard_timeout",
+    "scripted timeout completion reason")
+T.equal(zombie.x, 1.5, "timeout traversal did not reach its landing")
+T.truthy(finished, "timeout traversal did not release its bump")
 
 T.finish("pnc_split_fence_traversal_smoke")

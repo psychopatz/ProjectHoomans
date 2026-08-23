@@ -12,6 +12,7 @@ local Internal = Sync.Internal
 Internal.NativePathController =
     Internal.NativePathController or {}
 local Controller = Internal.NativePathController
+local TraversalAction = PNC.TraversalAction
 local TraversalQuery = PNC.TraversalQuery
 local TraversalProfiles = PNC.TraversalProfiles
 local PathInternal = PNC.PathService
@@ -33,8 +34,6 @@ local FENCE_CLIMB_CROSS_MS = 560
 local FENCE_TALL_CLIMB_FINISH_MS = 900
 local FENCE_RETRY_BACKOFF_MS = 900
 local FENCE_COOLDOWN_MS = 900
-local SPLIT_FENCE_TRANSITION_SETTLE_MS = 50
-
 local function objectBool(object, methodName)
     local method = object and object[methodName] or nil
     return type(method) == "function" and method(object) == true
@@ -128,28 +127,24 @@ local function updateWindowSmash(body, state, now)
         body:faceThisObject(action.object)
     end
     if action.kind == "fence_climb" then
-        local phase = tostring(action.phase or "single")
+        local phase
         local progress
-        local transferReady
-        if action.twoPhase == true and phase == "up" then
-            transferReady = traversalPhase(body) == "transfer"
-                or now >= (tonumber(action.upFinishAt) or now)
-            if transferReady then
-                -- Let the start clip's Idle transition settle before changing
-                -- BumpType. Doing both in one update can leave short fences
-                -- permanently in the bumped action state.
-                phase = "cross_pending"
-                action.phase = phase
-                action.crossPendingAt = now
-            end
-        end
-        if action.twoPhase == true and phase == "cross_pending"
-            and now >= (tonumber(action.crossPendingAt) or now)
-                + SPLIT_FENCE_TRANSITION_SETTLE_MS
-        then
-            phase = "cross"
-            action.phase = phase
-            action.crossingStartedAt = now
+        local phaseStartedAt
+        local crossPendingAt
+        local startedCrossing
+        phase,
+            progress,
+            phaseStartedAt,
+            crossPendingAt,
+            startedCrossing = TraversalAction.Evaluate(
+                action,
+                now,
+                traversalPhase(body)
+            )
+        action.phase = phase
+        action.crossPendingAt = crossPendingAt
+        if startedCrossing then
+            action.crossingStartedAt = phaseStartedAt
             if Animation and Animation.PlayBump then
                 Animation.PlayBump(
                     body,
@@ -164,27 +159,6 @@ local function updateWindowSmash(body, state, now)
             elseif body.setBumpType then
                 body:setBumpType(action.endAnim)
             end
-        end
-        if action.twoPhase == true and phase == "up" then
-            -- Bob_VaultOver_Start raises the body into the fence. Hold the
-            -- authored contact point until its transfer event, matching the
-            -- native ClimbOverFenceState boundary instead of sliding early.
-            progress = 0
-        elseif action.twoPhase == true and phase == "cross_pending" then
-            progress = 0
-        elseif action.twoPhase == true and phase == "cross" then
-            progress = math.max(0, math.min(1,
-                (now - (tonumber(action.crossingStartedAt) or now))
-                    / math.max(1, tonumber(action.crossingDurationMs)
-                        or FENCE_CLIMB_CROSS_MS)))
-        else
-            local duration = math.max(
-                1,
-                tonumber(action.travelDurationMs)
-                    or action.finishAt - action.startedAt
-            )
-            progress = math.max(0, math.min(1,
-                (now - action.startedAt) / duration))
         end
         local x = action.fromX + (action.toX - action.fromX) * progress
         local y = action.fromY + (action.toY - action.fromY) * progress

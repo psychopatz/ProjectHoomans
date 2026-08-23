@@ -13,12 +13,11 @@ PathService.Internal = PathService.Internal or {}
 local Internal = PathService.Internal
 local Animation = PNC.Animation
 local LiveBodyControl = PNC.LiveBodyControl
+local TraversalAction = PNC.TraversalAction
 local TraversalQuery = PNC.TraversalQuery
 local TRAVERSAL_FINISHED_VARIABLE = "PNCTraversalFinished"
 local TRAVERSAL_KIND_VARIABLE = "PNCTraversalKind"
 local TRAVERSAL_PHASE_VARIABLE = "PNCTraversalPhase"
-local SPLIT_FENCE_TRANSITION_SETTLE_MS = 50
-
 local function clamp01(value)
     return math.max(0, math.min(1, tonumber(value) or 0))
 end
@@ -154,10 +153,7 @@ end
 
 function Internal.beginTraversalAction(zombie, record, lane, spec)
     local now
-    local travelDurationMs
-    local finishHoldMs
     local hardTimeoutMs
-    local twoPhaseFence
     -- Native PathFindBehavior2 owns doors, windows, fences, and stairs in MP.
     -- This scripted interpolated traversal remains SP-only.
     if LiveBodyControl
@@ -182,57 +178,14 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
         )
     end
     now = Internal.Core.Now()
-    travelDurationMs = math.max(250, tonumber(spec.travelDurationMs) or 600)
-    finishHoldMs = math.max(120, tonumber(spec.finishHoldMs) or 320)
-    twoPhaseFence = spec.kind == "fence_climb"
-        and tostring(spec.startAnim or "") ~= ""
-        and tostring(spec.endAnim or "") ~= ""
-    if twoPhaseFence then
-        -- The low-fence animation is the same split start/end pair used by
-        -- ClimbOverFenceState. travelDurationMs is the crossing portion;
-        -- the start clip gets its own deadline and the hard timeout includes
-        -- a short landing grace window for a missing animation event.
-        travelDurationMs = math.max(
-            250,
-            tonumber(spec.crossingDurationMs) or travelDurationMs
-        )
-    end
-    -- Completion events are preferred, but a missing event must never pin an
-    -- NPC on the obstacle for several seconds.
-    hardTimeoutMs = travelDurationMs + math.min(finishHoldMs, 320)
-    if twoPhaseFence then
-        hardTimeoutMs = hardTimeoutMs + math.max(
-            250,
-            tonumber(spec.upDurationMs) or 420
-        )
-    end
-    lane.traversalAction = {
-        kind = tostring(spec.kind or "traversal"),
-        anim = tostring(spec.anim or "PNC_ClimbFence"),
-        startAnim = twoPhaseFence and tostring(spec.startAnim) or nil,
-        endAnim = twoPhaseFence and tostring(spec.endAnim) or nil,
-        twoPhase = twoPhaseFence,
-        phase = twoPhaseFence and "up" or "single",
-        phaseStartedAt = now,
-        upDurationMs = twoPhaseFence
-            and math.max(250, tonumber(spec.upDurationMs) or 700)
-            or 0,
-        finishHoldMs = finishHoldMs,
-        startX = tonumber(spec.fromX) or zombie:getX(),
-        startY = tonumber(spec.fromY) or zombie:getY(),
-        startZ = tonumber(spec.fromZ) or zombie:getZ(),
-        endX = tonumber(spec.toX) or zombie:getX(),
-        endY = tonumber(spec.toY) or zombie:getY(),
-        endZ = tonumber(spec.toZ) or zombie:getZ(),
-        startedAt = now,
-        travelDurationMs = travelDurationMs,
-        hardFinishAt = now + hardTimeoutMs,
-        sawBumpState = false,
-        obstacle = spec.obstacle,
-        fromSquare = spec.fromSquare,
-        toSquare = spec.toSquare,
-        interactionApplied = false,
-    }
+    lane.traversalAction = TraversalAction.Create(
+        spec,
+        now,
+        zombie:getX(),
+        zombie:getY(),
+        zombie:getZ()
+    )
+    hardTimeoutMs = lane.traversalAction.hardFinishAt - now
     lane.specialMoveUntil = now + hardTimeoutMs
     lane.specialAnim = lane.traversalAction.anim
     lane.ownerMode = lane.traversalAction.kind
@@ -290,13 +243,48 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
             lane.traversalAction.endZ,
             now,
             {
-                durationMs = travelDurationMs,
+                durationMs = lane.traversalAction.travelDurationMs,
                 kind = lane.traversalAction.kind,
                 profile = lane.motionProfile,
             }
         )
     end
     return true
+end
+
+local function advanceTraversalPhase(zombie, record, action, now)
+    local phase
+    local progress
+    local phaseStartedAt
+    local crossPendingAt
+    local startedCrossing
+    phase,
+        progress,
+        phaseStartedAt,
+        crossPendingAt,
+        startedCrossing = TraversalAction.Evaluate(
+            action,
+            now,
+            getTraversalPhase(zombie)
+        )
+    action.phase = phase
+    action.crossPendingAt = crossPendingAt
+    if not startedCrossing then return progress end
+    action.phaseStartedAt = phaseStartedAt
+    if Animation and Animation.PlayBump then
+        Animation.PlayBump(
+            zombie,
+            record,
+            action.endAnim,
+            {
+                keepManagedUseless = true,
+                leaseUntil = action.hardFinishAt,
+            }
+        )
+    elseif zombie.setBumpType then
+        zombie:setBumpType(action.endAnim)
+    end
+    return progress
 end
 
 function Internal.updateTraversalAction(zombie, record, lane, now)
@@ -311,9 +299,6 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     local nextY
     local nextZ
     local crossed
-    local phase
-    local phaseProgress
-    local transferReady
     if not action then
         return false, nil
     end
@@ -342,67 +327,7 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     if zombie.setTarget then
         zombie:setTarget(nil)
     end
-    phase = tostring(action.phase or "single")
-    if action.twoPhase == true and phase == "up" then
-        phaseProgress = clamp01(
-            (now - (tonumber(action.phaseStartedAt) or now))
-                / math.max(1, tonumber(action.upDurationMs) or 1)
-        )
-        -- The animation event is authoritative when available. The deadline
-        -- is deliberately also accepted so a missing XML event cannot leave
-        -- the NPC holding the fence forever. Do not switch clips in the same
-        -- update: the start node transitions through Idle, and setBumpType()
-        -- called in that transition frame can leave the short-fence handoff
-        -- stuck in the bumped state.
-        transferReady = getTraversalPhase(zombie) == "transfer"
-            or phaseProgress >= 1
-        if transferReady
-        then
-            action.phase = "cross_pending"
-            action.crossPendingAt = now
-            phase = "cross_pending"
-        else
-            progress = 0
-        end
-    end
-    if action.twoPhase == true and phase == "cross_pending" then
-        progress = 0
-        if now >= (tonumber(action.crossPendingAt) or now)
-            + SPLIT_FENCE_TRANSITION_SETTLE_MS
-        then
-            action.phase = "cross"
-            action.phaseStartedAt = now
-            phase = "cross"
-            if Animation and Animation.PlayBump then
-                Animation.PlayBump(
-                    zombie,
-                    record,
-                    action.endAnim,
-                    {
-                        keepManagedUseless = true,
-                        leaseUntil = action.hardFinishAt,
-                    }
-                )
-            elseif zombie.setBumpType then
-                zombie:setBumpType(action.endAnim)
-            end
-        end
-    end
-    if phase == "cross" then
-        progress = clamp01(
-            (now - (tonumber(action.phaseStartedAt) or now))
-                / math.max(1, tonumber(action.travelDurationMs) or 1)
-        )
-    elseif phase == "cross_pending" then
-        progress = 0
-    elseif phase == "up" then
-        progress = 0
-    else
-        progress = clamp01(
-            (now - (tonumber(action.startedAt) or now))
-                / math.max(1, tonumber(action.travelDurationMs) or 1)
-        )
-    end
+    progress = advanceTraversalPhase(zombie, record, action, now)
     eased = easeInOut(progress)
     nextX = (tonumber(action.startX) or zombie:getX()) + (((tonumber(action.endX) or zombie:getX()) - (tonumber(action.startX) or zombie:getX())) * eased)
     nextY = (tonumber(action.startY) or zombie:getY()) + (((tonumber(action.endY) or zombie:getY()) - (tonumber(action.startY) or zombie:getY())) * eased)

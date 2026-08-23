@@ -41,6 +41,7 @@ local pathServiceCalls = capture(
     ROOT .. "shared/PNC/Core/Pathing/PNC_PathService.lua"
 )
 local expectedPathServiceCalls = {
+    "PNC/Core/Pathing/PNC_TraversalAction",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Context",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Facing",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Logging",

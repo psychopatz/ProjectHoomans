@@ -19,6 +19,7 @@ local toSquare = {
 local position = { x = 0.5, y = 0.5, z = 0 }
 local bumpType
 local leases = 0
+local suppressPosition = false
 
 PNC = {
     TraversalQuery = {
@@ -45,6 +46,7 @@ PNC = {
     },
     LiveBodyControl = {
         SetAuthoritativePosition = function(_, x, y, z)
+            if suppressPosition then return true end
             position.x, position.y, position.z = x, y, z
             return true
         end,
@@ -78,6 +80,8 @@ local body = {
     faceThisObject = function() end,
 }
 
+T.load("ProjectHoomans", "shared",
+    "PNC/Core/Pathing/PNC_TraversalAction.lua")
 T.load("ProjectHoomans", "client",
     "PNC/PresenceSync/ClientNativePathController/"
         .. "PNC_ClientNativePathController_Passage.lua")
@@ -129,5 +133,25 @@ handled, reason = Controller.TryNativePassage(
 T.truthy(handled, "same fence is held during the landing cooldown")
 T.equal(reason, "native_fence_cooldown", "same fence cooldown reason")
 T.equal(state.passageAction, nil, "cooldown did not start another climb")
+
+-- Characterize the current same-side/server-correction behavior separately
+-- from the phase extraction. The native executor keeps its movement lease
+-- when the body has not crossed, even after the nominal finish deadline.
+position.x, position.y, position.z = 0.5, 0.5, 0
+suppressPosition = true
+state = {}
+handled, reason = Controller.TryNativePassage(
+    { id = "fence-corrected" }, body, state,
+    { x = 3.5, y = 0.5, z = 0 }, 3000)
+T.truthy(handled, "corrected fence traversal did not start")
+Controller.UpdateWindowSmash(body, state, 3700)
+Controller.UpdateWindowSmash(body, state, 3760)
+handled, reason = Controller.UpdateWindowSmash(body, state, 4600)
+T.truthy(handled, "same-side traversal stopped being handled")
+T.equal(reason, "native_fence_climb", "same-side lease behavior changed")
+T.truthy(state.passageAction ~= nil,
+    "same-side action unexpectedly cleared after its finish deadline")
+T.equal(state.fenceRetryAt, nil,
+    "same-side traversal unexpectedly installed retry backoff")
 
 T.finish("pnc_client_native_fence_passage_smoke")

@@ -8,6 +8,7 @@ PNC.ClientPresenceSync = PNC.ClientPresenceSync or {}
 PNC.ClientPresenceSync.Internal =
     PNC.ClientPresenceSync.Internal or {}
 
+require "PNC/Core/Pathing/PNC_TraversalAction"
 require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Constants"
 require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_State"
 require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Goal"

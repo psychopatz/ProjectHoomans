@@ -76,6 +76,8 @@ PNC = {
     },
 }
 
+T.load("ProjectHoomans", "shared",
+    "PNC/Core/Pathing/PNC_TraversalAction.lua")
 T.load(FILE)
 
 local lane = {}

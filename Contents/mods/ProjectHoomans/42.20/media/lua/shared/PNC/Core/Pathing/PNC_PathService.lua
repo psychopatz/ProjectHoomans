@@ -11,6 +11,7 @@ PNC.PathService = PNC.PathService or {}
 local PathService = PNC.PathService
 PathService.Internal = PathService.Internal or {}
 
+require "PNC/Core/Pathing/PNC_TraversalAction"
 require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Context"
 require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Facing"
 require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Logging"
