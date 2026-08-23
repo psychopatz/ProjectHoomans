@@ -1,0 +1,218 @@
+local Network = PNC.Network
+local Internal = Network.Internal
+local Core = PNC.Core
+local Const = PNC.Const
+
+function Network.SendDebugRoster(targetPlayer, diagnostics, authorized, audit)
+    local payload = {
+        authorized = authorized == true,
+        diagnostics = diagnostics or {},
+        audit = audit or {},
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_DEBUG_ROSTER, payload)
+    elseif not isServer or not isServer() then
+        triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_DEBUG_ROSTER, payload)
+    end
+end
+
+function Network.SendRelationshipDebug(
+    targetPlayer,
+    snapshot,
+    authorized,
+    reason
+)
+    local payload = {
+        authorized = authorized == true,
+        snapshot = authorized == true and snapshot or nil,
+        reason = reason,
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(
+            targetPlayer,
+            Const.MODULE,
+            Const.CMD_RELATIONSHIP_DEBUG,
+            payload
+        )
+    elseif not isServer or not isServer() then
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_RELATIONSHIP_DEBUG,
+            payload
+        )
+    end
+end
+
+function Network.SendConversationRelationship(targetPlayer, summary, reason)
+    local payload = {
+        summary = summary,
+        reason = reason,
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(
+            targetPlayer,
+            Const.MODULE,
+            Const.CMD_CONVERSATION_RELATIONSHIP,
+            payload
+        )
+    elseif not isServer or not isServer() then
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_CONVERSATION_RELATIONSHIP,
+            payload
+        )
+    end
+end
+
+function Network.SendNPCKnowledge(targetPlayer, snapshot, reason)
+    local payload = { snapshot = snapshot, reason = reason, serverTime = Core.Now() }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_NPC_KNOWLEDGE, payload)
+    elseif not isServer or not isServer() then
+        triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_NPC_KNOWLEDGE, payload)
+    end
+end
+
+function Internal.SendIdentityPayload(targetPlayer, command, payload)
+    payload = payload or {}
+    payload.serverTime = Core.Now()
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(targetPlayer, Const.MODULE, command, payload)
+    elseif not isServer or not isServer() then
+        triggerEvent("OnServerCommand", Const.MODULE, command, payload)
+    end
+end
+
+function Network.SendPlayerBootstrap(targetPlayer, payload)
+    Internal.SendIdentityPayload(targetPlayer, Const.CMD_PLAYER_BOOTSTRAP, payload)
+end
+
+function Network.SendNPCPresentation(targetPlayer, payload)
+    Internal.SendIdentityPayload(targetPlayer, Const.CMD_NPC_PRESENTATION, payload)
+end
+
+function Network.SendKnowledgeDisclosure(targetPlayer, payload)
+    Internal.SendIdentityPayload(targetPlayer, Const.CMD_KNOWLEDGE_DISCLOSURE, payload)
+end
+
+function Network.SendKnowledgeDebug(targetPlayer, snapshot, authorized, reason)
+    local payload = { authorized = authorized == true, snapshot = authorized == true and snapshot or nil, reason = reason, serverTime = Core.Now() }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_KNOWLEDGE_DEBUG, payload)
+    elseif not isServer or not isServer() then
+        triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_KNOWLEDGE_DEBUG, payload)
+    end
+end
+
+function Network.SendFactionDebug(
+    targetPlayer,
+    snapshot,
+    authorized,
+    reason
+)
+    local payload = {
+        authorized = authorized == true,
+        snapshot = authorized == true and snapshot or nil,
+        reason = reason,
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(
+            targetPlayer,
+            Const.MODULE,
+            Const.CMD_FACTION_DEBUG,
+            payload
+        )
+    elseif not isServer or not isServer() then
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_FACTION_DEBUG,
+            payload
+        )
+    end
+end
+
+function Network.SendFactionMembers(
+    targetPlayer,
+    snapshot,
+    reason
+)
+    local payload = {
+        snapshot = snapshot,
+        reason = reason,
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(
+            targetPlayer,
+            Const.MODULE,
+            Const.CMD_FACTION_MEMBERS,
+            payload
+        )
+    elseif not isServer or not isServer() then
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_FACTION_MEMBERS,
+            payload
+        )
+    end
+end
+
+function Network.SendCommunityDebug(
+    targetPlayer,
+    snapshot,
+    authorized,
+    reason
+)
+    local payload = {
+        authorized = authorized == true,
+        snapshot = authorized == true and snapshot or nil,
+        reason = reason,
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(
+            targetPlayer,
+            Const.MODULE,
+            Const.CMD_COMMUNITY_DEBUG,
+            payload
+        )
+    elseif not isServer or not isServer() then
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_COMMUNITY_DEBUG,
+            payload
+        )
+    end
+end
+
+function Network.SendNeedsDebug(targetPlayer, snapshot, authorized, reason)
+    local payload = { authorized = authorized == true, snapshot = authorized == true and snapshot or nil,
+        reason = reason, serverTime = Core.Now() }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_NEEDS_DEBUG, payload)
+    elseif not isServer or not isServer() then
+        triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_NEEDS_DEBUG, payload)
+    end
+end
+
+function Network.SendDirectorDebug(targetPlayer, snapshot, authorized, reason)
+    local payload = { authorized = authorized == true,
+        snapshot = authorized == true and snapshot or nil,
+        reason = reason, serverTime = Core.Now() }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(targetPlayer, Const.MODULE,
+            Const.CMD_DIRECTOR_DEBUG, payload)
+    elseif not isServer or not isServer() then
+        triggerEvent("OnServerCommand", Const.MODULE,
+            Const.CMD_DIRECTOR_DEBUG, payload)
+    end
+end

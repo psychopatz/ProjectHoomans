@@ -1,0 +1,76 @@
+local T = require "tests/support/test"
+
+local source = T.read(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Settlement/PNC_FacilityDefinitions.lua"
+)
+local prefix = "PNC/Core/Settlement/PNC_FacilityDefinitions/"
+local providers = {
+    "PNC_FacilityDefinitions_Core",
+    "PNC_FacilityDefinitions_Stockpile",
+    "PNC_FacilityDefinitions_Barracks",
+    "PNC_FacilityDefinitions_Farm",
+    "PNC_FacilityDefinitions_CommonRooms",
+    "PNC_FacilityDefinitions_Workstations",
+    "PNC_FacilityDefinitions_Water",
+}
+local publicFunctions = {
+    "GetComponentIconPath",
+    "Register",
+    "Get",
+    "GetLevel",
+    "GetComponentCosts",
+    "GetComponentBuildWork",
+    "RequiresComponentConstruction",
+    "GetComponentLimit",
+}
+local facilityIDs = {
+    "stockpile",
+    "barracks",
+    "farm",
+    "living_room",
+    "dining_room",
+    "hospital",
+    "research_facility",
+    "workshop",
+    "water_collector",
+}
+
+local previous = 0
+local i
+for i = 1, #providers do
+    local provider = providers[i]
+    local needle = 'require "' .. prefix .. provider .. '"'
+    local position = assert(source:find(needle, 1, true), needle)
+    T.truthy(position > previous, provider .. " load order")
+    previous = position
+end
+
+PNC = {}
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Settlement/PNC_FacilityDefinitions.lua"
+)
+T.equal(PNC.FacilityDefinitions.SCHEMA_VERSION, 1, "schema version")
+for i = 1, #publicFunctions do
+    local functionName = publicFunctions[i]
+    T.equal(
+        type(PNC.FacilityDefinitions[functionName]),
+        "function",
+        "entry point should preserve FacilityDefinitions." .. functionName
+    )
+end
+for i = 1, #facilityIDs do
+    local facilityID = facilityIDs[i]
+    T.truthy(
+        PNC.FacilityDefinitions.Get(facilityID),
+        "entry point should register " .. facilityID
+    )
+end
+for i = 1, #providers do
+    package.loaded[prefix .. providers[i]] = nil
+end
+
+T.finish("pnc_facility_definitions_presence_boundary_smoke")

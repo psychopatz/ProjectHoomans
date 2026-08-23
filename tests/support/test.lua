@@ -18,6 +18,7 @@ local roots = {
     ProjectHoomansCommon = repository .. "/Contents/mods/ProjectHoomans/common/media/",
     PsychopatzCore = coreRepository .. "/Contents/mods/PsychopatzCore/",
 }
+local defaultPackagePathsAdded = false
 
 local function cleanRelative(path)
     path = tostring(path or "")
@@ -72,6 +73,7 @@ function Test.path(mod, layer, relative)
 end
 
 function Test.addPackagePaths(specifications)
+    local usingDefaults = specifications == nil
     specifications = specifications or {
         { "ProjectHoomans", "shared" },
         { "ProjectHoomans", "server" },
@@ -87,10 +89,16 @@ function Test.addPackagePaths(specifications)
     end
     paths[#paths + 1] = package.path
     package.path = table.concat(paths, ";")
+    if usingDefaults then
+        defaultPackagePathsAdded = true
+    end
     return package.path
 end
 
 function Test.load(mod, layer, relative)
+    if not defaultPackagePathsAdded then
+        Test.addPackagePaths()
+    end
     if relative == nil then
         return dofile(mod)
     end

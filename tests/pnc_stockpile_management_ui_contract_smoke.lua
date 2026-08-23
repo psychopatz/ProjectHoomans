@@ -15,7 +15,8 @@ local storageSurface = T.read("ProjectHoomans", "client",
 local context = T.read("ProjectHoomans", "client",
     "PNC/UI/Context/PNC_StockpileAccessContext.lua")
 local definitions = T.read("ProjectHoomans", "shared",
-    "PNC/Core/Settlement/PNC_FacilityDefinitions.lua")
+    "PNC/Core/Settlement/PNC_FacilityDefinitions/"
+    .. "PNC_FacilityDefinitions_Core.lua")
 
 T.falsy(string.find(tabs, 'id = "storage"', 1, true),
     "colony management no longer registers a storage tab")

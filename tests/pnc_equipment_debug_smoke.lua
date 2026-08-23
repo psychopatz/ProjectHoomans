@@ -4,6 +4,11 @@ local ROOT =
     T.path("ProjectHoomans", "root", "")
 
 local api = T.read(ROOT .. "shared/PNC/Core/API/PNC_API.lua")
+    .. T.read(
+        "ProjectHoomans",
+        "shared",
+        "PNC/Core/API/PNC_API/DebugCommands.lua"
+    )
 local serverRoute = T.read(
     ROOT .. "server/PNC/Networking/Handlers/"
         .. "PNC_ServerLegacyDebugCommandHandler.lua"
@@ -25,7 +30,7 @@ T.contains(
 )
 T.contains(
     api,
-    "Inventory.SyncFromEquipment(record, \"debug_equipment_slot\")",
+    "syncAndApplyEquipment(record, \"debug_equipment_slot\")",
     "inventory/equipment reconciliation"
 )
 T.contains(
@@ -53,6 +58,4 @@ T.contains(
     "equipment = Core.DeepCopy(record.equipment or {})",
     "equipment diagnostics snapshot"
 )
-T.finish("pnc_equipment_debug_smoke")
-
 T.finish("pnc_equipment_debug_smoke")

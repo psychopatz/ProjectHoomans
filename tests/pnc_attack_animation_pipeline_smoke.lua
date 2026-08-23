@@ -2,6 +2,8 @@ local T = require "tests/support/test"
 
 local ANIMATION =
     T.path("ProjectHoomans", "shared", "PNC/Core/Visuals/PNC_Animation.lua")
+local ANIMATION_PROVIDERS =
+    T.path("ProjectHoomans", "shared", "PNC/Core/Visuals/PNC_Animation/")
 local CLIENT_ATTACK =
     T.path("ProjectHoomans", "client", "PNC/PresenceSync/")
     .. "PresenceVisuals/PNC_ClientPresenceVisuals_Attack.lua"
@@ -21,7 +23,13 @@ local ATTACK_VARIANT_XML =
 local SHOVE_VARIANT_XML =
     T.path("ProjectHoomans", "common", "AnimSets/zombie/bumped/PNC_ShoveBat.xml")
 
+local bumpPlayback = T.read(
+    ANIMATION_PROVIDERS .. "PNC_Animation_BumpPlayback.lua"
+)
 local animation = T.read(ANIMATION)
+    .. T.read(ANIMATION_PROVIDERS .. "PNC_Animation_BumpState.lua")
+    .. bumpPlayback
+    .. T.read(ANIMATION_PROVIDERS .. "PNC_Animation_BumpLifecycle.lua")
 local clientSync = T.read(CLIENT_ATTACK) .. T.read(CLIENT_MOTION)
 local pathMotion = T.read(PATH_MOTION) .. T.read(PATH_MOTION_PUMP)
 local attackXML = T.read(ATTACK_XML)
@@ -47,10 +55,12 @@ local firearms = T.read(
     T.path("ProjectHoomans", "shared", "PNC/Core/Combat/")
         .. "PNC_Combat_Firearms.lua"
 )
-local playBump = T.truthy(string.match(
-    animation,
-    "function Animation%.PlayBump.-\nend\n\nfunction Animation%.FinishBump"
-))
+T.contains(
+    bumpPlayback,
+    "function Animation.PlayBump",
+    "bump playback provider"
+)
+local playBump = bumpPlayback
 
 T.contains(
     playBump,

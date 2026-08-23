@@ -97,6 +97,11 @@ local mutationSource = T.read(
     "ProjectHoomans", "shared",
     "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Mutations.lua"
 )
+mutationSource = mutationSource .. T.read(
+    "ProjectHoomans", "shared",
+    "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Mutations/"
+    .. "PNC_Inventory_Mutations_Delta.lua"
+)
 T.equal(mutationSource:find("PNC.ProvisionScheduler", 1, true), nil,
     "Inventory must not depend directly on Provision")
 if not mutationSource:find(

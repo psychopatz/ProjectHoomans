@@ -23,6 +23,9 @@ local CLIENT_VISUALS =
 local ANIMATION =
     T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Visuals/PNC_Animation.lua"
+local ANIMATION_PROVIDERS =
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
+    .. "Visuals/PNC_Animation/"
 local PATH_CONTEXT =
     T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_PathService/Context/"
@@ -580,7 +583,11 @@ T.truthy(string.find(
     ),
     "native replica visuals have no exclusive path-owner gate")
 
-local animationSource = T.read(ANIMATION)
+local animationSource = T.read(
+    ANIMATION_PROVIDERS .. "PNC_Animation_NativeLocomotion.lua"
+) .. T.read(
+    ANIMATION_PROVIDERS .. "PNC_Animation_LiveSetup.lua"
+)
 local nativeStyleStart = T.truthy(string.find(
     animationSource,
     "function Animation.SyncNativeLocomotionStyle",

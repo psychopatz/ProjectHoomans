@@ -4,6 +4,10 @@ local ROOT =
     T.path("ProjectHoomans", "root", "")
 local api = T.read(
     ROOT .. "shared/PNC/Core/API/PNC_API.lua"
+) .. T.read(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/API/PNC_API/DebugCommands.lua"
 )
 local serverRoute = T.read(
     ROOT .. "server/PNC/Networking/Handlers/"
@@ -48,6 +52,4 @@ T.truthy(string.find(
     1,
     true
 ), "scene lab is not driven by the live registry")
-T.finish("pnc_animation_scene_debug_routes_smoke")
-
 T.finish("pnc_animation_scene_debug_routes_smoke")
