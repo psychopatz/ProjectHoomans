@@ -210,3 +210,114 @@ an in-game SP/MP traversal session.
   existing Pathing call cycles remain follow-up work. No in-game SP/MP smoke
   session was available in this pass.
 
+## Completed work — passage interaction boundaries
+
+**Completion date:** 2026-08-23
+
+This pass completed T-02. The stable
+`Internal.tryDoorOrWindowInteraction()` entry point now coordinates small
+door, window, breach, fence, object-adapter, and policy providers instead of
+containing all passage behavior in one 480-line function.
+
+### Files changed
+
+Production files under
+`shared/PNC/Core/Pathing/PNC_PathService/`:
+
+- `PNC_PathService_Interactions.lua` — stable public entry point, context and
+  candidate construction, and provider load order.
+- `PNC_PathService_PassagePolicy.lua` — suppression, direction, collision,
+  distance, and rejection policy.
+- `PNC_PathService_PassageObjects.lua` — door/window engine object adapters.
+- `PNC_PathService_PassageDoors.lua` — blocked-door and candidate-door flows.
+- `PNC_PathService_PassageWindowBreach.lua` — open/smash decisions.
+- `PNC_PathService_PassageWindows.lua` — candidate-window and climb flows.
+- `PNC_PathService_PassageFences.lua` — fence resolution, rejection, action
+  construction, and action tracking.
+
+Tests:
+
+- `tests/pnc_fence_interaction_smoke.lua` — characterizes blocked low-fence
+  action construction, tracking, and the exact 500 ms suppression boundary.
+- `tests/pnc_door_interaction_smoke.lua` — loads provider modules through the
+  normal shared package path while retaining its existing door assertions.
+
+### Behavior and compatibility preserved
+
+- `Internal.tryDoorOrWindowInteraction`, `Internal.rememberSpecialAction`,
+  `Internal.shouldSuppressSpecialAction`, `Internal.isDoorCollision`, and the
+  existing object adapters retain their names and contracts.
+- The PathService hub still loads only `PNC_PathService_Interactions`; that
+  entry file owns the provider order, so external load order is unchanged.
+- Door opening and hold state, window open/smash/climb behavior, low-fence
+  action specs, rejection reasons, logging, timestamps, and suppression
+  boundaries are preserved by focused and full-suite tests.
+- No save format, network payload, or unrelated production subsystem changed.
+
+### Before/after architecture metrics
+
+| Metric | Before | After |
+|---|---:|---:|
+| Whole-project production findings | 128 | 127 |
+| Targeted `LARGE_FUNCTION` findings | 1 | 0 |
+| `tryDoorOrWindowInteraction` span | 480 lines | 41 lines |
+| `tryDoorOrWindowInteraction` cyclomatic complexity | 50 | 9 |
+| `tryDoorOrWindowInteraction` cognitive complexity | 233 | 23 |
+| Introduced architecture findings | 0 | 0 |
+| Pathing call cycles | 2 | 2 |
+| Graph coverage gaps in changed files | 0 recorded | 0 recorded |
+
+The existing `NavigationRouter` and `EnginePathPlanner` cycles were outside
+this slice and remain unchanged.
+
+### Before/after token metrics
+
+Measured with local `tiktoken 0.14.0` and `o200k_base`:
+
+| Metric | Before | After | Delta |
+|---|---:|---:|---:|
+| Largest interaction-family file | 7,139 | 1,770 | -5,369 (-75.2%) |
+| Interaction-family files above 2,000 tokens | 1 | 0 | -1 |
+| Stable interaction entry file | 7,139 | 1,406 | -5,733 (-80.3%) |
+| Total interaction-family code | 7,139 | 8,836 | +1,697 (+23.8%) |
+
+The total grew because the providers now have explicit interfaces, module
+guards, and locally named dependencies. That is an intentional context-size
+tradeoff rather than a claim of less total code: every interaction provider
+now fits independently below the 2,000-token limit.
+
+### Tests and validation
+
+```text
+python3 tests/run_tests.py pnc_fence_interaction_smoke \
+  pnc_door_interaction_smoke pnc_native_path_stall_smoke \
+  pnc_traversal_route_edges_smoke pnc_window_break_traversal_smoke \
+  pnc_split_fence_traversal_smoke
+PASS 6/6
+
+python3 tests/run_tests.py
+PASS 241/241
+
+pz_verify --dir shared/PNC/Core/Pathing/PNC_PathService \
+  --kahlua --severity ERROR --no-snippets
+13 files, 0 errors, 0 warnings
+```
+
+The refreshed `project-hoomans` graph generation is
+`2026-08-23T11:35:39Z`. It records the wrapper's production and test callers,
+35 reachable callees within two hops, and no coverage issue in any changed
+production/test file. This is best-effort static evidence and does not replace
+an in-game SP/MP traversal session.
+
+### Remaining risks and recommended next refactor
+
+- Passage interactions no longer exceed the 2,000-token limit. The remaining
+  oversized PathService files are `PNC_PathService_Motion.lua` (9,333),
+  `PNC_PathService_Context.lua` (5,839), `PNC_PathService_Lane.lua` (5,820),
+  and `PNC_PathService_TraversalRuntime.lua` (3,132).
+- `PNC_PathService_Motion.lua` is the next recommended Pathing slice because
+  it contains both the 357-line `updateActiveMove` flow and the 478-line
+  `PathService.Pump` orchestration entry point. Characterize scheduler and
+  stalled-move outcomes before splitting its movement progression from pump
+  orchestration.
+- No in-game SP/MP smoke session was available in this pass.
