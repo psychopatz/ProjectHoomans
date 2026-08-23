@@ -25,10 +25,15 @@ local ANIMATION =
     .. "Visuals/PNC_Animation.lua"
 local PATH_CONTEXT =
     T.path("ProjectHoomans", "shared", "PNC/Core/")
-    .. "Pathing/PNC_PathService/PNC_PathService_Context.lua"
+    .. "Pathing/PNC_PathService/Context/"
+    .. "PNC_PathService_Context_Animation.lua"
 local TRAVERSAL_RUNTIME =
     T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_PathService/PNC_PathService_TraversalRuntime.lua"
+local TRAVERSAL_PROGRESS =
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
+    .. "Pathing/PNC_PathService/TraversalRuntime/"
+    .. "PNC_PathService_TraversalRuntime_Progress.lua"
 
 local useless = true
 local clientNow = 1000
@@ -614,16 +619,9 @@ local walkAnimStart = T.truthy(string.find(
     1,
     true
 ))
-local resetControllerStart = T.truthy(string.find(
-    pathContextSource,
-    "function Internal.resetPathController",
-    walkAnimStart,
-    true
-))
 local walkAnimSource = string.sub(
     pathContextSource,
-    walkAnimStart,
-    resetControllerStart - 1
+    walkAnimStart
 )
 local nativeGateAt = T.truthy(string.find(
     walkAnimSource,
@@ -641,6 +639,7 @@ T.truthy(nativeGateAt < fakeApplyAt,
     "engine-path locomotion reaches fake Animation.Apply before its gate")
 
 local traversalSource = T.read(TRAVERSAL_RUNTIME)
+    .. T.read(TRAVERSAL_PROGRESS)
 T.truthy(string.find(
         traversalSource,
         "native_mp_owner",
@@ -648,6 +647,4 @@ T.truthy(string.find(
         true
     ),
     "scripted setX/setY traversal has no multiplayer ownership gate")
-T.finish("pnc_mp_replica_transport_smoke")
-
 T.finish("pnc_mp_replica_transport_smoke")

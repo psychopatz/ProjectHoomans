@@ -1,5 +1,9 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({
+    { "ProjectHoomans", "shared" },
+})
+
 local FILE =
     T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_PathService/PNC_PathService_TraversalRuntime.lua"

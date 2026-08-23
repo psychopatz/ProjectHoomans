@@ -7,12 +7,12 @@ PNC = PNC or {}
 PNC.PathService = PNC.PathService or {}
 PNC.PathService.Internal = PNC.PathService.Internal or {}
 
-require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_PassagePolicy"
-require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_PassageObjects"
-require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_PassageDoors"
-require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_PassageWindowBreach"
-require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_PassageWindows"
-require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_PassageFences"
+require "PNC/Core/Pathing/PNC_PathService/Interactions/PNC_PathService_PassagePolicy"
+require "PNC/Core/Pathing/PNC_PathService/Interactions/PNC_PathService_PassageObjects"
+require "PNC/Core/Pathing/PNC_PathService/Interactions/PNC_PathService_PassageDoors"
+require "PNC/Core/Pathing/PNC_PathService/Interactions/PNC_PathService_PassageWindowBreach"
+require "PNC/Core/Pathing/PNC_PathService/Interactions/PNC_PathService_PassageWindows"
+require "PNC/Core/Pathing/PNC_PathService/Interactions/PNC_PathService_PassageFences"
 
 local Internal = PNC.PathService.Internal
 local TraversalQuery = PNC.TraversalQuery

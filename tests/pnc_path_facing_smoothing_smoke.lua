@@ -1,5 +1,7 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({ { "ProjectHoomans", "shared" } })
+
 local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/"
 
@@ -70,6 +72,4 @@ T.truthy(PNC.PathService.Internal.isRepeatedTraversalAttempt(
     99,
     1200
 ), "moving goal allowed an immediate reverse fence crossing")
-T.finish("pnc_path_facing_smoothing_smoke")
-
 T.finish("pnc_path_facing_smoothing_smoke")

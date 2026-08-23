@@ -1,5 +1,7 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({ { "ProjectHoomans", "shared" } })
+
 local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local warnings = {}

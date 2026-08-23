@@ -1,5 +1,7 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({ { "ProjectHoomans", "shared" } })
+
 local LIVE_BODY =
     T.path("ProjectHoomans", "shared", "PNC/Core/Pathing/")
     .. "PNC_LiveBodyControl.lua"

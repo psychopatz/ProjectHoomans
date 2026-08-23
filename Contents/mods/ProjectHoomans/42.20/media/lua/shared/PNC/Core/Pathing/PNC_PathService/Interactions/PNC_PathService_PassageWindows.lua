@@ -1,4 +1,4 @@
--- Window open, smash, and climb execution.
+-- Interaction provider: window open, smash, and climb execution.
 
 PNC = PNC or {}
 PNC.PathService = PNC.PathService or {}

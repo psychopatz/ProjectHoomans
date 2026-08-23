@@ -1,4 +1,4 @@
--- Fence probing and traversal-action creation.
+-- Interaction provider: fence probing and traversal-action creation.
 
 PNC = PNC or {}
 PNC.PathService = PNC.PathService or {}

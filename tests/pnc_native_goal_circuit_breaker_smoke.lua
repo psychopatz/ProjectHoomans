@@ -1,5 +1,7 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({ { "ProjectHoomans", "shared" } })
+
 local FILE =
     T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_PathService/PNC_PathService_Lane.lua"
@@ -36,6 +38,4 @@ T.truthy(not Internal.isNativeGoalBlocked(
     "meaningfully changed goal remained suppressed")
 T.truthy(lane.nativeFailureCount == 0,
     "changed goal did not reset native failure history")
-T.finish("pnc_native_goal_circuit_breaker_smoke")
-
 T.finish("pnc_native_goal_circuit_breaker_smoke")

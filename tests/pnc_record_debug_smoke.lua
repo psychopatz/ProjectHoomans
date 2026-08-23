@@ -1,5 +1,7 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({ { "ProjectHoomans", "shared" } })
+
 local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
 local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
 
@@ -145,6 +147,4 @@ PNC.ContextHub.BuildWorldContext(0, menu, {}, false)
 T.contains(menu.options[1].name, "[REC]", "recorded context indicator")
 T.contains(menu.options[1].name, "[Foreman]", "recorded NPC exposes debug metadata")
 T.equal(menu.options[2].name, "Dario Hanna", "unrecorded NPC remains uncluttered")
-T.finish("pnc_record_debug_smoke")
-
 T.finish("pnc_record_debug_smoke")

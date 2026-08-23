@@ -1,5 +1,7 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({ { "ProjectHoomans", "shared" } })
+
 local FILE =
     T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Visuals/PNC_AnimationScenes.lua"
@@ -344,6 +346,4 @@ T.truthy(holdAnimationCalls == 0,
     "path hold overwrote the active construction scene with Idle")
 T.truthy(holdMotionClears == 1,
     "path hold did not clear stale movement presentation for work")
-T.finish("pnc_animation_scenes_smoke")
-
 T.finish("pnc_animation_scenes_smoke")

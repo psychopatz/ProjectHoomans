@@ -1,5 +1,7 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({ { "ProjectHoomans", "shared" } })
+
 local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/"
 
@@ -161,6 +163,4 @@ T.truthy(
     canPlan and kind == "fence_climb_tall",
     "pair-based tall hoppable fence was not routable"
 )
-T.finish("pnc_traversal_route_edges_smoke")
-
 T.finish("pnc_traversal_route_edges_smoke")

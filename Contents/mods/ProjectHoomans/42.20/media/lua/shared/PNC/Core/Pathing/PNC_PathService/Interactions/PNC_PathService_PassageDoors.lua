@@ -1,4 +1,4 @@
--- Door-specific passage execution.
+-- Interaction provider: door-specific passage execution.
 
 PNC = PNC or {}
 PNC.PathService = PNC.PathService or {}
@@ -144,4 +144,3 @@ function Internal.tryDoorPassageCandidate(context, object, candidate)
     )
     return nil, nil, false
 end
-

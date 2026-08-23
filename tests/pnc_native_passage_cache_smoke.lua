@@ -1,5 +1,7 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({ { "ProjectHoomans", "shared" } })
+
 local fenceVisible = false
 local forward = {
     getX = function() return 1 end,

@@ -1,16 +1,34 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({ { "ProjectHoomans", "shared" } })
+
 local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_EnginePathPlanner.lua"
+local PLANNER_ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
+    .. "Pathing/PNC_EnginePathPlanner/"
 local CONTEXT_FILE =
     T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_EnginePathPlanner_Context.lua"
+local CONTEXT_ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
+    .. "Pathing/PNC_EnginePathPlanner_Context/"
 local MOTION_FILE =
     T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_PathService/PNC_PathService_Motion.lua"
+local MOTION_PUMP_FILE =
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
+    .. "Pathing/PNC_PathService/Motion/PNC_PathService_MotionPump.lua"
+local MOTION_NATIVE_FILE =
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
+    .. "Pathing/PNC_PathService/Motion/PNC_PathService_MotionNative.lua"
+local MOTION_NATIVE_PROGRESS_FILE =
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
+    .. "Pathing/PNC_PathService/Motion/PNC_PathService_MotionNativeProgress.lua"
 local BODY_CONTROL_FILE =
     T.path("ProjectHoomans", "shared", "PNC/Core/")
     .. "Pathing/PNC_LiveBodyControl.lua"
+local BODY_CONTROL_EVENTS_FILE =
+    T.path("ProjectHoomans", "shared", "PNC/Core/")
+    .. "Pathing/PNC_LiveBodyControl/PNC_LiveBodyControl_Events.lua"
 local SERVER_FILE =
     T.path("ProjectHoomans", "server", "PNC/")
     .. "PNC_Server.lua"
@@ -238,7 +256,7 @@ PNC.TraversalQuery = {
     end,
 }
 PNC.PathService = {
-    Pump = function()
+    AdvanceScriptedPassage = function()
         preHandoffCount = preHandoffCount + 1
         return true, "fence_climb"
     end,
@@ -434,7 +452,22 @@ PNC.EnginePathPlanner.GetSteeringTarget(
 T.truthy(requestCount == requestsBeforeCloseAdjustment + 1,
     "sub-tile adjustment did not stay on native movement")
 
-local plannerSource = T.read(FILE) .. T.read(CONTEXT_FILE)
+local plannerSource = T.read(FILE)
+    .. T.read(CONTEXT_FILE)
+    .. T.read(CONTEXT_ROOT .. "PNC_EnginePathPlanner_Context_State.lua")
+    .. T.read(CONTEXT_ROOT .. "PNC_EnginePathPlanner_Context_Passage.lua")
+    .. T.read(CONTEXT_ROOT .. "PNC_EnginePathPlanner_Context_NativeState.lua")
+    .. T.read(CONTEXT_ROOT .. "PNC_EnginePathPlanner_Context_AuthorityLease.lua")
+    .. T.read(CONTEXT_ROOT .. "PNC_EnginePathPlanner_Context_RequestCleanup.lua")
+    .. T.read(CONTEXT_ROOT .. "PNC_EnginePathPlanner_Context_RoutePolicy.lua")
+    .. T.read(PLANNER_ROOT .. "PNC_EnginePathPlanner_Passage.lua")
+    .. T.read(PLANNER_ROOT .. "PNC_EnginePathPlanner_Request.lua")
+    .. T.read(PLANNER_ROOT .. "PNC_EnginePathPlanner_Steering.lua")
+    .. T.read(PLANNER_ROOT .. "PNC_EnginePathPlanner_PumpTraversal.lua")
+    .. T.read(PLANNER_ROOT .. "PNC_EnginePathPlanner_PumpProgress.lua")
+    .. T.read(PLANNER_ROOT .. "PNC_EnginePathPlanner_Pump.lua")
+    .. T.read(PLANNER_ROOT .. "PNC_EnginePathPlanner_Frames.lua")
+    .. T.read(PLANNER_ROOT .. "PNC_EnginePathPlanner_Lifecycle.lua")
 T.truthy(not string.find(plannerSource, "pcall", 1, true),
     "native planner must not hide path errors with pcall")
 T.truthy(not string.find(plannerSource, "getClassField", 1, true),
@@ -448,22 +481,22 @@ T.truthy(not string.find(plannerSource, "path:size", 1, true)
     "native planner calls opaque zombie.pathfind.Path userdata")
 T.truthy(string.find(plannerSource, "behavior:update(", 1, true),
     "single-player planner does not use Bandits PathFindBehavior2 Move")
+local pumpSource = T.read(MOTION_PUMP_FILE)
+local nativeSource = T.read(MOTION_NATIVE_FILE)
+local nativeProgressSource = T.read(MOTION_NATIVE_PROGRESS_FILE)
 local motionSource = T.read(MOTION_FILE)
+    .. pumpSource .. nativeSource .. nativeProgressSource
 T.truthy(string.find(motionSource, "combat_attack_lease", 1, true),
     "combat attack lease does not cancel native movement")
-local pumpSource = T.truthy(string.match(
-    motionSource,
-    "function PathService%.Pump.-\nend\n\nfunction PathService%.AdvanceAbstract"
-))
 local nativePumpAt = T.truthy(string.find(
     pumpSource,
-    "enginePlanner.Pump",
+    "Internal.updateNativeMove",
     1,
     true
 ))
 local scriptedPassageAt = T.truthy(string.find(
     pumpSource,
-    "scriptedPassageOwner",
+    "ownsScriptedPassage",
     1,
     true
 ))
@@ -479,11 +512,14 @@ T.truthy(nativePumpAt < fakePumpAt,
     "ordinary fake locomotion runs before native path ownership")
 T.truthy(string.find(pumpSource, "engine_path_waiting", 1, true),
     "deferred native lane can still fall through to fake locomotion")
-T.truthy(string.find(pumpSource, "Internal.MotionHints.Remember", 1, true),
+T.truthy(string.find(nativeProgressSource,
+        "Internal.MotionHints.Remember", 1, true),
     "native movement does not publish interpolation hints")
-T.truthy(string.find(pumpSource, "Internal.refreshResolvedLocomotion", 1, true),
+T.truthy(string.find(nativeSource,
+        "Internal.refreshResolvedLocomotion", 1, true),
     "native movement does not refresh locomotion animation")
 local bodyControlSource = T.read(BODY_CONTROL_FILE)
+    .. T.read(BODY_CONTROL_EVENTS_FILE)
 T.truthy(string.find(
         bodyControlSource,
         "PNC.EnginePathPlanner.PumpFrame(record, zombie)",
@@ -514,7 +550,7 @@ T.truthy(updateCount == updatesBeforeFrame + 1,
     "zombie frame did not advance PathFindBehavior2 exactly once")
 local collisionHandoffCount = 0
 PNC.PathService = {
-    Pump = function()
+    AdvanceScriptedPassage = function()
         collisionHandoffCount = collisionHandoffCount + 1
         return true, "fence_climb"
     end,

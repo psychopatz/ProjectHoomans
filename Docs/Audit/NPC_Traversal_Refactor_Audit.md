@@ -112,6 +112,11 @@ This is the clearest “spaghetti” point in the current traversal slice. Sugge
 
 ### T-03 — `TraversalQuery` mixes read-only queries with route policy
 
+**Completed 2026-08-23.** The original flat entry path now explicitly loads
+seven providers under `shared/PNC/Core/Pathing/TraversalQuery/`; all 24 public
+query functions remain on `PNC.TraversalQuery`, and every family file is below
+2,000 exact `o200k_base` tokens.
+
 `PNC_TraversalQuery.lua` contains object classification, passage/fence lookup, occupancy checks, step validation, door/window usability, fence approach readiness, fence discovery, and action-kind selection. The high fan-in of `CanStep()` makes it a shared contract: changing its return semantics has impact outside traversal.
 
 Split by stable responsibility, not by arbitrary line count. Preserve the existing exported methods first, then delegate them to smaller internal modules. This keeps combat, following, zombie aggro, and fake locomotion from breaking during the migration.
@@ -123,6 +128,12 @@ Split by stable responsibility, not by arbitrary line count. Preserve the existi
 Do not split this file before T-01. First establish one traversal-action contract; then extract movement stages around that contract. Otherwise the same state transition will move between files while remaining duplicated.
 
 ### T-05 — Mutable ownership crosses too many boundaries
+
+**Context ownership update, 2026-08-23.** The stable
+`PNC_PathService_Context.lua` entry now loads seven providers under
+`PNC_PathService/Context/`. Position recovery, traversal memory, body reset,
+goal policy, and animation presentation are explicit boundaries; all existing
+`PathService.Internal` contracts remain compatible.
 
 `beginTraversalAction()` invalidates the engine planner, writes lane state, clears target/path state, changes body control flags, resets engine traversal variables, applies facing, starts animation, and records motion hints. This is valid behaviorally, but it makes ownership implicit and makes partial failure hard to reason about.
 

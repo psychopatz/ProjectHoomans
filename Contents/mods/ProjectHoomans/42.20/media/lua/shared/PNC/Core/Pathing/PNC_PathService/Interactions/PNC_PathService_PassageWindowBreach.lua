@@ -1,4 +1,4 @@
--- Window opening and smash-action handoff.
+-- Interaction provider: window opening and smash-action handoff.
 
 PNC = PNC or {}
 PNC.PathService = PNC.PathService or {}
@@ -85,4 +85,3 @@ function Internal.tryWindowBreach(context, object, objectSquare, objectKey)
     )
     return true, "window_smash", true
 end
-

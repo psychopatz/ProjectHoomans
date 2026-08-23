@@ -1,4 +1,4 @@
--- Project Zomboid door/window mutation adapters.
+-- Interaction provider: Project Zomboid door/window mutation adapters.
 
 PNC = PNC or {}
 PNC.PathService = PNC.PathService or {}
@@ -125,4 +125,3 @@ function Internal.smashWindowForNPC(zombie, object)
     if square and square.RecalcProperties then square:RecalcProperties() end
     return true
 end
-

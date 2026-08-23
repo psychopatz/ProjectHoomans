@@ -1,4 +1,4 @@
--- Shared probing geometry and special-action suppression policy.
+-- Interaction provider: shared probing geometry and special-action suppression policy.
 
 PNC = PNC or {}
 PNC.PathService = PNC.PathService or {}
@@ -120,4 +120,3 @@ function Internal.isDoorCollision(zombie)
         { "isCollidedThisFrame", "isCollided" }
     )
 end
-

@@ -11,6 +11,9 @@ local CLIENT_MOTION =
 local PATH_MOTION =
     T.path("ProjectHoomans", "shared", "PNC/Core/Pathing/")
     .. "PNC_PathService/PNC_PathService_Motion.lua"
+local PATH_MOTION_PUMP =
+    T.path("ProjectHoomans", "shared", "PNC/Core/Pathing/")
+    .. "PNC_PathService/Motion/PNC_PathService_MotionPump.lua"
 local ATTACK_XML =
     T.path("ProjectHoomans", "common", "AnimSets/zombie/bumped/PNC_Attack1H1.xml")
 local ATTACK_VARIANT_XML =
@@ -20,7 +23,7 @@ local SHOVE_VARIANT_XML =
 
 local animation = T.read(ANIMATION)
 local clientSync = T.read(CLIENT_ATTACK) .. T.read(CLIENT_MOTION)
-local pathMotion = T.read(PATH_MOTION)
+local pathMotion = T.read(PATH_MOTION) .. T.read(PATH_MOTION_PUMP)
 local attackXML = T.read(ATTACK_XML)
 local attackVariantXML = T.read(ATTACK_VARIANT_XML)
 local shoveVariantXML = T.read(SHOVE_VARIANT_XML)
@@ -196,16 +199,13 @@ T.truthy(
 )
 T.contains(
     pathMotion,
-    "if Internal.hasActiveAttack(record, now, zombie) then",
+    "holdAttackLease(record, zombie, lane, now)",
     "path service attack animation lease"
 )
-local pathPump = T.truthy(string.match(
-    pathMotion,
-    "function PathService%.Pump.-\nend\n\nfunction PathService%.AdvanceAbstract"
-))
+local pathPump = T.read(PATH_MOTION_PUMP)
 local actionLockAt = T.truthy(string.find(
     pathPump,
-    "Internal.hasActiveAttack(record, now, zombie)",
+    "holdAttackLease(record, zombie, lane, now)",
     1,
     true
 ))

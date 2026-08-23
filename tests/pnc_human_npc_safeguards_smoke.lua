@@ -1,5 +1,7 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({ { "ProjectHoomans", "shared" } })
+
 local LIVE_BODY_FILE = T.path("ProjectHoomans", "shared", "PNC/Core/Pathing/PNC_LiveBodyControl.lua")
 local CLIENT_FILE = T.path("ProjectHoomans", "client", "PNC/PNC_ClientHumanNPCSafeguards.lua")
 local SLEEP_PATCH_FILE = T.path("ProjectHoomans", "client", "PNC/Patches/PNC_HumanNPCSleepPatch.lua")
