@@ -297,6 +297,16 @@ local function builderFor(order)
     return nil
 end
 
+local function playerNumberFor(builder)
+    if builder and type(builder.getPlayerNum) == "function" then
+        local ok, playerNumber = pcall(builder.getPlayerNum, builder)
+        if ok and playerNumber ~= nil then
+            return tonumber(playerNumber) or 0
+        end
+    end
+    return 0
+end
+
 local function fakeRecipeData(builder, descriptor)
     local recorded = ArrayList and ArrayList.new and ArrayList.new() or nil
     local seen = {}
@@ -360,6 +370,13 @@ local function place(order)
     local ok, cursor = pcall(ISBuildIsoEntity.new, ISBuildIsoEntity,
         builder, info, blueprint.nSprite or 1, nil, logic)
     if not ok or not cursor then return false, "BUILD_CURSOR_CREATE_FAILED" end
+    -- ISBuildIsoEntity uses character on the server and player on the client
+    -- when calculating the completed object's health. Keep both contexts
+    -- valid because this completion path can cross the vanilla boundary.
+    cursor.character = builder
+    if cursor.player == nil or cursor.player == false then
+        cursor.player = playerNumberFor(builder)
+    end
     cursor.modData = {}
     cursor.updateModData = function() end
     cursor.blockBuild = false
@@ -375,10 +392,59 @@ local function place(order)
     return true
 end
 
+local function awardBuildXP(order, descriptor)
+    local payload = order.payload or {}
+    local awards = descriptor and descriptor.xpAwards or {}
+    local awarded = payload.xpAwarded or {}
+    local record
+
+    if payload.xpGranted == true then return true end
+    if #awards == 0 then
+        payload.xpAwarded = awarded
+        payload.xpGranted = true
+        Repository.MarkDirty()
+        return true
+    end
+
+    record = order.workerId and PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(order.workerId) or nil
+    if not record or not PNC.Skills
+        or type(PNC.Skills.AddXP) ~= "function"
+    then
+        return false, "BUILD_XP_WORKER_UNAVAILABLE"
+    end
+
+    for index, award in ipairs(awards) do
+        local key = tostring(index)
+        if awarded[key] ~= true then
+            local ok = PNC.Skills.AddXP(record, award.skillId,
+                tonumber(award.amount) or 0)
+            if ok ~= true then
+                return false, "BUILD_XP_NOT_APPLIED"
+            end
+            -- Persist each entry separately so a retry after a partial
+            -- failure cannot award an earlier recipe entry twice.
+            awarded[key] = true
+            payload.xpAwarded = awarded
+            Repository.MarkDirty()
+        end
+    end
+
+    payload.xpGranted = true
+    Repository.MarkDirty()
+    return true
+end
+
 local function complete(order)
     local placed, reason = place(order)
     if not placed then return false, reason end
-    return PNC.WorkInputService.Commit(order, "building_material_consumption")
+    local committed
+    committed, reason = PNC.WorkInputService.Commit(order,
+        "building_material_consumption")
+    if not committed then return false, reason end
+    local blueprint = blueprintFor(order)
+    local descriptor = Catalog.Get(blueprint and blueprint.objectInfoName)
+    return awardBuildXP(order, descriptor)
 end
 
 local function refund(order)

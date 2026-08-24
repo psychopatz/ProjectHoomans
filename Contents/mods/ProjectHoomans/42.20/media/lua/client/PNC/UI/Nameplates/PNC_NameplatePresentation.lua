@@ -204,6 +204,10 @@ function Presentation.WorkActionStatus(snapshot)
     elseif operation == "DECONSTRUCT" then
         verb, target = tr("UI_PNC_Action_Deconstructing", "Deconstructing"),
             facilityName(info)
+    elseif operation == "BUILD_OBJECT" then
+        verb = tr("UI_PNC_Action_Building", "Building")
+        target = tostring(info.buildDisplayName or info.objectInfoName
+            or tr("UI_PNC_Action_BuildObjectTarget", "object"))
     elseif operation == "CRAFT" then
         verb, target = tr("UI_PNC_Action_Crafting", "Crafting"), recipeTarget(info)
     elseif operation == "DISASSEMBLE" then

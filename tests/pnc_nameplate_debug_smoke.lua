@@ -186,6 +186,13 @@ local actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
 T.contains(actionText, "Building", "work action verb")
 T.contains(actionText, "barracks", "work action target")
 T.contains(actionText, "10%", "work action progress")
+snapshot.actionInformation = { kind = "work_order",
+    operation = "BUILD_OBJECT", status = "WORKING", percent = 57,
+    objectInfoName = "crafted_04_116", buildDisplayName = "Log Fence" }
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+T.contains(actionText, "Building", "object build action verb")
+T.contains(actionText, "Log Fence", "object build action target")
+T.contains(actionText, "57%", "object build action progress")
 snapshot.actionInformation = { kind = "return_home", percent = 35 }
 actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
 T.contains(actionText, "Returning Home", "home travel action")

@@ -20,6 +20,40 @@ local function resolveMoveIntent()
     return PNC.BehaviorMoveIntent
 end
 
+local function closeEnough(left, right, tolerance)
+    left, right = tonumber(left), tonumber(right)
+    return left ~= nil and right ~= nil
+        and math.abs(left - right) <= (tonumber(tolerance) or 0.2)
+end
+
+local function sameMoveTarget(record, x, y, z, mode, stopDistance)
+    local intent = record and record.runtime
+        and record.runtime.moveIntent or nil
+    if not intent or intent.kind ~= "move" then return false end
+    return closeEnough(intent.finalX or intent.x, x)
+        and closeEnough(intent.finalY or intent.y, y)
+        and closeEnough(intent.finalZ or intent.z, z, 0.05)
+        and tostring(intent.mode or "walk") == tostring(mode or "walk")
+        and closeEnough(intent.stopDistance or 0.7, stopDistance or 0.7,
+            0.05)
+end
+
+local function shouldInterruptScene(record, x, y, z, mode, stopDistance)
+    local runtime = record and record.runtime or nil
+    local scene = runtime and runtime.animationScene or nil
+    local intent = runtime and runtime.moveIntent or nil
+    if not scene then return false end
+    if not sameMoveTarget(record, x, y, z, mode, stopDistance) then
+        return true
+    end
+    -- A scene started after the last identical movement intent (for example a
+    -- combat/action bump) still needs one interruption. Once that transition
+    -- has happened, repeated movement ticks must not reset the scene again.
+    return tonumber(scene.startedAt) ~= nil
+        and tonumber(intent and intent.updatedAt) ~= nil
+        and tonumber(scene.startedAt) > tonumber(intent.updatedAt)
+end
+
 function Common.SetCombatDebug(record, target, reason, modeResolved, weaponStatus)
     record.runtime = record.runtime or {}
     record.runtime.targetKind = target and target.kind or "none"
@@ -88,7 +122,9 @@ function Common.MoveRecord(
     local intentNavigation = navigationOptions
     local moveIntent
     if record.presenceState == Const.PRESENCE_LIVE then
-        if PNC.AnimationScenes
+        if shouldInterruptScene(record, finalX, finalY, finalZ, mode,
+            stopDistance)
+            and PNC.AnimationScenes
             and PNC.AnimationScenes.Interrupt
         then
             PNC.AnimationScenes.Interrupt(

@@ -544,7 +544,15 @@ local function complete(order)
     end
     order.completionStarted = true
     Repository.MarkDirty()
-    local ok, reason = handler(order)
+    local callOk, ok, reason = pcall(handler, order)
+    if not callOk then
+        order.completionError = tostring(ok)
+        ok, reason = false, "COMPLETION_EXCEPTION"
+        if PNC.Core and PNC.Core.LogWarn then
+            PNC.Core.LogWarn("work completion exception order="
+                .. tostring(order.id) .. " error=" .. tostring(order.completionError))
+        end
+    end
     if ok ~= true then
         if order.cancellationRequested == true then
             releaseClaim(order, order.cancellationReason or "cancelled", true)
@@ -557,6 +565,7 @@ local function complete(order)
         end
         order.status, order.blockedReason = Status.BLOCKED,
             tostring(reason or "COMPLETION_FAILED")
+        order.completionStarted = nil
         Repository.MarkDirty(); return false, order.blockedReason
     end
     order.completionCommitted = true
@@ -884,6 +893,14 @@ function Service.BuildActionInformation(record)
     local progress = math.max(0, math.min(required,
         tonumber(order.progress) or 0))
     local payload = order.payload or {}
+    local blueprint = payload.blueprint or {}
+    local buildDescriptor
+    if order.operation == "BUILD_OBJECT" and PNC.BuildRecipeCatalog
+        and PNC.BuildRecipeCatalog.Get
+    then
+        buildDescriptor = PNC.BuildRecipeCatalog.Get(
+            blueprint.objectInfoName)
+    end
     local facilityId = payload.facilityId
     local facility = facilityId and PNC.SettlementRepository
         and PNC.SettlementRepository.GetFacility(facilityId) or nil
@@ -902,6 +919,9 @@ function Service.BuildActionInformation(record)
         quantity = order.quantity,
         technologyId = payload.technologyId,
         specimenFullType = payload.specimenFullType,
+        objectInfoName = blueprint.objectInfoName,
+        buildDisplayName = buildDescriptor and buildDescriptor.displayName
+            or blueprint.objectInfoName,
     }
 end
 

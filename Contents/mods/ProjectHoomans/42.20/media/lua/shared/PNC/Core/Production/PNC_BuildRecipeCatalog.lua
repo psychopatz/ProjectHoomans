@@ -9,6 +9,7 @@ Catalog.ByObject = Catalog.ByObject or {}
 Catalog.Order = Catalog.Order or {}
 Catalog.Generation = tonumber(Catalog.Generation) or 0
 Catalog.Queries = Catalog.Queries or {}
+Catalog.Initialized = Catalog.Initialized == true
 
 local function call(object, method, ...)
     if not object or type(object[method]) ~= "function" then return nil end
@@ -87,6 +88,23 @@ local function normalizeSkills(recipe)
     return output
 end
 
+local function normalizeXPAwards(recipe)
+    local output = {}
+    local count = tonumber(call(recipe, "getXPAwardCount")) or 0
+    for index = 0, count - 1 do
+        local award = call(recipe, "getXPAward", index)
+        local id = skillId(call(award, "getPerk"))
+        local amount = tonumber(call(award, "getAmount"))
+        if id and amount and amount > 0 then
+            output[#output + 1] = {
+                skillId = id,
+                amount = amount,
+            }
+        end
+    end
+    return output
+end
+
 local function objectInfos()
     if not SpriteConfigManager
         or type(SpriteConfigManager.GetObjectInfoList) ~= "function"
@@ -117,13 +135,17 @@ local function descriptor(info)
         iconName = iconName and tostring(iconName) or nil,
         buildWork = math.max(1, tonumber(call(recipe, "getTime")) or 100),
         requiredSkills = normalizeSkills(recipe),
+        xpAwards = normalizeXPAwards(recipe),
         requirements = normalizeRequirements(recipe),
         nativeObjectInfo = info,
         nativeRecipe = recipe,
     }
 end
 
-function Catalog.Build()
+function Catalog.Build(force)
+    if Catalog.Initialized and force ~= true then
+        return Catalog.Queries.List()
+    end
     local byObject, order = {}, {}
     for _, info in ipairs(objectInfos()) do
         local row = descriptor(info)
@@ -141,12 +163,17 @@ function Catalog.Build()
     end)
     Catalog.ByObject, Catalog.Order = byObject, order
     Catalog.Generation = Catalog.Generation + 1
+    Catalog.Initialized = true
     return Catalog.Queries.List()
+end
+
+function Catalog.Invalidate()
+    Catalog.Initialized = false
 end
 
 function Catalog.Get(objectInfoName)
     objectInfoName = tostring(objectInfoName or "")
-    if not Catalog.ByObject[objectInfoName] then Catalog.Build() end
+    if not Catalog.Initialized then Catalog.Build() end
     return Catalog.ByObject[objectInfoName]
 end
 
@@ -167,6 +194,9 @@ function Catalog.Queries.List()
                 requiredSkills = PNC.Core and PNC.Core.DeepCopy
                     and PNC.Core.DeepCopy(descriptorValue.requiredSkills)
                     or descriptorValue.requiredSkills,
+                xpAwards = PNC.Core and PNC.Core.DeepCopy
+                    and PNC.Core.DeepCopy(descriptorValue.xpAwards)
+                    or descriptorValue.xpAwards,
                 requirements = PNC.Core and PNC.Core.DeepCopy
                     and PNC.Core.DeepCopy(descriptorValue.requirements)
                     or descriptorValue.requirements,
