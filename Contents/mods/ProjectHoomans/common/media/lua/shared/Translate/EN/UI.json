@@ -357,7 +357,7 @@
     "UI_PNC_Settings_ShowFactionDebug": "Show NPC faction overlay",
     "UI_PNC_Settings_ShowPathDebug": "Show NPC path overlay",
     "UI_PNC_Settings_Title": "Project Hoomans",
-    "UI_PNC_Spawn": "PNC Spawn",
+    "UI_PNC_Spawn": "[Debug] Spawn Hoomans",
     "UI_PNC_SpawnCompanion": "Companion",
     "UI_PNC_SpawnEquipmentBoth": "Melee + Ranged Weapons",
     "UI_PNC_SpawnEquipmentChances": "Sandbox Equipment Chances",

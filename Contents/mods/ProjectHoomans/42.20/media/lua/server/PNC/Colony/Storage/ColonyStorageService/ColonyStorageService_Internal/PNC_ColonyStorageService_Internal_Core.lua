@@ -103,12 +103,13 @@ function Internal.LogTransaction(player, args, action, ok, reason, storage,
 end
 
 function Internal.DebugAllowed(player)
-    local access = player and player.getAccessLevel
-        and tostring(player:getAccessLevel() or "") or ""
-    if string.lower(access) == "admin" then return true end
-    if isServer and isServer() then return false end
-    if isDebugEnabled then return isDebugEnabled() == true end
-    return getCore and getCore() and getCore():getDebug() == true or false
+    local coreDebug = PsychopatzCore and PsychopatzCore.Debug
+    if not coreDebug or type(coreDebug.CanUse) ~= "function" then
+        local ok, loaded = pcall(require, "PsychopatzCore/Debug/PsychopatzDebug")
+        if ok then coreDebug = loaded end
+    end
+    return coreDebug and coreDebug.CanUse
+        and coreDebug.CanUse(player) == true or false
 end
 
 function Internal.RememberRequest(player, requestID)

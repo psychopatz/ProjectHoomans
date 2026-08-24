@@ -80,13 +80,13 @@ function Discovery.RadioScan(player, channelID, frequency)
 end
 
 function Discovery.CanUseDebug(player)
-    if not isServer or not isServer() then
-        return isDebugEnabled and isDebugEnabled() == true
-            or getCore and getCore() and getCore():getDebug() == true
+    local coreDebug = PsychopatzCore and PsychopatzCore.Debug
+    if not coreDebug or type(coreDebug.CanUse) ~= "function" then
+        local ok, loaded = pcall(require, "PsychopatzCore/Debug/PsychopatzDebug")
+        if ok then coreDebug = loaded end
     end
-    local access = player and player.getAccessLevel
-        and tostring(player:getAccessLevel() or "") or ""
-    return string.lower(access) == "admin"
+    return coreDebug and coreDebug.CanUse
+        and coreDebug.CanUse(player) == true or false
 end
 
 function Discovery.HandleAction(player, args)

@@ -42,7 +42,7 @@ local square = {
     getZ = function() return 0 end,
 }
 local root = PNC.DebugSpawnMenu.Add(context, square)
-T.equal(context.options[1].name, "PNC Spawn", "spawn root")
+T.equal(context.options[1].name, "[Debug] Spawn Hoomans", "spawn root")
 T.equal(#root.options, 3, "faction submenu count")
 T.equal(root.options[1].name, "Companion", "companion submenu")
 T.equal(root.options[2].name, "Neutral", "neutral submenu")

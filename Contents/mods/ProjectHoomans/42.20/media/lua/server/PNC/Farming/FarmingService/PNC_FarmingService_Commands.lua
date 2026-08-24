@@ -42,10 +42,13 @@ function Service.SetPolicy(player, args)
 end
 
 local function debugAllowed(player)
-    local service = PNC.ColonyStorageService
-    local internal = service and service.Internal
-    return internal and internal.DebugAllowed
-        and internal.DebugAllowed(player) == true
+    local coreDebug = PsychopatzCore and PsychopatzCore.Debug
+    if not coreDebug or type(coreDebug.CanUse) ~= "function" then
+        local ok, loaded = pcall(require, "PsychopatzCore/Debug/PsychopatzDebug")
+        if ok then coreDebug = loaded end
+    end
+    return coreDebug and coreDebug.CanUse
+        and coreDebug.CanUse(player) == true or false
 end
 
 function Service.DebugPlot(player, args)

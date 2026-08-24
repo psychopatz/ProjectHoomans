@@ -8,7 +8,7 @@ end
 if PNC and PNC.ConversationDebugUI and PNC.ConversationDebugUI.Text then
     PsychopatzCore.DebugHub.RegisterTool({
         id = "pnc.conversations",
-        source = "ProjectHoomans",
+        source = "Project Hoomans",
         order = 205,
         title = PNC.ConversationDebugUI.Text("hub.title"),
         description = PNC.ConversationDebugUI.Text("hub.description"),
@@ -23,7 +23,7 @@ end
 
 PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.npcMonitor",
-    source = "ProjectHoomans",
+    source = "Project Hoomans",
     order = 200,
     title = "PNC NPC Monitor",
     description = "Inspect NPC lifecycle, authority, presence, combat, and runtime bodies.",
@@ -42,7 +42,7 @@ PsychopatzCore.DebugHub.RegisterTool({
 
 PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.communities",
-    source = "ProjectHoomans",
+    source = "Project Hoomans",
     order = 230,
     title = getText
         and getText("UI_PNC_CommunityInspectorTitle")
@@ -64,7 +64,7 @@ PsychopatzCore.DebugHub.RegisterTool({
 
 PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.needs",
-    source = "ProjectHoomans",
+    source = "Project Hoomans",
     order = 225,
     title = "NPC Needs Debug",
     description = "Inspect and test server-authoritative individual and mobile-group Need reserves.",
@@ -74,7 +74,7 @@ PsychopatzCore.DebugHub.RegisterTool({
 
 PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.abstractDirector",
-    source = "ProjectHoomans",
+    source = "Project Hoomans",
     order = 226,
     title = "Abstract World Director",
     description = "Inspect strategic groups, locations, traversal, occupancy, combat-profile caches, encounters, and scheduled jobs.",
@@ -88,7 +88,7 @@ PsychopatzCore.DebugHub.RegisterTool({
 
 PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.communityOverlay",
-    source = "ProjectHoomans",
+    source = "Project Hoomans",
     order = 231,
     title = getText
         and getText("UI_PNC_CommunityWorldOverlayTitle")
@@ -110,7 +110,7 @@ PsychopatzCore.DebugHub.RegisterTool({
 
 PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.relationships",
-    source = "ProjectHoomans",
+    source = "Project Hoomans",
     order = 210,
     title = "PNC Relationship Inspector",
     description = "Inspect directed social data and trigger guarded test events.",
@@ -129,7 +129,7 @@ PsychopatzCore.DebugHub.RegisterTool({
 
 PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.knowledge",
-    source = "ProjectHoomans",
+    source = "Project Hoomans",
     order = 211,
     title = "NPC Knowledge Lab",
     description = "Compare NPC truth with one character's discovered notes and evidence.",
@@ -153,7 +153,7 @@ PsychopatzCore.DebugHub.RegisterTool({
 
 PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.factions",
-    source = "ProjectHoomans",
+    source = "Project Hoomans",
     order = 220,
     title = getText and getText("UI_PNC_FactionInspectorTitle")
         or "UI_PNC_FactionInspectorTitle",
@@ -173,7 +173,7 @@ PsychopatzCore.DebugHub.RegisterTool({
 
 PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.factionOverlay",
-    source = "ProjectHoomans",
+    source = "Project Hoomans",
     order = 221,
     title = getText
         and getText("UI_PNC_FactionWorldOverlayTitle")

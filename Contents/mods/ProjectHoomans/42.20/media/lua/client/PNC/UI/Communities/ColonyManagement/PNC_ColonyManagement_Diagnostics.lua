@@ -7,8 +7,14 @@ local function debugAvailable()
     if PNC.Client and PNC.Client.CanUseDebug then
         return PNC.Client.CanUseDebug() == true
     end
-    if isDebugEnabled then return isDebugEnabled() == true end
-    return getCore and getCore() and getCore():getDebug() == true or false
+    local coreDebug = PsychopatzCore and PsychopatzCore.Debug
+    if not coreDebug or type(coreDebug.CanUse) ~= "function" then
+        local ok, loaded = pcall(require, "PsychopatzCore/Debug/PsychopatzDebug")
+        if ok then coreDebug = loaded end
+    end
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    return coreDebug and coreDebug.CanUse
+        and coreDebug.CanUse(player) == true or false
 end
 
 local function serialize(fields)

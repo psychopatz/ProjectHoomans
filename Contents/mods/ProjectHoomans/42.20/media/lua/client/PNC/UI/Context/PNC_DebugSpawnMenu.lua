@@ -67,7 +67,8 @@ function Menu.Add(context, square)
         return nil
     end
     root = ISContextMenu:getNew(context)
-    rootOption = context:addOption(tr("UI_PNC_Spawn", "PNC Spawn"))
+    rootOption = context:addOption(
+        tr("UI_PNC_Spawn", "[Debug] Spawn Hoomans"))
     context:addSubMenu(rootOption, root)
     for i = 1, #FACTIONS do
         faction = FACTIONS[i]

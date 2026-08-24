@@ -131,18 +131,13 @@ Client.RequestFullSync = requestFullSync
 
 function Client.CanUseDebug()
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
-    local access
-    access = player and player.getAccessLevel and tostring(player:getAccessLevel() or "") or ""
-    if string.lower(access) == "admin" then
-        return true
+    local coreDebug = PsychopatzCore and PsychopatzCore.Debug
+    if not coreDebug or type(coreDebug.CanUse) ~= "function" then
+        local ok, loaded = pcall(require, "PsychopatzCore/Debug/PsychopatzDebug")
+        if ok then coreDebug = loaded end
     end
-    if Core.IsClientOnly and Core.IsClientOnly() then
-        return false
-    end
-    if isDebugEnabled then
-        return isDebugEnabled() == true
-    end
-    return getCore and getCore() and getCore():getDebug() == true or false
+    return coreDebug and coreDebug.CanUse
+        and coreDebug.CanUse(player) == true or false
 end
 
 function Client.RequestDebugRoster(forceAudit)
