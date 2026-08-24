@@ -395,7 +395,9 @@ local listSource = T.read(
 )
 T.truthy(string.find(listSource, "media/ui/icon.png", 1, true),
     "vanilla equipped circle texture missing")
-T.truthy(string.find(listSource, "media/ui/FavoriteStar.png", 1, true),
+T.truthy(string.find(
+    listSource, "media/ui/inventoryPanes/FavouriteYes.png", 1, true
+),
     "vanilla favorite star texture missing")
 T.truthy(string.find(
     listSource,

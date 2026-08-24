@@ -9,6 +9,7 @@ local SCENE_BY_OPERATION = {
     CONSTRUCT = "production.construct",
     RECONSTRUCT = "production.construct",
     DECONSTRUCT = "production.construct",
+    BUILD_OBJECT = "production.construct",
 }
 
 local function normalize(_, spec)

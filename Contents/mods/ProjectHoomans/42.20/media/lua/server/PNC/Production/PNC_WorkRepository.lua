@@ -18,7 +18,8 @@ end
 local function construction(order)
     return order and (order.operation == "CONSTRUCT"
         or order.operation == "RECONSTRUCT"
-        or order.operation == "DECONSTRUCT")
+        or order.operation == "DECONSTRUCT"
+        or order.operation == "BUILD_OBJECT")
 end
 
 local function compactConstruction(order)

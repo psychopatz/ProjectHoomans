@@ -371,6 +371,38 @@ T.equal(ok, true, "debug add test item")
 T.equal(loaded.inventory:count("Base.Nails"), 100,
     "debug add item did not reach storage")
 
+local beforePlanks = loaded.inventory:count("Base.Plank")
+local beforeNails = loaded.inventory:count("Base.Nails")
+local beforeDebugActivity = #activity(loaded)
+ok, reason = Service.DebugAction(playerA, {
+    storageId = loaded.id,
+    debugAction = "add_many",
+    requestId = "debug-build:1",
+    products = {
+        { fullType = "Base.Plank", quantity = 2 },
+        { fullType = "Base.Nails", quantity = 3 },
+    },
+})
+T.equal(ok, true, "batch debug add uses storage CRUD")
+T.equal(reason, "added", "batch debug add reason")
+T.equal(loaded.inventory:count("Base.Plank"), beforePlanks + 2,
+    "batch debug add stores the requested item")
+T.equal(loaded.inventory:count("Base.Nails"), beforeNails + 3,
+    "batch debug add stores every requested quantity")
+T.equal(#activity(loaded), beforeDebugActivity + 2,
+    "batch debug add records storage activity for each item type")
+local duplicateOK, duplicateReason = Service.DebugAction(playerA, {
+    storageId = loaded.id,
+    debugAction = "add_many",
+    requestId = "debug-build:1",
+    products = {{ fullType = "Base.Plank", quantity = 2 }},
+})
+T.equal(duplicateOK, false, "batch debug add rejects duplicate request")
+T.equal(duplicateReason, "duplicate_request",
+    "batch debug add duplicate reason")
+T.equal(loaded.inventory:count("Base.Plank"), beforePlanks + 2,
+    "duplicate batch does not change storage")
+
 for index = 1, 12 do
     T.truthy(Service.RecordActivity(loaded, {
         operation = "STORE",

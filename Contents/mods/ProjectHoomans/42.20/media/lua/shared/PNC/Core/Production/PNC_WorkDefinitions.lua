@@ -6,6 +6,7 @@ Definitions.OPERATION = {
     RESEARCH = "RESEARCH", CRAFT = "CRAFT", DISASSEMBLE = "DISASSEMBLE",
     CONSTRUCT = "CONSTRUCT", RECONSTRUCT = "RECONSTRUCT",
     DECONSTRUCT = "DECONSTRUCT",
+    BUILD_OBJECT = "BUILD_OBJECT",
 }
 Definitions.STATUS = {
     QUEUED = "QUEUED", WAITING_FOR_WORKER = "WAITING_FOR_WORKER",
@@ -34,6 +35,7 @@ Definitions.JOB_BY_OPERATION = {
     CONSTRUCT = "Constructor",
     RECONSTRUCT = "Constructor",
     DECONSTRUCT = "Constructor",
+    BUILD_OBJECT = "Constructor",
 }
 Definitions.CAPABILITY_BY_OPERATION = {
     RESEARCH = "work.research",

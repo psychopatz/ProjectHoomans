@@ -68,6 +68,11 @@ function Service.DebugAction(player, args)
         return ok, reason, storage, details
     end
     if not Internal.DebugAllowed(player) then return finish(false, "debug_required") end
+    if action == "add_many"
+        and not Internal.RememberRequest(player, args and args.requestId)
+    then
+        return finish(false, "duplicate_request")
+    end
     local storage, reason = Service.ResolveForPlayer(player, args and args.storageId)
     if not storage then return finish(false, reason) end
     local changed = false
@@ -110,10 +115,72 @@ function Service.DebugAction(player, args)
         item = type(item) == "table" and not item.getFullType and item[1] or item
         if not item then return finish(false, "item_type_unknown", storage) end
         changed, reason = CoreInventory.deposit(storage.inventory, item, quantity)
+    elseif action == "add_many" then
+        local products = type(args.products) == "table" and args.products or {}
+        if #products < 1 then
+            return finish(false, "items_required", storage)
+        end
+        local prepared = {}
+        local records = {}
+        local activity = {}
+        for index = 1, #products do
+            local product = products[index]
+            local fullType = tostring(product and product.fullType or "")
+            local quantity = math.max(1, math.floor(
+                tonumber(product and product.quantity) or 1))
+            if fullType == "" then
+                return finish(false, "item_type_unknown", storage)
+            end
+            local item = PNC.Equipment and PNC.Equipment.CreateItem
+                and PNC.Equipment.CreateItem(fullType) or nil
+            item = type(item) == "table" and not item.getFullType and item[1] or item
+            if not item then
+                return finish(false, "item_type_unknown", storage, {
+                    fullType = fullType,
+                })
+            end
+            local record, encodeReason = CoreInventory.encodeItem(item, quantity)
+            if not record then
+                return finish(false, encodeReason or "item_encode_failed",
+                    storage, { fullType = fullType })
+            end
+            prepared[#prepared + 1] = record
+            records[#records + 1] = record
+            activity[#activity + 1] = {
+                typeId = record[C.TYPE_ID], quantity = quantity,
+                fullType = fullType,
+            }
+        end
+        local allowed, preflightReason, preflightDetails = Internal.Preflight(
+            storage, records)
+        if not allowed then
+            return finish(false, preflightReason, storage, preflightDetails)
+        end
+        local backup = CoreInventory.Serializer
+            and CoreInventory.Serializer.serialize
+            and CoreInventory.Serializer.serialize(storage.inventory) or nil
+        for index = 1, #prepared do
+            changed, reason = CoreInventory.deposit(
+                storage.inventory, prepared[index])
+            if not changed then
+                if backup and CoreInventory.Serializer.deserialize then
+                    storage.inventory = CoreInventory.Serializer.deserialize(backup)
+                end
+                return finish(false, reason or "storage_add_failed", storage)
+            end
+        end
+        details.products = activity
+        Internal.RecordActivity(storage, "STORE", Internal.PlayerName(player),
+            activity, "debug_build_materials")
     else
         return finish(false, "unknown_debug_action", storage)
     end
-    if changed then Internal.CommitStorage(storage) end
+    if changed then
+        Internal.CommitStorage(storage)
+        if action == "add" or action == "fill" or action == "add_many" then
+            reason = "added"
+        end
+    end
     return finish(changed == true, reason or "ok", storage, details)
 end
 

@@ -16,6 +16,7 @@ local OPERATION_KEYS = {
     CONSTRUCT = { "UI_PNC_Task_Construct", "BUILD" },
     RECONSTRUCT = { "UI_PNC_Task_Reconstruct", "RECONSTRUCT" },
     DECONSTRUCT = { "UI_PNC_Task_Deconstruct", "DECONSTRUCT" },
+    BUILD_OBJECT = { "UI_PNC_Task_Construct", "BUILD" },
     CRAFT = { "UI_PNC_Task_Craft", "CRAFT" },
     DISASSEMBLE = { "UI_PNC_Task_Disassemble", "DISASSEMBLE" },
     RESEARCH = { "UI_PNC_Task_Research", "RESEARCH" },
@@ -59,6 +60,10 @@ local function targetName(task)
             and PNC.ColonyResearchDefinitions.Get(task.technologyId) or nil
         return definition and Shared.Tr(definition.labelKey,
             tostring(task.technologyId)) or tostring(task.technologyId)
+    end
+    if operation == "BUILD_OBJECT" then
+        return task.buildDisplayName or task.objectInfoName
+            or Shared.Tr("UI_PNC_Task_BaseArea", "BASE AREA")
     end
     return facilityName(task)
 end

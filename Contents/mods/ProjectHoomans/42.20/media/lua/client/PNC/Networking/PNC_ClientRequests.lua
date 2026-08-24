@@ -578,6 +578,10 @@ function Client.RequestBuildBarricade(options)
     return Client.RequestColonyAction("barricade_build", options)
 end
 
+function Client.RequestQueueBuilding(options)
+    return Client.RequestColonyAction("building_queue", options)
+end
+
 function Client.RequestUpgradeHQ(options)
     return Client.RequestColonyAction("hq_upgrade", options)
 end

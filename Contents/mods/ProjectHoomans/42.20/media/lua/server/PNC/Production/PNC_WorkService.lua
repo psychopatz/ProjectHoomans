@@ -812,6 +812,16 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
                 quantity = order.quantity,
                 technologyId = payload.technologyId,
                 specimenFullType = payload.specimenFullType,
+                objectInfoName = payload.blueprint
+                    and payload.blueprint.objectInfoName or nil,
+                buildDisplayName = payload.blueprint
+                    and PNC.BuildRecipeCatalog
+                    and PNC.BuildRecipeCatalog.Get(
+                        payload.blueprint.objectInfoName)
+                    and PNC.BuildRecipeCatalog.Get(
+                        payload.blueprint.objectInfoName).displayName or nil,
+                blueprint = payload.blueprint
+                    and copy(payload.blueprint) or nil,
                 funded = order.funded == true
                     or payload.input and payload.input.funded == true,
                 projectLifecycle = order.projectLifecycle,

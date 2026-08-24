@@ -122,6 +122,8 @@ function Controller.SelectTab(window, button)
     window.tab = definition.id
     if window.tab == "tasks" then
         window:requestSnapshot("tasks_opened")
+    elseif window.tab == "building" then
+        window:requestSnapshot("building_opened")
     end
     Controller.UpdateTabStyles(window)
     Controller.ApplyTabLayout(window)

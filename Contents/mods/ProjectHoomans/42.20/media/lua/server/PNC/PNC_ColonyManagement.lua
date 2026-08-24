@@ -279,6 +279,7 @@ canUseDebug = function(player)
         and tostring(player:getAccessLevel() or "") or ""
     return string.lower(access) == "admin"
 end
+Management.CanUseDebug = canUseDebug
 
 local function debugNeedAction(player, args)
     if not canUseDebug(player) then return false, "not_authorized" end
@@ -390,6 +391,9 @@ function Management.BuildSnapshot(player, options)
     local workshop = colony and PNC.CraftingService
         and PNC.CraftingService.Queries.BuildSnapshot(colony.id)
         or { knownRecipes = {}, orders = {} }
+    local building = colony and PNC.BuildingService
+        and PNC.BuildingService.BuildSnapshot(player, storageState, colony)
+        or { recipes = {}, queue = {} }
     local tasks = colony and PNC.TaskRequestService
         and PNC.TaskRequestService.Queries.BuildSnapshot(colony.id)
         or colony and PNC.WorkService and PNC.WorkService.Queries
@@ -450,7 +454,8 @@ function Management.BuildSnapshot(player, options)
     } or nil
     return { colony=colony, faction=factionSnapshot,
         people=people, attention=attention, levels=counts,
-        storage=storage, research=research, workshop=workshop, tasks=tasks,
+        storage=storage, research=research, workshop=workshop,
+        building=building, tasks=tasks,
         supplyShortages=supplyShortages,
         provisionStorage=provisionStorage,
         provisionSettings=provisionSettings,
@@ -641,6 +646,12 @@ function Management.HandleAction(player, args)
     elseif action == "disassemble_queue" then
         details, reason = PNC.CraftingService.Commands.QueueDisassembly(
             player, args.recordIndex)
+        ok = details ~= nil
+    elseif action == "building_queue" then
+        details, reason = PNC.BuildingService.Queue(player, args)
+        ok = details ~= nil
+    elseif action == "building_debug_get_items" then
+        details, reason = PNC.BuildingService.DebugGrantMaterials(player, args)
         ok = details ~= nil
     elseif action == "work_cancel" then
         ok, details = PNC.TaskRequestService.Commands.CancelForPlayer(player,

@@ -4,6 +4,8 @@ require "ISUI/ISContextMenu"
 PNC = PNC or {}
 
 ISPNCInventoryList = ISScrollingListBox:derive("ISPNCInventoryList")
+local Layout = PsychopatzCore and PsychopatzCore.UI
+    and PsychopatzCore.UI.Layout or nil
 
 local function catalogColor(value, dimmed)
     if dimmed then return 0.38, 0.38, 0.42 end
@@ -23,9 +25,17 @@ local function drawCatalogColumns(self, y, row, dimmed)
         local column = columns[index]
         local value = row.catalogCells[column.key]
         local x = math.floor(self.width * (tonumber(column.x) or 0))
+        local nextColumn = columns[index + 1]
+        local right = nextColumn and math.floor(self.width
+            * (tonumber(nextColumn.x) or 1)) or self.width
+        local available = math.max(1, right - x - 4)
         local r, g, b = catalogColor(row.catalogColors
             and row.catalogColors[column.key], dimmed)
-        self:drawText(tostring(value or ""), x, y + 7,
+        local text = tostring(value or "")
+        if Layout and Layout.Ellipsize then
+            text = Layout.Ellipsize(text, UIFont.Small, available)
+        end
+        self:drawText(text, x, y + 7,
             r, g, b, 1, UIFont.Small)
     end
     return true
@@ -76,13 +86,25 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     local countText = row.stack and row.stack > 1
         and (" (" .. tostring(row.stack) .. ")") or ""
     local textColor = dimmed and 0.40 or 0.86
+    local custom = drawCatalogColumns(self, y, row, dimmed)
+    local categoryX = math.floor(self.width * 0.64)
+    local nameWidth = math.max(1, self.width - 49 - indent)
+    if custom and self.catalogColumns[1] then
+        local firstColumnX = math.floor(self.width
+            * (tonumber(self.catalogColumns[1].x) or 1))
+        nameWidth = math.max(1, firstColumnX - 43 - indent)
+    elseif not custom then
+        nameWidth = math.max(1, categoryX - 43 - indent)
+    end
+    local name = tostring(row.name) .. countText
+    if Layout and Layout.Ellipsize then
+        name = Layout.Ellipsize(name, UIFont.Small, nameWidth)
+    end
     self:drawText(
-        tostring(row.name) .. countText,
+        name,
         39 + indent, y + 7,
         textColor, textColor, textColor, 1, UIFont.Small
     )
-    local custom = drawCatalogColumns(self, y, row, dimmed)
-    local categoryX = math.floor(self.width * 0.64)
     if not custom and self.ownerWindow and self.ownerWindow.giftMode
         and self.role == "player"
         and row.giftScore
@@ -96,8 +118,13 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
             0.50, 0.92, 0.70, 1, UIFont.Small
         )
     elseif not custom then
+        local category = tostring(row.category or "Item")
+        if Layout and Layout.Ellipsize then
+            category = Layout.Ellipsize(category, UIFont.Small,
+                math.max(1, self.width - categoryX - 4))
+        end
         self:drawText(
-            tostring(row.category or "Item"),
+            category,
             categoryX, y + 7,
             dimmed and 0.38 or 0.64,
             dimmed and 0.38 or 0.64,
@@ -195,7 +222,10 @@ function ISPNCInventoryList:new(x, y, width, height, ownerWindow, role)
     o.backgroundColor = { r = 0, g = 0, b = 0, a = 0.62 }
     o.borderColor = { r = 0.45, g = 0.45, b = 0.45, a = 0.9 }
     o.equippedItemIcon = getTexture and getTexture("media/ui/icon.png") or nil
-    o.favoriteStar = getTexture and getTexture("media/ui/FavoriteStar.png") or nil
+    -- Use the base-game favorite glyph so recipe rows and inventory rows
+    -- present favorites consistently with the native build menu.
+    o.favoriteStar = getTexture
+        and getTexture("media/ui/inventoryPanes/FavouriteYes.png") or nil
     o.treeExpanded = getTexture
         and getTexture("media/ui/inventoryPanes/Button_TreeExpanded.png") or nil
     o.treeCollapsed = getTexture

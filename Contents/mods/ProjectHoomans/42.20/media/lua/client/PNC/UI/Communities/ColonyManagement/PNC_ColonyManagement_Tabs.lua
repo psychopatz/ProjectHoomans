@@ -2,6 +2,7 @@ local Registry = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManageme
 local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
 local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
 local Workshop = require "PNC/UI/Communities/PNC_ColonyManagementWorkshopTab"
+local Building = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagementBuildingTab"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
 local DebugTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_DebugTab"
 local BaseTab = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
@@ -216,6 +217,29 @@ Registry.Register({
     end,
     rebuild = function(window, snapshot)
         return Workshop.Rebuild(window, snapshot, Shared.Tr)
+    end,
+})
+
+Registry.Register({
+    id = "building",
+    title = "BUILDING",
+    detailTitle = "COLONY BUILDING",
+    showRoster = false,
+    showDetails = true,
+    create = function(window, UIBuilder)
+        Building.Create(window, UIBuilder)
+    end,
+    layout = function(window, Layout, content)
+        Building.Layout(window, Layout, content)
+    end,
+    apply = function(window, active)
+        Building.Apply(window, active)
+    end,
+    rebuild = function(window, snapshot)
+        return Building.Rebuild(window, snapshot)
+    end,
+    onControl = function(window, button)
+        return Building.OnControl(window, button)
     end,
 })
 
