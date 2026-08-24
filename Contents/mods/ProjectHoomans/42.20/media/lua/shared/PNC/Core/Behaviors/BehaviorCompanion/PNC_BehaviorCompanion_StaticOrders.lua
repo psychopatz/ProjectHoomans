@@ -24,9 +24,11 @@ function Internal.TickGuardAnchor(record, zombie)
         x = anchorX,
         y = anchorY,
         radius = guardRadius,
-    }) then
+    }, { areaDefense = true }) then
+        record.activeBehavior = "GuardAnchor:combat"
         return true
     end
+    record.activeBehavior = "GuardAnchor"
     Common.ClearCombatTarget(record, "guarding_anchor")
     Common.MoveRecord(
         record,

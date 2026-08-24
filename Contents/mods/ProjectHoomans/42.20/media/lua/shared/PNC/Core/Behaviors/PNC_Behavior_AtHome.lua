@@ -6,6 +6,7 @@ PNC.BehaviorAtHome = PNC.BehaviorAtHome or {}
 local AtHome = PNC.BehaviorAtHome
 local Common = PNC.BehaviorCommon
 local Animation = PNC.Animation
+local Const = PNC.Const
 
 local function normalize(_, spec)
     spec = type(spec) == "table" and spec or {}
@@ -20,10 +21,31 @@ local function normalize(_, spec)
 end
 
 function AtHome.Tick(record, zombie)
+    local Companion = PNC.BehaviorCompanion
+    local order = record.orderSpec or {}
+    local anchorX = tonumber(order.x) or record.anchorX or record.x
+    local anchorY = tonumber(order.y) or record.anchorY or record.y
+    local anchorZ = tonumber(order.z) or record.anchorZ or record.z or 0
+    local radius = math.max(1, tonumber(order.radius)
+        or tonumber(Const and Const.GUARD_ENGAGE_RADIUS)
+        or tonumber(Const and Const.GUARD_RADIUS) or 3)
+    local engaged = Companion and Companion.Internal
+        and Companion.Internal.TryRespondToThreat
+        and Companion.Internal.TryRespondToThreat(
+            record,
+            zombie,
+            { x = anchorX, y = anchorY, z = anchorZ, radius = radius },
+            { areaDefense = true }
+        )
+    if engaged then
+        record.activeBehavior = "AtHome:combat"
+        return true
+    end
     record.activeBehavior = "AtHome"
     if PNC.NavigationRouter and PNC.NavigationRouter.Clear then
         PNC.NavigationRouter.Clear(record)
     end
+    Common.ClearCombatTarget(record, "at_home", zombie)
     Common.HaltMovement(record, zombie, "at_home")
     if zombie and Animation and Animation.Apply then
         Animation.Apply(zombie, record, "Idle")

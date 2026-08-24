@@ -45,7 +45,14 @@ local function tryEngageTarget(record, zombie, constraint, options)
         return false
     end
     local target
-    if Targeting.ResolveCompanionProtectionTarget then
+    if options and options.areaDefense == true
+        and Targeting.ResolveRoamingEngageTarget
+    then
+        target = Targeting.ResolveRoamingEngageTarget(
+            record,
+            constraint and constraint.radius
+        )
+    elseif Targeting.ResolveCompanionProtectionTarget then
         target = Targeting.ResolveCompanionProtectionTarget(
             record,
             options and options.ownerEngaged == true
