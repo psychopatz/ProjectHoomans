@@ -157,7 +157,18 @@ local function itemName(fullType, fallback)
         local value = getItemNameFromFullType(fullType)
         if value and value ~= "" then return value end
     end
+    if fullType and tostring(fullType) ~= "" then
+        local shortType = string.match(tostring(fullType), "([^%.]+)$")
+            or tostring(fullType)
+        return string.gsub(shortType, "_", " ")
+    end
     return fallback
+end
+
+local function activityItemName(info)
+    local fallback = info.activityItemLabelKey
+        and tr(info.activityItemLabelKey, "item") or nil
+    return itemName(info.activityItemFullType, fallback)
 end
 
 local function recipeTarget(info)
@@ -235,6 +246,10 @@ function Presentation.ActivityActionStatus(snapshot)
         and tr(info.labelKey, fallback) or fallback
     if info.facilityDefinitionId then
         text = text .. " - " .. facilityName(info)
+    end
+    local activityItem = activityItemName(info)
+    if activityItem and activityItem ~= "" then
+        text = text .. " - " .. activityItem
     end
     local phase = string.upper(tostring(info.phase or ""))
     if phase == "TRAVELLING" or phase == "TRAVEL" then

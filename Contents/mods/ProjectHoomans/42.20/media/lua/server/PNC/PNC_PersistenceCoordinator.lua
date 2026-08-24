@@ -140,8 +140,6 @@ function Coordinator.Commit(reason)
     if not ok then return failure(why) end
     ok, why = save("communities", PNC.Communities)
     if not ok then return failure(why) end
-    ok, why = save("colonyStorage", PNC.ColonyStorageRepository)
-    if not ok then return failure(why) end
     ok, why = save("recipeKnowledge", PNC.KnowledgeRepository)
     if not ok then return failure(why) end
     ok, why = save("research", PNC.ResearchRepository)
@@ -149,6 +147,10 @@ function Coordinator.Commit(reason)
     ok, why = save("needs", PNC.NeedsRepository)
     if not ok then return failure(why) end
     ok, why = save("work", PNC.WorkRepository)
+    if not ok then return failure(why) end
+    -- Work save checkpoints can commit construction inputs into storage;
+    -- persist storage after that checkpoint so both durable records agree.
+    ok, why = save("colonyStorage", PNC.ColonyStorageRepository)
     if not ok then return failure(why) end
     ok, why = save("settlements", PNC.SettlementRepository)
     if not ok then return failure(why) end

@@ -423,8 +423,8 @@ clock = clock + 1001
 Work.Tick(clock)
 T.equal(Work.Queries.Get(build.id).workerId, "backup",
     "another constructor continues the interrupted order")
-T.equal(Work.BuildActionInformation(PNC.Registry.Data.backup).percent, 40,
-    "replacement worker sees existing progress")
+T.equal(Work.BuildActionInformation(PNC.Registry.Data.backup).percent, 50,
+    "replacement worker resumes existing progress in the next work interval")
 T.truthy(Work.Commands.AddProgress(build.id, "backup", 100),
     "replacement constructor completes shared work points")
 T.equal(inventory["Base.Money"], 0,
@@ -549,6 +549,55 @@ T.truthy(Work.Commands.Cancel(recoveredProject.id),
     "recovered construction can be cancelled without its old reservation")
 T.equal(inventory["Base.Money"], beforeLegacyCancel + 1,
     "recovered cancellation resolves storage and refunds remaining material")
+
+-- Pre-checkpoint saves compacted an in-progress construction input down to
+-- `consume`, leaving it permanently blocked after reload. Progress now
+-- restores the durable funded/committed marker for that legacy shape.
+WorkRepository.Import({ schemaVersion = 1, nextId = 3, byId = {
+    ["work:2"] = { id = "work:2", operation = "CONSTRUCT",
+        status = "BLOCKED", progress = 89, requiredWork = 100,
+        createdAt = 1, funded = false,
+        previousOrder = { kind = "colony_home", baseId = "b1" },
+        payload = { facilityId = "construction_facility",
+            input = { consume = true } } },
+} })
+local recoveredCompacted = WorkRepository.Get("work:2")
+T.equal(recoveredCompacted.funded, true,
+    "compacted in-progress construction recovers as funded")
+T.equal(recoveredCompacted.payload.input.committed, true,
+    "compacted in-progress construction restores committed input state")
+T.equal(recoveredCompacted.previousOrder.kind, "colony_home",
+    "construction recovery retains the worker fallback order")
+local compactedPrepared, compactedPrepareReason =
+    Construction.Internal.Prepare(recoveredCompacted)
+T.truthy(compactedPrepared,
+    "recovered construction passes the normal preparation pipeline")
+T.equal(compactedPrepareReason, nil,
+    "recovered construction has no unavailable-input blocker")
+recoveredCompacted.status = "WORKING"
+recoveredCompacted.workerId, recoveredCompacted.stationId = "current",
+    "station:current"
+PNC.Registry.Data.current = { id = "current", alive = true,
+    factionId = "f1", communityId = "c1", skills = { Carpentry = 5 },
+    runtime = { workOrderId = recoveredCompacted.id },
+    orderSpec = { kind = "production_work",
+        workOrderId = recoveredCompacted.id, operation = "CONSTRUCT" } }
+PNC.Registry.Data.former = { id = "former", alive = true, factionId = "f1",
+    communityId = "c1", skills = { Carpentry = 5 },
+    runtime = { workOrderId = recoveredCompacted.id,
+        lastProductionWorkAt = clock },
+    orderSpec = { kind = "production_work",
+        workOrderId = recoveredCompacted.id, operation = "CONSTRUCT" } }
+T.equal(Work.ReconcileWorkerState(), 1,
+    "stale former worker is reconciled once")
+T.equal(PNC.Registry.Data.former.runtime.workOrderId, nil,
+    "stale former worker loses the old work claim")
+T.equal(PNC.Registry.Data.former.orderSpec.kind, "colony_home",
+    "stale former worker restores its previous order")
+T.equal(recoveredCompacted.workerId, "current",
+    "valid replacement worker keeps the construction claim")
+T.equal(PNC.Registry.Data.current.runtime.workOrderId, recoveredCompacted.id,
+    "valid replacement worker keeps its runtime claim")
 T.finish("pnc_production_lifecycle_smoke")
 
 T.finish("pnc_production_lifecycle_smoke")

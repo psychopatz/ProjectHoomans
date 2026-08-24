@@ -68,6 +68,21 @@ function Internal.Prepare(order)
         PNC.FacilityService.RefreshState(facility)
     end
     local input = order.payload and order.payload.input or nil
+    if input and tonumber(order.progress) and tonumber(order.progress) > 0
+        and not order.funded
+        and input.funded ~= true and input.committed ~= true
+        and (input.storageId == nil or input.storageId == "")
+        and (input.reservationId == nil or input.reservationId == "")
+    then
+        -- Compatibility for a construction record compacted by an older
+        -- save path. Its progress proves that the material boundary was
+        -- crossed, but the old runtime reservation was not durable.
+        order.funded = true
+        input.funded, input.committed = true, true
+        input.legacyRecovered = true
+        PNC.WorkRepository.MarkDirty()
+        return true
+    end
     if order.funded == true or input and (input.funded == true
         or input.committed == true)
     then order.funded = true; return true end

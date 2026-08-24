@@ -48,7 +48,9 @@ function Provider.addOptions(menu, entry, player)
     end
     for i = 1, #definitions do
         definition = definitions[i]
-        if definition.contextOnly == true
+        if definition.manualTabOnly == true then
+            definition = nil
+        elseif definition.contextOnly == true
             and type(definition.isVisible) == "function"
             and definition.isVisible(commandTarget(entry)) ~= true
         then

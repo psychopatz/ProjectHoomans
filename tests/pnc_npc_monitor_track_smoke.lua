@@ -94,6 +94,7 @@ local window = setmetatable({
         end,
     },
     updateControlState = function() end,
+    requestResponsiveLayout = function() end,
 }, { __index = ISPNCNPCMonitor })
 
 window:onTrack()

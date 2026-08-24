@@ -26,7 +26,7 @@ local function compactConstruction(order)
     order.runtime = nil
     order.workerId, order.stationId, order.stationTarget = nil, nil, nil
     order.collectionTarget, order.executionMode = nil, nil
-    order.facilityReservationId, order.previousOrder = nil, nil
+    order.facilityReservationId = nil
     order.lastAbstractAt, order.blockedReason = nil, nil
     if order.status ~= "PAUSED" and order.status ~= "CANCELLING"
         and order.status ~= "COMPLETED"
@@ -39,14 +39,35 @@ local function compactConstruction(order)
         payload.requirements = nil
         local input = payload.input
         if type(input) == "table" then
+            local funded = order.funded == true
+                or input.funded == true or input.committed == true
             payload.input = {
                 consume = input.consume == true,
-                funded = input.funded == true or input.committed == true,
-                committed = input.committed == true or input.funded == true,
+                funded = funded,
+                committed = funded,
             }
         end
     end
     return order
+end
+
+-- Older saves compacted construction inputs down to `consume`, even after
+-- the project had made progress.  That left the scheduler looking for a
+-- runtime-only reservation that can no longer exist after a reload.
+local function recoverCompactedConstructionInput(order)
+    local input = order and order.payload and order.payload.input or nil
+    local progress = order and tonumber(order.progress) or nil
+    if type(input) ~= "table" or not progress or progress <= 0
+        or order.funded == true
+        or input.funded == true or input.committed == true
+    then return end
+    if (input.storageId == nil or input.storageId == "")
+        and (input.reservationId == nil or input.reservationId == "")
+    then
+        order.funded = true
+        input.funded, input.committed = true, true
+        input.legacyRecovered = true
+    end
 end
 
 local function recover(order)
@@ -62,7 +83,7 @@ local function recover(order)
     if construction(order) then
         order.workerId, order.stationId, order.stationTarget = nil, nil, nil
         order.collectionTarget, order.executionMode = nil, nil
-        order.facilityReservationId, order.previousOrder = nil, nil
+        order.facilityReservationId = nil
         order.lastAbstractAt, order.blockedReason = nil, nil
         if order.status ~= "PAUSED" and order.status ~= "CANCELLING"
             and order.status ~= "COMPLETED"
@@ -77,6 +98,7 @@ local function recover(order)
                 committed = order.payload.input.committed == true
                     or order.payload.input.funded == true,
             }
+            recoverCompactedConstructionInput(order)
         end
     elseif order.status == "CLAIMED" or order.status == "TRAVEL_TO_STOCKPILE"
         or order.status == "TRAVEL_TO_STATION"
@@ -139,8 +161,40 @@ function Repository.Remove(id)
     return true
 end
 function Repository.MarkDirty() Repository.Dirty = true end
+
+local function checkpointConstructionInputs()
+    for _, order in pairs(Repository.State.byId or {}) do
+        local input = order and order.payload and order.payload.input or nil
+        if construction(order) and order.operation ~= "DECONSTRUCT"
+            and order.status ~= "COMPLETED"
+            and order.status ~= "CANCELLED"
+            and type(input) == "table"
+            and input.committed ~= true and input.funded ~= true
+            and PNC.WorkInputService
+            and PNC.WorkInputService.Commit
+        then
+            local committed = PNC.WorkInputService.Commit(
+                order, "construction_save_checkpoint")
+            if committed ~= true and tonumber(order.progress) > 0
+                and (input.storageId == nil or input.storageId == "")
+                and (input.reservationId == nil or input.reservationId == "")
+                and input.staged ~= true and input.itemIds == nil
+            then
+                -- A pre-fix save may already have discarded the reservation.
+                -- In-progress construction has already crossed the material
+                -- boundary, so preserve that fact instead of re-blocking it.
+                order.funded = true
+                input.funded, input.committed = true, true
+                input.legacyRecovered = true
+                Repository.Dirty = true
+            end
+        end
+    end
+end
+
 function Repository.Save()
     Repository.Load()
+    checkpointConstructionInputs()
     if not Repository.Dirty then return false, "not_dirty" end
     local target = ModData and ModData.getOrCreate
         and ModData.getOrCreate(Repository.MODDATA_KEY) or nil

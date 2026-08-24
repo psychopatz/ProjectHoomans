@@ -275,7 +275,9 @@ function Service.HasPersonalSupply(record, resourceKind, required)
             and tonumber(request.required.thirst) or 1
     local candidates = SupplyQueries.FindPersonal(
         record, request, math.max(0.001, amount or 0.001))
-    return #candidates > 0
+    return #candidates > 0,
+        candidates[1] and candidates[1].descriptor
+            and candidates[1].descriptor.fullType or nil
 end
 
 function Service.Process(rawRequest, options)

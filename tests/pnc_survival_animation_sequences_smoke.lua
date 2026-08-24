@@ -157,4 +157,16 @@ T.equal(requestedOptions.repeatMode, "once",
     "drink sequences cannot be overridden into an endless loop")
 T.equal(faced, "west", "the NPC faces the sink from the adjacent square")
 
+PNC.AnimationScenes.Request = function()
+    return false, "scene_missing"
+end
+record.runtime.animationScene = nil
+record.runtime.facilityActivity.phase = nil
+T.truthy(PNC.FacilityJobs.Tick(record, live),
+    "facility behavior did not handle a failed scene request")
+T.equal(record.runtime.facilityActivity.phase, "INTERRUPTED",
+    "failed scene request left the activity in STARTING")
+T.equal(record.runtime.facilityActivity.interruptReason, "scene_missing",
+    "failed scene request did not expose its reason")
+
 T.finish("pnc_survival_animation_sequences_smoke")

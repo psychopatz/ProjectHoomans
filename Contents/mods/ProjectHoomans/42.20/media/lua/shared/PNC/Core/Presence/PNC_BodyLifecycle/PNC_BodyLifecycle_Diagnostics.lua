@@ -14,6 +14,7 @@ function Lifecycle.BuildDiagnostics(record)
     local body
     local bite
     local diagnosticBodyState
+    local facilityActivity
     if not record then
         return nil
     end
@@ -21,6 +22,7 @@ function Lifecycle.BuildDiagnostics(record)
     body = Internal.registry() and Internal.registry().GetLiveZombie
         and Internal.registry().GetLiveZombie(record.id) or nil
     bite = record.runtime and record.runtime.lastZombieBite or nil
+    facilityActivity = record.runtime and record.runtime.facilityActivity or nil
     diagnosticBodyState = state.bodyState
     if record.presenceState == Const.PRESENCE_CORPSE then
         diagnosticBodyState = state.corpseState == "inert_loaded" and "corpse-loaded" or "corpse-missing"
@@ -51,6 +53,15 @@ function Lifecycle.BuildDiagnostics(record)
         bodyActionState = body and body.getActionStateName and body:getActionStateName() or nil,
         activeJob = record.activeJob,
         activeBehavior = record.activeBehavior,
+        facilityActivity = facilityActivity and {
+            capability = facilityActivity.capability,
+            phase = facilityActivity.phase,
+            manual = facilityActivity.manual == true,
+            manualToggleable = facilityActivity.manualToggleable == true,
+            facilityId = facilityActivity.facilityId,
+            componentRole = facilityActivity.componentRole,
+            sleepSurface = facilityActivity.sleepSurface,
+        } or nil,
         debugRecording = record.runtime and record.runtime.debug == true or false,
         healthState = record.health and record.health.state or nil,
         hpCurrent = record.health and record.health.current or nil,

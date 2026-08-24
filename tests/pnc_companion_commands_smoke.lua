@@ -118,6 +118,14 @@ PNC = {
 T.load(SHARED_ROOT .. "PNC_CompanionCommandRegistry.lua")
 T.load(SHARED_ROOT .. "PNC_CompanionCommandDefinitions.lua")
 T.load(SHARED_ROOT .. "PNC_CompanionCommandFlavor.lua")
+T.truthy(PNC.CompanionCommands.Get("manual_eat"),
+    "manual eat command is registered")
+T.truthy(PNC.CompanionCommands.Get("manual_drink"),
+    "manual drink command is registered")
+T.truthy(PNC.CompanionCommands.Get("manual_sleep"),
+    "manual sleep command is registered")
+T.equal(PNC.CompanionCommands.Get("manual_sleep").contextOnly, true,
+    "manual sleep stays out of the radial command list")
 T.load(SHARED_ROOT .. "PNC_CompanionCommandFlavorDefinitions.lua")
 
 T.truthy(PNC.CompanionCommandFlavor.Resolve("follow", "player", "seed"),
@@ -206,10 +214,10 @@ records.owned.affiliation = { factionID = "faction_alice" }
 T.equal(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
     true, "single-player faction ownership uses canonical account key")
 
-T.equal(#PNC.CompanionCommands.List(), 9, "registered command count")
+T.equal(#PNC.CompanionCommands.List(), 12, "registered command count")
 T.equal(PNC.CompanionCommands.Get("scavenge_nearby").clientOnly, true,
     "scavenge command opens its client setup UI")
-T.equal(#PNC.CompanionCommands.ListGroups(), 2,
+T.equal(#PNC.CompanionCommands.ListGroups(), 3,
     "registered command group count")
 T.equal(
     PNC.CompanionCommands.GetAttackTypeDefinition("auto").icon,

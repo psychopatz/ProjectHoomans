@@ -74,6 +74,12 @@ local function summary(record, player)
                 PNC.NeedsUtils.WorldAgeHours()) or {},
         needsView=needsView, morale=moraleView.score,
         moraleModifiers=moraleView.modifiers,
+        presenceState=record.presenceState,
+        actionInformation=PNC.ActivityStatus
+            and PNC.ActivityStatus.Build
+            and PNC.ActivityStatus.Build(record) or nil,
+        manualActivityDisabled=record.runtime
+            and record.runtime.manualActivityDisabled or nil,
         provision=PNC.ProvisionEvaluator
             and PNC.ProvisionEvaluator.GetDebugState
             and PNC.ProvisionEvaluator.GetDebugState(record) or {},

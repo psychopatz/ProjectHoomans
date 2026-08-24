@@ -20,6 +20,13 @@ Commands.RegisterGroup({
     dynamicAttackTypeIcon = true,
 })
 
+Commands.RegisterGroup({
+    id = "manual_activity",
+    nested = true,
+    labelKey = "UI_PNC_CommandManualActivity",
+    label = "Activities",
+})
+
 local function followOrder(_, player)
     return {
         kind = Const.ORDER_FOLLOW,
@@ -38,6 +45,13 @@ local function currentPosition(record)
     return tonumber(record and record.x) or 0,
         tonumber(record and record.y) or 0,
         tonumber(record and record.z) or 0
+end
+
+local function manualActivity(record, capability)
+    if not PNC.FacilityJobs or not PNC.FacilityJobs.ToggleManual then
+        return false
+    end
+    return PNC.FacilityJobs.ToggleManual(record, capability) == true
 end
 
 Commands.Register({
@@ -124,6 +138,45 @@ Commands.Register({
     apply = function(record)
         return PNC.FacilityJobs and PNC.FacilityJobs.Stop
             and PNC.FacilityJobs.Stop(record, "player_stop") == true
+    end,
+})
+
+Commands.Register({
+    id = "manual_eat",
+    group = "manual_activity",
+    contextOnly = true,
+    manualTabOnly = true,
+    labelKey = "UI_PNC_CommandEat",
+    label = "Eat",
+    icon = "media/ui/Emotes/PNC_EmoteMenu.png",
+    apply = function(record)
+        return manualActivity(record, "survival.eat.inventory")
+    end,
+})
+
+Commands.Register({
+    id = "manual_drink",
+    group = "manual_activity",
+    contextOnly = true,
+    manualTabOnly = true,
+    labelKey = "UI_PNC_CommandDrink",
+    label = "Drink",
+    icon = "media/ui/Emotes/PNC_EmoteMenu.png",
+    apply = function(record)
+        return manualActivity(record, "water.drink")
+    end,
+})
+
+Commands.Register({
+    id = "manual_sleep",
+    group = "manual_activity",
+    contextOnly = true,
+    manualTabOnly = true,
+    labelKey = "UI_PNC_CommandSleep",
+    label = "Toggle Sleep",
+    icon = "media/ui/Emotes/PNC_EmoteStay.png",
+    apply = function(record)
+        return manualActivity(record, "sleep")
     end,
 })
 

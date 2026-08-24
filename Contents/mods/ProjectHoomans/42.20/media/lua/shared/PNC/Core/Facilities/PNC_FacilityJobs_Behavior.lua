@@ -32,6 +32,7 @@ local function normalize(_, spec)
         taskLeaseId = tostring(spec.taskLeaseId or ""),
         resourceKind = tostring(spec.resourceKind or ""),
         resourceKey = tostring(spec.resourceKey or ""),
+        activityItemFullType = tostring(spec.activityItemFullType or ""),
         debugHold = spec.debugHold == true,
     }
 end
@@ -218,6 +219,8 @@ function Jobs.Tick(record, zombie)
     local distance
     local scene
     local sceneId
+    local started
+    local startReason
     if order.kind ~= KIND or not runtime or not definition then return false end
     if runtime.resourceKind == "nearby_water" and not runtime.resource
         and PNC.NearbyWaterService and PNC.NearbyWaterService.Resolve
@@ -298,11 +301,20 @@ function Jobs.Tick(record, zombie)
         runtime.phase = "STARTING"
         runtime.lastEffectWorldHour = PNC.NeedsUtils
             and PNC.NeedsUtils.WorldAgeHours() or nil
-        PNC.AnimationScenes.Request(record, zombie, sceneId, {
+        started, startReason = PNC.AnimationScenes.Request(record, zombie, sceneId, {
             reason = "facility_" .. tostring(order.capability),
             repeatMode = definition.completeWithScene == true
                 and "once" or "loop",
         })
+        if started ~= true then
+            -- Do not leave the nameplate in STARTING when scene setup fails.
+            -- The next decision may retry the activity, but the failure is
+            -- now observable and cannot masquerade as a stuck preparation.
+            runtime.phase = "INTERRUPTED"
+            runtime.interruptReason = tostring(
+                startReason or "scene_request_failed"
+            )
+        end
     end
     return true
 end

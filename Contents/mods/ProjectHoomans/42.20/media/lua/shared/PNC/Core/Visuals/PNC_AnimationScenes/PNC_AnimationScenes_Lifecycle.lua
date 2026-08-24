@@ -101,6 +101,46 @@ local function canReplaceCurrent(runtime, definition, options)
         or options.force == true
 end
 
+local function quiesceBlockingMovement(record, zombie, runtime, sceneId)
+    local pathService = PNC.PathService
+    local reason = "animation_scene:" .. tostring(sceneId)
+    local reset
+
+    if pathService and pathService.Commands
+        and pathService.Commands.Reset
+    then
+        reset = pathService.Commands.Reset
+        reset(record, zombie, reason)
+    elseif pathService and pathService.Reset then
+        pathService.Reset(zombie, record, reason)
+    else
+        -- Keep the scene safe even when the path module has not been loaded
+        -- yet. The normal runtime takes the reset boundary above.
+        runtime.pathing = nil
+        runtime.localNavigation = nil
+        runtime.moveIntent = nil
+    end
+
+    -- Follow state can outlive the movement lane. Do not let a sampled owner
+    -- movement flag from before the interaction immediately cancel the newly
+    -- acquired blocking scene on the next behavior tick.
+    if runtime.followState then
+        runtime.followState.ownerMoving = false
+    end
+
+    if PNC.BehaviorMoveIntent
+        and PNC.BehaviorMoveIntent.Hold
+    then
+        PNC.BehaviorMoveIntent.Hold(record, reason)
+    else
+        runtime.moveIntent = {
+            kind = "hold",
+            reason = reason,
+            updatedAt = Core.Now(),
+        }
+    end
+end
+
 function Scenes.Request(record, zombie, sceneId, options)
     local definition = Scenes.Get(sceneId)
     local runtime
@@ -124,17 +164,11 @@ function Scenes.Request(record, zombie, sceneId, options)
         Internal.ClearScene(record, zombie, "scene_replaced", false)
     end
     now = tonumber(options.now) or Core.Now()
+    if definition.blocking then
+        quiesceBlockingMovement(record, zombie, runtime, definition.id)
+    end
     scene = buildScene(runtime, definition, options, now)
     runtime.animationScene = scene
-    if definition.blocking
-        and PNC.BehaviorMoveIntent
-        and PNC.BehaviorMoveIntent.Hold
-    then
-        PNC.BehaviorMoveIntent.Hold(
-            record,
-            "animation_scene:" .. definition.id
-        )
-    end
     started, result = Internal.ActivateStep(
         record,
         zombie,

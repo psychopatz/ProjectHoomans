@@ -29,6 +29,9 @@ local companion = {
     affiliation = { factionID = "faction_player", communityRole = "resident" },
     health = { state = "normal" },
     needs = { hunger = 0.82, thirst = 0.10, fatigue = 0.10 },
+    runtime = { activityInformation = {
+        kind = "activity", capability = "sleep", phase = "QUEUED",
+    } },
 }
 
 isDebugEnabled = function() return true end
@@ -72,6 +75,11 @@ PNC = {
         Reset = function(record)
             record.needs = { hunger = 0, thirst = 0, fatigue = 0 }
             return true
+        end,
+    },
+    ActivityStatus = {
+        Build = function(record)
+            return record.runtime and record.runtime.activityInformation
         end,
     },
     NeedsUtils = { WorldAgeHours = function() return 42 end },
@@ -201,6 +209,8 @@ T.equal(#snapshot.people, 1, "owned companion appears")
 T.equal(snapshot.people[1].name, "Alex Rivera", "companion identity presented")
 T.equal(snapshot.people[1].followingCurrentPlayer, true,
     "snapshot marks the current player's follower")
+T.equal(snapshot.people[1].actionInformation.capability, "sleep",
+    "colony snapshot exposes canonical activity information")
 T.equal(#snapshot.people[1].journal, 1, "companion journal included")
 T.equal(#snapshot.attention, 1, "critical need appears in attention")
 T.equal(snapshot.attention[1].needType, "hunger", "critical need type")

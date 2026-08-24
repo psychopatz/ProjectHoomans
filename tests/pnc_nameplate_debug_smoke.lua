@@ -206,6 +206,27 @@ T.contains(actionText, "Sleeping", "facility activity label")
 T.contains(actionText, "barracks", "facility activity target")
 snapshot.actionInformation = {
     kind = "activity",
+    activityId = "facility:survival.eat.inventory",
+    labelKey = "UI_PNC_Activity_Eating",
+    fallback = "Eating",
+    phase = "STARTING",
+    activityItemFullType = "Base.Apple",
+    activityItemLabelKey = "UI_PNC_Action_FoodTarget",
+}
+getText = function(key)
+    if key == "UI_PNC_Action_FoodTarget" then return "food" end
+    if key == "UI_PNC_Activity_Eating" then return "Eating" end
+    return key
+end
+getItemNameFromFullType = function(fullType)
+    return fullType == "Base.Apple" and "Apple" or fullType
+end
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+T.contains(actionText, "Eating", "eating activity label")
+T.contains(actionText, "Apple", "eating activity item")
+T.contains(actionText, "preparing", "eating activity phase")
+snapshot.actionInformation = {
+    kind = "activity",
     activityId = "job:GuardAnchor",
     fallback = "Guard Anchor",
 }

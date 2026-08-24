@@ -71,6 +71,50 @@ local function activity(id, labelKey, fallback, extra)
     return output
 end
 
+local function fullTypeFromItem(item)
+    if not item or type(item.getFullType) ~= "function" then return nil end
+    local ok, fullType = pcall(item.getFullType, item)
+    fullType = ok and tostring(fullType or "") or ""
+    return fullType ~= "" and fullType or nil
+end
+
+local function supplyItemFullType(record, kind)
+    local supply = record.runtime and record.runtime.supply or nil
+    local state = supply and supply.byKind and supply.byKind[kind] or nil
+    local used = state and state.lastUsedItem or nil
+    if used and used.fullType then return tostring(used.fullType) end
+    local candidate = state and state.personalCandidates
+        and state.personalCandidates[1] or nil
+    return candidate and candidate.fullType
+        and tostring(candidate.fullType) or nil
+end
+
+local function facilityItem(record, runtime, capability)
+    if capability == "food.dine"
+        or capability == "survival.eat.inventory"
+        or runtime.resourceKind == "personal_food"
+    then
+        local selected = tostring(runtime.activityItemFullType
+            or record.orderSpec and record.orderSpec.activityItemFullType
+            or "")
+        if selected ~= "" then
+            return selected, "UI_PNC_Action_FoodTarget"
+        end
+        return supplyItemFullType(record, "FOOD"),
+            "UI_PNC_Action_FoodTarget"
+    end
+    if capability == "water.nearby"
+        or runtime.resourceKind == "nearby_water"
+    then
+        local resource = runtime.resource
+        return fullTypeFromItem(resource and resource.item),
+            "UI_PNC_Action_WaterTarget"
+    end
+    if capability == "water.drink" then
+        return nil, "UI_PNC_Action_WaterTarget"
+    end
+end
+
 Status.Register("survival_state", 100, function(record)
     if record.alive == false then
         return activity("dead", "UI_PNC_Activity_Dead", "Dead")
@@ -110,6 +154,8 @@ Status.Register("facility_activity", 80, function(record)
         and PNC.FacilityJobDefinitions.Get(capability) or nil
     local facility = runtime.facilityId and PNC.SettlementRepository
         and PNC.SettlementRepository.GetFacility(runtime.facilityId) or nil
+    local itemFullType, itemLabelKey = facilityItem(
+        record, runtime, capability)
     return activity("facility:" .. capability,
         definition and definition.activityLabelKey,
         definition and definition.activityText
@@ -118,6 +164,8 @@ Status.Register("facility_activity", 80, function(record)
             phase = tostring(runtime.phase or ""),
             facilityId = runtime.facilityId,
             facilityDefinitionId = facility and facility.definitionId or nil,
+            activityItemFullType = itemFullType,
+            activityItemLabelKey = itemLabelKey,
         })
 end)
 

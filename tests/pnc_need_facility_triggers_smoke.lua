@@ -97,9 +97,9 @@ PNC = {
     },
 }
 
-local Triggers = T.load("ProjectHoomans", "server",
+local Triggers = T["load"]("ProjectHoomans", "server",
     "PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityTriggers.lua")
-T.load("ProjectHoomans", "server", "PNC/Needs/PNC_NeedSupplyBridge.lua")
+T["load"]("ProjectHoomans", "server", "PNC/Needs/PNC_NeedSupplyBridge.lua")
 
 T.equal(provider, Triggers, "single provider owns all facility need routes")
 local candidates = Triggers.GetCandidates(record.id)
@@ -242,5 +242,18 @@ PNC.NeedSupplyBridge.Evaluate(record, "HYDRATION")
 T.equal(supplyCalls, beforeCombatWater + 1,
     "combat remains active while hydration falls back to inventory")
 record.runtime.target = nil
+
+atHome = true
+record.needs.fatigue = 0.90
+record.runtime.manualActivityDisabled = "sleep"
+T.falsy(Triggers.PreferFacility(record, "sleep"),
+    "sleep stays disabled after the manual sleep toggle is turned off")
+local suppressedSleep = false
+for _, candidate in ipairs(Triggers.GetCandidates(record.id)) do
+    if candidate.sourceRef == "sleep" then suppressedSleep = true end
+end
+T.falsy(suppressedSleep,
+    "the fatigue provider does not immediately requeue disabled sleep")
+record.runtime.manualActivityDisabled = nil
 
 T.finish("pnc_need_facility_triggers_smoke")

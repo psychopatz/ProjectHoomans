@@ -25,11 +25,18 @@ local function hasRoute(record, definition)
         or resolveAwayRoute(record, definition) ~= nil
 end
 
+local function manuallyDisabled(record, definition)
+    return record and record.runtime
+        and tostring(record.runtime.manualActivityDisabled or "")
+            == tostring(definition and definition.capability or "")
+end
+
 function Triggers.PreferFacility(record, triggerId)
     local definition = Definitions.Get(triggerId)
     local actionable = definition and Definitions.Evaluate(
         definition, record, false)
-    if not actionable or AwayRoutes.IsCombatActive(record)
+    if manuallyDisabled(record, definition)
+        or not actionable or AwayRoutes.IsCombatActive(record)
         or not hasRoute(record, definition)
     then
         return false
@@ -48,7 +55,8 @@ function Triggers.GetCandidates(npcId)
     for _, definition in ipairs(Definitions.List()) do
         local actionable, metadata = Definitions.Evaluate(
             definition, record, false)
-        local available = actionable and hasRoute(record, definition)
+        local available = not manuallyDisabled(record, definition)
+            and actionable and hasRoute(record, definition)
         if available then
             local route = resolveAwayRoute(record, definition)
             candidates[#candidates + 1] = route
@@ -75,6 +83,9 @@ function Triggers.Validate(intent)
     local definition = Definitions.Get(route and route.needId or intent.sourceRef)
     if not record or record.alive == false then return false, "NPC_UNAVAILABLE" end
     if not definition then return false, "TRIGGER_NOT_FOUND" end
+    if manuallyDisabled(record, definition) then
+        return false, "MANUAL_ACTIVITY_DISABLED"
+    end
     if not PNC.CompanionCommands.IsCompanion(record) then
         return false, "NOT_COMPANION"
     end

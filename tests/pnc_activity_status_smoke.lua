@@ -10,6 +10,18 @@ PNC = {
                 activityText = "Sleeping",
             }
         end
+        if capability == "survival.eat.inventory" then
+            return {
+                activityLabelKey = "UI_PNC_Activity_Eating",
+                activityText = "Eating",
+            }
+        end
+        if capability == "water.drink" then
+            return {
+                activityLabelKey = "UI_PNC_Activity_Drinking",
+                activityText = "Drinking",
+            }
+        end
     end },
     SettlementRepository = { GetFacility = function(id)
         return id == "barracks:1"
@@ -43,6 +55,46 @@ T.equal(sleep.facilityDefinitionId, "barracks",
     "facility context survives the activity pipeline")
 T.equal(sleep.providerId, "facility_activity",
     "specific facility provider owns sleep status")
+
+local eating = Status.Build({
+    alive = true,
+    runtime = {
+        facilityActivity = {
+            capability = "survival.eat.inventory",
+            phase = "STARTING",
+        },
+        supply = {
+            byKind = {
+                FOOD = { lastUsedItem = { fullType = "Base.Apple" } },
+            },
+        },
+    },
+})
+T.equal(eating.activityItemFullType, "Base.Apple",
+    "food activity exposes the selected item type")
+T.equal(eating.activityItemLabelKey, "UI_PNC_Action_FoodTarget",
+    "food activity exposes its item fallback")
+
+local eatingCandidate = Status.Build({
+    alive = true,
+    runtime = {
+        facilityActivity = {
+            capability = "food.dine", phase = "STARTING",
+            activityItemFullType = "Base.Bread",
+        },
+    },
+})
+T.equal(eatingCandidate.activityItemFullType, "Base.Bread",
+    "food activity keeps the selected item before consumption starts")
+
+local drinking = Status.Build({
+    alive = true,
+    runtime = { facilityActivity = {
+        capability = "water.drink", phase = "STARTING",
+    } },
+})
+T.equal(drinking.activityItemLabelKey, "UI_PNC_Action_WaterTarget",
+    "drinking activity exposes its water fallback")
 
 local combat = Status.Build({
     alive = true,

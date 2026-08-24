@@ -17,6 +17,8 @@ local played = {}
 local maintained = 0
 local finished = 0
 local held = 0
+local pathResets = 0
+local pathResetReasons = {}
 local bodyModData = {}
 
 ZombRand = function()
@@ -56,6 +58,16 @@ PNC = {
         Hold = function()
             held = held + 1
         end,
+    },
+    PathService = {
+        Commands = {
+            Reset = function(pathRecord, _, reason)
+                pathResets = pathResets + 1
+                pathResetReasons[#pathResetReasons + 1] = reason
+                pathRecord.runtime.pathing = nil
+                pathRecord.runtime.localNavigation = nil
+            end,
+        },
     },
 }
 
@@ -166,6 +178,12 @@ T.truthy(finished == 1,
     "idle scene interruption did not release the bump")
 
 now = 2000
+record.runtime.pathing = { phase = "active" }
+record.runtime.localNavigation = {
+    provider = "engine_path",
+    nativeActive = true,
+}
+record.runtime.followState = { ownerMoving = true }
 started, active = PNC.AnimationScenes.StartSurrender(
     record,
     body,
@@ -179,6 +197,16 @@ T.truthy(maintained == 1,
     "surrender loop was not maintained")
 T.truthy(held >= 2,
     "surrender did not hold movement")
+T.equal(pathResets, 1,
+    "blocking scene did not synchronously reset movement")
+T.equal(pathResetReasons[1], "animation_scene:social.surrender",
+    "blocking scene reset used the wrong ownership reason")
+T.falsy(record.runtime.pathing,
+    "blocking scene retained the previous movement lane")
+T.falsy(record.runtime.localNavigation,
+    "blocking scene retained native navigation")
+T.falsy(record.runtime.followState.ownerMoving,
+    "blocking scene retained stale follow movement")
 T.truthy(PNC.AnimationScenes.Interrupt(
     record,
     body,
@@ -326,6 +354,29 @@ T.truthy(played[#played].bump == "HammerLow"
     "construction did not advance to the low hammer animation")
 T.truthy(PNC.AnimationScenes.Interrupt(record, body, "combat"),
     "construction scene did not release for combat")
+
+record.runtime.pathing = { phase = "active" }
+record.runtime.localNavigation = {
+    provider = "engine_path",
+    nativeActive = true,
+}
+record.runtime.followState = { ownerMoving = true }
+local eatStarted = PNC.AnimationScenes.Request(
+    record,
+    body,
+    "survival.eat.inventory",
+    { now = now }
+)
+T.truthy(eatStarted,
+    "eating scene did not start")
+T.falsy(record.runtime.pathing,
+    "eating scene retained the previous movement lane")
+T.falsy(record.runtime.localNavigation,
+    "eating scene retained native navigation")
+T.falsy(record.runtime.followState.ownerMoving,
+    "eating scene retained stale follow movement")
+T.truthy(PNC.AnimationScenes.Tick(record, body, now + 1),
+    "eating scene was interrupted by pre-scene movement state")
 
 local holdAnimationCalls = 0
 local holdMotionClears = 0
