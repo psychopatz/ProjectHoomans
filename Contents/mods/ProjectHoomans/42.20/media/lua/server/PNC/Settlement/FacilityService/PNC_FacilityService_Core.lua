@@ -107,6 +107,49 @@ function Service.RefreshState(facilityOrId)
     return true, facility.cachedState
 end
 
+function Service.DebugGrantMaterials(player, args)
+    args = type(args) == "table" and args or {}
+    local storageService = PNC.ColonyStorageService
+    if not storageService or not storageService.ResolveForPlayer
+        or not storageService.DebugAction
+    then
+        return nil, "STORAGE_DEBUG_UNAVAILABLE"
+    end
+    local storage, reason = storageService.ResolveForPlayer(player)
+    if not storage then return nil, reason end
+    local definition = Definitions.Get(args.definitionId)
+    if not definition then return nil, "FACILITY_DEFINITION_NOT_FOUND" end
+    local costs = definition.buildCosts or definition.buildCost or {}
+    local products = {}
+    for _, cost in ipairs(costs) do
+        local fullType = cost.fullType
+            or cost.itemTypes and cost.itemTypes[1]
+        local quantity = math.max(1, math.floor(
+            tonumber(cost.amount or cost.quantity) or 1))
+        if fullType then
+            products[#products + 1] = {
+                fullType = tostring(fullType), quantity = quantity,
+            }
+        end
+    end
+    if #products == 0 then return nil, "FACILITY_HAS_NO_BUILD_MATERIALS" end
+    local granted, grantReason, _, grantDetails = storageService.DebugAction(
+        player, {
+            debugAction = "add_many",
+            storageId = storage.id,
+            products = products,
+            requestId = args.requestId,
+            transactionLogging = args.transactionLogging,
+        })
+    if not granted then return nil, grantReason end
+    return {
+        definitionId = tostring(args.definitionId),
+        storageId = storage.id,
+        products = products,
+        storageDetails = grantDetails,
+    }, "FACILITY_MATERIALS_GRANTED"
+end
+
 
 Internal.calculatedState = calculatedState
 Internal.emit = emit

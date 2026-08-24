@@ -50,6 +50,22 @@ local function requirementsMet(record, requirements)
     return rate > 0, reason, rate
 end
 
+local function recipeKnowledgeMet(record, order)
+    if not order or order.operation ~= "CRAFT" then return true end
+    if PNC.ResearchService and PNC.ResearchService.Queries
+        and PNC.ResearchService.Queries.HasRecipe
+        and PNC.ResearchService.Queries.HasRecipe(order.colonyId, order.recipeId)
+    then
+        return true
+    end
+    if PNC.RecipeKnowledge and PNC.RecipeKnowledge.Queries
+        and PNC.RecipeKnowledge.Queries.CanCraft
+    then
+        return PNC.RecipeKnowledge.Queries.CanCraft(record, order.recipeId)
+    end
+    return true
+end
+
 local function belongsToOrder(record, order)
     local affiliation = record and record.affiliation or {}
     local factionId = tostring(affiliation.factionID or affiliation.factionId
@@ -99,6 +115,7 @@ local function workerAvailable(record, order)
     then
         return false
     end
+    if not recipeKnowledgeMet(record, order) then return false end
     return requirementsMet(record, order.requiredSkills)
 end
 
@@ -117,6 +134,7 @@ local function findWorker(order)
         local eligible = not Service.ClaimsByWorker[tostring(record.id)]
             and not (record.runtime and record.runtime.workOrderId)
             and not (type(allowed) == "table" and allowed[job] == false)
+            and recipeKnowledgeMet(record, order)
             and requirementsMet(record, order.requiredSkills)
         if not eligible then return end
         if workerAvailable(record, order) then

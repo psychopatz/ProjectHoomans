@@ -23,6 +23,12 @@ local function tr(key, fallback)
     return value
 end
 
+local function canUseDebug()
+    local client = PNC.Client
+    return client and client.CanUseDebug
+        and client.CanUseDebug() == true
+end
+
 local function playerCount(fullType)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local inventory = player and player.getInventory and player:getInventory() or nil
@@ -126,6 +132,12 @@ function ISPNCFacilityBuildWindow:createChildren()
         target = self, onclick = ISPNCFacilityBuildWindow.onAction,
         variant = "success",
     })
+    self.debugMaterialsButton = UI.CreateButton(self, {
+        id = "debug_materials",
+        title = tr("UI_PNC_Facility_DebugGiveMaterials", "GIVE MATERIALS"),
+        target = self, onclick = ISPNCFacilityBuildWindow.onAction,
+        variant = "warning",
+    })
     self.cancelButton = UI.CreateButton(self, {
         id = "cancel", title = tr("UI_Cancel", "CANCEL"), target = self,
         onclick = ISPNCFacilityBuildWindow.onAction, variant = "danger",
@@ -139,6 +151,18 @@ function ISPNCFacilityBuildWindow:createChildren()
         onclick = ISPNCFacilityBuildWindow.onAction, variant = "quiet",
     })
     self:setCategory(self.options[1] and self.options[1].category or nil)
+    if self.focusDefinitionId then
+        local focused
+        for _, option in ipairs(self.options) do
+            if tostring(option.id) == tostring(self.focusDefinitionId) then
+                focused = option; break
+            end
+        end
+        if focused then
+            self:setCategory(focused.category)
+            self:setSelected(focused.id)
+        end
+    end
     self:requestResponsiveLayout(true)
 end
 
@@ -187,8 +211,13 @@ function ISPNCFacilityBuildWindow:onResponsiveLayout()
     self.descriptionY = cardsY + cardsHeight + 8
     Layout.SetBounds(self.confirmButton, rect.x,
         rect.y + rect.height - buttonHeight, 130, buttonHeight)
+    Layout.SetBounds(self.debugMaterialsButton, rect.x + 142,
+        rect.y + rect.height - buttonHeight, 160, buttonHeight)
     Layout.SetBounds(self.cancelButton, rect.x + rect.width - 110,
         rect.y + rect.height - buttonHeight, 110, buttonHeight)
+    self.debugMaterialsButton:setVisible(canUseDebug())
+    self.debugMaterialsButton:setEnable(canUseDebug()
+        and self.selectedOption ~= nil)
     Layout.SetBounds(self.previousPageButton,
         rect.x + math.floor(rect.width / 2) - 42,
         rect.y + rect.height - buttonHeight, 36, buttonHeight)
@@ -238,6 +267,9 @@ function ISPNCFacilityBuildWindow:setSelected(id)
     if self.confirmButton then
         self.confirmButton:setEnable(option and option.enabled == true)
     end
+    if self.debugMaterialsButton then
+        self.debugMaterialsButton:setEnable(canUseDebug() and option ~= nil)
+    end
 end
 
 function ISPNCFacilityBuildWindow:prerender()
@@ -259,6 +291,18 @@ function ISPNCFacilityBuildWindow:onAction(button)
     if button.internal == "page_next" then
         self:setCategoryPage((self.categoryPage or 1) + 1); return
     end
+    if button.internal == "debug_materials" then
+        if canUseDebug() and self.selectedOption then
+            local client = PNC.Client
+            if client and client.RequestDebugFacilityMaterials then
+                client.RequestDebugFacilityMaterials({
+                    definitionId = self.selectedOption.id,
+                })
+                self:close()
+            end
+        end
+        return
+    end
     if button.internal == "build" and self.selectedOption
         and self.selectedOption.enabled
     then
@@ -277,6 +321,7 @@ function ISPNCFacilityBuildWindow:new(x, y, width, height, options)
     setmetatable(object, self); self.__index = self
     object.options = options.options or {}
     object.onConfirm = options.onConfirm
+    object.focusDefinitionId = options.focusDefinitionId
     return object
 end
 
@@ -363,7 +408,8 @@ end
 
 BuildUI.BuildOptions = buildOptions
 
-function BuildUI.Open(settlement, onConfirm, storage, research)
+function BuildUI.Open(settlement, onConfirm, storage, research,
+    focusDefinitionId)
     if not settlement then return nil end
     if BuildUI.instance then BuildUI.instance:close() end
     local options = buildOptions(settlement, storage, research)
@@ -373,7 +419,8 @@ function BuildUI.Open(settlement, onConfirm, storage, research)
         math.floor((getCore():getScreenHeight() - height) / 2),
         width, height, {
             title = tr("UI_PNC_Facility_BuildTitle", "BUILD A BUILDING"),
-            options = options, onConfirm = onConfirm, resizable = false,
+            options = options, onConfirm = onConfirm,
+            focusDefinitionId = focusDefinitionId, resizable = false,
         })
     window:initialise(); window:instantiate(); window:addToUIManager()
     window:setVisible(true)

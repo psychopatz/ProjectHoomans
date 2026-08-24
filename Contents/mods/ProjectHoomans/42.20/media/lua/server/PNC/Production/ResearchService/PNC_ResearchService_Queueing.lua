@@ -20,8 +20,7 @@ local function researchTarget(order, worker, live)
     local technology = mode == "technology" and Definitions.Get(
         order.payload and order.payload.technologyId) or nil
     local capability = technology and technology.researchCapability
-        or mode == "blueprint" and "work.blueprint"
-        or mode == "reverse" and "work.reverse" or "work.research"
+        or mode == "blueprint" and "work.blueprint" or "work.research"
     return PNC.FacilityService.AcquireActivity(order.baseId, worker.id,
         capability, { abstract = live == nil, ttlMs = 30000,
             workOrderId = order.id })
@@ -87,6 +86,23 @@ function Service.Commands.ReconcileDuplicates()
         for index = 2, #bucket do
             local cancelled = PNC.WorkService.Commands.Cancel(
                 bucket[index].id, "duplicate_research_order")
+            if cancelled then removed = removed + 1 end
+        end
+    end
+    return removed
+end
+
+function Service.Commands.ReconcileRemovedReverseEngineering()
+    local removed = 0
+    for _, order in ipairs(PNC.WorkService.Queries.List()) do
+        local payload = order.payload or {}
+        if order.operation == "RESEARCH"
+            and order.status ~= "COMPLETED"
+            and order.status ~= "CANCELLED"
+            and payload.mode == "reverse"
+        then
+            local cancelled = PNC.WorkService.Commands.Cancel(
+                order.id, "reverse_engineering_removed")
             if cancelled then removed = removed + 1 end
         end
     end

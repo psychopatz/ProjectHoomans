@@ -10,6 +10,7 @@ require "PNC/Production/PNC_HomeDutyService"
 require "PNC/Production/PNC_WorkService"
 require "PNC/Production/PNC_ResearchService"
 require "PNC/Production/PNC_CraftingService"
+require "PNC/Production/PNC_RecipeBookService"
 require "PNC/Production/ConstructionService/PNC_ConstructionService"
 require "PNC/Production/PNC_BuildingService"
 

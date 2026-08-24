@@ -36,6 +36,8 @@ function Types.NewRecord(definition)
         equipmentPoolID = def.equipmentPoolID,
         equipment = Internal.NormalizeEquipment(def.equipment),
         inventory = Internal.NormalizeInventory(def.inventory),
+        recipeKnowledge = PNC.RecipeKnowledge
+            and PNC.RecipeKnowledge.Normalize(def.recipeKnowledge) or nil,
         combatProfile = {
             meleeDamage = tonumber(def.combatProfile.meleeDamage) or 10,
             rangedDamage = tonumber(def.combatProfile.rangedDamage) or 7,

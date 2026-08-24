@@ -78,6 +78,8 @@ function Types.NormalizeDefinition(definition)
         dynamicTraits = PNC.ConditionStats
             and PNC.ConditionStats.NormalizeTraits(dynamicTraitSource) or {},
         dynamicTraitsAuthored = dynamicTraitsAuthored == true,
+        recipeKnowledge = PNC.RecipeKnowledge
+            and PNC.RecipeKnowledge.Normalize(def.recipeKnowledge) or nil,
     }
 end
 

@@ -38,7 +38,6 @@ local snapshot = {
         facilities = {{ definitionId = "research_facility",
         constructionState = "BUILT", components = {
             { role = "work.research" }, { role = "work.blueprint" },
-            { role = "work.reverse" },
         } }} },
     research = {
         entries = {{
@@ -47,7 +46,7 @@ local snapshot = {
         }, {
             id = "utility:water_collector:1", labelKey = "Water Collection I",
             requiredWork = 65, known = false,
-            researchCapability = "work.reverse",
+            researchCapability = "work.research",
         }},
         learnedRecipeIds = {},
         orders = {{
@@ -68,7 +67,7 @@ T.truthy(window.researchCatalog.items[2].catalogCells.state == "RESEARCHING 25%"
 T.truthy(window.researchCatalog.items[2].catalogCells.state == "RESEARCHING 25%",
     "active research row does not expose resumable progress")
 T.truthy(window.researchCatalog.items[3].catalogCells.state == "NOT LEARNED",
-    "water technology should be researchable through the lab lane")
+    "water technology should be researchable through the research lane")
 ResearchTab.Rebuild(window, snapshot, function(_, fallback) return fallback end)
 T.truthy(#window.researchQueueList.items == 2,
     "research queue refresh must not accumulate headers")

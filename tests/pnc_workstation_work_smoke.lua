@@ -25,7 +25,6 @@ local occupied = {}
 local stations = {
     ["work.research"] = { "research:1" },
     ["work.craft"] = { "workshop:1:craft" },
-    ["work.disassemble"] = { "workshop:1:disassemble" },
 }
 PNC.FacilityService = { AcquireActivity = function(_, npcId, capability)
     for _, stationId in ipairs(stations[capability] or {}) do
@@ -90,10 +89,9 @@ T.equal(ok, false, "second same-workshop craft rejected")
 T.equal(reason, "NO_ACTIVITY_CAPACITY", "same craft blocker")
 
 local disassembly = queue("DISASSEMBLE")
-T.truthy(Work.Commands.Assign(disassembly.id, "crafter2"),
-    "craft and disassemble concurrent")
-T.equal(Work.Queries.Get(disassembly.id).stationId,
-    "workshop:1:disassemble", "separate disassembly station")
+ok, reason = Work.Commands.Assign(disassembly.id, "crafter2")
+T.equal(ok, false, "salvage shares the crafting station")
+T.equal(reason, "NO_ACTIVITY_CAPACITY", "shared station blocker")
 
 stations["work.craft"][2] = "workshop:2:craft"
 T.truthy(Work.Commands.Assign(craft2.id, "crafter3"), "second workshop craft")
@@ -124,9 +122,13 @@ T.equal(Work.Queries.Get(craft1.id).status, Definitions.STATUS.COMPLETED,
 T.equal(Work.ClaimsByStation["workshop:1:craft"], nil,
     "completion releases station")
 
+T.truthy(Work.Commands.Assign(disassembly.id, "crafter1"),
+    "salvage can use the released crafting station")
+T.equal(Work.Queries.Get(disassembly.id).stationId,
+    "workshop:1:craft", "salvage uses the shared crafting station")
 T.truthy(Work.Commands.Cancel(disassembly.id), "cancel")
-T.equal(occupied["workshop:1:disassemble"], nil,
-    "cancel releases facility reservation")
+T.equal(occupied["workshop:1:craft"], nil,
+    "cancel releases shared facility reservation")
 
 local collected = false
 PNC.Registry.Data.liveCrafter = { id = "liveCrafter", alive = true,

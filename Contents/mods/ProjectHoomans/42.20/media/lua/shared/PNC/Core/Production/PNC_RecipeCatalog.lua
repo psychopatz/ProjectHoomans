@@ -155,6 +155,7 @@ local function normalizeRecipe(recipe)
         resultQuantity = normalizedOutputs[1].amount,
         requiredSkills = skills,
         craftTime = tonumber(call(recipe, "getTime")) or 100,
+        needToBeLearn = call(recipe, "needToBeLearn") == true,
         supported = true,
     }
 end

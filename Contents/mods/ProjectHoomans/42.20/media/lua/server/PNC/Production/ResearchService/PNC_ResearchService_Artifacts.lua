@@ -1,4 +1,4 @@
--- Blueprint and reverse-engineering research commands.
+-- Blueprint research artifacts. Literature is handled by RecipeBookService.
 
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
@@ -97,37 +97,6 @@ function Service.Commands.StudyBlueprint(player, recordIndex)
         payload = { mode = "blueprint", storageId = context.storage.id,
             reservationId = reservation.id,
             resourceFullType = "PNC.RecipeBlueprint" } })
-    if not order then
-        PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
-    end
-    return order, reason
-end
-
-function Service.Commands.ReverseEngineer(player, recordIndex)
-    local context, reason = PNC.ProductionContext.ForPlayer(player)
-    if not context then return nil, reason end
-    local info
-    info, reason = PNC.ColonyStorageService.ReadProductionRecord(
-        context.storage.id, recordIndex)
-    if not info then return nil, reason end
-    local producers = PNC.RecipeCatalog.Queries.GetProducerKeys(info.fullType)
-    if #producers == 0 then return nil, "REVERSE_ENGINEER_UNSUPPORTED" end
-    if #producers > 1 then return nil, "REVERSE_ENGINEER_AMBIGUOUS" end
-    local descriptor = PNC.RecipeCatalog.Queries.Get(producers[1])
-    local recipeId = RegistryRepository.GetOrCreateId(descriptor.key)
-    local reservation
-    reservation, reason = PNC.ColonyStorageService.ReserveProductionRecord(
-        context.storage.id, recordIndex, 1, "research:specimen")
-    if not reservation then return nil, reason end
-    local order
-    order, reason = queue(context, { operation = "RESEARCH", recipeId = recipeId,
-        requiredWork = math.max(30, descriptor.craftTime
-            * Definitions.POLICY.reverseEngineeringWorkMultiplier),
-        requiredSkills = descriptor.requiredSkills,
-        payload = PNC.WorkInputService.Bind({ mode = "reverse",
-            storageId = context.storage.id, reservationId = reservation.id,
-            resourceFullType = info.fullType }, context.storage.id,
-            reservation.id, "research_resource") })
     if not order then
         PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
     end

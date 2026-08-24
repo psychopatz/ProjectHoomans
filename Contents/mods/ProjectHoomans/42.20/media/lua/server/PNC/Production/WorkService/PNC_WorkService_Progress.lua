@@ -119,6 +119,25 @@ function Service.Commands.AddProgress(orderId, workerId, amount)
     end
     if order.status == Status.PAUSED then return false, "WORK_ORDER_PAUSED" end
     local worker = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(workerId)
+    if order.operation == "CRAFT"
+        and PNC.RecipeKnowledge and PNC.RecipeKnowledge.Queries
+        and PNC.RecipeKnowledge.Queries.CanCraft
+    then
+        local researched = PNC.ResearchService and PNC.ResearchService.Queries
+            and PNC.ResearchService.Queries.HasRecipe
+            and PNC.ResearchService.Queries.HasRecipe(order.colonyId,
+                order.recipeId)
+        if not researched then
+            local known = PNC.RecipeKnowledge.Queries.CanCraft(
+                worker, order.recipeId)
+            if not known then
+                order.status, order.blockedReason = Status.BLOCKED,
+                    "RECIPE_BOOK_REQUIRED"
+                Repository.MarkDirty()
+                return false, order.blockedReason
+            end
+        end
+    end
     local eligible, reason = requirementsMet(worker, order.requiredSkills)
     if not eligible then
         order.status, order.blockedReason = Status.BLOCKED, reason

@@ -6,7 +6,7 @@ Definitions.OPERATION = {
     RESEARCH = "RESEARCH", CRAFT = "CRAFT", DISASSEMBLE = "DISASSEMBLE",
     CONSTRUCT = "CONSTRUCT", RECONSTRUCT = "RECONSTRUCT",
     DECONSTRUCT = "DECONSTRUCT",
-    BUILD_OBJECT = "BUILD_OBJECT",
+    BUILD_OBJECT = "BUILD_OBJECT", READ_BOOK = "READ_BOOK",
 }
 Definitions.STATUS = {
     QUEUED = "QUEUED", WAITING_FOR_WORKER = "WAITING_FOR_WORKER",
@@ -30,6 +30,7 @@ Definitions.BALANCE = {
 }
 Definitions.JOB_BY_OPERATION = {
     RESEARCH = "Researcher",
+    READ_BOOK = "Researcher",
     CRAFT = "WorkshopWorker",
     DISASSEMBLE = "WorkshopWorker",
     CONSTRUCT = "Constructor",
@@ -40,8 +41,32 @@ Definitions.JOB_BY_OPERATION = {
 Definitions.CAPABILITY_BY_OPERATION = {
     RESEARCH = "work.research",
     CRAFT = "work.craft",
-    DISASSEMBLE = "work.disassemble",
+    -- Salvaging remains its own work type/operation, but it uses the same
+    -- physical crafting station as CRAFT.  Keeping this mapping here makes
+    -- the shared station explicit for both assignment and presentation.
+    DISASSEMBLE = "work.craft",
+    READ_BOOK = "work.research",
 }
+Definitions.STATIONS = {
+    workshop = {
+        id = "workshop",
+        facilityId = "workshop",
+        capability = "work.craft",
+        role = "work.craft",
+        legacyRoles = { "work.disassemble" },
+        labelKey = "UI_PNC_Workshop_CraftingStation",
+    },
+}
+Definitions.STATION_BY_OPERATION = {
+    CRAFT = "workshop",
+    DISASSEMBLE = "workshop",
+}
+
+function Definitions.GetStation(operation)
+    local id = Definitions.STATION_BY_OPERATION[tostring(operation or "")]
+    return id and Definitions.STATIONS[id] or nil
+end
+
 Definitions.COLONY_JOBS = { "Constructor", "Researcher", "WorkshopWorker", "Farmer" }
 
 function Definitions.WorkRate(worker, requirements, facilityEfficiency, condition)

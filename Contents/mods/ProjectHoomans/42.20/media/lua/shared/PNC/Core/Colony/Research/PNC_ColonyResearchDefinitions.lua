@@ -59,7 +59,7 @@ for level = 1, 10 do
             level = math.min(5, math.floor((level + 1) / 2)) }},
         prerequisiteTechnology = level > 1
             and "utility:water_collector:" .. tostring(level - 1) or nil,
-        researchCapability = "work.reverse",
+        researchCapability = "work.research",
     }
 end
 

@@ -117,18 +117,89 @@ local function activeOrders(snapshot)
     return output
 end
 
-local function hasLane(snapshot, definitionId, role)
+local function defaultStation()
+    local definitions = PNC and PNC.WorkDefinitions or nil
+    local station = definitions and definitions.GetStation
+        and definitions.GetStation("CRAFT") or nil
+    return station or {
+        id = "workshop", facilityId = "workshop",
+        capability = "work.craft", role = "work.craft",
+        legacyRoles = { "work.disassemble" },
+        labelKey = "UI_PNC_Workshop_CraftingStation",
+    }
+end
+
+local function stationFor(entry, operation)
+    return entry and entry.requiredStation
+        or defaultStation()
+end
+
+local function stationLabel(station, tr)
+    local key = station and station.labelKey
+        or "UI_PNC_Workshop_CraftingStation"
+    return tr(key, key)
+end
+
+local function hasStation(snapshot, station)
+    local facilityId = station and station.facilityId or "workshop"
+    local role = station and station.role or "work.craft"
     for _, facility in ipairs(snapshot.settlement
         and snapshot.settlement.facilities or {}) do
-        if facility.definitionId == definitionId
+        if facility.definitionId == facilityId
             and facility.constructionState == "BUILT"
         then
             for _, component in ipairs(facility.components or {}) do
                 if component.role == role then return true end
+                for _, legacyRole in ipairs(station.legacyRoles or {}) do
+                    if component.role == legacyRole then return true end
+                end
             end
         end
     end
     return false
+end
+
+local function stationSortKey(entry, operation)
+    local station = stationFor(entry, operation)
+    return tostring(station and station.id or "workshop")
+end
+
+local function sortByStation(values, operation)
+    local output = {}
+    for _, value in ipairs(values or {}) do output[#output + 1] = value end
+    table.sort(output, function(left, right)
+        local leftStation, rightStation = stationSortKey(left, operation),
+            stationSortKey(right, operation)
+        if leftStation ~= rightStation then return leftStation < rightStation end
+        local leftName = left.descriptor and left.descriptor.displayName
+            or left.fullType or left.name or ""
+        local rightName = right.descriptor and right.descriptor.displayName
+            or right.fullType or right.name or ""
+        return tostring(leftName) < tostring(rightName)
+    end)
+    return output
+end
+
+local function addStationHeader(list, station, tr)
+    local label = stationLabel(station, tr)
+    list:addItem("station:" .. tostring(station and station.id or "workshop"), {
+        name = label, restricted = true, catalogHeader = true,
+        stationHeader = true,
+        catalogCells = { category = label, quantity = "", availability = "",
+            action = "" },
+    })
+end
+
+local function openStationBuild(window, station)
+    local settlement = window.snapshot and window.snapshot.settlement
+    if not settlement then return false end
+    local BuildModal = require "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal"
+    local Facility = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityActions"
+    BuildModal.Open(settlement, function(definitionId)
+        Facility.BeginBuild(window, definitionId)
+    end, window.snapshot.storage, window.snapshot.research,
+        station and station.facilityId or "workshop")
+    return true
 end
 
 local function canCraft(resolved, quantity)
@@ -159,13 +230,21 @@ function Workshop.OnCatalogCell(window, row, key, localX, width)
                 + (localX >= width * 0.5 and 1 or -1)))
             window.workshopQuantities[tostring(row.recipe.id)] = quantity
             window:rebuildDetails()
-        elseif key == "action" and canCraft(row.recipe, quantity) then
-            PNC.Client.RequestColonyAction("craft_queue",
-                { recipeId = row.recipe.id, quantity = quantity })
+        elseif key == "action" then
+            if row.stationMissing then
+                openStationBuild(window, row.requiredStation)
+            elseif canCraft(row.recipe, quantity) then
+                PNC.Client.RequestColonyAction("craft_queue",
+                    { recipeId = row.recipe.id, quantity = quantity })
+            end
         end
     elseif row.rowKind == "salvage" and key == "action" then
-        PNC.Client.RequestColonyAction("disassemble_queue",
-            { recordIndex = row.recordIndex })
+        if row.stationMissing then
+            openStationBuild(window, row.requiredStation)
+        else
+            PNC.Client.RequestColonyAction("disassemble_queue",
+                { recordIndex = row.recordIndex })
+        end
     end
 end
 
@@ -220,44 +299,89 @@ end
 function Workshop.Rebuild(window, snapshot, tr)
     if window.tab ~= "workshop" then return false end
     local workshop = snapshot.workshop or {}
+    local stationAvailability = {}
+    local function isStationReady(station)
+        local id = tostring(station and station.id or "workshop")
+        if stationAvailability[id] == nil then
+            stationAvailability[id] = hasStation(snapshot, station)
+        end
+        return stationAvailability[id]
+    end
+    local sharedStation = defaultStation()
+    local stationReady = isStationReady(sharedStation)
     window.workshopLaneAvailability = {
-        craft = hasLane(snapshot, "workshop", "work.craft"),
-        salvage = hasLane(snapshot, "workshop", "work.disassemble"),
+        -- Both lanes are separate work types, but intentionally share the
+        -- same physical station and therefore the same availability gate.
+        craft = stationReady,
+        salvage = stationReady,
     }
     rebuildQueue(window, activeOrders(snapshot))
     window.workshopRecipeList:clear()
     addCatalogHeader(window.workshopRecipeList,
         tr("UI_PNC_Workshop_Craftable", "CRAFTABLE ITEMS"))
+    local recipes = {}
     for _, recipe in ipairs(workshop.knownRecipes or {}) do
         if recipe and recipe.descriptor and recipe.status == "AVAILABLE" then
+            recipes[#recipes + 1] = recipe
+        end
+    end
+    local activeStation
+    for _, recipe in ipairs(sortByStation(recipes, "CRAFT")) do
+        local requiredStation = stationFor(recipe, "CRAFT")
+        if not activeStation
+            or stationSortKey(activeStation, "CRAFT")
+                ~= stationSortKey(recipe, "CRAFT")
+        then
+            activeStation = { requiredStation = requiredStation }
+            addStationHeader(window.workshopRecipeList, requiredStation, tr)
+        end
             local output = recipe.descriptor.outputs
                 and recipe.descriptor.outputs[1] or nil
             local fullType = output and output.itemTypes and output.itemTypes[1]
             local metadata, quantity = InventoryModel.Probe(fullType),
                 quantityFor(window, recipe.id)
             local stocked = canCraft(recipe, quantity)
-            local enabled = stocked and window.workshopLaneAvailability.craft
+            local missingStation = not isStationReady(requiredStation)
+            local enabled = missingStation or stocked and stationReady
+            local action = missingStation
+                and tr("UI_PNC_Workshop_BuildStation", "BUILD STATION")
+                or stocked and stationReady
+                and tr("UI_PNC_Workshop_CraftAction", "CRAFT")
+                or tr("UI_PNC_Workshop_MissingMaterials", "MISSING MATERIALS")
             window.workshopRecipeList:addItem(recipe.descriptor.displayName, {
                 rowKind = "recipe", recipe = recipe, enabled = enabled,
-                restricted = not enabled,
+                restricted = not enabled and not missingStation,
+                station = requiredStation, requiredStation = requiredStation,
+                stationMissing = missingStation,
                 name = tostring(recipe.descriptor.displayName or recipe.key),
                 texture = metadata.texture, catalogCells = {
                     category = tostring(metadata.category or "Recipe"),
                     quantity = "-  " .. tostring(quantity) .. "  +",
                     availability = stocked and "AVAILABLE" or "UNAVAILABLE",
-                    action = enabled and "CRAFT" or "NO CRAFT STATION" },
+                    action = action },
                 catalogColors = { availability = stocked and "success"
-                    or "warning", action = enabled and "accent" or "warning" },
+                    or "warning", action = missingStation and "warning"
+                    or enabled and "accent" or "warning" },
             })
-        end
     end
     window.workshopSalvageList:clear()
     addCatalogHeader(window.workshopSalvageList,
         tr("UI_PNC_Workshop_Salvageable", "SALVAGEABLE ITEMS"),
         tr("UI_PNC_Workshop_PotentialYield", "POTENTIAL YIELD"))
-    for _, candidate in ipairs(workshop.disassemblyCandidates or {}) do
+    activeStation = nil
+    for _, candidate in ipairs(sortByStation(
+        workshop.disassemblyCandidates or {}, "DISASSEMBLE")) do
+        local requiredStation = stationFor(candidate, "DISASSEMBLE")
+        if not activeStation
+            or stationSortKey(activeStation, "DISASSEMBLE")
+                ~= stationSortKey(candidate, "DISASSEMBLE")
+        then
+            activeStation = { requiredStation = requiredStation }
+            addStationHeader(window.workshopSalvageList, requiredStation, tr)
+        end
         local metadata = InventoryModel.Probe(candidate.fullType)
-        local enabled = window.workshopLaneAvailability.salvage
+        local missingStation = not isStationReady(requiredStation)
+        local enabled = missingStation or stationReady
         local yields = {}
         for _, value in ipairs(candidate.potentialYield or {}) do
             local yieldMetadata = InventoryModel.Probe(value.fullType)
@@ -267,14 +391,20 @@ function Workshop.Rebuild(window, snapshot, tr)
         end
         local yieldText = #yields > 0 and table.concat(yields, ", ") or "NONE"
         local row = { rowKind = "salvage", enabled = enabled,
-            restricted = not enabled, fullType = candidate.fullType,
+            restricted = not enabled and not missingStation,
+            station = requiredStation, requiredStation = requiredStation,
+            stationMissing = missingStation, fullType = candidate.fullType,
             name = tostring(metadata.name or candidate.fullType),
             texture = metadata.texture, recordIndex = candidate.recordIndex,
             catalogCells = { category = tostring(metadata.category or "Item"),
                 quantity = tostring(candidate.quantity), availability = yieldText,
-                action = enabled and "SALVAGE" or "NO DISASSEMBLY STATION" },
+                action = missingStation
+                    and tr("UI_PNC_Workshop_BuildStation", "BUILD STATION")
+                    or enabled and tr("UI_PNC_Workshop_SalvageAction", "SALVAGE")
+                    or tr("UI_PNC_Workshop_NoStation", "NO CRAFT STATION") },
             catalogColors = { availability = #yields > 0 and "success" or "warning",
-                action = enabled and "accent" or "warning" } }
+                action = missingStation and "warning"
+                    or enabled and "accent" or "warning" } }
         window.workshopSalvageList:addItem(row.name, row)
     end
     applySubtab(window, true)

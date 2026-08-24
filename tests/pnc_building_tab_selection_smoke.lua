@@ -86,4 +86,27 @@ T.equal(window.buildQueueList.yScroll, 32,
 T.equal(window.buildMaterialList.items[2].item.name, "Base.Plank",
     "materials follow the selected queue order after rebuild")
 
+local debugRequest
+PNC.Client.RequestColonyAction = function(action, args)
+    debugRequest = { action = action, args = args }
+end
+window.buildDebugAvailable = true
+recipes[1].materials = {{ itemTypes = { "Base.Plank" }, amount = 1,
+    available = 0, ready = false }}
+Building.Rebuild(window, { building = { recipes = recipes, queue = queue } })
+local missingRow
+for _, entry in ipairs(window.buildRecipeList.items or {}) do
+    if entry.item and entry.item.recipe == recipes[1] then
+        missingRow = entry.item
+        break
+    end
+end
+T.equal(missingRow.catalogCells.action, "GIVE",
+    "debug-enabled missing building exposes material shortcut")
+Building.OnRecipeCell(window, missingRow, "action")
+T.equal(debugRequest.action, "building_debug_get_items",
+    "building material shortcut uses existing debug action")
+T.equal(debugRequest.args.recipeKey, "WallA",
+    "building material shortcut targets selected recipe")
+
 T.finish("pnc_building_tab_selection_smoke")

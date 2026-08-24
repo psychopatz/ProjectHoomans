@@ -14,13 +14,16 @@ function Service.Commands.QueueCraft(player, recipeId, quantity)
     recipeId = math.floor(tonumber(recipeId) or 0)
     quantity = math.max(1, math.floor(tonumber(quantity) or 1))
     if not ctx then return nil, reason end
-    if not PNC.ResearchService.Queries.HasRecipe(ctx.colony.id, recipeId) then
-        return nil, "RECIPE_UNKNOWN"
-    end
     local resolved = Registry.Queries.Resolve(recipeId)
     if not resolved or resolved.status ~= "AVAILABLE" then
         return nil, "RECIPE_UNAVAILABLE"
     end
+    local researched = PNC.ResearchService.Queries.HasRecipe(
+        ctx.colony.id, recipeId)
+    local needsBook = PNC.RecipeKnowledge
+        and PNC.RecipeKnowledge.Queries.RequiresBook
+        and PNC.RecipeKnowledge.Queries.RequiresBook(resolved.descriptor)
+    if not researched and not needsBook then return nil, "RECIPE_UNKNOWN" end
     local requirements = {}
     for index = 1, #resolved.descriptor.inputs do
         local row = resolved.descriptor.inputs[index]
@@ -87,4 +90,3 @@ function Service.Commands.QueueDisassembly(player, recordIndex)
     end
     return order, reason
 end
-

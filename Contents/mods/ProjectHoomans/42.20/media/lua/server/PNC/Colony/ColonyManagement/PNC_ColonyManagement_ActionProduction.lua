@@ -24,8 +24,8 @@ function Internal.handleProductionAction(player, args, action)
         details, reason = PNC.ResearchService.Commands.StudyBlueprint(
             player, args.recordIndex)
         ok = details ~= nil
-    elseif action == "research_reverse_engineer" then
-        details, reason = PNC.ResearchService.Commands.ReverseEngineer(
+    elseif action == "research_read_book" then
+        details, reason = PNC.RecipeBookService.Commands.QueueRead(
             player, args.recordIndex)
         ok = details ~= nil
     elseif action == "blueprint_debug_create" then

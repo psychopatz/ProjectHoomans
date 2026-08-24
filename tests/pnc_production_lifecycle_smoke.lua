@@ -315,27 +315,12 @@ T.equal(#Crafting.Queries.DisassemblyCandidates({ id = "money-test",
     inventory = { records = {{}} } }), 0,
     "currency is never offered as salvage input")
 local researchCatalog = Research.Queries.BuildSnapshot("c1")
-T.equal(#researchCatalog.candidates, 2,
-    "research snapshot exposes blueprint and reverse-engineering choices")
+T.equal(#researchCatalog.candidates, 1,
+    "research snapshot exposes blueprint choices without reverse engineering")
 T.equal(researchCatalog.candidates[1].mode, "blueprint",
     "blueprint research choice is categorized")
-T.equal(researchCatalog.candidates[2].mode, "reverse",
-    "specimen research choice is categorized")
-local reverse = T.truthy(Research.Commands.ReverseEngineer({}, 2))
-T.truthy(Work.Commands.Assign(reverse.id, "worker"),
-    "reverse routing assignment")
-T.equal(acquiredCapabilities[#acquiredCapabilities], "work.reverse",
-    "reverse engineering routes to the laboratory")
-T.truthy(Work.Commands.Cancel(reverse.id), "reverse routing cleanup")
-occupied["work.reverse"] = nil
-reverse = T.truthy(Research.Commands.ReverseEngineer({}, 2))
-T.truthy(Work.Commands.Cancel(reverse.id), "reverse cancellation")
-T.equal(inventory["Base.Axe"], 1, "cancel preserves specimen")
-reverse = T.truthy(Research.Commands.ReverseEngineer({}, 2))
-T.truthy(Work.Commands.Assign(reverse.id, "worker"), "reverse assignment")
-T.truthy(Work.Commands.AddProgress(reverse.id, "worker", 100), "reverse completion")
-T.equal(inventory["Base.Axe"], 0, "reverse consumes specimen once")
-T.truthy(Research.Queries.HasRecipe("c1", 1), "reverse unlocks recipe")
+T.equal(Research.Commands.ReverseEngineer, nil,
+    "reverse engineering command is removed")
 
 ResearchRepository.ByColony, ResearchRepository.Runtime = {}, {}
 local blueprint = T.truthy(Research.Commands.StudyBlueprint({}, 1))
@@ -352,7 +337,7 @@ T.truthy(kitOK, "spear debug kit")
 T.equal(kit.recipeId, 1, "spear kit targets deterministic recipe")
 T.truthy(inventory["Base.Plank"] >= 8, "spear kit adds crafting materials")
 T.truthy(inventory["Base.SpearCrafted"] >= 2,
-    "spear kit adds reverse-engineering and deconstruction specimens")
+    "spear kit adds crafting and deconstruction specimens")
 
 local bootstrap = T.truthy(Construction.QueueBuild({}, bootstrapFacility, {
     bootstrapFromPlayer = true, buildWork = 5, buildCosts = {

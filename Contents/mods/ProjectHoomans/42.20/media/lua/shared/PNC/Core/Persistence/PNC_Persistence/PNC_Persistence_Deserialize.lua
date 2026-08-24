@@ -87,6 +87,7 @@ local function buildDefinition(
                 and Internal.hasTableEntries(
                     raw.dynamicTraits or raw.pncTraits
                 )),
+        recipeKnowledge = raw.recipeKnowledge,
     }
 end
 
@@ -164,6 +165,11 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     record.persist = raw.persist ~= false
     record.generation = type(raw.generation) == "table"
         and PNC.Core.DeepCopy(raw.generation) or nil
+    if PNC.RecipeKnowledge and PNC.RecipeKnowledge.Normalize then
+        record.recipeKnowledge = PNC.RecipeKnowledge.Normalize(
+            raw.recipeKnowledge or record.recipeKnowledge)
+        record.runtime.recipeKnowledgeIndex = nil
+    end
     return Internal.FinalizeDeserializedRecord(
         record,
         raw,

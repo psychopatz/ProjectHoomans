@@ -28,6 +28,9 @@ function Lifecycle.StampLiveBody(record, zombie)
     modData.PNC_PersistedShell = true
     modData.PNC_ShellVersion = Const.BODY_SHELL_VERSION
     modData.PNC_BaseOutfit = "Naked"
+    if PNC.RecipeKnowledge and PNC.RecipeKnowledge.BindLiveBody then
+        PNC.RecipeKnowledge.BindLiveBody(record, zombie)
+    end
     record.runtime.startupBodyHint = nil
     Internal.mark(record, "live", "bound", "body_stamped")
     return record.runtime.bodyLease

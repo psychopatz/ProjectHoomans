@@ -86,12 +86,15 @@ function Persistence.SerializeRecord(record)
     local progression
     local payload
     local inventoryPayload
+    local recipeKnowledge
     if not record or record.persist == false then
         return nil
     end
     identity = Internal.sanitizeIdentity(record.identity, record)
     progression = prepareProgression(record)
     inventoryPayload = serializeInventory(record)
+    recipeKnowledge = PNC.RecipeKnowledge
+        and PNC.RecipeKnowledge.Serialize(record) or nil
     payload = {
         schemaVersion = Const.PERSISTENCE_VERSION,
         recordRevision = math.max(0, math.floor(Internal.normalizeNumber(record.recordRevision, 0))),
@@ -153,6 +156,7 @@ function Persistence.SerializeRecord(record)
                 record.affiliation
             ) or nil,
         progression = progression,
+        recipeKnowledge = recipeKnowledge,
         corpse = Internal.sanitizeCorpse(record.corpse, record),
         travel = PNC.Travel
             and PNC.Travel.Model

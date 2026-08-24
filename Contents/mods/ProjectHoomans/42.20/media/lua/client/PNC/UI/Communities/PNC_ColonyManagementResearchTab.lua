@@ -32,8 +32,8 @@ function ResearchTab.Create(window, UIBuilder, tr)
         "UI_PNC_Research_BaseTab", ISPNCColonyManagementWindow.onResearchControl)
     window.researchBlueprintTab = control(window, UIBuilder, "tab_blueprint",
         "UI_PNC_Research_BlueprintTab", ISPNCColonyManagementWindow.onResearchControl)
-    window.researchReverseTab = control(window, UIBuilder, "tab_reverse",
-        "UI_PNC_Research_ReverseTab", ISPNCColonyManagementWindow.onResearchControl)
+    window.researchBooksTab = control(window, UIBuilder, "tab_books",
+        "UI_PNC_Research_BooksTab", ISPNCColonyManagementWindow.onResearchControl)
     window.researchPause = control(window, UIBuilder, "research_pause",
         "UI_PNC_Work_Pause", ISPNCColonyManagementWindow.onResearchControl,
         "warning")
@@ -68,7 +68,7 @@ function ResearchTab.Layout(window, Layout, content)
     Layout.SetBounds(window.researchBaseTab, rightX, content.y, tabWidth, 27)
     Layout.SetBounds(window.researchBlueprintTab,
         rightX + tabWidth + tabGap, content.y, tabWidth, 27)
-    Layout.SetBounds(window.researchReverseTab,
+    Layout.SetBounds(window.researchBooksTab,
         rightX + (tabWidth + tabGap) * 2, content.y,
         right - (tabWidth + tabGap) * 2, 27)
     local debugWidth = math.floor((content.width - 6) / 2)
@@ -98,14 +98,14 @@ local function applySubtab(window)
     if lanes[window.researchSubtab] ~= true then
         window.researchSubtab = lanes.base and "base"
             or lanes.blueprint and "blueprint"
-            or lanes.reverse and "reverse" or "base"
+            or lanes.books and "books" or "base"
     end
     setButtonState(window.researchBaseTab,
         window.researchSubtab == "base", lanes.base)
     setButtonState(window.researchBlueprintTab,
         window.researchSubtab == "blueprint", lanes.blueprint)
-    setButtonState(window.researchReverseTab,
-        window.researchSubtab == "reverse", lanes.reverse)
+    setButtonState(window.researchBooksTab,
+        window.researchSubtab == "books", lanes.books)
 end
 
 function ResearchTab.ApplyVisibility(window, active)
@@ -115,7 +115,7 @@ function ResearchTab.ApplyVisibility(window, active)
     window.researchCatalog:setVisible(active)
     window.researchBaseTab:setVisible(active)
     window.researchBlueprintTab:setVisible(active)
-    window.researchReverseTab:setVisible(active)
+    window.researchBooksTab:setVisible(active)
     window.researchPause:setVisible(active)
     window.researchCancel:setVisible(active)
     window.researchDebugBlueprint:setVisible(active and debugAuthorized)
@@ -126,7 +126,8 @@ end
 local function activeResearch(snapshot)
     local output = {}
     for _, order in ipairs(snapshot.research and snapshot.research.orders or {}) do
-        if order.operation == "RESEARCH" and order.status ~= "COMPLETED"
+        if (order.operation == "RESEARCH" or order.operation == "READ_BOOK")
+            and order.status ~= "COMPLETED"
             and order.status ~= "CANCELLED" then output[#output + 1] = order end
     end
     return output
@@ -141,10 +142,13 @@ end
 local function matchingOrder(orders, mode, id)
     for _, order in ipairs(orders) do
         local payload = order.payload or {}
-        if payload.mode == mode and (mode == "technology"
+        local matches = mode == "technology"
             and tostring(payload.technologyId) == tostring(id)
-            or mode ~= "technology" and tonumber(order.recipeId) == tonumber(id))
-        then return order end
+            or mode == "book"
+            and tostring(payload.bookFullType) == tostring(id)
+            or mode ~= "technology" and mode ~= "book"
+            and tonumber(order.recipeId) == tonumber(id)
+        if payload.mode == mode and matches then return order end
     end
 end
 
@@ -170,8 +174,8 @@ function ResearchTab.OnCatalogCell(window, row, key)
     elseif row.mode == "blueprint" then
         PNC.Client.RequestColonyAction("research_study_blueprint",
             { recordIndex = row.recordIndex })
-    elseif row.mode == "reverse" then
-        PNC.Client.RequestColonyAction("research_reverse_engineer",
+    elseif row.mode == "book" then
+        PNC.Client.RequestColonyAction("research_read_book",
             { recordIndex = row.recordIndex })
     end
 end
@@ -185,7 +189,7 @@ function ResearchTab.OnControl(window, buttonValue)
     local action = tostring(buttonValue and buttonValue.internal or "")
     local tab = action == "tab_base" and "base"
         or action == "tab_blueprint" and "blueprint"
-        or action == "tab_reverse" and "reverse" or nil
+        or action == "tab_books" and "books" or nil
     if tab and window.researchLaneAvailability[tab] then
         window.researchSubtab = tab; window:rebuildDetails(); return true
     end
@@ -248,21 +252,20 @@ function ResearchTab.Rebuild(window, snapshot, tr)
     window.researchLaneAvailability = {
         base = hasLane(snapshot, "work.research"),
         blueprint = hasLane(snapshot, "work.blueprint"),
-        reverse = hasLane(snapshot, "work.reverse"),
+        books = hasLane(snapshot, "work.research"),
     }
     applySubtab(window)
     rebuildQueue(window, orders)
     window.researchCatalog:clear()
-    local title = window.researchSubtab == "base" and "BASE RESEARCH"
-        or window.researchSubtab == "blueprint" and "RECIPE BLUEPRINTS"
-        or "REVERSE ENGINEERING"
+    local title = window.researchSubtab == "base" and getText("UI_PNC_Research_BaseTitle")
+        or window.researchSubtab == "blueprint" and getText("UI_PNC_Research_BlueprintTitle")
+        or getText("UI_PNC_Research_BooksTab")
     window.researchCatalog:addItem(title, { name = title, restricted = true,
         catalogHeader = true, catalogCells = { category = "CATEGORY",
             action = "RESEARCH", state = "STATE / PROGRESS" } })
     if window.researchSubtab == "base" then
         for _, entry in ipairs(research.entries or {}) do
-            local lane = entry.researchCapability == "work.reverse"
-                and "reverse" or "base"
+            local lane = "base"
             addRow(window.researchCatalog, { name = tr(entry.labelKey, entry.id),
                 mode = "technology", technologyId = entry.id,
                 category = string.upper(tostring(entry.category or "TECHNOLOGY")),
@@ -270,24 +273,29 @@ function ResearchTab.Rebuild(window, snapshot, tr)
                 prerequisiteKnown = entry.prerequisiteKnown ~= false,
                 order = matchingOrder(orders, "technology", entry.id),
                 laneAvailable = window.researchLaneAvailability[lane],
-                missingStation = lane == "reverse"
-                    and "NO LAB" or "NO RESEARCH STATION" })
+                missingStation = "NO RESEARCH STATION" })
         end
     else
         local mode = window.researchSubtab
         for _, candidate in ipairs(research.candidates or {}) do
-            if candidate.mode == mode then
+            local candidateMode = mode == "books" and "book" or mode
+            if candidate.mode == candidateMode then
                 local metadata = InventoryModel.Probe(candidate.fullType)
                 addRow(window.researchCatalog, { name = candidate.displayName,
                     texture = metadata.texture, mode = candidate.mode,
                     recipeId = candidate.recipeId,
+                    bookFullType = candidate.bookFullType,
                     recordIndex = candidate.recordIndex,
-                    category = mode == "blueprint" and "BLUEPRINT" or "SPECIMEN",
+                    category = mode == "blueprint" and "BLUEPRINT" or "BOOK",
                     known = candidate.known == true,
-                    order = matchingOrder(orders, mode, candidate.recipeId),
-                    laneAvailable = window.researchLaneAvailability[mode],
+                    order = matchingOrder(orders, candidate.mode,
+                        candidate.mode == "book" and candidate.bookFullType
+                            or candidate.recipeId),
+                    laneAvailable = mode == "books"
+                        and window.researchLaneAvailability.books
+                        or window.researchLaneAvailability[mode],
                     missingStation = mode == "blueprint"
-                        and "NO ARCHITECT BENCH" or "NO LAB" })
+                        and "NO ARCHITECT BENCH" or "NO RESEARCH STATION" })
             end
         end
     end

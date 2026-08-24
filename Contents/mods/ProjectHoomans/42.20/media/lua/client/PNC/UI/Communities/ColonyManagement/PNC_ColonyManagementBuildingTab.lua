@@ -8,6 +8,12 @@ local QueueOverlay = require
     "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueOverlay"
 local UI = PsychopatzCore and PsychopatzCore.UI or nil
 
+local function tr(key, fallback)
+    local value = getText and getText(key) or nil
+    if not value or value == key then return fallback end
+    return value
+end
+
 local RECIPE_COLUMNS = {
     { key = "category", x = 0.56 },
     { key = "stock", x = 0.76 },
@@ -57,6 +63,16 @@ end
 
 local function activeRecipe(window)
     return window.buildSelectedRecipe
+end
+
+local function giveRecipeMaterials(window, recipe)
+    if not recipe or window.buildDebugAvailable ~= true
+        or not PNC.Client or not PNC.Client.RequestColonyAction
+    then return false end
+    PNC.Client.RequestColonyAction("building_debug_get_items", {
+        recipeKey = recipe.recipeKey or recipe.objectInfoName,
+    })
+    return true
 end
 
 -- Building recipes are snapshots from the shared catalog. Resolve the native
@@ -199,8 +215,12 @@ function Building.OnRecipeCell(window, row, key)
         window.buildSelectedRecipe = row.recipe
         rebuildMaterials(window)
         updateFavoriteControls(window)
-        if key == "action" and row.enabled == true then
-            Placement.Begin(window, row.recipe)
+        if key == "action" then
+            if row.enabled == true then
+                Placement.Begin(window, row.recipe)
+            elseif row.debugGrantEnabled == true then
+                giveRecipeMaterials(window, row.recipe)
+            end
         end
     end
 end
@@ -226,8 +246,8 @@ function Building.Create(window, builder)
         "PLACE BLUEPRINT", "accent")
     window.buildCancelPlacement = button(window, builder,
         "cancel_placement", "CANCEL PLACEMENT", "warning")
-    window.buildGetItems = button(window, builder, "get_items", "GET ITEMS",
-        "warning")
+    window.buildGetItems = button(window, builder, "get_items",
+        tr("UI_PNC_Building_GiveMaterials", "GIVE MATERIALS"), "warning")
     window.buildQueueOverlay = button(window, builder,
         "toggle_queue_overlay", "SHOW QUEUE OVERLAY", "quiet")
     window.buildCancelOrder = button(window, builder, "cancel_order",
@@ -489,14 +509,17 @@ local function rebuildRecipes(window, recipes)
                     texture = recipe.iconName and getTexture
                         and getTexture(recipe.iconName) or nil,
                 }
+                local debugGrantEnabled = window.buildDebugAvailable == true
                 local row = {
                     rowKind = "recipe", recipe = recipe, enabled = ready,
+                    debugGrantEnabled = debugGrantEnabled,
                     restricted = not ready,
                     name = tostring(recipe.displayName), favorite = favorite,
                     texture = metadata.texture, catalogCells = {
                         category = tostring(recipe.category or "Miscellaneous"),
                         stock = ready and "AVAILABLE" or "MISSING",
-                        action = ready and "PLACE" or "NO STOCK",
+                        action = ready and "PLACE"
+                            or debugGrantEnabled and "GIVE" or "NO STOCK",
                     },
                     catalogColors = {
                         stock = ready and "success" or "warning",
@@ -623,13 +646,7 @@ function Building.OnControl(window, buttonValue)
         return true
     elseif action == "get_items" then
         local recipe = activeRecipe(window)
-        if recipe and PNC.Client and PNC.Client.RequestColonyAction
-            and window.buildDebugAvailable == true
-        then
-            PNC.Client.RequestColonyAction("building_debug_get_items", {
-                recipeKey = recipe.recipeKey or recipe.objectInfoName,
-            })
-        end
+        giveRecipeMaterials(window, recipe)
         return true
     elseif action == "cancel_order" then
         local order = selectedQueue(window)

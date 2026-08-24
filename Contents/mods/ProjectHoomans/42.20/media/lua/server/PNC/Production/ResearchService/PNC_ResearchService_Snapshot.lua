@@ -9,6 +9,7 @@ local Service = PNC.ResearchService
 local Repository = PNC.ResearchRepository
 local Registry = PNC.RecipeKnowledgeRegistry
 local Definitions = PNC.ColonyResearchDefinitions
+local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 
 function Service.Queries.BuildSnapshot(colonyId)
     local state = Repository.Get(colonyId)
@@ -34,11 +35,39 @@ function Service.Queries.BuildSnapshot(colonyId)
         and PNC.ColonyStorageRepository.GetForSettlement
         and PNC.ColonyStorageRepository.GetForSettlement(colonyId) or nil
     local grouped = {}
+    local books = {}
+    local groupedBooks = {}
     for recordIndex = 1, #(storage and storage.inventory
         and storage.inventory.records or {}) do
         local info = PNC.ColonyStorageService.ReadProductionRecord(
             storage.id, recordIndex)
         if info then
+            local nativeBook
+            if CoreInventory.decodeItem then
+                local ok, decoded = pcall(CoreInventory.decodeItem, info.record)
+                nativeBook = ok and decoded or nil
+            end
+            local book = PNC.RecipeKnowledge
+                and PNC.RecipeKnowledge.Queries
+                and PNC.RecipeKnowledge.Queries.BookDetails
+                and PNC.RecipeKnowledge.Queries.BookDetails(
+                    nativeBook, info.fullType)
+                or { relevant = false }
+            if book.relevant then
+                local bookKey = tostring(info.fullType or "")
+                local bookCandidate = groupedBooks[bookKey]
+                if not bookCandidate then
+                    bookCandidate = { mode = "book", recipeId = 0,
+                        bookFullType = info.fullType,
+                        displayName = info.fullType, fullType = info.fullType,
+                        recordIndex = recordIndex, quantity = 0, known = false }
+                    groupedBooks[bookKey] = bookCandidate
+                    books[#books + 1] = bookCandidate
+                    candidates[#candidates + 1] = bookCandidate
+                end
+                bookCandidate.quantity = bookCandidate.quantity
+                    + math.max(1, math.floor(tonumber(info.quantity) or 1))
+            end
             local mode, recipeId, descriptor
             if info.fullType == "PNC.RecipeBlueprint" then
                 local blueprint = info.metadata and info.metadata.PNC
@@ -48,15 +77,6 @@ function Service.Queries.BuildSnapshot(colonyId)
                     or nil
                 descriptor = resolved and resolved.descriptor or nil
                 mode = descriptor and "blueprint" or nil
-            else
-                local producers = PNC.RecipeCatalog.Queries.GetProducerKeys(
-                    info.fullType)
-                if #producers == 1 then
-                    descriptor = PNC.RecipeCatalog.Queries.Get(producers[1])
-                    recipeId = descriptor
-                        and Registry.Queries.GetId(descriptor.key) or 0
-                    mode = descriptor and "reverse" or nil
-                end
             end
             if mode then
                 local key = mode .. ":" .. tostring(descriptor.key) .. ":"
@@ -85,6 +105,7 @@ function Service.Queries.BuildSnapshot(colonyId)
     end)
     return { entries = entries,
         candidates = candidates,
+        books = books,
         learnedRecipeIds = PNC.Core.DeepCopy(state.learnedRecipeIds),
         learnedTechnologyIds = PNC.Core.DeepCopy(state.learnedTechnologyIds),
         knowledgeRevision = state.knowledgeRevision,

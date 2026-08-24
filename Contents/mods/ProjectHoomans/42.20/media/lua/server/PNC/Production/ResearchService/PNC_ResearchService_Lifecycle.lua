@@ -16,12 +16,11 @@ local function completion(order)
         return Service.Commands.UnlockTechnology(order.colonyId,
             payload.technologyId, order.factionId)
     end
-    if payload.mode ~= "blueprint" and payload.mode ~= "reverse" then
+    if payload.mode ~= "blueprint" then
         return false, "RESEARCH_MODE_UNKNOWN"
     end
     if payload.resourceCommitted ~= true then
-        local consume = payload.mode == "reverse"
-            or Definitions.POLICY.consumeBlueprintOnCompletion == true
+        local consume = Definitions.POLICY.consumeBlueprintOnCompletion == true
         local ok, reason
         if consume and payload.input then
             ok, reason = PNC.WorkInputService.Commit(order,
@@ -83,6 +82,8 @@ PNC.WorkService.RegisterCompletion("RESEARCH", completion)
 PNC.WorkService.RegisterTargetProvider("RESEARCH", researchTarget)
 PNC.WorkService.RegisterReconciler("research_duplicates",
     Service.Commands.ReconcileDuplicates)
+PNC.WorkService.RegisterReconciler("removed_reverse_engineering",
+    Service.Commands.ReconcileRemovedReverseEngineering)
 
 Internal.Completion = completion
 Internal.Cancellation = cancellation

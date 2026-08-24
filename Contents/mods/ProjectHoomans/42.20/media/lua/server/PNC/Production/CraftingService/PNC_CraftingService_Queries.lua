@@ -9,11 +9,39 @@ local Service = PNC.CraftingService
 local H = PNC.CraftingServiceInternal
 local Registry = PNC.RecipeKnowledgeRegistry
 
+local function stationSnapshot(operation)
+    local definitions = PNC.WorkDefinitions
+    local source = definitions and definitions.GetStation
+        and definitions.GetStation(operation) or nil
+    source = source or {
+        id = "workshop", facilityId = "workshop",
+        capability = "work.craft", role = "work.craft",
+        legacyRoles = { "work.disassemble" },
+        labelKey = "UI_PNC_Workshop_CraftingStation",
+    }
+    local station = {}
+    for key, value in pairs(source) do
+        if key ~= "legacyRoles" then station[key] = value end
+    end
+    station.legacyRoles = {}
+    for index, role in ipairs(source.legacyRoles or {}) do
+        station.legacyRoles[index] = role
+    end
+    return station
+end
+
+local function resolvedSnapshot(resolved, operation)
+    local output = {}
+    for key, value in pairs(resolved or {}) do output[key] = value end
+    output.requiredStation = stationSnapshot(operation)
+    return output
+end
+
 function Service.Queries.KnownRecipes(colonyId, storageId)
     local state = PNC.ResearchRepository.Get(colonyId, false)
-    local output = {}
-    for index = 1, #(state and state.learnedRecipeIds or {}) do
-        local resolved = Registry.Queries.Resolve(state.learnedRecipeIds[index])
+    local output, included = {}, {}
+    local function addRecipe(recipeId)
+        local resolved = Registry.Queries.Resolve(recipeId)
         if resolved and resolved.descriptor and storageId then
             resolved.availability = {}
             for inputIndex = 1, #resolved.descriptor.inputs do
@@ -23,7 +51,26 @@ function Service.Queries.KnownRecipes(colonyId, storageId)
                         storageId, input.itemTypes)
             end
         end
-        output[#output + 1] = resolved
+        if resolved and resolved.descriptor
+            and not included[resolved.descriptor.key]
+        then
+            included[resolved.descriptor.key] = true
+            output[#output + 1] = resolvedSnapshot(resolved, "CRAFT")
+        end
+    end
+    for index = 1, #(state and state.learnedRecipeIds or {}) do
+        addRecipe(state.learnedRecipeIds[index])
+    end
+    -- Literature recipes appear in the workshop catalog before colony-wide
+    -- blueprint research. Worker assignment remains the per-NPC book gate.
+    for _, descriptor in ipairs(PNC.RecipeCatalog.Queries.List() or {}) do
+        if descriptor.needToBeLearn == true
+            and not included[descriptor.key]
+        then
+            local recipeId = PNC.KnowledgeRepository.GetOrCreateId(
+                descriptor.key)
+            addRecipe(recipeId)
+        end
     end
     return output
 end
@@ -56,7 +103,9 @@ function Service.Queries.DisassemblyCandidates(storage)
                 if not candidate then
                     candidate = { fullType = info.fullType,
                         recordIndex = recordIndex, quantity = 0,
-                        potentialYield = {} }
+                        potentialYield = {},
+                        requiredStation = stationSnapshot("DISASSEMBLE"),
+                    }
                     for inputIndex = 1, #(resolved.descriptor
                         and resolved.descriptor.inputs or {})
                     do
@@ -103,4 +152,3 @@ function Service.Queries.BuildSnapshot(colonyId)
 end
 
 return Service
-
