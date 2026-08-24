@@ -72,7 +72,7 @@ PNC.PlayerContext = {
     end,
 }
 PNC.Relationships = { Get = function() return { familiarity = 50, approval = 25 } end }
-T.load(SERVER .. "PNC_NPCKnowledgeService.lua")
+T.load(SERVER .. "Knowledge/PNC_NPCKnowledgeService.lua")
 local Knowledge = PNC.NPCKnowledge
 PNC.PersistenceCoordinator = {
     Commit = function()

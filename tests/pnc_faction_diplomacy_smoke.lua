@@ -82,10 +82,10 @@ PNC.Registry = {
     MarkDirty = function() return true end,
 }
 
-T.load(SERVER .. "PNC_FactionTelemetry.lua")
-T.load(SERVER .. "PNC_FactionService.lua")
-T.load(SERVER .. "PNC_FactionIncidentService.lua")
-T.load(SERVER .. "PNC_FactionValidation.lua")
+T.load(SERVER .. "Factions/PNC_FactionTelemetry.lua")
+T.load(SERVER .. "Factions/PNC_FactionService.lua")
+T.load(SERVER .. "Factions/PNC_FactionIncidentService.lua")
+T.load(SERVER .. "Factions/PNC_FactionValidation.lua")
 
 local Factions = PNC.Factions
 local Types = PNC.FactionTypes

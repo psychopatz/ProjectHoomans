@@ -224,14 +224,14 @@ function PNC.Registry.MarkDirty(record, domain)
     return true
 end
 
-T.load(SERVER .. "PNC_PlayerCharacterDebug.lua")
-T.load(SERVER .. "PNC_PlayerCharacterService.lua")
-T.load(SERVER .. "PNC_SocialProfileDebug.lua")
-T.load(SERVER .. "PNC_SocialProfileService.lua")
-T.load(SERVER .. "PNC_ConductService.lua")
-T.load(SERVER .. "PNC_RelationshipService.lua")
-T.load(SERVER .. "PNC_SocialEventDebug.lua")
-T.load(SERVER .. "PNC_SocialEventService.lua")
+T.load(SERVER .. "Player/PNC_PlayerCharacterDebug.lua")
+T.load(SERVER .. "Player/PNC_PlayerCharacterService.lua")
+T.load(SERVER .. "Social/PNC_SocialProfileDebug.lua")
+T.load(SERVER .. "Social/PNC_SocialProfileService.lua")
+T.load(SERVER .. "Social/PNC_ConductService.lua")
+T.load(SERVER .. "Social/PNC_RelationshipService.lua")
+T.load(SERVER .. "Social/PNC_SocialEventDebug.lua")
+T.load(SERVER .. "Social/PNC_SocialEventService.lua")
 
 local Constants = PNC.SocialProfileConstants
 local Types = PNC.SocialProfileTypes

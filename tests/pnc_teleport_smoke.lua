@@ -5,7 +5,7 @@ local SERVER_ROOT = T.path("ProjectHoomans", "server", "")
 T.addPackagePaths()
 
 local CLIENT_FILE = T.path("ProjectHoomans", "client", "PNC/PNC_Client.lua")
-local SERVER_FILE = T.path("ProjectHoomans", "server", "PNC/PNC_Server.lua")
+local SERVER_FILE = T.path("ProjectHoomans", "server", "PNC/Server/PNC_Server.lua")
 
 local nativeTeleports = {}
 local clientCommands = {}

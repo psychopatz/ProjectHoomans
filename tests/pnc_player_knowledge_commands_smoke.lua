@@ -98,7 +98,7 @@ PNC = {
     },
 }
 
-T.load(SERVER .. "PNC_PlayerKnowledgeCommands.lua")
+T.load(SERVER .. "Knowledge/PNC_PlayerKnowledgeCommands.lua")
 local Commands = PNC.PlayerKnowledgeCommands
 
 local unknown = Commands.HandlePresentation({}, {

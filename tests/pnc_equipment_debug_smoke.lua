@@ -12,6 +12,10 @@ local api = T.read(ROOT .. "shared/PNC/Core/API/PNC_API.lua")
 local serverRoute = T.read(
     ROOT .. "server/PNC/Networking/Handlers/"
         .. "PNC_ServerLegacyDebugCommandHandler.lua"
+) .. T.read(
+    ROOT .. "server/PNC/Networking/Handlers/"
+        .. "ServerLegacyDebugCommandHandler/"
+        .. "PNC_ServerLegacyDebugCommandHandler_ApiActions.lua"
 )
 local monitor = T.read(ROOT .. "client/PNC/UI/PNC_NPCMonitor.lua")
 local view = T.read(

@@ -559,7 +559,7 @@ T.load(SHARED_ROOT .. "PNC/Core/Needs/PNC_NeedsStateCodec.lua")
 T.load(SHARED_ROOT .. "PNC/Core/Needs/PNC_PlayerNeedsModel.lua")
 T.load(SHARED_ROOT .. "PNC/Core/Needs/PNC_NeedsUtils.lua")
 T.load(SERVER_ROOT .. "PNC/Needs/PNC_NeedsRepository.lua")
-T.load(SERVER_ROOT .. "PNC/PNC_IndividualNeeds.lua")
+T.load(SERVER_ROOT .. "PNC/Needs/PNC_IndividualNeeds.lua")
 require "PNC/Supply/PNC_SupplyRequest"
 require "PNC/Supply/PNC_SupplyMetrics"
 require "PNC/Supply/PNC_ItemUtility"

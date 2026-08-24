@@ -162,7 +162,7 @@ local player = {
     end,
 }
 
-T.load(SERVER_ROOT .. "PNC_StartingCompanionService.lua")
+T.load(SERVER_ROOT .. "Companions/PNC_StartingCompanionService.lua")
 
 local granted, reason, result = PNC.StartingCompanions.Ensure(
     player, record.uuid, 12

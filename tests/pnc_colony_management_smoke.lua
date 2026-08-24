@@ -201,7 +201,7 @@ PNC = {
     } },
 }
 
-local Management = T.load(ROOT .. "PNC_ColonyManagement.lua")
+local Management = T.load(ROOT .. "Colony/PNC_ColonyManagement.lua")
 local player = { getUsername = function() return "Tester" end }
 local snapshot = Management.BuildSnapshot(player)
 

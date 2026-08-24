@@ -31,7 +31,7 @@ local BODY_CONTROL_EVENTS_FILE =
     .. "Pathing/PNC_LiveBodyControl/PNC_LiveBodyControl_Events.lua"
 local SERVER_FILE =
     T.path("ProjectHoomans", "server", "PNC/")
-    .. "PNC_Server.lua"
+    .. "Server/PNC_Server.lua"
 
 local now = 5000
 local outside = {}
@@ -661,6 +661,10 @@ T.truthy(PNC.EnginePathPlanner.PumpServerFrame() == 0,
 serverMode = false
 
 local serverSource = T.read(SERVER_FILE)
+    .. T.read(
+        T.path("ProjectHoomans", "server", "PNC/")
+            .. "Server/Server/PNC_Server_SubsystemPumps.lua"
+    )
 T.truthy(string.find(
         serverSource,
         "PNC.EnginePathPlanner.PumpServerFrame()",

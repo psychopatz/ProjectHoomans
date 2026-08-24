@@ -35,7 +35,12 @@ T.equal(actionArgs, actionPayload, "action payload identity")
 T.equal(Router.Handle("UnknownCommand", player, {}), false,
     "unknown command fallthrough")
 
-local source = T.read("ProjectHoomans", "server", "PNC/PNC_Server.lua")
+local source = T.read("ProjectHoomans", "server", "PNC/Server/PNC_Server.lua")
+    .. T.read(
+        "ProjectHoomans",
+        "server",
+        "PNC/Server/Server/PNC_Server_Lifecycle.lua"
+    )
 local moduleGate = T.truthy(string.find(source, "module ~= Const.MODULE", 1, true))
 local routerCall = T.truthy(string.find(
     source,

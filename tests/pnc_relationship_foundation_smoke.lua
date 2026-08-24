@@ -122,8 +122,8 @@ function PNC.Registry.MarkDirty(record, domain)
     return true
 end
 
-T.load(SERVER_ROOT .. "PNC_RelationshipService.lua")
-T.load(SERVER_ROOT .. "PNC_RelationshipDebug.lua")
+T.load(SERVER_ROOT .. "Social/PNC_RelationshipService.lua")
+T.load(SERVER_ROOT .. "Social/PNC_RelationshipDebug.lua")
 
 T.equal(PNC.Relationships.Personal.Queries.Get,
     PNC.Relationships.Get, "personal relationship query compatibility")

@@ -1,7 +1,7 @@
 local T = require "tests/support/test"
 
 local FILE =
-    T.path("ProjectHoomans", "server", "PNC/PNC_FactionBehavior.lua")
+    T.path("ProjectHoomans", "server", "PNC/Factions/PNC_FactionBehavior.lua")
 
 local function copy(value)
     if type(value) ~= "table" then return value end

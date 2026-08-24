@@ -126,8 +126,8 @@ function PNC.API.Despawn(id)
     return true
 end
 
-T.load(SERVER .. "PNC_FactionService.lua")
-T.load(SERVER .. "PNC_CommunitySiteResolver.lua")
+T.load(SERVER .. "Factions/PNC_FactionService.lua")
+T.load(SERVER .. "Communities/PNC_CommunitySiteResolver.lua")
 
 local siteOne = T.truthy(PNC.CommunityTypes.NormalizeSite({
     id = "community_site_building_a",
@@ -166,8 +166,8 @@ PNC.CommunitySiteResolver.FindSpawnPoints = function(site, count)
 end
 PNC.CommunitySiteResolver.IsSiteLoaded = function() return false end
 
-T.load(SERVER .. "PNC_CommunityDirector.lua")
-T.load(SERVER .. "PNC_MobileGroupDirector.lua")
+T.load(SERVER .. "Communities/PNC_CommunityDirector.lua")
+T.load(SERVER .. "Director/PNC_MobileGroupDirector.lua")
 PNC.Factions.Load()
 
 PNC.Factions.IDGenerator = function() return "faction_mobile_looters" end
@@ -284,7 +284,7 @@ for _, npcID in ipairs(caravanGenerated.npcIDs) do
         "trading caravan roams across the map")
 end
 
-T.load(SERVER .. "PNC_FactionDebug.lua")
+T.load(SERVER .. "Factions/PNC_FactionDebug.lua")
 local debugSnapshot = PNC.FactionDebug.BuildSnapshot(
     caravan.id,
     nil,

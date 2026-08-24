@@ -163,15 +163,15 @@ function PNC.Registry.MarkDirty(record, domain)
     return true
 end
 
-T.load(SERVER_ROOT .. "PNC_PlayerCharacterDebug.lua")
-T.load(SERVER_ROOT .. "PNC_PlayerCharacterService.lua")
+T.load(SERVER_ROOT .. "Player/PNC_PlayerCharacterDebug.lua")
+T.load(SERVER_ROOT .. "Player/PNC_PlayerCharacterService.lua")
 PNC.PlayerCharacters.Load()
-T.load(SERVER_ROOT .. "PNC_ConductService.lua")
-T.load(SERVER_ROOT .. "PNC_RelationshipService.lua")
-T.load(SERVER_ROOT .. "PNC_SocialEventDebug.lua")
-T.load(SERVER_ROOT .. "PNC_SocialEventService.lua")
-T.load(SERVER_ROOT .. "PNC_SocialEncounterTracker.lua")
-T.load(SERVER_ROOT .. "PNC_SocialEventHooks.lua")
+T.load(SERVER_ROOT .. "Social/PNC_ConductService.lua")
+T.load(SERVER_ROOT .. "Social/PNC_RelationshipService.lua")
+T.load(SERVER_ROOT .. "Social/PNC_SocialEventDebug.lua")
+T.load(SERVER_ROOT .. "Social/PNC_SocialEventService.lua")
+T.load(SERVER_ROOT .. "Social/PNC_SocialEncounterTracker.lua")
+T.load(SERVER_ROOT .. "Social/PNC_SocialEventHooks.lua")
 
 local Service = PNC.PlayerCharacters
 local IdentityTypes = PNC.PlayerCharacterTypes
@@ -655,7 +655,7 @@ T.truthy(PNC.SocialEvents ~= nil, "Phase 2 loaded")
 
 -- The lifecycle sweep clears a replaced object before rebinding its loaded
 -- survivor, avoiding a false duplicate-live assignment.
-T.load(SERVER_ROOT .. "PNC_PlayerCharacterLifecycle.lua")
+T.load(SERVER_ROOT .. "Player/PNC_PlayerCharacterLifecycle.lua")
 local replacementObject = makePlayer("Alice", newAliceData, {
     onlineID = 17,
     forename = "Alicia",

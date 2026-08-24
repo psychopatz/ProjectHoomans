@@ -142,10 +142,10 @@ PNC.Factions = {
     end,
 }
 
-T.load(SERVER .. "PNC_PlayerCharacterService.lua")
+T.load(SERVER .. "Player/PNC_PlayerCharacterService.lua")
 PNC.PlayerCharacters.Load()
-T.load(SERVER .. "PNC_PersistenceCoordinator.lua")
-T.load(SERVER .. "PNC_PlayerIdentityMigration.lua")
+T.load(SERVER .. "Server/PNC_PersistenceCoordinator.lua")
+T.load(SERVER .. "Player/PNC_PlayerIdentityMigration.lua")
 
 local username = "Bob"
 local mirror = { PNC_CharacterUUID = "char_legacy_6" }

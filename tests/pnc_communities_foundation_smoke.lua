@@ -211,9 +211,9 @@ T.truthy(CommunityTypes.AreEqual(
     CommunityTypes.NormalizeRegistry({ byID = {} })
 ), "normalization idempotent")
 
-T.load(SERVER .. "PNC_FactionService.lua")
-T.load(SERVER .. "PNC_CommunityService.lua")
-T.load(SERVER .. "PNC_CommunityValidation.lua")
+T.load(SERVER .. "Factions/PNC_FactionService.lua")
+T.load(SERVER .. "Communities/PNC_CommunityService.lua")
+T.load(SERVER .. "Communities/PNC_CommunityValidation.lua")
 PNC.Factions.Load()
 PNC.Communities.Load()
 
@@ -664,7 +664,7 @@ T.falsy(PNC.CommunityValidation.RepairIndexes(),
     "correct rebuild unchanged")
 
 -- Debug data is primitive-only and does not expose complete NPC records.
-T.load(SERVER .. "PNC_CommunityDebug.lua")
+T.load(SERVER .. "Communities/PNC_CommunityDebug.lua")
 local snapshot = PNC.CommunityDebug.BuildSnapshot(
     campID,
     refugees.id,

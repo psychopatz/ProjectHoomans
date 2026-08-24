@@ -86,12 +86,12 @@ local factionCoreIndex = indexOf(
     serverCalls,
     "PNC/Factions/PNC_FactionCore"
 )
-T.equal(serverCalls[factionCoreIndex - 1], "PNC/PNC_ConductDebug",
+T.equal(serverCalls[factionCoreIndex - 1], "PNC/Social/PNC_ConductDebug",
     "server Faction core initialization predecessor")
-T.equal(serverCalls[factionCoreIndex + 1], "PNC/PNC_CommunityService",
+T.equal(serverCalls[factionCoreIndex + 1], "PNC/Communities/PNC_CommunityService",
     "server Faction core initialization successor")
 local settlementIndex = indexOf(serverCalls, "PNC/Settlement/PNC_Settlement")
-T.equal(serverCalls[settlementIndex - 1], "PNC/PNC_CommunityService",
+T.equal(serverCalls[settlementIndex - 1], "PNC/Communities/PNC_CommunityService",
     "server Settlement initialization predecessor")
 local facilityJobsIndex = indexOf(serverCalls,
     "PNC/Settlement/FacilityJobs/PNC_FacilityJobs_Service")
@@ -105,21 +105,21 @@ T.equal(serverCalls[settlementIndex + 1], "PNC/Journals/PNC_JournalRoutes",
 local directorIndex = indexOf(serverCalls, "PNC/Director/PNC_Director")
 T.equal(serverCalls[directorIndex - 1], "PNC/Needs/PNC_NeedSupplyBridge",
     "server Director initialization predecessor")
-T.equal(serverCalls[directorIndex + 1], "PNC/PNC_NeedsScheduler",
+T.equal(serverCalls[directorIndex + 1], "PNC/Needs/PNC_NeedsScheduler",
     "server Director initialization successor")
 T.equal(serverCalls[#serverCalls - 1], "<install-server-profiler>",
     "server profiler installation timing")
-T.equal(serverCalls[#serverCalls], "PNC/PNC_Server",
+T.equal(serverCalls[#serverCalls], "PNC/Server/PNC_Server",
     "server runtime starts after dependencies")
 local conversationServerIndex = indexOf(
     serverCalls,
     "PNC/Conversation/PNC_ConversationServer"
 )
 T.equal(serverCalls[conversationServerIndex - 1],
-    "PNC/PNC_SocialEventHooks",
+    "PNC/Social/PNC_SocialEventHooks",
     "server Conversation initialization predecessor")
 T.equal(serverCalls[conversationServerIndex + 1],
-    "PNC/PNC_ServerInventory",
+    "PNC/Server/PNC_ServerInventory",
     "server Conversation initialization successor")
 
 local eventMarkers = {}
@@ -218,10 +218,10 @@ local factionCoreCalls = capture(
     ROOT .. "server/PNC/Factions/PNC_FactionCore.lua"
 )
 local expectedFactionCore = {
-    "PNC/PNC_FactionTelemetry",
-    "PNC/PNC_FactionService",
-    "PNC/PNC_FactionLeadership",
-    "PNC/PNC_FactionMembershipService",
+    "PNC/Factions/PNC_FactionTelemetry",
+    "PNC/Factions/PNC_FactionService",
+    "PNC/Factions/PNC_FactionLeadership",
+    "PNC/Factions/PNC_FactionMembershipService",
 }
 for index = 1, #expectedFactionCore do
     T.equal(factionCoreCalls[index], expectedFactionCore[index],

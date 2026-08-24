@@ -26,7 +26,7 @@ T.load(root .. "shared/PNC/Core/Needs/PNC_PlayerNeedsModel.lua")
 T.load(root .. "shared/PNC/Core/Needs/PNC_NeedsUtils.lua")
 T.load(root .. "shared/PNC/Core/Base/PNC_Sandbox.lua")
 T.load(root .. "server/PNC/Needs/PNC_NeedsRepository.lua")
-T.load(root .. "server/PNC/PNC_IndividualNeeds.lua")
+T.load(root .. "server/PNC/Needs/PNC_IndividualNeeds.lua")
 T.load(root .. "server/PNC/Needs/PNC_NeedHealthConsequences.lua")
 
 local outsider = { id = "outsider", alive = true }

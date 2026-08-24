@@ -60,7 +60,7 @@ PNC.Conversation = { History = service("ConversationHistory") }
 -- The generic mock looks services up directly on PNC.
 PNC.ConversationHistory = PNC.Conversation.History
 
-T.load(SERVER .. "PNC_PersistenceCoordinator.lua")
+T.load(SERVER .. "Server/PNC_PersistenceCoordinator.lua")
 T.equal(type(saveHook), "function", "coordinator registers world-save hook")
 
 saveHook()

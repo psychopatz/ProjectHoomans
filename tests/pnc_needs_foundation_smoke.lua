@@ -42,13 +42,13 @@ PNC.Factions = {
     SetNeeds = function(id, state) factions[id].needs = PNC.Core.DeepCopy(state); return true end,
     List = function() local output = {}; for _, faction in pairs(factions) do output[#output + 1] = faction end; return output end,
 }
-T.load(root .. "server/PNC/PNC_IndividualNeeds.lua")
-T.load(root .. "server/PNC/PNC_GroupNeeds.lua")
+T.load(root .. "server/PNC/Needs/PNC_IndividualNeeds.lua")
+T.load(root .. "server/PNC/Needs/PNC_GroupNeeds.lua")
 T.load(root .. "server/PNC/Needs/PNC_NeedHealthConsequences.lua")
-T.load(root .. "server/PNC/PNC_NeedsScheduler.lua")
+T.load(root .. "server/PNC/Needs/PNC_NeedsScheduler.lua")
 PNC.CompanionCommands = { IsOwnedByPlayer = function(record) return record.recruited == true end }
 PNC.Factions.GetPlayerFaction = function() return nil end
-T.load(root .. "server/PNC/PNC_ColonyManagement.lua")
+T.load(root .. "server/PNC/Colony/PNC_ColonyManagement.lua")
 PNC.GroupNeeds.RegisterListener("level_changed", function(...) levelEvents[#levelEvents + 1] = { values = { ... } } end)
 
 factions.small = { id = "small", name = "Small", mobile = { active = true }, memberIDs = { a = true, b = true } }

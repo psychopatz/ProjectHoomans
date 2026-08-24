@@ -136,8 +136,8 @@ for _, id in ipairs({ "settler", "looter", "trader", "refugee" }) do
         "archetype has no hostility " .. id)
 end
 
-T.load(SERVER .. "PNC_FactionService.lua")
-T.load(SERVER .. "PNC_FactionLeadership.lua")
+T.load(SERVER .. "Factions/PNC_FactionService.lua")
+T.load(SERVER .. "Factions/PNC_FactionLeadership.lua")
 local Factions = PNC.Factions
 Factions.Load()
 
@@ -601,7 +601,7 @@ alice.runtime.relationshipDebugChanges = {
         stateAfter = "unknown",
     },
 }
-T.load(SERVER .. "PNC_FactionDebug.lua")
+T.load(SERVER .. "Factions/PNC_FactionDebug.lua")
 T.truthy(string.find(
     PNC.FactionDebug.FormatList(),
     "Second Settlement",

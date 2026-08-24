@@ -104,7 +104,7 @@ PNC.Communities = {
     end,
 }
 
-T.load(SERVER .. "PNC_CommunitySiteResolver.lua")
+T.load(SERVER .. "Communities/PNC_CommunitySiteResolver.lua")
 
 local first = PNC.CommunitySiteResolver.DescribeAt(
     2,

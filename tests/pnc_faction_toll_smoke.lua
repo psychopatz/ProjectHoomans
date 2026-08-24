@@ -195,7 +195,7 @@ PNC = {
     },
 }
 
-T.load(SERVER .. "PNC_FactionTollService.lua")
+T.load(SERVER .. "Factions/PNC_FactionTollService.lua")
 
 T.equal(PNC.FactionTolls.Pump(now), 1,
     "entry creates one territorial demand")

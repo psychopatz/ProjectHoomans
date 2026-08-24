@@ -153,7 +153,7 @@ package.preload["PsychopatzCore/Inventory/PsychopatzItemTransfer"] = function()
     }
 end
 
-local Service = require "PNC/PNC_ServerInventory"
+local Service = require "PNC/Server/PNC_ServerInventory"
 local player = {}
 
 local ok, reason = Service.Transfer(player, {

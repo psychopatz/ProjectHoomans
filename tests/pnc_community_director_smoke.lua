@@ -68,9 +68,9 @@ function PNC.Registry.MarkDirty(record)
     return true
 end
 
-T.load(SERVER .. "PNC_FactionService.lua")
-T.load(SERVER .. "PNC_CommunityService.lua")
-T.load(SERVER .. "PNC_CommunitySiteResolver.lua")
+T.load(SERVER .. "Factions/PNC_FactionService.lua")
+T.load(SERVER .. "Communities/PNC_CommunityService.lua")
+T.load(SERVER .. "Communities/PNC_CommunitySiteResolver.lua")
 
 local npcSequence = 0
 PNC.Presence = {
@@ -122,7 +122,7 @@ function PNC.API.Despawn(id)
     return true
 end
 
-T.load(SERVER .. "PNC_CommunityDirector.lua")
+T.load(SERVER .. "Communities/PNC_CommunityDirector.lua")
 PNC.Factions.Load()
 PNC.Communities.Load()
 

@@ -121,7 +121,7 @@ PNC = {
     },
 }
 
-local Recruit = T.load(ROOT .. "PNC_DebugCompanionRecruit.lua")
+local Recruit = T.load(ROOT .. "Companions/PNC_DebugCompanionRecruit.lua")
 local player = { getUsername = function() return "Tester" end }
 
 T.equal(Recruit.IsEligible(records.hostile), true, "hostile eligible")
