@@ -138,6 +138,10 @@ local function startBandage(record, zombie, partId, now)
     record.runtime.tacticalState = "self_bandage"
     record.runtime.target = nil
     record.runtime.attackAction = nil
+    -- Treatment owns the tactical lane now. A previous melee/ranged action
+    -- may have left the short combat presentation lease alive, which made
+    -- the nameplate report Fighting while the bandage action was running.
+    record.runtime.inCombatUntil = 0
     if MoveIntent and MoveIntent.Hold then
         MoveIntent.Hold(record, "self_bandage")
     end

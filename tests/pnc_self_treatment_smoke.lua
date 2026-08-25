@@ -133,10 +133,13 @@ T.equal(consumed, 0, "unsafe treatment consumed no bandage")
 threat = nil
 now = now + 5100
 record.stamina.current = 100
+record.runtime.inCombatUntil = now + 2500
 T.equal(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
     "safe NPC starts treatment")
 T.equal(bumpType, "BandageLeftArm", "body-part-specific animation")
 T.equal(record.runtime.selfTreatment.phase, "bandaging", "bandage phase")
+T.equal(record.runtime.inCombatUntil, 0,
+    "bandaging clears the previous combat presentation lease")
 T.equal(treatmentSounds, 1, "self-bandage SFX")
 T.equal(bumpLeaseUntil, 7100, "bandage action lease covers treatment")
 T.equal(zombieModData.PNC_ClientTreatmentSoundKey, "Hand_L:6100",

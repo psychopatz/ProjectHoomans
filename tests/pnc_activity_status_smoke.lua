@@ -104,6 +104,23 @@ local combat = Status.Build({
 T.equal(combat.activityId, "combat",
     "combat overrides a stale generic job")
 
+PNC.BehaviorTreatment = {
+    BuildSnapshot = function(record)
+        return record.runtime and record.runtime.selfTreatment
+    end,
+}
+local bandaging = Status.Build({
+    alive = true,
+    runtime = {
+        selfTreatment = { phase = "bandaging", partId = "Hand_L" },
+        inCombatUntil = now + 2500,
+    },
+})
+T.equal(bandaging.kind, "treatment",
+    "active bandaging owns activity presentation")
+T.equal(bandaging.phase, "bandaging",
+    "stale combat lease cannot hide bandaging phase")
+
 local work = Status.Build({
     alive = true,
     runtime = { workOrderId = "work:1" },

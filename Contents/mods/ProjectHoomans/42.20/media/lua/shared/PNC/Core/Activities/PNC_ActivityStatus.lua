@@ -127,6 +127,12 @@ end)
 
 Status.Register("combat", 90, function(record)
     local runtime = record.runtime or {}
+    local treatment = runtime.selfTreatment
+    if treatment and treatment.phase == "bandaging" then
+        -- Bandaging is an active tactical owner. The combat lease can be a
+        -- stale presentation hold from the attack that preceded treatment.
+        return nil
+    end
     local attackActive = runtime.attackAction ~= nil
         and Core.Now() < (tonumber(runtime.attackAction.finishAt) or 0)
     local combatActive = runtime.target ~= nil or attackActive
