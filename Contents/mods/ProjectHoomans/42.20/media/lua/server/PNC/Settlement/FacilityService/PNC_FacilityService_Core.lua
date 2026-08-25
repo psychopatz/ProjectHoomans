@@ -153,8 +153,9 @@ function Service.RebuildIndexes()
         local level = facility and Definitions.GetLevel(
             facility.definitionId, facility.level) or nil
         -- Definitions are authoritative. Remove saved components belonging to
-        -- retired roles (research.room, workshop.room, and future migrations)
-        -- instead of allowing obsolete UI requirements to survive forever.
+        -- retired roles (research.room, research virtual benches/labs,
+        -- workshop.room, and future migrations) instead of allowing obsolete
+        -- UI requirements to survive forever.
         if facility and level and level.componentLimits
             and level.componentLimits[component.role] == nil
         then

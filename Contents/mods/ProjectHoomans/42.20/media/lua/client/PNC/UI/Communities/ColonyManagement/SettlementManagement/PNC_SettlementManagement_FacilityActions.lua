@@ -8,9 +8,9 @@ local Facility = {}
 
 local ANCHOR_LABELS = {
     ["sleep.bed"] = "UI_PNC_Facility_SleepSpot",
-    ["work.research"] = "UI_PNC_Facility_ResearchStation",
-    ["work.blueprint"] = "UI_PNC_Facility_ArchitectBench",
-    ["work.reverse"] = "UI_PNC_Facility_Lab",
+    ["work.research"] = "UI_PNC_Facility_ResearchTable",
+    ["work.blueprint"] = "UI_PNC_Facility_ResearchTable",
+    ["work.reverse"] = "UI_PNC_Facility_ResearchTable",
     ["work.craft"] = "UI_PNC_Facility_CraftingTable",
     ["work.disassemble"] = "UI_PNC_Facility_RecyclingSpot",
     ["water.spigot"] = "UI_PNC_Facility_WaterSpigot",
@@ -19,9 +19,9 @@ local ANCHOR_LABELS = {
 }
 local ANCHOR_SELECT_TITLES = {
     ["sleep.bed"] = "UI_PNC_Facility_SelectBed",
-    ["work.research"] = "UI_PNC_Facility_SelectResearchStation",
-    ["work.blueprint"] = "UI_PNC_Facility_SelectArchitectBench",
-    ["work.reverse"] = "UI_PNC_Facility_SelectLab",
+    ["work.research"] = "UI_PNC_Facility_SelectResearchTable",
+    ["work.blueprint"] = "UI_PNC_Facility_SelectResearchTable",
+    ["work.reverse"] = "UI_PNC_Facility_SelectResearchTable",
     ["work.craft"] = "UI_PNC_Facility_SelectCraftStation",
     ["work.disassemble"] = "UI_PNC_Facility_SelectDisassemblyStation",
     ["water.spigot"] = "UI_PNC_Facility_SelectWaterSpigot",
@@ -30,9 +30,9 @@ local ANCHOR_SELECT_TITLES = {
 }
 local ANCHOR_ASSIGN_TITLES = {
     ["sleep.bed"] = "UI_PNC_Facility_AssignBed",
-    ["work.research"] = "UI_PNC_Facility_AssignResearchStation",
-    ["work.blueprint"] = "UI_PNC_Facility_AssignArchitectBench",
-    ["work.reverse"] = "UI_PNC_Facility_AssignLab",
+    ["work.research"] = "UI_PNC_Facility_AssignResearchTable",
+    ["work.blueprint"] = "UI_PNC_Facility_AssignResearchTable",
+    ["work.reverse"] = "UI_PNC_Facility_AssignResearchTable",
     ["work.craft"] = "UI_PNC_Facility_AssignCraftStation",
     ["work.disassemble"] = "UI_PNC_Facility_AssignDisassemblyStation",
     ["water.spigot"] = "UI_PNC_Facility_AssignWaterSpigot",
@@ -61,8 +61,8 @@ local function areaOptions(window, facility, existing, onConfirm, requestedRole)
     if isDraft and facility.definitionId == "farm" then
         role = "facility.footprint"
     end
-    -- Construction always selects an abstract footprint. Anchor-only
-    -- facilities (research, utilities, and future workstation buildings) do
+    -- Construction always selects an abstract footprint. Legacy anchor-only
+    -- facilities (utilities and future non-native workstation buildings) do
     -- not declare a functional region role, so their draft still needs this
     -- selector role.
     if not role and isDraft then role = "facility.footprint" end
@@ -159,8 +159,8 @@ function Facility.BeginBuild(window, definitionId)
     end
     local draft = { definitionId = definitionId, level = 1, components = {} }
     -- The selected build area is an abstract construction footprint, not a
-    -- functional room. Facilities such as Research therefore do not need a
-    -- fake region component just to be placeable.
+    -- functional room. Native workstations bypass this selector entirely;
+    -- legacy facilities still use the footprint only for placement.
     local role = definitionId == "farm" and "facility.footprint"
         or areaRole(draft) or "facility.footprint"
     Support.OpenSelector(window, areaOptions(window, draft, nil, function(region)

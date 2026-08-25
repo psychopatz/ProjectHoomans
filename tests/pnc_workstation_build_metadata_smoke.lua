@@ -54,11 +54,25 @@ PNC = {
                     },
                 }
             end
+            if objectInfoName == "Base.Log_Table" then
+                return {
+                    objectInfoName = "Base.Log_Table",
+                    recipeKey = "Base.Log_Table",
+                    displayName = "Log Table",
+                    category = "Carpentry",
+                    iconName = "log_table_sprite",
+                    iconTexture = "native_log_table_texture",
+                    requirements = {
+                        { itemTypes = { "Base.Log" }, amount = 1 },
+                    },
+                }
+            end
             return nil
         end,
     },
     FacilityDefinitions = { ByID = {
         stockpile = true, primitive_forge = true, forge = true,
+        research_facility = true,
     } },
 }
 
@@ -73,7 +87,14 @@ function PNC.FacilityDefinitions.Get(id)
         return { id = id, category = "Blacksmithing", displayNameKey = id,
             descriptionKey = id, directWorkstation = true,
             stationId = id, entityScript = "Base.Primitive_Forge",
-            buildRecipeObjectInfoName = "Base.Forge", requiredTechnology = nil }
+                buildRecipeObjectInfoName = "Base.Forge", requiredTechnology = nil }
+    end
+    if id == "research_facility" then
+        return { id = id, category = "technology", displayNameKey = id,
+            descriptionKey = id, directWorkstation = true,
+            stationId = "research_facility", entityScript = "Base.Log_Table",
+            buildRecipeObjectInfoName = "Base.Log_Table",
+            requiredTechnology = nil }
     end
     return { id = id, category = "Blacksmithing", displayNameKey = id,
         descriptionKey = id, directWorkstation = true, stationId = "forge",
@@ -92,14 +113,16 @@ local options = BuildUI.BuildOptions({ hqLevel = 1, facilities = {
 } }, {
     rows = {
         { fullType = "Base.IronBar", quantity = 3 },
+        { fullType = "Base.Log", quantity = 1 },
         { fullType = "Base.Money", quantity = 1 },
     },
 })
 
-local primitive, proper
+local primitive, proper, research
 for _, option in ipairs(options) do
     if option.id == "primitive_forge" then primitive = option end
     if option.id == "forge" then proper = option end
+    if option.id == "research_facility" then research = option end
 end
 T.truthy(primitive, "primitive workstation is present")
 T.equal(primitive.name, "Forge", "native build name replaces facility id")
@@ -113,5 +136,14 @@ T.truthy(primitive.enabled, "primitive workstation is not research gated")
 T.falsy(proper.enabled, "proper workstation remains research gated")
 T.equal(proper.status, "RESEARCH REQUIRED",
     "proper workstation exposes research gating")
+T.truthy(research, "research Log Table workstation is present")
+T.equal(research.name, "Log Table",
+    "research facility uses the native Log Table build name")
+T.equal(research.texture, "native_log_table_texture",
+    "research facility uses the native Log Table icon")
+T.equal(research.costText, "1 Base.Log (1 total)",
+    "research facility uses the native Log Table materials")
+T.truthy(research.enabled,
+    "research Log Table workstation is not technology gated")
 
 T.finish("pnc_workstation_build_metadata_smoke")

@@ -19,8 +19,11 @@ local function researchTarget(order, worker, live)
     local mode = tostring(order and order.payload and order.payload.mode or "")
     local technology = mode == "technology" and Definitions.Get(
         order.payload and order.payload.technologyId) or nil
+    -- Blueprint study shares the same physical Log Table as technology
+    -- research and book reading, just as workshop salvage shares the craft
+    -- station. Keep the mode for UI/policy while reserving one real table.
     local capability = technology and technology.researchCapability
-        or mode == "blueprint" and "work.blueprint" or "work.research"
+        or "work.research"
     return PNC.FacilityService.AcquireActivity(order.baseId, worker.id,
         capability, { abstract = live == nil, ttlMs = 30000,
             workOrderId = order.id })

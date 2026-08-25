@@ -21,6 +21,24 @@ local CATEGORY_LABELS = {
     technology = "TECHNOLOGY", utilities = "UTILITIES",
 }
 local PAGE_SIZE = 4
+local FACILITY_WINDOW_SPEC = {
+    -- Logical pixels scaled from PsychopatzCore's 1920x1080 baseline.
+    width = 1180,
+    height = 760,
+    minWidth = 760,
+    minHeight = 540,
+    maxWidth = 1440,
+    maxHeight = 920,
+    screenMargin = 24,
+}
+
+local function facilityWindowSpec()
+    local spec = {}
+    for key, value in pairs(FACILITY_WINDOW_SPEC) do spec[key] = value end
+    return spec
+end
+
+BuildUI.WindowSpec = facilityWindowSpec
 
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
@@ -258,8 +276,8 @@ function FacilityCard:render()
         math.max(14, fontHeight(metaFont))
     -- Give the native build image a real visual area. Keep the metadata below
     -- it so tall object textures never collide with the title or requirements.
-    local imageHeight = math.max(82, math.min(136,
-        math.floor(self.height * 0.48)))
+    local imageHeight = math.max(42, math.min(136,
+        math.floor(self.height * 0.44)))
     local imageY, textY = 6, imageHeight + 8
 
     self:drawRect(0, 0, self.width, self.height, selected and 0.92 or 0.78,
@@ -415,11 +433,36 @@ function ISPNCFacilityBuildWindow:onResponsiveLayout()
         card:setVisible(shown)
         if shown then visible[#visible + 1] = card end
     end
+
+    local pageFooterRows = pageCount > 1 and 2 or 1
+    local footerHeight = pageFooterRows * buttonHeight
+        + gap * math.max(0, pageFooterRows - 1)
+    local descriptionFont = UIFont.Small
+    local descriptionLineHeight = math.max(14, fontHeight(descriptionFont))
+    local descriptionLines = {}
+    local selectedDescription = self.selectedOption
+        and tostring(self.selectedOption.description or "") or ""
+    if selectedDescription ~= "" then
+        descriptionLines = wrapText(selectedDescription, descriptionFont,
+            rect.width, 2)
+    end
+    self.descriptionLines = descriptionLines
+    local descriptionHeight = #descriptionLines * descriptionLineHeight
+    local footerY = rect.y + rect.height - footerHeight
+    local descriptionY = footerY - descriptionHeight
+    local cardsBottom = descriptionY
+        - (descriptionHeight > 0 and gap or 0)
     local cardsY = rect.y + categoryAreaHeight + gap
-    local cardsHeight = math.max(220, math.min(330,
-        rect.height - categoryAreaHeight - 115))
     local columns = math.min(4, math.max(1, #visible))
     local width = math.floor((rect.width - gap * (columns - 1)) / columns)
+    local rows = math.max(1, math.ceil(#visible / columns))
+    local cardsHeight = math.floor((cardsBottom - cardsY
+        - gap * math.max(0, rows - 1)) / rows)
+    -- The responsive minimum keeps this area usable at supported resolutions.
+    -- This guard also prevents a manually shrunk window from making the
+    -- cards push into the description or footer.
+    cardsHeight = math.max(1, math.min(Layout.Pixels(330, self.uiScale),
+        cardsHeight))
     for index, card in ipairs(visible) do
         local column = (index - 1) % columns
         local row = math.floor((index - 1) / columns)
@@ -427,22 +470,45 @@ function ISPNCFacilityBuildWindow:onResponsiveLayout()
             cardsY + row * (cardsHeight + gap), width, cardsHeight)
     end
     self.descriptionX = rect.x
-    self.descriptionY = cardsY + cardsHeight + 8
-    Layout.SetBounds(self.confirmButton, rect.x,
-        rect.y + rect.height - buttonHeight, 130, buttonHeight)
-    Layout.SetBounds(self.debugMaterialsButton, rect.x + 142,
-        rect.y + rect.height - buttonHeight, 160, buttonHeight)
-    Layout.SetBounds(self.cancelButton, rect.x + rect.width - 110,
-        rect.y + rect.height - buttonHeight, 110, buttonHeight)
-    self.debugMaterialsButton:setVisible(canUseDebug())
-    self.debugMaterialsButton:setEnable(canUseDebug()
+    self.descriptionY = cardsY + rows * cardsHeight
+        + gap * rows
+
+    local debugVisible = canUseDebug()
+    self.debugMaterialsButton:setVisible(debugVisible)
+    self.debugMaterialsButton:setEnable(debugVisible
         and self.selectedOption ~= nil)
-    Layout.SetBounds(self.previousPageButton,
-        rect.x + math.floor(rect.width / 2) - 42,
-        rect.y + rect.height - buttonHeight, 36, buttonHeight)
-    Layout.SetBounds(self.nextPageButton,
-        rect.x + math.floor(rect.width / 2) + 6,
-        rect.y + rect.height - buttonHeight, 36, buttonHeight)
+
+    -- Paging gets its own footer row. Sharing the action row made the
+    -- controls overlap whenever a legacy narrow geometry was restored.
+    local actionY = footerY + (pageFooterRows - 1) * (buttonHeight + gap)
+    local confirmWidth = Layout.Pixels(130, self.uiScale)
+    local debugWidth = Layout.Pixels(160, self.uiScale)
+    local cancelWidth = Layout.Pixels(110, self.uiScale)
+    local actionX = rect.x
+    Layout.SetBounds(self.confirmButton, actionX, actionY,
+        confirmWidth, buttonHeight)
+    actionX = actionX + confirmWidth + gap
+    if debugVisible then
+        Layout.SetBounds(self.debugMaterialsButton, actionX, actionY,
+            debugWidth, buttonHeight)
+        actionX = actionX + debugWidth + gap
+    end
+    local cancelX = rect.x + rect.width - cancelWidth
+    -- If the user manually shrinks the window below the responsive minimum,
+    -- flow CANCEL after the other actions instead of drawing over them.
+    if cancelX < actionX then cancelX = actionX end
+    Layout.SetBounds(self.cancelButton, cancelX, actionY,
+        cancelWidth, buttonHeight)
+    if pageCount > 1 then
+        local pageButtonWidth = Layout.Pixels(36, self.uiScale)
+        local pageWidth = pageButtonWidth * 2 + gap
+        local pageX = rect.x + math.floor((rect.width - pageWidth) / 2)
+        Layout.SetBounds(self.previousPageButton, pageX, footerY,
+            pageButtonWidth, buttonHeight)
+        Layout.SetBounds(self.nextPageButton,
+            pageX + pageButtonWidth + gap, footerY,
+            pageButtonWidth, buttonHeight)
+    end
     self.previousPageButton:setEnable(self.categoryPage > 1)
     self.nextPageButton:setEnable(self.categoryPage < pageCount)
     self.previousPageButton:setVisible(pageCount > 1)
@@ -495,10 +561,14 @@ function ISPNCFacilityBuildWindow:prerender()
     self:refreshFromSnapshot()
     PsychopatzWindow.prerender(self)
     local option = self.selectedOption
-    if option and self.descriptionY then
-        self:drawText(option.description, self.descriptionX,
-            self.descriptionY, Theme.colors.textMuted.r,
-            Theme.colors.textMuted.g, Theme.colors.textMuted.b, 1, UIFont.Small)
+    if option and self.descriptionY and self.descriptionLines then
+        local color = Theme.colors.textMuted
+        local lineHeight = math.max(14, fontHeight(UIFont.Small))
+        for index, line in ipairs(self.descriptionLines) do
+            self:drawText(line, self.descriptionX,
+                self.descriptionY + (index - 1) * lineHeight,
+                color.r, color.g, color.b, color.a or 1, UIFont.Small)
+        end
     end
 end
 
@@ -784,19 +854,18 @@ function BuildUI.Open(settlement, onConfirm, storage, research,
         focusDefinitionId = focusDefinitionId,
     }
     local options = buildOptions(settlement, storage, research)
-    local screenWidth = getCore():getScreenWidth()
-    local screenHeight = getCore():getScreenHeight()
-    local width = math.min(1180, math.max(760, screenWidth - 140))
-    local height = math.min(720, math.max(540, screenHeight - 160))
-    width = math.min(width, math.max(520, screenWidth - 40))
-    height = math.min(height, math.max(400, screenHeight - 40))
+    local spec = facilityWindowSpec()
+    local bounds = Layout.ResolveWindow(spec)
     local window = ISPNCFacilityBuildWindow:new(
-        math.floor((getCore():getScreenWidth() - width) / 2),
-        math.floor((getCore():getScreenHeight() - height) / 2),
-        width, height, {
+        bounds.x, bounds.y, bounds.width, bounds.height, {
             title = tr("UI_PNC_Facility_BuildTitle", "BUILD A BUILDING"),
             options = options, onConfirm = onConfirm,
-            focusDefinitionId = focusDefinitionId, resizable = false,
+            focusDefinitionId = focusDefinitionId,
+            responsiveSpec = spec,
+            -- This modal should follow the current screen, not restore the
+            -- old 520x360 geometry that caused the clipped build screen.
+            persistenceKey = false,
+            resizable = true,
             settlement = settlement, storage = storage, research = research,
             snapshotRevision = PNC.Network and PNC.Network.ClientState
                 and PNC.Network.ClientState.colonyManagementRevision or 0,

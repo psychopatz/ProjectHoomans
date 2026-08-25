@@ -17,9 +17,10 @@ Definitions.ComponentIconPaths = Definitions.ComponentIconPaths or {
     ["dining.table"] = "media/ui/Facilities/Components/chair.png",
     ["health.bed"] = "media/ui/Facilities/Components/bed/hospital.png",
     ["growing.plot"] = "media/ui/Facilities/Components/default.png",
-    ["work.research"] = "media/ui/Facilities/Components/research_station/research_station.png",
-    ["work.blueprint"] = "media/ui/Facilities/Components/research_station/architect_table.png",
-    ["work.reverse"] = "media/ui/Facilities/Components/research_station/Lab_Station.png",
+    -- All research lanes share one physical native Log Table.
+    ["work.research"] = "media/ui/Facilities/Components/workshop/workbench.png",
+    ["work.blueprint"] = "media/ui/Facilities/Components/workshop/workbench.png",
+    ["work.reverse"] = "media/ui/Facilities/Components/workshop/workbench.png",
     ["work.craft"] = "media/ui/Facilities/Components/workshop/workbench.png",
     ["work.disassemble"] = "media/ui/Facilities/Components/workshop/recycling_bench.png",
     ["work.zone"] = "media/ui/Facilities/Components/workshop/workbench.png",

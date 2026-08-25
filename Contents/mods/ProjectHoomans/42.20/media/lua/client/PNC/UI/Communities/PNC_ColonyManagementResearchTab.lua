@@ -153,6 +153,12 @@ local function matchingOrder(orders, mode, id)
 end
 
 local function hasLane(snapshot, role)
+    -- Base research, blueprint study, and book reading all use the same
+    -- physical native Log Table. Keep the logical lane names for activity
+    -- routing while checking only the shared workstation component.
+    if role == "work.blueprint" or role == "work.reverse" then
+        role = "work.research"
+    end
     for _, facility in ipairs(snapshot.settlement
         and snapshot.settlement.facilities or {}) do
         if facility.definitionId == "research_facility"
@@ -251,7 +257,7 @@ function ResearchTab.Rebuild(window, snapshot, tr)
     local research, orders = snapshot.research or {}, activeResearch(snapshot)
     window.researchLaneAvailability = {
         base = hasLane(snapshot, "work.research"),
-        blueprint = hasLane(snapshot, "work.blueprint"),
+        blueprint = hasLane(snapshot, "work.research"),
         books = hasLane(snapshot, "work.research"),
     }
     applySubtab(window)
@@ -273,7 +279,7 @@ function ResearchTab.Rebuild(window, snapshot, tr)
                 prerequisiteKnown = entry.prerequisiteKnown ~= false,
                 order = matchingOrder(orders, "technology", entry.id),
                 laneAvailable = window.researchLaneAvailability[lane],
-                missingStation = "NO RESEARCH STATION" })
+                missingStation = "NO RESEARCH TABLE" })
         end
     else
         local mode = window.researchSubtab
@@ -294,8 +300,7 @@ function ResearchTab.Rebuild(window, snapshot, tr)
                     laneAvailable = mode == "books"
                         and window.researchLaneAvailability.books
                         or window.researchLaneAvailability[mode],
-                    missingStation = mode == "blueprint"
-                        and "NO ARCHITECT BENCH" or "NO RESEARCH STATION" })
+                    missingStation = "NO RESEARCH TABLE" })
             end
         end
     end

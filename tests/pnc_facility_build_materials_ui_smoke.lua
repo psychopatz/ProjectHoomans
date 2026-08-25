@@ -47,6 +47,18 @@ end
 
 local BuildUI = require(
     "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal")
+local windowSpec = BuildUI.WindowSpec()
+T.equal(windowSpec.width, 1180,
+    "facility build modal uses the responsive baseline width")
+T.equal(windowSpec.height, 760,
+    "facility build modal uses enough baseline height for the recipe card")
+T.equal(windowSpec.minWidth, 760,
+    "facility build modal rejects the legacy narrow geometry")
+T.equal(windowSpec.minHeight, 540,
+    "facility build modal rejects the legacy short geometry")
+windowSpec.width = 1
+T.equal(BuildUI.WindowSpec().width, 1180,
+    "facility window spec is copied instead of shared")
 local settlement = { hqLevel = 1, facilities = {{
     definitionId = "stockpile", constructionState = "BUILT",
 }} }

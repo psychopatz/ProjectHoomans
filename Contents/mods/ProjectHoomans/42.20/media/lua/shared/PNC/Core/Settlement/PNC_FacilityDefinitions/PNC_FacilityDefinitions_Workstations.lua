@@ -8,12 +8,19 @@ Definitions.Register({
     category = "technology",
     displayNameKey = "UI_PNC_Facility_Research",
     descriptionKey = "UI_PNC_Facility_ResearchDescription",
-    iconPath = "media/ui/Facilities/BuildingMenu/researchCenter.png",
-    buildCosts = {{ fullType = "Base.Money", amount = 1 }},
+    -- Research is a native Build 42 workstation now. The build menu uses
+    -- the Log Table recipe's native name, materials, and icon.
+    iconPath = nil,
+    buildRecipeObjectInfoName = "Base.Log_Table",
+    entityScript = "Base.Log_Table",
+    directWorkstation = true,
+    stationId = "research_facility",
+    workstationRole = "work.research",
+    buildCosts = {},
     buildWork = 120,
     reconstructWork = 75,
     deconstructWork = 70,
-    allowMultipleRegions = false,
+    allowMultipleRegions = true,
     levels = {
         [1] = {
             requiredHQLevel = 1,
@@ -21,11 +28,7 @@ Definitions.Register({
                 "work.reverse" },
             componentLimits = {
                 ["work.research"] = { kind = "anchor", minCount = 1,
-                    maxCount = 1 },
-                ["work.blueprint"] = { kind = "anchor", minCount = 1,
-                    maxCount = 1 },
-                ["work.reverse"] = { kind = "anchor", minCount = 1,
-                    maxCount = 1 },
+                    maxCount = 1, managed = true },
             },
             activityLimits = {
                 ["work.research"] = { maxConcurrent = 1 },
@@ -36,9 +39,9 @@ Definitions.Register({
                 research = { operation = "RESEARCH", capacity = 1,
                     role = "work.research", interactionAnchor = "research" },
                 architect = { operation = "RESEARCH", capacity = 1,
-                    role = "work.blueprint", interactionAnchor = "architect" },
+                    role = "work.research", interactionAnchor = "research" },
                 laboratory = { operation = "RESEARCH", capacity = 1,
-                    role = "work.reverse", interactionAnchor = "laboratory" },
+                    role = "work.research", interactionAnchor = "research" },
             },
         },
     },

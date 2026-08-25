@@ -17,6 +17,7 @@ end
 
 local openedOptions
 local request
+local placement
 package.preload[
     "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
 ] = function()
@@ -36,16 +37,30 @@ package.preload[
         ApplyLocalResult = function() end,
     }
 end
+package.preload[
+    "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement"
+] = function()
+    return {
+        Begin = function(_, recipe)
+            placement = recipe
+            return true
+        end,
+    }
+end
 
 PNC = {
     FacilityDefinitions = {
-        GetLevel = function(definitionId)
+        Get = function(definitionId)
             T.truthy(definitionId == "research_facility",
                 "unexpected facility definition")
-            return { componentLimits = {
-                ["work.research"] = { kind = "anchor", minCount = 1,
-                    maxCount = 1 },
-            } }
+            return { directWorkstation = true,
+                buildRecipeObjectInfoName = "Base.Log_Table",
+                entityScript = "Base.Log_Table" }
+        end,
+    },
+    BuildRecipeCatalog = {
+        Get = function(name)
+            return { recipeKey = name, objectInfoName = name }
         end,
     },
     Client = {
@@ -60,18 +75,9 @@ local window = { snapshot = { settlement = { id = "base:1", revision = 4 } } }
 
 T.truthy(Facility.BeginBuild(window, "research_facility") == true,
     "research facility build did not open")
-T.truthy(openedOptions ~= nil, "research facility selector was not opened")
-T.truthy(string.find(openedOptions.instruction, "building footprint", 1, true),
-    "anchor-only facility did not use footprint instructions")
-
-local region = { levels = { [0] = { rows = {} } } }
-openedOptions.onConfirm(region)
-T.truthy(request and request.component,
-    "confirmed footprint did not submit facility creation")
-T.truthy(request.component.role == "facility.footprint",
-    "confirmed footprint used the wrong construction role")
-T.truthy(request.component.region == region,
-    "confirmed footprint did not preserve the selected region")
+T.falsy(openedOptions ~= nil, "research facility opened a room selector")
+T.equal(placement.objectInfoName, "Base.Log_Table",
+    "research facility routes the native Log Table to placement")
 T.finish("pnc_anchor_only_facility_build_selector_smoke")
 
 T.finish("pnc_anchor_only_facility_build_selector_smoke")

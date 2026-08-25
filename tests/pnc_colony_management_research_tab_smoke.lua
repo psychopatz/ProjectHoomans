@@ -37,7 +37,7 @@ local snapshot = {
     settlement = { id = "base-1", hqLevel = 1, maxHQLevel = 3,
         facilities = {{ definitionId = "research_facility",
         constructionState = "BUILT", components = {
-            { role = "work.research" }, { role = "work.blueprint" },
+            { role = "work.research" },
         } }} },
     research = {
         entries = {{
@@ -68,6 +68,10 @@ T.truthy(window.researchCatalog.items[2].catalogCells.state == "RESEARCHING 25%"
     "active research row does not expose resumable progress")
 T.truthy(window.researchCatalog.items[3].catalogCells.state == "NOT LEARNED",
     "water technology should be researchable through the research lane")
+T.truthy(window.researchLaneAvailability.base
+    and window.researchLaneAvailability.blueprint
+    and window.researchLaneAvailability.books,
+    "all research lanes should share the Log Table")
 ResearchTab.Rebuild(window, snapshot, function(_, fallback) return fallback end)
 T.truthy(#window.researchQueueList.items == 2,
     "research queue refresh must not accumulate headers")

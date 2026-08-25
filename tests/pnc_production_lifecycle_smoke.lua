@@ -258,7 +258,7 @@ T.equal(lockedHQReason, "PREREQUISITE_REQUIRED", "HQ prerequisite reason")
 local hqTwo = T.truthy(Research.Commands.QueueTechnology({}, "hq:2"))
 T.truthy(Work.Commands.Assign(hqTwo.id, "worker"), "HQ research assignment")
 T.equal(acquiredCapabilities[#acquiredCapabilities], "work.research",
-    "HQ capability research routes to the Research Station")
+    "HQ capability research routes to the shared Log Table")
 T.truthy(Work.Commands.AddProgress(hqTwo.id, "worker", 100),
     "HQ research completion")
 T.truthy(Research.Queries.HasTechnology("c1", "hq:2"),
@@ -325,8 +325,8 @@ T.equal(Research.Commands.ReverseEngineer, nil,
 ResearchRepository.ByColony, ResearchRepository.Runtime = {}, {}
 local blueprint = T.truthy(Research.Commands.StudyBlueprint({}, 1))
 T.truthy(Work.Commands.Assign(blueprint.id, "worker"), "blueprint assignment")
-T.equal(acquiredCapabilities[#acquiredCapabilities], "work.blueprint",
-    "blueprint study routes to the architect bench")
+T.equal(acquiredCapabilities[#acquiredCapabilities], "work.research",
+    "blueprint study routes to the shared Log Table")
 T.truthy(Work.Commands.AddProgress(blueprint.id, "worker", 100),
     "blueprint completion")
 T.equal(inventory["PNC.RecipeBlueprint"], 1, "blueprint returned by policy")

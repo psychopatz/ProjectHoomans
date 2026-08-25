@@ -136,11 +136,22 @@ local researchLevel = PNC.FacilityDefinitions.GetLevel(
 T.equal(researchLevel.componentLimits["research.room"], nil,
     "research room is not a functional component")
 T.equal(researchLevel.componentLimits["work.research"].minCount, 1,
-    "research station remains a research component")
-T.equal(researchLevel.componentLimits["work.blueprint"].minCount, 1,
-    "architect bench is required for blueprint study")
-T.equal(researchLevel.componentLimits["work.reverse"].minCount, 1,
-    "lab is required for reverse engineering")
+    "log table remains the research workstation component")
+T.equal(researchLevel.componentLimits["work.research"].managed, true,
+    "log table is managed by the facility")
+T.equal(researchLevel.componentLimits["work.blueprint"], nil,
+    "blueprint study no longer requires a virtual bench")
+T.equal(researchLevel.componentLimits["work.reverse"], nil,
+    "reverse engineering no longer requires a virtual lab")
+local researchDefinition = PNC.FacilityDefinitions.Get("research_facility")
+T.equal(researchDefinition.directWorkstation, true,
+    "research facility uses the native workstation build flow")
+T.equal(researchDefinition.entityScript, "Base.Log_Table",
+    "research facility uses the native Log Table entity")
+T.equal(researchDefinition.buildRecipeObjectInfoName, "Base.Log_Table",
+    "research facility resolves the native Log Table recipe")
+T.equal(researchDefinition.iconPath, nil,
+    "research facility uses the native table icon")
 local workshopLevel = PNC.FacilityDefinitions.GetLevel("workshop", 1)
 T.equal(workshopLevel.componentLimits["workshop.room"], nil,
     "workshop room is not a functional component")
@@ -395,30 +406,14 @@ local researchResult = PNC.FacilityService.Create(player, {
     baseId = base.id, definitionId = "research_facility",
     expectedRevision = base.revision,
     component = { kind = "region", role = "facility.footprint",
-        region = rectangle(7, 7, 8, 8) },
+        region = rectangle(7, 7, 7, 7) },
+    nativeBuild = true,
 })
 T.truthy(researchResult.ok,
-    "research facility accepts a non-component construction footprint")
+    "research facility accepts a native table construction footprint")
 local researchFacility = researchResult.facility
 researchFacility.constructionState = "BUILT"
 PNC.FacilityService.RefreshState(researchFacility)
-local stationOrder = PNC.FacilityService.SetComponent({}, {
-    facilityId = researchFacility.id,
-    expectedRevision = researchFacility.revision,
-    component = { kind = "anchor", role = "work.research",
-        x = 7, y = 7, z = 0 },
-})
-T.truthy(stationOrder.ok, "research station assignment")
-T.truthy(PNC.FacilityService.FinalizeSetComponent(
-    researchFacility.id, stationOrder.pendingComponent),
-    "research station construction completes")
-T.equal(PNC.FacilityService.SetComponent({}, {
-    facilityId = researchFacility.id,
-    expectedRevision = researchFacility.revision,
-    component = { kind = "anchor", role = "work.research",
-        x = 6, y = 7, z = 0 },
-}).reason, "OUTSIDE_FACILITY",
-    "station assignment stays inside its facility footprint")
 local researchStation
 for componentId, _ in pairs(researchFacility.componentIds) do
     local component = PNC.SettlementRepository.GetComponent(componentId)
@@ -427,39 +422,21 @@ for componentId, _ in pairs(researchFacility.componentIds) do
     end
 end
 T.equal(researchStation and researchStation.tileCount, 1,
-    "ordinary facility anchors occupy one fixed tile")
-T.equal(researchFacility.cachedState, "NEEDS_ASSIGNMENT",
-    "research facility remains incomplete without architect bench and lab")
-local architectOrder = PNC.FacilityService.SetComponent({}, {
-    facilityId = researchFacility.id,
-    expectedRevision = researchFacility.revision,
-    component = { kind = "anchor", role = "work.blueprint",
-        x = 8, y = 7, z = 0 },
-})
-T.truthy(architectOrder.ok, "architect bench assignment")
-T.truthy(PNC.FacilityService.FinalizeSetComponent(
-    researchFacility.id, architectOrder.pendingComponent),
-    "architect bench construction completes")
-local laboratoryOrder = PNC.FacilityService.SetComponent({}, {
-    facilityId = researchFacility.id,
-    expectedRevision = researchFacility.revision,
-    component = { kind = "anchor", role = "work.reverse",
-        x = 7, y = 8, z = 0 },
-})
-T.truthy(laboratoryOrder.ok, "laboratory assignment")
-T.truthy(PNC.FacilityService.FinalizeSetComponent(
-    researchFacility.id, laboratoryOrder.pendingComponent),
-    "laboratory construction completes")
+    "native Log Table occupies one fixed tile")
+T.equal(researchStation and researchStation.managedByFacility, true,
+    "native Log Table anchor is managed by the facility")
+T.equal(researchFacility.workstationPlacement.entityScript, "Base.Log_Table",
+    "native Log Table placement is persisted on the facility")
 T.equal(researchFacility.cachedState, "OPERATIONAL",
-    "all three research lanes complete the facility")
+    "one Log Table makes all research lanes operational")
 T.equal(#PNC.FacilityService.ListByCapability(base.id, "work.blueprint"), 1,
-    "architect bench exposes blueprint activity")
+    "shared Log Table exposes blueprint activity")
 T.equal(#PNC.FacilityService.ListByCapability(base.id, "work.reverse"), 1,
-    "laboratory exposes reverse-engineering activity")
+    "shared Log Table exposes reverse-engineering activity")
 local refreshedResearch = PNC.FacilityService.ListByCapability(
     base.id, "work.research")
 T.equal(#refreshedResearch, 1,
-    "assigned research station is independently usable")
+    "native Log Table is independently usable")
 T.equal(researchFacility.cachedState, "OPERATIONAL",
     "completed research facility remains operational")
 local retiredRoomId = "legacy:workshop.room"
@@ -474,6 +451,17 @@ T.equal(PNC.SettlementRepository.State.components[retiredRoomId], nil,
     "retired room component is removed from saved settlement state")
 T.equal(researchFacility.componentIds[retiredRoomId], nil,
     "retired room component is removed from its facility")
+local retiredResearchBenchId = "legacy:research.bench"
+researchFacility.componentIds[retiredResearchBenchId] = true
+PNC.SettlementRepository.State.components[retiredResearchBenchId] = {
+    id = retiredResearchBenchId, facilityId = researchFacility.id,
+    kind = "anchor", role = "work.blueprint", x = 7, y = 7, z = 0,
+}
+PNC.FacilityService.RebuildIndexes()
+T.equal(PNC.SettlementRepository.State.components[retiredResearchBenchId], nil,
+    "retired virtual research bench is removed from saved settlement state")
+T.equal(researchFacility.componentIds[retiredResearchBenchId], nil,
+    "retired virtual research bench is removed from its facility")
 
 local farmResult = PNC.FacilityService.Create(player, { baseId = base.id,
     definitionId = "farm", expectedRevision = base.revision,
