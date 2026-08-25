@@ -16,8 +16,6 @@ local Layout = UI.Layout
 local Protocol = PNC.ColonyJournalProtocol
 local RadioDeviceState = PsychopatzCore.RadioDeviceState
 local RadioImageAnimation = PsychopatzCore.RadioImageAnimation
-local RADIO_ICON_ON = "Item_WalkieTalkieCivilian"   -- Base.WalkieTalkie2
-local RADIO_ICON_OFF = "Item_WalkieTalkieCivilian2" -- Base.WalkieTalkie3
 
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
@@ -179,8 +177,6 @@ function ISPNCColonyJournalWindow:createChildren()
             searchPrefix = "media/ui/Radio/Signal_search/",
             frameCount = 5,
             frameDuration = 200,
-            offFallback = RADIO_ICON_OFF,
-            onFallback = RADIO_ICON_ON,
         }) or nil
     self.rowCount = 0
     self:requestResponsiveLayout(true)
@@ -252,21 +248,19 @@ function ISPNCColonyJournalWindow:render()
     local titleX = header.x + 10
     local titleWidth = header.width - 20
     if signalTexture then
-        local imageSize = math.min(Layout.Pixels(28, self.uiScale),
-            math.max(1, header.height - Layout.Pixels(12, self.uiScale)))
-        self:drawTextureScaled(signalTexture, header.x + 8, header.y + 5,
+        local imageSize = math.min(Layout.Pixels(30, self.uiScale),
+            math.max(1, header.height - Layout.Pixels(10, self.uiScale)))
+        local imageX = header.x + header.width - imageSize
+            - Layout.Pixels(8, self.uiScale)
+        local imageY = header.y + math.floor((header.height - imageSize) / 2)
+        self:drawTextureScaled(signalTexture, imageX, imageY,
             imageSize, imageSize, 1, 1, 1, 1)
-        titleX = header.x + imageSize + Layout.Pixels(16, self.uiScale)
-        titleWidth = header.width - (titleX - header.x) - 10
+        titleWidth = math.max(1, imageX - titleX - Layout.Pixels(10,
+            self.uiScale))
     end
-    local status = self.radioActive
-        and tr("UI_PNC_ColonyJournal_Live", "LIVE")
-        or tr("UI_PNC_ColonyJournal_Offline", "RADIO OFFLINE")
     UI.DrawSectionTitle(self,
         tr("UI_PNC_ColonyJournal_Title", "COLONY JOURNAL"),
         titleX, header.y + 7, titleWidth)
-    UI.DrawBadge(self, status, header.x + header.width - 10,
-        header.y + 6, self.radioActive and "success" or "warning")
     local countText = string.format("%d %s  /  %s",
         self.rowCount or 0,
         tr("UI_PNC_ColonyJournal_Entries", "ENTRIES"),
@@ -283,6 +277,7 @@ function ISPNCColonyJournalWindow:render()
             Theme.colors.textMuted.r, Theme.colors.textMuted.g,
             Theme.colors.textMuted.b, Theme.colors.textMuted.a, UIFont.Small)
     end
+
 end
 
 function ISPNCColonyJournalWindow:close()
@@ -300,7 +295,7 @@ end
 
 function JournalUI.CanOpen()
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
-    return RadioDeviceState.FindActivePlayerDevice(player) ~= nil
+    return RadioDeviceState.HasPlayerDevice(player)
 end
 
 function JournalUI.Open()
@@ -324,7 +319,8 @@ function JournalUI.Open()
     window:addToUIManager()
     window:setVisible(true)
     window:bringToTop()
-    window.radioActive = true
+    window.radioActive = RadioDeviceState.FindActivePlayerDevice(
+        getSpecificPlayer and getSpecificPlayer(0) or nil) ~= nil
     window:refreshRows()
     window:requestJournal(PNC.Core.Now())
     return window

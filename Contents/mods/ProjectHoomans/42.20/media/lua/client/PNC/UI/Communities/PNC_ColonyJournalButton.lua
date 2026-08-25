@@ -7,18 +7,14 @@ PNC.ColonyJournalButton = PNC.ColonyJournalButton or {}
 local ButtonAPI = PNC.ColonyJournalButton
 local Sidebar = PsychopatzCore.UI.Sidebar
 local RadioDeviceState = PsychopatzCore.RadioDeviceState
-local ICON_ON = "Item_WalkieTalkieCivilian"   -- Base.WalkieTalkie2
-local ICON_OFF = "Item_WalkieTalkieCivilian2" -- Base.WalkieTalkie3
-local ICONS = {}
-
-local function icon(name)
-    if ICONS[name] ~= nil then return ICONS[name] end
-    local texture = getTexture and getTexture(name) or nil
-    -- Do not permanently cache an early-load miss. PZ may initialize the
-    -- sidebar before the RadioIcons atlas is available.
-    if texture then ICONS[name] = texture end
-    return texture
-end
+local RadioImageAnimation = PsychopatzCore.RadioImageAnimation
+local radioAnimation = RadioImageAnimation
+    and RadioImageAnimation.New({
+        offPath = "media/ui/Radio/Signal_found/2.png",
+        searchPrefix = "media/ui/Radio/Signal_search/",
+        frameCount = 5,
+        frameDuration = 200,
+    }) or nil
 
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
@@ -30,12 +26,16 @@ local function activeRadio()
     return RadioDeviceState.FindActivePlayerDevice(player) ~= nil
 end
 
+local function hasRadio()
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    return RadioDeviceState.HasPlayerDevice(player)
+end
+
 local function radioIcon()
-    return icon(activeRadio() and ICON_ON or ICON_OFF)
+    return radioAnimation and radioAnimation:GetTexture(activeRadio()) or nil
 end
 
 function ButtonAPI.onClick()
-    if not activeRadio() then return end
     if PNC.ColonyJournalUI and PNC.ColonyJournalUI.Toggle then
         PNC.ColonyJournalUI.Toggle()
     end
@@ -51,14 +51,15 @@ if Sidebar and Sidebar.Register then
         order = 900,
         title = "",
         image = radioIcon,
+        imageRefreshInterval = 200,
         tooltip = function()
             local active = activeRadio()
             return active
                 and tr("UI_PNC_ColonyJournal_Open", "Open colony journal")
-                or tr("UI_PNC_ColonyJournal_RequiresRadio",
-                    "Requires an active, powered, audible walkie-talkie")
+                or tr("UI_PNC_ColonyJournal_SyncPaused",
+                    "Open colony journal (radio sync paused)")
         end,
-        enabled = activeRadio,
+        enabled = hasRadio,
         variant = "primary",
         disabledVariant = "quiet",
         displayBackground = false,
