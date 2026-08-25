@@ -61,6 +61,72 @@ function Core.IsManagedNPCBody(zombie)
         or false
 end
 
+-- Live IsoZombie instances use their ItemVisual script definitions when the
+-- engine evaluates helmetFall().  The script Item is shared, so keep the
+-- original ChanceToFall values and restore them at the end of the tick after
+-- the managed NPC update has passed through the engine fall logic.
+Core._VisualFallProtection = Core._VisualFallProtection or {}
+
+function Core.ProtectClothingFromFall(item)
+    if not item or not item.setChanceToFall then
+        return false
+    end
+    return pcall(item.setChanceToFall, item, 0)
+end
+
+function Core.ProtectVisualClothingFromFall(zombie)
+    local itemVisuals
+    local visual
+    local scriptItem
+    local fullType
+    local chanceToFall
+    local state
+    local i
+    if not zombie or not zombie.getItemVisuals then
+        return 0
+    end
+    itemVisuals = zombie:getItemVisuals()
+    if not itemVisuals or not itemVisuals.size then
+        return 0
+    end
+    for i = 0, itemVisuals:size() - 1 do
+        visual = itemVisuals:get(i)
+        scriptItem = visual and visual.getScriptItem
+            and visual:getScriptItem() or nil
+        fullType = visual and visual.getItemType
+            and tostring(visual:getItemType() or "") or ""
+        chanceToFall = scriptItem and scriptItem.getChanceToFall
+            and tonumber(scriptItem:getChanceToFall()) or 0
+        if scriptItem and fullType ~= "" and chanceToFall > 0
+            and scriptItem.DoParam
+        then
+            state = Core._VisualFallProtection[fullType]
+            if not state then
+                state = { item = scriptItem, chanceToFall = chanceToFall }
+                Core._VisualFallProtection[fullType] = state
+            end
+            pcall(scriptItem.DoParam, scriptItem, "ChanceToFall", "0")
+        end
+    end
+    return Core.TableSize(Core._VisualFallProtection)
+end
+
+function Core.RestoreVisualClothingFallProtection()
+    local fullType
+    local state
+    for fullType, state in pairs(Core._VisualFallProtection) do
+        if state.item and state.item.DoParam then
+            pcall(
+                state.item.DoParam,
+                state.item,
+                "ChanceToFall",
+                tostring(state.chanceToFall)
+            )
+        end
+        Core._VisualFallProtection[fullType] = nil
+    end
+end
+
 function Core.Now()
     return nowMillis()
 end

@@ -3,6 +3,7 @@ PNC.Visuals = PNC.Visuals or {}
 
 local Visuals = PNC.Visuals
 local Profiles = PNC.VisualProfiles
+local Core = PNC.Core
 
 local function isNetworkedGame()
     return (isClient and isClient() == true)
@@ -130,6 +131,9 @@ local function safeSetWornItem(zombie, item)
     bodyLocation = item.getBodyLocation and item:getBodyLocation() or nil
     if not bodyLocation then
         return false
+    end
+    if Core and Core.ProtectClothingFromFall then
+        Core.ProtectClothingFromFall(item)
     end
     return pcall(function()
         zombie:setWornItem(bodyLocation, item)

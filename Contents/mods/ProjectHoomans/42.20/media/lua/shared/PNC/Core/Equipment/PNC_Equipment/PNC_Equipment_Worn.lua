@@ -90,6 +90,9 @@ local function applyCreatedWornItem(zombie, equipment, record, entry, item)
     local wornOk
     local wornReason
     if bodyLocation then
+        if Core and Core.ProtectClothingFromFall then
+            Core.ProtectClothingFromFall(item)
+        end
         wornOk, wornReason = Internal.safeInvoke(
             zombie,
             "setWornItem",
@@ -195,4 +198,3 @@ function Internal.applyWornItems(zombie, equipment, record)
     end
     return true, "worn:" .. tostring(appliedCount)
 end
-

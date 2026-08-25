@@ -217,6 +217,9 @@ function Internal.prepareCorpseItems(record, zombie)
                 end
                 if item and descriptor.wornSlot and zombie.setWornItem then
                     copyLiveVisual(item, fullType)
+                    if PNC.Core and PNC.Core.ProtectClothingFromFall then
+                        PNC.Core.ProtectClothingFromFall(item)
+                    end
                     pcall(zombie.setWornItem, zombie, tostring(descriptor.wornSlot), item)
                 elseif item and descriptor.equipSlot == "primary" and zombie.setPrimaryHandItem then
                     pcall(zombie.setPrimaryHandItem, zombie, item)
@@ -238,6 +241,9 @@ function Internal.prepareCorpseItems(record, zombie)
                     local bodyLocation = item:getBodyLocation()
                     if bodyLocation and tostring(bodyLocation) ~= "" then
                         copyLiveVisual(item, fullType)
+                        if PNC.Core and PNC.Core.ProtectClothingFromFall then
+                            PNC.Core.ProtectClothingFromFall(item)
+                        end
                         pcall(zombie.setWornItem, zombie, tostring(bodyLocation), item)
                     end
                 end
@@ -252,6 +258,9 @@ function Internal.prepareCorpseItems(record, zombie)
             item = candidates[1] or create(tostring(kind))
             if item and zombie.setWornItem then
                 copyLiveVisual(item, tostring(kind))
+                if PNC.Core and PNC.Core.ProtectClothingFromFall then
+                    PNC.Core.ProtectClothingFromFall(item)
+                end
                 pcall(zombie.setWornItem, zombie, tostring(bodyLocation), item)
             end
         end
