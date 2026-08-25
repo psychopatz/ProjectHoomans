@@ -5,6 +5,7 @@ UI_EN = {
     UI_PNC_Research_ReadBook = "Read Book",
     UI_PNC_Facility_DebugGiveMaterials = "Give Building Materials",
     UI_PNC_Facility_Skill = "SKILL",
+    UI_PNC_Facility_LevelShort = "Lv",
     UI_PNC_Facility_SkillOther = "Other production",
     UI_PNC_Facility_BuildRecipeUnavailable = "Build recipe unavailable",
     UI_PNC_Facility_BuiltIn = "BUILT-IN",

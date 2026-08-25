@@ -242,6 +242,7 @@ local expectedSettlement = {
     "PNC/Settlement/PNC_FacilityValidationService",
     "PNC/Settlement/PNC_FacilityCostService",
     "PNC/Settlement/PNC_FacilityService",
+    "PNC/Settlement/PNC_StockpileVisualService",
     "PNC/Settlement/PNC_InteractionTargetResolver",
     "PNC/Settlement/PNC_FacilityReservations",
     "PNC/Settlement/PNC_StockpileAccessService",

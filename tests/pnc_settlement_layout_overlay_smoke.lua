@@ -50,6 +50,16 @@ T.equal(markers[2].role, "work.research", "component marker role")
 T.equal(markers[1].tileScale, 1, "room marker fills one tile")
 T.equal(markers[2].tileScale, 1, "component marker fills one tile")
 
+local stockpileMarkers = Overlay.BuildMarkers({ facilities = {{
+    id = "stockpile_1", definitionId = "stockpile", level = 1,
+    constructionRegion = region, components = {{
+        id = "stockpile_zone", kind = "region", role = "work.zone",
+        region = region,
+    }},
+}} })
+T.equal(stockpileMarkers[1].label, "Stockpile Lv 1",
+    "stockpile marker includes its storage level")
+
 local workRegion = { levels = { [0] = { rows = { [6] = { 6, 6 } } } } }
 local zonedSettlement = { facilities = {
     { id = "forge_1", definitionId = "forge", constructionRegion = workRegion,

@@ -17,7 +17,7 @@ local commitCount = 0
 local specs = {
     { id = "PNC_HasBrother", relationshipKind = "brother", sex = "male",
         sharesSurname = true },
-    { id = "PNC_HasLover", relationshipKind = "lover", sex = "orientation",
+    { id = "PNC_IsMarried", relationshipKind = "lover", sex = "orientation",
         sharesSurname = true },
     { id = "PNC_HasFriend", relationshipKind = "friend", sex = "random",
         sharesSurname = false },
@@ -177,7 +177,7 @@ T.equal(knowledgeCount, 3, "all dossiers initialized")
 T.equal(commitCount, 4, "selection plus each grant committed")
 
 local brother = npcs[record.startingCompanions.grants.PNC_HasBrother.npcID]
-local lover = npcs[record.startingCompanions.grants.PNC_HasLover.npcID]
+local lover = npcs[record.startingCompanions.grants.PNC_IsMarried.npcID]
 local friend = npcs[record.startingCompanions.grants.PNC_HasFriend.npcID]
 T.equal(brother.identity.survivor.surname, "SurvivorFamily",
     "family companion shares player surname")
@@ -198,7 +198,7 @@ T.equal(assignCount, 3, "reconnect performs no reassignment")
 
 -- Existing grants repair a stale faction/community link exactly once.
 lover.affiliation = nil
-record.startingCompanions.grants.PNC_HasLover.enrichmentVersion = 2
+record.startingCompanions.grants.PNC_IsMarried.enrichmentVersion = 2
 granted, reason = PNC.StartingCompanions.Ensure(
     player, record.uuid, 14
 )

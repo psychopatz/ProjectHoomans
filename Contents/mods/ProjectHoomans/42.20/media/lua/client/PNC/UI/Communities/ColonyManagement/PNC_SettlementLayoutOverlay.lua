@@ -102,6 +102,11 @@ end
 
 local function facilityLabel(facility, ordinal, total)
     local label = facilityName(facility)
+    if tostring(facility and facility.definitionId or "") == "stockpile" then
+        local level = math.max(1, math.floor(tonumber(facility.level) or 1))
+        local levelLabel = localizedName("UI_PNC_Facility_LevelShort", "Lv")
+        label = label .. " " .. levelLabel .. " " .. tostring(level)
+    end
     if tonumber(total) and tonumber(total) > 1 then
         return label .. " #" .. tostring(ordinal or 1)
     end

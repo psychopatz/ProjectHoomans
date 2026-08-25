@@ -51,6 +51,12 @@ function Service.FinalizeUpgrade(facilityId, targetLevel)
     touch(base, facility); updateState(base, facility); Service.RebuildIndexes()
     emit(PNC.EventTypes.FACILITY_UPGRADED, { facilityId = facility.id,
         level = facility.level, revision = facility.revision })
+    if facility.definitionId == "stockpile"
+        and PNC.StockpileVisualService
+        and PNC.StockpileVisualService.Apply
+    then
+        PNC.StockpileVisualService.Apply(facility)
+    end
     return true, "FacilityUpgraded"
 end
 

@@ -81,6 +81,12 @@ function H.CompleteBuild(order)
     facility.constructionState = "BUILT"
     facility.constructionWorkOrderId = nil
     PNC.FacilityService.RefreshState(facility)
+    if facility.definitionId == "stockpile"
+        and PNC.StockpileVisualService
+        and PNC.StockpileVisualService.Apply
+    then
+        PNC.StockpileVisualService.Apply(facility)
+    end
     return true
 end
 
@@ -133,6 +139,12 @@ function H.CompleteReconstruct(order)
                 PNC.ColonyStorageService.SetTierForSettlement(
                     order.colonyId, change.targetLevel)
             if not upgraded then return false, storageReason end
+        end
+        if facility and facility.definitionId == "stockpile"
+            and PNC.StockpileVisualService
+            and PNC.StockpileVisualService.Apply
+        then
+            PNC.StockpileVisualService.Apply(facility)
         end
         return true, reason
     end

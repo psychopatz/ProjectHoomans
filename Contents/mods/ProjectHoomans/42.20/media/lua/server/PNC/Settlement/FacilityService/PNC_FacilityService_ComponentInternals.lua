@@ -79,6 +79,8 @@ function Service.FinalizeSetComponent(facilityId, input)
     local facility = Repository.GetFacility(facilityId)
     local base = facility and PNC.BaseService.Get(facility.baseId) or nil
     if not base then return false, "FACILITY_NOT_FOUND" end
+    local previousVisual = facility.definitionId == "stockpile"
+        and facility.stockpileVisual or nil
     local result = applyComponent(base, facility, input)
     if result.ok ~= true then return false, result.reason end
     if facility.definitionId == "stockpile" and result.component
@@ -89,6 +91,12 @@ function Service.FinalizeSetComponent(facilityId, input)
     end
     facility.constructionState, facility.constructionWorkOrderId = "BUILT", nil
     Service.RefreshState(facility)
+    if facility.definitionId == "stockpile"
+        and PNC.StockpileVisualService
+        and PNC.StockpileVisualService.Apply
+    then
+        PNC.StockpileVisualService.Apply(facility, previousVisual)
+    end
     return true, result.event
 end
 

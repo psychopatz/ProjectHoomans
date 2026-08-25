@@ -185,15 +185,15 @@ for _, spec in ipairs(StartingTraits.DEFINITIONS) do
         englishCatalog, '"' .. spec.uiDescription .. '"', 1, true
     ) ~= nil, spec.id .. " has translated description")
 end
-local loverSpec = StartingTraits.GetDefinition(StartingTraits.IDS.LOVER)
+local marriedSpec = StartingTraits.GetDefinition(StartingTraits.IDS.IS_MARRIED)
 T.truthy(StartingTraits.ResolveCompanionFemale(
-    loverSpec, true, "gay", false
+    marriedSpec, true, "gay", false
 ), "gay female survivor receives female lover")
 T.equal(StartingTraits.ResolveCompanionFemale(
-    loverSpec, false, "straight", false
+    marriedSpec, false, "straight", false
 ), true, "straight male survivor receives female lover")
 T.equal(StartingTraits.ResolveCompanionFemale(
-    loverSpec, false, "bisexual", false
+    marriedSpec, false, "bisexual", false
 ), false, "bisexual lover follows deterministic roll")
 
 -- The vanilla trait lists exclude cost-zero definitions. The
