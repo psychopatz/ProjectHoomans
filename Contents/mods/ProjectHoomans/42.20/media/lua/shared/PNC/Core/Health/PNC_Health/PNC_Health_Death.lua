@@ -108,8 +108,15 @@ end
 
 local function retireDeadRecord(record)
     local deathMarker
+    local colonyOwned
+    local retired = false
+    colonyOwned = Registry
+        and Registry.IsColonyOwnedNPC
+        and Registry.IsColonyOwnedNPC(record)
     if Registry and Registry.AddDeathMarker then
-        deathMarker = Registry.AddDeathMarker(record)
+        if colonyOwned ~= false then
+            deathMarker = Registry.AddDeathMarker(record)
+        end
     end
     if deathMarker and Registry and Registry.RemoveRecord then
         record.runtime.deathRetired = true
@@ -117,19 +124,35 @@ local function retireDeadRecord(record)
             PNC.Network.BroadcastRemoval(record.id, "death")
         end
         Registry.RemoveRecord(record.id)
+        retired = true
+    elseif colonyOwned == false and Registry then
+        -- Unowned world NPCs still need a removal event so clients do not
+        -- retain their last roster snapshot, but they do not receive a
+        -- persistent map marker or a corpse-audit record.
+        record.runtime.deathRetired = true
+        if PNC.Network and PNC.Network.BroadcastRemoval then
+            PNC.Network.BroadcastRemoval(record.id, "death_untracked")
+        end
+        if Registry.RemoveRecord then
+            Registry.RemoveRecord(record.id)
+            retired = true
+        elseif Registry.MarkDirty then
+            Registry.MarkDirty(record, "health")
+        end
     elseif Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "health")
     end
-    return deathMarker
+    return deathMarker, retired
 end
 
 function Health.Kill(record, zombie, reason)
     local health = Health.Ensure(record)
     local deathMarker
+    local retired
     releaseOwnedWork(record)
     markDeadState(record, health, reason)
     notifyDeathSystems(record)
     createCorpse(record, zombie, reason)
-    deathMarker = retireDeadRecord(record)
-    return deathMarker ~= nil, deathMarker
+    deathMarker, retired = retireDeadRecord(record)
+    return retired == true or deathMarker ~= nil, deathMarker
 end

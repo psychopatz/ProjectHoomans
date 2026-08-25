@@ -20,7 +20,11 @@ Config.Population = {
     HARD_MAX_SETTLEMENT_CREATIONS_PER_PUMP = 1,
     HARD_MAX_NPC_RECORDS_PER_PUMP = 8,
     HARD_MAX_GROUP_CREATIONS_PER_HOUR = 2,
-    HARD_MAX_SETTLEMENT_CREATIONS_PER_DAY = 1,
+    -- A one-per-day global cap left the 3x3 player footprint visibly
+    -- underfilled and repeatedly retried the same queued sector. Keep the
+    -- per-pump cap at one, but allow the footprint to fill in three distinct
+    -- sectors per world day.
+    HARD_MAX_SETTLEMENT_CREATIONS_PER_DAY = 3,
     COMMITTED_GENERATION_HISTORY_LIMIT = 128,
     GENERATION_HISTORY_LIMIT = 96,
     DIRECTOR_LOG_HISTORY_LIMIT = 160,

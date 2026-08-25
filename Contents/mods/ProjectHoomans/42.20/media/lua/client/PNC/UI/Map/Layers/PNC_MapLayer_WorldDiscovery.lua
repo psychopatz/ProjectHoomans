@@ -20,10 +20,17 @@ local COLORS = {
 
 local function visible()
     local snapshot = State.worldDiscovery
-    return snapshot and #(snapshot.entities or {}) > 0
-        and (not PNC.MapDisplay
-            or not PNC.MapDisplay.AreBasesVisible
-            or PNC.MapDisplay.AreBasesVisible())
+    if not snapshot then return false end
+    if PNC.MapDisplay
+        and PNC.MapDisplay.AreBasesVisible
+        and PNC.MapDisplay.AreBasesVisible()
+    then
+        return false
+    end
+    for _, entity in ipairs(snapshot.entities or {}) do
+        if entity.kind ~= Types.KIND_MOBILE_GROUP then return true end
+    end
+    return false
 end
 
 local function populationNPCVisible(snapshot)
@@ -140,7 +147,9 @@ function Layer.FindAt(map, mouseX, mouseY, padding)
     for _, entity in ipairs(State.worldDiscovery
         and State.worldDiscovery.entities or {})
     do
-        if entity.x and entity.y then
+        if entity.kind ~= Types.KIND_MOBILE_GROUP
+            and entity.x and entity.y
+        then
             local x = map.mapAPI:worldToUIX(entity.x, entity.y)
             local y = map.mapAPI:worldToUIY(entity.x, entity.y)
             local dx, dy = mouseX - x, mouseY - y
@@ -167,7 +176,9 @@ function Layer.Render(map)
     local hovered
     local hoveredColor
     for _, entity in ipairs(State.worldDiscovery.entities or {}) do
-        if entity.x and entity.y then
+        if entity.kind ~= Types.KIND_MOBILE_GROUP
+            and entity.x and entity.y
+        then
             local x = map.mapAPI:worldToUIX(entity.x, entity.y)
             local y = map.mapAPI:worldToUIY(entity.x, entity.y)
             local dx, dy = mouseX - x, mouseY - y

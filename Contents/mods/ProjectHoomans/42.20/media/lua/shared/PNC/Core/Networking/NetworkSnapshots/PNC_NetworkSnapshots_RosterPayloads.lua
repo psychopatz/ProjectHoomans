@@ -94,7 +94,10 @@ function Network.BuildDeathMarkerSnapshot(marker)
         presenceState = Const.PRESENCE_CORPSE,
         alive = false,
         deathMarker = true,
-        colonist = marker.colonist == true,
+        colonyOwned = marker.colonyOwned == true
+            or marker.colonist == true,
+        colonist = marker.colonist == true
+            or marker.colonyOwned == true,
         infected = marker.infected == true,
         portrait = marker.portrait and Core.DeepCopy(marker.portrait) or nil,
         corpseToken = marker.corpseToken,

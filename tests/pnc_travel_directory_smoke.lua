@@ -184,12 +184,9 @@ PNC.Network.ClientState.snapshots["dead:neutral"] = {
     y = 55,
     z = 0,
 }
-local deadNeutral =
-    T.truthy(PNC.TravelDirectory.GetProjected("dead:neutral"))
-T.truthy(deadNeutral.deathMarker == true
-    and deadNeutral.colonist == false
-    and deadNeutral.x == 45,
-    "compact dead NPC marker was hidden or misclassified")
+local deadNeutral = PNC.TravelDirectory.GetProjected("dead:neutral")
+T.equal(deadNeutral, nil,
+    "unowned compact death marker leaked onto the map")
 
 PNC.Network.ClientState.snapshots["dead:colonist"] = {
     id = "dead:colonist",

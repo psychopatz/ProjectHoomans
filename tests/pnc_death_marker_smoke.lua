@@ -120,6 +120,19 @@ T.equal(marker.health, nil, "death marker retained health")
 T.equal(PNC.Registry.GetDeathMarkerRuntime(record.id).reanimateAt, 4000,
     "three-second wall-clock reanimation")
 
+local communityRecord = {
+    id = "community_dead_npc",
+    name = "Community Resident",
+    faction = "neutral",
+    affiliation = { communityID = "community_1" },
+    x = 12,
+    y = 13,
+    z = 0,
+}
+local communityMarker = PNC.Registry.AddDeathMarker(communityRecord)
+T.truthy(communityMarker and communityMarker.colonyOwned == true,
+    "community-owned NPC was not eligible for a death marker")
+
 PNC.BodyLifecycle.CreateInertCorpse = function(killedRecord)
     killedRecord.corpse = killedRecord.corpse or {
         token = "health_kill_token",
@@ -155,13 +168,13 @@ T.equal(releasedWorker.id, normalRecord.id,
     "death did not release the active worker")
 T.equal(releasedWorker.reason, "worker_died",
     "death worker release reason")
-T.truthy(normalMarker, "ordinary death marker missing")
-T.equal(normalMarker.infected, false, "ordinary death marked infected")
-T.equal(normalMarker.colonist, false, "ordinary death marked colonist")
+T.equal(normalMarker, nil, "ordinary death created a persistent marker")
 T.equal(removedRecords[normalRecord.id], true, "full NPC record was retained")
 T.equal(PNC.Registry.Data[normalRecord.id], nil, "retired NPC still registered")
 T.equal(removalBroadcasts[#removalBroadcasts].id, normalRecord.id,
     "retired NPC removal was not broadcast")
+T.equal(removalBroadcasts[#removalBroadcasts].reason, "death_untracked",
+    "unowned death used the persistent death-marker event")
 T.equal(deathRetirementOrder[#deathRetirementOrder - 1], "broadcast",
     "death snapshot was broadcast after registry retirement")
 T.equal(deathRetirementOrder[#deathRetirementOrder], "remove",
@@ -236,14 +249,23 @@ T.equal(zombieFlags.invincible, false,
 T.equal(zombieModData.PNC_DeathMarkerID, nil,
     "reanimated zombie retained death-marker ownership")
 
+local authorityMarker = PNC.Registry.AddDeathMarker({
+    id = "authority_marker",
+    name = "Authority Marker",
+    recruited = true,
+    x = 7,
+    y = 8,
+    z = 0,
+})
+T.truthy(authorityMarker, "authority guard fixture marker was not created")
 authority = false
 T.equal(PNC.Registry.AddDeathMarker({
     id = "client_marker",
     name = "Client Marker",
 }), nil, "client created an authoritative death marker")
-T.equal(PNC.Registry.RemoveDeathMarker(normalMarker.id), false,
+T.equal(PNC.Registry.RemoveDeathMarker(authorityMarker.id), false,
     "client removed an authoritative death marker")
-T.truthy(PNC.Registry.GetDeathMarker(normalMarker.id),
+T.truthy(PNC.Registry.GetDeathMarker(authorityMarker.id),
     "client authority guard lost an existing death marker")
 authority = true
 
@@ -253,6 +275,7 @@ local missingRecord = {
     x = 30,
     y = 40,
     z = 0,
+    recruited = true,
     corpse = {
         token = "missing_token",
         x = 30,
@@ -288,6 +311,7 @@ local collectedRecord = {
     x = 50,
     y = 60,
     z = 0,
+    recruited = true,
     corpse = {
         token = "collected_token",
         x = 50,
@@ -308,6 +332,29 @@ T.equal(removalBroadcasts[#removalBroadcasts].id, collectedMarker.id,
     "garbage-collected corpse broadcast the wrong marker removal")
 T.equal(removalBroadcasts[#removalBroadcasts].reason, "corpse_collected",
     "garbage-collected corpse removal reason")
+
+directory.deathMarkers = {
+    retained_colony = {
+        id = "retained_colony",
+        name = "Retained Colony NPC",
+        colonist = true,
+        x = 1, y = 2, z = 0,
+    },
+    legacy_world_npc = {
+        id = "legacy_world_npc",
+        name = "Legacy World NPC",
+        colonist = false,
+        x = 3, y = 4, z = 0,
+    },
+}
+PNC.Registry.DirectoryDirty = false
+local loadedMarkers = PNC.Registry.LoadDeathMarkers(directory)
+T.truthy(loadedMarkers.retained_colony ~= nil,
+    "colony death marker was discarded during load cleanup")
+T.equal(loadedMarkers.legacy_world_npc, nil,
+    "legacy unowned death marker survived load cleanup")
+T.equal(PNC.Registry.DirectoryDirty, true,
+    "death-marker cleanup was not scheduled for persistence")
 T.finish("pnc_death_marker_smoke")
 
 T.finish("pnc_death_marker_smoke")

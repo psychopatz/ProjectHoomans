@@ -17,9 +17,48 @@ local function normalizeString(value)
     return tostring(value)
 end
 
+local function hasValue(value)
+    return value ~= nil and tostring(value) ~= ""
+end
+
+-- Death markers are a player-facing colony record, not a general NPC
+-- cemetery.  Community membership is the authoritative colony relationship;
+-- the recruited/owner and legacy faction fields preserve compatibility with
+-- companions created before affiliations were introduced.
+function Registry.IsColonyOwnedNPC(record)
+    local affiliation
+    local faction
+    if type(record) ~= "table" then return false end
+    if record.colonyOwned == true
+        or record.colonist == true
+        or record.recruited == true
+        or hasValue(record.ownerUsername)
+        or record.ownerOnlineID ~= nil
+    then
+        return true
+    end
+    affiliation = type(record.affiliation) == "table"
+        and record.affiliation or nil
+    if affiliation and (
+        hasValue(affiliation.communityID)
+        or hasValue(affiliation.communityId)
+    ) then
+        return true
+    end
+    faction = string.lower(tostring(record.faction or ""))
+    return faction == "colonist"
+        or faction == "companion"
+        or faction == "friendly"
+end
+
 local function normalizeMarker(source, fallbackID)
     local marker
+    local colonyOwned
     if type(source) ~= "table" then return nil end
+    colonyOwned = source.colonyOwned == true
+        or source.colonist == true
+        or source.recruited == true
+        or tostring(source.faction or "") == "colonist"
     marker = {
         id = normalizeString(source.id or fallbackID),
         name = normalizeString(source.name or source.displayName) or "Unknown NPC",
@@ -29,9 +68,8 @@ local function normalizeMarker(source, fallbackID)
         corpseToken = normalizeString(source.corpseToken or source.token),
         createdWorldHour = tonumber(source.createdWorldHour) or 0,
         infected = source.infected == true,
-        colonist = source.colonist == true
-            or source.recruited == true
-            or tostring(source.faction or "") == "colonist",
+        colonyOwned = colonyOwned,
+        colonist = colonyOwned,
         portrait = PNC.Identity
             and PNC.Identity.NormalizePortraitSummary
             and PNC.Identity.NormalizePortraitSummary(source.portrait)
@@ -75,16 +113,27 @@ function Registry.LoadDeathMarkers(directory)
     local loaded = {}
     local id
     local marker
+    local discarded = 0
     Registry.DeathMarkerRuntime = {}
     for id, marker in pairs(source) do
         marker = normalizeMarker(marker, id)
         if marker then
-            loaded[marker.id] = marker
-            runtimeFor(marker, false)
+            if marker.colonyOwned == true then
+                loaded[marker.id] = marker
+                runtimeFor(marker, false)
+            else
+                discarded = discarded + 1
+            end
         end
     end
     directory.deathMarkers = loaded
     Registry.DeathMarkers = loaded
+    if discarded > 0 then
+        -- Persist the compacted directory on the next normal save.  Do not
+        -- broadcast startup cleanup: no client should retain a stale marker
+        -- after a fresh roster sync.
+        Registry.DirectoryDirty = true
+    end
     return loaded
 end
 
@@ -98,6 +147,7 @@ function Registry.AddDeathMarker(record)
     if not record or not record.id or not Registry.GetStorageDirectory then
         return nil
     end
+    if not Registry.IsColonyOwnedNPC(record) then return nil end
     directory = Registry.GetStorageDirectory()
     marker = normalizeMarker({
         id = record.id,
@@ -108,8 +158,8 @@ function Registry.AddDeathMarker(record)
         corpseToken = corpse and corpse.token,
         createdWorldHour = corpse and corpse.createdWorldHour,
         infected = infection and infection.fatal == true or false,
-        colonist = record.recruited == true
-            or tostring(record.faction or "") == "colonist",
+        colonyOwned = true,
+        colonist = true,
         portrait = PNC.Identity
             and PNC.Identity.BuildPortraitSummary
             and PNC.Identity.BuildPortraitSummary(record)
