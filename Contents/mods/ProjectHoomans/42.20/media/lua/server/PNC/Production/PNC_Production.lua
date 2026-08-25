@@ -8,6 +8,9 @@ require "PNC/Production/PNC_ProductionContext"
 require "PNC/Production/PNC_WorkInputService"
 require "PNC/Production/PNC_HomeDutyService"
 require "PNC/Production/PNC_WorkService"
+if PNC.ProvisionScheduler and PNC.ProvisionScheduler.BindWorkService then
+    PNC.ProvisionScheduler.BindWorkService(PNC.WorkService)
+end
 require "PNC/Production/PNC_ResearchService"
 require "PNC/Production/PNC_CraftingService"
 require "PNC/Production/PNC_RecipeBookService"

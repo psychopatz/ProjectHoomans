@@ -152,6 +152,25 @@ function Service.Process(rawRequest, options)
             source = "storage", storageId = storage.id,
         })
     end
+    local live = PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record.id) or nil
+    if request.purpose == "PROVISION" and live
+        and PNC.ProvisionScheduler
+        and PNC.ProvisionScheduler.QueueLivePickup
+    then
+        local queued, queueReason, queueDetails =
+            PNC.ProvisionScheduler.QueueLivePickup(
+                record, storage, request, selected, state)
+        if queueReason == "provision_pickup_queued" then
+            return queued, queueReason, queueDetails
+        end
+        -- The production work service is loaded after Supply in the server
+        -- composition root. During that bootstrap window, retain the
+        -- existing immediate path rather than dropping a valid provision.
+        if queued ~= nil or queueReason ~= "work_service_unavailable" then
+            return false, queueReason or "provision_pickup_failed", queueDetails
+        end
+    end
     local acquired, acquireReason, acquireDetails = acquireInstant(
         record, storage, request, selected, state
     )

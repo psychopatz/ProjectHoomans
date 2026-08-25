@@ -16,6 +16,26 @@ function H.Process(entry)
     if not definition then
         return true, nil, { ok = false, reason = "unknown_rule" }
     end
+    local existingRuntime = record.runtime
+        and record.runtime.provision or nil
+    local pending = existingRuntime and existingRuntime.pending
+        and existingRuntime.pending[entry.ruleID] or nil
+    if pending then
+        local work = PNC.WorkService
+        local order = work and work.Queries and work.Queries.Get
+            and work.Queries.Get(pending.workOrderId) or nil
+        local status = order and order.status or nil
+        if order and status ~= "COMPLETED" and status ~= "CANCELLED"
+            and status ~= "FAILED"
+        then
+            return false, H.WorldHour() + 0.25, {
+                ruleId = definition.id, ok = false, attempted = true,
+                reason = "provision_pickup_in_progress",
+            }
+        end
+        existingRuntime.pending[entry.ruleID] = nil
+        existingRuntime.incoming[entry.ruleID] = nil
+    end
     local runtime = record.runtime and record.runtime.provision
     if runtime then runtime.dirtyRules[entry.ruleID] = nil end
     Metrics.Increment("provisionEvaluations")
@@ -50,11 +70,23 @@ function H.Process(entry)
     runtime.incoming[entry.ruleID] = evaluation.deficit
     runtime.lastRequest = PNC.Core.DeepCopy(request)
     Metrics.Increment("provisionRequestsCreated")
-    local ok, reason = PNC.NPCSupplyService.Process(request, {
+    local ok, reason, details = PNC.NPCSupplyService.Process(request, {
         acquireOnly = true,
         ignorePersonal = true,
         force = true,
     })
+    if reason == "provision_pickup_queued" then
+        runtime.pending = runtime.pending or {}
+        runtime.pending[entry.ruleID] = {
+            workOrderId = details and details.workOrderId or nil,
+        }
+        runtime.lastRequestResult = reason
+        return false, H.WorldHour() + 0.25, {
+            ruleId = definition.id, ok = false, attempted = true,
+            reason = reason, onHand = evaluation.onHand,
+            workOrderId = details and details.workOrderId or nil,
+        }
+    end
     runtime.incoming[entry.ruleID] = nil
     runtime.lastRequestResult = reason
     if ok then
@@ -110,4 +142,33 @@ function Scheduler.ReconcileRecord(recordOrID)
     end
     H.SyncQueueMetric()
     return processed, results
+end
+
+function Scheduler.RequestManual(recordOrID)
+    local record = type(recordOrID) == "table" and recordOrID
+        or PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(tostring(recordOrID or "")) or nil
+    if not record or record.alive == false then
+        return false, "npc_missing", {}
+    end
+    for _, kind in ipairs({ "FOOD", "HYDRATION", "MEDICAL" }) do
+        if PNC.NPCSupplyService and PNC.NPCSupplyService.ClearRetry then
+            PNC.NPCSupplyService.ClearRetry(record, kind)
+        end
+    end
+    local _, results = Scheduler.ReconcileRecord(record)
+    local failed = false
+    local attempted = false
+    for _, result in ipairs(results or {}) do
+        local reason = tostring(result.reason or "")
+        local deferred = reason == "provision_pickup_queued"
+            or reason == "provision_pickup_in_progress"
+            or reason == "incoming"
+        attempted = result.attempted == true or attempted
+        if result.ok ~= true and not deferred then failed = true end
+    end
+    local reason = failed and "provision_grab_failed"
+        or attempted and "provision_grabbed"
+        or "provision_already_satisfied"
+    return not failed, reason, results
 end

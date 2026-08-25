@@ -32,6 +32,12 @@ local DEFINITIONS = {
         key = "UI_PNC_CommandSleep",
         fallback = "SLEEP",
     },
+    {
+        id = "manual_provision",
+        capabilities = { "provision" },
+        key = "UI_PNC_CommandProvision",
+        fallback = "GRAB PROVISION",
+    },
 }
 
 local function definitionFor(id)
@@ -70,6 +76,18 @@ local function currentActivity(person)
     if not info then
         return Shared.Text(person and person.activity, "IDLE")
     end
+    if info.kind == "work_order" then
+        local operation = tostring(info.operation or "")
+        local label
+        if operation == "PROVISION_PICKUP" then
+            label = Shared.Tr("UI_PNC_Activity_Provision", "GRABBING PROVISION")
+        else
+            label = tostring(info.buildDisplayName or info.recipeId
+                or operation or "WORKING")
+        end
+        local phase = tostring(info.phase or "")
+        return phase ~= "" and label .. " (" .. phase .. ")" or label
+    end
     local label = info.labelKey
         and Shared.Tr(info.labelKey, info.fallback)
         or Shared.Text(info.fallback or info.activityId, "IDLE")
@@ -86,6 +104,9 @@ end
 
 local function active(definition, person)
     local info = activityInfo(person)
+    if definition and definition.id == "manual_provision" then
+        return tostring(info and info.operation or "") == "PROVISION_PICKUP"
+    end
     return matches(definition, info and info.capability)
 end
 
@@ -138,14 +159,20 @@ function Activities.Apply(window, activeTab, Layout)
     local rect = window.layout.details
     local gap = Layout.Pixels(6, window.uiScale)
     local height = Layout.Pixels(28, window.uiScale)
-    local width = math.floor((rect.width - gap * 2) / 3)
+    local count = #window.activityControlList
+    local columns = math.min(4, math.max(1, count))
+    local rows = math.ceil(count / columns)
+    local width = math.floor((rect.width - gap * (columns - 1)) / columns)
     for index, button in ipairs(window.activityControlList or {}) do
-        local x = rect.x + (index - 1) * (width + gap)
-        local lastWidth = index == 3
+        local row = math.floor((index - 1) / columns)
+        local column = (index - 1) % columns
+        local x = rect.x + column * (width + gap)
+        local y = rect.y + row * (height + gap)
+        local lastWidth = column == columns - 1
             and rect.width - (x - rect.x) or width
-        Layout.SetBounds(button, x, rect.y, lastWidth, height)
+        Layout.SetBounds(button, x, y, lastWidth, height)
     end
-    local paneY = rect.y + height + gap
+    local paneY = rect.y + rows * height + (rows - 1) * gap + gap
     window:layoutPane(window.detailsPane, rect.x, paneY,
         rect.width, math.max(60, rect.height - (paneY - rect.y)))
 end

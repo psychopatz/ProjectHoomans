@@ -11,6 +11,7 @@ local marked = {}
 local liveBodies = {}
 local sentHome = {}
 local releasedWorkers = {}
+local manualProvisionRequests = 0
 
 local function companion(id, owner, x)
     return {
@@ -113,6 +114,13 @@ PNC = {
             end,
         },
     },
+    ProvisionScheduler = {
+        RequestManual = function(record)
+            manualProvisionRequests = manualProvisionRequests + 1
+            record.manualProvisionRequested = true
+            return true, "provision_grabbed"
+        end,
+    },
 }
 
 T.load(SHARED_ROOT .. "PNC_CompanionCommandRegistry.lua")
@@ -124,6 +132,8 @@ T.truthy(PNC.CompanionCommands.Get("manual_drink"),
     "manual drink command is registered")
 T.truthy(PNC.CompanionCommands.Get("manual_sleep"),
     "manual sleep command is registered")
+T.truthy(PNC.CompanionCommands.Get("manual_provision"),
+    "manual provision command is registered")
 T.equal(PNC.CompanionCommands.Get("manual_sleep").contextOnly, true,
     "manual sleep stays out of the radial command list")
 T.load(SHARED_ROOT .. "PNC_CompanionCommandFlavorDefinitions.lua")
@@ -214,11 +224,22 @@ records.owned.affiliation = { factionID = "faction_alice" }
 T.equal(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
     true, "single-player faction ownership uses canonical account key")
 
-T.equal(#PNC.CompanionCommands.List(), 12, "registered command count")
+T.equal(#PNC.CompanionCommands.List(), 13, "registered command count")
 T.equal(PNC.CompanionCommands.Get("scavenge_nearby").clientOnly, true,
     "scavenge command opens its client setup UI")
 T.equal(#PNC.CompanionCommands.ListGroups(), 3,
     "registered command group count")
+
+local provisionAffected, provisionReason = PNC.CompanionCommands.Execute(player, {
+    id = "owned",
+    commandID = "manual_provision",
+})
+T.equal(provisionAffected, 1, "manual provision command target count")
+T.equal(provisionReason, "commanded", "manual provision command result")
+T.equal(manualProvisionRequests, 1,
+    "manual provision uses the provision scheduler")
+T.equal(records.owned.manualProvisionRequested, true,
+    "manual provision targets the selected companion")
 T.equal(
     PNC.CompanionCommands.GetAttackTypeDefinition("auto").icon,
     "media/ui/emotes/yes.png",

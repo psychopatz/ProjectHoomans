@@ -54,6 +54,13 @@ local function manualActivity(record, capability)
     return PNC.FacilityJobs.ToggleManual(record, capability) == true
 end
 
+local function manualProvision(record)
+    local scheduler = PNC.ProvisionScheduler
+    if not scheduler or not scheduler.RequestManual then return false end
+    local ok = scheduler.RequestManual(record)
+    return ok == true
+end
+
 Commands.Register({
     id = "follow",
     group = "movement",
@@ -178,6 +185,17 @@ Commands.Register({
     apply = function(record)
         return manualActivity(record, "sleep")
     end,
+})
+
+Commands.Register({
+    id = "manual_provision",
+    group = "manual_activity",
+    contextOnly = true,
+    manualTabOnly = true,
+    labelKey = "UI_PNC_CommandProvision",
+    label = "Grab Provision",
+    icon = "media/ui/Emotes/PNC_EmoteMenu.png",
+    apply = manualProvision,
 })
 
 Commands.Register({

@@ -101,6 +101,15 @@ T.equal(commands[1].npcID, person.id,
 T.equal(requestedSnapshot, "manual_activity_manual_eat",
     "activities tab refreshes the colony snapshot after dispatch")
 
+T.truthy(Activities.OnControl(window, { internal = "manual_provision" }),
+    "activities tab sends the manual provision command")
+T.equal(commands[2].commandID, "manual_provision",
+    "activities tab uses the provision command id")
+T.equal(commands[2].npcID, person.id,
+    "provision command targets the selected colonist")
+T.equal(requestedSnapshot, "manual_activity_manual_provision",
+    "provision command refreshes the colony snapshot")
+
 person.actionInformation.capability = "sleep"
 person.manualActivityDisabled = nil
 Activities.OnPersonSelected(window)

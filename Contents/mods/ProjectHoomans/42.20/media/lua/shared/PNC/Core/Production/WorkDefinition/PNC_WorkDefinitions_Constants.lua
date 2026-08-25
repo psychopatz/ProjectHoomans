@@ -8,6 +8,7 @@ Definitions.OPERATION = {
     CONSTRUCT = "CONSTRUCT", RECONSTRUCT = "RECONSTRUCT",
     DECONSTRUCT = "DECONSTRUCT",
     BUILD_OBJECT = "BUILD_OBJECT", READ_BOOK = "READ_BOOK",
+    PROVISION_PICKUP = "PROVISION_PICKUP",
 }
 
 Definitions.STATUS = {
@@ -41,6 +42,7 @@ Definitions.JOB_BY_OPERATION = {
     RECONSTRUCT = "Constructor",
     DECONSTRUCT = "Constructor",
     BUILD_OBJECT = "Constructor",
+    PROVISION_PICKUP = "Provisioner",
 }
 
 Definitions.CAPABILITY_BY_OPERATION = {
@@ -50,6 +52,7 @@ Definitions.CAPABILITY_BY_OPERATION = {
     -- same physical crafting station capability.
     DISASSEMBLE = "work.craft",
     READ_BOOK = "work.research",
+    PROVISION_PICKUP = "work.provision",
 }
 
 return Definitions

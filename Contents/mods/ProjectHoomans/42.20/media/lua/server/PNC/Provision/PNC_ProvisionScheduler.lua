@@ -22,5 +22,6 @@ require "PNC/Provision/ProvisionScheduler/PNC_ProvisionScheduler_Queue"
 require "PNC/Provision/ProvisionScheduler/PNC_ProvisionScheduler_Audit"
 require "PNC/Provision/ProvisionScheduler/PNC_ProvisionScheduler_Processing"
 require "PNC/Provision/ProvisionScheduler/PNC_ProvisionScheduler_Pump"
+require "PNC/Provision/ProvisionScheduler/PNC_ProvisionScheduler_WorkBridge"
 
 return Scheduler

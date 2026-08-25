@@ -18,6 +18,7 @@ local ACTIVITY_REASON = {
     craft_inputs = "crafting",
     disassembly_specimen = "disassembly",
     research_resource = "research",
+    provision = "provision",
 }
 
 function H.ActivityItems(records)
@@ -58,4 +59,3 @@ function H.ReleaseTokens(reservation)
         end
     end
 end
-

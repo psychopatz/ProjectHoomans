@@ -41,23 +41,12 @@ local function debugNeedAction(player, args)
         return PNC.IndividualNeeds.Reset(record) == true, "reset"
     end
     if operation == "force_provision" then
-        for _, kind in ipairs({ "FOOD", "HYDRATION", "MEDICAL" }) do
-            PNC.NPCSupplyService.ClearRetry(record, kind)
-        end
-        local _, results = PNC.ProvisionScheduler.ReconcileRecord(record)
+        local ok, reason, results = PNC.ProvisionScheduler.RequestManual(record)
         local diagnostics = PNC.ProvisionEvaluator.Inspect(record) or {
             npcID = record.id,
         }
         diagnostics.forceResults = results
-        local failed = false
-        local attempted = false
-        for _, result in ipairs(results or {}) do
-            attempted = result.attempted == true or attempted
-            if result.ok ~= true then failed = true end
-        end
-        local reason = failed and "provision_grab_failed"
-            or attempted and "provision_grabbed" or "provision_already_satisfied"
-        return not failed, reason, diagnostics
+        return ok, reason, diagnostics
     end
     if operation == "inspect_provision" then
         local diagnostics, reason = PNC.ProvisionEvaluator.Inspect(record)
