@@ -8,6 +8,11 @@ Overlay.enabled = Overlay.enabled == true
 Overlay.layers = Overlay.layers or {}
 Overlay.markers = Overlay.markers or {}
 
+local function settlementKey(settlement)
+    return tostring(settlement and settlement.id or "") .. ":"
+        .. tostring(settlement and settlement.revision or "")
+end
+
 local COLORS = {
     -- Territory is context only. Keep it visible without washing out rooms,
     -- construction state, or point components above it.
@@ -290,12 +295,14 @@ end
 function Overlay.SetSettlement(settlement)
     Overlay.settlementId = settlement and settlement.id or nil
     Overlay.revision = settlement and settlement.revision or nil
+    Overlay.snapshotKey = settlementKey(settlement)
     Overlay.layers = Overlay.BuildLayers(settlement, true)
     Overlay.markers = Overlay.BuildMarkers(settlement)
 end
 
 function Overlay.SetEnabled(enabled)
     Overlay.enabled = enabled == true
+    Overlay.restoreEnabled = Overlay.enabled
     return Overlay.enabled
 end
 
@@ -306,6 +313,33 @@ end
 
 function Overlay.IsEnabled()
     return Overlay.enabled == true
+end
+
+function Overlay.SyncFromClientState()
+    local state = PNC.Network and PNC.Network.ClientState or nil
+    local snapshot = state and state.colonyManagement or nil
+    local settlement = snapshot and snapshot.settlement or nil
+    if not settlement then return false end
+
+    local snapshotRevision = tonumber(state.colonyManagementRevision) or 0
+    if Overlay.awaitingPostReset == true
+        and snapshotRevision <= (tonumber(Overlay.resetRevision) or 0)
+    then
+        return false
+    end
+
+    if Overlay.snapshotKey ~= settlementKey(settlement)
+        or Overlay.settlementId == nil
+    then
+        Overlay.SetSettlement(settlement)
+    end
+    if Overlay.awaitingPostReset == true then
+        Overlay.awaitingPostReset = false
+        if Overlay.restoreEnabled == true then
+            Overlay.SetEnabled(true)
+        end
+    end
+    return true
 end
 
 local function iconDrawer(playerNum)
@@ -420,16 +454,23 @@ function Overlay.Render()
 end
 
 function Overlay.Reset()
+    local state = PNC.Network and PNC.Network.ClientState or nil
+    local restoreEnabled = Overlay.enabled == true
     Overlay.enabled = false
     Overlay.layers = {}
     Overlay.markers = {}
     Overlay.hoveredMarker = nil
     Overlay.settlementId = nil
     Overlay.revision = nil
+    Overlay.snapshotKey = nil
+    Overlay.restoreEnabled = restoreEnabled
+    Overlay.resetRevision = tonumber(state and state.colonyManagementRevision) or 0
+    Overlay.awaitingPostReset = true
 end
 
 if Overlay.eventsInstalled ~= true then
     if Events and Events.OnPreUIDraw then Events.OnPreUIDraw.Add(Overlay.Render) end
+    if Events and Events.OnTick then Events.OnTick.Add(Overlay.SyncFromClientState) end
     if Events and Events.OnMainMenuEnter then Events.OnMainMenuEnter.Add(Overlay.Reset) end
     Overlay.eventsInstalled = true
 end

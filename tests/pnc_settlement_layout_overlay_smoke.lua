@@ -2,6 +2,14 @@ local T = require "tests/support/test"
 
 T.addPackagePaths()
 
+local tickCallback
+local resetCallback
+Events = {
+    OnPreUIDraw = { Add = function() end },
+    OnTick = { Add = function(callback) tickCallback = callback end },
+    OnMainMenuEnter = { Add = function(callback) resetCallback = callback end },
+}
+
 local Overlay = require "PNC/UI/Communities/ColonyManagement/PNC_SettlementLayoutOverlay"
 local region = { levels = { [0] = { rows = { [4] = { 2, 5 } } } } }
 local layers = Overlay.BuildLayers({
@@ -168,6 +176,29 @@ T.equal(groundMarkers[1].texturePath, nil,
     "workstation marker has no image")
 T.equal(groundMarkers[2].texturePath, nil,
     "work-zone marker has no image and remains a ground spot")
+
+local resetSettlement = { id = "base_reset", revision = 4,
+    geometry = { region = region }, facilities = {}, stockpileNodes = {
+        { id = "stock_reset", x = 4, y = 4, z = 0 },
+    } }
+PNC.Network = { ClientState = {
+    colonyManagement = { settlement = resetSettlement },
+    colonyManagementRevision = 10,
+} }
+Overlay.SetSettlement(resetSettlement)
+Overlay.SetEnabled(true)
+T.truthy(resetCallback, "overlay installs a reset callback")
+T.truthy(tickCallback, "overlay installs a snapshot sync tick")
+resetCallback()
+T.falsy(Overlay.IsEnabled(), "reset temporarily hides the old overlay")
+tickCallback()
+T.falsy(Overlay.IsEnabled(), "stale snapshot does not restore the overlay")
+PNC.Network.ClientState.colonyManagementRevision = 11
+tickCallback()
+T.truthy(Overlay.IsEnabled(), "fresh snapshot restores the previous overlay state")
+T.equal(Overlay.settlementId, "base_reset",
+    "fresh snapshot rebuilds the settlement overlay")
+
 T.finish("pnc_settlement_layout_overlay_smoke")
 
 T.finish("pnc_settlement_layout_overlay_smoke")

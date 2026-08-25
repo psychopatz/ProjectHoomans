@@ -39,39 +39,34 @@ Definitions.Register({
     visual = {
         mode = "nonrotatable",
         tiers = {
-            [1] = { sprite = "trash_01_22" },
-            [2] = { sprite = "trash_01_47" },
-            [3] = { sprite = "trash_01_44" },
-            [4] = { sprite = "trash_01_40" },
-            [5] = { sprite = "trash_01_41" },
             -- Captured from the primary [Debug] Grab Object Name entries.
-            -- These furniture sprites are thumpables so their world object
-            -- type matches the objects selected in-game.
-            [6] = { sprite = "furniture_storage_01_53",
+            -- These furniture sprites use the persistent thumpable world
+            -- object path so their visuals survive chunk saves and relogs.
+            [1] = { sprite = "furniture_storage_01_53",
                 objectType = "thumpable" }, -- Table
-            [7] = { sprite = "furniture_storage_02_29",
+            [2] = { sprite = "furniture_storage_02_29",
                 objectType = "thumpable" }, -- Chest
-            [8] = { sprite = "furniture_storage_01_49",
+            [3] = { sprite = "furniture_storage_01_49",
                 objectType = "thumpable" }, -- Drawers
-            [9] = { sprite = "furniture_storage_01_46",
+            [4] = { sprite = "furniture_storage_01_46",
                 objectType = "thumpable" }, -- Drawers
-            [10] = { sprite = "furniture_storage_01_32",
+            [5] = { sprite = "furniture_storage_01_32",
                 objectType = "thumpable" }, -- Drawers
-            [11] = { sprite = "furniture_storage_01_12",
+            [6] = { sprite = "furniture_storage_01_12",
                 objectType = "thumpable" }, -- Drawers
-            [12] = { sprite = "furniture_storage_01_8",
+            [7] = { sprite = "furniture_storage_01_8",
                 objectType = "thumpable" }, -- Drawers
-            [13] = { sprite = "furniture_storage_01_42",
+            [8] = { sprite = "furniture_storage_01_42",
                 objectType = "thumpable" }, -- Drawers
-            [14] = { sprite = "furniture_storage_02_16",
+            [9] = { sprite = "furniture_storage_02_16",
                 objectType = "thumpable" }, -- Cartbox
-            [15] = { sprite = "furniture_storage_02_9",
+            [10] = { sprite = "furniture_storage_02_9",
                 objectType = "thumpable" }, -- Locker
-            [16] = { sprite = "furniture_storage_02_1",
+            [11] = { sprite = "furniture_storage_02_1",
                 objectType = "thumpable" }, -- Locker
-            [17] = { sprite = "furniture_storage_02_4",
+            [12] = { sprite = "furniture_storage_02_4",
                 objectType = "thumpable" }, -- Locker
-            [18] = { sprite = "furniture_storage_02_12",
+            [13] = { sprite = "furniture_storage_02_12",
                 objectType = "thumpable" }, -- Locker
         },
     },

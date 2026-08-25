@@ -22,6 +22,28 @@ function World.SquareAt(point)
     return squareOk and square or nil
 end
 
+function World.SquareKey(square)
+    if not square then return nil end
+    -- LoadGridsquare is raised for every square entering the active cell.
+    -- These are guaranteed IsoGridSquare methods, so avoid three protected
+    -- calls on that hot event path.
+    local x = type(square.getX) == "function" and square:getX() or nil
+    local y = type(square.getY) == "function" and square:getY() or nil
+    local z = type(square.getZ) == "function" and square:getZ() or nil
+    if x == nil or y == nil or z == nil then return nil end
+    return tostring(x) .. ":" .. tostring(y) .. ":" .. tostring(z)
+end
+
+function World.SquareMatchesPoint(square, point)
+    if not square or not point then return false end
+    return tonumber(type(square.getX) == "function"
+            and square:getX() or nil) == tonumber(point.x)
+        and tonumber(type(square.getY) == "function"
+            and square:getY() or nil) == tonumber(point.y)
+        and tonumber(type(square.getZ) == "function"
+            and square:getZ() or nil) == tonumber(point.z)
+end
+
 local function listObjects(square)
     local objects = call(square, "getObjects")
     if not objects or type(objects.size) ~= "function"
@@ -55,6 +77,28 @@ local function isOwnedMarker(marker)
         or tostring(marker.owner) == VISUAL_OWNER)
 end
 
+function World.EnforceVisualOnly(object, spec)
+    if not object then return false end
+    call(object, "removeAllContainers")
+    call(object, "setOutlineOnMouseover", false)
+    if spec and spec.objectType == "thumpable" then
+        call(object, "setIsContainer", false)
+        call(object, "setIsThumpable", false)
+        call(object, "setIsDismantable", false)
+        call(object, "setCanBarricade", false)
+        call(object, "setIsHoppable", false)
+        call(object, "setIsDoor", false)
+        call(object, "setCanPassThrough", false)
+    end
+    return true
+end
+
+function World.OwnedFacilityId(object)
+    local marker = markerFor(object)
+    if not isOwnedMarker(marker) or marker.facilityId == nil then return nil end
+    return tostring(marker.facilityId)
+end
+
 function World.VisualObjects(square, facilityId)
     local output = {}
     for _, object in ipairs(listObjects(square)) do
@@ -79,6 +123,7 @@ function World.MatchingVisual(square, facilityId, spec)
         and tostring(marker.objectType or "isoobject")
             == tostring(spec.objectType or "isoobject")
     then
+        World.EnforceVisualOnly(objects[1], spec)
         return objects[1]
     end
     return nil
@@ -136,17 +181,7 @@ function World.AddObject(square, facility, spec, point)
     -- every container and interaction flag before the object enters the
     -- square.  Keep pass-through disabled so the sprite still contributes
     -- its normal collision footprint.
-    call(object, "removeAllContainers")
-    call(object, "setOutlineOnMouseover", false)
-    if spec.objectType == "thumpable" then
-        call(object, "setIsContainer", false)
-        call(object, "setIsThumpable", false)
-        call(object, "setIsDismantable", false)
-        call(object, "setCanBarricade", false)
-        call(object, "setIsHoppable", false)
-        call(object, "setIsDoor", false)
-        call(object, "setCanPassThrough", false)
-    end
+    World.EnforceVisualOnly(object, spec)
     local data = call(object, "getModData")
     if not data then return false, "STOCKPILE_VISUAL_MODDATA_UNAVAILABLE" end
     data[VISUAL_DATA_KEY] = {
@@ -176,6 +211,10 @@ function World.AddObject(square, facility, spec, point)
     if not isPresent(square, object) then
         return false, "STOCKPILE_VISUAL_ADD_FAILED"
     end
+    -- AddSpecialObject calls IsoObject.addToWorld(), which can recreate a
+    -- container from the furniture sprite.  This cleanup must run after the
+    -- engine insertion, not only before it.
+    World.EnforceVisualOnly(object, spec)
     call(object, "transmitCompleteItemToClients")
     call(object, "transmitModData")
     return true, object
