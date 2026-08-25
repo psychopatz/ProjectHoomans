@@ -6,6 +6,8 @@ local released
 local abstracted
 local reconciled
 local broadcast
+local provisionOrder
+local cancelledProvision
 
 package.preload["PsychopatzCore/World/PC_ZoneRegistry"] = function()
     return {
@@ -79,10 +81,27 @@ PNC = {
     Registry = {
         MarkDirty = function() end,
     },
-    WorkService = { Commands = { ReleaseWorker = function(id, reason)
-        released = id .. ":" .. reason
-        return true
-    end } },
+    WorkService = {
+        Queries = {
+            Get = function(id)
+                return provisionOrder and id == provisionOrder.id
+                    and provisionOrder or nil
+            end,
+        },
+        Commands = {
+            Cancel = function(id, reason)
+                if not provisionOrder or id ~= provisionOrder.id then
+                    return false, "WORK_ORDER_UNAVAILABLE"
+                end
+                cancelledProvision = tostring(id) .. ":" .. tostring(reason)
+                return true, provisionOrder
+            end,
+            ReleaseWorker = function(id, reason)
+                released = id .. ":" .. reason
+                return true
+            end,
+        },
+    },
     Presence = {
         Abstract = function(record, reason)
             abstracted = reason
@@ -183,6 +202,21 @@ T.equal(keptReason, "WORK_ORDER_IN_PROGRESS",
     "building worker follow refusal is explicit")
 T.equal(buildingWorker.runtime.workOrderId, "build-1",
     "follow refusal preserves the construction claim")
+
+local provisionWorker = {
+    id = "npc-provisioner", alive = true, x = 15, y = 16, z = 0,
+    presenceState = "abstract", runtime = { workOrderId = "work-provision" },
+    affiliation = { communityID = "colony-1" },
+}
+provisionOrder = { id = "work-provision", operation = "PROVISION_PICKUP" }
+local provisionFollowed, provisionFollowReason =
+    PNC.HomeDutyService.SendToPlayer(provisionWorker, player, "player_requested")
+T.equal(provisionFollowed, true,
+    "follow can override an interruptible provision pickup")
+T.equal(provisionFollowReason, "TRAVELING_TO_PLAYER",
+    "provision follow starts player travel")
+T.equal(cancelledProvision, "work-provision:follow_player_requested",
+    "follow cancels the provision pickup with an explicit reason")
 
 local courierCompleted
 PNC.ColonyStorageService = {

@@ -16,6 +16,14 @@ function H.Process(entry)
     if not definition then
         return true, nil, { ok = false, reason = "unknown_rule" }
     end
+    if PNC.HomeDutyService and PNC.HomeDutyService.IsAtHome
+        and not PNC.HomeDutyService.IsAtHome(record)
+    then
+        return false, H.WorldHour() + 0.25, {
+            ruleId = definition.id, ok = false, attempted = false,
+            reason = "provision_waiting_for_home",
+        }
+    end
     local existingRuntime = record.runtime
         and record.runtime.provision or nil
     local pending = existingRuntime and existingRuntime.pending

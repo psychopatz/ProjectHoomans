@@ -44,6 +44,11 @@ function Service.Commands.Queue(spec)
         requiredWork = math.max(1, tonumber(spec.requiredWork) or 100),
         progress = math.max(0, tonumber(spec.progress) or 0),
         requiredSkills = copy(spec.requiredSkills or {}),
+        -- Most colony work starts at the home base. Some operations, such as
+        -- This flag is explicit for persisted work-order consumers; the
+        -- provision operation also enforces its home-only policy in Core.
+        requiresHome = spec.requiresHome ~= false,
+        autoReturnHome = spec.autoReturnHome ~= false,
         payload = copy(spec.payload or {}),
         status = Status.QUEUED, priority = tonumber(spec.priority) or 0,
         revision = 0, createdAt = now(), updatedAt = now(),

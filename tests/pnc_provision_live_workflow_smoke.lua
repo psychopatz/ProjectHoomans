@@ -10,6 +10,9 @@ local function deepCopy(value)
 end
 
 local now = 1000
+local homeRequests = 0
+local returningHome = false
+local atHome = false
 PNC = {
     Core = { Now = function() return now end, DeepCopy = deepCopy },
     Registry = { Data = {} },
@@ -23,6 +26,14 @@ PNC = {
         return { id = "stockpile:1", x = 20, y = 21, z = 0 }
     end },
     ColonyStorageService = {},
+    HomeDutyService = {
+        IsAtHome = function() return atHome end,
+        IsReturningHome = function() return returningHome end,
+        SendHome = function()
+            homeRequests = homeRequests + 1
+            return true, "RETURNING_HOME"
+        end,
+    },
 }
 
 function PNC.Registry.Get(id) return PNC.Registry.Data[tostring(id)] end
@@ -88,9 +99,27 @@ T.equal(state.phase, "TRAVEL_TO_STOCKPILE", "live provision phase")
 
 local order = Work.Queries.Get(details.workOrderId)
 T.equal(order.operation, "PROVISION_PICKUP", "provision work operation")
+T.equal(order.requiresHome, true,
+    "provision pickup is a home-bound work order")
+T.equal(order.autoReturnHome, false,
+    "provision pickup does not silently send an away worker home")
+T.truthy(Work.Internal.requiresHome({ operation = "PROVISION_PICKUP" }),
+    "legacy provision orders remain home-bound")
 T.equal(order.status, Definitions.STATUS.QUEUED, "provision order queued")
-T.truthy(Work.Commands.Assign(order.id, record.id),
-    "live provision work order assigned")
+returningHome = true
+T.falsy(Work.Internal.workerAvailable(record, order),
+    "provision does not reacquire a worker already returning home")
+returningHome = false
+Work.Tick(now + 1)
+order = Work.Queries.Get(order.id)
+T.equal(order.status, Definitions.STATUS.WAITING_FOR_WORKER,
+    "away provision waits for a home worker")
+T.equal(order.blockedReason, "NO_HOME_WORKER",
+    "away provision reports the home vicinity requirement")
+T.equal(homeRequests, 0,
+    "away provision does not redirect the NPC home")
+atHome = true
+Work.Tick(Work.NextPassAt + 1)
 order = Work.Queries.Get(order.id)
 T.equal(order.status, Definitions.STATUS.TRAVEL_TO_STOCKPILE,
     "provision order starts at stockpile")
@@ -98,6 +127,13 @@ T.equal(record.orderSpec.phase, "COLLECT_INPUTS",
     "live provision targets stockpile first")
 T.equal(record.orderSpec.x, 20, "stockpile x target")
 T.equal(record.orderSpec.y, 21, "stockpile y target")
+
+Work.Tick(now + 1)
+T.equal(homeRequests, 0,
+    "provision scheduler did not redirect an away worker home")
+T.equal(Work.Queries.Get(order.id).status,
+    Definitions.STATUS.TRAVEL_TO_STOCKPILE,
+    "provision scheduler preserved the stockpile travel phase")
 
 T.truthy(Work.Commands.CollectInputs(order.id, record.id),
     "live provision collects at stockpile")

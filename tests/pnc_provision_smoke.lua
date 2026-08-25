@@ -208,6 +208,11 @@ PNC.NPCSupplyService = {
 }
 T.load(ROOT .. "server/PNC/Provision/PNC_ProvisionScheduler.lua")
 
+local provisionAtHome = true
+PNC.HomeDutyService = {
+    IsAtHome = function() return provisionAtHome end,
+}
+
 local bootstrapRecord = {
     id = "npc_bootstrap", alive = true,
     affiliation = { factionID = faction.id },
@@ -297,6 +302,28 @@ T.equal(PNC.ProvisionScheduler.Queue[1].readyAt, worldHour + 0.25,
 nowMs = 5005
 PNC.ProvisionScheduler.Pump(nowMs)
 T.equal(shortage.processed, 1, "retry deadline prevents query spam")
+
+PNC.ProvisionScheduler.Queue = {}
+PNC.ProvisionScheduler.Queued = {}
+local awayProvision = {
+    id = "npc_away_provision", alive = true,
+    affiliation = { factionID = faction.id },
+}
+records[awayProvision.id] = awayProvision
+candidates[awayProvision.id] = { FOOD = {}, HYDRATION = {}, MEDICAL = {} }
+provisionAtHome = false
+worldHour = 12
+PNC.ProvisionScheduler.MarkDirty(awayProvision, "food")
+nowMs = 6006
+PNC.ProvisionScheduler.Pump(nowMs)
+T.equal(awayProvision.processed, nil,
+    "abstract provision waits while the NPC is away from home")
+provisionAtHome = true
+worldHour = 13
+nowMs = 7007
+PNC.ProvisionScheduler.Pump(nowMs)
+T.equal(awayProvision.processed, 1,
+    "abstract provision acquires after the NPC reaches home")
 
 local saved = 0
 PNC.PlayerCharacters = {

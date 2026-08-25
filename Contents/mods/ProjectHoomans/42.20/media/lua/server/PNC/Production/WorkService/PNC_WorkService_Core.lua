@@ -50,6 +50,24 @@ local function requirementsMet(record, requirements)
     return rate > 0, reason, rate
 end
 
+local function requiresHome(order)
+    if not order then return true end
+    -- Provision pickup is home-only. This also migrates orders written by the
+    -- previous world-space pickup behavior, even if they persisted
+    -- requiresHome=false.
+    if order.operation == "PROVISION_PICKUP" then return true end
+    if order.requiresHome ~= nil then return order.requiresHome ~= false end
+    return true
+end
+
+local function autoReturnHome(order)
+    if not order then return true end
+    -- A hungry/following NPC must wait for an explicit home command instead
+    -- of having provision work silently take over its current behavior.
+    if order.operation == "PROVISION_PICKUP" then return false end
+    return order.autoReturnHome ~= false
+end
+
 local function specializationScore(record, order)
     local skillId = order and order.productionSkillId
     if not skillId then return 0 end
@@ -114,12 +132,18 @@ local function workerAvailable(record, order)
     if Service.ClaimsByWorker[tostring(record.id)] then return false end
     local runtime = record.runtime
     if runtime and runtime.workOrderId then return false end
+    if PNC.HomeDutyService and PNC.HomeDutyService.IsReturningHome
+        and PNC.HomeDutyService.IsReturningHome(record, order.baseId)
+    then
+        return false
+    end
     local job = Definitions.JOB_BY_OPERATION[order.operation]
     local allowed = record.allowedJobs
     -- Colony jobs are opt-out. Archetype tables predate colony production and
     -- therefore missing keys must mean allowed, not disabled.
     if type(allowed) == "table" and allowed[job] == false then return false end
-    if PNC.HomeDutyService and PNC.HomeDutyService.IsAtHome
+    if requiresHome(order) and PNC.HomeDutyService
+        and PNC.HomeDutyService.IsAtHome
         and not PNC.HomeDutyService.IsAtHome(record, order.baseId)
     then
         return false
@@ -162,13 +186,16 @@ local function findWorker(order)
     end
     if PNC.Registry.ForEach then PNC.Registry.ForEach(consider)
     else for _, record in pairs(PNC.Registry.Data or {}) do consider(record) end end
-    if not selected and away and PNC.HomeDutyService
+    if not selected and away and autoReturnHome(order)
+        and PNC.HomeDutyService
         and PNC.HomeDutyService.SendHome
     then
         PNC.HomeDutyService.SendHome(away, order.baseId, "work_waiting")
         return nil, "WORKER_RETURNING_HOME"
     end
-    return selected, selected and nil or "NO_QUALIFIED_WORKER"
+    return selected, selected and nil
+        or (autoReturnHome(order) and "NO_QUALIFIED_WORKER"
+            or "NO_HOME_WORKER")
 end
 
 function Service.RegisterCompletion(operation, handler)
@@ -212,6 +239,8 @@ Internal.now = now
 Internal.terminal = terminal
 Internal.copy = copy
 Internal.requirementsMet = requirementsMet
+Internal.requiresHome = requiresHome
+Internal.autoReturnHome = autoReturnHome
 Internal.belongsToOrder = belongsToOrder
 Internal.markAssignmentDirty = markAssignmentDirty
 Internal.workerAvailable = workerAvailable

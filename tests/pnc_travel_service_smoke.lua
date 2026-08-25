@@ -269,6 +269,43 @@ T.near(liveArrivalRecord.orderSpec.x, 10, 0.001, "live arrival roam center x")
 T.near(liveArrivalRecord.orderSpec.y, 5, 0.001, "live arrival roam center y")
 T.near(liveArrivalRecord.orderSpec.radius, 9, 0.001, "live arrival roam radius")
 
+-- A live body can be just outside the stop radius while its route projection
+-- has already reached the endpoint. It must finalize arrival instead of
+-- remaining en_route with a permanent 100% progress bar.
+local overshootRecord = {
+    id = "live-overshoot",
+    name = "Live Overshoot",
+    x = 0,
+    y = 0,
+    z = 0,
+    alive = true,
+    presenceState = "live",
+    runtime = {},
+}
+records[overshootRecord.id] = overshootRecord
+local overshootJourney = T.truthy(PNC.Travel.Service.Start(
+    overshootRecord,
+    {
+        journeyId = "journey:live-overshoot",
+        destination = { x = 10, y = 5, z = 0 },
+        arrivalAction = { type = "roam", radius = 4 },
+    }
+))
+local overshootBody = {
+    getX = function() return 10 end,
+    getY = function() return 7 end,
+    getZ = function() return 0 end,
+}
+PNC.Travel.Service.TickLive(overshootRecord, overshootBody, worldHour)
+T.truthy(overshootJourney.state == "arrived",
+    "live endpoint projection did not finalize arrival")
+T.near(overshootRecord.x, 10, 0.001,
+    "live endpoint recovery x")
+T.near(overshootRecord.y, 5, 0.001,
+    "live endpoint recovery y")
+T.truthy(PNC.Travel.Service.GetProgress(overshootRecord).state == "arrived",
+    "live endpoint recovery left the journey en route")
+
 local customArrivalCalls = 0
 local customAction
 T.truthy(PNC.Travel.Arrivals.RegisterHandler("trading",

@@ -209,6 +209,10 @@ function Scheduler.QueueLivePickup(record, storage, request, selected, state)
     local order, queueReason = work.Commands.Queue({
         operation = OPERATION, colonyId = storage.settlementId,
         factionId = storage.ownerFactionId, baseId = base.id,
+        -- Provision is a home-only pickup. An away/following NPC remains
+        -- hungry until the player explicitly sends them home.
+        requiresHome = true,
+        autoReturnHome = false,
         requiredWork = 1, priority = request.priority,
         payload = {
             storageId = storage.id, reservationId = reservation.id,

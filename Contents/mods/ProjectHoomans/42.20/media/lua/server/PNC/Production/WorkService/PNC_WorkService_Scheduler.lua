@@ -22,6 +22,8 @@ local collectionTarget = Internal.collectionTarget
 local requiresCollection = Internal.requiresCollection
 local setLiveOrder = Internal.setLiveOrder
 local claimStation = Internal.claimStation
+local requiresHome = Internal.requiresHome
+local autoReturnHome = Internal.autoReturnHome
 
 local function processOrder(order, at)
     if terminal(order) or order.status == Status.PAUSED then return end
@@ -79,13 +81,23 @@ local function processOrder(order, at)
             Repository.MarkDirty(); return
         end
     end
-    if PNC.HomeDutyService and PNC.HomeDutyService.IsAtHome
-        and not PNC.HomeDutyService.IsAtHome(worker, order.baseId)
+    local returningHome = PNC.HomeDutyService
+        and PNC.HomeDutyService.IsReturningHome
+        and PNC.HomeDutyService.IsReturningHome(worker, order.baseId)
+    if returningHome or (requiresHome(order) and PNC.HomeDutyService
+        and PNC.HomeDutyService.IsAtHome
+        and not PNC.HomeDutyService.IsAtHome(worker, order.baseId))
     then
         releaseClaim(order, "worker_left_home")
         order.status, order.blockedReason = Status.WAITING_FOR_WORKER,
-            "WORKER_RETURNING_HOME"
-        PNC.HomeDutyService.SendHome(worker, order.baseId, "worker_left_home")
+            autoReturnHome(order) and "WORKER_RETURNING_HOME"
+                or "WORKER_NOT_AT_HOME"
+        if autoReturnHome(order) and PNC.HomeDutyService
+            and PNC.HomeDutyService.SendHome
+        then
+            PNC.HomeDutyService.SendHome(worker, order.baseId,
+                "worker_left_home")
+        end
         Repository.MarkDirty()
         return
     end

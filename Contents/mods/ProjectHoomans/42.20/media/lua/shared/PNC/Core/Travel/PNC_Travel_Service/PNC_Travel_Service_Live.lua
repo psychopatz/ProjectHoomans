@@ -14,6 +14,17 @@ function Service.TickLive(recordOrID, body, atWorldHour)
     )
 
     Service.SyncLivePosition(record, body, atWorldHour)
+    -- Live bodies can drift just beyond the final stop radius after their
+    -- route projection has already reached the endpoint. Without this guard,
+    -- the UI reports 100% forever while the live movement order keeps trying
+    -- to reach an endpoint the engine pather has effectively missed.
+    if journey.state == "en_route"
+        and (tonumber(journey.distanceTotal) or 0) > 0
+        and (tonumber(journey.distanceTravelled) or 0)
+            >= (tonumber(journey.distanceTotal) or 0) - 0.001
+    then
+        Service.ReachCurrentWaypoint(record, atWorldHour)
+    end
     if journey.state == "waiting" then
         journey.waitRemainingWorldHours = math.max(
             0,
