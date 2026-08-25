@@ -517,6 +517,32 @@ function Client.RequestColonyManagement()
     return true
 end
 
+function Client.RequestColonyJournal(after, limit)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local state = ClientState.colonyJournal or {}
+    local args = {
+        after = math.max(0, math.floor(tonumber(after)
+            or tonumber(state.cursor) or 0)),
+        limit = math.min(32, math.max(1, math.floor(tonumber(limit) or 32))),
+    }
+    ClientState.lastColonyJournalRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE,
+                Const.CMD_COLONY_JOURNAL_REQUEST, args)
+            return true
+        end
+        return false
+    end
+    if not PNC.ColonyJournalFeed or not PNC.ColonyJournalFeed.GetDelta
+    then return false end
+    if Internal.ApplyColonyJournal then
+        Internal.ApplyColonyJournal(PNC.ColonyJournalFeed.GetDelta(player, args))
+        return true
+    end
+    return false
+end
+
 function Client.RequestColonyAction(action, options)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local args = type(options) == "table" and Core.DeepCopy(options) or {}

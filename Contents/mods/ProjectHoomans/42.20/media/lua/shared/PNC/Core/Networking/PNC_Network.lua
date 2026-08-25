@@ -35,6 +35,8 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     directorDebugAuthorized = false,
     colonyManagement = nil,
     colonyManagementRevision = 0,
+    colonyJournal = { rows = {}, cursor = 0, latestSequence = 0 },
+    colonyJournalRevision = 0,
     worldDiscovery = nil,
 }
 PNC.Network.ServerState = PNC.Network.ServerState or {

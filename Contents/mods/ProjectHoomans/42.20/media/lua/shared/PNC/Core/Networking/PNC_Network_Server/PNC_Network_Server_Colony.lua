@@ -9,6 +9,17 @@ function Network.SendColonyManagement(targetPlayer, snapshot)
     elseif not isServer or not isServer() then triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_COLONY_MANAGEMENT, payload) end
 end
 
+function Network.SendColonyJournal(targetPlayer, delta)
+    local payload = { delta = delta, serverTime = Core.Now() }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(targetPlayer, Const.MODULE,
+            Const.CMD_COLONY_JOURNAL, payload)
+    elseif not isServer or not isServer() then
+        triggerEvent("OnServerCommand", Const.MODULE,
+            Const.CMD_COLONY_JOURNAL, payload)
+    end
+end
+
 function Network.SendSettlementDelta(targetPlayer, settlement, actionResult, storage)
     local payload = { settlement = settlement, actionResult = actionResult,
         storage = storage,

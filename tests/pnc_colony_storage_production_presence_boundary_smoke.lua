@@ -50,7 +50,9 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.ColonyStorageService[name]), "function",
         "entry point preserves ColonyStorageService." .. name)
 end
-T.equal(publicCount, 14, "storage-production public function count")
+T.equal(publicCount, 15, "storage-production public function count")
+T.equal(type(PNC.ColonyStorageService.SetTierForSettlement), "function",
+    "storage tier transition belongs to the production service")
 T.equal(type(PNC.ColonyStorageService.ProductionReservations), "table",
     "production reservation state remains initialized")
 

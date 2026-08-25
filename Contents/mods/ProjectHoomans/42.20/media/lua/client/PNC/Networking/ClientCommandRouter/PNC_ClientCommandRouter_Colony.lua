@@ -3,6 +3,50 @@ local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 
+local function applyColonyJournal(delta)
+    delta = type(delta) == "table" and delta or {}
+    local journal = ClientState.colonyJournal or {}
+    journal.rows = journal.rows or {}
+    local incoming = type(delta.rows) == "table" and delta.rows or {}
+    local changed = delta.reset == true or #incoming > 0
+    if delta.reset == true then journal.rows = {} end
+    -- The server sends each batch in chronological order. Prepending each
+    -- row in that order leaves the newest row at index one without sorting or
+    -- copying the entire bounded history on every poll.
+    for index = 1, #incoming do
+        table.insert(journal.rows, 1, incoming[index])
+    end
+    local maxRows = 128
+    while #journal.rows > maxRows do table.remove(journal.rows) end
+    local cursor = tonumber(delta.nextCursor) or tonumber(journal.cursor) or 0
+    local latestSequence = tonumber(delta.latestSequence)
+        or journal.latestSequence or 0
+    if cursor ~= (tonumber(journal.cursor) or 0)
+        or latestSequence ~= (tonumber(journal.latestSequence) or 0)
+        or delta.error ~= journal.error
+    then
+        changed = true
+    end
+    journal.cursor = cursor
+    journal.latestSequence = latestSequence
+    journal.reset = delta.reset == true
+    journal.error = delta.error
+    journal.more = delta.more == true
+    journal.lastSyncAt = Core.Now()
+    ClientState.colonyJournal = journal
+    if changed then
+        ClientState.colonyJournalRevision =
+            (tonumber(ClientState.colonyJournalRevision) or 0) + 1
+    end
+    ClientState.lastColonyJournalReceiveAt = Core.Now()
+end
+
+Internal.ApplyColonyJournal = applyColonyJournal
+
+Internal.RegisterServerCommand(Const.CMD_COLONY_JOURNAL, function(args)
+    applyColonyJournal(args and args.delta or {})
+end)
+
 Internal.RegisterServerCommand(Const.CMD_COLONY_MANAGEMENT, function(args)
     ClientState.colonyManagement = args.snapshot
     ClientState.colonyManagementRevision =

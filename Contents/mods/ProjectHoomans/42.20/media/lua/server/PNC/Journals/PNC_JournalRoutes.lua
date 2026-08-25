@@ -9,6 +9,7 @@ local CoreJournals = require "PsychopatzCore/Journal/PC_JournalService"
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 local StorageJournal = require
     "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
+local ColonyJournalFeed = require "PNC/Journals/PNC_ColonyJournalFeed"
 
 Adapter.TYPE = {
     COLONY_ACTIVITY = "projecthoomans.colonyActivity",
@@ -49,10 +50,14 @@ end
 
 local function appendNPC(eventType, record, ...)
     if not Adapter.IsPlayerOwnedNPC(record) then return false end
+    local at = worldMinute()
     local ok = CoreJournals.append(
-        Adapter.TYPE.NPC_HISTORY, record.id, eventType, worldMinute(), ...
+        Adapter.TYPE.NPC_HISTORY, record.id, eventType, at, ...
     )
-    if ok then markNPCDirty(record) end
+    if ok then
+        markNPCDirty(record)
+        ColonyJournalFeed.AppendNPC(eventType, record, at, ...)
+    end
     return ok
 end
 
@@ -67,6 +72,10 @@ local function appendStorage(eventType, storageID, actor, typeID, quantity,
     )
     if ok and PNC.ColonyStorageRepository then
         PNC.ColonyStorageRepository.MarkDirty()
+    end
+    if ok then
+        ColonyJournalFeed.AppendStorage(eventType, storageID, actor, typeID,
+            quantity, reason, at or worldMinute())
     end
     return ok
 end

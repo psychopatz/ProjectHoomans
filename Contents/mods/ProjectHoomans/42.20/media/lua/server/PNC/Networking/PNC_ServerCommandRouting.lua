@@ -13,6 +13,7 @@ require "PNC/Networking/Handlers/PNC_ServerGameplayRequestCommandHandler"
 require "PNC/Networking/Handlers/PNC_ServerDiagnosticQueryCommandHandler"
 require "PNC/Networking/Handlers/PNC_ServerAuthorityDiagnosticCommandHandler"
 require "PNC/Networking/Handlers/PNC_ServerColonyManagementCommandHandler"
+require "PNC/Networking/Handlers/PNC_ServerColonyJournalCommandHandler"
 require "PNC/Networking/Handlers/PNC_ServerLegacyDebugCommandHandler"
 
 return PNC.ServerCommandRouter

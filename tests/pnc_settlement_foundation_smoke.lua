@@ -307,6 +307,11 @@ T.equal(PNC.FacilityService.Destroy(player, {
 local access = PNC.StockpileAccessService.FindNearest(base.id, 0, 0, 0)
 T.equal(access.facilityId, stockpileFacility.id,
     "stockpile facility supplies the collection access target")
+stockpileFacility.constructionState = "RECONSTRUCTING"
+local rebuildingAccess = PNC.StockpileAccessService.FindNearest(base.id, 0, 0, 0)
+T.equal(rebuildingAccess.facilityId, stockpileFacility.id,
+    "stockpile remains a collection target during its own upgrade")
+stockpileFacility.constructionState = "BUILT"
 T.equal(PNC.FacilityService.Create(player, {
     baseId = base.id, definitionId = "stockpile",
     expectedRevision = base.revision,

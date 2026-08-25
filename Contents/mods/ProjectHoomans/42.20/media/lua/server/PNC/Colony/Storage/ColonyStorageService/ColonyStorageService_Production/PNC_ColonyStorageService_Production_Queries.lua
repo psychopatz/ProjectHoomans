@@ -10,8 +10,23 @@ local Service = PNC.ColonyStorageService
 local H = PNC.ColonyStorageProductionInternal
 local Repository = PNC.ColonyStorageRepository
 local Internal = Service.Internal
+local Definitions = Internal.Definitions
 local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
+
+function Service.SetTierForSettlement(colonyId, targetTier)
+    local storage = Repository.GetForSettlement(colonyId)
+    if not storage then return false, "storage_not_found" end
+    targetTier = Definitions.NormalizeTier(targetTier)
+    local current = Definitions.NormalizeTier(storage.tier)
+    if current == targetTier then return true, "already_upgraded", storage end
+    if Definitions.GetNextTier(current) ~= targetTier then
+        return false, "invalid_storage_tier_transition", storage
+    end
+    storage.tier = targetTier
+    Internal.CommitStorage(storage)
+    return true, "upgraded", storage
+end
 
 function Service.HasProductionTransactionStage(storageId, transactionId, stage)
     return H.TransactionStage(H.StorageFor(storageId), transactionId, stage)
@@ -75,4 +90,3 @@ function Service.CountProductionAvailable(storageId, itemTypes)
 end
 
 return Service
-

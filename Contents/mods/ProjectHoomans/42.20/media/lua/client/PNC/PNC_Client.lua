@@ -96,6 +96,8 @@ local function onResetLua()
     ClientState.directorDebugReason = nil
     ClientState.colonyManagement = nil
     ClientState.colonyManagementRevision = 0
+    ClientState.colonyJournal = { rows = {}, cursor = 0, latestSequence = 0 }
+    ClientState.colonyJournalRevision = 0
     ClientState.worldDiscovery = nil
     ClientState.scavengeSessions = {}
     ClientState.activeScavengeSessionId = nil

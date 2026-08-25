@@ -26,7 +26,8 @@ end
 
 local function facilityNode(base, facility)
     if not facility or facility.definitionId ~= "stockpile"
-        or facility.constructionState ~= "BUILT"
+        or (facility.constructionState ~= "BUILT"
+            and facility.constructionState ~= "RECONSTRUCTING")
     then return nil end
     local region
     for componentId, present in pairs(facility.componentIds or {}) do
