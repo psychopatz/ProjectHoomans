@@ -24,7 +24,16 @@ local function tr(key, fallback)
     return value
 end
 
+local function canUseDebug()
+    return PNC.Client
+        and PNC.Client.CanUseDebug
+        and PNC.Client.CanUseDebug() == true
+end
+
 local function sendSpawn(_, square, faction, equipmentMode)
+    if not canUseDebug() then
+        return false
+    end
     local payload = {
         variant = faction,
         faction = faction,
@@ -63,7 +72,7 @@ function Menu.Add(context, square)
     local faction
     local factionOption
     local i
-    if not context or not square or not ISContextMenu then
+    if not canUseDebug() or not context or not square or not ISContextMenu then
         return nil
     end
     root = ISContextMenu:getNew(context)

@@ -10,6 +10,12 @@ local function tr(key, fallback)
     return value and value ~= "" and value ~= key and value or fallback
 end
 
+local function canUseDebug()
+    return PNC.Client
+        and PNC.Client.CanUseDebug
+        and PNC.Client.CanUseDebug() == true
+end
+
 local function snapshotFor(entry)
     return entry and (entry.snapshot
         or ClientState.snapshots and ClientState.snapshots[entry.id]) or nil
@@ -88,14 +94,16 @@ function Provider.addOptions(menu, entry, player)
             option.notAvailable = true
         end
     end
-    if PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() and #wounds > 0 then
+    if canUseDebug() and #wounds > 0 then
         local debugMenu = ISContextMenu:getNew(menu)
         menu:addSubMenu(menu:addOption(tr("UI_PNC_DebugBandage", "Debug Bandage (No Item)")), debugMenu)
         for i = 1, #wounds do
             local row = wounds[i]
             local partId = row.partId
             local debugOption = debugMenu:addOption(row.label, nil, function()
-                PNC.Client.SendBandage(entry.id, partId, true)
+                if canUseDebug() and PNC.Client.SendBandage then
+                    PNC.Client.SendBandage(entry.id, partId, true)
+                end
             end)
             if not inRange then debugOption.notAvailable = true end
         end

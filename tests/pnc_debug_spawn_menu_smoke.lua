@@ -21,9 +21,11 @@ local function newMenu()
     return menu
 end
 
+local debugAuthorized = false
 local sent
 PNC = {
     Client = {
+        CanUseDebug = function() return debugAuthorized end,
         SendDebug = function(action, payload)
             sent = { action = action, payload = payload }
             return true
@@ -41,6 +43,9 @@ local square = {
     getY = function() return 20 end,
     getZ = function() return 0 end,
 }
+T.equal(PNC.DebugSpawnMenu.Add(context, square), nil,
+    "spawn debug menu hidden without authorization")
+debugAuthorized = true
 local root = PNC.DebugSpawnMenu.Add(context, square)
 T.equal(context.options[1].name, "[Debug] Spawn Hoomans", "spawn root")
 T.equal(#root.options, 3, "faction submenu count")
@@ -58,6 +63,10 @@ for factionIndex = 1, 3 do
         "equipment choices for faction " .. tostring(factionIndex))
 end
 
+debugAuthorized = false
+choose(1, 2)
+T.equal(sent, nil, "stale spawn option is gated at callback time")
+debugAuthorized = true
 choose(1, 2)
 T.equal(sent.action, "spawn", "companion debug action")
 T.equal(sent.payload.faction, "colonist", "companion faction payload")

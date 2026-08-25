@@ -22,7 +22,7 @@ function Provider.isEnabled()
 end
 
 local function sendDebug(action, payload)
-    if PNC.Client and PNC.Client.SendDebug then
+    if Provider.isEnabled() and PNC.Client.SendDebug then
         PNC.Client.SendDebug(action, payload)
     end
 end
@@ -37,6 +37,9 @@ local function isRecording(entry)
 end
 
 function Provider.addOptions(menu, entry, player, contextData)
+    if not Provider.isEnabled() then
+        return
+    end
     local debugMenu = ISContextMenu:getNew(menu)
     local snapshot
     local actionSquare = entry.zombie and entry.zombie.getSquare and entry.zombie:getSquare() or contextData and contextData.square or nil

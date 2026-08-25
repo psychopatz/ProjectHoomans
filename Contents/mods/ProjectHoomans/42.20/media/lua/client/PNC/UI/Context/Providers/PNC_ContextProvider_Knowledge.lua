@@ -5,15 +5,24 @@ PNC.ContextHub = PNC.ContextHub or {}
 
 local Provider = { id = "npc_knowledge" }
 
+local function canUseDebug()
+    return PNC.Client
+        and PNC.Client.CanUseDebug
+        and PNC.Client.CanUseDebug() == true
+end
+
 function Provider.addOptions(menu, entry)
     menu:addOption("NPC Dossier", nil, function()
         if PNC.CharacterWindow and PNC.CharacterWindow.OpenDossier then
             PNC.CharacterWindow.OpenDossier(entry.id)
         end
     end)
-    if PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() then
+    if canUseDebug() then
         menu:addOption("Debug: Knowledge Laboratory", nil, function()
-            if PNC.KnowledgeDebugUI and PNC.KnowledgeDebugUI.Open then
+            if canUseDebug()
+                and PNC.KnowledgeDebugUI
+                and PNC.KnowledgeDebugUI.Open
+            then
                 PNC.KnowledgeDebugUI.Open(entry.id)
             end
         end)

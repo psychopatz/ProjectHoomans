@@ -35,7 +35,7 @@ local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, te
     end
 
     square = PNC.NPCSelection and PNC.NPCSelection.GetWorldSquare and PNC.NPCSelection.GetWorldSquare(worldobjects) or nil
-    if square and Client.CanUseDebug() then
+    if square and Client.CanUseDebug and Client.CanUseDebug() == true then
         if PNC.DebugSpawnMenu and PNC.DebugSpawnMenu.Add then
             PNC.DebugSpawnMenu.Add(context, square)
         end

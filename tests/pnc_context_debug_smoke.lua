@@ -85,6 +85,10 @@ T.load(CLIENT_ROOT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Debug.lua")
 
 T.equal(registeredProvider.id, "debug", "debug provider registered")
 T.equal(registeredProvider.isEnabled(), false, "provider hidden without debug authorization")
+local unauthorizedMenu = newMenu()
+registeredProvider.addOptions(unauthorizedMenu, { id = "npc_one" }, {}, {})
+T.equal(#unauthorizedMenu.options, 0,
+    "debug provider refuses direct option construction without authorization")
 debugAuthorized = true
 T.equal(registeredProvider.isEnabled(), true, "provider enabled with debug authorization")
 
@@ -113,6 +117,11 @@ T.equal(clearOption.notAvailable, false, "infection clear disabled for infected 
 clearOption.callback()
 T.equal(sent[1].action, "clear_infection", "world menu infection clear action")
 T.equal(sent[1].payload.id, "npc_one", "world menu infection clear NPC")
+local sentCount = #sent
+debugAuthorized = false
+clearOption.callback()
+T.equal(#sent, sentCount, "stale debug option is gated at callback time")
+debugAuthorized = true
 
 local bandageOption = findOption(debugMenu, "Bandage State")
 T.equal(bandageOption ~= nil, true, "bandage debug submenu missing")
