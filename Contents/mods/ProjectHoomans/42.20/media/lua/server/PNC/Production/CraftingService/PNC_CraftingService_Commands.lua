@@ -9,6 +9,13 @@ local Service = PNC.CraftingService
 local H = PNC.CraftingServiceInternal
 local Registry = PNC.RecipeKnowledgeRegistry
 
+local function requiredStationId(descriptor, operation)
+    local definitions = PNC.WorkDefinitions
+    local station = definitions and definitions.GetStationForRecipe
+        and definitions.GetStationForRecipe(descriptor, operation) or nil
+    return station and station.id or "workshop"
+end
+
 function Service.Commands.QueueCraft(player, recipeId, quantity)
     local ctx, reason = H.Context(player)
     recipeId = math.floor(tonumber(recipeId) or 0)
@@ -43,6 +50,8 @@ function Service.Commands.QueueCraft(player, recipeId, quantity)
     order, reason = PNC.WorkService.Commands.Queue({ operation = "CRAFT",
         colonyId = ctx.colony.id, factionId = ctx.faction.id, baseId = ctx.base.id,
         recipeId = recipeId, quantity = quantity,
+        requiredStationId = requiredStationId(resolved.descriptor, "CRAFT"),
+        productionSkillId = resolved.descriptor.productionSkillId,
         requiredWork = math.max(20, resolved.descriptor.craftTime * quantity),
         requiredSkills = resolved.descriptor.requiredSkills,
         payload = PNC.WorkInputService.Bind({ storageId = ctx.storage.id,
@@ -79,7 +88,11 @@ function Service.Commands.QueueDisassembly(player, recordIndex)
     local order
     order, reason = PNC.WorkService.Commands.Queue({ operation = "DISASSEMBLE",
         colonyId = ctx.colony.id, factionId = ctx.faction.id, baseId = ctx.base.id,
-        recipeId = recipeId, requiredWork = math.max(20,
+        recipeId = recipeId,
+        requiredStationId = requiredStationId(resolved.descriptor,
+            "DISASSEMBLE"),
+        productionSkillId = resolved.descriptor.productionSkillId,
+        requiredWork = math.max(20,
             resolved.descriptor.craftTime * 0.6),
         requiredSkills = resolved.descriptor.requiredSkills,
         payload = PNC.WorkInputService.Bind({ storageId = ctx.storage.id,

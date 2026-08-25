@@ -5,12 +5,17 @@ PNC = PNC or {}
 PNC.FacilityBuildUI = PNC.FacilityBuildUI or {}
 
 local BuildUI = PNC.FacilityBuildUI
+BuildUI.previousWindow = BuildUI.previousWindow or nil
+BuildUI.previousWindowWasVisible = BuildUI.previousWindowWasVisible or false
+BuildUI.lastOpenArgs = BuildUI.lastOpenArgs or nil
 local UI = PsychopatzCore.UI
 local Theme = UI.Theme
 local Layout = UI.Layout
+local ImageResolver = UI.ImageResolver
+    or require "PsychopatzCore/UI/Components/PsychopatzImageResolver"
 
-local CATEGORY_ORDER = { "housing", "food", "production", "technology",
-    "utilities" }
+local CATEGORY_ORDER = { "housing", "food", "technology", "utilities",
+    "production" }
 local CATEGORY_LABELS = {
     housing = "HOUSING", food = "FOOD", production = "PRODUCTION",
     technology = "TECHNOLOGY", utilities = "UTILITIES",
@@ -37,7 +42,22 @@ local function playerCount(fullType)
     return values and values.size and values:size() or 0
 end
 
+local function humanizeIdentifier(value)
+    local text = tostring(value or "")
+    text = text:match("([^%.]+)$") or text
+    text = string.gsub(text, "[_%-]+", " ")
+    if text == "" then return text end
+    return string.upper(string.sub(text, 1, 1)) .. string.sub(text, 2)
+end
+
 local function stockpileCount(storage, fullType)
+    if type(fullType) == "table" then
+        local best = 0
+        for _, candidate in ipairs(fullType) do
+            best = math.max(best, stockpileCount(storage, candidate))
+        end
+        return best
+    end
     local total = 0
     for _, row in ipairs(storage and storage.rows or {}) do
         if tostring(row.fullType or "") == tostring(fullType or "") then
@@ -47,11 +67,166 @@ local function stockpileCount(storage, fullType)
     return total
 end
 
-local function recipeFor(definition)
+local function buildDescriptorFor(definition)
+    if not definition or definition.directWorkstation ~= true then return nil end
+    local objectInfoName = definition.buildRecipeObjectInfoName
+        or definition.entityScript
+    local catalog = PNC.BuildRecipeCatalog
+    if not catalog then return nil end
+    local aliases = {
+        objectInfoName,
+        definition.entityScript,
+        definition.stationId,
+        tr(definition.displayNameKey, humanizeIdentifier(definition.id)),
+    }
+    if catalog.Queries and catalog.Queries.FindForAliases then
+        local descriptor = catalog.Queries.FindForAliases(aliases)
+        if descriptor then return descriptor end
+    end
+    if catalog.Get and objectInfoName then
+        local descriptor = catalog.Get(objectInfoName)
+        if descriptor then return descriptor end
+    end
+    if catalog.Queries and catalog.Queries.FindForObjectInfo
+        and objectInfoName
+    then
+        local descriptor = catalog.Queries.FindForObjectInfo(objectInfoName)
+        if descriptor then return descriptor end
+    end
+    if catalog.Queries and catalog.Queries.FindNativeObjectInfo
+        and objectInfoName
+    then
+        local info = catalog.Queries.FindNativeObjectInfo(objectInfoName)
+        if info then
+            return {
+                objectInfoName = tostring(objectInfoName),
+                displayName = tr(definition.displayNameKey,
+                    humanizeIdentifier(definition.id)),
+                category = definition.category,
+                nativeObjectInfo = info,
+                nativeOnly = true,
+                requirements = {},
+            }
+        end
+    end
+    return nil
+end
+
+local function descriptorTexture(descriptor)
+    return descriptor and ImageResolver.Resolve(descriptor) or nil
+end
+
+local function recipeFor(definition, descriptor)
+    if descriptor and type(descriptor.requirements) == "table" then
+        return descriptor.requirements
+    end
     local recipe = definition and (definition.buildCosts
         or definition.buildCost) or {}
     if recipe.fullType then return { recipe } end
     return recipe
+end
+
+local function costTypes(cost)
+    if type(cost) ~= "table" then return {} end
+    if type(cost.itemTypes) == "table" and #cost.itemTypes > 0 then
+        return cost.itemTypes
+    end
+    local fullType = cost.fullType or cost.itemType
+    return fullType and { tostring(fullType) } or {}
+end
+
+local function costLabel(cost)
+    local labels = {}
+    for _, fullType in ipairs(costTypes(cost)) do
+        labels[#labels + 1] = getItemNameFromFullType
+            and tostring(getItemNameFromFullType(fullType) or fullType)
+            or tostring(fullType)
+    end
+    return table.concat(labels, " / ")
+end
+
+local function productionCategory(definition, descriptor, primarySkill)
+    local work = PNC.WorkDefinitions
+    local valid = {}
+    for _, skillId in ipairs(work and work.CRAFTING_SKILL_ORDER or {}) do
+        valid[tostring(skillId)] = true
+    end
+    local nativeCategory = descriptor and tostring(descriptor.category or "")
+    if nativeCategory ~= "" and valid[nativeCategory] then
+        return nativeCategory
+    end
+    if definition and definition.directWorkstation == true
+        and primarySkill and valid[tostring(primarySkill)]
+    then
+        return tostring(primarySkill)
+    end
+    return tostring(definition and definition.category or "production")
+end
+
+local function themeColor(name, fallback)
+    return Theme.colors and Theme.colors[name] or fallback
+end
+
+local function fontHeight(font)
+    if type(Theme.FontHeight) == "function" then
+        local ok, value = pcall(Theme.FontHeight, font)
+        if ok and tonumber(value) then return tonumber(value) end
+    end
+    return 16
+end
+
+local function textWidth(font, value)
+    value = tostring(value or "")
+    if type(Theme.TextWidth) == "function" then
+        local ok, width = pcall(Theme.TextWidth, font, value)
+        if ok and tonumber(width) then return tonumber(width) end
+    end
+    return #value * 7
+end
+
+local function fitText(value, font, maxWidth)
+    local text = tostring(value or "")
+    local width = math.max(1, tonumber(maxWidth) or 1)
+    if textWidth(font, text) <= width then return text end
+    local suffix = "..."
+    local candidate = text
+    while #candidate > 0 do
+        candidate = string.sub(candidate, 1, #candidate - 1)
+        if textWidth(font, candidate .. suffix) <= width then
+            return candidate .. suffix
+        end
+    end
+    return suffix
+end
+
+local function wrapText(value, font, maxWidth, maxLines)
+    local text = tostring(value or "")
+    local width = math.max(1, tonumber(maxWidth) or 1)
+    local limit = math.max(1, math.floor(tonumber(maxLines) or 1))
+    local lines, current = {}, ""
+    if text == "" then return { "" } end
+    for word in string.gmatch(text, "%S+") do
+        local candidate = current == "" and word or current .. " " .. word
+        if current == "" or textWidth(font, candidate) <= width then
+            current = candidate
+        else
+            lines[#lines + 1] = current
+            current = word
+        end
+    end
+    if current ~= "" then lines[#lines + 1] = current end
+    if #lines <= limit then return lines end
+    local output = {}
+    for index = 1, limit do output[index] = lines[index] end
+    output[limit] = fitText(output[limit] .. " " .. lines[limit + 1],
+        font, width)
+    return output
+end
+
+local function drawCentered(element, value, y, font, tint, centerX, maxWidth)
+    local text = fitText(value, font, maxWidth)
+    element:drawTextCentre(text, centerX, y,
+        tint.r, tint.g, tint.b, tint.a or 1, font)
 end
 
 local FacilityCard = ISPanel:derive("PNCFacilityBuildCard")
@@ -63,31 +238,54 @@ end
 
 function FacilityCard:render()
     ISPanel.render(self)
-    local selected = self.owner.selectedId == self.option.id
-    local border = selected and Theme.colors.accent or Theme.colors.border
-    local text = self.option.enabled and Theme.colors.text or Theme.colors.textMuted
+    local option = self.option or {}
+    local selected = self.owner.selectedId == option.id
+    local border = selected and themeColor("accent",
+        { r = 0.2, g = 0.72, b = 0.82, a = 1 })
+        or themeColor("border", { r = 0.23, g = 0.28, b = 0.32, a = 0.9 })
+    local textTint = option.enabled
+        and themeColor("text", { r = 0.91, g = 0.94, b = 0.96, a = 1 })
+        or themeColor("textMuted", { r = 0.58, g = 0.65, b = 0.7, a = 1 })
+    local warning = themeColor("warning", { r = 0.94, g = 0.7, b = 0.27, a = 1 })
+    local muted = themeColor("textMuted", { r = 0.58, g = 0.65, b = 0.7, a = 1 })
+    local statusTint = option.enabled
+        and themeColor("success", { r = 0.39, g = 0.78, b = 0.48, a = 1 })
+        or themeColor("danger", { r = 0.94, g = 0.36, b = 0.31, a = 1 })
+    local padding = 10
+    local contentWidth = math.max(1, self.width - padding * 2)
+    local titleFont, metaFont = UIFont.Small, UIFont.Small
+    local titleHeight, lineHeight = fontHeight(titleFont),
+        math.max(14, fontHeight(metaFont))
+    -- Give the native build image a real visual area. Keep the metadata below
+    -- it so tall object textures never collide with the title or requirements.
+    local imageHeight = math.max(82, math.min(136,
+        math.floor(self.height * 0.48)))
+    local imageY, textY = 6, imageHeight + 8
+
     self:drawRect(0, 0, self.width, self.height, selected and 0.92 or 0.78,
         0.045, 0.06, 0.07)
     self:drawRectBorder(0, 0, self.width, self.height,
         border.a or 1, border.r, border.g, border.b)
-    if self.option.texture then
-        self:drawTextureScaledAspect(self.option.texture, 12, 12,
-            self.width - 24, 150, self.option.enabled and 1 or 0.42,
-            1, 1, 1)
+    ImageResolver.Draw(self, option.texture, padding, imageY,
+        contentWidth, imageHeight, option.enabled and 1 or 0.42)
+
+    local titleLines = wrapText(option.name, titleFont, contentWidth, 2)
+    for index, line in ipairs(titleLines) do
+        drawCentered(self, line, textY + (index - 1) * titleHeight,
+            titleFont, textTint, self.width / 2, contentWidth)
     end
-    self:drawTextCentre(self.option.name, self.width / 2, 170,
-        text.r, text.g, text.b, text.a or 1, UIFont.Medium)
-    self:drawTextCentre(self.option.costText, self.width / 2, 195,
-        Theme.colors.warning.r, Theme.colors.warning.g,
-        Theme.colors.warning.b, 1, UIFont.Small)
-    self:drawTextCentre(self.option.sourceText, self.width / 2, 214,
-        Theme.colors.textMuted.r, Theme.colors.textMuted.g,
-        Theme.colors.textMuted.b, 1, UIFont.Small)
-    self:drawTextCentre(self.option.status, self.width / 2, 237,
-        self.option.enabled and Theme.colors.success.r or Theme.colors.danger.r,
-        self.option.enabled and Theme.colors.success.g or Theme.colors.danger.g,
-        self.option.enabled and Theme.colors.success.b or Theme.colors.danger.b,
-        1, UIFont.Small)
+    textY = textY + math.max(1, #titleLines) * titleHeight + 3
+    drawCentered(self, option.costText, textY, metaFont, warning,
+        self.width / 2, contentWidth)
+    textY = textY + lineHeight
+    drawCentered(self, option.sourceText, textY, metaFont, muted,
+        self.width / 2, contentWidth)
+    textY = textY + lineHeight
+    drawCentered(self, option.skillText, textY, metaFont, muted,
+        self.width / 2, contentWidth)
+    textY = textY + lineHeight
+    drawCentered(self, option.status, textY, metaFont, statusTint,
+        self.width / 2, contentWidth)
 end
 
 function FacilityCard:new(x, y, width, height, owner, option)
@@ -115,7 +313,15 @@ function ISPNCFacilityBuildWindow:createChildren()
     self.categoryButtons = {}
     local available = {}
     for _, option in ipairs(self.options) do available[option.category] = true end
+    local categoryOrder = {}
     for _, category in ipairs(CATEGORY_ORDER) do
+        categoryOrder[#categoryOrder + 1] = category
+    end
+    for _, category in ipairs(PNC.WorkDefinitions
+        and PNC.WorkDefinitions.CRAFTING_SKILL_ORDER or {}) do
+        categoryOrder[#categoryOrder + 1] = category
+    end
+    for _, category in ipairs(categoryOrder) do
         if available[category] then
             local button = UI.CreateButton(self, {
                 id = "category:" .. category,
@@ -168,16 +374,28 @@ end
 
 function ISPNCFacilityBuildWindow:onResponsiveLayout()
     local rect = self:getContentRect({ top = 18, bottom = 12 })
-    local gap = Layout.Pixels(12, self.uiScale)
+    local gap = Layout.Pixels(10, self.uiScale)
     local buttonHeight = Layout.Pixels(30, self.uiScale)
     local categoryHeight = Layout.Pixels(28, self.uiScale)
+    local minimumCategoryWidth = Layout.Pixels(108, self.uiScale)
+    local categoryColumns = math.max(1, math.floor((rect.width + gap)
+        / (minimumCategoryWidth + gap)))
+    categoryColumns = math.max(1, math.min(#self.categoryButtons,
+        categoryColumns))
     local categoryWidth = math.floor((rect.width
-        - gap * math.max(0, #self.categoryButtons - 1))
-        / math.max(1, #self.categoryButtons))
-    local categoryX = rect.x
-    for _, button in ipairs(self.categoryButtons) do
-        Layout.SetBounds(button, categoryX, rect.y, categoryWidth, categoryHeight)
-        categoryX = categoryX + categoryWidth + gap
+        - gap * math.max(0, categoryColumns - 1))
+        / math.max(1, categoryColumns))
+    local categoryRows = math.max(1, math.ceil(#self.categoryButtons
+        / math.max(1, categoryColumns)))
+    local categoryAreaHeight = categoryRows * categoryHeight
+        + gap * math.max(0, categoryRows - 1)
+    for index, button in ipairs(self.categoryButtons) do
+        local column = (index - 1) % categoryColumns
+        local row = math.floor((index - 1) / categoryColumns)
+        Layout.SetBounds(button,
+            rect.x + column * (categoryWidth + gap),
+            rect.y + row * (categoryHeight + gap),
+            categoryWidth, categoryHeight)
     end
     local categoryCards, visible = {}, {}
     for _, card in ipairs(self.cards) do
@@ -197,8 +415,9 @@ function ISPNCFacilityBuildWindow:onResponsiveLayout()
         card:setVisible(shown)
         if shown then visible[#visible + 1] = card end
     end
-    local cardsY = rect.y + categoryHeight + gap
-    local cardsHeight = math.max(250, rect.height - categoryHeight - 115)
+    local cardsY = rect.y + categoryAreaHeight + gap
+    local cardsHeight = math.max(220, math.min(330,
+        rect.height - categoryAreaHeight - 115))
     local columns = math.min(4, math.max(1, #visible))
     local width = math.floor((rect.width - gap * (columns - 1)) / columns)
     for index, card in ipairs(visible) do
@@ -273,6 +492,7 @@ function ISPNCFacilityBuildWindow:setSelected(id)
 end
 
 function ISPNCFacilityBuildWindow:prerender()
+    self:refreshFromSnapshot()
     PsychopatzWindow.prerender(self)
     local option = self.selectedOption
     if option and self.descriptionY then
@@ -295,10 +515,13 @@ function ISPNCFacilityBuildWindow:onAction(button)
         if canUseDebug() and self.selectedOption then
             local client = PNC.Client
             if client and client.RequestDebugFacilityMaterials then
-                client.RequestDebugFacilityMaterials({
+                local ok = client.RequestDebugFacilityMaterials({
                     definitionId = self.selectedOption.id,
                 })
-                self:close()
+                if ok ~= false then
+                    self.debugMaterialsPending = true
+                    self.debugMaterialsButton:setEnable(false)
+                end
             end
         end
         return
@@ -306,14 +529,21 @@ function ISPNCFacilityBuildWindow:onAction(button)
     if button.internal == "build" and self.selectedOption
         and self.selectedOption.enabled
     then
-        if self.onConfirm then self.onConfirm(self.selectedOption.id) end
+        local started = self.onConfirm
+            and self.onConfirm(self.selectedOption.id)
+        if started == false then return end
+        self:close(started ~= true)
+        return
     end
     self:close()
 end
 
-function ISPNCFacilityBuildWindow:close()
+function ISPNCFacilityBuildWindow:close(restorePrevious)
     self:setVisible(false); self:removeFromUIManager()
     if BuildUI.instance == self then BuildUI.instance = nil end
+    if restorePrevious ~= false and BuildUI.RestorePrevious then
+        BuildUI.RestorePrevious()
+    end
 end
 
 function ISPNCFacilityBuildWindow:new(x, y, width, height, options)
@@ -322,6 +552,12 @@ function ISPNCFacilityBuildWindow:new(x, y, width, height, options)
     object.options = options.options or {}
     object.onConfirm = options.onConfirm
     object.focusDefinitionId = options.focusDefinitionId
+    object.settlement = options.settlement
+    object.storage = options.storage
+    object.research = options.research
+    object.snapshotRevision = tonumber(options.snapshotRevision) or 0
+    object.debugMaterialsPending = false
+    object.openArgs = options.openArgs
     return object
 end
 
@@ -346,6 +582,15 @@ local function stockpileState(settlement)
     return exists, built
 end
 
+local function facilitySkillProfile(definition)
+    local work = PNC.WorkDefinitions
+    local profile = work and work.GetStationSkillProfile
+        and work.GetStationSkillProfile(definition and definition.stationId)
+        or nil
+    if type(profile) == "table" and #profile > 0 then return profile end
+    return definition and definition.specializationSkills or {}
+end
+
 local function buildOptions(settlement, storage, research)
     local values = {}
     local ids = {}
@@ -355,19 +600,28 @@ local function buildOptions(settlement, storage, research)
     for _, id in ipairs(ids) do
         local definition = PNC.FacilityDefinitions.Get(id)
         local level = PNC.FacilityDefinitions.GetLevel(id, 1)
+        if definition and definition.legacyOnly ~= true then
+        local buildDescriptor = buildDescriptorFor(definition)
+        local skillProfile = facilitySkillProfile(definition)
+        local primarySkill = skillProfile[1]
+        local skillLabel = primarySkill
+            and PNC.WorkDefinitions.GetProductionSkillLabel(primarySkill)
+            or tr("UI_PNC_Facility_SkillOther", "Other production")
         local costParts, sourceParts = {}, {}
         local affordable = true
-        for _, cost in ipairs(recipeFor(definition)) do
+        local costs = recipeFor(definition, buildDescriptor)
+        for _, cost in ipairs(costs) do
             local required = math.max(0, math.floor(tonumber(
                 cost.amount or cost.quantity) or 0))
-            local stored = stockpileCount(storage, cost.fullType)
+            local types = costTypes(cost)
+            local stored = stockpileCount(storage, types)
             local fromPlayer = definition.bootstrapFromPlayer == true
-                and playerCount(cost.fullType) or 0
+                and playerCount(types[1]) or 0
             local available = definition.bootstrapFromPlayer == true
                 and fromPlayer or stored
             if available < required then affordable = false end
             costParts[#costParts + 1] = tostring(required) .. " "
-                .. tostring(cost.fullType) .. " (" .. tostring(available)
+                .. costLabel(cost) .. " (" .. tostring(available)
                 .. " " .. tr("UI_PNC_Facility_MaterialTotal", "total") .. ")"
             sourceParts[#sourceParts + 1] = tostring(available) .. " "
                 .. (definition.bootstrapFromPlayer == true
@@ -378,12 +632,17 @@ local function buildOptions(settlement, storage, research)
             >= (tonumber(level and level.requiredHQLevel) or 1)
         local technologyReady = technologyKnown(research,
             definition.requiredTechnology)
+        local recipeReady = definition.directWorkstation ~= true
+            or (buildDescriptor ~= nil and buildDescriptor.nativeOnly ~= true)
         local prerequisiteReady = id == "stockpile" or stockpileBuilt
         local singletonReady = id ~= "stockpile" or not stockpileExists
         local status = not singletonReady and tr(
                 "UI_PNC_Facility_StockpileExists", "ALREADY BUILT OR PLANNED")
             or not prerequisiteReady and tr(
                 "UI_PNC_Facility_StockpileRequired", "BUILD STOCKPILE FIRST")
+            or not recipeReady and tr(
+                "UI_PNC_Facility_BuildRecipeUnavailable",
+                "BUILD RECIPE UNAVAILABLE")
             or hqReady and affordable and technologyReady
             and tr("UI_PNC_Facility_Available", "AVAILABLE")
             or not hqReady and tr("UI_PNC_Facility_RequiresHQ", "HQ LEVEL TOO LOW")
@@ -392,28 +651,145 @@ local function buildOptions(settlement, storage, research)
             or tr("UI_PNC_Facility_MissingMaterials", "NEED MORE MATERIALS")
         values[#values + 1] = {
             id = id,
-            category = tostring(definition.category or "production"),
-            name = tr(definition.displayNameKey, id),
+            category = productionCategory(definition, buildDescriptor,
+                primarySkill),
+            name = buildDescriptor and buildDescriptor.displayName
+                or tr(definition.displayNameKey, id),
             description = tr(definition.descriptionKey, id),
-            texture = getTexture and getTexture(definition.iconPath) or nil,
+            texture = descriptorTexture(buildDescriptor)
+                or getTexture and definition.iconPath
+                and getTexture(definition.iconPath) or nil,
             costText = table.concat(costParts, " | "),
             sourceText = table.concat(sourceParts, " | "),
-            enabled = hqReady and affordable and technologyReady
+            skillText = tr("UI_PNC_Facility_Skill", "SKILL") .. ": "
+                .. skillLabel,
+            productionSkillId = primarySkill,
+            productionSkills = skillProfile,
+            buildRecipe = buildDescriptor,
+            buildRecipeObjectInfoName = buildDescriptor
+                and buildDescriptor.objectInfoName or nil,
+            buildMaterials = costs,
+            requiredTechnology = definition.requiredTechnology,
+            directWorkstation = definition.directWorkstation == true,
+            enabled = recipeReady and hqReady and affordable and technologyReady
                 and prerequisiteReady and singletonReady,
             status = status,
         }
+        end
     end
+    table.sort(values, function(left, right)
+        local leftSkill = PNC.WorkDefinitions and PNC.WorkDefinitions.CRAFTING_SKILL_ORDER
+            or {}
+        local function rank(option)
+            for index, skill in ipairs(leftSkill) do
+                if skill == option.productionSkillId then return index end
+            end
+            return #leftSkill + 1
+        end
+        local leftRank, rightRank = rank(left), rank(right)
+        if leftRank ~= rightRank then return leftRank < rightRank end
+        if tostring(left.category) ~= tostring(right.category) then
+            return tostring(left.category) < tostring(right.category)
+        end
+        return tostring(left.name) < tostring(right.name)
+    end)
     return values
 end
 
 BuildUI.BuildOptions = buildOptions
 
+function ISPNCFacilityBuildWindow:refreshFromSnapshot()
+    local client = PNC.ColonyManagementClient
+    if not client or type(client.ReadSnapshot) ~= "function" then return end
+    local update = client.ReadSnapshot()
+    local revision = tonumber(update and update.revision) or 0
+    if revision <= (tonumber(self.snapshotRevision) or 0) then return end
+    local snapshot = update.snapshot or {}
+    local settlement = snapshot.settlement
+    if not settlement then return end
+    if self.settlement and self.settlement.id
+        and tostring(self.settlement.id) ~= tostring(settlement.id)
+    then return end
+
+    local selectedId = self.selectedId
+    local options = buildOptions(settlement,
+        snapshot.storage or self.storage, snapshot.research or self.research)
+    local byId = {}
+    for _, option in ipairs(options) do byId[option.id] = option end
+    for _, card in ipairs(self.cards or {}) do
+        local id = card.option and card.option.id
+        card.option = id and byId[id] or card.option
+    end
+    self.options = options
+    self.settlement = settlement
+    self.storage = snapshot.storage or self.storage
+    self.research = snapshot.research or self.research
+    if BuildUI.lastOpenArgs then
+        BuildUI.lastOpenArgs.settlement = self.settlement
+        BuildUI.lastOpenArgs.storage = self.storage
+        BuildUI.lastOpenArgs.research = self.research
+    end
+    self.snapshotRevision = revision
+    self.debugMaterialsPending = false
+    self:setSelected(selectedId)
+    self:requestResponsiveLayout(true)
+end
+
+function BuildUI.RestorePrevious()
+    local previous = BuildUI.previousWindow
+    local shouldRestore = BuildUI.previousWindowWasVisible
+    BuildUI.previousWindow = nil
+    BuildUI.previousWindowWasVisible = false
+    if not previous or not shouldRestore then return end
+    if type(previous.addToUIManager) == "function" then
+        previous:addToUIManager()
+    end
+    if type(previous.setVisible) == "function" then
+        previous:setVisible(true)
+    end
+    if type(previous.bringToTop) == "function" then
+        previous:bringToTop()
+    end
+end
+
+function BuildUI.Reopen()
+    local args = BuildUI.lastOpenArgs
+    if not args then return nil end
+    return BuildUI.Open(args.settlement, args.onConfirm, args.storage,
+        args.research, args.focusDefinitionId)
+end
+
 function BuildUI.Open(settlement, onConfirm, storage, research,
     focusDefinitionId)
     if not settlement then return nil end
-    if BuildUI.instance then BuildUI.instance:close() end
+    if BuildUI.instance then BuildUI.instance:close(false) end
+    if not BuildUI.previousWindow then
+        local colonyUI = PNC.ColonyManagementUI
+        local previous = colonyUI and colonyUI.instance or nil
+        if previous and previous ~= BuildUI.instance then
+            BuildUI.previousWindow = previous
+            BuildUI.previousWindowWasVisible = type(previous.isVisible)
+                ~= "function" or previous:isVisible()
+            if type(previous.setVisible) == "function" then
+                previous:setVisible(false)
+            end
+            if type(previous.removeFromUIManager) == "function" then
+                previous:removeFromUIManager()
+            end
+        end
+    end
+    BuildUI.lastOpenArgs = {
+        settlement = settlement, onConfirm = onConfirm,
+        storage = storage, research = research,
+        focusDefinitionId = focusDefinitionId,
+    }
     local options = buildOptions(settlement, storage, research)
-    local width, height = 690, 430
+    local screenWidth = getCore():getScreenWidth()
+    local screenHeight = getCore():getScreenHeight()
+    local width = math.min(1180, math.max(760, screenWidth - 140))
+    local height = math.min(720, math.max(540, screenHeight - 160))
+    width = math.min(width, math.max(520, screenWidth - 40))
+    height = math.min(height, math.max(400, screenHeight - 40))
     local window = ISPNCFacilityBuildWindow:new(
         math.floor((getCore():getScreenWidth() - width) / 2),
         math.floor((getCore():getScreenHeight() - height) / 2),
@@ -421,6 +797,10 @@ function BuildUI.Open(settlement, onConfirm, storage, research,
             title = tr("UI_PNC_Facility_BuildTitle", "BUILD A BUILDING"),
             options = options, onConfirm = onConfirm,
             focusDefinitionId = focusDefinitionId, resizable = false,
+            settlement = settlement, storage = storage, research = research,
+            snapshotRevision = PNC.Network and PNC.Network.ClientState
+                and PNC.Network.ClientState.colonyManagementRevision or 0,
+            openArgs = BuildUI.lastOpenArgs,
         })
     window:initialise(); window:instantiate(); window:addToUIManager()
     window:setVisible(true)

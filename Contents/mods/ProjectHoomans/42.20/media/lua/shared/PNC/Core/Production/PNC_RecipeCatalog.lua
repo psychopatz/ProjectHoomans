@@ -7,6 +7,17 @@ PNC.RecipeCatalog = PNC.RecipeCatalog or {}
 
 local Catalog = PNC.RecipeCatalog
 
+local SKILL_ALIASES = {
+    MetalWelding = "Welding",
+    Metalwork = "Welding",
+}
+
+local function normalizeSkillId(value)
+    local id = tostring(value or "")
+    if id == "" then return nil end
+    return SKILL_ALIASES[id] or id
+end
+
 Catalog.ByKey = Catalog.ByKey or {}
 Catalog.ByResult = Catalog.ByResult or {}
 Catalog.ByIngredient = Catalog.ByIngredient or {}
@@ -95,6 +106,7 @@ local function normalizeSkills(recipe)
         if reason then return nil, reason end
         local perk = call(required, "getPerk")
         local id = perk and (call(perk, "getId") or call(perk, "getName"))
+        id = normalizeSkillId(id)
         local level = tonumber(call(required, "getLevel"))
         if id and level then
             output[#output + 1] = { skillId = tostring(id), level = level }
@@ -103,6 +115,55 @@ local function normalizeSkills(recipe)
     table.sort(output, function(left, right)
         return left.skillId < right.skillId
     end)
+    return output
+end
+
+local function normalizeXPAwards(recipe)
+    local output = {}
+    local rawCount = call(recipe, "getXPAwardCount")
+    local count = tonumber(rawCount) or 0
+    for index = 0, count - 1 do
+        local award = call(recipe, "getXPAward", index)
+        local perk = call(award, "getPerk")
+        local id = normalizeSkillId(perk
+            and (call(perk, "getId") or call(perk, "getName")))
+        local rawAmount = call(award, "getAmount")
+        local amount = tonumber(rawAmount)
+        if id and amount and amount > 0 then
+            output[#output + 1] = { skillId = id, amount = amount }
+        end
+    end
+    table.sort(output, function(left, right)
+        if left.amount ~= right.amount then return left.amount > right.amount end
+        return left.skillId < right.skillId
+    end)
+    return output
+end
+
+local function primaryProductionSkill(xpAwards, requiredSkills)
+    if type(xpAwards) == "table" and xpAwards[1] then
+        return xpAwards[1].skillId
+    end
+    if type(requiredSkills) == "table" and requiredSkills[1] then
+        return requiredSkills[1].skillId
+    end
+    return nil
+end
+
+local function normalizeTags(recipe)
+    -- CraftRecipe tags are runtime Java collections. Keep only primitive,
+    -- lower-case values so the recipe descriptor remains safe to cache and
+    -- the station resolver does not retain engine objects.
+    local values = listValues(call(recipe, "getTags")) or {}
+    local output, seen = {}, {}
+    for index = 1, #values do
+        local tag = string.lower(tostring(values[index] or ""))
+        if tag ~= "" and not seen[tag] then
+            seen[tag] = true
+            output[#output + 1] = tag
+        end
+    end
+    table.sort(output)
     return output
 end
 
@@ -139,6 +200,8 @@ local function normalizeRecipe(recipe)
     local skills
     skills, reason = normalizeSkills(recipe)
     if not skills then return nil, reason or "SKILLS_UNAVAILABLE" end
+    local tags = normalizeTags(recipe)
+    local xpAwards = normalizeXPAwards(recipe)
     local category = tostring(call(recipe, "getCategory") or "")
     local moduleName = tostring(call(recipe, "getModuleName")
         or string.match(key, "^([^.]+)%.") or "")
@@ -154,6 +217,9 @@ local function normalizeRecipe(recipe)
         resultFullType = normalizedOutputs[1].itemTypes[1],
         resultQuantity = normalizedOutputs[1].amount,
         requiredSkills = skills,
+        xpAwards = xpAwards,
+        productionSkillId = primaryProductionSkill(xpAwards, skills),
+        tags = tags,
         craftTime = tonumber(call(recipe, "getTime")) or 100,
         needToBeLearn = call(recipe, "needToBeLearn") == true,
         supported = true,

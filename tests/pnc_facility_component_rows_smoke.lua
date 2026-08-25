@@ -121,6 +121,23 @@ T.truthy(rows[1].componentAction.kind == "open_stockpile",
     "remote walkie-talkie view must remain accessible")
 T.truthy(rows[1].detail == "1.0 / 200.0 | 199.0 FREE | REMOTE VIEW",
     "stockpile summary is not rounded or remote state is unclear")
+
+PNC.FacilityDefinitions.GetLevel = function()
+    return { componentLimits = {
+        ["work.zone"] = { kind = "region", minCount = 1, maxCount = 1,
+            minTotalTiles = 1, maxTotalTiles = 1 },
+    } }
+end
+rows = Browser.BuildComponentRows({
+    definitionId = "forge", level = 1,
+    components = {{ id = "zone:1", kind = "region", role = "work.zone",
+        tileCount = 1 }},
+})
+T.equal(#rows, 2, "facility inspector exposes its required work zone")
+T.equal(rows[2].componentAction.kind, "region",
+    "work zone remains editable through the region selector")
+T.equal(rows[2].secondaryAction, nil,
+    "required work zone cannot be deleted from the component row")
 T.finish("pnc_facility_component_rows_smoke")
 
 T.finish("pnc_facility_component_rows_smoke")

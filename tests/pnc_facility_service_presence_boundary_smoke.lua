@@ -60,7 +60,7 @@ for name, _ in pairs(publicFunctions) do
     T.equal(type(PNC.FacilityService[name]), "function",
         "entry point should preserve FacilityService." .. name)
 end
-T.equal(publicCount, 18, "public function declaration count")
+T.equal(publicCount, 20, "public function declaration count")
 
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil

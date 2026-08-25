@@ -31,6 +31,20 @@ function Service.Queue(player, args)
     if not H.TargetValid(context.base, blueprint) then
         return nil, "BUILD_TARGET_OUTSIDE_BASE"
     end
+    local nativeFacility = args.facilityDefinitionId ~= nil
+    if nativeFacility then
+        if tostring(args.facilityBaseId or context.base.id)
+            ~= tostring(context.base.id)
+        then
+            return nil, "FACILITY_NATIVE_BUILD_BASE_MISMATCH"
+        end
+        local definition = PNC.FacilityDefinitions
+            and PNC.FacilityDefinitions.Get
+            and PNC.FacilityDefinitions.Get(args.facilityDefinitionId)
+        if not definition or definition.directWorkstation ~= true then
+            return nil, "FACILITY_NATIVE_BUILD_INVALID"
+        end
+    end
     Repository.Load()
     if H.DuplicateAt(context.colony.id, blueprint) then
         return nil, "BUILD_TARGET_ALREADY_QUEUED"
@@ -41,6 +55,30 @@ function Service.Queue(player, args)
         context.storage.id, requirements,
         "blueprint:" .. tostring(blueprint.objectInfoName))
     if not reservation then return nil, reason or "MISSING_MATERIALS" end
+    local preparedFacility
+    if nativeFacility then
+        local z = math.floor(tonumber(blueprint.z) or 0)
+        local y = math.floor(tonumber(blueprint.y) or 0)
+        local x = math.floor(tonumber(blueprint.x) or 0)
+        local region = { levels = { [z] = { rows = { [y] = { x, x } } } } }
+        local nativeResult = PNC.FacilityService
+            and PNC.FacilityService.Create
+            and PNC.FacilityService.Create(player, {
+                baseId = args.facilityBaseId or context.base.id,
+                expectedRevision = args.facilityExpectedRevision
+                    or context.base.revision,
+                definitionId = args.facilityDefinitionId,
+                nativeBuild = true,
+                component = { kind = "region", role = "facility.footprint",
+                    region = region },
+            })
+        if not nativeResult or nativeResult.ok ~= true then
+            PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
+            return nil, nativeResult and nativeResult.reason
+                or "FACILITY_NATIVE_BUILD_FAILED"
+        end
+        preparedFacility = nativeResult.facility
+    end
     local payload = {
         mode = "object_build",
         materialKind = "build_object",
@@ -50,6 +88,10 @@ function Service.Queue(player, args)
         requesterOnlineID = player and player.getOnlineID
             and tonumber(player:getOnlineID()) or nil,
     }
+    if preparedFacility then
+        payload.facilityId = preparedFacility.id
+        payload.facilityDefinitionId = args.facilityDefinitionId
+    end
     payload = PNC.WorkInputService.Bind(payload, context.storage.id,
         reservation.id, "building_materials")
     local order
@@ -62,7 +104,23 @@ function Service.Queue(player, args)
     })
     if not order then
         PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
+        if preparedFacility and PNC.FacilityService.RemoveNativeWorkstation then
+            PNC.FacilityService.RemoveNativeWorkstation(preparedFacility.id)
+        end
         return nil, reason or "BUILD_QUEUE_FAILED"
+    end
+    if preparedFacility then
+        preparedFacility.constructionWorkOrderId = order.id
+        preparedFacility.constructionState = "UNDER_CONSTRUCTION"
+        local serviceInternal = PNC.FacilityService.Internal
+        if serviceInternal and serviceInternal.touch then
+            serviceInternal.touch(context.base, preparedFacility)
+        elseif PNC.SettlementRepository then
+            PNC.SettlementRepository.MarkDirty()
+        end
+        if PNC.FacilityService.RebuildIndexes then
+            PNC.FacilityService.RebuildIndexes()
+        end
     end
     return order
 end
@@ -108,4 +166,3 @@ function Service.DebugGrantMaterials(player, args)
         storageDetails = depositDetails,
     }, "MATERIALS_GRANTED"
 end
-

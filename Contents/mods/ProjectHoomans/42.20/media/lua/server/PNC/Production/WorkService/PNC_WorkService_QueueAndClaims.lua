@@ -34,6 +34,10 @@ function Service.Commands.Queue(spec)
         baseId = tostring(spec.baseId or ""),
         recipeId = tonumber(spec.recipeId),
         recipeRevision = tonumber(spec.recipeRevision),
+        requiredStationId = spec.requiredStationId
+            and tostring(spec.requiredStationId) or nil,
+        productionSkillId = spec.productionSkillId
+            and tostring(spec.productionSkillId) or nil,
         funded = spec.funded == true,
         projectLifecycle = spec.projectLifecycle,
         quantity = math.max(1, math.floor(tonumber(spec.quantity) or 1)),

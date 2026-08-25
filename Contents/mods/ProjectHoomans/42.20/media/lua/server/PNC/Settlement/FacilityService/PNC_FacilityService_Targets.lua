@@ -41,6 +41,25 @@ function Service.ResolveWorkTarget(facilityOrId)
         componentIds[#componentIds + 1] = componentId
     end
     table.sort(componentIds)
+    -- The labor spot is independent from the physical workstation object.
+    -- Prefer it for all facility work so editing the spot changes where the
+    -- NPC stands without moving or reconstructing the station itself.
+    for _, componentId in ipairs(componentIds) do
+        local component = Repository.GetComponent(componentId)
+        if component and component.role == "work.zone" then
+            if component.kind == "anchor" then
+                return { x = component.x, y = component.y, z = component.z,
+                    componentId = component.id, role = component.role }
+            end
+            if component.kind == "region" and component.region then
+                local point = pointFromRegion(component.region)
+                if point then
+                    point.componentId, point.role = component.id, component.role
+                    return point
+                end
+            end
+        end
+    end
     for _, componentId in ipairs(componentIds) do
         local component = Repository.GetComponent(componentId)
         if component and component.kind == "anchor" then

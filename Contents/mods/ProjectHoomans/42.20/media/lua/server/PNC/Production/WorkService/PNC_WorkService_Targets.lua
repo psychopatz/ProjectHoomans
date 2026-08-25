@@ -52,7 +52,8 @@ local function acquireWorkTarget(order, worker, live)
     local capability = Definitions.CAPABILITY_BY_OPERATION[order.operation]
     return PNC.FacilityService.AcquireActivity(order.baseId, worker.id,
         capability, { abstract = live == nil, ttlMs = 30000,
-            workOrderId = order.id })
+            workOrderId = order.id,
+            stationId = order.requiredStationId })
 end
 
 local function claimStation(order, worker)

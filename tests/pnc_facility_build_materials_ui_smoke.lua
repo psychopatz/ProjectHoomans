@@ -2,6 +2,8 @@ local T = require "tests/support/test"
 T.addPackagePaths({
     { "ProjectHoomans", "client" },
     { "ProjectHoomans", "shared" },
+    { "PsychopatzCore", "client" },
+    { "PsychopatzCore", "shared" },
 })
 
 local function derive(self)
@@ -76,4 +78,68 @@ options = BuildUI.BuildOptions(settlement, {
     rows = {{ fullType = "Base.Money", quantity = 1 }},
 }, { learnedTechnologyIds = { "facility:workshop" } })
 T.truthy(options[3].enabled, "researched workshop becomes available")
+
+local requested
+local closed = false
+PNC.Client = {
+    CanUseDebug = function() return true end,
+    RequestDebugFacilityMaterials = function(args)
+        requested = args
+        return true
+    end,
+}
+local actionWindow = setmetatable({
+    selectedOption = { id = "forge" },
+    debugMaterialsButton = { setEnable = function() end },
+}, { __index = ISPNCFacilityBuildWindow })
+function actionWindow:close() closed = true end
+ISPNCFacilityBuildWindow.onAction(actionWindow, {
+    internal = "debug_materials",
+})
+T.equal(requested.definitionId, "forge",
+    "facility debug button sends the selected definition")
+T.falsy(closed, "facility debug button keeps the modal open")
+
+local buildStarted, restorePrevious
+local buildActionWindow = setmetatable({
+    selectedOption = { id = "forge", enabled = true },
+    onConfirm = function(id)
+        buildStarted = id
+        return true
+    end,
+}, { __index = ISPNCFacilityBuildWindow })
+function buildActionWindow:close(restore)
+    restorePrevious = restore
+end
+ISPNCFacilityBuildWindow.onAction(buildActionWindow, { internal = "build" })
+T.equal(buildStarted, "forge", "build action invokes the placement callback")
+T.equal(restorePrevious, false,
+    "placement-starting build closes without restoring the hidden colony UI")
+
+local refreshed = BuildUI.BuildOptions(settlement, {
+    rows = {},
+})
+local refreshWindow = setmetatable({
+    options = refreshed,
+    selectedId = refreshed[1] and refreshed[1].id,
+    selectedOption = refreshed[1],
+    settlement = settlement,
+    snapshotRevision = 1,
+    cards = {{ option = refreshed[1] }},
+}, { __index = ISPNCFacilityBuildWindow })
+function refreshWindow:requestResponsiveLayout() end
+PNC.ColonyManagementClient = {
+    ReadSnapshot = function()
+        return {
+            revision = 2,
+            snapshot = {
+                settlement = settlement,
+                storage = { rows = {{ fullType = "Base.Money", quantity = 1 }} },
+            },
+        }
+    end,
+}
+refreshWindow:refreshFromSnapshot()
+T.truthy(refreshWindow.options[1].enabled,
+    "facility modal refreshes affordability from the new snapshot")
 T.finish("pnc_facility_build_materials_ui_smoke")

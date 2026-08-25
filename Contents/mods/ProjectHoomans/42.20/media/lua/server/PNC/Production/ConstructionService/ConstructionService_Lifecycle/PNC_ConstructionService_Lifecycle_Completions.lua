@@ -11,6 +11,59 @@ local Internal = Service.Internal
 Internal.LifecycleInternal = Internal.LifecycleInternal or {}
 local H = Internal.LifecycleInternal
 
+local function workstationSprite(definition, placement)
+    local sprite = placement and placement.sprite or definition and definition.sprite
+    if sprite and tostring(sprite) ~= "" then return tostring(sprite) end
+    local manager = SpriteConfigManager
+    if manager and type(manager.GetObjectInfo) == "function"
+        and definition and definition.entityScript
+    then
+        local ok, info = pcall(manager.GetObjectInfo,
+            definition.entityScript)
+        if ok and info and type(info.getMainSpriteNameUI) == "function" then
+            local spriteOk, value = pcall(info.getMainSpriteNameUI, info)
+            if spriteOk and value and tostring(value) ~= "" then
+                return tostring(value)
+            end
+        end
+    end
+    return nil
+end
+
+local function placeDirectWorkstation(facility)
+    local placement = facility and facility.workstationPlacement or nil
+    if not placement or placement.placed == true then return true end
+    local definition = PNC.FacilityDefinitions
+        and PNC.FacilityDefinitions.Get
+        and PNC.FacilityDefinitions.Get(facility.definitionId) or nil
+    local script = placement.entityScript
+        or definition and definition.entityScript
+    if not script then return false, "WORKSTATION_ENTITY_SCRIPT_MISSING" end
+    if type(getCell) ~= "function" then
+        return false, "WORKSTATION_WORLD_UNAVAILABLE"
+    end
+    local cellOk, cell = pcall(getCell)
+    local square = cellOk and cell and cell.getGridSquare
+        and cell:getGridSquare(tonumber(placement.x) or 0,
+            tonumber(placement.y) or 0, tonumber(placement.z) or 0) or nil
+    if not square or type(square.addWorkstationEntity) ~= "function" then
+        return false, "WORKSTATION_WORLD_UNAVAILABLE"
+    end
+    local sprite = workstationSprite(definition, placement)
+    if not sprite then return false, "WORKSTATION_SPRITE_UNAVAILABLE" end
+    local ok, entity = pcall(square.addWorkstationEntity, square, script, sprite)
+    if not ok or not entity then
+        return false, "WORKSTATION_WORLD_PLACEMENT_FAILED"
+    end
+    placement.placed = true
+    placement.sprite = sprite
+    placement.entityScript = script
+    PNC.SettlementRepository.MarkDirty()
+    return true
+end
+
+H.PlaceDirectWorkstation = placeDirectWorkstation
+
 function H.CompleteBuild(order)
     local ok, reason = PNC.WorkInputService.Commit(order,
         "construction_material_consumption")
@@ -18,6 +71,13 @@ function H.CompleteBuild(order)
     local facility = PNC.SettlementRepository.GetFacility(
         order.payload and order.payload.facilityId)
     if not facility then return false, "FACILITY_NOT_FOUND" end
+    local definition = PNC.FacilityDefinitions
+        and PNC.FacilityDefinitions.Get
+        and PNC.FacilityDefinitions.Get(facility.definitionId) or nil
+    if definition and definition.directWorkstation == true then
+        local placed, placementReason = placeDirectWorkstation(facility)
+        if not placed then return false, placementReason end
+    end
     facility.constructionState = "BUILT"
     facility.constructionWorkOrderId = nil
     PNC.FacilityService.RefreshState(facility)
@@ -81,4 +141,3 @@ function H.CompleteReconstruct(order)
 end
 
 return Service
-

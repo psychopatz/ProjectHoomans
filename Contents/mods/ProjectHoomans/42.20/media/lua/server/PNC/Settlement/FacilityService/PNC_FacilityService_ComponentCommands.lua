@@ -37,6 +37,17 @@ function Service.SetComponent(player, args)
     if existing and existing.facilityId ~= facility.id then
         return { ok = false, reason = "INVALID_COMPONENT" }
     end
+    if existing and existing.role ~= input.role then
+        return { ok = false, reason = "INVALID_COMPONENT" }
+    end
+    if existing and existing.managedByFacility == true then
+        return { ok = false, reason = "FACILITY_COMPONENT_MANAGED" }
+    end
+    if existing and existing.role == "work.zone"
+        and (input.kind ~= "region" or input.role ~= "work.zone")
+    then
+        return { ok = false, reason = "FACILITY_WORK_ZONE_REQUIRED" }
+    end
     input.id = tostring(input.id or PNC.Core.GenerateID("component"))
     local check = Validation.NormalizeComponent(base, facility, input)
     if not check.ok then return check end
@@ -88,6 +99,9 @@ function Service.ReplaceAnchorRole(player, args)
     for componentId, present in pairs(facility.componentIds or {}) do
         local component = present == true and Repository.GetComponent(componentId)
         if component and component.role == role then
+            if component.managedByFacility == true then
+                return { ok = false, reason = "FACILITY_COMPONENT_MANAGED" }
+            end
             old[#old + 1] = component
         end
     end

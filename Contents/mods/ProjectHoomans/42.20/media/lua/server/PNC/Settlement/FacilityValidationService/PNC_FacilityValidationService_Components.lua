@@ -9,6 +9,33 @@ local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Farming = PNC.Farming
 local H = Validation.Internal
 
+local function regionTouchesFacility(facility, region)
+    local footprint = facility and facility.constructionRegion
+    if not footprint or not region then return false end
+    if GridRegion.containsRegion(footprint, region) then return true end
+    local normalized = GridRegion.normalize(region)
+    for z, level in pairs(normalized.levels) do
+        for y, spans in pairs(level.rows) do
+            for index = 1, #spans, 2 do
+                for x = spans[index], spans[index + 1] do
+                    if GridRegion.containsPoint(footprint, x - 1, y, z)
+                        or GridRegion.containsPoint(footprint, x + 1, y, z)
+                        or GridRegion.containsPoint(footprint, x, y - 1, z)
+                        or GridRegion.containsPoint(footprint, x, y + 1, z)
+                    then
+                        return true
+                    end
+                end
+            end
+        end
+    end
+    return false
+end
+
+function H.WorkZoneTouchesFacility(facility, region)
+    return regionTouchesFacility(facility, region)
+end
+
 function Validation.NormalizeComponent(base, facility, input)
     if type(input) ~= "table" or (input.kind ~= "anchor"
         and input.kind ~= "region" and input.kind ~= "abstract")
@@ -89,10 +116,11 @@ function Validation.NormalizeComponent(base, facility, input)
         if not H.BaseContainsRegion(base, region) then return H.Result(false, "OUTSIDE_BASE") end
         local movingStockpile = facility.definitionId == "stockpile"
             and input.role == "storage.stockpile"
-        if facility.constructionRegion and not movingStockpile
-            and not H.FacilityContainsRegion(facility, region)
-        then
-            return H.Result(false, "OUTSIDE_FACILITY")
+        if facility.constructionRegion and not movingStockpile then
+            local connected = input.role == "work.zone"
+                and regionTouchesFacility(facility, region)
+                or H.FacilityContainsRegion(facility, region)
+            if not connected then return H.Result(false, "OUTSIDE_FACILITY") end
         end
         if input.role ~= "growing.plot" then
             component.region = region
@@ -149,4 +177,3 @@ function Validation.NormalizeComponent(base, facility, input)
 end
 
 return Validation
-

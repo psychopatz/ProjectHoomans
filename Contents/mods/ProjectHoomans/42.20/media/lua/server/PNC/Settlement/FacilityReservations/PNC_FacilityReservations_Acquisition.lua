@@ -4,6 +4,32 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 local Reservations = PNC.FacilityReservations
 local H = Reservations.Internal
 
+local function isWorkCapability(capability)
+    capability = tostring(capability or "")
+    return capability == "farm.work" or string.sub(capability, 1, 5) == "work."
+end
+
+function H.LaborTarget(facility, capability)
+    if not isWorkCapability(capability) then return nil end
+    for componentId, present in pairs(facility and facility.componentIds or {}) do
+        if present == true then
+            local component = PNC.SettlementRepository.GetComponent(componentId)
+            if component and component.role == "work.zone" then
+                if component.kind == "anchor" then
+                    return { x = (tonumber(component.x) or 0) + 0.5,
+                        y = (tonumber(component.y) or 0) + 0.5,
+                        z = tonumber(component.z) or 0 }
+                end
+                if component.kind == "region" then
+                    local target = H.RegionTarget(component)
+                    if target then return target end
+                end
+            end
+        end
+    end
+    return nil
+end
+
 function H.RegionTarget(component)
     local zKeys = {}
     local z
@@ -39,7 +65,8 @@ end
 function PNC.FacilityService.AcquireActivity(baseId, npcId, capability,
     options)
     options = type(options) == "table" and options or {}
-    local facilities = PNC.FacilityService.ListByCapability(baseId, capability)
+    local facilities = PNC.FacilityService.ListByCapability(baseId, capability,
+        options.stationId)
     local requested = options.componentId and PNC.SettlementRepository
         .GetComponent(options.componentId) or nil
     for index = 1, #facilities do
@@ -65,6 +92,7 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability,
                     and PNC.FacilityInteractionTargets.Resolve(component) or {}
                 local target = targets[1]
                     or component.kind == "region" and H.RegionTarget(component)
+                target = H.LaborTarget(facility, capability) or target
                 return {
                     ok = true,
                     reservationId = reservation.id,

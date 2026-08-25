@@ -1,6 +1,7 @@
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Support = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
+local Placement = require "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement"
 local Farming = PNC.Farming
 
 local Facility = {}
@@ -44,7 +45,9 @@ local function areaRole(facility)
         facility.definitionId, facility.level or 1) or nil
     local roles = {}
     for role, limit in pairs(level and level.componentLimits or {}) do
-        if limit.kind == "region" then roles[#roles + 1] = role end
+        if limit.kind == "region" and role ~= "work.zone" then
+            roles[#roles + 1] = role
+        end
     end
     table.sort(roles)
     return roles[1]
@@ -52,9 +55,9 @@ end
 
 Facility.AreaRole = areaRole
 
-local function areaOptions(window, facility, existing, onConfirm)
+local function areaOptions(window, facility, existing, onConfirm, requestedRole)
     local isDraft = not facility or facility.id == nil
-    local role = areaRole(facility)
+    local role = requestedRole or areaRole(facility)
     if isDraft and facility.definitionId == "farm" then
         role = "facility.footprint"
     end
@@ -70,7 +73,9 @@ local function areaOptions(window, facility, existing, onConfirm)
     local movingStockpile = not isDraft
         and facility.definitionId == "stockpile"
         and role == "storage.stockpile"
-    local boundary = (isDraft or movingStockpile)
+    local boundary = role == "work.zone"
+        and Support.WorkZoneRegion(facility)
+        or (isDraft or movingStockpile)
         and Support.BaseRegion(window) or Support.FacilityRegion(facility)
     return {
         title = Support.Tr("UI_PNC_Facility_SelectArea", "SELECT FACILITY AREA"),
@@ -80,12 +85,16 @@ local function areaOptions(window, facility, existing, onConfirm)
             or role == "growing.plot"
             and Support.Tr("UI_PNC_Facility_SelectFarmlandHelp",
                 "Select connected cultivated farmland inside the base.")
+            or role == "work.zone"
+            and Support.Tr("UI_PNC_Facility_SelectWorkZoneHelp",
+                "Select one connected tile inside or beside the facility where workers stand.")
             or Support.Tr("UI_PNC_Facility_SelectAreaHelp",
                 "Select one connected room inside the base territory."),
         initialRegion = existing and existing.region or Support.EmptyRegion(),
         guideRegion = boundary,
         guideLayers = Support.UsedGuideLayers(window, existing and existing.id),
         guideRenderZ = math.floor(getSpecificPlayer(0):getZ()),
+        selectionKind = role == "work.zone" and "point" or "region",
         maxTiles = limit.maxTotalTiles,
         requiredSquareRule = role == "growing.plot" and nil or limit.worldRule,
         validate = function(region, stats)
@@ -127,6 +136,27 @@ end
 function Facility.BeginBuild(window, definitionId)
     local settlement = window.snapshot and window.snapshot.settlement
     if not settlement then return false end
+    local definitions = PNC.FacilityDefinitions
+    local definition = definitions and definitions.Get
+        and definitions.Get(definitionId) or nil
+    if definition and definition.directWorkstation == true then
+        local objectInfoName = definition.buildRecipeObjectInfoName
+            or definition.entityScript
+        local catalog = PNC.BuildRecipeCatalog
+        local descriptor = catalog and catalog.Get
+            and catalog.Get(objectInfoName) or nil
+        if not descriptor then return false, "BUILD_RECIPE_NOT_FOUND" end
+        -- Direct workstations use the same native cursor/blueprint flow as
+        -- the Building tab. The server binds the facility identity to this
+        -- object-build order so no room/zone selector is involved.
+        return Placement.Begin(window, {
+            recipeKey = descriptor.recipeKey,
+            objectInfoName = descriptor.objectInfoName,
+            facilityDefinitionId = definitionId,
+            facilityBaseId = settlement.id,
+            facilityExpectedRevision = settlement.revision,
+        })
+    end
     local draft = { definitionId = definitionId, level = 1, components = {} }
     -- The selected build area is an abstract construction footprint, not a
     -- functional room. Facilities such as Research therefore do not need a
@@ -144,11 +174,11 @@ end
 
 function Facility.BeginArea(window, facility, requestedRole, componentId)
     local role = requestedRole or areaRole(facility)
-    if not role then return false end
+    if not facility or not facility.id or not role then return false end
     local existing = componentId and Support.ComponentById(facility, componentId)
         or requestedRole == nil and Support.ComponentForRole(facility, role)
         or nil
-    Support.OpenSelector(window, areaOptions(window, facility, existing,
+    local options = areaOptions(window, facility, existing,
         function(region)
             PNC.Client.RequestSetFacilityComponent({ facilityId = facility.id,
                 expectedRevision = facility.revision,
@@ -157,7 +187,10 @@ function Facility.BeginArea(window, facility, requestedRole, componentId)
                     desiredCrop = existing and existing.desiredCrop or nil,
                     policy = existing and existing.policy or nil } })
             Support.ApplyLocalResult(window)
-        end))
+        end, role)
+    if not options then return false, "FACILITY_AREA_UNAVAILABLE" end
+    local selector, reason = Support.OpenSelector(window, options)
+    if not selector then return false, reason or "SELECTOR_UNAVAILABLE" end
     return true
 end
 

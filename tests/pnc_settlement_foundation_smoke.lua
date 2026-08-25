@@ -1,6 +1,7 @@
 local T = require "tests/support/test"
 
 T.addPackagePaths()
+local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 
 local sequence = 0
 function ZombRand() sequence = sequence + 1; return sequence end
@@ -264,7 +265,10 @@ T.equal(stockpileFacility.cachedState, "OPERATIONAL",
     "built stockpile is operational")
 local stockpileComponentId
 for componentId, _ in pairs(stockpileFacility.componentIds) do
-    stockpileComponentId = componentId
+    local component = PNC.SettlementRepository.GetComponent(componentId)
+    if component and component.role == "storage.stockpile" then
+        stockpileComponentId = componentId
+    end
 end
 local stockpileEdit = PNC.FacilityService.SetComponent(player, {
     facilityId = stockpileFacility.id,
@@ -311,6 +315,18 @@ T.equal(barracksResult.facility.cachedState, "UNDER_CONSTRUCTION",
 local barracks = barracksResult.facility
 T.equal(barracksResult.component, nil,
     "construction does not create functional components")
+local barracksWorkZone
+for componentId, _ in pairs(barracks.componentIds) do
+    local component = PNC.SettlementRepository.GetComponent(componentId)
+    if component and component.role == "work.zone" then
+        barracksWorkZone = component
+    end
+end
+T.truthy(barracksWorkZone, "facility creation adds a work zone")
+T.truthy(barracksWorkZone.region
+    and not GridRegion.containsRegion(barracks.constructionRegion,
+        barracksWorkZone.region),
+    "default work zone prefers a connected standing tile beside the footprint")
 T.equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision,
     component = { kind = "anchor", role = "sleep.bed",
@@ -318,6 +334,27 @@ T.equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     "FACILITY_NOT_BUILT", "components stay locked during construction")
 barracks.constructionState = "BUILT"
 PNC.FacilityService.RefreshState(barracks)
+
+local movedWorkZone = PNC.FacilityService.SetComponent({}, {
+    facilityId = barracks.id, expectedRevision = barracks.revision,
+    component = { id = barracksWorkZone.id, kind = "region", role = "work.zone",
+        region = rectangle(3, 4, 3, 4, 0) },
+})
+T.truthy(movedWorkZone.ok and movedWorkZone.component
+    and not movedWorkZone.pendingComponent and not movedWorkZone.workOrder,
+    "work zone moves directly without reconstruction")
+local movedWorkZoneComponent = PNC.SettlementRepository.GetComponent(
+    barracksWorkZone.id)
+T.equal(movedWorkZoneComponent.region.levels[0].rows[4][1], 3,
+    "work zone move applies its new coordinate immediately")
+T.equal(barracks.constructionState, "BUILT",
+    "work zone move does not change facility construction state")
+T.equal(PNC.FacilityService.SetComponent({}, {
+    facilityId = barracks.id, expectedRevision = barracks.revision,
+    component = { id = barracksWorkZone.id, kind = "region", role = "work.zone",
+        region = rectangle(6, 6, 6, 6, 0) },
+}).reason, "OUTSIDE_FACILITY",
+    "work zone cannot move to a disconnected tile")
 
 for index = 1, 4 do
     local bed = PNC.FacilityService.SetComponent({}, {
@@ -333,7 +370,8 @@ for index = 1, 4 do
 end
 T.equal(barracks.cachedState, "OPERATIONAL", "barracks state")
 local workTarget = PNC.FacilityService.ResolveWorkTarget(barracks)
-T.equal(workTarget.role, "sleep.bed", "facility work prefers an anchor target")
+T.equal(workTarget.role, "work.zone",
+    "facility work prefers the editable labor spot")
 T.equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision, component = {
         kind = "anchor", role = "sleep.bed", x = 3, y = 1, z = 0,
@@ -460,8 +498,7 @@ local plotOrder = PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     } })
 T.truthy(plotOrder.ok and plotOrder.component, "growing plot assigns immediately")
 
-local farmComponentId
-for id, _ in pairs(farm.componentIds) do farmComponentId = id end
+local farmComponentId = plotOrder.component.id
 local plotTwo = PNC.FacilityService.SetComponent({}, { facilityId = farm.id,
     expectedRevision = farm.revision, component = {
         kind = "region", role = "growing.plot", region = rectangle(4, 0, 7, 3, 0),

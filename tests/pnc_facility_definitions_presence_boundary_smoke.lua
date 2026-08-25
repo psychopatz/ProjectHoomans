@@ -72,5 +72,14 @@ end
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil
 end
+T.equal(#PNC.FacilityDefinitions.GetComponentCosts(
+    "barracks", 1, "work.zone"), 0,
+    "work zone coordinate moves have no material cost")
+T.equal(PNC.FacilityDefinitions.RequiresComponentConstruction(
+    "barracks", 1, "work.zone", "region"), false,
+    "work zone coordinate moves skip reconstruction")
+T.equal(PNC.FacilityDefinitions.RequiresComponentConstruction(
+    "barracks", 1, "sleep.bed", "anchor"), true,
+    "ordinary component construction remains enabled")
 
 T.finish("pnc_facility_definitions_presence_boundary_smoke")

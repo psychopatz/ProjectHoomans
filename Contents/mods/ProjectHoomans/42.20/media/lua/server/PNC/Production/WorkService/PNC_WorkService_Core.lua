@@ -50,6 +50,15 @@ local function requirementsMet(record, requirements)
     return rate > 0, reason, rate
 end
 
+local function specializationScore(record, order)
+    local skillId = order and order.productionSkillId
+    if not skillId then return 0 end
+    if PNC.Skills and PNC.Skills.GetLevel then
+        return tonumber(PNC.Skills.GetLevel(record, skillId)) or 0
+    end
+    return 0
+end
+
 local function recipeKnowledgeMet(record, order)
     if not order or order.operation ~= "CRAFT" then return true end
     if PNC.ResearchService and PNC.ResearchService.Queries
@@ -121,10 +130,12 @@ end
 
 local function findWorker(order)
     local selected
+    local selectedScore = -1
+    local selectedId = ""
     local away
     if not PNC.Registry then return nil end
     local function consider(record)
-        if selected or not record or record.alive == false
+        if not record or record.alive == false
             or not belongsToOrder(record, order)
         then
             return
@@ -138,7 +149,13 @@ local function findWorker(order)
             and requirementsMet(record, order.requiredSkills)
         if not eligible then return end
         if workerAvailable(record, order) then
-            selected = record
+            local score = specializationScore(record, order)
+            local recordId = tostring(record.id or "")
+            if not selected or score > selectedScore
+                or score == selectedScore and recordId < selectedId
+            then
+                selected, selectedScore, selectedId = record, score, recordId
+            end
         elseif not away then
             away = record
         end

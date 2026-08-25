@@ -63,6 +63,15 @@ function H.Complete(order)
     if not committed then return false, reason end
     local blueprint = H.BlueprintFor(order)
     local descriptor = Catalog.Get(blueprint and blueprint.objectInfoName)
+    local payload = order.payload or {}
+    if payload.facilityId and PNC.FacilityService
+        and PNC.FacilityService.FinalizeNativeWorkstationBuild
+    then
+        local finalized, finalizeReason =
+            PNC.FacilityService.FinalizeNativeWorkstationBuild(
+                payload.facilityId, order.id, blueprint)
+        if not finalized then return false, finalizeReason end
+    end
     return H.AwardBuildXP(order, descriptor)
 end
 
@@ -98,6 +107,15 @@ end
 function H.Cancel(order)
     local ok, reason = H.Refund(order)
     if not ok then return false, reason end
+    local payload = order.payload or {}
+    if payload.facilityId and PNC.FacilityService
+        and PNC.FacilityService.RemoveNativeWorkstation
+    then
+        local removed, removeReason =
+            PNC.FacilityService.RemoveNativeWorkstation(
+                payload.facilityId, order.id)
+        if not removed then return false, removeReason end
+    end
     return PNC.WorkInputService.Cancel(order)
 end
 
@@ -108,4 +126,3 @@ PNC.WorkService.RegisterPreparation("BUILD_OBJECT", H.Prepare)
 PNC.WorkService.RegisterCompletion("BUILD_OBJECT", H.Complete)
 
 return Service
-

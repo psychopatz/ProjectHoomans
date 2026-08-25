@@ -14,8 +14,21 @@ PNC = {
         MarkDirty = function() end,
     },
     FacilityValidationService = {},
+    BuildRecipeCatalog = {
+        Get = function(objectInfoName)
+            if objectInfoName ~= "Base.Forge" then return nil end
+            return { requirements = {
+                { itemTypes = { "Base.IronBar" }, amount = 4 },
+            } }
+        end,
+    },
     FacilityDefinitions = {
         Get = function(id)
+            if id == "forge" then
+                return { directWorkstation = true,
+                    buildRecipeObjectInfoName = "Base.Forge",
+                    buildCosts = {} }
+            end
             if id ~= "research" then return nil end
             return {
                 buildCosts = {
@@ -69,6 +82,17 @@ local repeated, repeatedReason = Service.DebugGrantMaterials({ id = "admin" }, {
 T.falsy(repeated, "duplicate facility debug request is rejected")
 T.equal(repeatedReason, "duplicate_request",
     "storage duplicate response is preserved")
+
+local forge, forgeReason = Service.DebugGrantMaterials({ id = "admin" }, {
+    definitionId = "forge", requestId = "facility-debug-forge-1",
+})
+T.truthy(forge, "direct workstation debug grant succeeds")
+T.equal(forgeReason, "FACILITY_MATERIALS_GRANTED",
+    "direct workstation debug grant reason")
+T.equal(deposits[2].products[1].fullType, "Base.IronBar",
+    "direct workstation debug uses native recipe material")
+T.equal(deposits[2].products[1].quantity, 4,
+    "direct workstation debug uses native recipe quantity")
 
 denied = true
 local blocked, blockedReason = Service.DebugGrantMaterials({ id = "guest" }, {

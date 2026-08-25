@@ -16,12 +16,19 @@ local calculatedState = Internal.calculatedState
 local emit = Internal.emit
 local updateState = Internal.updateState
 
-function Service.ListByCapability(baseId, capability)
+function Service.ListByCapability(baseId, capability, stationId)
     local output = {}
     local requestedBaseId = tostring(baseId or "")
+    local requestedStationId = tostring(stationId or "")
     for id, _ in pairs(Service.ByCapability[tostring(capability or "")] or {}) do
         local facility = Repository.GetFacility(id)
         if facility and tostring(facility.baseId or "") == requestedBaseId then
+            local definition = Definitions.Get(facility.definitionId)
+            local facilityStationId = definition and definition.stationId
+                or facility.definitionId
+            local stationMatches = requestedStationId == ""
+                or tostring(facilityStationId or "") == requestedStationId
+            if stationMatches then
             -- Saved facilities may still carry the cached state calculated by
             -- an older component definition (notably the retired
             -- research.room requirement). Capability discovery is the last
@@ -51,6 +58,7 @@ function Service.ListByCapability(baseId, capability)
             -- unassigned, and research benches behave the same way.
             if currentState == "OPERATIONAL" or hasRequestedWorkstation then
                 output[#output + 1] = facility
+            end
             end
         end
     end

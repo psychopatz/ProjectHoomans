@@ -50,6 +50,25 @@ T.equal(markers[2].role, "work.research", "component marker role")
 T.equal(markers[1].tileScale, 1, "room marker fills one tile")
 T.equal(markers[2].tileScale, 1, "component marker fills one tile")
 
+local workRegion = { levels = { [0] = { rows = { [6] = { 6, 6 } } } } }
+local zonedSettlement = { facilities = {
+    { id = "forge_1", definitionId = "forge", constructionRegion = workRegion,
+        components = {{ id = "zone_1", kind = "region", role = "work.zone",
+            region = workRegion }} },
+    { id = "forge_2", definitionId = "forge", constructionRegion = workRegion,
+        components = {{ id = "zone_2", kind = "region", role = "work.zone",
+            region = workRegion }} },
+} }
+local workLayers = Overlay.BuildLayers(zonedSettlement, false)
+T.equal(#workLayers, 2, "each facility exposes its work-zone overlay")
+T.equal(workLayers[1].kind, "work_zone", "work-zone layer kind")
+T.equal(workLayers[1].color.a < 0.30, true,
+    "work-zone highlight stays translucent over the native workstation")
+local workMarkers = Overlay.BuildMarkers(zonedSettlement)
+T.equal(#workMarkers, 2, "each facility exposes a work-zone marker")
+T.equal(workMarkers[1].label, "Forge #1", "first duplicate facility is numbered")
+T.equal(workMarkers[2].label, "Forge #2", "second duplicate facility is numbered")
+
 local constructionLayers = Overlay.BuildLayers({ facilities = {{
     id = "facility_building", definitionId = "research_facility",
     constructionState = "UNDER_CONSTRUCTION",
@@ -114,7 +133,7 @@ Overlay.SetSettlement({
 Overlay.SetEnabled(true)
 Overlay.Render()
 T.equal(renderedAreas, 3, "room areas stay hidden until their icon is hovered")
-T.equal(renderedIcons, 3, "all placeholder overlay icons rendered")
+T.equal(renderedIcons, 0, "overlay uses ground highlights without icons")
 for _, size in ipairs(renderedIconSizes) do
     T.equal(size.width, 40, "overlay icon tracks full projected tile width")
     T.equal(size.height, 40, "overlay icon remains square")
@@ -125,6 +144,20 @@ getMouseY = function() return 90 end
 Overlay.Render()
 T.equal(renderedAreas, 7, "hovering a room icon reveals its room area")
 T.equal(hoverLabel, "Farm", "hovering a room icon shows its facility name")
+
+local groundMarkers = Overlay.BuildMarkers({ facilities = {{
+    id = "forge_1", definitionId = "forge", constructionRegion = region,
+    components = {
+        { id = "station_1", kind = "anchor", role = "work.craft",
+            managedByFacility = true, x = 3, y = 4, z = 0 },
+        { id = "zone_1", kind = "region", role = "work.zone",
+            region = region },
+    },
+}} })
+T.equal(groundMarkers[1].texturePath, nil,
+    "workstation marker has no image")
+T.equal(groundMarkers[2].texturePath, nil,
+    "work-zone marker has no image and remains a ground spot")
 T.finish("pnc_settlement_layout_overlay_smoke")
 
 T.finish("pnc_settlement_layout_overlay_smoke")

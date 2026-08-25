@@ -16,6 +16,7 @@ local function roleLabel(role)
         ["work.reverse"] = "LAB",
         ["work.craft"] = "CRAFT STATION",
         ["work.disassemble"] = "DISASSEMBLY STATION",
+        ["work.zone"] = "WORK AREA",
         ["water.spigot"] = "SPIGOT",
         ["water.tank"] = "WATER TANKS",
         ["water.catcher"] = "RAIN CATCHERS",
@@ -38,14 +39,15 @@ local function costText(facility, role)
         facility.definitionId, facility.level, role)
     local policy = PNC.FacilityComponentPolicy
     if policy and policy.DescribeCosts then
-        return policy.DescribeCosts(costs)
+        local description = policy.DescribeCosts(costs)
+        return description ~= "" and description or nil
     end
     local output = {}
     for _, cost in ipairs(costs or {}) do
         output[#output + 1] = tostring(cost.amount or 1) .. "x "
             .. tostring(cost.fullType or "Base.Money")
     end
-    return table.concat(output, ", ")
+    return #output > 0 and table.concat(output, ", ") or nil
 end
 
 local function componentDetail(facility, component)
@@ -117,6 +119,24 @@ local function stockpileRows(facility, storage)
             }
         end
     end
+    for index = 1, #(facility.components or {}) do
+        local component = facility.components[index]
+        if component.role == "work.zone" then
+            rows[#rows + 1] = {
+                key = component.id,
+                label = "- " .. roleLabel(component.role),
+                iconPath = componentIconPath(component.role),
+                detail = componentDetail(facility, component),
+                child = true,
+                complete = true,
+                componentAction = {
+                    kind = component.kind, role = component.role,
+                    componentId = component.id,
+                },
+                actionLabel = text("UI_PNC_Facility_EditInline", "MANAGE"),
+            }
+        end
+    end
     return rows
 end
 
@@ -146,7 +166,8 @@ function Rows.Build(facility, storage)
         end
         local minimum = tonumber(limit.minCount) or 0
         local maximum = tonumber(limit.maxCount) or math.max(1, minimum)
-        local componentAction = #assigned < maximum and {
+        local managed = limit.managed == true
+        local componentAction = not managed and #assigned < maximum and {
             kind = limit.kind, role = role,
         } or nil
         local recipe = costText(facility, role)
@@ -160,12 +181,35 @@ function Rows.Build(facility, storage)
                 or #assigned >= minimum and "  READY" or "  REQUIRED"),
             complete = #assigned >= minimum and #pending == 0,
             componentAction = #pending > 0 and nil or componentAction,
-            actionLabel = limit.kind == "abstract"
+            actionLabel = managed and text("UI_PNC_Facility_BuiltIn",
+                "BUILT-IN") or limit.kind == "abstract"
                 and text("UI_PNC_Facility_BuildModule", "BUILD")
                 or text("UI_PNC_Facility_AssignInline", "ASSIGN"),
         }
         for index = 1, #assigned do
             local component = assigned[index]
+            local childAction, childSecondary, childActionLabel
+            if not managed then
+                if component.kind ~= "abstract" then
+                    if role == "growing.plot" then
+                        childAction = { kind = "farm_plot_crop", role = role,
+                            componentId = component.id }
+                    else
+                        childAction = { kind = component.kind, role = role,
+                            componentId = component.id }
+                    end
+                end
+                childSecondary = role ~= "work.zone" and {
+                    kind = component.kind, role = role,
+                    componentId = component.id, remove = true } or nil
+                childActionLabel = component.kind == "abstract"
+                    and text("UI_PNC_Task_Deconstruct", "DECONSTRUCT")
+                    or role == "growing.plot" and text(
+                        "UI_PNC_Farming_ChangeSeeds", "CHANGE SEEDS")
+                    or text("UI_PNC_Facility_EditInline", "MANAGE")
+            else
+                childActionLabel = text("UI_PNC_Facility_BuiltIn", "BUILT-IN")
+            end
             rows[#rows + 1] = {
                 key = component.id,
                 label = "- " .. roleLabel(role) .. " #" .. tostring(index),
@@ -173,23 +217,11 @@ function Rows.Build(facility, storage)
                 detail = componentDetail(facility, component),
                 child = true,
                 complete = true,
-                componentAction = component.kind == "abstract" and nil
-                    or role == "growing.plot" and {
-                        kind = "farm_plot_crop", role = role,
-                        componentId = component.id,
-                    } or { kind = component.kind, role = role,
-                        componentId = component.id },
-                secondaryAction = {
-                    kind = component.kind, role = role,
-                    componentId = component.id, remove = true,
-                },
-                actionLabel = component.kind == "abstract"
-                    and text("UI_PNC_Task_Deconstruct", "DECONSTRUCT")
-                    or role == "growing.plot" and text(
-                        "UI_PNC_Farming_ChangeSeeds", "CHANGE SEEDS")
-                    or text("UI_PNC_Facility_EditInline", "MANAGE"),
-                secondaryActionLabel = text(
-                    "UI_PNC_Task_Deconstruct", "DECONSTRUCT"),
+                componentAction = childAction,
+                secondaryAction = childSecondary,
+                actionLabel = childActionLabel,
+                secondaryActionLabel = not managed and role ~= "work.zone" and text(
+                    "UI_PNC_Task_Deconstruct", "DECONSTRUCT") or nil,
             }
         end
         for index = 1, #pending do

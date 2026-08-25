@@ -103,7 +103,7 @@ function Actions.Handle(window, action, facility)
     if action == "overlay" then LayoutOverlay.Toggle(settlement); return true end
     if action == "build_facility" then
         BuildModal.Open(settlement, function(definitionId)
-            Facility.BeginBuild(window, definitionId)
+            return Facility.BeginBuild(window, definitionId)
         end, window.snapshot and window.snapshot.storage,
             window.snapshot and window.snapshot.research)
         return true

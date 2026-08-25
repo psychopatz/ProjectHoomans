@@ -6,9 +6,9 @@ local function derive()
     function class:derive()
         return derive()
     end
-    function class:new(character, info, nSprite)
+    function class:new(character, info, nSprite, containers)
         return setmetatable({ character = character, info = info,
-            nSprite = nSprite }, { __index = class })
+            nSprite = nSprite, containers = containers }, { __index = class })
     end
     return class
 end
@@ -16,6 +16,9 @@ end
 ISBaseObject = nil
 ISBuildingObject = nil
 ISBuildIsoEntity = nil
+ISInventoryPaneContextMenu = {
+    getContainers = function() return { "player-container" } end,
+}
 package.preload["ISBaseObject"] = function()
     ISBaseObject = {}
     return ISBaseObject
@@ -29,6 +32,9 @@ package.preload["BuildingObjects/ISBuildIsoEntity"] = function()
     ISBuildIsoEntity = ISBuildingObject:derive("ISBuildIsoEntity")
     return ISBuildIsoEntity
 end
+-- The production game has this vanilla class loaded by the build menu before
+-- the colony UI opens. Seed the same native path for this focused smoke test.
+ISBuildIsoEntity = derive()
 
 local character = {
     getPlayerNum = function() return 0 end,
@@ -63,9 +69,34 @@ T.falsy(reason, "placement has no failure reason")
 T.truthy(window.buildPlacement, "placement cursor is retained by the window")
 T.equal(cell:getDrag(), window.buildPlacement,
     "placement cursor is registered with IsoCell")
+T.equal(window.buildPlacement.containers[1], "player-container",
+    "native placement receives vanilla crafting containers")
 
 Placement.Cancel(window)
 T.falsy(window.buildPlacement, "cancel clears the placement cursor")
 T.falsy(cell:getDrag(), "cancel clears the IsoCell drag state")
+
+local placementControls
+package.preload[
+    "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacementModal"
+] = function()
+    return { Open = function(options) placementControls = options end }
+end
+PNC.FacilityBuildUI = {
+    RestorePrevious = function() end,
+    Reopen = function() end,
+}
+local facilityWindow = {}
+local facilityOk = Placement.Begin(facilityWindow, {
+    recipeKey = "TestWorkstation", objectInfoName = "TestWall",
+    facilityDefinitionId = "primitive_furnace",
+    facilityBaseId = "base-1", facilityExpectedRevision = 2,
+})
+T.equal(facilityOk, true, "facility placement creates the native cursor")
+T.truthy(placementControls,
+    "facility placement opens the rotate/back placement controls")
+Placement.Cancel(facilityWindow, { restorePrevious = false })
+T.falsy(facilityWindow.buildPlacement,
+    "facility placement back path clears the native cursor")
 
 T.finish("pnc_building_placement_smoke")

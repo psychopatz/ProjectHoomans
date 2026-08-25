@@ -58,9 +58,13 @@ local info = {
     getName = function() return "TestWall" end,
     getRecipe = function() return entityRecipe end,
     getMainSpriteNameUI = function() return "test_wall_icon" end,
+    getIconTexture = function() return "native_test_texture" end,
 }
 SpriteConfigManager = {
     GetObjectInfoList = function() return list({ info }) end,
+    GetObjectInfo = function(name)
+        return name == "TestWall" and info or nil
+    end,
 }
 
 local Catalog = T.load("ProjectHoomans", "shared",
@@ -82,4 +86,12 @@ T.equal(rows[1].xpAwards[1].amount, 4.5,
     "recipe XP amount is discovered")
 T.equal(Catalog.Get("TestWall").nativeObjectInfo, info,
     "runtime object resolves separately")
+T.equal(Catalog.Get("Base.TestWall").nativeObjectInfo, info,
+    "full entity names resolve to short object-info names")
+T.equal(Catalog.Get("TestWall").iconTexture, "native_test_texture",
+    "native UI texture stays available in the runtime descriptor")
+T.equal(Catalog.Queries.FindForAliases({ "missing", "Test Wall" }),
+    Catalog.Get("TestWall"), "display aliases resolve native descriptors")
+T.equal(Catalog.Queries.FindNativeObjectInfo("Base.TestWall"), info,
+    "native object fallback resolves the full entity name")
 T.finish("pnc_build_recipe_catalog_smoke")

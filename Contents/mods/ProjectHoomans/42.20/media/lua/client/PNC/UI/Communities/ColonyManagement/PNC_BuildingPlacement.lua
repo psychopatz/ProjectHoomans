@@ -10,6 +10,18 @@ local function currentPlayer()
     return getSpecificPlayer and getSpecificPlayer(0) or nil
 end
 
+local function closeFacilityPlacementUI(active, restorePrevious)
+    if not active or active.pncFacilityPlacement ~= true then return end
+    local placementUI = PNC and PNC.BuildingPlacementUI or nil
+    if placementUI and placementUI.Close then placementUI.Close() end
+    if restorePrevious ~= false then
+        local buildUI = PNC and PNC.FacilityBuildUI or nil
+        if buildUI and buildUI.RestorePrevious then
+            buildUI.RestorePrevious()
+        end
+    end
+end
+
 local function fail(reason)
     Placement.lastError = reason
     if PNC and PNC.Core and PNC.Core.LogWarn then
@@ -241,7 +253,8 @@ if Events and Events.OnGameStart and Events.OnGameStart.Add then
     Events.OnGameStart.Add(installPlacementEvents)
 end
 
-function Placement.Cancel(window)
+function Placement.Cancel(window, options)
+    options = type(options) == "table" and options or {}
     local active = window and window.buildPlacement or nil
     local current = currentPlayer()
     local cell = getCell and getCell() or nil
@@ -250,9 +263,12 @@ function Placement.Cancel(window)
         if playerNum == nil and current then
             playerNum = current:getPlayerNum()
         end
+        active.pncSuppressPlacementRestore = options.restorePrevious == false
         cell:setDrag(nil, playerNum or 0)
+        active.pncSuppressPlacementRestore = nil
     end
     if window then window.buildPlacement = nil end
+    closeFacilityPlacementUI(active, options.restorePrevious ~= false)
     Placement.lastError = nil
 end
 
@@ -271,14 +287,27 @@ function Placement.Begin(window, recipe)
     if not info and SpriteConfigManager
         and SpriteConfigManager.GetObjectInfo
     then
-        local ok, resolved = pcall(SpriteConfigManager.GetObjectInfo,
-            recipe.objectInfoName)
-        info = ok and resolved or nil
+        info = SpriteConfigManager.GetObjectInfo(recipe.objectInfoName)
     end
     if not info then return fail("BUILD_RECIPE_NOT_FOUND") end
 
-    local ok, cursor = pcall(class.new, class, character, info, 1, nil, nil)
-    if not ok or not cursor then return fail("PLACEMENT_CURSOR_FAILED") end
+    -- ISBuildIsoEntity creates a BaseCraftingLogic when no logic is passed.
+    -- That constructor calls setContainers, so the native cursor must receive
+    -- the same container list as the vanilla build menu. Passing nil here
+    -- causes a Java-side NPE before the placement cursor can be shown.
+    local containers
+    if not ISInventoryPaneContextMenu then
+        -- This module is supplied by the vanilla client, but the fallback
+        -- cursor also runs in headless/test contexts where it is absent.
+        pcall(require, "ISUI/ISInventoryPaneContextMenu")
+    end
+    if ISInventoryPaneContextMenu
+        and type(ISInventoryPaneContextMenu.getContainers) == "function"
+    then
+        containers = ISInventoryPaneContextMenu.getContainers(character)
+    end
+    local cursor = class.new(class, character, info, 1, containers, nil)
+    if not cursor then return fail("PLACEMENT_CURSOR_FAILED") end
     cursor.pncPlacement = true
     cursor.player = character:getPlayerNum()
     cursor.character = character
@@ -287,6 +316,7 @@ function Placement.Begin(window, recipe)
     cursor.haveMaterial = function() return true end
     cursor.skipBuildAction = true
     cursor.dragNilAfterPlace = true
+    cursor.pncFacilityPlacement = recipe.facilityDefinitionId ~= nil
     cursor.onPlacement = function(target)
         local options = {
             recipeKey = cursor.recipeKey,
@@ -295,11 +325,20 @@ function Placement.Begin(window, recipe)
             north = target.north, nSprite = target.nSprite,
             sprite = target.sprite,
         }
+        if recipe.facilityDefinitionId then
+            options.facilityDefinitionId = recipe.facilityDefinitionId
+            options.facilityBaseId = recipe.facilityBaseId
+            options.facilityExpectedRevision =
+                recipe.facilityExpectedRevision
+        end
         PNC.Client.RequestColonyAction("building_queue", options)
         if window then window.buildPlacement = nil end
+        closeFacilityPlacementUI(cursor, true)
     end
     cursor.onCancel = function()
         if window then window.buildPlacement = nil end
+        closeFacilityPlacementUI(cursor,
+            cursor.pncSuppressPlacementRestore ~= true)
     end
 
     local cell = getCell and getCell() or nil
@@ -307,10 +346,23 @@ function Placement.Begin(window, recipe)
         return fail("PLACEMENT_CELL_UNAVAILABLE")
     end
     window.buildPlacement = cursor
-    local dragOk = pcall(cell.setDrag, cell, cursor, cursor.player)
-    if not dragOk then
-        window.buildPlacement = nil
-        return fail("PLACEMENT_DRAG_FAILED")
+    cell:setDrag(cursor, cursor.player)
+    if cursor.pncFacilityPlacement then
+        local placementUI = require
+            "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacementModal"
+        if placementUI and placementUI.Open then
+            placementUI.Open({
+                onBack = function()
+                    Placement.Cancel(window, { restorePrevious = false })
+                    local buildUI = PNC and PNC.FacilityBuildUI or nil
+                    if buildUI and buildUI.Reopen then
+                        buildUI.Reopen()
+                    elseif buildUI and buildUI.RestorePrevious then
+                        buildUI.RestorePrevious()
+                    end
+                end,
+            })
+        end
     end
     Placement.lastError = nil
     return true

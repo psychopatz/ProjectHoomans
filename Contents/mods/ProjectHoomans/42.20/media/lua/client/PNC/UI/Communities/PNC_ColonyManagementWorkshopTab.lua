@@ -164,10 +164,43 @@ local function stationSortKey(entry, operation)
     return tostring(station and station.id or "workshop")
 end
 
-local function sortByStation(values, operation)
+local function productionSkillId(entry, operation)
+    local station = stationFor(entry, operation)
+    local work = PNC and PNC.WorkDefinitions or nil
+    if work and work.GetProductionSkillId then
+        return work.GetProductionSkillId(entry and entry.descriptor, station)
+    end
+    return entry and entry.productionSkillId
+        or station and station.productionSkillId
+end
+
+local function productionSkillLabel(skillId, tr)
+    local work = PNC and PNC.WorkDefinitions or nil
+    local label = work and work.GetProductionSkillLabel
+        and work.GetProductionSkillLabel(skillId) or skillId
+    if not label or label == "" then
+        return tr("UI_PNC_Workshop_OtherSkill", "Other production")
+    end
+    return tostring(label)
+end
+
+local function skillSortKey(entry, operation)
+    local skillId = productionSkillId(entry, operation)
+    local order = PNC and PNC.WorkDefinitions
+        and PNC.WorkDefinitions.CRAFTING_SKILL_ORDER or {}
+    for index, value in ipairs(order) do
+        if value == skillId then return string.format("%03d", index) end
+    end
+    return string.format("%03d:%s", #order + 1, tostring(skillId or ""))
+end
+
+local function sortBySkillAndStation(values, operation)
     local output = {}
     for _, value in ipairs(values or {}) do output[#output + 1] = value end
     table.sort(output, function(left, right)
+        local leftSkill, rightSkill = skillSortKey(left, operation),
+            skillSortKey(right, operation)
+        if leftSkill ~= rightSkill then return leftSkill < rightSkill end
         local leftStation, rightStation = stationSortKey(left, operation),
             stationSortKey(right, operation)
         if leftStation ~= rightStation then return leftStation < rightStation end
@@ -178,6 +211,16 @@ local function sortByStation(values, operation)
         return tostring(leftName) < tostring(rightName)
     end)
     return output
+end
+
+local function addSkillHeader(list, skillId, tr)
+    local label = productionSkillLabel(skillId, tr)
+    list:addItem("skill:" .. tostring(skillId or "other"), {
+        name = label, restricted = true, catalogHeader = true,
+        skillHeader = true,
+        catalogCells = { category = label, quantity = "", availability = "",
+            action = "" },
+    })
 end
 
 local function addStationHeader(list, station, tr)
@@ -196,7 +239,7 @@ local function openStationBuild(window, station)
     local BuildModal = require "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal"
     local Facility = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityActions"
     BuildModal.Open(settlement, function(definitionId)
-        Facility.BeginBuild(window, definitionId)
+        return Facility.BeginBuild(window, definitionId)
     end, window.snapshot.storage, window.snapshot.research,
         station and station.facilityId or "workshop")
     return true
@@ -309,11 +352,22 @@ function Workshop.Rebuild(window, snapshot, tr)
     end
     local sharedStation = defaultStation()
     local stationReady = isStationReady(sharedStation)
+    local function anyKnownStationReady(values, operation)
+        if stationReady then return true end
+        for _, value in ipairs(values or {}) do
+            if isStationReady(stationFor(value, operation)) then return true end
+        end
+        return false
+    end
+    local craftStationReady = anyKnownStationReady(workshop.knownRecipes, "CRAFT")
+    local salvageStationReady = anyKnownStationReady(
+        workshop.disassemblyCandidates, "DISASSEMBLE")
     window.workshopLaneAvailability = {
-        -- Both lanes are separate work types, but intentionally share the
-        -- same physical station and therefore the same availability gate.
-        craft = stationReady,
-        salvage = stationReady,
+        -- Crafting and salvaging are different work types. They can use
+        -- different direct workstation definitions, while each recipe still
+        -- resolves to the same physical station for both operations.
+        craft = craftStationReady,
+        salvage = salvageStationReady,
     }
     rebuildQueue(window, activeOrders(snapshot))
     window.workshopRecipeList:clear()
@@ -325,8 +379,13 @@ function Workshop.Rebuild(window, snapshot, tr)
             recipes[#recipes + 1] = recipe
         end
     end
-    local activeStation
-    for _, recipe in ipairs(sortByStation(recipes, "CRAFT")) do
+    local activeSkill, activeStation
+    for _, recipe in ipairs(sortBySkillAndStation(recipes, "CRAFT")) do
+        local skillId = productionSkillId(recipe, "CRAFT")
+        if activeSkill ~= skillId then
+            activeSkill, activeStation = skillId, nil
+            addSkillHeader(window.workshopRecipeList, skillId, tr)
+        end
         local requiredStation = stationFor(recipe, "CRAFT")
         if not activeStation
             or stationSortKey(activeStation, "CRAFT")
@@ -342,10 +401,11 @@ function Workshop.Rebuild(window, snapshot, tr)
                 quantityFor(window, recipe.id)
             local stocked = canCraft(recipe, quantity)
             local missingStation = not isStationReady(requiredStation)
-            local enabled = missingStation or stocked and stationReady
+            local requiredStationReady = not missingStation
+            local enabled = missingStation or stocked and requiredStationReady
             local action = missingStation
                 and tr("UI_PNC_Workshop_BuildStation", "BUILD STATION")
-                or stocked and stationReady
+                or stocked and requiredStationReady
                 and tr("UI_PNC_Workshop_CraftAction", "CRAFT")
                 or tr("UI_PNC_Workshop_MissingMaterials", "MISSING MATERIALS")
             window.workshopRecipeList:addItem(recipe.descriptor.displayName, {
@@ -355,7 +415,7 @@ function Workshop.Rebuild(window, snapshot, tr)
                 stationMissing = missingStation,
                 name = tostring(recipe.descriptor.displayName or recipe.key),
                 texture = metadata.texture, catalogCells = {
-                    category = tostring(metadata.category or "Recipe"),
+                    category = productionSkillLabel(skillId, tr),
                     quantity = "-  " .. tostring(quantity) .. "  +",
                     availability = stocked and "AVAILABLE" or "UNAVAILABLE",
                     action = action },
@@ -368,9 +428,14 @@ function Workshop.Rebuild(window, snapshot, tr)
     addCatalogHeader(window.workshopSalvageList,
         tr("UI_PNC_Workshop_Salvageable", "SALVAGEABLE ITEMS"),
         tr("UI_PNC_Workshop_PotentialYield", "POTENTIAL YIELD"))
-    activeStation = nil
-    for _, candidate in ipairs(sortByStation(
+    activeSkill, activeStation = nil, nil
+    for _, candidate in ipairs(sortBySkillAndStation(
         workshop.disassemblyCandidates or {}, "DISASSEMBLE")) do
+        local skillId = productionSkillId(candidate, "DISASSEMBLE")
+        if activeSkill ~= skillId then
+            activeSkill, activeStation = skillId, nil
+            addSkillHeader(window.workshopSalvageList, skillId, tr)
+        end
         local requiredStation = stationFor(candidate, "DISASSEMBLE")
         if not activeStation
             or stationSortKey(activeStation, "DISASSEMBLE")
@@ -381,7 +446,8 @@ function Workshop.Rebuild(window, snapshot, tr)
         end
         local metadata = InventoryModel.Probe(candidate.fullType)
         local missingStation = not isStationReady(requiredStation)
-        local enabled = missingStation or stationReady
+        local requiredStationReady = not missingStation
+        local enabled = missingStation or requiredStationReady
         local yields = {}
         for _, value in ipairs(candidate.potentialYield or {}) do
             local yieldMetadata = InventoryModel.Probe(value.fullType)
@@ -396,7 +462,7 @@ function Workshop.Rebuild(window, snapshot, tr)
             stationMissing = missingStation, fullType = candidate.fullType,
             name = tostring(metadata.name or candidate.fullType),
             texture = metadata.texture, recordIndex = candidate.recordIndex,
-            catalogCells = { category = tostring(metadata.category or "Item"),
+            catalogCells = { category = productionSkillLabel(skillId, tr),
                 quantity = tostring(candidate.quantity), availability = yieldText,
                 action = missingStation
                     and tr("UI_PNC_Workshop_BuildStation", "BUILD STATION")

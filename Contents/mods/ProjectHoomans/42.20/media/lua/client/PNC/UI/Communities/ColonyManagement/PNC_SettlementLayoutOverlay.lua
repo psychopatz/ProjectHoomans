@@ -7,20 +7,22 @@ local Overlay = PNC.SettlementLayoutOverlay
 Overlay.enabled = Overlay.enabled == true
 Overlay.layers = Overlay.layers or {}
 Overlay.markers = Overlay.markers or {}
-Overlay.textureCache = Overlay.textureCache or {}
 
 local COLORS = {
     -- Territory is context only. Keep it visible without washing out rooms,
     -- construction state, or point components above it.
-    base = { r = 0.10, g = 0.70, b = 1.00, a = 0.06 },
-    barracks = { r = 0.72, g = 0.38, b = 1.00, a = 0.38 },
-    farm = { r = 0.22, g = 0.92, b = 0.28, a = 0.38 },
-    research_facility = { r = 0.16, g = 0.72, b = 1.00, a = 0.38 },
-    facility = { r = 1.00, g = 0.58, b = 0.15, a = 0.38 },
-    anchor = { r = 1.00, g = 0.82, b = 0.25, a = 0.58 },
-    stockpile = { r = 0.95, g = 0.82, b = 0.10, a = 0.58 },
-    construction = { r = 1.00, g = 0.54, b = 0.08, a = 0.34 },
-    deconstruction = { r = 1.00, g = 0.18, b = 0.12, a = 0.32 },
+    base = { r = 0.10, g = 0.70, b = 1.00, a = 0.025 },
+    barracks = { r = 0.72, g = 0.38, b = 1.00, a = 0.22 },
+    farm = { r = 0.22, g = 0.92, b = 0.28, a = 0.22 },
+    research_facility = { r = 0.16, g = 0.72, b = 1.00, a = 0.22 },
+    facility = { r = 1.00, g = 0.58, b = 0.15, a = 0.22 },
+    -- Ground spots must identify the work location without hiding the native
+    -- workstation sprite underneath them.
+    workZone = { r = 0.18, g = 0.95, b = 0.82, a = 0.24 },
+    anchor = { r = 1.00, g = 0.82, b = 0.25, a = 0.18 },
+    stockpile = { r = 0.95, g = 0.82, b = 0.10, a = 0.20 },
+    construction = { r = 1.00, g = 0.54, b = 0.08, a = 0.20 },
+    deconstruction = { r = 1.00, g = 0.18, b = 0.12, a = 0.18 },
 }
 
 local function facilityColor(facility, color)
@@ -32,37 +34,13 @@ local function facilityColor(facility, color)
     if state == "DECONSTRUCTING" then return COLORS.deconstruction end
     if state == "PLANNED" then
         return { r = color.r * 0.65, g = color.g * 0.65,
-            b = color.b * 0.65, a = 0.13 }
+            b = color.b * 0.65, a = 0.08 }
     end
     -- Completed building/room areas stay deliberately dark so beds, stations,
     -- stockpile nodes, and other anchor components remain visually dominant.
     return { r = color.r * 0.45, g = color.g * 0.45,
-        b = color.b * 0.45, a = 0.14 }
+        b = color.b * 0.45, a = 0.08 }
 end
-
-local ROOM_PLACEHOLDER = "media/ui/Facilities/BuildingMenu/livingRoom.png"
-local COMPONENT_PLACEHOLDERS = {
-    ["sleep.area"] = "media/ui/Facilities/Components/chair.png",
-    ["sleep.bed"] = "media/ui/Facilities/Components/bed/barracks.png",
-    ["dining.table"] = "media/ui/Facilities/Components/chair.png",
-    ["health.bed"] = "media/ui/Facilities/Components/bed/hospital.png",
-    ["growing.plot"] = "media/ui/Facilities/Components/default.png",
-    ["work.research"] =
-        "media/ui/Facilities/Components/research_station/research_station.png",
-    ["work.blueprint"] =
-        "media/ui/Facilities/Components/research_station/architect_table.png",
-    ["work.reverse"] =
-        "media/ui/Facilities/Components/research_station/Lab_Station.png",
-    ["work.craft"] =
-        "media/ui/Facilities/Components/workshop/workbench.png",
-    ["work.disassemble"] =
-        "media/ui/Facilities/Components/workshop/recycling_bench.png",
-    ["water.spigot"] =
-        "media/ui/Facilities/Components/water_station/pump_spigot.png",
-    ["water.tank"] = "media/ui/Facilities/Components/default.png",
-    ["water.catcher"] = "media/ui/Facilities/Components/default.png",
-    ["stockpile.access"] = "media/ui/Facilities/Components/storage/stockpile.png",
-}
 
 local function regionCenter(region)
     local count, sumX, sumY, sumZ = 0, 0, 0, 0
@@ -85,12 +63,12 @@ local function regionCenter(region)
         z = sumZ / count }
 end
 
-local function addMarker(markers, point, kind, id, role, texturePath, tileScale)
+local function addMarker(markers, point, kind, id, role, tileScale)
     if not point then return end
     markers[#markers + 1] = {
         x = point.x, y = point.y, z = point.z,
         kind = kind, id = id, role = role,
-        texturePath = texturePath, tileScale = tileScale or 1,
+        tileScale = tileScale or 1,
     }
 end
 
@@ -122,12 +100,23 @@ local function facilityName(facility)
         fallbackName(facility and facility.definitionId))
 end
 
-local function componentName(facility, component, ordinal)
+local function facilityLabel(facility, ordinal, total)
+    local label = facilityName(facility)
+    if tonumber(total) and tonumber(total) > 1 then
+        return label .. " #" .. tostring(ordinal or 1)
+    end
+    return label
+end
+
+local function componentName(facility, component, ordinal, ownerLabel)
     local role = tostring(component and component.role or "")
+    if role == "work.zone" then
+        return ownerLabel or facilityName(facility)
+    end
     if component and component.kind == "region"
         or role == "facility.footprint"
     then
-        return facilityName(facility)
+        return ownerLabel or facilityName(facility)
     end
     local labels = {
         ["sleep.bed"] = "Bed",
@@ -155,11 +144,12 @@ local function componentName(facility, component, ordinal)
     return label
 end
 
-local function facilityIcon(facility)
+local function isDirectWorkstation(facility)
     local definition = PNC.FacilityDefinitions
         and PNC.FacilityDefinitions.Get
-        and PNC.FacilityDefinitions.Get(facility.definitionId) or nil
-    return definition and definition.iconPath or ROOM_PLACEHOLDER
+        and PNC.FacilityDefinitions.Get(facility and facility.definitionId)
+        or nil
+    return definition and definition.directWorkstation == true
 end
 
 local function pointRegion(x, y, z)
@@ -190,17 +180,26 @@ function Overlay.BuildLayers(settlement, includeBase)
     for _, facility in ipairs(settlement and settlement.facilities or {}) do
         local sourceColor = COLORS[facility.definitionId] or COLORS.facility
         local color = facilityColor(facility, sourceColor)
+        local directWorkstation = isDirectWorkstation(facility)
         local hasRegion = false
         for _, component in ipairs(facility.components or {}) do
             if component.kind == "region" then hasRegion = true end
             local region = component.kind == "region" and component.region
                 or pointRegion(component.x, component.y, component.z)
-            addLayer(layers, region,
-                component.kind == "anchor" and COLORS.anchor or color,
-                "facility", facility.id, component.role, component.id,
-                component.kind == "region")
+            local workZone = component.role == "work.zone"
+            local componentColor = workZone and COLORS.workZone
+                or component.kind == "anchor" and COLORS.anchor or color
+            local layerKind = workZone and "work_zone"
+                or directWorkstation and component.kind == "anchor"
+                and "workstation" or "facility"
+            addLayer(layers, region, componentColor, layerKind,
+                facility.id, component.role, component.id,
+                component.kind == "region" and not workZone)
         end
-        if not hasRegion then
+        -- Direct workstations have a one-tile construction footprint only so
+        -- collision/revision infrastructure can remain shared. It is not a
+        -- room and must not become a room-zone overlay or room marker.
+        if not hasRegion and not directWorkstation then
             addLayer(layers, facility.constructionRegion, color,
                 "facility", facility.id, "facility.footprint",
                 "footprint:" .. tostring(facility.id))
@@ -215,34 +214,59 @@ end
 
 function Overlay.BuildMarkers(settlement)
     local markers = {}
+    local totals, seen = {}, {}
     for _, facility in ipairs(settlement and settlement.facilities or {}) do
+        local key = tostring(facility.definitionId or "")
+        totals[key] = (totals[key] or 0) + 1
+    end
+    for _, facility in ipairs(settlement and settlement.facilities or {}) do
+        local definitionKey = tostring(facility.definitionId or "")
+        seen[definitionKey] = (seen[definitionKey] or 0) + 1
+        local label = facilityLabel(facility, seen[definitionKey],
+            totals[definitionKey])
         local hasRoom = false
-        local roomIcon = facilityIcon(facility)
+        local hasWorkZone = false
+        local directWorkstation = isDirectWorkstation(facility)
         local ordinals = {}
         for _, component in ipairs(facility.components or {}) do
             local role = tostring(component.role or "")
             ordinals[role] = (ordinals[role] or 0) + 1
-            if component.kind == "region" then
+            if role == "work.zone" then
+                hasWorkZone = true
+                local point = component.kind == "region"
+                    and regionCenter(component.region)
+                    or { x = (tonumber(component.x) or 0) + 0.5,
+                        y = (tonumber(component.y) or 0) + 0.5,
+                        z = tonumber(component.z) or 0 }
+                addMarker(markers, point, "work_zone", component.id,
+                    component.role, 1)
+                if markers[#markers] then markers[#markers].label = label end
+            elseif component.kind == "region" then
                 hasRoom = true
                 addMarker(markers, regionCenter(component.region), "room",
-                    facility.id, component.role, roomIcon, 1)
-                markers[#markers].label = componentName(facility, component)
+                    facility.id, component.role, 1)
+                if markers[#markers] then
+                    markers[#markers].label = componentName(facility,
+                        component, nil, label)
+                end
             elseif component.kind == "anchor" then
+                local workstationMarker = directWorkstation
+                    and component.managedByFacility == true
                 addMarker(markers, {
                     x = (tonumber(component.x) or 0) + 0.5,
                     y = (tonumber(component.y) or 0) + 0.5,
                     z = tonumber(component.z) or 0,
-                }, "component", component.id, component.role,
-                    COMPONENT_PLACEHOLDERS[component.role]
-                        or "media/ui/Emotes/PNC_EmoteMenu.png", 1)
-                markers[#markers].label = componentName(facility, component,
-                    ordinals[role])
+                }, workstationMarker and "workstation" or "component",
+                    component.id, component.role, 1)
+                markers[#markers].label = workstationMarker
+                    and label
+                    or componentName(facility, component, ordinals[role])
             end
         end
-        if not hasRoom then
+        if not hasRoom and not directWorkstation and not hasWorkZone then
             addMarker(markers, regionCenter(facility.constructionRegion),
-                "room", facility.id, "facility.footprint", roomIcon, 1)
-            markers[#markers].label = facilityName(facility)
+                "room", facility.id, "facility.footprint", 1)
+            if markers[#markers] then markers[#markers].label = label end
         end
     end
     for _, node in ipairs(settlement and settlement.stockpileNodes or {}) do
@@ -250,8 +274,7 @@ function Overlay.BuildMarkers(settlement)
             x = (tonumber(node.x) or 0) + 0.5,
             y = (tonumber(node.y) or 0) + 0.5,
             z = tonumber(node.z) or 0,
-        }, "component", node.id, "stockpile.access",
-            COMPONENT_PLACEHOLDERS["stockpile.access"], 1)
+        }, "component", node.id, "stockpile.access", 1)
         markers[#markers].label = componentName(nil, {
             role = "stockpile.access", kind = "anchor",
         }, 1)
@@ -280,14 +303,6 @@ function Overlay.IsEnabled()
     return Overlay.enabled == true
 end
 
-local function markerTexture(path)
-    local cached = Overlay.textureCache[path]
-    if cached ~= nil then return cached ~= false and cached or nil end
-    cached = getTexture and getTexture(path) or nil
-    Overlay.textureCache[path] = cached or false
-    return cached
-end
-
 local function iconDrawer(playerNum)
     if not ISUIElement or not ISUIElement.new
         or not getPlayerScreenLeft or not getPlayerScreenTop
@@ -311,7 +326,7 @@ end
 local function renderMarkers(playerNum)
     if not isoToScreenX or not isoToScreenY then return end
     local drawer = iconDrawer(playerNum)
-    if not drawer or not drawer.drawTextureScaledAspect then return end
+    if not drawer then return end
     local mouseX = getMouseX and getMouseX() or nil
     local mouseY = getMouseY and getMouseY() or nil
     if mouseX ~= nil then mouseX = mouseX - drawer.x end
@@ -319,8 +334,7 @@ local function renderMarkers(playerNum)
     local hovered, hoveredDistance
     for _, marker in ipairs(Overlay.markers or {}) do
         marker.hovered = false
-        local texture = markerTexture(marker.texturePath)
-        if texture or (mouseX ~= nil and mouseY ~= nil) then
+        if mouseX ~= nil and mouseY ~= nil then
             local screenX = isoToScreenX(playerNum,
                 marker.x, marker.y, marker.z) - drawer.x
             local screenY = isoToScreenY(playerNum,
@@ -340,15 +354,6 @@ local function renderMarkers(playerNum)
                 and math.abs(dy) <= math.max(12, size / 2)
             if hit and (not hoveredDistance or distance < hoveredDistance) then
                 hovered, hoveredDistance = marker, distance
-            end
-            if screenX >= -size and screenY >= -size
-                and screenX <= drawer.width + size
-                and screenY <= drawer.height + size
-                and texture
-            then
-                drawer:drawTextureScaledAspect(texture,
-                    screenX - size / 2, screenY - size / 2,
-                    size, size, 0.92, 1, 1, 1)
             end
         end
     end

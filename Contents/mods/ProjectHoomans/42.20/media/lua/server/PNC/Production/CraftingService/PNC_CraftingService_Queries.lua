@@ -9,9 +9,11 @@ local Service = PNC.CraftingService
 local H = PNC.CraftingServiceInternal
 local Registry = PNC.RecipeKnowledgeRegistry
 
-local function stationSnapshot(operation)
+local function stationSnapshot(operation, recipe)
     local definitions = PNC.WorkDefinitions
-    local source = definitions and definitions.GetStation
+    local source = definitions and definitions.GetStationForRecipe
+        and definitions.GetStationForRecipe(recipe, operation) or nil
+    source = source or definitions and definitions.GetStation
         and definitions.GetStation(operation) or nil
     source = source or {
         id = "workshop", facilityId = "workshop",
@@ -27,13 +29,18 @@ local function stationSnapshot(operation)
     for index, role in ipairs(source.legacyRoles or {}) do
         station.legacyRoles[index] = role
     end
+    if definitions and definitions.GetProductionSkillId then
+        station.productionSkillId = definitions.GetProductionSkillId(recipe,
+            source)
+    end
     return station
 end
 
 local function resolvedSnapshot(resolved, operation)
     local output = {}
     for key, value in pairs(resolved or {}) do output[key] = value end
-    output.requiredStation = stationSnapshot(operation)
+    output.requiredStation = stationSnapshot(operation,
+        resolved and resolved.descriptor)
     return output
 end
 
@@ -104,7 +111,11 @@ function Service.Queries.DisassemblyCandidates(storage)
                     candidate = { fullType = info.fullType,
                         recordIndex = recordIndex, quantity = 0,
                         potentialYield = {},
-                        requiredStation = stationSnapshot("DISASSEMBLE"),
+                        descriptor = resolved.descriptor,
+                        productionSkillId = resolved.descriptor
+                            and resolved.descriptor.productionSkillId or nil,
+                        requiredStation = stationSnapshot("DISASSEMBLE",
+                            resolved.descriptor),
                     }
                     for inputIndex = 1, #(resolved.descriptor
                         and resolved.descriptor.inputs or {})

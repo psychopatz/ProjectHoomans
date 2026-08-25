@@ -29,6 +29,9 @@ local function componentConfig(definition, levelData, field, role)
 end
 
 function Policy.GetCosts(definition, levelData, role)
+    -- A work zone is only a logical standing coordinate. Moving it must not
+    -- consume materials or create a reconstruction order.
+    if tostring(role or "") == "work.zone" then return {} end
     return copyCosts(componentConfig(
         definition, levelData, "componentCosts", role) or DEFAULT_COSTS)
 end
@@ -39,6 +42,7 @@ function Policy.GetBuildWork(definition, levelData, role)
 end
 
 function Policy.RequiresConstruction(definition, levelData, role, kind)
+    if tostring(role or "") == "work.zone" then return false end
     local config = definition and definition.componentConstruction
     local levelConfig = levelData and levelData.componentConstruction
     local value = levelConfig and levelConfig[tostring(role or "")]

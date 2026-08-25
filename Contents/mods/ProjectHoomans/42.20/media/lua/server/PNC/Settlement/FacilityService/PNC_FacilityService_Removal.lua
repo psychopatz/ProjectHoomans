@@ -16,6 +16,42 @@ local emit = Internal.emit
 local isBuilt = Internal.isBuilt
 local removeComponent = Internal.removeComponent
 
+local function removeDirectWorkstation(facility)
+    local placement = facility and facility.workstationPlacement or nil
+    if not placement or placement.placed ~= true then return true end
+    if type(getCell) ~= "function" then
+        return false, "WORKSTATION_WORLD_UNAVAILABLE"
+    end
+    local cell = getCell()
+    local square = cell and cell:getGridSquare(tonumber(placement.x) or 0,
+        tonumber(placement.y) or 0, tonumber(placement.z) or 0) or nil
+    if not square then return false, "WORKSTATION_WORLD_UNAVAILABLE" end
+
+    local objects = square:getSpecialObjects()
+    local expectedSprite = tostring(placement.sprite or "")
+    local expectedScript = tostring(placement.entityScript or "")
+    if objects and type(objects.size) == "function"
+        and type(objects.get) == "function"
+    then
+        for index = objects:size() - 1, 0, -1 do
+            local object = objects:get(index)
+            local sprite = tostring(object:getSpriteName() or "")
+            local name = tostring(object:getName() or "")
+            local script = tostring(object:getScriptName() or "")
+            local spriteMatch = expectedSprite ~= ""
+                and sprite == expectedSprite
+            local scriptMatch = expectedScript ~= ""
+                and (name == expectedScript or script == expectedScript)
+            if spriteMatch or scriptMatch then
+                local result = square:transmitRemoveItemFromSquare(object, true)
+                if result == nil or tonumber(result) ~= -1 then return true end
+                return false, "WORKSTATION_WORLD_REMOVE_FAILED"
+            end
+        end
+    end
+    return false, "WORKSTATION_WORLD_OBJECT_NOT_FOUND"
+end
+
 function Service.RemoveComponent(player, args)
     args = type(args) == "table" and args or {}
     local facility = Repository.GetFacility(args.facilityId)
@@ -31,6 +67,12 @@ function Service.RemoveComponent(player, args)
     local component = Repository.GetComponent(args.componentId)
     if not component or component.facilityId ~= facility.id then
         return { ok = false, reason = "COMPONENT_NOT_FOUND" }
+    end
+    if component.managedByFacility == true then
+        return { ok = false, reason = "FACILITY_COMPONENT_MANAGED" }
+    end
+    if component.role == "work.zone" then
+        return { ok = false, reason = "FACILITY_WORK_ZONE_REQUIRED" }
     end
     if facility.definitionId == "stockpile"
         or component.role == "storage.stockpile"
@@ -92,7 +134,9 @@ function Service.FinalizeDestroy(facilityOrId)
     if facility.definitionId == "stockpile" then
         return false, "STOCKPILE_CANNOT_DECONSTRUCT"
     end
-    for componentId, _ in pairs(facility.componentIds) do
+    local removed, removeReason = removeDirectWorkstation(facility)
+    if not removed then return false, removeReason end
+    for componentId, _ in pairs(facility.componentIds or {}) do
         Repository.State.components[componentId] = nil
         if PNC.FacilityReservations then PNC.FacilityReservations.ReleaseComponent(componentId) end
     end

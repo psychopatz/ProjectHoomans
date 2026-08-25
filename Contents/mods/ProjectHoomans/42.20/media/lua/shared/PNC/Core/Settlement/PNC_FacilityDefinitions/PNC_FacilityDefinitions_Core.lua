@@ -22,6 +22,7 @@ Definitions.ComponentIconPaths = Definitions.ComponentIconPaths or {
     ["work.reverse"] = "media/ui/Facilities/Components/research_station/Lab_Station.png",
     ["work.craft"] = "media/ui/Facilities/Components/workshop/workbench.png",
     ["work.disassemble"] = "media/ui/Facilities/Components/workshop/recycling_bench.png",
+    ["work.zone"] = "media/ui/Facilities/Components/workshop/workbench.png",
     ["water.spigot"] = "media/ui/Facilities/Components/water_station/pump_spigot.png",
     ["water.tank"] = "media/ui/Facilities/Components/default.png",
     ["water.catcher"] = "media/ui/Facilities/Components/default.png",
@@ -37,6 +38,17 @@ function Definitions.Register(definition)
         or definition.id == "" or type(definition.levels) ~= "table"
     then
         return false, "INVALID_FACILITY_DEFINITION"
+    end
+    -- Every facility owns one editable labor spot. Keep this in the shared
+    -- registration path so new definitions cannot accidentally omit it.
+    for _, level in pairs(definition.levels) do
+        level.componentLimits = level.componentLimits or {}
+        if not level.componentLimits["work.zone"] then
+            level.componentLimits["work.zone"] = {
+                kind = "region", minCount = 1, maxCount = 1,
+                minTotalTiles = 1, maxTotalTiles = 1, workZone = true,
+            }
+        end
     end
     Definitions.ByID[definition.id] = definition
     return true, definition

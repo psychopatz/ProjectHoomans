@@ -22,6 +22,41 @@ function Support.FacilityRegion(facility)
     return facility and facility.constructionRegion or Support.EmptyRegion()
 end
 
+function Support.WorkZoneRegion(facility)
+    local sourceRegion = Support.FacilityRegion(facility)
+    -- Older/partial settlement snapshots may carry the component list before
+    -- the facility footprint has been copied into the client projection. The
+    -- existing work spot is still authoritative enough to keep the editor
+    -- usable while the next snapshot repairs the footprint.
+    if GridRegion.countTiles(sourceRegion) <= 0 then
+        for _, component in ipairs(facility and facility.components or {}) do
+            if component.role == "work.zone" and component.region then
+                sourceRegion = component.region
+                break
+            end
+        end
+    end
+    local source = GridRegion.normalize(sourceRegion)
+    local levels = {}
+    local function add(level, y, first, last)
+        levels[level] = levels[level] or { rows = {} }
+        local row = levels[level].rows[y] or {}
+        row[#row + 1], row[#row + 2] = first, last
+        levels[level].rows[y] = row
+    end
+    for z, level in pairs(source.levels) do
+        for y, spans in pairs(level.rows) do
+            for index = 1, #spans, 2 do
+                local first, last = spans[index], spans[index + 1]
+                add(z, y, first - 1, last + 1)
+                add(z, y - 1, first, last)
+                add(z, y + 1, first, last)
+            end
+        end
+    end
+    return GridRegion.normalize({ levels = levels })
+end
+
 function Support.Footprint(region)
     local rows = {}
     for _, level in pairs(GridRegion.normalize(region).levels) do

@@ -99,10 +99,16 @@ function Service.FinalizeRemoveComponent(facilityId, componentId)
     if not base or not component or component.facilityId ~= facility.id then
         return false, "COMPONENT_NOT_FOUND"
     end
+    if component.managedByFacility == true then
+        return false, "FACILITY_COMPONENT_MANAGED"
+    end
     if facility.definitionId == "stockpile"
         or component.role == "storage.stockpile"
     then
         return false, "STOCKPILE_CANNOT_DECONSTRUCT"
+    end
+    if component.role == "work.zone" then
+        return false, "FACILITY_WORK_ZONE_REQUIRED"
     end
     local result = removeComponent(base, facility, component)
     facility.constructionState, facility.constructionWorkOrderId = "BUILT", nil

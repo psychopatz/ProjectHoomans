@@ -17,6 +17,16 @@ local function call(object, method, ...)
     return ok and value or nil
 end
 
+local function shortObjectInfoName(value)
+    local text = tostring(value or "")
+    local short = text:match("([^%.]+)$")
+    return short or text
+end
+
+local function normalizeLookup(value)
+    return string.lower(string.gsub(shortObjectInfoName(value), "[^%w]", ""))
+end
+
 local function values(list)
     local output = {}
     if not list then return output end
@@ -113,6 +123,26 @@ local function objectInfos()
     return ok and values(list) or {}
 end
 
+local function nativeObjectInfo(objectInfoName)
+    if not SpriteConfigManager
+        or type(SpriteConfigManager.GetObjectInfo) ~= "function"
+    then return nil end
+    local candidates = {
+        tostring(objectInfoName or ""),
+        shortObjectInfoName(objectInfoName),
+    }
+    local seen = {}
+    for _, candidate in ipairs(candidates) do
+        if candidate ~= "" and not seen[candidate] then
+            seen[candidate] = true
+            local ok, info = pcall(SpriteConfigManager.GetObjectInfo,
+                candidate)
+            if ok and info then return info end
+        end
+    end
+    return nil
+end
+
 local function descriptor(info)
     local objectInfoName = tostring(call(info, "getName") or "")
     local entityRecipe = call(info, "getRecipe")
@@ -123,8 +153,9 @@ local function descriptor(info)
         or recipeName)
     local category = tostring(call(recipe, "getBuildCategory")
         or call(recipe, "getCategory") or "Miscellaneous")
-    local iconName = call(info, "getMainSpriteNameUI")
-        or call(recipe, "getIconName")
+    local iconTexture = call(info, "getIconTexture")
+    local iconName = call(recipe, "getIconName")
+        or call(info, "getMainSpriteNameUI")
     return {
         id = objectInfoName,
         recipeKey = objectInfoName,
@@ -133,6 +164,10 @@ local function descriptor(info)
         recipeName = recipeName,
         category = category,
         iconName = iconName and tostring(iconName) or nil,
+        -- This is a native Texture object and intentionally remains runtime
+        -- only. Build 42's ObjectInfo icon is already in the format expected
+        -- by ISUI drawTextureScaledAspect; iconName is only a fallback key.
+        iconTexture = iconTexture,
         buildWork = math.max(1, tonumber(call(recipe, "getTime")) or 100),
         requiredSkills = normalizeSkills(recipe),
         xpAwards = normalizeXPAwards(recipe),
@@ -174,7 +209,64 @@ end
 function Catalog.Get(objectInfoName)
     objectInfoName = tostring(objectInfoName or "")
     if not Catalog.Initialized then Catalog.Build() end
-    return Catalog.ByObject[objectInfoName]
+    local direct = Catalog.ByObject[objectInfoName]
+    if direct then return direct end
+    local short = shortObjectInfoName(objectInfoName)
+    return short ~= objectInfoName and Catalog.ByObject[short] or nil
+end
+
+-- Facility definitions store the native object identity, not a copied
+-- material/icon payload. Keep a small catalog-level resolver for callers
+-- that may have an alias or an entity-script name instead of the exact
+-- object-info key.
+function Catalog.Queries.FindForObjectInfo(objectInfoName)
+    objectInfoName = tostring(objectInfoName or "")
+    if objectInfoName == "" then return nil end
+    local direct = Catalog.Get(objectInfoName)
+    if direct then return direct end
+    local short = shortObjectInfoName(objectInfoName)
+    for _, value in ipairs(Catalog.Queries.List()) do
+        if tostring(value.objectInfoName or "") == objectInfoName
+            or tostring(value.id or "") == objectInfoName
+            or tostring(value.objectInfoName or "") == short
+            or tostring(value.id or "") == short
+        then
+            return Catalog.ByObject[value.objectInfoName]
+        end
+    end
+    return nil
+end
+
+function Catalog.Queries.FindForAliases(aliases)
+    local valuesToTry = type(aliases) == "table" and aliases or { aliases }
+    local normalized = {}
+    for _, aliasValue in ipairs(valuesToTry) do
+        local alias = tostring(aliasValue or "")
+        if alias ~= "" then
+            local direct = Catalog.Queries.FindForObjectInfo(alias)
+            if direct then return direct end
+            normalized[#normalized + 1] = normalizeLookup(alias)
+        end
+    end
+    if #normalized == 0 then return nil end
+    for _, value in ipairs(Catalog.Queries.List()) do
+        local keys = { value.objectInfoName, value.id, value.recipeName,
+            value.displayName }
+        for _, key in ipairs(keys) do
+            local normalizedKey = normalizeLookup(key)
+            for _, normalizedAlias in ipairs(normalized) do
+                if normalizedKey ~= "" and normalizedKey == normalizedAlias
+                then
+                    return Catalog.ByObject[value.objectInfoName]
+                end
+            end
+        end
+    end
+    return nil
+end
+
+function Catalog.Queries.FindNativeObjectInfo(objectInfoName)
+    return nativeObjectInfo(objectInfoName)
 end
 
 function Catalog.Queries.List()
