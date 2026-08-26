@@ -117,6 +117,7 @@ function Internal.sanitizeIdentity(rawIdentity, record)
             surname = Internal.normalizeString(identity.survivor and identity.survivor.surname),
             hairModel = Internal.normalizeString(identity.survivor and identity.survivor.hairModel),
             beardModel = Internal.normalizeString(identity.survivor and identity.survivor.beardModel),
+            skinColor = Internal.sanitizeColor(identity.survivor and identity.survivor.skinColor),
             hairColor = Internal.sanitizeColor(identity.survivor and identity.survivor.hairColor),
             skinTexture = Internal.normalizeString(identity.survivor and identity.survivor.skinTexture),
             voice = Internal.normalizeString(identity.survivor and identity.survivor.voice),

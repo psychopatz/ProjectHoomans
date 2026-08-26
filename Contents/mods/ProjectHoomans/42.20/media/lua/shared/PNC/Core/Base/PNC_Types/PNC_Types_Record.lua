@@ -4,7 +4,7 @@ local Internal = Types.Internal
 function Types.NewRecord(definition)
     local def = Types.NormalizeDefinition(definition)
     local now = PNC.Core.Now()
-    local hostile = def.faction == "hostile"
+    local hostile = def.tacticalClass == "hostile"
     local generatedID = def.id or PNC.Core.GenerateID("npc")
     local Identity = PNC.Identity
     local record = {
@@ -13,12 +13,12 @@ function Types.NewRecord(definition)
         identitySeed = Identity and Identity.NormalizeSeed(
             def.identitySeed,
             tostring(def.displayName or def.name or def.archetypeID
-                or def.faction or "PNC NPC") .. ":" .. tostring(generatedID)
+                or def.tacticalClass or "PNC NPC") .. ":" .. tostring(generatedID)
         ) or (tonumber(def.identitySeed) or 1),
         identity = Internal.NormalizeIdentity(def.identity),
         archetypeID = def.archetypeID,
         archetypeLabel = nil,
-        faction = def.faction,
+        tacticalClass = def.tacticalClass,
         outfit = def.outfit,
         visualProfile = def.visualProfile,
         isFemale = def.isFemale,
@@ -122,7 +122,7 @@ function Types.NewRecord(definition)
         Identity.ApplyRecordIdentity(record, def)
     else
         record.name = record.name or ((hostile and "Hostile NPC")
-            or (def.faction == "neutral" and "Neutral NPC")
+            or (def.tacticalClass == "neutral" and "Neutral NPC")
             or "Colonist NPC")
     end
 

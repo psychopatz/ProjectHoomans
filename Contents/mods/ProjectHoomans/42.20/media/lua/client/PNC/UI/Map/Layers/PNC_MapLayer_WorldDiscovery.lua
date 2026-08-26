@@ -47,7 +47,7 @@ local function populationNPCVisible(snapshot)
     if not generated then
         return true
     end
-    if snapshot.recruited == true or snapshot.colonist == true then
+    if snapshot.recruited == true or snapshot.colonyOwned == true then
         return true
     end
     if PNC.WorldDiscoveryDebugMap

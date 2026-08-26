@@ -52,6 +52,7 @@ function Debug.PerformAction(player, args)
             npcID = context.npcID,
             resultingRevision = context.value and context.value.revision,
             groupResult = copy(context.groupResult),
+            objectiveResult = copy(context.objectiveResult),
         }),
         player,
         context.targetFactionID)

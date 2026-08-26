@@ -100,7 +100,7 @@ function Persistence.SerializeRecord(record)
         recordRevision = math.max(0, math.floor(Internal.normalizeNumber(record.recordRevision, 0))),
         id = record.id,
         persist = record.persist ~= false,
-        faction = record.faction,
+        tacticalClass = record.tacticalClass,
         ownerUsername = Internal.normalizeString(record.ownerUsername),
         identity = identity,
         position = {
@@ -126,7 +126,7 @@ function Persistence.SerializeRecord(record)
                     == tostring(Const.ORDER_PATROL or "patrol")
             and math.max(1, math.floor(Internal.normalizeNumber(record.patrolIndex, 1)))
             or nil,
-        hostility = Internal.sanitizeHostility(record.hostility, record.faction),
+        hostility = Internal.sanitizeHostility(record.hostility, record.tacticalClass),
         health = Internal.serializeHealth(record.health, record.health and record.health.max or Const.DEFAULT_HP_MAX),
         stamina = Internal.serializeStamina(record.stamina),
         weaponMode = tostring(record.weaponMode or "melee"),

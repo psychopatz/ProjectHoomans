@@ -74,6 +74,10 @@ function Visuals.MaintainHumanAppearance(zombie, appearance, isFemale, refreshMo
         if appearance.beardModel and humanVisual.setBeardModel then
             pcall(humanVisual.setBeardModel, humanVisual, appearance.beardModel)
         end
+        immutableColor = makeImmutableColor(appearance.skinColor)
+        if immutableColor and humanVisual.setSkinColor then
+            pcall(humanVisual.setSkinColor, humanVisual, immutableColor)
+        end
         immutableColor = makeImmutableColor(appearance.hairColor)
         if immutableColor and humanVisual.setHairColor then
             pcall(humanVisual.setHairColor, humanVisual, immutableColor)

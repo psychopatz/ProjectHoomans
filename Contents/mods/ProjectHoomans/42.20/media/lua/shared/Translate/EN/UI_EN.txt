@@ -405,4 +405,8 @@ UI_EN = {
     UI_PNC_Research_WaterCollector8 = "Water Collection VIII",
     UI_PNC_Research_WaterCollector9 = "Water Collection IX",
     UI_PNC_Research_WaterCollector10 = "Water Collection X",
+    UI_PNC_FactionCreateAmbientLooterGroup = "Spawn Ambient Looter",
+    UI_PNC_FactionCreateStrategicLooterGroup = "Spawn Player-Base Hunter",
+    UI_PNC_FactionMobileControlMode = "Mobile Control",
+    UI_PNC_FactionMobileRefresh = "Refresh Mobile Objective",
 }

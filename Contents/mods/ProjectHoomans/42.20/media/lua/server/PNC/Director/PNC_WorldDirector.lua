@@ -14,6 +14,7 @@ local Actions = PNC.AbstractActions
 local EncounterResolver = PNC.AbstractEncounterResolver
 local CombatResolver = PNC.AbstractCombatResolver
 local MobileAccidents = PNC.AbstractMobileAccidents
+local MobileGroupDirector = PNC.MobileGroupDirector
 local Scheduler = PNC.Scheduler
 local Config = PNC.DirectorConfig
 
@@ -88,6 +89,17 @@ function Director.Initialize(force)
     for _, report in ipairs(Store.Registry.encounters) do
         if report.outcome == "QUEUED" then EncounterResolver.Enqueue(report) end
     end
+    Scheduler.RegisterJob("MobileAmbient", Config.MOBILE_AMBIENT_INTERVAL_HOURS,
+        function(at, budget)
+            if Director.Paused or not MobileGroupDirector
+                or not MobileGroupDirector.PumpAmbient
+            then
+                return 0
+            end
+            return MobileGroupDirector.PumpAmbient(at, budget)
+        end,
+        { budget = Config.DIRECTOR_JOB_BUDGET,
+            startAt = now + Config.MOBILE_AMBIENT_INTERVAL_HOURS })
     Scheduler.RegisterJob("AbstractTraversal", Config.TRAVERSAL_INTERVAL_HOURS,
         function(at, budget)
             if Director.Paused then return 0 end

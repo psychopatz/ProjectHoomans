@@ -38,7 +38,7 @@ function Behavior.ResolveIntent(observerRecord, target, context)
         return invalid
     end
     local observerFactionID =
-        Factions.GetOrganizationalFactionID(observerRecord)
+        Factions.GetFactionID(observerRecord)
     local observerFaction = observerFactionID
         and Factions.Registry.byID[observerFactionID] or nil
     local targetFactionID, targetKey, targetRecord =
@@ -51,25 +51,25 @@ function Behavior.ResolveIntent(observerRecord, target, context)
                 or not targetRecord
                     and observerRecord.hostility.attackPlayers
             ) == true
-        local legacy = {
+        local unaffiliated = {
             intent = hostile and "attack" or "observe",
             attackAllowed = hostile,
             pursueAllowed = hostile,
             commandable = false,
-            reason = hostile and "legacy_hostility"
+            reason = hostile and "tactical_hostility"
                 or "unaffiliated_neutral",
         }
         if context.returnDebugTrace == true then
             return {
-                result = legacy,
+                result = unaffiliated,
                 trace = {
-                    selectedRule = legacy.reason,
+                    selectedRule = unaffiliated.reason,
                     fallback = "observe",
-                    organizationalFaction = false,
+                    factionID = false,
                 },
             }
         end
-        return legacy
+        return unaffiliated
     end
     local sameFaction = targetFactionID ~= nil
         and targetFactionID == observerFactionID

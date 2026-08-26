@@ -31,8 +31,8 @@ local function notifyAbstraction(record, reason)
             worldAgeHours = worldAgeHours(),
             actorKey = entityRef,
             sourceFactionID = PNC.Factions
-                and PNC.Factions.GetOrganizationalFactionID
-                and PNC.Factions.GetOrganizationalFactionID(record)
+                and PNC.Factions.GetFactionID
+                and PNC.Factions.GetFactionID(record)
                 or nil,
             result = "accepted",
             reason = reason or "abstract",

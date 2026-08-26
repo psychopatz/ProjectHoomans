@@ -58,7 +58,7 @@ shows:
 - organizational faction, archetype, role, and rank;
 - relation and war state toward the current player's faction;
 - authoritative intent, reason, and attack authorization;
-- legacy tactical class and player/NPC/zombie hostility flags;
+- tactical class and player/NPC/zombie hostility flags;
 - current order, active job, and target.
 - directed player relationship approval, respect, familiarity, state,
   revision, and morale;

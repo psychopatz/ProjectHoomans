@@ -1,6 +1,5 @@
--- Server-authoritative bridge from organizational factions to existing
--- companion/combat fields. Persistent faction identity remains canonical;
--- legacy tactical fields are derived compatibility state.
+-- Server-authoritative bridge from persistent factions to tactical behavior.
+-- Persistent faction identity remains canonical; tactical fields are derived.
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode()
 then

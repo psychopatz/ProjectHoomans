@@ -85,6 +85,7 @@ PNC = {
                     id = "dead_colonist",
                     name = "Dead Colonist",
                     deathMarker = true,
+                    colonyOwned = true,
                     colonist = true,
                     state = "corpse",
                     x = 90,

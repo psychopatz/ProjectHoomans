@@ -227,7 +227,7 @@ factions; the separate faction registry is V6.
 
 Loading normalizes partial registry data, clears invalid/missing/dead/currently
 retired community references, and deterministically rebuilds both secondary
-indexes. Migration preserves the legacy faction class, hostility, ownership,
+indexes. Migration preserves the tactical class, hostility, ownership,
 diplomacy, relationships, conduct, profiles, and presence.
 
 ## Validation and debugging

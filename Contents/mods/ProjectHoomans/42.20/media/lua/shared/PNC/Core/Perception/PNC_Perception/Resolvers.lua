@@ -116,9 +116,9 @@ end
 
 function Perception.ResolveHostileTarget(record)
     local hostileConfig = record and record.hostility or {}
-    local organizationalFactionID = PNC.Factions
-        and PNC.Factions.GetOrganizationalFactionID
-        and PNC.Factions.GetOrganizationalFactionID(record)
+    local factionID = PNC.Factions
+        and PNC.Factions.GetFactionID
+        and PNC.Factions.GetFactionID(record)
         or nil
     local npcTarget = nil
     local playerTarget = nil
@@ -136,7 +136,7 @@ function Perception.ResolveHostileTarget(record)
     -- Organizational hostility is resolved dynamically for each player by
     -- CanNPCTargetPlayer(). Do not let a cached compatibility flag prevent
     -- that authoritative check after a transfer or treaty change.
-    if organizationalFactionID
+    if factionID
         or hostileConfig.attackPlayers ~= false
     then
         playerTarget = Perception.FindNearestEnemyPlayer(record, 12)
@@ -150,9 +150,9 @@ end
 
 function Perception.ResolveRoamingTarget(record, radius)
     local hostility = record and record.hostility or {}
-    local organizationalFactionID = PNC.Factions
-        and PNC.Factions.GetOrganizationalFactionID
-        and PNC.Factions.GetOrganizationalFactionID(record)
+    local factionID = PNC.Factions
+        and PNC.Factions.GetFactionID
+        and PNC.Factions.GetFactionID(record)
         or nil
     local searchRadius = math.max(1, tonumber(radius) or Const.ROAM_TARGET_RADIUS or 12)
     local npcTarget = nil
@@ -168,7 +168,7 @@ function Perception.ResolveRoamingTarget(record, radius)
     if hostility.attackNPCs ~= false then
         npcTarget = Perception.FindNearestEnemyNPC(record, searchRadius)
     end
-    if organizationalFactionID
+    if factionID
         or hostility.attackPlayers == true
     then
         playerTarget = Perception.FindNearestEnemyPlayer(record, searchRadius)

@@ -128,41 +128,27 @@ function Commands.List()
     return output
 end
 
-local function ownerUsername(record)
-    return record and (
-        record.ownerUsername
-        or record.characterWindow and record.characterWindow.ownerUsername
-    ) or nil
-end
-
-local function ownerOnlineID(record)
-    return record and (
-        record.ownerOnlineID
-        or record.characterWindow and record.characterWindow.ownerOnlineID
-    ) or nil
-end
-
 function Commands.IsCompanion(record)
-    local faction
-    local hasOwner
     if not record or record.alive == false then return false end
-    faction = tostring(record.faction or "")
-    hasOwner = ownerUsername(record) ~= nil or ownerOnlineID(record) ~= nil
-    return (faction == tostring(Const.FACTION_COLONIST or "colonist")
-        or faction == "companion")
-        and (record.recruited == true or hasOwner)
+    if PNC.Identity and PNC.Identity.Verifier
+        and PNC.Identity.Verifier.IsCompanion
+    then
+        return PNC.Identity.Verifier.IsCompanion(record)
+    end
+    return record.recruited == true
 end
 
 function Commands.IsOwnedByPlayer(record, player)
-    local recordUsername
-    local recordOnlineID
-    local username
-    local onlineID
     local organizationID
     local organization
     local uuid
     local playerKey
     if not record or not player then return false end
+    if PNC.Identity and PNC.Identity.Verifier
+        and PNC.Identity.Verifier.IsOwnedByPlayer
+    then
+        return PNC.Identity.Verifier.IsOwnedByPlayer(record, player)
+    end
     organizationID = record.affiliation
         and record.affiliation.factionID or nil
     organization = organizationID
@@ -170,7 +156,7 @@ function Commands.IsOwnedByPlayer(record, player)
         and PNC.Factions.Get
         and PNC.Factions.Get(organizationID)
         or nil
-    if organization and organization.ownerPlayerKey then
+    if organization then
         uuid = PNC.PlayerCharacters
             and PNC.PlayerCharacters.GetCharacterUUID
             and PNC.PlayerCharacters.GetCharacterUUID(player)
@@ -187,24 +173,16 @@ function Commands.IsOwnedByPlayer(record, player)
                     uuid
                 ) or nil
         if playerKey then
-            return organization.playerMemberKeys[playerKey] == true
+            return organization.ownerPlayerKey == playerKey
+                or organization.playerMemberKeys
+                    and organization.playerMemberKeys[playerKey] == true
         end
         -- Organizational ownership is character-UUID scoped. If the stable
         -- key cannot be resolved, never fall back to account name or online
         -- ID and accidentally grant a replacement survivor authority.
         return false
     end
-    recordUsername = ownerUsername(record)
-    recordOnlineID = tonumber(ownerOnlineID(record))
-    username = player.getUsername and tostring(player:getUsername() or "") or ""
-    onlineID = player.getOnlineID and tonumber(player:getOnlineID()) or nil
-    if recordUsername ~= nil and username ~= ""
-        and tostring(recordUsername) == username
-    then
-        return true
-    end
-    return recordOnlineID ~= nil and onlineID ~= nil
-        and recordOnlineID == onlineID
+    return false
 end
 
 local function livePosition(record)

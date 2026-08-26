@@ -33,6 +33,16 @@ function Director.GenerateForFaction(factionID, spec)
         spec.mobilePathMode,
         faction.mobile and faction.mobile.pathMode
     )
+    local controlMode = spec.mobileControlMode
+        or spec.mobilePathMode and (
+            mode == Constants.MOBILE_PATH_PLAYER
+                and Constants.MOBILE_CONTROL_STRATEGIC
+                or Constants.MOBILE_CONTROL_AMBIENT
+        )
+        or faction.mobile and faction.mobile.controlMode
+        or mode == Constants.MOBILE_PATH_PLAYER
+            and Constants.MOBILE_CONTROL_STRATEGIC
+        or Constants.MOBILE_CONTROL_AMBIENT
     local site, siteReason = H.ResolveSite(
         faction,
         spec,
@@ -68,7 +78,7 @@ function Director.GenerateForFaction(factionID, spec)
             forceLive = requestLive and siteLoaded,
             equipmentSpawnMode = faction.archetypeID == "looter"
                 and "both" or nil,
-            organizationalFactionID = faction.id,
+            factionID = faction.id,
             membershipStatus = "member",
             factionRole = H.FactionRole(faction, index),
             factionJoinedAt = at,
@@ -115,7 +125,8 @@ function Director.GenerateForFaction(factionID, spec)
         mode,
         at,
         previous,
-        previous ~= nil
+        previous ~= nil,
+        controlMode
     )
     local ok, reason, mobile = Factions.SetMobileGroup(
         faction.id,

@@ -32,8 +32,8 @@ function Debug.SetPlayerPacification(player, args)
     }, at)
     if not targetKey then return nil, reason end
     local factionID = PNC.Factions
-        and PNC.Factions.GetOrganizationalFactionID
-        and PNC.Factions.GetOrganizationalFactionID(observer)
+        and PNC.Factions.GetFactionID
+        and PNC.Factions.GetFactionID(observer)
         or nil
     if not factionID then
         return nil, "observer_has_no_faction"

@@ -17,38 +17,16 @@ local function normalizeString(value)
     return tostring(value)
 end
 
-local function hasValue(value)
-    return value ~= nil and tostring(value) ~= ""
-end
-
 -- Death markers are a player-facing colony record, not a general NPC
--- cemetery.  Community membership is the authoritative colony relationship;
--- the recruited/owner and legacy faction fields preserve compatibility with
--- companions created before affiliations were introduced.
+-- cemetery. Only faction membership in a player faction is eligible.
 function Registry.IsColonyOwnedNPC(record)
-    local affiliation
-    local faction
     if type(record) ~= "table" then return false end
-    if record.colonyOwned == true
-        or record.colonist == true
-        or record.recruited == true
-        or hasValue(record.ownerUsername)
-        or record.ownerOnlineID ~= nil
+    if PNC.Identity and PNC.Identity.Verifier
+        and PNC.Identity.Verifier.IsColonyOwnedNPC
     then
-        return true
+        return PNC.Identity.Verifier.IsColonyOwnedNPC(record)
     end
-    affiliation = type(record.affiliation) == "table"
-        and record.affiliation or nil
-    if affiliation and (
-        hasValue(affiliation.communityID)
-        or hasValue(affiliation.communityId)
-    ) then
-        return true
-    end
-    faction = string.lower(tostring(record.faction or ""))
-    return faction == "colonist"
-        or faction == "companion"
-        or faction == "friendly"
+    return record.colonyOwned == true
 end
 
 local function normalizeMarker(source, fallbackID)
@@ -56,9 +34,6 @@ local function normalizeMarker(source, fallbackID)
     local colonyOwned
     if type(source) ~= "table" then return nil end
     colonyOwned = source.colonyOwned == true
-        or source.colonist == true
-        or source.recruited == true
-        or tostring(source.faction or "") == "colonist"
     marker = {
         id = normalizeString(source.id or fallbackID),
         name = normalizeString(source.name or source.displayName) or "Unknown NPC",
@@ -67,6 +42,8 @@ local function normalizeMarker(source, fallbackID)
         z = tonumber(source.z) or 0,
         corpseToken = normalizeString(source.corpseToken or source.token),
         createdWorldHour = tonumber(source.createdWorldHour) or 0,
+        factionID = source.factionID
+            or source.affiliation and source.affiliation.factionID,
         infected = source.infected == true,
         colonyOwned = colonyOwned,
         colonist = colonyOwned,
@@ -160,6 +137,9 @@ function Registry.AddDeathMarker(record)
         infected = infection and infection.fatal == true or false,
         colonyOwned = true,
         colonist = true,
+        factionID = PNC.Identity and PNC.Identity.Verifier
+            and PNC.Identity.Verifier.GetFactionID(record)
+            or record.affiliation and record.affiliation.factionID,
         portrait = PNC.Identity
             and PNC.Identity.BuildPortraitSummary
             and PNC.Identity.BuildPortraitSummary(record)

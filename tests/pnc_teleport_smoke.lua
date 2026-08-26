@@ -105,7 +105,7 @@ PNC = {
 }
 
 require "PNC/Networking/PNC_ServerCommandRouter"
-require "PNC/Networking/Handlers/PNC_ServerLegacyDebugCommandHandler"
+require "PNC/Networking/Handlers/PNC_ServerDebugCommandHandler"
 T.load(SERVER_FILE)
 onClientCommand("PNC", "DebugCommand", serverPlayer, { action = "teleport_to_npc", id = "far_npc" })
 local serverCall = coreTeleportCalls[#coreTeleportCalls]

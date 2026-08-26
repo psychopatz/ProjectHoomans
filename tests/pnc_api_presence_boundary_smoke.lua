@@ -3,7 +3,7 @@ local T = require "tests/support/test"
 local source = T.read("ProjectHoomans", "shared", "PNC/Core/API/PNC_API.lua")
 local providers = {
     "Lifecycle", "HealthSnapshots", "MapPresentation", "DebugCommands",
-    "Travel", "Conversations", "AnimationScenes", "MapCommands",
+    "Travel", "Conversations", "AnimationScenes", "MapCommands", "Identity",
 }
 local publicFunctions = {
     "Spawn", "Despawn", "SetOrder", "SetHostility", "SetLoadout",
@@ -29,7 +29,7 @@ for i = 1, #publicFunctions do
         "entry point should preserve API." .. functionName)
 end
 for _, namespace in ipairs({
-    "MapPresentation", "Travel", "Conversations", "AnimationScenes", "MapCommands",
+    "MapPresentation", "Travel", "Conversations", "AnimationScenes", "MapCommands", "Identity",
 }) do
     T.truthy(type(PNC.API[namespace]) == "table", namespace .. " namespace")
 end
@@ -37,4 +37,7 @@ T.equal(type(PNC.API.Travel.Start), "function", "Travel.Start")
 T.equal(type(PNC.API.Conversations.RegisterBlock), "function", "Conversations.RegisterBlock")
 T.equal(type(PNC.API.AnimationScenes.Play), "function", "AnimationScenes.Play")
 T.equal(type(PNC.API.MapCommands.RegisterHandler), "function", "MapCommands.RegisterHandler")
+T.equal(type(PNC.API.Identity.Get), "function", "Identity.Get")
+T.equal(type(PNC.API.Identity.VerifyPayload), "function", "Identity.VerifyPayload")
+T.equal(type(PNC.API.Identity.ResolveOwnership), "function", "Identity.ResolveOwnership")
 T.finish("pnc_api_presence_boundary_smoke")

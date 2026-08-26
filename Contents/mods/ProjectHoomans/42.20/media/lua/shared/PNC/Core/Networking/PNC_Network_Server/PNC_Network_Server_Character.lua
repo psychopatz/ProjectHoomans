@@ -30,6 +30,12 @@ function Network.CanViewCharacter(player, record)
     if access == "admin" then
         return true
     end
+    if PNC.Identity and PNC.Identity.Verifier
+        and PNC.Identity.Verifier.GetFactionID
+        and PNC.Identity.Verifier.GetFactionID(record)
+    then
+        return PNC.Identity.Verifier.IsOwnedByPlayer(record, player)
+    end
     if record.ownerUsername and player.getUsername and tostring(record.ownerUsername) == tostring(player:getUsername()) then
         return true
     end

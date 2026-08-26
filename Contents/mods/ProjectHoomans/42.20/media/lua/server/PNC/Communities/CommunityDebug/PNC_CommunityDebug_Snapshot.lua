@@ -21,6 +21,7 @@ function Debug.BuildSnapshot(
 )
     local communities = Communities.List()
     local factions = {}
+    local mobileGroups = {}
     local roster = {}
     local diagnostics = {}
     local selected
@@ -47,7 +48,11 @@ function Debug.BuildSnapshot(
             ) or nil
     end
     for _, faction in ipairs(PNC.Factions.List()) do
-        factions[#factions + 1] = H.FactionSummary(faction)
+        local summary = H.FactionSummary(faction)
+        factions[#factions + 1] = summary
+        if summary.mobile then
+            mobileGroups[#mobileGroups + 1] = summary
+        end
         local leader = faction.leaderNPCID
             and PNC.Registry.Get(faction.leaderNPCID) or nil
         local relation = playerFaction
@@ -76,6 +81,9 @@ function Debug.BuildSnapshot(
                 and tostring(leader.name or leader.id) or nil,
         }
     end
+    table.sort(mobileGroups, function(left, right)
+        return tostring(left.id) < tostring(right.id)
+    end)
     for _, community in ipairs(communities) do
         if community.id == selectedCommunityID then
             selected = community
@@ -117,6 +125,7 @@ function Debug.BuildSnapshot(
         communities = communities,
         sites = Communities.ListSites(),
         factions = factions,
+        mobileGroups = mobileGroups,
         roster = roster,
         members = H.SelectedMembers(selected),
         selectedCommunity = H.Copy(selected),
@@ -140,4 +149,3 @@ function Debug.BuildSnapshot(
 end
 
 return Debug
-

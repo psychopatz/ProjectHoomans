@@ -14,7 +14,7 @@ local Registry = PNC.Registry
 
 Starting.NextRetryAt = Starting.NextRetryAt or {}
 Starting.RETRY_DELAY_MS = 5000
-Starting.ENRICHMENT_VERSION = 3
+Starting.ENRICHMENT_VERSION = 5
 
 function H.NowMs()
     return PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
@@ -71,4 +71,3 @@ function H.OwnerMatches(record, player)
 end
 
 return Starting
-

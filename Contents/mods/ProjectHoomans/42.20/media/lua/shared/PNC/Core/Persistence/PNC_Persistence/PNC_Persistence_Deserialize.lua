@@ -27,7 +27,7 @@ local function buildDefinition(
             or (identity and identity.displayName) or nil,
         name = raw.displayName or raw.name
             or (identity and identity.displayName) or nil,
-        faction = raw.faction,
+        tacticalClass = raw.tacticalClass,
         visualProfile = raw.visualProfile,
         outfit = raw.outfit,
         isFemale = raw.isFemale == true
@@ -143,7 +143,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     if record.orderSpec and PNC.OrderSystem and PNC.OrderSystem.Normalize then
         record.orderSpec = PNC.OrderSystem.Normalize(record, record.orderSpec)
     end
-    record.hostility = Internal.sanitizeHostility(raw.hostility, record.faction)
+    record.hostility = Internal.sanitizeHostility(raw.hostility, record.tacticalClass)
     record.health = Internal.sanitizeHealth(raw.health or raw, record.health and record.health.max or Const.DEFAULT_HP_MAX)
     record.alive = tostring(record.health.state or "") ~= "dead"
         and tostring(record.health.state or "") ~= "corpse"

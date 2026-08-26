@@ -12,6 +12,8 @@ local Archetypes = PNC.FactionArchetypes
 local Types = PNC.FactionTypes
 local Core = PNC.Core
 local Balance = PNC.FactionBalance
+local IdentityVerifier = PNC.Identity
+    and PNC.Identity.Verifier or nil
 local worldAgeHours = Internal.worldAgeHours
 local targetSummary = Internal.targetSummary
 local relationshipChanges = Internal.relationshipChanges
@@ -25,7 +27,9 @@ local function npcDiagnostic(
 )
     local affiliation = Factions.GetNPCAffiliation(record.id)
         or {}
-    local factionID = affiliation.factionID
+    local factionID = IdentityVerifier
+        and IdentityVerifier.GetFactionID(record)
+        or affiliation.factionID
     local faction = factionID and Factions.Get(factionID) or nil
     local relation = faction and playerFaction
         and faction.id ~= playerFaction.id
@@ -51,6 +55,12 @@ local function npcDiagnostic(
         and PNC.Relationships.Get
         and PNC.Relationships.Get(record.id, playerKey)
         or nil
+    local identity = IdentityVerifier
+        and IdentityVerifier.BuildView(record, { includeOwner = true })
+        or nil
+    local identityVerification = IdentityVerifier
+        and IdentityVerifier.Verify(record)
+        or nil
     return {
         npcID = record.id,
         factionID = factionID,
@@ -60,9 +70,17 @@ local function npcDiagnostic(
         rank = affiliation.rank,
         membershipStatus = affiliation.membershipStatus,
         affiliationRevision = affiliation.revision,
-        legacyFaction = record.faction,
-        recruited = record.recruited == true,
-        ownerUsername = record.ownerUsername,
+        tacticalClass = record.faction,
+        recruited = identity and identity.recruited
+            or record.recruited == true,
+        ownerUsername = identity and identity.ownerUsername
+            or record.ownerUsername,
+        ownerOnlineID = identity and identity.ownerOnlineID
+            or record.ownerOnlineID,
+        identity = identity,
+        identityVerification = identityVerification,
+        colonyOwned = identity and identity.colonyOwned
+            or false,
         hostilityMode = hostility.mode,
         attackPlayers = hostility.attackPlayers == true,
         attackNPCs = hostility.attackNPCs == true,

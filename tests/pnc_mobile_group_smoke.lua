@@ -107,7 +107,7 @@ function PNC.API.Spawn(spec)
     }
     PNC.Registry.Data[id] = record
     local added = PNC.Factions.AddNPC(
-        spec.organizationalFactionID,
+        spec.factionID,
         id,
         {
             membershipStatus = spec.membershipStatus,

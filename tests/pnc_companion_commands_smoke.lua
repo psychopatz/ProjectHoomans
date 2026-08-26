@@ -21,6 +21,10 @@ local function companion(id, owner, x)
         recruited = true,
         ownerUsername = owner,
         ownerOnlineID = owner == "alice" and 7 or 8,
+        affiliation = {
+            factionID = owner == "alice"
+                and "faction_alice" or "faction_bob",
+        },
         presenceState = "live",
         x = x or 0,
         y = 0,
@@ -219,6 +223,9 @@ PNC.Factions = {
             },
         },
     },
+    Get = function(id)
+        return PNC.Factions.Registry.byID[id]
+    end,
 }
 records.owned.affiliation = { factionID = "faction_alice" }
 T.equal(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
@@ -438,6 +445,7 @@ local ownedSnapshot = {
     z = 0,
     displayName = "Walker Sage",
     attackType = "none",
+    affiliation = { factionID = "faction_alice" },
     characterWindow = { ownerUsername = "alice" },
 }
 

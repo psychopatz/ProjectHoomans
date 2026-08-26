@@ -113,8 +113,8 @@ local function managedCandidateIsEnemy(candidate, currentRecord, npcID)
         and PNC.Network.ClientState.snapshots
         or {}
     local snapshot = snapshots[tostring(managedID)]
-    return snapshot and tostring(snapshot.faction or "") == "hostile"
-        or false, nil
+    return snapshot and type(snapshot.hostility) == "table"
+        and snapshot.hostility.attackPlayers == true or false, nil
 end
 
 local function candidateTargetsConversation(

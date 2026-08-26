@@ -16,7 +16,7 @@ end
 
 local function hostileParleyRequested(record, options)
     return options.allowHostileParley == true
-        and tostring(record.faction or "") == "hostile"
+        and tostring(record.tacticalClass or "") == "hostile"
         and type(record.hostility) == "table"
         and record.hostility.attackPlayers == true
 end

@@ -41,6 +41,10 @@ function Internal.handleCreationAction(player, args, action, context)
             tags.mobileGroup = true
             tags.mobilePathMode = tostring(
                 args and args.mobilePathMode or "random")
+            if args and args.mobileControlMode then
+                tags.mobileControlMode = tostring(
+                    args.mobileControlMode)
+            end
         end
         ok, reason, context.value = Factions.Create({
             name = generatedFactionName(archetypeID, context.at),
@@ -55,6 +59,13 @@ function Internal.handleCreationAction(player, args, action, context)
                     PNC.MobileGroupDirector.GenerateForFaction(
                         context.factionID,
                         mobileGroupSpec(player, args, context.at))
+                if ok and args and args.refreshMobileObjective
+                    and PNC.MobileGroupDirector.RefreshFactionObjective
+                then
+                    ok, reason, context.objectiveResult =
+                        PNC.MobileGroupDirector.RefreshFactionObjective(
+                            context.factionID, context.at)
+                end
             else
                 ok, reason, context.groupResult =
                     PNC.CommunityDirector.GenerateForFaction(
@@ -91,6 +102,13 @@ function Internal.handleCreationAction(player, args, action, context)
                 PNC.MobileGroupDirector.GenerateForFaction(
                     context.factionID,
                     mobileGroupSpec(player, args, context.at))
+            if ok and args and args.refreshMobileObjective
+                and PNC.MobileGroupDirector.RefreshFactionObjective
+            then
+                ok, reason, context.objectiveResult =
+                    PNC.MobileGroupDirector.RefreshFactionObjective(
+                        context.factionID, context.at)
+            end
         else
             ok, reason, context.groupResult =
                 PNC.CommunityDirector.GenerateForFaction(
@@ -100,6 +118,28 @@ function Internal.handleCreationAction(player, args, action, context)
     elseif action == "mobile_path_mode" then
         ok, reason, context.value = PNC.MobileGroupDirector.SetPathMode(
             context.factionID, args and args.mobilePathMode)
+        if ok and args and args.refreshMobileObjective
+            and PNC.MobileGroupDirector.RefreshFactionObjective
+        then
+            ok, reason, context.objectiveResult =
+                PNC.MobileGroupDirector.RefreshFactionObjective(
+                    context.factionID, context.at)
+        end
+    elseif action == "mobile_control_mode" then
+        ok, reason, context.value =
+            PNC.MobileGroupDirector.SetControlMode(
+                context.factionID, args and args.mobileControlMode)
+        if ok and args and args.refreshMobileObjective
+            and PNC.MobileGroupDirector.RefreshFactionObjective
+        then
+            ok, reason, context.objectiveResult =
+                PNC.MobileGroupDirector.RefreshFactionObjective(
+                    context.factionID, context.at)
+        end
+    elseif action == "mobile_refresh" then
+        ok, reason, context.objectiveResult =
+            PNC.MobileGroupDirector.RefreshFactionObjective(
+                context.factionID, context.at)
     elseif action == "mobile_relocate" then
         ok, reason, context.value =
             PNC.MobileGroupDirector.RelocateFaction(

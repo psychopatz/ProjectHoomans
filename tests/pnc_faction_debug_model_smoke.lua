@@ -241,6 +241,39 @@ expectRowContaining(overview, "Source faction", "Test Cooperative")
 expectRowContaining(overview, "Diplomatic state", "war")
 expectRowContaining(overview, "Invariant check", "PASS")
 
+local mobileRows = PNC.FactionDebugModel.BuildRows({
+    factions = {},
+    selectedFaction = {
+        id = "faction_mobile",
+        name = "Road Raiders",
+        archetypeID = "looter",
+        archetypeLabel = "Looter Gang",
+        status = "active",
+        mobile = {
+            active = true,
+            controlMode = "strategic",
+            pathMode = "player",
+            strategicTarget = {
+                kind = "player_base",
+                baseID = "base_player",
+                x = 10,
+                y = 20,
+                z = 0,
+            },
+            site = {
+                id = "site_staging",
+                home = { x = 1, y = 2, z = 0 },
+            },
+            nextMoveAt = 42,
+            relocationCount = 1,
+        },
+    },
+    currentPlayerFactionID = "faction_player",
+}, true, nil)
+expectRowContaining(mobileRows, "Group type", "control=strategic")
+expectRowContaining(mobileRows, "Mobile objective", "player base")
+expectRowContaining(mobileRows, "Mobile target", "base_player")
+
 local diplomacy = PNC.FactionDebugModel.BuildGUIRows(
     snapshot, true, nil, "diplomacy"
 )

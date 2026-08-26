@@ -29,6 +29,53 @@ local function colorToTable(color)
     }
 end
 
+local function readVisualColor(humanVisual, methodName)
+    local getter
+    local ok
+    local color
+    if not humanVisual then
+        return nil
+    end
+    getter = humanVisual[methodName]
+    if not getter then
+        return nil
+    end
+    ok, color = pcall(getter, humanVisual)
+    return ok and colorToTable(color) or nil
+end
+
+local function readVisualString(humanVisual, methodName)
+    local getter
+    local ok
+    local value
+    if not humanVisual then
+        return nil
+    end
+    getter = humanVisual[methodName]
+    if not getter then
+        return nil
+    end
+    ok, value = pcall(getter, humanVisual)
+    return ok and normalizeString(value) or nil
+end
+
+function Identity.GetCharacterAppearance(character)
+    local humanVisual
+    if not character or not character.getHumanVisual then
+        return nil
+    end
+    local ok
+    ok, humanVisual = pcall(character.getHumanVisual, character)
+    if not ok or not humanVisual then
+        return nil
+    end
+    return {
+        skinTexture = readVisualString(humanVisual, "getSkinTexture"),
+        skinColor = readVisualColor(humanVisual, "getSkinColor"),
+        hairColor = readVisualColor(humanVisual, "getHairColor"),
+    }
+end
+
 local function tryCreateSurvivor()
     local ok
     local desc
@@ -58,7 +105,7 @@ function Identity.GenerateResolvedIdentity(source)
     local forename
     local surname
     local displayName
-    local hairColor
+    local appearance
     if resolvedFemale == nil and desc and desc.isFemale then
         resolvedFemale = desc:isFemale()
     end
@@ -74,9 +121,7 @@ function Identity.GenerateResolvedIdentity(source)
     end
     forename = desc and desc.getForename and normalizeString(desc:getForename()) or nil
     surname = desc and desc.getSurname and normalizeString(desc:getSurname()) or nil
-    if humanVisual and humanVisual.getHairColor then
-        hairColor = colorToTable(humanVisual:getHairColor())
-    end
+    appearance = Identity.GetCharacterAppearance(desc)
     displayName = explicitName
     if not displayName then
         if forename or surname then
@@ -102,10 +147,10 @@ function Identity.GenerateResolvedIdentity(source)
             surname = surname,
             hairModel = humanVisual and humanVisual.getHairModel and normalizeString(humanVisual:getHairModel()) or nil,
             beardModel = humanVisual and humanVisual.getBeardModel and normalizeString(humanVisual:getBeardModel()) or nil,
-            hairColor = hairColor,
-            skinTexture = humanVisual and humanVisual.getSkinTexture and normalizeString(humanVisual:getSkinTexture()) or nil,
+            skinColor = appearance and appearance.skinColor or nil,
+            hairColor = appearance and appearance.hairColor or nil,
+            skinTexture = appearance and appearance.skinTexture or nil,
             voice = desc and desc.getVoicePrefix and normalizeString(desc:getVoicePrefix()) or nil,
         },
     }
 end
-

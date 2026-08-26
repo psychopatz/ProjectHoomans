@@ -9,7 +9,7 @@ It deliberately separates four concepts:
 - a faction archetype describes what kind of organization it is;
 - a faction record identifies one persistent organization;
 - `record.affiliation` stores an NPC's organization, role, rank, and status;
-- legacy `record.faction` is derived tactical compatibility state.
+- `record.faction` is the NPC tactical behavior class.
 
 `record.affiliation.factionID` is canonical membership. Assigning an NPC to a
 looter organization removes player ownership. Roaming looter organizations
@@ -415,7 +415,7 @@ for mobile refugees it gives the non-combat player-following roam mode. The
 Faction Inspector exposes both path modes and a guarded **Move Mobile Group
 Now** control for testing.
 
-The legacy tactical bridge sets peaceful settlers, traders, refugees, and
+The tactical behavior bridge sets peaceful settlers, traders, refugees, and
 territorial toll factions to neutral roaming. Regular roaming looters use
 hostile-hunt compatibility state by default; other archetypes use it only
 while their faction has an active war. Final target filtering still resolves
@@ -439,7 +439,8 @@ records through `PNC.Factions.Get`; they do not inspect the mutable registry.
 Once an NPC belongs to a player-owned organizational faction, command ownership
 must resolve an exact stable player entity key. Failure to resolve that key is
 a denial and never falls back to account username or transient online ID. The
-legacy owner fields remain only for unaffiliated/legacy companion compatibility.
+Owner username and online ID are presentation/navigation metadata only. Faction
+ownership is authorized by the stable factionID and player entity key.
 
 Add rejects unintended dual membership. Transfer changes source/destination
 indexes and history atomically. A player faction has exactly one player
@@ -509,9 +510,9 @@ Copied reads include:
   `TransferCurrentFactionLeadership`;
 - `HandlePlayerCharacterDeath`, `ReconcilePlayerMemberships`;
 - `SetEmblem`, `SetPlayerFactionEmblem`;
-- `GetRelation` (`GetDiplomacy` is a directed compatibility alias);
+- `GetRelation` for directed faction relations;
 - `AreAtWar`, `AreAllied`, `GetTruceUntil`, `IsFactionAtWar`;
-- `GetOrganizationalFactionID`, `GetLegacyFactionClass`.
+- `GetFactionID`.
 
 Authority mutation also includes membership, leadership, archival/destruction,
 `CommitDirectedRelation`, `RecalculateRelation`, and

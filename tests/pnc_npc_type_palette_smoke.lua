@@ -30,6 +30,7 @@ T.equal(Palette.ResolveType({
 }), "colonist", "snapshot colonist type")
 T.equal(Palette.ResolveType({
     deathMarker = true,
+    colonyOwned = true,
     colonist = true,
 }), "deadColonist", "dead colonist type")
 

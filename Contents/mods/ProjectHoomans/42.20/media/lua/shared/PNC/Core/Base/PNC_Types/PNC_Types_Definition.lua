@@ -3,11 +3,11 @@ local Internal = Types.Internal
 
 function Types.NormalizeDefinition(definition)
     local def = definition or {}
-    local faction = Types.NormalizeFaction(def.faction or def.role)
+    local tacticalClass = Types.NormalizeTacticalClass(def.tacticalClass)
     local x = tonumber(def.x) or 0
     local y = tonumber(def.y) or 0
     local z = tonumber(def.z) or 0
-    local isHostile = faction == "hostile"
+    local isHostile = tacticalClass == "hostile"
     local explicitName = Internal.NormalizeString(def.displayName or def.name)
     local vanillaTraitSource = def.vanillaTraits or def.physiologicalTraits
     local vanillaTraitsAuthored = def.vanillaTraitsAuthored
@@ -25,7 +25,7 @@ function Types.NormalizeDefinition(definition)
         name = explicitName,
         displayName = explicitName,
         archetypeID = Internal.NormalizeString(def.archetypeID),
-        faction = faction,
+        tacticalClass = tacticalClass,
         outfit = def.outfit and tostring(def.outfit) or nil,
         visualProfile = Internal.NormalizeString(def.visualProfile),
         isFemale = def.isFemale == nil and nil or def.isFemale == true,
@@ -52,7 +52,7 @@ function Types.NormalizeDefinition(definition)
         equipmentPoolID = Internal.NormalizeString(def.equipmentPoolID)
             or "Default",
         combatProfile = PNC.Core.DeepCopy(def.combatProfile or {}),
-        hostility = Types.NormalizeHostility(faction, def.hostility),
+        hostility = Types.NormalizeHostility(tacticalClass, def.hostility),
         equipment = Internal.NormalizeEquipment(def.equipment),
         inventory = Internal.NormalizeInventory(def.inventory),
         allowedJobs = PNC.Core.DeepCopy(def.allowedJobs or {}),
@@ -62,11 +62,10 @@ function Types.NormalizeDefinition(definition)
         recruited = def.recruited == true,
         social = type(def.social) == "table"
             and PNC.Core.DeepCopy(def.social) or nil,
-        organizationalFactionID = Internal.NormalizeString(
-            def.organizationalFactionID or def.factionID),
+        factionID = Internal.NormalizeString(def.factionID),
         membershipStatus = Internal.NormalizeString(def.membershipStatus),
-        factionRole = Internal.NormalizeString(def.factionRole or def.role),
-        factionRank = Internal.NormalizeString(def.factionRank or def.rank),
+        factionRole = Internal.NormalizeString(def.factionRole),
+        factionRank = Internal.NormalizeString(def.factionRank),
         factionJoinedAt = tonumber(def.factionJoinedAt),
         mapPresentation = PNC.MapPresentation
             and PNC.MapPresentation.Normalize(def.mapPresentation) or nil,

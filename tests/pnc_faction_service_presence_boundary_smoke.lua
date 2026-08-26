@@ -66,8 +66,7 @@ for functionName, _ in pairs(publicFunctions) do
     T.equal(type(PNC.Factions[functionName]), "function",
         "entry point should preserve Factions." .. functionName)
 end
-T.equal(publicCount, 87, "public function declaration count")
-T.equal(type(PNC.Factions.GetDiplomacy), "function", "diplomacy alias")
+T.equal(publicCount, 86, "public function declaration count")
 T.equal(type(PNC.Factions.NormalizeFactionRegistry), "function",
     "registry normalization alias")
 T.equal(type(PNC.Factions.NormalizeFaction), "function",

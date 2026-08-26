@@ -43,7 +43,7 @@ local function factionIDForEntityKey(key)
         local record = Registry and Registry.Get
             and Registry.Get(parsed.npcID) or nil
         return record
-            and PNC.Factions.GetOrganizationalFactionID(record)
+            and PNC.Factions.GetFactionID(record)
             or nil
     end
     if parsed.kind == "player" then

@@ -96,7 +96,7 @@
 - `PNC_Behavior_Common`: shared owner, movement, and combat-debug helpers
 - `PNC_Behavior_Targeting`: target refresh and facing helpers
 - `PNC_Behavior_Combat`: combat engage sequencing
-- `PNC_Behavior_Companion`: colonist follow, guard, and patrol job handlers (legacy module filename)
+- `PNC_Behavior_Companion`: colonist follow, guard, and patrol job handlers
 - `PNC_Behavior_Roaming`: faction-neutral, enemy-aware roaming with registered roam modes
 - `PNC_Behavior_Hostile`: hunt and direct engage job handlers
 - `PNC_Behavior_Incapacitated`: crawl and downed shove handling
@@ -177,8 +177,8 @@
   identity, copied directed queries, atomic membership/treaties, attack
   aggregation, policy-aware escalation, player factions,
   leadership/archive operations, index repair, and sanitized inspection
-- `PNC_FactionBehavior`: centralized derivation of legacy companion,
-  ownership, order, and hostility fields from canonical faction state
+- `PNC_FactionBehavior`: centralized derivation of companion ownership,
+  tactical class, order, and hostility fields from canonical faction state
 - `PNC_CommunityService`, `PNC_CommunitySiteResolver`,
   `PNC_CommunityDirector`, `PNC_CommunityValidation`, and
   `PNC_CommunityDebug`: separate `PNC_Communities` ModData authority,

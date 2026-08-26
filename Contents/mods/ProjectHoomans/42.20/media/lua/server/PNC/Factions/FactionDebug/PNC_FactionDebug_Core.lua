@@ -46,6 +46,7 @@ local function mobileGroupSpec(player, args, at)
         groupSize = args and args.groupSize,
         presenceMode = args and args.presenceMode,
         mobilePathMode = args and args.mobilePathMode,
+        mobileControlMode = args and args.mobileControlMode,
         worldAgeHours = at,
         debug = true,
     }

@@ -16,7 +16,7 @@ PNC = {
     Relationships = {},
     Stealth = {},
     Factions = {
-        GetOrganizationalFactionID = function(record)
+        GetFactionID = function(record)
             return record
                 and record.affiliation
                 and record.affiliation.factionID

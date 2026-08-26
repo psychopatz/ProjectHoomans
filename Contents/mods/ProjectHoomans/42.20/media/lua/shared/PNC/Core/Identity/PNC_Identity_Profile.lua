@@ -29,16 +29,16 @@ end
 
 function Identity.ResolveArchetypeID(source)
     local seed
-    local faction
+    local tacticalClass
     local options
     local explicit = normalizeString(source and source.archetypeID or nil)
     if explicit and Archetypes.Get(explicit) then
         return Archetypes.Get(explicit).id
     end
-    seed = Identity.NormalizeSeed(source and source.identitySeed or nil, tostring(source and source.faction or "colonist"))
-    faction = PNC.Types and PNC.Types.NormalizeFaction and PNC.Types.NormalizeFaction(source and source.faction) or tostring(source and source.faction or "colonist")
-    options = faction == "hostile" and Archetypes.GetHostileDefaults() or Archetypes.GetColonistDefaults()
-    return tostring(choose(options, seed, "archetype:" .. faction) or "General")
+    seed = Identity.NormalizeSeed(source and source.identitySeed or nil, tostring(source and source.tacticalClass or "colonist"))
+    tacticalClass = PNC.Types and PNC.Types.NormalizeTacticalClass and PNC.Types.NormalizeTacticalClass(source and source.tacticalClass) or tostring(source and source.tacticalClass or "colonist")
+    options = tacticalClass == "hostile" and Archetypes.GetHostileDefaults() or Archetypes.GetColonistDefaults()
+    return tostring(choose(options, seed, "archetype:" .. tacticalClass) or "General")
 end
 
 function Identity.ResolveIsFemale(source, seed)
@@ -71,7 +71,7 @@ function Identity.ApplyRecordIdentity(record, source)
     end
     seed = Identity.NormalizeSeed(
         source and (source.identitySeed or (source.identity and source.identity.seed)) or record.identitySeed,
-        tostring(source and (source.displayName or source.name or source.faction) or record.id or "pnc")
+        tostring(source and (source.displayName or source.name or source.tacticalClass) or record.id or "pnc")
     )
     archetype = Archetypes.Get(Identity.ResolveArchetypeID(source or record))
     resolvedIdentity = type(source and source.identity) == "table" and PNC.Core.DeepCopy(source.identity)
@@ -111,6 +111,7 @@ function Identity.RollAppearance(record)
     local spawnOutfit
     local runtime
     local hairColor
+    local skinColor
     local cacheKey
     if not record then
         return nil
@@ -124,6 +125,7 @@ function Identity.RollAppearance(record)
     survivor = record.identity and record.identity.survivor or {}
     spawnOutfit = archetype.looks and archetype.looks.spawnOutfit or {}
     hairColor = survivor.hairColor or {}
+    skinColor = survivor.skinColor or {}
     runtime = record.runtime or {}
     record.runtime = runtime
     cacheKey = table.concat({
@@ -137,6 +139,9 @@ function Identity.RollAppearance(record)
         tostring(hairColor.r or ""),
         tostring(hairColor.g or ""),
         tostring(hairColor.b or ""),
+        tostring(skinColor.r or ""),
+        tostring(skinColor.g or ""),
+        tostring(skinColor.b or ""),
     }, "|")
     if runtime.appearanceCacheKey == cacheKey and runtime.appearanceCache then
         return runtime.appearanceCache
@@ -145,6 +150,7 @@ function Identity.RollAppearance(record)
         outfit = record.outfit or (record.isFemale and spawnOutfit.female or spawnOutfit.male),
         outfitItems = type(look) == "table" and PNC.Core.DeepCopy(look) or {},
         skinTexture = resolveHumanSkinTexture(survivor.skinTexture, record.isFemale == true),
+        skinColor = survivor.skinColor,
         hairModel = survivor.hairModel,
         beardModel = record.isFemale and nil or survivor.beardModel,
         hairColor = survivor.hairColor,
@@ -164,7 +170,7 @@ function Identity.GetCharacterSummary(record)
         identitySeed = identity.seed or record and record.identitySeed or 1,
         isFemale = identity.isFemale == true or record and record.isFemale == true or false,
         recruited = record and record.recruited == true or false,
-        faction = record and record.faction or "colonist",
+        tacticalClass = record and record.tacticalClass or "colonist",
         survivor = PNC.Core.DeepCopy(identity.survivor or {}),
     }
 end

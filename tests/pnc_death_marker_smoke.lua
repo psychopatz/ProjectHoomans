@@ -81,6 +81,7 @@ local record = {
     z = 0,
     alive = false,
     recruited = true,
+    colonyOwned = true,
     faction = "colonist",
     portrait = {
         identitySeed = 12,
@@ -130,8 +131,8 @@ local communityRecord = {
     z = 0,
 }
 local communityMarker = PNC.Registry.AddDeathMarker(communityRecord)
-T.truthy(communityMarker and communityMarker.colonyOwned == true,
-    "community-owned NPC was not eligible for a death marker")
+T.equal(communityMarker, nil,
+    "unaffiliated community NPC received a colony death marker")
 
 PNC.BodyLifecycle.CreateInertCorpse = function(killedRecord)
     killedRecord.corpse = killedRecord.corpse or {
@@ -253,6 +254,7 @@ local authorityMarker = PNC.Registry.AddDeathMarker({
     id = "authority_marker",
     name = "Authority Marker",
     recruited = true,
+    colonyOwned = true,
     x = 7,
     y = 8,
     z = 0,
@@ -276,6 +278,7 @@ local missingRecord = {
     y = 40,
     z = 0,
     recruited = true,
+    colonyOwned = true,
     corpse = {
         token = "missing_token",
         x = 30,
@@ -312,6 +315,7 @@ local collectedRecord = {
     y = 60,
     z = 0,
     recruited = true,
+    colonyOwned = true,
     corpse = {
         token = "collected_token",
         x = 50,
@@ -337,24 +341,31 @@ directory.deathMarkers = {
     retained_colony = {
         id = "retained_colony",
         name = "Retained Colony NPC",
+        colonyOwned = true,
         colonist = true,
         x = 1, y = 2, z = 0,
     },
-    legacy_world_npc = {
-        id = "legacy_world_npc",
-        name = "Legacy World NPC",
+    unowned_world_npc = {
+        id = "unowned_world_npc",
+        name = "Unowned World NPC",
         colonist = false,
         x = 3, y = 4, z = 0,
+    },
+    class_only_npc = {
+        id = "class_only_npc",
+        name = "Class Only NPC",
+        colonist = true,
+        x = 5, y = 6, z = 0,
     },
 }
 PNC.Registry.DirectoryDirty = false
 local loadedMarkers = PNC.Registry.LoadDeathMarkers(directory)
 T.truthy(loadedMarkers.retained_colony ~= nil,
     "colony death marker was discarded during load cleanup")
-T.equal(loadedMarkers.legacy_world_npc, nil,
-    "legacy unowned death marker survived load cleanup")
+T.equal(loadedMarkers.unowned_world_npc, nil,
+    "unowned death marker survived load cleanup")
+T.equal(loadedMarkers.class_only_npc, nil,
+    "tactical-class-only death marker survived load cleanup")
 T.equal(PNC.Registry.DirectoryDirty, true,
     "death-marker cleanup was not scheduled for persistence")
-T.finish("pnc_death_marker_smoke")
-
 T.finish("pnc_death_marker_smoke")

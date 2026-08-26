@@ -39,6 +39,7 @@ function Identity.NormalizePortraitSummary(source, fallback)
         faceOnly = true,
         appearance = {
             skinTexture = normalizeString(appearance.skinTexture),
+            skinColor = normalizeColor(appearance.skinColor),
             hairModel = normalizeString(appearance.hairModel),
             beardModel = source.isFemale == true
                 and nil
@@ -55,6 +56,7 @@ function Identity.BuildPortraitSummary(record)
     local cacheKey
     local summary
     local hairColor
+    local skinColor
     if type(record) ~= "table" then return nil end
     runtime = record.runtime or {}
     record.runtime = runtime
@@ -64,6 +66,8 @@ function Identity.BuildPortraitSummary(record)
         or {}
     hairColor = type(appearance.hairColor) == "table"
         and appearance.hairColor or {}
+    skinColor = type(appearance.skinColor) == "table"
+        and appearance.skinColor or {}
     cacheKey = table.concat({
         tostring(identity.identitySeed or 1),
         tostring(identity.isFemale == true),
@@ -74,6 +78,9 @@ function Identity.BuildPortraitSummary(record)
         tostring(hairColor.r or ""),
         tostring(hairColor.g or ""),
         tostring(hairColor.b or ""),
+        tostring(skinColor.r or ""),
+        tostring(skinColor.g or ""),
+        tostring(skinColor.b or ""),
     }, "|")
     if runtime.portraitSummaryCacheKey == cacheKey
         and runtime.portraitSummaryCache

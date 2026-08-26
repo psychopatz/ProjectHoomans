@@ -72,7 +72,7 @@ function H.SpawnCommunityMembers(
             equipmentSpawnMode =
                 faction.archetypeID == "looter"
                     and "both" or nil,
-            organizationalFactionID = faction.id,
+            factionID = faction.id,
             membershipStatus = "member",
             factionRole = H.FactionRole(
                 faction.archetypeID,

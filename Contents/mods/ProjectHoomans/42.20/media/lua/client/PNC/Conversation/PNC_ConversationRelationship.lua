@@ -70,12 +70,26 @@ function Relationship.Resolve(entry, player)
         or record.relationshipCategory
         or relation.category
         or relation.status
-    if value ~= nil then return Relationship.Normalize(value) end
-    if snapshot.recruited == true
+    local verifier = PNC.Identity and PNC.Identity.Verifier or nil
+    local ownership = verifier
+        and verifier.BuildOwnershipSummary
+        and verifier.BuildOwnershipSummary(entry)
+        or nil
+    local recruited = ownership
+        and (ownership.recruited or ownership.colonyOwned)
+        or snapshot.recruited == true
         or record.recruited == true
         or snapshot.ownerUsername
         or record.ownerUsername
-    then
+    if value ~= nil then
+        local normalized = Relationship.Normalize(value)
+        -- A stale relationship presentation must not turn an already-owned
+        -- NPC back into a recruit candidate. Lovers retain their special
+        -- relationship category, while all other owned NPCs are Members.
+        return recruited and normalized ~= "Lover"
+            and "Member" or normalized
+    end
+    if recruited then
         return "Member"
     end
     local presentation = snapshot.mapPresentation

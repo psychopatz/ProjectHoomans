@@ -30,8 +30,11 @@ end
 local function normalizeOrder(record, spec)
     local pauseMinMs = math.max(0, tonumber(spec.pauseMinMs) or Const.ROAM_PAUSE_MIN_MS)
     local pauseMaxMs = math.max(pauseMinMs, tonumber(spec.pauseMaxMs) or Const.ROAM_PAUSE_MAX_MS)
+    local roadBounds = type(spec.roadBounds) == "table"
+        and spec.roadBounds or nil
     return {
-        kind = Const.ORDER_ROAM,
+        kind = spec.kind == Const.ORDER_HOSTILE_ROAM
+            and Const.ORDER_HOSTILE_ROAM or Const.ORDER_ROAM,
         roamMode = tostring(spec.roamMode or Const.ROAM_MODE_AREA),
         x = tonumber(spec.x) or record.anchorX,
         y = tonumber(spec.y) or record.anchorY,
@@ -42,6 +45,14 @@ local function normalizeOrder(record, spec)
         moveMode = tostring(spec.moveMode or "walk"),
         pauseMinMs = pauseMinMs,
         pauseMaxMs = pauseMaxMs,
+        shelterSiteID = type(spec.shelterSiteID) == "string"
+            and spec.shelterSiteID or nil,
+        roadBounds = roadBounds and {
+            minX = tonumber(roadBounds.minX),
+            minY = tonumber(roadBounds.minY),
+            maxX = tonumber(roadBounds.maxX),
+            maxY = tonumber(roadBounds.maxY),
+        } or nil,
     }
 end
 
@@ -272,6 +283,165 @@ local function playerMode(record, zombie, order)
     return true
 end
 
+local function roadBoundsChanged(order, state)
+    local bounds = order.roadBounds
+    if type(bounds) ~= "table" then return true end
+    return state.minX ~= tonumber(bounds.minX)
+        or state.minY ~= tonumber(bounds.minY)
+        or state.maxX ~= tonumber(bounds.maxX)
+        or state.maxY ~= tonumber(bounds.maxY)
+end
+
+local function chooseRoadGoal(record, order, state)
+    local bounds = order.roadBounds
+    if type(bounds) ~= "table"
+        or not tonumber(bounds.minX)
+        or not tonumber(bounds.minY)
+        or not tonumber(bounds.maxX)
+        or not tonumber(bounds.maxY)
+    then
+        return areaMode(record, nil, order)
+    end
+    local minX = math.min(tonumber(bounds.minX), tonumber(bounds.maxX))
+    local maxX = math.max(tonumber(bounds.minX), tonumber(bounds.maxX))
+    local minY = math.min(tonumber(bounds.minY), tonumber(bounds.maxY))
+    local maxY = math.max(tonumber(bounds.minY), tonumber(bounds.maxY))
+    state.minX, state.minY = minX, minY
+    state.maxX, state.maxY = maxX, maxY
+    state.goalX = minX + randomFraction() * math.max(0, maxX - minX)
+    state.goalY = minY + randomFraction() * math.max(0, maxY - minY)
+    state.goalZ = tonumber(order.z) or record.anchorZ or record.z
+    state.phase = "moving"
+end
+
+local function roadMode(record, zombie, order)
+    record.runtime = record.runtime or {}
+    local state = record.runtime.roaming or {}
+    local now = Core.Now()
+    local target
+    record.runtime.roaming = state
+    if state.goalX ~= nil
+        and record.runtime.pathing
+        and record.runtime.pathing.phase == "blocked"
+        and (
+            record.runtime.pathing.blockReason == "native_path_unreachable"
+            or record.runtime.pathing.blockReason == "native_goal_cooldown"
+        )
+    then
+        state.goalX, state.goalY, state.goalZ = nil, nil, nil
+        if beginAreaPause(record, zombie, order, state, now) then
+            return true
+        end
+    end
+    target = resolveRoamingThreat(
+        record,
+        state,
+        math.max(1, tonumber(order.targetRadius) or Const.ROAM_TARGET_RADIUS),
+        now
+    )
+    if target then
+        state.phase = "combat"
+        record.runtime.target = target
+        BehaviorCombat.TickEngage(record, zombie, target)
+        return true
+    end
+    if record.runtime.target ~= nil then
+        Common.ClearCombatTarget(record, "road_target_lost", zombie)
+    end
+    if roadBoundsChanged(order, state) then
+        state.waitUntil = nil
+        state.goalX, state.goalY, state.goalZ = nil, nil, nil
+    elseif state.waitUntil then
+        if now < state.waitUntil then
+            state.phase = "idle"
+            record.activeBehavior = "Roam:road:idle"
+            return true
+        end
+        state.waitUntil = nil
+    end
+    if not state.goalX then chooseRoadGoal(record, order, state) end
+    if state.goalX
+        and Core.Distance(record.x, record.y, state.goalX, state.goalY)
+            <= math.max(0.1, tonumber(order.reachedDistance)
+                or Const.ROAM_REACHED_DISTANCE)
+    then
+        if beginAreaPause(record, zombie, order, state, now) then
+            return true
+        end
+        chooseRoadGoal(record, order, state)
+    end
+    Common.ClearCombatTarget(record, "road_roaming", zombie)
+    Common.MoveRecord(
+        record,
+        zombie,
+        state.goalX,
+        state.goalY,
+        state.goalZ,
+        tostring(order.moveMode or "walk"),
+        math.max(0.1, tonumber(order.reachedDistance)
+            or Const.ROAM_REACHED_DISTANCE),
+        "roam_road"
+    )
+    return true
+end
+
+local function shelterMode(record, zombie, order)
+    record.runtime = record.runtime or {}
+    local state = record.runtime.roaming or {}
+    local now = Core.Now()
+    local target
+    local targetX = tonumber(order.x) or record.anchorX or record.x
+    local targetY = tonumber(order.y) or record.anchorY or record.y
+    local targetZ = tonumber(order.z) or record.anchorZ or record.z
+    local targetID = order.shelterSiteID
+    record.runtime.roaming = state
+    target = resolveRoamingThreat(
+        record,
+        state,
+        math.max(1, tonumber(order.targetRadius) or Const.ROAM_TARGET_RADIUS),
+        now
+    )
+    if target then
+        state.phase = "combat"
+        record.runtime.target = target
+        BehaviorCombat.TickEngage(record, zombie, target)
+        return true
+    end
+    if record.runtime.target ~= nil then
+        Common.ClearCombatTarget(record, "shelter_target_lost", zombie)
+    end
+    if state.targetX ~= targetX or state.targetY ~= targetY
+        or state.targetZ ~= targetZ or state.targetID ~= targetID
+    then
+        state.targetX, state.targetY, state.targetZ = targetX, targetY, targetZ
+        state.targetID = targetID
+        state.reached = false
+    end
+    if state.reached
+        or Core.Distance(record.x, record.y, targetX, targetY)
+            <= math.max(0.1, tonumber(order.reachedDistance) or 3)
+    then
+        state.reached = true
+        state.phase = "sheltered"
+        Common.ClearCombatTarget(record, "sheltered", zombie)
+        Common.HaltMovement(record, zombie, "mobile_shelter")
+        record.activeBehavior = "Roam:shelter:sheltered"
+        return true
+    end
+    Common.ClearCombatTarget(record, "moving_to_shelter", zombie)
+    Common.MoveRecord(
+        record,
+        zombie,
+        targetX,
+        targetY,
+        targetZ,
+        tostring(order.moveMode or "walk"),
+        math.max(0.1, tonumber(order.reachedDistance) or 3),
+        "mobile_shelter"
+    )
+    return true
+end
+
 function Roaming.RegisterMode(mode, handler)
     mode = tostring(mode or "")
     if mode == "" or type(handler) ~= "function" then return false end
@@ -294,6 +464,8 @@ end
 
 Roaming.RegisterMode(Const.ROAM_MODE_AREA, areaMode)
 Roaming.RegisterMode(Const.ROAM_MODE_PLAYER, playerMode)
+Roaming.RegisterMode(Const.ROAM_MODE_ROAD, roadMode)
+Roaming.RegisterMode(Const.ROAM_MODE_SHELTER, shelterMode)
 OrderSystem.RegisterNormalizer(Const.ORDER_ROAM, normalizeOrder)
 OrderSystem.RegisterNormalizer(Const.ORDER_HOSTILE_ROAM, normalizeOrder)
 JobSystem.RegisterOrder(Const.ORDER_ROAM, Const.JOB_ROAM)

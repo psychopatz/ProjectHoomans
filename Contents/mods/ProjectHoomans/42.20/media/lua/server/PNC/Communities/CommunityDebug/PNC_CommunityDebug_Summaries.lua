@@ -12,12 +12,35 @@ local CommunityMath = PNC.CommunityMath
 local Constants = PNC.CommunityConstants
 local Core = PNC.Core
 
+local function mobileSummary(faction)
+    local mobile = faction and faction.mobile or nil
+    if not mobile or mobile.active ~= true then return nil end
+    local ambient = mobile.ambient or {}
+    local target = mobile.controlMode == "strategic"
+        and mobile.strategicTarget or ambient.target
+    return {
+        active = true,
+        archetypeID = faction.archetypeID,
+        controlMode = mobile.controlMode,
+        pathMode = mobile.pathMode,
+        phase = ambient.phase,
+        objective = ambient.objective,
+        target = H.Copy(target),
+        siteID = mobile.site and mobile.site.id or nil,
+        siteKind = mobile.site and mobile.site.kind or nil,
+        nextMoveAt = mobile.nextMoveAt,
+        nextObjectiveAt = ambient.nextObjectiveAt,
+        revision = mobile.revision,
+    }
+end
+
 function H.FactionSummary(faction)
     return {
         id = faction.id,
         name = faction.name,
         archetypeID = faction.archetypeID,
         status = faction.status,
+        mobile = mobileSummary(faction),
     }
 end
 
@@ -78,4 +101,3 @@ function H.SelectedMembers(community)
 end
 
 return Debug
-

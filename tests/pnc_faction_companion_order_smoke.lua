@@ -40,7 +40,7 @@ PNC = {
     },
     Factions = {
         Registry = { byID = { player_faction = faction } },
-        GetOrganizationalFactionID = function(record)
+        GetFactionID = function(record)
             return record.affiliation and record.affiliation.factionID
         end,
     },

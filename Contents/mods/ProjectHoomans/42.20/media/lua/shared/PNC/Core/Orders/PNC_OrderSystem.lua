@@ -32,7 +32,7 @@ function OrderSystem.RegisterNormalizer(kind, normalizer)
 end
 
 local function fallbackOrder(record)
-    if record.faction == "hostile" then
+    if record.tacticalClass == "hostile" then
         return { kind = Const.ORDER_HOSTILE_HUNT }
     end
     return { kind = Const.ORDER_GUARD, x = record.anchorX, y = record.anchorY, z = record.anchorZ }

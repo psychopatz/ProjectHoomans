@@ -51,7 +51,7 @@ function Profiles.Resolve(record)
     if not record then
         return nil
     end
-    bucket = Profiles.Named[tostring(record.visualProfile or record.faction or "colonist")] or Profiles.Named.colonist
+    bucket = Profiles.Named[tostring(record.visualProfile or record.tacticalClass or "colonist")] or Profiles.Named.colonist
     genderKey = record.isFemale and "female" or "male"
     return bucket[genderKey] or bucket.male or bucket.female
 end

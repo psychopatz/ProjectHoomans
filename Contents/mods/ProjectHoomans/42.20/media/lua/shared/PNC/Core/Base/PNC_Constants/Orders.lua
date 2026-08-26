@@ -34,8 +34,9 @@ Const.ATTACK_TYPE_NONE = "none"
 Const.JOB_ROAM = "RoamArea"
 Const.ROAM_MODE_AREA = "area"
 Const.ROAM_MODE_PLAYER = "player"
+Const.ROAM_MODE_ROAD = "road"
+Const.ROAM_MODE_SHELTER = "shelter"
 PNC = PNC or {}
 PNC.Const = PNC.Const or {}
 
 local Const = PNC.Const
-

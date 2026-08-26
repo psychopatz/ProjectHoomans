@@ -19,11 +19,14 @@ local buildActionInformation = Parts.BuildActionInformation
 local buildVisualState = Parts.BuildVisualState
 local buildPathDebugState = Parts.BuildPathDebugState
 local buildCombatDebugState = Parts.BuildCombatDebugState
+local buildIdentityOwnershipSummary =
+    Parts.BuildIdentityOwnershipSummary
 
 function Network.BuildPresenceDelta(record)
     local aiState
     local inCombat
     local now = Core.Now()
+    local ownership = buildIdentityOwnershipSummary(record)
     local staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
     local firearmState = Firearms and Firearms.BuildDebugState
         and Firearms.BuildDebugState(record)
@@ -72,6 +75,15 @@ function Network.BuildPresenceDelta(record)
         x = record.x,
         y = record.y,
         z = record.z,
+        -- Keep the compact ownership identity on presence deltas as well as
+        -- roster/detail payloads. A client may first learn an NPC through a
+        -- mobile presence update, so conversation and map UI must not infer
+        -- membership from the tactical class.
+        factionID = ownership.factionID,
+        colonyOwned = ownership.colonyOwned,
+        recruited = ownership.recruited,
+        ownerUsername = ownership.ownerUsername,
+        ownerOnlineID = ownership.ownerOnlineID,
         presenceState = record.presenceState,
         zombieTargetable = Settings
             and Settings.CanZombieTargetRecord

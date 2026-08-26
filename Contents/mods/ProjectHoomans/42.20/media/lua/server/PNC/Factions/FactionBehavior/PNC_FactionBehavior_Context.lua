@@ -105,7 +105,7 @@ local function targetContext(target)
         and PNC.FactionTypes.IsValidNPCID(target.id)
     then
         local factionID =
-            Factions.GetOrganizationalFactionID(target)
+            Factions.GetFactionID(target)
         return factionID, EntityRef.ForNPC(target.id), target
     end
     local playerFaction =

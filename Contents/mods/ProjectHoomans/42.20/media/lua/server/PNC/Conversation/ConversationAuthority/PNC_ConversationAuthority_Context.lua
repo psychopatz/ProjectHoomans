@@ -114,19 +114,30 @@ local function relationshipCategory(record, relationship)
     local explicit = record and (
         record.conversationRelationship or record.relationshipCategory
     )
-    if explicit == "Lover" or explicit == "Member"
-        or explicit == "Acquaintance" or explicit == "FirstMeet"
-    then return explicit end
-    if record and (record.recruited == true or record.ownerUsername) then
+    local verifier = PNC.Identity and PNC.Identity.Verifier or nil
+    local ownership = verifier
+        and verifier.BuildOwnershipSummary
+        and verifier.BuildOwnershipSummary(record)
+        or nil
+    local recruited = ownership
+        and (ownership.recruited or ownership.colonyOwned)
+        or record and (record.recruited == true
+            or record.ownerUsername ~= nil)
+    if explicit == "Lover" then return explicit end
+    if recruited then
         return "Member"
+    end
+    if explicit == "Member" or explicit == "Acquaintance"
+        or explicit == "FirstMeet"
+    then
+        return explicit
     end
     if relationship and relationship.exists ~= false then return "Acquaintance" end
     return "FirstMeet"
 end
 
 local function audienceMap(record, category)
-    local hostile = tostring(record and record.faction or "") == "hostile"
-        and type(record.hostility) == "table"
+    local hostile = type(record and record.hostility) == "table"
         and record.hostility.attackPlayers == true
     return {
         hostile = hostile,

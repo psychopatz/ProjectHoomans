@@ -69,21 +69,22 @@ T.equal(sent, nil, "stale spawn option is gated at callback time")
 debugAuthorized = true
 choose(1, 2)
 T.equal(sent.action, "spawn", "companion debug action")
-T.equal(sent.payload.faction, "colonist", "companion faction payload")
+T.equal(sent.payload.tacticalClass, "colonist",
+    "companion tactical class payload")
 T.equal(sent.payload.equipmentSpawnMode, "melee", "companion melee override")
 
 choose(2, 3)
-T.equal(sent.payload.faction, "neutral", "neutral faction payload")
+T.equal(sent.payload.tacticalClass, "neutral",
+    "neutral tactical class payload")
 T.equal(sent.payload.equipmentSpawnMode, "ranged", "neutral ranged override")
 
 choose(3, 4)
-T.equal(sent.payload.faction, "hostile", "hostile faction payload")
+T.equal(sent.payload.tacticalClass, "hostile",
+    "hostile tactical class payload")
 T.equal(sent.payload.equipmentSpawnMode, "both", "hostile both override")
 
 choose(2, 1)
 T.equal(sent.payload.equipmentSpawnMode, nil, "sandbox chance mode has no override")
 T.equal(sent.payload.x, 10, "spawn square x")
 T.equal(sent.payload.y, 20, "spawn square y")
-T.finish("pnc_debug_spawn_menu_smoke")
-
 T.finish("pnc_debug_spawn_menu_smoke")

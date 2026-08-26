@@ -23,6 +23,8 @@ local buildVisualState = Parts.BuildVisualState
 local buildPathDebugState = Parts.BuildPathDebugState
 local buildCombatDebugState = Parts.BuildCombatDebugState
 local buildDetailedDebugState = Parts.BuildDetailedDebugState
+local buildIdentityOwnershipSummary =
+    Parts.BuildIdentityOwnershipSummary
 
 function Network.BuildSnapshot(record)
     local aiState
@@ -40,11 +42,13 @@ function Network.BuildSnapshot(record)
     local vehiclePassenger
     local treatmentState
     local attackMode
+    local ownership
     aiState, inCombat = resolveAIState(record)
     canRevive = PNC.Health and PNC.Health.CanRevive and PNC.Health.CanRevive(record) or false
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
     equipmentInfo = Equipment and Equipment.Describe and Equipment.Describe(record) or {}
     identity = buildIdentitySummary(record)
+    ownership = buildIdentityOwnershipSummary(record)
     inventorySummary = Inventory and Inventory.BuildSummaryPayload and Inventory.BuildSummaryPayload(record) or nil
     combat = buildCombatSummary(record, equipmentInfo)
     visualState = buildVisualState(record)
@@ -92,7 +96,7 @@ function Network.BuildSnapshot(record)
             and PNC.ConditionStats.NormalizeState(record.conditionStats, 0)
             or {},
         morale = record.social and record.social.morale or 0,
-        recruited = record.recruited == true,
+        recruited = ownership.recruited,
         relationshipCategory = record.generation
                 and record.generation.relationshipKind == "lover"
             and "Lover" or nil,
@@ -104,9 +108,11 @@ function Network.BuildSnapshot(record)
             } or nil,
         persist = record.persist ~= false,
         faction = record.faction,
-        -- The legacy faction value can mean "at war with another NPC
-        -- faction". Replicate the explicit target classes with it so MP
-        -- clients never infer player hostility from the coarse value alone.
+        factionID = ownership.factionID,
+        colonyOwned = ownership.colonyOwned,
+        -- Tactical class remains separate from factionID. Replicate explicit
+        -- hostility flags so MP clients never infer player hostility from a
+        -- coarse class value alone.
         hostility = Core.DeepCopy(record.hostility or {}),
         organizationalFaction =
             buildOrganizationalFactionSummary(record),
@@ -119,12 +125,8 @@ function Network.BuildSnapshot(record)
         z = record.z,
         orderKind = record.orderSpec and record.orderSpec.kind or nil,
         attackType = record.attackType or "auto",
-        ownerUsername = record.ownerUsername
-            or record.characterWindow
-                and record.characterWindow.ownerUsername,
-        ownerOnlineID = record.ownerOnlineID
-            or record.characterWindow
-                and record.characterWindow.ownerOnlineID,
+        ownerUsername = ownership.ownerUsername,
+        ownerOnlineID = ownership.ownerOnlineID,
         commandFeedback = buildCommandFeedback(record),
         bandageFeedback = buildBandageFeedback(record),
         actionInformation = buildActionInformation(record),
@@ -204,8 +206,8 @@ function Network.BuildSnapshot(record)
             archetypeID = identity.archetypeID,
             archetypeLabel = identity.archetypeLabel,
             identitySeed = identity.identitySeed,
-            ownerUsername = record.ownerUsername,
-            recruited = record.recruited == true,
+            ownerUsername = ownership.ownerUsername,
+            recruited = ownership.recruited,
             canRevive = canRevive,
             carry = inventorySummary,
         },

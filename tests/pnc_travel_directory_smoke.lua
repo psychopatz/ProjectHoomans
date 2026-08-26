@@ -195,6 +195,7 @@ PNC.Network.ClientState.snapshots["dead:colonist"] = {
     presenceState = "corpse",
     alive = false,
     deathMarker = true,
+    colonyOwned = true,
     colonist = true,
     x = 65,
     y = 75,
@@ -216,6 +217,22 @@ PNC.Network.ClientState.snapshots["dead:legacy"] = {
 }
 T.truthy(PNC.TravelDirectory.GetProjected("dead:legacy") == nil,
     "non-marker dead record leaked onto the map")
+
+PNC.Network.ClientState.snapshots["dead:legacy_colonist"] = {
+    id = "dead:legacy_colonist",
+    name = "Legacy Colonist Marker",
+    faction = "dead",
+    presenceState = "corpse",
+    alive = false,
+    deathMarker = true,
+    colonyOwned = false,
+    colonist = true,
+    x = 95,
+    y = 105,
+    z = 0,
+}
+T.truthy(PNC.TravelDirectory.GetProjected("dead:legacy_colonist") == nil,
+    "legacy colonist flag leaked an unowned death marker")
 
 PNC.Network.ClientState.snapshots["known:alice"] = {
     id = "known:alice",

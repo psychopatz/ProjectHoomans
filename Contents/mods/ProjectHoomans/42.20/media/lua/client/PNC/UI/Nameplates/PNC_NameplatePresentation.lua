@@ -72,10 +72,14 @@ function Presentation.StaminaRatio(snapshot)
 end
 
 function Presentation.NameColor(snapshot)
-    if snapshot and snapshot.faction == "hostile" then
+    if snapshot and snapshot.hostility
+        and snapshot.hostility.attackPlayers == true
+    then
         return NAME_COLORS.hostile
     end
-    if snapshot and (snapshot.recruited == true or snapshot.faction == "colonist" or snapshot.faction == "companion") then
+    if snapshot and (snapshot.colonyOwned == true
+        or snapshot.recruited == true)
+    then
         return NAME_COLORS.controlled
     end
     return NAME_COLORS.neutral

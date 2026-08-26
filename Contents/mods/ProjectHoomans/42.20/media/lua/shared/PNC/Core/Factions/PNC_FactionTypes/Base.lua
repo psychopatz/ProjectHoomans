@@ -110,6 +110,78 @@ function Internal.NormalizeTags(value)
     return output
 end
 
+local function normalizeTargetPoint(value, fallbackKind)
+    if type(value) ~= "table" then return nil end
+    local x = tonumber(value.x)
+    local y = tonumber(value.y)
+    if not x or not y or x ~= x or y ~= y
+        or x == math.huge or x == -math.huge
+        or y == math.huge or y == -math.huge
+    then
+        return nil
+    end
+    local output = {
+        kind = Internal.SafeString(
+            value.kind,
+            Constants.TAG_VALUE_MAX_LENGTH
+        ) or fallbackKind,
+        x = x,
+        y = y,
+        z = Internal.Finite(value.z, 0),
+        radius = math.max(1, Internal.Finite(value.radius, 1)),
+        siteID = Internal.SafeString(value.siteID, Constants.ID_MAX_LENGTH),
+        baseID = Internal.SafeString(value.baseID, Constants.ID_MAX_LENGTH),
+        factionID = Internal.SafeString(value.factionID, Constants.ID_MAX_LENGTH),
+        zoneID = Internal.SafeString(value.zoneID, Constants.ID_MAX_LENGTH),
+    }
+    local bounds = type(value.bounds) == "table"
+        and value.bounds or nil
+    if bounds then
+        local minX = tonumber(bounds.minX)
+        local minY = tonumber(bounds.minY)
+        local maxX = tonumber(bounds.maxX)
+        local maxY = tonumber(bounds.maxY)
+        if minX and minY and maxX and maxY then
+            output.bounds = {
+                minX = math.min(minX, maxX),
+                minY = math.min(minY, maxY),
+                maxX = math.max(minX, maxX),
+                maxY = math.max(minY, maxY),
+            }
+        end
+    end
+    return output
+end
+
+local function normalizeAmbient(value)
+    if type(value) ~= "table" then return nil end
+    local phase = Constants.VALID_MOBILE_AMBIENT_PHASES[value.phase]
+        and value.phase or Constants.MOBILE_AMBIENT_DAY
+    local objective = Constants.VALID_MOBILE_AMBIENT_OBJECTIVES[
+        value.objective
+    ] and value.objective or nil
+    local target = normalizeTargetPoint(value.target, objective)
+    if not objective or not target then
+        objective, target = nil, nil
+    end
+    return {
+        phase = phase,
+        objective = objective,
+        target = target,
+        nextCheckAt = Internal.Timestamp(value.nextCheckAt, 0),
+        nextObjectiveAt = Internal.Timestamp(value.nextObjectiveAt, 0),
+        retryAt = Internal.Timestamp(value.retryAt, 0),
+        revision = Internal.Revision(value.revision),
+    }
+end
+
+local function normalizeStrategicTarget(value)
+    local target = normalizeTargetPoint(value, "location")
+    if not target then return nil end
+    target.kind = target.kind or "location"
+    return target
+end
+
 -- Mobile groups deliberately store a primitive site snapshot rather than a
 -- Community record. A mobile faction has no reservation, population ledger,
 -- or home claim; the snapshot is only its current abstract staging point.
@@ -120,6 +192,10 @@ function Types.NormalizeMobileGroup(value)
     local lastMovedAt
     local nextMoveAt
     local relocationHours
+    local pathMode
+    local controlMode
+    local ambient
+    local strategicTarget
     if source.active ~= true then return nil end
     if not CommunityTypes or not CommunityTypes.NormalizeSite then
         return nil
@@ -147,12 +223,27 @@ function Types.NormalizeMobileGroup(value)
     if nextMoveAt <= lastMovedAt then
         nextMoveAt = lastMovedAt + relocationHours
     end
+    pathMode = Constants.VALID_MOBILE_PATH_MODES[
+        source.pathMode
+    ] and source.pathMode or Constants.MOBILE_PATH_RANDOM
+    controlMode = Constants.VALID_MOBILE_CONTROL_MODES[
+        source.controlMode
+    ] and source.controlMode or (
+        pathMode == Constants.MOBILE_PATH_PLAYER
+            and Constants.MOBILE_CONTROL_STRATEGIC
+            or Constants.MOBILE_CONTROL_AMBIENT
+    )
+    ambient = normalizeAmbient(source.ambient)
+    strategicTarget = normalizeStrategicTarget(
+        source.strategicTarget
+    )
     return {
         schemaVersion = Constants.MOBILE_GROUP_SCHEMA_VERSION,
         active = true,
-        pathMode = Constants.VALID_MOBILE_PATH_MODES[
-            source.pathMode
-        ] and source.pathMode or Constants.MOBILE_PATH_RANDOM,
+        pathMode = pathMode,
+        controlMode = controlMode,
+        strategicTarget = strategicTarget,
+        ambient = ambient,
         site = site,
         lastMovedAt = lastMovedAt,
         nextMoveAt = nextMoveAt,

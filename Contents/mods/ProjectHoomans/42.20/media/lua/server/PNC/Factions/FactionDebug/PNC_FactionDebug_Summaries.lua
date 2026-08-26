@@ -13,6 +13,8 @@ local Types = PNC.FactionTypes
 local Core = PNC.Core
 local Balance = PNC.FactionBalance
 local copy = Internal.copy
+local IdentityVerifier = PNC.Identity
+    and PNC.Identity.Verifier or nil
 
 local function factionSummary(faction)
     local archetype = Archetypes.Get(faction.archetypeID)
@@ -82,11 +84,24 @@ end
 
 local function npcSummary(record)
     local affiliation = Factions.GetNPCAffiliation(record.id)
+    local identity = IdentityVerifier
+        and IdentityVerifier.BuildView(record, { includeOwner = true })
+        or nil
+    local identityVerification = IdentityVerifier
+        and IdentityVerifier.Verify(record)
+        or nil
     return {
         id = record.id,
         name = tostring(record.name or record.id),
         alive = record.alive ~= false,
-        legacyFaction = record.faction,
+        factionID = identity and identity.factionID
+            or affiliation and affiliation.factionID or nil,
+        tacticalClass = record.faction,
+        recruited = identity and identity.recruited
+            or record.recruited == true,
+        colonyOwned = identity and identity.colonyOwned or false,
+        identity = identity,
+        identityVerification = identityVerification,
         recordRevision = record.recordRevision,
         presenceRevision = record.presenceRevision,
         affiliation = affiliation,

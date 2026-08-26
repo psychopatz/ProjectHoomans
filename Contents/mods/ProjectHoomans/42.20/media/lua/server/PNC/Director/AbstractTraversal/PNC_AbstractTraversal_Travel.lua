@@ -97,6 +97,9 @@ function Traversal.Advance(group, at)
         end
         return false, "in_transit"
     end
+    if group.mobileAmbient and group.state ~= "ACTIVE" then
+        return false, "mobile_ambient_hold"
+    end
     if group.state == "IDLE" or group.state == "ARRIVED"
         or group.state == "WAITING" or group.state == "ACTION_COMPLETE"
     then

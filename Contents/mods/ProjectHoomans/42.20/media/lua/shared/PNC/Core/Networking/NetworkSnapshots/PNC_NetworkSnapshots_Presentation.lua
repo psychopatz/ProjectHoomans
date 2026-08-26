@@ -6,6 +6,40 @@
 local Network = PNC.Network
 local Parts = Network.Internal.SnapshotParts
 local Core = PNC.Core
+local IdentityVerifier = PNC.Identity and PNC.Identity.Verifier
+
+function Parts.BuildIdentityOwnershipSummary(record)
+    local affiliation = type(record) == "table"
+        and type(record.affiliation) == "table"
+        and record.affiliation or {}
+    local factionID = affiliation.factionID
+    local recruited = record and record.recruited == true or false
+    local ownerUsername = record and record.ownerUsername or nil
+    local ownerOnlineID = record and record.ownerOnlineID or nil
+    if IdentityVerifier and IdentityVerifier.BuildOwnershipSummary then
+        local ownership = IdentityVerifier.BuildOwnershipSummary(record)
+        factionID = ownership.factionID
+        recruited = ownership.recruited
+        ownerUsername = ownership.ownerUsername
+        ownerOnlineID = ownership.ownerOnlineID
+        return {
+            factionID = factionID,
+            recruited = recruited,
+            colonyOwned = ownership.colonyOwned,
+            ownerUsername = ownerUsername,
+            ownerOnlineID = ownerOnlineID,
+        }
+    end
+    return {
+        factionID = factionID,
+        recruited = recruited,
+        colonyOwned = IdentityVerifier
+            and IdentityVerifier.IsColonyOwnedNPC(record)
+            or recruited,
+        ownerUsername = ownerUsername,
+        ownerOnlineID = ownerOnlineID,
+    }
+end
 
 function Parts.BuildTravelSummary(record, includeRoute)
     return PNC.Travel
@@ -39,8 +73,10 @@ end
 function Parts.BuildOrganizationalFactionSummary(record)
     local affiliation = type(record) == "table"
         and record.affiliation or nil
-    local factionID = type(affiliation) == "table"
-        and affiliation.factionID or nil
+    local factionID = IdentityVerifier
+        and IdentityVerifier.GetFactionID(record)
+        or type(affiliation) == "table"
+            and affiliation.factionID or nil
     if not factionID then return nil end
     local faction
     if PNC.Factions and PNC.Factions.GetPresentation then
@@ -50,6 +86,7 @@ function Parts.BuildOrganizationalFactionSummary(record)
     end
     return {
         id = tostring(factionID),
+        factionID = tostring(factionID),
         name = faction and tostring(faction.name)
             or tostring(factionID),
         archetypeID = faction

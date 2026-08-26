@@ -48,7 +48,8 @@ function Director.RelocateFaction(factionID, at, force)
         mobile.pathMode,
         at,
         mobile,
-        true
+        true,
+        mobile.controlMode
     )
     local index
     for index = 1, #members do
@@ -73,7 +74,31 @@ function Director.SetPathMode(factionID, mode)
     mode = H.PathMode(mode)
     return Factions.UpdateMobileGroup(
         factionID,
-        { pathMode = mode },
+        {
+            pathMode = mode,
+            controlMode = mode == Constants.MOBILE_PATH_PLAYER
+                and Constants.MOBILE_CONTROL_STRATEGIC
+                or Constants.MOBILE_CONTROL_AMBIENT,
+        },
         "mobile_group_path_mode"
+    )
+end
+
+function Director.SetControlMode(factionID, mode)
+    if not Constants.VALID_MOBILE_CONTROL_MODES[mode] then
+        return false, "invalid_mobile_control_mode"
+    end
+    local strategic = mode == Constants.MOBILE_CONTROL_STRATEGIC
+    return Factions.UpdateMobileGroup(
+        factionID,
+        {
+            controlMode = mode,
+            pathMode = strategic
+                and Constants.MOBILE_PATH_PLAYER
+                or Constants.MOBILE_PATH_RANDOM,
+            strategicTarget = strategic and nil or false,
+            ambient = strategic and false or nil,
+        },
+        "mobile_group_control_mode"
     )
 end

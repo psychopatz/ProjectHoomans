@@ -21,6 +21,29 @@ local function number(value)
     return string.format("%.1f", tonumber(value) or 0)
 end
 
+local function mobileDetail(mobile)
+    if type(mobile) ~= "table" or mobile.active ~= true then
+        return nil
+    end
+    local target = mobile.target
+    if mobile.controlMode == "strategic" then
+        return "mobile/strategic/player-base="
+            .. tostring(target and target.baseID or "pending")
+    end
+    return "mobile/ambient/"
+        .. tostring(mobile.phase or "pending") .. "/"
+        .. tostring(mobile.objective or "pending")
+end
+
+local function mobileTargetText(mobile)
+    local target = mobile and mobile.target or nil
+    if not target then return "pending" end
+    return tostring(target.kind or "location") .. " / "
+        .. tostring(target.siteID or target.baseID or "anonymous")
+        .. " @ " .. number(target.x) .. ", "
+        .. number(target.y) .. ", " .. number(target.z)
+end
+
 function Model.BuildCommunityItems(snapshot)
     local output = {}
     for _, community in ipairs(
@@ -46,7 +69,9 @@ function Model.BuildFactionItems(snapshot)
             id = faction.id,
             label = faction.name,
             detail = faction.archetypeID
-                .. "/" .. faction.status,
+                .. "/" .. faction.status
+                .. (mobileDetail(faction.mobile)
+                    and " | " .. mobileDetail(faction.mobile) or ""),
             faction = faction,
         }
     end
@@ -83,6 +108,13 @@ function Model.BuildRows(snapshot, authorized, reason)
     local registry = snapshot.registry or {}
     local community = snapshot.selectedCommunity
     local npc = snapshot.selectedNPC
+    local selectedFaction
+    for _, faction in ipairs(snapshot.factions or {}) do
+        if faction.id == snapshot.selectedFactionID then
+            selectedFaction = faction
+            break
+        end
+    end
     rows[#rows + 1] = row(
         text("UI_PNC_CommunityRegistry"),
         "schema " .. tostring(registry.schemaVersion or 0)
@@ -96,6 +128,55 @@ function Model.BuildRows(snapshot, authorized, reason)
             tostring(snapshot.action.action) .. ": "
                 .. tostring(snapshot.action.reason),
             snapshot.action.ok and "success" or "danger"
+        )
+    end
+    local mobileGroups = snapshot.mobileGroups or {}
+    rows[#rows + 1] = row(
+        "Mobile groups",
+        #mobileGroups,
+        #mobileGroups > 0 and "warning" or "textMuted"
+    )
+    if #mobileGroups > 0 then
+        local types = {}
+        for _, faction in ipairs(mobileGroups) do
+            types[#types + 1] = tostring(faction.archetypeID)
+                .. ":" .. tostring(
+                    faction.mobile and faction.mobile.controlMode
+                        or "unknown"
+                )
+        end
+        rows[#rows + 1] = row(
+            "Mobile types",
+            table.concat(types, ", ")
+        )
+    end
+    if selectedFaction and selectedFaction.mobile then
+        local mobile = selectedFaction.mobile
+        rows[#rows + 1] = row(
+            "Selected faction type",
+            tostring(selectedFaction.archetypeID)
+                .. " / " .. tostring(selectedFaction.name)
+        )
+        rows[#rows + 1] = row(
+            "Mobile control",
+            tostring(mobile.controlMode or "ambient")
+                .. " / path=" .. tostring(mobile.pathMode or "random"),
+            mobile.controlMode == "strategic" and "danger" or "warning"
+        )
+        rows[#rows + 1] = row(
+            "Mobile objective",
+            mobileDetail(mobile) or "pending",
+            mobile.controlMode == "strategic" and "danger" or "warning"
+        )
+        rows[#rows + 1] = row(
+            "Mobile target",
+            mobileTargetText(mobile)
+        )
+        rows[#rows + 1] = row(
+            "Mobile staging",
+            tostring(mobile.siteID or "unknown")
+                .. " / next move "
+                .. tostring(mobile.nextMoveAt or 0) .. " h"
         )
     end
     if not community then

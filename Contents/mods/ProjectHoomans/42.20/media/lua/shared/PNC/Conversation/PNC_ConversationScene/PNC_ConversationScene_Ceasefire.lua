@@ -45,8 +45,8 @@ function Internal.HandleCeasefire(player, record, zombie, token)
         return reject(player, "lease_owner_mismatch")
     end
     factionID = PNC.Factions
-        and PNC.Factions.GetOrganizationalFactionID
-        and PNC.Factions.GetOrganizationalFactionID(record) or nil
+        and PNC.Factions.GetFactionID
+        and PNC.Factions.GetFactionID(record) or nil
     if not factionID or not PNC.Factions.PacifyForPlayer then
         return reject(player, "faction_unavailable")
     end

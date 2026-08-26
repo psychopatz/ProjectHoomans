@@ -150,17 +150,11 @@ function Factions.GetAllowedRoles(archetypeID)
         or nil, archetype and nil or "unknown_archetype"
 end
 
-function Factions.GetOrganizationalFactionID(record)
+function Factions.GetFactionID(record)
     return type(record) == "table"
         and record.affiliation
         and record.affiliation.factionID
         or nil
-end
-
-function Factions.GetLegacyFactionClass(record)
-    -- Compatibility facade. Phase 5B derives this tactical classification
-    -- through the centralized faction behavior bridge.
-    return type(record) == "table" and record.faction or nil
 end
 
 return Factions

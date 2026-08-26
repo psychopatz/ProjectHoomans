@@ -43,7 +43,7 @@ T.equal(type(PNC.StartingCompanions.NextRetryAt), "table",
     "starting-companion retry state remains initialized")
 T.equal(PNC.StartingCompanions.RETRY_DELAY_MS, 5000,
     "retry delay remains stable")
-T.equal(PNC.StartingCompanions.ENRICHMENT_VERSION, 3,
+T.equal(PNC.StartingCompanions.ENRICHMENT_VERSION, 5,
     "enrichment version remains stable")
 
 for i = 1, #providers do

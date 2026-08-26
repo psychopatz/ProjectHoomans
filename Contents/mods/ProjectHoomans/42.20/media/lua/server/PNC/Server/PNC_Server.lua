@@ -10,10 +10,10 @@ PNC = PNC or {}
 PNC.Server = PNC.Server or {}
 PNC.Server.Internal = PNC.Server.Internal or {}
 
-if PNC.ServerLegacyDebugCommandHandler
-    and PNC.ServerLegacyDebugCommandHandler.ConfigureTeleport
+if PNC.ServerDebugCommandHandler
+    and PNC.ServerDebugCommandHandler.ConfigureTeleport
 then
-    PNC.ServerLegacyDebugCommandHandler.ConfigureTeleport(Teleport)
+    PNC.ServerDebugCommandHandler.ConfigureTeleport(Teleport)
 end
 
 require "PNC/Server/Server/PNC_Server_RecordProcessing"

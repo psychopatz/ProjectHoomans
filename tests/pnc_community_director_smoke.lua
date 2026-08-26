@@ -103,7 +103,7 @@ function PNC.API.Spawn(spec)
     }
     PNC.Registry.Data[id] = record
     local added = PNC.Factions.AddNPC(
-        spec.organizationalFactionID,
+        spec.factionID,
         id,
         {
             membershipStatus = spec.membershipStatus,
@@ -209,7 +209,7 @@ for _, npcID in ipairs(result.npcIDs) do
     T.equal(record.affiliation.communityID,
         community.id, "community membership")
     T.equal(record.faction, "neutral",
-        "legacy combat classification preserved")
+        "tactical class preserved")
 end
 T.equal(
     PNC.Registry.Get(result.npcIDs[2]).affiliation.role,

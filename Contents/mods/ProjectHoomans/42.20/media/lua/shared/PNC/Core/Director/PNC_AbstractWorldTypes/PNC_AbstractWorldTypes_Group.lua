@@ -107,6 +107,11 @@ function Types.NormalizeGroup(value, groupID)
         combatProfileSignature =
             type(source.combatProfileSignature) == "string"
                 and source.combatProfileSignature or nil,
+        mobileAmbient = source.mobileAmbient == true,
+        ambientObjective = source.ambientObjective == "road"
+            and "road"
+            or source.ambientObjective == "shelter"
+                and "shelter" or nil,
         revision = Internal.Integer(
             source.revision, 0, 2147483647, 0
         ),

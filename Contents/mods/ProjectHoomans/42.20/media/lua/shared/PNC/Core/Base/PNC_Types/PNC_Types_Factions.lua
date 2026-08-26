@@ -13,34 +13,29 @@ function Types.NormalizeAttackType(value, weaponMode)
     return auto
 end
 
-function Types.NormalizeFaction(value)
-    local faction = string.lower(tostring(value or "colonist"))
-    if faction == "hostile" or faction == "neutral"
-        or faction == "colonist"
+function Types.NormalizeTacticalClass(value)
+    local tacticalClass = string.lower(tostring(value or "colonist"))
+    if tacticalClass == "hostile" or tacticalClass == "neutral"
+        or tacticalClass == "colonist"
     then
-        return faction
+        return tacticalClass
     end
-    if faction == "enemy" or faction == "bandit" then return "hostile" end
-    if faction == "companion" or faction == "friendly" or faction == "ally"
-        or faction == "survivor"
-    then
-        return "colonist"
-    end
-    return "colonist"
+    return "neutral"
 end
 
 function Types.IsColonist(value)
-    local faction = type(value) == "table" and value.faction or value
-    return Types.NormalizeFaction(faction) == "colonist"
+    local tacticalClass = type(value) == "table"
+        and value.tacticalClass or value
+    return Types.NormalizeTacticalClass(tacticalClass) == "colonist"
 end
 
-function Types.DefaultHostility(faction)
-    faction = Types.NormalizeFaction(faction)
-    if faction == "hostile" then
+function Types.DefaultHostility(tacticalClass)
+    tacticalClass = Types.NormalizeTacticalClass(tacticalClass)
+    if tacticalClass == "hostile" then
         return { mode = "hostile_any_player", attackPlayers = true,
             attackNPCs = true, attackZombies = true }
     end
-    if faction == "neutral" then
+    if tacticalClass == "neutral" then
         return { mode = "neutral", attackPlayers = false,
             attackNPCs = true, attackZombies = false }
     end
@@ -48,9 +43,9 @@ function Types.DefaultHostility(faction)
         attackNPCs = true, attackZombies = true }
 end
 
-function Types.NormalizeHostility(faction, value)
+function Types.NormalizeHostility(tacticalClass, value)
     local source = type(value) == "table" and value or {}
-    local defaults = Types.DefaultHostility(faction)
+    local defaults = Types.DefaultHostility(tacticalClass)
     local normalized = {
         mode = tostring(source.mode or defaults.mode),
         attackPlayers = source.attackPlayers == nil
@@ -60,7 +55,7 @@ function Types.NormalizeHostility(faction, value)
         attackZombies = source.attackZombies == nil
             and defaults.attackZombies or source.attackZombies == true,
     }
-    if Types.NormalizeFaction(faction) == "neutral" then
+    if Types.NormalizeTacticalClass(tacticalClass) == "neutral" then
         normalized.attackNPCs = true
     end
     return normalized

@@ -39,7 +39,7 @@ function Internal.describeRecord(record)
         .. tostring(record.id or "nil")
         .. "]"
         .. " faction="
-        .. tostring(record.faction or "unknown")
+        .. tostring(record.tacticalClass or "unknown")
         .. " job="
         .. tostring(record.activeJob or "nil")
         .. " behavior="

@@ -21,7 +21,7 @@ function JobSystem.Select(record)
 
     if registeredJob then return registeredJob end
 
-    if record.faction == "hostile" then
+    if record.tacticalClass == "hostile" then
         if record.runtime.target then
             return "EngageTarget"
         end

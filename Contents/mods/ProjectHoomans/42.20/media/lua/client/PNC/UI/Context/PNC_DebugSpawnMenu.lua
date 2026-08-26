@@ -3,10 +3,25 @@ PNC.DebugSpawnMenu = PNC.DebugSpawnMenu or {}
 
 local Menu = PNC.DebugSpawnMenu
 
-local FACTIONS = {
-    { id = "colonist", key = "UI_PNC_SpawnCompanion", label = "Companion" },
-    { id = "neutral", key = "UI_PNC_SpawnNeutral", label = "Neutral" },
-    { id = "hostile", key = "UI_PNC_SpawnHostile", label = "Hostile" },
+local SPAWN_TYPES = {
+    {
+        id = "companion",
+        tacticalClass = "colonist",
+        key = "UI_PNC_SpawnCompanion",
+        label = "Companion",
+    },
+    {
+        id = "neutral",
+        tacticalClass = "neutral",
+        key = "UI_PNC_SpawnNeutral",
+        label = "Neutral",
+    },
+    {
+        id = "hostile",
+        tacticalClass = "hostile",
+        key = "UI_PNC_SpawnHostile",
+        label = "Hostile",
+    },
 }
 
 local EQUIPMENT_CHOICES = {
@@ -30,13 +45,15 @@ local function canUseDebug()
         and PNC.Client.CanUseDebug() == true
 end
 
-local function sendSpawn(_, square, faction, equipmentMode)
+local function sendSpawn(
+    _, square, spawnType, tacticalClass, equipmentMode
+)
     if not canUseDebug() then
         return false
     end
     local payload = {
-        variant = faction,
-        faction = faction,
+        variant = spawnType,
+        tacticalClass = tacticalClass,
         x = square:getX(),
         y = square:getY(),
         z = square:getZ(),
@@ -47,7 +64,9 @@ local function sendSpawn(_, square, faction, equipmentMode)
     return PNC.Client.SendDebug("spawn", payload)
 end
 
-local function addEquipmentChoices(context, parent, square, faction)
+local function addEquipmentChoices(
+    context, parent, square, spawnType, tacticalClass
+)
     local equipmentMenu = ISContextMenu:getNew(context)
     local i
     local choice
@@ -59,7 +78,8 @@ local function addEquipmentChoices(context, parent, square, faction)
             nil,
             sendSpawn,
             square,
-            faction,
+            spawnType,
+            tacticalClass,
             choice.mode
         )
     end
@@ -69,8 +89,8 @@ end
 function Menu.Add(context, square)
     local root
     local rootOption
-    local faction
-    local factionOption
+    local spawnType
+    local spawnOption
     local i
     if not canUseDebug() or not context or not square or not ISContextMenu then
         return nil
@@ -79,10 +99,17 @@ function Menu.Add(context, square)
     rootOption = context:addOption(
         tr("UI_PNC_Spawn", "[Debug] Spawn Hoomans"))
     context:addSubMenu(rootOption, root)
-    for i = 1, #FACTIONS do
-        faction = FACTIONS[i]
-        factionOption = root:addOption(tr(faction.key, faction.label))
-        addEquipmentChoices(root, factionOption, square, faction.id)
+    for i = 1, #SPAWN_TYPES do
+        spawnType = SPAWN_TYPES[i]
+        spawnOption = root:addOption(
+            tr(spawnType.key, spawnType.label))
+        addEquipmentChoices(
+            root,
+            spawnOption,
+            square,
+            spawnType.id,
+            spawnType.tacticalClass
+        )
     end
     return root
 end

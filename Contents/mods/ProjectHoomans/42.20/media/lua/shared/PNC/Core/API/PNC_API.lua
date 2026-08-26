@@ -8,6 +8,7 @@ PNC.API.Travel = PNC.API.Travel or {}
 PNC.API.Conversations = PNC.API.Conversations or {}
 PNC.API.AnimationScenes = PNC.API.AnimationScenes or {}
 PNC.API.MapCommands = PNC.API.MapCommands or {}
+PNC.API.Identity = PNC.API.Identity or {}
 
 require "PNC/Core/API/PNC_API/Lifecycle"
 require "PNC/Core/API/PNC_API/HealthSnapshots"
@@ -17,3 +18,4 @@ require "PNC/Core/API/PNC_API/Travel"
 require "PNC/Core/API/PNC_API/Conversations"
 require "PNC/Core/API/PNC_API/AnimationScenes"
 require "PNC/Core/API/PNC_API/MapCommands"
+require "PNC/Core/API/PNC_API/Identity"

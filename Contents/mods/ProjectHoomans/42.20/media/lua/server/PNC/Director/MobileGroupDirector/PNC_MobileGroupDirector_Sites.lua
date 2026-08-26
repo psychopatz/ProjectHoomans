@@ -57,6 +57,17 @@ function H.ResolveSite(faction, spec, at, forceNew)
         if existing then return existing, "existing_mobile_site" end
     end
     if mode == Constants.MOBILE_PATH_PLAYER then
+        if mobile and mobile.controlMode
+            == Constants.MOBILE_CONTROL_STRATEGIC
+            and H.TargetPlayerBaseSite
+        then
+            local baseSite, baseReason = H.TargetPlayerBaseSite(
+                faction,
+                at,
+                spec.searchRadius
+            )
+            if baseSite then return baseSite, baseReason end
+        end
         local site, reason = H.TargetPlayerSite(spec, at)
         if site then return site, reason end
     end

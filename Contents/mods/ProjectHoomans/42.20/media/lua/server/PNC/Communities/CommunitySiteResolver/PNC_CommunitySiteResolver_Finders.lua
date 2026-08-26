@@ -60,6 +60,10 @@ function Resolver.FindAvailableNear(x, y, z, options)
     )
     if origin and origin.kind == "building"
         and H.SiteIsAvailable(origin)
+        and (
+            type(options.siteFilter) ~= "function"
+            or options.siteFilter(origin) == true
+        )
     then
         return origin, originReason
     end
@@ -104,7 +108,12 @@ function Resolver.FindAvailableNear(x, y, z, options)
                     and not seen[candidate.id]
                 then
                     seen[candidate.id] = true
-                    if H.SiteIsAvailable(candidate) then
+                    if H.SiteIsAvailable(candidate)
+                        and (
+                            type(options.siteFilter) ~= "function"
+                            or options.siteFilter(candidate) == true
+                        )
+                    then
                         return candidate,
                             "nearby_building_found"
                     end
@@ -113,10 +122,10 @@ function Resolver.FindAvailableNear(x, y, z, options)
         end
     end
     if origin and origin.kind == "radius"
+        and type(options.siteFilter) ~= "function"
         and H.SiteIsAvailable(origin)
     then
         return origin, originReason
     end
     return nil, "no_available_loaded_site"
 end
-

@@ -23,7 +23,7 @@ local desiredOrder = Internal.desiredOrder
 
 local function apply(record, mode, owner, reason, faction)
     local changed = false
-    local legacyFaction
+    local tacticalClass
     local hostility
     local order
     local preservePlayerOrder
@@ -48,8 +48,8 @@ local function apply(record, mode, owner, reason, faction)
                 and recordOwnerOnlineID == ownerOnlineID
         )
     if mode == "player_owned" then
-        legacyFaction = Const.FACTION_COLONIST
-        hostility = Types.DefaultHostility(legacyFaction)
+        tacticalClass = Const.FACTION_COLONIST
+        hostility = Types.DefaultHostility(tacticalClass)
         changed = assign(record, "recruited", true) or changed
         changed = assign(
             record,
@@ -62,7 +62,7 @@ local function apply(record, mode, owner, reason, faction)
             owner.onlineID
         ) or changed
     elseif mode == "aggressive" then
-        legacyFaction = Const.FACTION_HOSTILE
+        tacticalClass = Const.FACTION_HOSTILE
         hostility = {
             mode = "faction_war",
             attackPlayers = owner.attackPlayers == true,
@@ -73,13 +73,13 @@ local function apply(record, mode, owner, reason, faction)
         changed = assign(record, "ownerUsername", nil) or changed
         changed = assign(record, "ownerOnlineID", nil) or changed
     else
-        legacyFaction = Const.FACTION_NEUTRAL
-        hostility = Types.DefaultHostility(legacyFaction)
+        tacticalClass = Const.FACTION_NEUTRAL
+        hostility = Types.DefaultHostility(tacticalClass)
         changed = assign(record, "recruited", false) or changed
         changed = assign(record, "ownerUsername", nil) or changed
         changed = assign(record, "ownerOnlineID", nil) or changed
     end
-    changed = assign(record, "faction", legacyFaction) or changed
+    changed = assign(record, "faction", tacticalClass) or changed
     if not same(record.hostility, hostility) then
         record.hostility = hostility
         changed = true
@@ -125,7 +125,7 @@ local function apply(record, mode, owner, reason, faction)
 end
 
 function Behavior.ApplyNPC(record, reason)
-    local factionID = Factions.GetOrganizationalFactionID(record)
+    local factionID = Factions.GetFactionID(record)
     local faction = factionID
         and Factions.Registry.byID[factionID] or nil
     local parsed

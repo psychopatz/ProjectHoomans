@@ -55,7 +55,7 @@ local function factionDebugLines(snapshot, settings)
         .. " (" .. tostring(value.intentReason or "-") .. ")"
     local target = value.target
     local third = "TACTICAL "
-        .. tostring(value.legacyFaction or "neutral")
+        .. tostring(value.tacticalClass or "neutral")
         .. " P/N/Z="
         .. tostring(value.attackPlayers == true) .. "/"
         .. tostring(value.attackNPCs == true) .. "/"

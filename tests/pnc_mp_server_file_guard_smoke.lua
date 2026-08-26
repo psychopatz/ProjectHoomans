@@ -10,7 +10,7 @@ for path in listing:lines() do
     serverOnlyFiles[#serverOnlyFiles + 1] = path
 end
 listing:close()
-T.equal(#serverOnlyFiles, 614,
+T.equal(#serverOnlyFiles, 615,
     "server Lua inventory changed without updating the MP loader gate")
 
 isClient = function() return true end
@@ -36,7 +36,7 @@ end
 require = originalRequire
 
 T.truthy(PNC.ServerCommandRouter == nil
-    and PNC.ServerLegacyDebugCommandHandler == nil
+    and PNC.ServerDebugCommandHandler == nil
     and PNC.Supply == nil
     and PNC.ColonyStorageService == nil,
     "pure multiplayer client initialized server-only Project Hoomans state")

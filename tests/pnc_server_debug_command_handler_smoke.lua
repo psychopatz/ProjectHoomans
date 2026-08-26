@@ -59,6 +59,11 @@ PNC = {
         GetColonistDefaults = function() return { "General" } end,
         GetHostileDefaults = function() return { "Scavenger" } end,
     },
+    Factions = {
+        EnsurePlayerFaction = function()
+            return true, nil, { id = "faction_debug" }
+        end,
+    },
     API = {
         Spawn = function(spec)
             spawned = spec
@@ -167,8 +172,8 @@ isServer = function() return true end
 getCell = function() return nil end
 
 local Router = require "PNC/Networking/PNC_ServerCommandRouter"
-require "PNC/Networking/Handlers/PNC_ServerLegacyDebugCommandHandler"
-PNC.ServerLegacyDebugCommandHandler.ConfigureTeleport({
+require "PNC/Networking/Handlers/PNC_ServerDebugCommandHandler"
+PNC.ServerDebugCommandHandler.ConfigureTeleport({
     ToCoordinates = function(receivedPlayer, x, y, z)
         teleported = { player = receivedPlayer, x = x, y = y, z = z }
         return true
@@ -188,13 +193,31 @@ Router.Handle("DebugCommand", player, { action = "unknown_action" })
 T.equal(#apiCalls, 0, "unknown debug action executed")
 
 Router.Handle("DebugCommand", player, {
-    action = "spawn", variant = "hostile_melee", x = 4, y = 5, z = 0,
+    action = "spawn", variant = "hostile_melee",
+    tacticalClass = "hostile", x = 4, y = 5, z = 0,
 })
 T.equal(spawned.faction, "hostile", "debug spawn faction")
+T.equal(spawned.factionID, nil, "hostile debug spawn has no player faction")
 T.equal(spawned.archetypeID, "Scavenger", "debug spawn archetype")
 T.equal(spawned.orderSpec.kind, "hostile_hunt", "debug spawn order")
 T.equal(spawned.forceLive, true, "debug spawn force-live")
 T.equal(spawned.debug, true, "debug spawn flag")
+
+local hostileSpawn = spawned
+Router.Handle("DebugCommand", player, {
+    action = "spawn", variant = "hostile_melee", faction = "hostile",
+})
+T.equal(spawned, hostileSpawn,
+    "debug spawn rejects the removed tactical-class alias")
+
+Router.Handle("DebugCommand", player, {
+    action = "spawn", variant = "companion",
+    tacticalClass = "colonist", x = 6, y = 7, z = 0,
+})
+T.equal(spawned.faction, "colonist", "debug companion tactical class")
+T.equal(spawned.factionID, "faction_debug",
+    "debug companion resolves the player faction ID")
+T.equal(spawned.recruited, true, "debug companion recruited state")
 
 Router.Handle("DebugCommand", player, {
     action = "teleport_to_npc", id = "npc-teleport",
@@ -288,6 +311,4 @@ T.equal(networkCalls.roster[2][1].id, "npc-1", "body audit roster")
 T.equal(networkCalls.roster[3], true, "body audit authorization")
 T.equal(networkCalls.roster[4], PNC.BodyLifecycle.LastAudit,
     "body audit metadata")
-T.finish("pnc_server_legacy_debug_command_handler_smoke")
-
-T.finish("pnc_server_legacy_debug_command_handler_smoke")
+T.finish("pnc_server_debug_command_handler_smoke")

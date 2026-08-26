@@ -200,25 +200,44 @@ function Client.SendDebug(action, payload)
         return snapshot ~= nil
     end
     if action == "spawn" and PNC.API and PNC.API.Spawn then
-        local variant = tostring(args.variant or "colonist")
-        local legacyFaction = (variant == "hostile_melee" or variant == "hostile_ranged")
-            and "hostile" or variant
-        local faction = PNC.Types.NormalizeFaction(args.faction or legacyFaction)
-        if faction ~= "colonist" and faction ~= "neutral" and faction ~= "hostile" then
-            faction = "colonist"
+        local variant = tostring(args.variant or "companion")
+        local tacticalClass = tostring(args.tacticalClass or "")
+        if tacticalClass ~= "colonist" and tacticalClass ~= "neutral"
+            and tacticalClass ~= "hostile"
+        then
+            return false
         end
-        local colonist = faction == "colonist"
-        local hostile = faction == "hostile"
+        local colonist = tacticalClass == "colonist"
+        local hostile = tacticalClass == "hostile"
+        local playerFaction
+        local playerFactionID
         local ownerUsername = colonist and player and player.getUsername and player:getUsername() or nil
         local ownerOnlineID = colonist and player and player.getOnlineID and player:getOnlineID() or nil
         local x = tonumber(args.x) or (player and player:getX()) or 0
         local y = tonumber(args.y) or (player and player:getY()) or 0
         local z = tonumber(args.z) or (player and player:getZ()) or 0
+        if colonist and PNC.Factions
+            and PNC.Factions.EnsurePlayerFaction
+        then
+            local factionOK
+            local factionReason
+            factionOK, factionReason, playerFaction =
+                PNC.Factions.EnsurePlayerFaction(player, {})
+            if not factionOK or not playerFaction then
+                return false
+            end
+            playerFactionID = playerFaction.id
+        end
         return PNC.API.Spawn({
-            faction = faction,
+            faction = tacticalClass,
             x = x, y = y, z = z,
             ownerUsername = ownerUsername,
             ownerOnlineID = ownerOnlineID,
+            recruited = colonist,
+            factionID = playerFactionID,
+            membershipStatus = colonist and "member" or nil,
+            factionRole = colonist and "civilian" or nil,
+            factionRank = colonist and "member" or nil,
             orderSpec = colonist and {
                 kind = Const.ORDER_FOLLOW,
                 ownerUsername = ownerUsername,

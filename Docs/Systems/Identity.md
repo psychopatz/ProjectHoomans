@@ -49,7 +49,55 @@ ID never establish ownership.
 See `Docs/Systems/PlayerCharacterIdentity.md` for schema, lifecycle,
 anti-spoofing, revisions, and callback limitations.
 
+## Organizational NPC Identity
+
+NPC organization membership is identified by
+record.affiliation.factionID (also serialized as the top-level factionID
+in network summaries). record.faction and colonist are tactical
+presentation fields; they must not establish player ownership,
+conversation membership, or death-marker eligibility.
+
+PNC.Identity.Verifier is the shared, read-only contract used by gameplay,
+network presentation, debug diagnostics, and future integrations:
+
+- GetFactionID(value) reads canonical identity from a record, snapshot,
+  wrapper, or payload.
+- GetPlayerFactionID(player) resolves the requesting survivor's current
+  faction without collapsing a multi-player faction to one username.
+- BuildOwnershipSummary(value) is the compact hot-path view used by
+  presence replication.
+- IsOwnedByPlayer(value, player) resolves a character-scoped player key
+  against the faction ownerPlayerKey and playerMemberKeys.
+- IsColonyOwnedNPC(value) identifies NPCs eligible for player-colony
+  presentation such as death markers.
+- Verify(value, options) reports missing, malformed, or unknown identity
+  fields.
+- BuildView(value, options) returns a serialization-safe public identity
+  view without exposing live records or engine objects.
+
+The integration facade is PNC.API.Identity. Its Get, GetForSource, Verify,
+VerifyPayload, GetPlayerFactionID, ResolveOwnership, IsOwnedByPlayer,
+GetVersion, and GetCapabilities methods are intended to be
+the stable boundary for the upcoming LLM conversation adapter. A faction
+can contain multiple player characters; all members therefore resolve
+through the same factionID rather than a single username or tactical class.
+
 ## Public Functions
+
+- PNC.Identity.Verifier.GetFactionID(value)
+- PNC.Identity.Verifier.GetPlayerFactionID(player)
+- PNC.Identity.Verifier.BuildOwnershipSummary(value)
+- PNC.Identity.Verifier.IsOwnedByPlayer(value, player)
+- PNC.Identity.Verifier.IsColonyOwnedNPC(value)
+- PNC.Identity.Verifier.Verify(value, options)
+- PNC.Identity.Verifier.BuildView(value, options)
+- PNC.API.Identity.Get(npcID, options)
+- PNC.API.Identity.GetForSource(source, options)
+- PNC.API.Identity.Verify(npcID, options)
+- PNC.API.Identity.VerifyPayload(payload, options)
+- PNC.API.Identity.GetPlayerFactionID(player)
+- PNC.API.Identity.ResolveOwnership(npcID, player)
+- PNC.API.Identity.IsOwnedByPlayer(npcID, player)
 - `PNC.RegisterArchetypeModule(id, spec)`
 - `PNC.RegisterArchetypeBundle(id, bundle)`
 - `PNC.LoadArchetypes()`

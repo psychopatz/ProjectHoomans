@@ -1,7 +1,7 @@
 --[[
     PNC Relationships Facade
     Personal relationships remain directed. Organizational faction war and
-    looter policy now take precedence over the legacy tactical classification.
+    looter policy now take precedence over the tactical classification.
 ]]
 
 PNC = PNC or {}
@@ -31,12 +31,12 @@ function Relationships.AreNPCsEnemies(source, target)
         return false
     end
     sourceOrganization = factions
-        and factions.GetOrganizationalFactionID
-        and factions.GetOrganizationalFactionID(source)
+        and factions.GetFactionID
+        and factions.GetFactionID(source)
         or source.affiliation and source.affiliation.factionID
     targetOrganization = factions
-        and factions.GetOrganizationalFactionID
-        and factions.GetOrganizationalFactionID(target)
+        and factions.GetFactionID
+        and factions.GetFactionID(target)
         or target.affiliation and target.affiliation.factionID
     if PNC.FactionBehavior
         and PNC.FactionBehavior.ResolveIntent

@@ -30,6 +30,16 @@ function Groups.ImportMobileFaction(factionOrID)
     if not location then return nil, reason end
     local existing = Groups.FindByFactionID(faction.id)
     if existing then
+        local ambient = faction.mobile.controlMode == "ambient"
+        local objective = faction.mobile.ambient
+            and faction.mobile.ambient.objective or nil
+        if existing.mobileAmbient ~= ambient
+            or existing.ambientObjective ~= objective
+        then
+            existing.mobileAmbient = ambient
+            existing.ambientObjective = objective
+            H.Touch(existing, "mobile_ambient_import")
+        end
         Groups.ReconcileMembers(existing, faction)
         return existing, "existing"
     end
@@ -51,9 +61,11 @@ function Groups.ImportMobileFaction(factionOrID)
             medical = 10, materials = 0 },
         combatProfileDirty = true,
         combatProfileReason = "mobile_faction_import",
+        mobileAmbient = faction.mobile.controlMode == "ambient",
+        ambientObjective = faction.mobile.ambient
+            and faction.mobile.ambient.objective or nil,
         diagnostics = { memberSignature = H.MemberSignature(ids) },
     })
     if group then Groups.RefreshLOD(group, Store.WorldAgeHours()) end
     return group, createReason
 end
-

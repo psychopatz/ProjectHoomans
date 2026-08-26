@@ -145,8 +145,7 @@ local function isAggressive(entry)
     local snapshot = entry and entry.snapshot or {}
     local record = entry and entry.record or {}
     local hostility = snapshot.hostility or record.hostility or {}
-    return tostring(snapshot.faction or record.faction or "") == "hostile"
-        and hostility.attackPlayers == true
+    return hostility.attackPlayers == true
 end
 
 function Conversation.RequestCeasefire(context)

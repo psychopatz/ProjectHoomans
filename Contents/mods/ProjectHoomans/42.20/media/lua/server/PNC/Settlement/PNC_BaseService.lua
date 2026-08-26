@@ -54,6 +54,10 @@ function Service.GetForColony(colonyId)
     return Repository.FindBaseByColony(tostring(colonyId or ""))
 end
 
+function Service.GetForFaction(factionId)
+    return Repository.FindBaseByFaction(tostring(factionId or ""))
+end
+
 function Service.GetTerritorySummary(baseOrId)
     local base = type(baseOrId) == "table" and baseOrId or Service.Get(baseOrId)
     if not base then return nil end

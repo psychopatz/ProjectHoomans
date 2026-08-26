@@ -89,17 +89,17 @@ local function resetDirty()
     PNC.Registry.DirtyByID = dirty
 end
 
-local function newNPC(id, legacyFaction)
+local function newNPC(id, tacticalClass)
     local record = {
         id = id,
         name = id,
         alive = true,
-        faction = legacyFaction or "neutral",
+        faction = tacticalClass or "neutral",
         hostility = {
-            attackPlayers = legacyFaction == "hostile",
+            attackPlayers = tacticalClass == "hostile",
             attackNPCs = true,
         },
-        recruited = legacyFaction == "colonist",
+        recruited = tacticalClass == "colonist",
         affiliation = Types.NewAffiliation(),
         recordRevision = 0,
         presenceRevision = 3,
@@ -256,12 +256,12 @@ T.equal(Factions.Registry.revision,
     unchangedRegistry,
     "identical emblem does not touch registry")
 
--- 13-18. Membership is separate from every legacy behavior field.
+-- 13-18. Membership is separate from every tactical behavior field.
 local alice = newNPC("npc_alice", "hostile")
 local bob = newNPC("npc_bob", "neutral")
 local cara = newNPC("npc_cara", "neutral")
 local dana = newNPC("npc_dana", "neutral")
-local aliceLegacy = {
+local aliceBaseline = {
     faction = alice.faction,
     attackPlayers = alice.hostility.attackPlayers,
     attackNPCs = alice.hostility.attackNPCs,
@@ -288,22 +288,22 @@ T.equal(alice.affiliation.role, "guard", "assigned role")
 T.equal(alice.affiliation.rank, "officer", "assigned rank")
 T.truthy(Factions.Registry.byID[settlementID]
     .memberIDs[alice.id], "member index")
-T.equal(alice.faction, aliceLegacy.faction,
-    "legacy faction unchanged")
+T.equal(alice.faction, aliceBaseline.faction,
+    "tactical class unchanged")
 T.equal(alice.hostility.attackPlayers,
-    aliceLegacy.attackPlayers, "attackPlayers unchanged")
+    aliceBaseline.attackPlayers, "attackPlayers unchanged")
 T.equal(alice.hostility.attackNPCs,
-    aliceLegacy.attackNPCs, "attackNPCs unchanged")
-T.equal(alice.recruited, aliceLegacy.recruited,
+    aliceBaseline.attackNPCs, "attackNPCs unchanged")
+T.equal(alice.recruited, aliceBaseline.recruited,
     "recruitment unchanged")
 T.equal(alice.presenceRevision,
-    aliceLegacy.presenceRevision, "presence unchanged")
+    aliceBaseline.presenceRevision, "presence unchanged")
 T.equal(alice.social.revision,
-    aliceLegacy.socialRevision, "social unchanged")
+    aliceBaseline.socialRevision, "social unchanged")
 T.equal(alice.social.relationships["npc:history"].revision,
-    aliceLegacy.relationshipRevision, "relationship unchanged")
+    aliceBaseline.relationshipRevision, "relationship unchanged")
 T.equal(alice.social.conduct.revision,
-    aliceLegacy.conductRevision, "conduct unchanged")
+    aliceBaseline.conductRevision, "conduct unchanged")
 
 local rejectedRevision = Factions.Registry.revision
 local rejectedRecordRevision = alice.recordRevision

@@ -38,11 +38,16 @@ end
 
 local function isPlayerCompanion(npc)
     local source = sourceFor(npc)
-    return type(source) == "table" and (
-        source.recruited == true
-        or source.colonist == true
-        or source.characterWindow and source.characterWindow.ownerUsername ~= nil
-    )
+    local verifier = PNC.Identity
+        and PNC.Identity.Verifier or nil
+    if type(source) ~= "table" then return false end
+    if verifier and verifier.IsColonyOwnedNPC then
+        return verifier.IsColonyOwnedNPC(source)
+    end
+    return source.recruited == true
+        or source.colonyOwned == true
+        or source.characterWindow
+            and source.characterWindow.ownerUsername ~= nil
 end
 
 function Identity.GetKnowledge(npc)

@@ -45,9 +45,6 @@ function Factions.GetRelation(sourceFactionID, targetFactionID)
     ))
 end
 
--- Compatibility alias. V3 is directed, so argument order now matters.
-Factions.GetDiplomacy = Factions.GetRelation
-
 function Factions.AreAtWar(firstFactionID, secondFactionID)
     Factions.EnsureLoaded()
     local first = Internal.registryRecord(firstFactionID)

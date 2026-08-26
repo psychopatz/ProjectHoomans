@@ -74,14 +74,14 @@ local function finalizeNewRecord(record, definition)
         end
     end
     OrderSystem.SetOrder(record, definition.orderSpec)
-    OrderSystem.SetHostility(record, definition.hostility or Types.DefaultHostility(definition.faction))
+    OrderSystem.SetHostility(record, definition.hostility or Types.DefaultHostility(definition.tacticalClass))
     Registry.AddRecord(record)
-    if definition.organizationalFactionID
+    if definition.factionID
         and PNC.Factions
         and PNC.Factions.AddNPC
     then
         local assigned, reason = PNC.Factions.AddNPC(
-            definition.organizationalFactionID,
+            definition.factionID,
             record.id,
             {
                 membershipStatus = definition.membershipStatus,
@@ -95,7 +95,7 @@ local function finalizeNewRecord(record, definition)
                 "PNC organizational faction assignment rejected id="
                     .. tostring(record.id)
                     .. " factionID="
-                    .. tostring(definition.organizationalFactionID)
+                    .. tostring(definition.factionID)
                     .. " reason=" .. tostring(reason)
             )
         end
@@ -107,9 +107,9 @@ local function finalizeNewRecord(record, definition)
             record.runtime.lifecycle = record.runtime.lifecycle or {}
             record.runtime.lifecycle.lastError = tostring(materializeReason or "materialize_failed")
             Core.LogWarn("PNC spawn materialization failed id=" .. tostring(record.id)
-                .. " faction=" .. tostring(record.faction) .. " reason=" .. tostring(materializeReason))
+                .. " tacticalClass=" .. tostring(record.tacticalClass) .. " reason=" .. tostring(materializeReason))
         else
-            Core.LogInfo("PNC spawned id=" .. tostring(record.id) .. " faction=" .. tostring(record.faction)
+            Core.LogInfo("PNC spawned id=" .. tostring(record.id) .. " tacticalClass=" .. tostring(record.tacticalClass)
                 .. " presence=" .. tostring(record.presenceState))
         end
     end

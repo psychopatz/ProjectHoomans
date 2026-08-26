@@ -23,14 +23,12 @@ end
 local function audienceMap(entry, relationshipID)
     local snapshot = entry and entry.snapshot or {}
     local record = entry and entry.record or {}
-    local faction = tostring(snapshot.faction or record.faction or "")
     local hostility = snapshot.hostility or record.hostility or {}
     -- `record.faction == "hostile"` is also the legacy compatibility state
     -- used when an organizational faction is fighting another NPC faction.
     -- Only an explicit player-hostility bit makes this player a hostile
     -- conversation audience. Missing replica data must fail closed.
-    local hostile = faction == "hostile"
-        and hostility.attackPlayers == true
+    local hostile = hostility.attackPlayers == true
     return {
         hostile = hostile,
         neutral = not hostile and relationshipID ~= "Member"
@@ -54,6 +52,9 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
         entry = entry,
         player = player,
         npcRecord = record,
+        identity = PNC.Identity and PNC.Identity.Verifier
+            and PNC.Identity.Verifier.BuildView(entry)
+            or nil,
         npcID = npcID,
         characterUUID = playerContext.characterUUID or "unbound",
         relationship = relationship or {},

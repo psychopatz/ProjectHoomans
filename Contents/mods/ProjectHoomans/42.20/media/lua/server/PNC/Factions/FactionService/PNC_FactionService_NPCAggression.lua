@@ -13,9 +13,9 @@ function Factions.OnNPCAggression(
     context
 )
     local attackerFactionID =
-        Factions.GetOrganizationalFactionID(attackerRecord)
+        Factions.GetFactionID(attackerRecord)
     local targetFactionID =
-        Factions.GetOrganizationalFactionID(targetRecord)
+        Factions.GetFactionID(targetRecord)
     context = type(context) == "table" and context or {}
     Internal.traceFactionCallback("callback", {
         operation = context.callback or "npc_aggression",
@@ -96,7 +96,7 @@ function Factions.OnNPCAttackPlayer(
     context
 )
     local attackerFactionID =
-        Factions.GetOrganizationalFactionID(attackerRecord)
+        Factions.GetFactionID(attackerRecord)
     local playerFaction
     context = type(context) == "table" and context or {}
     Internal.traceFactionCallback("callback", {
@@ -193,7 +193,7 @@ function Factions.OnRelationshipChanged(
     relationship
 )
     local observerFactionID =
-        Factions.GetOrganizationalFactionID(observerRecord)
+        Factions.GetFactionID(observerRecord)
     local targetFaction
     local parsed
     local livePlayer

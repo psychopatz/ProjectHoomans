@@ -10,18 +10,22 @@ local Const = PNC.Const
 local Stamina = PNC.Stamina
 local Identity = PNC.Identity
 local Settings = PNC.Sandbox
+local buildIdentityOwnershipSummary =
+    Parts.BuildIdentityOwnershipSummary
 
 function Network.BuildRosterSnapshot(record, includeTravelRoute)
     local aiState
     local inCombat
     local staminaInfo
     local identity
+    local ownership
     if type(record) ~= "table" then
         return nil
     end
     aiState, inCombat = Parts.ResolveAIState(record)
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
     identity = Parts.BuildIdentitySummary(record)
+    ownership = buildIdentityOwnershipSummary(record)
     return {
         interestDetailed = false,
         id = record.id,
@@ -30,6 +34,8 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
         archetypeID = identity.archetypeID,
         archetypeLabel = identity.archetypeLabel,
         identitySeed = identity.identitySeed,
+        factionID = ownership.factionID,
+        colonyOwned = ownership.colonyOwned,
         portrait = Identity
             and Identity.BuildPortraitSummary
             and Identity.BuildPortraitSummary(record)
@@ -48,12 +54,8 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
         z = record.z,
         orderKind = record.orderSpec and record.orderSpec.kind or nil,
         attackType = record.attackType or "auto",
-        ownerUsername = record.ownerUsername
-            or record.characterWindow
-                and record.characterWindow.ownerUsername,
-        ownerOnlineID = record.ownerOnlineID
-            or record.characterWindow
-                and record.characterWindow.ownerOnlineID,
+        ownerUsername = ownership.ownerUsername,
+        ownerOnlineID = ownership.ownerOnlineID,
         hpCurrent = record.health and record.health.current or nil,
         hpMax = record.health and record.health.max or nil,
         healthState = record.health and record.health.state or nil,
@@ -65,7 +67,7 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
         encumbranceRatio = staminaInfo.encumbranceRatio,
         aiState = aiState,
         inCombat = inCombat,
-        recruited = record.recruited == true,
+        recruited = ownership.recruited,
         relationshipCategory = record.generation
                 and record.generation.relationshipKind == "lover"
             and "Lover" or nil,
@@ -94,10 +96,9 @@ function Network.BuildDeathMarkerSnapshot(marker)
         presenceState = Const.PRESENCE_CORPSE,
         alive = false,
         deathMarker = true,
-        colonyOwned = marker.colonyOwned == true
-            or marker.colonist == true,
-        colonist = marker.colonist == true
-            or marker.colonyOwned == true,
+        colonyOwned = marker.colonyOwned == true,
+        factionID = marker.factionID,
+        colonist = marker.colonyOwned == true,
         infected = marker.infected == true,
         portrait = marker.portrait and Core.DeepCopy(marker.portrait) or nil,
         corpseToken = marker.corpseToken,

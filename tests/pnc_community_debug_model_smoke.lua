@@ -88,6 +88,52 @@ T.contains(communities[1].detail, "settled/active",
 local factions =
     PNC.CommunityDebugModel.BuildFactionItems(snapshot)
 T.equal(#factions, 1, "faction item count")
+
+local mobileFactionSnapshot = {
+    factions = {
+        {
+            id = "faction_mobile",
+            name = "Road Raiders",
+            archetypeID = "looter",
+            status = "active",
+            mobile = {
+                active = true,
+                controlMode = "strategic",
+                pathMode = "player",
+                target = {
+                    kind = "player_base",
+                    baseID = "base_player",
+                },
+            },
+        },
+    },
+    selectedFactionID = "faction_mobile",
+    mobileGroups = {},
+}
+mobileFactionSnapshot.mobileGroups[1] =
+    mobileFactionSnapshot.factions[1]
+local mobileItems =
+    PNC.CommunityDebugModel.BuildFactionItems(
+        mobileFactionSnapshot
+    )
+T.contains(mobileItems[1].detail,
+    "mobile/strategic/player-base=base_player",
+    "mobile faction list detail")
+local mobileRows = PNC.CommunityDebugModel.BuildRows(
+    mobileFactionSnapshot,
+    true,
+    nil
+)
+local mobileText = {}
+for _, item in ipairs(mobileRows) do
+    mobileText[#mobileText + 1] = item.label .. "=" .. item.value
+end
+T.contains(table.concat(mobileText, "\n"),
+    "Mobile control=strategic / path=player",
+    "mobile control debug row")
+T.contains(table.concat(mobileText, "\n"),
+    "Mobile types=looter:strategic",
+    "mobile type debug row")
 local npcs = PNC.CommunityDebugModel.BuildNPCItems(snapshot)
 T.contains(npcs[1].detail, "guard", "NPC role detail")
 local rows = PNC.CommunityDebugModel.BuildRows(

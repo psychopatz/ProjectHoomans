@@ -98,6 +98,10 @@ function H.AddCandidate(
     )
     if site and not seen[site.id]
         and H.SiteIsAvailable(site)
+        and (
+            type(options.siteFilter) ~= "function"
+            or options.siteFilter(site) == true
+        )
     then
         seen[site.id] = true
         candidates[#candidates + 1] = site
@@ -149,4 +153,3 @@ function H.RandomCandidateIndex(count, options)
     end
     return 1
 end
-

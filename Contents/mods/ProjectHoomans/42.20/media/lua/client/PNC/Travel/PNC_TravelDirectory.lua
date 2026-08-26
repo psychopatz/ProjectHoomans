@@ -125,10 +125,8 @@ function Directory.IsVisible(snapshot)
     local id
     local filter
     if snapshot and snapshot.deathMarker == true then
-        return (
-            snapshot.colonyOwned == true
-            or snapshot.colonist == true
-        ) and tonumber(snapshot.x) ~= nil
+        return snapshot.colonyOwned == true
+            and tonumber(snapshot.x) ~= nil
             and tonumber(snapshot.y) ~= nil
     end
     if not snapshot or snapshot.alive == false
@@ -175,10 +173,9 @@ function Directory.GetProjected(npcId, atWorldHour)
                 resolveOrganizationalFaction(snapshot),
             recruited = snapshot.recruited == true,
             colonyOwned = snapshot.colonyOwned == true
-                or snapshot.colonist == true,
-            colonist = snapshot.colonist == true
-                or snapshot.recruited == true
-                or tostring(snapshot.faction or "") == "colonist",
+                or snapshot.recruited == true,
+            colonist = snapshot.colonyOwned == true
+                or snapshot.recruited == true,
             deathMarker = snapshot.deathMarker == true,
             alive = snapshot.alive ~= false,
             infected = snapshot.infected == true,
@@ -244,10 +241,9 @@ function Directory.GetProjected(npcId, atWorldHour)
             resolveOrganizationalFaction(snapshot),
         recruited = snapshot.recruited == true,
         colonyOwned = snapshot.colonyOwned == true
-            or snapshot.colonist == true,
-        colonist = snapshot.colonist == true
-            or snapshot.recruited == true
-            or tostring(snapshot.faction or "") == "colonist",
+            or snapshot.recruited == true,
+        colonist = snapshot.colonyOwned == true
+            or snapshot.recruited == true,
         deathMarker = snapshot.deathMarker == true,
         alive = snapshot.alive ~= false,
         infected = snapshot.infected == true,

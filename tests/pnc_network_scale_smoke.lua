@@ -334,6 +334,7 @@ local deathSnapshot = PNC.Network.BuildDeathMarkerSnapshot({
     y = 34,
     z = 0,
     corpseToken = "corpse:12",
+    colonyOwned = true,
     colonist = true,
     infected = false,
     portrait = {

@@ -145,6 +145,17 @@ function Repository.FindBaseByColony(colonyId)
     return nil
 end
 
+function Repository.FindBaseByFaction(factionId)
+    Repository.Load()
+    factionId = tostring(factionId or "")
+    for _, base in pairs(Repository.State.bases) do
+        if tostring(base.factionId or "") == factionId then
+            return base
+        end
+    end
+    return nil
+end
+
 local function onInitGlobalModData()
     Repository.Load(true)
 end

@@ -19,7 +19,6 @@ local DEFINITIONS = {
         defaultRole = "civilian",
         behavior = {
             hostileToOutsiders = false,
-            defaultLegacyFaction = "neutral",
         },
         policyDefaults = {
             aggression = 0.30,
@@ -44,7 +43,6 @@ local DEFINITIONS = {
         defaultRole = "civilian",
         behavior = {
             hostileToOutsiders = false,
-            defaultLegacyFaction = "neutral",
         },
         policyDefaults = {
             aggression = 0.75,
@@ -69,7 +67,6 @@ local DEFINITIONS = {
         defaultRole = "civilian",
         behavior = {
             hostileToOutsiders = false,
-            defaultLegacyFaction = "neutral",
         },
         policyDefaults = {
             aggression = 0.20,
@@ -93,7 +90,6 @@ local DEFINITIONS = {
         defaultRole = "civilian",
         behavior = {
             hostileToOutsiders = false,
-            defaultLegacyFaction = "neutral",
         },
         policyDefaults = {
             aggression = 0.15,

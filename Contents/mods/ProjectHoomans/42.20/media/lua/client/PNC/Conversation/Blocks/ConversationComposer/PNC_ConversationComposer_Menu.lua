@@ -159,8 +159,15 @@ function Composer.BuildRootNode(context, options)
         end
         if options.dossierChoice then choices[#choices + 1] = options.dossierChoice end
         local record = context.npcRecord or {}
-        if record.recruited ~= true
-            and tostring(record.faction or "") ~= "hostile"
+        local verifier = PNC.Identity and PNC.Identity.Verifier or nil
+        local ownership = verifier
+            and verifier.BuildOwnershipSummary
+            and verifier.BuildOwnershipSummary(context.entry)
+            or nil
+        local recruited = ownership
+            and (ownership.recruited or ownership.colonyOwned)
+            or record.recruited == true
+        if not recruited
         then
             choices[#choices + 1] = {
                 id = "recruit",

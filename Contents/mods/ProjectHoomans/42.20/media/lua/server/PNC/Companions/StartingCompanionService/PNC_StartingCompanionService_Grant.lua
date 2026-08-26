@@ -70,6 +70,7 @@ function H.EnsureOne(player, character, state, spec, index, at)
     record.generation.relationshipKind = spec.relationshipKind
     record.generation.relationshipSince = "before_outbreak"
     record.generation.playerCharacterUUID = character.uuid
+    local appearanceChanged = H.ApplySharedAppearance(player, record, spec)
     if Registry.MarkDirty then
         Registry.MarkDirty(record, "starting_companion_relationship")
     end
@@ -85,8 +86,15 @@ function H.EnsureOne(player, character, state, spec, index, at)
         if not assigned then return false, reason end
     end
     H.ApplyLifelongKnowledge(player, character, npcID, spec, at)
-    if renamed and PNC.Network and PNC.Network.BroadcastRecord then
-        PNC.Network.BroadcastRecord(record, "starting_companion_shared_name")
+    if (renamed or appearanceChanged)
+        and PNC.Network and PNC.Network.BroadcastRecord
+    then
+        PNC.Network.BroadcastRecord(
+            record,
+            appearanceChanged
+                and "starting_companion_shared_appearance"
+                or "starting_companion_shared_name"
+        )
     end
     state.grants[spec.id] = {
         status = "granted",
@@ -103,4 +111,3 @@ function H.EnsureOne(player, character, state, spec, index, at)
 end
 
 return Starting
-

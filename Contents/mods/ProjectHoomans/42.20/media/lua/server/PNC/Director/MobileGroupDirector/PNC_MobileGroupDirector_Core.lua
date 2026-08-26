@@ -104,13 +104,20 @@ end
 function H.MobileOrder(faction, mobile, site)
     local home = site and site.home or {}
     local mode = H.PathMode(mobile and mobile.pathMode)
+    if H.AmbientOrder then
+        local ambient = H.AmbientOrder(faction, mobile, site)
+        if ambient then return ambient end
+    end
     if faction.archetypeID == "looter" then
         if mode == Constants.MOBILE_PATH_PLAYER then
             return {
                 kind = Const.ORDER_HOSTILE_HUNT,
-                x = home.x,
-                y = home.y,
-                z = home.z,
+                x = mobile and mobile.strategicTarget
+                    and mobile.strategicTarget.x or home.x,
+                y = mobile and mobile.strategicTarget
+                    and mobile.strategicTarget.y or home.y,
+                z = mobile and mobile.strategicTarget
+                    and mobile.strategicTarget.z or home.z,
             }
         end
         return {

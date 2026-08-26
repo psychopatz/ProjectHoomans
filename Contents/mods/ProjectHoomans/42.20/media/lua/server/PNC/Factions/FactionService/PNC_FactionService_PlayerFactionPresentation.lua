@@ -70,12 +70,12 @@ function Factions.EnsurePlayerFaction(player, options)
     faction, reason = Factions.GetPlayerFaction(player)
     if faction then
         local record = Internal.registryRecord(faction.id)
-        local legacyGeneratedName = record
+        local generatedName = record
             and type(record.name) == "string"
             and string.find(record.name, " Survivors$") ~= nil
         if record and record.tags
             and (record.tags.automaticallyCreated == true
-                or legacyGeneratedName)
+                or generatedName)
             and record.tags.factionNameConfirmed ~= true
             and record.tags.factionNamePending ~= true
         then

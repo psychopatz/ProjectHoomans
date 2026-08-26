@@ -1,7 +1,7 @@
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
-local Handler = PNC.ServerLegacyDebugCommandHandler
+local Handler = PNC.ServerDebugCommandHandler
 local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
 local H = Handler.Internal
@@ -30,4 +30,3 @@ Router.Register(Const.CMD_DEBUG, function(player, normalizedArgs, rawArgs)
 end)
 
 return Handler
-

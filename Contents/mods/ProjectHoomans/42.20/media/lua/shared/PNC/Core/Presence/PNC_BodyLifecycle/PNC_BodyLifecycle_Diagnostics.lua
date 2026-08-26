@@ -30,7 +30,7 @@ function Lifecycle.BuildDiagnostics(record)
     return {
         id = tostring(record.id),
         name = record.name,
-        faction = record.faction,
+        tacticalClass = record.tacticalClass,
         presenceState = record.presenceState,
         alive = record.alive ~= false,
         phase = state.phase,

@@ -66,7 +66,7 @@ function Factions.OnPlayerAggression(
     context
 )
     local targetFactionID =
-        Factions.GetOrganizationalFactionID(targetRecord)
+        Factions.GetFactionID(targetRecord)
     local playerFaction
     Internal.traceFactionCallback("callback", {
         operation = context and context.callback

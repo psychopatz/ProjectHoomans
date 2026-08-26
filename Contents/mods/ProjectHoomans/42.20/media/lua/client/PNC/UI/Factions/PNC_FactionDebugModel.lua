@@ -187,11 +187,45 @@ function Model.BuildRows(snapshot, authorized, reason)
         if mobile and mobile.active == true then
             local site = mobile.site or {}
             local home = site.home or {}
+            local ambient = mobile.ambient or {}
+            local target = mobile.controlMode == "strategic"
+                and mobile.strategicTarget or ambient.target
             rows[#rows + 1] = row(
                 "Group type", "mobile / "
+                    .. tostring(faction.archetypeID)
+                    .. " / control="
+                    .. tostring(mobile.controlMode or "ambient")
+                    .. " / path="
                     .. tostring(mobile.pathMode or "random"),
                 "warning"
             )
+            rows[#rows + 1] = row(
+                "Mobile objective",
+                mobile.controlMode == "strategic"
+                    and ("player base / "
+                        .. tostring(target and target.baseID
+                            or "pending"))
+                    or (tostring(ambient.phase or "pending")
+                        .. " / "
+                        .. tostring(ambient.objective or "pending")),
+                mobile.controlMode == "strategic"
+                    and "danger" or "warning"
+            )
+            if target then
+                rows[#rows + 1] = row(
+                    "Mobile target",
+                    tostring(target.kind or "location")
+                        .. " / "
+                        .. tostring(target.siteID or target.baseID
+                            or "anonymous")
+                        .. " @ " .. string.format(
+                            "%.1f, %.1f, %.0f",
+                            tonumber(target.x) or 0,
+                            tonumber(target.y) or 0,
+                            tonumber(target.z) or 0
+                        )
+                )
+            end
             rows[#rows + 1] = row(
                 "Mobile staging site",
                 tostring(site.id or "unknown")
@@ -385,7 +419,9 @@ function Model.BuildRows(snapshot, authorized, reason)
     if action then
         rows[#rows + 1] = row(
             "Last action",
-            action.ok and tostring(action.action)
+            action.ok
+                and (tostring(action.action) .. " / "
+                    .. tostring(action.reason))
                 or tostring(action.reason),
             action.ok and "success" or "warning"
         )
@@ -402,6 +438,22 @@ function Model.BuildRows(snapshot, authorized, reason)
                         group.siteKind or "site"
                     ),
                 "success"
+            )
+        end
+        local objective = action.objectiveResult
+        if objective then
+            local target = objective.controlMode == "strategic"
+                and objective.strategicTarget
+                or objective.ambient
+                    and objective.ambient.target
+            rows[#rows + 1] = row(
+                "  objective refresh",
+                tostring(objective.controlMode or "ambient")
+                    .. " / "
+                    .. tostring(target and (
+                        target.kind or target.siteID
+                            or target.baseID
+                    ) or "pending")
             )
         end
         rows[#rows + 1] = row(
@@ -617,7 +669,16 @@ function Model.BuildDashboard(snapshot, authorized, reason)
         npc = npc and {
             id = npc.id,
             name = npc.name,
-            legacyFaction = npc.legacyFaction,
+            factionID = npc.factionID
+                or npc.affiliation
+                    and npc.affiliation.factionID or nil,
+            tacticalClass = npc.tacticalClass,
+            colonyOwned = npc.colonyOwned == true
+                or npc.identity and npc.identity.colonyOwned == true,
+            recruited = npc.recruited == true
+                or npc.identity and npc.identity.recruited == true,
+            identity = npc.identity,
+            identityVerification = npc.identityVerification,
             recordRevision =
                 tonumber(npc.recordRevision) or 0,
             presenceRevision =
@@ -806,9 +867,35 @@ function Model.BuildGUIRows(
                     .. tostring(affiliation.rank or "none")
             )
             rows[#rows + 1] = row(
-                "Legacy faction",
-                dashboard.npc.legacyFaction or "(none)"
+                "Tactical class",
+                dashboard.npc.tacticalClass or "(none)"
             )
+            rows[#rows + 1] = row(
+                "Identity authority",
+                dashboard.npc.factionID or "(none)",
+                dashboard.npc.factionID and "success" or "warning"
+            )
+            rows[#rows + 1] = row(
+                "Ownership",
+                dashboard.npc.colonyOwned
+                    and "colony-owned" or "not colony-owned",
+                dashboard.npc.colonyOwned and "success" or "textMuted"
+            )
+            local identityVerification =
+                dashboard.npc.identityVerification
+            if identityVerification then
+                rows[#rows + 1] = row(
+                    "Identity verifier",
+                    identityVerification.ok and "PASS" or "FAIL",
+                    identityVerification.ok and "success" or "danger"
+                )
+                rows[#rows + 1] = row(
+                    "Verifier errors / warnings",
+                    tostring(#(identityVerification.errors or {}))
+                        .. " / "
+                        .. tostring(#(identityVerification.warnings or {}))
+                )
+            end
         end
         rows[#rows + 1] = row(
             "Active episodes", dashboard.activeEpisodeCount,

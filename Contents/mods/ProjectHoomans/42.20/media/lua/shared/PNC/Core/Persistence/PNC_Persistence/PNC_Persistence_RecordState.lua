@@ -113,6 +113,7 @@ function Internal.migrateLegacyIdentity(raw, definition)
             hairModel = raw.hairModel,
             beardModel = raw.beardModel,
             skinTexture = raw.skinTexture,
+            skinColor = Internal.sanitizeColor(raw.skinColor),
             hairColor = Internal.sanitizeColor(raw.hairColor),
             voice = raw.voice,
             forename = raw.forename,

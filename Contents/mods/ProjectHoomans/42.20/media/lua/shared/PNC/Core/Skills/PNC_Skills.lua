@@ -67,7 +67,7 @@ local function resolveBaseLevel(record, skillID)
     lowered = string.lower(tostring(skillID))
     level = Identity.Range(record.identitySeed, "skill:" .. tostring(skillID), 0, 3)
 
-    if (Types and Types.IsColonist and Types.IsColonist(record)) or record.faction == "colonist" then
+    if (Types and Types.IsColonist and Types.IsColonist(record)) or record.tacticalClass == "colonist" then
         if lowered == "fitness" or lowered == "strength" or lowered == "nimble" or lowered == "sneaking" then
             level = Identity.Range(record.identitySeed, "skill:" .. tostring(skillID), 1, 4)
         elseif skillID == specialty.melee then
@@ -75,7 +75,7 @@ local function resolveBaseLevel(record, skillID)
         elseif skillID == "Maintenance" then
             level = Identity.Range(record.identitySeed, "skill_focus:Maintenance", 1, 4)
         end
-    elseif record.faction == "hostile" then
+    elseif record.tacticalClass == "hostile" then
         if specialty.weaponMode == "ranged" and (skillID == "Aiming" or skillID == "Reloading") then
             level = Identity.Range(record.identitySeed, "skill_focus:" .. tostring(skillID), 3, 6)
         elseif skillID == specialty.melee then

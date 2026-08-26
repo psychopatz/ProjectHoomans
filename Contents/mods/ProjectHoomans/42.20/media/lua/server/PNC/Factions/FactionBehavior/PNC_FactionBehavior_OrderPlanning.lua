@@ -30,6 +30,14 @@ local function desiredOrder(record, mode, owner, faction, preservePlayerOrder)
     local mobile = faction and faction.mobile
     local home = mobile and mobile.site and mobile.site.home
     if mobile and mobile.active == true and home then
+        local mobileDirector = PNC.MobileGroupDirectorInternal
+        if mobileDirector and mobileDirector.MobileOrder then
+            return mobileDirector.MobileOrder(
+                faction,
+                mobile,
+                mobile.site
+            )
+        end
         local pathMode = mobile.pathMode
         if mode == "aggressive" then
             if pathMode == PNC.FactionConstants.MOBILE_PATH_RANDOM then

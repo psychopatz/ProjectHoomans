@@ -224,7 +224,7 @@ function Internal.IsProtectedNPC(record, other, target)
     if Relationships and Relationships.AreNPCsEnemies then
         return not Relationships.AreNPCsEnemies(record, other)
     end
-    return tostring(other.faction or "") == tostring(record.faction or "")
+    return tostring(other.tacticalClass or "") == tostring(record.tacticalClass or "")
 end
 
 return Tactics

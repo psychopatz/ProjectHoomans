@@ -32,19 +32,23 @@ local function entryFacts(entry)
         and record.orderSpec or {}
     local corpseState = PNC.Const
         and PNC.Const.PRESENCE_CORPSE
+    local verifier = PNC.Identity
+        and PNC.Identity.Verifier or nil
     local faction = string.lower(tostring(firstValue(
         entry.faction,
         snapshot.faction,
         record.faction,
         "neutral"
     )))
-    local colonist = entry.colonist == true
+    local colonist = verifier
+        and verifier.IsColonyOwnedNPC
+        and verifier.IsColonyOwnedNPC(entry)
+        or entry.colonyOwned == true
         or entry.recruited == true
-        or snapshot.colonist == true
+        or snapshot.colonyOwned == true
         or snapshot.recruited == true
-        or record.colonist == true
+        or record.colonyOwned == true
         or record.recruited == true
-        or faction == "colonist"
     local deathMarker = entry.deathMarker == true
         or snapshot.deathMarker == true
         or record.deathMarker == true

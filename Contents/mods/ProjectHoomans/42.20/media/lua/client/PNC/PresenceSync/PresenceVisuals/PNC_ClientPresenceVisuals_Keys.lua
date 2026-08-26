@@ -61,6 +61,7 @@ local function buildVisualKey(snapshot)
         tostring(snapshot and snapshot.isFemale == true),
         tostring(appearance.outfit or ""),
         tostring(appearance.skinTexture or ""),
+        stableTableSignature(appearance.skinColor),
         tostring(appearance.hairModel or ""),
         tostring(appearance.beardModel or ""),
         stableTableSignature(equipment.worn),
@@ -127,4 +128,3 @@ end
 
 
 Internal.BuildMotionKey = buildMotionKey
-

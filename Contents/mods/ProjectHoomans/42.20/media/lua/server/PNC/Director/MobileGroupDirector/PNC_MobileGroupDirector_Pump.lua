@@ -23,6 +23,9 @@ function Director.Pump(now)
     end
     Director.LastPumpAt = now
     local at = H.WorldAge()
+    if Director.PumpAmbient then
+        Director.PumpAmbient(at, 12)
+    end
     local factionIDs = {}
     for factionID, faction in pairs(
         Factions.Registry and Factions.Registry.byID or {}
@@ -47,4 +50,3 @@ function Director.Pump(now)
 end
 
 return Director
-

@@ -51,8 +51,8 @@ local function canGift(player, record, args)
     then
         return false, "conversation_lease_required"
     end
-    local faction = tostring(record.faction or "")
-    if faction == tostring(Const.FACTION_HOSTILE) then
+    local tacticalClass = tostring(record.tacticalClass or "")
+    if tacticalClass == tostring(Const.FACTION_HOSTILE) then
         return false, "hostile_gift_forbidden"
     end
     if PNC.ConversationScene and PNC.ConversationScene.Begin then

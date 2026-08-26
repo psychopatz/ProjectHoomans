@@ -106,7 +106,7 @@ PNC = {
         end,
     },
     Factions = {
-        GetOrganizationalFactionID = function()
+        GetFactionID = function()
             return "faction_hostile"
         end,
         PacifyForPlayer = function(factionID, key, options)

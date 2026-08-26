@@ -71,7 +71,7 @@ function H.ActiveMembers(faction)
     return output
 end
 
-function H.BuildMobileState(site, mode, at, previous, moved)
+function H.BuildMobileState(site, mode, at, previous, moved, controlMode)
     local interval = tonumber(previous and previous.relocationHours)
         or Constants.MOBILE_GROUP_RELOCATION_HOURS
     local relocationCount = tonumber(previous
@@ -81,6 +81,14 @@ function H.BuildMobileState(site, mode, at, previous, moved)
     return {
         active = true,
         pathMode = mode,
+        controlMode = controlMode
+            or previous and previous.controlMode
+            or mode == Constants.MOBILE_PATH_PLAYER
+                and Constants.MOBILE_CONTROL_STRATEGIC
+            or Constants.MOBILE_CONTROL_AMBIENT,
+        strategicTarget = previous and H.Copy(previous.strategicTarget)
+            or nil,
+        ambient = previous and H.Copy(previous.ambient) or nil,
         site = site,
         lastMovedAt = at,
         nextMoveAt = at + interval,

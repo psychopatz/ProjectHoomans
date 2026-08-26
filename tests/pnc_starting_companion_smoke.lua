@@ -16,7 +16,13 @@ local knowledgeCount = 0
 local commitCount = 0
 local specs = {
     { id = "PNC_HasBrother", relationshipKind = "brother", sex = "male",
-        sharesSurname = true },
+        sharesSurname = true, sharesAppearance = true },
+    { id = "PNC_HasSister", relationshipKind = "sister", sex = "female",
+        sharesSurname = true, sharesAppearance = true },
+    { id = "PNC_HasMom", relationshipKind = "mother", sex = "female",
+        sharesSurname = true, sharesAppearance = true },
+    { id = "PNC_HasDad", relationshipKind = "father", sex = "male",
+        sharesSurname = true, sharesAppearance = true },
     { id = "PNC_IsMarried", relationshipKind = "lover", sex = "orientation",
         sharesSurname = true },
     { id = "PNC_HasFriend", relationshipKind = "friend", sex = "random",
@@ -42,11 +48,24 @@ PNC = {
     Identity = {
         NormalizeSeed = function() return 41 end,
         Index = function() return 2 end,
+        GetCharacterAppearance = function()
+            return {
+                skinColor = { r = 0.44, g = 0.31, b = 0.22 },
+                hairColor = { r = 0.12, g = 0.07, b = 0.03 },
+                skinTexture = "FemaleBody03",
+            }
+        end,
         GenerateResolvedIdentity = function(definition)
             return {
                 displayName = "Casey Random",
                 isFemale = definition.isFemale,
-                survivor = { forename = "Casey", surname = "Random" },
+                survivor = {
+                    forename = "Casey",
+                    surname = "Random",
+                    skinColor = { r = 0.8, g = 0.7, b = 0.6 },
+                    hairColor = { r = 0.6, g = 0.5, b = 0.4 },
+                    skinTexture = "MaleBody01",
+                },
             }
         end,
     },
@@ -169,18 +188,33 @@ local granted, reason, result = PNC.StartingCompanions.Ensure(
 )
 T.equal(granted, true, "first ensure grants all companions")
 T.equal(reason, "granted", "first ensure result")
-T.equal(#result.npcIDs, 3, "three selected companions returned")
-T.equal(spawnCount, 3, "one NPC per selected trait")
-T.equal(assignCount, 3, "all companions assigned")
-T.equal(relationshipCount, 3, "all relationships initialized")
-T.equal(knowledgeCount, 3, "all dossiers initialized")
-T.equal(commitCount, 4, "selection plus each grant committed")
+T.equal(#result.npcIDs, 6, "six selected companions returned")
+T.equal(spawnCount, 6, "one NPC per selected trait")
+T.equal(assignCount, 6, "all companions assigned")
+T.equal(relationshipCount, 6, "all relationships initialized")
+T.equal(knowledgeCount, 6, "all dossiers initialized")
+T.equal(commitCount, 7, "selection plus each grant committed")
 
 local brother = npcs[record.startingCompanions.grants.PNC_HasBrother.npcID]
+local sister = npcs[record.startingCompanions.grants.PNC_HasSister.npcID]
+local mom = npcs[record.startingCompanions.grants.PNC_HasMom.npcID]
+local dad = npcs[record.startingCompanions.grants.PNC_HasDad.npcID]
 local lover = npcs[record.startingCompanions.grants.PNC_IsMarried.npcID]
 local friend = npcs[record.startingCompanions.grants.PNC_HasFriend.npcID]
-T.equal(brother.identity.survivor.surname, "SurvivorFamily",
-    "family companion shares player surname")
+for _, familyMember in ipairs({ brother, sister, mom, dad }) do
+    T.equal(familyMember.identity.survivor.surname, "SurvivorFamily",
+        "blood relative shares player surname")
+    T.equal(familyMember.identity.survivor.skinColor.r, 0.44,
+        "blood relative shares player skin color")
+    T.equal(familyMember.identity.survivor.skinColor.g, 0.31,
+        "blood relative shares player skin color green channel")
+    T.equal(familyMember.identity.survivor.hairColor.b, 0.03,
+        "blood relative shares player hair color")
+    local expectedTexture = familyMember.isFemale
+        and "FemaleBody03" or "MaleBody03"
+    T.equal(familyMember.identity.survivor.skinTexture, expectedTexture,
+        "blood relative shares player skin texture index")
+end
 T.equal(lover.identity.survivor.surname, "SurvivorFamily",
     "married lover shares player surname")
 T.equal(friend.identity.survivor.surname, "Random",
@@ -188,34 +222,48 @@ T.equal(friend.identity.survivor.surname, "Random",
 T.equal(lover.isFemale, true,
     "gay female survivor receives female lover")
 
+brother.identity.survivor.skinColor = { r = 0.1, g = 0.1, b = 0.1 }
+brother.identity.survivor.skinTexture = "MaleBody01"
+brother.isFemale = nil
+record.startingCompanions.grants.PNC_HasBrother.enrichmentVersion = 4
 granted, reason = PNC.StartingCompanions.Ensure(
     player, record.uuid, 13
 )
+T.equal(granted, true, "existing blood relative is enriched")
+T.equal(reason, "granted", "existing blood relative enrichment result")
+T.equal(brother.identity.survivor.skinColor.r, 0.44,
+    "existing blood relative receives player skin color")
+T.equal(brother.identity.survivor.skinTexture, "MaleBody03",
+    "existing blood relative receives player skin texture")
+
+granted, reason = PNC.StartingCompanions.Ensure(
+    player, record.uuid, 14
+)
 T.equal(granted, false, "reconnect does not grant again")
 T.equal(reason, "granted", "reconnect sees persisted grants")
-T.equal(spawnCount, 3, "reconnect creates no duplicates")
-T.equal(assignCount, 3, "reconnect performs no reassignment")
+T.equal(spawnCount, 6, "reconnect creates no duplicates")
+T.equal(assignCount, 6, "reconnect performs no reassignment")
 
 -- Existing grants repair a stale faction/community link exactly once.
 lover.affiliation = nil
 record.startingCompanions.grants.PNC_IsMarried.enrichmentVersion = 2
 granted, reason = PNC.StartingCompanions.Ensure(
-    player, record.uuid, 14
+    player, record.uuid, 15
 )
 T.equal(granted, true, "stale enrollment is repaired")
 T.equal(reason, "granted", "repair completes grant")
-T.equal(assignCount, 4, "only stale companion is reassigned")
+T.equal(assignCount, 7, "only stale companion is reassigned")
 granted, reason = PNC.StartingCompanions.Ensure(
-    player, record.uuid, 15
+    player, record.uuid, 16
 )
 T.equal(granted, false, "completed repair is not repeated")
 T.equal(reason, "granted", "completed repair remains resolved")
-T.equal(assignCount, 4, "repair performs no per-frame reassignment")
+T.equal(assignCount, 7, "repair performs no per-frame reassignment")
 local stableCommitCount = commitCount
 for frame = 1, 120 do
-    PNC.StartingCompanions.Ensure(player, record.uuid, 15 + frame)
+    PNC.StartingCompanions.Ensure(player, record.uuid, 16 + frame)
 end
-T.equal(assignCount, 4,
+T.equal(assignCount, 7,
     "steady lifecycle checks never repeat companion assignment")
 T.equal(commitCount, stableCommitCount,
     "steady lifecycle checks never save companion state per frame")

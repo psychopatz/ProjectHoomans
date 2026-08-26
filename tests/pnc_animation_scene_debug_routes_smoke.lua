@@ -11,11 +11,11 @@ local api = T.read(
 )
 local serverRoute = T.read(
     ROOT .. "server/PNC/Networking/Handlers/"
-        .. "PNC_ServerLegacyDebugCommandHandler.lua"
+        .. "PNC_ServerDebugCommandHandler.lua"
 ) .. T.read(
     ROOT .. "server/PNC/Networking/Handlers/"
-        .. "ServerLegacyDebugCommandHandler/"
-        .. "PNC_ServerLegacyDebugCommandHandler_ApiActions.lua"
+        .. "ServerDebugCommandHandler/"
+        .. "PNC_ServerDebugCommandHandler_ApiActions.lua"
 )
 local context = T.read(
     ROOT

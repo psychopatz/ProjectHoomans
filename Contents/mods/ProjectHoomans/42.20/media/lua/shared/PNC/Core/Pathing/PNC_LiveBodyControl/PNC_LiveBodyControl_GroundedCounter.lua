@@ -57,7 +57,7 @@ function Internal.isFriendlyGroundAttacker(record, attacker)
     if record.ownerOnlineID ~= nil and other.ownerOnlineID ~= nil then
         return tonumber(record.ownerOnlineID) == tonumber(other.ownerOnlineID)
     end
-    return tostring(record.faction or "") == tostring(other.faction or "")
+    return tostring(record.tacticalClass or "") == tostring(other.tacticalClass or "")
 end
 
 function Internal.counterStagger(record, zombie, attacker)

@@ -69,14 +69,14 @@ Server command-routing modules:
 - `PNC_ServerColonyManagementCommandHandler`: colony snapshot/action adapter;
   ColonyManagement retains action policy while the adapter preserves
   action-result attachment and settlement delta/full response selection
-- `PNC_ServerLegacyDebugCommandHandler`: compatibility adapter for the legacy
-  `CMD_DEBUG` action envelope; it preserves one authorization gate and delegates
-  to existing debug/domain APIs
+- `PNC_ServerDebugCommandHandler`: server-authoritative `CMD_DEBUG` action
+  handler; it preserves one authorization gate and delegates to debug/domain
+  APIs
 - `PNC_ServerCommandRouter.CanUseDebug`: preserves the existing SP debug-mode
   and multiplayer-admin authorization policy for routed commands
 - `PNC_ServerCommandRouter.Handle`: supplies handlers a normalized payload and
-  the untouched raw payload as an optional third argument where legacy nil
-  semantics must be preserved
+  the untouched raw payload as an optional third argument where nil semantics
+  must be preserved
 - `PNC_Server`: retains the single `Events.OnClientCommand` registration and
   validates the `PNC` module namespace before router dispatch
 
