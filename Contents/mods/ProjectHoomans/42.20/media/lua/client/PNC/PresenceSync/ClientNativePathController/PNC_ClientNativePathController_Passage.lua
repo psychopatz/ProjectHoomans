@@ -225,6 +225,8 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
     local crossingDuration
     local finishHold
     local finishDuration
+    local transferX
+    local transferY
     if not toSquare then return false, nil end
     if not fromSquare and body.getSquare then
         fromSquare = body:getSquare()
@@ -249,6 +251,20 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
         )
     then
         return false, "native_fence_landing_blocked"
+    end
+    if not TraversalQuery
+        or not TraversalQuery.GetFenceTransferPoint
+    then
+        return false, "native_fence_geometry_unavailable"
+    end
+    transferX, transferY = TraversalQuery.GetFenceTransferPoint(
+        fromSquare,
+        toSquare,
+        body:getX(),
+        body:getY()
+    )
+    if transferX == nil or transferY == nil then
+        return false, "native_fence_geometry_invalid"
     end
     _, tall = TraversalQuery.IsFence(object)
     profile = TraversalProfiles
@@ -306,8 +322,8 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
         fromSquare = fromSquare,
         toSquare = toSquare,
         fenceKey = fenceKey(object, passage),
-        toX = toSquare:getX() + 0.5,
-        toY = toSquare:getY() + 0.5,
+        toX = transferX,
+        toY = transferY,
         toZ = toSquare:getZ(),
     }
     if body.faceThisObject then body:faceThisObject(object) end

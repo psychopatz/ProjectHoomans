@@ -217,10 +217,34 @@ function Internal.tryFencePassage(context)
         return nil, nil, false
     end
     local fromSquare = resolveFromSquare(context, fence)
-    local landingX = fence.landingSquare:getX() + 0.5
-    local landingY = fence.landingSquare:getY() + 0.5
+    local landingX
+    local landingY
     local landingZ = fence.landingSquare:getZ()
     local fenceKey = "fence:" .. Internal.describeSquare(fence.square)
+    if not TraversalQuery
+        or not TraversalQuery.GetFenceTransferPoint
+    then
+        Internal.logTraversalReject(
+            context.record, context.zombie, context.lane,
+            "traversal_rejected", "fence_geometry_unavailable",
+            "object=" .. tostring(fenceKey)
+        )
+        return false, nil, true
+    end
+    landingX, landingY = TraversalQuery.GetFenceTransferPoint(
+        fromSquare,
+        fence.landingSquare,
+        context.fromX,
+        context.fromY
+    )
+    if landingX == nil or landingY == nil then
+        Internal.logTraversalReject(
+            context.record, context.zombie, context.lane,
+            "traversal_rejected", "fence_geometry_invalid",
+            "object=" .. tostring(fenceKey)
+        )
+        return false, nil, true
+    end
     if rejectFence(
         context,
         fence,

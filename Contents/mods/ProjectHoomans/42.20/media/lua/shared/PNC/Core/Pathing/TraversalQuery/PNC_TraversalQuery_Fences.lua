@@ -7,6 +7,52 @@ PNC.TraversalQuery.Internal = PNC.TraversalQuery.Internal or {}
 local TraversalQuery = PNC.TraversalQuery
 local Internal = TraversalQuery.Internal
 
+local FENCE_LANDING_MARGIN = 0.05
+
+local function clamp(value, minimum, maximum)
+    if value < minimum then return minimum end
+    if value > maximum then return maximum end
+    return value
+end
+
+function TraversalQuery.GetFenceTransferPoint(
+    fromSquare,
+    toSquare,
+    x,
+    y
+)
+    local dx
+    local dy
+    local startX = tonumber(x)
+    local startY = tonumber(y)
+    local targetX
+    local targetY
+    local minimumX
+    local maximumX
+    local minimumY
+    local maximumY
+    if not fromSquare or not toSquare
+        or not startX or not startY
+    then
+        return nil, nil
+    end
+    dx, dy = Internal.CardinalDelta(fromSquare, toSquare)
+    if not dx then
+        return nil, nil
+    end
+    -- Move exactly one cardinal tile, preserving the coordinate parallel to
+    -- the fence. Target-square centers are not valid transfer points: they
+    -- introduce a sideways turn whenever the actor approaches off-center.
+    targetX = startX + dx
+    targetY = startY + dy
+    minimumX = toSquare:getX() + FENCE_LANDING_MARGIN
+    maximumX = toSquare:getX() + 1 - FENCE_LANDING_MARGIN
+    minimumY = toSquare:getY() + FENCE_LANDING_MARGIN
+    maximumY = toSquare:getY() + 1 - FENCE_LANDING_MARGIN
+    return clamp(targetX, minimumX, maximumX),
+        clamp(targetY, minimumY, maximumY)
+end
+
 function TraversalQuery.IsFenceApproachReady(
     x,
     y,

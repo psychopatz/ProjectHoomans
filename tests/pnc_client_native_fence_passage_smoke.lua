@@ -16,7 +16,7 @@ local toSquare = {
     getY = function() return 0 end,
     getZ = function() return 0 end,
 }
-local position = { x = 0.5, y = 0.5, z = 0 }
+local position = { x = 0.5, y = 0.23, z = 0 }
 local bumpType
 local leases = 0
 local suppressPosition = false
@@ -81,12 +81,31 @@ local body = {
 }
 
 T.load("ProjectHoomans", "shared",
+    "PNC/Core/Pathing/TraversalQuery/PNC_TraversalQuery_Internal.lua")
+T.load("ProjectHoomans", "shared",
+    "PNC/Core/Pathing/TraversalQuery/PNC_TraversalQuery_Fences.lua")
+T.load("ProjectHoomans", "shared",
     "PNC/Core/Pathing/PNC_TraversalAction.lua")
 T.load("ProjectHoomans", "client",
     "PNC/PresenceSync/ClientNativePathController/"
         .. "PNC_ClientNativePathController_Passage.lua")
 
 local Controller = PNC.ClientPresenceSync.Internal.NativePathController
+local verticalFrom = {
+    getX = function() return 4 end,
+    getY = function() return 7 end,
+    getZ = function() return 0 end,
+}
+local verticalTo = {
+    getX = function() return 4 end,
+    getY = function() return 8 end,
+    getZ = function() return 0 end,
+}
+local verticalX, verticalY = PNC.TraversalQuery.GetFenceTransferPoint(
+    verticalFrom, verticalTo, 4.27, 7.41
+)
+T.equal(verticalX, 4.27, "vertical fence transfer changed its lane")
+T.equal(verticalY, 8.41, "vertical fence transfer did not cross one tile")
 local state = {}
 local handled, reason = Controller.TryNativePassage(
     { id = "fence-npc" }, body, state,
@@ -96,6 +115,10 @@ T.equal(reason, "native_fence_climb", "fence passage reason")
 T.equal(bumpType, "PNC_LegacyClimbFenceStart", "fence raise scene selected")
 T.equal(state.passageAction.kind, "fence_climb", "fence action retained")
 T.equal(state.passageAction.phase, "up", "fence starts in raise phase")
+T.equal(state.passageAction.toX, 1.5,
+    "horizontal fence transfer did not cross one tile")
+T.equal(state.passageAction.toY, 0.23,
+    "horizontal fence transfer changed its lane")
 
 handled, reason = Controller.UpdateWindowSmash(body, state, 1200)
 T.truthy(handled, "fence action remains active at midpoint")

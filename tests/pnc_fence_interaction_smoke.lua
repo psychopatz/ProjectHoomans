@@ -39,6 +39,9 @@ PNC = {
         IsDoor = function() return false end,
         GetFenceBetween = function() return fence, false end,
         IsFenceApproachReady = function() return true end,
+        GetFenceTransferPoint = function(_, _, x, y)
+            return x + 1, y
+        end,
     },
     TraversalProfiles = {
         Resolve = function()
