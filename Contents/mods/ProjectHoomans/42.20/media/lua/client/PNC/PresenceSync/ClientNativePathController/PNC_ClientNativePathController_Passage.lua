@@ -19,6 +19,7 @@ local PathInternal = PNC.PathService
     and PNC.PathService.Internal or nil
 local Animation = PNC.Animation
 local LiveBodyControl = PNC.LiveBodyControl
+local Core = PNC.Core
 local clearOwnedPath = Controller.ClearOwnedPath
 local beginMovementLease = Controller.BeginMovementLease
 local logState = Controller.LogState
@@ -36,6 +37,75 @@ local FENCE_RETRY_BACKOFF_MS = 900
 local FENCE_COOLDOWN_MS = 900
 local VANILLA_FENCE_TIMEOUT_MS = 4000
 local VANILLA_FENCE_START_GRACE_MS = 300
+
+local function holdFenceBody(body)
+    if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
+        LiveBodyControl.SetManagedBodyUseless(body, true, false)
+    end
+end
+
+local function fenceVariableString(body, name)
+    if body and body.getVariableString then
+        return tostring(body:getVariableString(name) or "")
+    end
+    return ""
+end
+
+local function fenceVariableBoolean(body, name)
+    return body and body.getVariableBoolean
+        and body:getVariableBoolean(name) == true or false
+end
+
+local function fenceDebugExtra(body, action, now, phase, observedPhase)
+    local bumpType = body and body.getBumpType
+        and tostring(body:getBumpType() or "")
+        or fenceVariableString(body, "BumpType")
+    local actionState = body and body.getActionStateName
+        and string.lower(tostring(body:getActionStateName() or ""))
+        or ""
+    return "phase=" .. tostring(phase or "")
+        .. " observed=" .. tostring(observedPhase or "")
+        .. " action=" .. tostring(actionState)
+        .. " bump=" .. tostring(bumpType)
+        .. " finished=" .. tostring(
+            fenceVariableBoolean(body, "BumpAnimFinished")
+        )
+        .. " elapsedMs=" .. tostring(
+            (tonumber(now) or 0)
+                - (tonumber(action and action.startedAt) or now or 0)
+        )
+        .. " pos=" .. tostring(body and body:getX() or "nil")
+        .. "," .. tostring(body and body:getY() or "nil")
+        .. " target=" .. tostring(action and action.toX or "nil")
+        .. "," .. tostring(action and action.toY or "nil")
+end
+
+local function logFencePhase(snapshot, body, state, action, now, phase, observedPhase)
+    if not state or state.fenceDebugPhase == phase then return end
+    state.fenceDebugPhase = phase
+    logState(
+        snapshot,
+        "native_fence_phase",
+        fenceDebugExtra(body, action, now, phase, observedPhase)
+    )
+    if phase == "cross_pending"
+        and tostring(observedPhase or "") ~= "transfer"
+        and not state.fenceDebugTimerFallbackLogged
+    then
+        state.fenceDebugTimerFallbackLogged = true
+        if Core and Core.LogWarn then
+            Core.LogWarn(
+                "[PNC][FENCE_DEBUG] timer fallback npc="
+                    .. tostring(snapshot and snapshot.id or "nil")
+                    .. " "
+                    .. fenceDebugExtra(
+                        body, action, now, phase, observedPhase
+                    )
+            )
+        end
+    end
+end
+
 local function objectBool(object, methodName)
     local method = object and object[methodName] or nil
     return type(method) == "function" and method(object) == true
@@ -148,21 +218,32 @@ local function updateWindowSmash(body, state, now)
     end
     if action.kind == "fence_climb" then
         local phase
+        local observedPhase
         local progress
         local phaseStartedAt
         local crossPendingAt
         local startedCrossing
+        observedPhase = traversalPhase(body)
         phase,
             progress,
             phaseStartedAt,
             crossPendingAt,
             startedCrossing = TraversalAction.Evaluate(
-                action,
-                now,
-                traversalPhase(body)
-            )
+            action,
+            now,
+            observedPhase
+        )
         action.phase = phase
         action.crossPendingAt = crossPendingAt
+        logFencePhase(
+            state.snapshot,
+            body,
+            state,
+            action,
+            now,
+            phase,
+            observedPhase
+        )
         if startedCrossing then
             action.crossingStartedAt = phaseStartedAt
             if Animation and Animation.PlayBump then
@@ -173,7 +254,7 @@ local function updateWindowSmash(body, state, now)
                     {
                         sceneId = "native_fence_climb",
                         leaseUntil = action.finishAt,
-                        keepManagedUseless = false,
+                        keepManagedUseless = true,
                     }
                 )
             elseif body.setBumpType then
@@ -192,7 +273,8 @@ local function updateWindowSmash(body, state, now)
                 and traversalPhase(body) ~= "finished"
                 and now < action.finishAt)
         then
-            beginMovementLease(body, state, action.key, now)
+            holdFenceBody(body)
+            state.lastProgressAt = now
             return true, "native_fence_climb"
         end
         finishPassageBump(body)
@@ -445,6 +527,10 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
         upDurationMs = tall and nil or upDuration,
         upFinishAt = tall and nil or now + upDuration,
         crossingDurationMs = tall and nil or crossingDuration,
+        -- The transfer event already marks the exact hand-off point. Do not
+        -- add another settle frame for low fences; it presents as a brief
+        -- freeze on the top rail before the crossing clip starts.
+        transitionSettleMs = tall and nil or 0,
         startAnim = tall and nil
             or profile.startAnim or "PNC_LegacyClimbFenceStart",
         endAnim = tall and nil
@@ -464,10 +550,13 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
                 or "PNC_LegacyClimbFenceStart", {
                 sceneId = "native_fence_climb",
                 leaseUntil = state.passageAction.finishAt,
-                keepManagedUseless = false,
+                keepManagedUseless = true,
             })
     end
-    beginMovementLease(body, state, key, now)
+    holdFenceBody(body)
+    state.fenceDebugPhase = nil
+    state.fenceDebugTimerFallbackLogged = nil
+    state.lastProgressAt = now
     logState(snapshot, "native_fence_climb_start", describeBody(body))
     return true, "native_fence_climb"
 end

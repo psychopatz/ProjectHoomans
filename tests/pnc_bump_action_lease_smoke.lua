@@ -160,6 +160,11 @@ T.equal(
     true,
     "animation adapter exposes active body lease"
 )
+T.equal(
+    PNC.Animation.IsCombatBumpActionActive(body, now),
+    true,
+    "combat bump was not recognized"
+)
 local attackAnimState = variables.PNCAnim
 T.equal(
     PNC.Animation.Apply(body, record, "Run"),
@@ -226,6 +231,11 @@ started = PNC.Animation.PlayBump(
 )
 T.equal(started, true, "scripted traversal bump started")
 T.equal(useless, true, "scripted traversal retained safe fake-body mode")
+T.equal(
+    PNC.Animation.IsCombatBumpActionActive(body, now),
+    false,
+    "traversal bump was incorrectly classified as combat"
+)
 T.equal(
     modData.PNC_BumpKeepUseless,
     true,

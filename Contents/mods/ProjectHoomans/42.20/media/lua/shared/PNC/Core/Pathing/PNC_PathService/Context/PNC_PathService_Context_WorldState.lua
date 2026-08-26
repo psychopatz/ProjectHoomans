@@ -72,8 +72,8 @@ function Internal.hasActiveAttack(record, now, zombie)
     end
     return zombie ~= nil
         and Animation
-        and Animation.IsBumpActionActive
-        and Animation.IsBumpActionActive(zombie, now)
+        and Animation.IsCombatBumpActionActive
+        and Animation.IsCombatBumpActionActive(zombie, now)
         or false
 end
 

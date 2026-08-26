@@ -148,6 +148,8 @@ T.equal(capturedSpec.startAnim, "FenceStart",
     "small fence start animation")
 T.equal(capturedSpec.endAnim, "FenceEnd",
     "small fence end animation")
+T.equal(capturedSpec.transitionSettleMs, 0,
+    "small fence added an artificial transition pause")
 T.equal(capturedSpec.toX, 1.5, "small fence landing x")
 T.equal(capturedSpec.toY, 0.5, "small fence landing y")
 T.equal(notedKind, "fence_climb", "fence attempt tracking")

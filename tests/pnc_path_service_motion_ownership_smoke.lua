@@ -81,7 +81,9 @@ T.equal(intentConsumptions, 0,
 T.equal(invalidations[1], "combat_attack_lease",
     "attack lease did not invalidate native movement")
 
-attackActive = false
+-- A traversal must take ownership even if the body still reports an active
+-- bump lease from the animation layer.
+attackActive = true
 navigation.nativeActive = true
 lane.traversalAction = { phase = "up" }
 Internal.updateActiveMove = function()
@@ -90,13 +92,14 @@ Internal.updateActiveMove = function()
 end
 handled, state = PNC.PathService.Pump(record, body, "ownership_test")
 T.truthy(handled and state == "fence_climb",
-    "scripted traversal did not precede native movement")
+    "scripted traversal did not override its own attack-looking bump lease")
 T.equal(activeMoveCalls, 1,
     "scripted traversal was not advanced exactly once")
 T.equal(nativePumpCalls, 0,
     "native engine advanced while scripted traversal owned motion")
 
 lane.traversalAction = nil
+attackActive = false
 navigation.nativeActive = false
 handled, state = PNC.PathService.Pump(record, body, "ownership_test")
 T.truthy(handled and state == "native_waiting",

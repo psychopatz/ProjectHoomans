@@ -128,6 +128,32 @@ function Animation.IsBumpActionActive(zombie, now)
     return false
 end
 
+-- A traversal/treatment bump also owns the animation lease, but it is not a
+-- combat action. Pathing must not interpret every PNC bump as an attack or it
+-- will suppress the traversal pump that is responsible for moving the body.
+function Animation.IsCombatBumpActionActive(zombie, now)
+    local modData = zombie
+        and zombie.getModData
+        and zombie:getModData()
+        or nil
+    local requested
+    local bumpType
+    if not modData
+        or not Animation.IsBumpActionActive(zombie, now)
+    then
+        return false
+    end
+    requested = tostring(modData.PNC_BumpRequestedType or "")
+    if zombie.getBumpType then
+        bumpType = tostring(zombie:getBumpType() or "")
+    elseif zombie.getVariableString then
+        bumpType = tostring(zombie:getVariableString("BumpType") or "")
+    else
+        bumpType = ""
+    end
+    return Internal.isCombatBumpType(requested, bumpType)
+end
+
 function Internal.setManagedUseless(
     zombie,
     requestedUseless,

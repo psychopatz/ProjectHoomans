@@ -29,6 +29,7 @@ local actionState = "pathfind"
 local bumpType
 local climbDirection
 local leases = 0
+local holdRequests = 0
 
 PNC = {
     TraversalQuery = {
@@ -56,7 +57,12 @@ PNC = {
         FinishBump = function() return true end,
     },
     LiveBodyControl = {
-        SetManagedBodyUseless = function() return false end,
+        SetManagedBodyUseless = function(_, requestedUseless)
+            if requestedUseless == true then
+                holdRequests = holdRequests + 1
+            end
+            return false
+        end,
         SetAuthoritativePosition = function(_, x, y, z)
             position.x, position.y, position.z = x, y, z
             return true
@@ -143,6 +149,8 @@ T.equal(state.passageAction.toX, 1.5,
     "small fence did not cross exactly one tile")
 T.equal(state.passageAction.toY, 0.23,
     "small fence transfer changed its lateral coordinate")
+T.equal(state.passageAction.transitionSettleMs, 0,
+    "small fence added an artificial transition pause")
 
 handled, reason = Controller.UpdateWindowSmash(body, state, 1200)
 T.truthy(handled, "small fence was not held during the raise phase")
@@ -163,7 +171,8 @@ T.truthy(handled, "small fence landing was not completed")
 T.equal(reason, "native_fence_crossed", "small fence landing reason")
 T.equal(state.passageAction, nil, "small fence action did not clear")
 T.equal(position.x, 1.5, "small fence did not reach the landing point")
-T.truthy(leases >= 2, "small fence movement ownership was not refreshed")
+T.truthy(holdRequests >= 2,
+    "small fence manual movement ownership was not refreshed")
 
 handled, reason = Controller.TryNativePassage(
     { id = "small-fence-npc" }, body, state,

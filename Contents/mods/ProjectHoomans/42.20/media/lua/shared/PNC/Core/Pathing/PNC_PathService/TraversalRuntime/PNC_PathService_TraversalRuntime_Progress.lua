@@ -80,6 +80,8 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     local nextY
     local nextZ
     local crossed
+    local previousPhase
+    local observedPhase
     if not action then return false, nil end
     if LiveBodyControl
         and LiveBodyControl.IsMultiplayer
@@ -98,7 +100,56 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     end
     if zombie.setPath2 then zombie:setPath2(nil) end
     if zombie.setTarget then zombie:setTarget(nil) end
+    previousPhase = action.phase
+    observedPhase = Runtime.getTraversalPhase(zombie)
     progress = advanceTraversalPhase(zombie, record, action, now)
+    if action.kind == "fence_climb"
+        and previousPhase ~= action.phase
+        and Internal.logMoveDebug
+    then
+        Internal.logMoveDebug(
+            record,
+            zombie,
+            lane,
+            "fence_phase",
+            action.phase,
+            "observed=" .. tostring(observedPhase)
+                .. " action=" .. tostring(
+                    Runtime.getActionStateName(zombie)
+                )
+                .. " elapsedMs=" .. tostring(
+                    now - (tonumber(action.startedAt) or now)
+                )
+                .. " pos=" .. tostring(zombie:getX())
+                .. "," .. tostring(zombie:getY())
+                .. " target=" .. tostring(action.endX)
+                .. "," .. tostring(action.endY)
+        )
+    end
+    if action.kind == "fence_climb"
+        and previousPhase == "up"
+        and action.phase == "cross_pending"
+        and tostring(observedPhase) ~= "transfer"
+        and Internal.logMoveWarning
+    then
+        Internal.logMoveWarning(
+            record,
+            zombie,
+            lane,
+            "fence_transfer_signal_missing",
+            "timer_fallback",
+            "elapsedMs=" .. tostring(
+                now - (tonumber(action.startedAt) or now)
+            )
+                .. " action=" .. tostring(
+                    Runtime.getActionStateName(zombie)
+                )
+                .. " pos=" .. tostring(zombie:getX())
+                .. "," .. tostring(zombie:getY())
+                .. " target=" .. tostring(action.endX)
+                .. "," .. tostring(action.endY)
+        )
+    end
     eased = easeInOut(progress)
     nextX = (tonumber(action.startX) or zombie:getX())
         + (((tonumber(action.endX) or zombie:getX())

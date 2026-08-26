@@ -228,6 +228,7 @@ local function beginFenceAction(
                     and profile.upDurationMs or nil,
                 crossingDurationMs = fence.tall ~= true
                     and profile.crossingDurationMs or nil,
+                transitionSettleMs = fence.tall ~= true and 0 or nil,
                 finishHoldMs = tonumber(profile.finishHoldMs)
                     or (fence.tall == true and 420 or 320),
             }

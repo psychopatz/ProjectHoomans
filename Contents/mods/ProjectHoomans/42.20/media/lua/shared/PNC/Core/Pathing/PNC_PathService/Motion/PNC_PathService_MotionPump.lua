@@ -41,6 +41,15 @@ local function prepareLane(record, zombie, lane, now)
 end
 
 local function holdAttackLease(record, zombie, lane, now)
+    -- A traversal bump is the movement owner. Its animation lease is not a
+    -- combat lease; allowing this branch to win leaves the action permanently
+    -- in "bumped" until its hard timeout.
+    if lane
+        and (lane.traversalAction ~= nil
+            or lane.vanillaFenceAction ~= nil)
+    then
+        return nil
+    end
     if not Internal.hasActiveAttack(record, now, zombie) then
         return nil
     end
