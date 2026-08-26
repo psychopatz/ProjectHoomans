@@ -61,6 +61,11 @@ end
 PsychopatzCore = {
     UI = {
         CreateButton = function(_, options) return button(options) end,
+        CreateTextEntry = function(_, options)
+            local value = entry()
+            if options and options.text then value:setText(options.text) end
+            return value
+        end,
         Layout = { SetBounds = function() end },
     },
 }

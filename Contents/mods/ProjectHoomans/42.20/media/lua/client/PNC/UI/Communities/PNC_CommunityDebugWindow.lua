@@ -73,37 +73,6 @@ local function drawEntity(list, y, entry, alternate)
     return y + list.itemheight
 end
 
-local function drawDetail(list, y, entry, alternate)
-    local item = entry.item
-    local muted = Theme.colors.textMuted
-    local color = Theme.colors[item.tone or "text"]
-        or Theme.colors.text
-    local labelWidth = math.min(
-        155,
-        math.floor(list:getWidth() * 0.38)
-    )
-    UI.DrawListSelection(
-        list, y, list.itemheight, false, alternate
-    )
-    list:drawText(
-        item.label,
-        10, y + 6,
-        muted.r, muted.g, muted.b, muted.a,
-        UIFont.Small
-    )
-    list:drawText(
-        Layout.Ellipsize(
-            item.value,
-            UIFont.Small,
-            math.max(40, list:getWidth() - labelWidth - 24)
-        ),
-        12 + labelWidth, y + 6,
-        color.r, color.g, color.b, color.a,
-        UIFont.Small
-    )
-    return y + list.itemheight
-end
-
 ISPNCCommunityDebugWindow =
     PsychopatzWindow:derive("ISPNCCommunityDebugWindow")
 
@@ -125,9 +94,16 @@ function ISPNCCommunityDebugWindow:createChildren()
         itemHeight = Layout.Pixels(44, self.uiScale),
         doDrawItem = drawEntity,
     })
-    self.details = UI.CreateList(self, {
+    self.details = UI.CreateKeyValueList(self, {
         itemHeight = Layout.Pixels(27, self.uiScale),
-        doDrawItem = drawDetail,
+        labelX = 10,
+        labelY = 6,
+        valueY = 6,
+        labelWidth = 155,
+        labelWidthRatio = 0.38,
+        valueXOffset = 2,
+        valueRightPadding = 12,
+        valueMinimumWidth = 40,
     })
     self.controls = {}
     self.roleIndex = 1

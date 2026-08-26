@@ -1,6 +1,5 @@
 require "ISUI/ISButton"
 require "ISUI/ISPanel"
-require "ISUI/ISTextEntryBox"
 require "ISUI/ISScrollingListBox"
 require "ISUI/ISContextMenu"
 require "PsychopatzCore/UI/PsychopatzUI"
@@ -97,12 +96,12 @@ end
 
 function ISPNCScavengeWindow:createChildren()
     UI.Window.createChildren(self)
-    self.searchEntry = ISTextEntryBox:new("", 0, 0, 200, 26)
-    self.searchEntry:initialise()
-    self.searchEntry:instantiate()
-    if self.searchEntry.setClearButton then self.searchEntry:setClearButton(true) end
-    self.searchEntry.onTextChange = function() self:rebuildManifest() end
-    self:addChild(self.searchEntry)
+    self.searchEntry = UI.CreateTextEntry(self, {
+        clearButton = true,
+        width = 200,
+        height = 26,
+        onTextChange = function() self:rebuildManifest() end,
+    })
 
     self.containerButton = makeButton(self, "containers", tr(
         "UI_PNC_Scavenge_Containers", "Containers"), 0, 118)

@@ -1,5 +1,4 @@
 require "PsychopatzCore/UI/PsychopatzUI"
-require "ISUI/ISTextEntryBox"
 
 PNC = PNC or {}
 PNC.ColonyNamePrompt = PNC.ColonyNamePrompt or {}
@@ -19,10 +18,10 @@ end
 
 function ISPNCColonyNamePrompt:createChildren()
     PsychopatzWindow.createChildren(self)
-    self.nameEntry = ISTextEntryBox:new("", 0, 0, 1, 1)
-    self.nameEntry:initialise()
-    self.nameEntry:instantiate()
-    self:addChild(self.nameEntry)
+    self.nameEntry = UI.CreateTextEntry(self, {
+        width = 1,
+        height = 1,
+    })
     self.saveButton = UI.CreateButton(self, {
         id = "save",
         title = "Name Faction",

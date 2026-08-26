@@ -19,21 +19,20 @@ local function drawItem(list, y, entry, alternate)
         Theme.colors.textMuted.r, Theme.colors.textMuted.g, Theme.colors.textMuted.b, Theme.colors.textMuted.a, UIFont.Small)
     return y + list.itemheight
 end
-local function drawDetail(list, y, entry, alternate)
-    local item = entry.item
-    UI.DrawListSelection(list, y, list.itemheight, false, alternate)
-    list:drawText(item.label, 8, y + 5, Theme.colors.textMuted.r, Theme.colors.textMuted.g, Theme.colors.textMuted.b, Theme.colors.textMuted.a, UIFont.Small)
-    list:drawText(Layout.Ellipsize(item.value, UIFont.Small, list:getWidth() - 130), 120, y + 5, Theme.colors.text.r, Theme.colors.text.g, Theme.colors.text.b, Theme.colors.text.a, UIFont.Small)
-    return y + list.itemheight
-end
-
 ISPNCNeedsDebugWindow = PsychopatzWindow:derive("ISPNCNeedsDebugWindow")
 function ISPNCNeedsDebugWindow:initialise() PsychopatzWindow.initialise(self) end
 function ISPNCNeedsDebugWindow:createChildren()
     PsychopatzWindow.createChildren(self)
     self.groups = UI.CreateList(self, { itemHeight = 40, doDrawItem = drawItem })
     self.individuals = UI.CreateList(self, { itemHeight = 40, doDrawItem = drawItem })
-    self.details = UI.CreateList(self, { itemHeight = 24, doDrawItem = drawDetail })
+    self.details = UI.CreateKeyValueList(self, {
+        itemHeight = 24,
+        labelX = 8,
+        labelY = 5,
+        valueY = 5,
+        valueX = 120,
+        valueRightPadding = 10,
+    })
     self.controls = {}
     local actions = { "refresh", "group_mode", "individual_mode", "profile", "supply_log", "need", "minus10", "plus10", "set0", "set25", "set50", "set75", "set100", "reset", "hour", "six_hours", "day", "scavenge", "activity", "force_eval", "force_food", "force_water", "force_medical", "clear_retry", "dump_scores", "force_provision", "provision_dirty", "provision_retry", "dump_provision" }
     for _, id in ipairs(actions) do self.controls[#self.controls + 1] = UI.CreateButton(self, { id = id, title = id:gsub("_", " "):upper(), target = self, onclick = ISPNCNeedsDebugWindow.onAction, variant = id == "scavenge" and "success" or "quiet" }) end

@@ -1,3 +1,4 @@
+require "PsychopatzCore/UI/PsychopatzUI"
 require "PNC/UI/NPCMonitor/PNC_NPCMonitorSupport"
 
 PNC.NPCMonitorView = PNC.NPCMonitorView or {}
@@ -35,20 +36,6 @@ function View.DrawRosterContent(list, y, entry)
     if Support.IsRecording(item) then
         UI.DrawBadge(list, "REC", right - presenceWidth - 6, y + 5, "danger")
     end
-end
-
-function View.DrawDetailItem(list, y, entry, alternate)
-    local item = entry.item
-    local height = list.itemheight
-    UI.DrawListSelection(list, y, height, false, alternate)
-    local muted = Theme.colors.textMuted
-    local text = Theme.colors[item.tone or "text"] or Theme.colors.text
-    local labelWidth = math.min(128, math.floor(list:getWidth() * 0.31))
-    local valueX = 12 + labelWidth
-    local valueWidth = math.max(30, list:getWidth() - valueX - 12)
-    list:drawText(tostring(item.label or ""), 12, y + 7, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
-    list:drawText(Layout.Ellipsize(item.value, UIFont.Small, valueWidth), valueX, y + 7, text.r, text.g, text.b, text.a, UIFont.Small)
-    return y + height
 end
 
 local function createToolbarButton(window, definition, collection)
@@ -128,7 +115,19 @@ function View.CreateChildren(window)
         doDrawItem = View.DrawRosterItem,
         drawItemContent = View.DrawRosterContent,
     })
-    window.details = UI.CreateList(window, { itemHeight = Layout.Pixels(28, window.uiScale), doDrawItem = View.DrawDetailItem })
+    window.details = UI.CreateKeyValueList(window, {
+        itemHeight = Layout.Pixels(28, window.uiScale),
+        labelX = 12,
+        labelY = 7,
+        valueY = 7,
+        labelWidth = 128,
+        labelWidthRatio = 0.31,
+        valueXOffset = 0,
+        valueRightPadding = 12,
+        valueMinimumWidth = 30,
+        labelColor = "textMuted",
+        valueColor = "text",
+    })
 
     local actions = {
         { "force_live", "UI_PNC_MonitorForceLive", "Force Live", ISPNCNPCMonitor.onAction, "success" },

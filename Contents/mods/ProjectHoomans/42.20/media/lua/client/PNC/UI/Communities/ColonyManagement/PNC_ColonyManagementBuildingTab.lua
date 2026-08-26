@@ -1,4 +1,3 @@
-require "ISUI/ISTextEntryBox"
 require "PNC/UI/Inventory/PNC_InventoryUI_List"
 
 local Building = {}
@@ -6,8 +5,6 @@ local InventoryModel = require "PNC/UI/Inventory/PNC_InventoryUI_Model"
 local Placement = require "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement"
 local QueueOverlay = require
     "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueOverlay"
-local UI = PsychopatzCore and PsychopatzCore.UI or nil
-
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
     if not value or value == key then return fallback end
@@ -252,16 +249,14 @@ function Building.Create(window, builder)
         "toggle_queue_overlay", "SHOW QUEUE OVERLAY", "quiet")
     window.buildCancelOrder = button(window, builder, "cancel_order",
         "CANCEL ORDER", "warning")
-    window.buildSearch = ISTextEntryBox:new("", 0, 0, 1, 1)
-    window.buildSearch:initialise()
-    window.buildSearch:instantiate()
-    if window.buildSearch.setClearButton then
-        window.buildSearch:setClearButton(true)
-    end
-    window.buildSearch.onTextChange = function()
-        Building.Rebuild(window, window.snapshot or {})
-    end
-    window:addChild(window.buildSearch)
+    window.buildSearch = builder.CreateTextEntry(window, {
+        clearButton = true,
+        width = 1,
+        height = 1,
+        onTextChange = function()
+            Building.Rebuild(window, window.snapshot or {})
+        end,
+    })
     window.buildFavoriteButton = button(window, builder,
         "toggle_favorite", "FAVORITE", "quiet")
     window.buildFavoritesFilter = button(window, builder,

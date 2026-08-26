@@ -1,13 +1,14 @@
 require "ISUI/ISLabel"
 require "ISUI/ISPanel"
 require "ISUI/ISTickBox"
-require "ISUI/ISTextEntryBox"
+require "PsychopatzCore/UI/PsychopatzUI"
 
 PNC = PNC or {}
 PNC.ProvisionRulePanel = PNC.ProvisionRulePanel or {}
 
 local RulePanel = PNC.ProvisionRulePanel
-local Theme = PsychopatzCore.UI.Theme
+local UI = PsychopatzCore.UI
+local Theme = UI.Theme
 
 local function label(parent, value)
     local widget = ISLabel:new(0, 0, 20, value, 1, 1, 1, 1,
@@ -46,18 +47,15 @@ function RulePanel.Create(parent, definition, model, tr)
     for _, field in ipairs(definition.ui.fields or {}) do
         local item = { definition = field }
         item.label = label(row.panel, tr(field.labelKey))
-        item.entry = ISTextEntryBox:new(
-            tostring(values[field.id] or field.min or 0), 0, 0, 70, 24
-        )
-        item.entry:initialise()
-        item.entry:instantiate()
+        item.entry = UI.CreateTextEntry(row.panel, {
+            text = tostring(values[field.id] or field.min or 0),
+            width = 70,
+            height = 24,
+            onlyNumbers = (tonumber(field.step) or 1) >= 1,
+        })
         -- PZ's numbers-only input rejects decimal separators on some builds.
         -- Native hunger/thirst utility fields are fractional; range validation
         -- still happens in the shared policy model when the form is applied.
-        if item.entry.setOnlyNumbers and (tonumber(field.step) or 1) >= 1 then
-            item.entry:setOnlyNumbers(true)
-        end
-        row.panel:addChild(item.entry)
         row.entries[#row.entries + 1] = item
     end
     return row

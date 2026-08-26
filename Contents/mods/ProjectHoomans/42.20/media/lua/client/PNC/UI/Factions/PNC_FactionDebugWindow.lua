@@ -1,5 +1,4 @@
 require "PsychopatzCore/UI/PsychopatzUI"
-require "ISUI/ISTextEntryBox"
 require "PNC/UI/Factions/PNC_FactionDebugModel"
 require "PNC/UI/Factions/PNC_FactionDebugOverlay"
 require "PNC/UI/Factions/PNC_FactionEmblemEditor"
@@ -108,37 +107,6 @@ local function drawEntity(list, y, entry, alternate)
     return y + list.itemheight
 end
 
-local function drawDetail(list, y, entry, alternate)
-    local item = entry.item
-    local muted = Theme.colors.textMuted
-    local color = Theme.colors[item.tone or "text"]
-        or Theme.colors.text
-    local labelWidth = math.min(
-        150,
-        math.floor(list:getWidth() * 0.34)
-    )
-    UI.DrawListSelection(
-        list, y, list.itemheight, false, alternate
-    )
-    list:drawText(
-        item.label,
-        10, y + 6,
-        muted.r, muted.g, muted.b, muted.a,
-        UIFont.Small
-    )
-    list:drawText(
-        Layout.Ellipsize(
-            item.value,
-            UIFont.Small,
-            math.max(40, list:getWidth() - labelWidth - 24)
-        ),
-        12 + labelWidth, y + 6,
-        color.r, color.g, color.b, color.a,
-        UIFont.Small
-    )
-    return y + list.itemheight
-end
-
 ISPNCFactionDebugWindow =
     PsychopatzWindow:derive("ISPNCFactionDebugWindow")
 
@@ -160,9 +128,16 @@ function ISPNCFactionDebugWindow:createChildren()
         itemHeight = Layout.Pixels(44, self.uiScale),
         doDrawItem = drawEntity,
     })
-    self.details = UI.CreateList(self, {
+    self.details = UI.CreateKeyValueList(self, {
         itemHeight = Layout.Pixels(27, self.uiScale),
-        doDrawItem = drawDetail,
+        labelX = 10,
+        labelY = 6,
+        valueY = 6,
+        labelWidth = 150,
+        labelWidthRatio = 0.34,
+        valueXOffset = 2,
+        valueRightPadding = 12,
+        valueMinimumWidth = 40,
     })
     self.dashboard = PNC.FactionDebugOverlay.NewDashboard(
         0, 0, 430, 492
@@ -193,20 +168,14 @@ function ISPNCFactionDebugWindow:createChildren()
         })
         self.controls[#self.controls + 1] = button
     end
-    self.groupSizeEntry = ISTextEntryBox:new(
-        tostring(self.groupSize),
-        0,
-        0,
-        64,
-        26
-    )
-    self.groupSizeEntry:initialise()
-    self.groupSizeEntry:instantiate()
-    self.groupSizeEntry:setOnlyNumbers(true)
-    self.groupSizeEntry.psychopatzPreferredWidth = 64
-    self.groupSizeEntry.tooltip =
-        text("UI_PNC_FactionGroupSizeTooltip")
-    self:addChild(self.groupSizeEntry)
+    self.groupSizeEntry = UI.CreateTextEntry(self, {
+        text = tostring(self.groupSize),
+        width = 64,
+        height = 26,
+        onlyNumbers = true,
+        preferredWidth = 64,
+        tooltip = text("UI_PNC_FactionGroupSizeTooltip"),
+    })
     self:requestResponsiveLayout(true)
     self:requestSnapshot()
 end

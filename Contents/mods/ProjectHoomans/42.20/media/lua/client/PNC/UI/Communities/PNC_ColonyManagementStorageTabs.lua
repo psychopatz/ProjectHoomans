@@ -1,4 +1,3 @@
-require "ISUI/ISTextEntryBox"
 require "PNC/UI/Inventory/PNC_InventoryUI_List"
 
 local StorageTabs = {}
@@ -24,16 +23,14 @@ local function drawActivityRow(list, y, entry, alternate)
 end
 
 function StorageTabs.Create(window, UI, tr)
-    window.storageSearch = ISTextEntryBox:new("", 0, 0, 180, 26)
-    window.storageSearch:initialise()
-    window.storageSearch:instantiate()
-    if window.storageSearch.setClearButton then
-        window.storageSearch:setClearButton(true)
-    end
-    window.storageSearch.onTextChange = function()
-        window:rebuildDetails()
-    end
-    window:addChild(window.storageSearch)
+    window.storageSearch = UI.CreateTextEntry(window, {
+        clearButton = true,
+        width = 180,
+        height = 26,
+        onTextChange = function()
+            window:rebuildDetails()
+        end,
+    })
     window.storageList = ISPNCInventoryList:new(0, 0, 100, 100, window, "storage")
     window.storageList:initialise()
     window.storageList:instantiate()

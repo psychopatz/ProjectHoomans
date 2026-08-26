@@ -1,6 +1,5 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 require "ISUI/ISComboBox"
-require "ISUI/ISTextEntryBox"
 require "PNC/UI/Relationships/PNC_RelationshipDebugModel"
 require "PNC/UI/Relationships/PNC_RelationshipGraphPanel"
 
@@ -75,36 +74,6 @@ local function drawEntity(list, y, entry, alternate)
     return y + height
 end
 
-local function drawDetail(list, y, entry, alternate)
-    local item = entry.item
-    local height = list.itemheight
-    local muted = Theme.colors.textMuted
-    local color = Theme.colors[item.tone or "text"]
-        or Theme.colors.text
-    local labelWidth = math.min(
-        150,
-        math.floor(list:getWidth() * 0.34)
-    )
-    UI.DrawListSelection(list, y, height, false, alternate)
-    list:drawText(
-        item.label,
-        10, y + 6,
-        muted.r, muted.g, muted.b, muted.a,
-        UIFont.Small
-    )
-    list:drawText(
-        Layout.Ellipsize(
-            item.value,
-            UIFont.Small,
-            math.max(40, list:getWidth() - labelWidth - 24)
-        ),
-        12 + labelWidth, y + 6,
-        color.r, color.g, color.b, color.a,
-        UIFont.Small
-    )
-    return y + height
-end
-
 ISPNCRelationshipDebugWindow =
     PsychopatzWindow:derive("ISPNCRelationshipDebugWindow")
 
@@ -122,9 +91,16 @@ function ISPNCRelationshipDebugWindow:createChildren()
         itemHeight = Layout.Pixels(44, self.uiScale),
         doDrawItem = drawEntity,
     })
-    self.details = UI.CreateList(self, {
+    self.details = UI.CreateKeyValueList(self, {
         itemHeight = Layout.Pixels(27, self.uiScale),
-        doDrawItem = drawDetail,
+        labelX = 10,
+        labelY = 6,
+        valueY = 6,
+        labelWidth = 150,
+        labelWidthRatio = 0.34,
+        valueXOffset = 2,
+        valueRightPadding = 12,
+        valueMinimumWidth = 40,
     })
     self.actionCombo = ISComboBox:new(
         0,
@@ -264,20 +240,16 @@ function ISPNCRelationshipDebugWindow:createChildren()
         self.sectionControls[#self.sectionControls + 1] = button
     end
     self.currentSection = "relationship"
-    self.customApproval = ISTextEntryBox:new(
-        "0", 0, 0, Layout.Pixels(86, self.uiScale),
-        Layout.Pixels(26, self.uiScale)
-    )
-    self.customApproval:initialise()
-    self.customApproval:instantiate()
-    self:addChild(self.customApproval)
-    self.customRespect = ISTextEntryBox:new(
-        "0", 0, 0, Layout.Pixels(86, self.uiScale),
-        Layout.Pixels(26, self.uiScale)
-    )
-    self.customRespect:initialise()
-    self.customRespect:instantiate()
-    self:addChild(self.customRespect)
+    self.customApproval = UI.CreateTextEntry(self, {
+        text = "0",
+        width = Layout.Pixels(86, self.uiScale),
+        height = Layout.Pixels(26, self.uiScale),
+    })
+    self.customRespect = UI.CreateTextEntry(self, {
+        text = "0",
+        width = Layout.Pixels(86, self.uiScale),
+        height = Layout.Pixels(26, self.uiScale),
+    })
     self.applyCustomButton = UI.CreateButton(self, {
         id = "apply_custom_baseline",
         title = "Apply synthetic baseline",

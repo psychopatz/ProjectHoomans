@@ -36,21 +36,19 @@ local function drawRow(list, y, entry, alternate)
     return y + list.itemheight
 end
 
-local function drawDetail(list, y, entry, alternate)
-    local item = entry.item
-    UI.DrawListSelection(list, y, list.itemheight, false, alternate)
-    local muted, color = Theme.colors.textMuted, Theme.colors.text
-    list:drawText(item.label, 8, y + 5, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
-    list:drawText(Layout.Ellipsize(item.value, UIFont.Small, list:getWidth() - 150), 145, y + 5, color.r, color.g, color.b, color.a, UIFont.Small)
-    return y + list.itemheight
-end
-
 ISPNCKnowledgeDebugWindow = PsychopatzWindow:derive("ISPNCKnowledgeDebugWindow")
 function ISPNCKnowledgeDebugWindow:initialise() PsychopatzWindow.initialise(self) end
 function ISPNCKnowledgeDebugWindow:createChildren()
     PsychopatzWindow.createChildren(self)
     self.rows = UI.CreateList(self, { itemHeight = Layout.Pixels(43, self.uiScale), doDrawItem = drawRow })
-    self.details = UI.CreateList(self, { itemHeight = Layout.Pixels(25, self.uiScale), doDrawItem = drawDetail })
+    self.details = UI.CreateKeyValueList(self, {
+        itemHeight = Layout.Pixels(25, self.uiScale),
+        labelX = 8,
+        labelY = 5,
+        valueY = 5,
+        valueX = 145,
+        valueRightPadding = 5,
+    })
     self.statusCombo = ISComboBox:new(0, 0, 140, Layout.Pixels(26, self.uiScale), self, ISPNCKnowledgeDebugWindow.onFilter)
     self.statusCombo:initialise(); self.statusCombo:instantiate(); self:addChild(self.statusCombo)
     for _, status in ipairs({ "all", "unknown", "suspected", "known", "confirmed" }) do self.statusCombo:addOptionWithData(status, status) end

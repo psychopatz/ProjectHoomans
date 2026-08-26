@@ -31,19 +31,6 @@ local function drawEntity(list, y, entry, alternate)
     return y + list.itemheight
 end
 
-local function drawDetail(list, y, entry, alternate)
-    local item = entry.item
-    local color = Theme.colors[item.tone or "text"] or Theme.colors.text
-    UI.DrawListSelection(list, y, list.itemheight, false, alternate)
-    list:drawText(item.label, 8, y + 5, Theme.colors.textMuted.r,
-        Theme.colors.textMuted.g, Theme.colors.textMuted.b,
-        Theme.colors.textMuted.a, UIFont.Small)
-    list:drawText(Layout.Ellipsize(item.value, UIFont.Small,
-        list:getWidth() - 155), 148, y + 5,
-        color.r, color.g, color.b, color.a, UIFont.Small)
-    return y + list.itemheight
-end
-
 ISPNCDirectorDebugWindow = PsychopatzWindow:derive("ISPNCDirectorDebugWindow")
 
 function ISPNCDirectorDebugWindow:initialise() PsychopatzWindow.initialise(self) end
@@ -53,7 +40,14 @@ function ISPNCDirectorDebugWindow:createChildren()
     self.groups = UI.CreateList(self, { itemHeight = 42, doDrawItem = drawEntity })
     self.locations = UI.CreateList(self, { itemHeight = 42, doDrawItem = drawEntity })
     self.sectors = UI.CreateList(self, { itemHeight = 42, doDrawItem = drawEntity })
-    self.details = UI.CreateList(self, { itemHeight = 25, doDrawItem = drawDetail })
+    self.details = UI.CreateKeyValueList(self, {
+        itemHeight = 25,
+        labelX = 8,
+        labelY = 5,
+        valueY = 5,
+        valueX = 148,
+        valueRightPadding = 7,
+    })
     self.controls = {}
     for _, definition in ipairs({
         { "refresh", "REFRESH", "quiet" },

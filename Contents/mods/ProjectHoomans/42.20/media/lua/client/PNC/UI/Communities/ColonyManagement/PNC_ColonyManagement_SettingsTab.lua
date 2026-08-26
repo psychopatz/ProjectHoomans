@@ -1,4 +1,3 @@
-require "ISUI/ISTextEntryBox"
 require "PsychopatzCore/UI/PsychopatzUI"
 
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
@@ -6,13 +5,11 @@ local Tab = {}
 local UI = PsychopatzCore.UI
 
 function Tab.Create(window)
-    window.factionNameEntry = ISTextEntryBox:new("", 0, 0, 1, 1)
-    window.factionNameEntry:initialise()
-    window.factionNameEntry:instantiate()
-    if window.factionNameEntry.setMaxTextLength then
-        window.factionNameEntry:setMaxTextLength(80)
-    end
-    window:addChild(window.factionNameEntry)
+    window.factionNameEntry = UI.CreateTextEntry(window, {
+        width = 1,
+        height = 1,
+        maxTextLength = 80,
+    })
     window.factionRenameButton = UI.CreateButton(window, {
         id = "faction_rename",
         title = Shared.Tr("UI_PNC_ColonySettings_Rename", "RENAME FACTION"),

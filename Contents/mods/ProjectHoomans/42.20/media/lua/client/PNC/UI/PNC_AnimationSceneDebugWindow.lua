@@ -1,7 +1,5 @@
 require "PsychopatzCore/UI/PsychopatzUI"
-require "ISUI/ISTextEntryBox"
 require "ISUI/ISComboBox"
-require "ISUI/ISScrollingListBox"
 require "PNC/Debug/PNC_AnimationSceneDebugModel"
 
 PNC = PNC or {}
@@ -11,6 +9,7 @@ PNC.AnimationSceneDebugWindow =
 local WindowAPI = PNC.AnimationSceneDebugWindow
 local Model = PNC.AnimationSceneDebugModel
 local UI = PsychopatzCore.UI
+local addDetail = UI.AddKeyValue
 
 ISPNCAnimationSceneDebugWindow =
     PsychopatzWindow:derive(
@@ -55,53 +54,6 @@ local function drawSceneItem(list, y, row, alternate)
     return y + list.itemheight
 end
 
-local function drawDetailItem(list, y, row, alternate)
-    local item = row.item
-    if alternate then
-        list:drawRect(
-            0, y, list:getWidth(), list.itemheight,
-            0.12, 0.16, 0.18, 0.20
-        )
-    end
-    list:drawText(
-        tostring(item.label),
-        8, y + 6,
-        0.62, 0.72, 0.80, 1,
-        UIFont.Small
-    )
-    list:drawText(
-        tostring(item.value),
-        math.min(152, math.floor(list:getWidth() * 0.35)),
-        y + 6,
-        item.warning and 1.0 or 0.92,
-        item.warning and 0.52 or 0.92,
-        item.warning and 0.28 or 0.92,
-        1,
-        UIFont.Small
-    )
-    return y + list.itemheight
-end
-
-local function newList(window, itemHeight, draw)
-    local list = ISScrollingListBox:new(0, 0, 100, 100)
-    list:initialise()
-    list:instantiate()
-    list.itemheight = itemHeight
-    list.doDrawItem = draw
-    list.drawBorder = true
-    window:addChild(list)
-    return list
-end
-
-local function addDetail(list, label, value, warning)
-    if value == nil or value == "" then value = "-" end
-    list:addItem(tostring(label), {
-        label = tostring(label),
-        value = tostring(value),
-        warning = warning == true,
-    })
-end
-
 function ISPNCAnimationSceneDebugWindow:initialise()
     PsychopatzWindow.initialise(self)
 end
@@ -109,16 +61,14 @@ end
 function ISPNCAnimationSceneDebugWindow:createChildren()
     PsychopatzWindow.createChildren(self)
 
-    self.search = ISTextEntryBox:new("", 0, 0, 100, 26)
-    self.search:initialise()
-    self.search:instantiate()
-    if self.search.setClearButton then
-        self.search:setClearButton(true)
-    end
-    self.search.onTextChange = function()
-        self:refreshCatalog()
-    end
-    self:addChild(self.search)
+    self.search = UI.CreateTextEntry(self, {
+        clearButton = true,
+        width = 100,
+        height = 26,
+        onTextChange = function()
+            self:refreshCatalog()
+        end,
+    })
 
     self.groupFilter = ISComboBox:new(
         0, 0, 180, 26, self,
@@ -128,16 +78,32 @@ function ISPNCAnimationSceneDebugWindow:createChildren()
     self.groupFilter:instantiate()
     self:addChild(self.groupFilter)
 
-    self.gapEntry = ISTextEntryBox:new(
-        "750", 0, 0, 90, 26
-    )
-    self.gapEntry:initialise()
-    self.gapEntry:instantiate()
-    self.gapEntry:setOnlyNumbers(true)
-    self:addChild(self.gapEntry)
+    self.gapEntry = UI.CreateTextEntry(self, {
+        text = "750",
+        width = 90,
+        height = 26,
+        onlyNumbers = true,
+    })
 
-    self.list = newList(self, 59, drawSceneItem)
-    self.details = newList(self, 26, drawDetailItem)
+    self.list = UI.CreateList(self, {
+        itemHeight = 59,
+        doDrawItem = drawSceneItem,
+    })
+    self.details = UI.CreateKeyValueList(self, {
+        itemHeight = 26,
+        valueXMax = 152,
+        valueXRatio = 0.35,
+        ellipsize = false,
+        labelX = 8,
+        labelY = 6,
+        valueY = 6,
+        labelColor = { r = 0.62, g = 0.72, b = 0.80, a = 1 },
+        valueColor = { r = 0.92, g = 0.92, b = 0.92, a = 1 },
+        warningColor = { r = 1.0, g = 0.52, b = 0.28, a = 1 },
+        alternateColor = { r = 0.16, g = 0.18, b = 0.20, a = 1 },
+        alternateAlpha = 0.12,
+        drawSelection = false,
+    })
 
     self.buttons = {}
     local definitions = {
