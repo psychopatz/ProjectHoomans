@@ -126,6 +126,8 @@ local function clearOwnedPath(body, state)
     state.completed = false
     state.failed = false
     state.forcedTraversalUntil = nil
+    state.forcedTraversalState = nil
+    state.forcedTraversalAction = nil
 end
 
 local function beginMovementLease(body, state, key, now)
@@ -198,4 +200,3 @@ Controller.BeginMovementLease = beginMovementLease
 Controller.FinishOwnedPath = finishOwnedPath
 Controller.NativeActionOwnsMovement = nativeActionOwnsMovement
 Controller.RetryDelay = retryDelay
-

@@ -20,13 +20,32 @@ function Types.NormalizeTacticalClass(value)
     then
         return tacticalClass
     end
+    if tacticalClass == "enemy" or tacticalClass == "bandit" then
+        return "hostile"
+    end
+    if tacticalClass == "companion" or tacticalClass == "friendly"
+        or tacticalClass == "ally" or tacticalClass == "survivor"
+    then
+        return "colonist"
+    end
     return "neutral"
 end
 
+-- Read both the canonical runtime field and the legacy input field.  This is
+-- intentionally a reader boundary; canonical records only store
+-- `tacticalClass`.
+function Types.ResolveTacticalClass(value)
+    if type(value) == "table" then
+        return Types.NormalizeTacticalClass(
+            value.tacticalClass ~= nil and value.tacticalClass
+                or value.faction
+        )
+    end
+    return Types.NormalizeTacticalClass(value)
+end
+
 function Types.IsColonist(value)
-    local tacticalClass = type(value) == "table"
-        and value.tacticalClass or value
-    return Types.NormalizeTacticalClass(tacticalClass) == "colonist"
+    return Types.ResolveTacticalClass(value) == "colonist"
 end
 
 function Types.DefaultHostility(tacticalClass)

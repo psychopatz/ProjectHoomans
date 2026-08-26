@@ -50,6 +50,7 @@ function Internal.setLaneGoal(record, lane, goal)
     lane.specialMoveUntil = 0
     lane.specialAnim = nil
     lane.traversalAction = nil
+    lane.vanillaFenceAction = nil
     lane.resolvedMode = nil
     lane.animSpeed = 1.0
     lane.speed = 0

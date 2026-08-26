@@ -46,9 +46,7 @@ PNC = {
             warnings[#warnings + 1] = message
         end,
     },
-    Types = {
-        NormalizeFaction = function(value) return value end,
-    },
+    Types = {},
     Inventory = {
         GetDebugEquipmentSpawnMode = function(variant, requested)
             return requested or "sandbox_chances"
@@ -196,7 +194,7 @@ Router.Handle("DebugCommand", player, {
     action = "spawn", variant = "hostile_melee",
     tacticalClass = "hostile", x = 4, y = 5, z = 0,
 })
-T.equal(spawned.faction, "hostile", "debug spawn faction")
+T.equal(spawned.tacticalClass, "hostile", "debug spawn tactical class")
 T.equal(spawned.factionID, nil, "hostile debug spawn has no player faction")
 T.equal(spawned.archetypeID, "Scavenger", "debug spawn archetype")
 T.equal(spawned.orderSpec.kind, "hostile_hunt", "debug spawn order")
@@ -214,7 +212,7 @@ Router.Handle("DebugCommand", player, {
     action = "spawn", variant = "companion",
     tacticalClass = "colonist", x = 6, y = 7, z = 0,
 })
-T.equal(spawned.faction, "colonist", "debug companion tactical class")
+T.equal(spawned.tacticalClass, "colonist", "debug companion tactical class")
 T.equal(spawned.factionID, "faction_debug",
     "debug companion resolves the player faction ID")
 T.equal(spawned.recruited, true, "debug companion recruited state")

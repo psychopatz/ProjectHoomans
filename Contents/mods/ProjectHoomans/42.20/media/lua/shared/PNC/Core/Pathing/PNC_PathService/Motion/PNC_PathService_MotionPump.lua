@@ -20,7 +20,10 @@ local function recordPumpDiagnostics(record, zombie, caller)
 end
 
 local function prepareLane(record, zombie, lane, now)
-    if not lane.traversalAction and Internal.repairInvalidBodyPosition then
+    if not lane.traversalAction
+        and not lane.vanillaFenceAction
+        and Internal.repairInvalidBodyPosition
+    then
         local repaired = Internal.repairInvalidBodyPosition(
             record, zombie, lane, now
         )
@@ -32,7 +35,7 @@ local function prepareLane(record, zombie, lane, now)
             Internal.FakeLocomotion.PrepareBody(zombie, lane, now)
         end
     end
-    if not lane.traversalAction then
+    if not lane.traversalAction and not lane.vanillaFenceAction then
         Internal.applyCombatFacing(zombie, lane, now, false)
     end
 end
@@ -59,6 +62,7 @@ end
 
 local function ownsScriptedPassage(zombie, lane)
     return lane.traversalAction ~= nil
+        or lane.vanillaFenceAction ~= nil
         or lane.blockedStepToX ~= nil
         or (
             Internal.LiveBodyControl

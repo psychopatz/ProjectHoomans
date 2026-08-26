@@ -140,7 +140,7 @@ local function newRecord(id)
     local record = PNC.Types.NewRecord({
         id = id,
         displayName = id,
-        faction = "neutral",
+        tacticalClass = "neutral",
         x = 0,
         y = 0,
         z = 0,
@@ -521,7 +521,7 @@ local oldRaw = {
     schemaVersion = 10,
     recordRevision = 7,
     id = "npc_migration",
-    faction = "neutral",
+    tacticalClass = "neutral",
     persist = true,
     position = { x = 1, y = 2, z = 0 },
     spawn = { x = 1, y = 2, z = 0 },
@@ -579,8 +579,8 @@ local neutralDefaults = PNC.Types.DefaultHostility("neutral")
 T.equal(neutralDefaults.attackPlayers, false,
     "neutral faction behavior unchanged")
 T.equal(PNC.Relationships.AreNPCsEnemies(
-    { id = "one", faction = "neutral", hostility = neutralDefaults },
-    { id = "two", faction = "hostile" }
+    { id = "one", tacticalClass = "neutral", hostility = neutralDefaults },
+    { id = "two", tacticalClass = "hostile" }
 ), true, "existing faction enemy API")
 T.finish("pnc_relationship_foundation_smoke")
 

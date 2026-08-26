@@ -14,7 +14,7 @@ ZombRand = function() return 0 end
 
 PNC = {
     Const = {
-        FACTION_COLONIST = "colonist",
+        TACTICAL_CLASS_COLONIST = "colonist",
         PRESENCE_LIVE = "live",
         PRESENCE_ABSTRACT = "abstract",
         PRESENCE_CORPSE = "corpse",
@@ -75,17 +75,17 @@ T.load(ROOT .. "Health/PNC_NPCWounds.lua")
 require "PNC/Core/Combat/CombatResolution/PNC_CombatResolution"
 T.load(ROOT .. "Health/PNC_PlayerDamage.lua")
 
-T.equal(PNC.Types.NormalizeFaction("colonist"), "colonist", "colonist faction")
-T.equal(PNC.Types.NormalizeFaction("companion"), "colonist", "legacy companion migration")
-T.equal(PNC.Types.NormalizeFaction("friendly"), "colonist", "legacy friendly migration")
-T.equal(PNC.Types.NormalizeFaction("neutral"), "neutral", "neutral faction")
-T.equal(PNC.Types.NormalizeFaction("bandit"), "hostile", "hostile alias")
-T.equal(PNC.Types.NormalizeDefinition({ faction = "companion" }).faction, "colonist", "legacy definition migration")
+T.equal(PNC.Types.NormalizeTacticalClass("colonist"), "colonist", "colonist tactical class")
+T.equal(PNC.Types.NormalizeTacticalClass("companion"), "colonist", "legacy companion migration")
+T.equal(PNC.Types.NormalizeTacticalClass("friendly"), "colonist", "legacy friendly migration")
+T.equal(PNC.Types.NormalizeTacticalClass("neutral"), "neutral", "neutral tactical class")
+T.equal(PNC.Types.NormalizeTacticalClass("bandit"), "hostile", "hostile alias")
+T.equal(PNC.Types.NormalizeDefinition({ faction = "companion" }).tacticalClass, "colonist", "legacy definition migration")
 
-local function makeRecord(id, faction)
+local function makeRecord(id, tacticalClass)
     return {
         id = id,
-        faction = faction,
+        tacticalClass = tacticalClass,
         presenceState = "live",
         alive = true,
         health = {

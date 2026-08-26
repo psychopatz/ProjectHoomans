@@ -104,7 +104,7 @@ local function newNPC(id)
         id = id,
         name = id,
         alive = true,
-        faction = "colonist",
+        tacticalClass = "colonist",
         affiliation = FactionTypes.NewAffiliation(),
         recordRevision = 0,
         presenceRevision = 7,

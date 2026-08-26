@@ -37,7 +37,7 @@ T.load(LUA_ROOT .. "Orders/PNC_OrderSystem.lua")
 
 local record = {
     id = "companion",
-    faction = "colonist",
+    tacticalClass = "colonist",
     anchorX = 1,
     anchorY = 2,
     anchorZ = 0,

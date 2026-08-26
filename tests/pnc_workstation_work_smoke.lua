@@ -47,15 +47,20 @@ PNC.FacilityReservations = { Release = function(id)
 end }
 
 local workers = {
-    { id = "researcher", alive = true, factionId = "f1", communityId = "c1",
+    { id = "researcher", alive = true,
+        affiliation = { factionID = "f1", communityID = "c1" },
         skills = { Carpentry = 4 }, runtime = {} },
-    { id = "crafter1", alive = true, factionId = "f1", communityId = "c1",
+    { id = "crafter1", alive = true,
+        affiliation = { factionID = "f1", communityID = "c1" },
         skills = { Carpentry = 5 }, runtime = {} },
-    { id = "crafter2", alive = true, factionId = "f1", communityId = "c1",
+    { id = "crafter2", alive = true,
+        affiliation = { factionID = "f1", communityID = "c1" },
         skills = { Carpentry = 5 }, runtime = {} },
-    { id = "crafter3", alive = true, factionId = "f1", communityId = "c1",
+    { id = "crafter3", alive = true,
+        affiliation = { factionID = "f1", communityID = "c1" },
         skills = { Carpentry = 5 }, runtime = {} },
-    { id = "unskilled", alive = true, factionId = "f1", communityId = "c1",
+    { id = "unskilled", alive = true,
+        affiliation = { factionID = "f1", communityID = "c1" },
         skills = { Carpentry = 1 }, runtime = {} },
 }
 for _, worker in ipairs(workers) do PNC.Registry.Data[worker.id] = worker end
@@ -132,7 +137,8 @@ T.equal(occupied["workshop:1:craft"], nil,
 
 local collected = false
 PNC.Registry.Data.liveCrafter = { id = "liveCrafter", alive = true,
-    factionId = "f1", communityId = "c1", x = 2, y = 3, z = 0,
+    affiliation = { factionID = "f1", communityID = "c1" },
+    x = 2, y = 3, z = 0,
     skills = { Carpentry = 5 }, runtime = {} }
 PNC.Registry.GetLiveZombie = function(id)
     return id == "liveCrafter" and {} or nil

@@ -70,7 +70,7 @@ local function npcDiagnostic(
         rank = affiliation.rank,
         membershipStatus = affiliation.membershipStatus,
         affiliationRevision = affiliation.revision,
-        tacticalClass = record.faction,
+        tacticalClass = record.tacticalClass,
         recruited = identity and identity.recruited
             or record.recruited == true,
         ownerUsername = identity and identity.ownerUsername

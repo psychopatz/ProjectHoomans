@@ -5,7 +5,15 @@ T.addPackagePaths({
     { "ProjectHoomans", "shared" },
 })
 
+IsoDirections = {
+    N = "N",
+    S = "S",
+    E = "E",
+    W = "W",
+}
+
 local fence = {}
+local fenceTall = false
 local fromSquare = {
     getX = function() return 0 end,
     getY = function() return 0 end,
@@ -17,9 +25,23 @@ local toSquare = {
     getZ = function() return 0 end,
 }
 local position = { x = 0.5, y = 0.23, z = 0 }
+local actionState = "pathfind"
 local bumpType
+local climbDirection
+local collision = false
+local pncActor
 local leases = 0
-local suppressPosition = false
+local clearCalls = 0
+
+ClimbOverFenceState = {
+    instance = function()
+        return {
+            setParams = function(_, _, direction)
+                climbDirection = direction
+            end,
+        }
+    end,
+}
 
 PNC = {
     TraversalQuery = {
@@ -28,13 +50,15 @@ PNC = {
                 object = fence,
                 fromSquare = fromSquare,
                 toSquare = toSquare,
-                dirX = 2,
+                dirX = 1,
                 dirY = 0,
             }
         end,
         IsFence = function(object)
-            return object == fence, false
+            return object == fence, fenceTall
         end,
+        IsFenceApproachReady = function() return true end,
+        CanTraverseAt = function() return true end,
     },
     PathService = { Internal = {} },
     Animation = {
@@ -45,8 +69,8 @@ PNC = {
         FinishBump = function() return true end,
     },
     LiveBodyControl = {
+        SetManagedBodyUseless = function() return false end,
         SetAuthoritativePosition = function(_, x, y, z)
-            if suppressPosition then return true end
             position.x, position.y, position.z = x, y, z
             return true
         end,
@@ -73,8 +97,24 @@ local body = {
     getX = function() return position.x end,
     getY = function() return position.y end,
     getZ = function() return position.z end,
-    getSquare = function() return math.floor(position.x) == 0
-        and fromSquare or toSquare end,
+    getSquare = function()
+        return math.floor(position.x) == 0
+            and fromSquare or toSquare
+    end,
+    getActionStateName = function() return actionState end,
+    isCollidedWithDoor = function() return collision end,
+    isCollidedThisFrame = function() return collision end,
+    isCollided = function() return collision end,
+    setVariable = function(_, name, value)
+        if name == "PNCActor" then pncActor = value end
+    end,
+    changeState = function()
+        actionState = "climbfence"
+    end,
+    climbOverFence = function(_, direction)
+        climbDirection = direction
+        actionState = "climbfence"
+    end,
     setLx = function() end,
     setLy = function() end,
     faceThisObject = function() end,
@@ -106,75 +146,78 @@ local verticalX, verticalY = PNC.TraversalQuery.GetFenceTransferPoint(
 )
 T.equal(verticalX, 4.27, "vertical fence transfer changed its lane")
 T.equal(verticalY, 8.41, "vertical fence transfer did not cross one tile")
+
+-- Small fences wait for the engine collision frame, then enter the vanilla
+-- state directly. The PNC controller only leases and observes the landing.
 local state = {}
 local handled, reason = Controller.TryNativePassage(
-    { id = "fence-npc" }, body, state,
+    { id = "small-fence-npc" }, body, state,
     { x = 3.5, y = 0.5, z = 0 }, 1000)
-T.truthy(handled, "fence intercepted before vanilla path request")
-T.equal(reason, "native_fence_climb", "fence passage reason")
-T.equal(bumpType, "PNC_LegacyClimbFenceStart", "fence raise scene selected")
-T.equal(state.passageAction.kind, "fence_climb", "fence action retained")
-T.equal(state.passageAction.phase, "up", "fence starts in raise phase")
-T.equal(state.passageAction.toX, 1.5,
-    "horizontal fence transfer did not cross one tile")
-T.equal(state.passageAction.toY, 0.23,
-    "horizontal fence transfer changed its lane")
+T.falsy(handled, "small fence preempted the path before collision")
+T.equal(reason, "native_fence_wait_collision",
+    "small fence did not wait for collision")
 
-handled, reason = Controller.UpdateWindowSmash(body, state, 1200)
-T.truthy(handled, "fence action remains active at midpoint")
-T.equal(reason, "native_fence_climb", "midpoint action reason")
-T.equal(position.x, 0.5, "fence raise holds the contact point")
+collision = true
+handled, reason = Controller.TryNativePassage(
+    { id = "small-fence-npc" }, body, state,
+    { x = 3.5, y = 0.5, z = 0 }, 1100)
+T.truthy(handled, "small fence was not intercepted")
+T.equal(reason, "native_fence_vanilla", "small fence state reason")
+T.equal(climbDirection, IsoDirections.E, "small fence direction")
+T.equal(pncActor, true, "small fence did not select the PNC actor set")
+T.equal(bumpType, nil, "small fence still selected a custom bump")
+T.equal(state.passageAction, nil, "small fence created a scripted action")
+T.equal(state.forcedTraversalState, "climbfence",
+    "small fence did not lease the vanilla state")
 
-handled, reason = Controller.UpdateWindowSmash(body, state, 1700)
-T.truthy(handled, "fence crossing phase remains active")
-T.equal(bumpType, "PNC_LegacyClimbFenceStart",
-    "fence changed clips before the transition settled")
-T.equal(state.passageAction.phase, "cross_pending",
-    "fence did not hold the transition boundary")
+handled, reason = Controller.UpdateVanillaFenceClimb(body, state, 1200)
+T.truthy(handled, "small fence was not held during the midpoint")
+T.equal(reason, "native_fence_vanilla", "small fence midpoint reason")
+T.equal(position.x, 0.5, "small fence controller moved the vanilla body")
 
-handled, reason = Controller.UpdateWindowSmash(body, state, 1760)
-T.truthy(handled, "fence crossing phase did not resume")
-T.equal(bumpType, "PNC_LegacyClimbFenceEnd", "fence landing scene selected")
-T.equal(state.passageAction.phase, "cross", "fence enters crossing phase")
-
-handled, reason = Controller.UpdateWindowSmash(body, state, 2000)
-T.truthy(handled, "fence action remains active during crossing")
-T.equal(reason, "native_fence_climb", "crossing action reason")
-T.truthy(position.x > 0.5 and position.x < 1.5,
-    "owned body advances through the fence scene")
-
-handled, reason = Controller.UpdateWindowSmash(body, state, 2601)
-T.truthy(handled, "fence completion handled")
-T.equal(reason, "native_fence_crossed", "fence completion reason")
-T.equal(position.x, 1.5, "owned body reaches landing square")
-T.equal(state.passageAction, nil, "fence action clears after landing")
-T.truthy(leases >= 2, "movement ownership remains leased during crossing")
+position.x = 1.5
+actionState = "pathfind"
+local clearCallsBeforeLanding = clearCalls
+handled, reason = Controller.UpdateVanillaFenceClimb(body, state, 1301)
+T.truthy(handled, "small fence landing was not observed")
+T.equal(reason, "native_fence_vanilla_crossed",
+    "small fence landing reason")
+T.equal(state.forcedTraversalAction, nil,
+    "small fence state did not clear after landing")
+T.equal(clearCalls, clearCallsBeforeLanding,
+    "small fence landing canceled the vanilla path")
+T.truthy(leases >= 2, "small fence movement lease was not refreshed")
 
 handled, reason = Controller.TryNativePassage(
-    { id = "fence-npc" }, body, state,
-    { x = -3.5, y = 0.5, z = 0 }, 1950)
-T.truthy(handled, "same fence is held during the landing cooldown")
-T.equal(reason, "native_fence_cooldown", "same fence cooldown reason")
-T.equal(state.passageAction, nil, "cooldown did not start another climb")
+    { id = "small-fence-npc" }, body, state,
+    { x = -3.5, y = 0.5, z = 0 }, 1400)
+T.truthy(handled, "small fence cooldown was not honored")
+T.equal(reason, "native_fence_cooldown", "small fence cooldown reason")
 
--- Characterize the current same-side/server-correction behavior separately
--- from the phase extraction. The native executor keeps its movement lease
--- when the body has not crossed, even after the nominal finish deadline.
-position.x, position.y, position.z = 0.5, 0.5, 0
-suppressPosition = true
+-- Tall fences keep the existing scripted crossing and its lane-preserving
+-- transfer point.
+fenceTall = true
+position.x, position.y, position.z = 0.5, 0.23, 0
+actionState = "pathfind"
 state = {}
+bumpType = nil
 handled, reason = Controller.TryNativePassage(
-    { id = "fence-corrected" }, body, state,
+    { id = "tall-fence-npc" }, body, state,
     { x = 3.5, y = 0.5, z = 0 }, 3000)
-T.truthy(handled, "corrected fence traversal did not start")
-Controller.UpdateWindowSmash(body, state, 3700)
-Controller.UpdateWindowSmash(body, state, 3760)
-handled, reason = Controller.UpdateWindowSmash(body, state, 4600)
-T.truthy(handled, "same-side traversal stopped being handled")
-T.equal(reason, "native_fence_climb", "same-side lease behavior changed")
-T.truthy(state.passageAction ~= nil,
-    "same-side action unexpectedly cleared after its finish deadline")
-T.equal(state.fenceRetryAt, nil,
-    "same-side traversal unexpectedly installed retry backoff")
+T.truthy(handled, "tall fence was not intercepted")
+T.equal(reason, "native_fence_climb", "tall fence reason")
+T.equal(bumpType, "PNC_ClimbFenceTall", "tall fence scene changed")
+T.equal(state.passageAction.phase, "single",
+    "tall fence stopped using its scripted crossing")
+T.equal(state.passageAction.toX, 1.5,
+    "tall fence did not cross one tile")
+T.equal(state.passageAction.toY, 0.23,
+    "tall fence transfer changed its lane")
+
+handled, reason = Controller.UpdateWindowSmash(body, state, 3901)
+T.truthy(handled, "tall fence did not complete")
+T.equal(reason, "native_fence_crossed", "tall fence completion reason")
+T.equal(state.passageAction, nil, "tall fence action did not clear")
+T.equal(position.x, 1.5, "tall fence did not reach the landing point")
 
 T.finish("pnc_client_native_fence_passage_smoke")

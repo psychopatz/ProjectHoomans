@@ -15,6 +15,11 @@ local function setPassageOwner(lane, interactType, now)
         lane.ownerMode = "window_smash"
     elseif interactType == "fence_climb" then
         lane.ownerMode = "fence_climb"
+        if lane.vanillaFenceAction then
+            lane.specialMoveUntil =
+                tonumber(lane.vanillaFenceAction.finishAt)
+                or now
+        end
     else
         lane.ownerMode = "window_climb"
     end
@@ -45,6 +50,26 @@ function Internal.updateScriptedSpecialMove(zombie, record, lane, now)
     end
     if Internal.refreshTraversalMemory then
         Internal.refreshTraversalMemory(lane, zombie)
+    end
+    if lane.vanillaFenceAction
+        and Internal.updateVanillaFenceAction
+    then
+        local fenceActive
+        local fenceState
+        fenceActive, fenceState = Internal.updateVanillaFenceAction(
+            zombie, record, lane, now
+        )
+        if fenceActive then
+            Internal.logMoveDebug(
+                record,
+                zombie,
+                lane,
+                "special_progress",
+                fenceState or lane.ownerMode,
+                ""
+            )
+            return true, fenceState or lane.ownerMode
+        end
     end
     if lane.traversalAction and Internal.updateTraversalAction then
         local traversalActive

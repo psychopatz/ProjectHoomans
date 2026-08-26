@@ -28,7 +28,7 @@ local factions = {
 local records = {
     alpha = {
         id = "npc_alpha",
-        faction = "colonist",
+        tacticalClass = "colonist",
         recruited = true,
         affiliation = {
             factionID = "faction_alpha",
@@ -39,19 +39,19 @@ local records = {
     },
     raider = {
         id = "npc_raider",
-        faction = "colonist",
+        tacticalClass = "colonist",
         recruited = false,
         affiliation = { factionID = "faction_raiders" },
     },
     factionless = {
         id = "npc_factionless",
-        faction = "colonist",
+        tacticalClass = "colonist",
         recruited = true,
         ownerUsername = "alice",
     },
     hostile = {
         id = "npc_hostile",
-        faction = "colonist",
+        tacticalClass = "colonist",
         recruited = false,
         hostility = { attackPlayers = true },
     },

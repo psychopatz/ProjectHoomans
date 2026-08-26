@@ -184,7 +184,7 @@ T.load(ROOT .. "Combat/CombatTactics/PNC_Combat_Tactics.lua")
 local function makeRecord(id)
     return {
         id = id,
-        faction = "colonist",
+        tacticalClass = "colonist",
         presenceState = "LIVE",
         alive = true,
         x = 0,
@@ -462,7 +462,7 @@ T.equal(record.runtime.combatThreatAssessment.hordeCount, 6,
 -- before checking the horde retreat gate.
 now = now + 250
 record = makeRecord("hostile_target_switch")
-record.faction = "hostile"
+record.tacticalClass = "hostile"
 record.runtime.target = { kind = "player", id = "player-1" }
 record.runtime.forcedZombieThreat = target
 PNC.CombatTactics.MarkZombieDamage(record, 1, 0, 0, now)
@@ -553,7 +553,7 @@ visibleHordeCount = 0
 nearbyNPCs = {
     {
         id = "ally",
-        faction = "colonist",
+        tacticalClass = "colonist",
         alive = true,
         x = 3,
         y = 0.1,
@@ -596,7 +596,7 @@ T.equal(reason, "reload_interrupted_by_pressure", "reload interruption reason")
 nearbyNPCs = {
     {
         id = "ally",
-        faction = "colonist",
+        tacticalClass = "colonist",
         alive = true,
         x = 1,
         y = 0.5,

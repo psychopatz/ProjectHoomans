@@ -53,7 +53,7 @@ anti-spoofing, revisions, and callback limitations.
 
 NPC organization membership is identified by
 record.affiliation.factionID (also serialized as the top-level factionID
-in network summaries). record.faction and colonist are tactical
+in network summaries). record.tacticalClass and the `colonist` value are tactical
 presentation fields; they must not establish player ownership,
 conversation membership, or death-marker eligibility.
 

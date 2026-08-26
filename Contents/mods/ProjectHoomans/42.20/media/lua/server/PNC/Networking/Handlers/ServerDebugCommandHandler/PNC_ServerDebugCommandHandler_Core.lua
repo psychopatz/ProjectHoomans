@@ -91,7 +91,7 @@ function H.HandleDebugSpawn(player, args)
             radius = Const.ROAM_DEFAULT_RADIUS,
         }
     local record = PNC.API.Spawn({
-        faction = tacticalClass,
+        tacticalClass = tacticalClass,
         archetypeID = H.ResolveDebugArchetype(
             args,
             tacticalClass,

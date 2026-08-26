@@ -17,6 +17,7 @@ function Internal.clearTraversalAction(zombie, lane, reason)
     end
     Runtime.resetTraversalVariables(zombie)
     lane.traversalAction = nil
+    lane.vanillaFenceAction = nil
     lane.specialMoveUntil = 0
     lane.specialAnim = nil
     lane.ownerMode = "fake_locomotion"

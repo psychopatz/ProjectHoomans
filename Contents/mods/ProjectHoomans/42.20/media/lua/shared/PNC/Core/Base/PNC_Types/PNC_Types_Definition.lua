@@ -3,7 +3,11 @@ local Internal = Types.Internal
 
 function Types.NormalizeDefinition(definition)
     local def = definition or {}
-    local tacticalClass = Types.NormalizeTacticalClass(def.tacticalClass)
+    local tacticalClass = Types.NormalizeTacticalClass(
+        def.tacticalClass ~= nil and def.tacticalClass
+            or def.faction ~= nil and def.faction
+            or def.role
+    )
     local x = tonumber(def.x) or 0
     local y = tonumber(def.y) or 0
     local z = tonumber(def.z) or 0

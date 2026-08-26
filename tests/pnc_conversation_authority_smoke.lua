@@ -47,7 +47,7 @@ local player = {
 }
 local record = {
     id = "npc-authority",
-    faction = "neutral",
+    tacticalClass = "neutral",
     hostility = { attackPlayers = false },
     runtime = {
         conversationLease = {

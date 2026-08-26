@@ -87,7 +87,7 @@ function PNC.API.Spawn(spec)
         id = id,
         name = "Director NPC " .. tostring(npcSequence),
         alive = true,
-        faction = spec.faction,
+        tacticalClass = spec.tacticalClass,
         recruited = false,
         ownerUsername = nil,
         ownerOnlineID = nil,
@@ -208,7 +208,7 @@ for _, npcID in ipairs(result.npcIDs) do
         "faction membership")
     T.equal(record.affiliation.communityID,
         community.id, "community membership")
-    T.equal(record.faction, "neutral",
+    T.equal(record.tacticalClass, "neutral",
         "tactical class preserved")
 end
 T.equal(

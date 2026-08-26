@@ -75,7 +75,7 @@ local neutral = {
     id = "neutral",
     snapshot = {
         recruited = false,
-        faction = "neutral",
+        tacticalClass = "neutral",
     },
 }
 

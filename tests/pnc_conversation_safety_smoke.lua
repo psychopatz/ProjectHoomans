@@ -56,7 +56,7 @@ local record = {
     presenceState = "live",
     activeJob = "FollowOwner",
     activeBehavior = "FollowOwner",
-    faction = "hostile",
+    tacticalClass = "hostile",
     hostility = { attackPlayers = true },
     health = {},
     runtime = {},

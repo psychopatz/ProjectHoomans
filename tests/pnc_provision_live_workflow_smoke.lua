@@ -46,8 +46,9 @@ function PNC.Registry.GetLiveZombie(id)
 end
 
 PNC.Registry.Data.live_provisioner = {
-    id = "live_provisioner", alive = true, factionId = "faction:1",
-    communityId = "colony:1", x = 3, y = 4, z = 0, runtime = {},
+    id = "live_provisioner", alive = true,
+    affiliation = { factionID = "faction:1", communityID = "colony:1" },
+    x = 3, y = 4, z = 0, runtime = {},
 }
 
 local Definitions = require "PNC/Core/Production/PNC_WorkDefinitions"

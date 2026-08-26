@@ -84,8 +84,7 @@ function Service.Queries.BuildSnapshot(colonyId, at)
             local record = PNC.Registry and PNC.Registry.Get
                 and PNC.Registry.Get(lease.npcId) or nil
             local affiliation = record and record.affiliation or {}
-            local recordColony = tostring(affiliation.communityID
-                or affiliation.communityId or record and record.communityId or "")
+            local recordColony = tostring(affiliation.communityID or "")
             if not colonyId or recordColony == tostring(colonyId) then
                 local state = lease.phase == "TRAVEL" and Definitions.STATE.TRAVEL
                     or lease.phase == "WORKING" and Definitions.STATE.WORKING

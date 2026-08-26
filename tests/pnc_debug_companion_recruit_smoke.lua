@@ -3,17 +3,17 @@ local T = require "tests/support/test"
 local ROOT = T.path("ProjectHoomans", "server", "PNC/")
 
 local records = {
-    hostile = { id = "hostile", faction = "hostile", alive = true },
-    neutral = { id = "neutral", faction = "neutral", alive = true },
-    companion = { id = "companion", faction = "colonist", recruited = true },
+    hostile = { id = "hostile", tacticalClass = "hostile", alive = true },
+    neutral = { id = "neutral", tacticalClass = "neutral", alive = true },
+    companion = { id = "companion", tacticalClass = "colonist", recruited = true },
     stale = {
         id = "stale",
-        faction = "colonist",
+        tacticalClass = "colonist",
         recruited = true,
         alive = true,
     },
     orphaned = {
-        id = "orphaned", faction = "colonist", recruited = true,
+        id = "orphaned", tacticalClass = "colonist", recruited = true,
         alive = true, ownerUsername = "Tester",
         orderSpec = { kind = "guard" },
     },
@@ -37,14 +37,17 @@ local communityByNPC = {}
 
 PNC = {
     Const = {
-        FACTION_NEUTRAL = "neutral",
-        FACTION_HOSTILE = "hostile",
-        FACTION_COLONIST = "colonist",
+        TACTICAL_CLASS_NEUTRAL = "neutral",
+        TACTICAL_CLASS_HOSTILE = "hostile",
+        TACTICAL_CLASS_COLONIST = "colonist",
         ORDER_FOLLOW = "follow",
     },
     Core = { LogInfo = function() end },
     Types = {
-        NormalizeFaction = function(value) return tostring(value or "") end,
+        NormalizeTacticalClass = function(value) return tostring(value or "") end,
+        ResolveTacticalClass = function(value)
+            return tostring(value and value.tacticalClass or "")
+        end,
     },
     Registry = {
         Get = function(id) return records[id] end,
@@ -64,14 +67,14 @@ PNC = {
         end,
         TransferNPC = function(id, factionID)
             transferCalls = transferCalls + 1
-            records[id].faction = "colonist"
+            records[id].tacticalClass = "colonist"
             records[id].recruited = true
             affiliations[id] = { factionID = factionID }
             return true, "transferred"
         end,
         AddNPC = function(factionID, id)
             addCalls = addCalls + 1
-            records[id].faction = "colonist"
+            records[id].tacticalClass = "colonist"
             records[id].recruited = true
             affiliations[id] = { factionID = factionID }
             return true, "added"
@@ -175,7 +178,7 @@ T.equal(orderCalls, ordersBeforeRepair,
     "membership repair did not force follow")
 
 records.canonical = {
-    id = "canonical", faction = "colonist", recruited = true,
+    id = "canonical", tacticalClass = "colonist", recruited = true,
     alive = true, ownerUsername = "Tester",
 }
 affiliations.canonical = { factionID = "player-faction" }
@@ -185,8 +188,8 @@ T.equal(ok, true, "canonical membership remains valid")
 T.equal(reason, "unchanged", "canonical membership is not rebuilt")
 T.equal(records.canonical.affiliation.communityID, "community_player",
     "canonical community is mirrored onto the NPC record")
-T.equal(records.canonical.communityId, "community_player",
-    "legacy scheduler community field is repaired")
+T.equal(records.canonical.communityId, nil,
+    "legacy scheduler community field is not reintroduced")
 T.finish("pnc_debug_companion_recruit_smoke")
 
 T.finish("pnc_debug_companion_recruit_smoke")

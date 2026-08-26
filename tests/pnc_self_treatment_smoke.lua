@@ -20,7 +20,7 @@ PNC = {
     Const = {
         PRESENCE_LIVE = "live",
         PRESENCE_ABSTRACT = "abstract",
-        FACTION_HOSTILE = "hostile",
+        TACTICAL_CLASS_HOSTILE = "hostile",
         SELF_BANDAGE_THREAT_RADIUS = 10,
         SELF_BANDAGE_INTERRUPT_RADIUS = 7,
         NPC_ZOMBIE_DEFENSE_RADIUS = 2.2,
@@ -100,7 +100,7 @@ T.load(FILE)
 local record = {
     id = "live_treatment",
     alive = true,
-    faction = "neutral",
+    tacticalClass = "neutral",
     hostility = { attackNPCs = true, attackZombies = true },
     presenceState = "live",
     x = 0, y = 0, z = 0,
@@ -178,7 +178,7 @@ treatable = true
 local abstractRecord = {
     id = "abstract_treatment",
     alive = true,
-    faction = "neutral",
+    tacticalClass = "neutral",
     hostility = { attackNPCs = true, attackZombies = true },
     presenceState = "abstract",
     x = 50, y = 50, z = 0,

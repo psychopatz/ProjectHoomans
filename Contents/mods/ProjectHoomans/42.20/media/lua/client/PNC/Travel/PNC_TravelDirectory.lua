@@ -168,7 +168,7 @@ function Directory.GetProjected(npcId, atWorldHour)
             id = tostring(snapshot.id),
             npcId = tostring(snapshot.id),
             name = Identity.GetName(snapshot),
-            faction = tostring(snapshot.faction or "neutral"),
+            tacticalClass = tostring(snapshot.tacticalClass or "neutral"),
             organizationalFaction =
                 resolveOrganizationalFaction(snapshot),
             recruited = snapshot.recruited == true,
@@ -236,7 +236,7 @@ function Directory.GetProjected(npcId, atWorldHour)
         id = tostring(snapshot.id),
         npcId = tostring(snapshot.id),
         name = Identity.GetName(snapshot),
-        faction = tostring(snapshot.faction or "neutral"),
+        tacticalClass = tostring(snapshot.tacticalClass or "neutral"),
         organizationalFaction =
             resolveOrganizationalFaction(snapshot),
         recruited = snapshot.recruited == true,

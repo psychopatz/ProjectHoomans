@@ -22,9 +22,9 @@ local records = {}
 
 PNC = {
     Const = {
-        FACTION_COLONIST = "colonist",
-        FACTION_HOSTILE = "hostile",
-        FACTION_NEUTRAL = "neutral",
+        TACTICAL_CLASS_COLONIST = "colonist",
+        TACTICAL_CLASS_HOSTILE = "hostile",
+        TACTICAL_CLASS_NEUTRAL = "neutral",
         ORDER_FOLLOW = "follow",
         ORDER_GUARD = "guard",
         ORDER_PATROL = "patrol",
@@ -108,7 +108,7 @@ local waiting = {
     id = "waiting",
     alive = true,
     recruited = true,
-    faction = "colonist",
+    tacticalClass = "colonist",
     ownerUsername = "alice",
     ownerOnlineID = 3,
     affiliation = { factionID = faction.id },
@@ -181,7 +181,7 @@ PNC.PlayerCharacters.RuntimeByUUID.character_alice = player
 local joining = copy(waiting)
 joining.id = "joining"
 joining.recruited = false
-joining.faction = "neutral"
+joining.tacticalClass = "neutral"
 joining.ownerUsername = nil
 joining.ownerOnlineID = nil
 joining.orderSpec = { kind = "guard", x = 20, y = 20, z = 0 }

@@ -215,8 +215,9 @@ PNC.FacilityReservations = {
     Start = function() return true end,
 }
 
-PNC.Registry.Data.worker = { id = "worker", alive = true, factionId = "f1",
-    communityId = "c1", skills = { Carpentry = 5 }, runtime = {},
+PNC.Registry.Data.worker = { id = "worker", alive = true,
+    affiliation = { factionID = "f1", communityID = "c1" },
+    skills = { Carpentry = 5 }, runtime = {},
     allowedJobs = { Researcher = true, WorkshopWorker = true } }
 PNC.Registry.Data.worker.allowedJobs.Constructor = true
 
@@ -393,8 +394,9 @@ T.equal(Work.BuildActionInformation(PNC.Registry.Data.worker).percent, 40,
     "action information reports shared order progress")
 PNC.Registry.Data.worker.alive = false
 constructionFacility.constructionState = "PLANNED"
-PNC.Registry.Data.backup = { id = "backup", alive = true, factionId = "f1",
-    communityId = "c1", skills = { Carpentry = 5 }, runtime = {},
+PNC.Registry.Data.backup = { id = "backup", alive = true,
+    affiliation = { factionID = "f1", communityID = "c1" },
+    skills = { Carpentry = 5 }, runtime = {},
     allowedJobs = { Constructor = true } }
 clock = clock + 1001
 Work.Tick(clock)
@@ -455,7 +457,7 @@ T.equal(constructionFacility.constructionState, "PLANNED",
 
 -- A colonist whose legacy affiliation omitted communityID still cycles from
 -- At Home into queued work by resolving the remembered home base.
-PNC.Registry.Data.backup.communityId = nil
+PNC.Registry.Data.backup.affiliation.communityID = nil
 PNC.Registry.Data.backup.runtime.homeBaseId = "b1"
 PNC.Registry.Data.backup.orderSpec = { kind = "colony_home", baseId = "b1" }
 PNC.HomeDutyService = {
@@ -563,12 +565,14 @@ recoveredCompacted.status = "WORKING"
 recoveredCompacted.workerId, recoveredCompacted.stationId = "current",
     "station:current"
 PNC.Registry.Data.current = { id = "current", alive = true,
-    factionId = "f1", communityId = "c1", skills = { Carpentry = 5 },
+    affiliation = { factionID = "f1", communityID = "c1" },
+    skills = { Carpentry = 5 },
     runtime = { workOrderId = recoveredCompacted.id },
     orderSpec = { kind = "production_work",
         workOrderId = recoveredCompacted.id, operation = "CONSTRUCT" } }
-PNC.Registry.Data.former = { id = "former", alive = true, factionId = "f1",
-    communityId = "c1", skills = { Carpentry = 5 },
+PNC.Registry.Data.former = { id = "former", alive = true,
+    affiliation = { factionID = "f1", communityID = "c1" },
+    skills = { Carpentry = 5 },
     runtime = { workOrderId = recoveredCompacted.id,
         lastProductionWorkAt = clock },
     orderSpec = { kind = "production_work",

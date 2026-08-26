@@ -229,7 +229,7 @@ function Client.SendDebug(action, payload)
             playerFactionID = playerFaction.id
         end
         return PNC.API.Spawn({
-            faction = tacticalClass,
+            tacticalClass = tacticalClass,
             x = x, y = y, z = z,
             ownerUsername = ownerUsername,
             ownerOnlineID = ownerOnlineID,

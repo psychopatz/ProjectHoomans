@@ -63,10 +63,12 @@ function PNC.Registry.ForEach(callback)
 end
 PNC.WorkService = { ClaimsByWorker = {}, Internal = {} }
 require "PNC/Production/WorkService/PNC_WorkService_Core"
-PNC.Registry.Data.low = { id = "low", alive = true, factionId = "f1",
-    communityId = "c1", skills = { Welding = 1 }, runtime = {} }
-PNC.Registry.Data.high = { id = "high", alive = true, factionId = "f1",
-    communityId = "c1", skills = { Welding = 6 }, runtime = {} }
+PNC.Registry.Data.low = { id = "low", alive = true,
+    affiliation = { factionID = "f1", communityID = "c1" },
+    skills = { Welding = 1 }, runtime = {} }
+PNC.Registry.Data.high = { id = "high", alive = true,
+    affiliation = { factionID = "f1", communityID = "c1" },
+    skills = { Welding = 6 }, runtime = {} }
 local worker = PNC.WorkService.Internal.findWorker({
     operation = "CRAFT", factionId = "f1", colonyId = "c1", baseId = "b1",
     requiredSkills = {}, productionSkillId = "Welding",

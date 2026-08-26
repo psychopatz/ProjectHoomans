@@ -2,6 +2,18 @@ local T = require "tests/support/test"
 
 T.addPackagePaths({ { "ProjectHoomans", "shared" } })
 
+IsoDirections = {
+    N = "N",
+    S = "S",
+    E = "E",
+    W = "W",
+}
+
+local fenceTall = false
+local zombieX = 0.5
+local actionState = "pathfind"
+local climbDirection
+
 local fromSquare = {
     getX = function() return 0 end,
     getY = function() return 0 end,
@@ -37,7 +49,7 @@ PNC = {
         GetPassageBetween = function() return fence end,
         FindPassageToward = function() return nil end,
         IsDoor = function() return false end,
-        GetFenceBetween = function() return fence, false end,
+        GetFenceBetween = function() return fence, fenceTall end,
         IsFenceApproachReady = function() return true end,
         GetFenceTransferPoint = function(_, _, x, y)
             return x + 1, y
@@ -57,6 +69,10 @@ PNC = {
         end,
     },
     PathService = { Internal = {} },
+    LiveBodyControl = {
+        IsMultiplayer = function() return false end,
+        SetManagedBodyUseless = function() return false end,
+    },
 }
 
 local Internal = PNC.PathService.Internal
@@ -91,10 +107,17 @@ Internal.noteTraversalAttempt = function(_, kind)
 end
 
 local zombie = {
-    getX = function() return 0.5 end,
+    getX = function() return zombieX end,
     getY = function() return 0.5 end,
     getZ = function() return 0 end,
-    getSquare = function() return fromSquare end,
+    getSquare = function()
+        return zombieX < 1 and fromSquare or toSquare
+    end,
+    getActionStateName = function() return actionState end,
+    climbOverFence = function(_, direction)
+        climbDirection = direction
+        actionState = "climbfence"
+    end,
     getForwardDirection = function()
         return { getX = function() return 1 end,
             getY = function() return 0 end }
@@ -119,13 +142,45 @@ local handled, reason = Internal.tryDoorOrWindowInteraction(
 )
 T.truthy(handled, "blocked fence interaction was not handled")
 T.equal(reason, "fence_climb", "blocked fence interaction reason")
-T.equal(capturedSpec.kind, "fence_climb", "fence action kind")
-T.equal(capturedSpec.anim, "FenceLow", "fence profile animation")
-T.equal(capturedSpec.startAnim, "FenceStart", "fence start animation")
-T.equal(capturedSpec.endAnim, "FenceEnd", "fence end animation")
-T.equal(capturedSpec.toX, 1.5, "fence landing x")
-T.equal(capturedSpec.toSquare, toSquare, "fence landing square")
+T.equal(climbDirection, IsoDirections.E, "small fence direction")
+T.equal(capturedSpec, nil, "small fence created a scripted action")
+T.truthy(lane.vanillaFenceAction,
+    "small fence did not create a vanilla state lease")
 T.equal(notedKind, "fence_climb", "fence attempt tracking")
+
+zombieX = 1.5
+actionState = "pathfind"
+handled, reason = Internal.updateVanillaFenceAction(
+    zombie, { id = "fence-test" }, lane, 1300
+)
+T.truthy(handled, "small fence landing was not completed")
+T.equal(reason, "fence_vanilla_crossed",
+    "small fence landing completion reason")
+T.equal(lane.vanillaFenceAction, nil,
+    "small fence vanilla lease did not clear")
+
+-- Tall fences retain the custom transfer action.
+fenceTall = true
+zombieX = 0.5
+actionState = "pathfind"
+capturedSpec = nil
+local tallLane = {
+    blockedStepFromX = 0.5,
+    blockedStepFromY = 0.5,
+    blockedStepFromZ = 0,
+    blockedStepToX = 1.5,
+    blockedStepToY = 0.5,
+    blockedStepToZ = 0,
+    goalRevision = 5,
+}
+handled, reason = Internal.tryDoorOrWindowInteraction(
+    zombie, { id = "tall-fence-test" }, tallLane, 3.5, 0.5, 0
+)
+T.truthy(handled, "tall fence interaction was not handled")
+T.equal(reason, "fence_climb", "tall fence interaction reason")
+T.equal(capturedSpec.kind, "fence_climb", "tall fence action kind")
+T.equal(capturedSpec.toX, 1.5, "tall fence landing x")
+T.equal(capturedSpec.toSquare, toSquare, "tall fence landing square")
 
 T.truthy(Internal.shouldSuppressSpecialAction(
     lane, lane.lastSpecialActionKey, 1499

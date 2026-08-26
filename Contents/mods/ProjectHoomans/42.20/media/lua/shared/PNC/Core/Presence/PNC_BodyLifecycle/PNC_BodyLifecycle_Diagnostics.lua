@@ -86,7 +86,7 @@ function Lifecycle.BuildDeathMarkerDiagnostics(marker)
     return {
         id = tostring(marker.id),
         name = marker.name,
-        faction = "dead",
+        tacticalClass = "dead",
         deathMarker = true,
         presenceState = Const.PRESENCE_CORPSE,
         alive = false,

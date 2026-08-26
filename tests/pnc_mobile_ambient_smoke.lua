@@ -108,7 +108,7 @@ PNC.Factions.Registry.byID[ambientFaction.id] = ambientFaction
 PNC.Registry.Data.npc_ambient = {
     id = "npc_ambient",
     alive = true,
-    faction = "neutral",
+    tacticalClass = "neutral",
     x = 300, y = 300, z = 0,
     anchorX = 300, anchorY = 300, anchorZ = 0,
     orderSpec = { kind = PNC.Const.ORDER_GUARD },

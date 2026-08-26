@@ -40,7 +40,7 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
             and Identity.BuildPortraitSummary
             and Identity.BuildPortraitSummary(record)
             or nil,
-        faction = record.faction,
+        tacticalClass = record.tacticalClass,
         organizationalFaction =
             Parts.BuildOrganizationalFactionSummary(record),
         worldDiscovery = Parts.BuildWorldDiscoverySummary(record),
@@ -92,7 +92,7 @@ function Network.BuildDeathMarkerSnapshot(marker)
         id = tostring(marker.id),
         displayName = tostring(marker.name or marker.id),
         name = tostring(marker.name or marker.id),
-        faction = "dead",
+        tacticalClass = "dead",
         presenceState = Const.PRESENCE_CORPSE,
         alive = false,
         deathMarker = true,

@@ -7,9 +7,9 @@ Const.PRESENCE_LIVE = "live"
 Const.PRESENCE_ABSTRACT = "abstract"
 Const.PRESENCE_CORPSE = "corpse"
 
-Const.FACTION_COLONIST = "colonist"
-Const.FACTION_NEUTRAL = "neutral"
-Const.FACTION_HOSTILE = "hostile"
+Const.TACTICAL_CLASS_COLONIST = "colonist"
+Const.TACTICAL_CLASS_NEUTRAL = "neutral"
+Const.TACTICAL_CLASS_HOSTILE = "hostile"
 
 Const.ORDER_FOLLOW = "follow"
 Const.ORDER_GUARD = "guard"

@@ -48,7 +48,7 @@ local function apply(record, mode, owner, reason, faction)
                 and recordOwnerOnlineID == ownerOnlineID
         )
     if mode == "player_owned" then
-        tacticalClass = Const.FACTION_COLONIST
+        tacticalClass = Const.TACTICAL_CLASS_COLONIST
         hostility = Types.DefaultHostility(tacticalClass)
         changed = assign(record, "recruited", true) or changed
         changed = assign(
@@ -62,7 +62,7 @@ local function apply(record, mode, owner, reason, faction)
             owner.onlineID
         ) or changed
     elseif mode == "aggressive" then
-        tacticalClass = Const.FACTION_HOSTILE
+        tacticalClass = Const.TACTICAL_CLASS_HOSTILE
         hostility = {
             mode = "faction_war",
             attackPlayers = owner.attackPlayers == true,
@@ -73,13 +73,13 @@ local function apply(record, mode, owner, reason, faction)
         changed = assign(record, "ownerUsername", nil) or changed
         changed = assign(record, "ownerOnlineID", nil) or changed
     else
-        tacticalClass = Const.FACTION_NEUTRAL
+        tacticalClass = Const.TACTICAL_CLASS_NEUTRAL
         hostility = Types.DefaultHostility(tacticalClass)
         changed = assign(record, "recruited", false) or changed
         changed = assign(record, "ownerUsername", nil) or changed
         changed = assign(record, "ownerOnlineID", nil) or changed
     end
-    changed = assign(record, "faction", tacticalClass) or changed
+    changed = assign(record, "tacticalClass", tacticalClass) or changed
     if not same(record.hostility, hostility) then
         record.hostility = hostility
         changed = true

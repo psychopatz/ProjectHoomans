@@ -43,7 +43,7 @@ PNC = {
         GetHostileDefaults = function() return { "General" } end,
     },
     Types = {
-        NormalizeFaction = function(value) return value or "colonist" end,
+        NormalizeTacticalClass = function(value) return value or "colonist" end,
     },
 }
 
@@ -56,7 +56,7 @@ local record = {
     name = "Portrait NPC",
     identitySeed = 44,
     archetypeID = "General",
-    faction = "colonist",
+    tacticalClass = "colonist",
     isFemale = false,
     identity = {
         seed = 44,

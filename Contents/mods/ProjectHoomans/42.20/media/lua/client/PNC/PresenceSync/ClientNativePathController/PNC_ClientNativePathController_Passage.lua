@@ -34,9 +34,47 @@ local FENCE_CLIMB_CROSS_MS = 560
 local FENCE_TALL_CLIMB_FINISH_MS = 900
 local FENCE_RETRY_BACKOFF_MS = 900
 local FENCE_COOLDOWN_MS = 900
+local VANILLA_FENCE_TIMEOUT_MS = 4000
+local VANILLA_FENCE_START_GRACE_MS = 300
 local function objectBool(object, methodName)
     local method = object and object[methodName] or nil
     return type(method) == "function" and method(object) == true
+end
+
+local function bodyCollided(body)
+    return objectBool(body, "isCollidedWithDoor")
+        or objectBool(body, "isCollidedThisFrame")
+        or objectBool(body, "isCollided")
+end
+
+local function actionStateName(body)
+    if not body or not body.getActionStateName then return "" end
+    return string.lower(tostring(body:getActionStateName() or ""))
+end
+
+local function fenceDirection(fromSquare, toSquare)
+    local dx = toSquare and fromSquare
+        and toSquare:getX() - fromSquare:getX() or 0
+    local dy = toSquare and fromSquare
+        and toSquare:getY() - fromSquare:getY() or 0
+    if not IsoDirections then return nil end
+    if dx > 0 then return IsoDirections.E end
+    if dx < 0 then return IsoDirections.W end
+    if dy > 0 then return IsoDirections.S end
+    if dy < 0 then return IsoDirections.N end
+    return nil
+end
+
+local function prepareFenceFacing(body, object)
+    if not body or not object then return false end
+    if body.isFacingObject
+        and body:isFacingObject(object, 0.5) ~= true
+    then
+        if body.faceThisObject then body:faceThisObject(object) end
+        return false
+    end
+    if body.faceThisObject then body:faceThisObject(object) end
+    return true
 end
 
 local function squareKey(square)
@@ -216,6 +254,122 @@ local function updateWindowSmash(body, state, now)
     return true, "native_window_smashed"
 end
 
+local function enterVanillaFenceState(body, direction)
+    if not body then return false end
+    -- PNC's climbfence nodes are identity-gated just like the rest of its
+    -- human animation set. Set the selector at the state boundary so a
+    -- collision-driven entry cannot inherit a stale vanilla identity.
+    if body.setVariable then body:setVariable("PNCActor", true) end
+    if actionStateName(body) == "climbfence" then return true end
+    if ClimbOverFenceState
+        and ClimbOverFenceState.instance
+        and body.changeState
+    then
+        local climbState = ClimbOverFenceState.instance()
+        if climbState and climbState.setParams then
+            climbState:setParams(body, direction)
+            body:changeState(climbState)
+            return true
+        end
+    end
+    -- This is only a compatibility fallback for runtimes where the state
+    -- singleton is unavailable. It is deliberately not the normal trigger:
+    -- Bandits enter the state directly after the collision frame.
+    if body.climbOverFence then
+        local result = body:climbOverFence(direction)
+        return result ~= false
+    end
+    return false
+end
+
+local function updateVanillaFenceClimb(body, state, now)
+    local action = state and state.forcedTraversalAction or nil
+    local actionState
+    local crossed
+    if not action then return false, nil end
+    actionState = actionStateName(body)
+    crossed = fenceCrossed(body, action)
+    if crossed then
+        -- Do not cancel PathFindBehavior2 here. ClimbOverFenceState.exit()
+        -- owns the normal repath, matching Bandits and the vanilla engine.
+        -- The controller only stops observing this fence and leaves the
+        -- existing request alive.
+        state.forcedTraversalAction = nil
+        state.forcedTraversalState = nil
+        state.forcedTraversalUntil = nil
+        state.fenceCooldownKey = action.fenceKey
+        state.fenceCooldownUntil = now + FENCE_COOLDOWN_MS
+        state.failed = false
+        state.lastProgressAt = now
+        state.retryAt = now
+        return true, "native_fence_vanilla_crossed"
+    end
+    if actionState == "climbfence"
+        and now < (tonumber(action.finishAt) or now)
+    then
+        beginMovementLease(body, state, action.key, now)
+        return true, "native_fence_vanilla"
+    end
+    if now < (tonumber(action.startGraceUntil) or now) then
+        beginMovementLease(body, state, action.key, now)
+        return true, "native_fence_vanilla_starting"
+    end
+    if actionState == "climbfence"
+        and LiveBodyControl
+        and LiveBodyControl.SuppressZombieState
+    then
+        LiveBodyControl.SuppressZombieState(body, state, now)
+    end
+    clearOwnedPath(body, state)
+    state.forcedTraversalAction = nil
+    state.forcedTraversalState = nil
+    state.forcedTraversalUntil = nil
+    state.requestKey = nil
+    state.fenceRetryKey = action.fenceKey
+    state.fenceRetryAt = now + FENCE_RETRY_BACKOFF_MS
+    state.failed = true
+    state.retryAt = state.fenceRetryAt
+    return true, "native_fence_vanilla_same_side"
+end
+
+local function startVanillaFenceClimb(
+    snapshot, body, state, passage, object, fromSquare, now
+)
+    local direction = fenceDirection(fromSquare, passage.toSquare)
+    if not direction then
+        return false, "native_fence_direction_unavailable"
+    end
+    if not prepareFenceFacing(body, object) then
+        return false, "native_fence_turning"
+    end
+    if not enterVanillaFenceState(body, direction) then
+        return false, "native_fence_state_unavailable"
+    end
+    local key = "fence_vanilla:"
+        .. tostring(snapshot and snapshot.id or "npc")
+        .. ":" .. tostring(now)
+    local fenceAction = {
+        kind = "fence_climb_vanilla",
+        key = key,
+        object = object,
+        fromSquare = fromSquare,
+        toSquare = passage.toSquare,
+        fenceKey = fenceKey(object, passage),
+        startedAt = now,
+        startGraceUntil = now + VANILLA_FENCE_START_GRACE_MS,
+        finishAt = now + VANILLA_FENCE_TIMEOUT_MS,
+    }
+    if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
+        LiveBodyControl.SetManagedBodyUseless(body, false, true)
+    end
+    state.forcedTraversalAction = fenceAction
+    state.forcedTraversalState = "climbfence"
+    state.forcedTraversalUntil = fenceAction.finishAt
+    beginMovementLease(body, state, key, now)
+    logState(snapshot, "native_fence_vanilla_start", describeBody(body))
+    return true, "native_fence_vanilla"
+end
+
 local function startFenceClimb(snapshot, body, state, passage, object, now)
     local toSquare = passage and passage.toSquare or nil
     local fromSquare = passage and passage.fromSquare or nil
@@ -230,6 +384,28 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
     if not toSquare then return false, nil end
     if not fromSquare and body.getSquare then
         fromSquare = body:getSquare()
+    end
+    _, tall = TraversalQuery.IsFence(object)
+    if tall ~= true then
+        -- A passage query is only a candidate. Let PathFindBehavior2 reach
+        -- the actual collision frame before taking ownership, just like
+        -- Bandits' ManageCollisions. This keeps the engine's fence params and
+        -- current path synchronized with the direct state transition.
+        if not bodyCollided(body) then
+            return false, "native_fence_wait_collision"
+        end
+        if TraversalQuery and TraversalQuery.CanTraverseAt
+            and not TraversalQuery.CanTraverseAt(
+                toSquare:getX() + 0.5,
+                toSquare:getY() + 0.5,
+                toSquare:getZ()
+            )
+        then
+            return false, "native_fence_landing_blocked"
+        end
+        return startVanillaFenceClimb(
+            snapshot, body, state, passage, object, fromSquare, now
+        )
     end
     if TraversalQuery and TraversalQuery.IsFenceApproachReady
         and not TraversalQuery.IsFenceApproachReady(
@@ -252,9 +428,7 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
     then
         return false, "native_fence_landing_blocked"
     end
-    if not TraversalQuery
-        or not TraversalQuery.GetFenceTransferPoint
-    then
+    if not TraversalQuery.GetFenceTransferPoint then
         return false, "native_fence_geometry_unavailable"
     end
     transferX, transferY = TraversalQuery.GetFenceTransferPoint(
@@ -266,7 +440,6 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
     if transferX == nil or transferY == nil then
         return false, "native_fence_geometry_invalid"
     end
-    _, tall = TraversalQuery.IsFence(object)
     profile = TraversalProfiles
         and TraversalProfiles.Resolve
         and TraversalProfiles.Resolve(
@@ -408,6 +581,8 @@ local function forceWindowClimb(
         body:setBumpType("ClimbWindow")
     end
     state.forcedTraversalUntil = now + STALL_TIMEOUT_MS
+    state.forcedTraversalState = "climbwindow"
+    state.forcedTraversalAction = nil
     state.requestKey = nil
     beginMovementLease(
         body,
@@ -457,6 +632,12 @@ local function tryNativePassage(
         if state.fenceCooldownKey == key
             and now < (tonumber(state.fenceCooldownUntil) or 0)
         then
+            if state.owned == true and state.failed ~= true then
+                -- The vanilla state has already landed and is repathing. Do
+                -- not cancel that live request merely because the query can
+                -- still see the fence for one more frame.
+                return false, "native_fence_cooldown_path_owned"
+            end
             clearOwnedPath(body, state)
             return true, "native_fence_cooldown"
         end
@@ -529,4 +710,5 @@ end
 
 Controller.FinishPassageBump = finishPassageBump
 Controller.UpdateWindowSmash = updateWindowSmash
+Controller.UpdateVanillaFenceClimb = updateVanillaFenceClimb
 Controller.TryNativePassage = tryNativePassage

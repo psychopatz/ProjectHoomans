@@ -152,7 +152,7 @@ T.equal(record.inventory.items.rounds.stack, 1, "matching loose rounds consumed"
 local autonomous = {
     id = "hostile_firearm",
     recruited = false,
-    faction = "hostile",
+    tacticalClass = "hostile",
     equipment = { primaryFullType = "Base.TestPistol" },
     runtime = {},
     inventory = {

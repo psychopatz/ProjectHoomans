@@ -29,8 +29,8 @@ function Recruit.IsEligible(record)
     local tacticalClass = PNC.Types and PNC.Types.NormalizeTacticalClass
         and PNC.Types.NormalizeTacticalClass(record.tacticalClass)
         or tostring(record.tacticalClass or "")
-    return tacticalClass == Const.FACTION_NEUTRAL
-        or tacticalClass == Const.FACTION_HOSTILE
+    return tacticalClass == Const.TACTICAL_CLASS_NEUTRAL
+        or tacticalClass == Const.TACTICAL_CLASS_HOSTILE
 end
 
 -- Recruitment is an action requirement, not another relationship axis.  The
@@ -49,7 +49,7 @@ function Recruit.EvaluateConversation(record, relationship)
     local tacticalClass = PNC.Types and PNC.Types.NormalizeTacticalClass
         and PNC.Types.NormalizeTacticalClass(record.tacticalClass)
         or tostring(record.tacticalClass or "")
-    if tacticalClass == Const.FACTION_HOSTILE then
+    if tacticalClass == Const.TACTICAL_CLASS_HOSTILE then
         return { eligible = false, reason = "hostile_audience" }
     end
     local approval = tonumber(relationship.approval) or 0

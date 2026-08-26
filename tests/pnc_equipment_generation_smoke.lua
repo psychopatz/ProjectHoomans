@@ -154,7 +154,7 @@ local function makeRecord(id, seed, archetypeID, override)
         id = id,
         identitySeed = seed,
         archetypeID = archetypeID or "General",
-        faction = "hostile",
+        tacticalClass = "hostile",
         weaponMode = "mixed",
         equipmentSpawnMode = override,
         equipmentPoolID = "Default",
@@ -260,7 +260,7 @@ T.truthy(medical and (
 
 T.load(ROOT .. "Inventory/PNC_Inventory_Actions.lua")
 local interactionRecord = makeRecord("inventory_interaction", 5150)
-interactionRecord.faction = "colonist"
+interactionRecord.tacticalClass = "colonist"
 local interactionInventory = PNC.Inventory.CreateFromTemplate(interactionRecord)
 local added, addReason, addedIDs = PNC.Inventory.AddItems(interactionRecord, {
     {

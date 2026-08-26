@@ -573,7 +573,7 @@ function Model.BuildSandboxDefinition(blockID, context)
     local fakeEntry = {
         id = context.npcID,
         snapshot = {
-            faction = context.audiences.hostile and "hostile" or "neutral",
+            tacticalClass = context.audiences.hostile and "hostile" or "neutral",
         },
     }
     return {

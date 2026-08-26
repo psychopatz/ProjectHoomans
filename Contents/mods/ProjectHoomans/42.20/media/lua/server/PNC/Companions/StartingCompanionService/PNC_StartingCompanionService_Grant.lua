@@ -45,7 +45,7 @@ function H.EnsureOne(player, character, state, spec, index, at)
         record = PNC.API.Spawn({
             id = npcID,
             archetypeID = "General",
-            faction = PNC.Const.FACTION_NEUTRAL,
+            tacticalClass = PNC.Const.TACTICAL_CLASS_NEUTRAL,
             isFemale = isFemale,
             identitySeed = seed,
             identity = resolvedIdentity,

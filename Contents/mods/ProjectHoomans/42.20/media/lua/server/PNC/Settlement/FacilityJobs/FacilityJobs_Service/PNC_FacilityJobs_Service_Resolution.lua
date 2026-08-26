@@ -54,10 +54,8 @@ end
 
 H.BaseForRecord = function(record)
     local affiliation = record and record.affiliation or {}
-    local factionId = tostring(affiliation.factionID
-        or affiliation.factionId or record and record.factionId or "")
-    local colonyId = tostring(affiliation.communityID
-        or affiliation.communityId or record and record.communityId or "")
+    local factionId = tostring(affiliation.factionID or "")
+    local colonyId = tostring(affiliation.communityID or "")
     local id
     local base
     for id, base in pairs(Repository.State.bases or {}) do
@@ -70,4 +68,3 @@ H.BaseForRecord = function(record)
     end
     return nil
 end
-

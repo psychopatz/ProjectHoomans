@@ -96,7 +96,7 @@ local function npcSummary(record)
         alive = record.alive ~= false,
         factionID = identity and identity.factionID
             or affiliation and affiliation.factionID or nil,
-        tacticalClass = record.faction,
+        tacticalClass = record.tacticalClass,
         recruited = identity and identity.recruited
             or record.recruited == true,
         colonyOwned = identity and identity.colonyOwned or false,

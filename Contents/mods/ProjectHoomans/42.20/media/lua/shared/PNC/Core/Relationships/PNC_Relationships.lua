@@ -12,13 +12,13 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Types = PNC.Types
 
-local function factionOf(value)
-    return Types.NormalizeFaction(type(value) == "table" and value.faction or value)
+local function tacticalClassOf(value)
+    return Types.ResolveTacticalClass(value)
 end
 
 function Relationships.AreNPCsEnemies(source, target)
-    local sourceFaction
-    local targetFaction
+    local sourceTacticalClass
+    local targetTacticalClass
     local factions = PNC.Factions
     local sourceOrganization
     local targetOrganization
@@ -64,20 +64,20 @@ function Relationships.AreNPCsEnemies(source, target)
         return false
     end
     if sourceOrganization and not targetOrganization then
-        return factionOf(target) == Const.FACTION_HOSTILE
+        return tacticalClassOf(target) == Const.TACTICAL_CLASS_HOSTILE
     end
     if targetOrganization and not sourceOrganization then
-        return factionOf(source) == Const.FACTION_HOSTILE
+        return tacticalClassOf(source) == Const.TACTICAL_CLASS_HOSTILE
     end
-    sourceFaction = factionOf(source)
-    targetFaction = factionOf(target)
-    if sourceFaction == Const.FACTION_HOSTILE then
-        return targetFaction ~= Const.FACTION_HOSTILE
+    sourceTacticalClass = tacticalClassOf(source)
+    targetTacticalClass = tacticalClassOf(target)
+    if sourceTacticalClass == Const.TACTICAL_CLASS_HOSTILE then
+        return targetTacticalClass ~= Const.TACTICAL_CLASS_HOSTILE
     end
-    return targetFaction == Const.FACTION_HOSTILE
+    return targetTacticalClass == Const.TACTICAL_CLASS_HOSTILE
 end
 
-function Relationships.SetFaction(record, faction, reason)
+function Relationships.SetTacticalClass(record, tacticalClass, reason)
     local normalized
     local previous
     local OrderSystem
@@ -85,26 +85,26 @@ function Relationships.SetFaction(record, faction, reason)
     if not record or record.alive == false then
         return false, "invalid_record"
     end
-    normalized = Types.NormalizeFaction(faction)
-    previous = factionOf(record)
+    normalized = Types.NormalizeTacticalClass(tacticalClass)
+    previous = tacticalClassOf(record)
     if previous == normalized then
         return false, "unchanged"
     end
 
-    record.faction = normalized
+    record.tacticalClass = normalized
     record.hostility = Types.DefaultHostility(normalized)
     record.runtime = record.runtime or {}
     record.runtime.target = nil
     record.runtime.attackAction = nil
     record.runtime.lastPathX = nil
     record.runtime.lastPathY = nil
-    record.runtime.factionChangedReason = tostring(reason or "relationship")
-    record.runtime.factionChangedAt = Core.Now()
+    record.runtime.tacticalClassChangedReason = tostring(reason or "relationship")
+    record.runtime.tacticalClassChangedAt = Core.Now()
     record.nextThinkAt = Core.Now()
     record.activeJob = nil
     record.activeBehavior = nil
 
-    if normalized == Const.FACTION_HOSTILE then
+    if normalized == Const.TACTICAL_CLASS_HOSTILE then
         record.recruited = false
         record.ownerUsername = nil
         record.ownerOnlineID = nil
@@ -133,11 +133,11 @@ function Relationships.SetFaction(record, faction, reason)
 
     Registry = PNC.Registry
     if Registry and Registry.MarkDirty then
-        Registry.MarkDirty(record, "faction")
+        Registry.MarkDirty(record, "tacticalClass")
         Registry.MarkDirty(record, "hostility")
     end
     if Core and Core.LogInfo then
-        Core.LogInfo("PNC faction transition id=" .. tostring(record.id)
+        Core.LogInfo("PNC tactical class transition id=" .. tostring(record.id)
             .. " from=" .. tostring(previous)
             .. " to=" .. tostring(normalized)
             .. " reason=" .. tostring(reason or "relationship"))
@@ -146,10 +146,14 @@ function Relationships.SetFaction(record, faction, reason)
 end
 
 function Relationships.ProvokeNeutralByPlayer(record)
-    if factionOf(record) ~= Const.FACTION_NEUTRAL then
+    if tacticalClassOf(record) ~= Const.TACTICAL_CLASS_NEUTRAL then
         return false, "not_neutral"
     end
-    return Relationships.SetFaction(record, Const.FACTION_HOSTILE, "attacked_by_player")
+    return Relationships.SetTacticalClass(
+        record,
+        Const.TACTICAL_CLASS_HOSTILE,
+        "attacked_by_player"
+    )
 end
 
 return Relationships

@@ -64,7 +64,7 @@ function Director.GenerateForFaction(factionID, spec)
     for index = 1, count do
         local point = points[index]
         local record = PNC.API.Spawn({
-            faction = "neutral",
+            tacticalClass = "neutral",
             archetypeID = H.NPCArchetype(faction),
             x = point.x,
             y = point.y,

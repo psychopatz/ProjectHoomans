@@ -94,7 +94,7 @@ local function newNPC(id, tacticalClass)
         id = id,
         name = id,
         alive = true,
-        faction = tacticalClass or "neutral",
+        tacticalClass = tacticalClass or "neutral",
         hostility = {
             attackPlayers = tacticalClass == "hostile",
             attackNPCs = true,

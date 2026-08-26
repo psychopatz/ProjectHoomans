@@ -19,7 +19,7 @@ function View.DrawRosterItem(list, y, entry, alternate)
     local name = Layout.Ellipsize(item.name or item.id or "Unknown NPC", UIFont.Medium, math.max(40, list:getWidth() - 190))
     list:drawText(name, 11, y + 5, text.r, text.g, text.b, text.a, UIFont.Medium)
     local summary = string.format("%s  •  %s  •  HP %d/%d",
-        string.upper(tostring(item.faction or "?")),
+        string.upper(tostring(item.tacticalClass or "?")),
         tostring(item.bodyState or "unknown"),
         math.floor(tonumber(item.hpCurrent) or 0),
         math.floor(tonumber(item.hpMax) or 0))

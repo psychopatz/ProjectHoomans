@@ -107,7 +107,7 @@ function Network.BuildSnapshot(record)
                 since = record.generation.relationshipSince,
             } or nil,
         persist = record.persist ~= false,
-        faction = record.faction,
+        tacticalClass = record.tacticalClass,
         factionID = ownership.factionID,
         colonyOwned = ownership.colonyOwned,
         -- Tactical class remains separate from factionID. Replicate explicit

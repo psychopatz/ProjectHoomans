@@ -34,10 +34,10 @@ local function entryFacts(entry)
         and PNC.Const.PRESENCE_CORPSE
     local verifier = PNC.Identity
         and PNC.Identity.Verifier or nil
-    local faction = string.lower(tostring(firstValue(
-        entry.faction,
-        snapshot.faction,
-        record.faction,
+    local tacticalClass = string.lower(tostring(firstValue(
+        entry.tacticalClass,
+        snapshot.tacticalClass,
+        record.tacticalClass,
         "neutral"
     )))
     local colonist = verifier
@@ -66,11 +66,11 @@ local function entryFacts(entry)
         orderSpec.kind,
         ""
     )))
-    return faction, colonist, deathMarker, orderKind
+    return tacticalClass, colonist, deathMarker, orderKind
 end
 
 function Palette.ResolveType(entry)
-    local faction, colonist, deathMarker, orderKind = entryFacts(entry)
+    local tacticalClass, colonist, deathMarker, orderKind = entryFacts(entry)
     if deathMarker then
         return colonist and "deadColonist" or "dead"
     end
@@ -83,7 +83,7 @@ function Palette.ResolveType(entry)
         return "follower"
     end
     if colonist then return "colonist" end
-    if Palette.COLORS[faction] then return faction end
+    if Palette.COLORS[tacticalClass] then return tacticalClass end
     return "neutral"
 end
 

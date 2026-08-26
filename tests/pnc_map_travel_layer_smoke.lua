@@ -41,7 +41,7 @@ PNC = {
                 {
                     id = "idle",
                     name = "Idle NPC",
-                    faction = "neutral",
+                    tacticalClass = "neutral",
                     state = "live",
                     x = 10,
                     y = 20,
@@ -53,7 +53,7 @@ PNC = {
                 {
                     id = "colonist",
                     name = "Working Colonist",
-                    faction = "colonist",
+                    tacticalClass = "colonist",
                     recruited = true,
                     state = "live",
                     x = 30,
@@ -62,7 +62,7 @@ PNC = {
                 {
                     id = "moving",
                     name = "Moving Follower",
-                    faction = "colonist",
+                    tacticalClass = "colonist",
                     recruited = true,
                     orderKind = "follow",
                     state = "en_route",

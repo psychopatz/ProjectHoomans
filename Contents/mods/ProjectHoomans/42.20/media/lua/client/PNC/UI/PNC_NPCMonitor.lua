@@ -30,9 +30,9 @@ local function findDiagnostic(npcID)
 end
 
 local function markerStyle(item)
-    local faction = tostring(item and item.faction or "")
-    if faction == "hostile" then return "thief.png", { r = 1, g = 0.25, b = 0.2 } end
-    if faction == "neutral" then return "crew.png", { r = 0.95, g = 0.75, b = 0.2 } end
+    local tacticalClass = tostring(item and item.tacticalClass or "")
+    if tacticalClass == "hostile" then return "thief.png", { r = 1, g = 0.25, b = 0.2 } end
+    if tacticalClass == "neutral" then return "crew.png", { r = 0.95, g = 0.75, b = 0.2 } end
     return "friend.png", { r = 0.15, g = 0.85, b = 1 }
 end
 

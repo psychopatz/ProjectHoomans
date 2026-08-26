@@ -267,7 +267,7 @@ local entry = {
         survivor = { forename = "Morgan", surname = "Hale" },
         identitySeed = 42,
         isFemale = true,
-        faction = "neutral",
+        tacticalClass = "neutral",
         relationshipCategory = "Acquaintance",
         organizationalFaction = {
             id = "crossroads", name = "Crossroads Exchange",
@@ -482,7 +482,7 @@ local unknownDefinition = PNC.Conversation.BuildDefinition({
     snapshot = {
         displayName = "Hidden Name",
         survivor = { forename = "Hidden", surname = "Name" },
-        faction = "neutral",
+        tacticalClass = "neutral",
         relationshipCategory = "FirstMeet",
     },
 }, player, "dawn")
@@ -505,7 +505,7 @@ local dailyDefinition = PNC.Conversation.BuildDefinition({
     snapshot = {
         displayName = "Daily NPC",
         survivor = { forename = "Daily", surname = "NPC" },
-        faction = "neutral",
+        tacticalClass = "neutral",
         relationshipCategory = "Acquaintance",
     },
 }, player, "dawn")
@@ -698,7 +698,7 @@ PsychopatzCore.Conversation.instance = nil
 
 local hostile = PNC.Conversation.BuildDefinition({
     id = "hostile", name = "Hostile",
-    snapshot = { faction = "hostile", hostility = { attackPlayers = true } },
+    snapshot = { tacticalClass = "hostile", hostility = { attackPlayers = true } },
 }, {}, "twilight")
 T.equal(hostile.context.allowHostileParley, true, "hostile parley context")
 T.equal(hostile.nodes.greeting.choices[1].id, "ceasefire",
@@ -707,7 +707,7 @@ T.equal(hostile.nodes.greeting.choices[1].id, "ceasefire",
 local factionWarOnly = PNC.Conversation.BuildDefinition({
     id = "faction-war-only", name = "Faction War Only",
     snapshot = {
-        faction = "hostile",
+        tacticalClass = "hostile",
         hostility = { attackPlayers = false, attackNPCs = true },
     },
 }, {}, "twilight")
@@ -716,7 +716,7 @@ T.equal(factionWarOnly.context.allowHostileParley, false,
 
 local incompleteReplica = PNC.Conversation.BuildDefinition({
     id = "incomplete-replica", name = "Incomplete Replica",
-    snapshot = { faction = "hostile" },
+    snapshot = { tacticalClass = "hostile" },
 }, {}, "twilight")
 T.equal(incompleteReplica.context.allowHostileParley, false,
     "missing MP hostility data fails closed")

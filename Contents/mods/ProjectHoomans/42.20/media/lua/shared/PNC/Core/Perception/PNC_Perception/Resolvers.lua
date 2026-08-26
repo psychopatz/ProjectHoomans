@@ -59,7 +59,7 @@ function Perception.ResolveCompanionTarget(record)
     if owner then
         hostileToOwnerNPC = (not record.hostility or record.hostility.attackNPCs ~= false) and Perception.FindNearestEnemyNPC({
             id = record.id,
-            faction = record.faction,
+            tacticalClass = record.tacticalClass,
             x = owner:getX(),
             y = owner:getY(),
             z = owner:getZ(),
@@ -67,7 +67,7 @@ function Perception.ResolveCompanionTarget(record)
         }, defenseRadius)
         hostileToOwnerZombie = (not record.hostility or record.hostility.attackZombies ~= false) and Perception.FindBestEnemyZombie({
             id = record.id,
-            faction = record.faction,
+            tacticalClass = record.tacticalClass,
             x = owner:getX(),
             y = owner:getY(),
             z = owner:getZ(),

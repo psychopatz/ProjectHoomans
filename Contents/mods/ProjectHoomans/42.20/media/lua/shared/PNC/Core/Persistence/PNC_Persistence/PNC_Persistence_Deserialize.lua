@@ -13,6 +13,19 @@ local RelationshipTypes = PNC.RelationshipTypes
 local RelationshipMath = PNC.RelationshipMath
 local FactionTypes = PNC.FactionTypes
 
+local function migrateLegacyAffiliation(value)
+    if type(value) ~= "table" then return value end
+    if value.factionId == nil and value.communityId == nil then
+        return value
+    end
+    local output = Core.DeepCopy(value)
+    output.factionID = output.factionID or output.factionId
+    output.communityID = output.communityID or output.communityId
+    output.factionId = nil
+    output.communityId = nil
+    return output
+end
+
 local function buildDefinition(
     raw,
     fallbackID,
@@ -27,7 +40,12 @@ local function buildDefinition(
             or (identity and identity.displayName) or nil,
         name = raw.displayName or raw.name
             or (identity and identity.displayName) or nil,
-        tacticalClass = raw.tacticalClass,
+        -- Older saves serialized the NPC tactical class as `faction`.
+        -- NormalizeDefinition consumes this compatibility input and emits
+        -- only the canonical tacticalClass field on the runtime record.
+        tacticalClass = raw.tacticalClass ~= nil and raw.tacticalClass
+            or raw.faction ~= nil and raw.faction
+            or raw.role,
         visualProfile = raw.visualProfile,
         outfit = raw.outfit,
         isFemale = raw.isFemale == true
@@ -160,7 +178,9 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         record.archetypeID
     )
     record.affiliation = FactionTypes
-        and FactionTypes.NormalizeAffiliation(raw.affiliation)
+        and FactionTypes.NormalizeAffiliation(
+            migrateLegacyAffiliation(raw.affiliation)
+        )
         or nil
     record.persist = raw.persist ~= false
     record.generation = type(raw.generation) == "table"

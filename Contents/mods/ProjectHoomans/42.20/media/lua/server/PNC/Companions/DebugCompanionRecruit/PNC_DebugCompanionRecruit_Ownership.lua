@@ -21,7 +21,7 @@ function H.ForceFollow(record, player, reason)
     local onlineID = player and player.getOnlineID
         and player:getOnlineID() or nil
     record.recruited = true
-    record.faction = Const.FACTION_COLONIST
+    record.tacticalClass = Const.TACTICAL_CLASS_COLONIST
     record.ownerUsername = username
     record.ownerOnlineID = onlineID
     record.runtime = record.runtime or {}
@@ -45,7 +45,7 @@ end
 
 function H.PreserveOwnedState(record, player, reason)
     record.recruited = true
-    record.faction = Const.FACTION_COLONIST
+    record.tacticalClass = Const.TACTICAL_CLASS_COLONIST
     if not record.ownerUsername and player and player.getUsername then
         record.ownerUsername = player:getUsername()
     end
@@ -58,4 +58,3 @@ function H.PreserveOwnedState(record, player, reason)
 end
 
 return Recruit
-

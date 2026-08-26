@@ -198,8 +198,8 @@ Mutation APIs are:
 
 These mutations are exposed through `PNC.Relationships.Personal.Commands`.
 The original direct methods on `PNC.Relationships` remain compatibility aliases
-for existing integrations. Shared tactical/faction helpers such as
-`AreNPCsEnemies`, `SetFaction`, and `ProvokeNeutralByPlayer` deliberately remain
+for existing integrations. Shared tactical/organizational helpers such as
+`AreNPCsEnemies`, `SetTacticalClass`, and `ProvokeNeutralByPlayer` deliberately remain
 outside `Personal`; they do not operate on the directed persisted relationship
 record.
 

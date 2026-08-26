@@ -155,7 +155,7 @@ local function newRecord(id)
     local record = PNC.Types.NewRecord({
         id = id,
         displayName = id,
-        faction = "neutral",
+        tacticalClass = "neutral",
         x = 0,
         y = 0,
         z = 0,

@@ -467,7 +467,7 @@ T.equal(Service.GetEntityKey(loadedAlice),
 local npc = PNC.Types.NewRecord({
     id = "npc_identity_memory",
     displayName = "Identity Memory NPC",
-    faction = "neutral",
+    tacticalClass = "neutral",
     identity = { seed = 1, survivor = {} },
 })
 PNC.Registry.Data[npc.id] = npc
@@ -601,7 +601,7 @@ T.truthy(simpleEqual(
 local socialTarget = PNC.Types.NewRecord({
     id = "npc_identity_social",
     displayName = "Social Target",
-    faction = "neutral",
+    tacticalClass = "neutral",
     identity = { seed = 1, survivor = {} },
 })
 PNC.Registry.Data[socialTarget.id] = socialTarget
@@ -634,7 +634,7 @@ T.equal(PNC.SocialEventHooks.OnTreatmentCompleted(
 local npcActor = PNC.Types.NewRecord({
     id = "npc_identity_actor",
     displayName = "NPC Actor",
-    faction = "neutral",
+    tacticalClass = "neutral",
     identity = { seed = 1, survivor = {} },
 })
 PNC.Registry.Data[npcActor.id] = npcActor

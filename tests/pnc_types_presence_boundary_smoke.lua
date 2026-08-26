@@ -4,12 +4,13 @@ local source = T.read("ProjectHoomans", "shared", "PNC/Core/Base/PNC_Types.lua")
 local prefix = "PNC/Core/Base/PNC_Types/"
 local providers = {
     "PNC_Types_Normalization",
-    "PNC_Types_Factions",
+    "PNC_Types_TacticalClasses",
     "PNC_Types_Definition",
     "PNC_Types_Record",
 }
 local publicFunctions = {
-    "NormalizeAttackType", "NormalizeFaction", "IsColonist",
+    "NormalizeAttackType", "NormalizeTacticalClass",
+    "ResolveTacticalClass", "IsColonist",
     "DefaultHostility", "NormalizeHostility", "NormalizeDefinition",
     "NewRecord",
 }

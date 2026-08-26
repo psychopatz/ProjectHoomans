@@ -163,7 +163,7 @@ PNC = {
             return "player:" .. account .. ":" .. uuid
         end,
     },
-    Const = { FACTION_NEUTRAL = "neutral" },
+    Const = { TACTICAL_CLASS_NEUTRAL = "neutral" },
     Core = { Now = function() return 1000 end, LogInfo = function() end },
 }
 

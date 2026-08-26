@@ -17,7 +17,7 @@ local function companion(id, owner, x)
     return {
         id = id,
         alive = true,
-        faction = "colonist",
+        tacticalClass = "colonist",
         recruited = true,
         ownerUsername = owner,
         ownerOnlineID = owner == "alice" and 7 or 8,
@@ -40,12 +40,12 @@ records.far = companion("far", "alice", 40)
 records.abstract = companion("abstract", "alice", 2)
 records.abstract.presenceState = "abstract"
 records.neutral = companion("neutral", "alice", 2)
-records.neutral.faction = "neutral"
+records.neutral.tacticalClass = "neutral"
 records.neutral.recruited = false
 
 PNC = {
     Const = {
-        FACTION_COLONIST = "colonist",
+        TACTICAL_CLASS_COLONIST = "colonist",
         PRESENCE_LIVE = "live",
         ORDER_FOLLOW = "follow",
         ORDER_GUARD = "guard",
@@ -437,7 +437,7 @@ T.load(CLIENT_ROOT
 local ownedSnapshot = {
     id = "client_owned",
     alive = true,
-    faction = "colonist",
+    tacticalClass = "colonist",
     recruited = true,
     presenceState = "live",
     x = 1,
@@ -616,7 +616,7 @@ PNC.Network.ClientState.snapshots.roster_owned = {
     id = "roster_owned",
     displayName = "Roster Companion",
     alive = true,
-    faction = "colonist",
+    tacticalClass = "colonist",
     recruited = true,
     presenceState = "live",
     x = 0.5,

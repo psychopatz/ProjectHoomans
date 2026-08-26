@@ -89,7 +89,7 @@ PNC = {
 local record = {
     id = "npc_manual",
     alive = true,
-    factionId = "faction",
+    affiliation = { factionID = "faction" },
     x = 10, y = 12, z = 0,
     orderSpec = { kind = "follow", ownerUsername = "alice" },
     runtime = {},

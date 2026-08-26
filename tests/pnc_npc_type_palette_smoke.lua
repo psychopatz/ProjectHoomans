@@ -11,21 +11,21 @@ PNC = {
 T.load(FILE)
 
 local Palette = PNC.NPCTypePalette
-T.equal(Palette.ResolveType({ faction = "neutral" }), "neutral",
+T.equal(Palette.ResolveType({ tacticalClass = "neutral" }), "neutral",
     "neutral type")
-T.equal(Palette.ResolveType({ faction = "hostile" }), "hostile",
+T.equal(Palette.ResolveType({ tacticalClass = "hostile" }), "hostile",
     "hostile type")
 T.equal(Palette.ResolveType({
     record = {
         recruited = true,
-        faction = "colonist",
+        tacticalClass = "colonist",
         orderSpec = { kind = "follow" },
     },
 }), "follower", "nested follower type")
 T.equal(Palette.ResolveType({
     snapshot = {
         recruited = true,
-        faction = "colonist",
+        tacticalClass = "colonist",
     },
 }), "colonist", "snapshot colonist type")
 T.equal(Palette.ResolveType({
@@ -34,8 +34,8 @@ T.equal(Palette.ResolveType({
     colonist = true,
 }), "deadColonist", "dead colonist type")
 
-local hostile = Palette.Resolve({ faction = "hostile" })
-local theme = Palette.BuildConversationTheme({ faction = "hostile" })
+local hostile = Palette.Resolve({ tacticalClass = "hostile" })
+local theme = Palette.BuildConversationTheme({ tacticalClass = "hostile" })
 T.equal(hostile.r, 1, "map hostile red")
 T.equal(theme.accent.r, hostile.r, "conversation uses map red")
 T.equal(theme.accent.g, hostile.g, "conversation uses map green")

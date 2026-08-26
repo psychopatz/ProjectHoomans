@@ -78,7 +78,7 @@ local function captureRecord(entry)
     return {
         id = entry.id,
         name = entry.name,
-        faction = tostring(record and record.faction or "unknown"),
+        tacticalClass = tostring(record and record.tacticalClass or "unknown"),
         presence = tostring(record and record.presenceState or "unknown"),
         inventoryItems = countMap(inventory and inventory.items),
         wornItems = countMap(inventory and inventory.worn),
@@ -122,7 +122,7 @@ function Content.Scan(options)
         output.roster[#output.roster + 1] = {
             id = entry.id,
             name = entry.name,
-            faction = tostring(record and record.faction or "unknown"),
+            tacticalClass = tostring(record and record.tacticalClass or "unknown"),
             presence = tostring(record and record.presenceState or "unknown"),
             inventoryItems = countMap(inventory and inventory.items),
             wornItems = countMap(inventory and inventory.worn),

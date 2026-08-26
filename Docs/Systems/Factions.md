@@ -9,7 +9,7 @@ It deliberately separates four concepts:
 - a faction archetype describes what kind of organization it is;
 - a faction record identifies one persistent organization;
 - `record.affiliation` stores an NPC's organization, role, rank, and status;
-- `record.faction` is the NPC tactical behavior class.
+- `record.tacticalClass` is the NPC tactical behavior class.
 
 `record.affiliation.factionID` is canonical membership. Assigning an NPC to a
 looter organization removes player ownership. Roaming looter organizations

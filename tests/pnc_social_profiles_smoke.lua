@@ -382,7 +382,7 @@ validatePersistedValue(serialized.social)
 local oldNPC = PNC.Persistence.DeserializeRecord({
     schemaVersion = 11,
     id = "npc_old_profile",
-    faction = "neutral",
+    tacticalClass = "neutral",
     identity = {
         seed = 700,
         archetypeID = "General",

@@ -9,7 +9,7 @@ PNC = {
     Core = { Now = function() return 70000 end },
     Registry = { Get = function(id)
         return id == "npc-2" and { id = id, name = "Riley",
-            communityId = "colony-1" } or nil
+            affiliation = { communityID = "colony-1" } } or nil
     end },
     TaskLeaseService = { ByID = {
         lease = { leaseId = "lease", taskId = "need:npc-2:sleep",

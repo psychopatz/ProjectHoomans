@@ -84,7 +84,7 @@ function Support.PopulateDetails(list, item, authorized, audit)
     local bite = item.bite or {}
     addDetail(list, "Name", item.name)
     addDetail(list, "UUID", item.id)
-    addDetail(list, "Faction", item.faction)
+    addDetail(list, "Tactical class", item.tacticalClass)
     addDetail(list, "Presence", tostring(item.presenceState or "-") .. " / " .. tostring(item.phase or "-"), Support.PresenceColor(item))
     addDetail(list, "Body", tostring(item.bodyState or "-") .. " / corpse " .. tostring(item.corpseState or "-"))
     if item.deathMarker == true then

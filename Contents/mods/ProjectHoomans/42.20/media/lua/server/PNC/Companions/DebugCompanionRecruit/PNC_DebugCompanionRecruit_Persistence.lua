@@ -22,14 +22,8 @@ function H.SynchronizeRecordMembership(record, faction, community)
             ~= tostring(faction.id or "")
         or tostring(record.affiliation.communityID or "")
             ~= tostring(community.id or "")
-        or tostring(record.factionId or "") ~= tostring(faction.id or "")
-        or tostring(record.communityId or "") ~= tostring(community.id or "")
     record.affiliation.factionID = faction.id
-    record.affiliation.factionId = faction.id
     record.affiliation.communityID = community.id
-    record.affiliation.communityId = community.id
-    record.factionId = faction.id
-    record.communityId = community.id
     if changed and Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "canonical_membership_sync")
     end
@@ -55,4 +49,3 @@ end
 -- caller; this function owns the cross-store faction/community transaction.
 
 return Recruit
-

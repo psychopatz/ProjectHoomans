@@ -100,12 +100,18 @@ local function isRangedWeapon(weapon)
 end
 
 function PlayerDamage.CanDamageRecord(record, attacker)
-    local faction
+    local tacticalClass
     if not record or record.alive == false then
         return false
     end
-    faction = Types and Types.NormalizeFaction and Types.NormalizeFaction(record.faction) or tostring(record.faction or "colonist")
-    if faction ~= (Const.FACTION_COLONIST or "colonist") then
+    if Types and Types.ResolveTacticalClass then
+        tacticalClass = Types.ResolveTacticalClass(record)
+    elseif Types and Types.NormalizeTacticalClass then
+        tacticalClass = Types.NormalizeTacticalClass(record and record.tacticalClass)
+    else
+        tacticalClass = tostring(record and record.tacticalClass or "colonist")
+    end
+    if tacticalClass ~= (Const.TACTICAL_CLASS_COLONIST or "colonist") then
         return true
     end
     local organizationID = PNC.Factions

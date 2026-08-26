@@ -50,7 +50,7 @@ function H.SpawnCommunityMembers(
     for index = 1, count do
         local point = points[index]
         local record = PNC.API.Spawn({
-            faction = "neutral",
+            tacticalClass = "neutral",
             archetypeID = H.NPCArchetype(
                 faction.archetypeID
             ),

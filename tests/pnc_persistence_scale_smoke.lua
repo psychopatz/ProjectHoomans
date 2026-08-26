@@ -65,7 +65,7 @@ PNC.Types = {
         local record = {
             id = tostring(definition.id),
             name = definition.displayName or definition.name,
-            faction = definition.faction or "neutral",
+            tacticalClass = definition.tacticalClass or "neutral",
             x = definition.x or 0,
             y = definition.y or 0,
             z = definition.z or 0,
@@ -138,7 +138,7 @@ for npcIndex = 1, 100 do
             survivor = {},
         },
         archetypeID = "Test",
-        faction = "neutral",
+        tacticalClass = "neutral",
         x = npcIndex,
         y = npcIndex * 2,
         z = 0,

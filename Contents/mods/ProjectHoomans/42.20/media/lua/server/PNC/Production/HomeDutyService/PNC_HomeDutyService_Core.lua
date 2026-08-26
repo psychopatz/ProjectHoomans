@@ -6,8 +6,7 @@ local H = Service.Internal
 
 function H.ColonyId(record)
     local affiliation = record and record.affiliation or {}
-    return tostring(affiliation.communityID or affiliation.communityId
-        or record and record.communityId or "")
+    return tostring(affiliation.communityID or "")
 end
 
 function H.BaseFor(record, baseId)
@@ -121,4 +120,3 @@ function Service.GetHomePoint(record, baseId)
 end
 
 return Service
-

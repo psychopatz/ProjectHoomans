@@ -68,9 +68,11 @@ T.load(SHARED .. "Factions/PNC_FactionIntent.lua")
 T.load(SHARED .. "Factions/PNC_FactionTypes.lua")
 
 PNC.Types = {
-    NormalizeFaction = function(value)
+    NormalizeTacticalClass = function(value)
         value = tostring(value or "neutral")
-        if value == "colonist" or value == "hostile" then
+        if value == "colonist" or value == "neutral"
+            or value == "hostile"
+        then
             return value
         end
         return "neutral"
@@ -92,6 +94,12 @@ PNC.Types = {
         }
     end,
 }
+PNC.Types.ResolveTacticalClass = function(value)
+    if type(value) == "table" then
+        value = value.tacticalClass or value.faction
+    end
+    return PNC.Types.NormalizeTacticalClass(value)
+end
 
 local dirty = {}
 PNC.Registry = { Data = {} }
@@ -184,7 +192,7 @@ local function npc(id)
         id = id,
         name = id,
         alive = true,
-        faction = "colonist",
+        tacticalClass = "colonist",
         recruited = true,
         ownerUsername = "Patrick",
         ownerOnlineID = 7,
@@ -300,7 +308,7 @@ T.truthy(Factions.AddNPC(
     looterNPC.id,
     { joinedAt = hour }
 ), "assign looter")
-T.equal(looterNPC.faction, "hostile", "looter tactical class")
+T.equal(looterNPC.tacticalClass, "hostile", "looter tactical class")
 T.equal(looterNPC.recruited, false, "looter not companion")
 T.equal(looterNPC.ownerUsername, nil, "looter owner cleared")
 T.equal(looterNPC.hostility.attackPlayers, true,
@@ -336,7 +344,7 @@ T.truthy(Factions.AddNPC(
     tollLooterNPC.id,
     { joinedAt = hour }
 ), "assign territorial toll looter")
-T.equal(tollLooterNPC.faction, "neutral",
+T.equal(tollLooterNPC.tacticalClass, "neutral",
     "toll settlement does not start shoot-on-sight")
 T.equal(Factions.CanNPCTargetPlayer(tollLooterNPC, player),
     false, "toll settlement awaits escalation")
@@ -394,7 +402,7 @@ T.truthy(Factions.AddNPC(
     playerNPC.id,
     { joinedAt = hour }
 ), "assign player faction NPC")
-T.equal(playerNPC.faction, "colonist",
+T.equal(playerNPC.tacticalClass, "colonist",
     "player member tactical class")
 T.equal(playerNPC.recruited, true,
     "player member companion")
@@ -429,7 +437,7 @@ T.truthy(Factions.AddNPC(
     traderNPC.id,
     { joinedAt = hour }
 ), "assign trader")
-T.equal(traderNPC.faction, "neutral",
+T.equal(traderNPC.tacticalClass, "neutral",
     "trader initially neutral")
 T.equal(traderNPC.recruited, false,
     "trader not companion")
@@ -443,7 +451,7 @@ T.truthy(Factions.AddNPC(
     settlerNPC.id,
     { joinedAt = hour }
 ), "assign peaceful settler")
-T.equal(settlerNPC.faction, "neutral",
+T.equal(settlerNPC.tacticalClass, "neutral",
     "settler is not colored hostile without war")
 T.equal(settlerNPC.hostility.attackPlayers, false,
     "settler does not attack neutral outsider")
@@ -469,7 +477,7 @@ T.truthy(Factions.AreAtWar(
     traderFaction.id,
     playerFaction.id
 ), "reverse war")
-T.equal(traderNPC.faction, "hostile",
+T.equal(traderNPC.tacticalClass, "hostile",
     "war activates aggressive behavior")
 T.equal(traderNPC.hostility.attackPlayers, true,
     "war attacks enemy player faction")
@@ -495,7 +503,7 @@ T.truthy(Factions.TransferNPC(
     traderFaction.id,
     { worldAgeHours = hour }
 ), "transfer companion into active enemy faction")
-T.equal(transferredNPC.faction, "hostile",
+T.equal(transferredNPC.tacticalClass, "hostile",
     "transferred member tactical class")
 T.equal(transferredNPC.recruited, false,
     "transferred member no longer companion")
@@ -528,7 +536,7 @@ T.truthy(Factions.MakePeace(
         reason = "manual_debug",
     }
 ), "make peace")
-T.equal(traderNPC.faction, "neutral",
+T.equal(traderNPC.tacticalClass, "neutral",
     "peace restores neutral behavior")
 T.equal(Factions.CanNPCTargetPlayer(traderNPC, player),
     false, "peace stops player targeting")
@@ -672,7 +680,7 @@ T.equal(Factions.AreAtWar(
 ), false, "archive ends active war")
 T.equal(traderNPC.affiliation.factionID, nil,
     "archive removes membership")
-T.equal(traderNPC.faction, "neutral",
+T.equal(traderNPC.tacticalClass, "neutral",
     "archived member becomes neutral")
 T.equal(looterNPC.presenceRevision, 9,
     "looter behavior leaves presence revision")
@@ -735,7 +743,7 @@ T.equal(Factions.ReconcileTerritorialLooterFactions(), 1,
 T.truthy(Factions.IsTerritorialTollFaction(
     looterFaction.id
 ), "legacy looter settlement receives toll tag")
-T.equal(looterNPC.faction, "neutral",
+T.equal(looterNPC.tacticalClass, "neutral",
     "legacy looter base stops shoot-on-sight behavior")
 
 -- V2 diplomacy migrates to directed relations, emblems, and V6
@@ -843,7 +851,7 @@ T.equal(Factions.Registry.byPlayerKey[memberKey], nil,
     "last dead player faction index removed")
 T.equal(playerNPC.affiliation.factionID, playerFaction.id,
     "surviving NPC remains with refugee faction")
-T.equal(playerNPC.faction, "neutral",
+T.equal(playerNPC.tacticalClass, "neutral",
     "former companion becomes neutral refugee")
 T.equal(playerNPC.recruited, false,
     "former companion is no longer recruited")

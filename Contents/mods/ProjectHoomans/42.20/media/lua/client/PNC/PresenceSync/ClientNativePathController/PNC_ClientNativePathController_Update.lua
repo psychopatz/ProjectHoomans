@@ -18,6 +18,7 @@ local ensureState = Controller.EnsureState
 local buildGoal = Controller.BuildGoal
 local clearOwnedPath = Controller.ClearOwnedPath
 local updateWindowSmash = Controller.UpdateWindowSmash
+local updateVanillaFenceClimb = Controller.UpdateVanillaFenceClimb
 local requestKey = Controller.RequestKey
 local beginMovementLease = Controller.BeginMovementLease
 local tryNativePassage = Controller.TryNativePassage
@@ -96,23 +97,41 @@ function Internal.UpdateNativePathController(
 
     local key = requestKey(snapshot, goal)
     if state.forcedTraversalUntil then
+        if state.forcedTraversalState == "climbfence"
+            and updateVanillaFenceClimb
+        then
+            local fenceHandled
+            local fenceState
+            fenceHandled, fenceState = updateVanillaFenceClimb(
+                body, state, now
+            )
+            if fenceHandled then
+                return true, fenceState
+            end
+        end
+        local forcedState = state.forcedTraversalState
+            or "climbwindow"
         local actionState = body.getActionStateName
             and string.lower(tostring(
                 body:getActionStateName() or ""
             )) or ""
-        if actionState == "climbwindow"
+        if actionState == forcedState
             and now < state.forcedTraversalUntil
         then
             beginMovementLease(body, state, key, now)
-            return true, "native_window_climb"
+            return true, forcedState == "climbwindow"
+                and "native_window_climb"
+                or "native_traversal"
         end
-        if actionState == "climbwindow"
+        if actionState == forcedState
             and LiveBodyControl
             and LiveBodyControl.SuppressZombieState
         then
             LiveBodyControl.SuppressZombieState(body, state, now)
         end
         state.forcedTraversalUntil = nil
+        state.forcedTraversalState = nil
+        state.forcedTraversalAction = nil
         state.requestKey = nil
         state.failed = true
         state.retryAt = now + RETRY_BASE_MS
@@ -207,4 +226,3 @@ function Internal.UpdateNativePathController(
     end
     return true, "native_path_moving"
 end
-

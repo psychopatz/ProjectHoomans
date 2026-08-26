@@ -118,7 +118,7 @@ T.truthy(portraitTarget == spec, "map portrait card changed its target spec")
 card:setContext({
     id = "npc_card",
     name = "Dion Amaya",
-    faction = "colonist",
+    tacticalClass = "colonist",
     roleTag = "farmer",
     organizationalFaction = {
         id = "colonist",
@@ -142,7 +142,7 @@ T.truthy(card.factionIcon == "faction_texture"
 card:setContext({
     id = "npc_card",
     name = "Dion Amaya",
-    faction = "neutral",
+    tacticalClass = "neutral",
     roleTag = "farmer",
     organizationalFaction = {
         name = "Ashwood Haven",
