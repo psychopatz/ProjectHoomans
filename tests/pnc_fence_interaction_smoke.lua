@@ -44,6 +44,7 @@ instanceof = function() return false end
 
 local capturedSpec
 local notedKind
+local invalidationCount = 0
 PNC = {
     TraversalQuery = {
         GetPassageBetween = function() return fence end,
@@ -72,6 +73,11 @@ PNC = {
     LiveBodyControl = {
         IsMultiplayer = function() return false end,
         SetManagedBodyUseless = function() return false end,
+    },
+    EnginePathPlanner = {
+        Invalidate = function()
+            invalidationCount = invalidationCount + 1
+        end,
     },
 }
 
@@ -137,7 +143,33 @@ local lane = {
 T.load("ProjectHoomans", "shared",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Interactions.lua")
 
-local handled, reason = Internal.tryDoorOrWindowInteraction(
+-- A goal-directed fence probe must not be enough to start a hop.  The lane
+-- has to carry the actor's own failed fence step; otherwise a nearby NPC can
+-- inherit a fence candidate while merely being stalled or pathing alongside
+-- it.
+PNC.TraversalQuery.FindFenceAhead = function()
+    return {
+        object = fence,
+        tall = fenceTall,
+        square = fromSquare,
+        fromSquare = fromSquare,
+        landingSquare = toSquare,
+        dirX = 1,
+        dirY = 0,
+    }
+end
+local unblockedLane = { goalRevision = 3 }
+capturedSpec = nil
+local handled, reason
+handled, reason = Internal.tryDoorOrWindowInteraction(
+    zombie, { id = "unblocked-fence-test" }, unblockedLane, 3.5, 0.5, 0
+)
+T.falsy(handled, "goal-directed fence probe started a hop without a bump")
+T.falsy(capturedSpec,
+    "unblocked fence probe created a traversal action")
+PNC.TraversalQuery.FindFenceAhead = nil
+
+handled, reason = Internal.tryDoorOrWindowInteraction(
     zombie, { id = "fence-test" }, lane, 3.5, 0.5, 0
 )
 T.truthy(handled, "blocked fence interaction was not handled")
@@ -153,6 +185,8 @@ T.equal(capturedSpec.transitionSettleMs, 0,
 T.equal(capturedSpec.toX, 1.5, "small fence landing x")
 T.equal(capturedSpec.toY, 0.5, "small fence landing y")
 T.equal(notedKind, "fence_climb", "fence attempt tracking")
+T.equal(invalidationCount, 1,
+    "small fence did not invalidate the native path handoff")
 
 -- Tall fences retain the same custom transfer action.
 fenceTall = true
@@ -176,6 +210,8 @@ T.equal(reason, "fence_climb", "tall fence interaction reason")
 T.equal(capturedSpec.kind, "fence_climb", "tall fence action kind")
 T.equal(capturedSpec.toX, 1.5, "tall fence landing x")
 T.equal(capturedSpec.toSquare, toSquare, "tall fence landing square")
+T.equal(invalidationCount, 2,
+    "tall fence did not invalidate the native path handoff")
 
 T.truthy(Internal.shouldSuppressSpecialAction(
     lane, lane.lastSpecialActionKey, 1499

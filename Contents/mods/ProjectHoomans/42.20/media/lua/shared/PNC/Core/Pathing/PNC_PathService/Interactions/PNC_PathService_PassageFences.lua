@@ -75,7 +75,14 @@ end
 local function resolveFence(context)
     local blockedFence
     local blockedFenceTall
-    if context.blockedFromSquare and context.blockedSquare
+    -- blockedFromSquare/blockedSquare can also be populated by the
+    -- goal-directed passage probe.  That probe is only a candidate, not a
+    -- collision report.  Treat the edge as exact only when the movement
+    -- lane recorded the failed step itself.
+    local hasBlockedStep = context.lane
+        and context.lane.blockedStepToX ~= nil
+    if hasBlockedStep
+        and context.blockedFromSquare and context.blockedSquare
         and TraversalQuery and TraversalQuery.GetFenceBetween
     then
         blockedFence, blockedFenceTall = TraversalQuery.GetFenceBetween(
@@ -202,6 +209,19 @@ local function beginFenceAction(
         ) or {}
     local duration = tonumber(profile.travelDurationMs)
         or (fence.tall == true and 900 or 600)
+    -- The scripted traversal becomes the movement owner at this point. A
+    -- native engine route may still have path2 attached when this branch was
+    -- reached through a stall/recovery callback; invalidate that route
+    -- before the bump starts so WalkTowardState cannot keep consuming it.
+    if PNC.EnginePathPlanner
+        and PNC.EnginePathPlanner.Invalidate
+    then
+        PNC.EnginePathPlanner.Invalidate(
+            context.record,
+            "fence_traversal_handoff",
+            context.zombie
+        )
+    end
     local started = Internal.beginTraversalAction
         and Internal.beginTraversalAction(
             context.zombie,
@@ -374,6 +394,14 @@ function Internal.tryFencePassage(context)
     local fence, exactBlockedEdge = resolveFence(context)
     if not fence or not fence.landingSquare then
         return nil, nil, false
+    end
+    if not exactBlockedEdge then
+        Internal.logTraversalReject(
+            context.record, context.zombie, context.lane,
+            "traversal_rejected", "fence_not_bumped",
+            "object=" .. Internal.describeSquare(fence.square)
+        )
+        return false, nil, true
     end
     local fromSquare = resolveFromSquare(context, fence)
     local landingX
