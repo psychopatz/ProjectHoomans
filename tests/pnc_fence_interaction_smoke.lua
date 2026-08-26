@@ -142,24 +142,17 @@ local handled, reason = Internal.tryDoorOrWindowInteraction(
 )
 T.truthy(handled, "blocked fence interaction was not handled")
 T.equal(reason, "fence_climb", "blocked fence interaction reason")
-T.equal(climbDirection, IsoDirections.E, "small fence direction")
-T.equal(capturedSpec, nil, "small fence created a scripted action")
-T.truthy(lane.vanillaFenceAction,
-    "small fence did not create a vanilla state lease")
+T.equal(capturedSpec.kind, "fence_climb", "small fence action kind")
+T.equal(capturedSpec.anim, "FenceLow", "small fence profile animation")
+T.equal(capturedSpec.startAnim, "FenceStart",
+    "small fence start animation")
+T.equal(capturedSpec.endAnim, "FenceEnd",
+    "small fence end animation")
+T.equal(capturedSpec.toX, 1.5, "small fence landing x")
+T.equal(capturedSpec.toY, 0.5, "small fence landing y")
 T.equal(notedKind, "fence_climb", "fence attempt tracking")
 
-zombieX = 1.5
-actionState = "pathfind"
-handled, reason = Internal.updateVanillaFenceAction(
-    zombie, { id = "fence-test" }, lane, 1300
-)
-T.truthy(handled, "small fence landing was not completed")
-T.equal(reason, "fence_vanilla_crossed",
-    "small fence landing completion reason")
-T.equal(lane.vanillaFenceAction, nil,
-    "small fence vanilla lease did not clear")
-
--- Tall fences retain the custom transfer action.
+-- Tall fences retain the same custom transfer action.
 fenceTall = true
 zombieX = 0.5
 actionState = "pathfind"

@@ -16,36 +16,6 @@ local function actionStateName(zombie)
     return string.lower(tostring(zombie:getActionStateName() or ""))
 end
 
-local function bodyCollided(zombie)
-    if not zombie then return false end
-    local methods = {
-        "isCollidedWithDoor",
-        "isCollidedThisFrame",
-        "isCollided",
-    }
-    local index
-    local method
-    for index = 1, #methods do
-        method = zombie[methods[index]]
-        if type(method) == "function" and method(zombie) == true then
-            return true
-        end
-    end
-    return false
-end
-
-local function prepareFenceFacing(zombie, object)
-    if not zombie or not object then return false end
-    if zombie.isFacingObject
-        and zombie:isFacingObject(object, 0.5) ~= true
-    then
-        if zombie.faceThisObject then zombie:faceThisObject(object) end
-        return false
-    end
-    if zombie.faceThisObject then zombie:faceThisObject(object) end
-    return true
-end
-
 local function fenceDirection(fromSquare, landingSquare)
     local dx = landingSquare and fromSquare
         and landingSquare:getX() - fromSquare:getX() or 0
@@ -60,11 +30,18 @@ local function fenceDirection(fromSquare, landingSquare)
 end
 
 local function enterVanillaFenceState(zombie, direction)
-    if not zombie then return false end
-    if zombie.setVariable then zombie:setVariable("PNCActor", true) end
-    if actionStateName(zombie) == "climbfence" then return true end
+    local result
+    if zombie and zombie.climbOverFence then
+        result = zombie:climbOverFence(direction)
+        if result ~= false
+            and actionStateName(zombie) == "climbfence"
+        then
+            return true
+        end
+    end
     if ClimbOverFenceState
         and ClimbOverFenceState.instance
+        and zombie
         and zombie.changeState
     then
         local climbState = ClimbOverFenceState.instance()
@@ -74,11 +51,7 @@ local function enterVanillaFenceState(zombie, direction)
             return true
         end
     end
-    if zombie.climbOverFence then
-        local result = zombie:climbOverFence(direction)
-        return result ~= false
-    end
-    return false
+    return result ~= false and zombie ~= nil
 end
 
 local function fenceCrossed(zombie, action)
@@ -145,8 +118,7 @@ local function rejectFence(
     context, fence, exactBlockedEdge, fromSquare,
     landingX, landingY, fenceKey
 )
-    if fence.tall == true
-        and TraversalQuery and TraversalQuery.IsFenceApproachReady
+    if TraversalQuery and TraversalQuery.IsFenceApproachReady
         and not TraversalQuery.IsFenceApproachReady(
             context.fromX,
             context.fromY,
@@ -270,21 +242,9 @@ local function beginFenceAction(
 end
 
 local function beginVanillaFenceAction(
-    context, fence, fromSquare, landingX, landingY, landingZ, fenceKey,
-    exactBlockedEdge
+    context, fence, fromSquare, landingX, landingY, landingZ, fenceKey
 )
     local direction
-    -- A forward-looking passage query must not preempt the engine. An exact
-    -- blocked edge or a real collision is the handoff point, matching
-    -- Bandits' collision-driven ManageCollisions path.
-    if not exactBlockedEdge
-        and not bodyCollided(context.zombie)
-    then
-        return false
-    end
-    if not prepareFenceFacing(context.zombie, fence.object) then
-        return false
-    end
     if LiveBodyControl
         and LiveBodyControl.IsMultiplayer
         and LiveBodyControl.IsMultiplayer()
@@ -448,24 +408,6 @@ function Internal.tryFencePassage(context)
         fenceKey
     ) then
         return false, nil, true
-    end
-    if fence.tall ~= true then
-        if not beginVanillaFenceAction(
-            context,
-            fence,
-            fromSquare,
-            landingX,
-            landingY,
-            landingZ,
-            fenceKey,
-            exactBlockedEdge
-        ) then
-            return false, nil, true
-        end
-        recordFenceAction(
-            context, fence, fenceKey, landingX, landingY, landingZ
-        )
-        return true, "fence_climb", true
     end
     if not beginFenceAction(
         context,
