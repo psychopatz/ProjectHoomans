@@ -40,5 +40,13 @@
   "status.block_unavailable": "That topic is not available right now ({reason}).",
   "status.choice_rejected": "That choice was rejected ({reason}).",
   "panel.current_relation": "CURRENT RELATION",
-  "panel.current_relation_edit": "Current relation"
+  "panel.current_relation_edit": "Current relation",
+  "panel.llm_input": "TYPE TO TALK",
+  "llm.input_tooltip": "Type a message for this NPC.",
+  "llm.send": "SEND",
+  "llm.status.off": "LLM BRIDGE OFF",
+  "llm.status.open": "OPEN A CONVERSATION",
+  "llm.status.waiting": "WAITING FOR NPC RESPONSE...",
+  "llm.status.speaking": "NPC IS SPEAKING...",
+  "llm.status.ready": "LLM CHAT READY"
 }

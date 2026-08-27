@@ -333,6 +333,16 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
                     domain = "pnc.system.shared.categories",
                 },
             },
+            {
+                partID = "llmInput",
+                factory = Conversation.CreateHoomansLLMInput,
+                visible = true,
+                title = {
+                    key = "panel.llm_input",
+                    domain = "pnc.system.shared.categories",
+                    fallback = "TYPE TO TALK",
+                },
+            },
         },
         lifecycle = Lifecycle.Create(),
         start = "greeting",
