@@ -1,5 +1,6 @@
 -- In-game NPC free-text chat over the bounded PsychopatzCore bridge.
 require "PsychopatzCore/UI/Conversation/PsychopatzConversationLayout"
+require "PNC/Integrations/PNC_HoomansLLMContext"
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
@@ -7,7 +8,7 @@ PNC.HoomansLLM = PNC.HoomansLLM or {}
 
 local Integration = PNC.HoomansLLM
 local Layout = PsychopatzCore.Conversation.Layout
-local Text = PsychopatzCore.Conversation.Text
+local Context = PNC.HoomansLLM.Context
 
 if not Layout.defaults.llmInput then
     local choices = Layout.GetNormalized("choices")
@@ -25,8 +26,7 @@ if not Layout.defaults.llmInput then
 end
 
 local MAX_INPUT_LENGTH = 1024
-local MAX_HISTORY_MESSAGES = 24
-local MAX_HISTORY_TEXT = 1200
+local MAX_LOG_TEXT = 900
 local Pending = nil
 local serial = 0
 
@@ -35,6 +35,21 @@ local function trim(value)
     value = string.gsub(value, "^%s+", "")
     value = string.gsub(value, "%s+$", "")
     return value
+end
+
+local function logText(value)
+    value = trim(value)
+    value = string.gsub(value, "[%r\n]+", " ")
+    if #value > MAX_LOG_TEXT then
+        value = string.sub(value, 1, MAX_LOG_TEXT - 1) .. "…"
+    end
+    return value ~= "" and value or "<empty>"
+end
+
+local function log(event, details)
+    if print then
+        print("[PNC][LLM] " .. tostring(event) .. " " .. tostring(details or ""))
+    end
 end
 
 local function bridgeEnabled()
@@ -56,61 +71,23 @@ local function currentView()
         and PsychopatzCore.Conversation.instance or nil
 end
 
-local function messageText(message)
-    if not message then return "" end
-    local payload = message.payload or message
-    return trim(Text.Resolve(payload))
-end
-
-local function buildPacket(view, requestID)
-    local context = view.spec and view.spec.context or {}
-    local npcName = trim(context.npcName or view.spec.npcID or "the survivor")
-    local playerName = trim(context.playerName or "the player")
-    local relationship = trim(
-        context.conversationRelationshipID
-            or context.relationshipID
-            or "unknown"
-    )
-    local role = trim(context.factionRole or context.npcType or "survivor")
-    local system = table.concat({
-        "You are " .. npcName .. ", an NPC in Project Hoomans.",
-        "Stay in character as a " .. role .. " survivor.",
-        "Answer the player naturally and concisely using only the supplied conversation context.",
-        "Do not claim to have performed game actions; the player can use the response choices for actions.",
-        "The player's name is " .. playerName .. ".",
-        "Your relationship with the player is " .. relationship .. ".",
-    }, " ")
-    local messages = {
-        { role = "system", content = system },
-    }
-    local history = view.historyPart and view.historyPart.messages or {}
-    local first = math.max(1, #history - MAX_HISTORY_MESSAGES + 1)
-    local index
-    for index = first, #history do
-        local message = history[index]
-        local content = messageText(message)
-        if content ~= "" then
-            content = string.sub(content, 1, MAX_HISTORY_TEXT)
-            messages[#messages + 1] = {
-                role = message.speaker == "player" and "user" or "assistant",
-                content = content,
-            }
-        end
-    end
+local function buildPacket(view, requestID, message)
+    local context = Context.Build(view, message)
+    context.request_id = requestID
+    context.session_id = context.session_id
+        or "pnc_session_" .. tostring(now()) .. "_" .. tostring(serial)
+    view.session.llmSessionID = context.session_id
     return {
         status = "pending",
         request_id = requestID,
-        npc_id = tostring(view.spec and view.spec.npcID or "unknown"),
-        npc_name = npcName,
-        player_name = playerName,
+        npc_id = context.npc_uuid,
+        world_uuid = context.world_uuid,
+        player_uuid = context.player_uuid,
+        session_id = context.session_id,
+        npc_name = context.npc_name,
+        player_name = context.player_name,
         model = "default",
-        messages = messages,
-        metadata = {
-            npc_name = npcName,
-            player_name = playerName,
-            relationship = relationship,
-            conversation_time = tostring(context.conversationTimeID or ""),
-        },
+        conversation_context = context,
     }
 end
 
@@ -132,6 +109,11 @@ function Integration.Submit(view, value)
     local session = view.session
     serial = serial + 1
     local requestID = "pnc_llm_" .. tostring(now()) .. "_" .. tostring(serial)
+    -- Build the packet before changing the session state. If a context
+    -- adapter is unavailable, the conversation remains usable instead of
+    -- being left permanently in the waiting state.
+    local packet = buildPacket(view, requestID, value)
+    if not packet then return false, "context_unavailable" end
     local pendingChoices = session.currentNode and session.currentNode.choices or {}
     session:append("player", value)
     session.pendingChoices = pendingChoices
@@ -154,16 +136,74 @@ function Integration.Submit(view, value)
         requestID = requestID,
         npcID = tostring(view.spec and view.spec.npcID or "unknown"),
         view = view,
-        packet = buildPacket(view, requestID),
+        packet = packet,
         claimed = false,
     }
+    log(
+        "chat_submit",
+        "npc=" .. tostring(Pending.npcID)
+            .. " request=" .. requestID
+            .. " chars=" .. tostring(#value)
+            .. " message=" .. logText(value)
+    )
     return true
 end
 
 function Integration.Poll()
     if not Pending or Pending.claimed then return { status = "idle" } end
     Pending.claimed = true
+    log(
+        "task_polled",
+        "npc=" .. tostring(Pending.npcID)
+            .. " request=" .. tostring(Pending.requestID)
+    )
     return Pending.packet
+end
+
+local function exposedTool(packet, name)
+    local context = packet and packet.conversation_context or {}
+    local tools = context.available_tools or {}
+    for _, tool in ipairs(tools) do
+        local definition = tool and tool["function"] or nil
+        if definition and tostring(definition.name or "") == name then
+            return true
+        end
+    end
+    return false
+end
+
+local function applySemanticTools(packet, arguments, npcID, session)
+    local calls = arguments and arguments.semantic_tool_calls
+    local results = {}
+    if type(calls) ~= "table" then return results end
+    for _, call in ipairs(calls) do
+        local name = trim(call and call.name)
+        local callArguments = call and type(call.arguments) == "table"
+            and call.arguments or {}
+        local result = { name = name, accepted = false }
+        if name == "social_react" and exposedTool(packet, name) then
+            -- There is no generic client-side relationship mutation API. Keep
+            -- this as an observable intent until a specific SocialEvent command
+            -- is registered by the authoritative gameplay layer.
+            result.reason = "social_event_boundary_unavailable"
+        elseif string.find(name, "^order_") == 1 and exposedTool(packet, name) then
+            local commandID = trim(callArguments.command_id)
+            local definition = PNC.CompanionCommands
+                and PNC.CompanionCommands.Get(commandID) or nil
+            local execute = PNC.Client and PNC.Client.ExecuteCompanionCommand
+            if definition and execute then
+                result.accepted = execute(commandID, npcID, "conversation", nil) == true
+                result.reason = result.accepted and "submitted" or "rejected_by_game"
+            else
+                result.reason = "unknown_command"
+            end
+        else
+            result.reason = "tool_not_exposed"
+        end
+        results[#results + 1] = result
+    end
+    session.llmSemanticResults = results
+    return results
 end
 
 function Integration.Deliver(arguments)
@@ -181,14 +221,27 @@ function Integration.Deliver(arguments)
         return { accepted = false, reason = "conversation_closed" }
     end
 
+    local semanticResults = applySemanticTools(Pending.packet, arguments, Pending.npcID, view.session)
     local response = trim(arguments.response_text)
     if response == "" then
         local failure = trim(arguments.error)
+        local actionAccepted = false
+        for _, result in ipairs(semanticResults) do
+            if result.accepted == true then actionAccepted = true break end
+        end
         response = failure ~= ""
             and "I cannot answer right now. (" .. string.sub(failure, 1, 420) .. ")"
+            or actionAccepted and "I will take care of that."
             or "I cannot answer right now."
     end
     response = string.sub(response, 1, 3900)
+    log(
+        "response_deliver",
+        "npc=" .. tostring(Pending.npcID)
+            .. " request=" .. requestID
+            .. " chars=" .. tostring(#response)
+            .. " response=" .. logText(response)
+    )
     local session = view.session
     session.queue = {}
     session.llmPending = nil
