@@ -13,6 +13,7 @@
   "category.goodbye": "Goodbye",
   "choice.view_dossier": "View dossier",
   "choice.recruit": "Would you like to join us?",
+  "choice.show_debug_text": "Show Debug Text",
   "response.recruit.admire.1": "All right. I can see the sense in following someone who has earned my trust.",
   "response.recruit.admire.2": "I was hoping you would ask. Give me a place in your group and I will pull my weight.",
   "response.recruit.admire.3": "Yes. I respect what you are building, and I would rather help than stand outside it.",

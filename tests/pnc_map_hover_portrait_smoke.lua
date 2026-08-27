@@ -64,6 +64,7 @@ local map = {
 }
 local portraitEntry = {
     id = "npc_portrait",
+    recruited = true,
     portrait = {
         identitySeed = 7,
         revision = 1,
@@ -110,6 +111,7 @@ T.truthy(portraitTargetCount == 2,
 
 local secondEntry = {
     id = "npc_portrait_2",
+    recruited = true,
     portrait = {
         identitySeed = 8,
         revision = 1,
@@ -148,5 +150,30 @@ T.truthy(portraitTargetCount == 4
 PNC.MapHoverPortrait.Hide(map)
 T.truthy(map.pncHoverPortrait.visible == false,
     "hover portrait remained visible after hover ended")
+
+PNC.Network = {
+    ClientState = { npcKnowledge = {} },
+}
+local unknownMap = {
+    width = 500,
+    height = 500,
+    children = {},
+    addChild = function(self, child)
+        self.children[#self.children + 1] = child
+    end,
+}
+local unknownEntry = {
+    id = "npc_unknown_portrait",
+    portrait = {
+        identitySeed = 9,
+        revision = 1,
+        appearance = { hairModel = "Short" },
+    },
+}
+clock = 1500
+T.equal(PNC.MapHoverPortrait.Update(unknownMap, unknownEntry, 200, 200), false,
+    "unknown survivor map hover did not remain hidden")
+T.equal(unknownMap.pncHoverPortrait, nil,
+    "unknown survivor created a 3D face renderer")
 
 T.finish("pnc_map_hover_portrait_smoke")

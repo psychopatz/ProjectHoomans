@@ -127,8 +127,12 @@ function FactionPresentation.RenderPortraitPlate(portraitUI, rawContext)
     local presentation = FactionPresentation.Resolve(rawContext or portraitUI)
     if not presentation then return end
 
-    -- Only render the emblem & faction plate when player knows identity and faction exists
-    if not presentation.isNameKnown or not presentation.isKnown or not presentation.emblem then
+    -- Only render the emblem and faction plate when identity and faction are
+    -- known. Debug companions are explicitly disclosed after they spawn.
+    if not presentation.isNameKnown
+        or not presentation.isKnown
+        or not presentation.emblem
+    then
         return
     end
 

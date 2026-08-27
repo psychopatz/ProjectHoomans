@@ -45,7 +45,8 @@ local function drawBlock(list, y, entry, alternate)
         item.translationFallback and tr("status.text_fallback")
             or item.translationValid and tr("status.text_ok")
             or tr("status.text_missing"),
-        item.eligible and tr("status.eligible") or tostring(item.eligibilityReason),
+        item.eligible and tr("status.eligible")
+            or tostring(item.eligibilityReason or tr("status.unknown")),
     }, " | ")
     list:drawText(Layout.Ellipsize(detail, UIFont.Small,
         list:getWidth() - 16), 8, y + 24,
@@ -54,13 +55,19 @@ local function drawBlock(list, y, entry, alternate)
     return y + list.itemheight
 end
 
-local function drawDetail(list, y, entry, alternate)
-    UI.DrawListSelection(list, y, list.itemheight, false, alternate)
-    list:drawText(Layout.Ellipsize(entry.item.text, UIFont.Small,
-        list:getWidth() - 16), 8, y + 5,
-        Theme.colors.text.r, Theme.colors.text.g,
-        Theme.colors.text.b, Theme.colors.text.a, UIFont.Small)
-    return y + list.itemheight
+local function booleanText(value)
+    if value == true then return tr("status.yes") end
+    if value == false then return tr("status.no") end
+    return tr("status.unknown")
+end
+
+local function statusTone(value)
+    return value == true and "success" or value == false and "danger" or "warning"
+end
+
+local function textValue(value)
+    if value == nil or value == "" then return "-" end
+    return tostring(value)
 end
 
 ISPNCConversationDebugWindow =
@@ -78,7 +85,12 @@ function ISPNCConversationDebugWindow:createChildren()
     self.search:instantiate()
     self:addChild(self.search)
     self.blocks = UI.CreateList(self, { itemHeight = 44, doDrawItem = drawBlock })
-    self.details = UI.CreateList(self, { itemHeight = 24, doDrawItem = drawDetail })
+    self.details = UI.CreateKeyValueList(self, {
+        itemHeight = 24,
+        labelX = 8,
+        valueX = 178,
+        valueRightPadding = 8,
+    })
     self.controls = {}
     local actions = {
         { id = "refresh", title = tr("button.refresh") },
@@ -123,8 +135,8 @@ function ISPNCConversationDebugWindow:onResponsiveLayout()
         rect.width - left - gap, rect.height - (top - rect.y))
 end
 
-function ISPNCConversationDebugWindow:addDetail(value)
-    self.details:addItem(tostring(value), { text = tostring(value) })
+function ISPNCConversationDebugWindow:addField(label, value, options)
+    UI.AddKeyValue(self.details, label, textValue(value), options)
 end
 
 function ISPNCConversationDebugWindow:refreshBlocks()
@@ -148,71 +160,107 @@ function ISPNCConversationDebugWindow:refreshDetails(sandbox)
     local item = selected(self.blocks)
     if not item then return end
     local inspection = Model.Inspect(item.id, self.context)
-    self:addDetail(tr("detail.id", { value = item.id }))
-    self:addDetail(tr("detail.owner", { value = item.block.ownerModID }))
-    self:addDetail(tr("detail.category", { value = item.block.category }))
-    self:addDetail(tr("detail.source", {
-        value = item.block.textSource.pathPattern,
-    }))
-    self:addDetail(tr("detail.registry_valid", { value = item.valid }))
-    self:addDetail(tr("detail.translation_valid", {
-        value = item.translationValid,
-    }))
-    self:addDetail(tr("detail.translation_fallback", {
-        value = item.translationFallback,
-    }))
-    self:addDetail(tr("detail.eligible", {
-        value = inspection and inspection.eligible,
-        reason = inspection and inspection.reason or "",
-    }))
-    self:addDetail(tr("detail.seed", {
-        value = inspection and inspection.seed,
-    }))
+    self:addField(tr("detail.label.id"), item.id)
+    self:addField(tr("detail.label.owner"), item.block.ownerModID)
+    self:addField(tr("detail.label.category"), item.block.category)
+    self:addField(tr("detail.label.source"), item.block.textSource.pathPattern)
+    self:addField(tr("detail.label.registry"), booleanText(item.valid), {
+        tone = statusTone(item.valid),
+    })
+    self:addField(tr("detail.label.translation"), booleanText(item.translationValid), {
+        tone = statusTone(item.translationValid),
+    })
+    self:addField(tr("detail.label.fallback"), booleanText(item.translationFallback), {
+        tone = item.translationFallback and "warning" or "text",
+    })
+    local eligible = inspection and inspection.eligible == true
+    self:addField(tr("detail.label.eligibility"), booleanText(eligible), {
+        tone = statusTone(eligible),
+    })
+    if inspection and inspection.reason then
+        self:addField(tr("detail.label.reason"), inspection.reason, {
+            tone = "warning",
+        })
+    end
+    self:addField(tr("detail.label.seed"), inspection and inspection.seed)
     for _, errorValue in ipairs(item.errors or {}) do
-        self:addDetail(tr("detail.error", { value = errorValue }))
+        self:addField(tr("detail.label.error"), errorValue, { tone = "danger" })
     end
     for _, errorValue in ipairs(item.translationErrors or {}) do
-        self:addDetail(tr("detail.text_error", { value = errorValue }))
+        self:addField(tr("detail.label.text_error"), errorValue, { tone = "danger" })
     end
-    for _, node in ipairs(inspection and inspection.nodes or {}) do
-        self:addDetail(tr("detail.node", {
-            id = node.id,
-            text = node.textKey or table.concat(node.textKeys or {}, ","),
-        }))
+    local nodes = inspection and inspection.nodes or {}
+    table.sort(nodes, function(left, right)
+        return tostring(left.id) < tostring(right.id)
+    end)
+    for _, node in ipairs(nodes) do
+        self:addField(tr("detail.label.node"), node.id, { tone = "accent" })
+        self:addField(tr("detail.label.node_text"),
+            node.textKey or table.concat(node.textKeys or {}, ","))
         for _, choice in ipairs(node.choices or {}) do
-            self:addDetail(tr("detail.choice", {
-                id = choice.id,
-                eligible = choice.eligible,
-                reason = choice.reason or "",
-            }))
+            local choiceEligible = choice.eligible == true
+            self:addField(tr("detail.label.choice"), choice.id, {
+                tone = "accent",
+            })
+            self:addField(tr("detail.label.choice_status"), booleanText(choiceEligible), {
+                tone = statusTone(choiceEligible),
+            })
+            if choice.reason then
+                self:addField(tr("detail.label.reason"), choice.reason, {
+                    tone = "warning",
+                })
+            end
             for _, outcome in ipairs(choice.outcomes or {}) do
-                self:addDetail(tr("detail.outcome", {
-                    id = outcome.id,
-                    eligible = outcome.eligible,
-                    weight = outcome.weight,
-                    next = outcome.next or outcome.close and "close" or "none",
-                    reason = outcome.reason or "",
-                }))
+                local outcomeEligible = outcome.eligible == true
+                self:addField(tr("detail.label.outcome"), outcome.id, {
+                    tone = "accent",
+                })
+                self:addField(tr("detail.label.outcome_status"),
+                    booleanText(outcomeEligible), {
+                        tone = statusTone(outcomeEligible),
+                    })
+                self:addField(tr("detail.label.weight"), outcome.weight)
+                self:addField(tr("detail.label.next"),
+                    outcome.next or outcome.close and "close" or "none")
+                self:addField(tr("detail.label.response"), outcome.responseKey)
+                if outcome.reason then
+                    self:addField(tr("detail.label.reason"), outcome.reason, {
+                        tone = "warning",
+                    })
+                end
                 for _, effect in ipairs(outcome.effects or {}) do
-                    self:addDetail(tr("detail.effect", { value = effect.type }))
+                    self:addField(tr("detail.label.effect"), effect.type, {
+                        tone = "success",
+                    })
                 end
             end
         end
     end
     if sandbox then
-        self:addDetail(tr("sandbox.outcome", { value = sandbox.outcomeID }))
-        self:addDetail(tr("sandbox.roll", {
-            roll = sandbox.roll,
-            total = sandbox.totalWeight,
-        }))
-        for key, value in pairs(sandbox.after.relationship or {}) do
-            self:addDetail(tr("sandbox.relationship", {
-                axis = key,
-                before = sandbox.before.relationship[key],
-                after = value,
-            }))
+        self:addField(tr("detail.label.sandbox_outcome"), sandbox.outcomeID, {
+            tone = "success",
+        })
+        self:addField(tr("detail.label.sandbox_roll"), table.concat({
+            textValue(sandbox.roll), textValue(sandbox.totalWeight),
+        }, " / "))
+        local axes = {}
+        for key in pairs(sandbox.after.relationship or {}) do
+            axes[#axes + 1] = key
         end
-        self:addDetail(tr("sandbox.no_mutation"))
+        table.sort(axes)
+        for _, key in ipairs(axes) do
+            self:addField(tr("detail.label.relationship"), key)
+            self:addField(tr("detail.label.before_after"), table.concat({
+                textValue(sandbox.before.relationship[key]),
+                textValue(sandbox.after.relationship[key]),
+            }, " -> "))
+        end
+        self:addField(tr("detail.label.persistence"), tr("status.no"), {
+            tone = "success",
+        })
+        self:addField(tr("detail.label.networked"), tr("status.no"), {
+            tone = "success",
+        })
     end
 end
 
@@ -313,9 +361,9 @@ function ISPNCConversationDebugWindow:onAction(button)
         if not item then return end
         local view, reason = Model.OpenSandbox(item.id, self.context)
         if not view then
-            self:addDetail(tr("sandbox.open_failed", {
+            self:addField(tr("detail.label.error"), tr("sandbox.open_failed", {
                 reason = tostring(reason or "unavailable"),
-            }))
+            }), { tone = "danger" })
         end
         return
     end
@@ -335,6 +383,7 @@ function ISPNCConversationDebugWindow:prerender()
 end
 
 function ISPNCConversationDebugWindow:close()
+    if self.setCapture then self:setCapture(false) end
     self:setVisible(false)
     self:removeFromUIManager()
     DebugUI.instance = nil
@@ -347,7 +396,7 @@ function ISPNCConversationDebugWindow:new(x, y, width, height, options)
     return object
 end
 
-function DebugUI.Open()
+function DebugUI.Open(context)
     if PNC.Client and PNC.Client.CanUseDebug
         and not PNC.Client.CanUseDebug()
     then return nil end
@@ -366,8 +415,13 @@ function DebugUI.Open()
         window:instantiate()
         DebugUI.instance = window
     end
+    if type(context) == "table" then
+        window.context = Model.NormalizeContext(context)
+    end
     window:addToUIManager()
     window:setVisible(true)
+    if window.setAlwaysOnTop then window:setAlwaysOnTop(true) end
+    if window.setCapture then window:setCapture(true) end
     window:bringToTop()
     window:refreshBlocks()
     return window

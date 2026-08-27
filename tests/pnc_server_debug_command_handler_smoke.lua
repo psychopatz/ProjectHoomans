@@ -20,6 +20,8 @@ local apiCalls = {}
 local networkCalls = {}
 local relationshipCalls = {}
 local diagnosticCalls = {}
+local knowledgeDisclosure
+local knowledgeSnapshot
 local spawned
 local teleported
 local audited
@@ -93,6 +95,7 @@ PNC = {
         GetLiveZombie = function() return nil end,
     },
     Network = {
+        SendNPCKnowledge = networkCapture("npcKnowledge"),
         SendRelationshipDebug = networkCapture("relationship"),
         SendConversationRelationship = networkCapture("conversation"),
         SendKnowledgeDebug = networkCapture("knowledge"),
@@ -122,6 +125,20 @@ PNC = {
         end,
     },
     NPCKnowledge = {
+        DiscoverAllForPlayer = function(receivedPlayer, npcID, at, source, deferCommit)
+            knowledgeDisclosure = {
+                player = receivedPlayer,
+                npcID = npcID,
+                at = at,
+                source = source,
+                deferCommit = deferCommit,
+            }
+            return { revealed = { "identity.name", "faction.identity" }, failures = {} }
+        end,
+        BuildPlayerSnapshotForPlayer = function(receivedPlayer, npcID)
+            knowledgeSnapshot = { player = receivedPlayer, npcID = npcID }
+            return { npcID = npcID, identity = { displayName = "Debug Companion" } }
+        end,
         ExecuteDebugForPlayer = function(receivedPlayer, args)
             diagnosticCalls.knowledge = args
             return { kind = "knowledge" }, "knowledge_reason"
@@ -216,6 +233,20 @@ T.equal(spawned.tacticalClass, "colonist", "debug companion tactical class")
 T.equal(spawned.factionID, "faction_debug",
     "debug companion resolves the player faction ID")
 T.equal(spawned.recruited, true, "debug companion recruited state")
+T.equal(knowledgeDisclosure.player, player,
+    "debug companion reveals knowledge for the spawning player")
+T.equal(knowledgeDisclosure.npcID, "spawned-1",
+    "debug companion reveals knowledge for the spawned NPC")
+T.equal(knowledgeDisclosure.source, "lifelong_relationship",
+    "debug companion uses the starter-companion disclosure source")
+T.equal(knowledgeDisclosure.deferCommit, true,
+    "debug companion defers the disclosure commit until the snapshot")
+T.equal(knowledgeSnapshot.player, player,
+    "debug companion builds a player knowledge snapshot")
+T.equal(networkCalls.npcKnowledge[1], player,
+    "debug companion sends the knowledge snapshot to the player")
+T.equal(networkCalls.npcKnowledge[2].npcID, "spawned-1",
+    "debug companion snapshot contains the spawned NPC")
 
 Router.Handle("DebugCommand", player, {
     action = "teleport_to_npc", id = "npc-teleport",

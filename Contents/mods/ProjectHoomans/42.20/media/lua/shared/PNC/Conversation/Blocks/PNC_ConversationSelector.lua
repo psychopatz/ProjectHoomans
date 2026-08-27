@@ -73,7 +73,12 @@ function Selector.IsCategoryEligible(categoryID, context, allowSystem)
     local eligible, reason = Rules.EvaluateAll(category.gates, context)
     if not eligible then return false, reason end
     if context and type(context.categoryValidator) == "function" then
-        return context.categoryValidator(category)
+        local valid, details = context.categoryValidator(category)
+        if valid == true then return true end
+        if type(details) == "table" then
+            return false, details[1] or "category_text_invalid"
+        end
+        return false, details or "category_text_invalid"
     end
     return true
 end

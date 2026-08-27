@@ -548,22 +548,37 @@ T.truthy(PNC.Network.ClientState.conversationHistory["npc-daily"]
     ["category:projecthoomans:whats_up"],
     "client remembers the authoritative daily use for the active session")
 PNC.Client.CanUseDebug = function() return true end
+local openedDebugContext
+PNC.ConversationDebugUI = {
+    Open = function(context)
+        openedDebugContext = context
+        return true
+    end,
+}
 local debugDailyMenu = PNC.Conversation.Composer.BuildMenuNode(
     dailyDefinition.context.conversationBlockContext,
     dailyDefinition.context.conversationMenuOptions
 )
 local debugDailyLabel
+local debugChoice
 for _, choiceValue in ipairs(debugDailyMenu.choices or {}) do
     if choiceValue.id == "projecthoomans:whats_up" then
         debugDailyLabel = PsychopatzCore.Conversation.Text.Resolve(
             choiceValue.text
         )
-        T.equal(choiceValue.enabled, false,
-            "debug exposes a used daily topic as disabled")
+    elseif choiceValue.id == "show_debug_text" then
+        debugChoice = choiceValue
     end
 end
-T.truthy(debugDailyLabel and string.find(debugDailyLabel, "once per day used", 1, true),
-    "debug daily topic includes the unavailable reason")
+T.equal(debugDailyLabel, nil,
+    "debug does not expose unavailable topics in the response channel")
+T.truthy(debugChoice, "debug exposes a single debug-text choice")
+T.equal(debugChoice.log, false, "debug-text choice does not enter the transcript")
+T.equal(debugChoice.next, "menu", "debug-text choice returns to the menu")
+debugChoice.action()
+T.equal(openedDebugContext, dailyDefinition.context.conversationBlockContext,
+    "debug-text choice opens the debugger with the live conversation context")
+PNC.ConversationDebugUI = nil
 PsychopatzCore.Conversation.instance = nil
 PNC.Network = nil
 

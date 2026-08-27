@@ -6,6 +6,37 @@ local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
 local H = Handler.Internal
 
+local function revealDebugCompanionKnowledge(player, npcID, at)
+    local knowledge = PNC.NPCKnowledge
+    if not knowledge then return end
+
+    -- Debug companions must enter the same known-at-creation pipeline as
+    -- starter companions, including faction identity and presentation data.
+    if knowledge.DiscoverAllForPlayer then
+        knowledge.DiscoverAllForPlayer(
+            player, npcID, at, "lifelong_relationship", true
+        )
+    elseif knowledge.DiscoverTopicForPlayer then
+        knowledge.DiscoverTopicForPlayer(
+            player, npcID, "identity_name", at,
+            "direct_disclosure", true
+        )
+    end
+
+    if knowledge.BuildPlayerSnapshotForPlayer
+        and PNC.Network and PNC.Network.SendNPCKnowledge
+    then
+        local snapshot = knowledge.BuildPlayerSnapshotForPlayer(
+            player, npcID
+        )
+        if snapshot then
+            PNC.Network.SendNPCKnowledge(
+                player, snapshot, "lifelong_relationship"
+            )
+        end
+    end
+end
+
 function Handler.ConfigureTeleport(value)
     H.Teleport = value
 end
@@ -47,6 +78,9 @@ function H.HandleDebugSpawn(player, args)
     local factionOK
     local factionReason
     local gameTime = getGameTime and getGameTime() or nil
+    local worldAgeHours = gameTime
+        and gameTime.getWorldAgeHours
+        and gameTime:getWorldAgeHours() or 0
     if tacticalClass ~= "colonist" and tacticalClass ~= "neutral"
         and tacticalClass ~= "hostile"
     then
@@ -60,9 +94,7 @@ function H.HandleDebugSpawn(player, args)
     then
         factionOK, factionReason, playerFaction =
             PNC.Factions.EnsurePlayerFaction(player, {
-                worldAgeHours = gameTime
-                    and gameTime.getWorldAgeHours
-                    and gameTime:getWorldAgeHours() or 0,
+                worldAgeHours = worldAgeHours,
             })
         if not factionOK or not playerFaction then
             PNC.Core.LogWarn(
@@ -112,6 +144,9 @@ function H.HandleDebugSpawn(player, args)
         equipmentSpawnMode = equipmentSpawnMode,
         debug = true,
     })
+    if colonist and record then
+        revealDebugCompanionKnowledge(player, record.id, worldAgeHours)
+    end
     PNC.Core.LogInfo("PNC debug spawn variant=" .. variant
         .. " tacticalClass=" .. tacticalClass
         .. " equipment=" .. tostring(equipmentSpawnMode or "sandbox_chances")

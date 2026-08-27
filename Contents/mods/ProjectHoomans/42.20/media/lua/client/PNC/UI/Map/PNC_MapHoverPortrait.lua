@@ -2,12 +2,14 @@
 
 require "PNC/UI/Map/PNC_MapHoverPortraitCard"
 require "PNC/Knowledge/PNC_KnowledgeInterest"
+require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
 PNC = PNC or {}
 PNC.MapHoverPortrait = PNC.MapHoverPortrait or {}
 
 local HoverPortrait = PNC.MapHoverPortrait
 local PortraitCard = PNC.MapHoverPortraitCard
+local Identity = PNC.NPCIdentityPresentation
 
 HoverPortrait.Size = 128
 HoverPortrait.NameHeight = 24
@@ -140,6 +142,15 @@ function HoverPortrait.Update(map, entry, markerX, markerY)
     id = tostring(entry.id)
     if PNC.KnowledgeInterest and PNC.KnowledgeInterest.Require then
         PNC.KnowledgeInterest.Require(id, "map_hover")
+    end
+    if not Identity or not Identity.IsNameKnown
+        or not Identity.IsNameKnown(entry)
+    then
+        -- Do not instantiate or bind the 3D face renderer for an unknown
+        -- survivor. The map marker remains available without exposing their
+        -- appearance before the player has learned their identity.
+        HoverPortrait.Hide(map)
+        return false
     end
     if type(entry.portrait) ~= "table" then
         HoverPortrait.Hide(map)

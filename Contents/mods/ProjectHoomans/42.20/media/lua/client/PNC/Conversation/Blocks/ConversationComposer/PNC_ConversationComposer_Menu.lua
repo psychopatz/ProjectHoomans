@@ -39,33 +39,17 @@ local GOODBYE_SOURCE = {
     domain = "pnc.goodbye.shared.goodbye",
 }
 
-local function readableReason(reason)
-    local value = tostring(reason or "unavailable")
-    value = string.gsub(value, "_", " ")
-    return value
-end
-
-local function debugCategoryText(source, labelKey, reason)
-    local label = PsychopatzCore.Conversation.Text.Resolve(payload(
-        source,
-        labelKey
-    ))
-    return {
-        text = label .. " (" .. readableReason(reason) .. ")",
-    }
-end
 local function categoryChoices(context)
     local choices = {}
-    local debug = conversationDebugEnabled()
     for _, category in ipairs(Registry.ListCategories()) do
-        local categoryEligible, categoryReason = Selector.IsCategoryEligible(
+        local categoryEligible = Selector.IsCategoryEligible(
             category.id, context, false
         )
         local categoryTextValid = Loader.EnsureSource(
             category.textSource,
             { category.labelKey }
         )
-        local selected, selection = Selector.SelectBlock(category.id, context)
+        local selected = Selector.SelectBlock(category.id, context)
         local textValid = selected and ensureBlockText(selected)
         if categoryEligible and selected and textValid and categoryTextValid then
             local selectedCategory = category
@@ -84,31 +68,30 @@ local function categoryChoices(context)
                     Composer.RequestCategory(context.npcID, selectedCategory.id)
                 end,
             }
-        elseif debug and categoryTextValid then
-            local reason = categoryReason
-            if not reason and selection and selection.candidates then
-                reason = "no_eligible_block"
-                for _, candidate in ipairs(selection.candidates) do
-                    if candidate.reason then
-                        reason = candidate.reason
-                        break
-                    end
-                end
-            end
-            local selectedCategory = category
-            choices[#choices + 1] = {
-                id = selectedCategory.id,
-                text = debugCategoryText(
-                    selectedCategory.textSource,
-                    selectedCategory.labelKey,
-                    reason or "no_eligible_block"
-                ),
-                enabled = false,
-                log = false,
-            }
         end
     end
     return choices
+end
+
+local function addDebugChoice(choices, context)
+    if not conversationDebugEnabled() then return end
+    choices[#choices + 1] = {
+        id = "show_debug_text",
+        text = dialoguePayload(
+            SYSTEM_SOURCE,
+            "choice.show_debug_text",
+            context
+        ),
+        log = false,
+        -- Return to the current category menu after the debugger is closed.
+        next = "menu",
+        action = function()
+            local debugUI = PNC.ConversationDebugUI
+            if debugUI and type(debugUI.Open) == "function" then
+                debugUI.Open(context)
+            end
+        end,
+    }
 end
 
 function Composer.BuildGreeting(context)
@@ -188,6 +171,7 @@ function Composer.BuildRootNode(context, options)
     end
     local requiredSystemKeys = {
         "status.block_unavailable", "status.choice_rejected",
+        "choice.show_debug_text",
     }
     for _, key in ipairs(RECRUIT_SYSTEM_KEYS) do
         requiredSystemKeys[#requiredSystemKeys + 1] = key
@@ -196,18 +180,20 @@ function Composer.BuildRootNode(context, options)
     local goodbyeValid = Loader.EnsureSource(GOODBYE_SOURCE, {
         "choice.goodbye", "response.goodbye",
     })
-    if not goodbyeValid then return { npc = greeting, choices = choices } end
-    choices[#choices + 1] = {
-        id = "goodbye",
-        text = dialoguePayload(
-            GOODBYE_SOURCE, "choice.goodbye", context
-        ),
-        response = dialoguePayload(
-            GOODBYE_SOURCE, "response.goodbye", context
-        ),
-        close = true,
-        closeReason = "goodbye",
-    }
+    if goodbyeValid then
+        choices[#choices + 1] = {
+            id = "goodbye",
+            text = dialoguePayload(
+                GOODBYE_SOURCE, "choice.goodbye", context
+            ),
+            response = dialoguePayload(
+                GOODBYE_SOURCE, "response.goodbye", context
+            ),
+            close = true,
+            closeReason = "goodbye",
+        }
+    end
+    addDebugChoice(choices, context)
     return { npc = greeting, choices = choices }
 end
 
