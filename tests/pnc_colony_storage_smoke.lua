@@ -481,9 +481,12 @@ local courierNPC = {
                 container = "root", stack = 2 },
             favorite = { id = "favorite", type = "Base.Hammer",
                 container = "root", stack = 1, fav = true },
+            identity_card = { id = "identity_card", type = "Base.IDcard",
+                container = "root", stack = 1,
+                customName = "ID Card: Courier" },
         },
         containers = { root = {
-            id = "root", items = { "cargo", "favorite" },
+            id = "root", items = { "cargo", "favorite", "identity_card" },
             maxWeight = 20,
         } },
     },
@@ -523,6 +526,17 @@ T.equal(courierNPC.inventory.items.cargo, nil,
     "courier removes deposited compact cargo")
 T.truthy(courierNPC.inventory.items.favorite,
     "courier preserves favorite items")
+T.truthy(courierNPC.inventory.items.identity_card,
+    "courier preserves forbidden identity cards")
+local forbiddenDeposit, forbiddenReason = Service.RequestNPCDeposit(playerA, {
+    requestId = "courier:forbidden-direct", npcId = courierNPC.id,
+    storageId = loaded.id, itemID = "identity_card", quantity = 1,
+    inventoryRevision = courierNPC.inventory.revision,
+})
+T.equal(forbiddenDeposit, false,
+    "direct NPC deposit rejects legacy identity card")
+T.equal(forbiddenReason, "item_off_limits",
+    "forbidden identity card deposit reason")
 
 ok, reason = Service.DebugAction(playerA, {
     storageId = loaded.id,

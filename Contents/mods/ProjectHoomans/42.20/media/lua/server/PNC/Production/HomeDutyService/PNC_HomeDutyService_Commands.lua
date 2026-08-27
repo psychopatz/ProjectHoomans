@@ -4,11 +4,13 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 local Service = PNC.HomeDutyService
 local H = Service.Internal
 
-function Service.SendHome(record, baseId, reason)
+function Service.SendHome(record, baseId, reason, options)
     if not record or record.alive == false then return false, "NPC_MISSING" end
     local point, pointReason, base = Service.GetHomePoint(record, baseId)
     if not point then return false, pointReason end
-    if Service.IsAtHome(record, base.id) then
+    local forceDestination = type(options) == "table"
+        and options.forceDestination == true
+    if Service.IsAtHome(record, base.id) and not forceDestination then
         return H.SetAtHome(record, base, point)
     end
     if Service.IsReturningHome(record, base.id) then

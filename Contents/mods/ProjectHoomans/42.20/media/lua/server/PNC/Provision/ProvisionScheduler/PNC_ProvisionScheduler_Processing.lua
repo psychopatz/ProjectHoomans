@@ -7,6 +7,36 @@ local Registry = PNC.ProvisionRuleRegistry
 local Evaluator = PNC.ProvisionEvaluator
 local Metrics = PNC.SupplyMetrics
 
+local function isFollowing(record)
+    if PNC.HomeDutyService and PNC.HomeDutyService.IsFollowing then
+        return PNC.HomeDutyService.IsFollowing(record) == true
+    end
+    local order = record and record.orderSpec or nil
+    return tostring(order and order.kind or "") == tostring(
+        PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
+end
+
+local function setIncomingProjection(record, ruleID, request)
+    local provision = record.runtime and record.runtime.provision
+    local supply = record.runtime and record.runtime.supply
+        and record.runtime.supply.byKind
+        and record.runtime.supply.byKind[request.resourceKind]
+    local projection = { hunger = 0, thirst = 0 }
+    for _, selected in ipairs(supply and supply.selected or {}) do
+        local quantity = math.max(0, tonumber(selected.quantity) or 0)
+        projection.hunger = projection.hunger
+            + (tonumber(selected.hunger) or 0) * quantity
+        projection.thirst = projection.thirst
+            + (tonumber(selected.thirst) or 0)
+                * math.max(1, tonumber(selected.remainingUses) or 1)
+                * quantity
+    end
+    if provision then
+        provision.incomingProjection = provision.incomingProjection or {}
+        provision.incomingProjection[ruleID] = projection
+    end
+end
+
 function H.Process(entry)
     local record = PNC.Registry and PNC.Registry.Get(entry.npcID)
     if not record or record.alive == false then
@@ -15,6 +45,12 @@ function H.Process(entry)
     local definition = Registry.Get(entry.ruleID)
     if not definition then
         return true, nil, { ok = false, reason = "unknown_rule" }
+    end
+    if isFollowing(record) then
+        return false, H.WorldHour() + 0.25, {
+            ruleId = definition.id, ok = false, attempted = false,
+            reason = "provision_blocked_while_following",
+        }
     end
     if PNC.HomeDutyService and PNC.HomeDutyService.IsAtHome
         and not PNC.HomeDutyService.IsAtHome(record)
@@ -43,6 +79,9 @@ function H.Process(entry)
         end
         existingRuntime.pending[entry.ruleID] = nil
         existingRuntime.incoming[entry.ruleID] = nil
+        existingRuntime.incomingProjection = existingRuntime.incomingProjection
+            or {}
+        existingRuntime.incomingProjection[entry.ruleID] = nil
     end
     local runtime = record.runtime and record.runtime.provision
     if runtime then runtime.dirtyRules[entry.ruleID] = nil end
@@ -75,6 +114,7 @@ function H.Process(entry)
         }
     end
     runtime = record.runtime.provision
+    runtime.incomingProjection = runtime.incomingProjection or {}
     runtime.incoming[entry.ruleID] = evaluation.deficit
     runtime.lastRequest = PNC.Core.DeepCopy(request)
     Metrics.Increment("provisionRequestsCreated")
@@ -84,6 +124,7 @@ function H.Process(entry)
         force = true,
     })
     if reason == "provision_pickup_queued" then
+        setIncomingProjection(record, entry.ruleID, request)
         runtime.pending = runtime.pending or {}
         runtime.pending[entry.ruleID] = {
             workOrderId = details and details.workOrderId or nil,
@@ -96,6 +137,7 @@ function H.Process(entry)
         }
     end
     runtime.incoming[entry.ruleID] = nil
+    runtime.incomingProjection[entry.ruleID] = nil
     runtime.lastRequestResult = reason
     if ok then
         Metrics.Increment("provisionRequestsSucceeded")

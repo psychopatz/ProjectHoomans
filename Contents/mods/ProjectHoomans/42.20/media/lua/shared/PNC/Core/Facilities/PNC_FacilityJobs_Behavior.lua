@@ -25,6 +25,7 @@ local function normalize(_, spec)
         interactionX = tonumber(spec.interactionX),
         interactionY = tonumber(spec.interactionY),
         interactionZ = tonumber(spec.interactionZ),
+        interactionSurfaceOffset = tonumber(spec.interactionSurfaceOffset),
         interactionAxis = tostring(spec.interactionAxis or ""),
         interactionFacing = tostring(spec.interactionFacing or ""),
         sceneId = tostring(spec.sceneId or ""),
@@ -225,8 +226,22 @@ function Jobs.Tick(record, zombie)
     if runtime.resourceKind == "nearby_water" and not runtime.resource
         and PNC.NearbyWaterService and PNC.NearbyWaterService.Resolve
     then
-        runtime.resource = PNC.NearbyWaterService.Resolve(record,
+        local resolved, resolveReason = PNC.NearbyWaterService.Resolve(record,
             runtime.resourceKey)
+        runtime.resource = resolved
+        if not resolved then
+            local leaseId = runtime.taskLeaseId
+            local failure = resolveReason or "WATER_SOURCE_UNAVAILABLE"
+            runtime.failedReason = failure
+            if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands
+                and PNC.Tasking.Commands.CancelForNPC
+            then
+                PNC.Tasking.Commands.CancelForNPC(record.id, failure)
+            else
+                finish(record, zombie, failure)
+            end
+            return true
+        end
     end
     record.activeJob = definition.activeJob or JOB
     record.activeBehavior = "Facility:" .. tostring(order.capability)

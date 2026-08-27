@@ -273,8 +273,6 @@ local npcRows = PNC.InventoryUIModel.BuildNPCRows({
             id = "identity_card",
             type = "Base.IDcard",
             container = "root",
-            interactionLocked = true,
-            interactionLockReason = "identity_card",
         },
     },
     containers = {
@@ -298,7 +296,7 @@ local npcNailsSelection = PNC.InventoryUIModel.BuildTransferSelection(
 )
 T.equal(#npcNailsSelection.itemIDs, 2, "quantity spans compact stacks")
 T.equal(npcRowsByID["identity_card"].restricted, true,
-    "off-limits item model state")
+    "identity card remains off-limits without lock metadata")
 
 T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =

@@ -17,6 +17,7 @@ local COLORS = {
     -- Territory is context only. Keep it visible without washing out rooms,
     -- construction state, or point components above it.
     base = { r = 0.10, g = 0.70, b = 1.00, a = 0.025 },
+    bedroom = { r = 0.72, g = 0.38, b = 1.00, a = 0.22 },
     barracks = { r = 0.72, g = 0.38, b = 1.00, a = 0.22 },
     farm = { r = 0.22, g = 0.92, b = 0.28, a = 0.22 },
     research_facility = { r = 0.16, g = 0.72, b = 1.00, a = 0.22 },
@@ -29,6 +30,7 @@ local COLORS = {
     construction = { r = 1.00, g = 0.54, b = 0.08, a = 0.20 },
     deconstruction = { r = 1.00, g = 0.18, b = 0.12, a = 0.18 },
 }
+Overlay.ZoneColors = COLORS
 
 local function facilityColor(facility, color)
     local state = tostring(facility.constructionState
@@ -45,6 +47,61 @@ local function facilityColor(facility, color)
     -- stockpile nodes, and other anchor components remain visually dominant.
     return { r = color.r * 0.45, g = color.g * 0.45,
         b = color.b * 0.45, a = 0.08 }
+end
+
+local function facilityDefinition(facility)
+    return PNC.FacilityDefinitions
+        and PNC.FacilityDefinitions.Get
+        and PNC.FacilityDefinitions.Get(facility and facility.definitionId)
+        or nil
+end
+
+local function facilityZoneEnabled(facility)
+    if facility and facility.zoneOverlay ~= nil then
+        return facility.zoneOverlay == true
+    end
+    local definition = facilityDefinition(facility)
+    return definition and definition.zoneOverlay == true
+end
+
+local function facilityWorkZoneEnabled(facility)
+    if facility and facility.workZoneEnabled ~= nil then
+        return facility.workZoneEnabled == true
+    end
+    local definition = facilityDefinition(facility)
+    if PNC.FacilityDefinitions
+        and PNC.FacilityDefinitions.RequiresWorkZone
+    then
+        return PNC.FacilityDefinitions.RequiresWorkZone(
+            facility and facility.definitionId, facility and facility.level) == true
+    end
+    return definition and definition.requiresWorkZone == true or false
+end
+
+local function facilityZoneColor(facility, color)
+    local state = tostring(facility.constructionState
+        or facility.cachedState or "BUILT")
+    if state == "UNDER_CONSTRUCTION" or state == "RECONSTRUCTING" then
+        return COLORS.construction
+    end
+    if state == "DECONSTRUCTING" then return COLORS.deconstruction end
+    if state == "PLANNED" then
+        return { r = color.r * 0.80, g = color.g * 0.80,
+            b = color.b * 0.80, a = 0.16 }
+    end
+    -- Zone-backed facilities need a readable persistent tint. Component
+    -- layers remain darker/hoverable; this is the room's primary identity.
+    return { r = color.r * 0.75, g = color.g * 0.75,
+        b = color.b * 0.75, a = 0.16 }
+end
+
+local function facilitySourceColor(facility)
+    local definition = facilityDefinition(facility)
+    local colorKey = facility and facility.zoneColor
+        or definition and definition.zoneColor
+        or facility and facility.definitionId
+        or "facility"
+    return COLORS[tostring(colorKey)] or COLORS.facility
 end
 
 local function regionCenter(region)
@@ -97,6 +154,8 @@ local function localizedName(key, fallback)
 end
 
 local function facilityName(facility)
+    local dynamic = localizedName(facility and facility.roomLabelKey, nil)
+    if dynamic then return dynamic end
     local definition = PNC.FacilityDefinitions
         and PNC.FacilityDefinitions.Get
         and PNC.FacilityDefinitions.Get(facility and facility.definitionId)
@@ -121,7 +180,9 @@ end
 local function componentName(facility, component, ordinal, ownerLabel)
     local role = tostring(component and component.role or "")
     if role == "work.zone" then
-        return ownerLabel or facilityName(facility)
+        local label = localizedName("UI_PNC_Overlay_WorkZone",
+            "Worker Standing Area")
+        return label .. " - " .. (ownerLabel or facilityName(facility))
     end
     if component and component.kind == "region"
         or role == "facility.footprint"
@@ -155,10 +216,7 @@ local function componentName(facility, component, ordinal, ownerLabel)
 end
 
 local function isDirectWorkstation(facility)
-    local definition = PNC.FacilityDefinitions
-        and PNC.FacilityDefinitions.Get
-        and PNC.FacilityDefinitions.Get(facility and facility.definitionId)
-        or nil
+    local definition = facilityDefinition(facility)
     return definition and definition.directWorkstation == true
 end
 
@@ -188,28 +246,41 @@ function Overlay.BuildLayers(settlement, includeBase)
             settlement and settlement.id)
     end
     for _, facility in ipairs(settlement and settlement.facilities or {}) do
-        local sourceColor = COLORS[facility.definitionId] or COLORS.facility
+        local sourceColor = facilitySourceColor(facility)
         local color = facilityColor(facility, sourceColor)
+        local zoneColor = facilityZoneColor(facility, sourceColor)
         local directWorkstation = isDirectWorkstation(facility)
+        local workZoneEnabled = facilityWorkZoneEnabled(facility)
         local hasRegion = false
+        if facilityZoneEnabled(facility) and facility.constructionRegion
+            and not directWorkstation
+        then
+            addLayer(layers, facility.constructionRegion, zoneColor,
+                "facility_zone", facility.id, "facility.zone",
+                "zone:" .. tostring(facility.id), false)
+        end
         for _, component in ipairs(facility.components or {}) do
-            if component.kind == "region" then hasRegion = true end
-            local region = component.kind == "region" and component.region
-                or pointRegion(component.x, component.y, component.z)
             local workZone = component.role == "work.zone"
-            local componentColor = workZone and COLORS.workZone
-                or component.kind == "anchor" and COLORS.anchor or color
-            local layerKind = workZone and "work_zone"
-                or directWorkstation and component.kind == "anchor"
-                and "workstation" or "facility"
-            addLayer(layers, region, componentColor, layerKind,
-                facility.id, component.role, component.id,
-                component.kind == "region" and not workZone)
+            if not workZone or workZoneEnabled then
+                if component.kind == "region" then hasRegion = true end
+                local region = component.kind == "region" and component.region
+                    or pointRegion(component.x, component.y, component.z)
+                local componentColor = workZone and COLORS.workZone
+                    or component.kind == "anchor" and COLORS.anchor or color
+                local layerKind = workZone and "work_zone"
+                    or directWorkstation and component.kind == "anchor"
+                    and "workstation" or "facility"
+                addLayer(layers, region, componentColor, layerKind,
+                    facility.id, component.role, component.id,
+                    component.kind == "region" and not workZone)
+            end
         end
         -- Direct workstations have a one-tile construction footprint only so
         -- collision/revision infrastructure can remain shared. It is not a
         -- room and must not become a room-zone overlay or room marker.
-        if not hasRegion and not directWorkstation then
+        if not hasRegion and not directWorkstation
+            and not facilityZoneEnabled(facility)
+        then
             addLayer(layers, facility.constructionRegion, color,
                 "facility", facility.id, "facility.footprint",
                 "footprint:" .. tostring(facility.id))
@@ -237,11 +308,13 @@ function Overlay.BuildMarkers(settlement)
         local hasRoom = false
         local hasWorkZone = false
         local directWorkstation = isDirectWorkstation(facility)
+        local workZoneEnabled = facilityWorkZoneEnabled(facility)
+        local zoneEnabled = facilityZoneEnabled(facility)
         local ordinals = {}
         for _, component in ipairs(facility.components or {}) do
             local role = tostring(component.role or "")
             ordinals[role] = (ordinals[role] or 0) + 1
-            if role == "work.zone" then
+            if role == "work.zone" and workZoneEnabled then
                 hasWorkZone = true
                 local point = component.kind == "region"
                     and regionCenter(component.region)
@@ -250,8 +323,11 @@ function Overlay.BuildMarkers(settlement)
                         z = tonumber(component.z) or 0 }
                 addMarker(markers, point, "work_zone", component.id,
                     component.role, 1)
-                if markers[#markers] then markers[#markers].label = label end
-            elseif component.kind == "region" then
+                if markers[#markers] then
+                    markers[#markers].label = componentName(
+                        facility, component, nil, label)
+                end
+            elseif role ~= "work.zone" and component.kind == "region" then
                 hasRoom = true
                 addMarker(markers, regionCenter(component.region), "room",
                     facility.id, component.role, 1)
@@ -259,7 +335,7 @@ function Overlay.BuildMarkers(settlement)
                     markers[#markers].label = componentName(facility,
                         component, nil, label)
                 end
-            elseif component.kind == "anchor" then
+            elseif role ~= "work.zone" and component.kind == "anchor" then
                 local workstationMarker = directWorkstation
                     and component.managedByFacility == true
                 addMarker(markers, {
@@ -273,7 +349,9 @@ function Overlay.BuildMarkers(settlement)
                     or componentName(facility, component, ordinals[role])
             end
         end
-        if not hasRoom and not directWorkstation and not hasWorkZone then
+        if not hasRoom and not directWorkstation
+            and (zoneEnabled or not hasWorkZone)
+        then
             addMarker(markers, regionCenter(facility.constructionRegion),
                 "room", facility.id, "facility.footprint", 1)
             if markers[#markers] then markers[#markers].label = label end

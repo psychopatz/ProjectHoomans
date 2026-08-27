@@ -47,6 +47,7 @@ local granted
 local actionExecuted
 local equipmentRefreshes = 0
 local canManage = true
+local materializedIDs = {}
 
 sendServerCommand = function(_, module, command, payload)
     sent[#sent + 1] = { module = module, command = command, payload = payload }
@@ -83,6 +84,10 @@ PNC = {
             removedIDs = itemIDs
             record.inventory.revision = record.inventory.revision + 1
             return true, "removed"
+        end,
+        MaterializeItem = function(_, _, itemID)
+            materializedIDs[#materializedIDs + 1] = itemID
+            return true, "materialized", function() end
         end,
         ApplyDelta = function(_, ops)
             for _, op in ipairs(ops or {}) do
@@ -169,6 +174,7 @@ T.equal(reason, "transferred_to_npc", "player-to-NPC reason")
 T.equal(addedSpecs[1].type, "Base.Bandage", "compact item type")
 T.equal(addedSpecs[1].cond, 4, "compact condition")
 T.equal(addedSpecs[1].fav, true, "compact favorite state")
+T.equal(materializedIDs[1], "npc-new", "live NPC receives native projection")
 T.equal(takenIDs[1], "55", "native source removed")
 T.equal(deltaSince, 3, "delta starts at client revision")
 

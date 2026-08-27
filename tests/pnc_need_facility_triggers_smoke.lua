@@ -29,6 +29,7 @@ local provider
 local supplyCalls = 0
 local atHome = true
 local hasPersonalFood = true
+local hasPersonalHydration = false
 
 PNC = {
     Const = { ORDER_FOLLOW = "follow" },
@@ -87,7 +88,9 @@ PNC = {
     CompanionCommands = { IsCompanion = function() return true end },
     NPCSupplyService = {
         HasPersonalSupply = function(_, kind)
-            return kind ~= "FOOD" or hasPersonalFood
+            if kind == "FOOD" then return hasPersonalFood end
+            if kind == "HYDRATION" then return hasPersonalHydration end
+            return true
         end,
         Process = function()
             supplyCalls = supplyCalls + 1
@@ -108,6 +111,10 @@ T.equal(#candidates, 5, "all configured need routes produce candidates")
 T.truthy(Triggers.PreferFacility(record, "hunger"),
     "dining is preferred while a table is available")
 T.equal(dirty, 1, "facility preference schedules one task reevaluation")
+local Events = require "PsychopatzCore/Events/PC_EventBus"
+Events.emit(PNC.EventTypes.NPC_INVENTORY_CHANGED, record)
+T.equal(dirty, 2,
+    "personal inventory arrival did not wake need-task reevaluation")
 PNC.NeedSupplyBridge.Evaluate(record, "FOOD")
 T.equal(supplyCalls, 0,
     "dining preference does not bypass the inventory eating primitive")
@@ -162,21 +169,42 @@ PNC.NearbyWaterService = {
     Consume = function(_, _, liters) return true, liters, 0.2 end,
 }
 record.needs.thirst = 0.60
+local residentNearbyCandidates = Triggers.GetCandidates(record.id)
+local residentNearbyCandidate
+for _, candidate in ipairs(residentNearbyCandidates) do
+    if candidate.sourceRef == "nearby_water" then
+        residentNearbyCandidate = candidate
+    end
+end
+T.falsy(residentNearbyCandidate,
+    "a resident does not leave home for nearby water")
+record.orderSpec = { kind = "follow" }
 local nearbyCandidates = Triggers.GetCandidates(record.id)
 local nearbyCandidate
 for _, candidate in ipairs(nearbyCandidates) do
     if candidate.sourceRef == "nearby_water" then nearbyCandidate = candidate end
 end
 T.truthy(nearbyCandidate,
-    "thirst falls back to a nearby water source when no spigot is available")
+    "a follower can use nearby water when no spigot is available")
 T.truthy(Triggers.PreferFacility(record, "hydration"),
-    "nearby water is preferred as a thirst route")
+    "nearby water is preferred for a follower")
 local nearbyDefinition = { needEffect = "nearby_water", effectDelayMs = 0 }
 ok, complete = PNC.NeedFacilityEffects.Tick(
     record, { resource = nearbyWater }, nearbyDefinition, 0, 1000)
 T.truthy(ok and complete, "nearby water completes through the shared effect")
 T.near(record.needs.thirst, 0.20, 0.000001,
     "nearby water applies proportional thirst relief")
+
+-- Personal hydration, including a dual-purpose food, bypasses a water route
+-- and lets NeedSupplyBridge consume the carried item directly.
+hasPersonalHydration = true
+local supplyBeforePersonalHydration = supplyCalls
+T.falsy(Triggers.PreferFacility(record, "hydration"),
+    "personal hydration still scheduled a water facility")
+PNC.NeedSupplyBridge.Evaluate(record, "HYDRATION")
+T.equal(supplyCalls, supplyBeforePersonalHydration + 1,
+    "personal hydration did not fall back to the supply consumer")
+hasPersonalHydration = false
 
 record.orderSpec = { kind = "follow" }
 atHome = false

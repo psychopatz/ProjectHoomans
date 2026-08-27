@@ -123,7 +123,7 @@ function Service.ReconcileWorkerState()
                 stations[tostring(order.stationId)] = order.id
             end
         else
-            releaseClaim(order, "stale_worker_claim")
+            releaseClaim(order, "stale_worker_claim", false, true)
             if order.status ~= Status.PAUSED
                 and order.status ~= Status.CANCELLING
             then

@@ -13,6 +13,15 @@ function Routes.IsFollowing(record)
         PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
 end
 
+-- Nearby-world needs are intentionally opt-in for residents. Followers may
+-- use a local source while away from the settlement; a resident must use a
+-- home facility or its personal supply instead of walking out of the base.
+function Routes.IsNearbyWaterAllowed(record)
+    if Routes.IsFollowing(record) then return true end
+    local runtime = record and record.runtime or {}
+    return runtime.allowNearbyWater == true
+end
+
 function Routes.IsCombatActive(record)
     local runtime = record and record.runtime or {}
     local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
@@ -28,6 +37,21 @@ function Routes.HasPersonalFood(record)
                 and record.needs.hunger) or 0.001),
             thirst = 0,
         }) == true
+end
+
+function Routes.HasPersonalHydration(record)
+    if not PNC.NPCSupplyService
+        or not PNC.NPCSupplyService.HasPersonalSupply
+    then
+        return false
+    end
+    local current = PNC.IndividualNeeds and PNC.IndividualNeeds.Get
+        and PNC.IndividualNeeds.Get(record, "thirst")
+        or record and record.needs and record.needs.thirst
+    return PNC.NPCSupplyService.HasPersonalSupply(record, "HYDRATION", {
+        hunger = 0,
+        thirst = math.max(0.001, tonumber(current) or 0.001),
+    }) == true
 end
 
 function Routes.Register(route)
@@ -67,6 +91,15 @@ function Routes.BuildCandidate(route, record, definition, metadata)
         capability = route.capability,
         interruptPolicy = "NORMAL", revision = 1,
     }
+end
+
+local function waterSource(record, key)
+    local service = PNC.NearbyWaterService
+    if not service then return nil, "NEARBY_WATER_UNAVAILABLE" end
+    if service.FindWithStatus then return service.FindWithStatus(record, key) end
+    if key and service.Resolve then return service.Resolve(record, key) end
+    if service.Find then return service.Find(record) end
+    return nil, "NEARBY_WATER_UNAVAILABLE"
 end
 
 Routes.Register({
@@ -122,26 +155,34 @@ Routes.Register({
     needId = "hydration",
     capability = "water.nearby",
     IsAvailable = function(record)
-        return not Routes.IsCombatActive(record)
-            and PNC.NearbyWaterService and PNC.NearbyWaterService.Find
-            and PNC.NearbyWaterService.Find(record) ~= nil
+        return Routes.IsNearbyWaterAllowed(record)
+            and not Routes.IsCombatActive(record)
+            and not Routes.HasPersonalHydration(record)
+            and waterSource(record) ~= nil
     end,
     TaskSuffix = function(record)
-        local source = PNC.NearbyWaterService.Find(record)
+        local source = waterSource(record)
         return tostring(source and source.key or "unknown") .. ":"
             .. tostring(record.id)
     end,
     Validate = function(record)
+        if not Routes.IsNearbyWaterAllowed(record) then
+            return false, "NEARBY_WATER_NOT_ALLOWED"
+        end
         if Routes.IsCombatActive(record) then return false, "NPC_BUSY" end
-        if not PNC.NearbyWaterService or not PNC.NearbyWaterService.Find
-            or not PNC.NearbyWaterService.Find(record)
-        then return false, "NEARBY_WATER_NOT_FOUND" end
+        if Routes.HasPersonalHydration(record) then
+            return false, "PERSONAL_HYDRATION_AVAILABLE"
+        end
+        local source, sourceReason = waterSource(record)
+        if not source then return false, sourceReason or "NEARBY_WATER_NOT_FOUND" end
         return true
     end,
     Assign = function(record)
-        local source = PNC.NearbyWaterService
-            and PNC.NearbyWaterService.Find(record) or nil
-        if not source then return nil, "NEARBY_WATER_NOT_FOUND" end
+        if not Routes.IsNearbyWaterAllowed(record) then
+            return nil, "NEARBY_WATER_NOT_ALLOWED"
+        end
+        local source, sourceReason = waterSource(record)
+        if not source then return nil, sourceReason or "NEARBY_WATER_NOT_FOUND" end
         local target, approaches = PNC.NearbyWaterService.BuildApproach(
             record, source)
         if not target then return nil, approaches end
@@ -156,10 +197,11 @@ Routes.Register({
         }
     end,
     Start = function(record, lease, assignment)
-        local source = PNC.NearbyWaterService
-            and PNC.NearbyWaterService.Resolve(record, assignment.resourceKey)
-            or nil
-        if not source then return false, "NEARBY_WATER_NOT_FOUND" end
+        if not Routes.IsNearbyWaterAllowed(record) then
+            return false, "NEARBY_WATER_NOT_ALLOWED"
+        end
+        local source, sourceReason = waterSource(record, assignment.resourceKey)
+        if not source then return false, sourceReason or "NEARBY_WATER_NOT_FOUND" end
         return PNC.FacilityJobs.Start(record, {
             id = assignment.facilityId, baseId = "nearby",
             definitionId = "nearby_water",
@@ -172,9 +214,9 @@ Routes.Register({
         })
     end,
     CanContinue = function(record, lease)
-        return not Routes.IsCombatActive(record)
-            and PNC.NearbyWaterService and PNC.NearbyWaterService.Resolve
-            and PNC.NearbyWaterService.Resolve(record, lease.resourceKey) ~= nil
+        return Routes.IsNearbyWaterAllowed(record)
+            and not Routes.IsCombatActive(record)
+            and waterSource(record, lease.resourceKey) ~= nil
     end,
 })
 

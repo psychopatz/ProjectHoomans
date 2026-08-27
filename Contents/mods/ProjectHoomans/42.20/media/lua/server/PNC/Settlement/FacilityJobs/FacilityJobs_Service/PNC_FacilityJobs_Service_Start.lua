@@ -50,6 +50,14 @@ function Jobs.Start(record, facilityOrId, capability, options)
         PNC.AnimationScenes.Interrupt(record, live, "movement")
     end
     local target = acquired.target
+    local resourceKind = options.resourceKind or acquired.resourceKind or ""
+    local resourceKey = options.resourceKey or acquired.resourceKey or ""
+    local resource = options.resource or acquired.resource
+    if resource and PNC.FacilityResources
+        and PNC.FacilityResources.CopyDescriptor
+    then
+        resource = PNC.FacilityResources.CopyDescriptor(resource)
+    end
     local sceneId = tostring(target.sceneId or definition.sceneId or "")
     local facilityDefinition = PNC.FacilityDefinitions.Get(facility.definitionId)
     local previousOrder = PNC.Core.DeepCopy(record.orderSpec)
@@ -74,12 +82,11 @@ function Jobs.Start(record, facilityOrId, capability, options)
         manualToggleable = options.manualToggleable == true,
         taskLeaseId = tostring(options.taskLeaseId or ""),
         abstract = options.abstract == true,
-        resourceKind = tostring(options.resourceKind or ""),
-        resourceKey = tostring(options.resourceKey or ""),
+        resourceKind = tostring(resourceKind),
+        resourceKey = tostring(resourceKey),
         activityItemFullType = activityItemFullType,
-        resource = options.resource,
-        approachCandidates = options.approachCandidates
-            or acquired.approachCandidates,
+        resource = resource,
+        approachCandidates = options.approachCandidates or acquired.approachCandidates,
         approachIndex = 1,
         failedApproaches = {},
     }
@@ -98,14 +105,15 @@ function Jobs.Start(record, facilityOrId, capability, options)
         interactionX = target.interactionX,
         interactionY = target.interactionY,
         interactionZ = target.interactionZ,
+        interactionSurfaceOffset = target.interactionSurfaceOffset,
         interactionAxis = target.interactionAxis,
         interactionFacing = target.interactionFacing,
         sceneId = sceneId,
         sleepSurface = target.sleepSurface,
         taskLeaseId = tostring(options.taskLeaseId or ""),
         debugHold = options.debugHold == true,
-        resourceKind = tostring(options.resourceKind or ""),
-        resourceKey = tostring(options.resourceKey or ""),
+        resourceKind = tostring(resourceKind),
+        resourceKey = tostring(resourceKey),
         activityItemFullType = activityItemFullType,
     })
     return true, "facility_activity_started", {
@@ -130,4 +138,3 @@ function Jobs.StartForFacility(record, facilityId, options)
 end
 
 return Jobs
-

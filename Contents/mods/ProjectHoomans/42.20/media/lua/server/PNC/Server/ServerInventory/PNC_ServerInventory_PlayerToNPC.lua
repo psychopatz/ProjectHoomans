@@ -8,6 +8,7 @@ PNC.ServerInventory.Internal = PNC.ServerInventory.Internal or {}
 local Service = PNC.ServerInventory
 local Internal = Service.Internal
 local Const = PNC.Const
+local Registry = PNC.Registry
 local Inventory = PNC.Inventory
 local ItemTransfer = Internal.ItemTransfer
 local isNativeBulkProtected = Internal.isNativeBulkProtected
@@ -15,6 +16,13 @@ local isNonEmptyContainer = Internal.isNonEmptyContainer
 local compactSpec = Internal.compactSpec
 local refreshLiveEquipment = Internal.refreshLiveEquipment
 local syncResult = Internal.syncResult
+
+local function rollbackProjections(projections)
+    for index = #(projections or {}), 1, -1 do
+        local undo = projections[index]
+        if type(undo) == "function" then pcall(undo) end
+    end
+end
 
 local function transferPlayerToNPC(player, record, args, sinceRevision)
     local itemIDs = type(args.itemIDs) == "table" and args.itemIDs or {}
@@ -66,8 +74,35 @@ local function transferPlayerToNPC(player, record, args, sinceRevision)
         "player_to_npc"
     )
     if not added then return false, addReason end
+
+    -- AddItems owns the persistent compact model, while a live zombie also
+    -- needs a native projection for gameplay consumers.  Without this step
+    -- the UI showed the gift, but SupplyInventory.Consume correctly rejected
+    -- it as physically absent and the NPC remained hungry.
+    local body = Registry and Registry.GetLiveZombie
+        and Registry.GetLiveZombie(record.id) or nil
+    local projections = {}
+    if body then
+        if not Inventory.MaterializeItem then
+            Inventory.RemoveItems(record, compactIDs,
+                "player_to_npc_projection_rollback")
+            return false, "live_inventory_projection_unavailable"
+        end
+        for index = 1, #compactIDs do
+            local projected, projectionReason, undo =
+                Inventory.MaterializeItem(record, body, compactIDs[index])
+            if not projected then
+                rollbackProjections(projections)
+                Inventory.RemoveItems(record, compactIDs,
+                    "player_to_npc_projection_rollback")
+                return false, projectionReason
+            end
+            projections[#projections + 1] = undo
+        end
+    end
     local removed, removeReason = ItemTransfer.TakeFromPlayer(player, itemIDs)
     if not removed then
+        rollbackProjections(projections)
         Inventory.RemoveItems(record, compactIDs, "player_to_npc_rollback")
         return false, removeReason
     end

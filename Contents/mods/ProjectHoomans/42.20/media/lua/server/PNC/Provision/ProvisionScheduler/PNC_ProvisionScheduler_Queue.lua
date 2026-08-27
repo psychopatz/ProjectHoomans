@@ -59,7 +59,8 @@ function Scheduler.MarkDirty(
     if record then
         record.runtime = record.runtime or {}
         record.runtime.provision = record.runtime.provision or {
-            incoming = {}, refilling = {}, evaluations = {}, dirtyRules = {},
+            incoming = {}, incomingProjection = {}, refilling = {},
+            evaluations = {}, dirtyRules = {},
         }
         record.runtime.provision.dirtyRules[ruleID] = true
     end

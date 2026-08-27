@@ -14,9 +14,16 @@ end
 function H.ProvisionRuntime(record)
     record.runtime = record.runtime or {}
     record.runtime.provision = record.runtime.provision or {
-        incoming = {}, refilling = {}, evaluations = {}, dirtyRules = {},
+        incoming = {}, incomingProjection = {}, refilling = {},
+        evaluations = {}, dirtyRules = {},
     }
-    return record.runtime.provision
+    local runtime = record.runtime.provision
+    runtime.incoming = runtime.incoming or {}
+    runtime.incomingProjection = runtime.incomingProjection or {}
+    runtime.refilling = runtime.refilling or {}
+    runtime.evaluations = runtime.evaluations or {}
+    runtime.dirtyRules = runtime.dirtyRules or {}
+    return runtime
 end
 
 function H.RequestFor(definition)

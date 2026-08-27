@@ -41,6 +41,22 @@ function AtHome.Tick(record, zombie)
         record.activeBehavior = "AtHome:combat"
         return true
     end
+
+    -- Existing saves may still have a colony_home order anchored to the
+    -- former stockpile point. Ask the authority-side home service to repair
+    -- that anchor before this behavior freezes the actor in place. A repair
+    -- creates the normal durable travel order, so the Travel behavior owns
+    -- movement on the next tick for both live and abstract NPCs.
+    local homeService = PNC.HomeDutyService
+    if homeService and homeService.EnsureHomeAnchor then
+        local repaired, repairState = homeService.EnsureHomeAnchor(
+            record, order.baseId, "idle_home_anchor")
+        if repaired and repairState == "RETURNING_HOME" then
+            record.activeBehavior = "AtHome:returning"
+            return true
+        end
+    end
+
     record.activeBehavior = "AtHome"
     if PNC.NavigationRouter and PNC.NavigationRouter.Clear then
         PNC.NavigationRouter.Clear(record)

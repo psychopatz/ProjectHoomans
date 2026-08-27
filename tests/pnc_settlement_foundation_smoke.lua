@@ -338,39 +338,22 @@ for componentId, _ in pairs(barracks.componentIds) do
         barracksWorkZone = component
     end
 end
-T.truthy(barracksWorkZone, "facility creation adds a work zone")
-T.truthy(barracksWorkZone.region
-    and not GridRegion.containsRegion(barracks.constructionRegion,
-        barracksWorkZone.region),
-    "default work zone prefers a connected standing tile beside the footprint")
+T.equal(barracksWorkZone, nil,
+    "bedroom creation does not add a work zone")
 T.equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision,
     component = { kind = "anchor", role = "sleep.bed",
         x = 0, y = 0, z = 0 } }).reason,
     "FACILITY_NOT_BUILT", "components stay locked during construction")
+-- Simulate an older save that still contains the universal work-zone record.
+local staleWorkZone = { id = "stale_bedroom_work_zone", facilityId = barracks.id,
+    kind = "region", role = "work.zone", region = rectangle(0, 4, 0, 4, 0) }
+PNC.SettlementRepository.State.components[staleWorkZone.id] = staleWorkZone
+barracks.componentIds[staleWorkZone.id] = true
 barracks.constructionState = "BUILT"
 PNC.FacilityService.RefreshState(barracks)
-
-local movedWorkZone = PNC.FacilityService.SetComponent({}, {
-    facilityId = barracks.id, expectedRevision = barracks.revision,
-    component = { id = barracksWorkZone.id, kind = "region", role = "work.zone",
-        region = rectangle(3, 4, 3, 4, 0) },
-})
-T.truthy(movedWorkZone.ok and movedWorkZone.component
-    and not movedWorkZone.pendingComponent and not movedWorkZone.workOrder,
-    "work zone moves directly without reconstruction")
-local movedWorkZoneComponent = PNC.SettlementRepository.GetComponent(
-    barracksWorkZone.id)
-T.equal(movedWorkZoneComponent.region.levels[0].rows[4][1], 3,
-    "work zone move applies its new coordinate immediately")
-T.equal(barracks.constructionState, "BUILT",
-    "work zone move does not change facility construction state")
-T.equal(PNC.FacilityService.SetComponent({}, {
-    facilityId = barracks.id, expectedRevision = barracks.revision,
-    component = { id = barracksWorkZone.id, kind = "region", role = "work.zone",
-        region = rectangle(6, 6, 6, 6, 0) },
-}).reason, "OUTSIDE_FACILITY",
-    "work zone cannot move to a disconnected tile")
+T.equal(PNC.SettlementRepository.GetComponent(staleWorkZone.id), nil,
+    "index rebuild removes an obsolete bedroom work zone")
 
 for index = 1, 4 do
     local bed = PNC.FacilityService.SetComponent({}, {
@@ -386,8 +369,8 @@ for index = 1, 4 do
 end
 T.equal(barracks.cachedState, "OPERATIONAL", "barracks state")
 local workTarget = PNC.FacilityService.ResolveWorkTarget(barracks)
-T.equal(workTarget.role, "work.zone",
-    "facility work prefers the editable labor spot")
+T.equal(workTarget.role, "facility.footprint",
+    "bedroom work target falls back to its room footprint")
 T.equal(PNC.FacilityService.SetComponent({}, { facilityId = barracks.id,
     expectedRevision = barracks.revision, component = {
         kind = "anchor", role = "sleep.bed", x = 3, y = 1, z = 0,
@@ -434,6 +417,11 @@ T.equal(researchFacility.workstationPlacement.entityScript, "Base.Log_Table",
     "native Log Table placement is persisted on the facility")
 T.equal(researchFacility.cachedState, "OPERATIONAL",
     "one Log Table makes all research lanes operational")
+local researchTarget = PNC.FacilityService.ResolveWorkTarget(researchFacility)
+T.equal(researchTarget.role, "work.research",
+    "native workstation target keeps its physical work role")
+T.equal(researchTarget.componentId, researchStation.id,
+    "native workstation target points to the managed Log Table anchor")
 T.equal(#PNC.FacilityService.ListByCapability(base.id, "work.blueprint"), 1,
     "shared Log Table exposes blueprint activity")
 T.equal(#PNC.FacilityService.ListByCapability(base.id, "work.reverse"), 1,

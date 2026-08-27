@@ -241,6 +241,7 @@ local expectedSettlement = {
     "PNC/Settlement/PNC_FacilityWorldValidation",
     "PNC/Settlement/PNC_FacilityValidationService",
     "PNC/Settlement/PNC_FacilityCostService",
+    "PNC/Settlement/PNC_FacilityResources",
     "PNC/Settlement/PNC_FacilityService",
     "PNC/Settlement/PNC_StockpileVisualService",
     "PNC/Settlement/PNC_InteractionTargetResolver",

@@ -125,6 +125,9 @@ Definitions.SUPPLY_MATERIAL_CHANGE = 0.10
 Definitions.SUPPLY_MAX_CANDIDATES = 24
 Definitions.SUPPLY_MAX_SELECTIONS = 3
 Definitions.SUPPLY_MAX_USES = 8
+-- Critical need responses may exceed the normal three-item refill batch, but
+-- still have a hard safety bound. Selection math stops at the actual deficit.
+Definitions.SUPPLY_MAX_STATE_AWARE_SELECTIONS = 64
 -- Needs owns when sleep becomes actionable and when rest is complete. Tasking
 -- consumes this policy as intent metadata; it must not duplicate thresholds.
 Definitions.SLEEP_TASK = {

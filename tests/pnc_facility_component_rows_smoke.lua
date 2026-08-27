@@ -87,6 +87,23 @@ T.truthy(rows[3].key == "bed:2"
     and rows[3].secondaryAction.remove == true,
     "second bed does not have individual manage and deconstruct actions")
 
+PNC.FacilityDefinitions.GetLevel = function()
+    return { componentLimits = {} }
+end
+rows = Browser.BuildComponentRows({
+    definitionId = "bedroom", level = 1, components = {},
+    roomProfile = {
+        bedCount = 2, capacity = 1, capacityOverride = 1,
+        scanStatus = "READY",
+    },
+})
+T.equal(rows[1].key, "room_capacity",
+    "room inspector exposes the capacity setting")
+T.equal(rows[1].detail, "1 SLEEPERS",
+    "room inspector shows the configured capacity")
+T.equal(rows[1].componentAction.kind, "set_room_capacity",
+    "room capacity row opens the setting editor")
+
 rows = Browser.BuildComponentRows({
     definitionId = "stockpile", level = 1,
     components = {{

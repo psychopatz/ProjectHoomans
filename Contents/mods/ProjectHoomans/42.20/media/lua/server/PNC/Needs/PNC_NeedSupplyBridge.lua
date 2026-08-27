@@ -6,6 +6,23 @@ PNC.NeedSupplyBridge = PNC.NeedSupplyBridge or {}
 local Bridge = PNC.NeedSupplyBridge
 local Definitions = PNC.NeedsDefinitions
 
+local function wakeProvision(record, needType, current)
+    local definition = Definitions.SUPPLY[needType]
+    local scheduler = PNC.ProvisionScheduler
+    if not definition or not scheduler or not scheduler.MarkDirty
+        or (tonumber(current) or 0) < (tonumber(definition.trigger) or 0)
+    then return end
+    local required = { hunger = 0, thirst = 0 }
+    required[needType] = math.max(0.001, tonumber(current) or 0.001)
+    local hasPersonal = PNC.NPCSupplyService
+        and PNC.NPCSupplyService.HasPersonalSupply
+        and PNC.NPCSupplyService.HasPersonalSupply(
+            record, definition.resourceKind, required)
+    if hasPersonal == true then return end
+    scheduler.MarkDirty(record,
+        needType == "hunger" and "food" or "hydration", 0)
+end
+
 local function priority(definition, current)
     local severity = math.max(0, math.min(100,
         (tonumber(current) or 0) * 100))
@@ -17,6 +34,7 @@ function Bridge.RequestForNeed(record, needType, force)
     local definition = Definitions.SUPPLY[needType]
     if not definition then return false, "supply_not_supported" end
     local current = PNC.IndividualNeeds.Get(record, needType)
+    wakeProvision(record, needType, current)
     if not force and current < definition.trigger then
         return false, "trigger_not_reached"
     end
@@ -89,6 +107,16 @@ function Bridge.Evaluate(record, forceKind)
         return Bridge.EnsureMedical(record, "BANDAGE", partID, true)
     end
     return changed
+end
+
+if PNC.IndividualNeeds and PNC.IndividualNeeds.RegisterListener then
+    PNC.IndividualNeeds.RegisterListener("severity_changed",
+        function(record, needType)
+            if needType == "hunger" or needType == "thirst" then
+                wakeProvision(record, needType,
+                    PNC.IndividualNeeds.Get(record, needType))
+            end
+        end)
 end
 
 return Bridge

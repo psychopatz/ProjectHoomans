@@ -5,6 +5,8 @@ local Triggers = PNC.NeedFacilityTriggers
 local Definitions = PNC.NeedFacilityTriggerDefinitions
 local AwayRoutes = PNC.NeedFacilityAwayRoutes
 local HomeRoute = PNC.NeedFacilityHomeRoute
+local Events = require "PsychopatzCore/Events/PC_EventBus"
+local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 
 local function recordFor(id)
     return PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(id) or nil
@@ -181,5 +183,18 @@ if PNC.IndividualNeeds and PNC.IndividualNeeds.RegisterListener then
             end
         end)
 end
+
+-- Provision pickup changes the personal-supply candidates without changing
+-- need severity. Wake tasking on that inventory event so a newly delivered
+-- item is consumed immediately instead of waiting for NeedsScheduler.
+local function onInventoryChanged(record)
+    if record and PNC.Tasking and PNC.Tasking.Commands
+        and PNC.Tasking.Commands.MarkDirty
+    then
+        PNC.Tasking.Commands.MarkDirty(record.id, "NPC_INVENTORY_CHANGED")
+    end
+end
+
+Events.subscribe(EventTypes.NPC_INVENTORY_CHANGED, onInventoryChanged, Triggers)
 
 return Triggers

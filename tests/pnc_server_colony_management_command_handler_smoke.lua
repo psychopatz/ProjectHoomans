@@ -75,6 +75,7 @@ T.equal(colonyCall.snapshot.actionResult.ok, true,
 local settlementActions = {
     "base_create", "base_expand", "base_shrink", "barricade_build",
     "hq_upgrade", "facility_create", "facility_upgrade",
+    "facility_capacity_set",
     "facility_component_set", "facility_component_remove",
     "facility_destroy", "stockpile_node_create", "stockpile_node_remove",
 }

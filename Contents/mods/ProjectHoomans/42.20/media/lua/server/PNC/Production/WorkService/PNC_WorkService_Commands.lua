@@ -46,7 +46,7 @@ function Service.Commands.Cancel(orderId, reason)
             return false, cancellationReason or "CANCELLATION_FAILED"
         end
     end
-    releaseClaim(order, order.cancellationReason, true)
+    releaseClaim(order, order.cancellationReason, true, false)
     order.status, order.cancelledAt = Status.CANCELLED, now()
     order.terminalPersisted = false
     order.blockedReason, order.revision = nil, order.revision + 1
@@ -65,7 +65,9 @@ function Service.Commands.ReleaseWorker(workerId, reason)
         and record.runtime.workOrderId or nil
     local order = orderId and Repository.Get(orderId) or nil
     if not order or terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
-    releaseClaim(order, reason or "worker_released")
+    local released, releaseReason = releaseClaim(order,
+        reason or "worker_released", false, true)
+    if released == false then return false, releaseReason end
     order.status = Status.WAITING_FOR_WORKER
     order.blockedReason = nil
     order.updatedAt, order.revision = now(), order.revision + 1

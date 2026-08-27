@@ -70,10 +70,12 @@ T.equal(stockpileMarkers[1].label, "Stockpile Lv 1",
 
 local workRegion = { levels = { [0] = { rows = { [6] = { 6, 6 } } } } }
 local zonedSettlement = { facilities = {
-    { id = "forge_1", definitionId = "forge", constructionRegion = workRegion,
+    { id = "forge_1", definitionId = "forge", workZoneEnabled = true,
+        constructionRegion = workRegion,
         components = {{ id = "zone_1", kind = "region", role = "work.zone",
             region = workRegion }} },
-    { id = "forge_2", definitionId = "forge", constructionRegion = workRegion,
+    { id = "forge_2", definitionId = "forge", workZoneEnabled = true,
+        constructionRegion = workRegion,
         components = {{ id = "zone_2", kind = "region", role = "work.zone",
             region = workRegion }} },
 } }
@@ -84,8 +86,42 @@ T.equal(workLayers[1].color.a < 0.30, true,
     "work-zone highlight stays translucent over the native workstation")
 local workMarkers = Overlay.BuildMarkers(zonedSettlement)
 T.equal(#workMarkers, 2, "each facility exposes a work-zone marker")
-T.equal(workMarkers[1].label, "Forge #1", "first duplicate facility is numbered")
-T.equal(workMarkers[2].label, "Forge #2", "second duplicate facility is numbered")
+T.equal(workMarkers[1].label, "Worker Standing Area - Forge #1",
+    "first work-zone marker identifies its labor spot")
+T.equal(workMarkers[2].label, "Worker Standing Area - Forge #2",
+    "second work-zone marker identifies its labor spot")
+
+local bedroomRegion = { levels = { [0] = { rows = {
+    [10] = { 10, 14 }, [11] = { 10, 14 },
+} } } }
+local bedroomLayers = Overlay.BuildLayers({ facilities = {{
+    id = "bedroom_1", definitionId = "bedroom", zoneOverlay = true,
+    constructionState = "BUILT", constructionRegion = bedroomRegion,
+    workZoneEnabled = false,
+    components = {{ id = "bedroom_work_zone", kind = "region",
+        role = "work.zone", region = {
+            levels = { [0] = { rows = { [10] = { 10, 10 } } } },
+        } }},
+}} }, false)
+T.equal(#bedroomLayers, 1,
+    "zone-backed bedroom exposes only its room layer")
+T.equal(bedroomLayers[1].kind, "facility_zone",
+    "bedroom footprint uses the reusable facility-zone layer")
+T.equal(bedroomLayers[1].hoverOnly, false,
+    "bedroom zone is visible without hovering")
+T.equal(bedroomLayers[1].color.r > 0.40, true,
+    "bedroom zone keeps its dedicated color visible")
+local bedroomMarkers = Overlay.BuildMarkers({ facilities = {{
+    id = "bedroom_1", definitionId = "bedroom", zoneOverlay = true,
+    constructionRegion = bedroomRegion,
+    workZoneEnabled = false,
+    components = {{ id = "bedroom_work_zone", kind = "region",
+        role = "work.zone", region = bedroomRegion }},
+}} })
+T.equal(#bedroomMarkers, 1,
+    "zone-backed bedroom exposes only its room marker")
+T.equal(bedroomMarkers[1].kind, "room",
+    "bedroom footprint gets a room marker")
 
 local constructionLayers = Overlay.BuildLayers({ facilities = {{
     id = "facility_building", definitionId = "research_facility",

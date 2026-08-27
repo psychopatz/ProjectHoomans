@@ -225,6 +225,10 @@ function Presentation.WorkActionStatus(snapshot)
         target = definition and tr(definition.labelKey,
             tostring(info.technologyId or "technology"))
             or tr("UI_PNC_Action_KnowledgeTarget", "knowledge")
+    elseif operation == "PROVISION_PICKUP" then
+        verb = tr("UI_PNC_Action_Grabbing", "Grabbing")
+        target = itemName(info.activityItemFullType,
+            tr("UI_PNC_Action_ProvisionTarget", "provision"))
     else
         verb = tr("UI_PNC_Action_Working", "Working")
         target = tostring(operation)
@@ -232,8 +236,13 @@ function Presentation.WorkActionStatus(snapshot)
     local text = verb .. " " .. target
     local status = tostring(info.status or "")
     if status == "TRAVEL_TO_STOCKPILE" then
-        text = tr("UI_PNC_Action_CollectingMaterials", "Collecting materials for")
-            .. " " .. target
+        if operation == "PROVISION_PICKUP" then
+            text = text .. " - "
+                .. tr("UI_PNC_Action_Traveling", "traveling")
+        else
+            text = tr("UI_PNC_Action_CollectingMaterials", "Collecting materials for")
+                .. " " .. target
+        end
     elseif status == "TRAVEL_TO_STATION" then
         text = text .. " - " .. tr("UI_PNC_Action_Traveling", "traveling")
     elseif status == "BLOCKED" then

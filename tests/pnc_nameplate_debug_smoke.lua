@@ -233,6 +233,16 @@ T.contains(actionText, "Eating", "eating activity label")
 T.contains(actionText, "Apple", "eating activity item")
 T.contains(actionText, "preparing", "eating activity phase")
 snapshot.actionInformation = {
+    kind = "work_order",
+    operation = "PROVISION_PICKUP",
+    status = "TRAVEL_TO_STOCKPILE",
+    percent = 0,
+    activityItemFullType = "Base.Apple",
+}
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+T.contains(actionText, "Grabbing", "provision pickup action verb")
+T.contains(actionText, "Apple", "provision pickup actual item")
+snapshot.actionInformation = {
     kind = "activity",
     activityId = "job:GuardAnchor",
     fallback = "Guard Anchor",

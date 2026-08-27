@@ -61,8 +61,21 @@ function Service.Commands.Queue(spec)
     return copy(order)
 end
 
-local function releaseClaim(order, reason, cancelInputs)
+local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
     if not order then return end
+    if cleanupOperation == true
+        and order.operation == "PROVISION_PICKUP"
+        and not order.completionCommitted
+    then
+        local cancellation = Service.CancellationHandlers
+            and Service.CancellationHandlers[order.operation]
+        if cancellation then
+            local cleaned, cleanupReason = cancellation(order)
+            if cleaned == false then
+                return false, cleanupReason or "WORK_RELEASE_CLEANUP_FAILED"
+            end
+        end
+    end
     local input = order.payload and order.payload.input
     if PNC.WorkInputService and input
         and (cancelInputs == true or input.staged == true)
@@ -95,6 +108,7 @@ local function releaseClaim(order, reason, cancelInputs)
     order.facilityReservationId, order.previousOrder = nil, nil
     order.stationTarget, order.collectionTarget = nil, nil
     order.executionMode, order.lastAbstractAt = nil, nil
+    return true
 end
 
 local function assignedOrderForRecord(record)

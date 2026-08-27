@@ -8,26 +8,41 @@ local MaterializationSafety = PNC.MaterializationSafety
 function Internal.FindMaterializeSquare(record, now, reason)
     local cell
     local query
+    local resourceTarget
+    local probeX, probeY, probeZ
     if not getCell then
-        return record.x, record.y, record.z, nil
+        return record.x, record.y, record.z, nil, nil, resourceTarget
     end
     cell = getCell()
+    if PNC.FacilityResources
+        and PNC.FacilityResources.ResolveActivityTarget
+    then
+        resourceTarget = PNC.FacilityResources.ResolveActivityTarget(record)
+    end
+    probeX = resourceTarget and resourceTarget.x or record.x
+    probeY = resourceTarget and resourceTarget.y or record.y
+    probeZ = resourceTarget and resourceTarget.z or record.z
     if MaterializationSafety and MaterializationSafety.Resolve then
-        return MaterializationSafety.Resolve(record, now, cell, {
-            requireSettle = tostring(reason or "") == "range_enter",
-        })
+        local x, y, z, recoveryReason, deferredReason =
+            MaterializationSafety.Resolve(record, now, cell, {
+                x = probeX, y = probeY, z = probeZ,
+                requireSettle = tostring(reason or "") == "range_enter",
+            })
+        return x, y, z, recoveryReason, deferredReason, resourceTarget
     end
     query = PNC.TraversalQuery
     if query and query.FindNearestMaterializationSquare then
-        return query.FindNearestMaterializationSquare(
-            record.x,
-            record.y,
-            record.z,
+        local x, y, z, recoveryReason =
+            query.FindNearestMaterializationSquare(
+            probeX,
+            probeY,
+            probeZ,
             tonumber(Const.MATERIALIZE_SAFE_RADIUS) or 8,
             cell
         )
+        return x, y, z, recoveryReason, nil, resourceTarget
     end
-    return record.x, record.y, record.z, nil
+    return probeX, probeY, probeZ, nil, nil, resourceTarget
 end
 
 function Internal.LogPositionRecovery(

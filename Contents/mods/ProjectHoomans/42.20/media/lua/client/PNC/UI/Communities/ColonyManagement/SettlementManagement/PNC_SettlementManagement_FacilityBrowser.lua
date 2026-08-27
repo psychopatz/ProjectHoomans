@@ -62,7 +62,8 @@ local function drawFacility(list, y, entry, alternate)
     if progress then state = state .. "  •  " .. progress end
     list:drawText(state, 18, y + 31,
         color.r, color.g, color.b, color.a, UIFont.Small)
-    local detail = tostring(#(facility.components or {})) .. " COMPONENTS"
+    local detail = tostring(#(facility.components or {})
+        + #(facility.discoveredComponents or {})) .. " COMPONENTS"
     if facility.activeTask then
         detail = (facility.activeTask.funded
             and tr("UI_PNC_Work_MaterialsSupplied", "MATERIALS SUPPLIED")
@@ -317,7 +318,8 @@ function Browser.Rebuild(window, snapshot)
     for index = 1, #facilities do
         local facility = facilities[index]
         local definition = PNC.FacilityDefinitions.Get(facility.definitionId)
-        facility.displayName = tr(definition and definition.displayNameKey or "",
+        facility.displayName = tr(facility.roomLabelKey
+            or definition and definition.displayNameKey or "",
             facility.definitionId)
         rows[#rows + 1] = facility
         if facility.id == previousId then selected = index end

@@ -34,6 +34,15 @@ local function requirementsFor(selected)
     return requirements
 end
 
+local function isFollowing(record)
+    if PNC.HomeDutyService and PNC.HomeDutyService.IsFollowing then
+        return PNC.HomeDutyService.IsFollowing(record) == true
+    end
+    local order = record and record.orderSpec or nil
+    return tostring(order and order.kind or "") == tostring(
+        PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
+end
+
 local function compactSelection(selected)
     local output = {}
     for index = 1, #(selected or {}) do
@@ -47,12 +56,23 @@ local function compactSelection(selected)
     return output
 end
 
+local function firstSelectedFullType(selected)
+    for index = 1, #(selected or {}) do
+        local entry = selected[index]
+        local descriptor = entry and entry.descriptor or {}
+        local fullType = tostring(descriptor.fullType or "")
+        if fullType ~= "" then return fullType end
+    end
+    return nil
+end
+
 local function releaseReservation(id)
     if id and PNC.ColonyStorageService
         and PNC.ColonyStorageService.ReleaseProductionReservation
     then
-        PNC.ColonyStorageService.ReleaseProductionReservation(id)
+        return PNC.ColonyStorageService.ReleaseProductionReservation(id)
     end
+    return true
 end
 
 local function reservationReady(payload)
@@ -132,9 +152,15 @@ local function cancel(order)
             PNC.ColonyStorageService.ForgetProductionTransaction(
                 payload.storageId, order.id)
         end
+        payload.collected = false
+        payload.reservationId = nil
+        payload.itemIds, payload.records = nil, nil
     elseif payload.reservationId then
-        releaseReservation(payload.reservationId)
+        local released = releaseReservation(payload.reservationId)
+        if released == false then return false, "provision_reservation_release_failed" end
+        payload.reservationId = nil
     end
+    if PNC.WorkRepository then PNC.WorkRepository.MarkDirty() end
     return true
 end
 
@@ -148,7 +174,9 @@ local function targetFor(order, worker, live)
         z = live.getZ and live:getZ() or z
         local service = PNC.StockpileAccessService
         local node = service and service.FindNearest
-            and service.FindNearest(order.baseId, x, y, z) or nil
+            and service.FindNearest(order.baseId, x, y, z, {
+                requireLoaded = true,
+            }) or nil
         if not node then return nil, "NO_STOCKPILE_ACCESS_NODE" end
         return { x = node.x, y = node.y, z = node.z, nodeId = node.id }
     end
@@ -193,6 +221,14 @@ function Scheduler.QueueLivePickup(record, storage, request, selected, state)
         return nil, "base_service_unavailable" end
     local base = PNC.BaseService.GetForColony(storage.settlementId)
     if not base then return nil, "base_not_found" end
+    if isFollowing(record) then
+        return nil, "provision_blocked_while_following"
+    end
+    if PNC.HomeDutyService and PNC.HomeDutyService.IsAtHome
+        and not PNC.HomeDutyService.IsAtHome(record, base.id)
+    then
+        return nil, "provision_waiting_for_home"
+    end
     if not PNC.ColonyStorageService
         or not PNC.ColonyStorageService.ReserveProductionMaterials
     then return nil, "production_reservation_unavailable" end
@@ -209,14 +245,15 @@ function Scheduler.QueueLivePickup(record, storage, request, selected, state)
     local order, queueReason = work.Commands.Queue({
         operation = OPERATION, colonyId = storage.settlementId,
         factionId = storage.ownerFactionId, baseId = base.id,
-        -- Provision is a home-only pickup. An away/following NPC remains
-        -- hungry until the player explicitly sends them home.
+        -- Provision is a home-only pickup. An away worker is returned home by
+        -- WorkService before this durable order is retried.
         requiresHome = true,
-        autoReturnHome = false,
+        autoReturnHome = true,
         requiredWork = 1, priority = request.priority,
         payload = {
             storageId = storage.id, reservationId = reservation.id,
             stage = STAGE, selected = compactSelection(selected),
+            activityItemFullType = firstSelectedFullType(selected),
             request = copy(request),
         },
     })

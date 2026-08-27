@@ -7,7 +7,7 @@ end
 
 local function roleLabel(role)
     local labels = {
-        ["sleep.bed"] = "SLEEPING SPOT",
+        ["sleep.bed"] = "BED",
         ["dining.table"] = "DINING TABLE",
         ["health.bed"] = "HOSPITAL BED",
         ["growing.plot"] = "GROWING PLOT",
@@ -52,7 +52,18 @@ end
 
 local function componentDetail(facility, component)
     local detail
-    if component.kind == "anchor" then
+    if component.kind == "discovered" then
+        detail = roleLabel(component.role) .. " | "
+            .. tostring(component.x or "?") .. ", "
+            .. tostring(component.y or "?")
+        if component.available == false then
+            detail = detail .. " | " .. text(
+                "UI_PNC_Facility_ResourceUnavailable", "UNAVAILABLE")
+        else
+            detail = detail .. " | " .. text(
+                "UI_PNC_Facility_ResourceAvailable", "AVAILABLE")
+        end
+    elseif component.kind == "anchor" then
         detail = roleLabel(component.role) .. " | "
             .. tostring(component.x) .. ", " .. tostring(component.y)
             .. " | FLOOR " .. tostring(component.z)
@@ -148,8 +159,8 @@ function Rows.Build(facility, storage)
     local level = PNC.FacilityDefinitions.GetLevel(
         facility.definitionId, facility.level)
     local roles = {}
-    for role, _ in pairs(level and level.componentLimits or {}) do
-        roles[#roles + 1] = role
+    for role, limit in pairs(level and level.componentLimits or {}) do
+        if not limit.legacy then roles[#roles + 1] = role end
     end
     table.sort(roles)
     for roleIndex = 1, #roles do
@@ -234,6 +245,69 @@ function Rows.Build(facility, storage)
                 detail = componentDetail(facility, component),
                 child = true,
                 complete = false,
+            }
+        end
+    end
+    local profile = facility.roomProfile
+    if profile then
+        local bedCount = tonumber(profile.bedCount)
+            or tonumber(profile.resourceCounts
+                and profile.resourceCounts["sleep.bed"]) or 0
+        local scanStatus = tostring(profile.scanStatus or "UNKNOWN")
+        local scanReady = scanStatus == "READY"
+        local configuredCapacity = tonumber(profile.capacityOverride)
+        local effectiveCapacity = tonumber(profile.capacity) or bedCount
+        local capacityDetail = configuredCapacity
+            and tostring(configuredCapacity) .. " "
+                .. text("UI_PNC_Facility_Sleepers", "SLEEPERS")
+            or text("UI_PNC_Facility_CapacityAutomatic", "AUTO") .. " | "
+                .. tostring(effectiveCapacity) .. " "
+                .. text("UI_PNC_Facility_Sleepers", "SLEEPERS")
+        rows[#rows + 1] = {
+            key = "room_capacity",
+            label = text("UI_PNC_Facility_Capacity", "CAPACITY"),
+            detail = capacityDetail,
+            complete = true,
+            componentAction = { kind = "set_room_capacity" },
+            actionLabel = text("UI_PNC_Facility_SetCapacity", "SET"),
+        }
+        rows[#rows + 1] = {
+            key = "discovered:sleep.bed",
+            label = text("UI_PNC_Facility_Beds", "BEDS"),
+            iconPath = componentIconPath("sleep.bed"),
+            detail = tostring(bedCount) .. " | " .. (scanReady
+                and text("UI_PNC_Facility_ResourceScanReady", "SCANNED")
+                or scanStatus),
+            complete = scanReady,
+        }
+        local discovered = {}
+        for index = 1, #(facility.discoveredComponents or {}) do
+            local component = facility.discoveredComponents[index]
+            if component.role == "sleep.bed" then
+                discovered[#discovered + 1] = component
+            end
+        end
+        for index = 1, #discovered do
+            local component = discovered[index]
+            rows[#rows + 1] = {
+                key = component.resourceKey or "discovered:bed:" .. tostring(index),
+                label = "- " .. text("UI_PNC_Facility_Bed", "BED")
+                    .. " #" .. tostring(index),
+                iconPath = componentIconPath("sleep.bed"),
+                detail = componentDetail(facility, component),
+                child = true,
+                complete = component.available ~= false,
+            }
+        end
+        if bedCount == 0 and scanReady then
+            rows[#rows + 1] = {
+                key = "discovered:floor",
+                label = "- " .. text("UI_PNC_Facility_FloorSleeping",
+                    "FLOOR SLEEPING"),
+                detail = text("UI_PNC_Facility_FloorSleepingHelp",
+                    "No bed detected; sleeping uses the room floor."),
+                child = true,
+                complete = scanReady,
             }
         end
     end

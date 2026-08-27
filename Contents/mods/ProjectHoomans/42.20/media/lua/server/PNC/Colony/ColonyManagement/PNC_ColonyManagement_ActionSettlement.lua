@@ -21,6 +21,8 @@ function Internal.handleSettlementAction(player, args, action)
         hq_upgrade = PNC.BaseService and PNC.BaseService.UpgradeHQ,
         facility_create = PNC.FacilityService and PNC.FacilityService.Create,
         facility_upgrade = PNC.FacilityService and PNC.FacilityService.Upgrade,
+        facility_capacity_set = PNC.FacilityService
+            and PNC.FacilityService.SetCapacity,
         facility_debug_get_materials = PNC.FacilityService
             and PNC.FacilityService.DebugGrantMaterials,
         facility_component_set = PNC.FacilityService

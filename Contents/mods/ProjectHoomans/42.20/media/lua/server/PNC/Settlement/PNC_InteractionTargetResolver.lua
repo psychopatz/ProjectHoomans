@@ -6,6 +6,7 @@ PNC.FacilityInteractionTargets = PNC.FacilityInteractionTargets or {}
 local Targets = PNC.FacilityInteractionTargets
 local SquareRules = require "PsychopatzCore/World/PsychopatzSquareRules"
 Targets.Resolvers = Targets.Resolvers or {}
+Targets.ResourceResolvers = Targets.ResourceResolvers or {}
 Targets.Cache = Targets.Cache or {}
 
 function Targets.Register(id, resolver)
@@ -13,6 +14,14 @@ function Targets.Register(id, resolver)
         return false, "INVALID_RESOLVER"
     end
     Targets.Resolvers[id] = resolver
+    return true
+end
+
+function Targets.RegisterResource(id, resolver)
+    if type(id) ~= "string" or id == "" or type(resolver) ~= "function" then
+        return false, "INVALID_RESOURCE_RESOLVER"
+    end
+    Targets.ResourceResolvers[id] = resolver
     return true
 end
 
@@ -38,6 +47,15 @@ function Targets.Resolve(component, context)
         Targets.Cache[component.id] = { revision = component.revision, targets = targets }
     end
     return targets
+end
+
+function Targets.ResolveResource(resource, context)
+    if type(resource) ~= "table" then return {} end
+    local resolverId = tostring(resource.targetResolver
+        or resource.detectorId or "")
+    local resolver = Targets.ResourceResolvers[resolverId]
+    local targets = resolver and resolver(resource, context or {}) or nil
+    return type(targets) == "table" and targets or {}
 end
 
 function Targets.ReportPathFailure(componentId)
@@ -112,8 +130,66 @@ local function sleepSpotTargets(component)
     } }
 end
 
+local function resourceBedTargets(resource, context)
+    local originX = math.floor(tonumber(resource.originX)
+        or tonumber(resource.x) or 0)
+    local originY = math.floor(tonumber(resource.originY)
+        or tonumber(resource.y) or 0)
+    local originZ = math.floor(tonumber(resource.originZ)
+        or tonumber(resource.z) or 0)
+    local square = SquareRules.GetSquare(originX, originY, originZ)
+    local bed = square and SquareRules.DescribeBed(square) or nil
+    local loaded = square ~= nil
+    if loaded and not bed then return {} end
+    bed = bed or {
+        object = resource.object,
+        x = tonumber(resource.x) or originX + 0.5,
+        y = tonumber(resource.y) or originY + 0.5,
+        z = tonumber(resource.z) or originZ,
+        axis = resource.axis,
+        facing = resource.facing,
+        surfaceOffset = resource.surfaceOffset,
+    }
+    local interactionZ = tonumber(bed.z) or originZ
+    local surfaceOffset = tonumber(bed.surfaceOffset)
+    if surfaceOffset and surfaceOffset > 0 then
+        -- Project Zomboid stores furniture surface height in pixels. Match
+        -- Offline Survivor's supported-bed placement conversion so the live
+        -- NPC and its abstract position use the mattress height.
+        interactionZ = interactionZ + (surfaceOffset + 1) / 96
+    end
+    local offsets = { { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } }
+    for index = 1, #offsets do
+        local x = originX + offsets[index][1]
+        local y = originY + offsets[index][2]
+        local approach = SquareRules.GetSquare(x, y, originZ)
+        if isApproachSquare(approach) then
+            return { {
+                x = x + 0.5, y = y + 0.5, z = originZ,
+                interactionX = bed.x, interactionY = bed.y,
+                interactionZ = interactionZ, interactionAxis = bed.axis,
+                interactionFacing = bed.facing,
+                interactionSurfaceOffset = bed.surfaceOffset,
+                sceneId = "facility.sleep.bed", sleepSurface = "bed",
+                object = bed.object, resourceKey = resource.resourceKey,
+                resourceKind = resource.resourceKind,
+            } }
+        end
+    end
+    return { {
+        x = originX + 0.5, y = originY + 0.5, z = originZ,
+        interactionX = bed.x, interactionY = bed.y, interactionZ = interactionZ,
+        interactionAxis = bed.axis, interactionFacing = bed.facing,
+        interactionSurfaceOffset = bed.surfaceOffset,
+        sceneId = "facility.sleep.bed", sleepSurface = "bed",
+        object = bed.object, resourceKey = resource.resourceKey,
+        resourceKind = resource.resourceKind,
+    } }
+end
+
 Targets.Register("sleepSpot", sleepSpotTargets)
 -- Compatibility for components saved before sleep spots became furniture-optional.
 Targets.Register("bed", sleepSpotTargets)
+Targets.RegisterResource("bed", resourceBedTargets)
 
 return Targets

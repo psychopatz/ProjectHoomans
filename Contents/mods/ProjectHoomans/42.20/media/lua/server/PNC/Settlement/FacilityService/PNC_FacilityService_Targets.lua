@@ -13,6 +13,15 @@ local Definitions = PNC.FacilityDefinitions
 local Costs = PNC.FacilityCostService
 local EventsBus = PsychopatzCore and PsychopatzCore.Events
 
+local function facilityRequiresWorkZone(facility)
+    if not facility then return false end
+    if Definitions.RequiresWorkZone then
+        return Definitions.RequiresWorkZone(
+            facility.definitionId, facility.level) == true
+    end
+    return false
+end
+
 
 local function pointFromRegion(region)
     local zKeys = {}
@@ -41,39 +50,50 @@ function Service.ResolveWorkTarget(facilityOrId)
         componentIds[#componentIds + 1] = componentId
     end
     table.sort(componentIds)
-    -- The labor spot is independent from the physical workstation object.
-    -- Prefer it for all facility work so editing the spot changes where the
-    -- NPC stands without moving or reconstructing the station itself.
+    if facilityRequiresWorkZone(facility) then
+        -- A labor zone is an explicit standing area for facilities such as
+        -- farms. It is never inferred from an unrelated room component.
+        for _, componentId in ipairs(componentIds) do
+            local component = Repository.GetComponent(componentId)
+            if component and component.role == "work.zone" then
+                if component.kind == "anchor" then
+                    return { x = component.x, y = component.y, z = component.z,
+                        componentId = component.id, role = component.role }
+                end
+                if component.kind == "region" and component.region then
+                    local point = pointFromRegion(component.region)
+                    if point then
+                        point.componentId, point.role = component.id, component.role
+                        return point
+                    end
+                end
+            end
+        end
+    end
+    -- Native workstations are the work target when a facility has no
+    -- separately configured labor zone. This keeps a forge/table anchor from
+    -- being replaced by a room footprint or a stale work-zone component.
     for _, componentId in ipairs(componentIds) do
         local component = Repository.GetComponent(componentId)
-        if component and component.role == "work.zone" then
-            if component.kind == "anchor" then
-                return { x = component.x, y = component.y, z = component.z,
-                    componentId = component.id, role = component.role }
-            end
-            if component.kind == "region" and component.region then
+        local role = tostring(component and component.role or "")
+        if component and component.kind == "anchor"
+            and string.sub(role, 1, 5) == "work."
+        then
+            return { x = component.x, y = component.y, z = component.z,
+                componentId = component.id, role = component.role }
+        end
+    end
+    if facilityRequiresWorkZone(facility) then
+        -- Farming can still use its plot as a recovery target if an older or
+        -- partially-loaded save has not restored the optional labor spot yet.
+        for _, componentId in ipairs(componentIds) do
+            local component = Repository.GetComponent(componentId)
+            if component and component.kind == "region" and component.region then
                 local point = pointFromRegion(component.region)
                 if point then
                     point.componentId, point.role = component.id, component.role
                     return point
                 end
-            end
-        end
-    end
-    for _, componentId in ipairs(componentIds) do
-        local component = Repository.GetComponent(componentId)
-        if component and component.kind == "anchor" then
-            return { x = component.x, y = component.y, z = component.z,
-                componentId = component.id, role = component.role }
-        end
-    end
-    for _, componentId in ipairs(componentIds) do
-        local component = Repository.GetComponent(componentId)
-        if component and component.kind == "region" and component.region then
-            local point = pointFromRegion(component.region)
-            if point then
-                point.componentId, point.role = component.id, component.role
-                return point
             end
         end
     end

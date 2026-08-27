@@ -29,6 +29,24 @@ function Service.Process(rawRequest, options)
     end
     local record = PNC.Registry and PNC.Registry.Get(request.requesterId) or nil
     if not record or record.alive == false then return false, "npc_missing" end
+    if request.purpose == "PROVISION" then
+        local following
+        if PNC.HomeDutyService and PNC.HomeDutyService.IsFollowing then
+            following = PNC.HomeDutyService.IsFollowing(record) == true
+        else
+            local order = record.orderSpec
+            following = tostring(order and order.kind or "") == tostring(
+                PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
+        end
+        if following then
+            return false, "provision_blocked_while_following"
+        end
+        if PNC.HomeDutyService and PNC.HomeDutyService.IsAtHome
+            and not PNC.HomeDutyService.IsAtHome(record)
+        then
+            return false, "provision_waiting_for_home"
+        end
+    end
     local state, root = runtime(record, request.resourceKind)
     local materiallyWorse = request.priority
         >= ((tonumber(state.lastPriority) or request.priority) + 15)
@@ -101,7 +119,8 @@ function Service.Process(rawRequest, options)
                 and (worldHour() + retryHours(request)) or 0
             Metrics.Increment("supplyRequestsSatisfiedFromPersonalInventory")
             Metrics.Increment("supplyRequestsSucceeded")
-            return true, personalReason
+            return true, personalReason, { remaining = remaining,
+                lastUsedItem = state.lastUsedItem }
         end
         return fail(record, request, state, personalReason, {
             source = "personal",
@@ -142,6 +161,9 @@ function Service.Process(rawRequest, options)
             typeId = selected[index].descriptor.typeId,
             quantity = selected[index].quantity,
             score = selected[index].score,
+            hunger = selected[index].descriptor.hunger,
+            thirst = selected[index].descriptor.thirst,
+            remainingUses = selected[index].descriptor.remainingUses,
         }
     end
     if #selected <= 0 then return fail(record, request, state, "no_supply", {

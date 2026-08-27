@@ -31,9 +31,31 @@ function H.SourceEntry(object, square, ordinal)
     }
 end
 
+function H.WorldAvailability(origin)
+    if not origin then return "origin_missing" end
+    local cell = getCell and getCell() or nil
+    if not cell or type(cell.getGridSquare) ~= "function" then
+        return "world_unavailable"
+    end
+    local x, y, z = H.Call(origin, "getX"), H.Call(origin, "getY"),
+        H.Call(origin, "getZ") or 0
+    if x == nil or y == nil then return "origin_missing" end
+    local ok, square = pcall(cell.getGridSquare, cell, math.floor(x),
+        math.floor(y), math.floor(z))
+    return ok and square and "loaded" or "unloaded"
+end
+
+local function noSourceReason(origin)
+    local availability = H.WorldAvailability(origin)
+    if availability == "origin_missing" then return "WATER_ORIGIN_UNAVAILABLE" end
+    if availability == "unloaded" then return "WATER_WORLD_UNLOADED" end
+    if availability == "world_unavailable" then return "WATER_WORLD_UNAVAILABLE" end
+    return "WATER_SOURCE_UNAVAILABLE"
+end
+
 function H.FindInternal(record, key)
     local origin = H.OriginFor(record)
-    if not origin then return nil end
+    if not origin then return nil, noSourceReason(origin) end
     local itemEntry = Locator.Find(origin, {
         radius = RADIUS, cacheKey = "nearby_water:" .. tostring(record.id),
         accept = function(entry)
@@ -53,7 +75,10 @@ function H.FindInternal(record, key)
         faucetEntry.key = faucetEntry.key or Locator.ObjectKeyFor(
             faucetEntry.object, faucetEntry.x, faucetEntry.y, faucetEntry.z)
     end
-    if not itemEntry then return faucetEntry end
+    if not itemEntry then
+        if faucetEntry then return faucetEntry end
+        return nil, noSourceReason(origin)
+    end
     if not faucetEntry or itemEntry.distSq <= faucetEntry.distSq then
         itemEntry.kind = "container"
         return itemEntry
@@ -63,6 +88,10 @@ end
 
 function Service.Find(record)
     return H.FindInternal(record)
+end
+
+function Service.FindWithStatus(record, key)
+    return H.FindInternal(record, key)
 end
 
 function Service.Resolve(record, key)
@@ -86,4 +115,3 @@ function Service.FindAt(record, x, y, z)
 end
 
 return Service
-

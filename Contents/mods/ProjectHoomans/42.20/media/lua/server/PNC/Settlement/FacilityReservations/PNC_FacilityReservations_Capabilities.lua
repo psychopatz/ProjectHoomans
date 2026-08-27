@@ -49,6 +49,26 @@ function PNC.FacilityService.GetActivityCapability(facilityOrId,
 end
 
 function Reservations.HasCapacity(facility, capability)
+    local resourceBinding = PNC.FacilityResources
+        and PNC.FacilityResources.GetBinding
+        and PNC.FacilityResources.GetBinding(facility, capability)
+    if resourceBinding then
+        local resources = PNC.FacilityResources.GetResources
+            and PNC.FacilityResources.GetResources(facility,
+                resourceBinding.detectorId) or {}
+        for index = 1, #resources do
+            local resource = resources[index]
+            if not Reservations.ByResource[resource.resourceKey] then
+                return H.HasActivityCapacity(facility.id, capability)
+            end
+        end
+        -- A virtual resource, such as floor sleeping, supplies capacity even
+        -- when a scan finds no physical furniture.
+        if resourceBinding.virtual then
+            return H.HasActivityCapacity(facility.id, capability)
+        end
+        return false
+    end
     if not facility or not H.ComponentForCapability(facility, capability) then
         return false
     end

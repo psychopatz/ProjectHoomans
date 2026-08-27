@@ -128,18 +128,24 @@ function Safety.Resolve(record, now, cell, options)
     local recoveryReason
     local safeSquare
     local safeChunk
+    local probeX
+    local probeY
+    local probeZ
 
     if not record then
         return nil, nil, nil, nil, "missing_record"
     end
     record.runtime = record.runtime or {}
     now = tonumber(now) or Core.Now()
+    probeX = tonumber(options and options.x) or tonumber(record.x) or 0
+    probeY = tonumber(options and options.y) or tonumber(record.y) or 0
+    probeZ = tonumber(options and options.z) or tonumber(record.z) or 0
     cell = cell or (getCell and getCell() or nil)
     if not cell or not query or not query.FindNearestMaterializationSquare then
         return nil, nil, nil, nil, "world_unavailable"
     end
 
-    square = getSquare(cell, record.x, record.y, record.z)
+    square = getSquare(cell, probeX, probeY, probeZ)
     if not square then
         record.runtime.materializationSafety = nil
         return nil, nil, nil, nil, "target_square_loading"
@@ -153,12 +159,12 @@ function Safety.Resolve(record, now, cell, options)
         record.runtime.materializationSafety = nil
         return nil, nil, nil, nil, "target_chunk_loading"
     end
-    if not neighborhoodIsLoaded(cell, record.x, record.y, record.z) then
+    if not neighborhoodIsLoaded(cell, probeX, probeY, probeZ) then
         record.runtime.materializationSafety = nil
         return nil, nil, nil, nil, "target_neighborhood_loading"
     end
 
-    key = stageKey(record.x, record.y, record.z)
+    key = stageKey(probeX, probeY, probeZ)
     stage = markStage(record, key, now)
     settleMs = math.max(
         0,

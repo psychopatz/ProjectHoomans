@@ -82,7 +82,8 @@ local function complete(order)
     end
     if ok ~= true then
         if order.cancellationRequested == true then
-            releaseClaim(order, order.cancellationReason or "cancelled", true)
+            releaseClaim(order, order.cancellationReason or "cancelled", true,
+                true)
             order.status, order.cancelledAt = Status.CANCELLED, now()
             order.completionStarted, order.blockedReason = nil, nil
             order.terminalPersisted = false

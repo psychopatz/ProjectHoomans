@@ -189,6 +189,57 @@ local request = PNC.ProvisionEvaluator.BuildRequest(
 T.equal(request.purpose, "PROVISION", "provision request purpose")
 T.near(request.required.hunger, 0.51, 0.000001, "request carries utility deficit")
 
+-- A queued food request may also carry hydration utility when it selects a
+-- dual-purpose item. The hydration lane must see that projected contribution
+-- instead of creating a second full request before the item arrives.
+candidates[npc.id].FOOD = {}
+candidates[npc.id].HYDRATION = {}
+npc.runtime = { provision = {
+    incoming = { food = 0, hydration = 0 },
+    incomingProjection = {
+        food = { hunger = 0.20, thirst = 0.14 },
+    },
+    refilling = {}, evaluations = {}, dirtyRules = {},
+} }
+hydration = PNC.ProvisionEvaluator.Evaluate(npc, "hydration")
+T.near(hydration.incomingProjected, 0.14, 0.000001,
+    "dual-purpose food hydration projection was ignored")
+T.near(hydration.available, 0.14, 0.000001,
+    "projected hydration was not included in availability")
+npc.runtime = nil
+
+-- A critical NPC need is allowed to raise the carry target for the current
+-- response. This prevents a three-item refill batch from being mistaken for
+-- enough food when the NPC is already critically hungry.
+PNC.NeedsDefinitions = {
+    SUPPLY = {
+        hunger = { target = 0.10 }, thirst = { target = 0.10 },
+    },
+    MOODLE_THRESHOLDS = {
+        hunger = { 0.15, 0.25, 0.45, 0.70 },
+        thirst = { 0.12, 0.25, 0.70, 0.84 },
+    },
+    SUPPLY_MAX_STATE_AWARE_SELECTIONS = 64,
+}
+PNC.IndividualNeeds = {
+    Get = function(record, needType)
+        return record.needs and record.needs[needType]
+    end,
+}
+npc.needs = { hunger = 0.93, thirst = 0.53 }
+candidates[npc.id].FOOD = {}
+food = PNC.ProvisionEvaluator.Evaluate(npc, "food")
+T.equal(food.stateAware, true, "critical hunger did not enter state-aware mode")
+T.near(food.target, 0.83, 0.000001,
+    "critical hunger did not raise the effective carry target")
+local urgentRequest = PNC.ProvisionEvaluator.BuildRequest(
+    npc, PNC.ProvisionRuleRegistry.Get("food"), food)
+T.equal(urgentRequest.stateAware, true,
+    "critical provision request lost state-aware metadata")
+T.equal(urgentRequest.selectionLimit, 64,
+    "critical provision request retained the normal three-item cap")
+npc.runtime = nil
+
 PNC.NPCSupplyService = {
     Process = function(raw, options)
         T.truthy(options.acquireOnly, "provision acquires only")

@@ -54,6 +54,7 @@ function SupplyInventory.AddCoreRecords(record, records, reason)
     local body = H.LiveBody(record)
     local physical
     local physicalItems = {}
+    local physicalProjectionMissing = false
     if body then
         physical, why = CoreInventory.wrapPhysicalInventory(body:getInventory())
         if not physical then
@@ -128,4 +129,3 @@ function SupplyInventory.CreateDestination(record, reason)
 end
 
 return SupplyInventory
-

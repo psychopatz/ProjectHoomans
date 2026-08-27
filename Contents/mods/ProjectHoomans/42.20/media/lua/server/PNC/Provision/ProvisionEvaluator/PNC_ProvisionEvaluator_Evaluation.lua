@@ -9,6 +9,48 @@ local SupplyInventory = PNC.SupplyInventory
 local SupplyQueries = SupplyInventory.Queries or SupplyInventory
 local Metrics = PNC.SupplyMetrics
 
+local function projectedAmount(runtime, definition)
+    local amount = 0
+    local projections = runtime and runtime.incomingProjection or {}
+    for ruleID, projection in pairs(projections) do
+        if tostring(ruleID) ~= tostring(definition.id) then
+            if definition.measure == "HUNGER_UTILITY" then
+                amount = amount + (tonumber(projection.hunger) or 0)
+            elseif definition.measure == "THIRST_UTILITY" then
+                amount = amount + (tonumber(projection.thirst) or 0)
+            end
+        end
+    end
+    return math.max(0, amount)
+end
+
+local function needState(record, definition, policyTarget)
+    local needType
+    if definition.measure == "HUNGER_UTILITY" then
+        needType = "hunger"
+    elseif definition.measure == "THIRST_UTILITY" then
+        needType = "thirst"
+    end
+    local needs = PNC.NeedsDefinitions
+    local individual = PNC.IndividualNeeds
+    if not needType or not needs or not individual
+        or type(individual.Get) ~= "function"
+    then
+        return policyTarget, false, nil, nil
+    end
+    local current = tonumber(individual.Get(record, needType))
+    local supply = needs.SUPPLY and needs.SUPPLY[needType] or nil
+    local needTarget = math.max(0, tonumber(supply and supply.target) or 0)
+    local needDeficit = math.max(0, (current or 0) - needTarget)
+    local thresholds = needs.MOODLE_THRESHOLDS
+        and needs.MOODLE_THRESHOLDS[needType] or nil
+    local critical = thresholds and tonumber(thresholds[#thresholds]) or 1
+    local stateAware = current ~= nil
+        and (current >= critical or needDeficit > policyTarget + 0.0001)
+    return math.max(policyTarget, needDeficit), stateAware,
+        current, needTarget
+end
+
 function Evaluator.Measure(record, definition)
     local request = H.RequestFor(definition)
     H.EnsurePersonalInventory(record)
@@ -42,8 +84,11 @@ function Evaluator.Evaluate(record, ruleOrID)
     local onHand = Evaluator.Measure(record, definition)
     local incoming = math.max(0,
         tonumber(runtime.incoming[definition.id]) or 0)
-    local available = onHand + incoming
-    local target = math.max(0, tonumber(values.target) or 0)
+    local incomingProjected = projectedAmount(runtime, definition)
+    local available = onHand + incoming + incomingProjected
+    local policyTarget = math.max(0, tonumber(values.target) or 0)
+    local target, stateAware, currentNeed, needTarget = needState(
+        record, definition, policyTarget)
     local threshold = math.max(0, tonumber(values.refillBelow) or 0)
     local refilling = runtime.refilling[definition.id] == true
     if values.enabled ~= true then
@@ -71,11 +116,17 @@ function Evaluator.Evaluate(record, ruleOrID)
         refilling = refilling,
         onHand = onHand,
         incoming = incoming,
+        incomingProjected = incomingProjected,
+        available = available,
         refillBelow = threshold,
         target = target,
         deficit = deficit,
         policyRevision = source.revision,
         policySource = source.source,
+        policyTarget = policyTarget,
+        stateAware = stateAware,
+        currentNeed = currentNeed,
+        needTarget = needTarget,
         evaluatedAt = PNC.NeedsUtils.WorldAgeHours(),
     }
     runtime.evaluations[definition.id] = result
@@ -97,6 +148,11 @@ function Evaluator.BuildRequest(record, definition, evaluation)
     else
         required.count = math.max(1, math.ceil(evaluation.deficit))
     end
+    local priority = tonumber(definition.priority) or 50
+    if evaluation.stateAware then
+        priority = math.max(priority, math.min(100,
+            85 + (tonumber(evaluation.currentNeed) or 0) * 15))
+    end
     return {
         requesterId = record.id,
         purpose = "PROVISION",
@@ -104,15 +160,21 @@ function Evaluator.BuildRequest(record, definition, evaluation)
         treatment = definition.treatment,
         required = required,
         target = evaluation.target,
-        priority = definition.priority,
+        priority = priority,
         sourcePolicy = definition.sourcePolicy or "CURRENT_BASE",
         fulfillment = definition.fulfillment or "INSTANT",
+        stateAware = evaluation.stateAware == true,
+        selectionLimit = evaluation.stateAware
+            and (PNC.NeedsDefinitions
+                and PNC.NeedsDefinitions.SUPPLY_MAX_STATE_AWARE_SELECTIONS
+                or 64) or nil,
     }
 end
 
 function Evaluator.GetDebugState(record)
     local runtime = record and record.runtime and record.runtime.provision
     return runtime and PNC.Core.DeepCopy(runtime) or {
-        incoming = {}, refilling = {}, evaluations = {}, dirtyRules = {},
+        incoming = {}, incomingProjection = {}, refilling = {},
+        evaluations = {}, dirtyRules = {},
     }
 end

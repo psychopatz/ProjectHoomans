@@ -29,6 +29,7 @@ local function usePersonal(record, request, state, options)
         or request.resourceKind == "HYDRATION"
             and tonumber(request.required.thirst) or 1
     required = math.max(0.001, required or 0.001)
+    state.lastUseFailure = nil
     if SupplyCommands.EnsurePersonalInventory then
         SupplyCommands.EnsurePersonalInventory(record)
     end
@@ -54,6 +55,11 @@ local function usePersonal(record, request, state, options)
     local maxUses = request.resourceKind == "HYDRATION"
         and (tonumber(PNC.NeedsDefinitions.SUPPLY_MAX_USES) or 8)
         or PNC.NeedsDefinitions.SUPPLY_MAX_SELECTIONS
+    if request.purpose == "NEED" then
+        maxUses = math.max(maxUses,
+            tonumber(PNC.NeedsDefinitions.SUPPLY_MAX_STATE_AWARE_SELECTIONS)
+                or 64)
+    end
     for index = 1, #candidates do
         if used >= maxUses
             or remaining <= 0

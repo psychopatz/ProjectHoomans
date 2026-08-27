@@ -33,11 +33,22 @@ function Service.Create(player, args)
     local definition = Definitions.Get(args.definitionId)
     local nativeBuild = args.nativeBuild == true
         and definition and definition.directWorkstation == true
+    local capacity
+    if args.capacity ~= nil and PNC.FacilityResources
+        and PNC.FacilityResources.NormalizeCapacity
+    then
+        local capacityReason
+        capacity, capacityReason = PNC.FacilityResources.NormalizeCapacity(
+            args.capacity)
+        if capacityReason then
+            return { ok = false, reason = capacityReason }
+        end
+    end
     local id = tostring(args.facilityId or PNC.Core.GenerateID("facility"))
     local facility = { schemaVersion = 1, id = id, baseId = base.id,
         definitionId = tostring(args.definitionId), level = 1,
         componentIds = {}, revision = 0, cachedState = "PLANNED",
-        constructionState = "PLANNED" }
+        constructionState = "PLANNED", capacity = capacity }
     if type(args.component) ~= "table" or args.component.kind ~= "region" then
         return { ok = false, reason = "FACILITY_FOOTPRINT_REQUIRED" }
     end
@@ -68,11 +79,15 @@ function Service.Create(player, args)
         then return { ok = false, reason = "OVERLAP_NOT_ALLOWED" } end
     end
     facility.constructionRegion = constructionRegion
-    local workZone, workZoneReason = buildDefaultWorkZone(
-        base, facility, constructionRegion)
-    if not workZone then
-        return { ok = false, reason = workZoneReason
-            or "FACILITY_WORK_ZONE_REQUIRED" }
+    local workZone
+    if Definitions.RequiresWorkZone(args.definitionId, facility.level) then
+        local workZoneReason
+        workZone, workZoneReason = buildDefaultWorkZone(
+            base, facility, constructionRegion)
+        if not workZone then
+            return { ok = false, reason = workZoneReason
+                or "FACILITY_WORK_ZONE_REQUIRED" }
+        end
     end
     local managedWorkstation
     if definition.directWorkstation == true then
@@ -107,8 +122,10 @@ function Service.Create(player, args)
         Repository.State.components[managedWorkstation.id] = managedWorkstation
         facility.componentIds[managedWorkstation.id] = true
     end
-    Repository.State.components[workZone.id] = workZone
-    facility.componentIds[workZone.id] = true
+    if workZone then
+        Repository.State.components[workZone.id] = workZone
+        facility.componentIds[workZone.id] = true
+    end
     local workOrder, workReason
     if nativeBuild then
         -- The native Build 42 object order owns material reservation and
@@ -130,7 +147,9 @@ function Service.Create(player, args)
         if managedWorkstation then
             Repository.State.components[managedWorkstation.id] = nil
         end
-        Repository.State.components[workZone.id] = nil
+        if workZone then
+            Repository.State.components[workZone.id] = nil
+        end
         Repository.State.facilities[id] = nil
         base.facilityIds[id] = nil
         Service.RebuildIndexes()

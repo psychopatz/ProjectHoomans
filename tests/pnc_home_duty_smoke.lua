@@ -13,8 +13,13 @@ package.preload["PsychopatzCore/World/PC_ZoneRegistry"] = function()
     return {
         get = function(id)
             if id == "zone-1" then
-                return { geometry = { minX = 10, maxX = 20,
-                    minY = 10, maxY = 20 } }
+                return { geometry = {
+                    levels = { [0] = { rows = {
+                        [10] = { 10, 20 }, [15] = { 10, 20 },
+                        [20] = { 10, 20 },
+                    } } },
+                    minX = 10, maxX = 20, minY = 10, maxY = 20,
+                } }
             end
         end,
     }
@@ -127,7 +132,8 @@ T.equal(PNC.HomeDutyService.IsAtHome(npc, "base-1"), false,
 local sent, reason = PNC.HomeDutyService.SendHome(npc, "base-1", "test")
 T.equal(sent, true, "return-home journey accepted")
 T.equal(reason, "RETURNING_HOME", "return-home state")
-T.equal(startedRequest.destination.x, 15, "journey targets stockpile x")
+T.equal(startedRequest.destination.x, 15, "journey targets base-zone x")
+T.equal(startedRequest.destination.y, 15, "journey targets base-zone y")
 T.equal(startedRequest.arrivalAction.type, "colony_home",
     "journey uses durable home arrival")
 T.equal(startedRequest.metadata.purpose, "return_home",
@@ -135,7 +141,7 @@ T.equal(startedRequest.metadata.purpose, "return_home",
 T.equal(PNC.HomeDutyService.BuildState(npc).state, "RETURNING_HOME",
     "home state exposes travel")
 
-npc.x, npc.y, npc.travel.state = 15, 16, "arrived"
+npc.x, npc.y, npc.travel.state = 15, 15, "arrived"
 local arrived = arrivals.colony_home(npc, npc.travel,
     startedRequest.arrivalAction)
 T.equal(arrived, true, "arrival handled")
@@ -148,6 +154,48 @@ T.equal(PNC.HomeDutyService.BuildState(npc).state, "AT_HOME",
 T.equal(PNC.HomeDutyService.GetColonyId(npc), "colony-1",
     "remembered home base resolves colony eligibility")
 
+local staleHome = {
+    id = "npc-stale-home", alive = true, x = 15, y = 16, z = 0,
+    presenceState = "abstract", runtime = {},
+    orderSpec = { kind = "colony_home", baseId = "base-1",
+        x = 15, y = 9, z = 0, radius = 2 },
+    affiliation = { communityID = "colony-1" },
+}
+local repaired, repairReason = PNC.HomeDutyService.EnsureHomeAnchor(
+    staleHome, "base-1", "test_stale_anchor")
+T.equal(repaired, true, "stale home anchor is repaired")
+T.equal(repairReason, "RETURNING_HOME",
+    "stale home anchor uses the durable return journey")
+T.equal(startedRequest.destination.x, 15,
+    "stale home anchor retargets to base-zone x")
+T.equal(startedRequest.destination.y, 15,
+    "stale home anchor retargets to base-zone y")
+
+PNC.BehaviorCommon = {
+    ClearCombatTarget = function() end,
+    HaltMovement = function() end,
+}
+PNC.BehaviorCompanion = {
+    Internal = { TryRespondToThreat = function() return false end },
+}
+PNC.Animation = {}
+PNC.NavigationRouter = {}
+PNC.BehaviorRegistry = { Register = function() end }
+PNC.JobSystem = { RegisterOrder = function() end }
+T.load(T.path("ProjectHoomans", "shared",
+    "PNC/Core/Behaviors/PNC_Behavior_AtHome.lua"))
+local idleStale = {
+    id = "npc-idle-stale", alive = true, x = 15, y = 16, z = 0,
+    presenceState = "abstract", runtime = {},
+    orderSpec = { kind = "colony_home", baseId = "base-1",
+        x = 15, y = 9, z = 0, radius = 2 },
+    affiliation = { communityID = "colony-1" },
+}
+T.equal(PNC.BehaviorAtHome.Tick(idleStale), true,
+    "idle behavior handles a stale home anchor")
+T.equal(idleStale.activeBehavior, "AtHome:returning",
+    "idle behavior hands stale anchor to travel")
+
 npc.x, npc.y = 2, 3
 npc.presenceState = "live"
 npc.runtime.workOrderId = "work-1"
@@ -158,15 +206,16 @@ T.equal(recovered, true, "recovery accepted")
 T.equal(recoverReason, "COLONIST_RECOVERED", "recovery reason")
 T.equal(released, "npc-1:colonist_recovered", "work claim released")
 T.equal(abstracted, "colonist_recovery", "live body safely abstracted")
-T.equal(npc.x, 15, "recovered beside stockpile x")
-T.equal(npc.y, 16, "recovered beside stockpile y")
+T.equal(npc.x, 15, "recovered at base-zone x")
+T.equal(npc.y, 15, "recovered at base-zone y")
 T.equal(npc.orderSpec.kind, "colony_home", "recovered colonist is At Home")
-T.equal(details.stockpileNodeId, "stockpile-1", "recovery reports stockpile")
+T.equal(details.stockpileNodeId, "stockpile-1",
+    "recovery preserves legacy stockpile metadata")
 T.equal(reconciled, true, "presence reconciled at destination")
 T.equal(broadcast, "colonist_recovered", "recovery replicated")
 
 local traveler = {
-    id = "npc-2", alive = true, x = 15, y = 16, z = 0,
+    id = "npc-2", alive = true, x = 15, y = 15, z = 0,
     presenceState = "abstract", runtime = {},
     affiliation = { communityID = "colony-1" },
 }
@@ -191,7 +240,7 @@ T.equal(traveler.orderSpec.kind, "follow", "arrival installs follow order")
 T.equal(traveler.orderSpec.ownerUsername, "owner", "follow owner is preserved")
 
 local buildingWorker = {
-    id = "npc-builder", alive = true, x = 15, y = 16, z = 0,
+    id = "npc-builder", alive = true, x = 15, y = 15, z = 0,
     presenceState = "abstract", runtime = { workOrderId = "build-1" },
     affiliation = { communityID = "colony-1" },
 }
@@ -204,7 +253,7 @@ T.equal(buildingWorker.runtime.workOrderId, "build-1",
     "follow refusal preserves the construction claim")
 
 local provisionWorker = {
-    id = "npc-provisioner", alive = true, x = 15, y = 16, z = 0,
+    id = "npc-provisioner", alive = true, x = 15, y = 15, z = 0,
     presenceState = "abstract", runtime = { workOrderId = "work-provision" },
     affiliation = { communityID = "colony-1" },
 }
@@ -236,7 +285,7 @@ local courier = {
 }
 T.equal(PNC.HomeDutyService.SendHome(courier, "base-1", "storage_courier"),
     true, "courier uses home journey")
-courier.x, courier.y, courier.travel.state = 15, 16, "arrived"
+courier.x, courier.y, courier.travel.state = 15, 15, "arrived"
 T.equal(arrivals.colony_home(courier, courier.travel,
     startedRequest.arrivalAction), true, "courier arrival handled")
 T.equal(courierCompleted, "npc-courier",

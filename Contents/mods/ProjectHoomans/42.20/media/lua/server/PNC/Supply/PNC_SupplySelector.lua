@@ -86,8 +86,9 @@ function Selector.SelectFromStorage(storage, request)
     end)
     local selected = {}
     local selectedUnits = 0
-    local maxSelections = math.max(1, tonumber(PNC.NeedsDefinitions
-        and PNC.NeedsDefinitions.SUPPLY_MAX_SELECTIONS) or 3)
+    local maxSelections = math.max(1, math.floor(tonumber(
+        request.selectionLimit) or tonumber(PNC.NeedsDefinitions
+            and PNC.NeedsDefinitions.SUPPLY_MAX_SELECTIONS) or 3))
     for index = 1, #scored do
         if selectedUnits >= maxSelections or remaining <= 0 then break end
         local candidate = scored[index]

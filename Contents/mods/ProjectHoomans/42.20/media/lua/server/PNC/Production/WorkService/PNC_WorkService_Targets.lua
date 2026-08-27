@@ -27,14 +27,16 @@ local function setLiveOrder(worker, order, target, phase)
     return true
 end
 
-local function collectionTarget(order, worker)
+local function collectionTarget(order, worker, live)
     local standardized = PNC.WorkInputService
         and PNC.WorkInputService.RequiresCollection(order)
     if not standardized and not Service.CollectionHandlers[order.operation]
         or not PNC.StockpileAccessService
     then return nil end
     local node = PNC.StockpileAccessService.FindNearest(order.baseId,
-        worker.x or 0, worker.y or 0, worker.z or 0)
+        worker.x or 0, worker.y or 0, worker.z or 0, {
+            requireLoaded = live ~= nil,
+        })
     if not node then return nil end
     return { x = node.x, y = node.y, z = node.z, nodeId = node.id }
 end
@@ -72,7 +74,8 @@ local function claimStation(order, worker)
         return false, "NO_AVAILABLE_WORKSTATION"
     end
     local needsCollection = live and requiresCollection(order)
-    local collectTarget = needsCollection and collectionTarget(order, worker)
+    local collectTarget = needsCollection
+        and collectionTarget(order, worker, live)
         or nil
     if needsCollection and not collectTarget then
         if acquired.reservationId and PNC.FacilityReservations then

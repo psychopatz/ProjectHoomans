@@ -53,6 +53,28 @@ function Internal.GetNativeMovementState(body)
     return Internal.GetNativeTraversalState(body)
 end
 
+-- Hoomans owns the single-player Behavior2 pump directly from Lua. Keep the
+-- vanilla WalkTowardState out of that route: IsoGameCharacter's deferred
+-- movement guard discards path2 whenever WalkTowardState is still active.
+-- Changing only this stale state is important; entering PathFindState would
+-- make Java execute Behavior2 a second time during the same update.
+function Internal.EnsureNativeMovementOwner(body)
+    local actionState
+    if not body or not body.getActionStateName then
+        return false
+    end
+    actionState = string.lower(tostring(body:getActionStateName() or ""))
+    if actionState ~= "walktoward"
+        or not body.changeState
+        or not ZombieIdleState
+        or not ZombieIdleState.instance
+    then
+        return false
+    end
+    body:changeState(ZombieIdleState.instance())
+    return true
+end
+
 function Internal.IsAtRequestGoal(body, navigation)
     if not body or not navigation then return false end
     local requestZ = tonumber(navigation.requestZ) or body:getZ()

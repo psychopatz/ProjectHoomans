@@ -9,6 +9,16 @@ local ROOT_INVENTORY_TEXTURE = getTexture
     and getTexture("media/ui/Icon_InventoryBasic.png")
     or nil
 
+local function isNPCDepositForbidden(item)
+    if type(item) ~= "table" then return false end
+    if item.interactionLocked == true then return true end
+    if tostring(item.type or "") == "Base.IDcard" then return true end
+    return item.templateKey == "tmpl:identity_card:0"
+        or item.legacyTemplateKey == "tmpl:identity_card:0"
+        or item.identityNPCId ~= nil
+        or item.identityNPCName ~= nil
+end
+
 local function safeCall(object, method, fallback)
     if not object or not object[method] then return fallback end
     local ok, value = pcall(object[method], object)
@@ -327,7 +337,7 @@ function Model.BuildNPCRows(inventory, containerID, expandedGroups)
                     or item.wornSlot ~= nil
                     or item.attachedSlot ~= nil,
                 favorite = item.fav == true,
-                restricted = item.interactionLocked == true,
+                restricted = isNPCDepositForbidden(item),
                 restrictionReason = item.interactionLockReason,
             }
         end

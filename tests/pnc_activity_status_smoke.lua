@@ -56,6 +56,20 @@ T.equal(sleep.facilityDefinitionId, "barracks",
 T.equal(sleep.providerId, "facility_activity",
     "specific facility provider owns sleep status")
 
+local legacyFacilityActivity = Status.Build({
+    alive = true,
+    activeJob = "FacilityActivity",
+    orderSpec = {
+        kind = "facility_activity", capability = "sleep",
+        facilityId = "barracks:1", phase = "SLEEPING",
+    },
+    runtime = {},
+})
+T.equal(legacyFacilityActivity.fallback, "Sleeping",
+    "legacy FacilityActivity records keep a specific activity label")
+T.equal(legacyFacilityActivity.activityId, "facility:sleep",
+    "legacy FacilityActivity records keep their capability identity")
+
 local eating = Status.Build({
     alive = true,
     runtime = {

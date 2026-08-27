@@ -9,6 +9,10 @@ function H.IsExclusiveComponent(component)
         or component.role == "growing.plot")
 end
 
+function H.IsExclusiveResource(resource)
+    return resource and resource.exclusive ~= false
+end
+
 function H.HasEntries(source)
     for _, _ in pairs(type(source) == "table" and source or {}) do
         return true
@@ -20,14 +24,42 @@ function H.Now()
     return PNC.Core.Now()
 end
 
+function H.HasActivityCapacity(facilityId, purpose)
+    local facility = PNC.SettlementRepository.GetFacility(facilityId)
+    local activityKey = tostring(facilityId) .. ":"
+        .. tostring(purpose or "activity")
+    local activityLimit
+    if PNC.FacilityResources and PNC.FacilityResources.GetCapacity then
+        activityLimit = select(1, PNC.FacilityResources.GetCapacity(
+            facility, purpose))
+    else
+        local level = facility and PNC.FacilityDefinitions.GetLevel(
+            facility.definitionId, facility.level) or nil
+        activityLimit = level and level.activityLimits
+            and level.activityLimits[purpose]
+            and level.activityLimits[purpose].maxConcurrent
+    end
+    return not activityLimit
+        or (tonumber(Reservations.ByActivity[activityKey]) or 0)
+            < activityLimit
+end
+
 function Reservations.Release(id, reason)
     local reservation = Reservations.ByID[tostring(id or "")]
     if not reservation then return false, "RESERVATION_NOT_FOUND" end
     Reservations.ByID[reservation.id] = nil
-    if Reservations.ByComponent[reservation.componentId] == reservation.id then
+    if reservation.componentId and reservation.componentId ~= ""
+        and Reservations.ByComponent[reservation.componentId] == reservation.id
+    then
         Reservations.ByComponent[reservation.componentId] = nil
     end
-    local activityKey = reservation.facilityId .. ":" .. reservation.purpose
+    if reservation.resourceKey and reservation.resourceKey ~= ""
+        and Reservations.ByResource[reservation.resourceKey] == reservation.id
+    then
+        Reservations.ByResource[reservation.resourceKey] = nil
+    end
+    local activityKey = tostring(reservation.facilityId) .. ":"
+        .. reservation.purpose
     Reservations.ByActivity[activityKey] = math.max(0,
         (tonumber(Reservations.ByActivity[activityKey]) or 1) - 1)
     if Reservations.ByActivity[activityKey] == 0 then
@@ -76,17 +108,8 @@ function Reservations.Reserve(facilityId, componentId, npcId, purpose,
     then
         return false, "COMPONENT_RESERVED"
     end
-    local facility = PNC.SettlementRepository.GetFacility(facilityId)
-    local level = facility and PNC.FacilityDefinitions.GetLevel(
-        facility.definitionId, facility.level) or nil
     local activityKey = facilityId .. ":" .. tostring(purpose or "activity")
-    local activityLimit = level and level.activityLimits
-        and level.activityLimits[purpose]
-        and level.activityLimits[purpose].maxConcurrent
-    if activityLimit
-        and (tonumber(Reservations.ByActivity[activityKey]) or 0)
-            >= activityLimit
-    then
+    if not H.HasActivityCapacity(facilityId, purpose) then
         return false, "NO_ACTIVITY_CAPACITY"
     end
     local id = PNC.Core.GenerateID("facility_reservation")
@@ -116,6 +139,60 @@ function Reservations.Reserve(facilityId, componentId, npcId, purpose,
     end
     npc[id] = true
     return true, reservation
+end
+
+function Reservations.ReserveResource(facilityId, resource, npcId, purpose,
+    ttlMs, metadata)
+    Reservations.Expire()
+    if type(resource) ~= "table" then
+        return false, "RESOURCE_NOT_FOUND"
+    end
+    local resourceKey = tostring(resource.resourceKey or "")
+    if resourceKey == "" then return false, "RESOURCE_KEY_REQUIRED" end
+    if Reservations.ByResource[resourceKey]
+        and H.IsExclusiveResource(resource)
+    then
+        return false, "RESOURCE_RESERVED"
+    end
+    if not H.HasActivityCapacity(facilityId, purpose) then
+        return false, "NO_ACTIVITY_CAPACITY"
+    end
+    local id = PNC.Core.GenerateID("facility_reservation")
+    local reservation = {
+        id = id,
+        facilityId = facilityId,
+        componentId = "",
+        resourceKey = resourceKey,
+        resourceKind = tostring(resource.resourceKind or ""),
+        resource = PNC.FacilityResources
+            and PNC.FacilityResources.CopyDescriptor
+            and PNC.FacilityResources.CopyDescriptor(resource) or resource,
+        npcId = tostring(npcId or ""),
+        purpose = tostring(purpose or "activity"),
+        state = "RESERVED",
+        workOrderId = type(metadata) == "table" and metadata.workOrderId
+            or nil,
+        createdAt = H.Now(),
+        expiresAt = H.Now() + math.max(1000,
+            math.floor(tonumber(ttlMs) or Reservations.DEFAULT_TTL_MS)),
+    }
+    Reservations.ByID[id] = reservation
+    if H.IsExclusiveResource(resource) then
+        Reservations.ByResource[resourceKey] = id
+    end
+    local activityKey = tostring(facilityId) .. ":" .. reservation.purpose
+    Reservations.ByActivity[activityKey] =
+        (tonumber(Reservations.ByActivity[activityKey]) or 0) + 1
+    local npc = Reservations.ByNPC[reservation.npcId]
+    if not npc then npc = {}; Reservations.ByNPC[reservation.npcId] = npc end
+    npc[id] = true
+    return true, reservation
+end
+
+function Reservations.ReleaseResource(resourceKey)
+    local id = Reservations.ByResource[tostring(resourceKey or "")]
+    return id and Reservations.Release(id, "resource_removed")
+        or false, id and "RESOURCE_NOT_RESERVED" or "RESOURCE_NOT_FOUND"
 end
 
 function Reservations.Start(id, ttlMs)

@@ -24,9 +24,11 @@ local publicFunctions = {
     "GetComponentBuildWork",
     "RequiresComponentConstruction",
     "GetComponentLimit",
+    "RequiresWorkZone",
 }
 local facilityIDs = {
     "stockpile",
+    "bedroom",
     "barracks",
     "farm",
     "living_room",
@@ -75,6 +77,21 @@ end
 T.equal(#PNC.FacilityDefinitions.GetComponentCosts(
     "barracks", 1, "work.zone"), 0,
     "work zone coordinate moves have no material cost")
+T.equal(PNC.FacilityDefinitions.Get("barracks").id, "bedroom",
+    "legacy barracks id resolves to the bedroom definition")
+T.equal(PNC.FacilityDefinitions.Get("bedroom").zoneOverlay, true,
+    "bedroom opts into the reusable zone overlay")
+T.equal(PNC.FacilityDefinitions.Get("bedroom").zoneColor, "bedroom",
+    "bedroom selects its dedicated overlay color")
+T.equal(PNC.FacilityDefinitions.RequiresWorkZone(
+    "bedroom", 1), false,
+    "bedroom does not invent a labor standing area")
+T.equal(PNC.FacilityDefinitions.GetComponentLimit(
+    "bedroom", 1, "work.zone"), nil,
+    "bedroom has no work-zone component limit")
+T.equal(PNC.FacilityDefinitions.RequiresWorkZone(
+    "farm", 1), true,
+    "farm explicitly opts into a labor standing area")
 T.equal(PNC.FacilityDefinitions.RequiresComponentConstruction(
     "barracks", 1, "work.zone", "region"), false,
     "work zone coordinate moves skip reconstruction")

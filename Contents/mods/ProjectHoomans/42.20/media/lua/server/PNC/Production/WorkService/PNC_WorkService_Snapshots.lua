@@ -13,6 +13,19 @@ local Status = Definitions.STATUS
 local terminal = Internal.terminal
 local copy = Internal.copy
 
+local function provisionItemFullType(payload)
+    if type(payload) ~= "table" then return nil end
+    local direct = tostring(payload.activityItemFullType or "")
+    if direct ~= "" then return direct end
+    for index = 1, #(payload.selected or {}) do
+        local selected = payload.selected[index]
+        local descriptor = selected and selected.descriptor or {}
+        local fullType = tostring(descriptor.fullType or "")
+        if fullType ~= "" then return fullType end
+    end
+    return nil
+end
+
 function Service.Queries.BuildTaskSnapshot(colonyId)
     local output = {}
     for _, order in ipairs(Service.Queries.List(colonyId)) do
@@ -23,6 +36,10 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
             local facilityId = order.facilityId or payload.facilityId
             local facility = facilityId and PNC.SettlementRepository
                 and PNC.SettlementRepository.GetFacility(facilityId) or nil
+            local activityItemFullType
+            if order.operation == "PROVISION_PICKUP" then
+                activityItemFullType = provisionItemFullType(payload)
+            end
             local required = math.max(1, tonumber(order.requiredWork) or 1)
             local progress = math.max(0, math.min(required,
                 tonumber(order.progress) or 0))
@@ -58,6 +75,7 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
                 quantity = order.quantity,
                 technologyId = payload.technologyId,
                 specimenFullType = payload.specimenFullType,
+                activityItemFullType = activityItemFullType,
                 objectInfoName = payload.blueprint
                     and payload.blueprint.objectInfoName or nil,
                 buildDisplayName = payload.blueprint
@@ -141,6 +159,10 @@ function Service.BuildActionInformation(record)
     local facilityId = payload.facilityId
     local facility = facilityId and PNC.SettlementRepository
         and PNC.SettlementRepository.GetFacility(facilityId) or nil
+    local activityItemFullType
+    if order.operation == "PROVISION_PICKUP" then
+        activityItemFullType = provisionItemFullType(payload)
+    end
     return {
         kind = "work_order",
         workOrderId = order.id,
@@ -157,6 +179,7 @@ function Service.BuildActionInformation(record)
         quantity = order.quantity,
         technologyId = payload.technologyId,
         specimenFullType = payload.specimenFullType,
+        activityItemFullType = activityItemFullType,
         objectInfoName = blueprint.objectInfoName,
         buildDisplayName = buildDescriptor and buildDescriptor.displayName
             or blueprint.objectInfoName,

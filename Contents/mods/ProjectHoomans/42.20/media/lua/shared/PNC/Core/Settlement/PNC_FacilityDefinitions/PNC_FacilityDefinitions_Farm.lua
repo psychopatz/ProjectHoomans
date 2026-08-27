@@ -12,6 +12,9 @@ Definitions.Register({
     buildWork = 100,
     reconstructWork = 65,
     deconstructWork = 60,
+    -- Farming uses an editable labor standing area; room and workstation
+    -- facilities do not receive one implicitly.
+    requiresWorkZone = true,
     allowMultipleRegions = false,
     componentConstruction = { ["growing.plot"] = false },
     levels = {

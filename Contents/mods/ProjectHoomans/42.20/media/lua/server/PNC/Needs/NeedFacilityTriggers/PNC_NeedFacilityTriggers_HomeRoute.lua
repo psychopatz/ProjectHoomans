@@ -6,6 +6,18 @@ PNC.NeedFacilityHomeRoute = PNC.NeedFacilityHomeRoute or {}
 local Home = PNC.NeedFacilityHomeRoute
 local Definitions = PNC.NeedFacilityTriggerDefinitions
 
+local function hasPersonalSupply(record, resourceKind, needType)
+    local service = PNC.NPCSupplyService
+    local current = PNC.IndividualNeeds and PNC.IndividualNeeds.Get
+        and PNC.IndividualNeeds.Get(record, needType)
+        or record and record.needs and record.needs[needType]
+    local required = { hunger = 0, thirst = 0 }
+    required[needType] = math.max(0.001, tonumber(current) or 0.001)
+    return service and service.HasPersonalSupply
+        and service.HasPersonalSupply(record, resourceKind, required) == true
+        or false
+end
+
 function Home.GetBase(record)
     return PNC.HomeDutyService and PNC.HomeDutyService.GetBase
         and PNC.HomeDutyService.GetBase(record) or nil
@@ -37,13 +49,13 @@ end
 
 local function hasRequiredPersonalSupply(record, definition)
     if definition and definition.needType == "hunger" then
-        return PNC.NPCSupplyService
-            and PNC.NPCSupplyService.HasPersonalSupply
-            and PNC.NPCSupplyService.HasPersonalSupply(record, "FOOD", {
-                hunger = math.max(0.001, tonumber(record and record.needs
-                    and record.needs.hunger) or 0.001),
-                thirst = 0,
-            }) == true
+        return hasPersonalSupply(record, "FOOD", "hunger")
+    end
+    if definition and definition.needType == "thirst" then
+        -- A carried drink, including a dual-purpose food such as an apple,
+        -- should be consumed by the personal-supply path before assigning a
+        -- trip to a water facility.
+        return not hasPersonalSupply(record, "HYDRATION", "thirst")
     end
     return true
 end

@@ -322,7 +322,8 @@ local function javaList(values)
 end
 local function nativeItem(fullType)
     local item = { fullType = fullType, modData = {}, weight = 0.1 }
-    local food = fullType == "Base.Apple"
+    local dualFood = fullType == "Mod.FoodApple"
+    local food = dualFood or fullType == "Base.Apple"
         or fullType == "Base.FractionalApple"
         or string.find(fullType, "Mod.Food", 1, true) == 1
     local water = fullType == "Base.WaterBottle"
@@ -336,6 +337,8 @@ local function nativeItem(fullType)
     function item:setCondition(value) self.condition = value end
     function item:getUsedDelta() return self.usedDelta end
     function item:setUsedDelta(value) self.usedDelta = value end
+    function item:getCount() return self.count or 1 end
+    function item:setCount(value) self.count = value end
     function item:IsDrainable() return self.usedDelta ~= nil end
     function item:isFavorite() return self.favorite == true end
     function item:setFavorite(value) self.favorite = value end
@@ -352,7 +355,9 @@ local function nativeItem(fullType)
         if fullType == "Base.FractionalApple" then return -0.15 end
         return food and -0.20 or 0
     end
-    function item:getThirstChange() return water and -0.15 or 0 end
+    function item:getThirstChange()
+        return dualFood and -0.10 or water and -0.15 or 0
+    end
     function item:getUseDelta() return water and 0.25 or 0 end
     function item:isWaterSource() return water end
     function item:isBandage() return fullType == "Base.Bandage" end
@@ -726,6 +731,24 @@ T.truthy(PNC.IndividualNeeds.Get(personalNPC, "hunger") < 0.30,
 T.equal(PNC.Inventory.Serialize(personalNPC)[2], "SEED_ONLY",
     "temporary personal food delta did not compact")
 
+-- Personal need fulfillment is state-aware too. A critical hunger request
+-- must consume enough carried units to reach its target, not stop at the
+-- normal three-use provision batch.
+local criticalPersonalNPC = supplyNPC("supply_critical_personal", {
+    emptyBaseline = true, hunger = 0.93, thirst = 0.53,
+})
+T.truthy(PNC.Inventory.AddItems(criticalPersonalNPC, {
+    { type = "Base.Apple", stack = 12 },
+}, "root", "test_critical_personal_food"))
+local criticalUse, criticalUseReason = SupplyService.Process({
+    requesterId = criticalPersonalNPC.id, resourceKind = "FOOD",
+    required = { hunger = 0.83 }, priority = 95,
+}, { personalOnly = true, force = true })
+T.equal(criticalUse, true,
+    "critical personal food was not consumed: " .. tostring(criticalUseReason))
+T.truthy(PNC.IndividualNeeds.Get(criticalPersonalNPC, "hunger") <= 0.10,
+    "critical personal food stopped at the normal provision cap")
+
 -- Instant storage food acquisition enters inventory, then is consumed once.
 T.truthy(CoreInventory.deposit(supplyStorage.inventory,
     nativeItem("Base.Apple"), 2))
@@ -768,6 +791,46 @@ T.truthy(PNC.IndividualNeeds.Get(multiFoodNPC, "hunger") <= 0.001,
     "multiple acquired foods did not reach target")
 T.equal(PNC.Inventory.Serialize(multiFoodNPC)[2], "SEED_ONLY",
     "multiple temporary foods did not compact")
+
+-- A dual-purpose food must satisfy and apply both primitive needs through the
+-- food lane. This is the apple case: one physical consumption changes hunger
+-- and hydration instead of forcing a second drink request.
+supplyStorage.inventory:clear()
+T.truthy(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Mod.FoodApple"), 1))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local dualFoodNPC = supplyNPC("supply_dual_food", {
+    emptyBaseline = true, hunger = 0.30, thirst = 0.30,
+})
+local dualFoodBefore = supplyStorage.inventory:count("Mod.FoodApple")
+local dualFoodOK = SupplyService.Process({
+    requesterId = dualFoodNPC.id, resourceKind = "FOOD",
+    required = { hunger = 0.20 }, priority = 85,
+})
+T.equal(dualFoodOK, true, "dual-purpose food request")
+T.equal(supplyStorage.inventory:count("Mod.FoodApple"),
+    dualFoodBefore - 1, "dual-purpose food was consumed once")
+T.truthy(PNC.IndividualNeeds.Get(dualFoodNPC, "hunger") < 0.30,
+    "dual-purpose food did not reduce hunger")
+T.truthy(PNC.IndividualNeeds.Get(dualFoodNPC, "thirst") < 0.30,
+    "dual-purpose food did not reduce thirst")
+
+-- State-aware storage selection may take more than the normal refill batch,
+-- while still stopping at the requested deficit.
+supplyStorage.inventory:clear()
+T.truthy(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.Apple"), 12))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local urgentSelected = PNC.SupplySelector.SelectFromStorage(supplyStorage, {
+    resourceKind = "FOOD", required = { hunger = 0.80 },
+    stateAware = true, selectionLimit = 64,
+})
+local urgentQuantity = 0
+for _, selected in ipairs(urgentSelected or {}) do
+    urgentQuantity = urgentQuantity + (tonumber(selected.quantity) or 0)
+end
+T.truthy(urgentQuantity > 3,
+    "state-aware storage selection retained the normal three-item cap")
 
 -- FEFO chooses earlier-expiring safe food, never the rotten candidate.
 supplyStorage.inventory:clear()
@@ -953,6 +1016,55 @@ T.equal(#liveSupplyItems, 0,
     "live food use did not mutate physical inventory")
 supplyBodies[liveSupplyNPC.id] = nil
 
+-- Native Build 42 groups identical items into one InventoryItem count. A
+-- one-unit consume must decrement that count, not remove the whole stack;
+-- otherwise compact state retains apples that the live body no longer has.
+local stackedNPC = supplyNPC("supply_native_stack", {
+    emptyBaseline = true, hunger = 0.30, thirst = 0.30,
+})
+T.truthy(PNC.Inventory.AddItems(stackedNPC, {
+    { type = "Base.Apple", stack = 51 },
+}, "root", "test_native_stack_food"))
+local stackedItemID
+for itemID, compact in pairs(stackedNPC.inventory.items) do
+    if compact.type == "Base.Apple" then stackedItemID = itemID end
+end
+T.truthy(stackedItemID, "native stack compact item was not created")
+local stackedItems = {}
+local stackedContainer = {}
+function stackedContainer:getItems() return javaList(stackedItems) end
+function stackedContainer:AddItem(value)
+    stackedItems[#stackedItems + 1] = value
+    value.owner = self
+    value.getContainer = function(self) return self.owner end
+    return value
+end
+function stackedContainer:DoRemoveItem(value)
+    for index = #stackedItems, 1, -1 do
+        if stackedItems[index] == value then
+            table.remove(stackedItems, index)
+            return true
+        end
+    end
+    return false
+end
+local stackedNative = nativeItem("Base.Apple")
+stackedNative.count = 51
+stackedContainer:AddItem(stackedNative)
+local stackedBody = { getInventory = function() return stackedContainer end }
+supplyBodies[stackedNPC.id] = stackedBody
+local stackedUse, stackedReason = SupplyService.Process({
+    requesterId = stackedNPC.id, resourceKind = "FOOD",
+    required = { hunger = 0.20 }, priority = 85,
+})
+T.equal(stackedUse, true, "stacked native food was consumed: "
+    .. tostring(stackedReason))
+T.equal(stackedNative:getCount(), 50,
+    "stacked native food removed the complete stack")
+T.equal(stackedNPC.inventory.items[stackedItemID].stack, 50,
+    "compact stack did not decrement by one")
+supplyBodies[stackedNPC.id] = nil
+
 -- A temporary native projection failure must not roll back authoritative
 -- compact provisioning. The missing projection can reconcile on a later spawn.
 T.truthy(CoreInventory.deposit(supplyStorage.inventory,
@@ -992,8 +1104,8 @@ T.equal(compactProjectionApple, true,
     "compact provision was not retained")
 supplyBodies[projectionNPC.id] = nil
 
--- Live consumption is transactional: compact metadata cannot stand in for a
--- missing physical item while the NPC is visible.
+-- Live consumption repairs a compact/native mismatch for an already-visible
+-- NPC. This covers items delivered before live projection was added.
 local staleProjectionNPC = supplyNPC(
     "supply_stale_projection", { emptyBaseline = true }
 )
@@ -1003,25 +1115,38 @@ T.truthy(PNC.Inventory.AddItems(staleProjectionNPC, {
 local staleItems = {}
 local staleContainer = {}
 function staleContainer:getItems() return javaList(staleItems) end
+function staleContainer:AddItem(item)
+    staleItems[#staleItems + 1] = item
+    return item
+end
+function staleContainer:DoRemoveItem(item)
+    for index = #staleItems, 1, -1 do
+        if staleItems[index] == item then
+            table.remove(staleItems, index)
+            return true
+        end
+    end
+    return false
+end
 local staleBody = { getInventory = function() return staleContainer end }
 supplyBodies[staleProjectionNPC.id] = staleBody
 local staleOK, staleReason = SupplyService.Process({
     requesterId = staleProjectionNPC.id, resourceKind = "FOOD",
     required = { hunger = 0.20 }, priority = 80,
 })
-T.equal(staleOK, false,
-    "stale physical projection allowed phantom eating: "
+T.equal(staleOK, true,
+    "stale physical projection was not repaired: "
         .. tostring(staleReason))
-T.equal(staleReason, "personal_use_failed",
-    "stale physical projection reported the wrong transaction failure")
-T.equal(PNC.IndividualNeeds.Get(staleProjectionNPC, "hunger"), 0.30,
-    "failed phantom eating changed hunger")
+T.equal(staleReason, "personal_used",
+    "repaired physical projection returned the wrong result")
+T.truthy(PNC.IndividualNeeds.Get(staleProjectionNPC, "hunger") < 0.30,
+    "repaired physical projection did not change hunger")
 local staleCompactCount = 0
 for _, compact in pairs(staleProjectionNPC.inventory.items) do
     if compact.type == "Base.Apple" then staleCompactCount = staleCompactCount + 1 end
 end
-T.equal(staleCompactCount, 1,
-    "failed phantom eating removed compact food")
+T.equal(staleCompactCount, 0,
+    "repaired physical projection left compact food behind")
 supplyBodies[staleProjectionNPC.id] = nil
 
 -- Acquired compact state survives save/load without FULL promotion.

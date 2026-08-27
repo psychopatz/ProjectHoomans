@@ -233,6 +233,22 @@ local Research = require "PNC/Production/PNC_ResearchService"
 local Crafting = require "PNC/Production/PNC_CraftingService"
 local Construction = require
     "PNC/Production/ConstructionService/PNC_ConstructionService"
+
+local provisionDisplayOrder = T.truthy(Work.Commands.Queue({
+    operation = "PROVISION_PICKUP", colonyId = "c1", factionId = "f1",
+    baseId = "b1", payload = {
+        selected = {{ descriptor = { fullType = "Base.Apple" }, quantity = 1 }},
+    },
+}))
+PNC.Registry.Data.worker.runtime.workOrderId = provisionDisplayOrder.id
+PNC.Registry.Data.worker.orderSpec = { phase = "COLLECT_INPUTS" }
+local provisionDisplay = Work.BuildActionInformation(PNC.Registry.Data.worker)
+T.equal(provisionDisplay.activityItemFullType, "Base.Apple",
+    "provision action snapshot exposes selected item")
+T.truthy(Work.Commands.Cancel(provisionDisplayOrder.id),
+    "provision display fixture cancellation")
+PNC.Registry.Data.worker.runtime.workOrderId = nil
+PNC.Registry.Data.worker.orderSpec = nil
 T.truthy(Research.Commands.UnlockRecipe("c1", 1, "f1"), "seed known recipe")
 
 local technology = T.truthy(Research.Commands.QueueTechnology({},

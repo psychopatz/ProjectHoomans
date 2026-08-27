@@ -3,6 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 local Reservations = PNC.FacilityReservations
 local H = Reservations.Internal
+local Definitions = PNC.FacilityDefinitions
 
 local function isWorkCapability(capability)
     capability = tostring(capability or "")
@@ -10,7 +11,14 @@ local function isWorkCapability(capability)
 end
 
 function H.LaborTarget(facility, capability)
-    if not isWorkCapability(capability) then return nil end
+    if not isWorkCapability(capability)
+        or not facility or not Definitions
+        or not Definitions.RequiresWorkZone
+        or Definitions.RequiresWorkZone(
+            facility.definitionId, facility.level) ~= true
+    then
+        return nil
+    end
     for componentId, present in pairs(facility and facility.componentIds or {}) do
         if present == true then
             local component = PNC.SettlementRepository.GetComponent(componentId)
@@ -71,38 +79,67 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability,
         .GetComponent(options.componentId) or nil
     for index = 1, #facilities do
         local facility = facilities[index]
-        local targetValid = options.abstract == true
-            or options.deferWorldValidation == true
-            or PNC.FacilityService.RevalidateTargets(facility)
-        local component
-        if options.componentId and requested
-            and requested.facilityId == facility.id
-            and (not H.IsExclusiveComponent(requested)
-                or not Reservations.ByComponent[requested.id])
-        then
-            component = requested
-        elseif not options.componentId then
-            component = H.ComponentForCapability(facility, capability)
-        end
-        if targetValid and component then
-            local ok, reservation = Reservations.Reserve(facility.id,
-                component.id, npcId, capability, options.ttlMs, options)
-            if ok then
-                local targets = PNC.FacilityInteractionTargets
-                    and PNC.FacilityInteractionTargets.Resolve(component) or {}
-                local target = targets[1]
-                    or component.kind == "region" and H.RegionTarget(component)
-                target = H.LaborTarget(facility, capability) or target
-                return {
-                    ok = true,
-                    reservationId = reservation.id,
-                    facilityId = facility.id,
-                    componentId = component.id,
-                    role = component.role,
-                    target = target,
-                    targets = targets,
-                    abstract = options.abstract == true,
-                }
+        local resourceBinding = PNC.FacilityResources
+            and PNC.FacilityResources.GetBinding
+            and PNC.FacilityResources.GetBinding(facility, capability)
+        if resourceBinding then
+            local selected = PNC.FacilityResources.Select(
+                facility, capability, options)
+            if selected then
+                local ok, reservation = Reservations.ReserveResource(
+                    facility.id, selected.resource, npcId, capability,
+                    options.ttlMs, options)
+                if ok then
+                    return {
+                        ok = true,
+                        reservationId = reservation.id,
+                        facilityId = facility.id,
+                        componentId = nil,
+                        role = selected.role or resourceBinding.role,
+                        target = selected.target,
+                        targets = selected.targets,
+                        resource = selected.resource,
+                        resourceKind = selected.resourceKind,
+                        resourceKey = selected.resourceKey,
+                        scanStatus = selected.scanStatus,
+                        abstract = options.abstract == true,
+                    }
+                end
+            end
+        else
+            local targetValid = options.abstract == true
+                or options.deferWorldValidation == true
+                or PNC.FacilityService.RevalidateTargets(facility)
+            local component
+            if options.componentId and requested
+                and requested.facilityId == facility.id
+                and (not H.IsExclusiveComponent(requested)
+                    or not Reservations.ByComponent[requested.id])
+            then
+                component = requested
+            elseif not options.componentId then
+                component = H.ComponentForCapability(facility, capability)
+            end
+            if targetValid and component then
+                local ok, reservation = Reservations.Reserve(facility.id,
+                    component.id, npcId, capability, options.ttlMs, options)
+                if ok then
+                    local targets = PNC.FacilityInteractionTargets
+                        and PNC.FacilityInteractionTargets.Resolve(component) or {}
+                    local target = targets[1]
+                        or component.kind == "region" and H.RegionTarget(component)
+                    target = H.LaborTarget(facility, capability) or target
+                    return {
+                        ok = true,
+                        reservationId = reservation.id,
+                        facilityId = facility.id,
+                        componentId = component.id,
+                        role = component.role,
+                        target = target,
+                        targets = targets,
+                        abstract = options.abstract == true,
+                    }
+                end
             end
         end
     end

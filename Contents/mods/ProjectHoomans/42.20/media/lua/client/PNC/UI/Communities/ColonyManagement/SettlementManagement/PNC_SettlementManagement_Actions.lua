@@ -13,6 +13,10 @@ Actions.AreaRole = Facility.AreaRole
 
 function Actions.HandleComponent(window, action, facility)
     if not facility or type(action) ~= "table" then return false end
+    if action.kind == "set_room_capacity" then
+        local CapacityModal = require "PNC/UI/Communities/ColonyManagement/PNC_FacilityCapacityModal"
+        return CapacityModal.Open(window, facility) ~= false
+    end
     if action.kind == "open_stockpile" then
         local storage = window.snapshot and window.snapshot.storage
         local access = storage and storage.access or nil

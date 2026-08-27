@@ -142,4 +142,16 @@ local faucetOK, faucetConsumed = Service.Consume(
 T.truthy(faucetOK, "clean faucet water is consumable")
 T.equal(faucetConsumed, 0.8, "faucet supplies the requested liters")
 
+cell.getGridSquare = function() return nil end
+PNC.Registry.GetLiveZombie = function()
+    return { getX = function() return 50 end,
+        getY = function() return 50 end,
+        getZ = function() return 0 end }
+end
+local unloaded, unloadedReason = Service.Resolve(
+    { id = "npc:unloaded" }, "missing-water")
+T.falsy(unloaded, "unloaded water does not produce a stale source")
+T.equal(unloadedReason, "WATER_WORLD_UNLOADED",
+    "unloaded water reports a retryable world state")
+
 T.finish("pnc_nearby_water_smoke")

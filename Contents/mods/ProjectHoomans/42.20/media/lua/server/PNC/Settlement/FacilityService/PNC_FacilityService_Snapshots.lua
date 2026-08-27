@@ -20,11 +20,16 @@ function Service.BuildSnapshot(facility)
     local output = PNC.Core.DeepCopy(facility)
     output.components = {}
     output.pendingComponents = {}
+    output.discoveredComponents = {}
+    output.roomProfile = nil
     output.farming = PNC.FarmingService and PNC.FarmingService.BuildFacilitySnapshot
         and PNC.FarmingService.BuildFacilitySnapshot(facility) or nil
     local level = Definitions.GetLevel(facility.definitionId, facility.level)
     output.capabilities = PNC.Core.DeepCopy(level and level.capabilities or {})
     output.workstations = PNC.Core.DeepCopy(level and level.workstations or {})
+    output.workZoneEnabled = Definitions.RequiresWorkZone
+        and Definitions.RequiresWorkZone(
+            facility.definitionId, facility.level) == true or false
     for id, _ in pairs(facility.componentIds) do
         local component = Repository.GetComponent(id)
         if component then
@@ -73,6 +78,13 @@ function Service.BuildSnapshot(facility)
                 end
             end
         end
+    end
+    if PNC.FacilityResources and PNC.FacilityResources.BuildSnapshot then
+        local resources = PNC.FacilityResources.BuildSnapshot(facility)
+        output.discoveredComponents = resources.components or {}
+        output.roomProfile = resources.profile
+        output.roomLabelKey = resources.profile
+            and resources.profile.roomLabelKey or nil
     end
     for _, station in pairs(output.workstations or {}) do
         local componentId

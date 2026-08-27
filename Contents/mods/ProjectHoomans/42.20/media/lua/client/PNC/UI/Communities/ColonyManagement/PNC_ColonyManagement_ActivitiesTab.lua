@@ -80,7 +80,7 @@ local function currentActivity(person)
         local operation = tostring(info.operation or "")
         local label
         if operation == "PROVISION_PICKUP" then
-            label = Shared.Tr("UI_PNC_Activity_Provision", "GRABBING PROVISION")
+            label = Shared.Tr("UI_PNC_Action_Grabbing", "GRABBING")
         else
             label = tostring(info.buildDisplayName or info.recipeId
                 or operation or "WORKING")

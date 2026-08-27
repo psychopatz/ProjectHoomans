@@ -95,6 +95,11 @@ local nextResult = BehaviorResult.Working
 local body
 local serverMode = false
 isServer = function() return serverMode end
+ZombieIdleState = {
+    instance = function()
+        return { name = "idle" }
+    end,
+}
 local behavior = {
     pathToLocation = function(self, x, y, z)
         self.target = { x = x, y = y, z = z }
@@ -132,6 +137,9 @@ body = {
     end,
     getActionStateName = function(self)
         return self.actionState or "idle"
+    end,
+    changeState = function(self, state)
+        self.actionState = state and state.name or "idle"
     end,
     isUseless = function(self) return self.useless end,
     setUseless = function(self, value) self.useless = value == true end,
@@ -318,6 +326,10 @@ local movedTarget = {
     mode = target.mode,
     stopDistance = target.stopDistance,
 }
+-- Replanning can encounter a stale vanilla WalkTowardState after a previous
+-- task or animation update. The native owner must release it before Behavior2
+-- can publish path2 again.
+body.actionState = "walktoward"
 local requestsBeforeMovingReplan = requestCount
 PNC.EnginePathPlanner.GetSteeringTarget(
     record,
@@ -326,6 +338,8 @@ PNC.EnginePathPlanner.GetSteeringTarget(
 )
 T.truthy(requestCount == requestsBeforeMovingReplan + 1,
     "moving target did not trigger a bounded native replan")
+T.equal(body.actionState, "idle",
+    "native replan left the vanilla WalkTowardState active")
 
 body.x = movedTarget.x
 body.y = movedTarget.y

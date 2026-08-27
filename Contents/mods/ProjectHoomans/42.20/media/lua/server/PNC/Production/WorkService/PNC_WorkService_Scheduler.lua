@@ -24,6 +24,7 @@ local setLiveOrder = Internal.setLiveOrder
 local claimStation = Internal.claimStation
 local requiresHome = Internal.requiresHome
 local autoReturnHome = Internal.autoReturnHome
+local isFollowing = Internal.isFollowing
 
 local function processOrder(order, at)
     if terminal(order) or order.status == Status.PAUSED then return end
@@ -49,7 +50,7 @@ local function processOrder(order, at)
     local worker = order.workerId and PNC.Registry and PNC.Registry.Get
         and PNC.Registry.Get(order.workerId) or nil
     if order.workerId and (not worker or worker.alive == false) then
-        releaseClaim(order, "worker_unavailable")
+        releaseClaim(order, "worker_unavailable", false, true)
         order.status, order.blockedReason = Status.WAITING_FOR_WORKER,
             "NO_QUALIFIED_WORKER"
         Repository.MarkDirty(); return
@@ -84,11 +85,14 @@ local function processOrder(order, at)
     local returningHome = PNC.HomeDutyService
         and PNC.HomeDutyService.IsReturningHome
         and PNC.HomeDutyService.IsReturningHome(worker, order.baseId)
-    if returningHome or (requiresHome(order) and PNC.HomeDutyService
+    local followingDuringProvision = order.operation == "PROVISION_PICKUP"
+        and isFollowing and isFollowing(worker)
+    if returningHome or followingDuringProvision
+        or (requiresHome(order) and PNC.HomeDutyService
         and PNC.HomeDutyService.IsAtHome
         and not PNC.HomeDutyService.IsAtHome(worker, order.baseId))
     then
-        releaseClaim(order, "worker_left_home")
+        releaseClaim(order, "worker_left_home", false, true)
         order.status, order.blockedReason = Status.WAITING_FOR_WORKER,
             autoReturnHome(order) and "WORKER_RETURNING_HOME"
                 or "WORKER_NOT_AT_HOME"
@@ -107,7 +111,7 @@ local function processOrder(order, at)
         local renewed = PNC.FacilityReservations.Start(
             order.facilityReservationId, 30000)
         if not renewed then
-            releaseClaim(order, "station_reservation_lost")
+            releaseClaim(order, "station_reservation_lost", false, true)
             order.status, order.blockedReason = Status.WAITING_FOR_WORKER,
                 "STATION_RESERVATION_LOST"
             Repository.MarkDirty(); return
@@ -124,10 +128,10 @@ local function processOrder(order, at)
         if not current or current.kind ~= "production_work"
             or tostring(current.workOrderId or "") ~= order.id
         then
-            local target = collectionTarget(order, worker)
+            local target = collectionTarget(order, worker, live)
             if requiresCollection(order) and not target
             then
-                releaseClaim(order, "stockpile_access_missing")
+                releaseClaim(order, "stockpile_access_missing", false, true)
                 order.status, order.blockedReason = Status.BLOCKED,
                     "NO_STOCKPILE_ACCESS_NODE"
                 Repository.MarkDirty()

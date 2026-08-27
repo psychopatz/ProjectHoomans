@@ -7,6 +7,7 @@ local Policy = PNC.FacilityComponentPolicy
 
 Definitions.SCHEMA_VERSION = 1
 Definitions.ByID = Definitions.ByID or {}
+Definitions.Aliases = Definitions.Aliases or {}
 
 Definitions.ComponentIconPaths = Definitions.ComponentIconPaths or {
     ["storage.stockpile"] = "media/ui/Facilities/Components/storage/stockpile.png",
@@ -40,11 +41,14 @@ function Definitions.Register(definition)
     then
         return false, "INVALID_FACILITY_DEFINITION"
     end
-    -- Every facility owns one editable labor spot. Keep this in the shared
-    -- registration path so new definitions cannot accidentally omit it.
+    -- A labor standing area is opt-in. Room-backed facilities such as
+    -- bedrooms, dining rooms, and hospitals must not acquire a fake work
+    -- component merely because they have a construction footprint.
     for _, level in pairs(definition.levels) do
         level.componentLimits = level.componentLimits or {}
-        if not level.componentLimits["work.zone"] then
+        if definition.requiresWorkZone == true
+            and not level.componentLimits["work.zone"]
+        then
             level.componentLimits["work.zone"] = {
                 kind = "region", minCount = 1, maxCount = 1,
                 minTotalTiles = 1, maxTotalTiles = 1, workZone = true,
@@ -55,13 +59,40 @@ function Definitions.Register(definition)
     return true, definition
 end
 
+function Definitions.RegisterAlias(alias, id)
+    alias, id = tostring(alias or ""), tostring(id or "")
+    if alias == "" or id == "" or not Definitions.ByID[id] then
+        return false, "INVALID_FACILITY_ALIAS"
+    end
+    Definitions.Aliases[alias] = id
+    return true, Definitions.ByID[id]
+end
+
 function Definitions.Get(id)
-    return Definitions.ByID[tostring(id or "")]
+    local requested = tostring(id or "")
+    return Definitions.ByID[requested]
+        or Definitions.ByID[Definitions.Aliases[requested] or ""]
 end
 
 function Definitions.GetLevel(id, level)
     local definition = Definitions.Get(id)
     return definition and definition.levels[math.floor(tonumber(level) or 1)] or nil
+end
+
+function Definitions.RequiresWorkZone(id, level)
+    local definition = Definitions.Get(id)
+    local levelData = definition
+        and definition.levels[math.floor(tonumber(level) or 1)] or nil
+    if levelData and levelData.requiresWorkZone ~= nil then
+        return levelData.requiresWorkZone == true
+    end
+    if definition and definition.requiresWorkZone ~= nil then
+        return definition.requiresWorkZone == true
+    end
+    -- Preserve explicitly authored custom definitions while preventing the
+    -- old universal injection from returning through a compatibility path.
+    return levelData and levelData.componentLimits
+        and levelData.componentLimits["work.zone"] ~= nil or false
 end
 
 function Definitions.GetComponentCosts(id, level, role)

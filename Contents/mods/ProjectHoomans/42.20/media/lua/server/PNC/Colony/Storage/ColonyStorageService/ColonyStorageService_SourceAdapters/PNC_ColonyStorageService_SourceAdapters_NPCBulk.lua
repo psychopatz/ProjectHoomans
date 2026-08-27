@@ -21,7 +21,7 @@ function Internal.NPCBulkSource(record)
     local body = PNC.Registry.GetLiveZombie(record.id)
     local entries = {}
     for _, item in pairs(inventory.items or {}) do
-        if item.interactionLocked ~= true
+        if not Internal.IsNPCDepositForbiddenItem(item)
             and item.fav ~= true
             and not item.equipSlot and not item.wornSlot
             and not item.attachedSlot
@@ -99,4 +99,3 @@ function Internal.NPCBulkSource(record)
 end
 
 return Internal
-

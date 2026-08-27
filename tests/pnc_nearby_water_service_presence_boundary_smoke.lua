@@ -38,7 +38,7 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.NearbyWaterService[name]), "function",
         "entry point preserves NearbyWaterService." .. name)
 end
-T.equal(publicCount, 8, "nearby-water public function count")
+T.equal(publicCount, 9, "nearby-water public function count")
 T.equal(PNC.NearbyWaterService.RADIUS, 12,
     "nearby-water search radius remains stable")
 T.equal(PNC.NearbyWaterService.MAX_DRINK_LITERS, 1,

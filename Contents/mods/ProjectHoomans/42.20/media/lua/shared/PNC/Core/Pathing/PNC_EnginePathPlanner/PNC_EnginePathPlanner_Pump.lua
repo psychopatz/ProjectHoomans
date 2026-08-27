@@ -16,6 +16,7 @@ function Planner.Pump(record, body, source)
     end
     local now = Core and Core.Now and Core.Now() or 0
     source = tostring(source or "scheduled")
+    Internal.EnsureNativeMovementOwner(body)
     if Diagnostics then
         Diagnostics.RecordPathPump(record, source)
         if record and record.presenceState == PNC.Const.PRESENCE_ABSTRACT then

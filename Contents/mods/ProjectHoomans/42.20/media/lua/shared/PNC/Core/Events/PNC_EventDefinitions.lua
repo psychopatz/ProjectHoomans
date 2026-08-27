@@ -18,6 +18,7 @@ PNC.EventTypes = PNC.EventTypes or {
     FACILITY_CREATED = "projecthoomans.facility.created",
     FACILITY_UPGRADED = "projecthoomans.facility.upgraded",
     FACILITY_COMPONENT_CHANGED = "projecthoomans.facility.componentChanged",
+    FACILITY_SETTINGS_CHANGED = "projecthoomans.facility.settingsChanged",
     FACILITY_STATE_CHANGED = "projecthoomans.facility.stateChanged",
     FACILITY_DESTROYED = "projecthoomans.facility.destroyed",
     STOCKPILE_NODE_CHANGED = "projecthoomans.stockpile.nodeChanged",

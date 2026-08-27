@@ -33,6 +33,8 @@ function Request.Create(spec)
         fulfillment = fulfillment,
         target = tonumber(spec.target),
         debug = spec.debug == true,
+        stateAware = spec.stateAware == true,
+        selectionLimit = tonumber(spec.selectionLimit),
     }
 end
 

@@ -11,6 +11,7 @@ PNC.FacilityReservations.Internal =
 local Reservations = PNC.FacilityReservations
 Reservations.ByID = Reservations.ByID or {}
 Reservations.ByComponent = Reservations.ByComponent or {}
+Reservations.ByResource = Reservations.ByResource or {}
 Reservations.ByNPC = Reservations.ByNPC or {}
 Reservations.ByActivity = Reservations.ByActivity or {}
 Reservations.DEFAULT_TTL_MS = 30000

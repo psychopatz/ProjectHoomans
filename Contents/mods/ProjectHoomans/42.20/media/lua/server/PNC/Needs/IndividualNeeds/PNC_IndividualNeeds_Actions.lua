@@ -9,24 +9,26 @@ local EventBus = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = PNC.EventTypes
 local H = Needs.Internal
 
-function Needs.Commands.ApplyFood(record, effect, source)
+local function applyConsumable(record, effect, source)
     effect = type(effect) == "table" and effect or {}
     Needs.Modify(record, "hunger", -(tonumber(effect.hunger) or 0),
+        source or "food_consumed")
+    Needs.Modify(record, "thirst", -(tonumber(effect.thirst) or 0),
         source or "food_consumed")
     Needs.ModifyNutrition(record, tonumber(effect.calories) or 0,
         source or "food_consumed")
     return true, Needs.GetState(record)
 end
 
+-- Both food and drink can restore both primitive needs.  Keep the two public
+-- commands for their existing callers, but make the effect application
+-- vector-aware so an apple consumed through the food lane also hydrates.
+function Needs.Commands.ApplyFood(record, effect, source)
+    return applyConsumable(record, effect, source or "food_consumed")
+end
+
 function Needs.Commands.ApplyDrink(record, effect, source)
-    effect = type(effect) == "table" and effect or {}
-    Needs.Modify(record, "thirst", -(tonumber(effect.thirst) or 0),
-        source or "drink_consumed")
-    if tonumber(effect.calories) then
-        Needs.ModifyNutrition(record, tonumber(effect.calories),
-            source or "drink_consumed")
-    end
-    return true, Needs.GetState(record)
+    return applyConsumable(record, effect, source or "drink_consumed")
 end
 function Needs.GetPriority(record, needType)
     local value = Needs.Get(record, needType) or 0
@@ -73,4 +75,3 @@ function Needs.Commands.ApplyRest(record, elapsedHours, source)
 end
 
 return Needs
-

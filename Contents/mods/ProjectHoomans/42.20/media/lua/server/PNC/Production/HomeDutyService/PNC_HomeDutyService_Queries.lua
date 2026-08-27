@@ -18,6 +18,12 @@ function Service.IsAtHome(record, baseId)
     )
 end
 
+function Service.IsFollowing(record)
+    local order = record and record.orderSpec or nil
+    return tostring(order and order.kind or "") == tostring(
+        PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
+end
+
 function Service.IsReturningHome(record, baseId)
     local travel = record and record.travel or nil
     local metadata = travel and travel.metadata or nil
@@ -41,4 +47,3 @@ function Service.BuildState(record)
 end
 
 return Service
-

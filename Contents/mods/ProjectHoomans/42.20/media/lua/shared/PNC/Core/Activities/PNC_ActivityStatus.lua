@@ -165,6 +165,7 @@ Status.Register("facility_activity", 80, function(record)
     return activity("facility:" .. capability,
         definition and definition.activityLabelKey,
         definition and definition.activityText
+            or capability ~= "" and humanize(capability)
             or humanize(record.activeJob or capability), {
             capability = capability,
             phase = tostring(runtime.phase or ""),
@@ -189,6 +190,32 @@ Status.Register("current_job", 10, function(record)
     local current = tostring(record.activeBehavior
         or record.activeJob or record.orderSpec and record.orderSpec.kind or "")
     if current == "" then return nil end
+    if current == "FacilityActivity" then
+        local order = record.orderSpec or {}
+        local facilityRuntime = runtime.facilityActivity or order
+        local capability = tostring(facilityRuntime.capability or "")
+        if capability ~= "" then
+            local definition = PNC.FacilityJobDefinitions
+                and PNC.FacilityJobDefinitions.Get(capability) or nil
+            local facilityId = facilityRuntime.facilityId
+            local facility = facilityId and PNC.SettlementRepository
+                and PNC.SettlementRepository.GetFacility(facilityId) or nil
+            local itemFullType, itemLabelKey = facilityItem(
+                record, facilityRuntime, capability)
+            return activity("facility:" .. capability,
+                definition and definition.activityLabelKey,
+                definition and definition.activityText
+                    or humanize(capability), {
+                    capability = capability,
+                    phase = tostring(facilityRuntime.phase or ""),
+                    facilityId = facilityId,
+                    facilityDefinitionId = facility
+                        and facility.definitionId or nil,
+                    activityItemFullType = itemFullType,
+                    activityItemLabelKey = itemLabelKey,
+                })
+        end
+    end
     return activity("job:" .. current, nil, humanize(current), {
         job = tostring(record.activeJob or ""),
         behavior = tostring(record.activeBehavior or ""),

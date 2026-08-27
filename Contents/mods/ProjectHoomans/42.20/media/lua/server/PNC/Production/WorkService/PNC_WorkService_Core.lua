@@ -62,10 +62,19 @@ end
 
 local function autoReturnHome(order)
     if not order then return true end
-    -- A hungry/following NPC must wait for an explicit home command instead
-    -- of having provision work silently take over its current behavior.
-    if order.operation == "PROVISION_PICKUP" then return false end
+    -- Provision pickup is home-bound. If its worker is away, the scheduler
+    -- owns the return-home handoff before the order can be retried.
+    if order.operation == "PROVISION_PICKUP" then return true end
     return order.autoReturnHome ~= false
+end
+
+local function isFollowing(record)
+    if PNC.HomeDutyService and PNC.HomeDutyService.IsFollowing then
+        return PNC.HomeDutyService.IsFollowing(record) == true
+    end
+    local order = record and record.orderSpec or nil
+    return tostring(order and order.kind or "") == tostring(
+        PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
 end
 
 local function specializationScore(record, order)
@@ -125,6 +134,9 @@ end
 
 local function workerAvailable(record, order)
     if not record or record.alive == false or not belongsToOrder(record, order) then
+        return false
+    end
+    if order.operation == "PROVISION_PICKUP" and isFollowing(record) then
         return false
     end
     if Service.ClaimsByWorker[tostring(record.id)] then return false end
@@ -239,6 +251,7 @@ Internal.copy = copy
 Internal.requirementsMet = requirementsMet
 Internal.requiresHome = requiresHome
 Internal.autoReturnHome = autoReturnHome
+Internal.isFollowing = isFollowing
 Internal.belongsToOrder = belongsToOrder
 Internal.markAssignmentDirty = markAssignmentDirty
 Internal.workerAvailable = workerAvailable

@@ -25,6 +25,29 @@ local Events = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes =
     require "PNC/Core/Events/PNC_EventDefinitions"
 
+local function removePhysicalUnit(adapter, nativeItem)
+    local count
+    local readOK
+    if nativeItem and type(nativeItem.getCount) == "function" then
+        readOK, count = pcall(nativeItem.getCount, nativeItem)
+        count = readOK and tonumber(count) or nil
+    end
+    if count and count > 1 then
+        if type(nativeItem.setCount) ~= "function" then
+            return false, "physical_stack_update_unavailable"
+        end
+        local updated = pcall(nativeItem.setCount, nativeItem, count - 1)
+        if not updated then return false, "physical_stack_update_failed" end
+        return true, function()
+            pcall(nativeItem.setCount, nativeItem, count)
+        end
+    end
+    if not adapter:_nativeRemove(nativeItem) then
+        return false, "physical_remove_failed"
+    end
+    return true, function() adapter:_nativeAdd(nativeItem) end
+end
+
 function H.CanonicalConsumptionOps(item, descriptor)
     local stack = math.max(1, math.floor(tonumber(item.stack) or 1))
     if descriptor.hydration and descriptor.useDelta > 0 then
@@ -72,6 +95,22 @@ function SupplyInventory.Consume(record, itemID, request)
     if body then
         local candidates = H.NativeCandidates(body, item)
         local selected = candidates[1]
+        if not selected and PNC.Inventory
+            and PNC.Inventory.MaterializeItem
+        then
+            -- Existing saves can contain a compact item that was added while
+            -- the NPC was live but never projected to its native inventory.
+            -- Repair only this selected item; a full snapshot would duplicate
+            -- unrelated native items. The compact record remains authoritative
+            -- if the repair cannot be completed.
+            local repaired, _, repairUndo =
+                PNC.Inventory.MaterializeItem(record, body, item.id)
+            if repaired then
+                candidates = H.NativeCandidates(body, item)
+                selected = candidates[1]
+            end
+            if not selected and repairUndo then pcall(repairUndo) end
+        end
         if selected then
             local adapter = CoreInventory.wrapPhysicalInventory(
                 selected.container
@@ -90,12 +129,10 @@ function SupplyInventory.Consume(record, itemID, request)
                     selected.item:setUsedDelta(before)
                 end
             else
-                if not adapter:_nativeRemove(selected.item) then
-                    return false, "physical_remove_failed"
-                end
-                physicalUndo = function()
-                    adapter:_nativeAdd(selected.item)
-                end
+                local removed, removeReason, undo = removePhysicalUnit(
+                    adapter, selected.item)
+                if not removed then return false, removeReason end
+                physicalUndo = undo
             end
         else
             -- A visible NPC may only consume an item that is present in its
@@ -144,4 +181,3 @@ function SupplyInventory.Consume(record, itemID, request)
 end
 
 return SupplyInventory
-

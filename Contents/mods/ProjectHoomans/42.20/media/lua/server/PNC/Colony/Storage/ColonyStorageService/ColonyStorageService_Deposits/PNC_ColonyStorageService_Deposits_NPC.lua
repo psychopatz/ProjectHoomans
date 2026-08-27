@@ -30,7 +30,9 @@ function Service.RequestNPCDeposit(player, args)
     end
     local item = inv.items[tostring(args.itemID or "")]
     if not item then return finish(false, "item_not_found", nil, storage, record) end
-    if item.interactionLocked == true then return finish(false, "item_off_limits", nil, storage, record) end
+    if Internal.IsNPCDepositForbiddenItem(item) then
+        return finish(false, "item_off_limits", nil, storage, record)
+    end
     if item.equipSlot or item.wornSlot or item.attachedSlot then
         return finish(false, "equipped_item", nil, storage, record)
     end
@@ -62,4 +64,3 @@ function Service.RequestNPCDeposit(player, args)
 end
 
 return Service
-

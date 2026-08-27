@@ -615,6 +615,10 @@ function Client.RequestUpgradeFacility(options)
     return Client.RequestColonyAction("facility_upgrade", options)
 end
 
+function Client.RequestSetFacilityCapacity(options)
+    return Client.RequestColonyAction("facility_capacity_set", options)
+end
+
 function Client.RequestDebugFacilityMaterials(options)
     return Client.RequestColonyAction("facility_debug_get_materials", options)
 end

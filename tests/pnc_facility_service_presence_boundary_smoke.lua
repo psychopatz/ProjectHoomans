@@ -8,6 +8,7 @@ local providers = {
     "PNC_FacilityService_Creation",
     "PNC_FacilityService_Targets",
     "PNC_FacilityService_Upgrades",
+    "PNC_FacilityService_Settings",
     "PNC_FacilityService_ComponentInternals",
     "PNC_FacilityService_ComponentCommands",
     "PNC_FacilityService_AnchorFinalization",
@@ -60,7 +61,7 @@ for name, _ in pairs(publicFunctions) do
     T.equal(type(PNC.FacilityService[name]), "function",
         "entry point should preserve FacilityService." .. name)
 end
-T.equal(publicCount, 20, "public function declaration count")
+T.equal(publicCount, 21, "public function declaration count")
 
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil

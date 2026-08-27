@@ -45,7 +45,8 @@ local function resolveSpawnPosition(record, reason, now)
     local z
     local recoveryReason
     local deferredReason
-    x, y, z, recoveryReason, deferredReason =
+    local resourceTarget
+    x, y, z, recoveryReason, deferredReason, resourceTarget =
         Internal.FindMaterializeSquare(record, now, reason)
     if deferredReason and deferredReason ~= "no_safe_square" then
         if MaterializationSafety and MaterializationSafety.Defer then
@@ -83,6 +84,7 @@ local function resolveSpawnPosition(record, reason, now)
         y = y,
         z = z,
         recoveryReason = recoveryReason,
+        activityTarget = resourceTarget,
     }
 end
 
@@ -165,6 +167,12 @@ local function finishMaterialization(
             position.y,
             position.z
         )
+    end
+    if position.activityTarget and PNC.FacilityResources
+        and PNC.FacilityResources.ApplyMaterializationTarget
+    then
+        PNC.FacilityResources.ApplyMaterializationTarget(
+            record, zombie, position.activityTarget)
     end
     record.presenceState = Const.PRESENCE_LIVE
     Registry.RegisterLiveZombie(record, zombie)

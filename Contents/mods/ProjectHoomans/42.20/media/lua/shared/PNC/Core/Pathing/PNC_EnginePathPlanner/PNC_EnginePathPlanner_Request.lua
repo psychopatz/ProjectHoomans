@@ -37,6 +37,7 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
         return false
     end
     Internal.ClearEngineRequest(body, navigation)
+    Internal.EnsureNativeMovementOwner(body)
     if Diagnostics then
         Diagnostics.Increment("Pathing.EnginePathRequests")
     end

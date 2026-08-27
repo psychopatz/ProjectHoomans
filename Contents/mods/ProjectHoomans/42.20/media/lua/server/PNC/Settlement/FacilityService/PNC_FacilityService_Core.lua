@@ -98,17 +98,48 @@ local function buildDefaultWorkZone(base, facility, region, componentId)
     return nil, "FACILITY_WORK_ZONE_REQUIRED"
 end
 
+local function facilityRequiresWorkZone(facility)
+    if not facility then return false end
+    if Definitions.RequiresWorkZone then
+        return Definitions.RequiresWorkZone(
+            facility.definitionId, facility.level) == true
+    end
+    local level = Definitions.GetLevel(
+        facility.definitionId, facility.level)
+    return level and level.componentLimits
+        and level.componentLimits["work.zone"] ~= nil or false
+end
+
 local function ensureWorkZone(facility, base)
     if not facility or not base then return false end
+    local shouldHaveWorkZone = facilityRequiresWorkZone(facility)
     local existing
+    local existingIds = {}
     for componentId, present in pairs(facility.componentIds or {}) do
         if present == true then
             local component = Repository.GetComponent(componentId)
             if component and component.role == "work.zone" then
-                existing = component
-                break
+                existing = existing or component
+                existingIds[#existingIds + 1] = componentId
             end
         end
+    end
+    if not shouldHaveWorkZone then
+        for _, componentId in ipairs(existingIds) do
+            facility.componentIds[componentId] = nil
+            Repository.State.components[componentId] = nil
+            if PNC.FacilityInteractionTargets
+                and PNC.FacilityInteractionTargets.Invalidate
+            then
+                PNC.FacilityInteractionTargets.Invalidate(componentId)
+            end
+            if PNC.FacilityReservations
+                and PNC.FacilityReservations.ReleaseComponent
+            then
+                PNC.FacilityReservations.ReleaseComponent(componentId)
+            end
+        end
+        return #existingIds > 0
     end
     if existing and existing.kind == "region"
         and existing.region and facility.constructionRegion
@@ -201,6 +232,12 @@ function Service.RefreshState(facilityOrId)
     touch(base, facility)
     updateState(base, facility)
     Service.RebuildIndexes()
+    if facility.constructionState == "BUILT"
+        and PNC.FacilityResources
+        and PNC.FacilityResources.Refresh
+    then
+        PNC.FacilityResources.Refresh(facility)
+    end
     return true, facility.cachedState
 end
 

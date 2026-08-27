@@ -8,6 +8,20 @@ local C = Internal.Constants
 local Events = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 
+function Internal.IsNPCDepositForbiddenItem(item)
+    if type(item) ~= "table" then return false end
+    if item.interactionLocked == true then return true end
+    if tostring(item.type or "") == "Base.IDcard" then return true end
+    if item.templateKey == "tmpl:identity_card:0"
+        or item.legacyTemplateKey == "tmpl:identity_card:0"
+        or item.identityNPCId ~= nil
+        or item.identityNPCName ~= nil
+    then
+        return true
+    end
+    return false
+end
+
 function Internal.PlayerName(player)
     return player and player.getUsername
         and tostring(player:getUsername() or "") or ""

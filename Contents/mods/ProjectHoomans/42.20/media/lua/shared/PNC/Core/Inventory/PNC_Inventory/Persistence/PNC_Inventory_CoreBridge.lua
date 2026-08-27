@@ -191,6 +191,38 @@ function Inventory.MaterializeLooseInventory(record, body)
     return Bridge.materializeLoose(record, body)
 end
 
+-- Project one newly-added compact item into an already-live NPC body.  The
+-- regular materializeLoose path is intentionally a snapshot operation and
+-- would duplicate other loose items if it were used for a single transfer.
+function Bridge.materializeItem(record, body, itemID)
+    local inv = Inventory.EnsureRecordInventory(record)
+    local item = inv and inv.items and inv.items[tostring(itemID or "")] or nil
+    local container = body and body.getInventory and body:getInventory() or nil
+    local encoded
+    local physical
+    local addOK
+    local addedItems
+    local reason
+    if not item or not container then
+        return false, "physical_inventory_unavailable"
+    end
+    encoded, reason = CoreInventory.encodeItem(
+        StateCodec.pseudoItem(item), 1)
+    if not encoded then return false, reason or "item_encode_failed" end
+    physical, reason = CoreInventory.wrapPhysicalInventory(container)
+    if not physical then return false, reason end
+    addOK, addedItems = physical:add(encoded)
+    if not addOK then return false, addedItems or "physical_add_failed" end
+    local addedItem = addedItems and addedItems[1]
+    return true, "materialized", function()
+        if addedItem then physical:_nativeRemove(addedItem) end
+    end
+end
+
+function Inventory.MaterializeItem(record, body, itemID)
+    return Bridge.materializeItem(record, body, itemID)
+end
+
 function Inventory.CaptureLooseInventory(record, body)
     return Bridge.captureLoose(record, body)
 end
