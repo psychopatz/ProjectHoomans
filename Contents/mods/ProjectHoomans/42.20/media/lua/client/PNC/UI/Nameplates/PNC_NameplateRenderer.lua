@@ -37,6 +37,7 @@ local COMBAT_DEFENSE_COLOR = { r = 0.16, g = 1.0, b = 0.30, a = 0.78 }
 local COMBAT_BLOCKER_COLOR = { r = 1.0, g = 0.15, b = 0.8, a = 0.95 }
 local ZOMBIE_ATTACKER_COLOR = { r = 1.0, g = 0.28, b = 0.12, a = 0.96 }
 local COMBAT_MARKER_HALF_SIZE = 9
+local SPEECH_COLOR = { r = 0.82, g = 0.96, b = 0.94, a = 1.0 }
 
 local function drawStatusBar(manager, left, top, width, height, ratio, color, alpha, backgroundAlpha)
     manager:drawRect(
@@ -282,8 +283,25 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
         entry.barColor = Presentation.IncapacitatedColor(currentTime)
     end
 
+    local actionHeight = getTextManager():getFontHeight(Fonts.debug) + 2
+    local speechHeight = actionHeight
+    if entry.speechVisible and entry.speechText ~= "" then
+        local speechY = nameY - speechHeight
+        if entry.actionVisible and entry.actionText ~= "" then
+            speechY = speechY - actionHeight - 2
+        end
+        Presentation.DrawOutlinedText(
+            manager,
+            entry.speechText,
+            screenX - ((entry.speechTextWidth or 0) / 2),
+            speechY,
+            SPEECH_COLOR,
+            0.95 * alpha,
+            Fonts.debug
+        )
+    end
+
     if entry.actionVisible and entry.actionText ~= "" then
-        local actionHeight = getTextManager():getFontHeight(Fonts.debug) + 2
         Presentation.DrawOutlinedText(
             manager,
             entry.actionText,

@@ -1,16 +1,28 @@
 -- PsychopatzCore bridge registration for the Project Hoomans LLM and local
 -- TTS speech-lifecycle channel.
 require "PNC/Integrations/PNC_HoomansLLM"
+require "PNC/Integrations/PNC_ConversationMemorySync"
+require "PNC/Integrations/PNC_VoiceGateway"
+
+-- The context adapter is optional for bridge-only consumers and lightweight
+-- bootstrap tests. A real Project Hoomans runtime has Conversation loaded.
+if PsychopatzCore and PsychopatzCore.Conversation then
+    require "PNC/Integrations/PNC_HoomansLLMContext"
+end
 
 PNC = PNC or {}
 PNC.HoomansLLM = PNC.HoomansLLM or {}
 
 local Integration = PNC.HoomansLLM
+local Context = PNC.HoomansLLM.Context
+local MemorySync = PNC.ConversationMemorySync
+local VoiceGateway = PNC.VoiceGateway
 local bridgeRegistered = false
 local tickRegistered = false
 local lastRegistrationState = nil
 local nextSettingCheckAt = 0
 local SETTING_CHECK_INTERVAL_MS = 1000
+local TOOL_NAMESPACE = "projecthoomans.llm"
 
 local function log(event, details)
     if print then
@@ -21,6 +33,28 @@ end
 local function bridgeEnabled()
     return Integration.IsBridgeEnabled
         and Integration.IsBridgeEnabled() == true
+end
+
+local function registerToolCatalog(bridge)
+    if type(bridge.RegisterTool) ~= "function"
+        or not Context or type(Context.GetToolDefinitions) ~= "function"
+    then
+        return false, "catalog_api_unavailable"
+    end
+    local definitions = Context.GetToolDefinitions()
+    for _, tool in ipairs(definitions or {}) do
+        local definition = tool and tool["function"] or nil
+        local name = definition and tostring(definition.name or "") or ""
+        if name ~= "" then
+            local ok, reason = bridge.RegisterTool(
+                TOOL_NAMESPACE, name, tool, { kind = "llm_tool" }
+            )
+            if not ok and reason ~= "duplicate_tool" then
+                return false, tostring(reason or "registration_failed")
+            end
+        end
+    end
+    return true, "registered"
 end
 
 local function nowMs()
@@ -82,6 +116,7 @@ local function registerBridge()
         end
         return false
     end
+    local catalogAvailable, catalogReason = registerToolCatalog(bridge)
     local pollOK, pollReason = bridge.RegisterCommand(
         "projecthoomans.llm",
         "pollChat",
@@ -107,6 +142,30 @@ local function registerBridge()
     local pollAvailable = pollOK == true or pollReason == "duplicate_command"
     local deliverAvailable = deliverOK == true
         or deliverReason == "duplicate_command"
+    local syncPollOK, syncPollReason = bridge.RegisterCommand(
+        "projecthoomans.llm",
+        "pollConversationSync",
+        {
+            readOnly = true,
+            category = "LLM",
+            handler = function()
+                return MemorySync.Poll()
+            end,
+        }
+    )
+    local syncAckOK, syncAckReason = bridge.RegisterCommand(
+        "projecthoomans.llm",
+        "ackConversationSync",
+        {
+            readOnly = false,
+            category = "LLM",
+            handler = function(_, arguments)
+                return MemorySync.Ack(arguments)
+            end,
+        }
+    )
+    local memorySyncAvailable = (syncPollOK == true or syncPollReason == "duplicate_command")
+        and (syncAckOK == true or syncAckReason == "duplicate_command")
     local startedOK, startedReason = bridge.RegisterCommand(
         "projecthoomans.llm",
         "speechStarted",
@@ -149,6 +208,8 @@ local function registerBridge()
             "bridge_registered",
             "namespace=projecthoomans.llm commands=pollChat,deliverChat speech_events="
                 .. tostring(speechEventsAvailable)
+                .. " memory_sync=" .. tostring(memorySyncAvailable)
+                .. " tool_catalog=" .. tostring(catalogAvailable)
         )
         lastRegistrationState = "registered"
     elseif lastRegistrationState ~= "registration_failed" then
@@ -159,6 +220,9 @@ local function registerBridge()
                 .. " speechStarted=" .. tostring(startedReason or startedOK)
                 .. " speechFinished=" .. tostring(finishedReason or finishedOK)
                 .. " speechFallback=" .. tostring(fallbackReason or fallbackOK)
+                .. " syncPoll=" .. tostring(syncPollReason or syncPollOK)
+                .. " syncAck=" .. tostring(syncAckReason or syncAckOK)
+                .. " toolCatalog=" .. tostring(catalogReason)
         )
         lastRegistrationState = "registration_failed"
     end
@@ -167,6 +231,10 @@ end
 
 local function onTick()
     applyBridgeSetting()
+    if VoiceGateway and VoiceGateway.Sync then
+        VoiceGateway.Sync()
+        if VoiceGateway.Update then VoiceGateway.Update() end
+    end
     registerBridge()
     local view = PsychopatzCore and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.instance or nil
@@ -183,5 +251,6 @@ end
 -- Register immediately when the core bridge is already READY. The tick hook
 -- remains as a retry path for the bridge's lazy activation mode.
 registerBridge()
+if VoiceGateway and VoiceGateway.Sync then VoiceGateway.Sync() end
 
 return Integration

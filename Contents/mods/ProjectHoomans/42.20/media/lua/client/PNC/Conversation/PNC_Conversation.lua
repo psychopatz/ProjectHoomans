@@ -10,7 +10,11 @@ require "PNC/Conversation/PNC_ConversationRelationship"
 require "PNC/Conversation/PNC_ConversationRelationshipPanel"
 require "PNC/Conversation/PNC_ConversationLifecycle"
 require "PNC/UI/PNC_NPCTypePalette"
+-- Register authored and LLM-resolved NPC messages with Core's optional voice
+-- gateway before any conversation can append a line.
+require "PNC/Integrations/PNC_VoiceGateway"
 require "PNC/Integrations/PNC_HoomansLLM"
+require "PNC/Integrations/PNC_ConversationMemorySync"
 require "PNC/Integrations/PNC_HoomansLLMBridge"
 require "PNC/Integrations/PNC_HoomansLLMInput"
 

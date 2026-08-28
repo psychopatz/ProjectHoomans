@@ -83,6 +83,12 @@ local function onResetLua()
     ClientState.conversationDiary = {}
     ClientState.conversationDiaryRevision = 0
     ClientState.lastConversationDelta = nil
+    ClientState.llmToolResults = {}
+    ClientState.llmToolResultOrder = {}
+    local context = PNC.HoomansLLM and PNC.HoomansLLM.Context
+    if context and context.ResetTransientState then
+        context.ResetTransientState()
+    end
     ClientState.factionDebug = nil
     ClientState.factionDebugAuthorized = false
     ClientState.factionDebugReason = nil

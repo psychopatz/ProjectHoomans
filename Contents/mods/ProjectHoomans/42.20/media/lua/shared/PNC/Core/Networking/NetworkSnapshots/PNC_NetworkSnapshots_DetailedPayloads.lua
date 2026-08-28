@@ -32,10 +32,13 @@ local function buildNeedsSummary(record)
         and repository.Get(record, false) or nil
     local needs = state and state.needs or record.needs
     if type(needs) ~= "table" then return nil end
+    local evaluatedAt = repository and repository.GetEvaluatedAt
+        and repository.GetEvaluatedAt(record) or nil
     return {
         hunger = tonumber(needs.hunger) or 0,
         thirst = tonumber(needs.thirst) or 0,
         fatigue = tonumber(needs.fatigue) or 0,
+        sampledAt = evaluatedAt,
     }
 end
 

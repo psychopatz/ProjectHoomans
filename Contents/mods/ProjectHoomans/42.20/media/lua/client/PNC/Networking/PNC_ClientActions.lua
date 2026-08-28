@@ -14,6 +14,26 @@ local Core = PNC.Core
 local Registry = PNC.Registry
 local ClientState = PNC.Network.ClientState
 
+local function traceCompanionCommand(commandID, npcId, scope, context, result)
+    local trace = PsychopatzCore and PsychopatzCore.DebugTrace
+    if not trace or not trace.IsEnabled or not trace.IsEnabled() then
+        return
+    end
+    local requestID = type(context) == "table" and context.requestID or nil
+    trace.Record({
+        source = "ProjectHoomans",
+        event = "game.companion_command",
+        requestID = requestID,
+        data = {
+            commandID = tostring(commandID or ""),
+            npcID = npcId and tostring(npcId) or nil,
+            scope = scope and tostring(scope) or nil,
+            origin = type(context) == "table" and context.origin or nil,
+            result = result,
+        },
+    })
+end
+
 local function teleportLocalPlayerNear(record, player)
     if not record or not player then
         return false
@@ -387,12 +407,16 @@ function Client.SendBandage(npcId, partId, debugFree, bandageType)
     return PNCBandageAction.Queue(player, npcId, partId, debugFree, bandageType)
 end
 
-function Client.SendCompanionCommand(commandID, npcId, scope)
+function Client.SendCompanionCommand(commandID, npcId, scope, context)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local args
     if not player or not PNC.CompanionCommands
         or not PNC.CompanionCommands.Get(commandID)
     then
+        traceCompanionCommand(commandID, npcId, scope, context, {
+            status = "rejected",
+            reason = "invalid_player_or_command",
+        })
         return false
     end
     args = {
@@ -402,17 +426,85 @@ function Client.SendCompanionCommand(commandID, npcId, scope)
         radius = tonumber(Const.COMPANION_COMMAND_RADIUS) or 20,
     }
     if Core.IsClientOnly and Core.IsClientOnly() then
-        if not sendClientCommand then return false end
+        if not sendClientCommand then
+            traceCompanionCommand(commandID, npcId, scope, context, {
+                status = "rejected",
+                reason = "network_api_unavailable",
+            })
+            return false
+        end
         sendClientCommand(
             player,
             Const.MODULE,
             Const.CMD_COMPANION_COMMAND,
             args
         )
+        traceCompanionCommand(commandID, npcId, scope, context, {
+            status = "network_queued",
+        })
         return true
     end
     local affected = PNC.CompanionCommands.Execute(player, args)
-    return (tonumber(affected) or 0) > 0
+    local succeeded = (tonumber(affected) or 0) > 0
+    traceCompanionCommand(commandID, npcId, scope, context, {
+        status = succeeded and "applied" or "rejected",
+        affected = tonumber(affected) or 0,
+    })
+    return succeeded
+end
+
+function Client.ExecuteLLMSocialReaction(npcID, kind, intensity, context)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local tools = PNC.ConversationLLMTools
+    local reaction = tools and tools.NormalizeReaction
+        and tools.NormalizeReaction(kind) or nil
+    local normalizedIntensity = tools and tools.NormalizeIntensity
+        and tools.NormalizeIntensity(intensity) or "normal"
+    local args
+    local result
+    if not player or not reaction then
+        return false, "invalid_social_reaction"
+    end
+    context = type(context) == "table" and context or {}
+    args = {
+        npcID = tostring(npcID or ""),
+        token = tostring(context.token or ""),
+        requestID = tostring(context.requestID or ""),
+        callID = tostring(context.callID or ""),
+        kind = reaction,
+        intensity = normalizedIntensity,
+    }
+    if args.npcID == "" or args.requestID == "" or args.callID == "" then
+        return false, "social_reaction_identity_missing"
+    end
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not sendClientCommand then
+            return false, "network_api_unavailable"
+        end
+        sendClientCommand(
+            player,
+            Const.MODULE,
+            Const.CMD_LLM_SOCIAL_REACTION,
+            args
+        )
+        traceCompanionCommand("social_react", npcID, "conversation", context, {
+            status = "network_queued",
+            reaction = reaction,
+            intensity = normalizedIntensity,
+            callID = args.callID,
+        })
+        return true, "network_queued"
+    end
+    local authority = PNC.Conversation and PNC.Conversation.Authority
+    if not authority or not authority.HandleLLMSocialReaction then
+        return false, "social_reaction_authority_unavailable"
+    end
+    result = authority.HandleLLMSocialReaction(player, args)
+    traceCompanionCommand("social_react", npcID, "conversation", context, result)
+    if type(result) == "table" then
+        return result.accepted == true, result.reason
+    end
+    return result == true, result and "applied" or "rejected"
 end
 
 function Client.ExecuteCompanionCommand(commandID, npcId, scope, context)
@@ -424,13 +516,22 @@ function Client.ExecuteCompanionCommand(commandID, npcId, scope, context)
             if not PNC.ScavengeController then
                 require "PNC/Scavenge/PNC_ScavengeController"
             end
-            return PNC.ScavengeController
+            local opened = PNC.ScavengeController
                 and PNC.ScavengeController.Open
                 and PNC.ScavengeController.Open(npcId, context) or false
+            traceCompanionCommand(commandID, npcId, scope, context, {
+                status = opened and "opened" or "rejected",
+                reason = opened and nil or "client_action_rejected",
+            })
+            return opened
         end
+        traceCompanionCommand(commandID, npcId, scope, context, {
+            status = "rejected",
+            reason = "unsupported_client_action",
+        })
         return false
     end
-    return Client.SendCompanionCommand(commandID, npcId, scope)
+    return Client.SendCompanionCommand(commandID, npcId, scope, context)
 end
 
 local SCAVENGE_LOCAL_METHODS = {

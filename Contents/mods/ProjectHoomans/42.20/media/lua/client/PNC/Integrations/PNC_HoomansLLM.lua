@@ -1,6 +1,9 @@
 -- In-game NPC free-text chat over the bounded PsychopatzCore bridge.
 require "PsychopatzCore/UI/Conversation/PsychopatzConversationLayout"
+require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
 require "PNC/Integrations/PNC_HoomansLLMContext"
+require "PNC/Integrations/PNC_ConversationMemorySync"
+require "PNC/UI/Nameplates/PNC_NameplateSpeech"
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
@@ -9,6 +12,8 @@ PNC.HoomansLLM = PNC.HoomansLLM or {}
 local Integration = PNC.HoomansLLM
 local Layout = PsychopatzCore.Conversation.Layout
 local Context = PNC.HoomansLLM.Context
+local Message = PsychopatzCore.Conversation.Message
+local Trace = PsychopatzCore.DebugTrace
 
 if not Layout.defaults.llmInput then
     local choices = Layout.GetNormalized("choices")
@@ -25,7 +30,10 @@ if not Layout.defaults.llmInput then
     }
 end
 
-local MAX_INPUT_LENGTH = 1024
+-- Keep this aligned with the context adapter and the bridge string limit. The
+-- old 1024-byte cap silently discarded most long player messages before the
+-- provider ever saw them.
+local MAX_INPUT_LENGTH = 4000
 local MAX_LOG_TEXT = 900
 local Pending = nil
 local ActiveSpeech = {}
@@ -53,6 +61,10 @@ local function log(event, details)
     end
 end
 
+local function traceEnabled()
+    return Trace and Trace.IsEnabled and Trace.IsEnabled() == true
+end
+
 local function bridgeEnabled()
     local bootstrap = PsychopatzCore and PsychopatzCore.BridgeBootstrap
     return bootstrap and bootstrap.IsEnabled
@@ -78,7 +90,7 @@ local function buildPacket(view, requestID, message)
     context.session_id = context.session_id
         or "pnc_session_" .. tostring(now()) .. "_" .. tostring(serial)
     view.session.llmSessionID = context.session_id
-    return {
+    local packet = {
         status = "pending",
         request_id = requestID,
         npc_id = context.npc_uuid,
@@ -90,6 +102,15 @@ local function buildPacket(view, requestID, message)
         model = "default",
         conversation_context = context,
     }
+    if traceEnabled() then
+        Trace.Record({
+            source = "ProjectHoomans",
+            event = "llm.request_queued",
+            requestID = requestID,
+            data = packet,
+        })
+    end
+    return packet
 end
 
 function Integration.Submit(view, value)
@@ -116,7 +137,15 @@ function Integration.Submit(view, value)
     local packet = buildPacket(view, requestID, value)
     if not packet then return false, "context_unavailable" end
     local pendingChoices = session.currentNode and session.currentNode.choices or {}
-    session:append("player", value)
+    local inputMessage = session:append("player", value, {
+        source = {
+            kind = "llm",
+            channel = "input",
+            requestID = requestID,
+            sessionID = packet.session_id,
+        },
+    })
+    if inputMessage then packet.message_id = inputMessage.messageID end
     session.pendingChoices = pendingChoices
     session.pendingNext = nil
     session.pendingClose = nil
@@ -158,6 +187,17 @@ function Integration.Poll()
         "npc=" .. tostring(Pending.npcID)
             .. " request=" .. tostring(Pending.requestID)
     )
+    if traceEnabled() then
+        Trace.Record({
+            source = "ProjectHoomans",
+            event = "llm.request_polled",
+            requestID = Pending.requestID,
+            data = {
+                npcID = Pending.npcID,
+                sessionID = Pending.packet and Pending.packet.session_id,
+            },
+        })
+    end
     return Pending.packet
 end
 
@@ -170,6 +210,11 @@ local function exposedTool(packet, name)
             return true
         end
     end
+    local toolIDs = context.available_tool_ids or {}
+    local expectedID = "projecthoomans.llm:" .. tostring(name or "")
+    for _, toolID in ipairs(toolIDs) do
+        if tostring(toolID) == expectedID then return true end
+    end
     return false
 end
 
@@ -177,23 +222,48 @@ local function applySemanticTools(packet, arguments, npcID, session)
     local calls = arguments and arguments.semantic_tool_calls
     local results = {}
     if type(calls) ~= "table" then return results end
-    for _, call in ipairs(calls) do
+    for index, call in ipairs(calls) do
         local name = trim(call and call.name)
+        local callID = trim(call and call.id)
+        if callID == "" then callID = "tool_" .. tostring(index) end
         local callArguments = call and type(call.arguments) == "table"
             and call.arguments or {}
-        local result = { name = name, accepted = false }
+        local result = { id = callID, name = name, accepted = false }
         if name == "social_react" and exposedTool(packet, name) then
-            -- There is no generic client-side relationship mutation API. Keep
-            -- this as an observable intent until a specific SocialEvent command
-            -- is registered by the authoritative gameplay layer.
-            result.reason = "social_event_boundary_unavailable"
+            local execute = PNC.Client and PNC.Client.ExecuteLLMSocialReaction
+            local kind = trim(callArguments.kind)
+            if kind == "" then
+                kind = trim(callArguments.reaction)
+            end
+            local intensity = trim(callArguments.intensity)
+            if execute then
+                result.accepted, result.reason = execute(
+                    npcID,
+                    kind,
+                    intensity,
+                    {
+                        origin = "llm_tool",
+                        requestID = packet and packet.request_id,
+                        callID = callID,
+                        token = packet and packet.conversation_context
+                            and packet.conversation_context.conversation_token,
+                    }
+                )
+                result.reaction = kind
+                result.intensity = intensity
+            else
+                result.reason = "social_reaction_client_unavailable"
+            end
         elseif string.find(name, "^order_") == 1 and exposedTool(packet, name) then
             local commandID = trim(callArguments.command_id)
             local definition = PNC.CompanionCommands
                 and PNC.CompanionCommands.Get(commandID) or nil
             local execute = PNC.Client and PNC.Client.ExecuteCompanionCommand
             if definition and execute then
-                result.accepted = execute(commandID, npcID, "conversation", nil) == true
+                result.accepted = execute(commandID, npcID, "conversation", {
+                    origin = "llm_tool",
+                    requestID = packet and packet.request_id,
+                }) == true
                 result.reason = result.accepted and "submitted" or "rejected_by_game"
             else
                 result.reason = "unknown_command"
@@ -204,18 +274,109 @@ local function applySemanticTools(packet, arguments, npcID, session)
         results[#results + 1] = result
     end
     session.llmSemanticResults = results
+    if traceEnabled() then
+        Trace.Record({
+            source = "ProjectHoomans",
+            event = "llm.tool_results",
+            requestID = packet and packet.request_id,
+            data = {
+                npcID = npcID,
+                calls = calls,
+                results = results,
+            },
+        })
+    end
     return results
 end
 
-local function completeTextResponse(view, response)
+local function completeTextResponse(view, response, source)
     local session = view and view.session
     if not session then return false end
     session.queue = {}
     session.llmPending = nil
     session.busy = true
-    session:queueMessage("npc", { fallback = response })
+    source = source or {}
+    source.messageID = source.messageID
+        or (source.requestID and "llm-response:" .. tostring(source.requestID))
+    session:queueMessage("npc", { fallback = response }, {
+        source = source,
+        messageID = source.messageID,
+    })
     Pending = nil
     return true
+end
+
+local function publishDetachedResponse(pending, response, source)
+    local view = pending and pending.view
+    local session = view and view.session
+    local packet = pending and pending.packet or {}
+    local context = packet.conversation_context or {}
+    if not view then return nil end
+    source = source or {}
+    source.messageID = source.messageID
+        or (source.requestID and "llm-response:" .. tostring(source.requestID))
+    local payload = { fallback = response }
+    local message = Message.New({
+        messageID = source.messageID,
+        saveUUID = context.world_uuid or Message.GetSaveID(),
+        conversationID = context.conversation_id
+            or context.session_id
+            or "llm:" .. tostring(pending.requestID),
+        sequence = 0,
+        speaker = "npc",
+        speakerID = pending.npcID,
+        speakerName = context.npc_name,
+        speakerKind = "npc",
+        playerUUID = context.player_uuid,
+        npcUUID = context.npc_uuid or pending.npcID,
+        namespace = session and session.namespace or "default",
+        payload = payload,
+        text = response,
+        gameDay = Message.GetGameDay(),
+        worldAgeHours = Message.GetWorldAgeHours(),
+        participants = context.participants,
+        source = source,
+        presentationState = { conversationUI = false, nameplate = true },
+    })
+    local History = PsychopatzCore.Conversation.History
+        or require "PsychopatzCore/UI/Conversation/PsychopatzConversationHistory"
+    if History and History.Append then
+        History.Append(
+            session and session.namespace or "default",
+            pending.npcID,
+            "npc",
+            payload,
+            session and session.characterUUID or context.player_uuid,
+            message
+        )
+    end
+    Message.Publish(message)
+    return message
+end
+
+local function responseOrFailure(arguments, actionAccepted, actionAttempted)
+    local response = trim(arguments and arguments.response_text)
+    if response ~= "" then return string.sub(response, 1, 3900) end
+
+    local failure = trim(arguments and arguments.error)
+    if failure == "" and actionAccepted then
+        return "I will take care of that."
+    end
+    if failure == "" and actionAttempted then
+        return "I understand."
+    end
+    if failure == "" then
+        local finishReason = trim(arguments and arguments.finish_reason)
+        local toolCount = tonumber(arguments and arguments.tool_call_count) or 0
+        failure = finishReason ~= ""
+            and "provider returned an empty response (finish_reason="
+                .. finishReason .. ", tool_calls=" .. tostring(toolCount) .. ")"
+            or "provider returned an empty response"
+    end
+    if failure ~= "" then
+        return "I cannot answer right now. (" .. string.sub(failure, 1, 420) .. ")"
+    end
+    return "I cannot answer right now."
 end
 
 function Integration.Deliver(arguments)
@@ -229,24 +390,61 @@ function Integration.Deliver(arguments)
     if not view or view ~= active or not view.session
         or tostring(view.spec and view.spec.npcID or "") ~= Pending.npcID
     then
+        local calls = arguments and arguments.semantic_tool_calls
+        local actionAttempted = type(calls) == "table" and #calls > 0
+        local response = responseOrFailure(arguments, false, actionAttempted)
+        if traceEnabled() then
+            Trace.Record({
+                source = "ProjectHoomans",
+                event = "llm.response_detached",
+                requestID = requestID,
+                data = {
+                    npcID = Pending.npcID,
+                    arguments = arguments,
+                    fallbackResponse = response,
+                    presentation = "nameplate",
+                },
+            })
+        end
+        local message = publishDetachedResponse(Pending, response, {
+            kind = "llm",
+            channel = "response_detached",
+            requestID = requestID,
+            sessionID = Pending.packet and Pending.packet.session_id,
+        })
         Pending = nil
-        return { accepted = false, reason = "conversation_closed" }
+        return {
+            accepted = message ~= nil,
+            reason = message and "conversation_closed" or "conversation_unavailable",
+            presentation = message and "nameplate" or nil,
+            message_id = message and message.messageID or nil,
+        }
     end
 
     local semanticResults = applySemanticTools(Pending.packet, arguments, Pending.npcID, view.session)
     local response = trim(arguments.response_text)
     if response == "" then
-        local failure = trim(arguments.error)
         local actionAccepted = false
         for _, result in ipairs(semanticResults) do
             if result.accepted == true then actionAccepted = true break end
         end
-        response = failure ~= ""
-            and "I cannot answer right now. (" .. string.sub(failure, 1, 420) .. ")"
-            or actionAccepted and "I will take care of that."
-            or "I cannot answer right now."
+        response = responseOrFailure(arguments, actionAccepted, #semanticResults > 0)
     end
     response = string.sub(response, 1, 3900)
+    if traceEnabled() then
+        Trace.Record({
+            source = "ProjectHoomans",
+            event = "llm.response_received",
+            requestID = requestID,
+            data = {
+                npcID = Pending.npcID,
+                arguments = arguments,
+                semanticResults = semanticResults,
+                presentation = "conversation_or_tts",
+                finalResponse = response,
+            },
+        })
+    end
     log(
         "response_deliver",
         "npc=" .. tostring(Pending.npcID)
@@ -268,6 +466,18 @@ function Integration.Deliver(arguments)
         session.llmPending = true
         session.busy = true
         view.historyPart:setTyping("npc")
+        if traceEnabled() then
+            Trace.Record({
+                source = "ProjectHoomans",
+                event = "llm.presentation_queued",
+                requestID = requestID,
+                data = {
+                    npcID = Pending.npcID,
+                    mode = "tts",
+                    utteranceID = Pending.utteranceID,
+                },
+            })
+        end
         return {
             accepted = true,
             presentation = "tts_pending",
@@ -275,7 +485,26 @@ function Integration.Deliver(arguments)
         }
     end
     session.pendingChoices = Pending.packet and session.pendingChoices or {}
-    completeTextResponse(view, response)
+    local deliveredNpcID = Pending.npcID
+    completeTextResponse(view, response, {
+        kind = "llm",
+        channel = "response",
+        requestID = requestID,
+        sessionID = Pending.packet and Pending.packet.session_id,
+        messageID = "llm-response:" .. requestID,
+    })
+    if traceEnabled() then
+        Trace.Record({
+            source = "ProjectHoomans",
+            event = "llm.presentation_completed",
+            requestID = requestID,
+            data = {
+                npcID = deliveredNpcID,
+                mode = "conversation",
+                messageID = "llm-response:" .. requestID,
+            },
+        })
+    end
     return { accepted = true }
 end
 
@@ -294,8 +523,31 @@ function Integration.SpeechStarted(arguments)
     local view = Pending.view
     local session = view and view.session
     if not view or view ~= currentView() or not session then
+        if traceEnabled() then
+            Trace.Record({
+                source = "ProjectHoomans",
+                event = "llm.tts_detached",
+                requestID = Pending.requestID,
+                data = {
+                    npcID = Pending.npcID,
+                    utteranceID = Pending.utteranceID,
+                    presentation = "nameplate",
+                },
+            })
+        end
+        local message = publishDetachedResponse(Pending, Pending.responseText, {
+            kind = "llm",
+            channel = "tts_detached",
+            requestID = Pending.requestID,
+            sessionID = Pending.packet and Pending.packet.session_id,
+            utteranceID = Pending.utteranceID,
+        })
         Pending = nil
-        return { accepted = false, reason = "conversation_closed" }
+        return {
+            accepted = message ~= nil,
+            reason = message and "conversation_closed" or "conversation_unavailable",
+            presentation = message and "nameplate" or nil,
+        }
     end
     local speech = {
         view = view,
@@ -317,6 +569,15 @@ function Integration.SpeechStarted(arguments)
         fallback = Pending.responseText,
         utterance_id = Pending.utteranceID,
         speech_started = true,
+    }, {
+        source = {
+            kind = "llm",
+            channel = "tts",
+            requestID = Pending.requestID,
+            sessionID = Pending.packet and Pending.packet.session_id,
+            utteranceID = Pending.utteranceID,
+            messageID = "llm-response:" .. Pending.requestID,
+        },
     })
     view.historyPart:setTyping(nil)
     ActiveSpeech[Pending.utteranceID] = speech
@@ -326,6 +587,17 @@ function Integration.SpeechStarted(arguments)
         "npc=" .. tostring(speech.npcID)
             .. " utterance=" .. tostring(speech.utteranceID)
     )
+    if traceEnabled() then
+        Trace.Record({
+            source = "ProjectHoomans",
+            event = "llm.speech_started",
+            requestID = speech.requestID,
+            data = {
+                npcID = speech.npcID,
+                utteranceID = speech.utteranceID,
+            },
+        })
+    end
     return { accepted = true, presentation = "displayed" }
 end
 
@@ -362,7 +634,14 @@ function Integration.SpeechFallback(arguments)
         if view and view == currentView() and view.session then
             view.session.pendingChoices = Pending.packet
                 and view.session.pendingChoices or {}
-            completeTextResponse(view, response)
+            completeTextResponse(view, response, {
+                kind = "llm",
+                channel = "tts_fallback",
+                requestID = Pending.requestID,
+                sessionID = Pending.packet and Pending.packet.session_id,
+                utteranceID = Pending.utteranceID,
+                messageID = "llm-response:" .. Pending.requestID,
+            })
             log(
                 "speech_fallback",
                 "npc=" .. tostring(arguments.npc_uuid or npcID)
@@ -370,7 +649,17 @@ function Integration.SpeechFallback(arguments)
             )
             return { accepted = true, presentation = "text_only" }
         end
+        local message = publishDetachedResponse(Pending, response, {
+            kind = "llm",
+            channel = "tts_fallback_detached",
+            requestID = Pending.requestID,
+            sessionID = Pending.packet and Pending.packet.session_id,
+            utteranceID = Pending.utteranceID,
+        })
         Pending = nil
+        if message then
+            return { accepted = true, presentation = "nameplate" }
+        end
     end
     return { accepted = false, reason = "speech_request_not_pending" }
 end

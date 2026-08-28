@@ -2,6 +2,7 @@ PNC = PNC or {}
 PNC.NameplateEntries = PNC.NameplateEntries or {}
 
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+require "PNC/UI/Nameplates/PNC_NameplateSpeech"
 
 local Entries = PNC.NameplateEntries
 local Bodies = PNC.NameplateBodies
@@ -10,6 +11,7 @@ local Presentation = PNC.NameplatePresentation
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
 local Identity = PNC.NPCIdentityPresentation
+local Speech = PNC.NameplateSpeech
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local UPDATE_RATE = 6
@@ -237,6 +239,8 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
     local infectionDebugText = showDebug
         and Debug.InfectionText(snapshot, settings) or ""
     local actionText, actionColor = Presentation.ActionStatus(snapshot)
+    local speech = Speech and Speech.Get(snapshot and snapshot.id) or nil
+    local speechText = Speech and Speech.GetDisplayText(speech) or ""
     local factionLine1
     local factionLine2
     local factionLine3
@@ -259,6 +263,8 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
         communityDebugLines(snapshot, settings)
     entry.actionColor = actionColor
     entry.actionVisible = actionText ~= ""
+    entry.speech = speech
+    entry.speechVisible = speechText ~= ""
     Presentation.CacheTextMetric(entry, "name", name, fonts.name)
     Presentation.CacheTextMetric(entry, "debugText", debugText, fonts.debug)
     Presentation.CacheTextMetric(
@@ -289,6 +295,12 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
         entry,
         "actionText",
         actionText,
+        fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "speechText",
+        speechText,
         fonts.debug
     )
     Presentation.CacheTextMetric(

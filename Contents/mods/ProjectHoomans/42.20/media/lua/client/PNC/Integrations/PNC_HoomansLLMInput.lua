@@ -12,7 +12,7 @@ local Conversation = PNC.Conversation
 local Text = PsychopatzCore.Conversation.Text
 local UI = PsychopatzCore.UI
 
-local MAX_INPUT_LENGTH = 1024
+local MAX_INPUT_LENGTH = 4000
 
 local function label(key, fallback)
     return Text.Resolve({

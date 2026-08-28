@@ -146,6 +146,7 @@ local expectedConversationShared = {
     "PNC/Conversation/Blocks/PNC_ConversationRules",
     "PNC/Conversation/Blocks/PNC_ConversationSelector",
     "PNC/Conversation/PNC_ConversationScene",
+    "PNC/Conversation/PNC_ConversationLLMTools",
     "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions",
 }
 for index = 1, #expectedConversationShared do

@@ -17,6 +17,38 @@ Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RELATIONSHIP,
         end
     end)
 
+Internal.RegisterServerCommand(Const.CMD_LLM_SOCIAL_REACTION_RESULT,
+    function(args)
+        args = type(args) == "table" and args or {}
+        ClientState.llmToolResults = ClientState.llmToolResults or {}
+        ClientState.llmToolResultOrder = ClientState.llmToolResultOrder or {}
+        local key = tostring(args.requestID or "") .. ":"
+            .. tostring(args.callID or "")
+        if key == ":" then return end
+        ClientState.llmToolResults[key] = args
+        ClientState.llmToolResultOrder[#ClientState.llmToolResultOrder + 1] = key
+        while #ClientState.llmToolResultOrder > 32 do
+            local oldest = table.remove(ClientState.llmToolResultOrder, 1)
+            ClientState.llmToolResults[oldest] = nil
+        end
+        if args.relationship then
+            local relationship = PNC.Conversation
+                and PNC.Conversation.Relationship
+            if relationship and relationship.ReceivePresentation then
+                relationship.ReceivePresentation(args.relationship)
+            end
+        end
+        local trace = PsychopatzCore and PsychopatzCore.DebugTrace
+        if trace and trace.IsEnabled and trace.IsEnabled() and trace.Record then
+            trace.Record({
+                source = "ProjectHoomans",
+                event = "llm.social_reaction_result",
+                requestID = args.requestID,
+                data = args,
+            })
+        end
+    end)
+
 Internal.RegisterServerCommand(Const.CMD_MAP_COMMAND_RESULT, function(args)
     if PNC.MapCommands and PNC.MapCommands.HandleResult then
         PNC.MapCommands.HandleResult(args)

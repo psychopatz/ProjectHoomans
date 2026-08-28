@@ -1,0 +1,115 @@
+require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
+require "PsychopatzCore/Events/PC_EventBus"
+
+PNC = PNC or {}
+PNC.NameplateSpeech = PNC.NameplateSpeech or {}
+
+local Speech = PNC.NameplateSpeech
+local Message = PsychopatzCore.Conversation.Message
+local Events = PsychopatzCore.Events
+
+Speech.MAX_PREVIEW_LENGTH = 180
+Speech.MIN_DURATION_MS = 4500
+Speech.MAX_DURATION_MS = 12000
+
+local OWNER_TOKEN = Speech
+local records = Speech.records or {}
+Speech.records = records
+local observedDay = Speech.observedDay
+
+local function now()
+    return getTimeInMillis and tonumber(getTimeInMillis()) or 0
+end
+
+local function compactText(value)
+    value = tostring(value or "")
+    value = string.gsub(value, "[\r\n]+", " ")
+    value = string.gsub(value, "%s+", " ")
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    return value
+end
+
+local function preview(value)
+    value = compactText(value)
+    if #value <= Speech.MAX_PREVIEW_LENGTH then return value end
+    return string.sub(value, 1, Speech.MAX_PREVIEW_LENGTH - 1) .. "…"
+end
+
+local function durationFor(value)
+    local duration = 2200 + (#compactText(value) * 28)
+    return math.max(
+        Speech.MIN_DURATION_MS,
+        math.min(Speech.MAX_DURATION_MS, duration)
+    )
+end
+
+local function activeConversationOwns(message)
+    local conversation = PsychopatzCore and PsychopatzCore.Conversation
+    local view = conversation and conversation.instance or nil
+    local session = view and view.session or nil
+    return session and tostring(session.conversationID or "")
+        == tostring(message and message.conversationID or "")
+end
+
+local function clearExpiredDay()
+    local day = Message.GetGameDay()
+    if observedDay == nil then
+        observedDay = day
+        Speech.observedDay = day
+        return
+    end
+    if observedDay == day then return end
+    observedDay = day
+    Speech.observedDay = day
+    for npcID, _ in pairs(records) do records[npcID] = nil end
+end
+
+local function onMessage(message)
+    if type(message) ~= "table"
+        or tostring(message.speakerKind or message.speaker or "") ~= "npc"
+    then
+        return
+    end
+    local npcID = tostring(message.speakerID or "")
+    local text = compactText(message.text)
+    if npcID == "" or text == "" then return end
+    clearExpiredDay()
+    records[npcID] = {
+        message = message,
+        text = preview(text),
+        expiresAt = now() + durationFor(text),
+    }
+end
+
+function Speech.Get(npcID)
+    clearExpiredDay()
+    npcID = tostring(npcID or "")
+    local record = records[npcID]
+    if not record then return nil end
+    if now() >= (tonumber(record.expiresAt) or 0) then
+        records[npcID] = nil
+        return nil
+    end
+    if activeConversationOwns(record.message) then return nil end
+    return record
+end
+
+function Speech.GetDisplayText(record)
+    return record and record.text or ""
+end
+
+function Speech.Clear(npcID)
+    if npcID == nil then
+        for id, _ in pairs(records) do records[id] = nil end
+        return true
+    end
+    npcID = tostring(npcID)
+    records[npcID] = nil
+    return true
+end
+
+Events.clearOwner(OWNER_TOKEN)
+Events.subscribe(Message.EVENT_TYPE, onMessage, OWNER_TOKEN)
+
+return Speech
