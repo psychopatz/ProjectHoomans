@@ -48,6 +48,7 @@ local body = {
 }
 local emitter = { isPlaying = function() return true end }
 local playedSound
+local npcVoiceEvent
 local rangeAllowed = true
 local player = {
     getInventory = function() return inventory end,
@@ -76,6 +77,14 @@ getText = function() return "Bandage" end
 
 PNC = {
     Const = { BANDAGE_RANGE = 3 },
+    NPCVoice = {
+        Triggers = {
+            Emit = function(patient, eventID)
+                npcVoiceEvent = { patient, eventID }
+                return true
+            end,
+        },
+    },
     Registry = {
         Get = function()
             return {
@@ -118,6 +127,8 @@ T.equal(queued.startedAnimation, "Loot", "other-character treatment animation")
 T.equal(player.animationVariable, "LootPosition=Mid", "mid treatment pose")
 T.equal(player.reportedEvent, "EventLootItem", "treatment interaction event")
 T.equal(playedSound, "FirstAidApplyBandage", "vanilla bandage SFX")
+T.equal(npcVoiceEvent[1], body, "patient body was not passed to voice trigger")
+T.equal(npcVoiceEvent[2], "action.bandage", "bandage voice event was not emitted")
 T.equal(queued.useProgressBar, true, "vanilla loading bar enabled")
 T.equal(item.jobType, "Bandage", "item progress label")
 

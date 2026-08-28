@@ -14,6 +14,7 @@ local Animation = PNC.Animation
 local Visuals = PNC.Visuals
 local Equipment = PNC.Equipment
 local AnimationTrace = PNC.AnimationTrace
+local NPCVoice = PNC.NPCVoice
 local buildVisualKey = Internal.BuildVisualKey
 local buildHandsKey = Internal.BuildHandsKey
 local syncTreatmentSound = Internal.SyncTreatmentSound
@@ -127,8 +128,10 @@ local function applyBodyPresentation(
     if AnimationTrace and AnimationTrace.Sample then
         AnimationTrace.Sample(zombie, "client_post_equipment", now)
     end
+    if NPCVoice and NPCVoice.Bind then
+        NPCVoice.Bind(snapshot, zombie)
+    end
 end
 
 Internal.ApplyIdentityVars = applyIdentityVars
 Internal.ApplyBodyPresentation = applyBodyPresentation
-

@@ -26,6 +26,8 @@ local pruneSnapshotDuplicates = Internal.PruneSnapshotDuplicates
 local refreshBodyMap = Internal.RefreshBodyMap
 local bindNativePathSnapshot =
     Internal.BindNativePathSnapshot
+local voiceTriggers = PNC.NPCVoice
+    and PNC.NPCVoice.Triggers or nil
 
 local function localSnapshotInterval(record, previous, now)
     local runtime = record and record.runtime or nil
@@ -259,6 +261,14 @@ function Sync.OnTick()
                         end
                     end
                     applySnapshotToBody(snapshot, body, remoteReplica)
+                    if voiceTriggers and voiceTriggers.Observe then
+                        voiceTriggers.Observe(
+                            snapshot,
+                            body,
+                            remoteReplica,
+                            now
+                        )
+                    end
                 end
             elseif isSnapshotDebugEnabled(snapshot)
                 and (now - (tonumber(Sync.UnresolvedLogAtByID[tostring(id)]) or 0)) >= 3000

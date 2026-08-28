@@ -134,6 +134,13 @@ Internal.RegisterServerCommand(Const.CMD_SYNC_RECORD, function(args)
     if not snapshot or not snapshot.id then
         return
     end
+    if args.event == "death"
+        and PNC.NPCVoice
+        and PNC.NPCVoice.Triggers
+        and PNC.NPCVoice.Triggers.ObserveDeath
+    then
+        PNC.NPCVoice.Triggers.ObserveDeath(snapshot)
+    end
     if args.event == "interest_exit" or args.event == "interest_enter" then
         storeSnapshot(snapshot, true)
     else

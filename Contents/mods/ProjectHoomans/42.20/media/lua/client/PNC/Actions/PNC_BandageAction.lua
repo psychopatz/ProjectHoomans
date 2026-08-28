@@ -112,6 +112,10 @@ function PNCBandageAction:update()
 end
 
 function PNCBandageAction:start()
+    local patient
+    local snapshot
+    local now
+
     -- Treating another character uses the mid-height interaction pose. The
     -- self-bandage action anim raises the player's arm because it expects the
     -- patient's BodyDamage to belong to the acting character.
@@ -128,6 +132,32 @@ function PNCBandageAction:start()
     end
     if self.character.playSound then
         self.sound = self.character:playSound("FirstAidApplyBandage")
+    end
+
+    patient = targetBody(self.npcId)
+    snapshot = PNC and PNC.Network and PNC.Network.ClientState
+        and PNC.Network.ClientState.snapshots
+        and PNC.Network.ClientState.snapshots[self.npcId] or nil
+    if patient
+        and PNC
+        and PNC.NPCVoice
+        and PNC.NPCVoice.Triggers
+        and PNC.NPCVoice.Triggers.Emit
+    then
+        now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+        PNC.NPCVoice.Triggers.Emit(
+            patient,
+            "action.bandage",
+            snapshot,
+            {
+                now = now,
+                occurrenceKey = table.concat({
+                    tostring(self.npcId or ""),
+                    tostring(self.partId or ""),
+                    tostring(now),
+                }, ":"),
+            }
+        )
     end
 end
 
