@@ -165,6 +165,10 @@ function Context.Build(view, message)
         "inCombat", "attackMode", "healthState", "staminaState",
         "presenceState", "weaponMode", "weaponStatus", "tacticalClass",
     })
+    local voiceProfile = PNC.NPCVoice
+        and PNC.NPCVoice.GetProfile
+        and PNC.NPCVoice.GetProfile(source, entry.zombie)
+        or nil
     local characterCard = {
         archetype = text(source.archetypeLabel or identity.archetypeLabel, nil),
         archetype_id = text(source.archetypeID or identity.archetypeID, nil),
@@ -176,6 +180,13 @@ function Context.Build(view, message)
         world_uuid = worldUUID(),
         player_uuid = playerUUID(view),
         npc_uuid = npcID,
+        conversation_id = view.session and view.session.llmSessionID or nil,
+        voice_binding = voiceProfile and {
+            npc_uuid = npcID,
+            slot = tostring(voiceProfile.prefix or "")
+                .. ":" .. tostring(voiceProfile.voiceType or 0),
+            pitch = tonumber(voiceProfile.pitch) or 0,
+        } or nil,
         npc_name = npcName,
         player_name = playerName,
         message = string.sub(text(message, ""), 1, 4000),

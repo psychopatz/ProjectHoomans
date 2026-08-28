@@ -28,6 +28,7 @@ end
 local MAX_INPUT_LENGTH = 1024
 local MAX_LOG_TEXT = 900
 local Pending = nil
+local ActiveSpeech = {}
 local serial = 0
 
 local function trim(value)
@@ -206,6 +207,17 @@ local function applySemanticTools(packet, arguments, npcID, session)
     return results
 end
 
+local function completeTextResponse(view, response)
+    local session = view and view.session
+    if not session then return false end
+    session.queue = {}
+    session.llmPending = nil
+    session.busy = true
+    session:queueMessage("npc", { fallback = response })
+    Pending = nil
+    return true
+end
+
 function Integration.Deliver(arguments)
     arguments = type(arguments) == "table" and arguments or {}
     local requestID = tostring(arguments.request_id or "")
@@ -243,13 +255,124 @@ function Integration.Deliver(arguments)
             .. " response=" .. logText(response)
     )
     local session = view.session
-    session.queue = {}
+    if tostring(arguments.presentation_mode or "") == "tts"
+        and trim(arguments.utterance_id) ~= ""
+    then
+        -- Keep the active request reserved until HoomansLLM reports that the
+        -- local OS audio process actually started.  No audio bytes or model
+        -- paths enter this payload.
+        Pending.ttsPending = true
+        Pending.utteranceID = trim(arguments.utterance_id)
+        Pending.conversationID = trim(arguments.conversation_id)
+        Pending.responseText = response
+        session.llmPending = true
+        session.busy = true
+        view.historyPart:setTyping("npc")
+        return {
+            accepted = true,
+            presentation = "tts_pending",
+            utterance_id = Pending.utteranceID,
+        }
+    end
+    session.pendingChoices = Pending.packet and session.pendingChoices or {}
+    completeTextResponse(view, response)
+    return { accepted = true }
+end
+
+local function pendingMatches(arguments)
+    return Pending
+        and Pending.ttsPending
+        and Pending.requestID == trim(arguments and arguments.request_id)
+        and Pending.utteranceID == trim(arguments and arguments.utterance_id)
+end
+
+function Integration.SpeechStarted(arguments)
+    arguments = type(arguments) == "table" and arguments or {}
+    if not pendingMatches(arguments) then
+        return { accepted = false, reason = "speech_request_not_pending" }
+    end
+    local view = Pending.view
+    local session = view and view.session
+    if not view or view ~= currentView() or not session then
+        Pending = nil
+        return { accepted = false, reason = "conversation_closed" }
+    end
+    local speech = {
+        view = view,
+        requestID = Pending.requestID,
+        conversationID = Pending.conversationID,
+        npcID = Pending.npcID,
+        utteranceID = Pending.utteranceID,
+    }
+    session.queue = {
+        {
+            speaker = "__tts_hold",
+            payload = { fallback = "", delayMs = math.huge },
+            readyAt = math.huge,
+        },
+    }
     session.llmPending = nil
     session.busy = true
-    session.pendingChoices = Pending.packet and session.pendingChoices or {}
-    session:queueMessage("npc", { fallback = response })
+    session:append("npc", {
+        fallback = Pending.responseText,
+        utterance_id = Pending.utteranceID,
+        speech_started = true,
+    })
+    view.historyPart:setTyping(nil)
+    ActiveSpeech[Pending.utteranceID] = speech
     Pending = nil
+    log(
+        "speech_started",
+        "npc=" .. tostring(speech.npcID)
+            .. " utterance=" .. tostring(speech.utteranceID)
+    )
+    return { accepted = true, presentation = "displayed" }
+end
+
+function Integration.SpeechFinished(arguments)
+    arguments = type(arguments) == "table" and arguments or {}
+    local utteranceID = trim(arguments.utterance_id)
+    local speech = ActiveSpeech[utteranceID]
+    if not speech
+        or speech.requestID ~= trim(arguments.request_id)
+        or speech.view ~= currentView()
+    then
+        return { accepted = false, reason = "speech_not_active" }
+    end
+    ActiveSpeech[utteranceID] = nil
+    local session = speech.view.session
+    if session then
+        session.queue = {}
+        if session.finishPending then session:finishPending() end
+    end
+    log(
+        "speech_finished",
+        "npc=" .. tostring(speech.npcID)
+            .. " utterance=" .. tostring(utteranceID)
+    )
     return { accepted = true }
+end
+
+function Integration.SpeechFallback(arguments)
+    arguments = type(arguments) == "table" and arguments or {}
+    if pendingMatches(arguments) then
+        local view = Pending.view
+        local response = Pending.responseText
+        local npcID = Pending.npcID
+        if view and view == currentView() and view.session then
+            view.session.pendingChoices = Pending.packet
+                and view.session.pendingChoices or {}
+            completeTextResponse(view, response)
+            log(
+                "speech_fallback",
+                "npc=" .. tostring(arguments.npc_uuid or npcID)
+                    .. " reason=" .. logText(arguments.error)
+            )
+            return { accepted = true, presentation = "text_only" }
+        end
+        Pending = nil
+    end
+    return { accepted = false, reason = "speech_request_not_pending" }
 end
 
 function Integration.GetPending()

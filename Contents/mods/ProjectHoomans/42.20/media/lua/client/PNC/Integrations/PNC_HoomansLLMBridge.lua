@@ -1,4 +1,5 @@
--- PsychopatzCore bridge registration for the Project Hoomans LLM channel.
+-- PsychopatzCore bridge registration for the Project Hoomans LLM and local
+-- TTS speech-lifecycle channel.
 require "PNC/Integrations/PNC_HoomansLLM"
 
 PNC = PNC or {}
@@ -106,15 +107,58 @@ local function registerBridge()
     local pollAvailable = pollOK == true or pollReason == "duplicate_command"
     local deliverAvailable = deliverOK == true
         or deliverReason == "duplicate_command"
+    local startedOK, startedReason = bridge.RegisterCommand(
+        "projecthoomans.llm",
+        "speechStarted",
+        {
+            readOnly = false,
+            category = "LLM",
+            handler = function(_, arguments)
+                return Integration.SpeechStarted(arguments)
+            end,
+        }
+    )
+    local finishedOK, finishedReason = bridge.RegisterCommand(
+        "projecthoomans.llm",
+        "speechFinished",
+        {
+            readOnly = false,
+            category = "LLM",
+            handler = function(_, arguments)
+                return Integration.SpeechFinished(arguments)
+            end,
+        }
+    )
+    local fallbackOK, fallbackReason = bridge.RegisterCommand(
+        "projecthoomans.llm",
+        "speechFallback",
+        {
+            readOnly = false,
+            category = "LLM",
+            handler = function(_, arguments)
+                return Integration.SpeechFallback(arguments)
+            end,
+        }
+    )
+    local speechEventsAvailable = (startedOK == true or startedReason == "duplicate_command")
+        and (finishedOK == true or finishedReason == "duplicate_command")
+        and (fallbackOK == true or fallbackReason == "duplicate_command")
     bridgeRegistered = pollAvailable and deliverAvailable
     if bridgeRegistered then
-        log("bridge_registered", "namespace=projecthoomans.llm commands=pollChat,deliverChat")
+        log(
+            "bridge_registered",
+            "namespace=projecthoomans.llm commands=pollChat,deliverChat speech_events="
+                .. tostring(speechEventsAvailable)
+        )
         lastRegistrationState = "registered"
     elseif lastRegistrationState ~= "registration_failed" then
         log(
             "bridge_registration_failed",
-            "poll=" .. tostring(pollReason or pollOK)
+                "poll=" .. tostring(pollReason or pollOK)
                 .. " deliver=" .. tostring(deliverReason or deliverOK)
+                .. " speechStarted=" .. tostring(startedReason or startedOK)
+                .. " speechFinished=" .. tostring(finishedReason or finishedOK)
+                .. " speechFallback=" .. tostring(fallbackReason or fallbackOK)
         )
         lastRegistrationState = "registration_failed"
     end
