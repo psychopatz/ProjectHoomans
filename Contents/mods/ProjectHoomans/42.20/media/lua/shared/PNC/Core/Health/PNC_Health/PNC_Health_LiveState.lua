@@ -66,7 +66,11 @@ function Health.Ensure(record)
         record.health.body = {
             wounds = {}, parts = {}, bleedingRate = 0, openWoundCount = 0,
             bandagedWoundCount = 0, lastBleedAt = 0,
+            wholeBodyAilments = {},
         }
+    end
+    if type(record.health.body.wholeBodyAilments) ~= "table" then
+        record.health.body.wholeBodyAilments = {}
     end
     return record.health
 end

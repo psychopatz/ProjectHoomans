@@ -17,6 +17,32 @@ function Wounds.Ensure(record)
         and health.body.wounds or {}
     health.body.parts = type(health.body.parts) == "table"
         and health.body.parts or {}
+    local sourceAilments = type(health.body.wholeBodyAilments) == "table"
+        and health.body.wholeBodyAilments or {}
+    local normalizedAilments = {}
+    local ailmentID
+    local ailment
+    for sourceID, sourceAilment in pairs(sourceAilments) do
+        ailmentID = tostring(sourceID)
+        ailment = sourceAilment
+        local severity = type(ailment) == "table"
+            and tonumber(ailment.severity) or tonumber(ailment)
+        if severity and severity > 1 then severity = severity / 1000 end
+        if severity and severity > 0 then
+            normalizedAilments[ailmentID] = {
+                severity = Core.Clamp(severity, 0, 1),
+            }
+        elseif type(ailment) == "table"
+            and ailment.active == true
+            and ailment.flavorOnly == true
+        then
+            normalizedAilments[ailmentID] = {
+                active = true,
+                flavorOnly = true,
+            }
+        end
+    end
+    health.body.wholeBodyAilments = normalizedAilments
     local i
     local partId
     local partHealth
@@ -54,21 +80,25 @@ function Wounds.SyncOverallHealth(record)
     local health = record and record.health or nil
     local body = health and Wounds.Ensure(record) or nil
     if not body then return nil end
-    local totalPercent = 0
+    local totalPartHealth = 0
+    local totalPartMax = 0
     local i
     local partHealth
     for i = 1, #Wounds.PartOrder do
         partHealth = body.parts[Wounds.PartOrder[i]]
-        totalPercent = totalPercent + Core.Clamp(
-            (tonumber(partHealth.current) or 0)
-                / math.max(1, tonumber(partHealth.max) or 100),
+        totalPartHealth = totalPartHealth + Core.Clamp(
+            tonumber(partHealth.current) or 0,
             0,
-            1
+            math.max(1, tonumber(partHealth.max) or 100)
+        )
+        totalPartMax = totalPartMax + math.max(
+            1, tonumber(partHealth.max) or 100
         )
     end
-    body.totalPartHealth = totalPercent * 100
-    body.totalPartMax = #Wounds.PartOrder * 100
-    body.overallPercent = totalPercent / #Wounds.PartOrder * 100
+    body.totalPartHealth = totalPartHealth
+    body.totalPartMax = totalPartMax
+    body.overallPercent = totalPartMax > 0
+        and totalPartHealth / totalPartMax * 100 or 0
     health.current = Core.Clamp(
         (tonumber(health.max) or 100) * body.overallPercent / 100,
         0,
@@ -157,6 +187,17 @@ function Wounds.Recalculate(record)
     body.bleedingRate = bleedingRate
     body.openWoundCount = openCount
     body.bandagedWoundCount = bandagedCount
+    local wholeBody = Wounds.WholeBody
+    if wholeBody and wholeBody.SetFlag then
+        wholeBody.SetFlag(record, "blood_loss", bleedingRate > 0)
+    elseif bleedingRate > 0 then
+        body.wholeBodyAilments.blood_loss = {
+            active = true,
+            flavorOnly = true,
+        }
+    elseif bleedingRate <= 0 then
+        body.wholeBodyAilments.blood_loss = nil
+    end
     Wounds.SyncOverallHealth(record)
     return body
 end
@@ -169,6 +210,7 @@ function Wounds.Clear(record)
     body.openWoundCount = 0
     body.bandagedWoundCount = 0
     body.lastBleedAt = 0
+    body.wholeBodyAilments = {}
 end
 
 return Wounds

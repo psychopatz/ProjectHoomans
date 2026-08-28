@@ -145,12 +145,33 @@ PNC.Health = {
     end,
 }
 PNC.IndividualNeeds.Ensure(starving, {
-    hunger = 0.90, thirst = 0.90, fatigue = 1,
+    hunger = 1, thirst = 1, fatigue = 1,
 })
+PNC.IndividualNeeds.Update(starving, 5, "test_starvation_build")
+T.equal(starving.health.current, 100,
+    "whole-body ailment buildup does not damage early")
+T.near(starving.health.body.wholeBodyAilments.starvation.severity,
+    0.5, 0.000001, "starvation buildup is persistent")
+T.near(starving.health.body.wholeBodyAilments.dehydration.severity,
+    0.5, 0.000001, "dehydration buildup is persistent")
+PNC.IndividualNeeds.Update(starving, 5, "test_starvation_onset")
+T.equal(starving.health.current, 100,
+    "damage starts after the whole-body ailment reaches 100%")
+T.near(starving.health.body.wholeBodyAilments.starvation.severity,
+    1, 0.000001, "starvation ailment reaches full severity")
+T.near(starving.health.body.wholeBodyAilments.dehydration.severity,
+    1, 0.000001, "dehydration ailment reaches full severity")
 PNC.IndividualNeeds.Update(starving, 1, "test_emergency_damage")
 local expectedDamage = PNC.NeedHealthConsequences.DAMAGE_PER_WORLD_HOUR.hunger
     + PNC.NeedHealthConsequences.DAMAGE_PER_WORLD_HOUR.thirst
 T.near(starving.health.current, 100 - expectedDamage, 0.000001, "vanilla emergency hunger and thirst health damage")
+PNC.IndividualNeeds.Set(starving, "hunger", 0, "test_starvation_cured")
+PNC.IndividualNeeds.Set(starving, "thirst", 0, "test_dehydration_cured")
+PNC.IndividualNeeds.Update(starving, 5, "test_whole_body_recovery")
+T.equal(starving.health.body.wholeBodyAilments.starvation, nil,
+    "resolved hunger removes starvation from the body")
+T.equal(starving.health.body.wholeBodyAilments.dehydration, nil,
+    "resolved thirst removes dehydration from the body")
 local exhausted = { id = "exhausted", recruited = true, alive = true,
     vanillaTraits = {}, vanillaTraitsAuthored = true,
     health = { current = 100, max = 100, state = "normal" } }

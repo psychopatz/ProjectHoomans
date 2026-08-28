@@ -166,6 +166,115 @@ local function overallStatus(current, maximum, incapacitated)
     return Shared.Text("IGUI_health_Crital_damage", "Critical damage")
 end
 
+local function needLevel(needType, value)
+    local definitions = PNC.NeedsDefinitions
+    if definitions and definitions.GetLevel then
+        return definitions.GetLevel(needType, value)
+    end
+    value = tonumber(value) or 0
+    if value >= 0.84 then return "CRITICAL" end
+    if value >= 0.70 then return "SEVERE" end
+    if value >= 0.45 then return "MODERATE" end
+    if value >= 0.25 then return "MINOR" end
+    return "NORMAL"
+end
+
+local function renderWholeBodyAilmentDetails(view, x, y, width, fontHeight,
+    needs, ailments)
+    local rows = {}
+    local definitions = PNC.NeedsDefinitions or {}
+    local order = definitions.WHOLE_BODY_AILMENT_ORDER or {}
+    local byID = definitions.WHOLE_BODY_AILMENTS or {}
+    local rendered = {}
+    local function addRow(ailmentID, ailment, definition)
+        local severity = tonumber(ailment and ailment.severity) or 0
+        local flavorOnly = definition
+            and (definition.displayMode == "flavor"
+                or definition.flavorOnly == true)
+        local needValue = definition and definition.needType
+            and tonumber(needs and needs[definition.needType]) or nil
+        local label = Shared.Text(
+            definition and definition.labelKey or
+                "UI_PNC_Health_Whole_Body_Ailment",
+            definition and (definition.label or definition.id) or ailmentID
+        )
+        local cause = definition and definition.cause
+            and Shared.Text(definition.causeKey, definition.cause) or nil
+        local status
+        local detail
+        local color
+        if flavorOnly then
+            if ailment.active ~= true then return end
+            detail = label
+            if cause then detail = detail .. " - " .. cause end
+            rows[#rows + 1] = {
+                detail = detail,
+                color = { r = 1, g = 0.68, b = 0.24 },
+            }
+            rendered[ailmentID] = true
+            return
+        end
+        if severity <= 0 then return end
+        if severity >= 1 then
+            status = Shared.Text("UI_PNC_Health_Ailment_Damaging",
+                "DAMAGE ACTIVE")
+            color = { r = 1, g = 0.28, b = 0.20 }
+        elseif definition
+            and definition.severityProgression == "building"
+        then
+            status = Shared.Text("UI_PNC_Health_Ailment_Building",
+                "BUILDING")
+            color = { r = 1, g = 0.68, b = 0.24 }
+        elseif needValue ~= nil and needValue >= 1 then
+            status = Shared.Text("UI_PNC_Health_Ailment_Building",
+                "BUILDING")
+            color = { r = 1, g = 0.68, b = 0.24 }
+        else
+            status = Shared.Text("UI_PNC_Health_Ailment_Recovering",
+                "RECOVERING")
+            color = { r = 0.35, g = 0.88, b = 0.45 }
+        end
+        detail = string.format("%s: %.0f%%", label, severity * 100)
+        if cause and needValue ~= nil then
+            detail = detail .. string.format(" | %s: %.0f%% (%s)", cause,
+                needValue * 100, tostring(needLevel(definition.needType,
+                    needValue)))
+        end
+        detail = detail .. " - " .. status
+        rows[#rows + 1] = { detail = detail, color = color }
+        rendered[ailmentID] = true
+    end
+    local ailmentID
+    local ailment
+    local definition
+    for i = 1, #order do
+        ailmentID = order[i]
+        ailment = ailments and ailments[ailmentID]
+        definition = byID[ailmentID]
+        if ailment then addRow(ailmentID, ailment, definition) end
+    end
+    for ailmentID, ailment in pairs(ailments or {}) do
+        if not rendered[ailmentID] then
+            addRow(ailmentID, ailment, byID[ailmentID])
+        end
+    end
+    if #rows == 0 then return y end
+
+    view:drawText(Shared.Text("UI_PNC_Health_Whole_Body", "Whole Body"),
+        x, y, 1, 1, 1, 1, UIFont.Small)
+    y = y + fontHeight
+    for _, row in ipairs(rows) do
+        view:drawText("- " .. row.detail, x + 15, y,
+            row.color.r, row.color.g, row.color.b, 1, UIFont.Small)
+        y = y + fontHeight
+    end
+    view.healthHitRegions[#view.healthHitRegions + 1] = {
+        x = x, y = y - fontHeight * (#rows + 1), width = width,
+        height = fontHeight * (#rows + 1), partId = "WholeBody",
+    }
+    return y
+end
+
 local function sortedWounds(wounds)
     local rows = {}
     local parts = PNC.NPCWounds and PNC.NPCWounds.Parts or {}
@@ -201,6 +310,10 @@ function Tabs.RenderHealth(view, snapshot, payload, topY)
         incapacitatedReason = payloadHealth.incapacitatedReason,
     }
     local body = resolved.bodyHealth or payloadHealth.body or {}
+    local needs = resolved.needs or payload and payload.needs or {}
+    local wholeBodyAilments = body.wholeBodyAilments
+        or resolved.wholeBodyAilments
+        or payload and payload.wholeBodyAilments or {}
     local wounds = body.wounds or {}
     local rows = sortedWounds(wounds)
     local padding = 12
@@ -244,6 +357,8 @@ function Tabs.RenderHealth(view, snapshot, payload, topY)
             infected and 1 or 0.45, infected and 0.35 or 0.9, 0.2, 1, UIFont.Small)
         y = y + fontHeight
     end
+    y = renderWholeBodyAilmentDetails(view, x, y, width, fontHeight,
+        needs, wholeBodyAilments)
     y = y + fontHeight
 
     if #rows > 0 then
@@ -488,16 +603,20 @@ local function showHealthMenu(view, partId, x, y)
     local wound = body and body.wounds and body.wounds[partId] or nil
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local canDebug = PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() == true
+    local isWholeBody = partId == "WholeBody"
     local context
     local option
-    if (not wound
+    if (isWholeBody and not canDebug) or (not wound
         or (wound.bandaged == true and wound.bandageDirty ~= true)
         or not player) and not canDebug
     then
         return false
     end
     context = ISContextMenu.get(0, x + view:getAbsoluteX(), y + view:getAbsoluteY())
-    if wound and (wound.bandaged ~= true or wound.bandageDirty == true) and player then
+    -- Whole Body ailments have no wound object and can never enter the normal
+    -- bandage flow. Debug menus may still inspect the region explicitly.
+    if not isWholeBody and wound
+        and (wound.bandaged ~= true or wound.bandageDirty == true) and player then
         option = context:addOption(Shared.Text("ContextMenu_Bandage", "Bandage"), nil)
         if PNC.BandageMenu and PNC.BandageMenu.AddMaterialOptions then
             PNC.BandageMenu.AddMaterialOptions(

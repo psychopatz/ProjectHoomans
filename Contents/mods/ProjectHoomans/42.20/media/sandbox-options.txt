@@ -3,7 +3,7 @@ VERSION = 1,
 option ProjectHoomans.PlayerOwnedNPCNeedMortality
 {
     type = boolean,
-    default = false,
+    default = true,
     page = ProjectHoomans,
     translation = ProjectHoomans.PlayerOwnedNPCNeedMortality,
 }

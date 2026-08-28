@@ -167,6 +167,10 @@ for npcIndex = 1, 100 do
                         bleedingRate = 0.018,
                     },
                 },
+                wholeBodyAilments = {
+                    starvation = { severity = 0.42 },
+                    flu = { severity = 0.13 },
+                },
                 parts = {},
             },
         },
@@ -254,6 +258,10 @@ end
 T.truthy(logicalItems >= 40, "acquired logical item count")
 T.equal(sample.health.body.partBase, 92, "body-part baseline")
 T.equal(sample.health.body.parts.Head, 70, "body-part override")
+T.equal(sample.health.body.wholeBodyAilments.starvation, 420,
+    "whole-body starvation severity is compacted")
+T.equal(sample.health.body.wholeBodyAilments.flu, 130,
+    "future whole-body ailment is preserved")
 T.equal(sample.runtime, nil, "runtime state leaked into save")
 T.equal(sample.travel.ownerMod, "ScaleFixture", "travel owner persisted")
 T.equal(sample.travel.route.points[2].x, 301, "travel route persisted")
@@ -266,6 +274,10 @@ T.equal(restored.health.body.parts.Head.current, 70,
     "compact health override round trip")
 T.equal(restored.health.body.parts.Neck.current, 92,
     "compact health baseline round trip")
+T.near(restored.health.body.wholeBodyAilments.starvation.severity,
+    0.42, 0.000001, "whole-body starvation round trip")
+T.near(restored.health.body.wholeBodyAilments.flu.severity,
+    0.13, 0.000001, "future whole-body ailment round trip")
 T.equal(restored.travel.journeyId, "journey:scale:1",
     "journey id round trip")
 T.equal(restored.orderSpec.kind, "travel",

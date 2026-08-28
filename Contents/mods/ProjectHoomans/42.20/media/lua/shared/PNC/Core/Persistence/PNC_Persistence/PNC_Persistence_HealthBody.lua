@@ -23,7 +23,8 @@ function Internal.sanitizeHealthBody(rawBody)
     local bleedingRate = 0
     local openWoundCount = 0
     local bandagedWoundCount = 0
-    local totalPercent = 0
+    local totalPartHealth = 0
+    local totalPartMax = 0
     local partCount = 0
     for partId, wound in pairs(type(source.wounds) == "table" and source.wounds or {}) do
         if type(wound) == "table" then
@@ -89,9 +90,11 @@ function Internal.sanitizeHealthBody(rawBody)
         end
     end
     for _, partHealth in pairs(parts) do
-        totalPercent = totalPercent + (
-            (tonumber(partHealth.current) or 0)
-            / math.max(1, tonumber(partHealth.max) or 100)
+        totalPartHealth = totalPartHealth + math.max(
+            0, tonumber(partHealth.current) or 0
+        )
+        totalPartMax = totalPartMax + math.max(
+            1, tonumber(partHealth.max) or 100
         )
         partCount = partCount + 1
     end
@@ -109,17 +112,42 @@ function Internal.sanitizeHealthBody(rawBody)
         fever = Core.Clamp(Internal.normalizeNumber(infectionSource.fever, 0), 0, 100),
         temperatureC = Core.Clamp(Internal.normalizeNumber(infectionSource.temperatureC, 37), 30, 45),
         lastUpdatedWorldHour = Internal.normalizeNumber(infectionSource.lastUpdatedWorldHour, 0),
+        lastDamageWorldHour = Internal.normalizeNumber(infectionSource.lastDamageWorldHour, 0),
     } or nil
+    local wholeBodyAilments = {}
+    for ailmentID, ailment in pairs(
+        type(source.wholeBodyAilments) == "table"
+            and source.wholeBodyAilments or {}
+    ) do
+        local severity = type(ailment) == "table"
+            and tonumber(ailment.severity) or tonumber(ailment)
+        if severity and severity > 1 then severity = severity / 1000 end
+        if severity and severity > 0 then
+            wholeBodyAilments[tostring(ailmentID)] = {
+                severity = Core.Clamp(severity, 0, 1),
+            }
+        elseif type(ailment) == "table"
+            and ailment.active == true
+            and ailment.flavorOnly == true
+        then
+            wholeBodyAilments[tostring(ailmentID)] = {
+                active = true,
+                flavorOnly = true,
+            }
+        end
+    end
     return {
         wounds = wounds,
         parts = parts,
         infection = infection,
-        totalPartHealth = partCount > 0 and totalPercent * 100
+        wholeBodyAilments = wholeBodyAilments,
+        totalPartHealth = partCount > 0 and totalPartHealth
             or math.max(0, Internal.normalizeNumber(source.totalPartHealth, 0)),
-        totalPartMax = partCount > 0 and partCount * 100
+        totalPartMax = partCount > 0 and totalPartMax
             or math.max(0, Internal.normalizeNumber(source.totalPartMax, 0)),
         overallPercent = partCount > 0
-            and Core.Clamp(totalPercent / partCount * 100, 0, 100)
+            and Core.Clamp(totalPartMax > 0
+                and totalPartHealth / totalPartMax * 100 or 0, 0, 100)
             or Core.Clamp(Internal.normalizeNumber(source.overallPercent, 100), 0, 100),
         bleedingRate = bleedingRate,
         openWoundCount = openWoundCount,
@@ -129,4 +157,3 @@ function Internal.sanitizeHealthBody(rawBody)
         lastBleedAt = 0,
     }
 end
-

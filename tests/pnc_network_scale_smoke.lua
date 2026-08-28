@@ -152,6 +152,16 @@ PNC = {
     VisualProfiles = { RollAppearance = function() return {} end },
     MotionHints = {},
     Health = { CanRevive = function() return false end },
+    NPCWounds = {
+        BuildSnapshot = function(record)
+            return record.health and record.health.body or { wounds = {} }
+        end,
+    },
+    NeedsRepository = {
+        Get = function(record)
+            return record and record.needsState or nil
+        end,
+    },
     Travel = {
         Model = {
             BuildSummary = function(journey, includeRoute)
@@ -208,7 +218,18 @@ local nearbyRecord = {
     x = 1,
     y = 0,
     z = 0,
-    health = { current = 100, max = 100, state = "normal" },
+    health = {
+        current = 100, max = 100, state = "normal",
+        body = {
+            wholeBodyAilments = {
+                starvation = { severity = 0.65 },
+                dehydration = { severity = 1 },
+            },
+        },
+    },
+    needsState = {
+        needs = { hunger = 0.90, thirst = 0.91, fatigue = 0.10 },
+    },
     equipment = { worn = {}, attached = {} },
     runtime = {},
     presenceRevision = 1,
@@ -287,6 +308,15 @@ T.equal(
     false,
     "detailed snapshot omitted explicit player hostility"
 )
+local needsSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
+T.near(needsSnapshot.needs.hunger, 0.90, 0.000001,
+    "detailed snapshot omitted hunger state")
+T.near(needsSnapshot.needs.thirst, 0.91, 0.000001,
+    "detailed snapshot omitted thirst state")
+T.near(needsSnapshot.bodyHealth.wholeBodyAilments.starvation.severity,
+    0.65, 0.000001, "detailed snapshot omitted starvation ailment")
+T.near(needsSnapshot.bodyHealth.wholeBodyAilments.dehydration.severity,
+    1, 0.000001, "detailed snapshot omitted dehydration ailment")
 T.equal(
     PNC.Network.BuildRosterSnapshot(nearbyRecord)
         .organizationalFaction.name,

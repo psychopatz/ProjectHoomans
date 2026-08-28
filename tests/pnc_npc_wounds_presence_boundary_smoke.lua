@@ -19,6 +19,7 @@ local expected = {
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_ClothingCoverage",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Clothing",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_BodyState",
+    "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_WholeBody",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Infection",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Mutation",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_ZombieAttack",

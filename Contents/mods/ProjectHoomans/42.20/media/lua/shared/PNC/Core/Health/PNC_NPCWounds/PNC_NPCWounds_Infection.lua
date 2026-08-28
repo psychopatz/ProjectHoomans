@@ -4,6 +4,11 @@ local Internal = Wounds.Internal
 local Core = PNC.Core
 local Settings = PNC.Sandbox
 
+local KNOX_FEVER_ID = "knox_fever"
+local FEVER_ONSET_PROGRESS = 0.45
+local FEVER_DAMAGE_PROGRESS = 0.90
+local FEVER_DAMAGE_HEALTH_FRACTION = 0.95
+
 local function infectionStage(progress)
     if progress < 0.20 then return "incubating" end
     if progress < 0.45 then return "queasy" end
@@ -12,10 +17,72 @@ local function infectionStage(progress)
     return "terminal"
 end
 
+local function setKnoxFever(record, severity)
+    local wholeBody = Wounds.WholeBody
+    if wholeBody and wholeBody.SetSeverity then
+        return wholeBody.SetSeverity(record, KNOX_FEVER_ID, severity)
+    end
+    return severity, false
+end
+
+local function feverDamageHours(infection, currentHour, infectedAt, fatalAt)
+    local duration = math.max(0.01, fatalAt - infectedAt)
+    local damageStart = infectedAt
+        + duration * FEVER_DAMAGE_PROGRESS
+    local previousDamageHour = tonumber(infection.lastDamageWorldHour)
+    if previousDamageHour == nil or previousDamageHour <= 0 then
+        previousDamageHour = tonumber(infection.lastUpdatedWorldHour)
+            or infectedAt
+    end
+    local fromHour = math.max(previousDamageHour, damageStart)
+    local toHour = math.min(currentHour, fatalAt)
+    return math.max(0, toHour - fromHour), toHour
+end
+
+local function applyKnoxFeverDamage(
+    record,
+    npcBody,
+    health,
+    infection,
+    currentHour,
+    infectedAt,
+    fatalAt,
+    applyDamage
+)
+    if applyDamage == false or not health or not PNC.Health
+        or not PNC.Health.ApplyDamage
+    then
+        return false
+    end
+    local elapsed, processedUntil = feverDamageHours(
+        infection, currentHour, infectedAt, fatalAt
+    )
+    if elapsed <= 0 then return false end
+    local duration = math.max(0.01, fatalAt - infectedAt)
+    local damageWindow = math.max(
+        0.01, duration * (1 - FEVER_DAMAGE_PROGRESS)
+    )
+    local damageRate = math.max(0, tonumber(health.max) or 100)
+        * FEVER_DAMAGE_HEALTH_FRACTION / damageWindow
+    local applied = false
+    if damageRate > 0 then
+        applied = PNC.Health.ApplyDamage(record, npcBody, {
+            amount = elapsed * damageRate,
+            type = "knox_fever",
+            attackerKind = "environment",
+        }) == true
+    end
+    infection.lastDamageWorldHour = processedUntil
+    return applied or processedUntil > (
+        tonumber(infection.lastUpdatedWorldHour) or 0
+    )
+end
+
 function Internal.RefreshInfectionState(
     record,
     currentHour,
-    applyDecline
+    applyDamage,
+    npcBody
 )
     local body = Wounds.Ensure(record)
     local infection = body.infection
@@ -26,11 +93,17 @@ function Internal.RefreshInfectionState(
     local fatalAt = tonumber(infection.fatalAtWorldHour)
         or (infectedAt + Settings.NPCInfectionMortalityHours())
     local duration = math.max(0.01, fatalAt - infectedAt)
-    local progress = Core.Clamp(
+    local calculatedProgress = Core.Clamp(
         (currentHour - infectedAt) / duration, 0, 1
     )
+    local progress = math.max(
+        Core.Clamp(tonumber(infection.progress) or 0, 0, 1),
+        calculatedProgress
+    )
     local fever = Core.Clamp(
-        (progress - 0.45) / 0.45, 0, 1
+        (progress - FEVER_ONSET_PROGRESS)
+            / (FEVER_DAMAGE_PROGRESS - FEVER_ONSET_PROGRESS),
+        0, 1
     ) * 100
     local stage = infectionStage(progress)
     local priorStage = infection.stage
@@ -44,24 +117,20 @@ function Internal.RefreshInfectionState(
     infection.stage = stage
     infection.fever = fever
     infection.temperatureC = 37 + fever / 100 * 3.5
+    local _, feverChanged = setKnoxFever(record, fever / 100)
+    changed = changed or feverChanged
+    changed = applyKnoxFeverDamage(
+        record,
+        npcBody or PNC.Registry and PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(record.id) or nil,
+        health,
+        infection,
+        currentHour,
+        infectedAt,
+        fatalAt,
+        applyDamage
+    ) or changed
     infection.lastUpdatedWorldHour = currentHour
-    if applyDecline ~= false and health and progress > 0.65 then
-        local decline = Core.Clamp(
-            (progress - 0.65) / 0.35, 0, 1
-        )
-        local targetHealth = math.max(
-            (tonumber(health.max) or 100) * 0.05,
-            (tonumber(health.max) or 100)
-                * (1 - decline * 0.95)
-        )
-        if (tonumber(health.current) or 0) > targetHealth + 0.01 then
-            Wounds.ApplyBodyDamage(
-                record,
-                health.current - targetHealth
-            )
-            changed = true
-        end
-    end
     if priorStage ~= stage then
         record.runtime = record.runtime or {}
         record.runtime.forceSyncEvent = "infection_" .. stage
@@ -110,7 +179,9 @@ function Internal.Infect(record, partId, nowHour, force)
         fever = 0,
         temperatureC = 37,
         lastUpdatedWorldHour = nowHour,
+        lastDamageWorldHour = nowHour,
     }
+    setKnoxFever(record, 0)
     return true, "infected"
 end
 
@@ -143,6 +214,7 @@ function Wounds.ClearInfection(record, source)
         return false, "not_infected"
     end
     body.infection = nil
+    setKnoxFever(record, 0)
     record.runtime = record.runtime or {}
     record.runtime.forceSyncEvent =
         tostring(source or "infection_cleared")
@@ -162,6 +234,7 @@ function Wounds.PrepareInfectionDeath(record)
     infection.stage = "fatal"
     infection.fever = 100
     infection.temperatureC = 40.5
+    setKnoxFever(record, 1)
     infection.fatalAtWorldHour =
         tonumber(infection.fatalAtWorldHour)
         or Internal.WorldHour()

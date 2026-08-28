@@ -21,6 +21,7 @@ function Network.BuildCharacterPayload(record)
         snapshot = snapshot,
         identity = identity,
         health = Core.DeepCopy(record.health or {}),
+        needs = Core.DeepCopy(snapshot.needs or {}),
         stamina = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {},
         inventory = inventoryPayload,
         equipment = Core.DeepCopy(record.equipment or {}),

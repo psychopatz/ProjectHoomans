@@ -171,7 +171,8 @@ function Wounds.Update(record, zombie, now)
         if Internal.RefreshInfectionState(
             record,
             currentHour,
-            false
+            false,
+            zombie
         ) then
             changed = true
         end
@@ -209,7 +210,8 @@ function Wounds.Update(record, zombie, now)
         and Internal.RefreshInfectionState(
             record,
             currentHour,
-            true
+            true,
+            zombie
         )
     then
         changed = true

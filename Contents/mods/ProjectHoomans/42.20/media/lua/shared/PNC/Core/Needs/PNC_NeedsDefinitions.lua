@@ -107,6 +107,43 @@ Definitions.NUTRITION = {
 Definitions.CONSEQUENCES = {
     criticalThreshold = 0.84, nonlethalHealthFloor = 10,
 }
+-- Whole Body ailments are abstract conditions. Their state lives on the
+-- NPC's health body rather than on a bandageable body part. Server-side need
+-- consequence policies decide how each condition builds, recovers, and
+-- damages health; these shared definitions describe their source and UI.
+Definitions.WHOLE_BODY_AILMENT_ORDER = {
+    "starvation", "dehydration", "knox_fever", "blood_loss",
+}
+Definitions.WHOLE_BODY_AILMENTS = {
+    starvation = {
+        id = "starvation", needType = "hunger",
+        label = "Starvation", labelKey = "UI_PNC_Health_Starvation",
+        cause = "Hunger", causeKey = "UI_PNC_Health_Hunger",
+    },
+    dehydration = {
+        id = "dehydration", needType = "thirst",
+        label = "Dehydration", labelKey = "UI_PNC_Health_Dehydration",
+        cause = "Thirst", causeKey = "UI_PNC_Health_Thirst",
+    },
+    -- Fever classes are metadata, not UI copy. A future curable fever can
+    -- use the same Whole Body slot without changing the state shape.
+    knox_fever = {
+        id = "knox_fever", label = "Fever",
+        labelKey = "UI_PNC_Health_Fever", feverClass = "incurable",
+        curable = false, severityProgression = "building",
+    },
+    blood_loss = {
+        id = "blood_loss", label = "Losing blood",
+        labelKey = "UI_PNC_Health_Losing_Blood", displayMode = "flavor",
+        flavorOnly = true, cause = "Active bleeding",
+        causeKey = "UI_PNC_Health_Active_Bleeding",
+    },
+}
+
+function Definitions.GetWholeBodyAilment(ailmentID)
+    return Definitions.WHOLE_BODY_AILMENTS[tostring(ailmentID or "")]
+end
+
 Definitions.SUPPLY = {
     hunger = {
         resourceKind = "FOOD", trigger = 0.25, target = 0.10,

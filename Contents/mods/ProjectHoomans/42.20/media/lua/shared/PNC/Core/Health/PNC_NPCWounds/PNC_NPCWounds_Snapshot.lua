@@ -11,6 +11,7 @@ function Wounds.BuildSnapshot(record)
         infected = Wounds.HasActiveInfection(record),
         infection = body.infection
             and Core.DeepCopy(body.infection) or nil,
+        wholeBodyAilments = Core.DeepCopy(body.wholeBodyAilments or {}),
         wounds = {},
         parts = Core.DeepCopy(body.parts),
         totalPartHealth = body.totalPartHealth,

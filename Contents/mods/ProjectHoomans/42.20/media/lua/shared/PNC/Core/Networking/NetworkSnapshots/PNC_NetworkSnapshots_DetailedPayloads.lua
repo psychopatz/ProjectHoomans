@@ -26,6 +26,19 @@ local buildDetailedDebugState = Parts.BuildDetailedDebugState
 local buildIdentityOwnershipSummary =
     Parts.BuildIdentityOwnershipSummary
 
+local function buildNeedsSummary(record)
+    local repository = PNC.NeedsRepository
+    local state = repository and repository.Get
+        and repository.Get(record, false) or nil
+    local needs = state and state.needs or record.needs
+    if type(needs) ~= "table" then return nil end
+    return {
+        hunger = tonumber(needs.hunger) or 0,
+        thirst = tonumber(needs.thirst) or 0,
+        fatigue = tonumber(needs.fatigue) or 0,
+    }
+end
+
 function Network.BuildSnapshot(record)
     local aiState
     local canRevive
@@ -41,6 +54,7 @@ function Network.BuildSnapshot(record)
     local firearmState
     local vehiclePassenger
     local treatmentState
+    local needsSummary
     local attackMode
     local ownership
     aiState, inCombat = resolveAIState(record)
@@ -54,6 +68,7 @@ function Network.BuildSnapshot(record)
     visualState = buildVisualState(record)
     appearance = Profiles and Profiles.RollAppearance and Profiles.RollAppearance(record) or nil
     bodyHealth = Wounds and Wounds.BuildSnapshot and Wounds.BuildSnapshot(record) or nil
+    needsSummary = buildNeedsSummary(record)
     firearmState = Firearms and Firearms.BuildDebugState
         and Firearms.BuildDebugState(record)
         or nil
@@ -143,6 +158,7 @@ function Network.BuildSnapshot(record)
         hpCurrent = record.health and record.health.current or nil,
         hpMax = record.health and record.health.max or nil,
         healthState = record.health and record.health.state or nil,
+        needs = needsSummary,
         canRevive = canRevive,
         reviveUntil = record.health and record.health.reviveUntil or 0,
         recentDamageUntil = record.health and record.health.recentDamageUntil or 0,

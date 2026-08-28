@@ -87,6 +87,22 @@ function Internal.buildCompactHealthBody(rawBody)
         output.wounds = output.wounds or {}
         output.wounds[tostring(partId)] = compactWound
     end
+    for ailmentID, ailment in pairs(normalized.wholeBodyAilments or {}) do
+        local severity = tonumber(ailment and ailment.severity) or 0
+        if severity > 0 then
+            output.wholeBodyAilments = output.wholeBodyAilments or {}
+            output.wholeBodyAilments[tostring(ailmentID)] =
+                math.floor(Core.Clamp(severity, 0, 1) * 1000 + 0.5)
+        elseif ailment and ailment.active == true
+            and ailment.flavorOnly == true
+        then
+            output.wholeBodyAilments = output.wholeBodyAilments or {}
+            output.wholeBodyAilments[tostring(ailmentID)] = {
+                active = true,
+                flavorOnly = true,
+            }
+        end
+    end
     infection = normalized.infection
     if infection then
         output.infection = {
@@ -107,6 +123,8 @@ function Internal.buildCompactHealthBody(rawBody)
                 and infection.temperatureC or nil,
             lastUpdatedWorldHour = infection.lastUpdatedWorldHour ~= 0
                 and infection.lastUpdatedWorldHour or nil,
+            lastDamageWorldHour = infection.lastDamageWorldHour ~= 0
+                and infection.lastDamageWorldHour or nil,
         }
     end
     if not Internal.hasTableEntries(output) then return nil end

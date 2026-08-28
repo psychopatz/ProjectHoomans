@@ -91,9 +91,12 @@ local beforeZeroElapsed = npc.health.current
 PNC.IndividualNeeds.Update(npc, 0, "maximum_pressure_no_elapsed")
 T.equal(npc.health.current, beforeZeroElapsed,
     "maximum pressure is not instant death")
+T.truthy(PNC.Sandbox.PlayerOwnedNPCNeedMortalityEnabled(),
+    "need mortality is enabled by default")
+SandboxVars.ProjectHoomans.PlayerOwnedNPCNeedMortality = false
 PNC.IndividualNeeds.Update(npc, 168, "nonlethal_catchup")
 T.truthy(npc.health.current >= PNC.NeedsDefinitions.CONSEQUENCES.nonlethalHealthFloor,
-    "default mortality OFF preserves safe floor")
+    "disabled mortality preserves safe floor")
 SandboxVars.ProjectHoomans.PlayerOwnedNPCNeedMortality = true
 PNC.IndividualNeeds.Update(npc, 168, "lethal_catchup")
 T.truthy(npc.health.current < PNC.NeedsDefinitions.CONSEQUENCES.nonlethalHealthFloor,

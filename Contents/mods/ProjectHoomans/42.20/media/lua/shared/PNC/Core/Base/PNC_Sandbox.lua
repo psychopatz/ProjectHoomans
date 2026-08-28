@@ -154,7 +154,7 @@ function Settings.ConstructionCancellationRefundMultiplier()
 end
 
 function Settings.PlayerOwnedNPCNeedMortalityEnabled()
-    return Settings.GetBoolean("PlayerOwnedNPCNeedMortality", false)
+    return Settings.GetBoolean("PlayerOwnedNPCNeedMortality", true)
 end
 
 function Settings.MobileGroupAccidentChance(groupType)

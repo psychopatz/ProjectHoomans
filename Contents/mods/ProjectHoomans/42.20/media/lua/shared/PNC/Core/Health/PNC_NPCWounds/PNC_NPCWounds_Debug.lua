@@ -115,6 +115,7 @@ function Wounds.ApplyDebugInfection(
     infection.fatalAtWorldHour =
         currentHour + mortality * (1 - progress)
     infection.pendingFatal = false
+    infection.lastDamageWorldHour = infection.infectedAtWorldHour
     Internal.RefreshInfectionState(record, currentHour, true)
     if requestedStage == "fatal" then
         local killed, reason = Wounds.TriggerInfectionDeath(
