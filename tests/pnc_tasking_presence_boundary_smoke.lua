@@ -52,7 +52,7 @@ for name in pairs(commandFunctions) do
     T.equal(type(Tasking.Commands[name]), "function",
         "entry point preserves Tasking.Commands." .. name)
 end
-T.equal(commandCount, 8, "tasking command function count")
+T.equal(commandCount, 9, "tasking command function count")
 local queryCount = 0
 for name in pairs(queryFunctions) do
     queryCount = queryCount + 1

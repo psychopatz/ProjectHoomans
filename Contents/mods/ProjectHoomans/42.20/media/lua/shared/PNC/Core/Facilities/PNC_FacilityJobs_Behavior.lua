@@ -42,6 +42,18 @@ local function state(record)
     return record and record.runtime and record.runtime.facilityActivity or nil
 end
 
+local function hasLiveTaskLease(leaseId)
+    leaseId = tostring(leaseId or "")
+    if leaseId == "" then return false end
+    local leases = PNC.TaskLeaseService
+    if not leases or type(leases.Get) ~= "function" then
+        -- This module is shared. Clients do not own the server lease table,
+        -- so an opaque client-side ID is not evidence of an orphan.
+        return true
+    end
+    return leases.Get(leaseId) ~= nil
+end
+
 local function restorePosition(record, zombie, runtime)
     if not runtime or runtime.positioned ~= true then return end
     local position = runtime.approachPosition
@@ -104,7 +116,7 @@ local function finish(record, zombie, reason)
     runtime.finishing = true
     restorePosition(record, zombie, runtime)
     if PNC.FacilityReservations and runtime.reservationId ~= ""
-        and runtime.taskLeaseId == ""
+        and not hasLiveTaskLease(runtime.taskLeaseId)
     then
         PNC.FacilityReservations.Release(
             runtime.reservationId,
@@ -125,10 +137,13 @@ function Jobs.Stop(record, reason)
         and PNC.Registry.GetLiveZombie(record.id) or nil
     runtime.stopRequested = true
     if record.runtime.animationScene and PNC.AnimationScenes then
-        PNC.AnimationScenes.Stop(record, zombie, reason or "player_stop")
+        -- Cleanup must continue even if scene interruption throws. Otherwise
+        -- the activity and its reservation survive without an owner.
+        pcall(PNC.AnimationScenes.Stop, record, zombie,
+            reason or "player_stop")
     end
-    finish(record, zombie, reason or "player_stop")
-    return true, "facility_activity_stopped"
+    local finished = finish(record, zombie, reason or "player_stop")
+    return finished == true, "facility_activity_stopped"
 end
 
 function Jobs.OnSceneTick(record, zombie, scene, now)

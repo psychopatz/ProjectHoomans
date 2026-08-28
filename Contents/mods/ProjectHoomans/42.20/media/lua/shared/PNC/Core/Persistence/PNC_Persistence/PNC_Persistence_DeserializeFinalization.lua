@@ -158,9 +158,14 @@ function Internal.FinalizeDeserializedRecord(
     record.persistedInventory = type(raw.inventory) == "table"
         and Core.DeepCopy(raw.inventory) or nil
     record = Persistence.RebuildRuntime(record)
+    if Persistence.Repairs and Persistence.Repairs.Apply then
+        Persistence.Repairs.Apply("npc_record", record, {
+            objectId = record.id,
+            sourceVersion = tonumber(raw.schemaVersion) or 0,
+        })
+    end
     restoreJournalAndTravel(record, raw)
     record.persistenceSourceVersion = tonumber(raw.schemaVersion) or 0
     restoreBodyHint(record, raw)
     return record
 end
-

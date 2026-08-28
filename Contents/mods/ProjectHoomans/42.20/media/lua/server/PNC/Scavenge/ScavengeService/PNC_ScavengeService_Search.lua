@@ -91,8 +91,10 @@ function Service.StartSearch(player, arguments)
     increment("SourcesScanned", #result.sources)
     emit("SearchStarted", session)
     for _, npcId in ipairs(npcIds) do
-        PNC.Tasking.Commands.MarkDirty(npcId, "SCAVENGE_SEARCH_STARTED")
-        PNC.Tasking.Commands.Reevaluate(npcId, "SCAVENGE_SEARCH_STARTED")
+        PNC.Tasking.Events.Emit("SCAVENGE_SEARCH_STARTED", {
+            npcId = npcId, source = "ScavengeService",
+            entityId = session.id,
+        }, { immediate = true })
     end
     Service.SendSnapshot(session)
     return true, "search_started", Service.BuildSnapshot(session)

@@ -145,6 +145,10 @@ local record = {
     runtime = {
         bodyLease = "lease-persisted",
     },
+    orderSpec = {
+        kind = "facility_activity",
+        taskLeaseId = "stale-facility-lease",
+    },
     generation = { source = "WORLD_POPULATION_DIRECTOR",
         generationId = "POP_GROUP_0000042", sectorId = "psector_1_2",
         createdAt = 34, seed = 42 },
@@ -199,6 +203,14 @@ T.truthy(restored.vanillaTraits.overweight == true,
     "vanilla weight trait did not round trip")
 T.truthy(restored.vanillaTraitsAuthored == true,
     "authored trait source did not round trip")
+T.equal(restored.orderSpec, nil,
+    "stale facility order was not repaired during deserialization")
+T.equal(restored.persistenceRepairVersions.facility_activity_runtime, 1,
+    "facility repair revision was not recorded after deserialization")
+
+local repairedPayload = PNC.Persistence.SerializeRecord(restored)
+T.equal(repairedPayload.repairVersions.facility_activity_runtime, 1,
+    "facility repair revision was not persisted")
 
 next = originalNext
 T.finish("pnc_kahlua_persistence_smoke")

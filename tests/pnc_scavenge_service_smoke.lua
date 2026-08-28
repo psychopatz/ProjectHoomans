@@ -143,8 +143,13 @@ PNC = {
             return true
         end,
     },
-    Tasking = { Commands = {
-        MarkDirty = function() dirty = dirty + 1 end,
+    Tasking = { Events = {
+        Emit = function(_, _, options)
+            dirty = dirty + 1
+            if options and options.immediate then reevaluated = reevaluated + 1 end
+            return true
+        end,
+    }, Commands = {
         Reevaluate = function() reevaluated = reevaluated + 1; return true end,
         CancelForNPC = function() return true end,
     } },

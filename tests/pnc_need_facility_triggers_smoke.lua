@@ -79,9 +79,11 @@ PNC = {
     },
     Tasking = {
         Diagnostics = { counters = { facilityLookups = 0 } },
+        Events = {
+            Emit = function() dirty = dirty + 1 end,
+        },
         Commands = {
             RegisterProvider = function(_, value) provider = value end,
-            MarkDirty = function() dirty = dirty + 1 end,
         },
     },
     TaskLeaseService = { ForNPC = function() return nil end },

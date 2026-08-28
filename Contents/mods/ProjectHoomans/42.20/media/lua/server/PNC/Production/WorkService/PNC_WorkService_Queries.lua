@@ -16,6 +16,12 @@ local terminal = Internal.terminal
 local copy = Internal.copy
 local workerAvailable = Internal.workerAvailable
 
+local function assignable(order)
+    return order and not order.workerId
+        and (order.status == Status.QUEUED
+            or order.status == Status.WAITING_FOR_WORKER)
+end
+
 function Service.Queries.Get(id) return copy(Repository.Get(id)) end
 function Service.Queries.CanAssign(orderId, workerId)
     local order = Repository.Get(orderId)
@@ -40,6 +46,26 @@ function Service.Queries.List(colonyId)
         if left.priority ~= right.priority then return left.priority > right.priority end
         return left.createdAt < right.createdAt
     end)
+    return output
+end
+
+-- Task candidate collection should not materialize and sort the complete
+-- durable history for every NPC decision. Return only the best assignable
+-- orders for this worker; the task arbiter performs the final global sort.
+function Service.Queries.ListAssignableForWorker(workerId, limit)
+    local output = {}
+    limit = math.max(1, math.floor(tonumber(limit) or 64))
+    Repository.Load()
+    for _, order in pairs(Repository.State.byId) do
+        if assignable(order) and Service.Queries.CanAssign(order.id, workerId) then
+            output[#output + 1] = order
+        end
+    end
+    table.sort(output, function(left, right)
+        if left.priority ~= right.priority then return left.priority > right.priority end
+        return left.createdAt < right.createdAt
+    end)
+    while #output > limit do output[#output] = nil end
     return output
 end
 

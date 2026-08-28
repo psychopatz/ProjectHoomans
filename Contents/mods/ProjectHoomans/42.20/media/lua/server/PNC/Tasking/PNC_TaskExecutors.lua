@@ -3,6 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 local Live = {}
 local Abstract = {}
+local TaskEvents = PNC.Tasking.Events
 
 function Live.Tick(lease)
     local record = PNC.Registry.Get(lease.npcId)
@@ -10,7 +11,10 @@ function Live.Tick(lease)
     local reservation = lease.reservationId
         and PNC.FacilityReservations.ByID[lease.reservationId] or nil
     if not runtime or not reservation then
-        PNC.Tasking.Commands.MarkDirty(lease.npcId, "LIVE_EXECUTOR_INVALID")
+        TaskEvents.Emit("TASK_EXECUTOR_INVALID", {
+            npcId = lease.npcId, source = "Tasking.LiveExecutor",
+            entityId = lease.leaseId,
+        })
         return false
     end
     -- Travel can take longer than the initial reservation window. Keep the
@@ -21,8 +25,11 @@ function Live.Tick(lease)
         local renewed = PNC.FacilityReservations.Start(
             lease.reservationId, 30000)
         if not renewed then
-            PNC.Tasking.Commands.MarkDirty(lease.npcId,
-                "LIVE_RESERVATION_RENEW_FAILED")
+            TaskEvents.Emit("TASK_EXECUTOR_INVALID", {
+                npcId = lease.npcId, source = "Tasking.LiveExecutor",
+                entityId = lease.leaseId,
+                cause = "LIVE_RESERVATION_RENEW_FAILED",
+            })
             return false
         end
         lease.nextReservationRenewAt = now + 10000
@@ -37,7 +44,10 @@ end
 function Abstract.Tick(lease)
     local record = PNC.Registry.Get(lease.npcId)
     if not record or not PNC.FacilityReservations.ByID[lease.reservationId] then
-        PNC.Tasking.Commands.MarkDirty(lease.npcId, "ABSTRACT_EXECUTOR_INVALID")
+        TaskEvents.Emit("TASK_EXECUTOR_INVALID", {
+            npcId = lease.npcId, source = "Tasking.AbstractExecutor",
+            entityId = lease.leaseId,
+        })
         return false
     end
     local now = PNC.NeedsUtils.WorldAgeHours()

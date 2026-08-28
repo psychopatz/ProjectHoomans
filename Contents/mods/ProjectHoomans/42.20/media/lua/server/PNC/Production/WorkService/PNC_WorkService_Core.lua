@@ -117,13 +117,16 @@ end
 
 local function markAssignmentDirty(order, cause)
     if not order or not PNC.Tasking or not PNC.Tasking.Commands
-        or not PNC.Tasking.Commands.MarkDirty or not PNC.Registry
+        or not PNC.Tasking.Events or not PNC.Tasking.Events.Emit
+        or not PNC.Registry
     then return 0 end
     local marked = 0
     local function consider(record)
         if record and record.alive ~= false and belongsToOrder(record, order) then
-            PNC.Tasking.Commands.MarkDirty(record.id,
-                cause or "WORK_REQUEST_CHANGED")
+            PNC.Tasking.Events.Emit(cause or "WORK_REQUEST_CHANGED", {
+                npcId = record.id, source = "WorkService",
+                entityId = order.id,
+            })
             marked = marked + 1
         end
     end

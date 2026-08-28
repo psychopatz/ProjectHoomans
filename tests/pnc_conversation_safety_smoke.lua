@@ -247,10 +247,29 @@ lifecycle.finish({}, spec, state, "danger")
 T.equal(record.runtime.conversationLease, nil,
     "finish releases idle scene")
 
+-- A non-hostile conversation may leave the speaking NPC's passive target on
+-- the player while its movement/animation lease is active. That target is not
+-- itself a danger signal; active combat state remains one.
+record.tacticalClass = "neutral"
+record.hostility = { attackPlayers = false }
+record.runtime = { target = { player = player } }
+spec.context.allowHostileParley = false
+T.equal(Safety.Check(spec), nil,
+    "passive talking target does not close a neutral conversation")
+T.equal(Scene.HasThreat(record, npc, player, 8), false,
+    "server ignores passive talking target")
+record.runtime.attackAction = { kind = "melee" }
+T.equal(Safety.Check(spec), "danger",
+    "active attack on the speaking player still closes the UI")
+T.equal(Scene.HasThreat(record, npc, player, 8), true,
+    "server preserves active attack danger")
+
 -- The talking NPC can offer a short parley while it is targeting this
 -- player. This only ignores that direct hostile target; nearby threats still
 -- use the regular close-on-danger rule above.
 candidates = {}
+record.tacticalClass = "hostile"
+record.hostility = { attackPlayers = true }
 record.runtime = {
     target = { player = player },
     attackAction = { kind = "melee" },

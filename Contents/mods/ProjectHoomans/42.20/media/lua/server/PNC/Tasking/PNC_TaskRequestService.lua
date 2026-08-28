@@ -9,6 +9,14 @@ local Definitions = PNC.TaskRequestDefinitions
 Service.Commands = Service.Commands or {}
 Service.Queries = Service.Queries or {}
 
+local function activityFacilityDefinitionId(activity)
+    local repository = PNC.SettlementRepository
+    local facility = activity and activity.facilityId and repository
+        and repository.GetFacility and repository.GetFacility(activity.facilityId)
+        or nil
+    return facility and facility.definitionId or nil
+end
+
 local function workId(requestId)
     requestId = tostring(requestId or "")
     if string.sub(requestId, 1, 5) == "work:" then return requestId end
@@ -31,6 +39,80 @@ function Service.Commands.CancelForPlayer(player, requestId, reason)
     local order, denied = authorized(player, requestId)
     if not order then return false, denied end
     return PNC.WorkService.Commands.Cancel(order.id, reason)
+end
+
+local function findLease(requestId)
+    requestId = tostring(requestId or "")
+    for _, lease in pairs(PNC.TaskLeaseService and PNC.TaskLeaseService.ByID
+        or {}) do
+        if tostring(lease.taskId or "") == requestId
+            or tostring(lease.leaseId or "") == requestId
+        then return lease end
+    end
+    return nil
+end
+
+local function ownedActivity(player, record, context)
+    if not record or not context then return false, "TASK_REQUEST_FORBIDDEN" end
+    local affiliation = record.affiliation or {}
+    local recordColony = tostring(affiliation.communityID or "")
+    if recordColony ~= ""
+        and recordColony ~= tostring(context.colony and context.colony.id or "")
+    then return false, "TASK_REQUEST_FORBIDDEN" end
+    if not PNC.CompanionCommands
+        or not PNC.CompanionCommands.IsOwnedByPlayer
+        or not PNC.CompanionCommands.IsOwnedByPlayer(record, player)
+    then return false, "TASK_REQUEST_FORBIDDEN" end
+    return true
+end
+
+function Service.Commands.CancelTransientForPlayer(player, requestId, reason)
+    local context, contextReason = PNC.ProductionContext.ForPlayer(player)
+    if not context then return false, contextReason end
+    local lease = findLease(requestId)
+    local record
+    if lease then
+        if lease.sourceDomain == "work" then
+            return false, "TASK_REQUEST_NOT_FOUND"
+        end
+        record = PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(lease.npcId) or nil
+        local allowed, denied = ownedActivity(player, record, context)
+        if not allowed then return false, denied end
+        if PNC.Tasking and PNC.Tasking.Commands
+            and PNC.Tasking.Commands.CancelLease
+        then
+            return PNC.Tasking.Commands.CancelLease(
+                lease.leaseId, reason or "player_cancelled")
+        end
+        return false, "TASKING_UNAVAILABLE"
+    end
+
+    requestId = tostring(requestId or "")
+    if string.sub(requestId, 1, 9) ~= "activity:" then
+        return false, "TASK_REQUEST_NOT_FOUND"
+    end
+    local npcId = string.sub(requestId, 10)
+    record = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(npcId) or nil
+    local allowed, denied = ownedActivity(player, record, context)
+    if not allowed then return false, denied end
+    local activity = record.runtime and record.runtime.facilityActivity or nil
+    if not activity then return false, "TASK_REQUEST_NOT_FOUND" end
+    local activityLease = findLease(activity.taskLeaseId)
+    if activityLease then
+        if PNC.Tasking and PNC.Tasking.Commands
+            and PNC.Tasking.Commands.CancelLease
+        then
+            return PNC.Tasking.Commands.CancelLease(
+                activityLease.leaseId, reason or "player_cancelled")
+        end
+        return false, "TASKING_UNAVAILABLE"
+    end
+    if not PNC.FacilityJobs or not PNC.FacilityJobs.Stop then
+        return false, "FACILITY_ACTIVITY_UNAVAILABLE"
+    end
+    return PNC.FacilityJobs.Stop(record, reason or "player_cancelled")
 end
 
 function Service.Commands.PauseForPlayer(player, requestId, paused)
@@ -79,10 +161,18 @@ function Service.Queries.BuildSnapshot(colonyId, at)
         task.cancellable = task.lifecycleState ~= Definitions.STATE.CANCELLING
         output[#output + 1] = task
     end
+    local seenActivities = {}
     for _, lease in pairs(PNC.TaskLeaseService and PNC.TaskLeaseService.ByID or {}) do
+        local record = PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(lease.npcId) or nil
+        local activity = record and record.runtime
+            and record.runtime.facilityActivity or nil
+        if activity and tostring(activity.taskLeaseId or "")
+            == tostring(lease.leaseId or "")
+        then
+            seenActivities[tostring(record.id)] = true
+        end
         if lease.sourceDomain ~= "work" then
-            local record = PNC.Registry and PNC.Registry.Get
-                and PNC.Registry.Get(lease.npcId) or nil
             local affiliation = record and record.affiliation or {}
             local recordColony = tostring(affiliation.communityID or "")
             if not colonyId or recordColony == tostring(colonyId) then
@@ -93,18 +183,62 @@ function Service.Queries.BuildSnapshot(colonyId, at)
                     or Definitions.STATE.CLAIMED
                 output[#output + 1] = {
                     id = lease.taskId, requestId = lease.taskId,
-                    sourceDomain = lease.sourceDomain, operation = lease.kind,
+                    sourceDomain = lease.sourceDomain,
+                    operation = activity and activity.capability or lease.kind,
                     status = state, lifecycleState = state,
-                    currentPhase = lease.phase, workerId = lease.npcId,
+                    currentPhase = activity and activity.phase or lease.phase,
+                    workerId = lease.npcId, npcId = lease.npcId,
                     workerName = record and tostring(record.name or record.id),
                     createdAt = lease.startedAt, lastProgressAt = lease.lastProgressAt,
                     ageMs = math.max(0, at - (tonumber(lease.startedAt) or at)),
-                    facilityId = lease.facilityId, stationId = lease.facilitySlotId,
+                    facilityId = activity and activity.facilityId
+                        or lease.facilityId,
+                    facilityDefinitionId = activityFacilityDefinitionId(activity),
+                    stationId = lease.facilitySlotId,
+                    activityItemFullType = activity
+                        and activity.activityItemFullType or nil,
+                    taskLeaseId = lease.leaseId,
                     progress = 0, requiredWork = 1, percent = 0,
-                    durable = false, cancellable = false,
+                    durable = false, cancellable = true,
                 }
             end
         end
+    end
+    if PNC.Registry and PNC.Registry.ForEach then
+        PNC.Registry.ForEach(function(record)
+            local activity = record and record.runtime
+                and record.runtime.facilityActivity or nil
+            if not activity or seenActivities[tostring(record.id)] then return end
+            local affiliation = record.affiliation or {}
+            local recordColony = tostring(affiliation.communityID or "")
+            if colonyId and recordColony ~= tostring(colonyId) then return end
+            local activityId = "activity:" .. tostring(record.id)
+            local facility = activity.facilityId and PNC.SettlementRepository
+                and PNC.SettlementRepository.GetFacility(activity.facilityId)
+                or nil
+            local state = activity.phase == "TRAVEL" and Definitions.STATE.TRAVEL
+                or activity.phase == "WORKING" and Definitions.STATE.WORKING
+                or Definitions.STATE.CLAIMED
+            output[#output + 1] = {
+                id = activityId, requestId = activityId,
+                sourceDomain = "facility_activity",
+                operation = activity.capability or "facility_activity",
+                status = state, lifecycleState = state,
+                currentPhase = activity.phase, workerId = record.id,
+                npcId = record.id,
+                workerName = tostring(record.name or record.id),
+                createdAt = activity.startedAt,
+                lastProgressAt = activity.lastProgressAt,
+                ageMs = math.max(0, at - (tonumber(activity.startedAt) or at)),
+                facilityId = activity.facilityId,
+                facilityDefinitionId = facility and facility.definitionId or nil,
+                activityItemFullType = activity.activityItemFullType,
+                taskLeaseId = activity.taskLeaseId,
+                progress = 0, requiredWork = 1, percent = 0,
+                durable = false, cancellable = true,
+                manual = activity.manual == true,
+            }
+        end)
     end
     table.sort(output, function(a, b)
         local first = tonumber(a.createdAt) or math.huge

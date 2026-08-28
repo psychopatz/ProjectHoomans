@@ -11,6 +11,23 @@ local Definitions = PNC.NeedsDefinitions
 local canUseDebug = Internal.canUseDebug
 local owned = Internal.owned
 
+local function stopActivity(record, reason)
+    local lease = PNC.TaskLeaseService and PNC.TaskLeaseService.ForNPC
+        and PNC.TaskLeaseService.ForNPC(record.id) or nil
+    if lease and PNC.Tasking and PNC.Tasking.Commands
+        and PNC.Tasking.Commands.CancelLease
+    then
+        local stopped = PNC.Tasking.Commands.CancelLease(
+            lease.leaseId, reason or "debug_stop")
+        if stopped == true or not record.runtime.facilityActivity then
+            return stopped == true
+        end
+    end
+    return PNC.FacilityJobs and PNC.FacilityJobs.Stop
+        and PNC.FacilityJobs.Stop(record, reason or "debug_stop") == true
+        or false
+end
+
 local function debugFacilityWorkAction(player, args)
     if not canUseDebug(player) then return false, "not_authorized" end
     local record = PNC.Registry and PNC.Registry.Get(args.npcID) or nil
@@ -19,9 +36,9 @@ local function debugFacilityWorkAction(player, args)
     end
     record.runtime = record.runtime or {}
     if tostring(args.operation or "start") == "stop" then
-        local stopped, stopReason = PNC.FacilityJobs.Stop(
-            record, "debug_stop")
-        return stopped, stopReason, { npcID = record.id }
+        local stopped = stopActivity(record, "debug_stop")
+        return stopped, stopped and "facility_activity_stopped"
+            or "facility_activity_not_active", { npcID = record.id }
     end
     local facility = PNC.SettlementRepository.GetFacility(args.facilityId)
     local base = facility and PNC.BaseService.Get(facility.baseId) or nil

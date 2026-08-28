@@ -12,10 +12,15 @@ package.preload["PNC/UI/Factions/PNC_FactionMemberModal"] = function()
 end
 
 local cancelledId
+local cancelledTaskId
 PNC = {
     Client = { RequestColonyAction = function(action, options)
-        T.equal(action, "work_cancel", "task action")
-        cancelledId = options.workOrderId
+        if action == "work_cancel" then
+            cancelledId = options.workOrderId
+        else
+            T.equal(action, "task_cancel", "transient task action")
+            cancelledTaskId = options.taskId
+        end
         return true
     end },
     FacilityDefinitions = {
@@ -65,6 +70,20 @@ modalOptions.onConfirm(modalOptions.context)
 T.equal(cancelledId, "build-1", "confirmed row cancels selected work order")
 T.contains(rows[2].label, "Crafted Spear", "craft output")
 T.contains(rows[2].detail, "UNASSIGNED", "queued task assignment")
+
+local transientRows = Tasks.BuildRows({ snapshot = { tasks = {
+    { id = "activity:npc-1", requestId = "activity:npc-1",
+        operation = "food.dine", sourceDomain = "facility_activity",
+        durable = false, cancellable = true, workerName = "Peter",
+        lifecycleState = "WORKING", percent = 0 },
+} } })
+T.equal(transientRows[1].action, "cancel_task",
+    "active facility activity exposes a transient cancellation action")
+T.truthy(Tasks.OnRow({}, transientRows[1]),
+    "transient task opens confirmation")
+modalOptions.onConfirm(modalOptions.context)
+T.equal(cancelledTaskId, "activity:npc-1",
+    "confirmed transient row cancels the selected activity")
 
 local empty = Tasks.BuildRows({ snapshot = { tasks = {} } })
 T.contains(empty[1].label, "NO AVAILABLE TASKS", "empty task state")

@@ -98,6 +98,10 @@ function Persistence.SerializeRecord(record)
     payload = {
         schemaVersion = Const.PERSISTENCE_VERSION,
         recordRevision = math.max(0, math.floor(Internal.normalizeNumber(record.recordRevision, 0))),
+        repairVersions = Persistence.Repairs
+            and Persistence.Repairs.CopyVersions(
+                record.persistenceRepairVersions
+            ) or nil,
         id = record.id,
         persist = record.persist ~= false,
         tacticalClass = record.tacticalClass,

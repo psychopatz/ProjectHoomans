@@ -11,6 +11,7 @@ local providers = {
     "PNC_Persistence_HealthCodec",
     "PNC_Persistence_RecordState",
     "PNC_Persistence_Runtime",
+    "PNC_Persistence_Repairs",
     "PNC_Persistence_Serialize",
     "PNC_Persistence_DeserializeFinalization",
     "PNC_Persistence_Deserialize",

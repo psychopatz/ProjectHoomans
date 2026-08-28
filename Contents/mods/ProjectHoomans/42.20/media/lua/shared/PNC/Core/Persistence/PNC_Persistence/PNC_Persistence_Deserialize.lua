@@ -141,6 +141,9 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     end
     record.id = tostring(raw.id or record.id)
     record.recordRevision = math.max(0, math.floor(Internal.normalizeNumber(raw.recordRevision, 0)))
+    record.persistenceRepairVersions = Persistence.Repairs
+        and Persistence.Repairs.NormalizeVersions(raw.repairVersions)
+        or {}
     record.x = Internal.normalizeNumber(position.x, record.x)
     record.y = Internal.normalizeNumber(position.y, record.y)
     record.z = Internal.normalizeNumber(position.z, record.z)

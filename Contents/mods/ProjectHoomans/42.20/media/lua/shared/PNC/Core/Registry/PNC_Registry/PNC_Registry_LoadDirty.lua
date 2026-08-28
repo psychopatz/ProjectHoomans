@@ -54,6 +54,17 @@ function Registry.Load()
         PNC.Network.ResetServerState()
     end
     directory = Internal.GetDirectory()
+    if PNC.Persistence and PNC.Persistence.Repairs
+        and PNC.Persistence.Repairs.Apply
+    then
+        local _, applied, failures = PNC.Persistence.Repairs.Apply(
+            "registry_directory", directory, {
+                objectId = Const.MODDATA_KEY,
+            })
+        if applied > 0 or failures > 0 then
+            Registry.DirectoryDirty = true
+        end
+    end
     if Registry.LoadDeathMarkers then
         Registry.LoadDeathMarkers(directory)
     end
@@ -66,6 +77,11 @@ function Registry.Load()
             if record then
                 Registry.Data[record.id] = record
                 Registry.SavedSnapshots[record.id] = Internal.CaptureSnapshot(record)
+                if record.persistenceRepairApplied == true
+                    or record.persistenceRepairPending == true
+                then
+                    Registry.MarkDirty(record, "persistence_repair")
+                end
                 if tonumber(raw and raw.schemaVersion)
                     ~= tonumber(Const.PERSISTENCE_VERSION)
                 then

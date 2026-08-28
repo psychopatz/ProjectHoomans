@@ -72,11 +72,13 @@ local function clearStaleWorkerState(record, workOrder, reason)
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "stale_work_order_recovered")
     end
-    if PNC.Tasking and PNC.Tasking.Commands
-        and PNC.Tasking.Commands.MarkDirty
+    if PNC.Tasking and PNC.Tasking.Events
+        and PNC.Tasking.Events.Emit
     then
-        PNC.Tasking.Commands.MarkDirty(record.id,
-            "STALE_WORK_ORDER_RECOVERED")
+        PNC.Tasking.Events.Emit("STALE_WORK_ORDER_RECOVERED", {
+            npcId = record.id, source = "WorkService.Reconciliation",
+            entityId = workOrder and workOrder.id,
+        })
     end
     return true
 end

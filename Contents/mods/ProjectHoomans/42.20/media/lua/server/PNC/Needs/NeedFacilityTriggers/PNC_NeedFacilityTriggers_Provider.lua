@@ -7,6 +7,7 @@ local AwayRoutes = PNC.NeedFacilityAwayRoutes
 local HomeRoute = PNC.NeedFacilityHomeRoute
 local Events = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
+local TaskEvents = PNC.Tasking and PNC.Tasking.Events
 
 local function recordFor(id)
     return PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(id) or nil
@@ -43,9 +44,12 @@ function Triggers.PreferFacility(record, triggerId)
     then
         return false
     end
-    if PNC.Tasking and PNC.Tasking.Commands then
-        PNC.Tasking.Commands.MarkDirty(record.id,
-            "NEED_FACILITY_" .. string.upper(definition.id))
+    if TaskEvents and TaskEvents.Emit then
+        TaskEvents.Emit("NEED_FACILITY_CHANGED", {
+            npcId = record.id, source = "NeedFacilityTriggers",
+            entityId = definition.id,
+            cause = "NEED_FACILITY_" .. string.upper(definition.id),
+        })
     end
     return true
 end
@@ -155,7 +159,6 @@ end
 local function stop(lease, reason)
     local record = recordFor(lease.npcId)
     if record and record.runtime and record.runtime.facilityActivity then
-        record.runtime.facilityActivity.reservationId = ""
         PNC.FacilityJobs.Stop(record, reason)
     end
     return true
@@ -176,8 +179,13 @@ if PNC.IndividualNeeds and PNC.IndividualNeeds.RegisterListener then
         function(record, needType)
             for _, definition in ipairs(Definitions.List()) do
                 if definition.needType == needType then
-                    PNC.Tasking.Commands.MarkDirty(record.id,
-                        "NEED_STATE_CHANGED")
+                    if TaskEvents and TaskEvents.Emit then
+                        TaskEvents.Emit("NPC_NEEDS_CHANGED", {
+                            npcId = record.id,
+                            source = "IndividualNeeds",
+                            entityId = needType,
+                        })
+                    end
                     return
                 end
             end
@@ -188,10 +196,12 @@ end
 -- need severity. Wake tasking on that inventory event so a newly delivered
 -- item is consumed immediately instead of waiting for NeedsScheduler.
 local function onInventoryChanged(record)
-    if record and PNC.Tasking and PNC.Tasking.Commands
-        and PNC.Tasking.Commands.MarkDirty
+    if record and TaskEvents and TaskEvents.Emit
     then
-        PNC.Tasking.Commands.MarkDirty(record.id, "NPC_INVENTORY_CHANGED")
+        TaskEvents.Emit("NPC_INVENTORY_CHANGED", {
+            npcId = record.id, source = "InventoryEvent",
+            entityId = record.id,
+        })
     end
 end
 

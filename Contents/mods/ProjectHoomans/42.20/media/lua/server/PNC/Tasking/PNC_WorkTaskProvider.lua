@@ -16,9 +16,14 @@ function Provider.GetCandidates(npcId)
     local record = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(npcId)
     if not record or record.alive == false or not Work then return {} end
     local output = {}
-    for _, order in ipairs(Work.Queries.List()) do
-        local eligible = assignable(order) and Work.Queries.CanAssign
-            and Work.Queries.CanAssign(order.id, npcId)
+    local indexed = Work.Queries.ListAssignableForWorker ~= nil
+    local orders = indexed
+        and Work.Queries.ListAssignableForWorker(npcId, 64)
+        or Work.Queries.List()
+    for _, order in ipairs(orders) do
+        local eligible = assignable(order)
+            and (indexed or not Work.Queries.CanAssign
+                or Work.Queries.CanAssign(order.id, npcId))
         if eligible == true then
             local priority = tonumber(order.priority) or 0
             output[#output + 1] = {
@@ -98,7 +103,10 @@ function Provider.Tick(lease)
             order and order.status or "WORK_ORDER_REMOVED")
     end
     if tostring(order.workerId or "") ~= lease.npcId then
-        PNC.Tasking.Commands.MarkDirty(lease.npcId, "WORK_ASSIGNMENT_LOST")
+        PNC.Tasking.Events.Emit("WORK_ASSIGNMENT_LOST", {
+            npcId = lease.npcId, source = "Tasking.WorkProvider",
+            entityId = lease.sourceRef,
+        })
         return false
     end
     local phase = order.completionStarted == true and "ATOMIC_COMMIT"

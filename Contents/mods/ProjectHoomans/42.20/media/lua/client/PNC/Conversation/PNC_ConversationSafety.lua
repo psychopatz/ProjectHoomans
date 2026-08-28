@@ -45,6 +45,13 @@ local function targetMatches(target, player, zombie, npcID)
         or target.worldObject == zombie
 end
 
+local function targetTargetsPlayer(target, player)
+    if not target or not player then return false end
+    if target == player then return true end
+    if type(target) ~= "table" then return false end
+    return target.player == player or target.worldObject == player
+end
+
 local function engineTargetsConversation(candidate, player, zombie)
     if not candidate or not candidate.getTarget then return false end
     local target = candidate:getTarget()
@@ -149,9 +156,14 @@ function Safety.HasDanger(
         or 0
     local runtime = record and record.runtime or {}
     local health = record and record.health or {}
+    local talkingTarget = targetTargetsPlayer(runtime.target, player)
     local hostileTalkingTarget = allowTalkingHostile == true
-        and targetMatches(runtime.target, player, zombie, npcID)
-    if (runtime.target ~= nil and not hostileTalkingTarget)
+        and talkingTarget
+    local passiveTalkingTarget = talkingTarget
+        and runtime.attackAction == nil
+        and current >= (tonumber(runtime.inCombatUntil) or 0)
+    local ignoredTalkingTarget = hostileTalkingTarget or passiveTalkingTarget
+    if (runtime.target ~= nil and not ignoredTalkingTarget)
         or (runtime.attackAction ~= nil and not hostileTalkingTarget)
         or (current < (tonumber(runtime.inCombatUntil) or 0)
             and not hostileTalkingTarget)

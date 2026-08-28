@@ -106,10 +106,13 @@ local function touch(record, reason)
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, reason or "recipe_knowledge")
     end
-    if PNC.Tasking and PNC.Tasking.Commands
-        and PNC.Tasking.Commands.MarkDirty
+    if PNC.Tasking and PNC.Tasking.Events
+        and PNC.Tasking.Events.Emit
     then
-        PNC.Tasking.Commands.MarkDirty(record.id, "RECIPE_KNOWLEDGE_CHANGED")
+        PNC.Tasking.Events.Emit("RECIPE_KNOWLEDGE_CHANGED", {
+            npcId = record.id, source = "RecipeKnowledge",
+            entityId = record.id,
+        })
     end
 end
 

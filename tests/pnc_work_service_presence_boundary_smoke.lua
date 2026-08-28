@@ -75,7 +75,7 @@ for name, _ in pairs(public.queries) do
 end
 T.equal(serviceCount, 8, "service function declaration count")
 T.equal(commandCount, 14, "command function declaration count")
-T.equal(queryCount, 5, "query function declaration count")
+T.equal(queryCount, 6, "query function declaration count")
 
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil

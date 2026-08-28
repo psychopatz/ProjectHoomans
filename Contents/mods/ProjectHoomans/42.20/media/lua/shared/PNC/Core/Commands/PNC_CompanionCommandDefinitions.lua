@@ -61,6 +61,26 @@ local function manualProvision(record)
     return ok == true
 end
 
+local function stopActivity(record, reason)
+    local lease = PNC.TaskLeaseService and PNC.TaskLeaseService.ForNPC
+        and PNC.TaskLeaseService.ForNPC(record.id) or nil
+    if lease and PNC.Tasking and PNC.Tasking.Commands
+        and PNC.Tasking.Commands.CancelLease
+    then
+        local stopped = PNC.Tasking.Commands.CancelLease(
+            lease.leaseId, reason or "player_stop")
+        if stopped == true
+            or not record.runtime
+            or not record.runtime.facilityActivity
+        then
+            return stopped == true
+        end
+    end
+    return PNC.FacilityJobs and PNC.FacilityJobs.Stop
+        and PNC.FacilityJobs.Stop(record, reason or "player_stop") == true
+        or false
+end
+
 Commands.Register({
     id = "follow",
     group = "movement",
@@ -143,8 +163,7 @@ Commands.Register({
         )
     end,
     apply = function(record)
-        return PNC.FacilityJobs and PNC.FacilityJobs.Stop
-            and PNC.FacilityJobs.Stop(record, "player_stop") == true
+        return stopActivity(record, "player_stop")
     end,
 })
 

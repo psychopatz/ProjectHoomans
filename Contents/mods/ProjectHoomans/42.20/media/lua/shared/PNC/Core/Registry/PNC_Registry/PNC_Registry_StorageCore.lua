@@ -80,6 +80,9 @@ local function getDirectory()
     directory.records = type(directory.records) == "table" and directory.records or {}
     directory.deathMarkers = type(directory.deathMarkers) == "table"
         and directory.deathMarkers or {}
+    directory.repairVersions = Persistence.Repairs
+        and Persistence.Repairs.NormalizeVersions(directory.repairVersions)
+        or {}
     return directory
 end
 

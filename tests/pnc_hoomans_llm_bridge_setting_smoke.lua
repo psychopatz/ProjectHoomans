@@ -67,7 +67,8 @@ T.equal(bridge.registerCount, 0, "disabled bridge does not register commands")
 configEnabled = true
 onTick()
 T.truthy(bootstrap.enabled, "enabled setting activates the bridge")
-T.equal(bridge.registerCount, 2, "enabled bridge registers both LLM commands")
+T.equal(bridge.registerCount, 5,
+    "enabled bridge registers LLM and speech event commands")
 
 configEnabled = false
 onTick()

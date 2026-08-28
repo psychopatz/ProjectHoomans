@@ -80,7 +80,7 @@ function Provider.Start(lease, assignment)
             taskLeaseId = lease.leaseId,
             abstract = lease.executionMode == "ABSTRACT" })
     if ok then PNC.TaskLeaseService.SetPhase(lease.leaseId,
-        lease.executionMode == "LIVE" and "TRAVEL" or "WAITING_FOR_WORLD") end
+        lease.executionMode == "LIVE" and "TRAVEL" or "WAITING") end
     return ok, reason
 end
 
@@ -105,7 +105,6 @@ end
 function Provider.Cancel(lease)
     local record = recordFor(lease and lease.npcId)
     if record and record.runtime and record.runtime.facilityActivity then
-        record.runtime.facilityActivity.reservationId = ""
         PNC.FacilityJobs.Stop(record, "farming_task_cancelled")
     end
     return true

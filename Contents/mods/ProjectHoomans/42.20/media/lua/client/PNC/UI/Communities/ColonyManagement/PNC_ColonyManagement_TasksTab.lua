@@ -70,9 +70,16 @@ end
 
 local function taskLabel(task)
     local operation = tostring(task.operation or "")
+    local activityVerb = {
+        ["food.dine"] = "EAT",
+        ["survival.eat.inventory"] = "EAT",
+        ["water.drink"] = "DRINK",
+        ["water.nearby"] = "DRINK",
+        ["sleep"] = "SLEEP",
+    }
     local definition = OPERATION_KEYS[operation]
     local verb = definition and Shared.Tr(definition[1], definition[2])
-        or operation
+        or activityVerb[operation] or operation
     local target = targetName(task)
     return verb .. (target and " " .. target or "") .. "  "
         .. tostring(math.max(0, math.min(100,
@@ -116,7 +123,9 @@ function Tasks.BuildRows(context)
             detail = taskDetail(task),
             colorName = status == "BLOCKED" and "warning"
                 or task.workerId and "success" or "muted",
-            action = task.cancellable ~= false and "cancel_work" or nil,
+            action = task.cancellable ~= false
+                and (task.durable == false and "cancel_task" or "cancel_work")
+                or nil,
             actionLabel = Shared.Tr("UI_PNC_Work_Cancel", "CANCEL"),
             actionColorName = "warning",
             workOrder = task,
@@ -127,7 +136,9 @@ end
 
 function Tasks.OnRow(window, row)
     local task = row and row.workOrder or nil
-    if row.action ~= "cancel_work" or not task or not task.id then
+    if (row.action ~= "cancel_work" and row.action ~= "cancel_task")
+        or not task or not task.id
+    then
         return false
     end
     local ConfirmModal = require "PNC/UI/Factions/PNC_FactionMemberModal"
@@ -140,9 +151,12 @@ function Tasks.OnRow(window, row)
         danger = true,
         context = { requestId = task.requestId or task.id },
         onConfirm = function(context)
-            PNC.Client.RequestColonyAction("work_cancel", {
+            local action = row.action == "cancel_task"
+                and "task_cancel" or "work_cancel"
+            PNC.Client.RequestColonyAction(action, {
                 requestId = context.requestId,
                 workOrderId = context.requestId,
+                taskId = context.requestId,
             })
         end,
     })

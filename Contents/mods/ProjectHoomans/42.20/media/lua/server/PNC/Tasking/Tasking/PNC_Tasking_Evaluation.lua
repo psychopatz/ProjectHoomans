@@ -9,21 +9,45 @@ local H = Tasking.Internal
 
 function H.Collect(record)
     local candidates = {}
+    local failures = {}
+    local maximum = math.max(1, math.floor(tonumber(
+        Tasking.MAX_CANDIDATES_PER_PROVIDER) or 64))
     if ScalingDiagnostics then
         ScalingDiagnostics.Increment("NPCDecisions.CandidateBuilds")
     end
     for domain, provider in pairs(Tasking.Providers) do
-        local values = provider.GetCandidates(record.id)
-        for _, value in ipairs(type(values) == "table" and values or {}) do
+        local context = { npcId = record.id, domain = domain }
+        local ok, values, callbackError = H.SafeCall(
+            "provider_get_candidates", provider.GetCandidates, context,
+            record.id)
+        if not ok then
+            failures[#failures + 1] = { domain = domain,
+                error = callbackError }
+        end
+        local providerCount = 0
+        for _, value in ipairs(ok and type(values) == "table" and values
+            or {}) do
+            if providerCount >= maximum then
+                Tasking.Diagnostics.counters.candidateTruncations =
+                    Tasking.Diagnostics.counters.candidateTruncations + 1
+                break
+            end
+            providerCount = providerCount + 1
             local intent = PNC.TaskIntent.Normalize(value)
             if intent then
-                local valid = provider.Validate(intent)
-                if valid == true then candidates[#candidates + 1] = intent end
+                local validOK, valid = H.SafeCall("provider_validate",
+                    provider.Validate, context, intent)
+                if validOK and valid == true then
+                    candidates[#candidates + 1] = intent
+                elseif not validOK then
+                    failures[#failures + 1] = { domain = domain,
+                        error = "VALIDATE_CALLBACK_FAILED" }
+                end
             end
         end
     end
     table.sort(candidates, function(a, b) return Priority.Compare(a, b) > 0 end)
-    return candidates
+    return candidates, failures
 end
 
 function H.StopLease(lease, reason)
@@ -32,7 +56,39 @@ function H.StopLease(lease, reason)
         return requested, state
     end
     local provider = Tasking.Providers[lease.sourceDomain]
-    if provider and provider.Cancel then provider.Cancel(lease, reason) end
+    local providerOK, providerResult, providerReason = true, true, nil
+    if provider and provider.Cancel then
+        providerOK, providerResult, providerReason = H.SafeCall(
+            "provider_cancel", provider.Cancel, {
+                npcId = lease.npcId, leaseId = lease.leaseId,
+                domain = lease.sourceDomain,
+            }, lease, reason)
+    end
+    -- A provider can fail after setting the lease to CANCELLING. Give the
+    -- facility owner one last chance to clear an activity that still points
+    -- at this lease before releasing the lease itself.
+    local cleanupOK = providerOK and providerResult ~= false
+    if not cleanupOK
+        and PNC.Registry and PNC.Registry.Get
+        and PNC.FacilityJobs and PNC.FacilityJobs.Stop
+    then
+        local record = PNC.Registry.Get(lease.npcId)
+        local activity = record and record.runtime
+            and record.runtime.facilityActivity or nil
+        if activity and tostring(activity.taskLeaseId or "")
+            == tostring(lease.leaseId)
+        then
+            local fallbackOK, fallbackResult = H.SafeCall(
+                "facility_cleanup_fallback", PNC.FacilityJobs.Stop, {
+                    npcId = lease.npcId, leaseId = lease.leaseId,
+                    domain = lease.sourceDomain,
+                }, record, reason or "task_provider_cleanup")
+            cleanupOK = fallbackOK and fallbackResult ~= false
+        end
+    end
+    if not cleanupOK then
+        return false, providerReason or "TASK_CLEANUP_FAILED"
+    end
     return Leases.Release(lease.leaseId, reason)
 end
 
@@ -57,9 +113,16 @@ function H.ExternalCurrent(record)
     return nil
 end
 
-function Tasking.Commands.Reevaluate(npcId, cause)
+function Tasking.Commands.Reevaluate(npcId, cause, event)
     local record = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(npcId)
     local diagnostics = { lastCause = tostring(cause or "manual"), candidates = {} }
+    if type(event) == "table" then
+        diagnostics.eventId = event.id
+        diagnostics.eventType = event.type
+        diagnostics.eventSource = event.source
+        diagnostics.eventRevision = event.revision
+        diagnostics.eventCauses = event.causes
+    end
     Tasking.Diagnostics.byNPC[tostring(npcId)] = diagnostics
     Tasking.Diagnostics.counters.reevaluations =
         Tasking.Diagnostics.counters.reevaluations + 1
@@ -72,19 +135,15 @@ function Tasking.Commands.Reevaluate(npcId, cause)
         diagnostics.lastReason = "NPC_UNAVAILABLE"
         return false, diagnostics.lastReason
     end
-    local current = Leases.ForNPC(npcId)
-    local previousTaskId = current and current.taskId or nil
-    if current then
-        local provider = Tasking.Providers[current.sourceDomain]
-        local canContinue = provider and provider.CanContinue
-            and provider.CanContinue(current) == true
-        if not canContinue then
-            H.StopLease(current, "task_invalidated"); current = nil
-        end
+    local current, currentOK, currentReason = H.ReconcileCurrentLease(npcId)
+    if not currentOK then
+        diagnostics.lastReason = currentReason or "TASK_CLEANUP_FAILED"
+        return false, diagnostics.lastReason
     end
-    local candidates = H.Collect(record)
+    local candidates, providerFailures = H.Collect(record)
     Tasking.Diagnostics.counters.candidates =
         Tasking.Diagnostics.counters.candidates + #candidates
+    diagnostics.providerFailures = providerFailures
     for _, intent in ipairs(candidates) do
         diagnostics.candidates[#diagnostics.candidates + 1] = H.Copy(intent)
     end
@@ -99,51 +158,27 @@ function Tasking.Commands.Reevaluate(npcId, cause)
         end
         diagnostics.lastReason = "CURRENT_TASK_CONTINUES"; return true, current
     end
-    if current then
-        local allowed, reason = Priority.CanPreempt(current, winner)
-        if not allowed then diagnostics.lastReason = reason; return true, current end
-        H.StopLease(current, "preempted")
-        Tasking.Diagnostics.counters.preemptions =
-            Tasking.Diagnostics.counters.preemptions + 1
-    else
-        local external = H.ExternalCurrent(record)
-        if external then
-            previousTaskId = external.taskId
-            local allowed, reason = Priority.CanPreempt(external, winner)
-            if not allowed then diagnostics.lastReason = reason; return false, reason end
-            local released = PNC.WorkService and PNC.WorkService.Commands
-                and PNC.WorkService.Commands.ReleaseWorker
-                and PNC.WorkService.Commands.ReleaseWorker(record.id,
-                    "task_preempted")
-            if not released then diagnostics.lastReason = "PREEMPTION_FAILED"; return false, diagnostics.lastReason end
-            Tasking.Diagnostics.counters.preemptions =
-                Tasking.Diagnostics.counters.preemptions + 1
+    local previousTaskId
+    local preemptOK, previous, didPreempt, preemptReason, preemptFailure = H.Preempt(
+        record, current, winner)
+    previousTaskId = previous
+    if not preemptOK then
+        diagnostics.lastReason = preemptReason
+        if current and preemptFailure == "not_allowed" then
+            return true, current
         end
-    end
-    local provider = Tasking.Providers[winner.sourceDomain]
-    local assignment, reason = provider.Assign(winner)
-    if not assignment then diagnostics.lastReason = reason or "ASSIGN_FAILED"; return false, diagnostics.lastReason end
-    local lease, leaseReason = Leases.Create(winner, assignment)
-    if not lease then
-        if provider.RollbackAssignment then
-            provider.RollbackAssignment(winner, assignment,
-                "lease_creation_failed")
-        elseif assignment.reservationId and PNC.FacilityReservations then
-            PNC.FacilityReservations.Release(assignment.reservationId,
-                "lease_creation_failed")
-        end
-        diagnostics.lastReason = leaseReason; return false, leaseReason
-    end
-    local started, startReason = provider.Start(lease, assignment)
-    if started ~= true then
-        if provider.RollbackAssignment then
-            provider.RollbackAssignment(winner, assignment, "start_failed")
-            lease.reservationId = nil
-        end
-        Leases.Release(lease.leaseId, "start_failed")
-        diagnostics.lastReason = startReason or "START_FAILED"
         return false, diagnostics.lastReason
     end
+    if didPreempt then
+        Tasking.Diagnostics.counters.preemptions =
+            Tasking.Diagnostics.counters.preemptions + 1
+    end
+    local assigned, leaseOrReason = H.Assign(winner)
+    if not assigned then
+        diagnostics.lastReason = leaseOrReason or "ASSIGN_FAILED"
+        return false, diagnostics.lastReason
+    end
+    local lease = leaseOrReason
     diagnostics.lastReason, diagnostics.currentLeaseId = "ASSIGNED", lease.leaseId
     if ScalingDiagnostics then
         ScalingDiagnostics.Increment("NPCDecisions.TaskAssignments")
@@ -154,5 +189,23 @@ function Tasking.Commands.Reevaluate(npcId, cause)
     return true, lease
 end
 
-return Tasking
+-- Immediate decisions still pass through the inbox. Removing the pending
+-- entry first prevents a command that needs an immediate response from being
+-- evaluated a second time by the next scheduled pump.
+function Tasking.Commands.ReevaluateNow(event)
+    if type(event) ~= "table" then return false, "TASK_EVENT_REQUIRED" end
+    local npcId = tostring(event.npcId or "")
+    if npcId == "" then return false, "TASK_EVENT_NPC_REQUIRED" end
+    if Tasking.Inbox and Tasking.Inbox.Remove then
+        local removed, entry = Tasking.Inbox.Remove(npcId)
+        if removed then event.causes = Tasking.Inbox.Causes(entry) end
+    end
+    local ok, result, reason = H.SafeCall("task_reevaluate_immediate",
+        Tasking.Commands.Reevaluate, { npcId = npcId,
+            eventId = event.id, domain = event.source }, npcId,
+        event.cause or event.type, event)
+    if not ok then return false, reason or "TASK_REEVALUATION_FAILED" end
+    return result, reason
+end
 
+return Tasking

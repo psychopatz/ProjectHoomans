@@ -22,6 +22,11 @@ function Internal.handleWorkDebugAction(player, args, action)
         ok, details = PNC.TaskRequestService.Commands.CancelForPlayer(
             player, args.requestId or args.workOrderId, "player_cancelled")
         reason = ok and "CANCELLED" or details
+    elseif action == "task_cancel" then
+        ok, details = PNC.TaskRequestService.Commands
+            .CancelTransientForPlayer(
+                player, args.requestId or args.taskId, "player_cancelled")
+        reason = ok and "CANCELLED" or details
     elseif action == "work_pause" then
         ok, details = PNC.TaskRequestService.Commands.PauseForPlayer(
             player, args.requestId or args.workOrderId, args.paused ~= false)

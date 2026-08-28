@@ -113,8 +113,10 @@ function Service.QueueMultiple(player, arguments)
     forEachWorker(session, function(npcId)
         local worker = session.workers and session.workers[npcId] or nil
         if worker and worker.phase == "IDLE" then worker.phase = "READY" end
-        PNC.Tasking.Commands.MarkDirty(npcId, "SCAVENGE_COLLECTION_QUEUED")
-        PNC.Tasking.Commands.Reevaluate(npcId, "SCAVENGE_COLLECTION_QUEUED")
+        PNC.Tasking.Events.Emit("SCAVENGE_COLLECTION_QUEUED", {
+            npcId = npcId, source = "ScavengeService",
+            entityId = session.id,
+        }, { immediate = true })
     end)
     return true, "collection_queued", Service.BuildSnapshot(session)
 end

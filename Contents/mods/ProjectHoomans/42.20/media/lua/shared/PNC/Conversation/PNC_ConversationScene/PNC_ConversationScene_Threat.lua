@@ -29,9 +29,14 @@ local function runtimeHasThreat(record, player, ignoreTalkingNPC)
     local runtime = record and record.runtime or {}
     local health = record and record.health or {}
     local current = Internal.Now()
+    local talkingTarget = Internal.TargetsPlayer(runtime.target, player)
     local hostileTalkingTarget = ignoreTalkingNPC == true
-        and Internal.TargetsPlayer(runtime.target, player)
-    return (runtime.target ~= nil and not hostileTalkingTarget)
+        and talkingTarget
+    local passiveTalkingTarget = talkingTarget
+        and runtime.attackAction == nil
+        and current >= (tonumber(runtime.inCombatUntil) or 0)
+    local ignoredTalkingTarget = hostileTalkingTarget or passiveTalkingTarget
+    return (runtime.target ~= nil and not ignoredTalkingTarget)
         or (runtime.attackAction ~= nil and not hostileTalkingTarget)
         or (current < (tonumber(runtime.inCombatUntil) or 0)
             and not hostileTalkingTarget)
