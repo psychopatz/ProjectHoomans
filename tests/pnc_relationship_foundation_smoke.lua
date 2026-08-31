@@ -514,6 +514,39 @@ T.equal(countMemories(
     normalizedOnce.relationships[clampKey]
 ), 1, "invalid memory discarded")
 
+-- Conversation cooldowns are stored by the same persistent relationship
+-- mutation boundary as the memory and score effects.
+local conversationApplied = PNC.Relationships.ApplyConversationEffect(
+    alice.id,
+    playerKey,
+    {
+        memoryType = "player_admired",
+        interactionType = "player_admired",
+        approval = 3,
+        respect = 4,
+        familiarity = 1,
+    },
+    {
+        blockID = "llm_social_reaction",
+        choiceID = "conversation-cooldown",
+        outcomeID = "admire",
+        worldAgeHours = 24,
+        cooldownType = "llm_positive_social",
+        cooldownUntil = 48,
+    }
+)
+T.truthy(conversationApplied,
+    "conversation effect commits through relationship mutation")
+local conversationRelationship = PNC.Relationships.Get(
+    alice.id,
+    playerKey
+)
+T.equal(conversationRelationship.cooldowns.llm_positive_social, 48,
+    "conversation positive cooldown is persisted")
+T.equal(conversationRelationship.memories[
+    #conversationRelationship.memories
+].type, "player_admired", "conversation memory type is persisted")
+
 -- 24-25. Older records migrate deterministically to V15 and can run again.
 T.equal(PNC.Const.PERSISTENCE_VERSION, 15,
     "persistence schema advanced to V15")

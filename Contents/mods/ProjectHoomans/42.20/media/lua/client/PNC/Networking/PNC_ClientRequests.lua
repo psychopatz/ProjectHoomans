@@ -292,8 +292,9 @@ function Client.RequestNPCKnowledgeTopic(npcID, topicID)
     }
     ClientState.pendingDisclosure = ClientState.pendingDisclosure or {}
     ClientState.pendingDisclosure[npcID] = args.requestID
-    return dispatchIdentity(player, Const.CMD_KNOWLEDGE_DISCLOSURE_REQUEST,
-        args, "HandleDisclosure")
+    local accepted, reason = dispatchIdentity(player,
+        Const.CMD_KNOWLEDGE_DISCLOSURE_REQUEST, args, "HandleDisclosure")
+    return accepted, reason, args.requestID
 end
 
 function Client.RequestKnowledgeDebug(npcID, showTruth, descriptorID)

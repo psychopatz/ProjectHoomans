@@ -21,7 +21,8 @@ function Scene.HandleClientCommand(player, command, args)
             record,
             zombie,
             args.token,
-            args.reason or "conversation_client_close"
+            args.reason or "conversation_client_close",
+            { llmRequestID = args.llmRequestID, player = player }
         )
     end
     if command == Scene.CMD_CEASEFIRE then

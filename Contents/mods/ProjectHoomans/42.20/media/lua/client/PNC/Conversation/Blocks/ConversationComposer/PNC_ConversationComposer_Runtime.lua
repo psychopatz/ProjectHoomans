@@ -59,7 +59,7 @@ local function appendDiary(npcID, entry)
     return false
 end
 
-local function receiveRelationshipAfter(npcID, after)
+local function receiveRelationshipAfter(npcID, after, delta, metadata)
     if type(after) ~= "table" then return false end
     local summary = {
         npcID = npcID,
@@ -72,7 +72,7 @@ local function receiveRelationshipAfter(npcID, after)
         revision = after.revision,
     }
     if Relationship and Relationship.ReceivePresentation then
-        Relationship.ReceivePresentation(summary)
+        Relationship.ReceivePresentation(summary, delta, metadata)
     end
     local view = activeView(npcID)
     local context = view and view.spec and view.spec.context

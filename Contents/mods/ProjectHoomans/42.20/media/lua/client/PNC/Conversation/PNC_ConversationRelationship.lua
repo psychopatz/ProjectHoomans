@@ -4,6 +4,8 @@ PNC.Conversation = PNC.Conversation or {}
 
 local Relationship = PNC.Conversation.Relationship or {}
 PNC.Conversation.Relationship = Relationship
+local presentationCache = Relationship.presentationCache or {}
+Relationship.presentationCache = presentationCache
 
 Relationship.categories = {
     FirstMeet = true,
@@ -108,18 +110,42 @@ function Relationship.GetPresentation(npcID)
         or nil
 end
 
-function Relationship.ReceivePresentation(summary)
+local function copyPresentation(summary)
+    return {
+        npcID = tostring(summary.npcID or ""),
+        exists = summary.exists == true,
+        approval = tonumber(summary.approval) or 0,
+        respect = tonumber(summary.respect) or 0,
+        familiarity = tonumber(summary.familiarity) or 0,
+        state = summary.state,
+        previousState = summary.previousState,
+        revision = tonumber(summary.revision) or 0,
+    }
+end
+
+function Relationship.ReceivePresentation(summary, delta, metadata)
     if type(summary) ~= "table" or not summary.npcID then return false end
+    local npcID = tostring(summary.npcID)
+    local previous = presentationCache[npcID]
+    presentationCache[npcID] = copyPresentation(summary)
+    local feedback = PNC.NameplateRelationshipFeedback
+    if feedback and feedback.Observe then
+        metadata = type(metadata) == "table" and metadata or {}
+        if metadata.source == nil then
+            metadata.source = "relationship_presentation"
+        end
+        feedback.Observe(npcID, previous, summary, delta, metadata)
+    end
     local state = PNC.Network and PNC.Network.ClientState or nil
     if state then
         state.conversationRelationships = state.conversationRelationships or {}
-        state.conversationRelationships[tostring(summary.npcID)] = summary
+        state.conversationRelationships[npcID] = summary
     end
     local view = PsychopatzCore
         and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.instance or nil
     if view and view.spec
-        and tostring(view.spec.npcID or "") == tostring(summary.npcID)
+        and tostring(view.spec.npcID or "") == npcID
         and view.extensionParts
         and view.extensionParts.relationship
         and view.extensionParts.relationship.setRelationship
@@ -127,6 +153,28 @@ function Relationship.ReceivePresentation(summary)
         view.extensionParts.relationship:setRelationship(summary)
     end
     return true
+end
+
+function Relationship.ReceiveAfter(npcID, after, delta, metadata)
+    if type(after) ~= "table" then return false end
+    return Relationship.ReceivePresentation({
+        npcID = npcID,
+        exists = true,
+        approval = after.approval,
+        respect = after.respect,
+        familiarity = after.familiarity,
+        state = after.state,
+        previousState = after.previousState,
+        revision = after.revision,
+    }, delta, metadata)
+end
+
+function Relationship.ResetPresentationCache()
+    for npcID, _ in pairs(presentationCache) do
+        presentationCache[npcID] = nil
+    end
+    local feedback = PNC.NameplateRelationshipFeedback
+    if feedback and feedback.Reset then feedback.Reset() end
 end
 
 function Relationship.ReceiveDebugSnapshot(snapshot)

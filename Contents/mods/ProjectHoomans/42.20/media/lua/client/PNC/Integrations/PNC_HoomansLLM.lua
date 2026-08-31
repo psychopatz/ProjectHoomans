@@ -37,6 +37,7 @@ end
 local MAX_INPUT_LENGTH = 4000
 local MAX_LOG_TEXT = 900
 local Pending = nil
+local PendingQueue = {}
 local ActiveSpeech = {}
 local serial = 0
 
@@ -45,6 +46,26 @@ local function trim(value)
     value = string.gsub(value, "^%s+", "")
     value = string.gsub(value, "%s+$", "")
     return value
+end
+
+local function cleanResponseText(value)
+    value = trim(value)
+    -- Text-only providers such as Horde may stop inside the optional action
+    -- envelope. It is a protocol fragment, never NPC dialogue. Complete
+    -- envelopes should already have been extracted by PBrainZ; this is a
+    -- defensive presentation boundary for older or partial bridge replies.
+    value = string.gsub(
+        value,
+        "<projecthoomans%-action>[%s%S]-</projecthoomans%-action>",
+        ""
+    )
+    value = string.gsub(
+        value,
+        "<projecthoomans%-action[^>]*>[%s%S]*$",
+        ""
+    )
+    value = string.gsub(value, "</projecthoomans%-action%s*>", "")
+    return trim(value)
 end
 
 local function logText(value)
@@ -114,43 +135,90 @@ local function buildPacket(view, requestID, message)
     return packet
 end
 
-function Integration.Submit(view, value)
-    if not bridgeEnabled() then
-        return false, "bridge_disabled"
-    end
-    if Pending then return false, "llm_request_pending" end
-    local headless = view and view.headless == true
-        and view.hoomansLLM == true
-    if not view or (view ~= currentView() and not headless)
-        or not view.session
+local function recipientViews(view, part)
+    local inline = Integration.Inline
+    if part and inline and part == inline.part
+        and tostring(part.inputMode or "nearest") == "nearby"
+        and type(inline.hosts) == "table"
+        and #inline.hosts > 0
     then
-        return false, "conversation_unavailable"
+        return inline.hosts
     end
-    if not view:isConversationInteractive() then
-        return false, "conversation_busy"
-    end
-    value = trim(value)
-    if value == "" then return false, "empty_message" end
-    value = string.sub(value, 1, MAX_INPUT_LENGTH)
+    return { view }
+end
 
-    local session = view.session
+local function queueItem(view, value)
     serial = serial + 1
     local requestID = "pnc_llm_" .. tostring(now()) .. "_" .. tostring(serial)
-    -- Build the packet before changing the session state. If a context
-    -- adapter is unavailable, the conversation remains usable instead of
-    -- being left permanently in the waiting state.
     local packet = buildPacket(view, requestID, value)
-    if not packet then return false, "context_unavailable" end
-    local pendingChoices = session.currentNode and session.currentNode.choices or {}
+    local lifecycleState = view and view.spec and view.spec.context
+        and view.spec.context.conversationLifecycleState
+        or view and view.lifecycleState or nil
+    if not packet then return nil end
+    if lifecycleState then lifecycleState.llmRequestID = requestID end
+    return {
+        requestID = requestID,
+        npcID = tostring(view.spec and view.spec.npcID or "unknown"),
+        view = view,
+        packet = packet,
+        lifecycleState = lifecycleState,
+        claimed = false,
+    }
+end
+
+local function clearLLMRequestState(item)
+    local state = item and item.lifecycleState or nil
+    if state and tostring(state.llmRequestID or "")
+        == tostring(item.requestID or "")
+    then
+        state.llmRequestID = nil
+    end
+end
+
+local function reserveQueueItem(item)
+    local client = PNC.Client
+    local context = item and item.packet
+        and item.packet.conversation_context or {}
+    if not client or not client.ReserveLLMRequest then
+        return true
+    end
+    local accepted, reason = client.ReserveLLMRequest(
+        item.npcID,
+        context.conversation_token,
+        item.requestID
+    )
+    if accepted ~= true then
+        log(
+            "llm_request_reserve_failed",
+            "npc=" .. tostring(item.npcID)
+                .. " request=" .. tostring(item.requestID)
+                .. " reason=" .. tostring(reason or "rejected")
+        )
+        return false, reason or "llm_request_reserve_failed"
+    end
+    log(
+        "llm_request_reserved",
+        "npc=" .. tostring(item.npcID)
+            .. " request=" .. tostring(item.requestID)
+            .. " reason=" .. tostring(reason or "reserved")
+    )
+    return true
+end
+
+local function prepareQueueItem(item, value)
+    local view = item.view
+    local session = view.session
+    local pendingChoices = session.currentNode
+        and session.currentNode.choices or {}
     local inputMessage = session:append("player", value, {
         source = {
             kind = "llm",
             channel = "input",
-            requestID = requestID,
-            sessionID = packet.session_id,
+            requestID = item.requestID,
+            sessionID = item.packet.session_id,
         },
     })
-    if inputMessage then packet.message_id = inputMessage.messageID end
+    if inputMessage then item.packet.message_id = inputMessage.messageID end
     session.pendingChoices = pendingChoices
     session.pendingNext = nil
     session.pendingClose = nil
@@ -167,24 +235,139 @@ function Integration.Submit(view, value)
     }
     session.busy = true
     view.historyPart:setTyping("npc")
-    Pending = {
-        requestID = requestID,
-        npcID = tostring(view.spec and view.spec.npcID or "unknown"),
-        view = view,
-        packet = packet,
-        claimed = false,
-    }
     if Speech and Speech.SetPending then
         Speech.SetPending(
-            Pending.npcID,
-            requestID,
+            item.npcID,
+            item.requestID,
             session.conversationID
         )
     end
+end
+
+local function activateNextPending()
+    Pending = table.remove(PendingQueue, 1)
+    if Pending then
+        log(
+            "task_ready",
+            "npc=" .. tostring(Pending.npcID)
+                .. " request=" .. tostring(Pending.requestID)
+        )
+    end
+    return Pending
+end
+
+local function finishPendingRequest()
+    local finished = Pending
+    local context = finished and finished.packet
+        and finished.packet.conversation_context or {}
+    local client = PNC.Client
+    local released
+    local releaseReason
+    if finished and client and client.ReleaseLLMRequest then
+        released, releaseReason = client.ReleaseLLMRequest(
+            finished.npcID,
+            context.conversation_token,
+            finished.requestID,
+            "request_completed"
+        )
+        if released ~= true then
+            log(
+                "llm_request_release_failed",
+                "npc=" .. tostring(finished.npcID)
+                    .. " request=" .. tostring(finished.requestID)
+                    .. " reason=" .. tostring(
+                        releaseReason or "rejected"
+                    )
+            )
+        else
+            log(
+                "llm_request_released",
+                "npc=" .. tostring(finished.npcID)
+                    .. " request=" .. tostring(finished.requestID)
+                    .. " reason=" .. tostring(
+                        releaseReason or "released"
+                    )
+            )
+        end
+    end
+    clearLLMRequestState(finished)
+    if finished and Speech and Speech.ClearPending then
+        Speech.ClearPending(finished.npcID, finished.requestID)
+    end
+    activateNextPending()
+    return finished
+end
+
+function Integration.Submit(view, value, part)
+    if not bridgeEnabled() then
+        return false, "bridge_disabled"
+    end
+    if Pending or #PendingQueue > 0 then
+        return false, "llm_request_pending"
+    end
+    local headless = view and view.headless == true
+        and view.hoomansLLM == true
+    if not view or (view ~= currentView() and not headless)
+        or not view.session
+    then
+        return false, "conversation_unavailable"
+    end
+    if not view:isConversationInteractive() then
+        return false, "conversation_busy"
+    end
+    value = trim(value)
+    if value == "" then return false, "empty_message" end
+    value = string.sub(value, 1, MAX_INPUT_LENGTH)
+
+    local views = recipientViews(view, part)
+    local items = {}
+    local seen = {}
+    local item
+    local targetView
+    for _, targetView in ipairs(views) do
+        local targetID = targetView and targetView.spec
+            and tostring(targetView.spec.npcID or "") or ""
+        if targetID == "" or seen[targetID] then
+            return false, "conversation_unavailable"
+        end
+        seen[targetID] = true
+        local headless = targetView.headless == true
+            and targetView.hoomansLLM == true
+        if targetView ~= currentView() and not headless then
+            return false, "conversation_unavailable"
+        end
+        if not targetView.session
+            or not targetView:isConversationInteractive()
+        then
+            return false, "conversation_busy"
+        end
+        item = queueItem(targetView, value)
+        if not item then return false, "context_unavailable" end
+        items[#items + 1] = item
+    end
+    if #items == 0 then return false, "conversation_unavailable" end
+    local recipientCount = #items
+    -- Build every packet before changing any session state. A multi-recipient
+    -- send is therefore atomic if one context adapter cannot build its view.
+    for _, queued in ipairs(items) do
+        local reserved, reserveReason = reserveQueueItem(queued)
+        if not reserved then
+            for _, failedItem in ipairs(items) do
+                clearLLMRequestState(failedItem)
+            end
+            return false, reserveReason
+        end
+    end
+    for _, queued in ipairs(items) do
+        prepareQueueItem(queued, value)
+    end
+    PendingQueue = items
+    activateNextPending()
     log(
         "chat_submit",
-        "npc=" .. tostring(Pending.npcID)
-            .. " request=" .. requestID
+        "recipients=" .. tostring(recipientCount)
+            .. " first_npc=" .. tostring(Pending.npcID)
+            .. " request=" .. tostring(Pending.requestID)
             .. " chars=" .. tostring(#value)
             .. " message=" .. logText(value)
     )
@@ -234,6 +417,12 @@ local function applySemanticTools(packet, arguments, npcID, session)
     local calls = arguments and arguments.semantic_tool_calls
     local results = {}
     if type(calls) ~= "table" then return results end
+    log(
+        "tool_calls_received",
+        "npc=" .. tostring(npcID)
+            .. " request=" .. tostring(packet and packet.request_id)
+            .. " count=" .. tostring(#calls)
+    )
     for index, call in ipairs(calls) do
         local name = trim(call and call.name)
         local callID = trim(call and call.id)
@@ -266,6 +455,22 @@ local function applySemanticTools(packet, arguments, npcID, session)
             else
                 result.reason = "social_reaction_client_unavailable"
             end
+        elseif name == "ask_name" and exposedTool(packet, name) then
+            local requestTopic = PNC.Client
+                and PNC.Client.RequestNPCKnowledgeTopic
+            result.topicID = "identity_name"
+            if requestTopic then
+                local accepted, reason, disclosureRequestID = requestTopic(
+                    npcID,
+                    "identity_name"
+                )
+                result.accepted = accepted == true
+                result.reason = reason or (result.accepted
+                    and "submitted" or "rejected_by_game")
+                result.disclosureRequestID = disclosureRequestID
+            else
+                result.reason = "identity_knowledge_client_unavailable"
+            end
         elseif string.find(name, "^order_") == 1 and exposedTool(packet, name) then
             local commandID = trim(callArguments.command_id)
             local definition = PNC.CompanionCommands
@@ -283,6 +488,16 @@ local function applySemanticTools(packet, arguments, npcID, session)
         else
             result.reason = "tool_not_exposed"
         end
+        log(
+            "tool_call_result",
+            "npc=" .. tostring(npcID)
+                .. " request=" .. tostring(packet and packet.request_id)
+                .. " id=" .. tostring(callID)
+                .. " name=" .. tostring(name)
+                .. " reaction=" .. tostring(result.reaction or "")
+                .. " accepted=" .. tostring(result.accepted == true)
+                .. " reason=" .. tostring(result.reason or "")
+        )
         results[#results + 1] = result
     end
     session.llmSemanticResults = results
@@ -314,7 +529,7 @@ local function completeTextResponse(view, response, source)
         source = source,
         messageID = source.messageID,
     })
-    Pending = nil
+    finishPendingRequest()
     return true
 end
 
@@ -386,15 +601,40 @@ local function publishDetachedResponse(pending, response, source)
 end
 
 local function responseOrFailure(arguments, actionAccepted, actionAttempted)
-    local response = trim(arguments and arguments.response_text)
-    if response ~= "" then return string.sub(response, 1, 3900), false end
+    local response = cleanResponseText(arguments and arguments.response_text)
+    local providerFailure = arguments and (
+        arguments.provider_failure == true
+        or arguments.providerFailure == true
+        or arguments.context_eligible == false
+        or arguments.contextEligible == false
+    )
+    if response ~= "" then
+        return response, providerFailure == true
+    end
 
+    local calls = arguments and arguments.semantic_tool_calls
+    local hasNameAction = false
+    local hasSocialAction = false
+    local hasOrderAction = false
+    for _, call in ipairs(type(calls) == "table" and calls or {}) do
+        local name = trim(call and call.name)
+        if name == "ask_name" then
+            hasNameAction = true
+        elseif name == "social_react" then
+            hasSocialAction = true
+        elseif string.find(name, "^order_") == 1 then
+            hasOrderAction = true
+        end
+    end
+    if hasNameAction then return "Sure. Let me introduce myself.", false end
+    if hasSocialAction then return "I hear you.", false end
+    if hasOrderAction then return "All right.", false end
     local failure = trim(arguments and arguments.error)
     if failure == "" and actionAccepted then
-        return "I will take care of that.", false
+        return "All right.", false
     end
     if failure == "" and actionAttempted then
-        return "I understand.", false
+        return "I hear you.", false
     end
     if failure == "" then
         local finishReason = trim(arguments and arguments.finish_reason)
@@ -463,7 +703,7 @@ function Integration.Deliver(arguments)
             providerFailure = providerFailure == true,
             contextEligible = providerFailure ~= true,
         })
-        Pending = nil
+        finishPendingRequest()
         return {
             accepted = message ~= nil,
             reason = message and "conversation_closed" or "conversation_unavailable",
@@ -473,7 +713,7 @@ function Integration.Deliver(arguments)
     end
 
     local semanticResults = applySemanticTools(Pending.packet, arguments, Pending.npcID, view.session)
-    local response = trim(arguments.response_text)
+    local response = cleanResponseText(arguments.response_text)
     local providerFailure = false
     if response == "" then
         local actionAccepted = false
@@ -486,7 +726,6 @@ function Integration.Deliver(arguments)
             #semanticResults > 0
         )
     end
-    response = string.sub(response, 1, 3900)
     if traceEnabled() then
         Trace.Record({
             source = "ProjectHoomans",
@@ -603,7 +842,7 @@ function Integration.SpeechStarted(arguments)
             providerFailure = Pending.responseIsFailure == true,
             contextEligible = Pending.responseIsFailure ~= true,
         })
-        Pending = nil
+        finishPendingRequest()
         return {
             accepted = message ~= nil,
             reason = message and "conversation_closed" or "conversation_unavailable",
@@ -644,7 +883,7 @@ function Integration.SpeechStarted(arguments)
     })
     view.historyPart:setTyping(nil)
     ActiveSpeech[Pending.utteranceID] = speech
-    Pending = nil
+    finishPendingRequest()
     log(
         "speech_started",
         "npc=" .. tostring(speech.npcID)
@@ -723,7 +962,7 @@ function Integration.SpeechFallback(arguments)
             providerFailure = Pending.responseIsFailure == true,
             contextEligible = Pending.responseIsFailure ~= true,
         })
-        Pending = nil
+        finishPendingRequest()
         if message then
             return { accepted = true, presentation = "nameplate" }
         end

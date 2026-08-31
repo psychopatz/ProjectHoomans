@@ -70,8 +70,17 @@ Nameplates.State = Nameplates.State or {
 require "PNC/UI/Nameplates/PNC_NameplatePresentation"
 require "PNC/UI/Nameplates/PNC_NameplateDebug"
 require "PNC/UI/Nameplates/PNC_NameplateBodies"
+require "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedback"
+require "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedbackRenderer"
+require "PNC/UI/Nameplates/PNC_NameplateScopes"
 require "PNC/UI/Nameplates/PNC_NameplateEntries"
 require "PNC/UI/Nameplates/PNC_NameplateRenderer"
+
+-- Public boundary for relationship-producing systems. They can publish a
+-- signed delta without reaching into the nameplate manager or its renderer.
+Nameplates.RelationshipFeedback = PNC.NameplateRelationshipFeedback
+Nameplates.RelationshipFeedbackRenderer =
+    PNC.NameplateRelationshipFeedbackRenderer
 
 local Settings = Nameplates.Settings
 local State = Nameplates.State

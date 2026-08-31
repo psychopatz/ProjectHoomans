@@ -357,6 +357,22 @@ end
 
 function Conversation.Open(entry, player, forcedTime)
     local npcID = tostring(entry and entry.id or "debug-npc")
+    -- Hostile NPCs use the compact nameplate chat route. Opening the full
+    -- conversation view first would create a normal scene lease and let the
+    -- combat safety gate reject it before the player can type anything.
+    -- Keep this handoff targeted to the selected entry so it cannot silently
+    -- switch the player to the nearest unrelated NPC.
+    if isAggressive(entry)
+        and PNC.HoomansLLM
+        and PNC.HoomansLLM.OpenInlineForTarget
+        and PNC.HoomansLLM.OpenInlineForTarget(entry)
+    then
+        Relationship.RequestPresentation(npcID)
+        if PNC.Client and PNC.Client.RequestNPCKnowledge then
+            PNC.Client.RequestNPCKnowledge(npcID)
+        end
+        return nil
+    end
     local state = PNC.Network and PNC.Network.ClientState
     if state then
         state.npcPresentations = state.npcPresentations or {}

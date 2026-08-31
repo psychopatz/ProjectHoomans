@@ -715,6 +715,101 @@ T.contains(
     "zombie attacker action graph rendered"
 )
 
+getCore = function()
+    return { getZoom = function() return 1 end }
+end
+getTimeInMillis = function() return 1000 end
+local speechDraws = {}
+TextDrawObject = {
+    new = function()
+        local object = {}
+        object.setDefaultColors = function(_, r, g, b, a)
+            object.defaultColor = { r = r, g = g, b = b, a = a }
+        end
+        object.setOutlineColors = function(_, r, g, b, a)
+            object.outlineColor = { r = r, g = g, b = b, a = a }
+        end
+        object.ReadString = function(_, font, text, maxChars)
+            object.font = font
+            object.text = text
+            object.maxChars = maxChars
+        end
+        object.getHeight = function() return 36 end
+        object.Draw = function(_, x, y, outlines, alpha)
+            speechDraws[#speechDraws + 1] = {
+                object = object,
+                x = x,
+                y = y,
+                outlines = outlines,
+                alpha = alpha,
+            }
+        end
+        return object
+    end,
+}
+local positionedText = {}
+PNC.NameplatePresentation.DrawOutlinedText = function(_, text, x, y)
+    positionedText[#positionedText + 1] = { text = text, x = x, y = y }
+end
+local liveRenderManager = {
+    playerIndex = 0,
+    x = 0,
+    y = 0,
+    player = {
+        getX = function() return 0 end,
+        getY = function() return 0 end,
+        getZ = function() return 0 end,
+    },
+    clearStencilRect = function() end,
+    entries = {
+        {
+            debugOnly = false,
+            zombie = {
+                isDead = function() return false end,
+                getX = function() return 0 end,
+                getY = function() return 0 end,
+                getZ = function() return 0 end,
+            },
+            snapshot = { healthState = "normal" },
+            name = "Replying NPC",
+            nameWidth = 60,
+            nameColor = { r = 1, g = 1, b = 1, a = 1 },
+            healthVisible = false,
+            staminaVisible = false,
+            speechText = "This reply wraps across several lines.",
+            speechTextWidth = 120,
+            speechVisible = true,
+            speech = {
+                message = {
+                    presentationState = {
+                        speechColor = { r = 255, g = 128, b = 32, a = 1 },
+                    },
+                },
+            },
+            actionVisible = true,
+            actionText = "Working 50%",
+            actionTextWidth = 66,
+            actionColor = { r = 0.35, g = 0.88, b = 1, a = 1 },
+        },
+    },
+}
+PNC.NameplateRenderer.Render(liveRenderManager, { enabled = true })
+T.equal(#speechDraws, 1, "speech text object was rendered")
+T.equal(speechDraws[1].object.font, "Medium",
+    "nameplate reply uses the larger player font")
+T.equal(speechDraws[1].object.maxChars, 42,
+    "nameplate reply uses bounded wrapping")
+T.equal(speechDraws[1].object.defaultColor.g, 128 / 255,
+    "nameplate reply keeps message color")
+T.equal(speechDraws[1].object.outlineColor.r, 0,
+    "nameplate reply has a dark text glow")
+T.equal(speechDraws[1].y, -205,
+    "wrapped reply is anchored above the activity line")
+T.equal(positionedText[1].text, "Working 50%",
+    "activity text remains rendered separately")
+T.equal(positionedText[1].y, -166,
+    "activity text keeps its reserved slot")
+
 local unknownBody = {
     getX = function() return 2 end,
     getY = function() return 2 end,
@@ -772,10 +867,125 @@ PNC.NameplateEntries.Refresh(overlayManager, {
     debugShowAnimation = false,
 })
 T.truthy(overlayManager.entries["unknown-npc"] ~= nil,
-    "debug overlay stayed hidden until the name introduction")
+    "debug scope keeps an undisclosed NPC in the render set")
+T.falsy(overlayManager.entries["unknown-npc"].scopes.identity,
+    "debug scope does not disclose NPC identity")
+T.truthy(overlayManager.entries["unknown-npc"].scopes.debug,
+    "debug scope is independently enabled")
+T.falsy(overlayManager.entries["unknown-npc"].actionVisible,
+    "debug scope does not promote activity text")
 T.equal(overlayManager.entries["unknown-npc"].name,
     "Unknown survivor",
-    "debug overlay leaked an undisclosed NPC name")
+    "undisclosed identity remains private in entry data")
+
+PNC.NameplateSpeech.SetPending(
+    "unknown-npc",
+    "other-npc-request",
+    "other-npc-conversation"
+)
+overlayManager.updateCounter = 5
+PNC.NameplateEntries.Refresh(overlayManager, {
+    enabled = true,
+    showAIDebug = false,
+    debugShowAnimation = false,
+})
+T.truthy(overlayManager.entries["unknown-npc"] ~= nil,
+    "active speech keeps an undisclosed NPC in the render set")
+T.truthy(overlayManager.entries["unknown-npc"].speech
+    and overlayManager.entries["unknown-npc"].speech.pending,
+    "other-NPC loading state reaches the nameplate pipeline")
+T.falsy(overlayManager.entries["unknown-npc"].scopes.identity,
+    "conversation scope does not disclose NPC identity")
+T.falsy(overlayManager.entries["unknown-npc"].scopes.debug,
+    "conversation scope does not enable debug text")
+T.truthy(overlayManager.entries["unknown-npc"].scopes.conversation,
+    "conversation scope is independently enabled")
+T.falsy(overlayManager.entries["unknown-npc"].actionVisible,
+    "conversation scope does not promote activity text")
+T.equal(overlayManager.entries["unknown-npc"].speechText, ".",
+    "other-NPC loading state uses the shared typing indicator")
+
+local conversationOnlyManager = {
+    playerIndex = 0,
+    x = 0,
+    y = 0,
+    player = liveRenderManager.player,
+    clearStencilRect = function() end,
+    entries = {
+        {
+            debugOnly = false,
+            scopes = {
+                identity = false,
+                debug = false,
+                conversation = true,
+            },
+            zombie = zombie,
+            snapshot = { healthState = "normal" },
+            name = "Unknown survivor",
+            nameWidth = 90,
+            nameColor = { r = 1, g = 1, b = 1, a = 1 },
+            healthVisible = true,
+            staminaVisible = true,
+            speechText = "Only the conversation scope is visible.",
+            speechTextWidth = 120,
+            speechVisible = true,
+            speech = {
+                message = {
+                    presentationState = {
+                        speechColor = { r = 80, g = 220, b = 255, a = 1 },
+                    },
+                },
+            },
+            actionVisible = true,
+            actionText = "Working 50%",
+            actionTextWidth = 66,
+            actionColor = { r = 0.35, g = 0.88, b = 1, a = 1 },
+        },
+    },
+}
+local speechCountBefore = #speechDraws
+local textCountBefore = #positionedText
+PNC.NameplateRenderer.Render(conversationOnlyManager, { enabled = true })
+T.equal(#speechDraws, speechCountBefore + 1,
+    "conversation-only entry still renders speech")
+T.equal(#positionedText, textCountBefore,
+    "conversation-only entry does not render identity or activity")
+
+local debugOnlyManager = {
+    playerIndex = 0,
+    x = 0,
+    y = 0,
+    player = liveRenderManager.player,
+    clearStencilRect = function() end,
+    entries = {
+        {
+            debugOnly = true,
+            scopes = {
+                identity = false,
+                debug = true,
+                conversation = false,
+            },
+            worldX = 2,
+            worldY = 2,
+            worldZ = 0,
+            name = "Unknown survivor",
+            nameWidth = 90,
+            nameColor = { r = 1, g = 1, b = 1, a = 1 },
+            debugText = "AI: combat",
+            debugTextWidth = 60,
+        },
+    },
+}
+local debugTextCountBefore = #positionedText
+PNC.NameplateRenderer.Render(debugOnlyManager, {
+    enabled = true,
+    showAIDebug = true,
+})
+T.equal(#positionedText, debugTextCountBefore + 1,
+    "debug-only entry renders its independent overlay")
+T.equal(positionedText[#positionedText].text, "AI: combat",
+    "debug-only entry does not render the undisclosed identity")
+PNC.NameplateSpeech.ClearPending("unknown-npc", "other-npc-request")
 T.finish("pnc_nameplate_debug_smoke")
 
 T.finish("pnc_nameplate_debug_smoke")

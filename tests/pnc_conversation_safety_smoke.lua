@@ -320,6 +320,120 @@ T.equal(pacifications[1].options.durationHours,
 Scene.End(record, npc, "lease-parley", "test")
 T.equal(record.runtime.conversationParley, nil,
     "ending conversation restores normal hostile policy")
+
+-- A hostile full-screen conversation is handed to the nameplate input before
+-- it can create a combat-gated scene lease. The fallback keeps the exact
+-- selected entry instead of resolving a different nearest NPC.
+local fallbackCalls = {}
+PNC.HoomansLLM = {
+    RequestInlineFallback = function(entry, reason, view)
+        fallbackCalls[#fallbackCalls + 1] = {
+            entry = entry,
+            reason = reason,
+            view = view,
+        }
+        return true
+    end,
+}
+record.runtime = {}
+record.tacticalClass = "hostile"
+record.hostility = { attackPlayers = true }
+spec.context.allowHostileParley = true
+spec.context.nameplateConversation = nil
+local fallbackLifecycle = PNC.Conversation.Lifecycle.Create()
+local fallbackStarted, fallbackReason = fallbackLifecycle.begin(
+    { kind = "full_conversation" },
+    spec
+)
+T.equal(fallbackStarted, false,
+    "hostile full conversation is not started")
+T.equal(fallbackReason, "nameplate_fallback",
+    "hostile conversation reports the nameplate handoff")
+T.equal(#fallbackCalls, 1,
+    "hostile conversation requests one nameplate handoff")
+T.equal(fallbackCalls[1].entry, spec.context.entry,
+    "handoff keeps the selected conversation entry")
+T.equal(fallbackCalls[1].reason, "hostile_nameplate_fallback",
+    "handoff records a diagnostic reason")
+PNC.HoomansLLM = nil
+
+-- The visual conversation can close while the provider is still working. A
+-- request lease keeps only that exact asynchronous request authorized.
+record.tacticalClass = "neutral"
+record.hostility = { attackPlayers = false }
+record.runtime = {}
+player.x = 0
+candidates = {}
+local llmStarted = Scene.Begin(
+    record,
+    npc,
+    player,
+    "lease-llm",
+    { maximumDistance = 5.5, dangerRadius = 8 }
+)
+T.equal(llmStarted, true, "LLM conversation scene begins")
+local reserved, llmLease = Scene.ReserveLLMRequest(
+    record,
+    npc,
+    player,
+    "lease-llm",
+    "request-llm"
+)
+T.equal(reserved, true, "LLM request lease is reserved")
+T.equal(llmLease.requestID, "request-llm", "request lease binds request ID")
+local released, releaseReason = Scene.ReleaseLLMRequest(
+    record,
+    player,
+    "lease-llm",
+    "request-llm",
+    "request_completed"
+)
+T.equal(released, true, "completed LLM request lease is released")
+T.equal(releaseReason, "released", "LLM request release is acknowledged")
+T.equal(record.runtime.llmRequestLease, nil,
+    "completed LLM request lease is cleared")
+reserved, llmLease = Scene.ReserveLLMRequest(
+    record,
+    npc,
+    player,
+    "lease-llm",
+    "request-llm-2"
+)
+T.equal(reserved, true, "conversation can reserve its next LLM request")
+Scene.End(
+    record,
+    npc,
+    "lease-llm",
+    "message_submitted",
+    { llmRequestID = "request-llm-2", player = player }
+)
+T.equal(record.runtime.conversationLease, nil,
+    "closing the visual conversation releases its short lease")
+T.truthy(record.runtime.llmRequestLease,
+    "closing the visual conversation keeps the request lease")
+local llmValid, _, validatedLease = Scene.ValidateLLMRequest(
+    record,
+    npc,
+    player,
+    "lease-llm",
+    "request-llm-2"
+)
+T.equal(llmValid, true, "reserved LLM request remains valid after close")
+T.equal(validatedLease, record.runtime.llmRequestLease,
+    "validation returns the reserved request lease")
+now = record.runtime.llmRequestLease.expiresAt + 1
+local expired, expiredReason = Scene.ValidateLLMRequest(
+    record,
+    npc,
+    player,
+    "lease-llm",
+    "request-llm-2"
+)
+T.equal(expired, false, "expired LLM request is rejected")
+T.equal(expiredReason, "llm_request_expired",
+    "expired LLM request has a diagnostic reason")
+T.equal(record.runtime.llmRequestLease, nil,
+    "expired LLM request is cleaned up")
 T.finish("pnc_conversation_safety_smoke")
 
 T.finish("pnc_conversation_safety_smoke")

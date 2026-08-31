@@ -1,4 +1,6 @@
 require "PNC/UI/Nameplates/PNC_NameplateSpeech"
+require "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedbackRenderer"
+require "PNC/UI/Nameplates/PNC_NameplateScopes"
 
 PNC = PNC or {}
 PNC.NameplateRenderer = PNC.NameplateRenderer or {}
@@ -8,6 +10,9 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 local Presentation = PNC.NameplatePresentation
 local NameplateDebug = PNC.NameplateDebug
 local Speech = PNC.NameplateSpeech
+local RelationshipFeedbackRenderer =
+    PNC.NameplateRelationshipFeedbackRenderer
+local Scopes = PNC.NameplateScopes
 local Layout = Presentation.Layout
 local Fonts = Presentation.Fonts
 
@@ -40,7 +45,13 @@ local COMBAT_DEFENSE_COLOR = { r = 0.16, g = 1.0, b = 0.30, a = 0.78 }
 local COMBAT_BLOCKER_COLOR = { r = 1.0, g = 0.15, b = 0.8, a = 0.95 }
 local ZOMBIE_ATTACKER_COLOR = { r = 1.0, g = 0.28, b = 0.12, a = 0.96 }
 local COMBAT_MARKER_HALF_SIZE = 9
-local SPEECH_COLOR = { r = 0.82, g = 0.96, b = 0.94, a = 1.0 }
+
+local function scopeVisible(entry, scope, fallback)
+    if type(entry.scopes) ~= "table" or entry.scopes[scope] == nil then
+        return fallback == true
+    end
+    return entry.scopes[scope] == true
+end
 
 local function drawStatusBar(manager, left, top, width, height, ratio, color, alpha, backgroundAlpha)
     manager:drawRect(
@@ -255,20 +266,118 @@ local function drawDebugText(
     return y
 end
 
+local drawConversation
+
 local function drawDebugOnly(manager, entry, metrics)
     local screenX = isoToScreenX(manager.playerIndex, entry.worldX, entry.worldY, entry.worldZ) - manager.x
     local screenY = isoToScreenY(manager.playerIndex, entry.worldX, entry.worldY, entry.worldZ) - manager.y
     local nameY = screenY - metrics.nameYOffset
-    Presentation.DrawOutlinedText(
-        manager,
-        entry.name,
-        screenX - ((entry.nameWidth or 0) / 2),
-        nameY,
-        entry.nameColor,
-        0.9,
-        Fonts.name
+    if RelationshipFeedbackRenderer
+        and RelationshipFeedbackRenderer.Draw
+        and scopeVisible(
+            entry,
+            Scopes.RELATIONSHIP_FEEDBACK,
+            false
+        )
+    then
+        RelationshipFeedbackRenderer.Draw(
+            manager,
+            entry.snapshot and entry.snapshot.id or entry.uuid,
+            screenX,
+            nameY,
+            {
+                currentTime = getTimeInMillis
+                    and getTimeInMillis() or nil,
+                nameWidth = entry.nameWidth,
+                zoom = metrics.zoom,
+                alpha = 0.9,
+            }
+        )
+    end
+    if scopeVisible(entry, Scopes.CONVERSATION, false) then
+        drawConversation(manager, entry, screenX, nameY - Layout.speechGap, 0.9)
+    end
+    if scopeVisible(entry, Scopes.IDENTITY, true) then
+        Presentation.DrawOutlinedText(
+            manager,
+            entry.name,
+            screenX - ((entry.nameWidth or 0) / 2),
+            nameY,
+            entry.nameColor,
+            0.9,
+            Fonts.name
+        )
+    end
+    if scopeVisible(entry, Scopes.DEBUG, true) then
+        drawDebugText(manager, entry, screenX, nameY + Layout.nameDebugGap, 0.9)
+    end
+end
+
+local function speechTextObject(entry, speechText)
+    if not speechText or speechText == "" then
+        entry.speechTextObjectKey = nil
+        entry.speechTextObject = nil
+        return nil
+    end
+    local color = Presentation.GetSpeechColor(entry.speech)
+    local maxChars = Layout.speechMaxCharsPerLine
+    local colorKey = tostring(color.r) .. ":" .. tostring(color.g)
+        .. ":" .. tostring(color.b) .. ":" .. tostring(color.a)
+    local cacheKey = tostring(speechText) .. "|"
+        .. tostring(maxChars) .. "|" .. colorKey
+    if entry.speechTextObjectKey == cacheKey and entry.speechTextObject then
+        return entry.speechTextObject
+    end
+    entry.speechTextObjectKey = cacheKey
+    entry.speechTextObject = Presentation.CreateSpeechTextObject(
+        speechText,
+        color,
+        maxChars
     )
-    drawDebugText(manager, entry, screenX, nameY + Layout.nameDebugGap, 0.9)
+    return entry.speechTextObject
+end
+
+drawConversation = function(manager, entry, screenX, speechBottomY, alpha)
+    if not scopeVisible(entry, Scopes.CONVERSATION, entry.speechVisible == true)
+        or not entry.speechVisible
+    then
+        return 0
+    end
+    local speechText = entry.speechText
+    local speechTextWidth = entry.speechTextWidth or 0
+    if entry.speech and entry.speech.pending and Speech
+        and Speech.GetDisplayText
+    then
+        speechText = Speech.GetDisplayText(entry.speech)
+        speechTextWidth = getTextManager():MeasureStringX(
+            Fonts.speech or Fonts.debug, speechText
+        )
+    end
+    if not speechText or speechText == "" then return 0 end
+    local actionHeight = getTextManager():getFontHeight(Fonts.debug) + 2
+    local speechObject = speechTextObject(entry, speechText)
+    local speechHeight = speechObject and speechObject:getHeight() or actionHeight
+    local speechY = speechBottomY - speechHeight
+    if speechObject then
+        local speechColor = Presentation.GetSpeechColor(entry.speech)
+        speechObject:Draw(
+            screenX,
+            speechY,
+            true,
+            alpha * speechColor.a
+        )
+    else
+        Presentation.DrawOutlinedText(
+            manager,
+            speechText,
+            screenX - (speechTextWidth / 2),
+            speechY,
+            Presentation.GetSpeechColor(entry.speech),
+            alpha,
+            Fonts.speech or Fonts.debug
+        )
+    end
+    return speechHeight
 end
 
 local function drawLive(manager, entry, metrics, currentTime, settings)
@@ -282,61 +391,75 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
     local nameY = screenY - metrics.nameYOffset
     local barLeft = screenX - (metrics.barWidth / 2)
     local barTop = screenY - metrics.barYOffset
+    local identityVisible = scopeVisible(entry, Scopes.IDENTITY, true)
+    local debugVisible = scopeVisible(entry, Scopes.DEBUG, true)
+    local conversationVisible = scopeVisible(
+        entry,
+        Scopes.CONVERSATION,
+        entry.speechVisible == true
+    )
     if entry.snapshot.healthState == "incapacitated" then
         entry.barColor = Presentation.IncapacitatedColor(currentTime)
     end
 
     local actionHeight = getTextManager():getFontHeight(Fonts.debug) + 2
-    local speechHeight = actionHeight
-    local speechText = entry.speechText
-    local speechTextWidth = entry.speechTextWidth or 0
-    if entry.speech and entry.speech.pending and Speech
-        and Speech.GetDisplayText
-    then
-        speechText = Speech.GetDisplayText(entry.speech)
-        speechTextWidth = getTextManager():MeasureStringX(
-            Fonts.debug, speechText
-        )
-    end
-    if entry.speechVisible and speechText ~= "" then
-        local speechY = nameY - speechHeight
-        if entry.actionVisible and entry.actionText ~= "" then
-            speechY = speechY - actionHeight - 2
-        end
-        Presentation.DrawOutlinedText(
-            manager,
-            speechText,
-            screenX - (speechTextWidth / 2),
-            speechY,
-            SPEECH_COLOR,
-            0.95 * alpha,
-            Fonts.debug
-        )
+    local actionY = nameY - actionHeight
+    local actionVisible = identityVisible and entry.actionVisible
+    local speechBottomY = actionVisible and (actionY - Layout.speechGap)
+        or (nameY - Layout.speechGap)
+    if conversationVisible then
+        drawConversation(manager, entry, screenX, speechBottomY, 0.95 * alpha)
     end
 
-    if entry.actionVisible and entry.actionText ~= "" then
+    if actionVisible and entry.actionText ~= "" then
         Presentation.DrawOutlinedText(
             manager,
             entry.actionText,
             screenX - ((entry.actionTextWidth or 0) / 2),
-            nameY - actionHeight,
+            actionY,
             entry.actionColor,
             0.95 * alpha,
             Fonts.debug
         )
     end
 
-    Presentation.DrawOutlinedText(
-        manager,
-        entry.name,
-        screenX - ((entry.nameWidth or 0) / 2),
-        nameY,
-        entry.nameColor,
-        entry.nameColor.a * alpha,
-        Fonts.name
-    )
-    drawHealth(manager, entry, metrics, barLeft, barTop, alpha)
-    local staminaTop = drawStamina(manager, entry, metrics, barLeft, barTop, alpha)
+    if identityVisible then
+        Presentation.DrawOutlinedText(
+            manager,
+            entry.name,
+            screenX - ((entry.nameWidth or 0) / 2),
+            nameY,
+            entry.nameColor,
+            entry.nameColor.a * alpha,
+            Fonts.name
+        )
+    end
+    if RelationshipFeedbackRenderer
+        and RelationshipFeedbackRenderer.Draw
+        and scopeVisible(
+            entry,
+            Scopes.RELATIONSHIP_FEEDBACK,
+            false
+        )
+    then
+        RelationshipFeedbackRenderer.Draw(
+            manager,
+            entry.snapshot and entry.snapshot.id or entry.uuid,
+            screenX,
+            nameY,
+            {
+                currentTime = currentTime,
+                nameWidth = entry.nameWidth,
+                zoom = metrics.zoom,
+                alpha = alpha,
+            }
+        )
+    end
+    local staminaTop
+    if identityVisible then
+        drawHealth(manager, entry, metrics, barLeft, barTop, alpha)
+        staminaTop = drawStamina(manager, entry, metrics, barLeft, barTop, alpha)
+    end
 
     local showDebug = settings.showAIDebug == true
     local showAnimation = settings.showAnimationDebug == true
@@ -345,9 +468,9 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
     local showFaction = settings.showFactionDebug == true
     local showCommunity =
         settings.showCommunityDebug == true
-    if showDebug or showAnimation or showScene
+    if debugVisible and (showDebug or showAnimation or showScene
         or showFaction or showCommunity
-    then
+    ) then
         local debugY
         if entry.staminaVisible then
             debugY = (entry.healthVisible and staminaTop or barTop) + metrics.barHeight + Layout.debugTextGap
@@ -1649,12 +1772,18 @@ function Renderer.Render(manager, settings)
     end
     if settings.showPathDebug then
         for _, entry in pairs(manager.entries) do
-            if not entry.debugOnly then drawPathGoal(manager, entry) end
+            if not entry.debugOnly
+                and scopeVisible(entry, Scopes.DEBUG, true)
+            then
+                drawPathGoal(manager, entry)
+            end
         end
     end
     if settings.showCombatDebug then
         for _, entry in pairs(manager.entries) do
-            if not entry.debugOnly then
+            if not entry.debugOnly
+                and scopeVisible(entry, Scopes.DEBUG, true)
+            then
                 drawCombatDebug(manager, entry)
             end
         end

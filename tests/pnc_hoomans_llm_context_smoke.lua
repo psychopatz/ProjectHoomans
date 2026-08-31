@@ -87,7 +87,8 @@ T.equal(context.recent_conversation[1].content, "Stay close.", "recent dialogue 
 T.equal(context.recent_conversation[2].role, "user", "player dialogue retained")
 T.equal(context.recent_conversation[2].content, "Do you need anything?", "player content retained")
 T.equal(context.available_tools[1]["function"].name, "social_react", "valid social tool name")
-T.equal(context.available_tools[2]["function"].name, "order_follow", "valid order tool name")
-T.equal(#context.available_tools, 2, "client-only tools are not exposed")
+T.equal(context.available_tools[2]["function"].name, "ask_name", "valid identity tool name")
+T.equal(context.available_tools[3]["function"].name, "order_follow", "valid order tool name")
+T.equal(#context.available_tools, 3, "client-only tools are not exposed")
 
 T.finish("pnc_hoomans_llm_context_smoke")

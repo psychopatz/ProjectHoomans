@@ -30,7 +30,17 @@ function Composer.ReceiveRecruitOutcome(args)
                 at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
             }
         end
-        receiveRelationshipAfter(args.npcID, args.relationshipAfter)
+        receiveRelationshipAfter(
+            args.npcID,
+            args.relationshipAfter,
+            args.relationshipDelta,
+            {
+                source = "recruitment_rejected",
+                eventID = args.eventID,
+                revision = args.relationshipAfter
+                    and args.relationshipAfter.revision,
+            }
+        )
         view.spec.context.lastConversationError = tostring(
             args.reason or "recruitment_rejected"
         )
@@ -107,7 +117,17 @@ function Composer.ReceiveRecruitOutcome(args)
         reason = args.reason,
         at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
     })
-    receiveRelationshipAfter(args.npcID, args.relationshipAfter)
+    receiveRelationshipAfter(
+        args.npcID,
+        args.relationshipAfter,
+        args.relationshipDelta,
+        {
+            source = "recruitment",
+            eventID = args.eventID,
+            revision = args.relationshipAfter
+                and args.relationshipAfter.revision,
+        }
+    )
     if PNC.Core and PNC.Core.LogInfo then
         PNC.Core.LogInfo("Conversation recruitment committed npc="
             .. tostring(args.npcID or "unknown") .. " route="
@@ -127,4 +147,3 @@ function Composer.ReceiveRecruitOutcome(args)
 end
 
 return Composer
-

@@ -736,6 +736,27 @@ local incompleteReplica = PNC.Conversation.BuildDefinition({
 T.equal(incompleteReplica.context.allowHostileParley, false,
     "missing MP hostility data fails closed")
 
+local hostileRouteCalls = {}
+PNC.HoomansLLM = {
+    OpenInlineForTarget = function(entry)
+        hostileRouteCalls[#hostileRouteCalls + 1] = entry
+        return true
+    end,
+}
+local hostileView = PNC.Conversation.Open({
+    id = "hostile-route",
+    name = "Hostile Route",
+    snapshot = {
+        tacticalClass = "hostile",
+        hostility = { attackPlayers = true },
+    },
+}, {})
+T.equal(hostileView, nil,
+    "hostile conversation does not open the full-screen view")
+T.equal(#hostileRouteCalls, 1,
+    "hostile conversation routes through the nameplate input")
+PNC.HoomansLLM = nil
+
 local sandbox = T.truthy(PNC.ConversationDebugModel.ExecuteSandbox(
     "projecthoomans:whats_up_local_activity_neutral",
     "opening", "detail", debugContext

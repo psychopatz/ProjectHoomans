@@ -56,6 +56,7 @@ local function applyGiftEffect(player, record, args, details)
     end
     if applied == true and result and result.relationship then
         local relationshipAfter = relationshipSnapshot(result.relationship)
+        details.eventID = result.eventID
         details.relationshipBefore = relationshipBefore
         details.relationshipAfter = relationshipAfter
         details.relationshipDelta = {

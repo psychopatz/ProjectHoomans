@@ -34,6 +34,7 @@ function Relationships.ApplyEventMutation(
     local relationship
     local memory
     local eventID
+    local interactionType
     local worldAgeHours
     local familiarityDelta
     local moraleDelta
@@ -50,6 +51,8 @@ function Relationships.ApplyEventMutation(
     end
     eventID = type(mutation.eventID) == "string"
         and mutation.eventID or nil
+    interactionType = type(mutation.interactionType) == "string"
+        and mutation.interactionType or nil
     worldAgeHours = finiteNumber(mutation.worldAgeHours)
     familiarityDelta = finiteNumber(mutation.familiarityDelta) or 0
     moraleDelta = finiteNumber(mutation.moraleDelta) or 0
@@ -152,6 +155,7 @@ function Relationships.ApplyEventMutation(
             eventID = eventID,
             memoryID = memory.id,
             memoryType = memory.type,
+            interactionType = interactionType,
             knowledgeSource = memory.knowledgeSource,
         }
     )
@@ -162,6 +166,9 @@ function Relationships.ApplyEventMutation(
         ),
         morale = record.social.morale,
         memoryID = memory.id,
+        eventID = eventID,
+        memoryType = memory.type,
+        interactionType = interactionType,
     }
 end
 
@@ -183,14 +190,22 @@ function Relationships.ApplyConversationEffect(
         tostring(math.floor(at * 1000)),
     }, ":")
     local memoryID = "conversation:" .. identity
+    local memoryType = type(effect.memoryType) == "string"
+        and effect.memoryType or "conversation_outcome"
+    local interactionType = type(effect.interactionType) == "string"
+        and effect.interactionType or memoryType
+    local tags = type(effect.tags) == "table"
+        and effect.tags or { conversation = true }
+    tags.conversation = true
     return Relationships.ApplyEventMutation(observerNPCID, targetKey, {
         eventID = memoryID,
         worldAgeHours = at,
+        interactionType = interactionType,
         familiarityDelta = tonumber(effect.familiarity) or 0,
         moraleDelta = 0,
         memory = {
             id = memoryID,
-            type = "conversation_outcome",
+            type = memoryType,
             aboutKey = targetKey,
             createdAt = at,
             lastEvaluatedAt = at,
@@ -203,7 +218,9 @@ function Relationships.ApplyConversationEffect(
             shareable = effect.shareable == true,
             knowledgeSource = "experienced",
             sourceKey = targetKey,
-            tags = { conversation = true },
+            tags = tags,
         },
+        cooldownType = context.cooldownType,
+        cooldownUntil = context.cooldownUntil,
     })
 end

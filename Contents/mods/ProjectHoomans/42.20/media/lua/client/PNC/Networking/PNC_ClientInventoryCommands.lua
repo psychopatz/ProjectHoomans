@@ -13,6 +13,21 @@ local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 
+local function receiveRelationshipAfter(npcID, after, delta, source, eventID)
+    local relationship = PNC.Conversation
+        and PNC.Conversation.Relationship
+    if type(after) ~= "table" or not relationship
+        or not relationship.ReceiveAfter
+    then
+        return false
+    end
+    return relationship.ReceiveAfter(npcID, after, delta, {
+        source = source or "inventory",
+        eventID = eventID or after.eventID,
+        revision = after.revision,
+    })
+end
+
 local function removeFromContainer(inventory, itemID)
     local container
     local i
@@ -170,6 +185,13 @@ Internal.RegisterServerCommand(Const.CMD_INVENTORY_RESULT, function(args)
             itemTypes = Core.DeepCopy(args.itemTypes),
             at = Core.Now(),
         }
+        receiveRelationshipAfter(
+            args.npcId,
+            args.relationshipAfter,
+            args.relationshipDelta,
+            args.giftEffect and "gift" or "inventory",
+            args.eventID or args.requestId
+        )
     end
     if PNC.InventoryWindow and PNC.InventoryWindow.OnResult then
         PNC.InventoryWindow.OnResult(ClientState.inventoryResult)

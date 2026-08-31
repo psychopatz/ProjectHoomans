@@ -13,6 +13,7 @@ PsychopatzCore = {
                 catalog_id = "catalog-1",
                 tools = {
                     { id = "projecthoomans.llm:social_react" },
+                    { id = "projecthoomans.llm:ask_name" },
                     { id = "projecthoomans.llm:order_follow" },
                 },
             }
@@ -52,10 +53,12 @@ local view = {
 }
 
 local context = Context.Build(view, "hello")
-T.equal(context.available_tools, nil, "catalog mode repeated full schemas")
+T.equal(context.available_tools, nil, "catalog mode avoids repeated full schemas")
 T.equal(context.tool_catalog_id, "catalog-1", "catalog ID missing")
-T.equal(#context.available_tool_ids, 2, "allowed tool IDs missing")
-T.equal(context.available_tool_ids[2], "projecthoomans.llm:order_follow",
+T.equal(#context.available_tool_ids, 3, "allowed tool IDs missing")
+T.equal(context.available_tool_ids[2], "projecthoomans.llm:ask_name",
+    "identity tool ID missing")
+T.equal(context.available_tool_ids[3], "projecthoomans.llm:order_follow",
     "command tool ID missing")
 
 T.finish("pnc_hoomans_llm_tool_catalog_smoke")

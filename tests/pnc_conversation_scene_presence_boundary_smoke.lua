@@ -19,6 +19,10 @@ local publicFunctions = {
     "HasThreat",
     "Begin",
     "End",
+    "ReserveLLMRequest",
+    "ClearLLMRequest",
+    "ReleaseLLMRequest",
+    "ValidateLLMRequest",
     "Pump",
     "HandleClientCommand",
 }

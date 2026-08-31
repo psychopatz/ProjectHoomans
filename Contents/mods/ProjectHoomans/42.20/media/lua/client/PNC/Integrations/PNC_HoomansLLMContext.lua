@@ -199,6 +199,10 @@ local function isProviderFailure(message, content)
         or string.find(lowered, "provider request failed", 1, true) ~= nil
         or string.find(lowered, "provider returned an empty response", 1, true) ~= nil
         or string.find(lowered, "openai-compatible provider", 1, true) ~= nil
+        or string.find(lowered, "i am an ai assistant", 1, true) ~= nil
+        or string.find(lowered, "as an ai", 1, true) ~= nil
+        or string.find(lowered, "language model", 1, true) ~= nil
+        or string.find(lowered, "personal identity", 1, true) ~= nil
 end
 
 local function recentConversation(view, currentMessage)
@@ -228,7 +232,7 @@ local function recentConversation(view, currentMessage)
 end
 
 local function availableTools(entry)
-    local seen = { social_react = true }
+    local seen = { social_react = true, ask_name = true }
     local output = {
         ToolPolicy and ToolPolicy.BuildDefinition
             and ToolPolicy.BuildDefinition()
@@ -246,8 +250,24 @@ local function availableTools(entry)
                         additionalProperties = false,
                     },
                 },
-            },
+        },
     }
+    if ToolPolicy and ToolPolicy.BuildIdentityDefinition then
+        output[#output + 1] = ToolPolicy.BuildIdentityDefinition()
+    else
+        output[#output + 1] = {
+            type = "function",
+            ["function"] = {
+                name = "ask_name",
+                description = "Ask the NPC to say their name through authoritative identity knowledge disclosure.",
+                parameters = {
+                    type = "object",
+                    properties = {},
+                    additionalProperties = false,
+                },
+            },
+        }
+    end
     local commands = PNC.CompanionCommands
     if not commands or not commands.List then return output end
     for _, definition in ipairs(commands.List()) do
@@ -340,6 +360,39 @@ function Context.Build(view, message)
         and PNC.Conversation.Relationship.GetPresentation
         and PNC.Conversation.Relationship.GetPresentation(npcID)
         or {}
+    local clientState = PNC.Network and PNC.Network.ClientState or {}
+    local reactionCapabilities = clientState.llmReactionCapabilities
+        and clientState.llmReactionCapabilities[npcID] or nil
+    local availableReactions = reactionCapabilities
+        and reactionCapabilities.available_reactions or nil
+    if type(availableReactions) ~= "table" then
+        availableReactions = ToolPolicy and ToolPolicy.ListAll
+            and ToolPolicy.ListAll() or {}
+    end
+    local capabilityCooldownUntil = reactionCapabilities
+        and tonumber(reactionCapabilities.positive_action_cooldown_until)
+        or nil
+    local capabilityCooldownActive = reactionCapabilities
+        and reactionCapabilities.positive_action_cooldown_active == true
+        or false
+    local capabilityCooldownRemaining = reactionCapabilities
+        and tonumber(
+            reactionCapabilities.positive_action_cooldown_remaining_hours
+        ) or 0
+    if capabilityCooldownUntil and worldHours >= capabilityCooldownUntil then
+        capabilityCooldownActive = false
+        capabilityCooldownRemaining = 0
+        availableReactions = {}
+        for _, reaction in ipairs(
+            ToolPolicy and ToolPolicy.ListAll and ToolPolicy.ListAll() or {}
+        ) do
+            if reaction ~= "flirt"
+                or reactionCapabilities.flirt_available_when_ready == true
+            then
+                availableReactions[#availableReactions + 1] = reaction
+            end
+        end
+    end
     local personality = block.npcPersonality
         or source.socialProfile
         or source.personality
@@ -403,14 +456,26 @@ function Context.Build(view, message)
             nil
         ),
         message = string.sub(text(message, ""), 1, 4000),
-        tool_ack_text = "I'll check that now.",
         character_card = characterCard,
         relationship_snapshot = relationship,
         relationship_capabilities = {
             state = relationship.state or relationship.category,
             revision = relationship.revision,
-            available_reactions = ToolPolicy and ToolPolicy.ListAvailable
-                and ToolPolicy.ListAvailable(relationship) or {},
+            available_reactions = availableReactions,
+            server_authoritative = true,
+            positive_action_cooldown_hours = reactionCapabilities
+                and reactionCapabilities.positive_action_cooldown_hours
+                or 24,
+            positive_action_cooldown_active = reactionCapabilities
+                and capabilityCooldownActive or false,
+            positive_action_cooldown_remaining_hours =
+                capabilityCooldownRemaining,
+            flirt_available = reactionCapabilities
+                and reactionCapabilities.flirt_available or nil,
+            flirt_reason = reactionCapabilities
+                and reactionCapabilities.flirt_reason or nil,
+            flirt_available_when_ready = reactionCapabilities
+                and reactionCapabilities.flirt_available_when_ready or nil,
         },
         preferences = preferences,
         current_state = state,

@@ -66,7 +66,17 @@ function Composer.ReceiveGiftResult(args)
             and args.giftEffect.kind or "general")
     -- Use the authoritative after-state immediately, then request a full
     -- presentation as a persistence/network consistency check.
-    receiveRelationshipAfter(args.npcId, args.relationshipAfter)
+    receiveRelationshipAfter(
+        args.npcId,
+        args.relationshipAfter,
+        args.relationshipDelta,
+        {
+            source = "gift",
+            eventID = args.eventID,
+            revision = args.relationshipAfter
+                and args.relationshipAfter.revision,
+        }
+    )
     if Relationship and Relationship.RequestPresentation then
         -- The authoritative effect is committed before this callback. Refresh
         -- the live conversation panel so its marker and attitude use the same
@@ -142,4 +152,3 @@ function Composer.ReceiveGiftResult(args)
 end
 
 return Composer
-

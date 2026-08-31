@@ -13,11 +13,21 @@ Presentation.Layout = {
     barYOffset = 130,
     debugTextGap = 14,
     nameDebugGap = 16,
+    speechMaxCharsPerLine = 42,
+    speechGap = 3,
 }
 
 Presentation.Fonts = {
     name = UIFont.Small,
     debug = UIFont.Small,
+    speech = UIFont.Medium,
+}
+
+Presentation.DefaultSpeechColor = {
+    r = 0.82,
+    g = 0.96,
+    b = 0.94,
+    a = 1.0,
 }
 
 local NAME_COLORS = {
@@ -49,6 +59,29 @@ local function clamp(value, minValue, maxValue)
     if value < minValue then return minValue end
     if value > maxValue then return maxValue end
     return value
+end
+
+local function copySpeechColor(value, fallback)
+    if type(value) ~= "table" then
+        return {
+            r = fallback.r,
+            g = fallback.g,
+            b = fallback.b,
+            a = fallback.a,
+        }
+    end
+    local red = tonumber(value.r) or fallback.r
+    local green = tonumber(value.g) or fallback.g
+    local blue = tonumber(value.b) or fallback.b
+    local alpha = tonumber(value.a) or fallback.a
+    local scale = math.max(red, green, blue) > 1 and (1 / 255) or 1
+    if alpha > 1 then alpha = alpha / 255 end
+    return {
+        r = clamp(red * scale, 0, 1),
+        g = clamp(green * scale, 0, 1),
+        b = clamp(blue * scale, 0, 1),
+        a = clamp(alpha, 0, 1),
+    }
 end
 
 local function ratio(current, maxValue)
@@ -104,6 +137,23 @@ end
 function Presentation.StaminaColor(staminaRatio)
     local value = 0.28 + (0.72 * clamp(tonumber(staminaRatio) or 0, 0, 1))
     return { r = value, g = value, b = value, a = 1.0 }
+end
+
+function Presentation.GetSpeechColor(record)
+    local message = record and record.message or record
+    local state = type(message and message.presentationState) == "table"
+        and message.presentationState or nil
+    local source = type(message and message.source) == "table"
+        and message.source or nil
+    local payload = type(message and message.payload) == "table"
+        and message.payload or nil
+    local style = type(payload and payload.style) == "table"
+        and payload.style or nil
+    local candidate = (type(record) == "table" and record.speechColor)
+        or (state and (state.speechColor or state.nameplateColor or state.color))
+        or (source and (source.speechColor or source.nameplateColor or source.color))
+        or (style and (style.speechColor or style.nameplateColor or style.color))
+    return copySpeechColor(candidate, Presentation.DefaultSpeechColor)
 end
 
 local function treatmentPartLabel(partId)
@@ -338,6 +388,33 @@ function Presentation.DrawOutlinedText(manager, text, x, y, color, alpha, font)
     manager:drawText(text, x, y - 1, 0, 0, 0, outlineAlpha, font)
     manager:drawText(text, x, y + 1, 0, 0, 0, outlineAlpha, font)
     manager:drawText(text, x, y, color.r, color.g, color.b, alpha, font)
+end
+
+function Presentation.CreateSpeechTextObject(text, color, maxCharsPerLine)
+    if not TextDrawObject or not TextDrawObject.new then return nil end
+    text = tostring(text or "")
+    if text == "" then return nil end
+    text = string.gsub(text, "\r\n?", "\n")
+    text = string.gsub(text, "\n", "[br/]")
+    color = copySpeechColor(color, Presentation.DefaultSpeechColor)
+    local object = TextDrawObject.new(
+        255, 255, 255,
+        true,   -- allow explicit [br/] line breaks
+        false,  -- images
+        false,  -- chat icons
+        false,  -- inline color tags; the message color is authoritative
+        false,  -- inline font tags
+        true    -- equalize line heights like player chat
+    )
+    object:setDefaultColors(color.r, color.g, color.b, 1.0)
+    object:setOutlineColors(0, 0, 0, 255)
+    object:ReadString(
+        Presentation.Fonts.speech or Presentation.Fonts.debug,
+        text,
+        math.max(1, math.floor(tonumber(maxCharsPerLine)
+            or Presentation.Layout.speechMaxCharsPerLine))
+    )
+    return object
 end
 
 return Presentation

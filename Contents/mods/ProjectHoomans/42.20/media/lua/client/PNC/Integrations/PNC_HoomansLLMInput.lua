@@ -2,7 +2,7 @@
 -- mounted in the full conversation and in the closed-UI NPC overlay.
 require "PsychopatzCore/Input/PsychopatzKeybinds"
 require "PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationLLMInput"
-require "PNC/Commands/PNC_CompanionCommandEmotes"
+require "PNC/Commands/PNC_CompanionTargetResolver"
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
@@ -12,17 +12,56 @@ local Integration = PNC.HoomansLLM
 local Conversation = PNC.Conversation
 local Text = PsychopatzCore.Conversation.Text
 local Keybinds = PsychopatzCore.Keybinds
-local Emotes = PNC.CompanionCommandEmotes
+local Targets = PNC.CompanionTargetResolver
 local LLMInput = PsychopatzConversationLLMInput
 
 local MAX_INPUT_LENGTH = 4000
 local INLINE_WIDTH = 320
-local INLINE_HEIGHT = 88
-local INLINE_Y_OFFSET = 220
+local INLINE_HEIGHT = 108
+local INLINE_PLAYER_Y_OFFSET = 36
+local INLINE_MODE_NEAREST = "nearest"
+local INLINE_MODE_NEARBY = "nearby"
+local INLINE_SCOPE_COLONISTS = "colonists"
+local INLINE_SCOPE_OTHER = "other"
+local INLINE_HIGHLIGHT_COLOR = {
+    r = 0.0,
+    g = 1.0,
+    b = 1.0,
+    a = 0.85,
+}
 local INLINE_TITLE = {
     key = "panel.llm_inline_input",
     domain = "pnc.system.shared.categories",
     fallback = "TALK TO",
+}
+local INLINE_MODE_BUTTONS = {
+    {
+        id = INLINE_MODE_NEAREST,
+        mode = INLINE_MODE_NEAREST,
+        title = {
+            key = "llm.mode.nearest",
+            fallback = "NEAREST NPC",
+        },
+    },
+    {
+        id = INLINE_MODE_NEARBY,
+        mode = INLINE_MODE_NEARBY,
+        title = {
+            key = "llm.mode.nearby",
+            fallback = "NEARBY NPCS",
+        },
+    },
+}
+local INLINE_SCOPE_TOGGLE = {
+    id = "npcScope",
+    title = {
+        key = "llm.scope.colonists",
+        fallback = "COLONISTS",
+    },
+    alternateTitle = {
+        key = "llm.scope.other",
+        fallback = "OTHER NPCS",
+    },
 }
 
 local function label(key, fallback)
@@ -41,7 +80,9 @@ local function stateFor(view)
         visible = true
         if not view or not view.session then
             status = label("llm.status.open", "OPEN A CONVERSATION")
-        elseif view.session.llmPending then
+        elseif view.session.llmPending
+            or Integration.GetPending and Integration.GetPending()
+        then
             status = label("llm.status.waiting", "WAITING FOR NPC RESPONSE...")
         elseif not view:isConversationInteractive() then
             status = label("llm.status.speaking", "NPC IS SPEAKING...")
@@ -72,6 +113,7 @@ function Integration.CreateInputPart(bounds, options)
     options.getState = options.getState or stateFor
     options.resolveText = options.resolveText or label
     options.maxInputLength = options.maxInputLength or MAX_INPUT_LENGTH
+    options.submitOnEnter = options.submitOnEnter ~= false
     options.tooltipKey = options.tooltipKey or "llm.input_tooltip"
     options.sendKey = options.sendKey or "llm.send"
     options.sendTitle = options.sendTitle or "SEND"
@@ -91,9 +133,153 @@ Conversation.CreateHoomansLLMInput = Integration.CreateInputPart
 local Inline = Integration.Inline or {}
 Integration.Inline = Inline
 
+local function isLongPressBinding(binding)
+    local longPressType = Keybinds and Keybinds.TYPE_LONG_PRESS
+        or "longpress"
+    return type(binding) == "table"
+        and tostring(binding.type or "") == tostring(longPressType)
+end
+
+local function focusInlineInputWhenReady()
+    if not Inline.part or not Inline.focusAfterTriggerRelease then
+        return false
+    end
+    local binding = Inline.triggerBinding
+    if binding and Keybinds and Keybinds.IsDown
+        and Keybinds.IsDown(binding)
+    then
+        return false
+    end
+    Inline.focusAfterTriggerRelease = false
+    Inline.triggerBinding = nil
+    if Inline.part.focusInput then
+        Inline.part:focusInput()
+        return true
+    end
+    return false
+end
+
+Integration.FocusInlineInputWhenReady = focusInlineInputWhenReady
+
+local function prepareInlineInputFocus(binding)
+    Inline.triggerBinding = isLongPressBinding(binding) and binding or nil
+    Inline.focusAfterTriggerRelease = Inline.triggerBinding ~= nil
+    if Inline.focusAfterTriggerRelease then
+        return focusInlineInputWhenReady()
+    end
+    if Inline.part and Inline.part.focusInput then
+        Inline.part:focusInput()
+        return true
+    end
+    return false
+end
+
+local function resolveInlineZombie(entry)
+    if entry and entry.zombie then return entry.zombie end
+    local registry = PNC.Registry
+    local id = tostring(entry and entry.id or "")
+    if id ~= "" and registry and registry.GetLiveZombie then
+        return registry.GetLiveZombie(id)
+    end
+    return nil
+end
+
+local function clearInlineHighlights(playerIndex)
+    local active = Inline.highlightedZombies or {}
+    for _, zombie in pairs(active) do
+        if zombie and zombie.setOutlineHighlight then
+            zombie:setOutlineHighlight(playerIndex, false)
+        end
+    end
+    Inline.highlightedZombies = {}
+end
+
+local function refreshInlineHighlights(playerIndex)
+    local previous = Inline.highlightedZombies or {}
+    local current = {}
+    for _, entry in ipairs(Inline.entries or {}) do
+        local id = tostring(entry and entry.id or "")
+        local zombie = resolveInlineZombie(entry)
+        if id ~= "" and zombie and zombie.setOutlineHighlight then
+            current[id] = zombie
+            -- IsoMovingObject.renderlast clears this native outline after the
+            -- frame, so reapply it while the inline conversation is active.
+            zombie:setOutlineHighlight(playerIndex, true)
+            if zombie.setOutlineHighlightCol then
+                zombie:setOutlineHighlightCol(
+                    playerIndex,
+                    INLINE_HIGHLIGHT_COLOR.r,
+                    INLINE_HIGHLIGHT_COLOR.g,
+                    INLINE_HIGHLIGHT_COLOR.b,
+                    INLINE_HIGHLIGHT_COLOR.a
+                )
+            end
+        end
+    end
+    for id, zombie in pairs(previous) do
+        if current[id] ~= zombie
+            and zombie
+            and zombie.setOutlineHighlight
+        then
+            zombie:setOutlineHighlight(playerIndex, false)
+        end
+    end
+    Inline.highlightedZombies = current
+    return current
+end
+
+Integration.RefreshInlineHighlights = function()
+    return refreshInlineHighlights(0)
+end
+
+Integration.ClearInlineHighlights = function()
+    clearInlineHighlights(0)
+end
+
 local function currentConversationView()
     return PsychopatzCore and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.instance or nil
+end
+
+local function currentTime()
+    return getTimeInMillis and getTimeInMillis() or 0
+end
+
+local function directTargetFromEntry(entry, player)
+    local source = entry and (entry.source or entry.record or entry.snapshot)
+        or nil
+    local zombie = entry and entry.zombie or source and source.zombie or nil
+    local id = tostring(entry and entry.id or source and source.id or "")
+    local x = zombie and zombie.getX and zombie:getX()
+        or tonumber(entry and entry.x)
+        or tonumber(source and source.x)
+    local y = zombie and zombie.getY and zombie:getY()
+        or tonumber(entry and entry.y)
+        or tonumber(source and source.y)
+    local z = zombie and zombie.getZ and zombie:getZ()
+        or tonumber(entry and entry.z)
+        or tonumber(source and source.z)
+    local dx
+    local dy
+    if id == "" or not player or x == nil or y == nil or z == nil then
+        return nil
+    end
+    if zombie and zombie.isDead and zombie:isDead() then return nil end
+    if math.floor(z) ~= math.floor(tonumber(player:getZ()) or 0) then
+        return nil
+    end
+    dx = x - player:getX()
+    dy = y - player:getY()
+    if (dx * dx) + (dy * dy) > 20 * 20 then return nil end
+    return {
+        id = id,
+        name = entry.name or source and source.name or "NPC",
+        distSq = (dx * dx) + (dy * dy),
+        source = entry,
+        zombie = zombie,
+        record = entry.record,
+        snapshot = entry.snapshot,
+    }
 end
 
 local function closePart(part)
@@ -104,13 +290,105 @@ end
 
 function Integration.CloseInline(reason)
     local part = Inline.part
-    local host = Inline.host
+    local hosts = Inline.hosts or {}
+    local closed = {}
+    clearInlineHighlights(0)
     closePart(part)
-    if host and host.close then host:close(reason or "inline_closed") end
+    for _, host in ipairs(hosts) do
+        if host and not closed[host] and host.close then
+            host:close(reason or "inline_closed")
+            closed[host] = true
+        end
+    end
+    if Inline.host and not closed[Inline.host] and Inline.host.close then
+        Inline.host:close(reason or "inline_closed")
+    end
     Inline.part = nil
     Inline.host = nil
+    Inline.hosts = nil
+    Inline.targets = nil
+    Inline.entries = nil
     Inline.target = nil
     Inline.targetID = nil
+    Inline.directTarget = nil
+    Inline.focusAfterTriggerRelease = false
+    Inline.triggerBinding = nil
+    return true
+end
+
+local function clearPendingInlineFallback()
+    Inline.pendingTargetEntry = nil
+    Inline.pendingFallbackReason = nil
+    Inline.pendingFallbackDeadline = nil
+    Inline.pendingFallbackNextAttemptAt = nil
+end
+
+local function queueInlineFallback(entry, reason)
+    local id = tostring(entry and entry.id or "")
+    if id == "" then return false end
+    Inline.pendingTargetEntry = entry
+    Inline.targetID = id
+    Inline.directTarget = entry
+    Inline.mode = INLINE_MODE_NEAREST
+    Inline.scope = INLINE_SCOPE_OTHER
+    Inline.pendingFallbackReason = tostring(reason or "conversation_handoff")
+    Inline.pendingFallbackDeadline = currentTime() + 5000
+    Inline.pendingFallbackNextAttemptAt = 0
+    return true
+end
+
+local function openQueuedInlineFallback(binding)
+    local entry = Inline.pendingTargetEntry
+    if not entry then return false end
+    local now = currentTime()
+    if now > (tonumber(Inline.pendingFallbackDeadline) or 0) then
+        clearPendingInlineFallback()
+        return false
+    end
+    if now < (tonumber(Inline.pendingFallbackNextAttemptAt) or 0) then
+        return false
+    end
+    Inline.pendingFallbackNextAttemptAt = now + 250
+    Inline.targetID = tostring(entry.id)
+    Inline.directTarget = entry
+    Inline.mode = INLINE_MODE_NEAREST
+    Inline.scope = INLINE_SCOPE_OTHER
+    if Integration.OpenInline(binding) then
+        clearPendingInlineFallback()
+        return true
+    end
+    return false
+end
+
+function Integration.OpenInlineForTarget(entry, binding)
+    if not Integration.IsBridgeEnabled
+        or not Integration.IsBridgeEnabled()
+        or Integration.GetPending and Integration.GetPending()
+    then
+        return false
+    end
+    if not queueInlineFallback(entry, "conversation_handoff") then
+        return false
+    end
+    local view = currentConversationView()
+    if view then
+        if view.close then view:close("nameplate_fallback") end
+        return true
+    end
+    return openQueuedInlineFallback(binding)
+end
+
+function Integration.RequestInlineFallback(entry, reason, view)
+    if not Integration.IsBridgeEnabled
+        or not Integration.IsBridgeEnabled()
+    then
+        return false
+    end
+    if not queueInlineFallback(entry, reason) then return false end
+    local current = currentConversationView()
+    if current and (not view or current == view) and current.close then
+        current:close("nameplate_fallback")
+    end
     return true
 end
 
@@ -131,23 +409,15 @@ local function screenBounds(playerIndex)
     return left, top, right, bottom
 end
 
-local function worldPosition(entry)
-    local zombie = entry and entry.zombie
-    if zombie and zombie.getX and zombie.getY and zombie.getZ then
-        return zombie:getX(), zombie:getY(), zombie:getZ()
-    end
-    local source = entry and (entry.snapshot or entry.record) or {}
-    return tonumber(source.x), tonumber(source.y), tonumber(source.z)
-end
-
-local function positionInline(playerIndex)
+local function positionInline(playerIndex, player)
     local part = Inline.part
-    local entry = Inline.target
-    if not part or not entry or not isoToScreenX or not isoToScreenY then
+    if not part or not player or not isoToScreenX or not isoToScreenY then
         return false
     end
-    local x, y, z = worldPosition(entry)
-    if x == nil or y == nil or z == nil then return false end
+    if not player.getX or not player.getY or not player.getZ then
+        return false
+    end
+    local x, y, z = player:getX(), player:getY(), player:getZ()
     local screenX = isoToScreenX(playerIndex, x, y, z)
     local screenY = isoToScreenY(playerIndex, x, y, z)
     local left, top, right, bottom = screenBounds(playerIndex)
@@ -158,24 +428,193 @@ local function positionInline(playerIndex)
     local minY = top
     local maxY = math.max(top, bottom - height)
     local targetX = screenX - (width / 2)
-    local targetY = screenY - INLINE_Y_OFFSET
+    -- The closed-T input belongs to the player interaction, not to the NPC's
+    -- nameplate. Keep it under the player's feet while the NPC response is
+    -- rendered independently by the shared detached speech lane.
+    local targetY = screenY + INLINE_PLAYER_Y_OFFSET
     part:setX(math.max(minX, math.min(maxX, targetX)))
     part:setY(math.max(minY, math.min(maxY, targetY)))
     return true
 end
 
-local function targetStillNearby(player)
-    if not player or not Inline.targetID or not Emotes then return nil end
-    local candidates = Emotes.CollectNearbyCompanions(player)
-    for _, candidate in ipairs(candidates) do
-        if tostring(candidate.id) == tostring(Inline.targetID) then
-            return Emotes.BuildConversationEntry(candidate)
+local function resolveInlineRecipients(player)
+    if not player or not Targets then return nil end
+    Inline.mode = Targets.NormalizeMode(Inline.mode or INLINE_MODE_NEAREST)
+    Inline.scope = Targets.NormalizeScope(
+        Inline.scope or INLINE_SCOPE_COLONISTS
+    )
+    local resolved = Targets.ResolveRecipients(
+        player,
+        Inline.mode,
+        nil,
+        Inline.scope
+    )
+    if not resolved then return nil end
+    local primary = resolved.target
+    if Inline.targetID then
+        local candidates = resolved.targets
+        if Inline.mode == INLINE_MODE_NEAREST and #candidates == 0 then
+            candidates = Targets.CollectNearbyTargets(
+                player,
+                nil,
+                Inline.scope
+            )
         end
+        local found = false
+        for _, candidate in ipairs(candidates) do
+            if tostring(candidate.id) == tostring(Inline.targetID) then
+                primary = candidate
+                found = true
+                break
+            end
+        end
+        if not found and Inline.directTarget then
+            primary = directTargetFromEntry(Inline.directTarget, player)
+            found = primary ~= nil
+            if found then resolved.targets = { primary } end
+        end
+        if not found then return nil end
     end
-    return nil
+    if not primary then return nil end
+    if Inline.mode == INLINE_MODE_NEAREST then
+        resolved.targets = { primary }
+    end
+    return {
+        primary = primary,
+        targets = resolved.targets,
+    }
 end
 
-function Integration.OpenInline()
+local function buildInlineHost(entry, player)
+    if not Conversation.BuildDefinition
+        or not PsychopatzCore.Conversation.CreateHeadless
+    then
+        return nil
+    end
+    local definition = Conversation.BuildDefinition(entry, player)
+    definition.context = definition.context or {}
+    definition.context.nameplateConversation = true
+    local host = PsychopatzCore.Conversation.CreateHeadless(definition)
+    if not host or host.lifecycleError then return nil end
+    host.hoomansLLM = true
+    return host
+end
+
+local function rebuildInlineHosts(player, resolved)
+    local oldHosts = {}
+    local newHosts = {}
+    local createdHosts = {}
+    local entries = {}
+    local old
+    local entry
+    local host
+    local id
+    local primaryTarget = resolved.primary or resolved.target
+    if not primaryTarget then return false end
+    for _, old in ipairs(Inline.hosts or {}) do
+        id = tostring(old.spec and old.spec.npcID or "")
+        if id ~= "" then oldHosts[id] = old end
+    end
+    for _, candidate in ipairs(resolved.targets) do
+        entry = Targets.BuildConversationEntry(candidate)
+        id = tostring(entry.id)
+        host = oldHosts[id]
+        if host and host.closed then host = nil end
+        if not host then
+            host = buildInlineHost(entry, player)
+            if host then createdHosts[#createdHosts + 1] = host end
+        end
+        if not host then
+            for _, created in ipairs(createdHosts) do
+                if created and created.close then
+                    created:close("inline_target_build_failed")
+                end
+            end
+            return false
+        end
+        oldHosts[id] = nil
+        entries[#entries + 1] = entry
+        newHosts[#newHosts + 1] = host
+    end
+    -- A mode switch is only available while no request is pending, so unused
+    -- hosts have no in-flight bridge work and can be retired safely.
+    for _, unused in pairs(oldHosts) do
+        if unused and unused.close then unused:close("inline_retargeted") end
+    end
+    local primaryID = tostring(primaryTarget.id or "")
+    local primaryIndex = 1
+    for index, candidate in ipairs(entries) do
+        if tostring(candidate.id) == primaryID then
+            primaryIndex = index
+            break
+        end
+    end
+    Inline.entries = entries
+    Inline.hosts = newHosts
+    Inline.target = entries[primaryIndex]
+    Inline.targetID = tostring(Inline.target.id)
+    Inline.host = newHosts[primaryIndex]
+    return true
+end
+
+function Integration.SetInlineMode(_, mode, part)
+    if part and part ~= Inline.part then return false end
+    if not Inline.part then return false end
+    if Integration.GetPending and Integration.GetPending() then return false end
+    local previousMode = Inline.mode
+    local player = getSpecificPlayer and getSpecificPlayer(0)
+        or getPlayer and getPlayer() or nil
+    Inline.mode = Targets.NormalizeMode(mode)
+    local resolved = resolveInlineRecipients(player)
+    if not resolved or #resolved.targets == 0 then
+        Inline.mode = previousMode
+        return false
+    end
+    if not rebuildInlineHosts(player, resolved) then
+        Inline.mode = previousMode
+        return false
+    end
+    refreshInlineHighlights(0)
+    Inline.part.owner = Inline.host
+    Inline.part:refreshControls()
+    positionInline(0, player)
+    return true
+end
+
+function Integration.SetInlineScope(_, value, part)
+    if part and part ~= Inline.part then return false end
+    if not Inline.part then return false end
+    if Integration.GetPending and Integration.GetPending() then return false end
+    local previousScope = Inline.scope
+    local player = getSpecificPlayer and getSpecificPlayer(0)
+        or getPlayer and getPlayer() or nil
+    Inline.scope = value == true
+        and INLINE_SCOPE_OTHER or INLINE_SCOPE_COLONISTS
+    local resolved = resolveInlineRecipients(player)
+    if not resolved or #resolved.targets == 0 then
+        Inline.scope = previousScope
+        return false
+    end
+    if not rebuildInlineHosts(player, resolved) then
+        Inline.scope = previousScope
+        return false
+    end
+    refreshInlineHighlights(0)
+    Inline.part.owner = Inline.host
+    Inline.part:refreshControls()
+    positionInline(0, player)
+    return true
+end
+
+function Integration.SubmitInline(view, value, part)
+    local accepted, reason = Integration.Submit(view, value, part)
+    if accepted == true then
+        Integration.CloseInline("message_submitted")
+    end
+    return accepted, reason
+end
+
+function Integration.OpenInline(binding)
     if not Integration.IsBridgeEnabled
         or not Integration.IsBridgeEnabled()
         or Integration.GetPending and Integration.GetPending()
@@ -185,37 +624,49 @@ function Integration.OpenInline()
     if currentConversationView() then return false end
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
-    if not player or not Emotes then return false end
-    local candidates = Emotes.CollectNearbyCompanions(player)
-    local candidate = candidates[1]
+    if not player or not Targets then return false end
+    Inline.mode = Targets.NormalizeMode(Inline.mode or INLINE_MODE_NEAREST)
+    Inline.scope = Targets.NormalizeScope(
+        Inline.scope or INLINE_SCOPE_COLONISTS
+    )
+    local resolved = Targets.ResolveRecipients(
+        player,
+        Inline.mode,
+        nil,
+        Inline.scope
+    )
+    local candidate = resolved and resolved.target
     if not candidate then return false end
-    if Inline.part and tostring(Inline.targetID) == tostring(candidate.id) then
+    if Inline.part and tostring(Inline.targetID) == tostring(candidate.id)
+        and Inline.mode == (Inline.part.inputMode or Inline.mode)
+    then
+        refreshInlineHighlights(0)
         if Inline.part.bringToTop then Inline.part:bringToTop() end
-        if Inline.part.focusInput then Inline.part:focusInput() end
+        prepareInlineInputFocus(binding)
         return true
     end
     if Inline.part then Integration.CloseInline("retargeted") end
-    if not Conversation.BuildDefinition
-        or not PsychopatzCore.Conversation.CreateHeadless
-    then
-        return false
-    end
-    local entry = Emotes.BuildConversationEntry(candidate)
-    local definition = Conversation.BuildDefinition(entry, player)
-    local host = PsychopatzCore.Conversation.CreateHeadless(definition)
-    if not host or host.lifecycleError then return false end
-    host.hoomansLLM = true
+    if not rebuildInlineHosts(player, resolved) then return false end
     local part = LLMInput:new(0, 0, INLINE_WIDTH, INLINE_HEIGHT, {
-        owner = host,
+        owner = Inline.host,
         partID = "llmInlineInput",
         title = INLINE_TITLE,
-        submit = Integration.Submit,
+        submit = Integration.SubmitInline,
         getState = stateFor,
         resolveText = label,
         maxInputLength = MAX_INPUT_LENGTH,
+        submitOnEnter = true,
         tooltipKey = "llm.input_tooltip",
         sendKey = "llm.send",
         sendTitle = "SEND",
+        modeButtons = INLINE_MODE_BUTTONS,
+        initialMode = Inline.mode,
+        onModeChanged = Integration.SetInlineMode,
+        toggleButton = INLINE_SCOPE_TOGGLE,
+        initialToggleValue = Inline.scope == INLINE_SCOPE_OTHER,
+        onToggleChanged = Integration.SetInlineScope,
+        maxInputLines = 6,
+        maxInputHeight = 122,
         showClose = true,
         onClose = function()
             Integration.CloseInline("user_closed")
@@ -228,39 +679,49 @@ function Integration.OpenInline()
     part:setReveal(1)
     if part.setAlwaysOnTop then part:setAlwaysOnTop(true) end
     Inline.part = part
-    Inline.host = host
-    Inline.target = entry
-    Inline.targetID = tostring(entry.id)
     part:refreshControls()
-    positionInline(0)
+    refreshInlineHighlights(0)
+    positionInline(0, player)
     if part.bringToTop then part:bringToTop() end
-    if part.focusInput then part:focusInput() end
+    prepareInlineInputFocus(binding)
     return true
 end
 
 function Integration.UpdateInline()
-    if not Inline.part then return end
     if currentConversationView() then
-        Integration.CloseInline("conversation_opened")
+        if Inline.part then Integration.CloseInline("conversation_opened") end
         return
     end
+    if Inline.pendingTargetEntry then
+        openQueuedInlineFallback("conversation_handoff")
+    end
+    if not Inline.part then return end
     if not Integration.IsBridgeEnabled
         or not Integration.IsBridgeEnabled()
     then
         Integration.CloseInline("bridge_disabled")
         return
     end
+    for _, host in ipairs(Inline.hosts or {}) do
+        if host and host.updateLifecycle then host:updateLifecycle() end
+    end
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
-    local entry = targetStillNearby(player)
-    if not entry then
+    local resolved = resolveInlineRecipients(player)
+    if not resolved then
         Integration.CloseInline("target_unavailable")
         return
     end
-    Inline.target = entry
+    if not rebuildInlineHosts(player, resolved) then
+        Integration.CloseInline("target_unavailable")
+        return
+    end
+    refreshInlineHighlights(0)
+    Inline.part.owner = Inline.host
     Inline.part.title = INLINE_TITLE
     Inline.part:refreshControls()
-    positionInline(0)
+    positionInline(0, player)
+    focusInlineInputWhenReady()
 end
 
 local function closeOnEscape(key)

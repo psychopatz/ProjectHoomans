@@ -119,7 +119,17 @@ function Composer.ReceiveOutcome(args)
         after = args.relationshipAfter,
         at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
     })
-    receiveRelationshipAfter(args.npcID, args.relationshipAfter)
+    receiveRelationshipAfter(
+        args.npcID,
+        args.relationshipAfter,
+        args.relationshipDelta,
+        {
+            source = "conversation_outcome",
+            eventID = args.eventID,
+            revision = args.relationshipAfter
+                and args.relationshipAfter.revision,
+        }
+    )
     for _, effect in ipairs(args.effectResults or {}) do
         if effect.type == "pnc:open_territory_claim"
             and effect.result and effect.result.openClaim == true

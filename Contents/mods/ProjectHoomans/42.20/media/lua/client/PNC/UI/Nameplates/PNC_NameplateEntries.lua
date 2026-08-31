@@ -3,6 +3,7 @@ PNC.NameplateEntries = PNC.NameplateEntries or {}
 
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 require "PNC/UI/Nameplates/PNC_NameplateSpeech"
+require "PNC/UI/Nameplates/PNC_NameplateScopes"
 
 local Entries = PNC.NameplateEntries
 local Bodies = PNC.NameplateBodies
@@ -12,6 +13,7 @@ local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
 local Identity = PNC.NPCIdentityPresentation
 local Speech = PNC.NameplateSpeech
+local Scopes = PNC.NameplateScopes
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local UPDATE_RATE = 6
@@ -213,7 +215,7 @@ end
 
 Entries.BuildCommunityDebugLines = communityDebugLines
 
-local function cacheMetrics(entry, snapshot, zombie, settings)
+local function cacheMetrics(entry, snapshot, zombie, settings, speech, scopes)
     local fonts = Presentation.Fonts
     local showDebug = settings and settings.showAIDebug == true
     local name = Identity.GetName(snapshot)
@@ -239,7 +241,7 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
     local infectionDebugText = showDebug
         and Debug.InfectionText(snapshot, settings) or ""
     local actionText, actionColor = Presentation.ActionStatus(snapshot)
-    local speech = Speech and Speech.Get(snapshot and snapshot.id) or nil
+    speech = speech or (Speech and Speech.Get(snapshot and snapshot.id) or nil)
     local speechText = Speech and Speech.GetDisplayText(speech) or ""
     local factionLine1
     local factionLine2
@@ -262,9 +264,13 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
     entry.communityDebugTone =
         communityDebugLines(snapshot, settings)
     entry.actionColor = actionColor
-    entry.actionVisible = actionText ~= ""
+    entry.scopes = scopes or {}
+    entry.identityVisible = entry.scopes[Scopes.IDENTITY] == true
+    entry.debugVisible = entry.scopes[Scopes.DEBUG] == true
+    entry.conversationVisible = entry.scopes[Scopes.CONVERSATION] == true
+    entry.actionVisible = entry.identityVisible and actionText ~= ""
     entry.speech = speech
-    entry.speechVisible = speechText ~= ""
+    entry.speechVisible = entry.conversationVisible and speechText ~= ""
     Presentation.CacheTextMetric(entry, "name", name, fonts.name)
     Presentation.CacheTextMetric(entry, "debugText", debugText, fonts.debug)
     Presentation.CacheTextMetric(
@@ -301,7 +307,7 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
         entry,
         "speechText",
         speechText,
-        fonts.debug
+        fonts.speech or fonts.debug
     )
     Presentation.CacheTextMetric(
         entry,
@@ -347,7 +353,15 @@ local function cacheMetrics(entry, snapshot, zombie, settings)
     )
 end
 
-local function populateLiveEntry(entry, snapshot, zombie, currentTime, settings)
+local function populateLiveEntry(
+    entry,
+    snapshot,
+    zombie,
+    currentTime,
+    settings,
+    speech,
+    scopes
+)
     if Diagnostics then
         Diagnostics.Increment("UI.NameplateEntryBuilds")
     end
@@ -356,17 +370,19 @@ local function populateLiveEntry(entry, snapshot, zombie, currentTime, settings)
     entry.debugOnly = false
     entry.healthRatio = Presentation.HealthRatio(snapshot)
     entry.nameColor = Presentation.NameColor(snapshot)
-    entry.healthVisible = Presentation.ShouldShowHealth(snapshot, currentTime)
-    entry.staminaVisible = Presentation.ShouldShowStamina(snapshot, currentTime)
+    entry.healthVisible = scopes[Scopes.IDENTITY]
+        and Presentation.ShouldShowHealth(snapshot, currentTime) or false
+    entry.staminaVisible = scopes[Scopes.IDENTITY]
+        and Presentation.ShouldShowStamina(snapshot, currentTime) or false
     entry.staminaRatio = Presentation.StaminaRatio(snapshot)
     entry.staminaColor = Presentation.StaminaColor(entry.staminaRatio)
     entry.barColor = snapshot.healthState == "incapacitated"
         and Presentation.IncapacitatedColor(currentTime)
         or Presentation.HealthColor(entry.healthRatio)
-    cacheMetrics(entry, snapshot, zombie, settings)
+    cacheMetrics(entry, snapshot, zombie, settings, speech, scopes)
 end
 
-local function populateDebugEntry(entry, snapshot, settings)
+local function populateDebugEntry(entry, snapshot, settings, speech, scopes)
     if Diagnostics then
         Diagnostics.Increment("UI.NameplateEntryBuilds")
     end
@@ -377,37 +393,13 @@ local function populateDebugEntry(entry, snapshot, settings)
     entry.worldY = tonumber(snapshot.y) or 0
     entry.worldZ = tonumber(snapshot.z) or 0
     entry.nameColor = Presentation.NameColor(snapshot)
-    cacheMetrics(entry, snapshot, nil, settings)
-end
-
-local function isLiveVisible(player, zombie)
-    local layout = Presentation.Layout
-    return math.abs(player:getZ() - zombie:getZ()) <= layout.floorTolerance
-        and Presentation.Distance(player, zombie) <= layout.maxDrawDistance
-end
-
-local function isDebugVisible(player, snapshot)
-    local layout = Presentation.Layout
-    return math.abs(player:getZ() - (tonumber(snapshot.z) or 0)) <= layout.floorTolerance
-        and PNC.Core.Distance(
-            player:getX(),
-            player:getY(),
-            tonumber(snapshot.x) or 0,
-            tonumber(snapshot.y) or 0
-        ) <= layout.maxDrawDistance
+    cacheMetrics(entry, snapshot, nil, settings, speech, scopes)
 end
 
 function Entries.Refresh(manager, settings)
     if Diagnostics then
         Diagnostics.Increment("UI.NameplateUpdateCalls")
     end
-    local debugActive = settings.showAIDebug == true
-        or settings.showPathDebug == true
-        or settings.showCombatDebug == true
-        or settings.showAnimationDebug == true
-        or settings.showAnimationSceneDebug == true
-        or settings.showFactionDebug == true
-        or settings.showCommunityDebug == true
     if settings.showFactionDebug == true
         and PNC.FactionDebugOverlay
         and PNC.FactionDebugOverlay.Update
@@ -465,21 +457,35 @@ function Entries.Refresh(manager, settings)
     local visible = {}
     for uuid, snapshot in pairs(ClientState.snapshots or {}) do
         local zombie = Bodies.Resolve(bodyIndex, uuid, snapshot)
+        local speech = Speech and Speech.Get(uuid) or nil
         local alive = snapshot and snapshot.alive ~= false
             and snapshot.presenceState == Const.PRESENCE_LIVE
-        if zombie and alive
-            and (Identity.IsNameKnown(snapshot) or debugActive)
+        local scopes = Scopes.Build(
+            player,
+            snapshot,
+            zombie,
+            settings,
+            speech
+        )
+        if zombie and alive and Scopes.IsLiveVisible(player, zombie)
+            and Scopes.HasRenderableScope(scopes)
         then
             Bodies.Tag(zombie, uuid, snapshot)
-            if isLiveVisible(player, zombie) then
-                local entry = manager.entries[uuid] or { uuid = uuid }
-                populateLiveEntry(entry, snapshot, zombie, currentTime, settings)
-                manager.entries[uuid] = entry
-                visible[uuid] = true
-            end
-        elseif debugActive and snapshot and isDebugVisible(player, snapshot) then
             local entry = manager.entries[uuid] or { uuid = uuid }
-            populateDebugEntry(entry, snapshot, settings)
+            populateLiveEntry(
+                entry,
+                snapshot,
+                zombie,
+                currentTime,
+                settings,
+                speech,
+                scopes
+            )
+            manager.entries[uuid] = entry
+            visible[uuid] = true
+        elseif snapshot and Scopes.HasRenderableScope(scopes) then
+            local entry = manager.entries[uuid] or { uuid = uuid }
+            populateDebugEntry(entry, snapshot, settings, speech, scopes)
             manager.entries[uuid] = entry
             visible[uuid] = true
         end

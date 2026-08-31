@@ -83,8 +83,20 @@ local function onResetLua()
     ClientState.conversationDiary = {}
     ClientState.conversationDiaryRevision = 0
     ClientState.lastConversationDelta = nil
+    if PNC.NameplateRelationshipFeedback
+        and PNC.NameplateRelationshipFeedback.Reset
+    then
+        PNC.NameplateRelationshipFeedback.Reset()
+    end
+    if PNC.Conversation
+        and PNC.Conversation.Relationship
+        and PNC.Conversation.Relationship.ResetPresentationCache
+    then
+        PNC.Conversation.Relationship.ResetPresentationCache()
+    end
     ClientState.llmToolResults = {}
     ClientState.llmToolResultOrder = {}
+    ClientState.llmReactionCapabilities = {}
     local context = PNC.HoomansLLM and PNC.HoomansLLM.Context
     if context and context.ResetTransientState then
         context.ResetTransientState()

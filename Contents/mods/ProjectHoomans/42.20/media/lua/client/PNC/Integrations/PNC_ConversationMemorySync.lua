@@ -143,6 +143,14 @@ function Sync.Enqueue(message)
     if Message.IsLLMContextEligible
         and not Message.IsLLMContextEligible(message, text)
     then
+        if print and message.source
+            and (message.source.providerFailure == true
+                or message.source.excludeFromLLM == true
+                or message.source.contextEligible == false)
+        then
+            print("[PNC][LLM] conversation_sync_skipped message="
+                .. messageID .. " reason=llm_context_excluded")
+        end
         return false, "llm_context_excluded"
     end
     local root = storage()
@@ -157,6 +165,12 @@ function Sync.Enqueue(message)
     end
     root.records[#root.records + 1] = wireMessage(message)
     root.index[messageID] = true
+    if print then
+        print("[PNC][LLM] conversation_sync_queued message="
+            .. messageID .. " speaker="
+            .. tostring(message.speakerKind or message.speaker or "unknown")
+            .. " pending=" .. tostring(#root.records))
+    end
     return true, "queued"
 end
 
@@ -196,6 +210,10 @@ function Sync.Ack(arguments)
         end
     end
     root.records = kept
+    if removed > 0 and print then
+        print("[PNC][LLM] conversation_sync_acknowledged count="
+            .. tostring(removed) .. " pending=" .. tostring(#root.records))
+    end
     return {
         acknowledged = removed,
         pendingCount = #root.records,

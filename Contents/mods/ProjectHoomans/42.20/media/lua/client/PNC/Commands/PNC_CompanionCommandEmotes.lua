@@ -3,17 +3,14 @@
 -- scopes. Nested groups stay private so vanilla never exposes them as roots.
 
 require "ISUI/ISEmoteRadialMenu"
-require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+require "PNC/Commands/PNC_CompanionTargetResolver"
 
 PNC = PNC or {}
 PNC.CompanionCommandEmotes = PNC.CompanionCommandEmotes or {}
 
 local Emotes = PNC.CompanionCommandEmotes
 local Commands = PNC.CompanionCommands
-local Const = PNC.Const
-local Registry = PNC.Registry
-local ClientState = PNC.Network and PNC.Network.ClientState or nil
-local Identity = PNC.NPCIdentityPresentation
+local Targets = PNC.CompanionTargetResolver
 local CLOSEST_MENU_KEY = "PNC_ClosestCompanionCommands"
 local GROUP_MENU_KEY = "PNC_GroupCompanionCommands"
 local CLOSEST_COMMAND_PREFIX = "PNC_ClosestCommand_"
@@ -44,128 +41,14 @@ local function replaceTokens(text, values)
     return output
 end
 
-local function targetName(source)
-    return Identity.GetName(source or { recruited = true })
-end
-
-local function hasOwnerIdentity(source)
-    return source and (
-        source.ownerUsername ~= nil
-        or source.ownerOnlineID ~= nil
-        or source.characterWindow
-            and (
-                source.characterWindow.ownerUsername ~= nil
-                or source.characterWindow.ownerOnlineID ~= nil
-            )
-    ) or false
-end
-
-local function isClientCommandCandidate(source, player, radius)
-    local x
-    local y
-    local z
-    local dx
-    local dy
-    if not source or not player
-        or source.alive == false
-        or tostring(source.presenceState or Const.PRESENCE_LIVE)
-            ~= tostring(Const.PRESENCE_LIVE)
-        or not Commands or not Commands.IsCompanion
-        or not Commands.IsCompanion(source)
-    then
-        return false
-    end
-    if hasOwnerIdentity(source)
-        and (not Commands.IsOwnedByPlayer
-            or not Commands.IsOwnedByPlayer(source, player))
-    then
-        return false
-    end
-    x = tonumber(source.x)
-    y = tonumber(source.y)
-    z = tonumber(source.z)
-    if x == nil or y == nil or z == nil then return false end
-    if math.floor(z) ~= math.floor(tonumber(player:getZ()) or 0) then
-        return false
-    end
-    dx = x - player:getX()
-    dy = y - player:getY()
-    return (dx * dx) + (dy * dy) <= radius * radius
-end
-
-local function pushCandidate(output, seen, player, source, radius)
-    local id = source and source.id and tostring(source.id) or nil
-    local x
-    local y
-    local dx
-    local dy
-    if not id or seen[id] then return end
-    if not isClientCommandCandidate(source, player, radius) then return end
-    x = tonumber(source.x)
-    y = tonumber(source.y)
-    if x == nil or y == nil then return end
-    dx = x - player:getX()
-    dy = y - player:getY()
-    seen[id] = true
-    output[#output + 1] = {
-        id = id,
-        name = targetName(source),
-        attackType = Commands.GetCurrentAttackType(source),
-        distSq = (dx * dx) + (dy * dy),
-        source = source,
-    }
-end
-
 function Emotes.CollectNearbyCompanions(player)
-    local output = {}
-    local seen = {}
-    local radius = tonumber(Const.COMPANION_COMMAND_RADIUS) or 20
-    local id
-    local snapshot
-    if not player or player.isDead and player:isDead() then return output end
-    if Registry and Registry.ForEach then
-        Registry.ForEach(function(record)
-            pushCandidate(output, seen, player, record, radius)
-        end)
-    end
-    for id, snapshot in pairs(
-        ClientState and ClientState.snapshots or {}
-    ) do
-        pushCandidate(output, seen, player, snapshot, radius)
-    end
-    table.sort(output, function(left, right)
-        if left.distSq ~= right.distSq then
-            return left.distSq < right.distSq
-        end
-        if left.name ~= right.name then
-            return left.name < right.name
-        end
-        return left.id < right.id
-    end)
-    return output
+    return Targets.CollectNearbyCompanions(player)
 end
 
 -- Convert the same closest-companion result used by the emote radial menu
 -- into the richer entry shape consumed by the conversation definition.
 function Emotes.BuildConversationEntry(target)
-    local source = target and target.source or target
-    local id = tostring(target and target.id or source and source.id or "")
-    local snapshot = ClientState and ClientState.snapshots
-        and ClientState.snapshots[id] or nil
-    local record = Registry and Registry.Get and Registry.Get(id) or nil
-    local zombie = Registry and Registry.GetLiveZombie
-        and Registry.GetLiveZombie(id) or nil
-    if not record and not snapshot then
-        record = source
-    end
-    return {
-        id = id,
-        name = target and target.name or targetName(record or snapshot or source),
-        record = record,
-        snapshot = snapshot,
-        zombie = zombie,
-        source = source,
-    }
+    return Targets.BuildConversationEntry(target)
 end
 
 function Emotes.ResolveAttackTypeIcon(target)
@@ -303,6 +186,7 @@ end
 
 function ISEmoteRadialMenu:init()
     local player
+    local nearby
     local closest
     local closestLabel
     local closestVisual
@@ -312,8 +196,9 @@ function ISEmoteRadialMenu:init()
     player = self.character
         or getSpecificPlayer and getSpecificPlayer(self.playerNum or 0)
         or nil
-    self.PNCNearbyCompanions = Emotes.CollectNearbyCompanions(player)
-    self.PNCClosestCompanion = self.PNCNearbyCompanions[1]
+    nearby = Targets.ResolveRecipients(player, "nearby")
+    self.PNCNearbyCompanions = nearby and nearby.targets or {}
+    self.PNCClosestCompanion = nearby and nearby.target or nil
     self.PNCCommandNestedMenus = {}
     closest = self.PNCClosestCompanion
     closestVisual = closest or {

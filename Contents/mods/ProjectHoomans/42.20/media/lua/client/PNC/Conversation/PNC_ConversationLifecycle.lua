@@ -19,6 +19,39 @@ local function isNetworkClient()
     return isClient and isClient() == true
 end
 
+local function isNameplateConversation(spec)
+    return spec and spec.context
+        and spec.context.nameplateConversation == true
+end
+
+local function isHostileConversation(spec)
+    local context = spec and spec.context or {}
+    local entry = context.entry or {}
+    local snapshot = entry.snapshot or {}
+    local entryRecord = entry.record or {}
+    local hostility = snapshot.hostility or entryRecord.hostility or {}
+    if hostility.attackPlayers == true then return true end
+    local _, _, record = Safety.ResolveActors(spec)
+    return record and record.hostility
+        and record.hostility.attackPlayers == true or false
+end
+
+local function requestNameplateFallback(view, spec, reason)
+    if isNameplateConversation(spec) or not isHostileConversation(spec) then
+        return false
+    end
+    local integration = PNC.HoomansLLM
+    if not integration or not integration.RequestInlineFallback then
+        return false
+    end
+    local context = spec and spec.context or {}
+    local entry = context.entry or {
+        id = spec and spec.npcID,
+        zombie = spec and spec.character,
+    }
+    return integration.RequestInlineFallback(entry, reason, view) == true
+end
+
 local function send(command, state, reason, extra)
     if not sendClientCommand or not Scene then return false end
     local payload = {
@@ -64,7 +97,14 @@ end
 
 function Lifecycle.Create()
     return {
-        begin = function(_, spec)
+        begin = function(view, spec)
+            if requestNameplateFallback(
+                view,
+                spec,
+                "hostile_nameplate_fallback"
+            ) then
+                return false, "nameplate_fallback"
+            end
             local reason = Safety.Check(spec)
             if reason then return false, reason end
             local _, _, _, npcID = Safety.ResolveActors(spec)
@@ -89,8 +129,15 @@ function Lifecycle.Create()
             spec.context.conversationLifecycleState = state
             return state
         end,
-        update = function(_, spec, state)
+        update = function(view, spec, state)
             if not state then return "npc_unavailable" end
+            if requestNameplateFallback(
+                view,
+                spec,
+                "hostile_nameplate_fallback"
+            ) then
+                return "nameplate_fallback"
+            end
             local time = currentTime()
             if time >= (tonumber(state.nextSafetyCheckAt) or 0) then
                 state.nextSafetyCheckAt = time + 180
@@ -117,7 +164,9 @@ function Lifecycle.Create()
             end
             if not state then return end
             if isNetworkClient() then
-                send(Scene.CMD_END, state, reason)
+                send(Scene.CMD_END, state, reason, {
+                    llmRequestID = state and state.llmRequestID or nil,
+                })
                 return
             end
             local _, zombie, record = Safety.ResolveActors(spec)
@@ -126,7 +175,11 @@ function Lifecycle.Create()
                     record,
                     zombie,
                     state.token,
-                    "conversation_" .. tostring(reason or "closed")
+                    "conversation_" .. tostring(reason or "closed"),
+                    {
+                        llmRequestID = state and state.llmRequestID or nil,
+                        player = spec and spec.context and spec.context.player,
+                    }
                 )
             end
         end,
