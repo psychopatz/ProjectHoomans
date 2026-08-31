@@ -61,6 +61,13 @@ local view = {
     session = {},
     historyPart = { messages = {
         { speaker = "npc", payload = { fallback = "Stay close." } },
+        { speaker = "npc", payload = {
+            fallback = "I cannot answer right now. (OpenAI-compatible provider request failed: APIStatusError.)",
+        } },
+        { speaker = "npc", source = { providerFailure = true }, payload = {
+            fallback = "provider fallback without a legacy marker",
+        } },
+        { speaker = "player", payload = { fallback = "Do you need anything?" } },
     } },
 }
 
@@ -75,8 +82,10 @@ T.equal(context.current_state.needs.highest, "hunger", "highest current need")
 T.equal(context.current_state.needs.urgency, "severe", "needs urgency")
 T.truthy(#context.relationship_capabilities.available_reactions >= 4,
     "relationship capabilities exposed")
-T.equal(#context.recent_conversation, 1, "bounded recent conversation")
+T.equal(#context.recent_conversation, 2, "provider failures pruned from recent conversation")
 T.equal(context.recent_conversation[1].content, "Stay close.", "recent dialogue content")
+T.equal(context.recent_conversation[2].role, "user", "player dialogue retained")
+T.equal(context.recent_conversation[2].content, "Do you need anything?", "player content retained")
 T.equal(context.available_tools[1]["function"].name, "social_react", "valid social tool name")
 T.equal(context.available_tools[2]["function"].name, "order_follow", "valid order tool name")
 T.equal(#context.available_tools, 2, "client-only tools are not exposed")

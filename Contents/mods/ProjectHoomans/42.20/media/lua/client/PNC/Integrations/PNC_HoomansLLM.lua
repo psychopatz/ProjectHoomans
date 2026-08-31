@@ -14,6 +14,7 @@ local Layout = PsychopatzCore.Conversation.Layout
 local Context = PNC.HoomansLLM.Context
 local Message = PsychopatzCore.Conversation.Message
 local Trace = PsychopatzCore.DebugTrace
+local Speech = PNC.NameplateSpeech
 
 if not Layout.defaults.llmInput then
     local choices = Layout.GetNormalized("choices")
@@ -118,7 +119,11 @@ function Integration.Submit(view, value)
         return false, "bridge_disabled"
     end
     if Pending then return false, "llm_request_pending" end
-    if not view or view ~= currentView() or not view.session then
+    local headless = view and view.headless == true
+        and view.hoomansLLM == true
+    if not view or (view ~= currentView() and not headless)
+        or not view.session
+    then
         return false, "conversation_unavailable"
     end
     if not view:isConversationInteractive() then
@@ -169,6 +174,13 @@ function Integration.Submit(view, value)
         packet = packet,
         claimed = false,
     }
+    if Speech and Speech.SetPending then
+        Speech.SetPending(
+            Pending.npcID,
+            requestID,
+            session.conversationID
+        )
+    end
     log(
         "chat_submit",
         "npc=" .. tostring(Pending.npcID)
@@ -312,6 +324,22 @@ local function publishDetachedResponse(pending, response, source)
     local packet = pending and pending.packet or {}
     local context = packet.conversation_context or {}
     if not view then return nil end
+    if session then
+        session.queue = {}
+        session.llmPending = nil
+        session.busy = false
+        session.pendingNext = nil
+        session.pendingClose = nil
+        session.pendingCloseReason = nil
+        if session.historyPart then
+            session.historyPart:setTyping(nil)
+        elseif view.historyPart then
+            view.historyPart:setTyping(nil)
+        end
+    end
+    if Speech and Speech.ClearPending then
+        Speech.ClearPending(pending.npcID, pending.requestID)
+    end
     source = source or {}
     source.messageID = source.messageID
         or (source.requestID and "llm-response:" .. tostring(source.requestID))
@@ -351,19 +379,22 @@ local function publishDetachedResponse(pending, response, source)
         )
     end
     Message.Publish(message)
+    if session and view.historyPart and view.historyPart.addMessage then
+        view.historyPart:addMessage(message)
+    end
     return message
 end
 
 local function responseOrFailure(arguments, actionAccepted, actionAttempted)
     local response = trim(arguments and arguments.response_text)
-    if response ~= "" then return string.sub(response, 1, 3900) end
+    if response ~= "" then return string.sub(response, 1, 3900), false end
 
     local failure = trim(arguments and arguments.error)
     if failure == "" and actionAccepted then
-        return "I will take care of that."
+        return "I will take care of that.", false
     end
     if failure == "" and actionAttempted then
-        return "I understand."
+        return "I understand.", false
     end
     if failure == "" then
         local finishReason = trim(arguments and arguments.finish_reason)
@@ -374,9 +405,9 @@ local function responseOrFailure(arguments, actionAccepted, actionAttempted)
             or "provider returned an empty response"
     end
     if failure ~= "" then
-        return "I cannot answer right now. (" .. string.sub(failure, 1, 420) .. ")"
+        return "I cannot answer right now. (" .. string.sub(failure, 1, 420) .. ")", true
     end
-    return "I cannot answer right now."
+    return "I cannot answer right now.", true
 end
 
 function Integration.Deliver(arguments)
@@ -392,7 +423,24 @@ function Integration.Deliver(arguments)
     then
         local calls = arguments and arguments.semantic_tool_calls
         local actionAttempted = type(calls) == "table" and #calls > 0
-        local response = responseOrFailure(arguments, false, actionAttempted)
+        local semanticResults = {}
+        if view and view.session then
+            semanticResults = applySemanticTools(
+                Pending.packet,
+                arguments,
+                Pending.npcID,
+                view.session
+            )
+        end
+        local actionAccepted = false
+        for _, result in ipairs(semanticResults) do
+            if result.accepted == true then actionAccepted = true break end
+        end
+        local response, providerFailure = responseOrFailure(
+            arguments,
+            actionAccepted,
+            actionAttempted
+        )
         if traceEnabled() then
             Trace.Record({
                 source = "ProjectHoomans",
@@ -401,6 +449,7 @@ function Integration.Deliver(arguments)
                 data = {
                     npcID = Pending.npcID,
                     arguments = arguments,
+                    semanticResults = semanticResults,
                     fallbackResponse = response,
                     presentation = "nameplate",
                 },
@@ -411,6 +460,8 @@ function Integration.Deliver(arguments)
             channel = "response_detached",
             requestID = requestID,
             sessionID = Pending.packet and Pending.packet.session_id,
+            providerFailure = providerFailure == true,
+            contextEligible = providerFailure ~= true,
         })
         Pending = nil
         return {
@@ -423,12 +474,17 @@ function Integration.Deliver(arguments)
 
     local semanticResults = applySemanticTools(Pending.packet, arguments, Pending.npcID, view.session)
     local response = trim(arguments.response_text)
+    local providerFailure = false
     if response == "" then
         local actionAccepted = false
         for _, result in ipairs(semanticResults) do
             if result.accepted == true then actionAccepted = true break end
         end
-        response = responseOrFailure(arguments, actionAccepted, #semanticResults > 0)
+        response, providerFailure = responseOrFailure(
+            arguments,
+            actionAccepted,
+            #semanticResults > 0
+        )
     end
     response = string.sub(response, 1, 3900)
     if traceEnabled() then
@@ -463,6 +519,7 @@ function Integration.Deliver(arguments)
         Pending.utteranceID = trim(arguments.utterance_id)
         Pending.conversationID = trim(arguments.conversation_id)
         Pending.responseText = response
+        Pending.responseIsFailure = providerFailure == true
         session.llmPending = true
         session.busy = true
         view.historyPart:setTyping("npc")
@@ -492,6 +549,8 @@ function Integration.Deliver(arguments)
         requestID = requestID,
         sessionID = Pending.packet and Pending.packet.session_id,
         messageID = "llm-response:" .. requestID,
+        providerFailure = providerFailure == true,
+        contextEligible = providerFailure ~= true,
     })
     if traceEnabled() then
         Trace.Record({
@@ -541,6 +600,8 @@ function Integration.SpeechStarted(arguments)
             requestID = Pending.requestID,
             sessionID = Pending.packet and Pending.packet.session_id,
             utteranceID = Pending.utteranceID,
+            providerFailure = Pending.responseIsFailure == true,
+            contextEligible = Pending.responseIsFailure ~= true,
         })
         Pending = nil
         return {
@@ -577,6 +638,8 @@ function Integration.SpeechStarted(arguments)
             sessionID = Pending.packet and Pending.packet.session_id,
             utteranceID = Pending.utteranceID,
             messageID = "llm-response:" .. Pending.requestID,
+            providerFailure = Pending.responseIsFailure == true,
+            contextEligible = Pending.responseIsFailure ~= true,
         },
     })
     view.historyPart:setTyping(nil)
@@ -641,6 +704,8 @@ function Integration.SpeechFallback(arguments)
                 sessionID = Pending.packet and Pending.packet.session_id,
                 utteranceID = Pending.utteranceID,
                 messageID = "llm-response:" .. Pending.requestID,
+                providerFailure = Pending.responseIsFailure == true,
+                contextEligible = Pending.responseIsFailure ~= true,
             })
             log(
                 "speech_fallback",
@@ -655,6 +720,8 @@ function Integration.SpeechFallback(arguments)
             requestID = Pending.requestID,
             sessionID = Pending.packet and Pending.packet.session_id,
             utteranceID = Pending.utteranceID,
+            providerFailure = Pending.responseIsFailure == true,
+            contextEligible = Pending.responseIsFailure ~= true,
         })
         Pending = nil
         if message then

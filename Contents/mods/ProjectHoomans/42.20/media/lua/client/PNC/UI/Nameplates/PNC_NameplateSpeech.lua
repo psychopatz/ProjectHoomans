@@ -1,5 +1,6 @@
 require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
 require "PsychopatzCore/Events/PC_EventBus"
+require "PsychopatzCore/UI/Conversation/PsychopatzConversationTyping"
 
 PNC = PNC or {}
 PNC.NameplateSpeech = PNC.NameplateSpeech or {}
@@ -7,6 +8,7 @@ PNC.NameplateSpeech = PNC.NameplateSpeech or {}
 local Speech = PNC.NameplateSpeech
 local Message = PsychopatzCore.Conversation.Message
 local Events = PsychopatzCore.Events
+local Typing = PsychopatzCore.Conversation.Typing
 
 Speech.MAX_PREVIEW_LENGTH = 180
 Speech.MIN_DURATION_MS = 4500
@@ -87,7 +89,9 @@ function Speech.Get(npcID)
     npcID = tostring(npcID or "")
     local record = records[npcID]
     if not record then return nil end
-    if now() >= (tonumber(record.expiresAt) or 0) then
+    if not record.pending
+        and now() >= (tonumber(record.expiresAt) or 0)
+    then
         records[npcID] = nil
         return nil
     end
@@ -96,7 +100,38 @@ function Speech.Get(npcID)
 end
 
 function Speech.GetDisplayText(record)
+    if record and record.pending then return Typing.GetText() end
     return record and record.text or ""
+end
+
+function Speech.SetPending(npcID, requestID, conversationID)
+    npcID = tostring(npcID or "")
+    if npcID == "" then return false end
+    records[npcID] = {
+        pending = true,
+        requestID = tostring(requestID or ""),
+        message = {
+            conversationID = conversationID,
+            speakerID = npcID,
+            speakerKind = "npc",
+        },
+        text = "",
+        startedAt = now(),
+    }
+    return true
+end
+
+function Speech.ClearPending(npcID, requestID)
+    npcID = tostring(npcID or "")
+    local record = records[npcID]
+    if not record or record.pending ~= true then return false end
+    if requestID ~= nil
+        and tostring(record.requestID or "") ~= tostring(requestID)
+    then
+        return false
+    end
+    records[npcID] = nil
+    return true
 end
 
 function Speech.Clear(npcID)

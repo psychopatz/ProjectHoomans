@@ -52,9 +52,33 @@ local function compactSource(source)
     if type(source) ~= "table" then return output end
     local keys = {
         "kind", "channel", "requestID", "sessionID", "utteranceID",
+        "providerFailure", "contextEligible", "excludeFromLLM",
     }
     for _, key in ipairs(keys) do
-        if source[key] ~= nil then output[key] = tostring(source[key]) end
+        if source[key] ~= nil then
+            if key == "providerFailure"
+                or key == "contextEligible"
+                or key == "excludeFromLLM"
+            then
+                local value = source[key]
+                local normalized = string.lower(tostring(value or ""))
+                if value == true or normalized == "true"
+                    or normalized == "1" or normalized == "yes"
+                    or normalized == "on"
+                then
+                    output[key] = true
+                elseif value == false or normalized == "false"
+                    or normalized == "0" or normalized == "no"
+                    or normalized == "off"
+                then
+                    output[key] = false
+                else
+                    output[key] = value
+                end
+            else
+                output[key] = tostring(source[key])
+            end
+        end
     end
     return output
 end
@@ -116,6 +140,11 @@ function Sync.Enqueue(message)
     end
     local text = tostring(message.text or "")
     if text == "" then return false, "empty_message" end
+    if Message.IsLLMContextEligible
+        and not Message.IsLLMContextEligible(message, text)
+    then
+        return false, "llm_context_excluded"
+    end
     local root = storage()
     if root.index[messageID] then return true, "duplicate" end
     if #root.records >= Sync.MAX_PENDING then

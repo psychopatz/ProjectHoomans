@@ -175,6 +175,32 @@ local function playerUUID(view)
     )
 end
 
+local function isProviderFailure(message, content)
+    local speaker = tostring(message and (message.speakerKind or message.speaker) or "")
+    if speaker ~= "npc" then return false end
+
+    if Message and Message.IsLLMContextEligible then
+        return not Message.IsLLMContextEligible(message, content)
+    end
+
+    local source = message and message.source
+    if type(source) ~= "table" then source = {} end
+    if source.contextEligible == false
+        or source.providerFailure == true
+        or source.excludeFromLLM == true
+    then
+        return true
+    end
+
+    -- History predates source metadata, so retain a narrow compatibility
+    -- filter for fallback text that was already persisted to a save.
+    local lowered = string.lower(tostring(content or ""))
+    return string.find(lowered, "i cannot answer right now", 1, true) ~= nil
+        or string.find(lowered, "provider request failed", 1, true) ~= nil
+        or string.find(lowered, "provider returned an empty response", 1, true) ~= nil
+        or string.find(lowered, "openai-compatible provider", 1, true) ~= nil
+end
+
 local function recentConversation(view, currentMessage)
     local history = view and view.historyPart and view.historyPart.messages or {}
     local output = {}
@@ -187,9 +213,13 @@ local function recentConversation(view, currentMessage)
         local content = textResolver and textResolver.Resolve
             and textResolver.Resolve(payload) or ""
         content = text(content, nil)
-        if content and not (index == #history and content == currentMessage) then
+        if content
+            and not isProviderFailure(message, content)
+            and not (index == #history and content == currentMessage)
+        then
             output[#output + 1] = {
-                role = message.speaker == "player" and "user" or "assistant",
+                role = message and message.speaker == "player"
+                    and "user" or "assistant",
                 content = string.sub(content, 1, 500),
             }
         end

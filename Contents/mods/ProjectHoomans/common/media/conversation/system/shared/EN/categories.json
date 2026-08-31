@@ -42,6 +42,7 @@
   "panel.current_relation": "CURRENT RELATION",
   "panel.current_relation_edit": "Current relation",
   "panel.llm_input": "TYPE TO TALK",
+  "panel.llm_inline_input": "TALK TO",
   "llm.input_tooltip": "Type a message for this NPC.",
   "llm.send": "SEND",
   "llm.status.off": "LLM BRIDGE OFF",

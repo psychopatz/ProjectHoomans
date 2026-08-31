@@ -145,6 +145,29 @@ function Emotes.CollectNearbyCompanions(player)
     return output
 end
 
+-- Convert the same closest-companion result used by the emote radial menu
+-- into the richer entry shape consumed by the conversation definition.
+function Emotes.BuildConversationEntry(target)
+    local source = target and target.source or target
+    local id = tostring(target and target.id or source and source.id or "")
+    local snapshot = ClientState and ClientState.snapshots
+        and ClientState.snapshots[id] or nil
+    local record = Registry and Registry.Get and Registry.Get(id) or nil
+    local zombie = Registry and Registry.GetLiveZombie
+        and Registry.GetLiveZombie(id) or nil
+    if not record and not snapshot then
+        record = source
+    end
+    return {
+        id = id,
+        name = target and target.name or targetName(record or snapshot or source),
+        record = record,
+        snapshot = snapshot,
+        zombie = zombie,
+        source = source,
+    }
+end
+
 function Emotes.ResolveAttackTypeIcon(target)
     local definition = Commands and Commands.GetAttackTypeDefinition
         and Commands.GetAttackTypeDefinition(target and target.attackType)

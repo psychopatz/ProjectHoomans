@@ -1,3 +1,5 @@
+require "PNC/UI/Nameplates/PNC_NameplateSpeech"
+
 PNC = PNC or {}
 PNC.NameplateRenderer = PNC.NameplateRenderer or {}
 
@@ -5,6 +7,7 @@ local Renderer = PNC.NameplateRenderer
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 local Presentation = PNC.NameplatePresentation
 local NameplateDebug = PNC.NameplateDebug
+local Speech = PNC.NameplateSpeech
 local Layout = Presentation.Layout
 local Fonts = Presentation.Fonts
 
@@ -285,15 +288,25 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
 
     local actionHeight = getTextManager():getFontHeight(Fonts.debug) + 2
     local speechHeight = actionHeight
-    if entry.speechVisible and entry.speechText ~= "" then
+    local speechText = entry.speechText
+    local speechTextWidth = entry.speechTextWidth or 0
+    if entry.speech and entry.speech.pending and Speech
+        and Speech.GetDisplayText
+    then
+        speechText = Speech.GetDisplayText(entry.speech)
+        speechTextWidth = getTextManager():MeasureStringX(
+            Fonts.debug, speechText
+        )
+    end
+    if entry.speechVisible and speechText ~= "" then
         local speechY = nameY - speechHeight
         if entry.actionVisible and entry.actionText ~= "" then
             speechY = speechY - actionHeight - 2
         end
         Presentation.DrawOutlinedText(
             manager,
-            entry.speechText,
-            screenX - ((entry.speechTextWidth or 0) / 2),
+            speechText,
+            screenX - (speechTextWidth / 2),
             speechY,
             SPEECH_COLOR,
             0.95 * alpha,

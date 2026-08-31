@@ -71,4 +71,53 @@ local ack = Sync.Ack({ message_ids = { message.messageID } })
 T.equal(ack.acknowledged, 1, "sync acknowledges canonical ID")
 T.equal(Sync.Poll().status, "idle", "acknowledged message leaves outbox")
 
+local providerFailure = Message.New({
+    saveUUID = Message.GetSaveID(),
+    messageID = "conversation-one:provider-failure",
+    conversationID = "conversation-one",
+    sequence = 2,
+    playerUUID = "player-one",
+    npcUUID = "npc-one",
+    speakerID = "npc-one",
+    speakerName = "Harley",
+    speakerKind = "npc",
+    text = "I cannot answer right now. (OpenAI-compatible provider request failed.)",
+    source = {
+        kind = "llm",
+        channel = "response",
+        providerFailure = true,
+        contextEligible = false,
+    },
+})
+Message.Publish(providerFailure)
+T.equal(Sync.Poll().pendingCount, 0,
+    "provider failures are excluded from LLM memory ingestion")
+
+local toolAck = Message.New({
+    saveUUID = Message.GetSaveID(),
+    messageID = "conversation-one:tool-ack",
+    conversationID = "conversation-one",
+    sequence = 3,
+    playerUUID = "player-one",
+    npcUUID = "npc-one",
+    speakerID = "npc-one",
+    speakerName = "Harley",
+    speakerKind = "npc",
+    text = "I will check that now.",
+    source = {
+        kind = "llm",
+        channel = "response",
+        providerFailure = false,
+        contextEligible = true,
+    },
+})
+Message.Publish(toolAck)
+local toolBatch = Sync.Poll()
+T.equal(toolBatch.pendingCount, 1,
+    "tool acknowledgement remains eligible for LLM memory ingestion")
+T.equal(toolBatch.messages[1].source.contextEligible, true,
+    "tool acknowledgement eligibility crosses the bridge")
+T.equal(toolBatch.messages[1].source.providerFailure, false,
+    "tool acknowledgement is not marked as a provider failure")
+
 T.finish("pnc_conversation_memory_sync_smoke")
