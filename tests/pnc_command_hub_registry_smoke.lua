@@ -59,6 +59,14 @@ zone.actions[3].onClick()
 T.equal(openedZones[1], "lumber", "chop wood workflow is not wired")
 T.equal(openedZones[2], "corpse_haul", "grab corpse workflow is not wired")
 T.equal(openedZones[3], "fishing", "fishing workflow is not wired")
+PNC.CommandHub.ZoneUI.activeDefinitionID = "fishing"
+PNC.CommandHub.ZoneUI.instances = {
+    fishing = { getIsVisible = function() return true end },
+}
+T.truthy(Registry.IsSelected(zone.actions[3]),
+    "active fishing zone action is not selected")
+T.falsy(Registry.IsSelected(zone.actions[1]),
+    "inactive zone action is selected")
 
 local workRegistry = T.load("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_WorkRegistry.lua")
@@ -96,6 +104,26 @@ T.contains(zoneWindowSource, "DELETE ZONE",
     "zone subwindows do not expose delete controls")
 T.contains(zoneWindowSource, "ZoneUI.CloseAll()",
     "zone subwindows do not close with the hidden parent")
+T.contains(zoneWindowSource, "PsychopatzAttachedWindow",
+    "zone subwindows do not use the shared attached-panel variant")
+T.contains(zoneWindowSource, "activeDefinitionID",
+    "zone subwindows do not track one active third-level child")
+T.contains(zoneWindowSource, "ZoneOverlay.SetActive",
+    "zone subwindows do not synchronize their world overlay")
+T.contains(zoneWindowSource, "geometryTrace = true",
+    "zone geometry tracing is not available")
+local zoneLayoutSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_ZoneWindow_Layout.lua")
+T.contains(zoneLayoutSource, "getContentRect({ padding = 12 })",
+    "zone layout is not using the shared attached content bounds")
+T.contains(zoneLayoutSource, "self:footerHeight()",
+    "zone layout does not reserve the shared resize footer")
+local actionSource = T.read("PsychopatzCore", "client",
+    "PsychopatzCore/UI/PsychopatzCommandHubActionsWindow.lua")
+T.contains(actionSource, "persistenceKey = \"PsychopatzCore.CommandHub.Actions\"",
+    "action panel geometry is not persisted")
+T.contains(actionSource, "Registry.IsSelected(action",
+    "zone action buttons do not expose selected state")
 
 local future = Registry.RegisterCategory({
     id = "future_category", order = 900,

@@ -18,14 +18,14 @@ local function sectionTitle(section)
 end
 
 function ISPNCCommandHubZoneWindow:onResponsiveLayout()
-    local rect = self:getContentRect({ top = 30, bottom = 42 })
     local scale = self.uiScale or Layout.Scale()
     local px = function(value) return Layout.Pixels(value, scale) end
+    local rect = self:getContentRect({ padding = 12 })
     local buttonHeight = px(27)
     local font = Theme.Font(scale)
     local headerHeight = math.max(px(14), Theme.FontHeight(font))
     local summaryHeight = math.max(px(14), Theme.FontHeight(UIFont.Small))
-    local sectionY = rect.y + headerHeight + px(10)
+    local sectionY = rect.y + headerHeight + px(8)
     local buttonGap = px(8)
     local summaryGap = px(6)
     local sectionGap = px(12)
@@ -38,11 +38,12 @@ function ISPNCCommandHubZoneWindow:onResponsiveLayout()
         if value then
             local headerY = cursor
             local buttonY = headerY + headerHeight + buttonGap
-            local half = math.floor(rect.width / 2)
-            local secondWidth = rect.width - half - px(4)
+            local columnGap = px(8)
+            local half = math.floor((rect.width - columnGap) / 2)
+            local secondWidth = rect.width - half - columnGap
             Layout.SetBounds(value.createButton, rect.x, buttonY, half,
                 buttonHeight)
-            Layout.SetBounds(value.clearButton, rect.x + half + px(4),
+            Layout.SetBounds(value.clearButton, rect.x + half + columnGap,
                 buttonY, math.max(px(80), secondWidth), buttonHeight)
             local summaryY = buttonY + buttonHeight + summaryGap
             controls[#controls + 1] = {
@@ -53,18 +54,27 @@ function ISPNCCommandHubZoneWindow:onResponsiveLayout()
         end
     end
     local statusHeight = math.max(px(14), Theme.FontHeight(UIFont.Small))
+    local contentBottom = cursor - sectionGap
+    local requiredHeight = contentBottom + statusHeight + px(8)
+        + self:footerHeight()
+    if self:getHeight() < requiredHeight then
+        local maximum = self.maximumHeight or requiredHeight
+        self:setHeight(math.min(maximum, requiredHeight))
+        rect = self:getContentRect({ padding = 12 })
+    end
     self.layout = {
         rect = rect,
         sectionY = sectionY,
         sections = controls,
         helpY = rect.y,
         statusY = math.max(rect.y + rect.height - statusHeight,
-            cursor - sectionGap),
+            contentBottom),
     }
+    self:syncResizeWidgets()
 end
 
 function ISPNCCommandHubZoneWindow:render()
-    PsychopatzWindow.render(self)
+    PsychopatzAttachedWindow.render(self)
     local layout = self.layout
     local definition = Registry.Get(self.definitionID)
     if not layout or not definition then return end

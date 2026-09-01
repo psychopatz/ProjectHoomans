@@ -56,6 +56,7 @@ local coreOptions = {
         return value
     end,
 }
+coreOptions.ApplyWindowOpacity = coreOptions.ApplyOpacity
 package.preload["PsychopatzCore/UI/PsychopatzCommandHub"] = function()
     return { Actions = actionsUI, Options = coreOptions }
 end

@@ -76,7 +76,7 @@ require "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedback"
 require "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedbackRenderer"
 require "PNC/UI/Nameplates/PNC_NameplateScopes"
 require "PNC/UI/Nameplates/PNC_NameplateEntries"
-require "PNC/UI/Nameplates/PNC_NameplateRenderer"
+require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer"
 
 -- Public boundary for relationship-producing systems. They can publish a
 -- signed delta without reaching into the nameplate manager or its renderer.

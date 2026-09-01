@@ -54,6 +54,12 @@ local function openDestination(sourceRegion, baseId, configuration,
         initialRegion = configuration.destinationRegion or emptyRegion(),
         selectionKind = "region",
         maxTiles = CorpseHaulUI.MAX_TILES,
+        guideLayers = {
+            {
+                region = sourceRegion,
+                color = { r = 1, g = 0.62, b = 0.12, a = 0.30 },
+            },
+        },
         highlightColor = { r = 0.18, g = 0.82, b = 1, a = 0.48 },
         previewColor = { r = 0.35, g = 0.9, b = 1, a = 0.28 },
         validate = validateRegion,

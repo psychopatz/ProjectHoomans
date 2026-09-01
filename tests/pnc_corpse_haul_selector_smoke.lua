@@ -83,5 +83,7 @@ T.contains(opened[3].title, "DESTINATION",
     "dump button opens the destination selector")
 T.equal(opened[3].initialRegion, destination,
     "dump selector starts from the saved destination")
+T.equal(opened[3].guideLayers[1].region, source,
+    "dump selector keeps the source region visible as a guide")
 
 T.finish("pnc_corpse_haul_selector_smoke")

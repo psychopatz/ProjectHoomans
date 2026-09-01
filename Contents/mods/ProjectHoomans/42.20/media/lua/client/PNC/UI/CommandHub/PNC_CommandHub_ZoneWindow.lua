@@ -1,6 +1,8 @@
 require "PsychopatzCore/UI/PsychopatzUI"
+require "PsychopatzCore/UI/PsychopatzAttachedWindow"
 require "ISUI/ISPanel"
 local CoreHub = require "PsychopatzCore/UI/PsychopatzCommandHub"
+require "PNC/UI/CommandHub/PNC_CommandHub_ZoneOverlay"
 
 PNC = PNC or {}
 PNC.CommandHub = PNC.CommandHub or {}
@@ -13,8 +15,12 @@ local Options = CoreHub.Options
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
 local Theme = UI.Theme
+local AttachedWindow = UI.AttachedWindow or PsychopatzAttachedWindow
+local Selector = UI.GridRegionSelector
+local ZoneOverlay = Hub.ZoneOverlay
 
 ZoneUI.instances = ZoneUI.instances or {}
+ZoneUI.activeDefinitionID = ZoneUI.activeDefinitionID or nil
 
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
@@ -32,19 +38,19 @@ local function snapshot()
         and PNC.Network.ClientState.colonyManagement or {}
 end
 
-ISPNCCommandHubZoneWindow = PsychopatzWindow:derive(
+ISPNCCommandHubZoneWindow = AttachedWindow:derive(
     "ISPNCCommandHubZoneWindow"
 )
 
 function ISPNCCommandHubZoneWindow:initialise()
-    PsychopatzWindow.initialise(self)
+    AttachedWindow.initialise(self)
     self.backgroundColor = Theme.Color("window")
     self.borderColor = Theme.Color("borderStrong")
-    Options.ApplyOpacity(self, Options.GetOpacity())
+    Options.ApplyWindowOpacity(self, Options.GetOpacity())
 end
 
 function ISPNCCommandHubZoneWindow:createChildren()
-    PsychopatzWindow.createChildren(self)
+    AttachedWindow.createChildren(self)
     self.controls = {}
     self.statusText = ""
     self.lastRevision = -1
@@ -108,12 +114,8 @@ function ISPNCCommandHubZoneWindow:refresh()
     if not definition then return end
     self.title = tr(definition.titleKey, definition.titleFallback or "ZONE")
     local zone = self:getZoneState()
-    if self.definitionID == "fishing" and PNC.FishingZoneOverlay then
-        if zone and PNC.FishingZoneOverlay.SetZone then
-            PNC.FishingZoneOverlay.SetZone(zone)
-        elseif PNC.FishingZoneOverlay.Clear then
-            PNC.FishingZoneOverlay.Clear()
-        end
+    if ZoneOverlay and ZoneOverlay.SetActive then
+        ZoneOverlay.SetActive(self.definitionID, zone)
     end
     for _, section in ipairs(definition.sections or {}) do
         local controls = self.controls[section.id]
@@ -209,11 +211,20 @@ function ISPNCCommandHubZoneWindow:prerender()
     if now - (tonumber(self.lastRequestAt) or 0) >= 2000 then
         self:requestSnapshot()
     end
-    PsychopatzWindow.prerender(self)
+    AttachedWindow.prerender(self)
     ZoneUI.SyncPositions()
 end
 
 function ISPNCCommandHubZoneWindow:close()
+    if Selector and Selector.instance
+        and Selector.instance.ownerWindow == self
+    then
+        Selector.instance:close(false)
+    end
+    if ZoneUI.activeDefinitionID == self.definitionID then
+        ZoneUI.activeDefinitionID = nil
+        if ZoneOverlay and ZoneOverlay.Clear then ZoneOverlay.Clear() end
+    end
     self:saveGeometry(true)
     self:setVisible(false)
     self:removeFromUIManager()
@@ -223,7 +234,7 @@ function ISPNCCommandHubZoneWindow:close()
 end
 
 function ISPNCCommandHubZoneWindow:new(x, y, width, height, options)
-    local object = PsychopatzWindow:new(x, y, width, height, options)
+    local object = AttachedWindow:new(x, y, width, height, options)
     setmetatable(object, self)
     self.__index = self
     return object
@@ -234,12 +245,28 @@ require "PNC/UI/CommandHub/PNC_CommandHub_ZoneWindow_Layout"
 function ZoneUI.Open(definitionID, owner)
     local definition = Registry.Get(definitionID)
     if not definition then return nil end
-    local window = ZoneUI.instances[definition.id]
+
+    local id = definition.id
+    local current = ZoneUI.instances[id]
+    if ZoneUI.activeDefinitionID == id
+        and current and current.getIsVisible and current:getIsVisible()
+    then
+        ZoneUI.Close(id)
+        return nil
+    end
+
+    -- The action panel is the parent of exactly one zone editor. Switching
+    -- actions closes the old third-level window before opening the new one.
+    ZoneUI.CloseAll()
+
+    local window = ZoneUI.instances[id]
     if not window then
         window = UI.NewWindow(ISPNCCommandHubZoneWindow, {
             title = tr(definition.titleKey, definition.titleFallback or "ZONE"),
             resizable = true,
-            persistenceKey = "PNC.CommandHub.Zone." .. definition.id,
+            collapsible = false,
+            bottomResize = true,
+            persistenceKey = "PNC.CommandHub.Zone." .. id,
             responsiveSpec = {
                 width = 360,
                 height = 170 + #(definition.sections or {}) * 94,
@@ -248,15 +275,17 @@ function ZoneUI.Open(definitionID, owner)
                 maxWidth = 560,
                 maxHeight = 520,
             },
+            geometryTrace = true,
         })
         window.definitionID = definition.id
         window.owner = owner
         window:initialise()
         window:instantiate()
-        ZoneUI.instances[definition.id] = window
+        ZoneUI.instances[id] = window
     else
         window.owner = owner or window.owner
     end
+    ZoneUI.activeDefinitionID = id
     window:addToUIManager()
     window:setVisible(true)
     window:bringToTop()
@@ -267,16 +296,28 @@ function ZoneUI.Open(definitionID, owner)
 end
 
 function ZoneUI.Close(definitionID)
-    local window = ZoneUI.instances[tostring(definitionID or "")]
+    local id = tostring(definitionID or "")
+    local window = ZoneUI.instances[id]
     if window then window:close() end
+    if ZoneUI.activeDefinitionID == id and not window then
+        ZoneUI.activeDefinitionID = nil
+        if ZoneOverlay and ZoneOverlay.Clear then ZoneOverlay.Clear() end
+    end
 end
 
 function ZoneUI.CloseAll()
+    if Selector and Selector.instance and Selector.instance.ownerWindow
+        and Selector.instance.ownerWindow.definitionID
+    then
+        Selector.instance:close(false)
+    end
     local pending = {}
     for _, window in pairs(ZoneUI.instances) do pending[#pending + 1] = window end
     for _, window in ipairs(pending) do
         if window then window:close() end
     end
+    ZoneUI.activeDefinitionID = nil
+    if ZoneOverlay and ZoneOverlay.Clear then ZoneOverlay.Clear() end
 end
 
 function ZoneUI.SyncPositions()
@@ -289,39 +330,31 @@ function ZoneUI.SyncPositions()
     end
     local anchor = CoreHub.Actions and CoreHub.Actions.instance or nil
     if not anchor or not anchor.getIsVisible or not anchor:getIsVisible() then
-        anchor = Hub.instance
-    end
-    if not anchor or not anchor.getIsVisible or not anchor:getIsVisible() then
+        ZoneUI.CloseAll()
         return
     end
-    local open = {}
-    for _, definition in ipairs(Registry.All()) do
-        local window = ZoneUI.instances[definition.id]
-        if window and window.getIsVisible and window:getIsVisible() then
-            open[#open + 1] = window
-        end
+
+    local window = ZoneUI.instances[ZoneUI.activeDefinitionID]
+    if not window or not window.getIsVisible or not window:getIsVisible() then
+        ZoneUI.activeDefinitionID = nil
+        if ZoneOverlay and ZoneOverlay.Clear then ZoneOverlay.Clear() end
+        return
     end
     local gap = Layout.Pixels(4, Layout.Scale())
     local branch = Options.GetBranch()
-    local cursor = branch == "left"
-        and anchor:getX() or anchor:getX() + anchor:getWidth()
     local screenWidth, screenHeight = Layout.ScreenSize()
-    for _, window in ipairs(open) do
-        local x
-        if branch == "left" then
-            x = cursor - window:getWidth()
-            cursor = x - gap
-        else
-            x = cursor
-            cursor = x + window:getWidth() + gap
-        end
-        x = Layout.Clamp(x, 0,
-            math.max(0, screenWidth - window:getWidth()))
-        local y = Layout.Clamp(anchor:getY(), 0,
-            math.max(0, screenHeight - window:getHeight()))
-        window:setX(x)
-        window:setY(y)
+    local x
+    if branch == "left" then
+        x = anchor:getX() - window:getWidth() - gap
+    else
+        x = anchor:getX() + anchor:getWidth() + gap
     end
+    x = Layout.Clamp(x, 0,
+        math.max(0, screenWidth - window:getWidth()))
+    local y = Layout.Clamp(anchor:getY(), 0,
+        math.max(0, screenHeight - window:getHeight()))
+    window:setX(x)
+    window:setY(y)
 end
 
 return ZoneUI

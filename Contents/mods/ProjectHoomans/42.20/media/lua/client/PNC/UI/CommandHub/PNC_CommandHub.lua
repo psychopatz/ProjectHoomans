@@ -8,6 +8,7 @@ local Hub = PNC.CommandHub
 local CoreHub = require "PsychopatzCore/UI/PsychopatzCommandHub"
 
 require "PNC/UI/CommandHub/PNC_CommandHub_CorpseHaulUI"
+require "PNC/UI/CommandHub/PNC_CommandHub_ZoneOverlay"
 require "PNC/UI/CommandHub/PNC_CommandHub_ZoneWindow"
 require "PNC/UI/CommandHub/PNC_CommandHub_Registry"
 require "PNC/UI/CommandHub/PNC_CommandHub_Window"

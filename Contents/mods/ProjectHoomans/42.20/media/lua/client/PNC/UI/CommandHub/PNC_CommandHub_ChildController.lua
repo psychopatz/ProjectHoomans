@@ -179,12 +179,14 @@ end
 
 function Controller.ApplyOpacity(opacity)
     local value = opacity or Options.GetOpacity()
-    Options.ApplyOpacity(Hub.instance, value)
-    Options.ApplyOpacity(Actions and Actions.instance or nil, value)
+    Options.ApplyWindowOpacity(Hub.instance, value)
+    Options.ApplyWindowOpacity(Actions and Actions.instance or nil, value)
     local zones = Hub.ZoneUI and Hub.ZoneUI.instances or {}
-    for _, window in pairs(zones) do Options.ApplyOpacity(window, value) end
-    Options.ApplyOpacity(Hub.WorkUI and Hub.WorkUI.instance or nil, value)
-    Options.ApplyOpacity(Hub.SettingsUI and Hub.SettingsUI.instance or nil, value)
+    for _, window in pairs(zones) do
+        Options.ApplyWindowOpacity(window, value)
+    end
+    Options.ApplyWindowOpacity(Hub.WorkUI and Hub.WorkUI.instance or nil, value)
+    Options.ApplyWindowOpacity(Hub.SettingsUI and Hub.SettingsUI.instance or nil, value)
     return value
 end
 

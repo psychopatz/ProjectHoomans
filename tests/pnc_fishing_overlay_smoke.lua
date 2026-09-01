@@ -23,6 +23,12 @@ T.truthy(Overlay.SetZone(zone), "valid fishing zone was not accepted")
 T.truthy(Overlay.IsEnabled(), "valid fishing overlay was not enabled")
 Overlay.Render()
 T.equal(#highlights, 2, "fishing zone and shoreline overlays were not rendered")
+T.truthy(Overlay.SetZone(zone, "external"),
+    "owned fishing overlay could not be refreshed")
+T.falsy(Overlay.Clear("ProjectHoomans.CommandHub.Zone"),
+    "command-hub cleanup removed an externally owned fishing overlay")
+T.truthy(Overlay.IsEnabled(),
+    "external fishing overlay was not preserved by scoped cleanup")
 Overlay.Clear()
 T.falsy(Overlay.IsEnabled(), "fishing overlay did not clear")
 

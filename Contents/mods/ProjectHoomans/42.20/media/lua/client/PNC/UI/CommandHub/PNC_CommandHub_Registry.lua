@@ -17,6 +17,14 @@ local function isOpen(childID)
         and controller.IsOpen(childID) == true or false
 end
 
+local function isZoneActionOpen(actionID)
+    local zoneUI = PNC.CommandHub.ZoneUI
+    if not zoneUI or zoneUI.activeDefinitionID ~= actionID then return false end
+    local window = zoneUI.instances and zoneUI.instances[actionID] or nil
+    return window ~= nil and window.getIsVisible
+        and window:getIsVisible() == true
+end
+
 local function toggleChild(childID, fallback)
     return function(_, owner)
         trace("pnc_toggle_child_start", "child=" .. tostring(childID)
@@ -128,6 +136,7 @@ Registry.RegisterCategory({
             tooltipKey = "UI_PNC_CommandHub_Zone_ChopWoodHelp",
             tooltipFallback = "Set a tree-cutting zone",
             onClick = openZone("lumber"),
+            selected = function() return isZoneActionOpen("lumber") end,
             closeHub = false,
         },
         {
@@ -139,6 +148,7 @@ Registry.RegisterCategory({
             tooltipKey = "UI_PNC_CommandHub_Zone_GrabCorpseHelp",
             tooltipFallback = "Choose a corpse source and destination area",
             onClick = openZone("corpse_haul"),
+            selected = function() return isZoneActionOpen("corpse_haul") end,
             closeHub = false,
         },
         {
@@ -150,6 +160,7 @@ Registry.RegisterCategory({
             tooltipKey = "UI_PNC_CommandHub_Zone_FishingHelp",
             tooltipFallback = "Set a shoreline fishing zone",
             onClick = openZone("fishing"),
+            selected = function() return isZoneActionOpen("fishing") end,
             closeHub = false,
         },
     },

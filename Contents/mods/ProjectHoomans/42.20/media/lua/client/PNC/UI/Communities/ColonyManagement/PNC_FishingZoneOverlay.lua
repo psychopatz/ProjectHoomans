@@ -8,6 +8,7 @@ PNC.FishingZoneOverlay = PNC.FishingZoneOverlay or {}
 local Overlay = PNC.FishingZoneOverlay
 Overlay.enabled = Overlay.enabled == true
 Overlay.zone = Overlay.zone or nil
+Overlay.owner = Overlay.owner or nil
 
 local ZONE_COLOR = { r = 0.12, g = 0.95, b = 0.35, a = 0.13 }
 local SPOT_COLOR = { r = 0.30, g = 1.00, b = 0.55, a = 0.52 }
@@ -32,7 +33,7 @@ local function renderRegion(playerNum, region, color)
     end
 end
 
-function Overlay.SetZone(zone)
+function Overlay.SetZone(zone, owner)
     if type(zone) ~= "table" or zone.valid ~= true
         or type(zone.geometry) ~= "table"
     then
@@ -40,12 +41,18 @@ function Overlay.SetZone(zone)
     end
     Overlay.zone = copy(zone)
     Overlay.enabled = true
+    Overlay.owner = owner or "external"
     return true
 end
 
-function Overlay.Clear()
+function Overlay.Clear(owner)
+    if owner ~= nil and Overlay.owner ~= nil and Overlay.owner ~= owner then
+        return false
+    end
     Overlay.zone = nil
     Overlay.enabled = false
+    Overlay.owner = nil
+    return true
 end
 
 function Overlay.IsEnabled()
