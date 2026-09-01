@@ -96,8 +96,8 @@ function ISPNCProvisionSettingsWindow:layoutRows()
     for _, row in ipairs(self.ruleRows or {}) do
         if row.definition.category ~= currentCategory then
             local category = self.categoryLabels[categoryIndex]
-            category.widget:setX(8)
-            category.widget:setY(y)
+            Layout.SetBounds(category.widget, 8, y,
+                math.max(1, width - 16), 24)
             y = y + 31
             categoryIndex = categoryIndex + 1
             currentCategory = row.definition.category
@@ -111,8 +111,7 @@ end
 
 function ISPNCProvisionSettingsWindow:onResponsiveLayout()
     local rect = self:getContentRect({ top = 30, bottom = 12 })
-    self.policyLabel:setX(rect.x)
-    self.policyLabel:setY(rect.y + 5)
+    Layout.SetBounds(self.policyLabel, rect.x, rect.y + 5, 68, 24)
     Layout.SetBounds(self.policyCombo, rect.x + 72, rect.y,
         math.min(260, rect.width - 72), 26)
     local footerHeight = 66
@@ -126,8 +125,7 @@ function ISPNCProvisionSettingsWindow:onResponsiveLayout()
         rect.x + rect.width - 190, buttonY, 88, 28)
     Layout.SetBounds(self.applyButton,
         rect.x + rect.width - 94, buttonY, 94, 28)
-    self.statusLabel:setX(rect.x)
-    self.statusLabel:setY(statusY)
+    Layout.SetBounds(self.statusLabel, rect.x, statusY, rect.width, 20)
     self:layoutRows()
 end
 
@@ -148,7 +146,8 @@ end
 function ISPNCProvisionSettingsWindow:onReset()
     self.model:ResetDefaults()
     self:refreshRows()
-    self.statusLabel:setName(tr("UI_PNC_Provision_DefaultsPending"))
+    UI.SetLabelText(self.statusLabel,
+        tr("UI_PNC_Provision_DefaultsPending"))
 end
 
 function ISPNCProvisionSettingsWindow:onCancel()
@@ -158,12 +157,14 @@ end
 function ISPNCProvisionSettingsWindow:onApply()
     local read = self:readRows()
     if not read then
-        self.statusLabel:setName(tr("UI_PNC_Provision_Invalid"))
+        UI.SetLabelText(self.statusLabel,
+            tr("UI_PNC_Provision_Invalid"))
         return
     end
     local ok = self.model:Submit()
-    self.statusLabel:setName(tr(ok and "UI_PNC_Provision_Applying"
-        or "UI_PNC_Provision_Invalid"))
+    UI.SetLabelText(self.statusLabel,
+        tr(ok and "UI_PNC_Provision_Applying"
+            or "UI_PNC_Provision_Invalid"))
 end
 
 function ISPNCProvisionSettingsWindow:requestSnapshot()
@@ -179,9 +180,9 @@ function ISPNCProvisionSettingsWindow:prerender()
             self:refreshRows()
             local result = update.result
             if result and result.action == "provision_set" then
-                self.statusLabel:setName(tr(result.ok
-                    and "UI_PNC_Provision_Applied"
-                    or "UI_PNC_Provision_Rejected"))
+                UI.SetLabelText(self.statusLabel,
+                    tr(result.ok and "UI_PNC_Provision_Applied"
+                        or "UI_PNC_Provision_Rejected"))
             end
         end
         self.lastReceiveAt = update.receivedAt

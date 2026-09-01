@@ -44,10 +44,17 @@ local dependencies = {
     "PNC/UI/Nameplates/PNC_NameplateDebug",
     "PNC/UI/Nameplates/PNC_NameplateBodies",
     "PNC/UI/Nameplates/PNC_NameplateEntries",
-    "PNC/UI/Nameplates/PNC_NameplateRenderer",
+    "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer",
 }
 for _, dependency in ipairs(dependencies) do
     package.preload[dependency] = function() return true end
+end
+local rendererDependencyLoaded = false
+package.preload[
+    "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer"
+] = function()
+    rendererDependencyLoaded = true
+    return true
 end
 
 PNC = {
@@ -74,6 +81,10 @@ HaloTextHelper = {
 }
 
 T.load(FILE)
+T.truthy(
+    rendererDependencyLoaded,
+    "nameplate manager loads the canonical renderer entry"
+)
 
 T.equal(
     PNC.Nameplates.IsCombatDebugEnabled(),

@@ -446,6 +446,8 @@ function Parts.BuildDetailedDebugState(
             aiState = aiState,
             activeJob = record.activeJob,
             activeBehavior = record.activeBehavior,
+            lumberRuntime = record.runtime and record.runtime.lumber
+                and PNC.Core.DeepCopy(record.runtime.lumber) or nil,
             orderKind = record.orderSpec and record.orderSpec.kind or nil,
             attackType = record.attackType or "auto",
             targetKind = combat.targetKind,

@@ -16,7 +16,7 @@ local Layout = PsychopatzCore.UI.Layout
 local WidgetWindow = PsychopatzCore.UI.WidgetWindow or {}
 
 Controller.entries = Controller.entries or {}
-Controller.closeOrder = { "zone", "work", "settings" }
+Controller.closeOrder = { "zone", "work", "settings", "events" }
 Controller.activeID = nil
 Controller.closing = false
 
@@ -152,6 +152,14 @@ function Controller.Toggle(id, owner)
     local entry = Controller.entries[key]
     if not entry then return false end
 
+    if Controller.activeID == key and Controller.IsOpen(key) then
+        -- A detached widget is still owned by this branch. Re-clicking its
+        -- parent button must close it just like an attached child, without
+        -- changing its saved position or destroying the instance.
+        Controller.CloseBranch(key)
+        return false
+    end
+
     if Controller.IsOpen(key) and type(entry.isDetached) == "function"
         and entry.isDetached()
     then
@@ -161,11 +169,6 @@ function Controller.Toggle(id, owner)
         if type(entry.focus) == "function" then entry.focus() end
         Controller.activeID = key
         return true
-    end
-
-    if Controller.activeID == key and Controller.IsOpen(key) then
-        Controller.CloseBranch(key)
-        return false
     end
 
     Controller.CloseAll("switch")
@@ -187,6 +190,8 @@ function Controller.ApplyOpacity(opacity)
     end
     Options.ApplyWindowOpacity(Hub.WorkUI and Hub.WorkUI.instance or nil, value)
     Options.ApplyWindowOpacity(Hub.SettingsUI and Hub.SettingsUI.instance or nil, value)
+    Options.ApplyWindowOpacity(PNC.ColonyJournalUI
+        and PNC.ColonyJournalUI.instance or nil, value)
     return value
 end
 
@@ -218,6 +223,12 @@ function Controller.SyncPositions()
         and type(settings.sync) == "function"
     then
         settings.sync(owner)
+    end
+    local events = Controller.entries.events
+    if Controller.IsOpen("events") and events
+        and type(events.sync) == "function"
+    then
+        events.sync(owner)
     end
     Controller.ApplyOpacity(Options.GetOpacity())
     return true
@@ -275,6 +286,32 @@ Controller.Register("settings", {
     focus = function() return focusModule(Hub.SettingsUI) end,
     sync = function(owner)
         placeWindow(Hub.SettingsUI and Hub.SettingsUI.instance, owner)
+    end,
+})
+
+Controller.Register("events", {
+    open = function(owner)
+        local journal = PNC.ColonyJournalUI
+        return journal and journal.Open and journal.Open(owner) or false
+    end,
+    close = function()
+        local journal = PNC.ColonyJournalUI
+        if journal and journal.Close then journal.Close() end
+    end,
+    isOpen = function()
+        return PNC.ColonyJournalUI
+            and moduleIsVisible(PNC.ColonyJournalUI) or false
+    end,
+    isDetached = function()
+        return PNC.ColonyJournalUI
+            and moduleIsDetached(PNC.ColonyJournalUI) or false
+    end,
+    focus = function()
+        return focusModule(PNC.ColonyJournalUI)
+    end,
+    sync = function(owner)
+        placeWindow(PNC.ColonyJournalUI
+            and PNC.ColonyJournalUI.instance or nil, owner)
     end,
 })
 

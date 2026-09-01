@@ -12,6 +12,7 @@ local liveBodies = {}
 local sentHome = {}
 local releasedWorkers = {}
 local manualProvisionRequests = 0
+local manualCorpseHaulRequests = 0
 
 local function companion(id, owner, x)
     return {
@@ -127,6 +128,13 @@ PNC = {
             return true, "provision_grabbed"
         end,
     },
+    CorpseHaulService = {
+        RequestManual = function(record)
+            manualCorpseHaulRequests = manualCorpseHaulRequests + 1
+            record.manualCorpseHaulRequested = true
+            return true, "CORPSE_HAUL_ORDER_FORCED"
+        end,
+    },
 }
 
 T.load(SHARED_ROOT .. "PNC_CompanionCommandRegistry.lua")
@@ -140,6 +148,8 @@ T.truthy(PNC.CompanionCommands.Get("manual_sleep"),
     "manual sleep command is registered")
 T.truthy(PNC.CompanionCommands.Get("manual_provision"),
     "manual provision command is registered")
+T.truthy(PNC.CompanionCommands.Get("manual_corpse_haul"),
+    "manual corpse haul command is registered")
 T.truthy(string.find(
     PNC.CompanionCommands.Get("camp").llmDescription,
     "stay here for now",
@@ -241,7 +251,7 @@ records.owned.affiliation = { factionID = "faction_alice" }
 T.equal(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
     true, "single-player faction ownership uses canonical account key")
 
-T.equal(#PNC.CompanionCommands.List(), 14, "registered command count")
+T.equal(#PNC.CompanionCommands.List(), 15, "registered command count")
 T.equal(PNC.CompanionCommands.Get("scavenge_nearby").clientOnly, true,
     "scavenge command opens its client setup UI")
 T.equal(#PNC.CompanionCommands.ListGroups(), 3,
@@ -257,6 +267,17 @@ T.equal(manualProvisionRequests, 1,
     "manual provision uses the provision scheduler")
 T.equal(records.owned.manualProvisionRequested, true,
     "manual provision targets the selected companion")
+
+local corpseAffected, corpseReason = PNC.CompanionCommands.Execute(player, {
+    id = "owned",
+    commandID = "manual_corpse_haul",
+})
+T.equal(corpseAffected, 1, "manual corpse haul command target count")
+T.equal(corpseReason, "commanded", "manual corpse haul command result")
+T.equal(manualCorpseHaulRequests, 1,
+    "manual corpse haul uses the corpse haul service")
+T.equal(records.owned.manualCorpseHaulRequested, true,
+    "manual corpse haul targets the selected companion")
 T.equal(
     PNC.CompanionCommands.GetAttackTypeDefinition("auto").icon,
     "media/ui/emotes/yes.png",

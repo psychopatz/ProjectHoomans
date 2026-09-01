@@ -58,6 +58,7 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
                 id = order.id,
                 operation = order.operation,
                 status = order.status,
+                manual = order.manual == true,
                 blockedReason = order.blockedReason,
                 progress = progress,
                 requiredWork = required,
@@ -163,12 +164,19 @@ function Service.BuildActionInformation(record)
     if order.operation == "PROVISION_PICKUP" then
         activityItemFullType = provisionItemFullType(payload)
     end
+    local lumber = order.operation == "LUMBER" and record.runtime
+        and record.runtime.lumber or nil
     return {
         kind = "work_order",
+        manual = order.manual == true,
         workOrderId = order.id,
         operation = order.operation,
         status = order.status,
-        phase = record.orderSpec and record.orderSpec.phase or nil,
+        phase = lumber and lumber.phase
+            or record.orderSpec and record.orderSpec.phase or nil,
+        waitingFor = lumber and lumber.waitingFor or nil,
+        waitingReason = lumber and lumber.waitingReason or nil,
+        toolDiagnostic = lumber and PNC.Core.DeepCopy(lumber.tool) or nil,
         progress = progress,
         requiredWork = required,
         percent = math.floor((progress / required) * 100 + 0.5),

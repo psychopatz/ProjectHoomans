@@ -4,6 +4,8 @@ PNC.CommandHub = PNC.CommandHub or {}
 local CoreHub = require "PsychopatzCore/UI/PsychopatzCommandHub"
 local Registry = CoreHub.Registry
 PNC.CommandHub.Registry = Registry
+PNC.CommandHub.Gates = PNC.CommandHub.Gates or {}
+local Gates = PNC.CommandHub.Gates
 
 local function trace(event, message)
     if CoreHub.Trace then
@@ -96,7 +98,71 @@ local function openZone(actionID)
     end
 end
 
-Registry.SetCategoryOrder({ "work", "zone", "settings" })
+local function hasRadio()
+    local journalButton = PNC.ColonyJournalButton
+    return journalButton
+        and type(journalButton.HasRadio) == "function"
+        and journalButton.HasRadio() == true or false
+end
+
+local function colonyManagementSnapshot()
+    local client = PNC.ColonyManagementClient
+    if client and type(client.ReadSnapshot) == "function" then
+        local update = client.ReadSnapshot()
+        if type(update) == "table" then
+            return update.snapshot or {}
+        end
+    end
+
+    local network = PNC.Network
+    local state = network and network.ClientState or nil
+    return state and state.colonyManagement or {}
+end
+
+function Gates.HasRadio()
+    return hasRadio()
+end
+
+function Gates.HasBaseAndStockpile()
+    local snapshot = colonyManagementSnapshot()
+    local settlement = type(snapshot) == "table" and snapshot.settlement or nil
+    if type(settlement) ~= "table" then return false end
+
+    -- stockpileNodes are optional navigation/access points. The actual
+    -- setup prerequisite is a built stockpile facility in the established
+    -- base, so a valid base does not remain disabled just because no access
+    -- point has been configured yet.
+    for _, facility in ipairs(settlement.facilities or {}) do
+        if tostring(facility.definitionId or "") == "stockpile" then
+            local state = tostring(facility.constructionState or "")
+            if state == "" or state == "BUILT" then return true end
+        end
+    end
+    return false
+end
+
+local function isJournalOpen()
+    local journal = PNC.ColonyJournalUI
+    return journal and journal.instance
+        and journal.instance.getIsVisible
+        and journal.instance:getIsVisible() == true or false
+end
+
+local function toggleEvents(_, owner)
+    trace("pnc_events_open_start", "has_owner=" .. tostring(owner ~= nil)
+        .. " available=" .. tostring(PNC.ColonyJournalUI ~= nil
+            and PNC.ColonyJournalUI.Toggle ~= nil))
+    local journal = PNC.ColonyJournalUI
+    if journal and type(journal.Toggle) == "function" then
+        local result = journal.Toggle(owner)
+        trace("pnc_events_open_result", "result=" .. tostring(result))
+        return result
+    end
+    trace("pnc_events_open_result", "result=false reason=missing_journal_ui")
+    return false
+end
+
+Registry.SetCategoryOrder({ "work", "zone", "settings", "events" })
 
 Registry.RegisterCategory({
     id = "work",
@@ -108,6 +174,7 @@ Registry.RegisterCategory({
     titleFallback = "Work",
     tooltipKey = "UI_PNC_CommandHub_WorkHelp",
     tooltipFallback = "Authorize colonists for automatic work",
+    enabled = Gates.HasBaseAndStockpile,
     onClick = toggleChild("work", openWork),
     selected = function() return isOpen("work") end,
     closeHub = false,
@@ -123,6 +190,7 @@ Registry.RegisterCategory({
     titleFallback = "Zone",
     tooltipKey = "UI_PNC_CommandHub_ZoneHelp",
     tooltipFallback = "Assign work areas for colony activities",
+    enabled = Gates.HasBaseAndStockpile,
     onClick = toggleChild("zone"),
     selected = function() return isOpen("zone") end,
     closeHub = false,
@@ -178,6 +246,20 @@ Registry.RegisterCategory({
     tooltipFallback = "Edit the hub position, dimensions, and opacity",
     onClick = toggleChild("settings", openHubSettings),
     selected = function() return isOpen("settings") end,
+    closeHub = false,
+})
+
+Registry.RegisterCategory({
+    id = "events",
+    source = "ProjectHoomans",
+    order = 40,
+    childID = "events",
+    titleKey = "UI_PNC_CommandHub_Category_Events",
+    titleFallback = "Events",
+    tooltipKey = "UI_PNC_CommandHub_EventsHelp",
+    tooltipFallback = "Open the colony journal",
+    onClick = toggleChild("events", toggleEvents),
+    selected = isJournalOpen,
     closeHub = false,
 })
 

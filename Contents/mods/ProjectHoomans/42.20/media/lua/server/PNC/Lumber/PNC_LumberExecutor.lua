@@ -23,6 +23,16 @@ function Executor.GetCandidates(npcId)
     local job = Service and Service.GetJob and Service.GetJob(npcId)
     local zone = job and Service.GetZone(job.zoneId) or nil
     local record = recordFor(npcId)
+    local workOrder = job and job.workOrderId and PNC.WorkService
+        and PNC.WorkService.Queries and PNC.WorkService.Queries.Get
+        and PNC.WorkService.Queries.Get(job.workOrderId) or nil
+    if PNC.LumberWorkAdapter and workOrder
+        and workOrder.status ~= "CANCELLED"
+        and workOrder.status ~= "COMPLETED"
+        and workOrder.status ~= "FAILED"
+    then
+        return {}
+    end
     if not job or not zone or job.active ~= true
         or zone.enabled ~= true
         or record and record.allowedJobs
@@ -41,6 +51,15 @@ end
 
 function Executor.Validate(candidate)
     local record = recordFor(candidate and candidate.npcId)
+    local job = Service and Service.GetJob(candidate and candidate.npcId)
+    local workOrder = job and job.workOrderId and PNC.WorkService
+        and PNC.WorkService.Queries and PNC.WorkService.Queries.Get
+        and PNC.WorkService.Queries.Get(job.workOrderId) or nil
+    if PNC.LumberWorkAdapter and workOrder
+        and workOrder.status ~= "CANCELLED"
+        and workOrder.status ~= "COMPLETED"
+        and workOrder.status ~= "FAILED"
+    then return false end
     return Service and Service.ValidateJob
         and Service.ValidateJob(candidate and candidate.npcId,
             candidate and candidate.sourceRef)

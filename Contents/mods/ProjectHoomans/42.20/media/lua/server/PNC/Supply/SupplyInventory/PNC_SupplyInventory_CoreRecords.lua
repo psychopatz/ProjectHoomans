@@ -96,6 +96,7 @@ function SupplyInventory.CreateDestination(record, reason)
         inventoryUndo = PNC.Core.DeepCopy(
             InventoryCommands.EnsureRecordInventory(record)
         ),
+        itemIDs = {},
         physicalItems = {},
         physicalProjectionMissing = false,
         rolledBack = false,
@@ -108,6 +109,9 @@ function SupplyInventory.CreateDestination(record, reason)
         for index = 1, #(details.physicalItems or {}) do
             self.physicalItems[#self.physicalItems + 1] =
                 details.physicalItems[index]
+        end
+        for index = 1, #(details.itemIDs or {}) do
+            self.itemIDs[#self.itemIDs + 1] = details.itemIDs[index]
         end
         self.physicalProjectionMissing = details.physicalProjectionMissing
             or self.physicalProjectionMissing

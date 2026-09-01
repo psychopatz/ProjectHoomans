@@ -140,6 +140,11 @@ local function workerAvailable(record, order)
     if not record or record.alive == false or not belongsToOrder(record, order) then
         return false
     end
+    if order.requiredWorkerId
+        and tostring(order.requiredWorkerId) ~= tostring(record.id)
+    then
+        return false
+    end
     if order.operation == "PROVISION_PICKUP" and isFollowing(record) then
         return false
     end
@@ -155,7 +160,9 @@ local function workerAvailable(record, order)
     local allowed = record.allowedJobs
     -- Colony jobs are opt-out. Archetype tables predate colony production and
     -- therefore missing keys must mean allowed, not disabled.
-    if type(allowed) == "table" and allowed[job] == false then return false end
+    if type(allowed) == "table" and allowed[job] == false
+        and order.manual ~= true
+    then return false end
     if requiresHome(order) and PNC.HomeDutyService
         and PNC.HomeDutyService.IsAtHome
         and not PNC.HomeDutyService.IsAtHome(record, order.baseId)
@@ -188,7 +195,10 @@ local function findWorker(order)
         local allowed = record.allowedJobs
         local eligible = not Service.ClaimsByWorker[tostring(record.id)]
             and not (record.runtime and record.runtime.workOrderId)
-            and not (type(allowed) == "table" and allowed[job] == false)
+            and not (order.requiredWorkerId
+                and tostring(order.requiredWorkerId) ~= tostring(record.id))
+            and not (type(allowed) == "table" and allowed[job] == false
+                and order.manual ~= true)
             and recipeKnowledgeMet(record, order)
             and requirementsMet(record, order.requiredSkills)
         if not eligible then return end

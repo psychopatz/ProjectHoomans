@@ -412,11 +412,20 @@ T.equal(relationshipChangeTone, "success",
     "relationship nameplate positive change tone")
 
 local rendererSource = T.read(
-    "ProjectHoomans", "client", "PNC/UI/Nameplates/PNC_NameplateRenderer.lua"
+    "ProjectHoomans", "client",
+    "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer.lua"
 )
 T.falsy(string.find(tostring(rendererSource), tostring("entry.hpText"), 1, true), "numeric HP rendering returned")
 
-T.load("ProjectHoomans", "client", "PNC/UI/Nameplates/PNC_NameplateRenderer.lua")
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer.lua"
+)
+T.truthy(
+    type(PNC.NameplateRenderer.Render) == "function",
+    "canonical renderer entry loads its public API"
+)
 local pathLines = PNC.NameplateRenderer.BuildPathDebugLines({
     navigationPolicy = "local",
     navigationProvider = "engine_path",
@@ -651,6 +660,12 @@ T.contains(
 )
 
 local renderedLines = 0
+local renderedGeometry = {
+    cone = 0,
+    target = 0,
+    blocker = 0,
+    movement = 0,
+}
 local renderedText = {}
 isoToScreenX = function(_, x, y) return (x - y) * 32 end
 isoToScreenY = function(_, x, y, z)
@@ -670,8 +685,29 @@ local manager = {
     playerIndex = 0,
     x = 0,
     y = 0,
-    drawLine2 = function()
+    drawLine2 = function(_, _, _, _, _, _, r, g, b)
         renderedLines = renderedLines + 1
+        if math.abs(r - 0.25) < 0.001
+            and math.abs(g - 0.90) < 0.001
+            and math.abs(b - 1.00) < 0.001
+        then
+            renderedGeometry.cone = renderedGeometry.cone + 1
+        elseif math.abs(r - 1.00) < 0.001
+            and math.abs(g - 0.22) < 0.001
+            and math.abs(b - 0.16) < 0.001
+        then
+            renderedGeometry.target = renderedGeometry.target + 1
+        elseif math.abs(r - 1.00) < 0.001
+            and math.abs(g - 0.15) < 0.001
+            and math.abs(b - 0.80) < 0.001
+        then
+            renderedGeometry.blocker = renderedGeometry.blocker + 1
+        elseif math.abs(r - 0.50) < 0.001
+            and math.abs(g - 1.00) < 0.001
+            and math.abs(b - 0.30) < 0.001
+        then
+            renderedGeometry.movement = renderedGeometry.movement + 1
+        end
     end,
 }
 local forward = {
@@ -757,7 +793,11 @@ PNC.NameplateRenderer.RenderCombatDebug(manager, {
         },
     },
 })
-T.truthy(renderedLines > 80, "combat geometry was not rendered")
+T.truthy(renderedLines > 0, "combat geometry was not rendered")
+T.truthy(renderedGeometry.cone > 0, "combat cone was not rendered")
+T.truthy(renderedGeometry.target > 0, "combat target marker was not rendered")
+T.truthy(renderedGeometry.blocker > 0, "fire-lane blocker was not rendered")
+T.truthy(renderedGeometry.movement > 0, "tactical movement was not rendered")
 local renderedTextJoined = table.concat(renderedText, "\n")
 T.contains(
     renderedTextJoined,

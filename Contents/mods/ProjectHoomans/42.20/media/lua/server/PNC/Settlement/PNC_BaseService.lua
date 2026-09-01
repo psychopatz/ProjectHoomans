@@ -182,8 +182,17 @@ function Service.BuildSnapshot(baseOrId)
     local output = PNC.Core.DeepCopy(base)
     output.maxHQLevel = #(Definitions.HQ_LEVELS or {})
     output.territory = Service.GetTerritorySummary(base)
-    output.corpseHaul = base.corpseHaul and PNC.Core.DeepCopy(base.corpseHaul)
-        or nil
+    output.corpseHaul = base.corpseHaul
+        and PNC.Core.DeepCopy(base.corpseHaul) or nil
+    local corpseHaul = PNC.CorpseHaulService
+    if output.corpseHaul and corpseHaul
+        and corpseHaul.CountCorpsesInRegion
+    then
+        local total, eligible = corpseHaul.CountCorpsesInRegion(
+            output.corpseHaul.sourceRegion)
+        output.corpseHaul.sourceCorpseCount = total
+        output.corpseHaul.sourceEligibleCorpseCount = eligible
+    end
     local zone = Zones.get(base.baseZoneId)
     output.geometry = zone and {
         tileCount = zone.cachedTileCount, bounds = zone.cachedBounds,

@@ -16,6 +16,8 @@ local Layout = UI.Layout
 local Protocol = PNC.ColonyJournalProtocol
 local RadioDeviceState = PsychopatzCore.RadioDeviceState
 local RadioImageAnimation = PsychopatzCore.RadioImageAnimation
+local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
+local WidgetWindow = UI.WidgetWindow
 
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
@@ -157,6 +159,7 @@ ISPNCColonyJournalWindow = PsychopatzWindow:derive(
 
 function ISPNCColonyJournalWindow:initialise()
     PsychopatzWindow.initialise(self)
+    Options.ApplyOpacity(self, Options.GetOpacity())
 end
 
 function ISPNCColonyJournalWindow:createChildren()
@@ -179,8 +182,33 @@ function ISPNCColonyJournalWindow:createChildren()
             frameDuration = 200,
         }) or nil
     self.rowCount = 0
+    self.lastContentOpacity = nil
     self:requestResponsiveLayout(true)
     self:refreshRows()
+    self:applyContentStyle()
+    if WidgetWindow then
+        WidgetWindow.Install(self, {
+            id = "pnc-colony-journal-widget",
+            onDetachedChanged = function()
+                local controller = PNC.CommandHub
+                    and PNC.CommandHub.ChildController
+                if controller and controller.SyncPositions then
+                    controller.SyncPositions()
+                end
+            end,
+        })
+    end
+end
+
+function ISPNCColonyJournalWindow:applyContentStyle()
+    local opacity = Options.GetOpacity()
+    local lift = 0.04
+    if self.lastContentOpacity == opacity then return end
+    -- Keep the journal body just above the window opacity, matching the
+    -- Work list while preserving the world visibility of the outer panel.
+    Options.ApplySurfaceOpacity(self.list, lift)
+    self.contentOpacity = Options.GetContentOpacity(lift)
+    self.lastContentOpacity = opacity
 end
 
 function ISPNCColonyJournalWindow:onResponsiveLayout()
@@ -227,6 +255,13 @@ function ISPNCColonyJournalWindow:requestJournal(now)
 end
 
 function ISPNCColonyJournalWindow:prerender()
+    if self.owner and self.owner.getIsVisible
+        and not self.owner:getIsVisible()
+    then
+        self:close()
+        return
+    end
+    self:applyContentStyle()
     local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
     self:checkRadio(now)
     local current = state()
@@ -235,6 +270,7 @@ function ISPNCColonyJournalWindow:prerender()
     end
     self:requestJournal(now)
     PsychopatzWindow.prerender(self)
+    if WidgetWindow then WidgetWindow.Sync(self) end
 end
 
 function ISPNCColonyJournalWindow:render()
@@ -242,7 +278,7 @@ function ISPNCColonyJournalWindow:render()
     local header = self.headerRect
     if not header then return end
     UI.DrawSurface(self, header.x, header.y, header.width, header.height,
-        true)
+        true, self.contentOpacity)
     local signalTexture = self.radioImageAnimation
         and self.radioImageAnimation:GetTexture(self.radioActive)
     local titleX = header.x + 10
@@ -281,6 +317,7 @@ function ISPNCColonyJournalWindow:render()
 end
 
 function ISPNCColonyJournalWindow:close()
+    self:saveGeometry(true)
     self:setVisible(false)
     self:removeFromUIManager()
     if JournalUI.instance == self then JournalUI.instance = nil end
@@ -294,11 +331,17 @@ function ISPNCColonyJournalWindow:new(x, y, width, height, options)
 end
 
 function JournalUI.CanOpen()
+    -- The event viewer is useful even without a radio. Radio possession and
+    -- signal availability only control whether new entries can be synced.
+    return true
+end
+
+function JournalUI.HasRadio()
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     return RadioDeviceState.HasPlayerDevice(player)
 end
 
-function JournalUI.Open()
+function JournalUI.Open(owner)
     if not JournalUI.CanOpen() then return nil, "radio_unavailable" end
     local window = JournalUI.instance
     if not window then
@@ -316,8 +359,10 @@ function JournalUI.Open()
         window:instantiate()
         JournalUI.instance = window
     end
+    window.owner = owner or window.owner
     window:addToUIManager()
     window:setVisible(true)
+    Options.ApplyOpacity(window, Options.GetOpacity())
     window:bringToTop()
     window.radioActive = RadioDeviceState.FindActivePlayerDevice(
         getSpecificPlayer and getSpecificPlayer(0) or nil) ~= nil
@@ -326,12 +371,16 @@ function JournalUI.Open()
     return window
 end
 
-function JournalUI.Toggle()
+function JournalUI.Close()
+    if JournalUI.instance then JournalUI.instance:close() end
+end
+
+function JournalUI.Toggle(owner)
     if JournalUI.instance and JournalUI.instance:getIsVisible() then
         JournalUI.instance:close()
         return false
     end
-    return JournalUI.Open() ~= nil
+    return JournalUI.Open(owner) ~= nil
 end
 
 return JournalUI

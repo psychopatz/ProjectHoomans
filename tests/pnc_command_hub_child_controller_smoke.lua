@@ -37,8 +37,10 @@ hub.visible = true
 local actionsWindow = fakeWindow(0, 0, 190, 150)
 local workWindow = fakeWindow(0, 0, 760, 560)
 local settingsWindow = fakeWindow(0, 0, 420, 340)
+local journalWindow = fakeWindow(0, 0, 640, 540)
 workWindow.psychopatzWidgetEnabled = true
 settingsWindow.psychopatzWidgetEnabled = true
+journalWindow.psychopatzWidgetEnabled = true
 
 local actionsUI = { instance = actionsWindow }
 function actionsUI.Open()
@@ -73,6 +75,14 @@ local settingsUI = { instance = settingsWindow }
 function settingsUI.Open() settingsWindow.visible = true return settingsWindow end
 function settingsUI.Close() settingsWindow.visible = false end
 
+local journalUI = { instance = journalWindow }
+function journalUI.Open(owner)
+    journalWindow.owner = owner
+    journalWindow.visible = true
+    return journalWindow
+end
+function journalUI.Close() journalWindow.visible = false end
+
 PNC = {
     CommandHub = {
         instance = hub,
@@ -80,6 +90,7 @@ PNC = {
         WorkUI = workUI,
         SettingsUI = settingsUI,
     },
+    ColonyJournalUI = journalUI,
 }
 
 local Controller = T.load("ProjectHoomans", "client",
@@ -104,6 +115,31 @@ T.truthy(Controller.Toggle("settings", hub),
 T.falsy(workWindow.visible, "work branch survived the settings switch")
 T.truthy(settingsWindow.visible, "settings window is not visible")
 
+T.truthy(Controller.Toggle("events", hub),
+    "events did not open the colony journal child")
+T.falsy(settingsWindow.visible, "settings branch survived the events switch")
+T.truthy(journalWindow.visible, "colony journal child is not visible")
+T.truthy(journalWindow.owner == hub,
+    "colony journal child did not receive the hub owner")
+T.truthy(Controller.Toggle("work", hub),
+    "work did not replace the attached events branch")
+T.falsy(journalWindow.visible,
+    "attached events branch survived the work switch")
+
+T.truthy(Controller.Toggle("events", hub),
+    "events did not reopen after a sibling switch")
+journalWindow.psychopatzWidgetDetached = true
+T.truthy(Controller.Toggle("zone", hub),
+    "zone did not open beside a detached events widget")
+T.truthy(journalWindow.visible,
+    "detached events widget was closed by a sibling branch switch")
+T.truthy(Controller.Toggle("events", hub),
+    "detached events widget could not be focused")
+T.falsy(Controller.Toggle("events", hub),
+    "second events click did not close the detached journal")
+T.falsy(journalWindow.visible,
+    "detached journal remained visible after its parent was re-clicked")
+
 T.truthy(Controller.Toggle("work", hub), "work did not reopen")
 workWindow.psychopatzWidgetDetached = true
 T.truthy(Controller.Toggle("zone", hub),
@@ -116,11 +152,17 @@ T.truthy(Controller.Toggle("work", hub),
 T.truthy(workWindow.visible, "focusing detached work widget hid it")
 T.falsy(actionsWindow.visible,
     "focusing a widget left the attached zone branch open")
+T.falsy(Controller.Toggle("work", hub),
+    "second click did not close the detached work widget")
+T.falsy(workWindow.visible,
+    "detached work widget remained visible after its parent was re-clicked")
 
 Controller.ApplyOpacity(0.4)
 T.equal(hub.opacity, 0.4, "parent opacity was not propagated")
 T.equal(settingsWindow.opacity, 0.4,
     "child opacity was not propagated")
+T.equal(journalWindow.opacity, 0.4,
+    "journal opacity was not propagated")
 Controller.CloseAll()
 T.truthy(hub.visible, "closing children closed the parent hub")
 T.falsy(settingsWindow.visible, "settings child was not closed")

@@ -61,6 +61,12 @@ local function manualProvision(record)
     return ok == true
 end
 
+local function manualCorpseHaul(record)
+    local service = PNC.CorpseHaulService
+    if not service or not service.RequestManual then return false end
+    return service.RequestManual(record) == true
+end
+
 local function stopActivity(record, reason)
     local lease = PNC.TaskLeaseService and PNC.TaskLeaseService.ForNPC
         and PNC.TaskLeaseService.ForNPC(record.id) or nil
@@ -237,6 +243,17 @@ Commands.Register({
     label = "Grab Provision",
     icon = "media/ui/Emotes/PNC_EmoteMenu.png",
     apply = manualProvision,
+})
+
+Commands.Register({
+    id = "manual_corpse_haul",
+    group = "manual_activity",
+    contextOnly = true,
+    manualTabOnly = true,
+    labelKey = "UI_PNC_CommandCorpseHaul",
+    label = "Grab Corpses",
+    icon = "media/ui/Emotes/PNC_EmoteMenu.png",
+    apply = manualCorpseHaul,
 })
 
 Commands.Register({

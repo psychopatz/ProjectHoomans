@@ -36,23 +36,29 @@ if Service and Service.RegisterHandler then
     Service.RegisterHandler("lumber_zone", {
         authorize = authorize,
         execute = function(player, npcIds, target, options)
-            local radius = math.max(1, math.min(
-                tonumber(Const.LUMBER_MAX_RADIUS) or 32,
-                math.floor(tonumber(options and options.radius)
-                    or tonumber(Const.LUMBER_DEFAULT_RADIUS) or 12)
-            ))
+            options = type(options) == "table" and options or {}
             local centerX = math.floor(tonumber(target.x) or 0)
             local centerY = math.floor(tonumber(target.y) or 0)
-            local zone, reason = PNC.LumberService.CreateZone({
-                minX = centerX - radius,
-                minY = centerY - radius,
-                maxX = centerX + radius,
-                maxY = centerY + radius,
+            local args = {
                 z = math.floor(tonumber(target.z) or 0),
                 npcIds = npcIds,
                 ownerType = "player",
                 ownerId = playerKey(player),
-            })
+            }
+            if type(options.region) == "table" then
+                args.region = options.region
+            else
+                local radius = math.max(1, math.min(
+                    tonumber(Const.LUMBER_MAX_RADIUS) or 32,
+                    math.floor(tonumber(options.radius)
+                        or tonumber(Const.LUMBER_DEFAULT_RADIUS) or 12)
+                ))
+                args.minX = centerX - radius
+                args.minY = centerY - radius
+                args.maxX = centerX + radius
+                args.maxY = centerY + radius
+            end
+            local zone, reason = PNC.LumberService.CreateZone(args)
             if not zone then
                 return { ok = false, accepted = 0, rejected = #npcIds,
                     reason = reason or "lumber_zone_failed" }

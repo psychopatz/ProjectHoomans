@@ -255,16 +255,15 @@ function Service.GetCorpseToken(corpse, create)
 end
 
 function Service.IsEligibleCorpse(corpse)
-    local data = corpse and corpse.getModData and corpse:getModData() or nil
     local item = corpse and corpse.getItem and corpse:getItem() or nil
     local fullType = item and item.getFullType and tostring(item:getFullType() or "") or ""
-    if not corpse or not data then return false end
+    if not corpse then return false end
     if corpse.isAnimal and corpse:isAnimal() == true then return false end
     if fullType == "Base.CorpseAnimal" then return false end
-    -- Hoomans-owned death markers are the default scope. An integration can
-    -- opt an external human corpse in explicitly without exposing all player
-    -- corpses to automatic NPC hauling.
-    return data.PNC_DeathMarkerID ~= nil or data.PNC_CorpseHaulAllowed == true
+    -- forEachCorpse already restricts this object to the engine's corpse
+    -- collection. The home-service check belongs to worker authorization, not
+    -- corpse ownership: ordinary vanilla human corpses are valid haul targets.
+    return true
 end
 
 function Service.GetCorpseAt(x, y, z, token)
@@ -282,6 +281,30 @@ function Service.GetCorpseAt(x, y, z, token)
         end
     end)
     return found
+end
+
+function Service.CountCorpsesInRegion(region)
+    local total = 0
+    local eligible = 0
+    local cell = getCell and getCell() or nil
+    if not cell or not cell.getGridSquare
+        or not Lifecycle or not Lifecycle.Internal
+        or not Lifecycle.Internal.forEachCorpse
+    then
+        return nil, nil
+    end
+    forEachRegionTile(region, function(x, y, z)
+        local square = squareAt(x, y, z)
+        if square then
+            Lifecycle.Internal.forEachCorpse(square, function(corpse)
+                total = total + 1
+                if Service.IsEligibleCorpse(corpse) then
+                    eligible = eligible + 1
+                end
+            end)
+        end
+    end)
+    return total, eligible
 end
 
 local function hasCorpse(square)
@@ -440,148 +463,107 @@ local function actionPayload(lease, assignment, action)
     }
 end
 
+local function isMultiplayerSession()
+    return type(isMultiplayer) == "function" and isMultiplayer() == true
+end
+
+local function sendVisualSync(lease, assignment, action)
+    local task = Service.GetTask(lease.taskId)
+    local record = Registry.Get(lease.npcId)
+    local body = record and Registry.GetLiveZombie(record.id) or nil
+    local player
+    local payload
+    local sent
+    if not isMultiplayerSession() then return true end
+    if not task or not body then return true end
+    if task.executorOnlineID and Core.ResolvePlayerByOnlineID then
+        player = Core.ResolvePlayerByOnlineID(task.executorOnlineID)
+    end
+    if not player then player = nearestPlayer(body) end
+    if not player then
+        task.visualSyncPending = true
+        return true
+    end
+    if player.getOnlineID then
+        task.executorOnlineID = tonumber(player:getOnlineID())
+    end
+    payload = actionPayload(lease, assignment, action)
+    if not PNC.Network or not PNC.Network.Internal
+        or not PNC.Network.Internal.SendToPlayer
+    then
+        task.visualSyncPending = true
+        return true
+    end
+    local ok, result = pcall(function()
+        return PNC.Network.Internal.SendToPlayer(player,
+            PNC.Const.CMD_CORPSE_HAUL_ACTION, payload)
+    end)
+    sent = ok and result ~= false
+    task.visualSyncPending = not sent
+    return true
+end
+
+local function applyGrab(task, body, assignment)
+    local corpse
+    local target
+    local ok
+    if not body.isDraggingCorpse or not body.pickUpCorpse then
+        return false, "GRAPPLE_UNAVAILABLE"
+    end
+    if body:isDraggingCorpse() then return false, "ALREADY_DRAGGING" end
+    corpse = Service.GetCorpseAt(assignment.sourceX, assignment.sourceY,
+        assignment.sourceZ, assignment.haulToken)
+    if not corpse then return false, "CORPSE_NOT_FOUND" end
+    ok = pcall(function() body:pickUpCorpse(corpse, "BwdDrag") end)
+    if not ok then return false, "GRAB_CALL_FAILED" end
+    if not body:isDraggingCorpse() then return false, "GRAB_REJECTED" end
+    target = body.getGrapplingTarget and body:getGrapplingTarget() or nil
+    task.grappleTargetOnlineID = target and target.getOnlineID
+        and tonumber(target:getOnlineID()) or nil
+    task.serverGrappleAppliedAt = Core.Now()
+    return true
+end
+
+local function applyDrop(task, body, assignment)
+    local distance
+    local ok
+    if not isDropPointAllowed(assignment) then
+        return false, "DROP_REGION_INVALID"
+    end
+    distance = Core.Distance(body:getX(), body:getY(),
+        assignment.dropX, assignment.dropY)
+    if distance > 1.0 then return false, "DROP_TOO_FAR" end
+    if not body.isDraggingCorpse or not body:isDraggingCorpse() then
+        return false, "NOT_DRAGGING"
+    end
+    if not body.setDoGrappleLetGo then
+        return false, "GRAPPLE_RELEASE_UNAVAILABLE"
+    end
+    ok = pcall(function() body:setDoGrappleLetGo() end)
+    if not ok then return false, "DROP_CALL_FAILED" end
+    task.serverGrappleReleasedAt = Core.Now()
+    return true
+end
+
 function Service.SendAction(lease, assignment, action)
     local task = Service.GetTask(lease.taskId)
     local record = Registry.Get(lease.npcId)
     local body = record and Registry.GetLiveZombie(record.id) or nil
-    local player = task and task.executorOnlineID
-        and Core.ResolvePlayerByOnlineID(task.executorOnlineID) or nil
-    local payload
+    local ok
+    local reason
     if not task or not record or not body then return false, "NPC_UNAVAILABLE" end
-    if not player then player = nearestPlayer(body) end
-    if not player then return false, "NO_EXECUTOR" end
-    task.executorOnlineID = tonumber(player:getOnlineID())
-    payload = actionPayload(lease, assignment, action)
-    if (not Core.IsClientOnly or not Core.IsClientOnly())
-        and PNC.CorpseHaulActions
-        and PNC.CorpseHaulActions.ReceiveCommand
-    then
-        if PNC.CorpseHaulActions.ReceiveCommand(payload) ~= true then
-            return false, "CLIENT_ACTION_REJECTED"
-        end
-        return true
+    if action == "grab" then
+        ok, reason = applyGrab(task, body, assignment)
+    elseif action == "drop" then
+        ok, reason = applyDrop(task, body, assignment)
+    else
+        return false, "UNKNOWN_CORPSE_ACTION"
     end
-    if PNC.Network and PNC.Network.Internal
-        and PNC.Network.Internal.SendToPlayer
-    then
-        return PNC.Network.Internal.SendToPlayer(player,
-            PNC.Const.CMD_CORPSE_HAUL_ACTION, payload), nil
-    end
-    return false, "NETWORK_UNAVAILABLE"
-end
-
-function Service.HandleClientAck(player, args)
-    args = type(args) == "table" and args or {}
-    local task = Service.GetTask(args.taskId)
-    local lease
-    local expected
-    local event = tostring(args and args.event or "")
-    if not task then return false, "TASK_NOT_FOUND" end
-    -- The client sends the task id; the lease id is not exposed to the client
-    -- as an authority token. Resolve through the runtime assignment instead.
-    local foundLease
-    local active = PNC.TaskLeaseService and PNC.TaskLeaseService.Active or {}
-    for _, candidateLeaseId in ipairs(active) do
-        local candidate = PNC.TaskLeaseService.Get(candidateLeaseId)
-        if candidate and tostring(candidate.taskId) == tostring(task.taskId) then
-            foundLease = candidate
-            break
-        end
-    end
-    lease = foundLease or lease
-    expected = task.executorOnlineID
-    if not lease or tostring(lease.npcId) ~= tostring(args.npcId or "")
-        or expected and tonumber(player and player:getOnlineID()) ~= tonumber(expected)
-    then return false, "ACK_NOT_AUTHORIZED" end
-
-    if event == "grab_request" or event == "drop_request" then
-        local assignment = lease.corpseHaul
-        local body = Registry.GetLiveZombie(lease.npcId)
-        local playerID = player and player.getOnlineID
-            and tonumber(player:getOnlineID()) or nil
-        local distance
-        local corpse
-        local target
-        local sent
-        if not Core.IsClientOnly or Core.IsClientOnly() ~= true then
-            return false, "REQUEST_NOT_CLIENT_ONLY"
-        end
-        if not playerID or not expected or playerID ~= tonumber(expected) then
-            return false, "REQUEST_NOT_AUTHORIZED"
-        end
-        if not assignment or not body then
-            return false, "NPC_UNAVAILABLE"
-        end
-        if event == "grab_request" then
-            if task.phase ~= "GRAB_PENDING" then
-                return false, "GRAB_NOT_PENDING"
-            end
-            distance = Core.Distance(body:getX(), body:getY(),
-                assignment.sourceX, assignment.sourceY)
-            if distance > 1.5 then return false, "SOURCE_TOO_FAR" end
-            if body.isDraggingCorpse and body:isDraggingCorpse() then
-                return false, "ALREADY_DRAGGING"
-            end
-            corpse = Service.GetCorpseAt(assignment.sourceX,
-                assignment.sourceY, assignment.sourceZ, assignment.haulToken)
-            if not corpse or not body.pickUpCorpse then
-                return false, "CORPSE_NOT_FOUND"
-            end
-            -- The client request carries no coordinates or corpse object.
-            -- The server resolves the reserved assignment again, then calls
-            -- the same vanilla grapple API used by ISGrabCorpseAction.
-            body:pickUpCorpse(corpse, "BwdDrag")
-            if not body.isDraggingCorpse or not body:isDraggingCorpse() then
-                return false, "GRAB_REJECTED"
-            end
-            target = body.getGrapplingTarget
-                and body:getGrapplingTarget() or nil
-            task.grappleTargetOnlineID = target and target.getOnlineID
-                and tonumber(target:getOnlineID()) or nil
-            task.serverGrappleAppliedAt = Core.Now()
-            task.lastAckAt, task.lastAck = Core.Now(), event
-            sent = Service.SendAction(lease, assignment, "sync_grab")
-            return sent == true, sent == true and nil or "SYNC_UNAVAILABLE"
-        end
-
-        if task.phase ~= "DROP_PENDING" then
-            return false, "DROP_NOT_PENDING"
-        end
-        if not isDropPointAllowed(assignment) then
-            return false, "DROP_REGION_INVALID"
-        end
-        distance = Core.Distance(body:getX(), body:getY(),
-            assignment.dropX, assignment.dropY)
-        if distance > 1.0 then return false, "DROP_TOO_FAR" end
-        if not body.isDraggingCorpse or not body:isDraggingCorpse() then
-            return false, "NOT_DRAGGING"
-        end
-        if not body.setDoGrappleLetGo then
-            return false, "GRAPPLE_RELEASE_UNAVAILABLE"
-        end
-        -- Release is intentionally issued on the server. Build 42 applies
-        -- the resulting corpse spawn on the authoritative world object.
-        body:setDoGrappleLetGo()
-        task.serverGrappleReleasedAt = Core.Now()
-        task.lastAckAt, task.lastAck = Core.Now(), event
-        sent = Service.SendAction(lease, assignment, "sync_drop")
-        return sent == true, sent == true and nil or "SYNC_UNAVAILABLE"
-    end
-
-    if event == "grab_queued" or event == "grab_complete" then
-        task.lastAckAt, task.lastAck = Core.Now(), event
-        return true
-    end
-    if event == "drop_queued" or event == "drop_complete" then
-        task.lastAckAt, task.lastAck = Core.Now(), event
-        return true
-    end
-    if event == "failed" then
-        task.failedReason = tostring(args.reason or "client_action_failed")
-        task.phase = "FAILED"
-        return false, task.failedReason
-    end
-    return false, "UNKNOWN_ACK"
+    if not ok then return false, reason end
+    task.lastAction, task.lastActionAt = action, Core.Now()
+    sendVisualSync(lease, assignment,
+        action == "grab" and "sync_grab" or "sync_drop")
+    return true
 end
 
 local function clearCorpseTaskMarker(x, y, z, token)
@@ -919,6 +901,217 @@ local function findBaseAssignment(base)
         end
     end
     return nil
+end
+
+local function homeBaseForRecord(record)
+    local home = PNC.HomeDutyService
+    local affiliation = record and record.affiliation or {}
+    local colonyId = tostring(affiliation.communityID or "")
+    if home and home.GetBase then
+        local base = home.GetBase(record)
+        if base then return base end
+    end
+    if colonyId ~= "" and PNC.BaseService
+        and PNC.BaseService.GetForColony
+    then
+        local base = PNC.BaseService.GetForColony(colonyId)
+        if base then return base end
+    end
+    return nil
+end
+
+local function currentWorkOrderFor(record)
+    local runtime = record and record.runtime or nil
+    local orderId = runtime and runtime.workOrderId or nil
+    local order = orderId and WorkRepository and WorkRepository.Get(orderId)
+        or nil
+    return order and not terminalWorkOrder(order) and order or nil
+end
+
+local function markManualOrder(order, record)
+    if not order or not record then return false, "CORPSE_HAUL_ORDER_INVALID" end
+    if order.workerId and tostring(order.workerId) ~= tostring(record.id) then
+        return false, "CORPSE_HAUL_ALREADY_ASSIGNED"
+    end
+    if order.requiredWorkerId
+        and tostring(order.requiredWorkerId) ~= tostring(record.id)
+    then
+        return false, "CORPSE_HAUL_ALREADY_ASSIGNED"
+    end
+    order.requiredWorkerId = tostring(record.id)
+    order.priority = 100
+    order.manual = true
+    if order.status == Status.PAUSED then
+        order.status = Status.WAITING_FOR_WORKER
+    end
+    order.blockedReason = nil
+    order.updatedAt = Core.Now()
+    order.revision = (tonumber(order.revision) or 0) + 1
+    if WorkRepository and WorkRepository.MarkDirty then
+        WorkRepository.MarkDirty()
+    end
+    if Work and Work.Internal and Work.Internal.markAssignmentDirty then
+        Work.Internal.markAssignmentDirty(order,
+            "MANUAL_CORPSE_HAUL_REQUESTED")
+    end
+    return true, order
+end
+
+local function manualResult(record, ok, reason, order, details)
+    if Core and Core.Log then
+        local message = "manual_corpse_haul npc="
+            .. tostring(record and record.id or "unknown")
+            .. " result=" .. tostring(ok == true)
+            .. " reason=" .. tostring(reason or "unknown")
+        if order and order.id then
+            message = message .. " order=" .. tostring(order.id)
+        end
+        if type(details) == "table" then
+            for _, key in ipairs({ "corpses", "eligible" }) do
+                if details[key] ~= nil then
+                    message = message .. " " .. key .. "="
+                        .. tostring(details[key])
+                end
+            end
+        end
+        Core.Log(ok == true and "INFO" or "WARN", message)
+    end
+    return ok, reason, order
+end
+
+local function findManualOrder(base, record)
+    if not WorkRepository or not WorkRepository.Load then return nil end
+    WorkRepository.Load()
+    local orders = {}
+    for _, order in pairs(WorkRepository.State.byId or {}) do
+        local assignment = assignmentForWorkOrder(order)
+        local status = order and order.status
+        local eligibleStatus = status == Status.QUEUED
+            or status == Status.WAITING_FOR_WORKER
+            or status == Status.PAUSED
+        if order and order.operation == "CORPSE_HAUL"
+            and tostring(order.baseId or "") == tostring(base.id or "")
+            and eligibleStatus and assignment
+            and (not order.workerId
+                or tostring(order.workerId) == tostring(record.id))
+            and (not order.requiredWorkerId
+                or tostring(order.requiredWorkerId) == tostring(record.id))
+            and Service.GetCorpseAt(assignment.sourceX, assignment.sourceY,
+                assignment.sourceZ, assignment.haulToken)
+        then
+            orders[#orders + 1] = order
+        end
+    end
+    table.sort(orders, function(left, right)
+        local leftCreated = tonumber(left.createdAt) or 0
+        local rightCreated = tonumber(right.createdAt) or 0
+        if leftCreated ~= rightCreated then return leftCreated < rightCreated end
+        return tostring(left.id or "") < tostring(right.id or "")
+    end)
+    return orders[1]
+end
+
+local function reevaluateManualOrder(record)
+    local tasking = PNC.Tasking and PNC.Tasking.Commands
+    if tasking and tasking.ReevaluateNow then
+        tasking.ReevaluateNow({
+            npcId = tostring(record.id), source = "CorpseHaulService",
+            cause = "manual_corpse_haul_requested",
+        })
+    end
+end
+
+function Service.RequestManual(record)
+    local base
+    local configuration
+    local current
+    local existing
+    local assignment
+    local order
+    local reason
+    local sourceCorpses
+    local eligibleCorpses
+    local runtime = record and record.runtime or nil
+    local now = Core.Now()
+    if not record or record.alive == false then
+        return manualResult(record, false, "NPC_UNAVAILABLE")
+    end
+    if record.health and record.health.state == "incapacitated" then
+        return manualResult(record, false, "NPC_INCAPACITATED")
+    end
+    if runtime and (runtime.attackAction or runtime.target
+        or now < (tonumber(runtime.inCombatUntil) or 0))
+    then
+        return manualResult(record, false, "NPC_BUSY")
+    end
+    current = currentWorkOrderFor(record)
+    if current and current.operation ~= "CORPSE_HAUL" then
+        return manualResult(record, false, "NPC_BUSY")
+    end
+    base = homeBaseForRecord(record)
+    if not base then return manualResult(record, false, "BASE_NOT_FOUND") end
+    configuration = configurationFor(base)
+    if not PNC.HomeDutyService or not PNC.HomeDutyService.IsAtHome then
+        return manualResult(record, false, "HOME_SERVICE_UNAVAILABLE")
+    end
+    if not PNC.HomeDutyService.IsAtHome(record, base.id) then
+        return manualResult(record, false, "NPC_NOT_AT_HOME")
+    end
+    if not Registry or not Registry.GetLiveZombie
+        or not Registry.GetLiveZombie(record.id)
+    then
+        return manualResult(record, false, "LIVE_WORKER_REQUIRED")
+    end
+    if current then
+        local accepted = markManualOrder(current, record)
+        if accepted then reevaluateManualOrder(record) end
+        return manualResult(record, accepted,
+            accepted and "CORPSE_HAUL_ORDER_FORCED"
+                or "CORPSE_HAUL_ORDER_INVALID", accepted and current or nil)
+    end
+    existing = findManualOrder(base, record)
+    if existing then
+        local accepted, acceptedReason = markManualOrder(existing, record)
+        if accepted then reevaluateManualOrder(record) end
+        return manualResult(record, accepted,
+            accepted and "CORPSE_HAUL_ORDER_FORCED" or acceptedReason,
+            accepted and existing or nil)
+    end
+    assignment = findBaseAssignment(base)
+    if not assignment then
+        sourceCorpses, eligibleCorpses = Service.CountCorpsesInRegion(
+            configuration and configuration.sourceRegion)
+        return manualResult(record, false, "NO_CORPSE_HAUL_AVAILABLE", nil, {
+            corpses = sourceCorpses, eligible = eligibleCorpses,
+        })
+    end
+    order, reason = Work.Commands.Queue({
+        operation = "CORPSE_HAUL", colonyId = base.colonyId,
+        factionId = base.factionId, baseId = base.id,
+        quantity = 1, requiredWork = 1, priority = 100,
+        requiredWorkerId = record.id, manual = true,
+        requiresHome = true, autoReturnHome = true,
+        phase = "SOURCE_APPROACH",
+        payload = {
+            haulToken = assignment.haulToken,
+            sourceX = assignment.sourceX, sourceY = assignment.sourceY,
+            sourceZ = assignment.sourceZ,
+            interactionX = assignment.interactionX,
+            interactionY = assignment.interactionY,
+            interactionZ = assignment.interactionZ,
+            dropX = assignment.dropX, dropY = assignment.dropY,
+            dropZ = assignment.dropZ,
+            facilityId = assignment.facilityId,
+            destinationRegion = assignment.destinationRegion,
+            configurationRevision = configuration and configuration.revision or 0,
+        },
+    })
+    if not order then
+        return manualResult(record, false,
+            reason or "CORPSE_HAUL_ORDER_FAILED")
+    end
+    reevaluateManualOrder(record)
+    return manualResult(record, true, "CORPSE_HAUL_ORDER_FORCED", order)
 end
 
 local function queuePendingOrders()

@@ -9,6 +9,7 @@ Definitions.OPERATION = {
     DECONSTRUCT = "DECONSTRUCT",
     BUILD_OBJECT = "BUILD_OBJECT", READ_BOOK = "READ_BOOK",
     PROVISION_PICKUP = "PROVISION_PICKUP", CORPSE_HAUL = "CORPSE_HAUL",
+    LUMBER = "LUMBER",
 }
 
 Definitions.STATUS = {
@@ -44,6 +45,7 @@ Definitions.JOB_BY_OPERATION = {
     BUILD_OBJECT = "Constructor",
     PROVISION_PICKUP = "Provisioner",
     CORPSE_HAUL = "CorpseHaul",
+    LUMBER = "Lumber",
 }
 
 Definitions.CAPABILITY_BY_OPERATION = {
@@ -58,6 +60,16 @@ Definitions.CAPABILITY_BY_OPERATION = {
     -- world-object claim, while this capability keeps the operation visible
     -- to generic work/task consumers.
     CORPSE_HAUL = "storage.stockpile",
+    -- Lumber claims a world object, while the tree ledger remains the
+    -- authority for discovery, reservations, damage, and output.
+    LUMBER = "work.lumber",
+}
+
+-- These operations own their progress clock. The generic scheduler must not
+-- advance them as if they were ordinary station work.
+Definitions.MANUAL_PROGRESS = {
+    CORPSE_HAUL = true,
+    LUMBER = true,
 }
 
 Definitions.REQUIRES_LIVE = {

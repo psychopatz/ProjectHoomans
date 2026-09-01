@@ -69,6 +69,8 @@ function StorageTabs.Create(window, UI, tr)
         { "validate", "UI_PNC_Storage_Validate", "Validate" },
         { "compact", "UI_PNC_Storage_Compact", "Compact" },
         { "recalculate", "UI_PNC_Storage_Recalculate", "Recalculate Weight" },
+        { "job_requirements_lumber", "UI_PNC_Storage_DebugForLumber",
+            "Debug for Lumber" },
     }
     for _, definition in ipairs(definitions) do
         window.storageControls[#window.storageControls + 1] = UI.CreateButton(
@@ -154,6 +156,11 @@ function StorageTabs.ApplyLayout(window, Layout, active)
         and window.storageDebugExpanded == true
     for _, button in ipairs(window.storageControls or {}) do
         button:setVisible(drawerVisible == true)
+        if button.internal == "job_requirements_lumber"
+            and button.setEnable
+        then
+            button:setEnable(window.selectedPersonID ~= nil)
+        end
     end
     if not active then return end
     local content = window.layout.content
@@ -247,10 +254,21 @@ function StorageTabs.OnControl(window, button, tr)
         return
     end
     local selected = window.storageList and window.storageList:selectedRow() or nil
+    local debugAction = action
+    local extra = {}
+    if action == "job_requirements_lumber" then
+        debugAction = "job_requirements"
+        extra.operation = "LUMBER"
+        extra.target = "worker"
+        extra.npcId = window.selectedPersonID
+    end
     PNC.Client.RequestColonyAction("storage_debug", {
         storageId = window.snapshot and window.snapshot.storage
             and window.snapshot.storage.storageId,
-        debugAction = action,
+        debugAction = debugAction,
+        operation = extra.operation,
+        target = extra.target,
+        npcId = extra.npcId,
         recordIndex = selected and selected.recordIndex,
         fullType = "Base.Nails",
         quantity = action == "remove" and selected

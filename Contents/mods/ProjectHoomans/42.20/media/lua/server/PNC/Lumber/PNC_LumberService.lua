@@ -14,12 +14,15 @@ local Const = PNC.Const or {}
 local Core = PNC.Core or {}
 local GridRegion
 local Zones
+local CoreInventory
 
 do
     local ok, value = pcall(require, "PsychopatzCore/World/PC_GridRegion")
     if ok then GridRegion = value end
     ok, value = pcall(require, "PsychopatzCore/World/PC_ZoneRegistry")
     if ok then Zones = value end
+    ok, value = pcall(require, "PsychopatzCore/Inventory/PsychopatzInventory")
+    if ok then CoreInventory = value end
 end
 
 Service.MODDATA_KEY = "PNC_LumberWorld_V1"
@@ -29,6 +32,11 @@ Service.MAX_WORKERS_PER_ZONE = 16
 Service.SCAN_TILES_PER_PUMP = 128
 Service.SCAN_ZONES_PER_PUMP = 1
 Service.SCAN_INTERVAL_MS = 1000
+-- Work orders are created immediately when a worker is assigned. This
+-- slower cadence is only for repairing links after load or an interrupted
+-- server tick, so large worker populations do not repeatedly copy/query
+-- every active lumber order once per scan pass.
+Service.WORK_RECONCILE_INTERVAL_MS = 5000
 Service.CLAIM_TTL_MS = 30000
 Service.HIT_INTERVAL_MS = 1500
 Service.ABSTRACT_MAX_ELAPSED_MS = 15000
@@ -39,6 +47,7 @@ Service.Runtime = Service.Runtime or {
     previousOrders = {},
     zoneCursor = 0,
     nextPumpAt = 0,
+    nextWorkReconcileAt = 0,
 }
 Service.Data = Service.Data or nil
 Service.Loaded = Service.Loaded == true
@@ -313,6 +322,7 @@ function Service.Load(force)
     if type(raw) == "table" then Service.Data = raw end
     ensureData()
     normalizeLoadedState()
+    Service.Runtime.nextWorkReconcileAt = 0
     Service.Loaded = true
     Service.Dirty = false
     return true, "loaded"
@@ -349,6 +359,15 @@ end
 function Service.GetJob(npcId)
     ensureData()
     return Service.Data.jobs[tostring(npcId or "")]
+end
+
+function Service.CancelWorkOrder(npcId, reason)
+    local job = Service.GetJob(npcId)
+    local adapter = PNC.LumberWorkAdapter
+    if not job or not job.workOrderId or not adapter
+        or not adapter.CancelOrder
+    then return false end
+    return adapter.CancelOrder(job, reason or "lumber_job_cancelled")
 end
 
 function Service.CreateZone(args)
@@ -422,6 +441,7 @@ function Service.AssignWorker(zoneId, npcId)
     end
     local current = Service.Data.jobs[npcId]
     if current and current.zoneId ~= zone.id then
+        Service.CancelWorkOrder(npcId, "worker_reassigned")
         Service.ReleaseTree(current.targetKey, "worker_reassigned")
         current.active = false
         Service.RestoreOrder(npcId)
@@ -438,12 +458,17 @@ function Service.AssignWorker(zoneId, npcId)
     if job.state == "COMPLETED" or job.state == "CANCELLED" then
         job.previousOrder = nil
         job.previousOrderCaptured = nil
+        job.state, job.phase = "READY", "WAITING"
     end
     job.active = true
     job.state = job.state == "COMPLETED" and "READY" or job.state
     job.zoneId, job.npcId = zone.id, npcId
     job.revision = (tonumber(job.revision) or 0) + 1
     Service.Data.jobs[npcId] = job
+    local adapter = PNC.LumberWorkAdapter
+    if adapter and adapter.EnsureOrder then
+        adapter.EnsureOrder(job)
+    end
     zone.revision = (tonumber(zone.revision) or 0) + 1
     markDirty()
     if PNC.Tasking and PNC.Tasking.Events
@@ -464,6 +489,7 @@ function Service.UnassignWorker(zoneId, npcId, reason)
         return false, "worker_not_assigned"
     end
     Service.ReleaseTree(job.targetKey, reason or "worker_unassigned")
+    Service.CancelWorkOrder(npcId, reason or "worker_unassigned")
     zone.workers[npcId] = nil
     job.active = false
     job.state, job.phase = "CANCELLED", "CANCELLED"
@@ -484,6 +510,7 @@ function Service.DisableZone(zoneId, reason)
         local job = Service.GetJob(npcId)
         if job then
             Service.ReleaseTree(job.targetKey, reason or "zone_disabled")
+            Service.CancelWorkOrder(npcId, reason or "zone_disabled")
             job.active = false
             job.state, job.phase = "CANCELLED", "CANCELLED"
             job.targetKey = nil
@@ -1002,9 +1029,15 @@ end
 function Service.CancelJob(npcId, reason)
     local job = Service.GetJob(npcId)
     if not job then return true end
+    if job.workOrderId and PNC.LumberWorkAdapter
+        and PNC.LumberWorkAdapter.CancelOrder
+    then
+        PNC.LumberWorkAdapter.CancelOrder(job, reason or "job_cancelled")
+    end
     Service.ReleaseTree(job.targetKey, reason or "job_cancelled")
     job.targetKey = nil
     job.leaseId = nil
+    job.active = false
     job.state, job.phase = "CANCELLED", "CANCELLED"
     job.revision = (tonumber(job.revision) or 0) + 1
     Service.RestoreOrder(npcId)
@@ -1017,6 +1050,11 @@ local function updateRuntime(record, job, tree)
     record.runtime.lumber = {
         jobId = job.id, zoneId = job.zoneId,
         treeKey = tree and tree.key or job.targetKey,
+        treeX = tree and tree.x or nil, treeY = tree and tree.y or nil,
+        treeZ = tree and tree.z or nil,
+        approachX = job.approach and job.approach.x or nil,
+        approachY = job.approach and job.approach.y or nil,
+        approachZ = job.approach and job.approach.z or nil,
         phase = job.phase, state = job.state,
         remainingWork = tree and tree.remainingWork or nil,
         maxWork = tree and tree.maxWork or nil,
@@ -1146,20 +1184,15 @@ local function resolveAbstractTool(record)
     }
 end
 
-local function resolveLiveTool(record, body)
-    if not body then return nil, "live_body_missing" end
-    local item
-    if type(body.getPrimaryHandItem) == "function" then
-        local ok, value = pcall(body.getPrimaryHandItem, body)
-        if ok then item = value end
+local function readLivePrimary(body)
+    if not body or type(body.getPrimaryHandItem) ~= "function" then
+        return nil
     end
-    if not item and PNC.Equipment and PNC.Equipment.ApplyHands then
-        pcall(PNC.Equipment.ApplyHands, body, record)
-        if type(body.getPrimaryHandItem) == "function" then
-            local ok, value = pcall(body.getPrimaryHandItem, body)
-            if ok then item = value end
-        end
-    end
+    local ok, item = pcall(body.getPrimaryHandItem, body)
+    return ok and item or nil
+end
+
+local function inspectLiveTool(item)
     if not item then return nil, "lumber_tool_missing" end
     local broken = false
     if type(item.isBroken) == "function" then
@@ -1179,6 +1212,225 @@ local function resolveLiveTool(record, body)
     end
     if not tagged and not damage then return nil, "tool_cannot_chop" end
     return { item = item, canChop = true, treeDamage = math.max(1, damage or 10) }
+end
+
+local function findLiveInventoryTool(body)
+    local container
+    local physical
+    local items
+    local tool
+    if not body or type(body.getInventory) ~= "function"
+        or not CoreInventory
+        or type(CoreInventory.wrapPhysicalInventory) ~= "function"
+    then
+        return nil, "physical_inventory_unavailable"
+    end
+    local ok
+    ok, container = pcall(body.getInventory, body)
+    if not ok or not container then
+        return nil, "physical_inventory_unavailable"
+    end
+    physical = CoreInventory.wrapPhysicalInventory(container, {
+        recursive = true,
+    })
+    if not physical or type(physical.query) ~= "function" then
+        return nil, "physical_inventory_unavailable"
+    end
+    items = physical:query(function(candidate)
+        return inspectLiveTool(candidate) ~= nil
+    end)
+    for index = 1, #items do
+        tool = inspectLiveTool(items[index])
+        if tool then return tool end
+    end
+    return nil, "lumber_tool_missing"
+end
+
+local function workToolFullType(record)
+    local inventory = record and record.inventory
+    local item
+    if inventory and inventory.equipped and inventory.items then
+        item = inventory.items[inventory.equipped.primary]
+    end
+    return tostring(item and item.type
+        or record and record.equipment and record.equipment.primaryFullType
+        or "")
+end
+
+local function materializeLiveTool(record)
+    local equipment = PNC.Equipment
+    local fullType = workToolFullType(record)
+    if fullType == "" then return nil, "lumber_tool_missing" end
+    if not equipment or type(equipment.CreateItem) ~= "function" then
+        return nil, "lumber_tool_materialization_unavailable"
+    end
+    local ok, item, reason = pcall(equipment.CreateItem, fullType)
+    if not ok or not item then
+        return nil, "lumber_tool_materialize_failed:" .. tostring(reason)
+    end
+    local internal = equipment.Internal
+    if internal and type(internal.applyPrimaryInventoryState) == "function" then
+        pcall(internal.applyPrimaryInventoryState, item, record)
+    end
+    return item
+end
+
+local function resolveLiveTool(record, body)
+    if not body then return nil, "live_body_missing" end
+    local item = readLivePrimary(body)
+    local tool, reason = inspectLiveTool(item)
+    if tool then return tool end
+
+    -- A tool in the body's inventory is usable even when it is not currently
+    -- in the primary hand. Prefer that real item over creating a presentation
+    -- copy from canonical metadata. This is what makes manually supplied
+    -- axes and the storage debug grant converge on the same live path.
+    tool, reason = findLiveInventoryTool(body)
+    if tool then
+        local equipment = PNC.Equipment
+        local networked = equipment and equipment.Internal
+            and type(equipment.Internal.isNetworkedGame) == "function"
+            and equipment.Internal.isNetworkedGame() == true
+        if not networked and type(body.setPrimaryHandItem) == "function" then
+            pcall(body.setPrimaryHandItem, body, tool.item)
+            item = readLivePrimary(body)
+            local equippedTool = inspectLiveTool(item)
+            if equippedTool then return equippedTool end
+        end
+        return tool
+    end
+
+    -- In single-player this equips the real body item. In multiplayer the
+    -- equipment layer intentionally publishes replica variables on the
+    -- server, so the materialization fallback supplies the server-side
+    -- HandWeapon needed by IsoTree:WeaponHit without mutating client hands.
+    local equipment = PNC.Equipment
+    local ensureHands = equipment and type(equipment.EnsureCombatHands) == "function"
+        and equipment.EnsureCombatHands
+        or equipment and type(equipment.ApplyHands) == "function"
+        and equipment.ApplyHands or nil
+    if ensureHands then
+        pcall(ensureHands, body, record)
+        item = readLivePrimary(body)
+        tool, reason = inspectLiveTool(item)
+        if tool then return tool end
+    end
+
+    item, reason = materializeLiveTool(record)
+    tool, reason = inspectLiveTool(item)
+    if tool then
+        tool.materialized = true
+        return tool
+    end
+    return nil, reason or "lumber_tool_missing"
+end
+
+local function toolFullType(item)
+    if not item or type(item.getFullType) ~= "function" then return nil end
+    local ok, fullType = pcall(item.getFullType, item)
+    return ok and fullType and tostring(fullType) or nil
+end
+
+local function requiredToolTypes()
+    local registry = PNC.JobRequirements
+    local definition = registry and registry.Get
+        and registry.Get("LUMBER") or nil
+    local requirement = definition and definition.requirements
+        and definition.requirements[1] or nil
+    local candidates = requirement and requirement.candidates or nil
+    if type(candidates) ~= "table" or #candidates < 1 then
+        candidates = { "Base.Axe", "Base.HandAxe", "Base.WoodAxe" }
+    end
+    local output = {}
+    for index = 1, #candidates do output[index] = tostring(candidates[index]) end
+    return output
+end
+
+local function toolDiagnostic(record, body)
+    local diagnostic = {
+        requiredItems = requiredToolTypes(),
+        available = false,
+        usable = false,
+        source = "none",
+    }
+    local canonicalFullType = workToolFullType(record)
+    diagnostic.canonicalPrimaryFullType = canonicalFullType ~= ""
+        and canonicalFullType or nil
+    local liveItem = body and readLivePrimary(body) or nil
+    diagnostic.livePrimaryFullType = toolFullType(liveItem)
+    if liveItem then
+        local liveTool, liveReason = inspectLiveTool(liveItem)
+        if liveTool then
+            diagnostic.available = true
+            diagnostic.usable = true
+            diagnostic.source = "live_primary"
+            diagnostic.selectedFullType = diagnostic.livePrimaryFullType
+            diagnostic.treeDamage = liveTool.treeDamage
+            if type(liveItem.getCondition) == "function" then
+                local ok, condition = pcall(liveItem.getCondition, liveItem)
+                if ok then diagnostic.condition = tonumber(condition) end
+            end
+            return diagnostic
+        end
+        diagnostic.reason = liveReason
+    end
+
+    local inventoryTool = body and findLiveInventoryTool(body) or nil
+    if inventoryTool then
+        diagnostic.available = true
+        diagnostic.usable = true
+        diagnostic.source = "live_inventory"
+        diagnostic.selectedFullType = toolFullType(inventoryTool.item)
+        diagnostic.treeDamage = inventoryTool.treeDamage
+        if type(inventoryTool.item.getCondition) == "function" then
+            local ok, condition = pcall(
+                inventoryTool.item.getCondition, inventoryTool.item)
+            if ok then diagnostic.condition = tonumber(condition) end
+        end
+        return diagnostic
+    end
+
+    local abstractTool, abstractReason = resolveAbstractTool(record)
+    if not body and abstractTool then
+        diagnostic.available = true
+        diagnostic.usable = true
+        diagnostic.source = "canonical_inventory"
+        diagnostic.selectedFullType = canonicalFullType
+        diagnostic.treeDamage = abstractTool.treeDamage
+        diagnostic.condition = abstractTool.condition
+        return diagnostic
+    end
+    if abstractTool then
+        diagnostic.available = true
+        diagnostic.source = "canonical_inventory"
+        diagnostic.fallbackAvailable = true
+        diagnostic.selectedFullType = canonicalFullType
+        diagnostic.treeDamage = abstractTool.treeDamage
+        diagnostic.condition = abstractTool.condition
+        diagnostic.reason = diagnostic.reason or "live_primary_missing"
+    else
+        diagnostic.reason = diagnostic.reason or abstractReason
+    end
+    return diagnostic
+end
+
+function Service.GetToolDiagnostic(record, body)
+    return toolDiagnostic(record, body)
+end
+
+local function persistLiveToolCondition(record, item)
+    local inventory = record and record.inventory
+    local itemID = inventory and inventory.equipped
+        and inventory.equipped.primary or nil
+    local state = itemID and inventory.items and inventory.items[itemID] or nil
+    if not state or type(item.getCondition) ~= "function" then return end
+    local ok, condition = pcall(item.getCondition, item)
+    condition = ok and tonumber(condition) or nil
+    if condition == nil or tonumber(state.cond) == condition then return end
+    state.cond = condition
+    if PNC.Registry and type(PNC.Registry.MarkDirty) == "function" then
+        pcall(PNC.Registry.MarkDirty, record, "lumber_tool_wear")
+    end
 end
 
 local function skillRate(record)
@@ -1277,6 +1529,11 @@ local function tickLive(job, record, body, tree, at)
     end
     if not adjacentToTree(body, tree) then
         job.state, job.phase = "TRAVELING", "TRAVEL"
+        if PNC.BehaviorCommon and PNC.BehaviorCommon.MoveRecord then
+            PNC.BehaviorCommon.MoveRecord(record, body,
+                approach.x, approach.y, approach.z, "walk", 0.7, "lumber")
+        end
+        updateRuntime(record, job, tree)
         return true, false, "not_adjacent"
     end
     if PNC.BehaviorCommon and PNC.BehaviorCommon.HaltMovement then
@@ -1307,6 +1564,7 @@ local function tickLive(job, record, body, tree, at)
             job.state, job.phase = "FAILED", "FAILED"
             return false, false, tostring(result)
         end
+        persistLiveToolCondition(record, tool.item)
         job.lastHitAt = at
         if type(actual.getHealth) == "function" then
             local healthOK, health = pcall(actual.getHealth, actual)
@@ -1411,7 +1669,7 @@ local function tickAbstract(job, record, tree, at)
     return true, false, actual and "physical_tree_appeared" or "abstract_chopping"
 end
 
-function Service.TickJob(lease)
+local function tickJob(lease)
     local npcId = tostring(lease and lease.npcId or "")
     local job = Service.GetJob(npcId)
     local zone = job and Service.GetZone(job.zoneId) or nil
@@ -1469,6 +1727,59 @@ function Service.TickJob(lease)
     return tickAbstract(job, record, tree, at)
 end
 
+local function waitingFor(phase, reason)
+    if phase == "WAITING_FOR_TOOL"
+        or string.find(tostring(reason or ""), "lumber_tool", 1, true)
+        or reason == "tool_cannot_chop"
+    then return "primary_tool" end
+    if phase == "WAITING_FOR_ENDURANCE" then return "endurance" end
+    if phase == "WAITING_FOR_MATERIALIZATION" then return "live_execution" end
+    if phase == "OUTPUT_PENDING" then return "output" end
+    if phase == "TRAVEL" or reason == "traveling"
+        or reason == "not_adjacent"
+    then return "travel" end
+    if phase == "WAITING_FOR_WORKER" or reason == "waiting_for_worker" then
+        return "worker"
+    end
+    return nil
+end
+
+local function publishTickDiagnostic(lease, reason, complete)
+    local npcId = tostring(lease and lease.npcId or "")
+    local job = Service.GetJob(npcId)
+    local record = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(npcId) or nil
+    if not job or not record then return end
+    record.runtime = record.runtime or {}
+    local runtime = record.runtime.lumber
+    if not runtime then
+        runtime = {}
+        record.runtime.lumber = runtime
+    end
+    local phase = tostring(job.phase or runtime.phase or "")
+    runtime.lastReason = reason
+    runtime.waitingFor = waitingFor(phase, reason)
+    runtime.waitingReason = runtime.waitingFor and reason or nil
+    if runtime.waitingFor == "primary_tool" then
+        local body = PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(npcId) or nil
+        runtime.tool = toolDiagnostic(record, body)
+    else
+        runtime.tool = nil
+    end
+    if complete then
+        runtime.waitingFor = nil
+        runtime.waitingReason = nil
+        runtime.tool = nil
+    end
+end
+
+function Service.TickJob(lease)
+    local ok, complete, reason = tickJob(lease)
+    publishTickDiagnostic(lease, reason, complete)
+    return ok, complete, reason
+end
+
 function Service.GetSnapshot(zoneId)
     local zone = Service.GetZone(zoneId)
     if not zone then return nil end
@@ -1484,11 +1795,32 @@ function Service.GetSnapshot(zoneId)
     local workers = {}
     for npcId, _ in pairs(zone.workers or {}) do
         local job = Service.GetJob(npcId)
+        local workerRecord = PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(tostring(npcId)) or nil
+        local runtime = workerRecord and workerRecord.runtime
+            and workerRecord.runtime.lumber or nil
+        local tree = job and job.targetKey
+            and Service.GetTree(job.targetKey) or nil
+        local workOrder = job and job.workOrderId and PNC.WorkRepository
+            and PNC.WorkRepository.Get
+            and PNC.WorkRepository.Get(job.workOrderId) or nil
         workers[#workers + 1] = {
             npcId = npcId, jobId = job and job.id or nil,
             state = job and job.state or "MISSING",
             phase = job and job.phase or "MISSING",
             treeKey = job and job.targetKey or nil,
+            executionMode = job and job.executionMode or nil,
+            workOrderId = job and job.workOrderId or nil,
+            workOrderStatus = workOrder and workOrder.status or nil,
+            workOrderProgress = workOrder and workOrder.progress or nil,
+            workOrderRequiredWork = workOrder
+                and workOrder.requiredWork or nil,
+            waitingReason = runtime and runtime.waitingReason or nil,
+            waitingFor = runtime and runtime.waitingFor or nil,
+            toolDiagnostic = copy(runtime and runtime.tool or nil),
+            remainingWork = tree and tree.remainingWork or nil,
+            maxWork = tree and tree.maxWork or nil,
+            approach = copy(job and job.approach or nil),
         }
     end
     return {
@@ -1519,6 +1851,13 @@ function Service.Pump(at)
                 processed = processed + 1
             end
         end
+    end
+    if PNC.LumberWorkAdapter and PNC.LumberWorkAdapter.Reconcile
+        and at >= (tonumber(Service.Runtime.nextWorkReconcileAt) or 0)
+    then
+        Service.Runtime.nextWorkReconcileAt = at
+            + Service.WORK_RECONCILE_INTERVAL_MS
+        PNC.LumberWorkAdapter.Reconcile()
     end
     if Service.Dirty and at - Service.LastSaveAt >= 5000 then
         Service.Save()

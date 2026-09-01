@@ -80,28 +80,36 @@ function ISPNCCommandHubSettingsWindow:createChildren()
         { id = "opacity", labelKey = "UI_PNC_CommandHub_Settings_Opacity" },
     }
     for _, definition in ipairs(definitions) do
-        local field = {
-            label = label(self, tr(definition.labelKey, definition.id)),
-        }
-        if definition.id == "opacity" then
-            field.slider = UI.CreateSlider(self, {
-                id = "command-hub-opacity",
-                target = self,
-                min = 20,
-                max = 100,
-                step = 1,
-                value = Options.GetOpacityPercent(),
-                onChange = function(_, value)
-                    self:updateOpacityLabel(value)
-                end,
-            })
-            field.valueLabel = label(self, formatOpacity(
-                Options.GetOpacityPercent()), Theme.colors.textMuted)
-        else
-            field.entry = UI.CreateTextEntry(self, {
-                onlyNumbers = true, maxTextLength = 5,
-            })
-        end
+        local opacity = definition.id == "opacity"
+        local row = UI.CreateFormRow(self, {
+            id = "command-hub-setting-row:" .. definition.id,
+            label = tr(definition.labelKey, definition.id),
+            valueLabel = opacity,
+            valueText = opacity and formatOpacity(
+                Options.GetOpacityPercent()) or nil,
+            createControl = function(parent)
+                if opacity then
+                    return UI.CreateSlider(parent, {
+                        id = "command-hub-opacity",
+                        target = self,
+                        min = 20,
+                        max = 100,
+                        step = 1,
+                        value = Options.GetOpacityPercent(),
+                        onChange = function(_, value)
+                            self:updateOpacityLabel(value)
+                        end,
+                    })
+                end
+                return UI.CreateTextEntry(parent, {
+                    onlyNumbers = true, maxTextLength = 5,
+                })
+            end,
+        })
+        local field = { row = row, label = row.label,
+            entry = not opacity and row.control or nil,
+            slider = opacity and row.control or nil,
+            valueLabel = row.valueLabel }
         self.fields[definition.id] = field
     end
     self.helpLabel = label(self,
@@ -147,7 +155,7 @@ end
 function ISPNCCommandHubSettingsWindow:updateOpacityLabel(value)
     local field = self.fields and self.fields.opacity
     if field and field.valueLabel then
-        field.valueLabel:setName(formatOpacity(value))
+        UI.SetLabelText(field.valueLabel, formatOpacity(value))
     end
 end
 
@@ -155,7 +163,7 @@ function ISPNCCommandHubSettingsWindow:setStatus(value)
     local text = tostring(value or "")
     self.statusText = text
     if self.statusLabel then
-        self.statusLabel:setName(text)
+        UI.SetLabelText(self.statusLabel, text)
         self.statusLabel:setVisible(text ~= "")
     end
 end

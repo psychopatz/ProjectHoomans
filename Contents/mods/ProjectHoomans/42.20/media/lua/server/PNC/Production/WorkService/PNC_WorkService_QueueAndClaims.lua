@@ -36,6 +36,8 @@ function Service.Commands.Queue(spec)
         recipeRevision = tonumber(spec.recipeRevision),
         requiredStationId = spec.requiredStationId
             and tostring(spec.requiredStationId) or nil,
+        requiredWorkerId = spec.requiredWorkerId
+            and tostring(spec.requiredWorkerId) or nil,
         productionSkillId = spec.productionSkillId
             and tostring(spec.productionSkillId) or nil,
         funded = spec.funded == true,
@@ -49,6 +51,7 @@ function Service.Commands.Queue(spec)
         -- provision operation also enforces its home-only policy in Core.
         requiresHome = spec.requiresHome ~= false,
         autoReturnHome = spec.autoReturnHome ~= false,
+        manual = spec.manual == true,
         payload = copy(spec.payload or {}),
         phase = spec.phase,
         status = Status.QUEUED, priority = tonumber(spec.priority) or 0,
@@ -66,7 +69,8 @@ local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
     if not order then return end
     if cleanupOperation == true and not order.completionCommitted
         and (order.operation == "PROVISION_PICKUP"
-            or order.operation == "CORPSE_HAUL")
+            or order.operation == "CORPSE_HAUL"
+            or order.operation == "LUMBER")
     then
         local cancellation = Service.CancellationHandlers
             and Service.CancellationHandlers[order.operation]

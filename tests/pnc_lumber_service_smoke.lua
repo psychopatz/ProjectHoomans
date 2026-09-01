@@ -212,17 +212,34 @@ local axe = {
     getTreeDamage = function() return 35 end,
     isBroken = function() return false end,
 }
+local moveCalls = 0
+local liveToolCreated = false
 local body = {
-    getPrimaryHandItem = function() return axe end,
-    getX = function() return 4.5 end,
-    getY = function() return 4.5 end,
-    getZ = function() return 0 end,
+    x = 2.5, y = 4.5, z = 0, primary = nil,
+    getPrimaryHandItem = function(self) return self.primary end,
+    getX = function(self) return self.x end,
+    getY = function(self) return self.y end,
+    getZ = function(self) return self.z end,
     setVariable = function() end,
     faceLocationF = function() end,
 }
 ItemTag = { CHOP_TREE = "chop" }
+PNC.BehaviorCommon = {
+    MoveRecord = function(_, zombie)
+        moveCalls = moveCalls + 1
+        zombie.lastMoveReason = "lumber"
+    end,
+    HaltMovement = function() end,
+}
+PNC.Equipment = {
+    EnsureCombatHands = function() return true, "server_replica" end,
+    CreateItem = function(fullType)
+        liveToolCreated = fullType == "Base.Axe"
+        return axe
+    end,
+}
 records.live = {
-    id = "live", alive = true, x = 4.5, y = 4.5, z = 0,
+    id = "live", alive = true, x = 2.5, y = 4.5, z = 0,
     presenceState = "live", equipment = { primaryFullType = "Base.Axe" },
     runtime = {},
 }
@@ -238,10 +255,47 @@ local liveLease = { npcId = "live", leaseId = "lease:live",
     executionMode = "LIVE" }
 T.truthy(Service.StartJob(liveLease), "live job start")
 now = 5000
+T.truthy(Service.TickJob(liveLease), "live travel tick")
+T.equal(moveCalls, 1, "live lumber reissues movement when not adjacent")
+body.x, records.live.x = 3.5, 3.5
+now = 6500
 T.truthy(Service.TickJob(liveLease), "live chopping tick")
+T.truthy(liveToolCreated, "live lumber materialized the configured axe")
 T.equal(liveTree.hits, 1, "server live tree hit")
 T.equal(Service.GetTree(liveKey).status, "DEPLETED",
     "live tree depletion")
 T.equal(#outputs, 1, "live output is owned by vanilla")
+
+local missingTool = {
+    id = "missing-tool", alive = true, equipment = {}, inventory = {},
+}
+local missingDiagnostic = Service.GetToolDiagnostic(missingTool, nil)
+T.falsy(missingDiagnostic.usable, "missing lumber tool is not usable")
+T.equal(missingDiagnostic.reason, "lumber_tool_missing",
+    "lumber diagnostic identifies the missing tool")
+local abstractDiagnostic = Service.GetToolDiagnostic(records.worker, nil)
+T.truthy(abstractDiagnostic.usable,
+    "abstract lumber diagnostic accepts the canonical equipped axe")
+T.equal(abstractDiagnostic.source, "canonical_inventory",
+    "abstract lumber diagnostic identifies its source")
+
+-- Management snapshots expose the WorkService bridge without replacing the
+-- LumberService tree ledger as the source of execution state.
+local liveJob = Service.GetJob("live")
+liveJob.workOrderId = "work:live"
+PNC.WorkRepository = {
+    Get = function(id)
+        return id == "work:live" and {
+            status = "WORKING", progress = 0, requiredWork = 1,
+        } or nil
+    end,
+}
+local liveSnapshot = Service.GetSnapshot(liveZone.id)
+T.equal(liveSnapshot.workers[1].executionMode, "LIVE",
+    "lumber snapshot reports live execution")
+T.equal(liveSnapshot.workers[1].workOrderId, "work:live",
+    "lumber snapshot reports durable work order")
+T.equal(liveSnapshot.workers[1].workOrderStatus, "WORKING",
+    "lumber snapshot reports work order status")
 
 T.finish("pnc_lumber_service_smoke")

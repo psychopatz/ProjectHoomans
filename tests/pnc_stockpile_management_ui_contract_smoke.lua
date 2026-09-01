@@ -40,6 +40,12 @@ T.contains(storageSurface, "storageActivityPane",
     "standalone storage window preserves activity logs")
 T.contains(storageSurface, "storageDebugToggle",
     "standalone storage window preserves authorized debug tools")
+T.contains(storageSurface, "UI_PNC_Storage_DebugForLumber",
+    "storage debug exposes the lumber requirement action")
+T.contains(storageSurface, 'debugAction = "job_requirements"',
+    "lumber debug routes through the reusable requirement action")
+T.contains(storageSurface, 'extra.operation = "LUMBER"',
+    "lumber debug identifies the requested job")
 T.contains(storageSurface, "access.writable == true",
     "inventory mover is writable only with authoritative base access")
 T.contains(storageSurface, "setVisible(transferVisible == true)",

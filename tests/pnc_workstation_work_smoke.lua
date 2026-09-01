@@ -73,6 +73,11 @@ Work.ClaimsByStation, Work.ClaimsByWorker = {}, {}
 Work.RegisterCompletion("CRAFT", function() return true end)
 Work.RegisterCompletion("DISASSEMBLE", function() return true end)
 Work.RegisterCompletion("RESEARCH", function() return true end)
+Work.RegisterTargetProvider("LUMBER", function(order, worker)
+    return { ok = true, componentId = "lumber:" .. tostring(worker.id),
+        targetKind = "lumber_zone", target = { x = 20, y = 20, z = 0 } }
+end)
+Work.RegisterCompletion("LUMBER", function() return true end)
 
 -- Project Zomboid's Kahlua runtime does not expose Lua's global next().
 -- Keep this absent so worker selection cannot regress to calling it directly.
@@ -126,6 +131,24 @@ T.equal(Work.Queries.Get(craft1.id).status, Definitions.STATUS.COMPLETED,
     "completed once")
 T.equal(Work.ClaimsByStation["workshop:1:craft"], nil,
     "completion releases station")
+
+local pinnedLumber = Work.Commands.Queue({ operation = "LUMBER",
+    colonyId = "c1", factionId = "f1", requiredWorkerId = "crafter1",
+    requiredWork = 1, payload = { lumberJobId = "legacy-job" } })
+PNC.Registry.Data.crafter1.orderSpec = {
+    kind = "lumber", lumberJobId = "legacy-job",
+}
+ok, reason = Work.Commands.Assign(pinnedLumber.id, "crafter2")
+T.equal(ok, false, "lumber order rejects a non-selected worker")
+T.equal(reason, "NO_QUALIFIED_WORKER", "lumber worker pin blocker")
+T.truthy(Work.Commands.Assign(pinnedLumber.id, "crafter1"),
+    "lumber order accepts the selected worker")
+T.equal(Work.Queries.Get(pinnedLumber.id).previousOrder, nil,
+    "lumber claim ignores its legacy projection")
+T.truthy(Work.Commands.Cancel(pinnedLumber.id),
+    "lumber worker pin releases cleanly")
+T.equal(PNC.Registry.Data.crafter1.orderSpec, nil,
+    "bridge does not restore a stale lumber projection")
 
 T.truthy(Work.Commands.Assign(disassembly.id, "crafter1"),
     "salvage can use the released crafting station")

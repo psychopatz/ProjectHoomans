@@ -30,6 +30,10 @@ function Hub.ToggleChild(id, owner)
     return false
 end
 
+function Hub.Sync()
+    return CoreHub.Sync()
+end
+
 function Hub.Open(options)
     options = options or {}
     local window = CoreHub.Open({

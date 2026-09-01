@@ -8,6 +8,8 @@ PsychopatzCore = {
 
 local clock, sequence = 1000, 0
 local atHome = false
+local sentSync = {}
+local manualLogs = {}
 local deepCopy
 deepCopy = function(value)
     if type(value) ~= "table" then return value end
@@ -20,20 +22,44 @@ local corpse = {
     x = 40, y = 40, z = 0,
     data = { PNC_DeathMarkerID = "dead:one", PNC_CorpseHaulToken = "corpse:one" },
 }
+local untrackedCorpse = { x = 40, y = 40, z = 0, data = {} }
+local player = { x = 5, y = 5, onlineID = 77 }
+local grappleTarget = { onlineID = 501 }
+function player:getX() return self.x end
+function player:getY() return self.y end
+function player:getOnlineID() return self.onlineID end
+function grappleTarget:getOnlineID() return self.onlineID end
 function corpse:getX() return self.x end
 function corpse:getY() return self.y end
 function corpse:getZ() return self.z end
 function corpse:getModData() return self.data end
 function corpse:transmitModData() self.transmitted = true end
+function untrackedCorpse:getX() return self.x end
+function untrackedCorpse:getY() return self.y end
+function untrackedCorpse:getZ() return self.z end
+function untrackedCorpse:getModData() return self.data end
 
+local squares
 local body = { x = 5, y = 5, z = 0, dragging = false }
 function body:getX() return self.x end
 function body:getY() return self.y end
 function body:getZ() return self.z end
 function body:isDraggingCorpse() return self.dragging end
+function body:pickUpCorpse(targetCorpse)
+    self.dragging, self.targetCorpse = true, targetCorpse
+end
+function body:getGrapplingTarget() return grappleTarget end
+function body:setDoGrappleLetGo()
+    self.dragging = false
+    if self.targetCorpse then
+        self.targetCorpse.x, self.targetCorpse.y = 60, 60
+        squares["60:60:0"].corpses = { self.targetCorpse }
+        squares["40:40:0"].corpses = {}
+    end
+end
 
-local squares = {
-    ["40:40:0"] = { corpses = { corpse } },
+squares = {
+    ["40:40:0"] = { corpses = { corpse, untrackedCorpse } },
     ["60:60:0"] = { corpses = {} },
 }
 getCell = function()
@@ -56,8 +82,14 @@ package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
 end
 
 PNC = {
+    Const = { CMD_CORPSE_HAUL_ACTION = "CorpseHaulAction" },
     Core = {
         Now = function() return clock end,
+        Log = function(level, message)
+            manualLogs[#manualLogs + 1] = {
+                level = level, message = message,
+            }
+        end,
         DeepCopy = deepCopy,
         GenerateID = function(prefix)
             sequence = sequence + 1
@@ -66,6 +98,10 @@ PNC = {
         Distance = function(x1, y1, x2, y2)
             local dx, dy = x1 - x2, y1 - y2
             return math.sqrt(dx * dx + dy * dy)
+        end,
+        ForEachPlayer = function(callback) callback(player) end,
+        ResolvePlayerByOnlineID = function(id)
+            return tonumber(id) == player.onlineID and player or nil
         end,
     },
     Tasking = {
@@ -80,6 +116,7 @@ PNC = {
     HomeDutyService = {
         IsAtHome = function() return atHome end,
         IsReturningHome = function() return false end,
+        GetBase = function() return nil end,
     },
     BodyLifecycle = {
         Internal = {
@@ -89,6 +126,14 @@ PNC = {
                 end
             end,
             stampCorpse = function() return true end,
+        },
+    },
+    Network = {
+        Internal = {
+            SendToPlayer = function(_, command, payload)
+                sentSync[#sentSync + 1] = { command = command, args = payload }
+                return true
+            end,
         },
     },
     SettlementRepository = {
@@ -111,10 +156,15 @@ PNC = {
         Save = function() end,
     },
 }
+isMultiplayer = function() return true end
 
 PNC.BaseService = {
     Get = function(id)
         return tostring(id) == "base:one"
+            and PNC.SettlementRepository.State.bases["base:one"] or nil
+    end,
+    GetForColony = function(id)
+        return tostring(id) == "colony:one"
             and PNC.SettlementRepository.State.bases["base:one"] or nil
     end,
 }
@@ -166,6 +216,11 @@ local saved, saveReason = CorpseService.SetConfiguration({}, {
 T.truthy(saved, "corpse source and destination regions can be configured")
 T.equal(saveReason, "CORPSE_HAUL_ZONES_SAVED",
     "corpse region configuration returns a stable result")
+local totalCorpses, eligibleCorpses = CorpseService.CountCorpsesInRegion(
+    PNC.SettlementRepository.State.bases["base:one"].corpseHaul.sourceRegion)
+T.equal(totalCorpses, 2, "source zone reports every corpse object")
+T.equal(eligibleCorpses, 2,
+    "ordinary human corpses are eligible without a Hoomans death marker")
 
 CorpseService.Pump(1000)
 local order = T.truthy(Work.Queries.List()[1],
@@ -177,10 +232,33 @@ T.equal(order.payload.dropX, 60, "queued destination remains outside the home ba
 
 local candidates = Provider.GetCandidates(record.id)
 T.equal(#candidates, 0, "away resident cannot receive home-only corpse work")
+local awayManual, awayManualReason = CorpseService.RequestManual(record)
+T.falsy(awayManual, "away resident cannot manually start corpse work")
+T.equal(awayManualReason, "NPC_NOT_AT_HOME",
+    "home authorization remains separate from corpse eligibility")
 
 atHome = true
+record.allowedJobs = { CorpseHaul = false }
+local forced, forcedReason = CorpseService.RequestManual(record)
+T.truthy(forced, "manual corpse command promotes the queued work order")
+T.equal(forcedReason, "CORPSE_HAUL_ORDER_FORCED",
+    "manual corpse command returns a stable result")
+T.truthy(#manualLogs > 0 and string.find(
+    manualLogs[#manualLogs].message,
+    "reason=CORPSE_HAUL_ORDER_FORCED",
+    1,
+    true
+), "manual corpse command logs its result reason")
+T.equal(Work.Queries.Get(order.id).priority, 100,
+    "manual corpse order uses forced priority")
+T.equal(Work.Queries.Get(order.id).requiredWorkerId, record.id,
+    "manual corpse order binds to the selected worker")
+T.equal(Work.Queries.Get(order.id).manual, true,
+    "manual corpse order is marked as manual")
 candidates = Provider.GetCandidates(record.id)
 T.equal(#candidates, 1, "home resident receives generic work candidate")
+T.equal(candidates[1].precedence, "FORCED_ORDER",
+    "manual corpse order uses the forced task precedence")
 T.equal(candidates[1].sourceDomain, "work",
     "corpse candidate uses the shared work provider")
 T.equal(candidates[1].sourceRef, order.id,
@@ -202,6 +280,13 @@ T.equal(record.orderSpec.operation, "CORPSE_HAUL",
 
 local lease = T.truthy(Leases.Create(candidates[1], assignment),
     "shared task lease is created")
+local physicalAssignment = {
+    haulToken = order.payload.haulToken,
+    sourceX = order.payload.sourceX, sourceY = order.payload.sourceY,
+    sourceZ = order.payload.sourceZ, dropX = order.payload.dropX,
+    dropY = order.payload.dropY, dropZ = order.payload.dropZ,
+    destinationRegion = order.payload.destinationRegion,
+}
 PNC.Tasking.Commands.Complete = function() return true end
 PNC.Tasking.Commands.CancelLease = function() return true end
 T.truthy(Provider.Tick(lease), "shared work provider ticks corpse operation")
@@ -211,6 +296,47 @@ T.equal(record.runtime.corpseHaulTaskId, order.id,
     "lifecycle marker follows the durable work order")
 T.equal(corpse.data.PNC_CorpseHaulTaskId, order.id,
     "corpse marker follows the durable work order")
+
+body.x, body.y = 40, 40
+T.equal(lease.taskId, order.id, "lease points at the durable corpse task")
+T.truthy(CorpseService.GetTask(lease.taskId),
+    "durable corpse task is available to the action boundary")
+T.equal(type(isMultiplayer), "function", "MP fixture exposes the session role")
+T.equal(isMultiplayer(), true, "MP fixture identifies as multiplayer")
+T.truthy(PNC.Network and PNC.Network.Internal
+    and PNC.Network.Internal.SendToPlayer,
+    "MP fixture exposes the corpse sync transport")
+T.equal(type(PNC.Network.Internal.SendToPlayer), "function",
+    "MP fixture exposes a callable corpse sync transport")
+T.truthy(CorpseService.SendAction(lease, physicalAssignment, "grab"),
+    "the server applies the native grapple directly")
+T.truthy(body.dragging, "native grapple attaches the corpse")
+T.equal(CorpseService.GetTask(order.id).visualSyncPending, false,
+    "authoritative grapple completes its MP sync send")
+T.equal(#sentSync, 1, "authoritative grapple emits one MP sync command")
+T.equal(sentSync[1].args.action, "sync_grab",
+    "authoritative grapple sends an MP visual synchronization command")
+body.x, body.y = 60, 60
+local dropped, dropReason = CorpseService.SendAction(lease, physicalAssignment,
+    "drop")
+T.truthy(dropped, "the server applies the native release directly: "
+    .. tostring(dropReason))
+T.falsy(body.dragging, "native release detaches the corpse")
+T.equal(sentSync[2].args.action, "sync_drop",
+    "authoritative release sends an MP visual synchronization command")
+
+isMultiplayer = function() return false end
+body.x, body.y, body.dragging, body.targetCorpse = 40, 40, false, nil
+corpse.x, corpse.y = 40, 40
+squares["40:40:0"].corpses = { corpse }
+squares["60:60:0"].corpses = {}
+T.truthy(CorpseService.SendAction(lease, physicalAssignment, "grab"),
+    "the singleplayer server applies the native grapple directly")
+body.x, body.y = 60, 60
+T.truthy(CorpseService.SendAction(lease, physicalAssignment, "drop"),
+    "the singleplayer server applies the native release directly")
+T.equal(#sentSync, 2,
+    "singleplayer performs the grapple without an MP sync command")
 
 -- Drive the operation through the shared provider tick. The real grapple
 -- action boundary is covered separately; this verifies that the operation
@@ -242,6 +368,7 @@ Leases.Release(lease.leaseId, "test_complete")
 
 -- Cancellation also goes through the durable operation cleanup hook, including
 -- the corpse marker that protects lifecycle processing during a grapple.
+record.allowedJobs = nil
 corpse.x, corpse.y = 40, 40
 squares["40:40:0"].corpses = { corpse }
 squares["60:60:0"].corpses = {}
@@ -268,6 +395,22 @@ T.equal(Work.Queries.Get(orderTwo.id).status, Definitions.STATUS.CANCELLED,
 T.falsy(record.runtime.workOrderId, "cancellation releases the shared worker claim")
 T.falsy(corpse.data.PNC_CorpseHaulTaskId,
     "cancellation clears the corpse lifecycle marker")
+
+-- A manual request must also be able to create the durable order directly
+-- when the automatic scanner has not queued it yet.
+corpse.x, corpse.y = 40, 40
+squares["40:40:0"].corpses = { corpse }
+squares["60:60:0"].corpses = {}
+local created, createdReason, createdOrder = CorpseService.RequestManual(record)
+T.truthy(created, "manual corpse command creates an order when none is queued")
+T.equal(createdReason, "CORPSE_HAUL_ORDER_FORCED",
+    "direct manual corpse order returns a stable result")
+T.equal(createdOrder.priority, 100,
+    "direct manual corpse order uses forced priority")
+T.equal(createdOrder.requiredWorkerId, record.id,
+    "direct manual corpse order binds to the selected worker")
+T.equal(createdOrder.payload.sourceX, 40,
+    "direct manual corpse order preserves the external source zone")
 
 local cleared, clearReason = CorpseService.ClearConfiguration({}, {
     baseId = "base:one",

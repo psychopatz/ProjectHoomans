@@ -145,7 +145,10 @@ local function processOrder(order, at)
                 or Status.TRAVEL_TO_STATION
         end
     end
-    if not live and order.status == Status.WORKING then
+    if not live and order.status == Status.WORKING
+        and not (Definitions.MANUAL_PROGRESS
+            and Definitions.MANUAL_PROGRESS[order.operation])
+    then
         local previous = tonumber(order.lastAbstractAt) or at
         order.lastAbstractAt = at
         Service.Commands.AddElapsed(order.id, worker.id,

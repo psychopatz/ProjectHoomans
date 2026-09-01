@@ -297,6 +297,13 @@ function Presentation.WorkActionStatus(snapshot)
         text = text .. " - " .. tr("UI_PNC_Action_Traveling", "traveling")
     elseif status == "BLOCKED" then
         text = text .. " - " .. tr("UI_PNC_Action_Blocked", "blocked")
+    elseif info.waitingFor then
+        local waiting = tostring(info.waitingFor or "")
+        local reason = tostring(info.waitingReason or "")
+        if reason ~= "" then
+            waiting = waiting .. ":" .. reason
+        end
+        text = text .. " (" .. string.gsub(waiting, "[_:]", " ") .. ")"
     end
     return text .. "  " .. tostring(math.max(0,
         math.min(100, math.floor(tonumber(info.percent) or 0)))) .. "%",
@@ -328,6 +335,13 @@ function Presentation.ActivityActionStatus(snapshot)
     elseif phase == "BLOCKED" then
         text = text .. " ("
             .. tr("UI_PNC_Action_Blocked", "blocked") .. ")"
+    elseif info.waitingFor then
+        local waiting = tostring(info.waitingFor or "")
+        local reason = tostring(info.waitingReason or "")
+        if reason ~= "" then
+            waiting = waiting .. ":" .. reason
+        end
+        text = text .. " (" .. string.gsub(waiting, "[_:]", " ") .. ")"
     end
     return text, ACTION_COLOR, text ~= ""
 end

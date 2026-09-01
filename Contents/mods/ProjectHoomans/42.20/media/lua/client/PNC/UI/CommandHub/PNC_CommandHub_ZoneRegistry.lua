@@ -122,6 +122,25 @@ local function regionSummary(region)
     return tostring(count) .. " " .. tr("UI_PNC_CommandHub_Zone_Tiles", "TILES")
 end
 
+local function corpseSourceSummary(zone)
+    if not zone or not zone.sourceRegion then
+        return tr("UI_PNC_CommandHub_Zone_NotConfigured", "NOT CONFIGURED")
+    end
+    local summary = regionSummary(zone.sourceRegion)
+    local total = zone.sourceCorpseCount
+    local eligible = zone.sourceEligibleCorpseCount
+    if total == nil then
+        return summary .. " | " .. tr(
+            "UI_PNC_CommandHub_Zone_CorpseCountUnavailable",
+            "CORPSE COUNT UNAVAILABLE")
+    end
+    return summary .. " | " .. tr(
+        "UI_PNC_CommandHub_Zone_CorpseCount", "CORPSES") .. ": "
+        .. tostring(total) .. " | " .. tr(
+            "UI_PNC_CommandHub_Zone_EligibleCorpseCount", "ELIGIBLE")
+        .. ": " .. tostring(eligible or 0)
+end
+
 local function zoneSummary(zone, kind)
     if not zone then return tr("UI_PNC_CommandHub_Zone_NotConfigured",
         "NOT CONFIGURED") end
@@ -242,9 +261,7 @@ Registry.Register({
             id = "source", titleKey = "UI_PNC_CommandHub_Zone_CorpseCollect",
             titleFallback = "CORPSE COLLECT",
             summary = function(zone)
-                return zone and zone.sourceRegion
-                    and regionSummary(zone.sourceRegion)
-                    or tr("UI_PNC_CommandHub_Zone_NotConfigured", "NOT CONFIGURED")
+                return corpseSourceSummary(zone)
             end,
             open = function(window)
                 return openCorpse(window, "source")

@@ -110,7 +110,18 @@ local function claimStation(order, worker)
     worker.runtime = worker.runtime or {}
     worker.runtime.workOrderId = order.id
     worker.runtime.lastProductionWorkAt = nil
-    order.previousOrder = copy(worker.orderSpec)
+    local previousOrder = worker.orderSpec
+    local payload = order.payload or {}
+    local lumberProjection = previousOrder
+        and tostring(previousOrder.kind or "")
+            == tostring(PNC.Const and PNC.Const.ORDER_LUMBER or "lumber")
+        and tostring(previousOrder.lumberJobId or "")
+            == tostring(payload.lumberJobId or "")
+    if lumberProjection then
+        order.previousOrder = nil
+    else
+        order.previousOrder = copy(previousOrder)
+    end
     if live and acquired.target then
         setLiveOrder(worker, order, collectTarget or acquired.target,
             collectTarget and "COLLECT_INPUTS" or "WORK_AT_STATION")

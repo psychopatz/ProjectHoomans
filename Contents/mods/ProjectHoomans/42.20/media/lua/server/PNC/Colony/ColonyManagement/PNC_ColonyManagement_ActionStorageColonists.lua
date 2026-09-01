@@ -43,6 +43,15 @@ function Internal.handleStorageColonistAction(player, args, action)
     elseif action == "storage_debug" then
         ok, reason, storage, details =
             PNC.ColonyStorageService.DebugAction(player, args)
+        if ok and details and details.npcId and PNC.Registry
+            and PNC.Registry.Get and PNC.Network
+            and PNC.Network.SendCharacterPayload
+        then
+            local record = PNC.Registry.Get(tostring(details.npcId))
+            if record then
+                PNC.Network.SendCharacterPayload(player, record)
+            end
+        end
     elseif action == "storage_upgrade" then
         ok, reason, storage, details =
             PNC.ColonyStorageService.Upgrade(player, args)

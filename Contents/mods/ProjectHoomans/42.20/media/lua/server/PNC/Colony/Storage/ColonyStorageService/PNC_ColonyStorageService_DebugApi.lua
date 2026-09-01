@@ -54,6 +54,11 @@ function Service.DebugAction(player, args)
         return ok, reason, storage, details
     end
     if not Internal.DebugAllowed(player) then return finish(false, "debug_required") end
+    if action == "job_requirements"
+        and type(Service.DebugSupplyJobRequirements) == "function"
+    then
+        return Service.DebugSupplyJobRequirements(player, args)
+    end
     if action == "add_many"
         and not Internal.RememberRequest(player, args and args.requestId)
     then

@@ -4,17 +4,11 @@ PsychopatzCore = {
     RuntimeRole = { AllowsServerCode = function() return true end },
 }
 
-package.preload["TimedActions/ISTimedActionQueue"] = function() return true end
-package.preload["TimedActions/ISGrabCorpseAction"] = function() return true end
-package.preload["TimedActions/ISDropCorpseAction"] = function() return true end
-package.preload["TimedActions/ISUnequipAction"] = function() return true end
-
 local registeredCommand
 PNC = {
     Const = {
         MODULE = "PNC",
         CMD_CORPSE_HAUL_ACTION = "CorpseHaulAction",
-        CMD_CORPSE_HAUL_ACK = "CorpseHaulAck",
     },
     Client = {
         Internal = {
@@ -27,15 +21,12 @@ PNC = {
     Core = {},
 }
 
-ISTimedActionQueue = {}
-ISGrabCorpseAction = {}
-ISDropCorpseAction = {}
-ISUnequipAction = {}
+Events = { OnTick = { Add = function() end } }
 
-local Actions = T.load("ProjectHoomans", "client",
-    "PNC/Actions/PNC_CorpseHaulActions.lua")
-T.truthy(Actions, "corpse action bridge loads on clients")
-T.truthy(registeredCommand, "server action command is routed to the bridge")
+local Sync = T.load("ProjectHoomans", "client",
+    "PNC/Networking/PNC_CorpseHaulSync.lua")
+T.truthy(Sync, "corpse sync loads on clients")
+T.truthy(registeredCommand, "server action command is routed to sync")
 T.equal(registeredCommand.command, "CorpseHaulAction",
     "grapple action command uses the shared transport")
 

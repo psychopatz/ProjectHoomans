@@ -86,4 +86,19 @@ T.equal(opened[3].initialRegion, destination,
 T.equal(opened[3].guideLayers[1].region, source,
     "dump selector keeps the source region visible as a guide")
 
+PNC.CommandHub = PNC.CommandHub or {}
+PNC.CommandHub.CorpseHaulUI = UI
+package.preload[
+    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FishingActions"
+] = function() return {} end
+local ZoneRegistry = T.load("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_ZoneRegistry.lua")
+local sourceSection = ZoneRegistry.Get("corpse_haul").sections[1]
+T.equal(sourceSection.summary({
+    sourceRegion = source,
+    sourceCorpseCount = 2,
+    sourceEligibleCorpseCount = 1,
+}), "2 TILES | CORPSES: 2 | ELIGIBLE: 1",
+    "corpse source summary reports total and eligible corpses")
+
 T.finish("pnc_corpse_haul_selector_smoke")

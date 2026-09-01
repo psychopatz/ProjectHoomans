@@ -216,11 +216,20 @@ Status.Register("current_job", 10, function(record)
                 })
         end
     end
-    return activity("job:" .. current, nil, humanize(current), {
+    local information = {
         job = tostring(record.activeJob or ""),
         behavior = tostring(record.activeBehavior or ""),
         orderKind = tostring(record.orderSpec and record.orderSpec.kind or ""),
-    })
+    }
+    local lumber = runtime.lumber
+    if tostring(record.activeJob or "") == "Lumber" and lumber then
+        information.phase = tostring(lumber.phase or "")
+        information.waitingFor = lumber.waitingFor
+        information.waitingReason = lumber.waitingReason
+        information.toolDiagnostic = Core and Core.DeepCopy
+            and Core.DeepCopy(lumber.tool) or nil
+    end
+    return activity("job:" .. current, nil, humanize(current), information)
 end)
 
 return Status

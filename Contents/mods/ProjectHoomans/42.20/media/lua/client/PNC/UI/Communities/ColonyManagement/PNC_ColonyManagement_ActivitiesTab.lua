@@ -38,6 +38,12 @@ local DEFINITIONS = {
         key = "UI_PNC_CommandProvision",
         fallback = "GRAB PROVISION",
     },
+    {
+        id = "manual_corpse_haul",
+        operation = "CORPSE_HAUL",
+        key = "UI_PNC_CommandCorpseHaul",
+        fallback = "GRAB CORPSES",
+    },
 }
 
 local function definitionFor(id)
@@ -81,6 +87,8 @@ local function currentActivity(person)
         local label
         if operation == "PROVISION_PICKUP" then
             label = Shared.Tr("UI_PNC_Action_Grabbing", "GRABBING")
+        elseif operation == "CORPSE_HAUL" then
+            label = Shared.Tr("UI_PNC_CommandCorpseHaul", "GRAB CORPSES")
         else
             label = tostring(info.buildDisplayName or info.recipeId
                 or operation or "WORKING")
@@ -106,6 +114,10 @@ local function active(definition, person)
     local info = activityInfo(person)
     if definition and definition.id == "manual_provision" then
         return tostring(info and info.operation or "") == "PROVISION_PICKUP"
+    end
+    if definition and definition.operation then
+        return info and info.kind == "work_order"
+            and tostring(info.operation or "") == definition.operation
     end
     return matches(definition, info and info.capability)
 end

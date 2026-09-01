@@ -110,6 +110,31 @@ T.equal(commands[2].npcID, person.id,
 T.equal(requestedSnapshot, "manual_activity_manual_provision",
     "provision command refreshes the colony snapshot")
 
+T.truthy(Activities.OnControl(window, { internal = "manual_corpse_haul" }),
+    "activities tab sends the manual corpse haul command")
+T.equal(commands[3].commandID, "manual_corpse_haul",
+    "activities tab uses the corpse haul command id")
+T.equal(commands[3].npcID, person.id,
+    "corpse haul command targets the selected colonist")
+T.equal(requestedSnapshot, "manual_activity_manual_corpse_haul",
+    "activities tab refreshes after corpse haul dispatch")
+
+person.actionInformation = {
+    kind = "work_order", operation = "CORPSE_HAUL", manual = true,
+    phase = "SOURCE_APPROACH", percent = 0,
+}
+Activities.OnPersonSelected(window)
+T.equal(window.activityControls.manual_corpse_haul.title,
+    "GRAB CORPSES (active)",
+    "corpse haul button reflects the active work order")
+T.equal(variants.manual_corpse_haul, "selected",
+    "active corpse haul uses the selected button presentation")
+rows = Activities.BuildRows({ selectedPerson = person, window = window })
+T.equal(rows[1].detail, "GRAB CORPSES (SOURCE_APPROACH)",
+    "corpse haul activity uses the reusable command label")
+T.equal(rows[2].detail, "MANUAL",
+    "manual corpse haul is shown as a manual activity")
+
 person.actionInformation.capability = "sleep"
 person.manualActivityDisabled = nil
 Activities.OnPersonSelected(window)

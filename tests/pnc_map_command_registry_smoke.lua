@@ -5,14 +5,19 @@ local sent
 local registeredLayer
 local gameSpeed = 0
 local originalRightClicks = 0
+local originalMouseDrags = 0
 local submenu
 
 local map = {
     playerNum = 0,
     width = 800,
     height = 600,
+    mouseX = 0,
+    mouseY = 0,
     getAbsoluteX = function() return 0 end,
     getAbsoluteY = function() return 0 end,
+    getMouseX = function(self) return self.mouseX end,
+    getMouseY = function(self) return self.mouseY end,
     mapAPI = {
         uiToWorldX = function(_, x) return x + 1000 end,
         uiToWorldY = function(_, _, y) return y + 2000 end,
@@ -21,6 +26,27 @@ local map = {
 
 package.preload["ISUI/Maps/ISWorldMap"] = function()
     ISWorldMap = {
+        onMouseDown = function()
+            originalMouseDrags = originalMouseDrags + 1
+            return false
+        end,
+        onMouseMove = function()
+            originalMouseDrags = originalMouseDrags + 1
+            return false
+        end,
+        onMouseMoveOutside = function()
+            originalMouseDrags = originalMouseDrags + 1
+            return false
+        end,
+        onMouseUp = function()
+            originalMouseDrags = originalMouseDrags + 1
+            return false
+        end,
+        onMouseUpOutside = function()
+            originalMouseDrags = originalMouseDrags + 1
+            return false
+        end,
+        onRightMouseDown = function() return true end,
         onRightMouseUp = function()
             originalRightClicks = originalRightClicks + 1
             return false
@@ -102,6 +128,7 @@ package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
 T.load(FILE .. "PNC_MapCommandRegistry.lua")
 T.load(FILE .. "Commands/PNC_MapCommand_Travel.lua")
+T.load(FILE .. "Commands/PNC_MapCommand_Lumber.lua")
 
 T.truthy(PNC.MapCommands.OpenForNPC({
     id = "npc:1",
@@ -121,8 +148,8 @@ T.truthy(map:onRightMouseUp(25, 35) == true,
     "command mode did not consume right click")
 T.truthy(originalRightClicks == 0,
     "vanilla debug map context replaced the NPC command context")
-T.truthy(submenu and #submenu.options == 1,
-    "travel provider did not populate the map context menu")
+T.truthy(submenu and #submenu.options == 2,
+    "map providers did not populate the map context menu")
 T.truthy(submenu.options[1].name == "Move Map Tester here",
     "travel context label lost the NPC name")
 submenu.options[1].callback()
@@ -131,6 +158,32 @@ T.truthy(sent and sent.commandID == "travel"
     and sent.target.x == 1025
     and sent.target.y == 2035,
     "map travel provider dispatched the wrong command payload")
+T.truthy(submenu.options[2].name == "Select lumber work region",
+    "lumber provider did not expose region selection")
+submenu.options[2].callback()
+T.truthy(PNC.MapCommands.RegionSelection ~= nil,
+    "lumber provider did not start map region selection")
+
+map.mouseX, map.mouseY = 30, 45
+T.truthy(map:onMouseDown(10, 20) == true,
+    "lumber region selection did not consume left mouse down")
+T.truthy(map:onMouseMove(20, 25) == true,
+    "lumber region selection did not consume map drag")
+T.truthy(map:onMouseUp(30, 45) == true,
+    "lumber region selection did not finish on mouse up")
+T.truthy(originalMouseDrags == 0,
+    "lumber region selection leaked into vanilla map panning")
+T.truthy(sent and sent.commandID == "lumber_zone"
+    and sent.options and sent.options.region,
+    "lumber region selection dispatched no region payload")
+local region = sent.options.region
+T.truthy(region.levels[0] and region.levels[0].rows[2020]
+    and region.levels[0].rows[2020][1] == 1010
+    and region.levels[0].rows[2020][2] == 1030
+    and region.levels[0].rows[2045][1] == 1010,
+    "lumber region payload had incorrect world bounds")
+T.truthy(not PNC.MapCommands.RegionSelection,
+    "lumber region selection remained active after dispatch")
 
 map:close()
 T.truthy(not PNC.MapCommands.IsSelected("npc:1"),

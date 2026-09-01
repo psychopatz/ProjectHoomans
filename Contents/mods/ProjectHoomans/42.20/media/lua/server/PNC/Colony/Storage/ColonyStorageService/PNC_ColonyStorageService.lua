@@ -9,6 +9,7 @@ require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_Source
 require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_Deposits"
 require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_Production"
 require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_DebugApi"
+require "PNC/Colony/Storage/ColonyStorageService/PNC_ColonyStorageService_JobRequirements"
 
 function PNC.ColonyStorageService.RecordActivity(storageOrID, event)
     local storage = type(storageOrID) == "table" and storageOrID

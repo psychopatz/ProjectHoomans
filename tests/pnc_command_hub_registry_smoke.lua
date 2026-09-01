@@ -21,6 +21,8 @@ T.equal(categories[1].id, "work", "work is not first in the manual hierarchy")
 T.equal(categories[2].id, "zone", "zone is not second in the manual hierarchy")
 T.equal(categories[3].id, "settings",
     "settings is not third in the manual hierarchy")
+T.equal(categories[4].id, "events",
+    "events is not fourth in the manual hierarchy")
 for _, id in ipairs({
     "structure", "production", "furniture", "external_furniture",
     "genetics", "power", "pipe_networks", "security", "misc", "floors",
@@ -36,8 +38,37 @@ T.truthy(Registry.Get("settings").onClick,
     "settings category does not expose its settings workflow")
 T.truthy(Registry.Get("work").onClick,
     "work category does not expose its authorization workflow")
+T.equal(Registry.Get("events").childID, "events",
+    "events category is not managed as a command-hub child")
+T.truthy(Registry.IsEnabled(Registry.Get("events")),
+    "events category is unexpectedly gated by radio availability")
+T.truthy(PNC.CommandHub.Gates
+    and PNC.CommandHub.Gates.HasBaseAndStockpile,
+    "command hub does not expose the base and stockpile gate")
+
+PNC.ColonyManagementClient = {
+    ReadSnapshot = function()
+        return { snapshot = {} }
+    end,
+}
+T.falsy(Registry.IsEnabled(Registry.Get("work")),
+    "work remains enabled without a base and stockpile")
+T.falsy(Registry.IsEnabled(Registry.Get("zone")),
+    "zone remains enabled without a base and stockpile")
+PNC.ColonyManagementClient.ReadSnapshot = function()
+    return {
+        snapshot = { settlement = {
+            facilities = { { definitionId = "stockpile", constructionState = "BUILT" } },
+        } },
+    }
+end
+T.truthy(Registry.IsEnabled(Registry.Get("work")),
+    "work did not enable after a base and stockpile became available")
+T.truthy(Registry.IsEnabled(Registry.Get("zone")),
+    "zone did not enable after a base and stockpile became available")
 
 local openedWork = false
+local openedEvents = false
 PNC.CommandHub.WorkUI = {
     Open = function()
         openedWork = true
@@ -51,8 +82,21 @@ PNC.CommandHub.ZoneUI = {
         return true
     end,
 }
+PNC.ColonyJournalButton = {
+    HasRadio = function() return false end,
+}
+PNC.ColonyJournalUI = {
+    Toggle = function()
+        openedEvents = true
+        return true
+    end,
+}
 Registry.Get("work").onClick()
 T.truthy(openedWork, "work category is not wired to its window")
+T.truthy(Registry.IsEnabled(Registry.Get("events")),
+    "events category is disabled without a radio")
+Registry.Get("events").onClick()
+T.truthy(openedEvents, "events category is not wired to the colony journal")
 zone.actions[1].onClick()
 zone.actions[2].onClick()
 zone.actions[3].onClick()
@@ -161,6 +205,10 @@ T.contains(childControllerSource, "CoreHub.Actions",
     "zone actions are not using the Core action window")
 T.falsy(string.find(childControllerSource, "Hub.ActionsUI", 1, true),
     "child controller still depends on the removed PNC action window")
+T.contains(childControllerSource, 'Controller.Register("events"',
+    "colony journal is not managed by the child controller")
+T.contains(childControllerSource, "PNC.ColonyJournalUI",
+    "child controller does not manage the colony journal instance")
 local zoneSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_ZoneWindow.lua")
 T.contains(zoneSource, "CoreHub.Actions",
@@ -179,6 +227,8 @@ T.contains(settingsSource, "UI.CreateTextEntry",
     "settings window has no editable fields")
 T.contains(settingsSource, "UI.CreateSlider",
     "settings window opacity is not using the shared slider")
+T.contains(settingsSource, "UI.SetLabelText",
+    "settings labels can move when their dynamic text changes")
 T.contains(settingsSource, "SettingsUI.Open",
     "settings window is not reachable")
 T.contains(settingsSource, "onBranchToggle",
@@ -189,8 +239,36 @@ local settingsLayoutSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_SettingsWindow_Layout.lua")
 T.contains(settingsLayoutSource, "onResponsiveLayout",
     "settings controls do not have responsive layout")
-T.contains(settingsLayoutSource, "statusLabel:setY",
+T.contains(settingsLayoutSource, "Layout.SetBounds(self.statusLabel",
     "settings feedback is not positioned in the footer")
+local animationSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/PNC_AnimationDebugWindow.lua")
+T.contains(animationSource, "Layout.SetBounds(self.search",
+    "animation search field bypasses shared bounds")
+T.falsy(string.find(animationSource, "self.search:setX", 1, true),
+    "animation search field still uses manual geometry")
+local animationSceneSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/PNC_AnimationSceneDebugWindow.lua")
+T.contains(animationSceneSource, "Layout.SetBounds(self.gapEntry",
+    "animation scene field bypasses shared bounds")
+T.falsy(string.find(animationSceneSource, "self.gapEntry:setX", 1, true),
+    "animation scene field still uses manual geometry")
+local provisionSettingsSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Provision/PNC_ProvisionSettingsWindow.lua")
+T.contains(provisionSettingsSource, "UI.SetLabelText(self.statusLabel",
+    "provision status label can jump after text changes")
+T.contains(provisionSettingsSource, "Layout.SetBounds(self.statusLabel",
+    "provision status label bypasses shared bounds")
+T.falsy(string.find(provisionSettingsSource, "statusLabel:setName",
+    1, true), "provision settings still mutates labels unsafely")
+local provisionRuleSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Provision/PNC_ProvisionRulePanel.lua")
+T.contains(provisionRuleSource, "UI.SetLabelText(widget",
+    "provision description labels can jump after wrapping")
+T.contains(provisionRuleSource, "Layout.SetBounds(row.panel",
+    "provision rule panels bypass shared bounds")
+T.falsy(string.find(provisionRuleSource, "widget:setName",
+    1, true), "provision rules still mutate labels unsafely")
 T.contains(childControllerSource, "function Controller.Toggle",
     "command hub child toggling is not centralized")
 T.contains(childControllerSource, "function Controller.CloseAll",

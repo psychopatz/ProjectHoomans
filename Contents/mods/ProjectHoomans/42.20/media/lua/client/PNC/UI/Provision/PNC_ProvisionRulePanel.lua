@@ -9,6 +9,7 @@ PNC.ProvisionRulePanel = PNC.ProvisionRulePanel or {}
 local RulePanel = PNC.ProvisionRulePanel
 local UI = PsychopatzCore.UI
 local Theme = UI.Theme
+local Layout = UI.Layout
 
 local function label(parent, value)
     local widget = ISLabel:new(0, 0, 20, value, 1, 1, 1, 1,
@@ -107,39 +108,38 @@ function RulePanel.Layout(row, width, y)
     row.y = y
     local padding = 12
     local compact = width < 420
-    row.panel:setX(4)
-    row.panel:setY(y)
-    row.panel:setWidth(math.max(200, width - 8))
+    local panelWidth = math.max(200, width - 8)
+    Layout.SetBounds(row.panel, 4, y, panelWidth,
+        math.max(1, row.height or 1))
     local innerWidth = row.panel:getWidth()
-    row.title:setX(12)
-    row.title:setY(9)
-    row.enabled:setX(compact and 12 or math.max(180, innerWidth - 126))
-    row.enabled:setY(compact and 31 or 3)
+    Layout.SetBounds(row.title, 12, 9, math.max(1, innerWidth - 24), 24)
+    local enabledX = compact and 12 or math.max(180, innerWidth - 126)
+    Layout.SetBounds(row.enabled, enabledX, compact and 31 or 3,
+        math.max(1, row.enabled.width or 70), 24)
     local descriptionY = compact and 59 or 36
     local lines = wrap(row.descriptionText, innerWidth - padding * 2)
     local visibleLines = math.min(3, #lines)
     for index, widget in ipairs(row.descriptionLines) do
         widget:setVisible(index <= visibleLines)
         if index <= visibleLines then
-            widget:setName(lines[index])
-            widget:setX(padding)
-            widget:setY(descriptionY + (index - 1) * 18)
+            UI.SetLabelText(widget, lines[index])
+            Layout.SetBounds(widget, padding,
+                descriptionY + (index - 1) * 18,
+                math.max(1, innerWidth - padding * 2), 18)
         end
     end
     local fieldY = descriptionY + visibleLines * 18 + 9
     for _, item in ipairs(row.entries) do
-        item.label:setX(18)
-        item.label:setY(fieldY + 4)
-        item.entry:setX(math.max(150, innerWidth - 94))
-        item.entry:setY(fieldY)
-        item.entry:setWidth(76)
-        item.entry:setHeight(24)
+        Layout.SetBounds(item.label, 18, fieldY + 4,
+            math.max(1, innerWidth - 118), 24)
+        Layout.SetBounds(item.entry, math.max(150, innerWidth - 94),
+            fieldY, 76, 24)
         fieldY = fieldY + 29
     end
-    row.measure:setX(18)
-    row.measure:setY(fieldY + 2)
+    Layout.SetBounds(row.measure, 18, fieldY + 2,
+        math.max(1, innerWidth - 36), 24)
     row.height = fieldY + 28
-    row.panel:setHeight(row.height)
+    Layout.SetBounds(row.panel, 4, y, panelWidth, row.height)
     return y + row.height
 end
 

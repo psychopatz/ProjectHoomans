@@ -42,6 +42,12 @@ local function tick(record, zombie)
     then
         return PNC.BehaviorCorpseHaul.TickWork(record, zombie, order) == true
     end
+    if order.operation == "LUMBER"
+        and PNC.BehaviorLumber
+        and PNC.BehaviorLumber.TickWork
+    then
+        return PNC.BehaviorLumber.TickWork(record, zombie, order) == true
+    end
     record.activeJob = PNC.WorkDefinitions.JOB_BY_OPERATION[order.operation]
         or JOB
     record.activeBehavior = "Work:" .. tostring(order.operation)

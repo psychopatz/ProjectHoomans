@@ -16,7 +16,6 @@ require "PNC/UI/CommandHub/PNC_CommandHub_SettingsWindow"
 require "PNC/UI/CommandHub/PNC_CommandHub_WorkRegistry"
 require "PNC/UI/CommandHub/PNC_CommandHub_WorkWindow"
 require "PNC/UI/CommandHub/PNC_CommandHub_ChildController"
-require "PNC/UI/CommandHub/PNC_CommandHub_Button"
 
 -- Keep PNC's child controller synchronized with the Core-owned host even
 -- when another mod opens the shared hub directly through PsychopatzCore.

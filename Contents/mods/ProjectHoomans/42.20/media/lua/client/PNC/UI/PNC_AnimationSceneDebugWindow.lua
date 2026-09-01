@@ -9,6 +9,7 @@ PNC.AnimationSceneDebugWindow =
 local WindowAPI = PNC.AnimationSceneDebugWindow
 local Model = PNC.AnimationSceneDebugModel
 local UI = PsychopatzCore.UI
+local Layout = UI.Layout
 local addDetail = UI.AddKeyValue
 
 ISPNCAnimationSceneDebugWindow =
@@ -149,23 +150,11 @@ function ISPNCAnimationSceneDebugWindow:onResponsiveLayout()
         width - margin * 2 - groupWidth
             - gapWidth - 16
     )
-    self.search:setX(margin)
-    self.search:setY(top)
-    self.search:setWidth(searchWidth)
-    self.search:setHeight(26)
-    self.groupFilter:setX(
-        margin + searchWidth + 8
-    )
-    self.groupFilter:setY(top)
-    self.groupFilter:setWidth(groupWidth)
-    self.groupFilter:setHeight(26)
-    self.gapEntry:setX(
-        margin + searchWidth + 8
-            + groupWidth + 8
-    )
-    self.gapEntry:setY(top)
-    self.gapEntry:setWidth(gapWidth)
-    self.gapEntry:setHeight(26)
+    local groupX = margin + searchWidth + 8
+    Layout.SetBounds(self.search, margin, top, searchWidth, 26)
+    Layout.SetBounds(self.groupFilter, groupX, top, groupWidth, 26)
+    Layout.SetBounds(self.gapEntry, groupX + groupWidth + 8, top,
+        gapWidth, 26)
 
     local buttonsTop = height - 43
     local mainTop = top + 36
@@ -177,16 +166,9 @@ function ISPNCAnimationSceneDebugWindow:onResponsiveLayout()
         280,
         math.floor((width - margin * 3) * 0.53)
     )
-    self.list:setX(margin)
-    self.list:setY(mainTop)
-    self.list:setWidth(leftWidth)
-    self.list:setHeight(mainHeight)
-    self.details:setX(margin * 2 + leftWidth)
-    self.details:setY(mainTop)
-    self.details:setWidth(
-        math.max(220, width - leftWidth - margin * 3)
-    )
-    self.details:setHeight(mainHeight)
+    Layout.SetBounds(self.list, margin, mainTop, leftWidth, mainHeight)
+    Layout.SetBounds(self.details, margin * 2 + leftWidth, mainTop,
+        math.max(220, width - leftWidth - margin * 3), mainHeight)
 
     local buttonWidth = math.max(
         112,
@@ -197,10 +179,7 @@ function ISPNCAnimationSceneDebugWindow:onResponsiveLayout()
     )
     local x = margin
     for _, button in ipairs(self.buttons) do
-        button:setX(x)
-        button:setY(buttonsTop)
-        button:setWidth(buttonWidth)
-        button:setHeight(28)
+        Layout.SetBounds(button, x, buttonsTop, buttonWidth, 28)
         x = x + buttonWidth + 8
     end
 end

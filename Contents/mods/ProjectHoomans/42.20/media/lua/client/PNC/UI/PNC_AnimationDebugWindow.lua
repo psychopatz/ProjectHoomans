@@ -9,6 +9,7 @@ local WindowAPI = PNC.AnimationDebugWindow
 local DebugPlayer = PNC.AnimationDebugPlayer
 local Catalog = PNC.AnimationDebugCatalog
 local UI = PsychopatzCore.UI
+local Layout = UI.Layout
 local addDetail = UI.AddKeyValue
 
 ISPNCAnimationDebugWindow =
@@ -226,14 +227,8 @@ function ISPNCAnimationDebugWindow:onResponsiveLayout()
     local searchWidth = math.max(180, math.floor(width * 0.55))
     local filterX = margin + searchWidth + 8
     local filterWidth = math.max(120, width - filterX - margin)
-    self.search:setX(margin)
-    self.search:setY(contentTop)
-    self.search:setWidth(searchWidth)
-    self.search:setHeight(26)
-    self.stateFilter:setX(filterX)
-    self.stateFilter:setY(contentTop)
-    self.stateFilter:setWidth(filterWidth)
-    self.stateFilter:setHeight(26)
+    Layout.SetBounds(self.search, margin, contentTop, searchWidth, 26)
+    Layout.SetBounds(self.stateFilter, filterX, contentTop, filterWidth, 26)
 
     local buttonsTop = height - 78
     local mainTop = contentTop + 36
@@ -242,16 +237,9 @@ function ISPNCAnimationDebugWindow:onResponsiveLayout()
         260,
         math.floor((width - margin * 3) * 0.56)
     )
-    self.list:setX(margin)
-    self.list:setY(mainTop)
-    self.list:setWidth(leftWidth)
-    self.list:setHeight(mainHeight)
-    self.details:setX(margin * 2 + leftWidth)
-    self.details:setY(mainTop)
-    self.details:setWidth(
-        math.max(180, width - leftWidth - margin * 3)
-    )
-    self.details:setHeight(mainHeight)
+    Layout.SetBounds(self.list, margin, mainTop, leftWidth, mainHeight)
+    Layout.SetBounds(self.details, margin * 2 + leftWidth, mainTop,
+        math.max(180, width - leftWidth - margin * 3), mainHeight)
 
     local x = margin
     local rowY = buttonsTop
@@ -264,10 +252,7 @@ function ISPNCAnimationDebugWindow:onResponsiveLayout()
             rowY = rowY + 32
             x = margin
         end
-        button:setX(x)
-        button:setY(rowY)
-        button:setWidth(buttonWidth)
-        button:setHeight(27)
+        Layout.SetBounds(button, x, rowY, buttonWidth, 27)
         x = x + buttonWidth + 8
     end
 end

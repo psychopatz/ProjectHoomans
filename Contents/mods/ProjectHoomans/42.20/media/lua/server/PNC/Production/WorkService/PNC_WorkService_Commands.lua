@@ -83,7 +83,9 @@ function Service.Commands.Pause(orderId, paused)
         return true, copy(order)
     end
     order.status = paused == false and Status.WAITING_FOR_WORKER or Status.PAUSED
-    if paused ~= false then releaseClaim(order, "paused") end
+    if paused ~= false then
+        releaseClaim(order, "paused", false, order.operation == "LUMBER")
+    end
     order.revision = order.revision + 1; Repository.MarkDirty()
     return true, copy(order)
 end
