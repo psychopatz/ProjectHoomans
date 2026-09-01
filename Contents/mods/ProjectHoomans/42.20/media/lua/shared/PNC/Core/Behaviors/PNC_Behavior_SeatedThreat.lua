@@ -7,6 +7,7 @@ PNC.BehaviorSeatedThreat = PNC.BehaviorSeatedThreat or {}
 
 local SeatedThreat = PNC.BehaviorSeatedThreat
 local Targeting = PNC.BehaviorTargeting
+local Perception = PNC.Perception
 local BehaviorCombat = PNC.BehaviorCombat
 local Common = PNC.BehaviorCommon
 local Scenes = PNC.AnimationScenes
@@ -15,7 +16,8 @@ local Const = PNC.Const
 local FACILITY_ORDER = "facility_activity"
 local CAMP_ORDER = "camp"
 local HOME_ORDER = "colony_home"
-local SCAN_MS = 350
+local SCAN_MS = tonumber(Const and Const.SEATED_THREAT_SCAN_MS) or 750
+local VALIDATE_MS = tonumber(Const and Const.SEATED_THREAT_VALIDATE_MS) or 250
 
 local function currentTime(value)
     return tonumber(value) or PNC.Core.Now()
@@ -80,7 +82,6 @@ end
 local function withinContext(target, context)
     local dx
     local dy
-    if target and target.immediateSelfDefense == true then return true end
     if not target or not context then return false end
     if tonumber(target.z) ~= nil
         and math.abs((tonumber(target.z) or 0) - context.z) >= 1
@@ -90,6 +91,17 @@ local function withinContext(target, context)
     dx = (tonumber(target.x) or 0) - context.x
     dy = (tonumber(target.y) or 0) - context.y
     return (dx * dx) + (dy * dy) <= context.radius * context.radius
+end
+
+local function isSeatedThreat(target)
+    return target
+        and target.kind == "zombie"
+        and target.visible ~= false
+        and (
+            target.immediateSelfDefense == true
+                or target.threatening == true
+        )
+        or false
 end
 
 local function targetInWorld(record, target)
@@ -110,25 +122,39 @@ local function shouldScan(runtime, now)
 end
 
 local function resolveTarget(record, runtime, context, now)
-    local target
     local current
+    local target
     if runtime.target then
-        current = targetInWorld(record, runtime.target)
-        if current and withinContext(current, context) then
-            return current
+        if now < (tonumber(runtime.seatedThreatNextValidateAt) or 0) then
+            if isSeatedThreat(runtime.target)
+                and withinContext(runtime.target, context)
+            then
+                return runtime.target
+            end
+            runtime.target = nil
+        else
+            current = targetInWorld(record, runtime.target)
+            runtime.seatedThreatNextValidateAt = now + VALIDATE_MS
+            if current
+                and isSeatedThreat(current)
+                and withinContext(current, context)
+            then
+                return current
+            end
+            runtime.target = nil
         end
-        runtime.target = nil
     end
     if not shouldScan(runtime, now)
-        or not Targeting
-        or not Targeting.ResolveRoamingEngageTarget
+        or not Perception
+        or not Perception.FindImmediateZombieThreat
     then
         return nil
     end
-    target = Targeting.ResolveRoamingEngageTarget(record, context.radius)
-    if not target or not target.kind or not withinContext(target, context) then
+    target = Perception.FindImmediateZombieThreat(record, context.radius)
+    if not isSeatedThreat(target) or not withinContext(target, context) then
         return nil
     end
+    runtime.seatedThreatNextValidateAt = now + VALIDATE_MS
     return target
 end
 
@@ -143,6 +169,7 @@ local function clearTransientState(record, zombie, reason)
     end
     runtime.seatedThreat = nil
     runtime.seatedThreatNextScanAt = nil
+    runtime.seatedThreatNextValidateAt = nil
 end
 
 local function continueCombat(record, zombie, now, state)

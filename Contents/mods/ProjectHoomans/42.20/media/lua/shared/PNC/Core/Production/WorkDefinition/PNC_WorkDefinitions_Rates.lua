@@ -5,6 +5,7 @@ local Definitions = PNC.WorkDefinitions
 
 Definitions.COLONY_JOBS = {
     "Constructor", "Researcher", "WorkshopWorker", "Farmer",
+    "Fishing", "Lumber", "CorpseHaul",
 }
 
 function Definitions.WorkRate(worker, requirements, facilityEfficiency, condition)

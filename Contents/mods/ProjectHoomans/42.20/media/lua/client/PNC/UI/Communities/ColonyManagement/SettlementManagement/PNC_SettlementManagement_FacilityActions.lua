@@ -73,10 +73,21 @@ local function areaOptions(window, facility, existing, onConfirm, requestedRole)
     local movingStockpile = not isDraft
         and facility.definitionId == "stockpile"
         and role == "storage.stockpile"
-    local boundary = role == "work.zone"
-        and Support.WorkZoneRegion(facility)
-        or (isDraft or movingStockpile)
-        and Support.BaseRegion(window) or Support.FacilityRegion(facility)
+    local externalStockpile = facility
+        and facility.definitionId == "stockpile"
+        and role == "storage.stockpile"
+    local boundary
+    if role == "work.zone" then
+        boundary = Support.WorkZoneRegion(facility)
+    elseif externalStockpile then
+        -- Stockpile storage is a mobile world region. It is still owned by
+        -- this base, but its tiles are allowed to be outside the base zone.
+        boundary = nil
+    elseif isDraft or movingStockpile then
+        boundary = Support.BaseRegion(window)
+    else
+        boundary = Support.FacilityRegion(facility)
+    end
     return {
         title = Support.Tr("UI_PNC_Facility_SelectArea", "SELECT FACILITY AREA"),
         instruction = role == "facility.footprint"
@@ -88,6 +99,9 @@ local function areaOptions(window, facility, existing, onConfirm, requestedRole)
             or role == "work.zone"
             and Support.Tr("UI_PNC_Facility_SelectWorkZoneHelp",
                 "Select one connected tile inside or beside the facility where workers stand.")
+            or externalStockpile
+            and Support.Tr("UI_PNC_Facility_SelectStockpileAreaHelp",
+                "Select a connected stockpile area; it may be outside the base territory.")
             or Support.Tr("UI_PNC_Facility_SelectAreaHelp",
                 "Select one connected room inside the base territory."),
         initialRegion = existing and existing.region or Support.EmptyRegion(),
@@ -99,7 +113,7 @@ local function areaOptions(window, facility, existing, onConfirm, requestedRole)
         requiredSquareRule = role == "growing.plot" and nil or limit.worldRule,
         validate = function(region, stats)
             local ok, reason = Support.ValidateConnected(region)
-            if ok and not GridRegion.containsRegion(boundary, region) then
+            if ok and boundary and not GridRegion.containsRegion(boundary, region) then
                 ok, reason = false, (isDraft or movingStockpile) and "OUTSIDE_BASE"
                     or "OUTSIDE_FACILITY"
             end

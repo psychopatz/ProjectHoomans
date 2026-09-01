@@ -619,7 +619,7 @@ local function campActivityIsSafe(record, zombie, runtime, order)
     return true
 end
 
-local function finish(record, zombie, reason)
+local function finish(record, zombie, reason, restoreOrder)
     local runtime = state(record)
     if not runtime or runtime.finishing == true then return false end
     runtime.finishing = true
@@ -642,8 +642,76 @@ local function finish(record, zombie, reason)
     record.runtime.facilityDebugWork = nil
     record.runtime.seatedThreat = nil
     record.runtime.seatedThreatNextScanAt = nil
-    PNC.OrderSystem.SetOrder(record, previous)
+    record.runtime.seatedThreatNextValidateAt = nil
+    if restoreOrder ~= false then
+        PNC.OrderSystem.SetOrder(record, previous)
+    end
     return true
+end
+
+local function stopAnimationScene(record, zombie, reason)
+    if record.runtime.animationScene and PNC.AnimationScenes then
+        -- Scene callbacks are extension points. Keep the activity cleanup
+        -- alive if one of them fails, but do not add protected calls around
+        -- ordinary facility logic.
+        pcall(PNC.AnimationScenes.Stop, record, zombie,
+            reason or "player_stop")
+    end
+end
+
+local function releaseTaskLeaseAfterAbort(record, leaseId, reason)
+    local commands
+    local cancelled
+    local cancelReason
+    local leases
+    local lease
+    local released
+    leaseId = tostring(leaseId or "")
+    if leaseId == "" then return true end
+
+    -- The facility activity has already been cleared before this call. That
+    -- lets the normal provider cancellation path release the lease without
+    -- entering Jobs.Stop and restoring the old order recursively.
+    commands = PNC.Tasking and PNC.Tasking.Commands
+    if commands and commands.CancelForNPC then
+        cancelled, cancelReason = commands.CancelForNPC(
+            record.id, reason or "order_changed")
+        if cancelled == true and cancelReason ~= "CANCELLATION_DEFERRED" then
+            return true
+        end
+    end
+
+    leases = PNC.TaskLeaseService
+    if leases and leases.Get and leases.Release then
+        lease = leases.Get(leaseId)
+        if not lease then return true end
+        released = leases.Release(leaseId, reason or "order_changed")
+        return released == true
+    end
+    return cancelled ~= false
+end
+
+-- Order changes are authoritative commands. Unlike Jobs.Stop, this path must
+-- not restore runtime.previousOrder because the caller is already installing
+-- a different order (follow, home, camp, and so on).
+function Jobs.AbortForOrderChange(record, zombie, reason)
+    local runtime = state(record)
+    local leaseId
+    local finished
+    local abortReason = reason or "order_changed"
+    if not runtime then return false, "facility_activity_not_active" end
+
+    zombie = zombie or PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record.id) or nil
+    leaseId = tostring(runtime.taskLeaseId or "")
+    runtime.stopRequested = true
+    stopAnimationScene(record, zombie, abortReason)
+    finished = finish(record, zombie, abortReason, false)
+    if not finished then return false, "facility_activity_abort_failed" end
+    record.activeJob = nil
+    record.activeBehavior = nil
+    releaseTaskLeaseAfterAbort(record, leaseId, abortReason)
+    return true, "facility_activity_aborted"
 end
 
 function Jobs.Stop(record, reason)
@@ -653,12 +721,9 @@ function Jobs.Stop(record, reason)
     zombie = PNC.Registry and PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
     runtime.stopRequested = true
-    if record.runtime.animationScene and PNC.AnimationScenes then
-        -- Cleanup must continue even if scene interruption throws. Otherwise
-        -- the activity and its reservation survive without an owner.
-        pcall(PNC.AnimationScenes.Stop, record, zombie,
-            reason or "player_stop")
-    end
+    -- Cleanup must continue even if scene interruption throws. Otherwise the
+    -- activity and its reservation survive without an owner.
+    stopAnimationScene(record, zombie, reason)
     local finished = finish(record, zombie, reason or "player_stop")
     return finished == true, "facility_activity_stopped"
 end

@@ -81,6 +81,14 @@ function Internal.auditCorpseRecord(record)
         or Internal.ensureRuntime(record)
     now = Core.Now()
     previousCorpseState = state.corpseState
+    if PNC.CorpseHaulService
+        and PNC.CorpseHaulService.IsRecordProtected
+        and PNC.CorpseHaulService.IsRecordProtected(record)
+    then
+        state.corpseState = "hauling"
+        state.missingSinceAt = 0
+        return
+    end
     square = cell:getGridSquare(
         math.floor(tonumber(record.x) or 0),
         math.floor(tonumber(record.y) or 0),

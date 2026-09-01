@@ -65,6 +65,13 @@ Catalog.Groups = Catalog.Groups or {
         },
     },
     {
+        id = "Fishing",
+        display = "Fishing",
+        skills = {
+            { id = "Fishing", display = "Fishing" },
+        },
+    },
+    {
         id = "Medical",
         display = "Medical",
         skills = {

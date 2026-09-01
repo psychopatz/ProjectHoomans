@@ -35,7 +35,11 @@ function Validation.CanChange(base, current, delta, operation, expectedRevision)
                 then
                     return H.Result(false, "OUTSIDE_BASE", { componentId = componentId })
                 end
+                local externalStockpileRegion = facility
+                    and facility.definitionId == "stockpile"
+                    and component and component.role == "storage.stockpile"
                 if component and component.kind == "region"
+                    and not externalStockpileRegion
                     and not GridRegion.containsRegion(candidate,
                         Validation.ProjectFootprint(component.region))
                 then

@@ -14,6 +14,9 @@ require "PNC/Core/Behaviors/PNC_BehaviorRegistry"
 require "PNC/Core/Behaviors/PNC_Behavior_Travel"
 require "PNC/Core/Behaviors/PNC_Behavior_AtHome"
 require "PNC/Core/Behaviors/PNC_Behavior_AtCamp"
+require "PNC/Core/Behaviors/PNC_Behavior_CorpseHaul"
+require "PNC/Core/Behaviors/PNC_Behavior_Lumber"
+require "PNC/Core/Behaviors/PNC_Behavior_Fishing"
 require "PNC/Core/Behaviors/PNC_Behavior_Incapacitated"
 require "PNC/Core/Behaviors/PNC_Behavior_Treatment"
 require "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion"
@@ -39,6 +42,34 @@ local AnimationScenes = PNC.AnimationScenes
 local LiveBodyControl = PNC.LiveBodyControl
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 
+local function clearStaleFacilityState(record, zombie)
+    local runtime = record and record.runtime or nil
+    local activity = runtime and runtime.facilityActivity or nil
+    local orderKind = tostring(record and record.orderSpec
+        and record.orderSpec.kind or "")
+    local scene = runtime and runtime.animationScene or nil
+    local definition
+
+    if orderKind == "facility_activity" then return false end
+    if activity and PNC.FacilityJobs
+        and PNC.FacilityJobs.AbortForOrderChange
+    then
+        PNC.FacilityJobs.AbortForOrderChange(
+            record, zombie, "stale_facility_activity")
+        return true
+    end
+    if scene and AnimationScenes and AnimationScenes.Get then
+        definition = AnimationScenes.Get(scene.id)
+        if definition and definition.category == "facility"
+            and AnimationScenes.Stop
+        then
+            AnimationScenes.Stop(record, zombie, "stale_facility_scene")
+            return true
+        end
+    end
+    return false
+end
+
 function Behavior.Tick(record, zombie, now)
     local job
     local previousJob = record and record.activeJob or nil
@@ -63,6 +94,11 @@ function Behavior.Tick(record, zombie, now)
         end
         return
     end
+
+    -- An order command can arrive after a scene callback has already failed
+    -- or after an older build left only the runtime activity behind. Repair
+    -- that stale presentation lease before it can consume this tick again.
+    clearStaleFacilityState(record, zombie)
 
     if record.health and record.health.state == "incapacitated" then
         if AnimationScenes and AnimationScenes.Stop then

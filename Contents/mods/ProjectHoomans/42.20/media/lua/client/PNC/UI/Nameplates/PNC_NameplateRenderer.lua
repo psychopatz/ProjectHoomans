@@ -61,6 +61,8 @@ local COMBAT_DEFENSE_COLOR = { r = 0.16, g = 1.0, b = 0.30, a = 0.78 }
 local COMBAT_BLOCKER_COLOR = { r = 1.0, g = 0.15, b = 0.8, a = 0.95 }
 local ZOMBIE_ATTACKER_COLOR = { r = 1.0, g = 0.28, b = 0.12, a = 0.96 }
 local COMBAT_MARKER_HALF_SIZE = 9
+local COMBAT_DEBUG_CONE_SEGMENTS = 8
+local COMBAT_DEBUG_CIRCLE_SEGMENTS = 16
 
 local function scopeVisible(entry, scope, fallback)
     if type(entry.scopes) ~= "table" or entry.scopes[scope] == nil then
@@ -1235,9 +1237,13 @@ drawWorldCircle = function(
     z,
     radius,
     color,
-    dashed
+    dashed,
+    segmentsOverride
 )
-    local segments = 28
+    local segments = math.max(
+        8,
+        math.floor(tonumber(segmentsOverride) or 28)
+    )
     local previousX
     local previousY
     local x
@@ -1320,7 +1326,7 @@ local function drawCombatCone(manager, zombie, debugState)
         tonumber(debugState.coneHalfAngleDegrees) or 55
     )
     local radius = tonumber(debugState.coneRadius) or 8.5
-    local segments = 12
+    local segments = COMBAT_DEBUG_CONE_SEGMENTS
     local previousX
     local previousY
     local x
@@ -1616,7 +1622,6 @@ local function drawCombatDebug(manager, entry)
     worldZ = zombie:getZ()
     target = debugState.target
 
-    drawCombatCone(manager, zombie, debugState)
     active = type(target) == "table"
         or type(debugState.action) == "table"
         or type(debugState.tacticalMove) == "table"
@@ -1624,6 +1629,7 @@ local function drawCombatDebug(manager, entry)
         or entry.snapshot.attackMode == true
         or entry.snapshot.inCombat == true
     if not active then return end
+    drawCombatCone(manager, zombie, debugState)
     drawWorldCircle(
         manager,
         worldX,
@@ -1631,7 +1637,8 @@ local function drawCombatDebug(manager, entry)
         worldZ,
         debugState.defenseRadius,
         COMBAT_DEFENSE_COLOR,
-        false
+        false,
+        COMBAT_DEBUG_CIRCLE_SEGMENTS
     )
     drawZombieAttackerDebug(
         manager,
@@ -1645,7 +1652,8 @@ local function drawCombatDebug(manager, entry)
         worldZ,
         debugState.pressureRadius,
         COMBAT_PRESSURE_COLOR,
-        true
+        true,
+        COMBAT_DEBUG_CIRCLE_SEGMENTS
     )
     drawWorldCircle(
         manager,
@@ -1654,7 +1662,8 @@ local function drawCombatDebug(manager, entry)
         worldZ,
         debugState.hordeRadius,
         COMBAT_HORDE_COLOR,
-        true
+        true,
+        COMBAT_DEBUG_CIRCLE_SEGMENTS
     )
     if debugState.mode == "melee"
         or debugState.mode == "mixed"
@@ -1666,7 +1675,8 @@ local function drawCombatDebug(manager, entry)
             worldZ,
             debugState.meleeRange,
             COMBAT_MELEE_COLOR,
-            false
+            false,
+            COMBAT_DEBUG_CIRCLE_SEGMENTS
         )
     end
     if debugState.mode == "ranged"
@@ -1679,7 +1689,8 @@ local function drawCombatDebug(manager, entry)
             worldZ,
             debugState.rangedPreferredDistance,
             COMBAT_AIM_COLOR,
-            true
+            true,
+            COMBAT_DEBUG_CIRCLE_SEGMENTS
         )
         drawWorldCircle(
             manager,
@@ -1688,7 +1699,8 @@ local function drawCombatDebug(manager, entry)
             worldZ,
             debugState.rangedRange,
             COMBAT_RANGE_COLOR,
-            false
+            false,
+            COMBAT_DEBUG_CIRCLE_SEGMENTS
         )
     end
 

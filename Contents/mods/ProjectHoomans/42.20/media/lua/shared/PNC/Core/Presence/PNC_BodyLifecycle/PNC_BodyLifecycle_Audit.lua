@@ -28,6 +28,7 @@ function Lifecycle.AuditLoadedBodies(now, force)
     local record
     local expected
     local deathMarker
+    local haulProtected
     now = tonumber(now) or Core.Now()
     if not Core.IsAuthority() or not reg or not reg.EnsureLoaded then
         return stats
@@ -50,15 +51,27 @@ function Lifecycle.AuditLoadedBodies(now, force)
         for i = zombieCount - 1, 0, -1 do
             zombie = zombieArray and zombieArray[i + 1] or zombieList:get(i)
             modData = zombie and zombie.getModData and zombie:getModData() or nil
+            haulProtected = modData and modData.PNC_CorpseHaulTaskId
+                and PNC.CorpseHaulService
+                and PNC.CorpseHaulService.IsLifecycleProtected
+                and PNC.CorpseHaulService.IsLifecycleProtected(
+                    modData.PNC_CorpseHaulTaskId, zombie) == true
+                or false
             local deathMarkerId = modData and (
-                modData.PNC_DeathMarkerID
-                or tostring(modData.PNC_BodyKind or "") == "corpse"
-                    and modData.PNC_UUID
+                not haulProtected and (
+                    modData.PNC_DeathMarkerID
+                    or tostring(modData.PNC_BodyKind or "") == "corpse"
+                        and modData.PNC_UUID
+                ) or nil
             ) or nil
             deathMarker = deathMarkerId
                 and reg.GetDeathMarker
                 and reg.GetDeathMarker(deathMarkerId) or nil
-            if deathMarker then
+            if haulProtected then
+                -- Vanilla grapple reanimates a corpse into a temporary
+                -- IsoZombie and copies its ModData. Do not let the ordinary
+                -- death-marker audit consume that transient body.
+            elseif deathMarker then
                 stats.scanned = stats.scanned + 1
                 stats.corpses = stats.corpses + 1
                 if deathMarker.infected == true

@@ -68,13 +68,15 @@ local function squareState(x, y, z)
 end
 
 local function accessPoint(region, base, preferredX, preferredY, preferredZ,
-    requireLoaded)
+    requireLoaded, allowOutsideBase)
     local best, deferred, seen = nil, nil, {}
     local bestDistance, deferredDistance
 
     local function consider(x, y, z)
         x, y, z = tonumber(x), tonumber(y), tonumber(z)
-        if not x or not y or not z or not isInsideBase(base, x, y, z) then
+        if not x or not y or not z
+            or (allowOutsideBase ~= true and not isInsideBase(base, x, y, z))
+        then
             return
         end
         local key = tostring(x) .. ":" .. tostring(y) .. ":" .. tostring(z)
@@ -163,10 +165,10 @@ local function facilityNode(base, facility, preferredX, preferredY, preferredZ,
         end
     end
     local point = accessPoint(region or facility.constructionRegion, base,
-        preferredX, preferredY, preferredZ, requireLoaded)
+        preferredX, preferredY, preferredZ, requireLoaded, true)
     if not point then return nil end
     return { schemaVersion = 1, id = "facility:" .. tostring(facility.id),
-        facilityId = facility.id, baseId = base.id,
+        facilityId = facility.id, baseId = base.id, region = region,
         x = point.x, y = point.y, z = point.z, radius = 2, revision = 0 }
 end
 
@@ -256,6 +258,29 @@ function Service.FindNearest(baseId, x, y, z, options)
         end
     end
     return best
+end
+
+-- Returns the persisted storage region for a built stockpile facility. This
+-- is intentionally separate from the access node: access is a navigation
+-- concern, while corpse drops must land on a tile contained by the region.
+function Service.GetFacilityRegion(facilityId)
+    local facility = Repository.GetFacility(facilityId)
+    if not facility or facility.definitionId ~= "stockpile" then return nil end
+    for componentId, present in pairs(facility.componentIds or {}) do
+        local component = present == true
+            and Repository.GetComponent(componentId) or nil
+        if component and component.role == "storage.stockpile" then
+            return component.region, facility, component
+        end
+    end
+    return nil
+end
+
+function Service.ContainsFacilityRegionTile(facilityId, x, y, z)
+    local region = Service.GetFacilityRegion(facilityId)
+    if not region or not GridRegion.containsPoint then return false end
+    return GridRegion.containsPoint(region, math.floor(tonumber(x) or 0),
+        math.floor(tonumber(y) or 0), math.floor(tonumber(z) or 0)) == true
 end
 
 function Service.HasArrived(nodeOrId, x, y, z)

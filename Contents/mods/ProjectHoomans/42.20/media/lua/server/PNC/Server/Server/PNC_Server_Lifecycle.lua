@@ -36,6 +36,9 @@ function H.OnServerStarted()
     if PNC.ColonyStorageRepository and PNC.ColonyStorageRepository.Load then
         PNC.ColonyStorageRepository.Load()
     end
+    if PNC.LumberService and PNC.LumberService.Load then
+        PNC.LumberService.Load(true)
+    end
     if PNC.AbstractWorldStore and PNC.AbstractWorldStore.Load then
         PNC.AbstractWorldStore.Load()
     end

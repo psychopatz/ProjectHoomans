@@ -11,6 +11,7 @@ local Definitions = PNC.NeedsDefinitions
 
 
 local setJobPermission = Internal.setJobPermission
+local cancelSpecialOrder = Internal.cancelSpecialOrder
 local colonistHomeAction = Internal.colonistHomeAction
 local colonistFollowAction = Internal.colonistFollowAction
 
@@ -47,6 +48,8 @@ function Internal.handleStorageColonistAction(player, args, action)
             PNC.ColonyStorageService.Upgrade(player, args)
     elseif action == "job_permission_set" then
         ok, reason, details = setJobPermission(player, args)
+    elseif action == "order_cancel" then
+        ok, reason, details = cancelSpecialOrder(player, args)
     elseif action == "colonist_return_home" then
         ok, reason, details = colonistHomeAction(player, args, false)
     elseif action == "colonist_follow_player" then

@@ -58,6 +58,9 @@ function H.PrepareTick(now)
     if PNC.ProvisionScheduler and PNC.ProvisionScheduler.Pump then
         PNC.ProvisionScheduler.Pump(now)
     end
+    if PNC.LumberService and PNC.LumberService.Pump then
+        PNC.LumberService.Pump(now)
+    end
     if PNC.EnginePathPlanner
         and PNC.EnginePathPlanner.PumpServerFrame
     then

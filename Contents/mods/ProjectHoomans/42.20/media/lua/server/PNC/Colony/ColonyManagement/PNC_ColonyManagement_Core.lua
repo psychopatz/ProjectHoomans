@@ -43,6 +43,23 @@ local function effectiveAllowedJobs(record)
     return output
 end
 
+local function specialOrderState(record)
+    local output = {}
+    local npcId = record and record.id or nil
+    local fishing = PNC.FishingService
+    local fishingJob = fishing and fishing.GetJob
+        and fishing.GetJob(npcId) or nil
+    output.Fishing = fishingJob and fishingJob.active == true or false
+    local lumber = PNC.LumberService
+    local lumberJob = lumber and lumber.GetJob
+        and lumber.GetJob(npcId) or nil
+    output.Lumber = lumberJob and lumberJob.active == true or false
+    local lease = PNC.TaskLeaseService and PNC.TaskLeaseService.ForNPC
+        and PNC.TaskLeaseService.ForNPC(npcId) or nil
+    output.CorpseHaul = lease and lease.sourceDomain == "corpse_haul" or false
+    return output
+end
+
 local function summary(record, player)
     local needs = PNC.IndividualNeeds.Ensure(record)
     local nutrition = PNC.IndividualNeeds.GetNutrition
@@ -96,6 +113,7 @@ local function summary(record, player)
             and PNC.NPCSupplyService.GetDebugState(record) or {},
         journal=journal,
         allowedJobs=effectiveAllowedJobs(record),
+        specialOrders=specialOrderState(record),
         home=PNC.HomeDutyService and PNC.HomeDutyService.BuildState
             and PNC.HomeDutyService.BuildState(record) or nil,
         storageCourier=record.runtime and record.runtime.storageCourier

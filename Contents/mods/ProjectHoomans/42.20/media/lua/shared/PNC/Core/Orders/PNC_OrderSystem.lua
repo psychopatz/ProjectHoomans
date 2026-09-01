@@ -97,7 +97,25 @@ function OrderSystem.SetOrder(record, orderSpec)
     local zombie
     local previousOrder = record.orderSpec
     local previousKind = tostring(previousOrder and previousOrder.kind or "")
+    local requestedKind = tostring(orderSpec
+        and (orderSpec.kind or orderSpec.mode) or "")
+    local activeFacility = record.runtime
+        and record.runtime.facilityActivity or nil
     record.runtime = record.runtime or {}
+
+    -- A blocking facility scene owns the behavior tick until it is stopped.
+    -- Commands such as follow/home must revoke that lease before the new order
+    -- is normalized; otherwise the old relaxing scene consumes every tick and
+    -- the command appears to have been ignored.
+    if previousKind == "facility_activity"
+        and requestedKind ~= "facility_activity"
+        and activeFacility
+        and PNC.FacilityJobs
+        and PNC.FacilityJobs.AbortForOrderChange
+    then
+        PNC.FacilityJobs.AbortForOrderChange(record, nil, "order_changed")
+    end
+
     record.orderSpec = OrderSystem.Normalize(record, orderSpec)
     if record.orderSpec.kind == Const.ORDER_FOLLOW then
         record.ownerUsername = record.orderSpec.ownerUsername
