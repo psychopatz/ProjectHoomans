@@ -139,7 +139,8 @@ local function processOrder(order, at)
             end
             order.collectionTarget = target and copy(target) or nil
             setLiveOrder(worker, order, target or order.stationTarget,
-                target and "COLLECT_INPUTS" or "WORK_AT_STATION")
+                target and "COLLECT_INPUTS"
+                    or order.livePhase or "WORK_AT_STATION")
             order.status = target and Status.TRAVEL_TO_STOCKPILE
                 or Status.TRAVEL_TO_STATION
         end

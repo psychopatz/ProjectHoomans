@@ -50,6 +50,7 @@ function Service.Commands.Queue(spec)
         requiresHome = spec.requiresHome ~= false,
         autoReturnHome = spec.autoReturnHome ~= false,
         payload = copy(spec.payload or {}),
+        phase = spec.phase,
         status = Status.QUEUED, priority = tonumber(spec.priority) or 0,
         revision = 0, createdAt = now(), updatedAt = now(),
         lastProgressAt = now(),
@@ -63,9 +64,9 @@ end
 
 local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
     if not order then return end
-    if cleanupOperation == true
-        and order.operation == "PROVISION_PICKUP"
-        and not order.completionCommitted
+    if cleanupOperation == true and not order.completionCommitted
+        and (order.operation == "PROVISION_PICKUP"
+            or order.operation == "CORPSE_HAUL")
     then
         local cancellation = Service.CancellationHandlers
             and Service.CancellationHandlers[order.operation]
@@ -107,6 +108,7 @@ local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
     order.workerId, order.stationId, order.facilityId = nil, nil, nil
     order.facilityReservationId, order.previousOrder = nil, nil
     order.stationTarget, order.collectionTarget = nil, nil
+    order.targetKind, order.phase, order.livePhase = nil, nil, nil
     order.executionMode, order.lastAbstractAt = nil, nil
     return true
 end

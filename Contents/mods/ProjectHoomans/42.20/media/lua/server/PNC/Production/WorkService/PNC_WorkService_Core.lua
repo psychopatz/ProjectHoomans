@@ -25,6 +25,7 @@ Service.CompletionHandlers = Service.CompletionHandlers or {}
 Service.PreparationHandlers = Service.PreparationHandlers or {}
 Service.CollectionHandlers = Service.CollectionHandlers or {}
 Service.TargetProviders = Service.TargetProviders or {}
+Service.ExecutionHandlers = Service.ExecutionHandlers or {}
 Service.ReconcileHandlers = Service.ReconcileHandlers or {}
 Service.ClaimsByStation = Service.ClaimsByStation or {}
 Service.ClaimsByWorker = Service.ClaimsByWorker or {}
@@ -161,6 +162,12 @@ local function workerAvailable(record, order)
     then
         return false
     end
+    if Definitions.REQUIRES_LIVE and Definitions.REQUIRES_LIVE[order.operation]
+        and (not PNC.Registry or not PNC.Registry.GetLiveZombie
+            or not PNC.Registry.GetLiveZombie(record.id))
+    then
+        return false
+    end
     if not recipeKnowledgeMet(record, order) then return false end
     return requirementsMet(record, order.requiredSkills)
 end
@@ -236,6 +243,13 @@ function Service.RegisterTargetProvider(operation, handler)
     operation = tostring(operation or "")
     if operation == "" or type(handler) ~= "function" then return false end
     Service.TargetProviders[operation] = handler
+    return true
+end
+
+function Service.RegisterExecution(operation, handler)
+    operation = tostring(operation or "")
+    if operation == "" or type(handler) ~= "function" then return false end
+    Service.ExecutionHandlers[operation] = handler
     return true
 end
 

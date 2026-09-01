@@ -48,10 +48,16 @@ local function stopSpecialOrder(record, job, reason)
             reason or "order_cancelled") or true
     end
     if job == "CorpseHaul" then
-        if lease and lease.sourceDomain == "corpse_haul"
-            and tasking and tasking.CancelForNPC
-        then
+        if lease and lease.sourceDomain == "work"
+            and tasking and tasking.CancelForNPC then
             return tasking.CancelForNPC(npcId, reason or "order_cancelled")
+        end
+        if record.runtime and record.runtime.workOrderId
+            and PNC.WorkService and PNC.WorkService.Commands
+            and PNC.WorkService.Commands.Cancel
+        then
+            return PNC.WorkService.Commands.Cancel(
+                record.runtime.workOrderId, reason or "order_cancelled")
         end
         return true
     end

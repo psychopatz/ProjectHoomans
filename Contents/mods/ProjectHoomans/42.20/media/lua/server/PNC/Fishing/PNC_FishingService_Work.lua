@@ -109,7 +109,9 @@ function Service.GetSnapshot(zoneId)
     return {
         id = zone.id, revision = zone.revision, enabled = zone.enabled,
         valid = zone.valid, bounds = H.Copy(zone.bounds),
+        geometry = H.Copy(zone.geometry),
         waterCount = zone.waterCount, landCount = zone.landCount,
+        spotCount = #(zone.fishingSpots or {}),
         fishingSpots = H.Copy(zone.fishingSpots),
         unloadedTiles = zone.unloadedTiles or 0, workers = workers,
     }

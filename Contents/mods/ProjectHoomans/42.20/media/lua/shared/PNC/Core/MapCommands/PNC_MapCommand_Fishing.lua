@@ -1,6 +1,6 @@
--- Server map-command adapter for a bounded fishing zone. The current map
--- command surface supplies a point, so the first slice expands that point to
--- a validated square; the zone service still owns shoreline derivation.
+-- Server command adapter for a selected in-world fishing region. The generic
+-- command transport is retained, but fishing selection is owned by the
+-- Psychopatz grid-region selector rather than the world map.
 
 PNC = PNC or {}
 
@@ -38,14 +38,14 @@ if Service and Service.RegisterHandler then
     Service.RegisterHandler("fishing_zone", {
         authorize = authorize,
         execute = function(player, npcIds, target, options)
-            local radius = math.max(1, math.min(tonumber(options and options.radius)
-                or tonumber(Const.FISHING_ZONE_RADIUS) or 12, 32))
-            local centerX = math.floor(tonumber(target.x) or 0)
-            local centerY = math.floor(tonumber(target.y) or 0)
+            options = type(options) == "table" and options or {}
+            local region = options.region
+            local centerX = math.floor(tonumber(target and target.x) or 0)
+            local centerY = math.floor(tonumber(target and target.y) or 0)
             local zone, reason = PNC.FishingService.CreateZone({
-                minX = centerX - radius, minY = centerY - radius,
-                maxX = centerX + radius, maxY = centerY + radius,
-                z = math.floor(tonumber(target.z) or 0), npcIds = npcIds,
+                region = region,
+                minX = centerX, minY = centerY, maxX = centerX, maxY = centerY,
+                z = math.floor(tonumber(target and target.z) or 0), npcIds = npcIds,
                 ownerType = "player", ownerId = playerKey(player),
             })
             if not zone then

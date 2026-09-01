@@ -182,6 +182,8 @@ function Service.BuildSnapshot(baseOrId)
     local output = PNC.Core.DeepCopy(base)
     output.maxHQLevel = #(Definitions.HQ_LEVELS or {})
     output.territory = Service.GetTerritorySummary(base)
+    output.corpseHaul = base.corpseHaul and PNC.Core.DeepCopy(base.corpseHaul)
+        or nil
     local zone = Zones.get(base.baseZoneId)
     output.geometry = zone and {
         tileCount = zone.cachedTileCount, bounds = zone.cachedBounds,

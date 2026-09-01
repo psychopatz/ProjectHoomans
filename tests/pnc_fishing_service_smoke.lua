@@ -59,6 +59,16 @@ function GridRegion.bounds(region)
     return { minX = minX, maxX = maxX, minY = minY, maxY = maxY,
         minZ = 0, maxZ = 0 }
 end
+function GridRegion.countTiles(region)
+    local count = 0
+    for _, spans in pairs(region.levels[0].rows) do
+        for index = 1, #spans, 2 do
+            count = count + spans[index + 1] - spans[index] + 1
+        end
+    end
+    return count
+end
+function GridRegion.isConnected() return true end
 package.preload["PsychopatzCore/World/PC_GridRegion"] = function() return GridRegion end
 package.preload["PsychopatzCore/World/PC_ZoneRegistry"] = function()
     return { register = function() return true end }
@@ -120,6 +130,18 @@ T.truthy(zone, reason or "fishing zone creation")
 T.equal(zone.valid, true, "water and land validate")
 T.truthy(#zone.fishingSpots > 0, "shoreline spot derived")
 T.equal(zone.fishingSpots[1].waterX, 2.5, "spot faces water")
+
+local selectedRegion = {
+    levels = { [0] = { rows = {
+        [0] = { 0, 1 }, [1] = { 0, 2 }, [2] = { 0, 2 },
+    } } },
+}
+local shapedZone, shapedReason = Service.CreateZone({
+    id = "fishing:shaped", region = selectedRegion,
+})
+T.truthy(shapedZone, shapedReason or "selected fishing region creation")
+T.equal(shapedZone.geometry, selectedRegion,
+    "selected fishing region was not preserved")
 
 local lease = { npcId = "npc", leaseId = "lease:fishing", executionMode = "ABSTRACT" }
 T.truthy(Service.StartJob(lease), "abstract fishing start")

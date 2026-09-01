@@ -142,6 +142,13 @@ function Commands.HandleResult(result)
         reason = "result_invalid",
     }
     Commands.LastResultAt = Core.Now()
+    if result and result.commandID == "fishing_zone"
+        and result.ok == true and result.details
+        and PNC.FishingZoneOverlay
+        and PNC.FishingZoneOverlay.SetZone
+    then
+        PNC.FishingZoneOverlay.SetZone(result.details)
+    end
     if result and result.target then
         Commands.LastTarget = {
             x = tonumber(result.target.x),

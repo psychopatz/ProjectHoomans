@@ -21,7 +21,6 @@ Const.ORDER_HOSTILE_HUNT = "hostile_hunt"
 Const.ORDER_TRAVEL = "travel"
 Const.ORDER_SCAVENGE = "scavenge"
 Const.ORDER_LUMBER = "lumber"
-Const.ORDER_CORPSE_HAUL = "corpse_haul"
 Const.ORDER_FISHING = "fishing"
 
 Const.FISHING_DEFAULT_RADIUS = 16

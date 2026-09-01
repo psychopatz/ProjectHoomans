@@ -184,6 +184,33 @@ local function normalizeRectangle(args)
     }
 end
 
+local function normalizeRegion(args)
+    if type(args.region) ~= "table" or not GridRegion
+        or type(GridRegion.validate) ~= "function"
+    then
+        return nil, "region_unavailable"
+    end
+    local valid, reason, normalized = GridRegion.validate(args.region)
+    if not valid then return nil, reason or "zone_empty" end
+    if GridRegion.isConnected and not GridRegion.isConnected(normalized, 4) then
+        return nil, "zone_disconnected"
+    end
+    local bounds = GridRegion.bounds(normalized)
+    if not bounds then return nil, "zone_bounds_missing" end
+    if bounds.minZ ~= bounds.maxZ then
+        return nil, "zone_multiple_levels"
+    end
+    if GridRegion.countTiles(normalized) > Service.MAX_ZONE_TILES then
+        return nil, "zone_too_large"
+    end
+    return {
+        minX = bounds.minX, minY = bounds.minY,
+        maxX = bounds.maxX, maxY = bounds.maxY,
+        minZ = bounds.minZ, maxZ = bounds.maxZ,
+        geometry = normalized,
+    }
+end
+
 local function ensureZoneRuntime(zone)
     zone.workers = type(zone.workers) == "table" and zone.workers or {}
     zone.treeKeys = type(zone.treeKeys) == "table" and zone.treeKeys or {}
@@ -329,7 +356,11 @@ function Service.CreateZone(args)
     if not Service.Loaded then Service.Load(true) end
     local rectangle
     local reason
-    rectangle, reason = normalizeRectangle(args)
+    if args.region ~= nil then
+        rectangle, reason = normalizeRegion(args)
+    else
+        rectangle, reason = normalizeRectangle(args)
+    end
     if not rectangle then return nil, reason end
     local id = tostring(args.id or makeID("lumber_zone"))
     if id == "" or Service.Data.zones[id] then
@@ -461,6 +492,34 @@ function Service.DisableZone(zoneId, reason)
     end
     markDirty()
     return true, "disabled"
+end
+
+function Service.DeleteZone(zoneId, reason)
+    local zone = Service.GetZone(zoneId)
+    local data = ensureData()
+    local id = tostring(zoneId or "")
+    if not zone then return false, "zone_not_found" end
+    local workerIds = {}
+    for npcId, _ in pairs(zone.workers or {}) do
+        workerIds[#workerIds + 1] = npcId
+    end
+    for _, npcId in ipairs(workerIds) do
+        if Service.UnassignWorker then
+            Service.UnassignWorker(id, npcId, reason or "zone_deleted")
+        else
+            zone.workers[npcId] = nil
+        end
+    end
+    unregisterCoreZone(id)
+    data.zones[id] = nil
+    for index = #data.zoneOrder, 1, -1 do
+        if tostring(data.zoneOrder[index]) == id then
+            table.remove(data.zoneOrder, index)
+        end
+    end
+    markDirty()
+    Service.Save()
+    return true, "deleted"
 end
 
 local function getCell()
@@ -1434,7 +1493,8 @@ function Service.GetSnapshot(zoneId)
     end
     return {
         id = zone.id, revision = zone.revision, enabled = zone.enabled,
-        bounds = copy(zone.bounds), scan = copy(zone.scan),
+        bounds = copy(zone.bounds), geometry = copy(zone.geometry),
+        scan = copy(zone.scan),
         discovered = #(zone.treeKeys or {}), available = available,
         inProgress = inProgress, depleted = depleted, workers = workers,
     }

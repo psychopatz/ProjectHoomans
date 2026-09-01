@@ -8,6 +8,35 @@ local H = Service.Internal
 local GridRegion = H.GridRegion
 local Zones = H.Zones
 
+local function normalizeRegion(args)
+    if type(args.region) ~= "table" or not GridRegion
+        or type(GridRegion.validate) ~= "function"
+    then
+        return nil, "fishing_region_unavailable"
+    end
+    local valid, reason, normalized = GridRegion.validate(args.region)
+    if not valid then return nil, reason or "fishing_zone_empty" end
+    if type(GridRegion.isConnected) == "function"
+        and not GridRegion.isConnected(normalized, 4)
+    then
+        return nil, "fishing_zone_disconnected"
+    end
+    local bounds = GridRegion.bounds(normalized)
+    if not bounds then return nil, "fishing_zone_bounds_missing" end
+    if bounds.minZ ~= bounds.maxZ then
+        return nil, "fishing_zone_multiple_levels"
+    end
+    if GridRegion.countTiles(normalized) > Service.MAX_ZONE_TILES then
+        return nil, "fishing_zone_too_large"
+    end
+    return {
+        geometry = normalized,
+        minX = bounds.minX, minY = bounds.minY,
+        maxX = bounds.maxX, maxY = bounds.maxY,
+        minZ = bounds.minZ, maxZ = bounds.maxZ,
+    }
+end
+
 local function buildRectangle(minX, minY, maxX, maxY, z)
     local rows = {}
     for y = minY, maxY do rows[y] = { minX, maxX } end
@@ -60,7 +89,12 @@ end
 function Service.CreateZone(args)
     args = type(args) == "table" and args or {}
     if not Service.Loaded then Service.Load(true) end
-    local rectangle, reason = normalizeRectangle(args)
+    local rectangle, reason
+    if args.region ~= nil then
+        rectangle, reason = normalizeRegion(args)
+    else
+        rectangle, reason = normalizeRectangle(args)
+    end
     if not rectangle then return nil, reason end
     local id = tostring(args.id or H.MakeID("fishing_zone"))
     local data = H.EnsureData()
@@ -99,6 +133,36 @@ function Service.CreateZone(args)
     H.MarkDirty()
     Service.Save()
     return zone
+end
+
+function Service.DeleteZone(zoneId, reason)
+    local zone = Service.GetZone(zoneId)
+    local data = H.EnsureData()
+    local id = tostring(zoneId or "")
+    if not zone then return false, "fishing_zone_not_found" end
+    local workerIds = {}
+    for npcId, _ in pairs(zone.workers or {}) do
+        workerIds[#workerIds + 1] = npcId
+    end
+    for _, npcId in ipairs(workerIds) do
+        if Service.CancelJob then
+            Service.CancelJob(npcId, reason or "fishing_zone_deleted")
+        else
+            zone.workers[npcId] = nil
+        end
+    end
+    if Zones and type(Zones.remove) == "function" then
+        pcall(Zones.remove, id)
+    end
+    data.zones[id] = nil
+    for index = #data.zoneOrder, 1, -1 do
+        if tostring(data.zoneOrder[index]) == id then
+            table.remove(data.zoneOrder, index)
+        end
+    end
+    H.MarkDirty()
+    Service.Save()
+    return true, "fishing_zone_deleted"
 end
 
 local function distanceSq(record, x, y)

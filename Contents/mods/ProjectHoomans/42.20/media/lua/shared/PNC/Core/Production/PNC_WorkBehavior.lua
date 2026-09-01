@@ -16,6 +16,16 @@ local function normalize(_, spec)
     return { kind = KIND, workOrderId = tostring(spec.workOrderId or ""),
         operation = tostring(spec.operation or ""),
         phase = tostring(spec.phase or "WORK_AT_STATION"),
+        haulToken = tostring(spec.haulToken or ""),
+        sourceX = tonumber(spec.sourceX) or 0,
+        sourceY = tonumber(spec.sourceY) or 0,
+        sourceZ = tonumber(spec.sourceZ) or 0,
+        interactionX = tonumber(spec.interactionX) or 0,
+        interactionY = tonumber(spec.interactionY) or 0,
+        interactionZ = tonumber(spec.interactionZ) or 0,
+        dropX = tonumber(spec.dropX) or 0,
+        dropY = tonumber(spec.dropY) or 0,
+        dropZ = tonumber(spec.dropZ) or 0,
         facilityId = tostring(spec.facilityId or ""),
         stationId = tostring(spec.stationId or ""),
         stockpileNodeId = tostring(spec.stockpileNodeId or ""),
@@ -26,6 +36,12 @@ end
 local function tick(record, zombie)
     local order = record.orderSpec or {}
     if order.kind ~= KIND or not PNC.WorkService then return false end
+    if order.operation == "CORPSE_HAUL"
+        and PNC.BehaviorCorpseHaul
+        and PNC.BehaviorCorpseHaul.TickWork
+    then
+        return PNC.BehaviorCorpseHaul.TickWork(record, zombie, order) == true
+    end
     record.activeJob = PNC.WorkDefinitions.JOB_BY_OPERATION[order.operation]
         or JOB
     record.activeBehavior = "Work:" .. tostring(order.operation)

@@ -650,12 +650,26 @@ local function finish(record, zombie, reason, restoreOrder)
 end
 
 local function stopAnimationScene(record, zombie, reason)
+    local runtime = record.runtime
+    local internal
     if record.runtime.animationScene and PNC.AnimationScenes then
         -- Scene callbacks are extension points. Keep the activity cleanup
         -- alive if one of them fails, but do not add protected calls around
         -- ordinary facility logic.
         pcall(PNC.AnimationScenes.Stop, record, zombie,
             reason or "player_stop")
+        if runtime.animationScene then
+            -- A failed scene stop can leave the blocking scene pointer behind
+            -- even though the command has already moved on. Use the scene
+            -- lifecycle's normal clear path when available, then guarantee
+            -- that the stale pointer cannot consume the next behavior tick.
+            internal = PNC.AnimationScenes.Internal
+            if internal and internal.ClearScene then
+                internal.ClearScene(record, zombie,
+                    reason or "player_stop", true)
+            end
+            runtime.animationScene = nil
+        end
     end
 end
 

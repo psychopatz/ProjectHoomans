@@ -91,7 +91,7 @@ Events = { OnTick = { Add = function(callback) addedTick = callback end } }
 local Actions = T.load("ProjectHoomans", "client",
     "PNC/Actions/PNC_CorpseHaulActions.lua")
 local grabArgs = {
-    taskId = "corpse_haul:one", npcId = "npc:worker", haulToken = "corpse:one",
+    taskId = "work:1", npcId = "npc:worker", haulToken = "corpse:one",
 }
 T.truthy(Actions.QueueGrab(body, corpse, grabArgs),
     "MP grab queues the vanilla action")

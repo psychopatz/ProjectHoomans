@@ -11,6 +11,35 @@ local Definitions = PNC.NeedsDefinitions
 local owned = Internal.owned
 local summary = Internal.summary
 
+local function playerKey(player)
+    if player and type(player.getUsername) == "function" then
+        local username = tostring(player:getUsername() or "")
+        if username ~= "" then return username end
+    end
+    if player and type(player.getOnlineID) == "function" then
+        return tostring(player:getOnlineID() or "")
+    end
+    return "local"
+end
+
+local function ownedZoneSnapshot(service, player)
+    local data = service and service.Data or nil
+    local zones = data and data.zones or nil
+    local ownerID = playerKey(player)
+    local selected
+    if type(zones) ~= "table" or type(service.GetSnapshot) ~= "function" then
+        return nil
+    end
+    for _, zone in pairs(zones) do
+        if tostring(zone.ownerId or "") == ownerID
+            and tostring(zone.ownerType or "player") == "player"
+            and zone.enabled ~= false
+            and (not selected or tostring(zone.id) < tostring(selected.id))
+        then selected = zone end
+    end
+    return selected and service.GetSnapshot(selected.id) or nil
+end
+
 local function enrichSettlement(settlement, base, tasks)
     if not settlement then return end
     settlement.facilities = {}
@@ -142,6 +171,10 @@ function Management.BuildSnapshot(player, options)
         provisionStorage=provisionStorage,
         provisionSettings=provisionSettings,
         settlement=settlement, utilities=utilities,
+        zoneState={
+            lumber=ownedZoneSnapshot(PNC.LumberService, player),
+            fishing=ownedZoneSnapshot(PNC.FishingService, player),
+        },
         generatedAt=PNC.NeedsUtils.WorldAgeHours() }
 end
 

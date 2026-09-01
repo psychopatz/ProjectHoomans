@@ -10,6 +10,7 @@ local UI = PsychopatzCore.UI
 local TOOLBAR = {
     { "claim", "UI_PNC_Base_ClaimAction", "CLAIM TERRITORY", "success" },
     { "overlay", "UI_PNC_Base_ShowLayout", "SHOW BASE LAYOUT", "selected" },
+    { "fishing_zone", "UI_PNC_Fishing_ZoneAction", "CREATE FISHING ZONE", "primary" },
     { "build_facility", "UI_PNC_Facility_BuildAction", "BUILD A BUILDING", "success" },
     { "expand", "UI_PNC_Base_ExpandAction", "EXPAND", "primary" },
     { "shrink", "UI_PNC_Base_ShrinkAction", "SHRINK", "warning" },
@@ -164,6 +165,9 @@ function Tab.Apply(window, active)
                 end
             end
             button:setEnable(current < maximum and learned)
+        end
+        if active and established and button.internal == "fishing_zone" then
+            button:setEnable(window.selectedPersonID ~= nil)
         end
     end
     Browser.Apply(window, active and established)

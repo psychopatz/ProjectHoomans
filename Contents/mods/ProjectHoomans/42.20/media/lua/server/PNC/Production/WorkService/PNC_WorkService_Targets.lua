@@ -17,12 +17,18 @@ local copy = Internal.copy
 
 local function setLiveOrder(worker, order, target, phase)
     if not target then return false end
+    local payload = order.payload or {}
     PNC.OrderSystem.SetOrder(worker, {
         kind = "production_work", workOrderId = order.id,
-        operation = order.operation, phase = phase,
+        operation = order.operation, phase = phase or order.livePhase,
         x = target.x, y = target.y, z = target.z,
         facilityId = order.facilityId, stationId = order.stationId,
         stockpileNodeId = target.nodeId,
+        haulToken = payload.haulToken,
+        sourceX = payload.sourceX, sourceY = payload.sourceY,
+        sourceZ = payload.sourceZ, interactionX = payload.interactionX,
+        interactionY = payload.interactionY, interactionZ = payload.interactionZ,
+        dropX = payload.dropX, dropY = payload.dropY, dropZ = payload.dropZ,
     })
     return true
 end
@@ -65,7 +71,9 @@ local function claimStation(order, worker)
     if not acquired or not acquired.ok then
         return false, acquired and acquired.reason or "NO_AVAILABLE_WORKSTATION"
     end
-    local stationId = tostring(acquired.componentId or "")
+    -- Work targets can be facility components or world objects. Store every
+    -- provider's durable collision key in the common stationId field.
+    local stationId = tostring(acquired.componentId or acquired.claimKey or "")
     if stationId == "" or Service.ClaimsByStation[stationId] then
         if acquired.reservationId and PNC.FacilityReservations then
             PNC.FacilityReservations.Release(acquired.reservationId,
@@ -89,6 +97,9 @@ local function claimStation(order, worker)
     order.facilityId = acquired.facilityId
     order.facilityReservationId = acquired.reservationId
     order.stationTarget = copy(acquired.target)
+    order.targetKind = acquired.targetKind
+    order.phase = acquired.phase or order.phase
+    order.livePhase = acquired.phase or order.livePhase
     order.executionMode = live and "LIVE" or "ABSTRACT"
     order.collectionTarget = collectTarget and copy(collectTarget) or nil
     order.status = collectTarget and Status.TRAVEL_TO_STOCKPILE

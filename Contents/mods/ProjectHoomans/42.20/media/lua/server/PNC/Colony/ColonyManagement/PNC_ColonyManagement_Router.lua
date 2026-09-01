@@ -24,6 +24,7 @@ function Management.HandleAction(player, args)
     end
     local outcome = Internal.handleSettlementAction(player, args, action)
         or Internal.handleStorageColonistAction(player, args, action)
+        or Internal.handleTaskingAction(player, args, action)
         or Internal.handleProductionAction(player, args, action)
         or Internal.handleWorkDebugAction(player, args, action)
         or { ok = false, reason = "unknown_colony_action" }

@@ -110,6 +110,8 @@ function Provider.Tick(lease)
         return false
     end
     local phase = order.completionStarted == true and "ATOMIC_COMMIT"
+        or order.phase == "DROP_PENDING" and "ATOMIC_COMMIT"
+        or order.phase == "GRAB_PENDING" and "WAITING"
         or order.status == Status.TRAVEL_TO_STOCKPILE
             and "TRAVEL"
         or order.status == Status.TRAVEL_TO_STATION and "TRAVEL"
@@ -120,6 +122,27 @@ function Provider.Tick(lease)
     if tonumber(order.lastProgressAt) ~= tonumber(lease.lastProgressAt) then
         lease.lastProgressAt = order.lastProgressAt
     end
+    local handler = Work.ExecutionHandlers
+        and Work.ExecutionHandlers[order.operation]
+    if handler then
+        local ok, reason = handler(order, lease)
+        if ok == false then
+            if PNC.Tasking.Commands.CancelLease then
+                PNC.Tasking.Commands.CancelLease(lease.leaseId,
+                    reason or "work_operation_failed")
+                return true
+            end
+            return false, reason or "WORK_OPERATION_FAILED"
+        end
+        local updated = Work.Queries.Get(lease.sourceRef)
+        if updated and (updated.status == Status.CANCELLED
+            or updated.status == Status.COMPLETED
+            or updated.status == Status.FAILED)
+        then
+            return PNC.Tasking.Commands.Complete(lease.leaseId,
+                updated.status)
+        end
+    end
     return true
 end
 
@@ -127,4 +150,5 @@ if PNC.Tasking and PNC.Tasking.Commands then
     PNC.Tasking.Commands.RegisterProvider("work", Provider)
 end
 
+PNC.WorkTaskProvider = Provider
 return Provider

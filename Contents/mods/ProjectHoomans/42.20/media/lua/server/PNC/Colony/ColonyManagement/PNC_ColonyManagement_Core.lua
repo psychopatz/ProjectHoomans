@@ -54,9 +54,13 @@ local function specialOrderState(record)
     local lumberJob = lumber and lumber.GetJob
         and lumber.GetJob(npcId) or nil
     output.Lumber = lumberJob and lumberJob.active == true or false
-    local lease = PNC.TaskLeaseService and PNC.TaskLeaseService.ForNPC
-        and PNC.TaskLeaseService.ForNPC(npcId) or nil
-    output.CorpseHaul = lease and lease.sourceDomain == "corpse_haul" or false
+    local workOrder = record and record.runtime
+        and record.runtime.workOrderId and PNC.WorkRepository
+        and PNC.WorkRepository.Get(record.runtime.workOrderId) or nil
+    output.CorpseHaul = workOrder and workOrder.operation == "CORPSE_HAUL"
+            and workOrder.status ~= "CANCELLED"
+            and workOrder.status ~= "COMPLETED"
+            and workOrder.status ~= "FAILED" or false
     return output
 end
 
