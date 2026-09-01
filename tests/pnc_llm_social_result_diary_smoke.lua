@@ -8,6 +8,7 @@ PNC = {
     Const = {
         CMD_CONVERSATION_RELATIONSHIP = "ConversationRelationship",
         CMD_LLM_SOCIAL_REACTION_RESULT = "LLMSocialReactionResult",
+        CMD_PLAYER_EMOTE_INTERACTION_RESULT = "PlayerEmoteInteractionResult",
         CMD_MAP_COMMAND_RESULT = "MapCommandResult",
         CMD_FACTION_TOLL = "FactionToll",
         CMD_CONVERSATION_CEASEFIRE_RESULT = "CeasefireResult",

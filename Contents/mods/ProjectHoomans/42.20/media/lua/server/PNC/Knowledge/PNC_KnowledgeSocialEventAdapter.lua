@@ -13,6 +13,10 @@ local PlayerCharacters = PNC.PlayerCharacters
 local Knowledge = PNC.NPCKnowledge
 
 local MAP = {
+    player_emote_insult = {
+        { "personality.aggression", 1, .45 },
+        { "personality.compassion", -1, .45 },
+    },
     treated_wound = { { "personality.compassion", 1, .45 } },
     saved_from_incapacitation = {
         { "personality.compassion", 1, .65 }, { "personality.bravery", 1, .55 }, { "personality.loyalty", 1, .55 },

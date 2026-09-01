@@ -110,6 +110,28 @@ Commands.Register({
 })
 
 Commands.Register({
+    id = "camp",
+    group = "movement",
+    labelKey = "UI_PNC_CommandCamp",
+    label = "Camp Here",
+    llmDescription = "Order this companion to stop following and make a temporary camp at their current location. Use for requests such as 'let's just stay here for now', 'make camp', or 'rest here'. Unlike Wait Here, camp allows the companion to satisfy needs such as sleep, food, and water without requiring a home.",
+    emote = "freeze",
+    icon = "media/ui/Emotes/PNC_EmoteStay.png",
+    buildOrder = function(record)
+        local x, y, z = currentPosition(record)
+        return {
+            kind = Const.ORDER_CAMP or "camp",
+            x = x,
+            y = y,
+            z = z,
+            radius = tonumber(Const.CAMP_RADIUS) or 3,
+            campId = "camp:" .. tostring(record.id),
+            resourceRadius = tonumber(Const.CAMP_RESOURCE_RADIUS) or 12,
+        }
+    end,
+})
+
+Commands.Register({
     id = "return_home",
     group = "movement",
     labelKey = "UI_PNC_CommandReturnHome",

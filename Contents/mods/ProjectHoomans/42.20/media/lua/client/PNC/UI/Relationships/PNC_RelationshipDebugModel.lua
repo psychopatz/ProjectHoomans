@@ -207,6 +207,24 @@ local function personalityBand(value)
     return "Very High"
 end
 
+local function conversationDeltaFor(snapshot, conversationDelta, deltas)
+    local observer = snapshot and snapshot.observer or {}
+    local observerID = tostring(
+        observer.npcID or observer.id or observer.key or ""
+    )
+    if type(deltas) == "table" and observerID ~= ""
+        and type(deltas[observerID]) == "table"
+    then
+        return deltas[observerID]
+    end
+    if type(conversationDelta) == "table"
+        and tostring(conversationDelta.npcID or "") == observerID
+    then
+        return conversationDelta
+    end
+    return nil
+end
+
 function Model.BuildTargets(roster, observerNPCID)
     local targets = {
         {
@@ -243,12 +261,12 @@ end
 function Model.BuildGraph(snapshot, actionID, context)
     context = type(context) == "table" and context or {}
     local relationship = snapshot and snapshot.relationship or {}
-    local delta = context.conversationDelta
-    local observer = snapshot and snapshot.observer or {}
+    local delta = conversationDeltaFor(
+        snapshot,
+        context.conversationDelta,
+        context.conversationDeltas
+    )
     if type(delta) == "table" and delta.after
-        and tostring(delta.npcID or "") == tostring(
-            observer.npcID or observer.id or ""
-        )
     then
         relationship = delta.after
     end
@@ -322,7 +340,8 @@ function Model.BuildRows(
     authorized,
     reason,
     graphEvaluation,
-    conversationDelta
+    conversationDelta,
+    conversationDeltas
 )
     local rows = {}
     local observer
@@ -346,11 +365,12 @@ function Model.BuildRows(
     observer = snapshot.observer or {}
     target = snapshot.target or {}
     relationship = snapshot.relationship or {}
-    if type(conversationDelta) == "table"
-        and conversationDelta.after
-        and tostring(conversationDelta.npcID or "") == tostring(
-            observer.npcID or observer.id or observer.key or ""
-        )
+    conversationDelta = conversationDeltaFor(
+        snapshot,
+        conversationDelta,
+        conversationDeltas
+    )
+    if type(conversationDelta) == "table" and conversationDelta.after
     then
         relationship = conversationDelta.after
     end

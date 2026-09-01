@@ -11,6 +11,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
     defaults = {
         enabled = true,
         showAIDebug = false,
+        showCampDebug = false,
         showPathDebug = false,
         showCombatDebug = false,
         showFactionDebug = false,
@@ -34,6 +35,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
 Nameplates.Settings = PNC.SettingsStore.values
 if Nameplates.Settings.enabled == nil then Nameplates.Settings.enabled = true end
 if Nameplates.Settings.showAIDebug == nil then Nameplates.Settings.showAIDebug = false end
+if Nameplates.Settings.showCampDebug == nil then Nameplates.Settings.showCampDebug = false end
 if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDebug = false end
 if Nameplates.Settings.showCombatDebug == nil then Nameplates.Settings.showCombatDebug = false end
 if Nameplates.Settings.showFactionDebug == nil then
@@ -90,6 +92,7 @@ local Renderer = PNC.NameplateRenderer
 
 local overlayDefinitions = {
     { id = "ai", setting = "showAIDebug", label = "AI" },
+    { id = "camp", setting = "showCampDebug", label = "Camp" },
     { id = "path", setting = "showPathDebug", label = "Paths" },
     { id = "combat", setting = "showCombatDebug", label = "Combat" },
     {
@@ -185,6 +188,26 @@ end
 
 function Nameplates.IsDebugEnabled()
     return Settings.showAIDebug == true
+end
+
+function Nameplates.IsCampDebugEnabled()
+    return Settings.showCampDebug == true
+end
+
+function Nameplates.ToggleCampDebug()
+    local player = getSpecificPlayer(0)
+    Settings.showCampDebug = not Settings.showCampDebug
+    PNC.SettingsStore:Set("showCampDebug", Settings.showCampDebug, true)
+    if player and HaloTextHelper and HaloTextHelper.addText then
+        local messageKey = Settings.showCampDebug
+            and "UI_PNC_CampOverlayEnabled"
+            or "UI_PNC_CampOverlayDisabled"
+        HaloTextHelper.addText(
+            player,
+            getText(messageKey)
+        )
+    end
+    return Settings.showCampDebug
 end
 
 function Nameplates.ToggleDebug()
@@ -361,6 +384,7 @@ end
 function Nameplates.ToggleOverlay(id)
     id = tostring(id or "")
     if id == "ai" then return Nameplates.ToggleDebug() end
+    if id == "camp" then return Nameplates.ToggleCampDebug() end
     if id == "path" then return Nameplates.TogglePathDebug() end
     if id == "combat" then return Nameplates.ToggleCombatDebug() end
     if id == "animation" then

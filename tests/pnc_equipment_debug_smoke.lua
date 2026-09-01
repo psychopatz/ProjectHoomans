@@ -58,6 +58,11 @@ T.contains(
     "monitor equipment button"
 )
 T.contains(
+    view,
+    '"overlay_camp"',
+    "monitor camp overlay button"
+)
+T.contains(
     diagnostics,
     "equipment = Core.DeepCopy(record.equipment or {})",
     "equipment diagnostics snapshot"

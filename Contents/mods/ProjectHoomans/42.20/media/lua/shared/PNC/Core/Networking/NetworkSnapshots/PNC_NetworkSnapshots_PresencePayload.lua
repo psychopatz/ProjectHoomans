@@ -19,6 +19,8 @@ local buildActionInformation = Parts.BuildActionInformation
 local buildVisualState = Parts.BuildVisualState
 local buildPathDebugState = Parts.BuildPathDebugState
 local buildCombatDebugState = Parts.BuildCombatDebugState
+local buildCampResourceDebugState = Parts.BuildCampResourceDebugState
+local buildSeatingDebugState = Parts.BuildSeatingDebugState
 local buildIdentityOwnershipSummary =
     Parts.BuildIdentityOwnershipSummary
 
@@ -126,6 +128,8 @@ function Network.BuildPresenceDelta(record)
         visualState = buildVisualState(record),
         pathDebugState = pathDebugState,
         combatDebugState = combatDebugState,
+        campResourceDebug = buildCampResourceDebugState(record),
+        seatingDebug = buildSeatingDebugState(record),
         travel = buildTravelSummary(record, false),
     }
 end

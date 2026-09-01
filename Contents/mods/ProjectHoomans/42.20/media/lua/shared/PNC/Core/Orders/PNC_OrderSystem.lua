@@ -95,6 +95,8 @@ end
 
 function OrderSystem.SetOrder(record, orderSpec)
     local zombie
+    local previousOrder = record.orderSpec
+    local previousKind = tostring(previousOrder and previousOrder.kind or "")
     record.runtime = record.runtime or {}
     record.orderSpec = OrderSystem.Normalize(record, orderSpec)
     if record.orderSpec.kind == Const.ORDER_FOLLOW then
@@ -131,6 +133,26 @@ function OrderSystem.SetOrder(record, orderSpec)
     end
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "order")
+    end
+    if PNC.CampResourceService and PNC.CampResourceService.OnOrderChanged then
+        PNC.CampResourceService.OnOrderChanged(
+            record, previousOrder, record.orderSpec)
+    end
+    -- Camp is a durable order boundary. Need severity can already be high
+    -- when a follower enters camp, so no severity_changed event is guaranteed
+    -- to arrive after the order change. Wake tasking after the snapshot has
+    -- been captured; facility_activity transitions are intentionally excluded
+    -- so starting a need task cannot immediately re-enter task evaluation.
+    if tostring(record.orderSpec.kind or "")
+        == tostring(Const.ORDER_CAMP or "camp")
+        and previousKind ~= tostring(Const.ORDER_CAMP or "camp")
+        and PNC.Tasking and PNC.Tasking.Events
+        and PNC.Tasking.Events.Emit
+    then
+        PNC.Tasking.Events.Emit("NPC_NEEDS_CHANGED", {
+            npcId = record.id, source = "OrderSystem",
+            entityId = record.id, cause = "CAMP_ENTERED",
+        })
     end
     wakeRecord(record)
 end

@@ -25,12 +25,20 @@ end
 
 local function relationshipCopy(value)
     value = type(value) == "table" and value or {}
-    return {
+    local output = {
         approval = tonumber(value.approval) or 0,
         respect = tonumber(value.respect) or 0,
         familiarity = tonumber(value.familiarity) or 0,
         state = value.state,
     }
+    if PNC.RelationshipTypes
+        and PNC.RelationshipTypes.NormalizeInteractionJournal
+    then
+        output.interactionRevision = tonumber(value.interactionRevision) or 0
+        output.interactionJournal = PNC.RelationshipTypes
+            .NormalizeInteractionJournal(value.interactionJournal)
+    end
+    return output
 end
 
 local function relationshipDelta(before, after)

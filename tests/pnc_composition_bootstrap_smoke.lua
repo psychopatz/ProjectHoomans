@@ -98,7 +98,9 @@ local facilityJobsIndex = indexOf(serverCalls,
 T.equal(serverCalls[facilityJobsIndex + 1],
     "PNC/World/PNC_NearbyResourceLocator",
     "nearby resource services load before Tasking")
-T.equal(serverCalls[facilityJobsIndex + 3], "PNC/Tasking/PNC_Tasking",
+T.equal(serverCalls[facilityJobsIndex + 3], "PNC/World/PNC_CampResourceService",
+    "camp resources load after nearby resource services")
+T.equal(serverCalls[facilityJobsIndex + 4], "PNC/Tasking/PNC_Tasking",
     "Tasking loads after nearby resource services")
 T.equal(serverCalls[settlementIndex + 1], "PNC/Journals/PNC_JournalRoutes",
     "server Settlement initialization successor")

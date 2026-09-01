@@ -36,8 +36,13 @@ local function dispatchIdentity(player, command, args, localHandler)
     if not PNC.PlayerKnowledgeCommands
         or not PNC.PlayerKnowledgeCommands[localHandler]
     then return false, "identity_command_handler_unavailable" end
-    PNC.PlayerKnowledgeCommands[localHandler](player, args)
-    return true, "dispatched"
+    local result = PNC.PlayerKnowledgeCommands[localHandler](player, args)
+    if type(result) == "table"
+        and (result.success == false or result.state == "error")
+    then
+        return false, result.reason or "identity_request_failed", result
+    end
+    return true, "dispatched", result
 end
 
 function Client.RequestPlayerBootstrap()
@@ -280,20 +285,24 @@ function Client.RequestKnownNPCKnowledge()
     return Client.RequestPlayerBootstrap()
 end
 
-function Client.RequestNPCKnowledgeTopic(npcID, topicID)
+function Client.RequestNPCKnowledgeTopic(npcID, topicID, options)
     npcID = tostring(npcID or "")
     topicID = tostring(topicID or "")
     if npcID == "" or topicID == "" then return false, "invalid_knowledge_topic" end
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    options = type(options) == "table" and options or {}
     local args = {
         requestID = requestID("disclosure"),
         npcID = npcID,
         topicID = topicID,
+        conversationToken = options.conversationToken or options.token,
+        origin = options.origin,
     }
     ClientState.pendingDisclosure = ClientState.pendingDisclosure or {}
     ClientState.pendingDisclosure[npcID] = args.requestID
     local accepted, reason = dispatchIdentity(player,
         Const.CMD_KNOWLEDGE_DISCLOSURE_REQUEST, args, "HandleDisclosure")
+    if accepted ~= true then ClientState.pendingDisclosure[npcID] = nil end
     return accepted, reason, args.requestID
 end
 

@@ -157,6 +157,17 @@ function Relationships.ApplyEventMutation(
             memoryType = memory.type,
             interactionType = interactionType,
             knowledgeSource = memory.knowledgeSource,
+            interaction = mutation.interaction or {
+                kind = mutation.sourceSystem or "social_event",
+                source = mutation.sourceSystem,
+                interactionType = interactionType,
+                eventID = eventID,
+                memoryID = memory.id,
+                memoryType = memory.type,
+                at = worldAgeHours,
+                worldAgeHours = worldAgeHours,
+                applied = true,
+            },
         }
     )
     return true, "applied", {
@@ -183,13 +194,16 @@ function Relationships.ApplyConversationEffect(
     effect = type(effect) == "table" and effect or {}
     context = type(context) == "table" and context or {}
     local at = math.max(0, tonumber(context.worldAgeHours) or 0)
+    local suppliedEventID = type(context.eventID) == "string"
+        and context.eventID or nil
     local identity = table.concat({
         tostring(context.blockID or "block"),
         tostring(context.choiceID or "choice"),
         tostring(context.outcomeID or "outcome"),
         tostring(math.floor(at * 1000)),
     }, ":")
-    local memoryID = "conversation:" .. identity
+    local memoryID = suppliedEventID and suppliedEventID
+        or "conversation:" .. identity
     local memoryType = type(effect.memoryType) == "string"
         and effect.memoryType or "conversation_outcome"
     local interactionType = type(effect.interactionType) == "string"
@@ -202,7 +216,7 @@ function Relationships.ApplyConversationEffect(
         worldAgeHours = at,
         interactionType = interactionType,
         familiarityDelta = tonumber(effect.familiarity) or 0,
-        moraleDelta = 0,
+        moraleDelta = tonumber(effect.morale) or 0,
         memory = {
             id = memoryID,
             type = memoryType,
@@ -222,5 +236,20 @@ function Relationships.ApplyConversationEffect(
         },
         cooldownType = context.cooldownType,
         cooldownUntil = context.cooldownUntil,
+        sourceSystem = context.sourceSystem,
+        interaction = context.interaction or {
+            kind = context.interactionKind or "conversation",
+            source = context.sourceSystem or "conversation",
+            interactionType = interactionType,
+            eventID = memoryID,
+            blockID = context.blockID,
+            categoryID = context.categoryID,
+            nodeID = context.nodeID,
+            choiceID = context.choiceID,
+            outcomeID = context.outcomeID,
+            at = at,
+            worldAgeHours = at,
+            applied = true,
+        },
     })
 end

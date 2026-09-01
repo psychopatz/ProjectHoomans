@@ -38,7 +38,7 @@ end
 
 function Presentation.Summarize(relationship, exists)
     relationship = type(relationship) == "table" and relationship or {}
-    return {
+    local summary = {
         exists = exists == true,
         approval = number(relationship.approval),
         respect = number(relationship.respect),
@@ -47,6 +47,17 @@ function Presentation.Summarize(relationship, exists)
         previousState = tostring(relationship.previousState or "unknown"),
         revision = math.max(0, math.floor(number(relationship.revision))),
     }
+    if PNC.RelationshipTypes
+        and PNC.RelationshipTypes.NormalizeInteractionJournal
+    then
+        summary.interactionRevision = math.max(
+            0,
+            math.floor(number(relationship.interactionRevision))
+        )
+        summary.interactionJournal = PNC.RelationshipTypes
+            .NormalizeInteractionJournal(relationship.interactionJournal)
+    end
+    return summary
 end
 
 function Presentation.BuildEvaluation(summary, requirement, context)
@@ -89,6 +100,23 @@ function Presentation.BuildForConversation(player, npcID)
         relationship ~= nil
     )
     summary.npcID = tostring(record.id)
+    -- These fields are intentionally part of the player's own presentation
+    -- response. They make SP/MP identity drift diagnosable without exposing
+    -- another player's relationship data.
+    summary.identityKey = targetKey
+    summary.relationshipLookup = relationship and "matched" or "missing"
+    summary.socialRevision = record.social
+        and tonumber(record.social.revision) or 0
+    summary.identityDiagnostics = {
+        accountIdentity = targetKey
+            and tostring(string.match(targetKey, "^player:([^:]+):") or "")
+            or nil,
+        characterUUID = targetKey
+            and tostring(string.match(targetKey, ":([^:]+)$") or "")
+            or nil,
+        relationshipRevision = summary.revision,
+        interactionRevision = summary.interactionRevision or 0,
+    }
     return summary
 end
 

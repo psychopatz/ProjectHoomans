@@ -11,6 +11,7 @@ local traceEvents = {}
 local reservations = {}
 local releases = {}
 local identityRequests = {}
+local companionOrders = {}
 PsychopatzCore = {
     DebugTrace = {
         IsEnabled = function() return true end,
@@ -54,12 +55,30 @@ PNC = {
         ExecuteLLMSocialReaction = function()
             return true, "accepted"
         end,
+        ExecuteCompanionCommand = function(commandID, npcID, scope)
+            companionOrders[#companionOrders + 1] = {
+                commandID = commandID,
+                npcID = npcID,
+                scope = scope,
+            }
+            return true
+        end,
         RequestNPCKnowledgeTopic = function(npcID, topicID)
             identityRequests[#identityRequests + 1] = {
                 npcID = npcID,
                 topicID = topicID,
             }
             return true, "dispatched", "disclosure-1"
+        end,
+    },
+    CompanionCommands = {
+        List = function()
+            return { { id = "camp", clientOnly = false } }
+        end,
+        Get = function(commandID)
+            return commandID == "camp"
+                and { id = "camp", clientOnly = false }
+                or nil
         end,
     },
 }
@@ -215,6 +234,11 @@ local inlineDelivered = Integration.Deliver({
             name = "ask_name",
             arguments = {},
         },
+        {
+            id = "camp-1",
+            name = "order_camp",
+            arguments = { command_id = "camp" },
+        },
     },
 })
 T.equal(inlineDelivered.presentation, "nameplate",
@@ -230,9 +254,14 @@ T.equal(identityRequests[1].npcID, "npc-two",
     "identity tool targets the active NPC")
 T.equal(identityRequests[1].topicID, "identity_name",
     "identity tool invokes the naming knowledge topic")
-T.equal(Speech.Get("npc-two").message.text,
-    "Sure. Let me introduce myself.",
-    "headless tool acknowledgement was not published to the nameplate")
+T.equal(companionOrders[1].commandID, "camp",
+    "camp LLM tool invokes the shared companion command")
+T.equal(companionOrders[1].npcID, "npc-two",
+    "camp LLM tool targets the active NPC")
+T.equal(companionOrders[1].scope, "conversation",
+    "camp LLM tool uses the conversation command scope")
+T.truthy(string.find(Speech.Get("npc-two").message.text, "Harley", 1, true),
+    "headless tool acknowledgement uses the NPC's dedicated name reply")
 T.equal(releases[2].requestID, inlinePacket.request_id,
     "completed headless request releases its lease")
 

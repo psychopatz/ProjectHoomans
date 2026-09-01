@@ -8,6 +8,7 @@ PNC = PNC or {}
 PNC.LivingRoomService = PNC.LivingRoomService or {}
 
 local Service = PNC.LivingRoomService
+local Ambient = require "PNC/Settlement/FacilityJobs/PNC_AmbientFacilityService"
 Service.NextAttemptAt = Service.NextAttemptAt or {}
 Service.CADENCE_MS = 5000
 
@@ -61,4 +62,6 @@ function Service.Pump(now)
     return started
 end
 
-return Service
+-- Compatibility name retained for existing pump callers and integrations.
+PNC.LivingRoomService = Ambient
+return Ambient

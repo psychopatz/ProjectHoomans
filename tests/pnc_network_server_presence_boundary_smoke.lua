@@ -12,6 +12,7 @@ local providers = {
     "PNC_Network_Server_Character",
     "PNC_Network_Server_DebugPayloads",
     "PNC_Network_Server_Colony",
+    "PNC_Network_Server_Social",
 }
 local publicFunctions = {
     "QueueRosterDelta",
@@ -30,6 +31,7 @@ local publicFunctions = {
     "SendDebugRoster",
     "SendRelationshipDebug",
     "SendConversationRelationship",
+    "SendConversationRelationshipForNPC",
     "SendNPCKnowledge",
     "SendPlayerBootstrap",
     "SendNPCPresentation",
@@ -59,8 +61,21 @@ for i = 1, #providers do
 end
 
 PNC = {
-    Core = {},
+    Core = { Now = function() return 12 end },
     Const = {},
+    RelationshipPresentation = {
+        BuildForConversation = function(_, npcID)
+            return {
+                npcID = tostring(npcID),
+                exists = true,
+                approval = 4,
+                respect = 2,
+                familiarity = 1,
+                state = "indifferent",
+                revision = 3,
+            }
+        end,
+    },
     Network = {
         ServerState = {
             interests = {},
@@ -81,5 +96,30 @@ for i = 1, #publicFunctions do
         "entry point should preserve Network." .. functionName
     )
 end
+
+local sent
+isServer = function() return true end
+sendServerCommand = function(_, module, command, payload)
+    sent = { module = module, command = command, payload = payload }
+end
+T.truthy(PNC.Network.SendConversationRelationshipForNPC(
+    {},
+    "npc-central",
+    "gift",
+    {
+        source = "gift",
+        eventID = "event-central",
+        relationshipDelta = { approval = 2, respect = 1 },
+        relationshipBefore = { approval = 2, respect = 1 },
+    }
+), "central relationship sender")
+T.equal(sent.payload.summary.npcID, "npc-central",
+    "central sender includes NPC summary")
+T.equal(sent.payload.source, "gift",
+    "central sender preserves source")
+T.equal(sent.payload.relationshipDelta.approval, 2,
+    "central sender preserves relationship delta")
+T.equal(sent.payload.eventID, "event-central",
+    "central sender preserves event id")
 
 T.finish("pnc_network_server_presence_boundary_smoke")

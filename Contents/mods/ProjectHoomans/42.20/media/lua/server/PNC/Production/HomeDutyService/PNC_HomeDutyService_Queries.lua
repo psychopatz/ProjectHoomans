@@ -24,6 +24,12 @@ function Service.IsFollowing(record)
         PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
 end
 
+function Service.IsCamped(record)
+    local order = record and record.orderSpec or nil
+    return tostring(order and order.kind or "") == tostring(
+        PNC.Const and PNC.Const.ORDER_CAMP or "camp")
+end
+
 function Service.IsReturningHome(record, baseId)
     local travel = record and record.travel or nil
     local metadata = travel and travel.metadata or nil
@@ -35,7 +41,17 @@ end
 
 function Service.BuildState(record)
     local base = H.BaseFor(record)
-    if not base then return { state = "NO_BASE" } end
+    local camped = Service.IsCamped(record)
+    if camped then
+        return {
+            state = "AT_CAMP",
+            baseId = base and base.id or nil,
+            returning = false,
+            atHome = false,
+            atCamp = true,
+        }
+    end
+    if not base then return { state = "NO_BASE", atCamp = false } end
     local returning = Service.IsReturningHome(record, base.id)
     return {
         state = returning and "RETURNING_HOME"
@@ -43,6 +59,7 @@ function Service.BuildState(record)
         baseId = base.id,
         returning = returning,
         atHome = Service.IsAtHome(record, base.id),
+        atCamp = false,
     }
 end
 

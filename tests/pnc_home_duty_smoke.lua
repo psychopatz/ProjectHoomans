@@ -35,7 +35,7 @@ end
 
 PNC = {
     Const = { PRESENCE_LIVE = "live", PRESENCE_ABSTRACT = "abstract",
-        ORDER_FOLLOW = "follow" },
+        ORDER_FOLLOW = "follow", ORDER_CAMP = "camp" },
     Core = { Now = function() return 1234 end },
     BaseService = {
         Get = function(id)
@@ -126,6 +126,15 @@ local npc = {
     presenceState = "abstract", runtime = {},
     affiliation = { communityID = "colony-1" },
 }
+
+local campOnly = {
+    id = "npc-camp-only", alive = true, x = 1, y = 2, z = 0,
+    runtime = {}, orderSpec = { kind = "camp", x = 1, y = 2, z = 0, radius = 3 },
+}
+local campState = PNC.HomeDutyService.BuildState(campOnly)
+T.equal(campState.state, "AT_CAMP",
+    "camp state is visible without requiring a home base")
+T.equal(campState.atCamp, true, "camp state exposes its dedicated flag")
 
 T.equal(PNC.HomeDutyService.IsAtHome(npc, "base-1"), false,
     "away colonist not at home")

@@ -13,6 +13,8 @@ local Layout = PsychopatzCore.UI.Layout
 local Theme = PsychopatzCore.UI.Theme
 local ClientState = PNC.Network.ClientState
 local Shared = PNC.CharacterWindowShared
+local Relationship = PNC.Conversation and PNC.Conversation.Relationship
+local Graph = PNC.RelationshipGraph
 
 local function translated(key, fallback)
     return Shared and Shared.Text and Shared.Text(key, fallback) or fallback
@@ -82,6 +84,10 @@ function Tabs.RenderInteractions(view, _, _, topY)
     local color = Theme.colors.text
     local muted = Theme.colors.textMuted
     local y = topY + Layout.Pixels(6, view.uiScale)
+    local current = ClientState.conversationRelationships
+        and ClientState.conversationRelationships[tostring(view.npcId)]
+        or Relationship and Relationship.GetPresentation
+        and Relationship.GetPresentation(view.npcId) or nil
     local established = view.snapshot and view.snapshot.startingRelationship
         or view.payload and view.payload.startingRelationship
     if established then
@@ -100,17 +106,56 @@ function Tabs.RenderInteractions(view, _, _, topY)
             muted.r, muted.g, muted.b, muted.a, UIFont.Small)
         y = y + lineHeight + Layout.Pixels(12, view.uiScale)
     end
+    if current then
+        local attitude = Graph and Graph.ResolveAttitude
+            and Graph.ResolveAttitude(current.approval, current.respect)
+            or current.state or "indifferent"
+        view:drawText(translated(
+            "UI_PNC_CurrentRelationship",
+            "CURRENT RELATION"
+        ), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+        y = y + lineHeight + 4
+        view:drawText(relationshipLabel(attitude), pad, y,
+            color.r, color.g, color.b, color.a, UIFont.Small)
+        y = y + lineHeight
+        view:drawText(
+            translated("UI_PNC_RelationshipApproval", "Approval")
+                .. " " .. signed(current.approval)
+                .. "   "
+                .. translated("UI_PNC_RelationshipRespect", "Respect")
+                .. " " .. signed(current.respect),
+            pad + Layout.Pixels(10, view.uiScale), y,
+            muted.r, muted.g, muted.b, muted.a, UIFont.Small
+        )
+        y = y + lineHeight
+        view:drawText(
+            translated("UI_PNC_RelationshipFamiliarity", "Familiarity")
+                .. " " .. signed(current.familiarity),
+            pad + Layout.Pixels(10, view.uiScale), y,
+            muted.r, muted.g, muted.b, muted.a, UIFont.Small
+        )
+        y = y + lineHeight + Layout.Pixels(12, view.uiScale)
+    end
     if #entries == 0 then
         if established then return y + pad end
-        view:drawText("NO PLAYER INTERACTIONS RECORDED", pad, y,
+        view:drawText(translated(
+            "UI_PNC_NoPlayerInteractions",
+            "NO PLAYER INTERACTIONS RECORDED"
+        ), pad, y,
             muted.r, muted.g, muted.b, muted.a, UIFont.Small)
         y = y + lineHeight * 2
-        view:drawText("Conversation choices, gifts, and recruitment attempts",
+        view:drawText(translated(
+            "UI_PNC_InteractionHistoryHint",
+            "Conversation choices, gifts, and recruitment attempts"
+        ),
             pad, y, color.r, color.g, color.b, color.a, UIFont.Small)
         return y + lineHeight + pad
     end
 
-    view:drawText("PLAYER / NPC INTERACTIONS", pad, y,
+    view:drawText(translated(
+        "UI_PNC_PlayerNPCInteractions",
+        "PLAYER / NPC INTERACTIONS"
+    ), pad, y,
         muted.r, muted.g, muted.b, muted.a, UIFont.Small)
     y = y + lineHeight + 4
     for index = #entries, 1, -1 do

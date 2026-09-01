@@ -217,12 +217,12 @@ local playerKey = PNC.EntityRef.ForPlayerIdentity(
     "char_phase2"
 )
 
--- 1. Exactly the five known data-driven definitions load.
+-- 1. Exactly the known data-driven definitions load.
 local definitionCount = 0
 for _, _ in pairs(PNC.SocialEventDefinitions) do
     definitionCount = definitionCount + 1
 end
-T.equal(definitionCount, 5, "five definitions")
+T.equal(definitionCount, 14, "fourteen definitions")
 T.equal(
     PNC.SocialEvents.GetDefinition("treated_wound")
         .targetMemory.approvalEffect,

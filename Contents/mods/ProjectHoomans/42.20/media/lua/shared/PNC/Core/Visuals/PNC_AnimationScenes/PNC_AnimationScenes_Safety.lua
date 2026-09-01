@@ -8,9 +8,12 @@ function Scenes.InterruptForSafety(record, zombie, now)
     local navigation = runtime and runtime.localNavigation or nil
     local followState = runtime and runtime.followState or nil
     local health = record and record.health or nil
+    local target = runtime and runtime.target or nil
+    local hasCombatTarget = type(target) == "table"
+        and target.kind ~= nil
     now = tonumber(now) or Core.Now()
     if not scene then return false end
-    if runtime.target ~= nil
+    if hasCombatTarget
         or runtime.attackAction ~= nil
         or now < (tonumber(runtime.inCombatUntil) or 0)
         or now < (tonumber(health and health.recentDamageUntil) or 0)

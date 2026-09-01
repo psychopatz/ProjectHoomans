@@ -100,6 +100,20 @@ T.truthy(identitySaveCalls >= 1,
 T.equal(Knowledge.GetDescriptor("char_a", npc.id, "identity.name").value,
     "Burton Gilmore", "introduced name is recorded")
 T.equal(Knowledge.Dirty, false, "introduction commits immediately")
+local repeatedIntroduction = Knowledge.DiscoverTopicForPlayer(
+    {}, npc.id, "identity_name", 5, "direct_disclosure"
+)
+T.equal(#repeatedIntroduction.revealed, 0,
+    "repeating a disclosure does not append duplicate evidence")
+T.equal(repeatedIntroduction.known[1], "identity.name",
+    "repeating a disclosure reports the already-known fact")
+local blockedTraits, blockedReason = Knowledge.DiscoverTopicForPlayer(
+    {}, npc.id, "social", 5, "direct_disclosure"
+)
+T.equal(blockedTraits, nil,
+    "personal knowledge disclosure remains gated by familiarity")
+T.equal(blockedReason, "insufficient_familiarity",
+    "blocked topic exposes the gate reason")
 PNC.Relationships.Get = function()
     return { familiarity = 50, approval = 25 }
 end

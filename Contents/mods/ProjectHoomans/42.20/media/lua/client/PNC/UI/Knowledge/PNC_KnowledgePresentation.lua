@@ -85,9 +85,7 @@ function Presentation.BuildDossierRows(snapshot)
             for _, descriptor in ipairs(category.descriptors or {}) do
                 section.rows[#section.rows + 1] = {
                     descriptorID = descriptor.descriptorID,
-                    label = words(string.match(
-                        descriptor.descriptorID, "%.(.+)$"
-                    ) or descriptor.descriptorID),
+                    label = Presentation.GetFactLabel(descriptor),
                     value = Presentation.FormatFact(descriptor),
                     confidence = tonumber(descriptor.confidence) or 0,
                     status = descriptor.status,
@@ -139,6 +137,13 @@ function Presentation.GetFactLabel(descriptor)
     local descriptorID = tostring(
         descriptor and descriptor.descriptorID or "information"
     )
+    local presentation = descriptor and descriptor.presentation or nil
+    if presentation and presentation.labelKey and getText then
+        local localized = getText(presentation.labelKey)
+        if localized and localized ~= presentation.labelKey then
+            return localized
+        end
+    end
     local skillID = string.match(descriptorID, "^skill%.(.+)$")
     local skill = skillID and PNC.SkillCatalog
         and PNC.SkillCatalog.Find and PNC.SkillCatalog.Find(skillID) or nil

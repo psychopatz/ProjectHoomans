@@ -120,13 +120,54 @@ local function copyPresentation(summary)
         state = summary.state,
         previousState = summary.previousState,
         revision = tonumber(summary.revision) or 0,
+        interactionRevision = tonumber(summary.interactionRevision) or 0,
+        socialRevision = tonumber(summary.socialRevision) or 0,
+        identityKey = summary.identityKey,
+        relationshipLookup = summary.relationshipLookup,
     }
+end
+
+local function samePresentation(left, right)
+    if type(left) ~= "table" or type(right) ~= "table" then
+        return false
+    end
+    return (tonumber(left.revision) or 0) == (tonumber(right.revision) or 0)
+        and (tonumber(left.approval) or 0) == (tonumber(right.approval) or 0)
+        and (tonumber(left.respect) or 0) == (tonumber(right.respect) or 0)
+        and (tonumber(left.familiarity) or 0)
+            == (tonumber(right.familiarity) or 0)
+        and tostring(left.state or "") == tostring(right.state or "")
+        and tostring(left.previousState or "")
+            == tostring(right.previousState or "")
+        and (tonumber(left.interactionRevision) or 0)
+            == (tonumber(right.interactionRevision) or 0)
+        and (tonumber(left.socialRevision) or 0)
+            == (tonumber(right.socialRevision) or 0)
 end
 
 function Relationship.ReceivePresentation(summary, delta, metadata)
     if type(summary) ~= "table" or not summary.npcID then return false end
     local npcID = tostring(summary.npcID)
+    local diary = PNC.Conversation and PNC.Conversation.Diary or nil
+    if diary and diary.Hydrate
+        and type(summary.interactionJournal) == "table"
+    then
+        diary.Hydrate(
+            npcID,
+            summary.interactionJournal,
+            summary.interactionRevision
+        )
+    end
     local previous = presentationCache[npcID]
+    local incomingRevision = tonumber(summary.revision) or 0
+    local previousRevision = previous
+        and (tonumber(previous.revision) or 0) or nil
+    if previousRevision and incomingRevision < previousRevision then
+        return true
+    end
+    if previous and samePresentation(previous, summary) then
+        return true
+    end
     presentationCache[npcID] = copyPresentation(summary)
     local feedback = PNC.NameplateRelationshipFeedback
     if feedback and feedback.Observe then
@@ -140,6 +181,31 @@ function Relationship.ReceivePresentation(summary, delta, metadata)
     if state then
         state.conversationRelationships = state.conversationRelationships or {}
         state.conversationRelationships[npcID] = summary
+        state.conversationRelationshipDiagnostics =
+            state.conversationRelationshipDiagnostics or {}
+        state.conversationRelationshipDiagnostics[npcID] = {
+            identityKey = summary.identityKey,
+            relationshipLookup = summary.relationshipLookup,
+            socialRevision = summary.socialRevision,
+            relationshipRevision = summary.revision,
+            interactionRevision = summary.interactionRevision,
+            identityDiagnostics = summary.identityDiagnostics,
+            receivedAt = PNC.Core and PNC.Core.Now
+                and PNC.Core.Now() or 0,
+        }
+        state.lastConversationRelationshipReceiveAt = PNC.Core
+            and PNC.Core.Now and PNC.Core.Now() or 0
+        if state.relationshipDebug
+            and state.relationshipDebug.observer
+            and tostring(state.relationshipDebug.observer.npcID
+                or state.relationshipDebug.observer.id or "") == npcID
+            and state.relationshipDebug.target
+            and state.relationshipDebug.target.kind == "player"
+        then
+            state.relationshipDebug.relationship = summary
+            state.relationshipDebug.generatedAt = state.lastConversationRelationshipReceiveAt
+            state.lastRelationshipDebugReceiveAt = state.lastConversationRelationshipReceiveAt
+        end
     end
     local view = PsychopatzCore
         and PsychopatzCore.Conversation
@@ -166,6 +232,12 @@ function Relationship.ReceiveAfter(npcID, after, delta, metadata)
         state = after.state,
         previousState = after.previousState,
         revision = after.revision,
+        interactionRevision = after.interactionRevision,
+        interactionJournal = after.interactionJournal,
+        identityKey = after.identityKey,
+        relationshipLookup = after.relationshipLookup,
+        socialRevision = after.socialRevision,
+        identityDiagnostics = after.identityDiagnostics,
     }, delta, metadata)
 end
 

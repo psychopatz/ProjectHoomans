@@ -11,6 +11,7 @@ PNC.Relationships.Internal = PNC.Relationships.Internal or {}
 
 require "PNC/Social/RelationshipService/PNC_RelationshipService_Context"
 require "PNC/Social/RelationshipService/PNC_RelationshipService_Commit"
+require "PNC/Social/RelationshipService/PNC_RelationshipService_InteractionJournal"
 require "PNC/Social/RelationshipService/PNC_RelationshipService_Queries"
 require "PNC/Social/RelationshipService/PNC_RelationshipService_MemoryCommands"
 require "PNC/Social/RelationshipService/PNC_RelationshipService_EventMutation"

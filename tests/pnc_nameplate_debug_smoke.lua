@@ -81,6 +81,66 @@ T.contains(combatSummary, "Tactic: lone_threat_counter",
 T.contains(combatSummary, "ViewZ: 1/2",
     "visible zombie summary")
 
+snapshot.campResourceDebug = {
+    mode = "activity",
+    campId = "camp:trailhead",
+    resourceRadius = 12,
+    bedCount = 2,
+    waterCount = 1,
+    otherCount = 0,
+    facilities = {
+        {
+            detectorId = "bed",
+            resourceKind = "sleep_surface",
+            resourceKey = "bed:10:20:0",
+            x = 10.5, y = 20.5, z = 0,
+        },
+        {
+            detectorId = "faucet",
+            resourceKind = "water_source",
+            resourceKey = "faucet:11:20:0:1",
+            x = 11.5, y = 20.5, z = 0,
+        },
+    },
+    activity = {
+        capability = "sleep",
+        phase = "WORKING",
+        resourceKind = "sleep_surface",
+        resourceKey = "bed:10:20:0",
+        sleepSurface = "bed",
+        abstract = true,
+    },
+}
+local campText = PNC.NameplateDebug.CampResourceText(snapshot, {
+    showCampDebug = true,
+})
+T.contains(campText, "Camp: activity", "camp activity overlay mode")
+T.contains(campText, "Task: SLEEP", "camp task summary")
+T.contains(campText, "Phase: WORKING", "camp phase summary")
+T.falsy(string.find(campText, "found=", 1, true),
+    "camp nameplate omits facility dump counts")
+T.falsy(string.find(campText, "bed:10:20:0", 1, true),
+    "camp nameplate omits resource coordinates and keys")
+T.equal(PNC.NameplateDebug.CampResourceText(snapshot, {
+    showCampDebug = false,
+}), "", "camp overlay component disabled")
+local campOnlyText = PNC.NameplateDebug.BuildText(snapshot, true, {
+    showCampDebug = true,
+    debugShowPresence = false,
+    debugShowAI = false,
+    debugShowJob = false,
+    debugShowOrder = false,
+    debugShowTarget = false,
+    debugShowCombat = false,
+    debugShowMagazine = false,
+    debugShowStamina = false,
+    debugShowBlock = false,
+})
+T.equal(campOnlyText, campText, "camp overlay is independently rendered")
+T.equal(PNC.NameplateDebug.BuildText(snapshot, true, {
+    showCampDebug = true,
+}), campText, "camp overlay does not enable AI debug text")
+
 local infected = PNC.NameplateDebug.InfectionText(snapshot, {
     debugShowInfection = true,
 })

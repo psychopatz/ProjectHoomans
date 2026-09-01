@@ -166,6 +166,96 @@ function Internal.sanitizeOrderSpec(orderSpec, record)
     return spec
 end
 
+-- Camp resources are intentionally persisted as a small whitelist of scalar
+-- descriptors. World objects, squares, Java userdata, and provider-specific
+-- runtime values must be rediscovered or revalidated after load.
+function Internal.sanitizeCampState(raw, record)
+    if type(raw) ~= "table" then return nil end
+    local rawResources = type(raw.resources) == "table"
+        and raw.resources or {}
+    local output = {
+        schemaVersion = math.max(1, math.floor(
+            Internal.normalizeNumber(raw.schemaVersion, 1))),
+        campId = Internal.normalizeString(raw.campId),
+        anchorX = Internal.normalizeNumber(raw.anchorX,
+            record and record.anchorX or 0),
+        anchorY = Internal.normalizeNumber(raw.anchorY,
+            record and record.anchorY or 0),
+        anchorZ = Internal.normalizeNumber(raw.anchorZ,
+            record and record.anchorZ or 0),
+        campRadius = math.max(0.5, math.min(24, Internal.normalizeNumber(
+            raw.campRadius, Const.CAMP_RADIUS or 3))),
+        resourceRadius = math.max(1, math.min(24, Internal.normalizeNumber(
+            raw.resourceRadius, Const.CAMP_RESOURCE_RADIUS or 12))),
+        capturedAtWorldHour = Internal.normalizeNumber(
+            raw.capturedAtWorldHour, 0),
+        resources = {},
+    }
+    local allowed = {
+        "kind", "detectorId", "targetResolver", "resourceKind", "role",
+        "capability", "resourceKey", "key", "x", "y", "z", "originX",
+        "originY", "originZ", "axis", "facing", "surfaceOffset", "sprite",
+        "sceneId", "sleepSurface", "exclusive", "available", "readOnly",
+        "seatSpots",
+    }
+    local spotAllowed = {
+        "x", "y", "z", "seatAnchorX", "seatAnchorY", "seatAnchorZ",
+        "direction", "side", "approachKey", "valid", "approachValid",
+        "validationState", "rejectionReason", "routeStatus",
+    }
+    local maximum = math.max(1, math.floor(Const.CAMP_RESOURCE_MAX or 64))
+    for index = 1, math.min(maximum, #rawResources) do
+        local source = rawResources[index]
+        if type(source) == "table" then
+            local resource = {}
+            for keyIndex = 1, #allowed do
+                local key = allowed[keyIndex]
+                local value = source[key]
+                local valueType = type(value)
+                if valueType == "number" or valueType == "string"
+                    or valueType == "boolean"
+                then
+                    resource[key] = value
+                end
+            end
+            if type(source.seatSpots) == "table" then
+                resource.seatSpots = {}
+                for spotIndex = 1, #source.seatSpots do
+                    local sourceSpot = source.seatSpots[spotIndex]
+                    if type(sourceSpot) == "table" then
+                        local spot = {}
+                        local copiedValues = 0
+                        for spotKeyIndex = 1, #spotAllowed do
+                            local spotKey = spotAllowed[spotKeyIndex]
+                            local value = sourceSpot[spotKey]
+                            local valueType = type(value)
+                            if valueType == "number"
+                                or valueType == "string"
+                                or valueType == "boolean"
+                            then
+                                spot[spotKey] = value
+                                copiedValues = copiedValues + 1
+                            end
+                        end
+                        if copiedValues > 0 then
+                            resource.seatSpots[#resource.seatSpots + 1] = spot
+                        end
+                    end
+                end
+                if #resource.seatSpots == 0 then
+                    resource.seatSpots = nil
+                end
+            end
+            resource.resourceKey = Internal.normalizeString(
+                resource.resourceKey or resource.key)
+            if resource.resourceKey then
+                output.resources[#output.resources + 1] = resource
+            end
+        end
+    end
+    return output
+end
+
 function Internal.serializePatrolPoints(record)
     local points = record and record.patrolPoints or nil
     local orderKind = record and record.orderSpec

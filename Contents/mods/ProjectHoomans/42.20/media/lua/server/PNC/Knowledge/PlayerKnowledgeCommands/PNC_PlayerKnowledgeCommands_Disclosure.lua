@@ -13,13 +13,6 @@ function H.IntroductionText(npcID)
         and PNC.Identity.GetCharacterSummary(record) or {}
     local name = identity.displayName or record.name
     if not name then return nil end
-    local faction = record.affiliation and PNC.Factions
-        and PNC.Factions.GetPresentation
-        and PNC.Factions.GetPresentation(record.affiliation.factionID) or nil
-    if faction and faction.name then
-        return "I'm " .. tostring(name) .. ". I'm with "
-            .. tostring(faction.name) .. "."
-    end
     return "I'm " .. tostring(name) .. "."
 end
 
@@ -46,31 +39,60 @@ function Commands.HandleDisclosure(player, args)
             local pendingByNPC = Commands.Uncommitted[context.characterUUID]
                 or {}
             Commands.Uncommitted[context.characterUUID] = pendingByNPC
-            if pendingByNPC[npcID]
-                or PNC.NPCKnowledge.GetDescriptor(
-                    context.characterUUID, npcID, "identity.name"
-                )
-            then
-                disclosure = { topicID = topicID,
-                    revealed = { "identity.name" }, failures = {} }
+            if pendingByNPC[npcID] then
+                if PNC.NPCKnowledgeAPI
+                    and PNC.NPCKnowledgeAPI.CommitPendingForPlayer
+                then
+                    local result
+                    result, reason = PNC.NPCKnowledgeAPI.CommitPendingForPlayer(
+                        player,
+                        {
+                            npcID = npcID,
+                            topicID = topicID,
+                            requestID = requestID,
+                            conversationToken = args.conversationToken
+                                or args.token,
+                            origin = args.origin or "conversation",
+                        }
+                    )
+                    if result then disclosure = result end
+                else
+                    reason = "knowledge_commit_pending"
+                end
             else
-                disclosure, reason = PNC.NPCKnowledge.DiscoverTopicForPlayer(
-                    player, npcID, topicID, nil, "direct_disclosure", true
-                )
+                if PNC.NPCKnowledgeAPI
+                    and PNC.NPCKnowledgeAPI.DiscloseForPlayer
+                then
+                    local result
+                    result, reason = PNC.NPCKnowledgeAPI.DiscloseForPlayer(
+                        player,
+                        {
+                            npcID = npcID,
+                            topicID = topicID,
+                            requestID = requestID,
+                            conversationToken = args.conversationToken
+                                or args.token,
+                            origin = args.origin or "conversation",
+                        }
+                    )
+                    if result then
+                        disclosure = result
+                    end
+                else
+                    disclosure, reason = PNC.NPCKnowledge.DiscoverTopicForPlayer(
+                        player, npcID, topicID, nil, "direct_disclosure", true
+                    )
+                end
             end
-            local committed, commitReason = false, reason
-            if disclosure then
-                committed, commitReason = PNC.PersistenceCoordinator.Commit(
-                    "knowledge_disclosure:" .. requestID
-                )
-            end
+            local committed, commitReason = disclosure ~= nil, reason
             if committed then
                 pendingByNPC[npcID] = nil
                 local presentation = H.PresentationFor(player, npcID, requestID)
                 payload = {
                     requestID = requestID, npcID = npcID, topicID = topicID,
                     success = true, reason = "committed",
-                    responseText = H.IntroductionText(npcID),
+                    responseText = topicID == "identity_name"
+                        and H.IntroductionText(npcID) or nil,
                     revealedFacts = disclosure.revealed or {},
                     presentation = presentation,
                     bindingRevision = context.bindingRevision,
@@ -84,7 +106,10 @@ function Commands.HandleDisclosure(player, args)
                 Commands.Diagnostics[context.characterUUID]
                     .knowledgeRevision = presentation.knowledgeRevision
             else
-                pendingByNPC[npcID] = true
+                local commitFailure = commitReason == "disk_failed"
+                    or commitReason == "knowledge_save_failed"
+                    or commitReason == "persistence_unavailable"
+                if commitFailure then pendingByNPC[npcID] = true end
                 payload = {
                     requestID = requestID, npcID = npcID, topicID = topicID,
                     success = false, reason = commitReason or "commit_failed",

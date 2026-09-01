@@ -16,5 +16,6 @@ require "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Character"
 require "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_DebugPayloads"
 require "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Colony"
 require "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_LLM"
+require "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Social"
 
 return PNC.Network

@@ -160,6 +160,8 @@ local function preflightObserver(event, definition, observer)
         relationshipBefore = relationship,
         mutation = {
             eventID = event.id,
+            sourceSystem = event.sourceSystem,
+            interactionType = event.type,
             worldAgeHours = evaluationAt,
             familiarityDelta = modifiedEffects.familiarityGain,
             moraleDelta = modifiedEffects.moraleEffect,
@@ -189,6 +191,14 @@ local function preflightObserver(event, definition, observer)
                 knowledgeSource = memoryDefinition.knowledgeSource,
                 sourceKey = nil,
                 tags = memoryDefinition.tags,
+            },
+            interaction = {
+                kind = event.type,
+                source = event.sourceSystem,
+                interactionType = event.type,
+                at = event.occurredAt,
+                worldAgeHours = evaluationAt,
+                applied = true,
             },
         },
         saturationBefore = {

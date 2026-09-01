@@ -149,6 +149,24 @@ local record = {
         kind = "facility_activity",
         taskLeaseId = "stale-facility-lease",
     },
+    campState = {
+        schemaVersion = 1, campId = "camp:npc_kahlua",
+        anchorX = 4, anchorY = 5, anchorZ = 0, campRadius = 3,
+        resourceRadius = 12,
+        capturedAtWorldHour = 34,
+        resources = {
+            {
+                resourceKey = "bed:8:10:0", resourceKind = "sleep_surface",
+                targetResolver = "bed", originX = 4, originY = 5, originZ = 0,
+                object = { mustNotPersist = true },
+                seatSpots = {
+                    { x = 8.5, y = 10.5, z = 0, approachKey = "E:Front",
+                        valid = true, seatAnchorX = 8.5,
+                        seatAnchorY = 10.5, seatAnchorZ = 0 },
+                },
+            },
+        },
+    },
     generation = { source = "WORLD_POPULATION_DIRECTOR",
         generationId = "POP_GROUP_0000042", sectorId = "psector_1_2",
         createdAt = 34, seed = 42 },
@@ -178,6 +196,14 @@ T.truthy(payload.vanillaTraits.overweight == true,
     "vanilla weight trait was not serialized")
 T.truthy(payload.vanillaTraitsAuthored == true,
     "authored trait source was not serialized")
+T.truthy(payload.campState and payload.campState.resources[1],
+    "camp resource snapshot was not serialized")
+T.equal(payload.campState.resources[1].object, nil,
+    "camp resource snapshot did not strip world object references")
+T.equal(payload.campState.campRadius, 3,
+    "camp activity radius was not serialized")
+T.truthy(payload.campState.resources[1].seatSpots[1],
+    "primitive seat approach metadata was not serialized")
 
 local restored = PNC.Persistence.DeserializeRecord(payload, record.id)
 T.truthy(restored, "deserialization failed without next()")
@@ -207,6 +233,14 @@ T.equal(restored.orderSpec, nil,
     "stale facility order was not repaired during deserialization")
 T.equal(restored.persistenceRepairVersions.facility_activity_runtime, 1,
     "facility repair revision was not recorded after deserialization")
+T.equal(restored.campState.campId, "camp:npc_kahlua",
+    "camp identity did not round trip")
+T.equal(restored.campState.resources[1].resourceKey, "bed:8:10:0",
+    "camp resource descriptor did not round trip")
+T.equal(restored.campState.campRadius, 3,
+    "camp activity radius did not round trip")
+T.equal(restored.campState.resources[1].seatSpots[1].approachKey,
+    "E:Front", "seat approach metadata did not round trip")
 
 local repairedPayload = PNC.Persistence.SerializeRecord(restored)
 T.equal(repairedPayload.repairVersions.facility_activity_runtime, 1,

@@ -403,6 +403,7 @@ function ISPNCRelationshipDebugWindow:refreshGraph()
         {
             bonus = tonumber(self.contextBonus) or 0,
             conversationDelta = ClientState.lastConversationDelta,
+            conversationDeltas = ClientState.lastConversationDeltas,
         }
     )
     if evaluation and self.graph then
@@ -523,7 +524,8 @@ function ISPNCRelationshipDebugWindow:refreshDetails()
         ClientState.relationshipDebugAuthorized,
         ClientState.relationshipDebugReason,
         evaluation,
-        ClientState.lastConversationDelta
+        ClientState.lastConversationDelta,
+        ClientState.lastConversationDeltas
     )
     rows = Model.FilterRows(rows, self.currentSection)
     self.details:clear()

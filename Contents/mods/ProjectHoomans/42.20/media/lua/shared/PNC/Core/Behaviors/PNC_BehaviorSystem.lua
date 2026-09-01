@@ -13,9 +13,11 @@ require "PNC/Core/Behaviors/PNC_Behavior_Combat"
 require "PNC/Core/Behaviors/PNC_BehaviorRegistry"
 require "PNC/Core/Behaviors/PNC_Behavior_Travel"
 require "PNC/Core/Behaviors/PNC_Behavior_AtHome"
+require "PNC/Core/Behaviors/PNC_Behavior_AtCamp"
 require "PNC/Core/Behaviors/PNC_Behavior_Incapacitated"
 require "PNC/Core/Behaviors/PNC_Behavior_Treatment"
 require "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion"
+require "PNC/Core/Behaviors/PNC_Behavior_SeatedThreat"
 require "PNC/Core/Behaviors/PNC_Behavior_Hostile"
 require "PNC/Core/Behaviors/PNC_Behavior_Roaming"
 
@@ -32,6 +34,7 @@ local Treatment = PNC.BehaviorTreatment
 local Companion = PNC.BehaviorCompanion
 local Hostile = PNC.BehaviorHostile
 local Combat = PNC.BehaviorCombat
+local SeatedThreat = PNC.BehaviorSeatedThreat
 local AnimationScenes = PNC.AnimationScenes
 local LiveBodyControl = PNC.LiveBodyControl
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
@@ -98,6 +101,15 @@ function Behavior.Tick(record, zombie, now)
     -- that must not holster the weapon or abandon the animation in progress.
     if Combat and Combat.TickCommittedAction
         and Combat.TickCommittedAction(record, zombie)
+    then
+        return
+    end
+
+    -- Automatic ambient seating is a blocking presentation scene. Give it a
+    -- narrow perception/combat handoff before the scene can consume the tick;
+    -- the arbiter keeps the facility activity alive for later resumption.
+    if SeatedThreat and SeatedThreat.Tick
+        and SeatedThreat.Tick(record, zombie, now)
     then
         return
     end

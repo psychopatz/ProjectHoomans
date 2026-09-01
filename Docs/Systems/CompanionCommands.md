@@ -19,6 +19,7 @@ Built-in commands are:
 
 - Follow Me
 - Wait Here
+- Camp Here
 - Attack Type: Auto
 - Attack Type: Melee
 - Attack Type: Ranged

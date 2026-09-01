@@ -33,7 +33,7 @@ local received = Message.New({
     speakerID = "npc-one",
     speakerName = "One",
     speakerKind = "npc",
-    text = "A full response that remains attached to the canonical message.",
+    text = "A **full** response that *chuckles* while remaining canonical.",
     worldAgeHours = worldHours,
     presentationState = {
         nameplate = true,
@@ -45,7 +45,12 @@ Message.Publish(received)
 local record = Speech.Get("npc-one")
 T.truthy(record, "nameplate receives canonical speech")
 T.equal(record.message, received, "nameplate keeps canonical message identity")
-T.equal(record.text, received.text, "short speech remains unchanged")
+T.equal(record.message.text, received.text, "canonical Markdown remains unchanged")
+T.equal(record.text, "A **full** response that *chuckles* while remaining canonical.",
+    "nameplate keeps the received text untouched")
+T.equal(Speech.GetDisplayText(record),
+    "A full response that chuckles while remaining canonical.",
+    "nameplate derives a safe display projection only when viewed")
 local speechColor = PNC.NameplatePresentation.GetSpeechColor(record)
 T.equal(speechColor.r, 34 / 255, "nameplate speech red color")
 T.equal(speechColor.g, 68 / 255, "nameplate speech green color")

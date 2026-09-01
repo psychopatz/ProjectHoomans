@@ -164,6 +164,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     if record.orderSpec and PNC.OrderSystem and PNC.OrderSystem.Normalize then
         record.orderSpec = PNC.OrderSystem.Normalize(record, record.orderSpec)
     end
+    record.campState = Internal.sanitizeCampState(raw.campState, record)
     record.hostility = Internal.sanitizeHostility(raw.hostility, record.tacticalClass)
     record.health = Internal.sanitizeHealth(raw.health or raw, record.health and record.health.max or Const.DEFAULT_HP_MAX)
     record.alive = tostring(record.health.state or "") ~= "dead"

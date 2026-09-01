@@ -1,14 +1,14 @@
 -- GENERATED FILE. Do not edit by hand.
--- Source: common/media/AnimSets/zombie (544 XML nodes)
+-- Source: common/media/AnimSets/zombie (545 XML nodes)
 PNC = PNC or {}
 PNC.AnimationDebugCatalog = {
-    generatedCount = 544,
+    generatedCount = 545,
     stateCounts = {
         ["attack"] = 18,
         ["attack-network"] = 18,
         ["attackvehicle"] = 3,
         ["attackvehicle-network"] = 3,
-        ["bumped"] = 236,
+        ["bumped"] = 237,
         ["climbdownrope"] = 1,
         ["climbfence"] = 4,
         ["climbrope"] = 1,
@@ -4083,6 +4083,25 @@ PNC.AnimationDebugCatalog = {
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
+            },
+        },
+        {
+            state = "bumped",
+            folder = "bumped",
+            file = "PNC_Anim_SitChair.xml",
+            path = "media/AnimSets/zombie/bumped/PNC_Anim_SitChair.xml",
+            extends = nil,
+            node = "PNC_Anim_SitChair",
+            anim = "Bob_SatChair",
+            looped = true,
+            speed = 1.0,
+            playable = true,
+            transitionCount = 0,
+            conditions = {
+                { name = "PNCActor", kind = "BOOL", value = "true" },
+                { name = "BumpType", kind = "STRING", value = "PNC_SitChair" },
+            },
+            events = {
             },
         },
         {

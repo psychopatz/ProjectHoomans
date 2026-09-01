@@ -41,7 +41,7 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.HomeDutyService[name]), "function",
         "entry point preserves HomeDutyService." .. name)
 end
-T.equal(publicCount, 11, "home-duty public function count")
+T.equal(publicCount, 12, "home-duty public function count")
 
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil

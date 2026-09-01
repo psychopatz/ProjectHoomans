@@ -460,12 +460,15 @@ function Client.ExecuteLLMSocialReaction(npcID, kind, intensity, context)
         and tools.NormalizeReaction(kind) or nil
     local normalizedIntensity = tools and tools.NormalizeIntensity
         and tools.NormalizeIntensity(intensity) or "normal"
+    local subtype
     local args
     local result
     if not player or not reaction then
         return false, "invalid_social_reaction"
     end
     context = type(context) == "table" and context or {}
+    subtype = tools and tools.NormalizeSubtypeForReaction
+        and tools.NormalizeSubtypeForReaction(context.subtype, reaction) or nil
     args = {
         npcID = tostring(npcID or ""),
         token = tostring(context.token or ""),
@@ -473,6 +476,7 @@ function Client.ExecuteLLMSocialReaction(npcID, kind, intensity, context)
         callID = tostring(context.callID or ""),
         kind = reaction,
         intensity = normalizedIntensity,
+        subtype = subtype,
     }
     if args.npcID == "" or args.requestID == "" or args.callID == "" then
         return false, "social_reaction_identity_missing"
@@ -502,9 +506,68 @@ function Client.ExecuteLLMSocialReaction(npcID, kind, intensity, context)
     result = authority.HandleLLMSocialReaction(player, args)
     traceCompanionCommand("social_react", npcID, "conversation", context, result)
     if type(result) == "table" then
-        return result.accepted == true, result.reason
+        return result.accepted == true, result.reason, result
     end
     return result == true, result and "applied" or "rejected"
+end
+
+function Client.ExecutePlayerEmoteInteraction(emote, context)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local interactions = PNC.VanillaEmoteInteractions
+    local definition = interactions and interactions.Get(emote) or nil
+    local requestID
+    local args
+    local result
+    local authority
+    if not player or not definition then
+        return false, "unsupported_emote"
+    end
+    context = type(context) == "table" and context or {}
+    requestID = tostring(context.requestID or "")
+    if requestID == "" then
+        requestID = Core.GenerateID and Core.GenerateID("emote")
+            or tostring(Core.Now())
+    end
+    args = {
+        requestID = requestID,
+        emote = definition.id,
+    }
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not sendClientCommand then
+            return false, "network_api_unavailable"
+        end
+        sendClientCommand(
+            player,
+            Const.MODULE,
+            Const.CMD_PLAYER_EMOTE_INTERACTION,
+            args
+        )
+        traceCompanionCommand("vanilla_emote", definition.id, "social", {
+            requestID = requestID,
+            origin = context.origin or "vanilla_emote_radial",
+        }, { status = "network_queued" })
+        return true, "network_queued", args
+    end
+    authority = PNC.PlayerEmoteInteractionAuthority
+    if not authority or not authority.Handle then
+        return false, "emote_interaction_authority_unavailable"
+    end
+    result = authority.Handle(player, args)
+    if PNC.CompanionCommandPresentation
+        and PNC.CompanionCommandPresentation.HandlePlayerEmoteInteractionResult
+    then
+        PNC.CompanionCommandPresentation.HandlePlayerEmoteInteractionResult(
+            result
+        )
+    end
+    traceCompanionCommand("vanilla_emote", definition.id, "social", {
+        requestID = requestID,
+        origin = context.origin or "vanilla_emote_radial",
+    }, result)
+    if type(result) == "table" then
+        return result.accepted == true, result.reason, result
+    end
+    return result == true, result and "applied" or "rejected", result
 end
 
 function Client.ReserveLLMRequest(npcID, token, requestID)

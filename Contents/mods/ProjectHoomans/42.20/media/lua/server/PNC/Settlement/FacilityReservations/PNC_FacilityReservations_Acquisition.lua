@@ -73,6 +73,11 @@ end
 function PNC.FacilityService.AcquireActivity(baseId, npcId, capability,
     options)
     options = type(options) == "table" and options or {}
+    local liveCharacter = PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(npcId) or nil
+    local selectionOptions = {}
+    for key, value in pairs(options) do selectionOptions[key] = value end
+    selectionOptions.character = liveCharacter
     local facilities = PNC.FacilityService.ListByCapability(baseId, capability,
         options.stationId)
     local requested = options.componentId and PNC.SettlementRepository
@@ -84,7 +89,7 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability,
             and PNC.FacilityResources.GetBinding(facility, capability)
         if resourceBinding then
             local selected = PNC.FacilityResources.Select(
-                facility, capability, options)
+                facility, capability, selectionOptions)
             if selected then
                 local ok, reservation = Reservations.ReserveResource(
                     facility.id, selected.resource, npcId, capability,

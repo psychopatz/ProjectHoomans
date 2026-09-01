@@ -60,21 +60,56 @@ function Knowledge.DiscoverTopicForPlayer(
     player, npcID, topicID, at, sourceType, deferCommit
 )
     local topic = tostring(topicID or "")
+    local source = sourceType or "direct_disclosure"
     local revealed = {}
     local failures = {}
+    local known = {}
+    local matched = 0
+    local firstFailureReason
+    local characterUUID
     if topic == "" then return nil, "unknown_knowledge_topic" end
+    if source == "direct_disclosure" then
+        characterUUID = Internal.characterUUIDForPlayer(
+            player, "knowledge_disclosure"
+        )
+        if not characterUUID then
+            return nil, "character_identity_unavailable"
+        end
+    end
     for _, descriptor in ipairs(Definitions.List()) do
         local presentation = descriptor.presentation or {}
         if tostring(presentation.topicID or "") == topic then
-            local result, reason = Knowledge.ForceRevealForPlayer(player, npcID, descriptor.id, at, sourceType or "direct_disclosure")
-            if result then
+            matched = matched + 1
+            local allowed, reason = true, nil
+            if source == "direct_disclosure" then
+                allowed, reason = Knowledge.CanDisclose(
+                    characterUUID, npcID, descriptor.id
+                )
+            end
+            local result
+            local alreadyKnown = false
+            if allowed and source == "direct_disclosure"
+                and Knowledge.GetDescriptor(characterUUID, npcID, descriptor.id)
+            then
+                known[#known + 1] = descriptor.id
+                alreadyKnown = true
+            elseif allowed then
+                result, reason = Knowledge.ForceRevealForPlayer(
+                    player, npcID, descriptor.id, at, source
+                )
+            end
+            if result and not alreadyKnown then
                 revealed[#revealed + 1] = descriptor.id
-            else
+            elseif not alreadyKnown then
+                firstFailureReason = firstFailureReason or reason
                 failures[#failures + 1] = descriptor.id .. ":" .. tostring(reason)
             end
         end
     end
-    if #revealed == 0 and #failures == 0 then return nil, "unknown_knowledge_topic" end
+    if matched == 0 then return nil, "unknown_knowledge_topic" end
+    if #revealed == 0 and #known == 0 and #failures > 0 then
+        return nil, firstFailureReason or "knowledge_disclosure_rejected"
+    end
     -- A direct answer changes player-facing identity immediately. Commit at
     -- the disclosure boundary so learned names survive a restart even when no
     -- later periodic world save occurs.
@@ -91,7 +126,10 @@ function Knowledge.DiscoverTopicForPlayer(
             end
         end
     end
-    return { topicID = topic, revealed = revealed, failures = failures }
+    return {
+        topicID = topic, revealed = revealed, known = known,
+        failures = failures,
+    }
 end
 
 

@@ -8,6 +8,7 @@ PNC.ServerInventory.Internal = PNC.ServerInventory.Internal or {}
 local Service = PNC.ServerInventory
 local Internal = Service.Internal
 local Registry = PNC.Registry
+local Network = PNC.Network
 local relationshipSnapshot = Internal.relationshipSnapshot
 
 PNC.Gifts = PNC.Gifts or {}
@@ -51,6 +52,19 @@ local function applyGiftEffect(player, record, args, details)
                     and details.itemTypes[1] or "gift",
                 worldAgeHours = getGameTime and getGameTime()
                     and getGameTime():getWorldAgeHours() or 0,
+                sourceSystem = "gift",
+                interaction = {
+                    kind = "gift",
+                    source = "gift",
+                    interactionType = gift and gift.interactionType
+                        or gift and gift.memoryType or "gift",
+                    choiceID = "gift",
+                    itemSummary = details.itemSummary,
+                    itemTypes = details.itemTypes,
+                    npcTextKey = details.giftReplyKey,
+                    responseKey = details.giftReplyKey,
+                    applied = true,
+                },
             }
         )
     end
@@ -64,6 +78,25 @@ local function applyGiftEffect(player, record, args, details)
             respect = relationshipAfter.respect - relationshipBefore.respect,
             familiarity = relationshipAfter.familiarity - relationshipBefore.familiarity,
         }
+        if Network and Network.SendConversationRelationshipForNPC then
+            local sent
+            local ignoredReason
+            local summary
+            sent, ignoredReason, summary = Network.SendConversationRelationshipForNPC(
+                player,
+                record.id,
+                "gift",
+                {
+                    source = "gift",
+                    eventID = details.eventID,
+                    relationshipBefore = relationshipBefore,
+                    relationshipDelta = details.relationshipDelta,
+                }
+            )
+            if sent == true and summary then
+                details.relationshipAfter = summary
+            end
+        end
     else
         details.giftEffectError = applyReason or "relationship_unavailable"
         details.relationshipBefore = relationshipBefore

@@ -251,6 +251,37 @@ Scenes.Register("facility.living.sit", {
     end,
 })
 
+Scenes.Register("facility.living.sitFurniture", {
+    label = "Sit on Furniture",
+    description = "A persistent chair pose anchored to a discovered seat.",
+    category = "facility",
+    priority = 20,
+    repeatMode = "loop",
+    blocking = true,
+    steps = {
+        { id = "sit_chair", bump = "SitChair", durationMs = 0, loop = true },
+    },
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = function(record, zombie, scene, now)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneTick then
+            return jobs.OnSceneTick(record, zombie, scene, now)
+        end
+        return true
+    end,
+    onStop = function(record, zombie, scene, reason)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneStopped then
+            jobs.OnSceneStopped(record, zombie, scene, reason)
+        end
+    end,
+})
+
 Scenes.Register("facility.water.drink", {
     label = "Drink from Spigot",
     description = "Drink clean water from the colony spigot.",

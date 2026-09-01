@@ -27,6 +27,7 @@ PersonalCommands.SetDebugBaseline = Relationships.SetDebugBaseline
 PersonalCommands.AddMemory = Relationships.AddMemory
 PersonalCommands.ApplyEventMutation = Relationships.ApplyEventMutation
 PersonalCommands.ApplyConversationEffect = Relationships.ApplyConversationEffect
+PersonalCommands.RecordInteraction = Relationships.RecordInteraction
 PersonalCommands.RemoveMemory = Relationships.RemoveMemory
 PersonalCommands.Recalculate = Relationships.Recalculate
 PersonalCommands.PruneMemories = Relationships.PruneMemories

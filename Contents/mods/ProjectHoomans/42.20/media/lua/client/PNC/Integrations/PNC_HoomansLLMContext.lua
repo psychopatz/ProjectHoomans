@@ -232,7 +232,9 @@ local function recentConversation(view, currentMessage)
 end
 
 local function availableTools(entry)
-    local seen = { social_react = true, ask_name = true }
+    local seen = {
+        social_react = true, ask_name = true, disclose_knowledge = true,
+    }
     local output = {
         ToolPolicy and ToolPolicy.BuildDefinition
             and ToolPolicy.BuildDefinition()
@@ -268,6 +270,10 @@ local function availableTools(entry)
             },
         }
     end
+    if ToolPolicy and ToolPolicy.BuildKnowledgeDefinition then
+        local knowledgeDefinition = ToolPolicy.BuildKnowledgeDefinition()
+        if knowledgeDefinition then output[#output + 1] = knowledgeDefinition end
+    end
     local commands = PNC.CompanionCommands
     if not commands or not commands.List then return output end
     for _, definition in ipairs(commands.List()) do
@@ -281,8 +287,9 @@ local function availableTools(entry)
                     type = "function",
                     ["function"] = {
                         name = toolName,
-                        description = "Request the Project Hoomans order '" .. commandID
-                            .. "'; authority validates it.",
+                        description = definition.llmDescription
+                            or ("Request the Project Hoomans order '" .. commandID
+                                .. "'; authority validates it."),
                         parameters = {
                             type = "object",
                             properties = {
@@ -421,6 +428,10 @@ function Context.Build(view, message)
         role = text(presentation.factionRole or presentation.npcType, "survivor"),
         traits = traits,
         personality = personality,
+        skills = block.npcSkills
+            or source.skillLevels
+            or source.skills
+            or {},
     }
     local definitions = availableTools(entry)
     local catalogID, availableToolIDs = toolCatalogReference(definitions)

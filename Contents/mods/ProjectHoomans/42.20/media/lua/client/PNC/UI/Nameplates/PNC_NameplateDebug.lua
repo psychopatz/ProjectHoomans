@@ -57,6 +57,39 @@ local function settingEnabled(settings, key)
     return not settings or settings[key] ~= false
 end
 
+function Debug.CampResourceText(snapshot, settings)
+    local camp
+    local activity
+    local task
+    local phase
+    if not settings or settings.showCampDebug ~= true then return "" end
+    camp = snapshot and snapshot.campResourceDebug
+        or snapshot and snapshot.debugState
+        and snapshot.debugState.campResourceDebug or nil
+    if not camp then return "Camp: none" end
+    activity = camp.activity
+    task = activity and tostring(activity.capability or "facility") or "idle"
+    phase = activity and tostring(activity.phase or "working") or "idle"
+    return "Camp: " .. tostring(camp.mode or "camp")
+        .. " | Task: " .. string.upper(task)
+        .. " | Phase: " .. string.upper(phase)
+end
+
+function Debug.SeatingText(snapshot, settings)
+    if not settings
+        or (settings.showAIDebug ~= true and settings.showCampDebug ~= true)
+    then return "" end
+    local seating = snapshot and snapshot.seatingDebug
+        or snapshot and snapshot.debugState
+        and snapshot.debugState.seatingDebug or nil
+    if not seating then return "" end
+    local active = seating.active == true and "ACTIVE" or "IDLE"
+    return "Seats: " .. tostring(seating.mode or "none")
+        .. " " .. active
+        .. " | Phase: " .. string.upper(tostring(seating.phase or "idle"))
+        .. " | Seat: " .. string.upper(tostring(seating.seatState or "idle"))
+end
+
 local function infectionState(snapshot)
     local infection = snapshot and snapshot.bodyHealth
         and snapshot.bodyHealth.infection or nil
@@ -73,31 +106,44 @@ function Debug.BuildText(snapshot, hasBoundBody, settings)
     local combatDebug = snapshot and snapshot.combatDebugState or nil
     local firearmState = snapshot and snapshot.firearmState or nil
     local parts = {}
+    local campText = Debug.CampResourceText(snapshot, settings)
+    local seatingText = Debug.SeatingText(snapshot, settings)
+    local aiDebugVisible = not settings
+        or settings.showAIDebug == true
+        or settings.showCampDebug == nil
     if not debugState then
-        return settingEnabled(settings, "debugShowAI") and "AI: Unknown" or ""
+        local aiText = aiDebugVisible
+            and settingEnabled(settings, "debugShowAI")
+            and "AI: Unknown" or ""
+        local unknown = aiText
+        if campText ~= "" then unknown = unknown ~= ""
+            and (unknown .. " | " .. campText) or campText end
+        if seatingText ~= "" then unknown = unknown ~= ""
+            and (unknown .. " | " .. seatingText) or seatingText end
+        return unknown
     end
     local presence = string.upper(tostring(snapshot.presenceState or "unknown"))
     if snapshot.presenceState == Const.PRESENCE_LIVE then
         presence = presence .. "/" .. (hasBoundBody and "BOUND" or "MISSING")
     end
-    if settingEnabled(settings, "debugShowPresence") then
+    if aiDebugVisible and settingEnabled(settings, "debugShowPresence") then
         parts[#parts + 1] = "Presence: " .. presence
     end
-    if settingEnabled(settings, "debugShowAI") then
+    if aiDebugVisible and settingEnabled(settings, "debugShowAI") then
         parts[#parts + 1] =
             "AI: " .. tostring(debugState.aiState or snapshot.aiState or "Unknown")
     end
-    if settingEnabled(settings, "debugShowJob") then
+    if aiDebugVisible and settingEnabled(settings, "debugShowJob") then
         parts[#parts + 1] = "Job: " .. tostring(debugState.activeJob or "-")
     end
-    if settingEnabled(settings, "debugShowOrder") then
+    if aiDebugVisible and settingEnabled(settings, "debugShowOrder") then
         parts[#parts + 1] = "Order: " .. tostring(debugState.orderKind or "-")
     end
-    if settingEnabled(settings, "debugShowTarget") then
+    if aiDebugVisible and settingEnabled(settings, "debugShowTarget") then
         parts[#parts + 1] =
             "Target: " .. tostring(debugState.targetKind or "none")
     end
-    if settingEnabled(settings, "debugShowCombat") then
+    if aiDebugVisible and settingEnabled(settings, "debugShowCombat") then
         parts[#parts + 1] = "Mode: " .. tostring(
             debugState.combatModeResolved or debugState.weaponMode or "-"
         )
@@ -122,7 +168,9 @@ function Debug.BuildText(snapshot, hasBoundBody, settings)
                 )
         end
     end
-    if settingEnabled(settings, "debugShowMagazine") and firearmState then
+    if aiDebugVisible and settingEnabled(settings, "debugShowMagazine")
+        and firearmState
+    then
         parts[#parts + 1] = "Mag: "
             .. tostring(firearmState.count or 0)
             .. "/"
@@ -134,15 +182,17 @@ function Debug.BuildText(snapshot, hasBoundBody, settings)
                 or tostring(firearmState.reserveCount or 0)
         )
     end
-    if settingEnabled(settings, "debugShowStamina") then
+    if aiDebugVisible and settingEnabled(settings, "debugShowStamina") then
         parts[#parts + 1] = "Stamina: " .. tostring(
             debugState.staminaState or snapshot.staminaState or "-"
         )
     end
-    if settingEnabled(settings, "debugShowBlock") then
+    if aiDebugVisible and settingEnabled(settings, "debugShowBlock") then
         parts[#parts + 1] =
             "Block: " .. tostring(debugState.combatBlockReason or "-")
     end
+    if campText ~= "" then parts[#parts + 1] = campText end
+    if seatingText ~= "" then parts[#parts + 1] = seatingText end
     return table.concat(parts, " | ")
 end
 

@@ -15,9 +15,11 @@ local Identity = PNC.NPCIdentityPresentation
 
 local SCOPE_COLONISTS = "colonists"
 local SCOPE_OTHER = "other"
+local SCOPE_SOCIAL = "social"
 
 Resolver.SCOPE_COLONISTS = SCOPE_COLONISTS
 Resolver.SCOPE_OTHER = SCOPE_OTHER
+Resolver.SCOPE_SOCIAL = SCOPE_SOCIAL
 
 local function targetName(source)
     return Identity.GetName(source or { recruited = true })
@@ -61,7 +63,7 @@ local function isClientTargetCandidate(source, player, radius, scope)
         then
             return false
         end
-    elseif isCompanion(source) then
+    elseif scope == SCOPE_OTHER and isCompanion(source) then
         return false
     end
     x = tonumber(source.x)
@@ -141,6 +143,10 @@ function Resolver.CollectNearbyCompanions(player, radius)
     return Resolver.CollectNearbyTargets(player, radius, SCOPE_COLONISTS)
 end
 
+function Resolver.CollectNearbySocialTargets(player, radius)
+    return Resolver.CollectNearbyTargets(player, radius, SCOPE_SOCIAL)
+end
+
 function Resolver.NormalizeMode(mode)
     mode = tostring(mode or "nearest")
     if mode == "nearby" or mode == "multiple" or mode == "group" then
@@ -157,6 +163,9 @@ function Resolver.NormalizeScope(scope)
         or scope == "noncolonists"
     then
         return SCOPE_OTHER
+    end
+    if scope == SCOPE_SOCIAL or scope == "all" then
+        return SCOPE_SOCIAL
     end
     return SCOPE_COLONISTS
 end

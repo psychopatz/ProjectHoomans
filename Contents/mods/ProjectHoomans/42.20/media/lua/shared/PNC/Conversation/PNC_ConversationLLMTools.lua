@@ -14,6 +14,15 @@ Tools.VERSION = 1
 Tools.REACTION_ORDER = {
     "comfort", "praise", "admire", "apologize", "flirt", "insult",
 }
+Tools.SOCIAL_SUBTYPE_ORDER = {
+    "compliment", "romantic_interest", "sexual_advance", "hostile_abuse",
+}
+Tools.SOCIAL_SUBTYPES = {
+    compliment = true,
+    romantic_interest = true,
+    sexual_advance = true,
+    hostile_abuse = true,
+}
 Tools.INTENSITIES = { "low", "normal", "high" }
 Tools.REACTIONS = {
     comfort = {
@@ -67,6 +76,44 @@ function Tools.NormalizeIntensity(value)
     return INTENSITY_SCALE[key] and key or "normal"
 end
 
+function Tools.NormalizeSubtype(value)
+    local key = normalized(value)
+    return Tools.SOCIAL_SUBTYPES[key] and key or nil
+end
+
+function Tools.DefaultSubtype(reaction)
+    reaction = Tools.NormalizeReaction(reaction)
+    if reaction == "admire" or reaction == "praise" then
+        return "compliment"
+    end
+    if reaction == "flirt" then
+        return "romantic_interest"
+    end
+    if reaction == "insult" then
+        return "hostile_abuse"
+    end
+    return nil
+end
+
+function Tools.NormalizeSubtypeForReaction(value, reaction)
+    local subtype = Tools.NormalizeSubtype(value)
+    reaction = Tools.NormalizeReaction(reaction)
+    if subtype == "compliment"
+        and (reaction == "admire" or reaction == "praise")
+    then
+        return subtype
+    end
+    if (subtype == "romantic_interest" or subtype == "sexual_advance")
+        and reaction == "flirt"
+    then
+        return subtype
+    end
+    if subtype == "hostile_abuse" and reaction == "insult" then
+        return subtype
+    end
+    return Tools.DefaultSubtype(reaction)
+end
+
 local function relationshipState(relationship)
     relationship = type(relationship) == "table" and relationship or {}
     return normalized(
@@ -112,16 +159,18 @@ function Tools.ListAll()
     return output
 end
 
-function Tools.GetEffect(reaction, intensity)
+function Tools.GetEffect(reaction, intensity, subtype)
     reaction = Tools.NormalizeReaction(reaction)
     if not reaction then return nil, "unknown_reaction" end
     intensity = Tools.NormalizeIntensity(intensity)
+    subtype = Tools.NormalizeSubtypeForReaction(subtype, reaction)
     local definition = Tools.REACTIONS[reaction]
     local scale = INTENSITY_SCALE[intensity]
     return {
         type = "llm_social_reaction",
         reaction = reaction,
         intensity = intensity,
+        subtype = subtype,
         approval = definition.approval * scale,
         respect = definition.respect * scale,
         familiarity = definition.familiarity * scale,
@@ -135,68 +184,13 @@ function Tools.GetEffect(reaction, intensity)
         tags = {
             llm = true,
             reaction = reaction,
+            subtype = subtype,
             interaction = reaction == "insult"
                 and "player_insulted" or REACTION_MEMORY_TYPES[reaction],
         },
     }
 end
 
-function Tools.BuildDefinition()
-    local enum = {}
-    for _, reaction in ipairs(Tools.REACTION_ORDER) do
-        enum[#enum + 1] = reaction
-    end
-    return {
-        type = "function",
-        ["function"] = {
-            name = "social_react",
-            description = "Register the NPC's bounded reaction to the player's social message. "
-                .. "For insults, cursing, or hostile abuse directed at the NPC, use kind "
-                .. "'insult'. For sincere positive intent use 'admire', 'praise', "
-                .. "'comfort', or 'apologize'; use 'flirt' only when the relationship "
-                .. "and NPC personality make it appropriate. Positive actions are "
-                .. "limited to one per in-game day. Insults have no daily limit. "
-                .. "Gameplay authority decides whether it applies.",
-            parameters = {
-                type = "object",
-                properties = {
-                    kind = {
-                        type = "string",
-                        enum = enum,
-                        description = "The social reaction intent.",
-                    },
-                    intensity = {
-                        type = "string",
-                        enum = Tools.INTENSITIES,
-                        description = "Low, normal, or high intensity.",
-                    },
-                },
-                required = { "kind" },
-                additionalProperties = false,
-            },
-        },
-    }
-end
-
--- Identity disclosure is a real conversation action, not an LLM-authored
--- fact.  Keeping it in the same catalog lets native and text-only providers
--- reach the existing authoritative knowledge service.
-function Tools.BuildIdentityDefinition()
-    return {
-        type = "function",
-        ["function"] = {
-            name = "ask_name",
-            description = "Ask the NPC to say their name. Use when the player asks "
-                .. "what's your name, who are you, or asks the NPC to introduce "
-                .. "themselves. This invokes authoritative identity knowledge "
-                .. "disclosure; do not invent or persist a name in the reply.",
-            parameters = {
-                type = "object",
-                properties = {},
-                additionalProperties = false,
-            },
-        },
-    }
-end
+require "PNC/Conversation/PNC_ConversationLLMToolSchemas"
 
 return Tools

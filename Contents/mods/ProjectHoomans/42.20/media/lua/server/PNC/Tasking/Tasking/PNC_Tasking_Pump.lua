@@ -9,6 +9,21 @@ local H = Tasking.Internal
 local Events = Tasking.Events
 local Inbox = Tasking.Inbox
 
+local function promoteMaterializedLease(lease)
+    if not lease or tostring(lease.executionMode or "") ~= "ABSTRACT" then
+        return
+    end
+    local record = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(lease.npcId) or nil
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    if not record or record.presenceState ~= PNC.Const.PRESENCE_LIVE
+        or not activity or activity.taskLeaseId ~= lease.leaseId
+    then return end
+    lease.executionMode = "LIVE"
+    activity.abstract = false
+end
+
 local function reconcileOrphanedActivities(at)
     if at < (tonumber(Tasking.NextOrphanReconcileAt) or 0) then
         return 0
@@ -98,6 +113,7 @@ function Tasking.Commands.Pump(at, budget)
         if #Leases.Active <= 0 then break end
         Tasking.ExecutorCursor = (Tasking.ExecutorCursor % #Leases.Active) + 1
         local lease = Leases.Get(Leases.Active[Tasking.ExecutorCursor])
+        promoteMaterializedLease(lease)
         local provider = lease and Tasking.Providers[lease.sourceDomain]
         local executor = provider and type(provider.Tick) == "function"
             and provider or lease and Tasking.Executors[lease.executionMode]

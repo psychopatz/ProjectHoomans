@@ -120,4 +120,11 @@ function H.FinishTick(now)
             PNC.SocialEventHooks.WorldAgeHours()
         )
     end
+    if PNC.SocialGreeting and PNC.SocialGreeting.Pump then
+        PNC.SocialGreeting.Pump(
+            PNC.SocialEventHooks and PNC.SocialEventHooks.WorldAgeHours
+                and PNC.SocialEventHooks.WorldAgeHours()
+                or nil
+        )
+    end
 end

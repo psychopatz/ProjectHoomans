@@ -121,6 +121,7 @@ Internal.RegisterServerCommand(Const.CMD_PLAYER_BOOTSTRAP, function(args)
         ClientState.conversationDiary = {}
         ClientState.conversationDiaryRevision = 0
         ClientState.lastConversationDelta = nil
+        ClientState.lastConversationDeltas = {}
         ClientState.bootstrapKnowledgeRevision = incomingRevision
     end
     if projectionIsCurrent(args) then

@@ -48,7 +48,9 @@ PNC = {
         TACTICAL_CLASS_COLONIST = "colonist",
         PRESENCE_LIVE = "live",
         ORDER_FOLLOW = "follow",
+        ORDER_CAMP = "camp",
         ORDER_GUARD = "guard",
+        CAMP_RADIUS = 3,
         COMPANION_COMMAND_RADIUS = 20,
         ATTACK_TYPE_AUTO = "auto",
         ATTACK_TYPE_MELEE = "melee",
@@ -138,6 +140,12 @@ T.truthy(PNC.CompanionCommands.Get("manual_sleep"),
     "manual sleep command is registered")
 T.truthy(PNC.CompanionCommands.Get("manual_provision"),
     "manual provision command is registered")
+T.truthy(string.find(
+    PNC.CompanionCommands.Get("camp").llmDescription,
+    "stay here for now",
+    1,
+    true
+), "camp command intent metadata is registered")
 T.equal(PNC.CompanionCommands.Get("manual_sleep").contextOnly, true,
     "manual sleep stays out of the radial command list")
 T.load(SHARED_ROOT .. "PNC_CompanionCommandFlavorDefinitions.lua")
@@ -146,6 +154,8 @@ T.truthy(PNC.CompanionCommandFlavor.Resolve("follow", "player", "seed"),
     "built-in player flavor missing")
 T.truthy(PNC.CompanionCommandFlavor.Resolve("follow", "npc", "seed"),
     "built-in NPC flavor missing")
+T.truthy(PNC.CompanionCommandFlavor.Resolve("camp", "player", "seed"),
+    "built-in camp player flavor missing")
 T.equal(PNC.CompanionCommandFlavor.Register("extension_command", {
     player = {
         { key = "UI_Extension_Command", fallback = "Extension fallback." },
@@ -231,7 +241,7 @@ records.owned.affiliation = { factionID = "faction_alice" }
 T.equal(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
     true, "single-player faction ownership uses canonical account key")
 
-T.equal(#PNC.CompanionCommands.List(), 13, "registered command count")
+T.equal(#PNC.CompanionCommands.List(), 14, "registered command count")
 T.equal(PNC.CompanionCommands.Get("scavenge_nearby").clientOnly, true,
     "scavenge command opens its client setup UI")
 T.equal(#PNC.CompanionCommands.ListGroups(), 3,
@@ -273,6 +283,17 @@ T.equal(records.owned.orderSpec.x, 3.5, "stay live-body anchor x")
 T.equal(records.owned.orderSpec.y, 1.5, "stay live-body anchor y")
 
 affected, reason = PNC.CompanionCommands.Execute(player, {
+    id = "owned",
+    commandID = "camp",
+})
+T.equal(affected, 1, "camp command target count")
+T.equal(reason, "commanded", "camp command result")
+T.equal(records.owned.orderSpec.kind, "camp", "camp order")
+T.equal(records.owned.orderSpec.x, 3.5, "camp live-body anchor x")
+T.equal(records.owned.orderSpec.y, 1.5, "camp live-body anchor y")
+T.equal(records.owned.orderSpec.radius, 3, "camp order radius")
+
+affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "neutral",
     commandID = "follow",
 })
@@ -292,7 +313,7 @@ affected, reason = PNC.CompanionCommands.Execute(player, {
     radius = 200,
 })
 T.equal(affected, 1, "closest command affects one nearby companion")
-T.equal(records.owned.orderSpec.kind, "guard",
+T.equal(records.owned.orderSpec.kind, "camp",
     "attack type changed movement order")
 T.equal(records.owned.weaponMode, "ranged", "ranged attack mode")
 T.equal(records.owned.attackType, "ranged", "ranged attack type")
@@ -500,20 +521,20 @@ registeredProvider.addOptions(
 )
 T.equal(context.options[1].name, "Companion Commands",
     "context command root")
-T.equal(#context.options[1].submenu.options, 5,
+T.equal(#context.options[1].submenu.options, 6,
     "movement commands and nested attack root")
-T.equal(context.options[1].submenu.options[3].name, "Go Home",
+T.equal(context.options[1].submenu.options[4].name, "Go Home",
     "context go-home command")
-T.equal(context.options[1].submenu.options[4].name, "Scavenge Nearby",
+T.equal(context.options[1].submenu.options[5].name, "Scavenge Nearby",
     "context scavenge command")
-T.equal(context.options[1].submenu.options[5].name, "Attack Type",
+T.equal(context.options[1].submenu.options[6].name, "Attack Type",
     "nested attack type root")
-local attackOptions = context.options[1].submenu.options[5].submenu.options
+local attackOptions = context.options[1].submenu.options[6].submenu.options
 T.equal(#attackOptions, 4, "attack type definitions")
 T.equal(attackOptions[4].notAvailable, true,
     "current attack type is disabled and red")
 T.equal(
-    context.options[1].submenu.options[5].iconTexture,
+    context.options[1].submenu.options[6].iconTexture,
     "media/ui/emotes/no.png",
     "context attack type icon did not reflect current setting"
 )
@@ -663,6 +684,12 @@ T.equal(
     "all-nearby radial go-home slice"
 )
 T.equal(
+    ISEmoteRadialMenu.menu.PNC_GroupCompanionCommands
+        .subMenu.PNC_GroupCommand_camp,
+    "Camp Here",
+    "all-nearby radial camp slice"
+)
+T.equal(
     ISEmoteRadialMenu.menu.PNC_ClosestCompanionCommands
         .subMenu.PNC_ClosestCommandGroup_attack_type,
     "Attack Type",
@@ -750,6 +777,14 @@ T.equal(radialSent[3].npcId, nil,
     "group radial go-home target should be nil")
 T.equal(radialSent[3].scope, "group",
     "group radial go-home scope")
+radial:emote("PNC_GroupCommand_camp")
+T.equal(radialSent[4].commandID, "camp",
+    "group radial camp dispatch")
+T.equal(radialSent[4].npcId, nil,
+    "group radial camp target should be nil")
+T.equal(radialSent[4].scope, "group", "group radial camp scope")
+T.equal(originalVisual, "freeze", "camp radial visual emote")
+T.equal(radialFlavor.commandID, "camp", "camp radial flavor command")
 radial:emote("wavehi")
 T.equal(originalVisual, "wavehi", "ordinary emote delegation")
 

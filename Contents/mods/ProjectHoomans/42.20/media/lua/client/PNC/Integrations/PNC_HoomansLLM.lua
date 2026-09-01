@@ -1,6 +1,8 @@
 -- In-game NPC free-text chat over the bounded PsychopatzCore bridge.
 require "PsychopatzCore/UI/Conversation/PsychopatzConversationLayout"
 require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
+require "PNC/Conversation/PNC_ConversationLLMTools"
+require "PNC/Conversation/PNC_ConversationToolReplies"
 require "PNC/Integrations/PNC_HoomansLLMContext"
 require "PNC/Integrations/PNC_ConversationMemorySync"
 require "PNC/UI/Nameplates/PNC_NameplateSpeech"
@@ -12,6 +14,8 @@ PNC.HoomansLLM = PNC.HoomansLLM or {}
 local Integration = PNC.HoomansLLM
 local Layout = PsychopatzCore.Conversation.Layout
 local Context = PNC.HoomansLLM.Context
+local LLMTools = PNC.ConversationLLMTools
+local ToolReplies = PNC.Conversation and PNC.Conversation.ToolReplies
 local Message = PsychopatzCore.Conversation.Message
 local Trace = PsychopatzCore.DebugTrace
 local Speech = PNC.NameplateSpeech
@@ -65,6 +69,32 @@ local function cleanResponseText(value)
         ""
     )
     value = string.gsub(value, "</projecthoomans%-action%s*>", "")
+    local lowered = string.lower(value)
+    local scaffoldStart = string.find(lowered, "^%s*instruction%s*:")
+        or string.find(lowered, "\n%s*instruction%s*:")
+        or string.find(lowered, "^%s*response%s*$")
+        or string.find(lowered, "\n%s*response%s*$")
+        or string.find(lowered, "^%s*answer%s*:")
+        or string.find(lowered, "\n%s*answer%s*:")
+        or string.find(lowered, "^%s*analysis%s*:")
+        or string.find(lowered, "\n%s*analysis%s*:")
+        or string.find(lowered, "^%s*self[- ]correction%s*:")
+        or string.find(lowered, "\n%s*self[- ]correction%s*:")
+        or string.find(lowered, "^%s*final%s+check%s*:")
+        or string.find(lowered, "\n%s*final%s+check%s*:")
+        or string.find(lowered, "^%s*new%s+attempt%s*:")
+        or string.find(lowered, "\n%s*new%s+attempt%s*:")
+    if scaffoldStart then
+        value = trim(string.sub(value, 1, scaffoldStart - 1))
+        if value == "" then return "" end
+        return value
+    end
+    local providerMeta = string.find(lowered, "self[- ]correction%s+check")
+        or string.find(lowered, "last turn['’]s instructions")
+        or string.find(lowered, "prompt for the final response")
+        or string.find(lowered, "player['’]s last message%s*:")
+        or string.find(lowered, "required action%s*:")
+    if providerMeta then return "" end
     return trim(value)
 end
 
@@ -437,8 +467,18 @@ local function applySemanticTools(packet, arguments, npcID, session)
                 kind = trim(callArguments.reaction)
             end
             local intensity = trim(callArguments.intensity)
+            local subtype = trim(callArguments.subtype)
+            if LLMTools and LLMTools.NormalizeReaction then
+                kind = LLMTools.NormalizeReaction(kind) or kind
+            end
+            if LLMTools and LLMTools.NormalizeSubtypeForReaction then
+                subtype = LLMTools.NormalizeSubtypeForReaction(subtype, kind)
+            end
             if execute then
-                result.accepted, result.reason = execute(
+                local accepted
+                local reason
+                local authoritativeResult
+                accepted, reason, authoritativeResult = execute(
                     npcID,
                     kind,
                     intensity,
@@ -448,12 +488,75 @@ local function applySemanticTools(packet, arguments, npcID, session)
                         callID = callID,
                         token = packet and packet.conversation_context
                             and packet.conversation_context.conversation_token,
+                        subtype = subtype,
                     }
                 )
+                result.accepted = accepted == true
+                result.reason = reason
                 result.reaction = kind
                 result.intensity = intensity
+                result.subtype = subtype
+                result.explicit = subtype == "sexual_advance"
+                result.authoritative = type(authoritativeResult) == "table"
+                if result.authoritative then
+                    result.relationship = authoritativeResult.relationship
+                    result.relationshipBefore =
+                        authoritativeResult.relationshipBefore
+                    result.relationshipAfter = authoritativeResult.relationshipAfter
+                    result.relationshipDelta = authoritativeResult.relationshipDelta
+                    result.cooldownUntil = authoritativeResult.cooldownUntil
+                    result.eventID = authoritativeResult.eventID
+                    result.memoryID = authoritativeResult.memoryID
+                    result.subtype = authoritativeResult.subtype or result.subtype
+                    result.explicit = authoritativeResult.explicit
+                    result.replyContext = authoritativeResult.replyContext
+                end
             else
                 result.reason = "social_reaction_client_unavailable"
+                result.reaction = kind
+                result.intensity = intensity
+                result.subtype = subtype
+                result.explicit = subtype == "sexual_advance"
+            end
+            if not result.replyContext then
+                result.replyContext = {
+                    outcome = result.accepted == true and "accepted" or "rejected",
+                    reaction = result.reaction,
+                    subtype = result.subtype,
+                    reason = result.reason,
+                    authoritative = result.authoritative == true,
+                }
+            end
+        elseif name == "disclose_knowledge" and exposedTool(packet, name) then
+            local requestTopic = PNC.Client
+                and PNC.Client.RequestNPCKnowledgeTopic
+            local topicID = trim(callArguments.topic_id)
+            result.topicID = topicID
+            if requestTopic and topicID ~= "" then
+                local accepted, reason, disclosureRequestID = requestTopic(
+                    npcID,
+                    topicID,
+                    {
+                        conversationToken = packet
+                            and packet.conversation_context
+                            and packet.conversation_context.conversation_token,
+                        origin = "llm_tool",
+                    }
+                )
+                result.accepted = accepted == true
+                result.reason = reason or (result.accepted
+                    and "submitted" or "rejected_by_game")
+                result.disclosureRequestID = disclosureRequestID
+                result.authoritative = false
+                result.replyContext = {
+                    outcome = result.accepted and "knowledge_request_submitted"
+                        or "knowledge_request_rejected",
+                    topicID = topicID,
+                    reason = result.reason,
+                }
+            else
+                result.reason = topicID == "" and "topic_required"
+                    or "knowledge_client_unavailable"
             end
         elseif name == "ask_name" and exposedTool(packet, name) then
             local requestTopic = PNC.Client
@@ -462,12 +565,19 @@ local function applySemanticTools(packet, arguments, npcID, session)
             if requestTopic then
                 local accepted, reason, disclosureRequestID = requestTopic(
                     npcID,
-                    "identity_name"
+                    "identity_name",
+                    {
+                        conversationToken = packet
+                            and packet.conversation_context
+                            and packet.conversation_context.conversation_token,
+                        origin = "llm_tool",
+                    }
                 )
                 result.accepted = accepted == true
                 result.reason = reason or (result.accepted
                     and "submitted" or "rejected_by_game")
                 result.disclosureRequestID = disclosureRequestID
+                result.authoritative = false
             else
                 result.reason = "identity_knowledge_client_unavailable"
             end
@@ -482,6 +592,7 @@ local function applySemanticTools(packet, arguments, npcID, session)
                     requestID = packet and packet.request_id,
                 }) == true
                 result.reason = result.accepted and "submitted" or "rejected_by_game"
+                result.commandID = commandID
             else
                 result.reason = "unknown_command"
             end
@@ -600,7 +711,20 @@ local function publishDetachedResponse(pending, response, source)
     return message
 end
 
-local function responseOrFailure(arguments, actionAccepted, actionAttempted)
+local function dedicatedToolReply(packet, semanticResults)
+    if not ToolReplies or not ToolReplies.Build then return nil end
+    local context = packet and packet.conversation_context or {}
+    return ToolReplies.Build(semanticResults, context)
+end
+
+local function responseOrFailure(
+    arguments,
+    actionAccepted,
+    actionAttempted,
+    semanticResults,
+    packet,
+    forceToolReply
+)
     local response = cleanResponseText(arguments and arguments.response_text)
     local providerFailure = arguments and (
         arguments.provider_failure == true
@@ -608,8 +732,19 @@ local function responseOrFailure(arguments, actionAccepted, actionAttempted)
         or arguments.context_eligible == false
         or arguments.contextEligible == false
     )
+    if forceToolReply then
+        local dedicated = dedicatedToolReply(packet, semanticResults)
+        if dedicated and dedicated ~= "" then
+            return dedicated, providerFailure == true
+        end
+    end
     if response ~= "" then
         return response, providerFailure == true
+    end
+
+    local dedicated = dedicatedToolReply(packet, semanticResults)
+    if dedicated and dedicated ~= "" then
+        return dedicated, providerFailure == true
     end
 
     local calls = arguments and arguments.semantic_tool_calls
@@ -679,7 +814,10 @@ function Integration.Deliver(arguments)
         local response, providerFailure = responseOrFailure(
             arguments,
             actionAccepted,
-            actionAttempted
+            actionAttempted,
+            semanticResults,
+            Pending.packet,
+            tostring(arguments.presentation_reason or "") == "tool_ack"
         )
         if traceEnabled() then
             Trace.Record({
@@ -713,7 +851,10 @@ function Integration.Deliver(arguments)
     end
 
     local semanticResults = applySemanticTools(Pending.packet, arguments, Pending.npcID, view.session)
-    local response = cleanResponseText(arguments.response_text)
+    local forceToolReply = tostring(arguments.presentation_reason or "")
+        == "tool_ack"
+    local response = forceToolReply and ""
+        or cleanResponseText(arguments.response_text)
     local providerFailure = false
     if response == "" then
         local actionAccepted = false
@@ -723,7 +864,10 @@ function Integration.Deliver(arguments)
         response, providerFailure = responseOrFailure(
             arguments,
             actionAccepted,
-            #semanticResults > 0
+            #semanticResults > 0,
+            semanticResults,
+            Pending.packet,
+            forceToolReply
         )
     end
     if traceEnabled() then

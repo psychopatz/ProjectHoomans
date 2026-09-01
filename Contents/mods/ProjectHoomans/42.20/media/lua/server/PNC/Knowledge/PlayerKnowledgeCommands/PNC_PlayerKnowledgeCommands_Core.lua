@@ -36,9 +36,16 @@ end
 function H.SanitizeSnapshot(snapshot)
     local safe = Core.DeepCopy(snapshot or {})
     local nameFact = H.FactFromSnapshot(safe, "identity.name")
+    local archetypeFact = H.FactFromSnapshot(safe, "identity.archetype")
+    local factionFact = H.FactFromSnapshot(safe, "faction.identity")
     safe.identity = type(safe.identity) == "table" and safe.identity or {}
     safe.identity.displayName = nameFact and tostring(nameFact.value) or nil
-    if not nameFact then safe.identity.archetypeLabel = nil end
+    safe.identity.archetypeLabel = archetypeFact
+        and safe.identity.archetypeLabel or nil
+    if not factionFact then
+        safe.identity.factionName = nil
+        safe.identity.factionRole = nil
+        safe.knownFaction = nil
+    end
     return safe, nameFact
 end
-

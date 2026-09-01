@@ -19,6 +19,29 @@ local function applyNearbyWater(record, state, definition, now)
         source = PNC.NearbyWaterService.Resolve(record, state.resourceKey)
         state.resource = source
     end
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    -- An abstract Camp retains a primitive faucet descriptor, not an
+    -- IsoObject. The captured resource is still authoritative proof that the
+    -- NPC can drink here, so apply the logical hydration effect without
+    -- trying to mutate an unloaded world object. Materialized Camp activity
+    -- continues through the normal live Consume path below.
+    if activity and activity.campActivity == true
+        and activity.abstract == true
+        and (not source or (not source.object and not source.item))
+    then
+        local liters = PNC.NearbyWaterService
+            and PNC.NearbyWaterService.DesiredLiters
+            and PNC.NearbyWaterService.DesiredLiters(record, nil) or 1
+        if PNC.IndividualNeeds and PNC.IndividualNeeds.Commands
+            and PNC.IndividualNeeds.Commands.ApplyDrink
+        then
+            PNC.IndividualNeeds.Commands.ApplyDrink(record, {
+                thirst = (tonumber(liters) or 0) / 2,
+            }, "camp_water_drink_abstract")
+        end
+        return true, true, "NEED_COMPLETE", liters
+    end
     local container = source and source.item
         and source.item.getFluidContainer
         and source.item:getFluidContainer() or nil

@@ -181,8 +181,37 @@ T.equal(writes[8].value, false,
     "faction overlay disabled persisted")
 
 T.equal(
+    PNC.Nameplates.IsCampDebugEnabled(),
+    false,
+    "camp facility overlay defaults off"
+)
+T.equal(
+    PNC.Nameplates.ToggleOverlay("camp"),
+    true,
+    "central dispatcher toggles camp facility overlay"
+)
+T.equal(writes[9].key, "showCampDebug",
+    "camp facility setting persisted")
+T.equal(writes[9].value, true,
+    "camp facility overlay enabled persisted")
+T.equal(halos[9], "UI_PNC_CampOverlayEnabled",
+    "camp facility enabled feedback")
+T.equal(
+    PNC.Nameplates.GetOverlaySummary(),
+    "ON: Camp",
+    "central overlay summary lists camp facility overlay"
+)
+T.equal(
+    PNC.Nameplates.ToggleCampDebug(),
+    false,
+    "camp facility overlay toggles off"
+)
+T.equal(writes[10].value, false,
+    "camp facility overlay disabled persisted")
+
+T.equal(
     #PNC.Nameplates.GetOverlayDefinitions(),
-    7,
+    8,
     "all overlay types share one registry"
 )
 T.equal(

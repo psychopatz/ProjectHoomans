@@ -19,6 +19,11 @@ function Internal.FindMaterializeSquare(record, now, reason)
     then
         resourceTarget = PNC.FacilityResources.ResolveActivityTarget(record)
     end
+    if not resourceTarget and PNC.CampResourceService
+        and PNC.CampResourceService.ResolveActivityTarget
+    then
+        resourceTarget = PNC.CampResourceService.ResolveActivityTarget(record)
+    end
     probeX = resourceTarget and resourceTarget.x or record.x
     probeY = resourceTarget and resourceTarget.y or record.y
     probeZ = resourceTarget and resourceTarget.z or record.z

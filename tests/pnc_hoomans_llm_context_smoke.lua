@@ -19,6 +19,11 @@ PNC = {
         List = function()
             return {
                 { id = "follow", clientOnly = false },
+                {
+                    id = "camp",
+                    clientOnly = false,
+                    llmDescription = "Use when the player says stay here for now.",
+                },
                 { id = "scavenge_nearby", clientOnly = true },
             }
         end,
@@ -52,6 +57,7 @@ local view = {
                 snapshot = {
                     archetypeLabel = "Scout",
                     vanillaTraits = { brave = true },
+                    skillLevels = { Carpentry = 4 },
                     socialProfile = { loyalty = 0.8 },
                     activeBehavior = "following",
                 },
@@ -76,6 +82,8 @@ T.equal(context.world_uuid, "pz-save:Save One", "save-scoped world identity")
 T.equal(context.player_uuid, "char_alex", "stable player identity")
 T.equal(context.npc_uuid, "npc_12", "stable NPC identity")
 T.equal(context.character_card.archetype, "Scout", "canonical character card")
+T.equal(context.character_card.skills.Carpentry, 4,
+    "canonical character card exposes NPC skill truth to the provider")
 T.equal(context.current_state.activeBehavior, "following", "compact state snapshot")
 T.equal(context.current_state.needs.hunger_level, "SEVERE", "needs severity")
 T.equal(context.current_state.needs.highest, "hunger", "highest current need")
@@ -89,6 +97,13 @@ T.equal(context.recent_conversation[2].content, "Do you need anything?", "player
 T.equal(context.available_tools[1]["function"].name, "social_react", "valid social tool name")
 T.equal(context.available_tools[2]["function"].name, "ask_name", "valid identity tool name")
 T.equal(context.available_tools[3]["function"].name, "order_follow", "valid order tool name")
-T.equal(#context.available_tools, 3, "client-only tools are not exposed")
+T.equal(context.available_tools[4]["function"].name, "order_camp", "valid camp tool name")
+T.truthy(string.find(
+    context.available_tools[4]["function"].description,
+    "stay here for now",
+    1,
+    true
+), "camp intent guidance is exposed to the LLM")
+T.equal(#context.available_tools, 4, "client-only tools are not exposed")
 
 T.finish("pnc_hoomans_llm_context_smoke")

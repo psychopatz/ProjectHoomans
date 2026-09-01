@@ -1,9 +1,11 @@
 -- Project Hoomans' adapter for the mod-agnostic PsychopatzCore voice stream.
 -- Core owns transport and lifecycle; this file only resolves Hoomans' NPC
--- body/profile into the compact binding understood by P BrainZ.
+-- body/profile into the compact binding understood by PBrainZ.
 
 require "PsychopatzCore/Voice/PsychopatzVoiceGateway"
 require "PNC/Audio/PNC_NPCVoice"
+require "PNC/Audio/PNC_PlayerVoice"
+pcall(require, "PsychopatzCore/UI/PsychopatzAudioSettings")
 
 PNC = PNC or {}
 PNC.VoiceGateway = PNC.VoiceGateway or {}
@@ -69,6 +71,40 @@ local function profileFor(message)
     }
 end
 
+local function playerProfileFor(message)
+    local voice = PNC and PNC.PlayerVoice or nil
+    if not voice or type(voice.GetProfile) ~= "function" then return nil end
+    local ok, profile = pcall(voice.GetProfile, message)
+    if not ok or type(profile) ~= "table" then return nil end
+    local playerID = trim(profile.player_uuid or profile.speaker_id)
+    local slot = trim(profile.slot)
+    if playerID == "" or slot == "" then return nil end
+    return {
+        speaker_id = playerID,
+        speaker_kind = "player",
+        player_uuid = playerID,
+        slot = slot,
+        pitch = tonumber(profile.pitch) or 0,
+    }
+end
+
+local function playerSpeechEnabled()
+    local audio = PsychopatzCore and PsychopatzCore.Audio or nil
+    if not audio or type(audio.IsPlayerSpeechEnabled) ~= "function" then
+        return false
+    end
+    local ok, enabled = pcall(audio.IsPlayerSpeechEnabled)
+    return ok and enabled == true
+end
+
+local function brainAvailable()
+    if not Gateway or type(Gateway.IsBridgeReady) ~= "function" then
+        return false
+    end
+    local ok, ready = pcall(Gateway.IsBridgeReady)
+    return ok and ready == true
+end
+
 local function sourceChannel(message)
     local source = message and message.source
     return type(source) == "table" and trim(source.channel) or ""
@@ -76,7 +112,12 @@ end
 
 local function accepts(message)
     if type(message) ~= "table" then return false end
-    if tostring(message.speakerKind or message.speaker or "npc") ~= "npc" then
+    local speakerKind = string.lower(tostring(
+        message.speakerKind or message.speaker or "npc"
+    ))
+    if speakerKind == "player" then
+        if not playerSpeechEnabled() or not brainAvailable() then return false end
+    elseif speakerKind ~= "npc" then
         return false
     end
     if trim(message.text) == "" then return false end
@@ -84,14 +125,18 @@ local function accepts(message)
         and message.presentationState or {}
     if state.tts == false then return false end
     -- These are already managed by the legacy LLM TTS callbacks. This guard
-    -- makes the Core stream safe while an older P BrainZ is still in use.
+    -- makes the Core stream safe while an older PBrainZ is still in use.
     local channel = sourceChannel(message)
     return channel ~= "tts" and channel ~= "tts_detached"
         and message.ttsManaged ~= true
 end
 
 local function enrich(message)
-    local binding = profileFor(message)
+    local speakerKind = string.lower(tostring(
+        message.speakerKind or message.speaker or "npc"
+    ))
+    local binding = speakerKind == "player"
+        and playerProfileFor(message) or profileFor(message)
     if not binding then return {} end
     return {
         voice_binding = binding,
@@ -104,14 +149,11 @@ local function enrich(message)
 end
 
 local function bridgeConfigured()
-    local bootstrap = PsychopatzCore and PsychopatzCore.BridgeBootstrap
-    if not bootstrap then return true end
-    if bootstrap.IsEnabled and bootstrap:IsEnabled() == true then return true end
-    if bootstrap.GetConfig then
-        local ok, config = pcall(bootstrap.GetConfig)
-        return ok and type(config) == "table" and config.enabled == true
-    end
-    return false
+    return brainAvailable()
+end
+
+function Adapter.IsBrainAvailable()
+    return brainAvailable()
 end
 
 function Adapter.Register()

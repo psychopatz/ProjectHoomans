@@ -46,12 +46,39 @@ function Network.SendRelationshipDebug(
     end
 end
 
-function Network.SendConversationRelationship(targetPlayer, summary, reason)
+-- Relationship presentation has one transport contract for every
+-- authoritative social source.  Emotes, LLM reactions, gifts, and social
+-- events may still send their own result payloads for dialogue/diary data,
+-- but the relationship panel always consumes this message shape.
+function Network.SendConversationRelationship(
+    targetPlayer,
+    summary,
+    reason,
+    relationshipContext
+)
+    relationshipContext = type(relationshipContext) == "table"
+        and relationshipContext or {}
     local payload = {
         summary = summary,
         reason = reason,
+        source = relationshipContext.source,
+        eventID = relationshipContext.eventID,
+        relationshipDelta = relationshipContext.relationshipDelta
+            or relationshipContext.delta,
+        relationshipBefore = relationshipContext.relationshipBefore
+            or relationshipContext.before,
+        relationshipAfter = relationshipContext.relationshipAfter
+            or relationshipContext.after
+            or summary,
+        revision = relationshipContext.revision
+            or summary and summary.revision or nil,
         serverTime = Core.Now(),
     }
+    if relationshipContext.npcID ~= nil then
+        payload.npcID = tostring(relationshipContext.npcID)
+    elseif type(summary) == "table" and summary.npcID ~= nil then
+        payload.npcID = tostring(summary.npcID)
+    end
     if isServer and isServer() and targetPlayer then
         sendServerCommand(
             targetPlayer,
@@ -59,6 +86,7 @@ function Network.SendConversationRelationship(targetPlayer, summary, reason)
             Const.CMD_CONVERSATION_RELATIONSHIP,
             payload
         )
+        return true
     elseif not isServer or not isServer() then
         triggerEvent(
             "OnServerCommand",
@@ -66,7 +94,9 @@ function Network.SendConversationRelationship(targetPlayer, summary, reason)
             Const.CMD_CONVERSATION_RELATIONSHIP,
             payload
         )
+        return true
     end
+    return false
 end
 
 function Network.SendNPCKnowledge(targetPlayer, snapshot, reason)

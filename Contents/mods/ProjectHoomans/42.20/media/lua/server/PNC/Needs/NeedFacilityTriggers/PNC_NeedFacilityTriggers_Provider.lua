@@ -16,14 +16,14 @@ end
 Triggers.HasFacility = HomeRoute.HasFacility
 
 local function resolveAwayRoute(record, definition)
-    if not AwayRoutes.IsFollowing(record)
+    if not AwayRoutes.IsAwayCompanion(record)
         and HomeRoute.IsAvailable(record, definition)
     then return nil end
     return AwayRoutes.Resolve(record, definition)
 end
 
 local function hasRoute(record, definition)
-    return not AwayRoutes.IsFollowing(record)
+    return not AwayRoutes.IsAwayCompanion(record)
         and HomeRoute.IsAvailable(record, definition)
         or resolveAwayRoute(record, definition) ~= nil
 end
@@ -52,6 +52,30 @@ function Triggers.PreferFacility(record, triggerId)
         })
     end
     return true
+end
+
+-- The passive needs scheduler is also the periodic safety net for needs whose
+-- severity did not change while the NPC was travelling. Check every
+-- definition once and emit one coalesced wake-up for the NPC; the task inbox
+-- deduplicates repeated scheduler ticks while preserving the best cause.
+function Triggers.WakeActionable(record)
+    if not record then return false end
+    for _, definition in ipairs(Definitions.List()) do
+        local actionable = Definitions.Evaluate(definition, record, false)
+        if not manuallyDisabled(record, definition)
+            and actionable and hasRoute(record, definition)
+        then
+            if TaskEvents and TaskEvents.Emit then
+                TaskEvents.Emit("NPC_NEEDS_CHANGED", {
+                    npcId = record.id, source = "NeedsScheduler",
+                    entityId = definition.id,
+                    cause = "NEED_FACILITY_REFRESH",
+                })
+            end
+            return true
+        end
+    end
+    return false
 end
 
 function Triggers.GetCandidates(npcId)
@@ -96,8 +120,8 @@ function Triggers.Validate(intent)
         return false, "NOT_COMPANION"
     end
     if record.health and record.health.state == "incapacitated"
-        or record.runtime and (record.runtime.workOrderId
-            or record.runtime.attackAction or record.runtime.target)
+        or AwayRoutes.IsCombatActive(record)
+        or record.runtime and record.runtime.workOrderId
     then return false, "NPC_BUSY" end
     local activity = record.runtime and record.runtime.facilityActivity
     local activityLease = PNC.TaskLeaseService.ForNPC(record.id)
@@ -145,8 +169,8 @@ function Triggers.CanContinue(lease)
     local definition = Definitions.Get(route and route.needId or lease.sourceRef)
     if not record or record.alive == false or not definition then return false end
     if record.health and record.health.state == "incapacitated"
-        or record.runtime and (record.runtime.attackAction
-            or record.runtime.target)
+        or AwayRoutes.IsCombatActive(record)
+        or record.runtime and record.runtime.workOrderId
     then return false end
     if route then
         return route.CanContinue(record, lease)

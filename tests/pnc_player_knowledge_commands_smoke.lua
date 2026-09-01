@@ -85,6 +85,12 @@ PNC = {
         commits = commits + 1
         return commitSucceeds, commitSucceeds and "committed" or "disk_failed"
     end },
+    Conversation = { Authority = { Internal = {
+        ValidateLease = function(_, _, token)
+            return token == "lease:one", token == "lease:one"
+                and "validated" or "invalid_lease", { token = token }
+        end,
+    } } },
     Network = {
         SendPlayerBootstrap = function(_, payload)
             sent.bootstrap[#sent.bootstrap + 1] = copy(payload)
@@ -111,6 +117,7 @@ T.equal(unknown.snapshot.identity.displayName, nil,
 
 local failed = Commands.HandleDisclosure({}, {
     requestID = "disclose:1", npcID = "npc_doyle", topicID = "identity_name",
+    conversationToken = "lease:one",
 })
 T.equal(failed.success, false, "failed commit rejects disclosure")
 T.equal(failed.responseText, nil, "failed commit cannot display introduction")
@@ -124,16 +131,18 @@ T.equal(pending.reason, "knowledge_commit_pending", "pending commit is diagnosab
 commitSucceeds = true
 local retried = Commands.HandleDisclosure({}, {
     requestID = "disclose:1", npcID = "npc_doyle", topicID = "identity_name",
+    conversationToken = "lease:one",
 })
 T.truthy(retried.success, "retry succeeds after durable commit")
 T.equal(disclosureCalls, 1, "retry does not duplicate learned evidence")
 T.equal(retried.responseText,
-    "I'm Doyle Wild. I'm with Pinecrest Settlement.",
+    "I'm Doyle Wild.",
     "response text is supplied by authority after commit")
 T.equal(retried.presentation.state, "known", "committed projection is known")
 
 local replay = Commands.HandleDisclosure({}, {
     requestID = "disclose:1", npcID = "npc_doyle", topicID = "identity_name",
+    conversationToken = "lease:one",
 })
 T.truthy(replay.success and replay.replayed == true,
     "successful request ID is idempotently replayed")

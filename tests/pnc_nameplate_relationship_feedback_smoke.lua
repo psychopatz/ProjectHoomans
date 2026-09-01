@@ -167,4 +167,34 @@ local llmFeedback = Feedback.Get("npc-llm", clock + 100)
 T.equal(llmFeedback.direction, "down",
     "LLM relationship results publish negative nameplate feedback")
 
+handlers[PNC.Const.CMD_CONVERSATION_RELATIONSHIP]({
+    source = "treated_wound",
+    eventID = "event-treatment",
+    summary = {
+        npcID = "npc-treatment",
+        approval = 14,
+        respect = 12,
+        familiarity = 3,
+        revision = 9,
+    },
+    relationshipBefore = {
+        npcID = "npc-treatment",
+        approval = 10,
+        respect = 10,
+        familiarity = 2,
+        revision = 8,
+    },
+    relationshipDelta = {
+        approval = 4,
+        respect = 2,
+        familiarity = 1,
+    },
+})
+T.equal(PNC.Network.ClientState.lastConversationDelta.source,
+    "treated_wound", "central relationship transport preserves source")
+T.equal(PNC.Network.ClientState.lastConversationDelta.delta.approval, 4,
+    "central relationship transport preserves delta")
+T.equal(PNC.Network.ClientState.lastConversationDeltas["npc-treatment"]
+    .after.approval, 14, "central relationship transport stores after state")
+
 T.finish("pnc_nameplate_relationship_feedback_smoke")

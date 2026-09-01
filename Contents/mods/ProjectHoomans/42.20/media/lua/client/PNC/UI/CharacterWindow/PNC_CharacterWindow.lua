@@ -16,7 +16,7 @@ local IdentityPresentation = PNC.NPCIdentityPresentation
 
 local TAB_ORDER = {
     { id = "Info", label = "Info" },
-    { id = "Dossier", label = "Dossier" },
+    { id = "Dossier", label = "Profile" },
     { id = "Interactions", label = "Interactions" },
     { id = "Skills", label = "Skills" },
     { id = "Health", label = "Health" },
@@ -206,6 +206,11 @@ function ISPNCCharacterWindow:setNPC(npcId)
     if PNC.Client and PNC.Client.RequestNPCKnowledge and self.npcId then
         PNC.Client.RequestNPCKnowledge(self.npcId)
     end
+    if PNC.Client and PNC.Client.RequestConversationRelationship
+        and self.npcId
+    then
+        PNC.Client.RequestConversationRelationship(self.npcId)
+    end
 end
 
 function ISPNCCharacterWindow:updateSnapshot()
@@ -218,6 +223,10 @@ function ISPNCCharacterWindow:updateSnapshot()
         tostring(payload and payload.inventory and payload.inventory.revision or 0),
         tostring(ClientState.npcKnowledge and ClientState.npcKnowledge[self.npcId]
             and ClientState.npcKnowledge[self.npcId].revision or 0),
+        tostring(ClientState.conversationRelationships
+            and ClientState.conversationRelationships[self.npcId]
+            and ClientState.conversationRelationships[self.npcId].revision
+            or 0),
         tostring(ClientState.conversationDiaryRevision or 0),
     }, "|")
     self.snapshot = snapshot

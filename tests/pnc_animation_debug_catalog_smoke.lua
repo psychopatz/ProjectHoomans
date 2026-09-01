@@ -8,15 +8,16 @@ PNC = {}
 T.load(CATALOG_FILE)
 
 local catalog = PNC.AnimationDebugCatalog
-T.truthy(catalog.generatedCount == 544, "catalog must include every zombie XML node")
-T.truthy(#catalog.entries == 544, "catalog entry count mismatch")
+T.truthy(catalog.generatedCount == 545, "catalog must include every zombie XML node")
+T.truthy(#catalog.entries == 545, "catalog entry count mismatch")
 T.truthy(catalog.stateCounts.hitreaction == 41, "nested hitreaction nodes missing")
-T.truthy(catalog.stateCounts.bumped == 236, "bumped node inventory mismatch")
+T.truthy(catalog.stateCounts.bumped == 237, "bumped node inventory mismatch")
 
 local attack
 local inheritedStagger
 local fenceStart
 local fenceEnd
+local sitChair
 local keys = {}
 for _, entry in ipairs(catalog.entries) do
     local key = entry.folder .. "/" .. entry.file
@@ -38,6 +39,10 @@ for _, entry in ipairs(catalog.entries) do
         and entry.file == "PNC_Anim_ClimbFenceEnd.xml"
     then
         fenceEnd = entry
+    elseif entry.state == "bumped"
+        and entry.file == "PNC_Anim_SitChair.xml"
+    then
+        sitChair = entry
     end
 end
 
@@ -77,6 +82,11 @@ T.truthy(
     fenceEnd.anim == "Bob_VaultOver_End",
     "fence landing clip mismatch"
 )
+T.truthy(sitChair, "chair seating animation node missing")
+T.truthy(sitChair.anim == "Bob_SatChair",
+    "chair seating must use the vanilla chair pose")
+T.truthy(sitChair.looped == true,
+    "chair seating pose must remain looped")
 T.finish("pnc_animation_debug_catalog_smoke")
 
 T.finish("pnc_animation_debug_catalog_smoke")

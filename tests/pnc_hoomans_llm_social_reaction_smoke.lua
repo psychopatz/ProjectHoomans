@@ -109,6 +109,8 @@ local accepted = Authority.HandleLLMSocialReaction(player, {
 })
 T.truthy(accepted.accepted, "social reaction accepted")
 T.equal(accepted.reaction, "comfort", "reaction normalized")
+T.equal(accepted.replyContext.outcome, "accepted",
+    "accepted result carries reply context")
 T.equal(applyCount, 1, "relationship effect applied once")
 T.truthy(sent[1] and sent[1].relationship, "bounded result returned")
 T.equal(appliedContext.cooldownType, "llm_positive_social",
@@ -151,6 +153,7 @@ local insult = Authority.HandleLLMSocialReaction(player, {
     token = "lease-token",
     kind = "insult",
     intensity = "normal",
+    subtype = "hostile_abuse",
 })
 T.truthy(insult.accepted, "insult reaction accepted")
 T.equal(applyCount, 2, "insult relationship effect applied")
@@ -168,6 +171,12 @@ T.equal(insult.relationshipDelta.respect, -3,
     "authoritative result reports the applied respect delta")
 T.equal(insult.relationshipDelta.familiarity, 0,
     "authoritative result reports the applied familiarity delta")
+T.equal(insult.subtype, "hostile_abuse",
+    "authoritative result preserves hostile subtype")
+T.equal(appliedEffect.subtype, "hostile_abuse",
+    "relationship effect persists hostile subtype metadata")
+T.equal(insult.replyContext.subtype, "hostile_abuse",
+    "reply context preserves hostile subtype")
 T.equal(insult.relationshipBefore.approval, 13,
     "authoritative result preserves the pre-mutation relationship")
 T.equal(insult.relationshipAfter.approval, 9,
@@ -216,8 +225,10 @@ local admire = Authority.HandleLLMSocialReaction(player, {
     token = "lease-token",
     kind = "admire",
     intensity = "normal",
+    subtype = "compliment",
 })
 T.truthy(admire.accepted, "admire reaches the authoritative mutation path")
+T.equal(admire.subtype, "compliment", "admire preserves compliment subtype")
 T.equal(appliedEffect.memoryType, "player_admired",
     "admire creates a typed relationship memory")
 T.equal(appliedEffect.interactionType, "player_admired",
@@ -233,8 +244,13 @@ local gated = Authority.HandleLLMSocialReaction(player, {
     token = "lease-token",
     kind = "flirt",
     intensity = "normal",
+    subtype = "sexual_advance",
 })
 T.falsy(gated.accepted, "flirt is relationship-gated")
 T.equal(gated.reason, "relationship_gate", "relationship gate reason")
+T.equal(gated.subtype, "sexual_advance",
+    "rejected result preserves sexual subtype")
+T.equal(gated.replyContext.subtype, "sexual_advance",
+    "rejected reply context preserves sexual subtype")
 
 T.finish("pnc_hoomans_llm_social_reaction_smoke")

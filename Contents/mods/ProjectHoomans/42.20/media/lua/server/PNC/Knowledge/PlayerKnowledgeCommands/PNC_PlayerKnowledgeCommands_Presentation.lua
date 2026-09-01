@@ -23,7 +23,11 @@ function H.PresentationFor(player, npcID, requestID)
     end
     local snapshot
     local nameFact
-    snapshot, reason = PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer(player, npcID)
+    if PNC.NPCKnowledgeAPI and PNC.NPCKnowledgeAPI.GetForPlayer then
+        snapshot, reason = PNC.NPCKnowledgeAPI.GetForPlayer(player, npcID)
+    else
+        snapshot, reason = PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer(player, npcID)
+    end
     if not snapshot then
         return {
             requestID = requestID, npcID = npcID, state = "error",

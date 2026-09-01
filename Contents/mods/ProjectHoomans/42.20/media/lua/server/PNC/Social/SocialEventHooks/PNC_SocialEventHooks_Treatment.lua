@@ -9,6 +9,18 @@ local Hooks = PNC.SocialEventHooks
 local H = PNC.SocialEventHooksInternal
 local EntityRef = PNC.EntityRef
 local Core = PNC.Core
+local Network = PNC.Network
+
+local function relationshipDelta(before, after)
+    return {
+        approval = (tonumber(after and after.approval) or 0)
+            - (tonumber(before and before.approval) or 0),
+        respect = (tonumber(after and after.respect) or 0)
+            - (tonumber(before and before.respect) or 0),
+        familiarity = (tonumber(after and after.familiarity) or 0)
+            - (tonumber(before and before.familiarity) or 0),
+    }
+end
 
 function Hooks.OnTreatmentCompleted(
     player,
@@ -22,6 +34,8 @@ function Hooks.OnTreatmentCompleted(
     local occurredAt
     local actionID
     local event
+    local output
+    local firstDetail
     if not H.Enabled() or not PNC.SocialEvents then
         return { ok = false, reason = "feature_disabled" }
     end
@@ -76,7 +90,28 @@ function Hooks.OnTreatmentCompleted(
             severity = tonumber(context and context.severity),
         },
     }
-    return PNC.SocialEvents.Emit(event)
+    output = PNC.SocialEvents.Emit(event)
+    if output and output.ok == true
+        and Network and Network.SendConversationRelationshipForNPC
+    then
+        firstDetail = output.details and output.details[1] or nil
+        Network.SendConversationRelationshipForNPC(
+            player,
+            targetRecord.id,
+            "treated_wound",
+            {
+                source = "treated_wound",
+                eventID = output.eventID,
+                relationshipBefore = firstDetail
+                    and firstDetail.relationshipBefore or nil,
+                relationshipDelta = relationshipDelta(
+                    firstDetail and firstDetail.relationshipBefore or nil,
+                    firstDetail and firstDetail.relationshipAfter or nil
+                ),
+            }
+        )
+    end
+    return output
 end
 
 function Hooks.OnIncapacitationRecovered(
@@ -129,4 +164,3 @@ function Hooks.OnIncapacitationRecovered(
 end
 
 return Hooks
-

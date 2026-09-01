@@ -329,6 +329,50 @@ T.equal(
     "trader",
     "detailed faction role"
 )
+nearbyRecord.orderSpec = {
+    kind = "camp",
+    campId = "camp:trailhead",
+    x = 1,
+    y = 0,
+    z = 0,
+    resourceRadius = 12,
+}
+nearbyRecord.campState = {
+    campId = "camp:trailhead",
+    anchorX = 1,
+    anchorY = 0,
+    anchorZ = 0,
+    resourceRadius = 12,
+    capturedAtWorldHour = 42,
+    resources = {
+        {
+            detectorId = "bed",
+            resourceKind = "sleep_surface",
+            role = "sleep.bed",
+            resourceKey = "bed:1:2:0",
+            x = 1.5, y = 2.5, z = 0,
+        },
+        {
+            detectorId = "faucet",
+            resourceKind = "water_source",
+            role = "water.spigot",
+            resourceKey = "faucet:2:2:0:1",
+            x = 2.5, y = 2.5, z = 0,
+        },
+    },
+}
+local campSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
+T.equal(campSnapshot.debugState.campResourceDebug.bedCount, 1,
+    "detailed camp debug bed count")
+T.equal(campSnapshot.debugState.campResourceDebug.waterCount, 1,
+    "detailed camp debug water count")
+T.equal(campSnapshot.debugState.campResourceDebug.facilities[1].resourceKey,
+    "bed:1:2:0", "detailed camp debug facility key")
+T.equal(PNC.Network.BuildPresenceDelta(nearbyRecord)
+    .campResourceDebug.resourceCount, 2,
+    "presence camp debug resource count")
+nearbyRecord.orderSpec = nil
+nearbyRecord.campState = nil
 T.equal(
     #PNC.Network.BuildRosterSnapshot(nearbyRecord).travel.route.points,
     2,

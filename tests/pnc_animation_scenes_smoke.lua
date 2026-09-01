@@ -108,6 +108,13 @@ T.truthy(livingScene and livingScene.repeatMode == "loop"
 T.truthy(livingScene.steps[1].bump == "Sit"
         and livingScene.steps[4].bump == "SitRubHands",
     "living-room scene uses the supplied sitting bumps")
+local furnitureScene = PNC.AnimationScenes.Get("facility.living.sitFurniture")
+T.truthy(furnitureScene and furnitureScene.repeatMode == "loop"
+        and #furnitureScene.steps == 1
+        and furnitureScene.steps[1].bump == "SitChair"
+        and furnitureScene.steps[1].loop == true
+        and furnitureScene.steps[1].durationMs == 0,
+    "furniture seating scene must hold the dedicated chair pose")
 local drinkScene = PNC.AnimationScenes.Get("facility.water.drink")
 T.truthy(drinkScene and drinkScene.bump == "Drink"
         and drinkScene.repeatMode == "once",

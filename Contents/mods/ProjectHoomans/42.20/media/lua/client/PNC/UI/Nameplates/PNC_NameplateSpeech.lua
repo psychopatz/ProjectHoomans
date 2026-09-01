@@ -1,6 +1,7 @@
 require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
 require "PsychopatzCore/Events/PC_EventBus"
 require "PsychopatzCore/UI/Conversation/PsychopatzConversationTyping"
+require "PsychopatzCore/Text/PsychopatzMarkdown"
 
 PNC = PNC or {}
 PNC.NameplateSpeech = PNC.NameplateSpeech or {}
@@ -9,6 +10,7 @@ local Speech = PNC.NameplateSpeech
 local Message = PsychopatzCore.Conversation.Message
 local Events = PsychopatzCore.Events
 local Typing = PsychopatzCore.Conversation.Typing
+local Markdown = PsychopatzCore.Markdown
 
 Speech.MAX_PREVIEW_LENGTH = 180
 Speech.MIN_DURATION_MS = 4500
@@ -101,7 +103,12 @@ end
 
 function Speech.GetDisplayText(record)
     if record and record.pending then return Typing.GetText() end
-    return record and record.text or ""
+    if not record then return "" end
+    if record.displayText == nil then
+        local source = record.message and record.message.text or record.text
+        record.displayText = preview(Markdown.ToSingleLine(source))
+    end
+    return record.displayText or ""
 end
 
 function Speech.SetPending(npcID, requestID, conversationID)

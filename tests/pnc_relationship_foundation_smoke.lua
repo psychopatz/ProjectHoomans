@@ -546,6 +546,27 @@ T.equal(conversationRelationship.cooldowns.llm_positive_social, 48,
 T.equal(conversationRelationship.memories[
     #conversationRelationship.memories
 ].type, "player_admired", "conversation memory type is persisted")
+T.equal(#conversationRelationship.interactionJournal, 1,
+    "conversation interaction is attached to the relationship journal")
+T.equal(
+    conversationRelationship.interactionJournal[1].interactionType,
+    "player_admired",
+    "relationship journal preserves the interaction type"
+)
+local relationshipPayload = PNC.Persistence.SerializeRecord(
+    PNC.Registry.Get(alice.id)
+)
+local relationshipReloaded = PNC.Persistence.DeserializeRecord(
+    relationshipPayload,
+    alice.id
+)
+local reloadedJournal = relationshipReloaded.social.relationships[playerKey]
+    .interactionJournal
+T.equal(#reloadedJournal, 1,
+    "relationship interaction journal survives record serialization")
+T.equal(reloadedJournal[1].eventID,
+    conversationRelationship.interactionJournal[1].eventID,
+    "relationship journal event identity survives reload")
 
 -- 24-25. Older records migrate deterministically to V15 and can run again.
 T.equal(PNC.Const.PERSISTENCE_VERSION, 15,

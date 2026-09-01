@@ -9,6 +9,39 @@ local Jobs = PNC.FacilityJobs
 local H = PNC.FacilityJobsServiceInternal
 local Repository = PNC.SettlementRepository
 
+local function copyApproachCandidates(candidates)
+    if type(candidates) ~= "table" then return nil end
+    local output = {}
+    for index = 1, #candidates do
+        local candidate = candidates[index]
+        if type(candidate) == "table" then
+            output[#output + 1] = {
+                x = tonumber(candidate.x), y = tonumber(candidate.y),
+                z = tonumber(candidate.z),
+                seatAnchorX = tonumber(candidate.seatAnchorX),
+                seatAnchorY = tonumber(candidate.seatAnchorY),
+                seatAnchorZ = tonumber(candidate.seatAnchorZ),
+                interactionX = tonumber(candidate.interactionX),
+                interactionY = tonumber(candidate.interactionY),
+                interactionZ = tonumber(candidate.interactionZ),
+                interactionAxis = candidate.interactionAxis,
+                interactionFacing = candidate.interactionFacing,
+                approachKey = candidate.approachKey,
+                seatDirection = candidate.seatDirection
+                    or candidate.direction,
+                seatSide = candidate.seatSide or candidate.side,
+                validSpot = candidate.validSpot,
+                validationState = candidate.validationState,
+                rejectionReason = candidate.rejectionReason,
+                routeStatus = candidate.routeStatus,
+                stopDistance = tonumber(candidate.stopDistance),
+                arrivalDistance = tonumber(candidate.arrivalDistance),
+            }
+        end
+    end
+    return #output > 0 and output or nil
+end
+
 function Jobs.Start(record, facilityOrId, capability, options)
     options = type(options) == "table" and options or {}
     local facility = type(facilityOrId) == "table" and facilityOrId
@@ -53,6 +86,13 @@ function Jobs.Start(record, facilityOrId, capability, options)
     local resourceKind = options.resourceKind or acquired.resourceKind or ""
     local resourceKey = options.resourceKey or acquired.resourceKey or ""
     local resource = options.resource or acquired.resource
+    local seating = options.seating == true or target.seating == true
+        or resourceKind == "seating_surface"
+    local liveObject = resource and resource.object
+        or target.object or target.furnitureObject
+    local approachCandidates = copyApproachCandidates(
+        options.approachCandidates or acquired.approachCandidates
+            or acquired.targets)
     if resource and PNC.FacilityResources
         and PNC.FacilityResources.CopyDescriptor
     then
@@ -74,6 +114,11 @@ function Jobs.Start(record, facilityOrId, capability, options)
         sleepSurface = tostring(target.sleepSurface or ""),
         phase = "QUEUED",
         target = { x = target.x, y = target.y, z = target.z },
+        seatAnchor = target.seatAnchorX and {
+            x = tonumber(target.seatAnchorX),
+            y = tonumber(target.seatAnchorY),
+            z = tonumber(target.seatAnchorZ or target.z),
+        } or nil,
         previousOrder = previousOrder,
         debugHold = options.debugHold == true,
         debugForceWater = options.debugForceWater == true,
@@ -84,12 +129,35 @@ function Jobs.Start(record, facilityOrId, capability, options)
         abstract = options.abstract == true,
         resourceKind = tostring(resourceKind),
         resourceKey = tostring(resourceKey),
+        seating = seating,
+        seatDirection = tostring(target.seatDirection or ""),
+        seatSide = tostring(target.seatSide or ""),
+        approachKey = tostring(target.approachKey or ""),
+        validSpot = target.validSpot ~= false,
+        seatValidation = tostring(target.validationState or ""),
+        seatRejectionReason = tostring(target.rejectionReason or ""),
+        seatRouteStatus = tostring(target.routeStatus or "UNTESTED"),
+        seatStopDistance = tonumber(target.stopDistance) or 0.10,
+        seatArrivalDistance = tonumber(target.arrivalDistance) or 0.14,
+        campActivity = options.campActivity == true,
+        campId = tostring(options.campId or ""),
+        campX = tonumber(options.campX or acquired.campX),
+        campY = tonumber(options.campY or acquired.campY),
+        campZ = tonumber(options.campZ or acquired.campZ),
+        campRadius = tonumber(options.campRadius or acquired.campRadius),
+        resourceRadius = tonumber(
+            options.resourceRadius or acquired.resourceRadius),
         activityItemFullType = activityItemFullType,
         resource = resource,
-        approachCandidates = options.approachCandidates or acquired.approachCandidates,
+        approachCandidates = approachCandidates,
         approachIndex = 1,
         failedApproaches = {},
     }
+    if seating and live and liveObject and PNC.SeatingRuntime
+        and PNC.SeatingRuntime.LiveObjects
+    then
+        PNC.SeatingRuntime.LiveObjects[tostring(record.id)] = liveObject
+    end
     if options.debugHold == true then
         record.runtime.facilityDebugWork = record.runtime.facilityActivity
     end
@@ -102,18 +170,39 @@ function Jobs.Start(record, facilityOrId, capability, options)
         componentRole = acquired.role or "",
         reservationId = acquired.reservationId,
         x = target.x, y = target.y, z = target.z,
+        seatAnchorX = target.seatAnchorX,
+        seatAnchorY = target.seatAnchorY,
+        seatAnchorZ = target.seatAnchorZ,
         interactionX = target.interactionX,
         interactionY = target.interactionY,
         interactionZ = target.interactionZ,
         interactionSurfaceOffset = target.interactionSurfaceOffset,
         interactionAxis = target.interactionAxis,
         interactionFacing = target.interactionFacing,
+        approachKey = target.approachKey,
+        seatDirection = target.seatDirection,
+        seatSide = target.seatSide,
+        validSpot = target.validSpot,
+        validationState = target.validationState,
+        rejectionReason = target.rejectionReason,
+        routeStatus = target.routeStatus,
+        stopDistance = target.stopDistance,
+        arrivalDistance = target.arrivalDistance,
+        seating = seating,
         sceneId = sceneId,
         sleepSurface = target.sleepSurface,
         taskLeaseId = tostring(options.taskLeaseId or ""),
         debugHold = options.debugHold == true,
         resourceKind = tostring(resourceKind),
         resourceKey = tostring(resourceKey),
+        campActivity = options.campActivity == true,
+        campId = tostring(options.campId or ""),
+        campX = tonumber(options.campX or acquired.campX),
+        campY = tonumber(options.campY or acquired.campY),
+        campZ = tonumber(options.campZ or acquired.campZ),
+        campRadius = tonumber(options.campRadius or acquired.campRadius),
+        resourceRadius = tonumber(
+            options.resourceRadius or acquired.resourceRadius),
         activityItemFullType = activityItemFullType,
     })
     return true, "facility_activity_started", {

@@ -102,8 +102,10 @@ function H.ExternalCurrent(record)
     local kind = tostring(record and record.orderSpec
         and record.orderSpec.kind or "")
     local followKind = tostring(PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
+    local campKind = tostring(PNC.Const and PNC.Const.ORDER_CAMP or "camp")
     if kind ~= "" and kind ~= "colony_home"
         and kind ~= followKind
+        and kind ~= campKind
         and kind ~= tostring(PNC.Const and PNC.Const.ORDER_GUARD or "guard")
         and kind ~= "facility_activity"
     then

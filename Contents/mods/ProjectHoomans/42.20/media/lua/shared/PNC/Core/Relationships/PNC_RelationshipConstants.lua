@@ -8,6 +8,10 @@ local Constants = PNC.RelationshipConstants
 Constants.SOCIAL_SCHEMA_VERSION = 3
 Constants.MEMORY_LIMIT = 20
 Constants.RECENT_EVENT_ID_LIMIT = 64
+-- The interaction diary is presentation history attached to the same
+-- directed relationship record. Keep it bounded so a long-running world
+-- cannot grow an unbounded per-player NPC payload.
+Constants.INTERACTION_JOURNAL_LIMIT = 80
 
 Constants.APPROVAL_MIN = -100
 Constants.APPROVAL_MAX = 100

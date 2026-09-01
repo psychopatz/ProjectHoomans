@@ -13,11 +13,36 @@ function Routes.IsFollowing(record)
         PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
 end
 
--- Nearby-world needs are intentionally opt-in for residents. Followers may
--- use a local source while away from the settlement; a resident must use a
--- home facility or its personal supply instead of walking out of the base.
+function Routes.IsCamped(record)
+    local order = record and record.orderSpec or {}
+    return tostring(order.kind or "") == tostring(
+        PNC.Const and PNC.Const.ORDER_CAMP or "camp")
+end
+
+local function hasActiveCampActivity(record)
+    local order = record and record.orderSpec or nil
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    return tostring(order and order.kind or "") == "facility_activity"
+        and activity ~= nil and activity.campActivity == true
+end
+
+function Routes.IsCampContext(record)
+    return Routes.IsCamped(record) or hasActiveCampActivity(record)
+end
+
+-- Shared eligibility seam for needs that are allowed to use temporary,
+-- world-local resources. New camp activities should use this predicate rather
+-- than duplicating order-kind checks in each route.
+function Routes.IsAwayCompanion(record)
+    return Routes.IsFollowing(record) or Routes.IsCampContext(record)
+end
+
+-- Nearby-world needs are intentionally opt-in for residents. Followers and
+-- camped companions may use a local source while away from the settlement; a
+-- resident must use a home facility or its personal supply instead.
 function Routes.IsNearbyWaterAllowed(record)
-    if Routes.IsFollowing(record) then return true end
+    if Routes.IsAwayCompanion(record) then return true end
     local runtime = record and record.runtime or {}
     return runtime.allowNearbyWater == true
 end
@@ -25,7 +50,10 @@ end
 function Routes.IsCombatActive(record)
     local runtime = record and record.runtime or {}
     local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
-    return runtime.attackAction ~= nil or runtime.target ~= nil
+    local target = runtime.target
+    local combatTarget = type(target) == "table" and target.kind ~= nil
+    return runtime.attackAction ~= nil or runtime.combatTarget ~= nil
+        or combatTarget
         or now < (tonumber(runtime.inCombatUntil) or 0)
 end
 
@@ -102,16 +130,174 @@ local function waterSource(record, key)
     return nil, "NEARBY_WATER_UNAVAILABLE"
 end
 
+local function campSleep(record, options)
+    local service = PNC.CampResourceService
+    if not service or not service.AcquireSleep then
+        return nil, "CAMP_RESOURCES_UNAVAILABLE"
+    end
+    return service.AcquireSleep(record, options)
+end
+
+local function campWater(record, options)
+    local service = PNC.CampResourceService
+    if not service or not service.AcquireWater then
+        return nil, "CAMP_RESOURCES_UNAVAILABLE"
+    end
+    return service.AcquireWater(record, options)
+end
+
+local function liveBody(record)
+    return PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record.id) or nil
+end
+
+Routes.Register({
+    sourceRef = "camp_sleep",
+    needId = "sleep",
+    capability = "sleep",
+    IsAvailable = function(record)
+        return Routes.IsCamped(record)
+            and not Routes.IsCombatActive(record)
+            and PNC.CampResourceService ~= nil
+    end,
+    Validate = function(record)
+        if not Routes.IsCamped(record) then return false, "NOT_CAMPED" end
+        if Routes.IsCombatActive(record) then return false, "NPC_BUSY" end
+        if not PNC.CampResourceService then
+            return false, "CAMP_RESOURCES_UNAVAILABLE"
+        end
+        return true
+    end,
+    TaskSuffix = function(record)
+        local order = record and record.orderSpec or {}
+        return tostring(order.campId or record.id)
+            .. ":" .. tostring(record.id)
+    end,
+    Assign = function(record)
+        local live = PNC.Registry and PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(record.id) or nil
+        return campSleep(record, { abstract = live == nil })
+    end,
+    Start = function(record, lease, assignment)
+        if not Routes.IsCamped(record) then return false, "NOT_CAMPED" end
+        return PNC.FacilityJobs.Start(record, {
+            id = assignment.facilityId, baseId = "nearby",
+            definitionId = "camp",
+        }, "sleep", {
+            automatic = true, acquired = assignment,
+            resource = assignment.resource,
+            resourceKey = assignment.resourceKey,
+            resourceKind = assignment.resourceKind,
+            approachCandidates = assignment.approachCandidates,
+            taskLeaseId = lease.leaseId, nearby = true,
+            abstract = lease.executionMode == "ABSTRACT",
+            campActivity = true, campId = assignment.campId,
+            campX = assignment.campX,
+            campY = assignment.campY,
+            campZ = assignment.campZ,
+            campRadius = assignment.campRadius,
+            resourceRadius = assignment.resourceRadius,
+        })
+    end,
+    CanContinue = function(record)
+        return Routes.IsCampContext(record) and not Routes.IsCombatActive(record)
+    end,
+})
+
+Routes.Register({
+    sourceRef = "camp_water",
+    needId = "hydration",
+    capability = "water.nearby",
+    IsAvailable = function(record)
+        local live = liveBody(record)
+        return Routes.IsCamped(record)
+            and not Routes.IsCombatActive(record)
+            and not Routes.HasPersonalHydration(record)
+            and PNC.CampResourceService
+            and PNC.CampResourceService.FindWater
+            and PNC.CampResourceService.FindWater(record, {
+                abstract = live == nil,
+            }) ~= nil
+    end,
+    Validate = function(record)
+        local live = liveBody(record)
+        if not Routes.IsCampContext(record) then
+            return false, "NOT_CAMPED"
+        end
+        if Routes.IsCombatActive(record) then return false, "NPC_BUSY" end
+        if Routes.HasPersonalHydration(record) then
+            return false, "PERSONAL_HYDRATION_AVAILABLE"
+        end
+        if not PNC.CampResourceService
+            or not PNC.CampResourceService.FindWater
+        then
+            return false, "CAMP_RESOURCES_UNAVAILABLE"
+        end
+        local resource, _, _, _, reason = PNC.CampResourceService.FindWater(
+            record, { abstract = live == nil })
+        if not resource then return false, reason or "CAMP_WATER_UNAVAILABLE" end
+        return true
+    end,
+    TaskSuffix = function(record)
+        local live = liveBody(record)
+        local resource = PNC.CampResourceService.FindWater(record, {
+            abstract = live == nil,
+        })
+        local order = record and record.orderSpec or {}
+        return tostring(order.campId or "camp") .. ":"
+            .. tostring(resource and resource.resourceKey or "unknown")
+            .. ":" .. tostring(record.id)
+    end,
+    Assign = function(record)
+        local live = liveBody(record)
+        return campWater(record, { abstract = live == nil })
+    end,
+    Start = function(record, lease, assignment)
+        if not Routes.IsCampContext(record) then return false, "NOT_CAMPED" end
+        return PNC.FacilityJobs.Start(record, {
+            id = assignment.facilityId, baseId = "nearby",
+            definitionId = "camp",
+        }, "water.nearby", {
+            automatic = true, acquired = assignment,
+            resource = assignment.resource,
+            resourceKey = assignment.resourceKey,
+            resourceKind = assignment.resourceKind or "nearby_water",
+            approachCandidates = assignment.approachCandidates,
+            taskLeaseId = lease.leaseId, nearby = true,
+            abstract = lease.executionMode == "ABSTRACT",
+            campActivity = true, campId = assignment.campId,
+            campX = assignment.campX,
+            campY = assignment.campY,
+            campZ = assignment.campZ,
+            campRadius = assignment.campRadius,
+            resourceRadius = assignment.resourceRadius,
+        })
+    end,
+    CanContinue = function(record)
+        local live = liveBody(record)
+        return Routes.IsCampContext(record)
+            and not Routes.IsCombatActive(record)
+            and PNC.CampResourceService
+            and PNC.CampResourceService.FindWater
+            and PNC.CampResourceService.FindWater(record, {
+                abstract = live == nil,
+            }) ~= nil
+    end,
+})
+
 Routes.Register({
     sourceRef = "follower_food",
     needId = "hunger",
     capability = "survival.eat.inventory",
     IsAvailable = function(record)
-        return Routes.IsFollowing(record) and not Routes.IsCombatActive(record)
+        return Routes.IsAwayCompanion(record)
+            and not Routes.IsCombatActive(record)
             and Routes.HasPersonalFood(record)
     end,
     Validate = function(record)
-        if not Routes.IsFollowing(record) or Routes.IsCombatActive(record) then
+        if not Routes.IsAwayCompanion(record)
+            or Routes.IsCombatActive(record)
+        then
             return false, "FOLLOWER_NOT_FREE"
         end
         if not Routes.HasPersonalFood(record) then
@@ -135,6 +321,8 @@ Routes.Register({
         }
     end,
     Start = function(record, lease, assignment)
+        local order = record and record.orderSpec or {}
+        local camped = Routes.IsCamped(record)
         return PNC.FacilityJobs.Start(record, {
             id = assignment.facilityId, baseId = "nearby",
             definitionId = "follower_food",
@@ -143,10 +331,18 @@ Routes.Register({
             resourceKind = "personal_food",
             taskLeaseId = lease.leaseId, nearby = true,
             abstract = lease.executionMode == "ABSTRACT",
+            campActivity = camped,
+            campId = camped and order.campId or nil,
+            campX = camped and order.x or nil,
+            campY = camped and order.y or nil,
+            campZ = camped and order.z or nil,
+            campRadius = camped and order.radius or nil,
+            resourceRadius = camped and order.resourceRadius or nil,
         })
     end,
     CanContinue = function(record)
-        return Routes.IsFollowing(record) and not Routes.IsCombatActive(record)
+        return Routes.IsAwayCompanion(record)
+            and not Routes.IsCombatActive(record)
     end,
 })
 
@@ -155,7 +351,8 @@ Routes.Register({
     needId = "hydration",
     capability = "water.nearby",
     IsAvailable = function(record)
-        return Routes.IsNearbyWaterAllowed(record)
+        return not Routes.IsCampContext(record)
+            and Routes.IsNearbyWaterAllowed(record)
             and not Routes.IsCombatActive(record)
             and not Routes.HasPersonalHydration(record)
             and waterSource(record) ~= nil
@@ -166,6 +363,9 @@ Routes.Register({
             .. tostring(record.id)
     end,
     Validate = function(record)
+        if Routes.IsCampContext(record) then
+            return false, "CAMP_WATER_ROUTE_REQUIRED"
+        end
         if not Routes.IsNearbyWaterAllowed(record) then
             return false, "NEARBY_WATER_NOT_ALLOWED"
         end
@@ -197,6 +397,9 @@ Routes.Register({
         }
     end,
     Start = function(record, lease, assignment)
+        if Routes.IsCampContext(record) then
+            return false, "CAMP_WATER_ROUTE_REQUIRED"
+        end
         if not Routes.IsNearbyWaterAllowed(record) then
             return false, "NEARBY_WATER_NOT_ALLOWED"
         end
@@ -214,7 +417,8 @@ Routes.Register({
         })
     end,
     CanContinue = function(record, lease)
-        return Routes.IsNearbyWaterAllowed(record)
+        return not Routes.IsCampContext(record)
+            and Routes.IsNearbyWaterAllowed(record)
             and not Routes.IsCombatActive(record)
             and waterSource(record, lease.resourceKey) ~= nil
     end,

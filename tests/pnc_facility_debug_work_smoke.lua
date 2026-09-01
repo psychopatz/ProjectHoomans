@@ -131,6 +131,105 @@ T.equal(facing, "east", "bed sleeper follows furniture axis")
 T.equal(requestedScene, "facility.sleep.bed", "bed XML scene selected")
 T.equal(bedRecord.runtime.facilityActivity.sleepSurface, "bed",
     "runtime exposes selected sleep surface")
+
+local seatSat
+local seatSitting
+local seatObject = {
+    isFurnitureOccupied = function() return false end,
+    setSatChair = function(_, value) seatSat = value end,
+}
+local seatX, seatY, seatZ = 0, 0, 0
+local seatZombie = {
+    getX = function() return seatX end,
+    getY = function() return seatY end,
+    getZ = function() return seatZ end,
+    setSitOnFurnitureObject = function(_, value) seatObject.owner = value end,
+    setSitOnFurnitureDirection = function(_, value) seatObject.direction = value end,
+    setSittingOnFurniture = function(_, value) seatSitting = value end,
+    setIsResting = function(_, value) seatObject.resting = value end,
+    setBed = function(_, value) seatObject.bed = value end,
+    setVariable = function(_, key, value) seatObject[key] = value end,
+    clearVariable = function(_, key) seatObject[key] = nil end,
+    setForwardIsoDirection = function(_, value) facing = value end,
+}
+PNC.SeatingRuntime.LiveObjects["npc:chair"] = seatObject
+PNC.FacilityResources = {
+    BuildSeatSpots = function(character, object)
+        T.equal(character, seatZombie,
+            "live seat refresh evaluates against the current body")
+        T.equal(object, seatObject,
+            "live seat refresh evaluates against the reserved furniture")
+        return {
+            {
+                x = 10.25, y = 5.75, z = 0,
+                direction = "E", side = "Front",
+                approachKey = "E:Front", valid = true,
+            },
+            {
+                x = 10.25, y = 6.75, z = 0,
+                direction = "S", side = "Front",
+                approachKey = "S:Front", valid = true,
+            },
+        }
+    end,
+}
+local seatOrder = normalizer({}, {
+    capability = "living", facilityId = "home_a", resourceKey = "seat:a",
+    resourceKind = "seating_surface", seating = true,
+    x = 10.25, y = 5.75, z = 0, seatDirection = "E", seatSide = "Front",
+    approachKey = "E:Front", validSpot = true,
+})
+local seatRecord = {
+    id = "npc:chair", x = 0, y = 0, z = 0, orderSpec = seatOrder,
+    runtime = { facilityActivity = {
+        capability = "living", seating = true, resourceKind = "seating_surface",
+        resourceKey = "seat:a", resource = {}, seatDirection = "E",
+        seatSide = "Front", approachKey = "E:Front", validSpot = true,
+    } },
+}
+T.equal(handler(seatRecord, seatZombie, jobName, 0), true,
+    "chair seating keeps travelling until its exact anchor is reached")
+seatX, seatY, seatZ = 10.25, 5.75, 0
+seatRecord.x, seatRecord.y, seatRecord.z = seatX, seatY, seatZ
+T.equal(handler(seatRecord, seatZombie, jobName, 0), true,
+    "chair seating starts at the exact SeatingManager anchor")
+T.equal(positioned.x, 10.25, "chair seating snaps to the anchor x")
+T.equal(positioned.y, 5.75, "chair seating snaps to the anchor y")
+T.equal(seatSat, true, "chair is marked occupied while the NPC is seated")
+T.equal(seatSitting, true, "NPC receives the furniture sitting state")
+T.equal(requestedScene, "facility.living.sitFurniture",
+    "chair seating selects the dedicated furniture scene")
+T.equal(seatRecord.runtime.facilityActivity.phase, "STARTING",
+    "chair seating enters the scene startup phase")
+
+PNC.SeatingRuntime.LiveObjects["npc:chair-retry"] = seatObject
+local retryOrder = normalizer({}, {
+    capability = "living", facilityId = "home_a", resourceKey = "seat:a",
+    resourceKind = "seating_surface", seating = true,
+    x = 10.25, y = 5.75, z = 0, seatDirection = "E", seatSide = "Front",
+    approachKey = "E:Front", validSpot = true,
+})
+local retryRecord = {
+    id = "npc:chair-retry", x = 10.25, y = 5.75, z = 0,
+    orderSpec = retryOrder,
+    runtime = {
+        pathing = { phase = "blocked" },
+        facilityActivity = {
+            capability = "living", seating = true,
+            resourceKind = "seating_surface", resourceKey = "seat:a",
+            resource = {}, seatDirection = "E", seatSide = "Front",
+            approachKey = "E:Front", validSpot = true,
+        },
+    },
+}
+T.equal(handler(retryRecord, seatZombie, jobName, 0), true,
+    "blocked chair approach is retried")
+T.equal(retryRecord.orderSpec.approachKey, "S:Front",
+    "blocked chair approach advances to the next valid spot")
+T.equal(move.x, 10.25, "seat retry keeps the alternate approach x")
+T.equal(move.y, 6.75, "seat retry moves to the alternate approach y")
+T.truthy(retryRecord.runtime.facilityActivity.failedApproaches["E:Front"],
+    "blocked chair approach is remembered as failed")
 T.finish("pnc_facility_debug_work_smoke")
 
 T.finish("pnc_facility_debug_work_smoke")

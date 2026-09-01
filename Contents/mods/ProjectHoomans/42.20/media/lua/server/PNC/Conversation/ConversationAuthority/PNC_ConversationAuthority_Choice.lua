@@ -92,6 +92,21 @@ function Authority.HandleChoice(player, args)
         return false, "no_eligible_outcome"
     end
     context.outcomeID = outcome.id
+    context.interaction = {
+        kind = "conversation",
+        source = "conversation",
+        categoryID = block.category,
+        blockID = block.id,
+        nodeID = state.nodeID,
+        choiceID = choice.id,
+        outcomeID = outcome.id,
+        playerTextKey = choice.textKey,
+        npcTextKey = outcome.responseKey,
+        responseKey = outcome.responseKey,
+        at = context.worldAgeHours,
+        worldAgeHours = context.worldAgeHours,
+        applied = true,
+    }
     local relationshipBefore = relationshipCopy(context.relationship)
     local effectResults
     ok, reason = Rules.ValidateEffects(outcome.effects, context)

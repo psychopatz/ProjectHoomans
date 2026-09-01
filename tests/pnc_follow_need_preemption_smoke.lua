@@ -11,7 +11,11 @@ local record = {
     orderSpec = { kind = "follow" },
 }
 PNC = {
-    Const = { ORDER_FOLLOW = "follow", ORDER_GUARD = "guard" },
+    Const = {
+        ORDER_FOLLOW = "follow",
+        ORDER_CAMP = "camp",
+        ORDER_GUARD = "guard",
+    },
     Core = {
         Now = function() return 1000 end,
         GenerateID = function(prefix)
@@ -78,5 +82,15 @@ T.equal(starts, 1, "the drink task starts while the owner is stationary")
 T.equal(releaseCalls, 0,
     "follow preemption does not use the unrelated work-release path")
 T.truthy(Tasking.Queries.GetLease(record.id), "the need owns a task lease")
+
+local firstLease = Tasking.Queries.GetLease(record.id)
+T.truthy(firstLease and Leases.Release(firstLease.leaseId, "test_reset"),
+    "test reset released the first need lease")
+record.orderSpec = { kind = "camp" }
+local campOK = Tasking.Commands.Reevaluate(record.id, "CAMP_NEED_STATE_CHANGED")
+T.truthy(campOK, "a normal need can suspend passive camp anchoring")
+T.equal(starts, 2, "the drink task starts while the NPC is camped")
+T.equal(releaseCalls, 0,
+    "camp preemption does not use the unrelated work-release path")
 
 T.finish("pnc_follow_need_preemption_smoke")

@@ -79,10 +79,13 @@ local function onResetLua()
     ClientState.relationshipDebugAuthorized = false
     ClientState.relationshipDebugReason = nil
     ClientState.conversationRelationships = {}
+    ClientState.conversationRelationshipDiagnostics = {}
     ClientState.conversationHistory = {}
     ClientState.conversationDiary = {}
+    ClientState.conversationDiaryRevisions = {}
     ClientState.conversationDiaryRevision = 0
     ClientState.lastConversationDelta = nil
+    ClientState.lastConversationDeltas = {}
     if PNC.NameplateRelationshipFeedback
         and PNC.NameplateRelationshipFeedback.Reset
     then
@@ -97,6 +100,10 @@ local function onResetLua()
     ClientState.llmToolResults = {}
     ClientState.llmToolResultOrder = {}
     ClientState.llmReactionCapabilities = {}
+    ClientState.playerEmoteInteractionResults = {}
+    ClientState.playerEmoteInteractionResultOrder = {}
+    ClientState.socialGreetingResults = {}
+    ClientState.socialGreetingResultOrder = {}
     local context = PNC.HoomansLLM and PNC.HoomansLLM.Context
     if context and context.ResetTransientState then
         context.ResetTransientState()

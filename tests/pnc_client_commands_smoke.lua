@@ -148,6 +148,17 @@ T.equal(State.npcKnowledge.npc_direct.categories[1].descriptors[1].value,
     "Burton Gilmore", "single-player disclosure uses shared cache receiver")
 T.equal(knowledgeRefreshes, 2,
     "single-player disclosure refreshes active conversation")
+PNC.PlayerKnowledgeCommands.HandleDisclosure = function()
+    return { success = false, reason = "insufficient_familiarity" }
+end
+local denied, deniedReason = Client.RequestNPCKnowledgeTopic(
+    "npc_direct", "traits"
+)
+T.falsy(denied, "single-player disclosure propagates the authoritative gate")
+T.equal(deniedReason, "insufficient_familiarity",
+    "single-player disclosure returns the gate reason")
+T.equal(State.pendingDisclosure.npc_direct, nil,
+    "rejected local disclosure does not leave a stale pending request")
 
 PNC.Core.IsClientOnly = function() return true end
 getSpecificPlayer = function() return {} end

@@ -171,8 +171,18 @@ local function finishMaterialization(
     if position.activityTarget and PNC.FacilityResources
         and PNC.FacilityResources.ApplyMaterializationTarget
     then
-        PNC.FacilityResources.ApplyMaterializationTarget(
-            record, zombie, position.activityTarget)
+        local applied = false
+        if position.activityTarget.campResource
+            and PNC.CampResourceService
+            and PNC.CampResourceService.ApplyMaterializationTarget
+        then
+            applied = PNC.CampResourceService.ApplyMaterializationTarget(
+                record, zombie, position.activityTarget)
+        end
+        if not applied then
+            PNC.FacilityResources.ApplyMaterializationTarget(
+                record, zombie, position.activityTarget)
+        end
     end
     record.presenceState = Const.PRESENCE_LIVE
     Registry.RegisterLiveZombie(record, zombie)

@@ -33,6 +33,11 @@ local definitions = {
         set = setAIDebug,
     },
     {
+        id = "showCampDebug",
+        label = "UI_PNC_Settings_ShowCampDebug",
+        get = function() return currentFlag("showCampDebug", false) end,
+    },
+    {
         id = "showPathDebug",
         label = "UI_PNC_Settings_ShowPathDebug",
         get = function() return currentFlag("showPathDebug", false) end,
@@ -155,11 +160,11 @@ if ModOptions and not Settings.nativeRegistered then
     options:addTitle("UI_PNC_Settings_OverlaySection")
     local index
     for index = 1, #definitions do
-        if index == 7 then
+        if index == 8 then
             options:addSeparator()
             options:addTitle("UI_PNC_Settings_OverlayPartsSection")
         end
-        if index == 19 then
+        if index == 20 then
             options:addSeparator()
             options:addTitle("UI_PNC_Settings_LoggingSection")
         end

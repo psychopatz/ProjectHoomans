@@ -15,6 +15,7 @@ PsychopatzCore = {
                     { id = "projecthoomans.llm:social_react" },
                     { id = "projecthoomans.llm:ask_name" },
                     { id = "projecthoomans.llm:order_follow" },
+                    { id = "projecthoomans.llm:order_camp" },
                 },
             }
         end,
@@ -31,7 +32,14 @@ PNC = {
     Network = { ClientState = { playerContext = { characterUUID = "player-1" } } },
     CompanionCommands = {
         List = function()
-            return { { id = "follow", clientOnly = false } }
+            return {
+                { id = "follow", clientOnly = false },
+                {
+                    id = "camp",
+                    clientOnly = false,
+                    llmDescription = "Use when the player says stay here for now.",
+                },
+            }
         end,
     },
 }
@@ -53,12 +61,21 @@ local view = {
 }
 
 local context = Context.Build(view, "hello")
+T.load("ProjectHoomans", "shared", "PNC/Conversation/PNC_ConversationLLMTools.lua")
+local definition = PNC.ConversationLLMTools.BuildDefinition()
+local properties = definition["function"].parameters.properties
+T.equal(properties.subtype.enum[3], "sexual_advance",
+    "sexual subtype is exposed in the social tool schema")
+T.equal(properties.explicit.type, "boolean",
+    "explicit social metadata is exposed in the social tool schema")
 T.equal(context.available_tools, nil, "catalog mode avoids repeated full schemas")
 T.equal(context.tool_catalog_id, "catalog-1", "catalog ID missing")
-T.equal(#context.available_tool_ids, 3, "allowed tool IDs missing")
+T.equal(#context.available_tool_ids, 4, "allowed tool IDs missing")
 T.equal(context.available_tool_ids[2], "projecthoomans.llm:ask_name",
     "identity tool ID missing")
 T.equal(context.available_tool_ids[3], "projecthoomans.llm:order_follow",
     "command tool ID missing")
+T.equal(context.available_tool_ids[4], "projecthoomans.llm:order_camp",
+    "camp command tool ID missing")
 
 T.finish("pnc_hoomans_llm_tool_catalog_smoke")

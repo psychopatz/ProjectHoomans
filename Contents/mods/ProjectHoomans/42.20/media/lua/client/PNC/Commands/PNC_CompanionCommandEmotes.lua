@@ -11,6 +11,8 @@ PNC.CompanionCommandEmotes = PNC.CompanionCommandEmotes or {}
 local Emotes = PNC.CompanionCommandEmotes
 local Commands = PNC.CompanionCommands
 local Targets = PNC.CompanionTargetResolver
+local VanillaInteractions = PNC.VanillaEmoteInteractions
+local Core = PNC.Core
 local CLOSEST_MENU_KEY = "PNC_ClosestCompanionCommands"
 local GROUP_MENU_KEY = "PNC_GroupCompanionCommands"
 local CLOSEST_COMMAND_PREFIX = "PNC_ClosestCommand_"
@@ -254,6 +256,9 @@ function ISEmoteRadialMenu:emote(emote)
     local targets
     local sent = false
     local player
+    local vanillaDefinition
+    local socialRecipients
+    local socialContext
     if string.sub(emoteName, 1, string.len(CLOSEST_GROUP_PREFIX))
         == CLOSEST_GROUP_PREFIX
     then
@@ -279,6 +284,41 @@ function ISEmoteRadialMenu:emote(emote)
         )
         targets = self.PNCNearbyCompanions or {}
     else
+        vanillaDefinition = VanillaInteractions
+            and VanillaInteractions.Get(emoteName) or nil
+        if vanillaDefinition then
+            player = self.character
+                or getSpecificPlayer and getSpecificPlayer(self.playerNum or 0)
+                or nil
+            socialRecipients = Targets.ResolveRecipients(
+                player,
+                "nearby",
+                vanillaDefinition.radius,
+                Targets.SCOPE_SOCIAL
+            )
+            socialContext = {
+                origin = "vanilla_emote_radial",
+                requestID = Core.GenerateID
+                    and Core.GenerateID("emote") or tostring(Core.Now()),
+                targets = socialRecipients and socialRecipients.targets or {},
+            }
+            if socialContext.targets and #socialContext.targets > 0
+                and PNC.CompanionCommandPresentation
+                and PNC.CompanionCommandPresentation.ShowPlayerFlavor
+            then
+                PNC.CompanionCommandPresentation.ShowPlayerFlavor(
+                    player,
+                    vanillaDefinition.flavorID,
+                    socialContext
+                )
+            end
+            if PNC.Client and PNC.Client.ExecutePlayerEmoteInteraction then
+                PNC.Client.ExecutePlayerEmoteInteraction(
+                    vanillaDefinition.id,
+                    socialContext
+                )
+            end
+        end
         return originalEmote(self, emote)
     end
     definition = Commands and Commands.Get(commandID) or nil

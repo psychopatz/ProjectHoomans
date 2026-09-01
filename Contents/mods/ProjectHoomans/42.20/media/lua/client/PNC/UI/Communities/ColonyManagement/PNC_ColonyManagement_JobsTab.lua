@@ -94,6 +94,8 @@ function Jobs.BuildRows(context)
     local home = person.home or {}
     local homeState = tostring(home.state or "NO_BASE")
     local homeDetails = {
+        AT_CAMP = Shared.Tr("UI_PNC_Jobs_AtCampHelp",
+            "AT CAMP - temporary local activities are available; colony duties remain unavailable."),
         AT_HOME = Shared.Tr("UI_PNC_Jobs_AtHomeHelp",
             "IDLE - available for colony duties."),
         RETURNING_HOME = Shared.Tr("UI_PNC_Jobs_ReturningHomeHelp",
@@ -107,7 +109,7 @@ function Jobs.BuildRows(context)
         key = "home_state",
         label = Shared.Tr("UI_PNC_Jobs_HomeState", "HOME STATUS"),
         detail = homeDetails[homeState] or homeState,
-        colorName = homeState == "AT_HOME" and "success"
+        colorName = (homeState == "AT_HOME" or homeState == "AT_CAMP") and "success"
             or homeState == "RETURNING_HOME" and "warning" or "muted",
     }
     for _, definition in ipairs(DEFINITIONS) do

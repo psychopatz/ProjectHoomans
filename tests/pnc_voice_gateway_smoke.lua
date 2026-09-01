@@ -23,6 +23,9 @@ PsychopatzCore.Bridge = {
     end,
     RegisterCommand = function() return true end,
 }
+PsychopatzCore.Audio = {
+    IsPlayerSpeechEnabled = function() return false end,
+}
 getTimeInMillis = function() return 2000 end
 getGameTime = function()
     return { getWorldAgeHours = function() return 72 end }
@@ -49,5 +52,56 @@ Message.Publish(Message.New({
 T.equal(#packets, 1, "Hoomans adapter publishes NPC voice packet")
 T.equal(packets[1].packet.voice_binding.npc_uuid, "npc-one", "adapter binds NPC")
 T.equal(packets[1].packet.voice_binding.slot, "VoiceFemale:0", "adapter uses NPC profile")
+
+local player = {
+    isFemale = function() return true end,
+    getUsername = function() return "player-one" end,
+    getDescriptor = function()
+        return {
+            isFemale = function() return true end,
+            getVoicePrefix = function() return "VoiceFemale" end,
+            getVoiceType = function() return 2 end,
+            getVoicePitch = function() return 7.4 end,
+        }
+    end,
+}
+getSpecificPlayer = function() return player end
+
+Message.Publish(Message.New({
+    saveUUID = "voice-save",
+    conversationID = "voice-conversation",
+    sequence = 2,
+    speaker = "player",
+    speakerID = "unbound",
+    speakerName = "Player One",
+    speakerKind = "player",
+    playerUUID = "unbound",
+    npcUUID = "npc-one",
+    text = "I will speak now.",
+    worldAgeHours = 72,
+}))
+T.equal(#packets, 1, "player speech remains disabled by default")
+
+PsychopatzCore.Audio.IsPlayerSpeechEnabled = function() return true end
+Message.Publish(Message.New({
+    saveUUID = "voice-save",
+    conversationID = "voice-conversation",
+    sequence = 3,
+    speaker = "player",
+    speakerID = "unbound",
+    speakerName = "Player One",
+    speakerKind = "player",
+    playerUUID = "unbound",
+    npcUUID = "npc-one",
+    text = "I will speak now.",
+    worldAgeHours = 72,
+}))
+T.equal(#packets, 2, "enabled player speech publishes a voice packet")
+T.equal(packets[2].packet.speaker_kind, "player", "player kind is preserved")
+T.equal(packets[2].packet.speaker_id, "player-one", "player identity is preserved")
+T.equal(packets[2].packet.voice_binding.speaker_kind, "player", "player binding kind is preserved")
+T.equal(packets[2].packet.voice_binding.player_uuid, "player-one", "player binding identity is preserved")
+T.equal(packets[2].packet.voice_binding.slot, "VoiceFemale:2", "player descriptor selects voice slot")
+T.equal(packets[2].packet.voice_binding.pitch, 7, "player descriptor pitch is rounded safely")
 
 T.finish("pnc_voice_gateway_smoke")

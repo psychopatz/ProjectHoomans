@@ -196,6 +196,23 @@ function Math.ModifySocialEvent(
         breakdown.forgiveness = factor
     end
 
+    if eventType == "player_emote_insult" then
+        factor = 1.25 - profile.forgiveness * 0.50
+        effects.approvalEffect = scaleNegative(
+            effects.approvalEffect,
+            factor
+        )
+        effects.respectEffect = scaleNegative(
+            effects.respectEffect,
+            factor
+        )
+        effects.moraleEffect = scaleNegative(
+            effects.moraleEffect,
+            factor
+        )
+        breakdown.forgiveness = factor
+    end
+
     if profile.socialStyle == Constants.SOCIAL_FRIENDLY then
         effects.approvalEffect = scalePositive(
             effects.approvalEffect,

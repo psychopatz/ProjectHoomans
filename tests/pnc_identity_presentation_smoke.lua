@@ -30,6 +30,7 @@ PNC.Network.ClientState.npcKnowledge["npc-stranger"] = {
             descriptors = {
                 { descriptorID = "identity.name", value = "Morgan Reed", status = "confirmed" },
                 { descriptorID = "identity.archetype", value = "doctor", status = "confirmed" },
+                { descriptorID = "faction.identity", value = "ashwood", status = "confirmed" },
             },
         },
     },

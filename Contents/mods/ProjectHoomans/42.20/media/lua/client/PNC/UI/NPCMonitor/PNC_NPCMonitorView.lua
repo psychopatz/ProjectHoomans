@@ -142,6 +142,7 @@ function View.CreateChildren(window)
         { "audit", "UI_PNC_MonitorAuditBodies", "Audit Bodies", ISPNCNPCMonitor.onAudit, "warning" },
         { "refresh", "UI_PNC_MonitorRefresh", "Refresh", ISPNCNPCMonitor.onRefresh, "quiet" },
         { "overlay_ai", nil, overlayButtonTitle("ai"), ISPNCNPCMonitor.onOverlayType, "quiet", "ai" },
+        { "overlay_camp", nil, overlayButtonTitle("camp"), ISPNCNPCMonitor.onOverlayType, "quiet", "camp" },
         { "overlay_path", nil, overlayButtonTitle("path"), ISPNCNPCMonitor.onOverlayType, "quiet", "path" },
         { "overlay_combat", nil, overlayButtonTitle("combat"), ISPNCNPCMonitor.onOverlayType, "quiet", "combat" },
         { "overlay_animation", nil, overlayButtonTitle("animation"), ISPNCNPCMonitor.onOverlayType, "quiet", "animation" },

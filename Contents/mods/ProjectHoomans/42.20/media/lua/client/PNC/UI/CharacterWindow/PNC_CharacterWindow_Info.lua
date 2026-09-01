@@ -9,26 +9,33 @@ local Shared = PNC.CharacterWindowShared
 local Layout = PsychopatzCore.UI.Layout
 local IdentityPresentation = PNC.NPCIdentityPresentation
 
-local function traitText(snapshot)
-    local model = PNC.PlayerNeedsModel
-    local ids = model and model.GetActiveTraitIDs
-        and model.GetActiveTraitIDs(snapshot.vanillaTraits) or {}
+local function knowledgeSnapshot(npcID)
+    local state = PNC.Network and PNC.Network.ClientState or nil
+    return state and state.npcKnowledge and state.npcKnowledge[tostring(npcID)] or nil
+end
+
+local function traitText(npcID)
+    local knowledge = knowledgeSnapshot(npcID)
     local labels = {}
-    local index
-    for index = 1, #ids do
-        local key = model.GetTraitLabelKey(ids[index])
-        labels[#labels + 1] = Shared.Text(key, ids[index])
+    local known = false
+    for _, category in ipairs(knowledge and knowledge.categories or {}) do
+        for _, descriptor in ipairs(category.descriptors or {}) do
+            local presentation = descriptor.presentation or {}
+            if presentation.topicID == "traits" and descriptor.value ~= nil then
+                known = true
+                if descriptor.value == true then
+                    labels[#labels + 1] = Shared.Text(
+                        presentation.labelKey, presentation.traitID
+                    )
+                end
+            end
+        end
     end
-    local dynamics = PNC.ConditionStats
-    local dynamicIDs = dynamics and dynamics.GetActiveTraitIDs
-        and dynamics.GetActiveTraitIDs(snapshot.dynamicTraits) or {}
-    for index = 1, #dynamicIDs do
-        local key = dynamics.GetTraitLabelKey(dynamicIDs[index])
-        labels[#labels + 1] = Shared.Text(key, dynamicIDs[index])
-    end
+    if not known then return "Unknown" end
     if #labels == 0 then
         return Shared.Text("UI_PNC_Character_Traits_None", "None")
     end
+    table.sort(labels)
     return table.concat(labels, ", ")
 end
 
@@ -97,7 +104,7 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
     y = Shared.DrawLabelValue(
         view,
         Shared.Text("UI_PNC_Character_Traits", "Traits"),
-        traitText(resolved),
+        traitText(view.npcId),
         x, y, labelWidth
     )
     y = Shared.DrawLabelValue(view, "Status", resolved.aiState or resolved.activeBehavior or "Idle", x, y, labelWidth)

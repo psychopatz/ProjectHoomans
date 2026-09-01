@@ -30,6 +30,9 @@ Const.COMBAT_BLOCK_LOG_REPEAT_MS = 5000
 Const.GUARD_RADIUS = 3.0
 Const.GUARD_STOP_DISTANCE = 0.45
 Const.GUARD_ENGAGE_RADIUS = 3.0
+Const.CAMP_RADIUS = 3.0
+Const.CAMP_STOP_DISTANCE = 0.45
+Const.CAMP_ENGAGE_RADIUS = 3.0
 Const.FOLLOW_DISTANCE = 1.8
 Const.FOLLOW_WALK_DISTANCE = 4.0
 -- Followers walk with the group and reserve running for a genuine separation.
@@ -104,4 +107,3 @@ PNC = PNC or {}
 PNC.Const = PNC.Const or {}
 
 local Const = PNC.Const
-

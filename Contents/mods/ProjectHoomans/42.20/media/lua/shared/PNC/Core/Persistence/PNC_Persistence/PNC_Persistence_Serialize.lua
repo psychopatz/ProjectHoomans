@@ -124,6 +124,7 @@ function Persistence.SerializeRecord(record)
         },
         presenceState = record.alive == false and Const.PRESENCE_CORPSE or Const.PRESENCE_ABSTRACT,
         orderSpec = Internal.sanitizeOrderSpec(record.orderSpec, record),
+        campState = Internal.sanitizeCampState(record.campState, record),
         patrolPoints = Internal.serializePatrolPoints(record),
         patrolIndex = record.orderSpec
                 and tostring(record.orderSpec.kind or "")

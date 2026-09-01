@@ -32,7 +32,7 @@ local hasPersonalFood = true
 local hasPersonalHydration = false
 
 PNC = {
-    Const = { ORDER_FOLLOW = "follow" },
+    Const = { ORDER_FOLLOW = "follow", ORDER_CAMP = "camp" },
     NeedsDefinitions = { SUPPLY = {
         hunger = { trigger = 0.35, target = 0.10, resourceKind = "FOOD",
             priorityBase = 50 },
@@ -65,6 +65,12 @@ PNC = {
     HomeDutyService = {
         GetBase = function() return { id = "base" } end,
         IsAtHome = function() return atHome end,
+    },
+    CampResourceService = {
+        FindWater = function()
+            return { resourceKey = "camp:faucet" }, { x = 10.5, y = 12.5,
+                z = 0 }, {}, { kind = "faucet" }
+        end,
     },
     FacilityService = {
         ListByCapability = function(_, capability)
@@ -258,13 +264,31 @@ T.falsy(noFoodCandidate,
     "the task provider omits follower eating when no food is available")
 hasPersonalFood = true
 
+record.orderSpec = { kind = "camp" }
+record.needs.hunger = 0.65
+record.needs.thirst = 0.60
+local campCandidates = Triggers.GetCandidates(record.id)
+local campFood
+local campWater
+for _, candidate in ipairs(campCandidates) do
+    if candidate.sourceRef == "follower_food" then campFood = candidate end
+    if candidate.sourceRef == "camp_water" then campWater = candidate end
+end
+T.truthy(campFood, "camp uses the reusable personal-food route")
+T.truthy(campWater, "camp uses the captured Camp water route")
+local beforeSchedulerWake = dirty
+T.truthy(Triggers.WakeActionable(record),
+    "the generic needs wake finds an actionable Camp need")
+T.equal(dirty, beforeSchedulerWake + 1,
+    "the generic needs wake emits one coalesced task reevaluation")
+
 record.runtime.inCombatUntil = 2000
 PNC.Core = { Now = function() return 1000 end }
 T.falsy(Triggers.PreferFacility(record, "hunger"),
     "a recent combat lease blocks the follower eating task")
 record.runtime.inCombatUntil = nil
 
-record.runtime.target = { id = "zombie:target" }
+record.runtime.target = { id = "zombie:target", kind = "zombie" }
 local beforeCombatWater = supplyCalls
 T.falsy(Triggers.PreferFacility(record, "hydration"),
     "active combat does not schedule a nearby-water movement task")

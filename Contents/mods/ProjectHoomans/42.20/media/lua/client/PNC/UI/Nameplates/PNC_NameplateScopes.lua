@@ -24,6 +24,7 @@ local function debugEnabled(settings)
             or settings.showAnimationSceneDebug == true
             or settings.showFactionDebug == true
             or settings.showCommunityDebug == true
+            or settings.showCampDebug == true
     ) or false
 end
 

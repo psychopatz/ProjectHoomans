@@ -37,6 +37,23 @@ local function text(value)
     return value
 end
 
+local function socialSubtype(reaction, value)
+    if not Tools or not Tools.NormalizeSubtypeForReaction then
+        return nil
+    end
+    return Tools.NormalizeSubtypeForReaction(value, reaction)
+end
+
+local function buildReplyContext(reaction, subtype, accepted, reason)
+    return {
+        outcome = accepted == true and "accepted" or "rejected",
+        reaction = reaction,
+        subtype = subtype,
+        reason = tostring(reason or (accepted and "applied" or "rejected")),
+        authoritative = true,
+    }
+end
+
 local function worldAgeHours()
     local time = getGameTime and getGameTime() or nil
     return time and time.getWorldAgeHours
@@ -98,6 +115,10 @@ local function sendResult(player, result)
 end
 
 local function rejected(player, args, reason, details)
+    local reaction = Tools and Tools.NormalizeReaction
+        and Tools.NormalizeReaction(args.kind or args.reaction)
+        or text(args.kind or args.reaction)
+    local subtype = socialSubtype(reaction, args.subtype)
     local result = {
         requestID = text(args.requestID),
         callID = text(args.callID),
@@ -105,8 +126,16 @@ local function rejected(player, args, reason, details)
         tool = "social_react",
         accepted = false,
         reason = tostring(reason or "rejected"),
-        reaction = text(args.kind or args.reaction),
+        reaction = reaction,
         intensity = text(args.intensity),
+        subtype = subtype,
+        explicit = subtype == "sexual_advance",
+        replyContext = buildReplyContext(
+            reaction,
+            subtype,
+            false,
+            reason
+        ),
     }
     if type(details) == "table" then
         result.retryAfterWorldHours = details.retryAfterWorldHours
@@ -198,6 +227,7 @@ local function handle(player, args)
         and Tools.NormalizeReaction(args.kind or args.reaction) or nil
     local intensity = Tools and Tools.NormalizeIntensity
         and Tools.NormalizeIntensity(args.intensity) or "normal"
+    local subtype = socialSubtype(reaction, args.subtype)
     local record
     local lease
     local pendingRequest
@@ -278,6 +308,7 @@ local function handle(player, args)
         "npc=" .. npcID .. " request=" .. requestID
             .. " call=" .. callID .. " reaction=" .. tostring(reaction)
             .. " intensity=" .. tostring(intensity)
+            .. " subtype=" .. tostring(subtype or "")
             .. " target=" .. tostring(targetKey)
             .. " before_approval=" .. tostring(before.approval or 0)
             .. " before_respect=" .. tostring(before.respect or 0)
@@ -301,7 +332,7 @@ local function handle(player, args)
         availabilityDetails.capabilities = capabilities
         return rejected(player, args, availabilityReason, availabilityDetails)
     end
-    effect, reason = Tools.GetEffect(reaction, intensity)
+    effect, reason = Tools.GetEffect(reaction, intensity, subtype)
     if not effect then return rejected(player, args, reason) end
 
     cooldownType, cooldownUntil = Policy.CooldownMutation(reaction, at)
@@ -318,6 +349,17 @@ local function handle(player, args)
             worldAgeHours = at,
             cooldownType = cooldownType,
             cooldownUntil = cooldownUntil,
+            sourceSystem = "llm_social_reaction",
+            interaction = {
+                kind = "llm_social_reaction",
+                source = "llm_tool",
+                interactionType = effect.interactionType
+                    or effect.memoryType or effect.type,
+                reaction = reaction,
+                intensity = intensity,
+                subtype = subtype,
+                applied = true,
+            },
         }
     )
     if applied ~= true then
@@ -354,6 +396,14 @@ local function handle(player, args)
         reason = reason or "applied",
         reaction = reaction,
         intensity = intensity,
+        subtype = subtype,
+        explicit = subtype == "sexual_advance",
+        replyContext = buildReplyContext(
+            reaction,
+            subtype,
+            true,
+            reason or "applied"
+        ),
         relationship = relationshipSummary,
         relationshipBefore = relationshipBefore,
         relationshipAfter = relationshipAfter,
@@ -392,7 +442,14 @@ local function handle(player, args)
         Network.SendConversationRelationship(
             player,
             relationshipSummary,
-            "llm_social_reaction"
+            "llm_social_reaction",
+            {
+                source = "llm_tool",
+                eventID = result.eventID,
+                relationshipBefore = relationshipBefore,
+                relationshipAfter = relationshipAfter,
+                relationshipDelta = relationshipDelta,
+            }
         )
     end
     return result

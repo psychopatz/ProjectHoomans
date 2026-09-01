@@ -49,9 +49,9 @@ Definitions.Register("living", {
     activeJob = "LivingRoom",
     activityLabelKey = "UI_PNC_Activity_Relaxing",
     activityText = "Relaxing",
-    sceneId = "facility.living.sit",
+    sceneId = "facility.living.sitFurniture",
     role = "living.chair",
-    arrivalDistance = 0.85,
+    arrivalDistance = 0.14,
     activityLabel = "SITTING",
 })
 
@@ -59,9 +59,9 @@ Definitions.Register("recreation", {
     activeJob = "Recreation",
     activityLabelKey = "UI_PNC_Activity_Recreating",
     activityText = "Recreating",
-    sceneId = "facility.living.sit",
+    sceneId = "facility.living.sitFurniture",
     role = "living.chair",
-    arrivalDistance = 0.85,
+    arrivalDistance = 0.14,
     activityLabel = "RECREATING",
     needEffect = "recreation",
     boredomReliefPerGameHour = 36,

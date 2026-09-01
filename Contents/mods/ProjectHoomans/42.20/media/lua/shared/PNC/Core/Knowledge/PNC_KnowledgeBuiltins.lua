@@ -135,6 +135,29 @@ Providers.Register("pnc_skill", {
     end,
 })
 
+-- Stable character traits are knowledge facts, not live need/state values.
+-- A false value is intentional: after a direct disclosure it lets the UI
+-- distinguish a known "none" from a trait that is still unknown.
+Providers.Register("pnc_trait", {
+    GetValue = function(record, descriptor)
+        local presentation = descriptor and descriptor.presentation or {}
+        local traitID = presentation.traitID
+        local sourceKind = presentation.traitSource
+        local traits
+        if type(record) ~= "table" then return nil, "npc_not_found" end
+        if sourceKind == "dynamic" then
+            traits = PNC.ConditionStats and PNC.ConditionStats.NormalizeTraits
+                and PNC.ConditionStats.NormalizeTraits(record and record.dynamicTraits)
+                or {}
+        else
+            traits = PNC.PlayerNeedsModel and PNC.PlayerNeedsModel.GetTraits
+                and PNC.PlayerNeedsModel.GetTraits(record) or {}
+        end
+        if not traitID then return nil end
+        return traits[traitID] == true
+    end,
+})
+
 Providers.Register("pnc_faction", {
     GetValue = function(record)
         local factionID = record and record.affiliation and record.affiliation.factionID or nil
@@ -205,8 +228,33 @@ Descriptors.Register({
     id = "faction.identity", version = 1, category = "faction", providerID = "pnc_faction",
     resolverID = "direct_fact", valueType = "text_enum", privacy = "personal",
     discovery = personal, capabilities = { disclosable = true, decayable = false },
-    presentation = { topicID = "identity_name" },
+    presentation = { topicID = "faction" },
 })
+
+local function registerTraitDescriptors(definitions, sourceKind)
+    for _, trait in ipairs(definitions or {}) do
+        local traitID = tostring(trait.id or "")
+        if traitID ~= "" then
+            Descriptors.Register({
+                id = "trait." .. traitID, version = 1,
+                category = "personality", providerID = "pnc_trait",
+                resolverID = "direct_fact", valueType = "boolean",
+                privacy = "personal", discovery = personal,
+                capabilities = { disclosable = true, decayable = false },
+                presentation = {
+                    topicID = "traits", traitID = traitID,
+                    traitSource = sourceKind, labelKey = trait.labelKey,
+                },
+            })
+        end
+    end
+end
+
+registerTraitDescriptors(PNC.PlayerNeedsModel
+    and PNC.PlayerNeedsModel.GetTraitDefinitions
+    and PNC.PlayerNeedsModel.GetTraitDefinitions() or {}, "vanilla")
+registerTraitDescriptors(PNC.ConditionStats
+    and PNC.ConditionStats.TRAIT_DEFINITIONS or {}, "dynamic")
 
 for _, group in ipairs(PNC.SkillCatalog and PNC.SkillCatalog.GetGroups and PNC.SkillCatalog.GetGroups() or {}) do
     for _, skill in ipairs(group.skills or {}) do

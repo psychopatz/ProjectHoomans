@@ -47,6 +47,7 @@ function Authority.HandleRecruit(player, args)
     if requestID == "" then return false, "request_id_required" end
     if not ok or not lease then return reject(reason or "invalid_lease") end
     lease.processedConversationRequests = lease.processedConversationRequests or {}
+    local relationshipCommands = personalRelationshipCommands()
     if lease.processedConversationRequests[requestID] then
         return reject("replayed_request")
     end
@@ -76,7 +77,6 @@ function Authority.HandleRecruit(player, args)
         local after = before
         local delta = { approval = -2, respect = -1, familiarity = 0 }
         local appliedResult
-        local relationshipCommands = personalRelationshipCommands()
         if relationshipCommands
             and relationshipCommands.ApplyConversationEffect then
             local applied
@@ -89,6 +89,14 @@ function Authority.HandleRecruit(player, args)
                     choiceID = "recruit",
                     outcomeID = "rejected",
                     worldAgeHours = context.worldAgeHours,
+                    sourceSystem = "recruitment",
+                    interaction = {
+                        kind = "recruitment",
+                        source = "recruitment",
+                        interactionType = "recruitment_rejected",
+                        choiceID = "recruit",
+                        applied = true,
+                    },
                 }
             )
             if applied == true and appliedResult
@@ -107,6 +115,29 @@ function Authority.HandleRecruit(player, args)
         })
     end
     History.Commit(attemptID, attemptPolicy, context, result and result.route)
+    if relationshipCommands and relationshipCommands.RecordInteraction then
+        relationshipCommands.RecordInteraction(
+            record.id,
+            context.playerEntityKey,
+            {
+                eventID = "conversation:recruitment:" .. tostring(record.id)
+                    .. ":" .. requestID,
+                kind = "recruitment",
+                source = "recruitment",
+                interactionType = "recruitment_accepted",
+                choiceID = "recruit",
+                npcTextKey = recruitReplyKey(
+                    args.npcID,
+                    nil,
+                    result and result.route,
+                    context.worldAgeHours
+                ),
+                applied = true,
+                at = context.worldAgeHours,
+                worldAgeHours = context.worldAgeHours,
+            }
+        )
+    end
     local payload = {
         requestID = requestID,
         success = true,

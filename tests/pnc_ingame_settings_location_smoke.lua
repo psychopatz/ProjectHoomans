@@ -64,6 +64,8 @@ T.equal(createdName, "UI_PNC_Settings_Title",
     "native mod-options translated title")
 T.truthy(options:getOption("showAIDebug"),
     "AI overlay missing from native options")
+T.truthy(options:getOption("showCampDebug"),
+    "camp facility overlay missing from native options")
 T.truthy(options:getOption("debugShowAnimation"),
     "animation detail missing from native options")
 T.truthy(options:getOption("storageTransactionLogging"),

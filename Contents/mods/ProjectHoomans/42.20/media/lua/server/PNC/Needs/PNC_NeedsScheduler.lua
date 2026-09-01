@@ -69,9 +69,14 @@ function Scheduler.Pump(now)
                     PNC.NeedSupplyBridge.Evaluate(record)
                 end
                 if PNC.NeedFacilityTriggers then
-                    PNC.NeedFacilityTriggers.PreferFacility(record, "health")
-                    PNC.NeedFacilityTriggers.PreferFacility(
-                        record, "recreation")
+                    if PNC.NeedFacilityTriggers.WakeActionable then
+                        PNC.NeedFacilityTriggers.WakeActionable(record)
+                    else
+                        PNC.NeedFacilityTriggers.PreferFacility(
+                            record, "health")
+                        PNC.NeedFacilityTriggers.PreferFacility(
+                            record, "recreation")
+                    end
                 end
                 if profiling then Scheduler.Profile.individualUpdates = Scheduler.Profile.individualUpdates + 1 end
                 count = count + 1

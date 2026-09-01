@@ -5,15 +5,56 @@ local ClientState = PNC.Network.ClientState
 
 Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RELATIONSHIP,
     function(args)
+        args = type(args) == "table" and args or {}
         local summary = args.summary
+        local npcID
+        local delta
+        local before
+        local after
+        local source
+        local hasChangeMetadata
         if type(summary) ~= "table" or not summary.npcID then return end
+        npcID = tostring(summary.npcID)
+        delta = args.relationshipDelta or args.delta
+        before = args.relationshipBefore or args.before
+        after = args.relationshipAfter or args.after or summary
+        hasChangeMetadata = delta ~= nil
+            or before ~= nil
+            or args.source ~= nil
+            or args.eventID ~= nil
         ClientState.conversationRelationships =
             ClientState.conversationRelationships or {}
-        ClientState.conversationRelationships[tostring(summary.npcID)] = summary
+        ClientState.conversationRelationships[npcID] = summary
         ClientState.lastConversationRelationshipReceiveAt = Core.Now()
+        source = args.source or "relationship_network"
         local relationship = PNC.Conversation and PNC.Conversation.Relationship
         if relationship and relationship.ReceivePresentation then
-            relationship.ReceivePresentation(summary)
+            relationship.ReceivePresentation(
+                summary,
+                delta,
+                {
+                    source = source,
+                    eventID = args.eventID,
+                    revision = args.revision or summary.revision,
+                }
+            )
+        end
+        if hasChangeMetadata then
+            ClientState.lastConversationDelta = {
+                npcID = npcID,
+                source = source,
+                delta = delta,
+                before = before,
+                after = after,
+                effects = {
+                    eventID = args.eventID,
+                },
+                at = Core.Now(),
+            }
+            ClientState.lastConversationDeltas =
+                ClientState.lastConversationDeltas or {}
+            ClientState.lastConversationDeltas[npcID] =
+                ClientState.lastConversationDelta
         end
     end)
 
@@ -112,6 +153,27 @@ Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RELATIONSHIP,
             })
         end
     end)
+
+Internal.RegisterServerCommand(Const.CMD_PLAYER_EMOTE_INTERACTION_RESULT,
+    function(args)
+        if PNC.CompanionCommandPresentation
+            and PNC.CompanionCommandPresentation.HandlePlayerEmoteInteractionResult
+        then
+            PNC.CompanionCommandPresentation.HandlePlayerEmoteInteractionResult(
+                args or {}
+            )
+        end
+    end)
+
+if Const.CMD_SOCIAL_GREETING then
+    Internal.RegisterServerCommand(Const.CMD_SOCIAL_GREETING, function(args)
+        if PNC.CompanionCommandPresentation
+            and PNC.CompanionCommandPresentation.HandleSocialGreeting
+        then
+            PNC.CompanionCommandPresentation.HandleSocialGreeting(args or {})
+        end
+    end)
+end
 
 Internal.RegisterServerCommand(Const.CMD_MAP_COMMAND_RESULT, function(args)
     if PNC.MapCommands and PNC.MapCommands.HandleResult then

@@ -23,6 +23,7 @@ local buildVisualState = Parts.BuildVisualState
 local buildPathDebugState = Parts.BuildPathDebugState
 local buildCombatDebugState = Parts.BuildCombatDebugState
 local buildDetailedDebugState = Parts.BuildDetailedDebugState
+local buildSeatingDebugState = Parts.BuildSeatingDebugState
 local buildIdentityOwnershipSummary =
     Parts.BuildIdentityOwnershipSummary
 
@@ -202,6 +203,7 @@ function Network.BuildSnapshot(record)
             combat,
             firearmState
         ),
+        seatingDebug = buildSeatingDebugState(record),
         appearance = appearance and Core.DeepCopy(appearance) or nil,
         travel = buildTravelSummary(record, true),
         mapPresentation = buildMapPresentationSummary(record),
